@@ -1,196 +1,141 @@
-Return-Path: <netdev+bounces-25658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749407750A0
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:03:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FAAE7750B2
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:09:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5EE71C2102E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 02:03:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4CBE281996
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 02:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B5C62C;
-	Wed,  9 Aug 2023 02:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F90632;
+	Wed,  9 Aug 2023 02:08:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D6C376
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:02:58 +0000 (UTC)
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA9EF3;
-	Tue,  8 Aug 2023 19:02:57 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6bcac140aaaso4940205a34.2;
-        Tue, 08 Aug 2023 19:02:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691546576; x=1692151376;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Axs5IugcYQGA7KHD1wIEp1iCvcichKmuTF1YhYLpm2s=;
-        b=IPmEF+Oc+Ymen9pbBQ1kQ8m7nBbjb4gHbbg5mwwR0AmavHfv0v/afWFmI45rIrXeJR
-         mYt3a3r1MH9dHxkBqWc0bzKhcaYSbV8sjI0S4ED/COMmjNegeZ4K8tmKZVgASKIo8OMc
-         UPKjfVGLLhljpEreQ6YVWiuZy8feXQwC6Jy5jRU/k+n1Lhi+byJCviv/mHU4MgYZOz8E
-         QNIe19Tf7PN6pWRhEe1s/N/di1l1KD6IkaNCWTiOyS+MpdqX/pDMsvp1i1iDCdY/M2Ua
-         XJrfKnVE60cmSSWKz/qBt1E4weGTXXtmWmrQi8j0F2RlvGuG+G9k9ZlxlsztSAq6NsPA
-         oLNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691546576; x=1692151376;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Axs5IugcYQGA7KHD1wIEp1iCvcichKmuTF1YhYLpm2s=;
-        b=BvwsfhxEF+XA4eDMDGTi+Ui/ScSEIrcdovnlmVaDa59HxalzkZESrWerDZ2Mmi4Iwv
-         R/bfSEmlSbwZRj5IrmvmylGJzcVHfkM3LOVMR6RuygiPB2c5fCh//6BmlRzMKDVZ7Qm5
-         nKtvUMOx72cohlb63zUBEvE7YCOfGiaJik2wWNHr+frLvO8p1OHyoJ76+heFkUWCzrgP
-         iPq1kLMYgpU3UUHKKAZKw8P9Mng4FmpvTig6uvzNiAdoOg8+RkAcg99Umi+cA3U1G9fB
-         bDNh4Hguwo1bQ+qqWMq06i3Sxa4oeexXOcf9T/pFUYdO4EsOUlSifWCCVuOi5tyDVwWd
-         SlPg==
-X-Gm-Message-State: AOJu0Yx7HA2KZMk4+9fqxKGnnrovZHw1Kv1oWh5ehiq2ZcfQH2jJs0QJ
-	Wwrz2wU2lfO9YqR9Qzm0xWc=
-X-Google-Smtp-Source: AGHT+IHlgYgM84isX0Aajw5zqTgIYkCyQoIlFM65l9Iv7mC6XODNv+KRtcVU5ZT2+cB8K2U5tIwfAA==
-X-Received: by 2002:a05:6830:1e52:b0:6b9:f1d3:160 with SMTP id e18-20020a0568301e5200b006b9f1d30160mr1505440otj.11.1691546576354;
-        Tue, 08 Aug 2023 19:02:56 -0700 (PDT)
-Received: from localhost.localdomain ([198.211.45.220])
-        by smtp.googlemail.com with ESMTPSA id v19-20020aa78093000000b00672401787c6sm8726941pff.109.2023.08.08.19.02.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 19:02:55 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v3 1/1] net: stmmac: xgmac: RX queue routing configuration
-Date: Wed,  9 Aug 2023 10:02:38 +0800
-Message-Id: <20230809020238.1136732-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4592662C
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:08:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23BE4C433C8;
+	Wed,  9 Aug 2023 02:08:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691546935;
+	bh=PT0mLcVjBLrfgD4nTIjBAloiFkwt2JhnyC433VN+0e0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pm/0Pyxgq4ql4H3TDzjZgEtGPCtzew/xPp4jABQVvsVElGP9Y+hHqmigHpwjpJ6i9
+	 Qd6eLSBDUfj+MT3AkG0oSZTF7OhNl4NA3h/J3nKoCP/59dDxBPW5SgrUS5opBlU/iG
+	 GEv6btU5zvrDd/iYrwIia2oYwO8sw9d44LTI/HanCN5+CKaBZcF6vIou3f53AjzLJ4
+	 Tq4Jd7NZqsZtpPCzMZ8/7GhB58/CmVlp1gvoGSfGCoObvAOOPke1Wjr5YSZCdmrQXw
+	 3lHWxvRVUngba/+wTSPBeq8O8OFSX5rJK1Ie+dW/lVdFwpRs9Gb93yoBnAaOEboe/9
+	 VOca2UqVviUjA==
+Date: Tue, 8 Aug 2023 19:08:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <emil.s.tantilov@intel.com>, <jesse.brandeburg@intel.com>,
+ <sridhar.samudrala@intel.com>, <shiraz.saleem@intel.com>,
+ <sindhu.devale@intel.com>, <willemb@google.com>, <decot@google.com>,
+ <andrew@lunn.ch>, <leon@kernel.org>, <mst@redhat.com>,
+ <simon.horman@corigine.com>, <shannon.nelson@amd.com>,
+ <stephen@networkplumber.org>
+Subject: Re: [PATCH net-next v4 00/15][pull request] Introduce Intel IDPF
+ driver
+Message-ID: <20230808190853.3edc88f4@kernel.org>
+In-Reply-To: <e1beeb14-fbb5-216c-f661-2bb9a84ba724@intel.com>
+References: <20230808003416.3805142-1-anthony.l.nguyen@intel.com>
+	<20230808133234.78504bca@kernel.org>
+	<e1beeb14-fbb5-216c-f661-2bb9a84ba724@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit abe80fdc6ee6 ("net: stmmac: RX queue routing configuration")
-introduced RX queue routing to DWMAC4 core.
-This patch extend the support to XGMAC2 core.
+On Tue, 8 Aug 2023 17:35:27 -0700 Linga, Pavan Kumar wrote:
+> On 8/8/2023 1:32 PM, Jakub Kicinski wrote:
+> > On Mon,  7 Aug 2023 17:34:01 -0700 Tony Nguyen wrote:  
+> >> This patch series introduces the Intel Infrastructure Data Path Function
+> >> (IDPF) driver. It is used for both physical and virtual functions. Except
+> >> for some of the device operations the rest of the functionality is the
+> >> same for both PF and VF. IDPF uses virtchnl version2 opcodes and
+> >> structures defined in the virtchnl2 header file which helps the driver
+> >> to learn the capabilities and register offsets from the device
+> >> Control Plane (CP) instead of assuming the default values.  
+> > 
+> > Patches 4 and 10 add kdoc warnings, please fix those.
+> > And double check all the checkpatch warning about lines > 80 chars.  
+> 
+> Thanks for the feedback.
+> 
+> Will review the warnings regarding 80char limit. Are you wanting them 
+> all removed or is it okay to leave the ones that help readability?
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
-Changes in v3:
-  - Clean unused defines
+For some definition of helps readability, yes.
+I glanced at the warnings on one of the first patches and most of them
+were just comments.
 
-Changes in v2:
-  - Convert the shift ops to FIELD_PREP
----
- .../net/ethernet/stmicro/stmmac/dwxgmac2.h    | 12 +++++++
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 34 +++++++++++++++++--
- 2 files changed, 44 insertions(+), 2 deletions(-)
+>  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
+> 'csum_caps' not described in enum 'idpf_cap_field'
+>  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
+> 'seg_caps' not described in enum 'idpf_cap_field'
+>  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
+> 'rss_caps' not described in enum 'idpf_cap_field'
+>  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
+> 'hsplit_caps' not described in enum 'idpf_cap_field'
+>  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
+> 'rsc_caps' not described in enum 'idpf_cap_field'
+>  > drivers/net/ethernet/intel/idpf/idpf.h:123: warning: Enum value   
+> 'other_caps' not described in enum 'idpf_cap_field'
+>  > drivers/net/ethernet/intel/idpf/idpf_txrx.h:153: warning: Function   
+> parameter or member 'DEFINE_DMA_UNMAP_ADDR(dma' not described in 
+> 'idpf_tx_buf'
+>  > drivers/net/ethernet/intel/idpf/idpf_txrx.h:153: warning: Function   
+> parameter or member 'DEFINE_DMA_UNMAP_LEN(len' not described in 
+> 'idpf_tx_buf'
+> 
+> /**
+>   * enum idpf_cap_field - Offsets into capabilities struct for specific caps
+>   * @IDPF_BASE_CAPS: generic base capabilities
+>   * @IDPF_CSUM_CAPS: checksum offload capabilities
+> ...
+>   */
+> enum idpf_cap_field {
+>           IDPF_BASE_CAPS          = -1,
+>           IDPF_CSUM_CAPS          = offsetof(struct virtchnl2_get_capabilities,
+>                                              csum_caps),
+>           IDPF_SEG_CAPS           = offsetof(struct
+> ...
+> }
+> 
+> 
+> /**
+>   * struct idpf_tx_buf
+>   * @next_to_watch: Next descriptor to clean
+>   * @skb: Pointer to the skb
+>   * @dma: DMA address
+>   * @len: DMA length
+> ...
+>   */
+> struct idpf_tx_buf {
+>          void *next_to_watch;
+>          struct sk_buff *skb;
+>          DEFINE_DMA_UNMAP_ADDR(dma);
+>          DEFINE_DMA_UNMAP_LEN(len);
+> ...
+> }
+> 
+> The script is parsing the offsetof() argument as part of the enum, which 
+> is not true. I believe it to be a false positive. Same for the second 
+> one where it parses 'DEFINE_DMA_UNMAP_ADDR(dma'. Is it okay to use 'dma' 
+> and 'len' in the kdoc header as-is or please suggest if you prefer 
+> something?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 1913385df685..5f931afab9aa 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -74,8 +74,20 @@
- #define XGMAC_RXQEN(x)			GENMASK((x) * 2 + 1, (x) * 2)
- #define XGMAC_RXQEN_SHIFT(x)		((x) * 2)
- #define XGMAC_RXQ_CTRL1			0x000000a4
-+#define XGMAC_AVCPQ			GENMASK(31, 28)
-+#define XGMAC_AVCPQ_SHIFT		28
-+#define XGMAC_PTPQ			GENMASK(27, 24)
-+#define XGMAC_PTPQ_SHIFT		24
-+#define XGMAC_TACPQE			BIT(23)
-+#define XGMAC_DCBCPQ			GENMASK(19, 16)
-+#define XGMAC_DCBCPQ_SHIFT		16
-+#define XGMAC_MCBCQEN			BIT(15)
-+#define XGMAC_MCBCQ			GENMASK(11, 8)
-+#define XGMAC_MCBCQ_SHIFT		8
- #define XGMAC_RQ			GENMASK(7, 4)
- #define XGMAC_RQ_SHIFT			4
-+#define XGMAC_UPQ			GENMASK(3, 0)
-+#define XGMAC_UPQ_SHIFT			0
- #define XGMAC_RXQ_CTRL2			0x000000a8
- #define XGMAC_RXQ_CTRL3			0x000000ac
- #define XGMAC_PSRQ(x)			GENMASK((x) * 8 + 7, (x) * 8)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index a0c2ef8bb0ac..38782662ff98 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -127,6 +127,36 @@ static void dwxgmac2_tx_queue_prio(struct mac_device_info *hw, u32 prio,
- 	writel(value, ioaddr + reg);
- }
- 
-+static void dwxgmac2_rx_queue_routing(struct mac_device_info *hw,
-+				      u8 packet, u32 queue)
-+{
-+	void __iomem *ioaddr = hw->pcsr;
-+	u32 value;
-+
-+	static const struct stmmac_rx_routing dwxgmac2_route_possibilities[] = {
-+		{ XGMAC_AVCPQ, XGMAC_AVCPQ_SHIFT },
-+		{ XGMAC_PTPQ, XGMAC_PTPQ_SHIFT },
-+		{ XGMAC_DCBCPQ, XGMAC_DCBCPQ_SHIFT },
-+		{ XGMAC_UPQ, XGMAC_UPQ_SHIFT },
-+		{ XGMAC_MCBCQ, XGMAC_MCBCQ_SHIFT },
-+	};
-+
-+	value = readl(ioaddr + XGMAC_RXQ_CTRL1);
-+
-+	/* routing configuration */
-+	value &= ~dwxgmac2_route_possibilities[packet - 1].reg_mask;
-+	value |= (queue << dwxgmac2_route_possibilities[packet - 1].reg_shift) &
-+		 dwxgmac2_route_possibilities[packet - 1].reg_mask;
-+
-+	/* some packets require extra ops */
-+	if (packet == PACKET_AVCPQ)
-+		value |= FIELD_PREP(XGMAC_TACPQE, 1);
-+	else if (packet == PACKET_MCBCQ)
-+		value |= FIELD_PREP(XGMAC_MCBCQEN, 1);
-+
-+	writel(value, ioaddr + XGMAC_RXQ_CTRL1);
-+}
-+
- static void dwxgmac2_prog_mtl_rx_algorithms(struct mac_device_info *hw,
- 					    u32 rx_alg)
- {
-@@ -1463,7 +1493,7 @@ const struct stmmac_ops dwxgmac210_ops = {
- 	.rx_queue_enable = dwxgmac2_rx_queue_enable,
- 	.rx_queue_prio = dwxgmac2_rx_queue_prio,
- 	.tx_queue_prio = dwxgmac2_tx_queue_prio,
--	.rx_queue_routing = NULL,
-+	.rx_queue_routing = dwxgmac2_rx_queue_routing,
- 	.prog_mtl_rx_algorithms = dwxgmac2_prog_mtl_rx_algorithms,
- 	.prog_mtl_tx_algorithms = dwxgmac2_prog_mtl_tx_algorithms,
- 	.set_mtl_tx_queue_weight = dwxgmac2_set_mtl_tx_queue_weight,
-@@ -1524,7 +1554,7 @@ const struct stmmac_ops dwxlgmac2_ops = {
- 	.rx_queue_enable = dwxlgmac2_rx_queue_enable,
- 	.rx_queue_prio = dwxgmac2_rx_queue_prio,
- 	.tx_queue_prio = dwxgmac2_tx_queue_prio,
--	.rx_queue_routing = NULL,
-+	.rx_queue_routing = dwxgmac2_rx_queue_routing,
- 	.prog_mtl_rx_algorithms = dwxgmac2_prog_mtl_rx_algorithms,
- 	.prog_mtl_tx_algorithms = dwxgmac2_prog_mtl_tx_algorithms,
- 	.set_mtl_tx_queue_weight = dwxgmac2_set_mtl_tx_queue_weight,
--- 
-2.34.1
-
+The parser is in scripts/kernel-doc, it's not very complicated.
+You can teach it new tricks.
 
