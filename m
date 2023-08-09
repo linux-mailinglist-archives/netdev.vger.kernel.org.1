@@ -1,139 +1,79 @@
-Return-Path: <netdev+bounces-26103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D7C776CB1
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 01:15:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63725776CD5
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 01:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D814C1C213CD
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:15:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F1E91C21357
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7E41E506;
-	Wed,  9 Aug 2023 23:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3B81E517;
+	Wed,  9 Aug 2023 23:31:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605921D2F0
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 23:15:22 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A44D1
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:15:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nhsyjxyXm6D1NvUK241dk4Pp+GVuES5XK5ThLEC8J2c=; b=fpc2Om5UFs8TL88bsh6qE2uNau
-	T/ZbEVY7PQMVariiPLNymlQCecdH3GgqNFljNJQKUMlstWSwfnChinNtpRCMvRhyf2Bv2t7rWO57/
-	q7sYWqLJDLehrs+P4robwyON2CdywCuwPRQNyNxljqyKDZiO3cs38HWHpdQIPSiHQAjLw7nFQ1AOk
-	bYWkzuaAOwdkhDYwc7EQ5JQM9vGrsVEKaP9kvmKQxjQxu7ImGwcghFHzJgeIVL8/qkANgYTzzgYS+
-	qEWyjR5fQ/ghUy/bFV+3wXlCH2bLVlYV4CkoKGbSQcdGWM9KQjDldWn+2/4d3qbavT2Wed4t4HWJv
-	srlAY6+w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45046)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qTsOa-00038L-1N;
-	Thu, 10 Aug 2023 00:15:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qTsOY-0001AD-Pu; Thu, 10 Aug 2023 00:15:14 +0100
-Date: Thu, 10 Aug 2023 00:15:14 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek Vasut <marex@denx.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZNQeAl9KYme8iItv@shell.armlinux.org.uk>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
- <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD271DA30
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 23:31:20 +0000 (UTC)
+Received: from out-102.mta0.migadu.com (out-102.mta0.migadu.com [91.218.175.102])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C90EE
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:31:18 -0700 (PDT)
+Message-ID: <230ada70-82e4-5350-e3f1-48555670d775@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691623876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vyI/+M3aclhO4SaI1jQVYSbyKpxFmKu64ie+uj3JSYg=;
+	b=mZULxI1TCzzszwYB7huFZcwX2IjKJJPQk7k9fKO81c2OJ2JJ+PylLg/YsD3dnqsHauMYSi
+	ieVzbqq65sdn+Q1C4KW39QLiGFbqYoOHgabQlIjsOL0fNJQ4tYi3bgDtYXv3NaeI0sWQLZ
+	LJnVPi0fP+eUSbyOuVop0aWOLB3qXAw=
+Date: Wed, 9 Aug 2023 16:31:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 21ef7b1e17d039053edaeaf41142423810572741
+Content-Language: en-US
+To: Tirthendu Sarkar <tirthendu.sarkar@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ kernel test robot <lkp@intel.com>
+References: <202308100207.to2feahW-lkp@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <202308100207.to2feahW-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 11:34:19PM +0200, Marek Vasut wrote:
-> On 8/9/23 15:40, Andrew Lunn wrote:
-> > > > Hm.. how about officially defining this PHY as the clock provider and disable
-> > > > PHY automatic hibernation as long as clock is acquired?
-> > > > 
-> > > Sorry, I don't know much about the clock provider/consumer, but I think there
-> > > will be more changes if we use clock provider/consume mechanism.
-> > 
-> > Less changes is not always best. What happens when a different PHY is
-> > used?
+On 8/9/23 11:29 AM, kernel test robot wrote:
+> Unverified Error/Warning (likely false positive, please contact us if interested):
 > 
-> Then the system wouldn't be affected by this AR803x specific behavior.
+> drivers/block/ublk_drv.c:445 ublk_setup_iod_zoned() warn: signedness bug returning '(-95)'
+> drivers/gpu/drm/tests/drm_exec_test.c:166 test_prepare_array() error: uninitialized symbol 'ret'.
+> drivers/input/touchscreen/iqs7211.c:1761 iqs7211_parse_cycles() error: buffer overflow 'cycle_alloc[0]' 2 <= 41
+> drivers/regulator/max77857-regulator.c:430:28: sparse: sparse: symbol 'max77857_id' was not declared. Should it be static?
+> drivers/soundwire/qcom.c:905:22-23: WARNING opportunity for min()
+> drivers/video/fbdev/core/fb_chrdev.c:239 do_fscreeninfo_to_user() warn: ignoring unreachable code.
+> kernel/workqueue.c:324:40: sparse: sparse: duplicate [noderef]
+> kernel/workqueue.c:324:40: sparse: sparse: multiple address spaces given: __percpu & __rcu
+> mm/khugepaged.c:2138 collapse_file() warn: variable dereferenced before check 'cc' (see line 1787)
+> net/xdp/xsk.c:696 xsk_build_skb() error: 'skb' dereferencing possible ERR_PTR()
 
-I don't think it is AR803x specific behaviour. I think it is an
-interesting stmmac behaviour, where it requires the clock from
-the PHY in order to do even the most trivial things (like reset
-itself.) That is a very interesting design decision.
-
-how does stmmac hardware complete a power-on reset if it needs
-the external clock from a PHY that itself might be in the process
-of powering itself up and establishing its clocks...
-
-There have been *hacks* to phylink requested over the years to
-work around this peculiar behaviour by stmmac - and it seems that
-it's not common behaviour.
-
-This kind of thing might affect Cadence's macb driver as well, but
-rather than it being a clock from the ethernet PHY, it seems to be
-from the serdes PHY built in to the SoC - if I understand what's
-reported in the proposed patch commit log (which I don't fully.)
-
-In the case of stmmac, I don't think it's fair to blame the AR803x.
-It's a hardware integration issue - the AR803x implementation which
-works fine elsewhere has a problem with the stmmac implementation,
-because design decisions made in both implementations end up being
-incompatible with each other.
-
-However, pair them with different implementations, and they're fine.
-
-Given that stmmac requires a clock from the PHY, I'm of the opinion
-that we need to have a way to tell phylib that "hey, this MAC must
-always have a receive clock from the PHY, please arrange for that
-to happen". AR803x needs to check that and arrange for the receive
-clock to always be output. phylib can also use that to ensure that
-when EEE mode is active in the PHY, clock-stop support is disabled...
-and that's actually a key part to getting EEE properly implemented.
-
-Clearly, the IEEE 802.3 folk catered for this issue when specifying
-EEE, where some MACs must always be fed a receive clock, and so I
-think phylib in Linux needs to recognise that this is A Thing that
-it should allow MACs to specify.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Maciej and Tirthendu, the report on xsk looks legit and may be related to commit 
+cf24f5a5feea ("xsk: add support for AF_XDP multi-buffer on Tx path"). Please 
+help to take a look. Thanks.
 
