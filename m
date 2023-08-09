@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-25756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3434F775594
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 10:39:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28FE077558B
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 10:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 652C31C2116D
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:39:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E722818B2
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D5817AD4;
-	Wed,  9 Aug 2023 08:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1FA19BBF;
+	Wed,  9 Aug 2023 08:30:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303211DA50
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72E34C43397;
-	Wed,  9 Aug 2023 08:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F79F1BB26
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:30:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A98B6C433C9;
+	Wed,  9 Aug 2023 08:30:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691569826;
-	bh=PONZ6KAAHDRUQddfGuS4AnIVYLmcjnGQRAKUNaKMi80=;
+	s=k20201202; t=1691569818;
+	bh=LRSwFv4pI3XWzbDZ/J9hIlPITjq11MH8a2xZRUVhncI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sgLPi2Y7XjmJG+eQZ3KRXQYcvMyEn6qiTFQTM/6n8fJmN/5VJthermeNZev01AgFI
-	 LpMNIHathD4DwXeRvWTgdtUSNJdhiPMgK8M+dZszL5qKFrDmS7tmJFYDoVv3BJU3ep
-	 sqEUMm5ZSNGrrVNFX+e0W3UCr6HaDJrTpZrpGVvhHMKtPlbHAV2AU653gfYnmNFxzl
-	 uuvbvyS0eQ12wPmHtBqo9ocrZBn5v23SDClxvQ9PsZa70jCuh4NXjYFbY/q5NhIVNz
-	 TPOdDUe3jMxzUVBWjDLPR1Dx3oeGCDxqeW8bKY+0Cvz3VTWH2cHvwe9NRgC9ShBkdU
-	 +dMx+UUY65f5g==
+	b=e+o+i1wgXDivrgYJw3UKSUbY1TposrHiCuh5lLxBDlrT7kLzkmQwFIrXynocla5Hg
+	 X8Qmi3wopgOr77hEI8EjULgzA8lcOeIxs/goV7EySR4CB+b3CEyiZweMyBzcbZl1TW
+	 wlWVcrh98arit6Hz8XYDgExQHs3IZew/yKi5QZUlWB3Wxsp4FkkG586iE2yS3N0reu
+	 dKc4x3FKGvCMHVn8Ps7ekYM/v9+S398Px7cmbG4B/hzh1Pc21FszHSkiXMG7PUeC3f
+	 6Ajx20TJ7Hs1p+eFeCjctOUPdGfWugWhrTR2Ial0KaI2z0Pmi053JsCW1jMY+URHZg
+	 j8VeeYILnIjtw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jason Gunthorpe <jgg@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>
@@ -44,9 +44,9 @@ Cc: Patrisious Haddad <phaddad@nvidia.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Raed Salem <raeds@nvidia.com>,
 	Saeed Mahameed <saeedm@nvidia.com>
-Subject: [PATCH mlx5-next v1 10/14] IB/core: Reorder GID delete code for RoCE
-Date: Wed,  9 Aug 2023 11:29:22 +0300
-Message-ID: <63c4d475bfde82ec6d81e20e612f5281da02ce07.1691569414.git.leon@kernel.org>
+Subject: [PATCH mlx5-next v1 11/14] net/mlx5: Configure MACsec steering for egress RoCEv2 traffic
+Date: Wed,  9 Aug 2023 11:29:23 +0300
+Message-ID: <184ad90a170f0a9c9eec4c8a0ec6419775ac4db5.1691569414.git.leon@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1691569414.git.leon@kernel.org>
 References: <cover.1691569414.git.leon@kernel.org>
@@ -60,41 +60,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Patrisious Haddad <phaddad@nvidia.com>
 
-Reorder GID delete code so that the driver del_gid operation is executed
-before nullifying the gid attribute ndev parameter, this allows drivers
-to access the ndev during their gid delete operation, which makes more
-sense since they had access to it during the gid addition operation.
+Add steering table in RDMA_TX domain, to forward MACsec traffic
+to MACsec crypto table in NIC domain.
+The tables are created in a lazy manner when the first TX SA is
+being created, and destroyed upon the destruction of the last SA.
 
 Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/infiniband/core/cache.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ .../mellanox/mlx5/core/lib/macsec_fs.c        | 46 ++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/infiniband/core/cache.c b/drivers/infiniband/core/cache.c
-index 2e91d8879326..73f913cbd146 100644
---- a/drivers/infiniband/core/cache.c
-+++ b/drivers/infiniband/core/cache.c
-@@ -400,6 +400,9 @@ static void del_gid(struct ib_device *ib_dev, u32 port,
- 		table->data_vec[ix] = NULL;
- 	write_unlock_irq(&table->rwlock);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
+index d39ca7c66542..15e7ea3ed79f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
+@@ -95,6 +95,8 @@ struct mlx5_macsec_tx {
+ 	struct ida tx_halloc;
  
-+	if (rdma_cap_roce_gid_table(ib_dev, port))
-+		ib_dev->ops.del_gid(&entry->attr, &entry->context);
+ 	struct mlx5_macsec_tables tables;
 +
- 	ndev_storage = entry->ndev_storage;
- 	if (ndev_storage) {
- 		entry->ndev_storage = NULL;
-@@ -407,9 +410,6 @@ static void del_gid(struct ib_device *ib_dev, u32 port,
- 		call_rcu(&ndev_storage->rcu_head, put_gid_ndev);
- 	}
++	struct mlx5_flow_table *ft_rdma_tx;
+ };
  
--	if (rdma_cap_roce_gid_table(ib_dev, port))
--		ib_dev->ops.del_gid(&entry->attr, &entry->context);
--
- 	put_gid_entry_locked(entry);
+ struct mlx5_macsec_rx_rule {
+@@ -173,6 +175,9 @@ static void macsec_fs_tx_destroy(struct mlx5_macsec_fs *macsec_fs)
+ 	struct mlx5_macsec_tx *tx_fs = macsec_fs->tx_fs;
+ 	struct mlx5_macsec_tables *tx_tables;
+ 
++	if (mlx5_is_macsec_roce_supported(macsec_fs->mdev))
++		mlx5_destroy_flow_table(tx_fs->ft_rdma_tx);
++
+ 	tx_tables = &tx_fs->tables;
+ 
+ 	/* Tx check table */
+@@ -301,6 +306,39 @@ static struct mlx5_flow_table
+ 	return fdb;
  }
  
++enum {
++	RDMA_TX_MACSEC_LEVEL = 0,
++};
++
++static int macsec_fs_tx_roce_create(struct mlx5_macsec_fs *macsec_fs)
++{
++	struct mlx5_macsec_tx *tx_fs = macsec_fs->tx_fs;
++	struct mlx5_core_dev *mdev = macsec_fs->mdev;
++	struct mlx5_flow_namespace *ns;
++	struct mlx5_flow_table *ft;
++	int err;
++
++	if (!mlx5_is_macsec_roce_supported(mdev)) {
++		mlx5_core_dbg(mdev, "Failed to init RoCE MACsec, capabilities not supported\n");
++		return 0;
++	}
++
++	ns = mlx5_get_flow_namespace(mdev, MLX5_FLOW_NAMESPACE_RDMA_TX_MACSEC);
++	if (!ns)
++		return -ENOMEM;
++
++	/* Tx RoCE crypto table  */
++	ft = macsec_fs_auto_group_table_create(ns, 0, RDMA_TX_MACSEC_LEVEL, CRYPTO_NUM_MAXSEC_FTE);
++	if (IS_ERR(ft)) {
++		err = PTR_ERR(ft);
++		mlx5_core_err(mdev, "Failed to create MACsec RoCE Tx crypto table err(%d)\n", err);
++		return err;
++	}
++	tx_fs->ft_rdma_tx = ft;
++
++	return 0;
++}
++
+ static int macsec_fs_tx_create(struct mlx5_macsec_fs *macsec_fs)
+ {
+ 	int inlen = MLX5_ST_SZ_BYTES(create_flow_group_in);
+@@ -443,7 +481,13 @@ static int macsec_fs_tx_create(struct mlx5_macsec_fs *macsec_fs)
+ 	}
+ 	tx_fs->check_rule = rule;
+ 
+-	goto out_flow_group;
++	err = macsec_fs_tx_roce_create(macsec_fs);
++	if (err)
++		goto err;
++
++	kvfree(flow_group_in);
++	kvfree(spec);
++	return 0;
+ 
+ err:
+ 	macsec_fs_tx_destroy(macsec_fs);
 -- 
 2.41.0
 
