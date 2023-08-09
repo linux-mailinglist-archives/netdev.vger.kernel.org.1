@@ -1,73 +1,74 @@
-Return-Path: <netdev+bounces-25962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FA27764AA
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:05:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B867764B1
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:09:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC7AA281D03
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:05:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 363BF2812D6
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E017E1BEF6;
-	Wed,  9 Aug 2023 16:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A9E1BF1B;
+	Wed,  9 Aug 2023 16:09:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48381AA83
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:05:53 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A513E2103;
-	Wed,  9 Aug 2023 09:05:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B522418AE4
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:09:01 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C532D2113;
+	Wed,  9 Aug 2023 09:09:00 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5A4A91F390;
-	Wed,  9 Aug 2023 16:05:51 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8C0A01F45E;
+	Wed,  9 Aug 2023 16:08:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1691597151; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1691597339; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kvmDSTIaCdq8N61OTz119nERnXMiJknpEuxA3UCZiDI=;
-	b=bcfatQtCYuUjWviw3S4UYIP6DEdvgv8Rf/eATZzlOX2Fy2JRHn4Ooj0LqKrtr+Nx3ceHvN
-	FxlgvIkQ/FJRJDKFXk6/RNefuJ4M0adGg4pdcpzjy/s9/NFwaBPrNlB/ZZN0Tkvu+A+lp3
-	RMBenB2HrgAeOC1LnPfeYKq7SX+0t4s=
+	bh=X2P0PdEHXJn16g+3yiKkWRHyzNKP9w9NMIFmjSewM/A=;
+	b=o945M/P89p11rlOWuOXRWr5LXC9vIGmlBN3cZHgcuirP+rB0x6BHYLjbnu0LC7eNSSI6EG
+	De5XjnYvSWx45OzkklMPHwfmxUG9E1ye2mgz2rVTZ2kumHn0FcgLME2GCYDyYJZ9x97pG8
+	rNpytZJnZYWVjEN1Kp/Snh49gwRuqnQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1691597151;
+	s=susede2_ed25519; t=1691597339;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kvmDSTIaCdq8N61OTz119nERnXMiJknpEuxA3UCZiDI=;
-	b=eyv81018VpTT+8NF3ZoW5Kuwr8nSJgVAGysPE9Zo2BLHAkN+XQGHck5gysUnW8lxCb4rMF
-	pyAoz3NdZMSfxpAQ==
+	bh=X2P0PdEHXJn16g+3yiKkWRHyzNKP9w9NMIFmjSewM/A=;
+	b=4wvCRsQCh1Yxmkbbpy00/vc78dfC2/mSKYjTTz4KeCExoiH4pnIIhF/LVC+heckrowlCPb
+	Pyv3fkraMlNNsRBw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1D4C0133B5;
-	Wed,  9 Aug 2023 16:05:51 +0000 (UTC)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5B4CC133B5;
+	Wed,  9 Aug 2023 16:08:59 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
 	by imap2.suse-dmz.suse.de with ESMTPSA
-	id pF6iBV+502Q+WwAAMHmgww
-	(envelope-from <tiwai@suse.de>); Wed, 09 Aug 2023 16:05:51 +0000
-Date: Wed, 09 Aug 2023 18:05:50 +0200
-Message-ID: <87wmy4ciap.wl-tiwai@suse.de>
+	id bKlkFRu602SZXAAAMHmgww
+	(envelope-from <tiwai@suse.de>); Wed, 09 Aug 2023 16:08:59 +0000
+Date: Wed, 09 Aug 2023 18:08:58 +0200
+Message-ID: <87v8doci5h.wl-tiwai@suse.de>
 From: Takashi Iwai <tiwai@suse.de>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Takashi Iwai <tiwai@suse.de>,
+Cc: Takashi Iwai <tiwai@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
 	linux-kernel@vger.kernel.org,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Mark Brown <broonie@kernel.org>,
 	netdev@vger.kernel.org
 Subject: Re: [PATCH RFC] Introduce uniptr_t as a generic "universal" pointer
-In-Reply-To: <CAHk-=wiyWOaPtOJ1PTdERswXV9m7W_UkPV-HE0kbpr48mbnrEA@mail.gmail.com>
+In-Reply-To: <CAHk-=wgGV61xrG=gO0=dXH64o2TDWWrXn1mx-CX885JZ7h84Og@mail.gmail.com>
 References: <87edkce118.wl-tiwai@suse.de>
 	<20230809143801.GA693@lst.de>
-	<CAHk-=wiyWOaPtOJ1PTdERswXV9m7W_UkPV-HE0kbpr48mbnrEA@mail.gmail.com>
+	<87a5v0e0mv.wl-tiwai@suse.de>
+	<CAHk-=wgGV61xrG=gO0=dXH64o2TDWWrXn1mx-CX885JZ7h84Og@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,71 +77,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 09 Aug 2023 17:48:11 +0200,
+On Wed, 09 Aug 2023 17:59:20 +0200,
 Linus Torvalds wrote:
 > 
-> On Wed, 9 Aug 2023 at 07:38, Christoph Hellwig <hch@lst.de> wrote:
+> On Wed, 9 Aug 2023 at 07:44, Takashi Iwai <tiwai@suse.de> wrote:
 > >
-> > The original set_fs removal series did that as uptr_t, and Linus
-> > hated it with passion.  I somehow doubt he's going to like it more now.
+> > The remaining question is whether the use of sockptr_t for other
+> > subsystems as a generic pointer is a recommended / acceptable move...
 > 
-> Christoph is right. I do hate this. The whole "pass a pointer that is
-> either user or kernel" concept is wrong.
+> Very much not recommended. sockptr_t is horrible too, but it was (part
+> of) what made it possible to fix an even worse horrible historical
+> mistake (ie getting rid of set_fs()).
 > 
-> Now, if it was some kind of extended pointer that also included the
-> length of the area and had a way to deal with updating the pointer
-> sanely, maybe that would be a different thing.
+> So I detest sockptr_t. It's garbage. At the very minimum it should
+> have had the length associated with it, not passed separately.
 > 
-> And it should guarantee that in the case of a user pointer it had gone
-> through access_ok().
+> But it's garbage exactly because it allowed for conversion of some
+> much much horrid legacy code with fairly minimal impact.
 > 
-> And it also allowed the other common cases like having a raw page
-> array, along with a unified interface to copy and update this kind of
-> pointer either as a source or a destination, that would be a different
-> thing.
+> New code does *not* have that excuse.
 > 
-> But this kind of "if (uniptr_is_kernel(src))" special case thing is
-> just garbage and *not* acceptable.
+> DO NOT MIX USER AND KERNEL POINTERS. And don't add interfaces that
+> think such mixing is ok. Pointers should be statically clearly of one
+> type or the other, and never lied about.
 > 
-> And oh, btw, we already *have* that extended kind of unipointer thing.
-> 
-> It's called "struct iov_iter".
-> 
-> And yes, it's a very complicated thing, exactly because it handles way
-> more cases than that uniptr_t. It's a *real* unified pointer of many
-> different types.
-> 
-> Those iov_iter things are often so complicated that you really don't
-> want to use them, but if you really want a uniptr, that is what you
-> should do. It comes with a real cost, but it does come with real
-> advantages, one of which is "this is extensively tested
-> nfrastructure".
+> Or you go all the way, and do that whole iterator thing, and make it
+> very clear that you're doing something truly generic that can be
+> passed fairly widely along across subsystem boundaries.
 
-Hmm.  In one side, I tend to agree that it can go wrong easily.
-
-OTOH, it simplifies the code well for us; as of now, we have two
-callbacks for copying PCM memory from/to the device, distinct for
-kernel and user pointers.  It's basically either copy_from_user() or
-memcpy() of the given size depending on the caller.  The sockptr_t or
-its variant would allow us to unify those to a single callback.
-
-Of course, we can create yet another local type that is just for the
-specific code -- or just (ab)use sockptr_t as is.  The fact is that it
-can simplify the code well, which in turn make more maintainable.
-
-Though, I have no strong opinion about this topic.  If you believe
-this kind of code is way too dangerous, fine, we can go with the
-current code.  OTOH, if the limited use is acceptable (as already seen
-with sockptr_t), we can either re-use it or have own one.
-
-(And yeah, iov_iter is there, but it's definitely overkill for the
-purpose.)
+OK, it looks like we need to scratch the idea...
 
 
 Takashi
