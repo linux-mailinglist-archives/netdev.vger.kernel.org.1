@@ -1,190 +1,106 @@
-Return-Path: <netdev+bounces-25984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA1C7765CF
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:59:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06227765D3
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63D981C213C3
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:59:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB38C281DDF
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1031DDE9;
-	Wed,  9 Aug 2023 16:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA661CA0D;
+	Wed,  9 Aug 2023 16:55:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507A518AE4
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:54:38 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A881BFE
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:54:37 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-564656d952aso84719a12.3
-        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 09:54:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FD119BA1
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:55:16 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09032108
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:55:14 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-99bdcade7fbso10999066b.1
+        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 09:55:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691600077; x=1692204877;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJoavCGKjXu9UnlxQ5IcBXvgyyUeMKP0A11XWYAQ1ew=;
-        b=kvSg/9Hek343JKZCf21rk4DCwQuEINE4swLbHVXptGH1QbLiEU81hPKASxUg7udt1x
-         2C7CQMXUfTSzdtNB5+uZ+PBzqH5cAL8wEPwYzssAE0/KHM/UQ8hetp31o21667mVymXg
-         BZQqV0K0IzD9L3BUrn3NR8dxoZxpkswXGxwsRe3lFKOPZyR4Gt38HUJHMSPRKrkbcvLy
-         FeYOEP1p5F61yz+spNhYnAwzWh0oFEh4rLEVja8VoWkcXpkPxBpzb6rPg2W+iEFh83Fm
-         py3M1GYi5IdrB+U8Hnjqsmq87Vwjnh550dwrYqIrw2UUXBhLUyfctBgi+hwQvD511pph
-         tzTw==
+        d=isovalent.com; s=google; t=1691600113; x=1692204913;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sEEzkpRk4R5ngJk0sdsY4jksrqnBMmsAjfH4cPZ0Ceo=;
+        b=LXifjXMjDkY+9vzyXyHF446KTFEVUBCGm6SxFbnjl7ZrDNlY8xnmabEJVxUW+ush49
+         KKTZgh4/nppv9HRYHadUjsFyw9RkxQOq/WYrOfj40CU1EJmV4qLnVT7Fpbp1G3xyg2fg
+         zVqg5l9IodUOMREAVjo0vXijlwzjHBQA0wc0IWOklIJ8xy95jxtpJkoZvFOJB1AhDlEE
+         8yQb/0zN3SLbB54vF7iBeSO7+HaQszGc6LK35twMKAIV0gwa+L4NPOQr+nfUGIkvZbpE
+         lTIBmsDwhaoOWEVeDVVn9FsSV6LTT5lELwKU13KV5VSCwyHi9BXIY5r0CWNQscVo3R7D
+         VHPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691600077; x=1692204877;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJoavCGKjXu9UnlxQ5IcBXvgyyUeMKP0A11XWYAQ1ew=;
-        b=Cs/AkhMBnijigqcwrsPeFJlztdWzi7AXvVe+8sAdtbmCOSnuEo89xYp2SIxhtubDvD
-         QBOdLRZDsDjUkxj5xMuEbms0DnMqklRBmKTRaFarPWP1ItGpKBKAphUBCguLdVD3xJho
-         3Eq/JoaSuxyalEmC6D5vIekAOfKfBBd5au7E17TiT33vAnx9IUP6NcKsvUCtpAbgK0+O
-         ydCTsAKE0kGzxH1wxHqoWKfzf7acxaFr6oSW7LQ1K+ykij2L1LoF2aONyCuw2gv3shP9
-         1MRpj+fWy5vc9E6ema3p421RlybTWMR37bk3/KEcOsNdowSOmsehUG9LXH+kc09ZVGPd
-         mVXw==
-X-Gm-Message-State: AOJu0Ywptf7uV+iN4LBXHyy4B/6SnSl2FkWGXnDlbGS28vlB7aHEvQSo
-	hxgpQaiieyaDyr+/SFy7PTUXR9k=
-X-Google-Smtp-Source: AGHT+IHkfEo/CuHLYJIBUJRCQ7P11C7kKQOtUR2S1XofX6DHMVaQijoivra6RCsunqQCuHo0nFrNLiM=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:3e07:0:b0:553:3ba2:f36 with SMTP id
- l7-20020a633e07000000b005533ba20f36mr331443pga.9.1691600077041; Wed, 09 Aug
- 2023 09:54:37 -0700 (PDT)
-Date: Wed,  9 Aug 2023 09:54:18 -0700
-In-Reply-To: <20230809165418.2831456-1-sdf@google.com>
+        d=1e100.net; s=20221208; t=1691600113; x=1692204913;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sEEzkpRk4R5ngJk0sdsY4jksrqnBMmsAjfH4cPZ0Ceo=;
+        b=GoodFtfC3gmYN/kyuIHIiJsN6Z+VD/SpNvzY1doMQt7Se9vNteGaSILZAIfhQFO1lo
+         K+JVuZNYHn85BG4gzDCU0ajxeyKeXXrftgN/OTuD2hPflLa5bwzglOSP3I2Rd9xCSdmL
+         lZt3+JNTEZKau+qgJcK0scqPIaAOR+WgLS5vIUFGgSVSmYFKkgIz+NvXqzh+HDGP3HWL
+         su0Ha3g4YSKPiI8EX3JGHezzgGdENAFkyt42thlqyu5rYg7w+JX3fmziv36mfnRpUe4N
+         2duyoDfL1QYP1uiU6r9maFsR/n7sSJAVzPmNwxpklCq6qMk9V8XZb1hbTslVbCR1slwo
+         f2wQ==
+X-Gm-Message-State: AOJu0YxsOirbZjfsLZ7vCdRrOgjfedwOTXoAdgHp4EUw3HBB/Sqz4xvQ
+	i40dgnKA8yiWsGDYwSBNsF+/VC8+ZElKd8uC7+tpYw==
+X-Google-Smtp-Source: AGHT+IF7dM2eXGn6dRXYNXBc36kPTeydH1cLQHZ69WdeM57HrUxewNW65BPbYowzY8vRF7JfnkGpiq0tLQV/ExDslXY=
+X-Received: by 2002:a17:907:78d9:b0:974:183a:54b6 with SMTP id
+ kv25-20020a17090778d900b00974183a54b6mr2328010ejc.33.1691600113512; Wed, 09
+ Aug 2023 09:55:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230809165418.2831456-1-sdf@google.com>
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230809165418.2831456-10-sdf@google.com>
-Subject: [PATCH bpf-next 9/9] xsk: document XDP_TX_METADATA_LEN layout
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	kuba@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
-	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
-	hawk@kernel.org, netdev@vger.kernel.org, xdp-hints@xdp-project.net
+MIME-Version: 1.0
+References: <CAN+4W8hMpL3+vNOrBBRw01tD6OxQ-Yy8OWpq9nRtiyjm0GgE4g@mail.gmail.com>
+ <20230809155538.67000-1-kuniyu@amazon.com>
+In-Reply-To: <20230809155538.67000-1-kuniyu@amazon.com>
+From: Lorenz Bauer <lmb@isovalent.com>
+Date: Wed, 9 Aug 2023 17:55:02 +0100
+Message-ID: <CAN+4W8h44UdLRT+QLdh2rNeiKg0AkPAuGtYuXOgtFzvT2kHsWg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] net: Fix slab-out-of-bounds in inet[6]_steal_sock
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martin.lau@kernel.org, martin.lau@linux.dev, memxor@gmail.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-- how to use
-- how to query features
-- pointers to the examples
+On Wed, Aug 9, 2023 at 4:56=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> > Things we could do if necessary:
+> > 1. Reset the flag in inet_csk_clone_lock like we do for SOCK_RCU_FREE
+>
+> I think we can't do this as sk_reuseport is inherited to twsk and used
+> in inet_bind_conflict().
 
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- Documentation/networking/index.rst           |  1 +
- Documentation/networking/xsk-tx-metadata.rst | 75 ++++++++++++++++++++
- 2 files changed, 76 insertions(+)
- create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+Ok, so what kind of state does reuseport carry in the various states then?
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 5b75c3f7a137..9b2accb48df7 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -123,6 +123,7 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
-    xfrm_sync
-    xfrm_sysctl
-    xdp-rx-metadata
-+   xsk-tx-metadata
- 
- .. only::  subproject and html
- 
-diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
-new file mode 100644
-index 000000000000..41600f08f794
---- /dev/null
-+++ b/Documentation/networking/xsk-tx-metadata.rst
-@@ -0,0 +1,75 @@
-+==================
-+AF_XDP TX Metadata
-+==================
-+
-+This document describes how to enable offloads when transmitting packets
-+via :doc:`af_xdp`. Refer to :doc:`xdp-rx-metadata` on how to access similar
-+metadata on the receive side.
-+
-+General Design
-+==============
-+
-+The headroom for the metadata is reserved via ``setsockopt(fd, SOL_XDP,
-+XDP_TX_METADATA_LEN, &len, 4)``. The metadata layout is a fixed UAPI,
-+refer to ``struct xsk_tx_metadata`` in ``include/uapi/linux/if_xdp.h``.
-+IOW, the ``len`` variable above should contain
-+``sizeof(struct xsk_tx_metadata)``.
-+
-+The headroom and the metadata itself should be located right before
-+``xdp_desc->addr`` in the umem frame. Within a frame, the metadata
-+layout is as follows::
-+
-+         XDP_TX_METADATA_LEN
-+     /                         \
-+    +-----------------+---------+----------------------------+
-+    | xsk_tx_metadata | padding |          payload           |
-+    +-----------------+---------+----------------------------+
-+                                ^
-+                                |
-+                          xdp_desc->addr
-+
-+An AF_XDP applications can request headrooms larger than ``sizeof(struct
-+xsk_tx_metadata)``. The kernel will ignore the padding (and will still
-+use ``xdp_desc->addr - XDP_TX_METADATA_LEN`` to locate
-+the ``xsk_tx_metadata``). The application is expected to zero-out
-+the metadata flags for the frames that shouldn't use any offloads.
-+
-+The flags field enables the particular offload:
-+
-+- ``XDP_TX_METADATA_TIMESTAMP``: requests the device to put transmission
-+  timestamp into ``tx_timestamp`` field of ``struct xsk_tx_metadata``.
-+- ``XDP_TX_METADATA_CHECKSUM``: requests the device to calculate L4
-+  checksum. ``csum_start`` specifies byte offset of there the checksumming
-+  should start and ``csum_offset`` specifies byte offset where the
-+  device should store the computed checksum.
-+- ``XDP_TX_METADATA_CHECKSUM_SW``: requests checksum calculation to
-+  be done in software; this mode works only in ``XSK_COPY`` mode and
-+  is mostly intended for testing. Do not enable this option, it
-+  will negatively affect performance.
-+
-+Besides the flags above, in order to trigger the offloads, the first
-+packet's ``struct xdp_desc`` descriptor should set ``XDP_TX_METADATA``
-+bit in the ``options`` field. Also not that in a multi-buffer packet
-+only the first chunk should carry the metadata.
-+
-+Querying Device Capabilities
-+============================
-+
-+Every devices exports its offloads capabilities via netlink netdev family.
-+Refer to ``xsk-flags`` features bitmask in
-+``Documentation/netlink/specs/netdev.yaml``.
-+
-+- ``tx-timestamp``: device supports ``XDP_TX_METADATA_TIMESTAMP``
-+- ``tx-checksum``: device supports ``XDP_TX_METADATA_CHECKSUM``
-+
-+Note that every devices supports ``XDP_TX_METADATA_CHECKSUM_SW`` when
-+running in ``XSK_COPY`` mode.
-+
-+See ``tools/net/ynl/samples/netdev.c`` on how to query this information.
-+
-+Example
-+=======
-+
-+See ``tools/testing/selftests/bpf/xdp_hw_metadata.c`` for an example
-+program that handles TX metadata. Also see https://github.com/fomichev/xskgen
-+for a more bare-bones example.
--- 
-2.41.0.640.ga95def55d0-goog
+TCP_LISTEN: sk_reuseport && sk_reuseport_cb
+TCP_ESTABLISHED: sk_reuseport && !sk_reuseport_cb
+TCP_TIME_WAIT: sk_reuseport && !sk_reuseport_cb
 
+Where is sk_reuseport_cb cleared? On clone? Or not at all?
+
+> > 2. Duplicate the cb check into inet[6]_steal_sock
+>
+> or 3. Add sk_fullsock() test ?
+
+I guess this would be in addition to the convoluted series of checks
+I've removed in this patch?
 
