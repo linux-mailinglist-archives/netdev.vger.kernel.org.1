@@ -1,138 +1,124 @@
-Return-Path: <netdev+bounces-25764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F62775605
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:01:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406C0775611
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:03:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 117AC281830
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 09:01:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F0C281A56
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 09:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E49D11CA5;
-	Wed,  9 Aug 2023 09:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F0111C97;
+	Wed,  9 Aug 2023 09:03:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6374411C81
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:01:09 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536CA1FCD
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:01:07 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1qTf3w-0001AB-Ib; Wed, 09 Aug 2023 11:01:04 +0200
-Received: from mfe by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1qTf3t-0007CX-0k; Wed, 09 Aug 2023 11:01:01 +0200
-Date: Wed, 9 Aug 2023 11:01:00 +0200
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Rob Herring <robh@kernel.org>
-Cc: kernel@pengutronix.de, devicetree@vger.kernel.org, conor+dt@kernel.org,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	alexandre.torgue@foss.st.com, linux-kernel@vger.kernel.org,
-	edumazet@google.com, joabreu@synopsys.com,
-	krzysztof.kozlowski+dt@linaro.org, peppe.cavallaro@st.com,
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v4 1/3] dt-bindings: net: snps,dwmac: add
- phy-supply support
-Message-ID: <20230809090100.pdtdidqk7mhvm4ks@pengutronix.de>
-References: <20230721110345.3925719-1-m.felsch@pengutronix.de>
- <20230721142433.GA1012219-robh@kernel.org>
- <20230724093953.h7vs6gzrpk3ieznv@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490B2613F
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:03:35 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 661D81FD8;
+	Wed,  9 Aug 2023 02:03:32 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8A1D360004;
+	Wed,  9 Aug 2023 09:03:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1691571809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TY7idmXtzOR/PC5YeEKZEVA/A054NNzndr9Zg5TyDl4=;
+	b=ge+WpLQZNVsCKJKDx/vwzWayO2FvINhQEq8GhHxjzdo/DfKr/2hRqOPfwtXMG8OMcE2Tg1
+	AuX7PyccTx+wm59x51mOX+H4WcElmKLObWyA00wdHHwvgRPhgPgBMYXerA3hiY8mXKze12
+	X36t7wJRAW8IiHBXp+3dXk0ICC64z2ip93xRDwAipHSE6vmMKhdtg5NqUGuHlZ+HrFiQdJ
+	BUX8OiUlC/1mUmXxDmuGGp6bTyAHV8x2FK8LT7dG8DmHpv4pEAvYc+SaD2s3qV0og9Djp0
+	RMU95gASBhcLH12b/T/WKziGHsTog8GaBVkmRIpbnqoLyDVBLUqmYOti9Hn9YQ==
+Message-ID: <44fde617-1159-4961-84c4-372fe265fbd8@arinc9.com>
+Date: Wed, 9 Aug 2023 12:03:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724093953.h7vs6gzrpk3ieznv@pengutronix.de>
-User-Agent: NeoMutt/20180716
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Subject: Re: [PATCH RESEND net-next 2/2] dt-bindings: net: dsa:
+ mediatek,mt7530: document MDIO-bus
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
+ <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
+ <dcb981b9-b435-c0e5-8e47-d66add207fdc@arinc9.com>
+ <20230808121707.chona7hakapp6whe@skbuf>
+Content-Language: en-US
+In-Reply-To: <20230808121707.chona7hakapp6whe@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rob,
+On 8.08.2023 15:17, Vladimir Oltean wrote:
+> On Sat, Aug 05, 2023 at 11:15:15PM +0300, Arınç ÜNAL wrote:
+>> I don't see a reason to resubmit this without addressing the requested
+>> change.
+>>
+>>>> Wouldn't we just skip the whole issue by documenting the need for defining all PHYs
+>>>> used on the switch when defining the MDIO bus?
+>>>
+>>> Good idea, please do that.
+>>
+>> https://lore.kernel.org/netdev/0f501bb6-18a0-1713-b08c-6ad244c022ec@arinc9.com/
+>>
+>> Arınç
+> 
+> Arınç, where do you see that comment being added? AFAIU, it is a
+> characteristic of the generic __of_mdiobus_register() code to set
+> mdio->phy_mask = ~0, and nothing specific to the mt7530.
 
-On 23-07-24, Marco Felsch wrote:
-> Hi Rob,
-> 
-> On 23-07-21, Rob Herring wrote:
-> > On Fri, Jul 21, 2023 at 01:03:43PM +0200, Marco Felsch wrote:
-> > > Document the common phy-supply property to be able to specify a phy
-> > > regulator.
-> > 
-> > What common property? I don't see any such property in 
-> > ethernet-controller.yaml.
-> 
-> Not in ethernet-controller.yaml but there are at least a few user of
-> this binding:
->  - allwinner,sun4i-a10-mdio.yaml
->  - allwinner,sun7i-a20-gmac.yaml
->  - allwinner,sun8i-a83t-emac.yaml
->  - fsl,fec.yaml
->  - rockchip-dwmac.yaml
->  - rockchip,emac.yaml
-> 
-> Also there is no <vendor>,phy-supply nor <ip-vendor>,phy-supply,
-> therefore I thought this is common.
+What I believe is specific to DSA is, 1:1 mapping of the port reg to the
+PHY reg on the mdio bus is disabled if the mdio bus is defined. Therefore,
+I believe a notice like below fits mediatek,mt7530.yaml.
 
-any further comments else I would like to gentle ping this series.
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+index e532c6b795f4..c59d58252cd5 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+@@ -128,6 +128,15 @@ properties:
+        See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
+        details for the regulator setup on these boards.
+  
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++    description:
++      Node for the internal MDIO bus connected to the embedded ethernet-PHYs.
++      For every port defined under the "^(ethernet-)?ports$" node, a PHY must be
++      defined under here and a phy-handle property must be defined under the
++      port node to point to the PHY node.
++
+    mediatek,mcm:
+      type: boolean
+      description:
 
-Regards,
-  Marco
-
-> > > Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
-> > > Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > > ---
-> > > Changelog:
-> > > v4:
-> > > - no changes
-> > > v3:
-> > > - no changes
-> > > v2
-> > > - add ack-by
-> > > 
-> > >  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > index ddf9522a5dc23..847ecb82b37ee 100644
-> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > @@ -160,6 +160,9 @@ properties:
-> > >        can be passive (no SW requirement), and requires that the MAC operate
-> > >        in a different mode than the PHY in order to function.
-> > >  
-> > > +  phy-supply:
-> > > +    description: PHY regulator
-> > 
-> > Is this for an serdes, sgmii, etc. type phy or ethernet phy? Either way, 
-> > this property belongs in the PHY's node because it is the PHY that has 
-> > supply connection. I'm guessing you put this here for the latter case 
-> > because ethernet PHYs on MDIO are "discoverable" except for the small 
-> > problem that powering them on is not discoverable. 
-> 
-> All kind of ethernet phys connected to you etherent MAC which need to be
-> power controlled by software. You're right this sould belong to the PHY
-> node (as Krzysztof already mentioned) but this isn't the case yet. As
-> you can see there are at least 6 user of the exact same binding.
-> 
-> Regards,
->   Marco
-> 
-> 
+Arınç
 
