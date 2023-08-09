@@ -1,193 +1,214 @@
-Return-Path: <netdev+bounces-25903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 351687761FB
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:03:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 963FA77621C
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1547281C0D
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:03:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2600F281C30
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252B819BAC;
-	Wed,  9 Aug 2023 14:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E590519BA9;
+	Wed,  9 Aug 2023 14:11:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7CE198B6
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:03:03 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0757C9F
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 07:03:02 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-68706d67ed9so4895679b3a.2
-        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 07:03:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691589781; x=1692194581;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WUyV0IQHJEvr40k2Rwcgkm93zaIwGC9loopJJhh7UqI=;
-        b=Wz+7joloyYO6Lw10Ia7K4c/M4KDyPgggc8E4K4ETfHouaevawkZUnA/8thu90SItz8
-         qH8wKMNutCKUi7b4d0+bXxd8scoCYOhpkpWS3TUAHT1N2HGPOqZa8oPJJMQ3E+auMcdp
-         v54brqU9OK4v2LBR8lZHfP3q3bg5z5DNrPjXa2ajgLHb8YAUC5kLmFfjGr4Bfeeyp6sg
-         +t5HrL9VpOF4baGiACE4wE3A1FOjsAmxogliZBUrGP+dsGrCHiwovxelkPzlwyGCIHYm
-         ApBXd+e7Q4+HscuOL/HNNujb4FaZ0laakRfWnbHlv8KnymKcVG43AkyNwHl+bHGpMLux
-         uL4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691589781; x=1692194581;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WUyV0IQHJEvr40k2Rwcgkm93zaIwGC9loopJJhh7UqI=;
-        b=iWFHjzO+4aQg7LdKmoz5AMuqAT+G6Wa8mcrJuSUFVFTzLGGUSc8zsDJOAiT/VUHiPn
-         OKxU2W0uqZbNIU/W75+2erOHeH3qpXRH5TkG0njlX4wJfoIUygZMVdf/qRImujHpbTK+
-         EKTN8svFdja4CrqW2MgmouhRvWjCjLsoDFaoWNOMc0ljlvCoSGZpvThe1fXv0TN1gB7Y
-         dAdFOwiGskRih3zGgu2Kr4AyvitE4aFXi2QwkfkXXzdD62kg2ebH0GyFG2z/tTqk7l++
-         lbbBxtepL8ZdUqWFWtYEWMHZOy1JHAAHx7odJxmcakZuh2YwRvS8A0cdQ+tgh7gmR+Ye
-         74Gg==
-X-Gm-Message-State: AOJu0YxQ7T5TkD0mwgkjpgB49MrKKKdoaVYnJnKF1eLr6oetuWAJa87w
-	h8FoBj8ntMTwfUEp/2VYXfD76RMXrZ2e7A==
-X-Google-Smtp-Source: AGHT+IEhNg/IdhrH23CFqR76ZE6YsNlgpAd4OquSilzZaMBj1s9K+y6Hp4t/jnD3sUhY3duezaehVw==
-X-Received: by 2002:a05:6a00:2402:b0:687:4dd1:92f8 with SMTP id z2-20020a056a00240200b006874dd192f8mr2450147pfh.10.1691589780726;
-        Wed, 09 Aug 2023 07:03:00 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q25-20020a62ae19000000b0064aea45b040sm9935674pff.168.2023.08.09.07.02.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 07:03:00 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	David Ahern <dsahern@kernel.org>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Thomas Haller <thaller@redhat.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 2/2] ipv4/fib: send notify when delete source address routes
-Date: Wed,  9 Aug 2023 22:02:34 +0800
-Message-Id: <20230809140234.3879929-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230809140234.3879929-1-liuhangbin@gmail.com>
-References: <20230809140234.3879929-1-liuhangbin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9379612D
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:11:27 +0000 (UTC)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 070E11FD8;
+	Wed,  9 Aug 2023 07:11:25 -0700 (PDT)
+Received: from [192.168.151.20] ([84.160.50.47]) by mrelayeu.kundenserver.de
+ (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MUGRh-1qKDUW0amp-00RG1U; Wed, 09 Aug 2023 16:11:07 +0200
+Message-ID: <ac96309a-8d8d-4435-36e6-6d152eb31876@online.de>
+Date: Wed, 9 Aug 2023 16:11:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Content-Language: en-US
+To: Arend van Spriel <aspriel@gmail.com>, Franky Lin
+ <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>,
+ Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org,
+ brcm80211-dev-list.pdl@broadcom.com, SHA-cyfmac-dev-list@infineon.com,
+ netdev@vger.kernel.org
+From: Max Schulze <max.schulze@online.de>
+Subject: BCM43455: brcmf_notify_rssi / cfg80211_cqm_rssi_notify : Unable to
+ handle kernel NULL pointer dereference
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Provags-ID: V03:K1:uSXs/MXnNaTK03B2n2PJe8JSbpO0UIJJ8+AgMWhwViXGfptymJ6
+ r/rRvCQCB19Iv+nI7IxHy8HH0wBBUuYUnpFaLhpfokSkSG7+EGU/4KBQa1jZl7l2X3VuECC
+ HMvgAQnGRfHWuHa+6Z8khyc7Z7++lYotif6/agiwrMrGNc/mRmYZcwduPcOK2xolsnrgSGD
+ /4EGYUvUCx5bqqAB2oMEQ==
+UI-OutboundReport: notjunk:1;M01:P0:MunnY7ohMK0=;I7cgtBGt6IO+MRL2tmsBTSZ/K8m
+ iiT7L4udNfhhvO+sauSvOx2nweFtg3KI0t3ZIRmdbuUtdKRKtbk11hMNf1hkiiquZTXpwiODB
+ h1TAapVlHTTgGgZwL9bvfdZ8+kUeMm1Nwy23Z6dvqDTPgMLCtsBmz825k+AEfCqAOHmp4rMYV
+ 6VntCh0okRIOMYwkWlPJ8FOrmx5iILgzYk/aspmjBT5aQyr92YCtyB6cqgA3Y1AAWlh8C2UgE
+ RWGq8YZWySibv0jXujB2vGgxKDl66dCdX835XaQxLNQbFoDZ1+/f4xuT0cK99i9o2Dv38+rCD
+ uqFr2tT+0GhglDkt3il+NGCOe8sRbh9x6Clqr5KkUaYgnuqnbzEQgg8z81gIDibGQ9RCsHzYl
+ hxI/J5qk3ir3gLTTvr5RyaMVFbXOBq9oO86OrB5autCIQ3oMKo0QLTJfAT5GzS44pD4HijMHG
+ XOd53XcqF4fqLZq9LThR6PQpSd6fvLyxPlD6Qyc1DNYVSwvZtxKt7hCAG0j4WmXLlqOBBEq+4
+ 5mXrsteABt9cGrFjVeRTr/JuDbBpP8CjtGct4yYvSAsPSz71rdmMptNll3nmv4i7VTUXnaWev
+ JmmMiXUaeyoXY++TdczxgOAJKhznLzv5QVPW5IBbBzAOh136Ww39S/X2D9ZTY2pX1xEHaXkYD
+ 1Ib3sqpxhfIcpYpzF4ylKbZAdDTa1gkA+kZKk6fKoWJiYF8c+Q6G7wU9g1azXNPuTCxkoWJkU
+ yfDGZS5DW9EITzAKSDNM7v/rDSENMUDOVdZcz4QeowQQqMqElhLI15rrgveGeeKwq+uCKboTQ
+ goWNGOKirFQp6EFrYW/nYaoc7yhdDH6zvWry+h37hLTFh5w8hdFoi6RUK3kD+P2CF3X54KV3F
+ T94HviB4ALyFdEQ==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-After deleting an interface address in fib_del_ifaddr(), the function
-scans the fib_info list for stray entries and calls fib_flush() and
-fib_table_flush(). Then the stray entries will be deleted silently and no
-RTM_DELROUTE notification will be sent.
+Hello,
 
-This lack of notification can make routing daemons like NetworkManager,
-miss the routing changes. e.g.
+I have a recurring kernel crash with the wifi device driver on kernel 6.1.42 and 6.1.44 . Hardware is a raspberry pi cm4 on the original CM4IO Board. The wifi chip is soldered on. From the datasheet, the chip is a BCM43455/CYW43455.
 
-+ ip link add dummy1 type dummy
-+ ip link add dummy2 type dummy
-+ ip link set dummy1 up
-+ ip link set dummy2 up
-+ ip addr add 192.168.5.5/24 dev dummy1
-+ ip route add 7.7.7.0/24 dev dummy2 src 192.168.5.5
-+ ip -4 route
-7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
-192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
-+ ip monitor route
-+ ip addr del 192.168.5.5/24 dev dummy1
-Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
-Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
-Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
+This crash happens roughly every 60 hours on devices in the field, and I have observed it every ~30th reboot on my homelab.
 
-As Ido reminded, fib_table_flush() isn't only called when an address is
-deleted, but also when an interface is deleted or put down. The lack of
-notification in these cases is deliberate. And commit 7c6bb7d2faaf
-("net/ipv6: Add knob to skip DELROUTE message on device down") introduced
-a sysctl to make IPv6 behave like IPv4 in this regard. So we can't send
-the route delete notify blindly in fib_table_flush().
+It seems that it is related to disconnecting from a station right beforehand. Same on reboot, seems to be just after disconnection.
 
-To fix this issue, let's add a new bit in "struct fib_info" to track the
-deleted prefer source address routes, and only send notify for them.
+I am using wpa_supplicant and NetworkManager on userspace. Due to roaming problems, I am running the module with parameters
 
-After update:
-+ ip monitor route
-+ ip addr del 192.168.5.5/24 dev dummy1
-Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
-Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
-Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
-Deleted 7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
+options brcmfmac p2pon=0 debug=50180 roamoff=1
 
-Suggested-by: Thomas Haller <thaller@redhat.com>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-v2: Add a bit in fib_info to mark the deleted src route.
----
- include/net/ip_fib.h     | 3 ++-
- net/ipv4/fib_semantics.c | 1 +
- net/ipv4/fib_trie.c      | 4 ++++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+I am attaching a crash from the field today, because it has some output after the kernel trace.
 
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index a91f8a28689a..12dedfa4c9fd 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -153,7 +153,8 @@ struct fib_info {
- #define fib_advmss fib_metrics->metrics[RTAX_ADVMSS-1]
- 	int			fib_nhs;
- 	u8			fib_nh_is_v6:1,
--				nh_updated:1;
-+				nh_updated:1,
-+				pfsrc_removed:1;
- 	struct nexthop		*nh;
- 	struct rcu_head		rcu;
- 	struct fib_nh		fib_nh[];
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index ce1c10e408cf..6cd919b442a7 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -1884,6 +1884,7 @@ int fib_sync_down_addr(struct net_device *dev, __be32 local)
- 			continue;
- 		if (fi->fib_prefsrc == local) {
- 			fi->fib_flags |= RTNH_F_DEAD;
-+			fi->pfsrc_removed = 1;
- 			ret++;
- 		}
- 	}
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 74d403dbd2b4..9cadeeaaa93a 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -2026,6 +2026,7 @@ void fib_table_flush_external(struct fib_table *tb)
- int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
- {
- 	struct trie *t = (struct trie *)tb->tb_data;
-+	struct nl_info info = { .nl_net = net };
- 	struct key_vector *pn = t->kv;
- 	unsigned long cindex = 1;
- 	struct hlist_node *tmp;
-@@ -2088,6 +2089,9 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
- 
- 			fib_notify_alias_delete(net, n->key, &n->leaf, fa,
- 						NULL);
-+			if (fi->pfsrc_removed)
-+				rtmsg_fib(RTM_DELROUTE, htonl(n->key), fa,
-+					  KEYLENGTH - fa->fa_slen, tb->tb_id, &info, 0);
- 			hlist_del_rcu(&fa->fa_list);
- 			fib_release_info(fa->fa_info);
- 			alias_free_mem_rcu(fa);
--- 
-2.38.1
+Thanks,
+Max
+
+
+
+
+
+Aug 09 11:28:33 pch8i: brcmfmac: brcmf_cfg80211_get_station RSSI -66 dBm
+Aug 09 11:28:37 pch8i: brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=0000000088524b81
+Aug 09 11:28:37 pch8i: brcmfmac: brcmf_fweh_event_worker event RSSI (56) ifidx 0 bsscfg 0 addr 00:00:00:00:00:00
+Aug 09 11:28:37 pch8i: brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 0
+Aug 09 11:28:37 pch8i: brcmutil: event payload, len=12
+Aug 09 11:28:37 pch8i: 00000000: ff ff ff b6 00 00 00 00 ff ff ff ab          ............
+Aug 09 11:28:37 pch8i: brcmfmac: brcmf_notify_rssi LOW rssi=-74
+Aug 09 11:28:37 pch8i: brcmfmac: brcmf_cfg80211_get_station RSSI -74 dBm
+Aug 09 11:28:37 pch8i wpa_supplicant[391]: wlan0: CTRL-EVENT-SIGNAL-CHANGE above=0 signal=-74 noise=9999 txrate=24000
+[...to show normal behaviour...]
+
+Aug 09 11:28:57 pch8i: brcmfmac: brcmf_cfg80211_get_station RSSI -80 dBm
+Aug 09 11:29:03 pch8i: brcmfmac: brcmf_cfg80211_get_station RSSI -81 dBm
+Aug 09 11:29:07 pch8i wpa_supplicant[391]: wlan0: CTRL-EVENT-DISCONNECTED bssid=00:01:XX:XX:a1:70 reason=0 locally_generated=1
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=00000000203d6aae
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=00000000203d6aae
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_fweh_event_worker event LINK (16) ifidx 0 bsscfg 0 addr 00:01:XX:XX:a1:70
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 1
+Aug 09 11:29:07 pch8i: brcmutil: event payload, len=22
+Aug 09 11:29:07 pch8i: 00000000: 30 14 01 00 00 0f ac 04 01 00 00 0f ac 04 01 00  0...............
+Aug 09 11:29:07 pch8i: 00000010: 00 0f ac 02 00 00          ......
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_is_linkdown Processing link down
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_notify_connect_status Linkdown
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_link_down Call WLC_DISASSOC to stop excess roaming
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=00000000203d6aae
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_btcoex_set_mode DHCP session ends
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_fweh_event_worker event RSSI (56) ifidx 0 bsscfg 0 addr 00:00:00:00:00:00
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 0
+Aug 09 11:29:07 pch8i: brcmutil: event payload, len=12
+Aug 09 11:29:07 pch8i: 00000000: 00 00 00 00 00 00 00 00 00 00 00 00          ............
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_notify_rssi LOW rssi=0
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key key index (0)
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key key index (1)
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key key index (2)
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key key index (3)
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key key index (4)
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key key index (5)
+Aug 09 11:29:07 pch8i: brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+Aug 09 11:29:07 pch8i: ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52
+Aug 09 11:29:07 pch8i: Unable to handle kernel NULL pointer dereference at virtual address 0000000000000004
+Aug 09 11:29:07 pch8i: Mem abort info:
+Aug 09 11:29:07 pch8i:   ESR = 0x0000000096000005
+Aug 09 11:29:07 pch8i:   EC = 0x25: DABT (current EL), IL = 32 bits
+Aug 09 11:29:07 pch8i:   SET = 0, FnV = 0
+Aug 09 11:29:07 pch8i:   EA = 0, S1PTW = 0
+Aug 09 11:29:07 pch8i:   FSC = 0x05: level 1 translation fault
+Aug 09 11:29:07 pch8i: Data abort info:
+Aug 09 11:29:07 pch8i:   ISV = 0, ISS = 0x00000005
+Aug 09 11:29:07 pch8i:   CM = 0, WnR = 0
+Aug 09 11:29:07 pch8i: user pgtable: 4k pages, 39-bit VAs, pgdp=00000000470bc000
+Aug 09 11:29:07 pch8i: [0000000000000004] pgd=0000000000000000, p4d=0000000000000000, pud=0000000000000000
+Aug 09 11:29:07 pch8i: Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+Aug 09 11:29:07 pch8i: Modules linked in: ov9281 rtc_pcf85063 regmap_i2c brcmfmac brcmutil cfg80211 vc4 v3d gpu_sched gpio_keys rfkill drm_shmem_helper i2c_mux_pinctrl snd_soc_hdmi_codec i2c_mux raspberrypi_hwmon i2c_brcmstb drm_display_helper bcm2835_codec(C) bcm2835_v4l2(C) bcm2835_isp(C) snd_bcm2835(C) cec bcm2835_mmal_vchiq(C) drm_dma_helper bcm2835_unicam drm_kms_helper v4l2_dv_timings v4l2_fwnode v4l2_async rpivid_hevc(C) v4l2_mem2mem snd_soc_core videobuf2_vmalloc videobuf2_dma_contig i2c_bcm2835 videobuf2_memops videobuf2_v4l2 snd_compress videobuf2_common snd_pcm_dmaengine snd_pcm videodev snd_timer vc_sm_cma(C) snd syscopyarea mc sysfillrect sysimgblt uio_pdrv_genirq fb_sys_fops nvmem_rmem uio drm fuse drm_panel_orientation_quirks backlight ip_tables x_tables ipv6
+Aug 09 11:29:08 pch8i: CPU: 0 PID: 1792 Comm: kworker/0:0 Tainted: G     C         6.1.42-v8+ #1
+Aug 09 11:29:08 pch8i: Hardware name: Raspberry Pi Compute Module 4 Rev 1.0 (DT)
+Aug 09 11:29:08 pch8i: Workqueue: events brcmf_fweh_event_worker [brcmfmac]
+Aug 09 11:29:08 pch8i: pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+Aug 09 11:29:08 pch8i: pc : cfg80211_cqm_rssi_notify+0x78/0x1b0 [cfg80211]
+Aug 09 11:29:08 pch8i: lr : cfg80211_cqm_rssi_notify+0x70/0x1b0 [cfg80211]
+Aug 09 11:29:08 pch8i: sp : ffffffc00c37bc40
+Aug 09 11:29:08 pch8i: x29: ffffffc00c37bc40 x28: ffffff8001e2ddd0 x27: ffffff8001e2dd80
+Aug 09 11:29:08 pch8i: x26: ffffff80437b4a48 x25: dead000000000100 x24: ffffff80437b43a0
+Aug 09 11:29:08 pch8i: x23: ffffff80434f6008 x22: 0000000000000cc0 x21: 0000000000000000
+Aug 09 11:29:08 pch8i: x20: 0000000000000000 x19: ffffff8040890000 x18: ffffffffffffffff
+Aug 09 11:29:08 pch8i: x17: 2c64656c69616620 x16: 4f464e4920415453 x15: 20544547203a6e6f
+Aug 09 11:29:08 pch8i: x14: 69746174735f7465 x13: 32352d202c64656c x12: 696166204f464e49
+Aug 09 11:29:08 pch8i: x11: 2041545320544547 x10: ffffffec638568a0 x9 : ffffffec16093000
+Aug 09 11:29:08 pch8i: x8 : ffffff8042de3e00 x7 : 0000000000000000 x6 : ffffffc00c37b8c8
+Aug 09 11:29:08 pch8i: x5 : ffffffc00c37b8f0 x4 : 00000000ffffffd8 x3 : 000000000000c404
+Aug 09 11:29:08 pch8i: x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000000
+Aug 09 11:29:08 pch8i: Call trace:
+Aug 09 11:29:08 pch8i:  cfg80211_cqm_rssi_notify+0x78/0x1b0 [cfg80211]
+Aug 09 11:29:08 pch8i:  brcmf_notify_rssi+0x10c/0x1b0 [brcmfmac]
+Aug 09 11:29:08 pch8i:  brcmf_fweh_call_event_handler+0x40/0xa0 [brcmfmac]
+Aug 09 11:29:08 pch8i:  brcmf_fweh_event_worker+0x1e4/0x4f0 [brcmfmac]
+Aug 09 11:29:08 pch8i:  process_one_work+0x1dc/0x450
+Aug 09 11:29:08 pch8i:  worker_thread+0x154/0x450
+Aug 09 11:29:08 pch8i:  kthread+0x104/0x110
+Aug 09 11:29:08 pch8i:  ret_from_fork+0x10/0x20
+Aug 09 11:29:08 pch8i: Code: d10e8300 97fffee9 35000074 f941bae0 (b9400414)
+Aug 09 11:29:08 pch8i: ---[ end trace 0000000000000000 ]---
+Aug 09 11:29:10 pch8i: brcmfmac: brcmf_sdio_bus_rxctl: resumed on timeout
+Aug 09 11:29:10 pch8i: brcmfmac: brcmf_sdio_readshared sdpcm_shared address 0x00206A70
+Aug 09 11:29:10 pch8i: brcmfmac: brcmf_sdio_checkdied firmware not built with -assert
+Aug 09 11:29:10 pch8i: ieee80211 phy0: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -110
+Aug 09 11:29:12 pch8i: brcmfmac: brcmf_sdio_bus_rxctl: resumed on timeout
+Aug 09 11:29:12 pch8i: brcmfmac: brcmf_sdio_readshared sdpcm_shared address 0x00206A70
+Aug 09 11:29:12 pch8i: brcmfmac: brcmf_sdio_checkdied firmware not built with -assert
+Aug 09 11:29:15 pch8i: brcmfmac: brcmf_sdio_bus_rxctl: resumed on timeout
+Aug 09 11:29:15 pch8i: brcmfmac: brcmf_sdio_readshared sdpcm_shared address 0x00206A70
+Aug 09 11:29:15 pch8i: brcmfmac: brcmf_sdio_checkdied firmware not built with -assert
+Aug 09 11:29:15 pch8i: ieee80211 phy0: brcmf_cfg80211_reg_notifier: Country code iovar returned err = -110
+Aug 09 11:29:18 pch8i wpa_supplicant[391]: wlan0: CTRL-EVENT-REGDOM-CHANGE init=CORE type=WORLD
+Aug 09 11:29:18 pch8i wpa_supplicant[391]: wlan0: CTRL-EVENT-REGDOM-CHANGE init=USER type=COUNTRY alpha2=DE
+Aug 09 11:29:18 pch8i: brcmfmac: brcmf_sdio_bus_rxctl: resumed on timeout
+Aug 09 11:29:18 pch8i: brcmfmac: brcmf_sdio_readshared sdpcm_shared address 0x00206A70
+Aug 09 11:29:18 pch8i: brcmfmac: brcmf_sdio_checkdied firmware not built with -assert
+Aug 09 11:29:18 pch8i: ieee80211 phy0: brcmf_cfg80211_get_tx_power: error (-110)
+Aug 09 11:29:20 pch8i NetworkManager[347]: <info>  [1691573360.5820] device (wlan0): supplicant interface state: completed -> disconnected
+Aug 09 11:29:20 pch8i NetworkManager[347]: <info>  [1691573360.5822] device (p2p-dev-wlan0): supplicant management interface state: completed -> disconnected
+Aug 09 11:29:20 pch8i: brcmfmac: brcmf_sdio_bus_rxctl: resumed on timeout
+Aug 09 11:29:20 pch8i: brcmfmac: brcmf_sdio_readshared sdpcm_shared address 0x00206A70
+Aug 09 11:29:20 pch8i: brcmfmac: brcmf_sdio_checkdied firmware not built with -assert
+Aug 09 11:29:20 pch8i: ieee80211 phy0: brcmf_cfg80211_dump_station: BRCMF_C_GET_ASSOCLIST failed, err=-110
+Aug 09 11:29:20 pch8i: brcmfmac: brcmf_cfg80211_scan START ESCAN
+Aug 09 11:29:23 pch8i wpa_supplicant[391]: wlan0: CTRL-EVENT-SCAN-FAILED ret=-110 retry=1
+Aug 09 11:29:23 pch8i: brcmfmac: brcmf_sdio_bus_rxctl: resumed on timeout
+Aug 09 11:29:23 pch8i: brcmfmac: brcmf_sdio_readshared sdpcm_shared address 0x00206A70
+Aug 09 11:29:23 pch8i: brcmfmac: brcmf_sdio_checkdied firmware not built with -assert
+Aug 09 11:29:23 pch8i: ieee80211 phy0: brcmf_vif_set_mgmt_ie: vndr ie set error : -110
+Aug 09 11:29:23 pch8i: ieee80211 phy0: brcmf_cfg80211_scan: scan error (-110)
+Aug 09 11:29:24 pch8i: brcmfmac: brcmf_cfg80211_scan START ESCAN
+Aug 09 11:29:24 pch8i: brcmfmac: brcmf_do_escan Enter
 
 
