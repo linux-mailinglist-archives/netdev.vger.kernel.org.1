@@ -1,60 +1,39 @@
-Return-Path: <netdev+bounces-26093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8263B776C82
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:59:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40CCB776C87
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 01:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CEC1C21347
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 22:59:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B221C21318
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FDC1DDE1;
-	Wed,  9 Aug 2023 22:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864331DDD7;
+	Wed,  9 Aug 2023 23:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63941DDD7
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 22:59:37 +0000 (UTC)
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1199DE71
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:59:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691621977; x=1723157977;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=RyuI2BMZUzAh7hCpj+khG0s4VEHQfqKZkLnllwgYkW4=;
-  b=cXbh/zp9MKlkyUR/GhCOpkL+raT8m+YLFROKZyWWjamxzjVvbBMoKIOi
-   dXSGm523N0/hVK6SEEOquKlGcIqM1WHkfbr4eE8+AQJP8kDgV31Mz39fA
-   sdZ/2rz7hFnIO/XTEOy4Txd16wxGRb8wBAzDtaLZ2ryNT/xrCW9EAdvfI
-   g=;
-X-IronPort-AV: E=Sophos;i="6.01,160,1684800000"; 
-   d="scan'208";a="665491557"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 22:59:31 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com (Postfix) with ESMTPS id 171BD40DB6;
-	Wed,  9 Aug 2023 22:59:31 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 9 Aug 2023 22:59:30 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 9 Aug 2023 22:59:28 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>, Mat Martineau
-	<martineau@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <mptcp@lists.linux.dev>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 mptcp-next] mptcp: Remove unnecessary test for __mptcp_init_sock().
-Date: Wed, 9 Aug 2023 15:59:18 -0700
-Message-ID: <20230809225918.21523-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACF219BC6
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 23:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AA4F3C433C9;
+	Wed,  9 Aug 2023 23:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691622022;
+	bh=PG86WY5yYn48ScTCNBYEksFoKIIGEniKtWos4nAaddw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XJqtpBafr3FdowGEPFg94JMGxihiQXT0XkzXhsI0FLtbhmy6YxWMPOrC0l+ojtf/D
+	 JblKCFYdvU8OeOkqSWzEVuS5vPZ62sJh+bbFgvGZdoJAjs0UeyYICMGXpZUdgHMdoN
+	 E2tY+0KU80uaXEC+tbXEUawqDdXM+i9+DS+/E3gDeGhQwbNfX62xk2rqlFbd+JldyC
+	 FBIXRKyZyrd12Mgj5Z8Uo0ia+SQcpLO7jJCWwJsFAbVa2K5dmSk9jq1RM2NwLjl2Xr
+	 2jxXqvGaI8U6DAH9v1qtacAzn9OVP1PUkIk/sDjSS6ZSeuWmA1PHFw5ILpmCPxcd1E
+	 +ltiQ/WSLXpRA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8CAB5C64459;
+	Wed,  9 Aug 2023 23:00:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,69 +41,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.100.32]
-X-ClientProxiedBy: EX19D032UWB002.ant.amazon.com (10.13.139.190) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net] ipv6: adjust ndisc_is_useropt() to also return true for
+ PIO
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169162202257.2325.18099698343343735059.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Aug 2023 23:00:22 +0000
+References: <20230807102533.1147559-1-maze@google.com>
+In-Reply-To: <20230807102533.1147559-1-maze@google.com>
+To: =?utf-8?q?Maciej_=C5=BBenczykowski_=3Cmaze=40google=2Ecom=3E?=@codeaurora.org
+Cc: zenczykowski@gmail.com, netdev@vger.kernel.org, furry@google.com,
+ lorenzo@google.com, dsahern@gmail.com, davem@davemloft.net,
+ edumazet@google.com, yoshfuji@linux-ipv6.org, stable@vger.kernel.org
 
-__mptcp_init_sock() always returns 0 because mptcp_init_sock() used
-to return the value directly.
+Hello:
 
-But after commit 18b683bff89d ("mptcp: queue data for mptcp level
-retransmission"), __mptcp_init_sock() need not return value anymore.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Let's remove the unnecessary test for __mptcp_init_sock() and make
-it return void.
+On Mon,  7 Aug 2023 03:25:32 -0700 you wrote:
+> The upcoming (and nearly finalized):
+>   https://datatracker.ietf.org/doc/draft-collink-6man-pio-pflag/
+> will update the IPv6 RA to include a new flag in the PIO field,
+> which will serve as a hint to perform DHCPv6-PD.
+> 
+> As we don't want DHCPv6 related logic inside the kernel, this piece of
+> information needs to be exposed to userspace.  The simplest option is to
+> simply expose the entire PIO through the already existing mechanism.
+> 
+> [...]
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/mptcp/protocol.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+Here is the summary with links:
+  - [net] ipv6: adjust ndisc_is_useropt() to also return true for PIO
+    https://git.kernel.org/netdev/net/c/048c796beb6e
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 65ee949a8a44..ddafb095fc3d 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2662,7 +2662,7 @@ static void mptcp_worker(struct work_struct *work)
- 	sock_put(sk);
- }
- 
--static int __mptcp_init_sock(struct sock *sk)
-+static void __mptcp_init_sock(struct sock *sk)
- {
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 
-@@ -2689,8 +2689,6 @@ static int __mptcp_init_sock(struct sock *sk)
- 	/* re-use the csk retrans timer for MPTCP-level retrans */
- 	timer_setup(&msk->sk.icsk_retransmit_timer, mptcp_retransmit_timer, 0);
- 	timer_setup(&sk->sk_timer, mptcp_timeout_timer, 0);
--
--	return 0;
- }
- 
- static void mptcp_ca_reset(struct sock *sk)
-@@ -2708,11 +2706,8 @@ static void mptcp_ca_reset(struct sock *sk)
- static int mptcp_init_sock(struct sock *sk)
- {
- 	struct net *net = sock_net(sk);
--	int ret;
- 
--	ret = __mptcp_init_sock(sk);
--	if (ret)
--		return ret;
-+	__mptcp_init_sock(sk);
- 
- 	if (!mptcp_is_enabled(net))
- 		return -ENOPROTOOPT;
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
