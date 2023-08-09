@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-25845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84BC775FAC
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:49:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BFB775FB0
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E8C280DB2
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 12:49:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECECF281894
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 12:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B2B182CA;
-	Wed,  9 Aug 2023 12:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47537182D9;
+	Wed,  9 Aug 2023 12:47:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B63C18008
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 12:45:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E9BC433C7;
-	Wed,  9 Aug 2023 12:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259D68BE0
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 12:47:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19DA6C433C8;
+	Wed,  9 Aug 2023 12:47:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691585140;
-	bh=M88IJBO4YiWBUGy1m6kbP7R0DUQRC+ov1yBfuhseJwY=;
+	s=k20201202; t=1691585276;
+	bh=TmUP36KRvLCsPoh00aN7EEj9RbH9FI0r7T+FB+MCggo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hDPv80CY54K2qo91COhFf/5ehtUL/fcQs5vs7BN6WTVG5+YIutw9plg+Qbah1nSGR
-	 9E8gFQ993gre62fYiXGNq4CBXhfSRAMZ6tOqYqcD0u5ocQ/xxgXqAEYC3HKo0ONGUI
-	 EzTBheTYnkRZnPnh7ox2A71KRT/qXzpj0ZtmCpsu/qMznWJCumj78/1+Hc+nem2Rrf
-	 G7TJiLU5KeEW6/oTFWYGOAJY6L9dV2sii0qWq7OqiGzLerou4ZtxCmAm72Z7CrhDFr
-	 m8J6uaa2bArFKO2yBbDCYALSVm2PBZV+dqpqkLejqeIlc9MXdjg95XE49sTvxxlwwF
-	 QzHfmMMiGapHQ==
-Date: Wed, 9 Aug 2023 14:45:36 +0200
+	b=CcGiEqraA37Qd1v2UfMWgPuV2tHZOBss60+3YC5TBGOXiuVpPuEmBnUcgZCd3bdLB
+	 hMOUya8Pw3Hgx2w3cMTUPuV9bpDDyT978vGMe9mZ52ZETPcoNkHXIPlyOKqr9J1WMZ
+	 ZcYO5dfWAeH5S9LirwDGGTYwdti/xew3/uANAPB8v2M8Ai8bBhprq6kMXQqyQXgrO6
+	 I0oRfbqa4dNOJy1PRAIDF4DAaIOrYLiVLDOPGGwwqBEr9xFQ2fJZaXHpL+DuAfRRM1
+	 +Dz7gVLokimE5Srw6DEY5d0hs/gjhA+LJBBnERQEYFToTKTGXOugIdp5W+Cet2kruK
+	 reT7PKqfdCGaQ==
+Date: Wed, 9 Aug 2023 14:47:52 +0200
 From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, asmaa@nvidia.com, davthompson@nvidia.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] mlxbf_gige: Remove two unused function
- declarations
-Message-ID: <ZNOKcA6flZf7Fuxv@vergenet.net>
-References: <20230808145249.41596-1-yuehaibing@huawei.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	Ping Gan <jacky_gam_2001@163.com>, Manjusaka <me@manjusaka.me>
+Subject: Re: [PATCH net] tcp: add missing family to tcp_set_ca_state()
+ tracepoint
+Message-ID: <ZNOK+MeUTXXOhD9S@vergenet.net>
+References: <20230808084923.2239142-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,13 +49,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230808145249.41596-1-yuehaibing@huawei.com>
+In-Reply-To: <20230808084923.2239142-1-edumazet@google.com>
 
-On Tue, Aug 08, 2023 at 10:52:49PM +0800, Yue Haibing wrote:
-> Commit f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
-> declared but never implemented these.
+On Tue, Aug 08, 2023 at 08:49:23AM +0000, Eric Dumazet wrote:
+> Before this code is copied, add the missing family, as we did in
+> commit 3dd344ea84e1 ("net: tracepoint: exposing sk_family in all tcp:tracepoints")
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> Fixes: 15fcdf6ae116 ("tcp: Add tracepoint for tcp_set_ca_state")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Ping Gan <jacky_gam_2001@163.com>
+> Cc: Manjusaka <me@manjusaka.me>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
