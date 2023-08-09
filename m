@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-25901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F7C7761F4
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:02:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57E7B7761FA
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0601C21289
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:02:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 115BC281CA9
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691A0198B9;
-	Wed,  9 Aug 2023 14:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DDF198BB;
+	Wed,  9 Aug 2023 14:02:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D36318C3E
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:02:42 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766731BFA
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 07:02:41 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-68706d67ed9so4895304b3a.2
-        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 07:02:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF6E17754
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:02:59 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD25219A1
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 07:02:58 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-686ba29ccb1so711378b3a.1
+        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 07:02:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691589760; x=1692194560;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=du20iG+IMRWJhg+5B/uM9dEYprGZcQpDcAfAuv79ob4=;
-        b=Onl1FWHx9WbxFwpT/TTy8jxQ4JDAJwSG6gRekUtjLhRMVeladUba1Qyxn1tnqjtMz5
-         bdoaZx3cLwu5bkgAgBhbMj6BZ42XPxaQyZ9u8Ez5r0KcxS8EMoyWRoFkmAFCbckF5FJQ
-         KOHz+ftjj8enIrukupYnEOjSpdwy4fKwD4WSdo89qFylmjQgh/QdNKwN2JzzgZnKYTYQ
-         VXRIUXPL2L44/LVBwwTwSSreNg9cBdA2hfuquqK63Jx7FmXL+bPIcBXUoWL4wlslADI9
-         5bkfLE56N+mB/9B+22R32n1QQaHUM/iIsD2g0VAxD1e5ujO6p/xyOShUST7ck+bL3Phn
-         WK0g==
+        d=gmail.com; s=20221208; t=1691589777; x=1692194577;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XyoLe9IDclPyc8nxtmRLL+Re9tT3RP6Hr8S5cgH6TTM=;
+        b=kje5h0U3k7K5XAKZFUJKKs0Y9Sx8mFR7VUTjZMv0iof6q2XVAFodD4biUmk9LyK3Zp
+         h5ibMR/ltTrH0H0kDJ/O8WgicO+r5ShGYJIFoHt2XeFp+mviBh8z9TFabfkjDq5rp60X
+         9X5iK2Swp7qWscrr730QcBQh2OyZHZlhNA+UeDhTUvzzDuBZxe59wbb3B8G5kTLCMV7S
+         FBdba8C0lggAicwZ6zXRFupbpbj6hFyYZJoma9nApnc+GyWXg3p4FUBYC1hV+ysfNZpH
+         xkaM2nxaBBQ0LPTsMYsdK6Ck7ahwnR8WbnusHTyTxnwoogC5ju2bd6LnnfOG+ghxuBls
+         5E1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691589760; x=1692194560;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=du20iG+IMRWJhg+5B/uM9dEYprGZcQpDcAfAuv79ob4=;
-        b=RxPLSMva4TP5tVfPHzLN75q6ONwczXzSlIXU0l9xUBL3DtVTpWNC/hLBIHirR1crpc
-         loe5i4NfkwEkqdRT70kwRv7FRV9Iz+afAI+X2Ni8rm+a1Hmt774mxnNZ3Yl6pntWCAiY
-         v5UlrwLJh8BI3PRMOrWResRP1udXh9aqzu8I/crdLq0+aWiGWCYGCT6/bqUiYA5ZPmvT
-         Z/TY0vg0o/uETfRKZzg98yrs1Wzn95G9Bo1XqWr/6Ecnrxvyt8M2gLqUbYUWsyDJjfuQ
-         8D92hqoaIE/loVYZbwzeyAvak5XbpiG8M2baHRM18V+RUJJvAS7Dwm5sP5V7biPI9Mjx
-         uGpA==
-X-Gm-Message-State: AOJu0YwCH4ZBCd41epAeTE+Jpv2AyrmahUbIvshy0+CD7VLa8CLHssZH
-	UPzWQU1z78GbNibQAHF+Fl7r5D590nW6eg==
-X-Google-Smtp-Source: AGHT+IGp5Q/lvivpfbj3c6WOFpduYE1gscBnFgDsVVuox1Vr39vQX8sQJGeM876WqnQ6OfXeVEH5IQ==
-X-Received: by 2002:a05:6a20:a114:b0:11e:7ced:3391 with SMTP id q20-20020a056a20a11400b0011e7ced3391mr2599215pzk.43.1691589759990;
-        Wed, 09 Aug 2023 07:02:39 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691589777; x=1692194577;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XyoLe9IDclPyc8nxtmRLL+Re9tT3RP6Hr8S5cgH6TTM=;
+        b=dwyNR2/c5iaJy5kJpePc5xZvBXeHYO8YxzAErOk1x/hN+W/SusBo2O8/B3hA/+lePF
+         kpi5LbzN6xSZK3oN3VTOkACiFof67cBuFvpY857Jt8jj8VkQtktR9pqqXTSNYUleRp5H
+         jDrfc8xfTLTRgAI5j9t+51/L/LbieyGHaEp66emcjQUCUC2fXiXW/r+XWKw0VnJrxCPK
+         1msHu7Mw9iI+adZYmzWuWpaz12C944URBilk2g4hrOoTZuBNO/tFqJtPnVcrgEHrVQML
+         fuAliolgaphQqpmfPKK0TL9WjaD9RKHvjOw/z99wKd9nN8wLkrqsPZP6ZSOgrZVfc/a8
+         Us6A==
+X-Gm-Message-State: AOJu0Yx2SWRdwKYaNZ6T8FeuDBjcv4JtrSu7tlY2n1Rwzf2zY7aj8Vx2
+	pg4YSEzFYyuCNKkS/UwuL+0LN0tcY6QkzQ==
+X-Google-Smtp-Source: AGHT+IF9lI7n2mNHvvSOAzAAhNTh2Zjq9clZv4hGRAyJAMk+alUP4xxy0gA2KCLjyw+Ten1kJvwzbA==
+X-Received: by 2002:aa7:888f:0:b0:687:82f9:3d8d with SMTP id z15-20020aa7888f000000b0068782f93d8dmr3747383pfe.2.1691589777346;
+        Wed, 09 Aug 2023 07:02:57 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q25-20020a62ae19000000b0064aea45b040sm9935674pff.168.2023.08.09.07.02.36
+        by smtp.gmail.com with ESMTPSA id q25-20020a62ae19000000b0064aea45b040sm9935674pff.168.2023.08.09.07.02.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 07:02:39 -0700 (PDT)
+        Wed, 09 Aug 2023 07:02:56 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -66,11 +67,14 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Thomas Haller <thaller@redhat.com>,
 	Stephen Hemminger <stephen@networkplumber.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 0/2] send notify when delete source address routes
-Date: Wed,  9 Aug 2023 22:02:32 +0800
-Message-Id: <20230809140234.3879929-1-liuhangbin@gmail.com>
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Ido Schimmel <idosch@idosch.org>
+Subject: [PATCHv2 net-next 1/2] fib: convert fib_nh_is_v6 and nh_updated to use a single bit
+Date: Wed,  9 Aug 2023 22:02:33 +0800
+Message-Id: <20230809140234.3879929-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230809140234.3879929-1-liuhangbin@gmail.com>
+References: <20230809140234.3879929-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,28 +89,89 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-After deleting an interface address, the relate perfer source address routes
-are also deleted. But there is no notify for the route deleting, which makes
-route daemons like NetworkManager keep a wrong cache. Fix this by sending
-notify when delete src routes.
+The FIB info structure currently looks like this:
+struct fib_info {
+        struct hlist_node          fib_hash;             /*     0    16 */
+        [...]
+        u32                        fib_priority;         /*    80     4 */
 
-Run fib_tests.sh and all passed.
+        /* XXX 4 bytes hole, try to pack */
 
-Tests passed: 203
-Tests failed:   0
+        struct dst_metrics *       fib_metrics;          /*    88     8 */
+        int                        fib_nhs;              /*    96     4 */
+        bool                       fib_nh_is_v6;         /*   100     1 */
+        bool                       nh_updated;           /*   101     1 */
 
-v2: Add a bit in fib_info to mark the deleted src route.
+        /* XXX 2 bytes hole, try to pack */
 
-Hangbin Liu (2):
-  fib: convert fib_nh_is_v6 and nh_updated to use a single bit
-  ipv4/fib: send notify when delete source address routes
+        struct nexthop *           nh;                   /*   104     8 */
+        struct callback_head       rcu __attribute__((__aligned__(8))); /*   112    16 */
+        /* --- cacheline 2 boundary (128 bytes) --- */
+        struct fib_nh              fib_nh[];             /*   128     0 */
 
- include/net/ip_fib.h     | 5 +++--
- net/ipv4/fib_semantics.c | 3 ++-
- net/ipv4/fib_trie.c      | 4 ++++
+        /* size: 128, cachelines: 2, members: 21 */
+        /* sum members: 122, holes: 2, sum holes: 6 */
+        /* forced alignments: 1 */
+} __attribute__((__aligned__(8)));
+
+Let's convert fib_nh_is_v6 and nh_updated to use a single bit, so that
+we can add other functional bits in later patch.
+
+Suggested-by: Ido Schimmel <idosch@idosch.org>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ include/net/ip_fib.h     | 4 ++--
+ net/ipv4/fib_semantics.c | 2 +-
  net/ipv4/nexthop.c       | 4 ++--
- 4 files changed, 11 insertions(+), 5 deletions(-)
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
+index a378eff827c7..a91f8a28689a 100644
+--- a/include/net/ip_fib.h
++++ b/include/net/ip_fib.h
+@@ -152,8 +152,8 @@ struct fib_info {
+ #define fib_rtt fib_metrics->metrics[RTAX_RTT-1]
+ #define fib_advmss fib_metrics->metrics[RTAX_ADVMSS-1]
+ 	int			fib_nhs;
+-	bool			fib_nh_is_v6;
+-	bool			nh_updated;
++	u8			fib_nh_is_v6:1,
++				nh_updated:1;
+ 	struct nexthop		*nh;
+ 	struct rcu_head		rcu;
+ 	struct fib_nh		fib_nh[];
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 65ba18a91865..ce1c10e408cf 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -1572,7 +1572,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
+ 			fib_info_update_nhc_saddr(net, &nexthop_nh->nh_common,
+ 						  fi->fib_scope);
+ 			if (nexthop_nh->fib_nh_gw_family == AF_INET6)
+-				fi->fib_nh_is_v6 = true;
++				fi->fib_nh_is_v6 = 1;
+ 		} endfor_nexthops(fi)
+ 
+ 		fib_rebalance(fi);
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index 93f14d39fef6..5243bb80bade 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -2213,12 +2213,12 @@ static void __nexthop_replace_notify(struct net *net, struct nexthop *nh,
+ 		 * and then walk the fib tables once
+ 		 */
+ 		list_for_each_entry(fi, &nh->fi_list, nh_list)
+-			fi->nh_updated = true;
++			fi->nh_updated = 1;
+ 
+ 		fib_info_notify_update(net, info);
+ 
+ 		list_for_each_entry(fi, &nh->fi_list, nh_list)
+-			fi->nh_updated = false;
++			fi->nh_updated = 0;
+ 	}
+ 
+ 	list_for_each_entry(f6i, &nh->f6i_list, nh_list)
 -- 
 2.38.1
 
