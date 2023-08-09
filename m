@@ -1,84 +1,149 @@
-Return-Path: <netdev+bounces-26096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF3DD776C8A
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 01:00:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75CBB776C8C
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 01:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E09C91C213B6
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:00:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D0031C2133B
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4861E50E;
-	Wed,  9 Aug 2023 23:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B7B1DDEC;
+	Wed,  9 Aug 2023 23:04:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11571DDFA
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 23:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 231B0C433C8;
-	Wed,  9 Aug 2023 23:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691622024;
-	bh=P74glUdH/007C96kaPxkIGE9cQ320WPzAI+0Uft+0Cc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IAKmtyKLbo0n+xuZBTTpNDOKXzsgdCFBHb9Xt9qb9eUK/js79+hK+D1IZ2HqYTEIs
-	 57qi/6FYDVpQPse/34fcS9qC5vECt9jv6xHlrs22pAallnmeBaoX+7xmXnMERfRkTd
-	 8ugpUcI2ct8Mk3vRxXrZsuHeCUP4oHHmOAiuI5JL8vXvqTXTTr8umh1s3QByyjOETF
-	 A+VeSUEhGBmpexEK6PL1iKiLf0p2U3ppKo+PsV6pkbJGARAJ3tsY9x36vRGKR7/XR9
-	 4hAZp8mCag4AIfdIBNgqMA3tb3vej+vXYnwDKraBeajFNlmvwgQkpRojBPe9yCGfgC
-	 kUWB6F48n2Ixg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0FDD1E3308F;
-	Wed,  9 Aug 2023 23:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E101D2F0
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 23:04:28 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC94FD1;
+	Wed,  9 Aug 2023 16:04:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0aTsFpaTqvr4ux06we+sMFc0Xxyk06OKa+L2Dw/ae7c=; b=kloDa30aaLvpJmOhk0KZoUs8OY
+	m2d65xgKpsEqBnqXxKtAF534hBd79+EhkDPOCsHcxaW8vHTcsWdIGsRwuKelzURDqraAIcg2Ge1mS
+	ZOSltO84hTwNqQM4XERu1SnboQvjkUAiPE+kgdnOwnDuPB1y1Nlrd/3zgWG/sHp2T9HeOH3dttYLI
+	EphaOadQ7ZQZjj6f5nOPHOuQorg9ay8CStkp0P8eVQtGEg9yJFCf3pBNq0SqbxYcL94027fKxU6nK
+	eUV8lXWrq2IIUJ54TT/EgEc8BIZfPM2imje/CazGwxREZ9jiyfqKS/mkCSMVL/CcoBLhzoOz0cgel
+	bzgB9S1A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44626)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qTsDk-00037q-0U;
+	Thu, 10 Aug 2023 00:04:05 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qTsDh-00018o-CO; Thu, 10 Aug 2023 00:04:01 +0100
+Date: Thu, 10 Aug 2023 00:04:01 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	linux-phy@lists.infradead.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	nicolas.ferre@microchip.com, claudiu.beznea@microchip.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	robert.hancock@calian.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, git@amd.com
+Subject: Re: [PATCH net] net: macb: In ZynqMP resume always configure PS GTR
+ for non-wakeup source
+Message-ID: <ZNQbYQ3zuGI3MbK0@shell.armlinux.org.uk>
+References: <1691414091-2260697-1-git-send-email-radhey.shyam.pandey@amd.com>
+ <20230809154121.673ec04b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/2] mlx5: Expose NIC temperature via hwmon API
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169162202406.2325.4542344753291198627.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Aug 2023 23:00:24 +0000
-References: <20230807180507.22984-1-saeed@kernel.org>
-In-Reply-To: <20230807180507.22984-1-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com, linux-hwmon@vger.kernel.org, jdelvare@suse.com,
- linux@roeck-us.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230809154121.673ec04b@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  7 Aug 2023 11:05:05 -0700 you wrote:
-> From: Saeed Mahameed <saeedm@nvidia.com>
+On Wed, Aug 09, 2023 at 03:41:21PM -0700, Jakub Kicinski wrote:
+> On Mon, 7 Aug 2023 18:44:51 +0530 Radhey Shyam Pandey wrote:
+> > On Zynq UltraScale+ MPSoC ubuntu platform when systemctl issues suspend,
+> > network manager bring down the interface and goes into suspend. When it
+> > wakes up it again enables the interface.
+> > 
+> > This leads to xilinx-psgtr "PLL lock timeout" on interface bringup, as
+> > the power management controller power down the entire FPD (including
+> > SERDES) if none of the FPD devices are in use and serdes is not
+> > initialized on resume.
+> > 
+> > $ sudo rtcwake -m no -s 120 -v
+> > $ sudo systemctl suspend  <this does ifconfig eth1 down>
+> > $ ifconfig eth1 up
+> > xilinx-psgtr fd400000.phy: lane 0 (type 10, protocol 5): PLL lock timeout
+> > phy phy-fd400000.phy.0: phy poweron failed --> -110
+> > 
+> > macb driver is called in this way:
+> > 1. macb_close: Stop network interface. In this function, it
+> >    reset MACB IP and disables PHY and network interface.
+> > 
+> > 2. macb_suspend: It is called in kernel suspend flow. But because
+> >    network interface has been disabled(netif_running(ndev) is
+> >    false), it does nothing and returns directly;
+> > 
+> > 3. System goes into suspend state. Some time later, system is
+> >    waken up by RTC wakeup device;
+> > 
+> > 4. macb_resume: It does nothing because network interface has
+> >    been disabled;
+> > 
+> > 5. macb_open: It is called to enable network interface again. ethernet
+> >    interface is initialized in this API but serdes which is power-off
+> >    by PMUFW during FPD-off suspend is not initialized again and so
+> >    we hit GT PLL lock issue on open.
+> > 
+> > To resolve this PLL timeout issue always do PS GTR initialization
+> > when ethernet device is configured as non-wakeup source.
+> > 
+> > Fixes: f22bd29ba19a ("net: macb: Fix ZynqMP SGMII non-wakeup source resume failure")
+> > Fixes: 8b73fa3ae02b ("net: macb: Added ZynqMP-specific initialization")
+> > Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
 > 
-> V1->V2:
->  - Remove internal tracker tags
->  - Remove sanitized mlx5 sensor names
->  - add HWMON dependency in the mlx5 Kconfig
-> 
-> [...]
+> Could be more of a PHY than MAC question. Adding remaining PHY
+> maintainers to CC.
 
-Here is the summary with links:
-  - [net-next,V2,1/2] net/mlx5: Expose port.c/mlx5_query_module_num() function
-    https://git.kernel.org/netdev/net-next/c/383a4de3b447
-  - [net-next,V2,2/2] net/mlx5: Expose NIC temperature via hardware monitoring kernel API
-    https://git.kernel.org/netdev/net-next/c/1f507e80c700
+This is not ethernet PHY stuff (drivers/net/phy), it's serdes PHY
+(drivers/phy). Their requirements vary a lot.
 
-You are awesome, thank you!
+Given the above description...
+
+In (1), phy_power_off() gets called. If this is actually done by
+the serdes PHY driver, then the clocks from the serdes PHY stop.
+
+Whether the PHY is re-initialised or not during the suspend/resume
+should not affect it - we haven't asked for it to be powered up
+again.
+
+So in (5), I assume that the problem occurs because macb_init_hw()
+is called before phy_power_on()... but what do I know... with these
+randomly generated abbreviations that are designed to exclude people
+from understanding what is going on which seem to be common in the
+computing world. FPD? GT? Shrug, utterly meaningless.
+
+However, surely phy_init() while the PHY is supposed to be powered
+off should fail? Don't know, this is outside of my area of knowledge.
+Adding generic phy maintainers and list...
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
