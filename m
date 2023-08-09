@@ -1,314 +1,157 @@
-Return-Path: <netdev+bounces-25807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11F77775CAE
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:29:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BD83775E20
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:49:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42A751C2112A
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:29:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6E9C281BCB
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEE11775C;
-	Wed,  9 Aug 2023 11:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53CF17FF2;
+	Wed,  9 Aug 2023 11:49:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001B517AAD
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 11:29:51 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F59DED;
-	Wed,  9 Aug 2023 04:29:50 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 378NlZZ8005941;
-	Wed, 9 Aug 2023 04:29:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type :
- content-transfer-encoding; s=pfpt0220;
- bh=H12jWoQ9Yn+PT5Ld8R+chIyyliHNetnP35GmXz/m5F0=;
- b=cT+bCLcjO8q5CHjRMkMATg7VZXvi5FnYtXeyX44VR3EGFst2Enrq36r+tdo91KR6/nG9
- 2mkAW34CU4UoU3JZorFnFPJML0x9TSMa14IC+qTBl/S4iNnFi95704sKh2yIfVjxF2BH
- MZ/sJBha24ADC39ZFzSJYPNlTQDYD7mbzISwqyl+ATedHSmWEYlXeAD1fpdcN5jbgLCu
- sMeWxmf1+KNqeJO2K0hktIM/3G6RWmHAqxZ/9OtBd4qMYyeMmEF4LYpNQl7LQN5Z8S3F
- PXBlKOFfizAWSPGqOqZ32+f0nbjaMnjFfkvkvbmyfq3Q1Db5MTUdkYrfRoUdFqShqHtB vw== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkntmhwh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 09 Aug 2023 04:29:40 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 9 Aug
- 2023 04:29:38 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 9 Aug 2023 04:29:38 -0700
-Received: from setup-1.sclab.marvell.com (unknown [10.106.25.74])
-	by maili.marvell.com (Postfix) with ESMTP id 3DB475B6928;
-	Wed,  9 Aug 2023 04:29:38 -0700 (PDT)
-From: Sathesh Edara <sedara@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <sburla@marvell.com>, <vburru@marvell.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>, <hgani@marvell.com>,
-        <andrew@lunn.ch>
-CC: <sedara@marvell.com>
-Subject: [net-next PATCH v3] octeon_ep: Add control plane host and firmware versions.
-Date: Wed, 9 Aug 2023 04:29:33 -0700
-Message-ID: <20230809112933.716736-1-sedara@marvell.com>
-X-Mailer: git-send-email 2.37.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADA111C98
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 11:49:29 +0000 (UTC)
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7E210D;
+	Wed,  9 Aug 2023 04:49:28 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 379BnDdT034968;
+	Wed, 9 Aug 2023 06:49:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1691581753;
+	bh=KDp7H40e6XDbVRlxnqJ5QHmRmDqHv6zD3uTT8GKlR/s=;
+	h=From:To:CC:Subject:Date;
+	b=aW0Z6K0P/uoQBqvYjuraG7sxMBIj/yVZM4cxJ2g4ocodJK25quHHveR5OmhWqD3wI
+	 JGNPEXaFwvj7T43kBt5oIJ12e6qcP5dHg67aat/cLJZhw9aPKip+s1P0idWSqAQTF7
+	 iGBSv5/VN4rF/V3DAg/BLNQTeo9mUWnJWpQNuI+Y=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 379BnD6I129508
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 9 Aug 2023 06:49:13 -0500
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 9
+ Aug 2023 06:49:12 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 9 Aug 2023 06:49:12 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 379BnCuO013039;
+	Wed, 9 Aug 2023 06:49:12 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 379BnBnD005116;
+	Wed, 9 Aug 2023 06:49:12 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        MD Danish Anwar <danishanwar@ti.com>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v3 0/5] Introduce IEP driver and packet timestamping support
+Date: Wed, 9 Aug 2023 17:19:01 +0530
+Message-ID: <20230809114906.21866-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: iz845MqLmRsInaTS4R0oFSwsvkiM94Nv
-X-Proofpoint-ORIG-GUID: iz845MqLmRsInaTS4R0oFSwsvkiM94Nv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-09_10,2023-08-09_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement control plane mailbox versions for host and firmware.
-Versions are published in info area of control mailbox bar4
-memory structure.Firmware will publish minimum and maximum
-supported versions.Control plane mailbox apis will check for
-firmware version before sending any control commands to firmware.
-Notifications from firmware will similarly be checked for host
-version compatibility.
+This series introduces Industrial Ethernet Peripheral (IEP) driver to
+support timestamping of ethernet packets and thus support PTP and PPS
+for PRU ICSSG ethernet ports.
 
-Signed-off-by: Sathesh Edara <sedara@marvell.com>
----
-v3:
-  - Fixed below warnings from the patchwork.
-	../drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h:61:18: warning: ‘octep_ctrl_net_f2h_cmd_versions’ defined but not used [-Wunused-const-variable=]
-   61 | static const u32 octep_ctrl_net_f2h_cmd_versions[OCTEP_CTRL_NET_F2H_CMD_MAX] = {
- 
-	../drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h:48:18: warning: ‘octep_ctrl_net_h2f_cmd_versions’ defined but not used [-Wunused-const-variable=]
-   48 | static const u32 octep_ctrl_net_h2f_cmd_versions[OCTEP_CTRL_NET_H2F_CMD_MAX] = {
+This series also adds 10M full duplex support for ICSSG ethernet driver.
 
-v2:
-  - Addressed review comments given by Andrew Lunn
-    1. Removed firmware version check
-    2. Fixed compilation error by adding missed header file
- .../marvell/octeon_ep/octep_cp_version.h      | 11 ++++++
- .../marvell/octeon_ep/octep_ctrl_mbox.c       |  9 ++++-
- .../marvell/octeon_ep/octep_ctrl_mbox.h       |  6 +++
- .../marvell/octeon_ep/octep_ctrl_net.c        | 37 ++++++++++++++++++-
- .../marvell/octeon_ep/octep_ctrl_net.h        |  4 ++
- 5 files changed, 64 insertions(+), 3 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h
+There are two IEP instances. IEP0 is used for packet timestamping while IEP1
+is used for 10M full duplex support.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h b/drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h
-new file mode 100644
-index 000000000000..0c741e752db6
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cp_version.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: BSD-3-Clause
-+ * Copyright (c) 2022 Marvell.
-+ */
-+#ifndef __OCTEP_CP_VERSION_H__
-+#define __OCTEP_CP_VERSION_H__
-+
-+#define OCTEP_CP_VERSION(a, b, c)	((((a) & 0xff) << 16) + \
-+					 (((b) & 0xff) << 8) + \
-+					  ((c) & 0xff))
-+
-+#endif /* __OCTEP_CP_VERSION_H__ */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
-index dab61cc1acb5..9d53c1402cb4 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
-@@ -37,7 +37,9 @@
- 
- #define OCTEP_CTRL_MBOX_INFO_MAGIC_NUM(m)	(m)
- #define OCTEP_CTRL_MBOX_INFO_BARMEM_SZ(m)	((m) + 8)
-+#define OCTEP_CTRL_MBOX_INFO_HOST_VERSION(m)   ((m) + 16)
- #define OCTEP_CTRL_MBOX_INFO_HOST_STATUS(m)	((m) + 24)
-+#define OCTEP_CTRL_MBOX_INFO_FW_VERSION(m)     ((m) + 136)
- #define OCTEP_CTRL_MBOX_INFO_FW_STATUS(m)	((m) + 144)
- 
- #define OCTEP_CTRL_MBOX_H2FQ_INFO(m)	((m) + OCTEP_CTRL_MBOX_INFO_SZ)
-@@ -71,7 +73,7 @@ static u32 octep_ctrl_mbox_circq_depth(u32 pi, u32 ci, u32 sz)
- 
- int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
- {
--	u64 magic_num, status;
-+	u64 magic_num, status, fw_versions;
- 
- 	if (!mbox)
- 		return -EINVAL;
-@@ -93,6 +95,9 @@ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
- 		return -EINVAL;
- 	}
- 
-+	fw_versions = readq(OCTEP_CTRL_MBOX_INFO_FW_VERSION(mbox->barmem));
-+	mbox->min_fw_version = ((fw_versions & 0xffffffff00000000ull) >> 32);
-+	mbox->max_fw_version = (fw_versions & 0xffffffff);
- 	mbox->barmem_sz = readl(OCTEP_CTRL_MBOX_INFO_BARMEM_SZ(mbox->barmem));
- 
- 	writeq(OCTEP_CTRL_MBOX_STATUS_INIT,
-@@ -113,6 +118,7 @@ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
- 			  OCTEP_CTRL_MBOX_TOTAL_INFO_SZ +
- 			  mbox->h2fq.sz;
- 
-+	writeq(mbox->version, OCTEP_CTRL_MBOX_INFO_HOST_VERSION(mbox->barmem));
- 	/* ensure ready state is seen after everything is initialized */
- 	wmb();
- 	writeq(OCTEP_CTRL_MBOX_STATUS_READY,
-@@ -258,6 +264,7 @@ int octep_ctrl_mbox_uninit(struct octep_ctrl_mbox *mbox)
- 	if (!mbox->barmem)
- 		return -EINVAL;
- 
-+	writeq(0, OCTEP_CTRL_MBOX_INFO_HOST_VERSION(mbox->barmem));
- 	writeq(OCTEP_CTRL_MBOX_STATUS_INVALID,
- 	       OCTEP_CTRL_MBOX_INFO_HOST_STATUS(mbox->barmem));
- 	/* ensure uninit state is written before uninitialization */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
-index 9c4ff0fba6a0..7f8135788efc 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
-@@ -121,6 +121,8 @@ struct octep_ctrl_mbox_q {
- };
- 
- struct octep_ctrl_mbox {
-+	/* control plane version */
-+	u64 version;
- 	/* size of bar memory */
- 	u32 barmem_sz;
- 	/* pointer to BAR memory */
-@@ -133,6 +135,10 @@ struct octep_ctrl_mbox {
- 	struct mutex h2fq_lock;
- 	/* lock for f2hq */
- 	struct mutex f2hq_lock;
-+	/* Min control plane version supported by firmware */
-+	u32 min_fw_version;
-+	/* Max control plane version supported by firmware */
-+	u32 max_fw_version;
- };
- 
- /* Initialize control mbox.
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 1cc6af2feb38..4c6d91a8c83e 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -14,6 +14,9 @@
- #include "octep_main.h"
- #include "octep_ctrl_net.h"
- 
-+/* Control plane version */
-+#define OCTEP_CP_VERSION_CURRENT	OCTEP_CP_VERSION(1, 0, 0)
-+
- static const u32 req_hdr_sz = sizeof(union octep_ctrl_net_req_hdr);
- static const u32 mtu_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_mtu);
- static const u32 mac_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_mac);
-@@ -21,6 +24,18 @@ static const u32 state_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_state);
- static const u32 link_info_sz = sizeof(struct octep_ctrl_net_link_info);
- static atomic_t ctrl_net_msg_id;
- 
-+/* Control plane version in which OCTEP_CTRL_NET_H2F_CMD was added */
-+static const u32 octep_ctrl_net_h2f_cmd_versions[OCTEP_CTRL_NET_H2F_CMD_MAX] = {
-+	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_LINK_INFO] =
-+	 OCTEP_CP_VERSION(1, 0, 0)
-+};
-+
-+/* Control plane version in which OCTEP_CTRL_NET_F2H_CMD was added */
-+static const u32 octep_ctrl_net_f2h_cmd_versions[OCTEP_CTRL_NET_F2H_CMD_MAX] = {
-+	[OCTEP_CTRL_NET_F2H_CMD_INVALID ... OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS] =
-+	 OCTEP_CP_VERSION(1, 0, 0)
-+};
-+
- static void init_send_req(struct octep_ctrl_mbox_msg *msg, void *buf,
- 			  u16 sz, int vfid)
- {
-@@ -41,7 +56,13 @@ static int octep_send_mbox_req(struct octep_device *oct,
- 			       struct octep_ctrl_net_wait_data *d,
- 			       bool wait_for_response)
- {
--	int err, ret;
-+	int err, ret, cmd;
-+
-+	/* check if firmware is compatible for this request */
-+	cmd = d->data.req.hdr.s.cmd;
-+	if (octep_ctrl_net_h2f_cmd_versions[cmd] > oct->ctrl_mbox.max_fw_version ||
-+	    octep_ctrl_net_h2f_cmd_versions[cmd] < oct->ctrl_mbox.min_fw_version)
-+		return -EOPNOTSUPP;
- 
- 	err = octep_ctrl_mbox_send(&oct->ctrl_mbox, &d->msg);
- 	if (err < 0)
-@@ -84,12 +105,16 @@ int octep_ctrl_net_init(struct octep_device *oct)
- 
- 	/* Initialize control mbox */
- 	ctrl_mbox = &oct->ctrl_mbox;
-+	ctrl_mbox->version = OCTEP_CP_VERSION_CURRENT;
- 	ctrl_mbox->barmem = CFG_GET_CTRL_MBOX_MEM_ADDR(oct->conf);
- 	ret = octep_ctrl_mbox_init(ctrl_mbox);
- 	if (ret) {
- 		dev_err(&pdev->dev, "Failed to initialize control mbox\n");
- 		return ret;
- 	}
-+	dev_info(&pdev->dev, "Control plane versions host: %llx, firmware: %x:%x\n",
-+		 ctrl_mbox->version, ctrl_mbox->min_fw_version,
-+		 ctrl_mbox->max_fw_version);
- 	oct->ctrl_mbox_ifstats_offset = ctrl_mbox->barmem_sz;
- 
- 	return 0;
-@@ -273,9 +298,17 @@ static int process_mbox_notify(struct octep_device *oct,
- {
- 	struct net_device *netdev = oct->netdev;
- 	struct octep_ctrl_net_f2h_req *req;
-+	int cmd;
- 
- 	req = (struct octep_ctrl_net_f2h_req *)msg->sg_list[0].msg;
--	switch (req->hdr.s.cmd) {
-+	cmd = req->hdr.s.cmd;
-+
-+	/* check if we support this command */
-+	if (octep_ctrl_net_f2h_cmd_versions[cmd] > OCTEP_CP_VERSION_CURRENT ||
-+	    octep_ctrl_net_f2h_cmd_versions[cmd] < OCTEP_CP_VERSION_CURRENT)
-+		return -EOPNOTSUPP;
-+
-+	switch (cmd) {
- 	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
- 		if (netif_running(netdev)) {
- 			if (req->link.state) {
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-index 37880dd79116..1c2ef4ee31d9 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-@@ -7,6 +7,8 @@
- #ifndef __OCTEP_CTRL_NET_H__
- #define __OCTEP_CTRL_NET_H__
- 
-+#include "octep_cp_version.h"
-+
- #define OCTEP_CTRL_NET_INVALID_VFID	(-1)
- 
- /* Supported commands */
-@@ -39,12 +41,14 @@ enum octep_ctrl_net_h2f_cmd {
- 	OCTEP_CTRL_NET_H2F_CMD_LINK_STATUS,
- 	OCTEP_CTRL_NET_H2F_CMD_RX_STATE,
- 	OCTEP_CTRL_NET_H2F_CMD_LINK_INFO,
-+	OCTEP_CTRL_NET_H2F_CMD_MAX
- };
- 
- /* Supported fw to host commands */
- enum octep_ctrl_net_f2h_cmd {
- 	OCTEP_CTRL_NET_F2H_CMD_INVALID = 0,
- 	OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS,
-+	OCTEP_CTRL_NET_F2H_CMD_MAX
- };
- 
- union octep_ctrl_net_req_hdr {
+This is v3 of the series [v1]. It addresses comments made on [v2].
+This series is based on linux-next(#next-20230807).
+
+Changes from v2 to v3:
+*) Addressed Roger's comment and moved IEP1 related changes in patch 5.
+*) Addressed Roger's comment and moved icss_iep.c / .h changes from patch 4
+   to patch 3.
+*) Added support for multiple timestamping in patch 4 as asked by Roger.
+*) Addressed Andrew's comment and added comment in case SPEED_10 in
+   icssg_config_ipg() API.
+*) Kept compatible as "ti,am654-icss-iep" for all TI K3 SoCs
+
+Changes from v1 to v2:
+*) Addressed Simon's comment to fix reverse xmas tree declaration. Some APIs
+   in patch 3 and 4 were not following reverse xmas tree variable declaration.
+   Fixed it in this version.
+*) Addressed Conor's comments and removed unsupported SoCs from compatible
+   comment in patch 1. 
+*) Addded patch 2 which was not part of v1. Patch 2, adds IEP node to dt
+   bindings for ICSSG.
+
+[v1] https://lore.kernel.org/all/20230803110153.3309577-1-danishanwar@ti.com/
+[v2] https://lore.kernel.org/all/20230807110048.2611456-1-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+
+Grygorii Strashko (1):
+  net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
+
+MD Danish Anwar (2):
+  dt-bindings: net: Add ICSS IEP
+  dt-bindings: net: Add IEP property in ICSSG DT binding
+
+Roger Quadros (2):
+  net: ti: icss-iep: Add IEP driver
+  net: ti: icssg-prueth: add packet timestamping and ptp support
+
+ .../devicetree/bindings/net/ti,icss-iep.yaml  |  37 +
+ .../bindings/net/ti,icssg-prueth.yaml         |   7 +
+ drivers/net/ethernet/ti/Kconfig               |  12 +
+ drivers/net/ethernet/ti/Makefile              |   1 +
+ drivers/net/ethernet/ti/icssg/icss_iep.c      | 961 ++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icss_iep.h      |  41 +
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |   7 +
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  21 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 451 +++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  28 +-
+ 10 files changed, 1558 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+
 -- 
-2.37.3
+2.34.1
 
 
