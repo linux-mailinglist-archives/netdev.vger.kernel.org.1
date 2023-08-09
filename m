@@ -1,149 +1,100 @@
-Return-Path: <netdev+bounces-25918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F6A7762A9
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:39:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B93C7762AC
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CC7E281B00
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:39:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25431280A7A
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C792118AF1;
-	Wed,  9 Aug 2023 14:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8CD18B03;
+	Wed,  9 Aug 2023 14:40:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBC9182B7
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:39:38 +0000 (UTC)
-Received: from out-79.mta0.migadu.com (out-79.mta0.migadu.com [91.218.175.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096EC2108
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 07:39:36 -0700 (PDT)
-Message-ID: <6acbbf63-ba10-4a66-5e31-b9a499f79489@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691591975;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K70SI6itTIMucJGr0SM6nBFOaQH3QInpyitYP0k5TGc=;
-	b=nJMgWPNHgDmf8TRqPDZuCQcujph5ZN/cHQX91FjhLiCSbwK5HK5u+PoCxWCJECpRrLlZFL
-	qMOT4lxVTbCtawzV70UYqUiNnr8Cl5+DkmzSDNk2B67R6vBN8L8Zf4/C0pkib2D99+57Qb
-	cKPYAoi/eiZvR9XkKDHftB/Qr9ml2ko=
-Date: Wed, 9 Aug 2023 07:39:28 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CA02CA4
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:40:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEFDC433C8;
+	Wed,  9 Aug 2023 14:39:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691592001;
+	bh=t6FjFc3AES2KACSvBk65Vzki7TTeide32e508stIQPM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iH/uNjKqst+lY51K1kZDshSOoR+reeILLpdtz8Ao14jstCiZMIKIepAR1KjxSIByQ
+	 ThlyHk8zjv/VdlVDLzyVj/Mf0RCbuGjc74ES7OxcffFuCl8I+9syQYqTiqzP//7wm7
+	 MTd9Urzs7nOpKPM+sJiInjD/0DW8xmVSL9WmIo+m/n0Kx6AvklgRwe9zaxKSUutARI
+	 2YmSzN9UCyK4Yc/tU9gdaCOYk7EvaXf5dh2grULVHSCxSCU8wU6ZRa3QDo1eWrdOAt
+	 ugZD+2wHve4uJSQCiRbgglp69eq/DxdvctVWuZWEeH4AqVQ1x+e33sUMz2vWZJwJbW
+	 nyxrmenqljSAA==
+Date: Wed, 9 Aug 2023 16:39:57 +0200
+From: Simon Horman <horms@kernel.org>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: geoff@infradead.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mpe@ellerman.id.au,
+	npiggin@gmail.com, christophe.leroy@csgroup.eu,
+	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH -next] net/ps3_gelic_net: Use ether_addr_to_u64() to
+ convert ethernet address
+Message-ID: <ZNOlPdxAPzIcB0Ij@vergenet.net>
+References: <20230808114050.4034547-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] net: Fix slab-out-of-bounds in
- inet[6]_steal_sock
-Content-Language: en-US
-To: Lorenz Bauer <lmb@isovalent.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima
- <kuniyu@amazon.com>, Martin KaFai Lau <martin.lau@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Kumar Kartikeya Dwivedi <memxor@gmail.com>
-References: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808114050.4034547-1-lizetao1@huawei.com>
 
-On 8/9/23 1:33 AM, Lorenz Bauer wrote:
-> Kumar reported a KASAN splat in tcp_v6_rcv:
+On Tue, Aug 08, 2023 at 07:40:50PM +0800, Li Zetao wrote:
+> Use ether_addr_to_u64() to convert an Ethernet address into a u64 value,
+> instead of directly calculating, as this is exactly what
+> this function does.
 > 
->    bash-5.2# ./test_progs -t btf_skc_cls_ingress
->    ...
->    [   51.810085] BUG: KASAN: slab-out-of-bounds in tcp_v6_rcv+0x2d7d/0x3440
->    [   51.810458] Read of size 2 at addr ffff8881053f038c by task test_progs/226
-> 
-> The problem is that inet[6]_steal_sock accesses sk->sk_protocol without
-> accounting for request sockets. I added the check to ensure that we only
-> every try to perform a reuseport lookup on a supported socket.
-> 
-> It turns out that this isn't necessary at all. struct sock_common contains
-> a skc_reuseport flag which indicates whether a socket is part of a
-
-Does it go back to the earlier discussion 
-(https://lore.kernel.org/bpf/7188429a-c380-14c8-57bb-9d05d3ba4e5e@linux.dev/) 
-that the sk->sk_reuseport is 1 from sk_clone for TCP_ESTABLISHED? It works 
-because there is sk->sk_reuseport"_cb" check going deeper into 
-reuseport_select_sock() but there is an extra inet6_ehashfn for all TCP_ESTABLISHED.
-
-> reuseport group. inet[6]_lookup_reuseport already check this flag,
-> so we can't execute an erroneous reuseport lookup by definition.
-> 
-> Remove the unnecessary assertions to fix the out of bounds access.
-> 
-> Fixes: 9c02bec95954 ("bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign")
-> Reported-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-> Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 > ---
->   include/net/inet6_hashtables.h | 10 ----------
->   include/net/inet_hashtables.h  | 10 ----------
->   2 files changed, 20 deletions(-)
+>  drivers/net/ethernet/toshiba/ps3_gelic_net.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
-> index 284b5ce7205d..f9907ed36d54 100644
-> --- a/include/net/inet6_hashtables.h
-> +++ b/include/net/inet6_hashtables.h
-> @@ -119,16 +119,6 @@ struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
->   	if (!prefetched)
->   		return sk;
->   
-> -	if (sk->sk_protocol == IPPROTO_TCP) {
-> -		if (sk->sk_state != TCP_LISTEN)
-> -			return sk;
-> -	} else if (sk->sk_protocol == IPPROTO_UDP) {
-> -		if (sk->sk_state != TCP_CLOSE)
-> -			return sk;
-> -	} else {
-> -		return sk;
-> -	}
-> -
->   	reuse_sk = inet6_lookup_reuseport(net, sk, skb, doff,
->   					  saddr, sport, daddr, ntohs(dport),
->   					  ehashfn);
-> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-> index 1177effabed3..57a46993383a 100644
-> --- a/include/net/inet_hashtables.h
-> +++ b/include/net/inet_hashtables.h
-> @@ -465,16 +465,6 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
->   	if (!prefetched)
->   		return sk;
->   
-> -	if (sk->sk_protocol == IPPROTO_TCP) {
-> -		if (sk->sk_state != TCP_LISTEN)
-> -			return sk;
-> -	} else if (sk->sk_protocol == IPPROTO_UDP) {
-> -		if (sk->sk_state != TCP_CLOSE)
-> -			return sk;
-> -	} else {
-> -		return sk;
-> -	}
-> -
->   	reuse_sk = inet_lookup_reuseport(net, sk, skb, doff,
->   					 saddr, sport, daddr, ntohs(dport),
->   					 ehashfn);
-> 
-> ---
-> base-commit: eb62e6aef940fcb1879100130068369d4638088f
-> change-id: 20230808-bpf-next-a442a095562b
-> 
-> Best regards,
+> diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> index 9d535ae59626..77a02819e412 100644
+> --- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> +++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+> @@ -596,7 +596,6 @@ void gelic_net_set_multi(struct net_device *netdev)
+>  	struct gelic_card *card = netdev_card(netdev);
+>  	struct netdev_hw_addr *ha;
+>  	unsigned int i;
 
+Hi Li Zetao,
+
+It looks like i is now unused in this function and should be removed.
+
+> -	uint8_t *p;
+>  	u64 addr;
+>  	int status;
+>  
+> @@ -629,12 +628,7 @@ void gelic_net_set_multi(struct net_device *netdev)
+>  
+>  	/* set multicast addresses */
+>  	netdev_for_each_mc_addr(ha, netdev) {
+> -		addr = 0;
+> -		p = ha->addr;
+> -		for (i = 0; i < ETH_ALEN; i++) {
+> -			addr <<= 8;
+> -			addr |= *p++;
+> -		}
+> +		addr = ether_addr_to_u64(ha->addr);
+>  		status = lv1_net_add_multicast_address(bus_id(card),
+>  						       dev_id(card),
+>  						       addr, 0);
+> -- 
+> 2.34.1
+
+-- 
+pw-bot: changes-requested
 
