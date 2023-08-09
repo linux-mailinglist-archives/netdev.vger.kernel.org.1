@@ -1,55 +1,39 @@
-Return-Path: <netdev+bounces-25759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E37B1775598
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 10:40:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21F5977558E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 10:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 990E6280A78
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:40:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D950B2817FB
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674491800F;
-	Wed,  9 Aug 2023 08:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8A9182C6;
+	Wed,  9 Aug 2023 08:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A759C1EA85
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:30:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD04BC433BC;
-	Wed,  9 Aug 2023 08:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AA41CA16
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 87BD8C433B8;
+	Wed,  9 Aug 2023 08:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691569831;
-	bh=UTVZ99+ysFDAzLoGeBnvQlb5LSbbHsFXgSAZFJNP76o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Yy8Jd0Ql6ZgxTpnMZSfgV8J293IwRcOcKQLhfvZfFvQfPZVPdLofZ5PYMvSzWSfUI
-	 Gycdi0s0njD7ihYatpyvTlywTjpBgyLSVDidXZyjilfxKBwYsZcLsuv4c47uKfV9dw
-	 y53LC1ERhl80LlwltTUPBV70l7pWkWUrkUQnQ9joKNuvgZ5dJ1NNG8O/ZSo28AcAUq
-	 kqkhjRwEjNZXnhtpsBKQzTQrPA5Odn1Mp0+M6bzHd+s8IcGmKJpeurZouXCCCqCo1L
-	 pmhbeFWO5pHHJF4bV55sfZeniwO0wYzLYqrs79su2syl64pjMRwnoBqkeM4wS69YKt
-	 QkwvJFDhG8z0w==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Patrisious Haddad <phaddad@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-rdma@vger.kernel.org,
-	Maor Gottlieb <maorg@nvidia.com>,
-	Mark Zhang <markzhang@nvidia.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Raed Salem <raeds@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: [PATCH mlx5-next v1 14/14] RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion
-Date: Wed,  9 Aug 2023 11:29:26 +0300
-Message-ID: <d81bcacfaa3ab1a82dd5f8f681dccd4a9fc855a2.1691569414.git.leon@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1691569414.git.leon@kernel.org>
-References: <cover.1691569414.git.leon@kernel.org>
+	s=k20201202; t=1691569821;
+	bh=4Mjj7h1enJcfJyIGcdaxo9qCNmWfFJ3uQOii3hhJbfk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aZPhPpbsAqyX4EiN05taBBURVeytubl4IDJXJo8lqL08LGCBv+lbYa/sHAVFUG8EF
+	 omMsp9Qa4XcrRhaphJdbdI0XyxYy87OgbXWJfMZGdp/TL6oC6u5lbMhvYEWfJcDxRy
+	 SzCIm/L812oVQ3DcqnGlsqmYXspS5KwZa0esIKmf2SYOgrcrAjJaGo9wuHUtUFktkZ
+	 8/2sArt1FQkHfLZOW6ZXpeKf1uPZCipKeXG/LTLlwLaeYe+FP27E+AUpCLy/PW4IYz
+	 /PoSPaBurYVwZr+HuLDg3a9Y7L8sx4/7U/DWmvcsYcB0Hncq68q2YYVneIl4Bnty9A
+	 84XZ56j3AS6Qg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40E86E505D5;
+	Wed,  9 Aug 2023 08:30:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,446 +41,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 pci/net 0/3] Fix ENETC probing after 6fffbc7ae137 ("PCI:
+ Honor firmware's device disabled status")
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169156982125.20993.4597878185625596543.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Aug 2023 08:30:21 +0000
+References: <20230803135858.2724342-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20230803135858.2724342-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: linux-pci@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bhelgaas@google.com,
+ robh@kernel.org, claudiu.manoil@nxp.com, michael@walle.cc,
+ linux-kernel@vger.kernel.org, lvjianmin@loongson.cn, liupeibao@loongson.cn,
+ zhoubinbin@loongson.cn, chenhuacai@loongson.cn
 
-From: Patrisious Haddad <phaddad@nvidia.com>
+Hello:
 
-Add RoCE MACsec rules when a gid is added for the MACsec netdevice and
-handle their cleanup when the gid is removed or the MACsec SA is deleted.
-Also support alias IP for the MACsec device, as long as we don't have
-more ips than what the gid table can hold.
-In addition handle the case where a gid is added but there are still no
-SAs added for the MACsec device, so the rules are added later on when
-the SAs are added.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/infiniband/hw/mlx5/macsec.c  | 235 +++++++++++++++++++++++++--
- drivers/infiniband/hw/mlx5/macsec.h  |   8 +-
- drivers/infiniband/hw/mlx5/main.c    |   6 +-
- drivers/infiniband/hw/mlx5/mlx5_ib.h |  10 ++
- include/linux/mlx5/driver.h          |   4 +-
- 5 files changed, 246 insertions(+), 17 deletions(-)
+On Thu,  3 Aug 2023 16:58:55 +0300 you wrote:
+> I'm not sure who should take this patch set (net maintainers or PCI
+> maintainers). Everyone could pick up just their part, and that would
+> work (no compile time dependencies). However, the entire series needs
+> ACK from both sides and Rob for sure.
+> 
+> v1 at:
+> https://lore.kernel.org/netdev/20230521115141.2384444-1-vladimir.oltean@nxp.com/
+> 
+> [...]
 
-diff --git a/drivers/infiniband/hw/mlx5/macsec.c b/drivers/infiniband/hw/mlx5/macsec.c
-index 349ad13af75d..3c56eb5eddf3 100644
---- a/drivers/infiniband/hw/mlx5/macsec.c
-+++ b/drivers/infiniband/hw/mlx5/macsec.c
-@@ -2,13 +2,174 @@
- /* Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. */
- 
- #include "macsec.h"
-+#include <linux/mlx5/macsec.h>
- 
- struct mlx5_reserved_gids {
- 	int macsec_index;
- 	const struct ib_gid_attr *physical_gid;
- };
- 
--int mlx5r_macsec_alloc_gids(struct mlx5_ib_dev *dev)
-+struct mlx5_roce_gids {
-+	struct list_head roce_gid_list_entry;
-+	u16 gid_idx;
-+	union {
-+		struct sockaddr_in  sockaddr_in;
-+		struct sockaddr_in6 sockaddr_in6;
-+	} addr;
-+};
-+
-+struct mlx5_macsec_device {
-+	struct list_head macsec_devices_list_entry;
-+	void *macdev;
-+	struct list_head macsec_roce_gids;
-+	struct list_head tx_rules_list;
-+	struct list_head rx_rules_list;
-+};
-+
-+static void cleanup_macsec_device(struct mlx5_macsec_device *macsec_device)
-+{
-+	if (!list_empty(&macsec_device->tx_rules_list) ||
-+	    !list_empty(&macsec_device->rx_rules_list) ||
-+	    !list_empty(&macsec_device->macsec_roce_gids))
-+		return;
-+
-+	list_del(&macsec_device->macsec_devices_list_entry);
-+	kfree(macsec_device);
-+}
-+
-+static struct mlx5_macsec_device *get_macsec_device(void *macdev,
-+						    struct list_head *macsec_devices_list)
-+{
-+	struct mlx5_macsec_device *iter, *macsec_device = NULL;
-+
-+	list_for_each_entry(iter, macsec_devices_list, macsec_devices_list_entry) {
-+		if (iter->macdev == macdev) {
-+			macsec_device = iter;
-+			break;
-+		}
-+	}
-+
-+	if (macsec_device)
-+		return macsec_device;
-+
-+	macsec_device = kzalloc(sizeof(*macsec_device), GFP_KERNEL);
-+	if (!macsec_device)
-+		return NULL;
-+
-+	macsec_device->macdev = macdev;
-+	INIT_LIST_HEAD(&macsec_device->tx_rules_list);
-+	INIT_LIST_HEAD(&macsec_device->rx_rules_list);
-+	INIT_LIST_HEAD(&macsec_device->macsec_roce_gids);
-+	list_add(&macsec_device->macsec_devices_list_entry, macsec_devices_list);
-+
-+	return macsec_device;
-+}
-+
-+static void mlx5_macsec_del_roce_gid(struct mlx5_macsec_device *macsec_device, u16 gid_idx)
-+{
-+	struct mlx5_roce_gids *current_gid, *next_gid;
-+
-+	list_for_each_entry_safe(current_gid, next_gid, &macsec_device->macsec_roce_gids,
-+				 roce_gid_list_entry)
-+		if (current_gid->gid_idx == gid_idx) {
-+			list_del(&current_gid->roce_gid_list_entry);
-+			kfree(current_gid);
-+		}
-+}
-+
-+static void mlx5_macsec_save_roce_gid(struct mlx5_macsec_device *macsec_device,
-+				      const struct sockaddr *addr, u16 gid_idx)
-+{
-+	struct mlx5_roce_gids *roce_gids;
-+
-+	roce_gids = kzalloc(sizeof(*roce_gids), GFP_KERNEL);
-+	if (!roce_gids)
-+		return;
-+
-+	roce_gids->gid_idx = gid_idx;
-+	if (addr->sa_family == AF_INET)
-+		memcpy(&roce_gids->addr.sockaddr_in, addr, sizeof(roce_gids->addr.sockaddr_in));
-+	else
-+		memcpy(&roce_gids->addr.sockaddr_in6, addr, sizeof(roce_gids->addr.sockaddr_in6));
-+
-+	list_add_tail(&roce_gids->roce_gid_list_entry, &macsec_device->macsec_roce_gids);
-+}
-+
-+static void handle_macsec_gids(struct list_head *macsec_devices_list,
-+			       struct mlx5_macsec_event_data *data)
-+{
-+	struct mlx5_macsec_device *macsec_device;
-+	struct mlx5_roce_gids *gid;
-+
-+	macsec_device = get_macsec_device(data->macdev, macsec_devices_list);
-+	if (!macsec_device)
-+		return;
-+
-+	list_for_each_entry(gid, &macsec_device->macsec_roce_gids, roce_gid_list_entry) {
-+		mlx5_macsec_add_roce_sa_rules(data->fs_id, (struct sockaddr *)&gid->addr,
-+					      gid->gid_idx, &macsec_device->tx_rules_list,
-+					      &macsec_device->rx_rules_list, data->macsec_fs,
-+					      data->is_tx);
-+	}
-+}
-+
-+static void del_sa_roce_rule(struct list_head *macsec_devices_list,
-+			     struct mlx5_macsec_event_data *data)
-+{
-+	struct mlx5_macsec_device *macsec_device;
-+
-+	macsec_device = get_macsec_device(data->macdev, macsec_devices_list);
-+	WARN_ON(!macsec_device);
-+
-+	mlx5_macsec_del_roce_sa_rules(data->fs_id, data->macsec_fs,
-+				      &macsec_device->tx_rules_list,
-+				      &macsec_device->rx_rules_list, data->is_tx);
-+}
-+
-+static int macsec_event(struct notifier_block *nb, unsigned long event, void *data)
-+{
-+	struct mlx5_macsec *macsec = container_of(nb, struct mlx5_macsec, blocking_events_nb);
-+
-+	mutex_lock(&macsec->lock);
-+	switch (event) {
-+	case MLX5_DRIVER_EVENT_MACSEC_SA_ADDED:
-+		handle_macsec_gids(&macsec->macsec_devices_list, data);
-+		break;
-+	case MLX5_DRIVER_EVENT_MACSEC_SA_DELETED:
-+		del_sa_roce_rule(&macsec->macsec_devices_list, data);
-+		break;
-+	default:
-+		mutex_unlock(&macsec->lock);
-+		return NOTIFY_DONE;
-+	}
-+	mutex_unlock(&macsec->lock);
-+	return NOTIFY_OK;
-+}
-+
-+void mlx5r_macsec_event_register(struct mlx5_ib_dev *dev)
-+{
-+	if (!mlx5_is_macsec_roce_supported(dev->mdev)) {
-+		mlx5_ib_dbg(dev, "RoCE MACsec not supported due to capabilities\n");
-+		return;
-+	}
-+
-+	dev->macsec.blocking_events_nb.notifier_call = macsec_event;
-+	blocking_notifier_chain_register(&dev->mdev->macsec_nh,
-+					 &dev->macsec.blocking_events_nb);
-+}
-+
-+void mlx5r_macsec_event_unregister(struct mlx5_ib_dev *dev)
-+{
-+	if (!mlx5_is_macsec_roce_supported(dev->mdev)) {
-+		mlx5_ib_dbg(dev, "RoCE MACsec not supported due to capabilities\n");
-+		return;
-+	}
-+
-+	blocking_notifier_chain_unregister(&dev->mdev->macsec_nh,
-+					   &dev->macsec.blocking_events_nb);
-+}
-+
-+int mlx5r_macsec_init_gids_and_devlist(struct mlx5_ib_dev *dev)
- {
- 	int i, j, max_gids;
- 
-@@ -29,6 +190,9 @@ int mlx5r_macsec_alloc_gids(struct mlx5_ib_dev *dev)
- 			dev->port[i].reserved_gids[j].macsec_index = -1;
- 	}
- 
-+	INIT_LIST_HEAD(&dev->macsec.macsec_devices_list);
-+	mutex_init(&dev->macsec.lock);
-+
- 	return 0;
- err:
- 	while (i >= 0) {
-@@ -47,15 +211,22 @@ void mlx5r_macsec_dealloc_gids(struct mlx5_ib_dev *dev)
- 
- 	for (i = 0; i < dev->num_ports; i++)
- 		kfree(dev->port[i].reserved_gids);
-+
-+	mutex_destroy(&dev->macsec.lock);
- }
- 
- int mlx5r_add_gid_macsec_operations(const struct ib_gid_attr *attr)
- {
- 	struct mlx5_ib_dev *dev = to_mdev(attr->device);
-+	struct mlx5_macsec_device *macsec_device;
- 	const struct ib_gid_attr *physical_gid;
- 	struct mlx5_reserved_gids *mgids;
- 	struct net_device *ndev;
- 	int ret = 0;
-+	union {
-+		struct sockaddr_in  sockaddr_in;
-+		struct sockaddr_in6 sockaddr_in6;
-+	} addr;
- 
- 	if (attr->gid_type != IB_GID_TYPE_ROCE_UDP_ENCAP)
- 		return 0;
-@@ -76,34 +247,62 @@ int mlx5r_add_gid_macsec_operations(const struct ib_gid_attr *attr)
- 		rcu_read_unlock();
- 		return 0;
- 	}
-+	dev_hold(ndev);
- 	rcu_read_unlock();
- 
-+	mutex_lock(&dev->macsec.lock);
-+	macsec_device = get_macsec_device(ndev, &dev->macsec.macsec_devices_list);
-+	if (!macsec_device) {
-+		ret = -ENOMEM;
-+		goto dev_err;
-+	}
-+
- 	physical_gid = rdma_find_gid(attr->device, &attr->gid,
- 				     attr->gid_type, NULL);
--	if (IS_ERR(physical_gid))
--		return 0;
-+	if (!IS_ERR(physical_gid)) {
-+		ret = set_roce_addr(to_mdev(physical_gid->device),
-+				    physical_gid->port_num,
-+				    physical_gid->index, NULL,
-+				    physical_gid);
-+		if (ret)
-+			goto gid_err;
- 
--	ret = set_roce_addr(to_mdev(physical_gid->device),
--			    physical_gid->port_num,
--			    physical_gid->index, NULL,
--			    physical_gid);
--	if (ret)
--		goto gid_err;
-+		mgids = &dev->port[attr->port_num - 1].reserved_gids[physical_gid->index];
-+		mgids->macsec_index = attr->index;
-+		mgids->physical_gid = physical_gid;
-+	}
- 
--	mgids = &dev->port[attr->port_num - 1].reserved_gids[physical_gid->index];
--	mgids->macsec_index = attr->index;
--	mgids->physical_gid = physical_gid;
-+	/* Proceed with adding steering rules, regardless if there was gid ambiguity or not.*/
-+	rdma_gid2ip((struct sockaddr *)&addr, &attr->gid);
-+	ret = mlx5_macsec_add_roce_rule(ndev, (struct sockaddr *)&addr, attr->index,
-+					&macsec_device->tx_rules_list,
-+					&macsec_device->rx_rules_list, dev->mdev->macsec_fs);
-+	if (ret && !IS_ERR(physical_gid))
-+		goto rule_err;
- 
--	return 0;
-+	mlx5_macsec_save_roce_gid(macsec_device, (struct sockaddr *)&addr, attr->index);
-+
-+	dev_put(ndev);
-+	mutex_unlock(&dev->macsec.lock);
-+	return ret;
- 
-+rule_err:
-+	set_roce_addr(to_mdev(physical_gid->device), physical_gid->port_num,
-+		      physical_gid->index, &physical_gid->gid, physical_gid);
-+	mgids->macsec_index = -1;
- gid_err:
- 	rdma_put_gid_attr(physical_gid);
-+	cleanup_macsec_device(macsec_device);
-+dev_err:
-+	dev_put(ndev);
-+	mutex_unlock(&dev->macsec.lock);
- 	return ret;
- }
- 
- void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr)
- {
- 	struct mlx5_ib_dev *dev = to_mdev(attr->device);
-+	struct mlx5_macsec_device *macsec_device;
- 	struct mlx5_reserved_gids *mgids;
- 	struct net_device *ndev;
- 	int i, max_gids;
-@@ -134,8 +333,10 @@ void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr)
- 		rcu_read_unlock();
- 		return;
- 	}
-+	dev_hold(ndev);
- 	rcu_read_unlock();
- 
-+	mutex_lock(&dev->macsec.lock);
- 	max_gids = MLX5_CAP_ROCE(dev->mdev, roce_address_table_size);
- 	for (i = 0; i < max_gids; i++) { /* Checking if macsec gid has ambiguous IP */
- 		mgids = &dev->port[attr->port_num - 1].reserved_gids[i];
-@@ -152,4 +353,12 @@ void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr)
- 			break;
- 		}
- 	}
-+	macsec_device = get_macsec_device(ndev, &dev->macsec.macsec_devices_list);
-+	mlx5_macsec_del_roce_rule(attr->index, dev->mdev->macsec_fs,
-+				  &macsec_device->tx_rules_list, &macsec_device->rx_rules_list);
-+	mlx5_macsec_del_roce_gid(macsec_device, attr->index);
-+	cleanup_macsec_device(macsec_device);
-+
-+	dev_put(ndev);
-+	mutex_unlock(&dev->macsec.lock);
- }
-diff --git a/drivers/infiniband/hw/mlx5/macsec.h b/drivers/infiniband/hw/mlx5/macsec.h
-index b60f8f046d6f..9b77ba90f0f4 100644
---- a/drivers/infiniband/hw/mlx5/macsec.h
-+++ b/drivers/infiniband/hw/mlx5/macsec.h
-@@ -14,12 +14,16 @@ struct mlx5_reserved_gids;
- 
- int mlx5r_add_gid_macsec_operations(const struct ib_gid_attr *attr);
- void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr);
--int mlx5r_macsec_alloc_gids(struct mlx5_ib_dev *dev);
-+int mlx5r_macsec_init_gids_and_devlist(struct mlx5_ib_dev *dev);
- void mlx5r_macsec_dealloc_gids(struct mlx5_ib_dev *dev);
-+void mlx5r_macsec_event_register(struct mlx5_ib_dev *dev);
-+void mlx5r_macsec_event_unregister(struct mlx5_ib_dev *dev);
- #else
- static inline int mlx5r_add_gid_macsec_operations(const struct ib_gid_attr *attr) { return 0; }
- static inline void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr) {}
--static inline int mlx5r_macsec_alloc_gids(struct mlx5_ib_dev *dev) { return 0; }
-+static inline int mlx5r_macsec_init_gids_and_devlist(struct mlx5_ib_dev *dev) { return 0; }
- static inline void mlx5r_macsec_dealloc_gids(struct mlx5_ib_dev *dev) {}
-+static inline void mlx5r_macsec_event_register(struct mlx5_ib_dev *dev) {}
-+static inline void mlx5r_macsec_event_unregister(struct mlx5_ib_dev *dev) {}
- #endif
- #endif /* __MLX5_MACSEC_H__ */
-diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-index f463cf8b7501..b4cc16a19757 100644
---- a/drivers/infiniband/hw/mlx5/main.c
-+++ b/drivers/infiniband/hw/mlx5/main.c
-@@ -3684,7 +3684,7 @@ static int mlx5_ib_stage_init_init(struct mlx5_ib_dev *dev)
- 	if (err)
- 		return err;
- 
--	err = mlx5r_macsec_alloc_gids(dev);
-+	err = mlx5r_macsec_init_gids_and_devlist(dev);
- 	if (err)
- 		return err;
- 
-@@ -4125,11 +4125,15 @@ static int mlx5_ib_stage_dev_notifier_init(struct mlx5_ib_dev *dev)
- {
- 	dev->mdev_events.notifier_call = mlx5_ib_event;
- 	mlx5_notifier_register(dev->mdev, &dev->mdev_events);
-+
-+	mlx5r_macsec_event_register(dev);
-+
- 	return 0;
- }
- 
- static void mlx5_ib_stage_dev_notifier_cleanup(struct mlx5_ib_dev *dev)
- {
-+	mlx5r_macsec_event_unregister(dev);
- 	mlx5_notifier_unregister(dev->mdev, &dev->mdev_events);
- }
- 
-diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-index a4b940b5035f..16713baf0d06 100644
---- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
-+++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-@@ -1090,6 +1090,12 @@ struct mlx5_special_mkeys {
- 	__be32 terminate_scatter_list_mkey;
- };
- 
-+struct mlx5_macsec {
-+	struct mutex lock; /* Protects mlx5_macsec internal contexts */
-+	struct list_head macsec_devices_list;
-+	struct notifier_block blocking_events_nb;
-+};
-+
- struct mlx5_ib_dev {
- 	struct ib_device		ib_dev;
- 	struct mlx5_core_dev		*mdev;
-@@ -1149,6 +1155,10 @@ struct mlx5_ib_dev {
- 	u16 pkey_table_len;
- 	u8 lag_ports;
- 	struct mlx5_special_mkeys mkeys;
-+
-+#ifdef CONFIG_MLX5_MACSEC
-+	struct mlx5_macsec macsec;
-+#endif
- };
- 
- static inline struct mlx5_ib_cq *to_mibcq(struct mlx5_core_cq *mcq)
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 848993823ba5..38412457c617 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -1328,6 +1328,7 @@ static inline bool mlx5_get_roce_state(struct mlx5_core_dev *dev)
- 	return mlx5_is_roce_on(dev);
- }
- 
-+#ifdef CONFIG_MLX5_MACSEC
- static inline bool mlx5e_is_macsec_device(const struct mlx5_core_dev *mdev)
- {
- 	if (!(MLX5_CAP_GEN_64(mdev, general_obj_types) &
-@@ -1366,11 +1367,12 @@ static inline bool mlx5_is_macsec_roce_supported(struct mlx5_core_dev *mdev)
- 	if (((MLX5_CAP_GEN_2(mdev, flow_table_type_2_type) &
- 	     NIC_RDMA_BOTH_DIRS_CAPS) != NIC_RDMA_BOTH_DIRS_CAPS) ||
- 	     !MLX5_CAP_FLOWTABLE_RDMA_TX(mdev, max_modify_header_actions) ||
--	     !mlx5e_is_macsec_device(mdev))
-+	     !mlx5e_is_macsec_device(mdev) || !mdev->macsec_fs)
- 		return false;
- 
- 	return true;
- }
-+#endif
- 
- enum {
- 	MLX5_OCTWORD = 16,
+Here is the summary with links:
+  - [v2,pci/net,1/3] PCI: move OF status = "disabled" detection to dev->match_driver
+    https://git.kernel.org/netdev/net/c/1a8c251cff20
+  - [v2,pci/net,2/3] net: enetc: reimplement RFS/RSS memory clearing as PCI quirk
+    https://git.kernel.org/netdev/net/c/f0168042a212
+  - [v2,pci/net,3/3] net: enetc: remove of_device_is_available() handling
+    https://git.kernel.org/netdev/net/c/bfce089ddd0e
+
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
