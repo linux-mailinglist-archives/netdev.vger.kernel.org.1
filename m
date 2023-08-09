@@ -1,119 +1,114 @@
-Return-Path: <netdev+bounces-25963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B867764B1
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:09:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6C2B7764BD
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 363BF2812D6
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:09:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03DB01C20A06
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A9E1BF1B;
-	Wed,  9 Aug 2023 16:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19061C9E5;
+	Wed,  9 Aug 2023 16:11:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B522418AE4
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:09:01 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C532D2113;
-	Wed,  9 Aug 2023 09:09:00 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8C0A01F45E;
-	Wed,  9 Aug 2023 16:08:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1691597339; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X2P0PdEHXJn16g+3yiKkWRHyzNKP9w9NMIFmjSewM/A=;
-	b=o945M/P89p11rlOWuOXRWr5LXC9vIGmlBN3cZHgcuirP+rB0x6BHYLjbnu0LC7eNSSI6EG
-	De5XjnYvSWx45OzkklMPHwfmxUG9E1ye2mgz2rVTZ2kumHn0FcgLME2GCYDyYJZ9x97pG8
-	rNpytZJnZYWVjEN1Kp/Snh49gwRuqnQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1691597339;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X2P0PdEHXJn16g+3yiKkWRHyzNKP9w9NMIFmjSewM/A=;
-	b=4wvCRsQCh1Yxmkbbpy00/vc78dfC2/mSKYjTTz4KeCExoiH4pnIIhF/LVC+heckrowlCPb
-	Pyv3fkraMlNNsRBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5B4CC133B5;
-	Wed,  9 Aug 2023 16:08:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id bKlkFRu602SZXAAAMHmgww
-	(envelope-from <tiwai@suse.de>); Wed, 09 Aug 2023 16:08:59 +0000
-Date: Wed, 09 Aug 2023 18:08:58 +0200
-Message-ID: <87v8doci5h.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Takashi Iwai <tiwai@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	linux-kernel@vger.kernel.org,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC] Introduce uniptr_t as a generic "universal" pointer
-In-Reply-To: <CAHk-=wgGV61xrG=gO0=dXH64o2TDWWrXn1mx-CX885JZ7h84Og@mail.gmail.com>
-References: <87edkce118.wl-tiwai@suse.de>
-	<20230809143801.GA693@lst.de>
-	<87a5v0e0mv.wl-tiwai@suse.de>
-	<CAHk-=wgGV61xrG=gO0=dXH64o2TDWWrXn1mx-CX885JZ7h84Og@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A3D18AE1
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:11:14 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E6019E
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:11:13 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qTlm9-0005UC-1i;
+	Wed, 09 Aug 2023 16:11:10 +0000
+Date: Wed, 9 Aug 2023 17:10:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Simon Horman <simon.horman@corigine.com>,
+	Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [PATCH net-next v3 0/4] Support offload LED blinking to PHY.
+Message-ID: <ZNO6hfjrJthoIUi9@makrotopia.org>
+References: <20230808210436.838995-1-andrew@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808210436.838995-1-andrew@lunn.ch>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 09 Aug 2023 17:59:20 +0200,
-Linus Torvalds wrote:
-> 
-> On Wed, 9 Aug 2023 at 07:44, Takashi Iwai <tiwai@suse.de> wrote:
-> >
-> > The remaining question is whether the use of sockptr_t for other
-> > subsystems as a generic pointer is a recommended / acceptable move...
-> 
-> Very much not recommended. sockptr_t is horrible too, but it was (part
-> of) what made it possible to fix an even worse horrible historical
-> mistake (ie getting rid of set_fs()).
-> 
-> So I detest sockptr_t. It's garbage. At the very minimum it should
-> have had the length associated with it, not passed separately.
-> 
-> But it's garbage exactly because it allowed for conversion of some
-> much much horrid legacy code with fairly minimal impact.
-> 
-> New code does *not* have that excuse.
-> 
-> DO NOT MIX USER AND KERNEL POINTERS. And don't add interfaces that
-> think such mixing is ok. Pointers should be statically clearly of one
-> type or the other, and never lied about.
-> 
-> Or you go all the way, and do that whole iterator thing, and make it
-> very clear that you're doing something truly generic that can be
-> passed fairly widely along across subsystem boundaries.
+Hi Andrew,
 
-OK, it looks like we need to scratch the idea...
+On Tue, Aug 08, 2023 at 11:04:32PM +0200, Andrew Lunn wrote:
+> Allow offloading of the LED trigger netdev to PHY drivers and
+> implement it for the Marvell PHY driver. Additionally, correct the
+> handling of when the initial state of the LED cannot be represented by
+> the trigger, and so an error is returned. As with ledtrig-timer,
+> disable offload when the trigger is deactivate, or replaced by another
+> trigger.
 
+I've tested the series and changed my driver accordingly, now
+deactivation of the offloaded tasks works fine when changing
+the trigger.
 
-Takashi
+Overall I believe this is good to go, however, what remains
+unresolved is the chicken-egg when assigning the 'netdev' trigger
+using linux,default-trigger in device tree: In this case selection of
+the netdev trigger happens on creation of the PHY instance which is
+*before* the creation of the netdev the PHY is going to be attached to.
+Hence 'netdev' gets activated *without* any hardware offloading.
+
+And while reading the current hardware state (as left behind by IC
+defaults or by the bootloader) works fine, by default the LEDs would
+show trigger 'none' in Linux right after boot (despite e.g. link and
+traffic indications are active by default -- which is would I tried to
+express by using linux,default-trigger...)
+
+Tested-by: Daniel Golle <daniel@makrotopia.org>
+
+> 
+> Since v2:
+> Add support for link speeds, not just link
+> Add missing checks for return values
+> Add patch disabling offload when driver is deactivated
+> 
+> Since v1:
+> 
+> Add true kerneldoc for the new entries in struct phy_driver
+> Add received Reviewed-by: tags
+> 
+> Since v0:
+> 
+> Make comments in struct phy_driver look more like kerneldoc
+> Add cover letter
+> 
+> Andrew Lunn (4):
+>   led: trig: netdev: Fix requesting offload device
+>   net: phy: phy_device: Call into the PHY driver to set LED offload
+>   net: phy: marvell: Add support for offloading LED blinking
+>   leds: trig-netdev: Disable offload on deactivation of trigger
+> 
+>  drivers/leds/trigger/ledtrig-netdev.c |  10 +-
+>  drivers/net/phy/marvell.c             | 281 ++++++++++++++++++++++++++
+>  drivers/net/phy/phy_device.c          |  68 +++++++
+>  include/linux/phy.h                   |  33 +++
+>  4 files changed, 389 insertions(+), 3 deletions(-)
+> 
+> -- 
+> 2.40.1
+> 
 
