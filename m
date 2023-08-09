@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-25971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D463776529
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:32:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008D677655A
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:46:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E990D281DD0
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:32:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31CAB1C2135D
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BB518AE0;
-	Wed,  9 Aug 2023 16:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFE01AA83;
+	Wed,  9 Aug 2023 16:46:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224601D2E2;
-	Wed,  9 Aug 2023 16:32:36 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F5710F3;
-	Wed,  9 Aug 2023 09:32:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACA918C2E;
+	Wed,  9 Aug 2023 16:46:31 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2FD81BF7;
+	Wed,  9 Aug 2023 09:46:30 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B52B71F390;
-	Wed,  9 Aug 2023 16:32:34 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5673021866;
+	Wed,  9 Aug 2023 16:46:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1691598754; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1691599589; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7QFcbq83iTfdOitDUN6evIcZyqpeTumZWQXVO5WSyTw=;
-	b=w1WP5bAZE/zSuw7kqB93vtowYM7zVuuhl8Rc2SRSan8LvPe8Lfx2xAZ7f327XDzSDFoVOM
-	HE+jCPblCOa+kKKjgT5n+lBklNdbXAIipUBF4mp0nnMwXIjyyl/C7J7fjSmb6FaNeYkO/b
-	ZxPpcHNe2bgsaMb5k8sMMUurew7OBP0=
+	bh=6rO3bUwCxHrhMQ/KnyWVceX9aLTMN6xCVxviePeeskU=;
+	b=txUbbjWI5xw5IUefZ5+yIFbM4fAhuTkdbK68tmd9ICSYbBAuJ++hpQQg6rxjeL0n2VXzel
+	zj2aZuTBkvwIOmCjEr7Y6at53HwZkrlpX/bcUlaDc/gM1tsNuSrUwU9J3XXEPKaw0XSmPn
+	3biEZDSHLsaLDk4yVAXY3G/xW3CIDBY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1691598754;
+	s=susede2_ed25519; t=1691599589;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7QFcbq83iTfdOitDUN6evIcZyqpeTumZWQXVO5WSyTw=;
-	b=5O/IJFSzRRrH1RkxV+y6NJZEypfhjSGMjUDCaG74+GsY1CDQkTgw5zNxPnqqCq1bWIWHNY
-	XSDjMn6ZbnYO8CCQ==
+	bh=6rO3bUwCxHrhMQ/KnyWVceX9aLTMN6xCVxviePeeskU=;
+	b=D6SVisjaDadmt9fliy1dxxoVcIW1VNppOcFZSit1E54dGhJ4h7QqGkljwSTY9FmUIB0Oy3
+	6rqA/qJDBVQvv/BQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 60335133B5;
-	Wed,  9 Aug 2023 16:32:34 +0000 (UTC)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1562F133B5;
+	Wed,  9 Aug 2023 16:46:28 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
 	by imap2.suse-dmz.suse.de with ESMTPSA
-	id voffEaK/02TLZgAAMHmgww
-	(envelope-from <krisman@suse.de>); Wed, 09 Aug 2023 16:32:34 +0000
+	id UXouO+TC02SQbAAAMHmgww
+	(envelope-from <krisman@suse.de>); Wed, 09 Aug 2023 16:46:28 +0000
 From: Gabriel Krisman Bertazi <krisman@suse.de>
 To: Breno Leitao <leitao@debian.org>
 Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
   willemdebruijn.kernel@gmail.com,  bpf@vger.kernel.org,
   linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,
   io-uring@vger.kernel.org,  kuba@kernel.org,  pabeni@redhat.com
-Subject: Re: [PATCH v2 4/8] io_uring/cmd: Extend support beyond SOL_SOCKET
-In-Reply-To: <20230808134049.1407498-5-leitao@debian.org> (Breno Leitao's
-	message of "Tue, 8 Aug 2023 06:40:44 -0700")
+Subject: Re: [PATCH v2 7/8] io_uring/cmd: BPF hook for getsockopt cmd
+In-Reply-To: <20230808134049.1407498-8-leitao@debian.org> (Breno Leitao's
+	message of "Tue, 8 Aug 2023 06:40:47 -0700")
 References: <20230808134049.1407498-1-leitao@debian.org>
-	<20230808134049.1407498-5-leitao@debian.org>
-Date: Wed, 09 Aug 2023 12:32:33 -0400
-Message-ID: <871qgc89cu.fsf@suse.de>
+	<20230808134049.1407498-8-leitao@debian.org>
+Date: Wed, 09 Aug 2023 12:46:27 -0400
+Message-ID: <87wmy46u58.fsf@suse.de>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,45 +83,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 Breno Leitao <leitao@debian.org> writes:
 
-> Add generic support for SOCKET_URING_OP_SETSOCKOPT, expanding the
-> current case, that just execute if level is SOL_SOCKET.
+> Add BPF hooks support for getsockopts io_uring command. So, bpf cgroups
+> programs can run when SOCKET_URING_OP_GETSOCKOPT command is called.
 >
-> This implementation basically calls sock->ops->setsockopt() with a
-> kernel allocated optval;
->
-> Since the callback for ops->setsockopt() is already using sockptr_t,
-> then the callbacks are leveraged to be called directly, similarly to
-> __sys_setsockopt().
+> This implementation follows a similar approach to what
+> __sys_getsockopt() does, but, using USER_SOCKPTR() for optval instead of
+> kernel pointer.
 >
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
->  io_uring/uring_cmd.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  io_uring/uring_cmd.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
 >
 > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> index 5404b788ca14..dbba005a7290 100644
+> index dbba005a7290..3693e5779229 100644
 > --- a/io_uring/uring_cmd.c
 > +++ b/io_uring/uring_cmd.c
-> @@ -205,10 +205,14 @@ static inline int io_uring_cmd_setsockopt(struct socket *sock,
+> @@ -5,6 +5,8 @@
+>  #include <linux/io_uring.h>
+>  #include <linux/security.h>
+>  #include <linux/nospec.h>
+> +#include <linux/compat.h>
+> +#include <linux/bpf-cgroup.h>
+>  
+>  #include <uapi/linux/io_uring.h>
+>  #include <uapi/asm-generic/ioctls.h>
+> @@ -179,17 +181,23 @@ static inline int io_uring_cmd_getsockopt(struct socket *sock,
 >  	if (err)
 >  		return err;
 >  
-> -	err = -EOPNOTSUPP;
->  	if (level == SOL_SOCKET && !sock_use_custom_sol_socket(sock))
->  		err = sock_setsockopt(sock, level, optname,
->  				      USER_SOCKPTR(optval), optlen);
-> +	else if (unlikely(!sock->ops->setsockopt))
-> +		err = -EOPNOTSUPP;
-> +	else
-> +		err = sock->ops->setsockopt(sock, level, optname,
-> +					    USER_SOCKPTR(koptval), optlen);
+> -	if (level == SOL_SOCKET) {
+> +	err = -EOPNOTSUPP;
+> +	if (level == SOL_SOCKET)
+>  		err = sk_getsockopt(sock->sk, level, optname,
+>  				    USER_SOCKPTR(optval),
+>  				    KERNEL_SOCKPTR(&optlen));
+> -		if (err)
+> -			return err;
+>  
+> +	if (!in_compat_syscall())
+> +		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
+> +						     optname,
+> +						     USER_SOCKPTR(optval),
+> +						     KERNEL_SOCKPTR(&optlen),
+> +						     optlen, err);
 
-Perhaps move this logic into a helper in net/ so io_uring doesn't need
-to know details of struct socket and there is no duplication of this code
-in __sys_getsockopt.
+I'm not sure if it makes sense to use in_compat_syscall() here.  Can't
+this be invoked in a ring with ctx->compat set, but from outside a
+compat syscall context (i.e. from sqpoll or even a !compat
+io_uring_enter syscall)? I suspect you might need to check ctx->compact
+instead, but I'm not sure. Did you consider that?
 
->  	return err;
+> +
+> +	if (!err)
+>  		return optlen;
+> -	}
+>  
+> -	return -EOPNOTSUPP;
+> +	return err;
 >  }
+>  
+>  static inline int io_uring_cmd_setsockopt(struct socket *sock,
 
 -- 
 Gabriel Krisman Bertazi
