@@ -1,184 +1,187 @@
-Return-Path: <netdev+bounces-25676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 759BC7751E2
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:20:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B8D775200
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:36:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ACDF1C210EC
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:20:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70ECE281A45
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A091FA4;
-	Wed,  9 Aug 2023 04:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E94A63B;
+	Wed,  9 Aug 2023 04:36:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE077ECE;
-	Wed,  9 Aug 2023 04:20:43 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C9B1BC3;
-	Tue,  8 Aug 2023 21:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691554842; x=1723090842;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=r7oMnxHSYoVbyUtHi0M6LPujLJLQY6C1FqwGaO8iCt8=;
-  b=LVE1pfFDg8DQGr2bdhC/XLX66tYOjOlfxVZbd7hfEZwq+V8XAvJd8Ef6
-   DX1fW6YvaKkrjaa6eDrJlX2VkbpljFxGq5pg5CCZ2BsoJXIzL8WbsPmKP
-   V1+k6AsT3NAXml1Ult31d1Hkn1ALAct8Xmxo5o4MQ78gDk8xOpImnGJ+R
-   zy8EsBww+MByHTfz7zZXCXKdmygP+Uu1So4oUS3kWbDzgsDQZ2ArN5lZC
-   LQ/doKP2Kd1lmBEZ7S+wBqJdoqYANl/8sqvK6XtwBWCexaJrbmVWur17p
-   25zXgueJAiE3eEjJGTCwfU+db/XEIlomqwros9pzcVsGj882tc9x6nhKM
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="361141854"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="361141854"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 21:18:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="725215103"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="725215103"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 08 Aug 2023 21:18:22 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qTaeL-0005nk-0u;
-	Wed, 09 Aug 2023 04:18:21 +0000
-Date: Wed, 9 Aug 2023 12:17:53 +0800
-From: kernel test robot <lkp@intel.com>
-To: Breno Leitao <leitao@debian.org>, sdf@google.com, axboe@kernel.dk,
-	asml.silence@gmail.com, willemdebruijn.kernel@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v2 7/8] io_uring/cmd: BPF hook for getsockopt cmd
-Message-ID: <202308091149.ltz0y4QZ-lkp@intel.com>
-References: <20230808134049.1407498-8-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6334F4680
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 04:36:34 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9DBB198D
+	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:36:32 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qTavu-0002zY-73; Wed, 09 Aug 2023 06:36:30 +0200
+Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qTavq-0003R7-J5; Wed, 09 Aug 2023 06:36:26 +0200
+Date: Wed, 9 Aug 2023 06:36:26 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Marek Vasut <marex@denx.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
+Message-ID: <20230809043626.GG5736@pengutronix.de>
+References: <20230804175842.209537-1-marex@denx.de>
+ <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
+ <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230808134049.1407498-8-leitao@debian.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Breno,
+On Wed, Aug 09, 2023 at 02:27:12AM +0000, Wei Fang wrote:
+> > >> Toggle hibernation mode OFF and ON to wake the PHY up and make it
+> > >> generate clock on RX_CLK pin for about 10 seconds.
+> > >> These clock are needed during start up by MACs like DWMAC in NXP
+> > >> i.MX8M Plus to release their DMA from reset. After the MAC has
+> > >> started up, the PHY can enter hibernation and disable the RX_CLK
+> > >> clock, this poses no problem for the MAC.
+> > >>
+> > >> Originally, this issue has been described by NXP in commit
+> > >> 9ecf04016c87 ("net: phy: at803x: add disable hibernation mode
+> > >> support") but this approach fully disables the hibernation support
+> > >> and takes away any power saving benefit. This patch instead makes the
+> > >> PHY generate the clock on start up for 10 seconds, which should be
+> > >> long enough for the EQoS MAC to release DMA from reset.
+> > >>
+> > >> Before this patch on i.MX8M Plus board with AR8031 PHY:
+> > >> "
+> > >> $ ifconfig eth1 up
+> > >> [   25.576734] imx-dwmac 30bf0000.ethernet eth1: Register
+> > >> MEM_TYPE_PAGE_POOL RxQ-0
+> > >> [   25.658916] imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:00]
+> > >> driver [Qualcomm Atheros AR8031/AR8033] (irq=38)
+> > >> [   26.670276] imx-dwmac 30bf0000.ethernet: Failed to reset the dma
+> > >> [   26.676322] imx-dwmac 30bf0000.ethernet eth1: stmmac_hw_setup:
+> > >> DMA engine initialization failed
+> > >> [   26.685103] imx-dwmac 30bf0000.ethernet eth1: __stmmac_open:
+> > Hw
+> > >> setup failed
+> > >> ifconfig: SIOCSIFFLAGS: Connection timed out "
+> > >>
+> > >
+> > > Have you reproduced this issue based on the upstream net-next or net
+> > tree?
+> > 
+> > On current linux-next next-20230808 so 6.5.0-rc5 . As far as I can tell,
+> > net-next is merged into this tree too.
+> > 
+> 
+> > > If so, can this issue be reproduced? The reason why I ask this is
+> > > because when I tried to reproduce this problem on net-next 6.3.0
+> > > version, I found that it could not be reproduced (I did not disable
+> > > hibernation mode when I reproduced this issue ). So I guess maybe other
+> > patches in eqos driver fixed the issue.
+> > 
+> > This is what I use for testing:
+> > 
+> > - Make sure "qca,disable-hibernation-mode" is NOT present in PHY DT node
+> Yes, I deleted this property when I reproduced this issue.
+> 
+> > - Boot the machine with NO ethernet cable plugged into the affected port
+> >    (i.e. the EQoS port), this is important
+> > - Make sure the EQoS MAC is not brought up e.g. by systemd-networkd or
+> >    whatever other tool, I use busybox initramfs for testing with plain
+> >    script as init (it mounts the various filesystems and runs /bin/sh)
+> 
+> It looks like something has been changed since I submitted the "disable hibernation
+> mode " patch. In previous test, I only need to unplug the cable and then use ifconfig
+> cmd to disable the interface, wait more than 10 seconds, then use ifconfig cmd to
+> enable the interface.
+> 
+> > - Wait longer than 10 seconds
+> > - If possible, measure AR8031 PHY pin 33 RX_CLK, wait for the RX_CLK to
+> >    be turned OFF by the PHY (means PHY entered hibernation)
+> > - ifconfig ethN up -- try to bring up the EQoS MAC <observe failure>
+> > 
+> > [...]
+> 
+> For the patch, I think your approach is better than mine, but I have a suggestion,
+> is the following modification more appropriate?
+> 
+> --- a/drivers/net/phy/at803x.c
+> +++ b/drivers/net/phy/at803x.c
+> @@ -991,12 +991,28 @@ static int at8031_pll_config(struct phy_device *phydev)
+>  static int at803x_hibernation_mode_config(struct phy_device *phydev)
+>  {
+>         struct at803x_priv *priv = phydev->priv;
+> +       int ret;
+> 
+>         /* The default after hardware reset is hibernation mode enabled. After
+>          * software reset, the value is retained.
+>          */
+> -       if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE))
+> -               return 0;
+> +       if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE)) {
+> +               /* Toggle hibernation mode OFF and ON to wake the PHY up and
+> +                * make it generate clock on RX_CLK pin for about 10 seconds.
+> +                * These clock are needed during start up by MACs like DWMAC
+> +                * in NXP i.MX8M Plus to release their DMA from reset. After
+> +                * the MAC has started up, the PHY can enter hibernation and
+> +                * disable the RX_CLK clock, this poses no problem for the MAC.
+> +                */
+> +               ret = at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
+> +                                           AT803X_DEBUG_HIB_CTRL_PS_HIB_EN, 0);
+> +               if (ret < 0)
+> +                       return ret;
+> +
+> +               return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
+> +                                            AT803X_DEBUG_HIB_CTRL_PS_HIB_EN,
+> +                                            AT803X_DEBUG_HIB_CTRL_PS_HIB_EN);
+> +       }
+> 
+>         return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
 
-kernel test robot noticed the following build errors:
+Hm.. how about officially defining this PHY as the clock provider and
+disable PHY automatic hibernation as long as clock is acquired?
 
-[auto build test ERROR on next-20230808]
-[cannot apply to bpf-next/master bpf/master net/main net-next/main linus/master horms-ipvs/master v6.5-rc5 v6.5-rc4 v6.5-rc3 v6.5-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Breno-Leitao/net-expose-sock_use_custom_sol_socket/20230809-011901
-base:   next-20230808
-patch link:    https://lore.kernel.org/r/20230808134049.1407498-8-leitao%40debian.org
-patch subject: [PATCH v2 7/8] io_uring/cmd: BPF hook for getsockopt cmd
-config: x86_64-randconfig-r012-20230808 (https://download.01.org/0day-ci/archive/20230809/202308091149.ltz0y4QZ-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230809/202308091149.ltz0y4QZ-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308091149.ltz0y4QZ-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/linux/export.h:5,
-                    from include/linux/linkage.h:7,
-                    from include/linux/kernel.h:17,
-                    from io_uring/uring_cmd.c:2:
-   io_uring/uring_cmd.c: In function 'io_uring_cmd_getsockopt':
->> include/linux/bpf-cgroup.h:393:41: error: 'tcp_bpf_bypass_getsockopt' undeclared (first use in this function)
-     393 |                                         tcp_bpf_bypass_getsockopt,             \
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
-      76 | # define likely(x)      __builtin_expect(!!(x), 1)
-         |                                             ^
-   include/linux/indirect_call_wrapper.h:66:42: note: in expansion of macro 'INDIRECT_CALL_1'
-      66 | #define INDIRECT_CALL_INET_1(f, f1, ...) INDIRECT_CALL_1(f, f1, __VA_ARGS__)
-         |                                          ^~~~~~~~~~~~~~~
-   include/linux/bpf-cgroup.h:392:22: note: in expansion of macro 'INDIRECT_CALL_INET_1'
-     392 |                     !INDIRECT_CALL_INET_1((sock)->sk_prot->bpf_bypass_getsockopt, \
-         |                      ^~~~~~~~~~~~~~~~~~~~
-   io_uring/uring_cmd.c:191:23: note: in expansion of macro 'BPF_CGROUP_RUN_PROG_GETSOCKOPT'
-     191 |                 err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/bpf-cgroup.h:393:41: note: each undeclared identifier is reported only once for each function it appears in
-     393 |                                         tcp_bpf_bypass_getsockopt,             \
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
-      76 | # define likely(x)      __builtin_expect(!!(x), 1)
-         |                                             ^
-   include/linux/indirect_call_wrapper.h:66:42: note: in expansion of macro 'INDIRECT_CALL_1'
-      66 | #define INDIRECT_CALL_INET_1(f, f1, ...) INDIRECT_CALL_1(f, f1, __VA_ARGS__)
-         |                                          ^~~~~~~~~~~~~~~
-   include/linux/bpf-cgroup.h:392:22: note: in expansion of macro 'INDIRECT_CALL_INET_1'
-     392 |                     !INDIRECT_CALL_INET_1((sock)->sk_prot->bpf_bypass_getsockopt, \
-         |                      ^~~~~~~~~~~~~~~~~~~~
-   io_uring/uring_cmd.c:191:23: note: in expansion of macro 'BPF_CGROUP_RUN_PROG_GETSOCKOPT'
-     191 |                 err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   In file included from include/net/sock.h:62,
-                    from include/linux/bpf-cgroup.h:11,
-                    from io_uring/uring_cmd.c:9:
->> include/linux/bpf-cgroup.h:393:41: error: implicit declaration of function 'tcp_bpf_bypass_getsockopt' [-Werror=implicit-function-declaration]
-     393 |                                         tcp_bpf_bypass_getsockopt,             \
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/indirect_call_wrapper.h:19:35: note: in definition of macro 'INDIRECT_CALL_1'
-      19 |                 likely(f == f1) ? f1(__VA_ARGS__) : f(__VA_ARGS__);     \
-         |                                   ^~
-   include/linux/bpf-cgroup.h:392:22: note: in expansion of macro 'INDIRECT_CALL_INET_1'
-     392 |                     !INDIRECT_CALL_INET_1((sock)->sk_prot->bpf_bypass_getsockopt, \
-         |                      ^~~~~~~~~~~~~~~~~~~~
-   io_uring/uring_cmd.c:191:23: note: in expansion of macro 'BPF_CGROUP_RUN_PROG_GETSOCKOPT'
-     191 |                 err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   io_uring/uring_cmd.c: In function 'io_uring_cmd_setsockopt':
-   io_uring/uring_cmd.c:223:58: error: 'koptval' undeclared (first use in this function); did you mean 'optval'?
-     223 |                                             USER_SOCKPTR(koptval), optlen);
-         |                                                          ^~~~~~~
-         |                                                          optval
-   cc1: some warnings being treated as errors
-
-
-vim +/tcp_bpf_bypass_getsockopt +393 include/linux/bpf-cgroup.h
-
-0d01da6afc5402 Stanislav Fomichev 2019-06-27  384  
-0d01da6afc5402 Stanislav Fomichev 2019-06-27  385  #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, optlen,   \
-0d01da6afc5402 Stanislav Fomichev 2019-06-27  386  				       max_optlen, retval)		       \
-0d01da6afc5402 Stanislav Fomichev 2019-06-27  387  ({									       \
-0d01da6afc5402 Stanislav Fomichev 2019-06-27  388  	int __ret = retval;						       \
-46531a30364bd4 Pavel Begunkov     2022-01-27  389  	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT) &&			       \
-46531a30364bd4 Pavel Begunkov     2022-01-27  390  	    cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))		       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  391  		if (!(sock)->sk_prot->bpf_bypass_getsockopt ||		       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  392  		    !INDIRECT_CALL_INET_1((sock)->sk_prot->bpf_bypass_getsockopt, \
-9cacf81f816111 Stanislav Fomichev 2021-01-15 @393  					tcp_bpf_bypass_getsockopt,	       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  394  					level, optname))		       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  395  			__ret = __cgroup_bpf_run_filter_getsockopt(	       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  396  				sock, level, optname, optval, optlen,	       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  397  				max_optlen, retval);			       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  398  	__ret;								       \
-9cacf81f816111 Stanislav Fomichev 2021-01-15  399  })
-9cacf81f816111 Stanislav Fomichev 2021-01-15  400  
-
+Regards,
+Oleksij
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
