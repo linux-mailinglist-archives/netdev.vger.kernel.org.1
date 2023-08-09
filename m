@@ -1,138 +1,135 @@
-Return-Path: <netdev+bounces-25967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0064B7764C3
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:13:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC347764EB
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 18:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6BE8281D34
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 018F51C20F14
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE7F1C9F2;
-	Wed,  9 Aug 2023 16:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E7D1C9E2;
+	Wed,  9 Aug 2023 16:22:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EEA18AE1
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:13:35 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9748A2130
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 09:13:34 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9ba3d6157so111378231fa.3
-        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 09:13:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691597613; x=1692202413;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hPlm2xkuUNqvfsLIE+lzEu/w4fUAF7NvkAcoEmwRf3Q=;
-        b=hYREuKLiHA+cYXn14kiwR1viCAhM6ddyjPLkENiQtBNJCrFcEWqSV7mw3Y05TOkeiX
-         BYbq5bZVG+nMCX1K5NRtrZIx4l7Om9aCKD3J8MKfTil0wksU0DCEguQAAlratraof+dg
-         oOvFOZ3OzHBHynSJvdI7h3RiyFX8eYHR7jTjmq98DAI7BCIXtpo5/UlU2i9n4WXXMlXi
-         efCo93AqyxWmrtKtTfCdBoFtniXSjztFt5q1hCEcvWXC/RNmDpO0ierg0zq5sBpa/CIF
-         96j6ZHiQv/fllPgkB2Co8p2FUVBN3E10Mebd7+5LIzOIvK8DaS+WrGXqaSwDRpEea9ou
-         gHfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691597613; x=1692202413;
-        h=cc:to:subject:message-id:date:from:references:in-reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hPlm2xkuUNqvfsLIE+lzEu/w4fUAF7NvkAcoEmwRf3Q=;
-        b=IheHgLBiTyWDzItIFttx1Ak4cTTbVJ+z1ZMjslsjMz8OIX+HO78gvOSSwFuWGzkETY
-         OuOOU5Jxa3NA5JwmXqPR9KleeqtLUZe6q7h0LaSovYDzvQ3jtRxOXR6MuK1mBCqLnWCx
-         hyKfCg2F2kc5YAxjNFTJ6khifNgBAYZllRu0gSrdu+56rJKzEzzxu8aTEQHcZN7SmMhd
-         IF2JAZ41zsvmMLtHharM4Fn2eLjdhRb5Hp7MzOxdl2nZHwXsI3o14rymSrXf5yRLTf33
-         Dnp7cyGMDuZBtTfYBaA+MBCq/GJOblNDYqp04XZUJ3zAR787Ck4cg5b5IkdH163hHl8h
-         OrOA==
-X-Gm-Message-State: AOJu0Yxz/AfmvCK4/ZxHkqsVRRqW7JZwut7mgrPw7zPHrE7gtTHS/KB3
-	b3SJGn7OYJEDoApAcyJ79k4BMBnVEtccKVTmG4GRJ5eaDBg=
-X-Google-Smtp-Source: AGHT+IEGyeUiYGGgET1ATBWrqrfkaIF9099BD/uyl+DMyMEihQDP7mtqFE7hjyNrwawGMxevU+hBjKw3VYYSX/b9z5Y=
-X-Received: by 2002:a2e:7a07:0:b0:2b9:c4ce:558f with SMTP id
- v7-20020a2e7a07000000b002b9c4ce558fmr2020056ljc.37.1691597612506; Wed, 09 Aug
- 2023 09:13:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EB018AE4
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 16:22:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD04ED;
+	Wed,  9 Aug 2023 09:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vNh9sRdmMwRNZB9dpYFP0p0p4eAm0Xeb7TBvjnG8gGU=; b=R6ugOU5Tlm6ASl+dQ1QM6iWYQC
+	0PuS0VwOlMM9oxwwg3GP5Fxb7sCSUjDal7QTPdr7LdGId/NaqwTb6UDhO6ELcgSCAIGSJpw/654o2
+	Y8/VNIJJRC8WMXjwcWg8UmQTOp3MSGhz2edBTbCfQqXCRfr0k5BDbGxXdSFOUyqSR7yo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qTlwc-003b9L-U6; Wed, 09 Aug 2023 18:21:58 +0200
+Date: Wed, 9 Aug 2023 18:21:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Uwe =?utf-8?B?S2xlaW5lLUvilJzDgm5pZw==?= <u.kleine-koenig@pengutronix.de>,
+	Ioana Ciornei <ciorneiioana@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexandru Ardelean <alexandru.ardelean@analog.com>,
+	Andre Edich <andre.edich@microchip.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Baruch Siach <baruch@tkos.co.il>,
+	Christophe Leroy <christophe.leroy@c-s.fr>,
+	Divya Koppera <Divya.Koppera@microchip.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
+	Michael Walle <michael@walle.cc>,
+	Neil Armstrong <narmstrong@baylibre.com>,
+	Nisar Sayed <Nisar.Sayed@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Philippe Schenker <philippe.schenker@toradex.com>,
+	Willy Liu <willy.liu@realtek.com>,
+	Yuiko Oshino <yuiko.oshino@microchip.com>
+Subject: Re: [PATCH] net: phy: Don't disable irqs on shutdown if WoL is
+ enabled
+Message-ID: <2f717c52-0ae5-4702-ab34-7ce0bffe8c86@lunn.ch>
+References: <20230804071757.383971-1-u.kleine-koenig@pengutronix.de>
+ <20230808145325.343c5098@kernel.org>
+ <1e438a02-6964-ce65-5584-e8ea57a694bb@gmail.com>
+ <ZNLIOEBXNgPOnFSf@shell.armlinux.org.uk>
+ <20230809142155.4dtmnmmecaycbtum@LXL00007.wbi.nxp.com>
+ <ZNOivVJ+G/sRiwai@shell.armlinux.org.uk>
+ <20230809154418.hjkf43ndwfzretiy@LXL00007.wbi.nxp.com>
+ <ZNO4RwYzZYUTu1uk@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a17:906:d550:b0:99c:eef:dddf with HTTP; Wed, 9 Aug 2023
- 09:13:31 -0700 (PDT)
-In-Reply-To: <20230809124107.360574-4-shaozhengchao@huawei.com>
-References: <20230809124107.360574-1-shaozhengchao@huawei.com> <20230809124107.360574-4-shaozhengchao@huawei.com>
-From: Jay Vosburgh <j.vosburgh@gmail.com>
-Date: Wed, 9 Aug 2023 09:13:31 -0700
-Message-ID: <CAAoacN=Lmh0h_9wQvAe_NRDw_SV22NYA3CN_-uvkOoPs6kQmxg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/5] bonding: remove unnecessary NULL check in
- debugfs function
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andy@greyhouse.net, 
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNO4RwYzZYUTu1uk@shell.armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/9/23, Zhengchao Shao <shaozhengchao@huawei.com> wrote:
-> Because debugfs_create_dir returns ERR_PTR, so bonding_debug_root will
-> never be NULL. Remove unnecessary NULL check for bonding_debug_root in
-> debugfs function.
+> Thinking about this, I wonder whether we could solve your issue by
+> disabling interrupts when the PHY is probed, rather than disabling
+> them on shutdown - something like this? (not build tested)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 3e9909b30938..4d1a37487923 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -3216,6 +3216,8 @@ static int phy_probe(struct device *dev)
+>  			goto out;
+>  	}
+>  
+> +        phy_disable_interrupts(phydev);
+> +
+>  	/* Start out supporting everything. Eventually,
+>  	 * a controller will attach, and may modify one
+>  	 * or both of these values
 
-So after this change it will call debugfs_create_dir(), et al, with
-the ERR_PTR value?  Granted, the current behavior is probably not
-right, but I don't see how this makes things better.
+At some point, the interrupt is going to be enabled again. And then
+the WoL interrupt will fire. I think some PHY drivers actually need to
+see that WoL interrupt. e.g. the marvell driver has this comment:
 
--J
+static int m88e1318_set_wol(struct phy_device *phydev,
+                            struct ethtool_wolinfo *wol)
+{
+....
+                /* If WOL event happened once, the LED[2] interrupt pin
+                 * will not be cleared unless we reading the interrupt status
+                 * register. If interrupts are in use, the normal interrupt
+                 * handling will clear the WOL event. Clear the WOL event
+                 * before enabling it if !phy_interrupt_is_valid()
+                 */
 
->
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  drivers/net/bonding/bond_debugfs.c | 9 ---------
->  1 file changed, 9 deletions(-)
->
-> diff --git a/drivers/net/bonding/bond_debugfs.c
-> b/drivers/net/bonding/bond_debugfs.c
-> index e4e7f4ee48e0..4c83f89c0a47 100644
-> --- a/drivers/net/bonding/bond_debugfs.c
-> +++ b/drivers/net/bonding/bond_debugfs.c
-> @@ -49,9 +49,6 @@ DEFINE_SHOW_ATTRIBUTE(bond_debug_rlb_hash);
->
->  void bond_debug_register(struct bonding *bond)
->  {
-> -	if (!bonding_debug_root)
-> -		return;
-> -
->  	bond->debug_dir =
->  		debugfs_create_dir(bond->dev->name, bonding_debug_root);
->
-> @@ -61,9 +58,6 @@ void bond_debug_register(struct bonding *bond)
->
->  void bond_debug_unregister(struct bonding *bond)
->  {
-> -	if (!bonding_debug_root)
-> -		return;
-> -
->  	debugfs_remove_recursive(bond->debug_dir);
->  }
->
-> @@ -71,9 +65,6 @@ void bond_debug_reregister(struct bonding *bond)
->  {
->  	struct dentry *d;
->
-> -	if (!bonding_debug_root)
-> -		return;
-> -
->  	d = debugfs_rename(bonding_debug_root, bond->debug_dir,
->  			   bonding_debug_root, bond->dev->name);
->  	if (!IS_ERR(d)) {
-> --
-> 2.34.1
->
->
+So it seems like just probing the marvell PHY is not enough to clear
+the WoL interrupt.
+
+Can we be sure that the other PHY has reached a state it can handle
+and clear an interrupt when we come to enable the interrupt? I think
+not, especially in cases like NFS root, where the interface will be
+put into use as soon as it exists, maybe before the other interface
+has probed.
+
+	Andrew
 
