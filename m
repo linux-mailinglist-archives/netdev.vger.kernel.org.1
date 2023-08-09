@@ -1,74 +1,101 @@
-Return-Path: <netdev+bounces-26056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 162A5776AF8
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:28:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E86776B05
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8B1281C11
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 21:28:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA07C281D9F
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 21:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C091DA32;
-	Wed,  9 Aug 2023 21:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4889C1DA3E;
+	Wed,  9 Aug 2023 21:34:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DF51C9E7
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 21:28:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0320C433C8;
-	Wed,  9 Aug 2023 21:28:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691616495;
-	bh=FdvTilkKSkQ8vAqa9+CyzBQk/hXXyy1elvk/K/FyXjs=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=FZKwvFkICOQumiCP808+0Ym4o1OqW1f2Wj2AJ1Xy7WVlwdbh0kwSdgDcUMQlWcyJD
-	 rVOYEqiEZDM05rBS3CXFG7ihLy9RtR2TYjv+INZsFIa9pTLHI3XjHh6Rymt+3LJ1sJ
-	 4Q6gu8IBoZ+jOMW9XzkUg6z6caSMhyigvEMngquXY9BVK1t1cCz5rlpAiyMgmlWF+e
-	 e2SUus0+wO0IoqSigtIkRJHUSs3obdyC0IrNxr4Fbhbp5Lul1L+hHE8Q88Kokq4Nft
-	 0eVzm0QhfUAn8AW/HrhUMf+uxlBqlx9ydi4LjTr9mluKfDtIpIw15jHdF77Z8gUfPD
-	 JCqTUZ3t+Gt6g==
-Message-ID: <677706de77d5d5b799d25c855a723b2c.sboyd@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D77324512
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 21:34:24 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FCC81BD9
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:34:23 -0700 (PDT)
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 35D6D847D9;
+	Wed,  9 Aug 2023 23:34:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1691616861;
+	bh=SQ2gMbZkFtP4ProycxTU4dLT6hG6sGL/5lHN3vzhHGs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BPASzPw+AlNTg7SkTts0EmR+WCiXleKLpYLAio8ftvbK9LdYbODBkd0efFS8hu1D4
+	 3yc4iyl/rYBDCanSc2Oea92+heqtbPQYkCFIssVDvAS8l4qjA/MoqUkct8EaRaY/P3
+	 b01mv5HnxA4YKbEVQtJTiv3YWlsQqZsF4es4Yj267Ly9+rpaP6qo43Y+dDTSHe4sVj
+	 aF4O2aFlaIqDQlNNfMub3vR5MKIZ1cG6T7Zx0YVROBlVQ8I8IDpEQMhgfDHrd5z47I
+	 VnqHN3z4/8rxuY6YpRevqum4yUceyaCN0YkxjhQVdQMDIb+PDn068BoNb8qQEdJU4K
+	 GDUKUGfGb06VQ==
+Message-ID: <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
+Date: Wed, 9 Aug 2023 23:34:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <4c0dfd1c-2b61-b954-73ad-ac8d4b82487d@kernel.org>
-References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com> <20230801010234.792557-1-niravkumar.l.rabara@intel.com> <20230801010234.792557-5-niravkumar.l.rabara@intel.com> <4c0dfd1c-2b61-b954-73ad-ac8d4b82487d@kernel.org>
-Subject: Re: [PATCH v2 4/5] clk: socfpga: agilex: add clock driver for the Agilex5
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: adrian.ho.yin.ng@intel.com, andrew@lunn.ch, conor+dt@kernel.org, devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, mturquette@baylibre.com, netdev@vger.kernel.org, p.zabel@pengutronix.de, richardcochran@gmail.com, robh+dt@kernel.org, wen.ping.teh@intel.com
-To: Dinh Nguyen <dinguyen@kernel.org>, niravkumar.l.rabara@intel.com
-Date: Wed, 09 Aug 2023 14:28:11 -0700
-User-Agent: alot/0.10
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Oleksij Rempel <linux@rempel-privat.de>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+References: <20230804175842.209537-1-marex@denx.de>
+ <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
+ <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <20230809043626.GG5736@pengutronix.de>
+ <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Quoting Dinh Nguyen (2023-08-08 04:03:47)
-> Hi Stephen/Mike,
->=20
-> On 7/31/23 20:02, niravkumar.l.rabara@intel.com wrote:
-> > From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
-> >=20
-> > Add support for Intel's SoCFPGA Agilex5 platform. The clock manager
-> > driver for the Agilex5 is very similar to the Agilex platform,we can
-> > re-use most of the Agilex clock driver.
-> >=20
-> > Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
-> > Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-> > Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
-> > ---
-> >   drivers/clk/socfpga/clk-agilex.c | 433 ++++++++++++++++++++++++++++++-
-> >   1 file changed, 431 insertions(+), 2 deletions(-)
-> >=20
->=20
-> If you're ok with this patch, can I take this through armsoc?
->=20
+On 8/9/23 15:40, Andrew Lunn wrote:
+>>> Hm.. how about officially defining this PHY as the clock provider and disable
+>>> PHY automatic hibernation as long as clock is acquired?
+>>>
+>> Sorry, I don't know much about the clock provider/consumer, but I think there
+>> will be more changes if we use clock provider/consume mechanism.
+> 
+> Less changes is not always best. What happens when a different PHY is
+> used?
 
-Usually any binding files go through arm-soc and clk tree but the driver
-only goes through clk tree via a PR. Is that possible here?
+Then the system wouldn't be affected by this AR803x specific behavior.
+
+> By having a clock provider in the PHY, you are defining a clear
+> API that any PHY needs to provide to work with this MAC.
+> 
+> As Russell has point out, this is not the first time we have run into
+> this problem. So far, it seems everybody has tried to solve it for
+> just their system. So maybe now we should look at the whole picture
+> and put in place a generic solution which can be made to work for any
+> PHY.
+
+I'll see what I can do, it might take a while though.
 
