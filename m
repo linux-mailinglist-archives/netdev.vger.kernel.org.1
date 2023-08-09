@@ -1,81 +1,279 @@
-Return-Path: <netdev+bounces-25922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3936A7762BC
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:41:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E1A7762C9
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:44:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A2E01C2129A
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:41:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C09E281A86
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE2518C1B;
-	Wed,  9 Aug 2023 14:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFEE19BAF;
+	Wed,  9 Aug 2023 14:44:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3145C18AF6
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:41:54 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44AC61FCC;
-	Wed,  9 Aug 2023 07:41:52 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RLXm51Kl3zcbYx;
-	Wed,  9 Aug 2023 22:40:37 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 9 Aug
- 2023 22:41:49 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <santosh.shilimkar@oracle.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<yuehaibing@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<rds-devel@oss.oracle.com>
-Subject: [PATCH net-next] rds: tcp: Remove unused declaration rds_tcp_map_seq()
-Date: Wed, 9 Aug 2023 22:41:48 +0800
-Message-ID: <20230809144148.13052-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6252917755
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:44:33 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 517621FCC;
+	Wed,  9 Aug 2023 07:44:32 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 56F5A21878;
+	Wed,  9 Aug 2023 14:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1691592265; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OwSY4kr16LY7LZGUOeApDYQYT7HNprfdzStod0Wm/tc=;
+	b=lw7cTIoLO1or5IHEnMQvxN1KTIzocFN/TX3MeezuSf8dM9GC2aMsWrbhP1kBScHjXBfK52
+	TApBqtkBZ+YMKrvvjTtTVqLkxFLXFLZW1stFDpR1Qt78LeUXjyT7U2dDio+BgfYC2w0X07
+	MA8QUDU1GQM9sxNWlbCKbGWRyVEMVJ0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1691592265;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OwSY4kr16LY7LZGUOeApDYQYT7HNprfdzStod0Wm/tc=;
+	b=lCkPSCKwk/0/a/1PDpwL785WMCmQo/IbNbk9mh8TuGfKl8AcSo+ewmL1vOe6O8r1IGUtcD
+	U7/I6bVvlgnW4+Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 24B7C133B5;
+	Wed,  9 Aug 2023 14:44:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id 64b8B0mm02RfNAAAMHmgww
+	(envelope-from <tiwai@suse.de>); Wed, 09 Aug 2023 14:44:25 +0000
+Date: Wed, 09 Aug 2023 16:44:24 +0200
+Message-ID: <87a5v0e0mv.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Takashi Iwai <tiwai@suse.de>,
+	linux-kernel@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	netdev@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH RFC] Introduce uniptr_t as a generic "universal" pointer
+In-Reply-To: <20230809143801.GA693@lst.de>
+References: <87edkce118.wl-tiwai@suse.de>
+	<20230809143801.GA693@lst.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-rds_tcp_map_seq() is never implemented and used since
-commit 70041088e3b9 ("RDS: Add TCP transport to RDS").
+On Wed, 09 Aug 2023 16:38:01 +0200,
+Christoph Hellwig wrote:
+> 
+> On Wed, Aug 09, 2023 at 04:35:47PM +0200, Takashi Iwai wrote:
+> > Although sockptr_t is used already in several places as a "universal"
+> > pointer, it's still too confusing to use it in other subsystems, since
+> > people see it always as if it were a network-related stuff.
+> > 
+> > This patch defines a more generic type, uniptr_t, that does exactly as
+> > same as sockptr_t for a wider use.  As of now, it's almost 1:1 copy
+> > with renames (just with comprehensive header file inclusions).
+> 
+> The original set_fs removal series did that as uptr_t, and Linus
+> hated it with passion.  I somehow doubt he's going to like it more now.
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/rds/tcp.h | 1 -
- 1 file changed, 1 deletion(-)
+Ah, good to know!
 
-diff --git a/net/rds/tcp.h b/net/rds/tcp.h
-index f8b5930d7b34..053aa7da87ef 100644
---- a/net/rds/tcp.h
-+++ b/net/rds/tcp.h
-@@ -56,7 +56,6 @@ void rds_tcp_restore_callbacks(struct socket *sock,
- 			       struct rds_tcp_connection *tc);
- u32 rds_tcp_write_seq(struct rds_tcp_connection *tc);
- u32 rds_tcp_snd_una(struct rds_tcp_connection *tc);
--u64 rds_tcp_map_seq(struct rds_tcp_connection *tc, u32 seq);
- extern struct rds_transport rds_tcp_transport;
- void rds_tcp_accept_work(struct sock *sk);
- int rds_tcp_laddr_check(struct net *net, const struct in6_addr *addr,
--- 
-2.34.1
+The remaining question is whether the use of sockptr_t for other
+subsystems as a generic pointer is a recommended / acceptable move...
 
+
+Takashi
+
+> > Signed-off-by: Takashi Iwai <tiwai@suse.de>
+> > ---
+> > 
+> > This is a RFC patch, or rather a material for bikeshedding.
+> > 
+> > Initially the discussion started from the use of sockptr_t for the
+> > sound driver in Andy's patch:
+> >   https://lore.kernel.org/r/20230721100146.67293-1-andriy.shevchenko@linux.intel.com
+> > followed by a bigger series of patches by me:
+> >   https://lore.kernel.org/r/20230731154718.31048-1-tiwai@suse.de
+> > 
+> > The first reaction to the patches (including my own) were
+> > "why sockptr_t?"  Yes, it's just confusing.  So, here it is, a
+> > proposal of defining the new type for the very purpose as sockptr_t.
+> > 
+> > The name of uniptr_t is nothing but my random pick up, and we can
+> > endlessly discuss for a better name (genptr_t or whatever).
+> > I'm totally open for the name.
+> > 
+> > After this introduction, sockptr_t can be alias of uniptr_t,
+> > e.g. simply override with "#define sockptr_t uniptr_t" or such.
+> > How can it be is another open question.
+> > 
+> > Also, we can clean up the macro implementation along with it;
+> > there seem a few (rather minor) issues as suggested by Andy:
+> >   https://lore.kernel.org/r/ZMlGKy7ibjkQ6ii7@smile.fi.intel.com
+> > 
+> > Honestly speaking, I don't mind to keep using sockptr_t generically
+> > despite of the name, if people agree.  The rename might make sense,
+> > though, if it's more widely used in other subsystems in future.
+> > 
+> > 
+> > Takashi
+> > 
+> > ===
+> > 
+> >  include/linux/uniptr.h | 121 +++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 121 insertions(+)
+> >  create mode 100644 include/linux/uniptr.h
+> > 
+> > diff --git a/include/linux/uniptr.h b/include/linux/uniptr.h
+> > new file mode 100644
+> > index 000000000000..f7994d3a45eb
+> > --- /dev/null
+> > +++ b/include/linux/uniptr.h
+> > @@ -0,0 +1,121 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Support for "universal" pointers that can point to either kernel or userspace
+> > + * memory.
+> > + *
+> > + * Original code from sockptr.h
+> > + *    Copyright (c) 2020 Christoph Hellwig
+> > + */
+> > +#ifndef _LINUX_UNIPTR_H
+> > +#define _LINUX_UNIPTR_H
+> > +
+> > +#include <linux/err.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/string.h>
+> > +#include <linux/types.h>
+> > +#include <linux/uaccess.h>
+> > +
+> > +typedef struct {
+> > +	union {
+> > +		void		*kernel;
+> > +		void __user	*user;
+> > +	};
+> > +	bool		is_kernel : 1;
+> > +} uniptr_t;
+> > +
+> > +static inline bool uniptr_is_kernel(uniptr_t uniptr)
+> > +{
+> > +	return uniptr.is_kernel;
+> > +}
+> > +
+> > +static inline uniptr_t KERNEL_UNIPTR(void *p)
+> > +{
+> > +	return (uniptr_t) { .kernel = p, .is_kernel = true };
+> > +}
+> > +
+> > +static inline uniptr_t USER_UNIPTR(void __user *p)
+> > +{
+> > +	return (uniptr_t) { .user = p };
+> > +}
+> > +
+> > +static inline bool uniptr_is_null(uniptr_t uniptr)
+> > +{
+> > +	if (uniptr_is_kernel(uniptr))
+> > +		return !uniptr.kernel;
+> > +	return !uniptr.user;
+> > +}
+> > +
+> > +static inline int copy_from_uniptr_offset(void *dst, uniptr_t src,
+> > +					  size_t offset, size_t size)
+> > +{
+> > +	if (!uniptr_is_kernel(src))
+> > +		return copy_from_user(dst, src.user + offset, size);
+> > +	memcpy(dst, src.kernel + offset, size);
+> > +	return 0;
+> > +}
+> > +
+> > +static inline int copy_from_uniptr(void *dst, uniptr_t src, size_t size)
+> > +{
+> > +	return copy_from_uniptr_offset(dst, src, 0, size);
+> > +}
+> > +
+> > +static inline int copy_to_uniptr_offset(uniptr_t dst, size_t offset,
+> > +					const void *src, size_t size)
+> > +{
+> > +	if (!uniptr_is_kernel(dst))
+> > +		return copy_to_user(dst.user + offset, src, size);
+> > +	memcpy(dst.kernel + offset, src, size);
+> > +	return 0;
+> > +}
+> > +
+> > +static inline int copy_to_uniptr(uniptr_t dst, const void *src, size_t size)
+> > +{
+> > +	return copy_to_uniptr_offset(dst, 0, src, size);
+> > +}
+> > +
+> > +static inline void *memdup_uniptr(uniptr_t src, size_t len)
+> > +{
+> > +	void *p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
+> > +
+> > +	if (!p)
+> > +		return ERR_PTR(-ENOMEM);
+> > +	if (copy_from_uniptr(p, src, len)) {
+> > +		kfree(p);
+> > +		return ERR_PTR(-EFAULT);
+> > +	}
+> > +	return p;
+> > +}
+> > +
+> > +static inline void *memdup_uniptr_nul(uniptr_t src, size_t len)
+> > +{
+> > +	char *p = kmalloc_track_caller(len + 1, GFP_KERNEL);
+> > +
+> > +	if (!p)
+> > +		return ERR_PTR(-ENOMEM);
+> > +	if (copy_from_uniptr(p, src, len)) {
+> > +		kfree(p);
+> > +		return ERR_PTR(-EFAULT);
+> > +	}
+> > +	p[len] = '\0';
+> > +	return p;
+> > +}
+> > +
+> > +static inline long strncpy_from_uniptr(char *dst, uniptr_t src, size_t count)
+> > +{
+> > +	if (uniptr_is_kernel(src)) {
+> > +		size_t len = min(strnlen(src.kernel, count - 1) + 1, count);
+> > +
+> > +		memcpy(dst, src.kernel, len);
+> > +		return len;
+> > +	}
+> > +	return strncpy_from_user(dst, src.user, count);
+> > +}
+> > +
+> > +static inline int check_zeroed_uniptr(uniptr_t src, size_t offset, size_t size)
+> > +{
+> > +	if (!uniptr_is_kernel(src))
+> > +		return check_zeroed_user(src.user + offset, size);
+> > +	return memchr_inv(src.kernel + offset, 0, size) == NULL;
+> > +}
+> > +
+> > +#endif /* _LINUX_UNIPTR_H */
+> > -- 
+> > 2.35.3
+> ---end quoted text---
+> 
 
