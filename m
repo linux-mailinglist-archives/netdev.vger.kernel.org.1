@@ -1,205 +1,190 @@
-Return-Path: <netdev+bounces-25934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBAC477635D
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:08:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0794777636E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CC23281AC0
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:08:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38B0D1C212CD
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5AF1AA6C;
-	Wed,  9 Aug 2023 15:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB8519BDD;
+	Wed,  9 Aug 2023 15:11:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5290A19BDF
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:08:46 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1071F210B
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:08:44 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99c3c8adb27so986796166b.1
-        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 08:08:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA86612D
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:11:00 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 322FA210D;
+	Wed,  9 Aug 2023 08:10:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1691593722; x=1692198522;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5G6T3JCdCSjXcLmjmeNQXnmppiYdA5F1SZkXm/TxHpg=;
-        b=AFMi7qSe9xi1nXJyOmj9Pf1I24OUvRB/WMsnyk7ANa4EJu5x3ixtwGAQ2DQvaklQEi
-         CIIcnzvPZAvh0QFlqDA0IwQ+55nVG3EZQr4bWau7vG4fNJcPqbiYKGZWaqfAR4TrYoPm
-         431MaydlkDgq9WWasTwku0JG9/tar21OVpVXWuM+11NWgISrYsTwj0JXBMlL+QqxREOz
-         3dGOHQEXE9zzqEQubiZaY2AqyrBNwAQmd2ftY8WL2bQRboSI67n3l8r1wlEi8jj1tf/v
-         zFWq5migteLX095kdcYSVWVG4aDyfxNZv8Z9JVf1CNkhvvZwLI8o6dQ1YyyDUwxJ+rSK
-         DWsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691593722; x=1692198522;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5G6T3JCdCSjXcLmjmeNQXnmppiYdA5F1SZkXm/TxHpg=;
-        b=GupEix9xvhtyO9gCosKjqSbwI9sTDNzbhycMvuOtt2kHMdkb0ytBccPwTJoYZ/w/eZ
-         jfaQnBZ4zlKh0AFb7Xhfzg9/RpiXQ88PwlnNgG2UgK+vCsOY8FdDn+QJ/XuDMpIOc09s
-         l4zB4ymi+6Bvum+GxettxKBPUAdJO5Vui+8fPghp+8UPzSMJg2S+DNtV195b2tzXu/S+
-         UsZ+tVqv7KspzUEFK8bUROheF+kzlkUBQDj0NoNeu8EkPlJRzDFhpTLxeMTe5oo1uOEc
-         QYmsQIqhe91nQjYOB+8EUefjkDAX67rXdyJULgxn7HMYSgJLoQKoPUv5BUDuSO5m/Faz
-         aBUA==
-X-Gm-Message-State: AOJu0YwoUl27F8A/7Gsh/FnqxG8BnxMweDjZcPgm9SUBzAhqbkS/GUwq
-	Cy8najDleI1e/ymi4gmdb3O1ssLkmOIfUpxCgvOKcg==
-X-Google-Smtp-Source: AGHT+IFJOmQaBG1yOZ2H7dcbIP6G4WTdTLU+oF9E60L/N6jLeiWxT1AzWslITS72T1ET4Iya7sJGmqsIkWYyudCliX8=
-X-Received: by 2002:a17:907:a041:b0:993:f12a:39ce with SMTP id
- gz1-20020a170907a04100b00993f12a39cemr2327076ejc.15.1691593722582; Wed, 09
- Aug 2023 08:08:42 -0700 (PDT)
+	d=buaa.edu.cn; s=buaa; h=Received:Message-ID:Date:MIME-Version:
+	User-Agent:Subject:To:Cc:References:From:In-Reply-To:
+	Content-Type:Content-Transfer-Encoding; bh=qdAiPe8csqwuuyDj6hTE7
+	PynnBwpqRO66suZ0OgkS3A=; b=GGIl5b9rBvyjp+SHD++MmiqmBvWcpFomjJE+4
+	6ouGUCB/NdgjX6bhl/fKObsDaQCnPtXQHsq8zoQjxIFrNt1CpVrGfxRn0TZ1tE0S
+	uWP0wT/MCYHAIW8HhhjMjOWPk4d3kcVlmR+GDlkNhchXcf4X1Idd9FJ9IoshdqaT
+	Hz3fOE=
+Received: from [10.193.157.69] (unknown [10.193.157.69])
+	by coremail-app1 (Coremail) with SMTP id OCz+CgDn7_NirNNkLfyhDA--.28238S3;
+	Wed, 09 Aug 2023 23:10:27 +0800 (CST)
+Message-ID: <5aca90c4-8436-40d1-87d5-3406fdb26c47@buaa.edu.cn>
+Date: Wed, 9 Aug 2023 23:10:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com> <6acbbf63-ba10-4a66-5e31-b9a499f79489@linux.dev>
-In-Reply-To: <6acbbf63-ba10-4a66-5e31-b9a499f79489@linux.dev>
-From: Lorenz Bauer <lmb@isovalent.com>
-Date: Wed, 9 Aug 2023 16:08:31 +0100
-Message-ID: <CAN+4W8hMpL3+vNOrBBRw01tD6OxQ-Yy8OWpq9nRtiyjm0GgE4g@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] net: Fix slab-out-of-bounds in inet[6]_steal_sock
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG]Bluetooth: possible semantic bug when the status field of
+ the HCI_Connection_Complete packet set to non-zero
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
+From: Xin-Yu Liu <LXYbhu@buaa.edu.cn>
+In-Reply-To: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:OCz+CgDn7_NirNNkLfyhDA--.28238S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxtF1kGF1fCrW8XFyUGFWxWFg_yoWxKry5pF
+	WYya9FkryDJ3WSyFnrAw48CF9Fv3yktrsrJr90q340y345WrykKFsak3Z0kayUGrsav3Wj
+	vF12qrZrA3Z8A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
+	AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xSY4AK6svPMxAIw28I
+	cxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Aw1UJr1UMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7IU5IksPUUUUU==
+X-CM-SenderInfo: te1sjjazrrjqpexdthxhgxhubq/
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 9, 2023 at 3:39=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
+Hi,
+
+Thanks for your reply.
+
+After carefully considering your feedback, we now realize that the scenario we were assuming is indeed quite exceptional. It has become clear that there is no necessity for any supplementary mechanisms to reset the Bluetooth system. In our forthcoming work, we plan to engage in an in-depth exploration of the spec and Linux Bluetooth source code, with the aim of deriving more valuable insights and outcomes.
+
+Once again, thank you for your active engagement and for taking the time to address our queries. Your assistance has been instrumental in guiding our approach.
+
+Wishing you all the best and looking forward to future interactions.
+
+Warm regards,
+Xin-Yu Liu
+
+2023/8/8 1:48, Luiz Augusto von Dentz :
+> Hi,
 >
-> On 8/9/23 1:33 AM, Lorenz Bauer wrote:
-> > Kumar reported a KASAN splat in tcp_v6_rcv:
-> >
-> >    bash-5.2# ./test_progs -t btf_skc_cls_ingress
-> >    ...
-> >    [   51.810085] BUG: KASAN: slab-out-of-bounds in tcp_v6_rcv+0x2d7d/0=
-x3440
-> >    [   51.810458] Read of size 2 at addr ffff8881053f038c by task test_=
-progs/226
-> >
-> > The problem is that inet[6]_steal_sock accesses sk->sk_protocol without
-> > accounting for request sockets. I added the check to ensure that we onl=
-y
-> > every try to perform a reuseport lookup on a supported socket.
-> >
-> > It turns out that this isn't necessary at all. struct sock_common conta=
-ins
-> > a skc_reuseport flag which indicates whether a socket is part of a
+> On Mon, Aug 7, 2023 at 8:17 AM Xin-Yu Liu <LXYbhu@buaa.edu.cn> wrote:
+>> Hello,
+>>
+>> Thanks for your reply.
+>>
+>> I apologize for my previous unclear statement, which may have misled you.
+>>
+>> Let me rephrase our question:
+>>
+>> When a Bluetooth device initiates a connection to another device, its host sends an HCI_Create_Connection command (OGF: 0x01, OCF: 0x0005) to the controller. Once the connection is established, the controller sends an HCI_Connection_Complete event (Event Code: 0x03) back to the host. If a valid HCI_Connection_Complete event has its parameter "Status" altered (with all other parameters unchanged), changing 0x00 to any value between 0x01 and 0xFF for example, the host will considerd that the connection fails to complete.
+>>
+>> In reality, if the HCI_Connection_Complete event's parameter "Connection_Handle" is valid and unaltered, it means the handle resource exists and has not been released. The observations we made support this statement:
+>>
+> Well according to the spec we can only assume the handle is valid if
+> the status is set to 0x00, so I am not really sure how we can possibly
+> check if the handle is valid if the status indicates a connection
+> failure?
 >
-> Does it go back to the earlier discussion
-> (https://lore.kernel.org/bpf/7188429a-c380-14c8-57bb-9d05d3ba4e5e@linux.d=
-ev/)
-> that the sk->sk_reuseport is 1 from sk_clone for TCP_ESTABLISHED? It work=
-s
-> because there is sk->sk_reuseport"_cb" check going deeper into
-> reuseport_select_sock() but there is an extra inet6_ehashfn for all TCP_E=
-STABLISHED.
-
-Sigh, I'd forgotten about this...
-
-For the TPROXY TCP replacement use case we sk_assign the SYN to the
-listener, which creates the reqsk. We can let follow up packets pass
-without sk_assign since they will match the reqsk and convert to a
-fullsock via the usual route. At least that is what the test does. I'm
-not even sure what it means to redirect a random packet into an
-established TCP socket TBH. It'd probably be dropped?
-
-For UDP, I'm not sure whether we even get into this situation? Doesn't
-seem like UDP sockets are cloned from each other, so we also shouldn't
-end up with a reuseport flag set erroneously.
-
-Things we could do if necessary:
-1. Reset the flag in inet_csk_clone_lock like we do for SOCK_RCU_FREE
-2. Duplicate the cb check into inet[6]_steal_sock
-
-Best
-Lorenz
-
+>> (a) When the tampered HCI_Connection_Complete event with altered "Status" is sent to the host, if we attempt to reconnect to the same device by sending another HCI_Create_Connection command, the controller will send an HCI_Command_Status event (Event Code: 0x0F) to the host, with the "Status" parameter set to 0x0B, indicating "CONNECTION ALREADY EXISTS" and leading to the connection failure.
+>>
+>> (b) When the tampered HCI_Connection_Complete event is sent to the host, if we manually send an HCI_Disconnect command, with the "Connection_Handle" parameter set to the same value as the previous HCI_Connection_Complete event's "Connection_Handle," and the "Reason" parameter set to 0x15, indicating "REMOTE DEVICE TERMINATED CONNECTION DUE TO POWER OFF," we receive a proper response, signifying that the Connection_Handle is valid and exists. Additionally, the issue described in (a) disappears.
+> Just read again the sentence above: 'TERMINATED CONNECTION', it can't
+> possible mean the handle is valid and exists, I'm afraid you are
+> arguing based on a controller implementation that doesn't comply with
+> the spec text above, it shall either disconnect the link so we
+> invalidate the handle on the host, then later we can reconnect, or
+> indicate the status is 0x00.
 >
-> > reuseport group. inet[6]_lookup_reuseport already check this flag,
-> > so we can't execute an erroneous reuseport lookup by definition.
-> >
-> > Remove the unnecessary assertions to fix the out of bounds access.
-> >
-> > Fixes: 9c02bec95954 ("bpf, net: Support SO_REUSEPORT sockets with bpf_s=
-k_assign")
-> > Reported-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-> > Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
-> > ---
-> >   include/net/inet6_hashtables.h | 10 ----------
-> >   include/net/inet_hashtables.h  | 10 ----------
-> >   2 files changed, 20 deletions(-)
-> >
-> > diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtab=
-les.h
-> > index 284b5ce7205d..f9907ed36d54 100644
-> > --- a/include/net/inet6_hashtables.h
-> > +++ b/include/net/inet6_hashtables.h
-> > @@ -119,16 +119,6 @@ struct sock *inet6_steal_sock(struct net *net, str=
-uct sk_buff *skb, int doff,
-> >       if (!prefetched)
-> >               return sk;
-> >
-> > -     if (sk->sk_protocol =3D=3D IPPROTO_TCP) {
-> > -             if (sk->sk_state !=3D TCP_LISTEN)
-> > -                     return sk;
-> > -     } else if (sk->sk_protocol =3D=3D IPPROTO_UDP) {
-> > -             if (sk->sk_state !=3D TCP_CLOSE)
-> > -                     return sk;
-> > -     } else {
-> > -             return sk;
-> > -     }
-> > -
-> >       reuse_sk =3D inet6_lookup_reuseport(net, sk, skb, doff,
-> >                                         saddr, sport, daddr, ntohs(dpor=
-t),
-> >                                         ehashfn);
-> > diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtable=
-s.h
-> > index 1177effabed3..57a46993383a 100644
-> > --- a/include/net/inet_hashtables.h
-> > +++ b/include/net/inet_hashtables.h
-> > @@ -465,16 +465,6 @@ struct sock *inet_steal_sock(struct net *net, stru=
-ct sk_buff *skb, int doff,
-> >       if (!prefetched)
-> >               return sk;
-> >
-> > -     if (sk->sk_protocol =3D=3D IPPROTO_TCP) {
-> > -             if (sk->sk_state !=3D TCP_LISTEN)
-> > -                     return sk;
-> > -     } else if (sk->sk_protocol =3D=3D IPPROTO_UDP) {
-> > -             if (sk->sk_state !=3D TCP_CLOSE)
-> > -                     return sk;
-> > -     } else {
-> > -             return sk;
-> > -     }
-> > -
-> >       reuse_sk =3D inet_lookup_reuseport(net, sk, skb, doff,
-> >                                        saddr, sport, daddr, ntohs(dport=
-),
-> >                                        ehashfn);
-> >
-> > ---
-> > base-commit: eb62e6aef940fcb1879100130068369d4638088f
-> > change-id: 20230808-bpf-next-a442a095562b
-> >
-> > Best regards,
+>> Well we can't do much about the dangling connection if we don't know
+>> its handle to be able to disconnect since there is no command to
+>> disconnect by address if that is what you were expecting us to do, so
+>> the bottom line seems to be that sending 0x0b to the controller is
+>> useless since we can't do anything about at the host, well other than
+>> reset but would likely affect other functionality as well.
+>>
+>> With knowledge of the handle, we think we can manually send an HCI_Disconnect command to deal with the dangling connection, just as we mentioned in (b).
+> Assuming the handle is valid on status != 0x00 would probably not work
+> with most controllers following the spec to the letter, in which case
+> the HCI_Disconnect would fail and in the meantime we have an hci_conn
+> with invalid state, so I don't think it is worth going sideways just
+> to get it working under special circumstances, where this special
+> circumstances might be a bug in the way status is used.
 >
+>> We believe that, in the situation we mentioned, the handle is valid but is rendered useless. Implementing an automated mechanism to handle the release of the handle (e.g., by sending an HCI_Disconnect command) might be a better choice.
+> Sorry but I have to disagree, in that case HCI_Disconnect would need
+> to be sent every time, which can also fail if the link-layer had
+> terminated the connection as indicated in the status.
+>
+>> Best wishes,
+>> Xin-Yu Liu
+>>
+>> 2023/8/5 13:09, Luiz Augusto von Dentz :
+>>
+>> Hi,
+>>
+>> On Fri, Aug 4, 2023 at 9:35 PM Xinyu Liu <LXYbhu@buaa.edu.cn> wrote:
+>>
+>> Hello,
+>>
+>> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in Linux 6.2:
+>>
+>> During the connection process, the host server needs to receive the HCI_Connection_Complete packet from the hardware controller. In normal cases, the status field of this packet is zero, which means that the connection is successfully completed:
+>>
+>> However, in our testing, when the status field was set to non-zero, 47 for instance, the Bluetooth connection failed. After that, when we attempt to reestablish a Bluetooth connection, the connection always fails. Upon analyzing the event packets sent from the controller to the host server, we observed that the Status field of the HCI_Command_Status packet becomes 0B, indicating that the controller believes the connection already exists. This situation has been causing the connection failure persistently:
+>>
+>> That seems like a link-layer issue, the controller is saying the
+>> connection had failed, and 0x0b also doesn't help either except if you
+>> are saying that the other parameters are actually valid (e.g. handle),
+>> that said the spec seems pretty clear about status other than 0x00
+>> means the connection had failed:
+>>
+>> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+>> page 2170
+>>
+>> 0x01 to 0xFF Connection failed to Complete. See [Vol 1] Part F,
+>> Controller Error Codes
+>> for a list of error codes and descriptions.
+>>
+>> In our understanding, it would be more preferable if a single failed Bluetooth connection does not result in subsequent connections also failing. We believe that having some mechanism to facilitate Bluetooth's recovery and restoration to normal functionality could be considered as a potentially better option.
+>>
+>> We are not sure whether this is a semantic bug or implementation feature in the Linux kernel. Any feedback would be appreciated, thanks!
+>>
+>> Well we can't do much about the dangling connection if we don't know
+>> its handle to be able to disconnect since there is no command to
+>> disconnect by address if that is what you were expecting us to do, so
+>> the bottom line seems to be that sending 0x0b to the controller is
+>> useless since we can't do anything about at the host, well other than
+>> reset but would likely affect other functionality as well.
+>>
+>>
+>
+
 
