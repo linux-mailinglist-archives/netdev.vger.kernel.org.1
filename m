@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-25861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C4D776072
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B370776085
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:21:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC2421C2121C
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:18:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5716F1C21233
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93A918B05;
-	Wed,  9 Aug 2023 13:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D121918B0B;
+	Wed,  9 Aug 2023 13:21:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC3918AE6
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:18:25 +0000 (UTC)
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71155128;
-	Wed,  9 Aug 2023 06:18:24 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-76c845dc5beso419793185a.1;
-        Wed, 09 Aug 2023 06:18:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01AB18AF6;
+	Wed,  9 Aug 2023 13:21:07 +0000 (UTC)
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06CFC1;
+	Wed,  9 Aug 2023 06:21:05 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-63cf9eddbc6so4436416d6.0;
+        Wed, 09 Aug 2023 06:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691587103; x=1692191903;
+        d=gmail.com; s=20221208; t=1691587265; x=1692192065;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Sjj2pw55OpJ9Ml+mCR1r9Is3y7on0GgaaZp6IQhtWX0=;
-        b=a7r2lNNuJIBtJEaovPO2UiEXZq7Fe93jgoypAriBtz3Zmbvj70/Oga3pRlXe8EnZJY
-         olTfyYpNTUWK/aOyR81kCyCBEQChIZFYpGJ9uP8TUDm5ZJEMPsZOnWOU+IgGbuKcZNrj
-         3MimVN64leU7M/6pNYP/iGImJUgK7FizDl9wZifQIjPuCmB2sESu1913SLkNWOFKcxY+
-         BczeCXx1hYiMv1u5Ru5b5bX8G6q+x57jCIBcKQchR1HDS7ntQMumaMHOC/vlJp6CmdYP
-         RrHUX7KW0WMdfP+sblRN2zNHu3h8GWgIYlcc2r/1w17Kr+QbjTkboCOVD9xmCO5/odW4
-         H4Zw==
+        bh=nwP+8GKyNioN79R+S+05Z2xZJ2OZ1LBS9/Chf0Y6fAM=;
+        b=GtXH2AScZ1vnntGc8QW099qNICz3/SL4CXv3xEIkA5oW2CORdoskzs3bZuOc04DSWJ
+         xfy3HYvm/P1fs4bZejallLe43rqHI3v0ikB76NlnOGL0gcjY63jnkm54zHUkeH0srGEK
+         LUbkMYqdlYMpYUaQ+WIyGIZRZ47KNwFwHNdmMRxRq20vEtYjfgoQh8kLwThGLbCQ1Swo
+         ywKbYDBt5vYQJ0Oq4t5ZlXsBNMS2QAZcIzmvhl7Avqbr2T3oV3UVS6B7BBo2ztJdf9u0
+         miMR35zYD8mD7UIrjveJZU1gl/m/TkAq3JyclGhBKh5FRUYC8MQn+gTRHWRAgFSoyQ/J
+         IPnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691587103; x=1692191903;
+        d=1e100.net; s=20221208; t=1691587265; x=1692192065;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Sjj2pw55OpJ9Ml+mCR1r9Is3y7on0GgaaZp6IQhtWX0=;
-        b=OiIX/J4N0EXuu2iKeBfydzlVXK1/30fOyBjp7PbRw5Pi0p3IET6mQ2jRe43lT7BKxB
-         cuVi5E126iGRD1AIOVctDxjyiIhxaZ5SFTIZYSZoKvrPUzGfpf0pOlKenhVHK71i2WnK
-         EwOuOJy1YjVH3gvLr39vZRrpVAHtAwLTpenrHWpIvg7gjnRgwdKiYwO0N/uXML8ztkwI
-         Smc5yfAOVyyDsVy3jpIlWZI+PX69qL/FpbWUchV0MCYXVMejQ70WKzAc1wJz7E4bqyK6
-         PN4rCbSr7bLcQVepb0pRjqlTIVHTiSRmJELKIyzoTeoWu+bXuHwqtQLbyjs1CbbiPh6x
-         uQQw==
-X-Gm-Message-State: AOJu0Ywxlr3WcQZDiArWRio7HG5pdRrTI5z2kiRpUYYEx1IZ0saoZruJ
-	2y2MqZ4f/uHakubzZQM6kN8=
-X-Google-Smtp-Source: AGHT+IEwKr/W7DJtj36rnSo26cXkG4CoslGWkhDlFQwvy2D21EJ9wyl/mAei8MbMDmbV5R2inhvM9Q==
-X-Received: by 2002:a05:620a:d45:b0:76d:264c:a89e with SMTP id o5-20020a05620a0d4500b0076d264ca89emr684548qkl.76.1691587103519;
-        Wed, 09 Aug 2023 06:18:23 -0700 (PDT)
+        bh=nwP+8GKyNioN79R+S+05Z2xZJ2OZ1LBS9/Chf0Y6fAM=;
+        b=JKWdyP8R2+b80SFrewM3+dG2MmlhJNaFxLg29bmzJ4WosPvvhTHx2yJqlzeaX+D12/
+         E0FU0+gq1h4gVDCNTqv4ROxTYI8aigAGd3csDuMOJwXWQBPnVjsbGTnXN2GwIrKjbA+j
+         QwRb23FBfqUrl/gpIF0gU1EYmZuqi7g4O1W5836Sx8SVykgRz4bU1UWN9rdiE3gtl9xq
+         CGGyi3FZvNDC05v7UcYmohiu48IGmWK9kedTuZvtRrpc5Z9kRWUsqhL1BG3Af8iYCZ2C
+         AXHYx8OwSzMUUxiLAlztnVkV9g/yKy1aFLOM2ui0js9vNN8CN9pwLlklPbibeHJ+A66n
+         v/5w==
+X-Gm-Message-State: AOJu0Ywoz0Krj+DyDFLNVPo8Mfbm4JexU4dRkjULR54+/Yd3U7lqoBEv
+	2vZJwJuY+wh198S9sAK2UXQ=
+X-Google-Smtp-Source: AGHT+IE76Gz4WoA4fl0/rX5W9f2fz7iLHIa+eBlWcELNDdj4Cj2sYlmkPv/tJs02yGsLSjVIs+uKwQ==
+X-Received: by 2002:a0c:aa96:0:b0:630:14e0:982e with SMTP id f22-20020a0caa96000000b0063014e0982emr3663849qvb.22.1691587264812;
+        Wed, 09 Aug 2023 06:21:04 -0700 (PDT)
 Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id h20-20020a05620a10b400b00766fbeb3e7csm3940349qkk.132.2023.08.09.06.18.23
+        by smtp.gmail.com with ESMTPSA id p14-20020ae9f30e000000b0076ca401d8c7sm3981609qkg.111.2023.08.09.06.21.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 06:18:23 -0700 (PDT)
-Date: Wed, 09 Aug 2023 09:18:22 -0400
+        Wed, 09 Aug 2023 06:21:04 -0700 (PDT)
+Date: Wed, 09 Aug 2023 09:21:04 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Tahsin Erdogan <trdgn@amazon.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Tahsin Erdogan <trdgn@amazon.com>, 
+To: Breno Leitao <leitao@debian.org>, 
+ sdf@google.com, 
+ axboe@kernel.dk, 
+ asml.silence@gmail.com, 
+ willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
  netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <64d3921ed1f1a_267bde294f2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230808230920.1944738-1-trdgn@amazon.com>
-References: <20230808230920.1944738-1-trdgn@amazon.com>
-Subject: RE: [PATCH v3] tun: avoid high-order page allocation for packet
- header
+ io-uring@vger.kernel.org, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Message-ID: <64d392c0235c6_267bde294c3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230808134049.1407498-3-leitao@debian.org>
+References: <20230808134049.1407498-1-leitao@debian.org>
+ <20230808134049.1407498-3-leitao@debian.org>
+Subject: RE: [PATCH v2 2/8] io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,64 +90,28 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tahsin Erdogan wrote:
-> When GSO is not enabled
-
-Not GSO, but gso.hdr_len, which is a feature of IFF_VNET_HDR.
-
-VIRTIO_NET_HDR_GSO_* does not need to be enabled to use the
-header length field.
-
-> and a packet is transmitted via writev(), all
-> payload is treated as header which requires a contiguous memory allocation.
-> This allocation request is harder to satisfy, and may even fail if there is
-> enough fragmentation.
+Breno Leitao wrote:
+> Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
+> level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
+> where a sockptr_t is either userspace or kernel space, and handled as
+> such.
 > 
-> Note that sendmsg() code path limits the linear copy length, so this change
-> makes writev() and sendmsg() more consistent.
+> Function io_uring_cmd_getsockopt() is inspired by __sys_getsockopt().
+> 
+> Differently from the getsockopt(2), the optlen field is not a userspace
+> pointers. In getsockopt(2), userspace provides optlen pointer, which is
+> overwritten by the kernel.  In this implementation, userspace passes a
+> u32, and the new value is returned in cqe->res. I.e., optlen is not a
+> pointer.
+> 
+> Important to say that userspace needs to keep the pointer alive until
+> the CQE is completed.
 
-This is not specific to writev(), equally to more common write().
+What bad things can happen otherwise?
 
-Tun sendmsg is a special case, only used by vhost-net from inside the
-kernel. Arguably consistency with packet_snd/packet_alloc_skb would be
-more important. That said, this makes sense to me. I assume your
-configuring a device with very large MTU?
-
+The kernel is not depending on a well behaved process for its
+correctness here, is it? Any user pages have to be pinned while
+kernel might refer to them, for instance.
  
-> Signed-off-by: Tahsin Erdogan <trdgn@amazon.com>
-> ---
-> v3: rebase to latest net-next
-> v2: replace linear == 0 with !linear
-> v1: https://lore.kernel.org/all/20230726030936.1587269-1-trdgn@amazon.com/
->  drivers/net/tun.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 5beb6b5dd7e5..53d19c958a20 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -1523,7 +1523,7 @@ static struct sk_buff *tun_alloc_skb(struct tun_file *tfile,
->  	int err;
->  
->  	/* Under a page?  Don't bother with paged skb. */
-> -	if (prepad + len < PAGE_SIZE || !linear)
-> +	if (prepad + len < PAGE_SIZE)
->  		linear = len;
->  
->  	if (len - linear > MAX_SKB_FRAGS * (PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER))
-> @@ -1913,6 +1913,9 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->  			 */
->  			zerocopy = false;
->  		} else {
-> +			if (!linear)
-> +				linear = min_t(size_t, good_linear, copylen);
-> +
->  			skb = tun_alloc_skb(tfile, align, copylen, linear,
->  					    noblock);
->  		}
-> -- 
-> 2.41.0
-> 
-
-
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
