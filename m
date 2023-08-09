@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-25881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9ECC77611C
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:34:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F0D77611F
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:34:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63FBE281CCB
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:34:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFEA2281AF5
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71C018C21;
-	Wed,  9 Aug 2023 13:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CFC1BB42;
+	Wed,  9 Aug 2023 13:29:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA321BB37
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D631BB36
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:29:00 +0000 (UTC)
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87C530DA;
-	Wed,  9 Aug 2023 06:28:46 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id 6B80D40014;
-	Wed,  9 Aug 2023 13:28:43 +0000 (UTC)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181EB30E3;
+	Wed,  9 Aug 2023 06:28:48 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPA id 9DA184000E;
+	Wed,  9 Aug 2023 13:28:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1691587725;
+	t=1691587727;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WKoPv036RC0ux4I34NtLKPGM96CkWE1vmgdCaUi+1T0=;
-	b=B2eJjBrDGWvPQpVXcbWXnlqYO0UN/zSBJaeSfKt/DOEq825FH6369L/vg1mXWt/dpQwxp2
-	3msa0SNzFxSPp3AQnv6fgpM8tej0z3Tr4Hi59w/eF6iUY0n7lFnTRZ8qTkZvaoi4tNhPkv
-	4zATom48wbuKKCY9xVf3wyasqy2T2KiIatlL6Xe48atCZx3oBovEkIeq9plrcD7cKQJMfC
-	g6n82T/2qAY3acPNbyjoOymYvZhPX2IANgHUnzu7/+1VkrpvHrLqrrT8YX391qCWH7sqsu
-	VGfj8eb3eUlnWY4si/j11ylF9rWLSPhG+p+Xd1B/ZuSEhmuA2axkQMTlDxrRVg==
+	bh=dXZMwpEZj8B9D3B2A9TvlPacnUlA9pl8Uk7gAZRMgBs=;
+	b=Sur9Byc1DxTsku42B3iXQoEhFLUMBOHnBkG6uqi3EbAXoosgIJKnrm/8vyvX1fsaKO0+fc
+	SbwtJbseKI7lqqwbxn6XRradlwx6TN6pa5nOz7kZpiYD/vK2c/C3z/mhaVyiCmEf6pzQTg
+	IUIllRuBrJ7+/IloIA8STtgXggUrzqr+To03RYuavcjEEHsczslCtXNLzk8+0zKHuF+P02
+	YegvBF00qWmFcsudUhrfYTQia7XqpO1sAYyfEVPkfnxbNR8F379WunLY9xHY0XSTqyImU/
+	/CyUAUTI1TKHIbvvrpO5jfj5BSlw52IUDhB/oslWd2A8s8LRESOeL2Lt1Oeocw==
 From: Herve Codina <herve.codina@bootlin.com>
 To: Herve Codina <herve.codina@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -67,9 +67,9 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	alsa-devel@alsa-project.org,
 	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v3 18/28] soc: fsl: cpm1: qmc: Remove timeslots handling from setup_chan()
-Date: Wed,  9 Aug 2023 15:27:45 +0200
-Message-ID: <20230809132757.2470544-19-herve.codina@bootlin.com>
+Subject: [PATCH v3 19/28] soc: fsl: cpm1: qmc: Introduce functions to change timeslots at runtime
+Date: Wed,  9 Aug 2023 15:27:46 +0200
+Message-ID: <20230809132757.2470544-20-herve.codina@bootlin.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230809132757.2470544-1-herve.codina@bootlin.com>
 References: <20230809132757.2470544-1-herve.codina@bootlin.com>
@@ -88,63 +88,104 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Timeslots setting is done at channel start() and stop().
-There is no more need to do that during setup_chan().
+Introduce qmc_chan_{get,set}_ts_info() function to allow timeslots
+modification at runtime.
 
-Simply remove timeslot setting from setup_chan().
+The modification is provided using qmc_chan_set_ts_info() and will be
+applied on next qmc_chan_start().
+qmc_chan_set_ts_info() must be called with the channel rx and/or tx
+stopped.
 
 Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- drivers/soc/fsl/qe/qmc.c | 28 ----------------------------
- 1 file changed, 28 deletions(-)
+ drivers/soc/fsl/qe/qmc.c | 51 ++++++++++++++++++++++++++++++++++++++++
+ include/soc/fsl/qe/qmc.h | 10 ++++++++
+ 2 files changed, 61 insertions(+)
 
 diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
-index 00408da14cb4..b67e73ad7c1a 100644
+index b67e73ad7c1a..2ab21a0023a7 100644
 --- a/drivers/soc/fsl/qe/qmc.c
 +++ b/drivers/soc/fsl/qe/qmc.c
-@@ -723,30 +723,6 @@ static int qmc_chan_setup_tsa_rx(struct qmc_chan *chan, bool enable)
- 	return qmc_chan_setup_tsa_32rx(chan, &info, enable);
+@@ -290,6 +290,57 @@ int qmc_chan_get_info(struct qmc_chan *chan, struct qmc_chan_info *info)
  }
+ EXPORT_SYMBOL(qmc_chan_get_info);
  
--static int qmc_chan_setup_tsa(struct qmc_chan *chan, bool enable)
--{
--	struct tsa_serial_info info;
--	int ret;
--
--	/* Retrieve info from the TSA related serial */
--	ret = tsa_serial_get_info(chan->qmc->tsa_serial, &info);
--	if (ret)
--		return ret;
--
--	/*
--	 * Setup one common 64 entries table or two 32 entries (one for Tx
--	 * and one for Tx) according to assigned TS numbers.
--	 */
--	if (chan->qmc->is_tsa_64rxtx)
--		return qmc_chan_setup_tsa_64rxtx(chan, &info, enable);
--
--	ret = qmc_chan_setup_tsa_32rx(chan, &info, enable);
--	if (ret)
--		return ret;
--
--	return qmc_chan_setup_tsa_32tx(chan, &info, enable);
--}
--
- static int qmc_chan_command(struct qmc_chan *chan, u8 qmc_opcode)
++int qmc_chan_get_ts_info(struct qmc_chan *chan, struct qmc_chan_ts_info *ts_info)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&chan->ts_lock, flags);
++
++	ts_info->rx_ts_mask_avail = chan->rx_ts_mask_avail;
++	ts_info->tx_ts_mask_avail = chan->tx_ts_mask_avail;
++	ts_info->rx_ts_mask = chan->rx_ts_mask;
++	ts_info->tx_ts_mask = chan->tx_ts_mask;
++
++	spin_unlock_irqrestore(&chan->ts_lock, flags);
++
++	return 0;
++}
++EXPORT_SYMBOL(qmc_chan_get_ts_info);
++
++int qmc_chan_set_ts_info(struct qmc_chan *chan, const struct qmc_chan_ts_info *ts_info)
++{
++	unsigned long flags;
++	int ret;
++
++	/* Only a subset of available timeslots is allowed */
++	if ((ts_info->rx_ts_mask & chan->rx_ts_mask_avail) != ts_info->rx_ts_mask)
++		return -EINVAL;
++	if ((ts_info->tx_ts_mask & chan->tx_ts_mask_avail) != ts_info->tx_ts_mask)
++		return -EINVAL;
++
++	/* In case of common rx/tx table, rx/tx masks must be identical */
++	if (chan->qmc->is_tsa_64rxtx) {
++		if (ts_info->rx_ts_mask != ts_info->tx_ts_mask)
++			return -EINVAL;
++	}
++
++	spin_lock_irqsave(&chan->ts_lock, flags);
++
++	if ((chan->tx_ts_mask != ts_info->tx_ts_mask && !chan->is_tx_stopped) ||
++	    (chan->rx_ts_mask != ts_info->rx_ts_mask && !chan->is_rx_stopped)) {
++		dev_err(chan->qmc->dev, "Channel rx and/or tx not stopped\n");
++		ret = -EBUSY;
++	} else {
++		chan->tx_ts_mask = ts_info->tx_ts_mask;
++		chan->rx_ts_mask = ts_info->rx_ts_mask;
++		ret = 0;
++	}
++	spin_unlock_irqrestore(&chan->ts_lock, flags);
++
++	return ret;
++}
++EXPORT_SYMBOL(qmc_chan_set_ts_info);
++
+ int qmc_chan_set_param(struct qmc_chan *chan, const struct qmc_chan_param *param)
  {
- 	return cpm_command(chan->id << 2, (qmc_opcode << 4) | 0x0E);
-@@ -1323,10 +1299,6 @@ static int qmc_setup_chan(struct qmc *qmc, struct qmc_chan *chan)
+ 	if (param->mode != chan->mode)
+diff --git a/include/soc/fsl/qe/qmc.h b/include/soc/fsl/qe/qmc.h
+index 6f1d6cebc9fe..802c161636bd 100644
+--- a/include/soc/fsl/qe/qmc.h
++++ b/include/soc/fsl/qe/qmc.h
+@@ -38,6 +38,16 @@ struct qmc_chan_info {
  
- 	chan->qmc = qmc;
+ int qmc_chan_get_info(struct qmc_chan *chan, struct qmc_chan_info *info);
  
--	ret = qmc_chan_setup_tsa(chan, true);
--	if (ret)
--		return ret;
--
- 	/* Set channel specific parameter base address */
- 	chan->s_param = qmc->dpram + (chan->id * 64);
- 	/* 16 bd per channel (8 rx and 8 tx) */
++struct qmc_chan_ts_info {
++	u64 rx_ts_mask_avail;
++	u64 tx_ts_mask_avail;
++	u64 rx_ts_mask;
++	u64 tx_ts_mask;
++};
++
++int qmc_chan_get_ts_info(struct qmc_chan *chan, struct qmc_chan_ts_info *ts_info);
++int qmc_chan_set_ts_info(struct qmc_chan *chan, const struct qmc_chan_ts_info *ts_info);
++
+ struct qmc_chan_param {
+ 	enum qmc_mode mode;
+ 	union {
 -- 
 2.41.0
 
