@@ -1,280 +1,108 @@
-Return-Path: <netdev+bounces-25817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8ED775E38
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:51:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EEDF775E50
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A298D2818DC
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65A0F2812B8
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063161800B;
-	Wed,  9 Aug 2023 11:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C24C1800B;
+	Wed,  9 Aug 2023 11:59:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96F7182AD
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 11:50:01 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8ABE10C0;
-	Wed,  9 Aug 2023 04:50:00 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 379BnkM5107908;
-	Wed, 9 Aug 2023 06:49:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691581786;
-	bh=bLi7eog4D4zCpcQySKcB5qsTvYGe8HOUojyDdT1AriI=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=XR9A+NI5zlszjRHfA9emZtLZIxJjf5KDSla6prcoSXtlN5zKDiRMgenWNRQ1iu9JS
-	 fzkLlgE0U9oSTVpBtNTGHlUsR9mnqZGqQL0BZIGw7l1SHVyWaA9NuyzLxDvpXWyqpz
-	 xk4QU/gWlsJCAuDfZF8VOk+E+4zPUFq74fQZ9BJw=
-Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 379BnkQl014225
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 9 Aug 2023 06:49:46 -0500
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 9
- Aug 2023 06:49:46 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 9 Aug 2023 06:49:46 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 379BnkvB008157;
-	Wed, 9 Aug 2023 06:49:46 -0500
-Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 379BnjKf002935;
-	Wed, 9 Aug 2023 06:49:45 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        MD Danish Anwar <danishanwar@ti.com>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH v3 5/5] net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
-Date: Wed, 9 Aug 2023 17:19:06 +0530
-Message-ID: <20230809114906.21866-6-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230809114906.21866-1-danishanwar@ti.com>
-References: <20230809114906.21866-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F7811C98;
+	Wed,  9 Aug 2023 11:59:36 +0000 (UTC)
+Received: from mail-oo1-xc43.google.com (mail-oo1-xc43.google.com [IPv6:2607:f8b0:4864:20::c43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E967F1729;
+	Wed,  9 Aug 2023 04:59:35 -0700 (PDT)
+Received: by mail-oo1-xc43.google.com with SMTP id 006d021491bc7-56c711a88e8so4570653eaf.2;
+        Wed, 09 Aug 2023 04:59:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691582375; x=1692187175;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4jcNuI0RwG4Oe2k8CS0Amzmn54vlJQH2irgVBpw5cvQ=;
+        b=rlrCYjW0lciQ7bUPICkiTmi6YRlotO03Drrkm96ynbFst6Jl1rqX3gl+hwmslyiGgQ
+         +7FtoVS+Vps2vOUveYgO6zjwy4/hmwv1HjDGiegO9KHCW6L0NrOVMC4feXPpypW88/Uc
+         uaQA+MnU5fPoiRg4AceXfuPvmIWKnxD5qmizNNJcBbVytuu23kShNLRVLu2ieiMlhHkF
+         cTG0PHTtIq70dQweFGOz2MqfSqw7Kiw826tDP5EyW66QvfJ2w+6SugZgxfYNF0r55DMm
+         0GDIyby8Nk6aklBtqY4Jy03wwTDXghj346L9V9e43lmo0hRolW1lCYdClzOi0dmSsBQ/
+         r46g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691582375; x=1692187175;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4jcNuI0RwG4Oe2k8CS0Amzmn54vlJQH2irgVBpw5cvQ=;
+        b=bfPeXEZTD3+tJUU0owBsI7WHpSo5KsLEkqnjZg53dgHmHqLovQRcJa9xJXiuPHACsM
+         bvpWfvS6WnFHi1+uYZIOM3TsphkRKKTQUedAOHUR81VHW5AsT5u/Kg3kiOPUdOJIEYD2
+         +HaMTxh0FV4J8MsyWIv/A8UNxqzMdoV6L56oTeZkXUcBYGphxgXr05BAjoVlExOh7V9x
+         Y81O5cooQwJtSBiCBFfYM1HQSjE9ZErrt21MrqXvns8rJisAwPkcjJ8ZuDHk/FvNXfaA
+         qQUwkInqXWOFP3S6b1MC4McLdnBjXe5mhBxb6xOOXXas+ycRPdzi0pCzKX7gFwV7pqTu
+         s1QQ==
+X-Gm-Message-State: AOJu0YzARtv74NFXCB2tgNPQgQGZkorLjn0JvR1mYRuwSec4x4/3Ye3o
+	bMv2Xl5zcrC2Nr0CRyCArTNYfTzUHEuaJJmv6aU=
+X-Google-Smtp-Source: AGHT+IE9bbZrZ0Q2Uem5+a9vsYtvTn16PS27QsVfCx4uF0e1WzbCijxQ7LLjK6SVHFdD329PnZp3Q1SlmeJWzCp0HR8=
+X-Received: by 2002:a05:6808:2105:b0:3a7:3ab9:e590 with SMTP id
+ r5-20020a056808210500b003a73ab9e590mr3389626oiw.9.1691582375168; Wed, 09 Aug
+ 2023 04:59:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com>
+In-Reply-To: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Wed, 9 Aug 2023 17:28:57 +0530
+Message-ID: <CAP01T74YAkdqNirpc4sCCnK_nwWpYJNcuM94xWDnbHY_Be6o=A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] net: Fix slab-out-of-bounds in inet[6]_steal_sock
+To: Lorenz Bauer <lmb@isovalent.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Grygorii Strashko <grygorii.strashko@ti.com>
+On Wed, 9 Aug 2023 at 14:04, Lorenz Bauer <lmb@isovalent.com> wrote:
+>
+> Kumar reported a KASAN splat in tcp_v6_rcv:
+>
+>   bash-5.2# ./test_progs -t btf_skc_cls_ingress
+>   ...
+>   [   51.810085] BUG: KASAN: slab-out-of-bounds in tcp_v6_rcv+0x2d7d/0x3440
+>   [   51.810458] Read of size 2 at addr ffff8881053f038c by task test_progs/226
+>
+> The problem is that inet[6]_steal_sock accesses sk->sk_protocol without
+> accounting for request sockets. I added the check to ensure that we only
+> every try to perform a reuseport lookup on a supported socket.
+>
+> It turns out that this isn't necessary at all. struct sock_common contains
+> a skc_reuseport flag which indicates whether a socket is part of a
+> reuseport group. inet[6]_lookup_reuseport already check this flag,
+> so we can't execute an erroneous reuseport lookup by definition.
+>
+> Remove the unnecessary assertions to fix the out of bounds access.
+>
+> Fixes: 9c02bec95954 ("bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign")
+> Reported-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+> Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
+> ---
 
-For AM65x SR2.0 it's required to enable IEP1 in raw 64bit mode which is
-used by PRU FW to monitor the link and apply w/a for 10M link issue.
-Note. No public errata available yet.
-
-Without this w/a the PRU FW will stuck if link state changes under TX
-traffic pressure.
-
-Hence, add support for 10M full duplex for AM65x SR2.0:
- - add new IEP API to enable IEP, but without PTP support
- - add pdata quirk_10m_link_issue to enable 10M link issue w/a.
-
-Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icss_iep.c     | 26 +++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icss_iep.h     |  2 ++
- drivers/net/ethernet/ti/icssg/icssg_config.c |  7 +++++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 27 ++++++++++++++++++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  2 ++
- 5 files changed, 62 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index 455c803dea36..527f17430f05 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -721,6 +721,32 @@ void icss_iep_put(struct icss_iep *iep)
- }
- EXPORT_SYMBOL_GPL(icss_iep_put);
- 
-+void icss_iep_init_fw(struct icss_iep *iep)
-+{
-+	/* start IEP for FW use in raw 64bit mode, no PTP support */
-+	iep->clk_tick_time = iep->def_inc;
-+	iep->cycle_time_ns = 0;
-+	iep->ops = NULL;
-+	iep->clockops_data = NULL;
-+	icss_iep_set_default_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_count(iep, 0);
-+	regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, iep->refclk_freq / 10); /* 100 ms pulse */
-+	regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
-+	if (iep->plat_data->flags & ICSS_IEP_SLOW_COMPEN_REG_SUPPORT)
-+		icss_iep_set_slow_compensation_count(iep, 0);
-+
-+	icss_iep_enable(iep);
-+	icss_iep_settime(iep, 0);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_init_fw);
-+
-+void icss_iep_exit_fw(struct icss_iep *iep)
-+{
-+	icss_iep_disable(iep);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_exit_fw);
-+
- int icss_iep_init(struct icss_iep *iep, const struct icss_iep_clockops *clkops,
- 		  void *clockops_data, u32 cycle_time_ns)
- {
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
-index 9c7f4d0a0916..803a4b714893 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.h
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
-@@ -35,5 +35,7 @@ int icss_iep_exit(struct icss_iep *iep);
- int icss_iep_get_count_low(struct icss_iep *iep);
- int icss_iep_get_count_hi(struct icss_iep *iep);
- int icss_iep_get_ptp_clock_idx(struct icss_iep *iep);
-+void icss_iep_init_fw(struct icss_iep *iep);
-+void icss_iep_exit_fw(struct icss_iep *iep);
- 
- #endif /* __NET_TI_ICSS_IEP_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index ab648d3efe85..933b84666574 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -210,6 +210,10 @@ void icssg_config_ipg(struct prueth_emac *emac)
- 	case SPEED_100:
- 		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
- 		break;
-+	case SPEED_10:
-+		/* IPG for 10M is same as 100M */
-+		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-@@ -440,6 +444,9 @@ void icssg_config_set_speed(struct prueth_emac *emac)
- 	case SPEED_100:
- 		fw_speed = FW_LINK_SPEED_100M;
- 		break;
-+	case SPEED_10:
-+		fw_speed = FW_LINK_SPEED_10M;
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 8881f7df1421..b186dce80c9c 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1149,7 +1149,6 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 
- 	/* remove unsupported modes */
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-@@ -2090,13 +2089,29 @@ static int prueth_probe(struct platform_device *pdev)
- 		goto free_pool;
- 	}
- 
-+	prueth->iep1 = icss_iep_get_idx(np, 1);
-+	if (IS_ERR(prueth->iep1)) {
-+		ret = dev_err_probe(dev, PTR_ERR(prueth->iep1), "iep1 get failed\n");
-+		icss_iep_put(prueth->iep0);
-+		prueth->iep0 = NULL;
-+		prueth->iep1 = NULL;
-+		goto free_pool;
-+	}
-+
-+	if (prueth->pdata.quirk_10m_link_issue) {
-+		/* Enable IEP1 for FW in 64bit mode as W/A for 10M FD link detect issue under TX
-+		 * traffic.
-+		 */
-+		icss_iep_init_fw(prueth->iep1);
-+	}
-+
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = prueth_netdev_init(prueth, eth0_node);
- 		if (ret) {
- 			dev_err_probe(dev, ret, "netdev init %s failed\n",
- 				      eth0_node->name);
--			goto netdev_exit;
-+			goto exit_iep;
- 		}
- 		prueth->emac[PRUETH_MAC0]->iep = prueth->iep0;
- 	}
-@@ -2167,6 +2182,10 @@ static int prueth_probe(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+exit_iep:
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
- free_pool:
- 	gen_pool_free(prueth->sram_pool,
- 		      (unsigned long)prueth->msmcram.va, msmc_ram_size);
-@@ -2212,6 +2231,10 @@ static void prueth_remove(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
-+	icss_iep_put(prueth->iep1);
- 	icss_iep_put(prueth->iep0);
- 
- 	gen_pool_free(prueth->sram_pool,
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index a56ab4cdc83c..3fe80a8758d3 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -208,6 +208,7 @@ struct prueth_pdata {
-  * @icssg_hwcmdseq: seq counter or HWQ messages
-  * @emacs_initialized: num of EMACs/ext ports that are up/running
-  * @iep0: pointer to IEP0 device
-+ * @iep1: pointer to IEP1 device
-  */
- struct prueth {
- 	struct device *dev;
-@@ -231,6 +232,7 @@ struct prueth {
- 	u8 icssg_hwcmdseq;
- 	int emacs_initialized;
- 	struct icss_iep *iep0;
-+	struct icss_iep *iep1;
- };
- 
- struct emac_tx_ts_response {
--- 
-2.34.1
-
+Thanks for the fix!
+Tested-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
 
