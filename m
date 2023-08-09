@@ -1,137 +1,205 @@
-Return-Path: <netdev+bounces-25932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25CDF77633E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:01:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBAC477635D
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:08:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC865281B88
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:01:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CC23281AC0
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685DE19BCB;
-	Wed,  9 Aug 2023 15:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5AF1AA6C;
+	Wed,  9 Aug 2023 15:08:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E20218C1B
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:01:50 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 683402107;
-	Wed,  9 Aug 2023 08:01:48 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 08F12E0008;
-	Wed,  9 Aug 2023 15:01:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1691593306;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g0zvfLvyRJt7hOgvNIifYjQHxyaOMWD1ltEX2pdHMbc=;
-	b=iXnta/0eS8D5cHJ76Q4dwhU+XK3qsGA5Twh8/3mjUO44s+pEvR/n0UP3phDRDaRzknJJqg
-	U0Po6QG77G0tYGseNfrgZzZ+oWZIReHQUy/j7wwlAqPpgNMdWXCyXkv/pWCbZTB17U0vBq
-	09x+R9HSs6PA9O+bm3Z01VLxBArlIT/tenAyyV94zuJu4ABgfwHf1jlpBmT9JL/aTrx54e
-	xulDWbuzkyyvyvjDTlEeKHtRrqbNHF9NWfFODttuROxRsjNMQwXq4dUnuY5B9C5WUAcO8L
-	rl4cb1owoaMRbW2+7s4uQte7dbC1HrDGo95q3ov+1CrqQAidzdIy5MawOqVkLw==
-Date: Wed, 9 Aug 2023 17:01:39 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 21/28] net: wan: Add framer framework support
-Message-ID: <20230809170139.2402e4a2@bootlin.com>
-In-Reply-To: <cc9417a3-ef86-bb46-9519-cf65b03b5f08@infradead.org>
-References: <20230809132757.2470544-1-herve.codina@bootlin.com>
-	<20230809132757.2470544-22-herve.codina@bootlin.com>
-	<cc9417a3-ef86-bb46-9519-cf65b03b5f08@infradead.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5290A19BDF
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:08:46 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1071F210B
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:08:44 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99c3c8adb27so986796166b.1
+        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 08:08:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1691593722; x=1692198522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5G6T3JCdCSjXcLmjmeNQXnmppiYdA5F1SZkXm/TxHpg=;
+        b=AFMi7qSe9xi1nXJyOmj9Pf1I24OUvRB/WMsnyk7ANa4EJu5x3ixtwGAQ2DQvaklQEi
+         CIIcnzvPZAvh0QFlqDA0IwQ+55nVG3EZQr4bWau7vG4fNJcPqbiYKGZWaqfAR4TrYoPm
+         431MaydlkDgq9WWasTwku0JG9/tar21OVpVXWuM+11NWgISrYsTwj0JXBMlL+QqxREOz
+         3dGOHQEXE9zzqEQubiZaY2AqyrBNwAQmd2ftY8WL2bQRboSI67n3l8r1wlEi8jj1tf/v
+         zFWq5migteLX095kdcYSVWVG4aDyfxNZv8Z9JVf1CNkhvvZwLI8o6dQ1YyyDUwxJ+rSK
+         DWsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691593722; x=1692198522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5G6T3JCdCSjXcLmjmeNQXnmppiYdA5F1SZkXm/TxHpg=;
+        b=GupEix9xvhtyO9gCosKjqSbwI9sTDNzbhycMvuOtt2kHMdkb0ytBccPwTJoYZ/w/eZ
+         jfaQnBZ4zlKh0AFb7Xhfzg9/RpiXQ88PwlnNgG2UgK+vCsOY8FdDn+QJ/XuDMpIOc09s
+         l4zB4ymi+6Bvum+GxettxKBPUAdJO5Vui+8fPghp+8UPzSMJg2S+DNtV195b2tzXu/S+
+         UsZ+tVqv7KspzUEFK8bUROheF+kzlkUBQDj0NoNeu8EkPlJRzDFhpTLxeMTe5oo1uOEc
+         QYmsQIqhe91nQjYOB+8EUefjkDAX67rXdyJULgxn7HMYSgJLoQKoPUv5BUDuSO5m/Faz
+         aBUA==
+X-Gm-Message-State: AOJu0YwoUl27F8A/7Gsh/FnqxG8BnxMweDjZcPgm9SUBzAhqbkS/GUwq
+	Cy8najDleI1e/ymi4gmdb3O1ssLkmOIfUpxCgvOKcg==
+X-Google-Smtp-Source: AGHT+IFJOmQaBG1yOZ2H7dcbIP6G4WTdTLU+oF9E60L/N6jLeiWxT1AzWslITS72T1ET4Iya7sJGmqsIkWYyudCliX8=
+X-Received: by 2002:a17:907:a041:b0:993:f12a:39ce with SMTP id
+ gz1-20020a170907a04100b00993f12a39cemr2327076ejc.15.1691593722582; Wed, 09
+ Aug 2023 08:08:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+References: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com> <6acbbf63-ba10-4a66-5e31-b9a499f79489@linux.dev>
+In-Reply-To: <6acbbf63-ba10-4a66-5e31-b9a499f79489@linux.dev>
+From: Lorenz Bauer <lmb@isovalent.com>
+Date: Wed, 9 Aug 2023 16:08:31 +0100
+Message-ID: <CAN+4W8hMpL3+vNOrBBRw01tD6OxQ-Yy8OWpq9nRtiyjm0GgE4g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] net: Fix slab-out-of-bounds in inet[6]_steal_sock
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Randy,
+On Wed, Aug 9, 2023 at 3:39=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
+>
+> On 8/9/23 1:33 AM, Lorenz Bauer wrote:
+> > Kumar reported a KASAN splat in tcp_v6_rcv:
+> >
+> >    bash-5.2# ./test_progs -t btf_skc_cls_ingress
+> >    ...
+> >    [   51.810085] BUG: KASAN: slab-out-of-bounds in tcp_v6_rcv+0x2d7d/0=
+x3440
+> >    [   51.810458] Read of size 2 at addr ffff8881053f038c by task test_=
+progs/226
+> >
+> > The problem is that inet[6]_steal_sock accesses sk->sk_protocol without
+> > accounting for request sockets. I added the check to ensure that we onl=
+y
+> > every try to perform a reuseport lookup on a supported socket.
+> >
+> > It turns out that this isn't necessary at all. struct sock_common conta=
+ins
+> > a skc_reuseport flag which indicates whether a socket is part of a
+>
+> Does it go back to the earlier discussion
+> (https://lore.kernel.org/bpf/7188429a-c380-14c8-57bb-9d05d3ba4e5e@linux.d=
+ev/)
+> that the sk->sk_reuseport is 1 from sk_clone for TCP_ESTABLISHED? It work=
+s
+> because there is sk->sk_reuseport"_cb" check going deeper into
+> reuseport_select_sock() but there is an extra inet6_ehashfn for all TCP_E=
+STABLISHED.
 
-On Wed, 9 Aug 2023 07:24:32 -0700
-Randy Dunlap <rdunlap@infradead.org> wrote:
+Sigh, I'd forgotten about this...
 
-> Hi,
-> 
-> On 8/9/23 06:27, Herve Codina wrote:
-> > diff --git a/drivers/net/wan/framer/Kconfig b/drivers/net/wan/framer/Kconfig
-> > new file mode 100644
-> > index 000000000000..96ef1e7ba8eb
-> > --- /dev/null
-> > +++ b/drivers/net/wan/framer/Kconfig
-> > @@ -0,0 +1,19 @@
-> > +# SPDX-License-Identifier: GPL-2.0-only
-> > +#
-> > +# FRAMER
-> > +#
-> > +
-> > +menu "Framer Subsystem"
-> > +
-> > +config GENERIC_FRAMER
-> > +	bool "Framer Core"  
-> 
-> Just curious: any reason that this cannot be tristate (i.e., a loadable module)?
-> Thanks.
+For the TPROXY TCP replacement use case we sk_assign the SYN to the
+listener, which creates the reqsk. We can let follow up packets pass
+without sk_assign since they will match the reqsk and convert to a
+fullsock via the usual route. At least that is what the test does. I'm
+not even sure what it means to redirect a random packet into an
+established TCP socket TBH. It'd probably be dropped?
 
-For the same reasons as generic phy cannot be built as module
-  b51fbf9fb0c3 phy-core: Don't allow building phy-core as a module
+For UDP, I'm not sure whether we even get into this situation? Doesn't
+seem like UDP sockets are cloned from each other, so we also shouldn't
+end up with a reuseport flag set erroneously.
 
-In the framer case, this allows to have the QMC HDLC driver built on systems
-without any framers (no providers and no framer core framework).
-Also the framer phandle is optional in the device tree QMC HDLC node.
+Things we could do if necessary:
+1. Reset the flag in inet_csk_clone_lock like we do for SOCK_RCU_FREE
+2. Duplicate the cb check into inet[6]_steal_sock
 
-Regards,
-Hervé
+Best
+Lorenz
 
-> 
-> > +	help
-> > +	  Generic Framer support.
-> > +
-> > +	  This framework is designed to provide a generic interface for framer
-> > +	  devices present in the kernel. This layer will have the generic
-> > +	  API by which framer drivers can create framer using the framer
-> > +	  framework and framer users can obtain reference to the framer.
-> > +	  All the users of this framework should select this config.
-> > +
-> > +endmenu  
-> 
-
-
-
--- 
-Hervé Codina, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+>
+> > reuseport group. inet[6]_lookup_reuseport already check this flag,
+> > so we can't execute an erroneous reuseport lookup by definition.
+> >
+> > Remove the unnecessary assertions to fix the out of bounds access.
+> >
+> > Fixes: 9c02bec95954 ("bpf, net: Support SO_REUSEPORT sockets with bpf_s=
+k_assign")
+> > Reported-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+> > Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
+> > ---
+> >   include/net/inet6_hashtables.h | 10 ----------
+> >   include/net/inet_hashtables.h  | 10 ----------
+> >   2 files changed, 20 deletions(-)
+> >
+> > diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtab=
+les.h
+> > index 284b5ce7205d..f9907ed36d54 100644
+> > --- a/include/net/inet6_hashtables.h
+> > +++ b/include/net/inet6_hashtables.h
+> > @@ -119,16 +119,6 @@ struct sock *inet6_steal_sock(struct net *net, str=
+uct sk_buff *skb, int doff,
+> >       if (!prefetched)
+> >               return sk;
+> >
+> > -     if (sk->sk_protocol =3D=3D IPPROTO_TCP) {
+> > -             if (sk->sk_state !=3D TCP_LISTEN)
+> > -                     return sk;
+> > -     } else if (sk->sk_protocol =3D=3D IPPROTO_UDP) {
+> > -             if (sk->sk_state !=3D TCP_CLOSE)
+> > -                     return sk;
+> > -     } else {
+> > -             return sk;
+> > -     }
+> > -
+> >       reuse_sk =3D inet6_lookup_reuseport(net, sk, skb, doff,
+> >                                         saddr, sport, daddr, ntohs(dpor=
+t),
+> >                                         ehashfn);
+> > diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtable=
+s.h
+> > index 1177effabed3..57a46993383a 100644
+> > --- a/include/net/inet_hashtables.h
+> > +++ b/include/net/inet_hashtables.h
+> > @@ -465,16 +465,6 @@ struct sock *inet_steal_sock(struct net *net, stru=
+ct sk_buff *skb, int doff,
+> >       if (!prefetched)
+> >               return sk;
+> >
+> > -     if (sk->sk_protocol =3D=3D IPPROTO_TCP) {
+> > -             if (sk->sk_state !=3D TCP_LISTEN)
+> > -                     return sk;
+> > -     } else if (sk->sk_protocol =3D=3D IPPROTO_UDP) {
+> > -             if (sk->sk_state !=3D TCP_CLOSE)
+> > -                     return sk;
+> > -     } else {
+> > -             return sk;
+> > -     }
+> > -
+> >       reuse_sk =3D inet_lookup_reuseport(net, sk, skb, doff,
+> >                                        saddr, sport, daddr, ntohs(dport=
+),
+> >                                        ehashfn);
+> >
+> > ---
+> > base-commit: eb62e6aef940fcb1879100130068369d4638088f
+> > change-id: 20230808-bpf-next-a442a095562b
+> >
+> > Best regards,
+>
 
