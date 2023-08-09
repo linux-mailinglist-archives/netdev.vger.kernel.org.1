@@ -1,190 +1,100 @@
-Return-Path: <netdev+bounces-25935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0794777636E
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:11:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C9C776380
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38B0D1C212CD
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:11:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09E771C21293
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB8519BDD;
-	Wed,  9 Aug 2023 15:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CBC1AA6C;
+	Wed,  9 Aug 2023 15:15:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA86612D
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:11:00 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 322FA210D;
-	Wed,  9 Aug 2023 08:10:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=buaa.edu.cn; s=buaa; h=Received:Message-ID:Date:MIME-Version:
-	User-Agent:Subject:To:Cc:References:From:In-Reply-To:
-	Content-Type:Content-Transfer-Encoding; bh=qdAiPe8csqwuuyDj6hTE7
-	PynnBwpqRO66suZ0OgkS3A=; b=GGIl5b9rBvyjp+SHD++MmiqmBvWcpFomjJE+4
-	6ouGUCB/NdgjX6bhl/fKObsDaQCnPtXQHsq8zoQjxIFrNt1CpVrGfxRn0TZ1tE0S
-	uWP0wT/MCYHAIW8HhhjMjOWPk4d3kcVlmR+GDlkNhchXcf4X1Idd9FJ9IoshdqaT
-	Hz3fOE=
-Received: from [10.193.157.69] (unknown [10.193.157.69])
-	by coremail-app1 (Coremail) with SMTP id OCz+CgDn7_NirNNkLfyhDA--.28238S3;
-	Wed, 09 Aug 2023 23:10:27 +0800 (CST)
-Message-ID: <5aca90c4-8436-40d1-87d5-3406fdb26c47@buaa.edu.cn>
-Date: Wed, 9 Aug 2023 23:10:27 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7848182A6
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:15:39 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2F6B1FD4
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 08:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691594138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ByiVqdXmSCalgud7Z24F8Ynz17kP0hKEcv57t3Zsk6s=;
+	b=EPYPv2ELYXN7gmZFvl0LsC7p5Stq+XxvQAdoi2OeB7NsPIPC7/xsTKJfCW6waIbjLWDM0S
+	28u4Ic9E5mjwIKiGOHjT/Rm2rQLwBZPdnBmul80Pb794nH9CBFf6F9k1i9HBRp6TADi7dY
+	qdAomOj1BLin+uvK9kETLswGMMS0Bl4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-471-18Dl6cEXPQyMvO52VygV8A-1; Wed, 09 Aug 2023 11:15:34 -0400
+X-MC-Unique: 18Dl6cEXPQyMvO52VygV8A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2021885CBE2;
+	Wed,  9 Aug 2023 15:15:33 +0000 (UTC)
+Received: from swamp.redhat.com (unknown [10.45.226.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7B0CE2026D4B;
+	Wed,  9 Aug 2023 15:15:30 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Jacob.e.keller@intel.com,
+	przemyslawx.patynowski@intel.com,
+	kamil.maziarz@intel.com,
+	dawidx.wesierski@intel.com,
+	mateusz.palczewski@intel.com,
+	slawomirx.laba@intel.com,
+	norbertx.zulinski@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	horms@kernel.org
+Subject: [PATCH net v2 0/2] Fix VF to VM attach detach
+Date: Wed,  9 Aug 2023 17:15:27 +0200
+Message-ID: <20230809151529.842798-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG]Bluetooth: possible semantic bug when the status field of
- the HCI_Connection_Complete packet set to non-zero
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
-From: Xin-Yu Liu <LXYbhu@buaa.edu.cn>
-In-Reply-To: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:OCz+CgDn7_NirNNkLfyhDA--.28238S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxtF1kGF1fCrW8XFyUGFWxWFg_yoWxKry5pF
-	WYya9FkryDJ3WSyFnrAw48CF9Fv3yktrsrJr90q340y345WrykKFsak3Z0kayUGrsav3Wj
-	vF12qrZrA3Z8A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
-	AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
-	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xSY4AK6svPMxAIw28I
-	cxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Aw1UJr1UMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7IU5IksPUUUUU==
-X-CM-SenderInfo: te1sjjazrrjqpexdthxhgxhubq/
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+v2: fixed typos in the description of the second patch
 
-Thanks for your reply.
+v1: https://lore.kernel.org/netdev/20230807094831.696626-1-poros@redhat.com/
 
-After carefully considering your feedback, we now realize that the scenario we were assuming is indeed quite exceptional. It has become clear that there is no necessity for any supplementary mechanisms to reset the Bluetooth system. In our forthcoming work, we plan to engage in an in-depth exploration of the spec and Linux Bluetooth source code, with the aim of deriving more valuable insights and outcomes.
+Petr Oros (2):
+  Revert "ice: Fix ice VF reset during iavf initialization"
+  ice: Fix NULL pointer deref during VF reset
 
-Once again, thank you for your active engagement and for taking the time to address our queries. Your assistance has been instrumental in guiding our approach.
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  8 ++---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 34 +++++--------------
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  1 -
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  1 -
+ 4 files changed, 12 insertions(+), 32 deletions(-)
 
-Wishing you all the best and looking forward to future interactions.
-
-Warm regards,
-Xin-Yu Liu
-
-2023/8/8 1:48, Luiz Augusto von Dentz :
-> Hi,
->
-> On Mon, Aug 7, 2023 at 8:17 AM Xin-Yu Liu <LXYbhu@buaa.edu.cn> wrote:
->> Hello,
->>
->> Thanks for your reply.
->>
->> I apologize for my previous unclear statement, which may have misled you.
->>
->> Let me rephrase our question:
->>
->> When a Bluetooth device initiates a connection to another device, its host sends an HCI_Create_Connection command (OGF: 0x01, OCF: 0x0005) to the controller. Once the connection is established, the controller sends an HCI_Connection_Complete event (Event Code: 0x03) back to the host. If a valid HCI_Connection_Complete event has its parameter "Status" altered (with all other parameters unchanged), changing 0x00 to any value between 0x01 and 0xFF for example, the host will considerd that the connection fails to complete.
->>
->> In reality, if the HCI_Connection_Complete event's parameter "Connection_Handle" is valid and unaltered, it means the handle resource exists and has not been released. The observations we made support this statement:
->>
-> Well according to the spec we can only assume the handle is valid if
-> the status is set to 0x00, so I am not really sure how we can possibly
-> check if the handle is valid if the status indicates a connection
-> failure?
->
->> (a) When the tampered HCI_Connection_Complete event with altered "Status" is sent to the host, if we attempt to reconnect to the same device by sending another HCI_Create_Connection command, the controller will send an HCI_Command_Status event (Event Code: 0x0F) to the host, with the "Status" parameter set to 0x0B, indicating "CONNECTION ALREADY EXISTS" and leading to the connection failure.
->>
->> (b) When the tampered HCI_Connection_Complete event is sent to the host, if we manually send an HCI_Disconnect command, with the "Connection_Handle" parameter set to the same value as the previous HCI_Connection_Complete event's "Connection_Handle," and the "Reason" parameter set to 0x15, indicating "REMOTE DEVICE TERMINATED CONNECTION DUE TO POWER OFF," we receive a proper response, signifying that the Connection_Handle is valid and exists. Additionally, the issue described in (a) disappears.
-> Just read again the sentence above: 'TERMINATED CONNECTION', it can't
-> possible mean the handle is valid and exists, I'm afraid you are
-> arguing based on a controller implementation that doesn't comply with
-> the spec text above, it shall either disconnect the link so we
-> invalidate the handle on the host, then later we can reconnect, or
-> indicate the status is 0x00.
->
->> Well we can't do much about the dangling connection if we don't know
->> its handle to be able to disconnect since there is no command to
->> disconnect by address if that is what you were expecting us to do, so
->> the bottom line seems to be that sending 0x0b to the controller is
->> useless since we can't do anything about at the host, well other than
->> reset but would likely affect other functionality as well.
->>
->> With knowledge of the handle, we think we can manually send an HCI_Disconnect command to deal with the dangling connection, just as we mentioned in (b).
-> Assuming the handle is valid on status != 0x00 would probably not work
-> with most controllers following the spec to the letter, in which case
-> the HCI_Disconnect would fail and in the meantime we have an hci_conn
-> with invalid state, so I don't think it is worth going sideways just
-> to get it working under special circumstances, where this special
-> circumstances might be a bug in the way status is used.
->
->> We believe that, in the situation we mentioned, the handle is valid but is rendered useless. Implementing an automated mechanism to handle the release of the handle (e.g., by sending an HCI_Disconnect command) might be a better choice.
-> Sorry but I have to disagree, in that case HCI_Disconnect would need
-> to be sent every time, which can also fail if the link-layer had
-> terminated the connection as indicated in the status.
->
->> Best wishes,
->> Xin-Yu Liu
->>
->> 2023/8/5 13:09, Luiz Augusto von Dentz :
->>
->> Hi,
->>
->> On Fri, Aug 4, 2023 at 9:35 PM Xinyu Liu <LXYbhu@buaa.edu.cn> wrote:
->>
->> Hello,
->>
->> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in Linux 6.2:
->>
->> During the connection process, the host server needs to receive the HCI_Connection_Complete packet from the hardware controller. In normal cases, the status field of this packet is zero, which means that the connection is successfully completed:
->>
->> However, in our testing, when the status field was set to non-zero, 47 for instance, the Bluetooth connection failed. After that, when we attempt to reestablish a Bluetooth connection, the connection always fails. Upon analyzing the event packets sent from the controller to the host server, we observed that the Status field of the HCI_Command_Status packet becomes 0B, indicating that the controller believes the connection already exists. This situation has been causing the connection failure persistently:
->>
->> That seems like a link-layer issue, the controller is saying the
->> connection had failed, and 0x0b also doesn't help either except if you
->> are saying that the other parameters are actually valid (e.g. handle),
->> that said the spec seems pretty clear about status other than 0x00
->> means the connection had failed:
->>
->> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
->> page 2170
->>
->> 0x01 to 0xFF Connection failed to Complete. See [Vol 1] Part F,
->> Controller Error Codes
->> for a list of error codes and descriptions.
->>
->> In our understanding, it would be more preferable if a single failed Bluetooth connection does not result in subsequent connections also failing. We believe that having some mechanism to facilitate Bluetooth's recovery and restoration to normal functionality could be considered as a potentially better option.
->>
->> We are not sure whether this is a semantic bug or implementation feature in the Linux kernel. Any feedback would be appreciated, thanks!
->>
->> Well we can't do much about the dangling connection if we don't know
->> its handle to be able to disconnect since there is no command to
->> disconnect by address if that is what you were expecting us to do, so
->> the bottom line seems to be that sending 0x0b to the controller is
->> useless since we can't do anything about at the host, well other than
->> reset but would likely affect other functionality as well.
->>
->>
->
+-- 
+2.41.0
 
 
