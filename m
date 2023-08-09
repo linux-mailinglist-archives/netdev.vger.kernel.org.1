@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-26055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B42776AF1
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 162A5776AF8
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 23:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07CEC281DDB
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 21:26:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8B1281C11
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 21:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99BF1DA24;
-	Wed,  9 Aug 2023 21:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C091DA32;
+	Wed,  9 Aug 2023 21:28:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA2A24512
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 21:26:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4A7C433C8;
-	Wed,  9 Aug 2023 21:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DF51C9E7
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 21:28:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0320C433C8;
+	Wed,  9 Aug 2023 21:28:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691616404;
-	bh=kBkC1V58t97IVsvmclGQ+bR6aEcDgZ9KrlmIvRsAWJU=;
+	s=k20201202; t=1691616495;
+	bh=FdvTilkKSkQ8vAqa9+CyzBQk/hXXyy1elvk/K/FyXjs=;
 	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=HGGMvH4PWzKW/naNhfxTPFitbiQbW6O/lMToJ4chpLxUYk1gFpxViSb8RfDz+X/l4
-	 15t1rxLYALYjnWlkIlOM52BBWb9sLGRnig34wqmlqZehe++HXlinoxuBoakZgtXalb
-	 vgV3JICJBD/H2VIf17MHpPUTReD2eqPLKvmLMRNDHITV+0+Ks8KI7TPTU1xlKH4/+x
-	 VgJGv7xkfBCvEchc1Q7HI9w+W1nnQb20CPf9+T7YRwZb7IhITNNu02JO+cAyXPW4um
-	 nEtEnIVbo6f32J/aDWgSJ4IrmBVOpZSoe2m8IkQXhWc5pYf6cw8NWxJqyX3e/CPGsH
-	 zwH5MMSyTBnrg==
-Message-ID: <d58e289b54f66c239ae09e94728716b7.sboyd@kernel.org>
+	b=FZKwvFkICOQumiCP808+0Ym4o1OqW1f2Wj2AJ1Xy7WVlwdbh0kwSdgDcUMQlWcyJD
+	 rVOYEqiEZDM05rBS3CXFG7ihLy9RtR2TYjv+INZsFIa9pTLHI3XjHh6Rymt+3LJ1sJ
+	 4Q6gu8IBoZ+jOMW9XzkUg6z6caSMhyigvEMngquXY9BVK1t1cCz5rlpAiyMgmlWF+e
+	 e2SUus0+wO0IoqSigtIkRJHUSs3obdyC0IrNxr4Fbhbp5Lul1L+hHE8Q88Kokq4Nft
+	 0eVzm0QhfUAn8AW/HrhUMf+uxlBqlx9ydi4LjTr9mluKfDtIpIw15jHdF77Z8gUfPD
+	 JCqTUZ3t+Gt6g==
+Message-ID: <677706de77d5d5b799d25c855a723b2c.sboyd@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -39,130 +39,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230801010234.792557-5-niravkumar.l.rabara@intel.com>
-References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com> <20230801010234.792557-1-niravkumar.l.rabara@intel.com> <20230801010234.792557-5-niravkumar.l.rabara@intel.com>
+In-Reply-To: <4c0dfd1c-2b61-b954-73ad-ac8d4b82487d@kernel.org>
+References: <20230618132235.728641-1-niravkumar.l.rabara@intel.com> <20230801010234.792557-1-niravkumar.l.rabara@intel.com> <20230801010234.792557-5-niravkumar.l.rabara@intel.com> <4c0dfd1c-2b61-b954-73ad-ac8d4b82487d@kernel.org>
 Subject: Re: [PATCH v2 4/5] clk: socfpga: agilex: add clock driver for the Agilex5
 From: Stephen Boyd <sboyd@kernel.org>
-Cc: adrian.ho.yin.ng@intel.com, andrew@lunn.ch, conor+dt@kernel.org, devicetree@vger.kernel.org, dinguyen@kernel.org, krzysztof.kozlowski+dt@linaro.org, linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, mturquette@baylibre.com, netdev@vger.kernel.org, p.zabel@pengutronix.de, richardcochran@gmail.com, robh+dt@kernel.org, wen.ping.teh@intel.com
-To: niravkumar.l.rabara@intel.com
-Date: Wed, 09 Aug 2023 14:26:40 -0700
+Cc: adrian.ho.yin.ng@intel.com, andrew@lunn.ch, conor+dt@kernel.org, devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, mturquette@baylibre.com, netdev@vger.kernel.org, p.zabel@pengutronix.de, richardcochran@gmail.com, robh+dt@kernel.org, wen.ping.teh@intel.com
+To: Dinh Nguyen <dinguyen@kernel.org>, niravkumar.l.rabara@intel.com
+Date: Wed, 09 Aug 2023 14:28:11 -0700
 User-Agent: alot/0.10
 
-Quoting niravkumar.l.rabara@intel.com (2023-07-31 18:02:33)
-> diff --git a/drivers/clk/socfpga/clk-agilex.c b/drivers/clk/socfpga/clk-a=
-gilex.c
-> index 74d21bd82710..3dcd0f233c17 100644
-> --- a/drivers/clk/socfpga/clk-agilex.c
-> +++ b/drivers/clk/socfpga/clk-agilex.c
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /*
-> - * Copyright (C) 2019, Intel Corporation
-> + * Copyright (C) 2019-2023, Intel Corporation
->   */
->  #include <linux/slab.h>
->  #include <linux/clk-provider.h>
-> @@ -9,6 +9,7 @@
->  #include <linux/platform_device.h>
-> =20
->  #include <dt-bindings/clock/agilex-clock.h>
-> +#include <dt-bindings/clock/intel,agilex5-clkmgr.h>
-> =20
->  #include "stratix10-clk.h"
-> =20
-> @@ -41,6 +42,67 @@ static const struct clk_parent_data mpu_free_mux[] =3D=
- {
->           .name =3D "f2s-free-clk", },
->  };
-> =20
-> +static const struct clk_parent_data core0_free_mux[] =3D {
-> +       { .fw_name =3D "main_pll_c1",
-> +         .name =3D "main_pll_c1", },
+Quoting Dinh Nguyen (2023-08-08 04:03:47)
+> Hi Stephen/Mike,
+>=20
+> On 7/31/23 20:02, niravkumar.l.rabara@intel.com wrote:
+> > From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+> >=20
+> > Add support for Intel's SoCFPGA Agilex5 platform. The clock manager
+> > driver for the Agilex5 is very similar to the Agilex platform,we can
+> > re-use most of the Agilex clock driver.
+> >=20
+> > Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
+> > Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
+> > Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+> > ---
+> >   drivers/clk/socfpga/clk-agilex.c | 433 ++++++++++++++++++++++++++++++-
+> >   1 file changed, 431 insertions(+), 2 deletions(-)
+> >=20
+>=20
+> If you're ok with this patch, can I take this through armsoc?
+>=20
 
-We're adding support for something new? Only set .fw_name in that case,
-as .name will never be used. To do even better, set only .index so that
-we don't do any string comparisons.
-
-> +       { .fw_name =3D "peri_pll_c0",
-> +         .name =3D "peri_pll_c0", },
-> +       { .fw_name =3D "osc1",
-> +         .name =3D "osc1", },
-> +       { .fw_name =3D "cb-intosc-hs-div2-clk",
-> +         .name =3D "cb-intosc-hs-div2-clk", },
-> +       { .fw_name =3D "f2s-free-clk",
-> +         .name =3D "f2s-free-clk", },
-> +};
-> +
-[...]
-> +
->  static int n5x_clk_register_c_perip(const struct n5x_perip_c_clock *clks,
->                                        int nums, struct stratix10_clock_d=
-ata *data)
->  {
-> @@ -535,6 +917,51 @@ static int n5x_clkmgr_init(struct platform_device *p=
-dev)
->         return 0;
->  }
-> =20
-> +static int agilex5_clkmgr_init(struct platform_device *pdev)
-> +{
-> +       struct device_node *np =3D pdev->dev.of_node;
-> +       struct device *dev =3D &pdev->dev;
-> +       struct stratix10_clock_data *clk_data;
-
-Maybe call this stratix_data so that clk_data.clk_data is
-stratix_data.clk_data.
-
-> +       struct resource *res;
-> +       void __iomem *base;
-> +       int i, num_clks;
-> +
-> +       res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> +       base =3D devm_ioremap_resource(dev, res);
-
-This is a single function call, devm_platform_ioremap_resource().
-
-> +       if (IS_ERR(base))
-> +               return PTR_ERR(base);
-> +
-> +       num_clks =3D AGILEX5_NUM_CLKS;
-> +
-> +       clk_data =3D devm_kzalloc(dev, struct_size(clk_data, clk_data.hws,
-> +                                                num_clks), GFP_KERNEL);
-> +       if (!clk_data)
-> +               return -ENOMEM;
-> +
-> +       for (i =3D 0; i < num_clks; i++)
-> +               clk_data->clk_data.hws[i] =3D ERR_PTR(-ENOENT);
-> +
-> +       clk_data->base =3D base;
-> +       clk_data->clk_data.num =3D num_clks;
-> +
-> +       agilex_clk_register_pll(agilex_pll_clks, ARRAY_SIZE(agilex_pll_cl=
-ks),
-> +                               clk_data);
-> +
-> +       agilex_clk_register_c_perip(agilex5_main_perip_c_clks,
-> +                                   ARRAY_SIZE(agilex5_main_perip_c_clks),
-> +                                   clk_data);
-> +
-> +       agilex_clk_register_cnt_perip(agilex5_main_perip_cnt_clks,
-> +                                     ARRAY_SIZE(agilex5_main_perip_cnt_c=
-lks),
-> +                                     clk_data);
-> +
-> +       agilex_clk_register_gate(agilex5_gate_clks,
-> +                                ARRAY_SIZE(agilex5_gate_clks), clk_data);
-> +
-> +       of_clk_add_hw_provider(np, of_clk_hw_onecell_get, &clk_data->clk_=
-data);
-
-devm? Or when is this provider removed?
-
-> +       return 0;
-> +}
-> +
->  static int agilex_clkmgr_probe(struct platform_device *pdev)
->  {
->         int (*probe_func)(struct platform_device *init_func);
+Usually any binding files go through arm-soc and clk tree but the driver
+only goes through clk tree via a PR. Is that possible here?
 
