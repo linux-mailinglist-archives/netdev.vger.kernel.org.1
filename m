@@ -1,72 +1,95 @@
-Return-Path: <netdev+bounces-25954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8113776447
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:45:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D3D776443
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 17:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D501281D83
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:45:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E5C1C21282
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F55F1BB2A;
-	Wed,  9 Aug 2023 15:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81D91BB29;
+	Wed,  9 Aug 2023 15:44:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D83619BCB
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:45:21 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2083.outbound.protection.outlook.com [40.107.212.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28AA9F1;
-	Wed,  9 Aug 2023 08:45:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA9D19BB4
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 15:44:29 +0000 (UTC)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2074.outbound.protection.outlook.com [40.107.14.74])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4C6211C;
+	Wed,  9 Aug 2023 08:44:28 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RM1rR/+aeqplAbv65hKiF2GwADfYYdDQ8hlfMeBGtCdCnTiDdLmCCwgIEx1PhZWsgwJA4I1IbZrcMcqDwC3+M3JMo1y/P8DJKqAyhQ5K7OMQk/auu4BC8MTwYXdCEd/PWKi9tEwY9U4G5RxSSA/MgJhJxUEZgRDQQeHecPY89TYGaxRvgUIQfwJi6yTCaIRycFJ81MfdZY07kqfV3s7wZg98OE3PrPvbz6UQN8q3zPcDer2gNWK/qpvs4/RS4rgAXkSn2L3xG/g+aaNI9NiJymE87i44GEniNEPF2BZVOY0VnjtKx0AoAGFbvIH+0fdRK7yk1+AfO6xycUxDLN572g==
+ b=EOBV0bHKVhjdasun1uvMT+Jmw47RRdkIu2HQwDretcLidLFQ6xbtQgFiUfj/LvrCbHLOgGGr8h+lIhNaGZxfhf37KEV3TkkVcRfgjnuIdd3eGbmXbhylZGVTlkZ9/VECtYk6sY8tVfksKMU2D92PCCeAQDxyaRPeDE3cz+r90p46JcCAJW3oZ3lOYOe3aphvNh360bIl6xH6p8w33InqRXYGadbr+W+P8b4m36rtq7LZCfcnouvEIUTHl500WovzcOmlSKB9L0L2Q5x0lzWiwe4OP1dRfWjOKZUTjWplNRnv3YCuJap+GDq8zfoz7lwsp/vjqKrFaQOg76ogFAl/lA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xpmpiKNBXBGD0h+w8Kc2kx7EYySgEMBTpZe3gjNroe0=;
- b=N0tkLOAB3deCkmqVwNq8timMz0FrpWlf9WFN7ASeDV7STpLaB77D3nh500BuMoAc0phETihYPOh6d5yCGW/9IAtSshXzyDXyS1DtnP688/Bmax5NKjhlVkXFF6t7U6Noj/v1KpaTZ0VzBXaw6zCAwXujKJVS3QxiNpFJ0tRrIZpeKoIDuK3MoAiT5bV6WSUp8wqT9tV9p1s2gTTjy4TsltibVgYqrJtu6Wv5UTRPg4ncM7D+2e8vSruoAfoZsFB5det7q3Mw9RV4Pz9gWpRQIyeW5OXhB92xqEjOp5yNy2njLDrgUvt2t4JJsuZ32ftmBrpZYMPfiESv+J8tMs+VLA==
+ bh=wCQV4qNb/CREVEDO4JZtXM6t8f8mPCc6M5B5n+0yaTU=;
+ b=SniaC91dymkDJCp0IScGGcBGurbiwBg6JAlkIlAbF/tGZY4biGrACFxZZ6T/OdJ5OLS4EZ5xh5QFZtrV5tERdDU5vm4hIziJeNLf0hZKPr8ONytoFONi90b5TTFY2oSvRtzKNfKbcBXEpwsW+jnqKaJK7zrZ2rPihLbhtgI0+0UjcLfU/3oZ08MWCoybArlHuE6nNAe+N+HM2dqAlVorjsVl2XWwfMWdvhibqiM8M9G5x8l+HUYipimAEqJBiGNjZFHBkAJd0rewGa+2VHMB+yvJZzgHZTULZyhKeKGjbyqCHxXlMxWj3PznAehhi5ygUjBoFUfWsFds7gV+gnrNgA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xpmpiKNBXBGD0h+w8Kc2kx7EYySgEMBTpZe3gjNroe0=;
- b=5Y1hObeglDEOuNegSwA8pLVqHAXBxaJ3VgK8a/gI9ly4BhpChJcnn8Kpd9X2QJtvcs1pthiSr8c4BmLbvMzxOtmHrp/thwocoySq6iRRzR5hfoq/FmxQmx1MqOCsgRFS5bMmkH966yCgTOzN61gTgZKdBMOANNG5vC5xsuVK3Wo=
+ bh=wCQV4qNb/CREVEDO4JZtXM6t8f8mPCc6M5B5n+0yaTU=;
+ b=YATQmLwaqO9UdURrRDfUmxfHWlwdzf4gRVO5xBvl4jhLPGxg900vWbsjWZxmduSnTCD/C5ypOHb2Uj8ZdhSDkHbJRTJkfX3+Yifu28GvcneHj72aQHrgC9uR0Iw4fqFqao+nK3FFQzBpfjFyMXy3j/03gFBg3yiDyED7qVMUvXI=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by DM4PR12MB6613.namprd12.prod.outlook.com (2603:10b6:8:b8::21) with
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
+ by DU0PR04MB9634.eurprd04.prod.outlook.com (2603:10a6:10:31c::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Wed, 9 Aug
- 2023 15:44:15 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::ee63:b5d6:340c:63b2%4]) with mapi id 15.20.6652.026; Wed, 9 Aug 2023
- 15:44:14 +0000
-Message-ID: <ff61f675-a5a8-d1d6-a1bf-a5879914b4a9@amd.com>
-Date: Wed, 9 Aug 2023 08:44:13 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v14 vfio 5/8] vfio/pds: Add VFIO live migration support
-To: Alex Williamson <alex.williamson@redhat.com>,
- Brett Creeley <brett.creeley@amd.com>
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com,
- yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
- kevin.tian@intel.com, horms@kernel.org, shannon.nelson@amd.com
-References: <20230807205755.29579-1-brett.creeley@amd.com>
- <20230807205755.29579-6-brett.creeley@amd.com>
- <20230808162704.7f5d4889.alex.williamson@redhat.com>
-Content-Language: en-US
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20230808162704.7f5d4889.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PH0PR07CA0026.namprd07.prod.outlook.com
- (2603:10b6:510:5::31) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+ 2023 15:44:24 +0000
+Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
+ ([fe80::fd28:f7a2:1bc1:53a0]) by GV1PR04MB9070.eurprd04.prod.outlook.com
+ ([fe80::fd28:f7a2:1bc1:53a0%6]) with mapi id 15.20.6652.026; Wed, 9 Aug 2023
+ 15:44:24 +0000
+Date: Wed, 9 Aug 2023 18:44:18 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Uwe =?utf-8?B?S2xlaW5lLUvilJzDgm5pZw==?= <u.kleine-koenig@pengutronix.de>,
+	Ioana Ciornei <ciorneiioana@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexandru Ardelean <alexandru.ardelean@analog.com>,
+	Andre Edich <andre.edich@microchip.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Baruch Siach <baruch@tkos.co.il>,
+	Christophe Leroy <christophe.leroy@c-s.fr>,
+	Divya Koppera <Divya.Koppera@microchip.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
+	Michael Walle <michael@walle.cc>,
+	Neil Armstrong <narmstrong@baylibre.com>,
+	Nisar Sayed <Nisar.Sayed@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Philippe Schenker <philippe.schenker@toradex.com>,
+	Willy Liu <willy.liu@realtek.com>,
+	Yuiko Oshino <yuiko.oshino@microchip.com>
+Subject: Re: [PATCH] net: phy: Don't disable irqs on shutdown if WoL is
+ enabled
+Message-ID: <20230809154418.hjkf43ndwfzretiy@LXL00007.wbi.nxp.com>
+References: <20230804071757.383971-1-u.kleine-koenig@pengutronix.de>
+ <20230808145325.343c5098@kernel.org>
+ <1e438a02-6964-ce65-5584-e8ea57a694bb@gmail.com>
+ <ZNLIOEBXNgPOnFSf@shell.armlinux.org.uk>
+ <20230809142155.4dtmnmmecaycbtum@LXL00007.wbi.nxp.com>
+ <ZNOivVJ+G/sRiwai@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNOivVJ+G/sRiwai@shell.armlinux.org.uk>
+X-ClientProxiedBy: AS4P195CA0009.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e2::17) To GV1PR04MB9070.eurprd04.prod.outlook.com
+ (2603:10a6:150:21::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,129 +97,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DM4PR12MB6613:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd7ceb0b-4d61-4fca-1614-08db98ef7bc4
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|DU0PR04MB9634:EE_
+X-MS-Office365-Filtering-Correlation-Id: af3d3ddc-ddf0-40d7-56b5-08db98ef8172
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	XrNx/3dwPSMoj+/7HqiF0ImJrkQEat/BniDPT2LJK4BCRljADDMCVuy51LtQ2/450n9slToiAPwYnzgU/+iTRuYwIw6lpuRXc9jng5AT+J3FgjAWyA3ubUv8TA5pXEB0tAR/xyphDj7CQ7lBE9d3g21MNjNRHnh1WLwNvSqU0FF8xaDMqm2BZvVQJZ7zslTshXoIFRyc0EIxMP5uOn7Lel+LRAoE5jxWEAtj8Jdy6XyS45CyGLjRyBghR+QlBa+ON21wt5Jj4mkgrW5d0/AKBY6Vzs9xW3Gdk/2jH6moK6FeBbeCeyGHZLFYNc0lilY+zwldSSTImTv3M9rgt02x19aqNP7BgwvgRBqqyKaPrrgeGEyd3z3cFzNzKo74pUbmcXPW2moRr6qczgqdLMRozcU4X0uISCmlgjHcJcurMuvruLdO/dFHvlgMlD0PfiG1WEvYDgEJ9GbS1qF3/ZR33ej+HF6O32CLEY7a3E1mudPmQD7BB7qgu2HvYQdHYLzoaHP9PmjM44gdGJtlZz9mIXGT0kD7hVnDWnNjQ5zxof25rG5sRksLmXCtWS9wJIB5XWDNfoFeOJ49aI6Flj+9LPS+iXXTXtM4/U5N1p7l6axv55vc5jCjC6pb/D5X6RkM1Y9gl8QXDRGCArufNBl3Eg==
+	MQDpVxbhm6qnWUuAgX7PV6ZxN4o4TDg5FjaxeMU/EgWZL6WHyulQzRrtIEoZ3LQBNFlwRXnkkcljTlriD/bzLA0vpxYpB2iUewAHTRNTcqABwWjI3JYpfNAFgy1p6iYDY7YGBKgg230JKt1i1IccFr2jrnbtaUJmz3XXlzJsn+8NhD0+0xxG8gHrmcBPFfxyZ/Yba/ev175FrSgGk8zFLbIZR05VnP8IfRn0sDMHFOJ+xpoMhcpBC9JnF9jRR30D+ghnVJM0AuXA4fiHV/OGDy6ApADZdUj4ls1IcdFxk9Re6gm1/57puI1VfrbYr7zaXm1haFtCDmI/wQLpLlHe+8RnguKr2yEaNKg4kxasjvan5S+er8vayUwZD4uRso2cKbh13HkbxcHku7KLWtnN6dOxpMaQSiHWHtxU+FV1H9pQZzWURSCF2PPA06bnq3n1ef0Z2OPm41bFUR7JXc43UbSl3D+4c7gPOZ2S1AGjnWTlyhNZucCEgt9smH0Lqgcbb9h3mXKdQwJ8JasNFJnTBDhilffQFi4LdJe3WaRc60VS8ad5aGxy1++/pHaF2CYK
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(396003)(366004)(136003)(39860400002)(186006)(451199021)(1800799006)(31686004)(6512007)(26005)(53546011)(6486002)(6506007)(478600001)(110136005)(38100700002)(2616005)(83380400001)(4326008)(66946007)(66476007)(66556008)(6636002)(8936002)(8676002)(2906002)(41300700001)(316002)(36756003)(31696002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(346002)(396003)(376002)(366004)(186006)(1800799006)(451199021)(6486002)(26005)(1076003)(6506007)(6512007)(6666004)(478600001)(38100700002)(54906003)(66946007)(66476007)(66556008)(4326008)(41300700001)(316002)(8676002)(8936002)(5660300002)(44832011)(7416002)(7406005)(2906002)(6916009)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NDd5RkUzZVdCYTBEdndLc3NQSURWQldzMk1xUTRtbTlFTUovVUxvaEhaSXdC?=
- =?utf-8?B?Vm5vUGwwZmJmUks1SC9SSncvMTRJaUlONmlvU2Z4Ty96OEtxRW95dWgyQkIr?=
- =?utf-8?B?R1U2ei9nN3k4UmEzVUdnaGRQL1I4TU9NQ0hnKzBua1lWNEJWNlR2Y3UzNElP?=
- =?utf-8?B?YUpYWnFVdHBXYkZWTlJ6dUI4N1JRbi82YjNvU2FkOWdrYzFKMW5CWkZhcDMw?=
- =?utf-8?B?Vm9tdmhIdkttS0F0MHhPaFBpK2h6YUhQbW5lbDNiRmxHeFVxUGlJdS9uTWdX?=
- =?utf-8?B?elFJbVhpb3kwN0luZHR2OGlrN2lXWXRRTTdDQmFXalA3a3l1OGJlSmRiWXd1?=
- =?utf-8?B?WHRBeDd2VDVvTWwvZnByaW5DcWoweTdSOU5JVTlyR2hVUC9yV2JLY0hoeTFQ?=
- =?utf-8?B?a2wraFVqQzlQK1NFLzVqTUVuSkp2cnV1Q3hBRG1QQ3V0U0Z6cDNmdTc5enZ6?=
- =?utf-8?B?a3RpL0hVZkRMVWZXelB2NVVPUmNEaEpPQTRXYm5CUXhJTFZ2Z3YwL21yK0lQ?=
- =?utf-8?B?ZFdwZi8yTG9nbytON2l3QWhacGxNUkNtQXd2Vm9oM05sZFB3cmJZanZLdHE1?=
- =?utf-8?B?Z1E1SGFRdjdzdHdVK2pQL0JFSXFQWk1xclNQQ01IczJ0WjJoMm9BcVd6bUxV?=
- =?utf-8?B?QjZFbXRqdFU0Skg0NGNRU3VqRVNsa3diS2tjM2JYNlczUWxoOFRKT3E5STJo?=
- =?utf-8?B?L1hvMy9KMTd1cGFrTW8wRmxmV2RVMjZmbnYxenFNVnpRMXdHRFByamhoWE83?=
- =?utf-8?B?Nng1ZHJZdW5ZaW1EYkEwSmlEQkJaUWc5bDBqZnZzOXZ5Ulh2akJ5U3kwNCt2?=
- =?utf-8?B?VitTZFUyQTc2YTFwTzA1M29mc2UxcFY2cnBBbHVDc3dBK0RKb0cwMlFQWnU0?=
- =?utf-8?B?MEpPQUY5QXdZUXlFMlNucG5ldm16U2s0WjVtcUdOWUJJMzJkWVVUemsxZ2xG?=
- =?utf-8?B?emdrTGZlRlJDc2R3T1l3cGJIZi9Rd3gxYTZJWnp6ZXovcXdZSWw2d1BjYXYv?=
- =?utf-8?B?OWh3dkFWalE5ZC9NT0c4ZUJyL05sWm02bm0veFJ0VmdjM25YRkFET3Fra3hi?=
- =?utf-8?B?alQ3UWRwNFpBTDZ2Q2YvMHJOMThXT3JzVXBybUtlOTczTDZ5ZDUySWlWN1U1?=
- =?utf-8?B?bnlLQUNONW54WEpqbFFpUXpkQVU1UFIxMW52RVl4M3gvVkYyV3U3aXBPMzBJ?=
- =?utf-8?B?R21YUHVkbUp2WEsveXIyd1AzdHRLeGY5NFF1S0RReUVTSlh3NHcrUXpMYU5W?=
- =?utf-8?B?dDJzanlMY0Q1b29JVWFIQ1VDSXBDd0Qvd1pYTXM5cDlUVVNpbkw0MkVDNiti?=
- =?utf-8?B?N2VQY1pkK0pCR2tOWStOQnlvVWxEaDloazcyMUFXcjE4TVhsYXA4bGdYTWU1?=
- =?utf-8?B?UlBnKzNFdkZkRFQyVkYweko4YjZTaXg4TUtBY1FtM3c0djhHeXczb1VYS05M?=
- =?utf-8?B?Z3cyc0w2WGo1YjIwQ2M4VUtiWElJWm9GYTl6Z01BYmZGVXBXb0Y5TlVTa01N?=
- =?utf-8?B?dVN6K3JXUDIzOTNuL3MrV2VNVVhmQk9jTGtmeFl2TnRyRWhsZHBVQk9MaFFS?=
- =?utf-8?B?KzUzN2h2eU1xVG1ZbUxrSE43TU1OMkVxS3p0bFo3V1BUVzA1WTBuSWRhWkdJ?=
- =?utf-8?B?Ums2TUZ2VEtORWNWTTFnbERFYk5KSEM3eVN6enpxVHAvNFlkaTdKUXFuQlFz?=
- =?utf-8?B?MXcxTmFrTUV0Mzc5STl1Q1RSa2tiTzBVNTJCMVcwbHh0Mnd0VHAxcEcraXZR?=
- =?utf-8?B?Q20wRmpVUWJPanBJOXdzSG1RQUV2TFA0Q213eWFuYWNCQ0xwT213T0doNWoz?=
- =?utf-8?B?bndwbTZVL2hFQnpwbW1pdEZua0FHeDMyYW8wQmt1OTZwYXV6a3NZMWVndGpN?=
- =?utf-8?B?U253Tm1ZUHVsNzJuOUk0OU5tdjFLMlVDQmdlZHk3M2lETFFabTlKdUtIaUtl?=
- =?utf-8?B?UFhEMXc4NlJxNmxvRHFrVnMxSlAvdEQ5TDRHc2ZFWlZ1bVdtOW8xUFJMaXVR?=
- =?utf-8?B?L3dYS0t1d3V0c2dOcHJjemVEZTF3ajduS1ZZOEF1YUZMZXhzbFhJRXI2QjR2?=
- =?utf-8?B?eUtyL2JBZUJKdERId2MzV0gzT2l4Z0RpUSt2Y0NpcXJpaS90MWJqd1QvQiti?=
- =?utf-8?Q?ZMRoKdCjPbs/erN+7TSCM+/oC?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd7ceb0b-4d61-4fca-1614-08db98ef7bc4
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+	=?us-ascii?Q?d3OBJcKkhZsM6+ujjIDV3H46kjsIpyhpvME+VoL8SewFNyJyUktjJqn16yh6?=
+ =?us-ascii?Q?iPSkhYMC+GZzriG0xF1injGS1AmMuZz1ZOSi61c7K9FPP80wAVbl2rBt87UV?=
+ =?us-ascii?Q?Jo7gATzhAuJUEWOjffgytdIHctpOOq4rSlFPYCh289ESb/OZBM8NjkLZ2/rP?=
+ =?us-ascii?Q?4f9D/1CbTxY+6WOps5QkkhEd0a3ftYuC9kfIeI+3z7Glc8tmmP593/TjIxFX?=
+ =?us-ascii?Q?bgLiUkMTdFnZfyt+ONRkr0UFZCGNNCtKI4ys0O++OX9M7DCtNpPzH7NEGKE0?=
+ =?us-ascii?Q?nahIhLmgNRuH4CXGppMeClh/nK13L7nJx9FMDFmdO0kG40Fr9sgQPlCXwMKc?=
+ =?us-ascii?Q?56W5WyvQa7f81S5pLIE5ewM/a5CPmHY0UHncViBF8BIurtK8QbD+blLH4hbB?=
+ =?us-ascii?Q?azlptzdszJQzLQ+sv3sXRrpIJm5qk/8zD49/Dr6Bb3C0GPT/1bQrlfNZaW3F?=
+ =?us-ascii?Q?kIGjyd3wpSVn3hV2znNsVYfQv8BD5toS4pWV9/BIJmax3fQSao/l5wnPt233?=
+ =?us-ascii?Q?Loiv01w311z2kAFYlGcXPkiMUveLbWtUME58LWhD6f72IqbpyA0uiYZys35x?=
+ =?us-ascii?Q?K2oS9Vff2H6On00Ee4Iezrx3mCSUH9a2dNRjgDfSFUkqNNGMFddDFpmu2+hW?=
+ =?us-ascii?Q?zN3oCLjiYAbCaf55Dcu2H0z8c6Fs9usGmH5ssuHOHG+CeMTgMilSOvgT9iVS?=
+ =?us-ascii?Q?Ca+O8iUIkopyGdvjUvJx0BMk1BX42V7Ob1TilQTkpcJ1TR1097GVhGTKLsFL?=
+ =?us-ascii?Q?Aw9lzsNE6TSbnuTQQBA4fcP3c3UGnqWuEN503RSg0qoK8wlMOphBpDv2bhQj?=
+ =?us-ascii?Q?EprCe5ib9l8vZJIhd7rNKhTmgH5KYe8xrfyddJuzgRAmDYNvUFz9Ee5lpVHw?=
+ =?us-ascii?Q?namf3nVOrK2SaATSqL6TRITqzVCzoj9yPVU0wmv3c3EopW67fcDeRkvvM/wS?=
+ =?us-ascii?Q?iXk0+EWbc2yl7ucafj81Xwl/jSE9WGzy/JbKikis3tH1nMiBistWMlQmE8MJ?=
+ =?us-ascii?Q?pxtbJO1aRY2EGgRzBT44eYEIAcMMqFvPuL6pBdIxIHAi1B9/HrGPVgmEZqf7?=
+ =?us-ascii?Q?mq471yyAuLR5D9PqDyhJDI3SyvkuuCCQ+DYUanBSBmR3w+gnKDKNH7TOr5xl?=
+ =?us-ascii?Q?21Iz2+GUDwm5jt90/JrE7HmWxRl98Y03nmZqO/75ILq0H/+EsotNXXcyxEyf?=
+ =?us-ascii?Q?uX+RWbt3kwErHAqwFDeRYE6DBrTaS8+SI3OA5WPfGJ8NOyAjmzZIxL+FBDdq?=
+ =?us-ascii?Q?BBQ4O19+3FTM4LtKNrCOTz0PKivtuG/tAHcFMeKXp+5GD1s4W85vweJqKt4L?=
+ =?us-ascii?Q?96BvF4lIcaMYb9U4pCyyyHcdgyMdBX5mBW9oQ9/mvIp6vbhCraf0mSSBt3el?=
+ =?us-ascii?Q?bfG9wTCmXK26WqM7j9MGMlt6T7aPg4W4Eh11AiG8ObjgeTTdj2z/HMrs9uq0?=
+ =?us-ascii?Q?AIQt9Zcmws+MVXZKcVYsLiG8nCcUT9fKs7CtlFzLbbfwHTHjm69Mdh6mHE+l?=
+ =?us-ascii?Q?AylGeDk0JfYhRwdMn+HbV7ki9Sc9guxyDYz3E3KOmS0WX++lSw2FJrZGrcw6?=
+ =?us-ascii?Q?VCMfZ07VboBOe/g56jlWHVEf7cmoJhjQ4H4dbID9UIs11Qz7Q6nPTrAoDUAc?=
+ =?us-ascii?Q?wg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: af3d3ddc-ddf0-40d7-56b5-08db98ef8172
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 15:44:14.5469
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 15:44:24.1583
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oHVVVErkwUZME/GfED1DJ+RNsniIesEqcPC0LbKyfLfElZfAmYOXA7J0S+iKyq9NwGm0JsA7Ij+eDAndsxp5lw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6613
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: S9/hb2YcdKD5+J5vlOrYhXhmFCWUaVq4+Gmwx+wMwV9QuO5NVaOQ6UkhPXG++nagKDX60qPrkzfzu7Lh5y/lqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9634
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/8/2023 3:27 PM, Alex Williamson wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On Wed, Aug 09, 2023 at 03:29:17PM +0100, Russell King (Oracle) wrote:
+> On Wed, Aug 09, 2023 at 05:21:55PM +0300, Ioana Ciornei wrote:
+> > That's a perfect summary of the problem that I was trying to fix.
+> > 
+> > The board in question is a LS1021ATSN which has two AR8031 PHYs that
+> > share an interrupt line. In case only one of the PHYs is probed and
+> > there are pending interrupts on the PHY#2 an IRQ storm will happen
+> > since there is no entity to clear the interrupt from PHY#2's registers.
+> > PHY#1's driver will get stuck in .handle_interrupt() indefinitely.
 > 
-> 
-> On Mon, 7 Aug 2023 13:57:52 -0700
-> Brett Creeley <brett.creeley@amd.com> wrote:
-> ...
->> +static int
->> +pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio)
->> +{
->> +     union pds_core_adminq_cmd cmd = {
->> +             .lm_suspend_status = {
->> +                     .opcode = PDS_LM_CMD_SUSPEND_STATUS,
->> +                     .vf_id = cpu_to_le16(pds_vfio->vf_id),
->> +             },
->> +     };
->> +     struct device *dev = pds_vfio_to_dev(pds_vfio);
->> +     union pds_core_adminq_comp comp = {};
->> +     unsigned long time_limit;
->> +     unsigned long time_start;
->> +     unsigned long time_done;
->> +     int err;
->> +
->> +     time_start = jiffies;
->> +     time_limit = time_start + HZ * SUSPEND_TIMEOUT_S;
->> +     do {
->> +             err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, &comp, true);
->> +             if (err != -EAGAIN)
->> +                     break;
->> +
->> +             msleep(SUSPEND_CHECK_INTERVAL_MS);
->> +     } while (time_before(jiffies, time_limit));
->> +
->> +     time_done = jiffies;
->> +     dev_dbg(dev, "%s: vf%u: Suspend comp received in %d msecs\n", __func__,
->> +             pds_vfio->vf_id, jiffies_to_msecs(time_done - time_start));
->> +
->> +     /* Check the results */
->> +     if (time_after_eq(time_done, time_limit)) {
->> +             dev_err(dev, "%s: vf%u: Suspend comp timeout\n", __func__,
->> +                     pds_vfio->vf_id);
->> +             err = -ETIMEDOUT;
-> 
-> If the command completes successfully but exceeds the time limit
-> this turns a success into a failure.  Is that desired?  Thanks,
-> 
-> Alex
-> 
+> So I have two further questions:
+> 1. Is WoL able to be supported on this hardware?
 
-Yes, this is the desired behavior. Based on the testing we have done and 
-downtime expectations for live migration it seems like the suspend 
-operation timing out after 5 seconds is reasonable behavior. It could 
-succeed, but that could also be the case if the timeout value was 10, 
-20, 30, or more seconds. Even so, it seems like we don't want to keep 
-spinning in the driver forever and we also don't want to further 
-increase the VM downtime.
+I don't know if anyone cares about WoL on the AR8031 PHYs from this
+board.
 
-Thanks,
+Both of the PHYs are used in conjuction with 2 eTSEC controllers - which
+use the driver in drivers/net/ethernet/freescale/gianfar.c.
 
-Brett
+The Ethernet controller does have WoL support, which means that WoL could
+still be supported on the board even though we would forbid WoL on the
+AR8031 PHYs.
+
+> 2. AR8031 has a seperate WOL_INT signal that can be used to wake up the
+>    system. Is this used in the hardware design?
+
+No, WOL_INT is not connected.
 
