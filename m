@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-25801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366B17759F0
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:04:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D633D775A91
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6CE6281BA6
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:03:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 130881C2117E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 11:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB75174F0;
-	Wed,  9 Aug 2023 11:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F361773D;
+	Wed,  9 Aug 2023 11:09:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1829174CA
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 11:03:55 +0000 (UTC)
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDEF410F3;
-	Wed,  9 Aug 2023 04:03:54 -0700 (PDT)
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.94.2)
-	(envelope-from <n0-1@orbyte.nwl.cc>)
-	id 1qTgya-0001jV-So; Wed, 09 Aug 2023 13:03:41 +0200
-Date: Wed, 9 Aug 2023 13:03:40 +0200
-From: Phil Sutter <phil@nwl.cc>
-To: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wang Weiyang <wangweiyang2@huawei.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>, gongruiqi1@huawei.com
-Subject: Re: [PATCH] netfilter: ebtables: replace zero-length array members
-Message-ID: <ZNNyjNDht6v84hvS@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wang Weiyang <wangweiyang2@huawei.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>, gongruiqi1@huawei.com
-References: <20230809075136.1323302-1-gongruiqi@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79393174F2;
+	Wed,  9 Aug 2023 11:09:35 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F9C10F3;
+	Wed,  9 Aug 2023 04:09:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691579374; x=1723115374;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Y/Oqi7kJ/0eaV+Zo9BP0T3NPTyRyjUXPNOygyZXvNwI=;
+  b=nKYY1nz42OmSvIjjj+hnVdX5DM8XrAWymX/WgxZnYnk1mTpNHoT8lfps
+   ChbVp0mJnGl3cBwY0ezehPb8wU014QaZxLgc53PhJRLzYs9l5Hf4kMZDV
+   GaEXIi4XmLzsxFflqRl2hZcWpXLie5lO+ESKph6OokhwdZZhZuwNQvAIP
+   Q+4ZXQ7YM6PDOPffnglVgmxudDoLSi1t2lKpqGy96o33Sn1QmslHpvXBf
+   gye7uxN6CrCeera1sW6W/U1FAl91GTVC2EcBSBmJbXhGoKwiAL9jfvmQe
+   dOAsUGwQScnrbZaGyAIRvqppjfqrONaEQJjqCYbSE7VWkuTyLMAn7X59l
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="434979692"
+X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
+   d="scan'208";a="434979692"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 04:09:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="875201554"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 09 Aug 2023 04:09:33 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qTh4D-00063k-2z;
+	Wed, 09 Aug 2023 11:09:29 +0000
+Date: Wed, 9 Aug 2023 19:09:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Breno Leitao <leitao@debian.org>, sdf@google.com, axboe@kernel.dk,
+	asml.silence@gmail.com, willemdebruijn.kernel@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v2 3/8] io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+Message-ID: <202308091848.hWtNtas3-lkp@intel.com>
+References: <20230808134049.1407498-4-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,30 +66,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230809075136.1323302-1-gongruiqi@huaweicloud.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230808134049.1407498-4-leitao@debian.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 03:51:36PM +0800, GONG, Ruiqi wrote:
-> From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
-> 
-> As suggested by Kees[1], replace the old-style 0-element array members
-> of multiple structs in ebtables.h with modern C99 flexible array.
-> 
-> [1]: https://lore.kernel.org/all/5E8E0F9C-EE3F-4B0D-B827-DC47397E2A4A@kernel.org/
-> 
-> Link: https://github.com/KSPP/linux/issues/21
-> Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
+Hi Breno,
 
-I tried this once[1], but it was rejected pointing at a revert[2]. It
-seems gcc was improved since then: The warning is gone and I don't find
--Wno-stringop-overflow flag in iptables sources.
+kernel test robot noticed the following build errors:
 
-Cheers, Phil
+[auto build test ERROR on next-20230808]
+[cannot apply to bpf-next/master bpf/master net/main net-next/main linus/master horms-ipvs/master v6.5-rc5 v6.5-rc4 v6.5-rc3 v6.5-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-[1] https://lore.kernel.org/all/20200719100220.4666-1-phil@nwl.cc/
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1e6e9d0f4859ec698d55381ea26f4136eff3afe1
+url:    https://github.com/intel-lab-lkp/linux/commits/Breno-Leitao/net-expose-sock_use_custom_sol_socket/20230809-011901
+base:   next-20230808
+patch link:    https://lore.kernel.org/r/20230808134049.1407498-4-leitao%40debian.org
+patch subject: [PATCH v2 3/8] io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+config: m68k-randconfig-r036-20230809 (https://download.01.org/0day-ci/archive/20230809/202308091848.hWtNtas3-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230809/202308091848.hWtNtas3-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308091848.hWtNtas3-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   m68k-linux-ld: io_uring/uring_cmd.o: in function `io_uring_cmd_sock':
+   io_uring/uring_cmd.c:183: undefined reference to `sk_getsockopt'
+>> m68k-linux-ld: io_uring/uring_cmd.c:210: undefined reference to `sock_setsockopt'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
