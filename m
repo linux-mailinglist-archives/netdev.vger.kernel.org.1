@@ -1,135 +1,79 @@
-Return-Path: <netdev+bounces-25894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECCD9776179
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:44:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB071776183
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29E891C211B9
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:44:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB1B1C209FB
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A37718C27;
-	Wed,  9 Aug 2023 13:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5175918C2A;
+	Wed,  9 Aug 2023 13:45:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEAA182BE
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:44:02 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82CC2107
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 06:43:56 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 379CjbDi024278;
-	Wed, 9 Aug 2023 06:43:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=ezS9SWbx8tDQlME/SczLZSWHUxOlIi5YQxkfAiWvp6Y=;
- b=JJ/cuL63stbBpnBcCFragmbeXDHWLzrTS2FVFvXUcgLilC1GHTg7fYyU+g7INF3TMX2G
- UuU80vMiwn1MHjBJ8TEMdvL4ntHaldtIfN/sUFhXhtQba/1kLXZF518NUFie9175UgmA
- DBamibQZIFGmVXKy1EKg16pXV1j9j7eKuOP037ROjJ6OMznX9D5HZHlznycfB+MbqrpR
- i1/cBOkWW0In/b52vV7m0UBPCaCowx7LvyL7cV3ObdVNXheuo4/kGvk9SDPdcBJK5fNi
- /8LLo4I91ucXUmcVyxTaVdgNCiozZLo2WeVjfgjaFZE5QtsWJRElE4cxl8zqbgdBqRXp 0A== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkntmwea-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 09 Aug 2023 06:43:49 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 9 Aug
- 2023 06:43:47 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 9 Aug 2023 06:43:47 -0700
-Received: from falcon.marvell.com (unknown [10.30.46.95])
-	by maili.marvell.com (Postfix) with ESMTP id 5B0023F704D;
-	Wed,  9 Aug 2023 06:43:43 -0700 (PDT)
-From: Manish Chopra <manishc@marvell.com>
-To: <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <aelior@marvell.com>, <palok@marvell.com>,
-        <njavali@marvell.com>, <skashyap@marvell.com>, <jmeneghi@redhat.com>,
-        <yuval.mintz@qlogic.com>, <skalluru@marvell.com>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <horms@kernel.org>,
-        David Miller <davem@davemloft.net>
-Subject: [PATCH v2 net] qede: fix firmware halt over suspend and resume
-Date: Wed, 9 Aug 2023 19:13:39 +0530
-Message-ID: <20230809134339.698074-1-manishc@marvell.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446D7612D
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:45:37 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A801982
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 06:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Z+fZ+Ra0n5r6MYVT7pXgD5j+fElAau9KXE/qJ6X8PFo=; b=CkMtY23IaLQWGRDqBK8tyA/MBx
+	pd0JLBHU4xelEGczV7v6WJCHFMFcsv3qVVeHbdkSGFTF+dTHY3DvK4fUGx0Tn55oEFZCAzt/y+7Ks
+	0xa9apeR/MCl8O3GRsczr74/GlUrFxrys9L50Ida+BwJ/YVtmcAx+FjCaAhK7ba3qQ4Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qTjVB-003aLW-Hm; Wed, 09 Aug 2023 15:45:29 +0200
+Date: Wed, 9 Aug 2023 15:45:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mv88e6060: add phylink_get_caps
+ implementation
+Message-ID: <c3102ba1-61a1-4b03-837a-a77dcfff157b@lunn.ch>
+References: <E1qTiMC-003FJP-V3@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 7MGVQI0NCsTFLzSPDa612xoPwnPITiCP
-X-Proofpoint-ORIG-GUID: 7MGVQI0NCsTFLzSPDa612xoPwnPITiCP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-09_10,2023-08-09_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1qTiMC-003FJP-V3@rmk-PC.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-While performing certain power-off sequences, PCI drivers are
-called to suspend and resume their underlying devices through
-PCI PM (power management) interface. However this NIC hardware
-does not support PCI PM suspend/resume operations so system wide
-suspend/resume leads to bad MFW (management firmware) state which
-causes various follow-up errors in driver when communicating with
-the device/firmware afterwards.
+On Wed, Aug 09, 2023 at 01:32:08PM +0100, Russell King (Oracle) wrote:
+> Add a phylink_get_caps implementation for Marvell 88e6060 DSA switch.
+> This is a fast ethernet switch, with internal PHYs for ports 0 through
+> 4. Port 4 also supports MII, REVMII, REVRMII and SNI. Port 5 supports
+> MII, REVMII, REVRMII and SNI without an internal PHY.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-To fix this driver implements PCI PM suspend handler to indicate
-unsupported operation to the PCI subsystem explicitly, thus avoiding
-system to go into suspended/standby mode.
+Looks sensible, and fits with the limited knowledge i have of this
+device.
 
-Fixes: 2950219d87b0 ("qede: Add basic network device support")
-Cc: David Miller <davem@davemloft.net>
-Signed-off-by: Manish Chopra <manishc@marvell.com>
-Signed-off-by: Alok Prasad <palok@marvell.com>
----
-V1->V2:
-* Replace SIMPLE_DEV_PM_OPS with DEFINE_SIMPLE_DEV_PM_OPS
----
- drivers/net/ethernet/qlogic/qede/qede_main.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_main.c b/drivers/net/ethernet/qlogic/qede/qede_main.c
-index d57e52a97f85..18ae7af1764c 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_main.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_main.c
-@@ -177,6 +177,18 @@ static int qede_sriov_configure(struct pci_dev *pdev, int num_vfs_param)
- }
- #endif
- 
-+static int __maybe_unused qede_suspend(struct device *dev)
-+{
-+	if (!dev)
-+		return -ENODEV;
-+
-+	dev_info(dev, "Device does not support suspend operation\n");
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+static DEFINE_SIMPLE_DEV_PM_OPS(qede_pm_ops, qede_suspend, NULL);
-+
- static const struct pci_error_handlers qede_err_handler = {
- 	.error_detected = qede_io_error_detected,
- };
-@@ -191,6 +203,7 @@ static struct pci_driver qede_pci_driver = {
- 	.sriov_configure = qede_sriov_configure,
- #endif
- 	.err_handler = &qede_err_handler,
-+	.driver.pm = &qede_pm_ops,
- };
- 
- static struct qed_eth_cb_ops qede_ll_ops = {
--- 
-2.27.0
-
+    Andrew
 
