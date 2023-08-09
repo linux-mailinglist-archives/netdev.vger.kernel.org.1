@@ -1,255 +1,91 @@
-Return-Path: <netdev+bounces-25915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CA41776297
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:35:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E290577629B
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FE0B281D62
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:35:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 139DD1C2131E
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3991517AC1;
-	Wed,  9 Aug 2023 14:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDEA17755;
+	Wed,  9 Aug 2023 14:36:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF0E19BAC
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:35:50 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD86BEE;
-	Wed,  9 Aug 2023 07:35:49 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 89D3F1F38C;
-	Wed,  9 Aug 2023 14:35:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1691591748; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=0yqLkSRXZ8f3zN1k6eS9Dsh1bWA3RF5pe3YHi1TbXrU=;
-	b=Y0EPY0Z55IgKRJqb9qpumcoLr0RyBq8JjsZFu8NQ9OrOKeKY23A2D58fbowxX+ORnb0jRr
-	Jkqljx1vafZqpX7L0f9dwH0fcbCI5kLL2ugXWQnX4LjJkK78XyJV1UPb+Z34JtuC0fzww+
-	WBgfS/2GsYSBVRj0OZFXuBNnWxF98WQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1691591748;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=0yqLkSRXZ8f3zN1k6eS9Dsh1bWA3RF5pe3YHi1TbXrU=;
-	b=1+XcZ0e8l0cXa6QMh5n2/GXE+vT70b2c9LDv93ahnmZ8uhsKna2SqpxtgBPkn5/rHs1kf/
-	vWVvkNGpNyLInEAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 531ED133B5;
-	Wed,  9 Aug 2023 14:35:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id T98SE0Sk02RTMAAAMHmgww
-	(envelope-from <tiwai@suse.de>); Wed, 09 Aug 2023 14:35:48 +0000
-Date: Wed, 09 Aug 2023 16:35:47 +0200
-Message-ID: <87edkce118.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: linux-kernel@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-    Mark Brown <broonie@kernel.org>,
-    Christoph Hellwig <hch@lst.de>,
-    netdev@vger.kernel.org
-Subject: [PATCH RFC] Introduce uniptr_t as a generic "universal" pointer
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4E92CA4
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:36:50 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCDF21FFA;
+	Wed,  9 Aug 2023 07:36:48 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RLXdN75BkzVkwB;
+	Wed,  9 Aug 2023 22:34:48 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 9 Aug
+ 2023 22:36:44 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <santosh.shilimkar@oracle.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<yuehaibing@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<rds-devel@oss.oracle.com>
+Subject: [PATCH net-next] net/rds: Remove unused function declarations
+Date: Wed, 9 Aug 2023 22:36:27 +0800
+Message-ID: <20230809143627.34564-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Although sockptr_t is used already in several places as a "universal"
-pointer, it's still too confusing to use it in other subsystems, since
-people see it always as if it were a network-related stuff.
+Commit 39de8281791c ("RDS: Main header file") declared but never implemented
+rds_trans_init() and rds_trans_exit(), remove it.
+Commit d37c9359056f ("RDS: Move loop-only function to loop.c") removed the
+implementation rds_message_inc_free() but not the declaration.
 
-This patch defines a more generic type, uniptr_t, that does exactly as
-same as sockptr_t for a wider use.  As of now, it's almost 1:1 copy
-with renames (just with comprehensive header file inclusions).
-
-Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
+ net/rds/rds.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-This is a RFC patch, or rather a material for bikeshedding.
-
-Initially the discussion started from the use of sockptr_t for the
-sound driver in Andy's patch:
-  https://lore.kernel.org/r/20230721100146.67293-1-andriy.shevchenko@linux.intel.com
-followed by a bigger series of patches by me:
-  https://lore.kernel.org/r/20230731154718.31048-1-tiwai@suse.de
-
-The first reaction to the patches (including my own) were
-"why sockptr_t?"  Yes, it's just confusing.  So, here it is, a
-proposal of defining the new type for the very purpose as sockptr_t.
-
-The name of uniptr_t is nothing but my random pick up, and we can
-endlessly discuss for a better name (genptr_t or whatever).
-I'm totally open for the name.
-
-After this introduction, sockptr_t can be alias of uniptr_t,
-e.g. simply override with "#define sockptr_t uniptr_t" or such.
-How can it be is another open question.
-
-Also, we can clean up the macro implementation along with it;
-there seem a few (rather minor) issues as suggested by Andy:
-  https://lore.kernel.org/r/ZMlGKy7ibjkQ6ii7@smile.fi.intel.com
-
-Honestly speaking, I don't mind to keep using sockptr_t generically
-despite of the name, if people agree.  The rename might make sense,
-though, if it's more widely used in other subsystems in future.
-
-
-Takashi
-
-===
-
- include/linux/uniptr.h | 121 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
- create mode 100644 include/linux/uniptr.h
-
-diff --git a/include/linux/uniptr.h b/include/linux/uniptr.h
-new file mode 100644
-index 000000000000..f7994d3a45eb
---- /dev/null
-+++ b/include/linux/uniptr.h
-@@ -0,0 +1,121 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Support for "universal" pointers that can point to either kernel or userspace
-+ * memory.
-+ *
-+ * Original code from sockptr.h
-+ *    Copyright (c) 2020 Christoph Hellwig
-+ */
-+#ifndef _LINUX_UNIPTR_H
-+#define _LINUX_UNIPTR_H
-+
-+#include <linux/err.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+
-+typedef struct {
-+	union {
-+		void		*kernel;
-+		void __user	*user;
-+	};
-+	bool		is_kernel : 1;
-+} uniptr_t;
-+
-+static inline bool uniptr_is_kernel(uniptr_t uniptr)
-+{
-+	return uniptr.is_kernel;
-+}
-+
-+static inline uniptr_t KERNEL_UNIPTR(void *p)
-+{
-+	return (uniptr_t) { .kernel = p, .is_kernel = true };
-+}
-+
-+static inline uniptr_t USER_UNIPTR(void __user *p)
-+{
-+	return (uniptr_t) { .user = p };
-+}
-+
-+static inline bool uniptr_is_null(uniptr_t uniptr)
-+{
-+	if (uniptr_is_kernel(uniptr))
-+		return !uniptr.kernel;
-+	return !uniptr.user;
-+}
-+
-+static inline int copy_from_uniptr_offset(void *dst, uniptr_t src,
-+					  size_t offset, size_t size)
-+{
-+	if (!uniptr_is_kernel(src))
-+		return copy_from_user(dst, src.user + offset, size);
-+	memcpy(dst, src.kernel + offset, size);
-+	return 0;
-+}
-+
-+static inline int copy_from_uniptr(void *dst, uniptr_t src, size_t size)
-+{
-+	return copy_from_uniptr_offset(dst, src, 0, size);
-+}
-+
-+static inline int copy_to_uniptr_offset(uniptr_t dst, size_t offset,
-+					const void *src, size_t size)
-+{
-+	if (!uniptr_is_kernel(dst))
-+		return copy_to_user(dst.user + offset, src, size);
-+	memcpy(dst.kernel + offset, src, size);
-+	return 0;
-+}
-+
-+static inline int copy_to_uniptr(uniptr_t dst, const void *src, size_t size)
-+{
-+	return copy_to_uniptr_offset(dst, 0, src, size);
-+}
-+
-+static inline void *memdup_uniptr(uniptr_t src, size_t len)
-+{
-+	void *p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
-+
-+	if (!p)
-+		return ERR_PTR(-ENOMEM);
-+	if (copy_from_uniptr(p, src, len)) {
-+		kfree(p);
-+		return ERR_PTR(-EFAULT);
-+	}
-+	return p;
-+}
-+
-+static inline void *memdup_uniptr_nul(uniptr_t src, size_t len)
-+{
-+	char *p = kmalloc_track_caller(len + 1, GFP_KERNEL);
-+
-+	if (!p)
-+		return ERR_PTR(-ENOMEM);
-+	if (copy_from_uniptr(p, src, len)) {
-+		kfree(p);
-+		return ERR_PTR(-EFAULT);
-+	}
-+	p[len] = '\0';
-+	return p;
-+}
-+
-+static inline long strncpy_from_uniptr(char *dst, uniptr_t src, size_t count)
-+{
-+	if (uniptr_is_kernel(src)) {
-+		size_t len = min(strnlen(src.kernel, count - 1) + 1, count);
-+
-+		memcpy(dst, src.kernel, len);
-+		return len;
-+	}
-+	return strncpy_from_user(dst, src.user, count);
-+}
-+
-+static inline int check_zeroed_uniptr(uniptr_t src, size_t offset, size_t size)
-+{
-+	if (!uniptr_is_kernel(src))
-+		return check_zeroed_user(src.user + offset, size);
-+	return memchr_inv(src.kernel + offset, 0, size) == NULL;
-+}
-+
-+#endif /* _LINUX_UNIPTR_H */
+diff --git a/net/rds/rds.h b/net/rds/rds.h
+index d35d1fc39807..dc360252c515 100644
+--- a/net/rds/rds.h
++++ b/net/rds/rds.h
+@@ -863,7 +863,6 @@ int rds_message_next_extension(struct rds_header *hdr,
+ 			       unsigned int *pos, void *buf, unsigned int *buflen);
+ int rds_message_add_rdma_dest_extension(struct rds_header *hdr, u32 r_key, u32 offset);
+ int rds_message_inc_copy_to_user(struct rds_incoming *inc, struct iov_iter *to);
+-void rds_message_inc_free(struct rds_incoming *inc);
+ void rds_message_addref(struct rds_message *rm);
+ void rds_message_put(struct rds_message *rm);
+ void rds_message_wait(struct rds_message *rm);
+@@ -1013,7 +1012,5 @@ void rds_trans_put(struct rds_transport *trans);
+ unsigned int rds_trans_stats_info_copy(struct rds_info_iterator *iter,
+ 				       unsigned int avail);
+ struct rds_transport *rds_trans_get(int t_type);
+-int rds_trans_init(void);
+-void rds_trans_exit(void);
+ 
+ #endif
 -- 
-2.35.3
+2.34.1
 
 
