@@ -1,82 +1,114 @@
-Return-Path: <netdev+bounces-26084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A10776C1C
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:20:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 306D1776C25
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:25:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3F5E1C20EB5
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 22:20:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D3671C21385
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 22:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577951DDE7;
-	Wed,  9 Aug 2023 22:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9AE21DDF0;
+	Wed,  9 Aug 2023 22:25:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B001C9E1
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 22:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 86B20C433C9;
-	Wed,  9 Aug 2023 22:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691619622;
-	bh=csBWtvwRbziRdxXRRnz5SOtm+ubyZCH8dAcQRA2YSf4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j3wDx3jIccsCix+gjp9pjIk9/U2nIBAWzHzCiKB0kVlyqf0FQAoTnR2OImegmR1Si
-	 U1jv312VeTKRkY/kzkeqtbg+UUvKVqMAITQnrGCI76bnbDYCRUT+YzTvZe3nethL0C
-	 TWSPyNPiiSJtKYvhg6nu7UsLIP5S/f/ituA6QUMSQOAWISV3qSehIb/ej7xnpFd1ic
-	 5W96T6+4cNnKAfdHcoSyK2j5JwRtfRykVXMSU2MMbq0/VGaYWN+913qkhfpaJTxR8i
-	 chcFC+yBTu4yCEgNw/Xjw8vUHcnkDtP7klMEZdMSAoiczuPttm769zWItKK8VvHOGg
-	 6kMzici9/fAYA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6A744E3308F;
-	Wed,  9 Aug 2023 22:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7D01DDD5
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 22:25:52 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0B5D2;
+	Wed,  9 Aug 2023 15:25:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691619951; x=1723155951;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=z0glSc8LY2LtLuJc7hMlmzjpzI22Dwm4Qp6bntrmsak=;
+  b=OiAPMiSUPWkwH3i8Rl9vVNsHhurPaEr2KJh5OxVmnn37tbiHqa/2E+nY
+   J/sry7rTxA/jYXAcdCCT+Zzm0OgB3OEjgrOf4Cn6yNZT/VdlRQke5G1fH
+   IK2zDK3eIqfoiz6kffQPDp2mGgQ8Brf0qhdcCAKSNlS2c0LhMF4gh/ZLL
+   zVN3tCG4mbST6UxYK4R9Ng/OjYFchHoCDGbAWN7VRjuNbhLn6n5ENGNVL
+   eux6x5fNyCPclm8ZuT8YX46OsTsvXg2ifdWDHFXG0SEQFwuoPIUbtOx4z
+   LN82jGmP4AdN12QLfg41UByNtHot07qiPf/igtXBW4nsWSzMuz9ON0JRp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="374959935"
+X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
+   d="scan'208";a="374959935"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 15:25:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="875458453"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 09 Aug 2023 15:25:51 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qTrch-0006SC-1D;
+	Wed, 09 Aug 2023 22:25:47 +0000
+Date: Thu, 10 Aug 2023 06:25:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ipmr: Call ipmr_ioctl() directly from
+ ipmr_sk_ioctl()
+Message-ID: <202308100626.gj6rvqoB-lkp@intel.com>
+References: <20230731145713.178509-1-gustavold@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2023-08-09
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169161962243.15093.7034192084083040541.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Aug 2023 22:20:22 +0000
-References: <20230809124818.167432-2-johannes@sipsolutions.net>
-In-Reply-To: <20230809124818.167432-2-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731145713.178509-1-gustavold@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi Gustavo,
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+kernel test robot noticed the following build errors:
 
-On Wed,  9 Aug 2023 14:48:19 +0200 you wrote:
-> Hi,
-> 
-> So I'm back, and we had a security fix pending for an
-> issue reported to security@kernel.org, but Greg hadn't
-> gotten around to applying it, so I'm handling it here.
-> Also, covering for Kalle, some driver fixes. Since we
-> want things routed to the right place I also included
-> a couple of maintainer updates, but to be honest now
-> I'm starting to have second thoughts about it. Oh well.
-> 
-> [...]
+[auto build test ERROR on net/main]
+[also build test ERROR on net-next/main linus/master v6.5-rc5 next-20230809]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Here is the summary with links:
-  - pull-request: wireless-2023-08-09
-    https://git.kernel.org/netdev/net/c/15c8795dbff8
+url:    https://github.com/intel-lab-lkp/linux/commits/Gustavo-Luiz-Duarte/net-ipmr-Call-ipmr_ioctl-directly-from-ipmr_sk_ioctl/20230731-225918
+base:   net/main
+patch link:    https://lore.kernel.org/r/20230731145713.178509-1-gustavold%40gmail.com
+patch subject: [PATCH] net: ipmr: Call ipmr_ioctl() directly from ipmr_sk_ioctl()
+config: i386-randconfig-i011-20230809 (https://download.01.org/0day-ci/archive/20230810/202308100626.gj6rvqoB-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20230810/202308100626.gj6rvqoB-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308100626.gj6rvqoB-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: ip6mr_ioctl
+   >>> referenced by mroute6.h:115 (include/linux/mroute6.h:115)
+   >>>               net/core/sock.o:(sk_ioctl) in archive vmlinux.a
+   >>> referenced by mroute6.h:130 (include/linux/mroute6.h:130)
+   >>>               net/core/sock.o:(sk_ioctl) in archive vmlinux.a
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
