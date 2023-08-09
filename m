@@ -1,187 +1,287 @@
-Return-Path: <netdev+bounces-25677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5B8D775200
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:36:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6EA775212
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70ECE281A45
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDE832819E3
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E94A63B;
-	Wed,  9 Aug 2023 04:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1414ECE;
+	Wed,  9 Aug 2023 04:53:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6334F4680
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 04:36:34 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9DBB198D
-	for <netdev@vger.kernel.org>; Tue,  8 Aug 2023 21:36:32 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qTavu-0002zY-73; Wed, 09 Aug 2023 06:36:30 +0200
-Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qTavq-0003R7-J5; Wed, 09 Aug 2023 06:36:26 +0200
-Date: Wed, 9 Aug 2023 06:36:26 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Marek Vasut <marex@denx.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <20230809043626.GG5736@pengutronix.de>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9650D81B
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 04:53:44 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33884172A;
+	Tue,  8 Aug 2023 21:53:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1691556816;
+	bh=aLsuRyNueNps0bFQ4pQb+x6W7rQ/5KpaQNJlP45Vnz8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=LGr9OY/jEncvFqrh4bN3YngPbbY6UMSB/5i7iiUYiPbvG6+WiNFx+K7CwBw2NE7lp
+	 u9TTY+nix45g9gOnaE6aSEnboMZCbwtxjhKYARtIhHeGmeLHtnbhmOdad8TflI0iWP
+	 elMG5jF+slADeve+tHaiLRvgCfwVG9SSeumz9sOaMpxLVKCbrzNvbzeoj7HGzGuzLW
+	 diWUSHj+rMUGK2/F+rLLDW17hxVoLkEA6DRP1Xp3SVImNVeyjLgq03j3UJwEeCIud4
+	 LE3WQRqX/uAHh5XTYH+j7HJ50ysbubFCoCFUmJFTlyhRDCdKfgDNgvKR4J61NBjK1w
+	 kqyr/aJTQKc/Q==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RLHkl1q0Mz4wy0;
+	Wed,  9 Aug 2023 14:53:35 +1000 (AEST)
+Date: Wed, 9 Aug 2023 14:53:33 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Yury Norov <yury.norov@gmail.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Maher Sanalla <msanalla@nvidia.com>, Saeed
+ Mahameed <saeedm@nvidia.com>
+Subject: linux-next: manual merge of the bitmap tree with the net-next tree
+Message-ID: <20230809145333.03f31309@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/IJJROMl7gUlfPHMeKnbCfDf";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 02:27:12AM +0000, Wei Fang wrote:
-> > >> Toggle hibernation mode OFF and ON to wake the PHY up and make it
-> > >> generate clock on RX_CLK pin for about 10 seconds.
-> > >> These clock are needed during start up by MACs like DWMAC in NXP
-> > >> i.MX8M Plus to release their DMA from reset. After the MAC has
-> > >> started up, the PHY can enter hibernation and disable the RX_CLK
-> > >> clock, this poses no problem for the MAC.
-> > >>
-> > >> Originally, this issue has been described by NXP in commit
-> > >> 9ecf04016c87 ("net: phy: at803x: add disable hibernation mode
-> > >> support") but this approach fully disables the hibernation support
-> > >> and takes away any power saving benefit. This patch instead makes the
-> > >> PHY generate the clock on start up for 10 seconds, which should be
-> > >> long enough for the EQoS MAC to release DMA from reset.
-> > >>
-> > >> Before this patch on i.MX8M Plus board with AR8031 PHY:
-> > >> "
-> > >> $ ifconfig eth1 up
-> > >> [   25.576734] imx-dwmac 30bf0000.ethernet eth1: Register
-> > >> MEM_TYPE_PAGE_POOL RxQ-0
-> > >> [   25.658916] imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:00]
-> > >> driver [Qualcomm Atheros AR8031/AR8033] (irq=38)
-> > >> [   26.670276] imx-dwmac 30bf0000.ethernet: Failed to reset the dma
-> > >> [   26.676322] imx-dwmac 30bf0000.ethernet eth1: stmmac_hw_setup:
-> > >> DMA engine initialization failed
-> > >> [   26.685103] imx-dwmac 30bf0000.ethernet eth1: __stmmac_open:
-> > Hw
-> > >> setup failed
-> > >> ifconfig: SIOCSIFFLAGS: Connection timed out "
-> > >>
-> > >
-> > > Have you reproduced this issue based on the upstream net-next or net
-> > tree?
-> > 
-> > On current linux-next next-20230808 so 6.5.0-rc5 . As far as I can tell,
-> > net-next is merged into this tree too.
-> > 
-> 
-> > > If so, can this issue be reproduced? The reason why I ask this is
-> > > because when I tried to reproduce this problem on net-next 6.3.0
-> > > version, I found that it could not be reproduced (I did not disable
-> > > hibernation mode when I reproduced this issue ). So I guess maybe other
-> > patches in eqos driver fixed the issue.
-> > 
-> > This is what I use for testing:
-> > 
-> > - Make sure "qca,disable-hibernation-mode" is NOT present in PHY DT node
-> Yes, I deleted this property when I reproduced this issue.
-> 
-> > - Boot the machine with NO ethernet cable plugged into the affected port
-> >    (i.e. the EQoS port), this is important
-> > - Make sure the EQoS MAC is not brought up e.g. by systemd-networkd or
-> >    whatever other tool, I use busybox initramfs for testing with plain
-> >    script as init (it mounts the various filesystems and runs /bin/sh)
-> 
-> It looks like something has been changed since I submitted the "disable hibernation
-> mode " patch. In previous test, I only need to unplug the cable and then use ifconfig
-> cmd to disable the interface, wait more than 10 seconds, then use ifconfig cmd to
-> enable the interface.
-> 
-> > - Wait longer than 10 seconds
-> > - If possible, measure AR8031 PHY pin 33 RX_CLK, wait for the RX_CLK to
-> >    be turned OFF by the PHY (means PHY entered hibernation)
-> > - ifconfig ethN up -- try to bring up the EQoS MAC <observe failure>
-> > 
-> > [...]
-> 
-> For the patch, I think your approach is better than mine, but I have a suggestion,
-> is the following modification more appropriate?
-> 
-> --- a/drivers/net/phy/at803x.c
-> +++ b/drivers/net/phy/at803x.c
-> @@ -991,12 +991,28 @@ static int at8031_pll_config(struct phy_device *phydev)
->  static int at803x_hibernation_mode_config(struct phy_device *phydev)
->  {
->         struct at803x_priv *priv = phydev->priv;
-> +       int ret;
-> 
->         /* The default after hardware reset is hibernation mode enabled. After
->          * software reset, the value is retained.
->          */
-> -       if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE))
-> -               return 0;
-> +       if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE)) {
-> +               /* Toggle hibernation mode OFF and ON to wake the PHY up and
-> +                * make it generate clock on RX_CLK pin for about 10 seconds.
-> +                * These clock are needed during start up by MACs like DWMAC
-> +                * in NXP i.MX8M Plus to release their DMA from reset. After
-> +                * the MAC has started up, the PHY can enter hibernation and
-> +                * disable the RX_CLK clock, this poses no problem for the MAC.
-> +                */
-> +               ret = at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
-> +                                           AT803X_DEBUG_HIB_CTRL_PS_HIB_EN, 0);
-> +               if (ret < 0)
-> +                       return ret;
-> +
-> +               return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
-> +                                            AT803X_DEBUG_HIB_CTRL_PS_HIB_EN,
-> +                                            AT803X_DEBUG_HIB_CTRL_PS_HIB_EN);
-> +       }
-> 
->         return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
+--Sig_/IJJROMl7gUlfPHMeKnbCfDf
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hm.. how about officially defining this PHY as the clock provider and
-disable PHY automatic hibernation as long as clock is acquired?
+Hi all,
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Today's linux-next merge of the bitmap tree got a conflict in:
+
+  drivers/net/ethernet/mellanox/mlx5/core/eq.c
+
+between commits:
+
+  54b2cf41b853 ("net/mlx5: Refactor completion IRQ request/release handlers=
+ in EQ layer")
+  ddd2c79da020 ("net/mlx5: Introduce mlx5_cpumask_default_spread")
+
+from the net-next tree and commit:
+
+  a4be5fa84bb2 ("net: mlx5: switch comp_irqs_request() to using for_each_nu=
+ma_cpu")
+
+from the bitmap tree.
+
+I fixed it up (I think - see below) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index ea0405e0a43f,7c8dc0443d6a..000000000000
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@@ -815,112 -803,82 +815,105 @@@ void mlx5_eq_update_ci(struct mlx5_eq *
+  }
+  EXPORT_SYMBOL(mlx5_eq_update_ci);
+ =20
+ -static void comp_irqs_release_pci(struct mlx5_core_dev *dev)
+ +static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)
+  {
+  	struct mlx5_eq_table *table =3D dev->priv.eq_table;
+ +	struct mlx5_irq *irq;
+ =20
+ -	mlx5_irqs_release_vectors(table->comp_irqs, table->num_comp_eqs);
+ +	irq =3D xa_load(&table->comp_irqs, vecidx);
+ +	if (!irq)
+ +		return;
+ +
+ +	xa_erase(&table->comp_irqs, vecidx);
+ +	mlx5_irq_release_vector(irq);
+  }
+ =20
+ -static int comp_irqs_request_pci(struct mlx5_core_dev *dev)
+ +static int mlx5_cpumask_default_spread(int numa_node, int index)
+  {
+- 	const struct cpumask *prev =3D cpu_none_mask;
+- 	const struct cpumask *mask;
+ -	struct mlx5_eq_table *table =3D dev->priv.eq_table;
+ -	int ncomp_eqs;
+ -	u16 *cpus;
+ -	int ret;
+ +	int found_cpu =3D 0;
+ +	int i =3D 0;
+- 	int cpu;
++ 	int cpu, hop;
+ -	int i;
+ =20
+ -	ncomp_eqs =3D table->num_comp_eqs;
+ -	cpus =3D kcalloc(ncomp_eqs, sizeof(*cpus), GFP_KERNEL);
+ -	if (!cpus)
+ -		return -ENOMEM;
+ -
+ -	i =3D 0;
+  	rcu_read_lock();
+- 	for_each_numa_hop_mask(mask, numa_node) {
+- 		for_each_cpu_andnot(cpu, mask, prev) {
+- 			if (i++ =3D=3D index) {
+- 				found_cpu =3D cpu;
+- 				goto spread_done;
+- 			}
+ -	for_each_numa_online_cpu(cpu, hop, dev->priv.numa_node) {
+ -		cpus[i] =3D cpu;
+ -		if (++i =3D=3D ncomp_eqs)
+++	for_each_numa_online_cpu(cpu, hop, numa_node) {
+++		if (i++ =3D=3D index) {
+++			found_cpu =3D cpu;
++ 			break;
+ +		}
+- 		prev =3D mask;
+  	}
+-=20
+- spread_done:
+  	rcu_read_unlock();
+ -	ret =3D mlx5_irqs_request_vectors(dev, cpus, ncomp_eqs, table->comp_irqs=
+, &table->rmap);
+ -	kfree(cpus);
+ -	return ret;
+ +	return found_cpu;
+  }
+ =20
+ -static void comp_irqs_release_sf(struct mlx5_core_dev *dev)
+ +static struct cpu_rmap *mlx5_eq_table_get_pci_rmap(struct mlx5_core_dev *=
+dev)
+  {
+ -	struct mlx5_eq_table *table =3D dev->priv.eq_table;
+ -
+ -	mlx5_irq_affinity_irqs_release(dev, table->comp_irqs, table->num_comp_eq=
+s);
+ +#ifdef CONFIG_RFS_ACCEL
+ +#ifdef CONFIG_MLX5_SF
+ +	if (mlx5_core_is_sf(dev))
+ +		return dev->priv.parent_mdev->priv.eq_table->rmap;
+ +#endif
+ +	return dev->priv.eq_table->rmap;
+ +#else
+ +	return NULL;
+ +#endif
+  }
+ =20
+ -static int comp_irqs_request_sf(struct mlx5_core_dev *dev)
+ +static int comp_irq_request_pci(struct mlx5_core_dev *dev, u16 vecidx)
+  {
+  	struct mlx5_eq_table *table =3D dev->priv.eq_table;
+ -	int ncomp_eqs =3D table->num_comp_eqs;
+ +	struct cpu_rmap *rmap;
+ +	struct mlx5_irq *irq;
+ +	int cpu;
+ =20
+ -	return mlx5_irq_affinity_irqs_request_auto(dev, ncomp_eqs, table->comp_i=
+rqs);
+ +	rmap =3D mlx5_eq_table_get_pci_rmap(dev);
+ +	cpu =3D mlx5_cpumask_default_spread(dev->priv.numa_node, vecidx);
+ +	irq =3D mlx5_irq_request_vector(dev, cpu, vecidx, &rmap);
+ +	if (IS_ERR(irq))
+ +		return PTR_ERR(irq);
+ +
+ +	return xa_err(xa_store(&table->comp_irqs, vecidx, irq, GFP_KERNEL));
+  }
+ =20
+ -static void comp_irqs_release(struct mlx5_core_dev *dev)
+ +static void comp_irq_release_sf(struct mlx5_core_dev *dev, u16 vecidx)
+  {
+  	struct mlx5_eq_table *table =3D dev->priv.eq_table;
+ +	struct mlx5_irq *irq;
+ =20
+ -	mlx5_core_is_sf(dev) ? comp_irqs_release_sf(dev) :
+ -			       comp_irqs_release_pci(dev);
+ +	irq =3D xa_load(&table->comp_irqs, vecidx);
+ +	if (!irq)
+ +		return;
+ =20
+ -	kfree(table->comp_irqs);
+ +	xa_erase(&table->comp_irqs, vecidx);
+ +	mlx5_irq_affinity_irq_release(dev, irq);
+  }
+ =20
+ -static int comp_irqs_request(struct mlx5_core_dev *dev)
+ +static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
+  {
+  	struct mlx5_eq_table *table =3D dev->priv.eq_table;
+ -	int ncomp_eqs;
+ -	int ret;
+ +	struct mlx5_irq *irq;
+ =20
+ -	ncomp_eqs =3D table->num_comp_eqs;
+ -	table->comp_irqs =3D kcalloc(ncomp_eqs, sizeof(*table->comp_irqs), GFP_K=
+ERNEL);
+ -	if (!table->comp_irqs)
+ -		return -ENOMEM;
+ +	irq =3D mlx5_irq_affinity_irq_request_auto(dev, &table->used_cpus, vecid=
+x);
+ +	if (IS_ERR(irq)) {
+ +		/* In case SF irq pool does not exist, fallback to the PF irqs*/
+ +		if (PTR_ERR(irq) =3D=3D -ENOENT)
+ +			return comp_irq_request_pci(dev, vecidx);
+ =20
+ -	ret =3D mlx5_core_is_sf(dev) ? comp_irqs_request_sf(dev) :
+ -				     comp_irqs_request_pci(dev);
+ -	if (ret < 0)
+ -		kfree(table->comp_irqs);
+ +		return PTR_ERR(irq);
+ +	}
+ =20
+ -	return ret;
+ +	return xa_err(xa_store(&table->comp_irqs, vecidx, irq, GFP_KERNEL));
+ +}
+ +
+ +static void comp_irq_release(struct mlx5_core_dev *dev, u16 vecidx)
+ +{
+ +	mlx5_core_is_sf(dev) ? comp_irq_release_sf(dev, vecidx) :
+ +			       comp_irq_release_pci(dev, vecidx);
+ +}
+ +
+ +static int comp_irq_request(struct mlx5_core_dev *dev, u16 vecidx)
+ +{
+ +	return mlx5_core_is_sf(dev) ? comp_irq_request_sf(dev, vecidx) :
+ +				      comp_irq_request_pci(dev, vecidx);
+  }
+ =20
+  #ifdef CONFIG_RFS_ACCEL
+
+--Sig_/IJJROMl7gUlfPHMeKnbCfDf
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTTG80ACgkQAVBC80lX
+0Gw9Lgf9FHT6ewnyAYc/pVrsLcMfSpVkP3c53BUUIh6pYfrTP52zhIjSvYKMe5fI
+KO00kqFC096QqNqLJWZVK6GgJMC7O3SlGpNokEd5MNbfEOsGWFvpWChjX7D9aWd9
+gu8iemW3FTiwUI9K65/BjZYy4tH2vigoLyvWyWtbroISYlHvC5NnYEd5rsn9WUud
+9BeErfdHjdp+WvO5AUouix/5OaFvFJCDhYojqBzW0/0t6lZqOyuUdP6Gm/QelI60
+0cCMHURdjqQNWSIBZGf3z6/bsfxdfmvTNOk0ieqE3r0ZMa7ua6SZb8HyoEOpNWcn
+BfRTZtOGcKkWLjIwrJ7WTKhqzNkneQ==
+=vqHv
+-----END PGP SIGNATURE-----
+
+--Sig_/IJJROMl7gUlfPHMeKnbCfDf--
 
