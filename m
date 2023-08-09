@@ -1,454 +1,185 @@
-Return-Path: <netdev+bounces-25890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C10C77614D
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:37:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BE2776150
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 15:37:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3C93281CC1
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:37:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31421C20ED7
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 13:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85CE1D2E9;
-	Wed,  9 Aug 2023 13:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21E918C20;
+	Wed,  9 Aug 2023 13:35:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9A818C31
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:29:32 +0000 (UTC)
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE9B3A8D;
-	Wed,  9 Aug 2023 06:29:16 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id 08FB540009;
-	Wed,  9 Aug 2023 13:29:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1691587747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+PYBgAyHlJGGX2+or/ElgmOR+XDjgrypny+3tAmy0Hs=;
-	b=FXB4D/Cys4ifjvLnQIc4825cwx2XdF3merlWtXC02qEapTB28tG/a/Wueu/qD/J6nv7RwI
-	hWd/gTWhyMrpNFuSYpgamoUWNmE0Dc/OmTkaiLgibXabzGko/uXt5kQMbozmM0epCBzTSa
-	+fD3+6W1Qk0jjqZ7hDLVhsRCHX27zpLTuZC9qJbBdMCcfuD7FVUkQ5OjR5c87hSeV6r1yv
-	uq7RS7vV5nLC1rZ6gg2B/UMmTjmouWioSeihEGbUpaGpdw6w4rDUe8rntCvztZV7/n5yUC
-	+NQZ1f33H9AR3dEGVOo7gF7nVlNrv0SLjuK2ydPFhnqlQ6jEqWrxq+gdY4t0HA==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>,
-	Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alsa-devel@alsa-project.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v3 28/28] net: wan: fsl_qmc_hdlc: Add framer support
-Date: Wed,  9 Aug 2023 15:27:55 +0200
-Message-ID: <20230809132757.2470544-29-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230809132757.2470544-1-herve.codina@bootlin.com>
-References: <20230809132757.2470544-1-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F92318AE2
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 13:35:10 +0000 (UTC)
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2089.outbound.protection.outlook.com [40.107.241.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCE81986;
+	Wed,  9 Aug 2023 06:35:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Jvm+CAR4Bzrva8YwEAwnBtT2CRltQdTvXxw1NczZezNMaCxBuzJy/4MjZH1G5dIayNttis8a2hozknsw4VGce6yW5GZS1GhIVD1NltcGMsIabiS3tRM7rV2tXI9ltTZuhy1HOp673N94RRAAh40ilmzBh5SJ9h9TGMWjmQfKvM/6jyRLy2859rmSJu1cyq73GugmwQJVYkYZ2LlkY1JPIslbsJRQCgcEiFlCmA5rMI3+HMu6y6UEJol/f7uzj1GiKtdr9FcZ9MCWd5uEC34Ys/01Vik2OZhid6u9IlreYFBIN0NHspSpk1z4WVKlLBqn2uP7OHvR9M9iqZDRbx1xWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3hOsLC85Pj1yRgxfWE+2sOzsup4hT9zk3K/87i7/rW8=;
+ b=XyEyzTv74bvi6dWFTV09j4ziibX5matswdCL3YCzuu4+kX+tks1y/8Ce1XtUHoJ7wSJBmDEiC2d0ttaxwqCLTvf4ID9sLkR+nompcUehQkCP/y9PaHS0IC3kNUZFN1iw6AkuS0/ViIZmP5zC4b28Z5ikf3RVCDpAkklxW2rNhZkLdULv/NMSleZ4Hdgz1wTIAKo5tbL1LoT41brvWkq4qkpTXeTN+qlUL2FVzyR1/F4XZBgG+Vj2FCrccGpHV2+n0Kk9yXLT6hKwLrXOvVEEQIf4rlOFW3L1Rs9SSsjIJNHk1pDPFzzdUK+LnwZxuSMLHPoKyZ5siK23mjgswHJErw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3hOsLC85Pj1yRgxfWE+2sOzsup4hT9zk3K/87i7/rW8=;
+ b=c05SlvM/Z1WJnmeCl2S85Y6/o9QFnLvCr/gbO6wT73eH1KvpYDdX+jUsiUEVMNBaNTbQSuVOZ6dwMTpdSF24xFb3Ha32AO6JAxUWK+Rod9VMYoE+bw2i7JBoOo6EjG6qN8xczSeEpcEaM+vjTqc7jTa5I/bV+OPz56JTDCxDyC0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by VE1PR04MB7438.eurprd04.prod.outlook.com (2603:10a6:800:1a0::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28; Wed, 9 Aug
+ 2023 13:35:06 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50%4]) with mapi id 15.20.6652.022; Wed, 9 Aug 2023
+ 13:35:06 +0000
+Message-ID: <d5690d60-addc-7cff-8a61-33322878bd1c@oss.nxp.com>
+Date: Wed, 9 Aug 2023 16:35:04 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] net: macsec: use TX SCI as MAC address
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230808141429.220830-1-radu-nicolae.pirea@oss.nxp.com>
+ <ZNJdo6bow7uK8bTn@hog> <b33195b3-aa6d-defa-97c4-280da7e5e6d6@oss.nxp.com>
+ <ZNOCLV6NZvzuPeWB@hog>
+Content-Language: en-US
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <ZNOCLV6NZvzuPeWB@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR07CA0230.eurprd07.prod.outlook.com
+ (2603:10a6:802:58::33) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|VE1PR04MB7438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0253937b-5319-4435-3478-08db98dd7152
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	uCs5abGPXvcHc7apjjnkf1JjA1/2OAHc1ZAOpyR4uUx2FE8eclXJuncshIxeYUrIrte1nU+kc57JziUS73nrRNXzUXxqERNWtMI5Qr7ZD5e4tt+DO+wxh1yGJA9L3lS+k8Wc7MHgeJpOlVqP4lkjTqp+bqpOAVa0O4XPU74bKp/ON43hS2IVx4FZjFSjjf44OXYugPJEKOI7w4ID9UKSh6rbfw9oeNnkV+JFoWEnxQRCu94Y6wvjtoiBn0YOrg7BnznM0r32l0RHWMV9j/RKsSm/IsHYTS/Xji9K5ykm6CIYfoHKvYjGM3ABJwzZxWgAZNe941kyeuUTBrkos8DLDnlWyhf1cFILwjqlnQ+8KamL9HXGrZ55OPECqJqLta523cVBr4xe+O+Gs+Fsx62bluESdxZi/GmWSIcF1muHRsYcElvMKIlkcGSTaGhoPxpTsrofKiZFcrM02HnCsnRnJdtqH2btCTRfxyVnWAfQYtTqU587p5Ywj2TLvH0ik0OEGalivF4eiwka0nIxpoG3a3qkg1mGsXfEyNEOQWI31cQBdKMH+fbHiEYozzs05MZBhrRlUxGWvzJU6/rFm/Dmw9mR905yrblKUsD1QvnifBoSC+5wwdv6z0aNoAqvW/veHds22RG0sT68t1Jv8k+2I7HxlfXrfXemh4WPLGJiBv8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(366004)(396003)(39860400002)(346002)(1800799006)(186006)(451199021)(6506007)(26005)(53546011)(31686004)(6512007)(6486002)(2616005)(31696002)(86362001)(478600001)(316002)(66476007)(6916009)(66556008)(66946007)(4326008)(41300700001)(8676002)(8936002)(5660300002)(38100700002)(2906002)(21314003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OGtQdEVqeHEyR0FSM1dPaVkybVVIcFZnSktFcEhBTTRYQXFuZlA5aWlJa0ZW?=
+ =?utf-8?B?Y1doU0VrU1VPY2ZPR2ZVSmYvdHVSL2dNWW43MEVSVk05NUpRbDZsaEdWa3d3?=
+ =?utf-8?B?bFowSGJUc1V0ZGVESno5RjlXcHZTWjc4OUF1RHQxeHkvSVdvVUkrUDh3Skdm?=
+ =?utf-8?B?RzJnSmVFRG9ubWk3UkljdlpvSzFEZmwvSWxBNzhxSkFpZjJDaXZaZmE4bDJ0?=
+ =?utf-8?B?d3g0TjVWYzhaTnVqZ3lhbi8xUG83RkdFSFFrZ1dzR1F4dk05dktSY3B1NS91?=
+ =?utf-8?B?R3ZVMVgxczZtRFIxVCtwYkJzaW8rZzdJOWRuRGJod0dSTWo2RDd5MjlkZkNV?=
+ =?utf-8?B?T3R6SlczOE1zUDk3WFRBZUxYaHc0Z3FzSlZIUnNmMDUwMmxPY09kRUxzWXgv?=
+ =?utf-8?B?amtDWG1ETjB2ZTJjRFBueS8zaUZ6TzFtQllBY2xlRDV1WXpuWnJXcWlTVUZ4?=
+ =?utf-8?B?SnpWdE5mczlGMjg4aXBYZjRMZE90VXBBU0tJQlBodHg2eXgxU29YZmJXK3F3?=
+ =?utf-8?B?TU01NW1ORlQ1aHNmWkpYWjY5Vkp1WUttQjVmMlVGOUtYTS9QS0NzVGo4NzhH?=
+ =?utf-8?B?dVAySys5NUlvUjVtbldQY1BTWlh1VXNoR2xEL0Ryazh5d1A5WS9UUjRQZG5E?=
+ =?utf-8?B?UVF6bkk5UldQU2JFVXpKMUpkNS9qQkY0QVptYks4UVdSazI2YWFpWG5KUjhk?=
+ =?utf-8?B?UzRuR0E2WHR5U3JSRFQ0QVQ4clBRM2UzbTZENExWSTZzYkdyRE9lMnFZZHpM?=
+ =?utf-8?B?aThseVg4UUZTYTBWbTNZTmpIWGljemxiM0IwRzk1T1RVTVVPVitySDRJaFpU?=
+ =?utf-8?B?RDlMeHlza0JCOUFRSEFES1lZSUNYOTB5QWZuSkdkc0tMUUQ1YnJ2NDJObGgy?=
+ =?utf-8?B?YXVRbGNFYllYTjZKRVFSb3ZzblliQnhLUWNydGh0b1JCQWVkOEFpTnAwYmNs?=
+ =?utf-8?B?cVZuam96dE9IM2pHZ1NBV0JWQ1gxcGg4aGFzalZlNlYzRjBSMWNLREVlZFFJ?=
+ =?utf-8?B?ejlEWHBBSHR0Mi9DSmRpMnJDVWtSN2FITEZJR2RqaTE0QlBCRENjZlJUdGk1?=
+ =?utf-8?B?VlZxTkVqejlpd0FiTFgrWm1Lb1dHbVozR0kxQjhzZzhNUXNseGd0YWZIZzlZ?=
+ =?utf-8?B?NlJ3NDVWT3F5dVRUTUNlbUVmblZ6aXZzVDF3ekczUGFhMTFuSDUwVXZoTndO?=
+ =?utf-8?B?aEhjbE0yWm11Z1l0NFJtZWNFbFZzV3BMUkhOeVRKSjJTc1RERk4xOFhVNGZY?=
+ =?utf-8?B?NnFxMzE0Q1lrR0VMVTM1dFpSNjJEaENNak95V3dWZVFyNUpQN051d3o4c2Qx?=
+ =?utf-8?B?WU1XZlBCTjFuVnNhZjU0bkpoZlVzVGZUdXg2Sng0a3JxSWNqUVZyN3ZHNnNp?=
+ =?utf-8?B?MCt4d29mT2RYWDNQVGc2MlBWeldROVJvc0k3OEdTKzh6R2o2MnNhZVhweGJt?=
+ =?utf-8?B?UkxLRmhQOEdycEtOREc2MEExUnFUUE9QRmJzVVg0SVNTQWJyaXNveWZOWG1Q?=
+ =?utf-8?B?ZWpxd1lBRTc3Q3YveW9ObVhUY1RZUk1CanhER3VqWkYyUWxKS2ZEZk9OM1ZC?=
+ =?utf-8?B?bS9rRFJyRVhjcG95anNwaW5DMzUyRmp4TjcwV1hiRmt4cnZDdER3WlRMR3VH?=
+ =?utf-8?B?L0treVhVeEcyQVVINngwcU9YRHROaGVHT0dpWHZQTHpEc1VJNS9tejhIMHdS?=
+ =?utf-8?B?TlNFakxlM3pPVUFKNGhEdmRKb05QRzhPYUh4ZjRsTi9EOC9Wa3ZGRWFmcUNu?=
+ =?utf-8?B?VXZNZjVDQlhTY1BYdGRuVk5GaHFmS3dIZHYzczhJQWdadm5CWWNlRncwS2Nr?=
+ =?utf-8?B?QkZQVjlKZWJIbXNma0ZveEgvalBLWFNmRkpuamtER0xoQW9Lb3VJSEZJdlg0?=
+ =?utf-8?B?dUtYL2x1aUlDR2VjRGtMNVBuTUltejZkSWgzbDBZZjJyeVNjRHRsSjNrZEtN?=
+ =?utf-8?B?Q3FZMlRPUCtMclBBMEk1L1ZSbDdjQkdLWDBDWlFhWlBpdk1ON1VCNHpLSlRM?=
+ =?utf-8?B?U2xvbjBTUDYrUWNzMC8rSzhpMFd2RjFIWDJkRkZyMFdsTDJZT3lqMmhNVzVy?=
+ =?utf-8?B?UThTeVpENlhaRnpQYjJHbFUxVnd1ZlA3ck5IVmxwcFRVRkhrQU80T1VTZHhH?=
+ =?utf-8?B?Y045aHU5a2ZCaFlnNkJpVytydVUzaVJFcmNwWFF4N1ZCYUNUUDVOeXNCZFMr?=
+ =?utf-8?B?UGc9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0253937b-5319-4435-3478-08db98dd7152
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 13:35:06.3099
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: geVDLkv/ahpyzRScCU+31AXvaly5SvR+RcllkeX0aoDucUPRmOqGQPMPwfSKIVU7DFrxSIXI3xRH1zFVZ+WKBfYNpJ7Ejubf8QEWT835EAk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7438
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add framer support in the fsl_qmc_hdlc driver in order to be able to
-signal carrier changes to the network stack based on the framer status
-Also use this framer to provide information related to the E1/T1 line
-interface on IF_GET_IFACE and configure the line interface according to
-IF_IFACE_{E1,T1} information.
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/wan/fsl_qmc_hdlc.c | 239 ++++++++++++++++++++++++++++++++-
- 1 file changed, 235 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index 4b8cb5761fd1..3efed8fedb40 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/dma-mapping.h>
-+#include <linux/framer/framer.h>
- #include <linux/hdlc.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -27,6 +28,9 @@ struct qmc_hdlc {
- 	struct device *dev;
- 	struct qmc_chan *qmc_chan;
- 	struct net_device *netdev;
-+	struct framer *framer;
-+	spinlock_t carrier_lock; /* Protect carrier detection */
-+	struct notifier_block nb;
- 	bool is_crc32;
- 	spinlock_t tx_lock; /* Protect tx descriptors */
- 	struct qmc_hdlc_desc tx_descs[8];
-@@ -40,6 +44,195 @@ static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
- 	return dev_to_hdlc(netdev)->priv;
- }
- 
-+static int qmc_hdlc_framer_set_carrier(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	unsigned long flags;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	spin_lock_irqsave(&qmc_hdlc->carrier_lock, flags);
-+
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto end;
-+	}
-+	if (framer_status.link_is_on)
-+		netif_carrier_on(qmc_hdlc->netdev);
-+	else
-+		netif_carrier_off(qmc_hdlc->netdev);
-+
-+end:
-+	spin_unlock_irqrestore(&qmc_hdlc->carrier_lock, flags);
-+	return ret;
-+}
-+
-+static int qmc_hdlc_framer_notifier(struct notifier_block *nb, unsigned long action,
-+				    void *data)
-+{
-+	struct qmc_hdlc *qmc_hdlc = container_of(nb, struct qmc_hdlc, nb);
-+	int ret;
-+
-+	if (action != FRAMER_EVENT_STATUS)
-+		return NOTIFY_DONE;
-+
-+	ret = qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+	return ret ? NOTIFY_DONE : NOTIFY_OK;
-+}
-+
-+static int qmc_hdlc_framer_start(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_power_on(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer power-on failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/* Be sure that get_status is supported */
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	qmc_hdlc->nb.notifier_call = qmc_hdlc_framer_notifier;
-+	ret = framer_notifier_register(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer notifier register failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	return 0;
-+
-+framer_power_off:
-+	framer_power_off(qmc_hdlc->framer);
-+	return ret;
-+}
-+
-+static void qmc_hdlc_framer_stop(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_notifier_unregister(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	framer_power_off(qmc_hdlc->framer);
-+}
-+
-+static int qmc_hdlc_framer_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface,
-+				     const te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (if_iface) {
-+	case IF_IFACE_E1:
-+		config.iface = FRAMER_IFACE_E1;
-+		break;
-+	case IF_IFACE_T1:
-+		config.iface = FRAMER_IFACE_T1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (te1->clock_type) {
-+	case CLOCK_DEFAULT:
-+		/* Keep current value */
-+		break;
-+	case CLOCK_EXT:
-+		config.clock_type = FRAMER_CLOCK_EXT;
-+		break;
-+	case CLOCK_INT:
-+		config.clock_type = FRAMER_CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	config.line_clock_rate = te1->clock_rate;
-+
-+	return framer_set_config(qmc_hdlc->framer, &config);
-+}
-+
-+static int qmc_hdlc_framer_get_iface(struct qmc_hdlc *qmc_hdlc, int *if_iface, te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer) {
-+		*if_iface = IF_IFACE_E1;
-+		return 0;
-+	}
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (config.iface) {
-+	case FRAMER_IFACE_E1:
-+		*if_iface = IF_IFACE_E1;
-+		break;
-+	case FRAMER_IFACE_T1:
-+		*if_iface = IF_IFACE_T1;
-+		break;
-+	}
-+
-+	if (!te1)
-+		return 0; /* Only iface type requested */
-+
-+	switch (config.clock_type) {
-+	case FRAMER_CLOCK_EXT:
-+		te1->clock_type = CLOCK_EXT;
-+		break;
-+	case FRAMER_CLOCK_INT:
-+		te1->clock_type = CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	te1->clock_rate = config.line_clock_rate;
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_init(struct qmc_hdlc *qmc_hdlc)
-+{
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_init(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer init failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qmc_hdlc_framer_exit(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_exit(qmc_hdlc->framer);
-+}
-+
- static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc_hdlc_desc *desc, size_t size);
- 
- #define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
-@@ -313,6 +506,12 @@ static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1
- 
- 	qmc_hdlc->slot_map = te1->slot_map;
- 
-+	ret = qmc_hdlc_framer_set_iface(qmc_hdlc, if_iface, te1);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer set iface failed %d\n", ret);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -320,11 +519,16 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- {
- 	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
- 	te1_settings te1;
-+	int ret;
- 
- 	switch (ifs->type) {
- 	case IF_GET_IFACE:
--		ifs->type = IF_IFACE_E1;
- 		if (ifs->size < sizeof(te1)) {
-+			/* Retrieve type only */
-+			ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, NULL);
-+			if (ret)
-+				return ret;
-+
- 			if (!ifs->size)
- 				return 0; /* only type requested */
- 
-@@ -334,6 +538,11 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- 
- 		memset(&te1, 0, sizeof(te1));
- 
-+		/* Retrieve info from framer */
-+		ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, &te1);
-+		if (ret)
-+			return ret;
-+
- 		/* Update slot_map */
- 		te1.slot_map = qmc_hdlc->slot_map;
- 
-@@ -367,10 +576,17 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	int ret;
- 	int i;
- 
--	ret = hdlc_open(netdev);
-+	ret = qmc_hdlc_framer_start(qmc_hdlc);
- 	if (ret)
- 		return ret;
- 
-+	ret = hdlc_open(netdev);
-+	if (ret)
-+		goto framer_stop;
-+
-+	/* Update carrier */
-+	qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+
- 	chan_param.mode = QMC_HDLC;
- 	/* HDLC_MAX_MRU + 4 for the CRC
- 	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
-@@ -420,6 +636,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	}
- hdlc_close:
- 	hdlc_close(netdev);
-+framer_stop:
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -455,6 +673,7 @@ static int qmc_hdlc_close(struct net_device *netdev)
- 	}
- 
- 	hdlc_close(netdev);
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return 0;
- }
- 
-@@ -503,6 +722,7 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 
- 	qmc_hdlc->dev = &pdev->dev;
- 	spin_lock_init(&qmc_hdlc->tx_lock);
-+	spin_lock_init(&qmc_hdlc->carrier_lock);
- 
- 	qmc_hdlc->qmc_chan = devm_qmc_chan_get_byphandle(qmc_hdlc->dev, np, "fsl,qmc-chan");
- 	if (IS_ERR(qmc_hdlc->qmc_chan)) {
-@@ -531,10 +751,19 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
-+	qmc_hdlc->framer = devm_framer_optional_get(qmc_hdlc->dev, "framer");
-+	if (IS_ERR(qmc_hdlc->framer))
-+		return PTR_ERR(qmc_hdlc->framer);
-+
-+	ret = qmc_hdlc_framer_init(qmc_hdlc);
-+	if (ret)
-+		return ret;
-+
- 	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
- 	if (!qmc_hdlc->netdev) {
- 		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto framer_exit;
- 	}
- 
- 	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
-@@ -550,11 +779,12 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	}
- 
- 	platform_set_drvdata(pdev, qmc_hdlc);
--
- 	return 0;
- 
- free_netdev:
- 	free_netdev(qmc_hdlc->netdev);
-+framer_exit:
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -564,6 +794,7 @@ static int qmc_hdlc_remove(struct platform_device *pdev)
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 
- 	return 0;
- }
+On 09.08.2023 15:10, Sabrina Dubroca wrote:
+> 2023-08-09, 09:37:40 +0300, Radu Pirea (OSS) wrote:
+>>
+>>
+>> On 08.08.2023 18:22, Sabrina Dubroca wrote:
+>>> 2023-08-08, 17:14:29 +0300, Radu Pirea (NXP OSS) wrote:
+>>>> According to IEEE 802.1AE the SCI comprises the MAC address and the port
+>>>> identifier.
+>>>
+>>> I don't think the SCI needs to be composed of the actual device's MAC
+>>> address. 8.2.1 says that the MAC address *can* be used to compose the
+>>> SCI, but doesn't mandate it.
+>> I used IEEE 802.1AE-2018 as documentation and the text is slightly
+>> different. However, the purpose of this patch is not to force this match
+>> between the MAC address and the SCI, is just to have different MAC addresses
+>> when the interfaces are created with an specific SCI.
+>>
+>> For example, the following command will not set 00:01:be:be:ef:17 as MAC
+>> address for the new interface. Would you expect that?
+>> ip link add link enet_p2 macsec0 type macsec address 00:01:be:be:ef:17 port
+>> 1 encrypt on
+> 
+> Yes, because "address XXX" comes after "type macsec", so it's an
+> argument of "type macsec", not of "ip link". IMO the manpage is pretty
+> clear about this.
+> 
+> The command you want is:
+> 
+> ip link add link enet_p2 macsec0 addr 00:01:be:be:ef:17 type macsec port 1 encrypt on
+Now I see...
+
+> 
+> And with this, I don't think your patch is needed at all. It would
+> even introduce an undesireable behavior, in case an explicit address
+> is provided (as in my command example) alongside a full SCI (instead
+> of just the port).
+> I agree. Thank you.
+
 -- 
-2.41.0
-
+Radu P.
 
