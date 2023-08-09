@@ -1,194 +1,207 @@
-Return-Path: <netdev+bounces-25689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1907752FB
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:38:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB8E7752F5
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 08:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC8B61C210FE
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:38:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E5F9281A69
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 06:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C178962C;
-	Wed,  9 Aug 2023 06:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A087B7F3;
+	Wed,  9 Aug 2023 06:38:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69EE5664
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 06:38:41 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE7951BFF;
-	Tue,  8 Aug 2023 23:38:39 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3796Y1QG027697;
-	Wed, 9 Aug 2023 01:34:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691562841;
-	bh=HfZIu7ucENKKJyiRVjl8TEZiwO3S69Lhhxi6s6qnyJ4=;
-	h=Date:Subject:From:To:CC:References:In-Reply-To;
-	b=EVeH0HXIPD4HhuSNWiMt4cTOBMy15trZOjgr/UlIVkIjRS2HL2wws6jme2NwSNt3f
-	 uZSxCxOqcNiR3KcLDNlb4HEHf/SEDKNeaXSUOw4sDYvjkwBTEh5/0qo4YyaAN23S7e
-	 oMmDW6AscIqZOncQ2DIZ1+zz9WOtHvYTnn6b9DwY=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3796Y1oQ088084
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 9 Aug 2023 01:34:01 -0500
-Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 9
- Aug 2023 01:33:59 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 9 Aug 2023 01:33:59 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3796XrbF018885;
-	Wed, 9 Aug 2023 01:33:54 -0500
-Message-ID: <34784261-bb31-9c58-de5e-ee64c85d9d11@ti.com>
-Date: Wed, 9 Aug 2023 12:03:53 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949D662C
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 06:38:35 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2086.outbound.protection.outlook.com [40.107.22.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6827710CF;
+	Tue,  8 Aug 2023 23:38:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IN6AFbzYribLEZec4abH0eLnDjborAri1063g5sByA+tCWEfeHr+nfIqyf3kqNDzzWl1I/MKRsLG7NvDcsXBEbaOKvuEmDeQWZNS3VQYz/OMTKMdaNgPpVH1e3rHd6Afhw0m4NUHIo3786p/uuDc95ffj4xbV00FIce/PKXeQ8ZUzs/JN3gu0qKb3DiNZBRLASIwBuvIpx3OqujZUK+ma6E5usQYm5ytszwrI8ZUk7FPmd1dePmp+GWaZIy3cOa/RIsPQEwgPAb05zLNXrbTbL/6YzRGN9LKBiBy5INqd6Wl2MZsrAWreW1EK8Qd+NzK2EzFHW3hjuO7gKqTCN4pwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AXPREfVea3KIRSg1pxvO6wJvu8FSO9qcSikQRZ2ZbWE=;
+ b=fb3+Xe+5QZKzK6HmZHlefUomSGCrb2ZbOeKhBEVdNikRARErYBTpCt4grqcpATlEo3R59XVYlmh0N1Tyoj51uVZh2TgA9QUSlGSSsK67MyQHIbQNSBtOBAX0+2JYJ68p9sftdDDYixJ7V0/5Qv6js3Pm6d54opVC6Y15yUD8va3MfDkBgFCpnxNorV1F7wnSlRT/0OHsoT5Fw2vaDdkUoBYaDGvI7cj4nj6pcMU0ZaYkaE4vfSs0wH84uk9E/IDTeG7qW4EhpR6NdPRsaXtN71q5b+EYl/qvyPtu8MoT5Awvc9mroxXQbUK6cjpHoOOqIrgBSyfm5ibIDvQumZJyiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AXPREfVea3KIRSg1pxvO6wJvu8FSO9qcSikQRZ2ZbWE=;
+ b=fTTYm78RN5ZRmU/m1AgCvE7ScqGexOORnFam5RjDbSnNXOZoS1PeA8lhYZBL6KMQNoLQPcOYsy0gvASpEtAKW78JMxC3mGxg6lSZTNGmo2lbvkaG/fTEzQZT8zE8AKQJLxY2bGtmgta4plUr+qKEmv0u+TsSn8Kz7KD228Lg1ao=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by DB9PR04MB10067.eurprd04.prod.outlook.com (2603:10a6:10:4c8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28; Wed, 9 Aug
+ 2023 06:38:29 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50%4]) with mapi id 15.20.6652.022; Wed, 9 Aug 2023
+ 06:38:28 +0000
+Message-ID: <b33195b3-aa6d-defa-97c4-280da7e5e6d6@oss.nxp.com>
+Date: Wed, 9 Aug 2023 09:37:40 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Subject: Re: [PATCH] net: macsec: use TX SCI as MAC address
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230808141429.220830-1-radu-nicolae.pirea@oss.nxp.com>
+ <ZNJdo6bow7uK8bTn@hog>
+Content-Language: en-US
+In-Reply-To: <ZNJdo6bow7uK8bTn@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR04CA0052.eurprd04.prod.outlook.com
+ (2603:10a6:802:2::23) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 0/5] Introduce IEP driver and packet timestamping
- support
-Content-Language: en-US
-From: Md Danish Anwar <a0501179@ti.com>
-To: Conor Dooley <conor@kernel.org>, Roger Quadros <rogerq@kernel.org>
-CC: MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap
-	<rdunlap@infradead.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230807110048.2611456-1-danishanwar@ti.com>
- <20230808-unnerving-press-7b61f9c521dc@spud>
- <1c8e5369-648e-98cb-cb14-08d700a38283@ti.com>
- <529218f6-2871-79a2-42bb-8f7886ae12c3@kernel.org>
- <8bb5a1eb-3912-c418-88fe-b3d8870e7157@ti.com>
- <20230808-nutmeg-mashing-543b41e56aa1@spud>
- <1182349e-3531-c3b2-e457-4aad2595fa71@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <1182349e-3531-c3b2-e457-4aad2595fa71@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DB9PR04MB10067:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d7fba66-8b6f-4d4e-3671-08db98a33da8
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	KKszF/ptHX3VsQ4JMZ1o1w8cIum81KylwjUKOxjDj9myvBekhcRXvByGVKVA4pHD+Ot54xyFoAELpxsfRHOV7bCIhOPQWy8MrdqqPeHJeVqi+tcRLLSivj4CTIgnvb0wla+VgGzpsYBaWEVVEloIecBO7KyFzU8XXnfaXYklRVWNd4qQK51I/DL6ej1IeM3KGIfEHFvGOxZ3IK+UpYGanobTUJR717K5f24n7BTZW91IQTMA8MornG71v/RdKd/8AjFgCTs4MMCX/4TA4UQtnWRGWrBU0p90fCjC51pl2cnWcFBKSmQE3ZihwHyIh/5CHWAJ6BGlFGBt3DA6C2htnXTzKCJ0GBRujzZabvts00cX3O6s+llOLSX9emYX6qYSsZJz1PBWeAJm0DgVeQviivGVGaM9cJbZQWn/QdfODl7+AyprSQ+MrFsykgRxQdGGXc8oEepf0syzn2u9jrMfTM+snZEtaakEpAdsOPtabxh8ru3F0VFG1eZqZiI7+wVEaeTHrVrsGcXA9/Sd9yMHJG4aFebbdyTXZQH5S4esUc0hQoV/fW5MZuc9n81do8Sx1Pww/Qyz7M5v2LZYnYa4xm+UOFI2DX0R1xuXSqtgVXzSzr4pojBTdfluTH3q8dSE851C2MyLxmbYq8DR1o+KOg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(366004)(39860400002)(346002)(376002)(1800799006)(186006)(451199021)(6512007)(26005)(6506007)(53546011)(38100700002)(5660300002)(86362001)(31696002)(2906002)(4326008)(6916009)(66476007)(66556008)(66946007)(8676002)(8936002)(41300700001)(316002)(6666004)(6486002)(478600001)(2616005)(83380400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Mi9KbEgxcTlrWVVuL2FSOEYyK0hZY2swMm11NUo1RTliS1d5eDI1a3g5TWVq?=
+ =?utf-8?B?SlNLK0NIUVI0cjg1cCtlZVVVSU4rZ2owVTNwNG1BS0NKNms1ZE5jcDVQNHh4?=
+ =?utf-8?B?N1NxUjRLUlFIUFlWdEl5c2QreEZKVGpaU3ZtcjBCb1NlOVVodGdlcnN5cDJV?=
+ =?utf-8?B?MmZMVVJLOVY1bHVuR1JuMnlPRmpleFVWK3U0azd2QVhOZ0t1MzdtRU15RDJM?=
+ =?utf-8?B?b0ZlN0FZbG0wYi82M1RiNlJaYnZWekZxdmVWNzZrZWxhQ2xkSVhsV28xWGZX?=
+ =?utf-8?B?K2tZUHREMG82SnNwUVRNeWNWbFV0MXdpQ2dKaElwNjBmVDZDUFAzQkMvOExN?=
+ =?utf-8?B?dkpyaTh0cWpqRWY1d21vS24vazJEMkhteE9xYTZqU25nd2VXdUN5L0MyZmlo?=
+ =?utf-8?B?YjFxc2gwazZMaDFoR0dKOS9wZHYxODExamdTOFppV09uMXdHdzlER2p0R2Vv?=
+ =?utf-8?B?ZmJPenYyT20wU3ZMNjBibklsNWh6eHFtT09jNVlxUktWbUZ3citkYm91T1BM?=
+ =?utf-8?B?SVJvc1BsZVRMWGlUNE94MTFydjF5Y096akQwem5jejlmU28wMVZ2WW5ocUFu?=
+ =?utf-8?B?RXozNkphbGtYbUJCWVhxMUpYOENlN2FlUlFzbE9kcVVzRzB3Mlc3Qjg4MVh1?=
+ =?utf-8?B?Z25POFU5dm8zZEcrYkovR3J5STdaZTM5Q2ViRTdET0pZUjhodS9RTzFlVDdT?=
+ =?utf-8?B?MzJmZjcrZnZJK2xlR3E2Q3E0THNMMXpQZzE3eGpZSERNc2tVRy94Sk5lTmt4?=
+ =?utf-8?B?eXRGaW5lWWl1ZkJzTnE1UThFZ1JCWUkrZ0VZUVBlSW8zK0ZublFBMkxmeVAr?=
+ =?utf-8?B?bldhMHIyOHlFOWxFTzNIRHJKb2cxMU93QVVSd1pWU0plRldwY0pEYTg3YnM5?=
+ =?utf-8?B?cHhKczNGalU2TjVmdVl0WXA4ek9OWlY3OE91QXJueld2aWUyLytidUhQZkNO?=
+ =?utf-8?B?QjNoMHYvT1pGcS9BdVByVU90V3hCY2FFTERwTUpTUmlwa0lQU2tqMm80QitL?=
+ =?utf-8?B?VmEydldJTGhJTzJnRVh5NmtVbnhtTGNzYXoyOCthUkhobmEzQ1dSVnpFRlNk?=
+ =?utf-8?B?MkpSMWtEaEM2eGIweU1rS3lxQTFra2xyN0xDZy9iNWxQcFNUTTV2eVpxNENG?=
+ =?utf-8?B?TytGb1dlV09kM21NK0E3U2FiNGt4YUc1NTNXc3ZjSmRNVGtkenFhMEJjM0t1?=
+ =?utf-8?B?RlYvakY3cXB3aEZJcXpONDBEaE00R1FKQmdnckxyRlBsUjFFZEdFMjRLWmhp?=
+ =?utf-8?B?MG5ZM3NqRkRnSGk1YjhZK29rRTFsTEwwM1FGMkxVNlRaWTJjS2RBUmNBWXBS?=
+ =?utf-8?B?MXV1REVqRXlCMGk1MDlqNHh4cDBrTjB5U0Zlb0FsNUo4VlVzbUc4SDAwRTRF?=
+ =?utf-8?B?L3JHVGx6V1lJMTVWcVhYVWU5Rm10UTNoVURnWlhKbWJVRlc4ZkpBTDcvQXpQ?=
+ =?utf-8?B?YzFVSWRMQWpGWjlvQ1NLVHovZ0o0NEEwRE52Q3pETzAxYUt4M3BkUGtrQnlQ?=
+ =?utf-8?B?cWNMRlcvaXlmRGdBOXVKQml1dTFkQi80S3hWQkhlUHVDTklPWDNnTnY4SXFR?=
+ =?utf-8?B?NHhWcDE1YTQ0aWNKZmR4Q0JlSjQrZ29Qd1ZtM05yUEdxTWxMQ1FsdzNmREFP?=
+ =?utf-8?B?UHNzV0NjZFJkMUFNR094cFhaWHhBdkdBSFY4cVBsK0F4L2gzZVhFeXhvY20z?=
+ =?utf-8?B?Ny9OVXc3NlJZdUkzQkkrQWFTeUJaM2c4V0hxVHRmZXFxakZUMzlrYnBGdWUy?=
+ =?utf-8?B?amFVYm8vZXVidTB3ajdrNGVBTFQrLzNOZUo2Mzl1Sy9YSmw3bVJKTDlkTTlr?=
+ =?utf-8?B?aTJ2a3EwWU1UdTNBTXhSZVdHNjcxMXljaEpOaVBOUWJ2SjF1SXo5Y29RZ0FB?=
+ =?utf-8?B?N2dTK09tN25JanR5ck9VYzh1MER5eWhJd3A4SUlCUmlBbEZiZWI3VlEzU3lu?=
+ =?utf-8?B?WGZrVm8rVnZ6WVVVelR2ZlJ6c1BGdzFTeVhlOVMrektiV1pLZFRUQkliK2VU?=
+ =?utf-8?B?cmcwQnI1cFIzT055eTJhRzdOMHZhWDh3a3BjRUsxUW5LejNPdmNQSlNLSDEw?=
+ =?utf-8?B?SFliaEdHS1ZNOWJObTlremJBYk1obUFNTElWQjE3cVlCVGkvQzFUY240UUdW?=
+ =?utf-8?B?WjF4em0yRkJMTGt1WitFUGR6SDlwdW5WU1lPMnYzcjg0ZEJGdEZCRGxHQmZm?=
+ =?utf-8?B?SVE9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d7fba66-8b6f-4d4e-3671-08db98a33da8
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 06:38:28.6687
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: w1EkCbOu0u6SCI+5d1Qkd+05PUjPj9mJBFjSaFm8ywFpAZ+8RPf0ECabL999l1BePrEkDIyYhBOxEPtj05mQhoUr/cfIaT+ndwEDHIC0SKg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB10067
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Conor,
 
-On 09/08/23 10:31 am, Md Danish Anwar wrote:
-> On 08/08/23 6:15 pm, Conor Dooley wrote:
->> On Tue, Aug 08, 2023 at 06:06:11PM +0530, Md Danish Anwar wrote:
->>> On 08/08/23 5:52 pm, Roger Quadros wrote:
->>>>
->>>>
->>>> On 08/08/2023 15:18, Md Danish Anwar wrote:
->>>>> On 08/08/23 5:38 pm, Conor Dooley wrote:
->>>>>> On Mon, Aug 07, 2023 at 04:30:43PM +0530, MD Danish Anwar wrote:
->>>>>>> This series introduces Industrial Ethernet Peripheral (IEP) driver to
->>>>>>> support timestamping of ethernet packets and thus support PTP and PPS
->>>>>>> for PRU ICSSG ethernet ports.
->>>>>>>
->>>>>>> This series also adds 10M full duplex support for ICSSG ethernet driver.
->>>>>>>
->>>>>>> There are two IEP instances. IEP0 is used for packet timestamping while IEP1
->>>>>>> is used for 10M full duplex support.
->>>>>>>
->>>>>>> This is v2 of the series [v1]. It addresses comments made on [v1].
->>>>>>> This series is based on linux-next(#next-20230807). 
->>>>>>>
->>>>>>> Changes from v1 to v2:
->>>>>>> *) Addressed Simon's comment to fix reverse xmas tree declaration. Some APIs
->>>>>>>    in patch 3 and 4 were not following reverse xmas tree variable declaration.
->>>>>>>    Fixed it in this version.
->>>>>>> *) Addressed Conor's comments and removed unsupported SoCs from compatible
->>>>>>>    comment in patch 1. 
->>>>>>
->>>>>> I'm sorry I missed responding there before you sent v2, it was a bank
->>>>>> holiday yesterday. I'm curious why you removed them, rather than just
->>>>>> added them with a fallback to the ti,am654-icss-iep compatible, given
->>>>>> your comment that "the same compatible currently works for all these
->>>>>> 3 SoCs".
->>>>>
->>>>> I removed them as currently the driver is being upstreamed only for AM654x,
->>>>> once I start up-streaming the ICSSG driver for AM64 and any other SoC. I will
->>>>> add them here. If at that time we are still using same compatible, then I will
->>>>> modify the comment otherwise add new compatible.
->>>>>
->>>>> As of now, I don't see the need of adding other SoCs in iep binding as IEP
->>>>> driver up-streaming is only planned for AM654x as of now.
->>>>
->>>> But, is there any difference in IEP hardware/driver for the other SoCs?
->>>> AFAIK the same IP is used on all SoCs.
->>>>
->>>> If there is no hardware/code change then we don't need to introduce a new compatible.
->>>> The comment for all SoCs can already be there right from the start.
->>>>
->>>
->>> There is no code change. The same compatible is used for other SoCs. Even if
->>> the code is same I was thinking to keep the compatible as below now
->>>
->>> - ti,am654-icss-iep   # for K3 AM65x SoCs
->>>
->>> and once other SoCs are introduced, I will just modify the comment,
->>>
->>> - ti,am654-icss-iep   # for K3 AM65x, AM64x SoCs
->>>
->>> But we can also keep the all SoCs in comment right from start as well. I am
->>> fine with both.
+
+On 08.08.2023 18:22, Sabrina Dubroca wrote:
+> 2023-08-08, 17:14:29 +0300, Radu Pirea (NXP OSS) wrote:
+>> According to IEEE 802.1AE the SCI comprises the MAC address and the port
+>> identifier.
+> 
+> I don't think the SCI needs to be composed of the actual device's MAC
+> address. 8.2.1 says that the MAC address *can* be used to compose the
+> SCI, but doesn't mandate it.
+I used IEEE 802.1AE-2018 as documentation and the text is slightly 
+different. However, the purpose of this patch is not to force this match 
+between the MAC address and the SCI, is just to have different MAC 
+addresses when the interfaces are created with an specific SCI.
+
+For example, the following command will not set 00:01:be:be:ef:17 as MAC 
+address for the new interface. Would you expect that?
+ip link add link enet_p2 macsec0 type macsec address 00:01:be:be:ef:17 
+port 1 encrypt on
+
+> 
+> If you want the SCI to match the device's MAC address, why not use
+> IFLA_MACSEC_PORT instead?
+
+In this case, if no MAC address is specified, it makes sense to inherit 
+the MAC address from the real netdev.
+
+> 
+>> If a new MACsec interface is created with a specific TX SCI, use that
+>> SCI to set the MAC address of the new interface.
 >>
->>> Conor / Roger, Please let me know which approach should I go with in next revision?
+>> Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+>> ---
+>>   drivers/net/macsec.c | 8 +++++---
+>>   1 file changed, 5 insertions(+), 3 deletions(-)
 >>
->> IMO, "ti,am564-icss-iep" goes in the driver and the other SoCs get
->> specific compatibles in the binding with "ti,am564-icss-iep" as a
->> fallback.
+>> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+>> index 984dfa5d6c11..6db69daf880d 100644
+>> --- a/drivers/net/macsec.c
+>> +++ b/drivers/net/macsec.c
+>> @@ -4103,12 +4103,14 @@ static int macsec_newlink(struct net *net, struct net_device *dev,
+>>   	/* need to be already registered so that ->init has run and
+>>   	 * the MAC addr is set
+>>   	 */
+>> -	if (data && data[IFLA_MACSEC_SCI])
+>> +	if (data && data[IFLA_MACSEC_SCI]) {
+>>   		sci = nla_get_sci(data[IFLA_MACSEC_SCI]);
+>> -	else if (data && data[IFLA_MACSEC_PORT])
+>> +		eth_hw_addr_set(dev, (u8 *)&sci);
+>> +	} else if (data && data[IFLA_MACSEC_PORT]) {
+>>   		sci = dev_to_sci(dev, nla_get_be16(data[IFLA_MACSEC_PORT]));
+>> -	else
+>> +	} else {
+>>   		sci = dev_to_sci(dev, MACSEC_PORT_ES);
+>> +	}
+>>   
+>>   	if (rx_handler && sci_exists(real_dev, sci)) {
+>>   		err = -EBUSY;
+>> -- 
+>> 2.34.1
+>>
 > 
-> Sure. Then as for now, "ti,am654-icss-iep" goes in the driver, I will keep the
-> dt binding compatible as below (as it was earlier in v1.)
-> 
-> - ti,am654-icss-iep   # for K3 AM65x, J721E and AM64x SoCs
-> 
-> When new SoCs are introduced I can add specific bindings for them with
-> "ti,am654-icss-iep" being the fallback.
-> 
-
-I checked internally and IEP hardware / driver is same across all TI K3 SoCs.
-Compatible "ti,am654-icss-iep" will be same for all SoCs. I don't think we need
-to introduce different compatibles for different SoCs in future as they will be
-using same hardware / driver. For now I will have below as compatible in dt
-bindings. This will not change in future. When new SoCs are added, they can
-just use this compatible itself. The driver will always use "ti,am654-icss-iep"
-as compatible.
-
-	- ti,am654-icss-iep   # for all TI K3 SoCs
 
 -- 
-Thanks and Regards,
-Danish.
+Radu P.
 
