@@ -1,45 +1,62 @@
-Return-Path: <netdev+bounces-25660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B01E7750C9
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:13:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F597750DC
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 04:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DE7A1C2108C
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 02:13:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40FD22819AC
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 02:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B8A648;
-	Wed,  9 Aug 2023 02:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5B964B;
+	Wed,  9 Aug 2023 02:19:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7F262C
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:13:37 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318151BCD;
-	Tue,  8 Aug 2023 19:13:36 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RLD8k2zPxzrSXp;
-	Wed,  9 Aug 2023 10:12:22 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 9 Aug 2023 10:13:33 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <shaojijie@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH net] net: hns3: fix strscpy causing content truncation issue
-Date: Wed, 9 Aug 2023 10:09:02 +0800
-Message-ID: <20230809020902.1941471-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCB4632
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 02:19:48 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009C81BD3;
+	Tue,  8 Aug 2023 19:19:46 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 378Nnvv0008226;
+	Tue, 8 Aug 2023 19:19:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=Duo3bRbVvb6/txE8EhkDQ9IknuBjLsomUlWEgOddVpM=;
+ b=NJysyXkrFzaIIQ/dbkmLujz3zrJrlipBPrOz/oNr9Zglz35p0H/+0/U7KljxD51F9EME
+ ZtwBmFLGrYy13Xo8dLC/OuxK6QQhrwtt4DwPTpPUeILj9yHJwdH9fjF2kvudyKbTmx+f
+ bWaJA55+nPNbYZt1KzxWVo8OY8egbkWA+kzIdrCwxEOKq8BYfoCdV2webHXcbOt6egA+
+ Eyc+CuXK4U/txoQQSIWD8QI5oqHWkDgs75cpGvHCkddAe2f3m2qzjHpQBbkZOSfPDa/u
+ 5zS6WReC5Pl6NMbuGkUENSEicE8JsVIXEhSS2ky5X59W3/tfrwFTKo0iChTrbtryWMf3 2A== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sbkntk304-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 08 Aug 2023 19:19:28 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 8 Aug
+ 2023 19:19:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 8 Aug 2023 19:19:26 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 55D8A5B6929;
+	Tue,  8 Aug 2023 19:19:22 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <hawk@kernel.org>, <alexander.duyck@gmail.com>,
+        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>,
+        Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH net-next] page_pool: Set page pool size.
+Date: Wed, 9 Aug 2023 07:49:20 +0530
+Message-ID: <20230809021920.913324-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,79 +65,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-GUID: SWsvK7huo-gMo5qfYeC52ab8k7UmSiF6
+X-Proofpoint-ORIG-GUID: SWsvK7huo-gMo5qfYeC52ab8k7UmSiF6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-08_24,2023-08-08_01,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Hao Chen <chenhao418@huawei.com>
+https://lore.kernel.org/netdev/
+	15d32b22-22b0-64e3-a49e-88d780c24616@kernel.org/T/
 
-hns3_dbg_fill_content()/hclge_dbg_fill_content() is aim to integrate some
-items to a string for content, and we add '\n' and '\0' in the last
-two bytes of content.
-
-strscpy() will add '\0' in the last byte of destination buffer(one of
-items), it result in finishing content print ahead of schedule and some
-dump content truncation.
-
-One Error log shows as below:
-cat mac_list/uc
-UC MAC_LIST:
-
-Expected:
-UC MAC_LIST:
-FUNC_ID  MAC_ADDR            STATE
-pf       00:2b:19:05:03:00   ACTIVE
-
-The destination buffer is length-bounded and not required to be
-NUL-terminated, so just change strscpy() to memcpy() to fix it.
-
-Fixes: 1cf3d5567f27 ("net: hns3: fix strncpy() not using dest-buf length as length issue")
-Signed-off-by: Hao Chen <chenhao418@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c         | 4 ++--
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-index 52546f625c8b..f276b5ecb431 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-@@ -464,9 +464,9 @@ static void hns3_dbg_fill_content(char *content, u16 len,
- 		if (result) {
- 			if (item_len < strlen(result[i]))
- 				break;
--			strscpy(pos, result[i], strlen(result[i]));
-+			memcpy(pos, result[i], strlen(result[i]));
- 		} else {
--			strscpy(pos, items[i].name, strlen(items[i].name));
-+			memcpy(pos, items[i].name, strlen(items[i].name));
- 		}
- 		pos += item_len;
- 		len -= item_len;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-index 409db2e70965..0fb2eaee3e8a 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-@@ -111,9 +111,9 @@ static void hclge_dbg_fill_content(char *content, u16 len,
- 		if (result) {
- 			if (item_len < strlen(result[i]))
- 				break;
--			strscpy(pos, result[i], strlen(result[i]));
-+			memcpy(pos, result[i], strlen(result[i]));
- 		} else {
--			strscpy(pos, items[i].name, strlen(items[i].name));
-+			memcpy(pos, items[i].name, strlen(items[i].name));
- 		}
- 		pos += item_len;
- 		len -= item_len;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 8336cea16aff..2986e238104e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -1434,7 +1434,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+ 	}
+ 
+ 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+-	pp_params.pool_size = numptrs;
++#define OTX2_PAGE_POOL_SIZE 2048
++	pp_params.pool_size = OTX2_PAGE_POOL_SIZE;
+ 	pp_params.nid = NUMA_NO_NODE;
+ 	pp_params.dev = pfvf->dev;
+ 	pp_params.dma_dir = DMA_FROM_DEVICE;
 -- 
-2.30.0
+2.25.1
 
 
