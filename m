@@ -1,234 +1,149 @@
-Return-Path: <netdev+bounces-25917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-25918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985517762A1
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:38:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F6A7762A9
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 16:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5195C281D78
-	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:38:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CC7E281B00
+	for <lists+netdev@lfdr.de>; Wed,  9 Aug 2023 14:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFB1182A3;
-	Wed,  9 Aug 2023 14:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C792118AF1;
+	Wed,  9 Aug 2023 14:39:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5349C2CA4
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:38:06 +0000 (UTC)
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD68D1FCC;
-	Wed,  9 Aug 2023 07:38:04 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 498816732D; Wed,  9 Aug 2023 16:38:01 +0200 (CEST)
-Date: Wed, 9 Aug 2023 16:38:01 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Takashi Iwai <tiwai@suse.de>
-Cc: linux-kernel@vger.kernel.org,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mark Brown <broonie@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	netdev@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH RFC] Introduce uniptr_t as a generic "universal" pointer
-Message-ID: <20230809143801.GA693@lst.de>
-References: <87edkce118.wl-tiwai@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBC9182B7
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 14:39:38 +0000 (UTC)
+Received: from out-79.mta0.migadu.com (out-79.mta0.migadu.com [91.218.175.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096EC2108
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 07:39:36 -0700 (PDT)
+Message-ID: <6acbbf63-ba10-4a66-5e31-b9a499f79489@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1691591975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K70SI6itTIMucJGr0SM6nBFOaQH3QInpyitYP0k5TGc=;
+	b=nJMgWPNHgDmf8TRqPDZuCQcujph5ZN/cHQX91FjhLiCSbwK5HK5u+PoCxWCJECpRrLlZFL
+	qMOT4lxVTbCtawzV70UYqUiNnr8Cl5+DkmzSDNk2B67R6vBN8L8Zf4/C0pkib2D99+57Qb
+	cKPYAoi/eiZvR9XkKDHftB/Qr9ml2ko=
+Date: Wed, 9 Aug 2023 07:39:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87edkce118.wl-tiwai@suse.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH bpf-next] net: Fix slab-out-of-bounds in
+ inet[6]_steal_sock
+Content-Language: en-US
+To: Lorenz Bauer <lmb@isovalent.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima
+ <kuniyu@amazon.com>, Martin KaFai Lau <martin.lau@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, Kumar Kartikeya Dwivedi <memxor@gmail.com>
+References: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 04:35:47PM +0200, Takashi Iwai wrote:
-> Although sockptr_t is used already in several places as a "universal"
-> pointer, it's still too confusing to use it in other subsystems, since
-> people see it always as if it were a network-related stuff.
+On 8/9/23 1:33 AM, Lorenz Bauer wrote:
+> Kumar reported a KASAN splat in tcp_v6_rcv:
 > 
-> This patch defines a more generic type, uniptr_t, that does exactly as
-> same as sockptr_t for a wider use.  As of now, it's almost 1:1 copy
-> with renames (just with comprehensive header file inclusions).
+>    bash-5.2# ./test_progs -t btf_skc_cls_ingress
+>    ...
+>    [   51.810085] BUG: KASAN: slab-out-of-bounds in tcp_v6_rcv+0x2d7d/0x3440
+>    [   51.810458] Read of size 2 at addr ffff8881053f038c by task test_progs/226
+> 
+> The problem is that inet[6]_steal_sock accesses sk->sk_protocol without
+> accounting for request sockets. I added the check to ensure that we only
+> every try to perform a reuseport lookup on a supported socket.
+> 
+> It turns out that this isn't necessary at all. struct sock_common contains
+> a skc_reuseport flag which indicates whether a socket is part of a
 
-The original set_fs removal series did that as uptr_t, and Linus
-hated it with passion.  I somehow doubt he's going to like it more now.
+Does it go back to the earlier discussion 
+(https://lore.kernel.org/bpf/7188429a-c380-14c8-57bb-9d05d3ba4e5e@linux.dev/) 
+that the sk->sk_reuseport is 1 from sk_clone for TCP_ESTABLISHED? It works 
+because there is sk->sk_reuseport"_cb" check going deeper into 
+reuseport_select_sock() but there is an extra inet6_ehashfn for all TCP_ESTABLISHED.
 
-> Signed-off-by: Takashi Iwai <tiwai@suse.de>
+> reuseport group. inet[6]_lookup_reuseport already check this flag,
+> so we can't execute an erroneous reuseport lookup by definition.
+> 
+> Remove the unnecessary assertions to fix the out of bounds access.
+> 
+> Fixes: 9c02bec95954 ("bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign")
+> Reported-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+> Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
 > ---
+>   include/net/inet6_hashtables.h | 10 ----------
+>   include/net/inet_hashtables.h  | 10 ----------
+>   2 files changed, 20 deletions(-)
 > 
-> This is a RFC patch, or rather a material for bikeshedding.
+> diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
+> index 284b5ce7205d..f9907ed36d54 100644
+> --- a/include/net/inet6_hashtables.h
+> +++ b/include/net/inet6_hashtables.h
+> @@ -119,16 +119,6 @@ struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
+>   	if (!prefetched)
+>   		return sk;
+>   
+> -	if (sk->sk_protocol == IPPROTO_TCP) {
+> -		if (sk->sk_state != TCP_LISTEN)
+> -			return sk;
+> -	} else if (sk->sk_protocol == IPPROTO_UDP) {
+> -		if (sk->sk_state != TCP_CLOSE)
+> -			return sk;
+> -	} else {
+> -		return sk;
+> -	}
+> -
+>   	reuse_sk = inet6_lookup_reuseport(net, sk, skb, doff,
+>   					  saddr, sport, daddr, ntohs(dport),
+>   					  ehashfn);
+> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+> index 1177effabed3..57a46993383a 100644
+> --- a/include/net/inet_hashtables.h
+> +++ b/include/net/inet_hashtables.h
+> @@ -465,16 +465,6 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
+>   	if (!prefetched)
+>   		return sk;
+>   
+> -	if (sk->sk_protocol == IPPROTO_TCP) {
+> -		if (sk->sk_state != TCP_LISTEN)
+> -			return sk;
+> -	} else if (sk->sk_protocol == IPPROTO_UDP) {
+> -		if (sk->sk_state != TCP_CLOSE)
+> -			return sk;
+> -	} else {
+> -		return sk;
+> -	}
+> -
+>   	reuse_sk = inet_lookup_reuseport(net, sk, skb, doff,
+>   					 saddr, sport, daddr, ntohs(dport),
+>   					 ehashfn);
 > 
-> Initially the discussion started from the use of sockptr_t for the
-> sound driver in Andy's patch:
->   https://lore.kernel.org/r/20230721100146.67293-1-andriy.shevchenko@linux.intel.com
-> followed by a bigger series of patches by me:
->   https://lore.kernel.org/r/20230731154718.31048-1-tiwai@suse.de
+> ---
+> base-commit: eb62e6aef940fcb1879100130068369d4638088f
+> change-id: 20230808-bpf-next-a442a095562b
 > 
-> The first reaction to the patches (including my own) were
-> "why sockptr_t?"  Yes, it's just confusing.  So, here it is, a
-> proposal of defining the new type for the very purpose as sockptr_t.
-> 
-> The name of uniptr_t is nothing but my random pick up, and we can
-> endlessly discuss for a better name (genptr_t or whatever).
-> I'm totally open for the name.
-> 
-> After this introduction, sockptr_t can be alias of uniptr_t,
-> e.g. simply override with "#define sockptr_t uniptr_t" or such.
-> How can it be is another open question.
-> 
-> Also, we can clean up the macro implementation along with it;
-> there seem a few (rather minor) issues as suggested by Andy:
->   https://lore.kernel.org/r/ZMlGKy7ibjkQ6ii7@smile.fi.intel.com
-> 
-> Honestly speaking, I don't mind to keep using sockptr_t generically
-> despite of the name, if people agree.  The rename might make sense,
-> though, if it's more widely used in other subsystems in future.
-> 
-> 
-> Takashi
-> 
-> ===
-> 
->  include/linux/uniptr.h | 121 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 121 insertions(+)
->  create mode 100644 include/linux/uniptr.h
-> 
-> diff --git a/include/linux/uniptr.h b/include/linux/uniptr.h
-> new file mode 100644
-> index 000000000000..f7994d3a45eb
-> --- /dev/null
-> +++ b/include/linux/uniptr.h
-> @@ -0,0 +1,121 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Support for "universal" pointers that can point to either kernel or userspace
-> + * memory.
-> + *
-> + * Original code from sockptr.h
-> + *    Copyright (c) 2020 Christoph Hellwig
-> + */
-> +#ifndef _LINUX_UNIPTR_H
-> +#define _LINUX_UNIPTR_H
-> +
-> +#include <linux/err.h>
-> +#include <linux/slab.h>
-> +#include <linux/string.h>
-> +#include <linux/types.h>
-> +#include <linux/uaccess.h>
-> +
-> +typedef struct {
-> +	union {
-> +		void		*kernel;
-> +		void __user	*user;
-> +	};
-> +	bool		is_kernel : 1;
-> +} uniptr_t;
-> +
-> +static inline bool uniptr_is_kernel(uniptr_t uniptr)
-> +{
-> +	return uniptr.is_kernel;
-> +}
-> +
-> +static inline uniptr_t KERNEL_UNIPTR(void *p)
-> +{
-> +	return (uniptr_t) { .kernel = p, .is_kernel = true };
-> +}
-> +
-> +static inline uniptr_t USER_UNIPTR(void __user *p)
-> +{
-> +	return (uniptr_t) { .user = p };
-> +}
-> +
-> +static inline bool uniptr_is_null(uniptr_t uniptr)
-> +{
-> +	if (uniptr_is_kernel(uniptr))
-> +		return !uniptr.kernel;
-> +	return !uniptr.user;
-> +}
-> +
-> +static inline int copy_from_uniptr_offset(void *dst, uniptr_t src,
-> +					  size_t offset, size_t size)
-> +{
-> +	if (!uniptr_is_kernel(src))
-> +		return copy_from_user(dst, src.user + offset, size);
-> +	memcpy(dst, src.kernel + offset, size);
-> +	return 0;
-> +}
-> +
-> +static inline int copy_from_uniptr(void *dst, uniptr_t src, size_t size)
-> +{
-> +	return copy_from_uniptr_offset(dst, src, 0, size);
-> +}
-> +
-> +static inline int copy_to_uniptr_offset(uniptr_t dst, size_t offset,
-> +					const void *src, size_t size)
-> +{
-> +	if (!uniptr_is_kernel(dst))
-> +		return copy_to_user(dst.user + offset, src, size);
-> +	memcpy(dst.kernel + offset, src, size);
-> +	return 0;
-> +}
-> +
-> +static inline int copy_to_uniptr(uniptr_t dst, const void *src, size_t size)
-> +{
-> +	return copy_to_uniptr_offset(dst, 0, src, size);
-> +}
-> +
-> +static inline void *memdup_uniptr(uniptr_t src, size_t len)
-> +{
-> +	void *p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
-> +
-> +	if (!p)
-> +		return ERR_PTR(-ENOMEM);
-> +	if (copy_from_uniptr(p, src, len)) {
-> +		kfree(p);
-> +		return ERR_PTR(-EFAULT);
-> +	}
-> +	return p;
-> +}
-> +
-> +static inline void *memdup_uniptr_nul(uniptr_t src, size_t len)
-> +{
-> +	char *p = kmalloc_track_caller(len + 1, GFP_KERNEL);
-> +
-> +	if (!p)
-> +		return ERR_PTR(-ENOMEM);
-> +	if (copy_from_uniptr(p, src, len)) {
-> +		kfree(p);
-> +		return ERR_PTR(-EFAULT);
-> +	}
-> +	p[len] = '\0';
-> +	return p;
-> +}
-> +
-> +static inline long strncpy_from_uniptr(char *dst, uniptr_t src, size_t count)
-> +{
-> +	if (uniptr_is_kernel(src)) {
-> +		size_t len = min(strnlen(src.kernel, count - 1) + 1, count);
-> +
-> +		memcpy(dst, src.kernel, len);
-> +		return len;
-> +	}
-> +	return strncpy_from_user(dst, src.user, count);
-> +}
-> +
-> +static inline int check_zeroed_uniptr(uniptr_t src, size_t offset, size_t size)
-> +{
-> +	if (!uniptr_is_kernel(src))
-> +		return check_zeroed_user(src.user + offset, size);
-> +	return memchr_inv(src.kernel + offset, 0, size) == NULL;
-> +}
-> +
-> +#endif /* _LINUX_UNIPTR_H */
-> -- 
-> 2.35.3
----end quoted text---
+> Best regards,
+
 
