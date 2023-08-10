@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-26403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B7A7777B55
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:53:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB378777B6F
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD52F1C20CAF
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:53:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2ECF1C215CF
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A3C200A0;
-	Thu, 10 Aug 2023 14:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79FC1200A6;
+	Thu, 10 Aug 2023 14:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC301E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F13B1E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:57:36 +0000 (UTC)
 Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99493A8;
-	Thu, 10 Aug 2023 07:53:07 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 37AAftPi010419;
-	Thu, 10 Aug 2023 16:52:49 +0200
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237E826B2;
+	Thu, 10 Aug 2023 07:57:35 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AClMGg009215;
+	Thu, 10 Aug 2023 16:57:15 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	message-id:date:mime-version:subject:to:cc:references:from
 	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=BKMmwew5tFclpv2pO0AXv3ufer96Kv+HUcWutf+ce1Q=; b=S+
-	aSbS8SUQEas3o1QUbKIb21Q1ovVPkEULlFJiQ6E9FWJl0UXhMhdR9tjGK0U9zVRm
-	M4KCHBHuQVTSbUtzb7PMsYe5nixH8OVdq3O1h7C26sRIWQTHC46led62QMgFtwoX
-	+NfjpY2uhLELxoRynATdVo4V+zEKw3K59iH5mcScIb8ycVelccaPAG2i14Bdk7j5
-	eisF6XW4I+iWCnWBgNSBwoCZ4MeZG4uwmyHa3MEqeDfVKkn1UkbdMC2lhN3PtXwx
-	7xryWZelGmmw0tI1GS35FV+N1ezmfV/SOOAe5ecN+ZPbuWqwxYq4u+IUPsBTDRGI
-	Lc83cGh3EGHpeTIc+ueg==
+	selector1; bh=uWaBWJYxBkUNO48/o8MmvLtGPToyy8i14IR+7MRvnVU=; b=ET
+	+ak5sm+bza9rbhYKy9OYWDH+7jI8wIfqqW+6gtYW6ArRE2y+T2GH/GDOe1VWpkh0
+	uO81R2KumLG1bUdEzD8kG1xM3omWHGheT5TfDQMv4/gjO2M/VeIS5vboHjxlzy7O
+	7WwXFuc6JrWh+Vz8iD1+SleOjZ4CX2b8YJ5j84DBIx6aZe5VcwB8AAiUsPoBkOED
+	frHc81/92al4zLSYM/q1giJL68niF8nUAPe+MpQ1sODLT7YWrj+klr/45GF8Uw51
+	CzRndY8gkqsWpEqutLCcpLYt377IQ1SBT+h9mnoHOv92MAgCfcP66iCHLEGjSqXd
+	K0GXH9lKMdicU2T1YRKQ==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sctu3tyt6-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sd0730ph1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Aug 2023 16:52:48 +0200 (MEST)
+	Thu, 10 Aug 2023 16:57:15 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 78358100064;
-	Thu, 10 Aug 2023 16:52:29 +0200 (CEST)
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 92AFF100053;
+	Thu, 10 Aug 2023 16:57:01 +0200 (CEST)
 Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6F44E2194DD;
-	Thu, 10 Aug 2023 16:52:29 +0200 (CEST)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 893DA2248B0;
+	Thu, 10 Aug 2023 16:57:01 +0200 (CEST)
 Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
  (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
- 2023 16:52:28 +0200
-Message-ID: <e5decb2b-f456-dfc8-5a91-76b102d8b9fd@foss.st.com>
-Date: Thu, 10 Aug 2023 16:52:27 +0200
+ 2023 16:57:00 +0200
+Message-ID: <43ea0060-ed69-4efe-4a39-224aa67ae9b8@foss.st.com>
+Date: Thu, 10 Aug 2023 16:57:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH net-next v3 08/10] net: stmmac: platform: support parsing
- safety irqs from DT
+Subject: Re: [PATCH net-next v3 10/10] net: stmmac: platform: support parsing
+ per channel irq from DT
 Content-Language: en-US
 To: Jisheng Zhang <jszhang@kernel.org>,
         "David S . Miller"
@@ -79,9 +79,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>
 References: <20230809165007.1439-1-jszhang@kernel.org>
- <20230809165007.1439-9-jszhang@kernel.org>
+ <20230809165007.1439-11-jszhang@kernel.org>
 From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20230809165007.1439-9-jszhang@kernel.org>
+In-Reply-To: <20230809165007.1439-11-jszhang@kernel.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.201.21.122]
@@ -97,41 +97,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 8/9/23 18:50, Jisheng Zhang wrote:
-> The snps dwmac IP may support safety features, and those Safety
-> Feature Correctible Error and Uncorrectible Error irqs may be
-> separate irqs. Add support to parse the safety irqs from DT.
+> The snps dwmac IP may support per channel interrupt. Add support to
+> parse the per channel irq from DT.
 > 
 > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 > ---
->   .../net/ethernet/stmicro/stmmac/stmmac_platform.c    | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
+>   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 10 ++++----
+>   .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++++++++++++++++++
+>   2 files changed, 29 insertions(+), 4 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 4ed5c976c7a3..245eeb7d3e83 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3612,7 +3612,7 @@ static int stmmac_request_irq_multi(struct net_device *dev)
+>   	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
+>   		if (i >= MTL_MAX_RX_QUEUES)
+>   			break;
+> -		if (priv->rx_irq[i] == 0)
+> +		if (priv->rx_irq[i] <= 0)
+
+What do you fix here ?
+
+>   			continue;
+>   
+>   		int_name = priv->int_name_rx_irq[i];
+> @@ -3637,7 +3637,7 @@ static int stmmac_request_irq_multi(struct net_device *dev)
+>   	for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
+>   		if (i >= MTL_MAX_TX_QUEUES)
+>   			break;
+> -		if (priv->tx_irq[i] == 0)
+> +		if (priv->tx_irq[i] <= 0)
+
+same here
+>   			continue;
+>   
+>   		int_name = priv->int_name_tx_irq[i];
+> @@ -7278,8 +7278,10 @@ int stmmac_dvr_probe(struct device *device,
+>   	priv->plat = plat_dat;
+>   	priv->ioaddr = res->addr;
+>   	priv->dev->base_addr = (unsigned long)res->addr;
+> -	priv->plat->dma_cfg->perch_irq_en =
+> -		(priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN);
+> +	if (res->rx_irq[0] > 0 && res->tx_irq[0] > 0) {
+> +		priv->plat->flags |= STMMAC_FLAG_PERCH_IRQ_EN;
+> +		priv->plat->dma_cfg->perch_irq_en = true;
+> +	}
+>   
+>   	priv->dev->irq = res->irq;
+>   	priv->wol_irq = res->wol_irq;
 > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index 23d53ea04b24..29145682b57b 100644
+> index 29145682b57b..9b46775b41ab 100644
 > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -738,6 +738,18 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+> @@ -705,6 +705,9 @@ EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
+>   int stmmac_get_platform_resources(struct platform_device *pdev,
+>   				  struct stmmac_resources *stmmac_res)
+>   {
+> +	char irq_name[8];
+> +	int i;
+> +
+>   	memset(stmmac_res, 0, sizeof(*stmmac_res));
+>   
+>   	/* Get IRQ information early to have an ability to ask for deferred
+> @@ -738,6 +741,26 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
 >   		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
 >   	}
 >   
-> +	stmmac_res->sfty_ce_irq = platform_get_irq_byname_optional(pdev, "sfty_ce");
-> +	if (stmmac_res->sfty_ce_irq < 0) {
-> +		if (stmmac_res->sfty_ce_irq == -EPROBE_DEFER)
-> +			return -EPROBE_DEFER;
+> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
+> +		snprintf(irq_name, sizeof(irq_name), "rx%i", i);
+> +		stmmac_res->rx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
+> +		if (stmmac_res->rx_irq[i] < 0) {
+> +			if (stmmac_res->rx_irq[i] == -EPROBE_DEFER)
+> +				return -EPROBE_DEFER;
+> +			break;
+> +		}
 > +	}
 > +
-> +	stmmac_res->sfty_ue_irq = platform_get_irq_byname_optional(pdev, "sfty_ue");
-> +	if (stmmac_res->sfty_ue_irq < 0) {
-> +		if (stmmac_res->sfty_ue_irq == -EPROBE_DEFER)
-> +			return -EPROBE_DEFER;
+> +	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
+> +		snprintf(irq_name, sizeof(irq_name), "tx%i", i);
+> +		stmmac_res->tx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
+> +		if (stmmac_res->tx_irq[i] < 0) {
+> +			if (stmmac_res->tx_irq[i] == -EPROBE_DEFER)
+> +				return -EPROBE_DEFER;
+> +			break;
+> +		}
 > +	}
 > +
->   	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
->   
->   	return PTR_ERR_OR_ZERO(stmmac_res->addr);
-Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-
-Regards
-Alex
+>   	stmmac_res->sfty_ce_irq = platform_get_irq_byname_optional(pdev, "sfty_ce");
+>   	if (stmmac_res->sfty_ce_irq < 0) {
+>   		if (stmmac_res->sfty_ce_irq == -EPROBE_DEFER)
 
 
