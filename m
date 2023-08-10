@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-26581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC8C778434
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:40:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB599778435
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D5111C20A91
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC6D31C20E66
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030A218AE5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B9C23BEC;
 	Thu, 10 Aug 2023 23:38:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C591ADCF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52BC1ADD7
 	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:38:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2953C433AB;
-	Thu, 10 Aug 2023 23:38:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C42AC433AD;
+	Thu, 10 Aug 2023 23:38:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691710733;
-	bh=ipCYduD5IWphIcHahDO5BwCi+YU71xnU3tJzhC8Ocyw=;
+	bh=W/Ur4vjq0RMNYT46/HA26fDAt0engewK2fNICkBLH7U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nCDvb0R/lpLKd6v9KNtCI+oWrIqET1Sacy8vu7IozBT8FitoBHejfA021kMO0/Iqx
-	 huepp+00pQNs7LHmd55MV6vZlGzojWlAk1TBZkfHd1r5J9UuaHljYOhAvkmsn9Ls5+
-	 kjaY4emG7ChA7BOU9Ewg3+lFMi16fsv37K6tvdtGFDtGCHRAa5c0AJr6ZLvobwFuGS
-	 aDtWFnv6ymT7Yfciee5hxWgjK9uB1aFZIfKGV5pR/0g0luJH+vCW+FJVCXgswHUFrm
-	 pe0E+87Xnktst5R0J284j3bm25AFI3MhSM8UKBzQ7pHW3Vr5CHu/eI/k+APLBfF4Qb
-	 H6wyyYM3LXFpw==
+	b=vHrAQ0uLjUwTYI6cUtpW8FrQ/vTGccX8fRKfN3PtAZhrFngPnvFsLsiNWQwGCIMAu
+	 hV+29vOXu7ZRFkGZyeJdHqpnKp9Vi2trvk1E0J9wjF/LQhlJA1BUVJXGb6rg2HRB74
+	 MF196lTjBqoJwBECnW/ykMB0mPITf5R1O960+KSAMbgGl50XBMcI97tw16jzKladVA
+	 Tr6HtJpwBs6ehbaeWX6NDE+DxLWllCOK1MfXZz0myzT4wtPtB6koNQk23Nj6FUMUDq
+	 9Rv4PHjZV9vnCEWlBYiQTF8jhLwRq4WYde90ReGO+3rHyLPoLJ/0WXGq4mr+YT4SSf
+	 DDQHy0EH3Fvnw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	johannes@sipsolutions.net,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 06/10] genetlink: add a family pointer to struct genl_info
-Date: Thu, 10 Aug 2023 16:38:41 -0700
-Message-ID: <20230810233845.2318049-7-kuba@kernel.org>
+Subject: [PATCH net-next v2 07/10] genetlink: add genlmsg_iput() API
+Date: Thu, 10 Aug 2023 16:38:42 -0700
+Message-ID: <20230810233845.2318049-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230810233845.2318049-1-kuba@kernel.org>
 References: <20230810233845.2318049-1-kuba@kernel.org>
@@ -52,114 +52,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Having family in struct genl_info is quite useful. It cuts
-down the number of arguments which need to be passed to
-helpers which already take struct genl_info.
+Add some APIs and helpers required for convenient construction
+of replies and notifications based on struct genl_info.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/net/genetlink.h |  4 ++--
- net/netlink/genetlink.c | 21 ++++++++++++---------
- 2 files changed, 14 insertions(+), 11 deletions(-)
+ include/net/genetlink.h | 54 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/genetlink.h b/include/net/genetlink.h
-index a8a15b9c22c8..6b858c4cba5b 100644
+index 6b858c4cba5b..e18a4c0d69ee 100644
 --- a/include/net/genetlink.h
 +++ b/include/net/genetlink.h
-@@ -93,6 +93,7 @@ struct genl_family {
-  * struct genl_info - receiving information
-  * @snd_seq: sending sequence number
-  * @snd_portid: netlink portid of sender
-+ * @family: generic netlink family
-  * @nlhdr: netlink message header
-  * @genlhdr: generic netlink message header
-  * @attrs: netlink attributes
-@@ -103,6 +104,7 @@ struct genl_family {
- struct genl_info {
- 	u32			snd_seq;
- 	u32			snd_portid;
-+	const struct genl_family *family;
- 	const struct nlmsghdr *	nlhdr;
- 	struct genlmsghdr *	genlhdr;
- 	struct nlattr **	attrs;
-@@ -247,13 +249,11 @@ struct genl_split_ops {
- 
- /**
-  * struct genl_dumpit_info - info that is available during dumpit op call
-- * @family: generic netlink family - for internal genl code usage
-  * @op: generic netlink ops - for internal genl code usage
-  * @attrs: netlink attributes
-  * @info: struct genl_info describing the request
-  */
- struct genl_dumpit_info {
--	const struct genl_family *family;
- 	struct genl_split_ops op;
- 	struct genl_info info;
+@@ -113,7 +113,7 @@ struct genl_info {
+ 	struct netlink_ext_ack *extack;
  };
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index d47879d5a74c..8315d31b53db 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -844,8 +844,8 @@ static int genl_start(struct netlink_callback *cb)
- 		genl_family_rcv_msg_attrs_free(attrs);
- 		return -ENOMEM;
- 	}
--	info->family = ctx->family;
- 	info->op = *ops;
-+	info->info.family	= ctx->family;
- 	info->info.snd_seq	= cb->nlh->nlmsg_seq;
- 	info->info.snd_portid	= NETLINK_CB(cb->skb).portid;
- 	info->info.nlhdr	= cb->nlh;
-@@ -872,11 +872,12 @@ static int genl_start(struct netlink_callback *cb)
  
- static int genl_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+-static inline struct net *genl_info_net(struct genl_info *info)
++static inline struct net *genl_info_net(const struct genl_info *info)
  {
--	struct genl_dumpit_info *info = cb->data;
--	const struct genl_split_ops *ops = &info->op;
-+	struct genl_dumpit_info *dump_info = cb->data;
-+	const struct genl_split_ops *ops = &dump_info->op;
-+	struct genl_info *info = &dump_info->info;
- 	int rc;
- 
--	info->info.extack = cb->extack;
-+	info->extack = cb->extack;
- 
- 	genl_op_lock(info->family);
- 	rc = ops->dumpit(skb, cb);
-@@ -886,19 +887,20 @@ static int genl_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 
- static int genl_done(struct netlink_callback *cb)
- {
--	struct genl_dumpit_info *info = cb->data;
--	const struct genl_split_ops *ops = &info->op;
-+	struct genl_dumpit_info *dump_info = cb->data;
-+	const struct genl_split_ops *ops = &dump_info->op;
-+	struct genl_info *info = &dump_info->info;
- 	int rc = 0;
- 
--	info->info.extack = cb->extack;
-+	info->extack = cb->extack;
- 
- 	if (ops->done) {
- 		genl_op_lock(info->family);
- 		rc = ops->done(cb);
- 		genl_op_unlock(info->family);
- 	}
--	genl_family_rcv_msg_attrs_free(info->info.attrs);
--	genl_dumpit_info_free(info);
-+	genl_family_rcv_msg_attrs_free(info->attrs);
-+	genl_dumpit_info_free(dump_info);
- 	return rc;
+ 	return read_pnet(&info->_net);
+ }
+@@ -270,6 +270,32 @@ genl_info_dump(struct netlink_callback *cb)
+ 	return &genl_dumpit_info(cb)->info;
  }
  
-@@ -952,6 +954,7 @@ static int genl_family_rcv_msg_doit(const struct genl_family *family,
++/**
++ * genl_info_init_ntf() - initialize genl_info for notifications
++ * @info:   genl_info struct to set up
++ * @family: pointer to the genetlink family
++ * @cmd:    command to be used in the notification
++ *
++ * Initialize a locally declared struct genl_info to pass to various APIs.
++ * Intended to be used when creating notifications.
++ */
++static inline void
++genl_info_init_ntf(struct genl_info *info, const struct genl_family *family,
++		   u8 cmd)
++{
++	struct genlmsghdr *hdr = (void *) &info->user_ptr[0];
++
++	memset(info, 0, sizeof(*info));
++	info->family = family;
++	info->genlhdr = hdr;
++	hdr->cmd = cmd;
++}
++
++static inline bool genl_info_is_ntf(const struct genl_info *info)
++{
++	return !info->nlhdr;
++}
++
+ int genl_register_family(struct genl_family *family);
+ int genl_unregister_family(const struct genl_family *family);
+ void genl_notify(const struct genl_family *family, struct sk_buff *skb,
+@@ -278,6 +304,32 @@ void genl_notify(const struct genl_family *family, struct sk_buff *skb,
+ void *genlmsg_put(struct sk_buff *skb, u32 portid, u32 seq,
+ 		  const struct genl_family *family, int flags, u8 cmd);
  
- 	info.snd_seq = nlh->nlmsg_seq;
- 	info.snd_portid = NETLINK_CB(skb).portid;
-+	info.family = family;
- 	info.nlhdr = nlh;
- 	info.genlhdr = nlmsg_data(nlh);
- 	info.attrs = attrbuf;
++static inline void *
++__genlmsg_iput(struct sk_buff *skb, const struct genl_info *info, int flags)
++{
++	return genlmsg_put(skb, info->snd_portid, info->snd_seq, info->family,
++			   flags, info->genlhdr->cmd);
++}
++
++/**
++ * genlmsg_iput - start genetlink message based on genl_info
++ * @skb: skb in which message header will be placed
++ * @info: genl_info as provided to do/dump handlers
++ *
++ * Convenience wrapper which starts a genetlink message based on
++ * information in user request. @info should be either the struct passed
++ * by genetlink core to do/dump handlers (when constructing replies to
++ * such requests) or a struct initialized by genl_info_init_ntf()
++ * when constructing notifications.
++ *
++ * Returns pointer to new genetlink header.
++ */
++static inline void *
++genlmsg_iput(struct sk_buff *skb, const struct genl_info *info)
++{
++	return __genlmsg_iput(skb, info, 0);
++}
++
+ /**
+  * genlmsg_nlhdr - Obtain netlink header from user specified header
+  * @user_hdr: user header as returned from genlmsg_put()
 -- 
 2.41.0
 
