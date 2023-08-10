@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-26567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5E07782B0
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:29:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244AE7782BF
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:33:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 614FE1C20D3A
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:29:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A8A281DB8
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E417B23BD9;
-	Thu, 10 Aug 2023 21:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D4023BE0;
+	Thu, 10 Aug 2023 21:33:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F9420F92
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 21:29:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9BDBC433C7;
-	Thu, 10 Aug 2023 21:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D8B20F92;
+	Thu, 10 Aug 2023 21:33:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBDB1C433C7;
+	Thu, 10 Aug 2023 21:33:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691702990;
-	bh=udij2PLbfirwon6in/VcXMGaiWAROe2LPcfk4aF2xiA=;
+	s=k20201202; t=1691703194;
+	bh=JBEQ5T1F14iE3Zlr18krO6C0aeBqKMC+YkVjR6hTAKE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kr4fT1MZ5n4GcU6trzHtMM5Y0K2DmSAq6NFe0l/WM2mtlZQTgFAYtRe7GiNfmHtki
-	 GkMwXKRH29jk22YBx5KtKeMnebZaxeX6+GM35fEtCbSX0ToaJy2HXrRz7ZvWHo/ADf
-	 HiFtf8j9CS3CqUNg2LzSSzalFMq/aG6x4NkCc+gVxJJKSKo7xBvgoXdBS2wzdyFfHV
-	 ESvT848fAvMkyl3rMEKWJZYchVB/JBlBSmEAlUGPbHHsG163YyagOEVG9HW+FASyzU
-	 P83eyNvkLm4TBsrlRGOO+G1y78XpBvTN4RLSA05q4FNQwqJMSMXKKkOJk1Ezxwpb8j
-	 fqMNoWQC9exYQ==
-Date: Thu, 10 Aug 2023 14:29:49 -0700
+	b=HGR22EXasfk4ZbhpXoPYbEO2wCbWe3SbL1ihE1nb0nktAFimGi9WQTos5Wjf2Mumu
+	 PKx/gjQb3wpGOeaY91jJf7iRvIqWDtq3jxUO0ypEp85peIKyq7vBCMyXkrRjuHWOY/
+	 Id+UdzGGyAqoK4MsProUIQp+naFaj7oVWdnQsoemNeW11od0ZM63VAfsAIhJz8vhFm
+	 AHE2KBpOi5/hnyrx/1hht8I4eE0C3VpSnCkKrYpMQlcGA6kluEHcW16I0kN9tvgmTZ
+	 kqYJYg7CSxcyXu6NRlOJrk6XU09q3Pw1m5att8fZGRoUc4UQhpQDSUpqCxDb29Lv8M
+	 m0rJ7YnFboBXQ==
+Date: Thu, 10 Aug 2023 14:33:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, xieyongji@bytedance.com,
- jasowang@redhat.com, david.marchand@redhat.com, lulu@redhat.com,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, xuanzhuo@linux.alibaba.com, eperezma@redhat.com
-Subject: Re: [PATCH v3 0/3] vduse: add support for networking devices
-Message-ID: <20230810142949.074c9430@kernel.org>
-In-Reply-To: <20230810150347-mutt-send-email-mst@kernel.org>
-References: <20230705100430.61927-1-maxime.coquelin@redhat.com>
-	<20230810150347-mutt-send-email-mst@kernel.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ daniel@iogearbox.net, andrii@kernel.org, ast@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: pull-request: bpf-next 2023-08-09
+Message-ID: <20230810143313.016929c5@kernel.org>
+In-Reply-To: <b3d4972e-2a08-d627-db2f-64dfd4e96bde@linux.dev>
+References: <20230810055123.109578-1-martin.lau@linux.dev>
+	<20230810141926.49f4c281@kernel.org>
+	<b3d4972e-2a08-d627-db2f-64dfd4e96bde@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,14 +51,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 10 Aug 2023 15:04:27 -0400 Michael S. Tsirkin wrote:
-> Another question is that with this userspace can inject
-> packets directly into net stack. Should we check CAP_NET_ADMIN
-> or such?
+On Thu, 10 Aug 2023 14:26:01 -0700 Martin KaFai Lau wrote:
+> On 8/10/23 2:19 PM, Jakub Kicinski wrote:
+> > On Wed,  9 Aug 2023 22:51:23 -0700 Martin KaFai Lau wrote:  
+> >>        bpf: fix bpf_dynptr_slice() to stop return an ERR_PTR.  
+> > 
+> > This one looks like solid bpf material TBH, any reason it's here?  
+> 
+> There is an earlier bpf_dynptr_check_off_len() call which should have caught 
+> that already, so ERR_PTR case should not happen.
+> https://lore.kernel.org/bpf/e0e8bf3b-70af-3827-2fa3-30f3d48bcf46@linux.dev/
 
-Directly into the stack? I thought VDUSE is vDPA in user space,
-meaning to get to the kernel the packet has to first go thru 
-a virtio-net instance.
-
-Or you mean directly into the network?
+That kind of info needs to be in the commit message :(
 
