@@ -1,235 +1,107 @@
-Return-Path: <netdev+bounces-26244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D8B7774F1
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 11:53:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8991E7774F8
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 11:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 148A61C21446
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE6E228201B
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8EB1EA98;
-	Thu, 10 Aug 2023 09:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C3B1ED20;
+	Thu, 10 Aug 2023 09:55:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B0F1E52C
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 09:53:42 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B33110CF;
-	Thu, 10 Aug 2023 02:53:41 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37A9rIxN072696;
-	Thu, 10 Aug 2023 04:53:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691661198;
-	bh=jKsz+QezJgKkJLCN1kbDV84OpiUUPkN/WbTbkJt1HdY=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=xUm5EL9LUwZFMYXKAEvp6+dtJWq+cUyu58mA4Nzl7c0xNoKd0FwuXZ85/kXCag7I0
-	 JP0bty0+TFU0DZhdLK0t6o1Pi5JLA+vqKea6mElYLh9Qp3Tb0ygQY7q0LWqBORc6av
-	 syLGxXF+ZFJkiKm3XP9tg2KeATyTIGlw/wOnDKak=
-Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37A9rIrZ028007
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 10 Aug 2023 04:53:18 -0500
-Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 10
- Aug 2023 04:53:18 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 10 Aug 2023 04:53:18 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37A9rBvY110323;
-	Thu, 10 Aug 2023 04:53:12 -0500
-Message-ID: <0b619ec5-9a86-a449-e8db-b12cca115b93@ti.com>
-Date: Thu, 10 Aug 2023 15:23:11 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3431E51F
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 09:55:17 +0000 (UTC)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F13E7F
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:55:16 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-4fe1c285690so1014300e87.3
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:55:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691661315; x=1692266115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kJN6PmBUbtaOFJo3kd3/wgKNS54x0sUQI5Hg4mm3fE8=;
+        b=HxKdoY1jczNlJRSW36ZBlzMOMPt480cRAgPSP3hHz2sUR/T/NUI+djlCICBK6gLUOy
+         zboeYaoFrIwTnDB10gcaVMGSBxPwefpqdGjpBXDF6gcduRRir2e8lf85YuH/WIlbH0n/
+         N1Yil6T2wjKrl9VN5719NQl3HsrnQJ7ewton4RXeJxIS0y4L6xsPGTIxddk2XqZ6hef6
+         1txIOVqpqiKeU5OnF3aV2jDu+x6sMV8/yL7D7LOvF6OcJDhsYkXXNuXgya9H+TNpu+CL
+         xDvP1Xc0j2LH32Wn/Zi/ayl6K/4BS6LMi9thXVOUycRVjpxsROUuBZxdbM5p80p0tP8t
+         6lfA==
+X-Gm-Message-State: AOJu0YzDCJuSD426MxVVnTL+NaSsSP634M50Isgft0uoeXMV8u1x1R5O
+	ZxnAxR6vZ08l3AVQtQgnKxw=
+X-Google-Smtp-Source: AGHT+IE2AkJmXXuGWhTypN9WOBFdEM62pvLGxgMfL/HueD6DoiK8TB+gHFVF51OCRQlXzGRsyDHs9w==
+X-Received: by 2002:ac2:548e:0:b0:4fd:e113:f5fa with SMTP id t14-20020ac2548e000000b004fde113f5famr1429964lfk.7.1691661314654;
+        Thu, 10 Aug 2023 02:55:14 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-001.fbsv.net. [2a03:2880:31ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id k9-20020a1709065fc900b0099329b3ab67sm703957ejv.71.2023.08.10.02.55.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 02:55:14 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: rdunlap@infradead.org,
+	benjamin.poirier@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next v5 0/2] netconsole: Enable compile time configuration
+Date: Thu, 10 Aug 2023 02:54:49 -0700
+Message-Id: <20230810095452.3171106-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [EXTERNAL] Re: [PATCH v3 1/5] dt-bindings: net: Add ICSS IEP
-Content-Language: en-US
-To: Conor Dooley <conor@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
-CC: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230809114906.21866-1-danishanwar@ti.com>
- <20230809114906.21866-2-danishanwar@ti.com>
- <20230809-cardboard-falsify-6cc9c09d8577@spud>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <20230809-cardboard-falsify-6cc9c09d8577@spud>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Conor,
+Enable netconsole features to be set at compilation time. Create two
+Kconfig options that allow users to set extended logs and release
+prepending features at compilation time.
 
-On 10/08/23 3:07 am, Conor Dooley wrote:
-> Hey,
-> 
-> On Wed, Aug 09, 2023 at 05:19:02PM +0530, MD Danish Anwar wrote:
->> Add DT binding documentation for ICSS IEP module.
->>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>  .../devicetree/bindings/net/ti,icss-iep.yaml  | 37 +++++++++++++++++++
->>  1 file changed, 37 insertions(+)
->>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
->> new file mode 100644
->> index 000000000000..adae240cfd53
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
->> @@ -0,0 +1,37 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
-> 
-> Does the module here refer to the hw component or to the linux kernel
-> module?
-> 
+The first patch de-duplicates the initialization code, and the second
+patch adds the support in the de-duplicated code, avoiding touching two
+different functions with the same change.
 
-The module here refers to the hardware component.
+  v1 -> v2:
+	* Improvements in the Kconfig help section.
 
->> +
->> +maintainers:
->> +  - Md Danish Anwar <danishanwar@ti.com>
->> +
->> +properties:
->> +  compatible:
->> +    enum:
->> +      - ti,am654-icss-iep   # for all TI K3 SoCs
-> 
-> *sigh* Please at least give me a chance to reply to the conversation on
-> the previous versions of the series before sending more, that's the
-> second time with this series :/
+  v2 -> v3:
+	* Honour the Kconfig settings when creating sysfs targets
+	* Add "by default" in a Kconfig help.
 
-My bad, I should have waited for your response. I will hold on posting next
-version until your response is received.
+  v3 -> v4:
+	* Create an additional patch, de-duplicating the initialization
+	  code for netconsole_target, and just patching it.
 
-> Right now this looks worse to me than what we started with given the
-> comment is even broader. I have not changed my mind re: what I said on
-> the previous version.
-> 
-
-OK, so in the previous version [1] your reply was to have specific compatibles
-as bindings with "ti-am654-icss-iep" as a fall back. I will go with this only.
-
-Does the below looks good to you? Here "ti,am642-icss-iep" and
-"ti,j721e-icss-iep" are different compatibles for different SoCs where as
-"ti,am654-icss-iep" is the fall back. Compatible "ti,am654-icss-iep" will go in
-the driver.
-
-properties:
-  compatible:
-    oneOf:
-      - items:
-          - enum:
-              - ti,am642-icss-iep
-              - ti,j721e-icss-iep
-          - const: ti,am654-icss-iep
-
-      - items:
-          - const: ti,am654-icss-iep
-
-examples:
-  - |
-
-    /* AM65x */
-    icssg0_iep0: iep@2e000 {
-        compatible = "ti,am654-icss-iep";
-        reg = <0x2e000 0x1000>;
-        clocks = <&icssg0_iepclk_mux>;
-    };
-
-    /* J721E */
-    icssg0_iep0: iep@2f000 {
-        compatible = "ti,j721e-icss-iep","ti,am654-icss-iep";
-        reg = <0x2e000 0x1000>;
-        clocks = <&icssg0_iepclk_mux>;
-    };
+  v4 -> v5:
+	* Remove complex code in the variable initialization.
 
 
-    /* AM64x */
-    icssg0_iep0: iep@2b000 {
-        compatible = "ti,am642-icss-iep", "ti,am654-icss-iep";
-        reg = <0x2e000 0x1000>;
-        clocks = <&icssg0_iepclk_mux>;
-    };
+Breno Leitao (2):
+  netconsole: Create a allocation helper
+  netconsole: Enable compile time configuration
 
-
-Please let me know if the compatible property and the example looks OK to you.
-Also please let me know if some other change is required. I will send next
-revision after your confirmation.
-
-> Thanks,
-> Conor.
-> 
->> +
->> +  reg:
->> +    maxItems: 1
->> +
->> +  clocks:
->> +    maxItems: 1
->> +    description: phandle to the IEP source clock
->> +
->> +required:
->> +  - compatible
->> +  - reg
->> +  - clocks
->> +
->> +additionalProperties: false
->> +
->> +examples:
->> +  - |
->> +    icssg0_iep0: iep@2e000 {
->> +        compatible = "ti,am654-icss-iep";
->> +        reg = <0x2e000 0x1000>;
->> +        clocks = <&icssg0_iepclk_mux>;
->> +    };
->> -- 
->> 2.34.1
->>
-
-[1] https://lore.kernel.org/all/20230808-nutmeg-mashing-543b41e56aa1@spud/
+ drivers/net/Kconfig      | 22 +++++++++++++++++++
+ drivers/net/netconsole.c | 47 +++++++++++++++++++++++-----------------
+ 2 files changed, 49 insertions(+), 20 deletions(-)
 
 -- 
-Thanks and Regards,
-Danish.
+2.34.1
+
 
