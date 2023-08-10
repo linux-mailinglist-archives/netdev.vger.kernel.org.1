@@ -1,116 +1,155 @@
-Return-Path: <netdev+bounces-26342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4146777916
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:06:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A90F77791A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91CE9282055
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:06:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 555DE1C21523
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9F31E1C3;
-	Thu, 10 Aug 2023 13:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7CE1E1C4;
+	Thu, 10 Aug 2023 13:08:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5451E1A3
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:06:36 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4711B2698;
-	Thu, 10 Aug 2023 06:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1691672796; x=1723208796;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YhVLeHe7hIFvREZYFRzYBtmlRfE8xXBsnawNuJxDi3c=;
-  b=c+bnVuPN+by49YNRYOn1T8Md9RlZTBZHQv3dRfiqiWWsGaBmIgpofygK
-   UtA6AGWphckknv7eS6kat4CBpgORgxLx7rJJC3MezxXBjpCC5ZJolojgx
-   nu5LuRNXLTT6DIXmmVMG+021k6JX/XjH25ECLKjzp0InK2BZM7taqBcHz
-   n6+8yxtQuW2euYpXIz6jmQiRviWyCHKSiCaK83jKKavXSVugr9gIBJiA1
-   lZGZhrPt6E0NpHt88js6tSb0C+6GWBOrgFD9vwGsOsWaFD4lF4J0g4FEy
-   vSOHXHMvWC6TXNnaE7dYS8ed/RJdjegvjT8z+jvgyFp97h4AQhvj0jhgq
-   A==;
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="asc'?scan'208";a="224802819"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 10 Aug 2023 06:06:35 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 10 Aug 2023 06:06:34 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Thu, 10 Aug 2023 06:06:30 -0700
-Date: Thu, 10 Aug 2023 14:05:52 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Md Danish Anwar <a0501179@ti.com>
-CC: Conor Dooley <conor@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
-	Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-	Simon Horman <simon.horman@corigine.com>, Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>, Richard Cochran
-	<richardcochran@gmail.com>, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
-	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v3 1/5] dt-bindings: net: Add ICSS IEP
-Message-ID: <20230810-wise-mousy-8841c8880353@wendy>
-References: <20230809114906.21866-1-danishanwar@ti.com>
- <20230809114906.21866-2-danishanwar@ti.com>
- <20230809-cardboard-falsify-6cc9c09d8577@spud>
- <0b619ec5-9a86-a449-e8db-b12cca115b93@ti.com>
- <20230810-drippy-draw-8e8a63164e46@wendy>
- <593b3505-9c1e-47e6-e856-f299fc257fa8@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007C51E1A1
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:08:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72903136
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:08:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691672880;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gv2PHDy05xeKCb4ONOqV5jsjjW0Plf8giK9Cu4AytwA=;
+	b=e22Gi62pAA3I75ahRh7K2HlvZEg/lXqtedvU6BVIYvHgULp/AtR2Lmx532NWTGNP3qI56b
+	gwh7xtj/WIAqKfZSIBZaZgMTeh4ArIcljDrqzRGlqRhRebWe/9N7AQ7/h7eoISbijR8GQ5
+	IPcaJAPPIJeWmaneMMWy1536pnchPrk=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-12-YI7mgYmVP4al5-pb-1FX0A-1; Thu, 10 Aug 2023 09:07:55 -0400
+X-MC-Unique: YI7mgYmVP4al5-pb-1FX0A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A46151C07263;
+	Thu, 10 Aug 2023 13:07:53 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.185])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 33D24C15BB8;
+	Thu, 10 Aug 2023 13:07:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com>
+References: <f0538006-6641-eaf6-b7b5-b3ef57afc652@gmail.com> <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com> <4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com> <20230522121125.2595254-1-dhowells@redhat.com> <20230522121125.2595254-9-dhowells@redhat.com> <2267272.1686150217@warthog.procyon.org.uk> <5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com> <776549.1687167344@warthog.procyon.org.uk> <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com> <20230630102143.7deffc30@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
+    netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    David Ahern <dsahern@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Al Viro <viro@zeniv.linux.org.uk>,
+    Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+    Jeff Layton <jlayton@kernel.org>,
+    Christian Brauner <brauner@kernel.org>,
+    Chuck Lever III <chuck.lever@oracle.com>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+    linux-mm@kvack.org, Boris Pismenny <borisp@nvidia.com>,
+    John Fastabend <john.fastabend@gmail.com>,
+    Gal Pressman <gal@nvidia.com>, ranro@nvidia.com, samiram@nvidia.com,
+    drort@nvidia.com, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lQFFhBRnHv9kDzPj"
-Content-Disposition: inline
-In-Reply-To: <593b3505-9c1e-47e6-e856-f299fc257fa8@ti.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3480242.1691672869.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 10 Aug 2023 14:07:49 +0100
+Message-ID: <3480243.1691672869@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---lQFFhBRnHv9kDzPj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Tariq Toukan <ttoukan.linux@gmail.com> wrote:
 
-On Thu, Aug 10, 2023 at 06:27:22PM +0530, Md Danish Anwar wrote:
->=20
-> Sure Conor, I will remove items from the last one and make it just const =
-like
-> below. Please let me know if this is ok.
+> We are collecting more info on how the repro is affected by the differen=
+t
+> parameters.
 
-Yeah, that looks okay to me, thanks.
+I'm wondering if userspace is feeding the unspliceable page in somehow.  C=
+ould
+you try running with the attached changes?  It might help catch the point =
+at
+which the offending page is first spliced into the pipe and any backtrace
+might help localise the driver that's producing it.
 
---lQFFhBRnHv9kDzPj
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
+David
+---
+diff --git a/fs/splice.c b/fs/splice.c
+index 3e2a31e1ce6a..877df1de3863 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -218,6 +218,8 @@ ssize_t splice_to_pipe(struct pipe_inode_info *pipe,
+ 	while (!pipe_full(head, tail, pipe->max_usage)) {
+ 		struct pipe_buffer *buf =3D &pipe->bufs[head & mask];
+ =
 
------BEGIN PGP SIGNATURE-----
++		WARN_ON_ONCE(!sendpage_ok(spd->pages[page_nr]));
++
+ 		buf->page =3D spd->pages[page_nr];
+ 		buf->offset =3D spd->partial[page_nr].offset;
+ 		buf->len =3D spd->partial[page_nr].len;
+@@ -252,6 +254,8 @@ ssize_t add_to_pipe(struct pipe_inode_info *pipe, stru=
+ct pipe_buffer *buf)
+ 	unsigned int mask =3D pipe->ring_size - 1;
+ 	int ret;
+ =
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNTgsAAKCRB4tDGHoIJi
-0qKdAP9zF9maVrY4ug5wrMq10xgDfH9HIUNUkVyNZtsiVQAJ8gEA02aF5QxHHj/S
-/GpcJBK9yWb+MPymVq1kN8VFnt1SNgQ=
-=fNDU
------END PGP SIGNATURE-----
++	WARN_ON_ONCE(!sendpage_ok(buf->page));
++
+ 	if (unlikely(!pipe->readers)) {
+ 		send_sig(SIGPIPE, current, 0);
+ 		ret =3D -EPIPE;
+@@ -861,6 +865,8 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe,=
+ struct file *out,
+ 				break;
+ 			}
+ =
 
---lQFFhBRnHv9kDzPj--
++			WARN_ON_ONCE(!sendpage_ok(buf->page));
++
+ 			bvec_set_page(&bvec[bc++], buf->page, seg, buf->offset);
+ 			remain -=3D seg;
+ 			if (remain =3D=3D 0 || bc >=3D ARRAY_SIZE(bvec))
+@@ -1411,6 +1417,8 @@ static int iter_to_pipe(struct iov_iter *from,
+ 		for (i =3D 0; i < n; i++) {
+ 			int size =3D min_t(int, left, PAGE_SIZE - start);
+ =
+
++			WARN_ON_ONCE(!sendpage_ok(pages[i]));
++
+ 			buf.page =3D pages[i];
+ 			buf.offset =3D start;
+ 			buf.len =3D size;
+
 
