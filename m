@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-26543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B7E67780C2
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:50:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56C07780BB
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02F51281262
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:50:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EF67281FFB
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F75F22EFA;
-	Thu, 10 Aug 2023 18:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6092150E;
+	Thu, 10 Aug 2023 18:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F76D1F95D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F72D62A
 	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 12CF7C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A436C433CA;
 	Thu, 10 Aug 2023 18:50:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691693422;
-	bh=SgbQKPSrQjPetGpVTNEWgg6M+ml5nVmTAAna2QG1xJk=;
+	bh=83pI7ohsf9XQ96NY9vRh0auNjVEOrdk1c9s0zdDol+M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UuDvc8Eqq81qBrEZvyjPXtQV6SMIoWgTeluevRIBFhcBHJgp+UD8oECxjoPW3SJ0e
-	 iH23r/0UZSN7G1f8SNTThm6g6Ao7m2bPUc9j2GNG4WJhujvUBAd8Jn5J2MTfGkrxRL
-	 mqHMUNrA8nFzzRdL/aNQXUo2d0l9oRYXi5bPHBgUfrVfCHgKyyQ+AAHiBAfpqzhTKL
-	 OkSpg6LkU6vWXWh4huYMIq06aQCCmhy7Zc51e/AePXutL9mBOfFRTB+5oPpJCRijVi
-	 nDegtxtc3mv7+Nj2j13hbLceXZ5GN42G/YhF/ahIfJsw3krhyZRwqzBM3+nrG6irC3
-	 bDty2LABgdxqw==
+	b=l3ahX9KgKthfG7/mhbLFtUet5Thg/nytPpir8Y6ONdcI3tFlLpV8Cr7VNAzg3Kg29
+	 FArdryOyCvw/izI8LPB9h1arKjkRZcVMY1iZX+hz/0H1B7ypayHraFUp0WLnHBLE8h
+	 IGCghtFT2ydeyVi+T7oYvxEUeeewXcZAAcpWX5hr6nzwJHtbLD8lyNDdZA+3EBVXcf
+	 BvTQi3zwpQFUuf0DDi4aW5Sxk05ZyubPGLIHnBSElZKKLVuYTCbRoqt/r5jHsjSY+L
+	 vuHVitmNRn+1Gdm48f2WM7AMq+OHpsolPiP8EKMD6OD/NAXWbYLdg7wKqOdStmGIcY
+	 3OsrXTtzGH+hw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB099C595C2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFF37C64459;
 	Thu, 10 Aug 2023 18:50:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,38 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: tls: set MSG_SPLICE_PAGES consistently
+Subject: Re: [PATCH net] net: hns3: fix strscpy causing content truncation issue
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169169342195.7825.6502924229390560914.git-patchwork-notify@kernel.org>
+ <169169342191.7825.8966149905125404687.git-patchwork-notify@kernel.org>
 Date: Thu, 10 Aug 2023 18:50:21 +0000
-References: <20230808180917.1243540-1-kuba@kernel.org>
-In-Reply-To: <20230808180917.1243540-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, tariqt@nvidia.com, borisp@nvidia.com,
- john.fastabend@gmail.com, dhowells@redhat.com
+References: <20230809020902.1941471-1-shaojijie@huawei.com>
+In-Reply-To: <20230809020902.1941471-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shenjian15@huawei.com, wangjie125@huawei.com, liuyonglong@huawei.com,
+ chenhao418@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  8 Aug 2023 11:09:17 -0700 you wrote:
-> We used to change the flags for the last segment, because
-> non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
-> That flag is no longer a thing so remove the setting.
+On Wed, 9 Aug 2023 10:09:02 +0800 you wrote:
+> From: Hao Chen <chenhao418@huawei.com>
 > 
-> Since flags most likely don't have MSG_SPLICE_PAGES set
-> this avoids passing parts of the sg as splice and parts
-> as non-splice. Before commit under Fixes we'd have called
-> tcp_sendpage() which would add the MSG_SPLICE_PAGES.
+> hns3_dbg_fill_content()/hclge_dbg_fill_content() is aim to integrate some
+> items to a string for content, and we add '\n' and '\0' in the last
+> two bytes of content.
+> 
+> strscpy() will add '\0' in the last byte of destination buffer(one of
+> items), it result in finishing content print ahead of schedule and some
+> dump content truncation.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: tls: set MSG_SPLICE_PAGES consistently
-    https://git.kernel.org/netdev/net/c/6b486676b41c
+  - [net] net: hns3: fix strscpy causing content truncation issue
+    https://git.kernel.org/netdev/net/c/5e3d20617b05
 
 You are awesome, thank you!
 -- 
