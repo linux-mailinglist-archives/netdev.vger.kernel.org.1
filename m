@@ -1,156 +1,136 @@
-Return-Path: <netdev+bounces-26375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02837777A11
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:02:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A3307779DE
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:47:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0D4A281818
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:02:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D1141C215D2
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C831F95E;
-	Thu, 10 Aug 2023 14:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C9F1DDE0;
+	Thu, 10 Aug 2023 13:45:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18C81F180
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:02:31 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AC1EA
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 07:02:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691676149; x=1723212149;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uG40sUKIZnt2R0Ju/ht3SWKA7islUW0SNsV68XD4/zU=;
-  b=Ldb2VVINs1F+oq0uT1yGdJSXYoGDcwy1ZehfA/risCVgNywUOyGt9Lvd
-   Iy59lWPjDlL/kXVhr65tvtDornVURXLtMcOvoFmyY/vsV+CVPxNxNrGXx
-   KHYtIwqw3W3BAg6W7J0g0bD/1880JD1XMnuHKBbeepT+H6x4ye7rIk+Nh
-   hp0+587KL18S4rPQSKZkNvRWx5cn2WZob8GlOJF2IxNl47PAUlV3C3Gpv
-   bf/kpSj+QaY8ilZvgwt1CaBQZQQGNmwRNdaxPertd5xcW2o6ldrsP4ygA
-   pwMQhvB2rpxjnvZMxDao277p3fDxbKNZxdv6BxqJvoh9Uw8df7evLKoCb
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="402382182"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="402382182"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 06:46:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="725818265"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="725818265"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 10 Aug 2023 06:46:11 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qU5zO-00072P-2P;
-	Thu, 10 Aug 2023 13:46:10 +0000
-Date: Thu, 10 Aug 2023 21:45:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <simon.horman@corigine.com>,
-	Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 09/15] inet: move inet->transparent to
- inet->inet_flags
-Message-ID: <202308102127.hRNurJL6-lkp@intel.com>
-References: <20230810103927.1705940-10-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C7F1E1B2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:45:58 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8604B2132;
+	Thu, 10 Aug 2023 06:45:57 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AClM6D009211;
+	Thu, 10 Aug 2023 15:45:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=qd8558qevje9CkFMuo6OGsMVLyIAZeqVXdpJae7LwQA=; b=Gu
+	3DsyFZQM4ymh8/EvcOJDwKyajC82pfjwqSpEXAJKYZVsLYCTfravJgbpoo/yBnyT
+	eyDEJ1WqdavyVJ89rBUHzeAxlOgEmlBmA/beSMclOPEmu7hTfmyFxTMjUKIN1FAX
+	vBgF8v0MeyMgAPcQNos3ckvvNlIx1V91u0yNsSD8IjiVBvb/xqKcEAjF9/X94uuC
+	BA76ExfKpsJXtdiBUb/3qfQYoud9jJ9pk71VTFAGOLZQVUlJ0d5429JwWmlPZ2E4
+	Sq9VGbkvCVuEqsr8zkXTvzSK4hUmscg7YZeFNne0GkFYLPdA5d2Ur9PaYzkyqdu7
+	Qu6Sq2NqX+2jjweK9bcg==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sd0730afe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Aug 2023 15:45:37 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id A7CBA100053;
+	Thu, 10 Aug 2023 15:45:36 +0200 (CEST)
+Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6E18321BF73;
+	Thu, 10 Aug 2023 15:45:36 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
+ (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
+ 2023 15:45:35 +0200
+Message-ID: <cebcf6a6-8a29-c67a-6dbf-5c561a8c0eb3@foss.st.com>
+Date: Thu, 10 Aug 2023 15:45:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810103927.1705940-10-edumazet@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net-next v3 01/10] net: stmmac: correct RX COE parsing for
+ xgmac
+Content-Language: en-US
+To: Jisheng Zhang <jszhang@kernel.org>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20230809165007.1439-1-jszhang@kernel.org>
+ <20230809165007.1439-2-jszhang@kernel.org>
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20230809165007.1439-2-jszhang@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To EQNDAG1NODE4.st.com
+ (10.75.129.133)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-10_10,2023-08-10_01,2023-05-22_02
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
+On 8/9/23 18:49, Jisheng Zhang wrote:
+> xgmac can support RX COE, but there's no two kinds of COE, I.E type 1
+> and type 2 COE.
+> 
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index e1f1c034d325..15ed3947361b 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6271,7 +6271,7 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
+>   	seq_printf(seq, "\tAV features: %s\n", (priv->dma_cap.av) ? "Y" : "N");
+>   	seq_printf(seq, "\tChecksum Offload in TX: %s\n",
+>   		   (priv->dma_cap.tx_coe) ? "Y" : "N");
+> -	if (priv->synopsys_id >= DWMAC_CORE_4_00) {
+> +	if (priv->synopsys_id >= DWMAC_CORE_4_00 || priv->plat->has_xgmac) {
+>   		seq_printf(seq, "\tIP Checksum Offload in RX: %s\n",
+>   			   (priv->dma_cap.rx_coe) ? "Y" : "N");
+>   	} else {
+> @@ -7013,7 +7013,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+>   	if (priv->plat->rx_coe) {
+>   		priv->hw->rx_csum = priv->plat->rx_coe;
+>   		dev_info(priv->device, "RX Checksum Offload Engine supported\n");
+> -		if (priv->synopsys_id < DWMAC_CORE_4_00)
+> +		if (priv->synopsys_id < DWMAC_CORE_4_00 && !priv->plat->has_xgmac)
+>   			dev_info(priv->device, "COE Type %d\n", priv->hw->rx_csum);
+>   	}
+>   	if (priv->plat->tx_coe)
 
-kernel test robot noticed the following build warnings:
+Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
 
-[auto build test WARNING on net-next/main]
+Regards
+Alex
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/inet-introduce-inet-inet_flags/20230810-184815
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230810103927.1705940-10-edumazet%40google.com
-patch subject: [PATCH net-next 09/15] inet: move inet->transparent to inet->inet_flags
-config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20230810/202308102127.hRNurJL6-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230810/202308102127.hRNurJL6-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308102127.hRNurJL6-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   net/mptcp/sockopt.c: In function 'mptcp_setsockopt_sol_ip_set_transparent':
->> net/mptcp/sockopt.c:689:27: warning: variable 'issk' set but not used [-Wunused-but-set-variable]
-     689 |         struct inet_sock *issk;
-         |                           ^~~~
-
-
-vim +/issk +689 net/mptcp/sockopt.c
-
-4f6e14bd19d6de Maxim Galaganov  2021-12-03  684  
-c9406a23c1161c Florian Westphal 2021-11-19  685  static int mptcp_setsockopt_sol_ip_set_transparent(struct mptcp_sock *msk, int optname,
-c9406a23c1161c Florian Westphal 2021-11-19  686  						   sockptr_t optval, unsigned int optlen)
-c9406a23c1161c Florian Westphal 2021-11-19  687  {
-c9406a23c1161c Florian Westphal 2021-11-19  688  	struct sock *sk = (struct sock *)msk;
-c9406a23c1161c Florian Westphal 2021-11-19 @689  	struct inet_sock *issk;
-c9406a23c1161c Florian Westphal 2021-11-19  690  	struct socket *ssock;
-c9406a23c1161c Florian Westphal 2021-11-19  691  	int err;
-c9406a23c1161c Florian Westphal 2021-11-19  692  
-c9406a23c1161c Florian Westphal 2021-11-19  693  	err = ip_setsockopt(sk, SOL_IP, optname, optval, optlen);
-c9406a23c1161c Florian Westphal 2021-11-19  694  	if (err != 0)
-c9406a23c1161c Florian Westphal 2021-11-19  695  		return err;
-c9406a23c1161c Florian Westphal 2021-11-19  696  
-c9406a23c1161c Florian Westphal 2021-11-19  697  	lock_sock(sk);
-c9406a23c1161c Florian Westphal 2021-11-19  698  
-c9406a23c1161c Florian Westphal 2021-11-19  699  	ssock = __mptcp_nmpc_socket(msk);
-ddb1a072f85870 Paolo Abeni      2023-04-14  700  	if (IS_ERR(ssock)) {
-c9406a23c1161c Florian Westphal 2021-11-19  701  		release_sock(sk);
-ddb1a072f85870 Paolo Abeni      2023-04-14  702  		return PTR_ERR(ssock);
-c9406a23c1161c Florian Westphal 2021-11-19  703  	}
-c9406a23c1161c Florian Westphal 2021-11-19  704  
-c9406a23c1161c Florian Westphal 2021-11-19  705  	issk = inet_sk(ssock->sk);
-c9406a23c1161c Florian Westphal 2021-11-19  706  
-c9406a23c1161c Florian Westphal 2021-11-19  707  	switch (optname) {
-c9406a23c1161c Florian Westphal 2021-11-19  708  	case IP_FREEBIND:
-53912fdfbaf575 Eric Dumazet     2023-08-10  709  		inet_assign_bit(FREEBIND, ssock->sk,
-53912fdfbaf575 Eric Dumazet     2023-08-10  710  				inet_test_bit(FREEBIND, sk));
-c9406a23c1161c Florian Westphal 2021-11-19  711  		break;
-c9406a23c1161c Florian Westphal 2021-11-19  712  	case IP_TRANSPARENT:
-ec4704602ed1ff Eric Dumazet     2023-08-10  713  		inet_assign_bit(TRANSPARENT, ssock->sk,
-ec4704602ed1ff Eric Dumazet     2023-08-10  714  				inet_test_bit(TRANSPARENT, sk));
-c9406a23c1161c Florian Westphal 2021-11-19  715  		break;
-c9406a23c1161c Florian Westphal 2021-11-19  716  	default:
-c9406a23c1161c Florian Westphal 2021-11-19  717  		release_sock(sk);
-c9406a23c1161c Florian Westphal 2021-11-19  718  		WARN_ON_ONCE(1);
-c9406a23c1161c Florian Westphal 2021-11-19  719  		return -EOPNOTSUPP;
-c9406a23c1161c Florian Westphal 2021-11-19  720  	}
-c9406a23c1161c Florian Westphal 2021-11-19  721  
-c9406a23c1161c Florian Westphal 2021-11-19  722  	sockopt_seq_inc(msk);
-c9406a23c1161c Florian Westphal 2021-11-19  723  	release_sock(sk);
-c9406a23c1161c Florian Westphal 2021-11-19  724  	return 0;
-c9406a23c1161c Florian Westphal 2021-11-19  725  }
-c9406a23c1161c Florian Westphal 2021-11-19  726  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
