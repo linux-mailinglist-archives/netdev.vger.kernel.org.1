@@ -1,40 +1,65 @@
-Return-Path: <netdev+bounces-26494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7BD4777F3E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:34:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7266B777F44
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:38:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D94728196B
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19BE12819E5
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD30214ED;
-	Thu, 10 Aug 2023 17:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0298214E0;
+	Thu, 10 Aug 2023 17:38:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7E61E1C0
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:34:42 +0000 (UTC)
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 4B5B92709
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:34:40 -0700 (PDT)
-Received: (qmail 243746 invoked by uid 1000); 10 Aug 2023 13:34:39 -0400
-Date: Thu, 10 Aug 2023 13:34:39 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
-Cc: bjorn@mork.no, davem@davemloft.net, edumazet@google.com,
-  eniac-xw.zhang@hp.com, hayeswang@realtek.com, jflf_kernel@gmx.com,
-  kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-  netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org,
-  svenva@chromium.org
-Subject: Re: [PATCH v2] r8152: Suspend USB device before shutdown when WoL is
- enabled
-Message-ID: <78e3aade-2a88-42f4-9991-8e245f3eb9b9@rowland.harvard.edu>
-References: <3c4fd3d8-2b0b-492e-aacc-afafcea98417@rowland.harvard.edu>
- <20230810162216.13455-1-alexandru.gagniuc@hp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15C11E1C0
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:38:40 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E6E26AA
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:38:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=6xDm4XlYlbe6Z0azw/hZ7dF7GIcNm4Q2rtxweNUAuzo=; b=S6jKz0rffK8YTK2hmeuUNxjNp/
+	UiCsbkIxfwacQi0mfrolXN3ksDcl5OlyqfJ625y4ScMmkmcqVfW5Vk6L/yxP2+5iyGIhbiaBtxMGz
+	aCs3KGkMsDseAAnB15dszjWwqQvCr3pPhFju0wKKuFQTjp9ZsZ3WowGFAz8daGvfv/zdTNj5zrbus
+	DUUhi913udhzUu2NgP/L1z9+CvtddSq3yIz0eyHKwZeVzdCVugrOwjVIYlJ09jSkSeSLVcVWHaxqA
+	z/jpORFTbPfTV7Tpe8O7Sl0El3Vbhd/VFDQS1EaVl3St0EBXONkFtAXR8H2T4pUEJhF6cb+6NNriJ
+	E3gKrA+Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41704)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qU9cF-0004Km-0F;
+	Thu, 10 Aug 2023 18:38:31 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qU9cE-0001zV-13; Thu, 10 Aug 2023 18:38:30 +0100
+Date: Thu, 10 Aug 2023 18:38:29 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Sergei Antonov <saproj@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: mv88e6060: add phylink_get_caps
+ implementation
+Message-ID: <ZNUglYF2Xy63l4aZ@shell.armlinux.org.uk>
+References: <E1qTkRn-003NBG-FH@rmk-PC.armlinux.org.uk>
+ <E1qTkRn-003NBG-FH@rmk-PC.armlinux.org.uk>
+ <20230810164441.udjyn7avp3afcwgo@skbuf>
+ <ZNUV2VzY01TWVSgk@shell.armlinux.org.uk>
+ <20230810171100.dvnsjgjo67hax4ld@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,73 +68,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230810162216.13455-1-alexandru.gagniuc@hp.com>
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,SORTED_RECIPS,SPF_HELO_PASS,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230810171100.dvnsjgjo67hax4ld@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 04:22:16PM +0000, Alexandru Gagniuc wrote:
-> From: Alan Stern <stern@rowland.harvard.edu>
+On Thu, Aug 10, 2023 at 08:11:00PM +0300, Vladimir Oltean wrote:
+> On Thu, Aug 10, 2023 at 05:52:41PM +0100, Russell King (Oracle) wrote:
+> > I wonder whether we have any implementation using SNI mode. I couldn't
+> > find anything in the in-kernel dts files for this driver, the only
+> > dts we have is one that was posted on-list recently, and that was using
+> > MII at 100Mbps:
+> > 
+> > https://lore.kernel.org/r/CABikg9zfGVEJsWf7eq=K5oKQozt86LLn-rzMaVmycekXkQEa8Q@mail.gmail.com
+> > 
+> > No one would be able to specify "sni" in their dts, so maybe for the
+> > sake of simplicity, we shouldn't detect whether it's in SNI mode, and
+> > just use MII, and limit the speed to just 10Mbps?
 > 
-> On Wed, Aug 02, 2023 at 11:23:46AM -0400, Alan Stern wrote:
-> > On Wed, Aug 02, 2023 at 02:56:43PM +0000, Gagniuc, Alexandru wrote:
-> > > On Wed, Jul 19, 2023 at 02:36:25PM -0400, Alan Stern wrote:
-> > > > How do you know that the link will _remain_ in the correct state?
-> > > 
-> > > The objective is to get to xhci_set_link_state() with the USB_SS_PORT_LS_U3
-> > > argument. This is achieved through usb_port_suspend() in drivers/usb/host/hub.c,
-> > > and the function is implemented in drivers/usb/host/xhci-hub.c.
-> > > 
-> > > This is the only path in the kernel that I am aware of for setting the U3 link
-> > > state. Given that it is part of the USB subsystem, I am fairly confident it will
-> > > show consistent behavior across platforms.
-> > 
-> > That does not answer my question.  I agree that making this change will 
-> > put the link into the U3 state.  But I don't have any reason to think 
-> > that some other software won't later put the link into some other state.
-> 
-> I don't have a rigurous proof that the link will remain in the correct state.
-> The only conjecture that I can make is that no other software besides the kernel
-> will be running at this time. Thus, if the kernel manages to not break the link
-> state, things should work as intended.
-> 
-> > > > That is, how do you know that the shutdown processing for the USB host 
-> > > > controller won't disable the link entirely, thereby preventing WoL from 
-> > > > working?
-> > > 
-> > > We are talking to the USB hub in order to set the link state. I don't see how
-> > > specifics of the host controller would influence behavior.
-> > 
-> > Specifics of the host controller probably won't influence behavior.  
-> > However, specifics of the _software_ can make a big difference.
-> > 
-> > >  I do expect a
-> > > controller which advertises S4/S5 in /proc/acpi/wakeup to not do anything that
-> > > would sabotage this capability. Disabling the link entirely would probalby
-> > > violate that promise.
-> > 
-> > Not if the kernel _tells_ the controller to disable the link.
-> > 
-> > > Think of USB-C docks with a power button showing up as a HID class. The scenario
-> > > herein would disable the power button. I would take that to be a bug in the host
-> > > controller driver if the S4/S5 capability is advertised.
-> > 
-> > Indeed.  And I am asking how you can be sure the host controller driver 
-> > (or some other part of the software stack) doesn't have this bug.
-> 
-> The only way that I have to show that is empirical. I observe that WoL from S5
-> does not work on a device with an r8153 chip. I apply the change, and verify
-> that WoL from S5 now works in this scenario. What are you thinking of in terms
-> of being sure no current or future bug exists?
+> Based on the fact that "marvell,mv88e6060" is in
+> dsa_switches_apply_workarounds[], it is technically possible that there
+> exist boards which use the SNI mode but have no phy-mode and other
+> phylink properties on the CPU port, and thus they work fine while
+> skipping phylink. Of course, "possible" != "real".
 
-I was thinking that the host controller driver's shutdown method might 
-turn off power to all of the ports.
+What I meant is that there are no in-tree users of the Marvell 88E6060
+DSA driver. It looks like it was contributed in 2008. Whether it had
+users between the date that it was contributed and today I don't know.
 
-For example, in the ehci-hcd driver, ehci_shutdown() calls 
-ehci_silence_controller(), which calls ehci_turn_off_all_ports().  I 
-don't know if xhci-hcd does anything similar.
+All that I can see is that the only users of it are out-of-tree users,
+which means we have the maintenance burden from the driver but no
+apparent platforms that make use of it, and no way to test it (other
+than if one of those out-of-tree users pops up, such as like last
+month.)
 
-Alan Stern
+I know that Arnd tends to strip out code that a platform uses when the
+platform is removed, was there a reason that this got left behind,
+assuming that it was used by a board?
+
+> Maybe if we don't want to introduce PHY_INTERFACE_MODE_SNI for fear of a
+> lack of real users, we could at least detect PortMode=0, and not
+> populate supported_interfaces, leading to an intentional validation
+> failure and a comment above that check, stating that phy-mode = "sni" is
+> not yet implemented?
+
+It would probably be better for mv88e6060_phylink_get_caps() to detect
+it and print the warning, leaving supported_interfaces empty - which
+will then cause phylink_create() to fail. Maybe that's what you meant,
+but I interpreted it as modifying the check in phylink_create().
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
