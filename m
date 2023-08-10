@@ -1,111 +1,128 @@
-Return-Path: <netdev+bounces-26588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB2DD778456
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:51:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AAF77845A
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10AB21C20BEF
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:51:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC6FE281E85
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91781134BE;
-	Thu, 10 Aug 2023 23:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90075174E3;
+	Thu, 10 Aug 2023 23:53:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7772C6FB3
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:51:20 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3B82D52
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 16:51:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BFA134C8
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:53:28 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A853526BC;
+	Thu, 10 Aug 2023 16:53:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691711478; x=1723247478;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+FebJGVtOU0ozNN9ME2PO2RSeW7ryCgG5maaWtlALcM=;
-  b=VOO3SrpywJkS0kfvWkewQSW1IJP9qDOWaObOPN8+50spi8DZEBMOKHVp
-   DZ4NaYSJNrXRo5pSaLCxiisSAIFy0Ly+wzyf1+FDh/ZINJH+yCiQQH4XJ
-   A+f8DANEsA+lYOxpEb11tEZoTmYI5Q/bRiM7nsRvWHPub7nvRhpx+yAU1
-   BESZW4S4uhRXw6qnz8FaLOejoMRYAotq4tH7x8Q7YRge1UPrP8IZnhEl2
-   gSdOMD7AY7zv+O9e7daLqgYMmaiRqyf4dbBgNVNbC/pPT73eVu1SuiK1P
-   Hct+q8UtlnPA/ICh96eGZHub/BhzczNLgdt7e21ZyINufysqtlh+Zu3yJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="402521338"
+  t=1691711606; x=1723247606;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=5JIN1Yu4mUkxQTHvXnfAGLOJxcyhh/wZyopkkYQtIuo=;
+  b=ix9GZsVn6x/6OELVvd7FHj+YyLU6uWn93NnF4ShO54pUvaK8TgoatOOl
+   6bCyujTRLYoAnBWAHJ7HXYvvVBsUW0JDj8SfKxvEw/+8Q2JviYkIDMA9L
+   mJ4vtwyRPT0IjsR/MnzBPWsAHweHtbm0oo32HlFgTIIAnrRX5ONTqhLI3
+   flDLJkn8utBlPPRKwCpVoPePvYV2pyEJQm8iR8UYiBJOb+qOauanHgVOn
+   V+8tZgAjZs3rkQdXfOzsrHvtFrEHlJm3mvcImMlUIcHwYviv6hW8kJeOP
+   /D4r0VMP6XvGQheYVRxdBAIj9wOwk4RCPrOZYBW8HoG1FQ6kvJ3i5jjya
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="351872279"
 X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
-   d="scan'208";a="402521338"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 16:51:18 -0700
+   d="scan'208";a="351872279"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 16:53:26 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="709331876"
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="856092397"
 X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
-   d="scan'208";a="709331876"
-Received: from jbrandeb-saw1.jf.intel.com ([10.166.28.102])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 16:51:18 -0700
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v2] ice: fix receive buffer size miscalculation
-Date: Thu, 10 Aug 2023 16:51:10 -0700
-Message-ID: <20230810235110.440553-1-jesse.brandeburg@intel.com>
-X-Mailer: git-send-email 2.41.0
+   d="scan'208";a="856092397"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 10 Aug 2023 16:53:24 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qUFT1-0007LM-0U;
+	Thu, 10 Aug 2023 23:53:23 +0000
+Date: Fri, 11 Aug 2023 07:53:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [mst-vhost:vhost 34/46] drivers/vdpa/vdpa_user/vduse_dev.c:1812:23:
+ error: use of undeclared identifier 'VIRTIO_RING_F_INDIRECT_DESC'
+Message-ID: <202308110712.wCQoOG00-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The driver is misconfiguring the hardware for some values of MTU such that
-it could use multiple descriptors to receive a packet when it could have
-simply used one.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   bb59e1f960bd07f70a4b3d8de99bfd8d71835199
+commit: 334f48a83105ebe129a660d1ea1a0c29f87d50c7 [34/46] vduse: Temporarily disable control queue features
+config: x86_64-buildonly-randconfig-r001-20230811 (https://download.01.org/0day-ci/archive/20230811/202308110712.wCQoOG00-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20230811/202308110712.wCQoOG00-lkp@intel.com/reproduce)
 
-Change the driver to use a round-up instead of the result of a shift, as
-the shift can truncate the lower bits of the size, and result in the
-problem noted above. It also aligns this driver with similar code in i40e.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308110712.wCQoOG00-lkp@intel.com/
 
-The insidiousness of this problem is that everything works with the wrong
-size, it's just not working as well as it could, as some MTU sizes end up
-using two or more descriptors, and there is no way to tell that is
-happening without looking at ice_trace or a bus analyzer.
+All errors (new ones prefixed by >>):
 
-Fixes: efc2214b6047 ("ice: Add support for XDP")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
----
-v2: added fixes tag pointing to the last time this line was modified in
-v5.5 instead of pointing back to the introduction of the driver.
----
- drivers/net/ethernet/intel/ice/ice_base.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+>> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_RING_F_INDIRECT_DESC'
+                   config->features &= VDUSE_NET_VALID_FEATURES_MASK;
+                                       ^
+   drivers/vdpa/vdpa_user/vduse_dev.c:66:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
+            BIT_ULL(VIRTIO_RING_F_INDIRECT_DESC) | \
+                    ^
+>> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_F_EVENT_IDX'
+   drivers/vdpa/vdpa_user/vduse_dev.c:67:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
+            BIT_ULL(VIRTIO_F_EVENT_IDX) |          \
+                    ^
+>> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_F_IOMMU_PLATFORM'
+   drivers/vdpa/vdpa_user/vduse_dev.c:69:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
+            BIT_ULL(VIRTIO_F_IOMMU_PLATFORM) |     \
+                    ^
+   drivers/vdpa/vdpa_user/vduse_dev.c:2007:51: warning: shift count >= width of type [-Wshift-count-overflow]
+           ret = dma_set_mask_and_coherent(&vdev->vdpa.dev, DMA_BIT_MASK(64));
+                                                            ^~~~~~~~~~~~~~~~
+   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
+   #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
+                                                        ^ ~~~
+   1 warning and 3 errors generated.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index b678bdf96f3a..074bf9403cd1 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -435,7 +435,8 @@ static int ice_setup_rx_ctx(struct ice_rx_ring *ring)
- 	/* Receive Packet Data Buffer Size.
- 	 * The Packet Data Buffer Size is defined in 128 byte units.
- 	 */
--	rlan_ctx.dbuf = ring->rx_buf_len >> ICE_RLAN_CTX_DBUF_S;
-+	rlan_ctx.dbuf = DIV_ROUND_UP(ring->rx_buf_len,
-+				     BIT_ULL(ICE_RLAN_CTX_DBUF_S));
- 
- 	/* use 32 byte descriptors */
- 	rlan_ctx.dsize = 1;
+
+vim +/VIRTIO_RING_F_INDIRECT_DESC +1812 drivers/vdpa/vdpa_user/vduse_dev.c
+
+  1804	
+  1805	static void vduse_dev_features_filter(struct vduse_dev_config *config)
+  1806	{
+  1807		/*
+  1808		 * Temporarily filter out virtio-net's control virtqueue and features
+  1809		 * that depend on it while CVQ is being made more robust for VDUSE.
+  1810		 */
+  1811		if (config->device_id == VIRTIO_ID_NET)
+> 1812			config->features &= VDUSE_NET_VALID_FEATURES_MASK;
+  1813	}
+  1814	
+
 -- 
-2.41.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
