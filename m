@@ -1,145 +1,82 @@
-Return-Path: <netdev+bounces-26247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3927774FE
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 11:55:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E43777522
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 11:59:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC38F1C214F8
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8135282047
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5A71ED43;
-	Thu, 10 Aug 2023 09:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5531ED21;
+	Thu, 10 Aug 2023 09:59:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C220C1E51F
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 09:55:20 +0000 (UTC)
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED58E7F;
-	Thu, 10 Aug 2023 02:55:19 -0700 (PDT)
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2b9e6cc93c6so10751981fa.2;
-        Thu, 10 Aug 2023 02:55:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691661318; x=1692266118;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gffuZaa/ihRTSH1k1c/YUIAF3UhoRHwdFaPoPVPmbmw=;
-        b=MXOmMHnLeWSA7FBPF9Mr1z5TCgbyMHvskShhvXmIkEaaWQK3rNJxDtlk+a2yo1W5Bg
-         pS/b+hg0qJpIYkeJXM31nF9ICMcxav95RFgfp9HqhLZPrHS03E1r+UBM9qe9AHbR1H7n
-         Yu0nk+prG4WzFCYBSTuiT4zrNSgFk1hzs54JwGicbBaiJr0jQMsDrLjFJdMAE0JLTOx5
-         eslnMxAAaQsrmvAwDIb/fDlq15fAfvc+JCG8hlFsYnxVJVgegzl1DzTP1NalylA9HD/H
-         K9cJQWIco/WhRq5xLRMly01lQM+/LE3ccHk/QcAsylRZrbt6zG8TmhP18lCV9j4iSJCr
-         ywjA==
-X-Gm-Message-State: AOJu0YxyZEJzjItyLuean85kBwnEFbYL1FaRQCxR8/fijgkK8fAcYvhG
-	TXaeDw6HhUacAzrXDvbfgVNAD2yOx3o=
-X-Google-Smtp-Source: AGHT+IF2qOMXARfDGKxIaYy0XzYbezH3oX9rJ+sMYHNNYmiKGfx4YJAsSyljW4IGXhFueEhr3HTu/Q==
-X-Received: by 2002:a2e:800c:0:b0:2b8:3a1e:eec9 with SMTP id j12-20020a2e800c000000b002b83a1eeec9mr1318765ljg.36.1691661317712;
-        Thu, 10 Aug 2023 02:55:17 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-014.fbsv.net. [2a03:2880:31ff:e::face:b00c])
-        by smtp.gmail.com with ESMTPSA id vr2-20020a170906bfe200b00988b8ff849csm687300ejb.108.2023.08.10.02.55.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 02:55:17 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: rdunlap@infradead.org,
-	benjamin.poirier@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v5 2/2] netconsole: Enable compile time configuration
-Date: Thu, 10 Aug 2023 02:54:51 -0700
-Message-Id: <20230810095452.3171106-3-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230810095452.3171106-1-leitao@debian.org>
-References: <20230810095452.3171106-1-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39B91E51F
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 09:59:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 395A1C433C9;
+	Thu, 10 Aug 2023 09:59:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691661557;
+	bh=irAw8C1RbIzipfSt1MnqWhrjlxxoQRCkAeMq+VcRA7Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aYS9XZ2gch8tOZFweR+abCikrsOTVWRnN3vXDIbjcrUfrDUWu96X3Eev55KVFElOY
+	 7kajLAH9n+49UZj2rxzfpHxngpCglRAWIx1j40PAF4HRI36aYeapTKiq5pbKvk5UVi
+	 mintMg9N1d+7ODhGW1WpIdTw8lL8Z5tXY58vIbac6YWgh35WZL5O26D29I8cz5+9V4
+	 i7aqSBpi8nF6Xtj0xjpAUEiVVGlPzX2HMg3Rhp8E1yHiShqJk3sxjidgxQH4ckRLAq
+	 aLonGSxc7+fch0bMq8UBUq990+t+gCGpSRXQmd0c8djyr7NNKXm6OqyQvIjOTItWho
+	 c79/k6XLLFc8A==
+Date: Thu, 10 Aug 2023 11:59:11 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>, nicolas.ferre@microchip.com,
+	conor.dooley@microchip.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	lgirdwood@gmail.com, broonie@kernel.org, perex@perex.cz,
+	tiwai@suse.com, maz@kernel.org, srinivas.kandagatla@linaro.org,
+	thierry.reding@gmail.com, u.kleine-koenig@pengutronix.de,
+	sre@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-pm@vger.kernel.org, linux-pwm@vger.kernel.org,
+	alsa-devel@alsa-project.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: update Claudiu Beznea's email address
+Message-ID: <ZNS0708cDAt7H7ul@vergenet.net>
+References: <20230804050007.235799-1-claudiu.beznea@tuxon.dev>
+ <ZM0Be8S8zII8wV4l@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZM0Be8S8zII8wV4l@nanopsycho>
 
-Enable netconsole features to be set at compilation time. Create two
-Kconfig options that allow users to set extended logs and release
-prepending features at compilation time.
+On Fri, Aug 04, 2023 at 03:47:39PM +0200, Jiri Pirko wrote:
+> Fri, Aug 04, 2023 at 07:00:07AM CEST, claudiu.beznea@tuxon.dev wrote:
+> >Update MAINTAINERS entries with a valid email address as the Microchip
+> >one is no longer valid.
+> >
+> >Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> >Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+> >Signed-off-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> >---
+> >
+> >Changes in v2:
+> >- collected tags
+> >- extended the recipients list to include individual subsystem
+> >  maintainers and lists instead using only linux-kernel@vger.kernel.org
+> >  as suggested initially by get_maintainers.pl
+> 
+> Consider adding entry in .mailmap as well please.
 
-Right now, the user needs to pass command line parameters to netconsole,
-such as "+"/"r" to enable extended logs and version prepending features.
+Hi Claudiu,
 
-With these two options, the user could set the default values for the
-features at compile time, and don't need to pass it in the command line
-to get them enabled, simplifying the command line.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/Kconfig      | 22 ++++++++++++++++++++++
- drivers/net/netconsole.c |  5 +++++
- 2 files changed, 27 insertions(+)
-
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 368c6f5b327e..55fb9509bcae 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -332,6 +332,28 @@ config NETCONSOLE_DYNAMIC
- 	  at runtime through a userspace interface exported using configfs.
- 	  See <file:Documentation/networking/netconsole.rst> for details.
- 
-+config NETCONSOLE_EXTENDED_LOG
-+	bool "Set kernel extended message by default"
-+	depends on NETCONSOLE
-+	default n
-+	help
-+	  Set extended log support for netconsole message. If this option is
-+	  set, log messages are transmitted with extended metadata header in a
-+	  format similar to /dev/kmsg.  See
-+	  <file:Documentation/networking/netconsole.rst> for details.
-+
-+config NETCONSOLE_PREPEND_RELEASE
-+	bool "Prepend kernel release version in the message by default"
-+	depends on NETCONSOLE_EXTENDED_LOG
-+	default n
-+	help
-+	  Set kernel release to be prepended to each netconsole message by
-+	  default. If this option is set, the kernel release is prepended into
-+	  the first field of every netconsole message, so, the netconsole
-+	  server/peer can easily identify what kernel release is logging each
-+	  message.  See <file:Documentation/networking/netconsole.rst> for
-+	  details.
-+
- config NETPOLL
- 	def_bool NETCONSOLE
- 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index f93b98d64a3c..1dc56d6b1c15 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -178,6 +178,11 @@ static struct netconsole_target *alloc_and_init(void)
- 	if (!nt)
- 		return nt;
- 
-+	if (IS_ENABLED(CONFIG_NETCONSOLE_EXTENDED_LOG))
-+		nt->extended = true;
-+	if (IS_ENABLED(CONFIG_NETCONSOLE_PREPEND_RELEASE))
-+		nt->release = true;
-+
- 	nt->np.name = "netconsole";
- 	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
- 	nt->np.local_port = 6665;
--- 
-2.34.1
-
+I'd like to echo Jiri's suggestion of adding .mailmap entry
+to reflect this change.
 
