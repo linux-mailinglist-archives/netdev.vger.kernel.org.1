@@ -1,71 +1,65 @@
-Return-Path: <netdev+bounces-26508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCD0777FB3
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:58:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D34E777FB7
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4805C281C20
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:58:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 370E12814F3
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F39A21513;
-	Thu, 10 Aug 2023 17:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC2D21514;
+	Thu, 10 Aug 2023 17:59:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AFD20FBF
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:58:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04745C433C7;
-	Thu, 10 Aug 2023 17:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE320FBF
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:59:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64E22C433C7;
+	Thu, 10 Aug 2023 17:59:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691690333;
-	bh=9xNnw9MlZHZXh+TQnt3n9ftd1NAsQ8YRcPHv37zvicU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xy6mfQx+q8eginJvxvN+k8QTIk80WTJBIsBz+TRvxiiuwmRxTvz8b04/CpPP1LDdU
-	 AKuJFDGch4wuE3Jp8Vu4+lfGkah5uYmPykwnfhoWJYmmpshBHUlJelXgeTGu7Dd51l
-	 s4OTIX07ZWZfOCleyQvqY3rUOZ0yarjWDweq1Ik6A9GL2JHptciMMNsxMRQVOmYTbE
-	 tVbSj7Ez2kx1+09yQX636Rw3rU0oBThUBCJlkTuRfdQwrRTme6nqLiIOQ+87JAYor0
-	 aD01Ujngz/t7awtglLSKHNlwJkdjaIpS3aXHUy6k4AIo/yHfXrUXjsBt4kl1uOnKQH
-	 FzqHvn78Og/UQ==
-Date: Thu, 10 Aug 2023 19:58:48 +0200
-From: Simon Horman <horms@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
-	Frantisek Krenzelok <fkrenzel@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Apoorv Kothari <apoorvko@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH net-next v3 6/6] selftests: tls: add rekey tests
-Message-ID: <ZNUlWDvyOal1p5OY@vergenet.net>
-References: <cover.1691584074.git.sd@queasysnail.net>
- <b66c17d650e970c40965041df97357d28e05631d.1691584074.git.sd@queasysnail.net>
+	s=k20201202; t=1691690383;
+	bh=zMZBAlIYuXts1JWarKGJe9B8Z9TCqF4od1Y1jiyno/w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BF5r4c4gIvQFQi5eUZ708LH7BFjr3WyT+hyC1REdcPPuTAW7OBAXNiU+0dZRyfWYY
+	 iGlOJcRModXhO9DfwIHXq139mTNMhZfD88YUCcuPd5lN3d6ZZ6h/cgHWpwyI6P5sPG
+	 opRssifeP7s6KjRaSh7ZQUbMBtpyDAWe+c2H/K9Pah/N7JUleVIzbyqlRmnBo72X+t
+	 iFwsfM/dlZIryHHh8/K/O+TEeatLGt72ib6xLEe4h7/cVfMbbWMENJWlMZ7Q7Wn0NU
+	 fQ93VyfrtlsLo62E4d0teVy0ONmlL+sLJvGX93xEVtNpoUcfpiyTQAWZCpnAQu7uts
+	 U3zEIQ0FlFkMQ==
+Date: Thu, 10 Aug 2023 10:59:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Ratheesh Kannoth <rkannoth@marvell.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+ <lcherian@marvell.com>, <gakula@marvell.com>, <jerinj@marvell.com>,
+ <hkelam@marvell.com>, <sbhatta@marvell.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH net] octeontx2-pf: Set page pool size
+Message-ID: <20230810105942.2bf835a6@kernel.org>
+In-Reply-To: <5e481c98-bf82-283f-e826-82802a2bd7d6@intel.com>
+References: <20230810024422.1781312-1-rkannoth@marvell.com>
+	<5e481c98-bf82-283f-e826-82802a2bd7d6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b66c17d650e970c40965041df97357d28e05631d.1691584074.git.sd@queasysnail.net>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 09, 2023 at 02:58:55PM +0200, Sabrina Dubroca wrote:
-
-nit: Ideally a patch description would go here.
-
-> v2: add rekey_fail test (reject changing the version/cipher)
-> v3: add rekey_peek_splice (suggested by Jakub)
->     add rekey+poll tests
+On Thu, 10 Aug 2023 19:09:21 +0200 Alexander Lobakin wrote:
+> And if the ring size is e.g. 256 or 512 or even 1024, why have Page Pool
+> with 2048 elements? Should be something like
 > 
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> min(numptrs, OTX2_PAGE_POOL_MAX_SZ)
 
-...
+And someone needs to tell me why the 2k was chosen as a value that
+uniquely fits this device but not other devices..
+-- 
+pw-bot: cr
 
