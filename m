@@ -1,169 +1,99 @@
-Return-Path: <netdev+bounces-26406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC2B9777B7C
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:01:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908B4777B79
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7FB01C21567
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:00:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40DE82821E1
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC12200BC;
-	Thu, 10 Aug 2023 15:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1394D200B5;
+	Thu, 10 Aug 2023 15:00:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90FE1E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:00:46 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCA426A0;
-	Thu, 10 Aug 2023 08:00:45 -0700 (PDT)
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AClMae009212;
-	Thu, 10 Aug 2023 17:00:21 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=GQgfxqFc/KsVSkK1DjWFr9HlyK6ZRhaXW7uJy3wWGoM=; b=Vs
-	hS5ujlDlKys7kWQYBg+YwF/nNc1Cd7OqmDaBiOygz9e97staIKZIzMntgeJ8zOym
-	dQk3SgBzOXD/MxOxdCPlB1LimuwVChzKjqDzWkl/7a08YWwApZsLFmjoqWZfuDgD
-	IDI1CqtjSa25QDFxb542dlLM11BLBhyMIS5DjF5zOxuymjP211zPp5wMKsu9h4Bl
-	MqB0bSNIkFq/7FNMH83Yca4qrAZHRpkIAyU6fXq7NAxHI9GaqdTX2W6F82ANv3Qe
-	/wRafxGnMK/42ns7FlFxd2r3WREoO+7jsY66SGDSmRfDMhPubuQH66c7Eaw87uDh
-	KqNfyj5MGl64Z3ARXFMA==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sd0730pxw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Aug 2023 17:00:21 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B4267100053;
-	Thu, 10 Aug 2023 17:00:20 +0200 (CEST)
-Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 85A572248C8;
-	Thu, 10 Aug 2023 17:00:20 +0200 (CEST)
-Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
- (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
- 2023 17:00:19 +0200
-Message-ID: <b3f5c37b-0bc5-f2b7-4132-509b4da7509e@foss.st.com>
-Date: Thu, 10 Aug 2023 17:00:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DDC1E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:00:37 +0000 (UTC)
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8270526B6
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:00:36 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-55fcc15e109so641061a12.3
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:00:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1691679636; x=1692284436;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/arWWfmyrsjrLBTqVG4GLgVzQSQxMO7wr/9WW4IOLeQ=;
+        b=BQH9xVCJn/Ub/xa6dbzN9R7lyA5EQeNZ+3kyH0GI5roEVMqaMe9eP9pTEy1/5XWW6H
+         x5Jeq8wCpG8fuVBjheBbs0+4um4Uz2LKzgO3KCY1SCBhuNbkyOjbVVE32Gz1MnhLiN8R
+         1a3ESzQ2aJxqLff583Xq4TJHjbGd1IcL9liyme5+vzRfE2RB0l+pATdY5o3//PkVKfoi
+         vrsP936B8n5YfnGrvAyyUP0UYfuYEd5ozy457/jJQVSe9ZBR9iY1ebo/vOiBVtcHsgEj
+         2cK00Y8/61cppe8HsIWAq7UlwuU0JVheCt28E1uZDMqgMM3eJkDwAzs8sYV8jQhf9ign
+         T2kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691679636; x=1692284436;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/arWWfmyrsjrLBTqVG4GLgVzQSQxMO7wr/9WW4IOLeQ=;
+        b=MMLvxAAzWpzkIriK3ejUvjVcirji2A1LrE3xLTi/363pj87WA3d0YcgtwKzXTyY8lL
+         n/n5ZPYn8HKuHgkU+OQ2cys3MaWjipjadbB+DpkbtvZTyMhcSiwkjPemD54SbB96l0pV
+         0nGHiHCk/8CsTYrmJNls7Mm15+j5tcMTyAbu3iDtXxOVjx7jsf4f8UEGhKbqhxN+7q1T
+         87EZELCX9atzQx6cHY9siDHTEQh59+mmyCvxhiXO1g887UUffWkHIq0vX3ihBJ5w/Ya4
+         A8IAg6lMXRH6MwAOTTdTL8oBQ0nNQQUIXDmtA4aLGRoaDDn7weUILy7XOy8PLqY/9d0Z
+         +Hog==
+X-Gm-Message-State: AOJu0YxrYGpvYDGrQpAJMDGbuFv6Mxt3TjbqSvD1N9pycV6g3p9pxPDs
+	s8rsVd95znv5w7P/K1pXbDdLKfu8YmIOLnIQSNUjhg==
+X-Google-Smtp-Source: AGHT+IFU4y0TMBdP/jJVSdKQ2NvXLzXXwTm1Ol8ZHFNrnd5g5cBjC0j57k7LYbnOk+IebgMiRtm4Ag==
+X-Received: by 2002:a17:90a:9ed:b0:263:5c6a:1956 with SMTP id 100-20020a17090a09ed00b002635c6a1956mr2052238pjo.25.1691679635932;
+        Thu, 10 Aug 2023 08:00:35 -0700 (PDT)
+Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
+        by smtp.gmail.com with ESMTPSA id pc16-20020a17090b3b9000b00263e1db8460sm3521451pjb.9.2023.08.10.08.00.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 08:00:35 -0700 (PDT)
+Date: Thu, 10 Aug 2023 08:00:33 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Nicolas Escande <nico.escande@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [iproute2,v2] man: bridge: update bridge link show
+Message-ID: <20230810080033.08853c15@hermes.local>
+In-Reply-To: <ZNIowqAsMJhhUtoq@shredder>
+References: <20230804164952.2649270-1-nico.escande@gmail.com>
+	<ZNIowqAsMJhhUtoq@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net-next] net: stmmac: don't create the MDIO bus if
- there's no mdio node on DT
-Content-Language: en-US
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Jose Abreu <joabreu@synopsys.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime
- Coquelin <mcoquelin.stm32@gmail.com>,
-        Alex Elder <elder@linaro.org>,
-        Srini
- Kandagatla <srinivas.kandagatla@linaro.org>,
-        Andrew Halaney
-	<ahalaney@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-References: <20230808120254.11653-1-brgl@bgdev.pl>
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20230808120254.11653-1-brgl@bgdev.pl>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.122]
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To EQNDAG1NODE4.st.com
- (10.75.129.133)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-10_12,2023-08-10_01,2023-05-22_02
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/8/23 14:02, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> The stmmac_dt_phy() function that parses the device-tree node of the MAC
-> and allocates the MDIO and PHY resources misses one use-case: when the
-> MAC doesn't have a fixed link but also doesn't define its own mdio bus
-> on the device tree and instead shares the MDIO lines with a different
-> MAC with its PHY phandle reaching over into a different node.
-> 
-> As this function could also use some more readability, rework it to
-> handle this use-case and simplify the code.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->   .../ethernet/stmicro/stmmac/stmmac_platform.c | 26 +++++++++----------
->   1 file changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index be8e79c7aa34..91844673df43 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -320,12 +320,14 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
->   static int stmmac_dt_phy(struct plat_stmmacenet_data *plat,
->   			 struct device_node *np, struct device *dev)
->   {
-> -	bool mdio = !of_phy_is_fixed_link(np);
->   	static const struct of_device_id need_mdio_ids[] = {
->   		{ .compatible = "snps,dwc-qos-ethernet-4.10" },
->   		{},
->   	};
->   
-> +	if (of_phy_is_fixed_link(np))
-> +		return 0;
-> +
->   	if (of_match_node(need_mdio_ids, np)) {
->   		plat->mdio_node = of_get_child_by_name(np, "mdio");
->   	} else {
-> @@ -340,20 +342,18 @@ static int stmmac_dt_phy(struct plat_stmmacenet_data *plat,
->   		}
->   	}
->   
-> -	if (plat->mdio_node) {
-> -		dev_dbg(dev, "Found MDIO subnode\n");
-> -		mdio = true;
-> -	}
-> +	if (!plat->mdio_node)
-> +		return 0;
->   
-> -	if (mdio) {
-> -		plat->mdio_bus_data =
-> -			devm_kzalloc(dev, sizeof(struct stmmac_mdio_bus_data),
-> -				     GFP_KERNEL);
-> -		if (!plat->mdio_bus_data)
-> -			return -ENOMEM;
-> +	dev_dbg(dev, "Found MDIO subnode\n");
->   
-> -		plat->mdio_bus_data->needs_reset = true;
-> -	}
-> +	plat->mdio_bus_data = devm_kzalloc(dev,
-> +					   sizeof(struct stmmac_mdio_bus_data),
-> +					   GFP_KERNEL);
-> +	if (!plat->mdio_bus_data)
-> +		return -ENOMEM;
-> +
-> +	plat->mdio_bus_data->needs_reset = true;
->   
->   	return 0;
->   }
+On Tue, 8 Aug 2023 14:36:34 +0300
+Ido Schimmel <idosch@idosch.org> wrote:
 
-Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+> On Fri, Aug 04, 2023 at 06:49:52PM +0200, Nicolas Escande wrote:
+> > Add missing man page documentation for bridge link show features added in
+> > 13a5d8fcb41b (bridge: link: allow filtering on bridge name) and
+> > 64108901b737 (bridge: Add support for setting bridge port attributes)  
+> 
+> FYI, the convention is to refer to a commit in the following format:
+> 
+> 13a5d8fcb41b ("bridge: link: allow filtering on bridge name")
+> 
 
-Regards
-Alex
+If you use checkpatch it will tell you that correct format is:
+commit 13a5d8fcb41b ("bridge: link: allow filtering on bridge name")
 
+Fixed it during merge
 
