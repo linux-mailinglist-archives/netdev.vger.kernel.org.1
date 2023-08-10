@@ -1,98 +1,100 @@
-Return-Path: <netdev+bounces-26160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9EB7770AD
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:48:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3902D7770C5
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D4381C213EF
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 06:48:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B6541C214A8
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 06:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD39E1FCF;
-	Thu, 10 Aug 2023 06:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF83D20EA;
+	Thu, 10 Aug 2023 06:53:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7C11107;
-	Thu, 10 Aug 2023 06:48:29 +0000 (UTC)
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FD110F5;
-	Wed,  9 Aug 2023 23:48:26 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VpScO4-_1691650102;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VpScO4-_1691650102)
-          by smtp.aliyun-inc.com;
-          Thu, 10 Aug 2023 14:48:23 +0800
-Message-ID: <1691650025.2692783-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v11 05/10] virtio_ring: introduce virtqueue_dma_dev()
-Date: Thu, 10 Aug 2023 14:47:05 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>,
- Christoph Hellwig <hch@infradead.org>,
- virtualization@lists.linux-foundation.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20230710034237.12391-1-xuanzhuo@linux.alibaba.com>
- <20230710034237.12391-6-xuanzhuo@linux.alibaba.com>
- <ZK/cxNHzI23I6efc@infradead.org>
- <20230713104805-mutt-send-email-mst@kernel.org>
- <ZLjSsmTfcpaL6H/I@infradead.org>
- <20230720131928-mutt-send-email-mst@kernel.org>
- <ZL6qPvd6X1CgUD4S@infradead.org>
- <1690251228.3455179-1-xuanzhuo@linux.alibaba.com>
- <20230725033321-mutt-send-email-mst@kernel.org>
- <1690283243.4048996-1-xuanzhuo@linux.alibaba.com>
- <1690524153.3603117-1-xuanzhuo@linux.alibaba.com>
- <20230801121543-mutt-send-email-mst@kernel.org>
- <1690940971.9409487-2-xuanzhuo@linux.alibaba.com>
- <1691388845.9121156-1-xuanzhuo@linux.alibaba.com>
- <1691632614.950658-1-xuanzhuo@linux.alibaba.com>
- <20230810023253-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230810023253-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42671C17
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:53:36 +0000 (UTC)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C405910F5
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 23:53:35 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-4036bd4fff1so135981cf.0
+        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 23:53:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691650415; x=1692255215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9SXCT/2gawCNMaorMZ7NOA4GCE3vpl+t+8z7dja7EwU=;
+        b=k/nJYM/0P5WRKY/9FrmaDZqWiO046TENSs0xMrdnfbdDUxk1mPNrHRR+cDjydD7NFd
+         b3r6XMSR08E1FyNZBCwZ+lqaW6ytPEi1335respAKmqyRdd8G1mE1xGXU6AHDEd9SrcB
+         Zj+Pl93ymf28tiTRT0rZ6NEsQ24KCnSMKkqQWfxzAFkJphGAKs2cfXR1vYi3FQbmXrFg
+         tEGT/W3paPeVWn1BJLQSfjajgb1B6A+Wrhwop1xlHWPBTFiqlH25yRrqBItvTS4GN0p/
+         MVBx/NZ7ULlL0/y1dohbBztjkFahpK/bOZdbDP0IDnwM7xz8ihwBoFGCiU3YeHjwU+lH
+         PlbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691650415; x=1692255215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9SXCT/2gawCNMaorMZ7NOA4GCE3vpl+t+8z7dja7EwU=;
+        b=DLmpvIc97+17CEYuZnLIZJloxM7LOuammUHEO3WRgpmMgctTqJwFSGxx3iV2ilqDhj
+         BOPhUVUNhUOebeDpu8a2/qkDglVhh2DRU93i5zesFeLOjN5Sv/ZYC3PGCEPRBN50fguL
+         wz4ew2WPXPKaQJtg24yYFGH7VIhYpZSOJpbfoB3RPRuI+a1r1hPNMf2TDIv3G3g8+NqG
+         JOi/cb6osWc9PDI/mxRmlHKnyH6vW0yBTTERIanW8KN7AJrKcnEntO2t68pW06xMxuQC
+         Azkj745a7A8/DfceiQW2YRDvalPHXDMV85HgtdYNQ17dXi9lD/+ii1h3OI3NOTOMkSK5
+         /wVA==
+X-Gm-Message-State: AOJu0YzJ/Mk8tM4hVdYJERQw9T2TQ9m4lJi30frTFwWwT0SyJkWdyd5F
+	ccziZS8otWIMwwkxfmJi+IcUuG4gy8FxyQj/dxNgtQ==
+X-Google-Smtp-Source: AGHT+IGjbLMDBw3eHhD81jqgbpuCV6OqepVleEETJMwmfJagyg2iKtKs4dRp3YvwhOullwESxhhqV0aKqClwBtSdCyM=
+X-Received: by 2002:a05:622a:1816:b0:403:aee3:64f7 with SMTP id
+ t22-20020a05622a181600b00403aee364f7mr288282qtc.6.1691650414804; Wed, 09 Aug
+ 2023 23:53:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20230809164753.2247594-1-trdgn@amazon.com>
+In-Reply-To: <20230809164753.2247594-1-trdgn@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 10 Aug 2023 08:53:23 +0200
+Message-ID: <CANn89iKvh=da2uRkGn5dTX5Yxvz-uZdSJoKf0+pPU16XVDt=fg@mail.gmail.com>
+Subject: Re: [PATCH v4] tun: avoid high-order page allocation for packet header
+To: Tahsin Erdogan <trdgn@amazon.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 10 Aug 2023 02:39:47 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Aug 10, 2023 at 09:56:54AM +0800, Xuan Zhuo wrote:
-> >
-> > Ping!!
-> >
-> > Could we push this to the next linux version?
-> >
-> > Thanks.
+On Wed, Aug 9, 2023 at 6:48=E2=80=AFPM Tahsin Erdogan <trdgn@amazon.com> wr=
+ote:
 >
-> You sent v12, so not this one for sure.
-> v12 triggered kbuild warnings, you need to fix them and repost.
-> Note that I'm on vacation from monday, so if you want this
-> merged this needs to be addressed ASAP.
+> When gso.hdr_len is zero and a packet is transmitted via write() or
+> writev(), all payload is treated as header which requires a contiguous
+> memory allocation. This allocation request is harder to satisfy, and may
+> even fail if there is enough fragmentation.
+>
+> Note that sendmsg() code path limits the linear copy length, so this chan=
+ge
+> makes write()/writev() and sendmsg() paths more consistent.
+>
+> Signed-off-by: Tahsin Erdogan <trdgn@amazon.com>
 
-I will post a new version today. The driver will use the wrappers.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
 Thanks.
-
-
->
-> --
-> MST
->
 
