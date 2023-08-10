@@ -1,120 +1,64 @@
-Return-Path: <netdev+bounces-26574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A93E77783D2
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 00:51:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B88D377841B
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D812A1C20DF2
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:51:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 540A3281C64
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB5E6AB5;
-	Thu, 10 Aug 2023 22:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445A16FB3;
+	Thu, 10 Aug 2023 23:25:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8436AB2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 22:51:50 +0000 (UTC)
-Received: from us-smtp-delivery-162.mimecast.com (us-smtp-delivery-162.mimecast.com [170.10.133.162])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 896C32710
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:51:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
-	t=1691707908;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QdN5At1lK1yQ6mtkPI5LWolmrULbcIojF+miizbUjIw=;
-	b=RUusJdm+by5GeXdf+RImvhW9iEg6zCZeeZT6D5Qp71KIYpCgv9N4FTorpE34sLWwSDb2gR
-	sH9L6fDMM5RRyN+EJPgdDyljSR3MxL/YBQwWRs4OrfNHVxoBzOPbMcAzxIfa57c7GUQFGb
-	mS7fpVng93hTT4wv/40RSe+iTSSXiDA=
-Received: from g8t01560s.inc.hp.com (g8t01560s.inc.hp.com [15.72.64.154]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-240-6L6-oMhJN3uud6nvKbImSA-1; Thu, 10 Aug 2023 18:51:47 -0400
-X-MC-Unique: 6L6-oMhJN3uud6nvKbImSA-1
-Received: from g7t14407g.inc.hpicorp.net (g7t14407g.inc.hpicorp.net [15.63.19.131])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by g8t01560s.inc.hp.com (Postfix) with ESMTPS id 7A03C201FF;
-	Thu, 10 Aug 2023 22:51:44 +0000 (UTC)
-Received: from localhost.localdomain (unknown [15.53.255.151])
-	by g7t14407g.inc.hpicorp.net (Postfix) with ESMTP id 20AE414;
-	Thu, 10 Aug 2023 22:51:43 +0000 (UTC)
-From: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
-To: stern@rowland.harvard.edu
-Cc: alexandru.gagniuc@hp.com,
-	bjorn@mork.no,
-	davem@davemloft.net,
-	edumazet@google.com,
-	eniac-xw.zhang@hp.com,
-	hayeswang@realtek.com,
-	jflf_kernel@gmx.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stable@vger.kernel.org,
-	svenva@chromium.org
-Subject: Re: [PATCH v2] r8152: Suspend USB device before shutdown when WoL is enabled
-Date: Thu, 10 Aug 2023 22:51:09 +0000
-Message-Id: <20230810225109.13973-1-alexandru.gagniuc@hp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <78e3aade-2a88-42f4-9991-8e245f3eb9b9@rowland.harvard.edu>
-References: <78e3aade-2a88-42f4-9991-8e245f3eb9b9@rowland.harvard.edu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1971877
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:25:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36639C433C7;
+	Thu, 10 Aug 2023 23:25:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691709925;
+	bh=FL1OURaLWmN9Xjh4/6ybt68IL/DKEmHGvQ/9+m7PYvU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DLk9oEjrX+q9V2ZbyAsOZSNLxGKTWBjH+PuVVo71qHPJHvxxfqtYNA+YxSlZFPQt1
+	 l/TzmFJkjtKqNBKSShYwIseP+oCEW8xWiJUCSOXVrJ6BlE3fairChfpNl9FgDm04tG
+	 vLyMK5JyjXE88kDn3IPsqVb8JxSlHgsYJJC8AnFDwFBcJBGzjQw2G6U9KiR+6vnVk7
+	 NpN+jNU280kzQZ3JzoHHy7ttK6gHbAiGdvD+RxaiJw3vc2JhhxJ00gQF7fLIrvKLTn
+	 MDLYB22JfrY4Jj8hpRE395g9HelEBhXERmLfnWCBeEBDJmEyoD0ft9qM/6S1O9SiCX
+	 xUHKSDwD+fzyA==
+Date: Thu, 10 Aug 2023 16:25:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "tip-bot2 for Nick Desaulniers" <tip-bot2@linutronix.de>, "Borislav
+ Petkov (AMD)" <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, linux-tip-commits@vger.kernel.org, Nathan
+ Chancellor <nathan@kernel.org>, Daniel Kolesa <daniel@octaforge.org>,
+ Naresh Kamboju <naresh.kamboju@linaro.org>, Sven Volkinsfeld
+ <thyrc@gmx.net>, Nick Desaulniers <ndesaulniers@google.com>,
+ x86@kernel.org, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ torvalds@linux-foundation.org
+Subject: Re: [tip: x86/bugs] x86/srso: Fix build breakage with the LLVM
+ linker
+Message-ID: <20230810162524.7c426664@kernel.org>
+In-Reply-To: <169165870802.27769.15353947574704602257.tip-bot2@tip-bot2>
+References: <20230809-gds-v1-1-eaac90b0cbcc@google.com>
+	<169165870802.27769.15353947574704602257.tip-bot2@tip-bot2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: hp.com
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 10, 2023 at 01:34:39PM -0400, Alan Stern wrote:
-> On Thu, Aug 10, 2023 at 04:22:16PM +0000, Alexandru Gagniuc wrote:
-> > On Wed, Aug 02, 2023 at 11:23:46AM -0400, Alan Stern wrote:
-> > >=20
-> > > Indeed.  And I am asking how you can be sure the host controller driv=
-er=20
-> > > (or some other part of the software stack) doesn't have this bug.
-> >=20
-> > The only way that I have to show that is empirical. I observe that WoL =
-from S5
-> > does not work on a device with an r8153 chip. I apply the change, and v=
-erify
-> > that WoL from S5 now works in this scenario. What are you thinking of i=
-n terms
-> > of being sure no current or future bug exists?
->=20
-> I was thinking that the host controller driver's shutdown method might=20
-> turn off power to all of the ports.
->=20
-> For example, in the ehci-hcd driver, ehci_shutdown() calls=20
-> ehci_silence_controller(), which calls ehci_turn_off_all_ports().  I=20
-> don't know if xhci-hcd does anything similar.
+On Thu, 10 Aug 2023 09:11:48 -0000 tip-bot2 for Nick Desaulniers wrote:
+> The following commit has been merged into the x86/bugs branch of tip:
 
-EHCI is a different beast. I don't think EHCI (USB2.0) has the U3 link stat=
-e.
-
-The equivalent for would be xhci_shutdown(). It makes a call to
-usb_disable_xhci_ports() for XHCI_SPURIOUS_REBOOT quirk. As I have not
-encountered it, I don't know how it will affect the link state of other por=
-ts.
-The quirk appears to switch ports to EHCI mode, rather than turn off power.
-
-Alex
-
+Hi folks, is there an ETA on this getting to Linus?
+The breakage has propagated to the networking trees, if the fix reaches
+Linus soon we'll just hold off on applying stuff and fast forward again.
 
