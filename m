@@ -1,189 +1,118 @@
-Return-Path: <netdev+bounces-26128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D81776E2E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 04:47:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C215776E3A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 04:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A439281F76
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 02:47:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8728C1C2143D
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 02:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B5E7F4;
-	Thu, 10 Aug 2023 02:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAE7806;
+	Thu, 10 Aug 2023 02:53:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922277E4
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:47:20 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCA21FD2;
-	Wed,  9 Aug 2023 19:47:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691635639; x=1723171639;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/WnrbMW80utT+lbY0w0287V8eDkHm+h8ytzuoecJbic=;
-  b=OV0QFC/w+GwXF5pHZrSys9kX2okzycbSF2qtZAqawGDZv4wZ6NPn3lf/
-   U4B9S2g+YbCZVGJrh6/x5Pl6Em0BR666TG2XKghJ9CqMosNe7eg76pbfs
-   ZlKCbcSm7VOV+8+gtQVDvronMmGDeU1wI9e6dU6NWeUMGd4b5krNzja20
-   1SKU3eNxtKo4e/M+cjrsKWPhSoil7IlpVW4NnRDNge9mY8RdPHn0aXEvF
-   q8y5+1bEnxrtRsBF3IWKXvy8IKTcULid6T+eegOdREVCWL6z8Y49h/v4Y
-   noCthsOVacUdD7xopyxlGpT1pC7f4p7J6SXyNhWTByv/BJczUsfG+1v1Q
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="350861782"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="350861782"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 19:47:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="735233033"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="735233033"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga007.fm.intel.com with ESMTP; 09 Aug 2023 19:47:18 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 9 Aug 2023 19:47:18 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 9 Aug 2023 19:47:18 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 9 Aug 2023 19:47:18 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.42) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 9 Aug 2023 19:47:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m3p2dhnkANYA2LVECiBaFn1xyuX/KM0eiQGtgOGYTzOSbnzotsj836kyzHb3fEkbfYOYKM9oFavc/zWbBBSHjci5pkVfG2lc7OkZ+pgYz/QegxKyLlgqFmM0OtG1fSkVS/6Qh6C8p2FbB0S2hv07IHfXFnvLG5PlHhevvWLLbpXo+rLoiTG2v0UZ445auT/uki7hAiWvrxpqezZ6eyWznuDdHgTiEk3Xh745wJbk1p+g1JsZTSMC9pAgu96xL3+dNK3i1oL3jKWf5A8LNpbOhtWRYtKsbojZtsjnTjLtM/gi5hxdFhZqxlXMzr2qdqSyTfTmDSgS0MAv/Nak09PpQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MLI/bMKMB6w2pN/9vjyWLrGPBI7qQLWRXhFdJQ6TrWE=;
- b=N0pX4jYYHCXdeSkzMfnRq5AbxEGvgytDOK4BuRRlQlrG7wEu0oZ4eODm3zgkNIAq7CAPTpXAR3lyi41dW6BihGqGeKmPSDfLbXWr0ZHGrPiA2z6yp5HP4JK8My0gGvhy9wWT75tKxEli+EsibjQRzCy6gsLRz+mTEMjPqsVQ6kQA0EZqVmZ83v3SlaX7aYx/VQxMPDIORSoC2sn8tjdqghG29o6J7B3AJAYsCYw9RGQglyl3xcZwJmA+DFI8BHhXSbZNZ/+8+Q9LIIILoi9uKPEe04ejImvdFX4g82Q7zpvOiIX2P8bb6hcIy36yGvPwW0VuWmKsBANy8qSvo89g8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH7PR11MB7594.namprd11.prod.outlook.com (2603:10b6:510:268::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 02:47:15 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::dcf3:7bac:d274:7bed]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::dcf3:7bac:d274:7bed%4]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 02:47:15 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson
-	<alex.williamson@redhat.com>
-CC: Brett Creeley <bcreeley@amd.com>, Brett Creeley <brett.creeley@amd.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "horms@kernel.org"
-	<horms@kernel.org>, "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
- tracking
-Thread-Topic: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
- tracking
-Thread-Index: AQHZyXH315oZeaJfAkWWY6/5iKI7jq/g/BYAgAEh2wCAAB5AAIAACU2AgACQSWA=
-Date: Thu, 10 Aug 2023 02:47:15 +0000
-Message-ID: <BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230807205755.29579-1-brett.creeley@amd.com>
- <20230807205755.29579-7-brett.creeley@amd.com>
- <20230808162718.2151e175.alex.williamson@redhat.com>
- <01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
- <20230809113300.2c4b0888.alex.williamson@redhat.com>
- <ZNPVmaolrI0XJG7Q@nvidia.com>
-In-Reply-To: <ZNPVmaolrI0XJG7Q@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH7PR11MB7594:EE_
-x-ms-office365-filtering-correlation-id: 4547c3cd-07d4-4c28-df9f-08db994c1b1b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: S0DVigtAV+bWwwP/N6B6p3aFkGPQgZFOjG21g48drtVMCgw7Sdkm/03tPwbQLUArUUio0zZhOxGnfsAmJXHFCz/QIwxWrAWanitNwkAlvgQ4XGfV/HD9fRUc0rcycBS13Vf3G/CG/x0LWCzoDCZ6/3mP9m+/eD7ojHUl/LsFrs2DY3UIawCYjE/oUZ8lq8dTMxkzaWVeM2O7pT0zBDifE2iBgRwOvh8vZF5ysqvEuGLsfEpR290tlmyCR+kSLFeu2970d+3bcVpiXaaaQD20rs/NoivJ+ra8BWlpt1nkcG38c+FiR40ZcT9H0rzSXntEu4PN5OOgkUN0nhGiWO9sJnLeIaIXNRFx6OmdvH2FpVRv1T43LigFsZE0eOcinFPm9hJt49K1eg4YXN72CEk8OPEIsECkefkfzsqLzgaKo5dWGQ9d5fQ+KCLCDYro3NiG4C8TIJs+BGGXEwED5LmJz/xGdI4pzvs5StRAOl2OLI9KsrpB89KSgVS9u5+7AE5PPU3VKzHyR5plLJM9q+qRGezBNhjbME5skEyTkQ+5DxRKYZfCIX9/pNef93By42UhRV3nRCPVd2wEDxf1KrALtJQCUYh+RWYyryJLo7Tu952HbAV/9FB6nZMLHo8hFubizLpeOKd5DnqhCeEWlnSWPQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(396003)(366004)(376002)(39860400002)(451199021)(1800799006)(186006)(71200400001)(26005)(6506007)(8936002)(8676002)(82960400001)(316002)(55016003)(86362001)(122000001)(478600001)(41300700001)(38070700005)(5660300002)(52536014)(7696005)(66556008)(7416002)(66476007)(66446008)(64756008)(4744005)(76116006)(66946007)(9686003)(33656002)(4326008)(2906002)(54906003)(110136005)(38100700002)(14143004);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?i3tLETUyt/wZK6TEwIlyEPT1pxGxGSiqIQjY8FbCNbu4VbkLEh3LJBSf1r7i?=
- =?us-ascii?Q?dltuj3y1OAIggpwq/SNA9kCLSxn2zgJe3hBDTfqHGcnj5XmQ0w6gurgvtboH?=
- =?us-ascii?Q?qXWS3GIV2mIZVkrrg77aKAHjreDG+SZh0p6gEvLAyWweISyJHeVhRjkzTd6o?=
- =?us-ascii?Q?szOYKbtK0jA1HwY8wBzBf+tacMGjcez5eQT6qcQ6jD6OR6xCW36Wx14YkHgs?=
- =?us-ascii?Q?eU7qf+Bli+iDpsrD09KLTTgcOPzYqXlHStzYDSt7/z58JK3izM6AdFAXsUCL?=
- =?us-ascii?Q?h9X5Xc+xWcQW3JAw0TER9N/3wJgP42GtyVKmojL/ISzs60rqKYvUm6s60z+Q?=
- =?us-ascii?Q?w9kKFoOyoB/pgUvJCQ0pCR7f1hqyiIIPfOtI+DQ38Xbe/2tXzg4hShBvjWpX?=
- =?us-ascii?Q?jCM8EqjtIstlj6FIK3voTiSQ3K5g7UBC8Jwha1f8HCX0YErVmhPr29z+vwxv?=
- =?us-ascii?Q?NK5vV1Tia6FCK2l16UDkLUg6yN+oSk25yiLqOt6omYSM5RJt6m59MffZD58F?=
- =?us-ascii?Q?9R9PVj7K496LoPumEDCWsWsxRYY886mbvABc1UikX+Wm2MtvEuWJEESxxQvY?=
- =?us-ascii?Q?XllDYOAAKmbD7BBrU+0xk+2Ji5e/rb4lcfm060/YImS4EiyadQFcFX8e8Y4H?=
- =?us-ascii?Q?LfEVQFsQW6LYFw/8A3G910l9YOTmMw11ks6G4kXj9GiMsnYc6f7EaAP2jR/E?=
- =?us-ascii?Q?jQB39WsLHEzUGdwTUCGxjv8Vf6ABdnw1A9qG5OWUh+3U1ntme7h2y2N06S5a?=
- =?us-ascii?Q?1F1q9iVPYM0VovOji1IkM8eXcvKDFVLyDZojxdjkmchnqZCT9OZw1A81dijd?=
- =?us-ascii?Q?37I8cZxMN9fiFh7WIhO9sLfvx29YgZBWS+3H+2er+4/RqObE41F/TDgA6Xmp?=
- =?us-ascii?Q?NVtk4Ra8oIUmw7AIUc5UPWN0JOyFr/m2QEAqYD9ptmMZfLcZVqd/qp/II+vI?=
- =?us-ascii?Q?ekabyNa6wJHHGWuoXWLIspVscpy+SZcRqIrJHl2RtZxziFhuefpHu/rniAnQ?=
- =?us-ascii?Q?TbORe4iuPreMj2F5qTa1pKysKcbHlTavKrjfZGIvqLxNwnrVwe8pD6SqzpVr?=
- =?us-ascii?Q?7gx3yjtYb4AMpTDGQqDKtJDcWER7eHGqWbsm00T7H+kAMZhbPSKzfjz0rUwd?=
- =?us-ascii?Q?Hrp1H0DBKOyTa1WOf1Quk9Z4ROPhrCzjfFYC+Y62v2HyuO39F4hx4lVHYWtD?=
- =?us-ascii?Q?AH81Xq8BS/CacoE2Nwde+DZ4xAErLlCqyt9ZBy1awwt24OswxwSlmr3WJ88J?=
- =?us-ascii?Q?KuCFV5mOEvQBMwHEPW7Jd+J3TaRBsRbtvDp6Vh6zikTkSi2AucbYgsQZr8AI?=
- =?us-ascii?Q?EHbGxJ3PvBgYL4ucmxKaMo3FOv/Wy6XyAeCxuA+6Qd+hVhMr06J52ekaWeAn?=
- =?us-ascii?Q?feZe7neVC1fn6i6xN/DwaQ6ZFy3JqxrFN1pkQDt8mX6cZFHlobUXMsYopL4l?=
- =?us-ascii?Q?Qw2xDKFxuWLIeNLRpiBYKeckgkTRIfSPam3NAosmhfGYWMf/PEyxG87CnoX/?=
- =?us-ascii?Q?Ik5AHd4Fa0pQGf5EaEp82XUjYvHMRroGkLNY200fiMrxriKnMW/ocSEttnmD?=
- =?us-ascii?Q?7Xu5A8y9szGUCs49vcO+unIVHOhW4ia4MpBGFuq/?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E0A7F5
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:53:23 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97050FB
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 19:53:22 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68783004143so335716b3a.2
+        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 19:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691636002; x=1692240802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NqOuClL83vR2aG4PuknLi06ZbW9aXvo6a0e74j7GawQ=;
+        b=ZuZLPkxIx/wq/0EYETj1ao2RzMJXF4nmF2YridU7DwVkQ5dilca1WpuLxIuNtqLNx8
+         F63tpbFKVizhE0ObD06u8YieA2vyZ0t9jRIIdg+tqNKGOAau7DM2KpM5hN2O9vfWB9ST
+         i6ibfbvLVZV2GJh3jhdaDyY5gb9Wf1JoQVDJQPLcP471DIAPEjROmViQXO7tAmYsn6Km
+         sgUzR1UOIYBTaSraH4OQuV0AmGAmQU+k0iIsF7CLAJhnxd05QPCNHgoCeJM1j06wKHbr
+         916CC4hIXAt0Zy4RgIHv+EF0yV91zpnjWpmXqTT4wu8OCC3fTrwfFzqb27k3SaYvB4TO
+         IbEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691636002; x=1692240802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NqOuClL83vR2aG4PuknLi06ZbW9aXvo6a0e74j7GawQ=;
+        b=QgYoEPa/W/+H8fQ3VW2JwCELPKBxgw2HB0Lno6dy4CuVl2GN0ZLQ/IAYuwGk4uHsex
+         6PTYgyQ5jVv/TjiiTWg5XBPORzOOp/tph5Q6CH36zZxyeh1pJGsg/BpvK6a9LSAmK2sr
+         QTRpz19qmBnLd8QNDv1aMHS5SUmT5Pi5QmM4DXOtR+kp2bIbguXkFwGbi/yJsSk0WUi3
+         9jTShM4RdW/WEVwIa26XBHmpJZ8F4ze0xFhZX/LRI7N1WE5tpjK7DGVerIEVoZCIqDZ9
+         SFNVkxNWR9FLNWflPmP6lot88PTDQk2wn+nZDtJxJ+huMNmmXxJtM0aZp953gC4YRGOj
+         BQ1g==
+X-Gm-Message-State: AOJu0YwZRnCkugJDqmxTnOwyLd5XVA1pOb3Ftq1y8fuMd4axKc0J2sPZ
+	ceGT9Y+Nab8P0TI0HQsZSqc=
+X-Google-Smtp-Source: AGHT+IFShjo/T/BYDxv4FeRTpY7ka0FBdrL/QzgiMWKOJK0m0fjl3wovRclSJgnANInBrP4+XOejkA==
+X-Received: by 2002:a05:6a00:13a5:b0:67b:f249:35e3 with SMTP id t37-20020a056a0013a500b0067bf24935e3mr1397498pfg.26.1691636001997;
+        Wed, 09 Aug 2023 19:53:21 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id y12-20020aa7804c000000b006732786b5f1sm301993pfm.213.2023.08.09.19.53.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Aug 2023 19:53:20 -0700 (PDT)
+Date: Thu, 10 Aug 2023 10:53:10 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, j.vosburgh@gmail.com,
+	andy@greyhouse.net, weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net-next 2/5] bonding: remove warning printing in
+ bond_create_debugfs
+Message-ID: <ZNRRFny6lQmRYd+F@Laptop-X1>
+References: <20230809124107.360574-1-shaozhengchao@huawei.com>
+ <20230809124107.360574-3-shaozhengchao@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4547c3cd-07d4-4c28-df9f-08db994c1b1b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Aug 2023 02:47:15.3855
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MnIJlCfH3R3z5tMTye85f9DI4yGIvg1wjHGqSBLxIDEQ0DBo7TAQm/W5megoo4I71INxgxT9GvU5icXsomY1Tw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7594
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230809124107.360574-3-shaozhengchao@huawei.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Thursday, August 10, 2023 2:06 AM
->=20
-> On Wed, Aug 09, 2023 at 11:33:00AM -0600, Alex Williamson wrote:
->=20
-> > Shameer, Kevin, Jason, Yishai, I'm hoping one or more of you can
-> > approve this series as well.  Thanks,
->=20
-> I've looked at it a few times now, I think it is OK, aside from the
-> nvme issue.
->=20
+On Wed, Aug 09, 2023 at 08:41:04PM +0800, Zhengchao Shao wrote:
+> Because debugfs_create_dir returns ERR_PTR, so warning printing will never
+> be invoked in bond_create_debugfs, remove it. If failed to create
+> directory, failure information will be printed in debugfs_create_dir.
+> 
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> ---
+>  drivers/net/bonding/bond_debugfs.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bond_debugfs.c
+> index 94c2f35e3bfc..e4e7f4ee48e0 100644
+> --- a/drivers/net/bonding/bond_debugfs.c
+> +++ b/drivers/net/bonding/bond_debugfs.c
+> @@ -87,9 +87,6 @@ void bond_debug_reregister(struct bonding *bond)
+>  void __init bond_create_debugfs(void)
+>  {
+>  	bonding_debug_root = debugfs_create_dir("bonding", NULL);
+> -
+> -	if (!bonding_debug_root)
 
-My only concern is the duplication of backing storage management
-of the migration file which I didn't take time to review.
+debugfs_create_dir() does not print information for all failures. We can use
+IS_ERR(bonding_debug_root) to check the value here.
 
-If all others are fine to leave it as is then I will not insist.
+Thanks
+Hangbin
+> -		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
+>  }
+>  
+>  void bond_destroy_debugfs(void)
+> -- 
+> 2.34.1
+> 
 
