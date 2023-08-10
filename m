@@ -1,112 +1,423 @@
-Return-Path: <netdev+bounces-26544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9BF7780E4
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:58:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2518E7780E9
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA2721C20D6B
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:58:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2FB281DDD
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF9721D3E;
-	Thu, 10 Aug 2023 18:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5B822EE4;
+	Thu, 10 Aug 2023 18:59:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D598200A4
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:58:39 +0000 (UTC)
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075072696
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:58:38 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-76c93abeb83so92338085a.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:58:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691693917; x=1692298717;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vsyCys9Hf/cc75Fnr2tkebJ8N3paAQId+bMwmSwTxOY=;
-        b=g7OHqXPvz9lvXEVQRoNwlIAWD3U3BVaszpP9c4VQfzVew2oR11nq/PKW4heanyaoI/
-         6U1ByG/45vFJbE5DUQK46T0mZDn420p1KqetFU1Z18z/8O5hDYyqEsV4csvPtuJ2bet6
-         1RxzlwHsoV2+r3lXpMpY6ykdbSzAT6VjZ+V5X6VkUFV99iOC2KYVAIoeBEBlG3YVzTQz
-         vS4gAb3eK7oGEslty93LfhmwSi/0ADON52kge07ftO7YW0FKmIbCJA8WiZ1fMmfSqNHf
-         VI/hzMwm7iLFsjCcH0TZhUWnPdUw27o0Osbe3rMLkjrT06iA2SeB0AEsvvsggfsmS6gI
-         MZog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691693917; x=1692298717;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vsyCys9Hf/cc75Fnr2tkebJ8N3paAQId+bMwmSwTxOY=;
-        b=JMK+brXrSQ06qH/E7YWiBxfqLGsP7vu6fQLEIBBbTz6xhdflXVL9OA9x34k8D+HlxJ
-         YkSUj4xBLFJi9b6hX5/tzSNVB3vRXbsCVBWmqCnYb6asVxZCKWtURePK42jIoFEf7Pvh
-         6m0u61O/0My0Vo29MegOckJWA2/WNwycVJooXwAfELv2IAMUdyY4gCfqYo9EYmHKC7XN
-         pYCKOq3ENTyI0+/PG10/Bosjij0kqJDUHdw05FFUpsHELgNxkk7gF5A8pQnnIzWHvmwi
-         OjYWh5GQJxncWThr6yIKmDc5jQaCbItijTi9nMxnCSOMc2eOkdNBthXOfOd7ZNnYZE3m
-         vncQ==
-X-Gm-Message-State: AOJu0YyVQXqq0rx4Di2aIwNDSf1M4TBMvvxnGjrvgY2I2RRBP2qT15HR
-	46nOJgecD73l75eEs8SPWBTu4g==
-X-Google-Smtp-Source: AGHT+IG2wYwwESDSTMeata50KjIGSTDd5oFZ54ICUMsQbCPWTAM07sDaAobSCA1IWHJxW0hVcjfxmQ==
-X-Received: by 2002:a05:620a:4148:b0:76c:bc4b:92b9 with SMTP id k8-20020a05620a414800b0076cbc4b92b9mr3903660qko.11.1691693917177;
-        Thu, 10 Aug 2023 11:58:37 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id x8-20020a05620a14a800b0076cc0a6e127sm677945qkj.116.2023.08.10.11.58.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 11:58:36 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1qUArj-005Ifq-Qt;
-	Thu, 10 Aug 2023 15:58:35 -0300
-Date: Thu, 10 Aug 2023 15:58:35 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	netdev@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Hari Ramakrishnan <rharix@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org,
-	sdf@google.com
-Subject: Re: [RFC PATCH v2 00/11] Device Memory TCP
-Message-ID: <ZNUzW3X3P0JvL4nI@ziepe.ca>
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <1009bd5b-d577-ca7b-8eff-192ee89ad67d@amd.com>
- <CAHS8izPrOcrJpE1ysCM7rwHhBMPvj0vQwzfOyVqdxsVux8oMww@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD038200A4
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:59:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 228C6C433C7;
+	Thu, 10 Aug 2023 18:59:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691693963;
+	bh=zV8iXn482Xl44urEsvg1+8q3ua3/0QByt+8pojQG1WQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rJ8lGztYkhyTMWSlzDA9vF27YeW5aUOos3lv4sG0uiOrY7Y78IQz9hyks/RKe/g2D
+	 iPxN9b/EAQ1v7mkb1rFA8qJLog+FZxBErqf2wMBSodQrl3mGbgIhdZ1Sop4ov5QfVN
+	 8IV0HAOpILs3349AJ/Fb6E2+qUgrz65OaORNN94JPu3wYuj279+vjhZiu77yNx2oIu
+	 +xQqLmZTBWHcJWri475u0mUPUBTlqdHoy8GUiZkfVsUb93FJHfv1lf/Re0qluUw0C2
+	 tblWzWTG26DVonLAOBiYloQVAoDVHZ3zgrNJCZ8DHTD+uNyjuP/rXKjO18IwOTDur0
+	 /cyyX2LacZvtA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.5-rc6
+Date: Thu, 10 Aug 2023 11:59:22 -0700
+Message-ID: <20230810185922.92197-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHS8izPrOcrJpE1ysCM7rwHhBMPvj0vQwzfOyVqdxsVux8oMww@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 10, 2023 at 11:44:53AM -0700, Mina Almasry wrote:
+Hi Linus!
 
-> Someone will correct me if I'm wrong but I'm not sure netlink itself
-> will do (sufficient) access control. However I meant for the netlink
-> API to bind dma-bufs to be a CAP_NET_ADMIN API, and I forgot to add
-> this check in this proof-of-concept, sorry. I'll add a CAP_NET_ADMIN
-> check in netdev_bind_dmabuf_to_queue() in the next iteration.
+The following changes since commit 999f6631866e9ea81add935b9c6ebaab0579d259:
 
-Can some other process that does not have the netlink fd manage to
-recv packets that were stored into the dmabuf?
+  Merge tag 'net-6.5-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-08-03 14:00:02 -0700)
 
-Jason
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.5-rc6
+
+for you to fetch changes up to 5e3d20617b055e725e785e0058426368269949f3:
+
+  net: hns3: fix strscpy causing content truncation issue (2023-08-10 11:47:56 -0700)
+
+----------------------------------------------------------------
+Including fixes from netfilter, wireless and bpf.
+
+Still trending up in size but the good news is that the "current"
+regressions are resolved, AFAIK.
+
+We're getting weirdly many fixes for Wake-on-LAN and suspend/resume
+handling on embedded this week (most not merged yet), not sure why.
+But those are all for older bugs.
+
+Current release - regressions:
+
+ - tls: set MSG_SPLICE_PAGES consistently when handing encrypted
+   data over to TCP
+
+Current release - new code bugs:
+
+ - eth: mlx5: correct IDs on VFs internal to the device (IPU)
+
+Previous releases - regressions:
+
+ - phy: at803x: fix WoL support / reporting on AR8032
+
+ - bonding: fix incorrect deletion of ETH_P_8021AD protocol VID
+   from slaves, leading to BUG_ON()
+
+ - tun: prevent tun_build_skb() from exceeding the packet size limit
+
+ - wifi: rtw89: fix 8852AE disconnection caused by RX full flags
+
+ - eth/PCI: enetc: fix probing after 6fffbc7ae137 ("PCI: Honor
+   firmware's device disabled status"), keep PCI devices around
+   even if they are disabled / not going to be probed to be
+   able to apply quirks on them
+
+ - eth: prestera: fix handling IPv4 routes with nexthop IDs
+
+Previous releases - always broken:
+
+ - netfilter: re-work garbage collection to avoid races between
+   user-facing API and timeouts
+
+ - tunnels: fix generating ipv4 PMTU error on non-linear skbs
+
+ - nexthop: fix infinite nexthop bucket dump when using maximum
+   nexthop ID
+
+ - wifi: nl80211: fix integer overflow in nl80211_parse_mbssid_elems()
+
+Misc:
+
+ - unix: use consistent error code in SO_PEERPIDFD
+
+ - ipv6: adjust ndisc_is_useropt() to include PREFIX_INFO,
+   in prep for upcoming IETF RFC
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Andrea Claudi (2):
+      selftests: mptcp: join: fix 'delete and re-add' test
+      selftests: mptcp: join: fix 'implicit EP' test
+
+Andrew Kanner (2):
+      drivers: net: prevent tun_build_skb() to exceed the packet size limit
+      net: core: remove unnecessary frame_sz check in bpf_xdp_adjust_tail()
+
+Chris Mi (1):
+      net/mlx5e: Unoffload post act rule when handling FIB events
+
+Claudiu Beznea (1):
+      MAINTAINERS: update Claudiu Beznea's email address
+
+Daniel Jurgens (3):
+      net/mlx5: Return correct EC_VF function ID
+      net/mlx5: Allow 0 for total host VFs
+      net/mlx5: Fix devlink controller number for ECVF
+
+David Rheinsberg (1):
+      net/unix: use consistent error code in SO_PEERPIDFD
+
+David S. Miller (3):
+      Merge branch 'at803x-wol'
+      Merge branch 'enetc-probe-fix'
+      Merge branch 'smc-fixes'
+
+Eric Dumazet (4):
+      net/packet: annotate data-races around tp->status
+      dccp: fix data-race around dp->dccps_mss_cache
+      macsec: use DEV_STATS_INC()
+      tcp: add missing family to tcp_set_ca_state() tracepoint
+
+Fedor Pchelkin (1):
+      drivers: vxlan: vnifilter: free percpu vni stats on error path
+
+Felix Fietkau (1):
+      wifi: cfg80211: fix sband iftype data lookup for AP_VLAN
+
+Florian Westphal (3):
+      tunnels: fix kasan splat when generating ipv4 pmtu error
+      selftests: net: test vxlan pmtu exceptions with tcp
+      netfilter: nf_tables: don't skip expired elements during walk
+
+Gal Pressman (1):
+      net/mlx5e: Take RTNL lock when needed before calling xdp_set_features()
+
+Gerd Bayer (2):
+      net/smc: Fix setsockopt and sysctl to specify same buffer size again
+      net/smc: Use correct buffer sizes when switching between TCP and SMC
+
+Hao Chen (1):
+      net: hns3: fix strscpy causing content truncation issue
+
+Ido Schimmel (20):
+      nexthop: Fix infinite nexthop dump when using maximum nexthop ID
+      nexthop: Make nexthop bucket dump more efficient
+      nexthop: Fix infinite nexthop bucket dump when using maximum nexthop ID
+      selftests: forwarding: Skip test when no interfaces are specified
+      selftests: forwarding: Switch off timeout
+      selftests: forwarding: bridge_mdb: Check iproute2 version
+      selftests: forwarding: bridge_mdb_max: Check iproute2 version
+      selftests: forwarding: Set default IPv6 traceroute utility
+      selftests: forwarding: Add a helper to skip test when using veth pairs
+      selftests: forwarding: ethtool: Skip when using veth pairs
+      selftests: forwarding: ethtool_extended_state: Skip when using veth pairs
+      selftests: forwarding: hw_stats_l3_gre: Skip when using veth pairs
+      selftests: forwarding: ethtool_mm: Skip when MAC Merge is not supported
+      selftests: forwarding: tc_actions: Use ncat instead of nc
+      selftests: forwarding: tc_flower: Relax success criterion
+      selftests: forwarding: tc_tunnel_key: Make filters more specific
+      selftests: forwarding: tc_flower_l2_miss: Fix failing test with old libnet
+      selftests: forwarding: bridge_mdb: Fix failing test with old libnet
+      selftests: forwarding: bridge_mdb_max: Fix failing test with old libnet
+      selftests: forwarding: bridge_mdb: Make test more robust
+
+Jakub Kicinski (12):
+      Merge branch 'tunnels-fix-ipv4-pmtu-icmp-checksum'
+      Merge branch 'mptcp-more-fixes-for-v6-5'
+      net: tls: avoid discarding data on record close
+      Merge branch 'wireguard-fixes-for-6-5-rc6'
+      Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'
+      Merge tag 'mlx5-fixes-2023-08-07' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
+      Merge branch 'nexthop-nexthop-dump-fixes'
+      Merge branch 'selftests-forwarding-various-fixes'
+      Merge tag 'wireless-2023-08-09' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge tag 'nf-23-08-10' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      net: tls: set MSG_SPLICE_PAGES consistently
+
+Jason A. Donenfeld (1):
+      wireguard: allowedips: expand maximum node depth
+
+Jian Shen (1):
+      net: hns3: restore user pause configure when disable autoneg
+
+Jianbo Liu (1):
+      net/mlx5e: TC, Fix internal port memory leak
+
+Jie Wang (2):
+      net: hns3: refactor hclge_mac_link_status_wait for interface reuse
+      net: hns3: add wait until mac link down
+
+Jonas Gorski (1):
+      net: marvell: prestera: fix handling IPv4 routes with nhid
+
+Keith Yeo (1):
+      wifi: nl80211: fix integer overflow in nl80211_parse_mbssid_elems()
+
+Lama Kayal (1):
+      net/mlx5e: Add capability check for vnic counters
+
+Larry Finger (2):
+      MAINTAINERS: Update entry for rtl8187
+      MAINTAINERS: Remove tree entry for rtl8180
+
+Li Yang (2):
+      net: phy: at803x: fix the wol setting functions
+      net: phy: at803x: remove set/get wol callbacks for AR8032
+
+Maciej Żenczykowski (1):
+      ipv6: adjust ndisc_is_useropt() to also return true for PIO
+
+Magnus Karlsson (1):
+      xsk: fix refcount underflow in error path
+
+Martin KaFai Lau (1):
+      Merge branch 'bug fixes for sockmap'
+
+Moshe Shemesh (2):
+      net/mlx5: Skip clock update work when device is in error state
+      net/mlx5: Reload auxiliary devices in pci error handlers
+
+Muhammad Husaini Zulkifli (1):
+      igc: Add lock to safeguard global Qbv variables
+
+Nathan Chancellor (1):
+      mISDN: Update parameter type of dsp_cmx_send()
+
+Nick Child (5):
+      ibmvnic: Enforce stronger sanity checks on login response
+      ibmvnic: Unmap DMA login rsp buffer on send login fail
+      ibmvnic: Handle DMA unmapping of login buffs in release functions
+      ibmvnic: Do partial reset on login failure
+      ibmvnic: Ensure login failure recovery is safe from other resets
+
+Nitya Sunkad (1):
+      ionic: Add missing err handling for queue reconfig
+
+Pablo Neira Ayuso (4):
+      netfilter: nf_tables: GC transaction API to avoid race with control plane
+      netfilter: nf_tables: adapt set backend to use GC transaction API
+      netfilter: nft_set_hash: mark set element as dead when deleting from packet path
+      netfilter: nf_tables: remove busy mark and gc batch API
+
+Paolo Abeni (2):
+      mptcp: avoid bogus reset on fallback close
+      mptcp: fix disconnect vs accept race
+
+Petr Tesarik (1):
+      wifi: brcm80211: handle params_v1 allocation failure
+
+Ping-Ke Shih (1):
+      wifi: rtw89: fix 8852AE disconnection caused by RX full flags
+
+Piotr Gardocki (1):
+      iavf: fix potential races for FDIR filters
+
+Shay Drory (1):
+      net/mlx5: LAG, Check correct bucket when modifying LAG
+
+Souradeep Chakrabarti (1):
+      net: mana: Fix MANA VF unload when hardware is unresponsive
+
+Vlad Buslov (1):
+      vlan: Fix VLAN 0 memory leak
+
+Vladimir Oltean (4):
+      net: dsa: ocelot: call dsa_tag_8021q_unregister() under rtnl_lock() on driver remove
+      PCI: move OF status = "disabled" detection to dev->match_driver
+      net: enetc: reimplement RFS/RSS memory clearing as PCI quirk
+      net: enetc: remove of_device_is_available() handling
+
+Wen Gong (1):
+      wifi: ath12k: Fix buffer overflow when scanning with extraie
+
+Xiang Yang (1):
+      mptcp: fix the incorrect judgment for msk->cb_flags
+
+Xu Kuohai (4):
+      bpf, sockmap: Fix map type error in sock_map_del_link
+      bpf, sockmap: Fix bug that strp_done cannot be called
+      selftests/bpf: fix a CI failure caused by vsock sockmap test
+      selftests/bpf: Add sockmap test for redirecting partial skb data
+
+Yevgeny Kliteynik (1):
+      net/mlx5: DR, Fix wrong allocation of modify hdr pattern
+
+Yonglong Liu (1):
+      net: hns3: fix deadlock issue when externel_lb and reset are executed together
+
+Ziyang Xuan (1):
+      bonding: Fix incorrect deletion of ETH_P_8021AD protocol vid from slaves
+
+ MAINTAINERS                                        |  27 +-
+ drivers/isdn/mISDN/dsp.h                           |   2 +-
+ drivers/isdn/mISDN/dsp_cmx.c                       |   2 +-
+ drivers/isdn/mISDN/dsp_core.c                      |   2 +-
+ drivers/net/bonding/bond_main.c                    |   4 +-
+ drivers/net/dsa/ocelot/felix.c                     |   2 +
+ drivers/net/ethernet/freescale/enetc/enetc_pf.c    | 125 +++++----
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c |   4 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  14 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c |   4 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  29 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c  |   2 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h  |   1 +
+ drivers/net/ethernet/ibm/ibmvnic.c                 | 112 +++++++-
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |   5 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.c        |  11 +-
+ drivers/net/ethernet/intel/igc/igc.h               |   4 +
+ drivers/net/ethernet/intel/igc/igc_main.c          |  34 ++-
+ .../ethernet/marvell/prestera/prestera_router.c    |  14 +-
+ .../mellanox/mlx5/core/diag/reporter_vnic.c        |  98 ++++---
+ .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  11 +
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  21 +-
+ .../ethernet/mellanox/mlx5/core/esw/devlink_port.c |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/lag/port_sel.c |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/clock.c    |   5 +
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/sriov.c    |   3 +-
+ .../ethernet/mellanox/mlx5/core/steering/dr_ptrn.c |   2 +-
+ drivers/net/ethernet/microsoft/mana/mana_en.c      |  37 ++-
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c    |  23 +-
+ drivers/net/macsec.c                               |  28 +-
+ drivers/net/phy/at803x.c                           |  47 ++--
+ drivers/net/tun.c                                  |   2 +-
+ drivers/net/vxlan/vxlan_vnifilter.c                |  11 +-
+ drivers/net/wireguard/allowedips.c                 |   8 +-
+ drivers/net/wireguard/selftest/allowedips.c        |  16 +-
+ drivers/net/wireless/ath/ath12k/wmi.c              |   3 +-
+ .../broadcom/brcm80211/brcmfmac/cfg80211.c         |   5 +
+ drivers/net/wireless/realtek/rtw89/mac.c           |   2 +-
+ drivers/pci/bus.c                                  |   4 +-
+ drivers/pci/of.c                                   |   5 -
+ include/linux/skmsg.h                              |   1 +
+ include/net/cfg80211.h                             |   3 +
+ include/net/netfilter/nf_tables.h                  | 120 +++-----
+ include/trace/events/tcp.h                         |   5 +-
+ net/8021q/vlan.c                                   |   3 +-
+ net/core/filter.c                                  |   6 -
+ net/core/skmsg.c                                   |  10 +-
+ net/core/sock.c                                    |   2 +-
+ net/core/sock_map.c                                |  10 +-
+ net/dccp/output.c                                  |   2 +-
+ net/dccp/proto.c                                   |  10 +-
+ net/ipv4/ip_tunnel_core.c                          |   2 +-
+ net/ipv4/nexthop.c                                 |  28 +-
+ net/ipv6/ndisc.c                                   |   3 +-
+ net/mptcp/protocol.c                               |   4 +-
+ net/mptcp/protocol.h                               |   1 -
+ net/mptcp/subflow.c                                |  60 ++--
+ net/netfilter/nf_tables_api.c                      | 307 ++++++++++++++++-----
+ net/netfilter/nft_set_hash.c                       |  85 +++---
+ net/netfilter/nft_set_pipapo.c                     |  68 +++--
+ net/netfilter/nft_set_rbtree.c                     | 146 ++++++----
+ net/packet/af_packet.c                             |  16 +-
+ net/smc/af_smc.c                                   |  79 ++++--
+ net/smc/smc.h                                      |   2 +-
+ net/smc/smc_clc.c                                  |   4 +-
+ net/smc/smc_core.c                                 |  25 +-
+ net/smc/smc_sysctl.c                               |  10 +-
+ net/tls/tls_device.c                               |  64 ++---
+ net/tls/tls_main.c                                 |   3 -
+ net/wireless/nl80211.c                             |   5 +-
+ net/xdp/xsk.c                                      |   1 +
+ .../selftests/bpf/prog_tests/sockmap_listen.c      |  74 ++++-
+ .../selftests/bpf/progs/test_sockmap_listen.c      |  14 +
+ tools/testing/selftests/net/fib_nexthops.sh        |  10 +
+ .../testing/selftests/net/forwarding/bridge_mdb.sh |  59 ++--
+ .../selftests/net/forwarding/bridge_mdb_max.sh     |  19 +-
+ tools/testing/selftests/net/forwarding/ethtool.sh  |   2 +
+ .../net/forwarding/ethtool_extended_state.sh       |   2 +
+ .../testing/selftests/net/forwarding/ethtool_mm.sh |  18 +-
+ .../selftests/net/forwarding/hw_stats_l3_gre.sh    |   2 +
+ .../net/forwarding/ip6_forward_instats_vrf.sh      |   2 +
+ tools/testing/selftests/net/forwarding/lib.sh      |  17 ++
+ tools/testing/selftests/net/forwarding/settings    |   1 +
+ .../testing/selftests/net/forwarding/tc_actions.sh |   6 +-
+ .../testing/selftests/net/forwarding/tc_flower.sh  |   8 +-
+ .../selftests/net/forwarding/tc_flower_l2_miss.sh  |  13 +-
+ .../selftests/net/forwarding/tc_tunnel_key.sh      |   9 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    |   6 +-
+ tools/testing/selftests/net/pmtu.sh                |  35 +++
+ 92 files changed, 1432 insertions(+), 693 deletions(-)
+ create mode 100644 tools/testing/selftests/net/forwarding/settings
 
