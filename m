@@ -1,78 +1,46 @@
-Return-Path: <netdev+bounces-26555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8077781F9
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:13:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E76B8778201
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45410281D4C
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:13:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ABB21C20CB8
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D4423BC8;
-	Thu, 10 Aug 2023 20:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AA823BCB;
+	Thu, 10 Aug 2023 20:17:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5884420CA8
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:13:42 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCC42718
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691698419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+r56t3s1kQWK8kt8Jy4XEcKaftYVcIdjxsSpjYz1P5c=;
-	b=cvLR2EZWjUGU0nkGJ5mv1uJ12RPNhRec+74/VBlh5jPh8Q1EcecP5Z7Y2VAhO7SYAXbA2u
-	4bGqxl5u62Reh8G3p3p3jb8d2lj3rCBP9Pira+7k3gyEYUgBaZ7GGY5o3jjPNgAPUP9DR9
-	00GVlM3gbjV1f1cuWzxNifcdS3ypwwY=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-156-PIXHe1_rNNOgTnjWlQOfxg-1; Thu, 10 Aug 2023 16:13:37 -0400
-X-MC-Unique: PIXHe1_rNNOgTnjWlQOfxg-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-40b52fc51b5so15510571cf.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:13:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691698417; x=1692303217;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+r56t3s1kQWK8kt8Jy4XEcKaftYVcIdjxsSpjYz1P5c=;
-        b=Vd7LElR/JmkTNMTzCVje8hQ+aLDPgwB+9eBoVqWJ7HrHyKfKTBTpNuZu1MAFLgoiGu
-         FZjjmW3bTTAw6dScxLWOmeOjBP0yqRflQz6GHEcMtuki61V1FHVqJyMyUpzslzr0gELq
-         uipXZybI/te07MbHkhBxTkodlaAHpYxrXMWK9yJsZw79vGkAyG5VNrhzxi5x4J4raIox
-         vua5q1MuI6ajQ2QfxOMzgjFIKwkXazuJ0oyXp7NX4I1JQHk/Osfmc7vQV7MEs4HOSZ8M
-         i/G4lHrJHSLqHz7f25mCK9Hff0rF+QH9EhvJPVf3+8uie0cpQzWMDiniiweLpvknmUm4
-         5Itw==
-X-Gm-Message-State: AOJu0YylHmiCrX6gNWQ/hQuD4GWr+OvCKGA6POBYDbo7N28rc9seYZOc
-	89gAMX6930TTBYuxGb8Dm/MOD0zf9wraQvzftDwMgPfx9ZnUGq1UAYOu9yuZ5e5T1swRZMlZSIA
-	2iqosEWw2NrYN5Q7l
-X-Received: by 2002:ac8:7dc1:0:b0:406:8bc4:2530 with SMTP id c1-20020ac87dc1000000b004068bc42530mr5219631qte.43.1691698417364;
-        Thu, 10 Aug 2023 13:13:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKTzKCd2z8Ms3vp2vzj84CZ85ZAldrpdKTbL/uZZd4q88+UU0E8JPW2ch0tmersN+0Xl1xOQ==
-X-Received: by 2002:ac8:7dc1:0:b0:406:8bc4:2530 with SMTP id c1-20020ac87dc1000000b004068bc42530mr5219609qte.43.1691698417081;
-        Thu, 10 Aug 2023 13:13:37 -0700 (PDT)
-Received: from fedora ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id h10-20020ac8714a000000b003f3937c16c4sm720285qtp.5.2023.08.10.13.13.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 13:13:36 -0700 (PDT)
-Date: Thu, 10 Aug 2023 15:13:34 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v3 0/9] arm64: dts: qcom: enable EMAC1 on sa8775p
-Message-ID: <j57dowviaas552jt6fdynyowkwm6j6xjc5ixjdk2v4nn4doibn@qnr47drkhljp>
-References: <20230810080909.6259-1-brgl@bgdev.pl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8AA200BC
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:17:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B58E9C433C8;
+	Thu, 10 Aug 2023 20:17:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691698644;
+	bh=2LkXagz5/siA1FP/5dAE4Mt0Kkq6mddlWPM/k+TwkN4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PLNG2GbnlGKmswJnGAu5gAiTYxAO0k/kY32xwa0BpD+q/lQFemPAZAnfjHiLMUPhN
+	 35XypHILHqpLIZ9OeSmnh1vcDvot7cnI9Ot6Nb60+9/Zhdr3szP50uXicWaQuBshgP
+	 aAJtE04opiq1P1IoYIc9Bx6WqGKuocDb3VV9tFobIK+I64ITD7CnKnZe/lw5AE+TYG
+	 EgBveYoYMBQsh3WnEv0ENrpyDkyL7DiE5VVy4YCurVRViAHKTGIWfxlgVbRjMUyHpx
+	 DiO7z1HSPgrXLQnDM8Bj6OJ4Vb7iywv7OiJE0RpRhS+Skv+KwmelkQXnJI0vNKI8IB
+	 Rxr0L7i6u4/Ww==
+Date: Thu, 10 Aug 2023 22:17:18 +0200
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: rdunlap@infradead.org, benjamin.poirier@gmail.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 1/2] netconsole: Create a allocation helper
+Message-ID: <ZNVFzhBVT/LyhTuR@vergenet.net>
+References: <20230810095452.3171106-1-leitao@debian.org>
+ <20230810095452.3171106-2-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,108 +49,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230810080909.6259-1-brgl@bgdev.pl>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230810095452.3171106-2-leitao@debian.org>
 
-On Thu, Aug 10, 2023 at 10:09:00AM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Thu, Aug 10, 2023 at 02:54:50AM -0700, Breno Leitao wrote:
+> De-duplicate the initialization and allocation code for struct
+> netconsole_target.
 > 
-> This series contains changes required to enable EMAC1 on sa8775p-ride.
-> This iteration no longer depends on any changes to the stmmac driver to
-> be functional. It turns out I was mistaken in thinking that the two
-> MACs' MDIO masters share the MDIO clock and data lines. In reality, only
-> one MAC is connected to an MDIO bus and it controlls PHYs for both MAC0
-> and MAC1. The MDIO master on MAC1 is not connected to anything.
+> The same allocation and initialization code is duplicated in two
+> different places in the netconsole subsystem, when the netconsole target
+> is initialized by command line parameters (alloc_param_target()), and
+> dynamically by sysfs (make_netconsole_target()).
 > 
+> Create a helper function, and call it from the two different functions.
+> 
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  drivers/net/netconsole.c | 42 +++++++++++++++++++++-------------------
+>  1 file changed, 22 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 87f18aedd3bd..f93b98d64a3c 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -167,19 +167,16 @@ static void netconsole_target_put(struct netconsole_target *nt)
+>  
+>  #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
+>  
+> -/* Allocate new target (from boot/module param) and setup netpoll for it */
+> -static struct netconsole_target *alloc_param_target(char *target_config)
+> +/* Allocate and initialize with defaults.
+> + * Note that these targets get their config_item fields zeroed-out.
+> + */
+> +static struct netconsole_target *alloc_and_init(void)
+>  {
+> -	int err = -ENOMEM;
+>  	struct netconsole_target *nt;
+>  
+> -	/*
+> -	 * Allocate and initialize with defaults.
+> -	 * Note that these targets get their config_item fields zeroed-out.
+> -	 */
+>  	nt = kzalloc(sizeof(*nt), GFP_KERNEL);
+>  	if (!nt)
+> -		goto fail;
+> +		return nt;
+>  
+>  	nt->np.name = "netconsole";
+>  	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
+> @@ -187,6 +184,21 @@ static struct netconsole_target *alloc_param_target(char *target_config)
+>  	nt->np.remote_port = 6666;
+>  	eth_broadcast_addr(nt->np.remote_mac);
+>  
+> +	return nt;
+> +}
+> +
+> +/* Allocate new target (from boot/module param) and setup netpoll for it */
+> +static struct netconsole_target *alloc_param_target(char *target_config)
+> +{
+> +	struct netconsole_target *nt;
+> +	int err;
 
-I've taken this for a quick (disconnected from network) spin, and things
-work as expected without having anything plugged in.
+Hi Breno,
 
-I'm trying to get someone to plug it in so I can test that networking
-actually works, but the interesting bit is the phy/mdio bit here, and
-that's at least working ok I can tell. The rest is boilerplate similar
-to the other MAC instance which works fine.
+This function returns err.
+However, clang-16 W=1 and Smatch warn that there is a case
+where this may occur without err having being initialised.
 
-Removing the driver results in the following oops, but that's already
-discussed[0] and is independent of the devicetree description:
+> +
+> +	nt = alloc_and_init();
+> +	if (!nt) {
+> +		err = -ENOMEM;
+> +		goto fail;
+> +	}
+> +
+>  	if (*target_config == '+') {
+>  		nt->extended = true;
+>  		target_config++;
 
-I'd add a test tag but I want to wait for some network traffic tests
-before I do such. I wouldn't wait on picking it up just because of
-that though.
+...
 
-[0] https://lore.kernel.org/netdev/ZNKLjuxnR2+V3g1D@shell.armlinux.org.uk/
-
-[root@dhcp19-243-28 ~]# modprobe -r dwmac_qcom_ethqos
-[ 1260.620402] qcom-ethqos 23040000.ethernet eth1: stmmac_dvr_remove: removing driver
-[ 1260.655724] qcom-ethqos 23040000.ethernet eth1: FPE workqueue stop
-[ 1261.034265] qcom-ethqos 23000000.ethernet eth0: stmmac_dvr_remove: removing driver
-[ 1261.042108] Unable to handle kernel paging request at virtual address dead000000000122
-[ 1261.050379] Mem abort info:
-[ 1261.053251]   ESR = 0x0000000096000044
-[ 1261.057113]   EC = 0x25: DABT (current EL), IL = 32 bits
-[ 1261.062573]   SET = 0, FnV = 0
-[ 1261.065712]   EA = 0, S1PTW = 0
-[ 1261.068946]   FSC = 0x04: level 0 translation fault
-[ 1261.073956] Data abort info:
-[ 1261.076916]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
-[ 1261.082552]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[ 1261.087882]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[ 1261.093338] [dead000000000122] address between user and kernel address ranges
-[ 1261.100667] Internal error: Oops: 0000000096000044 [#1] PREEMPT SMP
-[ 1261.107096] Modules linked in: r8152 rfkill marvell dwmac_qcom_ethqos(-) qcom_pon stmmac_platform crct10dif_ce stmmac spi_geni_qcom i2c_qcom_geni phy_qcom_qmp_usb phy_qcom_sgmii_eth phy_qcom_snps_femto_v2 pcs_xpcs qcom_wdt socinfo phy_qcom_qmp_pcie fuse ufs_qcom phy_qcom_qmp_ufs
-[ 1261.132407] CPU: 2 PID: 610 Comm: modprobe Not tainted 6.5.0-rc4-next-20230731-00008-g18ccccee8230 #7
-[ 1261.141860] Hardware name: Qualcomm SA8775P Ride (DT)
-[ 1261.147042] pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[ 1261.154185] pc : device_link_put_kref+0x44/0x110
-[ 1261.158926] lr : device_link_put_kref+0xf4/0x110
-[ 1261.163662] sp : ffff800082a938e0
-[ 1261.167066] x29: ffff800082a938e0 x28: ffff6ec68bdc9d80 x27: 0000000000000000
-[ 1261.174390] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
-[ 1261.181714] x23: ffff800082a93b38 x22: ffff6ec68690f2d8 x21: ffff6ec6896aed30
-[ 1261.189031] x20: ffff6ec68246b830 x19: ffff6ec68246b800 x18: 0000000000000006
-[ 1261.196355] x17: ffff9259b7856000 x16: ffffdc7b42e3eaec x15: 725f7276645f6361
-[ 1261.203679] x14: 0000000000000000 x13: 0000000000000002 x12: 0000000000000000
-[ 1261.210996] x11: 0000000000000040 x10: ffffdc7b447de0b0 x9 : ffffdc7b447de0a8
-[ 1261.218321] x8 : ffff6ec680400028 x7 : 0000000000000000 x6 : 0000000000000000
-[ 1261.225645] x5 : ffff6ec680400000 x4 : 00000000c0000000 x3 : ffff6ec6896ae8b0
-[ 1261.232963] x2 : dead000000000122 x1 : dead000000000122 x0 : ffff6ec68246b830
-[ 1261.240287] Call trace:
-[ 1261.242806]  device_link_put_kref+0x44/0x110
-[ 1261.247190]  device_link_del+0x30/0x48
-[ 1261.251040]  phy_detach+0x24/0x15c
-[ 1261.254530]  phy_disconnect+0x44/0x5c
-[ 1261.258295]  phylink_disconnect_phy+0x64/0xb0
-[ 1261.262764]  stmmac_release+0x58/0x2d4 [stmmac]
-[ 1261.267425]  __dev_close_many+0xac/0x14c
-[ 1261.271458]  dev_close_many+0x88/0x134
-[ 1261.275308]  unregister_netdevice_many_notify+0x130/0x7d0
-[ 1261.280852]  unregister_netdevice_queue+0xd4/0xdc
-[ 1261.285682]  unregister_netdev+0x24/0x38
-[ 1261.289715]  stmmac_dvr_remove+0x80/0x150 [stmmac]
-[ 1261.294636]  devm_stmmac_pltfr_remove+0x24/0x48 [stmmac_platform]
-[ 1261.300887]  devm_action_release+0x14/0x20
-[ 1261.305090]  devres_release_all+0xa0/0x100
-[ 1261.309293]  device_unbind_cleanup+0x18/0x68
-[ 1261.313676]  device_release_driver_internal+0x1f4/0x228
-[ 1261.319039]  driver_detach+0x4c/0x98
-[ 1261.322708]  bus_remove_driver+0x6c/0xbc
-[ 1261.326739]  driver_unregister+0x30/0x60
-[ 1261.330772]  platform_driver_unregister+0x14/0x20
-[ 1261.335603]  qcom_ethqos_driver_exit+0x18/0x1a8 [dwmac_qcom_ethqos]
-[ 1261.342035]  __arm64_sys_delete_module+0x19c/0x288
-[ 1261.346952]  invoke_syscall+0x48/0x110
-[ 1261.350804]  el0_svc_common.constprop.0+0xc4/0xe4
-[ 1261.355636]  do_el0_svc+0x38/0x94
-[ 1261.359040]  el0_svc+0x2c/0x84
-[ 1261.362178]  el0t_64_sync_handler+0x120/0x12c
-[ 1261.366646]  el0t_64_sync+0x190/0x194
-[ 1261.370413] Code: d2802441 aa1403e0 f2fbd5a1 f9000462 (f9000043) 
-[ 1261.376661] ---[ end trace 0000000000000000 ]---
-Segmentation fault
-
+-- 
+pw-bot: changes-requested
 
