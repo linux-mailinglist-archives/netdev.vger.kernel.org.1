@@ -1,609 +1,199 @@
-Return-Path: <netdev+bounces-26586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AEC677843A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:42:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C66778442
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E1D61C20F2D
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:42:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65784281DCB
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0425025141;
-	Thu, 10 Aug 2023 23:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E0A134B2;
+	Thu, 10 Aug 2023 23:45:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55F62515A
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:38:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8360C433B8;
-	Thu, 10 Aug 2023 23:38:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691710735;
-	bh=7L9YHQXUx+H99Kp/A1HX/2ApGo+F2jYJNjf3Dqcqufc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cetmCvo1QAkBtMofl2nZhwU4nXnPDxgNogRS0SmCL0+8XVWC+WkrXHm8zMq4gTXSH
-	 sevddVuSN2tUaABJDmMku0AehRUR6PBiVVGt/QDdRXntHun0w+SPRUvbTeDafu2VX8
-	 NoaZB7lqyoNgUep3uIjlbSTYuQcqGv5u7GBcdQ03s6GmDjOftEsBqU9w0SZL+obJ8F
-	 E9gXrckxABhL4X6CbNOCinLdDAW/rDBSncPVSI1PFeKdt8umtDWqF3DUFs4uxLc+F3
-	 kZHgNzEkHua/EtDAOraPnzq/ZHBVMdT30yVttHjkL9keamOoqXh4g6WA0eC+RgkMv5
-	 0zWu6MqVZcMOg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	johannes@sipsolutions.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	gal@nvidia.com,
-	tariqt@nvidia.com,
-	lucien.xin@gmail.com,
-	f.fainelli@gmail.com,
-	andrew@lunn.ch,
-	simon.horman@corigine.com,
-	linux@rempel-privat.de,
-	mkubecek@suse.cz
-Subject: [PATCH net-next v2 10/10] ethtool: netlink: always pass genl_info to .prepare_data
-Date: Thu, 10 Aug 2023 16:38:45 -0700
-Message-ID: <20230810233845.2318049-11-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230810233845.2318049-1-kuba@kernel.org>
-References: <20230810233845.2318049-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171D91877
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:45:04 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00086271E
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 16:45:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691711103; x=1723247103;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=o4Ig6Ef1IGmas+e9Rg2Cwi3lbhNE1EbhQXodoUpiRZU=;
+  b=lC46043gOIlIJfILxvqOTlAJItBsfJvbrJg/wVibc7LAoPWmp+UuQKhx
+   Sg/MbxJ6X+iuBYfIeXdrmOPsW19PBIXXTCxaOvqZ9JJZihutLlwj4gtEr
+   +oIM6WRRB9h7cKBGV8AwDRYmqhd2B89F7zY7nu8eBVBMmMtLpc/6RP9iR
+   d30/ZFOxnp/+zj0F2W7GEslWpyXkjaPrrOhUNrfmKWMLuTxaZ7hMlsTAa
+   UOQgugokT1B961jkjBX1BrzIwaxaAVX6trX/+GPaq3dlFYOX4y0ZYwUcL
+   G7kPnFzj4ZlIjUo1WytTVVkW9pRMC/DgNmgpvOSgKhl8Zd1VNzdk6CJkf
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="369023231"
+X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
+   d="scan'208";a="369023231"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 16:45:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="682318974"
+X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
+   d="scan'208";a="682318974"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga003.jf.intel.com with ESMTP; 10 Aug 2023 16:45:03 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 10 Aug 2023 16:45:02 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 10 Aug 2023 16:45:02 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 10 Aug 2023 16:45:02 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 10 Aug 2023 16:45:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H6mRhggXsMtRuA8BHZfdeIzHmR7+9RsYx0FQVPtNk4W+zN1ghBekdMNCh8WAZVdhhOckx/DOZmHvKqatwoWV5wdy16Xh42WlCF2p0R4TStmpsvTDJAuDVDZY8s1UCMNxnAy5pDcakXRfm6xoqokdtOn2XSe0kUZANXwjk3sZd2+QsZ3WUlkAl8VpFqje1fFWI8TRl+nB5mb0K7yPQNlTqIE/iiLa4TGxfvQDZldBOI+Os8q/civSV6Tf/xu5fpvh3pMwQhOC+baqOsa1geP1Fufcm4P90s0eZvAJJRy73JJQ9/KkmrYCXlLAhB4mt1F27ifDq4KJ0Q5n6oGESQZZ1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yd2L2hflcvET+j9l1RtzEI5g+PQiddAvnmbzSK+TPYE=;
+ b=jotyXUTume7siyPcO2fIBZZTZqGt2LnkMXlPIqinjAZkezz63g21X6Dq5k5c88kOBBMIE63VLMoITcUU1p4NdbNR92+fVKtOWA7jmGU/7reVXZ3CTCdT5Nr26QNz7emcWjE431zjqD5JVnLw7qyjjN0PCM+AxZq/zrDQPhScya1ENRdwNwuhM1iAZj6UbjvWksDfN/NBCw71IHmNWNtuRsXWT+noSOYHIJgV8jlQF4XzDq36sbem7GkLc/ASgVmpxulblQ/TTaKfsUh9sGdQJwrorww+SjccS/zH6bPv1Y+GQw7PNe37yO2/8zWpCNQven/rMyKjPUHrq4zXcJ16Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by CH0PR11MB5426.namprd11.prod.outlook.com (2603:10b6:610:d1::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28; Thu, 10 Aug
+ 2023 23:45:00 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::9c1c:5c49:de36:1cda]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::9c1c:5c49:de36:1cda%3]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
+ 23:45:00 +0000
+Message-ID: <e09cddf6-3207-b913-ad51-e283b3ebefa7@intel.com>
+Date: Thu, 10 Aug 2023 16:44:58 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.14.0
+Subject: Re: [PATCH iwl-net v1] ice: fix receive buffer size miscalculation
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>
+References: <20230810002313.421684-1-jesse.brandeburg@intel.com>
+ <16c05f6d-e971-b487-6eb8-ba5e2bcd658e@intel.com>
+Content-Language: en-US
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+In-Reply-To: <16c05f6d-e971-b487-6eb8-ba5e2bcd658e@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0108.namprd03.prod.outlook.com
+ (2603:10b6:303:b7::23) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|CH0PR11MB5426:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a46568b-725d-4420-efb1-08db99fbcfb0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VTohO7WORemV9hXMmE5yo8GZX8k5ELbSEixMXj2/NoIUF8BTXAiWZahPJ5iEKT25ObiFPijhbjdgubAx3riN5F/qvYRGNOh8cromJ0rQ/rFSSrxL6lGfzeJdv1YtO1m436aS14+egsgZnxvdhafCY3SV75s5oAOSun4XETnku7vT/ZLVvRD0qmqnIUNTtLFrtRPfLB5Z85qOH5OTzZrQK6hvmc88aXRFhF+xIjjU5BWstBbT1eGcLmeaOg2cnPlRYvSt1hGrZTbssAjfQCipvgzsS6Y2lfari2q2peUMwz2wSLk/ZdcKE+mnUm6LXlrdBIzO1eDZNO1la9IKuXgyMA40GB88Iv0g2b4brQ8zIFVFOpoaREat1VwbidyNwiRqx60xh76/t3y4nAzds/HBWfPDeo8YtVpB3Pb63YDU46PEZ/NugqvmTLo3UypJU/j5f8NX2FVFCyGUSgqodzF/HFjRI7a5zwbw/C2Y3/kNiz4uujbxE4DePcu1rBC2pedOCxpcIRQLAOi/LtqwhDNaUUoAwLUe9NgNN/Hnle+TJpC44HqIpEemZP4FiEXZqyyi42xTyCULKF8YBMAn3TA7svLjPqPLxQqMnQox1i/IngZPXd1yrs6iB5Wsk9vmcUzoyedrIwsv+m9F6jB480u+ww==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(346002)(396003)(376002)(366004)(136003)(451199021)(186006)(1800799006)(4744005)(2906002)(41300700001)(5660300002)(316002)(44832011)(8676002)(8936002)(36756003)(86362001)(31696002)(82960400001)(31686004)(38100700002)(2616005)(26005)(53546011)(6506007)(478600001)(6512007)(4326008)(6486002)(66476007)(66946007)(66556008)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YUwycFJ1TnNOOWVIdEJaUklib0xzc0ZWNnpVZTU5MDcwelBJbzJvRTU2WS8r?=
+ =?utf-8?B?S0tOTnFSY0pSVzltVnVITktoSTZMMDZnRmwrYVlDZkRyWS9weWM0WkxZQ1Zy?=
+ =?utf-8?B?VWpjYlR2VzhvSHp4K0ZlL2NteUR5SHV4bzBEdHV2OXVnZWh6bWk1a2dzYy9r?=
+ =?utf-8?B?bDBFSUxleTE5aVQ0Z0RkQ21Ka2ZDa0FYR1QyRWVNUUZOTmZtMjZIeFVVRkl3?=
+ =?utf-8?B?bUEwTXZjQWZENlUvOCtkS212Yjl2eGVua2toUGNMeGEyUnY5c3paTUZEd0RD?=
+ =?utf-8?B?WTE2RHFaOCtmODRsNVkrWHI2cmhKSGRORnJjYnpvK2ZaZE0yMVoxeUFVem02?=
+ =?utf-8?B?NThjdDM5UHVJOHF6TXBHSVU0RFc4eVBieCtEOW0ydW4rSGtpaGVFYlA4Nmdn?=
+ =?utf-8?B?dDhSR3QzKzdqMnJ5eXI5UTBmdkJDMnBrUkhQcmpoaFRaQ2kyaDhkNHA0cjd5?=
+ =?utf-8?B?MW5GWDJKNWNuUXh3aysvZFNScFFTUS9mMUFSTnhDM0RpQllNajFhN0NBMzIx?=
+ =?utf-8?B?WTNJWUZJcXJnVWNESG5KRG1ZVXREY2lFUUF5M21nUHZGSVBwRjJZZDRrOGJR?=
+ =?utf-8?B?ZDlKbmE1NTFKeXNvV2RaUkpxazUxbUpmdk5rYlgxVWF4dVQ4N3UxSHVKZjJH?=
+ =?utf-8?B?S1pya2plTC9kdzFGNVJvZTR1YjVGUHZ0QTdEemdsenVmRnJKazlnejdnTFZ5?=
+ =?utf-8?B?dWxObTVhdU1wNm5reXhTTnN6bFB1aTBQcTJNT3llSzdtZHhMOEhQMEo2ZTIx?=
+ =?utf-8?B?MGh5YXNMeWpkSndrc0ZXTHlGM0g1TEFucEt1VFVKR0EvbDdBOUtyelczTVJJ?=
+ =?utf-8?B?b2dueHZCcGNhTlBvN2xKSmNYOTZwRzBjNUI5T0F3NkM2MEQxUFhGTXN0dmZC?=
+ =?utf-8?B?OGRpUjZVa1V2ZFJOMllqaXBWa1JIMURtM2JvQTJaNXJjcWQraHY1TDMzenRh?=
+ =?utf-8?B?RCtLUGpjcEErZEJQMzBubk1UR0cwTW5MTVErSy9SOTI1czAxdjlQQXVpU0hz?=
+ =?utf-8?B?VmVETmJVQ3BtZkRCUlJQMmlXNHNvbGJUS1cwQnNqMTV4R1oxMk5yODBCQldt?=
+ =?utf-8?B?Ykx1N0NhT0pEZ0tONjJ3N2QwMjZXYVNxQnR1QmpTWjZDNDZzdEdveW9TSUNv?=
+ =?utf-8?B?ZjNlWVhncU1TOG9wcDl2RHpSK2cydXFrWGxNSXlLRzN0MFlETHJFYmkwK0oy?=
+ =?utf-8?B?eEN2TXdzVExwc0Z0NGxsMHdGeDlZU1dadGJYWjRIczk1Ty8wZGZqV3Ywa3VB?=
+ =?utf-8?B?dURvb1BpWkZhVllMK3ZOSU8vTUpUWk93bG9aTVZnWEpHOFkxMWNUZE9sOGpM?=
+ =?utf-8?B?cVNDeWI4bUx0OWk0VkMyQ1dZRi91SkVZMUdrZWt4R2RSTjAvYTZDTkxqS2JB?=
+ =?utf-8?B?UUFieExrVWJNZVF2dkV4czQ1T0hySkVReEUrRDkwMGRsK0poaHk3NXlCRHZa?=
+ =?utf-8?B?ZlZjR0hSSjl2cmZCWEJtUnIvUVJVNFhWN0lPb0dZczJ2ZFhCeVl1d3ZMOGpT?=
+ =?utf-8?B?VjlRbUNMa1RpYWtHN3ZuZWlGWEltUXhHcVU2YVNxbDhCWGlXRXBiQnpLUWVN?=
+ =?utf-8?B?Ukt1VlQ4MTFSenl3MEFsajJ3YlpkR0xlR1lLQTJuUDIxank2K2w1U3AvRnho?=
+ =?utf-8?B?b2ZIS2lDSVJwQU1pZDB2QVRCMEk5SnRhYTlGRGd6ZE9UU1JycWZxa2ZPY1A0?=
+ =?utf-8?B?RzRIT2J6UGtLWWVueVRXcE14YUVacUNBWFFhVkwvKzVpMGRXYTJiNEVIWVQ0?=
+ =?utf-8?B?VG9rc1QxZEFkWVBoQkNKdzZJOVRpQjNoRHdBcjNJdlMxaC9VYnhiY2VhQkdp?=
+ =?utf-8?B?TURSVDdnb3piVTRDWEV0YVZYSC9RRnBNRHh1SkhldTNLVUM5T25KVkV1aUZu?=
+ =?utf-8?B?ajVPSHV1TEV1QmxScnBzUFhiM0lhUXp3UERUOThQM0pNT1ZQWnB1YlQ1K1Zw?=
+ =?utf-8?B?NlJvYjRpNGswSkN5b1Z2bVJTcmsveWhIUmg2RnhsbUs1MVRlSWZXRm15TWww?=
+ =?utf-8?B?K1dDNTNkcy9sKzZqaHhHalNPaE85cGhtL0g1ZzZ5NkRhN0J4UklKOEZteGRW?=
+ =?utf-8?B?Z0lHTGs2blNQZ29LUktrK1RLR24wTU8xazNCVkVFL2VhcUhlUGxEeU53Z3pW?=
+ =?utf-8?B?dEZLY016d2dBajFlbWw2clIrOGtCS0hJRElCY0V3T3NxT1ppQkFGNlB2UGpF?=
+ =?utf-8?B?S0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a46568b-725d-4420-efb1-08db99fbcfb0
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 23:45:00.4423
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AOfJwYwinVYuIFUm9rtgbzLyfjo7tyo9MSRTllJFf7AC4RqOrLNsopRVDd1z/UTHD/TrneHKWLctkrDYQYm3NMjGnk+l0te57r9e7mqrn9I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5426
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-We had a number of bugs in the past because developers forgot
-to fully test dumps, which pass NULL as info to .prepare_data.
-.prepare_data implementations would try to access info->extack
-leading to a null-deref.
+On 8/10/2023 2:33 PM, Tony Nguyen wrote:
+> 
+> 
+> On 8/9/2023 5:23 PM, Jesse Brandeburg wrote:
+>> The driver is misconfiguring the hardware for some values of MTU such
+>> that
+>> it could use multiple descriptors to receive a packet when it could have
+>> simply used one.
+>>
+>> Change the driver to use a round-up instead of the result of a shift, as
+>> the shift can truncate the lower bits of the size, and result in the
+>> problem noted above. It also aligns this driver with similar code in
+>> i40e.
+>>
+>> The insidiousness of this problem is that everything works with the wrong
+>> size, it's just not working as well as it could, as some MTU sizes end up
+>> using two or more descriptors, and there is no way to tell that is
+>> happening without looking at ice_trace or a bus analyzer.
+> 
+> This should have a Fixes: ?
 
-Now that dumps and notifications can access struct genl_info
-we can pass it in, and remove the info null checks.
+Dang, you're correct. I'll send a v2.
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com> # pause
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: gal@nvidia.com
-CC: tariqt@nvidia.com
-CC: lucien.xin@gmail.com
-CC: f.fainelli@gmail.com
-CC: andrew@lunn.ch
-CC: simon.horman@corigine.com
-CC: linux@rempel-privat.de
-CC: mkubecek@suse.cz
-CC: johannes@sipsolutions.net
----
- net/ethtool/channels.c    |  2 +-
- net/ethtool/coalesce.c    |  6 +++---
- net/ethtool/debug.c       |  2 +-
- net/ethtool/eee.c         |  2 +-
- net/ethtool/eeprom.c      |  9 ++++-----
- net/ethtool/features.c    |  2 +-
- net/ethtool/fec.c         |  2 +-
- net/ethtool/linkinfo.c    |  2 +-
- net/ethtool/linkmodes.c   |  2 +-
- net/ethtool/linkstate.c   |  2 +-
- net/ethtool/mm.c          |  2 +-
- net/ethtool/module.c      |  5 ++---
- net/ethtool/netlink.c     | 13 ++++++++-----
- net/ethtool/netlink.h     |  2 +-
- net/ethtool/pause.c       |  5 ++---
- net/ethtool/phc_vclocks.c |  2 +-
- net/ethtool/plca.c        |  4 ++--
- net/ethtool/privflags.c   |  2 +-
- net/ethtool/pse-pd.c      |  6 +++---
- net/ethtool/rings.c       |  5 ++---
- net/ethtool/rss.c         |  3 ++-
- net/ethtool/stats.c       |  5 ++---
- net/ethtool/strset.c      |  2 +-
- net/ethtool/tsinfo.c      |  2 +-
- net/ethtool/wol.c         |  5 +++--
- 25 files changed, 47 insertions(+), 47 deletions(-)
-
-diff --git a/net/ethtool/channels.c b/net/ethtool/channels.c
-index 61c40e889a4d..7b4bbd674bae 100644
---- a/net/ethtool/channels.c
-+++ b/net/ethtool/channels.c
-@@ -24,7 +24,7 @@ const struct nla_policy ethnl_channels_get_policy[] = {
- 
- static int channels_prepare_data(const struct ethnl_req_info *req_base,
- 				 struct ethnl_reply_data *reply_base,
--				 struct genl_info *info)
-+				 const struct genl_info *info)
- {
- 	struct channels_reply_data *data = CHANNELS_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/coalesce.c b/net/ethtool/coalesce.c
-index 01a59ce211c8..83112c1a71ae 100644
---- a/net/ethtool/coalesce.c
-+++ b/net/ethtool/coalesce.c
-@@ -59,10 +59,9 @@ const struct nla_policy ethnl_coalesce_get_policy[] = {
- 
- static int coalesce_prepare_data(const struct ethnl_req_info *req_base,
- 				 struct ethnl_reply_data *reply_base,
--				 struct genl_info *info)
-+				 const struct genl_info *info)
- {
- 	struct coalesce_reply_data *data = COALESCE_REPDATA(reply_base);
--	struct netlink_ext_ack *extack = info ? info->extack : NULL;
- 	struct net_device *dev = reply_base->dev;
- 	int ret;
- 
-@@ -73,7 +72,8 @@ static int coalesce_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret < 0)
- 		return ret;
- 	ret = dev->ethtool_ops->get_coalesce(dev, &data->coalesce,
--					     &data->kernel_coalesce, extack);
-+					     &data->kernel_coalesce,
-+					     info->extack);
- 	ethnl_ops_complete(dev);
- 
- 	return ret;
-diff --git a/net/ethtool/debug.c b/net/ethtool/debug.c
-index e4369769817e..0b2dea56d461 100644
---- a/net/ethtool/debug.c
-+++ b/net/ethtool/debug.c
-@@ -23,7 +23,7 @@ const struct nla_policy ethnl_debug_get_policy[] = {
- 
- static int debug_prepare_data(const struct ethnl_req_info *req_base,
- 			      struct ethnl_reply_data *reply_base,
--			      struct genl_info *info)
-+			      const struct genl_info *info)
- {
- 	struct debug_reply_data *data = DEBUG_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
-index 42104bcb0e47..2853394d06a8 100644
---- a/net/ethtool/eee.c
-+++ b/net/ethtool/eee.c
-@@ -26,7 +26,7 @@ const struct nla_policy ethnl_eee_get_policy[] = {
- 
- static int eee_prepare_data(const struct ethnl_req_info *req_base,
- 			    struct ethnl_reply_data *reply_base,
--			    struct genl_info *info)
-+			    const struct genl_info *info)
- {
- 	struct eee_reply_data *data = EEE_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/eeprom.c b/net/ethtool/eeprom.c
-index 49c0a2a77f02..6209c3a9c8f7 100644
---- a/net/ethtool/eeprom.c
-+++ b/net/ethtool/eeprom.c
-@@ -51,8 +51,7 @@ static int fallback_set_params(struct eeprom_req_info *request,
- }
- 
- static int eeprom_fallback(struct eeprom_req_info *request,
--			   struct eeprom_reply_data *reply,
--			   struct genl_info *info)
-+			   struct eeprom_reply_data *reply)
- {
- 	struct net_device *dev = reply->base.dev;
- 	struct ethtool_modinfo modinfo = {0};
-@@ -103,7 +102,7 @@ static int get_module_eeprom_by_page(struct net_device *dev,
- 
- static int eeprom_prepare_data(const struct ethnl_req_info *req_base,
- 			       struct ethnl_reply_data *reply_base,
--			       struct genl_info *info)
-+			       const struct genl_info *info)
- {
- 	struct eeprom_reply_data *reply = MODULE_EEPROM_REPDATA(reply_base);
- 	struct eeprom_req_info *request = MODULE_EEPROM_REQINFO(req_base);
-@@ -124,7 +123,7 @@ static int eeprom_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret)
- 		goto err_free;
- 
--	ret = get_module_eeprom_by_page(dev, &page_data, info ? info->extack : NULL);
-+	ret = get_module_eeprom_by_page(dev, &page_data, info->extack);
- 	if (ret < 0)
- 		goto err_ops;
- 
-@@ -140,7 +139,7 @@ static int eeprom_prepare_data(const struct ethnl_req_info *req_base,
- 	kfree(page_data.data);
- 
- 	if (ret == -EOPNOTSUPP)
--		return eeprom_fallback(request, reply, info);
-+		return eeprom_fallback(request, reply);
- 	return ret;
- }
- 
-diff --git a/net/ethtool/features.c b/net/ethtool/features.c
-index 55d449a2d3fc..a79af8c25a07 100644
---- a/net/ethtool/features.c
-+++ b/net/ethtool/features.c
-@@ -35,7 +35,7 @@ static void ethnl_features_to_bitmap32(u32 *dest, netdev_features_t src)
- 
- static int features_prepare_data(const struct ethnl_req_info *req_base,
- 				 struct ethnl_reply_data *reply_base,
--				 struct genl_info *info)
-+				 const struct genl_info *info)
- {
- 	struct features_reply_data *data = FEATURES_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/fec.c b/net/ethtool/fec.c
-index 0d9a3d153170..e7d3f2c352a3 100644
---- a/net/ethtool/fec.c
-+++ b/net/ethtool/fec.c
-@@ -92,7 +92,7 @@ fec_stats_recalc(struct fec_stat_grp *grp, struct ethtool_fec_stat *stats)
- 
- static int fec_prepare_data(const struct ethnl_req_info *req_base,
- 			    struct ethnl_reply_data *reply_base,
--			    struct genl_info *info)
-+			    const struct genl_info *info)
- {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(active_fec_modes) = {};
- 	struct fec_reply_data *data = FEC_REPDATA(reply_base);
-diff --git a/net/ethtool/linkinfo.c b/net/ethtool/linkinfo.c
-index 310dfe63292a..5c317d23787b 100644
---- a/net/ethtool/linkinfo.c
-+++ b/net/ethtool/linkinfo.c
-@@ -23,7 +23,7 @@ const struct nla_policy ethnl_linkinfo_get_policy[] = {
- 
- static int linkinfo_prepare_data(const struct ethnl_req_info *req_base,
- 				 struct ethnl_reply_data *reply_base,
--				 struct genl_info *info)
-+				 const struct genl_info *info)
- {
- 	struct linkinfo_reply_data *data = LINKINFO_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/linkmodes.c b/net/ethtool/linkmodes.c
-index 20165e07ef90..b2591db49f7d 100644
---- a/net/ethtool/linkmodes.c
-+++ b/net/ethtool/linkmodes.c
-@@ -27,7 +27,7 @@ const struct nla_policy ethnl_linkmodes_get_policy[] = {
- 
- static int linkmodes_prepare_data(const struct ethnl_req_info *req_base,
- 				  struct ethnl_reply_data *reply_base,
--				  struct genl_info *info)
-+				  const struct genl_info *info)
- {
- 	struct linkmodes_reply_data *data = LINKMODES_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/linkstate.c b/net/ethtool/linkstate.c
-index 2158c17a0b32..b2de2108b356 100644
---- a/net/ethtool/linkstate.c
-+++ b/net/ethtool/linkstate.c
-@@ -81,7 +81,7 @@ static int linkstate_get_link_ext_state(struct net_device *dev,
- 
- static int linkstate_prepare_data(const struct ethnl_req_info *req_base,
- 				  struct ethnl_reply_data *reply_base,
--				  struct genl_info *info)
-+				  const struct genl_info *info)
- {
- 	struct linkstate_reply_data *data = LINKSTATE_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/mm.c b/net/ethtool/mm.c
-index 4058a557b5a4..2816bb23c3ad 100644
---- a/net/ethtool/mm.c
-+++ b/net/ethtool/mm.c
-@@ -27,7 +27,7 @@ const struct nla_policy ethnl_mm_get_policy[ETHTOOL_A_MM_HEADER + 1] = {
- 
- static int mm_prepare_data(const struct ethnl_req_info *req_base,
- 			   struct ethnl_reply_data *reply_base,
--			   struct genl_info *info)
-+			   const struct genl_info *info)
- {
- 	struct mm_reply_data *data = MM_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/module.c b/net/ethtool/module.c
-index e0d539b21423..ceb575efc290 100644
---- a/net/ethtool/module.c
-+++ b/net/ethtool/module.c
-@@ -38,10 +38,9 @@ static int module_get_power_mode(struct net_device *dev,
- 
- static int module_prepare_data(const struct ethnl_req_info *req_base,
- 			       struct ethnl_reply_data *reply_base,
--			       struct genl_info *info)
-+			       const struct genl_info *info)
- {
- 	struct module_reply_data *data = MODULE_REPDATA(reply_base);
--	struct netlink_ext_ack *extack = info ? info->extack : NULL;
- 	struct net_device *dev = reply_base->dev;
- 	int ret;
- 
-@@ -49,7 +48,7 @@ static int module_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret < 0)
- 		return ret;
- 
--	ret = module_get_power_mode(dev, data, extack);
-+	ret = module_get_power_mode(dev, data, info->extack);
- 	if (ret < 0)
- 		goto out_complete;
- 
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index f7b3171a0aad..3bbd5afb7b31 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -444,12 +444,12 @@ static int ethnl_default_doit(struct sk_buff *skb, struct genl_info *info)
- 
- static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
- 				  const struct ethnl_dump_ctx *ctx,
--				  struct netlink_callback *cb)
-+				  const struct genl_info *info)
- {
- 	void *ehdr;
- 	int ret;
- 
--	ehdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
-+	ehdr = genlmsg_put(skb, info->snd_portid, info->snd_seq,
- 			   &ethtool_genl_family, NLM_F_MULTI,
- 			   ctx->ops->reply_cmd);
- 	if (!ehdr)
-@@ -457,7 +457,7 @@ static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
- 
- 	ethnl_init_reply_data(ctx->reply_data, ctx->ops, dev);
- 	rtnl_lock();
--	ret = ctx->ops->prepare_data(ctx->req_info, ctx->reply_data, NULL);
-+	ret = ctx->ops->prepare_data(ctx->req_info, ctx->reply_data, info);
- 	rtnl_unlock();
- 	if (ret < 0)
- 		goto out;
-@@ -495,7 +495,7 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
- 		dev_hold(dev);
- 		rtnl_unlock();
- 
--		ret = ethnl_default_dump_one(skb, dev, ctx, cb);
-+		ret = ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
- 
- 		rtnl_lock();
- 		dev_put(dev);
-@@ -647,11 +647,14 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
- 	struct ethnl_reply_data *reply_data;
- 	const struct ethnl_request_ops *ops;
- 	struct ethnl_req_info *req_info;
-+	struct genl_info info;
- 	struct sk_buff *skb;
- 	void *reply_payload;
- 	int reply_len;
- 	int ret;
- 
-+	genl_info_init_ntf(&info, &ethtool_genl_family, cmd);
-+
- 	if (WARN_ONCE(cmd > ETHTOOL_MSG_KERNEL_MAX ||
- 		      !ethnl_default_notify_ops[cmd],
- 		      "unexpected notification type %u\n", cmd))
-@@ -670,7 +673,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
- 	req_info->flags |= ETHTOOL_FLAG_COMPACT_BITSETS;
- 
- 	ethnl_init_reply_data(reply_data, ops, dev);
--	ret = ops->prepare_data(req_info, reply_data, NULL);
-+	ret = ops->prepare_data(req_info, reply_data, &info);
- 	if (ret < 0)
- 		goto err_cleanup;
- 	ret = ops->reply_size(req_info, reply_data);
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 79424b34b553..9a333a8d04c1 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -355,7 +355,7 @@ struct ethnl_request_ops {
- 			     struct netlink_ext_ack *extack);
- 	int (*prepare_data)(const struct ethnl_req_info *req_info,
- 			    struct ethnl_reply_data *reply_data,
--			    struct genl_info *info);
-+			    const struct genl_info *info);
- 	int (*reply_size)(const struct ethnl_req_info *req_info,
- 			  const struct ethnl_reply_data *reply_data);
- 	int (*fill_reply)(struct sk_buff *skb,
-diff --git a/net/ethtool/pause.c b/net/ethtool/pause.c
-index 6657d0b888d8..f7c847aeb1a2 100644
---- a/net/ethtool/pause.c
-+++ b/net/ethtool/pause.c
-@@ -51,10 +51,9 @@ static int pause_parse_request(struct ethnl_req_info *req_base,
- 
- static int pause_prepare_data(const struct ethnl_req_info *req_base,
- 			      struct ethnl_reply_data *reply_base,
--			      struct genl_info *info)
-+			      const struct genl_info *info)
- {
- 	const struct pause_req_info *req_info = PAUSE_REQINFO(req_base);
--	struct netlink_ext_ack *extack = info ? info->extack : NULL;
- 	struct pause_reply_data *data = PAUSE_REPDATA(reply_base);
- 	enum ethtool_mac_stats_src src = req_info->src;
- 	struct net_device *dev = reply_base->dev;
-@@ -74,7 +73,7 @@ static int pause_prepare_data(const struct ethnl_req_info *req_base,
- 	if ((src == ETHTOOL_MAC_STATS_SRC_EMAC ||
- 	     src == ETHTOOL_MAC_STATS_SRC_PMAC) &&
- 	    !__ethtool_dev_mm_supported(dev)) {
--		NL_SET_ERR_MSG_MOD(extack,
-+		NL_SET_ERR_MSG_MOD(info->extack,
- 				   "Device does not support MAC merge layer");
- 		ethnl_ops_complete(dev);
- 		return -EOPNOTSUPP;
-diff --git a/net/ethtool/phc_vclocks.c b/net/ethtool/phc_vclocks.c
-index 637b2f5297d5..cadaabed60bd 100644
---- a/net/ethtool/phc_vclocks.c
-+++ b/net/ethtool/phc_vclocks.c
-@@ -24,7 +24,7 @@ const struct nla_policy ethnl_phc_vclocks_get_policy[] = {
- 
- static int phc_vclocks_prepare_data(const struct ethnl_req_info *req_base,
- 				    struct ethnl_reply_data *reply_base,
--				    struct genl_info *info)
-+				    const struct genl_info *info)
- {
- 	struct phc_vclocks_reply_data *data = PHC_VCLOCKS_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
-index 5a8cab4df0c9..b238a1afe9ae 100644
---- a/net/ethtool/plca.c
-+++ b/net/ethtool/plca.c
-@@ -40,7 +40,7 @@ const struct nla_policy ethnl_plca_get_cfg_policy[] = {
- 
- static int plca_get_cfg_prepare_data(const struct ethnl_req_info *req_base,
- 				     struct ethnl_reply_data *reply_base,
--				     struct genl_info *info)
-+				     const struct genl_info *info)
- {
- 	struct plca_reply_data *data = PLCA_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-@@ -183,7 +183,7 @@ const struct nla_policy ethnl_plca_get_status_policy[] = {
- 
- static int plca_get_status_prepare_data(const struct ethnl_req_info *req_base,
- 					struct ethnl_reply_data *reply_base,
--					struct genl_info *info)
-+					const struct genl_info *info)
- {
- 	struct plca_reply_data *data = PLCA_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/privflags.c b/net/ethtool/privflags.c
-index 23264a1ebf12..297be6a13ab9 100644
---- a/net/ethtool/privflags.c
-+++ b/net/ethtool/privflags.c
-@@ -57,7 +57,7 @@ static int ethnl_get_priv_flags_info(struct net_device *dev,
- 
- static int privflags_prepare_data(const struct ethnl_req_info *req_base,
- 				  struct ethnl_reply_data *reply_base,
--				  struct genl_info *info)
-+				  const struct genl_info *info)
- {
- 	struct privflags_reply_data *data = PRIVFLAGS_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 530b8b99e6df..cc478af77111 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -53,8 +53,8 @@ static int pse_get_pse_attributes(struct net_device *dev,
- }
- 
- static int pse_prepare_data(const struct ethnl_req_info *req_base,
--			       struct ethnl_reply_data *reply_base,
--			       struct genl_info *info)
-+			    struct ethnl_reply_data *reply_base,
-+			    const struct genl_info *info)
- {
- 	struct pse_reply_data *data = PSE_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-@@ -64,7 +64,7 @@ static int pse_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret < 0)
- 		return ret;
- 
--	ret = pse_get_pse_attributes(dev, info ? info->extack : NULL, data);
-+	ret = pse_get_pse_attributes(dev, info->extack, data);
- 
- 	ethnl_ops_complete(dev);
- 
-diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-index 1c4972526142..fb09f774ea01 100644
---- a/net/ethtool/rings.c
-+++ b/net/ethtool/rings.c
-@@ -24,10 +24,9 @@ const struct nla_policy ethnl_rings_get_policy[] = {
- 
- static int rings_prepare_data(const struct ethnl_req_info *req_base,
- 			      struct ethnl_reply_data *reply_base,
--			      struct genl_info *info)
-+			      const struct genl_info *info)
- {
- 	struct rings_reply_data *data = RINGS_REPDATA(reply_base);
--	struct netlink_ext_ack *extack = info ? info->extack : NULL;
- 	struct net_device *dev = reply_base->dev;
- 	int ret;
- 
-@@ -39,7 +38,7 @@ static int rings_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret < 0)
- 		return ret;
- 	dev->ethtool_ops->get_ringparam(dev, &data->ringparam,
--					&data->kernel_ringparam, extack);
-+					&data->kernel_ringparam, info->extack);
- 	ethnl_ops_complete(dev);
- 
- 	return 0;
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index be260ab34e58..5764202e6cb6 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -42,7 +42,8 @@ rss_parse_request(struct ethnl_req_info *req_info, struct nlattr **tb,
- 
- static int
- rss_prepare_data(const struct ethnl_req_info *req_base,
--		 struct ethnl_reply_data *reply_base, struct genl_info *info)
-+		 struct ethnl_reply_data *reply_base,
-+		 const struct genl_info *info)
- {
- 	struct rss_reply_data *data = RSS_REPDATA(reply_base);
- 	struct rss_req_info *request = RSS_REQINFO(req_base);
-diff --git a/net/ethtool/stats.c b/net/ethtool/stats.c
-index 010ed19ccc99..912f0c4fff2f 100644
---- a/net/ethtool/stats.c
-+++ b/net/ethtool/stats.c
-@@ -114,10 +114,9 @@ static int stats_parse_request(struct ethnl_req_info *req_base,
- 
- static int stats_prepare_data(const struct ethnl_req_info *req_base,
- 			      struct ethnl_reply_data *reply_base,
--			      struct genl_info *info)
-+			      const struct genl_info *info)
- {
- 	const struct stats_req_info *req_info = STATS_REQINFO(req_base);
--	struct netlink_ext_ack *extack = info ? info->extack : NULL;
- 	struct stats_reply_data *data = STATS_REPDATA(reply_base);
- 	enum ethtool_mac_stats_src src = req_info->src;
- 	struct net_device *dev = reply_base->dev;
-@@ -130,7 +129,7 @@ static int stats_prepare_data(const struct ethnl_req_info *req_base,
- 	if ((src == ETHTOOL_MAC_STATS_SRC_EMAC ||
- 	     src == ETHTOOL_MAC_STATS_SRC_PMAC) &&
- 	    !__ethtool_dev_mm_supported(dev)) {
--		NL_SET_ERR_MSG_MOD(extack,
-+		NL_SET_ERR_MSG_MOD(info->extack,
- 				   "Device does not support MAC merge layer");
- 		ethnl_ops_complete(dev);
- 		return -EOPNOTSUPP;
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index 3f7de54d85fb..c678b484a079 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -274,7 +274,7 @@ static int strset_prepare_set(struct strset_info *info, struct net_device *dev,
- 
- static int strset_prepare_data(const struct ethnl_req_info *req_base,
- 			       struct ethnl_reply_data *reply_base,
--			       struct genl_info *info)
-+			       const struct genl_info *info)
- {
- 	const struct strset_req_info *req_info = STRSET_REQINFO(req_base);
- 	struct strset_reply_data *data = STRSET_REPDATA(reply_base);
-diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
-index 63b5814bd460..9daed0aab162 100644
---- a/net/ethtool/tsinfo.c
-+++ b/net/ethtool/tsinfo.c
-@@ -25,7 +25,7 @@ const struct nla_policy ethnl_tsinfo_get_policy[] = {
- 
- static int tsinfo_prepare_data(const struct ethnl_req_info *req_base,
- 			       struct ethnl_reply_data *reply_base,
--			       struct genl_info *info)
-+			       const struct genl_info *info)
- {
- 	struct tsinfo_reply_data *data = TSINFO_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
-index a4a43d9e6e9d..5f2bc8e549af 100644
---- a/net/ethtool/wol.c
-+++ b/net/ethtool/wol.c
-@@ -24,7 +24,7 @@ const struct nla_policy ethnl_wol_get_policy[] = {
- 
- static int wol_prepare_data(const struct ethnl_req_info *req_base,
- 			    struct ethnl_reply_data *reply_base,
--			    struct genl_info *info)
-+			    const struct genl_info *info)
- {
- 	struct wol_reply_data *data = WOL_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-@@ -39,7 +39,8 @@ static int wol_prepare_data(const struct ethnl_req_info *req_base,
- 	dev->ethtool_ops->get_wol(dev, &data->wol);
- 	ethnl_ops_complete(dev);
- 	/* do not include password in notifications */
--	data->show_sopass = info && (data->wol.supported & WAKE_MAGICSECURE);
-+	data->show_sopass = genl_info_is_ntf(info) &&
-+		(data->wol.supported & WAKE_MAGICSECURE);
- 
- 	return 0;
- }
--- 
-2.41.0
+Thanks,
+Jesse
 
 
