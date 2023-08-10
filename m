@@ -1,119 +1,83 @@
-Return-Path: <netdev+bounces-26541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24E07780A7
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:47:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B7E67780C2
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 852961C21058
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:47:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02F51281262
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4E3214E5;
-	Thu, 10 Aug 2023 18:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F75F22EFA;
+	Thu, 10 Aug 2023 18:50:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B7162A
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:47:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F88DC433C7;
-	Thu, 10 Aug 2023 18:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F76D1F95D
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:50:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 12CF7C433C9;
+	Thu, 10 Aug 2023 18:50:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691693236;
-	bh=MI9uA1gPyDnlzeAssRrd1QMSMWY9aArciSGRIr3kqK4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NeQCgZ4lJ5NLzZkzbwQGFThnLvvxX9FDvSS9qK5+xyyWBCRwW1dDDO1VTdCyyDdmm
-	 QHnDWXey4AB8UI5tDnapUfxtxBDWkFEVOGkvCuNJIW3YVul9lopEeDgutRqken9Kv8
-	 +ag9EVbe8PWr3fe8a6Lg5B3ztfggob3/tkhHo6Vc7WKFl669KMdGDH81cnBU8Ittv7
-	 QfinEeffixpXG7XlykynfpXCriPN/snKt3scSyOW/Hac4c5z72krzz6HdjxCq+DKhq
-	 HSLr5MVrXtvFdFKhLpFZAN4tvOryZ8ZgKDDDwbE8bUQS975cev+u7vjxR0seeXohta
-	 wUYjU8YEa5YBg==
-Date: Thu, 10 Aug 2023 11:47:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jijie Shao <shaojijie@huawei.com>, Leon Romanovsky <leon@kernel.org>,
- yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shenjian15@huawei.com,
- wangjie125@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net] net: hns3: fix strscpy causing content truncation
- issue
-Message-ID: <20230810114715.32c8d525@kernel.org>
-In-Reply-To: <202308101103.D0827667B@keescook>
-References: <20230809020902.1941471-1-shaojijie@huawei.com>
-	<20230809070302.GR94631@unreal>
-	<7c44c161-9c86-8c60-f031-6d77d6c28c20@huawei.com>
-	<20230810102247.699ddc14@kernel.org>
-	<202308101103.D0827667B@keescook>
+	s=k20201202; t=1691693422;
+	bh=SgbQKPSrQjPetGpVTNEWgg6M+ml5nVmTAAna2QG1xJk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UuDvc8Eqq81qBrEZvyjPXtQV6SMIoWgTeluevRIBFhcBHJgp+UD8oECxjoPW3SJ0e
+	 iH23r/0UZSN7G1f8SNTThm6g6Ao7m2bPUc9j2GNG4WJhujvUBAd8Jn5J2MTfGkrxRL
+	 mqHMUNrA8nFzzRdL/aNQXUo2d0l9oRYXi5bPHBgUfrVfCHgKyyQ+AAHiBAfpqzhTKL
+	 OkSpg6LkU6vWXWh4huYMIq06aQCCmhy7Zc51e/AePXutL9mBOfFRTB+5oPpJCRijVi
+	 nDegtxtc3mv7+Nj2j13hbLceXZ5GN42G/YhF/ahIfJsw3krhyZRwqzBM3+nrG6irC3
+	 bDty2LABgdxqw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB099C595C2;
+	Thu, 10 Aug 2023 18:50:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: tls: set MSG_SPLICE_PAGES consistently
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169169342195.7825.6502924229390560914.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Aug 2023 18:50:21 +0000
+References: <20230808180917.1243540-1-kuba@kernel.org>
+In-Reply-To: <20230808180917.1243540-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, tariqt@nvidia.com, borisp@nvidia.com,
+ john.fastabend@gmail.com, dhowells@redhat.com
 
-On Thu, 10 Aug 2023 11:23:46 -0700 Kees Cook wrote:
-> tldr: use memcpy() instead of strscpy().
-> 
-> 
-> Okay, I went to go read up on the history here. For my own notes, here's
-> the original code, prior to 1cf3d5567f27 ("net: hns3: fix strncpy()
-> not using dest-buf length as length issue"):
-> 
-> static void hns3_dbg_fill_content(char *content, u16 len,
-> 				  const struct hns3_dbg_item *items,
-> 				  const char **result, u16 size)
-> {
-> 	char *pos = content;
-> 	u16 i;
-> 
-> 	memset(content, ' ', len);
-> 	for (i = 0; i < size; i++) {
-> 		if (result)
-> 			strncpy(pos, result[i], strlen(result[i]));
-> 		else
-> 			strncpy(pos, items[i].name, strlen(items[i].name));
-> 
-> 		pos += strlen(items[i].name) + items[i].interval;
-> 	}
-> 
-> 	*pos++ = '\n';
-> 	*pos++ = '\0';
-> }
-> 
-> The warning to be fixed was:
-> 
-> hclge_debugfs.c:90:25: warning: 'strncpy' output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
-> 
-> There are a few extra checks added in 1cf3d5567f27, but I'm more curious
-> about this original code's intent. It seems very confusing to me.
-> 
-> Firstly, why is "pos" updated based on "strlen(items[i].name)" even when
-> "result[i]" is used? Secondly, why is "interval" used? (These concerns
-> are mostly addressed in 1cf3d5567f27.)
-> 
-> I guess I'd just like to take a step back and ask, "What is this
-> function trying to do?" It seems to be building a series of strings in a
-> " "-padding buffer, and it intends that the buffer be newline and %NUL
-> terminated.
-> 
-> It looks very much like it wants to _avoid_ adding %NUL termination when
-> doing copies, which is why it's using strncpy with a length argument of
-> the source string length: it's _forcing_ the copy to not be terminated.
-> This is just memcpy.
-> 
-> strtomem() is designed for buffer sizes that can be known at compile
-> time, so it's not useful here (as was found), since a string is being
-> built up and uses a moving pointer.
-> 
-> I think the correct fix is to use memcpy() instead of strscpy(). No
-> %NUL-truncation is desired, the sizes are already determined and bounds
-> checked. (And the latter is what likely silenced the compiler warning.)
+Hello:
 
-Got it, thanks!
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  8 Aug 2023 11:09:17 -0700 you wrote:
+> We used to change the flags for the last segment, because
+> non-last segments had the MSG_SENDPAGE_NOTLAST flag set.
+> That flag is no longer a thing so remove the setting.
+> 
+> Since flags most likely don't have MSG_SPLICE_PAGES set
+> this avoids passing parts of the sg as splice and parts
+> as non-splice. Before commit under Fixes we'd have called
+> tcp_sendpage() which would add the MSG_SPLICE_PAGES.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: tls: set MSG_SPLICE_PAGES consistently
+    https://git.kernel.org/netdev/net/c/6b486676b41c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
