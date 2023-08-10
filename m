@@ -1,50 +1,45 @@
-Return-Path: <netdev+bounces-26560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98D9677821F
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:25:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E852E778231
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C45381C20E27
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:25:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6DC281E8E
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A7423BD5;
-	Thu, 10 Aug 2023 20:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB0320F92;
+	Thu, 10 Aug 2023 20:32:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F498200BC
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:25:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB26AC433C7;
-	Thu, 10 Aug 2023 20:24:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638DDEAD9
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:32:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5626C433C8;
+	Thu, 10 Aug 2023 20:32:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691699101;
-	bh=1YYXvFAoppm4M8kiOkIWEqbRmKvfNZDSn9Ngz3JPAKo=;
+	s=k20201202; t=1691699562;
+	bh=SRv5DtqNA/rqfrEgRedurzXWUixkLpPGUOBef8eHY5o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nv2GjkKRJtwGJdVS4ReDMYIqunL3Pv+KtO1RireTzIkzYGUlPAjKoCRaSUhNqxQSU
-	 UJTlYVOgEz12+kLlvWlYteXKKNkZGy4E8XQBxQUBTdKiuXgByFkYBGZA5CJMuZyJdH
-	 Hg4ef9Y6DZ80my1N1Xf38e7y/O+0qU5lWt8Plj5LK7F6xa1JbJOrkrsSV28GcSYjk1
-	 mWLwzP617xZ9ooLH56OWglb6fiZy+fRadKZ1I2lG2kKKBohHOcCl7/8r2qDWySDWR+
-	 +J66ty5N0U288JNVifaIm0ZVWIKL+ZcbaDVDiFhaGTzwFj7e6R6DuKJdFHNAC2se6g
-	 WLhye1H8PCcnw==
-Date: Thu, 10 Aug 2023 22:24:56 +0200
+	b=XSWoDcBTjo2Qzk/UQHFM07811bQ9YjZDSOyjpF63KjT81JFOmtAs2b40P9PFsq/9e
+	 NmaclxzWskIy6SSP4Y44ooedtIIErAIVD80NgeBP3BgdJWtX0XPxLCudOw0rT3ZkZN
+	 rEMv86izp/U6pxiFDIRqrRPBWOibcWowozHoRRWD67CNSjjvCJeTk5UYWVnRVra7Ta
+	 jBwkdwqAKL9pxdP9t8RMUBt0j5PWF/edTxV0Lguar/blb3tynbXi7dvjyE3yKuROeO
+	 foJGG0/ldPti4W8h5AxdoKz7HPO07WdREH+qSSMKJWllTCiDPGfTjIhRUQtyWRcWI2
+	 9OswPYHfnbSvw==
+Date: Thu, 10 Aug 2023 22:32:36 +0200
 From: Simon Horman <horms@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andi Shyti <andi.shyti@kernel.org>
-Subject: Re: [PATCH net-next 1/2] net/xgene: fix Wvoid-pointer-to-enum-cast
- warning
-Message-ID: <ZNVHmDgI9S1JKyht@vergenet.net>
-References: <20230810103923.151226-1-krzysztof.kozlowski@linaro.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, apetlund@simula.no,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net] net: fix the RTO timer retransmitting skb every 1ms
+ if linear option is enabled
+Message-ID: <ZNVJZKBA698aRXmR@vergenet.net>
+References: <20230810112148.2032-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,16 +48,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230810103923.151226-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230810112148.2032-1-kerneljasonxing@gmail.com>
 
-On Thu, Aug 10, 2023 at 12:39:22PM +0200, Krzysztof Kozlowski wrote:
-> 'enet_id' is an enum, thus cast of pointer on 64-bit compile test with
-> W=1 causes:
+On Thu, Aug 10, 2023 at 07:21:48PM +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
->   xgene_enet_main.c:2044:20: error: cast to smaller integer type 'enum xgene_enet_id' from 'const void *' [-Werror,-Wvoid-pointer-to-enum-cast]
+> In the real workload, I encountered an issue which could cause the RTO
+> timer to retransmit the skb per 1ms with linear option enabled. The amount
+> of lost-retransmitted skbs can go up to 1000+ instantly.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> The root cause is that if the icsk_rto happens to be zero in the 6th round
+> (which is the TCP_THIN_LINEAR_RETRIES value), then it will alway be zero
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org> # build-tested
+nit: alway -> always
+
+     checkpatch.pl --codespell is your friend
+
+> due to the changed calculation method in tcp_retransmit_timer() as follows:
+> 
+> icsk->icsk_rto = min(icsk->icsk_rto << 1, TCP_RTO_MAX);
+> 
+> Above line could be converted to
+> icsk->icsk_rto = min(0 << 1, TCP_RTO_MAX) = 0
+> 
+> Therefore, the timer expires so quickly without any doubt.
+> 
+> I read through the RFC 6298 and found that the RTO value can be rounded
+> up to a certain value, in Linux, say TCP_RTO_MIN as default, which is
+> regarded as the lower bound in this patch as suggested by Eric.
+> 
+> Fixes: 36e31b0af587 ("net: TCP thin linear timeouts")
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/ipv4/tcp_timer.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> index d45c96c7f5a4..b2b25861355c 100644
+> --- a/net/ipv4/tcp_timer.c
+> +++ b/net/ipv4/tcp_timer.c
+> @@ -599,7 +599,9 @@ void tcp_retransmit_timer(struct sock *sk)
+>  	    tcp_stream_is_thin(tp) &&
+>  	    icsk->icsk_retransmits <= TCP_THIN_LINEAR_RETRIES) {
+>  		icsk->icsk_backoff = 0;
+> -		icsk->icsk_rto = min(__tcp_set_rto(tp), TCP_RTO_MAX);
+> +		icsk->icsk_rto = clamp(__tcp_set_rto(tp),
+> +					    tcp_rto_min(sk),
+> +					    TCP_RTO_MAX);
+
+nit: this indentation looks a bit odd.
+
+		icsk->icsk_rto = clamp(__tcp_set_rto(tp),
+				       tcp_rto_min(sk),
+				       TCP_RTO_MAX);
+
+>  	} else if (sk->sk_state != TCP_SYN_SENT ||
+>  		   icsk->icsk_backoff >
+>  		   READ_ONCE(net->ipv4.sysctl_tcp_syn_linear_timeouts)) {
+> -- 
+> 2.37.3
+> 
+> 
 
