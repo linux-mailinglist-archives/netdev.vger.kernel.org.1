@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-26293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D342777762B
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 205BB77762C
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:46:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E11E2816B5
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:46:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF33B2816B5
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:46:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE35B1F955;
-	Thu, 10 Aug 2023 10:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162A4214FB;
+	Thu, 10 Aug 2023 10:40:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B6A3D71
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:40:02 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2AD2719
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:40:01 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-56942667393so10921737b3.2
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:40:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7373D71
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:40:04 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF4D2719
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:40:03 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d6349e1d4c2so798127276.2
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691664000; x=1692268800;
+        d=google.com; s=20221208; t=1691664002; x=1692268802;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eeQGgJ+1DzJk4iGlVIFEA3TwwcMSgrMNCsN1zmi2Wd0=;
-        b=miVP8LMmGNgKZ51pIdEc/ewi6Evr8UTFpVAet20KxpZlSq2gW1OcBCCAHEgQ4y9nGE
-         tSjHtw1dgXoCew6a6YVLfp2JjB4IIY8D0nFkiEX9KE1PjV+KuSw/5yCm0ASSuAbAcBdO
-         8pMM7Gtzgu6sBOBRuAWGUFSev4OMv+USMz+7iXpJbU+keuD73QI3/+ZuM+A8gpBGV6mi
-         xNKPYGD8Ml/DuvVc4sXdq9yFxb7pIMOEINZTmd57lTHbUnVZu5I0yKp1ilO6IQ4UMVN0
-         EWrB0eCja0UuJc0SuUR5xdBMACUU7bAenHQ2hYOE6vcqoVMKTN95aznVmcum1X9maQmj
-         7XTQ==
+        bh=UyELD65IEYejZ6Krhj/YgGFlULL/un+9MMUGmFvMQ4o=;
+        b=5F9yUHYFbXvUgVCSkycUoaQ6R3r+dSrHvQ+ZGURwCtJnNtDTxFJtcO/gLMCcm72wsF
+         7ql5BnEbrQCMPuMACTIkAqwJtkg1gCEQVX82uXP7aSvO+DA9f7U5smQB6ld4hW6O6Hnz
+         rjibIcEy3eUUbwk6sireYReW9JMK9wR24YmXhcf8IFhm+r8BOHCZCUM+COHSdK3Q7J45
+         WMyJ1+VkYhcUIoGtZEpIwRbbW0w2LuAhHWqNqnC3Vev+MJQtM3orvXCZ5nbDXZqS0wJs
+         +ijsfKmiv7X8bk4T5r+bd2rvkyXL6ZzdnsXHGJYmpVGYDRu8PW9TvNqcCxWOQlCDF7Cf
+         /vYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691664000; x=1692268800;
+        d=1e100.net; s=20221208; t=1691664002; x=1692268802;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eeQGgJ+1DzJk4iGlVIFEA3TwwcMSgrMNCsN1zmi2Wd0=;
-        b=BMw3zChoFGZGx9jN+3slqlnaqdF9z5Ub/LI8RabxxsT77Z9eWVvT+xygQp5XZcnBPe
-         r9coMmZl/UqoaNX0vyMgW0Xb3rIy4X/IYF3+4r+CdM+ZpJeR8OnS0FqPg4ZcEB91BYDd
-         GYD+smCbIl0HKJO8ZgQnPxns671lujsLGqHV5kTZ3yiUznhC7yqFEu1flhOUOZLcVBFf
-         wB5gVRk/si1RPeF4HCuqLJbfofZcIdGZjJznkbR44TwM7glb3ls241uMU9tvdLg7oWkD
-         l38NkPdAZ+MoI0LDpQaSgfE3wLH62+EJeCKdAKG8WfmjcyIcR393IUQjoWGPx/3vDqJd
-         8u3w==
-X-Gm-Message-State: AOJu0YyaO9WvyGsdDZKgJEkJPbIg5dgFvB0BonN0XwFXkQfgoDKOnGO0
-	G4DhsY/M00L2ILFNfV7F5yYwVwyUMg0zAA==
-X-Google-Smtp-Source: AGHT+IH4HVHKQHbk8aCb7QoVdxwR9eu90EoDLvKcoAkdum6XMF595s3w5UnF33Vx0/3x2IK+JFm91gHiihklFw==
+        bh=UyELD65IEYejZ6Krhj/YgGFlULL/un+9MMUGmFvMQ4o=;
+        b=kC5v2F6AYSNV+xfXlAwZBpZmD29quQmha0QBQNukXHQ4XyuV5LYojPne7kxiKN7qLv
+         mahFg5/7QfFVAyrI5IPvtjz+gPXD3qw5TVclMvPWZSD/UmKfLJf991JyVnYzgyHxtQbs
+         dj/74fqPv2zIAoq8DPM6N4Rj4K+glcObSBbZ9hc01zaG86fjeGVLGg0XfhHdK6pUOh9e
+         Zw2o8opwhYpBx5W0dqtXZ+4mg20Ez1LnwdSJ5rVRqi/XyvhqFlth9P90XHVXxS6deIli
+         GvRQKFcVLTnrBvNcARKmatI3Mrm7SVvPglTljtBVtqDbUQFNIlPu/LGg6DPEChMMB1e+
+         Xdbw==
+X-Gm-Message-State: AOJu0YxP1gDVFJRbzKFvAlSvuaAiAmiRoVjoFwqx4AeOqTvToM+e5QpF
+	Le8gJ+eFVAnovAkwPdNLl2ndeAO/kHE3LQ==
+X-Google-Smtp-Source: AGHT+IFdw5ZxrOzaZqw9AmwOTyM85XHlD6VYqiWbT1wwBUps+PJ0EUEmrHhCWds2rY7Bm9F81jy9wZJqOIoVRw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:ae0e:0:b0:589:a9fd:5447 with SMTP id
- m14-20020a81ae0e000000b00589a9fd5447mr28209ywh.2.1691664000801; Thu, 10 Aug
- 2023 03:40:00 -0700 (PDT)
-Date: Thu, 10 Aug 2023 10:39:25 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:25c7:0:b0:d4d:564d:8fbf with SMTP id
+ l190-20020a2525c7000000b00d4d564d8fbfmr29264ybl.13.1691664002388; Thu, 10 Aug
+ 2023 03:40:02 -0700 (PDT)
+Date: Thu, 10 Aug 2023 10:39:26 +0000
 In-Reply-To: <20230810103927.1705940-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230810103927.1705940-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230810103927.1705940-14-edumazet@google.com>
-Subject: [PATCH net-next 13/15] inet: move inet->defer_connect to inet->inet_flags
+Message-ID: <20230810103927.1705940-15-edumazet@google.com>
+Subject: [PATCH net-next 14/15] inet: implement lockless IP_TTL
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -77,202 +77,91 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Make room in struct inet_sock by removing this bit field,
-using one available bit in inet_flags instead.
+ip_select_ttl() is racy, because it reads inet->uc_ttl
+without proper locking.
 
-Also move local_port_range to fill the resulting hole,
-saving 8 bytes on 64bit arches.
+Add READ_ONCE()/WRITE_ONCE() annotations while
+allowing IP_TTL socket option to be set/read without
+holding the socket lock.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/inet_sock.h | 10 ++++------
- net/ipv4/af_inet.c      |  4 ++--
- net/ipv4/inet_diag.c    |  2 +-
- net/ipv4/tcp.c          | 12 +++++++-----
- net/ipv4/tcp_fastopen.c |  2 +-
- net/mptcp/protocol.c    | 12 ++++++++----
- 6 files changed, 23 insertions(+), 19 deletions(-)
+ net/ipv4/ip_output.c   |  2 +-
+ net/ipv4/ip_sockglue.c | 27 ++++++++++++---------------
+ 2 files changed, 13 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index 5eca2e70cbb2c16d26caa7f219ae53fe066ea3bd..acbb93d7607ab873783802b4be6a23f54e2086d3 100644
---- a/include/net/inet_sock.h
-+++ b/include/net/inet_sock.h
-@@ -229,21 +229,18 @@ struct inet_sock {
- 	__u8			min_ttl;
- 	__u8			mc_ttl;
- 	__u8			pmtudisc;
--	__u8			defer_connect:1; /* Indicates that fastopen_connect is set
--						  * and cookie exists so we defer connect
--						  * until first data frame is written
--						  */
- 	__u8			rcv_tos;
- 	__u8			convert_csum;
- 	int			uc_index;
- 	int			mc_index;
- 	__be32			mc_addr;
--	struct ip_mc_socklist __rcu	*mc_list;
--	struct inet_cork_full	cork;
- 	struct {
- 		__u16 lo;
- 		__u16 hi;
- 	}			local_port_range;
-+
-+	struct ip_mc_socklist __rcu	*mc_list;
-+	struct inet_cork_full	cork;
- };
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 8f396eada1b6e61ab174473e9859bc62a10a0d1c..ce6257860a4019d01e28d57d3ce4981fe79d0a0e 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -133,7 +133,7 @@ EXPORT_SYMBOL_GPL(ip_local_out);
+ static inline int ip_select_ttl(const struct inet_sock *inet,
+ 				const struct dst_entry *dst)
+ {
+-	int ttl = inet->uc_ttl;
++	int ttl = READ_ONCE(inet->uc_ttl);
  
- #define IPCORK_OPT	1	/* ip-options has been held in ipcork.opt */
-@@ -270,6 +267,7 @@ enum {
- 	INET_FLAGS_IS_ICSK	= 16,
- 	INET_FLAGS_NODEFRAG	= 17,
- 	INET_FLAGS_BIND_ADDRESS_NO_PORT = 18,
-+	INET_FLAGS_DEFER_CONNECT = 19,
- };
- 
- /* cmsg flags for inet */
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index c591f04eb6a9fc3b7b37a4b93b826a35488b9b50..3f4ac026b07ddcc8d5d8a791da363b56f2ce2746 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -646,7 +646,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 		err = -EISCONN;
- 		goto out;
- 	case SS_CONNECTING:
--		if (inet_sk(sk)->defer_connect)
-+		if (inet_test_bit(DEFER_CONNECT, sk))
- 			err = is_sendmsg ? -EINPROGRESS : -EISCONN;
- 		else
- 			err = -EALREADY;
-@@ -669,7 +669,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 
- 		sock->state = SS_CONNECTING;
- 
--		if (!err && inet_sk(sk)->defer_connect)
-+		if (!err && inet_test_bit(DEFER_CONNECT, sk))
- 			goto out;
- 
- 		/* Just entered SS_CONNECTING state; the only
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 128966dea5540caaa94f6b87db4d3960d177caac..e13a84433413ed88088435ff8e11efeb30fc3cca 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -192,7 +192,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
- 	inet_sockopt.nodefrag	= inet_test_bit(NODEFRAG, sk);
- 	inet_sockopt.bind_address_no_port = inet_test_bit(BIND_ADDRESS_NO_PORT, sk);
- 	inet_sockopt.recverr_rfc4884 = inet_test_bit(RECVERR_RFC4884, sk);
--	inet_sockopt.defer_connect = inet->defer_connect;
-+	inet_sockopt.defer_connect = inet_test_bit(DEFER_CONNECT, sk);
- 	if (nla_put(skb, INET_DIAG_SOCKOPT, sizeof(inet_sockopt),
- 		    &inet_sockopt))
- 		goto errout;
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 4fbc7ff8c53c05cbef3d108527239c7ec8c1363e..cee1e548660cb93835102836fe8103666c4c4697 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -583,7 +583,8 @@ __poll_t tcp_poll(struct file *file, struct socket *sock, poll_table *wait)
- 
- 		if (urg_data & TCP_URG_VALID)
- 			mask |= EPOLLPRI;
--	} else if (state == TCP_SYN_SENT && inet_sk(sk)->defer_connect) {
-+	} else if (state == TCP_SYN_SENT &&
-+		   inet_test_bit(DEFER_CONNECT, sk)) {
- 		/* Active TCP fastopen socket with defer_connect
- 		 * Return EPOLLOUT so application can call write()
- 		 * in order for kernel to generate SYN+data
-@@ -1007,7 +1008,7 @@ int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
- 	tp->fastopen_req->size = size;
- 	tp->fastopen_req->uarg = uarg;
- 
--	if (inet->defer_connect) {
-+	if (inet_test_bit(DEFER_CONNECT, sk)) {
- 		err = tcp_connect(sk);
- 		/* Same failure procedure as in tcp_v4/6_connect */
- 		if (err) {
-@@ -1025,7 +1026,7 @@ int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
- 	if (tp->fastopen_req) {
- 		*copied = tp->fastopen_req->copied;
- 		tcp_free_fastopen_req(tp);
--		inet->defer_connect = 0;
-+		inet_clear_bit(DEFER_CONNECT, sk);
- 	}
- 	return err;
- }
-@@ -1066,7 +1067,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 			zc = MSG_SPLICE_PAGES;
+ 	if (ttl < 0)
+ 		ttl = ip4_dst_hoplimit(dst);
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index cfa65a0b0900f2f77bfd800f105ea079e2afff7c..dbb2d2342ebf0c1f1366ee6b6b2158a6118b2659 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -1023,6 +1023,13 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 	case IP_BIND_ADDRESS_NO_PORT:
+ 		inet_assign_bit(BIND_ADDRESS_NO_PORT, sk, val);
+ 		return 0;
++	case IP_TTL:
++		if (optlen < 1)
++			return -EINVAL;
++		if (val != -1 && (val < 1 || val > 255))
++			return -EINVAL;
++		WRITE_ONCE(inet->uc_ttl, val);
++		return 0;
  	}
  
--	if (unlikely(flags & MSG_FASTOPEN || inet_sk(sk)->defer_connect) &&
-+	if (unlikely(flags & MSG_FASTOPEN ||
-+		     inet_test_bit(DEFER_CONNECT, sk)) &&
- 	    !tp->repair) {
- 		err = tcp_sendmsg_fastopen(sk, msg, &copied_syn, size, uarg);
- 		if (err == -EINPROGRESS && copied_syn > 0)
-@@ -3088,7 +3090,7 @@ int tcp_disconnect(struct sock *sk, int flags)
- 
- 	/* Clean up fastopen related fields */
- 	tcp_free_fastopen_req(tp);
--	inet->defer_connect = 0;
-+	inet_clear_bit(DEFER_CONNECT, sk);
- 	tp->fastopen_client_fail = 0;
- 
- 	WARN_ON(inet->inet_num && !icsk->icsk_bind_hash);
-diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-index 85e4953f118215ba7100931dccb37ad871c5dfd2..8ed54e7334a9c646dfbbc6dc41b9ef11b925de0a 100644
---- a/net/ipv4/tcp_fastopen.c
-+++ b/net/ipv4/tcp_fastopen.c
-@@ -451,7 +451,7 @@ bool tcp_fastopen_defer_connect(struct sock *sk, int *err)
- 
- 	if (tp->fastopen_connect && !tp->fastopen_req) {
- 		if (tcp_fastopen_cookie_check(sk, &mss, &cookie)) {
--			inet_sk(sk)->defer_connect = 1;
-+			inet_set_bit(DEFER_CONNECT, sk);
- 			return true;
- 		}
- 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 1c079e83481eaca16cf73c78050a298cf3e556b6..7d3dc55c4b3751b74681bc42a0a5fb2fae078f4b 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -1690,7 +1690,7 @@ static int mptcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg,
- 		if (!mptcp_disconnect(sk, 0))
- 			sk->sk_socket->state = SS_UNCONNECTED;
+ 	err = 0;
+@@ -1080,13 +1087,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 	case IP_TOS:	/* This sets both TOS and Precedence */
+ 		__ip_sock_set_tos(sk, val);
+ 		break;
+-	case IP_TTL:
+-		if (optlen < 1)
+-			goto e_inval;
+-		if (val != -1 && (val < 1 || val > 255))
+-			goto e_inval;
+-		inet->uc_ttl = val;
+-		break;
+ 	case IP_MTU_DISCOVER:
+ 		if (val < IP_PMTUDISC_DONT || val > IP_PMTUDISC_OMIT)
+ 			goto e_inval;
+@@ -1590,6 +1590,11 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 	case IP_BIND_ADDRESS_NO_PORT:
+ 		val = inet_test_bit(BIND_ADDRESS_NO_PORT, sk);
+ 		goto copyval;
++	case IP_TTL:
++		val = READ_ONCE(inet->uc_ttl);
++		if (val < 0)
++			val = READ_ONCE(sock_net(sk)->ipv4.sysctl_ip_default_ttl);
++		goto copyval;
  	}
--	inet_sk(sk)->defer_connect = 0;
-+	inet_clear_bit(DEFER_CONNECT, sk);
  
- 	return ret;
- }
-@@ -1708,7 +1708,8 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- 	lock_sock(sk);
- 
--	if (unlikely(inet_sk(sk)->defer_connect || msg->msg_flags & MSG_FASTOPEN)) {
-+	if (unlikely(inet_test_bit(DEFER_CONNECT, sk) ||
-+		     msg->msg_flags & MSG_FASTOPEN)) {
- 		int copied_syn = 0;
- 
- 		ret = mptcp_sendmsg_fastopen(sk, msg, len, &copied_syn);
-@@ -3618,7 +3619,9 @@ static int mptcp_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- 		err = __inet_stream_connect(ssock, uaddr, addr_len, O_NONBLOCK, 1);
- 	else
- 		err = inet_stream_connect(ssock, uaddr, addr_len, O_NONBLOCK);
--	inet_sk(sk)->defer_connect = inet_sk(ssock->sk)->defer_connect;
-+
-+	inet_assign_bit(DEFER_CONNECT, sk,
-+			inet_test_bit(DEFER_CONNECT, ssock->sk));
- 
- 	/* on successful connect, the msk state will be moved to established by
- 	 * subflow_finish_connect()
-@@ -3837,7 +3840,8 @@ static __poll_t mptcp_poll(struct file *file, struct socket *sock,
- 			mask |= EPOLLOUT | EPOLLWRNORM;
- 		else
- 			mask |= mptcp_check_writeable(msk);
--	} else if (state == TCP_SYN_SENT && inet_sk(sk)->defer_connect) {
-+	} else if (state == TCP_SYN_SENT &&
-+		   inet_test_bit(DEFER_CONNECT, sk)) {
- 		/* cf tcp_poll() note about TFO */
- 		mask |= EPOLLOUT | EPOLLWRNORM;
- 	}
+ 	if (needs_rtnl)
+@@ -1629,14 +1634,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 	case IP_TOS:
+ 		val = inet->tos;
+ 		break;
+-	case IP_TTL:
+-	{
+-		struct net *net = sock_net(sk);
+-		val = (inet->uc_ttl == -1 ?
+-		       READ_ONCE(net->ipv4.sysctl_ip_default_ttl) :
+-		       inet->uc_ttl);
+-		break;
+-	}
+ 	case IP_MTU_DISCOVER:
+ 		val = inet->pmtudisc;
+ 		break;
 -- 
 2.41.0.640.ga95def55d0-goog
 
