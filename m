@@ -1,196 +1,132 @@
-Return-Path: <netdev+bounces-26187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB3E777224
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:08:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C03277722A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DDA71C212BC
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:08:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD40B1C2137B
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176B21ADE8;
-	Thu, 10 Aug 2023 08:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC3B1ADE9;
+	Thu, 10 Aug 2023 08:09:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072C15667
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:08:49 +0000 (UTC)
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED931703
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:08:49 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-56cc461f34fso541032eaf.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:08:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8434429A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:09:16 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B6E10F5
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:09:15 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fe4cdb724cso5607355e9.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:09:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1691654928; x=1692259728;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HYRUJ+hUzncQKxAf9NNPlTt/VhJk8QH/rEeuA+qk9sA=;
-        b=a8kGnnynUB4sBdM72nMwBdfvq7DUb02Gnx5FekeZiuJ9eoMmLGdaf5EYdo2Xe70EOH
-         89qwJLSjVUTbx/sphZg2LI9ecaYcIbrJuNy/bmy6AE9OQjNpI+2Otd+lH3TcvzrTU55f
-         d01RRcjiCitNotH924VHxHO6Wk41AP3W2JqGM=
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1691654954; x=1692259754;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tsX5oKEyFSe+RgZBEB8JkNzTpB96tD6QQCUVk3EhDv4=;
+        b=yZWUCfTHC7LgxowkMm97O88bFAr77Q7obnNSg4cGopsi/uqBRPVsruAFADVTUr3fQc
+         pou96Zmf+K8VrjJcYz0PwRwx/I0TOagmb6iDEPTfTRfI0t0MljUh7Sq3yfPvsSEGiyZE
+         D452pmg7V/go7sIoHuCTSJz4jevW3pj0oLBID14MipZMUGZcRiWv/t4lDttis8uBAK8W
+         eWMkm3r7iBV7hQVjJXy28YXDSrhCIDZVlJ6qsEqH0/iXg970m9zAciZQy7cJsdxFlMVu
+         /OO8gGmdddDMtddSZW9MN47Jv8cABZ+ppPO/jM7jV26CTkiBUXbAcYJFRcZFmuuYKZ17
+         tMLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691654928; x=1692259728;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1691654954; x=1692259754;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HYRUJ+hUzncQKxAf9NNPlTt/VhJk8QH/rEeuA+qk9sA=;
-        b=ir6xo/IZWnOfk07q7r0OBdosP9jh9dQEP/OVmx+YbOhFTiA4fVdlsPEiqR7MFoX6eQ
-         1ERZqA85uV3Ti4SKcbPoxn+Ial9yHSWE4qiOmUnGkSK/UPwImE3+wjMllBWqhYMDQqPp
-         YbPhxs1EANDFlayaVz8ycYtdaZIjywys/FU8f1qykrOaHbri0nMZD1lRBs4IdwUMS6OZ
-         8Spxo4Wg7nIvbRJoWDv7N35dwyKnn5nhGDHqcP8As7To6ooIxxoQpIacTY/tzWOfCkLX
-         h5F/ITKt3NU4qT0kvd3f7GDC7mzC5uUIAz8g71kaO99rLUoPzPMWIiQN3KnuGOSRHaBx
-         M7wQ==
-X-Gm-Message-State: AOJu0Yw7+eB5ACZ8UlAadxXSOaqUN0gPPHZDqlvPifsmJGVcAkniGvDk
-	wf0DrzCp+csKo0Wg2SvjNdZNZpJkix8NNO0Ap6HSGQ==
-X-Google-Smtp-Source: AGHT+IHzyoZB0BBt4TQ0CSGeKpiyA8L+7XvoSRTOmz/bUb2RS4VyQZF7I4FgsStuFEbFgIf83XN+dreOGziCRWuf4RU=
-X-Received: by 2002:a54:410f:0:b0:3a7:2a94:73f6 with SMTP id
- l15-20020a54410f000000b003a72a9473f6mr1712474oic.49.1691654928490; Thu, 10
- Aug 2023 01:08:48 -0700 (PDT)
+        bh=tsX5oKEyFSe+RgZBEB8JkNzTpB96tD6QQCUVk3EhDv4=;
+        b=fwHSZc8uaBgISNRVL9zwFqO6mcoyx3LS1aVFt4UYFp0XzWJabfgFz/8NW/A+hTVu/g
+         Ue04Xvr3lGOknrIMDjQ9Nr1U/v96CIC+fuOrCLR/QxmDzVVkpvgVPAMwSb4vfwES6tyK
+         H8I6c+boccmnJmGpCx3yzToUYcK0Dpcl9YesDDbe3c7PoP4qDDdaOX+o7ezYirGOOFLX
+         BJ4bD6X5j5HnplruWHuwNVh6u+oG/TdJtTH6B/v6NhxsXNplbhC/tTHI9hBSZW7MmRzd
+         LvKhmR4MCu0ejdA5W0tSi+1HHE8JYRlaC6Wp8s9BPYbvI2vNdgyDX5zSRZnKM4wrkgDa
+         vNPA==
+X-Gm-Message-State: AOJu0YzwKI0d+I8upMEcxNF9fUgyrchml+bVBmZYx0yywn1j9GfvBzxU
+	zT6AVAS6qpSK6FoapcUm5em6uw==
+X-Google-Smtp-Source: AGHT+IFerTkKdSdiC8LnKg+PNItLplFhmiGNknJh7WpIPMZ1ebJmQ1fWhTg1F7ajrQn/O/Z705YH9g==
+X-Received: by 2002:a1c:f716:0:b0:3fc:92:73d6 with SMTP id v22-20020a1cf716000000b003fc009273d6mr1204841wmh.11.1691654953620;
+        Thu, 10 Aug 2023 01:09:13 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:74d3:226a:31b3:454c])
+        by smtp.gmail.com with ESMTPSA id y10-20020a1c4b0a000000b003fe2f3a89d4sm1321790wma.7.2023.08.10.01.09.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 01:09:13 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Andrew Halaney <ahalaney@redhat.com>
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH v3 0/9] arm64: dts: qcom: enable EMAC1 on sa8775p
+Date: Thu, 10 Aug 2023 10:09:00 +0200
+Message-Id: <20230810080909.6259-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1691640922-11362-1-git-send-email-shradhagupta@linux.microsoft.com>
-In-Reply-To: <1691640922-11362-1-git-send-email-shradhagupta@linux.microsoft.com>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Thu, 10 Aug 2023 13:38:36 +0530
-Message-ID: <CALs4sv1CEWni_oHwFAhUn4bMgU7in7jrh1DKH0vd8tKwpts8Ew@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: mana: Add gdma stats to ethtool output
- for mana
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ajay Sharma <sharmaajay@microsoft.com>, Leon Romanovsky <leon@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
-	Michael Kelley <mikelley@microsoft.com>, Shradha Gupta <shradhagupta@microsoft.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001c264c06028d1bc0"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000001c264c06028d1bc0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-On Thu, Aug 10, 2023 at 9:45=E2=80=AFAM Shradha Gupta
-<shradhagupta@linux.microsoft.com> wrote:
->
-> Extended performance counter stats in 'ethtool -S <interface>'
-> for MANA VF to include GDMA tx LSO packets and bytes count.
->
-> Tested-on: Ubuntu22
-> Testcases:
-> 1. LISA testcase:
-> PERF-NETWORK-TCP-THROUGHPUT-MULTICONNECTION-NTTTCP-Synthetic
-> 2. LISA testcase:
-> PERF-NETWORK-TCP-THROUGHPUT-MULTICONNECTION-NTTTCP-SRIOV
-> 3. Validated the GDMA stat packets and byte counters
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> ---
-> Changelog v1->v2
->  * removed extra line
->  * fixed variable declaration indentation
-> ---
+This series contains changes required to enable EMAC1 on sa8775p-ride.
+This iteration no longer depends on any changes to the stmmac driver to
+be functional. It turns out I was mistaken in thinking that the two
+MACs' MDIO masters share the MDIO clock and data lines. In reality, only
+one MAC is connected to an MDIO bus and it controlls PHYs for both MAC0
+and MAC1. The MDIO master on MAC1 is not connected to anything.
 
-Thanks.
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+v1 -> v2:
+- remove pin functions for MDIO signals and don't assign them to MAC1
+- add a delay after asserting the PHY's reset signal, not only when it's
+  released
+- remove the entire concept of shared-mdio property
+- add aliases for ethernet nodes in order to avoid MDIO bus name
+  conflicts in stmmac
 
-> --
-> 2.34.1
->
->
+v2 -> v3:
+- add a patch sorting aliases in sa8775p-ride.dts and sort the ethernet
+  entries
+- remove a newline between clocks and clock-names properties
+- collect tags
 
---0000000000001c264c06028d1bc0
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Bartosz Golaszewski (9):
+  arm64: dts: qcom: sa8775p: add a node for the second serdes PHY
+  arm64: dts: qcom: sa8775p: add a node for EMAC1
+  arm64: dts: qcom: sa8775p-ride: enable the second SerDes PHY
+  arm64: dts: qcom: sa8775p-ride: move the reset-gpios property of the
+    PHY
+  arm64: dts: qcom: sa8775p-ride: index the first SGMII PHY
+  arm64: dts: qcom: sa8775p-ride: add the second SGMII PHY
+  arm64: dts: qcom: sa8775p-ride: sort aliases alphabetically
+  arm64: dts: qcom: sa8775p-ride: add an alias for ethernet0
+  arm64: dts: qcom: sa8775p-ride: enable EMAC1
 
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIG4iAdsXs4VgvGmqvd56GtSym5VizvSF
-zCN9yCgdI1WXMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
-MDA4MDg0OFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA2C9WEAp3BmP8DrbxHKHRExXJIFU23GHlPvEqKtKOK7/4i45Qi
-DsBk8KBld9KQ9/RO+2K5C8QyTcz+gKZP+Ue3nx91+j+mkxFiuY9IB6muCOJAAPmkPzMFC5RPGud6
-mlOFJiIZMxUdxXh9OtpS0eEFoQbdxYHiahuUQBlLRGFlD/OI753QDWEq2UPxbY2snoJ3ZwrA7GMf
-KiysMViwI33BYeR3VIO4IPDfZkydDIYySZkSlF9H+QpHFjtkQPatDrL5tuIhUoMiXhE23wn/nVw2
-fwALQlK/FwNyq1ziMrrxzZdL/w6eJ0HWyCW5t2PVm6keFETVhFje7vly3JyBstCl
---0000000000001c264c06028d1bc0--
+ arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 102 ++++++++++++++++++++--
+ arch/arm64/boot/dts/qcom/sa8775p.dtsi     |  42 +++++++++
+ 2 files changed, 136 insertions(+), 8 deletions(-)
+
+-- 
+2.39.2
+
 
