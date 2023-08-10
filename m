@@ -1,254 +1,257 @@
-Return-Path: <netdev+bounces-26263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CACE7775CD
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:30:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 445B47775D3
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CADC628204C
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:30:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B18B281E33
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1236FA8;
-	Thu, 10 Aug 2023 10:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282681FB29;
+	Thu, 10 Aug 2023 10:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113601F948
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:30:12 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B23E83;
-	Thu, 10 Aug 2023 03:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IRD6HqxGhJnuitXIWeZDqxMqag7w8CYSo4tEAx8jmkE=; b=EkGY8AcBtIn/WQ3aZleVm5YukM
-	IX6AgJQlFSJ8kgfSLOZHHLaTeIIJSHD8TUTQwYeRDg+dthVGZcPbg1LJPQsYwwWgbmKPqkL5M9XxB
-	ylK7ZD+3Z4Zyi/IJVymtBHXScPVdbBaBsKau5lcQQlTisbSyMl2GWDzPD9Fh20goNh7RM7tFO0EYI
-	Xyn+hGgSSNOm/Hgri5QPgNRhdArtfwo8VSwXz/CV0Mjcw/G4avLHk2ie0eEFqh9iIFuiBup/XFChy
-	8zu+kdEUv/5stGXRKh2K1s/U5QwKJtxWWAh8sE0JnE2sfEgBRQS5eQTZ9RoHsAYR766OE5AHZ83ob
-	OBa7FECA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48818)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU2vd-0003oS-2M;
-	Thu, 10 Aug 2023 11:30:05 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU2vc-0001hB-Ho; Thu, 10 Aug 2023 11:30:04 +0100
-Date: Thu, 10 Aug 2023 11:30:04 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Wei Fang <wei.fang@nxp.com>, Marek Vasut <marex@denx.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-clk@vger.kernel.org,
-	Stephen Boyd <sboyd@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZNS8LEiuwsv660EC@shell.armlinux.org.uk>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809060836.GA13300@pengutronix.de>
- <ZNNRxY4z7HroDurv@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE3A1FB27
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:30:24 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8378183;
+	Thu, 10 Aug 2023 03:30:23 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fe1489ced6so1113675e87.0;
+        Thu, 10 Aug 2023 03:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691663422; x=1692268222;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CRzl5nclzSE8hR4x9ZVgXPrQ5iiewuXgP2wU5BbYhG0=;
+        b=RBZanUwVFFXs1CRlsPWTD1D4rm2iN8WnvSdWQcm0eWFng4V+8snaze27DhZdpgd4ql
+         LiAAA84oogziTrjzAYDplxwlOL+RUshSgz5D9g1xNtRVZ+YTt8SEekOhYSScCcjmvQBx
+         nFDVyk5Eya1Eca3Ogiexf66I+S57NXp/C4j3YNdwSVfJ7n7rD5ItvmgEIG+BUpK2g30i
+         v9Sbj8UDpaX2IYGvxwxrB5baM+875Zoo6S8mD4FwiLVFzzrkkmAyTt2UdIplwaErP6tF
+         hZnVcytuHZiN13jh3ArDdaowG6WW3/d2z0u3lJza8KSn+Rsuz6/5YvT9JS6wU8KO4xip
+         n8uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691663422; x=1692268222;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CRzl5nclzSE8hR4x9ZVgXPrQ5iiewuXgP2wU5BbYhG0=;
+        b=VAmo+4mYrvap4PtMSxMjkkIRF5C/925/LGVfBVvHk32uxUC4dCnkdwtMub/PY8skK8
+         vhKcsin6e2ZmS6l9wzVnNB66atytg0+6HhZ+MnBLYISVS9Gvp8i8hquhIewGCVIg7X4K
+         XgYHCPZhXK5qDt17xAMj4SIaRmZagXP8VfmG1s6cnSCwFqBvuXB1/jrnX7J5K/2mezGd
+         nTdiSNoQVqBYxMhXooUrLEbQPkqabkIaevqYk//2NWYhdFVMMO9vUiP/oJA2YpRt6vJ2
+         OMl0BLGT23Wy8H1avso000VfO+pD1Nao7/MZOlm5PT143RvwDSQusqTZp7XTMn5aWEpe
+         w47A==
+X-Gm-Message-State: AOJu0Yy/yF0P/Ww9RfvaCaxr2/qNKpO/lBKoiGGk/9pODYASVCFTi2ly
+	jqhSz0IkBijfitWL8RDOQzzqPLbLPfBsIAE0WNU=
+X-Google-Smtp-Source: AGHT+IFF5T/KYxxDfL/io4fonk+A+iEVXXLlCbBtzsEf41My95uCty3JM29JO4VXWW0h5riEia+ThqYWu8HJZjYDFDA=
+X-Received: by 2002:a05:6512:5c6:b0:4fb:8939:d95c with SMTP id
+ o6-20020a05651205c600b004fb8939d95cmr1358995lfo.30.1691663421398; Thu, 10 Aug
+ 2023 03:30:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNNRxY4z7HroDurv@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+From: Yikebaer Aizezi <yikebaer61@gmail.com>
+Date: Thu, 10 Aug 2023 18:30:10 +0800
+Message-ID: <CALcu4raN3=04gp5=f=sDMtTuTG0VZpunwqSVd8MNVcnfPe+t4w@mail.gmail.com>
+Subject: possible deadlock in raw_setsockopt
+To: socketcan@hartkopp.net, mkl@pengutronix.de, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 09:43:49AM +0100, Russell King (Oracle) wrote:
-> On Wed, Aug 09, 2023 at 08:08:36AM +0200, Oleksij Rempel wrote:
-> > If fully functional external clock provider is need to initialize the
-> > MAC, just disabling this clock on already initialized HW without doing
-> > proper re-initialization sequence is usually bad idea. HW may get some
-> > glitch which will make troubleshooting a pain.
-> 
-> There are cases where the PHY sits on a MDIO bus that is created
-> by the ethernet MAC driver, which means the PHY only exists during
-> the ethernet MAC driver probe.
-> 
-> I think that provided the clock is only obtained after we know the
-> PHY is present, that would probably be fine - but doing it before
-> the MDIO bus has been created will of course cause problems.
-> 
-> We've had these issues before with stmmac, so this "stmmac needs the
-> PHY receive clock" is nothing new - it's had problems with system
-> suspend/resume in the past, and I've made suggestions... and when
-> there's been two people trying to work on it, I've attempted to get
-> them to talk to each other which resulted in nothing further
-> happening.
-> 
-> Another solution could possibly be that we reserve bit 30 on the
-> PHY dev_flags to indicate that the receive clock must always be
-> provided. I suspect that would have an advantage in another
-> situation - for EEE, there's a control bit which allows the
-> receive clock to be stopped while the link is in low-power state.
-> If the MAC always needs the receive clock, then obviously that
-> should be blocked.
+Hello,
 
-Something like this for starters:
+When using Healer to fuzz the Linux-6.5-rc3,  the following crash
+was triggered.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fcab363d8dfa..a954f1d61709 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1254,6 +1254,11 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 			~(MAC_10HD | MAC_100HD | MAC_1000HD);
- 	priv->phylink_config.mac_managed_pm = true;
- 
-+	/* stmmac always requires a receive clock in order for things like
-+	 * hardware reset to work.
-+	 */
-+	priv->phylink_config.mac_requires_rxc = true;
-+
- 	phylink = phylink_create(&priv->phylink_config, fwnode,
- 				 mode, &stmmac_phylink_mac_ops);
- 	if (IS_ERR(phylink))
-diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 13c4121fa309..619a63a0d14f 100644
---- a/drivers/net/phy/at803x.c
-+++ b/drivers/net/phy/at803x.c
-@@ -990,7 +990,8 @@ static int at803x_hibernation_mode_config(struct phy_device *phydev)
- 	/* The default after hardware reset is hibernation mode enabled. After
- 	 * software reset, the value is retained.
- 	 */
--	if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE))
-+	if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE) &&
-+	    !(phydev->dev_flags & PHY_F_RXC_ALWAYS_ON))
- 		return 0;
- 
- 	return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 3e9909b30938..4d1a37487923 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3216,6 +3216,8 @@ static int phy_probe(struct device *dev)
- 			goto out;
- 	}
- 
-+        phy_disable_interrupts(phydev);
-+
- 	/* Start out supporting everything. Eventually,
- 	 * a controller will attach, and may modify one
- 	 * or both of these values
-@@ -3333,16 +3335,6 @@ static int phy_remove(struct device *dev)
- 	return 0;
- }
- 
--static void phy_shutdown(struct device *dev)
--{
--	struct phy_device *phydev = to_phy_device(dev);
--
--	if (phydev->state == PHY_READY || !phydev->attached_dev)
--		return;
--
--	phy_disable_interrupts(phydev);
--}
--
- /**
-  * phy_driver_register - register a phy_driver with the PHY layer
-  * @new_driver: new phy_driver to register
-@@ -3376,7 +3368,6 @@ int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
- 	new_driver->mdiodrv.driver.bus = &mdio_bus_type;
- 	new_driver->mdiodrv.driver.probe = phy_probe;
- 	new_driver->mdiodrv.driver.remove = phy_remove;
--	new_driver->mdiodrv.driver.shutdown = phy_shutdown;
- 	new_driver->mdiodrv.driver.owner = owner;
- 	new_driver->mdiodrv.driver.probe_type = PROBE_FORCE_SYNCHRONOUS;
- 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 4f1c8bb199e9..6568a2759101 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1830,6 +1830,8 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
- static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
- 			      phy_interface_t interface)
- {
-+	u32 flags = 0;
-+
- 	if (WARN_ON(pl->cfg_link_an_mode == MLO_AN_FIXED ||
- 		    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
- 		     phy_interface_mode_is_8023z(interface) && !pl->sfp_bus)))
-@@ -1838,7 +1840,10 @@ static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
- 	if (pl->phydev)
- 		return -EBUSY;
- 
--	return phy_attach_direct(pl->netdev, phy, 0, interface);
-+	if (pl->config.mac_requires_rxc)
-+		flags |= PHY_F_RXC_ALWAYS_ON;
-+
-+	return phy_attach_direct(pl->netdev, phy, flags, interface);
- }
- 
- /**
-@@ -1941,6 +1946,9 @@ int phylink_fwnode_phy_connect(struct phylink *pl,
- 		pl->link_config.interface = pl->link_interface;
- 	}
- 
-+	if (pl->config.mac_requires_rxc)
-+		flags |= PHY_F_RXC_ALWAYS_ON;
-+
- 	ret = phy_attach_direct(pl->netdev, phy_dev, flags,
- 				pl->link_interface);
- 	phy_device_free(phy_dev);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index ba08b0e60279..79df5e01707d 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -761,6 +761,7 @@ struct phy_device {
- 
- /* Generic phy_device::dev_flags */
- #define PHY_F_NO_IRQ		0x80000000
-+#define PHY_F_RXC_ALWAYS_ON	BIT(30)
- 
- static inline struct phy_device *to_phy_device(const struct device *dev)
- {
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 789c516c6b4a..a83c1a77338f 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -204,6 +204,7 @@ enum phylink_op_type {
-  * @poll_fixed_state: if true, starts link_poll,
-  *		      if MAC link is at %MLO_AN_FIXED mode.
-  * @mac_managed_pm: if true, indicate the MAC driver is responsible for PHY PM.
-+ * @mac_requires_rxc: if true, the MAC always requires a receive clock from PHY.
-  * @ovr_an_inband: if true, override PCS to MLO_AN_INBAND
-  * @get_fixed_state: callback to execute to determine the fixed link state,
-  *		     if MAC link is at %MLO_AN_FIXED mode.
-@@ -216,6 +217,7 @@ struct phylink_config {
- 	enum phylink_op_type type;
- 	bool poll_fixed_state;
- 	bool mac_managed_pm;
-+	bool mac_requires_rxc;
- 	bool ovr_an_inband;
- 	void (*get_fixed_state)(struct phylink_config *config,
- 				struct phylink_link_state *state);
+HEAD commit: 6eaae198076080886b9e7d57f4ae06fa782f90ef (tag: v6.5-rc3)
+git tree: upstream
+console output:
+https://drive.google.com/file/d/1d9rLH0SYwNhTm2datRKbVpET1irbx_tA/view?usp=drive_link
+kernel config: https://drive.google.com/file/d/1OQIne-cVGeH6R4nqGGm6Igm3DnsozLhJ/view?usp=drive_link
+C reproducer: https://drive.google.com/file/d/1iewyTDtNLkXAJSMnREXKNYcUwfN1mAqA/view?usp=drive_link
+Syzlang reproducer:
+https://drive.google.com/file/d/17p1lUipZkXyl9xE0_Qanerbg75W6ER5y/view?usp=drive_link
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+If you fix this issue, please add the following tag to the commit:
+Reported-by: Yikebaer Aizezi <yikebaer61@gmail.com>
+
+WARNING: possible circular locking dependency detected
+6.5.0-rc3 #1 Not tainted
+------------------------------------------------------
+syz-executor/13006 is trying to acquire lock:
+ffff88801ca69130 (sk_lock-AF_CAN){+.+.}-{0:0}, at: lock_sock
+home/smyl/linux-image/linux-6.5-rc3/./include/net/sock.h:1708 [inline]
+ffff88801ca69130 (sk_lock-AF_CAN){+.+.}-{0:0}, at:
+raw_setsockopt+0x3b6/0x1050
+home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
+
+but task is already holding lock:
+ffffffff8cdca268 (rtnl_mutex){+.+.}-{3:3}, at:
+raw_setsockopt+0x3ac/0x1050
+home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:606
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (rtnl_mutex){+.+.}-{3:3}:
+       __mutex_lock_common
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/mutex.c:603
+[inline]
+       __mutex_lock+0x14f/0x1440
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/mutex.c:747
+       raw_release+0x1bd/0x940
+home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:391
+       __sock_release+0xcd/0x290
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:654
+       sock_close+0x18/0x20
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:1386
+       __fput+0x391/0x9d0
+home/smyl/linux-image/linux-6.5-rc3/fs/file_table.c:384
+       task_work_run+0x153/0x230
+home/smyl/linux-image/linux-6.5-rc3/kernel/task_work.c:179
+       resume_user_mode_work
+home/smyl/linux-image/linux-6.5-rc3/./include/linux/resume_user_mode.h:49
+[inline]
+       exit_to_user_mode_loop
+home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:171 [inline]
+       exit_to_user_mode_prepare+0x210/0x240
+home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:204
+       __syscall_exit_to_user_mode_work
+home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:286 [inline]
+       syscall_exit_to_user_mode+0x19/0x50
+home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:297
+       do_syscall_64+0x42/0xb0
+home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:86
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+-> #0 (sk_lock-AF_CAN){+.+.}-{0:0}:
+       check_prev_add
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3142
+[inline]
+       check_prevs_add
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3261
+[inline]
+       validate_chain
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3876
+[inline]
+       __lock_acquire+0x2ecd/0x5b90
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5144
+       lock_acquire
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5761
+[inline]
+       lock_acquire+0x1ad/0x520
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5726
+       lock_sock_nested+0x34/0xe0
+home/smyl/linux-image/linux-6.5-rc3/net/core/sock.c:3492
+       lock_sock
+home/smyl/linux-image/linux-6.5-rc3/./include/net/sock.h:1708 [inline]
+       raw_setsockopt+0x3b6/0x1050
+home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
+       __sys_setsockopt+0x252/0x510
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2263
+       __do_sys_setsockopt
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2274 [inline]
+       __se_sys_setsockopt
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271 [inline]
+       __x64_sys_setsockopt+0xb9/0x150
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271
+       do_syscall_x64
+home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:50
+[inline]
+       do_syscall_64+0x35/0xb0
+home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:80
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(rtnl_mutex);
+                               lock(sk_lock-AF_CAN);
+                               lock(rtnl_mutex);
+  lock(sk_lock-AF_CAN);
+
+ *** DEADLOCK ***
+
+1 lock held by syz-executor/13006:
+ #0: ffffffff8cdca268 (rtnl_mutex){+.+.}-{3:3}, at:
+raw_setsockopt+0x3ac/0x1050
+home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:606
+
+stack backtrace:
+CPU: 0 PID: 13006 Comm: syz-executor Not tainted 6.5.0-rc3 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack home/smyl/linux-image/linux-6.5-rc3/lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x92/0xf0
+home/smyl/linux-image/linux-6.5-rc3/lib/dump_stack.c:106
+ check_noncircular+0x2ef/0x3d0
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:2195
+ check_prev_add
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3142
+[inline]
+ check_prevs_add
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3261
+[inline]
+ validate_chain
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3876
+[inline]
+ __lock_acquire+0x2ecd/0x5b90
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5144
+ lock_acquire home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5761
+[inline]
+ lock_acquire+0x1ad/0x520
+home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5726
+ lock_sock_nested+0x34/0xe0
+home/smyl/linux-image/linux-6.5-rc3/net/core/sock.c:3492
+ lock_sock home/smyl/linux-image/linux-6.5-rc3/./include/net/sock.h:1708
+[inline]
+ raw_setsockopt+0x3b6/0x1050
+home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
+ __sys_setsockopt+0x252/0x510
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2263
+ __do_sys_setsockopt
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2274 [inline]
+ __se_sys_setsockopt
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271 [inline]
+ __x64_sys_setsockopt+0xb9/0x150
+home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271
+ do_syscall_x64
+home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:50
+[inline]
+ do_syscall_64+0x35/0xb0
+home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x47959d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 b4 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1c93598068 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 000000000059c0a0 RCX: 000000000047959d
+RDX: 0000000000000002 RSI: 0000000000000065 RDI: 0000000000000003
+RBP: 000000000059c0a0 R08: 0000000000000004 R09: 0000000000000000
+R10: 00000000200001c0 R11: 0000000000000246 R12: 000000000059c0ac
+R13: 000000000000000b R14: 0000000000437250 R15: 00007f1c93578000
+ </TASK>
 
