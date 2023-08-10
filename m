@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-26272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CF6277760A
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:39:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815AD77760C
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:40:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57AC1280C73
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:39:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C8D1C20325
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88C91F94E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37F61F95A;
 	Thu, 10 Aug 2023 10:38:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4881ED2F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83321F958
 	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:38:46 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E162E6B;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE1210DE;
 	Thu, 10 Aug 2023 03:38:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1691663925; x=1723199925;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=u0Ir2ezi0Y7qZJJInoG5MrM3MApUurrsNbjZu/T1cVQ=;
-  b=jN3CEMb1awMR8gRUDTWJZXAALKnuUyq7tvB5Lh/xYXDV3SII5sBuiq/E
-   vnQRj1guo22wTfl0k/z+9jtkT0QyEsLmTLzVwT0D04LcDj7P8eD0HdL4X
-   UmPJi4x9NyzBzd3xMaVZiAn8LNO18ZzSt1ucxkuXIlNBLKBqg11cOH4/f
-   do8AJJv5ryStjXnXaTBv4wSqzS0iDWJg7TCsxOSRUkTjZVg80c7RRHhuM
-   KlDkaeN03X/C64u4Px/2ZDa0+XTK2M2utFm1crJnHVI8L+mHuplxgRW1C
-   tOq8CmKyaMFBZX3/CBCHNc7WsAUDacdfVvWFP3C4OLPOxSHOhIRu/EPvR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="370260814"
+  bh=wkWq6UQrSoqn7LKSKk0ei4dEQfQd6OfK7Y33L/lijD0=;
+  b=fMO2zN9ndoJNoNISfoFnXe91acWFl+WvxwfV6l59hjprCUN6OCgHb9gt
+   art30gfEsbbRDh/93C6mPdqSdlONsAdS2uAIXd8LKYugQZfh4fmSICOG6
+   R+lomwSn1bf4QQlt03mhqXq9zrMDRmyzBo8bCVEuCX97p+6jfUgVOdxod
+   i0SXjrwVfwgEqPYRgaiTKIHaU07TaMqa5tUxVPaq/N5iYDWn5Bkthd1C5
+   UdYIsEgEj1xWp35ju1KVW9MUF0x6QJXKpGypiRadt0afZgENd6HdjG/W1
+   +FLce1m+UzGY80wmvy+oqI4pkHa3BIy+Hdt9hSzAuXTU8pA0f8OuguBLP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="370260819"
 X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="370260814"
+   d="scan'208";a="370260819"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 03:38:44 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 03:38:45 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="767237173"
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="767237175"
 X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="767237173"
+   d="scan'208";a="767237175"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orsmga001.jf.intel.com with ESMTP; 10 Aug 2023 03:38:42 -0700
+  by orsmga001.jf.intel.com with ESMTP; 10 Aug 2023 03:38:43 -0700
 Received: from pelor.igk.intel.com (pelor.igk.intel.com [10.123.220.13])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 5D8FA333CD;
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 08EB4333E2;
 	Thu, 10 Aug 2023 11:38:41 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: Kees Cook <keescook@chromium.org>,
@@ -57,9 +57,9 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	linux-hardening@vger.kernel.org,
 	Steven Zou <steven.zou@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next v1 3/7] ice: drop two params of ice_aq_move_sched_elems()
-Date: Thu, 10 Aug 2023 06:35:05 -0400
-Message-Id: <20230810103509.163225-4-przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v1 4/7] ice: make use of DEFINE_FLEX() in ice_ddp.c
+Date: Thu, 10 Aug 2023 06:35:06 -0400
+Message-Id: <20230810103509.163225-5-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230810103509.163225-1-przemyslaw.kitszel@intel.com>
 References: <20230810103509.163225-1-przemyslaw.kitszel@intel.com>
@@ -76,255 +76,99 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Remove two arguments of ice_aq_move_sched_elems().
-Last of them was always NULL, and @grps_req was always 1.
-
-Assuming @grps_req to be one, allows us to use DEFINE_FLEX() macro,
-what removes some need for heap allocations.
+Use DEFINE_FLEX() macro for constant-num-of-elems (4)
+flex array members of ice_ddp.c
 
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-add/remove: 0/0 grow/shrink: 1/6 up/down: 46/-261 (-215)
+add/remove: 4/0 grow/shrink: 0/1 up/down: 1195/-887 (308)
 ---
- drivers/net/ethernet/intel/ice/ice_lag.c   | 48 ++++++----------------
- drivers/net/ethernet/intel/ice/ice_sched.c | 30 ++++----------
- drivers/net/ethernet/intel/ice/ice_sched.h |  6 +--
- 3 files changed, 23 insertions(+), 61 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ddp.c | 39 +++++++-----------------
+ 1 file changed, 11 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 36b7044717e8..84bfa49f1bf8 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -432,10 +432,11 @@ static void
- ice_lag_move_vf_node_tc(struct ice_lag *lag, u8 oldport, u8 newport,
- 			u16 vsi_num, u8 tc)
- {
--	u16 numq, valq, buf_size, num_moved, qbuf_size;
-+	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
- 	struct device *dev = ice_pf_to_dev(lag->pf);
-+	u16 numq, valq, num_moved, qbuf_size;
-+	u16 buf_size = const_flex_size(buf);
- 	struct ice_aqc_cfg_txqs_buf *qbuf;
--	struct ice_aqc_move_elem *buf;
- 	struct ice_sched_node *n_prt;
- 	struct ice_hw *new_hw = NULL;
- 	__le32 teid, parent_teid;
-@@ -507,26 +508,17 @@ ice_lag_move_vf_node_tc(struct ice_lag *lag, u8 oldport, u8 newport,
- 		goto resume_traffic;
- 
- 	/* Move Vf's VSI node for this TC to newport's scheduler tree */
--	buf_size = struct_size(buf, teid, 1);
--	buf = kzalloc(buf_size, GFP_KERNEL);
--	if (!buf) {
--		dev_warn(dev, "Failure to alloc memory for VF node failover\n");
--		goto resume_traffic;
--	}
--
- 	buf->hdr.src_parent_teid = parent_teid;
- 	buf->hdr.dest_parent_teid = n_prt->info.node_teid;
- 	buf->hdr.num_elems = cpu_to_le16(1);
- 	buf->hdr.mode = ICE_AQC_MOVE_ELEM_MODE_KEEP_OWN;
- 	buf->teid[0] = teid;
- 
--	if (ice_aq_move_sched_elems(&lag->pf->hw, 1, buf, buf_size, &num_moved,
--				    NULL))
-+	if (ice_aq_move_sched_elems(&lag->pf->hw, buf, buf_size, &num_moved))
- 		dev_warn(dev, "Failure to move VF nodes for failover\n");
- 	else
- 		ice_sched_update_parent(n_prt, ctx->sched.vsi_node[tc]);
- 
--	kfree(buf);
- 	goto resume_traffic;
- 
- qbuf_err:
-@@ -757,10 +749,11 @@ static void
- ice_lag_reclaim_vf_tc(struct ice_lag *lag, struct ice_hw *src_hw, u16 vsi_num,
- 		      u8 tc)
- {
--	u16 numq, valq, buf_size, num_moved, qbuf_size;
-+	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
- 	struct device *dev = ice_pf_to_dev(lag->pf);
-+	u16 numq, valq, num_moved, qbuf_size;
-+	u16 buf_size = const_flex_size(buf);
- 	struct ice_aqc_cfg_txqs_buf *qbuf;
--	struct ice_aqc_move_elem *buf;
- 	struct ice_sched_node *n_prt;
- 	__le32 teid, parent_teid;
- 	struct ice_vsi_ctx *ctx;
-@@ -822,26 +815,17 @@ ice_lag_reclaim_vf_tc(struct ice_lag *lag, struct ice_hw *src_hw, u16 vsi_num,
- 		goto resume_reclaim;
- 
- 	/* Move node to new parent */
--	buf_size = struct_size(buf, teid, 1);
--	buf = kzalloc(buf_size, GFP_KERNEL);
--	if (!buf) {
--		dev_warn(dev, "Failure to alloc memory for VF node failover\n");
--		goto resume_reclaim;
--	}
--
- 	buf->hdr.src_parent_teid = parent_teid;
- 	buf->hdr.dest_parent_teid = n_prt->info.node_teid;
- 	buf->hdr.num_elems = cpu_to_le16(1);
- 	buf->hdr.mode = ICE_AQC_MOVE_ELEM_MODE_KEEP_OWN;
- 	buf->teid[0] = teid;
- 
--	if (ice_aq_move_sched_elems(&lag->pf->hw, 1, buf, buf_size, &num_moved,
--				    NULL))
-+	if (ice_aq_move_sched_elems(&lag->pf->hw, buf, buf_size, &num_moved))
- 		dev_warn(dev, "Failure to move VF nodes for LAG reclaim\n");
- 	else
- 		ice_sched_update_parent(n_prt, ctx->sched.vsi_node[tc]);
- 
--	kfree(buf);
- 	goto resume_reclaim;
- 
- reclaim_qerr:
-@@ -1797,10 +1781,11 @@ static void
- ice_lag_move_vf_nodes_tc_sync(struct ice_lag *lag, struct ice_hw *dest_hw,
- 			      u16 vsi_num, u8 tc)
- {
--	u16 numq, valq, buf_size, num_moved, qbuf_size;
-+	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
- 	struct device *dev = ice_pf_to_dev(lag->pf);
-+	u16 numq, valq, num_moved, qbuf_size;
-+	u16 buf_size = const_flex_size(buf);
- 	struct ice_aqc_cfg_txqs_buf *qbuf;
--	struct ice_aqc_move_elem *buf;
- 	struct ice_sched_node *n_prt;
- 	__le32 teid, parent_teid;
- 	struct ice_vsi_ctx *ctx;
-@@ -1858,26 +1843,17 @@ ice_lag_move_vf_nodes_tc_sync(struct ice_lag *lag, struct ice_hw *dest_hw,
- 		goto resume_sync;
- 
- 	/* Move node to new parent */
--	buf_size = struct_size(buf, teid, 1);
--	buf = kzalloc(buf_size, GFP_KERNEL);
--	if (!buf) {
--		dev_warn(dev, "Failure to alloc for VF node move in reset rebuild\n");
--		goto resume_sync;
--	}
--
- 	buf->hdr.src_parent_teid = parent_teid;
- 	buf->hdr.dest_parent_teid = n_prt->info.node_teid;
- 	buf->hdr.num_elems = cpu_to_le16(1);
- 	buf->hdr.mode = ICE_AQC_MOVE_ELEM_MODE_KEEP_OWN;
- 	buf->teid[0] = teid;
- 
--	if (ice_aq_move_sched_elems(&lag->pf->hw, 1, buf, buf_size, &num_moved,
--				    NULL))
-+	if (ice_aq_move_sched_elems(&lag->pf->hw, buf, buf_size, &num_moved))
- 		dev_warn(dev, "Failure to move VF nodes for LAG reset rebuild\n");
- 	else
- 		ice_sched_update_parent(n_prt, ctx->sched.vsi_node[tc]);
- 
--	kfree(buf);
- 	goto resume_sync;
- 
- sync_qerr:
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index 02b3a34b7698..e48db9da1c7e 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -429,24 +429,20 @@ ice_aq_cfg_sched_elems(struct ice_hw *hw, u16 elems_req,
- }
- 
- /**
-- * ice_aq_move_sched_elems - move scheduler elements
-+ * ice_aq_move_sched_elems - move scheduler element (just 1 group)
-  * @hw: pointer to the HW struct
-- * @grps_req: number of groups to move
-  * @buf: pointer to buffer
-  * @buf_size: buffer size in bytes
-  * @grps_movd: returns total number of groups moved
-- * @cd: pointer to command details structure or NULL
-  *
-  * Move scheduling elements (0x0408)
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+index d71ed210f9c4..3bb760d2cf87 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+@@ -1558,21 +1558,14 @@ static enum ice_ddp_state ice_init_pkg_info(struct ice_hw *hw,
   */
- int
--ice_aq_move_sched_elems(struct ice_hw *hw, u16 grps_req,
--			struct ice_aqc_move_elem *buf, u16 buf_size,
--			u16 *grps_movd, struct ice_sq_cd *cd)
-+ice_aq_move_sched_elems(struct ice_hw *hw, struct ice_aqc_move_elem *buf,
-+			u16 buf_size, u16 *grps_movd)
+ static enum ice_ddp_state ice_get_pkg_info(struct ice_hw *hw)
  {
- 	return ice_aqc_send_sched_elem_cmd(hw, ice_aqc_opc_move_sched_elems,
--					   grps_req, (void *)buf, buf_size,
--					   grps_movd, cd);
-+					   1, buf, buf_size, grps_movd, NULL);
- }
+-	enum ice_ddp_state state = ICE_DDP_PKG_SUCCESS;
+-	struct ice_aqc_get_pkg_info_resp *pkg_info;
+-	u16 size;
++	DEFINE_FLEX(struct ice_aqc_get_pkg_info_resp, pkg_info, pkg_info,
++		    ICE_PKG_CNT);
++	u16 size = const_flex_size(pkg_info);
+ 	u32 i;
  
- /**
-@@ -2224,12 +2220,12 @@ int
- ice_sched_move_nodes(struct ice_port_info *pi, struct ice_sched_node *parent,
- 		     u16 num_items, u32 *list)
- {
--	struct ice_aqc_move_elem *buf;
-+	DEFINE_FLEX(struct ice_aqc_move_elem, buf, teid, 1);
-+	u16 buf_len = const_flex_size(buf);
- 	struct ice_sched_node *node;
- 	u16 i, grps_movd = 0;
- 	struct ice_hw *hw;
- 	int status = 0;
--	u16 buf_len;
+-	size = struct_size(pkg_info, pkg_info, ICE_PKG_CNT);
+-	pkg_info = kzalloc(size, GFP_KERNEL);
+-	if (!pkg_info)
++	if (ice_aq_get_pkg_info_list(hw, pkg_info, size, NULL))
+ 		return ICE_DDP_PKG_ERR;
  
- 	hw = pi->hw;
- 
-@@ -2241,35 +2237,27 @@ ice_sched_move_nodes(struct ice_port_info *pi, struct ice_sched_node *parent,
- 	    hw->max_children[parent->tx_sched_layer])
- 		return -ENOSPC;
- 
--	buf_len = struct_size(buf, teid, 1);
--	buf = kzalloc(buf_len, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
+-	if (ice_aq_get_pkg_info_list(hw, pkg_info, size, NULL)) {
+-		state = ICE_DDP_PKG_ERR;
+-		goto init_pkg_free_alloc;
+-	}
 -
- 	for (i = 0; i < num_items; i++) {
- 		node = ice_sched_find_node_by_teid(pi->root, list[i]);
- 		if (!node) {
- 			status = -EINVAL;
--			goto move_err_exit;
-+			break;
- 		}
- 
- 		buf->hdr.src_parent_teid = node->info.parent_teid;
- 		buf->hdr.dest_parent_teid = parent->info.node_teid;
- 		buf->teid[0] = node->info.node_teid;
- 		buf->hdr.num_elems = cpu_to_le16(1);
--		status = ice_aq_move_sched_elems(hw, 1, buf, buf_len,
--						 &grps_movd, NULL);
-+		status = ice_aq_move_sched_elems(hw, buf, buf_len, &grps_movd);
- 		if (status && grps_movd != 1) {
- 			status = -EIO;
--			goto move_err_exit;
-+			break;
- 		}
- 
- 		/* update the SW DB */
- 		ice_sched_update_parent(parent, node);
+ 	for (i = 0; i < le32_to_cpu(pkg_info->count); i++) {
+ #define ICE_PKG_FLAG_COUNT 4
+ 		char flags[ICE_PKG_FLAG_COUNT + 1] = { 0 };
+@@ -1602,10 +1595,7 @@ static enum ice_ddp_state ice_get_pkg_info(struct ice_hw *hw)
+ 			  pkg_info->pkg_info[i].name, flags);
  	}
  
--move_err_exit:
--	kfree(buf);
- 	return status;
+-init_pkg_free_alloc:
+-	kfree(pkg_info);
+-
+-	return state;
++	return ICE_DDP_PKG_SUCCESS;
  }
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.h b/drivers/net/ethernet/intel/ice/ice_sched.h
-index 8bd26353d76a..dc24bf55ff05 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.h
-@@ -165,10 +165,8 @@ ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
- 			     u16 *num_nodes_added);
- void ice_sched_replay_agg_vsi_preinit(struct ice_hw *hw);
- void ice_sched_replay_agg(struct ice_hw *hw);
--int
--ice_aq_move_sched_elems(struct ice_hw *hw, u16 grps_req,
--			struct ice_aqc_move_elem *buf, u16 buf_size,
--			u16 *grps_movd, struct ice_sq_cd *cd);
-+int ice_aq_move_sched_elems(struct ice_hw *hw, struct ice_aqc_move_elem *buf,
-+			    u16 buf_size, u16 *grps_movd);
- int ice_replay_vsi_agg(struct ice_hw *hw, u16 vsi_handle);
- int ice_sched_replay_q_bw(struct ice_port_info *pi, struct ice_q_ctx *q_ctx);
- #endif /* _ICE_SCHED_H_ */
+ /**
+@@ -1620,9 +1610,10 @@ static enum ice_ddp_state ice_chk_pkg_compat(struct ice_hw *hw,
+ 					     struct ice_pkg_hdr *ospkg,
+ 					     struct ice_seg **seg)
+ {
+-	struct ice_aqc_get_pkg_info_resp *pkg;
++	DEFINE_FLEX(struct ice_aqc_get_pkg_info_resp, pkg, pkg_info,
++		    ICE_PKG_CNT);
++	u16 size = const_flex_size(pkg);
+ 	enum ice_ddp_state state;
+-	u16 size;
+ 	u32 i;
+ 
+ 	/* Check package version compatibility */
+@@ -1641,15 +1632,8 @@ static enum ice_ddp_state ice_chk_pkg_compat(struct ice_hw *hw,
+ 	}
+ 
+ 	/* Check if FW is compatible with the OS package */
+-	size = struct_size(pkg, pkg_info, ICE_PKG_CNT);
+-	pkg = kzalloc(size, GFP_KERNEL);
+-	if (!pkg)
+-		return ICE_DDP_PKG_ERR;
+-
+-	if (ice_aq_get_pkg_info_list(hw, pkg, size, NULL)) {
+-		state = ICE_DDP_PKG_LOAD_ERROR;
+-		goto fw_ddp_compat_free_alloc;
+-	}
++	if (ice_aq_get_pkg_info_list(hw, pkg, size, NULL))
++		return ICE_DDP_PKG_LOAD_ERROR;
+ 
+ 	for (i = 0; i < le32_to_cpu(pkg->count); i++) {
+ 		/* loop till we find the NVM package */
+@@ -1666,8 +1650,7 @@ static enum ice_ddp_state ice_chk_pkg_compat(struct ice_hw *hw,
+ 		/* done processing NVM package so break */
+ 		break;
+ 	}
+-fw_ddp_compat_free_alloc:
+-	kfree(pkg);
++
+ 	return state;
+ }
+ 
 -- 
 2.40.1
 
