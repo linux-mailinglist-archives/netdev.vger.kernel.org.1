@@ -1,275 +1,210 @@
-Return-Path: <netdev+bounces-26435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F280B777BF0
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:16:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B870B777BFA
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9C7A1C20EEB
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:16:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DF2D282159
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3617820C8C;
-	Thu, 10 Aug 2023 15:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA7A20C8D;
+	Thu, 10 Aug 2023 15:20:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAC51E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:16:22 +0000 (UTC)
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891A590
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:16:21 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99c1f6f3884so149484466b.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:16:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691680580; x=1692285380;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E9BIJuejqLYsX23Cp7aFaqFKYfYh+8C8r5AvwFvd5Wk=;
-        b=sKtx61CMPHndzYdk7VjV7dzUQqSWwr5lHgk8sd4JxF9r5tdffUT4loEwBhMRMUqdOh
-         MFKxwI/Mt9gy5us2Zgcnu8Fq1GrxTwFSqg67GGaOUPcofMDIUUfHo7m4mpgh7QtD3QHr
-         MTQ1ZgQnSNA5tz8WerTDLzec5EGfIpPOexa106FwQ4V7teojwC/IrrpsVwQZgzZGSd71
-         AXotozRnAEq8zWuyGL48mH8Of68mQbkHVGCL/ImcJ2OKwpgh81jmdGUPr5O/gKjQiZl+
-         1LGZDcm3kTyMmcYr6yBfgtk5v5s2CRW4tN33bXvUsyYrCNQ8hz4xxlraN7d/mLpPrBD2
-         WHAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691680580; x=1692285380;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E9BIJuejqLYsX23Cp7aFaqFKYfYh+8C8r5AvwFvd5Wk=;
-        b=UV2NZDHa8+p2DDQF+6PDaYiROqUNsk6wVTi2jTI1RYzwPdWqCAzeC4puEHsgcCO+YM
-         1txl4BAmwzc/Iv4O9dbGcmY8nOg1E5TMY51BESiEOE4t4M5YH82c6MgvbHuGymFwB7Zu
-         OifJ40tna+LBEpEwQqaoZEpcFbu8gQJijUUrB5YSGOILRcB2haL92hdzLWJ8zcXKl1o4
-         sqjcAxkzrREMsTkjg/0DRcpQHgLEOyH0BcWLZlyaYMxlQ8u3MC8Br3F+TZvgiaKA38bF
-         bIR3Q2jzK1aDAJyLzHOcY8AJRDEKer53vcrzMlFk1XogStjsAleaoI6yBw/0gAej+9t2
-         CkiQ==
-X-Gm-Message-State: AOJu0YykTwiHJ0K2oI5RbdVstbMQ0f2Vlv9kGUfoz4KTygZTtJaoojeB
-	d/oVYibz0yv0oTyF7Z5JYsU=
-X-Google-Smtp-Source: AGHT+IGaYAuv/uN02d/TyhnmTx4Um4lCYrB7MozIpIUP9MhVoVkr0p6WyXED6Oyj1tf4xq4L1p/BFw==
-X-Received: by 2002:a17:907:77c5:b0:994:1eb4:6898 with SMTP id kz5-20020a17090777c500b009941eb46898mr2474629ejc.9.1691680579707;
-        Thu, 10 Aug 2023 08:16:19 -0700 (PDT)
-Received: from skbuf ([188.27.184.201])
-        by smtp.gmail.com with ESMTPSA id a18-20020a17090640d200b00993a9a951fasm1082140ejk.11.2023.08.10.08.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 08:16:19 -0700 (PDT)
-Date: Thu, 10 Aug 2023 18:16:17 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
- switch drivers
-Message-ID: <20230810151617.wv5xt5idbfu7wkyn@skbuf>
-References: <20230808120652.fehnyzporzychfct@skbuf>
- <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
- <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
- <20230808120652.fehnyzporzychfct@skbuf>
- <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
- <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
- <20230808123901.3jrqsx7pe357hwkh@skbuf>
- <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk>
- <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
- <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6621E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:20:30 +0000 (UTC)
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2160.outbound.protection.outlook.com [40.92.62.160])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9206A90
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:20:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JLCPz+R1I8vDgV5FwB0IHJL1yRIl7H9sBmRQj98n5vafVSQsHtlLSPNpceEHZEj1X6S1NKwHgapndTKpg6W3y0VO+J9+DIUxYvzzqxAHLkd5QC0wWvuLMPNurkL/1g0TdifaoA7rlbYRUYQzyuYED+YOTGmG57cedhEfYu9huoJUUPBlfBkAxyDmlT9YhnAweyYBowVOVby+qtP+Cg8GWuk+5V4+V7RbPaoqZR6ycA48iGjS++MTBkWjFj+0QN/3Aw9VHSIp4zTo2tE7rixPvTZFKaW/BXWKJhRZrsdjmOna7sGaY9EJyiQfB4tFcA+qhoRWTkmF7pfrUJhm9X6GXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IvrpoWdPQahSE5OROCP8QOD3irge+OttJ/BkrmdJg2o=;
+ b=IRAOOI9EVnno/fu0VbXHChOU90FYY9iap29GsCAygilYFR9JxMMsV0qg6hCFn9Slfi/BcEkz2raiAgo9i9UxP18djJ+TeVO70LQi9w6JxoIj4DnRPJ0m4iTXRr/+tP+sH7sMdZloMPR20xEjLyWTHfm1FAVbrx+cR+Tk0PGmdIttjuXywtuWwsxzubCu8Seerdvll1D35meNtU1JTl7DJ4WMa5hnBBPQYHgklmj4wQXFH14+bNS8N2tcD7a5chBo5LWhzIQBK1Z0CoaxN1Qt8pYRI6Yr4gCeoqfBzKd16UYk3OfP5RRjfWGlgOlnehpcxIB13RXVhAJVaw935ITbTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IvrpoWdPQahSE5OROCP8QOD3irge+OttJ/BkrmdJg2o=;
+ b=GxNfmegUf5iGi1fL7WOc55xFc+Y8Hj2HI3QqLx9paklNxZWpun3+47r6Vd4J6hoeYzyvMHF+n55zidmyX376Vbq4bgO4eACTY4yPb6u1RJilxXDfclAg2yH1JCIuVgY+KrnKBNt0Ow1kr2nR/mmFyjPkb8TeA2SdGHUVC2MP8jA7GWHummKiD9tRh3GEiyjEGjh//ORwiJUcP69NHf4CsQUqsx5MrWlUDA6PJNo3c1/2MBhXlnSEWu5r2rpUt45+CjcMCB1wfgAqLJEEDZikD+fyp2GIKk84IJwGsGxfibqe+iJOs9dLpIUul2m/UnGLOT3AohQ6PJkznKrfqmfavQ==
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
+ by ME3P282MB3998.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:1b2::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
+ 2023 15:20:22 +0000
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::826:d9a5:23be:3b14]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::826:d9a5:23be:3b14%3]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
+ 15:20:22 +0000
+From: Jinjian Song <songjinjian@hotmail.com>
+To: jiri@resnulli.us
+Cc: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	danielwinkler@google.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	haijun.liu@mediatek.com,
+	ilpo.jarvinen@linux.intel.com,
+	jesse.brandeburg@intel.com,
+	jinjian.song@fibocom.com,
+	johannes@sipsolutions.net,
+	kuba@kernel.org,
+	linuxwwan@intel.com,
+	linuxwwan_5g@intel.com,
+	loic.poulain@linaro.org,
+	m.chetan.kumar@linux.intel.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ricardo.martinez@linux.intel.com,
+	ryazanov.s.a@gmail.com,
+	songjinjian@hotmail.com,
+	soumya.prakash.mishra@intel.com,
+	vsankar@lenovo.com
+Subject: Re: [net-next 2/6] net: wwan: t7xx: Driver registers with Devlink framework
+Date: Thu, 10 Aug 2023 23:19:59 +0800
+Message-ID:
+ <MEYP282MB26975755ACB814BD556334BABB13A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ME3P282MB270324EC4CEEB864D04ECDB2BB0CA@ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM>
+References: <20230803021812.6126-1-songjinjian@hotmail.com> <MEYP282MB269720DC5940AEA0904569B3BB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM> <MEYP282MB26973DD342BDD69914C06FCFBB0EA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM> <ME3P282MB270324EC4CEEB864D04ECDB2BB0CA@ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM>
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	MAILING_LIST_MULTI,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+X-TMN: [K2l4yYYH39FLeohuVblH381FnWk192DU]
+X-ClientProxiedBy: SGAP274CA0023.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::35)
+ To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
+X-Microsoft-Original-Message-ID: <ZNDqd3oee/nLuSO+@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|ME3P282MB3998:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3aaa2711-a849-447d-4898-08db99b54f8a
+X-MS-Exchange-SLBlob-MailProps:
+	dx7TrgQSB6c9d3aaXfNnpKzRqBtZ6l12An6oGdBXNRLFnUP59jIvj1TSvAdGGnMQfmWwrmdaAgZ5x2pOxCXgt58Ce6Yf2hZ+dLOnUU1FUYSuf4r9MeBJ0SBP9zhpUHWT75/IbXhNedGJzzjGbw6AYXrlMn6Yxi8ayMyBfesxzFQh7QflBg/0FqgAVZK0yYGlY/4i95ghy9AKhfkPdl4ZtaaFBTOPEBbzdYCQxkrT85odBLM4K8s5HjWj4CnALnsyf8JvsLRCY0ZID2t7JftnWgiu1hLh6Jk8a8ONRXvdAbBMxY+8/GK0LGaRgnK1oI2RYlUl9FWmKNfw6Tfel+isH0tXZwycDtF1cKwAIz/ZdkRmqAd2Qi9OO+3okac2RzrzdCGBwk0Y+Zw2ysh8VmrjkrKhXoE/j+HWa7V+piCUCaEOEz6vQR1fe0+lD0Dy7krdbSQDbqWVZ+PyMt78eONRxyER4jTaCoZxwh5RJE7O+V7w1YohZhxT/+nQ5apt3eTAx+u59e/atbs4KV5PflT9iMASgAqTPtTSK8mOxV3BCYL0kBgIgWG6nNuRV4IPpTIamYNXbObx4lCvWwLpXVmMYo0+rooXtnE7vEyjvsSpZrCl17kkkQV1dJPNUagnS6Mqq91l7sG1xxcI9mrjIq3qDoQmOjXhoHkIodmTSmB2qc5zCOkzluvCm/AmKnEkFdHzX4F70B8Le4nupSYqFCQf1o4cUUNoKN9nLBfL6+zFlGKR9k5urYe3hWMs2V5MF5M/ekQAwYSUkGY=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	rVC7DTH8UoHwgxF4LbvBhtK4CPFo2rE3TJyB4W6PtQ9Or590k5f5YMjdJCJnXWq9OeFkwigoYCnb8Axqcha6M7k5n0HmK9NBlSgts9TdulQVm/MmfWNIqL3ZMZXtszPJff5TJvUyy30qxIpAOaY4UstnBXr0g/rYGwi+Kxi5faChamwWJ71XvVyGoeIjJK8JIlUFpR+vsF05aEg6SlgrNPIA2irR8jeD7/PXGKcE+co2eOF4VHaDdmn54w+R90j8zNMaIaPm4lbSJew1Ocy+u0IRGChXQwz7hGymgO7piATDgc8HmIf/g1M8BKhvwu/Mb6NSSHPk0DlDb5s5k60UePWHchXLH04Xqo1D/a5KfpCMV/voDuJmRIcBrJ/1S/y4kRf589lV6ixbpQcwwZbJtRiihgnGrrutJgjo+5EJ5G0SrbWd66yorKpzqOztG1vEz6KGXKfYwuV3vBEu7Ql4nHx9p2bX8B/PkapqgBW7MTblWDbFfwDZ8zeVwPPF/2ju9L4wYm1wQOCCYETlylJhX2wHHJgksK41YuWxmBNvzY+BZObEmnQH/FPCOXA35yAeX03XT5E8TNZAm+dO1kJjK2WQoOSqkly6mM9GDPtMig4=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?DXM9QjfYij1kMgjQHLcnxS1i7sFeab/bNfewHjcJqwVnZex/pmaJJklZCSXu?=
+ =?us-ascii?Q?NCuTQ35Ecfo9xXzr12EjJhFsK/hamRFe/hvWSgsCwlzYMSJHfvTQ50Jhc/21?=
+ =?us-ascii?Q?qQ9ONxKOsyWLRexhLMxhuLrYRcg+qKaGjCVL7rU+sFS0l/BhsWZK5Nj9JsEs?=
+ =?us-ascii?Q?GxIOoHMNJb6Cs6yDJ/T9MkHmcJFNtYr6mIkQcIx+xiQBCeUZ5spqn3Itum18?=
+ =?us-ascii?Q?E605JBjM7+J58SiPNt9tXAcYREjUyfDXq/eSvxwrVMCEzjaXEMhsnkfuXhQk?=
+ =?us-ascii?Q?Bsen2ZCggEOcaudPIs+XePU4g1ytcEYFJC3IicqRHnNaItxDSc9MkaKI7PUx?=
+ =?us-ascii?Q?49L9OprYBRRc+aGFQLo+A7TDGddbOYvMtcjLCaElroV/QIQPIitHQGSW+H/V?=
+ =?us-ascii?Q?FK66XRqtbwgCI50bccnHbejoE5JzY3C38BFQCUyl6v5Uva2CPbvxaYGNbehG?=
+ =?us-ascii?Q?ajjgc6sPJGN5D6rjZU8b25Ew1wDQzINcJZqMg2jbYcLt+MsqmxdQf+4IuywQ?=
+ =?us-ascii?Q?hPnTeZ9aicgc1pi2UbJLhzhGfsPhXRu9Yh3vLpNFcG6S9F3WkbyoFoaZtrDv?=
+ =?us-ascii?Q?MdZfGe+8LCNSozTzO8BU3Fl8h22Ol4l/PHZ+5oS7OL5HSkYlKDiudX3xQCai?=
+ =?us-ascii?Q?0SnuJJexofIvVFQr56Q5t8jRRT8IvveGXGlrtnjXQfNMNp3h9MeMjUL54VyH?=
+ =?us-ascii?Q?MPVmKQTxWOt45n7/3xXT7Qj4yzX40sMiY1jHun0WAS29cnivlaAkYbD/g4bj?=
+ =?us-ascii?Q?RDGzch3t0bgKcifMvIKBaT9iIPMtZnCfbzvSma7hIU9FQftpMbzUu1dk1f+v?=
+ =?us-ascii?Q?N1T+lRV/sSFFiB0uQ1rxkMQKij/t6XAtG+3YaL1et76gtDhki1KmvSYji3Es?=
+ =?us-ascii?Q?VC45HNI574BgmyadvzTfrg9aqshhhnXj66zsgpTK0+Rb7viB/gmbZi408Q/Z?=
+ =?us-ascii?Q?jLciQHwqnPIQeZg+VoVmGgpLXl4qJLq/+3nIWIrYmVZ3SQu7nVvJyp2NzKos?=
+ =?us-ascii?Q?ZxaUdt4eppPLRlwc1eQkHEOYGaM/DDYrNTgT10uB5a6x7nR2QnpuqWgMK5oC?=
+ =?us-ascii?Q?pU2WhxSbbmKPJAyYvACAsE397rTSAt3VFkJ5qNsut7Ik2hxKKZ2lvK8sx4cT?=
+ =?us-ascii?Q?lhYPuqEk3GZWOc+PHImO9l/0ZI5NVVXQ8ie236MfnRNAPFk5um0c4ItUu6aB?=
+ =?us-ascii?Q?aRRo0aNxXfEIoYPGzPBb11qJNErKLBTOIq/FfiR55vdAczIiLlIHu9lZPuA?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3aaa2711-a849-447d-4898-08db99b54f8a
+X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 15:20:22.5519
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ME3P282MB3998
 
-Hi Russell,
+>Mon, Aug 07, 2023 at 02:44:00PM CEST, songjinjian@hotmail.com wrote:
+>>Sat, Aug 05, 2023 at 02:12:13PM CEST, songjinjian@hotmail.com wrote:
+>>>>Thu, Aug 03, 2023 at 04:18:08AM CEST, songjinjian@hotmail.com wrote:
+>>>>
+>>>>[...]
+>>>>
+>>>>>>+static const struct devlink_param t7xx_devlink_params[] = {
+>>>>>>+	DEVLINK_PARAM_DRIVER(T7XX_DEVLINK_PARAM_ID_FASTBOOT,
+>>>>>>+			     "fastboot", DEVLINK_PARAM_TYPE_BOOL,
+>>>>>>+			     BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+>>>>>>+			     NULL, NULL, NULL),
+>>>>>
+>>>>>driver init params is there so the user could configure driver instance
+>>>>>and then hit devlink reload in order to reinitialize with the new param
+>>>>>values. In your case, it is a device command. Does not make any sense to
+>>>>>have it as param.
+>>>>>
+>>>>>NAK
+>>>>
+>>>>Thanks for your review, so drop this param and set this param insider driver when driver_reinit,
+>>>>is that fine?
+>>>
+>>>I don't understand the question, sorry.
+>>
+>>Thanks for your review, I mean if I don't define fastboot param like devlink_param above, I will
+>
+>Could you not thank me in every reply, please?
+>
+>
+>>define a global bool variable in driver, then when devlink ... driver_reinit, set this variable to true.
+>
+>That would be very wrong. Driver reinit should just reload the driver,
+>recreate the entities created. should not be trigger to change
+>behaviour.
 
-On Tue, Aug 08, 2023 at 03:19:20PM +0100, Russell King (Oracle) wrote:
-> On Tue, Aug 08, 2023 at 04:52:15PM +0300, Vladimir Oltean wrote:
-> > On Tue, Aug 08, 2023 at 01:57:43PM +0100, Russell King (Oracle) wrote:
-> > > Thanks for the r-b.
-> > > 
-> > > At risk of delaying this patch through further discussion... so I'll
-> > > say now that we're going off into discussions about future changes.
-> > > 
-> > > I believe all DSA drivers that provide .phylink_get_caps fill in the
-> > > .mac_capabilities member, which leaves just a few drivers that do not,
-> > > which are:
-> > > 
-> > > $ git grep -l dsa_switch_ops.*= drivers/net/dsa/ | xargs grep -L '\.phylink_get_caps'
-> > > drivers/net/dsa/dsa_loop.c
-> > > drivers/net/dsa/mv88e6060.c
-> > > drivers/net/dsa/realtek/rtl8366rb.c
-> > > drivers/net/dsa/vitesse-vsc73xx-core.c
-> > > 
-> > > I've floated the idea to Linus W and Arinc about setting
-> > > .mac_capabilities in the non-phylink_get_caps path as well, suggesting:
-> > 
-> > Not sure what you mean by "in the non-phylink_get_caps path" (what is
-> > that other path). Don't you mean that we should implement phylink_get_caps()
-> > for these drivers, to have a unified code flow for everyone?
-> 
-> I meant this:
-> 
->                 /* For legacy drivers */
->                 if (mode != PHY_INTERFACE_MODE_NA) {
->                         __set_bit(mode, dp->pl_config.supported_interfaces);
->                 } else {
->                         __set_bit(PHY_INTERFACE_MODE_INTERNAL,
->                                   dp->pl_config.supported_interfaces);
->                         __set_bit(PHY_INTERFACE_MODE_GMII,
->                                   dp->pl_config.supported_interfaces);
->                 }
+Thanks for your review, if so, I hope it is possible to keep the devlink param as above.
 
-Ah, ok, you'd like a built-in assumption of the mac_capabilities in
-dsa_port_phylink_create().
-
-> but ultimately yes, having the DSA phylink_get_caps method mandatory
-> would be excellent, but I don't think we have sufficient information
-> to do that.
-> 
-> For example, what interface modes does the Vitesse DSA switch support?
-> What speeds? Does it support pause? Does it vary depending on port?
-
-I only have a VSC7395 datasheet which was shared with me by Linus (and
-that link is no longer functional).
-
-This switch supports MII/REV-MII/GMII/RGMII on MAC 6, and MACs 0-4 are
-connected to internal PHYs (yes, there is no port 5, also see the
-comment in vsc73xx_probe()).
-
-Based on vsc73xx_init_port() and vsc73xx_adjust_enable_port(), I guess
-all ports support flow control, and thus, PHYs should advertise it.
-
-I don't have a datasheet for the other switches supported by the driver:
-
- * Vitesse VSC7385 SparX-G5 5+1-port Integrated Gigabit Ethernet Switch
- * Vitesse VSC7388 SparX-G8 8-port Integrated Gigabit Ethernet Switch
- * Vitesse VSC7395 SparX-G5e 5+1-port Integrated Gigabit Ethernet Switch
- * Vitesse VSC7398 SparX-G8e 8-port Integrated Gigabit Ethernet Switch
-
-but based on the common treatment in vsc73xx_init_port(), I'd say that
-on all models, port 6 (CPU_PORT) is the xMII port and all the others are
-internal PHY ports, and all support the same configuration. So a
-phylink_get_caps() implementation could probably also do one of two
-things, based on "if (port == CPU_PORT)".
-
-> > > 	MAC_1000 | MAC_100 | MAC_10 | MAC_SYM_PAUSE | MAC_ASYM_PAUSE
-> > > 
-> > > support more than 1G speeds. I think the only exception to that may
-> > > be dsa_loop, but as I think that makes use of the old fixed-link
-> > > software emulated PHYs, I believe that would be limited to max. 1G
-> > > as well.
-> > 
-> > I don't believe that dsa_loop makes use of fixed-link at all. Its user
-> > ports use phy/gmii mode through the non-OF-based dsa_slave_phy_connect()
-> > to the ds->slave_mii_bus, and the CPU port goes through the non-OF code
-> > path ("else" block) here (because dsa_loop_bdinfo.c _is_ non-OF-based):
-> 
-> Sorry, I meant fixed-phy not fixed-link.
-> 
-> > 
-> > dsa_port_setup:
-> > 	case DSA_PORT_TYPE_CPU:
-> > 		if (dp->dn) {
-> > 			err = dsa_shared_port_link_register_of(dp);
-> > 			if (err)
-> > 				break;
-> > 			dsa_port_link_registered = true;
-> > 		} else {
-> > 			dev_warn(ds->dev,
-> > 				 "skipping link registration for CPU port %d\n",
-> > 				 dp->index);
-> > 		}
-> 
-> What made me believe that it uses the old fixed-phy stuff is:
-> 
-> static int __init dsa_loop_init(void)
-> ...
->         for (i = 0; i < NUM_FIXED_PHYS; i++)
->                 phydevs[i] = fixed_phy_register(PHY_POLL, &status, NULL);
-> 
-> These PHYs end up on the "fixed-0" virtual MDIO bus, which also has a
-> MDIO device created for the dsa-loop driver at address 31. Thus, in
-> dsa_loop_drv_probe():
-> 
-> 	ps->bus = mdiodev->bus;
-> 
-> is the fixed-0 bus with these fixed-PHYs on, and dsa_loop_phy_read()
-> and dsa_loop_phy_write() access these fixed PHYs.
-> 
-> These fixed PHYs are clause-22 PHYs, which only support up to 1G
-> speeds. Therefore, it is my understanding that dsa-loop will only
-> support up to 1G speeds.
-
-Clear now. Yes, this is correct.
-
-> > > If we did set .mac_capabilities, then dsa_port_phylink_validate() would
-> > > always call phylink_generic_validate() for all DSA drivers, and at that
-> > > point, we don't need dsa_port_phylink_validate() anymore as it provides
-> > > nothing that isn't already done inside phylink.
-> > > 
-> > > Once dsa_port_phylink_validate() is gone, then I believe there are no
-> > > drivers populating the .validate method in phylink_mac_ops, which
-> > > then means there is the possibility to remove that method.
-> > 
-> > Assuming I understand correctly, I agree it would be beneficial for
-> > mv88e6060, rtl8366rb and vsc73xx to populate mac_capabilities and
-> > supported_interfaces.
-> 
-> ... which we can only do if someone can furnish information on what
-> these support. Short of that, we would need something in the core
-> DSA code (like we're doing for the supported_interfaces) that would
-> allow them to continue working until .phylink_get_caps could be
-> reasonably implemented for them.
-> 
-> Providing a legacy .phylink_get_caps would also be a possibility.
-> Maybe something like this:
-> 
-> void legacy_dsa_phylink_get_caps(struct dsa_switch *ds, int port,
-> 				 struct phylink_config *config)
-> {
-> 	struct dsa_port *dp = dsa_to_port(ds, port);
-> 	phy_interface_t mode;
-> 	int err;
-> 
-> 	err = of_get_phy_mode(dp->dn, &mode);
-> 	if (!err) {
-> 		__set_bit(mode, config->supported_interfaces);
-> 	} else {
-> 		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-> 			  config->supported_interfaces);
-> 		__set_bit(PHY_INTERFACE_MODE_GMII,
-> 			  config->supported_interfaces);
-> 	}
-> 
-> 	config->mac_capabilities = MAC_1000 | MAC_100 | MAC_10 |
-> 				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
-> }
-> 
-> and then dsa_port_phylink_create() always calls phylink_get_caps:
-> 
-> -	if (ds->ops->phylink_get_caps) {
-> -		ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
-> -	} else {
-> -	...
-> -	}
-> +	ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
-
-That could be an option, but I think the volume of switches is low
-enough that we could just consider converting them all.
-
-I see you've sent a mv88e6060 patch, I'll go review that now.
+>
+>>
+>>like:
+>>   t7xx_devlink { 
+>>       ....
+>>       bool reset_to_fastboot;
+>>   }
+>>
+>>
+>>   t7xx_devlink_reload_down () {
+>>       ...
+>>       case DEVLINK_RELOAD_ACTION_DRIVER_REINIT:
+>>           t7xx_devlink.reset_to_fastboot = true;
+>>       ...
+>>   }
+>>
+>>   other functions use this variable:
+>>
+>>   if (t7xx_devlink.reset_to_fastboot) {
+>>        iowrite(reg, "reset to fastboot");
+>>   }
+>>
+>>Intel colleague has change to the way of devlink_param, so I hope to keep this.
+>>
+>>>
+>
 
