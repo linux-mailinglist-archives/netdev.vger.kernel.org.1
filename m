@@ -1,176 +1,173 @@
-Return-Path: <netdev+bounces-26414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46726777B9E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:06:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A8B777BA2
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF5528231B
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:06:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8B841C21781
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993FC200DA;
-	Thu, 10 Aug 2023 15:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D65520C85;
+	Thu, 10 Aug 2023 15:06:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE511E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:06:04 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35391270B;
-	Thu, 10 Aug 2023 08:06:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691679963; x=1723215963;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S8YzG04gocUZ9R3udkExKMtCGsxlemTcewQ0cbLcHDw=;
-  b=go7UncKmK5OIsb+eR8hj/A1kn1uPEZmvuwMCfC0Jr/+oug3h9vvnPvVk
-   CT04F0OwJ4S/bHewhyGIY0WwAFncyvSvNx3BujvcfpFcpn/kV4cPXk77W
-   WIWsjUZqaX/QpQrBhrF9PTej9gl4xlge4ZvJVAefneQFaC8gwc61aLfMb
-   78W8iuE7yYi22FVBcVGnNHo0gzjJr0R6Wk2j9qDswl3Lou8Gu8Z/si4SF
-   0ljABbIJGfquHQqrt3xcTxjvjWpjLSXlskd4Nuul+MOdkUli9AhWVF9Pe
-   fINIJtFQ/dVthwbSmsIMhmy743s379+YXviFQkEylF4l16Ut3nfpHI0GA
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="368901759"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="368901759"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 08:03:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="978821689"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="978821689"
-Received: from pglc00052.png.intel.com ([10.221.207.72])
-  by fmsmga006.fm.intel.com with ESMTP; 10 Aug 2023 08:03:51 -0700
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: [PATCH net-next 2/2] net: stmmac: Tx coe sw fallback
-Date: Thu, 10 Aug 2023 23:03:28 +0800
-Message-Id: <20230810150328.19704-3-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.19.0
-In-Reply-To: <20230810150328.19704-1-rohan.g.thomas@intel.com>
-References: <20230810150328.19704-1-rohan.g.thomas@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608781E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:06:09 +0000 (UTC)
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0B12698;
+	Thu, 10 Aug 2023 08:06:04 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-76754b9eac0so73074585a.0;
+        Thu, 10 Aug 2023 08:06:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691679964; x=1692284764;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hcINWyJSy8FttTW3PogPL++09l+HfsTCOWsOuolO/bE=;
+        b=KyIlz0OeO6bMm1ooGIrzCXWAgefelU5mc6aRrLiEWtXG1HD2SvOhso0K0vqfzIAkJ4
+         mSgx4E7yHLk9vJkGD+opdVHi5uksB8nWwBYacPtUTK7uGWp0OBnc1SrPtceSQCC+LqyH
+         ZG2ACq3+klOjJZNzun7K3inI6PlIPhrYj46tcUGwcBGhYqi3xMgrzOOHLtOkpWN985rv
+         IglUYR/JZ5MNf4zOIk83SldvSBJeUW/UWYON0mP6W4GK0BfpyR4tRlcC/jMb6L5Vslzy
+         sXKsnxzWAVsKbYd6Iv1rp3x/VBS+S3nMDSi3Ev2os3OOqec5vdBDu6RX9Gw2IRvJ9yAz
+         imhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691679964; x=1692284764;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hcINWyJSy8FttTW3PogPL++09l+HfsTCOWsOuolO/bE=;
+        b=IfSumbRYslWpeuqWCmymc8P9C5qGym3vN11Ls1q9+QArgsYFcu1ib3Om4aHn9b2F0o
+         v5BgNgGEW5wVptC4NOgqUvFtdIy66QvX8gdl7xoJ+HB9c0kwKZPm0CB/LqWcsadFIO3q
+         jnPvTqo0dZH1tpXoACDbN7eCFc7mt9Up7OB1XLpQDRETMlFixXmMw5Eewurc84vjUpD7
+         KEqWUm2yCTxKXPbPpiscXmiWzNahGCehclov3BPuosICOmyER4tJqpKCDjJukG2R0LUg
+         OhvJNzq27J6xmARGz8H3FLjgLfYMsiiiNOUS/ccx1kYjwfquiJa4HANFPHk63sbFoPhf
+         7udg==
+X-Gm-Message-State: AOJu0YylsgvUWwP0oX9o68ACE0HQeL9YpxkZIh+umjw4YeNqL0DwjMaP
+	Y91EosORXCwsD76i8O+e1RcN/ZR7PHapc7uI
+X-Google-Smtp-Source: AGHT+IGbjOCWB+JOQozPXLQT3oo9A25bfdng+7udbcmtxZuyegLFzAjZAJnPYoK9r5nGUjxwTaPWLw==
+X-Received: by 2002:a05:620a:1707:b0:76d:1373:5942 with SMTP id az7-20020a05620a170700b0076d13735942mr3147276qkb.0.1691679963670;
+        Thu, 10 Aug 2023 08:06:03 -0700 (PDT)
+Received: from smtpclient.apple ([195.252.220.43])
+        by smtp.gmail.com with ESMTPSA id i10-20020a37c20a000000b0076768dfe53esm536804qkm.105.2023.08.10.08.06.03
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Aug 2023 08:06:03 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: Re: Race over table->data in proc_do_sync_threshold()
+From: Sishuai Gong <sishuai.system@gmail.com>
+In-Reply-To: <b4854287-cb97-27fb-053f-e52179c05e97@ssi.bg>
+Date: Thu, 10 Aug 2023 11:05:52 -0400
+Cc: horms@verge.net.au,
+ Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ lvs-devel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8D17F8D2-BF68-4BA4-8590-7DE1E71872A6@gmail.com>
+References: <B6988E90-0A1E-4B85-BF26-2DAF6D482433@gmail.com>
+ <b4854287-cb97-27fb-053f-e52179c05e97@ssi.bg>
+To: Julian Anastasov <ja@ssi.bg>
+X-Mailer: Apple Mail (2.3731.700.6)
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add sw fallback of tx checksum calculation for those tx queues that
-doesn't support  tx checksum offloading. Because, some DWMAC IPs
-support tx checksum offloading  only for few initial tx queues,
-starting from tx queue 0.
+Hello,
 
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 19 +++++++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  4 ++++
- include/linux/stmmac.h                        |  1 +
- 4 files changed, 26 insertions(+)
+I am not familiar with the code but I would like to give it a try :).
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 3401e888a9f6..f526bcaaaf64 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -219,6 +219,8 @@ struct stmmac_priv {
- 	int hwts_tx_en;
- 	bool tx_path_in_lpi_mode;
- 	bool tso;
-+	bool tx_q_coe_lmt;
-+	u32 tx_q_with_coe;
- 	int sph;
- 	int sph_cap;
- 	u32 sarc_type;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fcab363d8dfa..e095a9bd93b1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4409,6 +4409,17 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	WARN_ON(tx_q->tx_skbuff[first_entry]);
- 
- 	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
-+	/* Some DWMAC IPs support tx coe only for a few initial tx queues,
-+	 * starting from tx queue 0. So checksum offloading for those queues
-+	 * that doesn't support tx coe need to fallback to software checksum
-+	 * calculation.
-+	 */
-+	if (csum_insertion && priv->tx_q_coe_lmt &&
-+	    queue >= priv->tx_q_with_coe) {
-+		if (unlikely(skb_checksum_help(skb)))
-+			goto dma_map_err;
-+		csum_insertion = !csum_insertion;
-+	}
- 
- 	if (likely(priv->extend_desc))
- 		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
-@@ -7386,6 +7397,14 @@ int stmmac_dvr_probe(struct device *device,
- 		dev_info(priv->device, "SPH feature enabled\n");
- 	}
- 
-+	if (priv->plat->tx_coe &&
-+	    priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use) {
-+		priv->tx_q_coe_lmt = true;
-+		priv->tx_q_with_coe = priv->plat->tx_queues_with_coe;
-+		dev_info(priv->device, "TX COE limited to %u tx queues\n",
-+			 priv->tx_q_with_coe);
-+	}
-+
- 	/* Ideally our host DMA address width is the same as for the
- 	 * device. However, it may differ and then we have to use our
- 	 * host DMA width for allocation and the device DMA width for
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index be8e79c7aa34..0138b7c9c7ab 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -225,6 +225,10 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 				 &plat->tx_queues_to_use))
- 		plat->tx_queues_to_use = 1;
- 
-+	if (of_property_read_u32(tx_node, "snps,tx-queues-with-coe",
-+				 &plat->tx_queues_with_coe))
-+		plat->tx_queues_with_coe = plat->tx_queues_to_use;
-+
- 	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
- 		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
- 	else if (of_property_read_bool(tx_node, "snps,tx-sched-wfq"))
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 652404c03944..795c10d19c1c 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -252,6 +252,7 @@ struct plat_stmmacenet_data {
- 	u32 host_dma_width;
- 	u32 rx_queues_to_use;
- 	u32 tx_queues_to_use;
-+	u32 tx_queues_with_coe;
- 	u8 rx_sched_algorithm;
- 	u8 tx_sched_algorithm;
- 	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
--- 
-2.26.2
+It seems to me that replacing the second memcpy with WRITE_ONCE()=20
+is not necessary as long as we still hold the lock. Otherwise is this =
+close
+to what you suggest?
+
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c =
+b/net/netfilter/ipvs/ip_vs_ctl.c
+index 62606fb44d02..b4e22e30b896 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -1876,6 +1876,7 @@ static int
+ proc_do_sync_threshold(struct ctl_table *table, int write,
+                       void *buffer, size_t *lenp, loff_t *ppos)
+ {
++      struct netns_ipvs *ipvs =3D table->extra2;
+        int *valp =3D table->data;
+        int val[2];
+        int rc;
+@@ -1885,6 +1886,7 @@ proc_do_sync_threshold(struct ctl_table *table, =
+int write,
+                .mode =3D table->mode,
+        };
+
++      mutex_lock(&ipvs->sync_mutex);
+        memcpy(val, valp, sizeof(val));
+        rc =3D proc_dointvec(&tmp, write, buffer, lenp, ppos);
+        if (write) {
+@@ -1894,6 +1896,7 @@ proc_do_sync_threshold(struct ctl_table *table, =
+int write,
+                else
+                        memcpy(valp, val, sizeof(val));
+        }
++      mutex_unlock(&ipvs->sync_mutex);
+        return rc;
+ }
+
+@@ -4321,6 +4324,7 @@ static int __net_init =
+ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
+        ipvs->sysctl_sync_threshold[0] =3D DEFAULT_SYNC_THRESHOLD;
+        ipvs->sysctl_sync_threshold[1] =3D DEFAULT_SYNC_PERIOD;
+        tbl[idx].data =3D &ipvs->sysctl_sync_threshold;
++      tbl[idx].extra2 =3D ipvs;
+        tbl[idx++].maxlen =3D sizeof(ipvs->sysctl_sync_threshold);
+        ipvs->sysctl_sync_refresh_period =3D =
+DEFAULT_SYNC_REFRESH_PERIOD;
+        tbl[idx++].data =3D &ipvs->sysctl_sync_refresh_period;
+
+> On Aug 10, 2023, at 2:20 AM, Julian Anastasov <ja@ssi.bg> wrote:
+>=20
+>=20
+> Hello,
+>=20
+> On Wed, 9 Aug 2023, Sishuai Gong wrote:
+>=20
+>> Hi,
+>>=20
+>> We observed races over (struct ctl_table *) table->data when two =
+threads
+>> are running proc_do_sync_threshold() in parallel, as shown below:
+>>=20
+>> Thread-1 Thread-2
+>> memcpy(val, valp, sizeof(val)); memcpy(valp, val, sizeof(val));
+>>=20
+>> This race probably would mess up table->data. Is it better to add a =
+lock?
+>=20
+> We can put mutex_lock(&ipvs->sync_mutex) before the first
+> memcpy and to use two WRITE_ONCE instead of the second memcpy. But
+> this requires extra2 =3D ipvs in ip_vs_control_net_init_sysctl():
+>=20
+> tbl[idx].data =3D &ipvs->sysctl_sync_threshold;
+> + tbl[idx].extra2 =3D ipvs;
+>=20
+> Will you provide patch?
+>=20
+> Regards
+>=20
+> --
+> Julian Anastasov <ja@ssi.bg>
+
 
 
