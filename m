@@ -1,202 +1,131 @@
-Return-Path: <netdev+bounces-26249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B0177753B
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:00:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B934777544
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C33D28200E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F231C20AF9
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDE71ED25;
-	Thu, 10 Aug 2023 10:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF401ED26;
+	Thu, 10 Aug 2023 10:02:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECEE1E51F
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:00:46 +0000 (UTC)
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D9E30DF;
-	Thu, 10 Aug 2023 03:00:35 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-564d6aa9abdso1359116a12.1;
-        Thu, 10 Aug 2023 03:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691661624; x=1692266424;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bsyKa5hEaaL0qGnptzE/bNHXrwjhSxbRsAekRJz5cRs=;
-        b=NWKV8YebqVS1cHsP70Ml5POWU0s4gl8a6GnoIGML91LNf3M0eX7Hc5Dj4IVCQw7bSf
-         JbebL5aTDZpUuDR/ertqnr0xdxjx/gELAUJAkwqcM3TVVwtNFf/EcKN51AmOMEDeAA1S
-         GF1BFvSoy1zLBEOuTSwKjArsGEdw0W3D6eolVj6rL93e5FRSDeC+RIHnEDoIjMSA1Td/
-         iukQ9wrG1y/aPF1PRKt/AVthTULVmqndgiRpD9I+fsLGAXdn0RLUnKazL4+I7Q4VEplo
-         On9nW23nfFk8Sh78iFIm6nlX1yhgzgIwV1MfuNcJpAQ6vAK9GyrxNdhu1LsXEAKN1YV6
-         4WMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691661624; x=1692266424;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bsyKa5hEaaL0qGnptzE/bNHXrwjhSxbRsAekRJz5cRs=;
-        b=IGtBkKDCYwdpyx3Wv4JC7onn5d6nviobFcPbFUMb4/jWEMt2vxkqybPUApUiUTTQjS
-         1w2jYwBG98m9aPoyqS7VDrv3F8cySKQRoiVWW6Wyf21oNEa1m7Iru4jmBnQiPgAzh6JV
-         lqqA3/0MmbXGM4IWt2YkpCgDynJ/OoKfAj33FPGHRVQsm2KMUHr1A+9iOWF/d8d2/8wv
-         EObrTU6KFLKEhhd6P3ZgLCPeh2dqZtqbwsO5s42vRgxHQa1fYZEdJigws39ZBhfTZ9s3
-         x5QjVBr/Yv3EgKyWgywCmhTrrEctj0t9yP/feHLupT0ectkmWqCdIf7WJSRSnmpptUTU
-         OvAw==
-X-Gm-Message-State: AOJu0YzIkrwpyxvfOglmcuv0vXIN8o1MLllaytuiKp5Nl/UMhaXxqHqV
-	1Hvw69pyHr0jSbctwTwfe24=
-X-Google-Smtp-Source: AGHT+IGpOVTj+SVU9Si57XPYju4r/bD7x0ZYxVBJQ00aI9Sq/3XAcPzRtCVj4bw0Nwg0v0q1mFJBQg==
-X-Received: by 2002:a17:90a:a787:b0:268:e3d:1251 with SMTP id f7-20020a17090aa78700b002680e3d1251mr2148307pjq.20.1691661623932;
-        Thu, 10 Aug 2023 03:00:23 -0700 (PDT)
-Received: from localhost.localdomain ([198.211.45.220])
-        by smtp.googlemail.com with ESMTPSA id s23-20020a17090a1c1700b00263b4b1255esm3138978pjs.51.2023.08.10.03.00.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 03:00:23 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDBA1E51F
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:02:00 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD4F3C3B
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:01:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gF7i5HM+zGdPrfl8tdSW5v/khHwK6WWq7/y9FHzMH6I=; b=dTXrjUWRhNybUaxoHW/6kjEczm
+	w43bf3xX2CZK6zg8g9sXQF8/vxxYBVrCvKq9R+kNM6b/G/3I2BDTKiD/ObD+QwJMygqbEOKH2Jl6B
+	DhoY239E39allcvF/wfpbIZxYZah3EFBqd5m9NHl/QKmoQIZSgGst/Eg64M4UJc3/cGbkxQhcgHAa
+	lGwU5AzjgcxT+Dp9ZFoNnzBp6Rgc43G6EPa+d9BU834tnz3c2PfImf+eWZ+V7fyVvUxfJpiZwT+jY
+	M2+I/rtWtfg02iGUhyampqjjb0o0YXsm9aYosvy0TM25anzlCGXl/On2/cyBHScZxVyqIbbL/wnSb
+	1UX968zQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54166)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qU2UN-0003mm-05;
+	Thu, 10 Aug 2023 11:01:55 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qU2UL-0001fg-Fm; Thu, 10 Aug 2023 11:01:53 +0100
+Date: Thu, 10 Aug 2023 11:01:53 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marek Vasut <marex@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH 1/1] net: stmmac: dwmac4: extract MAC_HW_Feature regs MSB first
-Date: Thu, 10 Aug 2023 17:59:29 +0800
-Message-Id: <20230810095929.246901-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
+Message-ID: <ZNS1kalvEI6Y2Cs9@shell.armlinux.org.uk>
+References: <20230804175842.209537-1-marex@denx.de>
+ <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
+ <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <20230809043626.GG5736@pengutronix.de>
+ <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
+ <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
+ <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
+ <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The bit extraction sequences are a little messy.
-No code changes, just reorder them.
+On Thu, Aug 10, 2023 at 02:49:55AM +0200, Marek Vasut wrote:
+> On 8/10/23 00:06, Andrew Lunn wrote:
+> > On Wed, Aug 09, 2023 at 11:34:19PM +0200, Marek Vasut wrote:
+> > > On 8/9/23 15:40, Andrew Lunn wrote:
+> > > > > > Hm.. how about officially defining this PHY as the clock provider and disable
+> > > > > > PHY automatic hibernation as long as clock is acquired?
+> > > > > > 
+> > > > > Sorry, I don't know much about the clock provider/consumer, but I think there
+> > > > > will be more changes if we use clock provider/consume mechanism.
+> > > > 
+> > > > Less changes is not always best. What happens when a different PHY is
+> > > > used?
+> > > 
+> > > Then the system wouldn't be affected by this AR803x specific behavior.
+> > 
+> > Do you know it really is specific to the AR803x? Turning the clock off
+> > seams a reasonable thing to do when saving power, or when there is no
+> > link partner.
+> 
+> This hibernation behavior seem specific to this PHY, I haven't seen it on
+> another PHY connected to the EQoS so far.
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  | 54 +++++++++----------
- 1 file changed, 26 insertions(+), 28 deletions(-)
+Marvell PHYs can be programmed so that RXCLK stops when the PHY
+enters power down or energy-detect state, although it defaults to
+always keeping the RGMII interface powered (and thus providing a
+clock.)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-index 84d3a8551b03..3d9e20078193 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-@@ -379,27 +379,27 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
- {
- 	u32 hw_cap = readl(ioaddr + GMAC_HW_FEATURE0);
- 
--	/*  MAC HW feature0 */
--	dma_cap->mbps_10_100 = (hw_cap & GMAC_HW_FEAT_MIISEL);
--	dma_cap->mbps_1000 = (hw_cap & GMAC_HW_FEAT_GMIISEL) >> 1;
--	dma_cap->half_duplex = (hw_cap & GMAC_HW_FEAT_HDSEL) >> 2;
--	dma_cap->vlhash = (hw_cap & GMAC_HW_FEAT_VLHASH) >> 4;
-+	/* MAC HW feature0 */
-+	dma_cap->vlins = (hw_cap & GMAC_HW_FEAT_SAVLANINS) >> 27;
- 	dma_cap->multi_addr = (hw_cap & GMAC_HW_FEAT_ADDMAC) >> 18;
--	dma_cap->pcs = (hw_cap & GMAC_HW_FEAT_PCSSEL) >> 3;
--	dma_cap->sma_mdio = (hw_cap & GMAC_HW_FEAT_SMASEL) >> 5;
--	dma_cap->pmt_remote_wake_up = (hw_cap & GMAC_HW_FEAT_RWKSEL) >> 6;
--	dma_cap->pmt_magic_frame = (hw_cap & GMAC_HW_FEAT_MGKSEL) >> 7;
--	/* MMC */
--	dma_cap->rmon = (hw_cap & GMAC_HW_FEAT_MMCSEL) >> 8;
--	/* IEEE 1588-2008 */
--	dma_cap->atime_stamp = (hw_cap & GMAC_HW_FEAT_TSSEL) >> 12;
--	/* 802.3az - Energy-Efficient Ethernet (EEE) */
--	dma_cap->eee = (hw_cap & GMAC_HW_FEAT_EEESEL) >> 13;
- 	/* TX and RX csum */
--	dma_cap->tx_coe = (hw_cap & GMAC_HW_FEAT_TXCOSEL) >> 14;
- 	dma_cap->rx_coe =  (hw_cap & GMAC_HW_FEAT_RXCOESEL) >> 16;
--	dma_cap->vlins = (hw_cap & GMAC_HW_FEAT_SAVLANINS) >> 27;
-+	dma_cap->tx_coe = (hw_cap & GMAC_HW_FEAT_TXCOSEL) >> 14;
-+	/* 802.3az - Energy-Efficient Ethernet (EEE) */
-+	dma_cap->eee = (hw_cap & GMAC_HW_FEAT_EEESEL) >> 13;
-+	/* IEEE 1588-2008 */
-+	dma_cap->atime_stamp = (hw_cap & GMAC_HW_FEAT_TSSEL) >> 12;
- 	dma_cap->arpoffsel = (hw_cap & GMAC_HW_FEAT_ARPOFFSEL) >> 9;
-+	/* MMC */
-+	dma_cap->rmon = (hw_cap & GMAC_HW_FEAT_MMCSEL) >> 8;
-+	dma_cap->pmt_magic_frame = (hw_cap & GMAC_HW_FEAT_MGKSEL) >> 7;
-+	dma_cap->pmt_remote_wake_up = (hw_cap & GMAC_HW_FEAT_RWKSEL) >> 6;
-+	dma_cap->sma_mdio = (hw_cap & GMAC_HW_FEAT_SMASEL) >> 5;
-+	dma_cap->vlhash = (hw_cap & GMAC_HW_FEAT_VLHASH) >> 4;
-+	dma_cap->pcs = (hw_cap & GMAC_HW_FEAT_PCSSEL) >> 3;
-+	dma_cap->half_duplex = (hw_cap & GMAC_HW_FEAT_HDSEL) >> 2;
-+	dma_cap->mbps_1000 = (hw_cap & GMAC_HW_FEAT_GMIISEL) >> 1;
-+	dma_cap->mbps_10_100 = (hw_cap & GMAC_HW_FEAT_MIISEL);
- 
- 	/* MAC HW feature1 */
- 	hw_cap = readl(ioaddr + GMAC_HW_FEATURE1);
-@@ -408,7 +408,6 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
- 	dma_cap->av = (hw_cap & GMAC_HW_FEAT_AVSEL) >> 20;
- 	dma_cap->tsoen = (hw_cap & GMAC_HW_TSOEN) >> 18;
- 	dma_cap->sphen = (hw_cap & GMAC_HW_FEAT_SPHEN) >> 17;
--
- 	dma_cap->addr64 = (hw_cap & GMAC_HW_ADDR64) >> 14;
- 	switch (dma_cap->addr64) {
- 	case 0:
-@@ -424,31 +423,30 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
- 		dma_cap->addr64 = 32;
- 		break;
- 	}
--
- 	/* RX and TX FIFO sizes are encoded as log2(n / 128). Undo that by
- 	 * shifting and store the sizes in bytes.
- 	 */
- 	dma_cap->tx_fifo_size = 128 << ((hw_cap & GMAC_HW_TXFIFOSIZE) >> 6);
- 	dma_cap->rx_fifo_size = 128 << ((hw_cap & GMAC_HW_RXFIFOSIZE) >> 0);
-+
- 	/* MAC HW feature2 */
- 	hw_cap = readl(ioaddr + GMAC_HW_FEATURE2);
-+	/* Number of Auxiliary Snapshot Inputs */
-+	dma_cap->aux_snapshot_n = (hw_cap & GMAC_HW_FEAT_AUXSNAPNUM) >> 28;
-+	/* PPS output */
-+	dma_cap->pps_out_num = (hw_cap & GMAC_HW_FEAT_PPSOUTNUM) >> 24;
- 	/* TX and RX number of channels */
--	dma_cap->number_rx_channel =
--		((hw_cap & GMAC_HW_FEAT_RXCHCNT) >> 12) + 1;
- 	dma_cap->number_tx_channel =
- 		((hw_cap & GMAC_HW_FEAT_TXCHCNT) >> 18) + 1;
-+	dma_cap->number_rx_channel =
-+		((hw_cap & GMAC_HW_FEAT_RXCHCNT) >> 12) + 1;
- 	/* TX and RX number of queues */
--	dma_cap->number_rx_queues =
--		((hw_cap & GMAC_HW_FEAT_RXQCNT) >> 0) + 1;
- 	dma_cap->number_tx_queues =
- 		((hw_cap & GMAC_HW_FEAT_TXQCNT) >> 6) + 1;
--	/* PPS output */
--	dma_cap->pps_out_num = (hw_cap & GMAC_HW_FEAT_PPSOUTNUM) >> 24;
--
-+	dma_cap->number_rx_queues =
-+		((hw_cap & GMAC_HW_FEAT_RXQCNT) >> 0) + 1;
- 	/* IEEE 1588-2002 */
- 	dma_cap->time_stamp = 0;
--	/* Number of Auxiliary Snapshot Inputs */
--	dma_cap->aux_snapshot_n = (hw_cap & GMAC_HW_FEAT_AUXSNAPNUM) >> 28;
- 
- 	/* MAC HW feature3 */
- 	hw_cap = readl(ioaddr + GMAC_HW_FEATURE3);
+One Micrel PHY - "To save more power, the KSZ9031RNX stops the RX_CLK
+clock output to the MAC after 10 or more RX_CLK clock
+cycles have occurred in the receive LPI state." which seems to imply
+if EEE is enabled, then the receive clock will be stopped when
+entering low-power state.
+
+I've said this several times in this thread - I think we need a bit
+in the PHY device's dev_flags to allow the MAC to say "do not power
+down the receive clock" which is used by the PHY drivers to (a) program
+the hardware to prevent the receive clock being stopped in situations
+such as the AR803x hibernate mode, and (b) to program the hardware not
+to stop the receive clock when entering EEE low power. This does seem
+to be a generic thing and not specific to just one PHY - especially as
+the stopping of clocks when entering EEE low power is a IEEE 802.3
+defined thing.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
