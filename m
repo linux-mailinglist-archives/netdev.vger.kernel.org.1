@@ -1,63 +1,69 @@
-Return-Path: <netdev+bounces-26553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 153EE7781CA
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:49:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4F47781CE
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0BC1C20BA5
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:49:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22D061C20A71
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CBC22F1E;
-	Thu, 10 Aug 2023 19:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E312B22F1F;
+	Thu, 10 Aug 2023 19:50:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2462420CA8
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 19:49:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70838C433C7;
-	Thu, 10 Aug 2023 19:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0E020CA8
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 19:50:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C7C4C433C8;
+	Thu, 10 Aug 2023 19:50:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691696952;
-	bh=D3ftcslJ8YcyfvSLWosKRnrmeg4ITPNuHnd1GqSvXL0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=emz27WWvZZ1hiv59S5Ojs39+m6bGWpOehRnXX9Roe61sfrxb4QYqIpXAh9s8hmX/B
-	 V7gOkJtjnAviKdqb4XpPnL7hGxMbF5lIhafOzz9qzryy+cfBvBM3DAYrRtRec1n7qv
-	 d5OAkkCCzudrrK8vF8VUkcDM/FJEUrdHfG8TPVshy2tqXPfBwl4mBkXnIpp50usJz6
-	 gP/MVefeLRSp+d7AqYyN2S2H9nOPVgh1SNzF6hxWghcPwJyaYoT7c8hukOYl8C8Flv
-	 q227yWRWhqDlXTVJUidbcBnCWZPjmjQbr4J1dUlIn2lYS9kFmNcsqAEbmoxSxRm5Qy
-	 PHVOYeRndGadQ==
-Date: Thu, 10 Aug 2023 21:49:07 +0200
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: santosh.shilimkar@oracle.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com
-Subject: Re: [PATCH net-next] rds: tcp: Remove unused declaration
- rds_tcp_map_seq()
-Message-ID: <ZNU/M1Iot28KUYtv@vergenet.net>
-References: <20230809144148.13052-1-yuehaibing@huawei.com>
+	s=k20201202; t=1691697004;
+	bh=m7wsLm6cINbgrJRhcEN1/O+nRC9DUA51asBVUkiq1fY=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=IGIRD5mfRrCh2yyyo8qdvkfyF6BBlRCV9c/BpJejsoETuWhr8nZYJwgDKw1sgtrd5
+	 Ef3w12TxpNpXlyMzT4p802yQy2HAna+ze5YKL0ocIU8U0ooCQAQVwNieO3J4i8SeVk
+	 yCu1zNZB10Yb11L7UdhIf1op8sSb2HtBivLR/tLc68pR69lgfYS6YKdSjLJXNw+i5y
+	 fbcOrWZlIegsBrP4G/kjjDriZXEy+w+wpdBXeLN3C7m23lZFnHe1gkTEIJNObYHGfK
+	 /qSehQYBDe9UkZqB0vBE6UFGw0ZiZ8A85QWA+667GCPcDvlONHHqwUslkytsNwxA2h
+	 R+m1SA9sETHDQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35888C39562;
+	Thu, 10 Aug 2023 19:50:04 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.5-rc6
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20230810185922.92197-1-kuba@kernel.org>
+References: <20230810185922.92197-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20230810185922.92197-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.5-rc6
+X-PR-Tracked-Commit-Id: 5e3d20617b055e725e785e0058426368269949f3
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 25aa0bebba72b318e71fe205bfd1236550cc9534
+Message-Id: <169169700420.10464.407068100361851410.pr-tracker-bot@kernel.org>
+Date: Thu, 10 Aug 2023 19:50:04 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230809144148.13052-1-yuehaibing@huawei.com>
 
-On Wed, Aug 09, 2023 at 10:41:48PM +0800, Yue Haibing wrote:
-> rds_tcp_map_seq() is never implemented and used since
-> commit 70041088e3b9 ("RDS: Add TCP transport to RDS").
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+The pull request you sent on Thu, 10 Aug 2023 11:59:22 -0700:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.5-rc6
 
-BTW, I think these rds patches could have been rolled-up
-into a patch-set, or perhaps better still squashed into a single patch.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/25aa0bebba72b318e71fe205bfd1236550cc9534
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
