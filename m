@@ -1,113 +1,248 @@
-Return-Path: <netdev+bounces-26277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E2CF777617
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:41:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB56B777627
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5863F281F97
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F006280E5A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6812A1EA94;
-	Thu, 10 Aug 2023 10:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B9720F99;
+	Thu, 10 Aug 2023 10:39:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB5F1E52A
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:39:34 +0000 (UTC)
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351932D78
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:39:29 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99bc9e3cbf1so159341666b.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:39:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460DC1F953
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:39:58 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7FE326BD
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:39:56 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583312344e7so11023577b3.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:39:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691663968; x=1692268768;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJ9MOKpVeig316su6xi1KnGB5hanzaH9oU2jA9id/34=;
-        b=uQGbz65ij55MLDc2dLHsp6jUPyqPbIZtaosibRnlQmAfQnaP+7/6FNScNMWwQNAsAm
-         RhKorlMSJJ1/+82nKt4ONcCT8SjpLPVpNu0nsMUSqwQAEF5wpDtQqv+c3LE45yeX1pdA
-         HlJPKyIuMcGFiPAMuj13IX21xOpf4QSbO6Oop20Yk1ZbVBseuEKwWQ5nCtFyi6iv4YXV
-         oNYUgO1VPo2bKkmw/uH76fO4cG0kuAWdl+1FkW61427k1kTLM9ZpuMaamJYOjYftZ+3n
-         pvEgWZH0aSduZQCPV8FMObftKWMQ9tD2iwiIgGWEl2ObU58LrGGY9vz+XTCt2ZEqXrJi
-         6IWQ==
+        d=google.com; s=20221208; t=1691663996; x=1692268796;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J/ZWjKWRn9hPBnyl7x2au0PI6QMR0oxwkgUrCKu29G8=;
+        b=U7HUP9ik7LQ0LjIzW22F+i3vLoKsdTzU2DkiaZqTLquoY1pQJ0wuyyTUz8KXbs/UTD
+         WnN7rPl21Dy5E34tn84JnnIqWz1JHJfQEaAWvmLtXwkRVGRmbq8y0KuZNdrj9sGkvRvS
+         qHx1zHUpCWqf1Z7cayu+7QC2tQnfczokXyNrjWVRjKOd/SN4Cefjt3u61K4dE/QnW9vd
+         l9VVPm5xandgmNS/9beCDDOigaT1anrbKNU626Ju+aSeRHXedMCgosx2+mllXlumui5V
+         66MyrcEnWoSSr/hdLCbxxW3Iyi6hgSErkX3l1vHRvJpPwOlDcN1U3JbaSiDLBlhuo7Ek
+         2HsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691663968; x=1692268768;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zJ9MOKpVeig316su6xi1KnGB5hanzaH9oU2jA9id/34=;
-        b=LepIkKBz8uQeOLB59QO3LIEoOZ4dahZz6lIjp7tqPVCWVOUXyAAF8UgeYmTi8jH8xg
-         7HlAMzL0QY+3iX1DdBay8DCp6imKlVmomXtcApELv/8aGk+mQLkRjQjCz15EPQJYVL9q
-         oXMQNHK5oH/oXLjYMBztMDfceGqDPZET5u6wRZEJ6JOWFrv30L2PvrWPUBembvYIGAAe
-         A7PmqNgRzVw/KA03944iZJ8dPXmCZy6jGmjKXNPSkJR43QXvZ1Xp2ASaVrbIHcy957JC
-         rVCFJpefbMjx/gfULslYztHk5GBP0MeXDHrFwReJIeVjprKYFR2/llDP9avhMhCZ13SU
-         MpVw==
-X-Gm-Message-State: AOJu0Yww34jtGRoO88yCDg2wDXZFAp0idPZZmDudEd8VomCUIDNc8QIo
-	y28V5NbVN5JMIYFYiBTsleoMbA==
-X-Google-Smtp-Source: AGHT+IEK8P3dqAX5gIvsT8nsM2TfsbTvTxWqFzlAZ0erTN8BR+5qocrc6+mwqlnlgS+pS7P2w1dhFg==
-X-Received: by 2002:a17:906:53:b0:99b:4d3d:c9b7 with SMTP id 19-20020a170906005300b0099b4d3dc9b7mr2246114ejg.31.1691663967813;
-        Thu, 10 Aug 2023 03:39:27 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.222.113])
-        by smtp.gmail.com with ESMTPSA id mc5-20020a170906eb4500b00999bb1e01dfsm749244ejb.52.2023.08.10.03.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 03:39:27 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andi Shyti <andi.shyti@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next 1/2] net/xgene: fix Wvoid-pointer-to-enum-cast warning
-Date: Thu, 10 Aug 2023 12:39:22 +0200
-Message-Id: <20230810103923.151226-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20221208; t=1691663996; x=1692268796;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J/ZWjKWRn9hPBnyl7x2au0PI6QMR0oxwkgUrCKu29G8=;
+        b=grYyhsj59DmC9J98ruDkMj5m2S5MsSxWKLvKIhRPv0k90DMfXIfzWRGmJc5of3R+U1
+         yMN0P/ywAtcldPD8w0kb8VJ/dZrabr6CHxMTvkR6Mr7a5/hVyie6NzhZibrifj9eZEFw
+         2K/mTI5pIN0uc0Tk49S2moSGPK9HjRIKRTxQEet5VIu5trKfqYx8SjgSg7eJ7Xw1c66J
+         1Ve43jOakwmCJzApEXJaJQdZJnRQMlFp/sXnlaqPoe59TCcayvJrdCY7cQ0AxXcxYm9g
+         GziWOtI7E+KW0yKJq8DU8+LIrrXIE8JW8wSWQMgIkrA702as2QqAqTLAmjEznatje82r
+         pS4Q==
+X-Gm-Message-State: AOJu0YylB1cScbGHParPIF/xALFTFokh5ONu3HgIL9pw+oxi9nByb7aE
+	cy21rJnn0C4MvLbK5LF9H4o5SrgrwOuJZA==
+X-Google-Smtp-Source: AGHT+IE02i9PLZhW8ANLtCiRF+V0GQzntszyhKB15FDLjUxdpdC+JyieQWd4PEUeP+o63Hl0wRa0LOw4UyGtZQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a5b:b0c:0:b0:d3d:74b6:e082 with SMTP id
+ z12-20020a5b0b0c000000b00d3d74b6e082mr30929ybp.9.1691663996146; Thu, 10 Aug
+ 2023 03:39:56 -0700 (PDT)
+Date: Thu, 10 Aug 2023 10:39:22 +0000
+In-Reply-To: <20230810103927.1705940-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20230810103927.1705940-1-edumazet@google.com>
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230810103927.1705940-11-edumazet@google.com>
+Subject: [PATCH net-next 10/15] inet: move inet->is_icsk to inet->inet_flags
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <simon.horman@corigine.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-'enet_id' is an enum, thus cast of pointer on 64-bit compile test with
-W=1 causes:
+We move single bit fields to inet->inet_flags to avoid races.
 
-  xgene_enet_main.c:2044:20: error: cast to smaller integer type 'enum xgene_enet_id' from 'const void *' [-Werror,-Wvoid-pointer-to-enum-cast]
-
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ethernet/apm/xgene/xgene_enet_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/inet_connection_sock.h | 4 ++--
+ include/net/inet_sock.h            | 5 ++---
+ net/ipv4/af_inet.c                 | 2 +-
+ net/ipv4/cipso_ipv4.c              | 4 ++--
+ net/ipv4/inet_diag.c               | 2 +-
+ net/ipv4/ip_sockglue.c             | 4 ++--
+ net/ipv6/af_inet6.c                | 2 +-
+ net/ipv6/ipv6_sockglue.c           | 4 ++--
+ 8 files changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/apm/xgene/xgene_enet_main.c b/drivers/net/ethernet/apm/xgene/xgene_enet_main.c
-index 41d96f4b23d8..4d4140b7c450 100644
---- a/drivers/net/ethernet/apm/xgene/xgene_enet_main.c
-+++ b/drivers/net/ethernet/apm/xgene/xgene_enet_main.c
-@@ -2041,7 +2041,7 @@ static int xgene_enet_probe(struct platform_device *pdev)
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index c2b15f7e551617b06863a3b52056348d9c53bb12..7402918b015636bd668ae4ebb53b3f73d1cd34a6 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -341,9 +341,9 @@ static inline bool inet_csk_in_pingpong_mode(struct sock *sk)
+ 	return inet_csk(sk)->icsk_ack.pingpong >= TCP_PINGPONG_THRESH;
+ }
  
- 	of_id = of_match_device(xgene_enet_of_match, &pdev->dev);
- 	if (of_id) {
--		pdata->enet_id = (enum xgene_enet_id)of_id->data;
-+		pdata->enet_id = (uintptr_t)of_id->data;
- 	}
- #ifdef CONFIG_ACPI
- 	else {
+-static inline bool inet_csk_has_ulp(struct sock *sk)
++static inline bool inet_csk_has_ulp(const struct sock *sk)
+ {
+-	return inet_sk(sk)->is_icsk && !!inet_csk(sk)->icsk_ulp_ops;
++	return inet_test_bit(IS_ICSK, sk) && !!inet_csk(sk)->icsk_ulp_ops;
+ }
+ 
+ #endif /* _INET_CONNECTION_SOCK_H */
+diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+index cefd9a60dc6d8432cc685716c2e556be7a7dc2ec..38f7fc1c4dacfb4ecacbbb38ae484ed06f2638e2 100644
+--- a/include/net/inet_sock.h
++++ b/include/net/inet_sock.h
+@@ -201,7 +201,6 @@ struct rtable;
+  * @inet_id - ID counter for DF pkts
+  * @tos - TOS
+  * @mc_ttl - Multicasting TTL
+- * @is_icsk - is this an inet_connection_sock?
+  * @uc_index - Unicast outgoing device index
+  * @mc_index - Multicast device index
+  * @mc_list - Group array
+@@ -230,8 +229,7 @@ struct inet_sock {
+ 	__u8			min_ttl;
+ 	__u8			mc_ttl;
+ 	__u8			pmtudisc;
+-	__u8			is_icsk:1,
+-				nodefrag:1;
++	__u8			nodefrag:1;
+ 	__u8			bind_address_no_port:1,
+ 				defer_connect:1; /* Indicates that fastopen_connect is set
+ 						  * and cookie exists so we defer connect
+@@ -271,6 +269,7 @@ enum {
+ 	INET_FLAGS_MC_LOOP	= 13,
+ 	INET_FLAGS_MC_ALL	= 14,
+ 	INET_FLAGS_TRANSPARENT	= 15,
++	INET_FLAGS_IS_ICSK	= 16,
+ };
+ 
+ /* cmsg flags for inet */
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index c15aae4a386097b66a8908e2dcf23c549200e86f..7655574b2de152fad70b258e779fcdadfb283f32 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -325,7 +325,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
+ 		sk->sk_reuse = SK_CAN_REUSE;
+ 
+ 	inet = inet_sk(sk);
+-	inet->is_icsk = (INET_PROTOSW_ICSK & answer_flags) != 0;
++	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
+ 
+ 	inet->nodefrag = 0;
+ 
+diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
+index 79ae7204e8edb973764e53349d3270dda78e18c4..d048aa83329386b0bbe4c68d4dee2c86871f8efb 100644
+--- a/net/ipv4/cipso_ipv4.c
++++ b/net/ipv4/cipso_ipv4.c
+@@ -1881,7 +1881,7 @@ int cipso_v4_sock_setattr(struct sock *sk,
+ 
+ 	old = rcu_dereference_protected(sk_inet->inet_opt,
+ 					lockdep_sock_is_held(sk));
+-	if (sk_inet->is_icsk) {
++	if (inet_test_bit(IS_ICSK, sk)) {
+ 		sk_conn = inet_csk(sk);
+ 		if (old)
+ 			sk_conn->icsk_ext_hdr_len -= old->opt.optlen;
+@@ -2051,7 +2051,7 @@ void cipso_v4_sock_delattr(struct sock *sk)
+ 	sk_inet = inet_sk(sk);
+ 
+ 	hdr_delta = cipso_v4_delopt(&sk_inet->inet_opt);
+-	if (sk_inet->is_icsk && hdr_delta > 0) {
++	if (inet_test_bit(IS_ICSK, sk) && hdr_delta > 0) {
+ 		struct inet_connection_sock *sk_conn = inet_csk(sk);
+ 		sk_conn->icsk_ext_hdr_len -= hdr_delta;
+ 		sk_conn->icsk_sync_mss(sk, sk_conn->icsk_pmtu_cookie);
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 45fefd2f31fd7b921d796b0317b72b8858ca9c5b..ada198fc1a92bfbaa1abe691da24489edf281f22 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -183,7 +183,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
+ 
+ 	memset(&inet_sockopt, 0, sizeof(inet_sockopt));
+ 	inet_sockopt.recverr	= inet_test_bit(RECVERR, sk);
+-	inet_sockopt.is_icsk	= inet->is_icsk;
++	inet_sockopt.is_icsk	= inet_test_bit(IS_ICSK, sk);
+ 	inet_sockopt.freebind	= inet_test_bit(FREEBIND, sk);
+ 	inet_sockopt.hdrincl	= inet_test_bit(HDRINCL, sk);
+ 	inet_sockopt.mc_loop	= inet_test_bit(MC_LOOP, sk);
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 3f5323a230b3d84048838cb03d648b213bd95fab..dac471ed067b4ba276fc0a9379750df54ea8987c 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -1034,7 +1034,7 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 			break;
+ 		old = rcu_dereference_protected(inet->inet_opt,
+ 						lockdep_sock_is_held(sk));
+-		if (inet->is_icsk) {
++		if (inet_test_bit(IS_ICSK, sk)) {
+ 			struct inet_connection_sock *icsk = inet_csk(sk);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 			if (sk->sk_family == PF_INET ||
+@@ -1209,7 +1209,7 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		struct ip_mreqn mreq;
+ 
+ 		err = -EPROTO;
+-		if (inet_sk(sk)->is_icsk)
++		if (inet_test_bit(IS_ICSK, sk))
+ 			break;
+ 
+ 		if (optlen < sizeof(struct ip_mreq))
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 4a34a4ba62b229991307ebed74ac7cd9f3a943ba..fea7918ad6ef351afc6bfb45d54aae8d658d4b55 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -200,7 +200,7 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
+ 		sk->sk_reuse = SK_CAN_REUSE;
+ 
+ 	inet = inet_sk(sk);
+-	inet->is_icsk = (INET_PROTOSW_ICSK & answer_flags) != 0;
++	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
+ 
+ 	if (SOCK_RAW == sock->type) {
+ 		inet->inet_num = protocol;
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index eb334122512c2a7b41dc5f6bc83aaa3c2b946a06..d19577a94bcc6120e85dafb2768521e6567c0511 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -102,7 +102,7 @@ int ip6_ra_control(struct sock *sk, int sel)
+ struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
+ 					   struct ipv6_txoptions *opt)
+ {
+-	if (inet_sk(sk)->is_icsk) {
++	if (inet_test_bit(IS_ICSK, sk)) {
+ 		if (opt &&
+ 		    !((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE)) &&
+ 		    inet_sk(sk)->inet_daddr != LOOPBACK4_IPV6) {
+@@ -831,7 +831,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 			goto e_inval;
+ 
+ 		retv = -EPROTO;
+-		if (inet_sk(sk)->is_icsk)
++		if (inet_test_bit(IS_ICSK, sk))
+ 			break;
+ 
+ 		retv = -EFAULT;
 -- 
-2.34.1
+2.41.0.640.ga95def55d0-goog
 
 
