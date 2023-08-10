@@ -1,126 +1,85 @@
-Return-Path: <netdev+bounces-26369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56A967779E2
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:48:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84477779E7
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86C001C214B1
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:48:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFF5B1C215A6
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF8E1FB2E;
-	Thu, 10 Aug 2023 13:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47851E508;
+	Thu, 10 Aug 2023 13:49:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA391E1B2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:46:39 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC37CE54;
-	Thu, 10 Aug 2023 06:46:38 -0700 (PDT)
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 37ABphRs008067;
-	Thu, 10 Aug 2023 15:46:19 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=HbT+tUHLMeYFY+/JIhpY3GrboVoERo5Z1ifpZ9cL6vE=; b=RH
-	O5fty8jncHHGv8wC1zIJAQ1wxJo0nTjqRF8P9VMF7V3+GS5MbP34E9u7EQH7YqyS
-	v8ZUpxWKkRIKA4XemZjB5cXbamd3lAovMi5iLFdD6shomomKIuAE0Vq4bYKNbR5L
-	0pFagd3tZGfp/nyvh9zfE92q2kSdsbfLCyX0SR4kAqM+jcMPGRiVzYHTTDq55mlz
-	ZcgCyX8UahpR1yzW6N6ZUlkewOULK4mXvcCXyQAtQWAqWCiaVCdl14OQpFyhzVWa
-	u2o2bkxrsOwzrtdHqxBiwhrBdzQaEuLXcxdJMMH3+1j8iVL5LrWchqUEgucOqkTN
-	6j4hsE5c6cNP+FKE3F3Q==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3scdv7phy6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Aug 2023 15:46:19 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 2AC4C100053;
-	Thu, 10 Aug 2023 15:46:18 +0200 (CEST)
-Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 22D1A21BF73;
-	Thu, 10 Aug 2023 15:46:18 +0200 (CEST)
-Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
- (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
- 2023 15:46:17 +0200
-Message-ID: <7308becc-cdc2-74da-9eda-4b7923cbf5d0@foss.st.com>
-Date: Thu, 10 Aug 2023 15:46:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E3E1E1B2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:49:36 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C882129
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZV5oQjQkio4RNIA7u0IfMQnJS8J6IMw90LFT9MbDwpw=; b=5YLSGzZCWHqHxuegdKnhCBHZq7
+	63BwQA67tYNoT63kkscYY7JwH4ewjWpLNZwc7hxvnKIS4bdNGtEIsP9mTN7CAzahl67DdwzOrdJl7
+	eOEJT/5hlpg8JIq4MrLzFgqIjCQpBVcSuak3NJ+EbZluL2RAVxitWxyqED7UkDYYl9eY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qU62W-003hLR-4z; Thu, 10 Aug 2023 15:49:24 +0200
+Date: Thu, 10 Aug 2023 15:49:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Marek Vasut <marex@denx.de>,
+	Wei Fang <wei.fang@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
+Message-ID: <ffc4c902-689a-495a-9b57-e72601547c53@lunn.ch>
+References: <20230809043626.GG5736@pengutronix.de>
+ <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
+ <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
+ <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
+ <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
+ <ZNS1kalvEI6Y2Cs9@shell.armlinux.org.uk>
+ <ZNS9GpMJEDi1zugk@shell.armlinux.org.uk>
+ <20230810125117.GD13300@pengutronix.de>
+ <ZNTjQnufpCPMEEwd@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net-next v3 03/10] net: stmmac: mdio: enlarge the max
- XGMAC C22 ADDR to 31
-Content-Language: en-US
-To: Jisheng Zhang <jszhang@kernel.org>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230809165007.1439-1-jszhang@kernel.org>
- <20230809165007.1439-4-jszhang@kernel.org>
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20230809165007.1439-4-jszhang@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.122]
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To EQNDAG1NODE4.st.com
- (10.75.129.133)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-10_10,2023-08-10_01,2023-05-22_02
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNTjQnufpCPMEEwd@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/9/23 18:50, Jisheng Zhang wrote:
-> The IP can support up to 31 xgmac c22 addresses now.
+> > What will be the best way to solve this issue for DSA switches attached to
+> > MAC with RGMII RXC requirements?
 > 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> index 3db1cb0fd160..e6d8e34fafef 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> @@ -40,7 +40,7 @@
->   #define MII_XGMAC_WRITE			(1 << MII_XGMAC_CMD_SHIFT)
->   #define MII_XGMAC_READ			(3 << MII_XGMAC_CMD_SHIFT)
->   #define MII_XGMAC_BUSY			BIT(22)
-> -#define MII_XGMAC_MAX_C22ADDR		3
-> +#define MII_XGMAC_MAX_C22ADDR		31
->   #define MII_XGMAC_C22P_MASK		GENMASK(MII_XGMAC_MAX_C22ADDR, 0)
->   #define MII_XGMAC_PA_SHIFT		16
->   #define MII_XGMAC_DA_SHIFT		21
+> I have no idea - the problem there is the model that has been adopted
+> in Linux is that there is no direct relationship between the DSA switch
+> and the MAC like there is with a PHY.
 
-Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+A clock provider/consumer relationship can be expressed in DT. The DSA
+switch port would provide the clock, rather than the PHY.
 
-Regards
-Alex
-
+       Andrew
 
