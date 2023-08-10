@@ -1,201 +1,335 @@
-Return-Path: <netdev+bounces-26256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AA0F77758A
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9096777592
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67C6281F34
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:13:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83503282026
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67711ED36;
-	Thu, 10 Aug 2023 10:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2751ED43;
+	Thu, 10 Aug 2023 10:16:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4D01E51F
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:13:13 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B39310E9;
-	Thu, 10 Aug 2023 03:13:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691662388; x=1723198388;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=AznGjUuUepD5hhfdVh/YZQa4sIk0tWZjWcwKuICLFN4=;
-  b=Bd4lyYFbOTrJJcGeXg8pErdDwC+MGyye5lFb1shjJrusHjwKslMrLX/c
-   RCGoPvzNl8H5MmO6fEJZvh3i1QQcyNnrKjQu48yOIOvCf7DTtNAb5d9Oc
-   iOfC9wEk/Aa79FP44kEQiawmjKbnvT6d7P8C49KGDHNtd7s2qWogjS6fA
-   DLkb6ZIKQlIhCPS+4VeVS0NyW0zY23NQS5gJbhjGP1xlPWnmZJnmtjKrh
-   YEU5+in/BY00ZEoeRoeZWmJCqh0FyQf9V9ea3QjxFGwmX0qcHFHJYjQEU
-   w3OcXUHZzy6cCETrwRGj3N6qyipY+nys+aTu7HSJ+Eq0k3wWVEDWXwArJ
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="361496800"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="361496800"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 03:13:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="906004335"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="906004335"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga005.jf.intel.com with ESMTP; 10 Aug 2023 03:13:07 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 10 Aug 2023 03:13:07 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 10 Aug 2023 03:13:07 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 10 Aug 2023 03:13:07 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 10 Aug 2023 03:13:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vg+YVr1S1l10i/9zkXfuqy1EiSoQB2ErrefTOGpJaaZYpMbnmWPAyWit74upAqD2y554JYTqVlqgmVqTOQQvzky9ATVAJyxuo/OrgkS/zYNKbAUW148TD7DQ++xtagMO6sqbp2W3+mN5jrfLUMU8vkTJK73iRhMaCindx2z7EZS7zgHELH02dBWq9j9lP4Bq9lCaKanZX0gf0G/Y+PNui4lkpQI0Fl+zln8h8vSpu+swWXIY+hrop1skTUHtyDcf10Z8497xYQnNzWAJDnnHMEOQzkHdYybm1pZJ1pCQTvvvIjmcmVLWgDD5IoeGs9duz58mm+bTLfLTlgoXOHf/wQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AznGjUuUepD5hhfdVh/YZQa4sIk0tWZjWcwKuICLFN4=;
- b=UBRkLv0HVS90FI7jzIUltdOs57GmXoaSTxPHgx3sAQ3mpG0pge+IFnN3n5UwVqHgDzC9HAfSSxwiIniZWWhkqHCdgGGozIk3EdQDrG16c1FFKDXVIH4OEDl0Sjy313eAhXhy5G+gHqWD7wK/WPIC8d/WESl6+JZgw2GATZWiqX6QrnniqAqCvAk7YcBR4a8hT8SgXuXJIbEzjdRkzH7LHzCe8EtRlOU1ZT5aVMqlfsAm/o6Sps1Oj7iWy3ty2MZtLft9o7F8qU3RuIDAXtm9ZgTmD1hl8bxYtx81Jrz8dUU7ohWQ8Ntl3VKXoKwIBF/74R6+pXxtLyCBz9TZfCavbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by SJ0PR11MB5770.namprd11.prod.outlook.com (2603:10b6:a03:421::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Thu, 10 Aug
- 2023 10:13:00 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::f04:5042:e271:9eec]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::f04:5042:e271:9eec%7]) with mapi id 15.20.6652.028; Thu, 10 Aug 2023
- 10:13:00 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH 4/4][next] i40e: Replace one-element
- array with flex-array member in struct i40e_profile_aq_section
-Thread-Topic: [Intel-wired-lan] [PATCH 4/4][next] i40e: Replace one-element
- array with flex-array member in struct i40e_profile_aq_section
-Thread-Index: AQHZxP8nAR2Jb2eCKka8a4wo7rN7Fq/jXBeA
-Date: Thu, 10 Aug 2023 10:13:00 +0000
-Message-ID: <BL0PR11MB3122A0252290B39A83732948BD13A@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <cover.1690938732.git.gustavoars@kernel.org>
- <8b945fa3afeb26b954c400c5b880c0ae175091ac.1690938732.git.gustavoars@kernel.org>
-In-Reply-To: <8b945fa3afeb26b954c400c5b880c0ae175091ac.1690938732.git.gustavoars@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|SJ0PR11MB5770:EE_
-x-ms-office365-filtering-correlation-id: fb889d9d-bbfc-4613-f586-08db998a606f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3QAVklzDe2+xJ7f5crAxFmi8Lmj6h7ZgpLMtfijs0+DLqJmHtS7Pv7KrdNgaQhBSscOBL35A11rY2ozWXKOpskho5C4ylM+ecSIVCMNY6RwPOhDzMPm7ert4Qnb9PHwHlIe0lS0rNDeb4v06RXbhUxOdTZkyGlBwE2TMLvcVthmjXQq+2M0/0cTSVAVZK1uCsVfogKWIEepGk13kElDAegCyZ63XbwdX5b/Z5vYsx+fNj8wQAUvN2jNUoPhot8uHsTbHdbrj4mqFvuPBRrVO3jH4TCwXT0WRahRYLbSjCkCpdkDIvw8lzlgt7UYRNaXHSPrbvs/mBtZtKSsE7BwnaM7DsI4G+6KKTCMpFEbD4mUzt9/+v4SYMYAiuq9N8FV/ai9swQjwu9xu+/5xJwh4gjdR/GehwSUKAjaNYdzkFeSDKdqvFtMBFmW5uKzw1kO/cUxd4eNrH6TVNI3HUxCxgU49SBYPhODfw2Np7lnt0TYUV5z/VZBqpf4QN8kGONYQjkdEAF1NuMXEboqwUbMlHaWwg+IQQiYkP1mKEvOb9ylvKGgt4HblQv6DzVof8d8SxWEvjGmRthcgqkULXUQIFDPv/Q6DkBQBOpQGaj4F1/E=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(366004)(136003)(396003)(346002)(376002)(186006)(451199021)(1800799006)(83380400001)(55016003)(7696005)(110136005)(4326008)(4744005)(5660300002)(52536014)(8936002)(64756008)(38100700002)(38070700005)(66446008)(8676002)(316002)(2906002)(54906003)(66476007)(66946007)(66556008)(76116006)(33656002)(86362001)(82960400001)(966005)(478600001)(122000001)(71200400001)(9686003)(41300700001)(55236004)(26005)(6506007)(53546011);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pGf7yYQ2z8TbAvk2d43JqH3j1rglD6DaJMJF9Brit6azUqWfVVtda+WjcnqQ?=
- =?us-ascii?Q?Q9RiZfJfJ+EDBywbPJs6qosFvphK0x1QeK3MRhEkjhD2t3MMfVW4/tCAuLfP?=
- =?us-ascii?Q?1I2jqotd4jIQtlPCkQXVKL2CwxjNCMHtCSGEMksqdfAsgu4cwV4cDs83BwM9?=
- =?us-ascii?Q?HZxHJZCmshrg4EhxC/xwPuDa7mc3EKAIgG8/KhoSC/yCfipoV9QSXzWtzgVc?=
- =?us-ascii?Q?jOE6fcNN/uFC50IYRs0ON9tlaqi8a4ur12Jxrk7cWNnmxi8QohtqXwX49xMo?=
- =?us-ascii?Q?QclIjl2VULSmzpvsIzMgHtGsNSX7mNpGzgYC72KdtZJr/XM6HzZjcDDQM/Cn?=
- =?us-ascii?Q?QKd7vDQHXSo6ZbTt5ayTAuVuDajKvTJqOtRX3QDPHDf7Dyldu2IkP9+h6cGi?=
- =?us-ascii?Q?UPqV4sLzQrQJZ9s/kkRM15bYpRkySn5ZpAhBb9V0C+JfmJTsfI8RjeigyZuo?=
- =?us-ascii?Q?ZEeaiqaGbuE8ETsyiTVCejqYHJKf6J6jIkHlQO8C+iYz5VTOcGkvc42jnder?=
- =?us-ascii?Q?9Erap5QTLBRA9jYgH/6ro68/dsdH2JQV05qdC24PG0nUID0gDLhPxpgRRcx0?=
- =?us-ascii?Q?kFYe3d4dW8dawl3RTV6ZV8BxLELSGEyTLwsa95m6IAGKsQvUIev/oBOtUADX?=
- =?us-ascii?Q?C0i2vN4rdqz/64BP8XSaQSH0/RxVeLXCTAhR9PCq7WzLfBieFmfUOPFbUDpF?=
- =?us-ascii?Q?xCL7fY43zVX2bHHmKCXHptOLcuVVJY/WYz8RyF1JFQt993rwYsUmYy4RvG8b?=
- =?us-ascii?Q?2y8If9ZqkSsCiEvme8qJOfnujtWYLGC/gQgJDCw2nJsUfJwms7PLYUKxS25L?=
- =?us-ascii?Q?W+SQWDgX5YnNUbzYVHydTBO1nNnwPWFGADt0YeLdYBg1/3HxusaoxOvdpLqz?=
- =?us-ascii?Q?rKISH8DgtA6YfmGS8L9cjN7oZ5nlE1K0ZgPv4lyLFyaFqQz+bm/mX7rVne0r?=
- =?us-ascii?Q?2oXmF6WF8eBpBSUsDn3P+xaEcatwicJUdnPTIb95cEpJzE8NmjGB9nuEhQIQ?=
- =?us-ascii?Q?ffOQsHip/IYNUAvv9tf0LszhY498Lb4PmP9IfmZ+MxN4PBYUSMtVTLfqdcLM?=
- =?us-ascii?Q?aLO/ppylDAUJHR3sBqoJE7zyTe1H5OdFx6JugT1fd/8DkdqFPkr39EYJKIDk?=
- =?us-ascii?Q?ndGSFemHlzRJb8QcOjiXLk+NDD89RDIkpSt76FO6KgCEr+Qgy5v3MUNHDWhb?=
- =?us-ascii?Q?kEP9nDf+17sAsWbzfCwf0eu7De0AS4ntSDrB2YzoxuIP+cRKElXUccxiDtkC?=
- =?us-ascii?Q?BTQb5Xj6WJfvSDxDGjo+lEsn54/X7VIZ8AFWgmv7+2d6JrOIRC4eql/46SXI?=
- =?us-ascii?Q?CIFR2hLTff/CMK4AUdCXEAhVOF1KMj7IKTdazrnRMVq7/VrraO9tIIpiGPBs?=
- =?us-ascii?Q?KCtm+z+WdpNpyeug4wH73b3j8peV2cYMV+LZ11MJmrW6TY5vkQFjbNwIF/g0?=
- =?us-ascii?Q?f4BZkpDLDygErbFwcEavjTM6ypLkUlOtThX/uS9NdI3Tgsi3uCFXmcKnv4QQ?=
- =?us-ascii?Q?MEhIjuUsEBx6yRsOodTL9XOvfz8mcz2kKiJ8n1fZtxOphZpMtZx18L5bK1z8?=
- =?us-ascii?Q?X1N9FOFFdZh8vZA/FsBd9HnBjDinRNnSXkzRG3rWDRiWDN7j2C0HGEFrIClf?=
- =?us-ascii?Q?xA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2E81E51F
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:16:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E294E0
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:16:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691662590;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3g4MYlV9c76TpDpFrtoeRWOaaTNsy7O5xl7sNT1UeGY=;
+	b=YC020XI4XppKQuSTeaMOVteOVUnG9ArYn+X0i1IMb3h1EAo5GT1osvzsCAtfaNo91TV2z3
+	A4qVc45XbtX4YBF7e9BqY/WFwNbqpyPtDwaNCu0HUnwWbHd+Ok7fIJRbR2/GWNTJ6hiHSA
+	tssuW/h+wzX/g0wPtYxSqAXBBUJ6Aro=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-218-6-1IMrvwPGy0sbay95TYCg-1; Thu, 10 Aug 2023 06:16:29 -0400
+X-MC-Unique: 6-1IMrvwPGy0sbay95TYCg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94a355c9028so57581866b.3
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:16:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691662588; x=1692267388;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3g4MYlV9c76TpDpFrtoeRWOaaTNsy7O5xl7sNT1UeGY=;
+        b=bx1J9oCCe/MNKC2Bo5yNwqazW4nDQjwxpDd3uroOUqL6lKU5nd9MgCFUfgA4+r77iB
+         sXVAT/5SdbDmX/+goDHT5l1hzBJyEDruqHPeV9rGq5+OEAxdoZKxJj2mzPGjdyBeEVbC
+         rIsY5l41QbHdyxInxnvacq96IM3fd0666XMLVhjYIhyv9Jm02Bh9/Jttcmav+G9Urzfz
+         HBG+RZYxNKxE15wmzzjUaY8xHeX01mmUsIEwxlylMePJgtXo1L/MZXLRdFeT75lbDfHh
+         mYLMrt7OFogU8oY6EVvP5W9Fhg7+70Baj3MlDDX4yY1GgLjDXA+C8TEKQWChsZpgQrCX
+         En4w==
+X-Gm-Message-State: AOJu0Yz6mumRUi2PPMdwA8I3Z2BtB7jZAPjv9l8PBOsrFLYO/BPWWwI0
+	zOvmubKORbjVCYZvlY30zbEceyVj5QHgt1YTvCHVKpVhuoDlgEvak35/n7bzGB4Voo3NZRlA06p
+	PZXZ96Hdf0AOv9vi/
+X-Received: by 2002:a17:907:7856:b0:99c:180a:ea61 with SMTP id lb22-20020a170907785600b0099c180aea61mr1555822ejc.32.1691662588316;
+        Thu, 10 Aug 2023 03:16:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7imgOwBehMDtK5zFzF5zWgHpCvwi/z7Q7Fv3EqBMxz76NVAIMMScPuBMMs24VuIge8kuAeQ==
+X-Received: by 2002:a17:907:7856:b0:99c:180a:ea61 with SMTP id lb22-20020a170907785600b0099c180aea61mr1555806ejc.32.1691662587775;
+        Thu, 10 Aug 2023 03:16:27 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id d2-20020a170906640200b0099d0c0bb92bsm722592ejm.80.2023.08.10.03.16.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 03:16:27 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 8013CD3B807; Thu, 10 Aug 2023 12:16:26 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Hou Tao <houtao@huaweicloud.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn.topel@gmail.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Song
+ Liu <song@kernel.org>, Hao Luo <haoluo@google.com>, Yonghong Song
+ <yonghong.song@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, houtao1@huawei.com
+Subject: Re: [RFC PATCH bpf-next 1/2] bpf, cpumap: Use queue_rcu_work() to
+ remove unnecessary rcu_barrier()
+In-Reply-To: <20230728023030.1906124-2-houtao@huaweicloud.com>
+References: <20230728023030.1906124-1-houtao@huaweicloud.com>
+ <20230728023030.1906124-2-houtao@huaweicloud.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 10 Aug 2023 12:16:26 +0200
+Message-ID: <87il9nfbid.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb889d9d-bbfc-4613-f586-08db998a606f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Aug 2023 10:13:00.5225
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cjmO0KsJt8u9ltV/z/z08vG4rPpfguh/XBPEyyB5leVxUa7Ssp0lyQUety4G3IMn77q+aZhTxWVJTkviMnevOwCSvzE57kB1uUACPkqwkKSUgI13TlJH1EIVgFzuWu9n
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5770
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
-ustavo A. R. Silva
-> Sent: Wednesday, August 2, 2023 10:37 AM
-> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
-thony.l.nguyen@intel.com>; David S. Miller <davem@davemloft.net>; Eric Duma=
-zet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <p=
-abeni@redhat.com>
-> Cc: linux-hardening@vger.kernel.org; netdev@vger.kernel.org; intel-wired-=
-lan@lists.osuosl.org; linux-kernel@vger.kernel.org; Gustavo A. R. Silva <gu=
-stavoars@kernel.org>
-> Subject: [Intel-wired-lan] [PATCH 4/4][next] i40e: Replace one-element ar=
-ray with flex-array member in struct i40e_profile_aq_section
->
-> One-element and zero-length arrays are deprecated. So, replace one-elemen=
-t array in struct i40e_profile_aq_section with flexible-array member.
->
-> This results in no differences in binary output.
->
-> Link: https://github.com/KSPP/linux/issues/335
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
-> drivers/net/ethernet/intel/i40e/i40e_type.h | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
+Hou Tao <houtao@huaweicloud.com> writes:
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+> From: Hou Tao <houtao1@huawei.com>
+>
+> As for now __cpu_map_entry_replace() uses call_rcu() to wait for the
+> inflight xdp program and NAPI poll to exit the RCU read critical
+> section, and then launch kworker cpu_map_kthread_stop() to call
+> kthread_stop() to handle all pending xdp frames or skbs.
+>
+> But it is unnecessary to use rcu_barrier() in cpu_map_kthread_stop() to
+> wait for the completion of __cpu_map_entry_free(), because rcu_barrier()
+> will wait for all pending RCU callbacks and cpu_map_kthread_stop() only
+> needs to wait for the completion of a specific __cpu_map_entry_free().
+>
+> So use queue_rcu_work() to replace call_rcu(), schedule_work() and
+> rcu_barrier(). queue_rcu_work() will queue a __cpu_map_entry_free()
+> kworker after a RCU grace period. Because __cpu_map_entry_free() is
+> running in a kworker context, so it is OK to do all of these freeing
+> procedures include kthread_stop() in it.
+>
+> After the update, there is no need to do reference-counting for
+> bpf_cpu_map_entry, because bpf_cpu_map_entry is freed directly in
+> __cpu_map_entry_free(), so just remove it.
+>
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+
+I think your analysis is correct, and this is a nice cleanup of what is
+really a bit of an over-complicated cleanup flow - well done!
+
+I have a few nits below, but with those feel free to resend as non-RFC
+and add my:
+
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+
+> ---
+>  kernel/bpf/cpumap.c | 93 +++++++++++----------------------------------
+>  1 file changed, 23 insertions(+), 70 deletions(-)
+>
+> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+> index 0a16e30b16ef..24f39c37526f 100644
+> --- a/kernel/bpf/cpumap.c
+> +++ b/kernel/bpf/cpumap.c
+> @@ -67,10 +67,7 @@ struct bpf_cpu_map_entry {
+>  	struct bpf_cpumap_val value;
+>  	struct bpf_prog *prog;
+>=20=20
+> -	atomic_t refcnt; /* Control when this struct can be free'ed */
+> -	struct rcu_head rcu;
+> -
+> -	struct work_struct kthread_stop_wq;
+> +	struct rcu_work free_work;
+>  };
+>=20=20
+>  struct bpf_cpu_map {
+> @@ -115,11 +112,6 @@ static struct bpf_map *cpu_map_alloc(union bpf_attr =
+*attr)
+>  	return &cmap->map;
+>  }
+>=20=20
+> -static void get_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
+> -{
+> -	atomic_inc(&rcpu->refcnt);
+> -}
+> -
+>  static void __cpu_map_ring_cleanup(struct ptr_ring *ring)
+>  {
+>  	/* The tear-down procedure should have made sure that queue is
+> @@ -134,43 +126,6 @@ static void __cpu_map_ring_cleanup(struct ptr_ring *=
+ring)
+>  			xdp_return_frame(xdpf);
+>  }
+>=20=20
+> -static void put_cpu_map_entry(struct bpf_cpu_map_entry *rcpu)
+> -{
+> -	if (atomic_dec_and_test(&rcpu->refcnt)) {
+> -		if (rcpu->prog)
+> -			bpf_prog_put(rcpu->prog);
+> -		/* The queue should be empty at this point */
+> -		__cpu_map_ring_cleanup(rcpu->queue);
+> -		ptr_ring_cleanup(rcpu->queue, NULL);
+> -		kfree(rcpu->queue);
+> -		kfree(rcpu);
+> -	}
+> -}
+> -
+> -/* called from workqueue, to workaround syscall using preempt_disable */
+> -static void cpu_map_kthread_stop(struct work_struct *work)
+> -{
+> -	struct bpf_cpu_map_entry *rcpu;
+> -	int err;
+> -
+> -	rcpu =3D container_of(work, struct bpf_cpu_map_entry, kthread_stop_wq);
+> -
+> -	/* Wait for flush in __cpu_map_entry_free(), via full RCU barrier,
+> -	 * as it waits until all in-flight call_rcu() callbacks complete.
+> -	 */
+> -	rcu_barrier();
+> -
+> -	/* kthread_stop will wake_up_process and wait for it to complete */
+> -	err =3D kthread_stop(rcpu->kthread);
+> -	if (err) {
+> -		/* kthread_stop may be called before cpu_map_kthread_run
+> -		 * is executed, so we need to release the memory related
+> -		 * to rcpu.
+> -		 */
+> -		put_cpu_map_entry(rcpu);
+> -	}
+> -}
+> -
+>  static void cpu_map_bpf_prog_run_skb(struct bpf_cpu_map_entry *rcpu,
+>  				     struct list_head *listp,
+>  				     struct xdp_cpumap_stats *stats)
+> @@ -395,7 +350,6 @@ static int cpu_map_kthread_run(void *data)
+>  	}
+>  	__set_current_state(TASK_RUNNING);
+>=20=20
+> -	put_cpu_map_entry(rcpu);
+>  	return 0;
+>  }
+>=20=20
+> @@ -471,9 +425,6 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf=
+_cpumap_val *value,
+>  	if (IS_ERR(rcpu->kthread))
+>  		goto free_prog;
+>=20=20
+> -	get_cpu_map_entry(rcpu); /* 1-refcnt for being in cmap->cpu_map[] */
+> -	get_cpu_map_entry(rcpu); /* 1-refcnt for kthread */
+> -
+>  	/* Make sure kthread runs on a single CPU */
+>  	kthread_bind(rcpu->kthread, cpu);
+>  	wake_up_process(rcpu->kthread);
+> @@ -494,7 +445,7 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf=
+_cpumap_val *value,
+>  	return NULL;
+>  }
+>=20=20
+> -static void __cpu_map_entry_free(struct rcu_head *rcu)
+> +static void __cpu_map_entry_free(struct work_struct *work)
+>  {
+>  	struct bpf_cpu_map_entry *rcpu;
+>=20=20
+> @@ -503,30 +454,33 @@ static void __cpu_map_entry_free(struct rcu_head *r=
+cu)
+>  	 * new packets and cannot change/set flush_needed that can
+>  	 * find this entry.
+>  	 */
+> -	rcpu =3D container_of(rcu, struct bpf_cpu_map_entry, rcu);
+> +	rcpu =3D container_of(to_rcu_work(work), struct bpf_cpu_map_entry, free=
+_work);
+>=20=20
+>  	free_percpu(rcpu->bulkq);
+
+Let's move this free down to the end along with the others.
+
+> -	/* Cannot kthread_stop() here, last put free rcpu resources */
+> -	put_cpu_map_entry(rcpu);
+> +
+> +	/* kthread_stop will wake_up_process and wait for it to complete */
+
+Suggest adding to this comment: "cpu_map_kthread_run() makes sure the
+pointer ring is empty before exiting."
+
+> +	kthread_stop(rcpu->kthread);
+> +
+> +	if (rcpu->prog)
+> +		bpf_prog_put(rcpu->prog);
+> +	/* The queue should be empty at this point */
+> +	__cpu_map_ring_cleanup(rcpu->queue);
+> +	ptr_ring_cleanup(rcpu->queue, NULL);
+> +	kfree(rcpu->queue);
+> +	kfree(rcpu);
+>  }
+>=20=20
+>  /* After xchg pointer to bpf_cpu_map_entry, use the call_rcu() to
+> - * ensure any driver rcu critical sections have completed, but this
+> - * does not guarantee a flush has happened yet. Because driver side
+> - * rcu_read_lock/unlock only protects the running XDP program.  The
+> - * atomic xchg and NULL-ptr check in __cpu_map_flush() makes sure a
+> - * pending flush op doesn't fail.
+> + * ensure both any driver rcu critical sections and xdp_do_flush()
+> + * have completed.
+>   *
+>   * The bpf_cpu_map_entry is still used by the kthread, and there can
+> - * still be pending packets (in queue and percpu bulkq).  A refcnt
+> - * makes sure to last user (kthread_stop vs. call_rcu) free memory
+> - * resources.
+> + * still be pending packets (in queue and percpu bulkq).
+>   *
+> - * The rcu callback __cpu_map_entry_free flush remaining packets in
+> - * percpu bulkq to queue.  Due to caller map_delete_elem() disable
+> - * preemption, cannot call kthread_stop() to make sure queue is empty.
+> - * Instead a work_queue is started for stopping kthread,
+> - * cpu_map_kthread_stop, which waits for an RCU grace period before
+> + * Due to caller map_delete_elem() is in RCU read critical section,
+> + * cannot call kthread_stop() to make sure queue is empty. Instead
+> + * a work_struct is started for stopping kthread,
+> + * __cpu_map_entry_free, which waits for a RCU grace period before
+>   * stopping kthread, emptying the queue.
+>   */
+
+I think the above comment is a bit too convoluted, still. I'd suggest
+just replacing the whole thing with this:
+
+/* After the xchg of the bpf_cpu_map_entry pointer, we need to make sure th=
+e old
+ * entry is no longer in use before freeing. We use queue_rcu_work() to call
+ * __cpu_map_entry_free() in a separate workqueue after waiting for an RCU =
+grace
+ * period. This means that (a) all pending enqueue and flush operations have
+ * completed (because or the RCU callback), and (b) we are in a workqueue
+ * context where we can stop the kthread and wait for it to exit before fre=
+eing
+ * everything.
+ */
+
+>  static void __cpu_map_entry_replace(struct bpf_cpu_map *cmap,
+> @@ -536,9 +490,8 @@ static void __cpu_map_entry_replace(struct bpf_cpu_ma=
+p *cmap,
+>=20=20
+>  	old_rcpu =3D unrcu_pointer(xchg(&cmap->cpu_map[key_cpu], RCU_INITIALIZE=
+R(rcpu)));
+>  	if (old_rcpu) {
+> -		call_rcu(&old_rcpu->rcu, __cpu_map_entry_free);
+> -		INIT_WORK(&old_rcpu->kthread_stop_wq, cpu_map_kthread_stop);
+> -		schedule_work(&old_rcpu->kthread_stop_wq);
+> +		INIT_RCU_WORK(&old_rcpu->free_work, __cpu_map_entry_free);
+> +		queue_rcu_work(system_wq, &old_rcpu->free_work);
+>  	}
+>  }
+>=20=20
+> --=20
+> 2.29.2
 
 
