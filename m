@@ -1,193 +1,89 @@
-Return-Path: <netdev+bounces-26496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F74E777F46
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F04777F4B
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B05CF1C20D80
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE9761C20EEB
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2A2214F0;
-	Thu, 10 Aug 2023 17:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA800214F5;
+	Thu, 10 Aug 2023 17:40:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6181C1E1C0
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:40:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F9F26AA
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:40:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691689212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cooSfdq0cDIJR35S85G1uR/Tw8ZsJkuhty77AJQBC3A=;
-	b=K47Cr/nKEc9nO8ZgNtsPbnJ9bO5rAjkw1mkQ7JF0nSJyrLaYZFb7m3RNQbBhJBfNqPw6Q4
-	0L/QB0HAXy68/7ss0x3YPW/kzLDNtM4GnQsSs75YamcCQBlkEn0b8rLzykiJ02BEkkeM2l
-	qMsytMInTQgo6UY7rsRCKzesebFLC/c=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-225-HiE_9bd4ODCPU3xm-TzY-g-1; Thu, 10 Aug 2023 13:40:10 -0400
-X-MC-Unique: HiE_9bd4ODCPU3xm-TzY-g-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-790a08063b2so88004939f.3
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:40:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691689210; x=1692294010;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cooSfdq0cDIJR35S85G1uR/Tw8ZsJkuhty77AJQBC3A=;
-        b=bZD9yeVKHyA5kKkLyqhvEgHhX8bohqaGthd3P8ZqNFaf68lKuoo4KJdEjN3DvIEHTs
-         MrQvdLyBWQg9jO6bFslhUEUz6JLM8HCdSDXtZOLruSbr2rR5AaXNiiFnfhLp5ZoyH+tv
-         2KfyN4OW/4k23tiH3a9XK11glISP9cBSDFEqtMRjqwKOYoc6jhYRG5YGOFkCKddBiNm6
-         oZzAv6mAC9YK/tkR91t8WamgQ8VD7Bw872fWisuyNF4dLf6+t4me9p7EWDt3enePyeiE
-         Y43mj60NgZySjM0AxZ7su/DC/axowyC9+1zAK1PGkqxPOIF0bdS08CDzFvyJ18+6WHXm
-         wTbg==
-X-Gm-Message-State: AOJu0Ywr/CDOltToLeZ0ev5w9DrUCIsbdPR6cBbnNhEz17PDNW7VWOFY
-	cmJxnQw9D3HgDpcaRTJ+SpFYrN7zPe4AgEJ1bJ7ebhYUto+bkmZvCJCJ0o55sH5u1SaacJ0DkD6
-	YB0uGbUqthoBNFqoP
-X-Received: by 2002:a6b:fd09:0:b0:790:a23b:1dfc with SMTP id c9-20020a6bfd09000000b00790a23b1dfcmr4113662ioi.9.1691689210148;
-        Thu, 10 Aug 2023 10:40:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsSf1lZCbnO5jHFCYcvCJoUB9+NqxyQmyNvxzjJ38LvoLF2oHE0XViXtG4tGsF3T7Rrg2agg==
-X-Received: by 2002:a6b:fd09:0:b0:790:a23b:1dfc with SMTP id c9-20020a6bfd09000000b00790a23b1dfcmr4113643ioi.9.1691689209916;
-        Thu, 10 Aug 2023 10:40:09 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id f16-20020a02b790000000b0042bb2448847sm517912jam.53.2023.08.10.10.40.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 10:40:09 -0700 (PDT)
-Date: Thu, 10 Aug 2023 11:40:08 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christoph Hellwig <hch@lst.de>, "Tian, Kevin" <kevin.tian@intel.com>,
- Brett Creeley <bcreeley@amd.com>, Brett Creeley <brett.creeley@amd.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
- "shameerali.kolothum.thodi@huawei.com"
- <shameerali.kolothum.thodi@huawei.com>, "horms@kernel.org"
- <horms@kernel.org>, "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
- tracking
-Message-ID: <20230810114008.6b038d2a.alex.williamson@redhat.com>
-In-Reply-To: <ZNUcLM/oRaCd7Ig2@nvidia.com>
-References: <20230807205755.29579-1-brett.creeley@amd.com>
-	<20230807205755.29579-7-brett.creeley@amd.com>
-	<20230808162718.2151e175.alex.williamson@redhat.com>
-	<01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
-	<20230809113300.2c4b0888.alex.williamson@redhat.com>
-	<ZNPVmaolrI0XJG7Q@nvidia.com>
-	<BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20230810104734.74fbe148.alex.williamson@redhat.com>
-	<ZNUcLM/oRaCd7Ig2@nvidia.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EF51E1C0
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:40:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08B72C433C7;
+	Thu, 10 Aug 2023 17:40:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691689221;
+	bh=DgGIQxm9T3j5F5GS/tDZyHr6yrkokRMtYqyjFvotMd4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qQqjUiW47BPOFQCeCERwTvIkf4E83TbWzVQC/CRQofvOEhCOo4/tYWQbCTpKzmDg6
+	 oSw9fW1LGx2qMZovEja3J8zzS68C4bG1TCs2Ri9H93HNCvlVIPPvWF47AL2GW+/WUB
+	 MeQW1wjxowULzaKhkpd/NJgRK+lFdrCO4rM6TjViuDGXoBNPS3p414WgwlKXlQZuWA
+	 jBiOqAT/B+SOYO4Rfb+lhyjS8vVx+fSHG5DkSC9V8WBemgTaFd7XZx2/ZFt5BhSI/d
+	 kzuMp3GXzJHDz6j/COgR5ewWIrx/5EnQsQLAonkbScbwyEKYrIGYkg0pu53US4dvHF
+	 /QTk4NgBdwpMw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DE717C64459;
+	Thu, 10 Aug 2023 17:40:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V8 net] net: mana: Fix MANA VF unload when hardware is
+ unresponsive
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169168922090.685.4553491279994848251.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Aug 2023 17:40:20 +0000
+References: <1691576525-24271-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <1691576525-24271-1-git-send-email-schakrabarti@linux.microsoft.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
+ ssengar@linux.microsoft.com, vkuznets@redhat.com, tglx@linutronix.de,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ schakrabarti@microsoft.com, stable@vger.kernel.org
 
-On Thu, 10 Aug 2023 14:19:40 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Hello:
 
-> On Thu, Aug 10, 2023 at 10:47:34AM -0600, Alex Williamson wrote:
-> > On Thu, 10 Aug 2023 02:47:15 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >  =20
-> > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > > Sent: Thursday, August 10, 2023 2:06 AM
-> > > >=20
-> > > > On Wed, Aug 09, 2023 at 11:33:00AM -0600, Alex Williamson wrote:
-> > > >    =20
-> > > > > Shameer, Kevin, Jason, Yishai, I'm hoping one or more of you can
-> > > > > approve this series as well.  Thanks,   =20
-> > > >=20
-> > > > I've looked at it a few times now, I think it is OK, aside from the
-> > > > nvme issue.
-> > > >    =20
-> > >=20
-> > > My only concern is the duplication of backing storage management
-> > > of the migration file which I didn't take time to review.
-> > >=20
-> > > If all others are fine to leave it as is then I will not insist. =20
-> >=20
-> > There's leverage now if you feel strongly about it, but code
-> > consolidation could certainly come later.
-> >=20
-> > Are either of you willing to provide a R-b? =20
->=20
-> The code structure is good enough (though I agree with Kevin), so sure:
->=20
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
->=20
-> > What are we looking for relative to NVMe?  AIUI, the first couple
-> > revisions of this series specified an NVMe device ID, then switched to
-> > a wildcard, then settled on an Ethernet device ID, all with no obvious
-> > changes that would suggest support is limited to a specific device
-> > type.  I think we're therefore concerned that migration of an NVMe VF
-> > could be enabled by overriding/adding device IDs, whereas we'd like to
-> > standardize NVMe migration to avoid avoid incompatible implementations.=
- =20
->=20
-> Yeah
->=20
-> > It's somewhat a strange requirement since we have no expectation of
-> > compatibility between vendors for any other device type, but how far
-> > are we going to take it?  Is it enough that the device table here only
-> > includes the Ethernet VF ID or do we want to actively prevent what
-> > might be a trivial enabling of migration for another device type
-> > because we envision it happening through an industry standard that
-> > currently doesn't exist?  Sorry if I'm not familiar with the dynamics
-> > of the NVMe working group or previous agreements.  Thanks, =20
->=20
-> I don't really have a solid answer. Christoph and others in the NVMe
-> space are very firm that NVMe related things must go through
-> standards, I think that is their right.
->=20
-> It does not seem good to allow undermining that approach.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-If we wanted to enforce something like this the probe function could
-reject NVMe class devices, but...
-=20
-> On the flip side, if we are going to allow this driver, why are we not
-> letting them enable their full device functionality with all their
-> non-compliant VF/PF combinations? They shouldn't have to hide what
-> they are actually doing just to get merged.
+On Wed,  9 Aug 2023 03:22:05 -0700 you wrote:
+> When unloading the MANA driver, mana_dealloc_queues() waits for the MANA
+> hardware to complete any inflight packets and set the pending send count
+> to zero. But if the hardware has failed, mana_dealloc_queues()
+> could wait forever.
+> 
+> Fix this by adding a timeout to the wait. Set the timeout to 120 seconds,
+> which is a somewhat arbitrary value that is more than long enough for
+> functional hardware to complete any sends.
+> 
+> [...]
 
-This.  Is it enough that this appears to implement device type agnostic
-migration support for devices hosted by this distributed services card
-and NVMe happens to be one of those device types?  Is that a high
-enough bar that this is not simply a vendor specific NVMe migration
-implementation?
-=20
-> If we want to block anything it should be to block the PCI spec
-> non-compliance of having PF/VF IDs that are different.
+Here is the summary with links:
+  - [V8,net] net: mana: Fix MANA VF unload when hardware is unresponsive
+    https://git.kernel.org/netdev/net/c/a7dfeda6fdec
 
-PCI Express=C2=AE Base Specification Revision 6.0.1, pg 1461:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  9.3.3.11 VF Device ID (Offset 1Ah)
-
-  This field contains the Device ID that should be presented for every VF t=
-o the SI.
-
-  VF Device ID may be different from the PF Device ID...
-
-That?  Thanks,
-
-Alex
 
 
