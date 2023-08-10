@@ -1,71 +1,48 @@
-Return-Path: <netdev+bounces-26386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98C2777ADC
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:36:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8580777AF4
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05ED21C215E9
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:36:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ECAA1C20CDD
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5C31ADF8;
-	Thu, 10 Aug 2023 14:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2F51F95D;
+	Thu, 10 Aug 2023 14:41:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A651E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:36:43 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C2EB2684
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 07:36:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1SRmLprLJmwREFQ6LXlWeMC3HtmVfaMbnBQwXr4wJ4Y=; b=YQmDJMoqqXErw5+pz8Hgp9HD6K
-	HiRpu+zaVsepBtH0aEpFFv2n5uykvgaBT7X0PGL/PUyQtK3bcF3X46Ywjuik99AiKRyUn6QiZBc0K
-	uDB2s5QHTgdjWEL3CpDGltZdkJjmCh8EAhd63pPpbQDlTVo2Zbm5ivZqt2l6zRrkrh2lxgZ2PHyGK
-	3Io0pqIL9ZPrtXMjRX9HshY/y9b+kk7BtK5Dvq/2I5xBwAS++jtuGVJ1ggeOiseeKCOIux+PMACnh
-	ykmTc0E4/OXbAFAgnKrlrrO+4FWqMLom1Fmjhc8VbUBhnLAUCZTAWR3lj0YJ6Q6wPD221DUWi2aD1
-	aeCoZ0LQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33754)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU6mA-00046s-2C;
-	Thu, 10 Aug 2023 15:36:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU6m8-0001sJ-7s; Thu, 10 Aug 2023 15:36:32 +0100
-Date: Thu, 10 Aug 2023 15:36:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Marek Vasut <marex@denx.de>,
-	Wei Fang <wei.fang@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZNT18BsOZPGLN+Dj@shell.armlinux.org.uk>
-References: <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
- <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
- <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
- <ZNS1kalvEI6Y2Cs9@shell.armlinux.org.uk>
- <ZNS9GpMJEDi1zugk@shell.armlinux.org.uk>
- <20230810125117.GD13300@pengutronix.de>
- <ZNTjQnufpCPMEEwd@shell.armlinux.org.uk>
- <ffc4c902-689a-495a-9b57-e72601547c53@lunn.ch>
- <ZNTsMuuvqaOh6x0Q@shell.armlinux.org.uk>
- <52154174-d3c3-4482-81c7-eadde1fed8af@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAA51E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:41:19 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144C5E53;
+	Thu, 10 Aug 2023 07:41:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mwzlrRVAAscIA+kAEhLsLbd8lJPFeF2GaIFj/DPNlUg=; b=CvdSwUdVmV2teaGUwpXH1UQ0O8
+	a2ZBj4CYizSPAjivvpCnhPbyE4/2Q6rxRZT5UPCwN59L3VBnrcZ9kCpd1B2z3M2Dj8+rc3viDC1fb
+	A9g6yi3QbXz/YACPgw3NpvCJyrhjWzIvavSGqI/yb8SmLddyKecglVkSg002TsP3ByEk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qU6qa-003hdq-P6; Thu, 10 Aug 2023 16:41:08 +0200
+Date: Thu, 10 Aug 2023 16:41:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net/ethernet/realtek: Add Realtek
+ automotive PCIe driver code
+Message-ID: <8746dad6-a6f1-4db0-958b-7b66d9dbd1f5@lunn.ch>
+References: <20230810062915.252881-1-justinlai0215@realtek.com>
+ <20230810062915.252881-2-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,63 +51,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <52154174-d3c3-4482-81c7-eadde1fed8af@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230810062915.252881-2-justinlai0215@realtek.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 04:23:08PM +0200, Andrew Lunn wrote:
-> On Thu, Aug 10, 2023 at 02:54:58PM +0100, Russell King (Oracle) wrote:
-> > On Thu, Aug 10, 2023 at 03:49:24PM +0200, Andrew Lunn wrote:
-> > > > > What will be the best way to solve this issue for DSA switches attached to
-> > > > > MAC with RGMII RXC requirements?
-> > > > 
-> > > > I have no idea - the problem there is the model that has been adopted
-> > > > in Linux is that there is no direct relationship between the DSA switch
-> > > > and the MAC like there is with a PHY.
-> > > 
-> > > A clock provider/consumer relationship can be expressed in DT. The DSA
-> > > switch port would provide the clock, rather than the PHY.
-> > 
-> > Then we'll be in to people wanting to do it for PHYs as well, and as
-> > we've recently discussed that isn't something we want because of the
-> > dependencies it creates between mdio drivers and mac drivers.
-> > 
-> > Wouldn't the same dependency issue also apply for a DSA switch on a
-> > MDIO bus, where the MDIO bus is part of the MAC driver?
-> 
-> We already have some level of circular dependencies with DSA, e.g. the
-> MAC driver provides the MDIO bus with the switch on it. It registers
-> the MDIO bus, causing the switch to probe. That probe fails because
-> the MAC driver has not registered its interface yet, which is the CPU
-> interface. We end up deferring the switch probe, and by the second
-> attempt, the MAC is fully registered and the switch probes.
+> +#include <linux/version.h>
+> +#include <linux/ethtool.h>
+> +
+> +#define RTL_ALLOC_SKB_INTR(napi, length) napi_alloc_skb(&(napi), length)
+> +
+> +#define NETIF_F_ALL_CSUM NETIF_F_CSUM_MASK
+> +
+> +#define NETIF_F_HW_VLAN_RX NETIF_F_HW_VLAN_CTAG_RX
+> +#define NETIF_F_HW_VLAN_TX NETIF_F_HW_VLAN_CTAG_TX
+> +
+> +#define CONFIG_SRIOV 1
+> +
+> +#ifndef NETIF_F_RXALL
+> +#define NETIF_F_RXALL 0u
+> +#endif
+> +
+> +#ifndef NETIF_F_RXFCS
+> +#define NETIF_F_RXFCS 0u
+> +#endif
+> +
+> +#ifndef SET_NETDEV_DEV
+> +#define SET_NETDEV_DEV(net, pdev)
+> +#endif
+> +
+> +#ifndef SET_MODULE_OWNER
+> +#define SET_MODULE_OWNER(dev)
+> +#endif
+> +
+> +#ifndef SA_SHIRQ
+> +#define SA_SHIRQ IRQF_SHARED
+> +#endif
+> +
+> +#ifndef NETIF_F_GSO
+> +#define gso_size tso_size
+> +#define gso_segs tso_segs
+> +#endif
+> +
+> +#ifndef dma_mapping_error
+> +#define dma_mapping_error(a, b) 0
+> +#endif
+> +
+> +#ifndef netif_err
+> +#define netif_err(a, b, c, d)
+> +#endif
+> +
+> +#ifndef FALSE
+> +#define FALSE 0
+> +#endif
+> +
+> +#ifndef TRUE
+> +#define TRUE 1
+> +#endif
+> +
+> +#ifndef false
+> +#define false 0
+> +#endif
+> +
+> +#ifndef true
+> +#define true 1
+> +#endif
 
-If that sequence occurs with a MAC that wants a clock from DSA, then
-we're at a loss...
+When i see code like this, it just shouts 'vendor crap, don't bother
+reviewing'.
 
-The DSA driver probe fails because the MAC hasn't fully registered
-itself, so doesn't create the clock. The MAC driver tries to get the
-clock but it doesn't exist, so it defers, tearing down the MDIO bus
-in the process.
+Really, truly, get help from an experienced mainline developer to
+rewrite this code to mainline quality. Then post version 3.
 
-> The circular dependency with a clock consumer/provider between the MAC
-> and switch will be worse. We would need to avoid getting the clock in
-> the probe function. It would need to happen in during open, by which
-> time the switch should be present. MAC drivers also typically connect
-> to their PHY during open, not probe, so i don't see this as being too
-> big a problem.
+Just as a hint, you are targeting net-next/main, and only
+net-next/main. You can and should use everything which is in
+net-next/main, and you should assume it exists. You are not targeting
+older kernels, and you should not have 'vendor crap' like this so it
+will compile with older kernels.
 
-Providing nothing is happening in the MAC driver initialisation which
-requires that clock, then that would be fine.
+Spend some time looking at other drivers in mainline. If you are doing
+something which other driver don't do, very likely you are doing
+something wrong. Do you see other drivers looking to see if
+NETIF_F_RXALL exists, and it not setting it to 0?
 
-Removal should be possible provided the MAC driver doesn't need
-anything before it removes the MDIO bus.
+And please don't just fix this and repost. There is a lot more wrong.
+Find a mentor to help you. The community would like to see this driver
+in the kernel, but an entity the size of Realtek can easily contract
+somebody to help get the code into shape.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
+
+---
+pw-bot: cr
 
