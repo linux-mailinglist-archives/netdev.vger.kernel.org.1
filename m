@@ -1,71 +1,52 @@
-Return-Path: <netdev+bounces-26250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B934777544
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB7B3777551
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F231C20AF9
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:02:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCCAB1C21525
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF401ED26;
-	Thu, 10 Aug 2023 10:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BF11ED28;
+	Thu, 10 Aug 2023 10:03:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDBA1E51F
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:02:00 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD4F3C3B
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:01:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gF7i5HM+zGdPrfl8tdSW5v/khHwK6WWq7/y9FHzMH6I=; b=dTXrjUWRhNybUaxoHW/6kjEczm
-	w43bf3xX2CZK6zg8g9sXQF8/vxxYBVrCvKq9R+kNM6b/G/3I2BDTKiD/ObD+QwJMygqbEOKH2Jl6B
-	DhoY239E39allcvF/wfpbIZxYZah3EFBqd5m9NHl/QKmoQIZSgGst/Eg64M4UJc3/cGbkxQhcgHAa
-	lGwU5AzjgcxT+Dp9ZFoNnzBp6Rgc43G6EPa+d9BU834tnz3c2PfImf+eWZ+V7fyVvUxfJpiZwT+jY
-	M2+I/rtWtfg02iGUhyampqjjb0o0YXsm9aYosvy0TM25anzlCGXl/On2/cyBHScZxVyqIbbL/wnSb
-	1UX968zQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54166)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU2UN-0003mm-05;
-	Thu, 10 Aug 2023 11:01:55 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU2UL-0001fg-Fm; Thu, 10 Aug 2023 11:01:53 +0100
-Date: Thu, 10 Aug 2023 11:01:53 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek Vasut <marex@denx.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861921E51F
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:03:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D4BFC433C8;
+	Thu, 10 Aug 2023 10:03:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691661808;
+	bh=h3BA3I10oH7VW8/1K474QAx0VUkyw0uaaD0W0BPjf+Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NQuvaB982mwEO7JuDiSs+xIJamzFCo+k9o5sT80t2RT33S8xb6TdKuzeYXv9JiZkj
+	 KKnAWfjUKUtFZveI9RrBSzdu69lEH2TOY/SXQzFffAHtAzhTV75CV8vaG13doAsaIP
+	 V4X7jEYlglKETikr1QGpZ799l9hfEew87tejhLeLBpEOr2T0okDSBW9cmRzkG4AQ1p
+	 /kQJYqYWA91uGUilavbHwngUkuhx84EqdNUg3J5z5Ftl4+IPjD6BGw8tVqybABwTOZ
+	 DZCcDVhjYEOjHy50Kdhd4HvJrGKc0EV4iGIcze/wLc5yVC7SheVWJndU8xL51eR/dL
+	 CcvM/35+xMb8Q==
+Date: Thu, 10 Aug 2023 12:03:22 +0200
+From: Simon Horman <horms@kernel.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZNS1kalvEI6Y2Cs9@shell.armlinux.org.uk>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
- <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
- <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
- <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v3 1/1] net: stmmac: xgmac: RX queue routing
+ configuration
+Message-ID: <ZNS16rhrXq+JUR85@vergenet.net>
+References: <20230809020238.1136732-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,58 +55,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230809020238.1136732-1-0x1207@gmail.com>
 
-On Thu, Aug 10, 2023 at 02:49:55AM +0200, Marek Vasut wrote:
-> On 8/10/23 00:06, Andrew Lunn wrote:
-> > On Wed, Aug 09, 2023 at 11:34:19PM +0200, Marek Vasut wrote:
-> > > On 8/9/23 15:40, Andrew Lunn wrote:
-> > > > > > Hm.. how about officially defining this PHY as the clock provider and disable
-> > > > > > PHY automatic hibernation as long as clock is acquired?
-> > > > > > 
-> > > > > Sorry, I don't know much about the clock provider/consumer, but I think there
-> > > > > will be more changes if we use clock provider/consume mechanism.
-> > > > 
-> > > > Less changes is not always best. What happens when a different PHY is
-> > > > used?
-> > > 
-> > > Then the system wouldn't be affected by this AR803x specific behavior.
-> > 
-> > Do you know it really is specific to the AR803x? Turning the clock off
-> > seams a reasonable thing to do when saving power, or when there is no
-> > link partner.
+On Wed, Aug 09, 2023 at 10:02:38AM +0800, Furong Xu wrote:
+> Commit abe80fdc6ee6 ("net: stmmac: RX queue routing configuration")
+> introduced RX queue routing to DWMAC4 core.
+> This patch extend the support to XGMAC2 core.
 > 
-> This hibernation behavior seem specific to this PHY, I haven't seen it on
-> another PHY connected to the EQoS so far.
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> ---
+> Changes in v3:
+>   - Clean unused defines
+> 
+> Changes in v2:
+>   - Convert the shift ops to FIELD_PREP
 
-Marvell PHYs can be programmed so that RXCLK stops when the PHY
-enters power down or energy-detect state, although it defaults to
-always keeping the RGMII interface powered (and thus providing a
-clock.)
+Thanks for the updates.
 
-One Micrel PHY - "To save more power, the KSZ9031RNX stops the RX_CLK
-clock output to the MAC after 10 or more RX_CLK clock
-cycles have occurred in the receive LPI state." which seems to imply
-if EEE is enabled, then the receive clock will be stopped when
-entering low-power state.
-
-I've said this several times in this thread - I think we need a bit
-in the PHY device's dev_flags to allow the MAC to say "do not power
-down the receive clock" which is used by the PHY drivers to (a) program
-the hardware to prevent the receive clock being stopped in situations
-such as the AR803x hibernate mode, and (b) to program the hardware not
-to stop the receive clock when entering EEE low power. This does seem
-to be a generic thing and not specific to just one PHY - especially as
-the stopping of clocks when entering EEE low power is a IEEE 802.3
-defined thing.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Simon Horman <horms@kernel.org>
 
