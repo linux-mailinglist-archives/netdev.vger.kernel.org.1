@@ -1,155 +1,101 @@
-Return-Path: <netdev+bounces-26485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C432F777EDC
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:11:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5629777EF6
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 576E02822AE
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:11:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B85201C2168A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B06F20FAA;
-	Thu, 10 Aug 2023 17:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D0520FB5;
+	Thu, 10 Aug 2023 17:19:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506AB1E1C0
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:11:40 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5930126AE;
-	Thu, 10 Aug 2023 10:11:39 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37A8YUgO021277;
-	Thu, 10 Aug 2023 10:11:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=GbHNFW98eca4Qfh7V7EVB3e4FF63EwA31ytNxTv7wOw=;
- b=QC/jxLIT2K1sbxMSclxlzEQ+2cKG4/IN3RcHun1WS1f6Y/anPJy567ri5ctc+GDFcC6p
- ujlvcgiRWIHThF4MOutPvdDmd9vGTzCKMUbwedlU9qUGg8AMoyfjjgHl+HgxhEWOytYV
- VE89hl990JSiCTKveT+PdJ6QdRdIpvu24xZLUSOccvzA2cTkGbePqqhgncG7PCzxwU+T
- LxgAg+QW+mRA1BGurCtYiCEgBLT7l7k8wyVr2iOGyuzYS2xikwqsOybMCwRqQdNjwaKD
- dzje8SFj2J9D86pr/y95AK5lOS0ADD2s8xpex9aRzUBPcBo7lAs006QL92HJqIvaPioU LA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3scj5mbp80-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 10 Aug 2023 10:11:27 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 10 Aug
- 2023 10:11:24 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 10 Aug 2023 10:11:24 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id F15BE5C68E3;
-	Thu, 10 Aug 2023 10:11:20 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <naveenm@marvell.com>, <edumazet@google.com>,
-        <pabeni@redhat.com>
-Subject: [net-next Patch] octeontx2-pf: Allow both ntuple and TC features on the interface
-Date: Thu, 10 Aug 2023 22:41:19 +0530
-Message-ID: <20230810171119.23600-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF131E1C0
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:19:16 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B22C26BD;
+	Thu, 10 Aug 2023 10:19:15 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99bc9e3cbf1so241534266b.0;
+        Thu, 10 Aug 2023 10:19:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691687954; x=1692292754;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oa4B+1a65dQ6pp535Suh0RpK8subM4aWiX4LFqYd1nc=;
+        b=Sl4zlYhoRgpk19oNmOq9ZWSimGiGcCZABSUw8RUdKmEODJ6btKHLXIljdgyKLY8Vkv
+         dNzcT48Mj/NQqYF0vOWJ9sqzxZcqpmEhk90Bd5Ko+y2a8gZCtV4yblqJOUKEmk/wSNaV
+         OQcH4JlQRmtAhX3GGcjMXqdeBbR8W7PR9+vEQFMDOIkygRexQDLt95MHjXAbYzJPYVeG
+         oPrywmFcqPDMcDJwnm/E28gUAe0GLAArVSNwhRWWCa+xyW0XtxJKZP+a+r5Ov6xFsvfF
+         uBPZZ4z9+xAoxXCe5265b+oFfdtALZHdkY7fdoUsgo82dQyf3uJ3drdtFDVf/aveckMI
+         XStw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691687954; x=1692292754;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oa4B+1a65dQ6pp535Suh0RpK8subM4aWiX4LFqYd1nc=;
+        b=IHjV9x7Ph+FtevO2c+BTDSwUcDFDGnUf7LzigrOQ/CUU0bPBDs9JKN+oMzek+/E9Lf
+         yI0HrX6KamF4rK/cX4Gc9cXra7P+2PiUcpPaPWdeajyPm+Cvz60PjT22A5oXCkrtS00h
+         JbScQLeshusx4CXEsnunHXxkxSDFieMjAGIe8csJZ99bFccCsNQMLo7/7GTqqeSN2gEG
+         xU/xINOcpFSkDhU0GKdIxooGb8uCt8YbpikDgwh9BTFsB20BPOul3T8gyxknc0yHFJY/
+         G3aogyLlE61MkUoveNopcHJs0T9Ak4h0xBqZbi3ww2IjaWkJVUqKUWAvnef9LlJMk6Vg
+         ydow==
+X-Gm-Message-State: AOJu0YzYiqWF71xqbq3xRz3MEHBlIJgYUbwP+fkr9Qb6gj95/t5nMmiJ
+	nwODfmc+ecY2RdNZzEeAo1o=
+X-Google-Smtp-Source: AGHT+IFRdXs2EHk3/qqyal85mpIldj6sYZeDrJv+54CHbW9FX89UJY0hIAEORRYaLpqwdLmMml7oPA==
+X-Received: by 2002:a17:906:5397:b0:99c:5056:4e31 with SMTP id g23-20020a170906539700b0099c50564e31mr3620995ejo.15.1691687953670;
+        Thu, 10 Aug 2023 10:19:13 -0700 (PDT)
+Received: from skbuf ([188.27.184.201])
+        by smtp.gmail.com with ESMTPSA id j15-20020a170906278f00b009926928d486sm1193668ejc.35.2023.08.10.10.19.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 10:19:13 -0700 (PDT)
+Date: Thu, 10 Aug 2023 20:19:10 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
+	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, clement.leger@bootlin.com,
+	ulli.kroll@googlemail.com, kvalo@kernel.org,
+	bhupesh.sharma@linaro.org, robh@kernel.org, elder@linaro.org,
+	wei.fang@nxp.com, nicolas.ferre@microchip.com,
+	simon.horman@corigine.com, romieu@fr.zoreil.com,
+	dmitry.torokhov@gmail.com, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/5] net: dsa: realtek: Remove redundant
+ of_match_ptr()
+Message-ID: <20230810171910.w2ruvj4sbcu6dlsz@skbuf>
+References: <20230810081656.2981965-1-ruanjinjie@huawei.com>
+ <20230810081656.2981965-2-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: v6bpB2-kcdftdEYbjWDHb6zlzocOdFUW
-X-Proofpoint-GUID: v6bpB2-kcdftdEYbjWDHb6zlzocOdFUW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-10_14,2023-08-10_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810081656.2981965-2-ruanjinjie@huawei.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The current implementation does not allow the user to enable both
-hw-tc-offload and ntuple features on the interface. These checks
-are added as TC flower offload and ntuple features internally configures
-the same hardware resource MCAM. But TC HTB offload configures the
-transmit scheduler which can be safely enabled on the interface with
-ntuple feature.
+On Thu, Aug 10, 2023 at 04:16:52PM +0800, Ruan Jinjie wrote:
+> The driver depends on CONFIG_OF, it is not necessary to use
+> of_match_ptr() here.
+> 
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> ---
 
-This patch adds the same and ensures only TC flower offload and ntuple
-features are mutually exclusive.
-
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
----
- .../marvell/octeontx2/nic/otx2_common.c       | 21 +++----------------
- .../marvell/octeontx2/nic/otx2_common.h       |  9 ++++++++
- 2 files changed, 12 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 8336cea16aff..dce3cea00032 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1905,31 +1905,16 @@ int otx2_handle_ntuple_tc_features(struct net_device *netdev, netdev_features_t
- 		}
- 	}
- 
--	if ((changed & NETIF_F_HW_TC) && tc) {
--		if (!pfvf->flow_cfg->max_flows) {
--			netdev_err(netdev,
--				   "Can't enable TC, MCAM entries not allocated\n");
--			return -EINVAL;
--		}
--	}
--
- 	if ((changed & NETIF_F_HW_TC) && !tc &&
--	    pfvf->flow_cfg && pfvf->flow_cfg->nr_flows) {
-+	    otx2_tc_flower_rule_cnt(pfvf)) {
- 		netdev_err(netdev, "Can't disable TC hardware offload while flows are active\n");
- 		return -EBUSY;
- 	}
- 
- 	if ((changed & NETIF_F_NTUPLE) && ntuple &&
--	    (netdev->features & NETIF_F_HW_TC) && !(changed & NETIF_F_HW_TC)) {
--		netdev_err(netdev,
--			   "Can't enable NTUPLE when TC is active, disable TC and retry\n");
--		return -EINVAL;
--	}
--
--	if ((changed & NETIF_F_HW_TC) && tc &&
--	    (netdev->features & NETIF_F_NTUPLE) && !(changed & NETIF_F_NTUPLE)) {
-+	    otx2_tc_flower_rule_cnt(pfvf) && !(changed & NETIF_F_HW_TC)) {
- 		netdev_err(netdev,
--			   "Can't enable TC when NTUPLE is active, disable NTUPLE and retry\n");
-+			   "Can't enable NTUPLE when TC flower offload is active, disable TC rules and retry\n");
- 		return -EINVAL;
- 	}
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 25e99fd2e3fd..5fd05d94de7c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -940,6 +940,15 @@ static inline u64 otx2_convert_rate(u64 rate)
- 	return converted_rate;
- }
- 
-+static inline int otx2_tc_flower_rule_cnt(struct otx2_nic *pfvf)
-+{
-+	/* return here if MCAM entries not allocated */
-+	if (!pfvf->flow_cfg)
-+		return 0;
-+
-+	return pfvf->flow_cfg->nr_flows;
-+}
-+
- /* MSI-X APIs */
- void otx2_free_cints(struct otx2_nic *pfvf, int n);
- void otx2_set_cints_affinity(struct otx2_nic *pfvf);
--- 
-2.17.1
-
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
