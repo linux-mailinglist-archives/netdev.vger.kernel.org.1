@@ -1,104 +1,181 @@
-Return-Path: <netdev+bounces-26282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107BA77761E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:43:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4A177762F
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFC13280F9D
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:43:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76381281078
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C79F71FB5D;
-	Thu, 10 Aug 2023 10:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2899E1EA94;
+	Thu, 10 Aug 2023 10:41:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3851EA7B
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:39:49 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D04268D;
-	Thu, 10 Aug 2023 03:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fcdKfiSbV9Bw4yfr4yNiYOjw2xqNqL4+khp/9M2GE58=; b=X4ZuWlhKv4RIilso4lrR1RFv+/
-	tiQXDOAwGKIX1mlS18D5PkgWMOwXCzxm9W+hehSKPsLpG0TI5uRfvOBUCidvAN1KcMQ6dZLugd7Z8
-	QNrW5F4/TxG+NkmyNNIpCMYtyMCEOUTvD5WLkCQK/l4BZpHaYm2DS1AY673XWv0UE6z8vmIaBOSdD
-	85EkTT/udQ0ZhlX/RZFScIzwf9duK0KuyPuixHJThH5FWtlLmeH3sLi1VpVS75j27iDXp/CYSlGwC
-	F1H+ydP1GSBYbMb4Sz9O0vc95yV/bMZfnE/IsXuc6RPuBIu7q6yxzubrSOosbiGMEPfiWZmsCb9O1
-	o/mbJbCQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35390)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU34t-0003ph-1T;
-	Thu, 10 Aug 2023 11:39:39 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU34s-0001iY-ID; Thu, 10 Aug 2023 11:39:38 +0100
-Date: Thu, 10 Aug 2023 11:39:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Josua Mayer <josua@solid-run.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: sfp: handle 100G/25G active optical cables in
- sfp_parse_support
-Message-ID: <ZNS+aqPiaNRJ+SK1@shell.armlinux.org.uk>
-References: <20230810094817.29262-1-josua@solid-run.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1B61D2FE
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:41:33 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4D52720;
+	Thu, 10 Aug 2023 03:41:30 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9b6e943ebso21963231fa.1;
+        Thu, 10 Aug 2023 03:41:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691664089; x=1692268889;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8sDZ5IUJkTx+O3oWwbTDQAJM2hqa7MawEyJCwCqZhC0=;
+        b=Rd5sZMDGywAH33+SWcF2vo0qrXT+ANO744tyte3tM+UprDLFJazaHiwBc41NFE/tRa
+         AmQW0r+dvwaoNshZMyE3dJkR1QasYBV9mD9rt6pRWdq2HEjpXF1KYdwR9epMfWrtBpHV
+         Qv2Kry46XjY9jaLQ1ugcJixCXjXiQWrZNw0zL1TBJrJAt//o63E4g7dR6uwf2cMA0Ilv
+         YK5GjabFkP7ElRr6HNdRvO/W6dMHSqaZh93RcXtFwDLjlNWaaBKm3HBTmwY/z9L2r2zp
+         oQ9cXwYur7sltNVkuYjcOtVHvPU7Tl5OXKyarIE72md3eTR0hSCDOBnhv1wUnwyFdU1R
+         /M+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691664089; x=1692268889;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8sDZ5IUJkTx+O3oWwbTDQAJM2hqa7MawEyJCwCqZhC0=;
+        b=MIn9woCNzsaRmTK0pdKI7V2W312gHd6rhULIwFjn5B/cLijXnJz8iLgpAWlTP0y9gI
+         pDB/VGpNpf61zpxuCzSCBgi5e1vihmymkGJgstbn5tJ2GubhRvDXAjRfB2UeEpPAiYXR
+         4ArVVaO3BOiiXU3qcpDXHO6/BizUtegQVCk+BIcZudwIBqwFxH1w55QVK+RQJqLsdFeI
+         6NTNqX4ikGOzhT/MX6UBqrkERYKBMzk3Z1rOmEDZ99nHxMuH7LBHGSlAocIUwo0re873
+         P+JGyujuM7yeHz+8+ZYOjFI3kxtUxYE6GjYjBGj2WMauh/yvhuYs5CdJVGwH7aLMcJH/
+         ko2g==
+X-Gm-Message-State: AOJu0YyTLG2SP2nYr3EVGbkNEs1Du2Dxg5vVn9s/fVhakcSe6xan6L7l
+	H8yp90bEkUemcf203ZGRvFMlwZUiTuo5z+ALReCPVGI5/Lci5/VC
+X-Google-Smtp-Source: AGHT+IF80XsNIXDrfC3HiWwz+n83VAeXS57ZQ4ljXBYh7USyQwRX5PBAKXFczuuhI8Hva8g89WUbLC1X+vyBlaIU6y0=
+X-Received: by 2002:a2e:b04b:0:b0:2b9:a9d8:16a7 with SMTP id
+ d11-20020a2eb04b000000b002b9a9d816a7mr722740ljl.8.1691664088114; Thu, 10 Aug
+ 2023 03:41:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810094817.29262-1-josua@solid-run.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+References: <20230810031557.135557-1-yin31149@gmail.com> <20230810045106-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230810045106-mutt-send-email-mst@kernel.org>
+From: Hawkins Jiawei <yin31149@gmail.com>
+Date: Thu, 10 Aug 2023 18:41:16 +0800
+Message-ID: <CAKrof1PH3vDGesZpt2LO7xakV16FYyg3nKL_sStZ41Ka+oK_Sw@mail.gmail.com>
+Subject: Re: [PATCH] virtio-net: Zero max_tx_vq field for VIRTIO_NET_CTRL_MQ_HASH_CONFIG
+ case
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, eperezma@redhat.com, 
+	18801353760@163.com, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 11:48:17AM +0200, Josua Mayer wrote:
-> Handle extended compliance code 0x1 (SFF8024_ECC_100G_25GAUI_C2M_AOC)
-> for active optical cables supporting 25G and 100G speeds.
-> 
-> Since the specification makes no statement about transmitter range, and
-> as the specific sfp module that had been tested features only 2m fiber -
-> short-range (SR) modes are selected.
-> 
-> sfp_parse_support already handles SFF8024_ECC_100GBASE_SR4_25GBASE_SR
-> with compatible properties: 100000baseSR4; 25000baseSR; protocol 25gbase-r.
-> Add SFF8024_ECC_100G_25GAUI_C2M_AOC to the same case.
-> 
-> Tested with fs.com S28-AO02 AOC SFP28 module.
-> 
-> Signed-off-by: Josua Mayer <josua@solid-run.com>
+On 2023/8/10 16:51, Michael S. Tsirkin wrote:
+> On Thu, Aug 10, 2023 at 11:15:57AM +0800, Hawkins Jiawei wrote:
+>> Kernel uses `struct virtio_net_ctrl_rss` to save command-specific-data
+>> for both the VIRTIO_NET_CTRL_MQ_HASH_CONFIG and
+>> VIRTIO_NET_CTRL_MQ_RSS_CONFIG commands.
+>>
+>> According to the VirtIO standard, "Field reserved MUST contain zeroes.
+>> It is defined to make the structure to match the layout of
+>> virtio_net_rss_config structure, defined in 5.1.6.5.7.".
+>>
+>> Yet for the VIRTIO_NET_CTRL_MQ_HASH_CONFIG command case, the `max_tx_vq`
+>> field in struct virtio_net_ctrl_rss, which corresponds to the
+>> `reserved` field in struct virtio_net_hash_config, is not zeroed,
+>> thereby violating the VirtIO standard.
+>>
+>> This patch solves this problem by zeroing this field in
+>> virtnet_init_default_rss().
+>>
+>> Signed-off-by: Hawkins Jiawei <yin31149@gmail.com>
+>
+>
+>
+> Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
+> Cc: Andrew Melnychenko <andrew@daynix.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> And this is stable material I believe.
 
-Thanks. I think I would like one extra change:
+Hi Michael,
 
-> +	case SFF8024_ECC_100G_25GAUI_C2M_AOC:
->  	case SFF8024_ECC_100GBASE_SR4_25GBASE_SR:
->  		phylink_set(modes, 100000baseSR4_Full);
+Thank you for the reminder, I will send the v2 patch with all these tags
+included.
 
-Since SFPs are single lane, SR4 doesn't make sense (which requires
-four lanes), and I shouldn't have added it when adding these modes.
-It would be a good idea to drop that, or at least for the
-addition of the SFF8024_ECC_100G_25GAUI_C2M_AOC case.
+Thanks!
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+>
+>
+>
+>> ---
+>>
+>> TestStep
+>> ========
+>> 1. Boot QEMU with one virtio-net-pci net device with `mq` and `hash`
+>> feature on, command line like:
+>>        -netdev tap,vhost=off,...
+>>        -device virtio-net-pci,mq=on,hash=on,...
+>>
+>> 2. Trigger VIRTIO_NET_CTRL_MQ_HASH_CONFIG command in guest, command
+>> line like:
+>>      ethtool -K eth0 rxhash on
+>>
+>> Without this patch, in virtnet_commit_rss_command(), we can see the
+>> `max_tx_vq` field is 1 in gdb like below:
+>>
+>>      pwndbg> p vi->ctrl->rss
+>>      $1 = {
+>>        hash_types = 63,
+>>        indirection_table_mask = 0,
+>>        unclassified_queue = 0,
+>>        indirection_table = {0 <repeats 128 times>},
+>>        max_tx_vq = 1,
+>>        hash_key_length = 40 '(',
+>>        ...
+>>      }
+>>
+>> With this patch, in virtnet_commit_rss_command(), we can see the
+>> `max_tx_vq` field is 0 in gdb like below:
+>>
+>>      pwndbg> p vi->ctrl->rss
+>>      $1 = {
+>>        hash_types = 63,
+>>        indirection_table_mask = 0,
+>>        unclassified_queue = 0,
+>>        indirection_table = {0 <repeats 128 times>},
+>>        max_tx_vq = 0,
+>>        hash_key_length = 40 '(',
+>>        ...
+>>      }
+>>
+>>   drivers/net/virtio_net.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 1270c8d23463..8db38634ae82 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -2761,7 +2761,7 @@ static void virtnet_init_default_rss(struct virtnet_info *vi)
+>>              vi->ctrl->rss.indirection_table[i] = indir_val;
+>>      }
+>>
+>> -    vi->ctrl->rss.max_tx_vq = vi->curr_queue_pairs;
+>> +    vi->ctrl->rss.max_tx_vq = vi->has_rss ? vi->curr_queue_pairs : 0;
+>>      vi->ctrl->rss.hash_key_length = vi->rss_key_size;
+>>
+>>      netdev_rss_key_fill(vi->ctrl->rss.key, vi->rss_key_size);
+>> --
+>> 2.34.1
+>
 
