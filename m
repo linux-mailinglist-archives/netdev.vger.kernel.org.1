@@ -1,148 +1,147 @@
-Return-Path: <netdev+bounces-26387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8580777AF4
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:41:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74BE777B0D
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:44:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ECAA1C20CDD
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:41:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 139072821A4
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2F51F95D;
-	Thu, 10 Aug 2023 14:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57D51FB2D;
+	Thu, 10 Aug 2023 14:44:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAA51E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:41:19 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144C5E53;
-	Thu, 10 Aug 2023 07:41:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mwzlrRVAAscIA+kAEhLsLbd8lJPFeF2GaIFj/DPNlUg=; b=CvdSwUdVmV2teaGUwpXH1UQ0O8
-	a2ZBj4CYizSPAjivvpCnhPbyE4/2Q6rxRZT5UPCwN59L3VBnrcZ9kCpd1B2z3M2Dj8+rc3viDC1fb
-	A9g6yi3QbXz/YACPgw3NpvCJyrhjWzIvavSGqI/yb8SmLddyKecglVkSg002TsP3ByEk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qU6qa-003hdq-P6; Thu, 10 Aug 2023 16:41:08 +0200
-Date: Thu, 10 Aug 2023 16:41:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] net/ethernet/realtek: Add Realtek
- automotive PCIe driver code
-Message-ID: <8746dad6-a6f1-4db0-958b-7b66d9dbd1f5@lunn.ch>
-References: <20230810062915.252881-1-justinlai0215@realtek.com>
- <20230810062915.252881-2-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DFA1E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:44:03 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0BB826B7;
+	Thu, 10 Aug 2023 07:44:01 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AClMFF009213;
+	Thu, 10 Aug 2023 16:43:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=lr83yk56r2f+wy5jyGAofD+fwP+vkuyJt43Zjpa5KV4=; b=zl
+	nUVYSEF+5ckaVlq8pYuPA6QMSL2WVai4btRmRySGRPr2T6TDJUN23xPkHRXcOTS4
+	o6zKKACkEAzSCRw6P7tV5PZDqYqDfMItXWOETWJbFijqfehxJhEA0FdU5/xW6wVo
+	aahopf/52rab1U1eZM26eyy1WWTNyU6Kswl+IWNLII8n7liueb/YzGlTYJjouwAv
+	4yUpqUolRcNqsWesICd6vkT5FD+/MMO/J2HfpObZ5ctKmKbrWW4RTYmj9rjpqwgT
+	L/ox5bo47WeEa5ac7/05A6XNhmDAxo7/eEVEPGcXdrPy1EMSFlU8wmPUO6iAOef8
+	P2geTdp/33+fSc1u+0tQ==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sd0730mgg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Aug 2023 16:43:41 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 37C58100057;
+	Thu, 10 Aug 2023 16:43:41 +0200 (CEST)
+Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id EEAD0222C88;
+	Thu, 10 Aug 2023 16:43:40 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
+ (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
+ 2023 16:43:40 +0200
+Message-ID: <1c327ece-ce22-1d82-92ef-9db281e93f92@foss.st.com>
+Date: Thu, 10 Aug 2023 16:43:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810062915.252881-2-justinlai0215@realtek.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net-next v3 04/10] net: stmmac: enlarge max rx/tx queues
+ and channels to 16
+Content-Language: en-US
+To: Jisheng Zhang <jszhang@kernel.org>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20230809165007.1439-1-jszhang@kernel.org>
+ <20230809165007.1439-5-jszhang@kernel.org>
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20230809165007.1439-5-jszhang@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To EQNDAG1NODE4.st.com
+ (10.75.129.133)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-10_11,2023-08-10_01,2023-05-22_02
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +#include <linux/version.h>
-> +#include <linux/ethtool.h>
-> +
-> +#define RTL_ALLOC_SKB_INTR(napi, length) napi_alloc_skb(&(napi), length)
-> +
-> +#define NETIF_F_ALL_CSUM NETIF_F_CSUM_MASK
-> +
-> +#define NETIF_F_HW_VLAN_RX NETIF_F_HW_VLAN_CTAG_RX
-> +#define NETIF_F_HW_VLAN_TX NETIF_F_HW_VLAN_CTAG_TX
-> +
-> +#define CONFIG_SRIOV 1
-> +
-> +#ifndef NETIF_F_RXALL
-> +#define NETIF_F_RXALL 0u
-> +#endif
-> +
-> +#ifndef NETIF_F_RXFCS
-> +#define NETIF_F_RXFCS 0u
-> +#endif
-> +
-> +#ifndef SET_NETDEV_DEV
-> +#define SET_NETDEV_DEV(net, pdev)
-> +#endif
-> +
-> +#ifndef SET_MODULE_OWNER
-> +#define SET_MODULE_OWNER(dev)
-> +#endif
-> +
-> +#ifndef SA_SHIRQ
-> +#define SA_SHIRQ IRQF_SHARED
-> +#endif
-> +
-> +#ifndef NETIF_F_GSO
-> +#define gso_size tso_size
-> +#define gso_segs tso_segs
-> +#endif
-> +
-> +#ifndef dma_mapping_error
-> +#define dma_mapping_error(a, b) 0
-> +#endif
-> +
-> +#ifndef netif_err
-> +#define netif_err(a, b, c, d)
-> +#endif
-> +
-> +#ifndef FALSE
-> +#define FALSE 0
-> +#endif
-> +
-> +#ifndef TRUE
-> +#define TRUE 1
-> +#endif
-> +
-> +#ifndef false
-> +#define false 0
-> +#endif
-> +
-> +#ifndef true
-> +#define true 1
-> +#endif
+On 8/9/23 18:50, Jisheng Zhang wrote:
+> xgmac supports up to 16 rx/tx queues and up to 16 channels.
+> 
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 5 ++---
+>   include/linux/stmmac.h                              | 6 +++---
+>   2 files changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> index a0c2ef8bb0ac..aaae82d3d9dc 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> @@ -202,9 +202,8 @@ static void dwxgmac2_map_mtl_to_dma(struct mac_device_info *hw, u32 queue,
+>   	void __iomem *ioaddr = hw->pcsr;
+>   	u32 value, reg;
+>   
+> -	reg = (queue < 4) ? XGMAC_MTL_RXQ_DMA_MAP0 : XGMAC_MTL_RXQ_DMA_MAP1;
+> -	if (queue >= 4)
+> -		queue -= 4;
+> +	reg = XGMAC_MTL_RXQ_DMA_MAP0 + (queue & ~0x3);
+> +	queue &= 0x3;
+>   
+>   	value = readl(ioaddr + reg);
+>   	value &= ~XGMAC_QxMDMACH(queue);
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index ef67dba775d0..11671fd6adee 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -15,9 +15,9 @@
+>   #include <linux/platform_device.h>
+>   #include <linux/phy.h>
+>   
+> -#define MTL_MAX_RX_QUEUES	8
+> -#define MTL_MAX_TX_QUEUES	8
+> -#define STMMAC_CH_MAX		8
+> +#define MTL_MAX_RX_QUEUES	16
+> +#define MTL_MAX_TX_QUEUES	16
+> +#define STMMAC_CH_MAX		16
+>   
+>   #define STMMAC_RX_COE_NONE	0
+>   #define STMMAC_RX_COE_TYPE1	1
 
-When i see code like this, it just shouts 'vendor crap, don't bother
-reviewing'.
+Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
 
-Really, truly, get help from an experienced mainline developer to
-rewrite this code to mainline quality. Then post version 3.
+Regards
+Alex
 
-Just as a hint, you are targeting net-next/main, and only
-net-next/main. You can and should use everything which is in
-net-next/main, and you should assume it exists. You are not targeting
-older kernels, and you should not have 'vendor crap' like this so it
-will compile with older kernels.
-
-Spend some time looking at other drivers in mainline. If you are doing
-something which other driver don't do, very likely you are doing
-something wrong. Do you see other drivers looking to see if
-NETIF_F_RXALL exists, and it not setting it to 0?
-
-And please don't just fix this and repost. There is a lot more wrong.
-Find a mentor to help you. The community would like to see this driver
-in the kernel, but an entity the size of Realtek can easily contract
-somebody to help get the code into shape.
-
-    Andrew
-
----
-pw-bot: cr
 
