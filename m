@@ -1,133 +1,105 @@
-Return-Path: <netdev+bounces-26184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8048777213
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:06:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE96777219
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 719F1281ED4
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:06:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26AD4281EA9
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BACD1ADE5;
-	Thu, 10 Aug 2023 08:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84B71ADEF;
+	Thu, 10 Aug 2023 08:06:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5013520E8
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:06:28 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8AFD1703;
-	Thu, 10 Aug 2023 01:06:25 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RLzxK0WL4z1L9X1;
-	Thu, 10 Aug 2023 16:05:09 +0800 (CST)
-Received: from [10.69.136.139] (10.69.136.139) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA8E1ADE5
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:06:31 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 479CCF7
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:06:30 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RLztl3q74ztS6N;
+	Thu, 10 Aug 2023 16:02:55 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 10 Aug 2023 16:06:20 +0800
-Message-ID: <5bd40f2f-7b19-1c49-336a-25da7b574c5e@huawei.com>
-Date: Thu, 10 Aug 2023 16:06:20 +0800
+ 15.1.2507.27; Thu, 10 Aug 2023 16:06:25 +0800
+Message-ID: <ad91a67e-40af-fcab-8521-7d2174c6c1f4@huawei.com>
+Date: Thu, 10 Aug 2023 16:06:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
-	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
-From: Jijie Shao <shaojijie@huawei.com>
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20230728075840.4022760-1-shaojijie@huawei.com>
- <20230728075840.4022760-6-shaojijie@huawei.com>
- <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
- <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
- <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
- <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
- <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
- <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
-In-Reply-To: <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net-next 2/5] bonding: remove warning printing in
+ bond_create_debugfs
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <j.vosburgh@gmail.com>,
+	<andy@greyhouse.net>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20230809124107.360574-1-shaozhengchao@huawei.com>
+ <20230809124107.360574-3-shaozhengchao@huawei.com>
+ <ZNRRFny6lQmRYd+F@Laptop-X1>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ZNRRFny6lQmRYd+F@Laptop-X1>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.136.139]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-on 2023/7/31 17:10, Jijie Shao wrote:
-> What PHY driver is this?
+
+On 2023/8/10 10:53, Hangbin Liu wrote:
+> On Wed, Aug 09, 2023 at 08:41:04PM +0800, Zhengchao Shao wrote:
+>> Because debugfs_create_dir returns ERR_PTR, so warning printing will never
+>> be invoked in bond_create_debugfs, remove it. If failed to create
+>> directory, failure information will be printed in debugfs_create_dir.
 >>
->> It is not so clear what should actually happen with auto-neg turned
->> off. With it on, and the link going down, the PHY should react after
->> about 1 second. It is not supposed to react faster than that, although
->> some PHYs allow fast link down notification to be configured.
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> ---
+>>   drivers/net/bonding/bond_debugfs.c | 3 ---
+>>   1 file changed, 3 deletions(-)
 >>
->> Have you checked 802.3 to see what it says about auto-neg off and link
->> down detection?
+>> diff --git a/drivers/net/bonding/bond_debugfs.c b/drivers/net/bonding/bond_debugfs.c
+>> index 94c2f35e3bfc..e4e7f4ee48e0 100644
+>> --- a/drivers/net/bonding/bond_debugfs.c
+>> +++ b/drivers/net/bonding/bond_debugfs.c
+>> @@ -87,9 +87,6 @@ void bond_debug_reregister(struct bonding *bond)
+>>   void __init bond_create_debugfs(void)
+>>   {
+>>   	bonding_debug_root = debugfs_create_dir("bonding", NULL);
+>> -
+>> -	if (!bonding_debug_root)
+> 
+Hi Hangbin:
+> debugfs_create_dir() does not print information for all failures. We can use
+> IS_ERR(bonding_debug_root) to check the value here.
+> 
+	Thank you for your review. I think you are right here, and I
+will modify it.
+
+Zhengchao Shao
+> Thanks
+> Hangbin
+>> -		pr_warn("Warning: Cannot create bonding directory in debugfs\n");
+>>   }
+>>   
+>>   void bond_destroy_debugfs(void)
+>> -- 
+>> 2.34.1
 >>
->> I personally would not suppress this behaviour in the MAC
->> driver. Otherwise you are going to have funny combinations of special
->> cases of a feature which very few people actually use, making your
->> maintenance costs higher.
->>
->>         Andrew
-
-Hi Andrew,
-We trace how the PHY state machine changed and show as followed:
-
-[ 1974.220847][ T362] hns3 0000:35:00.0 eth1: set link(phy): autoneg=0, 
-speed=100, duplex=1
-[ 1974.233694][ T362] hns3 0000:35:00.0 eth1: link down
-[ 1974.267444][ T32] RTL8211F Gigabit Ethernet mii-0000:35:00.0:02: PHY 
-state change UP -> RUNNING
-[ 1974.892830][ T7] hns3 0000:35:00.0 eth1: link up
-[ 2004.277425][ T32] RTL8211F Gigabit Ethernet mii-0000:35:00.0:02: PHY 
-state change RUNNING -> NOLINK
-[ 2004.797731][ T7] hns3 0000:35:00.0 eth1: link down
-
-Meanwhile, we also open tracing event about mdio and here are some 
-useful logs:
-
-kworker/1:0-19 [001] .... 1973.329775: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x00 val:0x1040
-kworker/1:0-19 [001] .... 1973.331964: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x01 val:0x79ad
-kworker/2:1-32 [002] .... 1974.247627: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x00 val:0x1040
-kworker/2:1-32 [002] .... 1974.249870: mdio_access: mii-0000:35:00.0 
-write phy:0x02 reg:0x00 val:0x2100
-kworker/2:1-32 [002] .... 1974.252069: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x00 val:0x2100
-kworker/2:1-32 [002] .... 1974.254143: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x01 val:0x798d
-....
-kworker/2:1-32 [002] .... 2003.240015: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x01 val:0x798d
-....
-kworker/2:1-32 [002] .... 2004.269525: mdio_access: mii-0000:35:00.0 
-read phy:0x02 reg:0x01 val:0x7989
-
-As you can see, the link state changed after 30 seconds when only 
-setting autoneg off. When the BMSR changed, the PHY driver change state 
-immediately. This patch wants to fixed the first link down up showed on 
-logs cause the link do not changed.
-
-
-Regards
-Jijie Shao
-
 
