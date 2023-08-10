@@ -1,75 +1,61 @@
-Return-Path: <netdev+bounces-26213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF08E7772D4
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:26:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6D87772DB
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A80528208E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:26:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 476FC2820B8
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7898D1DDC1;
-	Thu, 10 Aug 2023 08:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771E41DDDD;
+	Thu, 10 Aug 2023 08:26:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB3120E3
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:26:27 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EDEED
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:26:26 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fe4b45a336so5263785e9.1
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:26:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691655984; x=1692260784;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5MR+5PFugPovCt/ZI4txJmfCVwmNkCdr2Q2Ayqtgi6o=;
-        b=WdVTRiGcf7KWGdovrZhaYzLlwUVf9l8MODnlO7thvaEU+sC0Cza6ueuUU76mU8Yg74
-         0Rfo3A/G1LS/Qpxbw/kebtdiDnffZ1PK1Mx5ni/vhp3Ox7JYgNyro81tJz49qyjI1pOK
-         nXuUDwV0PAqZUQNv4nlVTSbu3x2EUPBXuiF4vH/71+DABd10ENZekJgw0hYnm8/PwMEF
-         i5p1L6KLu2lJzaH3F6JrSSNIBk9oWL7DxAe5ybu6qlCzdOL0mloNb9GsVjRy3Bnos7vy
-         72nD56tdS3xUOhovArpb5gjat/Vw/j1shREx+OLuLKoXGr320YfTYLqIq7zmUj50GZX1
-         N8Rg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AE61ADFF;
+	Thu, 10 Aug 2023 08:26:41 +0000 (UTC)
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA93E56;
+	Thu, 10 Aug 2023 01:26:39 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-9936b3d0286so100551466b.0;
+        Thu, 10 Aug 2023 01:26:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691655984; x=1692260784;
+        d=1e100.net; s=20221208; t=1691655998; x=1692260798;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5MR+5PFugPovCt/ZI4txJmfCVwmNkCdr2Q2Ayqtgi6o=;
-        b=Sd9Uz6LNpFQu/r9r4oE/CR/Bu6qGS63QBOSEZp6XiyHHNSaLvIOaGk+YwvrxWvve0k
-         Zjj+oUrfGkdyoJny/GvZGq1DiH9wg79jvMoqxpKG++uozCARtWqjjuPBhXfZJxY0WNTI
-         pN+e3mt7aldftyEK8TMQ6DiCVCR5NCf7cola9MiSaK0Sqqcp0zPJBAngx6H9dxGQxguh
-         4iBEyzZyE/BRGN/cTjsFoUEDW7CODNCYaCXeHbtbgAHkjQXT0BAf3++kI4Ja7e8xt9vf
-         bLYBE4dZnnMpw1RImfmjbw550lyHYVWStj/zCYHqXShNN2OGa7nlUw7bvIgcHT5Bi2m2
-         9tsQ==
-X-Gm-Message-State: AOJu0YyQEJcS5rGR8QDAwmq1Iq4ZTn4/L4RvPjQP70TSiHN2ZhfRnjf4
-	sJginLAVPiCUDwGlhQE6IgPSSA==
-X-Google-Smtp-Source: AGHT+IED5EvUAbIPy9tMLOguRqy1DoclqnEEVwX479WbGpTt1LpbY1tJy4NuoGcxJzNG8xckTlf9Gw==
-X-Received: by 2002:a7b:cd0d:0:b0:3fa:98c3:7dbd with SMTP id f13-20020a7bcd0d000000b003fa98c37dbdmr1240929wmj.41.1691655984457;
-        Thu, 10 Aug 2023 01:26:24 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id o10-20020a1c750a000000b003fe2b6d64c8sm4321899wmc.21.2023.08.10.01.26.23
+        bh=U8rApuESa0pdY0AmwOH319MzG7nEB2DXH9x9ay8kvn0=;
+        b=gBsowc9TUzW0DfzcTEX9VY4XVPunlWnRC9z0+2wedToyJBzOwR5ZsjhJu79eL9gqjK
+         78X3rymT74ATMqsxyV3Xq0zVESLBtu1kPF1alftFugYAQgxWwc61vAREJkWjzGkahm6Z
+         UnVM/DmHmWZeQlwJjxbCUcpPBX9/gSiYoqp8gKTEVfAwx9DEF86imfeAQorGo2AeZ8Rw
+         1L1QkN4JpJbSoUEWOb+U3arkfTSVI6ISpBJk/I8WVpk//lHCfXbJi73JnDZYTIgyJFst
+         tdi58WTHNkmfYSkfMAyh/Ob4fVTtJ3kWKAgh0beiU3UCsbQHh0qLel8MddDXonsjFNQi
+         FozQ==
+X-Gm-Message-State: AOJu0Ywu5uo/lBgjvfnvNCeb0EzmpomeGa4FYJyvoAEZOQTjfjCbtn3Z
+	UZmGkkaL+oLZLoBCVTieRLI=
+X-Google-Smtp-Source: AGHT+IFx4EFqf13z8URjVO5WQq9zhgRcOP4Nw82UvtV0Z8zilOx3N6RkaSnLYXCygnYj8r2Qf2LCSg==
+X-Received: by 2002:a17:906:1da1:b0:98d:f062:8503 with SMTP id u1-20020a1709061da100b0098df0628503mr1360609ejh.77.1691655997855;
+        Thu, 10 Aug 2023 01:26:37 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-020.fbsv.net. [2a03:2880:31ff:14::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a13-20020a17090682cd00b00992f81122e1sm597355ejy.21.2023.08.10.01.26.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 01:26:23 -0700 (PDT)
-Date: Thu, 10 Aug 2023 10:26:22 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, johannes@sipsolutions.net,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com, axboe@kernel.dk, pshelar@ovn.org,
-	jmaloy@redhat.com, ying.xue@windriver.com, jacob.e.keller@intel.com,
-	drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-	dev@openvswitch.org, tipc-discussion@lists.sourceforge.net
-Subject: Re: [PATCH net-next 03/10] genetlink: remove userhdr from struct
- genl_info
-Message-ID: <ZNSfLomTSZy/4b8W@nanopsycho>
-References: <20230809182648.1816537-1-kuba@kernel.org>
- <20230809182648.1816537-4-kuba@kernel.org>
+        Thu, 10 Aug 2023 01:26:37 -0700 (PDT)
+Date: Thu, 10 Aug 2023 01:26:35 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Gabriel Krisman Bertazi <krisman@suse.de>
+Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v2 7/8] io_uring/cmd: BPF hook for getsockopt cmd
+Message-ID: <ZNSfO2aaX5TsKKqz@gmail.com>
+References: <20230808134049.1407498-1-leitao@debian.org>
+ <20230808134049.1407498-8-leitao@debian.org>
+ <87wmy46u58.fsf@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,24 +64,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230809182648.1816537-4-kuba@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <87wmy46u58.fsf@suse.de>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Aug 09, 2023 at 08:26:41PM CEST, kuba@kernel.org wrote:
->Only three families use info->userhdr and fixed headers
->are discouraged for new families. So remove the pointer
->from struct genl_info to save some space. Compute
->the header pointer at runtime. Saved space will be used
->for a family pointer in later patches.
->
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hello Gabriel,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+On Wed, Aug 09, 2023 at 12:46:27PM -0400, Gabriel Krisman Bertazi wrote:
+> Breno Leitao <leitao@debian.org> writes:
+> 
+> > Add BPF hooks support for getsockopts io_uring command. So, bpf cgroups
+> > programs can run when SOCKET_URING_OP_GETSOCKOPT command is called.
+> >
+> > This implementation follows a similar approach to what
+> > __sys_getsockopt() does, but, using USER_SOCKPTR() for optval instead of
+> > kernel pointer.
+> >
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  io_uring/uring_cmd.c | 18 +++++++++++++-----
+> >  1 file changed, 13 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+> > index dbba005a7290..3693e5779229 100644
+> > --- a/io_uring/uring_cmd.c
+> > +++ b/io_uring/uring_cmd.c
+> > @@ -5,6 +5,8 @@
+> >  #include <linux/io_uring.h>
+> >  #include <linux/security.h>
+> >  #include <linux/nospec.h>
+> > +#include <linux/compat.h>
+> > +#include <linux/bpf-cgroup.h>
+> >  
+> >  #include <uapi/linux/io_uring.h>
+> >  #include <uapi/asm-generic/ioctls.h>
+> > @@ -179,17 +181,23 @@ static inline int io_uring_cmd_getsockopt(struct socket *sock,
+> >  	if (err)
+> >  		return err;
+> >  
+> > -	if (level == SOL_SOCKET) {
+> > +	err = -EOPNOTSUPP;
+> > +	if (level == SOL_SOCKET)
+> >  		err = sk_getsockopt(sock->sk, level, optname,
+> >  				    USER_SOCKPTR(optval),
+> >  				    KERNEL_SOCKPTR(&optlen));
+> > -		if (err)
+> > -			return err;
+> >  
+> > +	if (!in_compat_syscall())
+> > +		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
+> > +						     optname,
+> > +						     USER_SOCKPTR(optval),
+> > +						     KERNEL_SOCKPTR(&optlen),
+> > +						     optlen, err);
+> 
+> I'm not sure if it makes sense to use in_compat_syscall() here.  Can't
+> this be invoked in a ring with ctx->compat set, but from outside a
+> compat syscall context (i.e. from sqpoll or even a !compat
+> io_uring_enter syscall)? I suspect you might need to check ctx->compact
+> instead, but I'm not sure. Did you consider that?
 
-I'm fine with the existing message, but what Johannes suggests is also
-ok.
+I think that checking ctx->compat seems to be the right thing to do. I
+will update.
 
