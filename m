@@ -1,234 +1,284 @@
-Return-Path: <netdev+bounces-26438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26772777C3C
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:33:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6513777C40
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:34:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F441C20DD9
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:33:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 139B11C21615
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759B820C98;
-	Thu, 10 Aug 2023 15:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4D920C99;
+	Thu, 10 Aug 2023 15:34:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E76200BC
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:33:20 +0000 (UTC)
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2173.outbound.protection.outlook.com [40.92.62.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E4E2690
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:33:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XtUnQ43DO9NiFebakhLcuoUweQHm0ja+88fKlx9sLyJXl7hw9m4Oyo6xx5DI4sffbOOn5X5QeEyXF7NtD4fPmXjIyipRL/1tBkJPLtquH2SH8k234iWxYEbNeyIHimyvFgrsqBksmfe9CSw70vEALLPxhAzyr6k01O2IBdxLWixZBC+Q3qZhR/1f3pu04g4gb0s/L6kk7mEhIKO/PmjAYqgroP1x+RG51m8gd/fo19GndnST5awzyj0hqnAYUhbMO1rI0uITz/QNI3X4TLPTLVC053V/VYNQWl52F/+zW3rymAa/+b7Mt01RBAhS9ZCoDe6iBl0kaYD07nQl6twCFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=At72umnLN6LEVS/NNv4gzuvyAUghRMLezp/gyVsaaao=;
- b=f4265X2ufWWz+9oKSSS5ChznMdXqutyugdmnL8Gm8B7NlMwT7/LjrjMoVqxNAivwky9W0az2Y0VQHbfqktzoU5UZARBdd/CvDij52CtVUHe9dGU2T1c2QcB3Akpj3mb9ioi0Sn5Wdj88qyNbRXVvgmTJ2S1bLXJVyCr1ZBHE6CurlrW3N6XewNcXVKPE42mIdhncHfk2mDXDhMM00VN9MVTNkaz+1OcjHy7+vdo+TQ0beIhf/hf3yzDJQwdJHQ4DiaW/88c4go423iIpwC2Tjl1YRUQ7brrCUMTdLBmoHuC/Rl8Eeg/jQfzbP5IciFQRS3+eun+ab8rSjDLCTCRu3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=At72umnLN6LEVS/NNv4gzuvyAUghRMLezp/gyVsaaao=;
- b=i4xCtNGdb4zcoIlKoFKk6Q9KDmuQo6I8s0VOuXKqRIO6agZv1n0L50s+xvfzYGNwpjkpObXtgrLC9rS4cqHeAeFaxFzPTY3E52qocfzzw2g+T+969+E2ywMEhAlXEXfi0iI7HW/EN6jKvF67ztcp45zXWCr50zUZAb81lJSFbE5t2qZdOljtK+8M2w8b4+UJtSqqR+d8DOcAfYa3dUK+Fc6vI2cotjJYxGK7L9pr6qcSC6LVeFWclcLPRQMeBVclRq7o0zKf+62dp/fFL7h030IbXI80rnrU1nZJ4e/a6QRtDU7paTY9otUZj7r3k0AsqbQkLMunLPGCRV3bSaOYUw==
-Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
- by SY4P282MB2586.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:126::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 15:33:12 +0000
-Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
- ([fe80::826:d9a5:23be:3b14]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
- ([fe80::826:d9a5:23be:3b14%3]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 15:33:12 +0000
-From: Jinjian Song <songjinjian@hotmail.com>
-To: jiri@resnulli.us
-Cc: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	danielwinkler@google.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	haijun.liu@mediatek.com,
-	ilpo.jarvinen@linux.intel.com,
-	jesse.brandeburg@intel.com,
-	jinjian.song@fibocom.com,
-	johannes@sipsolutions.net,
-	kuba@kernel.org,
-	linuxwwan@intel.com,
-	linuxwwan_5g@intel.com,
-	loic.poulain@linaro.org,
-	m.chetan.kumar@linux.intel.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	ricardo.martinez@linux.intel.com,
-	ryazanov.s.a@gmail.com,
-	songjinjian@hotmail.com,
-	soumya.prakash.mishra@intel.com,
-	vsankar@lenovo.com
-Subject: Re: [net-next 3/6] net: wwan: t7xx: Implements devlink ops of firmware flashing
-Date: Thu, 10 Aug 2023 23:32:52 +0800
-Message-ID:
- <MEYP282MB2697C334D0476215C8167B13BB13A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <MEYP282MB2697E81E8FEC49757A385A5FBB0CA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-References: <20230803021812.6126-1-songjinjian@hotmail.com> <MEYP282MB2697937841838C688E1237FDBB08A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM> <MEYP282MB269742CBB438E43607FA3BC4BB0EA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM> <MEYP282MB2697E81E8FEC49757A385A5FBB0CA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	MAILING_LIST_MULTI,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-Content-Transfer-Encoding: 8bit
-X-TMN: [sTyFxwKBuTiPTG65kQev4Nh0hrNQnBda]
-X-ClientProxiedBy: SG3P274CA0012.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::24)
- To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
-X-Microsoft-Original-Message-ID: <ZNDrQpikNYBTgb60@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82835200BC
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:34:50 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04BF626B9;
+	Thu, 10 Aug 2023 08:34:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=uiaKz3kmyqwtAsQ+m4lUcc+XfUWQizMTAyHXudFCUts=; b=0sTFD2dobCfvkVdaYNYksGeWwS
+	HC6JZ9QkLai4kzPXbkiRtm16EzeWVs+tVyLDP4kBh8SlecZusjhk+OpisNGLRQaBiFDCMYnSm28Se
+	DVDwp3WQaX0Cu5locixK+8lkY67YkcRWyHyKtUqCGTAOziOJL6kTCeajFx+5VTR7gglenD7BOISSt
+	3NVl+rouExtOxMABAc2hcs2sJz/ot1mexFFNYf7fGQFz4IsGbtVZJNfvfuiRndwB7ctCsRxm5mlm5
+	DM3OuabbfMN6WB1QTYIiDH8w+2TZYaprnPDcvv0syy+HjWND+QJOixAbUo9VWVj4M6CKjhUSZOHzi
+	w6uEfmbA==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qU7gH-0083T7-2V;
+	Thu, 10 Aug 2023 15:34:33 +0000
+Message-ID: <0d0ed95c-1ad4-25b1-fa6a-c432b7b0c9f4@infradead.org>
+Date: Thu, 10 Aug 2023 08:34:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|SY4P282MB2586:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8d2d4258-5965-4c65-4193-08db99b71b42
-X-MS-Exchange-SLBlob-MailProps:
-	7J/vb0KDx3g95xIFleXDt9v7AebcisefnrN7ypRBwvmDNkNeYX2T3UWOnDHKlmd9LkdkGmGa0SFoqnCARAycUEIjMGXE6b7I/5yuev1riLHhUZORCKXsL+mQzpajn0eUInBt/Fdv/idUiC2qwWLWL0x+1ONmlohx+NwcdYySTJaSbeWo6rQijd+fbjbTTf2X6vBCFH92FCD9JETzOcyF3wq44u/Re6RHwdyikb7oChmb8KPp7KvRVPmeVhnSqWszspZfQDYSYnz2zh8re+/ixFYRr+5q/1dpFr24B/yts9NqubAtCcmNibw9z2qEDc1PJwQjrSKSlwK32LwpPJ7w9EOvmsMcWbyi7xBuBB/EtOY+FHOZDO7S7L7plHsdsyVJAJtV+KXYhgFziNt6EMrD6vapXKC82AxUjUSqWVrcq5Jjb+4vhXfpe+dz9Bz5Xg7cVVvgbOsBiRiaI6TwNjG8Be2vIBXJtAEJAU645MKa1RYv4gdNeaFgo5DSAYG3i1AWmzglhszQp7EuoPEGS+Y2I0w2aqJ1tbzELCzYiAJ9dcj2MejsnoZhCeQp76hH18BbiidDWOlEGRfpkfUpSi53KbvrsQaNFFr3S+MEIPWhUIuKd27bzA6AI9eeqei4F5p4QyxvBJDVJyKLnUHy/revgf5pkV7RM+seFwrqrncoKQYWjAs/KL9ILQQLOx+8deCYwuolFDkwxO7XGNRR/RI4Jju9OSYOHfK0ySJODzKDwY/xT8OchOgIzWgHsiD3tBXLsoMMNcop/S7csMXlQgDxRBlFrspLUPUI2ww5Z0tAXbM=
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	hbKz6lbg/dJ/z4jSqmsmCUcoRIYfqNh38ZQdBJUnT0PWIABL8oLnlW4c9h7jC1lhDN0X1xDXBz9AdTXBj+tNY0nKk+hFBVEOEu0SLdI6zi+klm6L/pXBTVlHsrHmn9S2qmBAOeNRdzzIzSIXmaMi+h+l0CF4uHbF6xhtK2yJ1MN6+iVVeKJVbgpvB2xNcfMHA8fsla31cT/h5WQCl8Rj01QAkvXa3vX7OIIfPRUJhDoogJUxVqmXarofoDFhK3n07DHSJ+IsKYX1idBHVGdGd0XxxaQnLfkginf4bGgQYC045ShOlysszUBWGDhdJjmdKlJabt7Oc8JMfdBPjYHPYl8eRnQRFqA2zDmCYnERahv4C47V7IFtb/S/uIeMzBrNEQc7mv7M/VxZy0WrFpsbjbeI6huog3+pd/1kdp/SaWJMBtFDHpTQpGubKNqutf8bokQxGNMp9qCs55ITw2VlGmKDTHh3xGNnQy/yCSeFQNgy+l2tJu3ONTEU2VWVaOmDnDCMq7IqtdvUkdSA1a7Tv5ttkztZa1/E+imsZ/f8XERW8e/zdagaNjvWXJv749fieI7w+DO+Q1rzr8rMFp7u979yOIh8WaR8rV7dzBhGaFE=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?k3VdmevamraWbLVq38ixoZyu3so7DfnZpp895ixUWyK2sklqwC6pqEVTg4mH?=
- =?us-ascii?Q?TaTAOv6nYStBxBC3nEj17eMVzAdgODLJFQJ9JFj/PfHWdlphUgyUV+i+nixG?=
- =?us-ascii?Q?YwCO1wuG6W78+KGDuUbGqTmsADDtXq2K6OMAWyIXJJvahcpgAwRzFdCYatK/?=
- =?us-ascii?Q?gckZt7DfW3rWDjnQJgINWbumBgLipejeTmEpM1SLPC66vImtr0a5/x1wbaQT?=
- =?us-ascii?Q?yVPfuD0MJS0svJkVlV6KL+96L2lHA9v3iGNZ3CPlvL3Ng4WQlmE3dFiffPOr?=
- =?us-ascii?Q?zPTMY90FWCNymtL3imDNHEyhF4swQA4zBnBZhhNRdP7jP4KqmQFYfxRnKB7y?=
- =?us-ascii?Q?7452OrOdIXxfIpDF4C9rJnl8653aieWEtgyxKhIQ/A6opOy0j1GPDVYKfYN1?=
- =?us-ascii?Q?tbY1ODc8mSwm9xrPKUHuG+IfWQ1tx2S326VHXHk5iWRchz7fCgEbMMWSKOmF?=
- =?us-ascii?Q?tvUxqPij+9WqAER2ue0bnxEkZJtQTrbArmsAFGgokO5H1nGzjeReYmEKf6h3?=
- =?us-ascii?Q?xUiruJorTLvRC72p5BH9shlWpUPAa7UCXSj6dmRXf5uTaeFxkoetqO3x7qNQ?=
- =?us-ascii?Q?FvZ0qCT+mjPG1pGpB6dstRqYbG0L0nNH/dybQgkdjz7Qp3ZGf9lBOayn/y1H?=
- =?us-ascii?Q?mqWyDcpsxZqd1tYHIaQwuTmQyiTQcE4Mfe25kryjsfuSC5gBr2YCUhchYy5e?=
- =?us-ascii?Q?pIunfAL/UsbJxq43m3clUVxv3yxGZfWxw0cZRECVeFomi7HD29Mj92OJDUZd?=
- =?us-ascii?Q?Xy864IZe1k5vve3Ua0QChp6J1XMkzCxxljc8/6rucOyCzOIWXGHBV62AoE25?=
- =?us-ascii?Q?3DN2+Ub0f+SnhsRdDQlY9sa3CCfSBEJbiBe8VbeyyRVNsGJZRbN2cuWy2puv?=
- =?us-ascii?Q?l8lgWqAz+qIUEFCq40p4VICim+NNeq2LFAmyo1gR6A+DCZIgvRm6RZCodqRf?=
- =?us-ascii?Q?zZ9dtU6smPyLCP7u2FDqz107CMavP839BwOeCnuuxqObTjvQ+twErpOYvGp1?=
- =?us-ascii?Q?UJTOgDqnbsc1RZPhe7EFdp6UHR/6fu2GDlqrHKunEqBpK6byjLfjgqFD6+fZ?=
- =?us-ascii?Q?daoT64of55h+1d0JrMTdWN0i26ppE3DwMoV1sUl4mNpO9l4fs6Ea5zEmj/E8?=
- =?us-ascii?Q?1ki0M4sQBErEUPh42mAXQN01+9hhTTImRCZQpZc3Rpxo9HBQQDBo4X1Yngn+?=
- =?us-ascii?Q?+7yGOFCDIbGkG0w9ige2ySkv13GzjxbgP/POJ9CZwZ9r9ZtXetf2uA1dEVs?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d2d4258-5965-4c65-4193-08db99b71b42
-X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 15:33:12.0822
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY4P282MB2586
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v2] docs: staging: add netlink attrs best practices
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>, Lin Ma <linma@zju.edu.cn>
+Cc: corbet@lwn.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, void@manifault.com,
+ jani.nikula@intel.com, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20230809032552.765663-1-linma@zju.edu.cn>
+ <ZNTw+ApPS9U4VhZI@vergenet.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <ZNTw+ApPS9U4VhZI@vergenet.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
->Mon, Aug 07, 2023 at 02:26:53PM CEST, songjinjian@hotmail.com wrote:
->>Thansk for your review.
->>Witch command: echo 1 > /sys/bus/pci/devices/${bdf}/remove, then driver will run the
->>.remove ops, during this steps, driver get the fastboot param then send command to 
->>device let device reset to fastboot download mode.
->
->Ugh.
->
->
->>
->>>
->>>
->>>>4.use space command rescan device, driver probe and export flash port.
->>>
->>>Again, what's "command rescan device" ?
->>>
->>>Could you perhaps rather use command line examples?
->>
->>Thansk for your review.
->>With the command: echo 1 > /sys/bus/pci/rescan, then driver will run the .probe options
->>then driver will follow the fastboot download process to export the download ports.
->
->That is certainly incorrect. No configuration or operation with the
->device instance should require to unbind&bind the device on the bus.
 
-Thanks for your review, this remove rescan logic impliment in V5 patch driver version, as it can't be allowned 
-in driver so I move it out driver patch, just now it seemed no other suitable way to reprobe device and identify 
-device in download mode after device reset.
-By the way,this remove rescan logic works with iosm driver also, so if there is no idea of other way, I hope it
-can be allowned without effect the kernel. 
 
+On 8/10/23 07:15, Simon Horman wrote:
+> On Wed, Aug 09, 2023 at 11:25:52AM +0800, Lin Ma wrote:
+>> Provide some suggestions that who deal with Netlink code could follow
+>> (of course using the word "best-practices" may sound somewhat
+>> exaggerate).
 >>
->>>
->>>>5.devlink flash firmware image.
->>>>
->>>>if don't suggest use devlink param fastboot driver_reinit, I think set 
->>>>fastboot flag during this action, but Intel colleague Kumar have drop that way in the old 
->>>>v2 patch version.
->>>>https://patchwork.kernel.org/project/netdevbpf/patch/20230105154300.198873-1-m.chetan.kumar@linux.intel.com/ 
->>>>
->>>>>+	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
->>>>>+		return 0;
->>>>>+	default:
->>>>>+		/* Unsupported action should not get to this function */
->>>>>+		return -EOPNOTSUPP;
->>>>>+	}
->>>>>+}
->>>
->>>>>>+static int t7xx_devlink_info_get_loopback(struct devlink *devlink, struct devlink_info_req *req,
->>>>>>+					  struct netlink_ext_ack *extack)
->>>>>>+{
->>>>>>+	struct devlink_flash_component_lookup_ctx *lookup_ctx = req->version_cb_priv;
->>>>>>+	int ret;
->>>>>>+
->>>>>>+	if (!req)
->>>>>>+		return t7xx_devlink_info_get(devlink, req, extack);
->>>>>>+
->>>>>>+	ret = devlink_info_version_running_put_ext(req, lookup_ctx->lookup_name,
->>>>>
->>>>>It actually took me a while why you are doing this. You try to overcome
->>>>>the limitation for drivers to expose version for all components that are
->>>>>valid for flashing. That is not nice
->>>>>
->>>>>Please don't do things like this!
->>>>>
->>>>>Expose the versions for all valid components, or don't flash them.
->>>>
->>>>For the old modem firmware, it don't support the info_get function, so add the logic here to 
->>>>compatible with old modem firmware update during devlink flash.
->>>
->>>No! Don't do this. I don't care about your firmware. We enforce info_get
->>>and flash component parity, obey it. Either provide the version info for
->>>all components you want to flash with proper versions, or don't
->>>implement the flash.
+>> According to my recent practices, the parsing of the Netlink attributes
+>> lacks documents for kernel developers. Since recently the relevant docs
+>> for Netlink user space get replenished, I guess is a good chance for
+>> kernel space part to catch with.
 >>
->>Thanks for your review, I will delete the info_get_loopback function.
+>> First time to write a document and any reviews are appreciated.
 >>
->>>
->>>
->>>>
->>>>>>+						   "1.0", DEVLINK_INFO_VERSION_TYPE_COMPONENT);
->>>>>>+
->>>>>>+	return ret;
->>>>>> }
->>>>>> 
+>> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> 
+> Thanks for writing this up, from my perspective this is very useful.
+> 
+> Some trivial feedback follows.
+> 
+>> ---
+>> v1 -> v2: fix some typos in FOO example,
+>>           add extra section "About General Netlink Case" to avoid any
+>>           confusion for new code users.
 >>
->
+>>  Documentation/staging/index.rst               |   1 +
+>>  .../staging/netlink-attrs-best-practices.rst  | 544 ++++++++++++++++++
+>>  MAINTAINERS                                   |   1 +
+> 
+> Perhaps this was discussed earlier.
+> But I'm curious to know if there is a preference for putting
+> this into staging rather than networking or elsewhere.
+
+I don't know of any reason for it to be in staging. If there is one,
+I would like to hear about it.
+
+>>  3 files changed, 546 insertions(+)
+>>  create mode 100644 Documentation/staging/netlink-attrs-best-practices.rst
+>>
+
+>> diff --git a/Documentation/staging/netlink-attrs-best-practices.rst b/Documentation/staging/netlink-attrs-best-practices.rst
+>> new file mode 100644
+>> index 000000000000..7dac562bee47
+>> --- /dev/null
+>> +++ b/Documentation/staging/netlink-attrs-best-practices.rst
+>> @@ -0,0 +1,544 @@
+>> +.. SPDX-License-Identifier: BSD-3-Clause
+>> +
+>> +=================================
+>> +Netlink Attributes Best Practices
+>> +=================================
+>> +
+>> +Introduction
+>> +============
+>> +
+>> +This document serves as a guide to the best practices, or cautions, for parsing user-space-provided Netlink attributes in kernel space. The intended audience is those who want to leverage the powerful Netlink interface (mainly for classic or legacy Netlink and the general Netlink users basically don't worry about these, see penultimate section) in their code. Additionally, for those who are curious about the parsing of Netlink attributes but may feel apprehensive about delving into the code itself, this document can serve as an excellent starting point.
+> 
+> I think it is normal to linewrap rst documentation.
+> At <80 columns would be best IMHO.
+
+absolutely.
+
+> 
+>> +
+>> +However, if you are concerned about how to prepare Netlink messages from a user space socket instead of writing kernel code, it is recommended to read the `Netlink Handbook <https://docs.kernel.org/userspace-api/netlink/intro.html>`_ first.
+>> +
+>> +Background
+>> +==========
+>> +
+>> +Data Structures
+>> +---------------
+>> +
+>> +So what is a Netlink attribute? In simple terms, **the Netlink attribute is the structural payload carried by the Netlink message in TLV (Type-Length-Value) format** (At least it is suggested to do so). One can straightly read the comment and the code in ``include/net/netlink.h`` (most of the below content is derived from there). The following graph demonstrates the structure for the majority of messages.
+> 
+> Suggestion:
+> 
+> * straightly -> directly; or, perhaps better
+>   one can straightly -> one can
+> 
+>> +
+>> +.. code-block::
+>> +
+>> +   +-----------------+------------+--------------------------
+>> +   | Netlink Msg Hdr | Family Hdr |  Netlink Attributes  ...
+>> +   +-----------------+------------+--------------------------
+>> +                     ^            ^
+>> +
+>> +The ``^`` part will be padded to align to ``NLMSG_ALIGNTO`` (4 bytes for the Linux kernel).
+>> +
+>> +The term **majority** is used here because the structure is dependent on the specific Netlink family you are dealing with. For example, the general Netlink family (NETLINK_GENERIC) puts ``struct genlmsghdr`` in the Family Hdr location and is strictly followed by specified Netlink attributes TLV. Differently, the connector Netlink family (NETLINK_CONNECTOR) does not use Netlink attributes for transiting the payload, but straight places naked data structure after its family header ``struct cn_msg``. In general, when working with Netlink-powered code, most developers opt for Netlink attributes due to their convenience and ease of maintenance. This means is definitely okay to overlook the corner cases which may eventually be incorporated into Netlink attributes in the future.
+> 
+> Suggestions:
+> 
+> * "Differently, the connector"
+>   -> As a counter example, the connector"
+
+s/counter example/counterexample/
+
+> 
+> * "but straight places naked data structure after its family header"
+>   -> "but, rather, places a naked data structure immediately after its
+>       family header"
+> 
+> 
+>> +
+>> +The Netlink attribute in the Linux kernel conforms to the following structure.
+>> +
+>> +.. code-block:: c
+>> +
+>> +   // >------- nla header --------<
+>> +   // +-------------+-------------+----------- - - - ----------+
+>> +   // |  Attr Len   |  Attr Type  |          Attr Data         |
+>> +   // +-------------+-------------+----------- - - - ----------+
+>> +   // >-- 2 bytes --|-- 2 bytes --|------ Attr Len bytes ------<
+>> +
+>> +   struct nlattr {
+>> +       __u16           nla_len;
+>> +       __u16           nla_type;
+>> +   };
+>> +
+>> +The 2 bytes attr len (\ ``nla_len``\ ) indicates the entire attribute length (includes the nla header) and the other 2 bytes attr type (\ ``nla_type``\ ) is used by the kernel code to identify the expected attribute. To process these attributes, the kernel code needs to locate the specific attribute and extract the payload from it, a process known as attribute parsing. This procedure can be tedious and error-prone when done manually, so the interface provides parsers to simplify the process.
+>> +
+>> +*It is worth mentioning that if you choose to use general Netlink without a nested data structure, you don't even need to call any parsers as the interface already does this and your task will be simplified to handling the parsed result.*
+>> +
+>> +Parsers
+>> +-------
+>> +
+>> +There are several parsers available, each designed to handle a specific type of object being parsed. If you have a pointer to a Netlink message, specifically a (\ ``struct nlmsghdr *``\ ), it's likely that you'll want to call the ``nlmsg_parse`` function. The prototype for this function is as follows:
+>> +
+>> +.. code-block:: c
+>> +
+>> +   /**
+>> +    * nlmsg_parse - parse attributes of a netlink message
+>> +    * @nlh: netlink message header
+>> +    * @hdrlen: length of family specific header
+>> +    * @tb: destination array with maxtype+1 elements
+>> +    * @maxtype: maximum attribute type to be expected
+>> +    * @policy: validation policy
+>> +    * @extack: extended ACK report struct
+>> +    *
+>> +    * See nla_parse()
+>> +    */
+>> +   static inline int nlmsg_parse(const struct nlmsghdr *nlh, int hdrlen,
+>> +                     struct nlattr *tb[], int maxtype,
+>> +                     const struct nla_policy *policy,
+>> +                     struct netlink_ext_ack *extack);
+>> +
+
+Instead of duplicating kernel-doc function comments here, it is preferable to do
+what Jakub has started to do lately:
+
+.. kernel-doc:: include/linux/netlink.h
+   :identifiers: nlmsg_parse
+
+Same for the functions below.
+
+>> +Else if you have a pointer to Netlink attribute (\ ``struct nlattr *``\ ) already, the ``nla_parse``\ , or  ``nla_parse_nested`` could be your choices.
+> 
+> Suggestions:
+> 
+>   * Else -> Otherwise,
+>   * "could be your choices" -> "may  be used"
+> 
+>> +
+>> +.. code-block:: c
+>> +
+>> +   /**
+>> +    * nla_parse - Parse a stream of attributes into a tb buffer
+>> +    * @tb: destination array with maxtype+1 elements
+>> +    * @maxtype: maximum attribute type to be expected
+>> +    * @head: head of attribute stream
+>> +    * @len: length of attribute stream
+>> +    * @policy: validation policy
+>> +    * @extack: extended ACK pointer
+>> +    *
+>> +    * Parses a stream of attributes and stores a pointer to each attribute in
+>> +    * the tb array accessible via the attribute type. Attributes with a type
+>> +    * exceeding maxtype will be rejected, policy must be specified, attributes
+>> +    * will be validated in the strictest way possible.
+>> +    *
+>> +    * Returns 0 on success or a negative error code.
+>> +    */
+>> +   static inline int nla_parse(struct nlattr **tb, int maxtype,
+>> +                   const struct nlattr *head, int len,
+>> +                   const struct nla_policy *policy,
+>> +                   struct netlink_ext_ack *extack);
+>> +   /**
+>> +    * nla_parse_nested - parse nested attributes
+>> +    * @tb: destination array with maxtype+1 elements
+>> +    * @maxtype: maximum attribute type to be expected
+>> +    * @nla: attribute containing the nested attributes
+>> +    * @policy: validation policy
+>> +    * @extack: extended ACK report struct
+>> +    *
+>> +    * See nla_parse()
+>> +    */
+>> +   static inline int nla_parse_nested(struct nlattr *tb[], int maxtype,
+>> +                      const struct nlattr *nla,
+>> +                      const struct nla_policy *policy,
+>> +                      struct netlink_ext_ack *extack);
+>> +
+>> +Upon closer inspection, one will notice that the parameters for the various parsers bear a striking resemblance to one another. In fact, they share a commonality that goes beyond mere coincidence, as they all ultimately call upon the same internal parsing helper function, namely ``__nla_parse``.
+>> +
+>> +.. code-block:: c
+>> +
+>> +   int __nla_parse(struct nlattr **tb, int maxtype, const struct nlattr *head,
+>> +           int len, const struct nla_policy *policy, unsigned int validate,
+>> +           struct netlink_ext_ack *extack);
+>> +
+>> +The idea is straightforward since we know that adding an offset to either the Netlink message header or the nested attribute will yield the TLV format of the attributes. On this basis, we will learn how to utilize those parsers.
+
+[snip]
+
+-- 
+~Randy
 
