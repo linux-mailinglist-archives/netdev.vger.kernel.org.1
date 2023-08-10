@@ -1,167 +1,115 @@
-Return-Path: <netdev+bounces-26133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35CD8776E65
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 05:16:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C31776E74
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 05:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D117281ECF
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 03:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0CC31C2146C
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 03:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F997F5;
-	Thu, 10 Aug 2023 03:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78259A48;
+	Thu, 10 Aug 2023 03:22:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C222A3C
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:16:13 +0000 (UTC)
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2181BFB;
-	Wed,  9 Aug 2023 20:16:12 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-76c8dd2ce79so41943185a.1;
-        Wed, 09 Aug 2023 20:16:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691637372; x=1692242172;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YsP6+M83tJ99Nd1EkOWnQq9Dpk1PaD5qBivEPmeZxDU=;
-        b=k1ikJtf0/a6tAsog2qODYu08f/KtYdY2TnmgDrYOYtuPCoJ9GTXZGRxwOycFaD/93m
-         h6HhuYmkMsorlw4oevYiTdHyFNenGqRbbD4oqIZ1Cb6SRpYVcpPsi9aXgkcTZLjfuqAg
-         jjmtlOFUcrXoh56BwvfbilQWaWTRFeM5hB3wB6wNPnIRQu1QbStwaNgz85yoEff04g5h
-         qOJrnjCpwqNTe6MnltyZacILZCgMAmaOkAMbm+XAKls2DThDlkN3QmdNxmjVMhGr5MEW
-         J3vBaf5hTOJITclcX7iRSKET3ekA89rTDvgU9ufhsqwa3Zz4H5yypqpO5HgUQvA1mTZd
-         FLiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691637372; x=1692242172;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YsP6+M83tJ99Nd1EkOWnQq9Dpk1PaD5qBivEPmeZxDU=;
-        b=eT+OfP/5jzwSukgSiGv4QxKD09ipyvHeYDGHZbyUQ907GYHy7L966VSYCsgDJP+Jxx
-         6HCsKcju/agoad0/hZ6yI7I8xpNAkGJK5u0V2OrZZKGi2sqvdz9PUYuWhdscV0CCTmlm
-         qsWk3QWFEt3p1E4bJb7tfjOWZDlPdnExCK0bSbe/+kTyVEydKhAuSn++jOLxR95f7vQj
-         YRAzuOZYSTJBQ8odCmQG0fNvEvYIxnsB9bNd/5Y1pMgvWOpDN9lIpt/2M4OlUcv/bzFg
-         AogriQyqLVWzCam7O0ICAUdSTak9KXsJxKTfPy0HGDZW+BOaIerQFupqLaUamCZKasaZ
-         5dCw==
-X-Gm-Message-State: AOJu0YwQ0i0PzuiCH7NCcwgm7gMoUUddaS6SY05IrO6dG9o0AJyE2KpN
-	czt5p2N3TwAda7gpegs3iZ8=
-X-Google-Smtp-Source: AGHT+IFMLwyyp8q2A5J1hejT+OuuntqBztSvuBxvqHSxtLwm1T4wMASjwp68c86y5kwEyFOBxVoBAQ==
-X-Received: by 2002:a05:620a:2942:b0:767:96e2:a9cb with SMTP id n2-20020a05620a294200b0076796e2a9cbmr1104151qkp.38.1691637371837;
-        Wed, 09 Aug 2023 20:16:11 -0700 (PDT)
-Received: from localhost ([125.35.86.198])
-        by smtp.gmail.com with ESMTPSA id c4-20020a63ea04000000b0055c178a8df1sm357788pgi.94.2023.08.09.20.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 20:16:11 -0700 (PDT)
-From: Hawkins Jiawei <yin31149@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: eperezma@redhat.com,
-	yin31149@gmail.com,
-	18801353760@163.com,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] virtio-net: Zero max_tx_vq field for VIRTIO_NET_CTRL_MQ_HASH_CONFIG case
-Date: Thu, 10 Aug 2023 11:15:57 +0800
-Message-Id: <20230810031557.135557-1-yin31149@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64383815;
+	Thu, 10 Aug 2023 03:22:51 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 229CC10EC;
+	Wed,  9 Aug 2023 20:22:50 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RLsgV4FRPz4f3m7w;
+	Thu, 10 Aug 2023 11:22:46 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP4 (Coremail) with SMTP id gCh0CgAH5acDWNRk7bNoAQ--.45699S2;
+	Thu, 10 Aug 2023 11:22:46 +0800 (CST)
+Subject: Re: [RFC PATCH bpf-next 0/2] Remove unnecessary synchronizations in
+ cpumap
+To: bpf@vger.kernel.org, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@gmail.com>,
+ =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+ Hao Luo <haoluo@google.com>, Yonghong Song <yonghong.song@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ "houtao1@huawei.com" <houtao1@huawei.com>
+References: <20230728023030.1906124-1-houtao@huaweicloud.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <58cffe99-3578-3f6b-8a55-4f32ead13de9@huaweicloud.com>
+Date: Thu, 10 Aug 2023 11:22:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230728023030.1906124-1-houtao@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-CM-TRANSID:gCh0CgAH5acDWNRk7bNoAQ--.45699S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKr4rKF4xKrW3tw1xGr15Jwb_yoWDCrc_Aa
+	ykJF97Gw4UWFn2gFWDtr1xGF45Wrs5KF4jqa4vqrW5A343Za1rJr4v9FWxZry8Z397tr15
+	Gr15K3yktr1aqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_
+	WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU13rcDUUUUU==
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Kernel uses `struct virtio_net_ctrl_rss` to save command-specific-data
-for both the VIRTIO_NET_CTRL_MQ_HASH_CONFIG and
-VIRTIO_NET_CTRL_MQ_RSS_CONFIG commands.
+ping ? Any feedback about this patch set ?
 
-According to the VirtIO standard, "Field reserved MUST contain zeroes.
-It is defined to make the structure to match the layout of
-virtio_net_rss_config structure, defined in 5.1.6.5.7.".
-
-Yet for the VIRTIO_NET_CTRL_MQ_HASH_CONFIG command case, the `max_tx_vq`
-field in struct virtio_net_ctrl_rss, which corresponds to the
-`reserved` field in struct virtio_net_hash_config, is not zeroed,
-thereby violating the VirtIO standard.
-
-This patch solves this problem by zeroing this field in
-virtnet_init_default_rss().
-
-Signed-off-by: Hawkins Jiawei <yin31149@gmail.com>
----
-
-TestStep
-========
-1. Boot QEMU with one virtio-net-pci net device with `mq` and `hash`
-feature on, command line like:
-      -netdev tap,vhost=off,...
-      -device virtio-net-pci,mq=on,hash=on,...
-
-2. Trigger VIRTIO_NET_CTRL_MQ_HASH_CONFIG command in guest, command
-line like:
-	ethtool -K eth0 rxhash on
-
-Without this patch, in virtnet_commit_rss_command(), we can see the
-`max_tx_vq` field is 1 in gdb like below:
-
-	pwndbg> p vi->ctrl->rss
-	$1 = {
-	  hash_types = 63,
-	  indirection_table_mask = 0,
-	  unclassified_queue = 0,
-	  indirection_table = {0 <repeats 128 times>},
-	  max_tx_vq = 1,
-	  hash_key_length = 40 '(',
-	  ...
-	}
-
-With this patch, in virtnet_commit_rss_command(), we can see the
-`max_tx_vq` field is 0 in gdb like below:
-
-	pwndbg> p vi->ctrl->rss
-	$1 = {
-	  hash_types = 63,
-	  indirection_table_mask = 0,
-	  unclassified_queue = 0,
-	  indirection_table = {0 <repeats 128 times>},
-	  max_tx_vq = 0,
-	  hash_key_length = 40 '(',
-	  ...
-	}
-
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1270c8d23463..8db38634ae82 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2761,7 +2761,7 @@ static void virtnet_init_default_rss(struct virtnet_info *vi)
- 		vi->ctrl->rss.indirection_table[i] = indir_val;
- 	}
- 
--	vi->ctrl->rss.max_tx_vq = vi->curr_queue_pairs;
-+	vi->ctrl->rss.max_tx_vq = vi->has_rss ? vi->curr_queue_pairs : 0;
- 	vi->ctrl->rss.hash_key_length = vi->rss_key_size;
- 
- 	netdev_rss_key_fill(vi->ctrl->rss.key, vi->rss_key_size);
--- 
-2.34.1
+On 7/28/2023 10:30 AM, Hou Tao wrote:
+> From: Hou Tao <houtao1@huawei.com>
+>
+> Hi,
+>
+> The patchset aims to remove unnecessary synchronizations in cpu-map
+> which were found during code inspection. Patch #1 removes the
+> unnecessary rcu_barrier() when freeing bpf_cpu_map_entry and replaces
+> it by queue_rcu_work(). Patch #2 removes the unnecessary call_rcu()
+> and queue_work() when destroying cpu-map and does the freeing directly.
+>
+> Simply testing the patchset by running xdp_redirect_cpu test for
+> virtio-net and no issues are reported. Hope to get more feedback before
+> removing the RFC tag. As ususal, comments and suggestions are always
+> welcome.
+>
+> Regards,
+> Tao
+>
+> Hou Tao (2):
+>   bpf, cpumap: Use queue_rcu_work() to remove unnecessary rcu_barrier()
+>   bpf, cpumap: Clean up bpf_cpu_map_entry directly in cpu_map_free
+>
+>  kernel/bpf/cpumap.c | 110 +++++++++++++-------------------------------
+>  1 file changed, 31 insertions(+), 79 deletions(-)
+>
 
 
