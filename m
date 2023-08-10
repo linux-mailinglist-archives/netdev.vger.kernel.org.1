@@ -1,96 +1,100 @@
-Return-Path: <netdev+bounces-26109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AA82776D09
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 02:30:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE804776D38
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 02:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A8711C21427
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:30:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A884B281899
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 00:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5E6368;
-	Thu, 10 Aug 2023 00:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74756632;
+	Thu, 10 Aug 2023 00:50:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1FB7E4
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 00:30:50 +0000 (UTC)
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0FD2171D;
-	Wed,  9 Aug 2023 17:30:49 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-3490f207680so1482555ab.2;
-        Wed, 09 Aug 2023 17:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691627449; x=1692232249;
-        h=to:cc:date:message-id:subject:mime-version
-         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NgSnc+u+kbp/QMsiSMo1lKUz4Qdpl315YK5X8DFb5ck=;
-        b=ICtwK6cXoGKdAD2t5MqAhwnUcfiuQHSt6ZuVi/uRBsoK9+fMijN5qGaVKjksRl+i/e
-         1YGevAuqKdHISPNR/FtzvAKlHNzdn9qN/OHMaj6JeKuDJ7NT5SODvVf3woqMo4VKo+cD
-         2ZcniWn4WmORHx02OBTqR9+CDD8On1ecV/hK1dQ8ah3pTZkR06KqTJByjXdGLlcnyO7V
-         j6QUbatXwu9qRoIpz3osyDalxuD3AvSputENrAE8k8NbqKMU7rlUeJQLu1P4JBNjJw8T
-         cfoj1ecgbj+nnCKyuTnhhLMNSumwbZTGANnOY6hrE+WDJdVNRr4P8DNI/ivHuMa2JTcv
-         /ZTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691627449; x=1692232249;
-        h=to:cc:date:message-id:subject:mime-version
-         :content-transfer-encoding:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NgSnc+u+kbp/QMsiSMo1lKUz4Qdpl315YK5X8DFb5ck=;
-        b=LE1UBHQ/PBCF6VJ9cGv8Bg2pyfHyfV/Vwuz/GnNzmitDUY98Oc3foWBxjYoJgwUPo2
-         tO1SHj3zZUhWWDBYBCo40wtwJmxppt1L+1jV1dAQ0YcyzyU5jQaAdza7L8hWXohCCmMJ
-         xOoPnzEWNtbrRkzKsBY6DM9z8DwWWeDPmLbCZ8NC3sJzpG87UuKEblpmpNiEmz97PtnO
-         w2uGdxtt9hFdaPRmxZu2FrwmTUXFoJLnJLpMk8Hf5VJtSUxaXxuWJsl8kiBPhdBLDoza
-         DkmpRPtWXh88M0bH6KFCq0M8h1Gz9o4QdmkJz9pjJNKmgjQFuCzMPgdR/10ki2MCAK7c
-         4BQQ==
-X-Gm-Message-State: AOJu0YyehAoTZJFpiKNHZL76oldH2+DymbDpx/Ds1SV4nKrtqPZ6NXge
-	U1ydDO/yZ3AhFMSRUOVNX8nOIlDgiCEC0hTc
-X-Google-Smtp-Source: AGHT+IFsZ7685N0LVwr1S4nIrtNqvG3Kr0qiZabW/c59ku0TYIplO50JG5bKMeY9ddVW6so/jNopOA==
-X-Received: by 2002:a05:6e02:1b0e:b0:348:fe3b:c8b with SMTP id i14-20020a056e021b0e00b00348fe3b0c8bmr1019290ilv.1.1691627448974;
-        Wed, 09 Aug 2023 17:30:48 -0700 (PDT)
-Received: from smtpclient.apple ([195.252.220.43])
-        by smtp.gmail.com with ESMTPSA id u7-20020a92d1c7000000b0034587c5533fsm73494ilg.51.2023.08.09.17.30.48
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Aug 2023 17:30:48 -0700 (PDT)
-From: Sishuai Gong <sishuai.system@gmail.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: 7bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6946737B
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 00:49:59 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA051C9
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 17:49:58 -0700 (PDT)
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 180FC84698;
+	Thu, 10 Aug 2023 02:49:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1691628596;
+	bh=OMIIFFJqxb1PVgbx8QdhZiu6Hzg8Gi3gJ1SPfK5eysk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=poIZaVlAUSUCRQOB/EARUHUL3+R+WBT9MJoK1RUKto+YeR3Vjx3nDKURA6DAVQ7UK
+	 Jafp1FaWRMdU6XmdSrpaw0NwWK7eo2RKs4LWoUOBGT8dsofgStTNrtINSll38TK4jA
+	 YNGdaC7cQevib2Gnzqm+yvdhBkYd5N4MWArHac7+s4d25EqBReBkm2pjbZoMbYFjUW
+	 vbmf+IFyEaXLougJ7q0Wnpj1G3wFcVLoRhVgHufElnPm6cVTiv/XaslQ2aIvLRGTlu
+	 ol3dCS8zmJmf544Y4FrjefZyaycX2sEyZb6m0JBdffVS7LawafVAI+8rDgc/IncU5k
+	 iSBF5PUaBknog==
+Message-ID: <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
+Date: Thu, 10 Aug 2023 02:49:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
-Subject: Race over table->data in proc_do_sync_threshold()
-Message-Id: <B6988E90-0A1E-4B85-BF26-2DAF6D482433@gmail.com>
-Date: Wed, 9 Aug 2023 20:30:37 -0400
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
- lvs-devel@vger.kernel.org
-To: horms@verge.net.au,
- ja@ssi.bg
-X-Mailer: Apple Mail (2.3731.700.6)
-X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Wei Fang <wei.fang@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Oleksij Rempel <linux@rempel-privat.de>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+References: <20230804175842.209537-1-marex@denx.de>
+ <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
+ <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <20230809043626.GG5736@pengutronix.de>
+ <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+ <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
+ <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
+ <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On 8/10/23 00:06, Andrew Lunn wrote:
+> On Wed, Aug 09, 2023 at 11:34:19PM +0200, Marek Vasut wrote:
+>> On 8/9/23 15:40, Andrew Lunn wrote:
+>>>>> Hm.. how about officially defining this PHY as the clock provider and disable
+>>>>> PHY automatic hibernation as long as clock is acquired?
+>>>>>
+>>>> Sorry, I don't know much about the clock provider/consumer, but I think there
+>>>> will be more changes if we use clock provider/consume mechanism.
+>>>
+>>> Less changes is not always best. What happens when a different PHY is
+>>> used?
+>>
+>> Then the system wouldn't be affected by this AR803x specific behavior.
+> 
+> Do you know it really is specific to the AR803x? Turning the clock off
+> seams a reasonable thing to do when saving power, or when there is no
+> link partner.
 
-We observed races over (struct ctl_table *) table->data when two threads
-are running proc_do_sync_threshold() in parallel, as shown below:
-
-Thread-1			Thread-2
-memcpy(val, valp, sizeof(val)); memcpy(valp, val, sizeof(val));
-
-This race probably would mess up table->data. Is it better to add a lock?
-
-Thanks
+This hibernation behavior seem specific to this PHY, I haven't seen it 
+on another PHY connected to the EQoS so far.
 
