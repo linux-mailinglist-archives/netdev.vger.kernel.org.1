@@ -1,259 +1,404 @@
-Return-Path: <netdev+bounces-26464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92FB4777E43
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:29:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A212777E83
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3DE21C21676
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:29:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 977F51C216C0
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FA420FA2;
-	Thu, 10 Aug 2023 16:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BB220C97;
+	Thu, 10 Aug 2023 16:43:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559FB1E1D2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 16:28:58 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50EEA8;
-	Thu, 10 Aug 2023 09:28:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ora/VmM1qG9A9o6C4o8z3h7zDpDPf1uS/fJQhNtWUDQ=; b=0DKlyOz4YHEM+YRxUBXOpi84C5
-	jXzuowk37XObhCzNCbisO76OUFBC3v/bQo0ir01y7YpFHTVXJ5dkN7G/RvOnPVA9Yw4y8V5FtHUEC
-	jxlLe50SOHJTWH7NrNsggXpWimJdA5pCJP89ehLgABJCQ0A+VZBm/FCgOEUZz5znrwhmYH2WsXo1O
-	U9rBfyti/fapNFGZuCS/JRjx17SAOIJ1nzjGzfjy6FrQf7kl3NqbmxzRtIoH8moY3RcT5CLvAUAyU
-	iBgK2AJ/X5E9GV2Tx00ugGUeJFR4tsCOJIPoUnZQdZSXGt8ux6uphYZKWpjeHR+b0VCITif8wjg5N
-	USW0vTpg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46224)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU8Wi-0004Gb-2Z;
-	Thu, 10 Aug 2023 17:28:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU8Wf-0001x8-Un; Thu, 10 Aug 2023 17:28:41 +0100
-Date: Thu, 10 Aug 2023 17:28:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>
-Cc: Clark Wang <xiaoning.wang@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	"peppe.cavallaro@st.com" <peppe.cavallaro@st.com>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"joabreu@synopsys.com" <joabreu@synopsys.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	dl-linux-imx <linux-imx@nxp.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH V3 1/2] net: phylink: add a function to resume phy alone
- to fix resume issue with WoL enabled
-Message-ID: <ZNUQOS49kP5uTgqx@shell.armlinux.org.uk>
-References: <20230202081559.3553637-1-xiaoning.wang@nxp.com>
- <83a8fb89ac7a69d08c9ea1422dade301dcc87297.camel@redhat.com>
- <Y/c+MQtgtKFDjEZF@shell.armlinux.org.uk>
- <HE1PR0402MB2939A09FD54E72C80C19A467F3AB9@HE1PR0402MB2939.eurprd04.prod.outlook.com>
- <Y/dIoAqWfazh9k6F@shell.armlinux.org.uk>
- <152ee4d9-800e-545a-c2c6-08b03e9d1301@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1EB1E1DC;
+	Thu, 10 Aug 2023 16:43:29 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B58D10C4;
+	Thu, 10 Aug 2023 09:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691685808; x=1723221808;
+  h=message-id:subject:from:reply-to:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=r7+pRLOhmCU2mY1+yp43/cT6YSLlci8CmLi2j4cMZDM=;
+  b=a7b4p0prZDMNt18PH5rRzljbNrrJfQGyyvuROzBm1LFttHstKjunoOdt
+   hoNWUhvQeuyuceWq/n5VRdm8v4l/7yvODAVrLkVHsfKS0ZhVpfaoRq83h
+   CbnfcgRMgPdMx/ib1NTPnGzROBUhNifxXn9hCu5L9p9hYxA1SrXM16f2W
+   vsGWEXBuhoBq3BO+2C9nj1TgJi++vgjwjQVKD05O1dR/r7ZORBbMScnyL
+   tZV+L9IhtFngAvRhdk94a0ksFG6bKfqcYWTFnuWpPhTM0X5aByhKa6Uex
+   HvlCyk9xMf8aRjg4x4+Fi3a13wze2fzI2AyIHWhlJOT7iUUoxxGrTOnYv
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="351776957"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="351776957"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 09:36:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="855987630"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="855987630"
+Received: from linux.intel.com ([10.54.29.200])
+  by orsmga004.jf.intel.com with ESMTP; 10 Aug 2023 09:36:15 -0700
+Received: from tphi-mobl.amr.corp.intel.com (tphi-mobl.amr.corp.intel.com [10.209.57.169])
+	by linux.intel.com (Postfix) with ESMTP id 47411580AFF;
+	Thu, 10 Aug 2023 09:36:15 -0700 (PDT)
+Message-ID: <b14b087d8905297504dde89920d8d0a67b7544e8.camel@linux.intel.com>
+Subject: Re: [PATCH net-next v2 1/5] platform/x86: intel_pmc_core: Add IPC
+ mailbox accessor function and add SoC register access
+From: "David E. Box" <david.e.box@linux.intel.com>
+Reply-To: david.e.box@linux.intel.com
+To: Hans de Goede <hdegoede@redhat.com>, Choong Yong Liang
+ <yong.liang.choong@linux.intel.com>, Rajneesh Bhardwaj
+ <irenic.rajneesh@gmail.com>, Mark Gross <markgross@kernel.org>, Jose Abreu
+ <Jose.Abreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Marek
+ =?ISO-8859-1?Q?Beh=FAn?= <kabel@kernel.org>, Jean Delvare
+ <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wong
+ Vee Khee <veekhee@apple.com>, Jon Hunter <jonathanh@nvidia.com>, Jesse
+ Brandeburg <jesse.brandeburg@intel.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Andrey Konovalov <andrey.konovalov@linaro.org>,
+ Jochen Henneberg <jh@henneberg-systemdesign.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  platform-driver-x86@vger.kernel.org,
+ linux-hwmon@vger.kernel.org,  bpf@vger.kernel.org, Voon Wei Feng
+ <weifeng.voon@intel.com>, Tan Tee Min <tee.min.tan@linux.intel.com>,
+ Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>, Lai Peter Jun Ann
+ <jun.ann.lai@intel.com>
+Date: Thu, 10 Aug 2023 09:36:15 -0700
+In-Reply-To: <145d7375-0e58-b7cf-6240-5d8bc16b0344@redhat.com>
+References: <20230804084527.2082302-1-yong.liang.choong@linux.intel.com>
+	 <20230804084527.2082302-2-yong.liang.choong@linux.intel.com>
+	 <145d7375-0e58-b7cf-6240-5d8bc16b0344@redhat.com>
+Organization: David E. Box
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <152ee4d9-800e-545a-c2c6-08b03e9d1301@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 06:10:04PM +0200, Alexis Lothoré wrote:
-> Hello Clark, Russell,
-> 
-> On 2/23/23 12:06, Russell King (Oracle) wrote:
-> > On Thu, Feb 23, 2023 at 10:27:06AM +0000, Clark Wang wrote:
-> >> Hi Russel,
-> >>
-> >> I have sent the V4 patch set yesterday.
-> >> You can check it from: https://lore.kernel.org/linux-arm-kernel/20230222092636.1984847-2-xiaoning.wang@nxp.com/T/
-> >>
-> > 
-> > Ah yes, sent while net-next is closed.
-> > 
-> > Have you had any contact with Clément Léger ? If not, please can you
-> > reach out to Clément, because he has virtually the same problem. I
-> > don't want to end up with a load of different fixes in the mainline
-> > kernel for the same "we need the PHY clock enabled on stmmac" problem
-> > from different people.
-> 
-> I am resuming Clement's initial efforts on RZN1 GMAC interface, which indeed is
-> in need of an early PCS initialization mechanism too ([1]).
-> 
-> > Please try to come up with one patch set between you both to fix this.
-> > 
-> > (effectively, that's a temporary NAK on your series.)>
-> 
-> I would like to know if this series is still ongoing/alive ? I have checked for
-> follow-ups after V4 sent by Clark ([2]), but did not find anything. Clement
-> handed me over the topic right when Russell suggested to discuss this shared
-> need, so I am not sure if any mutualization discussion has happened yet ?
-> 
-> If not, what would be the next steps ? Based on my understanding and comments on
-> the [2] v3, I feel that Clark's series would be a good starting point. In order
-> to be able to use it in both series, we could possibly make it less specific to
-> the "resume" mechanism (basically, phylink_phy_resume() =>
-> phylink_phy_early_start() ) ? It would then prevent [1] from moving the whole
-> phylink_start() in stmmac_main too early (see issue raised by Russell) and allow
-> to just call phylink_phy_early_start() early enough, while still being usable in
-> the resume scenario raised by Clark. Or am I missing bigger issues with current
-> series ?
+Hi Hans,
 
-The whole thing died a death as soon as I suggested that the two parties
-work together, so currently as far as I'm concerned, the issue is dead
-and no patches have been merged to fix it.
+On Mon, 2023-08-07 at 13:02 +0200, Hans de Goede wrote:
+> > Hi David,
+> >=20
+> > On 8/4/23 10:45, Choong Yong Liang wrote:
+> > > > From: "David E. Box" <david.e.box@linux.intel.com>
+> > > >=20
+> > > > - Exports intel_pmc_core_ipc() for host access to the PMC IPC mailb=
+ox
+> > > > - Add support to use IPC command allows host to access SoC register=
+s
+> > > > through PMC firmware that are otherwise inaccessible to the host du=
+e to
+> > > > security policies.
+> > > >=20
+> > > > Signed-off-by: David E. Box <david.e.box@linux.intel.com>
+> > > > Signed-off-by: Chao Qin <chao.qin@intel.com>
+> > > > Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com=
+>
+> >=20
+> > The new exported intel_pmc_core_ipc() function does not seem to
+> > depend on any existing PMC code.
+> >=20
+> > IMHO it would be better to put this in a new .c file under
+> > arch/x86/platform/intel/ this is where similar helpers like
+> > the iosf_mbi functions also live.
+> >=20
+> > This also avoids Kconfig complications. Currently the
+> > drivers/platform/x86/intel/pmc/core.c code is only
+> > build if CONFIG_X86_PLATFORM_DEVICES and
+> > CONFIG_INTEL_PMC_CORE are both set. So if a driver
+> > wants to make sure this is enabled by selecting them
+> > then it needs to select both.
 
-As I stated, I don't want to merge one solution, and then have the other
-solution then come along later... the simple answer would have been for
-party A to test party B's changes to see whether they solved the
-problem, but clearly that never happened.
+Yeah, makes sense. This is an old patch. Once upon a time the PMC driver wa=
+s
+going to use the IPC to access some registers but we were able to get them =
+from
+elsewhere. The patch was brought back for the TSN use case. But you're corr=
+ect
+that arch/x86/platform/intel makes more sense if the function is to be expo=
+rted
+now and doesn't require to PMC driver to discover the interface. We'll do t=
+hat.
 
-If there's an unwillingness to work together to solve a common problem,
-then the problem will remain unsolved.
+> >=20
+> > Talking about Kconfig:
+> >=20
+> > #if IS_ENABLED(CONFIG_INTEL_PMC_CORE)
+> > int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf);
+> > #else
+> > static inline int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *=
+rbuf)
+> > {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -ENODEV;
+> > }
+> > #endif /* CONFIG_INTEL_PMC_CORE */
+> >=20
+> > Notice that CONFIG_INTEL_PMC_CORE is a tristate, so pmc might be build =
+as a
+> > > module where as a consumer of intel_pmc_core_ipc() might end up built=
+in in
+> > > which case this will not work without extra Kconfig protection. And i=
+f you
+> > are > going to add extra Kconfig you might just as well select or depen=
+d on
+> > > INTEL_PMC_CORE and drop the #if .
 
-Note that we also have an ongoing discussion because of the AR803x PHYs
-and their default-enabled hibernation mode, for which I've proposed
-this patch. I haven't considered whether it should impact the resume
-problem - it probably _should_ and it should probably cause the PHY to
-resume outputting its clock when it resumes (which should have already
-happened by the time stmmac begins resuming.)
+Sure. Thanks.
 
-However, as no one seems prepared to constructively comment on either
-my proposal nor (so far) the patch, there's no guarantee that we'll
-merge the change below.
+David
 
-So, right now I've no idea what's going to become of stmmac and its
-requirement to have RXC always present. It seems there's multiple
-issues that that requirement causes.
+> >=20
+> > Regards,
+> >=20
+> > Hans
+> >=20
+> >=20
+> >=20
+> >=20
+> >=20
+> >=20
+> > > > ---
+> > > > =C2=A0MAINTAINERS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 1 +
+> > > > =C2=A0drivers/platform/x86/intel/pmc/core.c=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 | 60 +++++++++++++++++++
+> > > > =C2=A0.../linux/platform_data/x86/intel_pmc_core.h=C2=A0 | 41 +++++=
+++++++++
+> > > > =C2=A03 files changed, 102 insertions(+)
+> > > > =C2=A0create mode 100644 include/linux/platform_data/x86/intel_pmc_=
+core.h
+> > > >=20
+> > > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > > index 069e176d607a..8a034dee9da9 100644
+> > > > --- a/MAINTAINERS
+> > > > +++ b/MAINTAINERS
+> > > > @@ -10648,6 +10648,7 @@ L:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0platf=
+orm-driver-x86@vger.kernel.org
+> > > > =C2=A0S:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Maintained
+> > > > =C2=A0F:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Documentation/ABI/testing/sys=
+fs-platform-intel-pmc
+> > > > =C2=A0F:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0drivers/platform/x86/intel/pm=
+c/
+> > > > +F:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0linux/platform_data/x86/intel_pmc_=
+core.h
+> > > > =C2=A0
+> > > > =C2=A0INTEL PMIC GPIO DRIVERS
+> > > > =C2=A0M:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Andy Shevchenko <andy@kernel.=
+org>
+> > > > diff --git a/drivers/platform/x86/intel/pmc/core.c > >
+> > > > b/drivers/platform/x86/intel/pmc/core.c
+> > > > index 5a36b3f77bc5..6fb1b0f453d8 100644
+> > > > --- a/drivers/platform/x86/intel/pmc/core.c
+> > > > +++ b/drivers/platform/x86/intel/pmc/core.c
+> > > > @@ -20,6 +20,7 @@
+> > > > =C2=A0#include <linux/pci.h>
+> > > > =C2=A0#include <linux/slab.h>
+> > > > =C2=A0#include <linux/suspend.h>
+> > > > +#include <linux/platform_data/x86/intel_pmc_core.h>
+> > > > =C2=A0
+> > > > =C2=A0#include <asm/cpu_device_id.h>
+> > > > =C2=A0#include <asm/intel-family.h>
+> > > > @@ -28,6 +29,8 @@
+> > > > =C2=A0
+> > > > =C2=A0#include "core.h"
+> > > > =C2=A0
+> > > > +#define PMC_IPCS_PARAM_COUNT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 7
+> > > > +
+> > > > =C2=A0/* Maximum number of modes supported by platfoms that has low=
+ power
+> > > > mode > > capability */
+> > > > =C2=A0const char *pmc_lpm_modes[] =3D {
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"S0i2.0",
+> > > > @@ -53,6 +56,63 @@ const struct pmc_bit_map msr_map[] =3D {
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{}
+> > > > =C2=A0};
+> > > > =C2=A0
+> > > > +int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf)
+> > > > +{
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct acpi_buffer buffe=
+r =3D { ACPI_ALLOCATE_BUFFER, NULL };
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0union acpi_object params=
+[PMC_IPCS_PARAM_COUNT] =3D {
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0{.type =3D ACPI_TYPE_INTEGER,},
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0};
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct acpi_object_list =
+arg_list =3D { PMC_IPCS_PARAM_COUNT,
+> > > > params };
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0union acpi_object *obj;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int status;
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!ipc_cmd || !rbuf)
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return -EINVAL;
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 0: IPC Command
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 1: IPC Sub Command
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 2: Size
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 3-6: Write Buffer for=
+ offset
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[0].integer.value =
+=3D ipc_cmd->cmd;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[1].integer.value =
+=3D ipc_cmd->sub_cmd;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[2].integer.value =
+=3D ipc_cmd->size;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[3].integer.value =
+=3D ipc_cmd->wbuf[0];
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[4].integer.value =
+=3D ipc_cmd->wbuf[1];
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[5].integer.value =
+=3D ipc_cmd->wbuf[2];
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params[6].integer.value =
+=3D ipc_cmd->wbuf[3];
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0status =3D acpi_evaluate=
+_object(NULL, "\\IPCS", &arg_list,
+> > > > &buffer);
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ACPI_FAILURE(status)=
+)
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return -ENODEV;
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0obj =3D buffer.pointer;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Check if the number o=
+f elements in package is 5 */
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (obj && obj->type =3D=
+=3D ACPI_TYPE_PACKAGE && obj->package.count
+> > > > =3D=3D > > 5) {
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0const union acpi_object *objs =3D obj->package.elem=
+ents;
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0if ((u8)objs[0].integer.value !=3D 0)
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret=
+urn -EINVAL;
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0rbuf[0] =3D objs[1].integer.value;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0rbuf[1] =3D objs[2].integer.value;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0rbuf[2] =3D objs[3].integer.value;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0rbuf[3] =3D objs[4].integer.value;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return -EINVAL;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > > > +
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+> > > > +}
+> > > > +EXPORT_SYMBOL(intel_pmc_core_ipc);
+> > > > +
+> > > > =C2=A0static inline u32 pmc_core_reg_read(struct pmc *pmc, int reg_=
+offset)
+> > > > =C2=A0{
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return readl(pmc->r=
+egbase + reg_offset);
+> > > > diff --git a/include/linux/platform_data/x86/intel_pmc_core.h > >
+> > > > b/include/linux/platform_data/x86/intel_pmc_core.h
+> > > > new file mode 100644
+> > > > index 000000000000..9bb3394fedcf
+> > > > --- /dev/null
+> > > > +++ b/include/linux/platform_data/x86/intel_pmc_core.h
+> > > > @@ -0,0 +1,41 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > > +/*
+> > > > + * Intel Core SoC Power Management Controller Header File
+> > > > + *
+> > > > + * Copyright (c) 2023, Intel Corporation.
+> > > > + * All Rights Reserved.
+> > > > + *
+> > > > + * Authors: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> > > > + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 David E. =
+Box <david.e.box@linux.intel.com>
+> > > > + */
+> > > > +#ifndef INTEL_PMC_CORE_H
+> > > > +#define INTEL_PMC_CORE_H
+> > > > +
+> > > > +#define IPC_SOC_REGISTER_ACCESS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00xAA
+> > > > +#define IPC_SOC_SUB_CMD_READ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A00x00
+> > > > +#define IPC_SOC_SUB_CMD_WRITE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00x0=
+1
+> > > > +
+> > > > +struct pmc_ipc_cmd {
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 cmd;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 sub_cmd;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 size;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 wbuf[4];
+> > > > +};
+> > > > +
+> > > > +#if IS_ENABLED(CONFIG_INTEL_PMC_CORE)
+> > > > +/**
+> > > > + * intel_pmc_core_ipc() - PMC IPC Mailbox accessor
+> > > > + * @ipc_cmd:=C2=A0 struct pmc_ipc_cmd prepared with input to send
+> > > > + * @rbuf:=C2=A0=C2=A0=C2=A0=C2=A0 Allocated u32[4] array for retur=
+ned IPC data
+> > > > + *
+> > > > + * Return: 0 on success. Non-zero on mailbox error
+> > > > + */
+> > > > +int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf);
+> > > > +#else
+> > > > +static inline int intel_pmc_core_ipc(struct pmc_ipc_cmd *ipc_cmd, =
+u32 >
+> > > > > *rbuf)
+> > > > +{
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -ENODEV;
+> > > > +}
+> > > > +#endif /* CONFIG_INTEL_PMC_CORE */
+> > > > +
+> > > > +#endif /* INTEL_PMC_CORE_H */
+> >=20
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fcab363d8dfa..a954f1d61709 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1254,6 +1254,11 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 			~(MAC_10HD | MAC_100HD | MAC_1000HD);
- 	priv->phylink_config.mac_managed_pm = true;
- 
-+	/* stmmac always requires a receive clock in order for things like
-+	 * hardware reset to work.
-+	 */
-+	priv->phylink_config.mac_requires_rxc = true;
-+
- 	phylink = phylink_create(&priv->phylink_config, fwnode,
- 				 mode, &stmmac_phylink_mac_ops);
- 	if (IS_ERR(phylink))
-diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 13c4121fa309..619a63a0d14f 100644
---- a/drivers/net/phy/at803x.c
-+++ b/drivers/net/phy/at803x.c
-@@ -990,7 +990,8 @@ static int at803x_hibernation_mode_config(struct phy_device *phydev)
- 	/* The default after hardware reset is hibernation mode enabled. After
- 	 * software reset, the value is retained.
- 	 */
--	if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE))
-+	if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE) &&
-+	    !(phydev->dev_flags & PHY_F_RXC_ALWAYS_ON))
- 		return 0;
- 
- 	return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 4f1c8bb199e9..6568a2759101 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1830,6 +1830,8 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
- static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
- 			      phy_interface_t interface)
- {
-+	u32 flags = 0;
-+
- 	if (WARN_ON(pl->cfg_link_an_mode == MLO_AN_FIXED ||
- 		    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
- 		     phy_interface_mode_is_8023z(interface) && !pl->sfp_bus)))
-@@ -1838,7 +1840,10 @@ static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
- 	if (pl->phydev)
- 		return -EBUSY;
- 
--	return phy_attach_direct(pl->netdev, phy, 0, interface);
-+	if (pl->config.mac_requires_rxc)
-+		flags |= PHY_F_RXC_ALWAYS_ON;
-+
-+	return phy_attach_direct(pl->netdev, phy, flags, interface);
- }
- 
- /**
-@@ -1941,6 +1946,9 @@ int phylink_fwnode_phy_connect(struct phylink *pl,
- 		pl->link_config.interface = pl->link_interface;
- 	}
- 
-+	if (pl->config.mac_requires_rxc)
-+		flags |= PHY_F_RXC_ALWAYS_ON;
-+
- 	ret = phy_attach_direct(pl->netdev, phy_dev, flags,
- 				pl->link_interface);
- 	phy_device_free(phy_dev);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index ba08b0e60279..79df5e01707d 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -761,6 +761,7 @@ struct phy_device {
- 
- /* Generic phy_device::dev_flags */
- #define PHY_F_NO_IRQ		0x80000000
-+#define PHY_F_RXC_ALWAYS_ON	BIT(30)
- 
- static inline struct phy_device *to_phy_device(const struct device *dev)
- {
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 789c516c6b4a..a83c1a77338f 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -204,6 +204,7 @@ enum phylink_op_type {
-  * @poll_fixed_state: if true, starts link_poll,
-  *		      if MAC link is at %MLO_AN_FIXED mode.
-  * @mac_managed_pm: if true, indicate the MAC driver is responsible for PHY PM.
-+ * @mac_requires_rxc: if true, the MAC always requires a receive clock from PHY.
-  * @ovr_an_inband: if true, override PCS to MLO_AN_INBAND
-  * @get_fixed_state: callback to execute to determine the fixed link state,
-  *		     if MAC link is at %MLO_AN_FIXED mode.
-@@ -216,6 +217,7 @@ struct phylink_config {
- 	enum phylink_op_type type;
- 	bool poll_fixed_state;
- 	bool mac_managed_pm;
-+	bool mac_requires_rxc;
- 	bool ovr_an_inband;
- 	void (*get_fixed_state)(struct phylink_config *config,
- 				struct phylink_link_state *state);
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
