@@ -1,205 +1,81 @@
-Return-Path: <netdev+bounces-26569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FE57782C1
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:33:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A442E7782C3
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19DE281C29
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:33:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2DD9281CE7
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D8F23BDE;
-	Thu, 10 Aug 2023 21:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C29A23BE6;
+	Thu, 10 Aug 2023 21:40:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA00A25142
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 21:33:24 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D59D12C
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691703203; x=1723239203;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=AmabJGLg0jwGpcubRRQU/fxIpqJ9OfQS8o+H0LWfJyo=;
-  b=mGmTVajHkumnQdpk8fvzhHsExe4z7WhjYRJ07BcM1zb2cd+78wZKNB31
-   9ipN+bTcbkoFsBc5BI/p5vvyT76U1SPZhZ0hehQBgYqs4xfU+XofUwFBP
-   beIztsz8W3n9G5qbvxVs+FQf91nnsfZ92KyBjlCIM8ocu4mme+zH4UCUx
-   e6OnbOU/Be/cR+XYcUHn9YusFL9Y4W8KqKHiZVaW/AiIz2aRT2WnC41mf
-   GcpjFun4VgsklzbCvy2NuTrA+kjjzlKozmNMM/5jVnWhXPz5vO0JhM/Vp
-   BFM5164dCHrHFyi+d6sWF6LZKs9XC7+he963Yej/Kdeemthb4VMjm9vE3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="361664270"
-X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
-   d="scan'208";a="361664270"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 14:33:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="822408929"
-X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
-   d="scan'208";a="822408929"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Aug 2023 14:33:22 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 10 Aug 2023 14:33:21 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 10 Aug 2023 14:33:21 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 10 Aug 2023 14:33:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EpDyh7it0VnXq+BPEPK7pyk8IHm+FnX0aYacxIt0zS7oG8f6hO7X10Z44Z9KxxrOy9G7wsDj4o5NZXkTtFU9h8jtm4H6ynpSCa0A6pa0x/c/yvAP6PN2lh3TQRPpsY7TWBITl+V3BL0g7ZNw9ZmLRldAOOWD/OTwx7ehtVSuauImSZV7RjfcNkZ5Vokkm3ZsP3kaye+frSFdjIWubl0El+SFR/W5Vemp5pBca9pnyX6jDINJNtMDiA94k4SOYZERX3lD1HCqmejjMKlMvXYC3GFMQrRvhvJP5zMj9xwGHhhda+WHNMY+RrA7y2Hxpeg+KvJ5StZ5e3x5oRQobZfRTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xMyMjIc/zBkWCLDTSkR/Fs78P6ab4QpasY7uM0jdL8U=;
- b=MHEQeT9GHpjbl8FlrRXWp5WSoi98lebCghJaf4WowmNUXLpxa4LhwJBiQCOsNAF51JlyZE7N7J50EdvIiE3DPle8RPMczJo6CnWJbSJjJm0zxZ/a1nNDoqbTyf3rjydKcvbbkK0dCpjOvJ430SQcGgzQapdXmObWmiyHpxWhUB9vO6CsvdyKnFd0SFM9PDG4oeMNzi8sRhlHivcko23+VjLmk5Lb5WNBJgSkSC8YK2Ur3Afdvfj6Wk8x6Kyyg6H6ipr005Lhrw+C4TbVcfLZ0OHkGbZVt5ULCzJRe3a3455l9dFRWmW3Csu908K0YG3jxOxh4vHOVb7RIOSuLmZekA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN6PR11MB3229.namprd11.prod.outlook.com (2603:10b6:805:ba::28)
- by SA2PR11MB4969.namprd11.prod.outlook.com (2603:10b6:806:111::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 21:33:20 +0000
-Received: from SN6PR11MB3229.namprd11.prod.outlook.com
- ([fe80::5c09:3f09:aae8:6468]) by SN6PR11MB3229.namprd11.prod.outlook.com
- ([fe80::5c09:3f09:aae8:6468%6]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 21:33:20 +0000
-Message-ID: <16c05f6d-e971-b487-6eb8-ba5e2bcd658e@intel.com>
-Date: Thu, 10 Aug 2023 14:33:16 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH iwl-net v1] ice: fix receive buffer size miscalculation
-Content-Language: en-US
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>
-References: <20230810002313.421684-1-jesse.brandeburg@intel.com>
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20230810002313.421684-1-jesse.brandeburg@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0113.namprd04.prod.outlook.com
- (2603:10b6:303:83::28) To SN6PR11MB3229.namprd11.prod.outlook.com
- (2603:10b6:805:ba::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9C322F02;
+	Thu, 10 Aug 2023 21:40:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A2DCBC433C8;
+	Thu, 10 Aug 2023 21:40:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691703651;
+	bh=jt/NUvha+AYuETQysbUBUq/dMQaLn0OJNT63dU0S4O4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CRiK0Vu2oY6CBNly+YV8KfDusbwR8fqYoLyGRqLu2df24sdtBxlqLD28VxhQSUBpX
+	 jsSKIEnimRCYbf48JL3/vydWN+hDMKWEltmuQ3vEyDvVJ2wTbfVsYlxvrYFLoefhGt
+	 dS3GyeuAGCb3c7qme3d75n8IRNUYkjldAgupWvf8AGqwpnL+ZHF+dnsDP/1m1lLuZ4
+	 IQsHgb4oQ7Am3tNbBY+hGKZZzv3uA0+ncQYZpg8AprGOBfieG/4PITNcDBnc8NMQMv
+	 iP8UGDM3lEsMCPXy9aC/5Jls9c55d4fw7PTfVjzDO9FojZkBKHcrSEYZOvzI6rdCs7
+	 d7arnJTGBBDhA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E756C595D0;
+	Thu, 10 Aug 2023 21:40:51 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR11MB3229:EE_|SA2PR11MB4969:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a0acc3d-d4c9-4bfc-d6be-08db99e96abc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: G12J4NJwpoJsl0XSHIMEmveYsNVt+EJRd2y74E6VNAQ/5sKbhwQF2w+TotOP2TX6C8/yTjBqVjuSt2HsUcDGL7o2b5z0ThtN/tlx25Cu4Sk3K1dzZ07cLKSZBIEuGzN2BqxITrud6OTwvJy2hm9lIkjG1sm1V5W7bwDotdn1S0jAgcjeCaLU4NnZO92xI6Ch4XXrTe2uZSuf6nxRIhvIV3fZBTtBnkKFu3A3hBpNhEF3wwg2QSo7rYIMrTxCIHoF/3nLgDguLpDJJxi3muiAk31ZLicgO1UJsmDkenTRRyWeyzyO5ryOHOuHAXik2G9n6foH/20VhV69pGZ2rPRMlZB9BnEKn6AyRbzg6TDPZs4jdruhb6U6FKgmgxnWyYfiuICZMH9rZOnq6MREhU11RBdX6WmPBtQpNsXX5pAt8uXucv/vchjfCbmIyP9pMjW8+fLKs/B0Yc8j13lNUcvKT/XxRrupPzQHqNhJhdsnTxuShjYmYzmcBxPzE6yBqTnhgMZ/idHq/DgSruDEFC2f09+ycQSExJTfTsvt/EuxmtY9c4BhqcrgbMwMNpcJpl4v8lTrHnw2eJ/m1sY0//WXbp3C7xqA1tONiHz4xWIHV49Q7PHI9sCZBx4EYlt7Tce2onhDQBBmZnOZzVIIRVDahA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3229.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(346002)(396003)(136003)(376002)(186006)(1800799006)(451199021)(31686004)(66946007)(6506007)(26005)(66476007)(478600001)(6666004)(53546011)(36756003)(66556008)(83380400001)(2616005)(41300700001)(82960400001)(316002)(4326008)(6512007)(6486002)(2906002)(86362001)(31696002)(8936002)(8676002)(5660300002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZDVFTElNM3QwTHlhZTlXNkUrUDRlLzNLUVVEa0c1KzlRclZORzBvNERxaWNM?=
- =?utf-8?B?SHdsd0tvbG5YWVE5dFpUSlFCS04wQ1dRa2tDUDZSRXpmeWwwaEZzVHZQelZH?=
- =?utf-8?B?a0hyWHlHam54L0VRY2NUd0VqYk9IWUp5MGk5MEtSOStMcU9VbHA1VTkxUnNS?=
- =?utf-8?B?N0ZBY0VoUldLeEpkRi9ERENjNHZTZmx5RXhxbGJQalFOMUIwWUdlRXFKakV2?=
- =?utf-8?B?amF2SGdMaHFYY242REg5V1MwZW50b3lGcmJxQWRoV1NWbVlsS3VsTHJ6ankv?=
- =?utf-8?B?dXg1UmpWYyt3T0NmUzNacWZCQkJ1MWR1Q0tVcVJqVjdmZFRBcWVKWk9PeUdY?=
- =?utf-8?B?MTVHS0RRQnBHSDd1U1kzSjBRL0RnZTIyK1ArVGVreG1YazBhdStlVWczTFFH?=
- =?utf-8?B?bHRPTU41cHVqWlhpTEVxVHJUMUxpRzZEQkJUazVEaDdvNUZZbWdiMmVwdVNh?=
- =?utf-8?B?U1l2a1k5UlAwRzFuZUFCWnZQbWJOYWMzMThKUTJtNE93ZmhEbFhZaHBPOFFy?=
- =?utf-8?B?YVhWK210eUNrZ3BPRzh0M0RVTzlQb1REVnVWMGZvL252eXBsUmM4ZUdBek0z?=
- =?utf-8?B?Zmw0Tkxnb2cyYzMyZWppMHFXclFGT0tXOFZ6UG9IZDNOM2hNWEl0R2M2UGVv?=
- =?utf-8?B?eDAvZXVvd2pRaXFtUGYxeTZ5SGtmUzFBV3RGb0dSWm5DUWhDV3hRMzkra25y?=
- =?utf-8?B?d1o3SzhEUHFoRDBPSXo0L1Y2WE9tVnByQzF4ckRUZXpCQmRSVElXVjVKUS9I?=
- =?utf-8?B?am44QWtLWkJBc0lkSHBIc0dZd012TkZrLzYxMmViUlpld0VaL1NvMmVWQzBN?=
- =?utf-8?B?L2hZTVhsRGNXWGMwS2lONjNWRGl5ZzJLbTJZK29kT3ZmbmRucFJjYkhoODY3?=
- =?utf-8?B?eEYyWkI4YnR5R01FOU80OEt4OTV6UVFFZnRyaUdSWFFrc1hzU3p2bFdobnN4?=
- =?utf-8?B?S2ZzSjNtTFZldjJpd3hBYytNWjF6bWVCbS9XRno0WHdrWmszTWI5UFhsMklm?=
- =?utf-8?B?bEZZamUzSnBMSHVzUVB3SzhDeExlQ3p1UU55eVg0Nis3Q1Z2VjZSdXNVd3dP?=
- =?utf-8?B?aFRUV2kvazluaGNzcjBEeVp0Q2JMTWM5Vjg2SGkrVU0yYmJHNHZkVG5rK0Rh?=
- =?utf-8?B?Ly9XbVQvUlIrRUFOcm82VFZZSHdGS3UzblFQMWN4c0Fjemo2Q3BDbHBPUlJ5?=
- =?utf-8?B?eE8xTkNOT3o4STFuUHozMFJjbitSQjl0aFdwdWVnOEhMdDVLN2hXcTN5L2F5?=
- =?utf-8?B?VTB6MkE2bnZSM1lyQnVLYWVNZkNsckltWlZPUEx3VmhaRzJvY29Ncmd4aXUz?=
- =?utf-8?B?MEY3VitvQUhtVkZ5QUJLNkZuSG41b2h2RDZvSGhhNGdTeThtaHY3QUZnVnBZ?=
- =?utf-8?B?K0ozalBxK2tnZWMyVDFNSkRuNWVWcy9DamozQnhuNFNLYzBaVmtTcEpLZG83?=
- =?utf-8?B?QzNnY1R5SmcySXlpd3AvUmNMN28vVm0zS0lZUGdIL2hsamg2SmNnZitJOU9T?=
- =?utf-8?B?Q3JrMXpYRTRCQUp3c0dQbFhHMHVkUUFjSUNRMHdCQXNvT3B6ZEluQk9reHho?=
- =?utf-8?B?VEQvaTV5a0hPR1BNQzYvVWZ1aDJ5bFlJNmxyclhPaG03TE1aRFlZSE1WWDRt?=
- =?utf-8?B?MVhrbC9QTUZXYlRpdzJSN05na3VXcDhBanQ1L0I0US9oaVhGK2RVcEhEVmZX?=
- =?utf-8?B?R205VWVuay85OUJxTlFLWjVyUFNnQ2xGM0FaNFVjS2dMZDFJSGI2SitCRDdz?=
- =?utf-8?B?eE0zTHhkc1FKSlMzQUVoR09VdFp4MXROZmlVVkx4QWhZeEVVVFpLb21yVGs3?=
- =?utf-8?B?aGZqMGtQV09DRGlZcVZFYkdUck9NWUY5aWovYm45UjdoL2lRN3g4Rnd3Mis4?=
- =?utf-8?B?VHA1SDI4d0RodlRXNXlmL2xGZlg1cld3bzE3K3ZVZVo2VVFFaEd6V1lKR1BX?=
- =?utf-8?B?eGtqL3RUdnRINXlpVzdvQVlCcUpPVHlFRUJNdUZIOUNGSW9QaFF4TDF1Unhw?=
- =?utf-8?B?d2R4bnl2STlFU1lwbnRQQWtHRUpKUVBvV2pweHpUVnhLVmF4YWt3ZXFmb0xp?=
- =?utf-8?B?V1A2ZEZVQUlzVHZCUjR2WVV2QTd5eFZCZ1Vyd1ExQ2xrd0YwMDJPM1Ura2Fo?=
- =?utf-8?B?LytTVkxvc05kWjYrejgzbThtdzUwUkN5SE9ZSWFIZFdEY2p4bDRENU9lYzcr?=
- =?utf-8?B?RFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a0acc3d-d4c9-4bfc-d6be-08db99e96abc
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3229.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 21:33:20.1607
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L0SS4aPMHafyd2RD+LwdTj8dhqaMyKkO3dvOidSAmAjHBdS+7VG43KLeV1p1cxFvqs5BnPgK4hUBlNQ0r1crxPDQ82/cUTnoQ1RVZE3G18g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4969
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2023-08-09
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169170365144.3628.7011774572938196429.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Aug 2023 21:40:51 +0000
+References: <20230810055123.109578-1-martin.lau@linux.dev>
+In-Reply-To: <20230810055123.109578-1-martin.lau@linux.dev>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, daniel@iogearbox.net, andrii@kernel.org, ast@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
+Hello:
 
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 8/9/2023 5:23 PM, Jesse Brandeburg wrote:
-> The driver is misconfiguring the hardware for some values of MTU such that
-> it could use multiple descriptors to receive a packet when it could have
-> simply used one.
+On Wed,  9 Aug 2023 22:51:23 -0700 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> Change the driver to use a round-up instead of the result of a shift, as
-> the shift can truncate the lower bits of the size, and result in the
-> problem noted above. It also aligns this driver with similar code in i40e.
+> The following pull-request contains BPF updates for your *net-next* tree.
 > 
-> The insidiousness of this problem is that everything works with the wrong
-> size, it's just not working as well as it could, as some MTU sizes end up
-> using two or more descriptors, and there is no way to tell that is
-> happening without looking at ice_trace or a bus analyzer.
-
-This should have a Fixes: ?
-
-> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_base.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> We've added 19 non-merge commits during the last 6 day(s) which contain
+> a total of 25 files changed, 369 insertions(+), 141 deletions(-).
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-> index b678bdf96f3a..074bf9403cd1 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_base.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
-> @@ -435,7 +435,8 @@ static int ice_setup_rx_ctx(struct ice_rx_ring *ring)
->   	/* Receive Packet Data Buffer Size.
->   	 * The Packet Data Buffer Size is defined in 128 byte units.
->   	 */
-> -	rlan_ctx.dbuf = ring->rx_buf_len >> ICE_RLAN_CTX_DBUF_S;
-> +	rlan_ctx.dbuf = DIV_ROUND_UP(ring->rx_buf_len,
-> +				     BIT_ULL(ICE_RLAN_CTX_DBUF_S));
->   
->   	/* use 32 byte descriptors */
->   	rlan_ctx.dsize = 1;
+> [...]
+
+Here is the summary with links:
+  - pull-request: bpf-next 2023-08-09
+    https://git.kernel.org/netdev/net-next/c/6a1ed1430daa
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
