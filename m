@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-26404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB378777B6F
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 16:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2B9777B7C
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2ECF1C215CF
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:57:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7FB01C21567
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79FC1200A6;
-	Thu, 10 Aug 2023 14:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC12200BC;
+	Thu, 10 Aug 2023 15:00:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F13B1E1A2
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 14:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90FE1E1A2
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 15:00:46 +0000 (UTC)
 Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237E826B2;
-	Thu, 10 Aug 2023 07:57:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCA426A0;
+	Thu, 10 Aug 2023 08:00:45 -0700 (PDT)
 Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AClMGg009215;
-	Thu, 10 Aug 2023 16:57:15 +0200
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37AClMae009212;
+	Thu, 10 Aug 2023 17:00:21 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	message-id:date:mime-version:subject:to:cc:references:from
 	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=uWaBWJYxBkUNO48/o8MmvLtGPToyy8i14IR+7MRvnVU=; b=ET
-	+ak5sm+bza9rbhYKy9OYWDH+7jI8wIfqqW+6gtYW6ArRE2y+T2GH/GDOe1VWpkh0
-	uO81R2KumLG1bUdEzD8kG1xM3omWHGheT5TfDQMv4/gjO2M/VeIS5vboHjxlzy7O
-	7WwXFuc6JrWh+Vz8iD1+SleOjZ4CX2b8YJ5j84DBIx6aZe5VcwB8AAiUsPoBkOED
-	frHc81/92al4zLSYM/q1giJL68niF8nUAPe+MpQ1sODLT7YWrj+klr/45GF8Uw51
-	CzRndY8gkqsWpEqutLCcpLYt377IQ1SBT+h9mnoHOv92MAgCfcP66iCHLEGjSqXd
-	K0GXH9lKMdicU2T1YRKQ==
+	selector1; bh=GQgfxqFc/KsVSkK1DjWFr9HlyK6ZRhaXW7uJy3wWGoM=; b=Vs
+	hS5ujlDlKys7kWQYBg+YwF/nNc1Cd7OqmDaBiOygz9e97staIKZIzMntgeJ8zOym
+	dQk3SgBzOXD/MxOxdCPlB1LimuwVChzKjqDzWkl/7a08YWwApZsLFmjoqWZfuDgD
+	IDI1CqtjSa25QDFxb542dlLM11BLBhyMIS5DjF5zOxuymjP211zPp5wMKsu9h4Bl
+	MqB0bSNIkFq/7FNMH83Yca4qrAZHRpkIAyU6fXq7NAxHI9GaqdTX2W6F82ANv3Qe
+	/wRafxGnMK/42ns7FlFxd2r3WREoO+7jsY66SGDSmRfDMhPubuQH66c7Eaw87uDh
+	KqNfyj5MGl64Z3ARXFMA==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sd0730ph1-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sd0730pxw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Aug 2023 16:57:15 +0200 (MEST)
+	Thu, 10 Aug 2023 17:00:21 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 92AFF100053;
-	Thu, 10 Aug 2023 16:57:01 +0200 (CEST)
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B4267100053;
+	Thu, 10 Aug 2023 17:00:20 +0200 (CEST)
 Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 893DA2248B0;
-	Thu, 10 Aug 2023 16:57:01 +0200 (CEST)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 85A572248C8;
+	Thu, 10 Aug 2023 17:00:20 +0200 (CEST)
 Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
  (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
- 2023 16:57:00 +0200
-Message-ID: <43ea0060-ed69-4efe-4a39-224aa67ae9b8@foss.st.com>
-Date: Thu, 10 Aug 2023 16:57:00 +0200
+ 2023 17:00:19 +0200
+Message-ID: <b3f5c37b-0bc5-f2b7-4132-509b4da7509e@foss.st.com>
+Date: Thu, 10 Aug 2023 17:00:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,30 +58,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH net-next v3 10/10] net: stmmac: platform: support parsing
- per channel irq from DT
+Subject: Re: [PATCH net-next] net: stmmac: don't create the MDIO bus if
+ there's no mdio node on DT
 Content-Language: en-US
-To: Jisheng Zhang <jszhang@kernel.org>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20230809165007.1439-1-jszhang@kernel.org>
- <20230809165007.1439-11-jszhang@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Jose Abreu <joabreu@synopsys.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>,
+        Alex Elder <elder@linaro.org>,
+        Srini
+ Kandagatla <srinivas.kandagatla@linaro.org>,
+        Andrew Halaney
+	<ahalaney@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20230808120254.11653-1-brgl@bgdev.pl>
 From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20230809165007.1439-11-jszhang@kernel.org>
+In-Reply-To: <20230808120254.11653-1-brgl@bgdev.pl>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.201.21.122]
@@ -96,96 +92,78 @@ X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/9/23 18:50, Jisheng Zhang wrote:
-> The snps dwmac IP may support per channel interrupt. Add support to
-> parse the per channel irq from DT.
+On 8/8/23 14:02, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> The stmmac_dt_phy() function that parses the device-tree node of the MAC
+> and allocates the MDIO and PHY resources misses one use-case: when the
+> MAC doesn't have a fixed link but also doesn't define its own mdio bus
+> on the device tree and instead shares the MDIO lines with a different
+> MAC with its PHY phandle reaching over into a different node.
+> 
+> As this function could also use some more readability, rework it to
+> handle this use-case and simplify the code.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
->   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 10 ++++----
->   .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++++++++++++++++++
->   2 files changed, 29 insertions(+), 4 deletions(-)
+>   .../ethernet/stmicro/stmmac/stmmac_platform.c | 26 +++++++++----------
+>   1 file changed, 13 insertions(+), 13 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 4ed5c976c7a3..245eeb7d3e83 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -3612,7 +3612,7 @@ static int stmmac_request_irq_multi(struct net_device *dev)
->   	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
->   		if (i >= MTL_MAX_RX_QUEUES)
->   			break;
-> -		if (priv->rx_irq[i] == 0)
-> +		if (priv->rx_irq[i] <= 0)
-
-What do you fix here ?
-
->   			continue;
->   
->   		int_name = priv->int_name_rx_irq[i];
-> @@ -3637,7 +3637,7 @@ static int stmmac_request_irq_multi(struct net_device *dev)
->   	for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
->   		if (i >= MTL_MAX_TX_QUEUES)
->   			break;
-> -		if (priv->tx_irq[i] == 0)
-> +		if (priv->tx_irq[i] <= 0)
-
-same here
->   			continue;
->   
->   		int_name = priv->int_name_tx_irq[i];
-> @@ -7278,8 +7278,10 @@ int stmmac_dvr_probe(struct device *device,
->   	priv->plat = plat_dat;
->   	priv->ioaddr = res->addr;
->   	priv->dev->base_addr = (unsigned long)res->addr;
-> -	priv->plat->dma_cfg->perch_irq_en =
-> -		(priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN);
-> +	if (res->rx_irq[0] > 0 && res->tx_irq[0] > 0) {
-> +		priv->plat->flags |= STMMAC_FLAG_PERCH_IRQ_EN;
-> +		priv->plat->dma_cfg->perch_irq_en = true;
-> +	}
->   
->   	priv->dev->irq = res->irq;
->   	priv->wol_irq = res->wol_irq;
 > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index 29145682b57b..9b46775b41ab 100644
+> index be8e79c7aa34..91844673df43 100644
 > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -705,6 +705,9 @@ EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
->   int stmmac_get_platform_resources(struct platform_device *pdev,
->   				  struct stmmac_resources *stmmac_res)
+> @@ -320,12 +320,14 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+>   static int stmmac_dt_phy(struct plat_stmmacenet_data *plat,
+>   			 struct device_node *np, struct device *dev)
 >   {
-> +	char irq_name[8];
-> +	int i;
-> +
->   	memset(stmmac_res, 0, sizeof(*stmmac_res));
+> -	bool mdio = !of_phy_is_fixed_link(np);
+>   	static const struct of_device_id need_mdio_ids[] = {
+>   		{ .compatible = "snps,dwc-qos-ethernet-4.10" },
+>   		{},
+>   	};
 >   
->   	/* Get IRQ information early to have an ability to ask for deferred
-> @@ -738,6 +741,26 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
->   		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
+> +	if (of_phy_is_fixed_link(np))
+> +		return 0;
+> +
+>   	if (of_match_node(need_mdio_ids, np)) {
+>   		plat->mdio_node = of_get_child_by_name(np, "mdio");
+>   	} else {
+> @@ -340,20 +342,18 @@ static int stmmac_dt_phy(struct plat_stmmacenet_data *plat,
+>   		}
 >   	}
 >   
-> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
-> +		snprintf(irq_name, sizeof(irq_name), "rx%i", i);
-> +		stmmac_res->rx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
-> +		if (stmmac_res->rx_irq[i] < 0) {
-> +			if (stmmac_res->rx_irq[i] == -EPROBE_DEFER)
-> +				return -EPROBE_DEFER;
-> +			break;
-> +		}
-> +	}
+> -	if (plat->mdio_node) {
+> -		dev_dbg(dev, "Found MDIO subnode\n");
+> -		mdio = true;
+> -	}
+> +	if (!plat->mdio_node)
+> +		return 0;
+>   
+> -	if (mdio) {
+> -		plat->mdio_bus_data =
+> -			devm_kzalloc(dev, sizeof(struct stmmac_mdio_bus_data),
+> -				     GFP_KERNEL);
+> -		if (!plat->mdio_bus_data)
+> -			return -ENOMEM;
+> +	dev_dbg(dev, "Found MDIO subnode\n");
+>   
+> -		plat->mdio_bus_data->needs_reset = true;
+> -	}
+> +	plat->mdio_bus_data = devm_kzalloc(dev,
+> +					   sizeof(struct stmmac_mdio_bus_data),
+> +					   GFP_KERNEL);
+> +	if (!plat->mdio_bus_data)
+> +		return -ENOMEM;
 > +
-> +	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-> +		snprintf(irq_name, sizeof(irq_name), "tx%i", i);
-> +		stmmac_res->tx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
-> +		if (stmmac_res->tx_irq[i] < 0) {
-> +			if (stmmac_res->tx_irq[i] == -EPROBE_DEFER)
-> +				return -EPROBE_DEFER;
-> +			break;
-> +		}
-> +	}
-> +
->   	stmmac_res->sfty_ce_irq = platform_get_irq_byname_optional(pdev, "sfty_ce");
->   	if (stmmac_res->sfty_ce_irq < 0) {
->   		if (stmmac_res->sfty_ce_irq == -EPROBE_DEFER)
+> +	plat->mdio_bus_data->needs_reset = true;
+>   
+>   	return 0;
+>   }
+
+Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+
+Regards
+Alex
 
 
