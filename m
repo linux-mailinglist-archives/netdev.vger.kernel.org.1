@@ -1,143 +1,119 @@
-Return-Path: <netdev+bounces-26547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E21C7780FB
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:04:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE0E778108
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181FE280D42
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:04:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88280281C83
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F354822EFE;
-	Thu, 10 Aug 2023 19:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACED822F0B;
+	Thu, 10 Aug 2023 19:07:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D9A20FB4
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 19:04:37 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC8C2717
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 12:04:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691694276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f/d485k4GYGK+Hhxc7O7Vh9Y7TOuExVY3FHsGQcP80A=;
-	b=Cb3WdRWfm3vdRov2ecktTcMzdJqThwB6HnpvGwrrBUwMM0CTo3mJPHr45ahxHH48YTez6t
-	8qa+OtIQaGaQtVbjPSe//oKVkC6eIUdi5y+NpvDMyfzQIohiK3phge9DUljZUW4uyHZwpJ
-	IFjRGttr+yWvWqMbAmUJgIPDlGu3gLE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-483-b5vc0xyBNEuHpVhHhxBZTw-1; Thu, 10 Aug 2023 15:04:33 -0400
-X-MC-Unique: b5vc0xyBNEuHpVhHhxBZTw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fe25f8c4bfso8061135e9.2
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 12:04:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08AA20FAC
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 19:07:43 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED4862D4B
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 12:07:40 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bc83a96067so9677115ad.0
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 12:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1691694460; x=1692299260;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nmOwYu+wAsqoAkxbWGneNadnCgLM0c5R8LClfgUNH9I=;
+        b=QkOkm0aFedzWAtuNszKzcm0KrHyY4YEWT0ltIriL5dNGRCGtKtfbjQGZDoRu8PHTGL
+         2q19rGzd320iFiPEMeYLLVjDrO+n8xsOaMVVVB1p6UAnbmbd6CBz92szKDrxxgg9pRQn
+         Rn8S9Iw75DpdEDSpYWSO36hoPOuxO4htgB28E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691694272; x=1692299072;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f/d485k4GYGK+Hhxc7O7Vh9Y7TOuExVY3FHsGQcP80A=;
-        b=XT7WKC0ambUkYISfw4ErbKYNLIT5TpK31QUXbKbcRbI3hXlKbUY4xjbL088rLiQitW
-         bVIB48yb1znpAQ3EXdlBTjQsCZr4a3NJw0PiMTBB/hpLku0EUp126vtO1Mm7Pry7yC/n
-         vSGu4BMSThuh1RCTuPdmQp6V73oxElHDKLNELgRzgMKqKQy0T19wJ8oGX/uRFQkVX0IM
-         fDXxt99y+8wsILHvEtM4KyFftg5GToV/eGhP04VX4Xsba4O3SZ4gsFTWBn9qac6VxuTh
-         oMHnV/pZwNdnqoZjKzIfMuJzd71cFUBj5ojepZFpGZRChW60DaBgYBZewLRLEdz2uxSl
-         PrNw==
-X-Gm-Message-State: AOJu0Yyy0L/5Pu2aZ1omUXDIhLK+dRuhVoE7dJMZQQU1rH7IWixAsKUl
-	nN9bpDRKfd2ken0+ecLxOtejMuPC9AxX+jHfNQRtxOD6WzxP49pW/ih41f2LMjMBOzNisvpPFAm
-	vxEAoFiYPCf0bF+RD
-X-Received: by 2002:a1c:f716:0:b0:3fc:92:73d6 with SMTP id v22-20020a1cf716000000b003fc009273d6mr2665608wmh.11.1691694272141;
-        Thu, 10 Aug 2023 12:04:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH7XXbeFXHjJXPtbXknI7UArQUoxvGNLo3LCjH5yIBicBM7CJNAjsPriiFtN22BWjuicw51CA==
-X-Received: by 2002:a1c:f716:0:b0:3fc:92:73d6 with SMTP id v22-20020a1cf716000000b003fc009273d6mr2665591wmh.11.1691694271848;
-        Thu, 10 Aug 2023 12:04:31 -0700 (PDT)
-Received: from redhat.com ([2.55.27.97])
-        by smtp.gmail.com with ESMTPSA id p16-20020a05600c205000b003fe26bf65e7sm2928355wmg.13.2023.08.10.12.04.29
+        d=1e100.net; s=20221208; t=1691694460; x=1692299260;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nmOwYu+wAsqoAkxbWGneNadnCgLM0c5R8LClfgUNH9I=;
+        b=R5e9GPZDkBLz2GxasPLIetXA8smoaRWgxPIQLinIaFpd4n35PBJpibTyJK4WUyfbtF
+         apooKLCA7JpJP3Em1hs5wzL1AbSnGhMY8Gu69Bvx2smFmNCbN+BogoHpXuZzbepsDOiF
+         xt0ZPRszC4wt8LCLhOqPsH5NllgmU3wV5ngP+4JCsm4j6vbjX4no8ZrPSEndFnSroTaz
+         /SQhDNYOlzkOpEJfMD9IsNUQLsxg8MCdinhgjkN7eaRi9VJnObvfwUpQzUo6yhlIjt9x
+         EzqLI4BRHbwcYF8XRkHEL/LTEEayXlpa55XHDyvPmJ0n2X5i4xTKHMT5qOqcS+OS4ABD
+         W2OQ==
+X-Gm-Message-State: AOJu0YylkL4k/gOp8WZUaxxcVhMRg/W+NalC+zdhe/Z2CGdkEy06Y/Pg
+	snSPzyMX4BqKZqqdPZlgZiVRQA==
+X-Google-Smtp-Source: AGHT+IEmgnGLrUOSbaCk2ycL3uzAZ+J06bwEXpv2ztZy56vch26GG8o6dUtXoEcAdUqVf+nIc0tC+A==
+X-Received: by 2002:a17:902:d4c3:b0:1bb:bc6d:457 with SMTP id o3-20020a170902d4c300b001bbbc6d0457mr3391924plg.36.1691694460449;
+        Thu, 10 Aug 2023 12:07:40 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id r2-20020a170902be0200b001bbbbda70ccsm2134447pls.158.2023.08.10.12.07.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 12:04:31 -0700 (PDT)
-Date: Thu, 10 Aug 2023 15:04:27 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: xieyongji@bytedance.com, jasowang@redhat.com, david.marchand@redhat.com,
-	lulu@redhat.com, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
-Subject: Re: [PATCH v3 0/3] vduse: add support for networking devices
-Message-ID: <20230810150347-mutt-send-email-mst@kernel.org>
-References: <20230705100430.61927-1-maxime.coquelin@redhat.com>
+        Thu, 10 Aug 2023 12:07:39 -0700 (PDT)
+Date: Thu, 10 Aug 2023 12:07:39 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Jan Engelhardt <jengelh@inai.de>
+Cc: Justin Stitt <justinstitt@google.com>, Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-hardening@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/7] netfilter: ipset: refactor deprecated strncpy
+Message-ID: <202308101206.35C628E5@keescook>
+References: <20230809-net-netfilter-v2-0-5847d707ec0a@google.com>
+ <20230809-net-netfilter-v2-1-5847d707ec0a@google.com>
+ <20230809201926.GA3325@breakpoint.cc>
+ <CAFhGd8oNsGEAmSYs4H3ppm1t2DrD8Br5wwg+VuNtwfoOA_-64A@mail.gmail.com>
+ <q49499n7-54p3-1soo-8s83-7p84724o08p7@vanv.qr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230705100430.61927-1-maxime.coquelin@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <q49499n7-54p3-1soo-8s83-7p84724o08p7@vanv.qr>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 05, 2023 at 12:04:27PM +0200, Maxime Coquelin wrote:
-> This small series enables virtio-net device type in VDUSE.
-> With it, basic operation have been tested, both with
-> virtio-vdpa and vhost-vdpa using DPDK Vhost library series
-> adding VDUSE support using split rings layout (merged in
-> DPDK v23.07-rc1).
+On Wed, Aug 09, 2023 at 11:54:48PM +0200, Jan Engelhardt wrote:
 > 
-> Control queue support (and so multiqueue) has also been
-> tested, but requires a Kernel series from Jason Wang
-> relaxing control queue polling [1] to function reliably,
-> so while Jason rework is done, a patch is added to disable
-> CVQ and features that depend on it (tested also with DPDK
-> v23.07-rc1).
-
-
-So I can put this in next, the issue I think is
-that of security: currently selinux can if necessary block
-access to creating virtio block devices.
-But if we have more than one type we need a way for selinux to
-block specific types. Can be a patch on top but pls work to
-address.
-
-Another question is that with this userspace can inject
-packets directly into net stack. Should we check CAP_NET_ADMIN
-or such?
-
-
-
-> [1]: https://lore.kernel.org/lkml/CACGkMEtgrxN3PPwsDo4oOsnsSLJfEmBEZ0WvjGRr3whU+QasUg@mail.gmail.com/T/
+> On Wednesday 2023-08-09 23:40, Justin Stitt wrote:
+> >On Wed, Aug 9, 2023 at 1:19 PM Florian Westphal <fw@strlen.de> wrote:
+> >>
+> >> Justin Stitt <justinstitt@google.com> wrote:
+> >> > Use `strscpy_pad` instead of `strncpy`.
+> >>
+> >> I don't think that any of these need zero-padding.
+> >It's a more consistent change with the rest of the series and I don't
+> >believe it has much different behavior to `strncpy` (other than
+> >NUL-termination) as that will continue to pad to `n` as well.
+> >
+> >Do you think the `_pad` for 1/7, 6/7 and 7/7 should be changed back to
+> >`strscpy` in a v3? I really am shooting in the dark as it is quite
+> >hard to tell whether or not a buffer is expected to be NUL-padded or
+> >not.
 > 
-> v2 -> v3 changes:
-> =================
-> - Use allow list instead of deny list (Michael)
-> 
-> v1 -> v2 changes:
-> =================
-> - Add a patch to disable CVQ (Michael)
-> 
-> RFC -> v1 changes:
-> ==================
-> - Fail device init if it does not support VERSION_1 (Jason)
-> 
-> Maxime Coquelin (3):
->   vduse: validate block features only with block devices
->   vduse: enable Virtio-net device type
->   vduse: Temporarily disable control queue features
-> 
->  drivers/vdpa/vdpa_user/vduse_dev.c | 51 +++++++++++++++++++++++++++---
->  1 file changed, 47 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.41.0
+> I don't recall either NF userspace or kernelspace code doing memcmp
+> with name-like fields, so padding should not be strictly needed.
 
+My only concern with padding is just to make sure any buffers copied to
+userspace have been zeroed. I would need to take a close look at how
+buffers are passed around here to know for sure...
+
+-- 
+Kees Cook
 
