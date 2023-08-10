@@ -1,68 +1,56 @@
-Return-Path: <netdev+bounces-26564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB48778262
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:53:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F6F77829F
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 23:19:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 365D91C20B45
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:53:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF933281E1A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 21:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F4222F0C;
-	Thu, 10 Aug 2023 20:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EFB23BD5;
+	Thu, 10 Aug 2023 21:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C5620FB3
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:53:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FADDC433C7;
-	Thu, 10 Aug 2023 20:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7851920F92;
+	Thu, 10 Aug 2023 21:19:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97F65C433C7;
+	Thu, 10 Aug 2023 21:19:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691700810;
-	bh=hjFZI1bWZhkQJAvPWDBQTHKlfTzg8WuwI3ke6THo4kM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r1OyGTtOTv44QirxiDCmkjPQyqlT0YUT7FARB5tvjc4qk7XCZRbqavV+XZZis6jSn
-	 xIhBdZq2c1jN8PM8FK+otIZ6+O5+t43fqpzMJMyhK5qovg1aMukWUnhA59weBxc390
-	 oEoyZL9YyimSiaeFuLjnqdNb+7DU+rs9r/tDuKvHLCONJSIF+j/KdSZK1WK5+cGBGG
-	 NUsrPz2/9M/fbM5Uo9rxuLqf7SdYYqBkOwT9lk7PYJBl6UXCdd5Ls44QQETGUmKagV
-	 mWESAdTsLFuDoSGtFYsytYxNWywHH3lDwjHTOh97y2h8uD3xm9RnjDMMfQ4Rx5fG9u
-	 VecrGMg5nre5g==
-Received: (nullmailer pid 1158727 invoked by uid 1000);
-	Thu, 10 Aug 2023 20:53:28 -0000
-Date: Thu, 10 Aug 2023 14:53:28 -0600
-From: Rob Herring <robh@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: luka.perkov@sartura.hr, netdev@vger.kernel.org, conor+dt@kernel.org, pabeni@redhat.com, davem@davemloft.net, andrew@lunn.ch, krzysztof.kozlowski+dt@linaro.org, linux@armlinux.org.uk, hkallweit1@gmail.com, edumazet@google.com, linux-kernel@vger.kernel.org, kuba@kernel.org, robh+dt@kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: ethernet-controller: add
- PSGMII mode
-Message-ID: <169170077839.1157642.6802176058827678901.robh@kernel.org>
-References: <20230810102309.223183-1-robert.marko@sartura.hr>
+	s=k20201202; t=1691702368;
+	bh=og9HCM8mQmPzM+NOFpjCrf20xt3BkhG9VCjZDie6ReI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sANQrPKYfhMakHRRRYi3FjGp4URh17sx8nDfqANEDoR166atV+MKeV9AV3xeAT3jU
+	 SgNt4to2XzrjvQQSySDF09EiGMFqe7q02BY8qx+LnKSky6KLonWg3w8hXSvyqP3roW
+	 ScO7aSQAae0qP8etczmk3j/eS9cZtiutWCZb8YIlggpOmp6mrAdJ6S00LJgvsZlAEw
+	 S3gvuaarLONwhVDdqFwAkPVnEQ0UoBvCaN2ChYZ6QyYozAzgBspxcGNEg588FdFseT
+	 gaXZo4DwFb3/Vkv1qHRzvkgk4PFRFmgI41/w2x7TE3+KyuMPV8wc3XeqnTfjPX2Ae1
+	 W6aakwu1M0Wpw==
+Date: Thu, 10 Aug 2023 14:19:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ daniel@iogearbox.net, andrii@kernel.org, ast@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: pull-request: bpf-next 2023-08-09
+Message-ID: <20230810141926.49f4c281@kernel.org>
+In-Reply-To: <20230810055123.109578-1-martin.lau@linux.dev>
+References: <20230810055123.109578-1-martin.lau@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810102309.223183-1-robert.marko@sartura.hr>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed,  9 Aug 2023 22:51:23 -0700 Martin KaFai Lau wrote:
+>       bpf: fix bpf_dynptr_slice() to stop return an ERR_PTR.
 
-On Thu, 10 Aug 2023 12:22:54 +0200, Robert Marko wrote:
-> Add a new PSGMII mode which is similar to QSGMII with the difference being
-> that it combines 5 SGMII lines into a single link compared to 4 on QSGMII.
-> 
-> It is commonly used by Qualcomm on their QCA807x PHY series.
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
->  Documentation/devicetree/bindings/net/ethernet-controller.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-
-Acked-by: Rob Herring <robh@kernel.org>
-
+This one looks like solid bpf material TBH, any reason it's here?
 
