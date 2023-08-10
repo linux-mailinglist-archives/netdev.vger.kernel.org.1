@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-26207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A717772B3
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:17:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1C77772B4
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACEB02822FC
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:17:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 285FE1C21373
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298291DA2C;
-	Thu, 10 Aug 2023 08:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6F81ADFE;
+	Thu, 10 Aug 2023 08:17:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2B21ADFE
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:17:39 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26B110C4;
-	Thu, 10 Aug 2023 01:17:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933291E506
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:17:41 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97079FE;
+	Thu, 10 Aug 2023 01:17:40 -0700 (PDT)
 Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RM0BH1X9Mz1L9Xq;
-	Thu, 10 Aug 2023 16:16:23 +0800 (CST)
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RM07g6LJwzJsnH;
+	Thu, 10 Aug 2023 16:14:07 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
  (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 10 Aug
- 2023 16:17:34 +0800
+ 2023 16:17:36 +0800
 From: Ruan Jinjie <ruanjinjie@huawei.com>
 To: <linus.walleij@linaro.org>, <alsi@bang-olufsen.dk>, <andrew@lunn.ch>,
 	<f.fainelli@gmail.com>, <olteanv@gmail.com>, <davem@davemloft.net>,
@@ -40,9 +40,9 @@ To: <linus.walleij@linaro.org>, <alsi@bang-olufsen.dk>, <andrew@lunn.ch>,
 	<linux-renesas-soc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-wireless@vger.kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v2 1/5] net: dsa: realtek: Remove redundant of_match_ptr()
-Date: Thu, 10 Aug 2023 16:16:52 +0800
-Message-ID: <20230810081656.2981965-2-ruanjinjie@huawei.com>
+Subject: [PATCH net-next v2 2/5] net: dsa: rzn1-a5psw: Remove redundant of_match_ptr()
+Date: Thu, 10 Aug 2023 16:16:53 +0800
+Message-ID: <20230810081656.2981965-3-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230810081656.2981965-1-ruanjinjie@huawei.com>
 References: <20230810081656.2981965-1-ruanjinjie@huawei.com>
@@ -59,8 +59,8 @@ X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemi500008.china.huawei.com (7.221.188.139)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -69,36 +69,22 @@ of_match_ptr() here.
 
 Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 ---
- drivers/net/dsa/realtek/realtek-mdio.c | 2 +-
- drivers/net/dsa/realtek/realtek-smi.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/dsa/rzn1_a5psw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
-index 4310e7793e58..292e6d087e8b 100644
---- a/drivers/net/dsa/realtek/realtek-mdio.c
-+++ b/drivers/net/dsa/realtek/realtek-mdio.c
-@@ -276,7 +276,7 @@ MODULE_DEVICE_TABLE(of, realtek_mdio_of_match);
- static struct mdio_driver realtek_mdio_driver = {
- 	.mdiodrv.driver = {
- 		.name = "realtek-mdio",
--		.of_match_table = of_match_ptr(realtek_mdio_of_match),
-+		.of_match_table = realtek_mdio_of_match,
- 	},
- 	.probe  = realtek_mdio_probe,
- 	.remove = realtek_mdio_remove,
-diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
-index c2bd8bb6c9c2..ff13563059c5 100644
---- a/drivers/net/dsa/realtek/realtek-smi.c
-+++ b/drivers/net/dsa/realtek/realtek-smi.c
-@@ -556,7 +556,7 @@ MODULE_DEVICE_TABLE(of, realtek_smi_of_match);
- static struct platform_driver realtek_smi_driver = {
+diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
+index c37d2e537230..b31ae8845b58 100644
+--- a/drivers/net/dsa/rzn1_a5psw.c
++++ b/drivers/net/dsa/rzn1_a5psw.c
+@@ -1090,7 +1090,7 @@ MODULE_DEVICE_TABLE(of, a5psw_of_mtable);
+ static struct platform_driver a5psw_driver = {
  	.driver = {
- 		.name = "realtek-smi",
--		.of_match_table = of_match_ptr(realtek_smi_of_match),
-+		.of_match_table = realtek_smi_of_match,
+ 		.name	 = "rzn1_a5psw",
+-		.of_match_table = of_match_ptr(a5psw_of_mtable),
++		.of_match_table = a5psw_of_mtable,
  	},
- 	.probe  = realtek_smi_probe,
- 	.remove = realtek_smi_remove,
+ 	.probe = a5psw_probe,
+ 	.remove = a5psw_remove,
 -- 
 2.34.1
 
