@@ -1,138 +1,126 @@
-Return-Path: <netdev+bounces-26506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7885777FA1
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:54:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD0D777FA9
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBDD51C21488
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB81281CE2
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6570821511;
-	Thu, 10 Aug 2023 17:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64E921512;
+	Thu, 10 Aug 2023 17:56:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB4E20FBF
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:54:50 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD567E7E
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:54:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691690087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DEbgyFSwr4grpjj9Lb0jzqz1ORrnMasCGrg9RIsiNrc=;
-	b=Su8CjY4vxcT7xYln+VwYdZ7Bl/DkFnaBTGiJXJnwj/eyI3UtUFxubRCMDpKtLQ9YYyfqos
-	elWMo2u2P8yoi0ZGyOoWKFsgxgq6ls9KXBWc+yjHKdcvrGiaO9+GtUwnzEx9b4v5IffxaM
-	1dqr1x9S+tT9edK/AC9fZYjVad+BCYs=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-vLv8gPHmP428lOllXzQFLg-1; Thu, 10 Aug 2023 13:54:46 -0400
-X-MC-Unique: vLv8gPHmP428lOllXzQFLg-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-791984d0dcbso486739f.3
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:54:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691690086; x=1692294886;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DEbgyFSwr4grpjj9Lb0jzqz1ORrnMasCGrg9RIsiNrc=;
-        b=BeASlT9Uxmd3bQRSCctv/TP5fP+RyPyMQESCBMO0IJMeT8aVuq3ulUP2O+6lGEXfCw
-         iuelDUkf0VSixUBUzw2j1d0St4mNXXhuaHUdrZpH7HelaTWZ08wltzFYho9J51OJOjaA
-         TdZYoJt2ao9baLu79qAE1eLFKaVJ54FkemWxcth5JrRCNbCspjIMgThip0rSYPEs11Mc
-         Yh+SLjcgWN8ICjVhlmrbhawdm3YvveV+taxN6Uj0jNDWzi+7FTuxelp/rWBWggVpV56p
-         tpDcGQSPSMJB8Jg8fKiDeHtF+JX1+VPEUlHDoIe1tzbFP/jtdzkQ+oqp/NDckpaYD2pC
-         UDpQ==
-X-Gm-Message-State: AOJu0YwHb+EMGk6+SJLGMt2tKMsoAbggoGiDldWZyBA77OeNp6UrUEYO
-	gStSMZtgo+Z5djthW4LLIaIaBx6f/h17E3LMGwnsIeDFRyCNIUE2lmaBnGdZhqb1oqxmIXdNR5K
-	pHH63SzHeBfpMMHXC
-X-Received: by 2002:a6b:d802:0:b0:783:5e93:1e7f with SMTP id y2-20020a6bd802000000b007835e931e7fmr4138467iob.18.1691690085949;
-        Thu, 10 Aug 2023 10:54:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFsNk82Q3LSF2n67H8Eoj/Sz4yXPWAYYogZh6heK7ptILV9xcHGMCFUNzsZsZ7JEI4E/ZiCg==
-X-Received: by 2002:a6b:d802:0:b0:783:5e93:1e7f with SMTP id y2-20020a6bd802000000b007835e931e7fmr4138459iob.18.1691690085736;
-        Thu, 10 Aug 2023 10:54:45 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id g15-20020a02b70f000000b0043021113e09sm530909jam.75.2023.08.10.10.54.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 10:54:45 -0700 (PDT)
-Date: Thu, 10 Aug 2023 11:54:44 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christoph Hellwig <hch@lst.de>, "Tian, Kevin" <kevin.tian@intel.com>,
- Brett Creeley <bcreeley@amd.com>, Brett Creeley <brett.creeley@amd.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
- "shameerali.kolothum.thodi@huawei.com"
- <shameerali.kolothum.thodi@huawei.com>, "horms@kernel.org"
- <horms@kernel.org>, "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
- tracking
-Message-ID: <20230810115444.21364456.alex.williamson@redhat.com>
-In-Reply-To: <ZNUhqEYeT7us5SV/@nvidia.com>
-References: <20230807205755.29579-1-brett.creeley@amd.com>
-	<20230807205755.29579-7-brett.creeley@amd.com>
-	<20230808162718.2151e175.alex.williamson@redhat.com>
-	<01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
-	<20230809113300.2c4b0888.alex.williamson@redhat.com>
-	<ZNPVmaolrI0XJG7Q@nvidia.com>
-	<BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20230810104734.74fbe148.alex.williamson@redhat.com>
-	<ZNUcLM/oRaCd7Ig2@nvidia.com>
-	<20230810114008.6b038d2a.alex.williamson@redhat.com>
-	<ZNUhqEYeT7us5SV/@nvidia.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B224C20FBF
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:56:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4FD8C433C7;
+	Thu, 10 Aug 2023 17:56:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691690196;
+	bh=jIRAXEP+/hVofwmvv0P+5psE1ZOVYRSQ3asUDxcA8qc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a2BGVdLRWAXqOCKMieEtCU/4DATms+FijEV9h3V7E8ykBPkNRICgX7eNO6kbOA8CD
+	 2FkI1cu7hj85W1ekHPwiDT5lTNKb4a9MD8SfjONT1UTH6UIOb+1rjZ3zYCA0VzYpl+
+	 Vm+0ff4EBFp00iiqNO4lnlXSQFjDx5QcsjkH/WsM7MG7yaEr9VVuiwsz0DAqm/YMpm
+	 IGVgsr+CUw0T6H8svv9VaQNoQA2SNGjzfU0j+MpB6b9YgZKGXiQaRVKYN3nKFmUmJR
+	 wCzl9nJHR0u/dlQogzYGXsgfoYCEepD3bgrRe2/IOwuVWwEME3F7rIqT6SDH+Tc8Cq
+	 co1q+m+Kp/qjA==
+Date: Thu, 10 Aug 2023 19:56:31 +0200
+From: Simon Horman <horms@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
+	Frantisek Krenzelok <fkrenzel@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Apoorv Kothari <apoorvko@amazon.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH net-next v3 3/6] tls: implement rekey for TLS1.3
+Message-ID: <ZNUkz7UNMPQVOr2M@vergenet.net>
+References: <cover.1691584074.git.sd@queasysnail.net>
+ <c0ef5c0cf4f56d247081ce366eb5de09bf506cf4.1691584074.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c0ef5c0cf4f56d247081ce366eb5de09bf506cf4.1691584074.git.sd@queasysnail.net>
 
-On Thu, 10 Aug 2023 14:43:04 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, Aug 09, 2023 at 02:58:52PM +0200, Sabrina Dubroca wrote:
+> This adds the possibility to change the key and IV when using
+> TLS1.3. Changing the cipher or TLS version is not supported.
+> 
+> Once we have updated the RX key, we can unblock the receive side. If
+> the rekey fails, the context is unmodified and userspace is free to
+> retry the update or close the socket.
+> 
+> This change only affects tls_sw, since 1.3 offload isn't supported.
+> 
+> v2:
+>  - reverse xmas tree
+>  - turn the alt_crypto_info into an else if
+>  - don't modify the context when rekey fails
+> 
+> v3:
+>  - only call tls_sw_strparser_arm when setting the initial RX key, not
+>    on rekeys
+>  - update tls_sk_poll to not say the socket is readable when we're
+>    waiting for a rekey, and wake up poll() when the new key is installed
+>  - use unsafe_memcpy to make FORTIFY_SOURCE happy
+> 
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
-> On Thu, Aug 10, 2023 at 11:40:08AM -0600, Alex Williamson wrote:
->=20
-> > PCI Express=C2=AE Base Specification Revision 6.0.1, pg 1461:
-> >=20
-> >   9.3.3.11 VF Device ID (Offset 1Ah)
-> >=20
-> >   This field contains the Device ID that should be presented for every =
-VF to the SI.
-> >=20
-> >   VF Device ID may be different from the PF Device ID...
-> >=20
-> > That?  Thanks, =20
->=20
-> NVMe matches using the class code, IIRC there is language requiring
-> the class code to be the same.
+...
 
-Ok, yes:
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
 
-  7.5.1.1.6 Class Code Register (Offset 09h)
-  ...
-  The field in a PF and its associated VFs must return the same value
-  when read.
+...
 
-Seems limiting, but it's indeed there.  We've got a lot of cleanup to
-do if we're going to start rejecting drivers for devices with PCI
-spec violations though ;)  Thanks,
+> @@ -2873,14 +2911,24 @@ int tls_set_sw_offload(struct sock *sk, int tx)
+>  
+>  	ctx->push_pending_record = tls_sw_push_pending_record;
+>  
+> +	/* setkey is the last operation that could fail during a
+> +	 * rekey. if it succeeds, we can start modifying the
+> +	 * context.
+> +	 */
+>  	rc = crypto_aead_setkey(*aead, key, keysize);
+> +	if (rc) {
+> +		if (new_crypto_info)
+> +			goto out;
+> +		else
+> +			goto free_aead;
+> +	}
+>  
+> -	if (rc)
+> -		goto free_aead;
+> -
+> -	rc = crypto_aead_setauthsize(*aead, prot->tag_size);
+> -	if (rc)
+> -		goto free_aead;
+> +	if (!new_crypto_info) {
+> +		rc = crypto_aead_setauthsize(*aead, prot->tag_size);
+> +		if (rc) {
+> +			goto free_aead;
+> +		}
 
-Alex
+nit: no need for {} here.
 
+> +	}
+>  
+>  	if (sw_ctx_rx) {
+>  		tfm = crypto_aead_tfm(sw_ctx_rx->aead_recv);
+
+...
 
