@@ -1,153 +1,103 @@
-Return-Path: <netdev+bounces-26535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3547778040
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:28:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA6A778044
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB254281DD0
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3B5F281FD8
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D473622EFC;
-	Thu, 10 Aug 2023 18:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDB41F942;
+	Thu, 10 Aug 2023 18:31:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98E021D35
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:28:12 +0000 (UTC)
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1A62684;
-	Thu, 10 Aug 2023 11:28:10 -0700 (PDT)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id A3C7F1388D;
-	Thu, 10 Aug 2023 21:28:07 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 89CC513888;
-	Thu, 10 Aug 2023 21:28:07 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id EE36B3C0439;
-	Thu, 10 Aug 2023 21:28:06 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1691692087; bh=GEpJwziKVMEJQjWFpY5qyjQHjnvAoeVbPjjlEWPqq04=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=HK98ndvPoIcaT6VF+mmV5svMpJ84SuLMKKhkmMHoGMRREvr7Ja/MFNBKqvdwn6WSe
-	 RamfdBb0QP7TYlc7VWrrqDcbUDSzHOZLNtzVxbmbCi+pyFUgW9h+sb9nyDVlOBhlgc
-	 tiSb1bsVVEWZQQhCoeXkrM8TpjOruJOia7cQXKLM=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 37AIS5hc198691;
-	Thu, 10 Aug 2023 21:28:06 +0300
-Date: Thu, 10 Aug 2023 21:28:05 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Sishuai Gong <sishuai.system@gmail.com>
-cc: Simon Horman <horms@verge.net.au>,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        lvs-devel@vger.kernel.org
-Subject: Re: Race over table->data in proc_do_sync_threshold()
-In-Reply-To: <8D17F8D2-BF68-4BA4-8590-7DE1E71872A6@gmail.com>
-Message-ID: <790529ba-8887-004a-505e-3d552326e1f5@ssi.bg>
-References: <B6988E90-0A1E-4B85-BF26-2DAF6D482433@gmail.com> <b4854287-cb97-27fb-053f-e52179c05e97@ssi.bg> <8D17F8D2-BF68-4BA4-8590-7DE1E71872A6@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713E622EFE
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:31:26 +0000 (UTC)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080CF2690
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:31:23 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99d6d5054bcso157219066b.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:31:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691692281; x=1692297081;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K8UR18nY4nhdVLAO78UBFPT4Nd7k6ZghzGQNJqLilPQ=;
+        b=ZOZWRsa5o+C3FLD3uv/886ZBYnERCWusdA9i6hUpQ0IyERTYL0fnJpt2f08gLfCSHP
+         QICEr2iEfI79d62uARkF+oL3o5DPlPnKYwh1lNv0vCtML09Z1OCjfnVr5FgDTgRvF9EZ
+         xCGsMc3KiWmcp+dLXmNA3MJfQFiPL85WMUtzFSDFpFTUvMshpXf3PWdwCfVXSg2X/sAc
+         SyK+wAyL8YBTUvyOPmLxnS5ZBzrIrrHhlR6yjuJLzn+8O3IJfj5tlrgQ3wMjUZ3fEFt7
+         C6sdLARH9yifys7+3xBYo5OYzdd4xqhMetKH6Us8/Yc/bC81SL8e8GobEezBwzAWn5Dc
+         xKHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691692281; x=1692297081;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K8UR18nY4nhdVLAO78UBFPT4Nd7k6ZghzGQNJqLilPQ=;
+        b=mGDSedR6YJSaWAJ2dSHFbmuVHkjwG5gKTXVeH+GS3Y82Uw8hvphUyvrjbsvLqN7tyq
+         07DSuMBzPqPTZJPJtsOSKE9Pym6s1PSnMc5+B+mOnEx8jMB1Ep5+gCH+KXrdM2WG+YWR
+         rb74McwSP3EeWopSAwbh8hRtcfqPW2WtjjvVl8X2RFk5f6UZeic1weaetYQPwWF00Isz
+         YJelnLFmqhPbtBJaZ+j3Rz38HOGLB74WQ+CfeNsR4onP8md+nmcP2R+iNEJkumf0Vhfm
+         sNiktfjpV3sFPUFejD5oAnGiA8Q7PjdcyvR8q23sCeLfRGv0Gex0KYMaTBE37YqPuYDg
+         yZHQ==
+X-Gm-Message-State: AOJu0YwDcE2BA6amYjT5Pcia18yS0NoB9NSL6ZqUXwQCtGGXFJsajQUt
+	FuzIbSDyXRnnR49motxRAYppaQrQBMSvdw==
+X-Google-Smtp-Source: AGHT+IFW/A5ziUMXRpXBExIZyJgTc9rbQgdnmLOVlq6YXShx9r2xvdtqm8mC7WYmKNvRNlGbWo1bOQ==
+X-Received: by 2002:a17:907:7f8b:b0:99c:c794:8ce0 with SMTP id qk11-20020a1709077f8b00b0099cc7948ce0mr4314829ejc.4.1691692281159;
+        Thu, 10 Aug 2023 11:31:21 -0700 (PDT)
+Received: from skbuf ([188.27.184.201])
+        by smtp.gmail.com with ESMTPSA id y22-20020a17090668d600b0099bcdfff7cbsm1253449ejr.160.2023.08.10.11.31.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 11:31:20 -0700 (PDT)
+Date: Thu, 10 Aug 2023 21:31:18 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Sergei Antonov <saproj@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: mv88e6060: add phylink_get_caps
+ implementation
+Message-ID: <20230810183118.3z77lrnun5pukgfa@skbuf>
+References: <E1qTkRn-003NBG-FH@rmk-PC.armlinux.org.uk>
+ <20230810164441.udjyn7avp3afcwgo@skbuf>
+ <ZNUV2VzY01TWVSgk@shell.armlinux.org.uk>
+ <20230810171100.dvnsjgjo67hax4ld@skbuf>
+ <ZNUglYF2Xy63l4aZ@shell.armlinux.org.uk>
+ <CABikg9zcNED55rjnq9a9ZTjp8pCKXWs9HBy5r2KAdECP1Dm8vg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABikg9zcNED55rjnq9a9ZTjp8pCKXWs9HBy5r2KAdECP1Dm8vg@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Aug 10, 2023 at 09:17:33PM +0300, Sergei Antonov wrote:
+> I am planning to submit a platform using "marvell,mv88e6060". For the
+> next release cycle hopefully.
+> Our should I rather try to move MV88E6060 support to /mv88e6xxx?
 
-	Hello,
-
-On Thu, 10 Aug 2023, Sishuai Gong wrote:
-
-> Hello,
-> 
-> I am not familiar with the code but I would like to give it a try :).
-> 
-> It seems to me that replacing the second memcpy with WRITE_ONCE() 
-> is not necessary as long as we still hold the lock. Otherwise is this close
-> to what you suggest?
-
-	Yes, just make it formatted according to
-Documentation/process/submitting-patches.rst
-
-	The mutex serializes writers but readers do not use this
-mutex. Anyways, looks like kernel provides inline version of
-memcpy which works correctly in our case by copying 4-byte integers.
-
-> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> index 62606fb44d02..b4e22e30b896 100644
-> --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
-> @@ -1876,6 +1876,7 @@ static int
->  proc_do_sync_threshold(struct ctl_table *table, int write,
->                        void *buffer, size_t *lenp, loff_t *ppos)
->  {
-> +      struct netns_ipvs *ipvs = table->extra2;
->         int *valp = table->data;
->         int val[2];
->         int rc;
-> @@ -1885,6 +1886,7 @@ proc_do_sync_threshold(struct ctl_table *table, int write,
->                 .mode = table->mode,
->         };
-> 
-> +      mutex_lock(&ipvs->sync_mutex);
->         memcpy(val, valp, sizeof(val));
->         rc = proc_dointvec(&tmp, write, buffer, lenp, ppos);
->         if (write) {
-> @@ -1894,6 +1896,7 @@ proc_do_sync_threshold(struct ctl_table *table, int write,
->                 else
->                         memcpy(valp, val, sizeof(val));
->         }
-> +      mutex_unlock(&ipvs->sync_mutex);
->         return rc;
->  }
-> 
-> @@ -4321,6 +4324,7 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
->         ipvs->sysctl_sync_threshold[0] = DEFAULT_SYNC_THRESHOLD;
->         ipvs->sysctl_sync_threshold[1] = DEFAULT_SYNC_PERIOD;
->         tbl[idx].data = &ipvs->sysctl_sync_threshold;
-> +      tbl[idx].extra2 = ipvs;
->         tbl[idx++].maxlen = sizeof(ipvs->sysctl_sync_threshold);
->         ipvs->sysctl_sync_refresh_period = DEFAULT_SYNC_REFRESH_PERIOD;
->         tbl[idx++].data = &ipvs->sysctl_sync_refresh_period;
-> 
-> > On Aug 10, 2023, at 2:20 AM, Julian Anastasov <ja@ssi.bg> wrote:
-> > 
-> > 
-> > Hello,
-> > 
-> > On Wed, 9 Aug 2023, Sishuai Gong wrote:
-> > 
-> >> Hi,
-> >> 
-> >> We observed races over (struct ctl_table *) table->data when two threads
-> >> are running proc_do_sync_threshold() in parallel, as shown below:
-> >> 
-> >> Thread-1 Thread-2
-> >> memcpy(val, valp, sizeof(val)); memcpy(valp, val, sizeof(val));
-> >> 
-> >> This race probably would mess up table->data. Is it better to add a lock?
-> > 
-> > We can put mutex_lock(&ipvs->sync_mutex) before the first
-> > memcpy and to use two WRITE_ONCE instead of the second memcpy. But
-> > this requires extra2 = ipvs in ip_vs_control_net_init_sysctl():
-> > 
-> > tbl[idx].data = &ipvs->sysctl_sync_threshold;
-> > + tbl[idx].extra2 = ipvs;
-> > 
-> > Will you provide patch?
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+Device tree bindings and the driver implementation should be seen as
+separate things. You can submit a platform for mv88e6060 regardless of
+what driver it's using, and if the driver is merged into mv88e6xxx, that
+needs to support the existing platforms as well.
 
