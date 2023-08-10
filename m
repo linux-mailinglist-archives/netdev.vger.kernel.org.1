@@ -1,126 +1,193 @@
-Return-Path: <netdev+bounces-26495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7266B777F44
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:38:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F74E777F46
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 19:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19BE12819E5
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:38:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B05CF1C20D80
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 17:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0298214E0;
-	Thu, 10 Aug 2023 17:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2A2214F0;
+	Thu, 10 Aug 2023 17:40:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15C11E1C0
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:38:40 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E6E26AA
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:38:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6xDm4XlYlbe6Z0azw/hZ7dF7GIcNm4Q2rtxweNUAuzo=; b=S6jKz0rffK8YTK2hmeuUNxjNp/
-	UiCsbkIxfwacQi0mfrolXN3ksDcl5OlyqfJ625y4ScMmkmcqVfW5Vk6L/yxP2+5iyGIhbiaBtxMGz
-	aCs3KGkMsDseAAnB15dszjWwqQvCr3pPhFju0wKKuFQTjp9ZsZ3WowGFAz8daGvfv/zdTNj5zrbus
-	DUUhi913udhzUu2NgP/L1z9+CvtddSq3yIz0eyHKwZeVzdCVugrOwjVIYlJ09jSkSeSLVcVWHaxqA
-	z/jpORFTbPfTV7Tpe8O7Sl0El3Vbhd/VFDQS1EaVl3St0EBXONkFtAXR8H2T4pUEJhF6cb+6NNriJ
-	E3gKrA+Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41704)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU9cF-0004Km-0F;
-	Thu, 10 Aug 2023 18:38:31 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU9cE-0001zV-13; Thu, 10 Aug 2023 18:38:30 +0100
-Date: Thu, 10 Aug 2023 18:38:29 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Sergei Antonov <saproj@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: dsa: mv88e6060: add phylink_get_caps
- implementation
-Message-ID: <ZNUglYF2Xy63l4aZ@shell.armlinux.org.uk>
-References: <E1qTkRn-003NBG-FH@rmk-PC.armlinux.org.uk>
- <E1qTkRn-003NBG-FH@rmk-PC.armlinux.org.uk>
- <20230810164441.udjyn7avp3afcwgo@skbuf>
- <ZNUV2VzY01TWVSgk@shell.armlinux.org.uk>
- <20230810171100.dvnsjgjo67hax4ld@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6181C1E1C0
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 17:40:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F9F26AA
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:40:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691689212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cooSfdq0cDIJR35S85G1uR/Tw8ZsJkuhty77AJQBC3A=;
+	b=K47Cr/nKEc9nO8ZgNtsPbnJ9bO5rAjkw1mkQ7JF0nSJyrLaYZFb7m3RNQbBhJBfNqPw6Q4
+	0L/QB0HAXy68/7ss0x3YPW/kzLDNtM4GnQsSs75YamcCQBlkEn0b8rLzykiJ02BEkkeM2l
+	qMsytMInTQgo6UY7rsRCKzesebFLC/c=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-225-HiE_9bd4ODCPU3xm-TzY-g-1; Thu, 10 Aug 2023 13:40:10 -0400
+X-MC-Unique: HiE_9bd4ODCPU3xm-TzY-g-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-790a08063b2so88004939f.3
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 10:40:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691689210; x=1692294010;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cooSfdq0cDIJR35S85G1uR/Tw8ZsJkuhty77AJQBC3A=;
+        b=bZD9yeVKHyA5kKkLyqhvEgHhX8bohqaGthd3P8ZqNFaf68lKuoo4KJdEjN3DvIEHTs
+         MrQvdLyBWQg9jO6bFslhUEUz6JLM8HCdSDXtZOLruSbr2rR5AaXNiiFnfhLp5ZoyH+tv
+         2KfyN4OW/4k23tiH3a9XK11glISP9cBSDFEqtMRjqwKOYoc6jhYRG5YGOFkCKddBiNm6
+         oZzAv6mAC9YK/tkR91t8WamgQ8VD7Bw872fWisuyNF4dLf6+t4me9p7EWDt3enePyeiE
+         Y43mj60NgZySjM0AxZ7su/DC/axowyC9+1zAK1PGkqxPOIF0bdS08CDzFvyJ18+6WHXm
+         wTbg==
+X-Gm-Message-State: AOJu0Ywr/CDOltToLeZ0ev5w9DrUCIsbdPR6cBbnNhEz17PDNW7VWOFY
+	cmJxnQw9D3HgDpcaRTJ+SpFYrN7zPe4AgEJ1bJ7ebhYUto+bkmZvCJCJ0o55sH5u1SaacJ0DkD6
+	YB0uGbUqthoBNFqoP
+X-Received: by 2002:a6b:fd09:0:b0:790:a23b:1dfc with SMTP id c9-20020a6bfd09000000b00790a23b1dfcmr4113662ioi.9.1691689210148;
+        Thu, 10 Aug 2023 10:40:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHsSf1lZCbnO5jHFCYcvCJoUB9+NqxyQmyNvxzjJ38LvoLF2oHE0XViXtG4tGsF3T7Rrg2agg==
+X-Received: by 2002:a6b:fd09:0:b0:790:a23b:1dfc with SMTP id c9-20020a6bfd09000000b00790a23b1dfcmr4113643ioi.9.1691689209916;
+        Thu, 10 Aug 2023 10:40:09 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id f16-20020a02b790000000b0042bb2448847sm517912jam.53.2023.08.10.10.40.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 10:40:09 -0700 (PDT)
+Date: Thu, 10 Aug 2023 11:40:08 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christoph Hellwig <hch@lst.de>, "Tian, Kevin" <kevin.tian@intel.com>,
+ Brett Creeley <bcreeley@amd.com>, Brett Creeley <brett.creeley@amd.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
+ "shameerali.kolothum.thodi@huawei.com"
+ <shameerali.kolothum.thodi@huawei.com>, "horms@kernel.org"
+ <horms@kernel.org>, "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
+ tracking
+Message-ID: <20230810114008.6b038d2a.alex.williamson@redhat.com>
+In-Reply-To: <ZNUcLM/oRaCd7Ig2@nvidia.com>
+References: <20230807205755.29579-1-brett.creeley@amd.com>
+	<20230807205755.29579-7-brett.creeley@amd.com>
+	<20230808162718.2151e175.alex.williamson@redhat.com>
+	<01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
+	<20230809113300.2c4b0888.alex.williamson@redhat.com>
+	<ZNPVmaolrI0XJG7Q@nvidia.com>
+	<BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20230810104734.74fbe148.alex.williamson@redhat.com>
+	<ZNUcLM/oRaCd7Ig2@nvidia.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810171100.dvnsjgjo67hax4ld@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 08:11:00PM +0300, Vladimir Oltean wrote:
-> On Thu, Aug 10, 2023 at 05:52:41PM +0100, Russell King (Oracle) wrote:
-> > I wonder whether we have any implementation using SNI mode. I couldn't
-> > find anything in the in-kernel dts files for this driver, the only
-> > dts we have is one that was posted on-list recently, and that was using
-> > MII at 100Mbps:
-> > 
-> > https://lore.kernel.org/r/CABikg9zfGVEJsWf7eq=K5oKQozt86LLn-rzMaVmycekXkQEa8Q@mail.gmail.com
-> > 
-> > No one would be able to specify "sni" in their dts, so maybe for the
-> > sake of simplicity, we shouldn't detect whether it's in SNI mode, and
-> > just use MII, and limit the speed to just 10Mbps?
-> 
-> Based on the fact that "marvell,mv88e6060" is in
-> dsa_switches_apply_workarounds[], it is technically possible that there
-> exist boards which use the SNI mode but have no phy-mode and other
-> phylink properties on the CPU port, and thus they work fine while
-> skipping phylink. Of course, "possible" != "real".
+On Thu, 10 Aug 2023 14:19:40 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-What I meant is that there are no in-tree users of the Marvell 88E6060
-DSA driver. It looks like it was contributed in 2008. Whether it had
-users between the date that it was contributed and today I don't know.
+> On Thu, Aug 10, 2023 at 10:47:34AM -0600, Alex Williamson wrote:
+> > On Thu, 10 Aug 2023 02:47:15 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >  =20
+> > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > Sent: Thursday, August 10, 2023 2:06 AM
+> > > >=20
+> > > > On Wed, Aug 09, 2023 at 11:33:00AM -0600, Alex Williamson wrote:
+> > > >    =20
+> > > > > Shameer, Kevin, Jason, Yishai, I'm hoping one or more of you can
+> > > > > approve this series as well.  Thanks,   =20
+> > > >=20
+> > > > I've looked at it a few times now, I think it is OK, aside from the
+> > > > nvme issue.
+> > > >    =20
+> > >=20
+> > > My only concern is the duplication of backing storage management
+> > > of the migration file which I didn't take time to review.
+> > >=20
+> > > If all others are fine to leave it as is then I will not insist. =20
+> >=20
+> > There's leverage now if you feel strongly about it, but code
+> > consolidation could certainly come later.
+> >=20
+> > Are either of you willing to provide a R-b? =20
+>=20
+> The code structure is good enough (though I agree with Kevin), so sure:
+>=20
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>=20
+> > What are we looking for relative to NVMe?  AIUI, the first couple
+> > revisions of this series specified an NVMe device ID, then switched to
+> > a wildcard, then settled on an Ethernet device ID, all with no obvious
+> > changes that would suggest support is limited to a specific device
+> > type.  I think we're therefore concerned that migration of an NVMe VF
+> > could be enabled by overriding/adding device IDs, whereas we'd like to
+> > standardize NVMe migration to avoid avoid incompatible implementations.=
+ =20
+>=20
+> Yeah
+>=20
+> > It's somewhat a strange requirement since we have no expectation of
+> > compatibility between vendors for any other device type, but how far
+> > are we going to take it?  Is it enough that the device table here only
+> > includes the Ethernet VF ID or do we want to actively prevent what
+> > might be a trivial enabling of migration for another device type
+> > because we envision it happening through an industry standard that
+> > currently doesn't exist?  Sorry if I'm not familiar with the dynamics
+> > of the NVMe working group or previous agreements.  Thanks, =20
+>=20
+> I don't really have a solid answer. Christoph and others in the NVMe
+> space are very firm that NVMe related things must go through
+> standards, I think that is their right.
+>=20
+> It does not seem good to allow undermining that approach.
 
-All that I can see is that the only users of it are out-of-tree users,
-which means we have the maintenance burden from the driver but no
-apparent platforms that make use of it, and no way to test it (other
-than if one of those out-of-tree users pops up, such as like last
-month.)
+If we wanted to enforce something like this the probe function could
+reject NVMe class devices, but...
+=20
+> On the flip side, if we are going to allow this driver, why are we not
+> letting them enable their full device functionality with all their
+> non-compliant VF/PF combinations? They shouldn't have to hide what
+> they are actually doing just to get merged.
 
-I know that Arnd tends to strip out code that a platform uses when the
-platform is removed, was there a reason that this got left behind,
-assuming that it was used by a board?
+This.  Is it enough that this appears to implement device type agnostic
+migration support for devices hosted by this distributed services card
+and NVMe happens to be one of those device types?  Is that a high
+enough bar that this is not simply a vendor specific NVMe migration
+implementation?
+=20
+> If we want to block anything it should be to block the PCI spec
+> non-compliance of having PF/VF IDs that are different.
 
-> Maybe if we don't want to introduce PHY_INTERFACE_MODE_SNI for fear of a
-> lack of real users, we could at least detect PortMode=0, and not
-> populate supported_interfaces, leading to an intentional validation
-> failure and a comment above that check, stating that phy-mode = "sni" is
-> not yet implemented?
+PCI Express=C2=AE Base Specification Revision 6.0.1, pg 1461:
 
-It would probably be better for mv88e6060_phylink_get_caps() to detect
-it and print the warning, leaving supported_interfaces empty - which
-will then cause phylink_create() to fail. Maybe that's what you meant,
-but I interpreted it as modifying the check in phylink_create().
+  9.3.3.11 VF Device ID (Offset 1Ah)
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+  This field contains the Device ID that should be presented for every VF t=
+o the SI.
+
+  VF Device ID may be different from the PF Device ID...
+
+That?  Thanks,
+
+Alex
+
 
