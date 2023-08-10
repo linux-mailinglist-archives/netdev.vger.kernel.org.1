@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-26359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D482777988
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:26:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777F077798C
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:27:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C1441C2150F
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:26:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BD511C215A1
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3511E1D6;
-	Thu, 10 Aug 2023 13:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460DE1E1D8;
+	Thu, 10 Aug 2023 13:26:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAC81FA3
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:26:37 +0000 (UTC)
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE1226AC
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:26:36 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so14272411fa.2
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:26:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396271E1D6
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:26:46 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07D2C7
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:26:44 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fe2de785e7so1389152e87.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:26:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691673994; x=1692278794;
+        d=linaro.org; s=google; t=1691674003; x=1692278803;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rh3ntjuJiL8gvbIjeXRIgcdbsWhGebp7qL5EIN/PMCc=;
-        b=dYLOJegwFRiYldA191vTjts56o+UbbryeM6fx7R1IazqZnQZm4tdAU+5CRfUGvHnNE
-         J/Ffms2AU2AR7qiXumDknLPzghQJTMauLajJkjPbLvjWq7OYre8Es5rU6lc+UcvT64bH
-         o0W/oIbzddH4HEccF2/jXsEF80DSYXjbOiqllSXxnrBTK0FdByHofkY6UcgupwzupZ54
-         jwbOEFSDDUoajA7p0KRj6ifDujz43XW3K2DIOiuCqjS+Pg+L52f+1cOt0AA/IERKRAdV
-         WP1koT9/OmWa8XyGEeH7h3FobB6qpA33bceGiFNgta+PU6zCaFeKzGcMcphtBsAP45/i
-         jS2w==
+        bh=6wb5HdAy3B1A4DS1S7ptcBX1i942zjCRrK4D+1uBmbM=;
+        b=b/of1N1zxw+wNkhyMEvsz160aiNNM//6pFFIzoF5iDr6XcXNPnp9qIRyDPL7AjfAZu
+         9ziw39B2TodaGYePjsLTR25HG0RCoqjrwkZlEqivzmEagkheVserPi48rjbOuduk7+Mw
+         7j2naGRYmHfj4rrM/W+tz73GIahh4APT47olsUleGpZ0x+gbCGd57BkZj4T2VJZ/+FaD
+         y9ApG5cdWwvOpBgOxAeraSxiRUuHZhAreobGyaju7168TjaXrquAT6cg3fsxq0o2usfu
+         WljF84LDJMIVxkDJlxUFJzp72s9vNgxQO/ayvMM4LzAQ/4U+XCi0t3w1tPCA7CGVkEsC
+         a17A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691673994; x=1692278794;
+        d=1e100.net; s=20221208; t=1691674003; x=1692278803;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rh3ntjuJiL8gvbIjeXRIgcdbsWhGebp7qL5EIN/PMCc=;
-        b=ACCl3rMtDEoMGyzZemZkt4PwFlNPKdWu/K2oRTrPo/XC8kWoGPdEcXG25cfoJn2fl1
-         CKwZXrJhuidMKpfjgW3ca3Gt9LyqY83KmeTQqdsVTPS88aU4EaQfBX8Y1rAGFMbAZKGa
-         CodAYZ8rT1Zmt++tM0d7F+qzmw5q8vjm4X0qG855XmO4YtsAbNPikD1aPRva0iMgHKKI
-         bYaz7usNm/D3qPb3PjXdF7GBb5iF7pM0He9wYSmDDWVwswjZbpdLSQsqIvqPmcqM99k0
-         WMRpoXqQDPG4Ubz1G3MhTVrgDDjfKW1/ONKdyG5a2nUgVXK5tN+31PI+HdJeYHoHcFM5
-         +vFA==
-X-Gm-Message-State: AOJu0Yy+x3YhVg8yamWSZDGU/G679JrLtdAPJRtkpI09PUbZGf6XsDM2
-	H1mr+UtAS/bUPwmKHRhSSj+VpQ==
-X-Google-Smtp-Source: AGHT+IHD1nJireRnw86bmmFeRAJKPt+F4pAvg1U1FkLD9w0LKXU50J/4cyFfLT4joHK2r41fuNDMEw==
-X-Received: by 2002:a05:6512:20c6:b0:4f8:74b5:b4ec with SMTP id u6-20020a05651220c600b004f874b5b4ecmr2067339lfr.41.1691673994352;
-        Thu, 10 Aug 2023 06:26:34 -0700 (PDT)
+        bh=6wb5HdAy3B1A4DS1S7ptcBX1i942zjCRrK4D+1uBmbM=;
+        b=knQ8KK9e+x9ND3NFSt0Rsec9IUK25oNtpwbz5ZDJBxcZqm4JepDX9caXTAlARD3rOb
+         oL2H9z9ygiqzQLzdiasj9Ro5YI7yQRhp3U6eGffn/CK9QeRGIZKJtuTu9AAizogsDaeA
+         kun7I6GU2c/HOsJqnalkgyKALNw24cHStLdlf7I8thIpfqHvRjDYd60JcHDH5Nqjiou4
+         Cjcs6qm+C5vlII/ex7f6jhxJb8udVX8oSXwFz203lompjmZfbk1UstA6bJiTSBVRA8mx
+         LCA86glEM6saZcssn1ou2fBz807ycOOCogH6eIOJhV26f9IKGWX3VngEriNh+XbAYN/u
+         Sh0w==
+X-Gm-Message-State: AOJu0YynPmyc6FlwBSsCx6TmuWvvNZtJkv4OulNBFRJWCfl+6uD2/Dw4
+	Wnn/hoJEiSq4Z72CP/w4WTQICg==
+X-Google-Smtp-Source: AGHT+IFLYlOzxWGLHVSCOn8/VI4OXXnRJ6DyJbr7mR4GINIrSdeU4OnzS3BRpBwOIifmsZEb2+lzSQ==
+X-Received: by 2002:a05:6512:3995:b0:4fb:893a:d322 with SMTP id j21-20020a056512399500b004fb893ad322mr1965704lfu.68.1691674003052;
+        Thu, 10 Aug 2023 06:26:43 -0700 (PDT)
 Received: from [192.168.1.101] (abxi185.neoplus.adsl.tpnet.pl. [83.9.2.185])
-        by smtp.gmail.com with ESMTPSA id c27-20020ac244bb000000b004fb85ffc82csm286637lfm.10.2023.08.10.06.26.33
+        by smtp.gmail.com with ESMTPSA id c27-20020ac244bb000000b004fb85ffc82csm286637lfm.10.2023.08.10.06.26.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 06:26:33 -0700 (PDT)
-Message-ID: <b5b0dafe-7864-4b00-ba2a-9a82de04f44b@linaro.org>
-Date: Thu, 10 Aug 2023 15:26:27 +0200
+        Thu, 10 Aug 2023 06:26:42 -0700 (PDT)
+Message-ID: <ad4c10fd-2a71-4c83-91ef-3fba1a0bae0e@linaro.org>
+Date: Thu, 10 Aug 2023 15:26:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,8 +65,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 7/9] arm64: dts: qcom: sa8775p-ride: sort aliases
- alphabetically
+Subject: Re: [PATCH v3 8/9] arm64: dts: qcom: sa8775p-ride: add an alias for
+ ethernet0
 Content-Language: en-US
 To: Bartosz Golaszewski <brgl@bgdev.pl>, Andy Gross <agross@kernel.org>,
  Bjorn Andersson <andersson@kernel.org>, Rob Herring <robh+dt@kernel.org>,
@@ -78,7 +78,7 @@ Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20230810080909.6259-1-brgl@bgdev.pl>
- <20230810080909.6259-8-brgl@bgdev.pl>
+ <20230810080909.6259-9-brgl@bgdev.pl>
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
  xsFNBF9ALYUBEADWAhxdTBWrwAgDQQzc1O/bJ5O7b6cXYxwbBd9xKP7MICh5YA0DcCjJSOum
@@ -115,7 +115,7 @@ Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
  bGqMHex48FVZhexNPYOd58EY9/7mL5u0sJmo+jTeb4JBgIbFPJCFyng4HwbniWgQJZ1WqaUC
  nas9J77uICis2WH7N8Bs9jy0wQYezNzqS+FxoNXmDQg2jetX8en4bO2Di7Pmx0jXA4TOb9TM
  izWDgYvmBE8=
-In-Reply-To: <20230810080909.6259-8-brgl@bgdev.pl>
+In-Reply-To: <20230810080909.6259-9-brgl@bgdev.pl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -128,11 +128,10 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 On 10.08.2023 10:09, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> For improved readability order the aliases alphabetically for
-> sa8775p-ride.
+> Once we add a second ethernet node, the MDIO bus names will conflict
+> unless we provide aliases. Add one for the existing ethernet node.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> Suggested-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 > ---
 Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
