@@ -1,227 +1,137 @@
-Return-Path: <netdev+bounces-26532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A8277802F
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:24:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F03D0778035
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB5F41C21083
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57C80281E9D
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 18:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C435B22EF4;
-	Thu, 10 Aug 2023 18:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3837F22EF9;
+	Thu, 10 Aug 2023 18:25:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69BC22EED
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:23:50 +0000 (UTC)
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 025B92684
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:23:49 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bbc06f830aso9076765ad.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:23:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2057A1E1DA
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:25:58 +0000 (UTC)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E372690
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:25:57 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6872615b890so2573211b3a.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 11:25:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1691691828; x=1692296628;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=v19mqXZMVEjkYcitM51ee25xYsPURi4wJGVMBga9gK8=;
-        b=GFZ1xaUnRfjSYeHWCjh3NhIcVzjbMHuqnLhoFdzfETeXoOYTs2BwF5sicdbGj7cQBP
-         FdRm1WPpZKA2Hvr3Psk9lC1cn8iGUtU/Xk1JC8ExbvRORW2d29L8jyjORA0s7QYbvmDc
-         1Ewed91ibDi3OArcbobobjE8+Zf+mrutFSTaQ=
+        d=google.com; s=20221208; t=1691691957; x=1692296757;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+BLYqudylqXgLrn3dkh31GMazxRYXHwKlIWAfdLP26Y=;
+        b=TT2elFGLHdgirqUPPztA6mM2wIL5hl9KSBxEw0WWmLnpkXhvsO2JR1FUBOgxMCW1+B
+         qqpBRNQ2CPhUiVw+2EdfIHYa+LhXGyiRs88RjaJNKBXvdn9XCeppCKahsbgpEhNVrgYO
+         zFJv77J2h8xTNHbvtJ2krPSifbBZqPa+Z+eY6zyN4ZfM/Fb/o5fpp6FX/E4JHRDISxQh
+         YhZ1Fp900sgjF7VnRp9vg4EvRcylAUjqNA/82TSe755eQ6msdYAB7r9/ih76DtyjJ1bg
+         jIkyuXrWRtaU7T6X1o0u88YO/hMDN+DoM3OTurwYkAc3VmuH/pFKDu+rSGspK+npHlvl
+         feiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691691828; x=1692296628;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v19mqXZMVEjkYcitM51ee25xYsPURi4wJGVMBga9gK8=;
-        b=XneFw/WcFhpo6pk3SODIbVw9hIxYuxJwC1rbn8CLd89nJHEe6KRaY4IM2TvX2RfwPi
-         wctrqjsLZzr92l5tIj17AoYY147kLc8ksomSSVJ+JGJN1mr9D2xSbR/p0fltNQpTSccA
-         QG98F5Q7oo0C/w9ZTwqXe7vXNvYRUbJLxzbVlrSjFhbFQ8dHj2yxPaVJqXN3H4xSI7lQ
-         cknDdSdHvXQMM9usBhQuIxA1XC+vivO1IU/x1V3GzULcNjwjFQ9SIWlwWcJFSZPPU+lW
-         lGW8HrR5iZ0L77Z8vb+LX96AryoUcXVR9NxZJbaQe8n6olTpYvzXM6AtchKR0yyPXJ4w
-         R7Pg==
-X-Gm-Message-State: AOJu0YxpgDa7vtswsOh6YP1Y1qK+nozbuKy6EdsDOhylehfxYIns0Ya0
-	h9omDTCwCzoAByPrEdDAd/ShVA==
-X-Google-Smtp-Source: AGHT+IEwTTVq7ZdESNwJOlnT1RSm4fL++7TopJKhsJTxrPKQ/5MqvLawEF7KqSII2I4SZyBOSkcNqg==
-X-Received: by 2002:a17:902:d488:b0:1b6:a37a:65b7 with SMTP id c8-20020a170902d48800b001b6a37a65b7mr3917339plg.23.1691691828422;
-        Thu, 10 Aug 2023 11:23:48 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id r12-20020a1709028bcc00b001b8052d58a0sm2095111plo.305.2023.08.10.11.23.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 11:23:47 -0700 (PDT)
-Date: Thu, 10 Aug 2023 11:23:46 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jijie Shao <shaojijie@huawei.com>, Leon Romanovsky <leon@kernel.org>,
-	yisen.zhuang@huawei.com, salil.mehta@huawei.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: hns3: fix strscpy causing content truncation
- issue
-Message-ID: <202308101103.D0827667B@keescook>
-References: <20230809020902.1941471-1-shaojijie@huawei.com>
- <20230809070302.GR94631@unreal>
- <7c44c161-9c86-8c60-f031-6d77d6c28c20@huawei.com>
- <20230810102247.699ddc14@kernel.org>
+        d=1e100.net; s=20221208; t=1691691957; x=1692296757;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+BLYqudylqXgLrn3dkh31GMazxRYXHwKlIWAfdLP26Y=;
+        b=P2CrBdqJgmZahaeYnQLDSlkIu7g531RLzOQVYIcO8SZObfD1Y9jOc2Ki+Bwv58VowY
+         gPcMTPo7Ha5GkiDKmzMXRAGOrzkB/lw6eLa8l1UR0qCnfK8HLkvUlods9EIqYhNlgH6o
+         0AvqIIO5E6B1Y8YYHg6tP+pwG1cQZq+d30e5R0Uq5Q6Kq0hoQOz0cWkGek3MUu6U90LZ
+         /0bXAiIjltlB5b+qH7OXRIolALz6vuIrV5MqHrO62Nxupci79BVTftUEVfU1UORzuePs
+         2PVyd0GbVF2bE9aIhYnhhAwxIeO8fqyPhZHGB7SH9QIi8lA1iK6s1MggLVrWCTGflbz7
+         sq/Q==
+X-Gm-Message-State: AOJu0YzvnVl4Z1LoSZYU9JtAq4Tybm51ibn5+L7ZBw60ieTUE+yPSUSG
+	fN8x+IclduFVfhKTx2HXr4Lxto0=
+X-Google-Smtp-Source: AGHT+IEc92sn+li9HY5MkxUeFXWfPGX3qr4M+mD9j/s/NzllJhY4lahZol6TYBOw6auXj8Rob99n398=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:6a00:399b:b0:687:26bc:6377 with SMTP id
+ fi27-20020a056a00399b00b0068726bc6377mr1086622pfb.3.1691691956739; Thu, 10
+ Aug 2023 11:25:56 -0700 (PDT)
+Date: Thu, 10 Aug 2023 11:25:54 -0700
+In-Reply-To: <23743395-5e9a-ec95-b685-e094777a1d4b@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230810102247.699ddc14@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Mime-Version: 1.0
+References: <20230809165418.2831456-1-sdf@google.com> <20230809165418.2831456-3-sdf@google.com>
+ <23743395-5e9a-ec95-b685-e094777a1d4b@redhat.com>
+Message-ID: <ZNUrsqtc7L+NGBy1@google.com>
+Subject: Re: [xdp-hints] [PATCH bpf-next 2/9] xsk: add TX timestamp and TX
+ checksum offload support
+From: Stanislav Fomichev <sdf@google.com>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: bpf@vger.kernel.org, brouer@redhat.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	haoluo@google.com, jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, 
+	willemb@google.com, dsahern@kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, maciej.fijalkowski@intel.com, hawk@kernel.org, 
+	netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 10:22:47AM -0700, Jakub Kicinski wrote:
-> On Thu, 10 Aug 2023 15:45:50 +0800 Jijie Shao wrote:
-> > on 2023/8/9 15:03, Leon Romanovsky wrote:
-> > > On Wed, Aug 09, 2023 at 10:09:02AM +0800, Jijie Shao wrote:  
-> > >> From: Hao Chen <chenhao418@huawei.com>
-> > >>
-> > >> hns3_dbg_fill_content()/hclge_dbg_fill_content() is aim to integrate some
-> > >> items to a string for content, and we add '\n' and '\0' in the last
-> > >> two bytes of content.
-> > >>
-> > >> strscpy() will add '\0' in the last byte of destination buffer(one of
-> > >> items), it result in finishing content print ahead of schedule and some
-> > >> dump content truncation.
-> > >>
-> > >> One Error log shows as below:
-> > >> cat mac_list/uc
-> > >> UC MAC_LIST:
-> > >>
-> > >> Expected:
-> > >> UC MAC_LIST:
-> > >> FUNC_ID  MAC_ADDR            STATE
-> > >> pf       00:2b:19:05:03:00   ACTIVE
-> > >>
-> > >> The destination buffer is length-bounded and not required to be
-> > >> NUL-terminated, so just change strscpy() to memcpy() to fix it.  
-> > > I think that you should change to strtomem() and not use plain memcpy().
-> > >
-> > > Thanks  
-> > 
-> > Hi:
-> > 
-> > We tried to replace memcpy with strtomem, but errors was reported during 
-> > compilation:
-> > /kernel/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c: In 
-> > function ‘hclge_dbg_fill_content.part.0’:
-> > /kernel/include/linux/compiler_types.h:397:38: error: call to 
-> > ‘__compiletime_assert_519’ declared with attribute error: BUILD_BUG_ON 
-> > failed: !__builtin_constant_p(_dest_len) || _dest_len == (size_t)-1
-> >    397 |  _compiletime_assert(condition, msg, __compiletime_assert_, 
-> > __COUNTER__)
-> >        |                                      ^
-> > /kernel/include/linux/compiler_types.h:378:4: note: in definition of 
-> > macro ‘__compiletime_assert’
-> >    378 |    prefix ## suffix();    \
-> >        |    ^~~~~~
-> > /kernel/include/linux/compiler_types.h:397:2: note: in expansion of 
-> > macro ‘_compiletime_assert’
-> >    397 |  _compiletime_assert(condition, msg, __compiletime_assert_, 
-> > __COUNTER__)
-> >        |  ^~~~~~~~~~~~~~~~~~~
-> > /kernel/include/linux/build_bug.h:39:37: note: in expansion of macro 
-> > ‘compiletime_assert’
-> >     39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), 
-> > msg)
-> >        |                                     ^~~~~~~~~~~~~~~~~~
-> > /kernel/include/linux/build_bug.h:50:2: note: in expansion of macro 
-> > ‘BUILD_BUG_ON_MSG’
-> >     50 |  BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-> >        |  ^~~~~~~~~~~~~~~~
-> > /kernel/include/linux/string.h:302:2: note: in expansion of macro 
-> > ‘BUILD_BUG_ON’
-> >    302 |  BUILD_BUG_ON(!__builtin_constant_p(_dest_len) ||  \
-> >        |  ^~~~~~~~~~~~
-> > /kernel/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c:115:4: 
-> > note: in expansion of macro ‘strtomem’
-> >    115 |    strtomem(pos, result[i]);
-> >        |    ^~~~~~~~
-> > 
-> > In the strtomem macro, __builtin_object_size is used to calculate the 
-> > _dest_len.
-> > We tried to print the _dest_len directly, and the result was -1.
-> > How can we solve this?
+On 08/09, Jesper Dangaard Brouer wrote:
 > 
-> Let's add Kees in case he has a immediate recommendation on use of
-> strtomem() vs memcpy() for this case..
+> 
+> On 09/08/2023 18.54, Stanislav Fomichev wrote:
+> > diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+> > index 1f6fc8c7a84c..e2558ac3e195 100644
+> > --- a/include/net/xdp_sock_drv.h
+> > +++ b/include/net/xdp_sock_drv.h
+> > @@ -165,6 +165,14 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
+> >   	return xp_raw_get_data(pool, addr);
+> >   }
+> > +static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool *pool, u64 addr)
+> > +{
+> > +	if (!pool->tx_metadata_len)
+> > +		return NULL;
+> > +
+> > +	return xp_raw_get_data(pool, addr) - pool->tx_metadata_len;
+> > +}
+> > +
+> >   static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
+> >   {
+> >   	struct xdp_buff_xsk *xskb = container_of(xdp, struct xdp_buff_xsk, xdp);
+> > @@ -324,6 +332,11 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
+> >   	return NULL;
+> >   }
+> > +static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool *pool, u64 addr)
+> > +{
+> > +	return NULL;
+> > +}
+> > +
+> >   static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
+> >   {
+> >   }
+> > diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+> > index 9c31e8d1e198..3a559753e793 100644
+> > --- a/include/net/xsk_buff_pool.h
+> > +++ b/include/net/xsk_buff_pool.h
+> > @@ -234,4 +234,9 @@ static inline u64 xp_get_handle(struct xdp_buff_xsk *xskb)
+> >   	return xskb->orig_addr + (offset << XSK_UNALIGNED_BUF_OFFSET_SHIFT);
+> >   }
+> > +static inline bool xp_tx_metadata_enabled(const xdp_buff_xsk *xskb)
+> 
+> Hmm, shouldn't this argument be "struct xsk_buff_pool *pool" ?!?
+> 
+> > +{
+> > +	return sq->xsk_pool->tx_metadata_len > 0;
+> > +}
+> 
+> Will this even compile?
 
-tldr: use memcpy() instead of strscpy().
-
-
-Okay, I went to go read up on the history here. For my own notes, here's
-the original code, prior to 1cf3d5567f27 ("net: hns3: fix strncpy()
-not using dest-buf length as length issue"):
-
-static void hns3_dbg_fill_content(char *content, u16 len,
-				  const struct hns3_dbg_item *items,
-				  const char **result, u16 size)
-{
-	char *pos = content;
-	u16 i;
-
-	memset(content, ' ', len);
-	for (i = 0; i < size; i++) {
-		if (result)
-			strncpy(pos, result[i], strlen(result[i]));
-		else
-			strncpy(pos, items[i].name, strlen(items[i].name));
-
-		pos += strlen(items[i].name) + items[i].interval;
-	}
-
-	*pos++ = '\n';
-	*pos++ = '\0';
-}
-
-The warning to be fixed was:
-
-hclge_debugfs.c:90:25: warning: 'strncpy' output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
-
-There are a few extra checks added in 1cf3d5567f27, but I'm more curious
-about this original code's intent. It seems very confusing to me.
-
-Firstly, why is "pos" updated based on "strlen(items[i].name)" even when
-"result[i]" is used? Secondly, why is "interval" used? (These concerns
-are mostly addressed in 1cf3d5567f27.)
-
-I guess I'd just like to take a step back and ask, "What is this
-function trying to do?" It seems to be building a series of strings in a
-" "-padding buffer, and it intends that the buffer be newline and %NUL
-terminated.
-
-It looks very much like it wants to _avoid_ adding %NUL termination when
-doing copies, which is why it's using strncpy with a length argument of
-the source string length: it's _forcing_ the copy to not be terminated.
-This is just memcpy.
-
-strtomem() is designed for buffer sizes that can be known at compile
-time, so it's not useful here (as was found), since a string is being
-built up and uses a moving pointer.
-
-I think the correct fix is to use memcpy() instead of strscpy(). No
-%NUL-truncation is desired, the sizes are already determined and bounds
-checked. (And the latter is what likely silenced the compiler warning.)
-
--Kees
-
--- 
-Kees Cook
+Yeah, you're right, this is completely bogus. This me doing the
+'fixes' before sending out :-/ Will fix in a v2, thanks!
 
