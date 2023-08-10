@@ -1,193 +1,140 @@
-Return-Path: <netdev+bounces-26358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E635777976
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:20:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D482777988
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 15:26:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A511B280298
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C1441C2150F
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 13:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6251E1D7;
-	Thu, 10 Aug 2023 13:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3511E1D6;
+	Thu, 10 Aug 2023 13:26:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524951E1A9
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:16:58 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7DCC10E6
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:16:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ox4LCOYp5d4aE7pl8Fs+ZghUp+ZrbbWXTbaXnH17VI0=; b=JQLxpV4Bu5ebE3JajWu+7mr6o/
-	wbHN0ybqte9MSf+mdDJ7VXQNWx9bZQs8BjdsW/nKdrM4onvVL3RDDwcLfQ+dqsZXvbrzya9Doz3Dc
-	pGnPkjt5Ngo2vRKBKbFMaQft/inim+8XSUL3iiNlFtjVUUGg4veC8qhrID+diDqkiD9bfhfPa/Yz8
-	iGUbeEfh1dn2GqVFevR6uhe+pus6IvLg2c2uLvpYn5exDKhxm5oFez4D3IMcezPHytHaEG0EE1eU8
-	thf/sYZZvV4NL37Rj4sC8mc1rjfMcFAq73ewjqd2a2tgOEAHKi0M9D1h7komq4ROJ1u+jo/u9JDKE
-	vYq0UC7A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53126)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU5X1-00041V-30;
-	Thu, 10 Aug 2023 14:16:51 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU5X0-0001pJ-8p; Thu, 10 Aug 2023 14:16:50 +0100
-Date: Thu, 10 Aug 2023 14:16:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Marek Vasut <marex@denx.de>, Andrew Lunn <andrew@lunn.ch>,
-	Wei Fang <wei.fang@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZNTjQnufpCPMEEwd@shell.armlinux.org.uk>
-References: <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <d8990f01-f6c8-4fec-b8b8-3d9fe82af51b@lunn.ch>
- <76131561-18d7-945e-cb52-3c96ed208638@denx.de>
- <18601814-68f6-4597-9d88-a1b4b69ad34f@lunn.ch>
- <36ee0fa9-040a-8f7e-0447-eb3704ab8e11@denx.de>
- <ZNS1kalvEI6Y2Cs9@shell.armlinux.org.uk>
- <ZNS9GpMJEDi1zugk@shell.armlinux.org.uk>
- <20230810125117.GD13300@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAC81FA3
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:26:37 +0000 (UTC)
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE1226AC
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:26:36 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so14272411fa.2
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 06:26:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691673994; x=1692278794;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rh3ntjuJiL8gvbIjeXRIgcdbsWhGebp7qL5EIN/PMCc=;
+        b=dYLOJegwFRiYldA191vTjts56o+UbbryeM6fx7R1IazqZnQZm4tdAU+5CRfUGvHnNE
+         J/Ffms2AU2AR7qiXumDknLPzghQJTMauLajJkjPbLvjWq7OYre8Es5rU6lc+UcvT64bH
+         o0W/oIbzddH4HEccF2/jXsEF80DSYXjbOiqllSXxnrBTK0FdByHofkY6UcgupwzupZ54
+         jwbOEFSDDUoajA7p0KRj6ifDujz43XW3K2DIOiuCqjS+Pg+L52f+1cOt0AA/IERKRAdV
+         WP1koT9/OmWa8XyGEeH7h3FobB6qpA33bceGiFNgta+PU6zCaFeKzGcMcphtBsAP45/i
+         jS2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691673994; x=1692278794;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rh3ntjuJiL8gvbIjeXRIgcdbsWhGebp7qL5EIN/PMCc=;
+        b=ACCl3rMtDEoMGyzZemZkt4PwFlNPKdWu/K2oRTrPo/XC8kWoGPdEcXG25cfoJn2fl1
+         CKwZXrJhuidMKpfjgW3ca3Gt9LyqY83KmeTQqdsVTPS88aU4EaQfBX8Y1rAGFMbAZKGa
+         CodAYZ8rT1Zmt++tM0d7F+qzmw5q8vjm4X0qG855XmO4YtsAbNPikD1aPRva0iMgHKKI
+         bYaz7usNm/D3qPb3PjXdF7GBb5iF7pM0He9wYSmDDWVwswjZbpdLSQsqIvqPmcqM99k0
+         WMRpoXqQDPG4Ubz1G3MhTVrgDDjfKW1/ONKdyG5a2nUgVXK5tN+31PI+HdJeYHoHcFM5
+         +vFA==
+X-Gm-Message-State: AOJu0Yy+x3YhVg8yamWSZDGU/G679JrLtdAPJRtkpI09PUbZGf6XsDM2
+	H1mr+UtAS/bUPwmKHRhSSj+VpQ==
+X-Google-Smtp-Source: AGHT+IHD1nJireRnw86bmmFeRAJKPt+F4pAvg1U1FkLD9w0LKXU50J/4cyFfLT4joHK2r41fuNDMEw==
+X-Received: by 2002:a05:6512:20c6:b0:4f8:74b5:b4ec with SMTP id u6-20020a05651220c600b004f874b5b4ecmr2067339lfr.41.1691673994352;
+        Thu, 10 Aug 2023 06:26:34 -0700 (PDT)
+Received: from [192.168.1.101] (abxi185.neoplus.adsl.tpnet.pl. [83.9.2.185])
+        by smtp.gmail.com with ESMTPSA id c27-20020ac244bb000000b004fb85ffc82csm286637lfm.10.2023.08.10.06.26.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 06:26:33 -0700 (PDT)
+Message-ID: <b5b0dafe-7864-4b00-ba2a-9a82de04f44b@linaro.org>
+Date: Thu, 10 Aug 2023 15:26:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810125117.GD13300@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/9] arm64: dts: qcom: sa8775p-ride: sort aliases
+ alphabetically
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Andrew Halaney <ahalaney@redhat.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20230810080909.6259-1-brgl@bgdev.pl>
+ <20230810080909.6259-8-brgl@bgdev.pl>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <20230810080909.6259-8-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 02:51:17PM +0200, Oleksij Rempel wrote:
-> On Thu, Aug 10, 2023 at 11:34:02AM +0100, Russell King (Oracle) wrote:
-> > On Thu, Aug 10, 2023 at 11:01:53AM +0100, Russell King (Oracle) wrote:
-> > > On Thu, Aug 10, 2023 at 02:49:55AM +0200, Marek Vasut wrote:
-> > > > On 8/10/23 00:06, Andrew Lunn wrote:
-> > > > > On Wed, Aug 09, 2023 at 11:34:19PM +0200, Marek Vasut wrote:
-> > > > > > On 8/9/23 15:40, Andrew Lunn wrote:
-> > > > > > > > > Hm.. how about officially defining this PHY as the clock provider and disable
-> > > > > > > > > PHY automatic hibernation as long as clock is acquired?
-> > > > > > > > > 
-> > > > > > > > Sorry, I don't know much about the clock provider/consumer, but I think there
-> > > > > > > > will be more changes if we use clock provider/consume mechanism.
-> > > > > > > 
-> > > > > > > Less changes is not always best. What happens when a different PHY is
-> > > > > > > used?
-> > > > > > 
-> > > > > > Then the system wouldn't be affected by this AR803x specific behavior.
-> > > > > 
-> > > > > Do you know it really is specific to the AR803x? Turning the clock off
-> > > > > seams a reasonable thing to do when saving power, or when there is no
-> > > > > link partner.
-> > > > 
-> > > > This hibernation behavior seem specific to this PHY, I haven't seen it on
-> > > > another PHY connected to the EQoS so far.
-> > > 
-> > > Marvell PHYs can be programmed so that RXCLK stops when the PHY
-> > > enters power down or energy-detect state, although it defaults to
-> > > always keeping the RGMII interface powered (and thus providing a
-> > > clock.)
-> > > 
-> > > One Micrel PHY - "To save more power, the KSZ9031RNX stops the RX_CLK
-> > > clock output to the MAC after 10 or more RX_CLK clock
-> > > cycles have occurred in the receive LPI state." which seems to imply
-> > > if EEE is enabled, then the receive clock will be stopped when
-> > > entering low-power state.
-> > > 
-> > > I've said this several times in this thread - I think we need a bit
-> > > in the PHY device's dev_flags to allow the MAC to say "do not power
-> > > down the receive clock" which is used by the PHY drivers to (a) program
-> > > the hardware to prevent the receive clock being stopped in situations
-> > > such as the AR803x hibernate mode, and (b) to program the hardware not
-> > > to stop the receive clock when entering EEE low power. This does seem
-> > > to be a generic thing and not specific to just one PHY - especially as
-> > > the stopping of clocks when entering EEE low power is a IEEE 802.3
-> > > defined thing.
-> > 
-> > Like this:
-> ... 
-> >  
-> > +        phy_disable_interrupts(phydev);
-> > +
-> >  	/* Start out supporting everything. Eventually,
-> >  	 * a controller will attach, and may modify one
-> >  	 * or both of these values
-> > @@ -3333,16 +3335,6 @@ static int phy_remove(struct device *dev)
-> >  	return 0;
-> >  }
-> >  
-> > -static void phy_shutdown(struct device *dev)
-> > -{
-> > -	struct phy_device *phydev = to_phy_device(dev);
-> > -
-> > -	if (phydev->state == PHY_READY || !phydev->attached_dev)
-> > -		return;
-> > -
-> > -	phy_disable_interrupts(phydev);
-> > -}
-> > -
+On 10.08.2023 10:09, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Except of shutdown part from other discussion, looks fine for me.
+> For improved readability order the aliases alphabetically for
+> sa8775p-ride.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Suggested-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+> ---
+Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
-Sigh... clearly I can't cope with email, especially when most of the
-subject line is hidden! All I see in the index is "Re: [PATCH] net: phy:
-at803x: Improve hi" for this thread, and I can't remember what the
-other thread was... and it's buried in email.
-
-> What will be the best way to solve this issue for DSA switches attached to
-> MAC with RGMII RXC requirements?
-
-I have no idea - the problem there is the model that has been adopted
-in Linux is that there is no direct relationship between the DSA switch
-and the MAC like there is with a PHY.
-
-The MAC sees only a fixed-link, as does the DSA switch. So from the
-software perspective, it's:
-
-MAC ---- fixed-link
-
-Switch ---- fixed-link
-
-And it just so happens that packets pass between the two by "magic".
-With a PHY, there is a direct relationship:
-
-MAC ---- PHY
-
-The MAC has a direct relationship with the PHY to the extent that the
-MAC driver is involved in managing the PHY through phylink/phylib.
-
-The effect of that de-coupling is that the MAC driver becomes quite
-independent of the switch driver - I don't believe the switch driver
-can query the MAC driver at probe time, nor the other way. If I'm
-mistaken about that, someone needs to say!
-
-What that leaves us with is firmware telling the switch driver...
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Konrad
 
