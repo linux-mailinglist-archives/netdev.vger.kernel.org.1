@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-26203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3717D777287
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:14:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEC9877728E
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68B3C1C21357
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFF071C203A5
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5C31E531;
-	Thu, 10 Aug 2023 08:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49DB1EA6E;
+	Thu, 10 Aug 2023 08:11:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316591DDFB
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA6E1ADFF
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:11:53 +0000 (UTC)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5ED1BCF;
-	Thu, 10 Aug 2023 01:11:47 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RM00t4t3MztSFD;
-	Thu, 10 Aug 2023 16:08:14 +0800 (CST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E24161BCF;
+	Thu, 10 Aug 2023 01:11:50 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RM03Y2QGrzkX7k;
+	Thu, 10 Aug 2023 16:10:33 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
  (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 10 Aug
- 2023 16:11:44 +0800
+ 2023 16:11:45 +0800
 From: Ruan Jinjie <ruanjinjie@huawei.com>
 To: <linus.walleij@linaro.org>, <alsi@bang-olufsen.dk>, <andrew@lunn.ch>,
 	<f.fainelli@gmail.com>, <olteanv@gmail.com>, <davem@davemloft.net>,
@@ -40,9 +40,9 @@ To: <linus.walleij@linaro.org>, <alsi@bang-olufsen.dk>, <andrew@lunn.ch>,
 	<linux-renesas-soc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-wireless@vger.kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [patch net-next 4/5] net: qualcomm: Remove redundant of_match_ptr()
-Date: Thu, 10 Aug 2023 16:11:01 +0800
-Message-ID: <20230810081102.2981505-5-ruanjinjie@huawei.com>
+Subject: [patch net-next 5/5] wlcore: spi: Remove redundant of_match_ptr()
+Date: Thu, 10 Aug 2023 16:11:02 +0800
+Message-ID: <20230810081102.2981505-6-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230810081102.2981505-1-ruanjinjie@huawei.com>
 References: <20230810081102.2981505-1-ruanjinjie@huawei.com>
@@ -69,22 +69,22 @@ of_match_ptr() here.
 
 Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 ---
- drivers/net/ethernet/qualcomm/qca_uart.c | 2 +-
+ drivers/net/wireless/ti/wlcore/spi.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethernet/qualcomm/qca_uart.c
-index ace99c62d03a..9adec91f35e9 100644
---- a/drivers/net/ethernet/qualcomm/qca_uart.c
-+++ b/drivers/net/ethernet/qualcomm/qca_uart.c
-@@ -403,7 +403,7 @@ static struct serdev_device_driver qca_uart_driver = {
- 	.remove = qca_uart_remove,
+diff --git a/drivers/net/wireless/ti/wlcore/spi.c b/drivers/net/wireless/ti/wlcore/spi.c
+index 3f88e6a0a510..7d9a139db59e 100644
+--- a/drivers/net/wireless/ti/wlcore/spi.c
++++ b/drivers/net/wireless/ti/wlcore/spi.c
+@@ -554,7 +554,7 @@ static void wl1271_remove(struct spi_device *spi)
+ static struct spi_driver wl1271_spi_driver = {
  	.driver = {
- 		.name = QCAUART_DRV_NAME,
--		.of_match_table = of_match_ptr(qca_uart_of_match),
-+		.of_match_table = qca_uart_of_match,
+ 		.name		= "wl1271_spi",
+-		.of_match_table = of_match_ptr(wlcore_spi_of_match_table),
++		.of_match_table = wlcore_spi_of_match_table,
  	},
- };
  
+ 	.probe		= wl1271_probe,
 -- 
 2.34.1
 
