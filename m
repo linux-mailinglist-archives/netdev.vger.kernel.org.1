@@ -1,120 +1,167 @@
-Return-Path: <netdev+bounces-26132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00AE8776E5E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 05:13:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CD8776E65
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 05:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3176B1C21446
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 03:13:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D117281ECF
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 03:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1F181C;
-	Thu, 10 Aug 2023 03:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F997F5;
+	Thu, 10 Aug 2023 03:16:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16067E4
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:13:07 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00439C6
-	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 20:13:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691637186;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=x9L6xP3gYbtAj0NCz8uLq+ActI3o6tJnEr7jbjLqmsY=;
-	b=GE0jWwTFjmNqwbfU/VfUqap4lOwMtnLQXtILQHznhKtrSPlM1bxAofx/MYTWqbSqml4NCH
-	5tJSJYe8HuhGbv3Dfs/k+3MNvE3mL4f08XtsU7loB8wU9eVtdeaTc4o3R2am3eTgATg4LY
-	KNhs+9lCPMYJ5AVHMlRtWa6u+dXpOvA=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-695-PMEYTa7MMwCIYYLCdWABiQ-1; Wed, 09 Aug 2023 23:13:03 -0400
-X-MC-Unique: PMEYTa7MMwCIYYLCdWABiQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E0113C0CEEE;
-	Thu, 10 Aug 2023 03:13:02 +0000 (UTC)
-Received: from dell-per430-12.lab.eng.pek2.redhat.com (dell-per430-12.lab.eng.pek2.redhat.com [10.73.196.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C39642166B25;
-	Thu, 10 Aug 2023 03:12:58 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C222A3C
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:16:13 +0000 (UTC)
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2181BFB;
+	Wed,  9 Aug 2023 20:16:12 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-76c8dd2ce79so41943185a.1;
+        Wed, 09 Aug 2023 20:16:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691637372; x=1692242172;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YsP6+M83tJ99Nd1EkOWnQq9Dpk1PaD5qBivEPmeZxDU=;
+        b=k1ikJtf0/a6tAsog2qODYu08f/KtYdY2TnmgDrYOYtuPCoJ9GTXZGRxwOycFaD/93m
+         h6HhuYmkMsorlw4oevYiTdHyFNenGqRbbD4oqIZ1Cb6SRpYVcpPsi9aXgkcTZLjfuqAg
+         jjmtlOFUcrXoh56BwvfbilQWaWTRFeM5hB3wB6wNPnIRQu1QbStwaNgz85yoEff04g5h
+         qOJrnjCpwqNTe6MnltyZacILZCgMAmaOkAMbm+XAKls2DThDlkN3QmdNxmjVMhGr5MEW
+         J3vBaf5hTOJITclcX7iRSKET3ekA89rTDvgU9ufhsqwa3Zz4H5yypqpO5HgUQvA1mTZd
+         FLiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691637372; x=1692242172;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YsP6+M83tJ99Nd1EkOWnQq9Dpk1PaD5qBivEPmeZxDU=;
+        b=eT+OfP/5jzwSukgSiGv4QxKD09ipyvHeYDGHZbyUQ907GYHy7L966VSYCsgDJP+Jxx
+         6HCsKcju/agoad0/hZ6yI7I8xpNAkGJK5u0V2OrZZKGi2sqvdz9PUYuWhdscV0CCTmlm
+         qsWk3QWFEt3p1E4bJb7tfjOWZDlPdnExCK0bSbe/+kTyVEydKhAuSn++jOLxR95f7vQj
+         YRAzuOZYSTJBQ8odCmQG0fNvEvYIxnsB9bNd/5Y1pMgvWOpDN9lIpt/2M4OlUcv/bzFg
+         AogriQyqLVWzCam7O0ICAUdSTak9KXsJxKTfPy0HGDZW+BOaIerQFupqLaUamCZKasaZ
+         5dCw==
+X-Gm-Message-State: AOJu0YwQ0i0PzuiCH7NCcwgm7gMoUUddaS6SY05IrO6dG9o0AJyE2KpN
+	czt5p2N3TwAda7gpegs3iZ8=
+X-Google-Smtp-Source: AGHT+IFMLwyyp8q2A5J1hejT+OuuntqBztSvuBxvqHSxtLwm1T4wMASjwp68c86y5kwEyFOBxVoBAQ==
+X-Received: by 2002:a05:620a:2942:b0:767:96e2:a9cb with SMTP id n2-20020a05620a294200b0076796e2a9cbmr1104151qkp.38.1691637371837;
+        Wed, 09 Aug 2023 20:16:11 -0700 (PDT)
+Received: from localhost ([125.35.86.198])
+        by smtp.gmail.com with ESMTPSA id c4-20020a63ea04000000b0055c178a8df1sm357788pgi.94.2023.08.09.20.16.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Aug 2023 20:16:11 -0700 (PDT)
+From: Hawkins Jiawei <yin31149@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: eperezma@redhat.com,
+	yin31149@gmail.com,
+	18801353760@163.com,
 	virtualization@lists.linux-foundation.org,
 	netdev@vger.kernel.org,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net V2] virtio-net: set queues after driver_ok
-Date: Wed,  9 Aug 2023 23:12:56 -0400
-Message-Id: <20230810031256.813284-1-jasowang@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] virtio-net: Zero max_tx_vq field for VIRTIO_NET_CTRL_MQ_HASH_CONFIG case
+Date: Thu, 10 Aug 2023 11:15:57 +0800
+Message-Id: <20230810031557.135557-1-yin31149@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 25266128fe16 ("virtio-net: fix race between set queues and
-probe") tries to fix the race between set queues and probe by calling
-_virtnet_set_queues() before DRIVER_OK is set. This violates virtio
-spec. Fixing this by setting queues after virtio_device_ready().
+Kernel uses `struct virtio_net_ctrl_rss` to save command-specific-data
+for both the VIRTIO_NET_CTRL_MQ_HASH_CONFIG and
+VIRTIO_NET_CTRL_MQ_RSS_CONFIG commands.
 
-Note that rtnl needs to be held for userspace requests to change the
-number of queues. So we are serialized in this way.
+According to the VirtIO standard, "Field reserved MUST contain zeroes.
+It is defined to make the structure to match the layout of
+virtio_net_rss_config structure, defined in 5.1.6.5.7.".
 
-Fixes: 25266128fe16 ("virtio-net: fix race between set queues and probe")
-Reported-by: Dragos Tatulea <dtatulea@nvidia.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+Yet for the VIRTIO_NET_CTRL_MQ_HASH_CONFIG command case, the `max_tx_vq`
+field in struct virtio_net_ctrl_rss, which corresponds to the
+`reserved` field in struct virtio_net_hash_config, is not zeroed,
+thereby violating the VirtIO standard.
+
+This patch solves this problem by zeroing this field in
+virtnet_init_default_rss().
+
+Signed-off-by: Hawkins Jiawei <yin31149@gmail.com>
 ---
-The patch is needed for -stable.
-Changes since V1: Tweak the commit log.
----
- drivers/net/virtio_net.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+
+TestStep
+========
+1. Boot QEMU with one virtio-net-pci net device with `mq` and `hash`
+feature on, command line like:
+      -netdev tap,vhost=off,...
+      -device virtio-net-pci,mq=on,hash=on,...
+
+2. Trigger VIRTIO_NET_CTRL_MQ_HASH_CONFIG command in guest, command
+line like:
+	ethtool -K eth0 rxhash on
+
+Without this patch, in virtnet_commit_rss_command(), we can see the
+`max_tx_vq` field is 1 in gdb like below:
+
+	pwndbg> p vi->ctrl->rss
+	$1 = {
+	  hash_types = 63,
+	  indirection_table_mask = 0,
+	  unclassified_queue = 0,
+	  indirection_table = {0 <repeats 128 times>},
+	  max_tx_vq = 1,
+	  hash_key_length = 40 '(',
+	  ...
+	}
+
+With this patch, in virtnet_commit_rss_command(), we can see the
+`max_tx_vq` field is 0 in gdb like below:
+
+	pwndbg> p vi->ctrl->rss
+	$1 = {
+	  hash_types = 63,
+	  indirection_table_mask = 0,
+	  unclassified_queue = 0,
+	  indirection_table = {0 <repeats 128 times>},
+	  max_tx_vq = 0,
+	  hash_key_length = 40 '(',
+	  ...
+	}
+
+ drivers/net/virtio_net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1270c8d23463..ff03921e46df 100644
+index 1270c8d23463..8db38634ae82 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -4219,8 +4219,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	if (vi->has_rss || vi->has_rss_hash_report)
- 		virtnet_init_default_rss(vi);
+@@ -2761,7 +2761,7 @@ static void virtnet_init_default_rss(struct virtnet_info *vi)
+ 		vi->ctrl->rss.indirection_table[i] = indir_val;
+ 	}
  
--	_virtnet_set_queues(vi, vi->curr_queue_pairs);
--
- 	/* serialize netdev register + virtio_device_ready() with ndo_open() */
- 	rtnl_lock();
+-	vi->ctrl->rss.max_tx_vq = vi->curr_queue_pairs;
++	vi->ctrl->rss.max_tx_vq = vi->has_rss ? vi->curr_queue_pairs : 0;
+ 	vi->ctrl->rss.hash_key_length = vi->rss_key_size;
  
-@@ -4233,6 +4231,8 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
-+	_virtnet_set_queues(vi, vi->curr_queue_pairs);
-+
- 	/* a random MAC address has been assigned, notify the device.
- 	 * We don't fail probe if VIRTIO_NET_F_CTRL_MAC_ADDR is not there
- 	 * because many devices work fine without getting MAC explicitly
+ 	netdev_rss_key_fill(vi->ctrl->rss.key, vi->rss_key_size);
 -- 
-2.39.3
+2.34.1
 
 
