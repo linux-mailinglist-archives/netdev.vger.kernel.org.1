@@ -1,55 +1,53 @@
-Return-Path: <netdev+bounces-26338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB5E7778E0
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:56:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F83A7778E7
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 14:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2B051C21264
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:56:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B04D31C21320
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 12:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536991E1B9;
-	Thu, 10 Aug 2023 12:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7161E1BB;
+	Thu, 10 Aug 2023 12:57:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4508B1E1A5
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 12:56:24 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6616C5;
-	Thu, 10 Aug 2023 05:56:21 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 37AAnqUE010476;
-	Thu, 10 Aug 2023 14:55:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=UJlI3EefGPgqyNpz7znYrTGmMrOIMm3+GM2TKKWSEuc=; b=pk
-	CjdEjMFdARe67kfgj7f8hUvXDjuzy3CNBx8udKNVcG08xMkEajRMbhSyhW6N2L4V
-	rio2rBSVZhgPxfYVEnfzcO8aJmmGW63jVXoH6kR4XWFuVTRhx5jXL+SvJjQALVgC
-	Z7PqKFcxeW57DWqri6zKAXc76925m6SNzBRp8t1qOsMfj+hKZQ2h+2+JbO0cpyCr
-	1ZTgOnEi+/7/cbOWSDIh+88jojPnAP/HKRuXA7ZQi/JFHju6CCJ6LXpWMrAN2V5f
-	aeYcnh15wNOxEY57ZF+vIYJkBl/vUGxnNxoVwwHvOnKJShqZrtc69lj1cGxWg5F4
-	Pu78Rz4+j9cj1CLVxuAA==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sctu3tbxq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Aug 2023 14:55:35 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id E69D4100057;
-	Thu, 10 Aug 2023 14:55:34 +0200 (CEST)
-Received: from Webmail-eu.st.com (eqndag1node4.st.com [10.75.129.133])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id AA32421A907;
-	Thu, 10 Aug 2023 14:55:34 +0200 (CEST)
-Received: from [10.201.21.122] (10.201.21.122) by EQNDAG1NODE4.st.com
- (10.75.129.133) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 10 Aug
- 2023 14:55:33 +0200
-Message-ID: <520b37d5-16fe-7113-2405-efa6fc393e5f@foss.st.com>
-Date: Thu, 10 Aug 2023 14:55:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798151E1A4
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 12:57:51 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24242C5;
+	Thu, 10 Aug 2023 05:57:50 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37ACvTcK049535;
+	Thu, 10 Aug 2023 07:57:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1691672249;
+	bh=SRjRe34ehad5M7YRy/nqD3E5u+nolVOaUEPJlquRXus=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=T33uo7GyZVN3KQ9oPUdDikxNHd9TLkmpRr3i6Hk2A0B6i5oLbAgBsVJat0mcDWvvv
+	 L4G3TuwScjbhOtK065v67tGaJo9bybobDDMnrV2yNLHILqM13sBMJ8BkkFrBZE8kP9
+	 uwC6Zhc/CvdQwPjWEHcaG+q1j5o8owVIq7RpOg5U=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37ACvTKT109279
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 10 Aug 2023 07:57:29 -0500
+Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 10
+ Aug 2023 07:57:29 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 10 Aug 2023 07:57:29 -0500
+Received: from [172.24.227.217] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37ACvMRd013085;
+	Thu, 10 Aug 2023 07:57:23 -0500
+Message-ID: <593b3505-9c1e-47e6-e856-f299fc257fa8@ti.com>
+Date: Thu, 10 Aug 2023 18:27:22 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,149 +55,144 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 1/1] net: stmmac: dwmac4: extract MAC_HW_Feature regs MSB
- first
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 1/5] dt-bindings: net: Add ICSS IEP
 Content-Language: en-US
-To: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-        Jose Abreu <joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>,
-        Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Joao Pinto <jpinto@synopsys.com>, Simon Horman
-	<horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <xfr@outlook.com>, <rock.xu@nio.com>
-References: <20230810095929.246901-1-0x1207@gmail.com>
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20230810095929.246901-1-0x1207@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Conor Dooley <conor.dooley@microchip.com>
+CC: Conor Dooley <conor@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>, <nm@ti.com>, <srk@ti.com>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20230809114906.21866-1-danishanwar@ti.com>
+ <20230809114906.21866-2-danishanwar@ti.com>
+ <20230809-cardboard-falsify-6cc9c09d8577@spud>
+ <0b619ec5-9a86-a449-e8db-b12cca115b93@ti.com>
+ <20230810-drippy-draw-8e8a63164e46@wendy>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <20230810-drippy-draw-8e8a63164e46@wendy>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.122]
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To EQNDAG1NODE4.st.com
- (10.75.129.133)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-10_10,2023-08-10_01,2023-05-22_02
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Furong
-
-On 8/10/23 11:59, Furong Xu wrote:
-> The bit extraction sequences are a little messy.
-> No code changes, just reorder them.
+On 10/08/23 6:22 pm, Conor Dooley wrote:
+> On Thu, Aug 10, 2023 at 03:23:11PM +0530, Md Danish Anwar wrote:
+>> On 10/08/23 3:07 am, Conor Dooley wrote:
+>>> On Wed, Aug 09, 2023 at 05:19:02PM +0530, MD Danish Anwar wrote:
+>>>> Add DT binding documentation for ICSS IEP module.
+>>>>
+>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>>> ---
+>>>>  .../devicetree/bindings/net/ti,icss-iep.yaml  | 37 +++++++++++++++++++
+>>>>  1 file changed, 37 insertions(+)
+>>>>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>>>> new file mode 100644
+>>>> index 000000000000..adae240cfd53
+>>>> --- /dev/null
+>>>> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>>>> @@ -0,0 +1,37 @@
+>>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>>> +%YAML 1.2
+>>>> +---
+>>>> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
+>>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>>> +
+>>>> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
+>>>
+>>> Does the module here refer to the hw component or to the linux kernel
+>>> module?
+>>>
+>>
+>> The module here refers to the hardware component.
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->   .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  | 54 +++++++++----------
->   1 file changed, 26 insertions(+), 28 deletions(-)
+> Sweet, thanks.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> index 84d3a8551b03..3d9e20078193 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> @@ -379,27 +379,27 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
->   {
->   	u32 hw_cap = readl(ioaddr + GMAC_HW_FEATURE0);
->   
-> -	/*  MAC HW feature0 */
+>>>> +
+>>>> +maintainers:
+>>>> +  - Md Danish Anwar <danishanwar@ti.com>
+>>>> +
+>>>> +properties:
+>>>> +  compatible:
+>>>> +    enum:
+>>>> +      - ti,am654-icss-iep   # for all TI K3 SoCs
+>>>
+>>> *sigh* Please at least give me a chance to reply to the conversation on
+>>> the previous versions of the series before sending more, that's the
+>>> second time with this series :/
+>>
+>> My bad, I should have waited for your response. I will hold on posting next
+>> version until your response is received.
+>>
+>>> Right now this looks worse to me than what we started with given the
+>>> comment is even broader. I have not changed my mind re: what I said on
+>>> the previous version.
+>>>
+>>
+>> OK, so in the previous version [1] your reply was to have specific compatibles
+>> as bindings with "ti-am654-icss-iep" as a fall back. I will go with this only.
+>>
+>> Does the below looks good to you? Here "ti,am642-icss-iep" and
+>> "ti,j721e-icss-iep" are different compatibles for different SoCs where as
+>> "ti,am654-icss-iep" is the fall back. Compatible "ti,am654-icss-iep" will go in
+>> the driver.
+>>
+>> properties:
+>>   compatible:
+>>     oneOf:
+>>       - items:
+>>           - enum:
+>>               - ti,am642-icss-iep
+>>               - ti,j721e-icss-iep
+>>           - const: ti,am654-icss-iep
+>>
+>>       - items:
+>>           - const: ti,am654-icss-iep
+> 
+> This one doesn't need to be an items list, since there is only one item.
+> It should be able to just be const:. I much prefer this approach.
+> 
+> Thanks,
+> Conor.
 
-Why to not start with the LSB ?
+Sure Conor, I will remove items from the last one and make it just const like
+below. Please let me know if this is ok.
 
-> -	dma_cap->mbps_10_100 = (hw_cap & GMAC_HW_FEAT_MIISEL);
-> -	dma_cap->mbps_1000 = (hw_cap & GMAC_HW_FEAT_GMIISEL) >> 1;
-> -	dma_cap->half_duplex = (hw_cap & GMAC_HW_FEAT_HDSEL) >> 2;
-> -	dma_cap->vlhash = (hw_cap & GMAC_HW_FEAT_VLHASH) >> 4;
-> +	/* MAC HW feature0 */
-> +	dma_cap->vlins = (hw_cap & GMAC_HW_FEAT_SAVLANINS) >> 27;
->   	dma_cap->multi_addr = (hw_cap & GMAC_HW_FEAT_ADDMAC) >> 18;
-> -	dma_cap->pcs = (hw_cap & GMAC_HW_FEAT_PCSSEL) >> 3;
-> -	dma_cap->sma_mdio = (hw_cap & GMAC_HW_FEAT_SMASEL) >> 5;
-> -	dma_cap->pmt_remote_wake_up = (hw_cap & GMAC_HW_FEAT_RWKSEL) >> 6;
-> -	dma_cap->pmt_magic_frame = (hw_cap & GMAC_HW_FEAT_MGKSEL) >> 7;
-> -	/* MMC */
-> -	dma_cap->rmon = (hw_cap & GMAC_HW_FEAT_MMCSEL) >> 8;
-> -	/* IEEE 1588-2008 */
-> -	dma_cap->atime_stamp = (hw_cap & GMAC_HW_FEAT_TSSEL) >> 12;
-> -	/* 802.3az - Energy-Efficient Ethernet (EEE) */
-> -	dma_cap->eee = (hw_cap & GMAC_HW_FEAT_EEESEL) >> 13;
->   	/* TX and RX csum */
-> -	dma_cap->tx_coe = (hw_cap & GMAC_HW_FEAT_TXCOSEL) >> 14;
->   	dma_cap->rx_coe =  (hw_cap & GMAC_HW_FEAT_RXCOESEL) >> 16;
-> -	dma_cap->vlins = (hw_cap & GMAC_HW_FEAT_SAVLANINS) >> 27;
-> +	dma_cap->tx_coe = (hw_cap & GMAC_HW_FEAT_TXCOSEL) >> 14;
-> +	/* 802.3az - Energy-Efficient Ethernet (EEE) */
-> +	dma_cap->eee = (hw_cap & GMAC_HW_FEAT_EEESEL) >> 13;
-> +	/* IEEE 1588-2008 */
-> +	dma_cap->atime_stamp = (hw_cap & GMAC_HW_FEAT_TSSEL) >> 12;
->   	dma_cap->arpoffsel = (hw_cap & GMAC_HW_FEAT_ARPOFFSEL) >> 9;
-> +	/* MMC */
-> +	dma_cap->rmon = (hw_cap & GMAC_HW_FEAT_MMCSEL) >> 8;
-> +	dma_cap->pmt_magic_frame = (hw_cap & GMAC_HW_FEAT_MGKSEL) >> 7;
-> +	dma_cap->pmt_remote_wake_up = (hw_cap & GMAC_HW_FEAT_RWKSEL) >> 6;
-> +	dma_cap->sma_mdio = (hw_cap & GMAC_HW_FEAT_SMASEL) >> 5;
-> +	dma_cap->vlhash = (hw_cap & GMAC_HW_FEAT_VLHASH) >> 4;
-> +	dma_cap->pcs = (hw_cap & GMAC_HW_FEAT_PCSSEL) >> 3;
-> +	dma_cap->half_duplex = (hw_cap & GMAC_HW_FEAT_HDSEL) >> 2;
-> +	dma_cap->mbps_1000 = (hw_cap & GMAC_HW_FEAT_GMIISEL) >> 1;
-> +	dma_cap->mbps_10_100 = (hw_cap & GMAC_HW_FEAT_MIISEL);
->   
->   	/* MAC HW feature1 */
->   	hw_cap = readl(ioaddr + GMAC_HW_FEATURE1);
-> @@ -408,7 +408,6 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
->   	dma_cap->av = (hw_cap & GMAC_HW_FEAT_AVSEL) >> 20;
->   	dma_cap->tsoen = (hw_cap & GMAC_HW_TSOEN) >> 18;
->   	dma_cap->sphen = (hw_cap & GMAC_HW_FEAT_SPHEN) >> 17;
-> -
->   	dma_cap->addr64 = (hw_cap & GMAC_HW_ADDR64) >> 14;
->   	switch (dma_cap->addr64) {
->   	case 0:
-> @@ -424,31 +423,30 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
->   		dma_cap->addr64 = 32;
->   		break;
->   	}
-> -
->   	/* RX and TX FIFO sizes are encoded as log2(n / 128). Undo that by
->   	 * shifting and store the sizes in bytes.
->   	 */
->   	dma_cap->tx_fifo_size = 128 << ((hw_cap & GMAC_HW_TXFIFOSIZE) >> 6);
->   	dma_cap->rx_fifo_size = 128 << ((hw_cap & GMAC_HW_RXFIFOSIZE) >> 0);
-> +
->   	/* MAC HW feature2 */
->   	hw_cap = readl(ioaddr + GMAC_HW_FEATURE2);
-> +	/* Number of Auxiliary Snapshot Inputs */
-> +	dma_cap->aux_snapshot_n = (hw_cap & GMAC_HW_FEAT_AUXSNAPNUM) >> 28;
-> +	/* PPS output */
-> +	dma_cap->pps_out_num = (hw_cap & GMAC_HW_FEAT_PPSOUTNUM) >> 24;
->   	/* TX and RX number of channels */
-> -	dma_cap->number_rx_channel =
-> -		((hw_cap & GMAC_HW_FEAT_RXCHCNT) >> 12) + 1;
->   	dma_cap->number_tx_channel =
->   		((hw_cap & GMAC_HW_FEAT_TXCHCNT) >> 18) + 1;
-> +	dma_cap->number_rx_channel =
-> +		((hw_cap & GMAC_HW_FEAT_RXCHCNT) >> 12) + 1;
->   	/* TX and RX number of queues */
-> -	dma_cap->number_rx_queues =
-> -		((hw_cap & GMAC_HW_FEAT_RXQCNT) >> 0) + 1;
->   	dma_cap->number_tx_queues =
->   		((hw_cap & GMAC_HW_FEAT_TXQCNT) >> 6) + 1;
-> -	/* PPS output */
-> -	dma_cap->pps_out_num = (hw_cap & GMAC_HW_FEAT_PPSOUTNUM) >> 24;
-> -
-> +	dma_cap->number_rx_queues =
-> +		((hw_cap & GMAC_HW_FEAT_RXQCNT) >> 0) + 1;
->   	/* IEEE 1588-2002 */
->   	dma_cap->time_stamp = 0;
-> -	/* Number of Auxiliary Snapshot Inputs */
-> -	dma_cap->aux_snapshot_n = (hw_cap & GMAC_HW_FEAT_AUXSNAPNUM) >> 28;
->   
->   	/* MAC HW feature3 */
->   	hw_cap = readl(ioaddr + GMAC_HW_FEATURE3);
+properties:
+  compatible:
+    oneOf:
+      - items:
+          - enum:
+              - ti,am642-icss-iep
+              - ti,j721e-icss-iep
+          - const: ti,am654-icss-iep
 
+      - const: ti,am654-icss-iep
+
+-- 
+Thanks and Regards,
+Danish.
 
