@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-26126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD6A2776E14
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 04:28:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1174C776E2A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 04:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA3AA1C213ED
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 02:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5FA5281EC0
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 02:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B7D7EF;
-	Thu, 10 Aug 2023 02:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DFF7F5;
+	Thu, 10 Aug 2023 02:45:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769507E4
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:28:10 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44DB61BD9;
-	Wed,  9 Aug 2023 19:28:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1691634489; x=1723170489;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bzEek1zgt1wND7V2uHTMP/IFQxtrm8y1bob9SqKo9zI=;
-  b=KaHzKPDBA3kBwQqdbVZf12BH8MpzsD74JdEC7brZTSu//iFSrFFgQBW8
-   RNc6YMSpIUYhOtId+9vp3Q/UaKaSZll2tuoFBOnsr9r2pLwZ+gO4K8jIp
-   PC93U3GbFLJkkhKSeFIZ5w/WKKJZ0ODjYLNs3VBMDskeSGAM/uFm5nTSc
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.01,160,1684800000"; 
-   d="scan'208";a="147646150"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 02:28:07 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com (Postfix) with ESMTPS id 159B08057B;
-	Thu, 10 Aug 2023 02:28:05 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 10 Aug 2023 02:27:46 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 10 Aug 2023 02:27:43 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <sishuai.system@gmail.com>
-CC: <horms@verge.net.au>, <ja@ssi.bg>, <lvs-devel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: Race over table->data in proc_do_sync_threshold()
-Date: Wed, 9 Aug 2023 19:27:34 -0700
-Message-ID: <20230810022734.47246-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <B6988E90-0A1E-4B85-BF26-2DAF6D482433@gmail.com>
-References: <B6988E90-0A1E-4B85-BF26-2DAF6D482433@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8247F4
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:45:26 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C796F170F;
+	Wed,  9 Aug 2023 19:45:25 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 379MpSHH014846;
+	Wed, 9 Aug 2023 19:44:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=BbXfmn1iVqjqs/mZCaFij8skAY5YtvqIYhY+IuDMDM0=;
+ b=SEM/TtykskYB3BLsLwPtQ5YCqUCVap5MgiYHmhSTxYTGGTRHhgaAEJrGOaWj39h2P/3m
+ p/UXhBaMlf1NkLFQ+qr2F8hX9rKJNQTv2N7Ln6nBARqSSy7n02iXQGg6IOXurK0oyGgC
+ 024VeucgaSDNDtra2ePIBUuMy4bZWzQkDkcpgwSwoiW7/8b03ISvd+LT6goWTywl1wGY
+ trIMbYdlTKMRimyzn+KSEj4bjyRiCbMY2tG1As65CxWY5RLKlcD2UxL0GXkWY1kvzLhH
+ CoWuHqqChjY21gtzN0w99hMo368deTh71sg66GBB+TJYUtE29yqx2czTkk14wWETotJe jQ== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3scj5m8xc6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 09 Aug 2023 19:44:30 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 9 Aug
+ 2023 19:44:28 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 9 Aug 2023 19:44:28 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 523A33F70A3;
+	Wed,  9 Aug 2023 19:44:24 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
+        "Alexander
+ Lobakin" <aleksander.lobakin@intel.com>
+Subject: [PATCH net] octeontx2-pf: Set page pool size
+Date: Thu, 10 Aug 2023 08:14:22 +0530
+Message-ID: <20230810024422.1781312-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,28 +65,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.106.100.32]
-X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-ORIG-GUID: yyk-8wPzdbKU-aHCG5wO5TM_YzM6G-8h
+X-Proofpoint-GUID: yyk-8wPzdbKU-aHCG5wO5TM_YzM6G-8h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-10_01,2023-08-09_01,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Sishuai Gong <sishuai.system@gmail.com>
-Date: Wed, 9 Aug 2023 20:30:37 -0400
-> Hi,
-> 
-> We observed races over (struct ctl_table *) table->data when two threads
-> are running proc_do_sync_threshold() in parallel, as shown below:
-> 
-> Thread-1			Thread-2
-> memcpy(val, valp, sizeof(val)); memcpy(valp, val, sizeof(val));
-> 
-> This race probably would mess up table->data. Is it better to add a lock?
+page pool infra does direct recycling aggressively.
+This would often keep ptr_ring left unused. Save
+memory by configuring ptr_ring to a constant value(2K).
 
-Yes, we should acquire mutex/seqlock etc.
+Please find discussion at
+https://lore.kernel.org/netdev/
+	15d32b22-22b0-64e3-a49e-88d780c24616@kernel.org/T/
+
+Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 77c8f650f7ac..123348a9e19e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -1432,7 +1432,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+ 	}
+ 
+ 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+-	pp_params.pool_size = numptrs;
++#define OTX2_PAGE_POOL_SZ 2048
++	pp_params.pool_size = OTX2_PAGE_POOL_SZ;
+ 	pp_params.nid = NUMA_NO_NODE;
+ 	pp_params.dev = pfvf->dev;
+ 	pp_params.dma_dir = DMA_FROM_DEVICE;
+-- 
+2.25.1
+
 
