@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-26166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5977770F5
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:08:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E924777100
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50ACD281E78
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 07:08:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FA3B1C214D0
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 07:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3E43FC2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D2246B4;
 	Thu, 10 Aug 2023 07:08:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C6E3D9E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F3C46AB
 	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 07:08:37 +0000 (UTC)
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 44468F3;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C43CDE40;
 	Thu, 10 Aug 2023 00:08:36 -0700 (PDT)
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: netfilter-devel@vger.kernel.org
@@ -29,10 +29,12 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	stable@vger.kernel.org
-Subject: [PATCH net 0/5] Netfilter fixes for net
-Date: Thu, 10 Aug 2023 09:08:25 +0200
-Message-Id: <20230810070830.24064-1-pablo@netfilter.org>
+Subject: [PATCH net 1/5] netfilter: nf_tables: don't skip expired elements during walk
+Date: Thu, 10 Aug 2023 09:08:26 +0200
+Message-Id: <20230810070830.24064-2-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230810070830.24064-1-pablo@netfilter.org>
+References: <20230810070830.24064-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,82 +48,136 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+From: Florian Westphal <fw@strlen.de>
 
-The following patchset contains Netfilter fixes for net.
+There is an asymmetry between commit/abort and preparation phase if the
+following conditions are met:
 
-The existing attempt to resolve races between control plane and GC work
-is error prone, as reported by Bien Pham <phamnnb@sea.com>, some places
-forgot to call nft_set_elem_mark_busy(), leading to double-deactivation
-of elements.
+1. set is a verdict map ("1.2.3.4 : jump foo")
+2. timeouts are enabled
 
-This series contains the following patches:
+In this case, following sequence is problematic:
 
-1) Do not skip expired elements during walk otherwise elements might
-   never decrement the reference counter on data, leading to memleak.
+1. element E in set S refers to chain C
+2. userspace requests removal of set S
+3. kernel does a set walk to decrement chain->use count for all elements
+   from preparation phase
+4. kernel does another set walk to remove elements from the commit phase
+   (or another walk to do a chain->use increment for all elements from
+    abort phase)
 
-2) Add a GC transaction API to replace the former attempt to deal with
-   races between control plane and GC. GC worker sets on NFT_SET_ELEM_DEAD_BIT
-   on elements and it creates a GC transaction to remove the expired
-   elements, GC transaction could abort in case of interference with
-   control plane and retried later (GC async). Set backends such as
-   rbtree and pipapo also perform GC from control plane (GC sync), in
-   such case, element deactivation and removal is safe because mutex
-   is held then collected elements are released via call_rcu().
+If E has already expired in 1), it will be ignored during list walk, so its use count
+won't have been changed.
 
-3) Adapt existing set backends to use the GC transaction API.
+Then, when set is culled, ->destroy callback will zap the element via
+nf_tables_set_elem_destroy(), but this function is only safe for
+elements that have been deactivated earlier from the preparation phase:
+lack of earlier deactivate removes the element but leaks the chain use
+count, which results in a WARN splat when the chain gets removed later,
+plus a leak of the nft_chain structure.
 
-4) Update rhash set backend to set on _DEAD bit to report deleted
-   elements from datapath for GC.
+Update pipapo_get() not to skip expired elements, otherwise flush
+command reports bogus ENOENT errors.
 
-5) Remove old GC batch API and the NFT_SET_ELEM_BUSY_BIT.
+Fixes: 3c4287f62044 ("nf_tables: Add set type for arbitrary concatenation of ranges")
+Fixes: 8d8540c4f5e0 ("netfilter: nft_set_rbtree: add timeout support")
+Fixes: 9d0982927e79 ("netfilter: nft_hash: add support for timeouts")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ net/netfilter/nf_tables_api.c  |  4 ++++
+ net/netfilter/nft_set_hash.c   |  2 --
+ net/netfilter/nft_set_pipapo.c | 18 ++++++++++++------
+ net/netfilter/nft_set_rbtree.c |  2 --
+ 4 files changed, 16 insertions(+), 10 deletions(-)
 
-Florian Westphal (1):
-  netfilter: nf_tables: don't skip expired elements during walk
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index d3c6ecd1f5a6..b4321869e5c6 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -5602,8 +5602,12 @@ static int nf_tables_dump_setelem(const struct nft_ctx *ctx,
+ 				  const struct nft_set_iter *iter,
+ 				  struct nft_set_elem *elem)
+ {
++	const struct nft_set_ext *ext = nft_set_elem_ext(set, elem->priv);
+ 	struct nft_set_dump_args *args;
+ 
++	if (nft_set_elem_expired(ext))
++		return 0;
++
+ 	args = container_of(iter, struct nft_set_dump_args, iter);
+ 	return nf_tables_fill_setelem(args->skb, set, elem, args->reset);
+ }
+diff --git a/net/netfilter/nft_set_hash.c b/net/netfilter/nft_set_hash.c
+index 0b73cb0e752f..24caa31fa231 100644
+--- a/net/netfilter/nft_set_hash.c
++++ b/net/netfilter/nft_set_hash.c
+@@ -278,8 +278,6 @@ static void nft_rhash_walk(const struct nft_ctx *ctx, struct nft_set *set,
+ 
+ 		if (iter->count < iter->skip)
+ 			goto cont;
+-		if (nft_set_elem_expired(&he->ext))
+-			goto cont;
+ 		if (!nft_set_elem_active(&he->ext, iter->genmask))
+ 			goto cont;
+ 
+diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
+index 49915a2a58eb..d54784ea465b 100644
+--- a/net/netfilter/nft_set_pipapo.c
++++ b/net/netfilter/nft_set_pipapo.c
+@@ -566,8 +566,7 @@ static struct nft_pipapo_elem *pipapo_get(const struct net *net,
+ 			goto out;
+ 
+ 		if (last) {
+-			if (nft_set_elem_expired(&f->mt[b].e->ext) ||
+-			    (genmask &&
++			if ((genmask &&
+ 			     !nft_set_elem_active(&f->mt[b].e->ext, genmask)))
+ 				goto next_match;
+ 
+@@ -601,8 +600,17 @@ static struct nft_pipapo_elem *pipapo_get(const struct net *net,
+ static void *nft_pipapo_get(const struct net *net, const struct nft_set *set,
+ 			    const struct nft_set_elem *elem, unsigned int flags)
+ {
+-	return pipapo_get(net, set, (const u8 *)elem->key.val.data,
+-			  nft_genmask_cur(net));
++	struct nft_pipapo_elem *ret;
++
++	ret = pipapo_get(net, set, (const u8 *)elem->key.val.data,
++			 nft_genmask_cur(net));
++	if (IS_ERR(ret))
++		return ret;
++
++	if (nft_set_elem_expired(&ret->ext))
++		return ERR_PTR(-ENOENT);
++
++	return ret;
+ }
+ 
+ /**
+@@ -2005,8 +2013,6 @@ static void nft_pipapo_walk(const struct nft_ctx *ctx, struct nft_set *set,
+ 			goto cont;
+ 
+ 		e = f->mt[r].e;
+-		if (nft_set_elem_expired(&e->ext))
+-			goto cont;
+ 
+ 		elem.priv = e;
+ 
+diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
+index 8d73fffd2d09..39956e5341c9 100644
+--- a/net/netfilter/nft_set_rbtree.c
++++ b/net/netfilter/nft_set_rbtree.c
+@@ -552,8 +552,6 @@ static void nft_rbtree_walk(const struct nft_ctx *ctx,
+ 
+ 		if (iter->count < iter->skip)
+ 			goto cont;
+-		if (nft_set_elem_expired(&rbe->ext))
+-			goto cont;
+ 		if (!nft_set_elem_active(&rbe->ext, iter->genmask))
+ 			goto cont;
+ 
+-- 
+2.30.2
 
-Pablo Neira Ayuso (4):
-  netfilter: nf_tables: GC transaction API to avoid race with control plane
-  netfilter: nf_tables: adapt set backend to use GC transaction API
-  netfilter: nft_set_hash: mark set element as dead when deleting from packet path
-  netfilter: nf_tables: remove busy mark and gc batch API
-
-Please, pull these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-23-08-10
-
-Thanks.
-
-----------------------------------------------------------------
-
-The following changes since commit c5ccff70501d92db445a135fa49cf9bc6b98c444:
-
-  Merge branch 'net-sched-bind-logic-fixes-for-cls_fw-cls_u32-and-cls_route' (2023-07-31 20:10:39 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-23-08-10
-
-for you to fetch changes up to a2dd0233cbc4d8a0abb5f64487487ffc9265beb5:
-
-  netfilter: nf_tables: remove busy mark and gc batch API (2023-08-10 08:25:27 +0200)
-
-----------------------------------------------------------------
-netfilter pull request 23-08-10
-
-----------------------------------------------------------------
-Florian Westphal (1):
-      netfilter: nf_tables: don't skip expired elements during walk
-
-Pablo Neira Ayuso (4):
-      netfilter: nf_tables: GC transaction API to avoid race with control plane
-      netfilter: nf_tables: adapt set backend to use GC transaction API
-      netfilter: nft_set_hash: mark set element as dead when deleting from packet path
-      netfilter: nf_tables: remove busy mark and gc batch API
-
- include/net/netfilter/nf_tables.h | 120 ++++++---------
- net/netfilter/nf_tables_api.c     | 307 ++++++++++++++++++++++++++++++--------
- net/netfilter/nft_set_hash.c      |  85 +++++++----
- net/netfilter/nft_set_pipapo.c    |  66 +++++---
- net/netfilter/nft_set_rbtree.c    | 146 ++++++++++--------
- 5 files changed, 476 insertions(+), 248 deletions(-)
 
