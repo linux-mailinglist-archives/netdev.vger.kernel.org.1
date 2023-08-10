@@ -1,133 +1,74 @@
-Return-Path: <netdev+bounces-26225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45B477735E
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:53:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD9D777385
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 10:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0478C28199A
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5DA428199A
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 08:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E17E1DDFE;
-	Thu, 10 Aug 2023 08:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA0E1EA65;
+	Thu, 10 Aug 2023 08:57:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1367A3C3C
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:53:17 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4951D211F
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:53:16 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-589878e5b37so8613577b3.2
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691657595; x=1692262395;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ISTwavJo5QNRA0ml/ZYkxWD9JkMB48oJk0Oc/hedKZY=;
-        b=cSx8JAyGkOmdsAHLDtARFe5E+bmkrOnNzYHajkz/Im644aeTTP5xiTIfbcqyJUfyjM
-         BWgv30uk2EgU3NPHpdPaFDcXp2dzkL5bmF7NQmKV/xk5hAbfSYA57I9FdoiPX6WTL5If
-         h8yELZgSUyiI3o+78nsOuxVjK4znn77Cp/xnizFqIcinv/C96+9SADDtYu+wfKZEfO+c
-         SqPxyPVMe1oUATXZyDVrBSxCsWaPgJv7fXDcSfajqF2J1NY6VnqOYeDWrWZNxrkG5oMc
-         N+HtOZtTumcoJfYCMGjZR0FJqXZUsdejxxhXhj932VOqQMh7f/xkPB2IVDQbVJYtd2yb
-         kJEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691657595; x=1692262395;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ISTwavJo5QNRA0ml/ZYkxWD9JkMB48oJk0Oc/hedKZY=;
-        b=DC5BDGMv8uzLpuc0JagyWWQOefHXsWczLwH7Jn10eBX6PMEKFFsFWvzuwz3GCXPyZV
-         3fR/Q6XXFUY1MujdvZzABAJm5Xb1kEhiRQkWLAYEiae4EtVa1dxSkZZwXGlj+YjCqvCj
-         1so5w5fch819L3vtspLDfJyLIVB28fyy4765vOJgTISFzdldFCIQyNfb8PkpovjWvq63
-         Fx8g5HuCqxUXW9nOH+z7EpH0lgThwe7GDAu0RWu5EOJq6w/VaUNcILan3dh25jA5PEzl
-         NXgwZek4A5MrBqEIVj2GBbj+n1SEqQgAa+e/23tkNT4+HzRotGrkUf83NGR7dQaBbLL0
-         uyug==
-X-Gm-Message-State: AOJu0Yz27SqsohCg9Ov3ZgjldXA7wRJUDfzBNEHAlX24buhtdxX8jHOo
-	gp7CHsd870rDDQGDV0BsLkxiF8jWquz7Kj8B0/t4Xw==
-X-Google-Smtp-Source: AGHT+IHR3OcxJgk9HIqvUQ98dw3GrFDpfjo2OZ3Zn5ukK1Ej8qavilwui19M8MLrNbXgTNYPBDiu1AU0FMOIqqB8uTs=
-X-Received: by 2002:a25:6993:0:b0:d63:5e7:4e1b with SMTP id
- e141-20020a256993000000b00d6305e74e1bmr2168294ybc.26.1691657595551; Thu, 10
- Aug 2023 01:53:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E036E1E525
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 08:57:10 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD2010E7
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 01:57:09 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RM13q6KvtzkX8p;
+	Thu, 10 Aug 2023 16:55:51 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
+ (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 10 Aug
+ 2023 16:57:04 +0800
+From: Li Zetao <lizetao1@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <idosch@nvidia.com>, <razor@blackwall.org>,
+	<jbenc@redhat.com>, <gavinl@nvidia.com>, <wsa+renesas@sang-engineering.com>,
+	<vladimir@nikishkin.pw>
+CC: <lizetao1@huawei.com>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next 0/2] Use helper functions to update stats
+Date: Thu, 10 Aug 2023 16:56:40 +0800
+Message-ID: <20230810085642.3781460-1-lizetao1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230809132757.2470544-1-herve.codina@bootlin.com> <20230809132757.2470544-23-herve.codina@bootlin.com>
-In-Reply-To: <20230809132757.2470544-23-herve.codina@bootlin.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 10 Aug 2023 10:53:04 +0200
-Message-ID: <CACRpkdZWHw7sL6EKe0EP0hX5TEsdhzgkPSdVtPPYhS3LqJRHFg@mail.gmail.com>
-Subject: Re: [PATCH v3 22/28] dt-bindings: net: Add the Lantiq PEF2256
- E1/T1/J1 framer
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, 
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, 
-	Nicolin Chen <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500012.china.huawei.com (7.221.188.12)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Herve,
+The patch set uses the helper functions dev_sw_netstats_rx_add() and
+dev_sw_netstats_tx_add() to update stats, which is the same as 
+implementing the function separately.
 
-thanks for your patch!
+Li Zetao (2):
+  net: macsec: Use helper functions to update stats
+  vxlan: Use helper functions to update stats
 
-On Wed, Aug 9, 2023 at 3:28=E2=80=AFPM Herve Codina <herve.codina@bootlin.c=
-om> wrote:
+ drivers/net/macsec.c           | 17 +++--------------
+ drivers/net/vxlan/vxlan_core.c | 13 ++-----------
+ 2 files changed, 5 insertions(+), 25 deletions(-)
 
-> The Lantiq PEF2256 is a framer and line interface component designed to
-> fulfill all required interfacing between an analog E1/T1/J1 line and the
-> digital PCM system highway/H.100 bus.
->
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-(...)
-> +    patternProperties:
-> +      '-pins$':
-> +        type: object
-> +        $ref: /schemas/pinctrl/pincfg-node.yaml#
+-- 
+2.34.1
 
-Shouldn't that be pinmux-node.yaml?
-
-> +        additionalProperties: false
-> +
-> +        properties:
-> +          pins:
-> +            enum: [ RPA, RPB, RPC, RPD, XPA, XPB, XPC, XPD ]
-> +
-> +          function:
-> +            enum: [ SYPR, RFM, RFMB, RSIGM, RSIG, DLR, FREEZE, RFSP, LOS=
-,
-> +                    SYPX, XFMS, XSIG, TCLK, XMFB, XSIGM, DLX, XCLK, XLT,
-> +                    GPI, GPOH, GPOL ]
-> +
-> +        required:
-> +          - pins
-> +          - function
-
-Because those are certainly defined in that file.
-
-Yours,
-Linus Walleij
 
