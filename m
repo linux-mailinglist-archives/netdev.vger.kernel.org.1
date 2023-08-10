@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-26231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBFFC7773B3
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 11:08:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D227773CD
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 11:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4E17281E53
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:08:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A91301C214AD
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 09:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9632C1E522;
-	Thu, 10 Aug 2023 09:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7DD1E523;
+	Thu, 10 Aug 2023 09:10:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4AF1DDFE
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 09:08:47 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE0C211E;
-	Thu, 10 Aug 2023 02:08:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yQ8hlwMYrDg6ST28m32+/PAD0xXq2o0xJouvIduOZYs=; b=HnTzeCu9uLUI04oB5RiPKLQ1/X
-	21LRsT4x9tFFcxFnwTHlCTIvxmCMW/VeK47hQwUepkJnG9CpPC4ipEMh/keAzyiATcHQDsMWezwVp
-	Cy/X6QO7ZWyem2aH8Q2UB0Hr9Vxi79xOimVJkIoCtCh7X+QKEehB0Mk5UjBex+Lahmg7X54irMbae
-	TBfg2IL7o86SMIMUS8ePV2qt67CV968CivloAjAxXQlQjfoV1k0o5YK4UeFUU7nM+OZ0xL79p0Fdc
-	gr4aq0z7c93NcAOJxVFepucBN7opapY5J1o/5ifPq2ekuKe+kwWMDBeSD9tIQG1OA9tI+XKjvrSyE
-	dpL2T/Rw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54116)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qU1el-0003g2-2X;
-	Thu, 10 Aug 2023 10:08:35 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qU1ej-0001dE-DA; Thu, 10 Aug 2023 10:08:33 +0100
-Date: Thu, 10 Aug 2023 10:08:33 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Marek Vasut <marex@denx.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>
-Subject: Re: [PATCH] net: phy: at803x: Improve hibernation support on start up
-Message-ID: <ZNSpEbDVFe5MdyqD@shell.armlinux.org.uk>
-References: <20230804175842.209537-1-marex@denx.de>
- <AM5PR04MB3139793206F9101A552FADA0880DA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <45b1ee70-8330-0b18-2de1-c94ddd35d817@denx.de>
- <AM5PR04MB31392C770BA3101BDFBA80318812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809043626.GG5736@pengutronix.de>
- <AM5PR04MB3139D8C0EBC9D2DFB0C778348812A@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230809060836.GA13300@pengutronix.de>
- <AM5PR04MB3139D7984B4DAADCB25597778813A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918F53C3C
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 09:10:26 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4512691
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:10:24 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3fe32016bc8so5505535e9.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 02:10:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691658622; x=1692263422;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fAcEDNRrH6pEHCwBfOU/n6m16S2gtqtCXBzBAjs/thg=;
+        b=yD607BcaPCJRMrxD5iLhD4zMyo16zEC+7+rIREbRnv5yImF70B0Vx1hfJ9l0/kLn3Y
+         DyvMYR9Y+WTEj6Vg9+o9OMjXzMgmeAPf+trmHhMWTvuWYTUm4C/VsfuwOrZpMfCNlBz8
+         kJ4mjcoa125gTf6w1TtZm/JbDhe/0aK/KpskUJ0DagtN4ktcgmEQaSr7vdTyo5A5hOpI
+         N6r/c2evunmXtA+Og60zUbsz3wN1PZozszwwR+9wC7tkvqFeAcHeTV/M1X4j7L5pdeFf
+         tYy2tvnrb5OuAhG/7+DJ8g4ARq1EccWK/j3vRNZ6clP9zJGvurp2xUzr/qan4uQGPtmS
+         atbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691658622; x=1692263422;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fAcEDNRrH6pEHCwBfOU/n6m16S2gtqtCXBzBAjs/thg=;
+        b=cL+PakkR/a0alol3llphzgjTiZP9XhmwtIKd7iZ1uO0VO/WMHMO0HwN02N1c5e3M5D
+         puaL80H0hT9akoTsWe26/zf+/kt8Y3/1H5uaVyNshMpLaest2z+TmZ+aXU9oCTu50hDg
+         cVMIihs+Pv6H40Tm262Fczmri3fb84Lh9FFIydUhtNdh0HRJykwKNR8rke1H4geZg7QL
+         r+xlZ/L/syWLCnv0EATtxj6hazZMjFElLlv3d5DzpKnc1VryLw+mfZO0/qkhNJ1ye3e2
+         V/M5i08bQtU5hZA+ze7eYNCkgslruUx92bfpndXafTMZl8q5zeSHlzAeG20lD2k7Zsji
+         EA/g==
+X-Gm-Message-State: AOJu0YwRISNNREL0JeNCnKE3eXRAvy55dfzIseEbmbKJn3p1o4M3/DfS
+	I8JUOShiYSSl91d6POBarfMiLA==
+X-Google-Smtp-Source: AGHT+IGxYhJAnKHDxJkWDvXemX7+i6lJpCaE9yJwjIfyTlkE2nHcjgWINtfDkmUL15f0C39X002oPQ==
+X-Received: by 2002:a05:6000:1111:b0:317:dcd5:afbf with SMTP id z17-20020a056000111100b00317dcd5afbfmr1542219wrw.23.1691658622607;
+        Thu, 10 Aug 2023 02:10:22 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id f14-20020adffcce000000b00317a04131c5sm1490080wrs.57.2023.08.10.02.10.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 02:10:22 -0700 (PDT)
+Date: Thu, 10 Aug 2023 11:10:21 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, johannes@sipsolutions.net, lorenzo@kernel.org
+Subject: Re: [PATCH net-next 08/10] netdev-genl: use struct genl_info for
+ reply construction
+Message-ID: <ZNSpfeVRb/I4RmUd@nanopsycho>
+References: <20230809182648.1816537-1-kuba@kernel.org>
+ <20230809182648.1816537-9-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,46 +73,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AM5PR04MB3139D7984B4DAADCB25597778813A@AM5PR04MB3139.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230809182648.1816537-9-kuba@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 03:28:13AM +0000, Wei Fang wrote:
-> > > Furthermore,
-> > > we would expect the hibernation mode is enabled when the ethernet
-> > > interface is brought up but the cable is not plugged, that is to say,
-> > > we only need the PHY to provide the clock for a while to make the MAC
-> > reset successfully.
-> > 
-> > Means, if external clock is not provided, MAC is not fully functional.
-> > Correct?
-> > 
-> The MAC will failed to do software reset if the PHY input clocks are not
-> present.
+Wed, Aug 09, 2023 at 08:26:46PM CEST, kuba@kernel.org wrote:
 
-Yes, that's well known to me - it's been brought up before with stmmac
-and phylink. I said earlier in this thread about this.
+[...]
 
-> > For example, if stmmac_open() fails without external clock, will
-> > stmmac_release() work properly?
-> Actually, I don't know much about stmmac driver and the dwmac IP,
-> Because I'm not responsible for this IP on NXP i.MX platform. But I
-> have a look at the code of stmmac_release(), I think stmmac_release()
-> will work properly, because it invokes phylink_stop() and phylink_disconnect_phy()
-> first which will disable the clock from PHY.
+>@@ -41,6 +41,7 @@ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+> static void
+> netdev_genl_dev_notify(struct net_device *netdev, int cmd)
+> {
+>+	GENL_INFO_NTF(info, &netdev_nl_family, cmd);
 
-When tearing down a network device, there should be no reason to call
-phylink_stop() - unregistering the netdev will take the network device
-down, and thus call the .ndo_stop method if the device was up. .ndo_stop
-should already be calling phylink_stop().
+These macros declaring and defining struct on stack always introduce
+some level of obfuscation to the code. Again, as I suggested in the
+reply to the previous patch, would it be nicer to have initializer
+helper instead? Something like:
 
-I just don't get why driver authors don't check things like this...
+	struct genl_info info;
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	genl_info_nft(&info, &netdev_nl_family, cmd);
+
+
+> 	struct sk_buff *ntf;
+> 
+> 	if (!genl_has_listeners(&netdev_nl_family, dev_net(netdev),
+>@@ -51,7 +52,7 @@ netdev_genl_dev_notify(struct net_device *netdev, int cmd)
+> 	if (!ntf)
+> 		return;
+> 
+>-	if (netdev_nl_dev_fill(netdev, ntf, 0, 0, 0, cmd)) {
+>+	if (netdev_nl_dev_fill(netdev, ntf, &info)) {
+> 		nlmsg_free(ntf);
+> 		return;
+> 	}
+
+[...]
 
