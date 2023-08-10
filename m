@@ -1,87 +1,113 @@
-Return-Path: <netdev+bounces-26136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D291E776E8C
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 05:30:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FC19776EA1
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 05:37:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9579E281EC1
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 03:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E409E281ECF
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 03:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCD5A51;
-	Thu, 10 Aug 2023 03:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D7FA54;
+	Thu, 10 Aug 2023 03:37:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E267F5;
-	Thu, 10 Aug 2023 03:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4DF0AC433C9;
-	Thu, 10 Aug 2023 03:30:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691638221;
-	bh=pSd+VoKNP34UZb9BcUq2Lnoe4HOh65In+TbpqL/m4nQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XmA0um0iP3q1bDWwDq2dmWmdk3qrwVLrodDgJsIA+6OtXnVtuCkZwVULbvi95j2mg
-	 ZwA2SbWIPuKGRQWNteMwu28BEcZ+qwocCylM0+WtoyZ63s/Hp6T442ykDfV+InEXaz
-	 iQ4JNrn/1Zbib4bUCyDDtDlC1VTRWjoUpHpRxgutJXA/fI839iHN4WSf94ansFnfIw
-	 FdkLeuYWosH3TTKv3ZvCDRU9Q9nRj52utgTFFbM7SowNDQcu2qh+BL6sCtTpibESrJ
-	 VJjY0D/isFLEuchp1oYEQYohD5aWlkPdutC0HoLGuL59m6So7oHVJg8pELr7tXyvjR
-	 e+MUnQgqAmssg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3018EE3308E;
-	Thu, 10 Aug 2023 03:30:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5A2A51
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 03:37:51 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510D11FF7
+	for <netdev@vger.kernel.org>; Wed,  9 Aug 2023 20:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691638669;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FSXOWT6dcdztqmjZzbfXKd/Gq/opxoDLOcxehy7PRw0=;
+	b=UucR7XVtWug/HHaJE6SoV1x5jRRfVrCiRGLiGv7/oBV3uRlccqgrL2T7LgJZ1HgutpgmFV
+	JZLFeNcjxtcrbRuWeoWZftPsV8ROtaxj+awbqjVqBx/u4gxU4WwEyttKH3pHuS36aeBA69
+	u0DY1LysGaXUCAq8GmwCj4t0G6T/IB8=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-O9AQfUHtNjWuhMHKWV7oYw-1; Wed, 09 Aug 2023 23:37:48 -0400
+X-MC-Unique: O9AQfUHtNjWuhMHKWV7oYw-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b9ce397ef1so5005131fa.1
+        for <netdev@vger.kernel.org>; Wed, 09 Aug 2023 20:37:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691638666; x=1692243466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FSXOWT6dcdztqmjZzbfXKd/Gq/opxoDLOcxehy7PRw0=;
+        b=dogRZb3fzaIEJKfSP30VVR9Ptwvh8jWyrvBTMRX9j073miMdIGX/Z0bTXE3eu6qCC8
+         ie4NBgEV4GmDOny/iAftwSSdQlPYijYq1hUjmxPvND/CLnQjWK2NEjpHqmy08MRLiP3h
+         3Xld7c4bj+AQWNJwS8IUZliMPVKjkMC+i019hNcTxeO/EL6h0+rRcatmYiI4P7nZ3xUz
+         3JfAFgvJ/QP0TGLX6k3YY/HFyEyavzIqqV64cOXYkay1jI7zyKXlC6g2z5xjkaSzWw45
+         0apDiFO4qdGp+cHfsBgx9r3CFYRlTzLa4Nk3xT/EAcDJcSumfXUHJJjJA7zSrucMyFes
+         m8gw==
+X-Gm-Message-State: AOJu0YyuagvjKvN0hSALoNZ7rHuGX/RYLdIB5tQsEOzLfoQ1fRb7I26n
+	aZAg9rQsvm3AHD/7NFLemaDWrKC2MVfdn2+E7gcSPrPlyMAdciAe/PNLnzH9M8L+zf3QrMmDTZh
+	T4QJeKwjsZr7TouMOvX/yj+e5w3BejYhe
+X-Received: by 2002:a2e:9447:0:b0:2b6:cd6a:17f7 with SMTP id o7-20020a2e9447000000b002b6cd6a17f7mr782538ljh.20.1691638666801;
+        Wed, 09 Aug 2023 20:37:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEewlMoMiXrQySS2PN2O/NVdVgzNVNBbaX/UNMdkpWnE72zb71JfMWUaEcEFr8F2RrqQ+ZaZi/ZseR6/KLEkFA=
+X-Received: by 2002:a2e:9447:0:b0:2b6:cd6a:17f7 with SMTP id
+ o7-20020a2e9447000000b002b6cd6a17f7mr782529ljh.20.1691638666517; Wed, 09 Aug
+ 2023 20:37:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf] xsk: fix refcount underflow in error path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169163822119.30696.9356557415848654995.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Aug 2023 03:30:21 +0000
-References: <20230809142843.13944-1-magnus.karlsson@gmail.com>
-In-Reply-To: <20230809142843.13944-1-magnus.karlsson@gmail.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-Cc: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, netdev@vger.kernel.org, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, bpf@vger.kernel.org,
- syzbot+8ada0057e69293a05fd4@syzkaller.appspotmail.com
+References: <20230809164753.2247594-1-trdgn@amazon.com>
+In-Reply-To: <20230809164753.2247594-1-trdgn@amazon.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 10 Aug 2023 11:37:35 +0800
+Message-ID: <CACGkMEuuEngqX6eKvRLvBm7_gGipVjfbkQ+JaXsE903CEkNfvA@mail.gmail.com>
+Subject: Re: [PATCH v4] tun: avoid high-order page allocation for packet header
+To: Tahsin Erdogan <trdgn@amazon.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Thu, Aug 10, 2023 at 12:48=E2=80=AFAM Tahsin Erdogan <trdgn@amazon.com> =
+wrote:
+>
+> When gso.hdr_len is zero and a packet is transmitted via write() or
+> writev(), all payload is treated as header which requires a contiguous
+> memory allocation. This allocation request is harder to satisfy, and may
+> even fail if there is enough fragmentation.
+>
+> Note that sendmsg() code path limits the linear copy length, so this chan=
+ge
+> makes write()/writev() and sendmsg() paths more consistent.
+>
+> Signed-off-by: Tahsin Erdogan <trdgn@amazon.com>
+> ---
+> v4: updated commit message address comments from Willem
+> v3: rebase to latest net-next
+> v2: replace linear =3D=3D 0 with !linear
+> v1: https://lore.kernel.org/all/20230726030936.1587269-1-trdgn@amazon.com=
+/
 
-This patch was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-On Wed,  9 Aug 2023 16:28:43 +0200 you wrote:
-> From: Magnus Karlsson <magnus.karlsson@intel.com>
-> 
-> Fix a refcount underflow problem reported by syzbot that can happen
-> when a system is running out of memory. If xp_alloc_tx_descs() fails,
-> and it can only fail due to not having enough memory, then the error
-> path is triggered. In this error path, the refcount of the pool is
-> decremented as it has incremented before. However, the reference to
-> the pool in the socket was not nulled. This means that when the socket
-> is closed later, the socket teardown logic will think that there is a
-> pool attached to the socket and try to decrease the refcount again,
-> leading to a refcount underflow.
-> 
-> [...]
-
-Here is the summary with links:
-  - [bpf] xsk: fix refcount underflow in error path
-    https://git.kernel.org/bpf/bpf/c/85c2c79a0730
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Thanks
 
 
