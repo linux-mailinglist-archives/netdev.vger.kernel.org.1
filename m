@@ -1,46 +1,73 @@
-Return-Path: <netdev+bounces-26556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E76B8778201
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:17:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0523E778205
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 22:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ABB21C20CB8
-	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:17:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E9A61C20D0D
+	for <lists+netdev@lfdr.de>; Thu, 10 Aug 2023 20:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AA823BCB;
-	Thu, 10 Aug 2023 20:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D3D23BCE;
+	Thu, 10 Aug 2023 20:18:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8AA200BC
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:17:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B58E9C433C8;
-	Thu, 10 Aug 2023 20:17:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691698644;
-	bh=2LkXagz5/siA1FP/5dAE4Mt0Kkq6mddlWPM/k+TwkN4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PLNG2GbnlGKmswJnGAu5gAiTYxAO0k/kY32xwa0BpD+q/lQFemPAZAnfjHiLMUPhN
-	 35XypHILHqpLIZ9OeSmnh1vcDvot7cnI9Ot6Nb60+9/Zhdr3szP50uXicWaQuBshgP
-	 aAJtE04opiq1P1IoYIc9Bx6WqGKuocDb3VV9tFobIK+I64ITD7CnKnZe/lw5AE+TYG
-	 EgBveYoYMBQsh3WnEv0ENrpyDkyL7DiE5VVy4YCurVRViAHKTGIWfxlgVbRjMUyHpx
-	 DiO7z1HSPgrXLQnDM8Bj6OJ4Vb7iywv7OiJE0RpRhS+Skv+KwmelkQXnJI0vNKI8IB
-	 Rxr0L7i6u4/Ww==
-Date: Thu, 10 Aug 2023 22:17:18 +0200
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: rdunlap@infradead.org, benjamin.poirier@gmail.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 1/2] netconsole: Create a allocation helper
-Message-ID: <ZNVFzhBVT/LyhTuR@vergenet.net>
-References: <20230810095452.3171106-1-leitao@debian.org>
- <20230810095452.3171106-2-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7737200BC
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:18:50 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A332728
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:18:50 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bbc87ded50so9796245ad.1
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 13:18:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1691698729; x=1692303529;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3kJtbeMd1DC0iwf7dIt5vaIqCFoNN1NxlZ/NfDv5F7k=;
+        b=FCF+Wwv3S/8SqhDJAVj3HEgDOxOPixLgcJvqdYQAH1j+YW245ZFcnvNZjGujwYtR0Q
+         pn2gvaHu8I+Ng7lyB5MFXtbXBmVybora9cdXqKw8ZPiDnqRcELg9poV0ZQDoytGeUxh/
+         NyhU472SfwlDvshlui960Ud23rM35VCRAtME8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691698729; x=1692303529;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3kJtbeMd1DC0iwf7dIt5vaIqCFoNN1NxlZ/NfDv5F7k=;
+        b=HnchZaDHtdzG6VTb0G55V+EmjN7bAKl2oeT6iQ7B5lcjuyedIcW5DWjHIgdiC2T7s9
+         xQAh6C/7cNr7XLJg5kXHYEoo4KQnlw9Oua7g5pZNaYlvDAfeIPWk1TU1maW4J+Z7Eoia
+         cP1aAlX2oo/BbBYnEADPYUeBjo+Yc9zBFSNYtsDepXkF8uMK6o9urf5HrvyAGaHSxLjX
+         637FdeCW2S/vrVocog05X/ututjB3JVXNm/isk3n47DKcdBKUUlfAwZJ3uFGtoQ+c+xq
+         hSCqVtw1xAGdo2c20v8Jj+Q+uvo3raQ4QFBTXSGjNBMKd1Yx+d8oEZMzoSssvTJ2gAC+
+         bdYA==
+X-Gm-Message-State: AOJu0YzrH70PZKauiO3oEShJi/KKvLf/SKFghzTe7A5PppP9LFK6Uj7/
+	xgF/rhmvEDki7MXHgUpB49ObXA==
+X-Google-Smtp-Source: AGHT+IFT1Y7VV5nno22ITJV4ENgNNpdHnyB1CYiMpLWZvConebc8vMlqaaHPcnrsW/4L73D14eVMcQ==
+X-Received: by 2002:a17:903:2285:b0:1b8:9044:b8ae with SMTP id b5-20020a170903228500b001b89044b8aemr3583313plh.11.1691698729615;
+        Thu, 10 Aug 2023 13:18:49 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x20-20020a170902ea9400b001b9de67285dsm2190933plb.156.2023.08.10.13.18.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 13:18:49 -0700 (PDT)
+Date: Thu, 10 Aug 2023 13:18:48 -0700
+From: Kees Cook <keescook@chromium.org>
+To: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wang Weiyang <wangweiyang2@huawei.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>, gongruiqi1@huawei.com
+Subject: Re: [PATCH] netfilter: ebtables: replace zero-length array members
+Message-ID: <202308101317.7AAED4DF6A@keescook>
+References: <20230809075136.1323302-1-gongruiqi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,86 +76,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230810095452.3171106-2-leitao@debian.org>
+In-Reply-To: <20230809075136.1323302-1-gongruiqi@huaweicloud.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 02:54:50AM -0700, Breno Leitao wrote:
-> De-duplicate the initialization and allocation code for struct
-> netconsole_target.
+On Wed, Aug 09, 2023 at 03:51:36PM +0800, GONG, Ruiqi wrote:
+> From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
 > 
-> The same allocation and initialization code is duplicated in two
-> different places in the netconsole subsystem, when the netconsole target
-> is initialized by command line parameters (alloc_param_target()), and
-> dynamically by sysfs (make_netconsole_target()).
+> As suggested by Kees[1], replace the old-style 0-element array members
+> of multiple structs in ebtables.h with modern C99 flexible array.
 > 
-> Create a helper function, and call it from the two different functions.
+> [1]: https://lore.kernel.org/all/5E8E0F9C-EE3F-4B0D-B827-DC47397E2A4A@kernel.org/
 > 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  drivers/net/netconsole.c | 42 +++++++++++++++++++++-------------------
->  1 file changed, 22 insertions(+), 20 deletions(-)
-> 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 87f18aedd3bd..f93b98d64a3c 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -167,19 +167,16 @@ static void netconsole_target_put(struct netconsole_target *nt)
->  
->  #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
->  
-> -/* Allocate new target (from boot/module param) and setup netpoll for it */
-> -static struct netconsole_target *alloc_param_target(char *target_config)
-> +/* Allocate and initialize with defaults.
-> + * Note that these targets get their config_item fields zeroed-out.
-> + */
-> +static struct netconsole_target *alloc_and_init(void)
->  {
-> -	int err = -ENOMEM;
->  	struct netconsole_target *nt;
->  
-> -	/*
-> -	 * Allocate and initialize with defaults.
-> -	 * Note that these targets get their config_item fields zeroed-out.
-> -	 */
->  	nt = kzalloc(sizeof(*nt), GFP_KERNEL);
->  	if (!nt)
-> -		goto fail;
-> +		return nt;
->  
->  	nt->np.name = "netconsole";
->  	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
-> @@ -187,6 +184,21 @@ static struct netconsole_target *alloc_param_target(char *target_config)
->  	nt->np.remote_port = 6666;
->  	eth_broadcast_addr(nt->np.remote_mac);
->  
-> +	return nt;
-> +}
-> +
-> +/* Allocate new target (from boot/module param) and setup netpoll for it */
-> +static struct netconsole_target *alloc_param_target(char *target_config)
-> +{
-> +	struct netconsole_target *nt;
-> +	int err;
+> Link: https://github.com/KSPP/linux/issues/21
+> Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
 
-Hi Breno,
+In theory, this should be fine. It is possible there are userspace tools
+that are doing (already) buggy things that will now turn into build
+failures. If the userspace ebtable tools still build happily with these
+UAPI changes, I imagine that would be a sufficient test.
 
-This function returns err.
-However, clang-16 W=1 and Smatch warn that there is a case
-where this may occur without err having being initialised.
-
-> +
-> +	nt = alloc_and_init();
-> +	if (!nt) {
-> +		err = -ENOMEM;
-> +		goto fail;
-> +	}
-> +
->  	if (*target_config == '+') {
->  		nt->extended = true;
->  		target_config++;
-
-...
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
 -- 
-pw-bot: changes-requested
+Kees Cook
 
