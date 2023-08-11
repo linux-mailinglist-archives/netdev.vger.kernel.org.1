@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-26835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C38B7792A0
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:15:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 941217792A2
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:15:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C3F21C21761
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC0542804D2
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA74A29E1D;
-	Fri, 11 Aug 2023 15:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCC32AB21;
+	Fri, 11 Aug 2023 15:15:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85C263B6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:14:45 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F25230CF
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:14:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA91749D
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:15:09 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2062.outbound.protection.outlook.com [40.107.100.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4619C30DA
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:15:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Um++wYZYyF3bpqsemA9RwhkUlgJbHJgUPzBg7kviJ2WOkGHLfe6TkuMzdbwKcjY4uazBBeiYvW9joXMSOMdKAIylZKvyXshOSFFe8idbuWV8jSqsCyd1TUiSJOP9vUStliJsiTqX73pTjb93bkn3tg3rt/1PwIscRRzWL1kHleadYuoNGR/7mSx7v4vyCqyG4Kf0cXCd4RnHy/OwR/A38eAwWfxQzKI7VfOWDE/W0+TKWCPE0RL7Tr/JadZB8g8VDQ/2hnxZAbS6CT1Hm+YvNDdrB9mA1LYY/EmJkYG+vGa0/CFhtgOdtw3dpy+hJDOvgXcVrSTJgzMSgZKshz2CaQ==
+ b=Ic0o+o+tY8AcKPlmxf5mDlOjkcFgtCowJ9qL5BiYSrH9MCCWQcMwZeLUpGpov4o4/INtWLKyqhMQ17dzJtfRYRAurJ8mGIVshYEDPuDtwwfFDmcKB/OJKPZd1MiNw57ySTs16Gb3anf8zee3uoyvv80Xl8c8uZ5olJTUJcB3y2yNW3rGQIAtHwM4f+Rg3HXdvDbIRSFnOXQTYX4VLzJoMVsSA38o7Rjq9lpAFFShJfuyWcg09bH0KB1d442Mu9FYHOOR1dt5+GObFX8vrxMBYZLEJQiWKGNfJY2oiCvC77tpQKlwGI6SF5sg4CgCo/PiK7JExDwfrjZyPJiQf+JJMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W4wvp/z5fRV51d2LRCBMAZDdrYVZJ/DVy06iM5GphYY=;
- b=XGjiTCg0aCirNKVnhHK+tZQcSX4PhW1VNWDVFWfuroqISRFFZyRVBkeJV1zN4zFLcjOgvxnr/GfE+zrbBYGVlk9PY8/HABUOx3lIy8y6/ikAI2ldcWi29nPMBzBCgvUuCkk8cA8wf1iuM4bgwd8QXdOG1yH4Ob3cauY7AiMCWcaCb94oTwYljIuK7pQKjGxjANC0cSBtYTWe7IPlwahTnDnDnVSA8JzRettHAqdhJWRohONgAcqWc3MkzmOzRbCvbb8hBLqhQ2yBj35sXlJWIVGrLiO+5fMkVkDve2vqhQJ5TSLiJoQ/Y8DeuidIOHfs5yJZft3x2Hn3P/mGlvlwlw==
+ bh=LO+L1AlL7xuLh2tvYSU+qzp+F7VjC4wOEyPTf5W/quY=;
+ b=MWwjjcA9pHT7EWANhj6C0tD5YjWQfuB0QKUZIAw2ViexyRUdkAEPeiLsm+qskjDhOb04m/5FMBwe+okLkmyyaimfCzjhjrDJtokxQ+BdjjajhOiubFGHzho05NtJoy57WBTBlY6foLK/ealZ8eTlifJnHHWZ87WaiC11pCEnmyMJS2bgV2cpMSX9pDBvGvAag37v54A8v2gXcv02QwfNhKzVLJSWF7BtSpsJPsgG0LCCqdkRZT7MxYjOAs5vvGK1DbLapObmml39wAQS8oSSXA2kHTxku6RgpowtBqVWeNgfejQGxh0cNQTBxEj8Qaoke9N3zHMAl+i70VOF5HQRPw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -35,18 +35,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W4wvp/z5fRV51d2LRCBMAZDdrYVZJ/DVy06iM5GphYY=;
- b=I9IdARZl18NzTFNSIgVkZoIW1OuaH9LnqB6o1mF6A5uBxOR5lOwpviAk7i4Jb5Bg8Zd0s9vehcKZ/wa58QSGlZsX1b0Hogk92/RrCElkD45VDnzGBFXv78MSjgTMmTmpTkrrlf9njy3w0KgOrQVbfUZNsQyKh+MkuoHk3BgwZWDZIg461NoYdz5u6U20ijuqNmoRRh4lpKwCW6SP8imEn7jvewVxWjlVnAiYE3qhHZOUwkADv0mlSp0ByY1FXEOGaVCjJjPbtH4qwyi90OxBG+6qf6fGFi1wmE1tatZC7lKFnK52/rV/JWba0Ka8a8Hm4UFI0szQuM2mLrfna6JNMw==
-Received: from DS7PR03CA0079.namprd03.prod.outlook.com (2603:10b6:5:3bb::24)
- by BY5PR12MB4259.namprd12.prod.outlook.com (2603:10b6:a03:202::17) with
+ bh=LO+L1AlL7xuLh2tvYSU+qzp+F7VjC4wOEyPTf5W/quY=;
+ b=Y+rtOROyLAbUN5CzLQUgMQ7wuMI3CUI+KVAAmTRsiJM2j5+7zy9PF/2gCSMoOXh2f0M+Z3eKPrIBvDafAZCjGl+LkQzur6iCUNy3/PUyMQ9ExBAjkkkkppV30WfkophukX8Dl2QebgVUMxSpu/sMtyHrUiypDfY56bxcvU+2LD5bWwXggX1Tede4yZJi1QhJYzJKDCovBxuyllYypZzk6S0uQEpCwRgYUuXYsgSKVwZjkd4u8YeTTdCWK8BsBBLM5Filikt+sPIskyGaNy0/QLdMbVQFs8q/oVRsvKjMdlSuqMbzrk8lpxTOLz6O9nl0UNXUjiGk2tMsWdAbiBquHw==
+Received: from DM6PR11CA0030.namprd11.prod.outlook.com (2603:10b6:5:190::43)
+ by CH2PR12MB4905.namprd12.prod.outlook.com (2603:10b6:610:64::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.20; Fri, 11 Aug
- 2023 15:14:42 +0000
-Received: from CY4PEPF0000EE3E.namprd03.prod.outlook.com
- (2603:10b6:5:3bb:cafe::e4) by DS7PR03CA0079.outlook.office365.com
- (2603:10b6:5:3bb::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
+ 2023 15:14:54 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:5:190:cafe::87) by DM6PR11CA0030.outlook.office365.com
+ (2603:10b6:5:190::43) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.31 via Frontend
- Transport; Fri, 11 Aug 2023 15:14:41 +0000
+ Transport; Fri, 11 Aug 2023 15:14:53 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -54,26 +54,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE3E.mail.protection.outlook.com (10.167.242.18) with Microsoft
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 15:14:41 +0000
+ 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 15:14:53 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 11 Aug 2023
- 08:14:28 -0700
+ 08:14:35 -0700
 Received: from localhost.localdomain (10.126.231.37) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 11 Aug
- 2023 08:14:25 -0700
+ 2023 08:14:33 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next 2/4] mlxsw: spectrum_flower: Disable learning and security lookup when redirecting
-Date: Fri, 11 Aug 2023 17:13:56 +0200
-Message-ID: <25a88ee9e0a1d9bd9d3a78376f3b6ff02bd53bce.1691764353.git.petrm@nvidia.com>
+Subject: [PATCH net-next 3/4] mlxsw: spectrum: Stop ignoring learning notifications from redirected traffic
+Date: Fri, 11 Aug 2023 17:13:57 +0200
+Message-ID: <13bc71f25d9ee4e74a514e2e992cb96f87304299.1691764353.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1691764353.git.petrm@nvidia.com>
 References: <cover.1691764353.git.petrm@nvidia.com>
@@ -90,26 +90,26 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3E:EE_|BY5PR12MB4259:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b2143b7-82ce-4d3a-9a73-08db9a7dafbc
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|CH2PR12MB4905:EE_
+X-MS-Office365-Filtering-Correlation-Id: acea16e6-e540-4e84-db5e-08db9a7db70f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	GTIAAGGmSCaeBvkIq7tMjoUxbB1mwjKRVM9UT1KiSFTjEKmuP32n4yq9VYMDzUhWp7wMl4uSV7h3j8h2kq4v5ms8Ts9oevpQi7QFI1A7yHtDABR5/b+KifpdEwHHbhtXUJRs++S90QpN5nOTPCYJQEKPWjXhs39FJvV9qxB2sfp+BfK//jw9I2mmGm2aDq5YvhUPImc+zf0gVHqE04Q29LAgOGe1K4DWCII+xOEKLE5Za9OJz07Bqk/FJd1z3i8wEt4A+rUlwOXaJdZgmyS0c0M0DZmsWi+RYbqJ2Kmquua2w4IAEd72RPpH1MfzQq0HUq4nT9bWWIthM6TmQNvOLNNzXlkyopYdE2fXApgDfJa7VK9EMcY4TDHFjtZPzeGdI0Wa+08rh8bD0N5rmqd/OucAzh3ZmDrRoH4baTEVDKY5LHA4GTU85GHckefy6IQeHvEuGWT3rbYHTtia5vmSR59qowuM8fb9WtUx2aImd5/TMVYm1UyaPzgdzLiTPTAJ1AixnJ9opRfH2/T0P1DMm1gFTONBO41GuRkQq2Pwj1euUZehfRjcEnv/t5wGW1LphJxWrXsI4y4Y+lw3yZXE8AlCj4UEdsdynYYoAc6vDkV6sKElPujjdyWq6buR5dayPTVXtKPCFANhcMDRTShWYWKxCBxeswzTEgaGUPE/dhgrDmsg7ikT7RiyewUS3DsrmeGKo3/szqBLYUOw9yYd4m2gNPedKuHIgmB1UgOVy7xLNCtZ+C8iKqFlll7NlIW6
+	TP8bFO6zPjnA8K1steIdIGHhQwYBWuDuHCdQD+VJ8R4lVcp4G77NzvuvkTaMpHN/D4/xYIPjasvVelp+9GFYjLgc7lx2I5LaleEMUyqSIQk8/eWPULXF573UUVhTSjR3AoiHsYE70HuTZoTIwp9sb0uhKHCQn1Vv83aSGqKJ9crycF6l337dpLlONiX6qt15gA/ThoFKvjQf2bUZ7hocrlkKSH7vD1xDvk7dtd1ZF4JOXegX3qjk9jK5Z2IT0JNQGdsOv4/1IrXqHHS7s+eTWpuleziojt097JyWjDTPflQYBIFu6naTesAH7daH1p5iCZJ/LnFfyYEYIJB/kfN6sYCjweciPp8Y9VN4A+Z69756FmiGhC5hTuIkn1FVErNjjcCyVQ41/dwC+qJfmLphERnpKQwyUnHJNSHGY2VNWiS2RlzHjts4W2MZoqoXkf1zYg6mjmKbcqQDt00b8YVhh014HqF1nJQhvXLJCW3LLlibFjz0curaQz15tp6HAj2x2RReX/cNMFQ+hiuRMz6OELuQTOioCiebiqOZqKZcwmpoi1Ne2VpLDFZn4D2Gne+Sn+bCFwDWosMqHgo3SbPmMxkJedd7zH8j8y89gWKn+9PX6NnCx3y/fjPl0VEGpNq4zrMUlCAj7IW8fpTpD2HFTHmCuScILQXYP0+lZYuDaW33B6lU9cn2Xjn9lssw9XyBFz6I4qnZRBZtswy9gm/OKg==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(396003)(39860400002)(376002)(186006)(1800799006)(82310400008)(451199021)(36840700001)(40470700004)(46966006)(40460700003)(36756003)(86362001)(40480700001)(356005)(82740400003)(7636003)(36860700001)(107886003)(16526019)(26005)(83380400001)(47076005)(2616005)(336012)(478600001)(110136005)(426003)(54906003)(6666004)(4326008)(70206006)(316002)(41300700001)(8936002)(8676002)(15650500001)(2906002)(5660300002)(70586007);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(1800799006)(451199021)(82310400008)(186006)(40470700004)(36840700001)(46966006)(70586007)(16526019)(2616005)(36756003)(508600001)(110136005)(6666004)(70206006)(107886003)(336012)(26005)(54906003)(4326008)(316002)(2906002)(15650500001)(7636003)(5660300002)(356005)(8936002)(8676002)(86362001)(83380400001)(36860700001)(426003)(47076005)(40460700003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 15:14:41.1613
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 15:14:53.4510
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b2143b7-82ce-4d3a-9a73-08db9a7dafbc
+X-MS-Exchange-CrossTenant-Network-Message-Id: acea16e6-e540-4e84-db5e-08db9a7db70f
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3E.namprd03.prod.outlook.com
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4259
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4905
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -119,103 +119,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Ido Schimmel <idosch@nvidia.com>
 
-It is possible to add a filter that redirects traffic from the ingress
-of a bridge port that is locked (i.e., performs security / SMAC lookup)
-and has learning enabled. For example:
+As explained in the previous patch, with the ignore action prepended to
+the redirect action, it is not longer possible for redirected traffic to
+generate learning notifications.
 
- # ip link add name br0 type bridge
- # ip link set dev swp1 master br0
- # bridge link set dev swp1 learning on locked on mab on
- # tc qdisc add dev swp1 clsact
- # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw src_ip 192.0.2.1 action mirred egress redirect dev swp2
-
-In the kernel's Rx path, this filter is evaluated before the Rx handler
-of the bridge, which means that redirected traffic should not be
-affected by bridge port configuration such as learning.
-
-However, the hardware data path is a bit different and the redirect
-action (FORWARDING_ACTION in hardware) merely attaches a pointer to the
-packet, which is later used by the L2 lookup stage to understand how to
-forward the packet. Between both stages - ingress ACL and L2 lookup -
-learning and security lookup are performed, which means that redirected
-traffic is affected by bridge port configuration, unlike in the kernel's
-data path.
-
-The learning discrepancy was handled in commit 577fa14d2100 ("mlxsw:
-spectrum: Do not process learned records with a dummy FID") by simply
-ignoring learning notifications generated by the redirected traffic. A
-similar solution is not possible for the security / SMAC lookup since
-- unlike learning - the CPU is not involved and packets that failed the
-lookup are dropped by the device.
-
-Instead, solve this by prepending the ignore action to the redirect
-action and use it to instruct the device to disable both learning and
-the security / SMAC lookup for redirected traffic.
+Therefore, remove the workaround that was added in commit 577fa14d2100
+("mlxsw: spectrum: Do not process learned records with a dummy FID") as
+it is no longer needed.
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlxsw/spectrum.h        |  3 +++
- drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c    |  9 +++++++++
- drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c | 10 ++++++++++
- 3 files changed, 22 insertions(+)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum.h         |  1 -
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c     | 10 ----------
+ .../net/ethernet/mellanox/mlxsw/spectrum_switchdev.c   |  6 ------
+ 3 files changed, 17 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
-index 8da7bb04fc3a..2fed55bcfd63 100644
+index 2fed55bcfd63..02ca2871b6f9 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
-@@ -1050,6 +1050,9 @@ int mlxsw_sp_acl_rulei_act_count(struct mlxsw_sp *mlxsw_sp,
- int mlxsw_sp_acl_rulei_act_fid_set(struct mlxsw_sp *mlxsw_sp,
- 				   struct mlxsw_sp_acl_rule_info *rulei,
- 				   u16 fid, struct netlink_ext_ack *extack);
-+int mlxsw_sp_acl_rulei_act_ignore(struct mlxsw_sp *mlxsw_sp,
-+				  struct mlxsw_sp_acl_rule_info *rulei,
-+				  bool disable_learning, bool disable_security);
- int mlxsw_sp_acl_rulei_act_sample(struct mlxsw_sp *mlxsw_sp,
- 				  struct mlxsw_sp_acl_rule_info *rulei,
- 				  struct mlxsw_sp_flow_block *block,
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c
-index 186161a3459d..7c59c8a13584 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c
-@@ -775,6 +775,15 @@ int mlxsw_sp_acl_rulei_act_fid_set(struct mlxsw_sp *mlxsw_sp,
- 	return mlxsw_afa_block_append_fid_set(rulei->act_block, fid, extack);
- }
+@@ -1271,7 +1271,6 @@ int mlxsw_sp_setup_tc_block_qevent_mark(struct mlxsw_sp_port *mlxsw_sp_port,
+ 					struct flow_block_offload *f);
  
-+int mlxsw_sp_acl_rulei_act_ignore(struct mlxsw_sp *mlxsw_sp,
-+				  struct mlxsw_sp_acl_rule_info *rulei,
-+				  bool disable_learning, bool disable_security)
-+{
-+	return mlxsw_afa_block_append_ignore(rulei->act_block,
-+					     disable_learning,
-+					     disable_security);
-+}
-+
- int mlxsw_sp_acl_rulei_act_sample(struct mlxsw_sp *mlxsw_sp,
- 				  struct mlxsw_sp_acl_rule_info *rulei,
- 				  struct mlxsw_sp_flow_block *block,
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
-index af3f57d017ec..9fd1ca079258 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
-@@ -160,6 +160,16 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
- 			 */
- 			rulei->egress_bind_blocker = 1;
+ /* spectrum_fid.c */
+-bool mlxsw_sp_fid_is_dummy(struct mlxsw_sp *mlxsw_sp, u16 fid_index);
+ struct mlxsw_sp_fid *mlxsw_sp_fid_lookup_by_index(struct mlxsw_sp *mlxsw_sp,
+ 						  u16 fid_index);
+ int mlxsw_sp_fid_nve_ifindex(const struct mlxsw_sp_fid *fid, int *nve_ifindex);
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
+index b6ee2d658b0c..9df098474743 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
+@@ -137,16 +137,6 @@ static const int *mlxsw_sp_packet_type_sfgc_types[] = {
+ 	[MLXSW_SP_FLOOD_TYPE_MC]	= mlxsw_sp_sfgc_mc_packet_types,
+ };
  
-+			/* Ignore learning and security lookup as redirection
-+			 * using ingress filters happens before the bridge.
-+			 */
-+			err = mlxsw_sp_acl_rulei_act_ignore(mlxsw_sp, rulei,
-+							    true, true);
-+			if (err) {
-+				NL_SET_ERR_MSG_MOD(extack, "Cannot append ignore action");
-+				return err;
-+			}
-+
- 			fid = mlxsw_sp_acl_dummy_fid(mlxsw_sp);
- 			fid_index = mlxsw_sp_fid_index(fid);
- 			err = mlxsw_sp_acl_rulei_act_fid_set(mlxsw_sp, rulei,
+-bool mlxsw_sp_fid_is_dummy(struct mlxsw_sp *mlxsw_sp, u16 fid_index)
+-{
+-	enum mlxsw_sp_fid_type fid_type = MLXSW_SP_FID_TYPE_DUMMY;
+-	struct mlxsw_sp_fid_family *fid_family;
+-
+-	fid_family = mlxsw_sp->fid_core->fid_family_arr[fid_type];
+-
+-	return fid_family->start_index == fid_index;
+-}
+-
+ struct mlxsw_sp_fid *mlxsw_sp_fid_lookup_by_index(struct mlxsw_sp *mlxsw_sp,
+ 						  u16 fid_index)
+ {
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
+index 3662b9da5489..6c749c148148 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
+@@ -3066,9 +3066,6 @@ static void mlxsw_sp_fdb_notify_mac_process(struct mlxsw_sp *mlxsw_sp,
+ 		goto just_remove;
+ 	}
+ 
+-	if (mlxsw_sp_fid_is_dummy(mlxsw_sp, fid))
+-		goto just_remove;
+-
+ 	mlxsw_sp_port_vlan = mlxsw_sp_port_vlan_find_by_fid(mlxsw_sp_port, fid);
+ 	if (!mlxsw_sp_port_vlan) {
+ 		netdev_err(mlxsw_sp_port->dev, "Failed to find a matching {Port, VID} following FDB notification\n");
+@@ -3136,9 +3133,6 @@ static void mlxsw_sp_fdb_notify_mac_lag_process(struct mlxsw_sp *mlxsw_sp,
+ 		goto just_remove;
+ 	}
+ 
+-	if (mlxsw_sp_fid_is_dummy(mlxsw_sp, fid))
+-		goto just_remove;
+-
+ 	mlxsw_sp_port_vlan = mlxsw_sp_port_vlan_find_by_fid(mlxsw_sp_port, fid);
+ 	if (!mlxsw_sp_port_vlan) {
+ 		netdev_err(mlxsw_sp_port->dev, "Failed to find a matching {Port, VID} following FDB notification\n");
 -- 
 2.41.0
 
