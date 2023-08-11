@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-26859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 012627793AB
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 18:00:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FAA47793AD
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 18:00:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7B542821B3
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:59:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E89D32811D4
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 16:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6AC329C5;
-	Fri, 11 Aug 2023 15:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96C32AB50;
+	Fri, 11 Aug 2023 15:57:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2885692
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:57:33 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B1030DD
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:32 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fbea14700bso19667285e9.3
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9D95692
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:57:35 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33B842723
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:34 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-3110ab7110aso1925797f8f.3
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691769451; x=1692374251;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691769453; x=1692374253;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZPAP5lBEX2vcC2T4wWrhVRQlFY/OnfoctTNX8XpZ/HE=;
-        b=jvCCu0z//XGvQvRaLGYiI/AUmcXKvjk/+LwdKG9hXzp1O9ngY8Dp/Ez4vg37ynwZ3U
-         w/4zsUCFm3urgqhr+hrvWMMKHjQ0eX1rQROPfShkhrDTtQeP/FPBuKo4r7xl5OEH08FT
-         rl6Yi47AG5whF7FTuz53bTmtAw4NHi5qzSK6C8uBuORePqkd5a0jcNeJ7J8wtnu6v8mX
-         IVkGlgC4LdOk74NXDXco5uXsagMpiD391OEzJ2hJM+6OLSXh9K5JlP8AqyP/rr7YiMmj
-         mE5nmqdW35IlQRxxXhRah+0EyFD/o+CiZotKGmBobG/OvwZKkt5GXmFsOAiGIQ1ffqac
-         ZRMg==
+        bh=NQDuGOkAjJPOER/22K/WlHSttoL0hpj7V6Oed+7zG/I=;
+        b=iFysRuOZZg9Q5TpydEjbKZ9hjRzI6kEtnePGPMU4JzQge+Jc4zPvqG3hdDrlJBBkSR
+         oT/eWQFL2M8XUtyROkPpnKA8lXYAP9m+AgvgPayRqHC3yn4NcU2uqM28t8aUXzx2RV6p
+         lGwsD3KPIF17Lc+Sw3ZQ7ciiIZoSrLXi6NR9HBfJYu+HElXl/FfqWr1HoecjELsiI8ZG
+         zJAWfa5VEV+H8d5laEvTJ62eCkcKcK5o/U70VxJvGBV9u8f+vUzo/Q2GZJUIHRPThQEJ
+         Wkf6AQ5eshkh2qJ1wFNDcda3inQ9KfxnWfEScZIyXjTG2vT7o+Y+b5aBN85L17lISxD4
+         KZZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691769451; x=1692374251;
+        d=1e100.net; s=20221208; t=1691769453; x=1692374253;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZPAP5lBEX2vcC2T4wWrhVRQlFY/OnfoctTNX8XpZ/HE=;
-        b=jA7ECWwgBc8qXmcHrqvEO1Ase+XTuP/RzMWhDj0Rn+JtxZdGme4dctCHbf3Y19fY3f
-         PaYbrotWW7QAmI1MX3o4QDe7ukWysNm8vA+7XzcMnHa2lFTEyzNvtsIOCy7XwMZfk9aG
-         HX549VcyTQXlXFaNe5H8ntf6HURRDdJKGhjCchuqbDhstwvQNTamMhCiraNj+xxaG/QN
-         4aYED4Xdee1Z9J3wKn+FE7Gh0WXqTL4KAli0T1zHU8dskQDEUtRz96KDAimrc/trP1St
-         aYGI6pCJL3O1tGHKM8mqnsWvawZs3+8GBnCicdMJKkCG3VFIXES9DXk3xGiPyq6BwWh9
-         XPNQ==
-X-Gm-Message-State: AOJu0Yy736msIgE98Kb3UTinplD2InCxrpsSeFwNTgdATzA7zi7+iaHW
-	zDNZrtkwEBX8ulGJPu29WJlzQelXpn8Sc2oXD8C6kw==
-X-Google-Smtp-Source: AGHT+IGM972n9nuegsiEEARruio27Sy8BNrVRm2etn63A2K2wNdeFcOKrmj/iQnt50vEDAYHnxVPSQ==
-X-Received: by 2002:adf:e48a:0:b0:317:dde3:2d16 with SMTP id i10-20020adfe48a000000b00317dde32d16mr1874360wrm.51.1691769451073;
-        Fri, 11 Aug 2023 08:57:31 -0700 (PDT)
+        bh=NQDuGOkAjJPOER/22K/WlHSttoL0hpj7V6Oed+7zG/I=;
+        b=dUaPTaAhHbKjaDqe4pCTNrxDyQ45mxtJ4XgAOUdkJZL8MwoO7H0234N6IUWMSnXim7
+         GwRcsszy0K1BvvRuVe8tXpHid2GEKZIllgxRiDnow0dqqSIBOHml2GIgiMqGUi2p/C42
+         17V5MCcb0imXWSgF0AwpVk9JOaWNQt6NusYLxRHa3vgPJrsNNT7fC8oZsG3hksgY2Klk
+         SW4thtsQn/PHgu1LcVey07vDCHjPdKSMqZNKWHKpXnhhsiikQXdRWvv8w0l7etsau7ug
+         9u4bE5SAh0VAtOHfnbTZRcEepbS+fBLT+axWfHmWuSiuqnZwDMT6iJDs0izWfGesq/+E
+         JxGw==
+X-Gm-Message-State: AOJu0YzmtqMzXLbpLLumxRK1k5GixHARW5LcDGP8Rw3HMn5k/Ixm0LhZ
+	W+XscxcD+7KtpDGjRMTzzTFK0smkxB7FZdkWRPkFjw==
+X-Google-Smtp-Source: AGHT+IEQmLeFpsrDRk06SyZq4TFzB1J3K2v4ypqysYEFx4AWiK2xwVdrpN03DJ4Ak1L2X41bf1cm0Q==
+X-Received: by 2002:adf:fe10:0:b0:317:73d3:441a with SMTP id n16-20020adffe10000000b0031773d3441amr1833566wrr.46.1691769452711;
+        Fri, 11 Aug 2023 08:57:32 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id l13-20020adfe9cd000000b0031934b035d2sm5031316wrn.52.2023.08.11.08.57.30
+        by smtp.gmail.com with ESMTPSA id a2-20020a5d4d42000000b00317ca89f6c5sm5808907wru.107.2023.08.11.08.57.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 08:57:30 -0700 (PDT)
+        Fri, 11 Aug 2023 08:57:32 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v4 08/13] devlink: remove duplicate temporary netlink callback prototypes
-Date: Fri, 11 Aug 2023 17:57:09 +0200
-Message-ID: <20230811155714.1736405-9-jiri@resnulli.us>
+Subject: [patch net-next v4 09/13] devlink: remove converted commands from small ops
+Date: Fri, 11 Aug 2023 17:57:10 +0200
+Message-ID: <20230811155714.1736405-10-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230811155714.1736405-1-jiri@resnulli.us>
 References: <20230811155714.1736405-1-jiri@resnulli.us>
@@ -87,85 +87,216 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Remove the duplicate temporary netlink callback prototype as the
-generated ones are already in place.
+As the commands are already defined in split ops, remove them
+from small ops.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v2->v3:
 - new patch
 ---
- net/devlink/devl_internal.h | 48 -------------------------------------
- 1 file changed, 48 deletions(-)
+ net/devlink/devl_internal.h |  2 +-
+ net/devlink/leftover.c      | 99 +------------------------------------
+ 2 files changed, 3 insertions(+), 98 deletions(-)
 
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index f8af6ffdbb3a..7caa385703de 100644
+index 7caa385703de..eb1d5066c73f 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -185,50 +185,11 @@ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
- 			     struct netlink_ext_ack *extack);
+@@ -118,7 +118,7 @@ typedef int devlink_nl_dump_one_func_t(struct sk_buff *msg,
+ 				       struct netlink_callback *cb,
+ 				       int flags);
  
- /* Devlink nl cmds */
--int devlink_nl_pre_doit_port(const struct genl_split_ops *ops,
--			     struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_pre_doit_port_optional(const struct genl_split_ops *ops,
--				      struct sk_buff *skb,
--				      struct genl_info *info);
- int devlink_nl_cmd_reload(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_cmd_eswitch_get_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_cmd_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_cmd_flash_update(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_selftests_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_selftests_get_dumpit(struct sk_buff *skb,
--				    struct netlink_callback *cb);
- int devlink_nl_cmd_selftests_run(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_port_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_port_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
--int devlink_nl_rate_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_rate_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
--int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_linecard_get_dumpit(struct sk_buff *skb,
--				   struct netlink_callback *cb);
--int devlink_nl_sb_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_sb_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
--int devlink_nl_sb_pool_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_sb_pool_get_dumpit(struct sk_buff *skb,
--				  struct netlink_callback *cb);
--int devlink_nl_sb_port_pool_get_doit(struct sk_buff *skb,
--				     struct genl_info *info);
--int devlink_nl_sb_port_pool_get_dumpit(struct sk_buff *skb,
--				       struct netlink_callback *cb);
--int devlink_nl_sb_tc_pool_bind_get_doit(struct sk_buff *skb,
--					struct genl_info *info);
--int devlink_nl_sb_tc_pool_bind_get_dumpit(struct sk_buff *skb,
--					  struct netlink_callback *cb);
--int devlink_nl_param_get_doit(struct sk_buff *skb,
--			      struct genl_info *info);
--int devlink_nl_param_get_dumpit(struct sk_buff *skb,
--				struct netlink_callback *cb);
--int devlink_nl_region_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_region_get_dumpit(struct sk_buff *skb,
--				 struct netlink_callback *cb);
--int devlink_nl_health_reporter_get_doit(struct sk_buff *skb,
--					struct genl_info *info);
--int devlink_nl_health_reporter_get_dumpit(struct sk_buff *skb,
--					  struct netlink_callback *cb);
- int devlink_nl_cmd_health_reporter_set_doit(struct sk_buff *skb,
- 					    struct genl_info *info);
- int devlink_nl_cmd_health_reporter_recover_doit(struct sk_buff *skb,
-@@ -241,12 +202,3 @@ int devlink_nl_cmd_health_reporter_dump_clear_doit(struct sk_buff *skb,
- 						   struct genl_info *info);
- int devlink_nl_cmd_health_reporter_test_doit(struct sk_buff *skb,
- 					     struct genl_info *info);
--int devlink_nl_trap_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_trap_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
--int devlink_nl_trap_group_get_dumpit(struct sk_buff *skb,
--				     struct netlink_callback *cb);
--int devlink_nl_trap_group_get_doit(struct sk_buff *skb, struct genl_info *info);
--int devlink_nl_trap_policer_get_doit(struct sk_buff *skb,
--				     struct genl_info *info);
--int devlink_nl_trap_policer_get_dumpit(struct sk_buff *skb,
--				       struct netlink_callback *cb);
+-extern const struct genl_small_ops devlink_nl_small_ops[54];
++extern const struct genl_small_ops devlink_nl_small_ops[40];
+ 
+ struct devlink *
+ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs);
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index 883c65545d26..3883a90d32bb 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -6307,15 +6307,7 @@ static int devlink_nl_cmd_trap_policer_set_doit(struct sk_buff *skb,
+ 	return devlink_trap_policer_set(devlink, policer_item, info);
+ }
+ 
+-const struct genl_small_ops devlink_nl_small_ops[54] = {
+-	{
+-		.cmd = DEVLINK_CMD_PORT_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_port_get_doit,
+-		.dumpit = devlink_nl_port_get_dumpit,
+-		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+-		/* can be retrieved by unprivileged users */
+-	},
++const struct genl_small_ops devlink_nl_small_ops[40] = {
+ 	{
+ 		.cmd = DEVLINK_CMD_PORT_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+@@ -6323,12 +6315,6 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.flags = GENL_ADMIN_PERM,
+ 		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_RATE_GET,
+-		.doit = devlink_nl_rate_get_doit,
+-		.dumpit = devlink_nl_rate_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_RATE_SET,
+ 		.doit = devlink_nl_cmd_rate_set_doit,
+@@ -6369,45 +6355,18 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.flags = GENL_ADMIN_PERM,
+ 		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_LINECARD_GET,
+-		.doit = devlink_nl_linecard_get_doit,
+-		.dumpit = devlink_nl_linecard_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
++
+ 	{
+ 		.cmd = DEVLINK_CMD_LINECARD_SET,
+ 		.doit = devlink_nl_cmd_linecard_set_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_SB_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_sb_get_doit,
+-		.dumpit = devlink_nl_sb_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+-	{
+-		.cmd = DEVLINK_CMD_SB_POOL_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_sb_pool_get_doit,
+-		.dumpit = devlink_nl_sb_pool_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_SB_POOL_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+ 		.doit = devlink_nl_cmd_sb_pool_set_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_SB_PORT_POOL_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_sb_port_pool_get_doit,
+-		.dumpit = devlink_nl_sb_port_pool_get_dumpit,
+-		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_SB_PORT_POOL_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+@@ -6415,14 +6374,6 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.flags = GENL_ADMIN_PERM,
+ 		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_SB_TC_POOL_BIND_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_sb_tc_pool_bind_get_doit,
+-		.dumpit = devlink_nl_sb_tc_pool_bind_get_dumpit,
+-		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_SB_TC_POOL_BIND_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+@@ -6496,13 +6447,6 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.doit = devlink_nl_cmd_reload,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_PARAM_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_param_get_doit,
+-		.dumpit = devlink_nl_param_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_PARAM_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+@@ -6524,13 +6468,6 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.flags = GENL_ADMIN_PERM,
+ 		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_REGION_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_region_get_doit,
+-		.dumpit = devlink_nl_region_get_dumpit,
+-		.flags = GENL_ADMIN_PERM,
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_REGION_NEW,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+@@ -6550,14 +6487,6 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.dumpit = devlink_nl_cmd_region_read_dumpit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_HEALTH_REPORTER_GET,
+-		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+-		.doit = devlink_nl_health_reporter_get_doit,
+-		.dumpit = devlink_nl_health_reporter_get_dumpit,
+-		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_HEALTH_REPORTER_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+@@ -6606,45 +6535,21 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.doit = devlink_nl_cmd_flash_update,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_TRAP_GET,
+-		.doit = devlink_nl_trap_get_doit,
+-		.dumpit = devlink_nl_trap_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_TRAP_SET,
+ 		.doit = devlink_nl_cmd_trap_set_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_TRAP_GROUP_GET,
+-		.doit = devlink_nl_trap_group_get_doit,
+-		.dumpit = devlink_nl_trap_group_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_TRAP_GROUP_SET,
+ 		.doit = devlink_nl_cmd_trap_group_set_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_TRAP_POLICER_GET,
+-		.doit = devlink_nl_trap_policer_get_doit,
+-		.dumpit = devlink_nl_trap_policer_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_TRAP_POLICER_SET,
+ 		.doit = devlink_nl_cmd_trap_policer_set_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
+-	{
+-		.cmd = DEVLINK_CMD_SELFTESTS_GET,
+-		.doit = devlink_nl_selftests_get_doit,
+-		.dumpit = devlink_nl_selftests_get_dumpit,
+-		/* can be retrieved by unprivileged users */
+-	},
+ 	{
+ 		.cmd = DEVLINK_CMD_SELFTESTS_RUN,
+ 		.doit = devlink_nl_cmd_selftests_run,
 -- 
 2.41.0
 
