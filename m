@@ -1,157 +1,156 @@
-Return-Path: <netdev+bounces-26682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EEEF77892B
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:48:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13590778956
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A7E11C212E6
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 08:48:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0F751C20D94
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 08:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1591353AD;
-	Fri, 11 Aug 2023 08:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC7853B1;
+	Fri, 11 Aug 2023 08:58:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C301869;
-	Fri, 11 Aug 2023 08:48:15 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A9130C1;
-	Fri, 11 Aug 2023 01:48:13 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37B8edTZ024271;
-	Fri, 11 Aug 2023 08:47:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : mime-version : content-type; s=pp1;
- bh=tyh5cDZWabZQwh7mE9BXjoP5MVCyfN6HDYx2RPApJoU=;
- b=AE6H5nbbtCjtT6P0Stv2ibvq/SSBiM2XQRogRVvjU+J6YsH/Q8+TqwDuqg2kce9iPN1X
- abj4Y3vzAAhY4DJ4+cRCoxJzXWhpD62GPlQQctyLM/1k9Ff/V7c1EVaSvo5B3fBPt4dH
- x0KzRDYhQ2YhNqAErttiIaeWtI92VlKWBkd4SFJuKm9sts3wWzx9VtSJmRuaHS+ZurpB
- dXHo7TUR+N3niZUXK34bDmY5XFeB8GykZgKUFuWD5VmEQZx5y73HKw41n4Y+C+cMK2Sr
- duNkOj9Rc+dG7g8a3iTvujnf+4SP0opPA1svGODvgiHTOvToUWfTvaEKQx6rTyi9HOV5 mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sdhh186nb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Aug 2023 08:47:47 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37B8hSZ2000377;
-	Fri, 11 Aug 2023 08:47:46 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sdhh186mn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Aug 2023 08:47:46 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37B7BDmP015363;
-	Fri, 11 Aug 2023 08:47:45 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sb3f3jvxm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Aug 2023 08:47:45 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37B8lhS515205064
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 11 Aug 2023 08:47:44 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D553420043;
-	Fri, 11 Aug 2023 08:47:43 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94F6D20040;
-	Fri, 11 Aug 2023 08:47:40 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 11 Aug 2023 08:47:40 +0000 (GMT)
-Date: Fri, 11 Aug 2023 14:17:39 +0530
-From: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
-To: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-        Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        Sachin Sant <sachinp@linux.ibm.com>
-Subject: Warning when compiling with python3.12
-Message-ID: <20230811084739.GY3902@linux.vnet.ibm.com>
-Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F00053AD
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:58:35 +0000 (UTC)
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7130110F6;
+	Fri, 11 Aug 2023 01:58:32 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-99bf8e5ab39so248432066b.2;
+        Fri, 11 Aug 2023 01:58:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691744311; x=1692349111;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gRWfB9LQHdt9A21IWCnZ+M54s1U8QSJYOzwROk+UCCg=;
+        b=WZCpEBQdd7mplWxI1kwwbFMJvcJzWH7VsBjIzpXFyBlLRPcoxGQlTKuFjhLMqgEu+Y
+         NKiu+fY/WKiLTTxjXxFTEn5EkW0Y6q9qlHToQPvpSu47jsjz7UmNBKLXSA2sR6a5PwJw
+         IocYHaHXJPT5ZCuMoCr5WZN27S8Au0NBNokXMuTm/UK0bQaxnhjrK1ArbFDP0ie9tFE2
+         G+K/+MMMV92Wo4xiE/juBT5CdDfPXVfvdz2ZrqoLJLYnxO/c1Cm/LOkRUWvdrtheD1AL
+         kMZXBJDLpaxwp76SoK51c/D0neXr/CwGUSg4FMJ7AFP82Pu0dpw68zNvWCq2UG8zwUwB
+         LQaQ==
+X-Gm-Message-State: AOJu0Yw8jwPw4347LRmObVRQAfnUTirLiIWK8btWRvcMLoqOXuOqYmv2
+	VPdygSinD6x9rmDRrDBUVdU=
+X-Google-Smtp-Source: AGHT+IHqLdWXwuYvIhydho+xwvmjaWx6+A6OQWMHGr5HxvYEPrYsLZo40YgOy9ZkahcSe4mRnQ5//w==
+X-Received: by 2002:a17:907:7883:b0:99b:e464:bf49 with SMTP id ku3-20020a170907788300b0099be464bf49mr1222415ejc.51.1691744310605;
+        Fri, 11 Aug 2023 01:58:30 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-003.fbsv.net. [2a03:2880:31ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a17-20020a17090682d100b009944e955e19sm1991096ejy.30.2023.08.11.01.58.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 01:58:30 -0700 (PDT)
+Date: Fri, 11 Aug 2023 01:58:25 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Simon Horman <horms@kernel.org>
+Cc: rdunlap@infradead.org, benjamin.poirier@gmail.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 1/2] netconsole: Create a allocation helper
+Message-ID: <ZNX4MexwrLKMABx+@gmail.com>
+References: <20230810095452.3171106-1-leitao@debian.org>
+ <20230810095452.3171106-2-leitao@debian.org>
+ <ZNVFzhBVT/LyhTuR@vergenet.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: iwD2xyczQJf4rg4xj5rqU1N8irk6mZ_s
-X-Proofpoint-GUID: rP9qckL4ZgKbijb2-20T1zBsL0UGXTAW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-10_20,2023-08-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 bulkscore=0 adultscore=0 clxscore=1011
- suspectscore=0 impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308110077
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZNVFzhBVT/LyhTuR@vergenet.net>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+Hello Simon,
 
-When trying to build on v6.5-rc4 with python 3.12 aka Python 3.12.0rc1 I am
-hitting the below Warning messages.
+On Thu, Aug 10, 2023 at 10:17:18PM +0200, Simon Horman wrote:
+> On Thu, Aug 10, 2023 at 02:54:50AM -0700, Breno Leitao wrote:
+> > De-duplicate the initialization and allocation code for struct
+> > netconsole_target.
+> > 
+> > The same allocation and initialization code is duplicated in two
+> > different places in the netconsole subsystem, when the netconsole target
+> > is initialized by command line parameters (alloc_param_target()), and
+> > dynamically by sysfs (make_netconsole_target()).
+> > 
+> > Create a helper function, and call it from the two different functions.
+> > 
+> > Suggested-by: Eric Dumazet <edumazet@google.com>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  drivers/net/netconsole.c | 42 +++++++++++++++++++++-------------------
+> >  1 file changed, 22 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> > index 87f18aedd3bd..f93b98d64a3c 100644
+> > --- a/drivers/net/netconsole.c
+> > +++ b/drivers/net/netconsole.c
+> > @@ -167,19 +167,16 @@ static void netconsole_target_put(struct netconsole_target *nt)
+> >  
+> >  #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
+> >  
+> > -/* Allocate new target (from boot/module param) and setup netpoll for it */
+> > -static struct netconsole_target *alloc_param_target(char *target_config)
+> > +/* Allocate and initialize with defaults.
+> > + * Note that these targets get their config_item fields zeroed-out.
+> > + */
+> > +static struct netconsole_target *alloc_and_init(void)
+> >  {
+> > -	int err = -ENOMEM;
+> >  	struct netconsole_target *nt;
+> >  
+> > -	/*
+> > -	 * Allocate and initialize with defaults.
+> > -	 * Note that these targets get their config_item fields zeroed-out.
+> > -	 */
+> >  	nt = kzalloc(sizeof(*nt), GFP_KERNEL);
+> >  	if (!nt)
+> > -		goto fail;
+> > +		return nt;
+> >  
+> >  	nt->np.name = "netconsole";
+> >  	strscpy(nt->np.dev_name, "eth0", IFNAMSIZ);
+> > @@ -187,6 +184,21 @@ static struct netconsole_target *alloc_param_target(char *target_config)
+> >  	nt->np.remote_port = 6666;
+> >  	eth_broadcast_addr(nt->np.remote_mac);
+> >  
+> > +	return nt;
+> > +}
+> > +
+> > +/* Allocate new target (from boot/module param) and setup netpoll for it */
+> > +static struct netconsole_target *alloc_param_target(char *target_config)
+> > +{
+> > +	struct netconsole_target *nt;
+> > +	int err;
+> 
+> Hi Breno,
+> 
+> This function returns err.
+> However, clang-16 W=1 and Smatch warn that there is a case
+> where this may occur without err having being initialised.
 
-I didn't see something similar reported upstream, hence thought of reporting.
+That can really happen, if we get into this function:
 
-/home/srikar/linux.git/scripts/bpf_doc.py:62: SyntaxWarning: invalid escape sequence '\w'
-  arg_re = re.compile('((\w+ )*?(\w+|...))( (\**)(\w+))?$')
-/home/srikar/linux.git/scripts/bpf_doc.py:64: SyntaxWarning: invalid escape sequence '\*'
-  proto_re = re.compile('(.+) (\**)(\w+)\(((([^,]+)(, )?){1,5})\)$')
-/home/srikar/linux.git/scripts/bpf_doc.py:117: SyntaxWarning: invalid escape sequence '\*'
-  p = re.compile(' \* ?(BPF\w+)$')
-/home/srikar/linux.git/scripts/bpf_doc.py:121: SyntaxWarning: invalid escape sequence '\*'
-  end_re = re.compile(' \* ?NOTES$')
-/home/srikar/linux.git/scripts/bpf_doc.py:136: SyntaxWarning: invalid escape sequence '\*'
-  p = re.compile(' \* ?((.+) \**\w+\((((const )?(struct )?(\w+|\.\.\.)( \**\w+)?)(, )?){1,5}\))$')
-/home/srikar/linux.git/scripts/bpf_doc.py:144: SyntaxWarning: invalid escape sequence '\*'
-  p = re.compile(' \* ?(?:\t| {5,8})Description$')
-/home/srikar/linux.git/scripts/bpf_doc.py:157: SyntaxWarning: invalid escape sequence '\*'
-  p = re.compile(' \* ?(?:\t| {5,8})(?:\t| {8})(.*)')
-/home/srikar/linux.git/scripts/bpf_doc.py:170: SyntaxWarning: invalid escape sequence '\*'
-  p = re.compile(' \* ?(?:\t| {5,8})Return$')
-/home/srikar/linux.git/scripts/bpf_doc.py:183: SyntaxWarning: invalid escape sequence '\*'
-  p = re.compile(' \* ?(?:\t| {5,8})(?:\t| {8})(.*)')
-/home/srikar/linux.git/scripts/bpf_doc.py:222: SyntaxWarning: invalid escape sequence '\s'
-  bpf_p = re.compile('\s*(BPF\w+)+')
-/home/srikar/linux.git/scripts/bpf_doc.py:227: SyntaxWarning: invalid escape sequence '\s'
-  assign_p = re.compile('\s*(BPF\w+)\s*=\s*(BPF\w+)')
-/home/srikar/linux.git/scripts/bpf_doc.py:242: SyntaxWarning: invalid escape sequence '\w'
-  self.enum_syscalls = re.findall('(BPF\w+)+', bpf_cmd_str)
-/home/srikar/linux.git/scripts/bpf_doc.py:266: SyntaxWarning: invalid escape sequence '\s'
-  p = re.compile('\s*FN\((\w+), (\d+), ##ctx\)|\\\\')
-/home/srikar/linux.git/scripts/bpf_doc.py:281: SyntaxWarning: invalid escape sequence '\('
-  self.define_unique_helpers = re.findall('FN\(\w+, \d+, ##ctx\)', fn_defines_str)
-/home/srikar/linux.git/scripts/bpf_doc.py:428: SyntaxWarning: invalid escape sequence '\*'
-  '/{}/,/\*\//:include/uapi/linux/bpf.h'.format(delimiter)]
-/home/srikar/linux.git/scripts/bpf_doc.py:499: SyntaxWarning: invalid escape sequence '\ '
-  footer = '''
-/home/srikar/linux.git/scripts/bpf_doc.py:601: SyntaxWarning: invalid escape sequence '\ '
-  one_arg += ' {}**\ '.format(a['star'].replace('*', '\\*'))
+        if (*target_config == 'r') {
+                if (!nt->extended) {
+                        pr_err("Netconsole configuration error. Release feature requires extended log message");
+                        goto fail;
 
-However I am not seeing this when using python 3.10 (Python 3.10.12) and
-python 3.11 (Python 3.11.4). Note this is just a warning and Kernel build does
-complete.
+	fail:
+		return ERR_PTR(err);
 
--- 
-Thanks and Regards
-Srikar Dronamraju
+
+Let me update it.
 
