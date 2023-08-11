@@ -1,188 +1,108 @@
-Return-Path: <netdev+bounces-26919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3220177974D
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 20:50:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12AA77976D
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 21:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3257B1C2179A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 18:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A53728243B
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 19:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B81219F2;
-	Fri, 11 Aug 2023 18:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B9E219F0;
+	Fri, 11 Aug 2023 19:00:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FEA1172E
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 18:50:33 +0000 (UTC)
-Received: from out-94.mta0.migadu.com (out-94.mta0.migadu.com [91.218.175.94])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B00E30E8
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 11:50:31 -0700 (PDT)
-Message-ID: <49f5a594-3db7-fb99-1083-7df1155d3357@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691779829;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aTSMPU3IVVneEIppNm0unuUG3WBb/CMepnvLmC2MOQE=;
-	b=Jjy3Hxr8xfaB7kvP0hFkE6FNlEU+fNmjgZdvMgik8IBihqs5T7HAdH4Pqlni9gMLbuGSgd
-	9CiidqEcANKn2qFZX4vW2BjIZ3OLRw6Vy8Pu+rZ3DVayA0ATTCwYn/iXpIQxP3ousL0wg1
-	fbT4Op0fk3nfff5/hhL2b+/ut+BnoI0=
-Date: Fri, 11 Aug 2023 11:50:17 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3DF8468
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 19:00:40 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED03730CF;
+	Fri, 11 Aug 2023 12:00:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691780439; x=1723316439;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=wtEhmMOeJDkVUYiG8gBXOCWEqswA0gnZypTeZtKMdYQ=;
+  b=k/HJBVWRpqFk2ZIiS5tqTzXzHF6lRYvBKtD3f0IR0Y247GQWGe8W5mW2
+   x6eQFlqc8M6fdLUVVbUDYZXFc2TPteG5LsUQIji1ZwXUk2YTzYHUWYT3W
+   Z145uXjnDZ51Ff5vV/z5+OUar+tg9od+mQbAwBqdgBF/mtxI7UNlsbROm
+   ze8vcjKAXRDFXrMM2vlkGAr25jHyoLwxn2aXA5S2nxh9u+NHHiEKenroc
+   Z69A+LiqrqBHTa1RrPodx5RsiDrSTryhcyCEI1Ed9+utBk8CPbhFUIvll
+   0Ylu6v/MqCrpL8k4jBGrnSsz+C6p9Ue3pgNlrK6vQJ06V7dKYg/M+ySyN
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="402718788"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="402718788"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 12:00:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="802768017"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="802768017"
+Received: from pglc00052.png.intel.com ([10.221.207.72])
+  by fmsmga004.fm.intel.com with ESMTP; 11 Aug 2023 12:00:35 -0700
+From: Rohan G Thomas <rohan.g.thomas@intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Rohan G Thomas <rohan.g.thomas@intel.com>
+Subject: [PATCH net-next v2 0/2] Tx coe sw fallback for unsupported queues
+Date: Sat, 12 Aug 2023 03:00:30 +0800
+Message-Id: <20230811190032.13391-1-rohan.g.thomas@intel.com>
+X-Mailer: git-send-email 2.19.0
+In-Reply-To: <20230810150328.19704-1-rohan.g.thomas@intel.com>
+References: <20230810150328.19704-1-rohan.g.thomas@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v11 2/5] selftests/bpf: Use random netns name for
- mptcp
-Content-Language: en-US
-To: Geliang Tang <geliang.tang@suse.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Florent Revest <revest@chromium.org>,
- Brendan Jackman <jackmanb@chromium.org>,
- Matthieu Baerts <matthieu.baerts@tessares.net>,
- Mat Martineau <martineau@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <cover.1691125344.git.geliang.tang@suse.com>
- <15d7646940fcbb8477b1be1aa11a5d5485d10b48.1691125344.git.geliang.tang@suse.com>
- <8b706f66-2afa-b3d0-a13a-11f1ffb452fe@linux.dev>
- <20230807064044.GA11180@localhost.localdomain>
- <9a84e026-402d-b6d9-b6d1-57d91455da47@linux.dev>
- <20230809081944.GA29707@bogon>
- <ffd1bb86-ed32-3301-346a-e369219841de@linux.dev>
- <20230811092915.GA8364@bogon>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20230811092915.GA8364@bogon>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/11/23 2:29 AM, Geliang Tang wrote:
-> On Thu, Aug 10, 2023 at 10:53:38PM -0700, Martin KaFai Lau wrote:
->> On 8/9/23 1:19 AM, Geliang Tang wrote:
->>> On Tue, Aug 08, 2023 at 11:03:30PM -0700, Martin KaFai Lau wrote:
->>>> On 8/6/23 11:40 PM, Geliang Tang wrote:
->>>>> On Fri, Aug 04, 2023 at 05:23:32PM -0700, Martin KaFai Lau wrote:
->>>>>> On 8/3/23 10:07 PM, Geliang Tang wrote:
->>>>>>> Use rand() to generate a random netns name instead of using the fixed
->>>>>>> name "mptcp_ns" for every test.
->>>>>>>
->>>>>>> By doing that, we can re-launch the test even if there was an issue
->>>>>>> removing the previous netns or if by accident, a netns with this generic
->>>>>>> name already existed on the system.
->>>>>>>
->>>>>>> Note that using a different name each will also help adding more
->>>>>>> subtests in future commits.
->>>>>
->>>>> Hi Martin,
->>>>>
->>>>> I tried to run mptcp tests simultaneously, and got "Cannot create
->>>>> namespace file "/var/run/netns/mptcp_ns": File exists" errors sometimes.
->>>>> So I add this patch to fix it.
->>>>>
->>>>> It's easy to reproduce, just run this commands in multiple terminals:
->>>>>     > for i in `seq 1 100`; do sudo ./test_progs -t mptcp; done
->>>>
->>>> Not only the "-t mptcp" test. Other tests in test_progs also don't support
->>>> running parallel in multiple terminals. Does it really help to test the bpf
->>>> part of the prog_tests/mptcp.c test by running like this? If it wants to
->>>> exercise the other mptcp networking specific code like this, a separate
->>>> mptcp test is needed outside of test_progs and it won't be run in the bpf
->>>> CI.
->>>>
->>>> If you agree, can you please avoid introducing unnecessary randomness to the
->>>> test_progs where bpf CI and most users don't run in this way?
->>>
->>> Thanks Martin. Sure, I agree. Let's drop this patch.
->>
->> Thanks you.
->>
->>>> I have a high level question. In LPC 2022
->>>> (https://lpc.events/event/16/contributions/1354/), I recall there was idea
->>>> in using bpf to make other mptcp decision/policy. Any thought and progress
->>>> on this? This set which only uses bpf to change the protocol feels like an
->>>> incomplete solution.
->>>
->>> We are implementing MPTCP packet scheduler using BPF. Patches aren't
->>> sent to BPF mail list yet, only temporarily on our mptcp repo[1].
->>>
->>> Here are the patches:
->>>
->>>    selftests/bpf: Add bpf_burst test
->>>    selftests/bpf: Add bpf_burst scheduler
->>>    bpf: Export more bpf_burst related functions
->>>    selftests/bpf: Add bpf_red test
->>>    selftests/bpf: Add bpf_red scheduler
->>>    selftests/bpf: Add bpf_rr test
->>>    selftests/bpf: Add bpf_rr scheduler
->>>    selftests/bpf: Add bpf_bkup test
->>>    selftests/bpf: Add bpf_bkup scheduler
->>>    selftests/bpf: Add bpf_first test
->>>    selftests/bpf: Add bpf_first scheduler
->>>    selftests/bpf: Add bpf scheduler test
->>>    selftests/bpf: add two mptcp netns helpers
->>>    selftests/bpf: use random netns name for mptcp
->>>    selftests/bpf: Add mptcp sched structs
->>>    bpf: Add bpf_mptcp_sched_kfunc_set
->>>    bpf: Add bpf_mptcp_sched_ops
->>>
->>> If you could take a look at these patches in advance, I would greatly
->>> appreciate it. Any feedback is welcome.
->>>
->>> [1]
->>> https://github.com/multipath-tcp/mptcp_net-next.git
->>
->> Thanks for sharing. I did not go into the details. iiuc, the scheduler is
->> specific to a namespace. Do you see if it is useful to have more finer
->> control like depending on what IP address it is connected to? BPF policy is
->> usually found more useful to have finer policy control than global or
->> per-netns.
->>
->> The same question goes for the fmod_ret here in this patch. The
->> progs/mptcpify.c selftest is as good as upgrading all TCP connections. Is it
->> your only use case and no need for finer selection?
-> 
-> This per-netns control is just the first step. We do need finer selection. The
-> most ideal mode is to select one app to upgrade it's TCP connections only. So
-> per-cgroup control is much better than per-netns. But we haven't found a good
-> per-cgroup solution yet.
+Hi,
+Some DWMAC IPs support tx coe only for a few initial tx queues,
+starting from tx queue 0. This patchset adds support for tx coe sw
+fallback for those queues that don't support tx coe. Also, add binding
+for snps,tx-queues-with-coe property.
 
-Selecting an app or cgroup can sort of be done by getting the current task or 
-current cgroup (there is helper to do that). I am imagining eventually it will 
-want to decide the protocol upgrade and/or the mptcp-scheduler when the 
-destination IP is decided. This fmod_ret upgrade for all acts like a global knob 
-(sysctl) and feels like a hack or at least incomplete. However, I also don't see 
-a clean way to do that for now in the current shape.
+changelog v2:
+* Reformed binding description.
+* Minor grammatical corrections in comments and commit messages.
 
-Please respin another revision to address the earlier selftest comment on the 
-netns name. Thanks.
+Rohan G Thomas (2):
+  dt-bindings: net: snps,dwmac: Tx queues with coe
+  net: stmmac: Tx coe sw fallback
 
+ .../devicetree/bindings/net/snps,dwmac.yaml   |  3 +++
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 19 +++++++++++++++++++
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  4 ++++
+ include/linux/stmmac.h                        |  1 +
+ 5 files changed, 29 insertions(+)
+
+-- 
+2.19.0
 
 
