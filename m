@@ -1,177 +1,89 @@
-Return-Path: <netdev+bounces-26959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8F1779AAF
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 00:23:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F3A8779AB1
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 00:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4754E1C20B3E
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:23:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FBE71C20AC0
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06EE34CC4;
-	Fri, 11 Aug 2023 22:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9D134CC6;
+	Fri, 11 Aug 2023 22:24:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913278833
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 22:23:06 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6B81703;
-	Fri, 11 Aug 2023 15:22:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bPZ6eb6D+5nlXp0LzoMf2AoIFF7EdtsEvpEfZCHzjiI=; b=xfHVd0qaUbmZh3B9YRJYOI4nvw
-	IJv4wL6ukw1CyguOkaUYiWVxDWYSQC/CgG1oRhMWnVwlc7gyFC87Z6KYYMDMTHhZpO20hyBUm7L19
-	zcmmEADFGqXGGUlZIjDbkcNFNQCeBLho7ClZc6pndLDYJevyi1Q+qtk1HKvvMfNpRTKM2mXQHU2xI
-	Br5nZkc0X8l4kKm5Se1QF3fMUDjBOlt/Y47Jxar86NhBIA1aO5/zShjC/mHTCAOxpYbI6td43ZUgj
-	nPQgHP5yDWUcgu1H1oUNhAT+OkXH8aNUfUt9QFYa3Pos3N6WxqvlAt5MgNyx+IjKnA+jq7jrfFXXT
-	51WU8/Pg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50692)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qUaWi-00063h-04;
-	Fri, 11 Aug 2023 23:22:36 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qUaWg-0003El-8N; Fri, 11 Aug 2023 23:22:34 +0100
-Date: Fri, 11 Aug 2023 23:22:34 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Giulio Benetti <giulio.benetti@benettiengineering.com>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jim Reinhart <jimr@tekvox.com>, James Autry <jautry@tekvox.com>,
-	Matthew Maron <matthewm@tekvox.com>
-Subject: Re: [PATCH] net: phy: broadcom: add support for BCM5221 phy
-Message-ID: <ZNa0qlICwsUq6H2C@shell.armlinux.org.uk>
-References: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3864B8833
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 22:24:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B76C433C7;
+	Fri, 11 Aug 2023 22:24:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691792681;
+	bh=SJm8zql4R1blYBqCgF0cDibC+/Ws9z7Xbqu36AMpLnA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GcatsjGaSpQEWZH/kdvZXZM2tvP3v+uevNPu8PNgJ1ky1kNrIb/DzxUkj5HSk7vSi
+	 OqzBAF2vka5jvtpTPAXkXk9zaOV6vk40If5poOXGzMqWNdZhCZtVpI9wIGXztTJ3WL
+	 pyosqdBQpuwDZrY9HfaIxR4ubPdDDqTucLxxVT3q1yxJE08kcRwIfFvvrE65ZxyvWf
+	 X+1kxdYlQrmJyRusph49vL40zpcv4Scy6/vFCWdcWb98bfeAwlIcemexP1FCZprKpu
+	 lIdWWp8hnZfhfScGk4p8Hn65TqZs/9gnAO7x19ioSDT0eb56De/27GBt9ag0dzwIv+
+	 YBjI7IKCa9a9Q==
+Date: Fri, 11 Aug 2023 15:24:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Michal Kubecek <mkubecek@suse.cz>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ johannes@sipsolutions.net, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ gal@nvidia.com, tariqt@nvidia.com, lucien.xin@gmail.com,
+ f.fainelli@gmail.com, andrew@lunn.ch, simon.horman@corigine.com,
+ linux@rempel-privat.de
+Subject: Re: [PATCH net-next v2 10/10] ethtool: netlink: always pass
+ genl_info to .prepare_data
+Message-ID: <20230811152440.516c6bc2@kernel.org>
+In-Reply-To: <ZNXjdj3edS1Up3Mt@nanopsycho>
+References: <20230810233845.2318049-1-kuba@kernel.org>
+	<20230810233845.2318049-11-kuba@kernel.org>
+	<ZNXYZRNJkAqw686J@nanopsycho>
+	<20230811071324.gfkzlpb3gbwvuufm@lion.mk-sys.cz>
+	<ZNXjdj3edS1Up3Mt@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 11, 2023 at 11:53:22PM +0200, Giulio Benetti wrote:
-> +	reg = phy_read(phydev, MII_BRCM_FET_INTREG);
-> +	if (reg < 0)
-> +		return reg;
-> +
-> +	/* Unmask events we are interested in and mask interrupts globally. */
-> +	reg = MII_BRCM_FET_IR_ENABLE |
-> +	      MII_BRCM_FET_IR_MASK;
-> +
-> +	err = phy_write(phydev, MII_BRCM_FET_INTREG, reg);
-> +	if (err < 0)
-> +		return err;
+On Fri, 11 Aug 2023 09:29:58 +0200 Jiri Pirko wrote:
+> >> Anyway, the genl_info_is_ntf() itself seems a bit odd to me. The only
+> >> user is here and I doubt there ever going to be any other. This
+> >> conditional per-op attr fill seems a bit odd.
+> >> 
+> >> Can't you handle this in side ethtool somehow? IDK :/  
+> >
+> >I don't think so. The point here is that notification can be seen by any
+> >unprivileged process so as long as we agree that those should not see
+> >the wake up passwords, we must not include the password in them. While
+> >ethtool could certanly drop the password from its output, any other
+> >utility parsing the notifications (or even patched ethtool) could still
+> >show it to anyone.  
+> 
+> Yeah, the question is, if it is a good design to have one CMD type
+> to conditionally send sensitive data. I would argue that sensitive data
+> could be sent over separate CMD with no notifier for it.
 
-Please explain why you read MII_BRCM_FET_INTREG, then discard its value
-and write a replacement value.
+Good catch!
 
-> +
-> +	/* Enable auto MDIX */
-> +	err = phy_clear_bits(phydev, BCM5221_AEGSR, BCM5221_AEGSR_MDIX_DIS);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* Enable shadow register access */
-> +	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
-> +	if (brcmtest < 0)
-> +		return brcmtest;
-> +
-> +	reg = brcmtest | MII_BRCM_FET_BT_SRE;
-> +
-> +	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
-> +	if (err < 0)
-> +		return err;
+Hopefully we can address that separately (I mean someone who cares can
+send a patch? :)). We had multiple people get surprised by info being
+NULL I think the value of the other changes outweighs resolving this
+little oddity. I'm going to send a v3 with the bug fixed later.
 
-I think you should consider locking the MDIO bus while the device is
-switched to the shadow register set, so that other accesses don't happen
-that may interfere with this.
-
-> +static int bcm5221_suspend(struct phy_device *phydev)
-> +{
-> +	int reg, err, err2, brcmtest;
-> +
-> +	/* Enable shadow register access */
-> +	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
-> +	if (brcmtest < 0)
-> +		return brcmtest;
-> +
-> +	reg = brcmtest | MII_BRCM_FET_BT_SRE;
-> +
-> +	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* Force Low Power Mode with clock enabled */
-> +	err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
-> +			   BCM5221_SHDW_AM4_EN_CLK_LPM |
-> +			   BCM5221_SHDW_AM4_FORCE_LPM);
-> +
-> +	/* Disable shadow register access */
-> +	err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
-> +	if (!err)
-> +		err = err2;
-
-Same here.
-
-> +
-> +	return err;
-> +}
-> +
-> +static int bcm5221_resume(struct phy_device *phydev)
-> +{
-> +	int reg, err, err2, brcmtest;
-> +
-> +	/* Enable shadow register access */
-> +	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
-> +	if (brcmtest < 0)
-> +		return brcmtest;
-> +
-> +	reg = brcmtest | MII_BRCM_FET_BT_SRE;
-> +
-> +	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* Exit Low Power Mode with clock enabled */
-> +	err = phy_clear_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
-> +			     BCM5221_SHDW_AM4_FORCE_LPM);
-> +
-> +	/* Disable shadow register access */
-> +	err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
-> +	if (!err)
-> +		err = err2;
-
-And, of course, same here.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On the existence of genl_info_is_ntf(), I would rather keep it.
+I'm a bit worried someone else will need to know at some point and
+will do it based on contents of info directly, which will make
+future refactoring risky.
 
