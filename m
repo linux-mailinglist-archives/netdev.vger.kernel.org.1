@@ -1,53 +1,37 @@
-Return-Path: <netdev+bounces-26839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2591F7792F9
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:24:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D66F779305
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 339962820B4
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:24:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC141C2094E
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397462AB27;
-	Fri, 11 Aug 2023 15:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0C12AB2A;
+	Fri, 11 Aug 2023 15:26:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E59C63B6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:24:41 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B9EDC;
-	Fri, 11 Aug 2023 08:24:37 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37BFOJY5024762;
-	Fri, 11 Aug 2023 10:24:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691767459;
-	bh=TWTgIYHYo1gfxLfGJr3o5tMioqcbKX9+NAaHDSGtkAY=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=ny79IsCyf9aXd+Xkc/HqviK/66Ot8EXYjdCfasdp+UcEU8y+WyLS71natAidAh+3j
-	 b+0v/KRmuqSJJsXRFaOj6ExcyErYL3Pfdy/eq3oU3qKwSN5hyPuiatoZxA2Ecl1Eob
-	 F1eKsj2X1JmJ4Z61i1Ijayvxw6A3Bl/iU1JtipjU=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37BFOJYF011768
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 11 Aug 2023 10:24:19 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 11
- Aug 2023 10:24:19 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 11 Aug 2023 10:24:19 -0500
-Received: from [10.250.38.120] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37BFOIKA127506;
-	Fri, 11 Aug 2023 10:24:18 -0500
-Message-ID: <4c40fbe4-3492-ec76-e452-3a3ecb0f2433@ti.com>
-Date: Fri, 11 Aug 2023 10:24:18 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7B463B6
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:26:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18745C433C7;
+	Fri, 11 Aug 2023 15:26:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691767594;
+	bh=8LXyzi9tvgdg/Pt2fdxEW4wGcEQOw91QGZ21a4I/e4w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cvZP4I+bsBDIGK4WsAPL+Bb5UUmNb7iVuvIfagSWS/sAp831+bUMfPaS+ZoTFtrsC
+	 psChQEYansyXexDJqNiT/liRlZ1DMW2KprtT+LIKOKgYZeFzMUrhdw7Pk5NHU6QQXR
+	 9tX8JqgefFaI62JUNJa1YmX4gCyNlvJNYn8NFirfFJHiCRutPqDTyY5K5usMUWUOkS
+	 aHL+DQHN3TTYtsH+Nut3XmtMvykQhAJph0vdiax6qhTX/hq+FgCI0sJHjJm5cglfJK
+	 wa8ZqErohcznOUjY+zYTbmVE7rkMgXJYztWygBmezaROcEWbXVWjTBZ/bOCE/bvxdS
+	 yfNUCt07FOj8w==
+Message-ID: <3fc59b72-65fb-66e3-e291-ec20d1f468d4@kernel.org>
+Date: Fri, 11 Aug 2023 18:26:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,232 +39,197 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 3/5] net: ti: icss-iep: Add IEP driver
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v2] net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption
+ MAC Merge support
 Content-Language: en-US
-To: Md Danish Anwar <a0501179@ti.com>, MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20230809114906.21866-1-danishanwar@ti.com>
- <20230809114906.21866-4-danishanwar@ti.com>
- <b43ee5ca-2aab-445a-e24b-cbc95f9186ea@ti.com>
- <c7ddb12d-ae18-5fc2-9729-c88ea73b21d7@ti.com>
-From: Andrew Davis <afd@ti.com>
-In-Reply-To: <c7ddb12d-ae18-5fc2-9729-c88ea73b21d7@ti.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, s-vadapalli@ti.com, srk@ti.com, vigneshr@ti.com,
+ p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230810152538.138718-1-rogerq@kernel.org>
+ <20230810152538.138718-1-rogerq@kernel.org>
+ <20230810154703.cyyivcxlppdqr45q@skbuf>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20230810154703.cyyivcxlppdqr45q@skbuf>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 8/10/23 6:50 AM, Md Danish Anwar wrote:
-> Hi Andrew,
+Hi Vladimir,
+
+On 10/08/2023 18:47, Vladimir Oltean wrote:
+> Hi Roger,
 > 
-> On 09/08/23 8:30 pm, Andrew Davis wrote:
->> On 8/9/23 6:49 AM, MD Danish Anwar wrote:
->>> From: Roger Quadros <rogerq@ti.com>
->>>
->>> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
->>> support timestamping of ethernet packets and thus support PTP and PPS
->>> for PRU ethernet ports.
->>>
->>> Signed-off-by: Roger Quadros <rogerq@ti.com>
->>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
->>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
->>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>> ---
->>>    drivers/net/ethernet/ti/Kconfig          |  12 +
->>>    drivers/net/ethernet/ti/Makefile         |   1 +
->>>    drivers/net/ethernet/ti/icssg/icss_iep.c | 935 +++++++++++++++++++++++
->>>    drivers/net/ethernet/ti/icssg/icss_iep.h |  38 +
->>>    4 files changed, 986 insertions(+)
->>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
->>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
->>>
->>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
->>> index 63e510b6860f..88b5b1b47779 100644
->>> --- a/drivers/net/ethernet/ti/Kconfig
->>> +++ b/drivers/net/ethernet/ti/Kconfig
->>> @@ -186,6 +186,7 @@ config CPMAC
->>>    config TI_ICSSG_PRUETH
->>>        tristate "TI Gigabit PRU Ethernet driver"
->>>        select PHYLIB
->>> +    select TI_ICSS_IEP
+> On Thu, Aug 10, 2023 at 06:25:38PM +0300, Roger Quadros wrote:
+>> Add driver support for viewing / changing the MAC Merge sublayer
+>> parameters and seeing the verification state machine's current state
+>> via ethtool.
 >>
->> Why not save selecting this until you add its use in the ICSSG_PRUETH driver in
->> the next patch.
+>> As hardware does not support interrupt notification for verification
+>> events we resort to polling on link up. On link up we try a couple of
+>> times for verification success and if unsuccessful then give up.
 >>
-> 
-> The next patch is only adding changes to icssg-prueth .c /.h files. This patch
-> is adding changes to Kconfig and the Makefile. To keep it that way selecting
-> this is added in this patch. No worries, I will move this to next patch.
-> 
->> [...]
+>> The Frame Preemption feature is described in the Technical Reference
+>> Manual [1] in section:
+>> 	12.3.1.4.6.7 Intersperced Express Traffic (IET – P802.3br/D2.0)
 >>
->>> +
->>> +static u32 icss_iep_readl(struct icss_iep *iep, int reg)
->>> +{
->>> +    return readl(iep->base + iep->plat_data->reg_offs[reg]);
->>> +}
+>> Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
 >>
->> Do these one line functions really add anything? Actually why
->> not use the regmap you have here.
+>> [1] AM62x TRM - https://www.ti.com/lit/ug/spruiv7a/spruiv7a.pdf
+>> [2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>
+>> Hi,
+>>
+>> Dropping the RFC tag as I now have MAC merge verification and frame
+>> preemption working.
+>>
+>> Changelog:
+>> v2:
+>> - Use proper control bits for PMAC enable (AM65_CPSW_PN_CTL_IET_PORT_EN)
+>>   and TX enable (AM65_CPSW_PN_IET_MAC_PENABLE)
+>> - Common IET Enable (AM65_CPSW_CTL_IET_EN) is set if any port has
+>>   AM65_CPSW_PN_CTL_IET_PORT_EN set.
+>> - Fix workaround for erratum i2208. i.e. Limit rx_min_frag_size to 124
+>> - Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
+>>   1G link if link is inactive.
+>> - resize the RX FIFO based on pmac_enabled, not tx_enabled.
+>>
+>> Test Procedure:
+>>
+>> - 2 EVMs with AM65-CPSW network port connected to each other
+>> - Run iet-setup.sh on both
+>>
+>> #!/bin/sh
+>> #iet-setup.sh
+>>
+>> ifconfig eth0 down
+>> ifconfig eth1 down
+>> ethtool -L eth0 tx 2
+>> ethtool --set-priv-flags eth0 p0-rx-ptype-rrobin off
+>> ethtool --set-mm eth0 pmac-enabled on tx-enabled on verify-enabled on verify-time 10 tx-min-frag-size 124
+>> ifconfig eth0 up
+>> sleep 10
+>>
+>> tc qdisc replace dev eth0 handle 8001: parent root stab overhead 24 taprio \
+>> num_tc 2 \
+>> map 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 \
+>> queues 1@0 1@1 \
+>> base-time 0 \
+>> sched-entry S 01 1216 \
+>> sched-entry S fe 12368 \
+>> flags 0x2 \
+>> fp P E E E E E E E
+>>
+>> tc -g class show dev eth0
+>> tc qdisc add dev eth0 clsact
+>> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5002 0xffff action skbedit priority 2
+>> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5003 0xffff action skbedit priority 3
+>>
+>> - check that MAC merge verification has succeeded
+>>
+>> ethtool --show-mm eth0
+>>
+>>         MAC Merge layer state for eth0:
+>>         pMAC enabled: on
+>>         TX enabled: on
+>>         TX active: on
+>>         TX minimum fragment size: 124
+>>         RX minimum fragment size: 124
+>>         Verify enabled: on
+>>         Verify time: 10
+>>         Max verify time: 134
+>>         Verification status: SUCCEEDED
 > 
-> These one line functions are not really adding anything but they are acting as
-> a wrapper around readl /writel and providing some sort of encapsulation as
-> directly calling readl will result in a little complicated code.
+> Do you also plan to add support for mqprio, to present the same feature
+> set as everyone, and permit IET to be used without EST?
+
+Yes. I'll try to include it in next spin.
+
 > 
-> /* WIth One line function */
-> ts_lo = icss_iep_readl(iep, ICSS_IEP_COUNT_REG0);
+> What else would need to change in order for the am65 cpsw to
+> successfully run the existing tools/testing/selftests/net/forwarding/ethtool_mm.sh?
+> Just the extra driver-specific ethtool --set-priv-flags? If so, maybe
+> you could create a wrapper over the generic selftest, and put it in
+> tools/testing/selftests/drivers/net/. For DSA we also symlink a lot of
+> bridge selftests, for example.
+
+OK. I'll give it a try.
+
 > 
-> /* Without one line function */
-> ts_lo = readl(iep->base, iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+>> - On receiver EVM run 2 iperf instances
+>>
+>> iperf3 -s -i30 -p5002&
+>> iperf3 -s -i30 -p5003&
+>>
+>> - On sender EVM run 2 iperf instances
+>>
+>> iperf3 -c 192.168.3.102 -u -b200M -l1472 -u -t5 -i30 -p5002&
+>> iperf3 -c 192.168.3.102 -u -b50M -l1472 -u -t5 -i30 -p5003&
+>>
+>> - Check IET stats on sender. Look for iet_tx_frag increments
+>>
+>> ethtool -S eth0 | grep iet
+>>
+>>      iet_rx_assembly_err: 0
+>>      iet_rx_assembly_ok: 0
+>>      iet_rx_smd_err: 0
+>>      iet_rx_frag: 0
+>>      iet_tx_hold: 0
+>>      iet_tx_frag: 17307
 > 
-> Previously regmap was used in this driver. But in older commit [1] in
-> 5.10-ti-linux-kernel (Before I picked the driver for upstream) it got changed
-> to readl / writel stating that regmap_read / write is too slow. IEP is time
-> sensitive and needs faster read and write, probably because of this they
-> changed it.
+> Can you please also implement the standardized ethtool_ops :: get_mm_stats()?
+> You can see these with ethtool -I --show-mm eth0.
+
+Yes.
+
+> 
+>>
+>> - Check IET stats on receiver. Look for iet_rx_frag and iet_rx_assembly_*
+>>
+>> ethtool -S eth0 | grep iet
+>>
+>>      iet_rx_assembly_err: 0
+> 
+> This would be struct ethtool_mm_stats :: MACMergeFrameAssErrorCount
+> 
+>>      iet_rx_assembly_ok: 17302
+> 
+> This would be struct ethtool_mm_stats :: MACMergeFrameAssOkCount
+> 
+>>      iet_rx_smd_err: 0
+> 
+> This would be struct ethtool_mm_stats :: MACMergeFrameSmdErrorCount
+> 
+>>      iet_rx_frag: 17307
+> 
+> This would be struct ethtool_mm_stats :: MACMergeFragCountRx
+> 
+>>      iet_tx_hold: 0
+> 
+> This would be struct ethtool_mm_stats :: MACMergeHoldCount
+> 
+>>      iet_tx_frag: 0
+> 
+> This would be struct ethtool_mm_stats :: MACMergeFragCountTx
 > 
 
-Sounds like you only need direct register access for time sensitive
-gettime/settime functions, if that is the only place writel()/readl() is
-needed just drop the helper and use directly in that one spot.
+Thanks for the hints :)
 
->>
->> [...]
->>
->>> +static void icss_iep_enable(struct icss_iep *iep)
->>> +{
->>> +    regmap_update_bits(iep->map, ICSS_IEP_GLOBAL_CFG_REG,
->>> +               IEP_GLOBAL_CFG_CNT_ENABLE,
->>> +               IEP_GLOBAL_CFG_CNT_ENABLE);
->>
->> Have you looked into regmap_fields?
->>
-> 
-> No I hadn't. But now I looked into regmap_fields, seems to be another way to
-> update the bits, instead of passing mask and value, regmap_filed_read / write
-> only takes the value. But for that we will need to create a regmap field. If
-> you want me to switch to regmap_fields instead of regmap_update_bits I can make
-> the changes. But I am fine with regmap_update_bits().
-> 
+> Also, I opened the AM62x datasheet again and I didn't find this, but I
+> still need to ask. The CPSW doesn't show the Ethernet counters broken
+> down by eMAC/pMAC, no? If it does, you should also add support for the
+> following:
 
-I'm suggesting regmap fields as I have used it several times and it resulted
-in greatly improved readability. Yes you will need a regmap field table, but
-that is the best part, it lets you put all your bit definitions in one spot
-that can match 1:1 with the datasheet, much easier to check for correctness
-than if the bit usages are all spread out in the driver.
+I don't think it does.
 
-I won't insist on you converting this driver to use it today, but I do recommend
-you at least give it a shot for your own learning.
+> 
+> ethtool -I --show-pause eth0 --src pmac
+> ethtool -S eth0 --groups eth-mac eth-phy eth-ctrl rmon -- --src pmac
 
-Andrew
-
->> [...]
->>
->>> +
->>> +    if (!!(iep->latch_enable & BIT(index)) == !!on)
->>> +        goto exit;
->>> +
->>
->> There has to be a better way to write this logic..
->>
->> [...]
->>
->>> +
->>> +static const struct of_device_id icss_iep_of_match[];
->>> +
->>
->> Why the forward declaration?
-> 
-> I will remove this, I don't see any reason for this.
-> 
->>
->>> +static int icss_iep_probe(struct platform_device *pdev)
->>> +{
->>> +    struct device *dev = &pdev->dev;
->>> +    struct icss_iep *iep;
->>> +    struct clk *iep_clk;
->>> +
->>> +    iep = devm_kzalloc(dev, sizeof(*iep), GFP_KERNEL);
->>> +    if (!iep)
->>> +        return -ENOMEM;
->>> +
->>> +    iep->dev = dev;
->>> +    iep->base = devm_platform_ioremap_resource(pdev, 0);
->>> +    if (IS_ERR(iep->base))
->>> +        return -ENODEV;
->>> +
->>> +    iep_clk = devm_clk_get(dev, NULL);
->>> +    if (IS_ERR(iep_clk))
->>> +        return PTR_ERR(iep_clk);
->>> +
->>> +    iep->refclk_freq = clk_get_rate(iep_clk);
->>> +
->>> +    iep->def_inc = NSEC_PER_SEC / iep->refclk_freq;    /* ns per clock tick */
->>> +    if (iep->def_inc > IEP_MAX_DEF_INC) {
->>> +        dev_err(dev, "Failed to set def_inc %d.  IEP_clock is too slow to be
->>> supported\n",
->>> +            iep->def_inc);
->>> +        return -EINVAL;
->>> +    }
->>> +
->>> +    iep->plat_data = of_device_get_match_data(dev);
->>
->> Directly using of_*() functions is often wrong, try just device_get_match_data().
->>
-> 
-> Sure. I will change to device_get_match_data().
-> 
->> [...]
->>
->>> +static struct platform_driver icss_iep_driver = {
->>> +    .driver = {
->>> +        .name = "icss-iep",
->>> +        .of_match_table = of_match_ptr(icss_iep_of_match),
->>
->> This driver cannot work without OF, using of_match_ptr() is not needed.
->>
-> 
-> Sure, I will drop of_match_ptr().
-> 
->> Andrew
-> 
-> 
-> For reading and updating registers, we can have
-> 	1. icss_iep_readl / writel and regmap_update_bits() OR
-> 	2. regmap_read / write and regmap_update_bits() OR
-> 	3. icss_iep_readl / writel and regmap_fields OR
-> 	4. regmap_read / write and regmap_fields
-> 	
-> 
-> Currently we are using 1. Please let me know if you are fine with this and I
-> can continue using 1. If not, please let me know your recommendation out of this 4.
-> 
-> [1]
-> https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/commit/?h=linux-5.10.y&id=f4f45bf71cad5be232536d63a0557d13a7eed162
-> 
+-- 
+cheers,
+-roger
 
