@@ -1,339 +1,229 @@
-Return-Path: <netdev+bounces-26964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C278779ACC
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 00:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74D09779AD3
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 00:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F53A1C20B77
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:45:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4DA31C20AB4
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5880034CC6;
-	Fri, 11 Aug 2023 22:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B0134CCE;
+	Fri, 11 Aug 2023 22:50:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3082F4E
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 22:45:40 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A7C2130;
-	Fri, 11 Aug 2023 15:45:37 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BE388FF802;
-	Fri, 11 Aug 2023 22:45:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1691793936;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pbtUUoJutGSdy50RvaJ3kKz0WaAIY7fJ4VKyrVHb2W8=;
-	b=G3vzjQWDz1PJOJkqVLNt8besnssHlQHj72Mj+EsY2ZKzP12pEziBSaD/RyQ6McCE1hbMzN
-	JFLjDkjioBJKafMfizcAO+iC66Xnd8VLwIo59dhaDMK9zQEyMsX5F3btfZC6b8in4BAUFy
-	uogFdKKn6C0+UcyInpJ9Nc1bYL5hN7GO4bRetEs/0lnWarSUkDkS7ZFbTBHWgGU6QvLbWn
-	BfHHdcdN9GuGHZTY3fX7I3LLlotEakVf7Ggf7hOqfG5vLywQNMDX3OH81NOrPWJl7S2e3b
-	hBsOuUneKGzVQJDc6xZDWRmOxK1yO2yylwja+4g9h7ftQlCmv8oGLkoYgDHWog==
-Message-ID: <3f262579-eec1-4b21-9b18-1d1d612e715b@arinc9.com>
-Date: Sat, 12 Aug 2023 01:45:29 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFED2F4E
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 22:50:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB58AC433C8;
+	Fri, 11 Aug 2023 22:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691794213;
+	bh=k02u5dlw3yPXK+0T6pf00+UIRqTxEUsHTDDQW8+4BpM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=EkXomq4EYP3brX2c1RiuwvfQyeNHIM6fA2Ddf6dQZ0zg4uvqyzm03zrFEA3bQrJU8
+	 XwJ5qMahpl8ei8/YMDrSGRgWu7Rjoe43IvHGb75QG8Oa78TPGTLDqYqoqpoepd5TfB
+	 0fIhUchFKQPw4fbbbC6l0jOgGdIOSuejq7HklleN7CsszJCyNx+hVSnqMeJ5RK601j
+	 IZ3EWhWiyUbB19KDld1JfOQ+wWbfQwidzuNQnszJGIRW2mKLQS3DRUXuTqnS8G8KR5
+	 iNjzl9c0zTf1oW9HK/T3sIGVrbJnEpVOezkrEdLKUsLY7RkVZYDIB7/iKyHrVIC6g4
+	 Jm/8Ow02NWtEw==
+Message-ID: <104f68073d00911668ed6ea38239ef5f1d15567d.camel@kernel.org>
+Subject: Re: [PATCH net-next 3/6] sunrpc: Use sendmsg(MSG_SPLICE_PAGES)
+ rather then sendpage
+From: Jeff Layton <jlayton@kernel.org>
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org, 
+ linux-kernel@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>, Trond
+ Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
+ <anna@kernel.org>,  linux-nfs@vger.kernel.org
+Date: Fri, 11 Aug 2023 18:50:10 -0400
+In-Reply-To: <20230609100221.2620633-4-dhowells@redhat.com>
+References: <20230609100221.2620633-1-dhowells@redhat.com>
+	 <20230609100221.2620633-4-dhowells@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Subject: Re: [PATCH RESEND net-next 2/2] dt-bindings: net: dsa:
- mediatek,mt7530: document MDIO-bus
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
- <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
- <dcb981b9-b435-c0e5-8e47-d66add207fdc@arinc9.com>
- <20230808121707.chona7hakapp6whe@skbuf>
- <44fde617-1159-4961-84c4-372fe265fbd8@arinc9.com>
- <20230809220102.t3dqw7iojez5xsq3@skbuf>
-Content-Language: en-US
-In-Reply-To: <20230809220102.t3dqw7iojez5xsq3@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 10.08.2023 01:01, Vladimir Oltean wrote:
-> On Wed, Aug 09, 2023 at 12:03:19PM +0300, Arınç ÜNAL wrote:
->> On 8.08.2023 15:17, Vladimir Oltean wrote:
->>> On Sat, Aug 05, 2023 at 11:15:15PM +0300, Arınç ÜNAL wrote:
->>>> I don't see a reason to resubmit this without addressing the requested
->>>> change.
->>>>
->>>>>> Wouldn't we just skip the whole issue by documenting the need for defining all PHYs
->>>>>> used on the switch when defining the MDIO bus?
->>>>>
->>>>> Good idea, please do that.
->>>>
->>>> https://lore.kernel.org/netdev/0f501bb6-18a0-1713-b08c-6ad244c022ec@arinc9.com/
->>>>
->>>> Arınç
->>>
->>> Arınç, where do you see that comment being added? AFAIU, it is a
->>> characteristic of the generic __of_mdiobus_register() code to set
->>> mdio->phy_mask = ~0, and nothing specific to the mt7530.
->>
->> What I believe is specific to DSA is, 1:1 mapping of the port reg to the
->> PHY reg on the mdio bus is disabled if the mdio bus is defined. Therefore,
->> I believe a notice like below fits mediatek,mt7530.yaml.
->>
->> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
->> index e532c6b795f4..c59d58252cd5 100644
->> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
->> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
->> @@ -128,6 +128,15 @@ properties:
->>         See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
->>         details for the regulator setup on these boards.
->> +  mdio:
->> +    $ref: /schemas/net/mdio.yaml#
->> +    unevaluatedProperties: false
->> +    description:
->> +      Node for the internal MDIO bus connected to the embedded ethernet-PHYs.
->> +      For every port defined under the "^(ethernet-)?ports$" node, a PHY must be
->> +      defined under here and a phy-handle property must be defined under the
->> +      port node to point to the PHY node.
->> +
->>     mediatek,mcm:
->>       type: boolean
->>       description:
->>
->> Arınç
-> 
-> In that case, putting the comment here would make more sense, no?
-> (and maybe enforcing an actual schema, but I've no idea how to do that)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-> index 480120469953..5a415f12f162 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-> @@ -59,7 +59,14 @@ properties:
->         - rtl8_4t
->         - seville
-> 
-> -# CPU and DSA ports must have phylink-compatible link descriptions
-> +# CPU and DSA ports must have phylink-compatible link descriptions.
-> +# On user ports, these are also supported, but are optional and may be omitted,
-> +# meaning that these ports are implicitly connected to a PHY on an internal
-> +# MDIO bus of the switch that isn't described in the device tree. If the switch
-> +# does have a child node for the internal MDIO bus, the phylink-compatible
-> +# bindings are also required (even if this is not enforced here). The detection
-> +# of an internal MDIO bus is model-specific and may involve matching on the
-> +# "mdio" node name or compatible string.
->   if:
->     oneOf:
->       - required: [ ethernet ]
-> 
-> Since commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus"), DSA as a
-> framework also supports auto-creating an internal MDIO bus based on the
-> presence of the "mdio" node name, so I guess it makes sense for the
-> "mdio" to appear in the generic dsa.yaml if there's nothing else that's
-> special about it.
+On Fri, 2023-06-09 at 11:02 +0100, David Howells wrote:
+> When transmitting data, call down into TCP using sendmsg with
+> MSG_SPLICE_PAGES to indicate that content should be spliced rather than
+> performing sendpage calls to transmit header, data pages and trailer.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Acked-by: Chuck Lever <chuck.lever@oracle.com>
+> cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+> cc: Anna Schumaker <anna@kernel.org>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-nfs@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  include/linux/sunrpc/svc.h | 11 +++++------
+>  net/sunrpc/svcsock.c       | 38 ++++++++++++--------------------------
+>  2 files changed, 17 insertions(+), 32 deletions(-)
+>=20
 
-I agree with this. I've done this which works. It's even found a port
-node with the ethernet property missing, as it should've.
+I'm seeing a regression in pynfs runs with v6.5-rc5. 3 tests are failing
+in a similar fashion. WRT1b is one of them
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-index ec74a660beda..03ccedbc49dc 100644
---- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-@@ -31,6 +31,24 @@ properties:
-        (single device hanging off a CPU port) must not specify this property
-      $ref: /schemas/types.yaml#/definitions/uint32-array
-  
-+  mdio:
-+    description: The internal MDIO bus of the switch
-+    $ref: /schemas/net/mdio.yaml#
-+
-+if:
-+  required: [ mdio ]
-+then:
-+  patternProperties:
-+    "^(ethernet-)?ports$":
-+      patternProperties:
-+        "^(ethernet-)?port@[0-9]+$":
-+          if:
-+            not:
-+              required: [ ethernet ]
-+          then:
-+            required:
-+              - phy-handle
-+
-  additionalProperties: true
-  
-  $defs:
-diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-index 8d7e878b84dc..fe1e2008995d 100644
---- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-@@ -78,6 +78,16 @@ examples:
-              };
-      };
-  
-+    macb1 {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
-+
-+            fixed-link {
-+                    speed = <1000>;
-+                    full-duplex;
-+            };
-+    };
-+
-      spi {
-              #address-cells = <1>;
-              #size-cells = <0>;
-@@ -138,6 +148,7 @@ examples:
-                                      phy-mode = "rgmii";
-                                      tx-internal-delay-ps = <2000>;
-                                      rx-internal-delay-ps = <2000>;
-+                                    ethernet = <&macb0>;
-  
-                                      fixed-link {
-                                              speed = <1000>;
-diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-index cfd69c2604ea..f600e65fc990 100644
---- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-@@ -6,9 +6,6 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
-  
-  title: Realtek switches for unmanaged switches
-  
--allOf:
--  - $ref: dsa.yaml#/$defs/ethernet-ports
--
-  maintainers:
-    - Linus Walleij <linus.walleij@linaro.org>
-  
-@@ -95,37 +92,41 @@ properties:
-        - '#address-cells'
-        - '#interrupt-cells'
-  
--  mdio:
--    $ref: /schemas/net/mdio.yaml#
--    unevaluatedProperties: false
--
--    properties:
--      compatible:
--        const: realtek,smi-mdio
--
--if:
--  required:
--    - reg
--
--then:
--  $ref: /schemas/spi/spi-peripheral-props.yaml#
--  not:
--    required:
--      - mdc-gpios
--      - mdio-gpios
--      - mdio
--
--  properties:
--    mdc-gpios: false
--    mdio-gpios: false
--    mdio: false
--
--else:
--  required:
--    - mdc-gpios
--    - mdio-gpios
--    - mdio
--    - reset-gpios
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
-+  - if:
-+      required: [ mdio ]
-+    then:
-+      properties:
-+        mdio:
-+          properties:
-+            compatible:
-+              const: realtek,smi-mdio
-+
-+          required:
-+            - compatible
-+
-+  - if:
-+      required:
-+        - reg
-+    then:
-+      $ref: /schemas/spi/spi-peripheral-props.yaml#
-+      not:
-+        required:
-+          - mdc-gpios
-+          - mdio-gpios
-+          - mdio
-+
-+      properties:
-+        mdc-gpios: false
-+        mdio-gpios: false
-+        mdio: false
-+    else:
-+      required:
-+        - mdc-gpios
-+        - mdio-gpios
-+        - mdio
-+        - reset-gpios
-  
-  required:
-    - compatible
+[vagrant@jlayton-kdo-nfsd nfs4.0]$  ./testserver.py --rundeps --maketree --=
+uid=3D0 --gid=3D0 localhost:/export/pynfs/4.0/ WRT1b                       =
+                             =20
+**************************************************                         =
+                                                                           =
+                         =20
+WRT1b    st_write.testSimpleWrite2                                : FAILURE=
+                                                                           =
+                         =20
+           READ returned                                                   =
+                                                                           =
+                         =20
+           b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',=
+                                                                           =
+                         =20
+           expected b'\x00\x00\x00\x00\x00write data'                      =
+                                                                           =
+                         =20
+INIT     st_setclientid.testValid                                 : PASS   =
+                                                                           =
+                         =20
+MKFILE   st_open.testOpen                                         : PASS   =
+                                                                           =
+                         =20
+**************************************************                         =
+                                                                           =
+                         =20
+Command line asked for 3 of 679 tests                                      =
+                                                                           =
+                         =20
+Of those: 0 Skipped, 1 Failed, 0 Warned, 2 Passed                          =
+                        =20
 
 
-> 
-> Also, in the earlier patch version you had replied to David Bauer:
-> 
-> | > While i was not aware of this side effect, I don't see how this breaks the ABI.
-> |
-> | Your patch doesn't break it, my then-intention of doing PHY muxing by
-> | utilising this would. Your first patch is perfectly fine as is.
-> 
-> Could you please clarify what is your valid use case for not having a
-> phy-handle to a PHY on an MDIO bus that is otherwise present in OF?
+This test just writes "write data" starting at offset 30 and then reads
+the data back. It looks like we're seeing zeroes in the read reply where
+the data should be.
 
-I had one possible use case, PHY muxing, but it has nothing to do with
-the PHY registers of the PHYs on the internal MDIO bus so it's not a
-valid use case.
+A bisect landed on this patch, which I'm assuming is the same as this
+commit in mainline:
 
-> It doesn't _have_ to be broken. Since DSA knows the addresses of the
-> internal PHYs, it can circumvent the lack of auto-scanning by manually
-> calling get_phy_device() at the right (port-based) MDIO addresses.
-> But any patch would need to have a clear reason before being considered
-> for merging.
+    5df5dd03a8f7 sunrpc: Use sendmsg(MSG_SPLICE_PAGES) rather then sendpage
 
-I think circumventing the mdio node for ports without a phy-handle will
-bring unnecessary complexity and confusion as I may define a port with
-reg = <1> with phy-handle to a phy with reg = <4>. In that case, a port
-with reg = <4> without a phy-handle would try the phy with reg <4> and fail.
+...any thoughts as to what might be wrong?
 
-This is of course if I understood correctly that "(port-based) MDIO
-addresses" means reading the MDIO address of a phy from the reg of a
-port defined under the ports node.
+> diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
+> index 762d7231e574..f66ec8fdb331 100644
+> --- a/include/linux/sunrpc/svc.h
+> +++ b/include/linux/sunrpc/svc.h
+> @@ -161,16 +161,15 @@ static inline bool svc_put_not_last(struct svc_serv=
+ *serv)
+>  extern u32 svc_max_payload(const struct svc_rqst *rqstp);
+> =20
+>  /*
+> - * RPC Requsts and replies are stored in one or more pages.
+> + * RPC Requests and replies are stored in one or more pages.
+>   * We maintain an array of pages for each server thread.
+>   * Requests are copied into these pages as they arrive.  Remaining
+>   * pages are available to write the reply into.
+>   *
+> - * Pages are sent using ->sendpage so each server thread needs to
+> - * allocate more to replace those used in sending.  To help keep track
+> - * of these pages we have a receive list where all pages initialy live,
+> - * and a send list where pages are moved to when there are to be part
+> - * of a reply.
+> + * Pages are sent using ->sendmsg with MSG_SPLICE_PAGES so each server t=
+hread
+> + * needs to allocate more to replace those used in sending.  To help kee=
+p track
+> + * of these pages we have a receive list where all pages initialy live, =
+and a
+> + * send list where pages are moved to when there are to be part of a rep=
+ly.
+>   *
+>   * We use xdr_buf for holding responses as it fits well with NFS
+>   * read responses (that have a header, and some data pages, and possibly
+> diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+> index f77cebe2c071..9d9f522e3ae1 100644
+> --- a/net/sunrpc/svcsock.c
+> +++ b/net/sunrpc/svcsock.c
+> @@ -1203,13 +1203,14 @@ static int svc_tcp_recvfrom(struct svc_rqst *rqst=
+p)
+>  static int svc_tcp_send_kvec(struct socket *sock, const struct kvec *vec=
+,
+>  			      int flags)
+>  {
+> -	return kernel_sendpage(sock, virt_to_page(vec->iov_base),
+> -			       offset_in_page(vec->iov_base),
+> -			       vec->iov_len, flags);
+> +	struct msghdr msg =3D { .msg_flags =3D MSG_SPLICE_PAGES | flags, };
+> +
+> +	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, vec, 1, vec->iov_len);
+> +	return sock_sendmsg(sock, &msg);
+>  }
+> =20
+>  /*
+> - * kernel_sendpage() is used exclusively to reduce the number of
+> + * MSG_SPLICE_PAGES is used exclusively to reduce the number of
+>   * copy operations in this path. Therefore the caller must ensure
+>   * that the pages backing @xdr are unchanging.
+>   *
+> @@ -1249,28 +1250,13 @@ static int svc_tcp_sendmsg(struct socket *sock, s=
+truct xdr_buf *xdr,
+>  	if (ret !=3D head->iov_len)
+>  		goto out;
+> =20
+> -	if (xdr->page_len) {
+> -		unsigned int offset, len, remaining;
+> -		struct bio_vec *bvec;
+> -
+> -		bvec =3D xdr->bvec + (xdr->page_base >> PAGE_SHIFT);
+> -		offset =3D offset_in_page(xdr->page_base);
+> -		remaining =3D xdr->page_len;
+> -		while (remaining > 0) {
+> -			len =3D min(remaining, bvec->bv_len - offset);
+> -			ret =3D kernel_sendpage(sock, bvec->bv_page,
+> -					      bvec->bv_offset + offset,
+> -					      len, 0);
+> -			if (ret < 0)
+> -				return ret;
+> -			*sentp +=3D ret;
+> -			if (ret !=3D len)
+> -				goto out;
+> -			remaining -=3D len;
+> -			offset =3D 0;
+> -			bvec++;
+> -		}
+> -	}
+> +	msg.msg_flags =3D MSG_SPLICE_PAGES;
+> +	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, xdr->bvec,
+> +		      xdr_buf_pagecount(xdr), xdr->page_len);
+> +	ret =3D sock_sendmsg(sock, &msg);
+> +	if (ret < 0)
+> +		return ret;
+> +	*sentp +=3D ret;
+> =20
+>  	if (tail->iov_len) {
+>  		ret =3D svc_tcp_send_kvec(sock, tail, 0);
+>=20
 
-Arınç
+--=20
+Jeff Layton <jlayton@kernel.org>
 
