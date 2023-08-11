@@ -1,104 +1,162 @@
-Return-Path: <netdev+bounces-26808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B9D7790AF
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:23:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03CA779113
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:54:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B24F1C20A3A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 13:23:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BE662819A5
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 13:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8432320FB3;
-	Fri, 11 Aug 2023 13:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C79729DEC;
+	Fri, 11 Aug 2023 13:54:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D3063B3
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 13:23:19 +0000 (UTC)
-Received: from out-114.mta1.migadu.com (out-114.mta1.migadu.com [IPv6:2001:41d0:203:375::72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB44125
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:23:17 -0700 (PDT)
-Message-ID: <271b76c6-a52a-0c8b-5560-8a72c4340faf@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691760195;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A2E63B3
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 13:54:38 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEE618F;
+	Fri, 11 Aug 2023 06:54:37 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 71FAA21868;
+	Fri, 11 Aug 2023 13:54:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1691762076; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SkZWE4XFj7n8PtSuWO95wRoJ9c9BRctbYRXHgzE+874=;
-	b=q9k1tHJR1cMhrkd4lyzS4+BSxbHSM490dxoSUrrR8QHrxenoc5OqPCuV0LHLB4XLaiM0Dw
-	N8ObBd2AOuHAaL+3bIkd10FDI6YsmHru3PRZOeZh6EbkHFkL+Pd8RPXucsT1d+yT5pTWU/
-	n+upeYSRMSeTp3dB4DCewzo6X1LIJiE=
-Date: Fri, 11 Aug 2023 14:23:08 +0100
+	bh=4qa8/BC1poqyiCNiUJJGsDqq/dAqZVtYPldavYVoO9M=;
+	b=df+qtuFvTeIPDAbs1LvqqhmV2SxNtZ64nCIgIZmngTs/cvZT63uNe8r4asquFjiMgcc6qL
+	7Oy784yAd21icDEM6XM4iZbnOCEUtgWyLRTKOzI4tX2qtpME5YHZUJzvhzicm9WQqPWFhP
+	3//NdWUGWDPGIOkMbbEwLxDHFaYjtXg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1691762076;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4qa8/BC1poqyiCNiUJJGsDqq/dAqZVtYPldavYVoO9M=;
+	b=wjuPv17QcZxsjZpv/8Wi1frm7hU+fkBuiFcWsOeNeziQiDo6WPSxDyXS7K/TbzLOIE2LBW
+	qIGm/VfqF8YPR3Bg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0FC55138E2;
+	Fri, 11 Aug 2023 13:54:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id D63hApw91mS4DgAAMHmgww
+	(envelope-from <tiwai@suse.de>); Fri, 11 Aug 2023 13:54:36 +0000
+Date: Fri, 11 Aug 2023 15:54:35 +0200
+Message-ID: <87350psmzo.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	linux-kernel@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC] Introduce uniptr_t as a generic "universal" pointer
+In-Reply-To: <87o7jgccm9.wl-tiwai@suse.de>
+References: <87edkce118.wl-tiwai@suse.de>
+	<20230809143801.GA693@lst.de>
+	<CAHk-=wiyWOaPtOJ1PTdERswXV9m7W_UkPV-HE0kbpr48mbnrEA@mail.gmail.com>
+	<87wmy4ciap.wl-tiwai@suse.de>
+	<CAHk-=wh-mUL6mp4chAc6E_UjwpPLyCPRCJK+iB4ZMD2BqjwGHA@mail.gmail.com>
+	<87o7jgccm9.wl-tiwai@suse.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 6/9] ice: add admin commands to access cgu
- configuration
-Content-Language: en-US
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, "Olech, Milena" <milena.olech@intel.com>,
- "Michalik, Michal" <michal.michalik@intel.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>,
- mschmidt <mschmidt@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
- Bart Van Assche <bvanassche@acm.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-References: <20230809214027.556192-1-vadim.fedorenko@linux.dev>
- <20230809214027.556192-7-vadim.fedorenko@linux.dev>
- <20230810192102.2932d58f@kernel.org>
- <8d52ab61-e532-0ef8-4227-ea1ab469f4cb@linux.dev>
- <DM6PR11MB46578D7F73BDA4D6EE7E0E239B10A@DM6PR11MB4657.namprd11.prod.outlook.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <DM6PR11MB46578D7F73BDA4D6EE7E0E239B10A@DM6PR11MB4657.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 11/08/2023 13:16, Kubalewski, Arkadiusz wrote:
->> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->> Sent: Friday, August 11, 2023 11:31 AM
->>
->> On 11/08/2023 03:21, Jakub Kicinski wrote:
->>> On Wed,  9 Aug 2023 22:40:24 +0100 Vadim Fedorenko wrote:
->>>> From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>>
->>>> Add firmware admin command to access clock generation unit
->>>> configuration, it is required to enable Extended PTP and SyncE features
->>>> in the driver.
->>>> Add definitions of possible hardware variations of input and output pins
->>>> related to clock generation unit and functions to access the data.
->>>
->>> Doesn't build, but hold off a little with reposting, please hopefully
->>> I'll have more time tomorrow to review.
->>
->> Yeah, we've found the issue already and Arkadiusz has prepared a patch
->> to fix it. I can do the repost once you are ok to review.
+On Wed, 09 Aug 2023 20:08:30 +0200,
+Takashi Iwai wrote:
 > 
-> Thanks Vadim,
+> On Wed, 09 Aug 2023 19:01:50 +0200,
+> Linus Torvalds wrote:
+> > 
+> > On Wed, 9 Aug 2023 at 09:05, Takashi Iwai <tiwai@suse.de> wrote:
+> > >
+> > > OTOH, it simplifies the code well for us; as of now, we have two
+> > > callbacks for copying PCM memory from/to the device, distinct for
+> > > kernel and user pointers.  It's basically either copy_from_user() or
+> > > memcpy() of the given size depending on the caller.  The sockptr_t or
+> > > its variant would allow us to unify those to a single callback.
+> > 
+> > I didn't see the follow-up patches that use this, but...
+> > 
+> > > (And yeah, iov_iter is there, but it's definitely overkill for the
+> > > purpose.)
+> > 
+> > You can actually use a "simplified form" of iov_iter, and it's not all that bad.
+> > 
+> > If the actual copying operation is just a memcpy, you're all set: just
+> > do copy_to/from_iter(), and it's a really nice interface, and you
+> > don't have to carry "ptr+size" things around.
+> > 
+> > And we now have a simple way to generate simple iov_iter's, so
+> > *creating* the iter is trivial too:
+> > 
+> >         struct iov_iter iter;
+> >         int ret = import_ubuf(ITER_SRC/DEST, uptr, len, &iter);
+> > 
+> >         if (unlikely(ret < 0))
+> >                 return ret;
+> > 
+> > and you're all done. You can now pass '&iter' around, and it has a
+> > nice user pointer and a range in it, and copying that thing is easy.
+> > 
+> > Perhaps somewhat strangely (*) we don't have the same for a simple
+> > kernel buffer, but adding that wouldn't be hard. You either end up
+> > using a 'kvec', or we could even add something like ITER_KBUF if it
+> > really matters.
+> > 
+> > Right now the kernel buffer init is a *bit* more involved than the
+> > above ubuf case:
+> > 
+> >         struct iov_iter iter;
+> >         struct kvec kvec = { kptr, len};
+> > 
+> >         iov_iter_kvec(&iter, ITER_SRC/DEST, &kvec, 1, len);
+> > 
+> > and that's maybe a *bit* annoying, but we could maybe simplify this
+> > with some helper macros even without ITER_KBUF.
+> > 
+> > So yes, iov_iter does have some abstraction overhead, but it really
+> > isn't that bad. And it *does* allow you to do a lot of things, and can
+> > actually simplify the users quite a bit, exactly because it allows you
+> > to just pass that single iter pointer around, and you automatically
+> > have not just the user/kernel distinction, you have the buffer size,
+> > and you have a lot of helper functions to use it.
+> > 
+> > I really think that if you want a user-or-kernel buffer interface, you
+> > should use these things.
+> > 
+> > Please? At least look into it.
 > 
-> Just realized you have already replied on this..
-> Ok, so I guess v4 after all.
-> 
-> Thank you!
-> Arkadiusz
+> All sounds convincing, I'll take a look tomorrow.  Thanks!
+
+FYI, I rewrote and tested patches, and it looks promising.
+
+The only missing piece in the upstream side was the export of
+import_ubuf().
 
 
-Yeah, it will be v4 anyway
+Takashi
 
