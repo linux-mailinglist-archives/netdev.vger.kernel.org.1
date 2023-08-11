@@ -1,125 +1,145 @@
-Return-Path: <netdev+bounces-26826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB337779206
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 16:39:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA92B77920D
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 16:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32349281BE3
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 14:39:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 192A8281FA6
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 14:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEE47499;
-	Fri, 11 Aug 2023 14:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F295879F0;
+	Fri, 11 Aug 2023 14:41:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11876FDA
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 14:39:46 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC81A2728
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=u0elVA+yHsWRBFvnYLi8GrehuhXpLeDvIBoM4eNKZco=; b=Nn
-	QJnezIvYNO13gjnj/NOXl9KtTYW4YBbUTFNLQ+mFBwvp8Xts95DEdEKlb1JFWEmXnGamRKTdGewS7
-	gIh8Oj/xuoNn+vQ7KCOMbRNxBFDiFG7LQ0jhUmDFzD3y1S5zB5dCRX0QiwMeZ0zHRHJPzt0Zzr3jJ
-	GoVjmBKwWPeEE7U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qUTHm-003oUo-1C; Fri, 11 Aug 2023 16:38:42 +0200
-Date: Fri, 11 Aug 2023 16:38:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandru Ardelean <alexandru.ardelean@analog.com>,
-	Andre Edich <andre.edich@microchip.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Christophe Leroy <christophe.leroy@c-s.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Divya Koppera <Divya.Koppera@microchip.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Kavya Sree Kotagiri <kavyasree.kotagiri@microchip.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Mathias Kresin <dev@kresin.me>, Maxim Kochetkov <fido_max@inbox.ru>,
-	Michael Walle <michael@walle.cc>,
-	Neil Armstrong <narmstrong@baylibre.com>,
-	Nisar Sayed <Nisar.Sayed@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Philippe Schenker <philippe.schenker@toradex.com>,
-	Willy Liu <willy.liu@realtek.com>,
-	Yuiko Oshino <yuiko.oshino@microchip.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: fix IRQ-based wake-on-lan over hibernate /
- power off
-Message-ID: <e4c4a448-2f3f-4693-bc5e-1d39ad76d233@lunn.ch>
-References: <E1qUPLi-003XN6-Dr@rmk-PC.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E708D6FDA
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 14:41:44 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AAAF2D7B;
+	Fri, 11 Aug 2023 07:41:42 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A7F4FE000C;
+	Fri, 11 Aug 2023 14:41:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1691764901;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4m5U0LhjY1Jq5li399j2cUJWhFltS+fVPgIybFfJYE=;
+	b=NrDc3y+ncrw7qejY/qgtpRZrXf4ZpivvC94Rk0NJB6Z1XTVfgogG1p6BPFoJ5SxWl3TFsB
+	XhlOpU02iZEFE12M8PKqOHH2KmlpuyzGMcWM0outgV2wpBEqLdxVdI78QReg2cJlveuASs
+	mmRo0kRfQy61iByc2Qsrj9gNs5t+H8ozoj1TnG0Rs4MJhsi9S4Z6cqvlH4JPt42Moh12oQ
+	9cYKnWWx2xrUX0OPnC7ouKKSrlVv6pPIOTZyInwXAsSH/6kNB6oBB/g7ayb4mkk+4ZGqbS
+	iNX0h0cZNGUqTMOTkzVw05AA5IWXfogjOrYosgbTnqK5zFBDctm0ndsm5NajGg==
+Message-ID: <252cdb0b-3630-9e29-45a6-ea0474f0d983@bootlin.com>
+Date: Fri, 11 Aug 2023 16:42:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/3] net: dsa: rzn1-a5psw: add support for
+ .port_bridge_flags
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?Q?Cl=C3=A9ment_Leger?= <clement@clement-leger.fr>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Milan Stevanovic <milan.stevanovic@se.com>,
+ Jimmy Lalande <jimmy.lalande@se.com>,
+ Pascal Eberhard <pascal.eberhard@se.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20230810093651.102509-1-alexis.lothore@bootlin.com>
+ <20230810093651.102509-3-alexis.lothore@bootlin.com>
+ <20230811100307.ocqkijjj5f6hi3q2@skbuf>
+Content-Language: en-US
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+In-Reply-To: <20230811100307.ocqkijjj5f6hi3q2@skbuf>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <E1qUPLi-003XN6-Dr@rmk-PC.armlinux.org.uk>
+X-GND-Sasl: alexis.lothore@bootlin.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 11, 2023 at 11:26:30AM +0100, Russell King (Oracle) wrote:
-> Uwe reports:
-> "Most PHYs signal WoL using an interrupt. So disabling interrupts [at
-> shutdown] breaks WoL at least on PHYs covered by the marvell driver."
+Hello Vladimir,
+On 8/11/23 12:03, Vladimir Oltean wrote:
+> Hi Alexis,
 > 
-> Discussing with Ioana, the problem which was trying to be solved was:
-> "The board in question is a LS1021ATSN which has two AR8031 PHYs that
-> share an interrupt line. In case only one of the PHYs is probed and
-> there are pending interrupts on the PHY#2 an IRQ storm will happen
-> since there is no entity to clear the interrupt from PHY#2's registers.
-> PHY#1's driver will get stuck in .handle_interrupt() indefinitely."
+> On Thu, Aug 10, 2023 at 11:36:50AM +0200, alexis.lothore@bootlin.com wrote:
+>> +	if (flags.mask & BR_FLOOD) {
+>> +		val = flags.val & BR_FLOOD ? BIT(port) : 0;
+>> +		a5psw_reg_rmw(a5psw, A5PSW_UCAST_DEF_MASK, BIT(port), val);
+>> +	}
+>> +
+>> +	if (flags.mask & BR_MCAST_FLOOD) {
+>> +		val = flags.val & BR_MCAST_FLOOD ? BIT(port) : 0;
+>> +		a5psw_reg_rmw(a5psw, A5PSW_MCAST_DEF_MASK, BIT(port), val);
+>> +	}
+>> +
+>> +	if (flags.mask & BR_BCAST_FLOOD) {
+>> +		val = flags.val & BR_BCAST_FLOOD ? BIT(port) : 0;
+>> +		a5psw_reg_rmw(a5psw, A5PSW_BCAST_DEF_MASK, BIT(port), val);
+>> +	}
 > 
-> Further confirmation that "the two AR8031 PHYs are on the same MDIO
-> bus."
-> 
-> With WoL using interrupts to wake the system, in such a case, the
-> system will begin booting with an asserted interrupt. Thus, we need to
-> cope with an interrupt asserted during boot.
-> 
-> Solve this instead by disabling interrupts during PHY probe. This will
-> ensure in Ioana's situation that both PHYs of the same type sharing an
-> interrupt line on a common MDIO bus will have their interrupt outputs
-> disabled when the driver probes the device, but before we hook in any
-> interrupt handlers - thus avoiding the interrupt storm.
-> 
-> A better fix would be for platform firmware to disable the interrupting
-> devices at source during boot, before control is handed to the kernel.
-> 
-> Fixes: e2f016cf7751 ("net: phy: add a shutdown procedure")
-> Link: 20230804071757.383971-1-u.kleine-koenig@pengutronix.de
-> Reported-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> These 3 port masks will only do what you expect while the bridge has
+> vlan_filtering=0, correct? When vlan_filtering=1, packets classified to
+> a VLAN which don't hit any FDB entry will be always flooded to all ports
+> in that VLAN, correct?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+After thoroughly reading the A5PSW doc again, I feel that this sentence is not
+exactly true. If I refer to section 4.5.3.9, paragraph 3.c:
 
-    Andrew
+The VLAN table is used for both, VLAN domain verification [...] as well as VLAN
+resolution. Once the frame has passed any VLAN domain verification (i.e. will
+not be discarded by the verification function already), the forwarding
+resolution applies.
+[...]
+- If the destination MAC address (Unicast or Multicast) is not found in the MAC
+address table, or if the destination address is the Broadcast address, the frame
+is forwarded according to the following rules:
+  - The destination port mask is loaded from the respective register
+U/M/BCAST_DEFAULT_MASK depending on unicast, multicast or broadcast. Then the
+following filtering on this mask applies.
+    - If the frame carries a VLAN tag, the VLAN resolution table is searched for
+a matching VLAN ID and the frame is sent only to ports that are associated with
+the VLAN ID.
+    - If the frame carries a VLAN tag and the VLAN ID does not match any entry
+in the VLAN Resolution Table, or the frame does not carry a VLAN tag, the frame
+is forwarded to all ports that are enabled by the default mask.
+    - If it cannot be associated with any VLAN group and if the default group
+has been set to all zero, the frame is discarded.
+[...]
+
+I understand from the second bullet that even when vlan filtering is enabled
+(which occurs as first step), the first flooding filter (used in second step,
+resolution) remains the flooding masks from unicast/multicast/broadcast default
+mask registers. The vlan resolution is then applied over it as a second filter,
+and only make the flooding more "restrictive", it does not bypass it (so if a
+port is in the vlan which VID is in an incoming packet but the port is not also
+defined in the U/M/B default mask, incoming packet won't be flooded to it).
+> 
+> Maybe you could restrict transitions to flooding disabled on ports with
+> vlan_filtering 1, and restrict transitions to vlan_filtering 1 on ports
+> with flooding disabled. Or at least add some comments about the
+> limitations. I wouldn't want subtle incompatibilities between the
+> hardware design and Linux' expectations to go under the radar like this.
+> 
+
+-- 
+Alexis LothorÃ©, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
