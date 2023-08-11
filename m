@@ -1,215 +1,249 @@
-Return-Path: <netdev+bounces-26692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2897789A1
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 11:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 519C97789F1
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 11:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 236B9282088
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:21:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 053B528215F
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004E4567B;
-	Fri, 11 Aug 2023 09:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF086568D;
+	Fri, 11 Aug 2023 09:29:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28425675
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 09:21:56 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6C52D78
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 02:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691745714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qc/WOX45CsZJBV93Err2MVMANsAd+cCgENPpEN+I0vA=;
-	b=HEciJhxfSG6QfDR+0fTTmk072F/Cp/OeWz6kwc9AHMmvuMe8lD00keVrAQzLHP3bYIF006
-	oEKY7E5o0aAFmNLQcxGD4NgdlPVF1RTHOfc+t7fjmjm00VUFukbgi819hij0BNTYfV3hC0
-	Frcw83xHtiiQqQc6osRphclIPS1edPw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-505-_5lrgXyPNciIy2OMe6SqZA-1; Fri, 11 Aug 2023 05:21:53 -0400
-X-MC-Unique: _5lrgXyPNciIy2OMe6SqZA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fe11910e46so8702515e9.0
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 02:21:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691745712; x=1692350512;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qc/WOX45CsZJBV93Err2MVMANsAd+cCgENPpEN+I0vA=;
-        b=JE59ghlxR0NCk7oTzZVoQje+V7JwJ40Qg8aENzb6JlulijuYmomZjv6SahN0iiSCoo
-         GeuvJpbGTirMal62IMWdGBgsgbdJcP4DIWmRVxCTnANFXPDI+qJPRpmJWCl9N+8aiikV
-         ekVFVOd+fK8f27Vl2zbWleaEBGo38Qc/it9NtCCS5gp3dnBY6DvW4WXDp0rHh9QdA6IE
-         Ay3h22/kLW0Sc3gdHlNOQiBTCKMqk6qLLYjWg1TuMDFSv3yqzfzngD2nPVwW7zhZ3KOF
-         YYPgLhOgK8WS71oINsNVJ33ytPf8h9rv8PZ2aKoA+2lKI784cS/yzZbQzIOQaMgoVdqs
-         im/w==
-X-Gm-Message-State: AOJu0YzhzyMFNp9Y5SP///3dIz1PLG/H7cnIp3LloJ6GPQGhc2RxUiGB
-	Mfs8zBXz4w1KL2iv/td/+OXCCvYuqnBDO28fDzx3P6xfMkXhFv6Ex9E+o2Rfc4pYHYa09OJp7DJ
-	aNGULwc6WSflXAiZT11B/Up1s
-X-Received: by 2002:a7b:cd0d:0:b0:3fb:e1d0:6417 with SMTP id f13-20020a7bcd0d000000b003fbe1d06417mr3662329wmj.19.1691745712234;
-        Fri, 11 Aug 2023 02:21:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IER/WnnKn4hVj56w4Zkki7TDfm7jIFT+xEdAc/BAFLPHbIKDezcMwpxxeM0f+d3cm1CIvnNuA==
-X-Received: by 2002:a7b:cd0d:0:b0:3fb:e1d0:6417 with SMTP id f13-20020a7bcd0d000000b003fbe1d06417mr3662316wmj.19.1691745711863;
-        Fri, 11 Aug 2023 02:21:51 -0700 (PDT)
-Received: from redhat.com ([2.55.42.146])
-        by smtp.gmail.com with ESMTPSA id u16-20020a5d4690000000b00313de682eb3sm4764736wrq.65.2023.08.11.02.21.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 02:21:51 -0700 (PDT)
-Date: Fri, 11 Aug 2023 05:21:46 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>,
-	Shannon Nelson <shannon.nelson@amd.com>, xuanzhuo@linux.alibaba.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net
-Subject: Re: [PATCH net-next v4 2/2] virtio-net: add cond_resched() to the
- command waiting loop
-Message-ID: <20230811052102-mutt-send-email-mst@kernel.org>
-References: <CACGkMEv+CYD3SqmWkay1qVaC8-FQTDpC05Y+3AkmQtJwLMLUjQ@mail.gmail.com>
- <20230727020930-mutt-send-email-mst@kernel.org>
- <CACGkMEuEFG-vT0xqddRAn2=V+4kayVG7NFVpB96vmecy0TLOWw@mail.gmail.com>
- <20230727054300-mutt-send-email-mst@kernel.org>
- <CACGkMEvbm1LmwpiOzE0mCt6YKHsDy5zYv9fdLhcKBPaPOzLmpA@mail.gmail.com>
- <CACGkMEs6ambtfdS+X_9LF7yCKqmwL73yjtD_UabTcdQDFiF3XA@mail.gmail.com>
- <20230810153744-mutt-send-email-mst@kernel.org>
- <CACGkMEvVg0KFMcYoKx0ZCCEABsP4TrQCJOUqTn6oHO4Q3aEJ4w@mail.gmail.com>
- <20230811012147-mutt-send-email-mst@kernel.org>
- <CACGkMEu8gCJGa4aLTrrNdCRYrZXohF0Pdx3a9kBhrhcHyt05-Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D970653B9;
+	Fri, 11 Aug 2023 09:29:02 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2045.outbound.protection.outlook.com [40.107.21.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DDED26BC;
+	Fri, 11 Aug 2023 02:29:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AY5tez26bxINybasaZi62Lrs0FQlmw9wqHt0upO+3y9K/Oei2SDyC1dBOQn32HDnT9cHMjitOLLYDN5fxKkDcRprjfDvJzjKGp1cVNifs4DMjrehOii31WWUkZoYmLOtQ3Xci/ii1wHKfFP4pPh4XT21gfNB7YrLU0C8ny9lEoAOpy1QG+6hYtNgbkPMr3gBkCxQd8WjXk14z7XweQ2j2zpkAgMbe77u+RWzs+2oeoJ/UkErNjMhnGQS60+D6W2n9HG8rjuqvQ3psx7oe5j+mSEDX4KpJx8UVw8xfd76ab3QIftuWITIznUDodAyn8+JZUGxV/xgSMm2NYjpxzzwqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sY4L2OQGLdsiygbFypbdBEOvZv8FTG8scfQBlSGqzLY=;
+ b=I2Z+L7SfDJetmQi3s1MraGVQOW1NU8q327IEYomsHTR4zzhwez54sRcCczFRorbixVfEc2umnqi9CXib6tY3xclV5cLW6R5RzTtHRhFdD9l0OgL0dFs/hwtqbOpC6msMSjM9plQ+gxvaKBex5TZk2caAApZ5fhY9vevC9gqr8CVgDwIerLG/yDGlzh8xknkbHRt8SkEJydnH5OwHpv67xEMcRKhNtQ9Vy3peC1LzGkbjPq5zs9mVOCbLpcq6uZeMZAQIGeVfyuy3a/eeQQdLwOAnYx04eh9UTBu6md6+F9Est7ornomDcZzdr7FJQcuIYHu9noxO9J8mqrb4kkCQ1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sY4L2OQGLdsiygbFypbdBEOvZv8FTG8scfQBlSGqzLY=;
+ b=xzPDR5rESNbn7umZqiaNwU2WfJzF31L8V/6ytWiBU+hNzu2pFHJnZvtCVPSF7WTlPo3l1u34Be8g9fRaZm4KqsEmcVOoueXMZdwJd3cS+9t0Wjw8+Ne9fIvQAI9mNvINFxGhuHrZ2daKw9HMvUiucbpiN5FI68amDZShBuzhZTE3WAoMYpC/y/Vm8Ydcup83vvaDO2VtLQmya5R8uit32OORCBZevjcxAsM4/XznCH9sAp27WInHFO9aXpS5He7nacawoQj8dA0qoy3QAI9rdjo2cts2LYULOVkzUwSLUHEpoJ+6irWzil7YmIGDL0x9UL3wPEhzjjmb+AXtvIaP9w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com (2603:10a6:7:83::14)
+ by AS8PR04MB8932.eurprd04.prod.outlook.com (2603:10a6:20b:42f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Fri, 11 Aug
+ 2023 09:28:57 +0000
+Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com
+ ([fe80::2867:7a72:20ac:5f71]) by HE1PR0402MB3497.eurprd04.prod.outlook.com
+ ([fe80::2867:7a72:20ac:5f71%3]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
+ 09:28:56 +0000
+Date: Fri, 11 Aug 2023 17:29:15 +0800
+From: Geliang Tang <geliang.tang@suse.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Florent Revest <revest@chromium.org>,
+	Brendan Jackman <jackmanb@chromium.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v11 2/5] selftests/bpf: Use random netns name
+ for mptcp
+Message-ID: <20230811092915.GA8364@bogon>
+References: <cover.1691125344.git.geliang.tang@suse.com>
+ <15d7646940fcbb8477b1be1aa11a5d5485d10b48.1691125344.git.geliang.tang@suse.com>
+ <8b706f66-2afa-b3d0-a13a-11f1ffb452fe@linux.dev>
+ <20230807064044.GA11180@localhost.localdomain>
+ <9a84e026-402d-b6d9-b6d1-57d91455da47@linux.dev>
+ <20230809081944.GA29707@bogon>
+ <ffd1bb86-ed32-3301-346a-e369219841de@linux.dev>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ffd1bb86-ed32-3301-346a-e369219841de@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: SI2PR04CA0013.apcprd04.prod.outlook.com
+ (2603:1096:4:197::6) To HE1PR0402MB3497.eurprd04.prod.outlook.com
+ (2603:10a6:7:83::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEu8gCJGa4aLTrrNdCRYrZXohF0Pdx3a9kBhrhcHyt05-Q@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: HE1PR0402MB3497:EE_|AS8PR04MB8932:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5073c41c-9ad1-4c48-e2d9-08db9a4d62c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Lz1NqOvwQFJoTbDtn/awC6z3wKa/Tg1a169AzTx1C9qTsuN/qBRESFIf+XLu1lu5zbPYnEWjrsx0+3FCc88zz3/PioVdGamIIfunJUJ2jmF4xDNcyv3FPGf3dQssGqfH0/aMYCnuaWH7p1OD8D2UvQU9w84sDM7KuF5Zdd9RRBQlEd9cvAeD3i/bHk0wCp+fupflWB6j7V7nr0Cv1Y1yPGzy0ESTEweaMfcKVGGNOhMNFRb4puLnyYza7TEVugEVgprp7Q308f0zP6BRC2gLtcwErfhrj1abHavvfPK5mLV0xTaDRDn1Tqkgb/JOB55cXgL+ZV1jmb0TZ+jx88eRiWtfHjKA8izcIX2tPp6e8OqqwfOSnLMHN3I7N3WcKI0NWYo5CxoCQtMSgPj9pRZ435q+FhnZsOVN7wL5a/Ug9pQTjwnJc43AVoEf2d9w7fyCaHdamh6sKISZo3+cZn4CREgT9ekUXJ6CWp+EkTvADI7PJDcBeotYYYo6qQk7N2qkziRkV8HbHhY/hg7Ow5XZb2+jhbAawla8mlLdthq7R5Jc8TgpgEXG5JFKlO57g1xfh1V/natsQQcTAuoSd7t8ILDaSdB2O66+bZsySAL5NzacIbT4eDAZdafuzxL4T/MH
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0402MB3497.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(396003)(136003)(346002)(39860400002)(376002)(451199021)(1800799006)(186006)(4326008)(966005)(9686003)(6512007)(316002)(6916009)(6506007)(86362001)(66946007)(6666004)(38100700002)(66556008)(33716001)(66476007)(6486002)(53546011)(33656002)(478600001)(54906003)(7406005)(8676002)(8936002)(66899021)(1076003)(26005)(2906002)(83380400001)(41300700001)(7416002)(44832011)(5660300002)(13296009)(17423001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?6KQ0WEQ3t6DjPbJ2owhAMvnV4tJHXPR6IR8f2AxjNeAOxkqzt/thMyneQlr4?=
+ =?us-ascii?Q?GH+w1WxMpjBynTs7hZ7hjbezLswsWmJV9cqDIS+0wkut7GSo4FPctbdj5UbA?=
+ =?us-ascii?Q?3o1exkX17DrG36VrEE31+uKPbEV7wpK45Ml7U8EtGRkrmT/cnVFiRZbCKA+N?=
+ =?us-ascii?Q?D12A1goawzERTipHAYFYbJyP3WAA2puig2ecZvUQ60wNtzBGeqYfqtyAIObs?=
+ =?us-ascii?Q?d7IauBB1Nx81PWN5brH0Ueln3jiKYcOlS5GZ/ahdtWjqs0oeUaymxr3uW14h?=
+ =?us-ascii?Q?ChE/T/vputSu/6QEu3Jm496yL4ru6wC29X8cj7WRUOOaWanUUfKXfe9fniyH?=
+ =?us-ascii?Q?PlXTAmLjSdZiVAjZxqy/ipL1W/xgad3ojyEifutE65ne9MSqsCesvgnscZuu?=
+ =?us-ascii?Q?LgBY954bYSEVTbs6mKaXy2CNFac9NqtNBtTBmS+Q+Mjpqz8u3cSt4Lcu7gJd?=
+ =?us-ascii?Q?8lsNcQJoN1yRfHKhqry7RRLMgGT2Z7NH+Y6PWqnQvOobMMhkEJdHODCP2hCt?=
+ =?us-ascii?Q?oTj6H8WVhOiNyn5Kh1pwhf7R07o3hfWhSqNkgmtl6xp1a90LOG2ZNL3WgEEW?=
+ =?us-ascii?Q?2mslIFK6FRwYWfsm2t7iawk0ILCByDGPE9AvlVXhMZ5DXB6JWBZOTXRtWk06?=
+ =?us-ascii?Q?yumL50OvpJF0xyU51okVvpNxxMBQF63HeHpkXCHEpDW51WF76QUKvD6asT9c?=
+ =?us-ascii?Q?3/HxyqOKF1SZPfIPeCzvOhEht3XE3+w+/IsWEgUJBqYG7pqSAouJf+pcQW9z?=
+ =?us-ascii?Q?oONs4GWLbfVKe3IemA3iwfpbakJiqDdfYtCwTp0Eo8SFWM39ItkN9Wvfi2CP?=
+ =?us-ascii?Q?FGtpndz63h2eMjRLC9yU7Yec/861m48Y0KNYWU8HK7Bsj0ZF9U5iZYSlwfZb?=
+ =?us-ascii?Q?lxqMl6iDYOl+l28wXFEG5P4v08GBRZG6cMnoKRklYGtvSnWOUtOkQ1WhB54a?=
+ =?us-ascii?Q?adCUi8YIuugj8S8zA4ouIPAM7y/wvTjP7XPxN1Dw4hKyvbFcnoE0kEXilycs?=
+ =?us-ascii?Q?xtj75oj/IevkBRaTXFbOuPDL1VQYCryLwVqcA5OFGLClIKups1yXy0qoQW9j?=
+ =?us-ascii?Q?lZKeZt/MSqkL52f4OL0TMJjeEj2IL/PJa312FpJfJGYCx5JHGmfz9g7qdZn3?=
+ =?us-ascii?Q?u7vQT3+Clr6L5bWrlxBYJKHIxW3nQbmrC+1MK+x+Eo6Sgl1fzl51GJq20WjJ?=
+ =?us-ascii?Q?kC9TJxxxe2sKSgp5+6OXrIx0X/lel74CgJFCEeQDT6Puarx7ybg3pipNgg9d?=
+ =?us-ascii?Q?VFuGi4Wcjk9u4l1hrP5GW8+DJH1LPQbMC1uO60sRgXLFmAFWSm3fwqIvwkIX?=
+ =?us-ascii?Q?XUDd76f3JaVTIpcUSpQ4xKzlNhM1ZQMiky8A6ZSCnee5HalsRKBJSJnCKsdO?=
+ =?us-ascii?Q?uo1TjpmMnrNFtNuoDrHctWd39vP1GkoYn9yOzJCiiiuPW3awsZCGnQBLidRr?=
+ =?us-ascii?Q?AFUjf/17SRanXqo5HCsULp2Y7NzzilXUpWt1woIxK2gB4WLwoGlmupeZ+YfD?=
+ =?us-ascii?Q?rnsd1auvf4ME13KSf3aNwVlK6s69CIEmTCUQudBhUXJu+4TKBCyuuqVSS8cI?=
+ =?us-ascii?Q?irkdjEttiCGiBsX0I2gpDEvYGDLAKErpoi1ietDK?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5073c41c-9ad1-4c48-e2d9-08db9a4d62c9
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0402MB3497.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 09:28:56.6875
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4UyKYZOvIHqamXNdrdj5L5P8xisvDeEjSaYNwNCa3ZoMYcpVlFD3Lv+n0F0v3C4OPw93xhLVgpBA8vHOISbnbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8932
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 11, 2023 at 05:18:51PM +0800, Jason Wang wrote:
-> On Fri, Aug 11, 2023 at 1:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Fri, Aug 11, 2023 at 10:23:15AM +0800, Jason Wang wrote:
-> > > On Fri, Aug 11, 2023 at 3:41 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Tue, Aug 08, 2023 at 10:30:56AM +0800, Jason Wang wrote:
-> > > > > On Mon, Jul 31, 2023 at 2:30 PM Jason Wang <jasowang@redhat.com> wrote:
-> > > > > >
-> > > > > > On Thu, Jul 27, 2023 at 5:46 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Thu, Jul 27, 2023 at 04:59:33PM +0800, Jason Wang wrote:
-> > > > > > > > > They really shouldn't - any NIC that takes forever to
-> > > > > > > > > program will create issues in the networking stack.
-> > > > > > > >
-> > > > > > > > Unfortunately, it's not rare as the device/cvq could be implemented
-> > > > > > > > via firmware or software.
-> > > > > > >
-> > > > > > > Currently that mean one either has sane firmware with a scheduler that
-> > > > > > > can meet deadlines, or loses ability to report errors back.
-> > > > > > >
-> > > > > > > > > But if they do they can always set this flag too.
-> > > > > > > >
-> > > > > > > > This may have false negatives and may confuse the management.
-> > > > > > > >
-> > > > > > > > Maybe we can extend the networking core to allow some device specific
-> > > > > > > > configurations to be done with device specific lock without rtnl. For
-> > > > > > > > example, split the set_channels to
-> > > > > > > >
-> > > > > > > > pre_set_channels
-> > > > > > > > set_channels
-> > > > > > > > post_set_channels
-> > > > > > > >
-> > > > > > > > The device specific part could be done in pre and post without a rtnl lock?
-> > > > > > > >
-> > > > > > > > Thanks
-> > > > > > >
-> > > > > > >
-> > > > > > > Would the benefit be that errors can be reported to userspace then?
-> > > > > > > Then maybe.  I think you will have to show how this works for at least
-> > > > > > > one card besides virtio.
-> > > > > >
-> > > > > > Even for virtio, this seems not easy, as e.g the
-> > > > > > virtnet_send_command() and netif_set_real_num_tx_queues() need to
-> > > > > > appear to be atomic to the networking core.
-> > > > > >
-> > > > > > I wonder if we can re-consider the way of a timeout here and choose a
-> > > > > > sane value as a start.
-> > > > >
-> > > > > Michael, any more input on this?
-> > > > >
-> > > > > Thanks
-> > > >
-> > > > I think this is just mission creep. We are trying to fix
-> > > > vduse - let's do that for starters.
-> > > >
-> > > > Recovering from firmware timeouts is far from trivial and
-> > > > just assuming that just because it timed out it will not
-> > > > access memory is just as likely to cause memory corruption
-> > > > with worse results than an infinite spin.
-> > >
-> > > Yes, this might require support not only in the driver
-> > >
-> > > >
-> > > > I propose we fix this for vduse and assume hardware/firmware
-> > > > is well behaved.
-> > >
-> > > One major case is the re-connection, in that case it might take
-> > > whatever longer that the kernel virito-net driver expects.
-> > > So we can have a timeout in VDUSE and trap CVQ then VDUSE can return
-> > > and fail early?
-> >
-> > Ugh more mission creep. not at all my point. vduse should cache
-> > values in the driver,
+On Thu, Aug 10, 2023 at 10:53:38PM -0700, Martin KaFai Lau wrote:
+> On 8/9/23 1:19 AM, Geliang Tang wrote:
+> > On Tue, Aug 08, 2023 at 11:03:30PM -0700, Martin KaFai Lau wrote:
+> > > On 8/6/23 11:40 PM, Geliang Tang wrote:
+> > > > On Fri, Aug 04, 2023 at 05:23:32PM -0700, Martin KaFai Lau wrote:
+> > > > > On 8/3/23 10:07 PM, Geliang Tang wrote:
+> > > > > > Use rand() to generate a random netns name instead of using the fixed
+> > > > > > name "mptcp_ns" for every test.
+> > > > > > 
+> > > > > > By doing that, we can re-launch the test even if there was an issue
+> > > > > > removing the previous netns or if by accident, a netns with this generic
+> > > > > > name already existed on the system.
+> > > > > > 
+> > > > > > Note that using a different name each will also help adding more
+> > > > > > subtests in future commits.
+> > > > 
+> > > > Hi Martin,
+> > > > 
+> > > > I tried to run mptcp tests simultaneously, and got "Cannot create
+> > > > namespace file "/var/run/netns/mptcp_ns": File exists" errors sometimes.
+> > > > So I add this patch to fix it.
+> > > > 
+> > > > It's easy to reproduce, just run this commands in multiple terminals:
+> > > >    > for i in `seq 1 100`; do sudo ./test_progs -t mptcp; done
+> > > 
+> > > Not only the "-t mptcp" test. Other tests in test_progs also don't support
+> > > running parallel in multiple terminals. Does it really help to test the bpf
+> > > part of the prog_tests/mptcp.c test by running like this? If it wants to
+> > > exercise the other mptcp networking specific code like this, a separate
+> > > mptcp test is needed outside of test_progs and it won't be run in the bpf
+> > > CI.
+> > > 
+> > > If you agree, can you please avoid introducing unnecessary randomness to the
+> > > test_progs where bpf CI and most users don't run in this way?
+> > 
+> > Thanks Martin. Sure, I agree. Let's drop this patch.
 > 
-> What do you mean by values here? The cvq command?
+> Thanks you.
 > 
-> Thanks
+> > > I have a high level question. In LPC 2022
+> > > (https://lpc.events/event/16/contributions/1354/), I recall there was idea
+> > > in using bpf to make other mptcp decision/policy. Any thought and progress
+> > > on this? This set which only uses bpf to change the protocol feels like an
+> > > incomplete solution.
+> > 
+> > We are implementing MPTCP packet scheduler using BPF. Patches aren't
+> > sent to BPF mail list yet, only temporarily on our mptcp repo[1].
+> > 
+> > Here are the patches:
+> > 
+> >   selftests/bpf: Add bpf_burst test
+> >   selftests/bpf: Add bpf_burst scheduler
+> >   bpf: Export more bpf_burst related functions
+> >   selftests/bpf: Add bpf_red test
+> >   selftests/bpf: Add bpf_red scheduler
+> >   selftests/bpf: Add bpf_rr test
+> >   selftests/bpf: Add bpf_rr scheduler
+> >   selftests/bpf: Add bpf_bkup test
+> >   selftests/bpf: Add bpf_bkup scheduler
+> >   selftests/bpf: Add bpf_first test
+> >   selftests/bpf: Add bpf_first scheduler
+> >   selftests/bpf: Add bpf scheduler test
+> >   selftests/bpf: add two mptcp netns helpers
+> >   selftests/bpf: use random netns name for mptcp
+> >   selftests/bpf: Add mptcp sched structs
+> >   bpf: Add bpf_mptcp_sched_kfunc_set
+> >   bpf: Add bpf_mptcp_sched_ops
+> > 
+> > If you could take a look at these patches in advance, I would greatly
+> > appreciate it. Any feedback is welcome.
+> > 
+> > [1]
+> > https://github.com/multipath-tcp/mptcp_net-next.git
+> 
+> Thanks for sharing. I did not go into the details. iiuc, the scheduler is
+> specific to a namespace. Do you see if it is useful to have more finer
+> control like depending on what IP address it is connected to? BPF policy is
+> usually found more useful to have finer policy control than global or
+> per-netns.
+> 
+> The same question goes for the fmod_ret here in this patch. The
+> progs/mptcpify.c selftest is as good as upgrading all TCP connections. Is it
+> your only use case and no need for finer selection?
 
-The card status generally.
+This per-netns control is just the first step. We do need finer selection. The
+most ideal mode is to select one app to upgrade it's TCP connections only. So
+per-cgroup control is much better than per-netns. But we haven't found a good
+per-cgroup solution yet.
 
-> > until someone manages to change
-> > net core to be more friendly to userspace devices.
-> >
-> > >
-> > > > Or maybe not well behaved firmware will
-> > > > set the flag losing error reporting ability.
-> > >
-> > > This might be hard since it means not only the set but also the get is
-> > > unreliable.
-> > >
-> > > Thanks
-> >
-> > /me shrugs
-> >
-> >
-> >
-> > > >
-> > > >
-> > > >
-> > > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > --
-> > > > > > > MST
-> > > > > > >
-> > > >
-> >
+Thanks,
+-Geliang
 
+> 
 
