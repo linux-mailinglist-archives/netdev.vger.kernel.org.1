@@ -1,213 +1,286 @@
-Return-Path: <netdev+bounces-26838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFC97792ED
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:22:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2591F7792F9
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 684561C21714
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:22:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 339962820B4
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2692AB22;
-	Fri, 11 Aug 2023 15:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397462AB27;
+	Fri, 11 Aug 2023 15:24:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01BE63B6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:22:50 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FE6A30C8
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:22:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691767369; x=1723303369;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Fkyv3rSrsrjBL4e8GlcWm/2hC7gH0L18Y3DUqVG2jz0=;
-  b=fTMrNxTO9TJoWdvI4SUpa7LSrWoUo4MLThOjP2EKr5z6wb/KX7/mZnob
-   Qwx0gVcHHKmQKtSpRVg8kY8+55f8nTo5Wz1pyIvcp/nxGrQ76+c4k7Wnv
-   9PzteHuIwxx/bRupN2/tzHtNnDBiPw2liTYXFtYIrd2fTbXyRWWEIZWbc
-   dYRoTJIUeXfTgcIIR1YQ/RdEO0OtNBZIsbcc9YIBSxfH3tQ+oSjE0kKpU
-   Pc2aBIy72yla7QEHPhdfebJdXhgSyUozf+2CS2tiqrIp+Dt9/n6L7p/Tj
-   praYHcjFS7+M1pZvi5W3YA1DCOhzzYx3BqpHLMDB+TPzzaecsB6o6Yawd
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="352023637"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="352023637"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 08:22:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="732700643"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="732700643"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 11 Aug 2023 08:22:44 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qUTyN-0007rC-2w;
-	Fri, 11 Aug 2023 15:22:43 +0000
-Date: Fri, 11 Aug 2023 23:21:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Heng Qi <hengqi@linux.alibaba.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Cc: oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 7/8] virtio-net: support tx netdim
-Message-ID: <202308112350.gTAjKZog-lkp@intel.com>
-References: <20230811065512.22190-8-hengqi@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E59C63B6
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:24:41 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B9EDC;
+	Fri, 11 Aug 2023 08:24:37 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37BFOJY5024762;
+	Fri, 11 Aug 2023 10:24:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1691767459;
+	bh=TWTgIYHYo1gfxLfGJr3o5tMioqcbKX9+NAaHDSGtkAY=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=ny79IsCyf9aXd+Xkc/HqviK/66Ot8EXYjdCfasdp+UcEU8y+WyLS71natAidAh+3j
+	 b+0v/KRmuqSJJsXRFaOj6ExcyErYL3Pfdy/eq3oU3qKwSN5hyPuiatoZxA2Ecl1Eob
+	 F1eKsj2X1JmJ4Z61i1Ijayvxw6A3Bl/iU1JtipjU=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37BFOJYF011768
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 11 Aug 2023 10:24:19 -0500
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 11
+ Aug 2023 10:24:19 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 11 Aug 2023 10:24:19 -0500
+Received: from [10.250.38.120] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37BFOIKA127506;
+	Fri, 11 Aug 2023 10:24:18 -0500
+Message-ID: <4c40fbe4-3492-ec76-e452-3a3ecb0f2433@ti.com>
+Date: Fri, 11 Aug 2023 10:24:18 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811065512.22190-8-hengqi@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 3/5] net: ti: icss-iep: Add IEP driver
+Content-Language: en-US
+To: Md Danish Anwar <a0501179@ti.com>, MD Danish Anwar <danishanwar@ti.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20230809114906.21866-1-danishanwar@ti.com>
+ <20230809114906.21866-4-danishanwar@ti.com>
+ <b43ee5ca-2aab-445a-e24b-cbc95f9186ea@ti.com>
+ <c7ddb12d-ae18-5fc2-9729-c88ea73b21d7@ti.com>
+From: Andrew Davis <afd@ti.com>
+In-Reply-To: <c7ddb12d-ae18-5fc2-9729-c88ea73b21d7@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Heng,
+On 8/10/23 6:50 AM, Md Danish Anwar wrote:
+> Hi Andrew,
+> 
+> On 09/08/23 8:30 pm, Andrew Davis wrote:
+>> On 8/9/23 6:49 AM, MD Danish Anwar wrote:
+>>> From: Roger Quadros <rogerq@ti.com>
+>>>
+>>> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
+>>> support timestamping of ethernet packets and thus support PTP and PPS
+>>> for PRU ethernet ports.
+>>>
+>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>> ---
+>>>    drivers/net/ethernet/ti/Kconfig          |  12 +
+>>>    drivers/net/ethernet/ti/Makefile         |   1 +
+>>>    drivers/net/ethernet/ti/icssg/icss_iep.c | 935 +++++++++++++++++++++++
+>>>    drivers/net/ethernet/ti/icssg/icss_iep.h |  38 +
+>>>    4 files changed, 986 insertions(+)
+>>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+>>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+>>>
+>>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+>>> index 63e510b6860f..88b5b1b47779 100644
+>>> --- a/drivers/net/ethernet/ti/Kconfig
+>>> +++ b/drivers/net/ethernet/ti/Kconfig
+>>> @@ -186,6 +186,7 @@ config CPMAC
+>>>    config TI_ICSSG_PRUETH
+>>>        tristate "TI Gigabit PRU Ethernet driver"
+>>>        select PHYLIB
+>>> +    select TI_ICSS_IEP
+>>
+>> Why not save selecting this until you add its use in the ICSSG_PRUETH driver in
+>> the next patch.
+>>
+> 
+> The next patch is only adding changes to icssg-prueth .c /.h files. This patch
+> is adding changes to Kconfig and the Makefile. To keep it that way selecting
+> this is added in this patch. No worries, I will move this to next patch.
+> 
+>> [...]
+>>
+>>> +
+>>> +static u32 icss_iep_readl(struct icss_iep *iep, int reg)
+>>> +{
+>>> +    return readl(iep->base + iep->plat_data->reg_offs[reg]);
+>>> +}
+>>
+>> Do these one line functions really add anything? Actually why
+>> not use the regmap you have here.
+> 
+> These one line functions are not really adding anything but they are acting as
+> a wrapper around readl /writel and providing some sort of encapsulation as
+> directly calling readl will result in a little complicated code.
+> 
+> /* WIth One line function */
+> ts_lo = icss_iep_readl(iep, ICSS_IEP_COUNT_REG0);
+> 
+> /* Without one line function */
+> ts_lo = readl(iep->base, iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+> 
+> Previously regmap was used in this driver. But in older commit [1] in
+> 5.10-ti-linux-kernel (Before I picked the driver for upstream) it got changed
+> to readl / writel stating that regmap_read / write is too slow. IEP is time
+> sensitive and needs faster read and write, probably because of this they
+> changed it.
+> 
 
-kernel test robot noticed the following build errors:
+Sounds like you only need direct register access for time sensitive
+gettime/settime functions, if that is the only place writel()/readl() is
+needed just drop the helper and use directly in that one spot.
 
-[auto build test ERROR on net-next/main]
+>>
+>> [...]
+>>
+>>> +static void icss_iep_enable(struct icss_iep *iep)
+>>> +{
+>>> +    regmap_update_bits(iep->map, ICSS_IEP_GLOBAL_CFG_REG,
+>>> +               IEP_GLOBAL_CFG_CNT_ENABLE,
+>>> +               IEP_GLOBAL_CFG_CNT_ENABLE);
+>>
+>> Have you looked into regmap_fields?
+>>
+> 
+> No I hadn't. But now I looked into regmap_fields, seems to be another way to
+> update the bits, instead of passing mask and value, regmap_filed_read / write
+> only takes the value. But for that we will need to create a regmap field. If
+> you want me to switch to regmap_fields instead of regmap_update_bits I can make
+> the changes. But I am fine with regmap_update_bits().
+> 
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/virtio-net-initially-change-the-value-of-tx-frames/20230811-150529
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230811065512.22190-8-hengqi%40linux.alibaba.com
-patch subject: [PATCH net-next 7/8] virtio-net: support tx netdim
-config: i386-randconfig-i011-20230811 (https://download.01.org/0day-ci/archive/20230811/202308112350.gTAjKZog-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230811/202308112350.gTAjKZog-lkp@intel.com/reproduce)
+I'm suggesting regmap fields as I have used it several times and it resulted
+in greatly improved readability. Yes you will need a regmap field table, but
+that is the best part, it lets you put all your bit definitions in one spot
+that can match 1:1 with the datasheet, much easier to check for correctness
+than if the bit usages are all spread out in the driver.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308112350.gTAjKZog-lkp@intel.com/
+I won't insist on you converting this driver to use it today, but I do recommend
+you at least give it a shot for your own learning.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+Andrew
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-kworld-315u.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-kworld-pc150u.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-kworld-plus-tv-analog.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-leadtek-y04g0051.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-lme2510.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-manli.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-mecool-kiii-pro.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-mecool-kii-pro.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-medion-x10.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-minix-neo.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-msi-digivox-iii.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-msi-digivox-ii.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-msi-tvanywhere.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-msi-tvanywhere-plus.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-nebula.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-nec-terratec-cinergy-xs.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-norwood.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-npgtech.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-odroid.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pctv-sedna.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pine64.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pinnacle-color.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pinnacle-grey.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pinnacle-pctv-hd.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pixelview-002t.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pixelview-mk12.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pixelview-new.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pixelview.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-powercolor-real-angel.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-proteus-2309.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-purpletv.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-pv951.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-rc6-mce.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-real-audio-220-32-keys.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-reddo.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-snapstream-firefly.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-streamzap.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-su3000.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-tanix-tx3mini.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-tanix-tx5max.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-tbs-nec.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-technisat-ts35.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-technisat-usb2.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-terratec-cinergy-c-pci.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-terratec-cinergy-s2-hd.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-terratec-cinergy-xs.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-terratec-slim-2.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-terratec-slim.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-tevii-nec.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-tivo.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-total-media-in-hand-02.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-total-media-in-hand.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-trekstor.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-tt-1500.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-twinhan1027.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-twinhan-dtv-cab-ci.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-vega-s9x.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-videomate-m1f.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-videomate-s350.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-videomate-tv-pvr.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-videostrong-kii-pro.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-wetek-hub.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-wetek-play2.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-winfast.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-winfast-usbii-deluxe.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-x96max.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-xbox-360.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-xbox-dvd.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/keymaps/rc-zx-irdec.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/rc-core.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-async.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/v4l2-core/v4l2-fwnode.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/radio/si470x/radio-si470x-common.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/watchdog/twl4030_wdt.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/watchdog/menz69_wdt.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/host/of_mmc_spi.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/mmc_core.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mmc/core/pwrseq_simple.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/firmware/google/vpd-sysfs.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/staging/greybus/gb-light.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/staging/greybus/gb-log.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/staging/greybus/gb-vibrator.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_performance.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_powersave.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/nvmem/nvmem_u-boot-env.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/parport/parport.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mtd/chips/cfi_util.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mtd/maps/map_funcs.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pcmcia/pcmcia_rsrc.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/iio/buffer/kfifo_buf.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-core.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-aspeed.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-scom.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mtty.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mbochs.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/bytestream-example.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/dma-example.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/inttype-example.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/record-example.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kmemleak/kmemleak-test.o
->> ERROR: modpost: "net_dim_get_tx_moderation" [drivers/net/virtio_net.ko] undefined!
-ERROR: modpost: "net_dim_get_rx_moderation" [drivers/net/virtio_net.ko] undefined!
-ERROR: modpost: "net_dim" [drivers/net/virtio_net.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>> [...]
+>>
+>>> +
+>>> +    if (!!(iep->latch_enable & BIT(index)) == !!on)
+>>> +        goto exit;
+>>> +
+>>
+>> There has to be a better way to write this logic..
+>>
+>> [...]
+>>
+>>> +
+>>> +static const struct of_device_id icss_iep_of_match[];
+>>> +
+>>
+>> Why the forward declaration?
+> 
+> I will remove this, I don't see any reason for this.
+> 
+>>
+>>> +static int icss_iep_probe(struct platform_device *pdev)
+>>> +{
+>>> +    struct device *dev = &pdev->dev;
+>>> +    struct icss_iep *iep;
+>>> +    struct clk *iep_clk;
+>>> +
+>>> +    iep = devm_kzalloc(dev, sizeof(*iep), GFP_KERNEL);
+>>> +    if (!iep)
+>>> +        return -ENOMEM;
+>>> +
+>>> +    iep->dev = dev;
+>>> +    iep->base = devm_platform_ioremap_resource(pdev, 0);
+>>> +    if (IS_ERR(iep->base))
+>>> +        return -ENODEV;
+>>> +
+>>> +    iep_clk = devm_clk_get(dev, NULL);
+>>> +    if (IS_ERR(iep_clk))
+>>> +        return PTR_ERR(iep_clk);
+>>> +
+>>> +    iep->refclk_freq = clk_get_rate(iep_clk);
+>>> +
+>>> +    iep->def_inc = NSEC_PER_SEC / iep->refclk_freq;    /* ns per clock tick */
+>>> +    if (iep->def_inc > IEP_MAX_DEF_INC) {
+>>> +        dev_err(dev, "Failed to set def_inc %d.  IEP_clock is too slow to be
+>>> supported\n",
+>>> +            iep->def_inc);
+>>> +        return -EINVAL;
+>>> +    }
+>>> +
+>>> +    iep->plat_data = of_device_get_match_data(dev);
+>>
+>> Directly using of_*() functions is often wrong, try just device_get_match_data().
+>>
+> 
+> Sure. I will change to device_get_match_data().
+> 
+>> [...]
+>>
+>>> +static struct platform_driver icss_iep_driver = {
+>>> +    .driver = {
+>>> +        .name = "icss-iep",
+>>> +        .of_match_table = of_match_ptr(icss_iep_of_match),
+>>
+>> This driver cannot work without OF, using of_match_ptr() is not needed.
+>>
+> 
+> Sure, I will drop of_match_ptr().
+> 
+>> Andrew
+> 
+> 
+> For reading and updating registers, we can have
+> 	1. icss_iep_readl / writel and regmap_update_bits() OR
+> 	2. regmap_read / write and regmap_update_bits() OR
+> 	3. icss_iep_readl / writel and regmap_fields OR
+> 	4. regmap_read / write and regmap_fields
+> 	
+> 
+> Currently we are using 1. Please let me know if you are fine with this and I
+> can continue using 1. If not, please let me know your recommendation out of this 4.
+> 
+> [1]
+> https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/commit/?h=linux-5.10.y&id=f4f45bf71cad5be232536d63a0557d13a7eed162
+> 
 
