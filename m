@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-26858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341157793AA
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:59:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 390AD7793AE
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 18:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55F771C216BD
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:59:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D462E1C2173F
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 16:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8C2329D0;
-	Fri, 11 Aug 2023 15:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330F234CD0;
+	Fri, 11 Aug 2023 15:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0025692
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:57:30 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4DBA30D8
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:28 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fe2fb9b4d7so18809415e9.1
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169B45692
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:57:36 +0000 (UTC)
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7CA30DB
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:31 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id 38308e7fff4ca-2b9cdba1228so33956691fa.2
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691769447; x=1692374247;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691769450; x=1692374250;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eTTNtyVdQ54Vp2keCdE/XH3tw/qXv7u3Z2Jlwnps83E=;
-        b=ALmG/vuNa498h4u0aKNKi22Jh+A/a1GB43o2jtxYqWuo6w1gLwYgas7SPIGtJ0Yoos
-         kOaGHVGUwRhgHAotTbWzrGMtEjqa4PzPUMmzix3p8hcyELmm4ENh0yGKDcEeZ2d/Fxa9
-         SKqxKvPe+P1bxUmJZvvMV1PBRJzRmMEW7OVI8D5uU/tfPXoYsI2RrRpKblm9PDVR3JxX
-         Y2/QM4o6M7KejShqbgh8vGpix+CKy5BKwuTnPux3noRUJOwmE830Oj+midu/2129NT/w
-         Qh1Ds/UIXC6gEFZ1qf/2kG5OmYtaZkJ001ZtaJ8zOl64JJgpbC0OI0qwWZn3bIWB177S
-         Htbw==
+        bh=AoBKKsjVhm0shDsxUg9vIgy+Hi/FXlFGY+28CoVvuXM=;
+        b=ukicQKy88wPsiI2dk7k2g5mhYfgbOD7zzSB/GovzEMk18OwNK4JPGag33rIRj1jGAQ
+         9T3zsAZdRq/84Jqyj9dvsvTf4PbV+ctNKrCx2Oa13gRA9gPPLhOAXrFNQDCfpExLK/ma
+         fNGw+hg93L7DIH+W24wVQH30dXppz/SL6h0eAVXF0beaulrlw7Sp7mWsqSXZ4IW15Vsh
+         uzFKhuPYBtbEMK1kkpV/9GVZk16EPLy9xgh4cblpLW58EieA30HdEDWFQ2CNxL/UkUZ4
+         CaE+3CgInQxa384Rt/ZQWVzIO3hYEZhrZNkPBEeADGQUnK9LRJ5Q3wxFRCXoakfuXWQC
+         m32A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691769447; x=1692374247;
+        d=1e100.net; s=20221208; t=1691769450; x=1692374250;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eTTNtyVdQ54Vp2keCdE/XH3tw/qXv7u3Z2Jlwnps83E=;
-        b=QPgQFqE3aT43wBfC/IFFlsfxiegRdDOb8bFGoPmKPBv5Lk3QJwdMV0Qz6E70pFEGJD
-         qF8Z4c/mHYxNiglEX6+aaCEM6XMuFN2+nNf9gue0MZSbYU+xCL6Bi2slf8GpvNklRp2/
-         Ef701eZL7A2dvDlmfkglAymZBnaC0fzqx76R8lcJREIKxVy3auThC4j/1tKroRPiSNA6
-         iUC4W/jN2qi92QTXAI/cPOz3mIqMFx8jA12rLhJaIBBwa3bwFfmwQCUz8VkCN4owSP7w
-         MLsoRCfjuTZouIWxDv4F3xoq2ANVFUPuCL1bPjNn9PAhGgYpZt/7km89AWmHx65QuFuc
-         3A5w==
-X-Gm-Message-State: AOJu0YxlZ24hzM7TjaZZ/oVASMaHfL7VUrX/QEiq7GCDpNbU2HMjz6+T
-	nIBrj9IZeTPv5tYrsJzqiC7r5ZzzHm+3VwpY3coiMw==
-X-Google-Smtp-Source: AGHT+IFezlDPF4lfh6fT+Y92i7AwCnz5TDcYTLnjKpjGME+LXopjEgeW+JNVRPBSzplwOVnCmQ5F2w==
-X-Received: by 2002:a05:600c:2494:b0:3fc:7d2:e0c0 with SMTP id 20-20020a05600c249400b003fc07d2e0c0mr2100187wms.27.1691769447364;
-        Fri, 11 Aug 2023 08:57:27 -0700 (PDT)
+        bh=AoBKKsjVhm0shDsxUg9vIgy+Hi/FXlFGY+28CoVvuXM=;
+        b=L64YNg8ze5qRICfBzlyPJNeE+ry/4bE2999aeMl8D76FHVXdVY30EyO6fFklvb86G4
+         vVjvQvQpM4Nyzzxf1jDfznrO+tADNrEyDW8v3zj32MPW4qiIsmuBRroTR1cw9p0Day8w
+         Nq57JC4tEkMDLrVxaVv2Hdo+cHXVmMJt2NFMWcGiRje3YBW3ZqxKRCVyfoARbHzmp8Uj
+         uU6i9PD9QJOzggb7B6NZXGJMm5C+OtLj6H4lr75Su6VXbGvU+vjJbkgPklOMW4QN0wvx
+         UXOvfSn99iRj5CaR67y3htviuq82eBzrnz+dSodIuBGGIfQoAbmcaBbf09tYOLcMnIzt
+         uUTw==
+X-Gm-Message-State: AOJu0YzaTdM6xEXl0Pt1Ebl/3FBdUZMBsFmx96T6CxP7kqPO6bRArKmQ
+	ELqIKi5ROlI+2Twezdzvaw8SxV0tOE+UArnwx9lWvifY
+X-Google-Smtp-Source: AGHT+IGqoIl32uUO6iv4AW6aPWVY6KOfOT5Xc2LqC/GRjpNqo5bGZYe7OAJi11wrN3e4TYAibPn7Gg==
+X-Received: by 2002:a2e:9bd4:0:b0:2b9:5b46:2107 with SMTP id w20-20020a2e9bd4000000b002b95b462107mr2059394ljj.9.1691769449186;
+        Fri, 11 Aug 2023 08:57:29 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id 24-20020a05600c029800b003fe2397c17fsm8364625wmk.17.2023.08.11.08.57.26
+        by smtp.gmail.com with ESMTPSA id i11-20020a05600c290b00b003fba6709c68sm5523028wmd.47.2023.08.11.08.57.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 08:57:26 -0700 (PDT)
+        Fri, 11 Aug 2023 08:57:28 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v4 06/13] devlink: pass flags as an arg of dump_one() callback
-Date: Fri, 11 Aug 2023 17:57:07 +0200
-Message-ID: <20230811155714.1736405-7-jiri@resnulli.us>
+Subject: [patch net-next v4 07/13] netlink: specs: devlink: add commands that do per-instance dump
+Date: Fri, 11 Aug 2023 17:57:08 +0200
+Message-ID: <20230811155714.1736405-8-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230811155714.1736405-1-jiri@resnulli.us>
 References: <20230811155714.1736405-1-jiri@resnulli.us>
@@ -80,469 +80,4795 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-In order to easily set NLM_F_DUMP_FILTERED for partial dumps, pass the
-flags as an arg of dump_one() callback. Currently, it is always
-NLM_F_MULTI.
+Add the definitions for the commands that do per-instance dump
+and re-generate the related code.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v2->v3:
 - new patch
 ---
- net/devlink/dev.c           | 13 +++---
- net/devlink/devl_internal.h |  3 +-
- net/devlink/health.c        |  7 +--
- net/devlink/leftover.c      | 87 ++++++++++++++++++-------------------
- net/devlink/netlink.c       |  2 +-
- 5 files changed, 56 insertions(+), 56 deletions(-)
+ Documentation/netlink/specs/devlink.yaml |  444 +++-
+ net/devlink/netlink_gen.c                |  332 ++-
+ net/devlink/netlink_gen.h                |   52 +-
+ tools/net/ynl/generated/devlink-user.c   | 2341 ++++++++++++++++++++--
+ tools/net/ynl/generated/devlink-user.h   | 1295 +++++++++++-
+ 5 files changed, 4319 insertions(+), 145 deletions(-)
 
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index 22e8ab3eaaa2..abf3393a7a17 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -218,11 +218,11 @@ int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index f6df0b3fd502..4f2aa48017a7 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -6,6 +6,16 @@ protocol: genetlink-legacy
  
- static int
- devlink_nl_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			struct netlink_callback *cb)
-+			struct netlink_callback *cb, int flags)
- {
- 	return devlink_nl_fill(msg, devlink, DEVLINK_CMD_NEW,
- 			       NETLINK_CB(cb->skb).portid,
--			       cb->nlh->nlmsg_seq, NLM_F_MULTI);
-+			       cb->nlh->nlmsg_seq, flags);
+ doc: Partial family for Devlink.
+ 
++definitions:
++  -
++    type: enum
++    name: sb-pool-type
++    entries:
++      -
++        name: ingress
++      -
++        name: egress
++
+ attribute-sets:
+   -
+     name: devlink
+@@ -24,6 +34,46 @@ attribute-sets:
+ 
+       # TODO: fill in the attributes in between
+ 
++      -
++        name: sb-index
++        type: u32
++        value: 11
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: sb-pool-index
++        type: u16
++        value: 17
++
++      -
++        name: sb-pool-type
++        type: u8
++        enum: sb-pool-type
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: sb-tc-index
++        type: u16
++        value: 22
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: param-name
++        type: string
++        value: 81
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: region-name
++        type: string
++        value: 88
++
++      # TODO: fill in the attributes in between
++
+       -
+         name: info-driver-name
+         type: string
+@@ -55,10 +105,35 @@ attribute-sets:
+ 
+       # TODO: fill in the attributes in between
+ 
++      -
++        name: health-reporter-name
++        type: string
++        value: 115
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: trap-name
++        type: string
++        value: 130
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: trap-group-name
++        type: string
++        value: 135
++
+       -
+         name: reload-failed
+         type: u8
+-        value: 136
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: trap-policer-id
++        type: u32
++        value: 142
+ 
+       # TODO: fill in the attributes in between
+ 
+@@ -103,6 +178,21 @@ attribute-sets:
+         type: nest
+         multi-attr: true
+         nested-attributes: dl-reload-act-stats
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: rate-node-name
++        type: string
++        value: 168
++
++      # TODO: fill in the attributes in between
++
++      -
++        name: linecard-index
++        type: u32
++        value: 171
++
+   -
+     name: dl-dev-stats
+     subset-of: devlink
+@@ -188,6 +278,188 @@ operations:
+       dump:
+         reply: *get-reply
+ 
++    -
++      name: port-get
++      doc: Get devlink port instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit-port
++        post: devlink-nl-post-doit
++        request:
++          value: 5
++          attributes: &port-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++        reply:
++          value: 7
++          attributes: *port-id-attrs
++      dump:
++        reply:
++          value: 3  # due to a bug, port dump returns DEVLINK_CMD_NEW
++          attributes: *port-id-attrs
++
++      # TODO: fill in the operations in between
++
++    -
++      name: sb-get
++      doc: Get shared buffer instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 11
++          attributes: &sb-id-attrs
++            - bus-name
++            - dev-name
++            - sb-index
++        reply: &sb-get-reply
++          value: 11
++          attributes: *sb-id-attrs
++      dump:
++        reply: *sb-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: sb-pool-get
++      doc: Get shared buffer pool instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 15
++          attributes: &sb-pool-id-attrs
++            - bus-name
++            - dev-name
++            - sb-index
++            - sb-pool-index
++        reply: &sb-pool-get-reply
++          value: 15
++          attributes: *sb-pool-id-attrs
++      dump:
++        reply: *sb-pool-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: sb-port-pool-get
++      doc: Get shared buffer port-pool combinations and threshold.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit-port
++        post: devlink-nl-post-doit
++        request:
++          value: 19
++          attributes: &sb-port-pool-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++            - sb-index
++            - sb-pool-index
++        reply: &sb-port-pool-get-reply
++          value: 19
++          attributes: *sb-port-pool-id-attrs
++      dump:
++        reply: *sb-port-pool-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: sb-tc-pool-bind-get
++      doc: Get shared buffer port-TC to pool bindings and threshold.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit-port
++        post: devlink-nl-post-doit
++        request:
++          value: 23
++          attributes: &sb-tc-pool-bind-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++            - sb-index
++            - sb-pool-type
++            - sb-tc-index
++        reply: &sb-tc-pool-bind-get-reply
++          value: 23
++          attributes: *sb-tc-pool-bind-id-attrs
++      dump:
++        reply: *sb-tc-pool-bind-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: param-get
++      doc: Get param instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 38
++          attributes: &param-id-attrs
++            - bus-name
++            - dev-name
++            - param-name
++        reply: &param-get-reply
++          value: 38
++          attributes: *param-id-attrs
++      dump:
++        reply: *param-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: region-get
++      doc: Get region instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit-port-optional
++        post: devlink-nl-post-doit
++        request:
++          value: 42
++          attributes: &region-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++            - region-name
++        reply: &region-get-reply
++          value: 42
++          attributes: *region-id-attrs
++      dump:
++        reply: *region-get-reply
++
+       # TODO: fill in the operations in between
+ 
+     -
+@@ -216,3 +488,173 @@ operations:
+             - info-version-stored
+       dump:
+         reply: *info-get-reply
++
++    -
++      name: health-reporter-get
++      doc: Get health reporter instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit-port-optional
++        post: devlink-nl-post-doit
++        request:
++          attributes: &health-reporter-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++            - health-reporter-name
++        reply: &health-reporter-get-reply
++          attributes: *health-reporter-id-attrs
++      dump:
++        reply: *health-reporter-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: trap-get
++      doc: Get trap instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 61
++          attributes: &trap-id-attrs
++            - bus-name
++            - dev-name
++            - trap-name
++        reply: &trap-get-reply
++          value: 61
++          attributes: *trap-id-attrs
++      dump:
++        reply: *trap-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: trap-group-get
++      doc: Get trap group instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 65
++          attributes: &trap-group-id-attrs
++            - bus-name
++            - dev-name
++            - trap-group-name
++        reply: &trap-group-get-reply
++          value: 65
++          attributes: *trap-group-id-attrs
++      dump:
++        reply: *trap-group-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: trap-policer-get
++      doc: Get trap policer instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 69
++          attributes: &trap-policer-id-attrs
++            - bus-name
++            - dev-name
++            - trap-policer-id
++        reply: &trap-policer-get-reply
++          value: 69
++          attributes: *trap-policer-id-attrs
++      dump:
++        reply: *trap-policer-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: rate-get
++      doc: Get rate instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 74
++          attributes: &rate-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++            - rate-node-name
++        reply: &rate-get-reply
++          value: 74
++          attributes: *rate-id-attrs
++      dump:
++        reply: *rate-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: linecard-get
++      doc: Get line card instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 78
++          attributes: &linecard-id-attrs
++            - bus-name
++            - dev-name
++            - linecard-index
++        reply: &linecard-get-reply
++          value: 78
++          attributes: *linecard-id-attrs
++      dump:
++        reply: *linecard-get-reply
++
++      # TODO: fill in the operations in between
++
++    -
++      name: selftests-get
++      doc: Get device selftest instances.
++      attribute-set: devlink
++      dont-validate:
++        - strict
++        - dump
++
++      do:
++        pre: devlink-nl-pre-doit
++        post: devlink-nl-post-doit
++        request:
++          value: 82
++          attributes: *dev-id-attrs
++        reply: &selftests-get-reply
++          value: 82
++          attributes: *dev-id-attrs
++      dump:
++        reply: *selftests-get-reply
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index 32d8cbed0c30..e384b91b2e3b 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -16,14 +16,120 @@ static const struct nla_policy devlink_get_nl_policy[DEVLINK_ATTR_DEV_NAME + 1]
+ 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+ };
+ 
++/* DEVLINK_CMD_PORT_GET - do */
++static const struct nla_policy devlink_port_get_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++};
++
++/* DEVLINK_CMD_SB_GET - do */
++static const struct nla_policy devlink_sb_get_nl_policy[DEVLINK_ATTR_SB_INDEX + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_SB_INDEX] = { .type = NLA_U32, },
++};
++
++/* DEVLINK_CMD_SB_POOL_GET - do */
++static const struct nla_policy devlink_sb_pool_get_nl_policy[DEVLINK_ATTR_SB_POOL_INDEX + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_SB_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_SB_POOL_INDEX] = { .type = NLA_U16, },
++};
++
++/* DEVLINK_CMD_SB_PORT_POOL_GET - do */
++static const struct nla_policy devlink_sb_port_pool_get_nl_policy[DEVLINK_ATTR_SB_POOL_INDEX + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_SB_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_SB_POOL_INDEX] = { .type = NLA_U16, },
++};
++
++/* DEVLINK_CMD_SB_TC_POOL_BIND_GET - do */
++static const struct nla_policy devlink_sb_tc_pool_bind_get_nl_policy[DEVLINK_ATTR_SB_TC_INDEX + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_SB_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_SB_POOL_TYPE] = NLA_POLICY_MAX(NLA_U8, 1),
++	[DEVLINK_ATTR_SB_TC_INDEX] = { .type = NLA_U16, },
++};
++
++/* DEVLINK_CMD_PARAM_GET - do */
++static const struct nla_policy devlink_param_get_nl_policy[DEVLINK_ATTR_PARAM_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PARAM_NAME] = { .type = NLA_NUL_STRING, },
++};
++
++/* DEVLINK_CMD_REGION_GET - do */
++static const struct nla_policy devlink_region_get_nl_policy[DEVLINK_ATTR_REGION_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_REGION_NAME] = { .type = NLA_NUL_STRING, },
++};
++
+ /* DEVLINK_CMD_INFO_GET - do */
+ static const struct nla_policy devlink_info_get_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
+ 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+ 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+ };
+ 
++/* DEVLINK_CMD_HEALTH_REPORTER_GET - do */
++static const struct nla_policy devlink_health_reporter_get_nl_policy[DEVLINK_ATTR_HEALTH_REPORTER_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_HEALTH_REPORTER_NAME] = { .type = NLA_NUL_STRING, },
++};
++
++/* DEVLINK_CMD_TRAP_GET - do */
++static const struct nla_policy devlink_trap_get_nl_policy[DEVLINK_ATTR_TRAP_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_TRAP_NAME] = { .type = NLA_NUL_STRING, },
++};
++
++/* DEVLINK_CMD_TRAP_GROUP_GET - do */
++static const struct nla_policy devlink_trap_group_get_nl_policy[DEVLINK_ATTR_TRAP_GROUP_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_TRAP_GROUP_NAME] = { .type = NLA_NUL_STRING, },
++};
++
++/* DEVLINK_CMD_TRAP_POLICER_GET - do */
++static const struct nla_policy devlink_trap_policer_get_nl_policy[DEVLINK_ATTR_TRAP_POLICER_ID + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_TRAP_POLICER_ID] = { .type = NLA_U32, },
++};
++
++/* DEVLINK_CMD_RATE_GET - do */
++static const struct nla_policy devlink_rate_get_nl_policy[DEVLINK_ATTR_RATE_NODE_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING, },
++};
++
++/* DEVLINK_CMD_LINECARD_GET - do */
++static const struct nla_policy devlink_linecard_get_nl_policy[DEVLINK_ATTR_LINECARD_INDEX + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_LINECARD_INDEX] = { .type = NLA_U32, },
++};
++
++/* DEVLINK_CMD_SELFTESTS_GET - do */
++static const struct nla_policy devlink_selftests_get_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++};
++
+ /* Ops table for devlink */
+-const struct genl_split_ops devlink_nl_ops[4] = {
++const struct genl_split_ops devlink_nl_ops[32] = {
+ 	{
+ 		.cmd		= DEVLINK_CMD_GET,
+ 		.validate	= GENL_DONT_VALIDATE_STRICT,
+@@ -40,6 +146,118 @@ const struct genl_split_ops devlink_nl_ops[4] = {
+ 		.dumpit		= devlink_nl_get_dumpit,
+ 		.flags		= GENL_CMD_CAP_DUMP,
+ 	},
++	{
++		.cmd		= DEVLINK_CMD_PORT_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit_port,
++		.doit		= devlink_nl_port_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_port_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_PORT_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_port_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_sb_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_sb_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_SB_INDEX,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_sb_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_POOL_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_sb_pool_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_sb_pool_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_SB_POOL_INDEX,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_POOL_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_sb_pool_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_PORT_POOL_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit_port,
++		.doit		= devlink_nl_sb_port_pool_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_sb_port_pool_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_SB_POOL_INDEX,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_PORT_POOL_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_sb_port_pool_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_TC_POOL_BIND_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit_port,
++		.doit		= devlink_nl_sb_tc_pool_bind_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_sb_tc_pool_bind_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_SB_TC_INDEX,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SB_TC_POOL_BIND_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_sb_tc_pool_bind_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_PARAM_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_param_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_param_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_PARAM_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_PARAM_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_param_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_REGION_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit_port_optional,
++		.doit		= devlink_nl_region_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_region_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_REGION_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_REGION_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_region_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
+ 	{
+ 		.cmd		= DEVLINK_CMD_INFO_GET,
+ 		.validate	= GENL_DONT_VALIDATE_STRICT,
+@@ -56,4 +274,116 @@ const struct genl_split_ops devlink_nl_ops[4] = {
+ 		.dumpit		= devlink_nl_info_get_dumpit,
+ 		.flags		= GENL_CMD_CAP_DUMP,
+ 	},
++	{
++		.cmd		= DEVLINK_CMD_HEALTH_REPORTER_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit_port_optional,
++		.doit		= devlink_nl_health_reporter_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_health_reporter_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_HEALTH_REPORTER_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_HEALTH_REPORTER_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_health_reporter_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_TRAP_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_trap_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_trap_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_TRAP_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_TRAP_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_trap_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_TRAP_GROUP_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_trap_group_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_trap_group_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_TRAP_GROUP_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_TRAP_GROUP_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_trap_group_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_TRAP_POLICER_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_trap_policer_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_trap_policer_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_TRAP_POLICER_ID,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_TRAP_POLICER_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_trap_policer_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_RATE_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_rate_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_rate_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_RATE_NODE_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_RATE_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_rate_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_LINECARD_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_linecard_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_linecard_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_LINECARD_INDEX,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_LINECARD_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_linecard_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SELFTESTS_GET,
++		.validate	= GENL_DONT_VALIDATE_STRICT,
++		.pre_doit	= devlink_nl_pre_doit,
++		.doit		= devlink_nl_selftests_get_doit,
++		.post_doit	= devlink_nl_post_doit,
++		.policy		= devlink_selftests_get_nl_policy,
++		.maxattr	= DEVLINK_ATTR_DEV_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= DEVLINK_CMD_SELFTESTS_GET,
++		.validate	= GENL_DONT_VALIDATE_DUMP,
++		.dumpit		= devlink_nl_selftests_get_dumpit,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
+ };
+diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
+index 11980e04a718..f8bbc93e39be 100644
+--- a/net/devlink/netlink_gen.h
++++ b/net/devlink/netlink_gen.h
+@@ -12,18 +12,68 @@
+ #include <uapi/linux/devlink.h>
+ 
+ /* Ops table for devlink */
+-extern const struct genl_split_ops devlink_nl_ops[4];
++extern const struct genl_split_ops devlink_nl_ops[32];
+ 
+ int devlink_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 			struct genl_info *info);
++int devlink_nl_pre_doit_port(const struct genl_split_ops *ops,
++			     struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_pre_doit_port_optional(const struct genl_split_ops *ops,
++				      struct sk_buff *skb,
++				      struct genl_info *info);
+ void
+ devlink_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 		     struct genl_info *info);
+ 
+ int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int devlink_nl_port_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_port_get_dumpit(struct sk_buff *skb,
++			       struct netlink_callback *cb);
++int devlink_nl_sb_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_sb_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int devlink_nl_sb_pool_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_sb_pool_get_dumpit(struct sk_buff *skb,
++				  struct netlink_callback *cb);
++int devlink_nl_sb_port_pool_get_doit(struct sk_buff *skb,
++				     struct genl_info *info);
++int devlink_nl_sb_port_pool_get_dumpit(struct sk_buff *skb,
++				       struct netlink_callback *cb);
++int devlink_nl_sb_tc_pool_bind_get_doit(struct sk_buff *skb,
++					struct genl_info *info);
++int devlink_nl_sb_tc_pool_bind_get_dumpit(struct sk_buff *skb,
++					  struct netlink_callback *cb);
++int devlink_nl_param_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_param_get_dumpit(struct sk_buff *skb,
++				struct netlink_callback *cb);
++int devlink_nl_region_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_region_get_dumpit(struct sk_buff *skb,
++				 struct netlink_callback *cb);
+ int devlink_nl_info_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_info_get_dumpit(struct sk_buff *skb,
+ 			       struct netlink_callback *cb);
++int devlink_nl_health_reporter_get_doit(struct sk_buff *skb,
++					struct genl_info *info);
++int devlink_nl_health_reporter_get_dumpit(struct sk_buff *skb,
++					  struct netlink_callback *cb);
++int devlink_nl_trap_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_trap_get_dumpit(struct sk_buff *skb,
++			       struct netlink_callback *cb);
++int devlink_nl_trap_group_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_trap_group_get_dumpit(struct sk_buff *skb,
++				     struct netlink_callback *cb);
++int devlink_nl_trap_policer_get_doit(struct sk_buff *skb,
++				     struct genl_info *info);
++int devlink_nl_trap_policer_get_dumpit(struct sk_buff *skb,
++				       struct netlink_callback *cb);
++int devlink_nl_rate_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_rate_get_dumpit(struct sk_buff *skb,
++			       struct netlink_callback *cb);
++int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_linecard_get_dumpit(struct sk_buff *skb,
++				   struct netlink_callback *cb);
++int devlink_nl_selftests_get_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_selftests_get_dumpit(struct sk_buff *skb,
++				    struct netlink_callback *cb);
+ 
+ #endif /* _LINUX_DEVLINK_GEN_H */
+diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
+index 8492789433b9..e9ab98b5ffe3 100644
+--- a/tools/net/ynl/generated/devlink-user.c
++++ b/tools/net/ynl/generated/devlink-user.c
+@@ -15,7 +15,21 @@
+ /* Enums */
+ static const char * const devlink_op_strmap[] = {
+ 	[3] = "get",
++	[7] = "port-get",
++	[DEVLINK_CMD_SB_GET] = "sb-get",
++	[DEVLINK_CMD_SB_POOL_GET] = "sb-pool-get",
++	[DEVLINK_CMD_SB_PORT_POOL_GET] = "sb-port-pool-get",
++	[DEVLINK_CMD_SB_TC_POOL_BIND_GET] = "sb-tc-pool-bind-get",
++	[DEVLINK_CMD_PARAM_GET] = "param-get",
++	[DEVLINK_CMD_REGION_GET] = "region-get",
+ 	[DEVLINK_CMD_INFO_GET] = "info-get",
++	[DEVLINK_CMD_HEALTH_REPORTER_GET] = "health-reporter-get",
++	[DEVLINK_CMD_TRAP_GET] = "trap-get",
++	[DEVLINK_CMD_TRAP_GROUP_GET] = "trap-group-get",
++	[DEVLINK_CMD_TRAP_POLICER_GET] = "trap-policer-get",
++	[DEVLINK_CMD_RATE_GET] = "rate-get",
++	[DEVLINK_CMD_LINECARD_GET] = "linecard-get",
++	[DEVLINK_CMD_SELFTESTS_GET] = "selftests-get",
+ };
+ 
+ const char *devlink_op_str(int op)
+@@ -25,6 +39,18 @@ const char *devlink_op_str(int op)
+ 	return devlink_op_strmap[op];
  }
  
- int devlink_nl_get_dumpit(struct sk_buff *msg, struct netlink_callback *cb)
-@@ -828,13 +828,13 @@ int devlink_nl_info_get_doit(struct sk_buff *skb, struct genl_info *info)
++static const char * const devlink_sb_pool_type_strmap[] = {
++	[0] = "ingress",
++	[1] = "egress",
++};
++
++const char *devlink_sb_pool_type_str(enum devlink_sb_pool_type value)
++{
++	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(devlink_sb_pool_type_strmap))
++		return NULL;
++	return devlink_sb_pool_type_strmap[value];
++}
++
+ /* Policies */
+ struct ynl_policy_attr devlink_dl_info_version_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_INFO_VERSION_NAME] = { .name = "info-version-name", .type = YNL_PT_NUL_STR, },
+@@ -88,6 +114,12 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_BUS_NAME] = { .name = "bus-name", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_DEV_NAME] = { .name = "dev-name", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_PORT_INDEX] = { .name = "port-index", .type = YNL_PT_U32, },
++	[DEVLINK_ATTR_SB_INDEX] = { .name = "sb-index", .type = YNL_PT_U32, },
++	[DEVLINK_ATTR_SB_POOL_INDEX] = { .name = "sb-pool-index", .type = YNL_PT_U16, },
++	[DEVLINK_ATTR_SB_POOL_TYPE] = { .name = "sb-pool-type", .type = YNL_PT_U8, },
++	[DEVLINK_ATTR_SB_TC_INDEX] = { .name = "sb-tc-index", .type = YNL_PT_U16, },
++	[DEVLINK_ATTR_PARAM_NAME] = { .name = "param-name", .type = YNL_PT_NUL_STR, },
++	[DEVLINK_ATTR_REGION_NAME] = { .name = "region-name", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_INFO_DRIVER_NAME] = { .name = "info-driver-name", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_INFO_SERIAL_NUMBER] = { .name = "info-serial-number", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_INFO_VERSION_FIXED] = { .name = "info-version-fixed", .type = YNL_PT_NEST, .nest = &devlink_dl_info_version_nest, },
+@@ -95,7 +127,11 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_INFO_VERSION_STORED] = { .name = "info-version-stored", .type = YNL_PT_NEST, .nest = &devlink_dl_info_version_nest, },
+ 	[DEVLINK_ATTR_INFO_VERSION_NAME] = { .name = "info-version-name", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_INFO_VERSION_VALUE] = { .name = "info-version-value", .type = YNL_PT_NUL_STR, },
++	[DEVLINK_ATTR_HEALTH_REPORTER_NAME] = { .name = "health-reporter-name", .type = YNL_PT_NUL_STR, },
++	[DEVLINK_ATTR_TRAP_NAME] = { .name = "trap-name", .type = YNL_PT_NUL_STR, },
++	[DEVLINK_ATTR_TRAP_GROUP_NAME] = { .name = "trap-group-name", .type = YNL_PT_NUL_STR, },
+ 	[DEVLINK_ATTR_RELOAD_FAILED] = { .name = "reload-failed", .type = YNL_PT_U8, },
++	[DEVLINK_ATTR_TRAP_POLICER_ID] = { .name = "trap-policer-id", .type = YNL_PT_U32, },
+ 	[DEVLINK_ATTR_RELOAD_ACTION] = { .name = "reload-action", .type = YNL_PT_U8, },
+ 	[DEVLINK_ATTR_DEV_STATS] = { .name = "dev-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_dev_stats_nest, },
+ 	[DEVLINK_ATTR_RELOAD_STATS] = { .name = "reload-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_stats_nest, },
+@@ -105,6 +141,8 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_REMOTE_RELOAD_STATS] = { .name = "remote-reload-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_stats_nest, },
+ 	[DEVLINK_ATTR_RELOAD_ACTION_INFO] = { .name = "reload-action-info", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_act_info_nest, },
+ 	[DEVLINK_ATTR_RELOAD_ACTION_STATS] = { .name = "reload-action-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_act_stats_nest, },
++	[DEVLINK_ATTR_RATE_NODE_NAME] = { .name = "rate-node-name", .type = YNL_PT_NUL_STR, },
++	[DEVLINK_ATTR_LINECARD_INDEX] = { .name = "linecard-index", .type = YNL_PT_U32, },
+ };
  
- static int
- devlink_nl_info_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			     struct netlink_callback *cb)
-+			     struct netlink_callback *cb, int flags)
+ struct ynl_policy_nest devlink_nest = {
+@@ -531,55 +569,29 @@ struct devlink_get_list *devlink_get_dump(struct ynl_sock *ys)
+ 	return NULL;
+ }
+ 
+-/* ============== DEVLINK_CMD_INFO_GET ============== */
+-/* DEVLINK_CMD_INFO_GET - do */
+-void devlink_info_get_req_free(struct devlink_info_get_req *req)
++/* ============== DEVLINK_CMD_PORT_GET ============== */
++/* DEVLINK_CMD_PORT_GET - do */
++void devlink_port_get_req_free(struct devlink_port_get_req *req)
  {
+ 	free(req->bus_name);
+ 	free(req->dev_name);
+ 	free(req);
+ }
+ 
+-void devlink_info_get_rsp_free(struct devlink_info_get_rsp *rsp)
++void devlink_port_get_rsp_free(struct devlink_port_get_rsp *rsp)
+ {
+-	unsigned int i;
+-
+ 	free(rsp->bus_name);
+ 	free(rsp->dev_name);
+-	free(rsp->info_driver_name);
+-	free(rsp->info_serial_number);
+-	for (i = 0; i < rsp->n_info_version_fixed; i++)
+-		devlink_dl_info_version_free(&rsp->info_version_fixed[i]);
+-	free(rsp->info_version_fixed);
+-	for (i = 0; i < rsp->n_info_version_running; i++)
+-		devlink_dl_info_version_free(&rsp->info_version_running[i]);
+-	free(rsp->info_version_running);
+-	for (i = 0; i < rsp->n_info_version_stored; i++)
+-		devlink_dl_info_version_free(&rsp->info_version_stored[i]);
+-	free(rsp->info_version_stored);
+ 	free(rsp);
+ }
+ 
+-int devlink_info_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++int devlink_port_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
+ {
+-	unsigned int n_info_version_running = 0;
+-	unsigned int n_info_version_stored = 0;
+-	unsigned int n_info_version_fixed = 0;
+ 	struct ynl_parse_arg *yarg = data;
+-	struct devlink_info_get_rsp *dst;
++	struct devlink_port_get_rsp *dst;
+ 	const struct nlattr *attr;
+-	struct ynl_parse_arg parg;
+-	int i;
+ 
+ 	dst = yarg->data;
+-	parg.ys = yarg->ys;
+-
+-	if (dst->info_version_fixed)
+-		return ynl_error_parse(yarg, "attribute already present (devlink.info-version-fixed)");
+-	if (dst->info_version_running)
+-		return ynl_error_parse(yarg, "attribute already present (devlink.info-version-running)");
+-	if (dst->info_version_stored)
+-		return ynl_error_parse(yarg, "attribute already present (devlink.info-version-stored)");
+ 
+ 	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
+ 		unsigned int type = mnl_attr_get_type(attr);
+@@ -606,92 +618,205 @@ int devlink_info_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
+ 			dst->dev_name = malloc(len + 1);
+ 			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
+ 			dst->dev_name[len] = 0;
+-		} else if (type == DEVLINK_ATTR_INFO_DRIVER_NAME) {
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_port_get_rsp *
++devlink_port_get(struct ynl_sock *ys, struct devlink_port_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_port_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_PORT_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_port_get_rsp_parse;
++	yrs.rsp_cmd = 7;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_port_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_PORT_GET - dump */
++int devlink_port_get_rsp_dump_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_port_get_rsp_dump *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
+ 			unsigned int len;
+ 
+ 			if (ynl_attr_validate(yarg, attr))
+ 				return MNL_CB_ERROR;
+ 
+ 			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
+-			dst->_present.info_driver_name_len = len;
+-			dst->info_driver_name = malloc(len + 1);
+-			memcpy(dst->info_driver_name, mnl_attr_get_str(attr), len);
+-			dst->info_driver_name[len] = 0;
+-		} else if (type == DEVLINK_ATTR_INFO_SERIAL_NUMBER) {
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
+ 			unsigned int len;
+ 
+ 			if (ynl_attr_validate(yarg, attr))
+ 				return MNL_CB_ERROR;
+ 
+ 			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
+-			dst->_present.info_serial_number_len = len;
+-			dst->info_serial_number = malloc(len + 1);
+-			memcpy(dst->info_serial_number, mnl_attr_get_str(attr), len);
+-			dst->info_serial_number[len] = 0;
+-		} else if (type == DEVLINK_ATTR_INFO_VERSION_FIXED) {
+-			n_info_version_fixed++;
+-		} else if (type == DEVLINK_ATTR_INFO_VERSION_RUNNING) {
+-			n_info_version_running++;
+-		} else if (type == DEVLINK_ATTR_INFO_VERSION_STORED) {
+-			n_info_version_stored++;
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
+ 		}
+ 	}
+ 
+-	if (n_info_version_fixed) {
+-		dst->info_version_fixed = calloc(n_info_version_fixed, sizeof(*dst->info_version_fixed));
+-		dst->n_info_version_fixed = n_info_version_fixed;
+-		i = 0;
+-		parg.rsp_policy = &devlink_dl_info_version_nest;
+-		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
+-			if (mnl_attr_get_type(attr) == DEVLINK_ATTR_INFO_VERSION_FIXED) {
+-				parg.data = &dst->info_version_fixed[i];
+-				if (devlink_dl_info_version_parse(&parg, attr))
+-					return MNL_CB_ERROR;
+-				i++;
+-			}
+-		}
+-	}
+-	if (n_info_version_running) {
+-		dst->info_version_running = calloc(n_info_version_running, sizeof(*dst->info_version_running));
+-		dst->n_info_version_running = n_info_version_running;
+-		i = 0;
+-		parg.rsp_policy = &devlink_dl_info_version_nest;
+-		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
+-			if (mnl_attr_get_type(attr) == DEVLINK_ATTR_INFO_VERSION_RUNNING) {
+-				parg.data = &dst->info_version_running[i];
+-				if (devlink_dl_info_version_parse(&parg, attr))
+-					return MNL_CB_ERROR;
+-				i++;
+-			}
+-		}
++	return MNL_CB_OK;
++}
++
++void devlink_port_get_rsp_list_free(struct devlink_port_get_rsp_list *rsp)
++{
++	struct devlink_port_get_rsp_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
+ 	}
+-	if (n_info_version_stored) {
+-		dst->info_version_stored = calloc(n_info_version_stored, sizeof(*dst->info_version_stored));
+-		dst->n_info_version_stored = n_info_version_stored;
+-		i = 0;
+-		parg.rsp_policy = &devlink_dl_info_version_nest;
+-		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
+-			if (mnl_attr_get_type(attr) == DEVLINK_ATTR_INFO_VERSION_STORED) {
+-				parg.data = &dst->info_version_stored[i];
+-				if (devlink_dl_info_version_parse(&parg, attr))
+-					return MNL_CB_ERROR;
+-				i++;
+-			}
++}
++
++struct devlink_port_get_rsp_list *devlink_port_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_port_get_rsp_list);
++	yds.cb = devlink_port_get_rsp_dump_parse;
++	yds.rsp_cmd = 7;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_PORT_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_port_get_rsp_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_SB_GET ============== */
++/* DEVLINK_CMD_SB_GET - do */
++void devlink_sb_get_req_free(struct devlink_sb_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void devlink_sb_get_rsp_free(struct devlink_sb_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_sb_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct ynl_parse_arg *yarg = data;
++	struct devlink_sb_get_rsp *dst;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_SB_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_index = 1;
++			dst->sb_index = mnl_attr_get_u32(attr);
+ 		}
+ 	}
+ 
+ 	return MNL_CB_OK;
+ }
+ 
+-struct devlink_info_get_rsp *
+-devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req)
++struct devlink_sb_get_rsp *
++devlink_sb_get(struct ynl_sock *ys, struct devlink_sb_get_req *req)
+ {
+ 	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
+-	struct devlink_info_get_rsp *rsp;
++	struct devlink_sb_get_rsp *rsp;
+ 	struct nlmsghdr *nlh;
  	int err;
  
- 	err = devlink_nl_info_fill(msg, devlink, DEVLINK_CMD_INFO_GET,
- 				   NETLINK_CB(cb->skb).portid,
--				   cb->nlh->nlmsg_seq, NLM_F_MULTI,
-+				   cb->nlh->nlmsg_seq, flags,
- 				   cb->extack);
- 	if (err == -EOPNOTSUPP)
- 		err = 0;
-@@ -1231,14 +1231,15 @@ int devlink_nl_selftests_get_doit(struct sk_buff *skb, struct genl_info *info)
+-	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_INFO_GET, 1);
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_SB_GET, 1);
+ 	ys->req_policy = &devlink_nest;
+ 	yrs.yarg.rsp_policy = &devlink_nest;
  
- static int devlink_nl_selftests_get_dump_one(struct sk_buff *msg,
- 					     struct devlink *devlink,
--					     struct netlink_callback *cb)
-+					     struct netlink_callback *cb,
-+					     int flags)
- {
- 	if (!devlink->ops->selftest_check)
- 		return 0;
+@@ -699,11 +824,13 @@ devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req)
+ 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
+ 	if (req->_present.dev_name_len)
+ 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.sb_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_SB_INDEX, req->sb_index);
  
- 	return devlink_nl_selftests_fill(msg, devlink,
- 					 NETLINK_CB(cb->skb).portid,
--					 cb->nlh->nlmsg_seq, NLM_F_MULTI,
-+					 cb->nlh->nlmsg_seq, flags,
- 					 cb->extack);
+ 	rsp = calloc(1, sizeof(*rsp));
+ 	yrs.yarg.data = rsp;
+-	yrs.cb = devlink_info_get_rsp_parse;
+-	yrs.rsp_cmd = DEVLINK_CMD_INFO_GET;
++	yrs.cb = devlink_sb_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_SB_GET;
+ 
+ 	err = ynl_exec(ys, nlh, &yrs);
+ 	if (err < 0)
+@@ -712,51 +839,38 @@ devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req)
+ 	return rsp;
+ 
+ err_free:
+-	devlink_info_get_rsp_free(rsp);
++	devlink_sb_get_rsp_free(rsp);
+ 	return NULL;
  }
  
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 500c91c61b2d..f8af6ffdbb3a 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -115,7 +115,8 @@ struct devlink_nl_dump_state {
- 
- typedef int devlink_nl_dump_one_func_t(struct sk_buff *msg,
- 				       struct devlink *devlink,
--				       struct netlink_callback *cb);
-+				       struct netlink_callback *cb,
-+				       int flags);
- 
- extern const struct genl_small_ops devlink_nl_small_ops[54];
- 
-diff --git a/net/devlink/health.c b/net/devlink/health.c
-index dbe2d6a1df3b..b9b3e68d9043 100644
---- a/net/devlink/health.c
-+++ b/net/devlink/health.c
-@@ -386,7 +386,8 @@ int devlink_nl_health_reporter_get_doit(struct sk_buff *skb,
- 
- static int devlink_nl_health_reporter_get_dump_one(struct sk_buff *msg,
- 						   struct devlink *devlink,
--						   struct netlink_callback *cb)
-+						   struct netlink_callback *cb,
-+						   int flags)
+-/* DEVLINK_CMD_INFO_GET - dump */
+-void devlink_info_get_list_free(struct devlink_info_get_list *rsp)
++/* DEVLINK_CMD_SB_GET - dump */
++void devlink_sb_get_list_free(struct devlink_sb_get_list *rsp)
  {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_health_reporter *reporter;
-@@ -404,7 +405,7 @@ static int devlink_nl_health_reporter_get_dump_one(struct sk_buff *msg,
- 						      DEVLINK_CMD_HEALTH_REPORTER_GET,
- 						      NETLINK_CB(cb->skb).portid,
- 						      cb->nlh->nlmsg_seq,
--						      NLM_F_MULTI);
-+						      flags);
- 		if (err) {
- 			state->idx = idx;
- 			return err;
-@@ -421,7 +422,7 @@ static int devlink_nl_health_reporter_get_dump_one(struct sk_buff *msg,
- 							      DEVLINK_CMD_HEALTH_REPORTER_GET,
- 							      NETLINK_CB(cb->skb).portid,
- 							      cb->nlh->nlmsg_seq,
--							      NLM_F_MULTI);
-+							      flags);
- 			if (err) {
- 				state->idx = idx;
- 				return err;
-diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index 21f1058ef14d..883c65545d26 100644
---- a/net/devlink/leftover.c
-+++ b/net/devlink/leftover.c
-@@ -1006,7 +1006,7 @@ static void devlink_rate_notify(struct devlink_rate *devlink_rate,
+-	struct devlink_info_get_list *next = rsp;
++	struct devlink_sb_get_list *next = rsp;
  
- static int
- devlink_nl_rate_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			     struct netlink_callback *cb)
-+			     struct netlink_callback *cb, int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_rate *devlink_rate;
-@@ -1022,8 +1022,7 @@ devlink_nl_rate_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
- 			continue;
- 		}
- 		err = devlink_nl_rate_fill(msg, devlink_rate, cmd, id,
--					   cb->nlh->nlmsg_seq,
--					   NLM_F_MULTI, NULL);
-+					   cb->nlh->nlmsg_seq, flags, NULL);
- 		if (err) {
- 			state->idx = idx;
- 			break;
-@@ -1100,7 +1099,7 @@ int devlink_nl_port_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 	while ((void *)next != YNL_LIST_END) {
+-		unsigned int i;
+-
+ 		rsp = next;
+ 		next = rsp->next;
  
- static int
- devlink_nl_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			     struct netlink_callback *cb)
-+			     struct netlink_callback *cb, int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_port *devlink_port;
-@@ -1111,8 +1110,8 @@ devlink_nl_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
- 		err = devlink_nl_port_fill(msg, devlink_port,
- 					   DEVLINK_CMD_NEW,
- 					   NETLINK_CB(cb->skb).portid,
--					   cb->nlh->nlmsg_seq,
--					   NLM_F_MULTI, cb->extack);
-+					   cb->nlh->nlmsg_seq, flags,
-+					   cb->extack);
- 		if (err) {
- 			state->idx = port_index;
- 			break;
-@@ -1856,7 +1855,8 @@ int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 		free(rsp->obj.bus_name);
+ 		free(rsp->obj.dev_name);
+-		free(rsp->obj.info_driver_name);
+-		free(rsp->obj.info_serial_number);
+-		for (i = 0; i < rsp->obj.n_info_version_fixed; i++)
+-			devlink_dl_info_version_free(&rsp->obj.info_version_fixed[i]);
+-		free(rsp->obj.info_version_fixed);
+-		for (i = 0; i < rsp->obj.n_info_version_running; i++)
+-			devlink_dl_info_version_free(&rsp->obj.info_version_running[i]);
+-		free(rsp->obj.info_version_running);
+-		for (i = 0; i < rsp->obj.n_info_version_stored; i++)
+-			devlink_dl_info_version_free(&rsp->obj.info_version_stored[i]);
+-		free(rsp->obj.info_version_stored);
+ 		free(rsp);
+ 	}
+ }
  
- static int devlink_nl_linecard_get_dump_one(struct sk_buff *msg,
- 					    struct devlink *devlink,
--					    struct netlink_callback *cb)
-+					    struct netlink_callback *cb,
-+					    int flags)
+-struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys)
++struct devlink_sb_get_list *devlink_sb_get_dump(struct ynl_sock *ys)
  {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_linecard *linecard;
-@@ -1872,8 +1872,7 @@ static int devlink_nl_linecard_get_dump_one(struct sk_buff *msg,
- 		err = devlink_nl_linecard_fill(msg, devlink, linecard,
- 					       DEVLINK_CMD_LINECARD_NEW,
- 					       NETLINK_CB(cb->skb).portid,
--					       cb->nlh->nlmsg_seq,
--					       NLM_F_MULTI,
-+					       cb->nlh->nlmsg_seq, flags,
- 					       cb->extack);
- 		mutex_unlock(&linecard->state_lock);
- 		if (err) {
-@@ -2120,7 +2119,7 @@ int devlink_nl_sb_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 	struct ynl_dump_state yds = {};
+ 	struct nlmsghdr *nlh;
+ 	int err;
  
- static int
- devlink_nl_sb_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			   struct netlink_callback *cb)
-+			   struct netlink_callback *cb, int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_sb *devlink_sb;
-@@ -2135,8 +2134,7 @@ devlink_nl_sb_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
- 		err = devlink_nl_sb_fill(msg, devlink, devlink_sb,
- 					 DEVLINK_CMD_SB_NEW,
- 					 NETLINK_CB(cb->skb).portid,
--					 cb->nlh->nlmsg_seq,
--					 NLM_F_MULTI);
-+					 cb->nlh->nlmsg_seq, flags);
- 		if (err) {
- 			state->idx = idx;
- 			break;
-@@ -2233,7 +2231,7 @@ int devlink_nl_sb_pool_get_doit(struct sk_buff *skb, struct genl_info *info)
- static int __sb_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
- 				struct devlink *devlink,
- 				struct devlink_sb *devlink_sb,
--				u32 portid, u32 seq)
-+				u32 portid, u32 seq, int flags)
- {
- 	u16 pool_count = devlink_sb_pool_count(devlink_sb);
- 	u16 pool_index;
-@@ -2248,7 +2246,7 @@ static int __sb_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
- 					      devlink_sb,
- 					      pool_index,
- 					      DEVLINK_CMD_SB_POOL_NEW,
--					      portid, seq, NLM_F_MULTI);
-+					      portid, seq, flags);
- 		if (err)
- 			return err;
- 		(*p_idx)++;
-@@ -2258,7 +2256,7 @@ static int __sb_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
+ 	yds.ys = ys;
+-	yds.alloc_sz = sizeof(struct devlink_info_get_list);
+-	yds.cb = devlink_info_get_rsp_parse;
+-	yds.rsp_cmd = DEVLINK_CMD_INFO_GET;
++	yds.alloc_sz = sizeof(struct devlink_sb_get_list);
++	yds.cb = devlink_sb_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_SB_GET;
+ 	yds.rsp_policy = &devlink_nest;
  
- static int
- devlink_nl_sb_pool_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--				struct netlink_callback *cb)
-+				struct netlink_callback *cb, int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_sb *devlink_sb;
-@@ -2272,7 +2270,7 @@ devlink_nl_sb_pool_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
- 		err = __sb_pool_get_dumpit(msg, state->idx, &idx,
- 					   devlink, devlink_sb,
- 					   NETLINK_CB(cb->skb).portid,
--					   cb->nlh->nlmsg_seq);
-+					   cb->nlh->nlmsg_seq, flags);
- 		if (err == -EOPNOTSUPP) {
- 			err = 0;
- 		} else if (err) {
-@@ -2436,7 +2434,7 @@ int devlink_nl_sb_port_pool_get_doit(struct sk_buff *skb,
- static int __sb_port_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
- 				     struct devlink *devlink,
- 				     struct devlink_sb *devlink_sb,
--				     u32 portid, u32 seq)
-+				     u32 portid, u32 seq, int flags)
- {
- 	struct devlink_port *devlink_port;
- 	u16 pool_count = devlink_sb_pool_count(devlink_sb);
-@@ -2455,8 +2453,7 @@ static int __sb_port_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
- 							   devlink_sb,
- 							   pool_index,
- 							   DEVLINK_CMD_SB_PORT_POOL_NEW,
--							   portid, seq,
--							   NLM_F_MULTI);
-+							   portid, seq, flags);
- 			if (err)
- 				return err;
- 			(*p_idx)++;
-@@ -2468,7 +2465,7 @@ static int __sb_port_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
- static int
- devlink_nl_sb_port_pool_get_dump_one(struct sk_buff *msg,
- 				     struct devlink *devlink,
--				     struct netlink_callback *cb)
-+				     struct netlink_callback *cb, int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_sb *devlink_sb;
-@@ -2482,7 +2479,7 @@ devlink_nl_sb_port_pool_get_dump_one(struct sk_buff *msg,
- 		err = __sb_port_pool_get_dumpit(msg, state->idx, &idx,
- 						devlink, devlink_sb,
- 						NETLINK_CB(cb->skb).portid,
--						cb->nlh->nlmsg_seq);
-+						cb->nlh->nlmsg_seq, flags);
- 		if (err == -EOPNOTSUPP) {
- 			err = 0;
- 		} else if (err) {
-@@ -2654,7 +2651,7 @@ static int __sb_tc_pool_bind_get_dumpit(struct sk_buff *msg,
- 					int start, int *p_idx,
- 					struct devlink *devlink,
- 					struct devlink_sb *devlink_sb,
--					u32 portid, u32 seq)
-+					u32 portid, u32 seq, int flags)
- {
- 	struct devlink_port *devlink_port;
- 	unsigned long port_index;
-@@ -2675,7 +2672,7 @@ static int __sb_tc_pool_bind_get_dumpit(struct sk_buff *msg,
- 							      DEVLINK_SB_POOL_TYPE_INGRESS,
- 							      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
- 							      portid, seq,
--							      NLM_F_MULTI);
-+							      flags);
- 			if (err)
- 				return err;
- 			(*p_idx)++;
-@@ -2693,7 +2690,7 @@ static int __sb_tc_pool_bind_get_dumpit(struct sk_buff *msg,
- 							      DEVLINK_SB_POOL_TYPE_EGRESS,
- 							      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
- 							      portid, seq,
--							      NLM_F_MULTI);
-+							      flags);
- 			if (err)
- 				return err;
- 			(*p_idx)++;
-@@ -2704,7 +2701,8 @@ static int __sb_tc_pool_bind_get_dumpit(struct sk_buff *msg,
+-	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_INFO_GET, 1);
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_SB_GET, 1);
  
- static int devlink_nl_sb_tc_pool_bind_get_dump_one(struct sk_buff *msg,
- 						   struct devlink *devlink,
--						   struct netlink_callback *cb)
-+						   struct netlink_callback *cb,
-+						   int flags)
+ 	err = ynl_exec_dump(ys, nlh, &yds);
+ 	if (err < 0)
+@@ -765,7 +879,2002 @@ struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys)
+ 	return yds.first;
+ 
+ free_list:
+-	devlink_info_get_list_free(yds.first);
++	devlink_sb_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_SB_POOL_GET ============== */
++/* DEVLINK_CMD_SB_POOL_GET - do */
++void devlink_sb_pool_get_req_free(struct devlink_sb_pool_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void devlink_sb_pool_get_rsp_free(struct devlink_sb_pool_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_sb_pool_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_sb_pool_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_SB_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_index = 1;
++			dst->sb_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_SB_POOL_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_pool_index = 1;
++			dst->sb_pool_index = mnl_attr_get_u16(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_sb_pool_get_rsp *
++devlink_sb_pool_get(struct ynl_sock *ys, struct devlink_sb_pool_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_sb_pool_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_SB_POOL_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.sb_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_SB_INDEX, req->sb_index);
++	if (req->_present.sb_pool_index)
++		mnl_attr_put_u16(nlh, DEVLINK_ATTR_SB_POOL_INDEX, req->sb_pool_index);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_sb_pool_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_SB_POOL_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_sb_pool_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_SB_POOL_GET - dump */
++void devlink_sb_pool_get_list_free(struct devlink_sb_pool_get_list *rsp)
++{
++	struct devlink_sb_pool_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
++	}
++}
++
++struct devlink_sb_pool_get_list *devlink_sb_pool_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_sb_pool_get_list);
++	yds.cb = devlink_sb_pool_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_SB_POOL_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_SB_POOL_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_sb_pool_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_SB_PORT_POOL_GET ============== */
++/* DEVLINK_CMD_SB_PORT_POOL_GET - do */
++void
++devlink_sb_port_pool_get_req_free(struct devlink_sb_port_pool_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void
++devlink_sb_port_pool_get_rsp_free(struct devlink_sb_port_pool_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_sb_port_pool_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_sb_port_pool_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_SB_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_index = 1;
++			dst->sb_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_SB_POOL_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_pool_index = 1;
++			dst->sb_pool_index = mnl_attr_get_u16(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_sb_port_pool_get_rsp *
++devlink_sb_port_pool_get(struct ynl_sock *ys,
++			 struct devlink_sb_port_pool_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_sb_port_pool_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_SB_PORT_POOL_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
++	if (req->_present.sb_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_SB_INDEX, req->sb_index);
++	if (req->_present.sb_pool_index)
++		mnl_attr_put_u16(nlh, DEVLINK_ATTR_SB_POOL_INDEX, req->sb_pool_index);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_sb_port_pool_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_SB_PORT_POOL_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_sb_port_pool_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_SB_PORT_POOL_GET - dump */
++void
++devlink_sb_port_pool_get_list_free(struct devlink_sb_port_pool_get_list *rsp)
++{
++	struct devlink_sb_port_pool_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
++	}
++}
++
++struct devlink_sb_port_pool_get_list *
++devlink_sb_port_pool_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_sb_port_pool_get_list);
++	yds.cb = devlink_sb_port_pool_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_SB_PORT_POOL_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_SB_PORT_POOL_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_sb_port_pool_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_SB_TC_POOL_BIND_GET ============== */
++/* DEVLINK_CMD_SB_TC_POOL_BIND_GET - do */
++void
++devlink_sb_tc_pool_bind_get_req_free(struct devlink_sb_tc_pool_bind_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void
++devlink_sb_tc_pool_bind_get_rsp_free(struct devlink_sb_tc_pool_bind_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_sb_tc_pool_bind_get_rsp_parse(const struct nlmsghdr *nlh,
++					  void *data)
++{
++	struct devlink_sb_tc_pool_bind_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_SB_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_index = 1;
++			dst->sb_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_SB_POOL_TYPE) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_pool_type = 1;
++			dst->sb_pool_type = mnl_attr_get_u8(attr);
++		} else if (type == DEVLINK_ATTR_SB_TC_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sb_tc_index = 1;
++			dst->sb_tc_index = mnl_attr_get_u16(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_sb_tc_pool_bind_get_rsp *
++devlink_sb_tc_pool_bind_get(struct ynl_sock *ys,
++			    struct devlink_sb_tc_pool_bind_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_sb_tc_pool_bind_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_SB_TC_POOL_BIND_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
++	if (req->_present.sb_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_SB_INDEX, req->sb_index);
++	if (req->_present.sb_pool_type)
++		mnl_attr_put_u8(nlh, DEVLINK_ATTR_SB_POOL_TYPE, req->sb_pool_type);
++	if (req->_present.sb_tc_index)
++		mnl_attr_put_u16(nlh, DEVLINK_ATTR_SB_TC_INDEX, req->sb_tc_index);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_sb_tc_pool_bind_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_SB_TC_POOL_BIND_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_sb_tc_pool_bind_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_SB_TC_POOL_BIND_GET - dump */
++void
++devlink_sb_tc_pool_bind_get_list_free(struct devlink_sb_tc_pool_bind_get_list *rsp)
++{
++	struct devlink_sb_tc_pool_bind_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
++	}
++}
++
++struct devlink_sb_tc_pool_bind_get_list *
++devlink_sb_tc_pool_bind_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_sb_tc_pool_bind_get_list);
++	yds.cb = devlink_sb_tc_pool_bind_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_SB_TC_POOL_BIND_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_SB_TC_POOL_BIND_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_sb_tc_pool_bind_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_PARAM_GET ============== */
++/* DEVLINK_CMD_PARAM_GET - do */
++void devlink_param_get_req_free(struct devlink_param_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req->param_name);
++	free(req);
++}
++
++void devlink_param_get_rsp_free(struct devlink_param_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->param_name);
++	free(rsp);
++}
++
++int devlink_param_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_param_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PARAM_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.param_name_len = len;
++			dst->param_name = malloc(len + 1);
++			memcpy(dst->param_name, mnl_attr_get_str(attr), len);
++			dst->param_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_param_get_rsp *
++devlink_param_get(struct ynl_sock *ys, struct devlink_param_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_param_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_PARAM_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.param_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_PARAM_NAME, req->param_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_param_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_PARAM_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_param_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_PARAM_GET - dump */
++void devlink_param_get_list_free(struct devlink_param_get_list *rsp)
++{
++	struct devlink_param_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.param_name);
++		free(rsp);
++	}
++}
++
++struct devlink_param_get_list *devlink_param_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_param_get_list);
++	yds.cb = devlink_param_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_PARAM_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_PARAM_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_param_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_REGION_GET ============== */
++/* DEVLINK_CMD_REGION_GET - do */
++void devlink_region_get_req_free(struct devlink_region_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req->region_name);
++	free(req);
++}
++
++void devlink_region_get_rsp_free(struct devlink_region_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->region_name);
++	free(rsp);
++}
++
++int devlink_region_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_region_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_REGION_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.region_name_len = len;
++			dst->region_name = malloc(len + 1);
++			memcpy(dst->region_name, mnl_attr_get_str(attr), len);
++			dst->region_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_region_get_rsp *
++devlink_region_get(struct ynl_sock *ys, struct devlink_region_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_region_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_REGION_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
++	if (req->_present.region_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_REGION_NAME, req->region_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_region_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_REGION_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_region_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_REGION_GET - dump */
++void devlink_region_get_list_free(struct devlink_region_get_list *rsp)
++{
++	struct devlink_region_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.region_name);
++		free(rsp);
++	}
++}
++
++struct devlink_region_get_list *devlink_region_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_region_get_list);
++	yds.cb = devlink_region_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_REGION_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_REGION_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_region_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_INFO_GET ============== */
++/* DEVLINK_CMD_INFO_GET - do */
++void devlink_info_get_req_free(struct devlink_info_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void devlink_info_get_rsp_free(struct devlink_info_get_rsp *rsp)
++{
++	unsigned int i;
++
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->info_driver_name);
++	free(rsp->info_serial_number);
++	for (i = 0; i < rsp->n_info_version_fixed; i++)
++		devlink_dl_info_version_free(&rsp->info_version_fixed[i]);
++	free(rsp->info_version_fixed);
++	for (i = 0; i < rsp->n_info_version_running; i++)
++		devlink_dl_info_version_free(&rsp->info_version_running[i]);
++	free(rsp->info_version_running);
++	for (i = 0; i < rsp->n_info_version_stored; i++)
++		devlink_dl_info_version_free(&rsp->info_version_stored[i]);
++	free(rsp->info_version_stored);
++	free(rsp);
++}
++
++int devlink_info_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	unsigned int n_info_version_running = 0;
++	unsigned int n_info_version_stored = 0;
++	unsigned int n_info_version_fixed = 0;
++	struct ynl_parse_arg *yarg = data;
++	struct devlink_info_get_rsp *dst;
++	const struct nlattr *attr;
++	struct ynl_parse_arg parg;
++	int i;
++
++	dst = yarg->data;
++	parg.ys = yarg->ys;
++
++	if (dst->info_version_fixed)
++		return ynl_error_parse(yarg, "attribute already present (devlink.info-version-fixed)");
++	if (dst->info_version_running)
++		return ynl_error_parse(yarg, "attribute already present (devlink.info-version-running)");
++	if (dst->info_version_stored)
++		return ynl_error_parse(yarg, "attribute already present (devlink.info-version-stored)");
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_INFO_DRIVER_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.info_driver_name_len = len;
++			dst->info_driver_name = malloc(len + 1);
++			memcpy(dst->info_driver_name, mnl_attr_get_str(attr), len);
++			dst->info_driver_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_INFO_SERIAL_NUMBER) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.info_serial_number_len = len;
++			dst->info_serial_number = malloc(len + 1);
++			memcpy(dst->info_serial_number, mnl_attr_get_str(attr), len);
++			dst->info_serial_number[len] = 0;
++		} else if (type == DEVLINK_ATTR_INFO_VERSION_FIXED) {
++			n_info_version_fixed++;
++		} else if (type == DEVLINK_ATTR_INFO_VERSION_RUNNING) {
++			n_info_version_running++;
++		} else if (type == DEVLINK_ATTR_INFO_VERSION_STORED) {
++			n_info_version_stored++;
++		}
++	}
++
++	if (n_info_version_fixed) {
++		dst->info_version_fixed = calloc(n_info_version_fixed, sizeof(*dst->info_version_fixed));
++		dst->n_info_version_fixed = n_info_version_fixed;
++		i = 0;
++		parg.rsp_policy = &devlink_dl_info_version_nest;
++		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++			if (mnl_attr_get_type(attr) == DEVLINK_ATTR_INFO_VERSION_FIXED) {
++				parg.data = &dst->info_version_fixed[i];
++				if (devlink_dl_info_version_parse(&parg, attr))
++					return MNL_CB_ERROR;
++				i++;
++			}
++		}
++	}
++	if (n_info_version_running) {
++		dst->info_version_running = calloc(n_info_version_running, sizeof(*dst->info_version_running));
++		dst->n_info_version_running = n_info_version_running;
++		i = 0;
++		parg.rsp_policy = &devlink_dl_info_version_nest;
++		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++			if (mnl_attr_get_type(attr) == DEVLINK_ATTR_INFO_VERSION_RUNNING) {
++				parg.data = &dst->info_version_running[i];
++				if (devlink_dl_info_version_parse(&parg, attr))
++					return MNL_CB_ERROR;
++				i++;
++			}
++		}
++	}
++	if (n_info_version_stored) {
++		dst->info_version_stored = calloc(n_info_version_stored, sizeof(*dst->info_version_stored));
++		dst->n_info_version_stored = n_info_version_stored;
++		i = 0;
++		parg.rsp_policy = &devlink_dl_info_version_nest;
++		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++			if (mnl_attr_get_type(attr) == DEVLINK_ATTR_INFO_VERSION_STORED) {
++				parg.data = &dst->info_version_stored[i];
++				if (devlink_dl_info_version_parse(&parg, attr))
++					return MNL_CB_ERROR;
++				i++;
++			}
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_info_get_rsp *
++devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_info_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_INFO_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_info_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_INFO_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_info_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_INFO_GET - dump */
++void devlink_info_get_list_free(struct devlink_info_get_list *rsp)
++{
++	struct devlink_info_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		unsigned int i;
++
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.info_driver_name);
++		free(rsp->obj.info_serial_number);
++		for (i = 0; i < rsp->obj.n_info_version_fixed; i++)
++			devlink_dl_info_version_free(&rsp->obj.info_version_fixed[i]);
++		free(rsp->obj.info_version_fixed);
++		for (i = 0; i < rsp->obj.n_info_version_running; i++)
++			devlink_dl_info_version_free(&rsp->obj.info_version_running[i]);
++		free(rsp->obj.info_version_running);
++		for (i = 0; i < rsp->obj.n_info_version_stored; i++)
++			devlink_dl_info_version_free(&rsp->obj.info_version_stored[i]);
++		free(rsp->obj.info_version_stored);
++		free(rsp);
++	}
++}
++
++struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_info_get_list);
++	yds.cb = devlink_info_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_INFO_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_INFO_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_info_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_HEALTH_REPORTER_GET ============== */
++/* DEVLINK_CMD_HEALTH_REPORTER_GET - do */
++void
++devlink_health_reporter_get_req_free(struct devlink_health_reporter_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req->health_reporter_name);
++	free(req);
++}
++
++void
++devlink_health_reporter_get_rsp_free(struct devlink_health_reporter_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->health_reporter_name);
++	free(rsp);
++}
++
++int devlink_health_reporter_get_rsp_parse(const struct nlmsghdr *nlh,
++					  void *data)
++{
++	struct devlink_health_reporter_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_HEALTH_REPORTER_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.health_reporter_name_len = len;
++			dst->health_reporter_name = malloc(len + 1);
++			memcpy(dst->health_reporter_name, mnl_attr_get_str(attr), len);
++			dst->health_reporter_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_health_reporter_get_rsp *
++devlink_health_reporter_get(struct ynl_sock *ys,
++			    struct devlink_health_reporter_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_health_reporter_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_HEALTH_REPORTER_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
++	if (req->_present.health_reporter_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_HEALTH_REPORTER_NAME, req->health_reporter_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_health_reporter_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_HEALTH_REPORTER_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_health_reporter_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_HEALTH_REPORTER_GET - dump */
++void
++devlink_health_reporter_get_list_free(struct devlink_health_reporter_get_list *rsp)
++{
++	struct devlink_health_reporter_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.health_reporter_name);
++		free(rsp);
++	}
++}
++
++struct devlink_health_reporter_get_list *
++devlink_health_reporter_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_health_reporter_get_list);
++	yds.cb = devlink_health_reporter_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_HEALTH_REPORTER_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_HEALTH_REPORTER_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_health_reporter_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_TRAP_GET ============== */
++/* DEVLINK_CMD_TRAP_GET - do */
++void devlink_trap_get_req_free(struct devlink_trap_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req->trap_name);
++	free(req);
++}
++
++void devlink_trap_get_rsp_free(struct devlink_trap_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->trap_name);
++	free(rsp);
++}
++
++int devlink_trap_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct ynl_parse_arg *yarg = data;
++	struct devlink_trap_get_rsp *dst;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_TRAP_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.trap_name_len = len;
++			dst->trap_name = malloc(len + 1);
++			memcpy(dst->trap_name, mnl_attr_get_str(attr), len);
++			dst->trap_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_trap_get_rsp *
++devlink_trap_get(struct ynl_sock *ys, struct devlink_trap_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_trap_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_TRAP_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.trap_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_TRAP_NAME, req->trap_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_trap_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_TRAP_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_trap_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_TRAP_GET - dump */
++void devlink_trap_get_list_free(struct devlink_trap_get_list *rsp)
++{
++	struct devlink_trap_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.trap_name);
++		free(rsp);
++	}
++}
++
++struct devlink_trap_get_list *devlink_trap_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_trap_get_list);
++	yds.cb = devlink_trap_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_TRAP_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_TRAP_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_trap_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_TRAP_GROUP_GET ============== */
++/* DEVLINK_CMD_TRAP_GROUP_GET - do */
++void devlink_trap_group_get_req_free(struct devlink_trap_group_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req->trap_group_name);
++	free(req);
++}
++
++void devlink_trap_group_get_rsp_free(struct devlink_trap_group_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->trap_group_name);
++	free(rsp);
++}
++
++int devlink_trap_group_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_trap_group_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_TRAP_GROUP_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.trap_group_name_len = len;
++			dst->trap_group_name = malloc(len + 1);
++			memcpy(dst->trap_group_name, mnl_attr_get_str(attr), len);
++			dst->trap_group_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_trap_group_get_rsp *
++devlink_trap_group_get(struct ynl_sock *ys,
++		       struct devlink_trap_group_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_trap_group_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_TRAP_GROUP_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.trap_group_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_TRAP_GROUP_NAME, req->trap_group_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_trap_group_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_TRAP_GROUP_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_trap_group_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_TRAP_GROUP_GET - dump */
++void devlink_trap_group_get_list_free(struct devlink_trap_group_get_list *rsp)
++{
++	struct devlink_trap_group_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.trap_group_name);
++		free(rsp);
++	}
++}
++
++struct devlink_trap_group_get_list *
++devlink_trap_group_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_trap_group_get_list);
++	yds.cb = devlink_trap_group_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_TRAP_GROUP_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_TRAP_GROUP_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_trap_group_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_TRAP_POLICER_GET ============== */
++/* DEVLINK_CMD_TRAP_POLICER_GET - do */
++void
++devlink_trap_policer_get_req_free(struct devlink_trap_policer_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void
++devlink_trap_policer_get_rsp_free(struct devlink_trap_policer_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_trap_policer_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_trap_policer_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_TRAP_POLICER_ID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.trap_policer_id = 1;
++			dst->trap_policer_id = mnl_attr_get_u32(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_trap_policer_get_rsp *
++devlink_trap_policer_get(struct ynl_sock *ys,
++			 struct devlink_trap_policer_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_trap_policer_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_TRAP_POLICER_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.trap_policer_id)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_TRAP_POLICER_ID, req->trap_policer_id);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_trap_policer_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_TRAP_POLICER_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_trap_policer_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_TRAP_POLICER_GET - dump */
++void
++devlink_trap_policer_get_list_free(struct devlink_trap_policer_get_list *rsp)
++{
++	struct devlink_trap_policer_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
++	}
++}
++
++struct devlink_trap_policer_get_list *
++devlink_trap_policer_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_trap_policer_get_list);
++	yds.cb = devlink_trap_policer_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_TRAP_POLICER_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_TRAP_POLICER_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_trap_policer_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_RATE_GET ============== */
++/* DEVLINK_CMD_RATE_GET - do */
++void devlink_rate_get_req_free(struct devlink_rate_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req->rate_node_name);
++	free(req);
++}
++
++void devlink_rate_get_rsp_free(struct devlink_rate_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp->rate_node_name);
++	free(rsp);
++}
++
++int devlink_rate_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct ynl_parse_arg *yarg = data;
++	struct devlink_rate_get_rsp *dst;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_PORT_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.port_index = 1;
++			dst->port_index = mnl_attr_get_u32(attr);
++		} else if (type == DEVLINK_ATTR_RATE_NODE_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.rate_node_name_len = len;
++			dst->rate_node_name = malloc(len + 1);
++			memcpy(dst->rate_node_name, mnl_attr_get_str(attr), len);
++			dst->rate_node_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_rate_get_rsp *
++devlink_rate_get(struct ynl_sock *ys, struct devlink_rate_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_rate_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_RATE_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
++	if (req->_present.rate_node_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_RATE_NODE_NAME, req->rate_node_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_rate_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_RATE_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_rate_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_RATE_GET - dump */
++void devlink_rate_get_list_free(struct devlink_rate_get_list *rsp)
++{
++	struct devlink_rate_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp->obj.rate_node_name);
++		free(rsp);
++	}
++}
++
++struct devlink_rate_get_list *devlink_rate_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_rate_get_list);
++	yds.cb = devlink_rate_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_RATE_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_RATE_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_rate_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_LINECARD_GET ============== */
++/* DEVLINK_CMD_LINECARD_GET - do */
++void devlink_linecard_get_req_free(struct devlink_linecard_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void devlink_linecard_get_rsp_free(struct devlink_linecard_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_linecard_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_linecard_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_LINECARD_INDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.linecard_index = 1;
++			dst->linecard_index = mnl_attr_get_u32(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_linecard_get_rsp *
++devlink_linecard_get(struct ynl_sock *ys, struct devlink_linecard_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_linecard_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_LINECARD_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.linecard_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_LINECARD_INDEX, req->linecard_index);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_linecard_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_LINECARD_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_linecard_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_LINECARD_GET - dump */
++void devlink_linecard_get_list_free(struct devlink_linecard_get_list *rsp)
++{
++	struct devlink_linecard_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
++	}
++}
++
++struct devlink_linecard_get_list *
++devlink_linecard_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_linecard_get_list);
++	yds.cb = devlink_linecard_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_LINECARD_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_LINECARD_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_linecard_get_list_free(yds.first);
++	return NULL;
++}
++
++/* ============== DEVLINK_CMD_SELFTESTS_GET ============== */
++/* DEVLINK_CMD_SELFTESTS_GET - do */
++void devlink_selftests_get_req_free(struct devlink_selftests_get_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++void devlink_selftests_get_rsp_free(struct devlink_selftests_get_rsp *rsp)
++{
++	free(rsp->bus_name);
++	free(rsp->dev_name);
++	free(rsp);
++}
++
++int devlink_selftests_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct devlink_selftests_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == DEVLINK_ATTR_BUS_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.bus_name_len = len;
++			dst->bus_name = malloc(len + 1);
++			memcpy(dst->bus_name, mnl_attr_get_str(attr), len);
++			dst->bus_name[len] = 0;
++		} else if (type == DEVLINK_ATTR_DEV_NAME) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(attr));
++			dst->_present.dev_name_len = len;
++			dst->dev_name = malloc(len + 1);
++			memcpy(dst->dev_name, mnl_attr_get_str(attr), len);
++			dst->dev_name[len] = 0;
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct devlink_selftests_get_rsp *
++devlink_selftests_get(struct ynl_sock *ys,
++		      struct devlink_selftests_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct devlink_selftests_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_SELFTESTS_GET, 1);
++	ys->req_policy = &devlink_nest;
++	yrs.yarg.rsp_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = devlink_selftests_get_rsp_parse;
++	yrs.rsp_cmd = DEVLINK_CMD_SELFTESTS_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	devlink_selftests_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* DEVLINK_CMD_SELFTESTS_GET - dump */
++void devlink_selftests_get_list_free(struct devlink_selftests_get_list *rsp)
++{
++	struct devlink_selftests_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp->obj.bus_name);
++		free(rsp->obj.dev_name);
++		free(rsp);
++	}
++}
++
++struct devlink_selftests_get_list *
++devlink_selftests_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct devlink_selftests_get_list);
++	yds.cb = devlink_selftests_get_rsp_parse;
++	yds.rsp_cmd = DEVLINK_CMD_SELFTESTS_GET;
++	yds.rsp_policy = &devlink_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, DEVLINK_CMD_SELFTESTS_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	devlink_selftests_get_list_free(yds.first);
+ 	return NULL;
+ }
+ 
+diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
+index af65e2f2f529..f6ec5b6e5d26 100644
+--- a/tools/net/ynl/generated/devlink-user.h
++++ b/tools/net/ynl/generated/devlink-user.h
+@@ -17,6 +17,7 @@ extern const struct ynl_family ynl_devlink_family;
+ 
+ /* Enums */
+ const char *devlink_op_str(int op);
++const char *devlink_sb_pool_type_str(enum devlink_sb_pool_type value);
+ 
+ /* Common nested types */
+ struct devlink_dl_info_version {
+@@ -140,6 +141,659 @@ void devlink_get_list_free(struct devlink_get_list *rsp);
+ 
+ struct devlink_get_list *devlink_get_dump(struct ynl_sock *ys);
+ 
++/* ============== DEVLINK_CMD_PORT_GET ============== */
++/* DEVLINK_CMD_PORT_GET - do */
++struct devlink_port_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++};
++
++static inline struct devlink_port_get_req *devlink_port_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_port_get_req));
++}
++void devlink_port_get_req_free(struct devlink_port_get_req *req);
++
++static inline void
++devlink_port_get_req_set_bus_name(struct devlink_port_get_req *req,
++				  const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_port_get_req_set_dev_name(struct devlink_port_get_req *req,
++				  const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_port_get_req_set_port_index(struct devlink_port_get_req *req,
++				    __u32 port_index)
++{
++	req->_present.port_index = 1;
++	req->port_index = port_index;
++}
++
++struct devlink_port_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++};
++
++void devlink_port_get_rsp_free(struct devlink_port_get_rsp *rsp);
++
++/*
++ * Get devlink port instances.
++ */
++struct devlink_port_get_rsp *
++devlink_port_get(struct ynl_sock *ys, struct devlink_port_get_req *req);
++
++/* DEVLINK_CMD_PORT_GET - dump */
++struct devlink_port_get_rsp_dump {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++};
++
++struct devlink_port_get_rsp_list {
++	struct devlink_port_get_rsp_list *next;
++	struct devlink_port_get_rsp_dump obj __attribute__ ((aligned (8)));
++};
++
++void devlink_port_get_rsp_list_free(struct devlink_port_get_rsp_list *rsp);
++
++struct devlink_port_get_rsp_list *devlink_port_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_SB_GET ============== */
++/* DEVLINK_CMD_SB_GET - do */
++struct devlink_sb_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 sb_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 sb_index;
++};
++
++static inline struct devlink_sb_get_req *devlink_sb_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_sb_get_req));
++}
++void devlink_sb_get_req_free(struct devlink_sb_get_req *req);
++
++static inline void
++devlink_sb_get_req_set_bus_name(struct devlink_sb_get_req *req,
++				const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_sb_get_req_set_dev_name(struct devlink_sb_get_req *req,
++				const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_sb_get_req_set_sb_index(struct devlink_sb_get_req *req, __u32 sb_index)
++{
++	req->_present.sb_index = 1;
++	req->sb_index = sb_index;
++}
++
++struct devlink_sb_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 sb_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 sb_index;
++};
++
++void devlink_sb_get_rsp_free(struct devlink_sb_get_rsp *rsp);
++
++/*
++ * Get shared buffer instances.
++ */
++struct devlink_sb_get_rsp *
++devlink_sb_get(struct ynl_sock *ys, struct devlink_sb_get_req *req);
++
++/* DEVLINK_CMD_SB_GET - dump */
++struct devlink_sb_get_list {
++	struct devlink_sb_get_list *next;
++	struct devlink_sb_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_sb_get_list_free(struct devlink_sb_get_list *rsp);
++
++struct devlink_sb_get_list *devlink_sb_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_SB_POOL_GET ============== */
++/* DEVLINK_CMD_SB_POOL_GET - do */
++struct devlink_sb_pool_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 sb_index:1;
++		__u32 sb_pool_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 sb_index;
++	__u16 sb_pool_index;
++};
++
++static inline struct devlink_sb_pool_get_req *
++devlink_sb_pool_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_sb_pool_get_req));
++}
++void devlink_sb_pool_get_req_free(struct devlink_sb_pool_get_req *req);
++
++static inline void
++devlink_sb_pool_get_req_set_bus_name(struct devlink_sb_pool_get_req *req,
++				     const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_sb_pool_get_req_set_dev_name(struct devlink_sb_pool_get_req *req,
++				     const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_sb_pool_get_req_set_sb_index(struct devlink_sb_pool_get_req *req,
++				     __u32 sb_index)
++{
++	req->_present.sb_index = 1;
++	req->sb_index = sb_index;
++}
++static inline void
++devlink_sb_pool_get_req_set_sb_pool_index(struct devlink_sb_pool_get_req *req,
++					  __u16 sb_pool_index)
++{
++	req->_present.sb_pool_index = 1;
++	req->sb_pool_index = sb_pool_index;
++}
++
++struct devlink_sb_pool_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 sb_index:1;
++		__u32 sb_pool_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 sb_index;
++	__u16 sb_pool_index;
++};
++
++void devlink_sb_pool_get_rsp_free(struct devlink_sb_pool_get_rsp *rsp);
++
++/*
++ * Get shared buffer pool instances.
++ */
++struct devlink_sb_pool_get_rsp *
++devlink_sb_pool_get(struct ynl_sock *ys, struct devlink_sb_pool_get_req *req);
++
++/* DEVLINK_CMD_SB_POOL_GET - dump */
++struct devlink_sb_pool_get_list {
++	struct devlink_sb_pool_get_list *next;
++	struct devlink_sb_pool_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_sb_pool_get_list_free(struct devlink_sb_pool_get_list *rsp);
++
++struct devlink_sb_pool_get_list *devlink_sb_pool_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_SB_PORT_POOL_GET ============== */
++/* DEVLINK_CMD_SB_PORT_POOL_GET - do */
++struct devlink_sb_port_pool_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 sb_index:1;
++		__u32 sb_pool_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	__u32 sb_index;
++	__u16 sb_pool_index;
++};
++
++static inline struct devlink_sb_port_pool_get_req *
++devlink_sb_port_pool_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_sb_port_pool_get_req));
++}
++void
++devlink_sb_port_pool_get_req_free(struct devlink_sb_port_pool_get_req *req);
++
++static inline void
++devlink_sb_port_pool_get_req_set_bus_name(struct devlink_sb_port_pool_get_req *req,
++					  const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_sb_port_pool_get_req_set_dev_name(struct devlink_sb_port_pool_get_req *req,
++					  const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_sb_port_pool_get_req_set_port_index(struct devlink_sb_port_pool_get_req *req,
++					    __u32 port_index)
++{
++	req->_present.port_index = 1;
++	req->port_index = port_index;
++}
++static inline void
++devlink_sb_port_pool_get_req_set_sb_index(struct devlink_sb_port_pool_get_req *req,
++					  __u32 sb_index)
++{
++	req->_present.sb_index = 1;
++	req->sb_index = sb_index;
++}
++static inline void
++devlink_sb_port_pool_get_req_set_sb_pool_index(struct devlink_sb_port_pool_get_req *req,
++					       __u16 sb_pool_index)
++{
++	req->_present.sb_pool_index = 1;
++	req->sb_pool_index = sb_pool_index;
++}
++
++struct devlink_sb_port_pool_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 sb_index:1;
++		__u32 sb_pool_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	__u32 sb_index;
++	__u16 sb_pool_index;
++};
++
++void
++devlink_sb_port_pool_get_rsp_free(struct devlink_sb_port_pool_get_rsp *rsp);
++
++/*
++ * Get shared buffer port-pool combinations and threshold.
++ */
++struct devlink_sb_port_pool_get_rsp *
++devlink_sb_port_pool_get(struct ynl_sock *ys,
++			 struct devlink_sb_port_pool_get_req *req);
++
++/* DEVLINK_CMD_SB_PORT_POOL_GET - dump */
++struct devlink_sb_port_pool_get_list {
++	struct devlink_sb_port_pool_get_list *next;
++	struct devlink_sb_port_pool_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void
++devlink_sb_port_pool_get_list_free(struct devlink_sb_port_pool_get_list *rsp);
++
++struct devlink_sb_port_pool_get_list *
++devlink_sb_port_pool_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_SB_TC_POOL_BIND_GET ============== */
++/* DEVLINK_CMD_SB_TC_POOL_BIND_GET - do */
++struct devlink_sb_tc_pool_bind_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 sb_index:1;
++		__u32 sb_pool_type:1;
++		__u32 sb_tc_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	__u32 sb_index;
++	enum devlink_sb_pool_type sb_pool_type;
++	__u16 sb_tc_index;
++};
++
++static inline struct devlink_sb_tc_pool_bind_get_req *
++devlink_sb_tc_pool_bind_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_sb_tc_pool_bind_get_req));
++}
++void
++devlink_sb_tc_pool_bind_get_req_free(struct devlink_sb_tc_pool_bind_get_req *req);
++
++static inline void
++devlink_sb_tc_pool_bind_get_req_set_bus_name(struct devlink_sb_tc_pool_bind_get_req *req,
++					     const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_sb_tc_pool_bind_get_req_set_dev_name(struct devlink_sb_tc_pool_bind_get_req *req,
++					     const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_sb_tc_pool_bind_get_req_set_port_index(struct devlink_sb_tc_pool_bind_get_req *req,
++					       __u32 port_index)
++{
++	req->_present.port_index = 1;
++	req->port_index = port_index;
++}
++static inline void
++devlink_sb_tc_pool_bind_get_req_set_sb_index(struct devlink_sb_tc_pool_bind_get_req *req,
++					     __u32 sb_index)
++{
++	req->_present.sb_index = 1;
++	req->sb_index = sb_index;
++}
++static inline void
++devlink_sb_tc_pool_bind_get_req_set_sb_pool_type(struct devlink_sb_tc_pool_bind_get_req *req,
++						 enum devlink_sb_pool_type sb_pool_type)
++{
++	req->_present.sb_pool_type = 1;
++	req->sb_pool_type = sb_pool_type;
++}
++static inline void
++devlink_sb_tc_pool_bind_get_req_set_sb_tc_index(struct devlink_sb_tc_pool_bind_get_req *req,
++						__u16 sb_tc_index)
++{
++	req->_present.sb_tc_index = 1;
++	req->sb_tc_index = sb_tc_index;
++}
++
++struct devlink_sb_tc_pool_bind_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 sb_index:1;
++		__u32 sb_pool_type:1;
++		__u32 sb_tc_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	__u32 sb_index;
++	enum devlink_sb_pool_type sb_pool_type;
++	__u16 sb_tc_index;
++};
++
++void
++devlink_sb_tc_pool_bind_get_rsp_free(struct devlink_sb_tc_pool_bind_get_rsp *rsp);
++
++/*
++ * Get shared buffer port-TC to pool bindings and threshold.
++ */
++struct devlink_sb_tc_pool_bind_get_rsp *
++devlink_sb_tc_pool_bind_get(struct ynl_sock *ys,
++			    struct devlink_sb_tc_pool_bind_get_req *req);
++
++/* DEVLINK_CMD_SB_TC_POOL_BIND_GET - dump */
++struct devlink_sb_tc_pool_bind_get_list {
++	struct devlink_sb_tc_pool_bind_get_list *next;
++	struct devlink_sb_tc_pool_bind_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void
++devlink_sb_tc_pool_bind_get_list_free(struct devlink_sb_tc_pool_bind_get_list *rsp);
++
++struct devlink_sb_tc_pool_bind_get_list *
++devlink_sb_tc_pool_bind_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_PARAM_GET ============== */
++/* DEVLINK_CMD_PARAM_GET - do */
++struct devlink_param_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 param_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *param_name;
++};
++
++static inline struct devlink_param_get_req *devlink_param_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_param_get_req));
++}
++void devlink_param_get_req_free(struct devlink_param_get_req *req);
++
++static inline void
++devlink_param_get_req_set_bus_name(struct devlink_param_get_req *req,
++				   const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_param_get_req_set_dev_name(struct devlink_param_get_req *req,
++				   const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_param_get_req_set_param_name(struct devlink_param_get_req *req,
++				     const char *param_name)
++{
++	free(req->param_name);
++	req->_present.param_name_len = strlen(param_name);
++	req->param_name = malloc(req->_present.param_name_len + 1);
++	memcpy(req->param_name, param_name, req->_present.param_name_len);
++	req->param_name[req->_present.param_name_len] = 0;
++}
++
++struct devlink_param_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 param_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *param_name;
++};
++
++void devlink_param_get_rsp_free(struct devlink_param_get_rsp *rsp);
++
++/*
++ * Get param instances.
++ */
++struct devlink_param_get_rsp *
++devlink_param_get(struct ynl_sock *ys, struct devlink_param_get_req *req);
++
++/* DEVLINK_CMD_PARAM_GET - dump */
++struct devlink_param_get_list {
++	struct devlink_param_get_list *next;
++	struct devlink_param_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_param_get_list_free(struct devlink_param_get_list *rsp);
++
++struct devlink_param_get_list *devlink_param_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_REGION_GET ============== */
++/* DEVLINK_CMD_REGION_GET - do */
++struct devlink_region_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 region_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	char *region_name;
++};
++
++static inline struct devlink_region_get_req *devlink_region_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_region_get_req));
++}
++void devlink_region_get_req_free(struct devlink_region_get_req *req);
++
++static inline void
++devlink_region_get_req_set_bus_name(struct devlink_region_get_req *req,
++				    const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_region_get_req_set_dev_name(struct devlink_region_get_req *req,
++				    const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_region_get_req_set_port_index(struct devlink_region_get_req *req,
++				      __u32 port_index)
++{
++	req->_present.port_index = 1;
++	req->port_index = port_index;
++}
++static inline void
++devlink_region_get_req_set_region_name(struct devlink_region_get_req *req,
++				       const char *region_name)
++{
++	free(req->region_name);
++	req->_present.region_name_len = strlen(region_name);
++	req->region_name = malloc(req->_present.region_name_len + 1);
++	memcpy(req->region_name, region_name, req->_present.region_name_len);
++	req->region_name[req->_present.region_name_len] = 0;
++}
++
++struct devlink_region_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 region_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	char *region_name;
++};
++
++void devlink_region_get_rsp_free(struct devlink_region_get_rsp *rsp);
++
++/*
++ * Get region instances.
++ */
++struct devlink_region_get_rsp *
++devlink_region_get(struct ynl_sock *ys, struct devlink_region_get_req *req);
++
++/* DEVLINK_CMD_REGION_GET - dump */
++struct devlink_region_get_list {
++	struct devlink_region_get_list *next;
++	struct devlink_region_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_region_get_list_free(struct devlink_region_get_list *rsp);
++
++struct devlink_region_get_list *devlink_region_get_dump(struct ynl_sock *ys);
++
+ /* ============== DEVLINK_CMD_INFO_GET ============== */
+ /* DEVLINK_CMD_INFO_GET - do */
+ struct devlink_info_get_req {
+@@ -152,14 +806,442 @@ struct devlink_info_get_req {
+ 	char *dev_name;
+ };
+ 
+-static inline struct devlink_info_get_req *devlink_info_get_req_alloc(void)
++static inline struct devlink_info_get_req *devlink_info_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_info_get_req));
++}
++void devlink_info_get_req_free(struct devlink_info_get_req *req);
++
++static inline void
++devlink_info_get_req_set_bus_name(struct devlink_info_get_req *req,
++				  const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_info_get_req_set_dev_name(struct devlink_info_get_req *req,
++				  const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++
++struct devlink_info_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 info_driver_name_len;
++		__u32 info_serial_number_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *info_driver_name;
++	char *info_serial_number;
++	unsigned int n_info_version_fixed;
++	struct devlink_dl_info_version *info_version_fixed;
++	unsigned int n_info_version_running;
++	struct devlink_dl_info_version *info_version_running;
++	unsigned int n_info_version_stored;
++	struct devlink_dl_info_version *info_version_stored;
++};
++
++void devlink_info_get_rsp_free(struct devlink_info_get_rsp *rsp);
++
++/*
++ * Get device information, like driver name, hardware and firmware versions etc.
++ */
++struct devlink_info_get_rsp *
++devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req);
++
++/* DEVLINK_CMD_INFO_GET - dump */
++struct devlink_info_get_list {
++	struct devlink_info_get_list *next;
++	struct devlink_info_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_info_get_list_free(struct devlink_info_get_list *rsp);
++
++struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_HEALTH_REPORTER_GET ============== */
++/* DEVLINK_CMD_HEALTH_REPORTER_GET - do */
++struct devlink_health_reporter_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 health_reporter_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	char *health_reporter_name;
++};
++
++static inline struct devlink_health_reporter_get_req *
++devlink_health_reporter_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_health_reporter_get_req));
++}
++void
++devlink_health_reporter_get_req_free(struct devlink_health_reporter_get_req *req);
++
++static inline void
++devlink_health_reporter_get_req_set_bus_name(struct devlink_health_reporter_get_req *req,
++					     const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_health_reporter_get_req_set_dev_name(struct devlink_health_reporter_get_req *req,
++					     const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_health_reporter_get_req_set_port_index(struct devlink_health_reporter_get_req *req,
++					       __u32 port_index)
++{
++	req->_present.port_index = 1;
++	req->port_index = port_index;
++}
++static inline void
++devlink_health_reporter_get_req_set_health_reporter_name(struct devlink_health_reporter_get_req *req,
++							 const char *health_reporter_name)
++{
++	free(req->health_reporter_name);
++	req->_present.health_reporter_name_len = strlen(health_reporter_name);
++	req->health_reporter_name = malloc(req->_present.health_reporter_name_len + 1);
++	memcpy(req->health_reporter_name, health_reporter_name, req->_present.health_reporter_name_len);
++	req->health_reporter_name[req->_present.health_reporter_name_len] = 0;
++}
++
++struct devlink_health_reporter_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 health_reporter_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	char *health_reporter_name;
++};
++
++void
++devlink_health_reporter_get_rsp_free(struct devlink_health_reporter_get_rsp *rsp);
++
++/*
++ * Get health reporter instances.
++ */
++struct devlink_health_reporter_get_rsp *
++devlink_health_reporter_get(struct ynl_sock *ys,
++			    struct devlink_health_reporter_get_req *req);
++
++/* DEVLINK_CMD_HEALTH_REPORTER_GET - dump */
++struct devlink_health_reporter_get_list {
++	struct devlink_health_reporter_get_list *next;
++	struct devlink_health_reporter_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void
++devlink_health_reporter_get_list_free(struct devlink_health_reporter_get_list *rsp);
++
++struct devlink_health_reporter_get_list *
++devlink_health_reporter_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_TRAP_GET ============== */
++/* DEVLINK_CMD_TRAP_GET - do */
++struct devlink_trap_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 trap_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *trap_name;
++};
++
++static inline struct devlink_trap_get_req *devlink_trap_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_trap_get_req));
++}
++void devlink_trap_get_req_free(struct devlink_trap_get_req *req);
++
++static inline void
++devlink_trap_get_req_set_bus_name(struct devlink_trap_get_req *req,
++				  const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_trap_get_req_set_dev_name(struct devlink_trap_get_req *req,
++				  const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_trap_get_req_set_trap_name(struct devlink_trap_get_req *req,
++				   const char *trap_name)
++{
++	free(req->trap_name);
++	req->_present.trap_name_len = strlen(trap_name);
++	req->trap_name = malloc(req->_present.trap_name_len + 1);
++	memcpy(req->trap_name, trap_name, req->_present.trap_name_len);
++	req->trap_name[req->_present.trap_name_len] = 0;
++}
++
++struct devlink_trap_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 trap_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *trap_name;
++};
++
++void devlink_trap_get_rsp_free(struct devlink_trap_get_rsp *rsp);
++
++/*
++ * Get trap instances.
++ */
++struct devlink_trap_get_rsp *
++devlink_trap_get(struct ynl_sock *ys, struct devlink_trap_get_req *req);
++
++/* DEVLINK_CMD_TRAP_GET - dump */
++struct devlink_trap_get_list {
++	struct devlink_trap_get_list *next;
++	struct devlink_trap_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_trap_get_list_free(struct devlink_trap_get_list *rsp);
++
++struct devlink_trap_get_list *devlink_trap_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_TRAP_GROUP_GET ============== */
++/* DEVLINK_CMD_TRAP_GROUP_GET - do */
++struct devlink_trap_group_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 trap_group_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *trap_group_name;
++};
++
++static inline struct devlink_trap_group_get_req *
++devlink_trap_group_get_req_alloc(void)
  {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_sb *devlink_sb;
-@@ -2718,7 +2716,7 @@ static int devlink_nl_sb_tc_pool_bind_get_dump_one(struct sk_buff *msg,
- 		err = __sb_tc_pool_bind_get_dumpit(msg, state->idx, &idx,
- 						   devlink, devlink_sb,
- 						   NETLINK_CB(cb->skb).portid,
--						   cb->nlh->nlmsg_seq);
-+						   cb->nlh->nlmsg_seq, flags);
- 		if (err == -EOPNOTSUPP) {
- 			err = 0;
- 		} else if (err) {
-@@ -4185,7 +4183,8 @@ static void devlink_param_notify(struct devlink *devlink,
+-	return calloc(1, sizeof(struct devlink_info_get_req));
++	return calloc(1, sizeof(struct devlink_trap_group_get_req));
+ }
+-void devlink_info_get_req_free(struct devlink_info_get_req *req);
++void devlink_trap_group_get_req_free(struct devlink_trap_group_get_req *req);
  
- static int devlink_nl_param_get_dump_one(struct sk_buff *msg,
- 					 struct devlink *devlink,
--					 struct netlink_callback *cb)
-+					 struct netlink_callback *cb,
-+					 int flags)
+ static inline void
+-devlink_info_get_req_set_bus_name(struct devlink_info_get_req *req,
++devlink_trap_group_get_req_set_bus_name(struct devlink_trap_group_get_req *req,
++					const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_trap_group_get_req_set_dev_name(struct devlink_trap_group_get_req *req,
++					const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_trap_group_get_req_set_trap_group_name(struct devlink_trap_group_get_req *req,
++					       const char *trap_group_name)
++{
++	free(req->trap_group_name);
++	req->_present.trap_group_name_len = strlen(trap_group_name);
++	req->trap_group_name = malloc(req->_present.trap_group_name_len + 1);
++	memcpy(req->trap_group_name, trap_group_name, req->_present.trap_group_name_len);
++	req->trap_group_name[req->_present.trap_group_name_len] = 0;
++}
++
++struct devlink_trap_group_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 trap_group_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	char *trap_group_name;
++};
++
++void devlink_trap_group_get_rsp_free(struct devlink_trap_group_get_rsp *rsp);
++
++/*
++ * Get trap group instances.
++ */
++struct devlink_trap_group_get_rsp *
++devlink_trap_group_get(struct ynl_sock *ys,
++		       struct devlink_trap_group_get_req *req);
++
++/* DEVLINK_CMD_TRAP_GROUP_GET - dump */
++struct devlink_trap_group_get_list {
++	struct devlink_trap_group_get_list *next;
++	struct devlink_trap_group_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_trap_group_get_list_free(struct devlink_trap_group_get_list *rsp);
++
++struct devlink_trap_group_get_list *
++devlink_trap_group_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_TRAP_POLICER_GET ============== */
++/* DEVLINK_CMD_TRAP_POLICER_GET - do */
++struct devlink_trap_policer_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 trap_policer_id:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 trap_policer_id;
++};
++
++static inline struct devlink_trap_policer_get_req *
++devlink_trap_policer_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_trap_policer_get_req));
++}
++void
++devlink_trap_policer_get_req_free(struct devlink_trap_policer_get_req *req);
++
++static inline void
++devlink_trap_policer_get_req_set_bus_name(struct devlink_trap_policer_get_req *req,
++					  const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_trap_policer_get_req_set_dev_name(struct devlink_trap_policer_get_req *req,
++					  const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_trap_policer_get_req_set_trap_policer_id(struct devlink_trap_policer_get_req *req,
++						 __u32 trap_policer_id)
++{
++	req->_present.trap_policer_id = 1;
++	req->trap_policer_id = trap_policer_id;
++}
++
++struct devlink_trap_policer_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 trap_policer_id:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 trap_policer_id;
++};
++
++void
++devlink_trap_policer_get_rsp_free(struct devlink_trap_policer_get_rsp *rsp);
++
++/*
++ * Get trap policer instances.
++ */
++struct devlink_trap_policer_get_rsp *
++devlink_trap_policer_get(struct ynl_sock *ys,
++			 struct devlink_trap_policer_get_req *req);
++
++/* DEVLINK_CMD_TRAP_POLICER_GET - dump */
++struct devlink_trap_policer_get_list {
++	struct devlink_trap_policer_get_list *next;
++	struct devlink_trap_policer_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void
++devlink_trap_policer_get_list_free(struct devlink_trap_policer_get_list *rsp);
++
++struct devlink_trap_policer_get_list *
++devlink_trap_policer_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_RATE_GET ============== */
++/* DEVLINK_CMD_RATE_GET - do */
++struct devlink_rate_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 port_index:1;
++		__u32 rate_node_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 port_index;
++	char *rate_node_name;
++};
++
++static inline struct devlink_rate_get_req *devlink_rate_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_rate_get_req));
++}
++void devlink_rate_get_req_free(struct devlink_rate_get_req *req);
++
++static inline void
++devlink_rate_get_req_set_bus_name(struct devlink_rate_get_req *req,
+ 				  const char *bus_name)
  {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_param_item *param_item;
-@@ -4196,8 +4195,7 @@ static int devlink_nl_param_get_dump_one(struct sk_buff *msg,
- 		err = devlink_nl_param_fill(msg, devlink, 0, param_item,
- 					    DEVLINK_CMD_PARAM_GET,
- 					    NETLINK_CB(cb->skb).portid,
--					    cb->nlh->nlmsg_seq,
--					    NLM_F_MULTI);
-+					    cb->nlh->nlmsg_seq, flags);
- 		if (err == -EOPNOTSUPP) {
- 			err = 0;
- 		} else if (err) {
-@@ -4848,8 +4846,7 @@ int devlink_nl_region_get_doit(struct sk_buff *skb, struct genl_info *info)
- static int devlink_nl_cmd_region_get_port_dumpit(struct sk_buff *msg,
- 						 struct netlink_callback *cb,
- 						 struct devlink_port *port,
--						 int *idx,
--						 int start)
-+						 int *idx, int start, int flags)
+ 	free(req->bus_name);
+@@ -169,7 +1251,7 @@ devlink_info_get_req_set_bus_name(struct devlink_info_get_req *req,
+ 	req->bus_name[req->_present.bus_name_len] = 0;
+ }
+ static inline void
+-devlink_info_get_req_set_dev_name(struct devlink_info_get_req *req,
++devlink_rate_get_req_set_dev_name(struct devlink_rate_get_req *req,
+ 				  const char *dev_name)
  {
- 	struct devlink_region *region;
- 	int err = 0;
-@@ -4863,7 +4860,7 @@ static int devlink_nl_cmd_region_get_port_dumpit(struct sk_buff *msg,
- 					     DEVLINK_CMD_REGION_GET,
- 					     NETLINK_CB(cb->skb).portid,
- 					     cb->nlh->nlmsg_seq,
--					     NLM_F_MULTI, region);
-+					     flags, region);
- 		if (err)
- 			goto out;
- 		(*idx)++;
-@@ -4875,7 +4872,8 @@ static int devlink_nl_cmd_region_get_port_dumpit(struct sk_buff *msg,
+ 	free(req->dev_name);
+@@ -178,43 +1260,204 @@ devlink_info_get_req_set_dev_name(struct devlink_info_get_req *req,
+ 	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
+ 	req->dev_name[req->_present.dev_name_len] = 0;
+ }
++static inline void
++devlink_rate_get_req_set_port_index(struct devlink_rate_get_req *req,
++				    __u32 port_index)
++{
++	req->_present.port_index = 1;
++	req->port_index = port_index;
++}
++static inline void
++devlink_rate_get_req_set_rate_node_name(struct devlink_rate_get_req *req,
++					const char *rate_node_name)
++{
++	free(req->rate_node_name);
++	req->_present.rate_node_name_len = strlen(rate_node_name);
++	req->rate_node_name = malloc(req->_present.rate_node_name_len + 1);
++	memcpy(req->rate_node_name, rate_node_name, req->_present.rate_node_name_len);
++	req->rate_node_name[req->_present.rate_node_name_len] = 0;
++}
  
- static int devlink_nl_region_get_dump_one(struct sk_buff *msg,
- 					  struct devlink *devlink,
--					  struct netlink_callback *cb)
-+					  struct netlink_callback *cb,
-+					  int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_region *region;
-@@ -4892,8 +4890,8 @@ static int devlink_nl_region_get_dump_one(struct sk_buff *msg,
- 		err = devlink_nl_region_fill(msg, devlink,
- 					     DEVLINK_CMD_REGION_GET,
- 					     NETLINK_CB(cb->skb).portid,
--					     cb->nlh->nlmsg_seq,
--					     NLM_F_MULTI, region);
-+					     cb->nlh->nlmsg_seq, flags,
-+					     region);
- 		if (err) {
- 			state->idx = idx;
- 			return err;
-@@ -4903,7 +4901,7 @@ static int devlink_nl_region_get_dump_one(struct sk_buff *msg,
+-struct devlink_info_get_rsp {
++struct devlink_rate_get_rsp {
+ 	struct {
+ 		__u32 bus_name_len;
+ 		__u32 dev_name_len;
+-		__u32 info_driver_name_len;
+-		__u32 info_serial_number_len;
++		__u32 port_index:1;
++		__u32 rate_node_name_len;
+ 	} _present;
  
- 	xa_for_each(&devlink->ports, port_index, port) {
- 		err = devlink_nl_cmd_region_get_port_dumpit(msg, cb, port, &idx,
--							    state->idx);
-+							    state->idx, flags);
- 		if (err) {
- 			state->idx = idx;
- 			return err;
-@@ -5699,7 +5697,7 @@ int devlink_nl_trap_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 	char *bus_name;
+ 	char *dev_name;
+-	char *info_driver_name;
+-	char *info_serial_number;
+-	unsigned int n_info_version_fixed;
+-	struct devlink_dl_info_version *info_version_fixed;
+-	unsigned int n_info_version_running;
+-	struct devlink_dl_info_version *info_version_running;
+-	unsigned int n_info_version_stored;
+-	struct devlink_dl_info_version *info_version_stored;
++	__u32 port_index;
++	char *rate_node_name;
+ };
  
- static int devlink_nl_trap_get_dump_one(struct sk_buff *msg,
- 					struct devlink *devlink,
--					struct netlink_callback *cb)
-+					struct netlink_callback *cb, int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_trap_item *trap_item;
-@@ -5714,8 +5712,7 @@ static int devlink_nl_trap_get_dump_one(struct sk_buff *msg,
- 		err = devlink_nl_trap_fill(msg, devlink, trap_item,
- 					   DEVLINK_CMD_TRAP_NEW,
- 					   NETLINK_CB(cb->skb).portid,
--					   cb->nlh->nlmsg_seq,
--					   NLM_F_MULTI);
-+					   cb->nlh->nlmsg_seq, flags);
- 		if (err) {
- 			state->idx = idx;
- 			break;
-@@ -5910,7 +5907,8 @@ int devlink_nl_trap_group_get_doit(struct sk_buff *skb, struct genl_info *info)
+-void devlink_info_get_rsp_free(struct devlink_info_get_rsp *rsp);
++void devlink_rate_get_rsp_free(struct devlink_rate_get_rsp *rsp);
  
- static int devlink_nl_trap_group_get_dump_one(struct sk_buff *msg,
- 					      struct devlink *devlink,
--					      struct netlink_callback *cb)
-+					      struct netlink_callback *cb,
-+					      int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_trap_group_item *group_item;
-@@ -5926,8 +5924,7 @@ static int devlink_nl_trap_group_get_dump_one(struct sk_buff *msg,
- 		err = devlink_nl_trap_group_fill(msg, devlink, group_item,
- 						 DEVLINK_CMD_TRAP_GROUP_NEW,
- 						 NETLINK_CB(cb->skb).portid,
--						 cb->nlh->nlmsg_seq,
--						 NLM_F_MULTI);
-+						 cb->nlh->nlmsg_seq, flags);
- 		if (err) {
- 			state->idx = idx;
- 			break;
-@@ -6205,7 +6202,8 @@ int devlink_nl_trap_policer_get_doit(struct sk_buff *skb,
+ /*
+- * Get device information, like driver name, hardware and firmware versions etc.
++ * Get rate instances.
+  */
+-struct devlink_info_get_rsp *
+-devlink_info_get(struct ynl_sock *ys, struct devlink_info_get_req *req);
++struct devlink_rate_get_rsp *
++devlink_rate_get(struct ynl_sock *ys, struct devlink_rate_get_req *req);
  
- static int devlink_nl_trap_policer_get_dump_one(struct sk_buff *msg,
- 						struct devlink *devlink,
--						struct netlink_callback *cb)
-+						struct netlink_callback *cb,
-+						int flags)
- {
- 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
- 	struct devlink_trap_policer_item *policer_item;
-@@ -6220,8 +6218,7 @@ static int devlink_nl_trap_policer_get_dump_one(struct sk_buff *msg,
- 		err = devlink_nl_trap_policer_fill(msg, devlink, policer_item,
- 						   DEVLINK_CMD_TRAP_POLICER_NEW,
- 						   NETLINK_CB(cb->skb).portid,
--						   cb->nlh->nlmsg_seq,
--						   NLM_F_MULTI);
-+						   cb->nlh->nlmsg_seq, flags);
- 		if (err) {
- 			state->idx = idx;
- 			break;
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 13388665f319..47e44fb45815 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -182,7 +182,7 @@ int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
- 		devl_lock(devlink);
+-/* DEVLINK_CMD_INFO_GET - dump */
+-struct devlink_info_get_list {
+-	struct devlink_info_get_list *next;
+-	struct devlink_info_get_rsp obj __attribute__ ((aligned (8)));
++/* DEVLINK_CMD_RATE_GET - dump */
++struct devlink_rate_get_list {
++	struct devlink_rate_get_list *next;
++	struct devlink_rate_get_rsp obj __attribute__ ((aligned (8)));
+ };
  
- 		if (devl_is_registered(devlink))
--			err = dump_one(msg, devlink, cb);
-+			err = dump_one(msg, devlink, cb, NLM_F_MULTI);
- 		else
- 			err = 0;
+-void devlink_info_get_list_free(struct devlink_info_get_list *rsp);
++void devlink_rate_get_list_free(struct devlink_rate_get_list *rsp);
  
+-struct devlink_info_get_list *devlink_info_get_dump(struct ynl_sock *ys);
++struct devlink_rate_get_list *devlink_rate_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_LINECARD_GET ============== */
++/* DEVLINK_CMD_LINECARD_GET - do */
++struct devlink_linecard_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 linecard_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 linecard_index;
++};
++
++static inline struct devlink_linecard_get_req *
++devlink_linecard_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_linecard_get_req));
++}
++void devlink_linecard_get_req_free(struct devlink_linecard_get_req *req);
++
++static inline void
++devlink_linecard_get_req_set_bus_name(struct devlink_linecard_get_req *req,
++				      const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_linecard_get_req_set_dev_name(struct devlink_linecard_get_req *req,
++				      const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++static inline void
++devlink_linecard_get_req_set_linecard_index(struct devlink_linecard_get_req *req,
++					    __u32 linecard_index)
++{
++	req->_present.linecard_index = 1;
++	req->linecard_index = linecard_index;
++}
++
++struct devlink_linecard_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++		__u32 linecard_index:1;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++	__u32 linecard_index;
++};
++
++void devlink_linecard_get_rsp_free(struct devlink_linecard_get_rsp *rsp);
++
++/*
++ * Get line card instances.
++ */
++struct devlink_linecard_get_rsp *
++devlink_linecard_get(struct ynl_sock *ys, struct devlink_linecard_get_req *req);
++
++/* DEVLINK_CMD_LINECARD_GET - dump */
++struct devlink_linecard_get_list {
++	struct devlink_linecard_get_list *next;
++	struct devlink_linecard_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_linecard_get_list_free(struct devlink_linecard_get_list *rsp);
++
++struct devlink_linecard_get_list *
++devlink_linecard_get_dump(struct ynl_sock *ys);
++
++/* ============== DEVLINK_CMD_SELFTESTS_GET ============== */
++/* DEVLINK_CMD_SELFTESTS_GET - do */
++struct devlink_selftests_get_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++};
++
++static inline struct devlink_selftests_get_req *
++devlink_selftests_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_selftests_get_req));
++}
++void devlink_selftests_get_req_free(struct devlink_selftests_get_req *req);
++
++static inline void
++devlink_selftests_get_req_set_bus_name(struct devlink_selftests_get_req *req,
++				       const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_selftests_get_req_set_dev_name(struct devlink_selftests_get_req *req,
++				       const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++
++struct devlink_selftests_get_rsp {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++};
++
++void devlink_selftests_get_rsp_free(struct devlink_selftests_get_rsp *rsp);
++
++/*
++ * Get device selftest instances.
++ */
++struct devlink_selftests_get_rsp *
++devlink_selftests_get(struct ynl_sock *ys,
++		      struct devlink_selftests_get_req *req);
++
++/* DEVLINK_CMD_SELFTESTS_GET - dump */
++struct devlink_selftests_get_list {
++	struct devlink_selftests_get_list *next;
++	struct devlink_selftests_get_rsp obj __attribute__ ((aligned (8)));
++};
++
++void devlink_selftests_get_list_free(struct devlink_selftests_get_list *rsp);
++
++struct devlink_selftests_get_list *
++devlink_selftests_get_dump(struct ynl_sock *ys);
+ 
+ #endif /* _LINUX_DEVLINK_GEN_H */
 -- 
 2.41.0
 
