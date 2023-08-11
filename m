@@ -1,60 +1,47 @@
-Return-Path: <netdev+bounces-26738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3240778BB6
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:16:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7299F778BDB
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58388282129
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:16:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2D331C20CB8
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9AA6FC8;
-	Fri, 11 Aug 2023 10:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130726FC9;
+	Fri, 11 Aug 2023 10:19:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8086D22
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:16:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C666C433C7;
-	Fri, 11 Aug 2023 10:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1691749006;
-	bh=p0874zC3P/4HkNA+wVRJkLg0l75K8zpw30iVncdc3hA=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D1C6FA1
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:19:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A05D7C433C7;
+	Fri, 11 Aug 2023 10:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691749194;
+	bh=E04nCDCoEElo4GIeU5ymaI8EKIYj8gGmoaOYtAc6NpE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZnbEJxBBvvyRVrrgqaUgZZHjXTQaaVvRcmnG+Kw6tY0jW8JMLnEntCAan1/Jv/IwK
-	 7S2gJZ1TdIKGrRy6ZexEARpp7JOigKWp2EyHIPnSQm30nHkGgawvRoW4h7JlKMa6bW
-	 B9VZPDYj7V1mJVZxUoasRspo2Tk97FQH9M1olZHQ=
-Date: Fri, 11 Aug 2023 12:16:44 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Oleksii_Moisieiev@epam.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
-	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
-	mchehab@kernel.org, fabrice.gasnier@foss.st.com,
-	andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
-	lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
-	arnd@kernel.org, richardcochran@gmail.com,
-	Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [IGNORE][PATCH v4 01/11] dt-bindings: Document common device
- controller bindings
-Message-ID: <2023081117-sprout-cruncher-862c@gregkh>
-References: <20230811100731.108145-1-gatien.chevallier@foss.st.com>
- <20230811100731.108145-2-gatien.chevallier@foss.st.com>
+	b=cqiguNGyppu7QC5FxvDPyIzXVoXA8vHP4LuAQz4VVya+3nJRE8kHhTnrrVmOG5yWm
+	 dsl3ID3HJ4gbutI7smEsYhlsbHysYlqPIR9HZ0rwGxMbc0a5x4twydhjxvGKhb9Stg
+	 xO0nTtTbEuiasoDfrqs03iDsiuYydqOVRMlWjpCnTmwN9+J8ggab4/0ZstxOoImjzs
+	 7yUsYkr0nJRDI22VItjwTLtu8XkYsuYcqqDL1bOZr5jmwYsT1aQEkmandKjx+0wEkB
+	 Cee1GQsgHOJsodzFOWDtDwTXDbmfEfyFpykLaJjpGB2HQRYMw+s6Ddfmd+Y9/XVFHK
+	 m6Zx+uURpgCCQ==
+Date: Fri, 11 Aug 2023 12:19:50 +0200
+From: Simon Horman <horms@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 07/17] nvme-tcp: allocate socket file
+Message-ID: <ZNYLRqZVjr5o3bst@vergenet.net>
+References: <20230810150630.134991-1-hare@suse.de>
+ <20230810150630.134991-8-hare@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,28 +50,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230811100731.108145-2-gatien.chevallier@foss.st.com>
+In-Reply-To: <20230810150630.134991-8-hare@suse.de>
 
-On Fri, Aug 11, 2023 at 12:07:21PM +0200, Gatien Chevallier wrote:
-> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+On Thu, Aug 10, 2023 at 05:06:20PM +0200, Hannes Reinecke wrote:
+> When using the TLS upcall we need to allocate a socket file such
+> that the userspace daemon is able to use the socket.
 > 
-> Introducing of the common device controller bindings for the controller
-> provider and consumer devices. Those bindings are intended to allow
-> divided system on chip into multiple domains, that can be used to
-> configure hardware permissions.
-> 
-> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
-> [Gatien: Fix typos and YAML error]
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
-> 
-> Changes in V4: 
-> 	Corrected typos and YAML errors	
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 
-Why are we supposed to ignore the first patch in this series, but pay
-attention to the 10 after this that depend on it?
+...
 
-totally confused,
+> @@ -1512,6 +1514,7 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
+>  	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
+>  	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
+>  	int ret, rcv_pdu_size;
+> +	struct file *sock_file;
+>  
+>  	mutex_init(&queue->queue_lock);
+>  	queue->ctrl = ctrl;
+> @@ -1534,6 +1537,13 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
+>  		goto err_destroy_mutex;
+>  	}
+>  
+> +	sock_file = sock_alloc_file(queue->sock, O_CLOEXEC, NULL);
+> +	if (IS_ERR(sock_file)) {
+> +		sock_release(queue->sock);
 
-greg k-h
+Hi Hannes,
+
+Is it correct to call sock_release() here?
+sock_alloc_file() already does so on error.
+
+Flagged by Smatch.
+
+> +		queue->sock = NULL;
+> +		ret = PTR_ERR(sock_file);
+> +		goto err_destroy_mutex;
+> +	}
+>  	nvme_tcp_reclassify_socket(queue->sock);
+>  
+>  	/* Single syn retry */
+
+...
 
