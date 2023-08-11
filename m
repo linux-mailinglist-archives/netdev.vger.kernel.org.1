@@ -1,238 +1,210 @@
-Return-Path: <netdev+bounces-26805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D240778FE9
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 14:52:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01121779056
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:08:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50C0D28223C
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:52:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1201282176
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 13:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F176C63B3;
-	Fri, 11 Aug 2023 12:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7356FDC;
+	Fri, 11 Aug 2023 13:08:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E266BA46
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 12:52:10 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F902696;
-	Fri, 11 Aug 2023 05:52:09 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6877eb31261so1412452b3a.1;
-        Fri, 11 Aug 2023 05:52:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691758328; x=1692363128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KbKJe2tEe/lB5NizJfxNPF+lCmWbaQQ8/etXP32dMGg=;
-        b=JZQY58hTx7UZ43EjBbTuSgw/ldGdUuDETy35lBvfcATVxUP/7MMSOchj7/cYCMZtdl
-         JJlmZcWDclNWZ2jhAGQXMRrMifXeJLpZIIahMNHiY+GeIObRzuSLii9UMypJhjB5MNli
-         a1yp7l4ydf1Wk1oJmA/ROiFJLxN0leVH62Tqp6O/kcDtG32451Qoc6ZHN5Sy71MUiQ/K
-         1IyZESCqfUG9C0W+Q5VV9u/vDlTSiebeM076DfgkMNBGOLv5A1113/3l58Yx8A1u2Hsh
-         bRQN/eOKEYOCjRkw4LrfTdSbOoahFcIjA12X5d3ochHm+FRtsH9ynrzlGqKlev4YD7uM
-         +2BA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB73063B3
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 13:08:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA114205
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:07:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691759257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ai7RARy0GvFTKbJLxGWvhy53DloW1hW+vR5xgBFmeS8=;
+	b=PYmUKjEYErKly/jXul0FYVk73ogU/yBqyoCrNORH5r/9eyVcz/zCSUTArSCQ8vqFjij9/m
+	cJihcvpcBj2x3QR3EelRQ/8/1CGt2vSHBpjq5L3vMfeeyDFR27dSTrNEcHrzbSgweE/KIF
+	7p1q96br11KCap64Wybr1fMMNDZYNWc=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-323-swl-igHVPI-EYItEqfzOgQ-1; Fri, 11 Aug 2023 09:07:35 -0400
+X-MC-Unique: swl-igHVPI-EYItEqfzOgQ-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-40fc220d343so24016571cf.0
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:07:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691758328; x=1692363128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KbKJe2tEe/lB5NizJfxNPF+lCmWbaQQ8/etXP32dMGg=;
-        b=Dmz7ZmatFVGNZZ6o4CG9sS09A4/htKURaCgWEBQC9Vok2CBHSYyGaJSAxnRY6O0gHf
-         N46JZQyMPC1uHH3kDzeeBO5+H0Ig8RkxOsGbedMJ+WSU9TxgobvQc7KB5J1vW0w22mfQ
-         lwpGZd2UNECGhKAqnMnNnBvnXoRG9whdJJs/3moccilHUp28v7jJd5tgsniiK9MlrlB3
-         NB06vQPU9+lNnLR3RcAd4EJWcZ24xS2DZcqnL+9LIgJkqNRkrkUaVWFzU0ow5yY9ZpDX
-         Rfh475UDsdTzRoittqbmEXyLy8eK/ni84pZSjhzMljRzva8+TPbwHLeHcOAeVu7oVrei
-         sfrQ==
-X-Gm-Message-State: AOJu0Yw0u0zLppOrfLXJ3iWGbQSEkmzLIjs7b6gD86LZ5DRxp5cnSTdO
-	QP+UrZEykzCVMfaN95VaC1Q=
-X-Google-Smtp-Source: AGHT+IEYLAU/icss22mnR69KwGu2yTOnUC8KZ+3hUTw336+X0NC7us98dUOT1vIwuGYtu5MnQtEQag==
-X-Received: by 2002:a05:6a20:1595:b0:13d:7aa3:aa72 with SMTP id h21-20020a056a20159500b0013d7aa3aa72mr1993967pzj.5.1691758328438;
-        Fri, 11 Aug 2023 05:52:08 -0700 (PDT)
-Received: from localhost.localdomain ([198.211.45.220])
-        by smtp.googlemail.com with ESMTPSA id t12-20020a1709028c8c00b001b9d88a4d1asm3796694plo.289.2023.08.11.05.51.57
+        d=1e100.net; s=20221208; t=1691759255; x=1692364055;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ai7RARy0GvFTKbJLxGWvhy53DloW1hW+vR5xgBFmeS8=;
+        b=SHqd4A3ymlKINEpmv7mpnKU8FOhh6quq6meWuYgK5EekcU0rVhwxk8drA2qWnXYS6n
+         +EIx0D4HhUvyfuGwJBZyoGS7beYlFLbddcH4HBFConLRbFAwxudSAUW9QJEXuWfY03Yq
+         486nKkBn3FRtAiqyvr5IkvhoSa3codzUJlMN77hsXbIYt1CpgZeFgvMbWEUmbJHepzJl
+         6x0w08J52pitp8GDpFUC11UFtZpbqShZLI1gvH07z1Ftj/5bNuHzvIb8GzrXKFioVEQo
+         ylPwDeV6j7hlG9/5+IWXkoTsp9s/4jS6Q84y9oL+EwbjlZu/3/g1P9afxit41ufxOzWQ
+         HARQ==
+X-Gm-Message-State: AOJu0YwV+TTpu/7QiyUIpaOKh6AOHtsTgrohqUJ6k3AmCI3VYlnSVepu
+	x2L+bRyhavwjJgMK8uolLENXLMTQYZCF4DVBF6ptijd/HhgaSHMc7qzwqO3XvCthqxqVyzA7SE5
+	dfcjYEDc/OBgOpvUY
+X-Received: by 2002:a05:622a:87:b0:403:af80:2ac0 with SMTP id o7-20020a05622a008700b00403af802ac0mr2404819qtw.1.1691759254939;
+        Fri, 11 Aug 2023 06:07:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwZyMEfgorr/nuxhQV6T9odES4XX4L/rCdHOeXynmVcva+OcX4DaJoc8RVk2UsmmAMNnJ0hw==
+X-Received: by 2002:a05:622a:87:b0:403:af80:2ac0 with SMTP id o7-20020a05622a008700b00403af802ac0mr2404788qtw.1.1691759254632;
+        Fri, 11 Aug 2023 06:07:34 -0700 (PDT)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id kk12-20020a05622a2c0c00b0040ff2f2f172sm1167192qtb.38.2023.08.11.06.07.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 05:52:07 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1 1/1] net: stmmac: xgmac: show more MAC HW features in debugfs
-Date: Fri, 11 Aug 2023 20:51:39 +0800
-Message-Id: <20230811125139.284272-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 11 Aug 2023 06:07:34 -0700 (PDT)
+Date: Fri, 11 Aug 2023 08:07:31 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v3 0/9] arm64: dts: qcom: enable EMAC1 on sa8775p
+Message-ID: <shclvmt6icvski4z2tkzi77wdqgek7lbjfo32m5v4qtsexutp7@txdejlevvqjr>
+References: <20230810080909.6259-1-brgl@bgdev.pl>
+ <j57dowviaas552jt6fdynyowkwm6j6xjc5ixjdk2v4nn4doibn@qnr47drkhljp>
+ <CAMRc=Md4UR=KdS716GTQ0+34NR4S5QDBM0HAoxj59=Y5G13L3A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CAMRc=Md4UR=KdS716GTQ0+34NR4S5QDBM0HAoxj59=Y5G13L3A@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-1. Show TSSTSSEL(Timestamp System Time Source),
-ADDMACADRSEL(additional MAC addresses), SMASEL(SMA/MDIO Interface),
-HDSEL(Half-duplex Support) in debugfs.
-2. Show exact number of additional MAC address registers for XGMAC2 core.
-3. XGMAC2 core does not have different IP checksum offload types, so just
-show rx_coe instead of rx_coe_type1 or rx_coe_type2.
-4. XGMAC2 core does not have rxfifo_over_2048 definition, skip it.
+On Fri, Aug 11, 2023 at 02:00:21PM +0200, Bartosz Golaszewski wrote:
+> On Thu, Aug 10, 2023 at 10:13 PM Andrew Halaney <ahalaney@redhat.com> wrote:
+> >
+> > On Thu, Aug 10, 2023 at 10:09:00AM +0200, Bartosz Golaszewski wrote:
+> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > >
+> > > This series contains changes required to enable EMAC1 on sa8775p-ride.
+> > > This iteration no longer depends on any changes to the stmmac driver to
+> > > be functional. It turns out I was mistaken in thinking that the two
+> > > MACs' MDIO masters share the MDIO clock and data lines. In reality, only
+> > > one MAC is connected to an MDIO bus and it controlls PHYs for both MAC0
+> > > and MAC1. The MDIO master on MAC1 is not connected to anything.
+> > >
+> >
+> > I've taken this for a quick (disconnected from network) spin, and things
+> > work as expected without having anything plugged in.
+> >
+> > I'm trying to get someone to plug it in so I can test that networking
+> > actually works, but the interesting bit is the phy/mdio bit here, and
+> > that's at least working ok I can tell. The rest is boilerplate similar
+> > to the other MAC instance which works fine.
+> >
+> > Removing the driver results in the following oops, but that's already
+> > discussed[0] and is independent of the devicetree description:
+> >
+> > I'd add a test tag but I want to wait for some network traffic tests
+> > before I do such. I wouldn't wait on picking it up just because of
+> > that though.
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/common.h  |  2 ++
- .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  4 +++
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  6 ++++-
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++++++++++----
- 4 files changed, 31 insertions(+), 6 deletions(-)
+I got it plugged in :)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index 16e67c18b6f7..b37f2f6b2229 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -434,6 +434,8 @@ struct dma_features {
- 	unsigned int tbssel;
- 	/* Numbers of Auxiliary Snapshot Inputs */
- 	unsigned int aux_snapshot_n;
-+	/* Timestamp System Time Source */
-+	unsigned int tssrc;
- };
- 
- /* RX Buffer size must be multiple of 4/8/16 bytes */
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 1913385df685..a00398674015 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -111,6 +111,8 @@
- #define XGMAC_LPI_TIMER_CTRL		0x000000d4
- #define XGMAC_HW_FEATURE0		0x0000011c
- #define XGMAC_HWFEAT_SAVLANINS		BIT(27)
-+#define XGMAC_HWFEAT_TSSTSSEL		GENMASK(26, 25)
-+#define XGMAC_HWFEAT_ADDMACADRSEL	GENMASK(22, 18)
- #define XGMAC_HWFEAT_RXCOESEL		BIT(16)
- #define XGMAC_HWFEAT_TXCOESEL		BIT(14)
- #define XGMAC_HWFEAT_EEESEL		BIT(13)
-@@ -121,7 +123,9 @@
- #define XGMAC_HWFEAT_MMCSEL		BIT(8)
- #define XGMAC_HWFEAT_MGKSEL		BIT(7)
- #define XGMAC_HWFEAT_RWKSEL		BIT(6)
-+#define XGMAC_HWFEAT_SMASEL		BIT(5)
- #define XGMAC_HWFEAT_VLHASH		BIT(4)
-+#define XGMAC_HWFEAT_HDSEL		BIT(3)
- #define XGMAC_HWFEAT_GMIISEL		BIT(1)
- #define XGMAC_HW_FEATURE1		0x00000120
- #define XGMAC_HWFEAT_L3L4FNUM		GENMASK(30, 27)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-index 070bd912580b..6d6abc3ddb53 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-@@ -389,9 +389,11 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
- {
- 	u32 hw_cap;
- 
--	/*  MAC HW feature 0 */
-+	/* MAC HW feature 0 */
- 	hw_cap = readl(ioaddr + XGMAC_HW_FEATURE0);
- 	dma_cap->vlins = (hw_cap & XGMAC_HWFEAT_SAVLANINS) >> 27;
-+	dma_cap->tssrc = (hw_cap & XGMAC_HWFEAT_TSSTSSEL) >> 25;
-+	dma_cap->multi_addr = (hw_cap & XGMAC_HWFEAT_ADDMACADRSEL) >> 18;
- 	dma_cap->rx_coe = (hw_cap & XGMAC_HWFEAT_RXCOESEL) >> 16;
- 	dma_cap->tx_coe = (hw_cap & XGMAC_HWFEAT_TXCOESEL) >> 14;
- 	dma_cap->eee = (hw_cap & XGMAC_HWFEAT_EEESEL) >> 13;
-@@ -402,7 +404,9 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
- 	dma_cap->rmon = (hw_cap & XGMAC_HWFEAT_MMCSEL) >> 8;
- 	dma_cap->pmt_magic_frame = (hw_cap & XGMAC_HWFEAT_MGKSEL) >> 7;
- 	dma_cap->pmt_remote_wake_up = (hw_cap & XGMAC_HWFEAT_RWKSEL) >> 6;
-+	dma_cap->sma_mdio = (hw_cap & XGMAC_HWFEAT_SMASEL) >> 5;
- 	dma_cap->vlhash = (hw_cap & XGMAC_HWFEAT_VLHASH) >> 4;
-+	dma_cap->half_duplex = (hw_cap & XGMAC_HWFEAT_HDSEL) >> 3;
- 	dma_cap->mbps_1000 = (hw_cap & XGMAC_HWFEAT_GMIISEL) >> 1;
- 
- 	/* MAC HW feature 1 */
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 4727f7be4f86..2d627640cc60 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6174,6 +6174,12 @@ DEFINE_SHOW_ATTRIBUTE(stmmac_rings_status);
- 
- static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
- {
-+	static const char * const dwxgmac_timestamp_source[] = {
-+		"None",
-+		"Internal",
-+		"External",
-+		"Both",
-+	};
- 	struct net_device *dev = seq->private;
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 
-@@ -6194,8 +6200,13 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
- 		   (priv->dma_cap.half_duplex) ? "Y" : "N");
- 	seq_printf(seq, "\tHash Filter: %s\n",
- 		   (priv->dma_cap.hash_filter) ? "Y" : "N");
--	seq_printf(seq, "\tMultiple MAC address registers: %s\n",
--		   (priv->dma_cap.multi_addr) ? "Y" : "N");
-+	if (priv->plat->has_xgmac)
-+		seq_printf(seq,
-+			   "\tNumber of Additional MAC address registers: %d\n",
-+			   priv->dma_cap.multi_addr);
-+	else
-+		seq_printf(seq, "\tMultiple MAC address registers: %s\n",
-+			   (priv->dma_cap.multi_addr) ? "Y" : "N");
- 	seq_printf(seq, "\tPCS (TBI/SGMII/RTBI PHY interfaces): %s\n",
- 		   (priv->dma_cap.pcs) ? "Y" : "N");
- 	seq_printf(seq, "\tSMA (MDIO) Interface: %s\n",
-@@ -6210,12 +6221,16 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
- 		   (priv->dma_cap.time_stamp) ? "Y" : "N");
- 	seq_printf(seq, "\tIEEE 1588-2008 Advanced Time Stamp: %s\n",
- 		   (priv->dma_cap.atime_stamp) ? "Y" : "N");
-+	if (priv->plat->has_xgmac)
-+		seq_printf(seq, "\tTimestamp System Time Source: %s\n",
-+			   dwxgmac_timestamp_source[priv->dma_cap.tssrc]);
- 	seq_printf(seq, "\t802.3az - Energy-Efficient Ethernet (EEE): %s\n",
- 		   (priv->dma_cap.eee) ? "Y" : "N");
- 	seq_printf(seq, "\tAV features: %s\n", (priv->dma_cap.av) ? "Y" : "N");
- 	seq_printf(seq, "\tChecksum Offload in TX: %s\n",
- 		   (priv->dma_cap.tx_coe) ? "Y" : "N");
--	if (priv->synopsys_id >= DWMAC_CORE_4_00) {
-+	if (priv->synopsys_id >= DWMAC_CORE_4_00 ||
-+	    priv->plat->has_xgmac) {
- 		seq_printf(seq, "\tIP Checksum Offload in RX: %s\n",
- 			   (priv->dma_cap.rx_coe) ? "Y" : "N");
- 	} else {
-@@ -6223,9 +6238,9 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
- 			   (priv->dma_cap.rx_coe_type1) ? "Y" : "N");
- 		seq_printf(seq, "\tIP Checksum Offload (type2) in RX: %s\n",
- 			   (priv->dma_cap.rx_coe_type2) ? "Y" : "N");
-+		seq_printf(seq, "\tRXFIFO > 2048bytes: %s\n",
-+			   (priv->dma_cap.rxfifo_over_2048) ? "Y" : "N");
- 	}
--	seq_printf(seq, "\tRXFIFO > 2048bytes: %s\n",
--		   (priv->dma_cap.rxfifo_over_2048) ? "Y" : "N");
- 	seq_printf(seq, "\tNumber of Additional RX channel: %d\n",
- 		   priv->dma_cap.number_rx_channel);
- 	seq_printf(seq, "\tNumber of Additional TX channel: %d\n",
--- 
-2.34.1
+Things work as expected, throughput seems to be ~950 Mbps and latency is
+good. Thanks!
+
+Tested-by: Andrew Halaney <ahalaney@redhat.com>
+
+> >
+> > [0] https://lore.kernel.org/netdev/ZNKLjuxnR2+V3g1D@shell.armlinux.org.uk/
+> >
+> > [root@dhcp19-243-28 ~]# modprobe -r dwmac_qcom_ethqos
+> > [ 1260.620402] qcom-ethqos 23040000.ethernet eth1: stmmac_dvr_remove: removing driver
+> > [ 1260.655724] qcom-ethqos 23040000.ethernet eth1: FPE workqueue stop
+> > [ 1261.034265] qcom-ethqos 23000000.ethernet eth0: stmmac_dvr_remove: removing driver
+> > [ 1261.042108] Unable to handle kernel paging request at virtual address dead000000000122
+> > [ 1261.050379] Mem abort info:
+> > [ 1261.053251]   ESR = 0x0000000096000044
+> > [ 1261.057113]   EC = 0x25: DABT (current EL), IL = 32 bits
+> > [ 1261.062573]   SET = 0, FnV = 0
+> > [ 1261.065712]   EA = 0, S1PTW = 0
+> > [ 1261.068946]   FSC = 0x04: level 0 translation fault
+> > [ 1261.073956] Data abort info:
+> > [ 1261.076916]   ISV = 0, ISS = 0x00000044, ISS2 = 0x00000000
+> > [ 1261.082552]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
+> > [ 1261.087882]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> > [ 1261.093338] [dead000000000122] address between user and kernel address ranges
+> > [ 1261.100667] Internal error: Oops: 0000000096000044 [#1] PREEMPT SMP
+> > [ 1261.107096] Modules linked in: r8152 rfkill marvell dwmac_qcom_ethqos(-) qcom_pon stmmac_platform crct10dif_ce stmmac spi_geni_qcom i2c_qcom_geni phy_qcom_qmp_usb phy_qcom_sgmii_eth phy_qcom_snps_femto_v2 pcs_xpcs qcom_wdt socinfo phy_qcom_qmp_pcie fuse ufs_qcom phy_qcom_qmp_ufs
+> > [ 1261.132407] CPU: 2 PID: 610 Comm: modprobe Not tainted 6.5.0-rc4-next-20230731-00008-g18ccccee8230 #7
+> > [ 1261.141860] Hardware name: Qualcomm SA8775P Ride (DT)
+> > [ 1261.147042] pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> > [ 1261.154185] pc : device_link_put_kref+0x44/0x110
+> > [ 1261.158926] lr : device_link_put_kref+0xf4/0x110
+> > [ 1261.163662] sp : ffff800082a938e0
+> > [ 1261.167066] x29: ffff800082a938e0 x28: ffff6ec68bdc9d80 x27: 0000000000000000
+> > [ 1261.174390] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+> > [ 1261.181714] x23: ffff800082a93b38 x22: ffff6ec68690f2d8 x21: ffff6ec6896aed30
+> > [ 1261.189031] x20: ffff6ec68246b830 x19: ffff6ec68246b800 x18: 0000000000000006
+> > [ 1261.196355] x17: ffff9259b7856000 x16: ffffdc7b42e3eaec x15: 725f7276645f6361
+> > [ 1261.203679] x14: 0000000000000000 x13: 0000000000000002 x12: 0000000000000000
+> > [ 1261.210996] x11: 0000000000000040 x10: ffffdc7b447de0b0 x9 : ffffdc7b447de0a8
+> > [ 1261.218321] x8 : ffff6ec680400028 x7 : 0000000000000000 x6 : 0000000000000000
+> > [ 1261.225645] x5 : ffff6ec680400000 x4 : 00000000c0000000 x3 : ffff6ec6896ae8b0
+> > [ 1261.232963] x2 : dead000000000122 x1 : dead000000000122 x0 : ffff6ec68246b830
+> > [ 1261.240287] Call trace:
+> > [ 1261.242806]  device_link_put_kref+0x44/0x110
+> > [ 1261.247190]  device_link_del+0x30/0x48
+> > [ 1261.251040]  phy_detach+0x24/0x15c
+> > [ 1261.254530]  phy_disconnect+0x44/0x5c
+> > [ 1261.258295]  phylink_disconnect_phy+0x64/0xb0
+> > [ 1261.262764]  stmmac_release+0x58/0x2d4 [stmmac]
+> > [ 1261.267425]  __dev_close_many+0xac/0x14c
+> > [ 1261.271458]  dev_close_many+0x88/0x134
+> > [ 1261.275308]  unregister_netdevice_many_notify+0x130/0x7d0
+> > [ 1261.280852]  unregister_netdevice_queue+0xd4/0xdc
+> > [ 1261.285682]  unregister_netdev+0x24/0x38
+> > [ 1261.289715]  stmmac_dvr_remove+0x80/0x150 [stmmac]
+> > [ 1261.294636]  devm_stmmac_pltfr_remove+0x24/0x48 [stmmac_platform]
+> > [ 1261.300887]  devm_action_release+0x14/0x20
+> > [ 1261.305090]  devres_release_all+0xa0/0x100
+> > [ 1261.309293]  device_unbind_cleanup+0x18/0x68
+> > [ 1261.313676]  device_release_driver_internal+0x1f4/0x228
+> > [ 1261.319039]  driver_detach+0x4c/0x98
+> > [ 1261.322708]  bus_remove_driver+0x6c/0xbc
+> > [ 1261.326739]  driver_unregister+0x30/0x60
+> > [ 1261.330772]  platform_driver_unregister+0x14/0x20
+> > [ 1261.335603]  qcom_ethqos_driver_exit+0x18/0x1a8 [dwmac_qcom_ethqos]
+> > [ 1261.342035]  __arm64_sys_delete_module+0x19c/0x288
+> > [ 1261.346952]  invoke_syscall+0x48/0x110
+> > [ 1261.350804]  el0_svc_common.constprop.0+0xc4/0xe4
+> > [ 1261.355636]  do_el0_svc+0x38/0x94
+> > [ 1261.359040]  el0_svc+0x2c/0x84
+> > [ 1261.362178]  el0t_64_sync_handler+0x120/0x12c
+> > [ 1261.366646]  el0t_64_sync+0x190/0x194
+> > [ 1261.370413] Code: d2802441 aa1403e0 f2fbd5a1 f9000462 (f9000043)
+> > [ 1261.376661] ---[ end trace 0000000000000000 ]---
+> > Segmentation fault
+> >
+> 
+> Yep. This is a very deep problem and will be the same for any MAC
+> reaching into another MAC's node to get its PHY's phandle. :(
+> 
+> Bart
+> 
 
 
