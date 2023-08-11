@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-26852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CEE3779391
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:57:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B958C779392
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:57:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB11E282227
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:57:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAB7E1C216B7
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0099F2AB50;
-	Fri, 11 Aug 2023 15:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1487F2AB5A;
+	Fri, 11 Aug 2023 15:57:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1065692
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:57:20 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AA94270F
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:18 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fe2048c910so19183095e9.1
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095F05692
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:57:23 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4EA12723
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:19 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3fe167d4a18so19639495e9.0
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:57:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691769436; x=1692374236;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=H6ude95TTG8bPb51iCiKbHfIBzK+PtXWCvCjnwGJf2E=;
-        b=P4rNfgBIc+6qiD5ouwSzJy1jD++wmSlcQwGMq7UFtbQLAU2e86MsIG+LjLjbq2pA1U
-         H3gd/McXFB5r00n16oWtaPZU3yq/k/UhA9ZWHb3QfHjiFurekv6vtZabfVUm+1IvdKdE
-         jZJ9JkAAFxBGccGhYga1LD+nMHyWMyg02mZQTzN6ypaMfwzr4HHrWf5aw6okNmRwQSUN
-         LHXv2hBI+i1DgmEp+EvQGSKSXl7QZ6iR26UglUpwlGPqBnD/N5ab6h/2rd98Mvxw3Yue
-         TcKsvRyX3zKAgP2jr6K7gwb4LLCWCnahsFLGMMEQZj2N1OPVkGGMME59fsc0Vtdmf+o9
-         SY4w==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691769438; x=1692374238;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YS4maoKCErTkiOhuvBGkMIGUBJDDkZ9nPNgJbvrjAc0=;
+        b=aa448WhC7qRalSpdQn+hn4us7Y3xD+kMjobOUwr3H109cSlefCiA+yMpIY1jEpMKtr
+         yippgctxsu/rQ6Ayvz9PaT0JkSzx0hhXY4+BJtbYKUuHQ63CJgSwxN6LKkdeVgi2ojLe
+         kEScY4aeQrhLHylyf5JdTfQe1E9D1mPh/1mUCvA5zXa4na6My+jA3Z7GGG4GhkzyY9/C
+         T1ZWAW7Siv/524BuP1RGepydwhoFjXbaiPFO+/p3pQtyDBJNCHdigHforVQsvnZFmTMr
+         XHE9sUFZ+7cHlrr6wktJ+ORc7PlUQ+3hGbOLN6jmtv96C04s5Qr57Zoiq5GTOp90EFy4
+         yUAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691769436; x=1692374236;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H6ude95TTG8bPb51iCiKbHfIBzK+PtXWCvCjnwGJf2E=;
-        b=fgtWg5LXJfvJHcrMYeVvnyDseTz2godREtLkp0RDn3i6qCsxxFiGQYikiTW5Hkg8SQ
-         v50dwUlB6MDukKKN65LgjNLjgMn7zoNCF1X1ceoteLBzn357tzA22nS7IkHOek/8oUFM
-         AgnLbz8EQwMlYUM30Alb/6mjn76RHlIxUcG7HiAuT9HrKH0U6kNaC7suRHdC5N9eXAc3
-         MO5EOM5MCVSe95qrx7B6JQcL3AdKIeDKfAw5klKxtOK1yT+22iB/zj/RM/MICmSDgBqF
-         LEhckECk3obJn8PNgfepCX4KPkQwImgPftXF5HmzREZQVwDX0BXGGC0T3tHgtQyzkCK0
-         Itgg==
-X-Gm-Message-State: AOJu0YwxNpEGVgf49oF5Rnfoe7EvTtOLPQBfH4WWrm0CCEc8RvVJV0Tw
-	mdT5geLfaO5PjJQF+2EMY9oSOBoX1mv6frvg1zXZqw==
-X-Google-Smtp-Source: AGHT+IFbO8kRNv8EoX3QJpO5qY2FNjgdLTS3VgsiqhHYLTJ8l02o+oqg74lUfWj+dVZiR/leIaHiXA==
-X-Received: by 2002:a7b:cd97:0:b0:3fe:4900:db95 with SMTP id y23-20020a7bcd97000000b003fe4900db95mr2019892wmj.37.1691769436443;
-        Fri, 11 Aug 2023 08:57:16 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691769438; x=1692374238;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YS4maoKCErTkiOhuvBGkMIGUBJDDkZ9nPNgJbvrjAc0=;
+        b=AGBhEN3xsGFsNndF504b1ELoMZ2EJW30jUSgW9FmQm8hNqY7FXjBY73/79TzWCOFiE
+         EKrbuHlY0Wf07xwwheWPCFRbyj7HOAYEDLL08TeDxJPjxe1NR/dxXLi/WbeSFojB1GvL
+         Tfy6VZeJiX4xZ8Trkn1e+1A5qmbLJIcWeSH1YzhzeH1ptreuOdI8feBcp3ij/j3ZsekJ
+         ROj0ggez4Bnn6W80DOwkTxDmHQKpcZDnVvrbjVnKRTpw/BOH8CRKpGivhj+VrZHv3xEV
+         1IIfw0gGfXidBQNytf9BwmAvJe5KTL56CgHVCYYH2lPTXheyDhsakLDko6g0NocXf4OI
+         5SgA==
+X-Gm-Message-State: AOJu0YzY6F0uTjtvcPiOmayvYgrV7zLrexAaGyr6Q8glOkOzmssObgcW
+	CGeEEzDDqaaLdTE6UxBRx/I6QulMrrouufeOaVKEeA==
+X-Google-Smtp-Source: AGHT+IHbMlRkAatFZ4k1n7FwuCT46W30dNh99Rxmqvs6YTL04evgiDNMg9ekX6ZFtsqcZ0pSgTSBFw==
+X-Received: by 2002:a5d:53c3:0:b0:315:a74c:f627 with SMTP id a3-20020a5d53c3000000b00315a74cf627mr1762272wrw.16.1691769438104;
+        Fri, 11 Aug 2023 08:57:18 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id g6-20020a5d5546000000b003142e438e8csm5833461wrw.26.2023.08.11.08.57.15
+        by smtp.gmail.com with ESMTPSA id e10-20020adfe7ca000000b0031784ac0babsm5776387wrn.28.2023.08.11.08.57.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 08:57:15 -0700 (PDT)
+        Fri, 11 Aug 2023 08:57:17 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -65,10 +66,12 @@ Cc: kuba@kernel.org,
 	saeedm@nvidia.com,
 	idosch@nvidia.com,
 	petrm@nvidia.com
-Subject: [patch net-next v4 00/13] devlink: introduce selective dumps
-Date: Fri, 11 Aug 2023 17:57:01 +0200
-Message-ID: <20230811155714.1736405-1-jiri@resnulli.us>
+Subject: [patch net-next v4 01/13] devlink: parse linecard attr in doit() callbacks
+Date: Fri, 11 Aug 2023 17:57:02 +0200
+Message-ID: <20230811155714.1736405-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230811155714.1736405-1-jiri@resnulli.us>
+References: <20230811155714.1736405-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,80 +87,134 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Motivation:
+No need to give the linecards any special treatment in netlink attribute
+parsing, as unlike for ports, there is only a couple of commands
+benefiting from that.
 
-For SFs, one devlink instance per SF is created. There might be
-thousands of these on a single host. When a user needs to know port
-handle for specific SF, he needs to dump all devlink ports on the host
-which does not scale good.
+Remove DEVLINK_NL_FLAG_NEED_LINECARD, make pre_doit() callback simpler
+by moving the linecard attribute parsing to linecard_[gs]et_doit() ops.
 
-Solution:
-
-Allow user to pass devlink handle (and possibly other attributes)
-alongside the dump command and dump only objects which are matching
-the selection.
-
-Use split ops to generate policies for dump callbacks acccording to
-the attributes used for selection.
-
-The userspace can use ctrl genetlink GET_POLICY command to find out if
-the selective dumps are supported by kernel for particular command.
-
-Example:
-$ devlink port show
-auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
-auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
-
-$ devlink port show auxiliary/mlx5_core.eth.0
-auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
-
-$ devlink port show auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
-
-Extension:
-
-patches #12 and #13 extends selection attributes by port index
-for health reporter dumping.
-
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v3->v4:
-- fixed NLM_F_DUMP_FILTERED flag handling
-v2->v3:
-- redid the whole thing using generated split ops and removed nested
-  selector attribute as suggested by Jakub. More in individual patches.
-v1->v2:
-- the original single patch (patch #10) was extended to a patchset
+ net/devlink/devl_internal.h |  7 -------
+ net/devlink/leftover.c      | 19 +++++++++++++------
+ net/devlink/netlink.c       |  8 --------
+ 3 files changed, 13 insertions(+), 21 deletions(-)
 
-Jiri Pirko (13):
-  devlink: parse linecard attr in doit() callbacks
-  devlink: parse rate attrs in doit() callbacks
-  devlink: introduce devlink_nl_pre_doit_port*() helper functions
-  devlink: rename doit callbacks for per-instance dump commands
-  devlink: introduce dumpit callbacks for split ops
-  devlink: pass flags as an arg of dump_one() callback
-  netlink: specs: devlink: add commands that do per-instance dump
-  devlink: remove duplicate temporary netlink callback prototypes
-  devlink: remove converted commands from small ops
-  devlink: allow user to narrow per-instance dumps by passing handle
-    attrs
-  netlink: specs: devlink: extend per-instance dump commands to accept
-    instance attributes
-  devlink: extend health reporter dump selector by port index
-  netlink: specs: devlink: extend health reporter dump attributes by
-    port index
-
- Documentation/netlink/specs/devlink.yaml |  457 +++-
- net/devlink/dev.c                        |   29 +-
- net/devlink/devl_internal.h              |   44 +-
- net/devlink/health.c                     |   40 +-
- net/devlink/leftover.c                   |  419 ++--
- net/devlink/netlink.c                    |  110 +-
- net/devlink/netlink_gen.c                |  424 +++-
- net/devlink/netlink_gen.h                |   52 +-
- tools/net/ynl/generated/devlink-user.c   | 2434 +++++++++++++++++++++-
- tools/net/ynl/generated/devlink-user.h   | 1824 +++++++++++++++-
- 10 files changed, 5327 insertions(+), 506 deletions(-)
-
+diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
+index 7fdd956ff992..3bbecebf192d 100644
+--- a/net/devlink/devl_internal.h
++++ b/net/devlink/devl_internal.h
+@@ -94,7 +94,6 @@ static inline bool devl_is_registered(struct devlink *devlink)
+ #define DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT	BIT(1)
+ #define DEVLINK_NL_FLAG_NEED_RATE		BIT(2)
+ #define DEVLINK_NL_FLAG_NEED_RATE_NODE		BIT(3)
+-#define DEVLINK_NL_FLAG_NEED_LINECARD		BIT(4)
+ 
+ enum devlink_multicast_groups {
+ 	DEVLINK_MCGRP_CONFIG,
+@@ -203,12 +202,6 @@ int devlink_resources_validate(struct devlink *devlink,
+ 			       struct devlink_resource *resource,
+ 			       struct genl_info *info);
+ 
+-/* Line cards */
+-struct devlink_linecard;
+-
+-struct devlink_linecard *
+-devlink_linecard_get_from_info(struct devlink *devlink, struct genl_info *info);
+-
+ /* Rates */
+ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
+ 			     struct netlink_ext_ack *extack);
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index e7900d9fa205..46cdd5d88583 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -285,7 +285,7 @@ devlink_linecard_get_from_attrs(struct devlink *devlink, struct nlattr **attrs)
+ 	return ERR_PTR(-EINVAL);
+ }
+ 
+-struct devlink_linecard *
++static struct devlink_linecard *
+ devlink_linecard_get_from_info(struct devlink *devlink, struct genl_info *info)
+ {
+ 	return devlink_linecard_get_from_attrs(devlink, info->attrs);
+@@ -1814,11 +1814,15 @@ static void devlink_linecard_notify(struct devlink_linecard *linecard,
+ static int devlink_nl_cmd_linecard_get_doit(struct sk_buff *skb,
+ 					    struct genl_info *info)
+ {
+-	struct devlink_linecard *linecard = info->user_ptr[1];
+-	struct devlink *devlink = linecard->devlink;
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_linecard *linecard;
+ 	struct sk_buff *msg;
+ 	int err;
+ 
++	linecard = devlink_linecard_get_from_info(devlink, info);
++	if (IS_ERR(linecard))
++		return PTR_ERR(linecard);
++
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!msg)
+ 		return -ENOMEM;
+@@ -2008,10 +2012,15 @@ static int devlink_linecard_type_unset(struct devlink_linecard *linecard,
+ static int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
+ 					    struct genl_info *info)
+ {
+-	struct devlink_linecard *linecard = info->user_ptr[1];
+ 	struct netlink_ext_ack *extack = info->extack;
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_linecard *linecard;
+ 	int err;
+ 
++	linecard = devlink_linecard_get_from_info(devlink, info);
++	if (IS_ERR(linecard))
++		return PTR_ERR(linecard);
++
+ 	if (info->attrs[DEVLINK_ATTR_LINECARD_TYPE]) {
+ 		const char *type;
+ 
+@@ -6347,14 +6356,12 @@ const struct genl_small_ops devlink_nl_small_ops[54] = {
+ 		.cmd = DEVLINK_CMD_LINECARD_GET,
+ 		.doit = devlink_nl_cmd_linecard_get_doit,
+ 		.dumpit = devlink_nl_instance_iter_dumpit,
+-		.internal_flags = DEVLINK_NL_FLAG_NEED_LINECARD,
+ 		/* can be retrieved by unprivileged users */
+ 	},
+ 	{
+ 		.cmd = DEVLINK_CMD_LINECARD_SET,
+ 		.doit = devlink_nl_cmd_linecard_set_doit,
+ 		.flags = GENL_ADMIN_PERM,
+-		.internal_flags = DEVLINK_NL_FLAG_NEED_LINECARD,
+ 	},
+ 	{
+ 		.cmd = DEVLINK_CMD_SB_GET,
+diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
+index bada2819827b..9fd683f38a53 100644
+--- a/net/devlink/netlink.c
++++ b/net/devlink/netlink.c
+@@ -112,7 +112,6 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs)
+ int devlink_nl_pre_doit(const struct genl_split_ops *ops,
+ 			struct sk_buff *skb, struct genl_info *info)
+ {
+-	struct devlink_linecard *linecard;
+ 	struct devlink_port *devlink_port;
+ 	struct devlink *devlink;
+ 	int err;
+@@ -151,13 +150,6 @@ int devlink_nl_pre_doit(const struct genl_split_ops *ops,
+ 			goto unlock;
+ 		}
+ 		info->user_ptr[1] = rate_node;
+-	} else if (ops->internal_flags & DEVLINK_NL_FLAG_NEED_LINECARD) {
+-		linecard = devlink_linecard_get_from_info(devlink, info);
+-		if (IS_ERR(linecard)) {
+-			err = PTR_ERR(linecard);
+-			goto unlock;
+-		}
+-		info->user_ptr[1] = linecard;
+ 	}
+ 	return 0;
+ 
 -- 
 2.41.0
 
