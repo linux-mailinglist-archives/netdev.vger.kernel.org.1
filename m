@@ -1,185 +1,91 @@
-Return-Path: <netdev+bounces-26633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B8F77874A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 08:07:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98006778773
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 08:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4690A281F8D
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 06:07:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B7521C210F8
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 06:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F70C17F8;
-	Fri, 11 Aug 2023 06:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D39185B;
+	Fri, 11 Aug 2023 06:28:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341D71102
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:07:15 +0000 (UTC)
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE0F2722;
-	Thu, 10 Aug 2023 23:07:14 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b9a828c920so24902661fa.1;
-        Thu, 10 Aug 2023 23:07:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC94EC6
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:28:31 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C032D56
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:28:28 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fe5c0e587eso15877115e9.0
+        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691734032; x=1692338832;
-        h=content-transfer-encoding:in-reply-to:subject:from:content-language
-         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4bk+exM8X9S4Sq3L4XC4ctpy1FDaZFp/bRE9a4iozmw=;
-        b=Y01wTSr/DoRbmIqKdYRW78ACJSxzyJbakuGLbhzDa1lmVlREwtW3tiMvb7Jp7Q/gPg
-         QxOXdmls7Im/6TQ9IkKhhefuxLlq6IARWRQ4yLpFylIKsdYb7smChXhW+i6C6nRS5XuW
-         I3II8X6IEB92dCL75R65+mmlnZlzx8HAC9MIW6Zy0isOl4hjFej+McYANsu3DzulM6Zy
-         f8SYcxCwwZB5csnGb7aqyisOo1zTCZ2zaWZxpFEdzC6UFUKGlq7N9TVEjh70NyWx8pX5
-         aPHh06gQEVWIGYOkILYsIXwiVxnHxrRjR36FR4WdXw3ibVZVAxyY+FwOXgRUmLoYSaer
-         OpcA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691735307; x=1692340107;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cpHllMP4SHxkSojawCu74l62nRNjnVIewdcFlVSPly8=;
+        b=cph7bS3FJjW4RaaIDG/VOXXWlsIgifBLbUOCAi4HcBExggqBN3YfAmNjc4SrmOnmZV
+         ZvB1O9/vJXdB3PYgBWDhYxsAzjU4SK1bwcaltNajflhq+UzYuhU865i/93f26RwC9nXx
+         Bi5WNm1oB0z3LFCLR2ZxSmhrWEWiwfejoMJn9SV1fGPwa9l1vC5abP53+Dny7sE5No+g
+         /i0hRo/rhHtf/JB6uqXVzfgPpN3jA7namK9hOZfKdEcw6nxydop4sj8/PltFfXBNBCHQ
+         TeNgT/U6MXzjK7rPNaOqzBO481YVLQciJQN/RmMMejYHEEPeZUXt+tAu4iqkDoC5ztrp
+         ytxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691734032; x=1692338832;
-        h=content-transfer-encoding:in-reply-to:subject:from:content-language
-         :references:cc:to:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4bk+exM8X9S4Sq3L4XC4ctpy1FDaZFp/bRE9a4iozmw=;
-        b=hF9SxdV0SyanBRUJKV5PjQPmHT9hNwMYY/+zx/KBnsHbMT5Qmsu1iPMylMD7+4WG2U
-         tLZ90NOAY8c+D5NuVS8btID/ZSfkZx7DFtolFl6xAck0ET/2c5NchQMeB8XObXqxRfQJ
-         F+ND6/m0g3q3ojA2lYa9b8IjNPWCH1HDK98Wv3N+SuI6uaCTCeDWLPNlQF6QmM9DezXG
-         hyy0bwHW04tTEFHfXX0QRRPL8MXHvJKrhaMv9q2Dtl31Hn3EdhfmBxJHn4Ra+5tg/c5E
-         zV1lvx9Djehd2iyXq0VM2syk+yfYCfpUBHf/anucOzgWms8UR/RVCdlwMCleY+bAXA+x
-         Ms8A==
-X-Gm-Message-State: AOJu0Yxku77Gk9UxoTp2VZ6+r2UzaVQTZ7HQ4GrmgOhC/pXlyNXQ+axj
-	c4AI8+mlYAUJzI0Fnrb4GS0=
-X-Google-Smtp-Source: AGHT+IEDJkq9L72dxkIvJYXHWt0S/ObKGtluYL52BnMKo73cLNHOz1YKohCZoSVoQZXhj4QPxSohZQ==
-X-Received: by 2002:a2e:3c0e:0:b0:2b9:e7d7:64bd with SMTP id j14-20020a2e3c0e000000b002b9e7d764bdmr733901lja.47.1691734031793;
-        Thu, 10 Aug 2023 23:07:11 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:9036:1900:752a:2ca1:e48c:43a7? (dynamic-2a02-3100-9036-1900-752a-2ca1-e48c-43a7.310.pool.telefonica.de. [2a02:3100:9036:1900:752a:2ca1:e48c:43a7])
-        by smtp.googlemail.com with ESMTPSA id s7-20020adfecc7000000b0031912c0ffebsm3542748wro.23.2023.08.10.23.07.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 23:07:11 -0700 (PDT)
-Message-ID: <2cdc67aa-6029-7231-76a8-54c6b51b066c@gmail.com>
-Date: Fri, 11 Aug 2023 08:07:03 +0200
+        d=1e100.net; s=20221208; t=1691735307; x=1692340107;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cpHllMP4SHxkSojawCu74l62nRNjnVIewdcFlVSPly8=;
+        b=k0MKkkyJqRp0ccgTvJ7JobO0U69xm8l4KrEIOFzmgchqx6+qIuxguxGa3GrETL3PcY
+         nA38VChtkUgdCNc/JBGXcyhBHZXGmOBOODz8OXsafjvEmtBsegMoqjW6tFfoqTUou6Pk
+         TpkJ2VPB/W8uNgZF3/ify5pNkVrYuT3kbLnsl3CgbQWque/pBIhh4owLqD2BaF3zpGRt
+         vObAylbWbnUnTHRvZQi9/+T2WiK/5iYpJ48h0RdjE5WfzyCPlLRwHaQsh8by4/g70NZ7
+         WUyg16Y4lY/AVXa0LuiZDYuoIV6PAt4FAT/DMDIcdJvGOld5qLLVPbEpuE6or4EE+xB0
+         mgPQ==
+X-Gm-Message-State: AOJu0YxAGc/vvrOGSbOK6sZCXY9RcqrMXWe4WtHnWU0OorhJdm/2lVl+
+	Ttw1+YF8TqL4Op1mcr96HF0abw==
+X-Google-Smtp-Source: AGHT+IFO51nR0NxpVRDNqOg6LhzRFHLgpX/uWstBFVF9utITvVux5/bFoTezTcdD+MuAkSy6SjZFLw==
+X-Received: by 2002:adf:fd82:0:b0:317:5351:e428 with SMTP id d2-20020adffd82000000b003175351e428mr582852wrr.4.1691735307263;
+        Thu, 10 Aug 2023 23:28:27 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id k3-20020a056000004300b003177074f830sm4382853wrx.59.2023.08.10.23.28.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 23:28:26 -0700 (PDT)
+Date: Fri, 11 Aug 2023 08:28:25 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, johannes@sipsolutions.net
+Subject: Re: [PATCH net-next v2 06/10] genetlink: add a family pointer to
+ struct genl_info
+Message-ID: <ZNXVCefkLQ3/GS8G@nanopsycho>
+References: <20230810233845.2318049-1-kuba@kernel.org>
+ <20230810233845.2318049-7-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-To: Luke Lu <luke.lu@libre.computer>, Andrew Lunn <andrew@lunn.ch>,
- Russell King <linux@armlinux.org.uk>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Florian Fainelli <f.fainelli@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org,
- linux-kernel@vger.kernel.org, Da Xue <da@libre.computer>
-References: <20230809214946.18975-1-luke.lu@libre.computer>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net v4] net: phy: meson-gxl: implement
- meson_gxl_phy_resume()
-In-Reply-To: <20230809214946.18975-1-luke.lu@libre.computer>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810233845.2318049-7-kuba@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 09.08.2023 23:49, Luke Lu wrote:
-> From: Da Xue <da@libre.computer>
-> 
-> While testing the suspend/resume function, we found the ethernet
-> is broken if using internal PHY of Amlogic meson GXL SoC.
-> After system resume back, the ethernet is down, no carrier found.
-> 
-> 	eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state
-> 		DOWN group default qlen 1000
-> 
-> In this patch, we re-initialize the internal PHY to fix this problem.
-> 
+Fri, Aug 11, 2023 at 01:38:41AM CEST, kuba@kernel.org wrote:
+>Having family in struct genl_info is quite useful. It cuts
+>down the number of arguments which need to be passed to
+>helpers which already take struct genl_info.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-It's not an unusual case that system cuts power to the PHY during
-system suspend. So the PHY needs to be re-initialized on resume.
-That's why we call phy_init_hw() in mdio_bus_phy_resume().
-
-If going your way we would be better off calling .config_init()
-in genphy_resume(). Please check the MAC driver, maybe it's better
-to re-initialize the PHY in the resume path of the MAC driver.
-
-> 	eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
-> 		group default qlen 1000
-> 
-> Fixes: 7334b3e47aee ("net: phy: Add Meson GXL Internal PHY driver")
-> Signed-off-by: Da Xue <da@libre.computer>
-> Signed-off-by: Luke Lu <luke.lu@libre.computer>
-> 
-> ---
-> Note, we don't Cc stable kernel tree in this patch intentionally, since
-> there will be a cherry-pick failure if apply this patch from kernel version
-> less than v6.2, it's not a logic failure but due to the changes too close.
-> 
-> Please check commit 69ff53e4a4c9 ("net: phy: meson-gxl: use MMD access dummy stubs for GXL, internal PHY")
-> We plan to slightly rework the patch, and send it to stable tree separately
-> once this patch is accepted into mainline.
-> 
-> v4:
->  - refactor commit message to better explain the problem & fix
->  - check return value of genphy_resume()
->  - add 'net' annotation
->  - add Fixes tag
-> 
-> v3: https://lore.kernel.org/netdev/20230808050016.1911447-1-da@libre.computer
->  - fix missing parameter of genphy_resume()
-> 
-> v2: https://lore.kernel.org/netdev/20230804201903.1303713-1-da@libre.computer
->  - call generic genphy_resume()
-> 
-> v1: https://lore.kernel.org/all/CACqvRUZRyXTVQyy9bUviQZ+_moLQBjPc6nin_NQC+CJ37yNnLw@mail.gmail.com
-> ---
->  drivers/net/phy/meson-gxl.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/phy/meson-gxl.c b/drivers/net/phy/meson-gxl.c
-> index bb9b33b6bce2..9ebe09b0cd8c 100644
-> --- a/drivers/net/phy/meson-gxl.c
-> +++ b/drivers/net/phy/meson-gxl.c
-> @@ -132,6 +132,21 @@ static int meson_gxl_config_init(struct phy_device *phydev)
->  	return 0;
->  }
->  
-> +static int meson_gxl_phy_resume(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret = genphy_resume(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = meson_gxl_config_init(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
->  /* This function is provided to cope with the possible failures of this phy
->   * during aneg process. When aneg fails, the PHY reports that aneg is done
->   * but the value found in MII_LPA is wrong:
-> @@ -196,7 +211,7 @@ static struct phy_driver meson_gxl_phy[] = {
->  		.config_intr	= smsc_phy_config_intr,
->  		.handle_interrupt = smsc_phy_handle_interrupt,
->  		.suspend        = genphy_suspend,
-> -		.resume         = genphy_resume,
-> +		.resume         = meson_gxl_phy_resume,
->  		.read_mmd	= genphy_read_mmd_unsupported,
->  		.write_mmd	= genphy_write_mmd_unsupported,
->  	}, {
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
