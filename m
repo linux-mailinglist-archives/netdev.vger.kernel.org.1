@@ -1,86 +1,134 @@
-Return-Path: <netdev+bounces-26913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7077E77963C
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 19:37:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB31779659
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 19:42:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B10C2823C9
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:37:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64C051C21797
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2D0219DB;
-	Fri, 11 Aug 2023 17:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34FF219DD;
+	Fri, 11 Aug 2023 17:42:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8DF1172E
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 17:37:14 +0000 (UTC)
-X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 11 Aug 2023 10:37:11 PDT
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA70A8;
-	Fri, 11 Aug 2023 10:37:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tu-berlin.de; l=676; s=dkim-tub; t=1691775431;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=w4aamHWJldp6h5Ct58c7qthgK+NVnM3KT47swLL3BsI=;
-  b=XNy1ygimnvgONomBYutkwe2yzruPCxXCvnvZX2AAhY6Qr7Bn3fFov2y7
-   HmbkMPeCk/E3I4z+P+h7rc4r4StVHFpLrCumopt40eiHwWFH/FG3TVS96
-   RQ0vf8GmHeA2OR4iNeWukqPnTGP+ONGK3KbvykAnV1g+nBcCGAosc3s/U
-   M=;
-X-IronPort-AV: E=Sophos;i="6.01,166,1684792800"; 
-   d="scan'208";a="3190198"
-Received: from postcard.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.142])
-  by mailrelay.tu-berlin.de with ESMTP; 11 Aug 2023 19:36:06 +0200
-From: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <jthinz@mailbox.tu-berlin.de>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <jthinz@mailbox.tu-berlin.de>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: Remove leftover include from nftables.h
-Date: Fri, 11 Aug 2023 19:33:57 +0200
-Message-ID: <20230811173357.408448-1-jthinz@mailbox.tu-berlin.de>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B951172E
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 17:42:29 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE938A8;
+	Fri, 11 Aug 2023 10:42:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XZde7I6ZCr5bOJRRVTdK4m++TLOgYH3d4jly0N/+708=; b=iq39bwOXdnWzTfOxalyj5f8aIF
+	NaUeiJ5RPqJ9+go6Zi8QLT+oYbh3UVnyAqHvKIE2mWA2ugPCoYleHYKgMgUKaAxSTyHsp01DEUUCd
+	uAISs/9qClSjx8ZI4gVA/5tU6Y41+zS3Tm9XCP8rJAkdNgg41gKhxdUASeu/irAqyh4c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qUW9O-003paE-E4; Fri, 11 Aug 2023 19:42:14 +0200
+Date: Fri, 11 Aug 2023 19:42:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	richardcochran@gmail.com, sd@queasysnail.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next v1 4/5] net: macsec: introduce mdo_insert_tx_tag
+Message-ID: <ee545162-7695-4089-804d-64438e1de620@lunn.ch>
+References: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230811153249.283984-5-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811153249.283984-5-radu-nicolae.pirea@oss.nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit db3685b4046f ("net: remove obsolete members from struct net")
-removed the uses of struct list_head from this header, without removing
-the corresponding included header.
+On Fri, Aug 11, 2023 at 06:32:48PM +0300, Radu Pirea (NXP OSS) wrote:
+> Offloading MACsec in PHYs requires inserting the SecTAG and the ICV in
+> the ethernet frame. This operation will increase the frame size with 32
+> bytes. If the frames are sent at line rate, the PHY will not have enough
+> room to insert the SecTAG and the ICV.
+> 
+> To mitigate this scenario, the PHY offer to use require a specific
+> ethertype with some padding bytes present in the ethernet frame. This
+> ethertype and its associated bytes will be replaced by the SecTAG and ICV.
 
-Signed-off-by: Jörn-Thorben Hinz <jthinz@mailbox.tu-berlin.de>
----
- include/net/netns/nftables.h | 2 --
- 1 file changed, 2 deletions(-)
+I think this could be worded better, to take into account different
+implementations. As far as i understand, some PHYs include a MAC,
+which reassembles the frame, and then places the frame into a queue
+for processing. After processing, a second MAC does the actual send on
+the wire. The queue allows for some number of back to back frames
+without having problems. The PHY then uses flow control pause to slow
+down the SoC MAC when there is a long burst of line rate frames which
+would otherwise overflow the queue.
 
-diff --git a/include/net/netns/nftables.h b/include/net/netns/nftables.h
-index 8c77832d0240..cc8060c017d5 100644
---- a/include/net/netns/nftables.h
-+++ b/include/net/netns/nftables.h
-@@ -2,8 +2,6 @@
- #ifndef _NETNS_NFTABLES_H_
- #define _NETNS_NFTABLES_H_
- 
--#include <linux/list.h>
--
- struct netns_nftables {
- 	u8			gencursor;
- };
--- 
-2.39.2
+So:
 
+> If the frames are sent at line rate, the PHY will not have enough
+> room to insert the SecTAG and the ICV.
+
+This probably want to clarify that a PHY which does not buffer....
+
+> To mitigate this scenario, the PHY offer to use require a specific
+
+and here you want to say some PHYs offer, since not all PHYs will do
+this.
+
+> +	if (macsec->offload == MACSEC_OFFLOAD_OFF) {
+> +		dev->needed_headroom -= ops->needed_headroom;
+> +		dev->needed_headroom += MACSEC_NEEDED_HEADROOM;
+> +		dev->needed_tailroom -= ops->needed_tailroom;
+> +		dev->needed_tailroom += MACSEC_NEEDED_TAILROOM;
+> +	} else {
+> +		dev->needed_headroom -= MACSEC_NEEDED_HEADROOM;
+> +		dev->needed_headroom += ops->needed_headroom;
+> +		dev->needed_tailroom -= MACSEC_NEEDED_TAILROOM;
+> +		dev->needed_tailroom += ops->needed_tailroom;
+> +	}
+
+It is not obvious to me what this is doing. Should this actually be in
+macsec_dev_init()? My main problem is why there is an else condition?
+
+> +static struct sk_buff *insert_tx_tag(struct sk_buff *skb,
+> +				     struct net_device *dev)
+> +{
+> +	struct macsec_dev *macsec = macsec_priv(dev);
+> +	const struct macsec_ops *ops;
+> +	struct macsec_context ctx;
+> +	int err;
+> +
+> +	if (!macsec_is_offloaded(macsec))
+> +		return ERR_PTR(-EINVAL);
+
+Hasn't this already been checked in macsec_start_xmit()?
+
+> +
+> +	ops = macsec_get_ops(macsec, &ctx);
+> +	if (!ops)
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	if (!ops->mdo_insert_tx_tag)
+> +		return skb;
+
+You are in the hot path here. You don't expect this to change from
+frame to frame. So could you evaluate this once and store it
+somewhere? Maybe in macsec_dev ?
+
+	Andrew
 
