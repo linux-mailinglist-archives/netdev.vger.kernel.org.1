@@ -1,272 +1,158 @@
-Return-Path: <netdev+bounces-26847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF284779346
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:35:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DEB779372
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AD2B1C211A0
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BFD32821AA
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD91B329A9;
-	Fri, 11 Aug 2023 15:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6C52AB3C;
+	Fri, 11 Aug 2023 15:46:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDCD63B6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:33:54 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2052.outbound.protection.outlook.com [40.107.8.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016F330DF;
-	Fri, 11 Aug 2023 08:33:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007B55692
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:46:36 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2086.outbound.protection.outlook.com [40.107.220.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCDDB18B
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:46:35 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KwC1Vlca8uqgYpNcbC9Uj2IFroRiHXCMBmxWxqj+7aYwOtbLs6yZydhDj/ALIh45be1Du2aw1VTDgCng6xSTmcfup3CasobTdR0LlS4eGMifh/iq7LZHM8xfK9PV8fAjDm2Y1EJSZaG5jhj38pBBcmRcw/4ZBUtWpD25CEUPh4O8fWHr6I94KHw6QMSR/ubmlAv+DF/Ahxe1qZ5u5zjpQ5OTifiQPr0FKa0xz1KKr+/zVu734dL7/kAvdefPGDtdEZY8osq2rbSqN+6qxC9ev4bN81gg+q3bZxITNgCUIktoCrq0h2tX/s5fAzQ7daKjY7wt7S34Hxye7HDJn29ZOw==
+ b=FAU4zX61csf3aZH8qdm92uEj685k+SxKesFAeVEIjse2hJ57O/HVdl4gGe2RDZGKCsEBOK5o+94lejn8KZUmYDt69UEnydg0aHjlKrOvbrTGEs77orQAc2cwYROOK6MDJlF6azDtFJ6ZrW2Y0akyBEflqeVjv1ub1Za2uu5gYuplcVojKCuVrfAQ8ATiqB137cPsmdE4e7yq6SRi1SC86tfJSV9bMVPWRSyhVdFNOoaipNiRsJlB8B13ff+QrIJVN/arRtBbRU03Gpb789KPCOnZxVJvI8Jur+QMqy13Qc/hIE9XWG/CkMx1UUhA9Ziph1UE5m8wFWqwV1Jr4qTOCQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tGm9AQ3LClk4b22e3mfvo+vrMF1yzGJZeFvv6yDBTCI=;
- b=cKa70QQdQ9BswzQdJMUBCkN2jUVQJ5aLYqywVXDU5SlRnYMwJmyKnMAWQVZQMWpZ9hsS9htrugVQfMrUwcQQnLsvZUsj97CC9xbpECnQ9ilPV2ycEZzMuSF6XEgGrtmgCaKOVXzffYLcnxbo4mXlU8VZdXO/eIpZtLH2Qi71S8RKSN8jPIsztqDPNBccjH+9o+RvYZH4vS/hnNTM+/qCPSMd3FrEVlQc/kDPmdOoul/gxyazRqQlplD7pjGZx7v35Wxey0egKvI/6sr5SIJTXXuG/ptZps9m30sp+rwuDNAuQOLVyorIC2JYDvs0776IAWMc06vrI+FApF3/ty7NkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
+ bh=WfxjnjK+z+cZGg46Qe2ypxuIJhJtvLynBgq8x7M2EVM=;
+ b=eRWRG5hYv7v294c6Iv399/Qr9DfHYUDX0Ro5IdMOm0R22aRqgdqQXw7yOO1G1uXHM/wmbw0O2ov1NCC3/8B36SZQ6sFRDKbs3k2gDTCtemkA4f7gboD3U1MHKhK4kmwWUnOprKvJxdmhy5vk0heFiD8BuU7rRCnIofFk7/M1seA3WXzbpYrowW48Sl7Hu+UMu6uFRZrrSZjKQNqxO01nIlIGDjsYZqqoTwXZzv5RdjGUm1iBX/zFo+iRH1sZg3IyDKpgkFKIyf+rP5YguQp7G/NGQiTDACJ16TzDzxVdSi8C7otGsmd/PNQAZQGTY9udZKherZzdDDHX1Y1I5J49PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tGm9AQ3LClk4b22e3mfvo+vrMF1yzGJZeFvv6yDBTCI=;
- b=fxkLvnbJV0AngXdHb/PO0z1BV/JaKHzycN4+0DSFLDgR2V1Hb47qQR7Bm299plsUoezYhedVeCA3Z86iBSxiuy4Asu1rcQpJS0Z1g06yJav7sde0nLajjpET+B6L2H4fBO0pwNDl83DSFs2MaH8c2SVrTRwUAhDRuWhfreT0YUk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
- by PR3PR04MB7338.eurprd04.prod.outlook.com (2603:10a6:102:80::7) with
+ bh=WfxjnjK+z+cZGg46Qe2ypxuIJhJtvLynBgq8x7M2EVM=;
+ b=DRDX0orJuZvUla61JL9plcNtk1C1wnaIC6NGzE12kFTqhWzUW+emuqHL0qnL4ZHgIO80jjFyxUWkOQQlK/3b/rU3GDd7BXjYLacF9WbUah3idUkf9DcnBYy1gbz8t++9YlEvZj7MBmefKFQk7vEW8ehvRy5HlbNbzspWgNOc5uCjYbAcoKdVo9P/6QB6UzpU0bjeQUhibpSp2G745GsR9sDnmSDZ+dYUgSgTYL18qYvcTpT71NDBnkM9nkUpkSBkhT+QIBNF/VtD08x1zN0MaE9mUU7onUZOwvMmt6GrnNMfoxbNx0rC4jMJRVI0S0NyPKiTy/tIk0zv5N56zDVqoQ==
+Received: from CY5PR22CA0076.namprd22.prod.outlook.com (2603:10b6:930:80::23)
+ by SJ1PR12MB6050.namprd12.prod.outlook.com (2603:10b6:a03:48b::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
- 2023 15:33:47 +0000
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::2545:6d13:5905:bf50%4]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
- 15:33:47 +0000
-From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	sd@queasysnail.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Subject: [RFC net-next v1 5/5] net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
-Date: Fri, 11 Aug 2023 18:32:49 +0300
-Message-Id: <20230811153249.283984-6-radu-nicolae.pirea@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
-References: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM8P190CA0006.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:219::11) To AM9PR04MB8954.eurprd04.prod.outlook.com
- (2603:10a6:20b:409::7)
+ 2023 15:46:31 +0000
+Received: from CY4PEPF0000EDD6.namprd03.prod.outlook.com
+ (2603:10b6:930:80:cafe::51) by CY5PR22CA0076.outlook.office365.com
+ (2603:10b6:930:80::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.31 via Frontend
+ Transport; Fri, 11 Aug 2023 15:46:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EDD6.mail.protection.outlook.com (10.167.241.210) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 15:46:30 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 11 Aug 2023
+ 08:46:18 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 11 Aug
+ 2023 08:46:17 -0700
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.986.37 via Frontend Transport; Fri, 11 Aug
+ 2023 08:46:14 -0700
+From: Vlad Buslov <vladbu@nvidia.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <amir.hanania@intel.com>,
+	<jeffrey.t.kirsher@intel.com>, <john.fastabend@gmail.com>,
+	<idosch@idosch.org>, <horms@kernel.org>, Vlad Buslov <vladbu@nvidia.com>,
+	<syzbot+662f783a5cdf3add2719@syzkaller.appspotmail.com>,
+	<syzbot+4b4f06495414e92701d5@syzkaller.appspotmail.com>,
+	<syzbot+d810d3cd45ed1848c3f7@syzkaller.appspotmail.com>
+Subject: [PATCH net] Revert "vlan: Fix VLAN 0 memory leak"
+Date: Fri, 11 Aug 2023 17:45:23 +0200
+Message-ID: <20230811154523.1877590-1-vladbu@nvidia.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|PR3PR04MB7338:EE_
-X-MS-Office365-Filtering-Correlation-Id: 55c8589b-75a0-409e-c9b1-08db9a805acf
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD6:EE_|SJ1PR12MB6050:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8fff7526-ef9a-47fb-3e40-08db9a8221cb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	od3NUWz1cUTSXYyaYMFfd04qYfj3U87f/UgfTSLTVNhWHuFe9fo0hpLbQ3KMZnYbSZNF+7NgiMw1egve/RBicpj5B0ixA1x/iu+FCIA3I9TthEpgTh91htAaFEm5xLRH2G4qsxcmZdytBPWw5Ye+14iiSrFhkKp/ut2MwPefyz6meft5owjnkhZ6/THLI3CRDDNjO75fXjweWhjbgy9/ypHy16l/l9SS+qacxIAvcTSfBsbHFF0AiP/0Cz4KBq/LJtfqqQbzMaBahmiYyhSvNzeLN76c0F8AyVajdu4ddiQ+1CD+a6L77weC5fCryIODM+kxRaEFKiS8BJ7Knt/nfabYp5RCTYfKjKZi/tHcArV7I2W3QerY+BzQ3EIlQ6lDfXPvmkwDLq+wBk6dBJofivWYBvLIsNt9YA+MYY1XKxcGjXTBpr8Azp7petVz2qFfXjkCIq85SMnHpfyQTa/HjyOJSxegm+AQwO/atQFrGi0QV2Qh3PSxC1wtksrCP+2bG7/iN5QpRHxqh08FO/gec3dK0J+uSnmtaEERIIX8+xLcdeOSf5V9Evxor//a1jTzAx2hTb6fjczX+KVugn6yx5lmkpDYcGk4pdEghPl/cAw=
+	NLTu0TKlDwB8/c3sFDKeTQEid6lLeuN29Axsygihg+cJFFITFZjmzVGnol+WEXBBAgl+UdKeIvpklAZDCXvbrTwcd2f2goQdvmxbMVPHYHEH/u56TOKO+yuYR8U6UQ7seDfJToxJEWIxwP0NRt8Jirr/jzM8na6YZm7aW+FQz/dhtqHGDgM1+xf75Rp9o5M4uRCJUjceJKHyaNCVZoU6+Pg5ZyNKVLSKgiiTKuT/JqQZ2BmZB7ZbGeH0PCvp5+uJ92GGQRPR62GmmrJWWW++tahJknHmhNeTY6ZGM00j2yWXH11DB5UkucMuX+QHUilODBRUS+NvuEFNbLRXoWRLJYWmgngpMQnl5vgHxJl5Bvvj4WtrWmtipNSRP+0x1wrTfgxZ3LBLmfDrGsvLmUJO/UCzeecTolxU6oCw/qnHUFCz0UHYiKDmuf1a0/qcTcz4Xi5A46TuNuxrQFtx9Zf+p9Kk4c+aCpWy6WyUs1WdMgtQoQivL7vv1B+VbE+wyayyFEFdlG01QkSPpy6cLKeJx8fQijuprAo8Y4gpGdqtS0wrCBANB+Ed9/gzS3YS/RxgxOI2b9Jp50z7UEH/1g4STsAsmJmPd5ZfP0238N6jtN0gwRphzJ4nb3JPifGtd11g5aYXEG3CnFkJbIeanHGTn4W2VE/jQ7WF+UJEeZJD+g2iHbXrGzAuCDovaHjXB8ZECU3L3kiEEr49RNnVyJYDS/mzsihSh9oE9mHyFvWXuNWOKB2lXxDeQTE6K45LehPxgXuwhbnB9JHbad9ZC4Tr/Oo4Fjmf44SbSZAPM5Ki92Q2JaTF4s+OKy5VJBAICxNp
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(39860400002)(366004)(396003)(346002)(186006)(451199021)(1800799006)(2906002)(6486002)(52116002)(38100700002)(2616005)(6512007)(26005)(1076003)(38350700002)(6506007)(478600001)(316002)(4326008)(66946007)(41300700001)(8676002)(8936002)(5660300002)(66556008)(66476007)(7416002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QTt48vgxYROeggHotlZV4j/o8TSeE8YeZboAWzXwR/PmoAc1lcYeGyO3SUzX?=
- =?us-ascii?Q?RM/SnNw5ItnZF8SCtt7LqqeDVtHxKnnaYPILN712HWYU4mrG8KOAesXI44Th?=
- =?us-ascii?Q?ZvRVFa6jzp19UemSLFt3tIotZ4JP3lRticxRnrp4cY0LzgfsQ62e/jYuSpx3?=
- =?us-ascii?Q?aAYIiNjAoULMS7kOXHPf7B8yH8oVQy2UQJdZoMs89i+O25FSmzc+rNfqN49R?=
- =?us-ascii?Q?JeFGqWq98cWI5KiqvjBI/2Zleinb0rK1IJAAnuMzDb3X46iSBW1zIEEtd5+4?=
- =?us-ascii?Q?1TE1KMdxguauf2gID6LWY1uvJgQIfSgT0WqM8RAHuezaSnu1b8k6A6IW2Ai3?=
- =?us-ascii?Q?4+VsjQduDc0OFP7VdWW1vuLVj3Pt9r04CxixE6NljBFaSB7yFoxslEWHaoPu?=
- =?us-ascii?Q?bo0RaTYkhhpFqSRQovhBpyOEwQSNe9pvkfZQdgbeumNJgjy4SrCJX42AQQcV?=
- =?us-ascii?Q?jpvW3tNKVWtgB5Gm8fcPhlbh2hoz6DhOwPKtipdm7eqIi6Q19UK/dm2mbQjZ?=
- =?us-ascii?Q?Tad53N8PcsVPaR8v5fCGW+REfAouEFAoSUkiWDj47Zpe++1zjftPF4lY5ZTN?=
- =?us-ascii?Q?5B3esLb3rPzaxQOHOuQSIEpftBCz4x2/Eu20KNBKSP74o1tDHfiJmJ7fo5WG?=
- =?us-ascii?Q?OxK8xHC5DqiRsEw0hhNmu0QsSqDCk93E0y+1leID9aMkP3XhWS3lHfN1TZ0k?=
- =?us-ascii?Q?BrKe7lD73/cE4Bji6HnEkQQq6KYxY79inv16xCt0OVJPykTqVZHdTiDE0uDx?=
- =?us-ascii?Q?FwjyctMniWTJ4OEbHgMZbpLUttnGOJboJjVRVv2qY/dxZWOjHcY9A2DCkYII?=
- =?us-ascii?Q?JFvAG5fxPxX0WW6dJaAGhoQPjIq1+zMP2Smb1Aki4m2oK9tjUMC+LYdkf4XM?=
- =?us-ascii?Q?tz65f/Wz9lf6fUmghml/BKUeV1Wwq3MT536nVCxgKSFsFJrcvjaps4Pn6240?=
- =?us-ascii?Q?EsKJC4NaWLNzoi8NowW0wr0MRXvHAPimS6ZtKllEob5zUPkV13uvrmtvi76t?=
- =?us-ascii?Q?FQ4/GAWeARjuFoSQmqMWoAj8K7oOy47z8DUp77SLMISJ2DX7TQ4cpgp6HRUC?=
- =?us-ascii?Q?woiLydg+auP+RiNqDwbILT3mKBrvI9OQDoIQpoODIdT7b5e9sHxLGtvGfWfl?=
- =?us-ascii?Q?85XjWQA6+Ye0LzE5akNCL5w3GJ6mmbrfmVAoHxuWUZRmL4XBJuS8GTdDJLnp?=
- =?us-ascii?Q?AmWop2rICtgIhseHgLPorU+Z3SDfeMfeApS0lGBs/cE3syf50BrRZjW0fWFi?=
- =?us-ascii?Q?SsbIz5s/kPlRc54A+D0H5tyN+rvjWz/qxLGx0AURysSI7jo9J9DPNedx266f?=
- =?us-ascii?Q?Ufoq1st05jWVYbAOjLh7HzfiBr0DTLnSeYBa2oW49jRcnX75CwYHU9KVCjhl?=
- =?us-ascii?Q?ifN4/pLvZleBhcr4fgcp8I5Vo5qLFGHsc3Xk0bbKPKsfjbjmrgYSWrvp5Sw1?=
- =?us-ascii?Q?O/6Di10gJd465c/f8EPNxOmHmAY7weaOl1pm1CHOSWqxqmeVV1k19IWBL5JA?=
- =?us-ascii?Q?lUJdnrbuMSpPgPKFQ0fjyhPyHBj78qyRj4UoXZmEqUn9Cc/9VRz6Ra+WgCkI?=
- =?us-ascii?Q?b8qDaIKucNJpuHSedLqrn9M8DKlmaxCtih9D62Vxu70rsoGVMDbr1iiEUr97?=
- =?us-ascii?Q?nQ=3D=3D?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55c8589b-75a0-409e-c9b1-08db9a805acf
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 15:33:47.4627
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(39860400002)(136003)(451199021)(82310400008)(1800799006)(186006)(36840700001)(40470700004)(46966006)(426003)(40460700003)(7636003)(83380400001)(336012)(2906002)(2616005)(110136005)(40480700001)(54906003)(478600001)(86362001)(82740400003)(36756003)(316002)(41300700001)(7696005)(26005)(1076003)(6666004)(5660300002)(8936002)(36860700001)(8676002)(356005)(7416002)(966005)(70586007)(47076005)(70206006)(4326008);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 15:46:30.5044
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G5WR/6ct9MwVE2PVmAXFkc/wPWaIbjJfi8uUzx4VmZQvaIDhSvriw2f3/2ysuXpruZN7y1vgQDBWGUlqwu5F8RWzNFVGIgIbRaoY6gE7DnM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7338
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8fff7526-ef9a-47fb-3e40-08db9a8221cb
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EDD6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6050
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement mdo_insert_tx_tag to insert the TLV header in the ethernet
-frame.
+This reverts commit 718cb09aaa6fa78cc8124e9517efbc6c92665384.
 
-The TLV header contains the TX SC that will be used to encrypt the
-frame.
+The commit triggers multiple syzbot issues, probably due to possibility of
+manually creating VLAN 0 on netdevice which will cause the code to delete
+it since it can't distinguish such VLAN from implicit VLAN 0 automatically
+created for devices with NETIF_F_HW_VLAN_CTAG_FILTER feature.
 
-Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+Reported-by: syzbot+662f783a5cdf3add2719@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/00000000000090196d0602a6167d@google.com/
+Reported-by: syzbot+4b4f06495414e92701d5@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/00000000000096ae870602a61602@google.com/
+Reported-by: syzbot+d810d3cd45ed1848c3f7@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000009f0f9c0602a616ce@google.com/
+Fixes: 718cb09aaa6f ("vlan: Fix VLAN 0 memory leak")
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
 ---
- drivers/net/phy/nxp-c45-tja11xx-macsec.c | 59 ++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ net/8021q/vlan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/nxp-c45-tja11xx-macsec.c b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-index da63e35571d0..53f8706bc572 100644
---- a/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-+++ b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/phy.h>
- #include <linux/processor.h>
-+#include <net/dst_metadata.h>
- #include <net/macsec.h>
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index b3662119ddbc..e40aa3e3641c 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -384,7 +384,8 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
+ 			dev->name);
+ 		vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
+ 	}
+-	if (event == NETDEV_DOWN)
++	if (event == NETDEV_DOWN &&
++	    (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER))
+ 		vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
  
- #include "nxp-c45-tja11xx.h"
-@@ -23,6 +24,7 @@
- #define VEND1_MACSEC_BASE		0x9000
- 
- #define MACSEC_CFG			0x0000
-+#define MACSEC_CFG_EXTSCS		BIT(26)
- #define MACSEC_CFG_BYPASS		BIT(1)
- #define MACSEC_CFG_S0I			BIT(0)
- 
-@@ -121,6 +123,8 @@
- #define ADPTR_CNTRL			0x0F00
- #define ADPTR_CNTRL_CONFIG_EN		BIT(14)
- #define ADPTR_CNTRL_ADPTR_EN		BIT(12)
-+#define ADPTR_TX_TAG_CNTRL		0x0F0C
-+#define ADPTR_TX_TAG_CNTRL_ENA		BIT(31)
- 
- #define TX_SC_FLT_BASE			0x800
- #define TX_SC_FLT_SIZE			0x10
-@@ -167,6 +171,14 @@
- #define MACSEC_INPBTS			0x0638
- #define MACSEC_IPSNFS			0x063C
- 
-+#define TJA11XX_TLV_TX_NEEDED_HEADROOM	(32)
-+#define TJA11XX_TLV_NEEDED_TAILROOM	(0)
-+
-+#define MACSEC_TLV_CP			BIT(0)
-+#define MACSEC_TLV_SC_ID_OFF		(2)
-+
-+#define ETH_P_TJA11XX_TLV		(0x4e58)
-+
- struct nxp_c45_rx_sc {
- 	struct macsec_rx_sc *rx_sc;
- 	struct macsec_rx_sa *rx_sa_a;
-@@ -310,6 +322,7 @@ void nxp_c45_macsec_config_init(struct phy_device *phydev)
- 			 MACSEC_EN | ADAPTER_EN);
- 
- 	nxp_c45_macsec_write(phydev, ADPTR_CNTRL, ADPTR_CNTRL_CONFIG_EN);
-+	nxp_c45_macsec_write(phydev, ADPTR_TX_TAG_CNTRL, ADPTR_TX_TAG_CNTRL_ENA);
- 	nxp_c45_macsec_write(phydev, ADPTR_CNTRL, ADPTR_CNTRL_CONFIG_EN |
- 			     ADPTR_CNTRL_ADPTR_EN);
- 	nxp_c45_macsec_write(phydev, ADPTR_CNTRL,
-@@ -322,6 +335,8 @@ void nxp_c45_macsec_config_init(struct phy_device *phydev)
- 	nxp_c45_macsec_write(phydev, MACSEC_UPFR0M1, MACSEC_OVP);
- 	nxp_c45_macsec_write(phydev, MACSEC_UPFR0M2, ETYPE_MASK);
- 	nxp_c45_macsec_write(phydev, MACSEC_UPFR0R, MACSEC_UPFR_EN);
-+
-+	nxp_c45_macsec_write(phydev, MACSEC_CFG, MACSEC_CFG_EXTSCS);
- }
- 
- static void nxp_c45_macsec_cfg_ptp(struct phy_device *phydev, bool enable)
-@@ -1750,6 +1765,47 @@ static int nxp_c45_mdo_get_rx_sa_stats(struct macsec_context *ctx)
- 	return 0;
- }
- 
-+struct tja11xx_tlv_header {
-+	struct ethhdr eth;
-+	u8 subtype;
-+	u8 len;
-+	u8 payload[28];
-+};
-+
-+static int nxp_c45_mdo_insert_tx_tag(struct macsec_context *ctx)
-+{
-+	struct nxp_c45_phy *priv = ctx->phydev->priv;
-+	struct sk_buff *skb = ctx->skb;
-+	struct tja11xx_tlv_header *tlv;
-+	struct nxp_c45_secy *phy_secy;
-+	struct metadata_dst *md_dst;
-+	struct ethhdr *eth;
-+	sci_t sci;
-+
-+	md_dst = skb_metadata_dst(skb);
-+	if (!md_dst)
-+		return -EINVAL;
-+
-+	sci = md_dst->u.macsec_info.sci;
-+	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, sci);
-+	if (IS_ERR(phy_secy))
-+		return PTR_ERR(phy_secy);
-+
-+	eth = eth_hdr(skb);
-+	tlv = skb_push(skb, TJA11XX_TLV_TX_NEEDED_HEADROOM);
-+	memmove(tlv, eth, sizeof(*eth));
-+	skb_reset_mac_header(skb);
-+	tlv->eth.h_proto = htons(ETH_P_TJA11XX_TLV);
-+	tlv->subtype = 1;
-+	tlv->len = sizeof(tlv->payload);
-+	memset(tlv->payload, 0, sizeof(tlv->payload));
-+
-+	tlv->payload[3] = phy_secy->secy_id << MACSEC_TLV_SC_ID_OFF |
-+		MACSEC_TLV_CP;
-+
-+	return 0;
-+}
-+
- static const struct macsec_ops nxp_c45_macsec_ops = {
- 	.mdo_dev_open = nxp_c45_mdo_dev_open,
- 	.mdo_dev_stop = nxp_c45_mdo_dev_stop,
-@@ -1770,6 +1826,9 @@ static const struct macsec_ops nxp_c45_macsec_ops = {
- 	.mdo_get_tx_sa_stats = nxp_c45_mdo_get_tx_sa_stats,
- 	.mdo_get_rx_sc_stats = nxp_c45_mdo_get_rx_sc_stats,
- 	.mdo_get_rx_sa_stats = nxp_c45_mdo_get_rx_sa_stats,
-+	.mdo_insert_tx_tag = nxp_c45_mdo_insert_tx_tag,
-+	.needed_headroom = TJA11XX_TLV_TX_NEEDED_HEADROOM,
-+	.needed_tailroom = TJA11XX_TLV_NEEDED_TAILROOM,
- };
- 
- int nxp_c45_macsec_probe(struct phy_device *phydev)
+ 	vlan_info = rtnl_dereference(dev->vlan_info);
 -- 
-2.34.1
+2.39.2
 
 
