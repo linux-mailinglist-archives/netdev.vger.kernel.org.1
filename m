@@ -1,84 +1,125 @@
-Return-Path: <netdev+bounces-26713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7371778A53
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 11:49:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4DB778A58
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 11:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 020A6281123
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:49:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB09F280F8E
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C9063AA;
-	Fri, 11 Aug 2023 09:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E545263AB;
+	Fri, 11 Aug 2023 09:50:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB143FE1
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 09:49:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52550C433C8;
-	Fri, 11 Aug 2023 09:49:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691747376;
-	bh=3Xc9b9hpSyJwEiUKOyQH74evABAG1Ic6UHFzpRwxovU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YMKmAUimk6KBhi5Fn3IPqNHbbLbyVegXcKtPOkA/B5xi7eKjXfY4VzTIKdvjvZ3Mg
-	 Ul2z9s2muCahBOZUQnDXnxU1fXrwCrNvAc0v1nyt/loclLNZs1SlLxj9asDt530Pan
-	 srVUSi31gKMcvFwEzStFvqaSFUFnczXcC0cuvs9ZIm1e81S2tgGzOS3PdD+SlDMSF8
-	 oBkRDfASkuYu5Pr/jW7oJXcksb/rqmUTCA2tcVNg2khYuvuZ0OJDQlpiPr3nUCIRdJ
-	 dkx8zG67/NWBM8AJPtegc6ujXALIhOdjkKOMsQTZPoPWLzcg89upNJjCrucZfWL3p6
-	 JdeNBbWcHwxiQ==
-Date: Fri, 11 Aug 2023 11:49:30 +0200
-From: Simon Horman <horms@kernel.org>
-To: alexis.lothore@bootlin.com
-Cc: =?utf-8?Q?Cl=C3=A9ment?= Leger <clement@clement-leger.fr>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Milan Stevanovic <milan.stevanovic@se.com>,
-	Jimmy Lalande <jimmy.lalande@se.com>,
-	Pascal Eberhard <pascal.eberhard@se.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH net-next v5 0/3] net: dsa: rzn1-a5psw: add support for
- vlan and .port_bridge_flags
-Message-ID: <ZNYEKrQZz/4NY4mW@vergenet.net>
-References: <20230810093651.102509-1-alexis.lothore@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DDF5690
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 09:50:21 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F13272D;
+	Fri, 11 Aug 2023 02:50:16 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.54])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RMf8p23XRzqSfB;
+	Fri, 11 Aug 2023 17:47:22 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 11 Aug
+ 2023 17:50:14 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <santosh.shilimkar@oracle.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<yuehaibing@huawei.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<rds-devel@oss.oracle.com>
+Subject: [PATCH v2 net-next] net/rds: Remove unused function declarations
+Date: Fri, 11 Aug 2023 17:50:10 +0800
+Message-ID: <20230811095010.8620-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230810093651.102509-1-alexis.lothore@bootlin.com>
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 11:36:48AM +0200, alexis.lothore@bootlin.com wrote:
-> From: Alexis Lothoré <alexis.lothore@bootlin.com>
-> 
-> Hello,
-> this series enables vlan support in Renesas RZN1 internal ethernet switch,
-> and is a follow up to the work initiated by Clement Leger a few months ago,
-> who handed me over the topic.
-> This new revision aims to iron the last few points raised by Vladimir to
-> ensure that the driver is in line with switch drivers expectations, and is
-> based on the lengthy discussion in [1] (thanks Vladimir for the valuable
-> explanations)
-> 
-> [1] https://lore.kernel.org/netdev/20230314163651.242259-1-clement.leger@bootlin.com/
-> 
+Commit 39de8281791c ("RDS: Main header file") declared but never implemented
+rds_trans_init() and rds_trans_exit(), remove it.
+Commit d37c9359056f ("RDS: Move loop-only function to loop.c") removed the
+implementation rds_message_inc_free() but not the declaration.
 
-For series,
+Since commit 55b7ed0b582f ("RDS: Common RDMA transport code")
+rds_rdma_conn_connect() is never implemented and used.
+rds_tcp_map_seq() is never implemented and used since
+commit 70041088e3b9 ("RDS: Add TCP transport to RDS").
 
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v2: fold tcp/rdma patch
+---
+ net/rds/rdma_transport.h | 1 -
+ net/rds/rds.h            | 3 ---
+ net/rds/tcp.h            | 1 -
+ 3 files changed, 5 deletions(-)
+
+diff --git a/net/rds/rdma_transport.h b/net/rds/rdma_transport.h
+index ca4c3a667091..d2fdb1529585 100644
+--- a/net/rds/rdma_transport.h
++++ b/net/rds/rdma_transport.h
+@@ -17,7 +17,6 @@
+  */
+ #define RDS_RDMA_REJ_INCOMPAT		1
+ 
+-int rds_rdma_conn_connect(struct rds_connection *conn);
+ int rds_rdma_cm_event_handler(struct rdma_cm_id *cm_id,
+ 			      struct rdma_cm_event *event);
+ int rds6_rdma_cm_event_handler(struct rdma_cm_id *cm_id,
+diff --git a/net/rds/rds.h b/net/rds/rds.h
+index d35d1fc39807..dc360252c515 100644
+--- a/net/rds/rds.h
++++ b/net/rds/rds.h
+@@ -863,7 +863,6 @@ int rds_message_next_extension(struct rds_header *hdr,
+ 			       unsigned int *pos, void *buf, unsigned int *buflen);
+ int rds_message_add_rdma_dest_extension(struct rds_header *hdr, u32 r_key, u32 offset);
+ int rds_message_inc_copy_to_user(struct rds_incoming *inc, struct iov_iter *to);
+-void rds_message_inc_free(struct rds_incoming *inc);
+ void rds_message_addref(struct rds_message *rm);
+ void rds_message_put(struct rds_message *rm);
+ void rds_message_wait(struct rds_message *rm);
+@@ -1013,7 +1012,5 @@ void rds_trans_put(struct rds_transport *trans);
+ unsigned int rds_trans_stats_info_copy(struct rds_info_iterator *iter,
+ 				       unsigned int avail);
+ struct rds_transport *rds_trans_get(int t_type);
+-int rds_trans_init(void);
+-void rds_trans_exit(void);
+ 
+ #endif
+diff --git a/net/rds/tcp.h b/net/rds/tcp.h
+index f8b5930d7b34..053aa7da87ef 100644
+--- a/net/rds/tcp.h
++++ b/net/rds/tcp.h
+@@ -56,7 +56,6 @@ void rds_tcp_restore_callbacks(struct socket *sock,
+ 			       struct rds_tcp_connection *tc);
+ u32 rds_tcp_write_seq(struct rds_tcp_connection *tc);
+ u32 rds_tcp_snd_una(struct rds_tcp_connection *tc);
+-u64 rds_tcp_map_seq(struct rds_tcp_connection *tc, u32 seq);
+ extern struct rds_transport rds_tcp_transport;
+ void rds_tcp_accept_work(struct sock *sk);
+ int rds_tcp_laddr_check(struct net *net, const struct in6_addr *addr,
+-- 
+2.34.1
 
 
