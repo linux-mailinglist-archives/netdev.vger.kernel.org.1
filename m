@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-26747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA732778C1A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E238778C1C
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB5C01C2156C
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:32:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FEA71C21584
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0949C566B;
-	Fri, 11 Aug 2023 10:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A144A539D;
+	Fri, 11 Aug 2023 10:32:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9D479CC
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:32:13 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E21F5
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:32:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955D126B31
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:32:47 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB89DC
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:32:46 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6B43321867;
-	Fri, 11 Aug 2023 10:32:11 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4B50A1F889;
+	Fri, 11 Aug 2023 10:32:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1691749931; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1691749965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=T+qcMehXaM0r1mfC9ir3s+1A5O0O+spie77jXbMpp4w=;
-	b=uSISX2TEZUgYsPXLSVIhrhO84dpvemCeJNgve09VqCqzpfrm4bwRRpSZxS7BgypJp6qbn5
-	bFDYDgSg1qACqTMMEUuzOfoPZW7MFS7FeIZlGPlviFT4xLQAe8suT4btqdFZ3KQJBd+ihp
-	MBLR98Kq0D2u06SOvO8xkZHaNhF/RgE=
+	bh=rSCiVd63A0apbQOTi8RD4ORweBgcojuoEuE9DEzZ7LI=;
+	b=2XXuDJKDL8Crugro2NSEFovJQEoWsttrmCRpVDjPksO6ZeTpeSnIPAfUroAIlFI+xhBFzm
+	2jhHUE21m2Awu6C/RphGOghxhvd1E4xJWHorF5LxOqU7lJ5PRJ83Jor3LU4elKfVxn0fVW
+	9gOyRm8/c+OK3REWkYV6f5XaYHxqSzY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1691749931;
+	s=susede2_ed25519; t=1691749965;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=T+qcMehXaM0r1mfC9ir3s+1A5O0O+spie77jXbMpp4w=;
-	b=1eKVElsQgYs7rKPBv8rP+d6zdinOV8nxdgLLDY/SPNFUM+/d889N1X4Gh3Xg74jFVJh1Xw
-	ZaFomiA6BNXMyMAQ==
+	bh=rSCiVd63A0apbQOTi8RD4ORweBgcojuoEuE9DEzZ7LI=;
+	b=i7xRR9AYtZ/w7qvekkhXG/NqEFvsM6bocRfPlyywLmfDJ1zSCSDofQgzel2TCK0jvEOYu9
+	J0zvxGYvzW9Ra1Dg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AC04213592;
-	Fri, 11 Aug 2023 10:32:10 +0000 (UTC)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 86EAE13592;
+	Fri, 11 Aug 2023 10:32:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
 	by imap2.suse-dmz.suse.de with ESMTPSA
-	id vKk3JCoO1mQiNwAAMHmgww
-	(envelope-from <hare@suse.de>); Fri, 11 Aug 2023 10:32:10 +0000
-Message-ID: <df555e96-b603-f024-a099-45fba40d7ea6@suse.de>
-Date: Fri, 11 Aug 2023 12:32:09 +0200
+	id oPirH0wO1mQiNwAAMHmgww
+	(envelope-from <hare@suse.de>); Fri, 11 Aug 2023 10:32:44 +0000
+Message-ID: <c05035e6-1d90-411b-545f-a1dbd1f946a4@suse.de>
+Date: Fri, 11 Aug 2023 12:32:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +64,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/17] nvme-tcp: allocate socket file
+Subject: Re: [PATCH 11/17] nvmet: make TCP sectype settable via configfs
 Content-Language: en-US
 To: Simon Horman <horms@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
@@ -72,7 +72,7 @@ Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
  Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
  Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 References: <20230810150630.134991-1-hare@suse.de>
- <20230810150630.134991-8-hare@suse.de> <ZNYLRqZVjr5o3bst@vergenet.net>
+ <20230810150630.134991-12-hare@suse.de> <ZNYMQPCbsqxOtFur@vergenet.net>
 From: Hannes Reinecke <hare@suse.de>
 Autocrypt: addr=hare@suse.de; keydata=
  xsFNBE6KyREBEACwRN6XKClPtxPiABx5GW+Yr1snfhjzExxkTYaINHsWHlsLg13kiemsS6o7
@@ -118,49 +118,32 @@ Autocrypt: addr=hare@suse.de; keydata=
  QuSHPtufr0nWz7vC3IackvoFHNjQ92ZbHhFbOqLYFHvqaBu8N2PE0YhPh0y0/sjmHM9DHUQh
  jbCcdMlwO54T4hHLBbuR/lU6locuDn9SsF5lFeoPtfnztU0+GtqTw+cRSo0g2ARonLsydcQ0
  YwtooKEemPj2lg==
-In-Reply-To: <ZNYLRqZVjr5o3bst@vergenet.net>
+In-Reply-To: <ZNYMQPCbsqxOtFur@vergenet.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/11/23 12:19, Simon Horman wrote:
-> On Thu, Aug 10, 2023 at 05:06:20PM +0200, Hannes Reinecke wrote:
->> When using the TLS upcall we need to allocate a socket file such
->> that the userspace daemon is able to use the socket.
->>
->> Signed-off-by: Hannes Reinecke <hare@suse.de>
->> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On 8/11/23 12:24, Simon Horman wrote:
+> On Thu, Aug 10, 2023 at 05:06:24PM +0200, Hannes Reinecke wrote:
 > 
 > ...
 > 
->> @@ -1512,6 +1514,7 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
->>   	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
->>   	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
->>   	int ret, rcv_pdu_size;
->> +	struct file *sock_file;
->>   
->>   	mutex_init(&queue->queue_lock);
->>   	queue->ctrl = ctrl;
->> @@ -1534,6 +1537,13 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
->>   		goto err_destroy_mutex;
->>   	}
->>   
->> +	sock_file = sock_alloc_file(queue->sock, O_CLOEXEC, NULL);
->> +	if (IS_ERR(sock_file)) {
->> +		sock_release(queue->sock);
+>> +static ssize_t nvmet_addr_tsas_store(struct config_item *item,
+>> +		const char *page, size_t count)
+>> +{
+>> +	struct nvmet_port *port = to_nvmet_port(item);
+>> +	u8 treq = nvmet_port_disc_addr_treq_mask(port);
 > 
 > Hi Hannes,
 > 
-> Is it correct to call sock_release() here?
-> sock_alloc_file() already does so on error.
+> treq appears to be unused in this function.
 > 
-> Flagged by Smatch.
-> 
-Ah, no, you are correct. Will be fixing it up.
+And so it is. Will be cleaning it up.
 
 Cheers,
 
