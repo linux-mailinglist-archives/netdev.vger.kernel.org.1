@@ -1,99 +1,80 @@
-Return-Path: <netdev+bounces-26597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D552B7784A8
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 02:47:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEBBD7784CD
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 03:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E78F281EA9
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 00:47:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F45D281EA5
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353A37E9;
-	Fri, 11 Aug 2023 00:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55997F6;
+	Fri, 11 Aug 2023 01:15:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7138371
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:47:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8340C433C7;
-	Fri, 11 Aug 2023 00:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691714839;
-	bh=IaxhkhHPZQw6m7eWITh2gsrzur8oY47l3tCN2cv5VUc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z15d1G7YV7/9qjOr4fju08cebRbQIW5i8BmkTNd4sJnXdNJphUGOsEM1tgVCqDBbB
-	 f/8F/kmNYcr/fDXZeNJN8KDXgUwtn4PsbjEMiHY9JDApND5zq1PnWjF//kWoXfRMlm
-	 sFqHVVi4rko2HUebYbjh8wmScub5yQGGCf6iGFK4Zrv5p0Wzu2uexOFpL5lq1iyhUA
-	 WjjFRLGOutZdGs2R7YDkKRD0BBce1stIyKB2ZqeeV5kM/wr+PsD/ef9/Tb2Xk6HwUM
-	 OQ6RRqoNiLxN15+WPYCVuYPKDju/1tkTXGrrxtL6APJl5Anb/P7Fd/SvUe1JqzXHGf
-	 Ed0cR9TOH9KDg==
-Date: Thu, 10 Aug 2023 17:47:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Manish Chopra <manishc@marvell.com>
-Cc: <netdev@vger.kernel.org>, <aelior@marvell.com>, <palok@marvell.com>,
- <njavali@marvell.com>, <skashyap@marvell.com>, <jmeneghi@redhat.com>,
- <yuval.mintz@qlogic.com>, <skalluru@marvell.com>, <pabeni@redhat.com>,
- <edumazet@google.com>, <horms@kernel.org>, David Miller
- <davem@davemloft.net>
-Subject: Re: [PATCH v2 net] qede: fix firmware halt over suspend and resume
-Message-ID: <20230810174718.38190258@kernel.org>
-In-Reply-To: <20230809134339.698074-1-manishc@marvell.com>
-References: <20230809134339.698074-1-manishc@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8BA7F1
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 01:15:18 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ADB42D61;
+	Thu, 10 Aug 2023 18:15:13 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RMQmP4FJpzrSFV;
+	Fri, 11 Aug 2023 09:13:57 +0800 (CST)
+Received: from [10.174.179.215] (10.174.179.215) by
+ canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 11 Aug 2023 09:15:11 +0800
+Subject: Re: [PATCH net-next] rds: tcp: Remove unused declaration
+ rds_tcp_map_seq()
+To: Simon Horman <horms@kernel.org>
+CC: <santosh.shilimkar@oracle.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<rds-devel@oss.oracle.com>
+References: <20230809144148.13052-1-yuehaibing@huawei.com>
+ <ZNU/M1Iot28KUYtv@vergenet.net>
+From: Yue Haibing <yuehaibing@huawei.com>
+Message-ID: <982cc90a-d45b-ceaa-c1cf-bc2a8e897e01@huawei.com>
+Date: Fri, 11 Aug 2023 09:15:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <ZNU/M1Iot28KUYtv@vergenet.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 9 Aug 2023 19:13:39 +0530 Manish Chopra wrote:
-> While performing certain power-off sequences, PCI drivers are
-> called to suspend and resume their underlying devices through
-> PCI PM (power management) interface. However this NIC hardware
-> does not support PCI PM suspend/resume operations so system wide
-> suspend/resume leads to bad MFW (management firmware) state which
-> causes various follow-up errors in driver when communicating with
-> the device/firmware afterwards.
-
-Does the FW end up recovering? That could still be preferable
-to rejecting suspend altogether. Reject is a big hammer,
-I'm a bit worried it will cause a regression in stable.
-
-> To fix this driver implements PCI PM suspend handler to indicate
-> unsupported operation to the PCI subsystem explicitly, thus avoiding
-> system to go into suspended/standby mode.
+On 2023/8/11 3:49, Simon Horman wrote:
+> On Wed, Aug 09, 2023 at 10:41:48PM +0800, Yue Haibing wrote:
+>> rds_tcp_map_seq() is never implemented and used since
+>> commit 70041088e3b9 ("RDS: Add TCP transport to RDS").
+>>
+>> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 > 
-> Fixes: 2950219d87b0 ("qede: Add basic network device support")
-> Cc: David Miller <davem@davemloft.net>
-> Signed-off-by: Manish Chopra <manishc@marvell.com>
-> Signed-off-by: Alok Prasad <palok@marvell.com>
-> ---
-> V1->V2:
-> * Replace SIMPLE_DEV_PM_OPS with DEFINE_SIMPLE_DEV_PM_OPS
-> ---
->  drivers/net/ethernet/qlogic/qede/qede_main.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+> Reviewed-by: Simon Horman <horms@kernel.org>
 > 
-> diff --git a/drivers/net/ethernet/qlogic/qede/qede_main.c b/drivers/net/ethernet/qlogic/qede/qede_main.c
-> index d57e52a97f85..18ae7af1764c 100644
-> --- a/drivers/net/ethernet/qlogic/qede/qede_main.c
-> +++ b/drivers/net/ethernet/qlogic/qede/qede_main.c
-> @@ -177,6 +177,18 @@ static int qede_sriov_configure(struct pci_dev *pdev, int num_vfs_param)
->  }
->  #endif
->  
-> +static int __maybe_unused qede_suspend(struct device *dev)
-> +{
-> +	if (!dev)
-> +		return -ENODEV;
+> BTW, I think these rds patches could have been rolled-up
+> into a patch-set, or perhaps better still squashed into a single patch.
 
-Can dev really be NULL here? That wouldn't make sense, what's the
-driver supposed to do in such case?
--- 
-pw-bot: cr
+Thanks, will fold them in v2.
+> .
+> 
 
