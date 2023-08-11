@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-26667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D8477886A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:41:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46F5B77886C
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 730601C20DBA
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 07:41:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 784D11C20B3B
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 07:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0B96FCF;
-	Fri, 11 Aug 2023 07:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772D76FDA;
+	Fri, 11 Aug 2023 07:36:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C7B6FBB
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF376FBB
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:36:49 +0000 (UTC)
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D11E73
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:36:47 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5868992ddd4so22015607b3.0
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:36:47 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 812CBE73
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:36:48 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-586b0ef8b04so21945217b3.3
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:36:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691739406; x=1692344206;
+        d=google.com; s=20221208; t=1691739408; x=1692344208;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5UMLpUluLENDH4N9gmhtp92yEoh+7NGF0JnjDU+TsY=;
-        b=jPn3wMTZOBfoGSGLMrfgcizvMgzD48jJ5pPGzY8lQzTlNkCQVRCMoO4BI6RG1k1ioQ
-         anR4PX2dNw99qTGhYZbps15Y/o8x2rNtzLdv6yUwtD7R75NwM7Kk20OT8CZMgj6uxErH
-         H2qDy9jE78ETPxN7MD0YXQr8/yK3vF8CpbDzZ7D20MzEwQ0OTJ8NbqWRgZ6brMdwdqS3
-         SDvl5u1whunaSiuAw28hgmcxr1hGubFDcxtjzru89CgiCCfE9oUfg3fFSoI8J6p44t+H
-         MK8VU/Djf9QLyghT14MQUb/DyBMKqPb89dsNSkrWvSv49c6P1Cqmb7nkbsSmv5Fc0GBW
-         B83w==
+        bh=qRXx54Rrv0R6ZUU0HGrbxO1CZZxe1cpmwnOg0j7oCL8=;
+        b=d0pAwkQ5bFXwMNexWwnoPB09NymFMwaF+ZcLVGtwniUZvESHn9xo9Qt4t+DJ4u1R7C
+         vLWu2Iq3Wm5WJ5uFS1jA102j1cu73MkMNfjeBlP0e9bUXbHr0a9IA8fHEMn8YVepGS0e
+         RTMlgiKBhX+M/O/ZIEGs1qKpReb/WjAXrrC5G4aqoWQvks9SRZPUq7o0coYEpNaqPD1w
+         wp7q9JZmruq/4nVXEOp/aKrCFAbP1V5usauGXUdLIncm0RLU+LlwLpCY2BvxedymyA8l
+         SXE/EEAyJdcwFF8trhDsjVJgC1QXzod4Y4l2clhct5t64xSW+uLoENUej7sjqDEP1GHN
+         AV2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691739406; x=1692344206;
+        d=1e100.net; s=20221208; t=1691739408; x=1692344208;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5UMLpUluLENDH4N9gmhtp92yEoh+7NGF0JnjDU+TsY=;
-        b=iXqxxTq6Lg2UthOxCel8XpM4+1Q/tEWCgflKRcexck8xkcoFrL7ZV4V18MOI+D//L4
-         uSbcowT1WBcDrezfwbChctR9fWgibaE2InPlmt7S8czud8PqmBd2bEPfUpD8CBEjGTWU
-         HTsk5zeiz5yQVr2g3g/l32wKqpbHaLhLX13bQ3kEU83HrDcyv6e5jWUb2owgjE+vaHoB
-         bLRT1lNfxHYxg8oDa7fBjnVKrKu58GUA+GcBYy4D5nTxlp5s+mS4AuSk/Q1o4qNAVudu
-         fNsYGaDFc+gdHJN4E5c/TndaCBUnB2I7AinvV8tpHZZ3ELrrOeB5Caj5w/QZaNs8WjjR
-         JYwA==
-X-Gm-Message-State: AOJu0YwJXbNcjxuoazWy/t2JdT8G2Alnavh/kS6eTdxRysBXS/l4p2zV
-	n/UQEtIy0HhIPzHDRDe9e17RwX+GnvUMcg==
-X-Google-Smtp-Source: AGHT+IGgqZOZI//tvdqzPujonP8TBSqfbeDB1WvHHujYeOsv4jD9eIcpSKZKlo4BUj6G7q3EK2jnvghXCE1l6A==
+        bh=qRXx54Rrv0R6ZUU0HGrbxO1CZZxe1cpmwnOg0j7oCL8=;
+        b=HyryHtfA0SLptuyHU98Ot1LWD41++yJgAfVbH6Lf8V90fH2sgkowPqx3SQsBOyUdu1
+         v5TjCBX4L/gRTEkoBoYQqNtRiYrtV1IeM2WV75thnYZlU3GlRkMh97TZNUhdIcDnyAwi
+         8mI7OEoD9cVHv2bUReqHoFptQ2xGnVID/SQEn09OSCOQRbxjtLS5TelFUxvd2IqkW85W
+         Lu9rPo3CV4PR3HvF6mu64lTBd83CjY/sUTQdAc1r2EZgvNAuiibzdMrFin6J9wJXyQ39
+         DzjJz1QMYx9S/RYfIjVTr6UuzGcWhQXVLpqaZ4oep8fdEL0jKwUapAuYt4G2UFihLeB/
+         TpZQ==
+X-Gm-Message-State: AOJu0YyMcepV3AyQ/3sChs0DUQL2zSUxUTbjfO2lIANlHYj2ywtD0/6C
+	6F2F7MliC0lBDisYjJsSKbO/fJ4T3PrU9A==
+X-Google-Smtp-Source: AGHT+IEvnsOoyI5jBGG4kymeZC36qUNhF0jlycQ9bWCyjnAEww/d2e6AwUFxMjP8Yn+XJleQqJ4uS0T8D9phmw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:d7d2:0:b0:d4f:d7a5:ba3b with SMTP id
- o201-20020a25d7d2000000b00d4fd7a5ba3bmr12532ybg.8.1691739406392; Fri, 11 Aug
- 2023 00:36:46 -0700 (PDT)
-Date: Fri, 11 Aug 2023 07:36:20 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:af42:0:b0:573:5797:4b9e with SMTP id
+ x2-20020a81af42000000b0057357974b9emr17215ywj.1.1691739407775; Fri, 11 Aug
+ 2023 00:36:47 -0700 (PDT)
+Date: Fri, 11 Aug 2023 07:36:21 +0000
 In-Reply-To: <20230811073621.2874702-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230811073621.2874702-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230811073621.2874702-15-edumazet@google.com>
-Subject: [PATCH v2 net-next 14/15] inet: implement lockless IP_TTL
+Message-ID: <20230811073621.2874702-16-edumazet@google.com>
+Subject: [PATCH v2 net-next 15/15] inet: implement lockless IP_MINTTL
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -77,91 +77,80 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-ip_select_ttl() is racy, because it reads inet->uc_ttl
-without proper locking.
+inet->min_ttl is already read with READ_ONCE().
 
-Add READ_ONCE()/WRITE_ONCE() annotations while
-allowing IP_TTL socket option to be set/read without
-holding the socket lock.
+Implementing IP_MINTTL socket option set/read
+without holding the socket lock is easy.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 ---
- net/ipv4/ip_output.c   |  2 +-
- net/ipv4/ip_sockglue.c | 27 ++++++++++++---------------
- 2 files changed, 13 insertions(+), 16 deletions(-)
+ net/ipv4/ip_sockglue.c | 32 ++++++++++++++------------------
+ 1 file changed, 14 insertions(+), 18 deletions(-)
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 8f396eada1b6e61ab174473e9859bc62a10a0d1c..ce6257860a4019d01e28d57d3ce4981fe79d0a0e 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -133,7 +133,7 @@ EXPORT_SYMBOL_GPL(ip_local_out);
- static inline int ip_select_ttl(const struct inet_sock *inet,
- 				const struct dst_entry *dst)
- {
--	int ttl = inet->uc_ttl;
-+	int ttl = READ_ONCE(inet->uc_ttl);
- 
- 	if (ttl < 0)
- 		ttl = ip4_dst_hoplimit(dst);
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index cfa65a0b0900f2f77bfd800f105ea079e2afff7c..dbb2d2342ebf0c1f1366ee6b6b2158a6118b2659 100644
+index dbb2d2342ebf0c1f1366ee6b6b2158a6118b2659..61b2e7bc7031501ff5a3ebeffc3f90be180fa09e 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -1023,6 +1023,13 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 	case IP_BIND_ADDRESS_NO_PORT:
- 		inet_assign_bit(BIND_ADDRESS_NO_PORT, sk, val);
+@@ -1030,6 +1030,17 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 			return -EINVAL;
+ 		WRITE_ONCE(inet->uc_ttl, val);
  		return 0;
-+	case IP_TTL:
++	case IP_MINTTL:
 +		if (optlen < 1)
 +			return -EINVAL;
-+		if (val != -1 && (val < 1 || val > 255))
++		if (val < 0 || val > 255)
 +			return -EINVAL;
-+		WRITE_ONCE(inet->uc_ttl, val);
++
++		if (val)
++			static_branch_enable(&ip4_min_ttl);
++
++		WRITE_ONCE(inet->min_ttl, val);
 +		return 0;
  	}
  
  	err = 0;
-@@ -1080,13 +1087,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 	case IP_TOS:	/* This sets both TOS and Precedence */
- 		__ip_sock_set_tos(sk, val);
+@@ -1326,21 +1337,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		err = xfrm_user_policy(sk, optname, optval, optlen);
  		break;
--	case IP_TTL:
+ 
+-	case IP_MINTTL:
 -		if (optlen < 1)
 -			goto e_inval;
--		if (val != -1 && (val < 1 || val > 255))
+-		if (val < 0 || val > 255)
 -			goto e_inval;
--		inet->uc_ttl = val;
+-
+-		if (val)
+-			static_branch_enable(&ip4_min_ttl);
+-
+-		/* tcp_v4_err() and tcp_v4_rcv() might read min_ttl
+-		 * while we are changint it.
+-		 */
+-		WRITE_ONCE(inet->min_ttl, val);
 -		break;
- 	case IP_MTU_DISCOVER:
- 		if (val < IP_PMTUDISC_DONT || val > IP_PMTUDISC_OMIT)
- 			goto e_inval;
-@@ -1590,6 +1590,11 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_BIND_ADDRESS_NO_PORT:
- 		val = inet_test_bit(BIND_ADDRESS_NO_PORT, sk);
+-
+ 	case IP_LOCAL_PORT_RANGE:
+ 	{
+ 		const __u16 lo = val;
+@@ -1595,6 +1591,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 		if (val < 0)
+ 			val = READ_ONCE(sock_net(sk)->ipv4.sysctl_ip_default_ttl);
  		goto copyval;
-+	case IP_TTL:
-+		val = READ_ONCE(inet->uc_ttl);
-+		if (val < 0)
-+			val = READ_ONCE(sock_net(sk)->ipv4.sysctl_ip_default_ttl);
++	case IP_MINTTL:
++		val = READ_ONCE(inet->min_ttl);
 +		goto copyval;
  	}
  
  	if (needs_rtnl)
-@@ -1629,14 +1634,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_TOS:
- 		val = inet->tos;
- 		break;
--	case IP_TTL:
--	{
--		struct net *net = sock_net(sk);
--		val = (inet->uc_ttl == -1 ?
--		       READ_ONCE(net->ipv4.sysctl_ip_default_ttl) :
--		       inet->uc_ttl);
+@@ -1731,9 +1730,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 		len -= msg.msg_controllen;
+ 		return copy_to_sockptr(optlen, &len, sizeof(int));
+ 	}
+-	case IP_MINTTL:
+-		val = inet->min_ttl;
 -		break;
--	}
- 	case IP_MTU_DISCOVER:
- 		val = inet->pmtudisc;
+ 	case IP_LOCAL_PORT_RANGE:
+ 		val = inet->local_port_range.hi << 16 | inet->local_port_range.lo;
  		break;
 -- 
 2.41.0.640.ga95def55d0-goog
