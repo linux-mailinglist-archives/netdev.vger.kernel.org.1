@@ -1,80 +1,78 @@
-Return-Path: <netdev+bounces-26600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C4377851A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 03:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67B4177851B
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 03:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D1E5281EA9
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:50:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21588281D4A
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 01:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A368811;
-	Fri, 11 Aug 2023 01:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18707811;
+	Fri, 11 Aug 2023 01:51:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A90C7F1
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 01:50:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E753C433C9;
-	Fri, 11 Aug 2023 01:50:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691718620;
-	bh=MIuozqkZQPdiui0wTMozc3wjugn42WVwN3d9+STl/i4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rhTZYmUxy1H4JR81XSecjJ4XqjLUmD10Y//zgD8ah7WAOLREvfwRf4zrMkH6H/UHi
-	 aBOk8D9034rLQmPzbPNeci8dqFcOwy4GWWoKotB4eW0eKvk4m7pDucwhlPfczzeeVP
-	 ug78dyg2awWuBK/S3aaw4N1IdwcX2Jv/M5O2rQwgaFhwVSc4X0aTqkbZG8QLBRPoOv
-	 lCF/x9qUS5n2yuy4ErRwhQ4xQK9Ph8HHA24UNUdfSmI3fr6KkwMsk8joaShNcdVJXa
-	 dv4ZOfBpIMCBcxphOvIa4zUuDNaxnUaoK+9v9tQ6jxtKZ9TrwcD1IACTFgavGGfxi9
-	 eH37vVig7XJDA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8601CC39562;
-	Fri, 11 Aug 2023 01:50:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7847F1
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 01:51:14 +0000 (UTC)
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id E876B2718
+	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 18:51:12 -0700 (PDT)
+Received: (qmail 263409 invoked by uid 1000); 10 Aug 2023 21:51:11 -0400
+Date: Thu, 10 Aug 2023 21:51:11 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
+Cc: bjorn@mork.no, davem@davemloft.net, edumazet@google.com,
+  eniac-xw.zhang@hp.com, hayeswang@realtek.com, jflf_kernel@gmx.com,
+  kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+  netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org,
+  svenva@chromium.org
+Subject: Re: [PATCH v2] r8152: Suspend USB device before shutdown when WoL is
+ enabled
+Message-ID: <cce11aea-166e-4d4b-84c0-a7fafb666aba@rowland.harvard.edu>
+References: <78e3aade-2a88-42f4-9991-8e245f3eb9b9@rowland.harvard.edu>
+ <20230810225109.13973-1-alexandru.gagniuc@hp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: caif: Remove unused declaration
- cfsrvl_ctrlcmd()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169171862054.26303.8151661131363401658.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Aug 2023 01:50:20 +0000
-References: <20230809134943.37844-1-yuehaibing@huawei.com>
-In-Reply-To: <20230809134943.37844-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810225109.13973-1-alexandru.gagniuc@hp.com>
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,SORTED_RECIPS,SPF_HELO_PASS,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 9 Aug 2023 21:49:43 +0800 you wrote:
-> Commit 43e369210108 ("caif: Move refcount from service layer to sock and dev.")
-> declared but never implemented this.
+On Thu, Aug 10, 2023 at 10:51:09PM +0000, Alexandru Gagniuc wrote:
+> On Thu, Aug 10, 2023 at 01:34:39PM -0400, Alan Stern wrote:
+> > I was thinking that the host controller driver's shutdown method might 
+> > turn off power to all of the ports.
+> > 
+> > For example, in the ehci-hcd driver, ehci_shutdown() calls 
+> > ehci_silence_controller(), which calls ehci_turn_off_all_ports().  I 
+> > don't know if xhci-hcd does anything similar.
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  include/net/caif/cfsrvl.h | 3 ---
->  1 file changed, 3 deletions(-)
+> EHCI is a different beast. I don't think EHCI (USB2.0) has the U3 link state.
 
-Here is the summary with links:
-  - [net-next] net: caif: Remove unused declaration cfsrvl_ctrlcmd()
-    https://git.kernel.org/netdev/net-next/c/4a8d287909c9
+USB-2 doesn't have link states, but it does have the notion of a 
+downstream port being suspended, which is effectively the same as U3.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> The equivalent for would be xhci_shutdown(). It makes a call to
+> usb_disable_xhci_ports() for XHCI_SPURIOUS_REBOOT quirk. As I have not
+> encountered it, I don't know how it will affect the link state of other ports.
+> The quirk appears to switch ports to EHCI mode, rather than turn off power.
 
+All right.  The important point is that the patch works for your 
+situation.  I was just trying to find out how much thought you had given 
+to the possibilities other people might face, if their systems aren't 
+quite the same as yours.
 
+Alan Stern
 
