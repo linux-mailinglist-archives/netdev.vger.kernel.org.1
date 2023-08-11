@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-26840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D66F779305
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:26:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B34D77932B
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC141C2094E
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 565BA28213A
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0C12AB2A;
-	Fri, 11 Aug 2023 15:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFCC2AB30;
+	Fri, 11 Aug 2023 15:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7B463B6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:26:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18745C433C7;
-	Fri, 11 Aug 2023 15:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD02D63B6
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:32:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD266C433C8;
+	Fri, 11 Aug 2023 15:32:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691767594;
-	bh=8LXyzi9tvgdg/Pt2fdxEW4wGcEQOw91QGZ21a4I/e4w=;
+	s=k20201202; t=1691767967;
+	bh=8nt9DTFqGIU4xkjW653vHfuilV4mMlbe76FwKDCFnK8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cvZP4I+bsBDIGK4WsAPL+Bb5UUmNb7iVuvIfagSWS/sAp831+bUMfPaS+ZoTFtrsC
-	 psChQEYansyXexDJqNiT/liRlZ1DMW2KprtT+LIKOKgYZeFzMUrhdw7Pk5NHU6QQXR
-	 9tX8JqgefFaI62JUNJa1YmX4gCyNlvJNYn8NFirfFJHiCRutPqDTyY5K5usMUWUOkS
-	 aHL+DQHN3TTYtsH+Nut3XmtMvykQhAJph0vdiax6qhTX/hq+FgCI0sJHjJm5cglfJK
-	 wa8ZqErohcznOUjY+zYTbmVE7rkMgXJYztWygBmezaROcEWbXVWjTBZ/bOCE/bvxdS
-	 yfNUCt07FOj8w==
-Message-ID: <3fc59b72-65fb-66e3-e291-ec20d1f468d4@kernel.org>
-Date: Fri, 11 Aug 2023 18:26:29 +0300
+	b=E3Ets5VjHBo2BMsplQol40tRgn91TgXVibqUuahKKPmjALG2/onhb+31vxyG2cnyC
+	 NpMyX8gXi47s4ru/SyuOaanYwmwP0whvEr0LDHfrF3etUL99SQx86rCTs3vf6RoyR/
+	 0Pr+o7vw4t1oBTuc14+JGcj4Y/rWRl+WDE2pOSbYqQxFpt9zBIeQFVTqz4xHx7pGjr
+	 9bLVmeOyyZXIywmi0aTFcoLsQmeIk0LVBGbH1YF2cw5vz/LkZmxwpRdYQ1ue9MJG5g
+	 kIGQbVNXS3m9pa9BBWGD/OGRMLSS7tl5x1uT7BZwXeel7JFYNcXD1K+BXVsAUzhfR5
+	 TlS4kYDeXN0Lw==
+Message-ID: <a8a47866-ba29-9d5b-459d-ecdb2e89935c@kernel.org>
+Date: Fri, 11 Aug 2023 18:32:42 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,23 +43,21 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
 Subject: Re: [PATCH v2] net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption
  MAC Merge support
 Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Simon Horman <horms@kernel.org>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, srk@ti.com, vigneshr@ti.com,
- p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ pabeni@redhat.com, vladimir.oltean@nxp.com, s-vadapalli@ti.com, srk@ti.com,
+ vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 References: <20230810152538.138718-1-rogerq@kernel.org>
- <20230810152538.138718-1-rogerq@kernel.org>
- <20230810154703.cyyivcxlppdqr45q@skbuf>
+ <ZNYDZkjuFjF7n3VV@vergenet.net>
 From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20230810154703.cyyivcxlppdqr45q@skbuf>
+In-Reply-To: <ZNYDZkjuFjF7n3VV@vergenet.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Vladimir,
+Hi Simon,
 
-On 10/08/2023 18:47, Vladimir Oltean wrote:
-> Hi Roger,
-> 
+On 11/08/2023 12:46, Simon Horman wrote:
 > On Thu, Aug 10, 2023 at 06:25:38PM +0300, Roger Quadros wrote:
 >> Add driver support for viewing / changing the MAC Merge sublayer
 >> parameters and seeing the verification state machine's current state
@@ -79,155 +77,91 @@ On 10/08/2023 18:47, Vladimir Oltean wrote:
 >> [2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
 >>
 >> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>
->> Hi,
->>
->> Dropping the RFC tag as I now have MAC merge verification and frame
->> preemption working.
->>
->> Changelog:
->> v2:
->> - Use proper control bits for PMAC enable (AM65_CPSW_PN_CTL_IET_PORT_EN)
->>   and TX enable (AM65_CPSW_PN_IET_MAC_PENABLE)
->> - Common IET Enable (AM65_CPSW_CTL_IET_EN) is set if any port has
->>   AM65_CPSW_PN_CTL_IET_PORT_EN set.
->> - Fix workaround for erratum i2208. i.e. Limit rx_min_frag_size to 124
->> - Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
->>   1G link if link is inactive.
->> - resize the RX FIFO based on pmac_enabled, not tx_enabled.
->>
->> Test Procedure:
->>
->> - 2 EVMs with AM65-CPSW network port connected to each other
->> - Run iet-setup.sh on both
->>
->> #!/bin/sh
->> #iet-setup.sh
->>
->> ifconfig eth0 down
->> ifconfig eth1 down
->> ethtool -L eth0 tx 2
->> ethtool --set-priv-flags eth0 p0-rx-ptype-rrobin off
->> ethtool --set-mm eth0 pmac-enabled on tx-enabled on verify-enabled on verify-time 10 tx-min-frag-size 124
->> ifconfig eth0 up
->> sleep 10
->>
->> tc qdisc replace dev eth0 handle 8001: parent root stab overhead 24 taprio \
->> num_tc 2 \
->> map 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 \
->> queues 1@0 1@1 \
->> base-time 0 \
->> sched-entry S 01 1216 \
->> sched-entry S fe 12368 \
->> flags 0x2 \
->> fp P E E E E E E E
->>
->> tc -g class show dev eth0
->> tc qdisc add dev eth0 clsact
->> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5002 0xffff action skbedit priority 2
->> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5003 0xffff action skbedit priority 3
->>
->> - check that MAC merge verification has succeeded
->>
->> ethtool --show-mm eth0
->>
->>         MAC Merge layer state for eth0:
->>         pMAC enabled: on
->>         TX enabled: on
->>         TX active: on
->>         TX minimum fragment size: 124
->>         RX minimum fragment size: 124
->>         Verify enabled: on
->>         Verify time: 10
->>         Max verify time: 134
->>         Verification status: SUCCEEDED
 > 
-> Do you also plan to add support for mqprio, to present the same feature
-> set as everyone, and permit IET to be used without EST?
+> Hi Roger,
+> 
+> some minor feedback from my side.
+> 
+> ...
+> 
+>> +static int am65_cpsw_get_mm(struct net_device *ndev, struct ethtool_mm_state *state)
+>> +{
+>> +	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+>> +	u32 port_ctrl, cmn_ctrl, iet_ctrl, iet_status, verify_cnt;
+>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> +	struct am65_cpsw_ndev_priv *priv = netdev_priv(ndev);
+>> +	u32 add_frag_size;
+>> +
+>> +	mutex_lock(&priv->mm_lock);
+>> +
+>> +	iet_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
+>> +	cmn_ctrl = readl(common->cpsw_base + AM65_CPSW_REG_CTL);
+> 
+> cmn_ctrl appears to be set but not used.
+> Is this intentional?
 
-Yes. I'll try to include it in next spin.
+No. It is stale code.
+> 
+>> +	port_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
+>> +
+>> +	state->tx_enabled = !!(iet_ctrl & AM65_CPSW_PN_IET_MAC_PENABLE);
+>> +	state->pmac_enabled = !!(port_ctrl & AM65_CPSW_PN_CTL_IET_PORT_EN);
+>> +
+>> +	iet_status = readl(port->port_base + AM65_CPSW_PN_REG_IET_STATUS);
+>> +
+>> +	if (iet_ctrl & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY)
+>> +		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+>> +	else if (iet_status & AM65_CPSW_PN_MAC_VERIFIED)
+>> +		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
+>> +	else if (iet_status & AM65_CPSW_PN_MAC_VERIFY_FAIL)
+>> +		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
+>> +	else
+>> +		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_UNKNOWN;
+>> +
+>> +	add_frag_size = AM65_CPSW_PN_IET_MAC_GET_ADDFRAGSIZE(iet_ctrl);
+>> +	state->tx_min_frag_size = ethtool_mm_frag_size_add_to_min(add_frag_size);
+>> +
+>> +	/* Errata i2208: RX min fragment size cannot be less than 124 */
+>> +	state->rx_min_frag_size = 124;
+>> +
+>> +	/* FPE active if common tx_enabled and verification success or disabled (forced) */
+>> +	state->tx_active = state->tx_enabled &&
+>> +			   (state->verify_status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
+>> +			    state->verify_status == ETHTOOL_MM_VERIFY_STATUS_DISABLED);
+>> +	state->verify_enabled = !(iet_ctrl & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY);
+>> +
+>> +	verify_cnt = AM65_CPSW_PN_MAC_GET_VERIFY_CNT(readl(port->port_base +
+>> +							   AM65_CPSW_PN_REG_IET_VERIFY));
+> 
+> Likewise, verify_cnt appears to be set but not used.
 
+Will remove it.
 > 
-> What else would need to change in order for the am65 cpsw to
-> successfully run the existing tools/testing/selftests/net/forwarding/ethtool_mm.sh?
-> Just the extra driver-specific ethtool --set-priv-flags? If so, maybe
-> you could create a wrapper over the generic selftest, and put it in
-> tools/testing/selftests/drivers/net/. For DSA we also symlink a lot of
-> bridge selftests, for example.
+>> +	state->verify_time = port->qos.iet.verify_time_ms;
+>> +	state->max_verify_time = am65_cpsw_iet_get_verify_timeout_ms(AM65_CPSW_PN_MAC_VERIFY_CNT_MASK,
+>> +								     port);
+>> +	mutex_unlock(&priv->mm_lock);
+>> +
+>> +	return 0;
+>> +}
+> 
+> ...
+> 
+>> +void am65_cpsw_iet_change_preemptible_tcs(struct am65_cpsw_port *port, u8 preemptible_tcs)
+> 
+> nit: should this function be static?
+> 
+>> +{
+>> +	port->qos.iet.preemptible_tcs = preemptible_tcs;
+>> +	am65_cpsw_iet_commit_preemptible_tcs(port);
+>> +}
+>> +
+>> +void am65_cpsw_iet_link_state_update(struct net_device *ndev)
+> 
+> Ditto
 
-OK. I'll give it a try.
-
-> 
->> - On receiver EVM run 2 iperf instances
->>
->> iperf3 -s -i30 -p5002&
->> iperf3 -s -i30 -p5003&
->>
->> - On sender EVM run 2 iperf instances
->>
->> iperf3 -c 192.168.3.102 -u -b200M -l1472 -u -t5 -i30 -p5002&
->> iperf3 -c 192.168.3.102 -u -b50M -l1472 -u -t5 -i30 -p5003&
->>
->> - Check IET stats on sender. Look for iet_tx_frag increments
->>
->> ethtool -S eth0 | grep iet
->>
->>      iet_rx_assembly_err: 0
->>      iet_rx_assembly_ok: 0
->>      iet_rx_smd_err: 0
->>      iet_rx_frag: 0
->>      iet_tx_hold: 0
->>      iet_tx_frag: 17307
-> 
-> Can you please also implement the standardized ethtool_ops :: get_mm_stats()?
-> You can see these with ethtool -I --show-mm eth0.
-
-Yes.
-
-> 
->>
->> - Check IET stats on receiver. Look for iet_rx_frag and iet_rx_assembly_*
->>
->> ethtool -S eth0 | grep iet
->>
->>      iet_rx_assembly_err: 0
-> 
-> This would be struct ethtool_mm_stats :: MACMergeFrameAssErrorCount
-> 
->>      iet_rx_assembly_ok: 17302
-> 
-> This would be struct ethtool_mm_stats :: MACMergeFrameAssOkCount
-> 
->>      iet_rx_smd_err: 0
-> 
-> This would be struct ethtool_mm_stats :: MACMergeFrameSmdErrorCount
-> 
->>      iet_rx_frag: 17307
-> 
-> This would be struct ethtool_mm_stats :: MACMergeFragCountRx
-> 
->>      iet_tx_hold: 0
-> 
-> This would be struct ethtool_mm_stats :: MACMergeHoldCount
-> 
->>      iet_tx_frag: 0
-> 
-> This would be struct ethtool_mm_stats :: MACMergeFragCountTx
-> 
-
-Thanks for the hints :)
-
-> Also, I opened the AM62x datasheet again and I didn't find this, but I
-> still need to ask. The CPSW doesn't show the Ethernet counters broken
-> down by eMAC/pMAC, no? If it does, you should also add support for the
-> following:
-
-I don't think it does.
-
-> 
-> ethtool -I --show-pause eth0 --src pmac
-> ethtool -S eth0 --groups eth-mac eth-phy eth-ctrl rmon -- --src pmac
+Yes, both need to be static.
+Thanks for review!
 
 -- 
 cheers,
