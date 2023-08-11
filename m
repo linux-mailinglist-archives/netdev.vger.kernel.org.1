@@ -1,178 +1,195 @@
-Return-Path: <netdev+bounces-26922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B15779774
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 21:01:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A752577978A
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 21:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61BB31C21800
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 19:01:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FCC31C209D2
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 19:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80064219F6;
-	Fri, 11 Aug 2023 19:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4EF219FF;
+	Fri, 11 Aug 2023 19:09:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734878468
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 19:01:28 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DC730F3;
-	Fri, 11 Aug 2023 12:01:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691780487; x=1723316487;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=k+MHekhYBs3WdAqPDc1G+2v4ip6Z4JNaBx70Obb3qiI=;
-  b=jeRh9VS82BzcnYcVqQMrKBI9UHSWlOM0ZuWBtAYMo9L9g0hJLv7p/tKP
-   VswrYqSNQPB3DaiMK8DDOelh+HITh5edYV80j5kVek9ernOkfwgAZ7bXs
-   XmaxJnN6vhvWP8kGWBX809b+sRErAsmy8NGDHI41ooGTUWrl7G13fWH+u
-   mWeIGt5lmmc//vrDmxGPC9+jbsMAvcWpFiGDxPkpdNaglUTbEikMPVJkn
-   NmvAxGjz+G/4n/ID36vCA87k4l5S2CY6awVVok8/Nkru1YZDWF1leBJi6
-   3ralR0LtYdeM1rBvgAmmh1vrKT7NvziykwlvFbIFLbn1YLp2dBbcOoh47
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="402719006"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="402719006"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 12:00:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="802768096"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="802768096"
-Received: from pglc00052.png.intel.com ([10.221.207.72])
-  by fmsmga004.fm.intel.com with ESMTP; 11 Aug 2023 12:00:50 -0700
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: [PATCH net-next v2 2/2] net: stmmac: Tx coe sw fallback
-Date: Sat, 12 Aug 2023 03:00:32 +0800
-Message-Id: <20230811190032.13391-3-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.19.0
-In-Reply-To: <20230811190032.13391-1-rohan.g.thomas@intel.com>
-References: <20230810150328.19704-1-rohan.g.thomas@intel.com>
- <20230811190032.13391-1-rohan.g.thomas@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6638468
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 19:09:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98760C433C7;
+	Fri, 11 Aug 2023 19:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691780987;
+	bh=VfmfHOv6xko6YT4HOZzOKBhoBWltWaprWd7FnqJLdbk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=taCcphmE1F9dHFapXEZ5XHEpRt26FV/M7dylMddLm0+jKLD9w0TeDKaZzhogexxsz
+	 OVscaYm6Itm2domY51J5SML9b6dhHc9BzU26ehqEpGSD2fjOxfD3wMrU0d3NDeRLGs
+	 t4mwBGIS/h7BwXEFKO4ztKUFgyNPEoE6ZhRlki25UEX0+bFiqHNhGJybLe3ZdbLhfu
+	 9fuj+MWou2o2jsb7jCyyxx7fcmzlxUkIS0Hp9paw3NonL1wYsXBUZzXGgHXFnheF2O
+	 M75l7mkRTAc08Dr39YAi45QMYJfXWJ0pbkQ2/wROS6KRDGGQaiJrQAirOYw7pxZG5L
+	 3FyvWFeqQzRrg==
+Received: (nullmailer pid 3934074 invoked by uid 1000);
+	Fri, 11 Aug 2023 19:09:44 -0000
+Date: Fri, 11 Aug 2023 13:09:44 -0600
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 1/2] dt-bindings: mt76: support setting
+ per-band MAC address
+Message-ID: <20230811190944.GA3730441-robh@kernel.org>
+References: <d3130584b64309da28a04826100643ff6239f9ca.1690841657.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d3130584b64309da28a04826100643ff6239f9ca.1690841657.git.daniel@makrotopia.org>
 
-Add sw fallback of tx checksum calculation for those tx queues that
-don't support tx checksum offloading. Because, some DWMAC IPs support
-tx checksum offloading only for a few initial tx queues, starting
-from tx queue 0.
+On Mon, Jul 31, 2023 at 11:23:16PM +0100, Daniel Golle wrote:
+> Introduce support for setting individual per-band MAC addresses using
+> NVMEM cells by adding a 'bands' object with enumerated child nodes
+> representing the 2.4 GHz, 5 GHz and 6 GHz bands.
+> 
+> In case it is defined, call of_get_mac_address for the per-band child
+> node, otherwise try with of_get_mac_address on the main device node and
+> fall back to a random address like it used to be.
+> 
+> While at it, add MAC address related properties also for the main node.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> Changes since v2:
+>  * drop items list with only a single item
+> 
+> Changes since v1:
+>  * add dt-bindings
+> 
+>  .../bindings/net/wireless/mediatek,mt76.yaml  | 58 ++++++++++++++++++-
+>  1 file changed, 57 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+> index 252207adbc54c..7eafed53da1de 100644
+> --- a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+> +++ b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+> @@ -37,6 +37,12 @@ properties:
+>      description:
+>        MT7986 should contain 3 regions consys, dcm, and sku, in this order.
+>  
+> +  '#address-cells':
+> +    const: 1
+> +
+> +  '#size-cells':
+> +    const: 0
+> +
+>    interrupts:
+>      maxItems: 1
+>  
+> @@ -72,13 +78,23 @@ properties:
+>  
+>    ieee80211-freq-limit: true
+>  
+> +  address: true
 
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 19 +++++++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  4 ++++
- include/linux/stmmac.h                        |  1 +
- 4 files changed, 26 insertions(+)
+What's this? Not a documented property.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 3401e888a9f6..f526bcaaaf64 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -219,6 +219,8 @@ struct stmmac_priv {
- 	int hwts_tx_en;
- 	bool tx_path_in_lpi_mode;
- 	bool tso;
-+	bool tx_q_coe_lmt;
-+	u32 tx_q_with_coe;
- 	int sph;
- 	int sph_cap;
- 	u32 sarc_type;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fcab363d8dfa..cb8d2c159832 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4409,6 +4409,17 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	WARN_ON(tx_q->tx_skbuff[first_entry]);
- 
- 	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
-+	/* Some DWMAC IPs support tx coe only for a few initial tx queues,
-+	 * starting from tx queue 0. So checksum offloading for those queues
-+	 * that don't support tx coe needs to fallback to software checksum
-+	 * calculation.
-+	 */
-+	if (csum_insertion && priv->tx_q_coe_lmt &&
-+	    queue >= priv->tx_q_with_coe) {
-+		if (unlikely(skb_checksum_help(skb)))
-+			goto dma_map_err;
-+		csum_insertion = !csum_insertion;
-+	}
- 
- 	if (likely(priv->extend_desc))
- 		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
-@@ -7386,6 +7397,14 @@ int stmmac_dvr_probe(struct device *device,
- 		dev_info(priv->device, "SPH feature enabled\n");
- 	}
- 
-+	if (priv->plat->tx_coe &&
-+	    priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use) {
-+		priv->tx_q_coe_lmt = true;
-+		priv->tx_q_with_coe = priv->plat->tx_queues_with_coe;
-+		dev_info(priv->device, "TX COE limited to %u tx queues\n",
-+			 priv->tx_q_with_coe);
-+	}
-+
- 	/* Ideally our host DMA address width is the same as for the
- 	 * device. However, it may differ and then we have to use our
- 	 * host DMA width for allocation and the device DMA width for
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index be8e79c7aa34..0138b7c9c7ab 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -225,6 +225,10 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 				 &plat->tx_queues_to_use))
- 		plat->tx_queues_to_use = 1;
- 
-+	if (of_property_read_u32(tx_node, "snps,tx-queues-with-coe",
-+				 &plat->tx_queues_with_coe))
-+		plat->tx_queues_with_coe = plat->tx_queues_to_use;
-+
- 	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
- 		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
- 	else if (of_property_read_bool(tx_node, "snps,tx-sched-wfq"))
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 652404c03944..795c10d19c1c 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -252,6 +252,7 @@ struct plat_stmmacenet_data {
- 	u32 host_dma_width;
- 	u32 rx_queues_to_use;
- 	u32 tx_queues_to_use;
-+	u32 tx_queues_with_coe;
- 	u8 rx_sched_algorithm;
- 	u8 tx_sched_algorithm;
- 	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
--- 
-2.19.0
 
+> +
+> +  local-mac-address: true
+> +
+> +  mac-address: true
+
+You really need a ref to the schema defining these. But first we need to 
+split them out from ethernet-controller.yaml. Which I think there were 
+patches for, but it stalled out.
+
+Anyways, it's fine for now if you're not up for that.
+
+> +
+>    nvmem-cells:
+> +    minItems: 1
+>      items:
+>        - description: NVMEM cell with EEPROM
+> +      - description: NVMEM cell with the MAC address
+>  
+>    nvmem-cell-names:
+> +    minItems: 1
+>      items:
+>        - const: eeprom
+> +      - const: mac-address
+>  
+>    mediatek,eeprom-data:
+>      $ref: /schemas/types.yaml#/definitions/uint32-array
+> @@ -213,6 +229,29 @@ properties:
+>                      description:
+>                        Half-dBm power delta for different numbers of antennas
+>  
+> +patternProperties:
+> +  '^band@[0-2]+$':
+> +    type: object
+> +    additionalProperties: false
+> +    properties:
+> +      reg:
+> +        maxItems: 1
+> +
+> +      address: true
+> +      local-mac-address: true
+> +      mac-address: true
+> +
+> +      nvmem-cells:
+> +        description: NVMEM cell with the MAC address
+> +
+> +      nvmem-cell-names:
+> +        const: mac-address
+> +
+> +    required:
+> +      - reg
+> +
+> +    unevaluatedProperties: false
+> +
+>  required:
+>    - compatible
+>    - reg
+> @@ -225,10 +264,13 @@ examples:
+>        #address-cells = <3>;
+>        #size-cells = <2>;
+>        wifi@0,0 {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+>          compatible = "mediatek,mt76";
+>          reg = <0x0000 0 0 0 0>;
+>          ieee80211-freq-limit = <5000000 6000000>;
+> -        mediatek,mtd-eeprom = <&factory 0x8000>;
+> +        nvmem-cells = <&factory_eeprom>;
+> +        nvmem-cell-names = "eeprom";
+>          big-endian;
+>  
+>          led {
+> @@ -257,6 +299,20 @@ examples:
+>               };
+>            };
+>          };
+> +
+> +        band@0 {
+> +          /* 2.4 GHz */
+> +          reg = <0>;
+> +          nvmem-cells = <&macaddr 0x4>;
+> +          nvmem-cell-names = "mac-address";
+> +        };
+> +
+> +        band@1 {
+> +          /* 5 GHz */
+> +          reg = <1>;
+> +          nvmem-cells = <&macaddr 0xa>;
+> +          nvmem-cell-names = "mac-address";
+> +        };
+>        };
+>      };
+>  
+> -- 
+> 2.41.0
 
