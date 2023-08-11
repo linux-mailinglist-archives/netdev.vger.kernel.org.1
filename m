@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-26833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E0EB77929A
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:14:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F4277929F
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 17:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA058282272
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:14:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D245280C0A
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 15:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9434B29E1B;
-	Fri, 11 Aug 2023 15:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEC82AB28;
+	Fri, 11 Aug 2023 15:14:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CDB63B6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:14:34 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E3B30C4
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:14:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112F663B6
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:14:37 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4991B2D7F
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 08:14:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WYiPy2qlLHcq+pYCQv498kqz+qtvygzuHION0E/tVNIfx1cyS+WcrFGudFE0hNdnM7uVsHpA/PxcOzkaFG0Yb892HFQpqRuO3aZFBY+dQ9HIiw4LthTofo9CzwYBIlFoNfHPelAbJqntmJESLBMWK3NSQ/swrUcPfKZSOenZ2s919uOPcggvC2gtFzpsak8Waz9xGegIssA87z7RTFIZLMWguy+6cJtAsx1dL2T/PkymfFSbsDkDDIP/UViy1087gKKIrIKFUcuDm37QxgQioobNKcV09DeSAO3ByHT8/ienGTYTUHeq71NNRFfA+21CPvTjswQjXpFGRB/5bkh1lA==
+ b=AeFbX56yF6tihaq4xCvd2mmwARK4G/zKi2jA5Agc0uh6uVh8Rj3hnk8mHeZTfNW7JUjzYNzv3jigyCqBdm2URDhJYgkLW3A3fTMTNokkZZlfPaOz7uQT0Mc7CCDZy+I36VRe6DqBt132i2RM71djHbhfMzMsCrUafvY4fBMGEoWcwasnpNwasdErpKD0siUZnjwPcosfBw/SC6d81raqmHOaPzD7vgjFuQrsnTGD5GMzEdxr394B3GBKp9g5V+WEPEEmxnMR0IklqRpadlkVMp61OusD8EA8gpVe2O1CrdGHjhcSEgcmN8mFvusdZElRHpeH7q7jhg0WrfBstXqWYA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A0xN5cbSj78hccADOv0I9JajsJeFaaEdW5rCRERHF8I=;
- b=hCbdYmFTrFebPit1zgmTa38QMVu1Ne/lU6DJ9or6RjReCvhAMbygzuVfJ/sA2oFSL+VXxQgGXE6OqiHgzTjmM1XFeLWDgcfSNch7XLGFGuowO5xOe//mkRYU31wDN6hPOfvIBHvp09lj4KyzNadZAOgmSeEOykmC4d3WuvFkql5KqIRpunZqj2vuJggGoiqKFxh6dIBh6pCfjm0su4zovjlLwJOHu3uoWje5juKZan9PSU3gmkfOSJBaAKwX5ufZVWzB8t0B4OFOa4aaaHO+h7dYkS4kNBYOIBbaaaLJq+SLVGpT49fUWFuBbMwSt54QSxF1cxVyAHMh9mT2yWfiGQ==
+ bh=S5gEKgGlkvmds0kF8PjPIPWjacfOz4BrIEjfhqsydrk=;
+ b=Q697blAG5MG2fzBBLLw90NgOxF9AxgWUjhX2wTEBNCrSV5N9Mw9JAEGCY4rUt53704gyjosUk5JSNWPU//cNeuyoNKeuZPQ6gG/kmOEEc9+7XnhJ6KQdl4xCPNvkBmB3TQQ4nsuNhFhOg2V2mMXlTVh14kisk6LoJf83xfWYTRLnoACIBoS/cmy5u1qOT31Stu9YHuEETmZJwGkdWmg7fvTAHAyk10aX6fLrOTyeuzlu5nxdXJhs1vvnFww0XRLE/HEx48qMjrHpVxiof5C0UVVmcsIyqsgiR/zpsfV3mA0g4dIV8+RAJb9knBFjEHnNlntcs39C1OBrk8Mv+ZmcuQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -35,18 +35,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A0xN5cbSj78hccADOv0I9JajsJeFaaEdW5rCRERHF8I=;
- b=mVXI3XVBt8n0oh1kOzzk0k7MvtScG/WPPT4ibSspz202ZdhrxiPB9LYhlzAbh+PSeW7qpQW38h3n3/0nsgcCDfMjez+K6uW6oCTnSk2O2e9h23/h3aFqE4LXqET/6Zn61vXRwcJv234rhJHC6dmenMHV4BFO0Wd5PN3S9j+cj+/yM20+9wJroOaqW7XkuNOJ0bri9iHBa30UOaJkHpysGZmeGyzM5oUEBtVE2y9ixa/lRNwvrkdKJ2ucYzTIyN+8aLaR3x/90b8qfV22fgUt0P++ogEj2mLqUXTuLKskJR0LOXRR4XZFeXZ+ngHlwjexQvFAq6mXtWNRe7jtEQud/A==
-Received: from CY5PR15CA0258.namprd15.prod.outlook.com (2603:10b6:930:66::29)
- by CY8PR12MB7562.namprd12.prod.outlook.com (2603:10b6:930:95::16) with
+ bh=S5gEKgGlkvmds0kF8PjPIPWjacfOz4BrIEjfhqsydrk=;
+ b=EGH6XyFNWAA5x3BhrIb30SYA061Q90sR0TpTlJ4hWBHUmitKxeamceVf99/Z2yAtvJVe4/s/aP40tOrnibHDfoJozqlRgrwnF/B43vUFBi+qwWFxxeO4L8xiOOD1T37oLy/urshO37s/D/A79OhxozMzfWTuuhlAVNlHMaca8NXAvBUAjgwikMcp8L0tB7tjepcrtWEYK07dfgcQr81jpdGARMEKXOq5rIVEqVZ4y26pbwzCV7uNVgJo4kh2pBvcva1d0nHGmOVxJ8WvRMlTf/m8HT67+UYq8Wh9U6BhlY9zCEAdOcO+Tdl7DDYY0WncBLocb3njQoZ4AkichKOBiQ==
+Received: from CH2PR19CA0003.namprd19.prod.outlook.com (2603:10b6:610:4d::13)
+ by MW4PR12MB6802.namprd12.prod.outlook.com (2603:10b6:303:20f::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.20; Fri, 11 Aug
- 2023 15:14:31 +0000
-Received: from CY4PEPF0000EE3D.namprd03.prod.outlook.com
- (2603:10b6:930:66:cafe::fc) by CY5PR15CA0258.outlook.office365.com
- (2603:10b6:930:66::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
+ 2023 15:14:33 +0000
+Received: from CY4PEPF0000EE39.namprd03.prod.outlook.com
+ (2603:10b6:610:4d:cafe::41) by CH2PR19CA0003.outlook.office365.com
+ (2603:10b6:610:4d::13) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.31 via Frontend
- Transport; Fri, 11 Aug 2023 15:14:31 +0000
+ Transport; Fri, 11 Aug 2023 15:14:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -54,27 +54,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE3D.mail.protection.outlook.com (10.167.242.17) with Microsoft
+ CY4PEPF0000EE39.mail.protection.outlook.com (10.167.242.13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 15:14:31 +0000
+ 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 15:14:32 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 11 Aug 2023
- 08:14:19 -0700
+ 08:14:24 -0700
 Received: from localhost.localdomain (10.126.231.37) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 11 Aug
- 2023 08:14:16 -0700
+ 2023 08:14:21 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next 0/4] mlxsw: Support traffic redirection from a locked bridge port
-Date: Fri, 11 Aug 2023 17:13:54 +0200
-Message-ID: <cover.1691764353.git.petrm@nvidia.com>
+Subject: [PATCH net-next 1/4] mlxsw: core_acl_flex_actions: Add IGNORE_ACTION
+Date: Fri, 11 Aug 2023 17:13:55 +0200
+Message-ID: <43912efec4eebab2bbe7e24589f258c8f22fa047.1691764353.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <cover.1691764353.git.petrm@nvidia.com>
+References: <cover.1691764353.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,26 +90,26 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3D:EE_|CY8PR12MB7562:EE_
-X-MS-Office365-Filtering-Correlation-Id: 93c91ab5-ddcb-40d9-411b-08db9a7da9b4
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE39:EE_|MW4PR12MB6802:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0e406037-1006-4656-9568-08db9a7daab5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	dZASvpSDo8ab10npdo+2rmrV/z1Uh2PzJqpfuYs01WMq6cX45e2biATaNlyRW/OJjBDVhOALD/fMcCTR7fLnK7/wu3iJw67QG+DQRsiqhp0XTC2SvzaWs0fho+0DuR7FgqiukwLMuGrYJZ5PNT5Ll4SPLS/c3W7slEXdhAYncfg0A/F+fvbysXPU4bUKGL+JNz+8tR5voFkszsAMHZLbCwAMw9W4sjI5eNemW64XLttaOCmRptc1bHt2zJ/DirIU2QkBUFb0uRhEqfnn6q/BULN5nbqD1cWa6l2P72Y24N771dczgn+njKHD2fwS4sdZRttM1ApLHZDiH/szqQtL+pAtfKyKawEaiMJagaWe3gqPBmaWD9LKPITp4yUKjNhYzhQ4WY6NPnVSi/cv9yntSdJOp6V3KXwHKJT7fq728sLlvnoAVKkPq6YL9MhUa++ic1UhQziPHhP/oNi63wUdDUw0Z+XnToozOCd9p9/yvsZpmQtLBWmd1riuiS2Y3rJMePIcOKosCvoWE7LlAJBmam3DJq4QA9ZIFw29qPmOPjsweeWEtxFc53lQc92dp4BPZUSWFdJxPC+LUcxrPLIQX+3PRF7TyvSK1PzvKckTIHvW1ry3Uhu0Y8NrWqJt0OB/7mHwIGIipQMA2V8GQLwh67UubwOxq2z8hOAmT9cgaoh9chd6+vJeE72dSI6D5Ocpf4nHQmPPVGEyS71UIIw2HOuZYngjRxLgpWfQgAmoJqk=
+	3K6P0/BrkKDmEf3D36NOOrm0nPKbAbCThFVON+JagOiXtQhjJpycl6tTFIjtNcuLdVx60tp8Xn51xaXMmatIslE9tRiImp8/+onMz/UXSONJ2OuPRlPufsGiSL3jnzZArSchfYBYYyEJzFOddwy+fGEJcF5dJhGKi63qcxTVXwjb/RUzu3h6b9sZZG9ZUuvkYZtis2zrQza2nGERVE19exG7vwEGAE9PHgYEV2oclJb/Tew/QLjsr1skgnWFkTVUtG2KWfU8N3q7zyAGHcjEb7QOEI1BFU3j/K9DttJBoctpQdsdtGsposKFVkHo0gHZxgbw08tG7PrOFnBxrbTZC4zkL0WZFLxvaUhl0tcLLJe51Tl6Qb/ScwkrsHG35pzr5TSlf9y9VDcfbuWuELhF/jKUy9zAwlyMDKiQpb5sNZ5qk+kKuBue8Mh5m3XM4W50s5sBQoNx0nmhCKxt7UNd3TDZq8LE96LefpsqhJLYXgQ6pfPWGS3xAx6RgSaUP9Rs3CNlJ4Zy5W1+elkJubLVGkZVFKyhjPSzNQeh740MDpvGwEviHabxJu5KBLmiAfMDPrXI8PwpoAUXDNN6Lsj0pai90kWNe7sn9W5Vfj+A8WJO9XurRc8T2UIKBc6BqkdFEhHL6dGxlQjjMeNVW259CD2YR+ngLaVuoB8vLKvrrwBHelh8SJdlsiB6rAJE82sGGsmPduyuxSZBicY0RuZ63AFoc7jrDzQK7Eqv3Vs27tclETKhRz0a2BsS605hcmwB
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39860400002)(376002)(1800799006)(82310400008)(186006)(451199021)(46966006)(36840700001)(40470700004)(2906002)(5660300002)(70586007)(8676002)(41300700001)(8936002)(4326008)(70206006)(478600001)(36860700001)(6666004)(2616005)(107886003)(40460700003)(26005)(336012)(83380400001)(316002)(110136005)(54906003)(426003)(86362001)(40480700001)(47076005)(36756003)(7636003)(82740400003)(16526019)(356005);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39860400002)(136003)(376002)(186006)(82310400008)(1800799006)(451199021)(36840700001)(40470700004)(46966006)(6666004)(478600001)(70586007)(4326008)(70206006)(5660300002)(316002)(110136005)(54906003)(41300700001)(107886003)(40460700003)(8936002)(8676002)(26005)(86362001)(82740400003)(336012)(40480700001)(16526019)(36756003)(36860700001)(47076005)(7636003)(356005)(66574015)(83380400001)(2906002)(426003)(2616005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 15:14:31.0403
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 15:14:32.7267
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93c91ab5-ddcb-40d9-411b-08db9a7da9b4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e406037-1006-4656-9568-08db9a7daab5
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3D.namprd03.prod.outlook.com
+	CY4PEPF0000EE39.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7562
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6802
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -115,71 +117,86 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Ido Schimmel writes:
+From: Ido Schimmel <idosch@nvidia.com>
 
-It is possible to add a filter that redirects traffic from the ingress
-of a bridge port that is locked (i.e., performs security / SMAC lookup)
-and has learning enabled. For example:
+Add the IGNORE_ACTION which is used to ignore basic switching functions
+such as learning on a per-packet basis.
 
- # ip link add name br0 type bridge
- # ip link set dev swp1 master br0
- # bridge link set dev swp1 learning on locked on mab on
- # tc qdisc add dev swp1 clsact
- # tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw src_ip 192.0.2.1 action mirred egress redirect dev swp2
+The action will be prepended to the FORWARDING_ACTION in subsequent
+patches.
 
-In the kernel's Rx path, this filter is evaluated before the Rx handler
-of the bridge, which means that redirected traffic should not be
-affected by bridge port configuration such as learning.
-
-However, the hardware data path is a bit different and the redirect
-action (FORWARDING_ACTION in hardware) merely attaches a pointer to the
-packet, which is later used by the L2 lookup stage to understand how to
-forward the packet. Between both stages - ingress ACL and L2 lookup -
-learning and security lookup are performed, which means that redirected
-traffic is affected by bridge port configuration, unlike in the kernel's
-data path.
-
-The learning discrepancy was handled in commit 577fa14d2100 ("mlxsw:
-spectrum: Do not process learned records with a dummy FID") by simply
-ignoring learning notifications generated by the redirected traffic. A
-similar solution is not possible for the security / SMAC lookup since
-- unlike learning - the CPU is not involved and packets that failed the
-lookup are dropped by the device.
-
-Instead, solve this by prepending the ignore action to the redirect
-action and use it to instruct the device to disable both learning and
-the security / SMAC lookup for redirected traffic.
-
-Patch #1 adds the ignore action.
-
-Patch #2 prepends the action to the redirect action in flower offload
-code.
-
-Patch #3 removes the workaround in commit 577fa14d2100 ("mlxsw:
-spectrum: Do not process learned records with a dummy FID") since it is
-no longer needed.
-
-Patch #4 adds a test case.
-
-Ido Schimmel (4):
-  mlxsw: core_acl_flex_actions: Add IGNORE_ACTION
-  mlxsw: spectrum_flower: Disable learning and security lookup when
-    redirecting
-  mlxsw: spectrum: Stop ignoring learning notifications from redirected
-    traffic
-  selftests: forwarding: Add test case for traffic redirection from a
-    locked port
-
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+---
  .../mellanox/mlxsw/core_acl_flex_actions.c    | 40 +++++++++++++++++++
  .../mellanox/mlxsw/core_acl_flex_actions.h    |  2 +
- .../net/ethernet/mellanox/mlxsw/spectrum.h    |  4 +-
- .../ethernet/mellanox/mlxsw/spectrum_acl.c    |  9 +++++
- .../ethernet/mellanox/mlxsw/spectrum_fid.c    | 10 -----
- .../ethernet/mellanox/mlxsw/spectrum_flower.c | 10 +++++
- .../mellanox/mlxsw/spectrum_switchdev.c       |  6 ---
- .../net/forwarding/bridge_locked_port.sh      | 36 +++++++++++++++++
- 8 files changed, 100 insertions(+), 17 deletions(-)
+ 2 files changed, 42 insertions(+)
 
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c
+index 9dfe7148199f..faa63ea9b83e 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c
+@@ -1887,6 +1887,46 @@ int mlxsw_afa_block_append_fid_set(struct mlxsw_afa_block *block, u16 fid,
+ }
+ EXPORT_SYMBOL(mlxsw_afa_block_append_fid_set);
+ 
++/* Ignore Action
++ * -------------
++ * The ignore action is used to ignore basic switching functions such as
++ * learning on a per-packet basis.
++ */
++
++#define MLXSW_AFA_IGNORE_CODE 0x0F
++#define MLXSW_AFA_IGNORE_SIZE 1
++
++/* afa_ignore_disable_learning
++ * Disable learning on ingress.
++ */
++MLXSW_ITEM32(afa, ignore, disable_learning, 0x00, 29, 1);
++
++/* afa_ignore_disable_security
++ * Disable security lookup on ingress.
++ * Reserved when Spectrum-1.
++ */
++MLXSW_ITEM32(afa, ignore, disable_security, 0x00, 28, 1);
++
++static void mlxsw_afa_ignore_pack(char *payload, bool disable_learning,
++				  bool disable_security)
++{
++	mlxsw_afa_ignore_disable_learning_set(payload, disable_learning);
++	mlxsw_afa_ignore_disable_security_set(payload, disable_security);
++}
++
++int mlxsw_afa_block_append_ignore(struct mlxsw_afa_block *block,
++				  bool disable_learning, bool disable_security)
++{
++	char *act = mlxsw_afa_block_append_action(block, MLXSW_AFA_IGNORE_CODE,
++						  MLXSW_AFA_IGNORE_SIZE);
++
++	if (IS_ERR(act))
++		return PTR_ERR(act);
++	mlxsw_afa_ignore_pack(act, disable_learning, disable_security);
++	return 0;
++}
++EXPORT_SYMBOL(mlxsw_afa_block_append_ignore);
++
+ /* MC Routing Action
+  * -----------------
+  * The Multicast router action. Can be used by RMFT_V2 - Router Multicast
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.h b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.h
+index db58037be46e..0ead3a212de8 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.h
+@@ -89,6 +89,8 @@ int mlxsw_afa_block_append_counter(struct mlxsw_afa_block *block,
+ 				   struct netlink_ext_ack *extack);
+ int mlxsw_afa_block_append_fid_set(struct mlxsw_afa_block *block, u16 fid,
+ 				   struct netlink_ext_ack *extack);
++int mlxsw_afa_block_append_ignore(struct mlxsw_afa_block *block,
++				  bool disable_learning, bool disable_security);
+ int mlxsw_afa_block_append_mcrouter(struct mlxsw_afa_block *block,
+ 				    u16 expected_irif, u16 min_mtu,
+ 				    bool rmid_valid, u32 kvdl_index);
 -- 
 2.41.0
 
