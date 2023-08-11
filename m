@@ -1,173 +1,112 @@
-Return-Path: <netdev+bounces-26750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0DF778C65
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:49:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFAC778C70
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3F361C214E1
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:49:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 457302821A0
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0405680;
-	Fri, 11 Aug 2023 10:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A5D5693;
+	Fri, 11 Aug 2023 10:50:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4531868
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:49:39 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19494695;
-	Fri, 11 Aug 2023 03:49:23 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b9e6cc93c6so28075491fa.2;
-        Fri, 11 Aug 2023 03:49:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691750962; x=1692355762;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iIQw6WBNp7ciWP2PmoacsY4tzU8T3VqystkQlcSBU+g=;
-        b=arf1KDjfEBJ8fVUdUEXOTsEQ/1wE0x5t8Ku6kBjfJ4YwMUnA2GD2rnCFqC1XdoXdoG
-         zF+ZKhP4AtVKFCG7t5sMIjwzt68lBptOqcuvCcHf//gjrSrJB/2HbnBg/qVQRV3cjj4n
-         3lYA2KEWyrJRv8WhAr69YKxFuqxRv7/X1VnCQh/prlgQpkAcItN8UuuQIJHksOH+QK1k
-         jlPMqnp8QegBVeQxVxLeS/4bqo0iMyQ0XJDce4jt7jqCWBm6/F6oRlPFPS16VI/llGzB
-         kVMun9yUIwVJ0bRmovrmugxeLF9ypZbLzxovZ/6z2Qa1Su0PfrjgqdmzfGxxkGHOAYyj
-         dVSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691750962; x=1692355762;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iIQw6WBNp7ciWP2PmoacsY4tzU8T3VqystkQlcSBU+g=;
-        b=BOcz2JxO+rdNesml9v/jzpWUnw5fDBNPabWyq+rnsPafrsEdaTMvBr0MfBaETa6HJ8
-         WedmRBhPzZ00aGDE7ipkGIydTFpd15791eQiHp31wVWDY1Hr2YxjaUHO9sc2HwOJQ0Kf
-         H6v3juE/jLHEVqR7OMt5OU3pLH7Tx4cDOrK0lCqrc3Am+GxxU4F76MaW3EfkhKziji6l
-         VtLquKHGHZDbXp7aHw/6wB8rJfniac5BKcGc5aaKerkOaEUZWu43wZAzwXe1j2MBpQGp
-         B5qNFlDTAloH8pTMOqwxXuVia3YXNKjkGFibjiy5WdV0AAOyCrvsJS7mF/wApooHnejV
-         gowg==
-X-Gm-Message-State: AOJu0Ywp61areH9eS/MMsSBtBYfG7SkakOYh9rm+jt7mBojbveOGQeM/
-	b/35g8xSYIJffjQxmyNrS2g=
-X-Google-Smtp-Source: AGHT+IHFnQM8AFGX5qZdEF9cilua1IvCfBq27QQjsjtHXnw5vmhTxQUscQJX0WOWTglSw7qQNO5eJg==
-X-Received: by 2002:a2e:b714:0:b0:2b9:d71c:b491 with SMTP id j20-20020a2eb714000000b002b9d71cb491mr1309584ljo.16.1691750961397;
-        Fri, 11 Aug 2023 03:49:21 -0700 (PDT)
-Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
-        by smtp.googlemail.com with ESMTPSA id j21-20020a2e6e15000000b002b97fe43238sm822046ljc.19.2023.08.11.03.49.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Aug 2023 03:49:21 -0700 (PDT)
-Message-ID: <9f7e9465-897a-445b-acd6-a968a683d14b@gmail.com>
-Date: Fri, 11 Aug 2023 12:49:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485F61865
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:50:46 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FB9347F9
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:50:31 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RMgVC6FWGzqSff;
+	Fri, 11 Aug 2023 18:47:31 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 11 Aug
+ 2023 18:50:23 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <yuehaibing@huawei.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next] net: e1000: Remove unused declarations
+Date: Fri, 11 Aug 2023 18:50:05 +0800
+Message-ID: <20230811105005.7692-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ARM board lockups/hangs triggered by locks and mutexes
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
- Boqun Feng <boqun.feng@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Thomas Gleixner <tglx@linutronix.de>, Florian Fainelli
- <f.fainelli@gmail.com>, linux-clk@vger.kernel.org,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- Network Development <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: OpenWrt Development List <openwrt-devel@lists.openwrt.org>,
- bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>
-References: <CACna6rxpzDWE5-gnmpgMgfzPmmHvEGTZk4GJvJ8jLSMazh2bVA@mail.gmail.com>
- <bd5feeb3-bc44-d4d2-7708-eea9243b49a4@gmail.com>
- <0f9d0cd6-d344-7915-7bc1-7a090b8305d2@gmail.com>
- <ee134dae-8353-5735-e02d-e2cb1088c428@broadcom.com>
-Content-Language: en-US
-From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-In-Reply-To: <ee134dae-8353-5735-e02d-e2cb1088c428@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7.08.2023 20:34, Florian Fainelli wrote:
-> On 8/7/23 04:10, Rafał Miłecki wrote:
->> On 4.08.2023 13:07, Rafał Miłecki wrote:
->>> I triple checked that. Dropping a single unused function breaks kernel /
->>> device stability on BCM53573!
->>>
->>> AFAIK the only thing below diff actually affects is location of symbols
->>> (I actually verified that by comparing System.map before and after -
->>> over 22'000 of relocated symbols).
->>>
->>> Can some unfortunate location of symbols cause those hangs/lockups?
->>
->> I performed another experiment. First I dropped mtd_check_of_node() to
->> bring kernel back to the stable state.
->>
->> Then I started adding useless code to the mtdchar_unlocked_ioctl(). I
->> ended up adding just enough to make sure all post-mtd symbols in
->> System.map got the same offset as in case of backporting
->> mtd_check_of_node().
->>
->> I started experiencing lockups/hangs again.
->>
->> I repeated the same test with adding dumb code to the brcm_nvram_probe()
->> and verifying symbols offsets following brcm_nvram_probe one.
->>
->> I believe this confirms that this problem is about offset or alignment
->> of some specific symbol(s). The remaining question is what symbols and
->> how to fix or workaround that.
-> 
-> In the config.gz file you attached in your first email, both CONFIG_MTD_* and CONFIG_NVMEM_* so it is not like we are reaching into module space for code and/or data and need veneers or anything, it is part of the kernel image so we can assert the maximum distance between instructions etc.
-> 
-> Now is it just that specific mutex that is an issue, or do other mutexes through the system do cause problems as well?
+Commit 675ad47375c7 ("e1000: Use netdev_<level>, pr_<level> and dev_<level>")
+declared but never implemented e1000_get_hw_dev_name().
+Commit 1532ecea1deb ("e1000: drop dead pcie code from e1000")
+removed e1000_check_mng_mode()/e1000_blink_led_start() but not the declarations.
+Commit c46b59b241ec ("e1000: Remove unused function e1000_mta_set.")
+removed e1000_mta_set() but not its declaration.
 
-If you mean mtd mutex, I'm quite sure it's not the one to blame. It just
-happened modified function was using a mutex. Could be any other.
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ drivers/net/ethernet/intel/e1000/e1000.h    | 1 -
+ drivers/net/ethernet/intel/e1000/e1000_hw.h | 3 ---
+ 2 files changed, 4 deletions(-)
 
-
-> Do we suspect the toolchain to be possibly problematic?
-
-Maybe, I really don't know much such low level stuff.
-
-
->>
->> Following dump change brings back lockups/hangs:
->>
->> diff --git a/drivers/mtd/mtdchar.c b/drivers/mtd/mtdchar.c
->> index ee437af41..0a24dec55 100644
->> --- a/drivers/mtd/mtdchar.c
->> +++ b/drivers/mtd/mtdchar.c
->> @@ -1028,6 +1028,22 @@ static long mtdchar_unlocked_ioctl(struct file *file, u_int cmd, u_long arg)
->>   {
->>       int ret;
->>
->> +    if (!file)
->> +        pr_info("Missing\n");
->> +    WARN_ON(!file);
->> +    WARN_ON(cmd == 1234);
->> +    WARN_ON(cmd == 5678);
->> +    WARN_ON(cmd == 1234);
->> +    WARN_ON(cmd == 5678);
->> +    WARN_ON(cmd == 1234);
->> +    WARN_ON(cmd == 5678);
->> +    WARN_ON(cmd == 1234);
->> +    WARN_ON(cmd == 5678);
->> +    WARN_ON(cmd == 1234);
->> +    WARN_ON(cmd == 5678);
->> +    WARN_ON(cmd == 1234);
->> +    WARN_ON(cmd == 5678);
->> +
->>       mutex_lock(&mtd_mutex);
->>       ret = mtdchar_ioctl(file, cmd, arg);
->>       mutex_unlock(&mtd_mutex);
->>
-> 
+diff --git a/drivers/net/ethernet/intel/e1000/e1000.h b/drivers/net/ethernet/intel/e1000/e1000.h
+index 4817eb13ca6f..75f3fd1d8d6e 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000.h
++++ b/drivers/net/ethernet/intel/e1000/e1000.h
+@@ -347,6 +347,5 @@ bool e1000_has_link(struct e1000_adapter *adapter);
+ void e1000_power_up_phy(struct e1000_adapter *);
+ void e1000_set_ethtool_ops(struct net_device *netdev);
+ void e1000_check_options(struct e1000_adapter *adapter);
+-char *e1000_get_hw_dev_name(struct e1000_hw *hw);
+ 
+ #endif /* _E1000_H_ */
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_hw.h b/drivers/net/ethernet/intel/e1000/e1000_hw.h
+index b57a04954ccf..95cdd17134e5 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_hw.h
++++ b/drivers/net/ethernet/intel/e1000/e1000_hw.h
+@@ -343,7 +343,6 @@ struct e1000_host_mng_dhcp_cookie {
+ };
+ #endif
+ 
+-bool e1000_check_mng_mode(struct e1000_hw *hw);
+ s32 e1000_read_eeprom(struct e1000_hw *hw, u16 reg, u16 words, u16 * data);
+ s32 e1000_validate_eeprom_checksum(struct e1000_hw *hw);
+ s32 e1000_update_eeprom_checksum(struct e1000_hw *hw);
+@@ -352,7 +351,6 @@ s32 e1000_read_mac_addr(struct e1000_hw *hw);
+ 
+ /* Filters (multicast, vlan, receive) */
+ u32 e1000_hash_mc_addr(struct e1000_hw *hw, u8 * mc_addr);
+-void e1000_mta_set(struct e1000_hw *hw, u32 hash_value);
+ void e1000_rar_set(struct e1000_hw *hw, u8 * mc_addr, u32 rar_index);
+ void e1000_write_vfta(struct e1000_hw *hw, u32 offset, u32 value);
+ 
+@@ -361,7 +359,6 @@ s32 e1000_setup_led(struct e1000_hw *hw);
+ s32 e1000_cleanup_led(struct e1000_hw *hw);
+ s32 e1000_led_on(struct e1000_hw *hw);
+ s32 e1000_led_off(struct e1000_hw *hw);
+-s32 e1000_blink_led_start(struct e1000_hw *hw);
+ 
+ /* Adaptive IFS Functions */
+ 
+-- 
+2.34.1
 
 
