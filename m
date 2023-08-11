@@ -1,82 +1,66 @@
-Return-Path: <netdev+bounces-26939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20A0779868
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:16:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485D077990E
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 23:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E25E81C2179B
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 20:16:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEBE2280CF3
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 20:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E2F2AB58;
-	Fri, 11 Aug 2023 20:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BD82AB5F;
+	Fri, 11 Aug 2023 20:59:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693A08468
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 20:16:04 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2C23596
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 13:16:01 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37BJrV53030928;
-	Fri, 11 Aug 2023 20:15:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dM7LjCgUI9C+X8fVNPvJuXklr68b8usCTEkOOGYV0zw=;
- b=HDi+tA1Eq2fSc9LcnVjH9EHtYQ+GCneCznho6qVGbPepbe9NdveguaQWKfbWsZQH4DHI
- VvL1K9TYsff/o1uxLgX4MZREAsSB5GysZaTBD/TLqgwgnsUgsxd22pPbsR61J3/++UgV
- TwuYd9XjYSZvo8+9i0xM+rBAUlH/r6Ux2Gd1GAq5qmqDEa7QK8gTEAG9UTxmuDga5iOq
- c1kaGfznbY5I40z4csarDU8S2yQPku0A3148ziL/pZnNBK1XTppgQ/E9fhIRBjKLJub+
- 4ytqP3f/sblBhe/dqseNc854Ko6H+yHitSLHb4SfWXrMxM0PZc2UIbXODaGeXbYHBdFw Fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sduhtrht6-1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1AB329AB
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 20:59:02 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A168AC;
+	Fri, 11 Aug 2023 13:59:01 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37BHLTvM012675;
+	Fri, 11 Aug 2023 20:58:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=sGCA0R7vqoJ2iWs7IvuyI9LSVz61DhA61nAyHoTsW+s=;
+ b=Dxjhctua8CrNzozjpxF4LsxJ4yWZqWg6GlU3BKLGWpZM5eso4lePZOOvlRvRp/tlOqyq
+ e+St9gbMWelU+/wrkicepmOWPofvEyq+wcHOF+KHNCNx5RuQDmUukqJcF60x6p8nMBZb
+ G+4jkWQDe0cYYvHKf5CeydbOD8RA6tsekj5AU6Lkl0oyqB9TZcSZPb++kDP5l2pjrtMC
+ 9QmCvEMSz4Fmd7F/G3mGdPNvfh8tSZV4VgWl48pGWuhOpLVhSCjjqdbEVLDp5rktxBR5
+ Tzx4n/jnEDZs3PPszK/a09QuRZbfLoTNRMAHcyk24+8PlSOzc8pmqd3WS/1VtxZncTNp Nw== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sdsaf0cjj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Aug 2023 20:15:55 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37BK8EeK015433;
-	Fri, 11 Aug 2023 20:15:55 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sduhtrhs1-1
+	Fri, 11 Aug 2023 20:58:46 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37BKwjOQ006358
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Aug 2023 20:15:55 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37BKC7dd015366;
-	Fri, 11 Aug 2023 20:15:53 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sb3f3qeva-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Aug 2023 20:15:53 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37BKFrQ77995932
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 11 Aug 2023 20:15:53 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 177BF58056;
-	Fri, 11 Aug 2023 20:15:53 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD9F258052;
-	Fri, 11 Aug 2023 20:15:52 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.53.174.71])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 11 Aug 2023 20:15:52 +0000 (GMT)
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-To: kuba@kernel.org
-Cc: aelior@marvell.com, davem@davemloft.net, edumazet@google.com,
-        manishc@marvell.com, netdev@vger.kernel.org, pabeni@redhat.com,
-        skalluru@marvell.com, VENKATA.SAI.DUGGI@ibm.com,
-        Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Subject: [Patch v5 4/4] bnx2x: prevent excessive debug information during a TX timeout
-Date: Fri, 11 Aug 2023 15:15:12 -0500
-Message-Id: <20230811201512.461657-5-thinhtr@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20230811201512.461657-1-thinhtr@linux.vnet.ibm.com>
-References: <20230728211133.2240873-1-thinhtr@linux.vnet.ibm.com>
- <20230811201512.461657-1-thinhtr@linux.vnet.ibm.com>
+	Fri, 11 Aug 2023 20:58:45 GMT
+Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 11 Aug 2023 13:58:45 -0700
+From: Bjorn Andersson <quic_bjorande@quicinc.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Chris Lew <quic_clew@quicinc.com>
+CC: Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mathieu Poirier
+	<mathieu.poirier@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH v2 0/4] soc: qcom: aoss: Introduce debugfs interface and cleanup things
+Date: Fri, 11 Aug 2023 13:58:35 -0700
+Message-ID: <20230811205839.727373-1-quic_bjorande@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,64 +68,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5_GF-QzI50eAhde8mDuXmSDJ0X-puRDE
-X-Proofpoint-ORIG-GUID: 2At8SkSc0A9KPTXbHhbVlBO2bt6uN6ah
+Content-Type: text/plain
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 4YQk9p4ZPnIJv3Dr4WxUHaDnT3fuuELY
+X-Proofpoint-GUID: 4YQk9p4ZPnIJv3Dr4WxUHaDnT3fuuELY
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-08-11_12,2023-08-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- phishscore=0 clxscore=1015 suspectscore=0 malwarescore=0 bulkscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308110184
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
+ clxscore=1011 priorityscore=1501 spamscore=0 bulkscore=0 malwarescore=0
+ mlxlogscore=656 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308110193
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
----
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c  | 6 ++++++
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c | 6 ------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+The Always On Processor supports a number useful commands for affecting
+system resources during in various debug scenarious. Introduce a debugfs
+interface for allowing the debugger/tester to send these commands.
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-index 5296f5b8426b..814350d10b7a 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-@@ -4971,6 +4971,12 @@ void bnx2x_tx_timeout(struct net_device *dev, unsigned int txqueue)
- {
- 	struct bnx2x *bp = netdev_priv(dev);
- 
-+	/* Immediately indicate link as down */
-+	bp->link_vars.link_up = 0;
-+	bp->force_link_down = true;
-+	netif_carrier_off(dev);
-+	BNX2X_ERR("Indicating link is down due to Tx-timeout\n");
-+
- 	/* We want the information of the dump logged,
- 	 * but calling bnx2x_panic() would kill all chances of recovery.
- 	 */
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index 7add3a420534..5c1bde0f15f3 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -10267,12 +10267,6 @@ static void bnx2x_sp_rtnl_task(struct work_struct *work)
- 		bp->sp_rtnl_state = 0;
- 		smp_mb();
- 
--		/* Immediately indicate link as down */
--		bp->link_vars.link_up = 0;
--		bp->force_link_down = true;
--		netif_carrier_off(bp->dev);
--		BNX2X_ERR("Indicating link is down due to Tx-timeout\n");
--
- 		bnx2x_nic_unload(bp, UNLOAD_NORMAL, true);
- 		/* When ret value shows failure of allocation failure,
- 		 * the nic is rebooted again. If open still fails, a error
+While at it, let's make some improvements to the qmp_send() API.
+
+
+In v1, Andrew pointed out the fact that this interface could be used to
+send proprietary commands from a userspace driver. As debugfs isn't
+enabled in the vast majority of shipping devices, this wouldn't be very
+useful. In the mantime having this interface present is very useful for
+members of the upstream Qualcomm community.
+
+It would be even more user (developer) friendly to expose each of these
+knobs as individual debugfs files. But the list of commands and
+resources looks to be varying from target to target, so this is still
+being investigated. The hope is to perhaps capture a set of common
+resources.
+
+Changes since v1:
+- Reverse xmas tree in qmp_send() in patch 1
+- Correct length check of input data in patch 2
+
+Bjorn Andersson (3):
+  soc: qcom: aoss: Move length requirements from caller
+  soc: qcom: aoss: Format string in qmp_send()
+  soc: qcom: aoss: Tidy up qmp_send() callers
+
+Chris Lew (1):
+  soc: qcom: aoss: Add debugfs interface for sending messages
+
+ drivers/net/ipa/ipa_power.c        |  5 +-
+ drivers/remoteproc/qcom_q6v5.c     |  8 +--
+ drivers/soc/qcom/qcom_aoss.c       | 82 +++++++++++++++++++++---------
+ include/linux/soc/qcom/qcom_aoss.h |  4 +-
+ 4 files changed, 61 insertions(+), 38 deletions(-)
+
 -- 
-2.27.0
+2.25.1
 
 
