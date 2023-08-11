@@ -1,196 +1,238 @@
-Return-Path: <netdev+bounces-26802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E43F9778F5D
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 14:24:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D240778FE9
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 14:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1352F1C217DA
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:24:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50C0D28223C
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6A412B96;
-	Fri, 11 Aug 2023 12:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F176C63B3;
+	Fri, 11 Aug 2023 12:52:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A3412B61
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 12:20:11 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7CF535AF
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 05:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691756397; x=1723292397;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qKLsGp+/zzY7Hp81Rv27R2NRKevsXmNrdwbYGtKBPkI=;
-  b=HNG29kEjlOKBq17eu1oG6JVyNf4gYd/iKb94a6oLOGhBmCYkhCCWJHn7
-   MHK8eH8eQ/DRcgXwrsZy9XoxqEJta21DKPrd/laKq0HIyyRSOHIGVhBTi
-   gvUz6SEdYLG/AvCqZmS8F5EwpYsgRUwnb9GBbrouCaF8RoMtrVhP2WTQZ
-   5lCoK3P8hxUmn7scOVHlankU0Tq1ZBh3YCQQQpKaVqddFuzbIidtL9mCX
-   bCdeNJAhmg8XrTcu2EloQSD/Vza3adkgH1rLHwtNeokFz2Cj01y6+7Uq2
-   6msr4RqdeeoGeHXYM26ROz+MQsJR5eW7odZte6+lHpgSBFLQddvl+zIvy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="375378670"
-X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
-   d="scan'208";a="375378670"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 05:18:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="846785872"
-X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
-   d="scan'208";a="846785872"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga002.fm.intel.com with ESMTP; 11 Aug 2023 05:18:30 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 11 Aug 2023 05:18:29 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 11 Aug 2023 05:18:29 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 11 Aug 2023 05:18:29 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 11 Aug 2023 05:18:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A/86xi0HSclKtDRlkEL9+1dTBJPEBY1XUBXcVv82eKQ58QR7rQNJqLz6W9zoeQ50FymWmpQlCDGISYTtC8C5bVkRO3GvGFIVYmTIisPMM5D4OwIRYhz/mmANfieqtNg+IbPUKfpf0FrFzhFouEhE+TJVujcbD/8zrfDXr3Xq+Puf+q6cUfC48uB5WmnH4hkA8XxhoXsnsNtSxJVthcriPg9rsZGfZ6Y+d/BBLb/jNMiKj6JKg1FEotfZ52sKwEqBW+YXvpAjc+siGcG0WOY19w5tfJcHJd1HDvi1LlX635bCT/8VgpBWSm3V41Dmpx1hyMUyBQkUfOVoaLZ+nnGilQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wu8OKgUDVL2HxZYqN+LR5UqCi33I/2myTdreIDGsxIo=;
- b=LzOvqChkG183fMqgQrh8+ADVWyxjUS4hF+dwWSAbcjr7omeZAcsuPUt5IzqH5SAQfgYG0PHyesrFYQ77rFuv6vVByGaSsf9wstUcFVgIHmdp2c+yWYCvoLPPokuBO1ix2MYwb9qRGnssymhijaD4L8Cwses0RD4aaTBMmZElM3p3CkCXE21kqCPX/EoExqWu2HxK0RqUCZt40bq/U8Zhb3+1tFVkZnlVLYEacYiFhoQr82tIHlJHfOIRvVhOYMn9kgNFzqJ+rz1BBTEdVMCNYD4a8T6s+kpLgD4RVyMiOvtt123dPClU3UPXA8Enlh8YHWuX2O5gU122Wml4W/z3rQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by SJ0PR11MB5119.namprd11.prod.outlook.com (2603:10b6:a03:2d6::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
- 2023 12:18:28 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::aa6e:f274:83d0:a0d2]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::aa6e:f274:83d0:a0d2%3]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
- 12:18:28 +0000
-Message-ID: <a703b919-65db-1500-6e65-5e9acb5f00cf@intel.com>
-Date: Fri, 11 Aug 2023 14:18:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net-next 0/5] net: Use pci_dev_id() to simplify the code
-Content-Language: en-US
-To: Zheng Zengkai <zhengzengkai@huawei.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<mark.einon@gmail.com>, <siva.kallam@broadcom.com>, <prashant@broadcom.com>,
-	<mchan@broadcom.com>, <steve.glendinning@shawell.net>, <mw@semihalf.com>,
-	<jiawenwu@trustnetic.com>, <mengyuanlou@net-swift.com>
-CC: <netdev@vger.kernel.org>, <wangxiongfeng2@huawei.com>
-References: <20230811110702.31019-1-zhengzengkai@huawei.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20230811110702.31019-1-zhengzengkai@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0025.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1c::23) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E266BA46
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 12:52:10 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F902696;
+	Fri, 11 Aug 2023 05:52:09 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6877eb31261so1412452b3a.1;
+        Fri, 11 Aug 2023 05:52:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691758328; x=1692363128;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KbKJe2tEe/lB5NizJfxNPF+lCmWbaQQ8/etXP32dMGg=;
+        b=JZQY58hTx7UZ43EjBbTuSgw/ldGdUuDETy35lBvfcATVxUP/7MMSOchj7/cYCMZtdl
+         JJlmZcWDclNWZ2jhAGQXMRrMifXeJLpZIIahMNHiY+GeIObRzuSLii9UMypJhjB5MNli
+         a1yp7l4ydf1Wk1oJmA/ROiFJLxN0leVH62Tqp6O/kcDtG32451Qoc6ZHN5Sy71MUiQ/K
+         1IyZESCqfUG9C0W+Q5VV9u/vDlTSiebeM076DfgkMNBGOLv5A1113/3l58Yx8A1u2Hsh
+         bRQN/eOKEYOCjRkw4LrfTdSbOoahFcIjA12X5d3ochHm+FRtsH9ynrzlGqKlev4YD7uM
+         +2BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691758328; x=1692363128;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KbKJe2tEe/lB5NizJfxNPF+lCmWbaQQ8/etXP32dMGg=;
+        b=Dmz7ZmatFVGNZZ6o4CG9sS09A4/htKURaCgWEBQC9Vok2CBHSYyGaJSAxnRY6O0gHf
+         N46JZQyMPC1uHH3kDzeeBO5+H0Ig8RkxOsGbedMJ+WSU9TxgobvQc7KB5J1vW0w22mfQ
+         lwpGZd2UNECGhKAqnMnNnBvnXoRG9whdJJs/3moccilHUp28v7jJd5tgsniiK9MlrlB3
+         NB06vQPU9+lNnLR3RcAd4EJWcZ24xS2DZcqnL+9LIgJkqNRkrkUaVWFzU0ow5yY9ZpDX
+         Rfh475UDsdTzRoittqbmEXyLy8eK/ni84pZSjhzMljRzva8+TPbwHLeHcOAeVu7oVrei
+         sfrQ==
+X-Gm-Message-State: AOJu0Yw0u0zLppOrfLXJ3iWGbQSEkmzLIjs7b6gD86LZ5DRxp5cnSTdO
+	QP+UrZEykzCVMfaN95VaC1Q=
+X-Google-Smtp-Source: AGHT+IEYLAU/icss22mnR69KwGu2yTOnUC8KZ+3hUTw336+X0NC7us98dUOT1vIwuGYtu5MnQtEQag==
+X-Received: by 2002:a05:6a20:1595:b0:13d:7aa3:aa72 with SMTP id h21-20020a056a20159500b0013d7aa3aa72mr1993967pzj.5.1691758328438;
+        Fri, 11 Aug 2023 05:52:08 -0700 (PDT)
+Received: from localhost.localdomain ([198.211.45.220])
+        by smtp.googlemail.com with ESMTPSA id t12-20020a1709028c8c00b001b9d88a4d1asm3796694plo.289.2023.08.11.05.51.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 05:52:07 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1 1/1] net: stmmac: xgmac: show more MAC HW features in debugfs
+Date: Fri, 11 Aug 2023 20:51:39 +0800
+Message-Id: <20230811125139.284272-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SJ0PR11MB5119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 001fe5a0-5bee-4a0b-1d80-08db9a651158
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Pf+uh59G4+iR1zkdPNNjVIb78ycFENyZaJ9NPgQbsSy8fhZU8kitHiuRXrWKGuCIcTZe22qL4Zxvp8vOY2EXZkA00PXu3jdPZL+/F25w5ejJb3XYQ81CTecqkTFhzmD0pMw9W9oAPPDUe9y2aKOk5VbNpoWRa2OxIhoIVvVe3kIVTApfgn9gK9nExV5hFoetqQ5BUCHAX8kzguBuX6fr5aaZASUa3W/SgK2X1uuEyhMtIKXgRro52kuoAdNLQqH8Vuzthwoo7NjRIBQwmxOjPnsfMFI31WsAeabqrEAQbtpxNODL+/b73DVEM5MVAz9LBB1qj4ygq1UkJWZgpJ6sE87poB0ZgjwHE/Duqb+BUBitGcNcCxFCxcRAsa93k2d/JZRjQCc1TlzgHLOVVcZ0/ljEDPJBIC/NNig3DfF1vNaX8GvOub4LzP7811XRuAKSBJasir+A8RtSdGh7aY4Aix8RYDYRMPxSygBgmtDh9leI4CTZEhAHgPSslhoicHrYV1J2C6MFiSbwp4srGwphUBna+oKlbMfQs2BhIS8tRtvgmPA9n6RvHcfUhbiN1uQosaz4wmjRzJv0srVDLLWtEHC9utfTJ551zgbZkXY0dvpeC0j0QTE2s/PANt5u6xzerBw/t92v2e/x1vplg4H5wio/+c3tHP5aexRYDvl9fPU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(366004)(396003)(39860400002)(346002)(136003)(451199021)(1800799006)(186006)(8936002)(8676002)(6506007)(26005)(53546011)(41300700001)(36756003)(83380400001)(4744005)(2906002)(2616005)(921005)(38100700002)(82960400001)(86362001)(31696002)(7416002)(5660300002)(6486002)(6512007)(66946007)(4326008)(66556008)(66476007)(6666004)(478600001)(31686004)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjdvYlpHNWdNbFBQOE1LM1NDN1NXdGRnRzdZUnJtYUtEY3gyaFlWRXhBRVMx?=
- =?utf-8?B?VTBTT2IrcjNnWHdXRmt3M1RkcnR3WFNvcXY2MGlLeUtjL0tQWGp5VVlGMmpi?=
- =?utf-8?B?UTVDVGlhdE03RjR0dkJ0SUVNWXRVNmFVUU4rOUZaa0ZqR1Z2d2JVdlJnQThl?=
- =?utf-8?B?THg0Sml1RkNCUko3RW10ZnA4cktxanlLL01KNzRBQVMrMVk2MWxTbXFzdjdw?=
- =?utf-8?B?TXJUT0ttNERRSG1oZG5UQi9COW5sK05hbUxjY1JSMUVUUWlBTnpIN25taldK?=
- =?utf-8?B?a29SamdPMlVVam5zMUtSRWdtWDFENThxV0RqeG9zRnBZVDQxWGsvakg3c3ZH?=
- =?utf-8?B?WXhHYlVLTHlOK2cwSjN0VFAwdFQ0b2huMlJEUm9tRnQvSENFQytBM2F2bEgr?=
- =?utf-8?B?ek1tblU2NUlOSWhKdCs1WEdvek9BM3N0U2RXbkpzR0kwQmNKV1VmWUlpNlpK?=
- =?utf-8?B?aThMbldjWHFOMHljTms5d3ZhcitjLzRuNHJlbTFDbit3OXdmU2FhSVhxbVl5?=
- =?utf-8?B?cXpqdjUxTlNOaGN2TWVzWE1aTmo1bGRDVjlaTHFvY2tpbVovNXQ0eHpHTm5E?=
- =?utf-8?B?NDV6YXEra2xCdm5manplZ2ZtYXhMZm5zQzRmVFF1dnUxellrem1MRy9nMlEw?=
- =?utf-8?B?dU1IalF4Wkd6cHJOUE4yeks3RGw0R01UMmxaZFBXNHJqbkVMUWF3NXFWM2Va?=
- =?utf-8?B?cUN2ZzEyUFJmNys2dVJrbWFLNlZ4U1pzM095VDI0cGp5VWFTbkNIOWVkVC9u?=
- =?utf-8?B?WmpmRUFtMGdqWDNETWp1NU10eFR6K0RkRnU0OW5lZmxGZXhnUGlUa3JnenFr?=
- =?utf-8?B?Uk9TMGZBTkF5b0xLRWlYN0ZvZWJoUEplR3dldW1zUEFZby9nQUlsSFQvZkw5?=
- =?utf-8?B?TEdWZzFoU1NlbVI4TVRSb3FMc2pSd1NrRTlhZm91bmpwL2g4Ky9ta3VxcDRS?=
- =?utf-8?B?bzQ5K2RJYmUxcTJjSkdOUFJvd2JIRDNTcjlQRFh6OGlsZmdzMGFEakhHVVc0?=
- =?utf-8?B?d2hiRitBdXVRN0NFZlc2dkszSGU3eWg4ZTMzVzVIQzJwUDJSbWlaMmdLaXly?=
- =?utf-8?B?TnNnbnhaU09LKzd2aitjRmpnWFN1R1RzclkwamlTdXBYay9KN2JCS1lSbEJE?=
- =?utf-8?B?Wkwvc2sxUHhzVTVKdll5V3U4bTNyTDBFTXZiK09Bencydk1OZVByclpXZ0pT?=
- =?utf-8?B?TXJ6NlBPTnkvV1lDZ2l4WE90dk5CeDRzL2Mvc0lTcGZOSFkxeGM2QUlyd2Er?=
- =?utf-8?B?dCsycjErdnhYNmNHQnRzdElVR2J1RWNiN2RLL3o1MnZWWWdzcXRIbWppdU42?=
- =?utf-8?B?alJueGE5eXN1ZGpmTDBaSkc1aTJ6UnYyY3BHVy9TZmZXMk9jWFg3MUtrSFc3?=
- =?utf-8?B?a3FqeDJHQXRMQ0tRMlAzam1uZzNvdlBEbWlTRVpNeGx5aVJTdXJsdWhMckJq?=
- =?utf-8?B?UTI2eUU0cDEvdHV0bm4wZS9DdEhGdzRjb2k0Q2ZEWjRhUDZuNjErUExoOFd5?=
- =?utf-8?B?SGd6RU5CYmJJZEZwUU1xVHF5cWdaMmMxYk56QnIrK01PNGJac1dBa09zZGhJ?=
- =?utf-8?B?SEszY2YwU0tKNmxGTDN1VGhvSXpQREJjV0ZNQW1vN1Z2dnJveUxzb2N2WDlC?=
- =?utf-8?B?OUx1YmlxV0h0TEg0MVcrV2ViYkNuVFhOZkZyNjVWVHdJRS9jbXhKRGxhaUg3?=
- =?utf-8?B?TGp1YStML1laSit4Z3lRR3VzMkc0NlJOa0NML3JQM2pmdVY1anVxSGd1MHQ5?=
- =?utf-8?B?OU5wdWVrV3ZyQlNCOTNWUEZVTzdSQmRNUXdobTZjSFU4eFhCZzA1TEIwd2pZ?=
- =?utf-8?B?Y01ZYVlTK09hdFpJdFR5OWFERVRDSzI0bVo5ejJWdEdvTzNOcXdEOVk4RHA5?=
- =?utf-8?B?MGRXRlFpTWxYeER2NXA0dXY0alB5SzVyQUhhdVpnUUNyUU1aQzg4U3YvSVdC?=
- =?utf-8?B?aG9DK2ExUW9YL3dWd2VZbTRPWHNkcis0TDM1QnIxQmdhOTAzOWZNWWJ0MkxW?=
- =?utf-8?B?Sk1nZ0Q3TnhwL096WHRkOTZBNUNYYlBlb0tTZkZvdlY2WHM2Q21DbVFSaEU0?=
- =?utf-8?B?NHgyZHhDYzJiT2tISktDeU1mL1JVc1ZUOGdOVVplREFFQTJCc2huYUVZRkhr?=
- =?utf-8?B?dUprSGliRXJmZ0NmRjZJaHpUR015ZDJxdkdaSWxQQ0c1VnBXMldWRUhWZzN6?=
- =?utf-8?B?NFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 001fe5a0-5bee-4a0b-1d80-08db9a651158
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 12:18:27.9770
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rg+1Qz5MhVcK5D7+ZlSYu6KXQvf0AeD+nRnUO6/lSngv1CanD0zAXWJ8EWobg59G97gz/uf230x51i60WlysPPAh0M6sGpYIKrSUUXSVcOs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5119
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/11/23 13:06, Zheng Zengkai wrote:
-> PCI core API pci_dev_id() can be used to get the BDF number for a pci
-> device. Use the API to simplify the code.
-> 
-> Zheng Zengkai (5):
->    et131x: Use pci_dev_id() to simplify the code
->    tg3: Use pci_dev_id() to simplify the code
->    net: smsc: Use pci_dev_id() to simplify the code
->    net: tc35815: Use pci_dev_id() to simplify the code
->    net: ngbe: use pci_dev_id() to simplify the code
-> 
->   drivers/net/ethernet/agere/et131x.c           | 3 +--
->   drivers/net/ethernet/broadcom/tg3.c           | 3 +--
->   drivers/net/ethernet/smsc/smsc9420.c          | 3 +--
->   drivers/net/ethernet/toshiba/tc35815.c        | 3 +--
->   drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 3 +--
->   5 files changed, 5 insertions(+), 10 deletions(-)
-> 
+1. Show TSSTSSEL(Timestamp System Time Source),
+ADDMACADRSEL(additional MAC addresses), SMASEL(SMA/MDIO Interface),
+HDSEL(Half-duplex Support) in debugfs.
+2. Show exact number of additional MAC address registers for XGMAC2 core.
+3. XGMAC2 core does not have different IP checksum offload types, so just
+show rx_coe instead of rx_coe_type1 or rx_coe_type2.
+4. XGMAC2 core does not have rxfifo_over_2048 definition, skip it.
 
-code looks fine,
-I wonder if it would be better to have just one patch here?
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  2 ++
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  4 +++
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  6 ++++-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++++++++++----
+ 4 files changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 16e67c18b6f7..b37f2f6b2229 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -434,6 +434,8 @@ struct dma_features {
+ 	unsigned int tbssel;
+ 	/* Numbers of Auxiliary Snapshot Inputs */
+ 	unsigned int aux_snapshot_n;
++	/* Timestamp System Time Source */
++	unsigned int tssrc;
+ };
+ 
+ /* RX Buffer size must be multiple of 4/8/16 bytes */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 1913385df685..a00398674015 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -111,6 +111,8 @@
+ #define XGMAC_LPI_TIMER_CTRL		0x000000d4
+ #define XGMAC_HW_FEATURE0		0x0000011c
+ #define XGMAC_HWFEAT_SAVLANINS		BIT(27)
++#define XGMAC_HWFEAT_TSSTSSEL		GENMASK(26, 25)
++#define XGMAC_HWFEAT_ADDMACADRSEL	GENMASK(22, 18)
+ #define XGMAC_HWFEAT_RXCOESEL		BIT(16)
+ #define XGMAC_HWFEAT_TXCOESEL		BIT(14)
+ #define XGMAC_HWFEAT_EEESEL		BIT(13)
+@@ -121,7 +123,9 @@
+ #define XGMAC_HWFEAT_MMCSEL		BIT(8)
+ #define XGMAC_HWFEAT_MGKSEL		BIT(7)
+ #define XGMAC_HWFEAT_RWKSEL		BIT(6)
++#define XGMAC_HWFEAT_SMASEL		BIT(5)
+ #define XGMAC_HWFEAT_VLHASH		BIT(4)
++#define XGMAC_HWFEAT_HDSEL		BIT(3)
+ #define XGMAC_HWFEAT_GMIISEL		BIT(1)
+ #define XGMAC_HW_FEATURE1		0x00000120
+ #define XGMAC_HWFEAT_L3L4FNUM		GENMASK(30, 27)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+index 070bd912580b..6d6abc3ddb53 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+@@ -389,9 +389,11 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
+ {
+ 	u32 hw_cap;
+ 
+-	/*  MAC HW feature 0 */
++	/* MAC HW feature 0 */
+ 	hw_cap = readl(ioaddr + XGMAC_HW_FEATURE0);
+ 	dma_cap->vlins = (hw_cap & XGMAC_HWFEAT_SAVLANINS) >> 27;
++	dma_cap->tssrc = (hw_cap & XGMAC_HWFEAT_TSSTSSEL) >> 25;
++	dma_cap->multi_addr = (hw_cap & XGMAC_HWFEAT_ADDMACADRSEL) >> 18;
+ 	dma_cap->rx_coe = (hw_cap & XGMAC_HWFEAT_RXCOESEL) >> 16;
+ 	dma_cap->tx_coe = (hw_cap & XGMAC_HWFEAT_TXCOESEL) >> 14;
+ 	dma_cap->eee = (hw_cap & XGMAC_HWFEAT_EEESEL) >> 13;
+@@ -402,7 +404,9 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
+ 	dma_cap->rmon = (hw_cap & XGMAC_HWFEAT_MMCSEL) >> 8;
+ 	dma_cap->pmt_magic_frame = (hw_cap & XGMAC_HWFEAT_MGKSEL) >> 7;
+ 	dma_cap->pmt_remote_wake_up = (hw_cap & XGMAC_HWFEAT_RWKSEL) >> 6;
++	dma_cap->sma_mdio = (hw_cap & XGMAC_HWFEAT_SMASEL) >> 5;
+ 	dma_cap->vlhash = (hw_cap & XGMAC_HWFEAT_VLHASH) >> 4;
++	dma_cap->half_duplex = (hw_cap & XGMAC_HWFEAT_HDSEL) >> 3;
+ 	dma_cap->mbps_1000 = (hw_cap & XGMAC_HWFEAT_GMIISEL) >> 1;
+ 
+ 	/* MAC HW feature 1 */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 4727f7be4f86..2d627640cc60 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6174,6 +6174,12 @@ DEFINE_SHOW_ATTRIBUTE(stmmac_rings_status);
+ 
+ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
+ {
++	static const char * const dwxgmac_timestamp_source[] = {
++		"None",
++		"Internal",
++		"External",
++		"Both",
++	};
+ 	struct net_device *dev = seq->private;
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+ 
+@@ -6194,8 +6200,13 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
+ 		   (priv->dma_cap.half_duplex) ? "Y" : "N");
+ 	seq_printf(seq, "\tHash Filter: %s\n",
+ 		   (priv->dma_cap.hash_filter) ? "Y" : "N");
+-	seq_printf(seq, "\tMultiple MAC address registers: %s\n",
+-		   (priv->dma_cap.multi_addr) ? "Y" : "N");
++	if (priv->plat->has_xgmac)
++		seq_printf(seq,
++			   "\tNumber of Additional MAC address registers: %d\n",
++			   priv->dma_cap.multi_addr);
++	else
++		seq_printf(seq, "\tMultiple MAC address registers: %s\n",
++			   (priv->dma_cap.multi_addr) ? "Y" : "N");
+ 	seq_printf(seq, "\tPCS (TBI/SGMII/RTBI PHY interfaces): %s\n",
+ 		   (priv->dma_cap.pcs) ? "Y" : "N");
+ 	seq_printf(seq, "\tSMA (MDIO) Interface: %s\n",
+@@ -6210,12 +6221,16 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
+ 		   (priv->dma_cap.time_stamp) ? "Y" : "N");
+ 	seq_printf(seq, "\tIEEE 1588-2008 Advanced Time Stamp: %s\n",
+ 		   (priv->dma_cap.atime_stamp) ? "Y" : "N");
++	if (priv->plat->has_xgmac)
++		seq_printf(seq, "\tTimestamp System Time Source: %s\n",
++			   dwxgmac_timestamp_source[priv->dma_cap.tssrc]);
+ 	seq_printf(seq, "\t802.3az - Energy-Efficient Ethernet (EEE): %s\n",
+ 		   (priv->dma_cap.eee) ? "Y" : "N");
+ 	seq_printf(seq, "\tAV features: %s\n", (priv->dma_cap.av) ? "Y" : "N");
+ 	seq_printf(seq, "\tChecksum Offload in TX: %s\n",
+ 		   (priv->dma_cap.tx_coe) ? "Y" : "N");
+-	if (priv->synopsys_id >= DWMAC_CORE_4_00) {
++	if (priv->synopsys_id >= DWMAC_CORE_4_00 ||
++	    priv->plat->has_xgmac) {
+ 		seq_printf(seq, "\tIP Checksum Offload in RX: %s\n",
+ 			   (priv->dma_cap.rx_coe) ? "Y" : "N");
+ 	} else {
+@@ -6223,9 +6238,9 @@ static int stmmac_dma_cap_show(struct seq_file *seq, void *v)
+ 			   (priv->dma_cap.rx_coe_type1) ? "Y" : "N");
+ 		seq_printf(seq, "\tIP Checksum Offload (type2) in RX: %s\n",
+ 			   (priv->dma_cap.rx_coe_type2) ? "Y" : "N");
++		seq_printf(seq, "\tRXFIFO > 2048bytes: %s\n",
++			   (priv->dma_cap.rxfifo_over_2048) ? "Y" : "N");
+ 	}
+-	seq_printf(seq, "\tRXFIFO > 2048bytes: %s\n",
+-		   (priv->dma_cap.rxfifo_over_2048) ? "Y" : "N");
+ 	seq_printf(seq, "\tNumber of Additional RX channel: %d\n",
+ 		   priv->dma_cap.number_rx_channel);
+ 	seq_printf(seq, "\tNumber of Additional TX channel: %d\n",
+-- 
+2.34.1
+
 
