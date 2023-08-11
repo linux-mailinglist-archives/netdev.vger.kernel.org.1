@@ -1,108 +1,185 @@
-Return-Path: <netdev+bounces-26632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7541B778740
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 08:04:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B8F77874A
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 08:07:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2517281FA4
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 06:04:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4690A281F8D
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 06:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7EB15D4;
-	Fri, 11 Aug 2023 06:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F70C17F8;
+	Fri, 11 Aug 2023 06:07:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24C4EC6
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:04:29 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE652722
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:04:28 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-686e29b058cso1273905b3a.1
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 23:04:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341D71102
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 06:07:15 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE0F2722;
+	Thu, 10 Aug 2023 23:07:14 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b9a828c920so24902661fa.1;
+        Thu, 10 Aug 2023 23:07:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691733868; x=1692338668;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c+xbAuMaSiM/UeyQGlzbx43nM6gU5cnHUqf9OqajJr8=;
-        b=ndpoS56WQkRs2Hi1mVbfgpEHjT72SYJY6bLLudqbgflzVW+LJFgmrvF6Am/Ph/WM2F
-         cylgat7IXlDLluQos3fL7DPGe1fQ2WfNHiXB4x9i1+5e34gsvfWPSSGY8riVimhtZ2Q1
-         01ptAEXGcDrEs7j079nFYq6U+vGy8k9p6SZ1dIGsufHDnQPVpXf1c31tNuLqEP82PkBx
-         1fE//BNv92SOUSHz0jrftVsbvyU+mUIxEb1Dai8lIR5hwFNlm0mJiOA3wloHhWddG73L
-         9yfNJO9qXHj0Do9nNDsh7E/NX7GFZlLFTEQAilXwWHF75JEDJRBxaLNSbxRr9Faqouw+
-         2I6w==
+        d=gmail.com; s=20221208; t=1691734032; x=1692338832;
+        h=content-transfer-encoding:in-reply-to:subject:from:content-language
+         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4bk+exM8X9S4Sq3L4XC4ctpy1FDaZFp/bRE9a4iozmw=;
+        b=Y01wTSr/DoRbmIqKdYRW78ACJSxzyJbakuGLbhzDa1lmVlREwtW3tiMvb7Jp7Q/gPg
+         QxOXdmls7Im/6TQ9IkKhhefuxLlq6IARWRQ4yLpFylIKsdYb7smChXhW+i6C6nRS5XuW
+         I3II8X6IEB92dCL75R65+mmlnZlzx8HAC9MIW6Zy0isOl4hjFej+McYANsu3DzulM6Zy
+         f8SYcxCwwZB5csnGb7aqyisOo1zTCZ2zaWZxpFEdzC6UFUKGlq7N9TVEjh70NyWx8pX5
+         aPHh06gQEVWIGYOkILYsIXwiVxnHxrRjR36FR4WdXw3ibVZVAxyY+FwOXgRUmLoYSaer
+         OpcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691733868; x=1692338668;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c+xbAuMaSiM/UeyQGlzbx43nM6gU5cnHUqf9OqajJr8=;
-        b=bP5JcSMmbqS0UO2Wa70J+cGont99k73JPPbYaNebmJjb6hHKpu3Bw2pteoht/5oddz
-         anGWXdppBM0kpkE4Zhn8BnyjZEPBg63wF+FUpb1a3AK3gOYrhV+yvRErReWVxozf3VdK
-         fWA+2PlPPC1LbAzXa/BU306SaipZQbFAweuPKAXkLGHJUxb0B1wXNHqb9mKRQA/vHOEA
-         zQUEvQjAH5Mjdo+l0WOOIo49jUC6KEnCeXmzxAeUu3Y60sy2jpalTTZLkQMsM9uN/hkH
-         umefAHpioCJr84RA0lCGLqN88aCpJv6e/9zdrCACeQ8+uPBrxWyzE+9lUI6hMUooUMHB
-         RYQw==
-X-Gm-Message-State: AOJu0Yxaf87kEVf+FLNY8zFjqfHqt8mipvFh+Xty1FDmGn+m++LB16AT
-	yg0Xz8zwHrpOnzCpxbVQBMk=
-X-Google-Smtp-Source: AGHT+IFjf2gReHa19cQCWU3vo13G1EjftzLGUIeJKMCrYZOPd9VWvQj0c9l8KLs35+Z5Gdg2MJK+Eg==
-X-Received: by 2002:a05:6a00:1a05:b0:66d:514c:cb33 with SMTP id g5-20020a056a001a0500b0066d514ccb33mr823586pfv.6.1691733868219;
-        Thu, 10 Aug 2023 23:04:28 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id y2-20020a62b502000000b00687cb400f4asm2485798pfe.24.2023.08.10.23.04.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 23:04:27 -0700 (PDT)
-Date: Fri, 11 Aug 2023 14:04:22 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, j.vosburgh@gmail.com,
-	andy@greyhouse.net, weiyongjun1@huawei.com, yuehaibing@huawei.com,
-	vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next,v2 0/5] bonding: do some cleanups in bond driver
-Message-ID: <ZNXPZunMa51A5ZHY@Laptop-X1>
-References: <20230810135007.3834770-1-shaozhengchao@huawei.com>
+        d=1e100.net; s=20221208; t=1691734032; x=1692338832;
+        h=content-transfer-encoding:in-reply-to:subject:from:content-language
+         :references:cc:to:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4bk+exM8X9S4Sq3L4XC4ctpy1FDaZFp/bRE9a4iozmw=;
+        b=hF9SxdV0SyanBRUJKV5PjQPmHT9hNwMYY/+zx/KBnsHbMT5Qmsu1iPMylMD7+4WG2U
+         tLZ90NOAY8c+D5NuVS8btID/ZSfkZx7DFtolFl6xAck0ET/2c5NchQMeB8XObXqxRfQJ
+         F+ND6/m0g3q3ojA2lYa9b8IjNPWCH1HDK98Wv3N+SuI6uaCTCeDWLPNlQF6QmM9DezXG
+         hyy0bwHW04tTEFHfXX0QRRPL8MXHvJKrhaMv9q2Dtl31Hn3EdhfmBxJHn4Ra+5tg/c5E
+         zV1lvx9Djehd2iyXq0VM2syk+yfYCfpUBHf/anucOzgWms8UR/RVCdlwMCleY+bAXA+x
+         Ms8A==
+X-Gm-Message-State: AOJu0Yxku77Gk9UxoTp2VZ6+r2UzaVQTZ7HQ4GrmgOhC/pXlyNXQ+axj
+	c4AI8+mlYAUJzI0Fnrb4GS0=
+X-Google-Smtp-Source: AGHT+IEDJkq9L72dxkIvJYXHWt0S/ObKGtluYL52BnMKo73cLNHOz1YKohCZoSVoQZXhj4QPxSohZQ==
+X-Received: by 2002:a2e:3c0e:0:b0:2b9:e7d7:64bd with SMTP id j14-20020a2e3c0e000000b002b9e7d764bdmr733901lja.47.1691734031793;
+        Thu, 10 Aug 2023 23:07:11 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:9036:1900:752a:2ca1:e48c:43a7? (dynamic-2a02-3100-9036-1900-752a-2ca1-e48c-43a7.310.pool.telefonica.de. [2a02:3100:9036:1900:752a:2ca1:e48c:43a7])
+        by smtp.googlemail.com with ESMTPSA id s7-20020adfecc7000000b0031912c0ffebsm3542748wro.23.2023.08.10.23.07.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 23:07:11 -0700 (PDT)
+Message-ID: <2cdc67aa-6029-7231-76a8-54c6b51b066c@gmail.com>
+Date: Fri, 11 Aug 2023 08:07:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810135007.3834770-1-shaozhengchao@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+To: Luke Lu <luke.lu@libre.computer>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King <linux@armlinux.org.uk>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Florian Fainelli <f.fainelli@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Da Xue <da@libre.computer>
+References: <20230809214946.18975-1-luke.lu@libre.computer>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net v4] net: phy: meson-gxl: implement
+ meson_gxl_phy_resume()
+In-Reply-To: <20230809214946.18975-1-luke.lu@libre.computer>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 09:50:02PM +0800, Zhengchao Shao wrote:
-> Do some cleanups in bond driver.
+On 09.08.2023 23:49, Luke Lu wrote:
+> From: Da Xue <da@libre.computer>
+> 
+> While testing the suspend/resume function, we found the ethernet
+> is broken if using internal PHY of Amlogic meson GXL SoC.
+> After system resume back, the ethernet is down, no carrier found.
+> 
+> 	eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state
+> 		DOWN group default qlen 1000
+> 
+> In this patch, we re-initialize the internal PHY to fix this problem.
+> 
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+It's not an unusual case that system cuts power to the PHY during
+system suspend. So the PHY needs to be re-initialized on resume.
+That's why we call phy_init_hw() in mdio_bus_phy_resume().
+
+If going your way we would be better off calling .config_init()
+in genphy_resume(). Please check the MAC driver, maybe it's better
+to re-initialize the PHY in the resume path of the MAC driver.
+
+> 	eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
+> 		group default qlen 1000
+> 
+> Fixes: 7334b3e47aee ("net: phy: Add Meson GXL Internal PHY driver")
+> Signed-off-by: Da Xue <da@libre.computer>
+> Signed-off-by: Luke Lu <luke.lu@libre.computer>
 > 
 > ---
-> v2: use IS_ERR instead of NULL check in patch 2/5, update commit 
->     information in patch 3/5, remove inline modifier in patch 4/5
+> Note, we don't Cc stable kernel tree in this patch intentionally, since
+> there will be a cherry-pick failure if apply this patch from kernel version
+> less than v6.2, it's not a logic failure but due to the changes too close.
+> 
+> Please check commit 69ff53e4a4c9 ("net: phy: meson-gxl: use MMD access dummy stubs for GXL, internal PHY")
+> We plan to slightly rework the patch, and send it to stable tree separately
+> once this patch is accepted into mainline.
+> 
+> v4:
+>  - refactor commit message to better explain the problem & fix
+>  - check return value of genphy_resume()
+>  - add 'net' annotation
+>  - add Fixes tag
+> 
+> v3: https://lore.kernel.org/netdev/20230808050016.1911447-1-da@libre.computer
+>  - fix missing parameter of genphy_resume()
+> 
+> v2: https://lore.kernel.org/netdev/20230804201903.1303713-1-da@libre.computer
+>  - call generic genphy_resume()
+> 
+> v1: https://lore.kernel.org/all/CACqvRUZRyXTVQyy9bUviQZ+_moLQBjPc6nin_NQC+CJ37yNnLw@mail.gmail.com
 > ---
-> Zhengchao Shao (5):
->   bonding: add modifier to initialization function and exit function
->   bonding: use IS_ERR instead of NULL check in bond_create_debugfs
->   bonding: remove redundant NULL check in debugfs function
->   bonding: use bond_set_slave_arr to simplify code
->   bonding: remove unnecessary NULL check in bond_destructor
+>  drivers/net/phy/meson-gxl.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
 > 
->  drivers/net/bonding/bond_debugfs.c | 15 +++-----------
->  drivers/net/bonding/bond_main.c    | 32 ++++--------------------------
->  drivers/net/bonding/bond_sysfs.c   |  4 ++--
->  3 files changed, 9 insertions(+), 42 deletions(-)
-> 
-> -- 
-> 2.34.1
-> 
+> diff --git a/drivers/net/phy/meson-gxl.c b/drivers/net/phy/meson-gxl.c
+> index bb9b33b6bce2..9ebe09b0cd8c 100644
+> --- a/drivers/net/phy/meson-gxl.c
+> +++ b/drivers/net/phy/meson-gxl.c
+> @@ -132,6 +132,21 @@ static int meson_gxl_config_init(struct phy_device *phydev)
+>  	return 0;
+>  }
+>  
+> +static int meson_gxl_phy_resume(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_resume(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = meson_gxl_config_init(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+>  /* This function is provided to cope with the possible failures of this phy
+>   * during aneg process. When aneg fails, the PHY reports that aneg is done
+>   * but the value found in MII_LPA is wrong:
+> @@ -196,7 +211,7 @@ static struct phy_driver meson_gxl_phy[] = {
+>  		.config_intr	= smsc_phy_config_intr,
+>  		.handle_interrupt = smsc_phy_handle_interrupt,
+>  		.suspend        = genphy_suspend,
+> -		.resume         = genphy_resume,
+> +		.resume         = meson_gxl_phy_resume,
+>  		.read_mmd	= genphy_read_mmd_unsupported,
+>  		.write_mmd	= genphy_write_mmd_unsupported,
+>  	}, {
+
 
