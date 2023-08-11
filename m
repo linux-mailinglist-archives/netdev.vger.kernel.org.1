@@ -1,71 +1,140 @@
-Return-Path: <netdev+bounces-26614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48837785A5
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 04:54:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF80E7785B1
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 05:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCCF9281C13
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 02:54:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 697B1281CFC
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 03:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB84A46;
-	Fri, 11 Aug 2023 02:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B951A46;
+	Fri, 11 Aug 2023 03:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C90CA3D
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 02:54:33 +0000 (UTC)
-X-Greylist: delayed 526 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Aug 2023 19:54:31 PDT
-Received: from out-108.mta0.migadu.com (out-108.mta0.migadu.com [91.218.175.108])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E3A2D5F
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 19:54:31 -0700 (PDT)
-Message-ID: <6adc1b56-c714-b60e-f274-4e82e276e52f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1691721943;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2qOGyHwJQegjUEjIKNLPS/UJ81OV2tyW98Si8f2LJZI=;
-	b=idmnwzhmxBAGO/IP7csDdPE/GFyfK/koSZ77lRWtNT0Rp1ZCEfRblnDGxAv0SMjnuEJ/dk
-	yHjynI115G8NJDkF/f1xHLxjY1g4Rh5iM09JQpv/PWxLsCVZsybVBXQ815q/bs8YXLRZI+
-	znPfRuTirXz2IH57hnTuRIZxrFuYC2g=
-Date: Fri, 11 Aug 2023 10:45:39 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA78A3D
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:01:42 +0000 (UTC)
+Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6BC92D60;
+	Thu, 10 Aug 2023 20:01:40 -0700 (PDT)
+Received: by mail-oi1-x242.google.com with SMTP id 5614622812f47-3a43cbb432aso1273450b6e.3;
+        Thu, 10 Aug 2023 20:01:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691722900; x=1692327700;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+DnlrBg/2kZEFPjJJJbtUXL+fxABbd2M98TkdtFb0+g=;
+        b=HN6VZN2dCED+zJj++6s5QY8U+Lc8YqJGdBQkKL7l+zjba2DlawIWk1msYVPK3MV/1G
+         LOAwuDWsYILScSMFUZYGkn8HUwXGTWR7Rwq6rbF6kiBoFXnrmRU/Tdf0CX91mA7pyQvw
+         q8e/1Xz4bEMW5/TiHzP+qaWvc4N2Ga5UK082b45c2K8nYmDBQwk4o9UhAq0KtqSdnPXt
+         A1Hyr2UnKJsA1T8Gf4ohopJWHhnkBf19I1Mp3rt3J1Sso62cugiqD7AJajmwEWa1uKjt
+         RQC54mZmFs9jtSZIPl3ebd4zmJ4cz8FCl24bY+vZb5C4voElo+pIL6VjcqKCtjUcaWTf
+         qDtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691722900; x=1692327700;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+DnlrBg/2kZEFPjJJJbtUXL+fxABbd2M98TkdtFb0+g=;
+        b=M3Ypxud8NhR0uTPs0gx8UqVNBgm+/p/SHy6eKTXOv8+uk41bZcKHb90aqZTOhHX8f6
+         3suKgXXzXzyliaxFmLn/eurKgREP2j01VaZ3pfnfgFZbLCO7M5yjtfxzufQCMARTcjdj
+         Wy6TwM5lxYY5W9W1eP51S2TvnKmgZH9eb8xzeF/GG0p5C29wQ0w7p8Tri5Pqj1ixYAy3
+         9MbsR5pG3Gx225ciDCZFQYkNcEWN/3Dlq0wRoOg2mbI14QPPtpDWydtmwNQ+DamP+CFz
+         pAycj5qefiNyc4nOZWC4YRrVDYr4LSDM3JJ9lYkGnBdANtvyIlRtO/+2gDqBj6xWgrkV
+         4Yug==
+X-Gm-Message-State: AOJu0YyvfPJmh03/ZxUV/UA+m7Vf2wz8iSid90Xj+lU/jJjeGJitvujN
+	SQTRw/mD0vaupFuVkJD0Kpbw50QDFz1lADiHx6w=
+X-Google-Smtp-Source: AGHT+IEtDeSbIJpS8KeWdJO69hZR7jtZ8fcq0PqdWTd5ibTJOUmDDOaoKZ+k6trX/mPSuZ/mvjZd3g==
+X-Received: by 2002:a05:6808:bd0:b0:3a7:25c6:7b83 with SMTP id o16-20020a0568080bd000b003a725c67b83mr935519oik.11.1691722900107;
+        Thu, 10 Aug 2023 20:01:40 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.10])
+        by smtp.gmail.com with ESMTPSA id l5-20020a639845000000b005646868da17sm2281197pgo.72.2023.08.10.20.01.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 20:01:39 -0700 (PDT)
+From: menglong8.dong@gmail.com
+X-Google-Original-From: imagedong@tencent.com
+To: edumazet@google.com,
+	ncardwell@google.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	flyingpeng@tencent.com,
+	Menglong Dong <imagedong@tencent.com>
+Subject: [PATCH net-next v4 0/4] net: tcp: support probing OOM
+Date: Fri, 11 Aug 2023 10:55:26 +0800
+Message-Id: <20230811025530.3510703-1-imagedong@tencent.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] netlink: allow nl_sset return -EOPNOTSUPP to fallback
- to do_sset
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
- gang.li@linux.dev
-References: <51b2f9c6-fc0f-9e77-6863-2d6b71130c51@linux.dev>
- <20230810100117.0b562777@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Gang Li <gang.li@linux.dev>
-In-Reply-To: <20230810100117.0b562777@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/11 01:01, Jakub Kicinski wrote:
-> On Thu, 10 Aug 2023 20:53:02 +0800 Gang Li wrote:
->> Subject: [PATCH 1/1] netlink: allow nl_sset return -EOPNOTSUPP to fallback to  do_sset
-> 
-> Please make sure to add the project to the subject next time.
-> [PATCH ethtool]
+From: Menglong Dong <imagedong@tencent.com>
 
-Sure, thanks!
+In this series, we make some small changes to make the tcp retransmission
+become zero-window probes if the receiver drops the skb because of memory
+pressure.
+
+In the 1st patch, we reply a zero-window ACK if the skb is dropped
+because out of memory, instead of dropping the skb silently.
+
+In the 2nd patch, we allow a zero-window ACK to update the window.
+
+In the 3rd patch, fix unexcepted socket die when snd_wnd is 0 in
+tcp_retransmit_timer().
+
+In the 4th patch, we refactor the debug message in tcp_retransmit_timer()
+to make it more correct.
+
+After these changes, the tcp can probe the OOM of the receiver forever.
+
+Changes since v3:
+- make the timeout "2 * TCP_RTO_MAX" in the 3rd patch
+- tp->retrans_stamp is not based on jiffies and can't be compared with
+  icsk->icsk_timeout in the 3rd patch. Fix it.
+- introduce the 4th patch
+
+Changes since v2:
+- refactor the code to avoid code duplication in the 1st patch
+- use after() instead of max() in tcp_rtx_probe0_timed_out()
+
+Changes since v1:
+- send 0 rwin ACK for the receive queue empty case when necessary in the
+  1st patch
+- send the ACK immediately by using the ICSK_ACK_NOW flag in the 1st
+  patch
+- consider the case of the connection restart from idle, as Neal comment,
+  in the 3rd patch
+
+Menglong Dong (4):
+  net: tcp: send zero-window ACK when no memory
+  net: tcp: allow zero-window ACK update the window
+  net: tcp: fix unexcepted socket die when snd_wnd is 0
+  net: tcp: refactor the dbg message in tcp_retransmit_timer()
+
+ include/net/inet_connection_sock.h |  3 ++-
+ net/ipv4/tcp_input.c               | 20 ++++++++++-----
+ net/ipv4/tcp_output.c              | 14 +++++++---
+ net/ipv4/tcp_timer.c               | 41 ++++++++++++++++++++++--------
+ 4 files changed, 56 insertions(+), 22 deletions(-)
+
+-- 
+2.40.1
+
 
