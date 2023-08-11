@@ -1,159 +1,123 @@
-Return-Path: <netdev+bounces-26625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B523D778627
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 05:44:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB0677866D
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 06:14:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 601B0281EB6
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 03:44:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D2A11C20BDA
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 04:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD6D10E2;
-	Fri, 11 Aug 2023 03:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C71810F1;
+	Fri, 11 Aug 2023 04:14:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EA3EA5
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:44:14 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16102D44
-	for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:44:13 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4f14865fcc0so1352e87.0
-        for <netdev@vger.kernel.org>; Thu, 10 Aug 2023 20:44:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DE510E4
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 04:14:30 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3549F;
+	Thu, 10 Aug 2023 21:14:29 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bdba48eccdso423795ad.3;
+        Thu, 10 Aug 2023 21:14:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691725452; x=1692330252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1691727269; x=1692332069;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tf2sysDYKA/7QZA+e13rp979FmH4xLq69U2IkRQ3KlI=;
-        b=4o0GNZpVHrAMJvtWfJF1DtgXBeIhW0mOUUL9d/sIqXucXmNGcZhSlwpuuAeWAW7Mw/
-         vtL2hD2Bo2tk+yYQjf42zw8CPoVebRjlBPih+7ZhV+pu3NRrIu5su2NylV7btJYQ1tCw
-         kIo78Ws+2cuvutZge6zVllsHnjl3PDeQ4TfsxRzwr1etpbI+39LcDT/TsujoJkbsey9p
-         8925U4lCF7GgTc/6Efd7ylb146/0DZft+jbAo8IFm2F4evFutAUVbC0G1NSBmTlcJ8CC
-         IjQZ6r600XS6taKExVFJBDB4yyT9vIMya2Co3/1VWAdWaC1L0uZb/+OzJfQZyHeZRu8k
-         oTmw==
+        bh=YSR3Q04lK59tiGJay4SkNer8bq6qRzC22OcRjYST5Xs=;
+        b=ixEv7OnX4jkE2gbNOieRXO69/GTH7zq/og7zqDIWbH+/gw6jP/MwDbdgnV45z35rsg
+         W2/laVoakXArMI3jrZ/2W4BUrRjZljKaPvgZ5W2DI9HirG2WJ4iaYLvV65qV9jjpfM5Z
+         jGZ6RVsQHERM9SswkODBO3BebWfrDrCMvhNIVC8ar4fH6xHv6d3Fj/6pqm9w/4MbVNda
+         DV5LsjHSN7CUM6jFD2vavZRqs6ycrNrn1H/UsM/6YyvM5mvOyMIJ2E+dRxeSkgAnPMbC
+         z2zPQ6t5HeSBwB17brm2ECR42uRHcWIUPUgubjJumA2T+M8C6x8BmPTxVthOEgeBHNm9
+         EviQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691725452; x=1692330252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1691727269; x=1692332069;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tf2sysDYKA/7QZA+e13rp979FmH4xLq69U2IkRQ3KlI=;
-        b=cP8myE/u4meUSmFypUv50BZH/rfpqZn906mm3UMprg7HTzkFOOcZdaWZkjK74BWvFe
-         JifxYQbUl1TSJfD40YIlzY8aXKNsjHvnWWqGlV+5Gp03uVZlk2cfTZ/YrDp6v0chEERM
-         2Nby8BCpuZHAaSEGpnpbHsAAwElUcBZ7ce+CMi+zAoUAFkZylazUlxE5M4wBj8un+5gp
-         kgG9oK3DTChBYglIDf29Y1Mu15z4qiG+w36gVTQ7UFPPyJ82KVmMlKS2J5o+j29/Z6t+
-         LZGKsd9+lT8SMPFmLmHznG/tzLgswIxZt3XT+xMgeCz+HlD401vAqLkiRN9NZGWQkshL
-         pKuQ==
-X-Gm-Message-State: AOJu0YwsQXx/3+dQLml6bmNvR/mTreV3+pWi+16V70PDfn0VuOV+pZRy
-	gi+ovUkhGp6WNS50WGUHBQ0sKA+eKRpNETeDhJ1n9Voof9lVKT+zzTo=
-X-Google-Smtp-Source: AGHT+IEh3EEBdNpBgyMz+1/dKWsFBvPcNtjDJFkOCbV0mom3IadYFnGpHpCNFI/xSc3BC3dHP+m9xkTtMVAscV4LOk0=
-X-Received: by 2002:ac2:593a:0:b0:4fe:3fb3:902d with SMTP id
- v26-20020ac2593a000000b004fe3fb3902dmr31170lfi.5.1691725451566; Thu, 10 Aug
- 2023 20:44:11 -0700 (PDT)
+        bh=YSR3Q04lK59tiGJay4SkNer8bq6qRzC22OcRjYST5Xs=;
+        b=RnB7ukjQULThgDJtcd1rpe0eOhIy6bp5K/sQvhsKJQmuEQzIZryF8hEPrPXwKIM/26
+         W1q5aP73IdsQg9D5DrUZS2kAYzkXyN5GqXql5cZ55NU4H1YD9DBW5dM4N7ZvI8IfR0u0
+         xzEndgIhwTv4pYRn6n2JC8qieGixsxo8tK/2BfLQNfWgWmoxp4hyAsA3OoSuoosZcH+h
+         CpgXzC6d62JdPpUhvOedjrJeTBKh22GkaZ/H6QVsAmia0Ywl7EnYiKsUmaKmPk2YDbNS
+         V8JGpQM9wFeW8zauOKXI2D2nGCaSe+azi8arQSOSus5QqEwMomBlpdAWfcAmx9TtioaP
+         7Xng==
+X-Gm-Message-State: AOJu0YxAODdt9sHlwG7PaoGqzw+/pKerVhP1a86WPnFHaqHVLIkn4cAK
+	wthK43vro1/qH/4P4xGsV+k=
+X-Google-Smtp-Source: AGHT+IEOhiTP3OqfDr24GR4MV2Zif3y73zLGJn4lAgQ4UFvuftuROMI632adJdSQEy0ThczGN6Em/w==
+X-Received: by 2002:a17:902:c409:b0:1bc:6c8:cded with SMTP id k9-20020a170902c40900b001bc06c8cdedmr1027879plk.67.1691727269271;
+        Thu, 10 Aug 2023 21:14:29 -0700 (PDT)
+Received: from localhost ([198.211.45.220])
+        by smtp.gmail.com with ESMTPSA id r2-20020a170902be0200b001bb9883714dsm2626522pls.143.2023.08.10.21.14.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Aug 2023 21:14:29 -0700 (PDT)
+Date: Fri, 11 Aug 2023 12:14:20 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH 1/1] net: stmmac: dwmac4: extract MAC_HW_Feature regs
+ MSB first
+Message-ID: <20230811121420.00007a95@gmail.com>
+In-Reply-To: <9b9635bd-2635-4115-bafb-8a07573c6556@lunn.ch>
+References: <20230810095929.246901-1-0x1207@gmail.com>
+	<9b9635bd-2635-4115-bafb-8a07573c6556@lunn.ch>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810103927.1705940-1-edumazet@google.com>
-In-Reply-To: <20230810103927.1705940-1-edumazet@google.com>
-From: Soheil Hassas Yeganeh <soheil@google.com>
-Date: Thu, 10 Aug 2023 23:43:35 -0400
-Message-ID: <CACSApvaWomz6GERnrVbNEG2ycpKJqMGAhsqLwMvYxPQpW2a+pg@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/15] inet: socket lock and data-races avoidance
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 6:39=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> In this series, I converted 20 bits in "struct inet_sock" and made
-> them truly atomic.
->
-> This allows to implement many IP_ socket options in a lockless
-> fashion (no need to acquire socket lock), and fixes data-races
-> that were showing up in various KCSAN reports.
->
-> I also took care of IP_TTL/IP_MINTTL, but left few other options
-> for another series.
+On Thu, 10 Aug 2023 15:59:25 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+> On Thu, Aug 10, 2023 at 05:59:29PM +0800, Furong Xu wrote:
+> > The bit extraction sequences are a little messy.
+> > No code changes, just reorder them.  
+> 
+> How is this substantially better?
+> 
+> If bugs are found in this code, your change is going to make it harder
+> to back port the fixes to stable kernels. cherry-pick is unlikely to
+> work, it will need a human to look at it. Not hard, but still effort
+> for somebody.
+> 
+> So i think there needs to be a clear benefit to this, and you should
+> mention the benefit in the commit message.
+> 
+>     Andrew
 
-They all look great. Thank you!
+Hi Andrew, Alexandre
 
-> Eric Dumazet (15):
->   inet: introduce inet->inet_flags
->   inet: set/get simple options locklessly
->   inet: move inet->recverr to inet->inet_flags
->   inet: move inet->recverr_rfc4884 to inet->inet_flags
->   inet: move inet->freebind to inet->inet_flags
->   inet: move inet->hdrincl to inet->inet_flags
->   inet: move inet->mc_loop to inet->inet_frags
->   inet: move inet->mc_all to inet->inet_frags
->   inet: move inet->transparent to inet->inet_flags
->   inet: move inet->is_icsk to inet->inet_flags
->   inet: move inet->nodefrag to inet->inet_flags
->   inet: move inet->bind_address_no_port to inet->inet_flags
->   inet: move inet->defer_connect to inet->inet_flags
->   inet: implement lockless IP_TTL
->   inet: implement lockless IP_MINTTL
->
->  include/net/inet_connection_sock.h  |   4 +-
->  include/net/inet_sock.h             |  92 ++++---
->  include/net/ipv6.h                  |   3 +-
->  include/net/route.h                 |   2 +-
->  include/net/tcp.h                   |   2 +-
->  net/core/sock.c                     |   2 +-
->  net/dccp/ipv4.c                     |   4 +-
->  net/ipv4/af_inet.c                  |  16 +-
->  net/ipv4/cipso_ipv4.c               |   4 +-
->  net/ipv4/igmp.c                     |   2 +-
->  net/ipv4/inet_diag.c                |  22 +-
->  net/ipv4/inet_timewait_sock.c       |   2 +-
->  net/ipv4/ip_output.c                |   7 +-
->  net/ipv4/ip_sockglue.c              | 405 +++++++++++++---------------
->  net/ipv4/netfilter/nf_defrag_ipv4.c |   2 +-
->  net/ipv4/ping.c                     |   7 +-
->  net/ipv4/raw.c                      |  26 +-
->  net/ipv4/route.c                    |   8 +-
->  net/ipv4/tcp.c                      |  12 +-
->  net/ipv4/tcp_fastopen.c             |   2 +-
->  net/ipv4/tcp_input.c                |   2 +-
->  net/ipv4/tcp_ipv4.c                 |   5 +-
->  net/ipv4/tcp_minisocks.c            |   3 +-
->  net/ipv4/udp.c                      |   7 +-
->  net/ipv4/udp_tunnel_core.c          |   2 +-
->  net/ipv6/af_inet6.c                 |   8 +-
->  net/ipv6/datagram.c                 |   2 +-
->  net/ipv6/ip6_output.c               |   5 +-
->  net/ipv6/ipv6_sockglue.c            |  12 +-
->  net/ipv6/raw.c                      |  16 +-
->  net/ipv6/udp.c                      |   2 +-
->  net/l2tp/l2tp_ip.c                  |   2 +-
->  net/mptcp/protocol.c                |  12 +-
->  net/mptcp/sockopt.c                 |  16 +-
->  net/netfilter/ipvs/ip_vs_core.c     |   4 +-
->  net/sctp/input.c                    |   2 +-
->  net/sctp/protocol.c                 |   2 +-
->  net/sctp/socket.c                   |   2 +-
->  38 files changed, 364 insertions(+), 364 deletions(-)
->
-> --
-> 2.41.0.640.ga95def55d0-goog
->
+In Synopsys databook, the description tables about all registers
+start with the MSB.
+So we can read one line code and then check it against one table row,
+and goto next line of code against next row of table.
+
+I agree with that this commit make cherry-pick less compatible.
+
+If the benefit above is not worthy enough, we abandon this commit :)
+
+Thanks.
 
