@@ -1,248 +1,339 @@
-Return-Path: <netdev+bounces-26962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA1A779AC2
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 00:40:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C278779ACC
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 00:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA8E28137B
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:40:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F53A1C20B77
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 22:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D53329AE;
-	Fri, 11 Aug 2023 22:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5880034CC6;
+	Fri, 11 Aug 2023 22:45:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042082F4E
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 22:40:04 +0000 (UTC)
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758E12D61
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:40:01 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-6418d37f006so7309066d6.2
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 15:40:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1691793600; x=1692398400;
-        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=264FeR7cZMIbNiVfoBItJOxN6IB5Mue3GAfnomjzMCs=;
-        b=egEeOviZZQtAMBi0t28yCERrjonaorWz3f3Z191BJ1uJuPqs8ZNc89xkBKqfKaq9A/
-         c1nanbTG44nGNOj/IZaPTaYezRdSozOw1Sj6r+uy4ItlzxBnSiOw1ICRsoQOhA/G5QuG
-         7SVraY+hgx3eqALSqon9vEcOhzd9ZUdePpiN8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691793600; x=1692398400;
-        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=264FeR7cZMIbNiVfoBItJOxN6IB5Mue3GAfnomjzMCs=;
-        b=QeY876M5xA3ukTGiceJ6L5Oz40YBzhtsTKvOiKlusY5LpoWLcbyn4IVkIoe1uvYEBt
-         J2xkQr83qjJc3k8Yanm89M0vzAx5+yr6Y1tDEniXyuCD7ae3ZIyoWdE+pXrs5nelRvP+
-         c2TJ3uhSKHjgnOTmmf2l0R7LQKvVi1GaqsksRjKfSYp7eyriMzDrUzJcgNIP7Y2Pc7gQ
-         G7i1es+kYYLHwoxx8BafV/I9GYTh/U8QBTyDWxAgdl4TfYYr8lFnyKoyV2YAa1fPEQJf
-         99iojvE4CUqnFPe07Fx/Z1A+EL84TB2agX6dWf8uqR5XpAiAIfD/KqIvX5H81twJrFu7
-         HIBA==
-X-Gm-Message-State: AOJu0YxADJjEiYQPgLkGwWi+wpdejjVVnMoVGIh1h+P9+ZpYNibpmGBE
-	5zfVAJjUDWRcBYAaj2r2KnqWLA==
-X-Google-Smtp-Source: AGHT+IEizOMbioRq6ckFd+WFGYrW3QDe3XauyoYlsyXdp0oanpqCuBEsP6zRf23otZHixC5HC6xKtw==
-X-Received: by 2002:a0c:e150:0:b0:63d:318c:7dfb with SMTP id c16-20020a0ce150000000b0063d318c7dfbmr2925096qvl.13.1691793600575;
-        Fri, 11 Aug 2023 15:40:00 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id q17-20020a0c8b11000000b0063d1f967268sm1536403qva.111.2023.08.11.15.39.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Aug 2023 15:40:00 -0700 (PDT)
-Message-ID: <6f7fd397-2b63-be20-fa9c-c26298226088@broadcom.com>
-Date: Fri, 11 Aug 2023 15:39:48 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3082F4E
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 22:45:40 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A7C2130;
+	Fri, 11 Aug 2023 15:45:37 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BE388FF802;
+	Fri, 11 Aug 2023 22:45:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1691793936;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pbtUUoJutGSdy50RvaJ3kKz0WaAIY7fJ4VKyrVHb2W8=;
+	b=G3vzjQWDz1PJOJkqVLNt8besnssHlQHj72Mj+EsY2ZKzP12pEziBSaD/RyQ6McCE1hbMzN
+	JFLjDkjioBJKafMfizcAO+iC66Xnd8VLwIo59dhaDMK9zQEyMsX5F3btfZC6b8in4BAUFy
+	uogFdKKn6C0+UcyInpJ9Nc1bYL5hN7GO4bRetEs/0lnWarSUkDkS7ZFbTBHWgGU6QvLbWn
+	BfHHdcdN9GuGHZTY3fX7I3LLlotEakVf7Ggf7hOqfG5vLywQNMDX3OH81NOrPWJl7S2e3b
+	hBsOuUneKGzVQJDc6xZDWRmOxK1yO2yylwja+4g9h7ftQlCmv8oGLkoYgDHWog==
+Message-ID: <3f262579-eec1-4b21-9b18-1d1d612e715b@arinc9.com>
+Date: Sat, 12 Aug 2023 01:45:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] net: phy: broadcom: add support for BCM5221 phy
-To: Andrew Lunn <andrew@lunn.ch>,
- Giulio Benetti <giulio.benetti@benettiengineering.com>
-Cc: Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+User-Agent: Mozilla Thunderbird
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Subject: Re: [PATCH RESEND net-next 2/2] dt-bindings: net: dsa:
+ mediatek,mt7530: document MDIO-bus
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jim Reinhart <jimr@tekvox.com>,
- James Autry <jautry@tekvox.com>, Matthew Maron <matthewm@tekvox.com>
-References: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
- <0188dd19-7fcb-4bfe-945d-6cb5b57ae80a@lunn.ch>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-In-Reply-To: <0188dd19-7fcb-4bfe-945d-6cb5b57ae80a@lunn.ch>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009cc41a0602ad64cd"
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
+ <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
+ <dcb981b9-b435-c0e5-8e47-d66add207fdc@arinc9.com>
+ <20230808121707.chona7hakapp6whe@skbuf>
+ <44fde617-1159-4961-84c4-372fe265fbd8@arinc9.com>
+ <20230809220102.t3dqw7iojez5xsq3@skbuf>
+Content-Language: en-US
+In-Reply-To: <20230809220102.t3dqw7iojez5xsq3@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000009cc41a0602ad64cd
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 8/11/23 15:16, Andrew Lunn wrote:
-> On Fri, Aug 11, 2023 at 11:53:22PM +0200, Giulio Benetti wrote:
->> This patch adds the BCM5221 PHY support by reusing
->> brcm_fet_config_intr() and brcm_fet_handle_interrupt() and
->> implementing config_init()/suspend()/resume().
+On 10.08.2023 01:01, Vladimir Oltean wrote:
+> On Wed, Aug 09, 2023 at 12:03:19PM +0300, Arınç ÜNAL wrote:
+>> On 8.08.2023 15:17, Vladimir Oltean wrote:
+>>> On Sat, Aug 05, 2023 at 11:15:15PM +0300, Arınç ÜNAL wrote:
+>>>> I don't see a reason to resubmit this without addressing the requested
+>>>> change.
+>>>>
+>>>>>> Wouldn't we just skip the whole issue by documenting the need for defining all PHYs
+>>>>>> used on the switch when defining the MDIO bus?
+>>>>>
+>>>>> Good idea, please do that.
+>>>>
+>>>> https://lore.kernel.org/netdev/0f501bb6-18a0-1713-b08c-6ad244c022ec@arinc9.com/
+>>>>
+>>>> Arınç
+>>>
+>>> Arınç, where do you see that comment being added? AFAIU, it is a
+>>> characteristic of the generic __of_mdiobus_register() code to set
+>>> mdio->phy_mask = ~0, and nothing specific to the mt7530.
 >>
->> Sponsored by: Tekvox Inc.
-> 
-> That is a new tag. Maybe you should update
-> Documentation/process/submitting-patches.rst ?
-> 
->> +static int bcm5221_config_init(struct phy_device *phydev)
->> +{
->> +	int reg, err, err2, brcmtest;
+>> What I believe is specific to DSA is, 1:1 mapping of the port reg to the
+>> PHY reg on the mdio bus is disabled if the mdio bus is defined. Therefore,
+>> I believe a notice like below fits mediatek,mt7530.yaml.
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+>> index e532c6b795f4..c59d58252cd5 100644
+>> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+>> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+>> @@ -128,6 +128,15 @@ properties:
+>>         See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
+>>         details for the regulator setup on these boards.
+>> +  mdio:
+>> +    $ref: /schemas/net/mdio.yaml#
+>> +    unevaluatedProperties: false
+>> +    description:
+>> +      Node for the internal MDIO bus connected to the embedded ethernet-PHYs.
+>> +      For every port defined under the "^(ethernet-)?ports$" node, a PHY must be
+>> +      defined under here and a phy-handle property must be defined under the
+>> +      port node to point to the PHY node.
 >> +
->> +	/* Reset the PHY to bring it to a known state. */
->> +	err = phy_write(phydev, MII_BMCR, BMCR_RESET);
->> +	if (err < 0)
->> +		return err;
->> +
->> +	/* The datasheet indicates the PHY needs up to 1us to complete a reset,
->> +	 * build some slack here.
->> +	 */
->> +	usleep_range(1000, 2000);
->> +
->> +	/* The PHY requires 65 MDC clock cycles to complete a write operation
->> +	 * and turnaround the line properly.
->> +	 *
->> +	 * We ignore -EIO here as the MDIO controller (e.g.: mdio-bcm-unimac)
->> +	 * may flag the lack of turn-around as a read failure. This is
->> +	 * particularly true with this combination since the MDIO controller
->> +	 * only used 64 MDC cycles. This is not a critical failure in this
->> +	 * specific case and it has no functional impact otherwise, so we let
->> +	 * that one go through. If there is a genuine bus error, the next read
->> +	 * of MII_BRCM_FET_INTREG will error out.
->> +	 */
->> +	err = phy_read(phydev, MII_BMCR);
->> +	if (err < 0 && err != -EIO)
->> +		return err;
+>>     mediatek,mcm:
+>>       type: boolean
+>>       description:
+>>
+>> Arınç
 > 
-> It is pretty normal to check the value of MII_BMCR and ensure that
-> BMCR_RESET has cleared. See phy_poll_reset(). It might not be needed,
-> if you trust the datasheet, but 802.3 C22 says it should clear.
+> In that case, putting the comment here would make more sense, no?
+> (and maybe enforcing an actual schema, but I've no idea how to do that)
 > 
->> +	/* Enable auto MDIX */
->> +	err = phy_clear_bits(phydev, BCM5221_AEGSR, BCM5221_AEGSR_MDIX_DIS);
->> +	if (err < 0)
->> +		return err;
+> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> index 480120469953..5a415f12f162 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> @@ -59,7 +59,14 @@ properties:
+>         - rtl8_4t
+>         - seville
 > 
-> It is better to set it based on phydev->mdix_ctrl.
+> -# CPU and DSA ports must have phylink-compatible link descriptions
+> +# CPU and DSA ports must have phylink-compatible link descriptions.
+> +# On user ports, these are also supported, but are optional and may be omitted,
+> +# meaning that these ports are implicitly connected to a PHY on an internal
+> +# MDIO bus of the switch that isn't described in the device tree. If the switch
+> +# does have a child node for the internal MDIO bus, the phylink-compatible
+> +# bindings are also required (even if this is not enforced here). The detection
+> +# of an internal MDIO bus is model-specific and may involve matching on the
+> +# "mdio" node name or compatible string.
+>   if:
+>     oneOf:
+>       - required: [ ethernet ]
 > 
->> @@ -1288,6 +1431,7 @@ static struct mdio_device_id __maybe_unused broadcom_tbl[] = {
->>   	{ PHY_ID_BCM53125, 0xfffffff0 },
->>   	{ PHY_ID_BCM53128, 0xfffffff0 },
->>   	{ PHY_ID_BCM89610, 0xfffffff0 },
->> +	{ PHY_ID_BCM5221, 0xfffffff0 },
-> 
-> This table has some sort of sorting. I would put this new entry before
-> PHY_ID_BCM5241.
-> 
->>   #define PHY_ID_BCM50610			0x0143bd60
->>   #define PHY_ID_BCM50610M		0x0143bd70
->>   #define PHY_ID_BCM5241			0x0143bc30
->> +#define PHY_ID_BCM5221			0x004061e0
-> 
-> The value looks odd. Is the OUI correct? Is that a broadcom OUI?
+> Since commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus"), DSA as a
+> framework also supports auto-creating an internal MDIO bus based on the
+> presence of the "mdio" node name, so I guess it makes sense for the
+> "mdio" to appear in the generic dsa.yaml if there's nothing else that's
+> special about it.
 
-Yes it is correct and yes it is assigned to Broadcom.
--- 
-Florian
+I agree with this. I've done this which works. It's even found a port
+node with the ethernet property missing, as it should've.
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+index ec74a660beda..03ccedbc49dc 100644
+--- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+@@ -31,6 +31,24 @@ properties:
+        (single device hanging off a CPU port) must not specify this property
+      $ref: /schemas/types.yaml#/definitions/uint32-array
+  
++  mdio:
++    description: The internal MDIO bus of the switch
++    $ref: /schemas/net/mdio.yaml#
++
++if:
++  required: [ mdio ]
++then:
++  patternProperties:
++    "^(ethernet-)?ports$":
++      patternProperties:
++        "^(ethernet-)?port@[0-9]+$":
++          if:
++            not:
++              required: [ ethernet ]
++          then:
++            required:
++              - phy-handle
++
+  additionalProperties: true
+  
+  $defs:
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+index 8d7e878b84dc..fe1e2008995d 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+@@ -78,6 +78,16 @@ examples:
+              };
+      };
+  
++    macb1 {
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            fixed-link {
++                    speed = <1000>;
++                    full-duplex;
++            };
++    };
++
+      spi {
+              #address-cells = <1>;
+              #size-cells = <0>;
+@@ -138,6 +148,7 @@ examples:
+                                      phy-mode = "rgmii";
+                                      tx-internal-delay-ps = <2000>;
+                                      rx-internal-delay-ps = <2000>;
++                                    ethernet = <&macb0>;
+  
+                                      fixed-link {
+                                              speed = <1000>;
+diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+index cfd69c2604ea..f600e65fc990 100644
+--- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+@@ -6,9 +6,6 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+  
+  title: Realtek switches for unmanaged switches
+  
+-allOf:
+-  - $ref: dsa.yaml#/$defs/ethernet-ports
+-
+  maintainers:
+    - Linus Walleij <linus.walleij@linaro.org>
+  
+@@ -95,37 +92,41 @@ properties:
+        - '#address-cells'
+        - '#interrupt-cells'
+  
+-  mdio:
+-    $ref: /schemas/net/mdio.yaml#
+-    unevaluatedProperties: false
+-
+-    properties:
+-      compatible:
+-        const: realtek,smi-mdio
+-
+-if:
+-  required:
+-    - reg
+-
+-then:
+-  $ref: /schemas/spi/spi-peripheral-props.yaml#
+-  not:
+-    required:
+-      - mdc-gpios
+-      - mdio-gpios
+-      - mdio
+-
+-  properties:
+-    mdc-gpios: false
+-    mdio-gpios: false
+-    mdio: false
+-
+-else:
+-  required:
+-    - mdc-gpios
+-    - mdio-gpios
+-    - mdio
+-    - reset-gpios
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++  - if:
++      required: [ mdio ]
++    then:
++      properties:
++        mdio:
++          properties:
++            compatible:
++              const: realtek,smi-mdio
++
++          required:
++            - compatible
++
++  - if:
++      required:
++        - reg
++    then:
++      $ref: /schemas/spi/spi-peripheral-props.yaml#
++      not:
++        required:
++          - mdc-gpios
++          - mdio-gpios
++          - mdio
++
++      properties:
++        mdc-gpios: false
++        mdio-gpios: false
++        mdio: false
++    else:
++      required:
++        - mdc-gpios
++        - mdio-gpios
++        - mdio
++        - reset-gpios
+  
+  required:
+    - compatible
 
 
---0000000000009cc41a0602ad64cd
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> 
+> Also, in the earlier patch version you had replied to David Bauer:
+> 
+> | > While i was not aware of this side effect, I don't see how this breaks the ABI.
+> |
+> | Your patch doesn't break it, my then-intention of doing PHY muxing by
+> | utilising this would. Your first patch is perfectly fine as is.
+> 
+> Could you please clarify what is your valid use case for not having a
+> phy-handle to a PHY on an MDIO bus that is otherwise present in OF?
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINppL7iS4jIoea//
-oRIX17CSlnjEFkVicezJXBnHQ80vMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMDgxMTIyNDAwMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA6zZaxHcbFeqNwsLBxXXHtbjJQ6IkaAk+T
-wnk7eT1l4FLloEPplQqaQq1h49/UvKQhTvbOOakQTkK8U50QuKS7mqueXhPLkQI055WycJMD3QBr
-ektWq6lqobItldgp6j4i0l9L1XpLXOrTOmMnhbku1YAxnz3XjRcSf5JqtfGSaupFCEee6DO6MTMG
-Zk7Xr32IwN1/ntzi19d06Bl9DW8oW4WQe3iaztRSfsRq0li3Fd/hfOGdfycYYPWSFBfenHvShI6l
-R+XVvghNRUPnM8bmG8VGIhsNCQS/oS0A3mwNpGOJ6v5JHPhQKu3A1tJ2ioCM4aI5hDGT5DISS7Zr
-sOl2
---0000000000009cc41a0602ad64cd--
+I had one possible use case, PHY muxing, but it has nothing to do with
+the PHY registers of the PHYs on the internal MDIO bus so it's not a
+valid use case.
+
+> It doesn't _have_ to be broken. Since DSA knows the addresses of the
+> internal PHYs, it can circumvent the lack of auto-scanning by manually
+> calling get_phy_device() at the right (port-based) MDIO addresses.
+> But any patch would need to have a clear reason before being considered
+> for merging.
+
+I think circumventing the mdio node for ports without a phy-handle will
+bring unnecessary complexity and confusion as I may define a port with
+reg = <1> with phy-handle to a phy with reg = <4>. In that case, a port
+with reg = <4> without a phy-handle would try the phy with reg <4> and fail.
+
+This is of course if I understood correctly that "(port-based) MDIO
+addresses" means reading the MDIO address of a phy from the reg of a
+port defined under the ports node.
+
+Arınç
 
