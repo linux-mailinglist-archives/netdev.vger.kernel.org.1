@@ -1,101 +1,123 @@
-Return-Path: <netdev+bounces-26721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B970778A88
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:01:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A800778A93
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7065A1C20CFA
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:01:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0CD1C20CAF
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED69A6AA1;
-	Fri, 11 Aug 2023 10:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29AD6AA3;
+	Fri, 11 Aug 2023 10:03:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBA863C3
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:01:46 +0000 (UTC)
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 804DC2D66
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:01:45 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-52164adea19so2263980a12.1
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 03:01:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58F85690
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:03:13 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A16E3;
+	Fri, 11 Aug 2023 03:03:12 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52307552b03so2315984a12.0;
+        Fri, 11 Aug 2023 03:03:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1691748104; x=1692352904;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NQHY9UG55J+wb0+yWlgj7OFouiQtRrKvLbZqsrBAxIk=;
-        b=Vyx8AoDMH904hxVZ/imQw1cOXrDHtZZ2tXgjlsFpnEJom0vUmS3Efis7rooSezH+yg
-         8YcnHlH5lOqYJBqEMVu/zflxev9qoogeyTSuApmrzWERrONRVT8ngLg9EWNL1wG0LAFz
-         4OIPdaxBHNacN5zHSLbsNs93uLzlu6fP1rKR9MIbgJdRJZAIoL4kcigODBu/OfHY3Eek
-         SwlwthTFZes/Z+jkcHl3vMBd474rhhSC1pwZlXmlhaIU7ae72whsTRzPr5Nzk36Z1+R6
-         0BS1YiX1O6wIfuQfR1Dhim1wJOkMDefCHoKfW9YG0C2Rup7mf5ym2aEhLCM8MUUzSQGD
-         jwpg==
+        d=gmail.com; s=20221208; t=1691748191; x=1692352991;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ttMKk9rqBt+1WGSIXymjZZbSeEZephzk63+VZ9udyhk=;
+        b=bPu6sMY1k+9VJFEa3lLJW4SaCenfmZ2fqfZqSFuSEhUF8gy+ejOhjLjj31X5bRIHPD
+         Itf7pyP3cRTFRXjieeYyq5ymEmWQ+7R2sRTbpqPu+V7LCLeo2G6lHfeFpPlDyamWh2cl
+         Qb65XLfBBlfktmox+II5+BrbxhLamsrUBD/T7a+y7814FiS1upfk2rntYvLgPz22taoH
+         Zqzg3QAij62O1mK0tR8ZbeZitjsJddIwAlbFSfX1kTpx1idHNcaj2jZziK7AAhLMufVm
+         gxjD9fmIQC/cgmv/kP/i7aM+cOOfk25VdR4EK4qH2xK1HI6Xxvvb5j3T/p2of+lMAjTV
+         cLfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691748104; x=1692352904;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NQHY9UG55J+wb0+yWlgj7OFouiQtRrKvLbZqsrBAxIk=;
-        b=Cs8iEYEn5lqGZ8iYBVrGsIaKrz3ovJR4KE0B0c2J9bMwgV4uyfPkqZJZHDqiyu7Gec
-         oJS8NIs/f5NqC5dG9nUyyTXn215txJnLK6Dfngx/Ru2C1EB5IvUpAQnQBwZuMi/ESee+
-         rJhyU2VlHgvXH+8O2U3AlRRrV89FxVX2aLOsf5c4Hl/bPpDBZhzCiRHhtt8XIVcMMgxa
-         2f87SoorZtrFcanxI3Y4G9v+lK6DeBi/XAZSjkGTZ6i3oCUw98F6PKxP5Na+Rg7w7KHs
-         Jklze3eSiol0YrocnnhLvBzsxxKPIfbfnJqRWxzz6mpO/MpAXsKhJKfG72o559q9fml7
-         XnOA==
-X-Gm-Message-State: AOJu0YyDIoFv52j5yO/uLNAT867WVQxH+lVk6cF30RCvuD/30VFMUVvA
-	o4WNulEorqc2Y1i6n/xzOtGhWA==
-X-Google-Smtp-Source: AGHT+IHv2udGQ0zfe+fmDYdfWER6dhXcYEv20n/WlH4/Q1P2C16bcodSbmBpuTUfOhqrJvPY5kdC0Q==
-X-Received: by 2002:a17:907:2724:b0:993:d536:3cb7 with SMTP id d4-20020a170907272400b00993d5363cb7mr1216227ejl.11.1691748103898;
-        Fri, 11 Aug 2023 03:01:43 -0700 (PDT)
-Received: from [192.168.1.2] (handbookness.lineup.volia.net. [93.73.104.44])
-        by smtp.gmail.com with ESMTPSA id kd5-20020a17090798c500b00982d0563b11sm2030688ejc.197.2023.08.11.03.01.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Aug 2023 03:01:43 -0700 (PDT)
-Message-ID: <95802373-c46a-c998-39af-b2d9ce685626@blackwall.org>
-Date: Fri, 11 Aug 2023 13:01:40 +0300
+        d=1e100.net; s=20221208; t=1691748191; x=1692352991;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ttMKk9rqBt+1WGSIXymjZZbSeEZephzk63+VZ9udyhk=;
+        b=Ml69nZf9oa7TcMMTXAHF+zXotEow1BKWsao/55hC27IZc+9xSep9BoyN1yyFjl5H/e
+         i8taQ9chebQIOFRgHgzvEEjD/LNTzbpiIxAh8C12D1w5lTe1Gdy7Lb/ECoPfHaWThLGZ
+         JkoELVqOxw047i9JHdKu9PlHHs8NgWAkTJzijcVubXmCxqgzSPbrN4bTpSjrDZN0RqQe
+         pzRVeHTpGMJex3FTtu0WFgtMCkBy2gdvBVLUpLJD87STAq4X8hbMePPvfhUl8Z9CwAND
+         fCxq5UTeyGU9jE5rBoxuPxH4VWROA2FLUeppYIUiCTxs/T1ATSjM3J64yv3CovgeG609
+         mjGA==
+X-Gm-Message-State: AOJu0YxGRVvzLZFl7AWk2XP5MdMjvkXLB+CSQyfGn8/tZO0AKFb49FqD
+	qFyT677V/zKdkWBvo9B6KyQ=
+X-Google-Smtp-Source: AGHT+IGg+Y9cCLRcyJm+vZcVDXWFml9c31ZRvLQ0lBTxNYkMofs5i6LsSOtor5FePGm2gTOxCgwGlw==
+X-Received: by 2002:a05:6402:2031:b0:523:d1ab:b2ec with SMTP id ay17-20020a056402203100b00523d1abb2ecmr718246edb.35.1691748190324;
+        Fri, 11 Aug 2023 03:03:10 -0700 (PDT)
+Received: from skbuf ([188.27.184.232])
+        by smtp.gmail.com with ESMTPSA id u14-20020aa7d98e000000b005231e3d89efsm1869472eds.31.2023.08.11.03.03.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 03:03:10 -0700 (PDT)
+Date: Fri, 11 Aug 2023 13:03:07 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: alexis.lothore@bootlin.com
+Cc: =?utf-8?Q?Cl=C3=A9ment?= Leger <clement@clement-leger.fr>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Milan Stevanovic <milan.stevanovic@se.com>,
+	Jimmy Lalande <jimmy.lalande@se.com>,
+	Pascal Eberhard <pascal.eberhard@se.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH net-next v5 2/3] net: dsa: rzn1-a5psw: add support for
+ .port_bridge_flags
+Message-ID: <20230811100307.ocqkijjj5f6hi3q2@skbuf>
+References: <20230810093651.102509-1-alexis.lothore@bootlin.com>
+ <20230810093651.102509-3-alexis.lothore@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH net-next 2/2] vxlan: Use helper functions to update stats
-Content-Language: en-US
-To: Li Zetao <lizetao1@huawei.com>, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, idosch@nvidia.com, jbenc@redhat.com,
- gavinl@nvidia.com, wsa+renesas@sang-engineering.com, vladimir@nikishkin.pw
-Cc: netdev@vger.kernel.org
-References: <20230810085642.3781460-1-lizetao1@huawei.com>
- <20230810085642.3781460-3-lizetao1@huawei.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20230810085642.3781460-3-lizetao1@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810093651.102509-3-alexis.lothore@bootlin.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/10/23 11:56, Li Zetao wrote:
-> Use the helper functions dev_sw_netstats_rx_add() and
-> dev_sw_netstats_tx_add() to update stats, which helps to
-> provide code readability.
-> 
-> Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> ---
->   drivers/net/vxlan/vxlan_core.c | 13 ++-----------
->   1 file changed, 2 insertions(+), 11 deletions(-)
-> 
+Hi Alexis,
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+On Thu, Aug 10, 2023 at 11:36:50AM +0200, alexis.lothore@bootlin.com wrote:
+> +	if (flags.mask & BR_FLOOD) {
+> +		val = flags.val & BR_FLOOD ? BIT(port) : 0;
+> +		a5psw_reg_rmw(a5psw, A5PSW_UCAST_DEF_MASK, BIT(port), val);
+> +	}
+> +
+> +	if (flags.mask & BR_MCAST_FLOOD) {
+> +		val = flags.val & BR_MCAST_FLOOD ? BIT(port) : 0;
+> +		a5psw_reg_rmw(a5psw, A5PSW_MCAST_DEF_MASK, BIT(port), val);
+> +	}
+> +
+> +	if (flags.mask & BR_BCAST_FLOOD) {
+> +		val = flags.val & BR_BCAST_FLOOD ? BIT(port) : 0;
+> +		a5psw_reg_rmw(a5psw, A5PSW_BCAST_DEF_MASK, BIT(port), val);
+> +	}
 
+These 3 port masks will only do what you expect while the bridge has
+vlan_filtering=0, correct? When vlan_filtering=1, packets classified to
+a VLAN which don't hit any FDB entry will be always flooded to all ports
+in that VLAN, correct?
 
+Maybe you could restrict transitions to flooding disabled on ports with
+vlan_filtering 1, and restrict transitions to vlan_filtering 1 on ports
+with flooding disabled. Or at least add some comments about the
+limitations. I wouldn't want subtle incompatibilities between the
+hardware design and Linux' expectations to go under the radar like this.
 
