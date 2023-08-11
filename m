@@ -1,71 +1,297 @@
-Return-Path: <netdev+bounces-26951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3030E7799D6
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 23:45:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A42EF7799F9
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 23:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 626ED281A2F
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 21:45:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38051C209DD
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 21:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41ADC329CD;
-	Fri, 11 Aug 2023 21:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7B8329D5;
+	Fri, 11 Aug 2023 21:54:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351338833
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 21:45:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FE93C433C7;
-	Fri, 11 Aug 2023 21:45:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691790308;
-	bh=EjqSQ9sVbqPtwEN0LdKgdnSCHddBC7vSGqAi57qUfmY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sKc2JuW+OizLw2iug6zux2qse6QHjt9aaWPhem2iz9WA0fcciAxXyCKViuM4MBv7X
-	 EFfW014kpszcecQDuL5mJZHNGUdVlGKY9Z4joGTXEJcqgZRv4Clf6c7tnrSJc9ovkn
-	 wPzz29c//tn2VXRRiXXV9Lo37lOhRvTh7NVD3cycbCFUGLFaXlbM9KqiQwK1ikCuH8
-	 hZ3HbwcgjE8Ir/e2pfZopfEjT8OKcoOtewNx+tLdQcfV8d3uBxI6RwmBsLfTdMom8+
-	 Y/Iyw0efqlHwnrQlQfDSCan5Q1+RV3mCDuppsIJ2NVBH3r10vK1hD7eFbzKGzCpKkE
-	 P5W1YiXYfC1eA==
-Date: Fri, 11 Aug 2023 14:45:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Manish Chopra <manishc@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Ariel Elior
- <aelior@marvell.com>, Alok Prasad <palok@marvell.com>, Nilesh Javali
- <njavali@marvell.com>, Saurav Kashyap <skashyap@marvell.com>,
- "jmeneghi@redhat.com" <jmeneghi@redhat.com>, "yuval.mintz@qlogic.com"
- <yuval.mintz@qlogic.com>, Sudarsana Reddy Kalluru <skalluru@marvell.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
- <edumazet@google.com>, "horms@kernel.org" <horms@kernel.org>, David Miller
- <davem@davemloft.net>
-Subject: Re: [EXT] Re: [PATCH v2 net] qede: fix firmware halt over suspend
- and resume
-Message-ID: <20230811144507.5ab3fdae@kernel.org>
-In-Reply-To: <BY3PR18MB4612F2621E50B2F12F2BC342AB10A@BY3PR18MB4612.namprd18.prod.outlook.com>
-References: <20230809134339.698074-1-manishc@marvell.com>
-	<20230810174718.38190258@kernel.org>
-	<BY3PR18MB4612F2621E50B2F12F2BC342AB10A@BY3PR18MB4612.namprd18.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722D68833
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 21:54:46 +0000 (UTC)
+X-Greylist: delayed 61 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 11 Aug 2023 14:54:44 PDT
+Received: from smtpdh19-su.aruba.it (smtpdh19-su.aruba.it [62.149.155.160])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F932712
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 14:54:44 -0700 (PDT)
+Received: from localhost.localdomain ([95.47.160.93])
+	by Aruba Outgoing Smtp  with ESMTPSA
+	id Ua4Wq7aKXFroIUa4cqW64A; Fri, 11 Aug 2023 23:53:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1691790821; bh=sgLKTG2jgUCHzbZ0AC5kRxPygfCZIK1iFs84y1o2j2k=;
+	h=From:To:Subject:Date:MIME-Version;
+	b=jalyRI6EQNn6aUL6iQvydrergSSz/TqtmgKSnViuLZ3n4ZfrYvojaVfjDb2brbucT
+	 XsiQn1PcAUN6NpYnp0ZHj7etLAvFw1h5TwvX5ZCE7gERdiu4rU6cZF6ukD75BkSKKS
+	 q7pwlH1xe9/CxKryN3euiYzSnqfQJUXEIyH+jCaAAwDvylI/X96Iu4vr/FGIZeNa2V
+	 xBT1KmwdPpvJq3UJfNEGLwVQFymA+VE+zFUtwIu4DWMD+r5FkDbgZNnlYP1yza6YBu
+	 z5pvcPHLift7hYiwv9WIVXaFJ6YDt61lK604wKfhjgQ16uuOHV3WdGM0LuNk2YRaRr
+	 pX+jb5hgwIS6Q==
+From: Giulio Benetti <giulio.benetti@benettiengineering.com>
+To: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Giulio Benetti <giulio.benetti@benettiengineering.com>,
+	Jim Reinhart <jimr@tekvox.com>,
+	James Autry <jautry@tekvox.com>,
+	Matthew Maron <matthewm@tekvox.com>
+Subject: [PATCH] net: phy: broadcom: add support for BCM5221 phy
+Date: Fri, 11 Aug 2023 23:53:22 +0200
+Message-Id: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfNDKmphGz4qnBWbzJRlED2AkkE0sAmkq+e+n2OZih68PFVNiooO28McspQwHO+nqr5ZeFH+4raGnERqeit6xQMtDc9IXvckGqbSQWI6oF+TV/scRqhbF
+ MOSG5jrvLNEXZcgRdvKQ/tgt+aVsg14y91PqVPnkgmKZ2weDF+AkoqmueqEyMUdzqjEIPx9rdOFCTKQjhddO3RtvnbisJRwzTFfpHAP0GhmyKleN+bDMHPyv
+ bLl8PbfF8raGVDilL4Ubr4DJFUO8yBt5/EUeJu6L3fff3p9bcmYeBH8MNf6f+1G6EbseyellWUoMX4A3CJNUQOSAqvF/1khAcOnRua1fKWV1wBEhdTnt/+tw
+ HOHZi+R7UmYGurrFPJK+ZfvrXfImdacmjYIuSMrXrHcoP+OSXZ/dyggR7F9vqjpDctB4kGOJEyFRHpxUAvuGMTUhDaBwTHEkSp28y+/Nyp7a8hTrFW6/bHNO
+ GC/bgT7uQOxZfPuWRQCkuXFlDZvywM2FoeI8BfQ96r+zPN6b72GunLt6AL65TjhljCbXbopGLwgVjEG3EOl7IjYdr1UMH/vk+j6mp4473WNSp2hqYtgIH0oK
+ ns+vnhaN/2xjWa+F9N0rzWJEgEK136vQ2V/JQwdx2YYYOhesqEzFAl5tPX+GXQdSJbcZ/Q47DqotIDynLeZThWzlOka1G4pz4Kt67UPg3C2CTCVIPgCRPlLB
+ 0So5HQPU8cU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 11 Aug 2023 09:31:15 +0000 Manish Chopra wrote:
-> > Does the FW end up recovering? That could still be preferable to rejecting
-> > suspend altogether. Reject is a big hammer, I'm a bit worried it will cause a
-> > regression in stable.  
-> 
-> Yes, By adding the driver's suspend handler with explicit error returned 
-> to PCI subsystem prevents the system wide suspend and does not impact the
-> device/FW at all. It keeps them operational as they were before.
+This patch adds the BCM5221 PHY support by reusing
+brcm_fet_config_intr() and brcm_fet_handle_interrupt() and
+implementing config_init()/suspend()/resume().
 
-I'm asking about recovery without this patch, not with it.
-That should be evident from the text I'm replying under.
+Sponsored by: Tekvox Inc.
+Cc: Jim Reinhart <jimr@tekvox.com>
+Cc: James Autry <jautry@tekvox.com>
+Cc: Matthew Maron <matthewm@tekvox.com>
+Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+---
+ drivers/net/phy/broadcom.c | 144 +++++++++++++++++++++++++++++++++++++
+ include/linux/brcmphy.h    |   8 +++
+ 2 files changed, 152 insertions(+)
+
+diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
+index 59cae0d808aa..99f6c0485f01 100644
+--- a/drivers/net/phy/broadcom.c
++++ b/drivers/net/phy/broadcom.c
+@@ -754,6 +754,84 @@ static int brcm_fet_config_init(struct phy_device *phydev)
+ 	return err;
+ }
+ 
++static int bcm5221_config_init(struct phy_device *phydev)
++{
++	int reg, err, err2, brcmtest;
++
++	/* Reset the PHY to bring it to a known state. */
++	err = phy_write(phydev, MII_BMCR, BMCR_RESET);
++	if (err < 0)
++		return err;
++
++	/* The datasheet indicates the PHY needs up to 1us to complete a reset,
++	 * build some slack here.
++	 */
++	usleep_range(1000, 2000);
++
++	/* The PHY requires 65 MDC clock cycles to complete a write operation
++	 * and turnaround the line properly.
++	 *
++	 * We ignore -EIO here as the MDIO controller (e.g.: mdio-bcm-unimac)
++	 * may flag the lack of turn-around as a read failure. This is
++	 * particularly true with this combination since the MDIO controller
++	 * only used 64 MDC cycles. This is not a critical failure in this
++	 * specific case and it has no functional impact otherwise, so we let
++	 * that one go through. If there is a genuine bus error, the next read
++	 * of MII_BRCM_FET_INTREG will error out.
++	 */
++	err = phy_read(phydev, MII_BMCR);
++	if (err < 0 && err != -EIO)
++		return err;
++
++	reg = phy_read(phydev, MII_BRCM_FET_INTREG);
++	if (reg < 0)
++		return reg;
++
++	/* Unmask events we are interested in and mask interrupts globally. */
++	reg = MII_BRCM_FET_IR_ENABLE |
++	      MII_BRCM_FET_IR_MASK;
++
++	err = phy_write(phydev, MII_BRCM_FET_INTREG, reg);
++	if (err < 0)
++		return err;
++
++	/* Enable auto MDIX */
++	err = phy_clear_bits(phydev, BCM5221_AEGSR, BCM5221_AEGSR_MDIX_DIS);
++	if (err < 0)
++		return err;
++
++	/* Enable shadow register access */
++	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
++	if (brcmtest < 0)
++		return brcmtest;
++
++	reg = brcmtest | MII_BRCM_FET_BT_SRE;
++
++	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
++	if (err < 0)
++		return err;
++
++        /* Exit low power mode */
++	err = phy_clear_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
++			 BCM5221_SHDW_AM4_FORCE_LPM);
++	if (err < 0)
++		goto done;
++
++	if (phydev->dev_flags & PHY_BRCM_AUTO_PWRDWN_ENABLE) {
++		/* Enable auto power down */
++		err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
++				   MII_BRCM_FET_SHDW_AS2_APDE);
++	}
++
++done:
++	/* Disable shadow register access */
++	err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
++	if (!err)
++		err = err2;
++
++	return err;
++}
++
+ static int brcm_fet_ack_interrupt(struct phy_device *phydev)
+ {
+ 	int reg;
+@@ -882,6 +960,61 @@ static int bcm54xx_phy_set_wol(struct phy_device *phydev,
+ 	return 0;
+ }
+ 
++static int bcm5221_suspend(struct phy_device *phydev)
++{
++	int reg, err, err2, brcmtest;
++
++	/* Enable shadow register access */
++	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
++	if (brcmtest < 0)
++		return brcmtest;
++
++	reg = brcmtest | MII_BRCM_FET_BT_SRE;
++
++	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
++	if (err < 0)
++		return err;
++
++	/* Force Low Power Mode with clock enabled */
++	err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
++			   BCM5221_SHDW_AM4_EN_CLK_LPM |
++			   BCM5221_SHDW_AM4_FORCE_LPM);
++
++	/* Disable shadow register access */
++	err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
++	if (!err)
++		err = err2;
++
++	return err;
++}
++
++static int bcm5221_resume(struct phy_device *phydev)
++{
++	int reg, err, err2, brcmtest;
++
++	/* Enable shadow register access */
++	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
++	if (brcmtest < 0)
++		return brcmtest;
++
++	reg = brcmtest | MII_BRCM_FET_BT_SRE;
++
++	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
++	if (err < 0)
++		return err;
++
++	/* Exit Low Power Mode with clock enabled */
++	err = phy_clear_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
++			     BCM5221_SHDW_AM4_FORCE_LPM);
++
++	/* Disable shadow register access */
++	err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
++	if (!err)
++		err = err2;
++
++	return err;
++}
++
+ static int bcm54xx_phy_probe(struct phy_device *phydev)
+ {
+ 	struct bcm54xx_phy_priv *priv;
+@@ -1208,6 +1341,16 @@ static struct phy_driver broadcom_drivers[] = {
+ 	.handle_interrupt = brcm_fet_handle_interrupt,
+ 	.suspend	= brcm_fet_suspend,
+ 	.resume		= brcm_fet_config_init,
++}, {
++	.phy_id		= PHY_ID_BCM5221,
++	.phy_id_mask	= 0xfffffff0,
++	.name		= "Broadcom BCM5221",
++	/* PHY_BASIC_FEATURES */
++	.config_init	= bcm5221_config_init,
++	.config_intr	= brcm_fet_config_intr,
++	.handle_interrupt = brcm_fet_handle_interrupt,
++	.suspend	= bcm5221_suspend,
++	.resume		= bcm5221_resume,
+ }, {
+ 	.phy_id		= PHY_ID_BCM5395,
+ 	.phy_id_mask	= 0xfffffff0,
+@@ -1288,6 +1431,7 @@ static struct mdio_device_id __maybe_unused broadcom_tbl[] = {
+ 	{ PHY_ID_BCM53125, 0xfffffff0 },
+ 	{ PHY_ID_BCM53128, 0xfffffff0 },
+ 	{ PHY_ID_BCM89610, 0xfffffff0 },
++	{ PHY_ID_BCM5221, 0xfffffff0 },
+ 	{ }
+ };
+ 
+diff --git a/include/linux/brcmphy.h b/include/linux/brcmphy.h
+index 5d732f48f787..3d7786cc997d 100644
+--- a/include/linux/brcmphy.h
++++ b/include/linux/brcmphy.h
+@@ -12,6 +12,7 @@
+ #define PHY_ID_BCM50610			0x0143bd60
+ #define PHY_ID_BCM50610M		0x0143bd70
+ #define PHY_ID_BCM5241			0x0143bc30
++#define PHY_ID_BCM5221			0x004061e0
+ #define PHY_ID_BCMAC131			0x0143bc70
+ #define PHY_ID_BCM5481			0x0143bca0
+ #define PHY_ID_BCM5395			0x0143bcf0
+@@ -330,6 +331,13 @@
+ 
+ #define BCM54XX_WOL_INT_STATUS		(MII_BCM54XX_EXP_SEL_WOL + 0x94)
+ 
++/* BCM5221 Registers */
++#define BCM5221_AEGSR			0x1C
++#define BCM5221_AEGSR_MDIX_DIS		BIT(11)
++
++#define BCM5221_SHDW_AM4_EN_CLK_LPM	BIT(2)
++#define BCM5221_SHDW_AM4_FORCE_LPM	BIT(1)
++
+ /*****************************************************************************/
+ /* Fast Ethernet Transceiver definitions. */
+ /*****************************************************************************/
+-- 
+2.34.1
+
 
