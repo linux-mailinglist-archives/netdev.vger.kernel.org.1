@@ -1,138 +1,152 @@
-Return-Path: <netdev+bounces-26652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2B3778831
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:30:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2FD77884B
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:36:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D10A8282085
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 07:30:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A72F1C21128
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 07:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BA41FDB;
-	Fri, 11 Aug 2023 07:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1971A4406;
+	Fri, 11 Aug 2023 07:36:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4601E1C4
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:30:24 +0000 (UTC)
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B0526AB;
-	Fri, 11 Aug 2023 00:30:23 -0700 (PDT)
-Received: from [192.168.151.20] ([217.224.112.34]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MOzjW-1q9QVQ25xE-00PMc5; Fri, 11 Aug 2023 09:30:08 +0200
-Message-ID: <eb944f1f-8d7c-5057-35f2-34812907e4d1@online.de>
-Date: Fri, 11 Aug 2023 09:30:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E44B1117
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:36:24 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C51BE73
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:36:23 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d66af3c8ac7so566169276.1
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:36:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691739383; x=1692344183;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=f9QZOsVC9WvAjcXR31lR0yTnNmgGYv/UqiIn7h8suB4=;
+        b=du5+2mZZroPu1ofNqVuNcg704DrlwSBoY0eBDaIwWi/G9YaAsXL8Yh02Mw1m3NnLSo
+         HdudxUxjYF9cEVOzdYF3wpLU17mMgFPO7GFxwytYGtyyC+4M7Av5NKX2O5/lQBfPAagC
+         dIrnO15OMGYz2ldzlMPwfQFP3cvBjP20QBOknKK70yaG3Kbbi2NCgLNFa2eTW//ePPLF
+         Nj2euvGQrfVvegcamZsOmN7kvK8E99cUP3vALSTvTW1RNoO7NYAHKbU8gsRDTss367hV
+         u+hcswiZ9m1TyS1LTd3p0yv/W+aMEo5vYZytfYp0n1sJsNvqARyMFkqjtHNlIV2dKpvd
+         ZJoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691739383; x=1692344183;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f9QZOsVC9WvAjcXR31lR0yTnNmgGYv/UqiIn7h8suB4=;
+        b=X1/VnqpuNuS2vT6RVo7NVXjotdbG60RLqHJStoezuWd1DB9rSswt+CHPCpvVlGCtjf
+         Y2DB52HouXsYvSALZKL6pb0BT4Hy3HI3SxfufrxZrdO8tjKam1Dq/GZSsKx6vlVI6bBh
+         49RCELpd018Jz/IQSM8S1sTInAG8Ld03np+Mqq7qQrscQW3YGG6HQr4W+0Fca/fPFMwo
+         P1atOGyzhPteNcJWfZN3nYzwOu9Nu54gQrsZPXEuBca1SzDVzp4OHHCAPO8Ewb0528zU
+         dJ0mdtc+03uVRnpen29shXoRN4ke82f050epk7uSSHkq87Wzcwxb1tzdprz4UsWElXcw
+         dDxw==
+X-Gm-Message-State: AOJu0YygRWQtKZlQZUxZxpRJTOkZIEPVYZk0n7wHlG5Xw4/3U8QRBk7l
+	hqcvv1q4rGeFz/HLpecAfr9IZzwWU4BavQ==
+X-Google-Smtp-Source: AGHT+IHpJtpQN2/wY15pIiffKfrjzwImlW9z7e++rmsFYtfUOwjZCDJuIaFHZ1/y3kpL82sSFvYoZLAjNiIf+g==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a5b:4c:0:b0:d14:6868:16a3 with SMTP id
+ e12-20020a5b004c000000b00d14686816a3mr13509ybp.5.1691739382889; Fri, 11 Aug
+ 2023 00:36:22 -0700 (PDT)
+Date: Fri, 11 Aug 2023 07:36:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: [PATCH] wifi: nl80211: avoid NULL-ptr deref after
- cfg80211_cqm_rssi_update
-Content-Language: en-US
-From: Max Schulze <max.schulze@online.de>
-To: Arend van Spriel <aspriel@gmail.com>, Franky Lin
- <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>,
- Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org,
- brcm80211-dev-list.pdl@broadcom.com, SHA-cyfmac-dev-list@infineon.com,
- netdev@vger.kernel.org
-References: <ac96309a-8d8d-4435-36e6-6d152eb31876@online.de>
- <bc3bf8f6-7ad7-bf69-9227-f972dac4e66b@online.de>
-In-Reply-To: <bc3bf8f6-7ad7-bf69-9227-f972dac4e66b@online.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:do9exluVpxUqgCt14zbZFktqXqM74KvMmw9JlvSUr2uKLtoAPX3
- N2OkaV/BZGEdsGgWom5xHsnDcACvU3RTGlUPbTE1jDZBaG3G6V1C2U8vmET7Y5MWWsThp6l
- TMwl6Z3R1948qfW/gIDiW/q/j3LM1Pf37Jft9btsuMQzzUwBsZl21P6yBuvpLe0iveZCTRd
- QdWzNFQc/oInYCgSpFdJg==
-UI-OutboundReport: notjunk:1;M01:P0:qoKBlb1hWbY=;I8se9gl3J3siyiJt+4w5ZliESsM
- sXtxqImP0kvTeLjsPZTCUDVxVdLgKNjWITvCijBx04HNLiBliNGoKrbBdwZhNlpTLpsr/d0Se
- jbHZjrFG6/PKcJAEaGlFzllWVdZc79SZVyjReVRVelgo8owI5EttvUvZLQc4ik+I6FdHSxdNS
- F2jwS3FAX6t/mVZ9r+ntGqBOTQyzFizlpAiMu99sAliVIJQS2weN+iFY26ZpPMFRqvVhI8Imj
- 2SIugS6DrRxlfI2BeOBexrOCFEw/QV07oJ3loqoP51uAy5aXsCP6fnwQP9G//lV2B8d+DeTpS
- UubAPBgQDYvfeEFriC2kyiaip1z8rgx9VT0xJTBYQ894f+Cxj9Nt2E0BiKgbK//yv1D1EbknX
- kKg8JNmYGNmcuk/Oqds4yf07ScXnPKMhNfQK3+DQk90QdA1nMJ+3Yby+xRCo12LqnPEixhAjH
- u5zEmC+ItpQySdk+YAGA6PS2E1BIK8WQ49+rNfakn2BnKk2cuOor0eCFoCVOA38zgy5izR+zx
- IL5r94HlEAWwuhiD435jYp2qecsf7CIYOxC3PBYmhCZSOAWU0ZZWLtHc85pU+y5+18bniS4Sv
- IRK2xWkzH8IPg+t5KuMdFmnt1XEttP9KAO4PmhCJuO2D+PcHmVofTgEADgaID0U1uGrL35MQY
- W4SIk2mm2Exk2bOHgjQY9wB1jdC94v12n9QUQG2+92toi85a3L/xDBjX+2Iw2tyF6CZIGE/Dd
- mfHVUDLfXOatpv70Duxe4SJ9aorQGu3qXbmamsCagz8a3koP5sBjW+moZeftYUuVwYXmmOWPx
- rp6o/fuINosg5wglXY2SkAHl/7VGrlXg+hox+NL4naO0o4y4kWJVxe6yfXdKagYrX55ZUGilv
- 8aZFrY7/CSuO6sQ==
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230811073621.2874702-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 00/15] inet: socket lock and data-races avoidance
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <simon.horman@corigine.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In cfg80211_cqm_rssi_notify, when calling cfg80211_cqm_rssi_update, this might free
-the wdev->cqm_config . Check for this when it returns.
+In this series, I converted 20 bits in "struct inet_sock" and made
+them truly atomic.
 
-This has been observed on brcmfmac, when a RSSI event is generated just right
-after disconnecting from AP. Then probing for STA details returns nothing, as
-evidenced i.e. by
-"ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52".
+This allows to implement many IP_ socket options in a lockless
+fashion (no need to acquire socket lock), and fixes data-races
+that were showing up in various KCSAN reports.
 
+I also took care of IP_TTL/IP_MINTTL, but left few other options
+for another series.
 
-Signed-off-by: Max Schulze <max.schulze@online.de>
-Tested-by: Max Schulze <max.schulze@online.de>
-Link: https://lore.kernel.org/linux-wireless/bc3bf8f6-7ad7-bf69-9227-f972dac4e66b@online.de/
----
+v2: addressed a feedback from a build bot in patch 9 by removing
+ unused issk variable in mptcp_setsockopt_sol_ip_set_transparent()
+ Added Acked-by: tags from Soheil (thanks!)
 
-I have deployed this to 22 systems without issues and eliminating those null-ptr deref.
+Eric Dumazet (15):
+  inet: introduce inet->inet_flags
+  inet: set/get simple options locklessly
+  inet: move inet->recverr to inet->inet_flags
+  inet: move inet->recverr_rfc4884 to inet->inet_flags
+  inet: move inet->freebind to inet->inet_flags
+  inet: move inet->hdrincl to inet->inet_flags
+  inet: move inet->mc_loop to inet->inet_frags
+  inet: move inet->mc_all to inet->inet_frags
+  inet: move inet->transparent to inet->inet_flags
+  inet: move inet->is_icsk to inet->inet_flags
+  inet: move inet->nodefrag to inet->inet_flags
+  inet: move inet->bind_address_no_port to inet->inet_flags
+  inet: move inet->defer_connect to inet->inet_flags
+  inet: implement lockless IP_TTL
+  inet: implement lockless IP_MINTTL
 
-Example Trace from Problem:
+ include/net/inet_connection_sock.h  |   4 +-
+ include/net/inet_sock.h             |  92 ++++---
+ include/net/ipv6.h                  |   3 +-
+ include/net/route.h                 |   2 +-
+ include/net/tcp.h                   |   2 +-
+ net/core/sock.c                     |   2 +-
+ net/dccp/ipv4.c                     |   4 +-
+ net/ipv4/af_inet.c                  |  16 +-
+ net/ipv4/cipso_ipv4.c               |   4 +-
+ net/ipv4/igmp.c                     |   2 +-
+ net/ipv4/inet_diag.c                |  22 +-
+ net/ipv4/inet_timewait_sock.c       |   2 +-
+ net/ipv4/ip_output.c                |   7 +-
+ net/ipv4/ip_sockglue.c              | 405 +++++++++++++---------------
+ net/ipv4/netfilter/nf_defrag_ipv4.c |   2 +-
+ net/ipv4/ping.c                     |   7 +-
+ net/ipv4/raw.c                      |  26 +-
+ net/ipv4/route.c                    |   8 +-
+ net/ipv4/tcp.c                      |  12 +-
+ net/ipv4/tcp_fastopen.c             |   2 +-
+ net/ipv4/tcp_input.c                |   2 +-
+ net/ipv4/tcp_ipv4.c                 |   5 +-
+ net/ipv4/tcp_minisocks.c            |   3 +-
+ net/ipv4/udp.c                      |   7 +-
+ net/ipv4/udp_tunnel_core.c          |   2 +-
+ net/ipv6/af_inet6.c                 |   8 +-
+ net/ipv6/datagram.c                 |   2 +-
+ net/ipv6/ip6_output.c               |   5 +-
+ net/ipv6/ipv6_sockglue.c            |  12 +-
+ net/ipv6/raw.c                      |  16 +-
+ net/ipv6/udp.c                      |   2 +-
+ net/l2tp/l2tp_ip.c                  |   2 +-
+ net/mptcp/protocol.c                |  12 +-
+ net/mptcp/sockopt.c                 |  19 +-
+ net/netfilter/ipvs/ip_vs_core.c     |   4 +-
+ net/sctp/input.c                    |   2 +-
+ net/sctp/protocol.c                 |   2 +-
+ net/sctp/socket.c                   |   2 +-
+ 38 files changed, 364 insertions(+), 367 deletions(-)
 
-wpa_supplicant[332]: wlan0: CTRL-EVENT-DISCONNECTED bssid=XX:XX:XX:XX:74:1f reason=3 locally_generated=1
-brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=0000000017163222
-brcmfmac: brcmf_fweh_event_worker event LINK (16) ifidx 0 bsscfg 0 addr xx:xx:xx:xx:74:1f
-brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 2
-brcmutil: event payload, len=0
-brcmfmac: brcmf_is_linkdown Processing link down
-brcmfmac: brcmf_notify_connect_status Linkdown
-brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=00000000dcf7c0c0
-brcmfmac: brcmf_fweh_event_worker event RSSI (56) ifidx 0 bsscfg 0 addr 00:00:xx:xx:00:50
-brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 0
-brcmutil: event payload, len=12
-00000000: 00 00 00 00 00 00 00 00 00 00 00 00              ............
-brcmfmac: brcmf_notify_rssi LOW rssi=0
-brcmfmac: brcmf_cfg80211_del_key key index (0)
-brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
-brcmfmac: brcmf_fil_cmd_data Firmware error: BCME_NOTFOUND (-30)
-brcmfmac: brcmf_fil_iovar_data_get ifidx=0, name=tdls_sta_info, len=296, err=-52
-brcmfmac: brcmf_fil_cmd_data Firmware error: BCME_BADADDR (-21)
-brcmfmac: brcmf_fil_iovar_data_get ifidx=0, name=sta_info, len=296, err=-52
-ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52
-==================================================================
-BUG: KASAN: null-ptr-deref in cfg80211_cqm_rssi_notify (/home/r/linux/net/wireless/nl80211.c:19089) cfg80211
-
-
- net/wireless/nl80211.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 8bcf8e293..b12424382 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -19088,7 +19088,7 @@ void cfg80211_cqm_rssi_notify(struct net_device *dev,
- 
- 		cfg80211_cqm_rssi_update(rdev, dev);
- 
--		if (rssi_level == 0)
-+		if (rssi_level == 0 && wdev->cqm_config)
- 			rssi_level = wdev->cqm_config->last_rssi_event_value;
- 	}
- 
 -- 
-2.39.1
+2.41.0.640.ga95def55d0-goog
 
 
