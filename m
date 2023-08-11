@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-26595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D4277849B
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 02:40:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B676A778499
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 02:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEB8A281EC3
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 00:40:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C67E71C20F2D
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 00:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D40811;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B617EC;
 	Fri, 11 Aug 2023 00:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CE8629
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144AD371
 	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 93905C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BAD0C433C7;
 	Fri, 11 Aug 2023 00:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691714423;
-	bh=jBrZsLshbErJau2UB1NGD4IiKnIwy6urCcdiFirZOLk=;
+	bh=OiJe0CYwaZbunlG6mValXSE+sdr6d2DVT7HODnNxbRc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mcth0UhJg+6X8rrZ72Wj0To8BxdrkAALQtBb0NhrySTIq/AyrBD3b3qxCmHhyrxpn
-	 +IgIsey1KiOg008jvWVQC/KRLmPNWMlMsl8Ua0zg2J4xEQ6tq/weclG9PcQ0peMjC4
-	 p6b5bOO1ayrE10LV8ehW3FPLHpo6cN3f4b4uuRH21ARgzr2Nnv5NcPpk7Zzoy9rxaa
-	 Ds0zDNUVwyszYyw26w6Y9Y5VBgeveNoGPnAImS9iX+9r48dnas2vjytIzX/J5A38y2
-	 1773Ihp+5/pYF5v5fa49Kk7MRiVEdlCplCOaypWu4f3uM//lT0H7tcBy5VWl27IQAq
-	 ElN6Rl68NtOCg==
+	b=QfmAcLFhOMB/BHEc7zHU9O+wsuSPrdzn1TOe/X7U7SZ8QLlbiUVglsXdgQWHwQbKf
+	 6vVrIBuDkbkvvxhfP5Jr5/9pcxfDWthkubeHxdwSGBuxwpqqb3Cr/9QKG7JhKyPZE8
+	 x/z9nlajugGT4jIa4FHk+Ewhzh60yCwP4uW6y1V0pnV2JxcAlngF9JD3ZZU1EFFfjk
+	 roGNrbnepMgN29XgJfKdDVy/iyEDy6a5CdAtfA92gs/VVShs2ivM2pEKoyHwSQy9rJ
+	 m+PYMkMNOo+IH+Fm4U03LmOVNYU5lnIqoXdJKuGWC5JiVM5wxYRxZvQbWiky3FJXAv
+	 Y8SzZ1LWT6PRQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79C5EE1CF31;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 700CFC395C5;
 	Fri, 11 Aug 2023 00:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,36 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: mhi: Remove redundant initialization owner in
- mhi_net_driver
+Subject: Re: [PATCH net-next v3 0/4] Support offload LED blinking to PHY.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169171442349.25552.1558951182843628852.git-patchwork-notify@kernel.org>
+ <169171442345.25552.8793390051761790550.git-patchwork-notify@kernel.org>
 Date: Fri, 11 Aug 2023 00:40:23 +0000
-References: <20230808021238.2975585-1-lizetao1@huawei.com>
-In-Reply-To: <20230808021238.2975585-1-lizetao1@huawei.com>
-To: Li Zetao <lizetao1@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org
+References: <20230808210436.838995-1-andrew@lunn.ch>
+In-Reply-To: <20230808210436.838995-1-andrew@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, rmk+kernel@armlinux.org.uk,
+ simon.horman@corigine.com, ansuelsmth@gmail.com, daniel@makrotopia.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 8 Aug 2023 10:12:38 +0800 you wrote:
-> The module_mhi_driver() will set "THIS_MODULE" to driver.owner when
-> register a mhi_driver driver, so it is redundant initialization to set
-> driver.owner in the statement. Remove it for clean code.
+On Tue,  8 Aug 2023 23:04:32 +0200 you wrote:
+> Allow offloading of the LED trigger netdev to PHY drivers and
+> implement it for the Marvell PHY driver. Additionally, correct the
+> handling of when the initial state of the LED cannot be represented by
+> the trigger, and so an error is returned. As with ledtrig-timer,
+> disable offload when the trigger is deactivate, or replaced by another
+> trigger.
 > 
-> Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> ---
->  drivers/net/mhi_net.c | 1 -
->  1 file changed, 1 deletion(-)
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: mhi: Remove redundant initialization owner in mhi_net_driver
-    https://git.kernel.org/netdev/net-next/c/215c44fa69d7
+  - [net-next,v3,1/4] led: trig: netdev: Fix requesting offload device
+    https://git.kernel.org/netdev/net-next/c/7df1f14c04cb
+  - [net-next,v3,2/4] net: phy: phy_device: Call into the PHY driver to set LED offload
+    https://git.kernel.org/netdev/net-next/c/1dcc03c9a7a8
+  - [net-next,v3,3/4] net: phy: marvell: Add support for offloading LED blinking
+    https://git.kernel.org/netdev/net-next/c/460b0b648fab
+  - [net-next,v3,4/4] leds: trig-netdev: Disable offload on deactivation of trigger
+    https://git.kernel.org/netdev/net-next/c/e8fbcc47a8e9
 
 You are awesome, thank you!
 -- 
