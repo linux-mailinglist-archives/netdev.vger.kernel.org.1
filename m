@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-26976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49883779BA9
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 01:52:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F45779BAB
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 01:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BE71C20B33
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 23:52:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B85C281E31
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 23:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233791CCAA;
-	Fri, 11 Aug 2023 23:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C69A1CCAC;
+	Fri, 11 Aug 2023 23:54:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B431CCA3
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 23:52:40 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4E32C5
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 16:52:39 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bbc87ded50so17150405ad.1
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 16:52:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217D41CCA3
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 23:54:24 +0000 (UTC)
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11DDC1719
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 16:54:24 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5656a5b83e4so1067557a12.3
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 16:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1691797959; x=1692402759;
+        d=broadcom.com; s=google; t=1691798063; x=1692402863;
         h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=n4+EMyT5Q/59e/XZEIxxDcCDbrvUoAnLNd9pO4sFFJk=;
-        b=b5gKyTudfoZkEk0SefJWapmiBQdASVAjtCRG5ze+TTdXT5qW63dy1SOssq3bR+KciZ
-         xsYmMFvI0NIi6CVQpdreJ2eyn4lEpRCgVixldok1BB9qF8eGXLuXEemQMHoRY/WDoztD
-         jcBrMT/VNXdwyYOhwhWWH8TYEY3cBOFnBUIYs=
+        bh=kO0hpQ9jaTi4TsjoO5MOVleB82VjuqKPahaA+L7cobM=;
+        b=UaEp06N1mSYzvOQ/7Q2pBbNiQOfTkC3RaqA+JTtlFN/KKOZdf+4pELiubJ5ePemk0d
+         1NMsPqZKZ+b65ypwy70yA6C2Mdt0N7QZIH3wdU61YVpP9hg/kHcZLbDKGZv94goNE9AQ
+         KpMMUeKTOkeA71dr/YXR90HMlTFIyVEOGAMIY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691797959; x=1692402759;
+        d=1e100.net; s=20221208; t=1691798063; x=1692402863;
         h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n4+EMyT5Q/59e/XZEIxxDcCDbrvUoAnLNd9pO4sFFJk=;
-        b=h+VALp62oD6edLidy2MM/uP+plBxhvG4sO4pxLVRVWSlGKV5zI5GMjda6Y8Et47ydh
-         DvBdVyhCSfkBnPMm0gcXIMglzF7J5rzKTB69L3lrK0G78Vg9gxdbcfkUDWL6hgTISKJN
-         HdxAhs+LLdApdDQfLfW+Q5y9kVvnVyHFCdesTcs9PPkjqEVEtaLlLQ/SuOYpd4Wtcop/
-         e0s+MNd1Q17IGgH9daVu7DdHIuJT3L7sRlkyiA4GvofuMlFzl1sd/rOAexuwzqtiTBcx
-         ECCrZOtmz0BbU5321m9ljU4ml4hzij5gU5WKBbR9r8vr2nSWn/O6HSbZPTJ35tzYe01e
-         a8cA==
-X-Gm-Message-State: AOJu0Ywd8fssJbIB3EfsImJs1bNP3UrGSgWeg3AhHZ6+N/B1n5VXLtxG
-	usaih1I6kVL7M40IWZSNYLC8aQ==
-X-Google-Smtp-Source: AGHT+IFJjGTfOhfQAAevtGtNGIgIkzCtIOT6y2vG/KIXn+YQIGXzMb3D9ZlvV4ZE/xCH1eKddRlJow==
-X-Received: by 2002:a17:902:ec86:b0:1b0:3df7:5992 with SMTP id x6-20020a170902ec8600b001b03df75992mr2912082plg.32.1691797959306;
-        Fri, 11 Aug 2023 16:52:39 -0700 (PDT)
+        bh=kO0hpQ9jaTi4TsjoO5MOVleB82VjuqKPahaA+L7cobM=;
+        b=SXoo8460Z/q+C/hWcw5A9bRTFFOiImoa9DrUrcp3YOFHP/5xdfZjBhzEOI7pk8mrKc
+         zArm8NXBacH1w0UKeYcURGlNxcpeJKGZ626RulC74TaMr9sTCG5dUG/RHU+VkwQi4x8J
+         FRd0j591kEXl2Wrx0Rm1ykkge9pq8dEWnHejVdoGnzA6PmD/JCPZ2awqWQpgKAPI8gx4
+         voFe1QD8IT7e6hEEw8wagRNvJrx3jJClBoULkN8ifh+1o7gh0IfUUoyPcN4jpOTx687T
+         1uWZhsiaPRNE9REwudeCJDcDBG3KlCsfXdb88PLy3mdo7RsZ6r8/3NI2kdUxxJE0ViiQ
+         heAg==
+X-Gm-Message-State: AOJu0Yyf5zWIqMIOKryPK0TQds1u4Nd9HN1UyuizrRPVYhWbiIwZoqb8
+	m/ecwapbtrXaIHx1W3u1YFIJnP8V+YzvBVhymlk=
+X-Google-Smtp-Source: AGHT+IFy0hGODJnLKWmWXAojN074ld3P6ZvmaE+E7ItWPBKNWW1wfD889/lXcklglxOP8eo54XYZNQ==
+X-Received: by 2002:a17:903:181:b0:1bd:b8c8:98fc with SMTP id z1-20020a170903018100b001bdb8c898fcmr3237236plg.14.1691798063486;
+        Fri, 11 Aug 2023 16:54:23 -0700 (PDT)
 Received: from ?IPV6:2607:fb91:ae9:9152:61f0:1e0:65f1:ffd5? ([2607:fb91:ae9:9152:61f0:1e0:65f1:ffd5])
-        by smtp.gmail.com with ESMTPSA id bg3-20020a1709028e8300b001b6a27dff99sm4494041plb.159.2023.08.11.16.52.37
+        by smtp.gmail.com with ESMTPSA id i4-20020a1709026ac400b001b8062c1db3sm4486602plt.82.2023.08.11.16.54.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Aug 2023 16:52:38 -0700 (PDT)
-Message-ID: <859ff6a9-3ba9-ea2e-7b85-01813c5df0dd@broadcom.com>
-Date: Fri, 11 Aug 2023 16:52:35 -0700
+        Fri, 11 Aug 2023 16:54:22 -0700 (PDT)
+Message-ID: <73951864-6632-1a67-5c7e-a96586429429@broadcom.com>
+Date: Fri, 11 Aug 2023 16:54:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,22 +62,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH] net: phy: broadcom: add support for BCM5221 phy
-To: Giulio Benetti <giulio.benetti@benettiengineering.com>,
+Subject: Re: [PATCH] net: phy: broadcom: stub c45 read/write for 54810
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: netdev@vger.kernel.org,
  Broadcom internal kernel review list
  <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jim Reinhart <jimr@tekvox.com>,
- James Autry <jautry@tekvox.com>, Matthew Maron <matthewm@tekvox.com>
-References: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
+References: <1691796578-846-1-git-send-email-justin.chen@broadcom.com>
+ <87e4f794-669f-8d43-793c-b8c1878cbd15@broadcom.com>
+ <CALSSxFbo1jbNyxF-imfd32wsKC+Z6U2F_qL-iXeXbmrLVp=HRA@mail.gmail.com>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
-In-Reply-To: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
+In-Reply-To: <CALSSxFbo1jbNyxF-imfd32wsKC+Z6U2F_qL-iXeXbmrLVp=HRA@mail.gmail.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000069e18b0602ae685b"
+	boundary="000000000000a01f8c0602ae6e53"
 X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
@@ -85,100 +85,49 @@ X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---00000000000069e18b0602ae685b
+--000000000000a01f8c0602ae6e53
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 
-On 8/11/2023 2:53 PM, Giulio Benetti wrote:
-> This patch adds the BCM5221 PHY support by reusing
-> brcm_fet_config_intr() and brcm_fet_handle_interrupt() and
-> implementing config_init()/suspend()/resume().
+On 8/11/2023 4:47 PM, Justin Chen wrote:
+> On Fri, Aug 11, 2023 at 4:40 PM Florian Fainelli
+> <florian.fainelli@broadcom.com> wrote:
+>>
+>>
+>>
+>> On 8/11/2023 4:29 PM, Justin Chen wrote:
+>>> The 54810 does not support c45. The mmd_phy_indirect accesses return
+>>> arbirtary values leading to odd behavior like saying it supports EEE
+>>> when it doesn't. We also see that reading/writing these non-existent
+>>> MMD registers leads to phy instability in some cases.
+>>>
+>>> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+>>
+>> Thanks for submitting this fix, I would be tempted to slap a:
+>>
+>> Fixes: b14995ac2527 ("net: phy: broadcom: Add BCM54810 PHY entry")
+>>
+>> so we get it back ported to stable trees where appropriate. It is not
+>> clear whether we should return -EINVAL vs. -EOPNOTSUPP which may more
+>> clearly indicate the inability to support MMD registers?
 > 
-> Sponsored by: Tekvox Inc.
-> Cc: Jim Reinhart <jimr@tekvox.com>
-> Cc: James Autry <jautry@tekvox.com>
-> Cc: Matthew Maron <matthewm@tekvox.com>
-> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+> Hmm agreed EOPNOTSUPP seems better here. Will submit v2 with fixes tag
+> if there are no objections to this patch.
 
-Looks good, few comments below.
+Since this is a fix, you will want to use [PATCH net] as the subject 
+prefix per:
 
-> ---
->   drivers/net/phy/broadcom.c | 144 +++++++++++++++++++++++++++++++++++++
->   include/linux/brcmphy.h    |   8 +++
->   2 files changed, 152 insertions(+)
-> 
-> diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-> index 59cae0d808aa..99f6c0485f01 100644
-> --- a/drivers/net/phy/broadcom.c
-> +++ b/drivers/net/phy/broadcom.c
-> @@ -754,6 +754,84 @@ static int brcm_fet_config_init(struct phy_device *phydev)
->   	return err;
->   }
->   
-> +static int bcm5221_config_init(struct phy_device *phydev)
-> +{
+https://www.kernel.org/doc/Documentation/networking/netdev-FAQ.txt
 
-Very similar to brcm_fet_config_init() except that you configure fewer 
-interrupt sources, do not have the LED mode programming and your MDI-X 
-programming is done via a 10BaseT specific register rather than the shadow.
-
-Can you consider adding parameters to brcm_fet_config_init() such that 
-you can specify the 5221 specific settings such as the interrupt mask 
-for instance?
-
-This should help address the locking that Russell suggested.
-
-[snip]
->   
-> +static int bcm5221_suspend(struct phy_device *phydev)
-> +{
-> +	int reg, err, err2, brcmtest;
-> +
-> +	/* Enable shadow register access */
-> +	brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
-> +	if (brcmtest < 0)
-> +		return brcmtest;
-> +
-> +	reg = brcmtest | MII_BRCM_FET_BT_SRE;
-> +
-> +	err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* Force Low Power Mode with clock enabled */
-> +	err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
-> +			   BCM5221_SHDW_AM4_EN_CLK_LPM |
-> +			   BCM5221_SHDW_AM4_FORCE_LPM);
-> +
-> +	/* Disable shadow register access */
-> +	err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
-> +	if (!err)
-> +		err = err2;
-> +
-> +	return err;
-> +}
-
-bcm5221_suspend() is essentially brcm_fet_suspend() minus the setting of 
-the BMCR.PDOWN bit, can you consider factoring brcm_fet_suspend() into a 
-helper that can decide whether to set the power down bit or not? Does 
-not brcm_fet_suspend() work as-is?
-
-> +
-> +static int bcm5221_resume(struct phy_device *phydev)
-> +{
-
-This should really be calling bcm5221_config_init() here, if the PHY was 
-on a power island that is powered off during system suspend, 
-bcm5221_resume() would not be restoring the auto-power down that is set 
-during config_init(), probably not desired because that means you will 
-burn power when the cable is disconnected...
+and wait 24hrs in case someone provides additional review that you can 
+incorporate in your v2.
 -- 
 Florian
 
---00000000000069e18b0602ae685b
+--000000000000a01f8c0602ae6e53
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -249,15 +198,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGmwFyyrpJb1gVVB
-/TVl7/vA1tGMg5WoCXktpLr51CURMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMDgxMTIzNTIzOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJI24UsXXJUFConY
+Qk4OVbN+meZdcZtAihw6fd5+8jEGMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMDgxMTIzNTQyM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCb4bL95/ZFT6fxGqmx79Ipm/JVfP8JY97G
-3xbz2wqItBGqW1vMitekfy98MyhxdGkqjnI5dftqhLzqLk4v+eS8QoBSpFhzCEX22sMJ1OpWUj1j
-a7Io95hJGETAHjq81He7d33Dvk4sjGt+WJKws+nG2Mf1Bf2P615tc/g0PZ3YkW4W7nMbnEbZnKDB
-1Krwl+6koREKhoMmIOzVYpWgCKkFqfM/6qU54gofg8N11pvgQgSnpfnb/vC9/IKzn0I0Mk4Zj/qp
-RPbIGESYyC98IG+rPHDksU5TpErUqodj1ijWrZ5m5sEaYO02PCcFXoX38HA7HN6Fsjwaaolk00Bu
-YCqS
---00000000000069e18b0602ae685b--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAqTHpP7LAhCW8GklKwnMQL48HKHX6wY/AE
+rdsO4BL4fV9eDSEN+mNv07j3rYgc2v3gwKA2X0QpRycR+26B2h8QIkyUvKUWQDR7uMuyd3szoscM
+ICpn1DUN7Vv8DnCWyQXgg+ZR6De7PAkFvBouX8FoxqzXfnbTjCSNxcPFVkyPo5+mCq83YbO5X7n6
+KYrYip172P+OddPtAHYZUzXPCimYQRAeLSi46n6oYzrymNvnpeSiwLMY5M/fcJ1TwDSIzl5026of
++rt/Gkc/kC36JwvA08b3U4d5nlJKnsFcUUzCFdfh1yD5vLTnkm75dlAOImjjqCz7QAOBqlzQcsbF
+Xi1/
+--000000000000a01f8c0602ae6e53--
 
