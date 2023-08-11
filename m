@@ -1,163 +1,98 @@
-Return-Path: <netdev+bounces-26700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A227789ED
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 11:31:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DDD0778A05
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 11:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C715282142
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:31:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16C8A2802AB
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD65D7488;
-	Fri, 11 Aug 2023 09:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D545694;
+	Fri, 11 Aug 2023 09:34:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0370746E;
-	Fri, 11 Aug 2023 09:28:19 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FDAD2D78;
-	Fri, 11 Aug 2023 02:28:18 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RMdjL2hQgzrSQw;
-	Fri, 11 Aug 2023 17:27:02 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
- (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 11 Aug
- 2023 17:28:15 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <john.fastabend@gmail.com>, <jakub@cloudflare.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yonghong.song@linux.dev>, <kpsingh@kernel.org>,
-	<sdf@google.com>, <haoluo@google.com>, <jolsa@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <liujian56@huawei.com>
-Subject: [PATCH bpf-next v2 7/7] selftests/bpf: add tests for verdict skmsg to closed socket
-Date: Fri, 11 Aug 2023 17:32:37 +0800
-Message-ID: <20230811093237.3024459-8-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230811093237.3024459-1-liujian56@huawei.com>
-References: <20230811093237.3024459-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26145679
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 09:34:33 +0000 (UTC)
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87769C3
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 02:34:32 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d18566dc0c1so1664621276.0
+        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 02:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691746472; x=1692351272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=smN+SCWW2lKTSARYfwTP+xuBJ9NW+4x7+X95r/DL53w=;
+        b=K282RvNdEnW7n5QERUHuFNXOJydN1zwNIvZe/Cpivm5a5uRi4o+lZ/cAvgJQ/926R9
+         wL+afDgiAQZxh/vPgwU6rwTMvAFg6DBHzj5qpuzWbjGIXBKkV4qI0AdhCNCWLul8GnwV
+         Aedm0zoyHDYdb9S96BgdM3G1PV2xoATPSa2EERgQfXN8Dlq5azOYi6nfkj5gMxx484KD
+         FCZ4Kh1QlyKbtQWq9EUvsbYhi1D+eYDx4cFNr29YZTlwMDdodUOp0G7qU3Dg+/M/YacN
+         DE8t9ZWDGvf2xfctOURuH8+LO+WgLw0+QTaks2WuhljncCsDme/szqTPDdaIQCsi8yjo
+         mEqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691746472; x=1692351272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=smN+SCWW2lKTSARYfwTP+xuBJ9NW+4x7+X95r/DL53w=;
+        b=aubpdY8zc0p9WfIToMygDHDrkHBr5TfdGY/LfsgHv1Yd9DyYIpWNHnCgfCQqifHW+r
+         xvDfEapuPKAhNz7c3kAkGvsabzFC6UCVjN5rqTIJFiMN2FR3ksCjnp7Zir3ZK6gv2UZf
+         dkrDFUWJfWy1e1u2Hh17glv0blL7q9cUVliQjiJl8DGmttPtBibTFHiuwCTRCZOA2NAu
+         XF9fk+F/Eek0+wzSX/JM0KdVfHJdMuiwKel3INuBoEA8bHNF6BpGq/qTibLTR5EE420G
+         iSgNYI4vqtJS3u6Hz6hR+AmPInKqcjI7dOJX0v5dMwFSVFtOQ0VIF8aoTAmMUZBWFfct
+         B2rQ==
+X-Gm-Message-State: AOJu0Yzg3i6kISYWE5NNCSx5WpcKovmV4eFjuMSMMCQC5J8PA5H/cyFR
+	H6q84pE6ctmPvUt/8Womnm3/gEWOa/vnhXAqW6tPLA==
+X-Google-Smtp-Source: AGHT+IGjowQEzSv7PVwIHlKiu413nF9rlr3/ZMr5eI0rYZsr7D7PvUEmpj08JdXt4Jpa2UlmUQgdfaJzQGcTaYVim0Q=
+X-Received: by 2002:a05:6902:565:b0:ce7:919f:38f8 with SMTP id
+ a5-20020a056902056500b00ce7919f38f8mr1190723ybt.52.1691746471825; Fri, 11 Aug
+ 2023 02:34:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230810081656.2981965-1-ruanjinjie@huawei.com> <20230810081656.2981965-2-ruanjinjie@huawei.com>
+In-Reply-To: <20230810081656.2981965-2-ruanjinjie@huawei.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 11 Aug 2023 11:34:20 +0200
+Message-ID: <CACRpkdb+LMN=WRzLXGwWb_U5KhKpUVmcjNsvHk-3eb-PzbLYbQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/5] net: dsa: realtek: Remove redundant of_match_ptr()
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com, 
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, clement.leger@bootlin.com, ulli.kroll@googlemail.com, 
+	kvalo@kernel.org, bhupesh.sharma@linaro.org, robh@kernel.org, 
+	elder@linaro.org, wei.fang@nxp.com, nicolas.ferre@microchip.com, 
+	simon.horman@corigine.com, romieu@fr.zoreil.com, dmitry.torokhov@gmail.com, 
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add four tests for verdict skmsg to closed socket in sockmap_basic.c.
+On Thu, Aug 10, 2023 at 10:17=E2=80=AFAM Ruan Jinjie <ruanjinjie@huawei.com=
+> wrote:
 
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 42 +++++++++++++++----
- 1 file changed, 34 insertions(+), 8 deletions(-)
+> The driver depends on CONFIG_OF, it is not necessary to use
+> of_match_ptr() here.
+>
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index 37b0c05b77ff..689e904cc11e 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -476,9 +476,10 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 		test_sockmap_drop_prog__destroy(drop);
- }
- 
--static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanently, bool is_self)
-+static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanently, bool is_self,
-+				     bool target_shutdown)
- {
--	int key, sent, recvd, recv_fd;
-+	int key, sent, recvd, recv_fd, target_fd;
- 	int err, map, verdict, s, c0, c1, p0, p1;
- 	struct test_sockmap_msg_verdict *skel;
- 	char buf[256] = "0123456789";
-@@ -522,18 +523,22 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanently, bool
- 		skel->bss->skmsg_redir_flags = BPF_F_INGRESS;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = p1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 1;
-+			target_fd = c1;
- 			recv_fd = c1;
- 		}
- 	} else {
- 		skel->bss->skmsg_redir_flags = 0;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = c1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 2;
-+			target_fd = p0;
- 			recv_fd = c0;
- 		}
- 	}
-@@ -546,6 +551,19 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanently, bool
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
- 	ASSERT_EQ(recvd, sizeof(buf), "recv_timeout(recv_fd)");
- 
-+	if (target_shutdown) {
-+		signal(SIGPIPE, SIG_IGN);
-+		close(target_fd);
-+		sent = send(p1, &buf, sizeof(buf), 0);
-+		if (is_permanently) {
-+			ASSERT_EQ(sent, -1, "xsend(p1)");
-+			ASSERT_EQ(errno, EPIPE, "xsend(p1)");
-+		} else {
-+			ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
-+		}
-+		goto out_close;
-+	}
-+
- 	sent = xsend(p1, &buf, sizeof(buf), 0);
- 	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
-@@ -600,15 +618,23 @@ void test_sockmap_basic(void)
- 	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
- 		test_sockmap_skb_verdict_fionread(false);
- 	if (test__start_subtest("sockmap msg_verdict"))
--		test_sockmap_msg_verdict(false, false, false);
-+		test_sockmap_msg_verdict(false, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress"))
--		test_sockmap_msg_verdict(true, false, false);
-+		test_sockmap_msg_verdict(true, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanently"))
--		test_sockmap_msg_verdict(false, true, false);
-+		test_sockmap_msg_verdict(false, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanently"))
--		test_sockmap_msg_verdict(true, true, false);
-+		test_sockmap_msg_verdict(true, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanently self"))
--		test_sockmap_msg_verdict(false, true, true);
-+		test_sockmap_msg_verdict(false, true, true, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanently self"))
--		test_sockmap_msg_verdict(true, true, true);
-+		test_sockmap_msg_verdict(true, true, true, false);
-+	if (test__start_subtest("sockmap msg_verdict permanently shutdown"))
-+		test_sockmap_msg_verdict(false, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress permanently shutdown"))
-+		test_sockmap_msg_verdict(true, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict shutdown"))
-+		test_sockmap_msg_verdict(false, false, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress shutdown"))
-+		test_sockmap_msg_verdict(true, false, false, true);
- }
--- 
-2.34.1
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
+Yours,
+Linus Walleij
 
