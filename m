@@ -1,148 +1,138 @@
-Return-Path: <netdev+bounces-26651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB18277882F
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:30:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2B3778831
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 09:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F6A81C20BA4
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 07:30:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D10A8282085
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 07:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433DD1FC4;
-	Fri, 11 Aug 2023 07:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BA41FDB;
+	Fri, 11 Aug 2023 07:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7F91117
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:30:04 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB7026AB
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:30:02 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3178dd81ac4so1453618f8f.3
-        for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 00:30:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691739000; x=1692343800;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fVs8GP/KKP3l7uk2C2YMLUg3oRMrM7bgeVE6UAb0kEo=;
-        b=DpTu8fC+PDcLRHOyecA6PstUY/gwNzJPre0SK11Wff57+McHtZ1CM6NkoFHBhWCljM
-         9rJPfxroH3mv9FVLdqM8Erht5Q3CZS2uSsg5Q1ZuJnxQd0c34XRPT+sv2ynMQkGTCWS+
-         CWas2Xtyddnzzw9jj8lr8hxDKO93nsiEXwbahbIdVqksv1yovHEZBw0NQUNfFLPPIilW
-         0J/lKnOiy4WRCJDrjrkNoYV0eCodBwLshOAmYxioVL1fAJLCQskyFKaDUsPavnMJ1l6x
-         9Z0B3S27hhfoewRCE+hWzD17aSxOHERf+t+ot6qpChVeFdoXNIuA2MGxGwy4KpeLglk3
-         gIow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691739000; x=1692343800;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fVs8GP/KKP3l7uk2C2YMLUg3oRMrM7bgeVE6UAb0kEo=;
-        b=AG7orEoPx6KgY96jHr0ewFJ6LAZzHTgPoe20FGWUpcIq9aXdRhVlVsU6oiSxR74Vpr
-         YUgna2rGNH6HbRwNNM0/ZRLl1+1gvKXl8mr29F7ZU2aarPEHyITJ67FHJlWNkJ2k38yP
-         NH5u9POp0z8okK/4WItcYlUmC2Xde3XEYattRkqwj9gxaYL5Nz77PKXQrTP+Aw+GrGGX
-         f4bTGq3W+LaYJSNT/XEwa7C7JvEjY06UbSAh65nJ82W1t9yBT5+dKuDwPoLQmQXfBt8X
-         NjlKrgmHC/dYKmX9m9D8tTVo240LePSHHuyo3+gdYs1OrN7CtTAqMiHluFRohcTNFy6v
-         mQlw==
-X-Gm-Message-State: AOJu0Yx9HLZi1Sb0OnQhxc/X+yLKfPvMnDx4vq7sOXU2nnqIfR7dpyXB
-	fCVQTXVZOjfhMiE9L+Ca/f0AOQ==
-X-Google-Smtp-Source: AGHT+IE7xm9zgM+I6Pg63RuAL6J0atowi4kWJFIGUxNpKLZKbzjS8ZIybi4WAF1kU9jWarbSXzl/9Q==
-X-Received: by 2002:a5d:4451:0:b0:317:5722:a41b with SMTP id x17-20020a5d4451000000b003175722a41bmr948866wrr.7.1691739000534;
-        Fri, 11 Aug 2023 00:30:00 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id t18-20020adff612000000b00317b0155502sm4538257wrp.8.2023.08.11.00.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 00:29:59 -0700 (PDT)
-Date: Fri, 11 Aug 2023 09:29:58 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	johannes@sipsolutions.net,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, gal@nvidia.com,
-	tariqt@nvidia.com, lucien.xin@gmail.com, f.fainelli@gmail.com,
-	andrew@lunn.ch, simon.horman@corigine.com, linux@rempel-privat.de
-Subject: Re: [PATCH net-next v2 10/10] ethtool: netlink: always pass
- genl_info to .prepare_data
-Message-ID: <ZNXjdj3edS1Up3Mt@nanopsycho>
-References: <20230810233845.2318049-1-kuba@kernel.org>
- <20230810233845.2318049-11-kuba@kernel.org>
- <ZNXYZRNJkAqw686J@nanopsycho>
- <20230811071324.gfkzlpb3gbwvuufm@lion.mk-sys.cz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4601E1C4
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 07:30:24 +0000 (UTC)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B0526AB;
+	Fri, 11 Aug 2023 00:30:23 -0700 (PDT)
+Received: from [192.168.151.20] ([217.224.112.34]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MOzjW-1q9QVQ25xE-00PMc5; Fri, 11 Aug 2023 09:30:08 +0200
+Message-ID: <eb944f1f-8d7c-5057-35f2-34812907e4d1@online.de>
+Date: Fri, 11 Aug 2023 09:30:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811071324.gfkzlpb3gbwvuufm@lion.mk-sys.cz>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: [PATCH] wifi: nl80211: avoid NULL-ptr deref after
+ cfg80211_cqm_rssi_update
+Content-Language: en-US
+From: Max Schulze <max.schulze@online.de>
+To: Arend van Spriel <aspriel@gmail.com>, Franky Lin
+ <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>,
+ Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org,
+ brcm80211-dev-list.pdl@broadcom.com, SHA-cyfmac-dev-list@infineon.com,
+ netdev@vger.kernel.org
+References: <ac96309a-8d8d-4435-36e6-6d152eb31876@online.de>
+ <bc3bf8f6-7ad7-bf69-9227-f972dac4e66b@online.de>
+In-Reply-To: <bc3bf8f6-7ad7-bf69-9227-f972dac4e66b@online.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:do9exluVpxUqgCt14zbZFktqXqM74KvMmw9JlvSUr2uKLtoAPX3
+ N2OkaV/BZGEdsGgWom5xHsnDcACvU3RTGlUPbTE1jDZBaG3G6V1C2U8vmET7Y5MWWsThp6l
+ TMwl6Z3R1948qfW/gIDiW/q/j3LM1Pf37Jft9btsuMQzzUwBsZl21P6yBuvpLe0iveZCTRd
+ QdWzNFQc/oInYCgSpFdJg==
+UI-OutboundReport: notjunk:1;M01:P0:qoKBlb1hWbY=;I8se9gl3J3siyiJt+4w5ZliESsM
+ sXtxqImP0kvTeLjsPZTCUDVxVdLgKNjWITvCijBx04HNLiBliNGoKrbBdwZhNlpTLpsr/d0Se
+ jbHZjrFG6/PKcJAEaGlFzllWVdZc79SZVyjReVRVelgo8owI5EttvUvZLQc4ik+I6FdHSxdNS
+ F2jwS3FAX6t/mVZ9r+ntGqBOTQyzFizlpAiMu99sAliVIJQS2weN+iFY26ZpPMFRqvVhI8Imj
+ 2SIugS6DrRxlfI2BeOBexrOCFEw/QV07oJ3loqoP51uAy5aXsCP6fnwQP9G//lV2B8d+DeTpS
+ UubAPBgQDYvfeEFriC2kyiaip1z8rgx9VT0xJTBYQ894f+Cxj9Nt2E0BiKgbK//yv1D1EbknX
+ kKg8JNmYGNmcuk/Oqds4yf07ScXnPKMhNfQK3+DQk90QdA1nMJ+3Yby+xRCo12LqnPEixhAjH
+ u5zEmC+ItpQySdk+YAGA6PS2E1BIK8WQ49+rNfakn2BnKk2cuOor0eCFoCVOA38zgy5izR+zx
+ IL5r94HlEAWwuhiD435jYp2qecsf7CIYOxC3PBYmhCZSOAWU0ZZWLtHc85pU+y5+18bniS4Sv
+ IRK2xWkzH8IPg+t5KuMdFmnt1XEttP9KAO4PmhCJuO2D+PcHmVofTgEADgaID0U1uGrL35MQY
+ W4SIk2mm2Exk2bOHgjQY9wB1jdC94v12n9QUQG2+92toi85a3L/xDBjX+2Iw2tyF6CZIGE/Dd
+ mfHVUDLfXOatpv70Duxe4SJ9aorQGu3qXbmamsCagz8a3koP5sBjW+moZeftYUuVwYXmmOWPx
+ rp6o/fuINosg5wglXY2SkAHl/7VGrlXg+hox+NL4naO0o4y4kWJVxe6yfXdKagYrX55ZUGilv
+ 8aZFrY7/CSuO6sQ==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Aug 11, 2023 at 09:13:24AM CEST, mkubecek@suse.cz wrote:
->On Fri, Aug 11, 2023 at 08:42:45AM +0200, Jiri Pirko wrote:
->> Fri, Aug 11, 2023 at 01:38:45AM CEST, kuba@kernel.org wrote:
->> >@@ -24,7 +24,7 @@ const struct nla_policy ethnl_wol_get_policy[] = {
->> > 
->> > static int wol_prepare_data(const struct ethnl_req_info *req_base,
->> > 			    struct ethnl_reply_data *reply_base,
->> >-			    struct genl_info *info)
->> >+			    const struct genl_info *info)
->> > {
->> > 	struct wol_reply_data *data = WOL_REPDATA(reply_base);
->> > 	struct net_device *dev = reply_base->dev;
->> >@@ -39,7 +39,8 @@ static int wol_prepare_data(const struct ethnl_req_info *req_base,
->> > 	dev->ethtool_ops->get_wol(dev, &data->wol);
->> > 	ethnl_ops_complete(dev);
->> > 	/* do not include password in notifications */
->> >-	data->show_sopass = info && (data->wol.supported & WAKE_MAGICSECURE);
->> >+	data->show_sopass = genl_info_is_ntf(info) &&
->> >+		(data->wol.supported & WAKE_MAGICSECURE);
->> 
->> I believe that you are missing "!" here:
->> 	data->show_sopass = !genl_info_is_ntf(info) &&
->> 		(data->wol.supported & WAKE_MAGICSECURE);
->
->Agreed.
->
->> But, you are changing the output for dumpit if I'm not mistaken.
->> ethnl_default_dump_one() currently calls this with info==NULL too, not
->> only ethnl_default_notify().
->
->I would rather see this as a fix. Not showing the password in dumps made
->little sense as it meant the dump output was different from single
->device queries. It was the price to pay for inability to distinguish
->between a dump and a notification.
->
->IIRC the early versions submitted went even further and did not set
->GENL_UNS_ADMIN_PERM for ETHTOOL_MSG_WOL_GET and only omitted the
->password when the request came from an unprivileged process (so that
->unprivileged processes could still query the rest of WoL information)
->but this was dropped during the review as an unnecessary complication.
->
->> Anyway, the genl_info_is_ntf() itself seems a bit odd to me. The only
->> user is here and I doubt there ever going to be any other. This
->> conditional per-op attr fill seems a bit odd.
->> 
->> Can't you handle this in side ethtool somehow? IDK :/
->
->I don't think so. The point here is that notification can be seen by any
->unprivileged process so as long as we agree that those should not see
->the wake up passwords, we must not include the password in them. While
->ethtool could certanly drop the password from its output, any other
->utility parsing the notifications (or even patched ethtool) could still
->show it to anyone.
+In cfg80211_cqm_rssi_notify, when calling cfg80211_cqm_rssi_update, this might free
+the wdev->cqm_config . Check for this when it returns.
 
-Yeah, the question is, if it is a good design to have one CMD type
-to conditionally send sensitive data. I would argue that sensitive data
-could be sent over separate CMD with no notifier for it.
+This has been observed on brcmfmac, when a RSSI event is generated just right
+after disconnecting from AP. Then probing for STA details returns nothing, as
+evidenced i.e. by
+"ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52".
 
+
+Signed-off-by: Max Schulze <max.schulze@online.de>
+Tested-by: Max Schulze <max.schulze@online.de>
+Link: https://lore.kernel.org/linux-wireless/bc3bf8f6-7ad7-bf69-9227-f972dac4e66b@online.de/
+---
+
+I have deployed this to 22 systems without issues and eliminating those null-ptr deref.
+
+Example Trace from Problem:
+
+wpa_supplicant[332]: wlan0: CTRL-EVENT-DISCONNECTED bssid=XX:XX:XX:XX:74:1f reason=3 locally_generated=1
+brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=0000000017163222
+brcmfmac: brcmf_fweh_event_worker event LINK (16) ifidx 0 bsscfg 0 addr xx:xx:xx:xx:74:1f
+brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 2
+brcmutil: event payload, len=0
+brcmfmac: brcmf_is_linkdown Processing link down
+brcmfmac: brcmf_notify_connect_status Linkdown
+brcmfmac: brcmf_rx_event Enter: mmc1:0001:1: rxp=00000000dcf7c0c0
+brcmfmac: brcmf_fweh_event_worker event RSSI (56) ifidx 0 bsscfg 0 addr 00:00:xx:xx:00:50
+brcmfmac: brcmf_fweh_event_worker   version 2 flags 0 status 0 reason 0
+brcmutil: event payload, len=12
+00000000: 00 00 00 00 00 00 00 00 00 00 00 00              ............
+brcmfmac: brcmf_notify_rssi LOW rssi=0
+brcmfmac: brcmf_cfg80211_del_key key index (0)
+brcmfmac: brcmf_cfg80211_del_key Ignore clearing of (never configured) key
+brcmfmac: brcmf_fil_cmd_data Firmware error: BCME_NOTFOUND (-30)
+brcmfmac: brcmf_fil_iovar_data_get ifidx=0, name=tdls_sta_info, len=296, err=-52
+brcmfmac: brcmf_fil_cmd_data Firmware error: BCME_BADADDR (-21)
+brcmfmac: brcmf_fil_iovar_data_get ifidx=0, name=sta_info, len=296, err=-52
+ieee80211 phy0: brcmf_cfg80211_get_station: GET STA INFO failed, -52
+==================================================================
+BUG: KASAN: null-ptr-deref in cfg80211_cqm_rssi_notify (/home/r/linux/net/wireless/nl80211.c:19089) cfg80211
+
+
+ net/wireless/nl80211.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 8bcf8e293..b12424382 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -19088,7 +19088,7 @@ void cfg80211_cqm_rssi_notify(struct net_device *dev,
+ 
+ 		cfg80211_cqm_rssi_update(rdev, dev);
+ 
+-		if (rssi_level == 0)
++		if (rssi_level == 0 && wdev->cqm_config)
+ 			rssi_level = wdev->cqm_config->last_rssi_event_value;
+ 	}
+ 
+-- 
+2.39.1
 
 
