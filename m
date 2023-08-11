@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-26611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88E6777858F
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 04:40:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96299778594
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 04:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40319281AC9
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 02:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBF3B1C20EB8
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 02:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BA8A46;
-	Fri, 11 Aug 2023 02:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21197A3D;
+	Fri, 11 Aug 2023 02:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F7AA40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C492F36F
 	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 02:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55483C433C8;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C939C433CB;
 	Fri, 11 Aug 2023 02:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1691721622;
-	bh=YndZcHJCV/o6mRr0NKkn4QmiusTlRpbegp99anOFoBE=;
+	bh=dlLx6L5zKOsRJgI7/v+ZzPVU4r2Gh7u9HezzxdL/GK4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AQyvlO30I0XiZ267clyidO57KQbHYuTbwf6St9AIG7KnE5ceUoo8+9h1qPpOHMVeR
-	 6ho6EQSJy47bzqUMMTh+5cfVG5mcwhuMbbVnrsZ0GoiqksqtxUvTkbDLlB2skUmusD
-	 9fTbjpWJxPIEEgZ6RjPACGaRt2Iq3iXtxtYKd3fAkrnsSnvTn5eMjzpjXYXfDynC8y
-	 gKLsCCEtF2gXn3o4dO6N6znXQgLZE4VCqNmNntvsRWuuZgw1qUz7W9smSE8scX9tyH
-	 CEj0t7mcTFo7N7sLucMiuEMD87doi+qKrUjIO3WXWx4z9m/B2Gu2Gxjv9ruIyK8Kz8
-	 kPDVeKftwiruw==
+	b=Ew0WDR08VfoOw2mBWogc3VsHmARwr2CO8kpYeRTF7mUup2BxKW1EIB1llS19YpAbb
+	 c5Pd+dKpjSGgndk6BsylUJaGGCUFFZAoQQgZdQaf6zsaErWixGd2wYxlFm+Y5ypJT2
+	 v5nwMI4Guz+CXl/LbI2n5TA9FBWmHsj2pjd1t5hXrcxrPtX+SL+jtcQQHmcQSLt1eG
+	 pVywyfkG/BP0fbUdO3Bk2hLg2yxOeHvH40aER7xhsjcm0CVmyZ7Cp34bmE7wAs4rdd
+	 o/duRI0c4c0LuVHfObfKKvoQuWVRClDYIn16ylygNPkHvA1UvQU5GDvkhLBbsS5YAL
+	 j96BI5Fs9D5nQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 36742C39562;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41076E21ECC;
 	Fri, 11 Aug 2023 02:40:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,38 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4] tun: avoid high-order page allocation for packet header
+Subject: Re: [PATCH net-next] sctp: Remove unused declaration
+ sctp_backlog_migrate()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169172162221.18522.12671280608585780104.git-patchwork-notify@kernel.org>
+ <169172162226.18522.10036459431907109450.git-patchwork-notify@kernel.org>
 Date: Fri, 11 Aug 2023 02:40:22 +0000
-References: <20230809164753.2247594-1-trdgn@amazon.com>
-In-Reply-To: <20230809164753.2247594-1-trdgn@amazon.com>
-To: Tahsin Erdogan <trdgn@amazon.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, davem@davemloft.net,
+References: <20230809142323.9428-1-yuehaibing@huawei.com>
+In-Reply-To: <20230809142323.9428-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- herbert@gondor.apana.org.au, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ linux-sctp@vger.kernel.org, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 9 Aug 2023 09:47:52 -0700 you wrote:
-> When gso.hdr_len is zero and a packet is transmitted via write() or
-> writev(), all payload is treated as header which requires a contiguous
-> memory allocation. This allocation request is harder to satisfy, and may
-> even fail if there is enough fragmentation.
+On Wed, 9 Aug 2023 22:23:23 +0800 you wrote:
+> Commit 61c9fed41638 ("[SCTP]: A better solution to fix the race between sctp_peeloff()
+> and sctp_rcv().") removed the implementation but left declaration in place. Remove it.
 > 
-> Note that sendmsg() code path limits the linear copy length, so this change
-> makes write()/writev() and sendmsg() paths more consistent.
-> 
-> [...]
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  include/net/sctp/sctp.h | 2 --
+>  1 file changed, 2 deletions(-)
 
 Here is the summary with links:
-  - [v4] tun: avoid high-order page allocation for packet header
-    https://git.kernel.org/netdev/net-next/c/6231e47b6fad
+  - [net-next] sctp: Remove unused declaration sctp_backlog_migrate()
+    https://git.kernel.org/netdev/net-next/c/afa2420cff54
 
 You are awesome, thank you!
 -- 
