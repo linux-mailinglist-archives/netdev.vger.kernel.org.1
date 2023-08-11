@@ -1,81 +1,47 @@
-Return-Path: <netdev+bounces-26722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A800778A93
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:03:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BA0778A9D
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 12:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0CD1C20CAF
-	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:03:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59A571C213F3
+	for <lists+netdev@lfdr.de>; Fri, 11 Aug 2023 10:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29AD6AA3;
-	Fri, 11 Aug 2023 10:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBFC6AB2;
+	Fri, 11 Aug 2023 10:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58F85690
-	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:03:13 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A16E3;
-	Fri, 11 Aug 2023 03:03:12 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52307552b03so2315984a12.0;
-        Fri, 11 Aug 2023 03:03:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691748191; x=1692352991;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ttMKk9rqBt+1WGSIXymjZZbSeEZephzk63+VZ9udyhk=;
-        b=bPu6sMY1k+9VJFEa3lLJW4SaCenfmZ2fqfZqSFuSEhUF8gy+ejOhjLjj31X5bRIHPD
-         Itf7pyP3cRTFRXjieeYyq5ymEmWQ+7R2sRTbpqPu+V7LCLeo2G6lHfeFpPlDyamWh2cl
-         Qb65XLfBBlfktmox+II5+BrbxhLamsrUBD/T7a+y7814FiS1upfk2rntYvLgPz22taoH
-         Zqzg3QAij62O1mK0tR8ZbeZitjsJddIwAlbFSfX1kTpx1idHNcaj2jZziK7AAhLMufVm
-         gxjD9fmIQC/cgmv/kP/i7aM+cOOfk25VdR4EK4qH2xK1HI6Xxvvb5j3T/p2of+lMAjTV
-         cLfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691748191; x=1692352991;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ttMKk9rqBt+1WGSIXymjZZbSeEZephzk63+VZ9udyhk=;
-        b=Ml69nZf9oa7TcMMTXAHF+zXotEow1BKWsao/55hC27IZc+9xSep9BoyN1yyFjl5H/e
-         i8taQ9chebQIOFRgHgzvEEjD/LNTzbpiIxAh8C12D1w5lTe1Gdy7Lb/ECoPfHaWThLGZ
-         JkoELVqOxw047i9JHdKu9PlHHs8NgWAkTJzijcVubXmCxqgzSPbrN4bTpSjrDZN0RqQe
-         pzRVeHTpGMJex3FTtu0WFgtMCkBy2gdvBVLUpLJD87STAq4X8hbMePPvfhUl8Z9CwAND
-         fCxq5UTeyGU9jE5rBoxuPxH4VWROA2FLUeppYIUiCTxs/T1ATSjM3J64yv3CovgeG609
-         mjGA==
-X-Gm-Message-State: AOJu0YxGRVvzLZFl7AWk2XP5MdMjvkXLB+CSQyfGn8/tZO0AKFb49FqD
-	qFyT677V/zKdkWBvo9B6KyQ=
-X-Google-Smtp-Source: AGHT+IGg+Y9cCLRcyJm+vZcVDXWFml9c31ZRvLQ0lBTxNYkMofs5i6LsSOtor5FePGm2gTOxCgwGlw==
-X-Received: by 2002:a05:6402:2031:b0:523:d1ab:b2ec with SMTP id ay17-20020a056402203100b00523d1abb2ecmr718246edb.35.1691748190324;
-        Fri, 11 Aug 2023 03:03:10 -0700 (PDT)
-Received: from skbuf ([188.27.184.232])
-        by smtp.gmail.com with ESMTPSA id u14-20020aa7d98e000000b005231e3d89efsm1869472eds.31.2023.08.11.03.03.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Aug 2023 03:03:10 -0700 (PDT)
-Date: Fri, 11 Aug 2023 13:03:07 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: alexis.lothore@bootlin.com
-Cc: =?utf-8?Q?Cl=C3=A9ment?= Leger <clement@clement-leger.fr>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Milan Stevanovic <milan.stevanovic@se.com>,
-	Jimmy Lalande <jimmy.lalande@se.com>,
-	Pascal Eberhard <pascal.eberhard@se.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH net-next v5 2/3] net: dsa: rzn1-a5psw: add support for
- .port_bridge_flags
-Message-ID: <20230811100307.ocqkijjj5f6hi3q2@skbuf>
-References: <20230810093651.102509-1-alexis.lothore@bootlin.com>
- <20230810093651.102509-3-alexis.lothore@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B1663C3
+	for <netdev@vger.kernel.org>; Fri, 11 Aug 2023 10:05:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8CAC433C7;
+	Fri, 11 Aug 2023 10:05:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691748339;
+	bh=XJBi7RicqQxuh8Je/sFptxR9tPKlatLCcxehTcXio+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NBXRM0WJbFvD94h4fBkehs3FeBtbgs2HX8wSNG+2Dpa243lQ+ueARrkyKwySSYXIB
+	 yVjzm3h4bDxD4yKX18M0pYTI8udXgMyTMgsTAjoDU6u9JdGCg0T5s1OqYmItYoWvKU
+	 OVNmd8tYMn9+7ImaCyxKKRd510P5AYO7LUxaYoTO4ahmMAx0/Qx/ib2bZSI3GA6XTz
+	 GQU1exVSN737/6qinYK71Mi0TEXTpkV0WXEFnRTpM4CMv0NvE85ey3l6BZWwBZC7Pf
+	 JSYbK6zWo08Js4/oaeu1xd26zz4uRaqjA2mrYrjLAL40KUb4P3bPd5yKE3hMUsjg9c
+	 Liu6xTYz6uYmw==
+Date: Fri, 11 Aug 2023 12:05:35 +0200
+From: Simon Horman <horms@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
+	jacob.e.keller@intel.com,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net-next v2 2/5] ice: configure FW logging
+Message-ID: <ZNYH705yA5qGxnvJ@vergenet.net>
+References: <20230810170109.1963832-1-anthony.l.nguyen@intel.com>
+ <20230810170109.1963832-3-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,40 +50,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230810093651.102509-3-alexis.lothore@bootlin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230810170109.1963832-3-anthony.l.nguyen@intel.com>
 
-Hi Alexis,
+On Thu, Aug 10, 2023 at 10:01:06AM -0700, Tony Nguyen wrote:
+> From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+> 
+> Users want the ability to debug FW issues by retrieving the
+> FW logs from the E8xx devices. Use debugfs to allow the user to
+> read/write the FW log configuration by adding a 'fwlog/modules' file.
+> Reading the file will show either the currently running configuration or
+> the next configuration (if the user has changed the configuration).
+> Writing to the file will update the configuration, but NOT enable the
+> configuration (that is a separate command).
 
-On Thu, Aug 10, 2023 at 11:36:50AM +0200, alexis.lothore@bootlin.com wrote:
-> +	if (flags.mask & BR_FLOOD) {
-> +		val = flags.val & BR_FLOOD ? BIT(port) : 0;
-> +		a5psw_reg_rmw(a5psw, A5PSW_UCAST_DEF_MASK, BIT(port), val);
-> +	}
+...
+
+> @@ -5635,10 +5653,14 @@ static int __init ice_module_init(void)
+>  		goto err_dest_wq;
+>  	}
+>  
+> +	ice_debugfs_init();
 > +
-> +	if (flags.mask & BR_MCAST_FLOOD) {
-> +		val = flags.val & BR_MCAST_FLOOD ? BIT(port) : 0;
-> +		a5psw_reg_rmw(a5psw, A5PSW_MCAST_DEF_MASK, BIT(port), val);
-> +	}
-> +
-> +	if (flags.mask & BR_BCAST_FLOOD) {
-> +		val = flags.val & BR_BCAST_FLOOD ? BIT(port) : 0;
-> +		a5psw_reg_rmw(a5psw, A5PSW_BCAST_DEF_MASK, BIT(port), val);
-> +	}
+>  	status = pci_register_driver(&ice_driver);
+>  	if (status) {
+>  		pr_err("failed to register PCI driver, err %d\n", status);
+>  		goto err_dest_lag_wq;
+> +		destroy_workqueue(ice_wq);
+> +		ice_debugfs_exit();
 
-These 3 port masks will only do what you expect while the bridge has
-vlan_filtering=0, correct? When vlan_filtering=1, packets classified to
-a VLAN which don't hit any FDB entry will be always flooded to all ports
-in that VLAN, correct?
+Hi Paul and Tony,
 
-Maybe you could restrict transitions to flooding disabled on ports with
-vlan_filtering 1, and restrict transitions to vlan_filtering 1 on ports
-with flooding disabled. Or at least add some comments about the
-limitations. I wouldn't want subtle incompatibilities between the
-hardware design and Linux' expectations to go under the radar like this.
+this new code seems to be unreachable.
+Should it go before the goto statement?
+
+>  	}
+>  
+>  	return 0;
+
+...
 
