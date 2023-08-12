@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-26985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-26986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B395779C2D
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 03:02:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5170B779C34
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 03:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B620D1C20A94
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 01:02:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04C0E281DF1
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 01:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321C1A2D;
-	Sat, 12 Aug 2023 01:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99399EA2;
+	Sat, 12 Aug 2023 01:07:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2999E64B
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 01:02:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E79FC433C8;
-	Sat, 12 Aug 2023 01:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E86864B
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 01:07:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71796C433C7;
+	Sat, 12 Aug 2023 01:07:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691802174;
-	bh=TW00OTazVnzY5glwiEUj36zrMi+rWEbjlvVO8Y0bFjM=;
+	s=k20201202; t=1691802477;
+	bh=kKoMGqkaZrFbOmdnbjaZigHjWuY+wtaLeAvAQcSut8g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Fm/RY8l9z6PTI5gb0/4raKaSc9c1aBuEwrq5aze3mdytVjevCainytJvGMnWYYeve
-	 QkBYw/8KmFTrC+iXCUGt9oEDFHGb/uUHlv1x7XQf/ndVlskgMwdq7ei8b/JParD6GI
-	 RkijYxqX2i8MrLATjz/oI6lnXpDZomQ7oGGvWW+B1w0ApRzOP8USsA5ITNOPsQ1yHG
-	 KPZ2/AWj743uk4osgfYVjMtI4RHhpsSc13JhTvq1Q3DSjcGZxOS+kBu5cEX0YRKDjI
-	 nX2NW9kxb2sTqnUCm41f1cd/pT6MZ6k1LsNPq5MWkko27KEJ2xv5OnpETuTpi/Dz5b
-	 qkNMn5Esj4asA==
-Date: Fri, 11 Aug 2023 18:02:53 -0700
+	b=s+ecJZcm4Oz+U3bYwpLmbRS+QGsII+kG+5Ys0Day30a0lTlmbEW/48JDwfh5b1zhi
+	 XbM0VghvEgEJi9hEztjT19jxl9svUYb9VHZImvmIa3TFOnzP5unzQMpaKKYe1K1yCz
+	 WlwA9/ohm0vsDLnLR0JjYMsi/HtxdJQ+O6UpUM+QFGBO/OP4bBO7wuejAQDbH2MeGy
+	 OmxvfgYoEBcDZdRAV6DmTJeq88waEj9YwPqpyAsYLM4ChP8pBKskt50lseHBpbVRUY
+	 rcSNfsQMkbLesVajkALme9GXf98DDjvWeGD5Zv9jVRtr5yq9oKf7+6kzQfGw1mhYuV
+	 rU6cCDFBWjipA==
+Date: Fri, 11 Aug 2023 18:07:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
- idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next v4 00/13] devlink: introduce selective dumps
-Message-ID: <20230811180253.0114d307@kernel.org>
-In-Reply-To: <20230811155714.1736405-1-jiri@resnulli.us>
-References: <20230811155714.1736405-1-jiri@resnulli.us>
+To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, corbet@lwn.net,
+ emil.s.tantilov@intel.com, joshua.a.hay@intel.com,
+ sridhar.samudrala@intel.com, alan.brady@intel.com, madhu.chittim@intel.com,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, willemb@google.com,
+ decot@google.com
+Subject: Re: [PATCH net-next 0/2] Fix invalid kernel-doc warnings
+Message-ID: <20230811180755.14efaf73@kernel.org>
+In-Reply-To: <20230812002549.36286-1-pavan.kumar.linga@intel.com>
+References: <20230812002549.36286-1-pavan.kumar.linga@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,11 +51,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 11 Aug 2023 17:57:01 +0200 Jiri Pirko wrote:
-> For SFs, one devlink instance per SF is created. There might be
-> thousands of these on a single host. When a user needs to know port
-> handle for specific SF, he needs to dump all devlink ports on the host
-> which does not scale good.
+On Fri, 11 Aug 2023 17:25:47 -0700 Pavan Kumar Linga wrote:
+> kernel-doc reports invalid warnings on IDPF driver patch series [1]
+> that is submitted for review. This patch series fixes those warnings.
+> 
+> [1]: https://lore.kernel.org/netdev/20230808003416.3805142-1-anthony.l.nguyen@intel.com/
+> ---
+> These fixes are needed for the IDPF driver patch series to have
+> a clean CI. So targeting the series to net-next instead of
+> linux-docs.
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+Neat, thanks for these.
+
+Jon, no strong preference on the tree here. I'll confirm these resolve
+the issues in Pavan's driver when applying it, there's no hard
+requirement for the kdoc patches to be in net-next at that point.
 
