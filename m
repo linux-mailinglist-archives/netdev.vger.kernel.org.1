@@ -1,308 +1,260 @@
-Return-Path: <netdev+bounces-27046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62FB477A043
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 16:08:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9404977A04A
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 16:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 128251C208DE
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 14:08:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4FB28104B
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 14:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BD97492;
-	Sat, 12 Aug 2023 14:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC4E7496;
+	Sat, 12 Aug 2023 14:09:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D4C1CCDE
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 14:08:26 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E000510E4;
-	Sat, 12 Aug 2023 07:08:24 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fe45da0a89so4625460e87.1;
-        Sat, 12 Aug 2023 07:08:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691849303; x=1692454103;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lvsoikQWEB5Xn0/N76cOc5eFdD0OPbNTdNyqAWmArTU=;
-        b=U2+9azpW5oMrmNE3l3mihbWW8Xyzz8tXfm9isLao5gk7inRoXHaPacB6YLrc9MCRDv
-         2GUFjHDFiFaB3VsKP9KLqXyLFOCzwtW6dmnY6FvALwLGyFVzetqOFEeGVBEdaM6CSFDS
-         7MCeBkVnVUSu2HbtFkBJSt+0vGPzJFW6a6M13VwpuMq/IdBpe9uWI/4XDDc1R1/65VTl
-         ZZG0qB16K8rcvY0sFcyfTnqe5m1VVo8v9QJCiwmUs7kH86YNOhNbwLDCmZyPKTa1btFo
-         H/PkyOXcR2nseszSvCIVFfVaKeR0QcLI6ATqb8ijOi93nsiBWXLhro2/snF/GK+eSvyd
-         STMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691849303; x=1692454103;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lvsoikQWEB5Xn0/N76cOc5eFdD0OPbNTdNyqAWmArTU=;
-        b=arTJR24xyzqsTkx/AMxAUOEg9qiHgWbJZIWgiDCoIqCchyIvt0Q9VCRZT+1ck1B7lj
-         aPCENzf23wrmZPwVJ1qwCVcdzxgM0eLetzbcbaFzZE9PJ7N+chq33oR1j0gZwaiSMvLM
-         6HxRn/Z1B58vU6Ce/h/8+wGmW6xG+UbprQrLkV1WkVV3S9VErhW7O+6tkTCA15sFqZMI
-         xtAGK6ZVi1hFtt2ZEr/ohmVVaT6D1wQ9OYrbSZl6VUgf0FWv8XCpVhEgapX8i8pZmJbp
-         JMm6LyLJQn4F1Cmj/atAeiSV2Cl7IyXqJzkgtM/fMRefPx/fyx63/V9ywA7uQLj1bbY3
-         4SjQ==
-X-Gm-Message-State: AOJu0YzWEYjE/MfFhdyOBAJBLpeBLFMmthHotS9AeVGsNMTihnhfOkFa
-	hRiMzIWCKWDiZxzLTYNKY4IlGkoDgTxJm9X7AOY=
-X-Google-Smtp-Source: AGHT+IFW1C6CLj0BI8HxzToq2WIbUYUHyZbWv7lBYxBVd+mJKCuU7Bs1Hq2EVAgmLigxZ9NJFfSzng9imggKHKNu8Dc=
-X-Received: by 2002:a05:6512:398d:b0:4f7:6404:4638 with SMTP id
- j13-20020a056512398d00b004f764044638mr1740427lfu.17.1691849302450; Sat, 12
- Aug 2023 07:08:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093A66FCC
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 14:09:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB08C433C8;
+	Sat, 12 Aug 2023 14:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691849362;
+	bh=z+m4uxf5uQXSYdBR7XRst5uEUqfj5OU0THhKy2Pgzw0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NRcuuSwRkCingBsl/vsEZbgeFFYLrf1y+jccW0/5Yc5HDj+1VoVAME8JmLoRwatmv
+	 cq9vWxL4zAE9ZVUJLta84Dvv5Inw/EfKSi/yAs63VyBxmpmvFYbATcUsu77nljsk2A
+	 aA3VJilGgMOpA/ket7dhpg569WOR9pO165Aa92NCsdjCCxPdIgZY5ieRy7nbUuFLnh
+	 5IcBP4Gl/p7TKLadf1jSNE+GDBp+0bp0kFtLguMP/b1EWW/an8byu12FnBRohiFL9c
+	 uRJrWRUhrLp3tNfyj4R8So0k0XxPic0tJx3E0PAmnu0wkeyaegTrtitZo78/ruaSpI
+	 fW6TnxXPQeEnQ==
+Date: Sat, 12 Aug 2023 16:09:12 +0200
+From: Simon Horman <horms@kernel.org>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, alexandre.torgue@foss.st.com, vkoul@kernel.org,
+	jic23@kernel.org, olivier.moysan@foss.st.com,
+	arnaud.pouliquen@foss.st.com, mchehab@kernel.org,
+	fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
+	ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
+	will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
+	richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>,
+	peng.fan@oss.nxp.com, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v4 05/11] firewall: introduce stm32_firewall framework
+Message-ID: <ZNeSiFQGdOXbR+2S@vergenet.net>
+References: <20230811100731.108145-1-gatien.chevallier@foss.st.com>
+ <20230811100731.108145-6-gatien.chevallier@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALcu4raN3=04gp5=f=sDMtTuTG0VZpunwqSVd8MNVcnfPe+t4w@mail.gmail.com>
- <8e578867-5223-e96a-41e3-5d6d27af1727@hartkopp.net>
-In-Reply-To: <8e578867-5223-e96a-41e3-5d6d27af1727@hartkopp.net>
-From: Yikebaer Aizezi <yikebaer61@gmail.com>
-Date: Sat, 12 Aug 2023 22:08:10 +0800
-Message-ID: <CALcu4ra8A1xMT2pgiF3Xope=RVTj+5L7KXstK+WwNtNSgqKAWA@mail.gmail.com>
-Subject: Re: possible deadlock in raw_setsockopt
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: mkl@pengutronix.de, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, "pabeni@redhat.com" <pabeni@redhat.com>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811100731.108145-6-gatien.chevallier@foss.st.com>
 
-Thanks, I'll check it out.
+On Fri, Aug 11, 2023 at 12:07:25PM +0200, Gatien Chevallier wrote:
 
-Oliver Hartkopp <socketcan@hartkopp.net> =E4=BA=8E2023=E5=B9=B48=E6=9C=8812=
-=E6=97=A5=E5=91=A8=E5=85=AD 19:44=E5=86=99=E9=81=93=EF=BC=9A
->
-> Hello,
->
-> it seems to be the common pattern to use
->
-> rtnl_lock();
-> lock_sock(sk);
->
-> (..)
->
-> release_lock(sk);
-> rtnl_unlock();
->
-> And the referenced code here
-> home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
-> already follows this pattern.
->
-> A wrong locking has been introduced in
->
-> ee8b94c8510c ("can: raw: fix receiver memory leak")
->
-> which has been fixed in
->
-> 11c9027c983e ("can: raw: fix lockdep issue in raw_release()")
->
-> Your selected linux-6.5-rc3 tree has the above problem but it is fixed
-> in Linus' latest tree now.
->
-> Best regards,
-> Oliver
->
-> On 10.08.23 12:30, Yikebaer Aizezi wrote:
-> > Hello,
-> >
-> > When using Healer to fuzz the Linux-6.5-rc3,  the following crash
-> > was triggered.
-> >
-> > HEAD commit: 6eaae198076080886b9e7d57f4ae06fa782f90ef (tag: v6.5-rc3)
-> > git tree: upstream
-> > console output:
-> > https://drive.google.com/file/d/1d9rLH0SYwNhTm2datRKbVpET1irbx_tA/view?=
-usp=3Ddrive_link
-> > kernel config: https://drive.google.com/file/d/1OQIne-cVGeH6R4nqGGm6Igm=
-3DnsozLhJ/view?usp=3Ddrive_link
-> > C reproducer: https://drive.google.com/file/d/1iewyTDtNLkXAJSMnREXKNYcU=
-wfN1mAqA/view?usp=3Ddrive_link
-> > Syzlang reproducer:
-> > https://drive.google.com/file/d/17p1lUipZkXyl9xE0_Qanerbg75W6ER5y/view?=
-usp=3Ddrive_link
-> >
-> > If you fix this issue, please add the following tag to the commit:
-> > Reported-by: Yikebaer Aizezi <yikebaer61@gmail.com>
-> >
-> > WARNING: possible circular locking dependency detected
-> > 6.5.0-rc3 #1 Not tainted
-> > ------------------------------------------------------
-> > syz-executor/13006 is trying to acquire lock:
-> > ffff88801ca69130 (sk_lock-AF_CAN){+.+.}-{0:0}, at: lock_sock
-> > home/smyl/linux-image/linux-6.5-rc3/./include/net/sock.h:1708 [inline]
-> > ffff88801ca69130 (sk_lock-AF_CAN){+.+.}-{0:0}, at:
-> > raw_setsockopt+0x3b6/0x1050
-> > home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
-> >
-> > but task is already holding lock:
-> > ffffffff8cdca268 (rtnl_mutex){+.+.}-{3:3}, at:
-> > raw_setsockopt+0x3ac/0x1050
-> > home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:606
-> >
-> > which lock already depends on the new lock.
-> >
-> >
-> > the existing dependency chain (in reverse order) is:
-> >
-> > -> #1 (rtnl_mutex){+.+.}-{3:3}:
-> >         __mutex_lock_common
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/mutex.c:603
-> > [inline]
-> >         __mutex_lock+0x14f/0x1440
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/mutex.c:747
-> >         raw_release+0x1bd/0x940
-> > home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:391
-> >         __sock_release+0xcd/0x290
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:654
-> >         sock_close+0x18/0x20
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:1386
-> >         __fput+0x391/0x9d0
-> > home/smyl/linux-image/linux-6.5-rc3/fs/file_table.c:384
-> >         task_work_run+0x153/0x230
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/task_work.c:179
-> >         resume_user_mode_work
-> > home/smyl/linux-image/linux-6.5-rc3/./include/linux/resume_user_mode.h:=
-49
-> > [inline]
-> >         exit_to_user_mode_loop
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:171 [inline]
-> >         exit_to_user_mode_prepare+0x210/0x240
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:204
-> >         __syscall_exit_to_user_mode_work
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:286 [inline]
-> >         syscall_exit_to_user_mode+0x19/0x50
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/entry/common.c:297
-> >         do_syscall_64+0x42/0xb0
-> > home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:86
-> >         entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > -> #0 (sk_lock-AF_CAN){+.+.}-{0:0}:
-> >         check_prev_add
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3142
-> > [inline]
-> >         check_prevs_add
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3261
-> > [inline]
-> >         validate_chain
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3876
-> > [inline]
-> >         __lock_acquire+0x2ecd/0x5b90
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5144
-> >         lock_acquire
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5761
-> > [inline]
-> >         lock_acquire+0x1ad/0x520
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5726
-> >         lock_sock_nested+0x34/0xe0
-> > home/smyl/linux-image/linux-6.5-rc3/net/core/sock.c:3492
-> >         lock_sock
-> > home/smyl/linux-image/linux-6.5-rc3/./include/net/sock.h:1708 [inline]
-> >         raw_setsockopt+0x3b6/0x1050
-> > home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
-> >         __sys_setsockopt+0x252/0x510
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2263
-> >         __do_sys_setsockopt
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2274 [inline]
-> >         __se_sys_setsockopt
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271 [inline]
-> >         __x64_sys_setsockopt+0xb9/0x150
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271
-> >         do_syscall_x64
-> > home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:50
-> > [inline]
-> >         do_syscall_64+0x35/0xb0
-> > home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:80
-> >         entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > other info that might help us debug this:
-> >
-> >   Possible unsafe locking scenario:
-> >
-> >         CPU0                    CPU1
-> >         ----                    ----
-> >    lock(rtnl_mutex);
-> >                                 lock(sk_lock-AF_CAN);
-> >                                 lock(rtnl_mutex);
-> >    lock(sk_lock-AF_CAN);
-> >
-> >   *** DEADLOCK ***
-> >
-> > 1 lock held by syz-executor/13006:
-> >   #0: ffffffff8cdca268 (rtnl_mutex){+.+.}-{3:3}, at:
-> > raw_setsockopt+0x3ac/0x1050
-> > home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:606
-> >
-> > stack backtrace:
-> > CPU: 0 PID: 13006 Comm: syz-executor Not tainted 6.5.0-rc3 #1
-> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> > rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-> > Call Trace:
-> >   <TASK>
-> >   __dump_stack home/smyl/linux-image/linux-6.5-rc3/lib/dump_stack.c:88 =
-[inline]
-> >   dump_stack_lvl+0x92/0xf0
-> > home/smyl/linux-image/linux-6.5-rc3/lib/dump_stack.c:106
-> >   check_noncircular+0x2ef/0x3d0
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:2195
-> >   check_prev_add
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3142
-> > [inline]
-> >   check_prevs_add
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3261
-> > [inline]
-> >   validate_chain
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:3876
-> > [inline]
-> >   __lock_acquire+0x2ecd/0x5b90
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5144
-> >   lock_acquire home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockd=
-ep.c:5761
-> > [inline]
-> >   lock_acquire+0x1ad/0x520
-> > home/smyl/linux-image/linux-6.5-rc3/kernel/locking/lockdep.c:5726
-> >   lock_sock_nested+0x34/0xe0
-> > home/smyl/linux-image/linux-6.5-rc3/net/core/sock.c:3492
-> >   lock_sock home/smyl/linux-image/linux-6.5-rc3/./include/net/sock.h:17=
-08
-> > [inline]
-> >   raw_setsockopt+0x3b6/0x1050
-> > home/smyl/linux-image/linux-6.5-rc3/net/can/raw.c:607
-> >   __sys_setsockopt+0x252/0x510
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2263
-> >   __do_sys_setsockopt
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2274 [inline]
-> >   __se_sys_setsockopt
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271 [inline]
-> >   __x64_sys_setsockopt+0xb9/0x150
-> > home/smyl/linux-image/linux-6.5-rc3/net/socket.c:2271
-> >   do_syscall_x64
-> > home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:50
-> > [inline]
-> >   do_syscall_64+0x35/0xb0
-> > home/smyl/linux-image/linux-6.5-rc3/arch/x86/entry/common.c:80
-> >   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > RIP: 0033:0x47959d
-> > Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
-> > 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-> > 01 f0 ff ff 73 01 c3 48 c7 c1 b4 ff ff ff f7 d8 64 89 01 48
-> > RSP: 002b:00007f1c93598068 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-> > RAX: ffffffffffffffda RBX: 000000000059c0a0 RCX: 000000000047959d
-> > RDX: 0000000000000002 RSI: 0000000000000065 RDI: 0000000000000003
-> > RBP: 000000000059c0a0 R08: 0000000000000004 R09: 0000000000000000
-> > R10: 00000000200001c0 R11: 0000000000000246 R12: 000000000059c0ac
-> > R13: 000000000000000b R14: 0000000000437250 R15: 00007f1c93578000
-> >   </TASK>
-> >
+...
+
+> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
+> new file mode 100644
+> index 000000000000..900f3b052a66
+> --- /dev/null
+> +++ b/drivers/bus/stm32_firewall.c
+> @@ -0,0 +1,293 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
+> + */
+> +
+> +#include <linux/bitfield.h>
+> +#include <linux/bits.h>
+> +#include <linux/bus/stm32_firewall_device.h>
+> +#include <linux/device.h>
+> +#include <linux/err.h>
+> +#include <linux/init.h>
+> +#include <linux/io.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/of_platform.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/types.h>
+> +#include <linux/slab.h>
+> +
+> +#include "stm32_firewall.h"
+> +
+> +/* Corresponds to STM32_FIREWALL_MAX_EXTRA_ARGS + firewall ID */
+> +#define STM32_FIREWALL_MAX_ARGS		(STM32_FIREWALL_MAX_EXTRA_ARGS + 1)
+> +
+> +static LIST_HEAD(firewall_controller_list);
+> +static DEFINE_MUTEX(firewall_controller_list_lock);
+> +
+> +/* Firewall device API */
+> +int stm32_firewall_get_firewall(struct device_node *np, struct stm32_firewall *firewall,
+> +				unsigned int nb_firewall)
+> +{
+> +	struct stm32_firewall_controller *ctrl;
+> +	struct of_phandle_iterator it;
+> +	unsigned int i, j = 0;
+> +	int err;
+> +
+> +	if (!firewall || !nb_firewall)
+> +		return -EINVAL;
+> +
+> +	/* Parse property with phandle parsed out */
+> +	of_for_each_phandle(&it, err, np, "feature-domains", "#feature-domain-cells", 0) {
+> +		struct of_phandle_args provider_args;
+> +		struct device_node *provider = it.node;
+> +		const char *fw_entry;
+> +		bool match = false;
+> +
+> +		if (err) {
+> +			pr_err("Unable to get feature-domains property for node %s\n, err: %d",
+> +			       np->full_name, err);
+> +			of_node_put(provider);
+> +			return err;
+> +		}
+> +
+> +		if (j > nb_firewall) {
+> +			pr_err("Too many firewall controllers");
+> +			of_node_put(provider);
+> +			return -EINVAL;
+> +		}
+> +
+> +		provider_args.args_count = of_phandle_iterator_args(&it, provider_args.args,
+> +								    STM32_FIREWALL_MAX_ARGS);
+> +
+> +		/* Check if the parsed phandle corresponds to a registered firewall controller */
+> +		mutex_lock(&firewall_controller_list_lock);
+> +		list_for_each_entry(ctrl, &firewall_controller_list, entry) {
+> +			if (ctrl->dev->of_node->phandle == it.phandle) {
+> +				match = true;
+> +				firewall[j].firewall_ctrl = ctrl;
+> +				break;
+> +			}
+> +		}
+> +		mutex_unlock(&firewall_controller_list_lock);
+> +
+> +		if (!match) {
+> +			firewall[j].firewall_ctrl = NULL;
+> +			pr_err("No firewall controller registered for %s\n", np->full_name);
+> +			of_node_put(provider);
+> +			return -ENODEV;
+> +		}
+> +
+> +		err = of_property_read_string_index(np, "feature-domain-names", j, &fw_entry);
+> +		if (err == 0)
+> +			firewall[j].entry = fw_entry;
+> +
+> +		/* Handle the case when there are no arguments given along with the phandle */
+> +		if (provider_args.args_count < 0 ||
+> +		    provider_args.args_count > STM32_FIREWALL_MAX_ARGS) {
+> +			of_node_put(provider);
+> +			return -EINVAL;
+> +		} else if (provider_args.args_count == 0) {
+> +			firewall[j].extra_args_size = 0;
+> +			firewall[j].firewall_id = U32_MAX;
+> +			j++;
+> +			continue;
+> +		}
+> +
+> +		/* The firewall ID is always the first argument */
+> +		firewall[j].firewall_id = provider_args.args[0];
+> +
+> +		/* Extra args start at the third argument */
+> +		for (i = 0; i < provider_args.args_count; i++)
+> +			firewall[j].extra_args[i] = provider_args.args[i + 1];
+
+Hi Gatien,
+
+Above it is checked that the maximum value of provider_args.args_count is
+STM32_FIREWALL_MAX_ARGS.
+So here the maximum value of i is STM32_FIREWALL_MAX_ARGS - 1.
+
+STM32_FIREWALL_MAX_ARGS is defined as STM32_FIREWALL_MAX_EXTRA_ARGS + 1
+And STM32_FIREWALL_MAX_EXTRA_ARGS is defined as 5.
+So the maximum value of i is (5 + 1 - 1) = 5.
+
+firewall[j] is of type struct stm32_firewall.
+And its args field has STM32_FIREWALL_MAX_EXTRA_ARGS (5) elements.
+Thus the maximum valid index is (5 - 1) = 4.
+
+But the line above may access index 5.
+
+Flagged by Smatch.
+
+> +
+> +		/* Remove the firewall ID arg that is not an extra argument */
+> +		firewall[j].extra_args_size = provider_args.args_count - 1;
+> +
+> +		j++;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(stm32_firewall_get_firewall);
+
+...
+
+> diff --git a/include/linux/bus/stm32_firewall_device.h b/include/linux/bus/stm32_firewall_device.h
+> new file mode 100644
+> index 000000000000..7b4450a8ec15
+> --- /dev/null
+> +++ b/include/linux/bus/stm32_firewall_device.h
+> @@ -0,0 +1,141 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
+> + */
+> +
+> +#ifndef STM32_FIREWALL_DEVICE_H
+> +#define STM32_FIREWALL_DEVICE_H
+> +
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/types.h>
+> +
+> +#define STM32_FIREWALL_MAX_EXTRA_ARGS		5
+> +
+> +/* Opaque reference to stm32_firewall_controller */
+> +struct stm32_firewall_controller;
+> +
+> +/**
+> + * struct stm32_firewall - Information on a device's firewall. Each device can have more than one
+> + *			   firewall.
+> + *
+> + * @firewall_ctrl:		Pointer referencing a firewall controller of the device. It is
+> + *				opaque so a device cannot manipulate the controller's ops or access
+> + *				the controller's data
+> + * @extra_args:			Extra arguments that are implementation dependent
+> + * @entry:			Name of the firewall entry
+> + * @extra_args_size:		Number of extra arguments
+> + * @firewall_id:		Firewall ID associated the device for this firewall controller
+> + */
+> +struct stm32_firewall {
+> +	struct stm32_firewall_controller *firewall_ctrl;
+> +	u32 extra_args[STM32_FIREWALL_MAX_EXTRA_ARGS];
+> +	const char *entry;
+> +	size_t extra_args_size;
+> +	u32 firewall_id;
+> +};
+
+...
 
