@@ -1,206 +1,204 @@
-Return-Path: <netdev+bounces-27076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA17277A30C
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 23:30:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5DCF77A41C
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 01:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47D26280FF5
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 21:30:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77F828101F
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 23:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDFD8C18;
-	Sat, 12 Aug 2023 21:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D389B8F47;
+	Sat, 12 Aug 2023 23:00:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109AC8C15
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 21:30:31 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24C321706;
-	Sat, 12 Aug 2023 14:30:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691875830; x=1723411830;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pRiq/xmjLemE5+eZt4bLhSjlC//rAZoKgUD4BEAjCho=;
-  b=QJ0RXufWklkBDrt/kuZs2fQXRfJzs1TupUhHAO1nokbkzVOH16kIOKT5
-   0IWKpfPodcTv1cYJ4PBOjxwakVqcxaMh2MPhrApjqvRXFtstjX8wnFrnR
-   JCYV3c1yUbMneQrWepQIODGD+5XWN9XMjDLxaM8Yb2i9PzyS8uGSrE8AR
-   2ee4VikoUuIXv0FWUAY+NXQqYPou2d2VM+Pvv/OerNEJwwKOCCeB+qmmI
-   gIBsEaR/MSrXF9aXoU8Z/orNfdFZUX15vsuQLrvbXrkSWdA7SZgc3IH3Y
-   S0RaGR5U4WirptmIU62I45wazKMrjGO/m93CPhhxF/dB7tpfmXbz3AEat
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="374615452"
-X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
-   d="scan'208";a="374615452"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2023 14:30:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="732996864"
-X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
-   d="scan'208";a="732996864"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 12 Aug 2023 14:30:22 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qUwBi-0008nG-3C;
-	Sat, 12 Aug 2023 21:30:22 +0000
-Date: Sun, 13 Aug 2023 05:30:16 +0800
-From: kernel test robot <lkp@intel.com>
-To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-	Keguang Zhang <keguang.zhang@gmail.com>
-Subject: Re: [PATCH 4/5] net: stmmac: Add glue layer for Loongson-1 SoC
-Message-ID: <202308130554.Rbxxtltt-lkp@intel.com>
-References: <20230812151135.1028780-5-keguang.zhang@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2470C2585;
+	Sat, 12 Aug 2023 23:00:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FAEAC433C7;
+	Sat, 12 Aug 2023 23:00:19 +0000 (UTC)
+Date: Sat, 12 Aug 2023 19:00:17 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Manjusaka <me@manjusaka.me>
+Cc: edumazet@google.com, bpf@vger.kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, mhiramat@kernel.org,
+ ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v3] tracepoint: add new `tcp:tcp_ca_event` trace event
+Message-ID: <20230812190017.3a62396c@rorschach.local.home>
+In-Reply-To: <c0d899ef-38c8-4e24-b351-9a0958a0e669@manjusaka.me>
+References: <CANn89iKQXhqgOTkSchH6Bz-xH--pAoSyEORBtawqBTvgG+dFig@mail.gmail.com>
+	<20230812201249.62237-1-me@manjusaka.me>
+	<c0d899ef-38c8-4e24-b351-9a0958a0e669@manjusaka.me>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230812151135.1028780-5-keguang.zhang@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Keguang,
+On Sun, 13 Aug 2023 04:17:24 +0800
+Manjusaka <me@manjusaka.me> wrote:
 
-kernel test robot noticed the following build warnings:
+> On 2023/8/13 04:12, Zheao Li wrote:
+> > In normal use case, the tcp_ca_event would be changed in high frequency.
+> > 
+> > The developer can monitor the network quality more easier by tracing
+> > TCP stack with this TP event.
+> > 
+> > So I propose to add a `tcp:tcp_ca_event` trace event
+> > like `tcp:tcp_cong_state_set` to help the people to
+> > trace the TCP connection status
+> > 
+> > Signed-off-by: Zheao Li <me@manjusaka.me>
+> > ---
+> >  include/net/tcp.h          |  9 ++----
+> >  include/trace/events/tcp.h | 60 ++++++++++++++++++++++++++++++++++++++
+> >  net/ipv4/tcp_cong.c        | 10 +++++++
+> >  3 files changed, 72 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > index 0ca972ebd3dd..a68c5b61889c 100644
+> > --- a/include/net/tcp.h
+> > +++ b/include/net/tcp.h
+> > @@ -1154,13 +1154,8 @@ static inline bool tcp_ca_needs_ecn(const struct sock *sk)
+> >  	return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
+> >  }
+> >  
+> > -static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
+> > -{
+> > -	const struct inet_connection_sock *icsk = inet_csk(sk);
+> > -
+> > -	if (icsk->icsk_ca_ops->cwnd_event)
+> > -		icsk->icsk_ca_ops->cwnd_event(sk, event);
+> > -}
+> > +/* from tcp_cong.c */
+> > +void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event);
+> >  
+> >  /* From tcp_cong.c */
+> >  void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
+> > diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+> > index 7b1ddffa3dfc..993eb00403ea 100644
+> > --- a/include/trace/events/tcp.h
+> > +++ b/include/trace/events/tcp.h
+> > @@ -41,6 +41,18 @@
+> >  	TP_STORE_V4MAPPED(__entry, saddr, daddr)
+> >  #endif
+> >  
+> > +/* The TCP CA event traced by tcp_ca_event*/
+> > +#define tcp_ca_event_names    \
+> > +		EM(CA_EVENT_TX_START)     \
+> > +		EM(CA_EVENT_CWND_RESTART) \
+> > +		EM(CA_EVENT_COMPLETE_CWR) \
+> > +		EM(CA_EVENT_LOSS)         \
+> > +		EM(CA_EVENT_ECN_NO_CE)    \
+> > +		EMe(CA_EVENT_ECN_IS_CE)
+> > +
+> > +#define show_tcp_ca_event_names(val) \
+> > +	__print_symbolic(val, tcp_ca_event_names)
+> > +
+> >  /*
+> >   * tcp event with arguments sk and skb
+> >   *
+> > @@ -419,6 +431,54 @@ TRACE_EVENT(tcp_cong_state_set,
+> >  		  __entry->cong_state)
+> >  );
+> >  
+> > +TRACE_EVENT(tcp_ca_event,
+> > +
+> > +	TP_PROTO(struct sock *sk, const u8 ca_event),
+> > +
+> > +	TP_ARGS(sk, ca_event),
+> > +
+> > +	TP_STRUCT__entry(
+> > +		__field(const void *, skaddr)
+> > +		__field(__u16, sport)
+> > +		__field(__u16, dport)
+> > +		__field(__u16, family)
+> > +		__array(__u8, saddr, 4)
+> > +		__array(__u8, daddr, 4)
+> > +		__array(__u8, saddr_v6, 16)
+> > +		__array(__u8, daddr_v6, 16)
+> > +		__field(__u8, ca_event)
+> > +	),
+> > +
+> > +	TP_fast_assign(
+> > +		struct inet_sock *inet = inet_sk(sk);
+> > +		__be32 *p32;
+> > +
+> > +		__entry->skaddr = sk;
+> > +
+> > +		__entry->sport = ntohs(inet->inet_sport);
+> > +		__entry->dport = ntohs(inet->inet_dport);
+> > +		__entry->family = sk->sk_family;
+> > +
+> > +		p32 = (__be32 *) __entry->saddr;
+> > +		*p32 = inet->inet_saddr;
+> > +
+> > +		p32 = (__be32 *) __entry->daddr;
+> > +		*p32 =  inet->inet_daddr;
+> > +
+> > +		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
+> > +			   sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
+> > +
+> > +		__entry->ca_event = ca_event;
+> > +	),
+> > +
+> > +	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c ca_event=%s",
+> > +		  show_family_name(__entry->family),
+> > +		  __entry->sport, __entry->dport,
+> > +		  __entry->saddr, __entry->daddr,
+> > +		  __entry->saddr_v6, __entry->daddr_v6,
+> > +		  show_tcp_ca_event_names(__entry->ca_event))
+> > +);
+> > +
+> >  #endif /* _TRACE_TCP_H */
+> >  
+> >  /* This part must be outside protection */
+> > diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
+> > index 1b34050a7538..fb7ec6ebbbd0 100644
+> > --- a/net/ipv4/tcp_cong.c
+> > +++ b/net/ipv4/tcp_cong.c
+> > @@ -34,6 +34,16 @@ struct tcp_congestion_ops *tcp_ca_find(const char *name)
+> >  	return NULL;
+> >  }
+> >  
+> > +void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
+> > +{
+> > +	const struct inet_connection_sock *icsk = inet_csk(sk);
+> > +
+> > +	trace_tcp_ca_event(sk, (u8)event);
+> > +
+> > +	if (icsk->icsk_ca_ops->cwnd_event)
+> > +		icsk->icsk_ca_ops->cwnd_event(sk, event);
+> > +}
+> > +
+> >  void tcp_set_ca_state(struct sock *sk, const u8 ca_state)
+> >  {
+> >  	struct inet_connection_sock *icsk = inet_csk(sk);  
+> 
+> For more information, this patch is not passthrough the `./scripts/checkpatch.pl` check 
+> with the following error message `Macros with complex values should be enclosed in parentheses`.
+> 
+> I have no idea because there is no complex expression and the `include/trace/events/sock.h` files 
+> also failed in the style check.
 
-[auto build test WARNING on 21ef7b1e17d039053edaeaf41142423810572741]
+Please ignore all checkpatch.pl messages when it comes to the
+TRACE_EVENT() macro and pretty much anything it recommends to do with
+TRACE_EVENTS() in general.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Keguang-Zhang/MIPS-loongson32-Remove-Loongson1-MAC-arch-code/20230812-231420
-base:   21ef7b1e17d039053edaeaf41142423810572741
-patch link:    https://lore.kernel.org/r/20230812151135.1028780-5-keguang.zhang%40gmail.com
-patch subject: [PATCH 4/5] net: stmmac: Add glue layer for Loongson-1 SoC
-config: parisc-allyesconfig (https://download.01.org/0day-ci/archive/20230813/202308130554.Rbxxtltt-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230813/202308130554.Rbxxtltt-lkp@intel.com/reproduce)
+checkpatch.pl's recommendations on the include/trace code is just
+wrong, and makes it worse.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308130554.Rbxxtltt-lkp@intel.com/
+One day I need to add a patch to fix checkpatch.
 
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c: In function 'ls1x_dwmac_probe':
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:188:21: error: implicit declaration of function 'of_parse_phandle' [-Werror=implicit-function-declaration]
-     188 |         syscon_np = of_parse_phandle(pdev->dev.of_node, "syscon", 0);
-         |                     ^~~~~~~~~~~~~~~~
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:188:19: warning: assignment to 'struct device_node *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     188 |         syscon_np = of_parse_phandle(pdev->dev.of_node, "syscon", 0);
-         |                   ^
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:192:17: error: implicit declaration of function 'of_match_node'; did you mean 'for_each_node'? [-Werror=implicit-function-declaration]
-     192 |         match = of_match_node(ls1x_dwmac_syscon_match, syscon_np);
-         |                 ^~~~~~~~~~~~~
-         |                 for_each_node
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:192:15: warning: assignment to 'const struct of_device_id *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     192 |         match = of_match_node(ls1x_dwmac_syscon_match, syscon_np);
-         |               ^
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:194:17: error: implicit declaration of function 'of_node_put'; did you mean 'bpf_module_put'? [-Werror=implicit-function-declaration]
-     194 |                 of_node_put(syscon_np);
-         |                 ^~~~~~~~~~~
-         |                 bpf_module_put
-   cc1: some warnings being treated as errors
+-- Steve
 
 
-vim +188 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-
-   170	
-   171	static int ls1x_dwmac_probe(struct platform_device *pdev)
-   172	{
-   173		struct plat_stmmacenet_data *plat_dat;
-   174		struct stmmac_resources stmmac_res;
-   175		struct device_node *syscon_np;
-   176		const struct of_device_id *match;
-   177		struct regmap *regmap;
-   178		struct ls1x_dwmac *dwmac;
-   179		const struct ls1x_dwmac_syscon *syscon;
-   180		size_t size;
-   181		int ret;
-   182	
-   183		ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-   184		if (ret)
-   185			return ret;
-   186	
-   187		/* Probe syscon */
- > 188		syscon_np = of_parse_phandle(pdev->dev.of_node, "syscon", 0);
-   189		if (!syscon_np)
-   190			return -ENODEV;
-   191	
- > 192		match = of_match_node(ls1x_dwmac_syscon_match, syscon_np);
-   193		if (!match) {
-   194			of_node_put(syscon_np);
-   195			return -EINVAL;
-   196		}
-   197		syscon = (const struct ls1x_dwmac_syscon *)match->data;
-   198	
-   199		regmap = syscon_node_to_regmap(syscon_np);
-   200		of_node_put(syscon_np);
-   201		if (IS_ERR(regmap)) {
-   202			ret = PTR_ERR(regmap);
-   203			dev_err(&pdev->dev, "Unable to map syscon: %d\n", ret);
-   204			return ret;
-   205		}
-   206	
-   207		size = syscon->nr_reg_fields * sizeof(struct regmap_field *);
-   208		dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac) + size, GFP_KERNEL);
-   209		if (!dwmac)
-   210			return -ENOMEM;
-   211	
-   212		plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-   213		if (IS_ERR(plat_dat)) {
-   214			dev_err(&pdev->dev, "dt configuration failed\n");
-   215			return PTR_ERR(plat_dat);
-   216		}
-   217	
-   218		plat_dat->bsp_priv = dwmac;
-   219		plat_dat->init = ls1x_dwmac_init;
-   220		dwmac->dev = &pdev->dev;
-   221		dwmac->plat_dat = plat_dat;
-   222		dwmac->syscon = syscon;
-   223		dwmac->regmap = regmap;
-   224	
-   225		ret = stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-   226		if (ret)
-   227			goto err_remove_config_dt;
-   228	
-   229		return 0;
-   230	
-   231	err_remove_config_dt:
-   232		if (pdev->dev.of_node)
-   233			stmmac_remove_config_dt(pdev, plat_dat);
-   234	
-   235		return ret;
-   236	}
-   237	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
