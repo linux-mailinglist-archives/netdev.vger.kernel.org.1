@@ -1,88 +1,101 @@
-Return-Path: <netdev+bounces-27065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA24277A175
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:43:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24AD377A179
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC7C4281042
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:43:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E198F1C208F4
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9066D8836;
-	Sat, 12 Aug 2023 17:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51648883B;
+	Sat, 12 Aug 2023 17:47:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7501823D3
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:43:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D66DC433C8;
-	Sat, 12 Aug 2023 17:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B6620EE
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:47:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AB3DC433C7;
+	Sat, 12 Aug 2023 17:47:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691862184;
-	bh=ebop/vhKG+d6ioZES9vEyyolUgCe+T6JMuW233egLIE=;
+	s=k20201202; t=1691862463;
+	bh=vdPr7Kd2KSwm7V82XjFtxBtkVUVxXjALdt/pa5tnOfA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JzPZCT2qbpEAkWJPc6drUu/evkBUoBXEM30b60pUouZMOb1kPzyU1jtrCIfBxtMf/
-	 WLIPbX3NN5cCPFv0So8QLDa88E0mcxrXqehqAoJDpBCDaIbVT8Nys5lZLOMKgLhZbx
-	 XcHEmXb+NBEXauVnmQVItxoH9F6uzlqOijb3bnbZN775yfB398Hbw7MkOghPJu8hrA
-	 rvYUJXwsXzjlxpiBKVp+sl1VZB0BMBng7oTKAa98JBBYlOwG1JHWwe0nqPLixZ2L3y
-	 GVcFaUAM/6PC0ZxoXNhhKABMi1O4pnexxqm7msHHLw1qNPn8KkD+7X2zOITJrRJx9p
-	 G35go0u8CFCMg==
-Date: Sat, 12 Aug 2023 19:43:00 +0200
+	b=FbMPp9Il+NKZCMT04hrcAJmZS48vP70mvB6QLO0C2EyywKYPck3Ty1NrZiM4cUm0b
+	 5lXwuTR2pueQjEBJXDVRHrsq9Zm4TenfYiSVDO3fNORiai/YkmD3yrl50ll7V8bxtf
+	 yCL0oFAXYvvOCoTjQlN6cmGroi+Yey9nvSMlhnRkQSkHOihsvVOH04vHIwkZJXWIo8
+	 VsL807xabUrYD4VtnZM5J5rRqv3EFpVJdXyM3qRdMKCe8m9/t0RcX47S5RwgBN+0Sm
+	 FVsRRBNf6jyek82daGjPBThokmJowuqT+LXKfpbSru6NHBetSU0shLHLKTbi1TkfVX
+	 6FTh130EugZ2Q==
+Date: Sat, 12 Aug 2023 19:47:38 +0200
 From: Simon Horman <horms@kernel.org>
-To: Michal Schmidt <mschmidt@redhat.com>
-Cc: netdev@vger.kernel.org, Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Abhijit Ayarekar <aayarekar@marvell.com>,
-	Satananda Burla <sburla@marvell.com>,
-	Vimlesh Kumar <vimleshk@marvell.com>
-Subject: Re: [PATCH net 2/4] octeon_ep: cancel tx_timeout_task later in
- remove sequence
-Message-ID: <ZNfEpKt9SlLWAaH3@vergenet.net>
-References: <20230810150114.107765-1-mschmidt@redhat.com>
- <20230810150114.107765-3-mschmidt@redhat.com>
- <ZNUGu74owyfsAbEW@vergenet.net>
- <CADEbmW2tmCd5K852-z7VQfMmp=ae06_gOE66uduhnV3zbA4RcA@mail.gmail.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, mlxsw@nvidia.com,
+	Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
+	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: mirror_gre_changes: Tighten up the TTL
+ test match
+Message-ID: <ZNfFuoNXvwaB8jmX@vergenet.net>
+References: <3ea00504d4fa00a4f3531044e3df20312d472a39.1691769262.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADEbmW2tmCd5K852-z7VQfMmp=ae06_gOE66uduhnV3zbA4RcA@mail.gmail.com>
+In-Reply-To: <3ea00504d4fa00a4f3531044e3df20312d472a39.1691769262.git.petrm@nvidia.com>
 
-On Fri, Aug 11, 2023 at 05:58:44PM +0200, Michal Schmidt wrote:
-> On Thu, Aug 10, 2023 at 5:48 PM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Thu, Aug 10, 2023 at 05:01:12PM +0200, Michal Schmidt wrote:
-> > > tx_timeout_task is canceled too early when removing the driver. Nothing
-> >
-> > nit: canceled -> cancelled
-> >
-> >      also elsewhere in this patchset
-> >
-> >      ./checkpatch.pl --codespell is your friend here
-> >
-> > ...
+On Fri, Aug 11, 2023 at 05:59:27PM +0200, Petr Machata wrote:
+
++ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+
+> This test verifies whether the encapsulated packets have the correct
+> configured TTL. It does so by sending ICMP packets through the test
+> topology and mirroring them to a gretap netdevice. On a busy host
+> however, more than just the test ICMP packets may end up flowing
+> through the topology, get mirrored, and counted. This leads to
+> potential spurious failures as the test observes much more mirrored
+> packets than the sent test packets, and assumes a bug.
 > 
-> Hi Simon,
-> thank you for the review.
+> Fix this by tightening up the mirror action match. Change it from
+> matchall to a flower classifier matching on ICMP packets specifically.
 > 
-> I think both spellings are valid.
-> https://www.grammarly.com/blog/canceled-vs-cancelled/
+> Fixes: 45315673e0c5 ("selftests: forwarding: Test changes in mirror-to-gretap")
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-Thanks, I did not know that.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> Do you want me to resend the patchset for this?
-
-No, not in light of your previous point.
-
--- 
-pw-bot: under-review
+> ---
+>  tools/testing/selftests/net/forwarding/mirror_gre_changes.sh | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh b/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+> index aff88f78e339..5ea9d63915f7 100755
+> --- a/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+> +++ b/tools/testing/selftests/net/forwarding/mirror_gre_changes.sh
+> @@ -72,7 +72,8 @@ test_span_gre_ttl()
+>  
+>  	RET=0
+>  
+> -	mirror_install $swp1 ingress $tundev "matchall $tcflags"
+> +	mirror_install $swp1 ingress $tundev \
+> +		"prot ip flower $tcflags ip_prot icmp"
+>  	tc filter add dev $h3 ingress pref 77 prot $prot \
+>  		flower skip_hw ip_ttl 50 action pass
+>  
+> -- 
+> 2.41.0
+> 
+> 
 
