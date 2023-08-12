@@ -1,333 +1,277 @@
-Return-Path: <netdev+bounces-27041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B55A0779FE1
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 14:05:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DC3779FEA
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 14:16:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D876A281097
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 12:05:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1519A28108C
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 12:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9414E6FCC;
-	Sat, 12 Aug 2023 12:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FAA7469;
+	Sat, 12 Aug 2023 12:16:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CA11CCDE
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 12:04:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B222C433C7;
-	Sat, 12 Aug 2023 12:04:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691841898;
-	bh=Tm6DNYHrf0rPVq5h6JOcnhhx37xoD4Q1jsYHtNNZqAY=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=HxvoLCMTKNaT6pXRAf7a3buppsMD12Bi8XpoSyE3pDVn+vOOo7rG+R6KCKVkehotm
-	 AsyEFKwQsM+ZwLELQQ0rq5ptMw+jyuNrgYhkSH/Gt+V7vsiTS6htI39mcxjHakkepy
-	 7yN14sTy2WhAh/gRMGePz84VaqMHC82F0uk7dpPI4sj0wY2GUXLOoX2CfzpwUnNRgg
-	 WDmSSvpwAGLlEvnjL/4w8qlicWnbX1h8ngUJbzEMLaM6LzHtk9i7nI84FaF1p1W6bg
-	 /Y19P54JouU3vWYnmPC/6WTYdM+7JbxY2lBlFUoq4Yhb8s6bZqYCgVUhL/FpzP6aN1
-	 xm0KBzJZWszeQ==
-Message-ID: <6410981f7adc45de4f4b1c2455d5b6d398472628.camel@kernel.org>
-Subject: Re: [PATCH v2 1/4] SUNRPC: Convert svc_tcp_sendmsg to use bio_vecs
- directly
-From: Jeff Layton <jlayton@kernel.org>
-To: Chuck Lever <cel@kernel.org>, linux-nfs@vger.kernel.org, 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71041CCDF
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 12:16:14 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E1BE6C
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 05:16:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=plMBHvNM+Okj/L0EifIi8x5Bd6N2+fRE64bG+NfDvN8=; b=JLTkirnPHqy/b9WVq/8G0bRUEN
+	aGg9I0cP7M2lTRe942goV7SqJPlcvxN1qb/mR5lpWygEzbWh4unku7fBbelHluOntx27h3Ylkshoj
+	SvOuKQUqPsyDdtgwoI/eRt89xOeSipS5/CdXLJMRHH1oof5uLj/PCaZqZ0dEhjxcVsGs4xumlghCA
+	6csv7uPk03KscRq312ZYcDUQhqT3Ni9EaOjAE8UfHaoQSEMSZiS53+0khMabCKVEvdUydQsMFiqVY
+	wPA4zhL7E7i3B0smYopFRy4YtxwhYTF0la+DD2ljyqeCRE3l5NGLua0nG5/UglN9KfhFXN2KmV4Xu
+	Q+6GVCcw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37018)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qUnXG-0006e5-0p;
+	Sat, 12 Aug 2023 13:16:02 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qUnXE-0003tH-6x; Sat, 12 Aug 2023 13:16:00 +0100
+Date: Sat, 12 Aug 2023 13:16:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Cc: Chuck Lever <chuck.lever@oracle.com>, dhowells@redhat.com
-Date: Sat, 12 Aug 2023 08:04:57 -0400
-In-Reply-To: <168935823761.1984.15760913629466718014.stgit@manet.1015granger.net>
-References: 
-	<168935791041.1984.13295336680505732841.stgit@manet.1015granger.net>
-	 <168935823761.1984.15760913629466718014.stgit@manet.1015granger.net>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
+ switch drivers
+Message-ID: <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk>
+References: <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
+ <20230808120652.fehnyzporzychfct@skbuf>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <20230808123901.3jrqsx7pe357hwkh@skbuf>
+ <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk>
+ <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
+ <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
+ <20230810151617.wv5xt5idbfu7wkyn@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810151617.wv5xt5idbfu7wkyn@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 2023-07-14 at 14:10 -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
->=20
-> Add a helper to convert a whole xdr_buf directly into an array of
-> bio_vecs, then send this array instead of iterating piecemeal over
-> the xdr_buf containing the outbound RPC message.
->=20
-> Note that the rules of the RPC protocol mean there can be only one
-> outstanding send at a time on a transport socket. The kernel's
-> SunRPC server enforces this via the transport's xpt_mutex. Thus we
-> can use a per-transport shared array for the xdr_buf conversion
-> rather than allocate one every time or use one that is part of
-> struct svc_rqst.
->=20
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  include/linux/sunrpc/svcsock.h |    3 ++
->  include/linux/sunrpc/xdr.h     |    2 +
->  net/sunrpc/svcsock.c           |   59 ++++++++++++++--------------------=
-------
->  net/sunrpc/xdr.c               |   50 ++++++++++++++++++++++++++++++++++
->  4 files changed, 75 insertions(+), 39 deletions(-)
->=20
+On Thu, Aug 10, 2023 at 06:16:17PM +0300, Vladimir Oltean wrote:
+> Hi Russell,
+> 
+> On Tue, Aug 08, 2023 at 03:19:20PM +0100, Russell King (Oracle) wrote:
+> > On Tue, Aug 08, 2023 at 04:52:15PM +0300, Vladimir Oltean wrote:
+> > > On Tue, Aug 08, 2023 at 01:57:43PM +0100, Russell King (Oracle) wrote:
+> > > > Thanks for the r-b.
+> > > > 
+> > > > At risk of delaying this patch through further discussion... so I'll
+> > > > say now that we're going off into discussions about future changes.
+> > > > 
+> > > > I believe all DSA drivers that provide .phylink_get_caps fill in the
+> > > > .mac_capabilities member, which leaves just a few drivers that do not,
+> > > > which are:
+> > > > 
+> > > > $ git grep -l dsa_switch_ops.*= drivers/net/dsa/ | xargs grep -L '\.phylink_get_caps'
+> > > > drivers/net/dsa/dsa_loop.c
+> > > > drivers/net/dsa/mv88e6060.c
+> > > > drivers/net/dsa/realtek/rtl8366rb.c
+> > > > drivers/net/dsa/vitesse-vsc73xx-core.c
+> > > > 
+> > > > I've floated the idea to Linus W and Arinc about setting
+> > > > .mac_capabilities in the non-phylink_get_caps path as well, suggesting:
+> > > 
+> > > Not sure what you mean by "in the non-phylink_get_caps path" (what is
+> > > that other path). Don't you mean that we should implement phylink_get_caps()
+> > > for these drivers, to have a unified code flow for everyone?
+> > 
+> > I meant this:
+> > 
+> >                 /* For legacy drivers */
+> >                 if (mode != PHY_INTERFACE_MODE_NA) {
+> >                         __set_bit(mode, dp->pl_config.supported_interfaces);
+> >                 } else {
+> >                         __set_bit(PHY_INTERFACE_MODE_INTERNAL,
+> >                                   dp->pl_config.supported_interfaces);
+> >                         __set_bit(PHY_INTERFACE_MODE_GMII,
+> >                                   dp->pl_config.supported_interfaces);
+> >                 }
+> 
+> Ah, ok, you'd like a built-in assumption of the mac_capabilities in
+> dsa_port_phylink_create().
+> 
+> > but ultimately yes, having the DSA phylink_get_caps method mandatory
+> > would be excellent, but I don't think we have sufficient information
+> > to do that.
+> > 
+> > For example, what interface modes does the Vitesse DSA switch support?
+> > What speeds? Does it support pause? Does it vary depending on port?
+> 
+> I only have a VSC7395 datasheet which was shared with me by Linus (and
+> that link is no longer functional).
+> 
+> This switch supports MII/REV-MII/GMII/RGMII on MAC 6, and MACs 0-4 are
+> connected to internal PHYs (yes, there is no port 5, also see the
+> comment in vsc73xx_probe()).
+> 
+> Based on vsc73xx_init_port() and vsc73xx_adjust_enable_port(), I guess
+> all ports support flow control, and thus, PHYs should advertise it.
+> 
+> I don't have a datasheet for the other switches supported by the driver:
+> 
+>  * Vitesse VSC7385 SparX-G5 5+1-port Integrated Gigabit Ethernet Switch
+>  * Vitesse VSC7388 SparX-G8 8-port Integrated Gigabit Ethernet Switch
+>  * Vitesse VSC7395 SparX-G5e 5+1-port Integrated Gigabit Ethernet Switch
+>  * Vitesse VSC7398 SparX-G8e 8-port Integrated Gigabit Ethernet Switch
+> 
+> but based on the common treatment in vsc73xx_init_port(), I'd say that
+> on all models, port 6 (CPU_PORT) is the xMII port and all the others are
+> internal PHY ports, and all support the same configuration. So a
+> phylink_get_caps() implementation could probably also do one of two
+> things, based on "if (port == CPU_PORT)".
+...
+> That could be an option, but I think the volume of switches is low
+> enough that we could just consider converting them all.
 
-I've seen some pynfs test regressions in mainline (v6.5-rc5-ish)
-kernels. Here's one failing test:
+It's actually better - the vitesse driver uses .adjust_link, which
+means it's excluded from phylink for the DSA/CPU ports.
 
-_text =3D b'write data' # len=3D10
+So, I think for Vitesse, we just need to set INTERNAL and GMII
+for ports != CPU_PORT, speeds 10..1000Mbps at FD and HD, and also
+sym and asym pause.
 
-[...]
+That leaves the RTL836x driver, for which I've found:
 
-def testSimpleWrite2(t, env):
-    """WRITE with stateid=3Dzeros changing size
+http://realtek.info/pdf/rtl8366_8369_datasheet_1-1.pdf
 
-    FLAGS: write all
-    DEPEND: MKFILE
-    CODE: WRT1b
-    """
-    c =3D env.c1
-    c.init_connection()
-    attrs =3D {FATTR4_SIZE: 32, FATTR4_MODE: 0o644}
-    fh, stateid =3D c.create_confirm(t.word(), attrs=3Dattrs,
-                                   deny=3DOPEN4_SHARE_DENY_NONE)
-    res =3D c.write_file(fh, _text, 30)
-    check(res, msg=3D"WRITE with stateid=3Dzeros changing size")
-    res =3D c.read_file(fh, 25, 20)
-    _compare(t, res, b'\0'*5 + _text, True)
+and that indicates that the user ports use RSGMII which is SGMII with
+a clock in one direction. The only dts I can find is:
 
-This test writes 10 bytes of data (to a file at offset 30, and then does
-a 20 byte read starting at offset 25. The READ reply has NULs where the
-written data should be
+arch/arm/boot/dts/gemini-dlink-dir-685.dts
 
-The patch that broke things is this one:
+which doesn't specify phy-mode for these, so that'll be using the
+phylib default of GMII.
 
-    5df5dd03a8f7 sunrpc: Use sendmsg(MSG_SPLICE_PAGES) rather then sendpage
+Port 5 supports MII/GMII/RGMII by hardware strapping, which has three
+modes of operation:
 
-This patch fixes the problem and gets the test run "green" again. I
-think we will probably want to send this patch to mainline for v6.5, but
-it'd be good to understand what's broken and how this fixes it.
+  MII/GMII (mac mode): 1G (GMII) when linked at 1G, otherwise 100M (MII)
+  RGMII: only 1G
+  MII (phy mode): only 100M FD supported. Flow control by hardware
+  strapping but is readable via a register, but omits to say where.
 
-Do you (or David) have any insight?
+There's also some suggestion that asym flow control is supported in 1G
+mode - but it doesn't say whether it's supported in 100M (and since
+IEEE 802.3 advertisements do not make this conditional on speed...
+yea, sounds like a slightly broken design to me.)
 
-It'd also be good to understand whether we also need to fix UDP. pynfs
-is tcp-only, so I can't run the same test there as easily.
+So for realtek, I propose (completely untested):
 
-> diff --git a/include/linux/sunrpc/svcsock.h b/include/linux/sunrpc/svcsoc=
-k.h
-> index a7116048a4d4..a9bfeadf4cbe 100644
-> --- a/include/linux/sunrpc/svcsock.h
-> +++ b/include/linux/sunrpc/svcsock.h
-> @@ -40,6 +40,9 @@ struct svc_sock {
-> =20
->  	struct completion	sk_handshake_done;
-> =20
-> +	struct bio_vec		sk_send_bvec[RPCSVC_MAXPAGES]
-> +						____cacheline_aligned;
-> +
->  	struct page *		sk_pages[RPCSVC_MAXPAGES];	/* received data */
->  };
-> =20
-> diff --git a/include/linux/sunrpc/xdr.h b/include/linux/sunrpc/xdr.h
-> index f89ec4b5ea16..42f9d7eb9a1a 100644
-> --- a/include/linux/sunrpc/xdr.h
-> +++ b/include/linux/sunrpc/xdr.h
-> @@ -139,6 +139,8 @@ void	xdr_terminate_string(const struct xdr_buf *, con=
-st u32);
->  size_t	xdr_buf_pagecount(const struct xdr_buf *buf);
->  int	xdr_alloc_bvec(struct xdr_buf *buf, gfp_t gfp);
->  void	xdr_free_bvec(struct xdr_buf *buf);
-> +unsigned int xdr_buf_to_bvec(struct bio_vec *bvec, unsigned int bvec_siz=
-e,
-> +			     const struct xdr_buf *xdr);
-> =20
->  static inline __be32 *xdr_encode_array(__be32 *p, const void *s, unsigne=
-d int len)
->  {
-> diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-> index e43f26382411..e35e5afe4b81 100644
-> --- a/net/sunrpc/svcsock.c
-> +++ b/net/sunrpc/svcsock.c
-> @@ -36,6 +36,8 @@
->  #include <linux/skbuff.h>
->  #include <linux/file.h>
->  #include <linux/freezer.h>
-> +#include <linux/bvec.h>
-> +
->  #include <net/sock.h>
->  #include <net/checksum.h>
->  #include <net/ip.h>
-> @@ -1194,72 +1196,52 @@ static int svc_tcp_recvfrom(struct svc_rqst *rqst=
-p)
->  	return 0;	/* record not complete */
->  }
-> =20
-> -static int svc_tcp_send_kvec(struct socket *sock, const struct kvec *vec=
-,
-> -			      int flags)
-> -{
-> -	struct msghdr msg =3D { .msg_flags =3D MSG_SPLICE_PAGES | flags, };
-> -
-> -	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, vec, 1, vec->iov_len);
-> -	return sock_sendmsg(sock, &msg);
-> -}
-> -
->  /*
->   * MSG_SPLICE_PAGES is used exclusively to reduce the number of
->   * copy operations in this path. Therefore the caller must ensure
->   * that the pages backing @xdr are unchanging.
->   *
-> - * In addition, the logic assumes that * .bv_len is never larger
-> - * than PAGE_SIZE.
-> + * Note that the send is non-blocking. The caller has incremented
-> + * the reference count on each page backing the RPC message, and
-> + * the network layer will "put" these pages when transmission is
-> + * complete.
-> + *
-> + * This is safe for our RPC services because the memory backing
-> + * the head and tail components is never kmalloc'd. These always
-> + * come from pages in the svc_rqst::rq_pages array.
->   */
-> -static int svc_tcp_sendmsg(struct socket *sock, struct xdr_buf *xdr,
-> +static int svc_tcp_sendmsg(struct svc_sock *svsk, struct xdr_buf *xdr,
->  			   rpc_fraghdr marker, unsigned int *sentp)
->  {
-> -	const struct kvec *head =3D xdr->head;
-> -	const struct kvec *tail =3D xdr->tail;
->  	struct kvec rm =3D {
->  		.iov_base	=3D &marker,
->  		.iov_len	=3D sizeof(marker),
->  	};
->  	struct msghdr msg =3D {
-> -		.msg_flags	=3D 0,
-> +		.msg_flags	=3D MSG_MORE,
->  	};
-> +	unsigned int count;
->  	int ret;
-> =20
->  	*sentp =3D 0;
-> -	ret =3D xdr_alloc_bvec(xdr, GFP_KERNEL);
-> -	if (ret < 0)
-> -		return ret;
-> =20
-> -	ret =3D kernel_sendmsg(sock, &msg, &rm, 1, rm.iov_len);
-> +	ret =3D kernel_sendmsg(svsk->sk_sock, &msg, &rm, 1, rm.iov_len);
->  	if (ret < 0)
->  		return ret;
->  	*sentp +=3D ret;
->  	if (ret !=3D rm.iov_len)
->  		return -EAGAIN;
-> =20
-> -	ret =3D svc_tcp_send_kvec(sock, head, 0);
-> -	if (ret < 0)
-> -		return ret;
-> -	*sentp +=3D ret;
-> -	if (ret !=3D head->iov_len)
-> -		goto out;
-> +	count =3D xdr_buf_to_bvec(svsk->sk_send_bvec,
-> +				ARRAY_SIZE(svsk->sk_send_bvec), xdr);
-> =20
->  	msg.msg_flags =3D MSG_SPLICE_PAGES;
-> -	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, xdr->bvec,
-> -		      xdr_buf_pagecount(xdr), xdr->page_len);
-> -	ret =3D sock_sendmsg(sock, &msg);
-> +	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, svsk->sk_send_bvec,
-> +		      count, xdr->len);
-> +	ret =3D sock_sendmsg(svsk->sk_sock, &msg);
->  	if (ret < 0)
->  		return ret;
->  	*sentp +=3D ret;
-> -
-> -	if (tail->iov_len) {
-> -		ret =3D svc_tcp_send_kvec(sock, tail, 0);
-> -		if (ret < 0)
-> -			return ret;
-> -		*sentp +=3D ret;
-> -	}
-> -
-> -out:
->  	return 0;
->  }
-> =20
-> @@ -1290,8 +1272,7 @@ static int svc_tcp_sendto(struct svc_rqst *rqstp)
->  	if (svc_xprt_is_dead(xprt))
->  		goto out_notconn;
->  	tcp_sock_set_cork(svsk->sk_sk, true);
-> -	err =3D svc_tcp_sendmsg(svsk->sk_sock, xdr, marker, &sent);
-> -	xdr_free_bvec(xdr);
-> +	err =3D svc_tcp_sendmsg(svsk, xdr, marker, &sent);
->  	trace_svcsock_tcp_send(xprt, err < 0 ? (long)err : sent);
->  	if (err < 0 || sent !=3D (xdr->len + sizeof(marker)))
->  		goto out_close;
-> diff --git a/net/sunrpc/xdr.c b/net/sunrpc/xdr.c
-> index 2a22e78af116..358e6de91775 100644
-> --- a/net/sunrpc/xdr.c
-> +++ b/net/sunrpc/xdr.c
-> @@ -164,6 +164,56 @@ xdr_free_bvec(struct xdr_buf *buf)
->  	buf->bvec =3D NULL;
->  }
-> =20
-> +/**
-> + * xdr_buf_to_bvec - Copy components of an xdr_buf into a bio_vec array
-> + * @bvec: bio_vec array to populate
-> + * @bvec_size: element count of @bio_vec
-> + * @xdr: xdr_buf to be copied
-> + *
-> + * Returns the number of entries consumed in @bvec.
-> + */
-> +unsigned int xdr_buf_to_bvec(struct bio_vec *bvec, unsigned int bvec_siz=
-e,
-> +			     const struct xdr_buf *xdr)
-> +{
-> +	const struct kvec *head =3D xdr->head;
-> +	const struct kvec *tail =3D xdr->tail;
-> +	unsigned int count =3D 0;
-> +
-> +	if (head->iov_len) {
-> +		bvec_set_virt(bvec++, head->iov_base, head->iov_len);
-> +		++count;
-> +	}
-> +
-> +	if (xdr->page_len) {
-> +		unsigned int offset, len, remaining;
-> +		struct page **pages =3D xdr->pages;
-> +
-> +		offset =3D offset_in_page(xdr->page_base);
-> +		remaining =3D xdr->page_len;
-> +		while (remaining > 0) {
-> +			len =3D min_t(unsigned int, remaining,
-> +				    PAGE_SIZE - offset);
-> +			bvec_set_page(bvec++, *pages++, len, offset);
-> +			remaining -=3D len;
-> +			offset =3D 0;
-> +			if (unlikely(++count > bvec_size))
-> +				goto bvec_overflow;
-> +		}
-> +	}
-> +
-> +	if (tail->iov_len) {
-> +		bvec_set_virt(bvec, tail->iov_base, tail->iov_len);
-> +		if (unlikely(++count > bvec_size))
-> +			goto bvec_overflow;
-> +	}
-> +
-> +	return count;
-> +
-> +bvec_overflow:
-> +	pr_warn_once("%s: bio_vec array overflow\n", __func__);
-> +	return count - 1;
-> +}
-> +
->  /**
->   * xdr_inline_pages - Prepare receive buffer for a large reply
->   * @xdr: xdr_buf into which reply will be placed
->=20
->=20
+8<====
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next] net: dsa: realtek: add phylink_get_caps
+ implementation
 
---=20
-Jeff Layton <jlayton@kernel.org>
+The user ports use RSGMII, but we don't have that, and DT doesn't
+specify a phy interface mode, so phylib defaults to GMII. These support
+1G, 100M and 10M with flow control. It is unknown whether asymetric
+pause is supported at all speeds.
+
+The CPU port uses MII/GMII/RGMII/REVMII by hardware pin strapping,
+and support speeds specific to each, with full duplex only supported
+in some modes. Flow control may be supported again by hardware pin
+strapping, and theoretically is readable through a register but no
+information is given in the datasheet for that.
+
+So, we do a best efforts - and be lenient.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/dsa/realtek/rtl8366rb.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index 25f88022b9e4..76b5c43e1430 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -1049,6 +1049,32 @@ static enum dsa_tag_protocol rtl8366_get_tag_protocol(struct dsa_switch *ds,
+ 	return DSA_TAG_PROTO_RTL4_A;
+ }
+ 
++static void rtl8366rb_phylink_get_caps(struct dsa_switch *ds, int port,
++				       struct phylink_config *config)
++{
++	unsigned long *interfaces = config->supported_interfaces;
++	struct realtek_priv *priv = ds->priv;
++
++	if (port == priv->cpu_port) {
++		__set_bit(PHY_INTERFACE_MODE_MII, interfaces);
++		__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
++		/* Only supports 100M FD */
++		__set_bit(PHY_INTERFACE_MODE_REVMII, interfaces);
++		/* Only supports 1G FD */
++		__set_bit(PHY_INTERFACE_MODE_RGMII, interfaces);
++
++		config->mac_capabilities = MAC_1000 | MAC_100 |
++					   MAC_SYM_PAUSE;
++	}
++
++	/* RSGMII port, but we don't have that, and we don't
++	 * specify in DT, so phylib uses the default of GMII
++	 */
++	__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
++	config->mac_capabilities = MAC_1000 | MAC_100 | MAC_10 |
++				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
++}
++
+ static void
+ rtl8366rb_mac_link_up(struct dsa_switch *ds, int port, unsigned int mode,
+ 		      phy_interface_t interface, struct phy_device *phydev,
+@@ -1796,6 +1822,7 @@ static int rtl8366rb_detect(struct realtek_priv *priv)
+ static const struct dsa_switch_ops rtl8366rb_switch_ops_smi = {
+ 	.get_tag_protocol = rtl8366_get_tag_protocol,
+ 	.setup = rtl8366rb_setup,
++	.phylink_get_caps = rtl8366rb_phylink_get_caps,
+ 	.phylink_mac_link_up = rtl8366rb_mac_link_up,
+ 	.phylink_mac_link_down = rtl8366rb_mac_link_down,
+ 	.get_strings = rtl8366_get_strings,
+@@ -1821,6 +1848,7 @@ static const struct dsa_switch_ops rtl8366rb_switch_ops_mdio = {
+ 	.setup = rtl8366rb_setup,
+ 	.phy_read = rtl8366rb_dsa_phy_read,
+ 	.phy_write = rtl8366rb_dsa_phy_write,
++	.phylink_get_caps = rtl8366rb_phylink_get_caps,
+ 	.phylink_mac_link_up = rtl8366rb_mac_link_up,
+ 	.phylink_mac_link_down = rtl8366rb_mac_link_down,
+ 	.get_strings = rtl8366_get_strings,
+-- 
+2.30.2
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
