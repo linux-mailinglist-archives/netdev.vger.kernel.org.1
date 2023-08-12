@@ -1,188 +1,111 @@
-Return-Path: <netdev+bounces-27063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D14077A167
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:28:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC6577A172
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:35:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7307280FBB
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:28:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9572280FDC
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1B98824;
-	Sat, 12 Aug 2023 17:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167E38833;
+	Sat, 12 Aug 2023 17:35:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5976323D3
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:28:03 +0000 (UTC)
-Received: from smtpweb158.aruba.it (smtpweb158.aruba.it [62.149.158.158])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48EB81993
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 10:28:01 -0700 (PDT)
-Received: from [192.168.1.205] ([95.47.160.93])
-	by Aruba Outgoing Smtp  with ESMTPSA
-	id UsP7qw2gvAtggUsP7qUg5M; Sat, 12 Aug 2023 19:27:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1691861279; bh=WdK2I7Y+vABxEZzrHZY4tQquHYXwxPmq+x/0MGOhJT0=;
-	h=Date:MIME-Version:Subject:To:From:Content-Type;
-	b=j4u3NcrHy3Wa4swbjgNU7jB9uBRlDNL1rmUtWobEhSLx396fZAzr52ob0odZVzRwI
-	 x0A4fb2O4SSUK/1xOLp2bbMPP89rHrfRkSgox8fRdyj46s5ZpayQw/1IbJEu6vL1FK
-	 u6+RKp5njjFEZSBPyrOYBcHAifj7wkx6d3vGa+eactnUpgl/ZTneodnVQoGPJ4R5nM
-	 pXhOfoobGtmd5YNlyCpkp4EmO/Zaficm1FQxV74nsqG9/L0NcD33VEC6iCasK7oJRP
-	 6voVCUBQF8zxRgyaO/qceAuQBC3AaJ+LPpCciUqhptzcwTj02o82SWpJxChpfiz/XX
-	 Mhz51cVekgboQ==
-Message-ID: <4a67a6ae-f697-1353-1b0f-55b42e5dbdfa@benettiengineering.com>
-Date: Sat, 12 Aug 2023 19:27:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D320EE
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:35:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91823C433C7;
+	Sat, 12 Aug 2023 17:34:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691861701;
+	bh=s7NR+MioVWfbUYMOJj5jSg2ONA9cpOi9OaWQnY0Hq4c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JoVl68ioNVwYRCVONID2qSUARe1bi384vwGBhyUW31qi3WIsYE6ks0SY8YTWQXA2W
+	 hNK1jaXyJwbxeb3kiCbVwoIe5qAafcozNCJTFPxBKcVjVXwdp2ZTdWDim1ieOpSpbj
+	 Ohzw40QPRk/0i12WGYn4v0BGYWWodVv5PgzN9HCm7/IfR+no/zCzcEhQqHrrmuliw2
+	 liRmBy66u2zOFjvhlRivZeuYo09JWN9vr7RycfNWF100UGwc5v3HJLRDTwXcHdau3T
+	 gSlq8F+EllsB0n4GLCVsVXQK0+sHC4yp3P8lUt83JEPwpgqqYkyLqZS2ykOod5XXZN
+	 avBbaSTFalkDw==
+Date: Sat, 12 Aug 2023 19:34:56 +0200
+From: Simon Horman <horms@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 6/8] virtio-net: support rx netdim
+Message-ID: <ZNfCwDi/NvLR/WTm@vergenet.net>
+References: <20230811065512.22190-1-hengqi@linux.alibaba.com>
+ <20230811065512.22190-7-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH] net: phy: broadcom: add support for BCM5221 phy
-Content-Language: en-US
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jim Reinhart <jimr@tekvox.com>,
- James Autry <jautry@tekvox.com>, Matthew Maron <matthewm@tekvox.com>
-References: <20230811215322.8679-1-giulio.benetti@benettiengineering.com>
- <859ff6a9-3ba9-ea2e-7b85-01813c5df0dd@broadcom.com>
-From: Giulio Benetti <giulio.benetti@benettiengineering.com>
-In-Reply-To: <859ff6a9-3ba9-ea2e-7b85-01813c5df0dd@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfINVkbhKg9D/+OB2rMBSZDDCi8Evw9TCNC6vd1wnlQFjU+UJ8EKDNiTCgAyGEHF2SzWitjH7CNegvUCfKdc15sjytd0/0vYGTlS63Q2UXXRbJN40ZAOB
- F3LQygNPOecJBzQOavOcaT3p+MqrsnHenpE60jQGDO/zEjYUdxBj7GGe9lcXabJGvfADZn5oliTuD0h3JebYTEKNxwJrDAW9lwvIxnkkqXI2yBVHmKrj6/QH
- kAMlNShgk6x8kftnzVV8n8Agxr2+CzJL4KAVVd/DSVAcG5aoVO6W7jn70Y/2F3EHTsLXzPNNUSgYLlCgdHElNSs5tdkyPpYCSFhIc+loIxALBVAki5q8MDEl
- vKrIcmVSauTUvmULJ4s8QZrS8TrnmimI6sUR25G2/WoERyWz318+xzkoKgLUOhF21Px1M5tInXW9IUqCxmDtKwXzkuinLVD1hNmbPbArwakE+IeynVoujGQ9
- mXqIQCaI9FP9GyCird+1tgJlXE2qLw2cVAFeHn49YQ1GqxN0BS7OKR2OfKfF3K9JuHMB8cx6iz/Yhw5WnjGd4gvCp2ER6VglgHm3efdburyfSSoHugQRIDYM
- WYF49NEorosG0A3xLcOiQhmMPp3C3HnHHHJ2hG9Y7h6mEMKKbxSkE0yuw+GpcMJcxWw=
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811065512.22190-7-hengqi@linux.alibaba.com>
 
-Hello Florian,
-
-thanks for reviewing,
-
-On 12/08/23 01:52, Florian Fainelli wrote:
+On Fri, Aug 11, 2023 at 02:55:10PM +0800, Heng Qi wrote:
+> By comparing the traffic information in the complete napi processes,
+> let the virtio-net driver automatically adjust the coalescing
+> moderation parameters of each receive queue.
 > 
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 124 +++++++++++++++++++++++++++++++++------
+>  1 file changed, 106 insertions(+), 18 deletions(-)
 > 
-> On 8/11/2023 2:53 PM, Giulio Benetti wrote:
->> This patch adds the BCM5221 PHY support by reusing
->> brcm_fet_config_intr() and brcm_fet_handle_interrupt() and
->> implementing config_init()/suspend()/resume().
->>
->> Sponsored by: Tekvox Inc.
->> Cc: Jim Reinhart <jimr@tekvox.com>
->> Cc: James Autry <jautry@tekvox.com>
->> Cc: Matthew Maron <matthewm@tekvox.com>
->> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
-> 
-> Looks good, few comments below.
-> 
->> ---
->>   drivers/net/phy/broadcom.c | 144 +++++++++++++++++++++++++++++++++++++
->>   include/linux/brcmphy.h    |   8 +++
->>   2 files changed, 152 insertions(+)
->>
->> diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
->> index 59cae0d808aa..99f6c0485f01 100644
->> --- a/drivers/net/phy/broadcom.c
->> +++ b/drivers/net/phy/broadcom.c
->> @@ -754,6 +754,84 @@ static int brcm_fet_config_init(struct phy_device 
->> *phydev)
->>       return err;
->>   }
->> +static int bcm5221_config_init(struct phy_device *phydev)
->> +{
-> 
-> Very similar to brcm_fet_config_init() except that you configure fewer 
-> interrupt sources, do not have the LED mode programming and your MDI-X 
-> programming is done via a 10BaseT specific register rather than the shadow.
-> 
-> Can you consider adding parameters to brcm_fet_config_init() such that 
-> you can specify the 5221 specific settings such as the interrupt mask 
-> for instance?
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 0318113bd8c2..3fb801a7a785 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/average.h>
+>  #include <linux/filter.h>
+>  #include <linux/kernel.h>
+> +#include <linux/dim.h>
+>  #include <net/route.h>
+>  #include <net/xdp.h>
+>  #include <net/net_failover.h>
+> @@ -168,8 +169,17 @@ struct receive_queue {
+>  
+>  	struct virtnet_rq_stats stats;
+>  
+> +	/* The number of rx notifications */
+> +	u16 calls;
+> +
+> +	/* Is dynamic interrupt moderation enabled? */
+> +	bool dim_enabled;
+> +
+>  	struct virtnet_interrupt_coalesce intr_coal;
+>  
+> +	/* Dynamic Iterrupt Moderation */
 
-So if I've understood correctly I should drop bcm5221_config_init() and
-use brcm_fet_config_init() by checking the struct phy_driver .phy_id to
-be PHY_ID_BCM5221.
+Hi Heng Qi,
 
-> This should help address the locking that Russell suggested.
+nit: Iterrupt -> interrupt
 
-But I don't understand how this can help to prevent the locking Russell
-suggested, can you please elaborate more or point me and example?
-As far as I've understood I should take care to lock sections to prevent
-from interrupts to occur during shadow mode switching, is it correct?
-So maybe you mean that if I do this in brcm_fet_config_init() it will be
-fixed for the other phys using brcm_fet_config_init(), correct?
+     Also, elsewhere in this patchset.
 
-> [snip]
->> +static int bcm5221_suspend(struct phy_device *phydev)
->> +{
->> +    int reg, err, err2, brcmtest;
->> +
->> +    /* Enable shadow register access */
->> +    brcmtest = phy_read(phydev, MII_BRCM_FET_BRCMTEST);
->> +    if (brcmtest < 0)
->> +        return brcmtest;
->> +
->> +    reg = brcmtest | MII_BRCM_FET_BT_SRE;
->> +
->> +    err = phy_write(phydev, MII_BRCM_FET_BRCMTEST, reg);
->> +    if (err < 0)
->> +        return err;
->> +
->> +    /* Force Low Power Mode with clock enabled */
->> +    err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXMODE4,
->> +               BCM5221_SHDW_AM4_EN_CLK_LPM |
->> +               BCM5221_SHDW_AM4_FORCE_LPM);
->> +
->> +    /* Disable shadow register access */
->> +    err2 = phy_write(phydev, MII_BRCM_FET_BRCMTEST, brcmtest);
->> +    if (!err)
->> +        err = err2;
->> +
->> +    return err;
->> +}
-> 
-> bcm5221_suspend() is essentially brcm_fet_suspend() minus the setting of 
-> the BMCR.PDOWN bit, can you consider factoring brcm_fet_suspend() into a 
-> helper that can decide whether to set the power down bit or not? Does 
-> not brcm_fet_suspend() work as-is?
+     ./checkpatch.pl --codespell is your friend here
 
-Sure, I will,
+> +	struct dim dim;
+> +
+>  	/* Chain pages by the private ptr. */
+>  	struct page *pages;
+>  
 
->> +
->> +static int bcm5221_resume(struct phy_device *phydev)
->> +{
-> 
-> This should really be calling bcm5221_config_init() here, if the PHY was 
-> on a power island that is powered off during system suspend, 
-> bcm5221_resume() would not be restoring the auto-power down that is set 
-> during config_init(), probably not desired because that means you will 
-> burn power when the cable is disconnected...
-
-oh yes! You're right, I will then drop bcm5221_resume() in favor of 
-bcm5221_config_init(), so brcm_fet_config_init() with phy_id == 
-PHY_ID_BCM5221 checks.
-
-Thanks again
-Best regards
--- 
-Giulio Benetti
-CEO&CTO@Benetti Engineering sas
+...
 
