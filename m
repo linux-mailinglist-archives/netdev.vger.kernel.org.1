@@ -1,128 +1,116 @@
-Return-Path: <netdev+bounces-27005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E35779D31
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 07:05:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1A5779D3C
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 07:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C07281E07
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 05:05:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA49C1C20ACB
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 05:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72D61854;
-	Sat, 12 Aug 2023 05:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38DBB1854;
+	Sat, 12 Aug 2023 05:29:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC05D1849
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 05:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE761849
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 05:29:51 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D352722;
-	Fri, 11 Aug 2023 22:05:10 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCB22728;
+	Fri, 11 Aug 2023 22:29:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=QVO+YD/A9B88x8NiWdr2MCn5pXPPZlopwlUOKBD1+Hs=; b=x9fOkwf6k49NlChnY1xxM6PETP
-	P4j8i5BsNPySDLS3g3HkFJdbJ28w4pH9V5oxszkcYAZ9eRr5JvAC9aSykeZtjJ4pJjgOnXlToRQsP
-	uV5NM1XRiUZtEduKEJifSEbdJC/dCp67mh3HJi0BQ18h35g7IAm4biCCqneXsi+oDQnVeDoMcMbMI
-	Lj9XTwsG3f6IbJ52G1HWORVyQ687kQzXVA1vpSVDJmDyPBKifbL28cMa5+udxNimqA1HD0+Kb4T25
-	w/L0qMUWxh72qF/lwB78909lAqq8rWhAj9RcasDICSiwUwszWzAqW2VLAJB2DrduGBFuIG7nLzxlO
-	L1f4kaKQ==;
-Received: from [2601:1c2:980:9ec0::2764]
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=g5NFUKgbQYz1dATIngsvfO0U1dhl0IZLO4aTbVVSTIg=; b=jO9TgWeryajGwbsedVXMLlZz+2
+	9FGP9xqBmaMHODdzaU+0NIgdaRHh1ILlPo3YN20+6Je2QcDozgyIAgxmG0UW1bW5B7VnvYFFhrt6R
+	GT3nTiZPmphmLhluO1CNJPNCfocsWk4obOsXW58QOka2dGi+89DWrOmk7zwjIZqeteUu+hX9wE7ky
+	LnJYdN1/xF/E3rD7AwRW/BMz6MTi7jiTiwz8+M43+DMJuaAb7b1LoDu/YtL6CF31z0CuV9dWgXl+7
+	aaScFOVLgsCOfLZEaFKxDOtyrRvzHmwQ+tkVdLNMPVFAizdWZCB0VGL/luH71TwAhwUJCdZoNnbVs
+	QUzhlSpQ==;
+Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qUgWl-00CdzG-1Z;
-	Sat, 12 Aug 2023 04:47:03 +0000
-Message-ID: <9efeeb6a-a2d4-9b56-c127-119c1ac378b6@infradead.org>
-Date: Fri, 11 Aug 2023 21:47:01 -0700
+	id 1qUhCA-00Chm0-2O;
+	Sat, 12 Aug 2023 05:29:50 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	kernel test robot <lkp@intel.com>,
+	Krishnanand Prabhu <krishnanand.prabhu@intel.com>,
+	Luca Coelho <luciano.coelho@intel.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	linux-wireless@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] wifi: iwlwifi: mvm: add dependency for PTP clock
+Date: Fri, 11 Aug 2023 22:29:47 -0700
+Message-ID: <20230812052947.22913-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next 1/2] scripts: kernel-doc: parse
- DEFINE_DMA_UNMAP_[ADDR|LEN]
-Content-Language: en-US
-To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>, netdev@vger.kernel.org,
- kuba@kernel.org
-Cc: linux-doc@vger.kernel.org, corbet@lwn.net, emil.s.tantilov@intel.com,
- joshua.a.hay@intel.com, sridhar.samudrala@intel.com, alan.brady@intel.com,
- madhu.chittim@intel.com, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, willemb@google.com, decot@google.com
-References: <20230812002549.36286-1-pavan.kumar.linga@intel.com>
- <20230812002549.36286-2-pavan.kumar.linga@intel.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230812002549.36286-2-pavan.kumar.linga@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+When the code to use the PTP HW clock was added, it didn't update
+the Kconfig entry for the PTP dependency, leading to build errors,
+so update the Kconfig entry to depend on PTP_1588_CLOCK_OPTIONAL.
 
+aarch64-linux-ld: drivers/net/wireless/intel/iwlwifi/mvm/ptp.o: in function `iwl_mvm_ptp_init':
+drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:294: undefined reference to `ptp_clock_register'
+drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:294:(.text+0xce8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `ptp_clock_register'
+aarch64-linux-ld: drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:301: undefined reference to `ptp_clock_index'
+drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:301:(.text+0xd18): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `ptp_clock_index'
+aarch64-linux-ld: drivers/net/wireless/intel/iwlwifi/mvm/ptp.o: in function `iwl_mvm_ptp_remove':
+drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:315: undefined reference to `ptp_clock_index'
+drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:315:(.text+0xe80): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `ptp_clock_index'
+aarch64-linux-ld: drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:319: undefined reference to `ptp_clock_unregister'
+drivers/net/wireless/intel/iwlwifi/mvm/ptp.c:319:(.text+0xeac): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `ptp_clock_unregister'
 
-On 8/11/23 17:25, Pavan Kumar Linga wrote:
-> At present, if the marcos DEFINE_DMA_UNMAP_ADDR() and
+Fixes: 1595ecce1cf3 ("wifi: iwlwifi: mvm: add support for PTP HW clock (PHC)")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Link: https://lore.kernel.org/all/202308110447.4QSJHmFH-lkp@intel.com/
+Cc: Krishnanand Prabhu <krishnanand.prabhu@intel.com>
+Cc: Luca Coelho <luciano.coelho@intel.com>
+Cc: Gregory Greenman <gregory.greenman@intel.com>
+Cc: Johannes Berg <johannes.berg@intel.com>
+Cc: Kalle Valo <kvalo@kernel.org>
+Cc: linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/wireless/intel/iwlwifi/Kconfig |    1 +
+ 1 file changed, 1 insertion(+)
 
-                     macros
-
-> DEFINE_DMA_UNMAP_LEN() are used in the structures as shown
-> below, instead of parsing the parameter in the parenthesis,
-
-                                                 parentheses
-
-> kernel-doc parses 'DEFINE_DMA_UNMAP_ADDR(' and
-> 'DEFINE_DMA_UNMAP_LEN(' which results in the following
-> warnings:
-> 
-> drivers/net/ethernet/intel/idpf/idpf_txrx.h:201: warning: Function
-> parameter or member 'DEFINE_DMA_UNMAP_ADDR(dma' not described in
-> 'idpf_tx_buf'
-> drivers/net/ethernet/intel/idpf/idpf_txrx.h:201: warning: Function
-> parameter or member 'DEFINE_DMA_UNMAP_LEN(len' not described in
-> 'idpf_tx_buf'
-> 
-> struct idpf_tx_buf {
-> 	DEFINE_DMA_UNMAP_ADDR(dma);
-> 	DEFINE_DMA_UNMAP_LEN(len);
-> };
-> 
-> Fix the warnings by parsing DEFINE_DMA_UNMAP_ADDR() and
-> DEFINE_DMA_UNMAP_LEN().
-> 
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-
-Looks good. Thanks.
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-
-> ---
->  scripts/kernel-doc | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-> index d0116c6939dc..cfb1cb223508 100755
-> --- a/scripts/kernel-doc
-> +++ b/scripts/kernel-doc
-> @@ -1168,6 +1168,10 @@ sub dump_struct($$) {
->  	$members =~ s/DECLARE_KFIFO_PTR\s*\($args,\s*$args\)/$2 \*$1/gos;
->  	# replace DECLARE_FLEX_ARRAY
->  	$members =~ s/(?:__)?DECLARE_FLEX_ARRAY\s*\($args,\s*$args\)/$1 $2\[\]/gos;
-> +	#replace DEFINE_DMA_UNMAP_ADDR
-> +	$members =~ s/DEFINE_DMA_UNMAP_ADDR\s*\($args\)/dma_addr_t $1/gos;
-> +	#replace DEFINE_DMA_UNMAP_LEN
-> +	$members =~ s/DEFINE_DMA_UNMAP_LEN\s*\($args\)/__u32 $1/gos;
->  	my $declaration = $members;
->  
->  	# Split nested struct/union elements as newer ones
-
--- 
-~Randy
+diff -- a/drivers/net/wireless/intel/iwlwifi/Kconfig b/drivers/net/wireless/intel/iwlwifi/Kconfig
+--- a/drivers/net/wireless/intel/iwlwifi/Kconfig
++++ b/drivers/net/wireless/intel/iwlwifi/Kconfig
+@@ -66,6 +66,7 @@ config IWLMVM
+ 	tristate "Intel Wireless WiFi MVM Firmware support"
+ 	select WANT_DEV_COREDUMP
+ 	depends on MAC80211
++	depends on PTP_1588_CLOCK_OPTIONAL
+ 	help
+ 	  This is the driver that supports the MVM firmware. The list
+ 	  of the devices that use this firmware is available here:
 
