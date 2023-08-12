@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-27012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68BB779E78
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 11:17:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62045779E7B
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 11:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D62001C20828
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 09:17:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CFAE1C20400
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 09:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28C1CCC9;
-	Sat, 12 Aug 2023 09:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9531CCCB;
+	Sat, 12 Aug 2023 09:17:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CC01CCC8
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 09:17:30 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7E219A3;
-	Sat, 12 Aug 2023 02:17:28 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 61E701BF206;
-	Sat, 12 Aug 2023 09:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16FB1CCCA
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 09:17:37 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1788268C;
+	Sat, 12 Aug 2023 02:17:35 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9372F1BF204;
+	Sat, 12 Aug 2023 09:17:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1691831847;
+	t=1691831854;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=voAtLXmLl9r79y4j5NbdVi9awaISDF1Sa79XgocDMGs=;
-	b=kncA3e3JiQcrxoNOJ4hUbNZOZ3oAl04PNDSloDgEq6cUb5Lz4IoUQ9aW5yKUf2sozSK2oS
-	zCvZWVOPPWPvljoxiw2YsHG7n6yaRAV/tngrRQk8UPt89kXCuBjos1klD8u19jgy7VMBiQ
-	yQMiIOWrMpUmDmdnkHLX10sBb3L24hCQ1vMUFQjdMMM3zn2wTGyR2EOvqsg0iRD6oFaoMI
-	JTEvNqHIt7kqdk+TqXyd4ux+xMhZWq43eyeDutFTcDxvw+zydqUZRL8kKc9UUONIy2S4jL
-	6sJoaBMHMt3cJjHgB72OdUHSHcEXNKZ4g4uheAbakfY5RqOy4usqR4iiGolCYQ==
+	bh=LsRwvKVYtk21gU+9mAWLQMZ2egmxY1XWYNUSUt9DxMo=;
+	b=FwNw7L1GC8Df9y3lwueMde8imrg8OOVhGbTF/yJ67+g0C8mgismJeZHjEW3fLSi3mOzqoL
+	NRZ/x93oZYTZVUKrYZTZJZkljv/76NiYLplgGPGW1yarpIQObKhpmDxg6bCZKtcDWtb2x2
+	yQc34XfD21nFUSAMKODDiLNRjbygrAE9TSyDj1ln4rxOIWF92F+IFFhcIKfpBgjrpbIUO4
+	31dxjC/E8cnKH/GE4TtXmPIB5ttnTxTTi0dZQ94yRCrU5ZvSsTFXQFMEox2qqLVVAILsFG
+	ZqM40yaY1DizcfKIJSWOY/HylHGYZXjZojkpOpN7/0p1a2a6+rZCdA07FIvmLA==
 From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
@@ -64,9 +64,9 @@ Cc: mithat.guner@xeront.com,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH 1/4] dt-bindings: net: dsa: microchip,lan937x: add missing ethernet on example
-Date: Sat, 12 Aug 2023 12:17:05 +0300
-Message-Id: <20230812091708.34665-2-arinc.unal@arinc9.com>
+Subject: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Date: Sat, 12 Aug 2023 12:17:06 +0300
+Message-Id: <20230812091708.34665-3-arinc.unal@arinc9.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230812091708.34665-1-arinc.unal@arinc9.com>
 References: <20230812091708.34665-1-arinc.unal@arinc9.com>
@@ -81,48 +81,133 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: arinc.unal@arinc9.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The port@5 node on the example is missing the ethernet property. Add it.
-Remove the MAC bindings on the example as they cannot be validated.
+Add the schema to document the internal MDIO bus. Adjust realtek.yaml
+accordingly.
 
 Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 ---
- .../bindings/net/dsa/microchip,lan937x.yaml           | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ .../devicetree/bindings/net/dsa/dsa.yaml      | 18 +++++
+ .../devicetree/bindings/net/dsa/realtek.yaml  | 66 +++++++++----------
+ 2 files changed, 50 insertions(+), 34 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-index 8d7e878b84dc..49af4b0d5916 100644
---- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-@@ -68,16 +68,6 @@ examples:
-   - |
-     #include <dt-bindings/gpio/gpio.h>
+diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+index ec74a660beda..03ccedbc49dc 100644
+--- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+@@ -31,6 +31,24 @@ properties:
+       (single device hanging off a CPU port) must not specify this property
+     $ref: /schemas/types.yaml#/definitions/uint32-array
  
--    macb0 {
--            #address-cells = <1>;
--            #size-cells = <0>;
--
--            fixed-link {
--                    speed = <1000>;
--                    full-duplex;
--            };
--    };
--
-     spi {
-             #address-cells = <1>;
-             #size-cells = <0>;
-@@ -138,6 +128,7 @@ examples:
-                                     phy-mode = "rgmii";
-                                     tx-internal-delay-ps = <2000>;
-                                     rx-internal-delay-ps = <2000>;
-+                                    ethernet = <&macb1>;
++  mdio:
++    description: The internal MDIO bus of the switch
++    $ref: /schemas/net/mdio.yaml#
++
++if:
++  required: [ mdio ]
++then:
++  patternProperties:
++    "^(ethernet-)?ports$":
++      patternProperties:
++        "^(ethernet-)?port@[0-9]+$":
++          if:
++            not:
++              required: [ ethernet ]
++          then:
++            required:
++              - phy-handle
++
+ additionalProperties: true
  
-                                     fixed-link {
-                                             speed = <1000>;
+ $defs:
+diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+index cfd69c2604ea..ea7db0890abc 100644
+--- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+@@ -6,9 +6,6 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+ title: Realtek switches for unmanaged switches
+ 
+-allOf:
+-  - $ref: dsa.yaml#/$defs/ethernet-ports
+-
+ maintainers:
+   - Linus Walleij <linus.walleij@linaro.org>
+ 
+@@ -95,37 +92,38 @@ properties:
+       - '#address-cells'
+       - '#interrupt-cells'
+ 
+-  mdio:
+-    $ref: /schemas/net/mdio.yaml#
+-    unevaluatedProperties: false
+-
+-    properties:
+-      compatible:
+-        const: realtek,smi-mdio
+-
+-if:
+-  required:
+-    - reg
+-
+-then:
+-  $ref: /schemas/spi/spi-peripheral-props.yaml#
+-  not:
+-    required:
+-      - mdc-gpios
+-      - mdio-gpios
+-      - mdio
+-
+-  properties:
+-    mdc-gpios: false
+-    mdio-gpios: false
+-    mdio: false
+-
+-else:
+-  required:
+-    - mdc-gpios
+-    - mdio-gpios
+-    - mdio
+-    - reset-gpios
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++  - if:
++      required: [ mdio ]
++    then:
++      properties:
++        mdio:
++          properties:
++            compatible:
++              const: realtek,smi-mdio
++
++  - if:
++      required:
++        - reg
++    then:
++      $ref: /schemas/spi/spi-peripheral-props.yaml#
++      not:
++        required:
++          - mdc-gpios
++          - mdio-gpios
++          - mdio
++
++      properties:
++        mdc-gpios: false
++        mdio-gpios: false
++        mdio: false
++    else:
++      required:
++        - mdc-gpios
++        - mdio-gpios
++        - mdio
++        - reset-gpios
+ 
+ required:
+   - compatible
 -- 
 2.39.2
 
