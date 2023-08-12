@@ -1,49 +1,45 @@
-Return-Path: <netdev+bounces-27044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD9E277A025
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 15:33:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DB777A032
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 15:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1E32280F60
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 13:33:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D73041C208D2
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 13:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D90747F;
-	Sat, 12 Aug 2023 13:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD057485;
+	Sat, 12 Aug 2023 13:46:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF84E1CCDE
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 13:33:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AD4C433C7;
-	Sat, 12 Aug 2023 13:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFCC7483
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 13:46:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B62DC433C8;
+	Sat, 12 Aug 2023 13:46:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691847201;
-	bh=noXy/LbHQWUdG6MjdZkjn0BvHhLEkCRtSWWXD0bVQCI=;
+	s=k20201202; t=1691848007;
+	bh=FF19mRP9MCnqBmcE1/PThUv5SqaymEY1w30r5hJqrrI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=afL2TH2ppvGq5D0ccNWtFxVwe7kzbD+KdvUmZK25SpzzYfUwhc8HTC4iCAdg8XJMX
-	 8UNwdGFRSfpyKgD+y4RZIzVgCtggoe8j7ewhvWFtJK2b4yzNKTfuO0VepE3D2aavSH
-	 lD71CQ/jY/IV/Z0qBa3eSoFhyYZGAl+5KRoX0Yz5s7ztLZHMAFY/g3GG0tmDdziVKb
-	 1TzKtRgc/xSsP4nl858lEIaTPSLdnn8OOIw8mE9xKu38URC7iEqOgtNREpsCBUZGTW
-	 nN8kvFB/izhdpBGd952q5fDCZfHYqwoVY+U3GBN/T+qaCQTXqBi0ZayTv1x+5s6Npe
-	 mfpZQwHu0gTtQ==
-Date: Sat, 12 Aug 2023 15:33:17 +0200
+	b=rD347akMUJagmLChtJkZ1WvfXiRN4Cm2AVyQXxOjWdl6G5ijCbuTtZtlZMEBfGmrY
+	 TpcagMa2zMldidEu8xD9CcX3PiSgCPVrC5TLcEVEu0yDmA83Pwub7hPj97jm6+i0yJ
+	 oV2lCD5FKtgzPLXDlO2DQqVA5ntasxPE0qYz/XPJSo9UE+TViLTbkGl2hB12PthUzU
+	 lt9+Iz4LaaU+zPX2WneF130/eKBnF0V09iuq+NfbaWAfqlb6wptxVeyikC5GCrIug4
+	 lJM6uVHJF2EevLD3Hcx/BstmtMvcJPQWnX6qjoIYrtav4rJJoNYHyIX4E2iZg7wgvt
+	 QV6cFP63NLD2Q==
+Date: Sat, 12 Aug 2023 15:46:43 +0200
 From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>,
-	Anjali Kulkarni <anjali.k.kulkarni@oracle.com>,
-	Florian Westphal <fw@strlen.de>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Liam Howlett <liam.howlett@oracle.com>
-Subject: Re: [PATCH net-next] netlink: convert nlk->flags to atomic flags
-Message-ID: <ZNeKHZmSYDIejGKx@vergenet.net>
-References: <20230811072226.2777425-1-edumazet@google.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: e1000: Remove unused declarations
+Message-ID: <ZNeNQ5tAefTj3JQl@vergenet.net>
+References: <20230811105005.7692-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,356 +48,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230811072226.2777425-1-edumazet@google.com>
+In-Reply-To: <20230811105005.7692-1-yuehaibing@huawei.com>
 
-On Fri, Aug 11, 2023 at 07:22:26AM +0000, Eric Dumazet wrote:
-
-+ Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-  Florian Westphal <fw@strlen.de>
-  Kuniyuki Iwashima <kuniyu@amazon.com>
-  Liam Howlett <liam.howlett@oracle.com>
-
-> sk_diag_put_flags(), netlink_setsockopt(), netlink_getsockopt()
-> and others use nlk->flags without correct locking.
+On Fri, Aug 11, 2023 at 06:50:05PM +0800, Yue Haibing wrote:
+> Commit 675ad47375c7 ("e1000: Use netdev_<level>, pr_<level> and dev_<level>")
+> declared but never implemented e1000_get_hw_dev_name().
+> Commit 1532ecea1deb ("e1000: drop dead pcie code from e1000")
+> removed e1000_check_mng_mode()/e1000_blink_led_start() but not the declarations.
+> Commit c46b59b241ec ("e1000: Remove unused function e1000_mta_set.")
+> removed e1000_mta_set() but not its declaration.
 > 
-> Use set_bit(), clear_bit(), test_bit(), assign_bit() to remove
-> data-races.
-> 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-> ---
->  net/netlink/af_netlink.c | 90 ++++++++++++++--------------------------
->  net/netlink/af_netlink.h | 22 ++++++----
->  net/netlink/diag.c       | 10 ++---
->  3 files changed, 48 insertions(+), 74 deletions(-)
-> 
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index 96c605e45235815a273784302d45fa7ff88e6d62..642b9d382fb46ddbc3523584c98e07da6860951a 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -84,7 +84,7 @@ struct listeners {
->  
->  static inline int netlink_is_kernel(struct sock *sk)
->  {
-> -	return nlk_sk(sk)->flags & NETLINK_F_KERNEL_SOCKET;
-> +	return nlk_test_bit(KERNEL_SOCKET, sk);
->  }
->  
->  struct netlink_table *nl_table __read_mostly;
-> @@ -349,9 +349,7 @@ static void netlink_deliver_tap_kernel(struct sock *dst, struct sock *src,
->  
->  static void netlink_overrun(struct sock *sk)
->  {
-> -	struct netlink_sock *nlk = nlk_sk(sk);
-> -
-> -	if (!(nlk->flags & NETLINK_F_RECV_NO_ENOBUFS)) {
-> +	if (!nlk_test_bit(RECV_NO_ENOBUFS, sk)) {
->  		if (!test_and_set_bit(NETLINK_S_CONGESTED,
->  				      &nlk_sk(sk)->state)) {
->  			sk->sk_err = ENOBUFS;
-> @@ -1407,9 +1405,7 @@ EXPORT_SYMBOL_GPL(netlink_has_listeners);
->  
->  bool netlink_strict_get_check(struct sk_buff *skb)
->  {
-> -	const struct netlink_sock *nlk = nlk_sk(NETLINK_CB(skb).sk);
-> -
-> -	return nlk->flags & NETLINK_F_STRICT_CHK;
-> +	return nlk_test_bit(STRICT_CHK, NETLINK_CB(skb).sk);
->  }
->  EXPORT_SYMBOL_GPL(netlink_strict_get_check);
->  
-> @@ -1455,7 +1451,7 @@ static void do_one_broadcast(struct sock *sk,
->  		return;
->  
->  	if (!net_eq(sock_net(sk), p->net)) {
-> -		if (!(nlk->flags & NETLINK_F_LISTEN_ALL_NSID))
-> +		if (!nlk_test_bit(LISTEN_ALL_NSID, sk))
->  			return;
->  
->  		if (!peernet_has_id(sock_net(sk), p->net))
-> @@ -1488,7 +1484,7 @@ static void do_one_broadcast(struct sock *sk,
->  		netlink_overrun(sk);
->  		/* Clone failed. Notify ALL listeners. */
->  		p->failure = 1;
-> -		if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
-> +		if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
->  			p->delivery_failure = 1;
->  		goto out;
->  	}
-> @@ -1510,7 +1506,7 @@ static void do_one_broadcast(struct sock *sk,
->  	val = netlink_broadcast_deliver(sk, p->skb2);
->  	if (val < 0) {
->  		netlink_overrun(sk);
-> -		if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
-> +		if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
->  			p->delivery_failure = 1;
->  	} else {
->  		p->congested |= val;
-> @@ -1604,7 +1600,7 @@ static int do_one_set_err(struct sock *sk, struct netlink_set_err_data *p)
->  	    !test_bit(p->group - 1, nlk->groups))
->  		goto out;
->  
-> -	if (p->code == ENOBUFS && nlk->flags & NETLINK_F_RECV_NO_ENOBUFS) {
-> +	if (p->code == ENOBUFS && nlk_test_bit(RECV_NO_ENOBUFS, sk)) {
->  		ret = 1;
->  		goto out;
->  	}
-> @@ -1668,7 +1664,7 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
->  	struct sock *sk = sock->sk;
->  	struct netlink_sock *nlk = nlk_sk(sk);
->  	unsigned int val = 0;
-> -	int err;
-> +	int nr = -1;
->  
->  	if (level != SOL_NETLINK)
->  		return -ENOPROTOOPT;
-> @@ -1679,14 +1675,12 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
->  
->  	switch (optname) {
->  	case NETLINK_PKTINFO:
-> -		if (val)
-> -			nlk->flags |= NETLINK_F_RECV_PKTINFO;
-> -		else
-> -			nlk->flags &= ~NETLINK_F_RECV_PKTINFO;
-> -		err = 0;
-> +		nr = NETLINK_F_RECV_PKTINFO;
->  		break;
->  	case NETLINK_ADD_MEMBERSHIP:
->  	case NETLINK_DROP_MEMBERSHIP: {
-> +		int err;
-> +
->  		if (!netlink_allowed(sock, NL_CFG_F_NONROOT_RECV))
->  			return -EPERM;
->  		err = netlink_realloc_groups(sk);
-> @@ -1706,61 +1700,38 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
->  		if (optname == NETLINK_DROP_MEMBERSHIP && nlk->netlink_unbind)
->  			nlk->netlink_unbind(sock_net(sk), val);
->  
-> -		err = 0;
->  		break;
->  	}
->  	case NETLINK_BROADCAST_ERROR:
-> -		if (val)
-> -			nlk->flags |= NETLINK_F_BROADCAST_SEND_ERROR;
-> -		else
-> -			nlk->flags &= ~NETLINK_F_BROADCAST_SEND_ERROR;
-> -		err = 0;
-> +		nr = NETLINK_F_BROADCAST_SEND_ERROR;
->  		break;
->  	case NETLINK_NO_ENOBUFS:
-> +		assign_bit(NETLINK_F_RECV_NO_ENOBUFS, &nlk->flags, val);
->  		if (val) {
-> -			nlk->flags |= NETLINK_F_RECV_NO_ENOBUFS;
->  			clear_bit(NETLINK_S_CONGESTED, &nlk->state);
->  			wake_up_interruptible(&nlk->wait);
-> -		} else {
-> -			nlk->flags &= ~NETLINK_F_RECV_NO_ENOBUFS;
->  		}
-> -		err = 0;
->  		break;
->  	case NETLINK_LISTEN_ALL_NSID:
->  		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_BROADCAST))
->  			return -EPERM;
-> -
-> -		if (val)
-> -			nlk->flags |= NETLINK_F_LISTEN_ALL_NSID;
-> -		else
-> -			nlk->flags &= ~NETLINK_F_LISTEN_ALL_NSID;
-> -		err = 0;
-> +		nr = NETLINK_F_LISTEN_ALL_NSID;
->  		break;
->  	case NETLINK_CAP_ACK:
-> -		if (val)
-> -			nlk->flags |= NETLINK_F_CAP_ACK;
-> -		else
-> -			nlk->flags &= ~NETLINK_F_CAP_ACK;
-> -		err = 0;
-> +		nr = NETLINK_F_CAP_ACK;
->  		break;
->  	case NETLINK_EXT_ACK:
-> -		if (val)
-> -			nlk->flags |= NETLINK_F_EXT_ACK;
-> -		else
-> -			nlk->flags &= ~NETLINK_F_EXT_ACK;
-> -		err = 0;
-> +		nr = NETLINK_F_EXT_ACK;
->  		break;
->  	case NETLINK_GET_STRICT_CHK:
-> -		if (val)
-> -			nlk->flags |= NETLINK_F_STRICT_CHK;
-> -		else
-> -			nlk->flags &= ~NETLINK_F_STRICT_CHK;
-> -		err = 0;
-> +		nr = NETLINK_F_STRICT_CHK;
->  		break;
->  	default:
-> -		err = -ENOPROTOOPT;
-> +		return -ENOPROTOOPT;
->  	}
-> -	return err;
-> +	if (nr >= 0)
-> +		assign_bit(nr, &nlk->flags, val);
-> +	return 0;
->  }
->  
->  static int netlink_getsockopt(struct socket *sock, int level, int optname,
-> @@ -1827,7 +1798,7 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
->  		return -EINVAL;
->  
->  	len = sizeof(int);
-> -	val = nlk->flags & flag ? 1 : 0;
-> +	val = test_bit(flag, &nlk->flags);
->  
->  	if (put_user(len, optlen) ||
->  	    copy_to_user(optval, &val, len))
-> @@ -2004,9 +1975,9 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->  		msg->msg_namelen = sizeof(*addr);
->  	}
->  
-> -	if (nlk->flags & NETLINK_F_RECV_PKTINFO)
-> +	if (nlk_test_bit(RECV_PKTINFO, sk))
->  		netlink_cmsg_recv_pktinfo(msg, skb);
-> -	if (nlk->flags & NETLINK_F_LISTEN_ALL_NSID)
-> +	if (nlk_test_bit(LISTEN_ALL_NSID, sk))
->  		netlink_cmsg_listen_all_nsid(sk, msg, skb);
->  
->  	memset(&scm, 0, sizeof(scm));
-> @@ -2083,7 +2054,7 @@ __netlink_kernel_create(struct net *net, int unit, struct module *module,
->  		goto out_sock_release;
->  
->  	nlk = nlk_sk(sk);
-> -	nlk->flags |= NETLINK_F_KERNEL_SOCKET;
-> +	set_bit(NETLINK_F_KERNEL_SOCKET, &nlk->flags);
->  
->  	netlink_table_grab();
->  	if (!nl_table[unit].registered) {
-> @@ -2218,7 +2189,7 @@ static int netlink_dump_done(struct netlink_sock *nlk, struct sk_buff *skb,
->  	nl_dump_check_consistent(cb, nlh);
->  	memcpy(nlmsg_data(nlh), &nlk->dump_done_errno, sizeof(nlk->dump_done_errno));
->  
-> -	if (extack->_msg && nlk->flags & NETLINK_F_EXT_ACK) {
-> +	if (extack->_msg && test_bit(NETLINK_F_EXT_ACK, &nlk->flags)) {
->  		nlh->nlmsg_flags |= NLM_F_ACK_TLVS;
->  		if (!nla_put_string(skb, NLMSGERR_ATTR_MSG, extack->_msg))
->  			nlmsg_end(skb, nlh);
-> @@ -2347,8 +2318,8 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
->  			 const struct nlmsghdr *nlh,
->  			 struct netlink_dump_control *control)
->  {
-> -	struct netlink_sock *nlk, *nlk2;
->  	struct netlink_callback *cb;
-> +	struct netlink_sock *nlk;
->  	struct sock *sk;
->  	int ret;
->  
-> @@ -2383,8 +2354,7 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
->  	cb->min_dump_alloc = control->min_dump_alloc;
->  	cb->skb = skb;
->  
-> -	nlk2 = nlk_sk(NETLINK_CB(skb).sk);
-> -	cb->strict_check = !!(nlk2->flags & NETLINK_F_STRICT_CHK);
-> +	cb->strict_check = nlk_test_bit(STRICT_CHK, NETLINK_CB(skb).sk);
->  
->  	if (control->start) {
->  		cb->extack = control->extack;
-> @@ -2428,7 +2398,7 @@ netlink_ack_tlv_len(struct netlink_sock *nlk, int err,
->  {
->  	size_t tlvlen;
->  
-> -	if (!extack || !(nlk->flags & NETLINK_F_EXT_ACK))
-> +	if (!extack || !test_bit(NETLINK_F_EXT_ACK, &nlk->flags))
->  		return 0;
->  
->  	tlvlen = 0;
-> @@ -2500,7 +2470,7 @@ void netlink_ack(struct sk_buff *in_skb, struct nlmsghdr *nlh, int err,
->  	 * requests to cap the error message, and get extra error data if
->  	 * requested.
->  	 */
-> -	if (err && !(nlk->flags & NETLINK_F_CAP_ACK))
-> +	if (err && !test_bit(NETLINK_F_CAP_ACK, &nlk->flags))
->  		payload += nlmsg_len(nlh);
->  	else
->  		flags |= NLM_F_CAPPED;
-> diff --git a/net/netlink/af_netlink.h b/net/netlink/af_netlink.h
-> index fd424cd63f31cf09b00398a1ca92c0e0600ac7bb..2145979b9986a0331b34b6ba2fda867f23d0d71c 100644
-> --- a/net/netlink/af_netlink.h
-> +++ b/net/netlink/af_netlink.h
-> @@ -8,14 +8,16 @@
->  #include <net/sock.h>
->  
->  /* flags */
-> -#define NETLINK_F_KERNEL_SOCKET		0x1
-> -#define NETLINK_F_RECV_PKTINFO		0x2
-> -#define NETLINK_F_BROADCAST_SEND_ERROR	0x4
-> -#define NETLINK_F_RECV_NO_ENOBUFS	0x8
-> -#define NETLINK_F_LISTEN_ALL_NSID	0x10
-> -#define NETLINK_F_CAP_ACK		0x20
-> -#define NETLINK_F_EXT_ACK		0x40
-> -#define NETLINK_F_STRICT_CHK		0x80
-> +enum {
-> +	NETLINK_F_KERNEL_SOCKET,
-> +	NETLINK_F_RECV_PKTINFO,
-> +	NETLINK_F_BROADCAST_SEND_ERROR,
-> +	NETLINK_F_RECV_NO_ENOBUFS,
-> +	NETLINK_F_LISTEN_ALL_NSID,
-> +	NETLINK_F_CAP_ACK,
-> +	NETLINK_F_EXT_ACK,
-> +	NETLINK_F_STRICT_CHK,
-> +};
->  
->  #define NLGRPSZ(x)	(ALIGN(x, sizeof(unsigned long) * 8) / 8)
->  #define NLGRPLONGS(x)	(NLGRPSZ(x)/sizeof(unsigned long))
-> @@ -23,10 +25,10 @@
->  struct netlink_sock {
->  	/* struct sock has to be the first member of netlink_sock */
->  	struct sock		sk;
-> +	unsigned long		flags;
->  	u32			portid;
->  	u32			dst_portid;
->  	u32			dst_group;
-> -	u32			flags;
->  	u32			subscriptions;
->  	u32			ngroups;
->  	unsigned long		*groups;
-> @@ -56,6 +58,8 @@ static inline struct netlink_sock *nlk_sk(struct sock *sk)
->  	return container_of(sk, struct netlink_sock, sk);
->  }
->  
-> +#define nlk_test_bit(nr, sk) test_bit(NETLINK_F_##nr, &nlk_sk(sk)->flags)
-> +
->  struct netlink_table {
->  	struct rhashtable	hash;
->  	struct hlist_head	mc_list;
-> diff --git a/net/netlink/diag.c b/net/netlink/diag.c
-> index e4f21b1067bccacc86811bd240056de65c470ad9..9c4f231be27572f9d889248c33a04868f22e44de 100644
-> --- a/net/netlink/diag.c
-> +++ b/net/netlink/diag.c
-> @@ -27,15 +27,15 @@ static int sk_diag_put_flags(struct sock *sk, struct sk_buff *skb)
->  
->  	if (nlk->cb_running)
->  		flags |= NDIAG_FLAG_CB_RUNNING;
-> -	if (nlk->flags & NETLINK_F_RECV_PKTINFO)
-> +	if (nlk_test_bit(RECV_PKTINFO, sk))
->  		flags |= NDIAG_FLAG_PKTINFO;
-> -	if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
-> +	if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
->  		flags |= NDIAG_FLAG_BROADCAST_ERROR;
-> -	if (nlk->flags & NETLINK_F_RECV_NO_ENOBUFS)
-> +	if (nlk_test_bit(RECV_NO_ENOBUFS, sk))
->  		flags |= NDIAG_FLAG_NO_ENOBUFS;
-> -	if (nlk->flags & NETLINK_F_LISTEN_ALL_NSID)
-> +	if (nlk_test_bit(LISTEN_ALL_NSID, sk))
->  		flags |= NDIAG_FLAG_LISTEN_ALL_NSID;
-> -	if (nlk->flags & NETLINK_F_CAP_ACK)
-> +	if (nlk_test_bit(CAP_ACK, sk))
->  		flags |= NDIAG_FLAG_CAP_ACK;
->  
->  	return nla_put_u32(skb, NETLINK_DIAG_FLAGS, flags);
-> -- 
-> 2.41.0.640.ga95def55d0-goog
-> 
-> 
 
