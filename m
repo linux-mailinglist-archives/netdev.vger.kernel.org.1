@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-27051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5CD477A0A3
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:12:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D62877A0AC
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:12:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8DA81C208F6
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 15:12:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA949281046
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 15:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E912C7496;
-	Sat, 12 Aug 2023 15:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84ABD79C1;
+	Sat, 12 Aug 2023 15:12:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9ACB29AC
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 15:12:02 +0000 (UTC)
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE40171B;
-	Sat, 12 Aug 2023 08:12:01 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-26837895fbbso2001720a91.3;
-        Sat, 12 Aug 2023 08:12:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794962F50
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 15:12:11 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C951984;
+	Sat, 12 Aug 2023 08:12:09 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bcad794ad4so19845635ad.3;
+        Sat, 12 Aug 2023 08:12:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691853121; x=1692457921;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kLJorMlL6hfqjCM48v52PYqEdNPQtxhp1HCXAeYBAoM=;
-        b=FdObHNE2jednt/gMSOvuljKxBw5KmUvVCylKbyUD+D4afoeky1RIpGWnqTOlZrgY6R
-         bf+P5UNIHEb8tMBUmVYAdC+OhqtZwHR07AmKp/ZRvZkU3Jt4juX8aKfKVniZMDQL1Z96
-         CRec6p08c/9YPPJGw5fcdYu1oSA2A+ulrkxDm7FKcMJ8MKUzUcFEhv34lsqNUuOL2UNs
-         oxjNitu5MAOt1IWOIyLFg7oMaQqRuEOEGUMH8gAtaO2H+WkMxIxMrR9rIUjRiVKwMzRZ
-         YL4ZVBK32rQm/nUxfUgaUTo9WG4rotLHOC03nEuX/gmFe3tEFT+G1U9/YIo4dYZcNamd
-         tgTw==
+        d=gmail.com; s=20221208; t=1691853129; x=1692457929;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mdbUNkku7p7EjUqwDMY1rwpQnBjCJuEzhk5BzNxLshM=;
+        b=Wsr8ZcmiWcKPNmBmmJfvjR9UghArhBb0EGxghNU90G+bnwqxTD753ekuLb+AWZqzH+
+         UiF22Ib+QnWNMd/5XZUEdETXaubacEWdxl2jw/ArzWlcFrFWVS1crtaJ0zFiOo9cXnk1
+         1Vr03dKlmFXWfRLfAaENr4ihzQs0peBFeylu30AVCOxL2UX9i3n/1N8FJxRK9K8CaRNb
+         6vPaJioWXjc7iMiTvg0yoNZIu4CsNfYb97C9SizhISM5rF45DX591QayPNhWxgbItn9l
+         Uj88dFZJRcI2r4yTgnD4vULk+MkWyYEQR6rs8Hc6vmYBe++xRNtQCxlBTg9LCl1yNAHS
+         Nxsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691853121; x=1692457921;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kLJorMlL6hfqjCM48v52PYqEdNPQtxhp1HCXAeYBAoM=;
-        b=d6zd0k+jyfRz3dEmLOF6whm+rn3Q+mPeOpfEnOEDzNX4EvHP0cISVQqBCET2xRiXHp
-         4q89FyUijTqzQnCpshK+DPckp6IbCo0ZKiJrJW7juKg7SX4Wu2eZvnPKj/fiEIO1dhKC
-         lTkrwEtd4uiCet7zwThCnqIiUGnSn9xc9dnSep5f22Jc4BQF3R5ZA3XqbgisNT40eQs4
-         cDZZj0DyWIGgMxRkVxsjuikSJ54c0ywc9btjKndvxOBre19Cj203/At33U8ngDeoLUXJ
-         EMGh1BxvUvmTsI/srQbjbjkrSTmJc3JKeVz2FFAObn7M2gfFgZH446JzQ0DkzmBEtEEF
-         BR0g==
-X-Gm-Message-State: AOJu0YzSZrLQm52z9o5jPYzgSZgc9dJcgclCQFzCcJt0ZEt4//PaG7cj
-	AGfTfdwbH6a/B8SX0OATRkDiJKkv4xQWh05n
-X-Google-Smtp-Source: AGHT+IEqP+xKIcFC285EPyhVzS2Z6SWw7VLVDaiMxz4bWKwdsTAFaf210apQ45+cIXlxaG7AI+ompg==
-X-Received: by 2002:a17:90a:4f4a:b0:268:5477:811c with SMTP id w10-20020a17090a4f4a00b002685477811cmr4445249pjl.23.1691853120729;
-        Sat, 12 Aug 2023 08:12:00 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691853129; x=1692457929;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mdbUNkku7p7EjUqwDMY1rwpQnBjCJuEzhk5BzNxLshM=;
+        b=Eh9ccIb7BuceTQraKkagyRTaba3U78XA0zpAOQapEEnMYqSnJ3THNNuHiGY8KlZOb7
+         xh/qZz+DWxbu3Ka/67/spP70X1Kw1oTgCu7/lOL88ZBBs1srGtsPggQwYtC53JYTi3fT
+         b83YzMqxQJIT35mFMIwEGkdyArtk/ArENYeVUgUzVbPjmewjpjUsKJ7SW06xhLMKdZ3w
+         iWc9Sg6b7OgdS2sPLcIoFvyyz+Wb/+wSDUo1zc840aQMS8hvM6tHrru7x08973Y1aU20
+         ZRJEBipwPay/EWPeKCGiHBneOqeBzooEtPDXrI3Wh51mTO/OdiK+kxUs+ZDiZzI/iz/6
+         pTag==
+X-Gm-Message-State: AOJu0YxXpqLOFFU7XASVGHqFbRAdMojPAwNnoqF9TCyl9GfOE3Agr1i5
+	euYBr8uD/yHL/3jTxxH1oWyMX9M8u9mYj3T2
+X-Google-Smtp-Source: AGHT+IEiDAiPR0YpiPHCuRK8/M603XfedzSYj6efGlRqNuDOXUIUTHtpmBYa8M50vwtLBxBO+kBwvg==
+X-Received: by 2002:a17:903:11c3:b0:1bb:4861:d3a7 with SMTP id q3-20020a17090311c300b001bb4861d3a7mr3715888plh.16.1691853128608;
+        Sat, 12 Aug 2023 08:12:08 -0700 (PDT)
 Received: from kelvin-ThinkPad-L14-Gen-1.. ([38.114.108.131])
-        by smtp.gmail.com with ESMTPSA id 17-20020a17090a195100b0026b41363887sm1040927pjh.27.2023.08.12.08.11.55
+        by smtp.gmail.com with ESMTPSA id 17-20020a17090a195100b0026b41363887sm1040927pjh.27.2023.08.12.08.12.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Aug 2023 08:12:00 -0700 (PDT)
+        Sat, 12 Aug 2023 08:12:08 -0700 (PDT)
 From: Keguang Zhang <keguang.zhang@gmail.com>
 To: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
@@ -73,11 +74,13 @@ Cc: Lee Jones <lee@kernel.org>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
 	Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-	Kelvin Zhang <kelvin.zhang@amlogic.com>
-Subject: [PATCH 0/5] Move Loongson1 MAC arch-code to the driver dir
-Date: Sat, 12 Aug 2023 23:11:30 +0800
-Message-Id: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+	Keguang Zhang <keguang.zhang@gmail.com>
+Subject: [PATCH 1/5] MIPS: loongson32: Remove Loongson1 MAC arch-code
+Date: Sat, 12 Aug 2023 23:11:31 +0800
+Message-Id: <20230812151135.1028780-2-keguang.zhang@gmail.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,35 +95,181 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kelvin Zhang <kelvin.zhang@amlogic.com>
+Loongson1 MAC arch-code should be moved to the driver dir.
+Therefore, remove the deprecated implementation.
 
-In order to convert Loongson1 MAC platform devices to the devicetree
-nodes, Loongson1 MAC arch-code should be moved to the driver dir.
-    
-In other words, this patchset is a preparation for converting
-Loongson1 platform devices to devicetree.
+Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+---
+ arch/mips/loongson32/common/platform.c | 127 +++++--------------------
+ 1 file changed, 23 insertions(+), 104 deletions(-)
 
-Keguang Zhang (5):
-  MIPS: loongson32: Remove Loongson1 MAC arch-code
-  dt-bindings: mfd: syscon: Add compatibles for Loongson-1 syscon
-  dt-bindings: net: Add Loongson-1 DWMAC glue layer
-  net: stmmac: Add glue layer for Loongson-1 SoC
-  MAINTAINERS: Add entry for Loongson-1 DWMAC
-
- .../devicetree/bindings/mfd/syscon.yaml       |   2 +
- .../bindings/net/loongson,ls1x-dwmac.yaml     |  98 +++++++
- .../devicetree/bindings/net/snps,dwmac.yaml   |   2 +
- MAINTAINERS                                   |   2 +
- arch/mips/loongson32/common/platform.c        | 127 ++-------
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 257 ++++++++++++++++++
- 8 files changed, 396 insertions(+), 104 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-
-
-base-commit: 21ef7b1e17d039053edaeaf41142423810572741
+diff --git a/arch/mips/loongson32/common/platform.c b/arch/mips/loongson32/common/platform.c
+index 8075590a9f83..37dcda402680 100644
+--- a/arch/mips/loongson32/common/platform.c
++++ b/arch/mips/loongson32/common/platform.c
+@@ -10,7 +10,6 @@
+ #include <linux/sizes.h>
+ #include <linux/phy.h>
+ #include <linux/serial_8250.h>
+-#include <linux/stmmac.h>
+ #include <linux/usb/ehci_pdriver.h>
+ 
+ #include <platform.h>
+@@ -62,87 +61,7 @@ void __init ls1x_serial_set_uartclk(struct platform_device *pdev)
+ }
+ 
+ /* Synopsys Ethernet GMAC */
+-static struct stmmac_mdio_bus_data ls1x_mdio_bus_data = {
+-	.phy_mask	= 0,
+-};
+-
+-static struct stmmac_dma_cfg ls1x_eth_dma_cfg = {
+-	.pbl		= 1,
+-};
+-
+-int ls1x_eth_mux_init(struct platform_device *pdev, void *priv)
+-{
+-	struct plat_stmmacenet_data *plat_dat = NULL;
+-	u32 val;
+-
+-	val = __raw_readl(LS1X_MUX_CTRL1);
+-
+-#if defined(CONFIG_LOONGSON1_LS1B)
+-	plat_dat = dev_get_platdata(&pdev->dev);
+-	if (plat_dat->bus_id) {
+-		__raw_writel(__raw_readl(LS1X_MUX_CTRL0) | GMAC1_USE_UART1 |
+-			     GMAC1_USE_UART0, LS1X_MUX_CTRL0);
+-		switch (plat_dat->phy_interface) {
+-		case PHY_INTERFACE_MODE_RGMII:
+-			val &= ~(GMAC1_USE_TXCLK | GMAC1_USE_PWM23);
+-			break;
+-		case PHY_INTERFACE_MODE_MII:
+-			val |= (GMAC1_USE_TXCLK | GMAC1_USE_PWM23);
+-			break;
+-		default:
+-			pr_err("unsupported mii mode %d\n",
+-			       plat_dat->phy_interface);
+-			return -ENOTSUPP;
+-		}
+-		val &= ~GMAC1_SHUT;
+-	} else {
+-		switch (plat_dat->phy_interface) {
+-		case PHY_INTERFACE_MODE_RGMII:
+-			val &= ~(GMAC0_USE_TXCLK | GMAC0_USE_PWM01);
+-			break;
+-		case PHY_INTERFACE_MODE_MII:
+-			val |= (GMAC0_USE_TXCLK | GMAC0_USE_PWM01);
+-			break;
+-		default:
+-			pr_err("unsupported mii mode %d\n",
+-			       plat_dat->phy_interface);
+-			return -ENOTSUPP;
+-		}
+-		val &= ~GMAC0_SHUT;
+-	}
+-	__raw_writel(val, LS1X_MUX_CTRL1);
+-#elif defined(CONFIG_LOONGSON1_LS1C)
+-	plat_dat = dev_get_platdata(&pdev->dev);
+-
+-	val &= ~PHY_INTF_SELI;
+-	if (plat_dat->phy_interface == PHY_INTERFACE_MODE_RMII)
+-		val |= 0x4 << PHY_INTF_SELI_SHIFT;
+-	__raw_writel(val, LS1X_MUX_CTRL1);
+-
+-	val = __raw_readl(LS1X_MUX_CTRL0);
+-	__raw_writel(val & (~GMAC_SHUT), LS1X_MUX_CTRL0);
+-#endif
+-
+-	return 0;
+-}
+-
+-static struct plat_stmmacenet_data ls1x_eth0_pdata = {
+-	.bus_id			= 0,
+-	.phy_addr		= -1,
+-#if defined(CONFIG_LOONGSON1_LS1B)
+-	.phy_interface		= PHY_INTERFACE_MODE_MII,
+-#elif defined(CONFIG_LOONGSON1_LS1C)
+-	.phy_interface		= PHY_INTERFACE_MODE_RMII,
+-#endif
+-	.mdio_bus_data		= &ls1x_mdio_bus_data,
+-	.dma_cfg		= &ls1x_eth_dma_cfg,
+-	.has_gmac		= 1,
+-	.tx_coe			= 1,
+-	.rx_queues_to_use	= 1,
+-	.tx_queues_to_use	= 1,
+-	.init			= ls1x_eth_mux_init,
+-};
+-
++#ifdef CONFIG_LOONGSON1_LS1B
+ static struct resource ls1x_eth0_resources[] = {
+ 	[0] = {
+ 		.start	= LS1X_GMAC0_BASE,
+@@ -157,27 +76,10 @@ static struct resource ls1x_eth0_resources[] = {
+ };
+ 
+ struct platform_device ls1x_eth0_pdev = {
+-	.name		= "stmmaceth",
++	.name		= "loongson,ls1b-dwmac",
+ 	.id		= 0,
+ 	.num_resources	= ARRAY_SIZE(ls1x_eth0_resources),
+ 	.resource	= ls1x_eth0_resources,
+-	.dev		= {
+-		.platform_data = &ls1x_eth0_pdata,
+-	},
+-};
+-
+-#ifdef CONFIG_LOONGSON1_LS1B
+-static struct plat_stmmacenet_data ls1x_eth1_pdata = {
+-	.bus_id			= 1,
+-	.phy_addr		= -1,
+-	.phy_interface		= PHY_INTERFACE_MODE_MII,
+-	.mdio_bus_data		= &ls1x_mdio_bus_data,
+-	.dma_cfg		= &ls1x_eth_dma_cfg,
+-	.has_gmac		= 1,
+-	.tx_coe			= 1,
+-	.rx_queues_to_use	= 1,
+-	.tx_queues_to_use	= 1,
+-	.init			= ls1x_eth_mux_init,
+ };
+ 
+ static struct resource ls1x_eth1_resources[] = {
+@@ -194,15 +96,32 @@ static struct resource ls1x_eth1_resources[] = {
+ };
+ 
+ struct platform_device ls1x_eth1_pdev = {
+-	.name		= "stmmaceth",
++	.name		= "loongson,ls1b-dwmac",
+ 	.id		= 1,
+ 	.num_resources	= ARRAY_SIZE(ls1x_eth1_resources),
+ 	.resource	= ls1x_eth1_resources,
+-	.dev		= {
+-		.platform_data = &ls1x_eth1_pdata,
++};
++#elif defined(CONFIG_LOONGSON1_LS1C)
++static struct resource ls1x_eth0_resources[] = {
++	[0] = {
++		.start	= LS1X_GMAC0_BASE,
++		.end	= LS1X_GMAC0_BASE + SZ_64K - 1,
++		.flags	= IORESOURCE_MEM,
++	},
++	[1] = {
++		.name	= "macirq",
++		.start	= LS1X_GMAC0_IRQ,
++		.flags	= IORESOURCE_IRQ,
+ 	},
+ };
+-#endif	/* CONFIG_LOONGSON1_LS1B */
++
++struct platform_device ls1x_eth0_pdev = {
++	.name		= "loongson,ls1c-dwmac",
++	.id		= 0,
++	.num_resources	= ARRAY_SIZE(ls1x_eth0_resources),
++	.resource	= ls1x_eth0_resources,
++};
++#endif
+ 
+ /* GPIO */
+ static struct resource ls1x_gpio0_resources[] = {
 -- 
 2.39.2
 
