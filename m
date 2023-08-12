@@ -1,111 +1,88 @@
-Return-Path: <netdev+bounces-27064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC6577A172
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:35:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA24277A175
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9572280FDC
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:35:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC7C4281042
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167E38833;
-	Sat, 12 Aug 2023 17:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9066D8836;
+	Sat, 12 Aug 2023 17:43:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D320EE
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:35:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91823C433C7;
-	Sat, 12 Aug 2023 17:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7501823D3
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:43:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D66DC433C8;
+	Sat, 12 Aug 2023 17:43:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691861701;
-	bh=s7NR+MioVWfbUYMOJj5jSg2ONA9cpOi9OaWQnY0Hq4c=;
+	s=k20201202; t=1691862184;
+	bh=ebop/vhKG+d6ioZES9vEyyolUgCe+T6JMuW233egLIE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JoVl68ioNVwYRCVONID2qSUARe1bi384vwGBhyUW31qi3WIsYE6ks0SY8YTWQXA2W
-	 hNK1jaXyJwbxeb3kiCbVwoIe5qAafcozNCJTFPxBKcVjVXwdp2ZTdWDim1ieOpSpbj
-	 Ohzw40QPRk/0i12WGYn4v0BGYWWodVv5PgzN9HCm7/IfR+no/zCzcEhQqHrrmuliw2
-	 liRmBy66u2zOFjvhlRivZeuYo09JWN9vr7RycfNWF100UGwc5v3HJLRDTwXcHdau3T
-	 gSlq8F+EllsB0n4GLCVsVXQK0+sHC4yp3P8lUt83JEPwpgqqYkyLqZS2ykOod5XXZN
-	 avBbaSTFalkDw==
-Date: Sat, 12 Aug 2023 19:34:56 +0200
+	b=JzPZCT2qbpEAkWJPc6drUu/evkBUoBXEM30b60pUouZMOb1kPzyU1jtrCIfBxtMf/
+	 WLIPbX3NN5cCPFv0So8QLDa88E0mcxrXqehqAoJDpBCDaIbVT8Nys5lZLOMKgLhZbx
+	 XcHEmXb+NBEXauVnmQVItxoH9F6uzlqOijb3bnbZN775yfB398Hbw7MkOghPJu8hrA
+	 rvYUJXwsXzjlxpiBKVp+sl1VZB0BMBng7oTKAa98JBBYlOwG1JHWwe0nqPLixZ2L3y
+	 GVcFaUAM/6PC0ZxoXNhhKABMi1O4pnexxqm7msHHLw1qNPn8KkD+7X2zOITJrRJx9p
+	 G35go0u8CFCMg==
+Date: Sat, 12 Aug 2023 19:43:00 +0200
 From: Simon Horman <horms@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: netdev@vger.kernel.org, Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 6/8] virtio-net: support rx netdim
-Message-ID: <ZNfCwDi/NvLR/WTm@vergenet.net>
-References: <20230811065512.22190-1-hengqi@linux.alibaba.com>
- <20230811065512.22190-7-hengqi@linux.alibaba.com>
+	Abhijit Ayarekar <aayarekar@marvell.com>,
+	Satananda Burla <sburla@marvell.com>,
+	Vimlesh Kumar <vimleshk@marvell.com>
+Subject: Re: [PATCH net 2/4] octeon_ep: cancel tx_timeout_task later in
+ remove sequence
+Message-ID: <ZNfEpKt9SlLWAaH3@vergenet.net>
+References: <20230810150114.107765-1-mschmidt@redhat.com>
+ <20230810150114.107765-3-mschmidt@redhat.com>
+ <ZNUGu74owyfsAbEW@vergenet.net>
+ <CADEbmW2tmCd5K852-z7VQfMmp=ae06_gOE66uduhnV3zbA4RcA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230811065512.22190-7-hengqi@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADEbmW2tmCd5K852-z7VQfMmp=ae06_gOE66uduhnV3zbA4RcA@mail.gmail.com>
 
-On Fri, Aug 11, 2023 at 02:55:10PM +0800, Heng Qi wrote:
-> By comparing the traffic information in the complete napi processes,
-> let the virtio-net driver automatically adjust the coalescing
-> moderation parameters of each receive queue.
+On Fri, Aug 11, 2023 at 05:58:44PM +0200, Michal Schmidt wrote:
+> On Thu, Aug 10, 2023 at 5:48 PM Simon Horman <horms@kernel.org> wrote:
+> >
+> > On Thu, Aug 10, 2023 at 05:01:12PM +0200, Michal Schmidt wrote:
+> > > tx_timeout_task is canceled too early when removing the driver. Nothing
+> >
+> > nit: canceled -> cancelled
+> >
+> >      also elsewhere in this patchset
+> >
+> >      ./checkpatch.pl --codespell is your friend here
+> >
+> > ...
 > 
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 124 +++++++++++++++++++++++++++++++++------
->  1 file changed, 106 insertions(+), 18 deletions(-)
+> Hi Simon,
+> thank you for the review.
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 0318113bd8c2..3fb801a7a785 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -19,6 +19,7 @@
->  #include <linux/average.h>
->  #include <linux/filter.h>
->  #include <linux/kernel.h>
-> +#include <linux/dim.h>
->  #include <net/route.h>
->  #include <net/xdp.h>
->  #include <net/net_failover.h>
-> @@ -168,8 +169,17 @@ struct receive_queue {
->  
->  	struct virtnet_rq_stats stats;
->  
-> +	/* The number of rx notifications */
-> +	u16 calls;
-> +
-> +	/* Is dynamic interrupt moderation enabled? */
-> +	bool dim_enabled;
-> +
->  	struct virtnet_interrupt_coalesce intr_coal;
->  
-> +	/* Dynamic Iterrupt Moderation */
+> I think both spellings are valid.
+> https://www.grammarly.com/blog/canceled-vs-cancelled/
 
-Hi Heng Qi,
+Thanks, I did not know that.
 
-nit: Iterrupt -> interrupt
+> Do you want me to resend the patchset for this?
 
-     Also, elsewhere in this patchset.
+No, not in light of your previous point.
 
-     ./checkpatch.pl --codespell is your friend here
-
-> +	struct dim dim;
-> +
->  	/* Chain pages by the private ptr. */
->  	struct page *pages;
->  
-
-...
+-- 
+pw-bot: under-review
 
