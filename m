@@ -1,111 +1,78 @@
-Return-Path: <netdev+bounces-27059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0ECF77A10B
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 18:32:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C14877A141
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 19:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7597281020
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 16:32:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 478D5280FA7
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 17:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91DF23D3;
-	Sat, 12 Aug 2023 16:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F78B8481;
+	Sat, 12 Aug 2023 17:11:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBF420EE
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 16:32:08 +0000 (UTC)
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7B11BEC;
-	Sat, 12 Aug 2023 09:32:05 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A187520002;
-	Sat, 12 Aug 2023 16:31:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1691857924;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k0tFZ9iZJY1cW3i69oGk18vJfZc2Ya3VW3GueM9Vdfw=;
-	b=XRVBlDJf3+BDJtYBUIKHXrhqWtZNwQdvgBRWcdWOHBlmuBhhs8pME+7zkv7qlGGpNz4I+y
-	MhJwwY+TQq10v5fM/u3gOUAtPNvT9q44nhq7ngJDucd3+0LJqXanXaYS3oY83y6kaScpEl
-	Z9CDYUFlY9MUrhYfBld4zV/rxoa2igZM4zsH6ikXH1q0gMKjZRM49oSjzHdtKXmV4k6DoN
-	rdB7CydIxjiK8OgrWlTzKuOF2XuUaUy5mKzlrhu9yDoCHmIEUEwzshDMReMVImsqimMUT6
-	H4XwRy4naTrMvLcX+ldb0PmWDeF7RmcN3ka6lThJ9uWEJhI9+YeAeMtNJpikeA==
-Message-ID: <fc4344b7-232f-48db-9258-db6face34494@arinc9.com>
-Date: Sat, 12 Aug 2023 19:31:56 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D6720EE
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 17:11:46 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5A1E4D;
+	Sat, 12 Aug 2023 10:11:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qob9GvmfgPfkS28nsR/UdlyRcMxaMz2yJgxRzfLFVrk=; b=N1mraUYZ6TaB5IgBpdq0jiHHpC
+	F/8w1Mnc6nU+VnA7uYU8orhpmK27grB/wZOiGSm29tIhOPoX1dq3HCwbPeCgIwI9WyOESZJblu8RV
+	1uRRVWZCrKiDX90zdrfOPMCFF2MHz6UcgFY6grZtDzspB8Aq7DV4rbbxEjppCPyek0bQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qUs9F-003v4p-2T; Sat, 12 Aug 2023 19:11:33 +0200
+Date: Sat, 12 Aug 2023 19:11:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bjorn Andersson <quic_bjorande@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Chris Lew <quic_clew@quicinc.com>, Alex Elder <elder@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] soc: qcom: aoss: Add debugfs interface for
+ sending messages
+Message-ID: <6ea7796f-9d31-49a5-849e-3a52d35e26ea@lunn.ch>
+References: <20230811205839.727373-1-quic_bjorande@quicinc.com>
+ <20230811205839.727373-3-quic_bjorande@quicinc.com>
+ <d212e5a7-e9e5-4297-85fb-030818f7c647@lunn.ch>
+ <20230811233228.GT1428172@hu-bjorande-lv.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] dt-bindings: net: dsa: realtek: require compatible
- property under mdio node
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-4-arinc.unal@arinc9.com>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20230812091708.34665-4-arinc.unal@arinc9.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811233228.GT1428172@hu-bjorande-lv.qualcomm.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I will drop this patch because only the SMI controlled switches must define
-the compatible string. There's no way to make a distinction between the SMI
-and MDIO controlled switches on the schema so this would mean requiring the
-compatible property for the MDIO controlled switches too which is wrong.
+> As mentioned in the cover letter, I do recognize your concern here. I
+> don't see it as a realistic way to work around the kernel for reasons of
+> being proprietary - given that we don't have debugfs mounted in the vast
+> majority of product.
 
-Arınç
+Look around. How many drivers do you see which allow passing binary
+blobs to firmware?
 
-On 12.08.2023 12:17, Arınç ÜNAL wrote:
-> The compatible property must be defined under the mdio node. Enforce it.
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
->   Documentation/devicetree/bindings/net/dsa/realtek.yaml | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> index ea7db0890abc..f600e65fc990 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> @@ -103,6 +103,9 @@ allOf:
->               compatible:
->                 const: realtek,smi-mdio
->   
-> +          required:
-> +            - compatible
-> +
->     - if:
->         required:
->           - reg
+      Andrew
 
