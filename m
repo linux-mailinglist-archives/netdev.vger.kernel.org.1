@@ -1,39 +1,40 @@
-Return-Path: <netdev+bounces-27011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C061779E70
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 11:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A68BB779E78
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 11:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1777D1C2030F
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 09:17:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D62001C20828
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 09:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0301CCC8;
-	Sat, 12 Aug 2023 09:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28C1CCC9;
+	Sat, 12 Aug 2023 09:17:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCAD1CCC6
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 09:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CC01CCC8
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 09:17:30 +0000 (UTC)
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B65441720;
-	Sat, 12 Aug 2023 02:17:21 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 045391BF208;
-	Sat, 12 Aug 2023 09:17:11 +0000 (UTC)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7E219A3;
+	Sat, 12 Aug 2023 02:17:28 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 61E701BF206;
+	Sat, 12 Aug 2023 09:17:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1691831840;
+	t=1691831847;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WAUiGhJM5qG7OX6mRIP1V08NHkhKxQbeca7wqYfG1ck=;
-	b=S/Ujxv8p5lVdHotql81+u9Mbu6oGIGhjka9ikFKgTlCv7dX4Kkr5eYBVuKP+KZ51CwKHez
-	DcGupjkhiq3Xw19MiEguAtBcaeHN18JebZ38PNj89/H7Il/A17WU4tQ6nmSHeDgzO6xlLn
-	t4cRv7YM4H1i8Wx+GAdOaXPa61BI2SdSpotjIzD4Qbwz6jBt0h4dkRnkbm+rEZG+NQqp0N
-	BxT7NSbKZrCd78bRcQOH/zGyXRFW79FAXG+QDM2FTv6KpCrxCVaSA+kHuLti4kZSzlaONp
-	Jdp1GQg5AkPa6OjtlCjVXuvcWqKgB4cPNciISBrtbHXVJgM+ko40TH8xPdrkNA==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=voAtLXmLl9r79y4j5NbdVi9awaISDF1Sa79XgocDMGs=;
+	b=kncA3e3JiQcrxoNOJ4hUbNZOZ3oAl04PNDSloDgEq6cUb5Lz4IoUQ9aW5yKUf2sozSK2oS
+	zCvZWVOPPWPvljoxiw2YsHG7n6yaRAV/tngrRQk8UPt89kXCuBjos1klD8u19jgy7VMBiQ
+	yQMiIOWrMpUmDmdnkHLX10sBb3L24hCQ1vMUFQjdMMM3zn2wTGyR2EOvqsg0iRD6oFaoMI
+	JTEvNqHIt7kqdk+TqXyd4ux+xMhZWq43eyeDutFTcDxvw+zydqUZRL8kKc9UUONIy2S4jL
+	6sJoaBMHMt3cJjHgB72OdUHSHcEXNKZ4g4uheAbakfY5RqOy4usqR4iiGolCYQ==
 From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
@@ -63,10 +64,12 @@ Cc: mithat.guner@xeront.com,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next 0/4] Document internal MDIO bus of DSA switch and support it on MT7530
-Date: Sat, 12 Aug 2023 12:17:04 +0300
-Message-Id: <20230812091708.34665-1-arinc.unal@arinc9.com>
+Subject: [PATCH 1/4] dt-bindings: net: dsa: microchip,lan937x: add missing ethernet on example
+Date: Sat, 12 Aug 2023 12:17:05 +0300
+Message-Id: <20230812091708.34665-2-arinc.unal@arinc9.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230812091708.34665-1-arinc.unal@arinc9.com>
+References: <20230812091708.34665-1-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,15 +86,44 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello there.
+The port@5 node on the example is missing the ethernet property. Add it.
+Remove the MAC bindings on the example as they cannot be validated.
 
-This patch series documents the internal MDIO bus of the switches
-controlled by DSA and brings support for it on the MT7530 DSA subdriver.
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+ .../bindings/net/dsa/microchip,lan937x.yaml           | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-There are also some dt-bindings improvements included.
-
-Cheers.
-Arınç
-
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+index 8d7e878b84dc..49af4b0d5916 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+@@ -68,16 +68,6 @@ examples:
+   - |
+     #include <dt-bindings/gpio/gpio.h>
+ 
+-    macb0 {
+-            #address-cells = <1>;
+-            #size-cells = <0>;
+-
+-            fixed-link {
+-                    speed = <1000>;
+-                    full-duplex;
+-            };
+-    };
+-
+     spi {
+             #address-cells = <1>;
+             #size-cells = <0>;
+@@ -138,6 +128,7 @@ examples:
+                                     phy-mode = "rgmii";
+                                     tx-internal-delay-ps = <2000>;
+                                     rx-internal-delay-ps = <2000>;
++                                    ethernet = <&macb1>;
+ 
+                                     fixed-link {
+                                             speed = <1000>;
+-- 
+2.39.2
 
 
