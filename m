@@ -1,151 +1,155 @@
-Return-Path: <netdev+bounces-27017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E854779E8F
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 11:30:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F56779E91
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 11:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F36561C2039E
-	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 09:30:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E7FE2805FD
+	for <lists+netdev@lfdr.de>; Sat, 12 Aug 2023 09:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81F01CCCA;
-	Sat, 12 Aug 2023 09:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D761CCD4;
+	Sat, 12 Aug 2023 09:33:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1971CCAA
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 09:30:43 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE41DA
-	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 02:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Kqw2WXc7ILNlDK1nITi5q51uh7dKGN1ItgAQ07sP1sY=; b=CumHXwa97W/vLzVb+oBR+8+mz2
-	za/PrVKWGDo9sn84xfget0f4RRWhzXgqFRR2Pk1PtM52fJXPdbhSD+VMwemm+NeGh+ttB8XhdA5VF
-	DXPxOwiL6TS1HqwwH2ypJsftr7B9K/3R//9uAtsiuIxAbsyGEXR1B/6ZnqxCJBRd+DI+v+/wqGttZ
-	EWibQeC5wMlceuvWsEm7b8aG7fFTrDQpUlRna0Q4EYsAK8zWKmFWYSKS06FY2iGpzmBIfxRB2K2E4
-	MMbmRqWysDnR0s7aEnYBQXDHoPTBNKOoFmBu0jJSqWQWB3zosSCmZO7pJQLoC/AmTtwTBSL8UpTdf
-	uVewHw3Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53172 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qUkx7-0006XM-16;
-	Sat, 12 Aug 2023 10:30:33 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qUkx7-003dMX-9b; Sat, 12 Aug 2023 10:30:33 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Sergei Antonov <saproj@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v3] net: dsa: mv88e6060: add phylink_get_caps
- implementation
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158EA1CCC6
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 09:33:49 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0CE5DA
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 02:33:46 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-586a5cd0ea9so33349287b3.2
+        for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 02:33:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691832826; x=1692437626;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4rS4CCxfpoiukbOIxgBFGUKKJf7qqCnJZN5NzTeoFLk=;
+        b=ets8+9LnJH81VPhXNGqv2p1mRixHbIdCVhyY8e219U6tyEIrQnW+fyDhVHmDDUcpl+
+         Tm0HYppRHuKMg15hP5gkuQY/VwcGjyBbkK3vDrS4SoL3zMZelqS3NuIN6fLFhUXAWvxR
+         VvvqZ8FgJgj1cyfROtDzw6NhGHt15/KSks/7fqTz8slVZnOtq+MhmEZciSn7VU1n32Ch
+         cl75RP6KjA+wTlw8x5i1KkUkos8tXRtKVK/Je1t7Bl3J1cNY4uQpLalI2JjVmCeq6XLQ
+         UuM6xqN0YD40o3ayFJVFkKTYEzbw4mUpjwY56Vc2HCphW7SbrFXXrAZD8q18JN2o62QL
+         70LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691832826; x=1692437626;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4rS4CCxfpoiukbOIxgBFGUKKJf7qqCnJZN5NzTeoFLk=;
+        b=OlnlEUevm262hx2X8f1plr4ckpdbuEprSXsw/6uKSwsC1OO1NLgqDE2OxHbFUptEkq
+         mHVAV4ieCVexs9/tS+OEuF/a8h4UQ2DF4UER04lGqY81eoQQcH7NUEtXmWwZ7LOOl9HF
+         bkI4EIP0Ma6jmZpAfQ4Azrl69H5ehgNdKnKTVrk7N6ZRozE81ZDfJsGiG5i5D/fA+yZ7
+         F3oLRa/G8ZC/4qVWWuPms4G7c5clEAK/sLFZxtoee+guITYhsX3Jb4i+QsgZMGHX2x13
+         cENKhpsVf22zYNvWjUY2lHnEtqVmpYSUSgZL+9gIw2jDKsUNFGriUOEy/htElwmrJ2E/
+         DZ9Q==
+X-Gm-Message-State: AOJu0YwoS+aYWIBksNnRrly8k3q17AioZDEjrhGfHZnkMvaWV4LBp7ML
+	G3MjReHtRbi1DeGaceKCODX5BpVOWjM0uQ==
+X-Google-Smtp-Source: AGHT+IGaTiMZ+w9dxSllC1PYi/mdz8Sx5YB0eB8g8kdQ+ifBtc24D9tGpseEYbdzsH2GPaNXeIJuKiu3phXvEw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1820:b0:cb6:6c22:d0f8 with SMTP
+ id cf32-20020a056902182000b00cb66c22d0f8mr65487ybb.4.1691832826029; Sat, 12
+ Aug 2023 02:33:46 -0700 (PDT)
+Date: Sat, 12 Aug 2023 09:33:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qUkx7-003dMX-9b@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 12 Aug 2023 10:30:33 +0100
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
+Message-ID: <20230812093344.3561556-1-edumazet@google.com>
+Subject: [PATCH v3 net-next 00/15] inet: socket lock and data-races avoidance
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <simon.horman@corigine.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a phylink_get_caps implementation for Marvell 88e6060 DSA switch.
-This is a fast ethernet switch, with internal PHYs for ports 0 through
-4. Port 4 also supports MII, REVMII, REVRMII and SNI. Port 5 supports
-MII, REVMII, REVRMII and SNI without an internal PHY.
+In this series, I converted 20 bits in "struct inet_sock" and made
+them truly atomic.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/dsa/mv88e6060.c | 45 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+This allows to implement many IP_ socket options in a lockless
+fashion (no need to acquire socket lock), and fixes data-races
+that were showing up in various KCSAN reports.
 
-diff --git a/drivers/net/dsa/mv88e6060.c b/drivers/net/dsa/mv88e6060.c
-index fdda62d6eb16..294312b58e4f 100644
---- a/drivers/net/dsa/mv88e6060.c
-+++ b/drivers/net/dsa/mv88e6060.c
-@@ -247,11 +247,56 @@ mv88e6060_phy_write(struct dsa_switch *ds, int port, int regnum, u16 val)
- 	return reg_write(priv, addr, regnum, val);
- }
- 
-+static void mv88e6060_phylink_get_caps(struct dsa_switch *ds, int port,
-+				       struct phylink_config *config)
-+{
-+	unsigned long *interfaces = config->supported_interfaces;
-+	struct mv88e6060_priv *priv = ds->priv;
-+	int addr = REG_PORT(port);
-+	int ret;
-+
-+	ret = reg_read(priv, addr, PORT_STATUS);
-+	if (ret < 0) {
-+		dev_err(ds->dev,
-+			"port %d: unable to read status register: %pe\n",
-+			port, ERR_PTR(ret));
-+		return;
-+	}
-+
-+	/* If the port is configured in SNI mode (acts as a 10Mbps PHY),
-+	 * it should have phy-mode = "sni", but that doesn't yet exist, so
-+	 * forcibly fail validation until the need arises to introduce it.
-+	 */
-+	if (!(ret & PORT_STATUS_PORTMODE)) {
-+		dev_warn(ds->dev, "port %d: SNI mode not supported\n", port);
-+		return;
-+	}
-+
-+	config->mac_capabilities = MAC_100 | MAC_10 | MAC_SYM_PAUSE;
-+
-+	if (port >= 4) {
-+		/* Ports 4 and 5 can support MII, REVMII and REVRMII modes */
-+		__set_bit(PHY_INTERFACE_MODE_MII, interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_REVMII, interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_REVRMII, interfaces);
-+	}
-+	if (port <= 4) {
-+		/* Ports 0 to 3 have internal PHYs, and port 4 can optionally
-+		 * use an internal PHY.
-+		 */
-+		/* Internal PHY */
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL, interfaces);
-+		/* Default phylib interface mode */
-+		__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
-+	}
-+}
-+
- static const struct dsa_switch_ops mv88e6060_switch_ops = {
- 	.get_tag_protocol = mv88e6060_get_tag_protocol,
- 	.setup		= mv88e6060_setup,
- 	.phy_read	= mv88e6060_phy_read,
- 	.phy_write	= mv88e6060_phy_write,
-+	.phylink_get_caps = mv88e6060_phylink_get_caps,
- };
- 
- static int mv88e6060_probe(struct mdio_device *mdiodev)
+I also took care of IP_TTL/IP_MINTTL, but left few other options
+for another series.
+
+v3: fixed patch 7, feedback from build bot about ipvs set_mcast_loop()
+
+v2: addressed a feedback from a build bot in patch 9 by removing
+ unused issk variable in mptcp_setsockopt_sol_ip_set_transparent()
+ Added Acked-by: tags from Soheil (thanks!)
+
+Eric Dumazet (15):
+  inet: introduce inet->inet_flags
+  inet: set/get simple options locklessly
+  inet: move inet->recverr to inet->inet_flags
+  inet: move inet->recverr_rfc4884 to inet->inet_flags
+  inet: move inet->freebind to inet->inet_flags
+  inet: move inet->hdrincl to inet->inet_flags
+  inet: move inet->mc_loop to inet->inet_frags
+  inet: move inet->mc_all to inet->inet_frags
+  inet: move inet->transparent to inet->inet_flags
+  inet: move inet->is_icsk to inet->inet_flags
+  inet: move inet->nodefrag to inet->inet_flags
+  inet: move inet->bind_address_no_port to inet->inet_flags
+  inet: move inet->defer_connect to inet->inet_flags
+  inet: implement lockless IP_TTL
+  inet: implement lockless IP_MINTTL
+
+ include/net/inet_connection_sock.h  |   4 +-
+ include/net/inet_sock.h             |  92 ++++---
+ include/net/ipv6.h                  |   3 +-
+ include/net/route.h                 |   2 +-
+ include/net/tcp.h                   |   2 +-
+ net/core/sock.c                     |   2 +-
+ net/dccp/ipv4.c                     |   4 +-
+ net/ipv4/af_inet.c                  |  16 +-
+ net/ipv4/cipso_ipv4.c               |   4 +-
+ net/ipv4/igmp.c                     |   2 +-
+ net/ipv4/inet_diag.c                |  22 +-
+ net/ipv4/inet_timewait_sock.c       |   2 +-
+ net/ipv4/ip_output.c                |   7 +-
+ net/ipv4/ip_sockglue.c              | 405 +++++++++++++---------------
+ net/ipv4/netfilter/nf_defrag_ipv4.c |   2 +-
+ net/ipv4/ping.c                     |   7 +-
+ net/ipv4/raw.c                      |  26 +-
+ net/ipv4/route.c                    |   8 +-
+ net/ipv4/tcp.c                      |  12 +-
+ net/ipv4/tcp_fastopen.c             |   2 +-
+ net/ipv4/tcp_input.c                |   2 +-
+ net/ipv4/tcp_ipv4.c                 |   5 +-
+ net/ipv4/tcp_minisocks.c            |   3 +-
+ net/ipv4/udp.c                      |   7 +-
+ net/ipv4/udp_tunnel_core.c          |   2 +-
+ net/ipv6/af_inet6.c                 |   8 +-
+ net/ipv6/datagram.c                 |   2 +-
+ net/ipv6/ip6_output.c               |   5 +-
+ net/ipv6/ipv6_sockglue.c            |  12 +-
+ net/ipv6/raw.c                      |  16 +-
+ net/ipv6/udp.c                      |   2 +-
+ net/l2tp/l2tp_ip.c                  |   2 +-
+ net/mptcp/protocol.c                |  12 +-
+ net/mptcp/sockopt.c                 |  19 +-
+ net/netfilter/ipvs/ip_vs_core.c     |   4 +-
+ net/netfilter/ipvs/ip_vs_sync.c     |   4 +-
+ net/sctp/input.c                    |   2 +-
+ net/sctp/protocol.c                 |   2 +-
+ net/sctp/socket.c                   |   2 +-
+ 39 files changed, 365 insertions(+), 370 deletions(-)
+
 -- 
-2.30.2
+2.41.0.640.ga95def55d0-goog
 
 
