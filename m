@@ -1,198 +1,86 @@
-Return-Path: <netdev+bounces-27141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A44677A737
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:59:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84B3177A742
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 17:09:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C71B8281008
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 14:59:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5E33280FB0
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 15:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56BA79DF;
-	Sun, 13 Aug 2023 14:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8778779EF;
+	Sun, 13 Aug 2023 15:09:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A968279C6
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 14:59:12 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF62E4B;
-	Sun, 13 Aug 2023 07:59:09 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4E9BAC0003;
-	Sun, 13 Aug 2023 14:58:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1691938747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vbfJ1w4vh9YoBeVEGEmzngRytdBt78w8hV92B1PwD0w=;
-	b=Zrz/Jo7HSDyWNAVlKAx9QLmmLp0ngnZoSEwxn4kw9tPJat6WjyJXyEV5i+jyX6p9CL6Urc
-	m8t9x3Pk52MAyX5BJeR0Hw+gXNBK9ze9V2pcd5Lw3WWIx2n7sSE1sk9sXfI4+Vm1rzdpcN
-	dw2CbphKiuUmzRM1kcq88sWEzsjoheclqsWZazQOe2VW3Vc4zxss0NC84zLzj2bBYGwV43
-	MJ23nSifNSw1hpsDn+2NLrHEcmWeRCpEXFE6xdHbYjjSVVT2muXFgsvl614TxiE5K8gRxm
-	X1p5BpNm09wOmAZB693eYrQ3xpa9a8rQxxOyChOrq9aDorKKgD3VDT4sdtdgjg==
-Message-ID: <891c0b67-abe1-416c-aa94-675f7f3d8044@arinc9.com>
-Date: Sun, 13 Aug 2023 17:58:57 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D78917C5
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 15:09:25 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16ACE6A;
+	Sun, 13 Aug 2023 08:09:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=W2wqWQ3KB/fmDRV98QTDbhm4GDqKPYDoQbKjO7pgA2A=; b=sBRi+Csjtr6xBLC3I5dkaj/nPc
+	pd49JvNMDPv6dCdCev/pwlJfth5VEqJKYm4uM2L0tUmD3MmypHo1S68O6LzSDDgMHtJyiKKWgxJxn
+	G7aksQUy4fSMml9R7ijGqMdGRUXTr5ClXS1HR9b5awTC4qrKlvN/puBIGB1zWLNQxQxk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qVCiQ-003yOJ-CP; Sun, 13 Aug 2023 17:09:14 +0200
+Date: Sun, 13 Aug 2023 17:09:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Alfred Lee <l00g33k@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	sgarzare@redhat.com, AVKrasnov@sberdevices.ru
+Subject: Re: [PATCH v2 net] net: dsa: mv88e6xxx: Wait for EEPROM done before
+ HW reset
+Message-ID: <dc56700c-8617-44de-8285-720e1514ebc9@lunn.ch>
+References: <20230811232832.24321-1-l00g33k@gmail.com>
+ <20230813105804.2r4zdr6dyqe5dsrf@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
- <abc44324-454c-4524-b05e-fe989755ea47@arinc9.com>
- <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
- <abc44324-454c-4524-b05e-fe989755ea47@arinc9.com>
- <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <20230813112026.ohsx6srbt2staxma@skbuf>
- <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
-Content-Language: en-US
-In-Reply-To: <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230813105804.2r4zdr6dyqe5dsrf@skbuf>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 13.08.2023 15:59, Arınç ÜNAL wrote:
-> On 13.08.2023 14:53, Vladimir Oltean wrote:
->> On Sat, Aug 12, 2023 at 10:20:43PM +0300, Arınç ÜNAL wrote:
->>> diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
->>> index 4d5f5cc6d031e2..82dda8fae8b16e 100644
->>> --- a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
->>> +++ b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
->>> @@ -72,6 +72,10 @@ properties:
->>>             - compatible
->>>             - reg
->>> +  mdio:
->>> +    $ref: dsa.yaml#/properties/mdio
->>> +    unevaluatedProperties: false
->>
->> sja1105 does not support an "mdio" child property. I haven't checked the
->> others. Don't add properties that aren't supported.
+On Sun, Aug 13, 2023 at 01:58:04PM +0300, Vladimir Oltean wrote:
+> Hi Alfred,
 > 
-> Adding the mdio property to the dsa.yaml schema will allow it on all of the
-> schemas that refer to dsa.yaml such as this one. This addition here is only
-> to disallow additional properties under the mdio property for this specific
-> schema.
+> On Fri, Aug 11, 2023 at 04:28:32PM -0700, Alfred Lee wrote:
+> > If the switch is reset during active EEPROM transactions, as in
+> > just after an SoC reset after power up, the I2C bus transaction
+> > may be cut short leaving the EEPROM internal I2C state machine
+> > in the wrong state.  When the switch is reset again, the bad
+> > state machine state may result in data being read from the wrong
+> > memory location causing the switch to enter unexpect mode
+> > rendering it inoperational.
+> > 
+> > Fixes: 8abbffd27ced ("net: dsa: mv88e6xxx: Wait for EEPROM done after HW reset")
+> > Signed-off-by: Alfred Lee <l00g33k@gmail.com>
+> > ---
 > 
-> That said, my understanding is that the internal MDIO bus exists on all of
-> the switches controlled by DSA. Whether each individual DSA subdriver
-> supports registering it does not matter in terms of documenting the
-> internal MDIO bus for all DSA switches.
+> I don't think you understand the meaning of the Fixes: tag.
 
-On top of this, I'd argue to document the internal MDIO bus on the
-ethernet-switch.yaml schema instead.
+The subject looks correct, but the hash is wrong. The correct hash is
+a3dcb3e7e70c72a68a79b30fc3a3adad5612731c.
 
-Arınç
+Fixes: a3dcb3e7e70c ("net: dsa: mv88e6xxx: Wait for EEPROM done after HW reset")
 
-> 
-> SJA1110 uses the mdios property instead because it's got two internal mdio
-> buses, which is why I invalidate the mdio property for it. If SJA1105 has
-> also got two internal mdio buses, let me know.
-> 
->>
->>> +
->>>   patternProperties:
->>>     "^(ethernet-)?ports$":
->>>       patternProperties:
->>>
->>> The nxp,sja1105.yaml schema also needed some changes.
->>>
->>> dt-bindings: net: dsa: nxp,sja1105: improve internal MDIO bus bindings
->>>
->>> SJA1110 Ethernet Switch uses the mdios property for its internal MDIO bus.
->>> Therefore, disallow the mdios property for SJA1105, and the mdio property
->>> for SJA1110.
->>>
->>> Require the phy-handle property on the non-CPU ports if the mdios property
->>> is being used.
->>>
->>> Refer to dsa.yaml#/properties/mdio to point the human readers to the
->>> description on the dsa.yaml schema.
->>>
->>> ---
->>>   .../bindings/net/dsa/nxp,sja1105.yaml         | 20 ++++++++++++++++++-
->>>   1 file changed, 19 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
->>> index 82dda8fae8b16e..7d92350f1065b2 100644
->>> --- a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
->>> +++ b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
->>> @@ -52,7 +52,7 @@ properties:
->>>       patternProperties:
->>>         "^mdio@[0-1]$":
->>> -        $ref: /schemas/net/mdio.yaml#
->>> +        $ref: dsa.yaml#/properties/mdio
->>>           unevaluatedProperties: false
->>>           properties:
->>> @@ -128,14 +128,32 @@ allOf:
->>>       then:
->>>         properties:
->>>           spi-cpol: false
->>> +        mdios: false
->>> +
->>>         required:
->>>           - spi-cpha
->>>       else:
->>>         properties:
->>>           spi-cpha: false
->>> +        mdio: false
->>> +
->>>         required:
->>>           - spi-cpol
->>> +  - if:
->>> +      required: [ mdios ]
->>> +    then:
->>> +      patternProperties:
->>> +        "^(ethernet-)?ports$":
->>> +          patternProperties:
->>> +            "^(ethernet-)?port@[0-9]+$":
->>> +              if:
->>> +                not:
->>> +                  required: [ ethernet ]
->>> +              then:
->>> +                required:
->>> +                  - phy-handle
->>
->> For sja1105, phylink-compatible bindings (phy-handle, fixed-link or managed)
->> are required for all ports (user, dsa or cpu).
->>
->> Also, sja1105 does not populate the slave_mii_bus, so it never uses the
->> fallback where ports implicitly connect to an internal PHY if no phylink
->> bindings are present.
-> 
-> I'll handle these accordingly with your answer to my question above.
-> 
-> Arınç
+       Andrew
 
