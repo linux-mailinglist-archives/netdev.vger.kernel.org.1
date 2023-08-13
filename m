@@ -1,135 +1,95 @@
-Return-Path: <netdev+bounces-27108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59B5E77A62F
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 13:27:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2EB677A632
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 13:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88EBD280EBF
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:26:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAE511C208F2
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C41522A;
-	Sun, 13 Aug 2023 11:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50DF0522C;
+	Sun, 13 Aug 2023 11:30:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A7C1FCC
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 11:26:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B695DC433C8;
-	Sun, 13 Aug 2023 11:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07473FE0
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 11:30:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 46563C433C7;
+	Sun, 13 Aug 2023 11:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691926015;
-	bh=rlKj/mDDGKn6pmmyFelrGiNR0L9ITP4m+ZN6VYvbJrk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WolvVV7Zms7r1VD9RiBM/rRhIdlsuIc+RDBfAAsVZQOvqR8GFnNCviUepG/8k5esh
-	 cRDFzp0mefIay1+vX9Cp+hTbcM6uQ4XUtvijYAGwGxLRoPIVwg02EMPBClWK7YX1xE
-	 54mRg9S4jibe2lwVDP0maXvF7P+S4Z4tpVTVOu1lzekdL968uq8RcsanpDcZ+4ccQ2
-	 HqbGbZPx/eC/Z++o6cZPXHD4tPqHj+HXJ9SbxfUf+JikicgY7TFdaLEuxNf8tSZOGX
-	 iQ45e7TYh2ZhNerrY3mlc9bfYrVjsQ0bI5MPLOUXEYyAFcBYKaMZ1+V4+dSAWYLgzR
-	 GK2ozQYZzH0Kw==
-Date: Sun, 13 Aug 2023 14:26:50 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Hari Ramakrishnan <rharix@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org,
-	sdf@google.com, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
- dma-buf to netdevice
-Message-ID: <20230813112650.GK7707@unreal>
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-3-almasrymina@google.com>
+	s=k20201202; t=1691926220;
+	bh=tv0AJaJfM1H7xAQNmykztN3H5FVSHFg0uLsHKr48Ejg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bVQkejMU84wHVEID3w+1CUnD+hPtVzmefQflM+YJVVn4ekOr5w68vMXZsfkaVf+qP
+	 5bW56RLTgXZiY4/8+3YPxtX2/SYBs3IxGWSbW7iMqmgbaOdBsYwDS3TJBJIH5H5jkb
+	 NGErhhQf+XTb8+EN4CWtga2+kz84ENz58zvCogGMiB9uR65B409AHi1uBn8w19gM3W
+	 mIYLTH8NMiAP7eVlPsX24wDCayP+3XbgEEXWpdOGDbQVkBq6iT6vcSmC007R1hn1iB
+	 UF41wqWyeNDpd+8rVit5BbGt6n04KBogk+J2UXJAEQ9hsKS9M14AUhIT3vfFehi/Bb
+	 k/9QiMi0lYgkg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 293B0C595D0;
+	Sun, 13 Aug 2023 11:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810015751.3297321-3-almasrymina@google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phy: fix IRQ-based wake-on-lan over hibernate /
+ power off
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169192622016.28684.14964917014181303735.git-patchwork-notify@kernel.org>
+Date: Sun, 13 Aug 2023 11:30:20 +0000
+References: <E1qUPLi-003XN6-Dr@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1qUPLi-003XN6-Dr@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandru.ardelean@analog.com,
+ andre.edich@microchip.com, atenart@kernel.org, baruch@tkos.co.il,
+ christophe.leroy@c-s.fr, davem@davemloft.net, Divya.Koppera@microchip.com,
+ edumazet@google.com, f.fainelli@gmail.com, hauke@hauke-m.de,
+ ioana.ciornei@nxp.com, kuba@kernel.org, jbrunet@baylibre.com,
+ kavyasree.kotagiri@microchip.com, linus.walleij@linaro.org,
+ m.felsch@pengutronix.de, marex@denx.de, martin.blumenstingl@googlemail.com,
+ dev@kresin.me, fido_max@inbox.ru, michael@walle.cc, narmstrong@baylibre.com,
+ Nisar.Sayed@microchip.com, o.rempel@pengutronix.de, pabeni@redhat.com,
+ philippe.schenker@toradex.com, willy.liu@realtek.com,
+ yuiko.oshino@microchip.com, u.kleine-koenig@pengutronix.de,
+ netdev@vger.kernel.org
 
-On Wed, Aug 09, 2023 at 06:57:38PM -0700, Mina Almasry wrote:
-> Add a netdev_dmabuf_binding struct which represents the
-> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
-> an rx queue on the netdevice. On the binding, the dma_buf_attach
-> & dma_buf_map_attachment will occur. The entries in the sg_table from
-> mapping will be inserted into a genpool to make it ready
-> for allocation.
-> 
-> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
-> holds the dma-buf offset of the base of the chunk and the dma_addr of
-> the chunk. Both are needed to use allocations that come from this chunk.
-> 
-> We create a new type that represents an allocation from the genpool:
-> page_pool_iov. We setup the page_pool_iov allocation size in the
-> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
-> allocated by the page pool and given to the drivers.
-> 
-> The user can unbind the dmabuf from the netdevice by closing the netlink
-> socket that established the binding. We do this so that the binding is
-> automatically unbound even if the userspace process crashes.
-> 
-> The binding and unbinding leaves an indicator in struct netdev_rx_queue
-> that the given queue is bound, but the binding doesn't take effect until
-> the driver actually reconfigures its queues, and re-initializes its page
-> pool. This issue/weirdness is highlighted in the memory provider
-> proposal[1], and I'm hoping that some generic solution for all
-> memory providers will be discussed; this patch doesn't address that
-> weirdness again.
-> 
-> The netdev_dmabuf_binding struct is refcounted, and releases its
-> resources only when all the refs are released.
-> 
-> [1] https://lore.kernel.org/netdev/20230707183935.997267-1-kuba@kernel.org/
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> ---
->  include/linux/netdevice.h |  57 ++++++++++++
->  include/net/page_pool.h   |  27 ++++++
->  net/core/dev.c            | 178 ++++++++++++++++++++++++++++++++++++++
->  net/core/netdev-genl.c    | 101 ++++++++++++++++++++-
->  4 files changed, 361 insertions(+), 2 deletions(-)
+Hello:
 
-<...>
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding);
-> +
-> +static inline void
-> +netdev_devmem_binding_get(struct netdev_dmabuf_binding *binding)
-> +{
-> +	refcount_inc(&binding->ref);
-> +}
-> +
-> +static inline void
-> +netdev_devmem_binding_put(struct netdev_dmabuf_binding *binding)
-> +{
-> +	if (!refcount_dec_and_test(&binding->ref))
-> +		return;
-> +
-> +	__netdev_devmem_binding_free(binding);
-> +}
+On Fri, 11 Aug 2023 11:26:30 +0100 you wrote:
+> Uwe reports:
+> "Most PHYs signal WoL using an interrupt. So disabling interrupts [at
+> shutdown] breaks WoL at least on PHYs covered by the marvell driver."
+> 
+> Discussing with Ioana, the problem which was trying to be solved was:
+> "The board in question is a LS1021ATSN which has two AR8031 PHYs that
+> share an interrupt line. In case only one of the PHYs is probed and
+> there are pending interrupts on the PHY#2 an IRQ storm will happen
+> since there is no entity to clear the interrupt from PHY#2's registers.
+> PHY#1's driver will get stuck in .handle_interrupt() indefinitely."
+> 
+> [...]
 
-Not a big deal, but it looks like reimplemented version of kref_get/kref_put to me.
+Here is the summary with links:
+  - [net] net: phy: fix IRQ-based wake-on-lan over hibernate / power off
+    https://git.kernel.org/netdev/net/c/cc941e548bff
 
-Thanks
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
