@@ -1,85 +1,103 @@
-Return-Path: <netdev+bounces-27102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5045277A60D
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 12:59:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8941577A617
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 13:07:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 471971C2090D
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 10:59:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B20391C204F3
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6F43D74;
-	Sun, 13 Aug 2023 10:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACE34400;
+	Sun, 13 Aug 2023 11:07:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41841FCC
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 10:59:24 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0871D170D
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 03:59:23 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99bed101b70so468552766b.3
-        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 03:59:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165D63FE0
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 11:07:52 +0000 (UTC)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E491BD;
+	Sun, 13 Aug 2023 04:07:51 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-98377c5d53eso449910966b.0;
+        Sun, 13 Aug 2023 04:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691924361; x=1692529161;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vUkOCDgMbe4HtJ5KVuy5PNulyqCVnGGCHOXRR9jkCWM=;
-        b=igjj2VMiBHOaufZOmvU/9DJpXdDKTDc5zubObRdPvWyiMg5gsOveMK/aBme/zk0Gtj
-         uE7iS26vKu+ztyT8W6DvVjoGWRCSouSk2gw89Ehzu7H0Zk6cAC7IlmNSgNk9BBu+DzM6
-         a9H2F4KvuCxIEpg+xrsZ40xdyvNZGHIwVwl7OstKYGfHespB+uKJVubfv775OR2bvhu5
-         ia0RB4Pw+ROH7Tm8ACoxEhBTdaBgnjzfe3Z6cPjS+8O51Qx1fm+AIpwzhYtwKvP3VL2M
-         s8ZaikV0zb+lez8R2fWga7pZCXdSG0DFAbzGhCTq98Ac7wDemjabv42/Jvz31aFMNNX2
-         Nlhw==
+        d=gmail.com; s=20221208; t=1691924870; x=1692529670;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+JzoWKJWfDj4FguRZ7Oco2p7HgbsRYijC1lYv2wlZ+U=;
+        b=kn7+miFpzqcrheYyIkdteTYanxmSe9imJRlF5Ticz8m+hZ8E8lV+DONipGiZfiaryb
+         EJZw5xLfQZHLH9o45z+C4C804uHrYB8pMP8GhvbyNxrum4cq7chQEfgHayGivKdBbvV4
+         cmXI1XxdGd6Dz5w5jWDGs9BEABnNOe+tBHn+EGvY/soTguXoYbkxdp275oVsLkuvRvvz
+         qnRpQLHzrN5Oc8KR7x5BXSY1YrkKl64oteQPukRRcOwECrKUfccjS1OTE8cz/kq/Jbex
+         gqBcQVz+QZisvO2Z61hnXlkd+b5txb2LSmU7eE3E7q/sKmc2iE5LIdzJnONqO7somYrw
+         o0Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691924361; x=1692529161;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vUkOCDgMbe4HtJ5KVuy5PNulyqCVnGGCHOXRR9jkCWM=;
-        b=NfPNGvgmjnPkjWsdKvlzUcOq/z9QyzzUFyWTu6OYm/hu1pESXAPOsLxXEV8yMgpG8z
-         1sgXRo0raMzcE2VTh2Y1B3J6N5k59Gao8ecsVFb3vr6ubAW8aABRka0f/GHNZRpt8E+S
-         D7y9Q8JX/7vXF9uKtDg3M6nUFPqwyhA0b+ncQlHvNjc6cpFThiQdcjCu7SMU++dfmruD
-         bGrJbA87znv6jegCaXub/5xOm2VdbceKo7Zd7buApCIZI1AxsHseOFvrMz84i97giL0M
-         8tBQnAKQLadKEsKBC7ueOSrtuvHHMbwfJlbqcl4m4HsLVi7YFAf45dkffUQg500k5O7M
-         OfAA==
-X-Gm-Message-State: AOJu0YyVIUGbP1FgYNzzWnhOR9CC5j/0V0ZpxRebW3+Pdk2zM0axN4Nz
-	usf/oZlBh0nFZEaIgGq+Lj0=
-X-Google-Smtp-Source: AGHT+IGeccqf10JBT4frZ8qVV6ymSM2uS7RXCVzBDv9HcxqawycBH/cHFnuO55SKxMXoVxlAPEzyVw==
-X-Received: by 2002:a17:906:5a4b:b0:99c:8906:4b25 with SMTP id my11-20020a1709065a4b00b0099c89064b25mr5716071ejc.74.1691924361333;
-        Sun, 13 Aug 2023 03:59:21 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691924870; x=1692529670;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+JzoWKJWfDj4FguRZ7Oco2p7HgbsRYijC1lYv2wlZ+U=;
+        b=N5kQWz8TUi8k1JYbVPBXY7ubeod4aFmgU1SFDvrJxPFoV/CC8VVsC3rWNOsP5tCJ4j
+         mvh25umdK59NiNOAacjrNb8XTxZirwbRHqvikTbTepIdAaMKpdzs9sjeBTrMt5kbFIj2
+         dSOnziwqJVbBYl3l4MgCZT9zgum7Ux5AkkCx6wKvu+TgHqB5/xde/E489J5NV+ylIFDw
+         9D6tSbauHqKvpgJ1wKb7njYqI6odga166JG5iA5Jkv+u0UppdE/xM9F8UTbEV69OOqpA
+         aKJQ8oVn+ttXyIAhAbXhtkbdia+Xs/xnzN2cM5S+p9k5M0eiFc1/Ob/EVISW2N9trffA
+         gYvA==
+X-Gm-Message-State: AOJu0Ywv4WW4AGKLGt8E2QwpJppRtkQTFd58IwO/8WepKX+PZDQq1zJS
+	vttMe6eGZT+ekIgCvaclJ5A=
+X-Google-Smtp-Source: AGHT+IGiBbzIr6xiUxTXEqiYjsMf2mnAhUrlkotMHGlTp3fQ8LNKaqiiDrm0mAkbHAIKUi8nhneRlQ==
+X-Received: by 2002:a17:906:14e:b0:99b:f3d1:7735 with SMTP id 14-20020a170906014e00b0099bf3d17735mr5293600ejh.29.1691924870146;
+        Sun, 13 Aug 2023 04:07:50 -0700 (PDT)
 Received: from skbuf ([188.27.184.148])
-        by smtp.gmail.com with ESMTPSA id jx20-20020a170906ca5400b0099d804da2e9sm2866393ejb.225.2023.08.13.03.59.20
+        by smtp.gmail.com with ESMTPSA id a17-20020a170906671100b0099bd8c1f67esm4453038ejp.109.2023.08.13.04.07.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Aug 2023 03:59:21 -0700 (PDT)
-Date: Sun, 13 Aug 2023 13:59:18 +0300
+        Sun, 13 Aug 2023 04:07:49 -0700 (PDT)
+Date: Sun, 13 Aug 2023 14:07:47 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Sergei Antonov <saproj@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: dsa: mv88e6060: add phylink_get_caps
- implementation
-Message-ID: <20230813105918.fmfcoiaqlqecivep@skbuf>
-References: <E1qUkx7-003dMX-9b@rmk-PC.armlinux.org.uk>
- <E1qUkx7-003dMX-9b@rmk-PC.armlinux.org.uk>
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: microchip,lan937x: add
+ missing ethernet on example
+Message-ID: <20230813110747.rvvsvte2t6pbe5j4@skbuf>
+References: <20230812091708.34665-1-arinc.unal@arinc9.com>
+ <20230812091708.34665-1-arinc.unal@arinc9.com>
+ <20230812091708.34665-2-arinc.unal@arinc9.com>
+ <20230812091708.34665-2-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <E1qUkx7-003dMX-9b@rmk-PC.armlinux.org.uk>
- <E1qUkx7-003dMX-9b@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230812091708.34665-2-arinc.unal@arinc9.com>
+ <20230812091708.34665-2-arinc.unal@arinc9.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -87,15 +105,49 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 12, 2023 at 10:30:33AM +0100, Russell King (Oracle) wrote:
-> Add a phylink_get_caps implementation for Marvell 88e6060 DSA switch.
-> This is a fast ethernet switch, with internal PHYs for ports 0 through
-> 4. Port 4 also supports MII, REVMII, REVRMII and SNI. Port 5 supports
-> MII, REVMII, REVRMII and SNI without an internal PHY.
+On Sat, Aug 12, 2023 at 12:17:05PM +0300, Arınç ÜNAL wrote:
+> The port@5 node on the example is missing the ethernet property. Add it.
+> Remove the MAC bindings on the example as they cannot be validated.
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 > ---
+>  .../bindings/net/dsa/microchip,lan937x.yaml           | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+> index 8d7e878b84dc..49af4b0d5916 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+> @@ -68,16 +68,6 @@ examples:
+>    - |
+>      #include <dt-bindings/gpio/gpio.h>
+>  
+> -    macb0 {
+> -            #address-cells = <1>;
+> -            #size-cells = <0>;
+> -
+> -            fixed-link {
+> -                    speed = <1000>;
+> -                    full-duplex;
+> -            };
+> -    };
+> -
+>      spi {
+>              #address-cells = <1>;
+>              #size-cells = <0>;
+> @@ -138,6 +128,7 @@ examples:
+>                                      phy-mode = "rgmii";
+>                                      tx-internal-delay-ps = <2000>;
+>                                      rx-internal-delay-ps = <2000>;
+> +                                    ethernet = <&macb1>;
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+macb1 instead of macb0: was it intentional?
+
+>  
+>                                      fixed-link {
+>                                              speed = <1000>;
+> -- 
+> 2.39.2
+> 
+
 
