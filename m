@@ -1,53 +1,55 @@
-Return-Path: <netdev+bounces-27163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 617FD77A949
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 18:12:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3679377A94A
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 18:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9296E1C20965
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:12:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D5A1C2096F
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2E58F52;
-	Sun, 13 Aug 2023 16:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A368F52;
+	Sun, 13 Aug 2023 16:12:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209178825;
-	Sun, 13 Aug 2023 16:12:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76BB0C433C7;
-	Sun, 13 Aug 2023 16:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2338F4F
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 16:12:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8378C433C7;
+	Sun, 13 Aug 2023 16:12:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691943128;
-	bh=JbgolobhW7kbZvMZt0HTCiNppeSYP5KrDUBliH8hbVA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dmCTlpuV45l+KsWpMuhIjyXd6vvEHX+RGqZsjxVWCT6JRvsLdr79aGBb/5Z4KlMBl
-	 L3TbVUOtN2o+KhskZfMgcqFVS4/n1DmeoN9Tvv61MFOCaFZ7Lu2XOf4gpDAQQoKmjx
-	 gkx1hsjt4Gr38U026rVoJ+7Bmm0JUZDUrg0+FNZyfOkYPo5geR2vTLBxzwr5KxyjdB
-	 i7qqpmhNQEpxD39qpxCsFBzM0EbZKdUKeW8lz6lsH74dK2EHNW789hCNdmodjXdyKT
-	 xh6upD7QC86vDgL+YtFCW0cGFKuiPmZZ0VTGseqHJOgAvZh5b3iLXeU1Sd72DaBeER
-	 yTdoYcQnIbgxg==
+	s=k20201202; t=1691943143;
+	bh=pUhHomwpsMbBnYK/7qs+qvKtOqAEWcAL813zxbIscRg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IQBQ21dx10NDOydHEM51I50eIYIKsTy5Ur8pT3xAQKr1LA3DWVmT84LXFqBnDXpLo
+	 +ncEn/5fxplpwFb1KTVylM425rlOyt2PTz24v7xCldQKuCZqM7J5hEdEEFDxk0fy27
+	 tg+bswI+YRmEOfgprZKNW4F93PPqPwe6aNPS5Uw6/4gM/wH4RPWRyXyzlB/eLaHy4K
+	 r9+O2N6vqk8eX91B82r8aRUzxreGpGzLIDa6OTK536yu2w8bi7BqE8247Gyrx7ZBUc
+	 +OYNCvnHjZTG1VrvaPez32YU0jobGOgQgho2KnlCZ6kBLafv24qMOGrUbibvRvk1iD
+	 a77tny+R4cX+A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Dominique Martinet <asmadeus@codewreck.org>,
+Cc: Yuanjun Gong <ruc_gongyuanjun@163.com>,
 	Simon Horman <simon.horman@corigine.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	lucho@ionkov.net,
-	davem@davemloft.net,
+	chris.snook@gmail.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	v9fs@lists.linux.dev,
+	pavan.chebbi@broadcom.com,
+	trix@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 01/14] 9p: virtio: make sure 'offs' is initialized in zc_request
-Date: Sun, 13 Aug 2023 12:11:49 -0400
-Message-Id: <20230813161202.1086004-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 04/14] ethernet: atheros: fix return value check in atl1c_tso_csum()
+Date: Sun, 13 Aug 2023 12:11:52 -0400
+Message-Id: <20230813161202.1086004-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230813161202.1086004-1-sashal@kernel.org>
+References: <20230813161202.1086004-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,41 +61,40 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.253
 Content-Transfer-Encoding: 8bit
 
-From: Dominique Martinet <asmadeus@codewreck.org>
+From: Yuanjun Gong <ruc_gongyuanjun@163.com>
 
-[ Upstream commit 4a73edab69d3a6623f03817fe950a2d9585f80e4 ]
+[ Upstream commit 8d01da0a1db237c44c92859ce3612df7af8d3a53 ]
 
-Similarly to the previous patch: offs can be used in handle_rerrors
-without initializing on small payloads; in this case handle_rerrors will
-not use it because of the size check, but it doesn't hurt to make sure
-it is zero to please scan-build.
+in atl1c_tso_csum, it should check the return value of pskb_trim(),
+and return an error code if an unexpected value is returned
+by pskb_trim().
 
-This fixes the following warning:
-net/9p/trans_virtio.c:539:3: warning: 3rd function call argument is an uninitialized value [core.CallAndMessage]
-                handle_rerror(req, in_hdr_len, offs, in_pages);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+Signed-off-by: Yuanjun Gong <ruc_gongyuanjun@163.com>
 Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
-Signed-off-by: Eric Van Hensbergen <ericvh@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/9p/trans_virtio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/atheros/atl1c/atl1c_main.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
-index f582351d84ecb..36b5f72e2165c 100644
---- a/net/9p/trans_virtio.c
-+++ b/net/9p/trans_virtio.c
-@@ -394,7 +394,7 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
- 	struct page **in_pages = NULL, **out_pages = NULL;
- 	struct virtio_chan *chan = client->trans;
- 	struct scatterlist *sgs[4];
--	size_t offs;
-+	size_t offs = 0;
- 	int need_drop = 0;
- 	int kicked = 0;
+diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+index 2b239ecea05f2..ff28dbf515747 100644
+--- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
++++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+@@ -1989,8 +1989,11 @@ static int atl1c_tso_csum(struct atl1c_adapter *adapter,
+ 			real_len = (((unsigned char *)ip_hdr(skb) - skb->data)
+ 					+ ntohs(ip_hdr(skb)->tot_len));
  
+-			if (real_len < skb->len)
+-				pskb_trim(skb, real_len);
++			if (real_len < skb->len) {
++				err = pskb_trim(skb, real_len);
++				if (err)
++					return err;
++			}
+ 
+ 			hdr_len = (skb_transport_offset(skb) + tcp_hdrlen(skb));
+ 			if (unlikely(skb->len == hdr_len)) {
 -- 
 2.40.1
 
