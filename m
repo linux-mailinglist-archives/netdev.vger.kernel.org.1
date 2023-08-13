@@ -1,206 +1,351 @@
-Return-Path: <netdev+bounces-27127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36BB377A6D3
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:18:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9DB77A6FF
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66E391C208F6
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 14:18:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77718280FA7
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 14:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EABF746B;
-	Sun, 13 Aug 2023 14:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF2C5395;
+	Sun, 13 Aug 2023 14:38:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7AD2C9D
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 14:18:33 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69AC310FC;
-	Sun, 13 Aug 2023 07:18:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691936312; x=1723472312;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=vaY0h3XyjILUoFc0gEPKPcVu7f2rYwwaHrLpd3OZXXA=;
-  b=VyOuRLE05V9MWHmpsZjAqBQwaOZAZkCCarXemD1AOI3YULR0eUSgWLlQ
-   9Z57AuFFuWyOSi99qQcfFSkh+9lMQEWcemsMwMSQr7EpYYy5p49Tj96mZ
-   Sr/RVLsXKssEw0E1UhFHSnbFex1OyeNJT5T8IdNk/d5oMZA6bYE9uqazi
-   1+4SBNm6Th++FGG6DMLcqZ7oOmmtTfb4OjunS89nHLoQl4E8Y+TorRFiK
-   6HWt94nCY5Nrqtkxw6T6zDE4nACTf4w2v/7XHb5MLjR3dx5Hg87yrdY8Q
-   0hkZTq4l5Ik8FHpttwjdRvD7sOldIeQFEDtwowWYoHgq+s56piTCdQbT2
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="374663746"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="374663746"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 07:18:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="847332846"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="847332846"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga002.fm.intel.com with ESMTP; 13 Aug 2023 07:18:31 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 13 Aug 2023 07:18:30 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 13 Aug 2023 07:18:30 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Sun, 13 Aug 2023 07:18:30 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Sun, 13 Aug 2023 07:18:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LqT7EtZ6mUrb15Dwyfntwhsqc/wYGbHMHA4BVRECauqXyeRLWOef2FcYyqz0B1LgXiY86EeLBjXXJLgigJMgBI5NI+m1BW4yu5lltqVmcN8R9gOtnxvKngv6/B+tFCBAWN/cRq8qQ44G7CNsnO/jomWpDZYd3hePsx0pXi/+jSccvYu+r4sKGCiWwVMWAYjg9NQE9681VqR7o8mD1tt9rcxZv5v0KZsN4wUtPA/sKNtemzBe7d5Nxkq6+vlsWKzpw7StSVCNCckAlyNceOLClJuu+1biD8f4TamPf0LLgGjwUBx6l+SfQGJGnZc/2RCIFVLB5bZ0kPbMjdL+vHpKTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UHNc4WT05Tyr68XHRxFS77w9+irKaS3Tiea8lIm3Cqk=;
- b=CTaeFeEmu3Q+wafJg9s6RlT3yuczUpiTqFk3Dx8+GYModFCKKAkHI9qXfmOoccLpDea/eVgnapU0RbFHjLLFA3LQ++4aAwiXwH7F6/P/ojzq/8vQPy8vkcIqXeVQ2p7dCeYzXr3wH9DQCRohLJ3mCYANzwOHqTekhlJ84IQwOAmXKsMPJnwc3uZHwQ50z2aWyoh3JqW+0EtTNxZ90VXsTQVPo6NMJT4vEgykk44CJlxLCgo9AklGTkc6vrPLyb2wkPUj7hAjAuief2Qb2P6fMopTt/ty3HR/8LvUbZV6P9/kucPAdwsZfloAOad+CZBW3WqVJVY6J8frHWkqAKy/kQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM3PR11MB8714.namprd11.prod.outlook.com (2603:10b6:0:b::18) by
- CY8PR11MB7171.namprd11.prod.outlook.com (2603:10b6:930:92::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.24; Sun, 13 Aug 2023 14:18:28 +0000
-Received: from DM3PR11MB8714.namprd11.prod.outlook.com
- ([fe80::b393:daa3:e9cb:58d9]) by DM3PR11MB8714.namprd11.prod.outlook.com
- ([fe80::b393:daa3:e9cb:58d9%7]) with mapi id 15.20.6678.022; Sun, 13 Aug 2023
- 14:18:28 +0000
-From: "G Thomas, Rohan" <rohan.g.thomas@intel.com>
-To: "jszhang@kernel.org" <jszhang@kernel.org>
-CC: "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
-	"joabreu@synopsys.com" <joabreu@synopsys.com>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"peppe.cavallaro@st.com" <peppe.cavallaro@st.com>, "robh+dt@kernel.org"
-	<robh+dt@kernel.org>
-Subject: Re: [PATCH net-next v3 03/10] net: stmmac: mdio: enlarge the max
- XGMAC C22 ADDR to 31
-Thread-Topic: Re: [PATCH net-next v3 03/10] net: stmmac: mdio: enlarge the max
- XGMAC C22 ADDR to 31
-Thread-Index: AdnN64iTNewURgUoSuyDlZj1njalFw==
-Date: Sun, 13 Aug 2023 14:18:27 +0000
-Message-ID: <DM3PR11MB871491A357B9A12BF1B0CC82DE16A@DM3PR11MB8714.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM3PR11MB8714:EE_|CY8PR11MB7171:EE_
-x-ms-office365-filtering-correlation-id: 090729dc-b9ea-43de-2571-08db9c0829eb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: JfStwQbltdlwz2SAUWUD/gY/hlB/z66LoJZ4vlekB8C0hGjvYTWJfTIYImx16O1t12OZdQn/0kekJvRdP7il6Rk233JW+TKIfWC/QCF2PCDQ4qbv6umh9XGgExMD85RrZq4iUvGy01qJ6nF8kBq7gF31yV0rnilNmRyI/t6VIAHDEneRkHFs0nuDZIFvvVD3giH3NR8dh6DN+LpR4kVNZ0SeeNxkOrwuq31nIYrjtbh3HOL9SATqZ6MEk9O9Mg5ty6A7lZKzvNOUhL9WeT75mdMWwKJ6wkvrk+y5ncc+3deJdha5gHDlm8QzFe3L8oayKCEmP5tWeTRMW/KaKBBThycjxuvAr4Q1Sf5ws8H3gqXlv/mIjf3nqVBupl7b3HiBA54qZYuKb8Nw/1jOd3G2IcvDHUZgThHgEEbfOmqi0xOcMjcqA0igvZO7y13T2dTHQNA7ozKL9hsI1wtQb+JKE/futxMV6iCupy6fXnT1H7iC2LGhJllpAIQ36QRuvlwskZt7SDxZTh92UqLyhRuGGzv/5J/aIUh/g+D3q9EA7pUlS2pDQx+0NsZK+r2AbiSmV0PRgqwNVX+eAB5yL/5wNTy3SCIJZgZHBoU4e8fyp1iD5WZpDeligNlAUMJ6mhTQytJh1s5vhoX6gkDCPjayKg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8714.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(136003)(396003)(366004)(346002)(186006)(451199021)(1800799006)(66946007)(66556008)(64756008)(66446008)(66476007)(6916009)(76116006)(316002)(41300700001)(54906003)(8936002)(8676002)(52536014)(5660300002)(478600001)(71200400001)(7416002)(2906002)(53546011)(6506007)(9686003)(83380400001)(26005)(7696005)(4326008)(82960400001)(55016003)(38070700005)(38100700002)(122000001)(86362001)(33656002)(147533002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VbzEWJQQbUoCAsPHEIpBPZriIQFOJHwwflswVQog5SJIPM52NOvy3Qbt9YNV?=
- =?us-ascii?Q?q499XE7HLIbNlx0XuZBNkaJjc3Q25Ia+SDnphCuvlGRqRN5aLHOH1EPqmhA4?=
- =?us-ascii?Q?bo9Khwl6Wnv5sm5rlLDNRHr8pbtRm3Olo36qpxB4pIsKOCHYyJG6xoyXwxMs?=
- =?us-ascii?Q?9h0QnUWyyOJQXZ0YM4U+Ic3fl3LehPf9FtjwRHrZSiiHrrta6orNjtt7P3Eu?=
- =?us-ascii?Q?5EWBpH9BlCE0/eb6BjtKxrOzpfZ4cxb5ngr7XEdNvEcnUpSDj7n5E0lujxlB?=
- =?us-ascii?Q?h8Abt226HIYvmcPL1TwGOuD0BRxx54BMaNwCvIO9zedKFgGYY5e7rllDdiAo?=
- =?us-ascii?Q?bsDstZs1RQg02Z1T5m3+kqGptlZAIPF6DyivVUHV7L8+tlX+velGJ7MLxRz7?=
- =?us-ascii?Q?Ob/AlseYxcbrLI0gvCWhP3s6SjY7ZHpQ7RxYbsmkUxy4hTMNsAQ5ZhAbg+VO?=
- =?us-ascii?Q?38DKr6KHVS+EatduprsveJWPArNQYdmeSdtyGsONKq9TjK/6gFuojMmlELEM?=
- =?us-ascii?Q?zU7PzRdWACzeqCs5vfGZUTXxv3tN1JXW5S0GPORlMUWbKU+xZhUiXdgpexpO?=
- =?us-ascii?Q?qeAZOL7lzj3P2arF97SBEFm9JX1KSPKBVv+jrJ6sA4skwOMa6UBjB5aZX5PW?=
- =?us-ascii?Q?gm0qSj/Tcm0F538sEpq7TIlLq/W21wXm/pAV5jNN/2ZomkYD0B+GSQUGB9++?=
- =?us-ascii?Q?xMwOgVei1V9aliw2aBUICkt3l5YxfjMgTeBhIpbud/t8i7yXADhQeSWRIV+i?=
- =?us-ascii?Q?I9tjWzs+8EkJ6ybEHCS0+ppkJZKvQ/HinYY4s3AQnqCghhcgbudVJoFPDr7q?=
- =?us-ascii?Q?ff/bBK+ZPyJiyP7foUSzycIhm6yNl+HpNwrUjuFleZY7E3JRhxp3ep5rtzm5?=
- =?us-ascii?Q?5lyUJHDzdURKpAkEWmtZw7a2iOsIS65I4gXFc/5Vj+r3K2GoqMmPUgD7IK37?=
- =?us-ascii?Q?CMqhnLrElVQi3DNxNUAFkWiL0yu6qJz3TULpKLdFLmuiV8sTKmTeb/Xge6rA?=
- =?us-ascii?Q?feitfmlipPIZy+z6uXhyblIHnq/RH6SHSx+JUosxjwjB6WCRuA713RbAlVP8?=
- =?us-ascii?Q?16sLEpeJv/Ln4ye4LATl44VYmwXqk+tT+C4Y3TkMwtj/bA3GTh2phbpDe0GV?=
- =?us-ascii?Q?Cd9q4o7rqHOPfJ0tWpHRCXHDKzto60mYz3+x+L0hTPG3jcokRp+QW/E+eUpY?=
- =?us-ascii?Q?sNYZWstkugYsT7gQNbF2rH0EghlEURM4oODLulNY+z+9dOL/bw39D6ffn7z2?=
- =?us-ascii?Q?BDlY/Ndmzzm5Sa67aKc3So+XxRMYRk48Kr2i1sg0Wa1CepATOWinSoRu2QOC?=
- =?us-ascii?Q?AXVESlcrrW2x3jkPD+C9fB2xtoZ6n5JqCNKr1IW9qvNU9FU1t1EB2Se70nVf?=
- =?us-ascii?Q?sed1Xt1aS7iICmnmmoNvoDWFyP9L6J2IPEl1dGOUru/KLTjw+1hs9cw1X9DO?=
- =?us-ascii?Q?gzgBR9p6Tgs/mJbQdopI8s2Uc+VXQX9vDb7uJmbtocTzRP6Nu20XrtZIkntr?=
- =?us-ascii?Q?uLajo0UFmGadfn2vImkHLbg1vaJdNZz1N5NV8PUuzBds9R1XU68J75i1pMAw?=
- =?us-ascii?Q?rKiVntObqY0xPhMTKcK9E/N8PLV0WA/b81/+JraB?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211C03D7A
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 14:38:38 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 352CC10DE
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 07:38:37 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0EE5A1F8C2;
+	Sun, 13 Aug 2023 14:38:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1691937515; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XG77WwgrbqNAtRpiCA9zFnnIvUyShu4BoNdctPor2wE=;
+	b=Bg/qQOqZ16DQASt5PLdWIG883y/1UYlTRzdcUTK3KTNwsltZUhdmF+5frxlNsNCi+h3qBD
+	dA24fBX+9VuRSJNULZIoTY5jWxSOX/7h8lLhkqAvd3XQm2/bUVIl9ywJJxJFuclhPlRaxg
+	Uub35h9LLG0s39+ZvFiIh9A2PKZxF1U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1691937515;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XG77WwgrbqNAtRpiCA9zFnnIvUyShu4BoNdctPor2wE=;
+	b=FWueex4DGXdIEKQISY/F2VuXT0F0EzMIBl4Spw4qs01qVYCmHh3jsw0J4s6OCm2U228qlM
+	20ILG2j/LsYKX9BQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BC7351322C;
+	Sun, 13 Aug 2023 14:38:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id VD3FLOrq2GSzEAAAMHmgww
+	(envelope-from <hare@suse.de>); Sun, 13 Aug 2023 14:38:34 +0000
+Message-ID: <fe971baa-e009-2388-dc0b-54eb4788eb3f@suse.de>
+Date: Sun, 13 Aug 2023 16:38:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8714.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 090729dc-b9ea-43de-2571-08db9c0829eb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2023 14:18:27.9451
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Zz0FiPSy3zx1j7ehIrxH4keH4iM4UiZQtrgB2Y+/e538zTzoDLg57LCehLrI1bC/P7WCuIm9tKSS5jTH1jh79A5Q1VFvQUn5nZHEeWSuJLE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7171
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 14/17] nvmet-tcp: reference counting for queues
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230811121755.24715-1-hare@suse.de>
+ <20230811121755.24715-15-hare@suse.de>
+ <6aa77bb8-8d22-3e40-c8fe-654b5c094b10@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <6aa77bb8-8d22-3e40-c8fe-654b5c094b10@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 8/13/23 16:01, Sagi Grimberg wrote:
+> 
+> 
+> On 8/11/23 15:17, Hannes Reinecke wrote:
+>> The 'queue' structure is referenced from various places and
+>> used as an argument of asynchronous functions, so it's really
+>> hard to figure out if the queue is still valid when the
+>> asynchronous function triggers.
+>> So add reference counting to validate the queue structure.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>> ---
+>>   drivers/nvme/target/tcp.c | 74 ++++++++++++++++++++++++++++++---------
+>>   1 file changed, 57 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+>> index f19ea9d923fd..84b726dfc1c4 100644
+>> --- a/drivers/nvme/target/tcp.c
+>> +++ b/drivers/nvme/target/tcp.c
+>> @@ -127,6 +127,7 @@ enum nvmet_tcp_queue_state {
+>>   };
+>>   struct nvmet_tcp_queue {
+>> +    struct kref        kref;
+>>       struct socket        *sock;
+>>       struct nvmet_tcp_port    *port;
+>>       struct work_struct    io_work;
+>> @@ -192,6 +193,9 @@ static struct workqueue_struct *nvmet_tcp_wq;
+>>   static const struct nvmet_fabrics_ops nvmet_tcp_ops;
+>>   static void nvmet_tcp_free_cmd(struct nvmet_tcp_cmd *c);
+>>   static void nvmet_tcp_free_cmd_buffers(struct nvmet_tcp_cmd *cmd);
+>> +static int nvmet_tcp_get_queue(struct nvmet_tcp_queue *queue);
+>> +static void nvmet_tcp_put_queue(struct nvmet_tcp_queue *queue);
+>> +static void nvmet_tcp_data_ready(struct sock *sk);
+>>   static inline u16 nvmet_tcp_cmd_tag(struct nvmet_tcp_queue *queue,
+>>           struct nvmet_tcp_cmd *cmd)
+>> @@ -1437,11 +1441,21 @@ static void 
+>> nvmet_tcp_restore_socket_callbacks(struct nvmet_tcp_queue *queue)
+>>       struct socket *sock = queue->sock;
+>>       write_lock_bh(&sock->sk->sk_callback_lock);
+>> +    /*
+>> +     * Check if nvmet_tcp_set_queue_sock() has been called;
+>> +     * if not the queue reference has not been increased
+>> +     * and we're getting an refcount error on exit.
+>> +     */
+>> +    if (sock->sk->sk_data_ready != nvmet_tcp_data_ready) {
+>> +        write_unlock_bh(&sock->sk->sk_callback_lock);
+>> +        return;
+>> +    }
+> 
+> This is really ugly I think.
+> 
+Me too, but what would be the alternative?
 
-On 8/9/23 18:50, Jisheng Zhang wrote:
-> The IP can support up to 31 xgmac c22 addresses now.
->=20
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/=
-net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> index 3db1cb0fd160..e6d8e34fafef 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> @@ -40,7 +40,7 @@
->   #define MII_XGMAC_WRITE			(1 << MII_XGMAC_CMD_SHIFT)
->   #define MII_XGMAC_READ			(3 << MII_XGMAC_CMD_SHIFT)
->   #define MII_XGMAC_BUSY			BIT(22)
-> -#define MII_XGMAC_MAX_C22ADDR		3
-> +#define MII_XGMAC_MAX_C22ADDR		31
->   #define MII_XGMAC_C22P_MASK		GENMASK(MII_XGMAC_MAX_C22ADDR, 0)
->   #define MII_XGMAC_PA_SHIFT		16
->   #define MII_XGMAC_DA_SHIFT		21
+>>       sock->sk->sk_data_ready =  queue->data_ready;
+>>       sock->sk->sk_state_change = queue->state_change;
+>>       sock->sk->sk_write_space = queue->write_space;
+>>       sock->sk->sk_user_data = NULL;
+>>       write_unlock_bh(&sock->sk->sk_callback_lock);
+>> +    nvmet_tcp_put_queue(queue);
+>>   }
+>>   static void nvmet_tcp_uninit_data_in_cmds(struct nvmet_tcp_queue 
+>> *queue)
+>> @@ -1474,6 +1488,30 @@ static void 
+>> nvmet_tcp_free_cmd_data_in_buffers(struct nvmet_tcp_queue *queue)
+>>           nvmet_tcp_free_cmd_buffers(&queue->connect);
+>>   }
+>> +static void nvmet_tcp_release_queue_final(struct kref *kref)
+>> +{
+>> +    struct nvmet_tcp_queue *queue = container_of(kref, struct 
+>> nvmet_tcp_queue, kref);
+>> +
+>> +    WARN_ON(queue->state != NVMET_TCP_Q_DISCONNECTING);
+>> +    nvmet_tcp_free_cmds(queue);
+>> +    ida_free(&nvmet_tcp_queue_ida, queue->idx);
+>> +    /* ->sock will be released by fput() */
+>> +    fput(queue->sock->file);
+>> +    kfree(queue);
+>> +}
+>> +
+>> +static int nvmet_tcp_get_queue(struct nvmet_tcp_queue *queue)
+>> +{
+>> +    if (!queue)
+>> +        return 0;
+>> +    return kref_get_unless_zero(&queue->kref);
+>> +}
+>> +
+>> +static void nvmet_tcp_put_queue(struct nvmet_tcp_queue *queue)
+>> +{
+>> +    kref_put(&queue->kref, nvmet_tcp_release_queue_final);
+>> +}
+>> +
+>>   static void nvmet_tcp_release_queue_work(struct work_struct *w)
+>>   {
+>>       struct page *page;
+>> @@ -1493,15 +1531,11 @@ static void 
+>> nvmet_tcp_release_queue_work(struct work_struct *w)
+>>       nvmet_sq_destroy(&queue->nvme_sq);
+>>       cancel_work_sync(&queue->io_work);
+>>       nvmet_tcp_free_cmd_data_in_buffers(queue);
+>> -    /* ->sock will be released by fput() */
+>> -    fput(queue->sock->file);
+>> -    nvmet_tcp_free_cmds(queue);
+>>       if (queue->hdr_digest || queue->data_digest)
+>>           nvmet_tcp_free_crypto(queue);
+>> -    ida_free(&nvmet_tcp_queue_ida, queue->idx);
+>>       page = virt_to_head_page(queue->pf_cache.va);
+>>       __page_frag_cache_drain(page, queue->pf_cache.pagecnt_bias);
+>> -    kfree(queue);
+>> +    nvmet_tcp_put_queue(queue);
+> 
+> What made you pick these vs. the others for before/after the
+> final reference?
+> 
+I wanted to call 'nvmet_tcp_put_queue()' for a failed allocation
+in nvmet_tcp_alloc_queue(), and at that time the queue itself
+is not live.
+nvmet_tcp_release_queue() is only called on a live queue, so using
+that as the kref ->release() function would either limit it's
+usefulness or would require me to ensure that all calls in there
+can be made with a non-initialized argument.
 
-Recent commit 10857e677905 ("net: stmmac: XGMAC support for mdio C22
-addr > 3") already addressed this in a different way. As per Synopsis
-IP team until version 2.2, XGMAC supports only MDIO devices 0 - 3. An
-XGMAC IP version check is newly added for the same reason. I think this
-covers your commit also. Please have a look and if so you can drop this
-commit.
+>>   }
+>>   static void nvmet_tcp_data_ready(struct sock *sk)
+>> @@ -1512,8 +1546,10 @@ static void nvmet_tcp_data_ready(struct sock *sk)
+>>       read_lock_bh(&sk->sk_callback_lock);
+>>       queue = sk->sk_user_data;
+>> -    if (likely(queue))
+>> +    if (likely(nvmet_tcp_get_queue(queue))) {
+>>           queue_work_on(queue_cpu(queue), nvmet_tcp_wq, &queue->io_work);
+>> +        nvmet_tcp_put_queue(queue);
+>> +    }
+> 
+> No... Why?
+> 
+> The shutdown code should serialize perfectly without this. Why add
+> a kref to the normal I/O path?
+> 
+> I thought we'd simply move release_work to do a kref_put and take
+> an extra reference when we fire the tls handshake...
+> 
+Because I feel ever so slightly unsure about using the sk_user_data
+argument. This function is completely asynchronous, and I can't really
+see how we can ensure that sk_user_data references a valid object.
+(If it were valid, why would we need to check for !queue ?)
 
-BR,
-Rohan
+If you have lifetime guarantees that the kref isn't required, by all
+means, please tell me, and we can drop the kref thing here.
+But I guess that would imply to _not_ having to check for (!queue)
+which is fine by me, too.
+
+>>       read_unlock_bh(&sk->sk_callback_lock);
+>>   }
+>> @@ -1523,18 +1559,16 @@ static void nvmet_tcp_write_space(struct sock 
+>> *sk)
+>>       read_lock_bh(&sk->sk_callback_lock);
+>>       queue = sk->sk_user_data;
+>> -    if (unlikely(!queue))
+>> +    if (unlikely(!nvmet_tcp_get_queue(queue)))
+>>           goto out;
+>>       if (unlikely(queue->state == NVMET_TCP_Q_CONNECTING)) {
+>>           queue->write_space(sk);
+>> -        goto out;
+>> -    }
+>> -
+>> -    if (sk_stream_is_writeable(sk)) {
+>> +    } else if (sk_stream_is_writeable(sk)) {
+>>           clear_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+>>           queue_work_on(queue_cpu(queue), nvmet_tcp_wq, &queue->io_work);
+>>       }
+>> +    nvmet_tcp_put_queue(queue);
+> 
+> Same here...
+> 
+> Why not simply exclude the kref get/put to the tls handshake where
+> there is actually a race?
+> 
+It's not abot the handshake, it's about socket closing.
+See above.
+
+>>   out:
+>>       read_unlock_bh(&sk->sk_callback_lock);
+>>   }
+>> @@ -1545,7 +1579,7 @@ static void nvmet_tcp_state_change(struct sock *sk)
+>>       read_lock_bh(&sk->sk_callback_lock);
+>>       queue = sk->sk_user_data;
+>> -    if (!queue)
+>> +    if (!nvmet_tcp_get_queue(queue))
+>>           goto done;
+>>       switch (sk->sk_state) {
+>> @@ -1562,6 +1596,7 @@ static void nvmet_tcp_state_change(struct sock *sk)
+>>           pr_warn("queue %d unhandled state %d\n",
+>>               queue->idx, sk->sk_state);
+>>       }
+>> +    nvmet_tcp_put_queue(queue);
+>>   done:
+>>       read_unlock_bh(&sk->sk_callback_lock);
+>>   }
+>> @@ -1582,6 +1617,9 @@ static int nvmet_tcp_set_queue_sock(struct 
+>> nvmet_tcp_queue *queue)
+>>       if (ret < 0)
+>>           return ret;
+>> +    if (unlikely(!nvmet_tcp_get_queue(queue)))
+>> +        return -ECONNRESET;
+>> +
+> 
+> Can this actually fail?
+> 
+Yes. The socket might have been closed before this call.
+Unlikely, I know, but still...
+
+>>       /*
+>>        * Cleanup whatever is sitting in the TCP transmit queue on socket
+>>        * close. This is done to prevent stale data from being sent should
+>> @@ -1603,6 +1641,7 @@ static int nvmet_tcp_set_queue_sock(struct 
+>> nvmet_tcp_queue *queue)
+>>            * If the socket is already closing, don't even start
+>>            * consuming it
+>>            */
+>> +        nvmet_tcp_put_queue(queue);
+>>           ret = -ENOTCONN;
+>>       } else {
+>>           sock->sk->sk_user_data = queue;
+>> @@ -1636,6 +1675,7 @@ static void nvmet_tcp_alloc_queue(struct 
+>> nvmet_tcp_port *port,
+>>       INIT_WORK(&queue->release_work, nvmet_tcp_release_queue_work);
+>>       INIT_WORK(&queue->io_work, nvmet_tcp_io_work);
+>> +    kref_init(&queue->kref);
+>>       queue->sock = newsock;
+>>       queue->port = port;
+>>       queue->nr_cmds = 0;
+>> @@ -1672,15 +1712,15 @@ static void nvmet_tcp_alloc_queue(struct 
+>> nvmet_tcp_port *port,
+>>       mutex_unlock(&nvmet_tcp_queue_mutex);
+>>       ret = nvmet_tcp_set_queue_sock(queue);
+>> -    if (ret)
+>> -        goto out_destroy_sq;
+>> +    if (!ret)
+>> +        return;
+>> -    return;
+>> -out_destroy_sq:
+>> +    queue->state = NVMET_TCP_Q_DISCONNECTING;
+>>       mutex_lock(&nvmet_tcp_queue_mutex);
+>>       list_del_init(&queue->queue_list);
+>>       mutex_unlock(&nvmet_tcp_queue_mutex);
+>> -    nvmet_sq_destroy(&queue->nvme_sq);
+>> +    nvmet_tcp_put_queue(queue);
+>> +    return;
+>>   out_free_connect:
+>>       nvmet_tcp_free_cmd(&queue->connect);
+>>   out_ida_remove:
+
+But thanks for the review!
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
 
