@@ -1,117 +1,80 @@
-Return-Path: <netdev+bounces-27190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1C3A77AABC
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 21:02:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F3577AAC5
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 21:05:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA371C2082F
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 19:02:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05672280EF8
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 19:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5448F78;
-	Sun, 13 Aug 2023 19:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D769443;
+	Sun, 13 Aug 2023 19:05:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC538466
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 19:02:39 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EFF6170D;
-	Sun, 13 Aug 2023 12:02:32 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b9e6cc93d8so56808211fa.0;
-        Sun, 13 Aug 2023 12:02:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691953350; x=1692558150;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/1lGPqv1iSWWYndcdm44N796wnrwYOzK/z733GpYzNk=;
-        b=XiCI7liiU5Y+icmm8yci6xws0x3WQYQEwyvgXGsqkFEoZx7tuJdWJKhN3GCN2DyUF1
-         4IyL95YD3CQ7Nc7vyk3ts1qnnju0za83OWiz2xZ9cBAUwh2p0WxJfsRGBn86mZdIIkk/
-         XKlYkVr4gc69NnL3g71JvPsJyYwL+sRPSOOf6bzSBHeV/k20hdWGtHz0q9y5lm9qGVuf
-         WEiXmzXtI+RRyhBlNUfqIensHEEepUu8OeodNKmpWe6Cp42FvePmEUZjqKgiVm/9hMiT
-         J8kNEbYVP+P920fy+cX1fSEVIX50IAO2+tGS2vKT4OPKmR4uux0tHK1FfjL+x/WtsxvU
-         E9eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691953350; x=1692558150;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/1lGPqv1iSWWYndcdm44N796wnrwYOzK/z733GpYzNk=;
-        b=bWB+vQDG56igrFVtd3JYAPSYii17qGztXwfnTVru/DNz7QuDnvKkNvQFT43pYmn0jB
-         WM43Me1Cl75jERnnH4ODDXZ0mgPVMhzPJnkUHxkDLi1z/yzBOAJHGfVJiPqAquxlArds
-         L1SHQpGIzvaCbuBBkQ/QDn5DXy9Wm19Pl0dliFHPTeBnkjVhbtJVdI+ltmbEw+NRGsvJ
-         +cObC8aGG3zAxnxoG61cxQIJw8JChrP1gsuGKuCxEp4KWUHBcYXPqv3lSvkY1PWGFH7x
-         G/bJpHzrtB3dSoOGPXXq92TtVKP7I9iNMP1IxlHMRd3KMCLcxLKst2XjHTUtdo/qK+/w
-         GAVQ==
-X-Gm-Message-State: AOJu0YxIOsHMzJTO7hAXK9IKUENjx+wXI+PqJguAQ5i4MGZx/bK9YKts
-	j5cXcY7IZgCke3L5HMqXnjM=
-X-Google-Smtp-Source: AGHT+IGrieknj/tH+gn9lVfd6xWvlDTto2rG2CojERZaieo4pEES6TqmKcjZxrDymguLVX6hXVZy3Q==
-X-Received: by 2002:ac2:4d84:0:b0:4fa:21d4:b3ca with SMTP id g4-20020ac24d84000000b004fa21d4b3camr4649958lfe.2.1691953350032;
-        Sun, 13 Aug 2023 12:02:30 -0700 (PDT)
-Received: from skbuf ([188.27.184.148])
-        by smtp.gmail.com with ESMTPSA id w7-20020aa7da47000000b0052567e6586bsm209432eds.38.2023.08.13.12.02.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Aug 2023 12:02:29 -0700 (PDT)
-Date: Sun, 13 Aug 2023 22:02:27 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F59257D
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 19:05:04 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72246DA;
+	Sun, 13 Aug 2023 12:04:59 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qVGOJ-0000QV-0X;
+	Sun, 13 Aug 2023 19:04:43 +0000
+Date: Sun, 13 Aug 2023 20:04:29 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
 	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230813190227.6k2qyxfewbkmatn6@skbuf>
-References: <20230812091708.34665-3-arinc.unal@arinc9.com>
- <abc44324-454c-4524-b05e-fe989755ea47@arinc9.com>
- <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
- <abc44324-454c-4524-b05e-fe989755ea47@arinc9.com>
- <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <20230813112026.ohsx6srbt2staxma@skbuf>
- <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
- <891c0b67-abe1-416c-aa94-675f7f3d8044@arinc9.com>
+Subject: Re: [PATCH net-next v2] net: phy: mediatek-ge-soc: support PHY LEDs
+Message-ID: <ZNkpPRc9loNX2Wos@makrotopia.org>
+References: <32e534441225c62e3bf9384b797d9beda7475053.1691943605.git.daniel@makrotopia.org>
+ <8f20d427-91cc-4fbc-b263-dfc76df855f9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <891c0b67-abe1-416c-aa94-675f7f3d8044@arinc9.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+In-Reply-To: <8f20d427-91cc-4fbc-b263-dfc76df855f9@lunn.ch>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 13, 2023 at 05:58:57PM +0300, Arınç ÜNAL wrote:
-> On top of this, I'd argue to document the internal MDIO bus on the
-> ethernet-switch.yaml schema instead.
+On Sun, Aug 13, 2023 at 08:57:01PM +0200, Andrew Lunn wrote:
+> On Sun, Aug 13, 2023 at 05:24:55PM +0100, Daniel Golle wrote:
+> > Implement netdev trigger and primitive bliking offloading as well as
+> > simple set_brigthness function for both PHY LEDs of the in-SoC PHYs
+> > found in MT7981 and MT7988.
+> > 
+> > For MT7988, read boottrap register and apply LED polarities accordingly
+> 
+> Should this be bootstrap? With an S? boottrap appears quite often in
+> the code, so maybe the datasheet does say boottrap?
 
-Why?
+Yes, datasheet and vendor code refer to boottrap register which reflects
+the state of the pins used for bootStrapping the SoC...
+
+> 
+>     Andrew
 
