@@ -1,49 +1,57 @@
-Return-Path: <netdev+bounces-27142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84B3177A742
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 17:09:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8963977A761
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 17:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5E33280FB0
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 15:09:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39E96280E8F
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 15:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8778779EF;
-	Sun, 13 Aug 2023 15:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D84846C;
+	Sun, 13 Aug 2023 15:25:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D78917C5
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 15:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DD76FA6
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 15:25:00 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16ACE6A;
-	Sun, 13 Aug 2023 08:09:19 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF97E0;
+	Sun, 13 Aug 2023 08:25:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=W2wqWQ3KB/fmDRV98QTDbhm4GDqKPYDoQbKjO7pgA2A=; b=sBRi+Csjtr6xBLC3I5dkaj/nPc
-	pd49JvNMDPv6dCdCev/pwlJfth5VEqJKYm4uM2L0tUmD3MmypHo1S68O6LzSDDgMHtJyiKKWgxJxn
-	G7aksQUy4fSMml9R7ijGqMdGRUXTr5ClXS1HR9b5awTC4qrKlvN/puBIGB1zWLNQxQxk=;
+	bh=D6GK4r3g2pMNaj1/iMHxZq3AeQCZgFzlhT3OyuIGXJg=; b=uRaBb/AjtZ/XDK/WInjRB3JU3o
+	6m1Wl7WsYf6RGEtONjYbrd/7QyYu6c5BD4/xibXyQvgO7IhbBfjPnsfsQZcS6PI3yCfuYtqEjCSDc
+	ila7+dAYUp4jG02OEh/FfPskHSsqoYuKlBRhuu983PnIRovYNRIDZ+tSL4tRFKt2iPc8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qVCiQ-003yOJ-CP; Sun, 13 Aug 2023 17:09:14 +0200
-Date: Sun, 13 Aug 2023 17:09:14 +0200
+	id 1qVCxZ-003yRr-Jv; Sun, 13 Aug 2023 17:24:53 +0200
+Date: Sun, 13 Aug 2023 17:24:53 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Alfred Lee <l00g33k@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	sgarzare@redhat.com, AVKrasnov@sberdevices.ru
-Subject: Re: [PATCH v2 net] net: dsa: mv88e6xxx: Wait for EEPROM done before
- HW reset
-Message-ID: <dc56700c-8617-44de-8285-720e1514ebc9@lunn.ch>
-References: <20230811232832.24321-1-l00g33k@gmail.com>
- <20230813105804.2r4zdr6dyqe5dsrf@skbuf>
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+	Kelvin Zhang <kelvin.zhang@amlogic.com>
+Subject: Re: [PATCH 0/5] Move Loongson1 MAC arch-code to the driver dir
+Message-ID: <2ed268fd-113a-4da0-8f33-04d618053dca@lunn.ch>
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,35 +60,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230813105804.2r4zdr6dyqe5dsrf@skbuf>
+In-Reply-To: <20230812151135.1028780-1-keguang.zhang@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 13, 2023 at 01:58:04PM +0300, Vladimir Oltean wrote:
-> Hi Alfred,
+On Sat, Aug 12, 2023 at 11:11:30PM +0800, Keguang Zhang wrote:
+> From: Kelvin Zhang <kelvin.zhang@amlogic.com>
 > 
-> On Fri, Aug 11, 2023 at 04:28:32PM -0700, Alfred Lee wrote:
-> > If the switch is reset during active EEPROM transactions, as in
-> > just after an SoC reset after power up, the I2C bus transaction
-> > may be cut short leaving the EEPROM internal I2C state machine
-> > in the wrong state.  When the switch is reset again, the bad
-> > state machine state may result in data being read from the wrong
-> > memory location causing the switch to enter unexpect mode
-> > rendering it inoperational.
-> > 
-> > Fixes: 8abbffd27ced ("net: dsa: mv88e6xxx: Wait for EEPROM done after HW reset")
-> > Signed-off-by: Alfred Lee <l00g33k@gmail.com>
-> > ---
-> 
-> I don't think you understand the meaning of the Fixes: tag.
+> In order to convert Loongson1 MAC platform devices to the devicetree
+> nodes, Loongson1 MAC arch-code should be moved to the driver dir.
+>     
+> In other words, this patchset is a preparation for converting
+> Loongson1 platform devices to devicetree.
 
-The subject looks correct, but the hash is wrong. The correct hash is
-a3dcb3e7e70c72a68a79b30fc3a3adad5612731c.
+It is a long time since i converted an ARM system from platform data
+to DT. But what we tended to do was to allow both for a period of
+time.
 
-Fixes: a3dcb3e7e70c ("net: dsa: mv88e6xxx: Wait for EEPROM done after HW reset")
+Does a system using platform data still work after this change? The
+first patch seems to delete a lot of code, not just move it around.
 
-       Andrew
+Can you restructure this patchset to add the glue layer and DT binding
+in parallel with platform data. Then have a patchset which convert all
+in tree machines to using DT. And then a patchset, submitted in maybe
+6 months time, to remove support for platform data.
+
+	Andrew
 
