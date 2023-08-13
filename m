@@ -1,48 +1,53 @@
-Return-Path: <netdev+bounces-27158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078B677A8D8
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 18:07:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C85877A8F8
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 18:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCB741C20959
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:07:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBFD5280CD0
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 16:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEC78F57;
-	Sun, 13 Aug 2023 16:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB628BF4;
+	Sun, 13 Aug 2023 16:09:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F308F40
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 16:07:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE37C433C9;
-	Sun, 13 Aug 2023 16:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B750F8825
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 16:09:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D85FC433C8;
+	Sun, 13 Aug 2023 16:09:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691942827;
-	bh=xUGXoWAyBi8RvnPW66l+BhmdRQ0+9ggG17KUQfjkeXU=;
+	s=k20201202; t=1691942942;
+	bh=ue/Ai6RKwL0lcSy2kuBTBjDoCsGd2bPg7HDVZMm4BPQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=E+D6ayECLmSgOu/P9QzP+Y26CyREDtjWrrzdbn8Gwdy7i2YhZ4oif0d6FYN8CO8Gd
-	 TVtT2yhZeDcVO0NVDQnjgVHrxA2EzRTf5PdwwpAdVeCyeXGjwOpm4dLkpq4t2rVPZS
-	 IAgQ0t2zBNVuvAyhkXqKJPF9fPEpvWE8+WkwZjhvYczltz8zOk77xCp6pKdNELSUOy
-	 QEqQRRTBK2vogHEm7MgUz/864x5ooLZwt+wabEcy7tpiez8hoL3RUGkEO47AX21uD8
-	 mGmJ3DbVSSQt37qKaBq3fwMyjVBW6904cc5cFQM/okS/BrMPpehvF4Hc+kHHXLBOk1
-	 r8oRHnmzQrnrw==
+	b=hp/ZiysZVeKJWDfvjRnAUwVtmc01PYznLO9oBJPA7kT1Fv5xWVWMUs4LgtSrjBXM4
+	 mig5LpOtdfUiG2SQIFxHslrTfzPCXbGMgaWIp9o5McowG0Q9DPyxGWJtE4OnAW9bSE
+	 c5pUc7A8Zw+0Bp70g3JzZU8c+p1lFjElCZlBfFWqiRRdQ0hwah59wahXoZ2HacqzQc
+	 BurHPZ/tMd9Dge+K2yq+ac2KAgG0mChdwfYGOZGEiE0HQ9FVrlJuztSWZOVzlqXi2x
+	 SjY2NLI6fRBHq9+JHbSZ+LkInV40sSSg2E26VqlUMNbW6caKMsSWyZnwf3Az3mEszy
+	 LQ3khRFgi3rjw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jiri Benc <jbenc@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Ilya Dryomov <idryomov@gmail.com>,
+	Dongsheng Yang <dongsheng.yang@easystack.cn>,
 	Sasha Levin <sashal@kernel.org>,
+	axboe@kernel.dk,
+	xiubli@redhat.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	ceph-devel@vger.kernel.org,
+	linux-block@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 11/31] vxlan: generalize vxlan_parse_gpe_hdr and remove unused args
-Date: Sun, 13 Aug 2023 12:05:44 -0400
-Message-Id: <20230813160605.1080385-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 29/31] rbd: harden get_lock_owner_info() a bit
+Date: Sun, 13 Aug 2023 12:06:02 -0400
+Message-Id: <20230813160605.1080385-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230813160605.1080385-1-sashal@kernel.org>
 References: <20230813160605.1080385-1-sashal@kernel.org>
@@ -57,112 +62,84 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.126
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Benc <jbenc@redhat.com>
+From: Ilya Dryomov <idryomov@gmail.com>
 
-[ Upstream commit 17a0a64448b568442a101de09575f81ffdc45d15 ]
+[ Upstream commit 8ff2c64c9765446c3cef804fb99da04916603e27 ]
 
-The vxlan_parse_gpe_hdr function extracts the next protocol value from
-the GPE header and marks GPE bits as parsed.
+- we want the exclusive lock type, so test for it directly
+- use sscanf() to actually parse the lock cookie and avoid admitting
+  invalid handles
+- bail if locker has a blank address
 
-In order to be used in the next patch, split the function into protocol
-extraction and bit marking. The bit marking is meaningful only in
-vxlan_rcv; move it directly there.
-
-Rename the function to vxlan_parse_gpe_proto to reflect what it now
-does. Remove unused arguments skb and vxflags. Move the function earlier
-in the file to allow it to be called from more places in the next patch.
-
-Signed-off-by: Jiri Benc <jbenc@redhat.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Reviewed-by: Dongsheng Yang <dongsheng.yang@easystack.cn>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/vxlan.c | 58 ++++++++++++++++++++++-----------------------
- 1 file changed, 28 insertions(+), 30 deletions(-)
+ drivers/block/rbd.c  | 21 +++++++++++++++------
+ net/ceph/messenger.c |  1 +
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/vxlan.c b/drivers/net/vxlan.c
-index 129e270e9a7cd..90d656ea8fc6a 100644
---- a/drivers/net/vxlan.c
-+++ b/drivers/net/vxlan.c
-@@ -730,6 +730,32 @@ static int vxlan_fdb_append(struct vxlan_fdb *f,
- 	return 1;
- }
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 189e2f74b9147..1d2ba739fb268 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -3864,10 +3864,9 @@ static struct ceph_locker *get_lock_owner_info(struct rbd_device *rbd_dev)
+ 	u32 num_lockers;
+ 	u8 lock_type;
+ 	char *lock_tag;
++	u64 handle;
+ 	int ret;
  
-+static bool vxlan_parse_gpe_proto(struct vxlanhdr *hdr, __be16 *protocol)
-+{
-+	struct vxlanhdr_gpe *gpe = (struct vxlanhdr_gpe *)hdr;
-+
-+	/* Need to have Next Protocol set for interfaces in GPE mode. */
-+	if (!gpe->np_applied)
-+		return false;
-+	/* "The initial version is 0. If a receiver does not support the
-+	 * version indicated it MUST drop the packet.
-+	 */
-+	if (gpe->version != 0)
-+		return false;
-+	/* "When the O bit is set to 1, the packet is an OAM packet and OAM
-+	 * processing MUST occur." However, we don't implement OAM
-+	 * processing, thus drop the packet.
-+	 */
-+	if (gpe->oam_flag)
-+		return false;
-+
-+	*protocol = tun_p_to_eth_p(gpe->next_protocol);
-+	if (!*protocol)
-+		return false;
-+
-+	return true;
-+}
-+
- static struct vxlanhdr *vxlan_gro_remcsum(struct sk_buff *skb,
- 					  unsigned int off,
- 					  struct vxlanhdr *vh, size_t hdrlen,
-@@ -1738,35 +1764,6 @@ static void vxlan_parse_gbp_hdr(struct vxlanhdr *unparsed,
- 	unparsed->vx_flags &= ~VXLAN_GBP_USED_BITS;
- }
- 
--static bool vxlan_parse_gpe_hdr(struct vxlanhdr *unparsed,
--				__be16 *protocol,
--				struct sk_buff *skb, u32 vxflags)
--{
--	struct vxlanhdr_gpe *gpe = (struct vxlanhdr_gpe *)unparsed;
+-	dout("%s rbd_dev %p\n", __func__, rbd_dev);
 -
--	/* Need to have Next Protocol set for interfaces in GPE mode. */
--	if (!gpe->np_applied)
--		return false;
--	/* "The initial version is 0. If a receiver does not support the
--	 * version indicated it MUST drop the packet.
--	 */
--	if (gpe->version != 0)
--		return false;
--	/* "When the O bit is set to 1, the packet is an OAM packet and OAM
--	 * processing MUST occur." However, we don't implement OAM
--	 * processing, thus drop the packet.
--	 */
--	if (gpe->oam_flag)
--		return false;
--
--	*protocol = tun_p_to_eth_p(gpe->next_protocol);
--	if (!*protocol)
--		return false;
--
--	unparsed->vx_flags &= ~VXLAN_GPE_USED_BITS;
--	return true;
--}
--
- static bool vxlan_set_mac(struct vxlan_dev *vxlan,
- 			  struct vxlan_sock *vs,
- 			  struct sk_buff *skb, __be32 vni)
-@@ -1867,8 +1864,9 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 	 * used by VXLAN extensions if explicitly requested.
- 	 */
- 	if (vs->flags & VXLAN_F_GPE) {
--		if (!vxlan_parse_gpe_hdr(&unparsed, &protocol, skb, vs->flags))
-+		if (!vxlan_parse_gpe_proto(&unparsed, &protocol))
- 			goto drop;
-+		unparsed.vx_flags &= ~VXLAN_GPE_USED_BITS;
- 		raw_proto = true;
+ 	ret = ceph_cls_lock_info(osdc, &rbd_dev->header_oid,
+ 				 &rbd_dev->header_oloc, RBD_LOCK_NAME,
+ 				 &lock_type, &lock_tag, &lockers, &num_lockers);
+@@ -3888,18 +3887,28 @@ static struct ceph_locker *get_lock_owner_info(struct rbd_device *rbd_dev)
+ 		goto err_busy;
  	}
  
+-	if (lock_type == CEPH_CLS_LOCK_SHARED) {
+-		rbd_warn(rbd_dev, "shared lock type detected");
++	if (lock_type != CEPH_CLS_LOCK_EXCLUSIVE) {
++		rbd_warn(rbd_dev, "incompatible lock type detected");
+ 		goto err_busy;
+ 	}
+ 
+ 	WARN_ON(num_lockers != 1);
+-	if (strncmp(lockers[0].id.cookie, RBD_LOCK_COOKIE_PREFIX,
+-		    strlen(RBD_LOCK_COOKIE_PREFIX))) {
++	ret = sscanf(lockers[0].id.cookie, RBD_LOCK_COOKIE_PREFIX " %llu",
++		     &handle);
++	if (ret != 1) {
+ 		rbd_warn(rbd_dev, "locked by external mechanism, cookie %s",
+ 			 lockers[0].id.cookie);
+ 		goto err_busy;
+ 	}
++	if (ceph_addr_is_blank(&lockers[0].info.addr)) {
++		rbd_warn(rbd_dev, "locker has a blank address");
++		goto err_busy;
++	}
++
++	dout("%s rbd_dev %p got locker %s%llu@%pISpc/%u handle %llu\n",
++	     __func__, rbd_dev, ENTITY_NAME(lockers[0].id.name),
++	     &lockers[0].info.addr.in_addr,
++	     le32_to_cpu(lockers[0].info.addr.nonce), handle);
+ 
+ out:
+ 	kfree(lock_tag);
+diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
+index 57d043b382ed0..9bf085ddbe51f 100644
+--- a/net/ceph/messenger.c
++++ b/net/ceph/messenger.c
+@@ -1144,6 +1144,7 @@ bool ceph_addr_is_blank(const struct ceph_entity_addr *addr)
+ 		return true;
+ 	}
+ }
++EXPORT_SYMBOL(ceph_addr_is_blank);
+ 
+ int ceph_addr_port(const struct ceph_entity_addr *addr)
+ {
 -- 
 2.40.1
 
