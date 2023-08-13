@@ -1,52 +1,57 @@
-Return-Path: <netdev+bounces-27146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938E177A7A6
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 17:50:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5809777A7BE
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 17:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C66991C20904
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 15:50:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F564280F15
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 15:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40738829;
-	Sun, 13 Aug 2023 15:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A3F847B;
+	Sun, 13 Aug 2023 15:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7724A848A;
-	Sun, 13 Aug 2023 15:49:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB107C433C8;
-	Sun, 13 Aug 2023 15:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E5379DF
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 15:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A7F8C433C7;
+	Sun, 13 Aug 2023 15:50:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691941793;
-	bh=5G/6MmmDbF+aTI5FivsCQk62zOXuGQY9zq77rjeaItw=;
+	s=k20201202; t=1691941825;
+	bh=ySZLsf9RtmrTPiZ0OE31mAdhA4GkF9k0uIoMr3k1e6g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QMjNaX5TXxMQLMB6JeokgO2/21buQY9VLXC4E6syiAF7qe+BRaRy8HXrzsSz762vy
-	 wWWPHNdnM38zbrmU/fBnBJJ89v5+mwLt0jxuo9QyLfb0rgSAmTTWvcF3JEEHU9VwV8
-	 NuZnGcIlXuDd9Tg0dHDkpH5nvCdobVwSVulWX86YxmntcNK1GY9kLn+4TWzcmSfxTJ
-	 v7iXpLM9o650pNxVCDx7JaiECz6OpnRQGPdTexUdL//4TzWBZyl2Hf/5PVaS980Itx
-	 8nxGn4c7/zIx7WWs8lrEm4HhLVYhtKrYqJ/EKapx7j+20mDs8pMOMrSzie5ms/VXC9
-	 /x+4nfoA4S4Dw==
+	b=YJY+QBeB7ee52YGivxo05UdGujCtUZO6YciAkU8y94qqWHHZ7mwMGnhKslls0xX8w
+	 MdlBUVGiIn2x2vohoyOuhH7rn+LsnEgrTeuKf/0idlVKCDD73Qoz6dbOnRFBabIZ7E
+	 zScPGCgjfOw+XLr/P1Pb+ezGzabxd3LsmogLKHyp55GmTtBsdLqZWhdnW36n3tnfhd
+	 Pb1xvthZEd3BCA5Sn0+BOXTDzwGlBMJImSS3It5bYQzGcVdOmYWZZP3lbwzsErXpJJ
+	 IP44a32BTeNWnQ3kj59+39sK7jw4J+0uNdNUcm5pQu/AK283qsf1fbSybPdTygo99h
+	 fc4kyJKYw31ow==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Dominique Martinet <asmadeus@codewreck.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
+Cc: Hao Lan <lanhao@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	lucho@ionkov.net,
-	davem@davemloft.net,
+	yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	v9fs@lists.linux.dev,
+	huangguangbin2@huawei.com,
+	simon.horman@corigine.com,
+	chenhao418@huawei.com,
+	wangjie125@huawei.com,
+	shenjian15@huawei.com,
+	leon@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 10/54] 9p: virtio: make sure 'offs' is initialized in zc_request
-Date: Sun, 13 Aug 2023 11:48:49 -0400
-Message-Id: <20230813154934.1067569-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.4 19/54] net: hns3: add tm flush when setting tm
+Date: Sun, 13 Aug 2023 11:48:58 -0400
+Message-Id: <20230813154934.1067569-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230813154934.1067569-1-sashal@kernel.org>
 References: <20230813154934.1067569-1-sashal@kernel.org>
@@ -61,41 +66,232 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.4.10
 Content-Transfer-Encoding: 8bit
 
-From: Dominique Martinet <asmadeus@codewreck.org>
+From: Hao Lan <lanhao@huawei.com>
 
-[ Upstream commit 4a73edab69d3a6623f03817fe950a2d9585f80e4 ]
+[ Upstream commit 6d2336120aa6e1a8a64fa5d6ee5c3f3d0809fe9b ]
 
-Similarly to the previous patch: offs can be used in handle_rerrors
-without initializing on small payloads; in this case handle_rerrors will
-not use it because of the size check, but it doesn't hurt to make sure
-it is zero to please scan-build.
+When the tm module is configured with traffic, traffic
+may be abnormal. This patch fixes this problem.
+Before the tm module is configured, traffic processing
+should be stopped. After the tm module is configured,
+traffic processing is enabled.
 
-This fixes the following warning:
-net/9p/trans_virtio.c:539:3: warning: 3rd function call argument is an uninitialized value [core.CallAndMessage]
-                handle_rerror(req, in_hdr_len, offs, in_pages);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
-Signed-off-by: Eric Van Hensbergen <ericvh@kernel.org>
+Signed-off-by: Hao Lan <lanhao@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/9p/trans_virtio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  4 +++
+ .../hns3/hns3_common/hclge_comm_cmd.c         |  1 +
+ .../hns3/hns3_common/hclge_comm_cmd.h         |  2 ++
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    |  3 ++
+ .../hisilicon/hns3/hns3pf/hclge_dcb.c         | 34 ++++++++++++++++---
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_tm.c | 31 ++++++++++++++++-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_tm.h |  4 +++
+ 7 files changed, 73 insertions(+), 6 deletions(-)
 
-diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
-index 2c9495ccda6ba..f3f6782894239 100644
---- a/net/9p/trans_virtio.c
-+++ b/net/9p/trans_virtio.c
-@@ -428,7 +428,7 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
- 	struct page **in_pages = NULL, **out_pages = NULL;
- 	struct virtio_chan *chan = client->trans;
- 	struct scatterlist *sgs[4];
--	size_t offs;
-+	size_t offs = 0;
- 	int need_drop = 0;
- 	int kicked = 0;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index 9c9c72dc57e00..0f01e58f95c99 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -101,6 +101,7 @@ enum HNAE3_DEV_CAP_BITS {
+ 	HNAE3_DEV_SUPPORT_FEC_STATS_B,
+ 	HNAE3_DEV_SUPPORT_LANE_NUM_B,
+ 	HNAE3_DEV_SUPPORT_WOL_B,
++	HNAE3_DEV_SUPPORT_TM_FLUSH_B,
+ };
  
+ #define hnae3_ae_dev_fd_supported(ae_dev) \
+@@ -172,6 +173,9 @@ enum HNAE3_DEV_CAP_BITS {
+ #define hnae3_ae_dev_wol_supported(ae_dev) \
+ 	test_bit(HNAE3_DEV_SUPPORT_WOL_B, (ae_dev)->caps)
+ 
++#define hnae3_ae_dev_tm_flush_supported(hdev) \
++	test_bit(HNAE3_DEV_SUPPORT_TM_FLUSH_B, (hdev)->ae_dev->caps)
++
+ enum HNAE3_PF_CAP_BITS {
+ 	HNAE3_PF_SUPPORT_VLAN_FLTR_MDF_B = 0,
+ };
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+index b85c412683ddc..40684743a4c6c 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+@@ -156,6 +156,7 @@ static const struct hclge_comm_caps_bit_map hclge_pf_cmd_caps[] = {
+ 	{HCLGE_COMM_CAP_FEC_STATS_B, HNAE3_DEV_SUPPORT_FEC_STATS_B},
+ 	{HCLGE_COMM_CAP_LANE_NUM_B, HNAE3_DEV_SUPPORT_LANE_NUM_B},
+ 	{HCLGE_COMM_CAP_WOL_B, HNAE3_DEV_SUPPORT_WOL_B},
++	{HCLGE_COMM_CAP_TM_FLUSH_B, HNAE3_DEV_SUPPORT_TM_FLUSH_B},
+ };
+ 
+ static const struct hclge_comm_caps_bit_map hclge_vf_cmd_caps[] = {
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+index 18f1b4bf362da..2b7197ce0ae8f 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+@@ -153,6 +153,7 @@ enum hclge_opcode_type {
+ 	HCLGE_OPC_TM_INTERNAL_STS	= 0x0850,
+ 	HCLGE_OPC_TM_INTERNAL_CNT	= 0x0851,
+ 	HCLGE_OPC_TM_INTERNAL_STS_1	= 0x0852,
++	HCLGE_OPC_TM_FLUSH		= 0x0872,
+ 
+ 	/* Packet buffer allocate commands */
+ 	HCLGE_OPC_TX_BUFF_ALLOC		= 0x0901,
+@@ -349,6 +350,7 @@ enum HCLGE_COMM_CAP_BITS {
+ 	HCLGE_COMM_CAP_FEC_STATS_B = 25,
+ 	HCLGE_COMM_CAP_LANE_NUM_B = 27,
+ 	HCLGE_COMM_CAP_WOL_B = 28,
++	HCLGE_COMM_CAP_TM_FLUSH_B = 31,
+ };
+ 
+ enum HCLGE_COMM_API_CAP_BITS {
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 32bb14303473b..0811f9a4f9ee2 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -411,6 +411,9 @@ static struct hns3_dbg_cap_info hns3_dbg_cap[] = {
+ 	}, {
+ 		.name = "support wake on lan",
+ 		.cap_bit = HNAE3_DEV_SUPPORT_WOL_B,
++	}, {
++		.name = "support tm flush",
++		.cap_bit = HNAE3_DEV_SUPPORT_TM_FLUSH_B,
+ 	}
+ };
+ 
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.c
+index c4aded65e848b..cda7e0d0ba56e 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.c
+@@ -216,6 +216,10 @@ static int hclge_notify_down_uinit(struct hclge_dev *hdev)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = hclge_tm_flush_cfg(hdev, true);
++	if (ret)
++		return ret;
++
+ 	return hclge_notify_client(hdev, HNAE3_UNINIT_CLIENT);
+ }
+ 
+@@ -227,6 +231,10 @@ static int hclge_notify_init_up(struct hclge_dev *hdev)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = hclge_tm_flush_cfg(hdev, false);
++	if (ret)
++		return ret;
++
+ 	return hclge_notify_client(hdev, HNAE3_UP_CLIENT);
+ }
+ 
+@@ -313,6 +321,7 @@ static int hclge_ieee_setpfc(struct hnae3_handle *h, struct ieee_pfc *pfc)
+ 	struct net_device *netdev = h->kinfo.netdev;
+ 	struct hclge_dev *hdev = vport->back;
+ 	u8 i, j, pfc_map, *prio_tc;
++	int last_bad_ret = 0;
+ 	int ret;
+ 
+ 	if (!(hdev->dcbx_cap & DCB_CAP_DCBX_VER_IEEE))
+@@ -350,13 +359,28 @@ static int hclge_ieee_setpfc(struct hnae3_handle *h, struct ieee_pfc *pfc)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = hclge_buffer_alloc(hdev);
+-	if (ret) {
+-		hclge_notify_client(hdev, HNAE3_UP_CLIENT);
++	ret = hclge_tm_flush_cfg(hdev, true);
++	if (ret)
+ 		return ret;
+-	}
+ 
+-	return hclge_notify_client(hdev, HNAE3_UP_CLIENT);
++	/* No matter whether the following operations are performed
++	 * successfully or not, disabling the tm flush and notify
++	 * the network status to up are necessary.
++	 * Do not return immediately.
++	 */
++	ret = hclge_buffer_alloc(hdev);
++	if (ret)
++		last_bad_ret = ret;
++
++	ret = hclge_tm_flush_cfg(hdev, false);
++	if (ret)
++		last_bad_ret = ret;
++
++	ret = hclge_notify_client(hdev, HNAE3_UP_CLIENT);
++	if (ret)
++		last_bad_ret = ret;
++
++	return last_bad_ret;
+ }
+ 
+ static int hclge_ieee_setapp(struct hnae3_handle *h, struct dcb_app *app)
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
+index 922c0da3660c7..c40ea6b8c8ec6 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
+@@ -1484,7 +1484,11 @@ int hclge_tm_schd_setup_hw(struct hclge_dev *hdev)
+ 		return ret;
+ 
+ 	/* Cfg schd mode for each level schd */
+-	return hclge_tm_schd_mode_hw(hdev);
++	ret = hclge_tm_schd_mode_hw(hdev);
++	if (ret)
++		return ret;
++
++	return hclge_tm_flush_cfg(hdev, false);
+ }
+ 
+ static int hclge_pause_param_setup_hw(struct hclge_dev *hdev)
+@@ -2113,3 +2117,28 @@ int hclge_tm_get_port_shaper(struct hclge_dev *hdev,
+ 
+ 	return 0;
+ }
++
++int hclge_tm_flush_cfg(struct hclge_dev *hdev, bool enable)
++{
++	struct hclge_desc desc;
++	int ret;
++
++	if (!hnae3_ae_dev_tm_flush_supported(hdev))
++		return 0;
++
++	hclge_cmd_setup_basic_desc(&desc, HCLGE_OPC_TM_FLUSH, false);
++
++	desc.data[0] = cpu_to_le32(enable ? HCLGE_TM_FLUSH_EN_MSK : 0);
++
++	ret = hclge_cmd_send(&hdev->hw, &desc, 1);
++	if (ret) {
++		dev_err(&hdev->pdev->dev,
++			"failed to config tm flush, ret = %d\n", ret);
++		return ret;
++	}
++
++	if (enable)
++		msleep(HCLGE_TM_FLUSH_TIME_MS);
++
++	return ret;
++}
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
+index dd6f1fd486cf2..45dcfef3f90cc 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
+@@ -33,6 +33,9 @@ enum hclge_opcode_type;
+ #define HCLGE_DSCP_MAP_TC_BD_NUM	2
+ #define HCLGE_DSCP_TC_SHIFT(n)		(((n) & 1) * 4)
+ 
++#define HCLGE_TM_FLUSH_TIME_MS	10
++#define HCLGE_TM_FLUSH_EN_MSK	BIT(0)
++
+ struct hclge_pg_to_pri_link_cmd {
+ 	u8 pg_id;
+ 	u8 rsvd1[3];
+@@ -272,4 +275,5 @@ int hclge_tm_get_port_shaper(struct hclge_dev *hdev,
+ 			     struct hclge_tm_shaper_para *para);
+ int hclge_up_to_tc_map(struct hclge_dev *hdev);
+ int hclge_dscp_to_tc_map(struct hclge_dev *hdev);
++int hclge_tm_flush_cfg(struct hclge_dev *hdev, bool enable);
+ #endif
 -- 
 2.40.1
 
