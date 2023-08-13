@@ -1,75 +1,48 @@
-Return-Path: <netdev+bounces-27094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DDA877A598
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 10:28:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F91677A5B4
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB9EC280F24
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 08:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A515F280F1B
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 09:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CB71FAD;
-	Sun, 13 Aug 2023 08:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2FA1FAD;
+	Sun, 13 Aug 2023 09:01:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9121FA2
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 08:28:40 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBDA010FE;
-	Sun, 13 Aug 2023 01:28:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691915319; x=1723451319;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XxPTm8R4vR10S02dVEZu8zr6sQWPR0ovTfnQKuydudc=;
-  b=FQvNokOZJFJY0mJT2Elb1kVRvspb/85iaouttocNHXFrn8pUYxSNliua
-   HMuwMgyqwRKytJCL2IPqaxA/QucsiumeDuwTtiQDEKyRuTCJSic+a7qDt
-   +7uAgarLVNqt6bZaJ/qR+YG0tB5UB0UcsUQuzRMXjhkkU7/6mWYMKaD1v
-   rhoVfFToAvqFnkmZrochSpQAUV9h7arzT55rwzWD4vJw3BHvAkuZ1i5Q9
-   OmvzcZ6f2vCmokKeDsVtgmY+XqeUqwabzApJwhz35JQcYBExI/eEKeikC
-   IWrVprZwvZx5vzBCW3kY3qL9SY4/gWe+dHzlYQCXAR8LrA7dX8CGrMeea
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="351482597"
-X-IronPort-AV: E=Sophos;i="6.01,169,1684825200"; 
-   d="scan'208";a="351482597"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 01:28:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="733112417"
-X-IronPort-AV: E=Sophos;i="6.01,169,1684825200"; 
-   d="scan'208";a="733112417"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 13 Aug 2023 01:28:34 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qV6Sf-00091s-2h;
-	Sun, 13 Aug 2023 08:28:33 +0000
-Date: Sun, 13 Aug 2023 16:28:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-	Keguang Zhang <keguang.zhang@gmail.com>
-Subject: Re: [PATCH 4/5] net: stmmac: Add glue layer for Loongson-1 SoC
-Message-ID: <202308131600.I6iscZMl-lkp@intel.com>
-References: <20230812151135.1028780-5-keguang.zhang@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182BB7E
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 09:01:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA1A2C433C7;
+	Sun, 13 Aug 2023 09:01:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691917272;
+	bh=M5xzbbXOw1O1Eak/rDfTjDV1q7y12QZGBZUFE9oIEZ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iAU3zOdjKJWnb4NkKOKxIDhkJy5nQMbqxecR5AkgpjOK4fitH7a4B1RORxEjqovuu
+	 XdbMH7sMcvNC9yWO++mlpmR8r6gc2YMOpTMCUOQCAJPHswp1mWMO0r1Od9IgXbcoqc
+	 NcgJRV3i4YdoFfqbM0W9MRBCZvWwr3yRDSnZjavuNvkaN8HZF6v0rUnSzYBAaLkYNm
+	 Tj5oAy331cjncrwM7qMsJSwFIHio0jWUlg/vufzjknKPLhKAo3EstVvdpHnZrC1yKv
+	 EnvT6DHhr7QHtibwZq43VRv5Jf8Lupazw/60r+D4ySLF8+8g6hZcUHQ0Lf2LLCqda/
+	 a5M99t1RsQU9Q==
+Date: Sun, 13 Aug 2023 12:01:07 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Alessio Igor Bogani <alessio.bogani@elettra.eu>,
+	richardcochran@gmail.com,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net-next 1/2] igb: Stop PTP related workqueues if aren't
+ necessary
+Message-ID: <20230813090107.GE7707@unreal>
+References: <20230810175410.1964221-1-anthony.l.nguyen@intel.com>
+ <20230810175410.1964221-2-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,128 +51,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230812151135.1028780-5-keguang.zhang@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230810175410.1964221-2-anthony.l.nguyen@intel.com>
 
-Hi Keguang,
+On Thu, Aug 10, 2023 at 10:54:09AM -0700, Tony Nguyen wrote:
+> From: Alessio Igor Bogani <alessio.bogani@elettra.eu>
+> 
+> The workqueues ptp_tx_work and ptp_overflow_work are unconditionally allocated
+> by igb_ptp_init(). Stop them if aren't necessary (ptp_clock_register() fails
+> and CONFIG_PTP is disabled).
+> 
+> Signed-off-by: Alessio Igor Bogani <alessio.bogani@elettra.eu>
+> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  drivers/net/ethernet/intel/igb/igb_ptp.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+> index 405886ee5261..02276c922ac0 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+> @@ -1406,7 +1406,13 @@ void igb_ptp_init(struct igb_adapter *adapter)
+>  		dev_info(&adapter->pdev->dev, "added PHC on %s\n",
+>  			 adapter->netdev->name);
+>  		adapter->ptp_flags |= IGB_PTP_ENABLED;
+> +		return;
+>  	}
+> +
+> +	if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
+> +		cancel_delayed_work_sync(&adapter->ptp_overflow_work);
+> +
+> +	cancel_work_sync(&adapter->ptp_tx_work);
 
-kernel test robot noticed the following build errors:
+Is it possible to move work initialization to be after call to ptp_clock_register()?
 
-[auto build test ERROR on 21ef7b1e17d039053edaeaf41142423810572741]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Keguang-Zhang/MIPS-loongson32-Remove-Loongson1-MAC-arch-code/20230812-231420
-base:   21ef7b1e17d039053edaeaf41142423810572741
-patch link:    https://lore.kernel.org/r/20230812151135.1028780-5-keguang.zhang%40gmail.com
-patch subject: [PATCH 4/5] net: stmmac: Add glue layer for Loongson-1 SoC
-config: parisc-allyesconfig (https://download.01.org/0day-ci/archive/20230813/202308131600.I6iscZMl-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230813/202308131600.I6iscZMl-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308131600.I6iscZMl-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c: In function 'ls1x_dwmac_probe':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:188:21: error: implicit declaration of function 'of_parse_phandle' [-Werror=implicit-function-declaration]
-     188 |         syscon_np = of_parse_phandle(pdev->dev.of_node, "syscon", 0);
-         |                     ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:188:19: warning: assignment to 'struct device_node *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     188 |         syscon_np = of_parse_phandle(pdev->dev.of_node, "syscon", 0);
-         |                   ^
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:192:17: error: implicit declaration of function 'of_match_node'; did you mean 'for_each_node'? [-Werror=implicit-function-declaration]
-     192 |         match = of_match_node(ls1x_dwmac_syscon_match, syscon_np);
-         |                 ^~~~~~~~~~~~~
-         |                 for_each_node
-   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:192:15: warning: assignment to 'const struct of_device_id *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     192 |         match = of_match_node(ls1x_dwmac_syscon_match, syscon_np);
-         |               ^
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c:194:17: error: implicit declaration of function 'of_node_put'; did you mean 'bpf_module_put'? [-Werror=implicit-function-declaration]
-     194 |                 of_node_put(syscon_np);
-         |                 ^~~~~~~~~~~
-         |                 bpf_module_put
-   cc1: some warnings being treated as errors
+diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+index 405886ee5261..56fd2b0fe70c 100644
+--- a/drivers/net/ethernet/intel/igb/igb_ptp.c
++++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+@@ -1386,11 +1386,6 @@ void igb_ptp_init(struct igb_adapter *adapter)
+        }
+ 
+        spin_lock_init(&adapter->tmreg_lock);
+-       INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
+-
+-       if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
+-               INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
+-                                 igb_ptp_overflow_check);
+ 
+        adapter->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
+        adapter->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
+@@ -1407,6 +1402,15 @@ void igb_ptp_init(struct igb_adapter *adapter)
+                         adapter->netdev->name);
+                adapter->ptp_flags |= IGB_PTP_ENABLED;
+        }
++
++       if (!adapter->ptp_clock)
++               return;
++
++       INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
++
++       if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
++               INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
++                                 igb_ptp_overflow_check);
+ }
+ 
+ /**
 
 
-vim +/of_parse_phandle +188 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
 
-   170	
-   171	static int ls1x_dwmac_probe(struct platform_device *pdev)
-   172	{
-   173		struct plat_stmmacenet_data *plat_dat;
-   174		struct stmmac_resources stmmac_res;
-   175		struct device_node *syscon_np;
-   176		const struct of_device_id *match;
-   177		struct regmap *regmap;
-   178		struct ls1x_dwmac *dwmac;
-   179		const struct ls1x_dwmac_syscon *syscon;
-   180		size_t size;
-   181		int ret;
-   182	
-   183		ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-   184		if (ret)
-   185			return ret;
-   186	
-   187		/* Probe syscon */
- > 188		syscon_np = of_parse_phandle(pdev->dev.of_node, "syscon", 0);
-   189		if (!syscon_np)
-   190			return -ENODEV;
-   191	
- > 192		match = of_match_node(ls1x_dwmac_syscon_match, syscon_np);
-   193		if (!match) {
- > 194			of_node_put(syscon_np);
-   195			return -EINVAL;
-   196		}
-   197		syscon = (const struct ls1x_dwmac_syscon *)match->data;
-   198	
-   199		regmap = syscon_node_to_regmap(syscon_np);
-   200		of_node_put(syscon_np);
-   201		if (IS_ERR(regmap)) {
-   202			ret = PTR_ERR(regmap);
-   203			dev_err(&pdev->dev, "Unable to map syscon: %d\n", ret);
-   204			return ret;
-   205		}
-   206	
-   207		size = syscon->nr_reg_fields * sizeof(struct regmap_field *);
-   208		dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac) + size, GFP_KERNEL);
-   209		if (!dwmac)
-   210			return -ENOMEM;
-   211	
-   212		plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-   213		if (IS_ERR(plat_dat)) {
-   214			dev_err(&pdev->dev, "dt configuration failed\n");
-   215			return PTR_ERR(plat_dat);
-   216		}
-   217	
-   218		plat_dat->bsp_priv = dwmac;
-   219		plat_dat->init = ls1x_dwmac_init;
-   220		dwmac->dev = &pdev->dev;
-   221		dwmac->plat_dat = plat_dat;
-   222		dwmac->syscon = syscon;
-   223		dwmac->regmap = regmap;
-   224	
-   225		ret = stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-   226		if (ret)
-   227			goto err_remove_config_dt;
-   228	
-   229		return 0;
-   230	
-   231	err_remove_config_dt:
-   232		if (pdev->dev.of_node)
-   233			stmmac_remove_config_dt(pdev, plat_dat);
-   234	
-   235		return ret;
-   236	}
-   237	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>  }
+>  
+>  /**
+> -- 
+> 2.38.1
+> 
+> 
 
