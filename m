@@ -1,43 +1,79 @@
-Return-Path: <netdev+bounces-27082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38C777A48E
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 03:53:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DEAF77A491
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 03:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A0AE280F97
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 01:53:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22E78280F69
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 01:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E23E10FA;
-	Sun, 13 Aug 2023 01:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5BF10F6;
+	Sun, 13 Aug 2023 01:59:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E08D7E;
-	Sun, 13 Aug 2023 01:53:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD7C6C433C7;
-	Sun, 13 Aug 2023 01:53:28 +0000 (UTC)
-Date: Sat, 12 Aug 2023 21:53:27 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Joe Perches <joe@perches.com>
-Cc: Zheao Li <me@manjusaka.me>, edumazet@google.com, bpf@vger.kernel.org,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- mhiramat@kernel.org, ncardwell@google.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-Subject: Re: [PATCH v3] tracepoint: add new `tcp:tcp_ca_event` trace event
-Message-ID: <20230812215327.1dbd30f3@rorschach.local.home>
-In-Reply-To: <6bfa88099fe13b3fd4077bb3a3e55e3ae04c3b5d.camel@perches.com>
-References: <CANn89iKQXhqgOTkSchH6Bz-xH--pAoSyEORBtawqBTvgG+dFig@mail.gmail.com>
-	<20230812201249.62237-1-me@manjusaka.me>
-	<20230812205905.016106c0@rorschach.local.home>
-	<20230812210140.117da558@rorschach.local.home>
-	<20230812210450.53464a78@rorschach.local.home>
-	<6bfa88099fe13b3fd4077bb3a3e55e3ae04c3b5d.camel@perches.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5C77E
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 01:59:52 +0000 (UTC)
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5843010FC
+	for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 18:59:51 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso2456667a12.3
+        for <netdev@vger.kernel.org>; Sat, 12 Aug 2023 18:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1691891991; x=1692496791;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+/CZUr4BOJ9A4g/EJQv8nU92G8B2uTxt26ZdHAnXEYE=;
+        b=aju+GZQHRpAdyNoxsn8XjpHFaGx99Nac8OJpnJv7FLjEt/hK5UCfwSWuIMHUYYlreV
+         TazrcadpFr7Y85Smp3TlAmqGKiV7L2vmJ75VWlzCnfuTBSWy9ug3uZC2vytQVrHRPDkA
+         ymWdhmlCUhRns28plQ3nkiVwt3Z7z+JpM535sPfVX2tHJVhBbsUzPQjV1pxpN9mGfWPB
+         L0eHjk758FaPVvLRegbFW/Y2IY6uRVxgEIGzRzBay+c/GgAq0YyJh7wP3zZTtWNj7GmJ
+         XmvUx9KwFGaxm9rR0Gisd7PtpocRzjyJU2HsOP7vNgEmt9MybTLU1EN0k63EApvAtggc
+         7E1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691891991; x=1692496791;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+/CZUr4BOJ9A4g/EJQv8nU92G8B2uTxt26ZdHAnXEYE=;
+        b=KPfAqxEok2kx2BqLFEz/AXwEbZpfCzNs+n7FJcNEIjGkIPNQLBi+5Rna2ThbSJWBxk
+         DvThekYisRw3NBd2UwOYckrYLe969rcgPFIwPL/L/uOY8pfN5G8iuCVURyAntrJs+noU
+         bCrgKsquYb6YLVH+OugotBqsIqSRSCazMa+oBP7qph0/tmDloHM9Cvj350ENdUDluSAm
+         karsn24gH7o5c2WNRnJVALv5pC/HqaD9hPN1b5rBQiGMpJaqKRuYohjemAMhtdv94Dz3
+         Qeya4W5BPrrMqcMqMCU0pe/HOWYz+SqhhP/wNn5mISAI8Oe879XNJItHKJfbHOs2nqmx
+         j6gQ==
+X-Gm-Message-State: AOJu0YxNy1smuoL6JenD0FfAKwgcLrshISgVD1UgXFlFqA8y59SDPNCN
+	6OfsY2KMRi336PGXouLw4zjPHrNklVdX732F3UtN1V4y
+X-Google-Smtp-Source: AGHT+IGZT3lRbxWdL/X9cnKcEexajsiBHi3p3oFjfhI3xk2LEh/pfewN4xIUNkXnJoHSXccsgbK9TQ==
+X-Received: by 2002:a17:90a:e651:b0:268:13c4:b800 with SMTP id ep17-20020a17090ae65100b0026813c4b800mr5485381pjb.21.1691891990780;
+        Sat, 12 Aug 2023 18:59:50 -0700 (PDT)
+Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
+        by smtp.gmail.com with ESMTPSA id m8-20020a17090a4d8800b00267ae12b80bsm7268411pjh.34.2023.08.12.18.59.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Aug 2023 18:59:50 -0700 (PDT)
+Date: Sat, 12 Aug 2023 18:59:48 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Bjorn Andersson <quic_bjorande@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Chris Lew
+ <quic_clew@quicinc.com>, Alex Elder <elder@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Mathieu Poirier
+ <mathieu.poirier@linaro.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+ <linux-remoteproc@vger.kernel.org>
+Subject: Re: [PATCH v2 2/4] soc: qcom: aoss: Add debugfs interface for
+ sending messages
+Message-ID: <20230812185948.29f1d53b@hermes.local>
+In-Reply-To: <20230811233228.GT1428172@hu-bjorande-lv.qualcomm.com>
+References: <20230811205839.727373-1-quic_bjorande@quicinc.com>
+	<20230811205839.727373-3-quic_bjorande@quicinc.com>
+	<d212e5a7-e9e5-4297-85fb-030818f7c647@lunn.ch>
+	<20230811233228.GT1428172@hu-bjorande-lv.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,19 +82,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, 12 Aug 2023 18:17:17 -0700
-Joe Perches <joe@perches.com> wrote:
+On Fri, 11 Aug 2023 16:32:28 -0700
+Bjorn Andersson <quic_bjorande@quicinc.com> wrote:
 
-> > I forgot to say "for TRACE_EVENT() macros". This is not about what
-> > checkpatch says about other code.  
+> On Fri, Aug 11, 2023 at 11:01:50PM +0200, Andrew Lunn wrote:
+> > > +static ssize_t qmp_debugfs_write(struct file *file, const char __user *userstr,
+> > > +				 size_t len, loff_t *pos)
+> > > +{
+> > > +	struct qmp *qmp = file->private_data;
+> > > +	char buf[QMP_MSG_LEN];
+> > > +	int ret;
+> > > +
+> > > +	if (!len || len >= QMP_MSG_LEN)
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (copy_from_user(buf, userstr, len))
+> > > +		return -EFAULT;
+> > > +	buf[len] = '\0';
+> > > +
+> > > +	ret = qmp_send(qmp, buf);
+> > > +	if (ret < 0)
+> > > +		return ret;  
+> > 
+> > Sorry, but you still appear to be sending binary blobs from userspace
+> > to the firmware. This is not liked.
+> >   
 > 
-> trace has its own code style and checkpatch needs another
-> parsing mechanism just for it, including the alignment to
-> open parenthesis test.
+> As mentioned in the cover letter, I do recognize your concern here. I
+> don't see it as a realistic way to work around the kernel for reasons of
+> being proprietary - given that we don't have debugfs mounted in the vast
+> majority of product.
 
-If you have a template patch to add the parsing mechanism, I'd be happy
-to try to fill in the style.
-
--- Steve
+Anyone who cares about security, and has things like kernel lockdown turned on
+is going to be scared by this. If you allow API to tell firmware to do any arbitrary thing
+it means you could be telling firmware "please read this area of kernel memory for me"
 
