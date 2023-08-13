@@ -1,93 +1,70 @@
-Return-Path: <netdev+bounces-27192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40B677AADB
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 21:22:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1B9F77AB0C
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 22:08:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E39BA280F10
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 19:22:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301301C2097D
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 20:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40A39448;
-	Sun, 13 Aug 2023 19:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71A39450;
+	Sun, 13 Aug 2023 20:08:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AD8466
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 19:22:44 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175BF18E;
-	Sun, 13 Aug 2023 12:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZxIg9UUewrFM0vEREoEcGwG6IbEZLqB2tnEvw27Bhyw=; b=lOurZ5u9goav9sLbBJjIWVfaq2
-	TgKUPLHapU5ze2gv9nHt7Y/NCxbpE8W7D+jh2Fkd5wYrFiGQMhcj4HX+hzh9rOBve0t8O4jze/IKm
-	z7xDsOY9kzlTwmsgKjRNIdw+62u5gRc6Ss/l//GJWYUaflJhT2AtSdO4P0bd+5hmtXLc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qVGfT-003zDS-Sv; Sun, 13 Aug 2023 21:22:27 +0200
-Date: Sun, 13 Aug 2023 21:22:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C49625
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:08:40 +0000 (UTC)
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB7710F6;
+	Sun, 13 Aug 2023 13:08:38 -0700 (PDT)
+Received: from fpc.intra.ispras.ru (unknown [10.10.165.4])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 51F4B40F1DCD;
+	Sun, 13 Aug 2023 20:08:35 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 51F4B40F1DCD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1691957315;
+	bh=aAUGuClVCL2l6tb8cgm/NDi9zW81/np9gFGNuwtgWHo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TbNO57zV+byHKgV/3vOBM17f3NxsLFPORHq9sQFbJWfPzb0EZR3OmuwrLOAl7Yioz
+	 3kqh/rNT/dU0L1UYvVWeuUcRZwzTS6Z2s+puPKU6DtdMewXPumHdhPP4Tgkes2fUz5
+	 uOhBXj2QwlXcm6Wdb/0/G4JNuvVP9yrdCAPBh8u4=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2] net: phy: mediatek-ge-soc: support PHY LEDs
-Message-ID: <473888d3-256f-43ac-bd33-e578918424be@lunn.ch>
-References: <32e534441225c62e3bf9384b797d9beda7475053.1691943605.git.daniel@makrotopia.org>
- <8f20d427-91cc-4fbc-b263-dfc76df855f9@lunn.ch>
- <ZNkpPRc9loNX2Wos@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH 4.19/5.4/5.10/5.15/6.1 0/1] sch_netem: fix issues in netem_change() vs get_dist_table()
+Date: Sun, 13 Aug 2023 23:07:45 +0300
+Message-Id: <20230813200746.288589-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNkpPRc9loNX2Wos@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 13, 2023 at 08:04:29PM +0100, Daniel Golle wrote:
-> On Sun, Aug 13, 2023 at 08:57:01PM +0200, Andrew Lunn wrote:
-> > On Sun, Aug 13, 2023 at 05:24:55PM +0100, Daniel Golle wrote:
-> > > Implement netdev trigger and primitive bliking offloading as well as
-> > > simple set_brigthness function for both PHY LEDs of the in-SoC PHYs
-> > > found in MT7981 and MT7988.
-> > > 
-> > > For MT7988, read boottrap register and apply LED polarities accordingly
-> > 
-> > Should this be bootstrap? With an S? boottrap appears quite often in
-> > the code, so maybe the datasheet does say boottrap?
-> 
-> Yes, datasheet and vendor code refer to boottrap register which reflects
-> the state of the pins used for bootStrapping the SoC...
-
-O.K. So following the datasheet makes sense.
-
-Again, if there is need for a respin, maybe add a comment next to the
-#define.
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Commit 2174a08db80d ("sch_netem: acquire qdisc lock in netem_change()")
+was backported to older stables where it is causing 'sleeping in invalid
+context' bug. The following patch fixes the problem and can be cleanly
+applied to the stable branches affected. It was backported to 6.4.y about
+a month ago.
 
