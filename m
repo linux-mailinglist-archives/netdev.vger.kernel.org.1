@@ -1,245 +1,125 @@
-Return-Path: <netdev+bounces-27105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C2D77A621
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 13:15:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D8777A62A
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 13:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55C25280EBB
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:15:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3911C208E1
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FD246A6;
-	Sun, 13 Aug 2023 11:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D4E5225;
+	Sun, 13 Aug 2023 11:23:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFC71FCC
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 11:15:43 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15031E71;
-	Sun, 13 Aug 2023 04:15:41 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso453107666b.1;
-        Sun, 13 Aug 2023 04:15:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691925339; x=1692530139;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ffQwIT8DtQciacgmcGYmh0gcVi8vW0sLMlcRipYUMb0=;
-        b=lv+4s+abJJwmmA2QoTwzpHZqaGoE2Yx5q0hKU0hCe8ogbB3gAwMna3KPgse6NS2xb1
-         eZ0Tt/z1tA9YMmPcqp1Sc7BGWBE7v9XIbBMcmQ7LIV3rZKZL7YObIo3IHn083S0G3Y5e
-         zwOyOpUABJ+N48A1Utcrk7xpfR+QTjN/A6T6tC1U2v+Ardn3F6ZwxUZBSmby2PJcmYSh
-         Ba3TxtfAEuD76QhCda2K/l49ES8jyAZ2+Mf0K/GGe1sdFDaSFrGRgKQs3dLyTp+sWgSs
-         pZJrFyQYLwxxqB9bHolzDjAnQ2uRDf3HnYmqSGdhRqbd9mF713kBohK/zye1L0D57yKC
-         Xmrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691925339; x=1692530139;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ffQwIT8DtQciacgmcGYmh0gcVi8vW0sLMlcRipYUMb0=;
-        b=H8wBHalrOulXsQBBYESlO7XqHcddyEo4poF002xcmfC2DxEiE23XRo60Q2Uh1sgK6C
-         VQl5kDTeJHgWrXi0Qf5VYsFSiCHT8x6wMgFSq/LnCo3+3lf2Dr6lOcqw/tgX23+E5mEj
-         OKrTiAnsVSssr+yUZArUndcSYMeQsko9VHFScBnwk4udJ0yJi1J4XTV1qWFTdeq6gkNC
-         BDM3QDYmgOfOvU7Qm6ouUkl7cwfdcpPt/ELJkJBddrhaqUPunaoTkbqM15W8mIljTngG
-         CadO9XzUHEuaTJr5wjh2G3dnUas5pTUVn6f/iHofd/qS40dDgUoihmulMv6AUaFNmLYe
-         EJxg==
-X-Gm-Message-State: AOJu0YzJ/PG/Oq3aqiCQaIAr4X+d1uADxRx8sfz4u6uZB1ceWW/2/Bif
-	FxHUb2yicD0I+0EnhCMknxU=
-X-Google-Smtp-Source: AGHT+IHbnnUzjq58IVRQ5OmTqhgJH3jrLO72zDiXsRXFG194sdp3hZNNtscLtOLq+nFZ5yAA6LXkOQ==
-X-Received: by 2002:a17:907:7886:b0:994:54af:e282 with SMTP id ku6-20020a170907788600b0099454afe282mr6411319ejc.10.1691925339304;
-        Sun, 13 Aug 2023 04:15:39 -0700 (PDT)
-Received: from skbuf ([188.27.184.148])
-        by smtp.gmail.com with ESMTPSA id f16-20020a170906561000b00992076f4a01sm4474034ejq.190.2023.08.13.04.15.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Aug 2023 04:15:38 -0700 (PDT)
-Date: Sun, 13 Aug 2023 14:15:36 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230813111536.xzmxytghjzxhzmq7@skbuf>
-References: <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B921A1FD5
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 11:23:24 +0000 (UTC)
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B47DC5;
+	Sun, 13 Aug 2023 04:23:22 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8DF9D40003;
+	Sun, 13 Aug 2023 11:23:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1691925800;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9GXovUO/PFAmMSu4eDPxz+1S111/9HB7f0QHyjq9J88=;
+	b=MEO8bynVSnOxZ01sRklkbXmoBw+J8LaQRA7TI6gDLKiq2Z6rv8LcwgSJvOH7uqbev8KURt
+	TrWsWTvx0cisOxLJl9Jsd5U6AhKfM8Vawwnc3F950pKoeWuqUVD51RTYzzYEOTZGiNUBp9
+	KkY0o3sTyTIohpr0KOqb/mvrRH7UFYd930PofaMrhXqmNgotEgVyUcnaa5GXO/nAhxykge
+	lp0fDU4JHgJr7Yg7aMPrdA8aAFGkzFmh4HgAbBXexTcb5EWJtjG+9cyu0Q5bDnOd0j11eR
+	uDeHxATwJwJaNo2csLR6FU73vH3DWRxrla/o1kkz3jWXdeS/PSi5SkIfzdTD6Q==
+Message-ID: <49acfbe1-a310-441d-99a5-16955b4cf41e@arinc9.com>
+Date: Sun, 13 Aug 2023 14:23:10 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: microchip,lan937x: add missing
+ ethernet on example
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20230812091708.34665-1-arinc.unal@arinc9.com>
+ <20230812091708.34665-1-arinc.unal@arinc9.com>
+ <20230812091708.34665-2-arinc.unal@arinc9.com>
+ <20230812091708.34665-2-arinc.unal@arinc9.com>
+ <20230813110747.rvvsvte2t6pbe5j4@skbuf>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20230813110747.rvvsvte2t6pbe5j4@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230812091708.34665-3-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
+X-GND-Sasl: arinc.unal@arinc9.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 12, 2023 at 12:17:06PM +0300, Arınç ÜNAL wrote:
-> Add the schema to document the internal MDIO bus. Adjust realtek.yaml
-> accordingly.
+On 13.08.2023 14:07, Vladimir Oltean wrote:
+> On Sat, Aug 12, 2023 at 12:17:05PM +0300, Arınç ÜNAL wrote:
+>> The port@5 node on the example is missing the ethernet property. Add it.
+>> Remove the MAC bindings on the example as they cannot be validated.
+>>
+>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>> ---
+>>   .../bindings/net/dsa/microchip,lan937x.yaml           | 11 +----------
+>>   1 file changed, 1 insertion(+), 10 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+>> index 8d7e878b84dc..49af4b0d5916 100644
+>> --- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+>> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+>> @@ -68,16 +68,6 @@ examples:
+>>     - |
+>>       #include <dt-bindings/gpio/gpio.h>
+>>   
+>> -    macb0 {
+>> -            #address-cells = <1>;
+>> -            #size-cells = <0>;
+>> -
+>> -            fixed-link {
+>> -                    speed = <1000>;
+>> -                    full-duplex;
+>> -            };
+>> -    };
+>> -
+>>       spi {
+>>               #address-cells = <1>;
+>>               #size-cells = <0>;
+>> @@ -138,6 +128,7 @@ examples:
+>>                                       phy-mode = "rgmii";
+>>                                       tx-internal-delay-ps = <2000>;
+>>                                       rx-internal-delay-ps = <2000>;
+>> +                                    ethernet = <&macb1>;
 > 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
->  .../devicetree/bindings/net/dsa/dsa.yaml      | 18 +++++
->  .../devicetree/bindings/net/dsa/realtek.yaml  | 66 +++++++++----------
->  2 files changed, 50 insertions(+), 34 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> index ec74a660beda..03ccedbc49dc 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> @@ -31,6 +31,24 @@ properties:
->        (single device hanging off a CPU port) must not specify this property
->      $ref: /schemas/types.yaml#/definitions/uint32-array
->  
-> +  mdio:
-> +    description: The internal MDIO bus of the switch
-> +    $ref: /schemas/net/mdio.yaml#
-> +
-> +if:
-> +  required: [ mdio ]
-> +then:
-> +  patternProperties:
-> +    "^(ethernet-)?ports$":
-> +      patternProperties:
-> +        "^(ethernet-)?port@[0-9]+$":
-> +          if:
-> +            not:
-> +              required: [ ethernet ]
+> macb1 instead of macb0: was it intentional?
 
-To match only on user ports, this must also exclude DSA ports ("required: [ link ]").
+Yes, port@4 defines macb0. I used macb1 for port@5 here.
 
-> +          then:
-> +            required:
-> +              - phy-handle
-
-No. The only thing permitted by the slave_mii_bus is to do something meaningful
-when phylink bindings ("phy-handle", "fixed-link" or "managed") are absent. But
-the presence of slave_mii_bus does not imply that user ports have a required
-phy-handle. They might be SerDes ports or xMII ports. So they might use "managed"
-or "fixed-link". The only thing that you can enforce is that, if the slave_mii_bus
-has an OF presence, then user ports must have phylink bindings.
-
-> +
->  additionalProperties: true
->  
->  $defs:
-> diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> index cfd69c2604ea..ea7db0890abc 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> @@ -6,9 +6,6 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  
->  title: Realtek switches for unmanaged switches
->  
-> -allOf:
-> -  - $ref: dsa.yaml#/$defs/ethernet-ports
-> -
->  maintainers:
->    - Linus Walleij <linus.walleij@linaro.org>
->  
-> @@ -95,37 +92,38 @@ properties:
->        - '#address-cells'
->        - '#interrupt-cells'
->  
-> -  mdio:
-> -    $ref: /schemas/net/mdio.yaml#
-> -    unevaluatedProperties: false
-> -
-> -    properties:
-> -      compatible:
-> -        const: realtek,smi-mdio
-> -
-> -if:
-> -  required:
-> -    - reg
-> -
-> -then:
-> -  $ref: /schemas/spi/spi-peripheral-props.yaml#
-> -  not:
-> -    required:
-> -      - mdc-gpios
-> -      - mdio-gpios
-> -      - mdio
-> -
-> -  properties:
-> -    mdc-gpios: false
-> -    mdio-gpios: false
-> -    mdio: false
-> -
-> -else:
-> -  required:
-> -    - mdc-gpios
-> -    - mdio-gpios
-> -    - mdio
-> -    - reset-gpios
-> +allOf:
-> +  - $ref: dsa.yaml#/$defs/ethernet-ports
-> +  - if:
-> +      required: [ mdio ]
-> +    then:
-> +      properties:
-> +        mdio:
-> +          properties:
-> +            compatible:
-> +              const: realtek,smi-mdio
-> +
-> +  - if:
-> +      required:
-> +        - reg
-> +    then:
-> +      $ref: /schemas/spi/spi-peripheral-props.yaml#
-> +      not:
-> +        required:
-> +          - mdc-gpios
-> +          - mdio-gpios
-> +          - mdio
-> +
-> +      properties:
-> +        mdc-gpios: false
-> +        mdio-gpios: false
-> +        mdio: false
-> +    else:
-> +      required:
-> +        - mdc-gpios
-> +        - mdio-gpios
-> +        - mdio
-> +        - reset-gpios
->  
->  required:
->    - compatible
-> -- 
-> 2.39.2
-> 
-
+Arınç
 
