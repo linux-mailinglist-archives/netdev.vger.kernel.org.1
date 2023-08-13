@@ -1,48 +1,43 @@
-Return-Path: <netdev+bounces-27096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 615DA77A5B6
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:01:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9968E77A5B7
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A108280FAC
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 09:01:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29250280F42
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 09:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72F41FAD;
-	Sun, 13 Aug 2023 09:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59F61FB9;
+	Sun, 13 Aug 2023 09:03:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE517E
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 09:01:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E2EC433C8;
-	Sun, 13 Aug 2023 09:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854A87E
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 09:03:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C92D6C433C7;
+	Sun, 13 Aug 2023 09:03:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691917289;
-	bh=ftsqMJ7kJK3s47sRpTaRHWrIiHYrq6d1XOWO+4W1p/A=;
+	s=k20201202; t=1691917397;
+	bh=wL7aCqb94Cdrt5jofRLuQExYraS5Rk/IOXsF4HRviZI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ssGlu5slnGCFLJD3g+4F6Xf3YrCIaoaRS7KM3COtj0SLcej36uvUYzGYJ3Il+MZda
-	 3oblaDRGBYyFtDVieyaMnnVbyH+yP+bwl1EzbnxON/BkaEWSj4YX/jPyuBilLBKXK5
-	 sxyhqP1qIVz8LiMLRpuU0O6cxSNrXR71JgSJsu6UPVm4DDNyhfrYH6VZK+9ozIVg8z
-	 oU6LVq3gMThWBoohmJyA45wqlQxFxps5JzNL6JAreSnGNBJoGmAX+DNnnb8Z7Tcb0K
-	 RPz7ziPbwqTATqrAeIWLGxpzC4X/mj85oPtUupwSKu//fgRt3sib0S3w2AaFvYRAGL
-	 ZxIRi63wx9SgQ==
-Date: Sun, 13 Aug 2023 12:01:25 +0300
+	b=pAGMMuT7SjxOMH85jrVhbeUR+xXUM/R/qQA6Zi57fPbtWS7C1b2FMoguz6De30SiQ
+	 Jg0KVE7WCGMNEby20RXO/rPV5QjJYduJNdLJI/yULQnb4LCsO7gkrX0VJ1n4AspfMJ
+	 zNfNWdJJZADle2YKz7moYHMBR1Kp0g+2fjKM/dGjfUkY61c80YpXEwRQFYmzOz3NgK
+	 9cMhEeUkjpSq1pdjflHosJIcEvc0geXP+npWIwh6b5AXmiVL95P/s7/to0ztYkexVU
+	 Y7bdW1x8qNq6zrnYJvc0oBN/Mw3CyVbvj8X40PN/+zJCA8Qqb6FJ69xMyaPNgwuYKz
+	 cItg/tcuicceA==
+Date: Sun, 13 Aug 2023 12:03:13 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>, sasha.neftin@intel.com,
-	Naama Meir <naamax.meir@linux.intel.com>,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next 2/2] e1000e: Use PME poll to circumvent
- unreliable ACPI wake
-Message-ID: <20230813090125.GF7707@unreal>
-References: <20230810175410.1964221-1-anthony.l.nguyen@intel.com>
- <20230810175410.1964221-3-anthony.l.nguyen@intel.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-net v2] ice: fix receive buffer size miscalculation
+Message-ID: <20230813090313.GG7707@unreal>
+References: <20230810235110.440553-1-jesse.brandeburg@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,33 +46,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230810175410.1964221-3-anthony.l.nguyen@intel.com>
+In-Reply-To: <20230810235110.440553-1-jesse.brandeburg@intel.com>
 
-On Thu, Aug 10, 2023 at 10:54:10AM -0700, Tony Nguyen wrote:
-> From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+On Thu, Aug 10, 2023 at 04:51:10PM -0700, Jesse Brandeburg wrote:
+> The driver is misconfiguring the hardware for some values of MTU such that
+> it could use multiple descriptors to receive a packet when it could have
+> simply used one.
 > 
-> On some I219 devices, ethernet cable plugging detection only works once
-> from PCI D3 state. Subsequent cable plugging does set PME bit correctly,
-> but device still doesn't get woken up.
+> Change the driver to use a round-up instead of the result of a shift, as
+> the shift can truncate the lower bits of the size, and result in the
+> problem noted above. It also aligns this driver with similar code in i40e.
 > 
-> Since I219 connects to the root complex directly, it relies on platform
-> firmware (ACPI) to wake it up. In this case, the GPE from _PRW only
-> works for first cable plugging but fails to notify the driver for
-> subsequent plugging events.
+> The insidiousness of this problem is that everything works with the wrong
+> size, it's just not working as well as it could, as some MTU sizes end up
+> using two or more descriptors, and there is no way to tell that is
+> happening without looking at ice_trace or a bus analyzer.
 > 
-> The issue was originally found on CNP, but the same issue can be found
-> on ADL too. So workaround the issue by continuing use PME poll after
-> first ACPI wake. As PME poll is always used, the runtime suspend
-> restriction for CNP can also be removed.
-> 
-> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
-> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-> Acked-by: Sasha Neftin <sasha.neftin@intel.com>
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Fixes: efc2214b6047 ("ice: Add support for XDP")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 > ---
->  drivers/net/ethernet/intel/e1000e/netdev.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> v2: added fixes tag pointing to the last time this line was modified in
+> v5.5 instead of pointing back to the introduction of the driver.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_base.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 
 Thanks,
