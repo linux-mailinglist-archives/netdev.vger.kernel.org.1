@@ -1,203 +1,146 @@
-Return-Path: <netdev+bounces-27098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E6677A5BB
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:06:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02D4C77A5F3
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 12:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29FE1C208E5
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 09:06:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D45280F59
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 10:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5711C1FB9;
-	Sun, 13 Aug 2023 09:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9311FDC;
+	Sun, 13 Aug 2023 10:12:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91CA7E
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 09:06:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C4BC433C7;
-	Sun, 13 Aug 2023 09:06:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691917562;
-	bh=MOUoxzvR1CPW0JXDdK0xEyu1X8cNtNkMtsilpDEvcbA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FYdULDb/4Nhijf7L7WBumsbA9hrhVs7VwNP54EzDtzOKVulbm3HSfmW16szIRxjuX
-	 w5yEWRADqdXqZbp9y7o9mtSQ5ZBgG7oaVFMZiAJP1N1DWtXgI+9yEfe2MuYvdR4z9Z
-	 J9BI4EyddYptG4pypRMNzdkZd2D6hLuSucyjJI+CXoKTG6ewylWhuvyY6DfKD5FJYq
-	 6psC+N7aQehytw2cDkBEpM8zhL56FaS7Q17Th8P2W5Bvi1aO8EdyrVv2zj5hWIrwPf
-	 Hl3fxbkVl3Ay2fhprG+6EB1OJbrDUv7sETiJl6EJFj0bF7VHOE8v853fVk5ScN20qc
-	 WtLeD4bHQIiDg==
-Date: Sun, 13 Aug 2023 12:05:57 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jijie Shao <shaojijie@huawei.com>,
-	yisen.zhuang@huawei.com, salil.mehta@huawei.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: hns3: fix strscpy causing content truncation
- issue
-Message-ID: <20230813090557.GH7707@unreal>
-References: <20230809020902.1941471-1-shaojijie@huawei.com>
- <20230809070302.GR94631@unreal>
- <7c44c161-9c86-8c60-f031-6d77d6c28c20@huawei.com>
- <20230810102247.699ddc14@kernel.org>
- <202308101103.D0827667B@keescook>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFFF7E
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 10:12:58 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2054.outbound.protection.outlook.com [40.107.223.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EA741708
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 03:12:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y2yKzA4ZAjQ1Z+YN/cmpqdnAoIKUWQWt6FCWAdvs1UMIGfGfHOKaCl1f0CrgAdBykDCdHi5ZWawCeadKMTofN4eRKflZscsgwyaK9Ddu8pLioCmlcEMsy8K/4PKp32sKcAUrlnnw8erwRTgNjJduZF/+bhsE7vxQ31jN8XxXKSHqp/hZZDb+dX/0R08RlaMMn/eB3IdiKdi2mq5KYMCKlOoq8dmiP9SQw6h7sIlr6k8iqCbb3uQn9/DjJbDjmeur7TwpJ1bmcqKOxt7TjOaYUDjwn5i8DeuXDP5AWeR4GfzcPxzUAzZ6komhjKbWaRTv171XvIGk/I1eLl/BFYhofQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YkCQpR+8OLnuPwNjFUfUyTh2Ij0sWaMSrHlwn+WXaXo=;
+ b=H3fcDf+BLb+nUFCxKHR1Y3LjtpY/EwsJO5nmoWfDS384fKRwYEASgW8My27VM3UDhGUwG/wIC5zL9irdZHHb1o0Hs9C/phQ7/6t1/FuDmU6udV/Kxm20T03VsP6moNNL3MOoUQSVx9hjY9otHU+QmHpCvr3ljsMc+BUq2YgvcPL/laHP/2q25YqomKHiUyxyKxSklnY7+dVxH1kE8MxbUVACnhBJRrFUR+nMYUOdFfV3/yARnXKYjJBvlnua08LYondovwtJjwdhiil7qC7HOc72tRLwdYgoIzj4Z2tz+kAMZ6hG8ktghi+lQYmGqC7DhaxkbvOVamqg4o5RVb7uQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YkCQpR+8OLnuPwNjFUfUyTh2Ij0sWaMSrHlwn+WXaXo=;
+ b=jS+Sg7zSeO+Fkwd+CDZTMm0HaXEMm817zHGJCYaigCGDjQWd7GD/yTuFdzVcUA5tNG6hhhv9KpZsjvxAlVmaa51oc/orBifgBoK4w+VAOXxgun9tJdhTceC0F7FqqIdnM9r1JgohHsOvSDyoyDIpEWqW7DuOQKPBPh1hSinY+fPgyxGXWDiefjTv+MEAfVoxekUqExQl6l3K5At7Iy3hqFGQQeZKc1Ae6NlwpqpDdXVselIM1LJQYoA4e054QFyqZfxY3QbrU3R2I8dNPmNTFsukoIetQ/vM6n64HK9fglBZqIfIt92zyEV1UU48uABzt3xf4DGrpg6q9PNk5RThYw==
+Received: from DM6PR14CA0059.namprd14.prod.outlook.com (2603:10b6:5:18f::36)
+ by SN7PR12MB6838.namprd12.prod.outlook.com (2603:10b6:806:266::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.24; Sun, 13 Aug
+ 2023 10:12:53 +0000
+Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
+ (2603:10b6:5:18f:cafe::ae) by DM6PR14CA0059.outlook.office365.com
+ (2603:10b6:5:18f::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.33 via Frontend
+ Transport; Sun, 13 Aug 2023 10:12:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.12 via Frontend Transport; Sun, 13 Aug 2023 10:12:53 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Sun, 13 Aug 2023
+ 03:12:41 -0700
+Received: from [172.27.1.102] (10.126.230.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Sun, 13 Aug
+ 2023 03:12:38 -0700
+Message-ID: <922f30b7-69e0-77dc-6e21-8a16d7a4979a@nvidia.com>
+Date: Sun, 13 Aug 2023 13:12:33 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <202308101103.D0827667B@keescook>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net v2] devlink: Delay health recover notification until
+ devlink registered
+To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+CC: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, Jiri Pirko <jiri@nvidia.com>
+References: <20230809203521.1414444-1-shayd@nvidia.com>
+ <20230810103300.186b42c8@kernel.org> <ZNXrr7MspgDp8QfA@nanopsycho>
+ <20230811144231.0cea3205@kernel.org> <20230811151403.127c8755@kernel.org>
+Content-Language: en-US
+From: Shay Drory <shayd@nvidia.com>
+In-Reply-To: <20230811151403.127c8755@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.230.37]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|SN7PR12MB6838:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6e25cb8-01ae-441c-03b8-08db9be5db57
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LmLUOwFRKT7HPW/ZAcluO0uciBBDKBJimd5vo66vuuKRDLGpe+ocunke8ZVZNVjZVK7K/35ltrEBANMa1uoL7bK4GiGFjiy8wlGn7pn713znQKrKdlUjT9LnQOuup0jwVOOwtQC7XbNQZUR+ShO2Ah+KUndUWSCfH03u0D3jEHsz6McmOt4oCf9AsKoI8rJIbZgvC6nsZhbOAvheOT88ubjVykV0WjelBRHD4kip/bqbaxO1jD8JdM4gBFuY8DOnbckxjW0wDQyVyhm0JGMSYT5FvsD21Ft5f3fuefA9n5HVTEMY1zWJlRlougxPhFVo/+jL+zbUM5oUlVOHt33Kf4xTIrBrCUTok5SUdwwCYD6qu/pGyo/bDYAKTefdjRELmq3Aa8ChWO3EEfS0inADuh9WyXUmA1n9TYrDHnIa551sIiCp2Vlt/vWVacev6EefaqQBx5Fqm9i9OfBXUpLnh9OyrOMp0ccRLcCRYwLp+uZo0slKmErXnhRnfK3lqI53qSjqGEOJ17fwCp7ujtf23aKvyTzBouF9nwaqlVb3cOwQxNyOXeoIDBwe9R8JIohut/S/9t/X2+aDv6kZE8hkWd7Hx4d50EH2ymS9kQ1en4WaMKC1U/NZmuhrQQ8+f2vf3Ft94tq49nXi3dbZ6UNdNDtDvGttfQwKMXnZaVRB0e4yCluIjccydGw1JIlKuvoWS2syCt0MbdHjCG1iz3OT7bF9mBxyv+KNAfvS3Xzq0gH3N2o9q9tdXzv9vwWcM0pZf6h9R/XmNyEhD0V/or0Cag==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(396003)(376002)(346002)(1800799006)(451199021)(82310400008)(186006)(36840700001)(40470700004)(46966006)(83380400001)(36756003)(16526019)(53546011)(107886003)(336012)(26005)(36860700001)(426003)(2616005)(47076005)(31686004)(40480700001)(16576012)(70586007)(316002)(4326008)(15650500001)(70206006)(6666004)(31696002)(5660300002)(41300700001)(82740400003)(8676002)(8936002)(4744005)(2906002)(40460700003)(86362001)(478600001)(110136005)(54906003)(356005)(7636003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2023 10:12:53.1692
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6e25cb8-01ae-441c-03b8-08db9be5db57
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE38.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6838
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 10, 2023 at 11:23:46AM -0700, Kees Cook wrote:
-> On Thu, Aug 10, 2023 at 10:22:47AM -0700, Jakub Kicinski wrote:
-> > On Thu, 10 Aug 2023 15:45:50 +0800 Jijie Shao wrote:
-> > > on 2023/8/9 15:03, Leon Romanovsky wrote:
-> > > > On Wed, Aug 09, 2023 at 10:09:02AM +0800, Jijie Shao wrote:  
-> > > >> From: Hao Chen <chenhao418@huawei.com>
-> > > >>
-> > > >> hns3_dbg_fill_content()/hclge_dbg_fill_content() is aim to integrate some
-> > > >> items to a string for content, and we add '\n' and '\0' in the last
-> > > >> two bytes of content.
-> > > >>
-> > > >> strscpy() will add '\0' in the last byte of destination buffer(one of
-> > > >> items), it result in finishing content print ahead of schedule and some
-> > > >> dump content truncation.
-> > > >>
-> > > >> One Error log shows as below:
-> > > >> cat mac_list/uc
-> > > >> UC MAC_LIST:
-> > > >>
-> > > >> Expected:
-> > > >> UC MAC_LIST:
-> > > >> FUNC_ID  MAC_ADDR            STATE
-> > > >> pf       00:2b:19:05:03:00   ACTIVE
-> > > >>
-> > > >> The destination buffer is length-bounded and not required to be
-> > > >> NUL-terminated, so just change strscpy() to memcpy() to fix it.  
-> > > > I think that you should change to strtomem() and not use plain memcpy().
-> > > >
-> > > > Thanks  
-> > > 
-> > > Hi:
-> > > 
-> > > We tried to replace memcpy with strtomem, but errors was reported during 
-> > > compilation:
-> > > /kernel/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c: In 
-> > > function ‘hclge_dbg_fill_content.part.0’:
-> > > /kernel/include/linux/compiler_types.h:397:38: error: call to 
-> > > ‘__compiletime_assert_519’ declared with attribute error: BUILD_BUG_ON 
-> > > failed: !__builtin_constant_p(_dest_len) || _dest_len == (size_t)-1
-> > >    397 |  _compiletime_assert(condition, msg, __compiletime_assert_, 
-> > > __COUNTER__)
-> > >        |                                      ^
-> > > /kernel/include/linux/compiler_types.h:378:4: note: in definition of 
-> > > macro ‘__compiletime_assert’
-> > >    378 |    prefix ## suffix();    \
-> > >        |    ^~~~~~
-> > > /kernel/include/linux/compiler_types.h:397:2: note: in expansion of 
-> > > macro ‘_compiletime_assert’
-> > >    397 |  _compiletime_assert(condition, msg, __compiletime_assert_, 
-> > > __COUNTER__)
-> > >        |  ^~~~~~~~~~~~~~~~~~~
-> > > /kernel/include/linux/build_bug.h:39:37: note: in expansion of macro 
-> > > ‘compiletime_assert’
-> > >     39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), 
-> > > msg)
-> > >        |                                     ^~~~~~~~~~~~~~~~~~
-> > > /kernel/include/linux/build_bug.h:50:2: note: in expansion of macro 
-> > > ‘BUILD_BUG_ON_MSG’
-> > >     50 |  BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-> > >        |  ^~~~~~~~~~~~~~~~
-> > > /kernel/include/linux/string.h:302:2: note: in expansion of macro 
-> > > ‘BUILD_BUG_ON’
-> > >    302 |  BUILD_BUG_ON(!__builtin_constant_p(_dest_len) ||  \
-> > >        |  ^~~~~~~~~~~~
-> > > /kernel/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c:115:4: 
-> > > note: in expansion of macro ‘strtomem’
-> > >    115 |    strtomem(pos, result[i]);
-> > >        |    ^~~~~~~~
-> > > 
-> > > In the strtomem macro, __builtin_object_size is used to calculate the 
-> > > _dest_len.
-> > > We tried to print the _dest_len directly, and the result was -1.
-> > > How can we solve this?
-> > 
-> > Let's add Kees in case he has a immediate recommendation on use of
-> > strtomem() vs memcpy() for this case..
-> 
-> tldr: use memcpy() instead of strscpy().
-> 
-> 
-> Okay, I went to go read up on the history here. For my own notes, here's
-> the original code, prior to 1cf3d5567f27 ("net: hns3: fix strncpy()
-> not using dest-buf length as length issue"):
-> 
-> static void hns3_dbg_fill_content(char *content, u16 len,
-> 				  const struct hns3_dbg_item *items,
-> 				  const char **result, u16 size)
-> {
-> 	char *pos = content;
-> 	u16 i;
-> 
-> 	memset(content, ' ', len);
-> 	for (i = 0; i < size; i++) {
-> 		if (result)
-> 			strncpy(pos, result[i], strlen(result[i]));
-> 		else
-> 			strncpy(pos, items[i].name, strlen(items[i].name));
-> 
-> 		pos += strlen(items[i].name) + items[i].interval;
-> 	}
-> 
-> 	*pos++ = '\n';
-> 	*pos++ = '\0';
-> }
-> 
-> The warning to be fixed was:
-> 
-> hclge_debugfs.c:90:25: warning: 'strncpy' output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
-> 
-> There are a few extra checks added in 1cf3d5567f27, but I'm more curious
-> about this original code's intent. It seems very confusing to me.
-> 
-> Firstly, why is "pos" updated based on "strlen(items[i].name)" even when
-> "result[i]" is used? Secondly, why is "interval" used? (These concerns
-> are mostly addressed in 1cf3d5567f27.)
-> 
-> I guess I'd just like to take a step back and ask, "What is this
-> function trying to do?" It seems to be building a series of strings in a
-> " "-padding buffer, and it intends that the buffer be newline and %NUL
-> terminated.
-> 
-> It looks very much like it wants to _avoid_ adding %NUL termination when
-> doing copies, which is why it's using strncpy with a length argument of
-> the source string length: it's _forcing_ the copy to not be terminated.
-> This is just memcpy.
-> 
-> strtomem() is designed for buffer sizes that can be known at compile
-> time, so it's not useful here (as was found), since a string is being
-> built up and uses a moving pointer.
-> 
-> I think the correct fix is to use memcpy() instead of strscpy(). No
-> %NUL-truncation is desired, the sizes are already determined and bounds
-> checked. (And the latter is what likely silenced the compiler warning.)
 
-Thanks for an explanation.
+On 12/08/2023 1:14, Jakub Kicinski wrote:
+> External email: Use caution opening links or attachments
+>
+>
+> On Fri, 11 Aug 2023 14:42:31 -0700 Jakub Kicinski wrote:
+>>> Limiting the creation of health reporter only when instance is
+>>> registered does not seem like a good solution to me.
+>>>
+>>> As with any other object, we postpone the notifications only after
+>>> register is done, that sounds fine, doesn't it?
+>> No, it doesn't. Registering health reporters on a semi-initialized
+>> device is a major foot gun, we should not allow this unless really
+>> necessary.
+> FWIW I mean that the recovery may race with the init and try to access
+> things which aren't set up yet. Could lead to deadlocks or crashes at
+> worst and sprinkling of "if (!initialized) return;" at best.
+> All the same problems we had before reload was put under the instance
+> lock basically.
 
-> 
-> -Kees
-> 
-> -- 
-> Kees Cook
+
+Ack, will work on it and send a new patch.
+
 
