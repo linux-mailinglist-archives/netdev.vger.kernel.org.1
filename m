@@ -1,78 +1,203 @@
-Return-Path: <netdev+bounces-27097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9968E77A5B7
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:03:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E6677A5BB
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 11:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29250280F42
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 09:03:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29FE1C208E5
+	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 09:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59F61FB9;
-	Sun, 13 Aug 2023 09:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5711C1FB9;
+	Sun, 13 Aug 2023 09:06:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854A87E
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 09:03:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C92D6C433C7;
-	Sun, 13 Aug 2023 09:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91CA7E
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 09:06:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C4BC433C7;
+	Sun, 13 Aug 2023 09:06:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691917397;
-	bh=wL7aCqb94Cdrt5jofRLuQExYraS5Rk/IOXsF4HRviZI=;
+	s=k20201202; t=1691917562;
+	bh=MOUoxzvR1CPW0JXDdK0xEyu1X8cNtNkMtsilpDEvcbA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pAGMMuT7SjxOMH85jrVhbeUR+xXUM/R/qQA6Zi57fPbtWS7C1b2FMoguz6De30SiQ
-	 Jg0KVE7WCGMNEby20RXO/rPV5QjJYduJNdLJI/yULQnb4LCsO7gkrX0VJ1n4AspfMJ
-	 zNfNWdJJZADle2YKz7moYHMBR1Kp0g+2fjKM/dGjfUkY61c80YpXEwRQFYmzOz3NgK
-	 9cMhEeUkjpSq1pdjflHosJIcEvc0geXP+npWIwh6b5AXmiVL95P/s7/to0ztYkexVU
-	 Y7bdW1x8qNq6zrnYJvc0oBN/Mw3CyVbvj8X40PN/+zJCA8Qqb6FJ69xMyaPNgwuYKz
-	 cItg/tcuicceA==
-Date: Sun, 13 Aug 2023 12:03:13 +0300
+	b=FYdULDb/4Nhijf7L7WBumsbA9hrhVs7VwNP54EzDtzOKVulbm3HSfmW16szIRxjuX
+	 w5yEWRADqdXqZbp9y7o9mtSQ5ZBgG7oaVFMZiAJP1N1DWtXgI+9yEfe2MuYvdR4z9Z
+	 J9BI4EyddYptG4pypRMNzdkZd2D6hLuSucyjJI+CXoKTG6ewylWhuvyY6DfKD5FJYq
+	 6psC+N7aQehytw2cDkBEpM8zhL56FaS7Q17Th8P2W5Bvi1aO8EdyrVv2zj5hWIrwPf
+	 Hl3fxbkVl3Ay2fhprG+6EB1OJbrDUv7sETiJl6EJFj0bF7VHOE8v853fVk5ScN20qc
+	 WtLeD4bHQIiDg==
+Date: Sun, 13 Aug 2023 12:05:57 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-net v2] ice: fix receive buffer size miscalculation
-Message-ID: <20230813090313.GG7707@unreal>
-References: <20230810235110.440553-1-jesse.brandeburg@intel.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jijie Shao <shaojijie@huawei.com>,
+	yisen.zhuang@huawei.com, salil.mehta@huawei.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net: hns3: fix strscpy causing content truncation
+ issue
+Message-ID: <20230813090557.GH7707@unreal>
+References: <20230809020902.1941471-1-shaojijie@huawei.com>
+ <20230809070302.GR94631@unreal>
+ <7c44c161-9c86-8c60-f031-6d77d6c28c20@huawei.com>
+ <20230810102247.699ddc14@kernel.org>
+ <202308101103.D0827667B@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230810235110.440553-1-jesse.brandeburg@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <202308101103.D0827667B@keescook>
 
-On Thu, Aug 10, 2023 at 04:51:10PM -0700, Jesse Brandeburg wrote:
-> The driver is misconfiguring the hardware for some values of MTU such that
-> it could use multiple descriptors to receive a packet when it could have
-> simply used one.
+On Thu, Aug 10, 2023 at 11:23:46AM -0700, Kees Cook wrote:
+> On Thu, Aug 10, 2023 at 10:22:47AM -0700, Jakub Kicinski wrote:
+> > On Thu, 10 Aug 2023 15:45:50 +0800 Jijie Shao wrote:
+> > > on 2023/8/9 15:03, Leon Romanovsky wrote:
+> > > > On Wed, Aug 09, 2023 at 10:09:02AM +0800, Jijie Shao wrote:  
+> > > >> From: Hao Chen <chenhao418@huawei.com>
+> > > >>
+> > > >> hns3_dbg_fill_content()/hclge_dbg_fill_content() is aim to integrate some
+> > > >> items to a string for content, and we add '\n' and '\0' in the last
+> > > >> two bytes of content.
+> > > >>
+> > > >> strscpy() will add '\0' in the last byte of destination buffer(one of
+> > > >> items), it result in finishing content print ahead of schedule and some
+> > > >> dump content truncation.
+> > > >>
+> > > >> One Error log shows as below:
+> > > >> cat mac_list/uc
+> > > >> UC MAC_LIST:
+> > > >>
+> > > >> Expected:
+> > > >> UC MAC_LIST:
+> > > >> FUNC_ID  MAC_ADDR            STATE
+> > > >> pf       00:2b:19:05:03:00   ACTIVE
+> > > >>
+> > > >> The destination buffer is length-bounded and not required to be
+> > > >> NUL-terminated, so just change strscpy() to memcpy() to fix it.  
+> > > > I think that you should change to strtomem() and not use plain memcpy().
+> > > >
+> > > > Thanks  
+> > > 
+> > > Hi:
+> > > 
+> > > We tried to replace memcpy with strtomem, but errors was reported during 
+> > > compilation:
+> > > /kernel/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c: In 
+> > > function ‘hclge_dbg_fill_content.part.0’:
+> > > /kernel/include/linux/compiler_types.h:397:38: error: call to 
+> > > ‘__compiletime_assert_519’ declared with attribute error: BUILD_BUG_ON 
+> > > failed: !__builtin_constant_p(_dest_len) || _dest_len == (size_t)-1
+> > >    397 |  _compiletime_assert(condition, msg, __compiletime_assert_, 
+> > > __COUNTER__)
+> > >        |                                      ^
+> > > /kernel/include/linux/compiler_types.h:378:4: note: in definition of 
+> > > macro ‘__compiletime_assert’
+> > >    378 |    prefix ## suffix();    \
+> > >        |    ^~~~~~
+> > > /kernel/include/linux/compiler_types.h:397:2: note: in expansion of 
+> > > macro ‘_compiletime_assert’
+> > >    397 |  _compiletime_assert(condition, msg, __compiletime_assert_, 
+> > > __COUNTER__)
+> > >        |  ^~~~~~~~~~~~~~~~~~~
+> > > /kernel/include/linux/build_bug.h:39:37: note: in expansion of macro 
+> > > ‘compiletime_assert’
+> > >     39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), 
+> > > msg)
+> > >        |                                     ^~~~~~~~~~~~~~~~~~
+> > > /kernel/include/linux/build_bug.h:50:2: note: in expansion of macro 
+> > > ‘BUILD_BUG_ON_MSG’
+> > >     50 |  BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+> > >        |  ^~~~~~~~~~~~~~~~
+> > > /kernel/include/linux/string.h:302:2: note: in expansion of macro 
+> > > ‘BUILD_BUG_ON’
+> > >    302 |  BUILD_BUG_ON(!__builtin_constant_p(_dest_len) ||  \
+> > >        |  ^~~~~~~~~~~~
+> > > /kernel/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c:115:4: 
+> > > note: in expansion of macro ‘strtomem’
+> > >    115 |    strtomem(pos, result[i]);
+> > >        |    ^~~~~~~~
+> > > 
+> > > In the strtomem macro, __builtin_object_size is used to calculate the 
+> > > _dest_len.
+> > > We tried to print the _dest_len directly, and the result was -1.
+> > > How can we solve this?
+> > 
+> > Let's add Kees in case he has a immediate recommendation on use of
+> > strtomem() vs memcpy() for this case..
 > 
-> Change the driver to use a round-up instead of the result of a shift, as
-> the shift can truncate the lower bits of the size, and result in the
-> problem noted above. It also aligns this driver with similar code in i40e.
+> tldr: use memcpy() instead of strscpy().
 > 
-> The insidiousness of this problem is that everything works with the wrong
-> size, it's just not working as well as it could, as some MTU sizes end up
-> using two or more descriptors, and there is no way to tell that is
-> happening without looking at ice_trace or a bus analyzer.
 > 
-> Fixes: efc2214b6047 ("ice: Add support for XDP")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> ---
-> v2: added fixes tag pointing to the last time this line was modified in
-> v5.5 instead of pointing back to the introduction of the driver.
-> ---
->  drivers/net/ethernet/intel/ice/ice_base.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Okay, I went to go read up on the history here. For my own notes, here's
+> the original code, prior to 1cf3d5567f27 ("net: hns3: fix strncpy()
+> not using dest-buf length as length issue"):
 > 
+> static void hns3_dbg_fill_content(char *content, u16 len,
+> 				  const struct hns3_dbg_item *items,
+> 				  const char **result, u16 size)
+> {
+> 	char *pos = content;
+> 	u16 i;
+> 
+> 	memset(content, ' ', len);
+> 	for (i = 0; i < size; i++) {
+> 		if (result)
+> 			strncpy(pos, result[i], strlen(result[i]));
+> 		else
+> 			strncpy(pos, items[i].name, strlen(items[i].name));
+> 
+> 		pos += strlen(items[i].name) + items[i].interval;
+> 	}
+> 
+> 	*pos++ = '\n';
+> 	*pos++ = '\0';
+> }
+> 
+> The warning to be fixed was:
+> 
+> hclge_debugfs.c:90:25: warning: 'strncpy' output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
+> 
+> There are a few extra checks added in 1cf3d5567f27, but I'm more curious
+> about this original code's intent. It seems very confusing to me.
+> 
+> Firstly, why is "pos" updated based on "strlen(items[i].name)" even when
+> "result[i]" is used? Secondly, why is "interval" used? (These concerns
+> are mostly addressed in 1cf3d5567f27.)
+> 
+> I guess I'd just like to take a step back and ask, "What is this
+> function trying to do?" It seems to be building a series of strings in a
+> " "-padding buffer, and it intends that the buffer be newline and %NUL
+> terminated.
+> 
+> It looks very much like it wants to _avoid_ adding %NUL termination when
+> doing copies, which is why it's using strncpy with a length argument of
+> the source string length: it's _forcing_ the copy to not be terminated.
+> This is just memcpy.
+> 
+> strtomem() is designed for buffer sizes that can be known at compile
+> time, so it's not useful here (as was found), since a string is being
+> built up and uses a moving pointer.
+> 
+> I think the correct fix is to use memcpy() instead of strscpy(). No
+> %NUL-truncation is desired, the sizes are already determined and bounds
+> checked. (And the latter is what likely silenced the compiler warning.)
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Thanks for an explanation.
+
+> 
+> -Kees
+> 
+> -- 
+> Kees Cook
 
