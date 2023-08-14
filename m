@@ -1,47 +1,49 @@
-Return-Path: <netdev+bounces-27298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF2C77B622
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:11:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCFA77B626
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:11:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87A0D280E0C
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:11:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6FC42810BD
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63B7AD4F;
-	Mon, 14 Aug 2023 10:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63E4AD59;
+	Mon, 14 Aug 2023 10:11:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1362AD43
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:10:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACC1EC433C8;
-	Mon, 14 Aug 2023 10:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66690AD27
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:11:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E438C433C8;
+	Mon, 14 Aug 2023 10:11:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692007829;
-	bh=KwEYWO1MLwfGzs8d9axTJTvThPuNr1FoAll8e/c5bs8=;
+	s=k20201202; t=1692007877;
+	bh=uxvanIIHvhdIZvWa0ZURaB6hMyqkNSdzk1Vwl2Ugphk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rEvUnJQPmABiDutqgr8m+OXFoOgC0DhNrvPLd7YomjZcp4lnxy4MITsRKzGRN2oq5
-	 TmeYBaI0M7NAn47UxTKIq6Xb/SpULm9/2tyAPJtCME2t+sjFTGZ+nxBGRu5HkrgXOL
-	 xSEN9pzffJheMZldCQuIFqRvSK8/GUA+M0pkGrXcWnaB8y9+KlYgDHAaXm5oTrdrLc
-	 ZspwTOE3FH7i0Fk/YLhAnI4kFDBrUuTUNPIeHkU2xDZ8usPbiBKuel2AY7OoLh3bbT
-	 TjScp4/AOggVZjLykJvzzUMfi/goVWMPCnT+nbzzx+C+gXG6wqHGtWu2vLpIBtIZ9Q
-	 rfpgkmCPmjoTQ==
-Date: Mon, 14 Aug 2023 13:10:25 +0300
+	b=qbwq5yrZW58GOvlUw/BEWbHlCWfcT5bSz/K4lOpXdVNzecfQ1TjWO7eWfaK/a6Ko8
+	 C6TK62g5tFHU6tm9GLmgV9gWdFWWIFXJFnRRrANz+JoNl5PYgr3EdIbUPxuloHWDQr
+	 ny6vjPD5pOV06y0rdEuXpIuIvLxtcjwR55I2rpmZ5d1InZNA71fuQbWt58g3H6LWbb
+	 i6hU2zZo6EvS7dtz//YL4eBCuiJvp8Kp9cNF7b4U+GYsXDwkg1R4/2E28bDNGvoepn
+	 j3cAobipHAU5tqKc92ahHHngTC8yUbmoHDLoJV1sO9DGUShpNEllYyEVF9hKiSrFYv
+	 6MpJMjG6Uj+qQ==
+Date: Mon, 14 Aug 2023 13:11:13 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Dong Chenchen <dongchenchen2@huawei.com>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, fw@strlen.de, timo.teras@iki.fi,
-	yuehaibing@huawei.com, weiyongjun1@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: xfrm: skip policies marked as dead while
- reinserting policies
-Message-ID: <20230814101025.GD3921@unreal>
-References: <20230814013352.2771452-1-dongchenchen2@huawei.com>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: vadim.fedorenko@linux.dev, davem@davemloft.net, edumazet@google.com,
+	elic@nvidia.com, kuba@kernel.org, linux-rdma@vger.kernel.org,
+	mbloch@nvidia.com, netdev@vger.kernel.org, pabeni@redhat.com,
+	roid@nvidia.com, saeedm@nvidia.com, shayd@nvidia.com,
+	vladbu@nvidia.com, kernel test robot <lkp@intel.com>,
+	Dan Carpenter <error27@gmail.com>
+Subject: Re: [PATCH -next v2] net/mlx5: Devcom, only use devcom after NULL
+ check in mlx5_devcom_send_event()
+Message-ID: <20230814101113.GE3921@unreal>
+References: <face8e0a-b3f6-85d9-ce1d-8afecdafe2a8@linux.dev>
+ <20230814072342.189470-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,67 +52,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230814013352.2771452-1-dongchenchen2@huawei.com>
+In-Reply-To: <20230814072342.189470-1-lizetao1@huawei.com>
 
-On Mon, Aug 14, 2023 at 09:33:52AM +0800, Dong Chenchen wrote:
-> BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
-> Read of size 1 at addr ffff8881051f3bf8 by task ip/668
+On Mon, Aug 14, 2023 at 03:23:42PM +0800, Li Zetao wrote:
+> There is a warning reported by kernel test robot:
 > 
-> CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x72/0xa0
->  print_report+0xd0/0x620
->  kasan_report+0xb6/0xf0
->  xfrm_policy_inexact_list_reinsert+0xb6/0x430
->  xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
->  xfrm_policy_inexact_alloc_chain+0x23f/0x320
->  xfrm_policy_inexact_insert+0x6b/0x590
->  xfrm_policy_insert+0x3b1/0x480
->  xfrm_add_policy+0x23c/0x3c0
->  xfrm_user_rcv_msg+0x2d0/0x510
->  netlink_rcv_skb+0x10d/0x2d0
->  xfrm_netlink_rcv+0x49/0x60
->  netlink_unicast+0x3fe/0x540
->  netlink_sendmsg+0x528/0x970
->  sock_sendmsg+0x14a/0x160
->  ____sys_sendmsg+0x4fc/0x580
->  ___sys_sendmsg+0xef/0x160
->  __sys_sendmsg+0xf7/0x1b0
->  do_syscall_64+0x3f/0x90
->  entry_SYSCALL_64_after_hwframe+0x73/0xdd
+> smatch warnings:
+> drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c:264
+> 	mlx5_devcom_send_event() warn: variable dereferenced before
+> 		IS_ERR check devcom (see line 259)
 > 
-> The root cause is:
+> The reason for the warning is that the pointer is used before check, put
+> the assignment to comp after devcom check to silence the warning.
 > 
-> cpu 0			cpu1
-> xfrm_dump_policy
-> xfrm_policy_walk
-> list_move_tail
-> 			xfrm_add_policy
-> 			... ...
-> 			xfrm_policy_inexact_list_reinsert
-> 			list_for_each_entry_reverse
-> 				if (!policy->bydst_reinsert)
-> 				//read non-existent policy
-> xfrm_dump_policy_done
-> xfrm_policy_walk_done
-> list_del(&walk->walk.all);
-> 
-> If dump_one_policy() returns err (triggered by netlink socket),
-> xfrm_policy_walk() will move walk initialized by socket to list
-> net->xfrm.policy_all. so this socket becomes visible in the global
-> policy list. The head *walk can be traversed when users add policies
-> with different prefixlen and trigger xfrm_policy node merge.
-> 
-> It can be fixed by skip such "policies" with walk.dead set to 1.
-> 
-> Fixes: 9cf545ebd591 ("xfrm: policy: store inexact policies in a tree ordered by destination address")
-> Fixes: 12a169e7d8f4 ("ipsec: Put dumpers on the dump list")
-> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> Fixes: 88d162b47981 ("net/mlx5: Devcom, Infrastructure changes")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <error27@gmail.com>
+> Closes: https://lore.kernel.org/r/202308041028.AkXYDwJ6-lkp@intel.com/
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 > ---
->  net/xfrm/xfrm_policy.c | 3 +++
->  1 file changed, 3 insertions(+)
+> v1 -> v2: Modify the order of variable declarations to end up with reverse x-mas tree order.
+> v1: https://lore.kernel.org/all/20230804092636.91357-1-lizetao1@huawei.com/
+> 
+>  drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 
 Thanks,
