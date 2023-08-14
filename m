@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-27458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE68F77C107
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:50:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9818577C10E
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 851741C20AB9
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:50:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A6BD28121E
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BE5D30A;
-	Mon, 14 Aug 2023 19:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A80D30E;
+	Mon, 14 Aug 2023 19:52:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73435687
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:50:50 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CCA9FA
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:50:49 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-5236a9788a7so6451740a12.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:50:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7BB5687
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:52:34 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65C5F120
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:52:32 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9fa64db41so69919691fa.1
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:52:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692042647; x=1692647447;
+        d=linaro.org; s=google; t=1692042750; x=1692647550;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kb0ShcqIWwZ8vW68RmG3NUpdS0I2e+OEWn7VJy9tC8I=;
-        b=p7Xr9z9CgGfjbk1IAKIOwD9ld694ltUV7RN8+ZuB7qTLE1J6/sxlZO1hOWSIkWQeJN
-         11ouGSEo8MLRPtghAaFRukq9fNzdOT5rc822C1IPpvEgmxJviR96P0dJRIHA/+DZdOD8
-         PGOQTfCjTJ9OKhVxrt/FAyg+fl4FRs6C94bHSEd4of/VlH3keIramBJiiL21lKhXME8t
-         9RIITI8Ta0M+6qmG7B0eG/wKharpn0qKlpkVg60d4QdwfjoBTKrDOyLQOxQACPMKrMlD
-         Dzxrddtjpj284VFg/doZB0CYOk4kCdX0N8N6DconY1djR0fW9i6MzbQ1pMzZyMUfOi6U
-         mtWw==
+        bh=aFPHil3VN5VwOd9/RmmBPUpBPRF2hJNyEcrMRkz91WI=;
+        b=Nam9WGvo4nse9P/4+o9yT+MKRo93lZvZHbPhUqsCqsxSqC+5apKdj4HhJzfvLLqHi7
+         LfY6GPUnphqbJeVm/ixnvHQwSBHw0x1nfKrOSX/IhAqh0FtC5m6PPFydxki0FhFMGswh
+         PiZQqa2aBx+KPbQKn/XEj/0AiId1qtcEmYdh9J2Ccm5j3gaEj8xsXSEGC1Sjzo6sMSCj
+         DLScG5MqrwHCBXSrrPIZ8SirEkOqxF7p8xSoY/rR1f1uV0GXQtLqstc8L6zKQSnfRqNW
+         p+H2gPpJJIoS2GIwDnWKI9ue0iA1EqbMCGMAjuUj6YdqzJYrOs6MbJAh4xRZwycyr8uX
+         Pdcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692042647; x=1692647447;
+        d=1e100.net; s=20221208; t=1692042750; x=1692647550;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kb0ShcqIWwZ8vW68RmG3NUpdS0I2e+OEWn7VJy9tC8I=;
-        b=bz16P7xaPjh47dhKMJHqfMKAc/td89GdKKKtSyCJ8fTqFzTaJ6e5tbW2NHqJl5Zm8e
-         J7YFuZkak/M7ueNVzp9xJEEzf898hrZgwHteITGp86g0PcJtZLhZ0fJl3di/r3ZdbSZg
-         HQdfw1V8NbfcjZw7JAvFq4WqdEJom6zarLlcKpmb4f8OhbHrzXaIepJTSTX2fw6btleC
-         L4btHlr//1VmIRJCM1rIvGJ9TA+JduWVYcZnCiebcsUEGvU4/zPfvGm4Qdut0S1IRIs2
-         Mt4BMgHWnbfGX/20Y3u/mHrnmKrVtpb51zhtQhzN2+G8jGXtZav1Wth6CXegtMEM8dQ0
-         6PzA==
-X-Gm-Message-State: AOJu0YyK5QLsx0bkOEhMVwi99uTWttEZBmhnZsCmOopQZufvM0mk9rev
-	ElcnFq8Q1BvpMvgxzKd9W2fwxg==
-X-Google-Smtp-Source: AGHT+IGL6psO4RUxjx2ppNu36MtOVlPU0IKFkwRw1TipnuJpYturHbZk78Q/rpmmMNBUB7mR3fGWqA==
-X-Received: by 2002:aa7:d1d5:0:b0:523:102f:3ce0 with SMTP id g21-20020aa7d1d5000000b00523102f3ce0mr8543673edp.21.1692042647690;
-        Mon, 14 Aug 2023 12:50:47 -0700 (PDT)
+        bh=aFPHil3VN5VwOd9/RmmBPUpBPRF2hJNyEcrMRkz91WI=;
+        b=E+VBgTfCXLc3ycNb6QoEMj66l2p8TlvGEzNaPv65PU0sAO+oLLCeC4WgDa0Xvbh40z
+         OETlOl5eg6pjcopqPofYCqvw0m1h/R2lWxxCozLRXBwJ6VioYmxFWiu9EhRIqN2Ac2zu
+         3f1hHQwyT4fK+25xodKt71mHDTp5gGoyk6+z+EbKLdVSSnNI/yLODXhPJDjxY4tfgxPS
+         8qQ8kW0TG5OXBrK6Jjkyr6EE9hwwhH6rhatDXsegmnkc6XXVzYexqUT2dFrHNcPqtula
+         Agq+Vge+2r1GCRGJMUikt6xR4oIuTn9rPgkcxsA6J89KkKinLCaDbSUoCsxnT5KDqK+v
+         89ww==
+X-Gm-Message-State: AOJu0YyHe4Ed20rT8lcw0j6P0p/Vzn1/Vlbd6Zo3AkBo+qdoqRcYmOvu
+	lR0vbHhmj13bdrkHHoHX6f8AWQ==
+X-Google-Smtp-Source: AGHT+IGk2WlvhxtBGwqxOHsyQt43Gr+unp4SPvZqT4Q4QVuwozdHl+Yvgtrlo/0sKdCp5JEZFiCN6g==
+X-Received: by 2002:a2e:96d4:0:b0:2b9:4492:1226 with SMTP id d20-20020a2e96d4000000b002b944921226mr7726372ljj.11.1692042750567;
+        Mon, 14 Aug 2023 12:52:30 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.214.188])
-        by smtp.gmail.com with ESMTPSA id t9-20020aa7d709000000b0051df54c6a27sm5868404edq.56.2023.08.14.12.50.45
+        by smtp.gmail.com with ESMTPSA id h11-20020a170906110b00b00977cad140a8sm5980721eja.218.2023.08.14.12.52.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 12:50:47 -0700 (PDT)
-Message-ID: <b224ccaf-d70f-8f65-4b2f-6f4798841558@linaro.org>
-Date: Mon, 14 Aug 2023 21:50:44 +0200
+        Mon, 14 Aug 2023 12:52:30 -0700 (PDT)
+Message-ID: <5319fd76-8ac3-18ce-4065-d90bca29a54e@linaro.org>
+Date: Mon, 14 Aug 2023 21:52:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,24 +66,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
+Subject: Re: [PATCH v2 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
+ Block of FSD SoC
 Content-Language: en-US
 To: Sriranjani P <sriranjani.p@samsung.com>, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- richardcochran@gmail.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, mcoquelin.stm32@gmail.com, alim.akhtar@samsung.com,
- linux-fsd@tesla.com, pankaj.dubey@samsung.com, swathi.ks@samsung.com,
- ravi.patel@samsung.com
+ krzysztof.kozlowski+dt@linaro.org, alexandre.torgue@foss.st.com,
+ peppe.cavallaro@st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Chandrasekar R <rcsekar@samsung.com>,
- Suresh Siddha <ssiddha@tesla.com>
-References: <20230814112539.70453-1-sriranjani.p@samsung.com>
- <CGME20230814112612epcas5p275cffb4d3dae86c6090ca246083631c4@epcas5p2.samsung.com>
- <20230814112539.70453-3-sriranjani.p@samsung.com>
+ linux-kernel@vger.kernel.org, pankaj.dubey@samsung.com,
+ alim.akhtar@samsung.com, ravi.patel@samsung.com,
+ 'Jayati Sahu' <jayati.sahu@samsung.com>, swathi.ks@samsung.com
+References: <20230111075422.107173-1-sriranjani.p@samsung.com>
+ <CGME20230111075450epcas5p3f13b94bfeaa66d386aa51f87ca4ec5bf@epcas5p3.samsung.com>
+ <20230111075422.107173-4-sriranjani.p@samsung.com>
+ <2590a514-81f7-1876-c43b-80c8abe40cf9@linaro.org>
+ <000001d9ce98$bbaedb90$330c92b0$@samsung.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230814112539.70453-3-sriranjani.p@samsung.com>
+In-Reply-To: <000001d9ce98$bbaedb90$330c92b0$@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -93,145 +93,161 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 14/08/2023 13:25, Sriranjani P wrote:
-> The FSD SoC contains two instance of the Synopsys DWC ethernet QOS IP core.
-> The binding that it uses is slightly different from existing ones because
-> of the integration (clocks, resets).
+On 14/08/2023 12:18, Sriranjani P wrote:
 > 
-> For FSD SoC, a mux switch is needed between internal and external clocks.
-> By default after reset internal clock is used but for receiving packets
-> properly, external clock is needed. Mux switch to external clock happens
-> only when the external clock is present.
 > 
-> Signed-off-by: Chandrasekar R <rcsekar@samsung.com>
-> Signed-off-by: Suresh Siddha <ssiddha@tesla.com>
-> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
-> Signed-off-by: Sriranjani P <sriranjani.p@samsung.com>
-> ---
+>> -----Original Message-----
+>> From: Krzysztof Kozlowski [mailto:krzysztof.kozlowski@linaro.org]
+>> Sent: 12 January 2023 15:05
+>> To: Sriranjani P <sriranjani.p@samsung.com>; davem@davemloft.net;
+>> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
+>> robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
+>> alexandre.torgue@foss.st.com; peppe.cavallaro@st.com;
+>> joabreu@synopsys.com; mcoquelin.stm32@gmail.com
+>> Cc: netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-
+>> kernel@vger.kernel.org; pankaj.dubey@samsung.com;
+>> alim.akhtar@samsung.com; ravi.patel@samsung.com; Jayati Sahu
+>> <jayati.sahu@samsung.com>
+>> Subject: Re: [PATCH v2 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
+>> Block of FSD SoC
+>>
+>> On 11/01/2023 08:54, Sriranjani P wrote:
+>>> The FSD SoC contains two instances of Synopsys DWC QoS Ethernet IP,
+>>> one in FSYS0 block and other in PERIC block.
+>>>
+>>> Adds device tree node for Ethernet in FSYS0 Block and enables the same
+>>> for FSD platform.
+>>>
+>>> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
+>>> Signed-off-by: Jayati Sahu <jayati.sahu@samsung.com>
+>>> Signed-off-by: Sriranjani P <sriranjani.p@samsung.com>
+>>> ---
+>>>  arch/arm64/boot/dts/tesla/fsd-evb.dts      |  9 ++++
+>>>  arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi | 56
+>> ++++++++++++++++++++++
+>>>  arch/arm64/boot/dts/tesla/fsd.dtsi         | 22 +++++++++
+>>>  3 files changed, 87 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/boot/dts/tesla/fsd-evb.dts
+>>> b/arch/arm64/boot/dts/tesla/fsd-evb.dts
+>>> index 1db6ddf03f01..ca0c1a28d562 100644
+>>> --- a/arch/arm64/boot/dts/tesla/fsd-evb.dts
+>>> +++ b/arch/arm64/boot/dts/tesla/fsd-evb.dts
+>>> @@ -30,6 +30,15 @@
+>>>  	};
+>>>  };
+>>>
+>>> +&ethernet_0 {
+>>> +	status = "okay";
+>>> +
+>>> +	fixed-link {
+>>> +		speed = <1000>;
+>>> +		full-duplex;
+>>> +	};
+>>> +};
+>>> +
+>>>  &fin_pll {
+>>>  	clock-frequency = <24000000>;
+>>>  };
+>>> diff --git a/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
+>>> b/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
+>>> index d0abb9aa0e9e..7ccc0738a149 100644
+>>> --- a/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
+>>> +++ b/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
+>>> @@ -64,6 +64,62 @@
+>>>  		samsung,pin-pud = <FSD_PIN_PULL_NONE>;
+>>>  		samsung,pin-drv = <FSD_PIN_DRV_LV2>;
+>>>  	};
+>>> +
+>>> +		eth0_tx_clk: eth0-tx-clk-pins {
+>>
+>> Wrong indentation.
+> Will fix in the next version.
+>>
+>>> +		samsung,pins = "gpf0-0";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_DOWN>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
+>>> +	};
+>>> +
+>>> +	eth0_tx_data: eth0-tx-data-pins {
+>>> +		samsung,pins = "gpf0-1", "gpf0-2", "gpf0-3", "gpf0-4";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
+>>> +	};
+>>> +
+>>> +	eth0_tx_ctrl: eth0-tx-ctrl-pins {
+>>> +		samsung,pins = "gpf0-5";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
+>>> +	};
+>>> +
+>>> +	eth0_phy_intr: eth0-phy-intr-pins {
+>>> +		samsung,pins = "gpf0-6";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_NONE>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV4>;
+>>> +	};
+>>> +
+>>> +	eth0_rx_clk: eth0-rx-clk-pins {
+>>> +		samsung,pins = "gpf1-0";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
+>>> +	};
+>>> +
+>>> +	eth0_rx_data: eth0-rx-data-pins {
+>>> +		samsung,pins = "gpf1-1", "gpf1-2", "gpf1-3", "gpf1-4";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
+>>> +	};
+>>> +
+>>> +	eth0_rx_ctrl: eth0-rx-ctrl-pins {
+>>> +		samsung,pins = "gpf1-5";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
+>>> +	};
+>>> +
+>>> +	eth0_mdio: eth0-mdio-pins {
+>>> +		samsung,pins = "gpf1-6", "gpf1-7";
+>>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
+>>> +		samsung,pin-pud = <FSD_PIN_PULL_NONE>;
+>>> +		samsung,pin-drv = <FSD_PIN_DRV_LV4>;
+>>> +	};
+>>>  };
+>>>
+>>>  &pinctrl_peric {
+>>> diff --git a/arch/arm64/boot/dts/tesla/fsd.dtsi
+>>> b/arch/arm64/boot/dts/tesla/fsd.dtsi
+>>> index f35bc5a288c2..ade707cc646b 100644
+>>> --- a/arch/arm64/boot/dts/tesla/fsd.dtsi
+>>> +++ b/arch/arm64/boot/dts/tesla/fsd.dtsi
+>>> @@ -32,6 +32,7 @@
+>>>  		spi0 = &spi_0;
+>>>  		spi1 = &spi_1;
+>>>  		spi2 = &spi_2;
+>>> +		eth0 = &ethernet_0;
+>>
+>> This is a friendly reminder during the review process.
+>>
+>> It seems my previous comments were not fully addressed. Maybe my
+>> feedback got lost between the quotes, maybe you just forgot to apply it.
+>> Please go back to the previous discussion and either implement all requested
+>> changes or keep discussing them.
+> Sorry somehow I'm not able to find my previous mail chain.
 
+Why? It is in the lore. I think this proves that responding after half a
+year make it difficult for both reviewer and submitter.
 
-> +static int dwc_eqos_setup_rxclock(struct platform_device *pdev, int ins_num)
-> +{
-> +	struct device_node *np = pdev->dev.of_node;
-> +	struct regmap *syscon;
-> +	unsigned int reg;
-> +
-> +	if (np && of_property_read_bool(np, "fsd-rx-clock-skew")) {
-> +		syscon = syscon_regmap_lookup_by_phandle_args(np,
-> +							      "fsd-rx-clock-skew",
-> +							      1, &reg);
-> +		if (IS_ERR(syscon)) {
-> +			dev_err(&pdev->dev,
-> +				"couldn't get the rx-clock-skew syscon!\n");
-> +			return PTR_ERR(syscon);
-> +		}
-> +
-> +		regmap_write(syscon, reg, rx_clock_skew_val[ins_num]);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int fsd_eqos_clk_init(struct fsd_eqos_plat_data *plat,
-> +			     struct plat_stmmacenet_data *data)
-> +{
-> +	int ret = 0, i;
-> +
-> +	const struct fsd_eqos_variant *fsd_eqos_v_data =
-> +						plat->fsd_eqos_inst_var;
-> +
-> +	plat->clks = devm_kcalloc(plat->dev, fsd_eqos_v_data->num_clks,
-> +				  sizeof(*plat->clks), GFP_KERNEL);
-> +	if (!plat->clks)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < fsd_eqos_v_data->num_clks; i++)
-> +		plat->clks[i].id = fsd_eqos_v_data->clk_list[i];
-> +
-> +	ret = devm_clk_bulk_get(plat->dev, fsd_eqos_v_data->num_clks,
-> +				plat->clks);
+> I had replied to your comment in the previous version of the mail.
+> In this case alias id is used to differentiate between Ethernet instance 0 and 1 in the driver code.
 
-Instead of duplicating entire clock management with existing code, you
-should extend/rework existing one.
-
-This code is unfortunately great example how not to stuff vendor code
-into upstream project. :(
-
-> +
-> +	return ret;
-> +}
-> +
-> +static int fsd_clks_endisable(void *priv, bool enabled)
-> +{
-> +	int ret, num_clks;
-> +	struct fsd_eqos_plat_data *plat = priv;
-> +
-> +	num_clks = plat->fsd_eqos_inst_var->num_clks;
-> +
-> +	if (enabled) {
-> +		ret = clk_bulk_prepare_enable(num_clks, plat->clks);
-> +		if (ret) {
-> +			dev_err(plat->dev, "Clock enable failed, err = %d\n", ret);
-> +			return ret;
-> +		}
-> +	} else {
-> +		clk_bulk_disable_unprepare(num_clks, plat->clks);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int fsd_eqos_probe(struct platform_device *pdev,
-> +			  struct plat_stmmacenet_data *data,
-> +			  struct stmmac_resources *res)
-> +{
-> +	struct fsd_eqos_plat_data *priv_plat;
-> +	struct device_node *np = pdev->dev.of_node;
-> +	int ret = 0;
-> +
-> +	priv_plat = devm_kzalloc(&pdev->dev, sizeof(*priv_plat), GFP_KERNEL);
-> +	if (!priv_plat) {
-> +		ret = -ENOMEM;
-
-return -ENOMEM
-
-> +		goto error;
-> +	}
-> +
-> +	priv_plat->dev = &pdev->dev;
-> +	data->bus_id = of_alias_get_id(np, "eth");
-
-No, you cannot do like this. Aliases are board specific and are based on
-labeling on the board.
-
-> +
-> +	priv_plat->fsd_eqos_inst_var = &fsd_eqos_clk_info[data->bus_id];
-> +
-> +	ret = fsd_eqos_clk_init(priv_plat, data);
-> +
-> +	data->bsp_priv = priv_plat;
-> +	data->clks_config = fsd_clks_endisable;
-> +	data->rxmux_setup = dwc_eqos_rxmux_setup;
-> +
-> +	ret = fsd_clks_endisable(priv_plat, true);
-> +	if (ret)
-> +		goto error;
-> +
-> +	ret = dwc_eqos_setup_rxclock(pdev, data->bus_id);
-> +	if (ret) {
-> +		fsd_clks_endisable(priv_plat, false);
-> +		dev_err_probe(&pdev->dev, ret, "Unable to setup rxclock\n");
-
-The syntax is: return dev_err_probe().
-
-> +	}
-> +
-> +error:
-> +	return ret;
-> +}
-
-....
-
+Nope. Aliases are per board, not per SoC, so how is this supposed to
+work if we number them reversed (1->0) in another board?
 
 Best regards,
 Krzysztof
