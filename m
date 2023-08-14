@@ -1,51 +1,53 @@
-Return-Path: <netdev+bounces-27250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC45977B286
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:32:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B9C77B288
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65C3D28101C
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:32:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAD3B281029
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3448834;
-	Mon, 14 Aug 2023 07:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA188BE8;
+	Mon, 14 Aug 2023 07:33:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0CB1842
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:32:31 +0000 (UTC)
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31501E75
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 00:32:29 -0700 (PDT)
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3177b6bd875so534202f8f.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 00:32:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691998347; x=1692603147;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1JZhJnxLl5/hxwRD6RcnqAJV9VSz0s93qZ3zTgomAZw=;
-        b=IPvHYDLJiC15Ze3/Y355vrq+Evpc0PciKdqAF+6zmxGdmc7wY2eFs1E6FcKc64nLom
-         CQeQigSGnJAAMaeid8NnM5rY5fmcbJkohhyqdrIJgwncxvmY5O5QYexzUwkJ2vPZai83
-         aWAvL7QA4D8cxy/M/h1pD/0fUiRQePZw2sHH80ABxmJ44zhZWRPwjEL5j+hTWDLOqmTo
-         3zPKuwBY4SVr9eMFR3SVtrQFUUJce1ZmQdtI+gaWlImJPEs73qlmYiG/V0iWBOXYm2hp
-         nIVPEmfbouBCVE/ROIbnjFq8jKbtw5eND+KDoOSGph0mwYvT8TGNAV1STYOhMvXX3U1s
-         oLYw==
-X-Gm-Message-State: AOJu0Ywio8j/H4rNtkhDlvdjdouIiaWSWmxAzpPyvDaCOEljv7+O2kA9
-	UZPXh4ruFo/nT7cgoSTrhdg=
-X-Google-Smtp-Source: AGHT+IFIuDKzN57buPIfzHNzuN7jnsdw/924uPh1ka2T9FPgyq9fOkvIYzoBbf4tyJArdlbSuLSxbw==
-X-Received: by 2002:a5d:4dce:0:b0:317:6c66:bdc3 with SMTP id f14-20020a5d4dce000000b003176c66bdc3mr5716541wru.7.1691998347302;
-        Mon, 14 Aug 2023 00:32:27 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id n5-20020a05600c294500b003fbaade0735sm16352384wmd.19.2023.08.14.00.32.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 00:32:26 -0700 (PDT)
-Message-ID: <9bd285d7-78cd-ff13-4e89-eb36ad478780@grimberg.me>
-Date: Mon, 14 Aug 2023 10:32:25 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA6D6D24
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:33:08 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7199010E3;
+	Mon, 14 Aug 2023 00:33:06 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37E7Wcq2125087;
+	Mon, 14 Aug 2023 02:32:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1691998358;
+	bh=bdFeH2qZcAR1f3pLZ/uXJO+MJdOLdWxGk+XknPyZBWU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=m2tiXeq61s36w4XXM4p2Qz8TUxiWU0KJVCHEd48Mr1hNxLuw1qRjhdLlQHvczValZ
+	 9sWvZn/kIWuyIzXRXRGmG7/Jw4NEI3L57s04ztorsJzJqSn3pxIsWw9Gc47Re0AWGU
+	 48cAx1kIJl81VSco1uk3NaNFozUFqbW5rcaTp8+s=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37E7Wccw025922
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 14 Aug 2023 02:32:38 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 14
+ Aug 2023 02:32:37 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 14 Aug 2023 02:32:37 -0500
+Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37E7WVTf028513;
+	Mon, 14 Aug 2023 02:32:32 -0500
+Message-ID: <1f6a36fb-dfbe-1536-47de-f2335aac5bfa@ti.com>
+Date: Mon, 14 Aug 2023 13:02:31 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,192 +56,249 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH 14/17] nvmet-tcp: reference counting for queues
+Subject: Re: [PATCH v3 3/5] net: ti: icss-iep: Add IEP driver
 Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230811121755.24715-1-hare@suse.de>
- <20230811121755.24715-15-hare@suse.de>
- <6aa77bb8-8d22-3e40-c8fe-654b5c094b10@grimberg.me>
- <fe971baa-e009-2388-dc0b-54eb4788eb3f@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <fe971baa-e009-2388-dc0b-54eb4788eb3f@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Andrew Davis <afd@ti.com>, MD Danish Anwar <danishanwar@ti.com>,
+        Randy
+ Dunlap <rdunlap@infradead.org>,
+        Roger Quadros <rogerq@kernel.org>,
+        Simon
+ Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20230809114906.21866-1-danishanwar@ti.com>
+ <20230809114906.21866-4-danishanwar@ti.com>
+ <b43ee5ca-2aab-445a-e24b-cbc95f9186ea@ti.com>
+ <c7ddb12d-ae18-5fc2-9729-c88ea73b21d7@ti.com>
+ <4c40fbe4-3492-ec76-e452-3a3ecb0f2433@ti.com>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <4c40fbe4-3492-ec76-e452-3a3ecb0f2433@ti.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 8/13/23 17:38, Hannes Reinecke wrote:
-> On 8/13/23 16:01, Sagi Grimberg wrote:
+On 11/08/23 8:54 pm, Andrew Davis wrote:
+> On 8/10/23 6:50 AM, Md Danish Anwar wrote:
+>> Hi Andrew,
 >>
->>
->> On 8/11/23 15:17, Hannes Reinecke wrote:
->>> The 'queue' structure is referenced from various places and
->>> used as an argument of asynchronous functions, so it's really
->>> hard to figure out if the queue is still valid when the
->>> asynchronous function triggers.
->>> So add reference counting to validate the queue structure.
+>> On 09/08/23 8:30 pm, Andrew Davis wrote:
+>>> On 8/9/23 6:49 AM, MD Danish Anwar wrote:
+>>>> From: Roger Quadros <rogerq@ti.com>
+>>>>
+>>>> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
+>>>> support timestamping of ethernet packets and thus support PTP and PPS
+>>>> for PRU ethernet ports.
+>>>>
+>>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+>>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>>>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>>> ---
+>>>>    drivers/net/ethernet/ti/Kconfig          |  12 +
+>>>>    drivers/net/ethernet/ti/Makefile         |   1 +
+>>>>    drivers/net/ethernet/ti/icssg/icss_iep.c | 935 +++++++++++++++++++++++
+>>>>    drivers/net/ethernet/ti/icssg/icss_iep.h |  38 +
+>>>>    4 files changed, 986 insertions(+)
+>>>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+>>>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+>>>>
+>>>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+>>>> index 63e510b6860f..88b5b1b47779 100644
+>>>> --- a/drivers/net/ethernet/ti/Kconfig
+>>>> +++ b/drivers/net/ethernet/ti/Kconfig
+>>>> @@ -186,6 +186,7 @@ config CPMAC
+>>>>    config TI_ICSSG_PRUETH
+>>>>        tristate "TI Gigabit PRU Ethernet driver"
+>>>>        select PHYLIB
+>>>> +    select TI_ICSS_IEP
 >>>
->>> Signed-off-by: Hannes Reinecke <hare@suse.de>
->>> ---
->>>   drivers/nvme/target/tcp.c | 74 ++++++++++++++++++++++++++++++---------
->>>   1 file changed, 57 insertions(+), 17 deletions(-)
+>>> Why not save selecting this until you add its use in the ICSSG_PRUETH driver in
+>>> the next patch.
 >>>
->>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
->>> index f19ea9d923fd..84b726dfc1c4 100644
->>> --- a/drivers/nvme/target/tcp.c
->>> +++ b/drivers/nvme/target/tcp.c
->>> @@ -127,6 +127,7 @@ enum nvmet_tcp_queue_state {
->>>   };
->>>   struct nvmet_tcp_queue {
->>> +    struct kref        kref;
->>>       struct socket        *sock;
->>>       struct nvmet_tcp_port    *port;
->>>       struct work_struct    io_work;
->>> @@ -192,6 +193,9 @@ static struct workqueue_struct *nvmet_tcp_wq;
->>>   static const struct nvmet_fabrics_ops nvmet_tcp_ops;
->>>   static void nvmet_tcp_free_cmd(struct nvmet_tcp_cmd *c);
->>>   static void nvmet_tcp_free_cmd_buffers(struct nvmet_tcp_cmd *cmd);
->>> +static int nvmet_tcp_get_queue(struct nvmet_tcp_queue *queue);
->>> +static void nvmet_tcp_put_queue(struct nvmet_tcp_queue *queue);
->>> +static void nvmet_tcp_data_ready(struct sock *sk);
->>>   static inline u16 nvmet_tcp_cmd_tag(struct nvmet_tcp_queue *queue,
->>>           struct nvmet_tcp_cmd *cmd)
->>> @@ -1437,11 +1441,21 @@ static void 
->>> nvmet_tcp_restore_socket_callbacks(struct nvmet_tcp_queue *queue)
->>>       struct socket *sock = queue->sock;
->>>       write_lock_bh(&sock->sk->sk_callback_lock);
->>> +    /*
->>> +     * Check if nvmet_tcp_set_queue_sock() has been called;
->>> +     * if not the queue reference has not been increased
->>> +     * and we're getting an refcount error on exit.
->>> +     */
->>> +    if (sock->sk->sk_data_ready != nvmet_tcp_data_ready) {
->>> +        write_unlock_bh(&sock->sk->sk_callback_lock);
->>> +        return;
->>> +    }
 >>
->> This is really ugly I think.
+>> The next patch is only adding changes to icssg-prueth .c /.h files. This patch
+>> is adding changes to Kconfig and the Makefile. To keep it that way selecting
+>> this is added in this patch. No worries, I will move this to next patch.
 >>
-> Me too, but what would be the alternative?
+>>> [...]
+>>>
+>>>> +
+>>>> +static u32 icss_iep_readl(struct icss_iep *iep, int reg)
+>>>> +{
+>>>> +    return readl(iep->base + iep->plat_data->reg_offs[reg]);
+>>>> +}
+>>>
+>>> Do these one line functions really add anything? Actually why
+>>> not use the regmap you have here.
+>>
+>> These one line functions are not really adding anything but they are acting as
+>> a wrapper around readl /writel and providing some sort of encapsulation as
+>> directly calling readl will result in a little complicated code.
+>>
+>> /* WIth One line function */
+>> ts_lo = icss_iep_readl(iep, ICSS_IEP_COUNT_REG0);
+>>
+>> /* Without one line function */
+>> ts_lo = readl(iep->base, iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+>>
+>> Previously regmap was used in this driver. But in older commit [1] in
+>> 5.10-ti-linux-kernel (Before I picked the driver for upstream) it got changed
+>> to readl / writel stating that regmap_read / write is too slow. IEP is time
+>> sensitive and needs faster read and write, probably because of this they
+>> changed it.
+>>
 > 
->>>       sock->sk->sk_data_ready =  queue->data_ready;
->>>       sock->sk->sk_state_change = queue->state_change;
->>>       sock->sk->sk_write_space = queue->write_space;
->>>       sock->sk->sk_user_data = NULL;
->>>       write_unlock_bh(&sock->sk->sk_callback_lock);
->>> +    nvmet_tcp_put_queue(queue);
->>>   }
->>>   static void nvmet_tcp_uninit_data_in_cmds(struct nvmet_tcp_queue 
->>> *queue)
->>> @@ -1474,6 +1488,30 @@ static void 
->>> nvmet_tcp_free_cmd_data_in_buffers(struct nvmet_tcp_queue *queue)
->>>           nvmet_tcp_free_cmd_buffers(&queue->connect);
->>>   }
->>> +static void nvmet_tcp_release_queue_final(struct kref *kref)
->>> +{
->>> +    struct nvmet_tcp_queue *queue = container_of(kref, struct 
->>> nvmet_tcp_queue, kref);
->>> +
->>> +    WARN_ON(queue->state != NVMET_TCP_Q_DISCONNECTING);
->>> +    nvmet_tcp_free_cmds(queue);
->>> +    ida_free(&nvmet_tcp_queue_ida, queue->idx);
->>> +    /* ->sock will be released by fput() */
->>> +    fput(queue->sock->file);
->>> +    kfree(queue);
->>> +}
->>> +
->>> +static int nvmet_tcp_get_queue(struct nvmet_tcp_queue *queue)
->>> +{
->>> +    if (!queue)
->>> +        return 0;
->>> +    return kref_get_unless_zero(&queue->kref);
->>> +}
->>> +
->>> +static void nvmet_tcp_put_queue(struct nvmet_tcp_queue *queue)
->>> +{
->>> +    kref_put(&queue->kref, nvmet_tcp_release_queue_final);
->>> +}
->>> +
->>>   static void nvmet_tcp_release_queue_work(struct work_struct *w)
->>>   {
->>>       struct page *page;
->>> @@ -1493,15 +1531,11 @@ static void 
->>> nvmet_tcp_release_queue_work(struct work_struct *w)
->>>       nvmet_sq_destroy(&queue->nvme_sq);
->>>       cancel_work_sync(&queue->io_work);
->>>       nvmet_tcp_free_cmd_data_in_buffers(queue);
->>> -    /* ->sock will be released by fput() */
->>> -    fput(queue->sock->file);
->>> -    nvmet_tcp_free_cmds(queue);
->>>       if (queue->hdr_digest || queue->data_digest)
->>>           nvmet_tcp_free_crypto(queue);
->>> -    ida_free(&nvmet_tcp_queue_ida, queue->idx);
->>>       page = virt_to_head_page(queue->pf_cache.va);
->>>       __page_frag_cache_drain(page, queue->pf_cache.pagecnt_bias);
->>> -    kfree(queue);
->>> +    nvmet_tcp_put_queue(queue);
->>
->> What made you pick these vs. the others for before/after the
->> final reference?
->>
-> I wanted to call 'nvmet_tcp_put_queue()' for a failed allocation
-> in nvmet_tcp_alloc_queue(), and at that time the queue itself
-> is not live.
-> nvmet_tcp_release_queue() is only called on a live queue, so using
-> that as the kref ->release() function would either limit it's
-> usefulness or would require me to ensure that all calls in there
-> can be made with a non-initialized argument.
+> Sounds like you only need direct register access for time sensitive
+> gettime/settime functions, if that is the only place writel()/readl() is
+> needed just drop the helper and use directly in that one spot.
 > 
->>>   }
->>>   static void nvmet_tcp_data_ready(struct sock *sk)
->>> @@ -1512,8 +1546,10 @@ static void nvmet_tcp_data_ready(struct sock *sk)
->>>       read_lock_bh(&sk->sk_callback_lock);
->>>       queue = sk->sk_user_data;
->>> -    if (likely(queue))
->>> +    if (likely(nvmet_tcp_get_queue(queue))) {
->>>           queue_work_on(queue_cpu(queue), nvmet_tcp_wq, 
->>> &queue->io_work);
->>> +        nvmet_tcp_put_queue(queue);
->>> +    }
+
+In total both icss_iep_readl() and writel() are used 4 time each. All related
+to gettime / settime. This is the only place where these helper APIs are used.
+I will drop these helper apis and used readl / writel directly.
+
+>>>
+>>> [...]
+>>>
+>>>> +static void icss_iep_enable(struct icss_iep *iep)
+>>>> +{
+>>>> +    regmap_update_bits(iep->map, ICSS_IEP_GLOBAL_CFG_REG,
+>>>> +               IEP_GLOBAL_CFG_CNT_ENABLE,
+>>>> +               IEP_GLOBAL_CFG_CNT_ENABLE);
+>>>
+>>> Have you looked into regmap_fields?
+>>>
 >>
->> No... Why?
+>> No I hadn't. But now I looked into regmap_fields, seems to be another way to
+>> update the bits, instead of passing mask and value, regmap_filed_read / write
+>> only takes the value. But for that we will need to create a regmap field. If
+>> you want me to switch to regmap_fields instead of regmap_update_bits I can make
+>> the changes. But I am fine with regmap_update_bits().
 >>
->> The shutdown code should serialize perfectly without this. Why add
->> a kref to the normal I/O path?
->>
->> I thought we'd simply move release_work to do a kref_put and take
->> an extra reference when we fire the tls handshake...
->>
-> Because I feel ever so slightly unsure about using the sk_user_data
-> argument. This function is completely asynchronous, and I can't really
-> see how we can ensure that sk_user_data references a valid object.
-> (If it were valid, why would we need to check for !queue ?)
 > 
-> If you have lifetime guarantees that the kref isn't required, by all
-> means, please tell me, and we can drop the kref thing here.
-> But I guess that would imply to _not_ having to check for (!queue)
-> which is fine by me, too.
+> I'm suggesting regmap fields as I have used it several times and it resulted
+> in greatly improved readability. Yes you will need a regmap field table, but
+> that is the best part, it lets you put all your bit definitions in one spot
+> that can match 1:1 with the datasheet, much easier to check for correctness
+> than if the bit usages are all spread out in the driver.
+> 
+> I won't insist on you converting this driver to use it today, but I do recommend
+> you at least give it a shot for your own learning.
+> 
 
-Something doesn't add up here.
-What I think you need to do, is add another reference just for the
-tls handshake.
+Sure Andrew. For now I will keep it as regmap_update_bits(). I will look into
+regmap_fields for my own learning.
 
-Then in the timeout handler you call tls_handshake_cancel():
-- if you got %true back, you drop the reference and schedule
-a release work
-- if you got %false back, you simply ignore the timeout because
-the .ta_done() was already triggered.
-- in .ta_done() you drop the reference, cancel the timeout work
-   and then continue or remove based on the status.
+> Andrew
+> 
+>>> [...]
+>>>
+>>>> +
+>>>> +    if (!!(iep->latch_enable & BIT(index)) == !!on)
+>>>> +        goto exit;
+>>>> +
+>>>
+>>> There has to be a better way to write this logic..
+>>>
+>>> [...]
+>>>
+>>>> +
+>>>> +static const struct of_device_id icss_iep_of_match[];
+>>>> +
+>>>
+>>> Why the forward declaration?
+>>
+>> I will remove this, I don't see any reason for this.
+>>
+>>>
+>>>> +static int icss_iep_probe(struct platform_device *pdev)
+>>>> +{
+>>>> +    struct device *dev = &pdev->dev;
+>>>> +    struct icss_iep *iep;
+>>>> +    struct clk *iep_clk;
+>>>> +
+>>>> +    iep = devm_kzalloc(dev, sizeof(*iep), GFP_KERNEL);
+>>>> +    if (!iep)
+>>>> +        return -ENOMEM;
+>>>> +
+>>>> +    iep->dev = dev;
+>>>> +    iep->base = devm_platform_ioremap_resource(pdev, 0);
+>>>> +    if (IS_ERR(iep->base))
+>>>> +        return -ENODEV;
+>>>> +
+>>>> +    iep_clk = devm_clk_get(dev, NULL);
+>>>> +    if (IS_ERR(iep_clk))
+>>>> +        return PTR_ERR(iep_clk);
+>>>> +
+>>>> +    iep->refclk_freq = clk_get_rate(iep_clk);
+>>>> +
+>>>> +    iep->def_inc = NSEC_PER_SEC / iep->refclk_freq;    /* ns per clock
+>>>> tick */
+>>>> +    if (iep->def_inc > IEP_MAX_DEF_INC) {
+>>>> +        dev_err(dev, "Failed to set def_inc %d.  IEP_clock is too slow to be
+>>>> supported\n",
+>>>> +            iep->def_inc);
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +
+>>>> +    iep->plat_data = of_device_get_match_data(dev);
+>>>
+>>> Directly using of_*() functions is often wrong, try just
+>>> device_get_match_data().
+>>>
+>>
+>> Sure. I will change to device_get_match_data().
+>>
+>>> [...]
+>>>
+>>>> +static struct platform_driver icss_iep_driver = {
+>>>> +    .driver = {
+>>>> +        .name = "icss-iep",
+>>>> +        .of_match_table = of_match_ptr(icss_iep_of_match),
+>>>
+>>> This driver cannot work without OF, using of_match_ptr() is not needed.
+>>>
+>>
+>> Sure, I will drop of_match_ptr().
+>>
+>>> Andrew
+>>
+>>
+>> For reading and updating registers, we can have
+>>     1. icss_iep_readl / writel and regmap_update_bits() OR
+>>     2. regmap_read / write and regmap_update_bits() OR
+>>     3. icss_iep_readl / writel and regmap_fields OR
+>>     4. regmap_read / write and regmap_fields
+>>     
+>>
+>> Currently we are using 1. Please let me know if you are fine with this and I
+>> can continue using 1. If not, please let me know your recommendation out of
+>> this 4.
+>>
+>> [1]
+>> https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/commit/?h=linux-5.10.y&id=f4f45bf71cad5be232536d63a0557d13a7eed162
+>>
 
-btw in the queue release you should call tls_handshake_cancel() as well.
+-- 
+Thanks and Regards,
+Danish.
 
