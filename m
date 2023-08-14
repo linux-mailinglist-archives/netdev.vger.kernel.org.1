@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-27387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2953377BC38
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:59:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF47177BC57
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 596871C20A1C
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:59:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC3B31C203BB
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1077AC153;
-	Mon, 14 Aug 2023 14:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0803EC15B;
+	Mon, 14 Aug 2023 15:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06341A923
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:59:53 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69741E6A
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:59:52 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2ba0f27a4c2so66116801fa.2
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:59:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDF8C139
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:05:40 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA1F118F;
+	Mon, 14 Aug 2023 08:05:39 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-991c786369cso596802466b.1;
+        Mon, 14 Aug 2023 08:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692025190; x=1692629990;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lg5JoEqxgYDPgFMmvDX3z7J1VVCT3sZtIBZo9X2mZIo=;
-        b=kz5J28owKQbu2I61EGgHFkfpYKyUjwIe0q6D8NBn94SRnNcZ0DfHxg6Kd87ZBM8gFB
-         QPrnme8dBStf3JZ78zuxKkA0RSgx+g0UajbElij/oZQxrI9OgQ1b2xONhrJxucgrM5BD
-         NNJjg85vgqrHlpiUy0MhhJVhPk5mM82NJZnQbwTcATrzpMXcSio2ZKBarS6s3AxgcN3A
-         WFSMuNsngQxiDPjOsmYRKZLUmKgv6ByY7ARDAf1JhgD7FjUqo/Y3O3hmq5rsC6vkD1CW
-         Km+GomfT/rBfUS8Ck6tkTiHtxWOmecJDv1xgCS6XJD/RzIT0uzQlhv1kZQmcw6s+sq+a
-         SAvQ==
+        d=gmail.com; s=20221208; t=1692025538; x=1692630338;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EyTsS0N9nnty1CNb27CMYPQxvCHWi9OMqi5a0wP9j2s=;
+        b=DhKCmnLAU3vKa+c63Ab3ZbNzOJF5Rd10Kc9ygOR9MdCgf33F1W2wJ+KLxDqvTOj7dP
+         aeXZloIZpC8EASxfeo9AlS7585pYQfHzUDG5pufF80JqMDNlmxATLlRG6qpb5ITT60r8
+         iJ7x+MfBG4vTJwiHfyTck1hNlMJDzBizDfuDpsYZGfNXpxPNEergJNzwhjE4vUcNDeTU
+         EA61BjvUsLsffFjkerEvIUu1NLQzQwalozaMllc64X7vEK6czeGc9u5xkytnctpv1TlJ
+         ntGAeQ3MXadQ0u32dgS0VjOBxadiFZ3j5KRRG7f8wz0kLXaUA5OifhNc1mpriCMxTLmC
+         Zt5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692025190; x=1692629990;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lg5JoEqxgYDPgFMmvDX3z7J1VVCT3sZtIBZo9X2mZIo=;
-        b=f5RF5fF8sbSk+G1qXECufXJlgq7RbtIzN8B+7z8JqImajEoCsO5/xp1BS5EtwZ8wBG
-         iuCASCxUkGWzRyuHTZHbb782v7HSZ97CKdcMdGxXd/N5a0mAwUTZGSHF7N5X7QfqaBYC
-         kA/4j1676ozEc4IORis8Dz11LOPjnRwoN37h4Gb8YF6kOZbfIIVUjMfpO107mkzi13uB
-         XmuX3Drlq59ExfXHLRJI54lmpTS4RCBgL4ZApWo0ONLa9ck+QNZPQkHpkAovVWVJD2Hr
-         MGjckPO/uL7Xg+pNvLxQBKnDs150Lu5Ti6/4XcbIyuBAxWk+cZn4qfgo/xM3nJg4pCfq
-         0DgQ==
-X-Gm-Message-State: AOJu0Yzm3jgYFbtRrbB7mwaCdJbGPS6yu9lXE31KdVPaVakXvoQWccBW
-	YGHkNtbqWjBiyz/WEQT7YHk=
-X-Google-Smtp-Source: AGHT+IGgMGmptcIX0lTQFr/0+3GFCDsd9GMKHFG+lxdvMTg934oHjK+J2OSomaALH+h06Sr+ztmi0w==
-X-Received: by 2002:a2e:9790:0:b0:2b4:75f0:b9e9 with SMTP id y16-20020a2e9790000000b002b475f0b9e9mr7077054lji.10.1692025190493;
-        Mon, 14 Aug 2023 07:59:50 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692025538; x=1692630338;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EyTsS0N9nnty1CNb27CMYPQxvCHWi9OMqi5a0wP9j2s=;
+        b=QTOCv9q+22MpIM+stpODnlj/d+A4gxOhPkXhqmfjfEkc5Cj+1XLYhvQt9b3l23/fIX
+         Tup8thhiv02OXNlKH2f3tr9uAo6yMtUO+kMQtZVqXUp2o59ZCoZjBjPRCz4q06RFDwuk
+         H0xIZ/yEx+30TfgdY/5DerQZNAJkJ+O4kewmkIOPbd5jijPh+vP97VDmvnhiAHfH1Wzz
+         7tMi1JC1fp+gqv/rGGiLnZSkNdsPoryPvfNC6HsWrKAdtGeL+3W6mlGepQsY6jkXuX0G
+         mFHB31NUbKo2mXe11edtLpwdbag0jXB5hNsDvlgWqjnDqLQuM3I78P/egzt6sEDayQGJ
+         3OlQ==
+X-Gm-Message-State: AOJu0YxSqyF+3Q4X0snvVHF0+yWgP7wSyTmXqVsqOJXkQ2rmiQ/qnlfe
+	p99x6WXEdX4V/9WsIsDZViQ=
+X-Google-Smtp-Source: AGHT+IFyqU7M7LIUAcZuycerhP4j/Ml64BlmKcgq9L+T+xxUcVhsh2dcGYhtmXx1QEU034EO5nJGPA==
+X-Received: by 2002:a17:906:cc52:b0:98d:e605:2bce with SMTP id mm18-20020a170906cc5200b0098de6052bcemr7187517ejb.46.1692025537888;
+        Mon, 14 Aug 2023 08:05:37 -0700 (PDT)
 Received: from skbuf ([188.26.184.136])
-        by smtp.gmail.com with ESMTPSA id w4-20020a170906d20400b00997cce73cc7sm5786598ejz.29.2023.08.14.07.59.49
+        by smtp.gmail.com with ESMTPSA id g11-20020a17090613cb00b00992d0de8762sm5744792ejc.216.2023.08.14.08.05.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 07:59:50 -0700 (PDT)
-Date: Mon, 14 Aug 2023 17:59:48 +0300
+        Mon, 14 Aug 2023 08:05:37 -0700 (PDT)
+Date: Mon, 14 Aug 2023 18:05:34 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
- switch drivers
-Message-ID: <20230814145948.u6ul5dgjpl5bnasp@skbuf>
-References: <E1qTKdM-003Cpx-Eh@rmk-PC.armlinux.org.uk>
- <20230808120652.fehnyzporzychfct@skbuf>
- <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
- <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
- <20230808123901.3jrqsx7pe357hwkh@skbuf>
- <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk>
- <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
- <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
- <20230810151617.wv5xt5idbfu7wkyn@skbuf>
- <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net] net: dsa: mt7530: fix handling of 802.1X PAE frames
+Message-ID: <20230814150534.epuluw2gfldrtgnl@skbuf>
+References: <20230813105917.32102-1-arinc.unal@arinc9.com>
+ <20230813105917.32102-1-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230813105917.32102-1-arinc.unal@arinc9.com>
+ <20230813105917.32102-1-arinc.unal@arinc9.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -94,88 +96,62 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 12, 2023 at 01:16:00PM +0100, Russell King (Oracle) wrote:
-> So for realtek, I propose (completely untested):
+On Sun, Aug 13, 2023 at 01:59:17PM +0300, Arınç ÜNAL wrote:
+> 802.1X PAE frames are link-local frames, therefore they must be trapped to
+> the CPU port. Currently, the MT753X switches treat 802.1X PAE frames as
+> regular multicast frames, therefore flooding them to user ports. To fix
+> this, set 802.1X PAE frames to be trapped to the CPU port(s).
 > 
-> 8<====
-> From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-> Subject: [PATCH net-next] net: dsa: realtek: add phylink_get_caps
->  implementation
-> 
-> The user ports use RSGMII, but we don't have that, and DT doesn't
-> specify a phy interface mode, so phylib defaults to GMII. These support
-> 1G, 100M and 10M with flow control. It is unknown whether asymetric
-> pause is supported at all speeds.
-> 
-> The CPU port uses MII/GMII/RGMII/REVMII by hardware pin strapping,
-> and support speeds specific to each, with full duplex only supported
-> in some modes. Flow control may be supported again by hardware pin
-> strapping, and theoretically is readable through a register but no
-> information is given in the datasheet for that.
-> 
-> So, we do a best efforts - and be lenient.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 > ---
->  drivers/net/dsa/realtek/rtl8366rb.c | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
+>  drivers/net/dsa/mt7530.c | 4 ++++
+>  drivers/net/dsa/mt7530.h | 2 ++
+>  2 files changed, 6 insertions(+)
 > 
-> diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-> index 25f88022b9e4..76b5c43e1430 100644
-> --- a/drivers/net/dsa/realtek/rtl8366rb.c
-> +++ b/drivers/net/dsa/realtek/rtl8366rb.c
-> @@ -1049,6 +1049,32 @@ static enum dsa_tag_protocol rtl8366_get_tag_protocol(struct dsa_switch *ds,
->  	return DSA_TAG_PROTO_RTL4_A;
->  }
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index 38b3c6dda386..b8bb9f3b3609 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+> @@ -1006,6 +1006,10 @@ mt753x_trap_frames(struct mt7530_priv *priv)
+>  	mt7530_rmw(priv, MT753X_BPC, MT753X_BPDU_PORT_FW_MASK,
+>  		   MT753X_BPDU_CPU_ONLY);
 >  
-> +static void rtl8366rb_phylink_get_caps(struct dsa_switch *ds, int port,
-> +				       struct phylink_config *config)
-> +{
-> +	unsigned long *interfaces = config->supported_interfaces;
-> +	struct realtek_priv *priv = ds->priv;
+> +	/* Trap 802.1X PAE frames to the CPU port(s) */
+> +	mt7530_rmw(priv, MT753X_BPC, MT753X_PAE_PORT_FW_MASK,
+> +		   MT753X_PAE_PORT_FW(MT753X_BPDU_CPU_ONLY));
 > +
-> +	if (port == priv->cpu_port) {
-> +		__set_bit(PHY_INTERFACE_MODE_MII, interfaces);
-> +		__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
-> +		/* Only supports 100M FD */
-> +		__set_bit(PHY_INTERFACE_MODE_REVMII, interfaces);
-> +		/* Only supports 1G FD */
-> +		__set_bit(PHY_INTERFACE_MODE_RGMII, interfaces);
 
-also, I guess that this should allow all 4 variants of RGMII.
+In the interest of efficiency, this could have been merged with the
+previous write to MT753X_BPC, which would save some MDIO transactions:
 
-> +
-> +		config->mac_capabilities = MAC_1000 | MAC_100 |
-> +					   MAC_SYM_PAUSE;
-> +	}
-> +
-> +	/* RSGMII port, but we don't have that, and we don't
-> +	 * specify in DT, so phylib uses the default of GMII
-> +	 */
-> +	__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
-> +	config->mac_capabilities = MAC_1000 | MAC_100 | MAC_10 |
-> +				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
-> +}
-> +
->  static void
->  rtl8366rb_mac_link_up(struct dsa_switch *ds, int port, unsigned int mode,
->  		      phy_interface_t interface, struct phy_device *phydev,
-> @@ -1796,6 +1822,7 @@ static int rtl8366rb_detect(struct realtek_priv *priv)
->  static const struct dsa_switch_ops rtl8366rb_switch_ops_smi = {
->  	.get_tag_protocol = rtl8366_get_tag_protocol,
->  	.setup = rtl8366rb_setup,
-> +	.phylink_get_caps = rtl8366rb_phylink_get_caps,
->  	.phylink_mac_link_up = rtl8366rb_mac_link_up,
->  	.phylink_mac_link_down = rtl8366rb_mac_link_down,
->  	.get_strings = rtl8366_get_strings,
-> @@ -1821,6 +1848,7 @@ static const struct dsa_switch_ops rtl8366rb_switch_ops_mdio = {
->  	.setup = rtl8366rb_setup,
->  	.phy_read = rtl8366rb_dsa_phy_read,
->  	.phy_write = rtl8366rb_dsa_phy_write,
-> +	.phylink_get_caps = rtl8366rb_phylink_get_caps,
->  	.phylink_mac_link_up = rtl8366rb_mac_link_up,
->  	.phylink_mac_link_down = rtl8366rb_mac_link_down,
->  	.get_strings = rtl8366_get_strings,
+	mt7530_rmw(priv, MT753X_BPC,
+		   MT753X_BPDU_PORT_FW_MASK | MT753X_PAE_PORT_FW_MASK,
+		   MT753X_BPDU_CPU_ONLY |
+		   MT753X_PAE_PORT_FW(MT753X_BPDU_CPU_ONLY));
+
+In the interest of readability, this is probably fine too.
+
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+>  	/* Trap LLDP frames with :0E MAC DA to the CPU port(s) */
+>  	mt7530_rmw(priv, MT753X_RGAC2, MT753X_R0E_PORT_FW_MASK,
+>  		   MT753X_R0E_PORT_FW(MT753X_BPDU_CPU_ONLY));
+> diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+> index 08045b035e6a..17e42d30fff4 100644
+> --- a/drivers/net/dsa/mt7530.h
+> +++ b/drivers/net/dsa/mt7530.h
+> @@ -66,6 +66,8 @@ enum mt753x_id {
+>  /* Registers for BPDU and PAE frame control*/
+>  #define MT753X_BPC			0x24
+>  #define  MT753X_BPDU_PORT_FW_MASK	GENMASK(2, 0)
+> +#define  MT753X_PAE_PORT_FW_MASK	GENMASK(18, 16)
+> +#define  MT753X_PAE_PORT_FW(x)		FIELD_PREP(MT753X_PAE_PORT_FW_MASK, x)
+>  
+>  /* Register for :03 and :0E MAC DA frame control */
+>  #define MT753X_RGAC2			0x2c
 > -- 
-> 2.30.2
+> 2.39.2
+> 
+
 
