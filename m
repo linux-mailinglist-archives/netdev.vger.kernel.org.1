@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-27220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DA177AFB0
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 04:55:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A824777AFB1
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 04:56:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7C7A280E6F
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 02:55:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6537A1C20443
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 02:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739661851;
-	Mon, 14 Aug 2023 02:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155AA1851;
+	Mon, 14 Aug 2023 02:56:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FDE1842
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 02:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E9A1842
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 02:56:01 +0000 (UTC)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D878E65;
-	Sun, 13 Aug 2023 19:55:26 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1998E65;
+	Sun, 13 Aug 2023 19:56:00 -0700 (PDT)
 Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RPJqj5YsZzVkFh;
-	Mon, 14 Aug 2023 10:53:21 +0800 (CST)
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RPJpg74lFzNn9T;
+	Mon, 14 Aug 2023 10:52:27 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
  (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 14 Aug
- 2023 10:55:22 +0800
+ 2023 10:55:57 +0800
 From: Ruan Jinjie <ruanjinjie@huawei.com>
 To: <linus.walleij@linaro.org>, <alsi@bang-olufsen.dk>, <andrew@lunn.ch>,
 	<f.fainelli@gmail.com>, <olteanv@gmail.com>, <davem@davemloft.net>,
@@ -40,9 +40,9 @@ To: <linus.walleij@linaro.org>, <alsi@bang-olufsen.dk>, <andrew@lunn.ch>,
 	<linux-renesas-soc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-wireless@vger.kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v3 0/5] net: Remove redundant of_match_ptr() macro
-Date: Mon, 14 Aug 2023 10:54:42 +0800
-Message-ID: <20230814025447.2708620-1-ruanjinjie@huawei.com>
+Subject: [PATCH net-next v3 1/5] net: dsa: realtek: Remove redundant of_match_ptr()
+Date: Mon, 14 Aug 2023 10:55:15 +0800
+Message-ID: <20230814025520.2708714-2-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -53,7 +53,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemi500008.china.huawei.com (7.221.188.139)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
@@ -62,27 +62,44 @@ X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since these net drivers depend on CONFIG_OF, there is
-no need to wrap the macro of_match_ptr() here.
+The driver depends on CONFIG_OF, it is not necessary to use
+of_match_ptr() here.
 
-Changes in v3:
-- Collect responses from v1 and v2.
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/net/dsa/realtek/realtek-mdio.c | 2 +-
+ drivers/net/dsa/realtek/realtek-smi.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Ruan Jinjie (5):
-  net: dsa: realtek: Remove redundant of_match_ptr()
-  net: dsa: rzn1-a5psw: Remove redundant of_match_ptr()
-  net: gemini: Remove redundant of_match_ptr()
-  net: qualcomm: Remove redundant of_match_ptr()
-  wlcore: spi: Remove redundant of_match_ptr()
-
- drivers/net/dsa/realtek/realtek-mdio.c   | 2 +-
- drivers/net/dsa/realtek/realtek-smi.c    | 2 +-
- drivers/net/dsa/rzn1_a5psw.c             | 2 +-
- drivers/net/ethernet/cortina/gemini.c    | 4 ++--
- drivers/net/ethernet/qualcomm/qca_uart.c | 2 +-
- drivers/net/wireless/ti/wlcore/spi.c     | 2 +-
- 6 files changed, 7 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
+index 4310e7793e58..292e6d087e8b 100644
+--- a/drivers/net/dsa/realtek/realtek-mdio.c
++++ b/drivers/net/dsa/realtek/realtek-mdio.c
+@@ -276,7 +276,7 @@ MODULE_DEVICE_TABLE(of, realtek_mdio_of_match);
+ static struct mdio_driver realtek_mdio_driver = {
+ 	.mdiodrv.driver = {
+ 		.name = "realtek-mdio",
+-		.of_match_table = of_match_ptr(realtek_mdio_of_match),
++		.of_match_table = realtek_mdio_of_match,
+ 	},
+ 	.probe  = realtek_mdio_probe,
+ 	.remove = realtek_mdio_remove,
+diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
+index c2bd8bb6c9c2..ff13563059c5 100644
+--- a/drivers/net/dsa/realtek/realtek-smi.c
++++ b/drivers/net/dsa/realtek/realtek-smi.c
+@@ -556,7 +556,7 @@ MODULE_DEVICE_TABLE(of, realtek_smi_of_match);
+ static struct platform_driver realtek_smi_driver = {
+ 	.driver = {
+ 		.name = "realtek-smi",
+-		.of_match_table = of_match_ptr(realtek_smi_of_match),
++		.of_match_table = realtek_smi_of_match,
+ 	},
+ 	.probe  = realtek_smi_probe,
+ 	.remove = realtek_smi_remove,
 -- 
 2.34.1
 
