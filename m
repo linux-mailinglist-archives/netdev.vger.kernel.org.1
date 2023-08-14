@@ -1,196 +1,220 @@
-Return-Path: <netdev+bounces-27518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B08EB77C357
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 00:19:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C8C77C35E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 00:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6149028127B
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:19:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 441D1281284
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540C3100C9;
-	Mon, 14 Aug 2023 22:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089DE100CE;
+	Mon, 14 Aug 2023 22:21:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EB7DDB7
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 22:19:19 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA1E18B
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692051558; x=1723587558;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IEXl9VKIxh2l46MXtSTHhGRQH0LqdvDXO7Y2dwE1P6k=;
-  b=QirIXSjXfihAgUePlN55QbgrqKHrn0/qhtoClBeboDqdtso+bCgKunjh
-   QrSHp4fyCsbfQgR40ALM6RK53zerhG8tKk/S+Lwk3wF7doScUH/BP16UV
-   EY4dtqmf12zWQvee2NwSy8pRb8kRXcK3+uTpLNjnFNZEvMa7VhT8gOUL0
-   vVRJqAaj0qwvJFWpsFrvN2kVv9jJMg4LmTTPHDuL/eSt2gblZvtc80T8N
-   AIEBw8BtX61OEFNfC0sC6Q9JP/A6MaFOpfABSkHvSoU064P1aWvZHE6tB
-   k5WRV6ghaDNYNbPf9aDQjI1EnOJ7MxFbkdDN3bFgNy85AJenNCxFqD66I
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="357115874"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="357115874"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 15:19:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="823628537"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="823628537"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 Aug 2023 15:19:16 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 14 Aug 2023 15:19:16 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 14 Aug 2023 15:19:16 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.173)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 14 Aug 2023 15:19:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YrJ31yiu84P74RtQOoz4BKCGX870z/x6SB/y3zcry519fat8oHEJh/0iSIUP2lYl2phHHBVMzx0AcgNHJOkFl+Ab2FsbuGMRIqM/UhSgEuwzRjnDEKwDvU00aa3NxoBLRi9ZE/pnNjt/eALJGvVdKRph6y37KdOCI8k3yGU/E7k6axJQhGC1mfUlzUodIZX0nucjh0UPmLPDLNkRGShUJyAn5UL0vaKOH3D0DMtfJwsPjrU6Qdz9S0VZ+LozuJyJ6MGSCGKGgO3y4hkBiaVx37DZ1aMj+w+0xLBA4jZp3osVjRReo9pn2O8+kb2B01EVM/6oKNFz5mAzyuBB3p9vxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cbqtAWIAWdLKRgmbD2wvK6AxllRSmvqj51hiQrNvhKA=;
- b=WtzauaMeasH5XA5bIN4VJYZMnaOrOf1fPvBqqOo4TJlsqMEXF7VtiXD4QXT2lztdujDXCwYyM4oYavRaqrsO8jfQUT/4xCtjUmm3g94nOzs3FEyqwz9goT6HWk3tIIoCDrE4jLCpgfGSAosb4APHpgGCNpt4AJvWbQ1m9PrgKD0Iy/Ti5X5najGXtZqnuQpVHE0U9c8LZyniErk6p8GPeW/Wsx58Z/0B8idmpmevTv53LoK0Bavgi14nxjYBZ53JnmjIlrgZkMGz0W2jvuC35i03d1JxBFtmAZpK2A0JHrv9IgCNWDiMfWoGxc0oKVS5JZK1BXDJ9goIDo+CBv80MA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN6PR11MB3229.namprd11.prod.outlook.com (2603:10b6:805:ba::28)
- by SA1PR11MB6688.namprd11.prod.outlook.com (2603:10b6:806:25b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.24; Mon, 14 Aug
- 2023 22:19:15 +0000
-Received: from SN6PR11MB3229.namprd11.prod.outlook.com
- ([fe80::5c09:3f09:aae8:6468]) by SN6PR11MB3229.namprd11.prod.outlook.com
- ([fe80::5c09:3f09:aae8:6468%6]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
- 22:19:14 +0000
-Message-ID: <2ef66ad0-d8d2-ae28-9624-04a3fbe94de4@intel.com>
-Date: Mon, 14 Aug 2023 15:19:10 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH net-next] net: e1000e: Remove unused declarations
-Content-Language: en-US
-To: Yue Haibing <yuehaibing@huawei.com>, <jesse.brandeburg@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20230814135821.4808-1-yuehaibing@huawei.com>
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20230814135821.4808-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0330.namprd04.prod.outlook.com
- (2603:10b6:303:82::35) To SN6PR11MB3229.namprd11.prod.outlook.com
- (2603:10b6:805:ba::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE396DF47
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 22:21:33 +0000 (UTC)
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E07F18B
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:21:32 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-d678b44d1f3so4427282276.0
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692051691; x=1692656491;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G1xaUQI2fxozmkGVocHLZICmPCuoU6o/UqfLTnqyztE=;
+        b=KYrUw81rSfN4N/IgsfQvP8W/gIRdhfmptGgPNcLI1VCRWES761nt14rFnLtFVVGH4F
+         aJJwCEdclRs1QhlWDHbj9hjpuSzd+psviCN6QhOo3HJdeE5+PgoBEPWqbP/fLKiSLQlh
+         zX+goPiVj0cjymGhkyWJzLKsa+fXl7L82zUiERc0ERvM0cTQwonq94DWiBWt32yhHYje
+         QjiG5eBk3Fuc9zgLkC6rsDtviuKDo3j+X3b6wXdK1H2Dmrd82nMV+dUJjv4WrA+xV0Mn
+         U4AH4w5uT29awx5MhUv2ubVhmuQaPQhY0lH8yazEc1C4GHVtNdDIT4lKHdpdbsPSZwVz
+         B9fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692051691; x=1692656491;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G1xaUQI2fxozmkGVocHLZICmPCuoU6o/UqfLTnqyztE=;
+        b=D9ZpDeg6DHIyRUZ5B9Q7r3WEO6tuGDqnmv38OcRs1Hht1ZfdInckbKtxDKt//nnbWA
+         wIqCuXJkGEiiFZSvHJb2J/s1Ls6bcn0ynqBqz+38QseUVX3TIHmi8ZRTmOOyj30VN9cd
+         cdieHQ8voPtURrsaEDF3JmTIUoDWEvOcbRSpu7mKA3LXQEdvXYo8P5KltKeV8gzVvMoD
+         vSXlT58WXUOwO5UfhahhTHuJyPXXCnAhJB/gXgAg+ncSX3aElAY/GkuDajWTqF0FYAqp
+         4jAn0GsYi+i2JabY9H2YSIopqJ1EUzc96AxVQXSuacivpt26gUmwzZSQeFk0Fug1ggXz
+         TjLQ==
+X-Gm-Message-State: AOJu0YyXj4EeYuNbz1Jj3+E9a+BL+taD7cNuz/xqnY8Gx2gMUe7sSKQs
+	u+zlsWRav/utNJ+YTmV/AiyVJfFoPOUDeb0JZWR1ZA==
+X-Google-Smtp-Source: AGHT+IExJ6fBl4MMh1Y3D/xRU1oKKR8UFjWH6xs6gYKMLDoKnHbsawlMWmfF7qyy/g8CCaLz6zAhKnWOoDPDWAb6Xio=
+X-Received: by 2002:a25:ac9b:0:b0:d4a:499d:a881 with SMTP id
+ x27-20020a25ac9b000000b00d4a499da881mr385767ybi.9.1692051691393; Mon, 14 Aug
+ 2023 15:21:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR11MB3229:EE_|SA1PR11MB6688:EE_
-X-MS-Office365-Filtering-Correlation-Id: 555eed3c-6a8c-4c7e-5735-08db9d147e49
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uVvhOLPLOrPYc3gpbo0DRmzcpD+JF9CnvJYsiu8zmDRIs3E/w0sSJI85PtWr3bYm5MsCIr6M4eW+k+o4t+/5DOITIbCYoHl/4dPk9VtAGGjRD2foE/mtzwtcRLkVjondw/u4vKBwsQt2XwQKOQs6FMVwKH8n3JTb6biDKOMpCQ3c05pBobEBeBfMwz0gzK2rvMMhu1q+c7VdsLNvOfbXbg5RltbJjOy2jrL+gyrU1vI5dw/QCmsaAiOU4kEz8LLGnGFCwr+u75nztRh06Eh6+lKQFJb38nMEJi7sVIYoKxyntg4KFVH4DnPVo/daPyA8E1/EYw4ddlwbU/cVb/yFCSvzF2L/wvuL3J4WFVoN4Zm8nk74fdmnkS9lRBc6PdqicmxX+vymruInBA+0AWeFuMPS3mvzq0UNuv3u1vNUff6TzLXQBF/awc7mWSkcE35So/Qhl9ozqXUEg7umM46HO0/tlAoudx6tFOUO5EZsCRzjAcMugp2gbOmKP7NV2Zhx9KP/19C+yZHDlLZH9rF4xVuqTVlx7U6o2SM6CoetiBQSZSGDJ599BKOw+CYONasukLDvhAdTKFZCwyU2H827875c7SO4cDqms0WxjLy8FunHZ2MGyWi730Wj39TenQjfJenrE1VPaHbfHa6Hky57oA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3229.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(376002)(366004)(136003)(396003)(1800799006)(186006)(451199021)(6506007)(53546011)(26005)(41300700001)(8936002)(66476007)(66556008)(66946007)(8676002)(316002)(6512007)(2616005)(83380400001)(31686004)(6666004)(6486002)(478600001)(38100700002)(36756003)(86362001)(31696002)(4326008)(82960400001)(5660300002)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WTRERHNRdjI4c0tkcTdkZ1RQMEFBRlQ2WGFtSWdvaHFGMjZ3YjNFWUMzVFZx?=
- =?utf-8?B?S052YVN6STJ0dVJHWWJlMWI3QjFWVStkTER1L0prZXRObVgvYlR2aXA3WE5V?=
- =?utf-8?B?azlZOU9jZTJhc2VIWk5RdmcrRTArMnhYREg2ZWVDRkxPNXdFNURQUFR6bGU5?=
- =?utf-8?B?STFNTVBXeitPMTBlb3BqbHo2R1M5ai9Uakg2enhjNEtXMSsxTUV5OGpLNDh2?=
- =?utf-8?B?RWk5c0NzSzhkUWJJQlVOK3JkTVR5ZjBWZCtGSVZSL3FBNmROWUIyS21RMlBQ?=
- =?utf-8?B?QWhEUUtXdW5UTzN0aFZpVnY2dkdYc2ZKVkNFQ0E1MEt1MkQrdmRBWFFyMlN4?=
- =?utf-8?B?aytTbzhlR0xoY01qOEt0T2dOeldpckNoNk5LeThNTGxVMVhLQmh0QUJERmxu?=
- =?utf-8?B?ZmVzWm9SeHNRc0VWT0dReGNkdnFSYmVYUDA0bGdYUkVvSGN5dzRYNy9sTVJS?=
- =?utf-8?B?SlcyR1RBeUJ2ODd4U282SXVqRnB2VWVSb0E5dXorczFHN3U4RmxGMk1Ec0ZE?=
- =?utf-8?B?cU1LUU5WVDhaOEVUTWd6alpaS3ExYVhjMXZUdU4xc0xncjVUK0o5dXJLZ21o?=
- =?utf-8?B?Mnp2aFdIaTJvMS8xcGk2Z0VxV2JzRzh3MEFCMjVXUkZaTy9SOXlrazU2eDA0?=
- =?utf-8?B?M0ZhZmN6TU1GdXZlcTlFZlRhSzVmNmtPOTRVbjhjVXBLL0dhb3JYQ0pFbVNz?=
- =?utf-8?B?dlQrYTdVTkVpdWVLakVxbmZwQ3k5MFFDbFNKWXpIR2I3bDc4K2tjNC8xMHlI?=
- =?utf-8?B?ZEhndmwxbXhZazZNWFMwZEFLM1dUbWZtdDllWmFONXBJRnJVZ0RZdUdJTzIv?=
- =?utf-8?B?ZnEvcDEvUGRlVGlxMlRwMTNIdFJaUzJnK1BJMEVseHhtYlZPSmY3YUVjK1ZU?=
- =?utf-8?B?a2NCdG5zZXlNcURmTWJMTjZld25waU9LZ2RYZm1mczg4NW5LSGMzckRINUVY?=
- =?utf-8?B?Z0IzMHM0RlQrMTFFL3MyOWEvWXVkZkFHcmd6YmhMK3g1cmdLZXNDT2REbTZn?=
- =?utf-8?B?Nm1Pb1N0bnpad2ttSE5GRjFmNVZqVWJmRHRpOG1qK1pUQUlzRDl3djRXelRw?=
- =?utf-8?B?QXBvUi9PajRaQ093ZlVPNTI3NkprUmxTV0tSQ3ZzdlpnZDRQNDdFdG1MWk1W?=
- =?utf-8?B?cTNmYzV2RnI5QWZFQjZ2cmJSUURQbUhMQldDVDdoYnIyNnBIQnBGSFlHcHRD?=
- =?utf-8?B?YkJUNlJoK1pad200RGprTVFNM2pHdEE5K0lIMWVGcm56STUyNG9ELzVyMS9l?=
- =?utf-8?B?OFhQam1BZmRhVUdyTTBIcFVQTW1WTXI4cUhHTHJWa1YzYmtRb2JZOWJZd1Iw?=
- =?utf-8?B?NFp6U0QwcHliZGRlRkwrZWtzUnYxR1RvMTcvWVJpRXVhb1o1V1FVcGROUGRh?=
- =?utf-8?B?bGptT0l0dDVLU3htOVg0eU90c2MwQUtSNlRMdUpwY1JiVDRLZmlPdHZLUW81?=
- =?utf-8?B?UkNSR0ZhdFlFSURkRGNnNU1mWUt0ekFJY1ZtTHVwUFUvYUcwRGtrc1FmQUNL?=
- =?utf-8?B?T0hIQWh6cVoxVkEvcjhKdEZKdFd6Mmpra0c4a0V3RFlzU2cxOVZaaVQ4MzVV?=
- =?utf-8?B?Vk1xOFhkQSs1aWthUDQ2WkNCcmZpbFFDb2hkZi9uNVFBVWxqMWtVYVl6bjQ0?=
- =?utf-8?B?UUl0TWZsUUFtU085Rzc5NDd3TjF0cXYzeGEyT2lTR1gwenpRWCswcVY1R0Zn?=
- =?utf-8?B?V21wOGViVTJPZ21jUVM1cG42RXAzUWR3eURlU2VXUW1XbjNVR3IvdjcvZXFI?=
- =?utf-8?B?aG5wbnU1eGR1SENIcUppV2c2ZldVYVh3ajJ4c1RTYkpBWUJwdDMvNGhqemJ0?=
- =?utf-8?B?RGpWOVliOVRoN21waGY3RDIxMEltY1lCaUp6aFA1eGg0VVE2NVVWSGRsaVJn?=
- =?utf-8?B?bC90eFpybmV0UkxEajA1OHROMFh3dmMxeFA4NEFhMXhsU3Uya0Q4bWYzMkk0?=
- =?utf-8?B?ZHozbVN3ZUJTNVhCNXIwSWJ4NXMvYldDQjFVY3RyYWdsUW9ucWh4WWRlT2t5?=
- =?utf-8?B?TWF1QzdVTUNCZTVVdnlucUdNKzUwb1VlcmlKTndScGxKUW5vZHhoMWlqazBx?=
- =?utf-8?B?M2FNU1dUUXBwc2o5MjBmZnNsRXFxbU4wMFMxZzY2STZWQTZTcnBQSVdHelBu?=
- =?utf-8?B?T1hJeEQ5MXQwRmlzeXBMVVU5VUR0VnR1NWM5NGhGRGRRVEM4VEdyOHBjM05N?=
- =?utf-8?B?Qmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 555eed3c-6a8c-4c7e-5735-08db9d147e49
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3229.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2023 22:19:14.8833
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fk3Cm19Mp9XDTvCkIgEovz1HVFQ7XW7fFKE2VD2VQ/rDolmCeapKUBK7RaJJ8ROumghAKXdIElTTyKU5sVza20fAQHvzPxFZ9UW7GSLTMoQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6688
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk> <20230808123901.3jrqsx7pe357hwkh@skbuf>
+ <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk> <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
+ <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk> <20230810151617.wv5xt5idbfu7wkyn@skbuf>
+ <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk> <20230814145948.u6ul5dgjpl5bnasp@skbuf>
+ <ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk> <055be6c4-3c28-459d-bb52-5ac2ee24f1f1@lunn.ch>
+ <ZNpWAsdS8tDv9qKp@shell.armlinux.org.uk>
+In-Reply-To: <ZNpWAsdS8tDv9qKp@shell.armlinux.org.uk>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 15 Aug 2023 00:21:19 +0200
+Message-ID: <CACRpkdbZwfG2E8egObGkgTu2uL8auS5z2yzb0OH-UdAsnbrzHg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
+ switch drivers
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/14/2023 6:58 AM, Yue Haibing wrote:
-> Commit bdfe2da6aefd ("e1000e: cosmetic move of function prototypes to the new mac.h")
-> declared but never implemented them.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+On Mon, Aug 14, 2023 at 6:27=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
 
-I believe netdev has been taking all these unused declaration patches 
-directly so...
+> > >                 ethernet@60000000 {
+> > > ...
+> > >                         ethernet-port@0 {
+> > >                                 phy-mode =3D "rgmii";
+> > >                                 fixed-link {
+> > >                                         speed =3D <1000>;
+> > >                                         full-duplex;
+> > >                                         pause;
+> > >                                 };
+> > >                         };
+> > >
+> > > So that also uses "rgmii".
+> > >
+> > > I'm tempted not to allow the others as the driver doesn't make any
+> > > adjustments, and we only apparently have the one user.
+> >
+> > RGMII on both ends is unlikely to work, so probably one is
+> > wrong. Probably the switch has strapping to set it to rgmii-id, but we
+> > don't actually know that. And i guess we have no ability to find out
+> > the truth?
+>
+> "rgmii" on both ends _can_ work - from our own documentation:
+>
+> * PHY_INTERFACE_MODE_RGMII: the PHY is not responsible for inserting any
+>   internal delay by itself, it assumes that either the Ethernet MAC (if c=
+apable)
+>   or the PCB traces insert the correct 1.5-2ns delay
+>      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>
+> So, if the board is correctly laid out to include this delay, then RGMII
+> on both ends can work.
+>
+> Next, we have no ability to find anything out - we have no hardware.
+> LinusW does, but I have no idea whether Linus can read the state of the
+> pin strapping. I can see from the RTL8366 info I found that there is
+> a register that the delay settings can be read from, but this is not
+> the RTL8366, it's RTL8366RB, which Linus already pointed out is
+> revision B and is different. So, I would defer to Linus for anything on
+> this, and without input from Linus, all we have to go on is what we
+> have in the kernel sources.
 
-Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+I looked at the delays a bit, on the Gemini I think it is set up
+from the pin control system, for example we have this in
+arch/arm/boot/dts/gemini/gemini-sl93512r.dts:
 
-> ---
->   drivers/net/ethernet/intel/e1000e/mac.h | 2 --
->   1 file changed, 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/mac.h b/drivers/net/ethernet/intel/e1000e/mac.h
-> index 6ab261119801..563176fd436e 100644
-> --- a/drivers/net/ethernet/intel/e1000e/mac.h
-> +++ b/drivers/net/ethernet/intel/e1000e/mac.h
-> @@ -29,8 +29,6 @@ s32 e1000e_set_fc_watermarks(struct e1000_hw *hw);
->   s32 e1000e_setup_fiber_serdes_link(struct e1000_hw *hw);
->   s32 e1000e_setup_led_generic(struct e1000_hw *hw);
->   s32 e1000e_setup_link_generic(struct e1000_hw *hw);
-> -s32 e1000e_validate_mdi_setting_generic(struct e1000_hw *hw);
-> -s32 e1000e_validate_mdi_setting_crossover_generic(struct e1000_hw *hw);
->   
->   void e1000e_clear_hw_cntrs_base(struct e1000_hw *hw);
->   void e1000_clear_vfta_generic(struct e1000_hw *hw);
+                                pinctrl-gmii {
+                                        mux {
+                                                function =3D "gmii";
+                                                groups =3D
+"gmii_gmac0_grp", "gmii_gmac1_grp";
+                                        };
+                                        /* Control pad skew comes from
+sl_switch.c in the vendor code */
+                                        conf0 {
+                                                pins =3D "P10 GMAC1 TXC";
+                                                skew-delay =3D <5>;
+                                        };
+                                        conf1 {
+                                                pins =3D "V11 GMAC1 TXEN";
+                                                skew-delay =3D <7>;
+                                        };
+                                        conf2 {
+                                                pins =3D "T11 GMAC1 RXC";
+                                                skew-delay =3D <8>;
+                                        };
+                                        conf3 {
+                                                pins =3D "U11 GMAC1 RXDV";
+                                                skew-delay =3D <7>;
+                                        };
+                                        conf4 {
+                                                pins =3D "V7 GMAC0 TXC";
+                                                skew-delay =3D <10>;
+                                        };
+                                        conf5 {
+                                                pins =3D "P8 GMAC0 TXEN";
+                                                skew-delay =3D <7>; /* 5
+at another place? */
+                                        };
+                                        conf6 {
+                                                pins =3D "T8 GMAC0 RXC";
+                                                skew-delay =3D <15>;
+                                        };
+                                        conf7 {
+                                                pins =3D "R8 GMAC0 RXDV";
+                                                skew-delay =3D <0>;
+                                        };
+                                        conf8 {
+                                                /* The data lines all
+have default skew */
+                                                pins =3D "U8 GMAC0
+RXD0", "V8 GMAC0 RXD1",
+                                                       "P9 GMAC0
+RXD2", "R9 GMAC0 RXD3",
+                                                       "R11 GMAC1
+RXD0", "P11 GMAC1 RXD1",
+                                                       "V12 GMAC1
+RXD2", "U12 GMAC1 RXD3",
+                                                       "R10 GMAC1
+TXD0", "T10 GMAC1 TXD1",
+                                                       "U10 GMAC1
+TXD2", "V10 GMAC1 TXD3";
+                                                skew-delay =3D <7>;
+                                        };
+                                        /* Appears in sl351x_gmac.c in
+the vendor code */
+                                        conf9 {
+                                                pins =3D "U7 GMAC0
+TXD0", "T7 GMAC0 TXD1",
+                                                       "R7 GMAC0
+TXD2", "P7 GMAC0 TXD3";
+                                                skew-delay =3D <5>;
+                                        };
+                                };
+                        };
+
+For the DIR-685 this is set to the default value of 7 for all skews.
+
+I haven't found any registers dealing with delays in RTL8366RB.
+I might need to look closer (vendor mess...)
+
+I think the PCB can have been engineered to match this since clearly
+other PCBs contain elaborate values per line. Here is a picture
+of the DIR-685 PCB:
+https://www.redeszone.net/app/uploads-redeszone.net/d-link_dir-685_analisis=
+_15-1024x755.jpg
+the swirly lines to the right are toward the memory indicating that
+the engineer is consciously designing delays on this board.
+
+Yours,
+Linus Walleij
 
