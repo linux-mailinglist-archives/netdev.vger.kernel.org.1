@@ -1,109 +1,168 @@
-Return-Path: <netdev+bounces-27290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D434877B5F5
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:07:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2051177B600
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1253F1C20934
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:07:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF47280E5C
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AA2AD43;
-	Mon, 14 Aug 2023 10:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BFBAD44;
+	Mon, 14 Aug 2023 10:09:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3D3AD26
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:07:01 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA29FD8
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:06:59 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3fe4cdb72b9so37391915e9.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:06:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692007618; x=1692612418;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LN8g4lwFIyJXb7Ox+6A1U6+7e/RjfOAucao0Qh5pRHI=;
-        b=O2EOMhan9fWkaYPrcpYeFPDFzrR/7KcHvTWPLstWjaz1tgPItAoOJdHFu8yB/eI61L
-         IG6lQqbwLU4U50ToYGB6jBp6cqi0whLG7dRMeyv/aEZBRFHtCmTnSDM3LzIRTBIKazS1
-         wmpMg0YvWi+5IkCuLO/xQWHhsPguThJrFp0kQfCuc049RPBanxDtCA+Uem//sMwpP1Bt
-         vw4xQHUBKZ3O3S8l9srtPDBhb961R82yBtmoQyRd0FLdGSLoZj9ROqcFX+MQCjs6g6o9
-         JgOutK8kt29amC6OVMo6/9D3nW9l3rP/uciIvliSAdpUUORV2LuBuJkurgSrz0H5ZFUC
-         vy3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692007618; x=1692612418;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LN8g4lwFIyJXb7Ox+6A1U6+7e/RjfOAucao0Qh5pRHI=;
-        b=g/26+ox+xnNO8hkI3x71eIArF2+4kMk4HYyi3ig5xXUgDEIx62DvZcLEU4mrYeu7Xh
-         ChFDGAjaV964xMR5YPRvZbQUdFym33YyvCt7JxOFGL0foZTMVr2l9BVbz30+sO3OnZUh
-         Y3BsRW1ei5WJ+WCWZl8sZlaej25f716TnDN9sdkGJQjOWiptMVmClVdoDpYb2QRJMt0B
-         fJIywbRpboE291KjVQsErxdc/JTNG4E5udHosn29izBNFjYvavUEDISfwrVFuENQ0FUs
-         J0xrghD+vn/JyDkHE8A4hQhtamfvlbnED8IaF3mSdySjGTvq5NZxhMEU/jta8BTdnnrN
-         9oJw==
-X-Gm-Message-State: AOJu0YzLemF0ByKStPGtpP9yEQJt19+8tcE6C0xhVI+gNmXKXhlSklIS
-	4vCKhv+W1/LphE9T5Ae0SKo=
-X-Google-Smtp-Source: AGHT+IGdiIGDdOHdtgm+i5oKnRLf2dx0mZPo0LrjiMRR0daBDDDbDKbyIc650sFeqOTf2baV+x+WJQ==
-X-Received: by 2002:a05:600c:259:b0:3fe:2102:8083 with SMTP id 25-20020a05600c025900b003fe21028083mr6536251wmj.26.1692007618109;
-        Mon, 14 Aug 2023 03:06:58 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id l18-20020a5d4112000000b003144b95e1ecsm13806320wrp.93.2023.08.14.03.06.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 03:06:57 -0700 (PDT)
-Subject: Re: [PATCH v2 net-next 1/3] sfc: use padding to fix alignment in
- loopback test
-To: Arnd Bergmann <arnd@arndb.de>, "edward.cree" <edward.cree@amd.com>,
- linux-net-drivers@amd.com, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Netdev <netdev@vger.kernel.org>, Martin Habets
- <habetsm.xilinx@gmail.com>, Kees Cook <keescook@chromium.org>
-References: <cover.1687545312.git.ecree.xilinx@gmail.com>
- <dfe2eb3d6ad3204079df63ae123b82d49b0c90e2.1687545312.git.ecree.xilinx@gmail.com>
- <ceec28d4-48e2-4de1-9f26-bfd3c61fde45@app.fastmail.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <90e83021-49f3-2b0e-bb9c-01539229c50b@gmail.com>
-Date: Mon, 14 Aug 2023 11:06:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EAEA955
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:09:16 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CA7133;
+	Mon, 14 Aug 2023 03:09:15 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37EA8tqL021908;
+	Mon, 14 Aug 2023 05:08:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1692007735;
+	bh=57XUk92ZlkTTnzZmuSBzRzVS86e3pGIMjmRShA8tzuQ=;
+	h=From:To:CC:Subject:Date;
+	b=zHRtUR5Fhsi9OxfwZ8QN7IOd2GsCtpwjpQjW7rNl1cH49dW+LGnL/uyWobBT9Zbnj
+	 YxHTwMRzJg2NHLIx0Lv9XLmFHZqK3+235Z1NIMG3cWTVDTRNtfiQ/ZEnsXy7xgwYZH
+	 rRKZfD98k0J1UxHf0JNPaCgfnNZ98ImFoj50hwJo=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37EA8sxG030851
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 14 Aug 2023 05:08:55 -0500
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 14
+ Aug 2023 05:08:54 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 14 Aug 2023 05:08:54 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37EA8s9N033239;
+	Mon, 14 Aug 2023 05:08:54 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 37EA8rBP020344;
+	Mon, 14 Aug 2023 05:08:54 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        MD Danish Anwar <danishanwar@ti.com>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v4 0/5] Introduce IEP driver and packet timestamping support
+Date: Mon, 14 Aug 2023 15:38:42 +0530
+Message-ID: <20230814100847.3531480-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ceec28d4-48e2-4de1-9f26-bfd3c61fde45@app.fastmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 12/08/2023 09:23, Arnd Bergmann wrote:
-> On Fri, Jun 23, 2023, at 20:38, edward.cree@amd.com wrote:
-> Unfortunately, the same warning now came back after commit
-> 55c1528f9b97f ("sfc: fix field-spanning memcpy in selftest")
-...
-> I'm out of ideas for how to fix both warnings at the same time,
-> with the struct group we get the iphdr at an invalid offset from
-> the start of the inner structure,
+This series introduces Industrial Ethernet Peripheral (IEP) driver to
+support timestamping of ethernet packets and thus support PTP and PPS
+for PRU ICSSG ethernet ports.
 
-But the actual address of the iphdr is properly aligned now, right?
-AFAICT the concept of the offset per se being 'valid' or not is not
- even meaningful; it's the access address that must be aligned, not
- the difference from random addresses used to construct it.
-In which case arguably the warning is just bogus and it's a compiler
- fix we need at this point.
+This series also adds 10M full duplex support for ICSSG ethernet driver.
 
--e
+There are two IEP instances. IEP0 is used for packet timestamping while IEP1
+is used for 10M full duplex support.
+
+This is v4 of the series [v1]. It addresses comments made on [v3].
+This series is based on linux-next(#next-20230809).
+
+Change from v3 to v4:
+*) Changed compatible in iep dt bindings. Now each SoC has their own compatible
+   in the binding with "ti,am654-icss-iep" as a fallback as asked by Conor.
+*) Addressed Andew's comments and removed helper APIs icss_iep_readl() / 
+   writel(). Now the settime/gettime APIs directly use readl() / writel().
+*) Moved selecting TI_ICSS_IEP in Kconfig from patch 3 to patch 4.
+*) Removed forward declaration of icss_iep_of_match in patch 3.
+*) Replaced use of of_device_get_match_data() to device_get_match_data() in
+   patch 3.
+*) Removed of_match_ptr() from patch 3 as it is not needed.
+
+Changes from v2 to v3:
+*) Addressed Roger's comment and moved IEP1 related changes in patch 5.
+*) Addressed Roger's comment and moved icss_iep.c / .h changes from patch 4
+   to patch 3.
+*) Added support for multiple timestamping in patch 4 as asked by Roger.
+*) Addressed Andrew's comment and added comment in case SPEED_10 in
+   icssg_config_ipg() API.
+*) Kept compatible as "ti,am654-icss-iep" for all TI K3 SoCs
+
+Changes from v1 to v2:
+*) Addressed Simon's comment to fix reverse xmas tree declaration. Some APIs
+   in patch 3 and 4 were not following reverse xmas tree variable declaration.
+   Fixed it in this version.
+*) Addressed Conor's comments and removed unsupported SoCs from compatible
+   comment in patch 1. 
+*) Addded patch 2 which was not part of v1. Patch 2, adds IEP node to dt
+   bindings for ICSSG.
+
+[v1] https://lore.kernel.org/all/20230803110153.3309577-1-danishanwar@ti.com/
+[v2] https://lore.kernel.org/all/20230807110048.2611456-1-danishanwar@ti.com/
+[v3] https://lore.kernel.org/all/20230809114906.21866-1-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+Grygorii Strashko (1):
+  net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
+
+MD Danish Anwar (2):
+  dt-bindings: net: Add ICSS IEP
+  dt-bindings: net: Add IEP property in ICSSG DT binding
+
+Roger Quadros (2):
+  net: ti: icss-iep: Add IEP driver
+  net: ti: icssg-prueth: add packet timestamping and ptp support
+
+ .../devicetree/bindings/net/ti,icss-iep.yaml  |  61 ++
+ .../bindings/net/ti,icssg-prueth.yaml         |   7 +
+ drivers/net/ethernet/ti/Kconfig               |  12 +
+ drivers/net/ethernet/ti/Makefile              |   1 +
+ drivers/net/ethernet/ti/icssg/icss_iep.c      | 947 ++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icss_iep.h      |  41 +
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |   7 +
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  21 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 451 ++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  28 +-
+ 10 files changed, 1568 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+
+-- 
+2.34.1
+
 
