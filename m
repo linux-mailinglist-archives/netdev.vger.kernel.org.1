@@ -1,325 +1,209 @@
-Return-Path: <netdev+bounces-27256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA7677B2F5
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:49:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A1077B336
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:03:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F33DB1C209F5
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B72E28100A
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 08:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8F98F6F;
-	Mon, 14 Aug 2023 07:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20209467;
+	Mon, 14 Aug 2023 08:03:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B0F1842
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:49:17 +0000 (UTC)
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA81AAD;
-	Mon, 14 Aug 2023 00:49:15 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-686efa1804eso2625844b3a.3;
-        Mon, 14 Aug 2023 00:49:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691999355; x=1692604155;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JvyGhMpX+o51E+mF4qI6rwhZPJg9mK6wL+BnFVzwP6k=;
-        b=Yb0l717oru2mmuNrohriRs9Dmmp/qo5vYeMM0psQVHMmUMwTqpU7oSqFKeygHW1y/x
-         efh+YlYAVHSL0eUrsZEw1sZn/9cBPIDnGQaPLSVzkLriDmgv4IAqsRVgzWHaqdddFbm0
-         1zwDW8LLQUqyJqI6mFy8iyczjIb8oL51bbzDKih/PXTd61R0tVALMcaWa4AFpBiln5C/
-         UK11sO2h74A4hAHIwaQ2JdzgM+MEDMiXc4G1t7vVVdLsSi9I0sRJhGv1qj/U7bY1dOI9
-         ibkuFopacykNVT/wsnPkhcsR8HWZgLSoJVeAgtTl6DtdYbtSBvBe33qdAM1JDyU8lWnY
-         ohTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691999355; x=1692604155;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JvyGhMpX+o51E+mF4qI6rwhZPJg9mK6wL+BnFVzwP6k=;
-        b=SaNoU9lJWWtaEiPQ5Ak2LjvTJat/c/4hcLuC+YhVoMRFr0sRn1ZiLbey4BfOHvmXnO
-         TnoCAhRa0lx7gqomcuMg7z2Gt5RtVy0pfHFGCIyLGlfii48q5aOqDJdhdjQimf0OR4fs
-         bFcqrF2W8r7Lw8FAeaMHG0tfppOsRCBGwtTq+i92ly+FHDkBJOcrl5oiwiBhFjjgH5Ho
-         Ffv9rgePKmMf+/e94hueTseTGreXjvSrLVXmY4CoMJofLhuF0kbKh1DkEhEYCYDev8wr
-         LS+TG676NOmuvuPQL/RmRWpyjLSRorbCgeTLKqoJ4LcfHadiL0KQxSP62/BxJckURvfl
-         W/2Q==
-X-Gm-Message-State: AOJu0YyE8e4+OAxD6VdIeOda1sV5ZvvBhfmnxOiLWe3a6umizy4qZYWP
-	JbKnznwmx0KySBXpGzd6NkLNlKNMGKMrT5BW
-X-Google-Smtp-Source: AGHT+IHPkyGi16FzcnW5HooZw4QuxHDlIQ3jLDr2cmQZfNFuVvArhywM/FR0SzyUK+VY5z7SlcxoCQ==
-X-Received: by 2002:a05:6300:8003:b0:140:f1d2:4fc with SMTP id an3-20020a056300800300b00140f1d204fcmr7369153pzc.45.1691999355228;
-        Mon, 14 Aug 2023 00:49:15 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id j29-20020a633c1d000000b00563397f1624sm7904004pga.69.2023.08.14.00.49.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 00:49:14 -0700 (PDT)
-Date: Mon, 14 Aug 2023 15:49:09 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Stefano Salsano <stefano.salsano@uniroma2.it>,
-	Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
-	Ahmed Abdelsalam <ahabdels.dev@gmail.com>
-Subject: Re: [net-next v2 1/2] seg6: add NEXT-C-SID support for SRv6 End.X
- behavior
-Message-ID: <ZNncdWeTgSuAuodC@Laptop-X1>
-References: <20230812180926.16689-1-andrea.mayer@uniroma2.it>
- <20230812180926.16689-2-andrea.mayer@uniroma2.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF38F5671
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:03:16 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2080.outbound.protection.outlook.com [40.107.95.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 212171702;
+	Mon, 14 Aug 2023 01:03:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fLZ2rHgMjy+LSECOIlus6uZayMuJt46UHa1Rg13aDMyqeLp8kNF7KNT7vA/zOFqQ//CiTWOtggODdFfrim8iv1jzrfdX9HK3rL9S0/gQrGvnLxbKCWBq7gf8pf/RM26O2RIBfthTp3pSQnKji+WLdt37+9MoCYzJwrstAESzLjD2U4eKTKvU2JDVEiHU91juj/UjSMvI6zSRz3r6CXYCNVoyN+zB4UPYDU4LGKTf6J9hWBznEJFyIZeflv2N2bJL7dCHNEBCQ3SvxXOzVnVdkuB0/ncKV2SSxoIjaE7r8BmJEzXGfaTbuaI+Y1iDoDhRiNccVez7NSrBOSa52NE5Aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1rN0noe+P7/3W+W3xZfZkL2UMSbGxiV29zTdRNTTnYI=;
+ b=ifgOcDer2ws2QT7HM8VM5GzuujbRyaXQo2oFzvULSWbAWI2ZkOJIsMl9kcXA9YMLjHbNIM0ysIvnnkJnxvFpmif9V3NRBP+6rDT5LSHmSX4gS3/dCm1BjdUwLnjRu9RbJu3f9R6N//lT3jegVHQFK/hTMWqFSJFXSSSfK2DoGwotdMyzJ62bBXtrbQb9Q1bmzvGa+NJyH3MkuE2B6phzs94hxwkNx8tlmvnZCeYxmPUY+Oo+X/OAhsyJBUnhmr+O8KPAbFZYbo2yuI0i3dJIMpDB3QA17EVL74CPpgMj5a8XPga6qcxGMSiYAIpzQ5zAVWnDfz+tT1ixtK7A1HdC2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1rN0noe+P7/3W+W3xZfZkL2UMSbGxiV29zTdRNTTnYI=;
+ b=eTKIw8tJ5El9inxBlgkRIHxGlAWvTFbm8InGVOdB7IYhATJ49sMLt/I8rtYpwuig17PMptC6OlvZhS9lxoXOQ2n1NXps2v7pWJfkuHVhOT9AttKyck6W8tlUnPsVF0NXk5cLa3JpD3mPbw/gxYQs4SHTI8wbveTwiXfTtj9Df98=
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com (2603:10b6:5:45::18) by
+ DS0PR12MB6416.namprd12.prod.outlook.com (2603:10b6:8:cb::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6678.24; Mon, 14 Aug 2023 08:03:02 +0000
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::ed2a:4807:1825:170f]) by DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::ed2a:4807:1825:170f%5]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
+ 08:03:02 +0000
+From: "Quan, Evan" <Evan.Quan@amd.com>
+To: Randy Dunlap <rdunlap@infradead.org>, "rafael@kernel.org"
+	<rafael@kernel.org>, "lenb@kernel.org" <lenb@kernel.org>, "Deucher,
+ Alexander" <Alexander.Deucher@amd.com>, "Koenig, Christian"
+	<Christian.Koenig@amd.com>, "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+	"airlied@gmail.com" <airlied@gmail.com>, "daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "Limonciello, Mario"
+	<Mario.Limonciello@amd.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>, "hdegoede@redhat.com"
+	<hdegoede@redhat.com>, "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
+	"Lazar, Lijo" <Lijo.Lazar@amd.com>, "jim.cromie@gmail.com"
+	<jim.cromie@gmail.com>, "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
+	"andrealmeid@igalia.com" <andrealmeid@igalia.com>, "trix@redhat.com"
+	<trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de"
+	<arnd@arndb.de>, "andrew@lunn.ch" <andrew@lunn.ch>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH V8 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Thread-Topic: [PATCH V8 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Thread-Index: AQHZy13P45gUlRqMfUa1FWDr4AZM/6/jq2yAgAXH9UA=
+Date: Mon, 14 Aug 2023 08:03:02 +0000
+Message-ID:
+ <DM6PR12MB2619B174ABD45D6C3D261B9CE417A@DM6PR12MB2619.namprd12.prod.outlook.com>
+References: <20230810073803.1643451-1-evan.quan@amd.com>
+ <20230810073803.1643451-2-evan.quan@amd.com>
+ <efb2d30c-3945-a63d-9a3f-7cf39124f76a@infradead.org>
+In-Reply-To: <efb2d30c-3945-a63d-9a3f-7cf39124f76a@infradead.org>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2023-08-14T08:02:58Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=a34a2889-3e5e-487a-984e-b7520cf3077b;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB2619:EE_|DS0PR12MB6416:EE_
+x-ms-office365-filtering-correlation-id: 55324542-6cd0-40a2-5744-08db9c9ce1e3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Or+7pImhVNZrqFXcRI0FC1pnvWPDIayOb/pTgmnyWtrIvL6rEyAfpJOxDrt4NLT5zS31Lub0eRfeNWJmISt08HW/na2XjhKjDOVouowkpEYg/a9PNDBOA+aRndFHIkqb+cuJYv1SHtzNxRLfiRmci0MzJ8eEkmLjTYECNPbI+DREvzKXu/CoH+0uEgGbH7ClkmnU/WkkcFGDN2Q/D5nRZx4NnJ/d6FbRhXeL/K68hIteLTBrmPUW5KB1Y3Sb/nOASuAyodxkF5uRCGFf331Ee+Zv+ygyeQbf8O1XsQ+hVYjppEF5BYFHW67O+qHNllXSndzRiP8NUXBKuGNrW741cp7oFFiqCoKhZ34fcm3zHr8oVVdSAV82eHZDsJ/WgKy7G8FuEP8m8PsaJ7dMZc8UZO8mudiasG1hLP6ApJLDPAWJ5vV/jYBgMgJP8ipebD7ZOq9C0WYduBJ8Ug0cg7UEbArOwL83zapm64b0848OXNzV/QsKFFwXCpFEFp/hYD1CxBzpSiuVb8pSJM4pgAhz5ziCxIJIvehMFjLoJhi6LM4DKjO56VpaxmHx+Lua4xakvlENm1GfHnhfmy4WqOAhlJ/njSxSMvFyzyJz6WaIIN2MxKX6v3wEodkSCtsiigDM/34jyxwpG9OkMn1P4BSITA==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2619.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(376002)(366004)(136003)(396003)(451199021)(186006)(1800799006)(33656002)(52536014)(5660300002)(7416002)(2906002)(86362001)(55016003)(83380400001)(66476007)(54906003)(66556008)(64756008)(66446008)(4326008)(38070700005)(76116006)(38100700002)(66946007)(316002)(110136005)(41300700001)(26005)(9686003)(53546011)(6506007)(7696005)(71200400001)(8936002)(8676002)(478600001)(921005)(122000001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?NkRrSW1EZllwWWszck1Qcko1S2tFenFGMHZBSVZDSTQzUFRDTEhEVU5kOXg0?=
+ =?utf-8?B?cXZ2M3RCc2FEZ2d4UEMxajJBeXYxb0kxYkU3OEVzRGhaRVZ2aUxHV29HZEUx?=
+ =?utf-8?B?RFlxTDAyd3ZONnFtS2R0bzlLOHNhRCthZmg0aXM2ZUloK2l6R1hKWnJINHI2?=
+ =?utf-8?B?emxpNGRnU1gyNjdFRUtXZGgxdkZ1bmZZRGVqYlRQMDN1cTFpSml1WkVkRDYz?=
+ =?utf-8?B?eDB2N2thTGhhY29kaFRkUy9vUG1XQmlkbTg5bndYSlM0WkdudDJ5QThpVkdh?=
+ =?utf-8?B?aTc5eW16bEpCWEFjMnBKalBTcjBPdUhBZVBZcDVXcDdBcjIxYjFFMk4zNXVD?=
+ =?utf-8?B?VzdGd213N0NJNHQ1ZVdhK1hVNGRKRUFCSi9EQmQ5dW81Y2lGNUUyTkRtQmo4?=
+ =?utf-8?B?ZFI3QlE2T29STmM0eWZDdDFobDE0ZGJ6eXVFc1NNcDZDTE96SFBlcjk0Q2t2?=
+ =?utf-8?B?Y1VGNlJla2UxTkRub29uSmJ4dlhYVTBRcDRmTEJ2R1MwbWV2YzFHZHRTaWZ1?=
+ =?utf-8?B?eUMvb1llb2c0Smh6ZVRocnBsN2FzQkRoa0tFU2VsWW9qMlE3Z3gvMDB4QytY?=
+ =?utf-8?B?aHdWL1VhZG9UNGVHOGdSenZlUkU3T01JVVcyVVhSLy90WWExbG5jL2R6YktU?=
+ =?utf-8?B?NUY0QlZpVEh6RGt4RjlzT0VaMnBUNXF6OGhvcXVwallCdGd4Wm5Idk93TmZL?=
+ =?utf-8?B?Q1c1SFdwcTJyRDdPM2JTTU5MQ0NaZWxub0tzZmNGem9JSXdBOVdPNERnNnMy?=
+ =?utf-8?B?OUoxb2hWWTJ2MVBhNDZha0lyemhLb0ZBWGFGTlk1WXE5N09BcEd2SlBLbnJy?=
+ =?utf-8?B?d1NZMUhuR00zQ1ZNZlBYdTNLUTRMVUFBMFNOampKYjhIOVcrZFEyWnpYdW9Y?=
+ =?utf-8?B?OCs3Vzl1RGdJY0dOR3lkSmFhcXNIZ0VzekI2alBuS2R3SmtHTzBUd0UybkhK?=
+ =?utf-8?B?NlZoYXJURU9KM0F2bmcyZW1wR0FIVjRkdkNBNGdEMGFQQzFiMTVyajdDU2Fh?=
+ =?utf-8?B?eW1oZFBNZ2ZLU2VyclhYMU1USFd0SHJsUVo5amErVzB3VnRKNytNOUkxcnVD?=
+ =?utf-8?B?NzNDSy9Lc2p1QmpubU03MnNCNkJEaFNNTzRkUi9BdWNhZ3VOZWxzZzNXeHl1?=
+ =?utf-8?B?djlNM1o0ZTl5RU96bGllNUZEZTQxQ3htbGM2QjM5aURzR2FNUmdHVjJ3RDE1?=
+ =?utf-8?B?YzMwR1lDU1BBSHBRVmFaSExmOGpvRWYvUkk4MnNWM1o4VXhuUEdBa2puRm1h?=
+ =?utf-8?B?Z25scVl6VE9CZnlFSDRzc1dNdkpDM2h1NkdJUit3R003VlhIQURlVFUzbDN0?=
+ =?utf-8?B?VHU5ZUtHQUloSnB1ZHhja3ppUC9Ub2RLMEhqNEZSVVF0UEh3dHlJbXliUkFt?=
+ =?utf-8?B?L1E4NG1JeG9EazRTVE0raFFOZVU5ZVVCUVQwdHczSEw2N0RYSXFvc2QvYnVv?=
+ =?utf-8?B?dmdCQzBFb0RSamZ5OENwakI3eHNIRW9WOHRyU3BsZ0NvL1Y3bXA3c3JOVHhS?=
+ =?utf-8?B?NWFHTFh1ZWlQdXVJN25XbXlNRjJHbnRYS1R6dVJxbXNVeUQxaWp0eklDVU5m?=
+ =?utf-8?B?N0lkMVRBWTZKREl1NllrMnZ2bm92VytCOTdkK3RQVDcwS0RsR1RRd0RIREY1?=
+ =?utf-8?B?N21WdGlhbFV1WXZRZFhwNVBZQjJRUnRIWmJaT0ovcjZZZFdQNmZHLzJ2QWMz?=
+ =?utf-8?B?aHA0VHhTbXEvMGFGamNFRXVwM3dDMGV0cDBERVNSTWZPOFpwQTd1ako0RmdW?=
+ =?utf-8?B?TE9kQmpSdFFOV1piSFFVK09sVzBjeFZEaThETjE0TnY1SGZEb2RHa2plV1k0?=
+ =?utf-8?B?VnlNdVFiZ2ZvTTN0aEZkdVlvRWtHVlNXVWxJVThnTU4yZmpRckUySjVuOVh4?=
+ =?utf-8?B?dkg5R0xPSnp1VThTNzkzd3haUWlUZHFsbVB1OW9pU2VZdjM4a0o5OW5yQWRG?=
+ =?utf-8?B?OGR0UnRYbFMrQ28rb25PV1cwbk10cEF6WDdMbFFrUitPaE1pVXk2QUtnRXBG?=
+ =?utf-8?B?cFVIeVhLbThUSDM4MHFKSlpTcklQS0JEbDJGUjRhQlovc3JnQWFxUDFxWlNK?=
+ =?utf-8?B?K2lQWTBUUEN2RFdaNEdqaGh2Ump5YUROVC9ybHl1MUVCYnViaG1OUXpZMlIv?=
+ =?utf-8?Q?PEi4=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230812180926.16689-2-andrea.mayer@uniroma2.it>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2619.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55324542-6cd0-40a2-5744-08db9c9ce1e3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2023 08:03:02.1416
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vl+5LiTUi7Qzkfhv1YTL72O9v/AgzqQotTP79JnHnpjLYYESymkv7MayAJAOynJU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6416
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 12, 2023 at 08:09:25PM +0200, Andrea Mayer wrote:
-> The NEXT-C-SID mechanism described in [1] offers the possibility of
-> encoding several SRv6 segments within a single 128 bit SID address. Such
-> a SID address is called a Compressed SID (C-SID) container. In this way,
-> the length of the SID List can be drastically reduced.
-> 
-> A SID instantiated with the NEXT-C-SID flavor considers an IPv6 address
-> logically structured in three main blocks: i) Locator-Block; ii)
-> Locator-Node Function; iii) Argument.
-> 
->                         C-SID container
-> +------------------------------------------------------------------+
-> |     Locator-Block      |Loc-Node|            Argument            |
-> |                        |Function|                                |
-> +------------------------------------------------------------------+
-> <--------- B -----------> <- NF -> <------------- A --------------->
-> 
->    (i) The Locator-Block can be any IPv6 prefix available to the provider;
-> 
->   (ii) The Locator-Node Function represents the node and the function to
->        be triggered when a packet is received on the node;
-> 
->  (iii) The Argument carries the remaining C-SIDs in the current C-SID
->        container.
-> 
-> This patch leverages the NEXT-C-SID mechanism previously introduced in the
-> Linux SRv6 subsystem [2] to support SID compression capabilities in the
-> SRv6 End.X behavior [3].
-> An SRv6 End.X behavior with NEXT-C-SID flavor works as an End.X behavior
-> but it is capable of processing the compressed SID List encoded in C-SID
-> containers.
-> 
-> An SRv6 End.X behavior with NEXT-C-SID flavor can be configured to support
-> user-provided Locator-Block and Locator-Node Function lengths. In this
-> implementation, such lengths must be evenly divisible by 8 (i.e. must be
-> byte-aligned), otherwise the kernel informs the user about invalid
-> values with a meaningful error code and message through netlink_ext_ack.
-> 
-> If Locator-Block and/or Locator-Node Function lengths are not provided
-> by the user during configuration of an SRv6 End.X behavior instance with
-> NEXT-C-SID flavor, the kernel will choose their default values i.e.,
-> 32-bit Locator-Block and 16-bit Locator-Node Function.
-> 
-> [1] - https://datatracker.ietf.org/doc/html/draft-ietf-spring-srv6-srh-compression
-> [2] - https://lore.kernel.org/all/20220912171619.16943-1-andrea.mayer@uniroma2.it/
-> [3] - https://datatracker.ietf.org/doc/html/rfc8986#name-endx-l3-cross-connect
-> 
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> ---
->  net/ipv6/seg6_local.c | 108 ++++++++++++++++++++++++++++++++++--------
->  1 file changed, 88 insertions(+), 20 deletions(-)
-> 
-> diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-> index dd433cc265c8..24e2b4b494cb 100644
-> --- a/net/ipv6/seg6_local.c
-> +++ b/net/ipv6/seg6_local.c
-> @@ -109,15 +109,19 @@ struct bpf_lwt_prog {
->  #define next_csid_chk_lcnode_fn_bits(flen)		\
->  	next_csid_chk_lcblock_bits(flen)
->  
-> +/* flag indicating that flavors are set up for a given End* behavior */
-> +#define SEG6_F_LOCAL_FLAVORS		SEG6_F_ATTR(SEG6_LOCAL_FLAVORS)
-> +
->  #define SEG6_F_LOCAL_FLV_OP(flvname)	BIT(SEG6_LOCAL_FLV_OP_##flvname)
-> +#define SEG6_F_LOCAL_FLV_NEXT_CSID	SEG6_F_LOCAL_FLV_OP(NEXT_CSID)
->  #define SEG6_F_LOCAL_FLV_PSP		SEG6_F_LOCAL_FLV_OP(PSP)
->  
->  /* Supported RFC8986 Flavor operations are reported in this bitmask */
->  #define SEG6_LOCAL_FLV8986_SUPP_OPS	SEG6_F_LOCAL_FLV_PSP
->  
-> -/* Supported Flavor operations are reported in this bitmask */
-> -#define SEG6_LOCAL_FLV_SUPP_OPS		(SEG6_F_LOCAL_FLV_OP(NEXT_CSID) | \
-> +#define SEG6_LOCAL_END_FLV_SUPP_OPS	(SEG6_F_LOCAL_FLV_NEXT_CSID | \
->  					 SEG6_LOCAL_FLV8986_SUPP_OPS)
-> +#define SEG6_LOCAL_END_X_FLV_SUPP_OPS	SEG6_F_LOCAL_FLV_NEXT_CSID
->  
->  struct seg6_flavors_info {
->  	/* Flavor operations */
-> @@ -411,9 +415,72 @@ static int end_next_csid_core(struct sk_buff *skb, struct seg6_local_lwt *slwt)
->  	return input_action_end_finish(skb, slwt);
->  }
->  
-> +static int input_action_end_x_finish(struct sk_buff *skb,
-> +				     struct seg6_local_lwt *slwt)
-> +{
-> +	seg6_lookup_nexthop(skb, &slwt->nh6, 0);
-> +
-> +	return dst_input(skb);
-> +}
-> +
-> +static int input_action_end_x_core(struct sk_buff *skb,
-> +				   struct seg6_local_lwt *slwt)
-> +{
-> +	struct ipv6_sr_hdr *srh;
-> +
-> +	srh = get_and_validate_srh(skb);
-> +	if (!srh)
-> +		goto drop;
-> +
-> +	advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
-> +
-> +	return input_action_end_x_finish(skb, slwt);
-> +
-> +drop:
-> +	kfree_skb(skb);
-> +	return -EINVAL;
-> +}
-> +
-> +static int end_x_next_csid_core(struct sk_buff *skb,
-> +				struct seg6_local_lwt *slwt)
-> +{
-> +	const struct seg6_flavors_info *finfo = &slwt->flv_info;
-> +	struct in6_addr *daddr = &ipv6_hdr(skb)->daddr;
-> +
-> +	if (seg6_next_csid_is_arg_zero(daddr, finfo))
-> +		return input_action_end_x_core(skb, slwt);
-> +
-> +	/* update DA */
-> +	seg6_next_csid_advance_arg(daddr, finfo);
-> +
-> +	return input_action_end_x_finish(skb, slwt);
-> +}
-> +
->  static bool seg6_next_csid_enabled(__u32 fops)
->  {
-> -	return fops & BIT(SEG6_LOCAL_FLV_OP_NEXT_CSID);
-> +	return fops & SEG6_F_LOCAL_FLV_NEXT_CSID;
-> +}
-> +
-> +/* Processing of SRv6 End, End.X, and End.T behaviors can be extended through
-> + * the flavors framework. These behaviors must report the subset of (flavor)
-> + * operations they currently implement. In this way, if a user specifies a
-> + * flavor combination that is not supported by a given End* behavior, the
-> + * kernel refuses to instantiate the tunnel reporting the error.
-> + */
-> +static int seg6_flv_supp_ops_by_action(int action, __u32 *fops)
-> +{
-> +	switch (action) {
-> +	case SEG6_LOCAL_ACTION_END:
-> +		*fops = SEG6_LOCAL_END_FLV_SUPP_OPS;
-> +		break;
-> +	case SEG6_LOCAL_ACTION_END_X:
-> +		*fops = SEG6_LOCAL_END_X_FLV_SUPP_OPS;
-> +		break;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	return 0;
->  }
->  
->  /* We describe the packet state in relation to the absence/presence of the SRH
-> @@ -746,21 +813,14 @@ static int input_action_end(struct sk_buff *skb, struct seg6_local_lwt *slwt)
->  /* regular endpoint, and forward to specified nexthop */
->  static int input_action_end_x(struct sk_buff *skb, struct seg6_local_lwt *slwt)
->  {
-> -	struct ipv6_sr_hdr *srh;
-> -
-> -	srh = get_and_validate_srh(skb);
-> -	if (!srh)
-> -		goto drop;
-> -
-> -	advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
-> -
-> -	seg6_lookup_nexthop(skb, &slwt->nh6, 0);
-> +	const struct seg6_flavors_info *finfo = &slwt->flv_info;
-> +	__u32 fops = finfo->flv_ops;
->  
-> -	return dst_input(skb);
-> +	/* check for the presence of NEXT-C-SID since it applies first */
-> +	if (seg6_next_csid_enabled(fops))
-> +		return end_x_next_csid_core(skb, slwt);
->  
-> -drop:
-> -	kfree_skb(skb);
-> -	return -EINVAL;
-> +	return input_action_end_x_core(skb, slwt);
->  }
->  
->  static int input_action_end_t(struct sk_buff *skb, struct seg6_local_lwt *slwt)
-> @@ -1404,13 +1464,14 @@ static struct seg6_action_desc seg6_action_table[] = {
->  		.action		= SEG6_LOCAL_ACTION_END,
->  		.attrs		= 0,
->  		.optattrs	= SEG6_F_LOCAL_COUNTERS |
-> -				  SEG6_F_ATTR(SEG6_LOCAL_FLAVORS),
-> +				  SEG6_F_LOCAL_FLAVORS,
->  		.input		= input_action_end,
->  	},
->  	{
->  		.action		= SEG6_LOCAL_ACTION_END_X,
->  		.attrs		= SEG6_F_ATTR(SEG6_LOCAL_NH6),
-> -		.optattrs	= SEG6_F_LOCAL_COUNTERS,
-> +		.optattrs	= SEG6_F_LOCAL_COUNTERS |
-> +				  SEG6_F_LOCAL_FLAVORS,
->  		.input		= input_action_end_x,
->  	},
->  	{
-> @@ -2070,7 +2131,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
->  {
->  	struct seg6_flavors_info *finfo = &slwt->flv_info;
->  	struct nlattr *tb[SEG6_LOCAL_FLV_MAX + 1];
-> -	unsigned long fops;
-> +	int action = slwt->action;
-> +	__u32 fops, supp_fops;
->  	int rc;
->  
->  	rc = nla_parse_nested_deprecated(tb, SEG6_LOCAL_FLV_MAX,
-> @@ -2086,7 +2148,8 @@ static int parse_nla_flavors(struct nlattr **attrs, struct seg6_local_lwt *slwt,
->  		return -EINVAL;
->  
->  	fops = nla_get_u32(tb[SEG6_LOCAL_FLV_OPERATION]);
-> -	if (fops & ~SEG6_LOCAL_FLV_SUPP_OPS) {
-> +	rc = seg6_flv_supp_ops_by_action(action, &supp_fops);
-> +	if (rc < 0 || (fops & ~supp_fops)) {
->  		NL_SET_ERR_MSG(extack, "Unsupported Flavor operation(s)");
->  		return -EOPNOTSUPP;
->  	}
-> @@ -2618,6 +2681,11 @@ int __init seg6_local_init(void)
->  	 */
->  	BUILD_BUG_ON(SEG6_LOCAL_MAX + 1 > BITS_PER_TYPE(unsigned long));
->  
-> +	/* Check whether the number of defined flavors exceeds the maximum
-> +	 * allowed value.
-> +	 */
-> +	BUILD_BUG_ON(SEG6_LOCAL_FLV_OP_MAX + 1 > BITS_PER_TYPE(__u32));
-> +
->  	/* If the default NEXT-C-SID Locator-Block/Node Function lengths (in
->  	 * bits) have been changed with invalid values, kernel build stops
->  	 * here.
-> -- 
-> 2.20.1
-> 
-
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+W0FNRCBPZmZpY2lhbCBVc2UgT25seSAtIEdlbmVyYWxdDQoNCg0KDQo+IC0tLS0tT3JpZ2luYWwg
+TWVzc2FnZS0tLS0tDQo+IEZyb206IFJhbmR5IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3Jn
+Pg0KPiBTZW50OiBUaHVyc2RheSwgQXVndXN0IDEwLCAyMDIzIDExOjQxIFBNDQo+IFRvOiBRdWFu
+LCBFdmFuIDxFdmFuLlF1YW5AYW1kLmNvbT47IHJhZmFlbEBrZXJuZWwub3JnOyBsZW5iQGtlcm5l
+bC5vcmc7DQo+IERldWNoZXIsIEFsZXhhbmRlciA8QWxleGFuZGVyLkRldWNoZXJAYW1kLmNvbT47
+IEtvZW5pZywgQ2hyaXN0aWFuDQo+IDxDaHJpc3RpYW4uS29lbmlnQGFtZC5jb20+OyBQYW4sIFhp
+bmh1aSA8WGluaHVpLlBhbkBhbWQuY29tPjsNCj4gYWlybGllZEBnbWFpbC5jb207IGRhbmllbEBm
+ZndsbC5jaDsgam9oYW5uZXNAc2lwc29sdXRpb25zLm5ldDsNCj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5l
+dDsgZWR1bWF6ZXRAZ29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBwYWJlbmlAcmVkaGF0
+LmNvbTsgTGltb25jaWVsbG8sIE1hcmlvIDxNYXJpby5MaW1vbmNpZWxsb0BhbWQuY29tPjsNCj4g
+bWRhZW56ZXJAcmVkaGF0LmNvbTsgbWFhcnRlbi5sYW5raG9yc3RAbGludXguaW50ZWwuY29tOw0K
+PiB0emltbWVybWFubkBzdXNlLmRlOyBoZGVnb2VkZUByZWRoYXQuY29tOyBqaW5neXV3YW5nX3Zp
+cEAxNjMuY29tOw0KPiBMYXphciwgTGlqbyA8TGlqby5MYXphckBhbWQuY29tPjsgamltLmNyb21p
+ZUBnbWFpbC5jb207DQo+IGJlbGxvc2lsaWNpb0BnbWFpbC5jb207IGFuZHJlYWxtZWlkQGlnYWxp
+YS5jb207IHRyaXhAcmVkaGF0LmNvbTsNCj4ganNnQGpzZy5pZC5hdTsgYXJuZEBhcm5kYi5kZTsg
+YW5kcmV3QGx1bm4uY2gNCj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4
+LWFjcGlAdmdlci5rZXJuZWwub3JnOyBhbWQtDQo+IGdmeEBsaXN0cy5mcmVlZGVza3RvcC5vcmc7
+IGRyaS1kZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5vcmc7IGxpbnV4LQ0KPiB3aXJlbGVzc0B2Z2Vy
+Lmtlcm5lbC5vcmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRD
+SCBWOCAxLzldIGRyaXZlcnMgY29yZTogQWRkIHN1cHBvcnQgZm9yIFdpZmkgYmFuZCBSRg0KPiBt
+aXRpZ2F0aW9ucw0KPiANCj4gDQo+IA0KPiBPbiA4LzEwLzIzIDAwOjM3LCBFdmFuIFF1YW4gd3Jv
+dGU6DQo+ID4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vYWRtaW4tZ3VpZGUva2VybmVsLXBh
+cmFtZXRlcnMudHh0DQo+ID4gYi9Eb2N1bWVudGF0aW9uL2FkbWluLWd1aWRlL2tlcm5lbC1wYXJh
+bWV0ZXJzLnR4dA0KPiA+IGluZGV4IGExNDU3OTk1ZmQ0MS4uMjFmNzNhMGJiZDBiIDEwMDY0NA0K
+PiA+IC0tLSBhL0RvY3VtZW50YXRpb24vYWRtaW4tZ3VpZGUva2VybmVsLXBhcmFtZXRlcnMudHh0
+DQo+ID4gKysrIGIvRG9jdW1lbnRhdGlvbi9hZG1pbi1ndWlkZS9rZXJuZWwtcGFyYW1ldGVycy50
+eHQNCj4gPiBAQCAtNzE1MiwzICs3MTUyLDEyIEBADQo+ID4gIAkJCQl4bW9uIGNvbW1hbmRzLg0K
+PiA+ICAJCQlvZmYJeG1vbiBpcyBkaXNhYmxlZC4NCj4gPg0KPiA+ICsJd2JyZj0JCVtLTkxdDQo+
+ID4gKwkJCUZvcm1hdDogeyBvbiB8IGF1dG8gfCBvZmYgfQ0KPiA+ICsJCQlDb250cm9scyBpZiBX
+QlJGIGZlYXR1cmVzIHNob3VsZCBiZSBlbmFibGVkIG9yDQo+IGRpc2FibGVkDQo+ID4gKwkJCWZv
+cmNlbHkuIERlZmF1bHQgaXMgYXV0by4NCj4gDQo+ICJmb3JjZWx5IiBpcyBub3QgYSB3b3JkLiAi
+Zm9yY2VkbHkiIGlzIGEgd29yZCwgYnV0IGl0J3Mgbm90IHVzZWQgdmVyeSBtdWNoIEFGQUlLLg0K
+PiBJIHdvdWxkIHByb2JhYmx5IHdyaXRlICJDb250cm9scyBpZiBXQlJGIGZlYXR1cmVzIHNob3Vs
+ZCBiZSBmb3JjZWQgb24gb3Igb2ZmLiINClllYWgsIHRoYXQgc291bmRzIGJldHRlci4gV2lsbCB1
+cGRhdGUgdGhpcyBhcyBzdWdnZXN0ZWQuDQoNCkV2YW4NCj4gDQo+ID4gKwkJCW9uCUZvcmNlIGVu
+YWJsZSB0aGUgV0JSRiBmZWF0dXJlcy4NCj4gPiArCQkJYXV0bwlVcCB0byB0aGUgc3lzdGVtIHRv
+IGRvIHByb3BlciBjaGVja3MgdG8NCj4gPiArCQkJCWRldGVybWluZSB0aGUgV0JSRiBmZWF0dXJl
+cyBzaG91bGQgYmUNCj4gZW5hYmxlZA0KPiA+ICsJCQkJb3Igbm90Lg0KPiA+ICsJCQlvZmYJRm9y
+Y2UgZGlzYWJsZSB0aGUgV0JSRiBmZWF0dXJlcy4NCj4gDQo+IC0tDQo+IH5SYW5keQ0K
 
