@@ -1,105 +1,85 @@
-Return-Path: <netdev+bounces-27247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D208177B270
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:29:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B513477B27A
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:31:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1326A280F0F
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:29:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BD221C203B7
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55248487;
-	Mon, 14 Aug 2023 07:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3673A8820;
+	Mon, 14 Aug 2023 07:31:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A827B6D24
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:29:07 +0000 (UTC)
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB145E75
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 00:29:04 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3180fd48489so3265997f8f.3
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 00:29:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1691998143; x=1692602943;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FXmTyjOjqbJrnEr9NK8/CkgQsGSGHVKfXT9QUa+DJos=;
-        b=S0W1wiFtxslctM1AdKVzQLoJ+FVShr7M6E4orGGSnVgGm/D/dIrEXpF6DyjNDyeFvJ
-         4n2IXrFg7D4RfMgC3JpgjIFqJJoZfIrR4qvNGGEWFY6kCZ0Ysr6QQCjY+WfizpdMv3u2
-         k/uPyyLYKfsRZlZqYxiInChaaAb05n3wej5/7vLBrW/N+OhOcCrITjzCL6Mq9bR4xK1I
-         4gwfgzkMycp8im1dLnqA+RynxLqC1fI5bLfwq5M75VsJ+nsWdpEHf/SlWxa+FrwY7wlv
-         SuJ7U254HEU3/kcYgr5f16TIU9KJGo92UbmWEMBapKxstD+oe0oEhLy5Do53eYS8v0TN
-         2NmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691998143; x=1692602943;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FXmTyjOjqbJrnEr9NK8/CkgQsGSGHVKfXT9QUa+DJos=;
-        b=V7+cyRSZCQUW8oKNAX2s1tUBf0xfyXtgDQt5EWJ+aPEIy4ylk95ZWw/vazcgKcr0lR
-         TG8g8t6MCLJypmXlEE/uLuOikMjt0lu/wXUqoQIAnrMNACOtGWQCDdxtopyNNElb7nrC
-         QG5aKsuj6e+uZP6S/F6NLONQwkvohUqT8MPt2+CN4T8jV28iIHYZli6dlWan7HVWFCI3
-         K2KZR/07mnlGUby5h+nbsAKpcGmcnq5gzEKoTmvViVW0O022lE4tW/C+SneU445dnsrL
-         OT//5diKOoIYwAQETfvG0YdL9uQh4jwHItgkoNXDeajF4Qs7CXAEWo2q+i/OtuFI5FyU
-         MGeA==
-X-Gm-Message-State: AOJu0YxIQ3fwbEa3qGXf4PIZMN8RINM0nQX4hiK7smjYYGkb9IZcSKXg
-	nXoquKAPFW5znwgaIWou8M6Ag3Ou2qJmAGRX5qH02w==
-X-Google-Smtp-Source: AGHT+IGumNJsAXd0DMcbj6/ulgwttGs5GfPHz8XtlAmhCge+FdMeWdOsCWZaWYmzp+suaP2WbRl4Gw==
-X-Received: by 2002:a5d:4448:0:b0:317:f537:748d with SMTP id x8-20020a5d4448000000b00317f537748dmr5151204wrr.64.1691998143008;
-        Mon, 14 Aug 2023 00:29:03 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id x13-20020a5d444d000000b00317f29ad113sm13467685wrr.32.2023.08.14.00.29.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 00:29:02 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	dsahern@gmail.com
-Subject: [patch iproute2-next] devlink: spell out STATE in devlink port function help
-Date: Mon, 14 Aug 2023 09:29:01 +0200
-Message-ID: <20230814072901.1865650-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0708A1842
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:31:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9652BC433C7;
+	Mon, 14 Aug 2023 07:30:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691998264;
+	bh=+wVLxwxYeITuhnEHSDMVdq/EHuC0zXvhqJzjEpHNoL0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MtyrHjkaqZOC8vTm60mW7OIGLTc37l2BnMN6vw/UILe6ZHa49edhBQLwrTmUh62xp
+	 LwxZD6HPkH1QLaMtRgohb+gMo4JO/kDwiJW6uTPaHRx+wETPNSIxLrD4rgvZiaionl
+	 0UbmAnXFwUYXrWI2L8hp0N7ZrbqIwQt4AVFuKATFEOQYZJJ1j8boxB+NxDjVZwZN/2
+	 8atPLhLzWgiSOKuRFiZrZJ7bqpwjNF85rU/v1AavbZmqqnlQEM4X3KHVv2lqqviMFL
+	 8hocmKb4UrTJ9PJzrBlYndcQcFw2E87wshzSKahFdXtoJlKOcg8t59rbi2Bo0t3nxa
+	 4z2yM6onN7tAw==
+Message-ID: <9f69629b-b341-44d0-de31-f8ac3f22fa6b@kernel.org>
+Date: Mon, 14 Aug 2023 09:30:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: snps,dwmac: Tx queues with
+ coe
+To: Rohan G Thomas <rohan.g.thomas@intel.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20230810150328.19704-1-rohan.g.thomas@intel.com>
+ <20230810150328.19704-2-rohan.g.thomas@intel.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <20230810150328.19704-2-rohan.g.thomas@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+On 10/08/2023 17:03, Rohan G Thomas wrote:
+> Add dt-bindings for the number of tx queues with coe support. Some
+> dwmac IPs support tx queues only for few initial tx queues, starting
+> from tx queue 0.
+> 
+> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
 
-Be in-sync with port help and port man page and spell out the possible
-states instead of "STATE".
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- devlink/devlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You missed at least DT list (maybe more), so this won't be tested by
+automated tooling. Performing review on untested code might be a waste
+of time, thus I will skip this patch entirely till you follow the
+process allowing the patch to be tested.
 
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 3cb102736b19..1a522111385b 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -4962,7 +4962,7 @@ static int cmd_port_param_show(struct dl *dl)
- 
- static void cmd_port_function_help(void)
- {
--	pr_err("Usage: devlink port function set DEV/PORT_INDEX [ hw_addr ADDR ] [ state STATE ]\n");
-+	pr_err("Usage: devlink port function set DEV/PORT_INDEX [ hw_addr ADDR ] [ state { active | inactive } ]\n");
- 	pr_err("                      [ roce { enable | disable } ] [ migratable { enable | disable } ]\n");
- 	pr_err("       devlink port function rate { help | show | add | del | set }\n");
- }
--- 
-2.41.0
+Please kindly resend and include all necessary To/Cc entries.
+
+Best regards,
+Krzysztof
 
 
