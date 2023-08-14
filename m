@@ -1,201 +1,86 @@
-Return-Path: <netdev+bounces-27375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1AF977BAFF
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:08:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6934977BB48
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87D302810F1
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:08:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E9228112B
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D946C13D;
-	Mon, 14 Aug 2023 14:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78339C13F;
+	Mon, 14 Aug 2023 14:13:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D433BA4C
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:08:13 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CDB1D7;
-	Mon, 14 Aug 2023 07:08:11 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RPbmq0HYLz1GDWN;
-	Mon, 14 Aug 2023 22:06:51 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 14 Aug
- 2023 22:08:08 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <saeedm@nvidia.com>, <leon@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<borisp@nvidia.com>, <tariqt@nvidia.com>, <lkayal@nvidia.com>,
-	<msanalla@nvidia.com>, <kliteyn@nvidia.com>, <valex@nvidia.com>
-CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] net/mlx5: Remove unused declaration
-Date: Mon, 14 Aug 2023 22:08:04 +0800
-Message-ID: <20230814140804.47660-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D694BE68
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:13:08 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE11211B;
+	Mon, 14 Aug 2023 07:12:46 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qVYJ2-0003LI-EH; Mon, 14 Aug 2023 16:12:28 +0200
+Date: Mon, 14 Aug 2023 16:12:28 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, fw@strlen.de, leon@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	timo.teras@iki.fi, yuehaibing@huawei.com, weiyongjun1@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Patch net, v2] net: xfrm: skip policies marked as dead while
+ reinserting policies
+Message-ID: <20230814141228.GC25551@breakpoint.cc>
+References: <20230814140013.712001-1-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230814140013.712001-1-dongchenchen2@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
-declared mlx5e_ipsec_inverse_table_init() but never implemented it.
-Commit f52f2faee581 ("net/mlx5e: Introduce flow steering API")
-declared mlx5e_fs_set_tc() but never implemented it.
-Commit f2f3df550139 ("net/mlx5: EQ, Privatize eq_table and friends")
-declared mlx5_eq_comp_cpumask() but never implemented it.
-Commit cac1eb2cf2e3 ("net/mlx5: Lag, properly lock eswitch if needed")
-removed mlx5_lag_update() but not its declaration.
-Commit 35ba005d820b ("net/mlx5: DR, Set flex parser for TNL_MPLS dynamically")
-removed mlx5dr_ste_build_tnl_mpls() but not its declaration.
+Dong Chenchen <dongchenchen2@huawei.com> wrote:
+> BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
+> Read of size 1 at addr ffff8881051f3bf8 by task ip/668
+> 
+> CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x72/0xa0
+>  print_report+0xd0/0x620
+>  kasan_report+0xb6/0xf0
+>  xfrm_policy_inexact_list_reinsert+0xb6/0x430
+>  xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
+>  xfrm_policy_inexact_alloc_chain+0x23f/0x320
+>  xfrm_policy_inexact_insert+0x6b/0x590
+>  xfrm_policy_insert+0x3b1/0x480
+>  xfrm_add_policy+0x23c/0x3c0
+>  xfrm_user_rcv_msg+0x2d0/0x510
+>  netlink_rcv_skb+0x10d/0x2d0
+>  xfrm_netlink_rcv+0x49/0x60
+>  netlink_unicast+0x3fe/0x540
+>  netlink_sendmsg+0x528/0x970
+>  sock_sendmsg+0x14a/0x160
+>  ____sys_sendmsg+0x4fc/0x580
+>  ___sys_sendmsg+0xef/0x160
+>  __sys_sendmsg+0xf7/0x1b0
+>  do_syscall_64+0x3f/0x90
+>  entry_SYSCALL_64_after_hwframe+0x73/0xdd
 
-Commit e126ba97dba9 ("mlx5: Add driver for Mellanox Connect-IB adapters")
-declared but never implemented mlx5_alloc_cmd_mailbox_chain() and mlx5_free_cmd_mailbox_chain().
-Commit 0cf53c124756 ("net/mlx5: FWPage, Use async events chain")
-removed mlx5_core_req_pages_handler() but not its declaration.
-Commit 938fe83c8dcb ("net/mlx5_core: New device capabilities handling")
-removed mlx5_query_odp_caps() but not its declaration.
-Commit f6a8a19bb11b ("RDMA/netdev: Hoist alloc_netdev_mqs out of the driver")
-removed mlx5_rdma_netdev_alloc() but not its declaration.
+Thanks for following up.
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/fs.h    |  1 -
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h       |  1 -
- drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h   |  1 -
- .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |  2 --
- .../mellanox/mlx5/core/steering/dr_types.h         |  4 ----
- include/linux/mlx5/driver.h                        | 14 --------------
- 6 files changed, 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-index e5a44b0b9616..4d6225e0eec7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-@@ -150,7 +150,6 @@ struct mlx5e_flow_steering *mlx5e_fs_init(const struct mlx5e_profile *profile,
- 					  struct dentry *dfs_root);
- void mlx5e_fs_cleanup(struct mlx5e_flow_steering *fs);
- struct mlx5e_vlan_table *mlx5e_fs_get_vlan(struct mlx5e_flow_steering *fs);
--void mlx5e_fs_set_tc(struct mlx5e_flow_steering *fs, struct mlx5e_tc_table *tc);
- struct mlx5e_tc_table *mlx5e_fs_get_tc(struct mlx5e_flow_steering *fs);
- struct mlx5e_l2_table *mlx5e_fs_get_l2(struct mlx5e_flow_steering *fs);
- struct mlx5_flow_namespace *mlx5e_fs_get_ns(struct mlx5e_flow_steering *fs, bool egress);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
-index 9ee014a8ad24..2ed99772f168 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
-@@ -54,7 +54,6 @@ struct mlx5e_accel_tx_ipsec_state {
- 
- #ifdef CONFIG_MLX5_EN_IPSEC
- 
--void mlx5e_ipsec_inverse_table_init(void);
- void mlx5e_ipsec_set_iv_esn(struct sk_buff *skb, struct xfrm_state *x,
- 			    struct xfrm_offload *xo);
- void mlx5e_ipsec_set_iv(struct sk_buff *skb, struct xfrm_state *x,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
-index 69a75459775d..4b7f7131c560 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h
-@@ -85,7 +85,6 @@ void mlx5_eq_del_cq(struct mlx5_eq *eq, struct mlx5_core_cq *cq);
- struct mlx5_eq_comp *mlx5_eqn2comp_eq(struct mlx5_core_dev *dev, int eqn);
- struct mlx5_eq *mlx5_get_async_eq(struct mlx5_core_dev *dev);
- void mlx5_cq_tasklet_cb(struct tasklet_struct *t);
--struct cpumask *mlx5_eq_comp_cpumask(struct mlx5_core_dev *dev, int ix);
- 
- u32 mlx5_eq_poll_irq_disabled(struct mlx5_eq_comp *eq);
- void mlx5_cmd_eq_recover(struct mlx5_core_dev *dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-index 43b0144121ca..ccc2d088b569 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-@@ -292,8 +292,6 @@ static inline int mlx5_rescan_drivers(struct mlx5_core_dev *dev)
- 	return ret;
- }
- 
--void mlx5_lag_update(struct mlx5_core_dev *dev);
--
- enum {
- 	MLX5_NIC_IFC_FULL		= 0,
- 	MLX5_NIC_IFC_DISABLED		= 1,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
-index 6c59de3e28f6..1a98d25a9bae 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
-@@ -436,10 +436,6 @@ void mlx5dr_ste_build_mpls(struct mlx5dr_ste_ctx *ste_ctx,
- 			   struct mlx5dr_ste_build *sb,
- 			   struct mlx5dr_match_param *mask,
- 			   bool inner, bool rx);
--void mlx5dr_ste_build_tnl_mpls(struct mlx5dr_ste_ctx *ste_ctx,
--			       struct mlx5dr_ste_build *sb,
--			       struct mlx5dr_match_param *mask,
--			       bool inner, bool rx);
- void mlx5dr_ste_build_tnl_mpls_over_gre(struct mlx5dr_ste_ctx *ste_ctx,
- 					struct mlx5dr_ste_build *sb,
- 					struct mlx5dr_match_param *mask,
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 3e1017d764b7..d7b906da13e3 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -1032,10 +1032,6 @@ void mlx5_trigger_health_work(struct mlx5_core_dev *dev);
- int mlx5_frag_buf_alloc_node(struct mlx5_core_dev *dev, int size,
- 			     struct mlx5_frag_buf *buf, int node);
- void mlx5_frag_buf_free(struct mlx5_core_dev *dev, struct mlx5_frag_buf *buf);
--struct mlx5_cmd_mailbox *mlx5_alloc_cmd_mailbox_chain(struct mlx5_core_dev *dev,
--						      gfp_t flags, int npages);
--void mlx5_free_cmd_mailbox_chain(struct mlx5_core_dev *dev,
--				 struct mlx5_cmd_mailbox *head);
- int mlx5_core_create_mkey(struct mlx5_core_dev *dev, u32 *mkey, u32 *in,
- 			  int inlen);
- int mlx5_core_destroy_mkey(struct mlx5_core_dev *dev, u32 mkey);
-@@ -1049,8 +1045,6 @@ void mlx5_pagealloc_start(struct mlx5_core_dev *dev);
- void mlx5_pagealloc_stop(struct mlx5_core_dev *dev);
- void mlx5_pages_debugfs_init(struct mlx5_core_dev *dev);
- void mlx5_pages_debugfs_cleanup(struct mlx5_core_dev *dev);
--void mlx5_core_req_pages_handler(struct mlx5_core_dev *dev, u16 func_id,
--				 s32 npages, bool ec_function);
- int mlx5_satisfy_startup_pages(struct mlx5_core_dev *dev, int boot);
- int mlx5_reclaim_startup_pages(struct mlx5_core_dev *dev);
- void mlx5_register_debugfs(void);
-@@ -1090,8 +1084,6 @@ int mlx5_core_create_psv(struct mlx5_core_dev *dev, u32 pdn,
- int mlx5_core_destroy_psv(struct mlx5_core_dev *dev, int psv_num);
- __be32 mlx5_core_get_terminate_scatter_list_mkey(struct mlx5_core_dev *dev);
- void mlx5_core_put_rsc(struct mlx5_core_rsc_common *common);
--int mlx5_query_odp_caps(struct mlx5_core_dev *dev,
--			struct mlx5_odp_caps *odp_caps);
- 
- int mlx5_init_rl_table(struct mlx5_core_dev *dev);
- void mlx5_cleanup_rl_table(struct mlx5_core_dev *dev);
-@@ -1193,12 +1185,6 @@ int mlx5_sriov_blocking_notifier_register(struct mlx5_core_dev *mdev,
- void mlx5_sriov_blocking_notifier_unregister(struct mlx5_core_dev *mdev,
- 					     int vf_id,
- 					     struct notifier_block *nb);
--#ifdef CONFIG_MLX5_CORE_IPOIB
--struct net_device *mlx5_rdma_netdev_alloc(struct mlx5_core_dev *mdev,
--					  struct ib_device *ibdev,
--					  const char *name,
--					  void (*setup)(struct net_device *));
--#endif /* CONFIG_MLX5_CORE_IPOIB */
- int mlx5_rdma_rn_get_params(struct mlx5_core_dev *mdev,
- 			    struct ib_device *device,
- 			    struct rdma_netdev_alloc_params *params);
--- 
-2.34.1
-
+Acked-by: Florian Westphal <fw@strlen.de>
 
