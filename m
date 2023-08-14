@@ -1,83 +1,70 @@
-Return-Path: <netdev+bounces-27473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD91177C1CF
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:53:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1F777C1DB
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:56:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D0CE28120E
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 20:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DEAC28123A
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 20:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE5ADDB3;
-	Mon, 14 Aug 2023 20:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E152DDB7;
+	Mon, 14 Aug 2023 20:56:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C098B2CA6
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 20:53:42 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B44B4C3;
-	Mon, 14 Aug 2023 13:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0c42Rh8URF+7/wY+si+N31nQijMDe4WdLz8gnVGOvSI=; b=IgKJa8ZH+DQGfujq2qDtlZRROT
-	or6JwXvQIFntfD6UeCI5ezNrHtxyh+40va5MdYC/JDsohxMgLuYNF5uGb/fkkqjypgeprjEy6THkG
-	vMxJClyQTMscvBObKESsCr1ANNqxRe1MtZsr+PNGCaPoLkWxa4AxN4tqp2X11leLQ8w8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qVeZ6-0045cV-Mz; Mon, 14 Aug 2023 22:53:28 +0200
-Date: Mon, 14 Aug 2023 22:53:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sriranjani P <sriranjani.p@samsung.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	richardcochran@gmail.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
-	alim.akhtar@samsung.com, linux-fsd@tesla.com,
-	pankaj.dubey@samsung.com, swathi.ks@samsung.com,
-	ravi.patel@samsung.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-samsung-soc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Jayati Sahu <jayati.sahu@samsung.com>
-Subject: Re: [PATCH v3 4/4] arm64: dts: fsd: Add Ethernet support for PERIC
- Block of FSD SoC
-Message-ID: <ec90ca79-89a5-4741-a3b7-886fc1bd14d1@lunn.ch>
-References: <20230814112539.70453-1-sriranjani.p@samsung.com>
- <CGME20230814112625epcas5p1e1d488a590bfc10d4e2a06dcff166037@epcas5p1.samsung.com>
- <20230814112539.70453-5-sriranjani.p@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D6CCA5C
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 20:56:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6096BC433C8;
+	Mon, 14 Aug 2023 20:56:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692046591;
+	bh=k6kSskohmYLd6oy5jpMXyKyL/rSesljGzXAqjwUDQEQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QdxA7cMRdxwJwQM97CI3pr+OWmeTK6mWx4TYd5m3RBFev42cNqF4yA/ouQya5Hbjo
+	 gf2vUueVRMYWwGg0spYjO/9jwoq4Gms3vXM9f8k9tLY4zyS5YXUMXkL17/ATpEiOUQ
+	 TK1G4UktWHGF0nNh6MHYt6v8vxZCxhYmzN/xUYaF+Z0gvn4CHryY5N7TCaao6Yq8dq
+	 nDdVlcIrrzY95/jlXpynaanqcyA0a2DlDpPgOt11Ig1OReu474/QpVqwWn969yOu3i
+	 3qoVG9zAV4ktHu8dEwHA94e5dn+c5aS9fZNmS6FhsO4NMI/ZD2/QwkF29I6Lv9BqQF
+	 cExKgBgyNtU4A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] net: warn about attempts to register negative ifindex
+Date: Mon, 14 Aug 2023 13:56:24 -0700
+Message-ID: <20230814205627.2914583-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230814112539.70453-5-sriranjani.p@samsung.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-> +&ethernet_1 {
-> +	status = "okay";
-> +
-> +	fixed-link {
-> +		speed = <1000>;
-> +		full-duplex;
-> +	};
-> +};
+Follow up to the recently posted fix for OvS lacking input
+validation:
+https://lore.kernel.org/all/20230814203840.2908710-1-kuba@kernel.org/
 
-So the exact same comments i made for patch 3/4 apply here.
+Warn about negative ifindex more explicitly and misc YNL updates.
 
-   Andrew
+Jakub Kicinski (3):
+  net: warn about attempts to register negative ifindex
+  netlink: specs: add ovs_vport new command
+  tools: ynl: add more info to KeyErrors on missing attrs
+
+ Documentation/netlink/specs/ovs_vport.yaml | 18 ++++++++++++++++++
+ net/core/dev.c                             |  5 +++++
+ tools/net/ynl/lib/ynl.py                   | 15 ++++++++++++---
+ 3 files changed, 35 insertions(+), 3 deletions(-)
+
+-- 
+2.41.0
+
 
