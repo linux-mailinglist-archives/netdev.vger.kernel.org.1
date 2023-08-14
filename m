@@ -1,99 +1,169 @@
-Return-Path: <netdev+bounces-27363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC3777BA13
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:33:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B843277BA55
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:42:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE5CF281056
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9337B1C209EE
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB173BE74;
-	Mon, 14 Aug 2023 13:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13226BE7E;
+	Mon, 14 Aug 2023 13:42:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B647BA2D
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 13:33:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25B28C433C7;
-	Mon, 14 Aug 2023 13:33:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692019985;
-	bh=l2pqgmH/iXu/AHzuckN0N3T97huLLoFc5gSrbjRBGgQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=djFKH6exoViDcFtdywnv3Vjz+UqKxiUBC5nPgeQnBtcq8gKx8sFJjmSh/65ZicXiK
-	 1M3iXpZPPlGN/4M6KOWfOpDTzXaIjyfWHXrdA48J6xic5cuko9TfjybFWMeOfJahhn
-	 /Ekt6oppBXwqEde02oFdrAaU9+ys2/XGqFryE5yWnutSQgs2Gro7OxyClB/8yaa/Ue
-	 vWPF5E67hkvaqQnk4EZsA+G6WXTLGEoB9yQZGuzbqFX9Rll4PrxCz1t9d1L3kFJrIC
-	 CeA8lNN5TpnVyrY1fx5oGcHaggSRUxY2Mq+M14L88XkE9VB04o7mfBG5XeE/Fnw6w6
-	 5HBSR400Wf/EA==
-Received: (nullmailer pid 2086712 invoked by uid 1000);
-	Mon, 14 Aug 2023 13:33:03 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05721AD29;
+	Mon, 14 Aug 2023 13:42:21 +0000 (UTC)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E023D106;
+	Mon, 14 Aug 2023 06:42:20 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-68843ed67a8so166825b3a.2;
+        Mon, 14 Aug 2023 06:42:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692020540; x=1692625340;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lDCAzxWdtY8TWbeLrXdWW1Rai4n5TCJ5494zqu6HPfU=;
+        b=Fjxw6gu8bboVjTZ+auStS34IcemdRAKkM+l3uJNXDisu2msNUp+VeFdjl63CoEetEY
+         Nr4h1LFqyJcDm2xvSnXF0ptRW5mPdJ3Gdpmh2gsRjyc65E08bIG+BVaG28tdv/t1v/x3
+         lOwabI1XL66yLiAu6ZzR/ApmyEWyFYIN01fonPiBsRJF2rJgclPOWP4pep2ANjAkKANq
+         8I+MoaxPlX3rFpRQBYtRZ0wOA0Fc1KdeJytDa0UyBWaqLynECIxewWZIAJuayKggHglk
+         dDyh4fqEZyjwy1BI9HAZ7u1Ybu+wNl82tS+WOOSTG6gIbJXVwZchk4+bma5M9poAQA3S
+         g6EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692020540; x=1692625340;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lDCAzxWdtY8TWbeLrXdWW1Rai4n5TCJ5494zqu6HPfU=;
+        b=Xt3WvWCV/v1QaznAUbyyWnOy8efqNfzJPq0iNc/huPCd65hNJw4ylc7L7bp2AbE1f1
+         RxiZIsBBfm3Pg5pNt9Hwzdg71wpieSWNcpeQ1ag31rKyrjuVXT/thIPgeIhkPXcGXFAe
+         TR5nkAW9D4+JiuwNWiYfmX9rH/qFgIAQAEKm/WNR626w/ARFuW+0x6atc1w46Z3XEVmR
+         M/q1f8cwvYFTH9wGRHjCcDcd5ZU0j+W7O41vv+8JkVi6nFcNTStQ8E3BCh0baZ+rLvy7
+         FE65u4MVvTpR35rf2+VKceblA7Ws9KUvMUq02Bisebvr1Apa/9teTSyznOX0Tdoljxgv
+         qfNg==
+X-Gm-Message-State: AOJu0YzuRHcP/1shtFPYo2SaBzT1vJAHqkozA2Y/Yws6wZkVa2+Nxgg7
+	0+rtrB+Fuq/GU97in8QiHqrEAN8MnMY1TRUE
+X-Google-Smtp-Source: AGHT+IE9wKPAW8hDDXYgn6NS1woZmMGvp8CdL1oFFe/zjWjyGir6jLu0Ld1BbUDtZFJTbdD3OGS95A==
+X-Received: by 2002:a05:6a21:47cb:b0:131:eeba:184b with SMTP id as11-20020a056a2147cb00b00131eeba184bmr11891180pzc.25.1692020539955;
+        Mon, 14 Aug 2023 06:42:19 -0700 (PDT)
+Received: from localhost.localdomain (bb219-74-209-211.singnet.com.sg. [219.74.209.211])
+        by smtp.gmail.com with ESMTPSA id m3-20020a638c03000000b0055c02b8688asm8555583pgd.20.2023.08.14.06.42.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 06:42:19 -0700 (PDT)
+From: Leon Hwang <hffilwlqm@gmail.com>
+To: bpf@vger.kernel.org
+Cc: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	x86@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	mykolal@fb.com,
+	shuah@kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	hffilwlqm@gmail.com,
+	tangyeechou@gmail.com,
+	kernel-patches-bot@fb.com,
+	maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH bpf-next 0/2] bpf, x64: Fix tailcall infinite loop bug
+Date: Mon, 14 Aug 2023 21:41:45 +0800
+Message-ID: <20230814134147.70289-1-hffilwlqm@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Sriranjani P <sriranjani.p@samsung.com>
-Cc: edumazet@google.com, linux-kernel@vger.kernel.org, alexandre.torgue@foss.st.com, ravi.patel@samsung.com, alim.akhtar@samsung.com, linux-samsung-soc@vger.kernel.org, linux-fsd@tesla.com, conor+dt@kernel.org, mcoquelin.stm32@gmail.com, kuba@kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pabeni@redhat.com, robh+dt@kernel.org, pankaj.dubey@samsung.com, richardcochran@gmail.com, krzysztof.kozlowski+dt@linaro.org, joabreu@synopsys.com, devicetree@vger.kernel.org, davem@davemloft.net, swathi.ks@samsung.com
-In-Reply-To: <20230814112539.70453-2-sriranjani.p@samsung.com>
-References: <20230814112539.70453-1-sriranjani.p@samsung.com>
- <CGME20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66@epcas5p3.samsung.com>
- <20230814112539.70453-2-sriranjani.p@samsung.com>
-Message-Id: <169201998303.2086680.8457687937999615543.robh@kernel.org>
-Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
- bindings
-Date: Mon, 14 Aug 2023 07:33:03 -0600
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+
+From commit ebf7d1f508a73871 ("bpf, x64: rework pro/epilogue and tailcall
+handling in JIT"), the tailcall on x64 works better than before.
+
+From commit e411901c0b775a3a ("bpf: allow for tailcalls in BPF subprograms
+for x64 JIT"), tailcall is able to run in BPF subprograms on x64.
+
+From commit 5b92a28aae4dd0f8 ("bpf: Support attaching tracing BPF program
+to other BPF programs"), BPF program is able to trace other BPF programs.
+
+How about combining them all together?
+
+1. FENTRY/FEXIT on a BPF subprogram.
+2. A tailcall runs in the BPF subprogram.
+3. The tailcall calls itself.
+
+As a result, a tailcall infinite loop comes up. And the loop would halt
+the machine.
+
+As we know, in tail call context, the tail_call_cnt propagates by stack
+and RAX register between BPF subprograms. So do it in FENTRY/FEXIT
+trampolines.
+
+How did I discover the bug?
+
+From commit 7f6e4312e15a5c37 ("bpf: Limit caller's stack depth 256 for
+subprogs with tailcalls"), the total stack size limits to around 8KiB.
+Then, I write some bpf progs to validate the stack consuming, that are
+tailcalls running in bpf2bpf and FENTRY/FEXIT tracing on bpf2bpf[1].
+
+At that time, accidently, I made a tailcall loop. And then the loop halted
+my VM. Without the loop, the bpf progs would consume over 8KiB stack size.
+But the _stack-overflow_ did not halt my VM.
+
+With bpf_printk(), I confirmed that the tailcall count limit did not work
+expectedly. Next, read the code and fix it.
+
+Finally, unfortunately, I only fix it on x64 but other arches. As a
+result, CI tests failed because this bug hasn't been fixed on s390x.
+
+Some helps are requested.
+
+[1]: https://github.com/Asphaltt/learn-by-example/tree/main/ebpf/tailcall-stackoverflow
+
+Leon Hwang (2):
+  bpf, x64: Fix tailcall infinite loop bug
+  selftests/bpf: Add testcases for tailcall infinite loop bug fixing
+
+ arch/x86/net/bpf_jit_comp.c                   |  23 ++-
+ include/linux/bpf.h                           |   6 +
+ kernel/bpf/trampoline.c                       |   5 +-
+ kernel/bpf/verifier.c                         |   9 +-
+ .../selftests/bpf/prog_tests/tailcalls.c      | 194 +++++++++++++++++-
+ .../bpf/progs/tailcall_bpf2bpf_fentry.c       |  18 ++
+ .../bpf/progs/tailcall_bpf2bpf_fexit.c        |  18 ++
+ 7 files changed, 264 insertions(+), 9 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/tailcall_bpf2bpf_fentry.c
+ create mode 100644 tools/testing/selftests/bpf/progs/tailcall_bpf2bpf_fexit.c
 
 
-On Mon, 14 Aug 2023 16:55:36 +0530, Sriranjani P wrote:
-> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
-> Ethernet YAML schema to enable the DT validation.
-> 
-> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
-> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
-> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
-> Signed-off-by: Sriranjani P <sriranjani.p@samsung.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
->  .../devicetree/bindings/net/tesla,ethqos.yaml | 114 ++++++++++++++++++
->  2 files changed, 117 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/tesla,ethqos.yaml
-> 
-
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/tesla,ethqos.yaml: properties:clock-names: {'minItems': 5, 'maxItems': 10, 'items': [{'const': 'ptp_ref'}, {'const': 'master_bus'}, {'const': 'slave_bus'}, {'const': 'tx'}, {'const': 'rx'}, {'const': 'master2_bus'}, {'const': 'slave2_bus'}, {'const': 'eqos_rxclk_mux'}, {'const': 'eqos_phyrxclk'}, {'const': 'dout_peric_rgmii_clk'}]} should not be valid under {'required': ['maxItems']}
-	hint: "maxItems" is not needed with an "items" list
-	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
-Documentation/devicetree/bindings/net/tesla,ethqos.example.dtb: /example-0/ethernet@14300000: failed to match any schema with compatible: ['tesla,dwc-qos-ethernet-4.21']
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230814112539.70453-2-sriranjani.p@samsung.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+base-commit: 9930e4af4b509bcf6f060b09b16884f26102d110
+-- 
+2.41.0
 
 
