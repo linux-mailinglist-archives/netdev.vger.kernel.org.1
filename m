@@ -1,97 +1,77 @@
-Return-Path: <netdev+bounces-27334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6ACA77B82E
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:05:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA0277B835
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88A1128110A
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:05:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 181311C20A83
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:07:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FA7BA56;
-	Mon, 14 Aug 2023 12:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88F4BA58;
+	Mon, 14 Aug 2023 12:07:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4646523D0
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:05:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E00DEC433C7;
-	Mon, 14 Aug 2023 12:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692014719;
-	bh=FbT2dGK+KjdiPggXst+c0SjzNrm3X6tj0alE8n8blc8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z02heUrNzW4mdGNQuujm4F0j2KYvG9Qt71nlXUi/p9zou8bCpfWjhPIN4TPkl4xMg
-	 07xfW4f7OoByaGluZLFIBcFq/C68ovyku8OXbrWpQyhvJwhIm6dn7dNMFm4kCMBiDO
-	 yLoS3++zqiWHF996sVS9GbKC5uHwEcCHB7TmcRbXG8bgoIskk4uPulA2UD//GWI+to
-	 PEgkWRVcgcwVy71KPCv3o7eXvmVYm3GRNF6GLZxdxrTa+fvp2ylVtymEYjaA/+hYdA
-	 B3GeCmKd3/CfzRomfOVGscK0fpAeE+USwtZMqhEPQQr5bo9TilvXA2ZMoaeK3D+6kd
-	 Jog7geFyn2rKA==
-Date: Mon, 14 Aug 2023 15:05:15 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] tun: add __exit annotations to module exit func
- tun_cleanup()
-Message-ID: <20230814120515.GH3921@unreal>
-References: <20230814083000.3893589-1-william.xuanziyang@huawei.com>
- <20230814101707.GG3921@unreal>
- <0b8a2c5f-0d53-f5e5-f148-b333c0c89a14@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE88AD47
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:07:51 +0000 (UTC)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B710CF5
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 05:07:49 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5230f92b303so1343212a12.0
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 05:07:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692014868; x=1692619668;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=Wlv8x8Q8sv4ngSnC87D1x+1mNUASRQRQc4c9jin5BAE9Ekl5pggofoXU5/yXgK3B9w
+         lsPRg/cQVm9bEIFJZ1iOwx5eD02YE+cRpMeugivRPEIQxDJANVPb0yVZSKv7bodXwgLe
+         z8KkwDLdXxttTwGsD9dq7l26xLEY+nvAQD4gESe9fZ3ksfxJkRLwjnzAvknWfu6gKuy1
+         7qyE8YU0/W6CfF+v00AjkvMivCOgDaiTjxdmrNQlzjnf75wYaHa7NODpo8d84VpDL+aF
+         Ko8H9rFdwv4W4I0GyD8SjDViUtI1dpYqEjyLmNVVMVp4+GiiTLWnQsr2SX4koQQ8aRXl
+         YNww==
+X-Gm-Message-State: AOJu0YwyyEUtflr9+mDO5vLF/gVItXsgK3ITtUA2x6F0Z/FJ5xRRK+0r
+	wXWqaRwc3idt/g0GoQLUcRM=
+X-Google-Smtp-Source: AGHT+IGcelZsJE4I1ve4SYii4MRlYCXgkAdzgvdIliZCGpeDWyVhjZJpryR1khJ+Rs/PQxpkjDkPVQ==
+X-Received: by 2002:a17:906:116:b0:99b:d594:8f89 with SMTP id 22-20020a170906011600b0099bd5948f89mr6886195eje.0.1692014867980;
+        Mon, 14 Aug 2023 05:07:47 -0700 (PDT)
+Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id mb8-20020a170906eb0800b00988f168811bsm5635390ejb.135.2023.08.14.05.07.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 05:07:46 -0700 (PDT)
+Message-ID: <4eca46c0-7fca-f4b6-78d2-21b523e748ed@grimberg.me>
+Date: Mon, 14 Aug 2023 15:07:44 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b8a2c5f-0d53-f5e5-f148-b333c0c89a14@huawei.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 10/17] nvme-fabrics: parse options 'keyring' and 'tls_key'
+Content-Language: en-US
+To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230814111943.68325-1-hare@suse.de>
+ <20230814111943.68325-11-hare@suse.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230814111943.68325-11-hare@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Aug 14, 2023 at 07:27:59PM +0800, Ziyang Xuan (William) wrote:
-> > On Mon, Aug 14, 2023 at 04:30:00PM +0800, Ziyang Xuan wrote:
-> >> Add missing __exit annotations to module exit func tun_cleanup().
-> >>
-> >> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-> >> ---
-> >>  drivers/net/tun.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> >> index 973b2fc74de3..291c118579a9 100644
-> >> --- a/drivers/net/tun.c
-> >> +++ b/drivers/net/tun.c
-> >> @@ -3740,7 +3740,7 @@ static int __init tun_init(void)
-> >>  	return ret;
-> >>  }
-> >>  
-> >> -static void tun_cleanup(void)
-> >> +static void __exit tun_cleanup(void)
-> > 
-> > Why __exit and not __net_exit?
-> 
-> tun_cleanup() is a module exit function. it corresponds to tun_init().
-> tun_init() uses __init, so tun_cleanup() uses __exit.
-
-__net_init is equal to __init.
-
-> 
-> Thank you!
-> William Xuan
-> > 
-> > Thanks
-> > 
-> >>  {
-> >>  	misc_deregister(&tun_miscdev);
-> >>  	rtnl_link_unregister(&tun_link_ops);
-> >> -- 
-> >> 2.25.1
-> >>
-> >>
-> > .
-> > 
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 
