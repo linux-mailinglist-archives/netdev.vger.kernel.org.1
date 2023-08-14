@@ -1,141 +1,119 @@
-Return-Path: <netdev+bounces-27467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2186577C19E
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:38:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E4377C1A5
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E76281288
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 20:38:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D06C281251
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 20:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320FBCA5C;
-	Mon, 14 Aug 2023 20:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF33CA6C;
+	Mon, 14 Aug 2023 20:40:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D129C2CA6
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 20:38:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE607C433C7;
-	Mon, 14 Aug 2023 20:38:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692045524;
-	bh=EvWgzTAcPqIqOv65wLPvZqXPF9W9Zs4Occdmjk66shw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UUUnFaNzb29JxxgyIsggGMQzplEd4KLie+yz6/WlCFwIroLQucTqGF4GeEpQLPbNC
-	 Kbhjz0sfG2s2w71B5mTrq6AbR+uTrYCz5VE440mYmX4Sqah5nTaSuKpvSWmR1pSvur
-	 1hr8gMjhNUsjpYBLk0ATpTdn81Ge29WwANHmUBTpE9FZaIzwh3FcjG2UNkme589mvR
-	 Un2bzvS5/qHLrNpjoO7FD+NttmHHMLOIzgroFs0EUVxmfm/pz45swXBlG+53NxPlCp
-	 1u4JhR18ysAqlLyeaJEhqGw2HDfaZ+ScUsW26Or/wOoHlamvSFwNNpjJCyVU3vSbSy
-	 GTz3Me6T2/JsQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	syzbot+7456b5dcf65111553320@syzkaller.appspotmail.com,
-	pshelar@ovn.org,
-	andrey.zhadchenko@virtuozzo.com,
-	brauner@kernel.org,
-	dev@openvswitch.org
-Subject: [PATCH net] net: openvswitch: reject negative ifindex
-Date: Mon, 14 Aug 2023 13:38:40 -0700
-Message-ID: <20230814203840.2908710-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B985687
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 20:40:19 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C88AE5E;
+	Mon, 14 Aug 2023 13:40:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BlrSDh1oWixOHfKJbeuFZ7Gd0lCm0lENmSCCvEiVQRE=; b=zsOhdtaaUYZZaAbTkpIlzs/sac
+	FkqYwD5s050zfzBo0NlJRgOLLpLFVCYsfgaVFiZV/4gG0IZvDEpD5oKs99JatBlyLW4woGB3XF+ra
+	XVGlyPb87AXjDxPe+mU0A5KCO+WBiBvG9EDTaMORU4rPhoGjP36ed6DMRrzC3Q5YOIIk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qVeLz-0045X0-Ny; Mon, 14 Aug 2023 22:39:55 +0200
+Date: Mon, 14 Aug 2023 22:39:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sriranjani P <sriranjani.p@samsung.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	richardcochran@gmail.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
+	alim.akhtar@samsung.com, linux-fsd@tesla.com,
+	pankaj.dubey@samsung.com, swathi.ks@samsung.com,
+	ravi.patel@samsung.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-samsung-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Message-ID: <4e745c2a-57bd-45da-8bd2-ee1cb2bab84f@lunn.ch>
+References: <20230814112539.70453-1-sriranjani.p@samsung.com>
+ <CGME20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66@epcas5p3.samsung.com>
+ <20230814112539.70453-2-sriranjani.p@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230814112539.70453-2-sriranjani.p@samsung.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Recent changes in net-next (commit 759ab1edb56c ("net: store netdevs
-in an xarray")) refactored the handling of pre-assigned ifindexes
-and let syzbot surface a latent problem in ovs. ovs does not validate
-ifindex, making it possible to create netdev ports with negative
-ifindex values. It's easy to repro with YNL:
+> +  fsd-rx-clock-skew:
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    items:
+> +      - items:
+> +          - description: phandle to the syscon node
+> +          - description: offset of the control register
+> +    description:
+> +      Should be phandle/offset pair. The phandle to the syscon node.
 
-$ ./cli.py --spec netlink/specs/ovs_datapath.yaml \
-         --do new \
-	 --json '{"upcall-pid": 1, "name":"my-dp"}'
-$ ./cli.py --spec netlink/specs/ovs_vport.yaml \
-	 --do new \
-	 --json '{"upcall-pid": "00000001", "name": "some-port0", "dp-ifindex":3,"ifindex":4294901760,"type":2}'
+What clock are you skew-ing here? And why?
 
-$ ip link show
--65536: some-port0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 7a:48:21:ad:0b:fb brd ff:ff:ff:ff:ff:ff
-...
+> +    ethernet_1: ethernet@14300000 {
+> +              compatible = "tesla,dwc-qos-ethernet-4.21";
+> +              reg = <0x0 0x14300000 0x0 0x10000>;
+> +              interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
+> +              clocks = <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_PTP_REF_I>,
+> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_ACLK_I>,
+> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_HCLK_I>,
+> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_RGMII_CLK_I>,
+> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_RX_I>,
+> +                       <&clock_peric PERIC_BUS_D_PERIC_IPCLKPORT_EQOSCLK>,
+> +                       <&clock_peric PERIC_BUS_P_PERIC_IPCLKPORT_EQOSCLK>,
+> +                       <&clock_peric PERIC_EQOS_PHYRXCLK_MUX>,
+> +                       <&clock_peric PERIC_EQOS_PHYRXCLK>,
+> +                       <&clock_peric PERIC_DOUT_RGMII_CLK>;
+> +              clock-names = "ptp_ref",
+> +                            "master_bus",
+> +                            "slave_bus",
+> +                            "tx",
+> +                            "rx",
+> +                            "master2_bus",
+> +                            "slave2_bus",
+> +                            "eqos_rxclk_mux",
+> +                            "eqos_phyrxclk",
+> +                            "dout_peric_rgmii_clk";
+> +              pinctrl-names = "default";
+> +              pinctrl-0 = <&eth1_tx_clk>, <&eth1_tx_data>, <&eth1_tx_ctrl>,
+> +                          <&eth1_phy_intr>, <&eth1_rx_clk>, <&eth1_rx_data>,
+> +                          <&eth1_rx_ctrl>, <&eth1_mdio>;
+> +              fsd-rx-clock-skew = <&sysreg_peric 0x10>;
+> +              iommus = <&smmu_peric 0x0 0x1>;
+> +              phy-mode = "rgmii";
 
-Validate the inputes. Now the second command correctly returns:
+I know it is just an example, but "rgmii" is generally
+wrong. "rgmii-id" is generally what you need. And when i do see
+"rgmii", it starts ringing alarm bells for me, it could mean your
+RGMII delays are being handled wrongly.
 
-$ ./cli.py --spec netlink/specs/ovs_vport.yaml \
-	 --do new \
-	 --json '{"upcall-pid": "00000001", "name": "some-port0", "dp-ifindex":3,"ifindex":4294901760,"type":2}'
-
-lib.ynl.NlError: Netlink error: Numerical result out of range
-nl_len = 108 (92) nl_flags = 0x300 nl_type = 2
-	error: -34	extack: {'msg': 'integer out of range', 'unknown': [[type:4 len:36] b'\x0c\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x03\x00\xff\xff\xff\x7f\x00\x00\x00\x00\x08\x00\x01\x00\x08\x00\x00\x00'], 'bad-attr': '.ifindex'}
-
-Accept 0 since it used to be silently ignored.
-
-Fixes: 54c4ef34c4b6 ("openvswitch: allow specifying ifindex of new interfaces")
-Reported-by: syzbot+7456b5dcf65111553320@syzkaller.appspotmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: pshelar@ovn.org
-CC: andrey.zhadchenko@virtuozzo.com
-CC: brauner@kernel.org
-CC: dev@openvswitch.org
----
- net/openvswitch/datapath.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index a6d2a0b1aa21..3d7a91e64c88 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -1829,7 +1829,7 @@ static int ovs_dp_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 	parms.port_no = OVSP_LOCAL;
- 	parms.upcall_portids = a[OVS_DP_ATTR_UPCALL_PID];
- 	parms.desired_ifindex = a[OVS_DP_ATTR_IFINDEX]
--		? nla_get_u32(a[OVS_DP_ATTR_IFINDEX]) : 0;
-+		? nla_get_s32(a[OVS_DP_ATTR_IFINDEX]) : 0;
- 
- 	/* So far only local changes have been made, now need the lock. */
- 	ovs_lock();
-@@ -2049,7 +2049,7 @@ static const struct nla_policy datapath_policy[OVS_DP_ATTR_MAX + 1] = {
- 	[OVS_DP_ATTR_USER_FEATURES] = { .type = NLA_U32 },
- 	[OVS_DP_ATTR_MASKS_CACHE_SIZE] =  NLA_POLICY_RANGE(NLA_U32, 0,
- 		PCPU_MIN_UNIT_SIZE / sizeof(struct mask_cache_entry)),
--	[OVS_DP_ATTR_IFINDEX] = {.type = NLA_U32 },
-+	[OVS_DP_ATTR_IFINDEX] = NLA_POLICY_MIN(NLA_S32, 0),
- };
- 
- static const struct genl_small_ops dp_datapath_genl_ops[] = {
-@@ -2302,7 +2302,7 @@ static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 	parms.port_no = port_no;
- 	parms.upcall_portids = a[OVS_VPORT_ATTR_UPCALL_PID];
- 	parms.desired_ifindex = a[OVS_VPORT_ATTR_IFINDEX]
--		? nla_get_u32(a[OVS_VPORT_ATTR_IFINDEX]) : 0;
-+		? nla_get_s32(a[OVS_VPORT_ATTR_IFINDEX]) : 0;
- 
- 	vport = new_vport(&parms);
- 	err = PTR_ERR(vport);
-@@ -2539,7 +2539,7 @@ static const struct nla_policy vport_policy[OVS_VPORT_ATTR_MAX + 1] = {
- 	[OVS_VPORT_ATTR_TYPE] = { .type = NLA_U32 },
- 	[OVS_VPORT_ATTR_UPCALL_PID] = { .type = NLA_UNSPEC },
- 	[OVS_VPORT_ATTR_OPTIONS] = { .type = NLA_NESTED },
--	[OVS_VPORT_ATTR_IFINDEX] = { .type = NLA_U32 },
-+	[OVS_VPORT_ATTR_IFINDEX] = NLA_POLICY_MIN(NLA_S32, 0),
- 	[OVS_VPORT_ATTR_NETNSID] = { .type = NLA_S32 },
- 	[OVS_VPORT_ATTR_UPCALL_STATS] = { .type = NLA_NESTED },
- };
--- 
-2.41.0
-
+       Andrew
 
