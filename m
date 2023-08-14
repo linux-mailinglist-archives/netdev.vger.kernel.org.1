@@ -1,132 +1,227 @@
-Return-Path: <netdev+bounces-27304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411A477B6EC
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:40:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C88177B70E
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DA91C20A34
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:40:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B0691C203A1
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6EC9476;
-	Mon, 14 Aug 2023 10:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FE1A93C;
+	Mon, 14 Aug 2023 10:50:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DE323D0
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:40:24 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFADA1994;
-	Mon, 14 Aug 2023 03:40:01 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99d6d5054bcso763319966b.1;
-        Mon, 14 Aug 2023 03:40:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5878F77
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:50:52 +0000 (UTC)
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F71A18F;
+	Mon, 14 Aug 2023 03:50:51 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4fe11652b64so6404529e87.0;
+        Mon, 14 Aug 2023 03:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692009595; x=1692614395;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aBAVpXS8NM/S563eJtaui9WR2vwiGDxIvWqt84h+Oyw=;
-        b=V70f5VYcQVBIRnMn6jR03+6JOI14+oCqXEWxRdHaanV/itzXjH9HeO9NNoZV7KFT9j
-         nYaWU4HQ6T6n3IV5dPW7x9uINA6vgEvjmG0DE3jMr2iFoHsEty9DIWE/MdLgCbpm/BJg
-         nnAXEbLjMJtg9Wlm3s9H9HmJBQ6at1Jj3kpH4+req6Fyj/yHbK08CPwZHLZfUNamu9U+
-         APEy+XpTZzT1EwQD/sNFi8r3lzivs55sBQIvAjPMS7pfp+p4ueqyPl9bk0ilH+zuWTKU
-         tJkkYVwN/Qa+zF6n1GnoNUJ6ypDlepd+/oT7wD3Tg7wZ3QjeDCeaq10emFC6At5osy5m
-         24ag==
+        d=gmail.com; s=20221208; t=1692010249; x=1692615049;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jdzw0rHpRr91l8BAcXFT84UEK+jpp9hS9qWwexkoFFI=;
+        b=NmPp/20s/8vM+ZwsIYdJOdGC62ty7spi+o//yCDIw7eV+WtVltjdUNm1GGqB7HtOw6
+         maAiEFD8FuFnIHynzdsuaEixLZGznc6mwRG2bHcr4HU58eU5E6PfhXXRq0lIqqh8Cp6D
+         0l9gIIt6ojU9awjNQC/hmZWGGdkplUZTmOPItR4pDYPb4cqz7da0AgrnOV/LF/orhjut
+         YkE8m3149AoSPwqL3Cssu27ELbAmE6sUxq1+660NRw2KQWaSbJkoJymj06j7zrTWEHnq
+         KJnIyVMeLR4Pv5EUzuNDQmhbr00j3jbLhB7neqC88XmVaD1y9glSQprWUZC+6GWleoq2
+         TafQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692009595; x=1692614395;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aBAVpXS8NM/S563eJtaui9WR2vwiGDxIvWqt84h+Oyw=;
-        b=fbvpR0OyRiDN2QB5ojvGSmbYIYXnF/D+UykERLGj3zhSOhB/SZcFEdIwyQzRIRFVm9
-         EZshLEwXQFFR/KaNNmSa2h33MHz2hDgJGy7KAoHkDC88TEVLSc5RvESbZynZrjwqJHBs
-         WSZN00O3lg42AELUgSH8mz/+Bqy5XDt4i+aLPg+RHu1UWPgSeYT+CyDwAa7XO3y4NTyq
-         9hJceaHWGdzNFndY56lxQEtNdjjcaX2GMO2fyCmqzb7cC079tBmZM8HPMrR3gdE+9yRO
-         Hgd7niNGpEmFUnz3JBdLP/jz86HMU5kNzGpLK/Df1O6sY3skgSU/XcDAyXtwnr42sbIq
-         OZxw==
-X-Gm-Message-State: AOJu0YxzdfsYCJByJJsjzUgvEN6GB9pTFjTHlS6Ka8c0Azt/tkWJbIiP
-	W8y5Fvmdlzx0JG46rLnIzvA=
-X-Google-Smtp-Source: AGHT+IGWQdWdFfldoc+s7RKd4/99QgX6XSZumLq8F7bFXSVWECP7EKR6y4ID5N1QKyWzkJA/s+6bjw==
-X-Received: by 2002:a17:907:2d94:b0:978:8979:c66c with SMTP id gt20-20020a1709072d9400b009788979c66cmr13860963ejc.18.1692009595070;
-        Mon, 14 Aug 2023 03:39:55 -0700 (PDT)
-Received: from skbuf ([188.26.184.136])
-        by smtp.gmail.com with ESMTPSA id o8-20020a170906288800b0099cc15f09a0sm5495409ejd.55.2023.08.14.03.39.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 03:39:54 -0700 (PDT)
-Date: Mon, 14 Aug 2023 13:39:51 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230814103951.epdk3bzhkn2h7oul@skbuf>
-References: <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-3-arinc.unal@arinc9.com>
- <abc44324-454c-4524-b05e-fe989755ea47@arinc9.com>
- <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <20230813112026.ohsx6srbt2staxma@skbuf>
- <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
- <891c0b67-abe1-416c-aa94-675f7f3d8044@arinc9.com>
- <20230813190227.6k2qyxfewbkmatn6@skbuf>
- <af044838-36ef-4ed3-af0a-a58181b6345a@arinc9.com>
+        d=1e100.net; s=20221208; t=1692010249; x=1692615049;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jdzw0rHpRr91l8BAcXFT84UEK+jpp9hS9qWwexkoFFI=;
+        b=MSoNGlGcIudhEtndDd+vzLZhIP256uDJHRGqaq6jStqbgbIgpgGBtYR/baZXw0ZtF5
+         1HdwePuJySFLjA+97T0Ui7rzNEb4zrGBKKhr8VUmtml7eyAWE2E42nyipq9/AjeYgg6R
+         r+STLA+5PfmDRb/CWVnK4wH0wniA3ZOoSX1Fhr6tMUqV59p+3KBqaxD92WTEGSx1BeZa
+         DvPp4F/1i0si9IK5yWpg3SSUyRJvtKSYn0E6u4sKWcU8prB/nPFW6PYamhoVvbGMrr95
+         vR4NkLzaGGr0l/VjduE5Y8PxaCL0h4tJ9qZw1MZ+7j3WnnCJAkB35xBIqEE5hK40buOs
+         LgLA==
+X-Gm-Message-State: AOJu0YwbUXqaRJiOVc2l0w+FObqRfs1QbTNWlNvdBh8L2K3vsWRPH3rJ
+	q4JTeyU1TIBCVkmBkgkIDGM4Gsknkuz02WGazNs=
+X-Google-Smtp-Source: AGHT+IH+lmfKPWRI9A8rGnFGRYYJU7cvFv8MbgRMB14ww/vT51xVFwFoqjwMMqEahd51AXKqIih0ZuZ1P98cjYlt25U=
+X-Received: by 2002:a05:6512:3b0f:b0:4fb:cab9:ddf with SMTP id
+ f15-20020a0565123b0f00b004fbcab90ddfmr7501155lfv.57.1692010249295; Mon, 14
+ Aug 2023 03:50:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <af044838-36ef-4ed3-af0a-a58181b6345a@arinc9.com>
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+ <20230812151135.1028780-5-keguang.zhang@gmail.com> <ZNkfz1yKD90XmTFL@vergenet.net>
+In-Reply-To: <ZNkfz1yKD90XmTFL@vergenet.net>
+From: Keguang Zhang <keguang.zhang@gmail.com>
+Date: Mon, 14 Aug 2023 18:50:32 +0800
+Message-ID: <CAJhJPsXOUOB_0kWcKC0Sy8F9qPbkU+NfVFRz-Hkk8eS-YuUS7w@mail.gmail.com>
+Subject: Re: [PATCH 4/5] net: stmmac: Add glue layer for Loongson-1 SoC
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 14, 2023 at 01:06:19PM +0300, Arınç ÜNAL wrote:
-> On 13.08.2023 22:02, Vladimir Oltean wrote:
-> > On Sun, Aug 13, 2023 at 05:58:57PM +0300, Arınç ÜNAL wrote:
-> > > On top of this, I'd argue to document the internal MDIO bus on the
-> > > ethernet-switch.yaml schema instead.
-> > 
-> > Why?
-> 
-> Because a generic switch can have an internal MDIO bus, it's not specific
-> to a DSA controlled switch.
-> 
-> Arınç
+On Mon, Aug 14, 2023 at 2:24=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Sat, Aug 12, 2023 at 11:11:34PM +0800, Keguang Zhang wrote:
+> > This glue driver is created based on the arch-code
+> > implemented earlier with the platform-specific settings.
+> >
+> > Use syscon for SYSCON register access.
+> >
+> > Partialy based on the previous work by Serge Semin.
+> >
+> > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+>
+> ...
+>
+> Hi Keguang Zhang,
+>
+> some minor feedback from my side.
+>
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c b/dr=
+ivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+>
+> ...
+>
+> > +const struct reg_field ls1b_dwmac_syscon_regfields[] =3D {
+> > +     [GMAC1_USE_UART1]       =3D REG_FIELD(LS1X_SYSCON0, 4, 4),
+> > +     [GMAC1_USE_UART0]       =3D REG_FIELD(LS1X_SYSCON0, 3, 3),
+> > +     [GMAC1_SHUT]            =3D REG_FIELD(LS1X_SYSCON1, 13, 13),
+> > +     [GMAC0_SHUT]            =3D REG_FIELD(LS1X_SYSCON1, 12, 12),
+> > +     [GMAC1_USE_TXCLK]       =3D REG_FIELD(LS1X_SYSCON1, 3, 3),
+> > +     [GMAC0_USE_TXCLK]       =3D REG_FIELD(LS1X_SYSCON1, 2, 2),
+> > +     [GMAC1_USE_PWM23]       =3D REG_FIELD(LS1X_SYSCON1, 1, 1),
+> > +     [GMAC0_USE_PWM01]       =3D REG_FIELD(LS1X_SYSCON1, 0, 0)
+> > +};
+>
+> nit: Perhaps ls1b_dwmac_syscon_regfields should be static.
+>
+> > +
+> > +const struct reg_field ls1c_dwmac_syscon_regfields[] =3D {
+> > +     [GMAC_SHUT]             =3D REG_FIELD(LS1X_SYSCON0, 6, 6),
+> > +     [PHY_INTF_SELI]         =3D REG_FIELD(LS1X_SYSCON1, 28, 30)
+> > +};
+>
+> Likewise, perhaps ls1c_dwmac_syscon_regfields should be static.
+>
+Will do.
+Thanks!
+> ...
+>
+> > +static const struct of_device_id ls1x_dwmac_syscon_match[] =3D {
+> > +     { .compatible =3D "loongson,ls1b-syscon", .data =3D &ls1b_dwmac_s=
+yscon },
+> > +     { .compatible =3D "loongson,ls1c-syscon", .data =3D &ls1c_dwmac_s=
+yscon },
+> > +     { }
+> > +};o
+>
+> I am seeing a warning about ls1x_dwmac_syscon_match being unused.
+> I think this is due to CONFIG_OF being unset.
 
-I'm not sure it's that simple. Check out arch/mips/boot/dts/mscc/ocelot.dtsi.
-Its switch IP ("mscc,vsc7514-switch") is on the same hierarchical level
-with the "mscc,ocelot-miim" nodes (so, not a child), because the MDIO controller
-isn't part of the address space of the switching IP. Actually that could equally
-be considered true for DSA. Placing the "mdio" node as a child of the switch is
-one of the possible options, but it has its limitations and is certainly
-not the only one.
+Will fix these warnings.
+>
+> > +
+> > +static int ls1x_dwmac_probe(struct platform_device *pdev)
+> > +{
+> > +     struct plat_stmmacenet_data *plat_dat;
+> > +     struct stmmac_resources stmmac_res;
+> > +     struct device_node *syscon_np;
+> > +     const struct of_device_id *match;
+> > +     struct regmap *regmap;
+> > +     struct ls1x_dwmac *dwmac;
+> > +     const struct ls1x_dwmac_syscon *syscon;
+> > +     size_t size;
+> > +     int ret;
+> > +
+> > +     ret =3D stmmac_get_platform_resources(pdev, &stmmac_res);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     /* Probe syscon */
+> > +     syscon_np =3D of_parse_phandle(pdev->dev.of_node, "syscon", 0);
+> > +     if (!syscon_np)
+> > +             return -ENODEV;
+> > +
+> > +     match =3D of_match_node(ls1x_dwmac_syscon_match, syscon_np);
+> > +     if (!match) {
+> > +             of_node_put(syscon_np);
+> > +             return -EINVAL;
+> > +     }
+> > +     syscon =3D (const struct ls1x_dwmac_syscon *)match->data;
+> > +
+> > +     regmap =3D syscon_node_to_regmap(syscon_np);
+> > +     of_node_put(syscon_np);
+> > +     if (IS_ERR(regmap)) {
+> > +             ret =3D PTR_ERR(regmap);
+> > +             dev_err(&pdev->dev, "Unable to map syscon: %d\n", ret);
+> > +             return ret;
+> > +     }
+> > +
+> > +     size =3D syscon->nr_reg_fields * sizeof(struct regmap_field *);
+> > +     dwmac =3D devm_kzalloc(&pdev->dev, sizeof(*dwmac) + size, GFP_KER=
+NEL);
+> > +     if (!dwmac)
+> > +             return -ENOMEM;
+> > +
+> > +     plat_dat =3D stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> > +     if (IS_ERR(plat_dat)) {
+> > +             dev_err(&pdev->dev, "dt configuration failed\n");
+> > +             return PTR_ERR(plat_dat);
+> > +     }
+> > +
+> > +     plat_dat->bsp_priv =3D dwmac;
+> > +     plat_dat->init =3D ls1x_dwmac_init;
+> > +     dwmac->dev =3D &pdev->dev;
+> > +     dwmac->plat_dat =3D plat_dat;
+> > +     dwmac->syscon =3D syscon;
+> > +     dwmac->regmap =3D regmap;
+> > +
+> > +     ret =3D stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+> > +     if (ret)
+> > +             goto err_remove_config_dt;
+> > +
+> > +     return 0;
+> > +
+> > +err_remove_config_dt:
+> > +     if (pdev->dev.of_node)
+> > +             stmmac_remove_config_dt(pdev, plat_dat);
+> > +
+> > +     return ret;
+> > +}
+>
+> ...
+
+
+
+--=20
+Best regards,
+
+Keguang Zhang
 
