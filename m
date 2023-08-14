@@ -1,139 +1,125 @@
-Return-Path: <netdev+bounces-27230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D27E277B029
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 05:32:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1647377B08A
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 06:39:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC63280EBC
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 03:32:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44AEC280F27
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 04:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D4D3D65;
-	Mon, 14 Aug 2023 03:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095041FDE;
+	Mon, 14 Aug 2023 04:39:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D6C187C
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:32:49 +0000 (UTC)
-Received: from mail-pj1-f79.google.com (mail-pj1-f79.google.com [209.85.216.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB971BCB
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:32:48 -0700 (PDT)
-Received: by mail-pj1-f79.google.com with SMTP id 98e67ed59e1d1-26b3c15ffeeso2561090a91.0
-        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:32:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F044F1FAA
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 04:39:31 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285D3E7E
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 21:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1691987923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aK0SJ5Ys3aL4eIY1ULDHKa+YKSKcNhoW58WmpbgTceE=;
+	b=eoL4inzHPzeQhbVRNc6f0N7/ILcXv3q+s/g0KSmfSRkrv/hOCOvFlOwmWshhMvGu9Ml3xZ
+	wf6eaVTqyZ1kAJnH1A5+N0oj5Tz1vEZOjehqo9K3ozsVNKFRPfqwKs9zWHIRAJiYZb9tg3
+	/BU/79UN8kA/b2/88V5CzHTzJmu0SII=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-107-85ZWEHp-NKOrjkp4mpUs8g-1; Mon, 14 Aug 2023 00:38:41 -0400
+X-MC-Unique: 85ZWEHp-NKOrjkp4mpUs8g-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b9fa64db5cso37932301fa.2
+        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 21:38:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691983967; x=1692588767;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+cylwmDNW7JKQ6N6AHEkHm5tFBbzoC/Jb4px0DmBX8w=;
-        b=B+FvC/Sy1BYm84pegOiMM8x7qEBED5KxJorXo1RDANREfWjmRDdua0JXH7Sr+KTBvh
-         QNglARvZy2ZSL89P4MH0GD2U60ZTv96vKRhlRVESrPg19fL8Vv+hNeTdOjbTAefai2v1
-         V3V1UseSMXMpUcHgyxnIzgYf0krKWub9i4FttDPujvlwqMjrh4zdXa5NSfDUWjDDA2Y7
-         V58HMaPN7LWbIGMOZa6ABIo0csD56k36ub/jW+k/8w8d8mabNhcKEwlSQO2lIEQDVFIP
-         LqvpryK9qdRfVmFzppcF8yujTGNKVcLMIoCqTGhgES9GznCGJvtJn56fwWZAGzebZB8G
-         wymw==
-X-Gm-Message-State: AOJu0Yy91BxLjLuEi50rfofG9OUFRqNHzbYur1iqq+rD1fRyS1AdqTjc
-	9hEsFeX2uFboqu1+14NSrh+Wz80up9vq809+0hubQJZBUCIo
-X-Google-Smtp-Source: AGHT+IF3hEKWeg6Nn7BUbVcgrMEiMZ6b+TxzHlqPUoCaVcZRs5GQmTy9JjgReKIT1K/+An2otTENkaPYri5UqrjT6i5O1wrLSQoc
+        d=1e100.net; s=20221208; t=1691987919; x=1692592719;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aK0SJ5Ys3aL4eIY1ULDHKa+YKSKcNhoW58WmpbgTceE=;
+        b=IHNhjUVj0lUiJuUIeiciQ9qToqREhqVSqUj9P3uWAaSwt9GDW0fUXV1epM7j/f0UiH
+         hesR421gtzUbV1LuMQasSMHR2NIcxzeCJGUOCmrCf7LSZSFfk5CAXanOCrsquhCoF+3/
+         gyc1B67a6DTS3YDPtpVd+L1MPbnOHadmwAIguyJJN7Po4BEy9B3fEVxEpEHr+klcE6cY
+         /FizBSyKZicuJRgePxs1f4HBoC4dPoT8ypPUksctY+aBihnHPzM6s0oygJYof/6xigK6
+         55vGHJMLpev1wrvS90/zZI2UQyJ305KZzhX2cdADdAJmQihqlD4bxI1WLOjanhi1toGd
+         qb2g==
+X-Gm-Message-State: AOJu0YxIlF3MCLSH1oLSPDD55Ht2VwE5B7zyXVwxIo63y2o1YIyJIsOC
+	9m8Gz/7NGcj8KqCNiC7G7aCpkPgy/hpO1ifHZSudH1ETItZLGvVQBM64vLCVGloybNjAQ0ixhoo
+	sG2JZA1Jyvx2TaqOh5ZGm935MVKEwYwW5
+X-Received: by 2002:a2e:b712:0:b0:2b4:6eb0:2a27 with SMTP id j18-20020a2eb712000000b002b46eb02a27mr5968655ljo.17.1691987919725;
+        Sun, 13 Aug 2023 21:38:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPgsJX7lmRRXk9QZtHBISV4+zSZ0QOhF0u67nsy81U9FUxM1FnoRDpxfZLXAQcZCxRxHts49gu6GBBBeW2d/I=
+X-Received: by 2002:a2e:b712:0:b0:2b4:6eb0:2a27 with SMTP id
+ j18-20020a2eb712000000b002b46eb02a27mr5968639ljo.17.1691987919420; Sun, 13
+ Aug 2023 21:38:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90a:9907:b0:269:3c79:9b15 with SMTP id
- b7-20020a17090a990700b002693c799b15mr1973060pjp.5.1691983967680; Sun, 13 Aug
- 2023 20:32:47 -0700 (PDT)
-Date: Sun, 13 Aug 2023 20:32:47 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005bfece0602d9b7c8@google.com>
-Subject: [syzbot] [net?] WARNING in ip_tunnel_delete_nets (2)
-From: syzbot <syzbot+b7a5f4ad84b87ee1b3ae@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20230811065512.22190-1-hengqi@linux.alibaba.com>
+In-Reply-To: <20230811065512.22190-1-hengqi@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 14 Aug 2023 12:38:28 +0800
+Message-ID: <CACGkMEugNDGufpcK0apumz6+MdptoshMPuVWB4Czo1Z5jw1UyA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/8] virtio-net: support dynamic notification
+ coalescing moderation
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Fri, Aug 11, 2023 at 2:55=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
+wrote:
+>
+> Now, virtio-net already supports per-queue notification coalescing parame=
+ter
+> setting. Based on this, we use the netdim library[1] of linux to support
+> dynamic notification coalescing moderation for virtio-net.
+>
+> [1] https://docs.kernel.org/networking/net_dim.html
 
-syzbot found the following issue on:
+Do you have perf numbers?
 
-HEAD commit:    2ccdd1b13c59 Linux 6.5-rc6
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16e56ef7a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8fc59e2140295873
-dashboard link: https://syzkaller.appspot.com/bug?extid=b7a5f4ad84b87ee1b3ae
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Thanks
 
-Unfortunately, I don't have any reproducer for this issue yet.
+>
+> This series also introduces some extractions and fixes. Please review.
+>
+> Heng Qi (8):
+>   virtio-net: initially change the value of tx-frames
+>   virtio-net: fix mismatch of getting txq tx-frames param
+>   virtio-net: returns whether napi is complete
+>   virtio-net: separate rx/tx coalescing moderation cmds
+>   virtio-net: extract virtqueue coalescig cmd for reuse
+>   virtio-net: support rx netdim
+>   virtio-net: support tx netdim
+>   virtio-net: a tiny comment update
+>
+>  drivers/net/virtio_net.c | 370 +++++++++++++++++++++++++++++++++------
+>  1 file changed, 316 insertions(+), 54 deletions(-)
+>
+> --
+> 2.19.1.6.gb485710b
+>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e6e598627dd6/disk-2ccdd1b1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/486c6739d779/vmlinux-2ccdd1b1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5da0f3ac1d56/bzImage-2ccdd1b1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b7a5f4ad84b87ee1b3ae@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 18960 at net/core/dev.c:10876 unregister_netdevice_many_notify+0x14d8/0x19a0 net/core/dev.c:10876
-Modules linked in:
-CPU: 0 PID: 18960 Comm: kworker/u4:2 Not tainted 6.5.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-Workqueue: netns cleanup_net
-RIP: 0010:unregister_netdevice_many_notify+0x14d8/0x19a0 net/core/dev.c:10876
-Code: b4 1a 00 00 48 c7 c6 e0 0e 81 8b 48 c7 c7 20 0f 81 8b c6 05 11 62 6c 06 01 e8 44 21 23 f9 0f 0b e9 64 f7 ff ff e8 d8 5f 5c f9 <0f> 0b e9 3b f7 ff ff e8 cc 8f af f9 e9 fc ec ff ff 4c 89 e7 e8 1f
-RSP: 0018:ffffc900002cfa28 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 000000007cf48c01 RCX: 0000000000000000
-RDX: ffff8880391ba080 RSI: ffffffff8828c0e8 RDI: 0000000000000001
-RBP: ffff888077db4000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 000000000000004e R12: ffff88802380c900
-R13: 0000000000000000 R14: 0000000000000002 R15: ffff88802380c900
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000c001ac9010 CR3: 000000001ea93000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ip_tunnel_delete_nets+0x2bb/0x3a0 net/ipv4/ip_tunnel.c:1144
- ops_exit_list+0x125/0x170 net/core/net_namespace.c:175
- cleanup_net+0x505/0xb20 net/core/net_namespace.c:614
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:389
- ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
