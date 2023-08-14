@@ -1,160 +1,99 @@
-Return-Path: <netdev+bounces-27362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3548377B9EE
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:27:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EC3777BA13
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E80A1C20A04
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE5CF281056
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36BABE71;
-	Mon, 14 Aug 2023 13:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB173BE74;
+	Mon, 14 Aug 2023 13:33:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A51BE5F
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 13:27:33 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8205012D;
-	Mon, 14 Aug 2023 06:27:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692019652; x=1723555652;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=uEAgFuelBW2HgyEvKYz5wAP7z+RpkG1urn+9Q46Dy7I=;
-  b=bk+eyYKuBrFmu+7+0R+2HpsogVQuD8ts7xFdW/Pp6C1EArEkdnu3+4jI
-   19OxaOgzzDCvlgIdF31Qfb81FZ5JC+8hVhXRw2AoiTPVARHq+I/PSLLtT
-   VAo//rcdqEiftiPjRrctjwm1jYol+8CbssBn4+NebN9+jReQd6FxBQ4XC
-   k0Lu5V7ZoKjKnMGQQSStms3U4wqk8jwDZzQXQPKI7YndgjTSV2OTYNlJ7
-   ltntS49aTu0bsbBU1cBTAmYrlTaSLz265XprDPcXdxMZfNQjXxRLXtcD7
-   ZcISf1J/O2BUV3jqCqdGaQFvGLtPfGcMtiQfdeVHCqFhvrucMpD6nDkGD
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="458399097"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="458399097"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 06:27:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="768452779"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="768452779"
-Received: from lgarello-mobl.ger.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.249.40.121])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 06:27:28 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Bjorn Helgaas <helgaas@kernel.org>,
-	linux-pci@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Moshe Shemesh <moshe@mellanox.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH 1/1] net/mlx5: Convert PCI error values to generic errnos
-Date: Mon, 14 Aug 2023 16:27:20 +0300
-Message-Id: <20230814132721.26608-1-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B647BA2D
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 13:33:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25B28C433C7;
+	Mon, 14 Aug 2023 13:33:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692019985;
+	bh=l2pqgmH/iXu/AHzuckN0N3T97huLLoFc5gSrbjRBGgQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=djFKH6exoViDcFtdywnv3Vjz+UqKxiUBC5nPgeQnBtcq8gKx8sFJjmSh/65ZicXiK
+	 1M3iXpZPPlGN/4M6KOWfOpDTzXaIjyfWHXrdA48J6xic5cuko9TfjybFWMeOfJahhn
+	 /Ekt6oppBXwqEde02oFdrAaU9+ys2/XGqFryE5yWnutSQgs2Gro7OxyClB/8yaa/Ue
+	 vWPF5E67hkvaqQnk4EZsA+G6WXTLGEoB9yQZGuzbqFX9Rll4PrxCz1t9d1L3kFJrIC
+	 CeA8lNN5TpnVyrY1fx5oGcHaggSRUxY2Mq+M14L88XkE9VB04o7mfBG5XeE/Fnw6w6
+	 5HBSR400Wf/EA==
+Received: (nullmailer pid 2086712 invoked by uid 1000);
+	Mon, 14 Aug 2023 13:33:03 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-
-mlx5_pci_link_toggle() returns mix PCI specific error codes and generic
-errnos.
-
-Convert the PCI specific error values to generic errno using
-pcibios_err_to_errno() before returning them.
-
-Fixes: eabe8e5e88f5 ("net/mlx5: Handle sync reset now event")
-Fixes: 212b4d7251c1 ("net/mlx5: Wait for firmware to enable CRS before pci_restore_state")
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-
----
-
-Maintainers beware, this will conflict with read+write -> set/clear_word
-fixes in pci.git/pcie-rmw. As such, it might be the easiest for Bjorn to
-take it instead of net people.
+From: Rob Herring <robh@kernel.org>
+To: Sriranjani P <sriranjani.p@samsung.com>
+Cc: edumazet@google.com, linux-kernel@vger.kernel.org, alexandre.torgue@foss.st.com, ravi.patel@samsung.com, alim.akhtar@samsung.com, linux-samsung-soc@vger.kernel.org, linux-fsd@tesla.com, conor+dt@kernel.org, mcoquelin.stm32@gmail.com, kuba@kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pabeni@redhat.com, robh+dt@kernel.org, pankaj.dubey@samsung.com, richardcochran@gmail.com, krzysztof.kozlowski+dt@linaro.org, joabreu@synopsys.com, devicetree@vger.kernel.org, davem@davemloft.net, swathi.ks@samsung.com
+In-Reply-To: <20230814112539.70453-2-sriranjani.p@samsung.com>
+References: <20230814112539.70453-1-sriranjani.p@samsung.com>
+ <CGME20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66@epcas5p3.samsung.com>
+ <20230814112539.70453-2-sriranjani.p@samsung.com>
+Message-Id: <169201998303.2086680.8457687937999615543.robh@kernel.org>
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Date: Mon, 14 Aug 2023 07:33:03 -0600
 
 
-I wonder if these PCIBIOS_* error codes are useful at all? There's 1:1
-mapping into errno values so no information loss if the functions would just
-return errnos directly. Perhaps this is just legacy nobody has bothered to
-remove? If nobody opposes, I could take a look at getting rid of them.
+On Mon, 14 Aug 2023 16:55:36 +0530, Sriranjani P wrote:
+> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
+> Ethernet YAML schema to enable the DT validation.
+> 
+> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
+> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
+> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
+> Signed-off-by: Sriranjani P <sriranjani.p@samsung.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
+>  .../devicetree/bindings/net/tesla,ethqos.yaml | 114 ++++++++++++++++++
+>  2 files changed, 117 insertions(+), 2 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/tesla,ethqos.yaml
+> 
 
----
- drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-index 4804990b7f22..0afd9dbfc471 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-@@ -371,7 +371,7 @@ static int mlx5_pci_link_toggle(struct mlx5_core_dev *dev)
- 
- 	err = pci_read_config_word(dev->pdev, PCI_DEVICE_ID, &dev_id);
- 	if (err)
--		return err;
-+		return pcibios_err_to_errno(err);
- 	err = mlx5_check_dev_ids(dev, dev_id);
- 	if (err)
- 		return err;
-@@ -386,16 +386,16 @@ static int mlx5_pci_link_toggle(struct mlx5_core_dev *dev)
- 	/* PCI link toggle */
- 	err = pci_read_config_word(bridge, cap + PCI_EXP_LNKCTL, &reg16);
- 	if (err)
--		return err;
-+		return pcibios_err_to_errno(err);
- 	reg16 |= PCI_EXP_LNKCTL_LD;
- 	err = pci_write_config_word(bridge, cap + PCI_EXP_LNKCTL, reg16);
- 	if (err)
--		return err;
-+		return pcibios_err_to_errno(err);
- 	msleep(500);
- 	reg16 &= ~PCI_EXP_LNKCTL_LD;
- 	err = pci_write_config_word(bridge, cap + PCI_EXP_LNKCTL, reg16);
- 	if (err)
--		return err;
-+		return pcibios_err_to_errno(err);
- 
- 	/* Check link */
- 	if (!bridge->link_active_reporting) {
-@@ -408,7 +408,7 @@ static int mlx5_pci_link_toggle(struct mlx5_core_dev *dev)
- 	do {
- 		err = pci_read_config_word(bridge, cap + PCI_EXP_LNKSTA, &reg16);
- 		if (err)
--			return err;
-+			return pcibios_err_to_errno(err);
- 		if (reg16 & PCI_EXP_LNKSTA_DLLLA)
- 			break;
- 		msleep(20);
-@@ -426,7 +426,7 @@ static int mlx5_pci_link_toggle(struct mlx5_core_dev *dev)
- 	do {
- 		err = pci_read_config_word(dev->pdev, PCI_DEVICE_ID, &reg16);
- 		if (err)
--			return err;
-+			return pcibios_err_to_errno(err);
- 		if (reg16 == dev_id)
- 			break;
- 		msleep(20);
--- 
-2.30.2
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/tesla,ethqos.yaml: properties:clock-names: {'minItems': 5, 'maxItems': 10, 'items': [{'const': 'ptp_ref'}, {'const': 'master_bus'}, {'const': 'slave_bus'}, {'const': 'tx'}, {'const': 'rx'}, {'const': 'master2_bus'}, {'const': 'slave2_bus'}, {'const': 'eqos_rxclk_mux'}, {'const': 'eqos_phyrxclk'}, {'const': 'dout_peric_rgmii_clk'}]} should not be valid under {'required': ['maxItems']}
+	hint: "maxItems" is not needed with an "items" list
+	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+Documentation/devicetree/bindings/net/tesla,ethqos.example.dtb: /example-0/ethernet@14300000: failed to match any schema with compatible: ['tesla,dwc-qos-ethernet-4.21']
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230814112539.70453-2-sriranjani.p@samsung.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
