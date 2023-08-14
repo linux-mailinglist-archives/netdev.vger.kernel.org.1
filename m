@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-27493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE3F377C28B
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:43:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C8877C293
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:43:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8961C28120C
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:43:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F5D1C20B86
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C3D100D7;
-	Mon, 14 Aug 2023 21:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E85F100AD;
+	Mon, 14 Aug 2023 21:41:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3933100AD
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:41:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61CF1C43395;
-	Mon, 14 Aug 2023 21:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE3E100A0
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:41:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67F6CC433AB;
+	Mon, 14 Aug 2023 21:41:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692049312;
-	bh=a4oiqe5VfuAXHiPcnBxIHzPx+/0ybpqQH5lsc2XnOtU=;
+	s=k20201202; t=1692049313;
+	bh=dJBGJsm+NMzFsFg6tAofMW0qR6sRbbbI2BqyKCb/fzg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HhE3q47n0pfIFK2+P7ufGQVfZS/Sto79ulYP3A3zf5exIK+d8s443T1pgXVoTp91n
-	 EbkOdiI9qCLLZ7K4nwoK8MjMAkeQzKxRcGuBKaK9a09RUH6pczZnh+zKWNXK5cea7I
-	 D0NA7F6Oy6p/NdtL44BpN4Gx9IoveovFEhv7Dkr65ifGu2ZLFLB+Encc/JrzzUBHb9
-	 ze48+ZD/5ctv+cbsz0y5jesM7ChA35KzS+jmp3fLMqzoAoRPZnBbASGQXHEqr/gMS+
-	 mEkUukdVwC3btwj4CGrRu7zBLCY3SWsu0mM71iXcVJ7Yjt+xVnDas6L6NxU/xkFx4w
-	 Nb1+GUR3O77wg==
+	b=ZcQoGmTopO7r2H6a8YohEy4coehTuEWOjZ4zRL1aa77RlF3bNpLzXkgtm4/9uygxc
+	 POZ2HdP0XsDDfImmmLBJTu9SqL+n9rWZAJyHHAJWmKyfFYSum/nJlaxzy8+mtlEYkB
+	 NulMfN8aPPEvYUP84sE337ub8cvfA4T4UZ/tdU4bEC/grnLT2Xz+3Rr3UK2+al9cZa
+	 fjlE1se72v2ZQ8+85ClIRRT7j2jUGDp6hRzVQajBndUwQbDx8cFC728ZdZo5o3KPwU
+	 vsyfkJ5GtRbMNonAC7pl4qKON4cDSMtxZ7SZcFcngyzk1a67+UVybEJ34UliwJ4k0W
+	 FuGgvLu1GYRYA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,12 +38,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>,
 	Moshe Shemesh <moshe@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [net-next 04/14] net/mlx5: Expose max possible SFs via devlink resource
-Date: Mon, 14 Aug 2023 14:41:34 -0700
-Message-ID: <20230814214144.159464-5-saeed@kernel.org>
+	Shay Drory <shayd@nvidia.com>
+Subject: [net-next 05/14] net/mlx5: Check with FW that sync reset completed successfully
+Date: Mon, 14 Aug 2023 14:41:35 -0700
+Message-ID: <20230814214144.159464-6-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230814214144.159464-1-saeed@kernel.org>
 References: <20230814214144.159464-1-saeed@kernel.org>
@@ -55,136 +54,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shay Drory <shayd@nvidia.com>
+From: Moshe Shemesh <moshe@nvidia.com>
 
-Introduce devlink resource for exposing max possible SFs on mlx5
-devices.
+Even if the PF driver had no error on his part of the sync reset flow,
+the firmware can see wider picture as it syncs all the PFs in the flow.
+So add at end of sync reset flow check with firmware by reading MFRL
+register and initialization segment that the flow had no issue from
+firmware point of view too.
 
-For example:
-$ devlink resource show pci/0000:00:0b.0
-pci/0000:00:0b.0:
-  name max_local_SFs size 5 unit entry dpipe_tables none
-  name max_external_SFs size 0 unit entry dpipe_tables none
-
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/devlink.h |  8 ++++
- .../ethernet/mellanox/mlx5/core/sf/hw_table.c | 44 +++++++++++++++++--
- 2 files changed, 48 insertions(+), 4 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |  3 ++
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    | 39 ++++++++++++++++---
+ .../ethernet/mellanox/mlx5/core/fw_reset.h    |  2 +
+ include/linux/mlx5/mlx5_ifc.h                 |  3 +-
+ 4 files changed, 40 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-index defba5bd91d9..961f75da6227 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-@@ -6,6 +6,14 @@
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+index 3d82ec890666..af8460bb257b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+@@ -212,6 +212,9 @@ static int mlx5_devlink_reload_up(struct devlink *devlink, enum devlink_reload_a
+ 		/* On fw_activate action, also driver is reloaded and reinit performed */
+ 		*actions_performed |= BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT);
+ 		ret = mlx5_load_one_devl_locked(dev, true);
++		if (ret)
++			return ret;
++		ret = mlx5_fw_reset_verify_fw_complete(dev, extack);
+ 		break;
+ 	default:
+ 		/* Unsupported action should not get to this function */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
+index 4804990b7f22..e87766f91150 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
+@@ -127,17 +127,23 @@ static int mlx5_fw_reset_get_reset_state_err(struct mlx5_core_dev *dev,
+ 	if (mlx5_reg_mfrl_query(dev, NULL, NULL, &reset_state))
+ 		goto out;
  
- #include <net/devlink.h>
- 
-+enum mlx5_devlink_resource_id {
-+	MLX5_DL_RES_MAX_LOCAL_SFS = 1,
-+	MLX5_DL_RES_MAX_EXTERNAL_SFS,
++	if (!reset_state)
++		return 0;
 +
-+	__MLX5_ID_RES_MAX,
-+	MLX5_ID_RES_MAX = __MLX5_ID_RES_MAX - 1,
-+};
-+
- enum mlx5_devlink_param_id {
- 	MLX5_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
- 	MLX5_DEVLINK_PARAM_ID_FLOW_STEERING_MODE,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/hw_table.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/hw_table.c
-index 17aa348989cb..c4daeaaafead 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sf/hw_table.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/hw_table.c
-@@ -9,6 +9,7 @@
- #include "mlx5_core.h"
- #include "eswitch.h"
- #include "diag/sf_tracepoint.h"
-+#include "devlink.h"
+ 	switch (reset_state) {
+ 	case MLX5_MFRL_REG_RESET_STATE_IN_NEGOTIATION:
+ 	case MLX5_MFRL_REG_RESET_STATE_RESET_IN_PROGRESS:
+-		NL_SET_ERR_MSG_MOD(extack, "Sync reset was already triggered");
++		NL_SET_ERR_MSG_MOD(extack, "Sync reset still in progress");
+ 		return -EBUSY;
+-	case MLX5_MFRL_REG_RESET_STATE_TIMEOUT:
+-		NL_SET_ERR_MSG_MOD(extack, "Sync reset got timeout");
++	case MLX5_MFRL_REG_RESET_STATE_NEG_TIMEOUT:
++		NL_SET_ERR_MSG_MOD(extack, "Sync reset negotiation timeout");
+ 		return -ETIMEDOUT;
+ 	case MLX5_MFRL_REG_RESET_STATE_NACK:
+ 		NL_SET_ERR_MSG_MOD(extack, "One of the hosts disabled reset");
+ 		return -EPERM;
++	case MLX5_MFRL_REG_RESET_STATE_UNLOAD_TIMEOUT:
++		NL_SET_ERR_MSG_MOD(extack, "Sync reset unload timeout");
++		return -ETIMEDOUT;
+ 	}
  
- struct mlx5_sf_hw {
- 	u32 usr_sfnum;
-@@ -243,6 +244,32 @@ static void mlx5_sf_hw_table_hwc_cleanup(struct mlx5_sf_hwc_table *hwc)
- 	kfree(hwc->sfs);
+ out:
+@@ -151,7 +157,7 @@ int mlx5_fw_reset_set_reset_sync(struct mlx5_core_dev *dev, u8 reset_type_sel,
+ 	struct mlx5_fw_reset *fw_reset = dev->priv.fw_reset;
+ 	u32 out[MLX5_ST_SZ_DW(mfrl_reg)] = {};
+ 	u32 in[MLX5_ST_SZ_DW(mfrl_reg)] = {};
+-	int err;
++	int err, rst_res;
+ 
+ 	set_bit(MLX5_FW_RESET_FLAGS_PENDING_COMP, &fw_reset->reset_flags);
+ 
+@@ -164,13 +170,34 @@ int mlx5_fw_reset_set_reset_sync(struct mlx5_core_dev *dev, u8 reset_type_sel,
+ 		return 0;
+ 
+ 	clear_bit(MLX5_FW_RESET_FLAGS_PENDING_COMP, &fw_reset->reset_flags);
+-	if (err == -EREMOTEIO && MLX5_CAP_MCAM_FEATURE(dev, reset_state))
+-		return mlx5_fw_reset_get_reset_state_err(dev, extack);
++	if (err == -EREMOTEIO && MLX5_CAP_MCAM_FEATURE(dev, reset_state)) {
++		rst_res = mlx5_fw_reset_get_reset_state_err(dev, extack);
++		return rst_res ? rst_res : err;
++	}
+ 
+ 	NL_SET_ERR_MSG_MOD(extack, "Sync reset command failed");
+ 	return mlx5_cmd_check(dev, err, in, out);
  }
  
-+static void mlx5_sf_hw_table_res_unregister(struct mlx5_core_dev *dev)
++int mlx5_fw_reset_verify_fw_complete(struct mlx5_core_dev *dev,
++				     struct netlink_ext_ack *extack)
 +{
-+	devl_resources_unregister(priv_to_devlink(dev));
-+}
-+
-+static int mlx5_sf_hw_table_res_register(struct mlx5_core_dev *dev, u16 max_fn,
-+					 u16 max_ext_fn)
-+{
-+	struct devlink_resource_size_params size_params;
-+	struct devlink *devlink = priv_to_devlink(dev);
++	u8 rst_state;
 +	int err;
 +
-+	devlink_resource_size_params_init(&size_params, max_fn, max_fn, 1,
-+					  DEVLINK_RESOURCE_UNIT_ENTRY);
-+	err = devl_resource_register(devlink, "max_local_SFs", max_fn, MLX5_DL_RES_MAX_LOCAL_SFS,
-+				     DEVLINK_RESOURCE_ID_PARENT_TOP, &size_params);
++	err = mlx5_fw_reset_get_reset_state_err(dev, extack);
 +	if (err)
 +		return err;
 +
-+	devlink_resource_size_params_init(&size_params, max_ext_fn, max_ext_fn, 1,
-+					  DEVLINK_RESOURCE_UNIT_ENTRY);
-+	return devl_resource_register(devlink, "max_external_SFs", max_ext_fn,
-+				      MLX5_DL_RES_MAX_EXTERNAL_SFS, DEVLINK_RESOURCE_ID_PARENT_TOP,
-+				      &size_params);
++	rst_state = mlx5_get_fw_rst_state(dev);
++	if (!rst_state)
++		return 0;
++
++	mlx5_core_err(dev, "Sync reset did not complete, state=%d\n", rst_state);
++	NL_SET_ERR_MSG_MOD(extack, "Sync reset did not complete successfully");
++	return rst_state;
 +}
 +
- int mlx5_sf_hw_table_init(struct mlx5_core_dev *dev)
+ int mlx5_fw_reset_set_live_patch(struct mlx5_core_dev *dev)
  {
- 	struct mlx5_sf_hw_table *table;
-@@ -262,12 +289,17 @@ int mlx5_sf_hw_table_init(struct mlx5_core_dev *dev)
- 	if (err)
- 		return err;
+ 	return mlx5_reg_mfrl_set(dev, MLX5_MFRL_REG_RESET_LEVEL0, 0, 0, false);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.h b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.h
+index c57465595f7c..ea527d06a85f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.h
+@@ -12,6 +12,8 @@ int mlx5_fw_reset_set_reset_sync(struct mlx5_core_dev *dev, u8 reset_type_sel,
+ int mlx5_fw_reset_set_live_patch(struct mlx5_core_dev *dev);
  
-+	if (mlx5_sf_hw_table_res_register(dev, max_fn, max_ext_fn))
-+		mlx5_core_dbg(dev, "failed to register max SFs resources");
-+
- 	if (!max_fn && !max_ext_fn)
- 		return 0;
+ int mlx5_fw_reset_wait_reset_done(struct mlx5_core_dev *dev);
++int mlx5_fw_reset_verify_fw_complete(struct mlx5_core_dev *dev,
++				     struct netlink_ext_ack *extack);
+ void mlx5_fw_reset_events_start(struct mlx5_core_dev *dev);
+ void mlx5_fw_reset_events_stop(struct mlx5_core_dev *dev);
+ void mlx5_drain_fw_reset(struct mlx5_core_dev *dev);
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index 87fd6f9ed82c..9aed7e9b9f29 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -10858,8 +10858,9 @@ enum {
+ 	MLX5_MFRL_REG_RESET_STATE_IDLE = 0,
+ 	MLX5_MFRL_REG_RESET_STATE_IN_NEGOTIATION = 1,
+ 	MLX5_MFRL_REG_RESET_STATE_RESET_IN_PROGRESS = 2,
+-	MLX5_MFRL_REG_RESET_STATE_TIMEOUT = 3,
++	MLX5_MFRL_REG_RESET_STATE_NEG_TIMEOUT = 3,
+ 	MLX5_MFRL_REG_RESET_STATE_NACK = 4,
++	MLX5_MFRL_REG_RESET_STATE_UNLOAD_TIMEOUT = 5,
+ };
  
- 	table = kzalloc(sizeof(*table), GFP_KERNEL);
--	if (!table)
--		return -ENOMEM;
-+	if (!table) {
-+		err = -ENOMEM;
-+		goto alloc_err;
-+	}
- 
- 	mutex_init(&table->table_lock);
- 	table->dev = dev;
-@@ -291,6 +323,8 @@ int mlx5_sf_hw_table_init(struct mlx5_core_dev *dev)
- table_err:
- 	mutex_destroy(&table->table_lock);
- 	kfree(table);
-+alloc_err:
-+	mlx5_sf_hw_table_res_unregister(dev);
- 	return err;
- }
- 
-@@ -299,12 +333,14 @@ void mlx5_sf_hw_table_cleanup(struct mlx5_core_dev *dev)
- 	struct mlx5_sf_hw_table *table = dev->priv.sf_hw_table;
- 
- 	if (!table)
--		return;
-+		goto res_unregister;
- 
--	mutex_destroy(&table->table_lock);
- 	mlx5_sf_hw_table_hwc_cleanup(&table->hwc[MLX5_SF_HWC_EXTERNAL]);
- 	mlx5_sf_hw_table_hwc_cleanup(&table->hwc[MLX5_SF_HWC_LOCAL]);
-+	mutex_destroy(&table->table_lock);
- 	kfree(table);
-+res_unregister:
-+	mlx5_sf_hw_table_res_unregister(dev);
- }
- 
- static int mlx5_sf_hw_vhca_event(struct notifier_block *nb, unsigned long opcode, void *data)
+ enum {
 -- 
 2.41.0
 
