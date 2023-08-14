@@ -1,304 +1,308 @@
-Return-Path: <netdev+bounces-27251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B9C77B288
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:33:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035D477B2D5
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAD3B281029
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:33:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8ACB1C209F2
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA188BE8;
-	Mon, 14 Aug 2023 07:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECD48F53;
+	Mon, 14 Aug 2023 07:45:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA6D6D24
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:33:08 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7199010E3;
-	Mon, 14 Aug 2023 00:33:06 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37E7Wcq2125087;
-	Mon, 14 Aug 2023 02:32:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1691998358;
-	bh=bdFeH2qZcAR1f3pLZ/uXJO+MJdOLdWxGk+XknPyZBWU=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=m2tiXeq61s36w4XXM4p2Qz8TUxiWU0KJVCHEd48Mr1hNxLuw1qRjhdLlQHvczValZ
-	 9sWvZn/kIWuyIzXRXRGmG7/Jw4NEI3L57s04ztorsJzJqSn3pxIsWw9Gc47Re0AWGU
-	 48cAx1kIJl81VSco1uk3NaNFozUFqbW5rcaTp8+s=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37E7Wccw025922
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 14 Aug 2023 02:32:38 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 14
- Aug 2023 02:32:37 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 14 Aug 2023 02:32:37 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37E7WVTf028513;
-	Mon, 14 Aug 2023 02:32:32 -0500
-Message-ID: <1f6a36fb-dfbe-1536-47de-f2335aac5bfa@ti.com>
-Date: Mon, 14 Aug 2023 13:02:31 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66321842;
+	Mon, 14 Aug 2023 07:45:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B0E5C433C8;
+	Mon, 14 Aug 2023 07:45:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691999120;
+	bh=UKxzW+x4Bhe85PmCQpAj1NUbjaWZu2yOxA+zzBepsrE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=U+fU3YxMeUFcSIo7V3KmCJ2QTEc3AnZCdoNWjSghgVde7qgMy8l/dQzOTbk/ntBDP
+	 3KTqYUep+CFqdzcV07x8MUYit4roChSFCHX6BgrPdiuEkcuCgyDRI/27/95in9IG/R
+	 et6Rjp00/KXHufGqRtds2Abh1OPpVrCzcc+ivyhDtw1hSt/Ww/WaR1GZ6iy6zTrcw1
+	 EWrFsr1nRABg/B8Gk0YSJwHYN4pDoWwovImdPgnVoY/8yFg7hB0zLZ8azajnGM2qp7
+	 AByvzbPvevMO2D6vwg8gPSO0W8bbHCxQ9Xra2yTG02aGO2B0ve32Ry+tWrtqqIPcjn
+	 cfHJ2sd0PE8qw==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>,
+	Yuval Mintz <Yuval.Mintz@qlogic.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH] qed: remove unused 'resp_size' calculation
+Date: Mon, 14 Aug 2023 09:45:03 +0200
+Message-Id: <20230814074512.1067715-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 3/5] net: ti: icss-iep: Add IEP driver
-Content-Language: en-US
-To: Andrew Davis <afd@ti.com>, MD Danish Anwar <danishanwar@ti.com>,
-        Randy
- Dunlap <rdunlap@infradead.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Simon
- Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20230809114906.21866-1-danishanwar@ti.com>
- <20230809114906.21866-4-danishanwar@ti.com>
- <b43ee5ca-2aab-445a-e24b-cbc95f9186ea@ti.com>
- <c7ddb12d-ae18-5fc2-9729-c88ea73b21d7@ti.com>
- <4c40fbe4-3492-ec76-e452-3a3ecb0f2433@ti.com>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <4c40fbe4-3492-ec76-e452-3a3ecb0f2433@ti.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 11/08/23 8:54 pm, Andrew Davis wrote:
-> On 8/10/23 6:50 AM, Md Danish Anwar wrote:
->> Hi Andrew,
->>
->> On 09/08/23 8:30 pm, Andrew Davis wrote:
->>> On 8/9/23 6:49 AM, MD Danish Anwar wrote:
->>>> From: Roger Quadros <rogerq@ti.com>
->>>>
->>>> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
->>>> support timestamping of ethernet packets and thus support PTP and PPS
->>>> for PRU ethernet ports.
->>>>
->>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
->>>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
->>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
->>>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>>> ---
->>>>    drivers/net/ethernet/ti/Kconfig          |  12 +
->>>>    drivers/net/ethernet/ti/Makefile         |   1 +
->>>>    drivers/net/ethernet/ti/icssg/icss_iep.c | 935 +++++++++++++++++++++++
->>>>    drivers/net/ethernet/ti/icssg/icss_iep.h |  38 +
->>>>    4 files changed, 986 insertions(+)
->>>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
->>>>    create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
->>>>
->>>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
->>>> index 63e510b6860f..88b5b1b47779 100644
->>>> --- a/drivers/net/ethernet/ti/Kconfig
->>>> +++ b/drivers/net/ethernet/ti/Kconfig
->>>> @@ -186,6 +186,7 @@ config CPMAC
->>>>    config TI_ICSSG_PRUETH
->>>>        tristate "TI Gigabit PRU Ethernet driver"
->>>>        select PHYLIB
->>>> +    select TI_ICSS_IEP
->>>
->>> Why not save selecting this until you add its use in the ICSSG_PRUETH driver in
->>> the next patch.
->>>
->>
->> The next patch is only adding changes to icssg-prueth .c /.h files. This patch
->> is adding changes to Kconfig and the Makefile. To keep it that way selecting
->> this is added in this patch. No worries, I will move this to next patch.
->>
->>> [...]
->>>
->>>> +
->>>> +static u32 icss_iep_readl(struct icss_iep *iep, int reg)
->>>> +{
->>>> +    return readl(iep->base + iep->plat_data->reg_offs[reg]);
->>>> +}
->>>
->>> Do these one line functions really add anything? Actually why
->>> not use the regmap you have here.
->>
->> These one line functions are not really adding anything but they are acting as
->> a wrapper around readl /writel and providing some sort of encapsulation as
->> directly calling readl will result in a little complicated code.
->>
->> /* WIth One line function */
->> ts_lo = icss_iep_readl(iep, ICSS_IEP_COUNT_REG0);
->>
->> /* Without one line function */
->> ts_lo = readl(iep->base, iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
->>
->> Previously regmap was used in this driver. But in older commit [1] in
->> 5.10-ti-linux-kernel (Before I picked the driver for upstream) it got changed
->> to readl / writel stating that regmap_read / write is too slow. IEP is time
->> sensitive and needs faster read and write, probably because of this they
->> changed it.
->>
-> 
-> Sounds like you only need direct register access for time sensitive
-> gettime/settime functions, if that is the only place writel()/readl() is
-> needed just drop the helper and use directly in that one spot.
-> 
+From: Arnd Bergmann <arnd@arndb.de>
 
-In total both icss_iep_readl() and writel() are used 4 time each. All related
-to gettime / settime. This is the only place where these helper APIs are used.
-I will drop these helper apis and used readl / writel directly.
+Newer versions of clang warn about this variable being assigned but
+never used:
 
->>>
->>> [...]
->>>
->>>> +static void icss_iep_enable(struct icss_iep *iep)
->>>> +{
->>>> +    regmap_update_bits(iep->map, ICSS_IEP_GLOBAL_CFG_REG,
->>>> +               IEP_GLOBAL_CFG_CNT_ENABLE,
->>>> +               IEP_GLOBAL_CFG_CNT_ENABLE);
->>>
->>> Have you looked into regmap_fields?
->>>
->>
->> No I hadn't. But now I looked into regmap_fields, seems to be another way to
->> update the bits, instead of passing mask and value, regmap_filed_read / write
->> only takes the value. But for that we will need to create a regmap field. If
->> you want me to switch to regmap_fields instead of regmap_update_bits I can make
->> the changes. But I am fine with regmap_update_bits().
->>
-> 
-> I'm suggesting regmap fields as I have used it several times and it resulted
-> in greatly improved readability. Yes you will need a regmap field table, but
-> that is the best part, it lets you put all your bit definitions in one spot
-> that can match 1:1 with the datasheet, much easier to check for correctness
-> than if the bit usages are all spread out in the driver.
-> 
-> I won't insist on you converting this driver to use it today, but I do recommend
-> you at least give it a shot for your own learning.
-> 
+drivers/net/ethernet/qlogic/qed/qed_vf.c:63:67: error: parameter 'resp_size' set but not used [-Werror,-Wunused-but-set-parameter]
 
-Sure Andrew. For now I will keep it as regmap_update_bits(). I will look into
-regmap_fields for my own learning.
+There is no indication in the git history on how this was ever
+meant to be used, so just remove the entire calculation and argument
+passing for it to avoid the warning.
 
-> Andrew
-> 
->>> [...]
->>>
->>>> +
->>>> +    if (!!(iep->latch_enable & BIT(index)) == !!on)
->>>> +        goto exit;
->>>> +
->>>
->>> There has to be a better way to write this logic..
->>>
->>> [...]
->>>
->>>> +
->>>> +static const struct of_device_id icss_iep_of_match[];
->>>> +
->>>
->>> Why the forward declaration?
->>
->> I will remove this, I don't see any reason for this.
->>
->>>
->>>> +static int icss_iep_probe(struct platform_device *pdev)
->>>> +{
->>>> +    struct device *dev = &pdev->dev;
->>>> +    struct icss_iep *iep;
->>>> +    struct clk *iep_clk;
->>>> +
->>>> +    iep = devm_kzalloc(dev, sizeof(*iep), GFP_KERNEL);
->>>> +    if (!iep)
->>>> +        return -ENOMEM;
->>>> +
->>>> +    iep->dev = dev;
->>>> +    iep->base = devm_platform_ioremap_resource(pdev, 0);
->>>> +    if (IS_ERR(iep->base))
->>>> +        return -ENODEV;
->>>> +
->>>> +    iep_clk = devm_clk_get(dev, NULL);
->>>> +    if (IS_ERR(iep_clk))
->>>> +        return PTR_ERR(iep_clk);
->>>> +
->>>> +    iep->refclk_freq = clk_get_rate(iep_clk);
->>>> +
->>>> +    iep->def_inc = NSEC_PER_SEC / iep->refclk_freq;    /* ns per clock
->>>> tick */
->>>> +    if (iep->def_inc > IEP_MAX_DEF_INC) {
->>>> +        dev_err(dev, "Failed to set def_inc %d.  IEP_clock is too slow to be
->>>> supported\n",
->>>> +            iep->def_inc);
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    iep->plat_data = of_device_get_match_data(dev);
->>>
->>> Directly using of_*() functions is often wrong, try just
->>> device_get_match_data().
->>>
->>
->> Sure. I will change to device_get_match_data().
->>
->>> [...]
->>>
->>>> +static struct platform_driver icss_iep_driver = {
->>>> +    .driver = {
->>>> +        .name = "icss-iep",
->>>> +        .of_match_table = of_match_ptr(icss_iep_of_match),
->>>
->>> This driver cannot work without OF, using of_match_ptr() is not needed.
->>>
->>
->> Sure, I will drop of_match_ptr().
->>
->>> Andrew
->>
->>
->> For reading and updating registers, we can have
->>     1. icss_iep_readl / writel and regmap_update_bits() OR
->>     2. regmap_read / write and regmap_update_bits() OR
->>     3. icss_iep_readl / writel and regmap_fields OR
->>     4. regmap_read / write and regmap_fields
->>     
->>
->> Currently we are using 1. Please let me know if you are fine with this and I
->> can continue using 1. If not, please let me know your recommendation out of
->> this 4.
->>
->> [1]
->> https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/commit/?h=linux-5.10.y&id=f4f45bf71cad5be232536d63a0557d13a7eed162
->>
+Fixes: 1408cc1fa48c5 ("qed: Introduce VFs")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/ethernet/qlogic/qed/qed_vf.c | 45 +++++++++---------------
+ 1 file changed, 17 insertions(+), 28 deletions(-)
 
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_vf.c b/drivers/net/ethernet/qlogic/qed/qed_vf.c
+index 7b0e390c0b07d..0e265ed1f501c 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_vf.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_vf.c
+@@ -60,7 +60,7 @@ static void qed_vf_pf_req_end(struct qed_hwfn *p_hwfn, int req_status)
+ #define QED_VF_CHANNEL_MSLEEP_ITERATIONS	10
+ #define QED_VF_CHANNEL_MSLEEP_DELAY		25
+ 
+-static int qed_send_msg2pf(struct qed_hwfn *p_hwfn, u8 *done, u32 resp_size)
++static int qed_send_msg2pf(struct qed_hwfn *p_hwfn, u8 *done)
+ {
+ 	union vfpf_tlvs *p_req = p_hwfn->vf_iov_info->vf2pf_request;
+ 	struct ustorm_trigger_vf_zone trigger;
+@@ -72,9 +72,6 @@ static int qed_send_msg2pf(struct qed_hwfn *p_hwfn, u8 *done, u32 resp_size)
+ 	/* output tlvs list */
+ 	qed_dp_tlv_list(p_hwfn, p_req);
+ 
+-	/* need to add the END TLV to the message size */
+-	resp_size += sizeof(struct channel_list_end_tlv);
+-
+ 	/* Send TLVs over HW channel */
+ 	memset(&trigger, 0, sizeof(struct ustorm_trigger_vf_zone));
+ 	trigger.vf_pf_msg_valid = 1;
+@@ -172,7 +169,7 @@ static int _qed_vf_pf_release(struct qed_hwfn *p_hwfn, bool b_final)
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 
+ 	if (!rc && resp->hdr.status != PFVF_STATUS_SUCCESS)
+ 		rc = -EAGAIN;
+@@ -301,7 +298,7 @@ static int qed_vf_pf_acquire(struct qed_hwfn *p_hwfn)
+ 		memset(p_iov->pf2vf_reply, 0, sizeof(union pfvf_tlvs));
+ 
+ 		/* send acquire request */
+-		rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++		rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 
+ 		/* Re-try acquire in case of vf-pf hw channel timeout */
+ 		if (retry_cnt && rc == -EBUSY) {
+@@ -705,7 +702,7 @@ int qed_vf_pf_tunnel_param_update(struct qed_hwfn *p_hwfn,
+ 		    sizeof(struct channel_list_end_tlv));
+ 
+ 	p_resp = &p_iov->pf2vf_reply->tunn_param_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status, sizeof(*p_resp));
++	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status);
+ 
+ 	if (rc)
+ 		goto exit;
+@@ -772,7 +769,7 @@ qed_vf_pf_rxq_start(struct qed_hwfn *p_hwfn,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->queue_start;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -822,7 +819,7 @@ int qed_vf_pf_rxq_stop(struct qed_hwfn *p_hwfn,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -867,7 +864,7 @@ qed_vf_pf_txq_start(struct qed_hwfn *p_hwfn,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->queue_start;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -918,7 +915,7 @@ int qed_vf_pf_txq_stop(struct qed_hwfn *p_hwfn, struct qed_queue_cid *p_cid)
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -968,7 +965,7 @@ int qed_vf_pf_vport_start(struct qed_hwfn *p_hwfn,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -997,7 +994,7 @@ int qed_vf_pf_vport_stop(struct qed_hwfn *p_hwfn)
+ 	qed_add_tlv(p_hwfn, &p_iov->offset,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -1075,12 +1072,10 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 	struct vfpf_vport_update_tlv *req;
+ 	struct pfvf_def_resp_tlv *resp;
+ 	u8 update_rx, update_tx;
+-	u32 resp_size = 0;
+ 	u16 size, tlv;
+ 	int rc;
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	resp_size = sizeof(*resp);
+ 
+ 	update_rx = p_params->update_vport_active_rx_flg;
+ 	update_tx = p_params->update_vport_active_tx_flg;
+@@ -1096,7 +1091,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 		p_act_tlv = qed_add_tlv(p_hwfn, &p_iov->offset,
+ 					CHANNEL_TLV_VPORT_UPDATE_ACTIVATE,
+ 					size);
+-		resp_size += sizeof(struct pfvf_def_resp_tlv);
+ 
+ 		if (update_rx) {
+ 			p_act_tlv->update_rx = update_rx;
+@@ -1116,7 +1110,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 		tlv = CHANNEL_TLV_VPORT_UPDATE_TX_SWITCH;
+ 		p_tx_switch_tlv = qed_add_tlv(p_hwfn, &p_iov->offset,
+ 					      tlv, size);
+-		resp_size += sizeof(struct pfvf_def_resp_tlv);
+ 
+ 		p_tx_switch_tlv->tx_switching = p_params->tx_switching_flg;
+ 	}
+@@ -1127,7 +1120,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 		size = sizeof(struct vfpf_vport_update_mcast_bin_tlv);
+ 		p_mcast_tlv = qed_add_tlv(p_hwfn, &p_iov->offset,
+ 					  CHANNEL_TLV_VPORT_UPDATE_MCAST, size);
+-		resp_size += sizeof(struct pfvf_def_resp_tlv);
+ 
+ 		memcpy(p_mcast_tlv->bins, p_params->bins,
+ 		       sizeof(u32) * ETH_MULTICAST_MAC_BINS_IN_REGS);
+@@ -1142,7 +1134,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 		tlv = CHANNEL_TLV_VPORT_UPDATE_ACCEPT_PARAM;
+ 		size = sizeof(struct vfpf_vport_update_accept_param_tlv);
+ 		p_accept_tlv = qed_add_tlv(p_hwfn, &p_iov->offset, tlv, size);
+-		resp_size += sizeof(struct pfvf_def_resp_tlv);
+ 
+ 		if (update_rx) {
+ 			p_accept_tlv->update_rx_mode = update_rx;
+@@ -1166,7 +1157,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 		p_rss_tlv = qed_add_tlv(p_hwfn,
+ 					&p_iov->offset,
+ 					CHANNEL_TLV_VPORT_UPDATE_RSS, size);
+-		resp_size += sizeof(struct pfvf_def_resp_tlv);
+ 
+ 		if (rss_params->update_rss_config)
+ 			p_rss_tlv->update_rss_flags |=
+@@ -1203,7 +1193,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 		tlv = CHANNEL_TLV_VPORT_UPDATE_ACCEPT_ANY_VLAN;
+ 		p_any_vlan_tlv = qed_add_tlv(p_hwfn, &p_iov->offset, tlv, size);
+ 
+-		resp_size += sizeof(struct pfvf_def_resp_tlv);
+ 		p_any_vlan_tlv->accept_any_vlan = p_params->accept_any_vlan;
+ 		p_any_vlan_tlv->update_accept_any_vlan_flg =
+ 		    p_params->update_accept_any_vlan_flg;
+@@ -1213,7 +1202,7 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
+ 	qed_add_tlv(p_hwfn, &p_iov->offset,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, resp_size);
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -1245,7 +1234,7 @@ int qed_vf_pf_reset(struct qed_hwfn *p_hwfn)
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -1303,7 +1292,7 @@ int qed_vf_pf_filter_ucast(struct qed_hwfn *p_hwfn,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -1332,7 +1321,7 @@ int qed_vf_pf_int_cleanup(struct qed_hwfn *p_hwfn)
+ 	qed_add_tlv(p_hwfn, &p_iov->offset,
+ 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
+ 
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -1364,7 +1353,7 @@ int qed_vf_pf_get_coalesce(struct qed_hwfn *p_hwfn,
+ 		    sizeof(struct channel_list_end_tlv));
+ 	resp = &p_iov->pf2vf_reply->read_coal_resp;
+ 
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
+@@ -1402,7 +1391,7 @@ qed_vf_pf_bulletin_update_mac(struct qed_hwfn *p_hwfn,
+ 		    sizeof(struct channel_list_end_tlv));
+ 
+ 	p_resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status, sizeof(*p_resp));
++	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status);
+ 	qed_vf_pf_req_end(p_hwfn, rc);
+ 	return rc;
+ }
+@@ -1433,7 +1422,7 @@ qed_vf_pf_set_coalesce(struct qed_hwfn *p_hwfn,
+ 		    sizeof(struct channel_list_end_tlv));
+ 
+ 	resp = &p_iov->pf2vf_reply->default_resp;
+-	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
++	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
+ 	if (rc)
+ 		goto exit;
+ 
 -- 
-Thanks and Regards,
-Danish.
+2.39.2
+
 
