@@ -1,125 +1,156 @@
-Return-Path: <netdev+bounces-27478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27F377C202
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:01:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26B877C212
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5F81C20B9A
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:01:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FD021C20B9A
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:06:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F52DDC4;
-	Mon, 14 Aug 2023 21:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C8FDDD2;
+	Mon, 14 Aug 2023 21:06:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8E0DDA3
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:01:40 +0000 (UTC)
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7BC1718
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:01:13 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-26b5e737191so745547a91.2
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:01:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD54DDCB;
+	Mon, 14 Aug 2023 21:06:49 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA925E65;
+	Mon, 14 Aug 2023 14:06:47 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-52364e9daceso6423414a12.2;
+        Mon, 14 Aug 2023 14:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1692046873; x=1692651673;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RnOqfXebl5dRNUljflWYEjtYdatKhTnC4hi2EDyy3rE=;
-        b=f+mEmzgNuQSxLlf1UxAtmo6Xr2Chh74/KT2SGtB4Uyic5HM7yZZU1RBC10Kl8xqQ/W
-         02J31pTYLLLGXokaE7rm/p7zFgPiBbeXCfyrNz8Jna9t2q9JeLKRFoK53nF241hyOkoo
-         0ckUDmz5DEwchQ+H5W4az68Ntwo/6ZvAPVhTPHVedPrVYIF6g5ZykgeS8IsgvPInsL6N
-         Yfte/JwM7v0eODQ/sucspVhNQbDL/F6r/HywLGUEiKXCOdOAvCfmEkAs+ptoQUSCoDoP
-         U2/B0a/Kq+5r/Yom0IqKkkVvB8pdgl6JMsV/fExMwTYhdsGmQs1ahycGJl2W/EX0C7Ue
-         z6FQ==
+        d=gmail.com; s=20221208; t=1692047206; x=1692652006;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BGnQRNiyVwSNbQlh18XOyksehaxGg2fPJZTp5rmqjrc=;
+        b=hZy9jMAbJqx5t0whylgnWV3+kLvWLwn75nVX8i+sVfmXzgf2V+MQjfmsfVRUErdqD3
+         BWL3R4tCdvPiGfsaYcod5T+8zgNKZvxmXEvjA4DGaoFwVzOuk30VvS6LwDj0s3MqZDEz
+         6y3qQ37K65yj/lgncMXfmhgEPMTOqZBmWrJrPJ4ZrPG8GPFuXdmQ0myDE1e1QCqzt+DK
+         UI3S4T40JH2BADgpT+1iU13CsH7Gwy0efEqBaDhrE8DiCV9pEhyiSofKuwxklmNivMjS
+         x8eTubX0ZcN9+5xeSWyT7g5Cebv1wUmiyd1QUqaaEEMWHtzzN6gUb/LijcpU/G7Gm0c1
+         T2WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692046873; x=1692651673;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RnOqfXebl5dRNUljflWYEjtYdatKhTnC4hi2EDyy3rE=;
-        b=ivLKUFGoU8VATZmRuJaMcQ3fEJn+ZRZVlEgW2LbmaSMX0aHLcavdHzOyQBy2D1fJG7
-         MwJTcLr+hrMsS9gc38DLCBT3YqUKSGHmFL0wS2TJLs8GGc7tzy1gOAw3RoSM+H+RLYDo
-         /PnxzkK3ra8Dr6DX5rcUmeBXSRrwaTnMOpghD3vLww9PEEC3DA8P6jPbiZOQZSMhJxSC
-         T+ino53M76UpayrtK8YBQNrbynJPU0LSIrVnaDTqlvH3I+NqlLOnIYkRTopN+xAEDAGB
-         D2ZfLiKJxfzK/m6OYC6bwEGArDntWsu3tFLT0LJ/V0aRVOnpLDynBc/p7gXxVWa9LUDL
-         g6Wg==
-X-Gm-Message-State: AOJu0YxO6zOmXNP+4SEhFNb0vdmakQQu+QX+Xur88u+puA59I/bmwoQr
-	8o0ei1oHr8hIpCHLDb/tdrgRyw==
-X-Google-Smtp-Source: AGHT+IHKNceQUmeAFhyH23LTGWMQK0GUOJmI4GMnK7wvaQ5bf2A5drLHyKcLWNJ7Ia+S/WbNSTQ+Yw==
-X-Received: by 2002:a17:90a:e584:b0:267:f758:15d4 with SMTP id g4-20020a17090ae58400b00267f75815d4mr6835511pjz.48.1692046872860;
-        Mon, 14 Aug 2023 14:01:12 -0700 (PDT)
-Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
-        by smtp.gmail.com with ESMTPSA id gk18-20020a17090b119200b00263ba6a248bsm10469478pjb.1.2023.08.14.14.01.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 14:01:12 -0700 (PDT)
-Date: Mon, 14 Aug 2023 14:01:10 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: =?UTF-8?B?RnJhbsOnb2lz?= Michel <francois.michel@uclouvain.be>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] [PATCH 2/3] netem: allow using a seeded
- PRNG for generating random losses
-Message-ID: <20230814140110.0b35eb8b@hermes.local>
-In-Reply-To: <dffa41e5-cde3-5b88-9539-9c03d9e10807@uclouvain.be>
-References: <20230814023147.1389074-1-francois.michel@uclouvain.be>
-	<20230814023147.1389074-3-francois.michel@uclouvain.be>
-	<20230814084907.18c339c2@hermes.local>
-	<dffa41e5-cde3-5b88-9539-9c03d9e10807@uclouvain.be>
+        d=1e100.net; s=20221208; t=1692047206; x=1692652006;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BGnQRNiyVwSNbQlh18XOyksehaxGg2fPJZTp5rmqjrc=;
+        b=CByFCORvRMKnFjj7Gn2N1pwK2MnZMB18TpAI4kGltmkNgxq/E8gnXy/BcZRnMlw0y2
+         2SXu9WQlUqN0rUVnp7NyzQsMbho76Tja8s8QryTJUux8FLgh4P0e3rY4M8XWJtzbK5u8
+         9XDMSURsqaLPyMrpMsyBg5UINrWWSs37XXpW/8W10eey81U8HkFtE8GVC+X2/2AKbfa7
+         RbcurdGFNMBY5+ipoXaR78412LlfWrPgbn+8kRhsYUwvppfgTiZM3lslm5jDhn0kAOYT
+         odWDeH8hyGcQJfzAjoNHWqM5IdEq8pGWUzbU4OCdr2t6xWZaVmx6bi80hrDTzg47RPgt
+         gHvw==
+X-Gm-Message-State: AOJu0Yz+F/AJCeRZlBmi88qnezjTnZSYgphmWqH604KRLphxIlRFpj7k
+	DAR/d51S10b9w2YgivHwksR9VRr9WF7eYLhRQxw=
+X-Google-Smtp-Source: AGHT+IEgw1idU08AfDbthDkWP0ZE+35xEq4Rs685OP6MwdbFIqKicWP8OcHH9ADH2iu2pdS0K1x+C0mmzIyRFIyaFQs=
+X-Received: by 2002:a05:6402:141:b0:522:b112:6254 with SMTP id
+ s1-20020a056402014100b00522b1126254mr7482965edu.4.1692047205936; Mon, 14 Aug
+ 2023 14:06:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230814092302.1903203-1-dallerivemichele@gmail.com>
+ <2023081411-apache-tubeless-7bb3@gregkh> <0e91e3be-abbb-4bf7-be05-ba75c7522736@lunn.ch>
+In-Reply-To: <0e91e3be-abbb-4bf7-be05-ba75c7522736@lunn.ch>
+From: Michele Dalle Rive <dallerivemichele@gmail.com>
+Date: Mon, 14 Aug 2023 23:06:34 +0200
+Message-ID: <CACETy0=V9B8UOCi+BKfyrX06ca=WvC0Gvo_ouR=DjX=_-jhAwg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] Rust Socket abstractions
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	Davide Rovelli <davide.rovelli@usi.ch>, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 14 Aug 2023 22:14:53 +0200
-Fran=C3=A7ois Michel <francois.michel@uclouvain.be> wrote:
+On Mon, 14 Aug 2023 at 22:23, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Mon, Aug 14, 2023 at 05:25:49PM +0200, Greg KH wrote:
+> > On Mon, Aug 14, 2023 at 11:22:55AM +0200, Michele Dalle Rive wrote:
+> > > This patch series is intended to create Rust abstractions for Sockets
+> > > and other fundamental network entities.
+> > >
+> > > Specifically, it was added:
+> > > - Ip address and Socket address wrappers (for `in_addr`, `in6_addr`,
+> > >   `sockaddr_in`, `sockaddr_in6`, `sockaddr_storage`).
+> > > - Socket wrapper.
+> > > - Socket flags and options enums.
+> > > - TCP and UDP specific abstractions over the Rust Socket structure.
+> > >
+> > > This series is a RFC because I would appreciate some feedback about:
+> > > - The structure of the module: is the division of the files and modules
+> > >   appropriate or should it be more or less fine-grained?
+> > >   Also, should the `net` module export all the structures of its
+> > >   submodules? I noticed that it is done in the standard library.
+> > > - Whether the documentation is comprehensive enough.
+> > > - A few other specific questions, written in the individual patches.
+> > >
+> > > I would greatly appreciate any kind of feedback or opinion.
+> > > I am pretty new to the patch/mailing list world, so please point out any
+> > > mistake I might make.
+> >
+> > The best feedback is "who will use these new interfaces?"  Without that,
+> > it's really hard to review a patchset as it's difficult to see how the
+> > bindings will be used, right?
+>
+> There is a long standing tradition in Linux, you don't get a new API
+> merged without a user.
 
-> Thank you very much for your comment.
->=20
-> I do not use prandom_u32_state() directly in order to ensure
-> that the original netem behaviour is preserved when no seed is specified.
->=20
-> But I agree that it would be cleaner to directly use prandom_u32_state()=
-=20
-> instead of get_random_u32(), if we are sure that we won't have problems=20
-> (e.g. short prng cycles) with the randomly generated seeds when no seed=20
-> is explicitly provided. If it is okay, then
-> I don't see a reason to not use prandom_u32_state() directly.
->=20
-> I'll make an update of the patch taking these comments into account and=20
-> simplifying the patch.
->=20
-> Thank you !
->=20
-> Fran=C3=A7ois
+Sorry for not being clear on that.
 
-Older versions of netem had prandom_u32_state() equivalent built inside.
-The code was split out later to be usable in other places.
-Over time, get_random_u32() was added because it was more random and
-there were calls to unify random number usage.
+These abstractions are meant to be used by modules: having them, modules
+can start using the kernel network functionalities through a first, high level
+interface.
 
-The prandom was based on Tausworthe to have good long simulation cycles
-and reasonable performance.
+Since there is currently no network support in Rust, this patch series
+represents a first step to provide access to networking to modules.
+Sockets are just the highest layer of the network stack: the goal would be
+to port structures deeper in the network stack, to give modules more
+access to the network api. However, you need to start somewhere.
 
-Going back to prandom always is good idea, since get_random_u32()
-has addition locking and batched entropy which netem really doesn't need/wa=
-nt.
+>
+> There is not too much use of in kernel sockets. Network file systems
+> like NFS, and SMB are one. These need to be careful with memory usage,
+> you could be busy writing blocks out because the system is low on
+> memory and trying to free some up, and asking for more memory might
+> not work.  Sending kernel log messages to a server. But that needs
+> care because of the different contexts it can be used in. Without
+> knowing what it will be used for, it is hard for us the point the
+> special considerations which need to be made.
+>
+> So please also let us see the code using this API.
+>
+>         Andrew
 
+The lack of these abstractions was noticed in the context of a research
+of the usability of Rust for the development of consensus algorithms using UDP.
+Any kind of kernel module requiring network support can take advantage
+of these socket abstractions, from a tcp echo server to any kind of complex
+networking kernel module.
 
+I could add an example kernel module in `samples/rust` showing an example
+of usage of these APIs.
 
+Thank you for your time,
+
+Michele
 
