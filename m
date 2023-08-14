@@ -1,108 +1,140 @@
-Return-Path: <netdev+bounces-27402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D01477BD59
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:46:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E068077BD5B
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD94F1C209E9
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:46:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 118D41C209E9
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3946C2E7;
-	Mon, 14 Aug 2023 15:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160C4C2EA;
+	Mon, 14 Aug 2023 15:46:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B00C154
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:46:25 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7501B10E5
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:46:23 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-184--xZHB92IP4OU1uQ2F_SF_g-1; Mon, 14 Aug 2023 11:46:19 -0400
-X-MC-Unique: -xZHB92IP4OU1uQ2F_SF_g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83A13855716;
-	Mon, 14 Aug 2023 15:46:18 +0000 (UTC)
-Received: from hog (unknown [10.39.192.31])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B0C3063F71;
-	Mon, 14 Aug 2023 15:46:16 +0000 (UTC)
-Date: Mon, 14 Aug 2023 17:46:15 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vfedorenko@novek.ru>,
-	Frantisek Krenzelok <fkrenzel@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Apoorv Kothari <apoorvko@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH net-next v3 3/6] tls: implement rekey for TLS1.3
-Message-ID: <ZNpMR8nYKlIP9JQw@hog>
-References: <cover.1691584074.git.sd@queasysnail.net>
- <c0ef5c0cf4f56d247081ce366eb5de09bf506cf4.1691584074.git.sd@queasysnail.net>
- <20230811184347.1f7077a9@kernel.org>
- <ZNpC4lAmlLn-5A9h@hog>
- <20230814082128.632d2b03@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA89C139
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:46:37 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174D510CE
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:46:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FgEDjXeG6Bx1eIClysGUqD21mmR4qygWHf6uVaATfTI=; b=Q7NrGmkY7WGoPRbRUE3FWp/VBR
+	AgCHHqXG5/MBWOIRh37RGdVIKC9YdMEj1mitxOZHnTrjLBc6sD3w/aS0QK+BQO+L1VxX/OSE1K3Oh
+	0MbktW87ffLH55EUeVFXFRvMEudZcWa99JtBRm1/vesvt4ERRA5tVbgGIMNOWFcoXA/M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qVZlt-0044Ga-PR; Mon, 14 Aug 2023 17:46:21 +0200
+Date: Mon, 14 Aug 2023 17:46:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
+ switch drivers
+Message-ID: <055be6c4-3c28-459d-bb52-5ac2ee24f1f1@lunn.ch>
+References: <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <ZNI1WA3mGMl93ib8@shell.armlinux.org.uk>
+ <20230808123901.3jrqsx7pe357hwkh@skbuf>
+ <ZNI7x9uMe6UP2Xhr@shell.armlinux.org.uk>
+ <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
+ <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
+ <20230810151617.wv5xt5idbfu7wkyn@skbuf>
+ <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk>
+ <20230814145948.u6ul5dgjpl5bnasp@skbuf>
+ <ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230814082128.632d2b03@kernel.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-08-14, 08:21:28 -0700, Jakub Kicinski wrote:
-> On Mon, 14 Aug 2023 17:06:10 +0200 Sabrina Dubroca wrote:
-> > 2023-08-11, 18:43:47 -0700, Jakub Kicinski wrote:
-> > > On Wed,  9 Aug 2023 14:58:52 +0200 Sabrina Dubroca wrote: =20
-> > > >  =09=09=09TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXSW);
-> > > >  =09=09=09TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRRXSW);
-> > > >  =09=09=09conf =3D TLS_SW; =20
-> > >=20
-> > > Should we add a statistic for rekeying? =20
-> >=20
-> > Hmpf, at least I shouldn't be incrementing the existing stats on every
-> > update, especially not TLSCURR* :/
-> >=20
-> > I don't see much benefit in tracking succesful rekeys. Failed rekeys
-> > seem more interesting to me. What would we get from counting succesful
-> > rekeys?
->=20
-> No huge benefit from counting rekeys, the main (only?) one I see is
-> that when user reports issues we can see whether rekeys were involved
-> (given that they are fairly rare). It could help narrow down triage.
+> > > +		__set_bit(PHY_INTERFACE_MODE_RGMII, interfaces);
+> > 
+> > also, I guess that this should allow all 4 variants of RGMII.
+> 
+> I'm not sure - looking at what's available, the RTL8366 datasheet (not
+> RB) says that there's pinstrapping for the RGMII delays. It also suggests
+> that there may be a register that can be modified for this, but the driver
+> doesn't appear to touch it - in fact, it does nothing with the interface
+> mode. Moreover, the only in-kernel DT for this has:
+> 
+>                         rtl8366rb_cpu_port: port@5 {
+>                                 reg = <5>;
+>                                 label = "cpu";
+>                                 ethernet = <&gmac0>;
+>                                 phy-mode = "rgmii";
+>                                 fixed-link {
+>                                         speed = <1000>;
+>                                         full-duplex;
+>                                         pause;
+>                                 };
+>                         };
+> 
+> Whether that can be changed in the RB version of the device or not, I
+> don't know, so whether it makes sense to allow the other RGMII modes,
+> again, I don't know.
+> 
+> Annoyingly, gmac0 doesn't exist in this file, it's defined in
+> gemini.dtsi, which this file references through a heirarchy of nodes
+> (makes it very much less readable), but it points at:
+> 
+> / {
+> ...
+>         soc {
+> ...
+>                 ethernet@60000000 {
+> ...
+>                         ethernet-port@0 {
+>                                 phy-mode = "rgmii";
+>                                 fixed-link {
+>                                         speed = <1000>;
+>                                         full-duplex;
+>                                         pause;
+>                                 };
+>                         };
+> 
+> So that also uses "rgmii".
+> 
+> I'm tempted not to allow the others as the driver doesn't make any
+> adjustments, and we only apparently have the one user.
 
-Ok. So unless you objcet I'll add 4 more counters: {RX,TX}REKEY{OK,ERROR}.
+RGMII on both ends is unlikely to work, so probably one is
+wrong. Probably the switch has strapping to set it to rgmii-id, but we
+don't actually know that. And i guess we have no ability to find out
+the truth?
 
-And it probably shouldn't be "rekey" in case we decide to implement
-full 1.2 renegotiation (with cipher change) and use the same
-counter. Or 1.2 renegotiation without cipher change gets to use the
-rekey counters, and cipher change would get a new set of counters.
+So a narrow definition seems reasonable at the moment, to raise a red
+warning flag if somebody does try to use rgmii-id which is not
+actually implemented in the driver. And that user then gets to sort
+out the problem.
 
-I could also just call them *UPDATE* but that might be a bit too
-vague.
+	 Andrew
 
---=20
-Sabrina
+
+
+
 
 
