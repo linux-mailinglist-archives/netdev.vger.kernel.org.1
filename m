@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-27476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7FBF77C1DF
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:57:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517A877C1E0
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:57:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BFF6280F3D
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 20:57:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E5D21C20B84
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 20:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605E5DF5A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC29EDF69;
 	Mon, 14 Aug 2023 20:56:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BE9DDB5
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 20:56:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD85C433CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83835DDD2
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 20:56:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C30D3C433C7;
 	Mon, 14 Aug 2023 20:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692046592;
-	bh=gLQ5VU056H869PDuHq4uWCqUQzWL0qabrPkbUTmmMDM=;
+	s=k20201202; t=1692046593;
+	bh=fZa5u3rKhblFUJXeA49wV6czKxOro69Ms5qMfD7QvoA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TKV2+xnIVpPGnmjG9/4EWGNrTIPDPTaRgxb/fWcW/zhUXinbmpK0mjjCduUb2AZLp
-	 hbOXgw590/aZFvP9UuFJjtshpTYOkIjPbVzVxKY82lSJ9y/Goao+G+uONlsj5H0oYT
-	 S1j8pCPeBk3gy3pZLY3vLvYUWFaG/QnYM5nlHaefX1YeGF4eio8F7GK9jeU2EbSIfK
-	 t6srU/P4FJbW49wQiqhgHbDk3c6jOYGAPw+1tP9k6RJCMhuVdTRrZYfBD5sfoAOOog
-	 k83dFAeV92gbqJucZSbpZrWhqwgZew97J+oG865toR1TnoAVUTZo9A8qHrOKkUjCXS
-	 XEuhrYbkyPeyQ==
+	b=rq6hWVZ5HHlria4pyBFD2FMQT+db0X/kkoOMRiy7iX7HNm+nhMWtOA8b84oRMNfn8
+	 nrsDcwNJ275fIdLb9RXaMO/9ZCdkZ8SIwmckQfGhLngZwZSLIs0e5XVNc4tqVMJt3J
+	 VGrXmV8id+RnzeLSdShF1/D5uB9Hhm/hKmkbikrXy7rlc0elJbhTTGAzGK/pK7dyT7
+	 bYmBwTU9knBkkiiGTqTNWvRMz109v4jDqDLEagoiFmSk4uqgfCh9O3+pbKmLRY/B8C
+	 iGHWIJSXWoR3zTf7S+Ef2GBbEr5yDtEVuO6NQaQzsrCHY0g1SvHnSzjTrL4veoxx7+
+	 3bu00Gl/hl1sg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -37,9 +37,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
 	donald.hunter@gmail.com
-Subject: [PATCH net-next 2/3] netlink: specs: add ovs_vport new command
-Date: Mon, 14 Aug 2023 13:56:26 -0700
-Message-ID: <20230814205627.2914583-3-kuba@kernel.org>
+Subject: [PATCH net-next 3/3] tools: ynl: add more info to KeyErrors on missing attrs
+Date: Mon, 14 Aug 2023 13:56:27 -0700
+Message-ID: <20230814205627.2914583-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230814205627.2914583-1-kuba@kernel.org>
 References: <20230814205627.2914583-1-kuba@kernel.org>
@@ -51,52 +51,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add NEW to the spec, it was useful testing the fix for OvS
-input validation.
+When developing specs its useful to know which attr space
+YNL was trying to find an attribute in on key error.
+
+Instead of printing:
+ KeyError: 0
+add info about the space:
+ Exception: Space 'vport' has no attribute with value '0'
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 CC: donald.hunter@gmail.com
 ---
- Documentation/netlink/specs/ovs_vport.yaml | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ tools/net/ynl/lib/ynl.py | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/netlink/specs/ovs_vport.yaml b/Documentation/netlink/specs/ovs_vport.yaml
-index 17336455bec1..ef298b001445 100644
---- a/Documentation/netlink/specs/ovs_vport.yaml
-+++ b/Documentation/netlink/specs/ovs_vport.yaml
-@@ -81,6 +81,10 @@ uapi-header: linux/openvswitch.h
-     name-prefix: ovs-vport-attr-
-     enum-name: ovs-vport-attr
-     attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-       -
-         name: port-no
-         type: u32
-@@ -120,6 +124,20 @@ uapi-header: linux/openvswitch.h
- operations:
-   name-prefix: ovs-vport-cmd-
-   list:
-+    -
-+      name: new
-+      doc: Create a new OVS vport
-+      attribute-set: vport
-+      fixed-header: ovs-header
-+      do:
-+        request:
-+          attributes:
-+            - name
-+            - type
-+            - upcall-pid
-+            - dp-ifindex
-+            - ifindex
-+            - options
-     -
-       name: get
-       doc: Get / dump OVS vport configuration and state
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 3ca28d4bcb18..6951bcc7efdc 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -395,7 +395,10 @@ genl_family_name_to_id = None
+                              self.family.genl_family['mcast'][mcast_name])
+ 
+     def _add_attr(self, space, name, value):
+-        attr = self.attr_sets[space][name]
++        try:
++            attr = self.attr_sets[space][name]
++        except KeyError:
++            raise Exception(f"Space '{space}' has no attribute '{name}'")
+         nl_type = attr.value
+         if attr["type"] == 'nest':
+             nl_type |= Netlink.NLA_F_NESTED
+@@ -450,7 +453,10 @@ genl_family_name_to_id = None
+         attr_space = self.attr_sets[space]
+         rsp = dict()
+         for attr in attrs:
+-            attr_spec = attr_space.attrs_by_val[attr.type]
++            try:
++                attr_spec = attr_space.attrs_by_val[attr.type]
++            except KeyError:
++                raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
+             if attr_spec["type"] == 'nest':
+                 subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'])
+                 decoded = subdict
+@@ -479,7 +485,10 @@ genl_family_name_to_id = None
+ 
+     def _decode_extack_path(self, attrs, attr_set, offset, target):
+         for attr in attrs:
+-            attr_spec = attr_set.attrs_by_val[attr.type]
++            try:
++                attr_spec = attr_set.attrs_by_val[attr.type]
++            except KeyError:
++                raise Exception(f"Space '{attr_set.name}' has no attribute with value '{attr.type}'")
+             if offset > target:
+                 break
+             if offset == target:
 -- 
 2.41.0
 
