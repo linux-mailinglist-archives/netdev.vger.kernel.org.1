@@ -1,211 +1,196 @@
-Return-Path: <netdev+bounces-27522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE53A77C39A
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 00:43:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D1D877C3A1
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 00:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E78201C20BF4
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:43:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 536A91C20BE7
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 22:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8B58828;
-	Mon, 14 Aug 2023 22:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C33A92E;
+	Mon, 14 Aug 2023 22:52:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568787E;
-	Mon, 14 Aug 2023 22:43:03 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E41198;
-	Mon, 14 Aug 2023 15:43:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=so+nIMogsDEjvaVSmTA1TkKUt0VqeGL8iPbeGxQGV44=; b=V9laNy1dvw7FVJMjSINjPje0wq
-	jiL3SO5WjjPgzr9qyzrbQd/GFauY5VmOSLeBaOBfqnEYlPNJMkpiXDSJpgdMOEhGYMXMZRI1me5K3
-	atQIr0hEulDUXTNEEVncS57V2Yry8hA4lwBuqO3QsCLe0wLhP2LASSdDSC/IaESiPWpe1D8qJoMha
-	v72RmhMzR1CVrzs4OjyO9i9qv2nKxYvdgcX3YvDY+lM0OWAYsvBiEc84SSFxiDAb5fMEy1YXNQ3MK
-	S/T+zdsRO5t0uX+9ZV2CVIxHULwdiQe6DnCBdQ/z7frYtQuVt0ilZn0ppAFWZXvD1w42htLE/hwca
-	c+4a+I+A==;
-Received: from [2601:1c2:980:9ec0::577]
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qVgGn-004eME-OR; Mon, 14 Aug 2023 22:42:42 +0000
-Message-ID: <479a9c1f-9db7-61c8-3485-9b330f777930@infradead.org>
-Date: Mon, 14 Aug 2023 15:42:34 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FE7A925
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 22:52:04 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F1911D;
+	Mon, 14 Aug 2023 15:52:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nednKRBRkaJmNHBL0VItqwCDXJ3Uebym8sSULMHv7QcsCootzB4ouccWMmZxuh4OzwB08k3LsKT64v7mQDMxlCVS+Qt6VuR9Ztr4EGrgY6CGUaPLwl6i3SqEriFs1WnOYoHyOWWzm9soi/5s+VtNY6zUr9YGIJUENKQ6muMp+yiy98u2ra+u9+M0Ldm71qHwH3uCGfJ6z8QOwNU0gEezPY91UiSLt9nAXOytNhZAd4eQQgjS+sHwU87F1a6B35CgpMqhyNeOno0WlDFNzJSx3Oe9i5BFtK3SbaIwdxsjwiD+pSnPj+432HNgNlduQfET3qWFx1Fh5D799PhAHTY9KQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ac5yvHfSmL2Lghlc8eanSbEyA12KUyIbFO6u0Sn3R60=;
+ b=Osm7Zuh0znbPVY2gGsEx0maPhP/twub2ogw620/qyRb+Wc5nJ6rkJtNQt3pq03Z6RaATh+ja/Gio3QSZrOGR97T6XS2e4Npm3oMjDdYLcBPzXE7ILI4n67G/JcXKQc4t9KBqNSeBwX0og8nCDcmlg4jdi9BXmRK3X0LJ+rpGV4Mds9YuHlxSf/UhjKuGXHyirAB+AWV6Q4wBuq1HSsc1qOJ6EzyGQD3GiJ19GFJMtYT3AitrSV125tIlAixAztm5j5ohNY+LGNdrTbTTxxhpF6P/T6o4jQn2IMbpq2EDVWZavxXoRJA89ADwaXJyyuar2xEBvMEf9jQSAZq3CCUVmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ac5yvHfSmL2Lghlc8eanSbEyA12KUyIbFO6u0Sn3R60=;
+ b=4NAjdEawFYpqlSGk4tE2P0HX5OoqqaB6yq6zDTfQxifs1bop94/C6iQUxCYLt50dN570MOp0JmuIppSovIR3cJgrpPJobCYULoP0mgXieQhXevrPK9Uf6UFsW8pAbl2EA/vCGj6n90mvC0Ocnt/3TnjCY+4ik3mlvvwNBdFEHQU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by MW3PR12MB4379.namprd12.prod.outlook.com (2603:10b6:303:5e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Mon, 14 Aug
+ 2023 22:51:58 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6678.025; Mon, 14 Aug 2023
+ 22:51:58 +0000
+Message-ID: <b1fef809-b3de-433d-c21c-836612a4d9ba@amd.com>
+Date: Mon, 14 Aug 2023 15:51:56 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
+ tracking
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, Brett Creeley <brett.creeley@amd.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "yishaih@nvidia.com" <yishaih@nvidia.com>,
+ "shameerali.kolothum.thodi@huawei.com"
+ <shameerali.kolothum.thodi@huawei.com>, "horms@kernel.org"
+ <horms@kernel.org>, "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+References: <20230807205755.29579-1-brett.creeley@amd.com>
+ <20230807205755.29579-7-brett.creeley@amd.com>
+ <20230808162718.2151e175.alex.williamson@redhat.com>
+ <01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
+ <20230809113300.2c4b0888.alex.williamson@redhat.com>
+ <ZNPVmaolrI0XJG7Q@nvidia.com>
+ <BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230810104734.74fbe148.alex.williamson@redhat.com>
+ <ZNUcLM/oRaCd7Ig2@nvidia.com> <20230812104951.GC11480@lst.de>
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20230812104951.GC11480@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ2PR07CA0001.namprd07.prod.outlook.com
+ (2603:10b6:a03:505::11) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v6 5/6] page_pool: update document about frag API
-Content-Language: en-US
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Liang Chen <liangchen.linux@gmail.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Eric Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>, linux-doc@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20230814125643.59334-1-linyunsheng@huawei.com>
- <20230814125643.59334-6-linyunsheng@huawei.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230814125643.59334-6-linyunsheng@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MW3PR12MB4379:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9af5b073-a7d3-4eec-6fde-08db9d1910ce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0bzblrl7MRjy9SLBphF6FFTag7hvxUs/pc9IAW3R1APRR7bwUrG76LHY6/CQlIrzD3Vdr+ax6k6TWjHFFde81CEzdEHOJUFxC9fTmDGh+9DWfY4faUIcy6UihstrQpzQ7EiiCHekNNr74U3oC3QBEXWRgRmbcuRi8D+W8BkBg7l1d1rHVzLx0arwjRB1uaCQpRCMRjVKWBVxzfY1e2QbweC8/B4wQCtfpZBPmzYQLQn+2+IzGYIK84b3mjSO7mNm1qzq5jKBoCiToWwIrNZQYNpTOX3L6PNDELq1ElvEzdhzIwnyNlQcs6XNfJuKEi6W4o/CHsrY/cDYTWhk3KUV2f5N+MkqgO/Tyxk+ApUf18FTsJcKgIBhQn6jigGB15GrHT/HGKaEPTYHavCIT4uJzYRq8nYtPMa8OFudbEXiAx0hYXv3tf8uclT9h4rz+q0At7QebmVSfiSMNRRa0suB+AZ4eHcr2ZWU/al+gkvC+31V44Pdc3vbI5J0gN9epGJDzqWduVCjQRHU+LLuGIbzC5VQWTnKOEapbJIVM76kd+ZXQqx2ixBNzae6M/oaZfumwDUocBtCOyfj/VZyRuD5c9WYSuLqZYkrOvEOK74B3v0q4taALfEcfyvjqkWIfqbbntVoV1h8K84SqjDKFYqN++MoxnjxmCDdvROXjo2oeNY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(136003)(346002)(396003)(376002)(39860400002)(451199021)(1800799006)(186006)(38100700002)(54906003)(110136005)(6486002)(478600001)(2906002)(5660300002)(36756003)(31696002)(4326008)(66476007)(66556008)(66946007)(41300700001)(8936002)(8676002)(316002)(53546011)(6506007)(26005)(83380400001)(31686004)(2616005)(6512007)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cGNmV2RpRzhjdXFlV01XUEJ4Y2tJZi85eEQ2bjJQZElMQ3RhcnpBd2pkM0px?=
+ =?utf-8?B?dS9UQjh5K2t3YnFRZ3FId1hzaHJaZXBCeTlNOTV5SmxIalp5b0V6ek5XaHpD?=
+ =?utf-8?B?OUJ1VHd0T3RrazJTS1RoWEN1UTRWUk43cENpR1gyR2RwTzhLdTJ4MnRtR3pp?=
+ =?utf-8?B?M0lyK1N6ZFdTcWpqaEFqSk5QWlo3ZDVoa2VuWUdXVnl4WFlva0NXb3NlaDRa?=
+ =?utf-8?B?cWNBeHFKVXFtT3ZVVGllNit5RFdIUFBKbTVQRHpwcGhkNnpldlh5N016R3NL?=
+ =?utf-8?B?YXBLVE4vaXYxS2phNkhPb1hEcjBvRVV4OG43K1IrUy93L25Ec3M3aHpLUzlI?=
+ =?utf-8?B?Q0owRy8vSmxUeXJ1NTFJemRRdENuNHE0b2hOQ2VhMUpNVFJ6MmdsaGZTR1lx?=
+ =?utf-8?B?d2JvSFpvbm4vTWQvOTR2V21NUDRIUHF5MGdodS9XdHd0bndKdkJNeC9Jakoy?=
+ =?utf-8?B?Si9IMjVpNmpFUDFkSEk4M3JnWmc2U3N6V1hhZkNKekt3WE1RanBmQUxIQWc3?=
+ =?utf-8?B?L0daTEFVU0luNFNPWVdJSkhMRVFDTm1EZlZ3ekdTR090d0I0aUZha3BFV2xV?=
+ =?utf-8?B?WVRxVThIZDhGNitiTkJvTUpVaDB6SFUrbGtmZEJodGlqRFhhSkJxeGhmQzhE?=
+ =?utf-8?B?ZFpJMGVBQTA5YkpQV3ZLRlNBS3ZqU2s2ek5hZjVhNmlub1NPQStjeVZhZ1Zj?=
+ =?utf-8?B?K3Q5aXp3T2k2eFpCZWpWak9RYjV1ME9la0FhNkRkcG9GeUVHQUxrbVhQRmFD?=
+ =?utf-8?B?TTMrV0dtU2Fha2N0QnE1a1dORWc2Q2ZudVBhWUZmdGtGZVRqTUhMd2wwSU5h?=
+ =?utf-8?B?ZlpVa0tHWUw4S25qQXpPclZ6TEVKNTJSaytVOFZTeE5UM2diOG0wRHJQTHNF?=
+ =?utf-8?B?SytKSEs0UHRmZFpiTGMwcmxaUXpuS3J3QWNhUVpWaGduN2lmdUIrUTNQVXRk?=
+ =?utf-8?B?TloveVNabUZRN01mM1VhTjc2SlZjaDRCajFGTHdwMm00QXBsbS9IQm9LV0RI?=
+ =?utf-8?B?ODdqRU16TU5JYnR5eGg0di9jNTdLWHI4T1p6cU1jazhyRGF5ZVpvU0FrR0hm?=
+ =?utf-8?B?UisrRW01dS9mTmZNT3R5dTVsOGY4U3hKbitrMUhRMDN4REIyN0VIejQ1OW11?=
+ =?utf-8?B?cEVpcFJFenhBYUdQSE5FU0x6S0J3MlZaK2twcThHRyt1STBiYjRYZk0wcC8x?=
+ =?utf-8?B?MEw0bEl0ajQrdkRZamtTTnhJQTlyWlhlSDhXS0ZWalcvNEFlVzRBdERRL1Vv?=
+ =?utf-8?B?aHBQbTJDYWhJWTA3TElVS2g0bzFYdEF6amgrOFI5Qzl0K0M0Nm5aWTZOSHdw?=
+ =?utf-8?B?MitXajM4bER6VWE4cCtSNFRNc1FIbjZWVGN5a3V0QzZtc2t2NWdyVndIcEVL?=
+ =?utf-8?B?YTJVL090SndnNFVIRFp2V2haVHNsUTB2T0hOWFhlM3FlQy9nRzZlZVhCdnhJ?=
+ =?utf-8?B?bnExclhWNENSeGRHNG1KQ0pEWk5jMlRoM1VPQ2QzK1ltMHhDRnBLZjJHemtw?=
+ =?utf-8?B?V2txeHNXUmtkcU5HTC8xc01tUis2Y3FTVVBVQUFSNkpJOVFuOUNhRkplRXpk?=
+ =?utf-8?B?OFlqcHdOS3JKUlZyaVc0NGxwbndXWU9WWWYxVjFPRTRzQW1FYjZNSmFlblpN?=
+ =?utf-8?B?UVFYVEg2K0hGNmVnbHZSUjNEODJYb2RMZXRyZWVkaEppYUs5MlF5aGJ2aERK?=
+ =?utf-8?B?WlpiRDkraHY5QXI3T0l5T1h5SXp0ZkpNTWluOFQzYjJWUFhJL1BpNDFqMlJO?=
+ =?utf-8?B?MG9DbGtBT1hIdERWTVIyWlBuazlyV05CV2pjS3VMWkVzNFdveGNIVWlpMEJ0?=
+ =?utf-8?B?TU1WUkxPbFg0Y0lsNnV5ZW1PRXhoV3VmbGUvTDFhVG9kdGZYTGhvUUpjcjdB?=
+ =?utf-8?B?bjhhSXJyNXM3cE5HUSs2VUpNTVZMSWcvYjdqK0s3enhKak9zekZHOERnZGZC?=
+ =?utf-8?B?c3pFOS9SQnYwZHh3OGUvcG1abVBZVW81dTQ3RzN0YlJJdXBqVXFVTnRKZWRX?=
+ =?utf-8?B?SFZPQ1pSbXBqV3hPOUZHRVAwWmZJbHpGYVlaVWRsV3lER1NUUjNYa2dZSVdZ?=
+ =?utf-8?B?enpMV1hxRUgxRXVudjM3a0ZnSmtuUHAyczBIVmd6bjlWVXl2c0lZNnRrZkdq?=
+ =?utf-8?Q?4b6xWCT2FlalzhKFJIc8s7cXL?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9af5b073-a7d3-4eec-6fde-08db9d1910ce
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2023 22:51:58.6372
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HDI4eGp9njwWoSsRJmWerJao7vB0pzWceIXuIDZTGap4HaNpmKHswhf2Rd1YlCigzj0QPD03QR70IT3Os0xtow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4379
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi--
-
-On 8/14/23 05:56, Yunsheng Lin wrote:
-> As more drivers begin to use the frag API, update the
-> document about how to decide which API to use for the
-> driver author.
+On 8/12/2023 3:49 AM, Christoph Hellwig wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> CC: Lorenzo Bianconi <lorenzo@kernel.org>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Liang Chen <liangchen.linux@gmail.com>
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->   Documentation/networking/page_pool.rst |  4 +-
->   include/net/page_pool/helpers.h        | 58 +++++++++++++++++++++++---
->   2 files changed, 55 insertions(+), 7 deletions(-)
+> 
+> On Thu, Aug 10, 2023 at 02:19:40PM -0300, Jason Gunthorpe wrote:
+>>> It's somewhat a strange requirement since we have no expectation of
+>>> compatibility between vendors for any other device type, but how far
+>>> are we going to take it?  Is it enough that the device table here only
+>>> includes the Ethernet VF ID or do we want to actively prevent what
+>>> might be a trivial enabling of migration for another device type
+>>> because we envision it happening through an industry standard that
+>>> currently doesn't exist?  Sorry if I'm not familiar with the dynamics
+>>> of the NVMe working group or previous agreements.  Thanks,
+>>
+>> I don't really have a solid answer. Christoph and others in the NVMe
+>> space are very firm that NVMe related things must go through
+>> standards, I think that is their right.
+> 
+> Yes, anything that uses a class code needs a standardized way of
+> being managed.  That is very different from say mlx5 which is obviously
+> controlled by Mellanox.
+> 
+> So I don't think any vfio driver except for the plain passthrough ones
+> should bind anything but very specific PCI IDs.
+> 
+> And AMD really needs to join the NVMe working group where the passthrough
+> work is happening right now.  If you need help finding the right persons
+> at AMD to work with NVMe send me a mail offline, I can point you to them.
 > 
 
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index b920224f6584..0f1eaa2986f9 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -8,13 +8,28 @@
->   /**
->    * DOC: page_pool allocator
->    *
-> - * The page_pool allocator is optimized for the XDP mode that
-> - * uses one frame per-page, but it can fallback on the
-> - * regular page allocator APIs.
-> + * The page_pool allocator is optimized for recycling page or page frag used by
-> + * skb packet and xdp frame.
->    *
-> - * Basic use involves replacing alloc_pages() calls with the
-> - * page_pool_alloc_pages() call.  Drivers should use
-> - * page_pool_dev_alloc_pages() replacing dev_alloc_pages().
-> + * Basic use involves replacing napi_alloc_frag() and alloc_pages() calls with
-> + * page_pool_cache_alloc() and page_pool_alloc(), which allocate memory with or
-> + * without page splitting depending on the requested memory size.
-> + *
-> + * If the driver knows that it always requires full pages or its allocates are
+Hi Christoph,
 
-                                                              allocations
+We have folks at AMD participating in NVMe working groups and are aware 
+of TPARs related to NVMe live migration. We’re checking to be sure they 
+are up to speed on the discussions and will reach out to you if they 
+need help getting further involved.
 
-> + * always smaller than half a page, it can use one of the more specific API
-> + * calls:
-> + *
-> + * 1. page_pool_alloc_pages(): allocate memory without page splitting when
-> + * driver knows that the memory it need is always bigger than half of the page
-> + * allocated from page pool. There is no cache line dirtying for 'struct page'
-> + * when a page is recycled back to the page pool.
-> + *
-> + * 2. page_pool_alloc_frag(): allocate memory with page splitting when driver
-> + * knows that the memory it need is always smaller than or equal to half of the
-> + * page allocated from page pool. Page splitting enables memory saving and thus
-> + * avoid TLB/cache miss for data access, but there also is some cost to
+As I mentioned in another response, I've been out for a few days so 
+apologies for the delayed response.
 
-       avoids
+Thanks for your help,
 
-> + * implement page splitting, mainly some cache line dirtying/bouncing for
-> + * 'struct page' and atomic operation for page->pp_frag_count.
->    *
->    * API keeps track of in-flight pages, in order to let API user know
->    * when it is safe to free a page_pool object.  Thus, API users
-> @@ -100,6 +115,14 @@ static inline struct page *page_pool_alloc_frag(struct page_pool *pool,
->   	return __page_pool_alloc_frag(pool, offset, size, gfp);
->   }
->   
-> +/**
-> + * page_pool_dev_alloc_frag() - allocate a page frag.
-> + * @pool[in]	pool from which to allocate
-> + * @offset[out]	offset to the allocated page
-> + * @size[in]	requested size
-
-Please use kernel-doc syntax/notation here.
-
-> + *
-> + * Get a page frag from the page allocator or page_pool caches.
-> + */
->   static inline struct page *page_pool_dev_alloc_frag(struct page_pool *pool,
->   						    unsigned int *offset,
->   						    unsigned int size)
-> @@ -143,6 +166,14 @@ static inline struct page *page_pool_alloc(struct page_pool *pool,
->   	return page;
->   }
->   
-> +/**
-> + * page_pool_dev_alloc() - allocate a page or a page frag.
-> + * @pool[in]:		pool from which to allocate
-> + * @offset[out]:	offset to the allocated page
-> + * @size[in, out]:	in as the requested size, out as the allocated size
-
-and here.
-
-> + *
-> + * Get a page or a page frag from the page allocator or page_pool caches.
-> + */
->   static inline struct page *page_pool_dev_alloc(struct page_pool *pool,
->   					       unsigned int *offset,
->   					       unsigned int *size)
-> @@ -165,6 +196,13 @@ static inline void *page_pool_cache_alloc(struct page_pool *pool,
->   	return page_address(page) + offset;
->   }
->   
-> +/**
-> + * page_pool_dev_cache_alloc() - allocate a cache.
-> + * @pool[in]:		pool from which to allocate
-> + * @size[in, out]:	in as the requested size, out as the allocated size
-
-and here.
-
-> + *
-> + * Get a cache from the page allocator or page_pool caches.
-> + */
->   static inline void *page_pool_dev_cache_alloc(struct page_pool *pool,
->   					      unsigned int *size)
->   {
-> @@ -316,6 +354,14 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
->   	page_pool_put_full_page(pool, page, true);
->   }
->   
-> +/**
-> + * page_pool_cache_free() - free a cache into the page_pool
-> + * @pool[in]:		pool from which cache was allocated
-> + * @data[in]:		cache to free
-> + * @allow_direct[in]:	freed by the consumer, allow lockless caching
-
-and here.
-
-> + *
-> + * Free a cache allocated from page_pool_dev_cache_alloc().
-> + */
->   static inline void page_pool_cache_free(struct page_pool *pool, void *data,
->   					bool allow_direct)
->   {
-
-Thanks.
-
+Brett
 
