@@ -1,280 +1,153 @@
-Return-Path: <netdev+bounces-27296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3635C77B618
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:10:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6265677B61A
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64DF41C209D0
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:10:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 939631C20A20
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660FCBA43;
-	Mon, 14 Aug 2023 10:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D101AD4B;
+	Mon, 14 Aug 2023 10:10:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5302CBA3E
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:09:45 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE0EE6E;
-	Mon, 14 Aug 2023 03:09:43 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37EA9Sfo079416;
-	Mon, 14 Aug 2023 05:09:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1692007768;
-	bh=iA6Uz4Oqgz9X1gDFeDPaXxk9fTRruHqI/MaGWn7FXww=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=RK72CML3kmsk5H8Peyy8OwPjUc0hGe3GDZat8r3vqpDwtjUWUVXE3ClwnEo8t8wN3
-	 m91/wRY4j7v5JnkIVItSs2JToEhuAE3/OCu4idBF8g7ov8wtGQnJ9t16g5AxSCC0Pu
-	 Yiv2gQ862CsaiRnfbIDJEr1sj9tGo9Gre6NVtlYM=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37EA9SXr031148
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 14 Aug 2023 05:09:28 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 14
- Aug 2023 05:09:27 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 14 Aug 2023 05:09:27 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37EA9R7a023910;
-	Mon, 14 Aug 2023 05:09:28 -0500
-Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.217])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 37EA9R5F020145;
-	Mon, 14 Aug 2023 05:09:27 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        MD Danish Anwar <danishanwar@ti.com>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH v4 5/5] net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
-Date: Mon, 14 Aug 2023 15:38:47 +0530
-Message-ID: <20230814100847.3531480-6-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230814100847.3531480-1-danishanwar@ti.com>
-References: <20230814100847.3531480-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2E7AD27
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:10:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88466C433C8;
+	Mon, 14 Aug 2023 10:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692007817;
+	bh=bSsdTL71z4hGrSCltN3Y+AqF61F+d6Q3fdKuz/7vM9c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hn30rE1OHQgjLAlP5+msmRlW5EYFw0eFluVuWY4hzDe/U/9Oju19LSQzb8BQWAunu
+	 fNWN3r4A+/iA7OnJXsiDsGJIxeZzUKHrMjC3LMn9qZDI6w5PkdSyFFHJGm0Q0UeAs+
+	 PZhpZO2nit1KP1T3pP41jPTCdr8jQgMyRXrhoTIhYh/Jfn3InFMxQgJNRMFZRgbSXi
+	 FrLXVBNPLK58102Xmle3dC42yL4QUj9048QZU/UHn1bQwh9472cqdtoazf939gq45X
+	 z0fnqLH7ppkCHbGysqAZSxvaYUmA3VNFJ2rixJ2b9xlaAw1esW9KDOOxMunq3N8zDd
+	 it/vEu5HDEpFQ==
+Date: Mon, 14 Aug 2023 13:10:13 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, fw@strlen.de, timo.teras@iki.fi,
+	yuehaibing@huawei.com, weiyongjun1@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: xfrm: skip policies marked as dead while
+ reinserting policies
+Message-ID: <20230814101013.GC3921@unreal>
+References: <20230814013352.2771452-1-dongchenchen2@huawei.com>
+ <20230814070349.GA3921@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230814070349.GA3921@unreal>
 
-From: Grygorii Strashko <grygorii.strashko@ti.com>
+On Mon, Aug 14, 2023 at 04:58:46PM +0800, Dong Chenchen wrote:
+> On Mon, Aug 14, 2023 at 09:33:52AM +0800, Dong Chenchen wrote:
+> >> BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
+> >> Read of size 1 at addr ffff8881051f3bf8 by task ip/668
+> >> 
+> >> CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
+> >> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
+> >> Call Trace:
+> >>  <TASK>
+> >>  dump_stack_lvl+0x72/0xa0
+> >>  print_report+0xd0/0x620
+> >>  kasan_report+0xb6/0xf0
+> >>  xfrm_policy_inexact_list_reinsert+0xb6/0x430
+> >>  xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
+> >>  xfrm_policy_inexact_alloc_chain+0x23f/0x320
+> >>  xfrm_policy_inexact_insert+0x6b/0x590
+> >>  xfrm_policy_insert+0x3b1/0x480
+> >>  xfrm_add_policy+0x23c/0x3c0
+> >>  xfrm_user_rcv_msg+0x2d0/0x510
+> >>  netlink_rcv_skb+0x10d/0x2d0
+> >>  xfrm_netlink_rcv+0x49/0x60
+> >>  netlink_unicast+0x3fe/0x540
+> >>  netlink_sendmsg+0x528/0x970
+> >>  sock_sendmsg+0x14a/0x160
+> >>  ____sys_sendmsg+0x4fc/0x580
+> >>  ___sys_sendmsg+0xef/0x160
+> >>  __sys_sendmsg+0xf7/0x1b0
+> >>  do_syscall_64+0x3f/0x90
+> >>  entry_SYSCALL_64_after_hwframe+0x73/0xdd
+> >> 
+> >> The root cause is:
+> >> 
+> >> cpu 0			cpu1
+> >> xfrm_dump_policy
+> >> xfrm_policy_walk
+> >> list_move_tail
+> >> 			xfrm_add_policy
+> >> 			... ...
+> >> 			xfrm_policy_inexact_list_reinsert
+> >> 			list_for_each_entry_reverse
+> >> 				if (!policy->bydst_reinsert)
+> >> 				//read non-existent policy
+> >> xfrm_dump_policy_done
+> >> xfrm_policy_walk_done
+> >> list_del(&walk->walk.all);
+> >> 
+> >> If dump_one_policy() returns err (triggered by netlink socket),
+> >> xfrm_policy_walk() will move walk initialized by socket to list
+> >> net->xfrm.policy_all. so this socket becomes visible in the global
+> >> policy list. The head *walk can be traversed when users add policies
+> >> with different prefixlen and trigger xfrm_policy node merge.
+> >> 
+> >> It can be fixed by skip such "policies" with walk.dead set to 1.
+> >
+> >But where in the xfrm_dump_policy() flow, these policies are becoming to
+> >be walk.dead == 1?
+> >
+> >Thanks
+> >
+> user will use xfrm_dispatch[XFRM_MSG_GETPOLICY] ops to get xfrm policy.
+> 	
+> 	.start = xfrm_dump_policy_start
+> 
+> xfrm_dump_policy_start() will set walk.dead to 1 by call 
+> xfrm_policy_walk_init().
 
-For AM65x SR2.0 it's required to enable IEP1 in raw 64bit mode which is
-used by PRU FW to monitor the link and apply w/a for 10M link issue.
-Note. No public errata available yet.
+Thanks
 
-Without this w/a the PRU FW will stuck if link state changes under TX
-traffic pressure.
-
-Hence, add support for 10M full duplex for AM65x SR2.0:
- - add new IEP API to enable IEP, but without PTP support
- - add pdata quirk_10m_link_issue to enable 10M link issue w/a.
-
-Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icss_iep.c     | 26 +++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icss_iep.h     |  2 ++
- drivers/net/ethernet/ti/icssg/icssg_config.c |  7 +++++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 27 ++++++++++++++++++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  2 ++
- 5 files changed, 62 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index d123b8ba3f31..0a34d42ea56d 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -709,6 +709,32 @@ void icss_iep_put(struct icss_iep *iep)
- }
- EXPORT_SYMBOL_GPL(icss_iep_put);
- 
-+void icss_iep_init_fw(struct icss_iep *iep)
-+{
-+	/* start IEP for FW use in raw 64bit mode, no PTP support */
-+	iep->clk_tick_time = iep->def_inc;
-+	iep->cycle_time_ns = 0;
-+	iep->ops = NULL;
-+	iep->clockops_data = NULL;
-+	icss_iep_set_default_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_inc(iep, iep->def_inc);
-+	icss_iep_set_compensation_count(iep, 0);
-+	regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, iep->refclk_freq / 10); /* 100 ms pulse */
-+	regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
-+	if (iep->plat_data->flags & ICSS_IEP_SLOW_COMPEN_REG_SUPPORT)
-+		icss_iep_set_slow_compensation_count(iep, 0);
-+
-+	icss_iep_enable(iep);
-+	icss_iep_settime(iep, 0);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_init_fw);
-+
-+void icss_iep_exit_fw(struct icss_iep *iep)
-+{
-+	icss_iep_disable(iep);
-+}
-+EXPORT_SYMBOL_GPL(icss_iep_exit_fw);
-+
- int icss_iep_init(struct icss_iep *iep, const struct icss_iep_clockops *clkops,
- 		  void *clockops_data, u32 cycle_time_ns)
- {
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
-index 9c7f4d0a0916..803a4b714893 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.h
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
-@@ -35,5 +35,7 @@ int icss_iep_exit(struct icss_iep *iep);
- int icss_iep_get_count_low(struct icss_iep *iep);
- int icss_iep_get_count_hi(struct icss_iep *iep);
- int icss_iep_get_ptp_clock_idx(struct icss_iep *iep);
-+void icss_iep_init_fw(struct icss_iep *iep);
-+void icss_iep_exit_fw(struct icss_iep *iep);
- 
- #endif /* __NET_TI_ICSS_IEP_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index ab648d3efe85..933b84666574 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -210,6 +210,10 @@ void icssg_config_ipg(struct prueth_emac *emac)
- 	case SPEED_100:
- 		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
- 		break;
-+	case SPEED_10:
-+		/* IPG for 10M is same as 100M */
-+		icssg_mii_update_ipg(prueth->mii_rt, slice, MII_RT_TX_IPG_100M);
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-@@ -440,6 +444,9 @@ void icssg_config_set_speed(struct prueth_emac *emac)
- 	case SPEED_100:
- 		fw_speed = FW_LINK_SPEED_100M;
- 		break;
-+	case SPEED_10:
-+		fw_speed = FW_LINK_SPEED_10M;
-+		break;
- 	default:
- 		/* Other links speeds not supported */
- 		netdev_err(emac->ndev, "Unsupported link speed\n");
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 1bcb4e174652..410612f43cbd 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1149,7 +1149,6 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 
- 	/* remove unsupported modes */
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
-@@ -2090,13 +2089,29 @@ static int prueth_probe(struct platform_device *pdev)
- 		goto free_pool;
- 	}
- 
-+	prueth->iep1 = icss_iep_get_idx(np, 1);
-+	if (IS_ERR(prueth->iep1)) {
-+		ret = dev_err_probe(dev, PTR_ERR(prueth->iep1), "iep1 get failed\n");
-+		icss_iep_put(prueth->iep0);
-+		prueth->iep0 = NULL;
-+		prueth->iep1 = NULL;
-+		goto free_pool;
-+	}
-+
-+	if (prueth->pdata.quirk_10m_link_issue) {
-+		/* Enable IEP1 for FW in 64bit mode as W/A for 10M FD link detect issue under TX
-+		 * traffic.
-+		 */
-+		icss_iep_init_fw(prueth->iep1);
-+	}
-+
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = prueth_netdev_init(prueth, eth0_node);
- 		if (ret) {
- 			dev_err_probe(dev, ret, "netdev init %s failed\n",
- 				      eth0_node->name);
--			goto netdev_exit;
-+			goto exit_iep;
- 		}
- 		prueth->emac[PRUETH_MAC0]->iep = prueth->iep0;
- 	}
-@@ -2167,6 +2182,10 @@ static int prueth_probe(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+exit_iep:
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
- free_pool:
- 	gen_pool_free(prueth->sram_pool,
- 		      (unsigned long)prueth->msmcram.va, msmc_ram_size);
-@@ -2212,6 +2231,10 @@ static void prueth_remove(struct platform_device *pdev)
- 		prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+	if (prueth->pdata.quirk_10m_link_issue)
-+		icss_iep_exit_fw(prueth->iep1);
-+
-+	icss_iep_put(prueth->iep1);
- 	icss_iep_put(prueth->iep0);
- 
- 	gen_pool_free(prueth->sram_pool,
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index a56ab4cdc83c..3fe80a8758d3 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -208,6 +208,7 @@ struct prueth_pdata {
-  * @icssg_hwcmdseq: seq counter or HWQ messages
-  * @emacs_initialized: num of EMACs/ext ports that are up/running
-  * @iep0: pointer to IEP0 device
-+ * @iep1: pointer to IEP1 device
-  */
- struct prueth {
- 	struct device *dev;
-@@ -231,6 +232,7 @@ struct prueth {
- 	u8 icssg_hwcmdseq;
- 	int emacs_initialized;
- 	struct icss_iep *iep0;
-+	struct icss_iep *iep1;
- };
- 
- struct emac_tx_ts_response {
--- 
-2.34.1
-
+> 
+> Thanks
+> >> 
+> >> Fixes: 9cf545ebd591 ("xfrm: policy: store inexact policies in a tree ordered by destination address")
+> >> Fixes: 12a169e7d8f4 ("ipsec: Put dumpers on the dump list")
+> >> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> >> ---
+> >>  net/xfrm/xfrm_policy.c | 3 +++
+> >>  1 file changed, 3 insertions(+)
+> >> 
+> >> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> >> index d6b405782b63..5b56faad78e0 100644
+> >> --- a/net/xfrm/xfrm_policy.c
+> >> +++ b/net/xfrm/xfrm_policy.c
+> >> @@ -848,6 +848,9 @@ static void xfrm_policy_inexact_list_reinsert(struct net *net,
+> >>  	matched_d = 0;
+> >>  
+> >>  	list_for_each_entry_reverse(policy, &net->xfrm.policy_all, walk.all) {
+> >> +		if (policy->walk.dead)
+> >> +			continue;
+> >> +
+> >>  		struct hlist_node *newpos = NULL;
+> >>  		bool matches_s, matches_d;
+> >>  
+> >> -- 
+> >> 2.25.1
+> >> 
+> >> 
+> 
 
