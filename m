@@ -1,37 +1,56 @@
-Return-Path: <netdev+bounces-27268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09EC977B485
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:46:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B7E77B4D0
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:56:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8438281056
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 08:46:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878AF280628
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 08:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2BBA926;
-	Mon, 14 Aug 2023 08:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC44A92D;
+	Mon, 14 Aug 2023 08:55:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6B88BEB
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:46:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9824C433C7;
-	Mon, 14 Aug 2023 08:45:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692002760;
-	bh=B3y8EHsDG3ckVBJqhMu+4wNcutKVET22OPIzB3BHlZ0=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=IAwz4csbyfvh6Sc60rY3F4KQBQhcpuI6oJ+2qyYb1X2EbPWPD3nk515LAGsCCsdua
-	 /RrfgQ8LZe60yxmHXmLqV2iNhQXTZt2yJNHTUAdt5j2LnL1x91+2f5crAXVuXr7I+M
-	 4yclnHX6puLJ4n3dhyx6fFlKoAJrUyCEJEOmcFpwYcb5oz6hDBAECRGUtxHoU2pTIO
-	 MFGXP339tDE3ExQFau5AQwyOMqlNhNAVCuVXJbJGJti/5BtYxFL5HOtTmPoxvb3ZI5
-	 /6NUgd6v072+ZFgYjyLs9xp0kxcFYsd108Ld5M+KyiFrmZ+S1cmRAt8Vy6EnHsgF6C
-	 14tNDLeY82NTw==
-Message-ID: <cceef8a4-6f38-bfd4-4f77-5dffa558b287@kernel.org>
-Date: Mon, 14 Aug 2023 10:45:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541CA8F53
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:55:59 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226D310F2;
+	Mon, 14 Aug 2023 01:55:31 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id B65CB6016E;
+	Mon, 14 Aug 2023 10:55:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1692003317; bh=VQy5c2/nDDbNkydVW9MBCgI4reVwpfLDVYXeXthZIdc=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=e7DCEI/UOd6r521/7QGzvwjK/WqfjX+9opvAic4Dk78wQqmMwxJ3YY46BXZt/KuIO
+	 dyxNei5zN42Ilrzc3cZ0+ZOZc/dxoueuUDsrqBq6iBsM0UiO8iSbnNAjioI5XZRGN/
+	 XpUaIqCE/RqXOw+c96rZFklXf6VbOnLDBiJGZtPDpUQuNMnBbCCmoP/Z2dLxM7qCRt
+	 CyhLxTCt9PFmLRbqbr4DSD2B6enIzY0gD8pFjdCeDMV8KrjIspqSlK1G1gO9DZsLFn
+	 RsQLn2dRyFUyBpSb0Ge9hMBnAN+M0tcmVnZR+Xv0ItpExEwJqmYld/x5jFELS6f4Ne
+	 d7n0X9IWhadUA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id WsHRS72meZ71; Mon, 14 Aug 2023 10:55:15 +0200 (CEST)
+Received: from [192.168.1.6] (unknown [94.250.191.183])
+	by domac.alu.hr (Postfix) with ESMTPSA id 1E6A46015E;
+	Mon, 14 Aug 2023 10:55:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1692003315; bh=VQy5c2/nDDbNkydVW9MBCgI4reVwpfLDVYXeXthZIdc=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=J9mdlWg+4NjgO7JfU1U0SkIn9qKTuEae7tsVyBM6r8a+4WzHB6xAMc3c28fWJfM6v
+	 QMHs86RQZiQwfrPkLNBrlRZpTePFuCJLk6Yy+O3Ki4/NYFE5P+qkFP4215hUd3WD2f
+	 7uB4XxbLS4M7M2HqOehnU+EJHbywJLU4RL7AzrZsfgZw3UPVT6gNGYwAK6bHlKObY0
+	 syX4mp6uuliZ9mg1hoTeZIWcMUNLEVwQc4QxN3Wow1lawVB21k6hnVRL812+gq8Tww
+	 8kA8xhctdSbuuCa/DDsNTCkCUEjCaT+TipAPSR7LJZHR1gCWnzhuUFnCoMPIyBEoGe
+	 Q0vo+yPU9i1lg==
+Message-ID: <39ea7c85-c235-bc49-cd49-a2d7633eda4c@alu.unizg.hr>
+Date: Mon, 14 Aug 2023 10:54:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -39,140 +58,165 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: hawk@kernel.org, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "jiawenwu@trustnetic.com" <jiawenwu@trustnetic.com>,
- "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>,
- "yang.lee@linux.alibaba.com" <yang.lee@linux.alibaba.com>,
- "error27@gmail.com" <error27@gmail.com>,
- "linyunsheng@huawei.com" <linyunsheng@huawei.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "kys@microsoft.com" <kys@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "longli@microsoft.com" <longli@microsoft.com>,
- "shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
- "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
- "michael.chan@broadcom.com" <michael.chan@broadcom.com>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- "jdelvare@suse.com" <jdelvare@suse.com>,
- "linux@roeck-us.net" <linux@roeck-us.net>,
- "yisen.zhuang@huawei.com" <yisen.zhuang@huawei.com>,
- "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
- "nbd@nbd.name" <nbd@nbd.name>, "john@phrozen.org" <john@phrozen.org>,
- "sean.wang@mediatek.com" <sean.wang@mediatek.com>,
- "Mark-MC.Lee@mediatek.com" <Mark-MC.Lee@mediatek.com>,
- "lorenzo@kernel.org" <lorenzo@kernel.org>,
- "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
- "angelogioacchino.delregno@collabora.com"
- <angelogioacchino.delregno@collabora.com>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org"
- <leon@kernel.org>,
- "gerhard@engleder-embedded.com" <gerhard@engleder-embedded.com>,
- "maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
- "alexanderduyck@fb.com" <alexanderduyck@fb.com>,
- "wei.fang@nxp.com" <wei.fang@nxp.com>,
- "shenwei.wang@nxp.com" <shenwei.wang@nxp.com>,
- "xiaoning.wang@nxp.com" <xiaoning.wang@nxp.com>,
- "linux-imx@nxp.com" <linux-imx@nxp.com>,
- "lgirdwood@gmail.com" <lgirdwood@gmail.com>,
- "broonie@kernel.org" <broonie@kernel.org>,
- "jaswinder.singh@linaro.org" <jaswinder.singh@linaro.org>,
- "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
- "UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
- "horatiu.vultur@microchip.com" <horatiu.vultur@microchip.com>,
- "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
- "grygorii.strashko@ti.com" <grygorii.strashko@ti.com>,
- "simon.horman@corigine.com" <simon.horman@corigine.com>,
- "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
- "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
- "joabreu@synopsys.com" <joabreu@synopsys.com>,
- "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
- "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
- "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
- "mw@semihalf.com" <mw@semihalf.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Geethasowjanya Akula <gakula@marvell.com>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
- Hariprasad Kelam <hkelam@marvell.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- "jgross@suse.com" <jgross@suse.com>,
- "sstabellini@kernel.org" <sstabellini@kernel.org>,
- "oleksandr_tyshchenko@epam.com" <oleksandr_tyshchenko@epam.com>,
- "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
- "ryder.lee@mediatek.com" <ryder.lee@mediatek.com>,
- "shayne.chen@mediatek.com" <shayne.chen@mediatek.com>,
- "kvalo@kernel.org" <kvalo@kernel.org>, "andrii@kernel.org"
- <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "song@kernel.org" <song@kernel.org>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@google.com"
- <sdf@google.com>, "haoluo@google.com" <haoluo@google.com>,
- "jolsa@kernel.org" <jolsa@kernel.org>
-Subject: Re: [EXT] Re: [PATCH v1 net] page_pool: Cap queue size to 32k.
+ Thunderbird/102.14.0
+Subject: Re: selftests: net/af_unix test_unix_oob [FAILED]
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexander@mihalicyn.com, davem@davemloft.net, edumazet@google.com,
+ fw@strlen.de, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ shuah@kernel.org
+References: <abf98942-0058-f2ad-8e55-fbdd83b7c2d6@alu.unizg.hr>
+ <20230807204648.50070-1-kuniyu@amazon.com>
+ <ba4da366-b8cf-ca36-e2dc-cce7260cccf8@alu.unizg.hr>
+ <25d01cd0-e6a1-1701-a066-f96a23767361@alu.unizg.hr>
 Content-Language: en-US
-To: Ratheesh Kannoth <rkannoth@marvell.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230814060411.2401817-1-rkannoth@marvell.com>
- <8c6d19da5c4c38062b7a4e500de1d5dc1280fbc8.camel@sipsolutions.net>
- <MWHPR1801MB1918230E007D7B2C5A768B37D317A@MWHPR1801MB1918.namprd18.prod.outlook.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <MWHPR1801MB1918230E007D7B2C5A768B37D317A@MWHPR1801MB1918.namprd18.prod.outlook.com>
+In-Reply-To: <25d01cd0-e6a1-1701-a066-f96a23767361@alu.unizg.hr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-
-On 14/08/2023 10.05, Ratheesh Kannoth wrote:
->> From: Johannes Berg <johannes@sipsolutions.net>
->> Subject: [EXT] Re: [PATCH v1 net] page_pool: Cap queue size to 32k.
->>> Please find discussion at
->>> https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_l
+On 8/8/23 10:53, Mirsad Todorovac wrote:
+> On 8/8/23 01:09, Mirsad Todorovac wrote:
+>> On 8/7/23 22:46, Kuniyuki Iwashima wrote:
+>>> From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+>>> Date: Mon, 7 Aug 2023 21:44:41 +0200
+>>>> Hi all,
+>>>>
+>>>> In the kernel 6.5-rc5 build on Ubuntu 22.04 LTS (jammy jellyfish) on a Ryzen 7950 assembled box,
+>>>> vanilla torvalds tree kernel, the test test_unix_oob unexpectedly fails:
+>>>>
+>>>> # selftests: net/af_unix: test_unix_oob
+>>>> # Test 2 failed, sigurg 23 len 63 OOB %
+>>>>
+>>>> It is this code:
+>>>>
+>>>>           /* Test 2:
+>>>>            * Verify that the first OOB is over written by
+>>>>            * the 2nd one and the first OOB is returned as
+>>>>            * part of the read, and sigurg is received.
+>>>>            */
+>>>>           wait_for_data(pfd, POLLIN | POLLPRI);
+>>>>           len = 0;
+>>>>           while (len < 70)
+>>>>                   len = recv(pfd, buf, 1024, MSG_PEEK);
+>>>>           len = read_data(pfd, buf, 1024);
+>>>>           read_oob(pfd, &oob);
+>>>>           if (!signal_recvd || len != 127 || oob != '#') {
+>>>>                   fprintf(stderr, "Test 2 failed, sigurg %d len %d OOB %c\n",
+>>>>                   signal_recvd, len, oob);
+>>>>                   die(1);
+>>>>           }
+>>>>
+>>>> In 6.5-rc4, this test was OK, so it might mean we have a regression?
 >>>
->> I'm not the one who's going to apply this, but honestly, I don't think that will
->> work as a commit message for such a change ...
->> Sure, link to it by all means, but also summarize it and make sense of it for
->> the commit message?
+>>> Thanks for reporting.
+>>>
+>>> I confirmed the test doesn't fail on net-next at least, but it's based
+>>> on v6.5-rc4.
+>>>
+>>>    ---8<---
+>>>    [root@localhost ~]# ./test_unix_oob
+>>>    [root@localhost ~]# echo $?
+>>>    0
+>>>    [root@localhost ~]# uname -r
+>>>    6.5.0-rc4-01192-g66244337512f
+>>>    ---8<---
+>>>
+>>> I'll check 6.5-rc5 later.
+>>
+>> Hi, Kuniyuki,
+>>
+>> It seems that there is a new development. I could reproduce the error with the failed test 2
+>> as early as 6.0-rc1. However, the gotcha is that the error appears to be sporadically manifested
+>> (possibly a race)?
+>>
+>> I am currently attempting a bisect.
 > 
-> Why do you think it will not work ?. There is a long discussion about pros and cons of different approaches by
-> Page pool maintainers in the discussion link.  However I  summarize it here, as commit message, it will
-> Lead to some more questions by reviewers.
+> Bisect had shown that the condition existed already at 5.11 torvalds tree.
 > 
+> It has to do with the configs chosen (I used the configs from seltests/*/config merged), but it
+> is also present in the Ubuntu production build:
+> 
+> marvin@defiant:~$ cd linux/kernel/linux_torvalds
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> Test 2 failed, sigurg 23 len 63 OOB %
+> marvin@defiant:~/linux/kernel/linux_torvalds$ uname -rms
+> Linux 6.4.8-060408-generic x86_64
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..1000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> Test 1 failed sigurg 0 len 63
+> marvin@defiant:~/linux/kernel/linux_torvalds$
+> 
+> It happens on rare occasions, so it seems to be a hard-to-spot race.
+> 
+> Normal test running test_unix_oob once never noticed that, save by accident, which brought the problem to attention ...
+> 
+> However, the problem seems to be config-driven rather than kernel-version-driven.
+> 
+> marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..100000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+> Test 3.1 Inline failed, len 1 oob % atmark 0
+> Test 1 Inline failed, sigurg 0 len 63
+> Test 1 Inline failed, sigurg 0 len 63
+> Test 1 Inline failed, sigurg 0 len 63
+> Test 2 Inline failed, len 63 atmark 1
+> Test 3 Inline failed, sigurg 23 len 63 data x
+> Test 3 Inline failed, sigurg 23 len 63 data x
+> Test 3 Inline failed, sigurg 23 len 63 data x
+> Test 3 Inline failed, sigurg 23 len 63 data x
+> Test 2 Inline failed, len 63 atmark 1
+> Test 3.1 Inline failed, len 1 oob % atmark 0
+> Test 2 failed, sigurg 23 len 63 OOB %
+> marvin@defiant:~/linux/kernel/linux_torvalds$ uname -rms
+> Linux 6.5.0-060500rc4-generic x86_64
+> marvin@defiant:~/linux/kernel/linux_torvalds$
+> 
+> At moments, I was able to reproduce with certain configs, but now something odd happens.
+> 
+> I will keep investigating.
 
-I agree with Johannes, this commit message is too thin.
+Please not that the bug persisted in 6.5-rc6:
 
-It makes sense to give a summary of the discussion, because it show us
-(page_pool maintainers) what you concluded for the discussion.
+marvin@defiant:~/linux/kernel/linux_torvalds$ for a in {0..100000}; do !!; done
+for a in {0..100000}; do tools/testing/selftests/net/af_unix/test_unix_oob ; done
+Test 2 failed, sigurg 23 len 63 OOB %
+Test 2 Inline failed, len 63 atmark 1
+Test 3 Inline failed, sigurg 23 len 63 data x
+Test 2 failed, sigurg 23 len 63 OOB %
+Test 3.1 Inline failed, len 1 oob % atmark 0
+Test 3 Inline failed, sigurg 23 len 63 data x
+Test 1 Inline failed, sigurg 0 len 63
+Test 1 Inline failed, sigurg 0 len 63
+Test 3.1 Inline failed, len 1 oob % atmark 0
+Test 1 Inline failed, sigurg 0 len 63
+Test 2 failed, sigurg 23 len 63 OOB %
+Test 1 Inline failed, sigurg 0 len 63
+Test 2 failed, sigurg 23 len 63 OOB %
+Test 3.1 Inline failed, len 1 oob % atmark 0
+Test 3.1 Inline failed, len 1 oob % atmark 0
+marvin@defiant:~/linux/kernel/linux_torvalds$
 
-Further more, you also send another patch:
-  - "[PATCH net-next] page_pool: Set page pool size"
-  - 
-https://lore.kernel.org/all/20230809021920.913324-1-rkannoth@marvell.com/
+The bug can be triggered as a non-privileged user, but is not clear whether it is exploitable to elevate privileges.
 
-That patch solves the issue for your driver marvell/octeontx2 and I like
-than change.
-
-Why did you conclude that PP core should also change?
-
---Jesper
-(p.s. Cc/To list have gotten excessive with 89 recipients)
-
-
-
+Best regards,
+Mirsad Todorovac
 
