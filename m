@@ -1,119 +1,249 @@
-Return-Path: <netdev+bounces-27448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91CE977C067
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:11:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F1177C06F
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:11:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C65A92811FF
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:11:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1957E1C20B50
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9A6CA66;
-	Mon, 14 Aug 2023 19:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED874CA67;
+	Mon, 14 Aug 2023 19:11:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD77C2CE
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:11:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3087DC433C9;
-	Mon, 14 Aug 2023 19:11:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692040270;
-	bh=SKT9AcALWyy63u4qVauRO5pzUnSm/sXbOePBOf6TjoY=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=LCgb6Cnf+prC8blAbTgElCbyFUWLVZTEvIGHG7A2phGLMApQ0OzRpjQ40kCn1BeHC
-	 28NtqSbakhlxyLDpiCZkK35dvaTi4Wk5VpxzuGESMSM4fo6VeExkaeuf0HRNKf8uhr
-	 EfQrSeDFMGydlPbSvjHqbOH240zwdR7JP9Y1H9a25D4tt73Ws+82OAWWeCd5Z0mW3O
-	 1rdC41y3wWgzP90WLWHs9S2cdplXshzYfNVA6wVcV2jJiTyzIQOpPJ7YEQdGvuzWSo
-	 Ukzy2lqIk+BNk7H9TjI/11IEFPyFe0CF6/pISNrQPLV2Grw+G3XJJqMhznpKi97cbH
-	 TMotDBrCBDLeg==
-Message-ID: <f3bca29ab509069b8fe947672eb19bc1926a97ab.camel@kernel.org>
-Subject: Re: [PATCH v2] sunrpc: set the bv_offset of first bvec in
- svc_tcp_sendmsg
-From: Jeff Layton <jlayton@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: David Howells <dhowells@redhat.com>, Trond Myklebust
- <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, Neil
- Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
- <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-nfs@vger.kernel.org,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Mon, 14 Aug 2023 15:11:07 -0400
-In-Reply-To: <ZNp5nzfLGij7O5/k@tissot.1015granger.net>
-References: <20230814-sendpage-v2-1-f56d1a25926c@kernel.org>
-	 <ZNp5nzfLGij7O5/k@tissot.1015granger.net>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E223BCA4B
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:11:54 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0D41702
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:11:51 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99c93638322so970411166b.1
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:11:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692040310; x=1692645110;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Mo9zfMF4rzhISKZ3uWZNmfx0/F+q0VWq5mhKXrJtzwg=;
+        b=G5LuqB47KqASYkQCxngknTDuDLpMahbLF9i4GmcHbdeToC9cx/igeI7mCHVSSwX8UT
+         pWG+tKcn+L8FnXY2Xu5D0jKhRkjL8cqEq8D7iZlRONg6d6kNri+A391waYWwsa1h4Ydh
+         E7EU8RH/S3N/YibvbVEeoKa+aTHRodd7nL635F+bWm0a0hiaSiz0irCxfaUQP6Lj2V9W
+         Q+QUiRlxhJfWZEGZK0VVhqzelgNSa9RmXfIw67gPMNovAyx9xp/M5TF+UhCreJA8DAtu
+         PqQbFxI8jXMgXo/dqfSb9L8s64JdVTogaLBajvRM+kP/soAF7TOvGUpM65c5A/QwXr1I
+         +foA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692040310; x=1692645110;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mo9zfMF4rzhISKZ3uWZNmfx0/F+q0VWq5mhKXrJtzwg=;
+        b=Taavt4Xiz8BR3tYht0LDNHVYJnGSM1JhwpzNUhEi49uX+Z7EGj0HK0MEl00vjE7OLV
+         0ekxhz4ZPYStgmLAVUXZIThXI5gNGgIyFszx64lfDZwH3vUBHMKA1HSzlLvICUH2hUm/
+         hqgDSc4OXf1aESMulexJv1QPH0nnmXkzvgRzAPtX23Yf5qhZA0Pfsp2e3YVLgj67Belk
+         bxNBex6xLNdY+SMXPsnmFDL/wiOl1ciiDlytRfFwzVSDP3l4fl0s/Ee2qqjtPltxViyP
+         fZF/knUgEGrhtLSgb9zvlCwLO0sRsZRCGf0poDWV+1lhIAl+aW3e1JddP42d7x7/hvhq
+         alfw==
+X-Gm-Message-State: AOJu0YwX0r3WsSimO8HmrAZvsurPuBSWeqgaT8bR5nwwAePanth8jLhV
+	OfpjCjJ6pur1GvS2JJJliENqMw==
+X-Google-Smtp-Source: AGHT+IGLcWiHa+m0i2IU1V4krPCSZTNR6TfQG1pTLgEyD0EoKeloaegoQm8ZqHLBojqoawO2eKacvw==
+X-Received: by 2002:a17:907:7789:b0:99b:cdfd:fb44 with SMTP id ky9-20020a170907778900b0099bcdfdfb44mr12190607ejc.9.1692040310238;
+        Mon, 14 Aug 2023 12:11:50 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.214.188])
+        by smtp.gmail.com with ESMTPSA id s6-20020a170906454600b0099cd1c0cb21sm5892574ejq.129.2023.08.14.12.11.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 12:11:49 -0700 (PDT)
+Message-ID: <2d672791-2194-8d66-9de2-a8bf0e4db088@linaro.org>
+Date: Mon, 14 Aug 2023 21:11:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH 3/5] dt-bindings: net: Add Loongson-1 DWMAC glue layer
+Content-Language: en-US
+To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Serge Semin <Sergey.Semin@baikalelectronics.ru>
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+ <20230812151135.1028780-4-keguang.zhang@gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230812151135.1028780-4-keguang.zhang@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 2023-08-14 at 14:59 -0400, Chuck Lever wrote:
-> On Mon, Aug 14, 2023 at 01:36:54PM -0400, Jeff Layton wrote:
-> > svc_tcp_sendmsg used to factor in the xdr->page_base when sending pages=
-,
-> > but 5df5dd03a8f7 dropped that part of the handling. Fix it by setting
-> > the bv_offset of the first bvec.
-> >=20
-> > Fixes: 5df5dd03a8f7 ("sunrpc: Use sendmsg(MSG_SPLICE_PAGES) rather then=
- sendpage")
-> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
->=20
-> LGTM. However, nfsd-fixes does not have 5df5dd03a8f7 because the
-> previous nfsd-next was merged into v6.5 before David's
-> MSG_SPLICE_PAGES work was merged.
->=20
-> Unless someone has a better suggestion, I'll rebase nfsd-fixes to
-> v6.5-r6 and apply this fix to send to Linus.
->=20
+On 12/08/2023 17:11, Keguang Zhang wrote:
+> Add devicetree binding document for Loongson-1 DWMAC glue layer.
+> 
+> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> ---
+>  .../bindings/net/loongson,ls1x-dwmac.yaml     | 98 +++++++++++++++++++
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |  2 +
+>  2 files changed, 100 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> new file mode 100644
+> index 000000000000..150799460599
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> @@ -0,0 +1,98 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/loongson,ls1x-dwmac.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Loongson-1 DWMAC glue layer
+> +
+> +maintainers:
+> +  - Keguang Zhang <keguang.zhang@gmail.com>
+> +
+> +select:
+> +  properties:
+> +    compatible:
+> +      contains:
+> +        enum:
+> +          - loongson,ls1b-dwmac
+> +          - loongson,ls1c-dwmac
+> +  required:
+> +    - compatible
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - enum:
+> +          - loongson,ls1b-dwmac
+> +          - loongson,ls1c-dwmac
+> +      - const: snps,dwmac-3.50a
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    const: stmmaceth
 
-ACK. That's probably safer than trying to pull in the big rework at the
-last minute.
+This should be list (items) with one const item.
 
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  interrupt-names:
+> +    const: macirq
 
->=20
-> > ---
-> > Changes in v2:
-> > - limit the change to just svc_tcp_sendmsg
-> > ---
-> >  net/sunrpc/svcsock.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >=20
-> > diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-> > index e43f26382411..2eb8df44f894 100644
-> > --- a/net/sunrpc/svcsock.c
-> > +++ b/net/sunrpc/svcsock.c
-> > @@ -1244,6 +1244,9 @@ static int svc_tcp_sendmsg(struct socket *sock, s=
-truct xdr_buf *xdr,
-> >  	if (ret !=3D head->iov_len)
-> >  		goto out;
-> > =20
-> > +	if (xdr_buf_pagecount(xdr))
-> > +		xdr->bvec[0].bv_offset =3D offset_in_page(xdr->page_base);
-> > +
-> >  	msg.msg_flags =3D MSG_SPLICE_PAGES;
-> >  	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, xdr->bvec,
-> >  		      xdr_buf_pagecount(xdr), xdr->page_len);
-> >=20
-> > ---
-> > base-commit: 2ccdd1b13c591d306f0401d98dedc4bdcd02b421
-> > change-id: 20230814-sendpage-b04874eed249
-> >=20
-> > Best regards,
-> > --=20
-> > Jeff Layton <jlayton@kernel.org>
-> >=20
->=20
+Ditto
 
---=20
-Jeff Layton <jlayton@kernel.org>
+> +
+> +  syscon:
+
+Let me quote:
+
+"Phandle to syscon device requires a vendor, descriptive name and a
+description"
+
+You only got description right.
+
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Phandle to the syscon containing some extra configurations
+> +      including PHY interface mode.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - clock-names
+> +  - interrupts
+> +  - interrupt-names
+> +  - phy-handle
+> +  - phy-mode
+
+Drop, it is not defined here and already required by snps,dwmac.
+
+> +  - syscon
+> +
+> +allOf:
+> +  - $ref: snps,dwmac.yaml#
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +
+> +    gmac0: ethernet@1fe10000 {
+> +        compatible = "loongson,ls1b-dwmac", "snps,dwmac-3.50a";
+> +        reg = <0x1fe10000 0x10000>;
+> +
+> +        clocks = <&clkc LS1X_CLKID_AHB>;
+> +        clock-names = "stmmaceth";
+> +
+> +        interrupt-parent = <&intc1>;
+> +        interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
+> +        interrupt-names = "macirq";
+> +
+> +        phy-handle = <&phy0>;
+> +        phy-mode = "mii";
+> +
+> +        snps,pbl = <1>;
+> +        syscon = <&syscon>;
+> +
+> +        mdio {
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +            compatible = "snps,dwmac-mdio";
+> +
+> +            phy0: ethernet-phy@0 {
+> +                reg = <0x0>;
+> +            };
+> +        };
+> +    };
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index ddf9522a5dc2..e1a956cf171e 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -66,6 +66,8 @@ properties:
+>          - ingenic,x2000-mac
+>          - loongson,ls2k-dwmac
+>          - loongson,ls7a-dwmac
+> +        - loongson,ls1b-dwmac
+> +        - loongson,ls1c-dwmac
+
+You should not need it. Isn't snps,dwmac-3.50a already there? Anyway,
+not alphabetically ordered...
+
+>          - qcom,qcs404-ethqos
+>          - qcom,sa8775p-ethqos
+>          - qcom,sc8280xp-ethqos
+
+Best regards,
+Krzysztof
+
 
