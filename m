@@ -1,186 +1,312 @@
-Return-Path: <netdev+bounces-27201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9A877AF0E
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 02:48:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6316277AF18
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 03:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1AF6280EFA
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 00:48:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77FD2280ED8
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 01:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E36B39D;
-	Mon, 14 Aug 2023 00:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4201510F2;
+	Mon, 14 Aug 2023 01:10:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F778EBE
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 00:48:49 +0000 (UTC)
-Received: from mail-pl1-f207.google.com (mail-pl1-f207.google.com [209.85.214.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03828E6D
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 17:48:48 -0700 (PDT)
-Received: by mail-pl1-f207.google.com with SMTP id d9443c01a7336-1bbebf511abso45711115ad.1
-        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 17:48:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691974127; x=1692578927;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ffSiHmXmKvWjGufuXWAkAV+GTFU4ol0O8toxVI2rWJk=;
-        b=Hl9CmhWg1GwzdIH0iGjyHIILv9c2FwN+9HuU8yZQ/bobBRBhDLv13Us58Cuu7xgCQE
-         t261HH8opdqhrl3qcyS9GyObFyNTMKl2bRdkDczEuvv99gK3oLgsZN9unfWfoe6U8hmy
-         XXcXKfkxoLbrLKX+xNTimIah34LHLNsdrLG3MOZPWzSAEAguCo7/J1XO87ME4IzKW//v
-         RMvr8drUiX7bYNCJTjI+3NI8L0JMrusLNAfUzyk254TvMoSuKqaziN1UKLBNl/atYqYR
-         PnUHNLNLbttlq3PB3rWIDxENWOSQyGgeTcRDDbqE5SsdUF22DlsLmsD8WNjMMMHAGzhx
-         sYSQ==
-X-Gm-Message-State: AOJu0Yx2Mb7mLLmjAW8KGAVAAAkxOGW7qsd4g60mk7t1KcM4FIQspmQy
-	jSk4ZYYJKSFjtK5sk9st6EoalPSe2i+fLORBJMwzvxdIDhoX
-X-Google-Smtp-Source: AGHT+IGPgJJXdVh8mbvUoK5oesGeh9HjctSCCkMz4+0xqO4BQKMhfhx6Y1y1iuqFPeayyQFbPlzkZFTSzh8oVKrIKjkLtS9ZJD9H
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B734039D
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 01:10:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37007C433C7;
+	Mon, 14 Aug 2023 01:10:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1691975437;
+	bh=sSoPoNHGalzvIc70oDi0FxnGludM4NLeHbZZnOdBj90=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eJZRaOCVMLsbH1+BfzU6qUmRBhziWNQDcW0phtDKDVv9Q/O3xDA63VWTr5k5qxJuH
+	 Mxj5bIAqH3kFZZFDvb5CtFXywQeGtbTn7kgqpUJPWf+kAqjRUZ1ui5kslyh3IENqEI
+	 DsFhdLcLUMYrAb/XosQpGbYGHN9XbRA6mT/i3cF5oc4KawmYhgMIggm/xYUU5RMO/Q
+	 ABjxA4NwmU08k10E/NfmJycF8iwET1HkMcgSYmg7gVpfuNK/phWQI6y9xYIUBWztno
+	 XYKAwZQJ2ioHAr3n77eOROL2fpoi7ZpOEA6tgUkkwSd5M8XfP2wC/Q9tkKzP7JAdx7
+	 y0OvFvXpsvgSg==
+Message-ID: <7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
+Date: Sun, 13 Aug 2023 19:10:35 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:ce84:b0:1b2:436b:931d with SMTP id
- f4-20020a170902ce8400b001b2436b931dmr3390972plg.2.1691974127528; Sun, 13 Aug
- 2023 17:48:47 -0700 (PDT)
-Date: Sun, 13 Aug 2023 17:48:47 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d730410602d76cf6@google.com>
-Subject: [syzbot] [net?] [wireless?] INFO: rcu detected stall in cfg80211_wiphy_work
-From: syzbot <syzbot+b904439e05f11f81ac62@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jiri@nvidia.com, 
-	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
+ dma-buf to netdevice
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>,
+ Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>,
+ stephen@networkplumber.org, sdf@google.com,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20230810015751.3297321-1-almasrymina@google.com>
+ <20230810015751.3297321-3-almasrymina@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230810015751.3297321-3-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 8/9/23 7:57 PM, Mina Almasry wrote:
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 8e7d0cb540cd..02a25ccf771a 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -151,6 +151,8 @@
+>  #include <linux/pm_runtime.h>
+>  #include <linux/prandom.h>
+>  #include <linux/once_lite.h>
+> +#include <linux/genalloc.h>
+> +#include <linux/dma-buf.h>
+> 
+>  #include "dev.h"
+>  #include "net-sysfs.h"
+> @@ -2037,6 +2039,182 @@ static int call_netdevice_notifiers_mtu(unsigned long val,
+>  	return call_netdevice_notifiers_info(val, &info.info);
+>  }
+> 
+> +/* Device memory support */
+> +
+> +static void netdev_devmem_free_chunk_owner(struct gen_pool *genpool,
+> +					   struct gen_pool_chunk *chunk,
+> +					   void *not_used)
+> +{
+> +	struct dmabuf_genpool_chunk_owner *owner = chunk->owner;
+> +
+> +	kvfree(owner->ppiovs);
+> +	kfree(owner);
+> +}
+> +
+> +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding)
+> +{
+> +	size_t size, avail;
+> +
+> +	gen_pool_for_each_chunk(binding->chunk_pool,
+> +				netdev_devmem_free_chunk_owner, NULL);
+> +
+> +	size = gen_pool_size(binding->chunk_pool);
+> +	avail = gen_pool_avail(binding->chunk_pool);
+> +
+> +	if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+> +		  size, avail))
+> +		gen_pool_destroy(binding->chunk_pool);
+> +
+> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
+> +				 DMA_BIDIRECTIONAL);
+> +	dma_buf_detach(binding->dmabuf, binding->attachment);
+> +	dma_buf_put(binding->dmabuf);
+> +	kfree(binding);
+> +}
+> +
+> +void netdev_unbind_dmabuf_to_queue(struct netdev_dmabuf_binding *binding)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	unsigned long xa_idx;
+> +
+> +	list_del_rcu(&binding->list);
+> +
+> +	xa_for_each(&binding->bound_rxq_list, xa_idx, rxq)
+> +		if (rxq->binding == binding)
+> +			rxq->binding = NULL;
+> +
+> +	netdev_devmem_binding_put(binding);
 
-syzbot found the following issue on:
+This does a put on the binding but it does not notify the driver that
+that the dmabuf references need to be flushed from the rx queue.
 
-HEAD commit:    cacc6e22932f tpm: Add a helper for checking hwrng enabled
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13b0b5c7a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3e670757e16affb
-dashboard link: https://syzkaller.appspot.com/bug?extid=b904439e05f11f81ac62
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a49fcda80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=136f8679a80000
+Also, what about the device getting deleted - e.g., the driver is removed?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c18b40f6d56d/disk-cacc6e22.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b270ef22b038/vmlinux-cacc6e22.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/aae3a8e7d564/bzImage-cacc6e22.xz
+> +}
+> +
+> +int netdev_bind_dmabuf_to_queue(struct net_device *dev, unsigned int dmabuf_fd,
+> +				u32 rxq_idx, struct netdev_dmabuf_binding **out)
+> +{
+> +	struct netdev_dmabuf_binding *binding;
+> +	struct netdev_rx_queue *rxq;
+> +	struct scatterlist *sg;
+> +	struct dma_buf *dmabuf;
+> +	unsigned int sg_idx, i;
+> +	unsigned long virtual;
+> +	u32 xa_idx;
+> +	int err;
+> +
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+> +
+> +	if (rxq->binding)
+> +		return -EEXIST;
 
-The issue was bisected to:
+So this proposal is limiting a binding to a single dmabuf at a time? Is
+this just for the RFC?
 
-commit c2368b19807affd7621f7c4638cd2e17fec13021
-Author: Jiri Pirko <jiri@nvidia.com>
-Date:   Fri Jul 29 07:10:35 2022 +0000
+Also, this suggests that the Rx queue is unique to the flow. I do not
+recall a netdev API to create H/W queues on the fly (only a passing
+comment from Kuba), so how is the H/W queue (or queue set since a
+completion queue is needed as well) created for the flow? And in turn if
+it is unique to the flow, what deletes the queue if an app does not do a
+proper cleanup? If the queue sticks around, the dmabuf references stick
+around.
 
-    net: devlink: introduce "unregistering" mark and use it during devlinks iteration
+Also, if this is an app specific h/w queue, flow steering is not
+mentioned in this RFC.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=123267c3a80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=113267c3a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=163267c3a80000
+> +
+> +	dmabuf = dma_buf_get(dmabuf_fd);
+> +	if (IS_ERR_OR_NULL(dmabuf))
+> +		return -EBADFD;
+> +
+> +	binding = kzalloc_node(sizeof(*binding), GFP_KERNEL,
+> +			       dev_to_node(&dev->dev));
+> +	if (!binding) {
+> +		err = -ENOMEM;
+> +		goto err_put_dmabuf;
+> +	}
+> +
+> +	xa_init_flags(&binding->bound_rxq_list, XA_FLAGS_ALLOC);
+> +
+> +	refcount_set(&binding->ref, 1);
+> +
+> +	binding->dmabuf = dmabuf;
+> +
+> +	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
+> +	if (IS_ERR(binding->attachment)) {
+> +		err = PTR_ERR(binding->attachment);
+> +		goto err_free_binding;
+> +	}
+> +
+> +	binding->sgt = dma_buf_map_attachment(binding->attachment,
+> +					      DMA_BIDIRECTIONAL);
+> +	if (IS_ERR(binding->sgt)) {
+> +		err = PTR_ERR(binding->sgt);
+> +		goto err_detach;
+> +	}
+> +
+> +	/* For simplicity we expect to make PAGE_SIZE allocations, but the
+> +	 * binding can be much more flexible than that. We may be able to
+> +	 * allocate MTU sized chunks here. Leave that for future work...
+> +	 */
+> +	binding->chunk_pool = gen_pool_create(PAGE_SHIFT,
+> +					      dev_to_node(&dev->dev));
+> +	if (!binding->chunk_pool) {
+> +		err = -ENOMEM;
+> +		goto err_unmap;
+> +	}
+> +
+> +	virtual = 0;
+> +	for_each_sgtable_dma_sg(binding->sgt, sg, sg_idx) {
+> +		dma_addr_t dma_addr = sg_dma_address(sg);
+> +		struct dmabuf_genpool_chunk_owner *owner;
+> +		size_t len = sg_dma_len(sg);
+> +		struct page_pool_iov *ppiov;
+> +
+> +		owner = kzalloc_node(sizeof(*owner), GFP_KERNEL,
+> +				     dev_to_node(&dev->dev));
+> +		owner->base_virtual = virtual;
+> +		owner->base_dma_addr = dma_addr;
+> +		owner->num_ppiovs = len / PAGE_SIZE;
+> +		owner->binding = binding;
+> +
+> +		err = gen_pool_add_owner(binding->chunk_pool, dma_addr,
+> +					 dma_addr, len, dev_to_node(&dev->dev),
+> +					 owner);
+> +		if (err) {
+> +			err = -EINVAL;
+> +			goto err_free_chunks;
+> +		}
+> +
+> +		owner->ppiovs = kvmalloc_array(owner->num_ppiovs,
+> +					       sizeof(*owner->ppiovs),
+> +					       GFP_KERNEL);
+> +		if (!owner->ppiovs) {
+> +			err = -ENOMEM;
+> +			goto err_free_chunks;
+> +		}
+> +
+> +		for (i = 0; i < owner->num_ppiovs; i++) {
+> +			ppiov = &owner->ppiovs[i];
+> +			ppiov->owner = owner;
+> +			refcount_set(&ppiov->refcount, 1);
+> +		}
+> +
+> +		dma_addr += len;
+> +		virtual += len;
+> +	}
+> +
+> +	/* TODO: need to be able to bind to multiple rx queues on the same
+> +	 * netdevice. The code should already be able to handle that with
+> +	 * minimal changes, but the netlink API currently allows for 1 rx
+> +	 * queue.
+> +	 */
+> +	err = xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit_32b,
+> +		       GFP_KERNEL);
+> +	if (err)
+> +		goto err_free_chunks;
+> +
+> +	rxq->binding = binding;
+> +	*out = binding;
+> +
+> +	return 0;
+> +
+> +err_free_chunks:
+> +	gen_pool_for_each_chunk(binding->chunk_pool,
+> +				netdev_devmem_free_chunk_owner, NULL);
+> +	gen_pool_destroy(binding->chunk_pool);
+> +err_unmap:
+> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
+> +				 DMA_BIDIRECTIONAL);
+> +err_detach:
+> +	dma_buf_detach(dmabuf, binding->attachment);
+> +err_free_binding:
+> +	kfree(binding);
+> +err_put_dmabuf:
+> +	dma_buf_put(dmabuf);
+> +	return err;
+> +}
+> +
+>  #ifdef CONFIG_NET_INGRESS
+>  static DEFINE_STATIC_KEY_FALSE(ingress_needed_key);
+> 
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index bf7324dd6c36..288ed0112995 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c> @@ -167,10 +231,37 @@ static int netdev_genl_netdevice_event(struct
+notifier_block *nb,
+>  	return NOTIFY_OK;
+>  }
+> 
+> +static int netdev_netlink_notify(struct notifier_block *nb, unsigned long state,
+> +				 void *_notify)
+> +{
+> +	struct netlink_notify *notify = _notify;
+> +	struct netdev_dmabuf_binding *rbinding;
+> +
+> +	if (state != NETLINK_URELEASE || notify->protocol != NETLINK_GENERIC)
+> +		return NOTIFY_DONE;
+> +
+> +	rcu_read_lock();
+> +
+> +	list_for_each_entry_rcu(rbinding, &netdev_rbinding_list, list) {
+> +		if (rbinding->owner_nlportid == notify->portid) {
+> +			netdev_unbind_dmabuf_to_queue(rbinding);
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b904439e05f11f81ac62@syzkaller.appspotmail.com
-Fixes: c2368b19807a ("net: devlink: introduce "unregistering" mark and use it during devlinks iteration")
+This ties the removal of a dmabuf to the close of the netlink socket as
+suggested in the previous round of comments. What happens if the process
+closes the dmabuf fd? Is the outstanding dev binding sufficient to keep
+the allocation / use in place?
 
-rcu: INFO: rcu_preempt self-detected stall on CPU
-rcu: 	1-....: (10490 ticks this GP) idle=5a24/1/0x4000000000000000 softirq=8393/8393 fqs=5242
-rcu: 	         hardirqs   softirqs   csw/system
-rcu: 	 number:        0          0            0
-rcu: 	cputime:    25922      26566          195   ==> 52500(ms)
-rcu: 	(t=10502 jiffies g=5333 q=584 ncpus=2)
-CPU: 1 PID: 5054 Comm: kworker/1:4 Not tainted 6.5.0-rc5-syzkaller-00056-gcacc6e22932f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-Workqueue: events cfg80211_wiphy_work
-RIP: 0010:taprio_dequeue_tc_priority+0x266/0x4b0 net/sched/sch_taprio.c:798
-Code: 10 89 ef 44 89 f6 e8 39 b5 2c f9 44 39 f5 0f 84 40 ff ff ff e8 3b ba 2c f9 49 83 ff 0f 0f 87 e1 01 00 00 48 8b 04 24 0f b6 00 <38> 44 24 36 7c 08 84 c0 0f 85 bf 01 00 00 8b 33 8b 4c 24 30 48 8b
-RSP: 0018:ffffc900001e0d60 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: ffff88802b8e7394 RCX: 0000000000000100
-RDX: ffff888076ac0000 RSI: ffffffff88594e65 RDI: 0000000000000004
-RBP: 0000000000000008 R08: 0000000000000004 R09: 0000000000000008
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000010
-R13: ffff88807af8ab60 R14: 0000000000000000 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000600 CR3: 0000000022134000 CR4: 0000000000350ee0
-Call Trace:
- <IRQ>
- taprio_dequeue+0x12e/0x5f0 net/sched/sch_taprio.c:868
- dequeue_skb net/sched/sch_generic.c:292 [inline]
- qdisc_restart net/sched/sch_generic.c:397 [inline]
- __qdisc_run+0x1c4/0x19d0 net/sched/sch_generic.c:415
- qdisc_run include/net/pkt_sched.h:125 [inline]
- qdisc_run include/net/pkt_sched.h:122 [inline]
- net_tx_action+0x71e/0xc80 net/core/dev.c:5049
- __do_softirq+0x218/0x965 kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu kernel/softirq.c:632 [inline]
- irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1109
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
-RIP: 0010:__ieee80211_link_release_channel+0x2/0x450 net/mac80211/chan.c:1778
-Code: 89 f7 e8 81 1f 21 f8 e9 44 e0 ff ff 4c 89 f7 e8 74 1f 21 f8 e9 fe fb ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 41 57 <41> 56 41 55 41 54 55 53 48 89 fb e8 3e 15 cd f7 48 89 da 48 b8 00
-RSP: 0018:ffffc90003cff768 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff888076ac0000 RSI: ffffffff89b909f5 RDI: ffff8880677463a8
-RBP: ffff8880677463a8 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff888067744c80
-R13: ffffc90003cff890 R14: ffff888066980e20 R15: ffff888067746c82
- ieee80211_link_use_channel+0x2dd/0x750 net/mac80211/chan.c:1849
- __ieee80211_sta_join_ibss+0x5f3/0x17e0 net/mac80211/ibss.c:303
- ieee80211_sta_create_ibss+0x206/0x410 net/mac80211/ibss.c:1352
- ieee80211_sta_find_ibss net/mac80211/ibss.c:1482 [inline]
- ieee80211_ibss_work+0xc19/0x15a0 net/mac80211/ibss.c:1709
- ieee80211_iface_work+0xbb8/0xd40 net/mac80211/iface.c:1680
- cfg80211_wiphy_work+0x24e/0x330 net/wireless/core.c:435
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:389
- ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
