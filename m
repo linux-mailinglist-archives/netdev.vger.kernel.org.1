@@ -1,87 +1,122 @@
-Return-Path: <netdev+bounces-27213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1723277AF86
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 04:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C65677AF9D
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 04:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47CD31C2086B
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 02:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 080711C208F4
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 02:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B070915BE;
-	Mon, 14 Aug 2023 02:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F98E17F5;
+	Mon, 14 Aug 2023 02:39:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27231381
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 02:31:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B69D3C433C7;
-	Mon, 14 Aug 2023 02:31:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691980263;
-	bh=VWxsrgrmzgiFVeh4uApFFOq1bvVtEbfmqGxK5dcHgJE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SqNYowo89QH+fv5UYg6/rjtlSX8A654pS4ZglHks3eafCI4ipt5BTaf8h2y1eUBkK
-	 KKUWawzDfLHRwDYCXYWmHgIYFpbmhkcSR4avxjw7AGHLB5vH5jIMSjpSGzQqz3Y8FL
-	 rZWeuQEhJbzyz6C+gUUDIiAXrZFyvTYWN6eN4jNsyuloz01ncxvPuLi8cz+7pwIf2l
-	 546uPdmjU1Cu01L7CK3vpdLnL+QX2vp/FF5RU1IvTxLvh+2nzUYLm6x8a/6X7YhR5Y
-	 NMHuEsHCpiuYk6O1FlUO9eE79p7M0yZRNMOxK8UGFtb2NLc20YWYSvubBLmiikhMoT
-	 WgdQYSnyEOzPg==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Chris Lew <quic_clew@quicinc.com>,
-	Bjorn Andersson <quic_bjorande@quicinc.com>
-Cc: Alex Elder <elder@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-remoteproc@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: (subset) [PATCH v2 0/4] soc: qcom: aoss: Introduce debugfs interface and cleanup things
-Date: Sun, 13 Aug 2023 19:33:50 -0700
-Message-ID: <169198038111.2378845.5285992748905331833.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230811205839.727373-1-quic_bjorande@quicinc.com>
-References: <20230811205839.727373-1-quic_bjorande@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64ED51381
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 02:39:37 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B0E2E5C;
+	Sun, 13 Aug 2023 19:39:36 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-52557cc5e7bso1236109a12.0;
+        Sun, 13 Aug 2023 19:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691980774; x=1692585574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o88IqoMul1NmqneJL1pozmAF/JAULtWS//3BlTdUYhw=;
+        b=dx21bchEmSOgW5N3EaIdXyNZMMaPjqDFkAXC3jm7P2oIhejYkgnucnK+3RgO24hLQ6
+         G7DVRadbYUeOpFMCJ47uxtwJkQ//MtaOsVYMbvzzfle/qUjYZR3gplWY8sQQ7yWAmEJ3
+         n7AOwH6jvNVAgMtL2sMSSP/v4XGz8CfG3BJk5l2GoFeSMBWppWbJ8P/HNfIvbYyI17DA
+         uNMTHQhWtBATZTt2o+3pdoCdxK/rb+0290MS5BQ2OwFwWV/i7MxIikxt3CzvGvSndqU4
+         QKbkknYwg1XFltEBOLovboZsqdsZRI/9aLaqAlwInWg3sAnZX7INWlMGdu4zEDnyc93v
+         3v+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691980774; x=1692585574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o88IqoMul1NmqneJL1pozmAF/JAULtWS//3BlTdUYhw=;
+        b=gd1lC6b58iIX5xSeuZhOZvqNe7x3DUrm5Sk0lkUVePdASrOEEoo50keVgOexl5zysV
+         Tgr3FNPjGBBYGpxzu6HRVA4dEnLwWJYeTp4wnVf8J09Ijm0c2MiAFaeN7PED33adGUKp
+         2iuU9ObnDcxAZfYpwcvbLbxHSrmBr/aL3KmfRkqaYZuUBeMxH3X9gv7Gpo0AQw2/s9wv
+         D50bdOVrw2JwjVBCymgvgvdBuyHTdMe17+E4MPm1AeE30XAkKbz8KvLLcPOi7RBQ4rG0
+         Xc5b+jc1oFFS4JDzKXQGjPSulUAkJ+9neIC0AfY5aeuKL94jVMAaxqY4PQ3Lj8bSE1e0
+         WyLg==
+X-Gm-Message-State: AOJu0YwFNxxofwZ8Ij0ZIpYW1nDxC1qTHQoQQcOtN16uVWsuAMidJfBO
+	9Jhii2/OTjUe2V3yXLLjTXo8XZRYE2cza0PcwMc=
+X-Google-Smtp-Source: AGHT+IH5OtWDXARgolJQKyqZo0mDfZ3BN8MY79h7fU3Mkky5lG/CWHlqGHigQFgUTdawJ08wpQoU2tcutsoFIOTpQyU=
+X-Received: by 2002:aa7:d84e:0:b0:523:c6fa:871d with SMTP id
+ f14-20020aa7d84e000000b00523c6fa871dmr7701653eds.19.1691980774374; Sun, 13
+ Aug 2023 19:39:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com> <2ed268fd-113a-4da0-8f33-04d618053dca@lunn.ch>
+In-Reply-To: <2ed268fd-113a-4da0-8f33-04d618053dca@lunn.ch>
+From: Keguang Zhang <keguang.zhang@gmail.com>
+Date: Mon, 14 Aug 2023 10:39:18 +0800
+Message-ID: <CAJhJPsWPnsPkp95G2wRfAdw6u7v9SfgqgMUUH3s+2Us2ue4F9g@mail.gmail.com>
+Subject: Re: [PATCH 0/5] Move Loongson1 MAC arch-code to the driver dir
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+
+On Sun, Aug 13, 2023 at 11:24=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> On Sat, Aug 12, 2023 at 11:11:30PM +0800, Keguang Zhang wrote:
+> > From: Kelvin Zhang <kelvin.zhang@amlogic.com>
+> >
+> > In order to convert Loongson1 MAC platform devices to the devicetree
+> > nodes, Loongson1 MAC arch-code should be moved to the driver dir.
+> >
+> > In other words, this patchset is a preparation for converting
+> > Loongson1 platform devices to devicetree.
+>
+> It is a long time since i converted an ARM system from platform data
+> to DT. But what we tended to do was to allow both for a period of
+> time.
+>
+> Does a system using platform data still work after this change? The
+> first patch seems to delete a lot of code, not just move it around.
+>
+> Can you restructure this patchset to add the glue layer and DT binding
+> in parallel with platform data. Then have a patchset which convert all
+> in tree machines to using DT. And then a patchset, submitted in maybe
+> 6 months time, to remove support for platform data.
+>
+Sure, I will keep the platform data from the next version.
+Thanks!
+
+>         Andrew
 
 
-On Fri, 11 Aug 2023 13:58:35 -0700, Bjorn Andersson wrote:
-> The Always On Processor supports a number useful commands for affecting
-> system resources during in various debug scenarious. Introduce a debugfs
-> interface for allowing the debugger/tester to send these commands.
-> 
-> While at it, let's make some improvements to the qmp_send() API.
-> 
-> 
-> [...]
 
-Applied, thanks!
-
-[1/4] soc: qcom: aoss: Move length requirements from caller
-      commit: 59e09100836fdb618b107c37189d6001b5825872
-[3/4] soc: qcom: aoss: Format string in qmp_send()
-      commit: 8873d1e2f88afbe89c99d8f49f88934a2da2991f
-[4/4] soc: qcom: aoss: Tidy up qmp_send() callers
-      commit: b4f63bbff96e4510676b1e78b00d14baaee9ad29
-
-
-Please note that I did not pick the debugfs interface (patch 2/4).
-
+--=20
 Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+
+Keguang Zhang
 
