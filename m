@@ -1,434 +1,99 @@
-Return-Path: <netdev+bounces-27228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A937377AFEA
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 05:15:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F28877AFEF
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 05:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A351C20974
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 03:15:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC931C204F5
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 03:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B9E1FBE;
-	Mon, 14 Aug 2023 03:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A44020F1;
+	Mon, 14 Aug 2023 03:23:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2357A1FA8
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:15:33 +0000 (UTC)
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1016B124
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:15:32 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-447684c4283so1393012137.2
-        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691982931; x=1692587731;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NZznD3nQHeXt8rIyMKVuEIcq9PJ86Iyh5+Zr5YBSO+k=;
-        b=lXEI8IIbpI8n48sOXr3hvDhwYRWLaTDyqwUEopiyBDxsyroPfxCckgLGtJrXmuv5yh
-         NITt110gJN2BMfkRU1xGplJ26ZK+qKQYRffILXAItJkaK4lRLuHZEjYZnTLKLtvDUqJF
-         z7fg+TOKpH+fPM8941NM360b/HAbCg3iUhHaTjpugygGNaOEuGA70Vn21HawfugEFCHN
-         weYVPYF8lD67+G+frhtycpgZgoVDHLTM84707d7QIVuIwrnObyG/HuCplkhnYX4L7uLn
-         kpNluRS6K8yqfS8UmbWRKOBDZPkS1CpKRnOyJ9iUYQ/0FwVbEK8YSR90IlMxJBL0hGjF
-         sy3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691982931; x=1692587731;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NZznD3nQHeXt8rIyMKVuEIcq9PJ86Iyh5+Zr5YBSO+k=;
-        b=Rc8XK0hpoj4tvE4VWm7cD0wH/V6SGq6ztrZUBNtZ/LB4ATbMtm8/k3fjmORdBDgAs/
-         ZVdxMhQ/fwKJLYBNQ3ngyEFKN8/rEM++Dmn6XTjG5fKIbcwKIqcbilSklYSQWu2ExXyV
-         FXapcb3b1wzvfgOPQcex9SYpjmzA93PJB8OwyzyQBQKUDb87w/vWy8KmZICwj6dIvDRK
-         D3p0Vz7suY5nWmPjQU9JOLaBIW6Dvii2CqZ3VvDdC6+Ab1VI54CyiHU7XE5GusNnru/t
-         ZzJgZEPOOfRMOzGmEXnYH6zCtoXXMgP1AFmT58Lrrfrh4f2R11edA1CbNYBw6JHMLsLj
-         rZyA==
-X-Gm-Message-State: AOJu0YxTtpGSca8G3JHhzMsTviPDwg0vvKm+cJpauv2ZCSiX1C235nhG
-	1rRJ9vtU07rDB7uEugPR7dfshoxJXl1144Bfllnt2g==
-X-Google-Smtp-Source: AGHT+IEa0Tg5PtzOiTQt+NYNH3vBjS+uoUdGntOpsIviOEZ20x4xyWrm76A5rrriWvNB4qP5/8xSY+FG1P2Nd69YIWc=
-X-Received: by 2002:a67:ffd1:0:b0:444:e9a0:13f7 with SMTP id
- w17-20020a67ffd1000000b00444e9a013f7mr8062119vsq.5.1691982930754; Sun, 13 Aug
- 2023 20:15:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F357D1FCE
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:23:12 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5850E110
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:23:11 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RPKSb4tWgzrSDV;
+	Mon, 14 Aug 2023 11:21:51 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 14 Aug 2023 11:23:09 +0800
+From: Ziyang Xuan <william.xuanziyang@huawei.com>
+To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<idosch@idosch.org>
+CC: <kaber@trash.net>
+Subject: [PATCH net] team: Fix incorrect deletion of ETH_P_8021AD protocol vid from slaves
+Date: Mon, 14 Aug 2023 11:23:01 +0800
+Message-ID: <20230814032301.2804971-1-william.xuanziyang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-3-almasrymina@google.com> <7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
-In-Reply-To: <7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 13 Aug 2023 20:15:19 -0700
-Message-ID: <CAHS8izMpw6+5mUkk0=VxWPkxAiZVa5G_rhTC1MwctoAo1SqoxQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
- dma-buf to netdevice
-To: David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org, 
-	sdf@google.com, Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 13, 2023 at 6:10=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 8/9/23 7:57 PM, Mina Almasry wrote:
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 8e7d0cb540cd..02a25ccf771a 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -151,6 +151,8 @@
-> >  #include <linux/pm_runtime.h>
-> >  #include <linux/prandom.h>
-> >  #include <linux/once_lite.h>
-> > +#include <linux/genalloc.h>
-> > +#include <linux/dma-buf.h>
-> >
-> >  #include "dev.h"
-> >  #include "net-sysfs.h"
-> > @@ -2037,6 +2039,182 @@ static int call_netdevice_notifiers_mtu(unsigne=
-d long val,
-> >       return call_netdevice_notifiers_info(val, &info.info);
-> >  }
-> >
-> > +/* Device memory support */
-> > +
-> > +static void netdev_devmem_free_chunk_owner(struct gen_pool *genpool,
-> > +                                        struct gen_pool_chunk *chunk,
-> > +                                        void *not_used)
-> > +{
-> > +     struct dmabuf_genpool_chunk_owner *owner =3D chunk->owner;
-> > +
-> > +     kvfree(owner->ppiovs);
-> > +     kfree(owner);
-> > +}
-> > +
-> > +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *bindin=
-g)
-> > +{
-> > +     size_t size, avail;
-> > +
-> > +     gen_pool_for_each_chunk(binding->chunk_pool,
-> > +                             netdev_devmem_free_chunk_owner, NULL);
-> > +
-> > +     size =3D gen_pool_size(binding->chunk_pool);
-> > +     avail =3D gen_pool_avail(binding->chunk_pool);
-> > +
-> > +     if (!WARN(size !=3D avail, "can't destroy genpool. size=3D%lu, av=
-ail=3D%lu",
-> > +               size, avail))
-> > +             gen_pool_destroy(binding->chunk_pool);
-> > +
-> > +     dma_buf_unmap_attachment(binding->attachment, binding->sgt,
-> > +                              DMA_BIDIRECTIONAL);
-> > +     dma_buf_detach(binding->dmabuf, binding->attachment);
-> > +     dma_buf_put(binding->dmabuf);
-> > +     kfree(binding);
-> > +}
-> > +
-> > +void netdev_unbind_dmabuf_to_queue(struct netdev_dmabuf_binding *bindi=
-ng)
-> > +{
-> > +     struct netdev_rx_queue *rxq;
-> > +     unsigned long xa_idx;
-> > +
-> > +     list_del_rcu(&binding->list);
-> > +
-> > +     xa_for_each(&binding->bound_rxq_list, xa_idx, rxq)
-> > +             if (rxq->binding =3D=3D binding)
-> > +                     rxq->binding =3D NULL;
-> > +
-> > +     netdev_devmem_binding_put(binding);
->
-> This does a put on the binding but it does not notify the driver that
-> that the dmabuf references need to be flushed from the rx queue.
->
+Similar to commit 01f4fd270870 ("bonding: Fix incorrect deletion of
+ETH_P_8021AD protocol vid from slaves"), we can trigger BUG_ON(!vlan_info)
+in unregister_vlan_dev() with the following testcase:
 
-Correct, FWIW this is called out in the commit message of this patch,
-and is a general issue with all memory providers and not really
-specific to the memory provider added for devmem TCP. Jakub described
-the issue in the cover letter of the memory provider proposal:
-https://lore.kernel.org/netdev/20230707183935.997267-1-kuba@kernel.org/
+  # ip netns add ns1
+  # ip netns exec ns1 ip link add team1 type team
+  # ip netns exec ns1 ip link add team_slave type veth peer veth2
+  # ip netns exec ns1 ip link set team_slave master team1
+  # ip netns exec ns1 ip link add link team_slave name team_slave.10 type vlan id 10 protocol 802.1ad
+  # ip netns exec ns1 ip link add link team1 name team1.10 type vlan id 10 protocol 802.1ad
+  # ip netns exec ns1 ip link set team_slave nomaster
+  # ip netns del ns1
 
-For now the selftest triggers a driver reset after bind & unbind for
-the configuration to take effect. I think the right thing to do is a
-generic solution should be applied to the general memory provider
-proposal and devmem TCP will follow that.
+Add S-VLAN tag related features support to team driver. So the team driver
+will always propagate the VLAN info to its slaves.
 
-One way to resolve this could be to trigger ethtool_ops->reset() call
-on any memory provider configuration, which would recreate the queues
-as part of the reset. Or adding a new API (ethtool op or otherwise)
-which will only recreate the queues (or a specific queue).
+Fixes: 8ad227ff89a7 ("net: vlan: add 802.1ad support")
+Suggested-by: Ido Schimmel <idosch@idosch.org>
+Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+---
+ drivers/net/team/team.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> Also, what about the device getting deleted - e.g., the driver is removed=
-?
->
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+index d3dc22509ea5..382756c3fb83 100644
+--- a/drivers/net/team/team.c
++++ b/drivers/net/team/team.c
+@@ -2200,7 +2200,9 @@ static void team_setup(struct net_device *dev)
+ 
+ 	dev->hw_features = TEAM_VLAN_FEATURES |
+ 			   NETIF_F_HW_VLAN_CTAG_RX |
+-			   NETIF_F_HW_VLAN_CTAG_FILTER;
++			   NETIF_F_HW_VLAN_CTAG_FILTER |
++			   NETIF_F_HW_VLAN_STAG_RX |
++			   NETIF_F_HW_VLAN_STAG_FILTER;
+ 
+ 	dev->hw_features |= NETIF_F_GSO_ENCAP_ALL;
+ 	dev->features |= dev->hw_features;
+-- 
+2.25.1
 
-Good point, I don't think I'm handling that correctly. I'm not sure
-what the solution is at the moment. It probably is not right for the
-bind to do a netdev_hold(), because it doesn't make much sense for the
-dma-buf binding to keep the netdev alive, I think.
-
-So probably the netdev freeing needs to unbind from the dma-buf, and
-the netlink unbind needs to not duplicate the unbind. Should be simple
-to implement I think. Thanks for catching.
-
-> > +}
-> > +
-> > +int netdev_bind_dmabuf_to_queue(struct net_device *dev, unsigned int d=
-mabuf_fd,
-> > +                             u32 rxq_idx, struct netdev_dmabuf_binding=
- **out)
-> > +{
-> > +     struct netdev_dmabuf_binding *binding;
-> > +     struct netdev_rx_queue *rxq;
-> > +     struct scatterlist *sg;
-> > +     struct dma_buf *dmabuf;
-> > +     unsigned int sg_idx, i;
-> > +     unsigned long virtual;
-> > +     u32 xa_idx;
-> > +     int err;
-> > +
-> > +     rxq =3D __netif_get_rx_queue(dev, rxq_idx);
-> > +
-> > +     if (rxq->binding)
-> > +             return -EEXIST;
->
-> So this proposal is limiting a binding to a single dmabuf at a time? Is
-> this just for the RFC?
->
-
-I'm only allowing 1 rx queue to be bound to 1 dma-buf, and that is a
-permanent restriction, I think. It would be amazing if we could bind
-multiple dma-bufs to the same rx queue and the driver could somehow
-know which dma-buf this packet is destined for. Unfortunately I don't
-think drivers can do this without fancy parsing of incoming traffic,
-and devmem TCP is possible without such driver support - as long as we
-restrict 1 dma-buf per queue.
-
-> Also, this suggests that the Rx queue is unique to the flow.  I do not
-> recall a netdev API to create H/W queues on the fly (only a passing
-> comment from Kuba), so how is the H/W queue (or queue set since a
-> completion queue is needed as well) created for the flow? And in turn if
-> it is unique to the flow, what deletes the queue if an app does not do a
-> proper cleanup? If the queue sticks around, the dmabuf references stick
-> around.
->
-
-An RX queue is unique to an application & its dma-buf, not a single
-flow. It is possible for the application to bind its dma-buf to an rx
-queue, then steer multiple flows to that rx queue, and receive
-incoming packets from these multiple flows onto its dma-buf.
-
-Not implemented in this POC RFC, but will be implemented in the next
-version: it should also be possible for the application to bind its
-dma-buf to multiple rx queues, and steer its flows to one of these rx
-queues, and receive incoming packets on the dma-buf.
-
-I'm currently not thinking along the lines of creating a new H/W queue
-for each new devmem flow. Instead, an existing queue gets re-purposed
-for device memory TCP by binding it to a dma-buf and configuring flow
-steering & RSS to steer this dma-buf owner's flows onto this rx queue.
-
-We could go in the direction of creating new H/W queues for each
-dma-buf binding if you think there is some upside. Off the top of my
-head, I think the current model fits in better with the general
-memory-provider plans which configure existing queues rather than
-create new ones.
-
-> Also, if this is an app specific h/w queue, flow steering is not
-> mentioned in this RFC.
->
-
-Technically it's not an app-specific h/w queue. In theory it's also
-possible for multiple applications running under the same user to
-share a single dma-buf which is bound to any number of rx queues, and
-for all these applications to receive incoming packets on the shared
-dma-buf simultaneously.
-
-Flow steering is mentioned as a dependency in the cover letter, but
-I've largely neglected to elaborate on how the use case works
-end-to-end with userspace flow steering & RSS configuration, largely
-because the APIs are flexible to handle many different use cases.
-Sorry about that, I'll add a section regarding that in the next
-iteration.
-
-> > +
-> > +     dmabuf =3D dma_buf_get(dmabuf_fd);
-> > +     if (IS_ERR_OR_NULL(dmabuf))
-> > +             return -EBADFD;
-> > +
-> > +     binding =3D kzalloc_node(sizeof(*binding), GFP_KERNEL,
-> > +                            dev_to_node(&dev->dev));
-> > +     if (!binding) {
-> > +             err =3D -ENOMEM;
-> > +             goto err_put_dmabuf;
-> > +     }
-> > +
-> > +     xa_init_flags(&binding->bound_rxq_list, XA_FLAGS_ALLOC);
-> > +
-> > +     refcount_set(&binding->ref, 1);
-> > +
-> > +     binding->dmabuf =3D dmabuf;
-> > +
-> > +     binding->attachment =3D dma_buf_attach(binding->dmabuf, dev->dev.=
-parent);
-> > +     if (IS_ERR(binding->attachment)) {
-> > +             err =3D PTR_ERR(binding->attachment);
-> > +             goto err_free_binding;
-> > +     }
-> > +
-> > +     binding->sgt =3D dma_buf_map_attachment(binding->attachment,
-> > +                                           DMA_BIDIRECTIONAL);
-> > +     if (IS_ERR(binding->sgt)) {
-> > +             err =3D PTR_ERR(binding->sgt);
-> > +             goto err_detach;
-> > +     }
-> > +
-> > +     /* For simplicity we expect to make PAGE_SIZE allocations, but th=
-e
-> > +      * binding can be much more flexible than that. We may be able to
-> > +      * allocate MTU sized chunks here. Leave that for future work...
-> > +      */
-> > +     binding->chunk_pool =3D gen_pool_create(PAGE_SHIFT,
-> > +                                           dev_to_node(&dev->dev));
-> > +     if (!binding->chunk_pool) {
-> > +             err =3D -ENOMEM;
-> > +             goto err_unmap;
-> > +     }
-> > +
-> > +     virtual =3D 0;
-> > +     for_each_sgtable_dma_sg(binding->sgt, sg, sg_idx) {
-> > +             dma_addr_t dma_addr =3D sg_dma_address(sg);
-> > +             struct dmabuf_genpool_chunk_owner *owner;
-> > +             size_t len =3D sg_dma_len(sg);
-> > +             struct page_pool_iov *ppiov;
-> > +
-> > +             owner =3D kzalloc_node(sizeof(*owner), GFP_KERNEL,
-> > +                                  dev_to_node(&dev->dev));
-> > +             owner->base_virtual =3D virtual;
-> > +             owner->base_dma_addr =3D dma_addr;
-> > +             owner->num_ppiovs =3D len / PAGE_SIZE;
-> > +             owner->binding =3D binding;
-> > +
-> > +             err =3D gen_pool_add_owner(binding->chunk_pool, dma_addr,
-> > +                                      dma_addr, len, dev_to_node(&dev-=
->dev),
-> > +                                      owner);
-> > +             if (err) {
-> > +                     err =3D -EINVAL;
-> > +                     goto err_free_chunks;
-> > +             }
-> > +
-> > +             owner->ppiovs =3D kvmalloc_array(owner->num_ppiovs,
-> > +                                            sizeof(*owner->ppiovs),
-> > +                                            GFP_KERNEL);
-> > +             if (!owner->ppiovs) {
-> > +                     err =3D -ENOMEM;
-> > +                     goto err_free_chunks;
-> > +             }
-> > +
-> > +             for (i =3D 0; i < owner->num_ppiovs; i++) {
-> > +                     ppiov =3D &owner->ppiovs[i];
-> > +                     ppiov->owner =3D owner;
-> > +                     refcount_set(&ppiov->refcount, 1);
-> > +             }
-> > +
-> > +             dma_addr +=3D len;
-> > +             virtual +=3D len;
-> > +     }
-> > +
-> > +     /* TODO: need to be able to bind to multiple rx queues on the sam=
-e
-> > +      * netdevice. The code should already be able to handle that with
-> > +      * minimal changes, but the netlink API currently allows for 1 rx
-> > +      * queue.
-> > +      */
-> > +     err =3D xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit=
-_32b,
-> > +                    GFP_KERNEL);
-> > +     if (err)
-> > +             goto err_free_chunks;
-> > +
-> > +     rxq->binding =3D binding;
-> > +     *out =3D binding;
-> > +
-> > +     return 0;
-> > +
-> > +err_free_chunks:
-> > +     gen_pool_for_each_chunk(binding->chunk_pool,
-> > +                             netdev_devmem_free_chunk_owner, NULL);
-> > +     gen_pool_destroy(binding->chunk_pool);
-> > +err_unmap:
-> > +     dma_buf_unmap_attachment(binding->attachment, binding->sgt,
-> > +                              DMA_BIDIRECTIONAL);
-> > +err_detach:
-> > +     dma_buf_detach(dmabuf, binding->attachment);
-> > +err_free_binding:
-> > +     kfree(binding);
-> > +err_put_dmabuf:
-> > +     dma_buf_put(dmabuf);
-> > +     return err;
-> > +}
-> > +
-> >  #ifdef CONFIG_NET_INGRESS
-> >  static DEFINE_STATIC_KEY_FALSE(ingress_needed_key);
-> >
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index bf7324dd6c36..288ed0112995 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c> @@ -167,10 +231,37 @@ static int netdev_g=
-enl_netdevice_event(struct
-> notifier_block *nb,
-> >       return NOTIFY_OK;
-> >  }
-> >
-> > +static int netdev_netlink_notify(struct notifier_block *nb, unsigned l=
-ong state,
-> > +                              void *_notify)
-> > +{
-> > +     struct netlink_notify *notify =3D _notify;
-> > +     struct netdev_dmabuf_binding *rbinding;
-> > +
-> > +     if (state !=3D NETLINK_URELEASE || notify->protocol !=3D NETLINK_=
-GENERIC)
-> > +             return NOTIFY_DONE;
-> > +
-> > +     rcu_read_lock();
-> > +
-> > +     list_for_each_entry_rcu(rbinding, &netdev_rbinding_list, list) {
-> > +             if (rbinding->owner_nlportid =3D=3D notify->portid) {
-> > +                     netdev_unbind_dmabuf_to_queue(rbinding);
->
-> This ties the removal of a dmabuf to the close of the netlink socket as
-> suggested in the previous round of comments. What happens if the process
-> closes the dmabuf fd? Is the outstanding dev binding sufficient to keep
-> the allocation / use in place?
->
-
-Correct, the outstanding dev binding keeps the dma-buf & its
-attachment in place until the driver no longer needs the binding and
-drops the references.
-
---=20
-Thanks,
-Mina
 
