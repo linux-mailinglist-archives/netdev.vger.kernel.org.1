@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-27315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59AA77B773
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:21:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0447377B76E
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02E5F1C20A6D
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 11:21:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31CFA1C20A33
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 11:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FFABE56;
-	Mon, 14 Aug 2023 11:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAFDBA3F;
+	Mon, 14 Aug 2023 11:19:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8F3BE4F
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 11:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0127ABA39
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 11:19:55 +0000 (UTC)
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2A6E73
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 650EAE65
 	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 04:19:53 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out2.suse.de (Postfix) with ESMTP id 095FD1FD63;
+	by smtp-out2.suse.de (Postfix) with ESMTP id 0552F1FD60;
 	Mon, 14 Aug 2023 11:19:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1692011992; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FQqYYIOb8vWqxiQHbz2yDg7e1e95gSKNG15/a5Zrh7U=;
-	b=UQz5Kw0Jhl2SqwJb68x6iNE8b9ogxAdgsY9+VT8x0w9fa2QsyBLl+Hb4tUUL2y9qtt/qlI
-	Z6YiFvrUEp4tBohaLB2NVnH2Rhco0yeNv8YbkMEQi2xW+Tp4fIQhDkgIlPo66kUMQv04uV
-	aoQF1itEFuIfuKLTDU5qj/Dmwhhibj8=
+	bh=dJedWcfmoMMiDpU3S5/ZkLEN/lbkR52H+V7ZHgteZ9k=;
+	b=F5GTfRsErnzY129niK6o1sLv1XTZMOynYh/fL3PD+XyIaQsIERCBd17CVv3jIuApy8D+26
+	h3nDmD60jMS+p0cuYkplTOqqBsyQUh83MBDyJQIjKxrI2WdimRK1Hp83ZfX7u7DwQvut8c
+	lf3fANbKTZiIbt1OGSjrFqRFVZwOKTQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1692011992;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FQqYYIOb8vWqxiQHbz2yDg7e1e95gSKNG15/a5Zrh7U=;
-	b=B9XHmdlGJw3xfyMQkEjprTznh/1v1y1dGAiOd9n9Kb0oWaSHNjRHO4enHh6eaITLzmmv+X
-	h7gNOVRJBbiMeWBQ==
+	bh=dJedWcfmoMMiDpU3S5/ZkLEN/lbkR52H+V7ZHgteZ9k=;
+	b=+Ab1vE2LwxEtwv4ELwJ31LDjLizgEr38OPkHEm7OHodUQePAwnS12Uh6y75KINaoCmbnad
+	rQXhjeRuawFp8TAQ==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id D8C7B2C149;
+	by relay2.suse.de (Postfix) with ESMTP id DE12D2C14E;
 	Mon, 14 Aug 2023 11:19:51 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id CA57F51CB0C1; Mon, 14 Aug 2023 13:19:51 +0200 (CEST)
+	id D313051CB0C3; Mon, 14 Aug 2023 13:19:51 +0200 (CEST)
 From: Hannes Reinecke <hare@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>,
@@ -57,9 +57,9 @@ Cc: Sagi Grimberg <sagi@grimberg.me>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 01/17] nvme-keyring: register '.nvme' keyring
-Date: Mon, 14 Aug 2023 13:19:27 +0200
-Message-Id: <20230814111943.68325-2-hare@suse.de>
+Subject: [PATCH 02/17] nvme-keyring: define a 'psk' keytype
+Date: Mon, 14 Aug 2023 13:19:28 +0200
+Message-Id: <20230814111943.68325-3-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230814111943.68325-1-hare@suse.de>
 References: <20230814111943.68325-1-hare@suse.de>
@@ -76,166 +76,141 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Register a '.nvme' keyring to hold keys for TLS and DH-HMAC-CHAP and
-add a new config option NVME_KEYRING.
-We need a separate keyring for NVMe as the configuration is done
-via individual commands (eg for configfs), and the usual per-session
-or per-process keyrings can't be used.
+Define a 'psk' keytype to hold the NVMe TLS PSKs.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/common/Kconfig   |  4 ++++
- drivers/nvme/common/Makefile  |  3 ++-
- drivers/nvme/common/keyring.c | 40 +++++++++++++++++++++++++++++++++++
- drivers/nvme/host/core.c      | 10 +++++++--
- include/linux/nvme-keyring.h  | 28 ++++++++++++++++++++++++
- 5 files changed, 82 insertions(+), 3 deletions(-)
- create mode 100644 drivers/nvme/common/keyring.c
- create mode 100644 include/linux/nvme-keyring.h
+ drivers/nvme/common/keyring.c | 94 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 94 insertions(+)
 
-diff --git a/drivers/nvme/common/Kconfig b/drivers/nvme/common/Kconfig
-index 4514f44362dd..641b27adb047 100644
---- a/drivers/nvme/common/Kconfig
-+++ b/drivers/nvme/common/Kconfig
-@@ -2,3 +2,7 @@
- 
- config NVME_COMMON
-        tristate
-+
-+config NVME_KEYRING
-+       bool
-+       select KEYS
-diff --git a/drivers/nvme/common/Makefile b/drivers/nvme/common/Makefile
-index 720c625b8a52..0cbd0b0b8d49 100644
---- a/drivers/nvme/common/Makefile
-+++ b/drivers/nvme/common/Makefile
-@@ -4,4 +4,5 @@ ccflags-y			+= -I$(src)
- 
- obj-$(CONFIG_NVME_COMMON)	+= nvme-common.o
- 
--nvme-common-y			+= auth.o
-+nvme-common-$(CONFIG_NVME_AUTH)	+= auth.o
-+nvme-common-$(CONFIG_NVME_KEYRING) += keyring.o
 diff --git a/drivers/nvme/common/keyring.c b/drivers/nvme/common/keyring.c
-new file mode 100644
-index 000000000000..5cf64b278119
---- /dev/null
+index 5cf64b278119..494dd365052e 100644
+--- a/drivers/nvme/common/keyring.c
 +++ b/drivers/nvme/common/keyring.c
-@@ -0,0 +1,40 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023 Hannes Reinecke, SUSE Labs
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/key-type.h>
-+#include <keys/user-type.h>
-+#include <linux/nvme.h>
-+
-+static struct key *nvme_keyring;
-+
-+key_serial_t nvme_keyring_id(void)
-+{
-+	return nvme_keyring->serial;
-+}
-+EXPORT_SYMBOL_GPL(nvme_keyring_id);
-+
-+int nvme_keyring_init(void)
-+{
-+	nvme_keyring = keyring_alloc(".nvme",
-+				     GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
-+				     current_cred(),
-+				     (KEY_POS_ALL & ~KEY_POS_SETATTR) |
-+				     (KEY_USR_ALL & ~KEY_USR_SETATTR),
-+				     KEY_ALLOC_NOT_IN_QUOTA, NULL, NULL);
-+	if (IS_ERR(nvme_keyring))
-+		return PTR_ERR(nvme_keyring);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(nvme_keyring_init);
-+
-+void nvme_keyring_exit(void)
-+{
-+	key_revoke(nvme_keyring);
-+	key_put(nvme_keyring);
-+}
-+EXPORT_SYMBOL_GPL(nvme_keyring_exit);
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 37b6fa746662..dfc574d0f18d 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -25,6 +25,7 @@
- #include "nvme.h"
- #include "fabrics.h"
- #include <linux/nvme-auth.h>
+@@ -8,6 +8,8 @@
+ #include <linux/key-type.h>
+ #include <keys/user-type.h>
+ #include <linux/nvme.h>
++#include <linux/nvme-tcp.h>
 +#include <linux/nvme-keyring.h>
  
- #define CREATE_TRACE_POINTS
- #include "trace.h"
-@@ -4703,12 +4704,16 @@ static int __init nvme_core_init(void)
- 		result = PTR_ERR(nvme_ns_chr_class);
- 		goto unregister_generic_ns;
- 	}
--
--	result = nvme_init_auth();
-+	result = nvme_keyring_init();
- 	if (result)
- 		goto destroy_ns_chr;
-+	result = nvme_init_auth();
-+	if (result)
-+		goto keyring_exit;
- 	return 0;
+ static struct key *nvme_keyring;
  
-+keyring_exit:
-+	nvme_keyring_exit();
- destroy_ns_chr:
- 	class_destroy(nvme_ns_chr_class);
- unregister_generic_ns:
-@@ -4732,6 +4737,7 @@ static int __init nvme_core_init(void)
- static void __exit nvme_core_exit(void)
+@@ -17,8 +19,94 @@ key_serial_t nvme_keyring_id(void)
+ }
+ EXPORT_SYMBOL_GPL(nvme_keyring_id);
+ 
++static void nvme_tls_psk_describe(const struct key *key, struct seq_file *m)
++{
++	seq_puts(m, key->description);
++	seq_printf(m, ": %u", key->datalen);
++}
++
++static bool nvme_tls_psk_match(const struct key *key,
++			       const struct key_match_data *match_data)
++{
++	const char *match_id;
++	size_t match_len;
++
++	if (!key->description) {
++		pr_debug("%s: no key description\n", __func__);
++		return false;
++	}
++	match_len = strlen(key->description);
++	pr_debug("%s: id %s len %zd\n", __func__, key->description, match_len);
++
++	if (!match_data->raw_data) {
++		pr_debug("%s: no match data\n", __func__);
++		return false;
++	}
++	match_id = match_data->raw_data;
++	pr_debug("%s: match '%s' '%s' len %zd\n",
++		 __func__, match_id, key->description, match_len);
++	return !memcmp(key->description, match_id, match_len);
++}
++
++static int nvme_tls_psk_match_preparse(struct key_match_data *match_data)
++{
++	match_data->lookup_type = KEYRING_SEARCH_LOOKUP_ITERATE;
++	match_data->cmp = nvme_tls_psk_match;
++	return 0;
++}
++
++static struct key_type nvme_tls_psk_key_type = {
++	.name           = "psk",
++	.flags          = KEY_TYPE_NET_DOMAIN,
++	.preparse       = user_preparse,
++	.free_preparse  = user_free_preparse,
++	.match_preparse = nvme_tls_psk_match_preparse,
++	.instantiate    = generic_key_instantiate,
++	.revoke         = user_revoke,
++	.destroy        = user_destroy,
++	.describe       = nvme_tls_psk_describe,
++	.read           = user_read,
++};
++
++static struct key *nvme_tls_psk_lookup(struct key *keyring,
++		const char *hostnqn, const char *subnqn,
++		int hmac, bool generated)
++{
++	char *identity;
++	size_t identity_len = (NVMF_NQN_SIZE) * 2 + 11;
++	key_ref_t keyref;
++	key_serial_t keyring_id;
++
++	identity = kzalloc(identity_len, GFP_KERNEL);
++	if (!identity)
++		return ERR_PTR(-ENOMEM);
++
++	snprintf(identity, identity_len, "NVMe0%c%02d %s %s",
++		 generated ? 'G' : 'R', hmac, hostnqn, subnqn);
++
++	if (!keyring)
++		keyring = nvme_keyring;
++	keyring_id = key_serial(keyring);
++	pr_debug("keyring %x lookup tls psk '%s'\n",
++		 keyring_id, identity);
++	keyref = keyring_search(make_key_ref(keyring, true),
++				&nvme_tls_psk_key_type,
++				identity, false);
++	if (IS_ERR(keyref)) {
++		pr_debug("lookup tls psk '%s' failed, error %ld\n",
++			 identity, PTR_ERR(keyref));
++		kfree(identity);
++		return ERR_PTR(-ENOKEY);
++	}
++	kfree(identity);
++
++	return key_ref_to_ptr(keyref);
++}
++
+ int nvme_keyring_init(void)
  {
- 	nvme_exit_auth();
-+	nvme_keyring_exit();
- 	class_destroy(nvme_ns_chr_class);
- 	class_destroy(nvme_subsys_class);
- 	class_destroy(nvme_class);
-diff --git a/include/linux/nvme-keyring.h b/include/linux/nvme-keyring.h
-new file mode 100644
-index 000000000000..32bd264a71e6
---- /dev/null
-+++ b/include/linux/nvme-keyring.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2023 Hannes Reinecke, SUSE Labs
-+ */
++	int err;
 +
-+#ifndef _NVME_KEYRING_H
-+#define _NVME_KEYRING_H
-+
-+#ifdef CONFIG_NVME_KEYRING
-+
-+key_serial_t nvme_keyring_id(void);
-+int nvme_keyring_init(void);
-+void nvme_keyring_exit(void);
-+
-+#else
-+
-+static inline key_serial_t nvme_keyring_id(void)
-+{
-+	return 0;
-+}
-+static inline int nvme_keyring_init(void)
-+{
-+	return 0;
-+}
-+static inline void nvme_keyring_exit(void) {}
-+
-+#endif /* !CONFIG_NVME_KEYRING */
-+#endif /* _NVME_KEYRING_H */
+ 	nvme_keyring = keyring_alloc(".nvme",
+ 				     GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+ 				     current_cred(),
+@@ -28,12 +116,18 @@ int nvme_keyring_init(void)
+ 	if (IS_ERR(nvme_keyring))
+ 		return PTR_ERR(nvme_keyring);
+ 
++	err = register_key_type(&nvme_tls_psk_key_type);
++	if (err) {
++		key_put(nvme_keyring);
++		return err;
++	}
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(nvme_keyring_init);
+ 
+ void nvme_keyring_exit(void)
+ {
++	unregister_key_type(&nvme_tls_psk_key_type);
+ 	key_revoke(nvme_keyring);
+ 	key_put(nvme_keyring);
+ }
 -- 
 2.35.3
 
