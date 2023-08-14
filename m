@@ -1,83 +1,93 @@
-Return-Path: <netdev+bounces-27400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 243B877BD27
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:35:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56BA177BD51
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:43:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BCA228115F
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:35:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69CBB1C20A51
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D29CC2DD;
-	Mon, 14 Aug 2023 15:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A486C2E6;
+	Mon, 14 Aug 2023 15:43:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83821C154
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:35:42 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944BBC5
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:35:41 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-668-0QcCinrKNLmPciCBeNQiZw-1; Mon, 14 Aug 2023 11:35:37 -0400
-X-MC-Unique: 0QcCinrKNLmPciCBeNQiZw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AE7A81C07583;
-	Mon, 14 Aug 2023 15:35:36 +0000 (UTC)
-Received: from hog (unknown [10.39.192.31])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EA80C4021B9;
-	Mon, 14 Aug 2023 15:35:34 +0000 (UTC)
-Date: Mon, 14 Aug 2023 17:35:33 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v1 2/5] net: phy: remove MACSEC guard
-Message-ID: <ZNpJxca6SE4Mii2L@hog>
-References: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
- <20230811153249.283984-3-radu-nicolae.pirea@oss.nxp.com>
- <056a153c-19d7-41bb-ac26-04410a2d0dc4@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F100BC139
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:43:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB4DFC433C8;
+	Mon, 14 Aug 2023 15:43:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692027806;
+	bh=4M4QSrCs/4eFD+3ggQCLqZfClvZElawWXoDFuEO/OYg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ab+QiJnd9e3G8SiFdFoOEP/XbNKL8qJQqAW4Yeiadho7J2rqandOYUldSHXC/vwH2
+	 PxX5OH21fJurFxXKLwyYX2xXzKGtRn9SyKvN/SR/diwrKmgv9bHc9U7XP3s0iqBf/c
+	 0OVvPbUQ19bQ1aN/lWaGUY8q377xFS7R3FulDxkUDcijo9P4+FBPfOUuNa0UsNaXFl
+	 QY1VhaxDWCzMFK/lt4B+mmd0a1696x3DJIzH//VntHLkq8JgsQtjZqrITKxm25+1B4
+	 L8Q0igwV9WqrTCSsv7yqrUOpeKl6i6tVOI9Rzpw/9J3y+OTCpnxnZg8pGtxPXylqbC
+	 nBeFzBuBAa4iw==
+Date: Mon, 14 Aug 2023 16:43:20 +0100
+From: Conor Dooley <conor@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>, nm@ti.com, srk@ti.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 0/5] Introduce IEP driver and packet timestamping
+ support
+Message-ID: <20230814-quarters-cahoots-1fbd583baad9@spud>
+References: <20230814100847.3531480-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="sO9y4wGyKLEBtlMT"
 Content-Disposition: inline
-In-Reply-To: <056a153c-19d7-41bb-ac26-04410a2d0dc4@lunn.ch>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230814100847.3531480-1-danishanwar@ti.com>
 
-2023-08-11, 18:59:57 +0200, Andrew Lunn wrote:
-> On Fri, Aug 11, 2023 at 06:32:46PM +0300, Radu Pirea (NXP OSS) wrote:
-> > Allow the phy driver to build the MACSEC support even if
-> > CONFIG_MACSEC=N.
-> 
-> What is missing from this commit message is an answer to the question
-> 'Why?'
 
-The same question applies to patch #1. Why would we need a dummy
-implementation of macsec_pn_wrapped when !CONFIG_MACSEC?
+--sO9y4wGyKLEBtlMT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I guess it's to avoid conditional compilation of
-drivers/net/phy/nxp-c45-tja11xx-macsec.c and a few ifdefs in the main
-driver.
+On Mon, Aug 14, 2023 at 03:38:42PM +0530, MD Danish Anwar wrote:
 
--- 
-Sabrina
+> MD Danish Anwar (2):
+>   dt-bindings: net: Add ICSS IEP
+>   dt-bindings: net: Add IEP property in ICSSG DT binding
 
+For these two,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+
+Thanks,
+Conor.
+
+--sO9y4wGyKLEBtlMT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNpLmAAKCRB4tDGHoIJi
+0u1xAP9M5o6AwHsPfJpPcLSWCn9wBcTEpc3Zj86fHWMLdbZPEgEAjh9E4Pq/sFfU
+6Ps4YLG/mOYxU1csU9sn9aa8hj6t0gc=
+=EJFy
+-----END PGP SIGNATURE-----
+
+--sO9y4wGyKLEBtlMT--
 
