@@ -1,111 +1,136 @@
-Return-Path: <netdev+bounces-27488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F4677C280
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:37:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F54B77C284
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9735281286
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:37:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BB671C20BB2
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E16BDF61;
-	Mon, 14 Aug 2023 21:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D7EDF64;
+	Mon, 14 Aug 2023 21:41:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D026CA4E;
-	Mon, 14 Aug 2023 21:37:05 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D3611D;
-	Mon, 14 Aug 2023 14:37:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HrxOsLNMinh0XT55HWMr9WeUCVus6jXn08caJP+Pw+Q=; b=h21GG1K/7J7XB2gv3AgKdeVbYB
-	m2PXkhRcOaWWou8fBstYy5jFxyzOVlQakI3bzSt0rX1CKkXK0SBeLmT6C5AtIpzMD84eUJjoQ2Myc
-	8OaNgPPwugQrP3T9LU0M1S9R8QCZepcXJsNIWGCVBfkWA4F/9KltrwblRxKf9uo41XT0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qVfEz-0045qo-Qk; Mon, 14 Aug 2023 23:36:45 +0200
-Date: Mon, 14 Aug 2023 23:36:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michele Dalle Rive <dallerivemichele@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Davide Rovelli <davide.rovelli@usi.ch>,
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [RFC PATCH 0/7] Rust Socket abstractions
-Message-ID: <e3b4164a-5392-4209-99e5-560bf96df1df@lunn.ch>
-References: <20230814092302.1903203-1-dallerivemichele@gmail.com>
- <2023081411-apache-tubeless-7bb3@gregkh>
- <0e91e3be-abbb-4bf7-be05-ba75c7522736@lunn.ch>
- <CACETy0=V9B8UOCi+BKfyrX06ca=WvC0Gvo_ouR=DjX=_-jhAwg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D3DDDCB
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:41:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6667C433C8;
+	Mon, 14 Aug 2023 21:41:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692049309;
+	bh=MgkdN53feOlNKdjXarDJyyatmuvzY/Ucmd6fglfoO6w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tzLIWcghV530N9YP9C6ycC01vrPSZQ4pJa/Ob314TWNX6yULGYC3CGAgS5tqpCEe/
+	 2Lyd1opBDYKpSexGRVH7BM/MQgoShzH+3H7ghXiSy/ZsnwyGJn0DEyxStNuGbccFMm
+	 ubF2KBlbmwnGwvjBHqHcbVBV+yCqpz1ZR0O3+gHuFcyXJ0MCVkQRXJ13QikRc2mE0Y
+	 kEupmRg8Yd81zeA1vXWKDGuBr8YaS1UEDEjGyiZNSjygHPlO+eb93izkbkJLs4NwEN
+	 7zqS2CFk+V0r4RWREImtX5F+Ht6sCnc63fQBFXcPvKUZmywD3Qs8lqIQ2D2pmOAn3x
+	 YSLLLOCIe2rCw==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net-next 00/14] mlx5 updates 2023-08-14
+Date: Mon, 14 Aug 2023 14:41:30 -0700
+Message-ID: <20230814214144.159464-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACETy0=V9B8UOCi+BKfyrX06ca=WvC0Gvo_ouR=DjX=_-jhAwg@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-> > There is a long standing tradition in Linux, you don't get a new API
-> > merged without a user.
-> 
-> Sorry for not being clear on that.
-> 
-> These abstractions are meant to be used by modules: having them, modules
-> can start using the kernel network functionalities through a first, high level
-> interface.
-> 
-> Since there is currently no network support in Rust, this patch series
-> represents a first step to provide access to networking to modules.
-> Sockets are just the highest layer of the network stack: the goal would be
-> to port structures deeper in the network stack, to give modules more
-> access to the network api. However, you need to start somewhere.
-> 
-> >
-> > There is not too much use of in kernel sockets. Network file systems
-> > like NFS, and SMB are one. These need to be careful with memory usage,
-> > you could be busy writing blocks out because the system is low on
-> > memory and trying to free some up, and asking for more memory might
-> > not work.  Sending kernel log messages to a server. But that needs
-> > care because of the different contexts it can be used in. Without
-> > knowing what it will be used for, it is hard for us the point the
-> > special considerations which need to be made.
-> >
-> > So please also let us see the code using this API.
-> >
-> >         Andrew
-> 
-> The lack of these abstractions was noticed in the context of a research
-> of the usability of Rust for the development of consensus algorithms using UDP.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-O.K, so what are the use cases for consensus algorithms using UDP
-within the kernel? Where is this code? Ideally you should post it for
-merging alongside the rust API to sockets its needs. We can then
-review both together, just as we would if somebody were submitting a
-new API in C along with its user.
+This series provides updates to mlx5 driver.
+For more information please see tag log below.
 
-    Andrew
+Please pull and let me know if there is any problem.
+
+Thanks,
+Saeed.
+
+
+The following changes since commit f3cc00303cdbc82f719e0cf0dc6f057e8741b5ee:
+
+  Merge branch 'devlink-introduce-selective-dumps' (2023-08-14 11:47:27 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-08-14
+
+for you to fetch changes up to bd3a2f77809b84df5dc15edd72cf9955568e698e:
+
+  net/mlx5: Don't query MAX caps twice (2023-08-14 14:40:22 -0700)
+
+----------------------------------------------------------------
+mlx5-updates-2023-08-14
+
+1) Handle PTP out of order CQEs issue
+2) Check FW status before determining reset successful
+3) Expose maximum supported SFs via devlink resource
+4) MISC cleanups
+
+----------------------------------------------------------------
+Jianbo Liu (1):
+      net/mlx5: E-switch, Add checking for flow rule destinations
+
+Jiri Pirko (5):
+      net/mlx5: Use auxiliary_device_uninit() instead of device_put()
+      net/mlx5: Remove redundant SF supported check from mlx5_sf_hw_table_init()
+      net/mlx5: Use mlx5_sf_start_function_id() helper instead of directly calling MLX5_CAP_GEN()
+      net/mlx5: Remove redundant check of mlx5_vhca_event_supported()
+      net/mlx5: Fix error message in mlx5_sf_dev_state_change_handler()
+
+Moshe Shemesh (1):
+      net/mlx5: Check with FW that sync reset completed successfully
+
+Rahul Rameshbabu (3):
+      net/mlx5: Consolidate devlink documentation in devlink/mlx5.rst
+      net/mlx5e: Make tx_port_ts logic resilient to out-of-order CQEs
+      net/mlx5e: Add recovery flow for tx devlink health reporter for unhealthy PTP SQ
+
+Shay Drory (4):
+      net/mlx5: Expose max possible SFs via devlink resource
+      net/mlx5: Remove unused CAPs
+      net/mlx5: Remove unused MAX HCA capabilities
+      net/mlx5: Don't query MAX caps twice
+
+ .../ethernet/mellanox/mlx5/counters.rst            |   6 +
+ .../ethernet/mellanox/mlx5/devlink.rst             | 313 ---------------------
+ .../ethernet/mellanox/mlx5/index.rst               |   1 -
+ Documentation/networking/devlink/mlx5.rst          | 182 ++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/devlink.c  |   3 +
+ drivers/net/ethernet/mellanox/mlx5/core/devlink.h  |   8 +
+ .../net/ethernet/mellanox/mlx5/core/en/health.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   | 237 ++++++++++++----
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h   |  59 +++-
+ .../ethernet/mellanox/mlx5/core/en/reporter_tx.c   |  65 +++++
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.h |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c    |  28 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  31 ++
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c       |  59 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c |  39 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/fw_reset.h |   2 +
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  16 +-
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   3 +
+ .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c   |  12 +-
+ .../net/ethernet/mellanox/mlx5/core/sf/hw_table.c  |  49 +++-
+ include/linux/mlx5/device.h                        |  69 +----
+ include/linux/mlx5/driver.h                        |   1 -
+ include/linux/mlx5/mlx5_ifc.h                      |  46 +--
+ 25 files changed, 672 insertions(+), 569 deletions(-)
+ delete mode 100644 Documentation/networking/device_drivers/ethernet/mellanox/mlx5/devlink.rst
 
