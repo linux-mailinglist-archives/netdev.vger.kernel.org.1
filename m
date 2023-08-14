@@ -1,110 +1,139 @@
-Return-Path: <netdev+bounces-27234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 308DE77B144
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 08:10:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590D777B202
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E074D280FF0
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 06:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE246280FB7
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48D35393;
-	Mon, 14 Aug 2023 06:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8702F6ABC;
+	Mon, 14 Aug 2023 07:03:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FE65237;
-	Mon, 14 Aug 2023 06:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D181BC433C9;
-	Mon, 14 Aug 2023 06:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E1B5C98
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:03:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC6D9C433C8;
+	Mon, 14 Aug 2023 07:03:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691993423;
-	bh=NHnjRKtw8AgBc1nGIFhnjo9Ir+/TB9yG1+otJ39s1mM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dK6N5B9T7MU3nZsq0jm7eM98Y2swR8l0mgR2gpc3z55kNI4pSh0UuvQdhWKr/Cmj2
-	 pDk9ymc8c9qxOlH/7n8dtF/lCag28JQDpAlZ1Dnamx4+dZrTfRvHDBdAUBn8pkmjTb
-	 zs/2sAdQNLBvzqbb6tHxqLt6JIgmS9gP3+UuQ8L8YHLEu9WoC1T4cf1iTwJi/QQgcY
-	 lR6vFBl7Ykx1FrmtaLUIrWG4Y2KiSL1D+C7hcEaHYDWIF0JiBL0bezE5KhB6xqiR1+
-	 r6UtMnGLahFxoVlU40OYgZMZZxUmfWjuBoTDRRLz0ZaWE3gZHybuB3ddlRdIr0j8E1
-	 xiQxyvJ8CGxBA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B51E9E93B34;
-	Mon, 14 Aug 2023 06:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1691996633;
+	bh=DM+JJ+ZGmtq8OUU4oXT6tfyiRynncn7hCNTgM2YToBw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=toQyCX7JDXh/jjcEqfp3wE2tJMtqiO7Mxq3ZSWW1GnhyOUT6KHg0w6ZYV33xpDcGJ
+	 qleCwVZIxX3+pEdlf6XqwBx2zqxbD6Ym2+m9y3zIBwKe2PVDPvbQ6DixnUMT81iUQf
+	 8b5RUFKyjZRYO6lh/9lQl19vtk54qK8DMmponoehz4EoXlUwrjq6jIWh+7i8Ifs2fm
+	 Ys7xWdnl/Bk9GkIxa4LaOzK9bEGlI+GC+MScMVR2+Noa0sjm8FdB2O8OuQwKdNnwiU
+	 bk2XI8NvZ3pSlG8czOMETG6HDktYd6oIo3B8na2pzovZ29j2kQfIZCq/PMZ9693hTa
+	 oSAkDJ2Ij+3jQ==
+Date: Mon, 14 Aug 2023 10:03:49 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, fw@strlen.de, timo.teras@iki.fi,
+	yuehaibing@huawei.com, weiyongjun1@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: xfrm: skip policies marked as dead while
+ reinserting policies
+Message-ID: <20230814070349.GA3921@unreal>
+References: <20230814013352.2771452-1-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/14] mptcp: get rid of msk->subflow
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169199342373.13316.7611325761631728090.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Aug 2023 06:10:23 +0000
-References: <20230811-upstream-net-next-20230811-mptcp-get-rid-of-msk-subflow-v1-0-36183269ade8@tessares.net>
-In-Reply-To: <20230811-upstream-net-next-20230811-mptcp-get-rid-of-msk-subflow-v1-0-36183269ade8@tessares.net>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuniyu@amazon.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230814013352.2771452-1-dongchenchen2@huawei.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 11 Aug 2023 17:57:13 +0200 you wrote:
-> The MPTCP protocol maintains an additional struct socket per connection,
-> mainly to be able to easily use tcp-level struct socket operations.
+On Mon, Aug 14, 2023 at 09:33:52AM +0800, Dong Chenchen wrote:
+> BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
+> Read of size 1 at addr ffff8881051f3bf8 by task ip/668
 > 
-> This leads to several side effects, beyond the quite unfortunate /
-> confusing 'subflow' field name:
+> CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x72/0xa0
+>  print_report+0xd0/0x620
+>  kasan_report+0xb6/0xf0
+>  xfrm_policy_inexact_list_reinsert+0xb6/0x430
+>  xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
+>  xfrm_policy_inexact_alloc_chain+0x23f/0x320
+>  xfrm_policy_inexact_insert+0x6b/0x590
+>  xfrm_policy_insert+0x3b1/0x480
+>  xfrm_add_policy+0x23c/0x3c0
+>  xfrm_user_rcv_msg+0x2d0/0x510
+>  netlink_rcv_skb+0x10d/0x2d0
+>  xfrm_netlink_rcv+0x49/0x60
+>  netlink_unicast+0x3fe/0x540
+>  netlink_sendmsg+0x528/0x970
+>  sock_sendmsg+0x14a/0x160
+>  ____sys_sendmsg+0x4fc/0x580
+>  ___sys_sendmsg+0xef/0x160
+>  __sys_sendmsg+0xf7/0x1b0
+>  do_syscall_64+0x3f/0x90
+>  entry_SYSCALL_64_after_hwframe+0x73/0xdd
 > 
-> - active and passive sockets behaviour is inconsistent: only active ones
->   have a not NULL msk->subflow, leading to different error handling and
->   different error code returned to the user-space in several places.
+> The root cause is:
 > 
-> [...]
+> cpu 0			cpu1
+> xfrm_dump_policy
+> xfrm_policy_walk
+> list_move_tail
+> 			xfrm_add_policy
+> 			... ...
+> 			xfrm_policy_inexact_list_reinsert
+> 			list_for_each_entry_reverse
+> 				if (!policy->bydst_reinsert)
+> 				//read non-existent policy
+> xfrm_dump_policy_done
+> xfrm_policy_walk_done
+> list_del(&walk->walk.all);
+> 
+> If dump_one_policy() returns err (triggered by netlink socket),
+> xfrm_policy_walk() will move walk initialized by socket to list
+> net->xfrm.policy_all. so this socket becomes visible in the global
+> policy list. The head *walk can be traversed when users add policies
+> with different prefixlen and trigger xfrm_policy node merge.
+> 
+> It can be fixed by skip such "policies" with walk.dead set to 1.
 
-Here is the summary with links:
-  - [net-next,01/14] mptcp: avoid unneeded mptcp_token_destroy() calls
-    https://git.kernel.org/netdev/net-next/c/131a627751e3
-  - [net-next,02/14] mptcp: avoid additional __inet_stream_connect() call
-    https://git.kernel.org/netdev/net-next/c/ccae357c1c6a
-  - [net-next,03/14] mptcp: avoid subflow socket usage in mptcp_get_port()
-    https://git.kernel.org/netdev/net-next/c/cfb63e50d319
-  - [net-next,04/14] net: factor out inet{,6}_bind_sk helpers
-    https://git.kernel.org/netdev/net-next/c/e6d360ff87f0
-  - [net-next,05/14] mptcp: mptcp: avoid additional indirection in mptcp_bind()
-    https://git.kernel.org/netdev/net-next/c/8cf2ebdc0078
-  - [net-next,06/14] net: factor out __inet_listen_sk() helper
-    https://git.kernel.org/netdev/net-next/c/71a9a874cd6b
-  - [net-next,07/14] mptcp: avoid additional indirection in mptcp_listen()
-    https://git.kernel.org/netdev/net-next/c/40f56d0c7043
-  - [net-next,08/14] mptcp: avoid additional indirection in mptcp_poll()
-    https://git.kernel.org/netdev/net-next/c/5426a4ef6455
-  - [net-next,09/14] mptcp: avoid unneeded indirection in mptcp_stream_accept()
-    https://git.kernel.org/netdev/net-next/c/1f6610b92ac3
-  - [net-next,10/14] mptcp: avoid additional indirection in sockopt
-    https://git.kernel.org/netdev/net-next/c/f0bc514bd5c1
-  - [net-next,11/14] mptcp: avoid ssock usage in mptcp_pm_nl_create_listen_socket()
-    https://git.kernel.org/netdev/net-next/c/3aa362494170
-  - [net-next,12/14] mptcp: change the mpc check helper to return a sk
-    https://git.kernel.org/netdev/net-next/c/3f326a821b99
-  - [net-next,13/14] mptcp: get rid of msk->subflow
-    https://git.kernel.org/netdev/net-next/c/39880bd808ad
-  - [net-next,14/14] mptcp: Remove unnecessary test for __mptcp_init_sock()
-    https://git.kernel.org/netdev/net-next/c/e263691773cd
+But where in the xfrm_dump_policy() flow, these policies are becoming to
+be walk.dead == 1?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks
 
-
+> 
+> Fixes: 9cf545ebd591 ("xfrm: policy: store inexact policies in a tree ordered by destination address")
+> Fixes: 12a169e7d8f4 ("ipsec: Put dumpers on the dump list")
+> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> ---
+>  net/xfrm/xfrm_policy.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> index d6b405782b63..5b56faad78e0 100644
+> --- a/net/xfrm/xfrm_policy.c
+> +++ b/net/xfrm/xfrm_policy.c
+> @@ -848,6 +848,9 @@ static void xfrm_policy_inexact_list_reinsert(struct net *net,
+>  	matched_d = 0;
+>  
+>  	list_for_each_entry_reverse(policy, &net->xfrm.policy_all, walk.all) {
+> +		if (policy->walk.dead)
+> +			continue;
+> +
+>  		struct hlist_node *newpos = NULL;
+>  		bool matches_s, matches_d;
+>  
+> -- 
+> 2.25.1
+> 
+> 
 
