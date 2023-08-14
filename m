@@ -1,63 +1,51 @@
-Return-Path: <netdev+bounces-27449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F1177C06F
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:11:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0386677C070
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1957E1C20B50
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:11:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 267AF1C20B45
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED874CA67;
-	Mon, 14 Aug 2023 19:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5532CA6D;
+	Mon, 14 Aug 2023 19:12:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E223BCA4B
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:11:54 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0D41702
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:11:51 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99c93638322so970411166b.1
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692040310; x=1692645110;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mo9zfMF4rzhISKZ3uWZNmfx0/F+q0VWq5mhKXrJtzwg=;
-        b=G5LuqB47KqASYkQCxngknTDuDLpMahbLF9i4GmcHbdeToC9cx/igeI7mCHVSSwX8UT
-         pWG+tKcn+L8FnXY2Xu5D0jKhRkjL8cqEq8D7iZlRONg6d6kNri+A391waYWwsa1h4Ydh
-         E7EU8RH/S3N/YibvbVEeoKa+aTHRodd7nL635F+bWm0a0hiaSiz0irCxfaUQP6Lj2V9W
-         Q+QUiRlxhJfWZEGZK0VVhqzelgNSa9RmXfIw67gPMNovAyx9xp/M5TF+UhCreJA8DAtu
-         PqQbFxI8jXMgXo/dqfSb9L8s64JdVTogaLBajvRM+kP/soAF7TOvGUpM65c5A/QwXr1I
-         +foA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB060C2CE
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:12:25 +0000 (UTC)
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53C611715
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:12:21 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5230963f636so1433792a12.0
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:12:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692040310; x=1692645110;
+        d=1e100.net; s=20221208; t=1692040340; x=1692645140;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mo9zfMF4rzhISKZ3uWZNmfx0/F+q0VWq5mhKXrJtzwg=;
-        b=Taavt4Xiz8BR3tYht0LDNHVYJnGSM1JhwpzNUhEi49uX+Z7EGj0HK0MEl00vjE7OLV
-         0ekxhz4ZPYStgmLAVUXZIThXI5gNGgIyFszx64lfDZwH3vUBHMKA1HSzlLvICUH2hUm/
-         hqgDSc4OXf1aESMulexJv1QPH0nnmXkzvgRzAPtX23Yf5qhZA0Pfsp2e3YVLgj67Belk
-         bxNBex6xLNdY+SMXPsnmFDL/wiOl1ciiDlytRfFwzVSDP3l4fl0s/Ee2qqjtPltxViyP
-         fZF/knUgEGrhtLSgb9zvlCwLO0sRsZRCGf0poDWV+1lhIAl+aW3e1JddP42d7x7/hvhq
-         alfw==
-X-Gm-Message-State: AOJu0YwX0r3WsSimO8HmrAZvsurPuBSWeqgaT8bR5nwwAePanth8jLhV
-	OfpjCjJ6pur1GvS2JJJliENqMw==
-X-Google-Smtp-Source: AGHT+IGLcWiHa+m0i2IU1V4krPCSZTNR6TfQG1pTLgEyD0EoKeloaegoQm8ZqHLBojqoawO2eKacvw==
-X-Received: by 2002:a17:907:7789:b0:99b:cdfd:fb44 with SMTP id ky9-20020a170907778900b0099bcdfdfb44mr12190607ejc.9.1692040310238;
-        Mon, 14 Aug 2023 12:11:50 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.214.188])
-        by smtp.gmail.com with ESMTPSA id s6-20020a170906454600b0099cd1c0cb21sm5892574ejq.129.2023.08.14.12.11.48
+        bh=ZYZDzpDhPpUu+V/D6Iom0HMlkeGtrJCPzmM64j8kbtE=;
+        b=cC1YbBaay0QCengLZUF2d8XZ45I7+KRbkB2ferFhlhaIjdFYKRDDcJttUG58UFEpVM
+         QWNkcsvswKZAxrvsEqxzvS1k3R9L/ovhkW/tO9vfYfxa+/3Xj901swgbZZqIijahGFvY
+         sal4wSBfzd++GIBUgRclJHlKSJvnxsOG/KK5nTXG1OrHUrp9WizILs4Q8DpVDB1njH+S
+         ck8JwWVkkegN9Opd9i9H72imfv1j9+95EtvVsSnaYKkYjsw02spySX1Yd8yRUUXdKtM6
+         JfCkxk219XZwL/GtX+2vMHWgc3iEZaj5aTx8IpHwQXDPuOtALeHyjTZu170Lp603jfXM
+         SESw==
+X-Gm-Message-State: AOJu0YwtJMeG7x0d4Hn54frVCLrioNdCyvGz+tbodhgDWTCwqY5GaV6Z
+	LbYAaG71nn5VDNLLad0azwbpHuhqDic=
+X-Google-Smtp-Source: AGHT+IErgcbz/hR+TLPLKyCV4srVgY9c5gHs09OFSnnnRxqYVHGz7HwbbnM6fh5lgPuKvo+wNJVGVg==
+X-Received: by 2002:a17:906:21c:b0:99c:c178:cef9 with SMTP id 28-20020a170906021c00b0099cc178cef9mr8072805ejd.2.1692040339460;
+        Mon, 14 Aug 2023 12:12:19 -0700 (PDT)
+Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
+        by smtp.gmail.com with ESMTPSA id ke10-20020a17090798ea00b00982a352f078sm5951999ejc.124.2023.08.14.12.12.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 12:11:49 -0700 (PDT)
-Message-ID: <2d672791-2194-8d66-9de2-a8bf0e4db088@linaro.org>
-Date: Mon, 14 Aug 2023 21:11:47 +0200
+        Mon, 14 Aug 2023 12:12:18 -0700 (PDT)
+Message-ID: <a7e01b78-52ba-9576-6d71-6d1f81aecd44@grimberg.me>
+Date: Mon, 14 Aug 2023 22:12:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,185 +53,208 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH 3/5] dt-bindings: net: Add Loongson-1 DWMAC glue layer
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 15/17] nvmet-tcp: enable TLS handshake upcall
 Content-Language: en-US
-To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Serge Semin <Sergey.Semin@baikalelectronics.ru>
-References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
- <20230812151135.1028780-4-keguang.zhang@gmail.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230812151135.1028780-4-keguang.zhang@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230814111943.68325-1-hare@suse.de>
+ <20230814111943.68325-16-hare@suse.de>
+ <cf21000c-177e-c882-ac30-fe3190748bae@grimberg.me>
+ <bebf00fb-be2d-d6da-bd7f-4e610095decc@suse.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <bebf00fb-be2d-d6da-bd7f-4e610095decc@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 12/08/2023 17:11, Keguang Zhang wrote:
-> Add devicetree binding document for Loongson-1 DWMAC glue layer.
+
+>>> @@ -1864,6 +1877,14 @@ static struct config_group 
+>>> *nvmet_ports_make(struct config_group *group,
+>>>           return ERR_PTR(-ENOMEM);
+>>>       }
+>>> +    if (nvme_keyring_id()) {
+>>> +        port->keyring = key_lookup(nvme_keyring_id());
+>>> +        if (IS_ERR(port->keyring)) {
+>>> +            pr_warn("NVMe keyring not available, disabling TLS\n");
+>>> +            port->keyring = NULL;
+>>
+>> why setting this to NULL?
+>>
+> It's check when changing TSAS; we can only enable TLS if the nvme 
+> keyring is available.
+
+ok
+
 > 
-> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
-> ---
->  .../bindings/net/loongson,ls1x-dwmac.yaml     | 98 +++++++++++++++++++
->  .../devicetree/bindings/net/snps,dwmac.yaml   |  2 +
->  2 files changed, 100 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+>>> +        }
+>>> +    }
+>>> +
+>>>       for (i = 1; i <= NVMET_MAX_ANAGRPS; i++) {
+>>>           if (i == NVMET_DEFAULT_ANA_GRPID)
+>>>               port->ana_state[1] = NVME_ANA_OPTIMIZED;
+>>> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+>>> index 8cfd60f3b564..7f9ae53c1df5 100644
+>>> --- a/drivers/nvme/target/nvmet.h
+>>> +++ b/drivers/nvme/target/nvmet.h
+>>> @@ -158,6 +158,7 @@ struct nvmet_port {
+>>>       struct config_group        ana_groups_group;
+>>>       struct nvmet_ana_group        ana_default_group;
+>>>       enum nvme_ana_state        *ana_state;
+>>> +    struct key            *keyring;
+>>>       void                *priv;
+>>>       bool                enabled;
+>>>       int                inline_data_size;
+>>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+>>> index f19ea9d923fd..77fa339008e1 100644
+>>> --- a/drivers/nvme/target/tcp.c
+>>> +++ b/drivers/nvme/target/tcp.c
+>>> @@ -8,9 +8,13 @@
+>>>   #include <linux/init.h>
+>>>   #include <linux/slab.h>
+>>>   #include <linux/err.h>
+>>> +#include <linux/key.h>
+>>>   #include <linux/nvme-tcp.h>
+>>> +#include <linux/nvme-keyring.h>
+>>>   #include <net/sock.h>
+>>>   #include <net/tcp.h>
+>>> +#include <net/tls.h>
+>>> +#include <net/handshake.h>
+>>>   #include <linux/inet.h>
+>>>   #include <linux/llist.h>
+>>>   #include <crypto/hash.h>
+>>> @@ -66,6 +70,16 @@ device_param_cb(idle_poll_period_usecs, 
+>>> &set_param_ops,
+>>>   MODULE_PARM_DESC(idle_poll_period_usecs,
+>>>           "nvmet tcp io_work poll till idle time period in usecs: 
+>>> Default 0");
+>>> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+>>> +/*
+>>> + * TLS handshake timeout
+>>> + */
+>>> +static int tls_handshake_timeout = 10;
+>>> +module_param(tls_handshake_timeout, int, 0644);
+>>> +MODULE_PARM_DESC(tls_handshake_timeout,
+>>> +         "nvme TLS handshake timeout in seconds (default 10)");
+>>> +#endif
+>>> +
+>>>   #define NVMET_TCP_RECV_BUDGET        8
+>>>   #define NVMET_TCP_SEND_BUDGET        8
+>>>   #define NVMET_TCP_IO_WORK_BUDGET    64
+>>> @@ -122,11 +136,13 @@ struct nvmet_tcp_cmd {
+>>>   enum nvmet_tcp_queue_state {
+>>>       NVMET_TCP_Q_CONNECTING,
+>>> +    NVMET_TCP_Q_TLS_HANDSHAKE,
+>>>       NVMET_TCP_Q_LIVE,
+>>>       NVMET_TCP_Q_DISCONNECTING,
+>>>   };
+>>>   struct nvmet_tcp_queue {
+>>> +    struct kref        kref;
+>>
+>> Why is kref the first member of the struct?
+>>
+> Habit.
+> I don't mind where it'll end up.
+
+Move it to the back together with the tls section.
+
 > 
-> diff --git a/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
-> new file mode 100644
-> index 000000000000..150799460599
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
-> @@ -0,0 +1,98 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/loongson,ls1x-dwmac.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Loongson-1 DWMAC glue layer
-> +
-> +maintainers:
-> +  - Keguang Zhang <keguang.zhang@gmail.com>
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - loongson,ls1b-dwmac
-> +          - loongson,ls1c-dwmac
-> +  required:
-> +    - compatible
-> +
-> +properties:
-> +  compatible:
-> +    items:
-> +      - enum:
-> +          - loongson,ls1b-dwmac
-> +          - loongson,ls1c-dwmac
-> +      - const: snps,dwmac-3.50a
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  clock-names:
-> +    const: stmmaceth
+>>>       struct socket        *sock;
+>>>       struct nvmet_tcp_port    *port;
+>>>       struct work_struct    io_work;
+>>> @@ -155,6 +171,10 @@ struct nvmet_tcp_queue {
+>>>       struct ahash_request    *snd_hash;
+>>>       struct ahash_request    *rcv_hash;
+>>> +    /* TLS state */
+>>> +    key_serial_t        tls_pskid;
+>>> +    struct delayed_work    tls_handshake_work;
+>>> +
+>>>       unsigned long           poll_end;
+>>>       spinlock_t        state_lock;
+>>> @@ -1283,12 +1303,21 @@ static int nvmet_tcp_try_recv(struct 
+>>> nvmet_tcp_queue *queue,
+>>>       return ret;
+>>>   }
+>>> +static void nvmet_tcp_release_queue(struct kref *kref)
+>>> +{
+>>> +    struct nvmet_tcp_queue *queue =
+>>> +        container_of(kref, struct nvmet_tcp_queue, kref);
+>>> +
+>>> +    WARN_ON(queue->state != NVMET_TCP_Q_DISCONNECTING);
+>>> +    queue_work(nvmet_wq, &queue->release_work);
+>>> +}
+>>> +
+>>>   static void nvmet_tcp_schedule_release_queue(struct nvmet_tcp_queue 
+>>> *queue)
+>>>   {
+>>>       spin_lock_bh(&queue->state_lock);
+>>>       if (queue->state != NVMET_TCP_Q_DISCONNECTING) {
+>>>           queue->state = NVMET_TCP_Q_DISCONNECTING;
+>>> -        queue_work(nvmet_wq, &queue->release_work);
+>>> +        kref_put(&queue->kref, nvmet_tcp_release_queue);
+>>>       }
+>>>       spin_unlock_bh(&queue->state_lock);
+>>>   }
+>>> @@ -1485,6 +1514,8 @@ static void nvmet_tcp_release_queue_work(struct 
+>>> work_struct *w)
+>>>       mutex_unlock(&nvmet_tcp_queue_mutex);
+>>>       nvmet_tcp_restore_socket_callbacks(queue);
+>>> +    tls_handshake_cancel(queue->sock->sk);
+>>> +    cancel_delayed_work_sync(&queue->tls_handshake_work);
+>>
+>> We should call it tls_handshake_tmo_work or something to make it
+>> clear it is a timeout work.
+>>
+> Okay.
+> 
+>>>       cancel_work_sync(&queue->io_work);
+>>>       /* stop accepting incoming data */
+>>>       queue->rcv_state = NVMET_TCP_RECV_ERR;
+>>> @@ -1512,8 +1543,13 @@ static void nvmet_tcp_data_ready(struct sock *sk)
+>>>       read_lock_bh(&sk->sk_callback_lock);
+>>>       queue = sk->sk_user_data;
+>>> -    if (likely(queue))
+>>> -        queue_work_on(queue_cpu(queue), nvmet_tcp_wq, &queue->io_work);
+>>> +    if (likely(queue)) {
+>>> +        if (queue->data_ready)
+>>> +            queue->data_ready(sk);
+>>> +        if (queue->state != NVMET_TCP_Q_TLS_HANDSHAKE)
+>>> +            queue_work_on(queue_cpu(queue), nvmet_tcp_wq,
+>>> +                      &queue->io_work);
+>>> +    }
+>>>       read_unlock_bh(&sk->sk_callback_lock);
+>>>   }
+>>> @@ -1621,6 +1657,83 @@ static int nvmet_tcp_set_queue_sock(struct 
+>>> nvmet_tcp_queue *queue)
+>>>       return ret;
+>>>   }
+>>> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+>>> +static void nvmet_tcp_tls_handshake_done(void *data, int status,
+>>> +                     key_serial_t peerid)
+>>> +{
+>>> +    struct nvmet_tcp_queue *queue = data;
+>>> +
+>>> +    pr_debug("queue %d: TLS handshake done, key %x, status %d\n",
+>>> +         queue->idx, peerid, status);
+>>> +    spin_lock_bh(&queue->state_lock);
+>>> +    if (queue->state != NVMET_TCP_Q_TLS_HANDSHAKE) {
+>>
+>> Is this even possible?
+>>
+> I guess it can happen when the socket closes during handshake; the 
+> daemon might still be sending a 'done' event but 
+> nvmet_tcp_schedule_release_queue() has been called.
 
-This should be list (items) with one const item.
+Umm, if the socket closes during the handshake then the state
+is NVMET_TCP_Q_TLS_HANDSHAKE.
 
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  interrupt-names:
-> +    const: macirq
-
-Ditto
-
-> +
-> +  syscon:
-
-Let me quote:
-
-"Phandle to syscon device requires a vendor, descriptive name and a
-description"
-
-You only got description right.
-
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Phandle to the syscon containing some extra configurations
-> +      including PHY interface mode.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +  - interrupts
-> +  - interrupt-names
-> +  - phy-handle
-> +  - phy-mode
-
-Drop, it is not defined here and already required by snps,dwmac.
-
-> +  - syscon
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +
-> +    gmac0: ethernet@1fe10000 {
-> +        compatible = "loongson,ls1b-dwmac", "snps,dwmac-3.50a";
-> +        reg = <0x1fe10000 0x10000>;
-> +
-> +        clocks = <&clkc LS1X_CLKID_AHB>;
-> +        clock-names = "stmmaceth";
-> +
-> +        interrupt-parent = <&intc1>;
-> +        interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
-> +        interrupt-names = "macirq";
-> +
-> +        phy-handle = <&phy0>;
-> +        phy-mode = "mii";
-> +
-> +        snps,pbl = <1>;
-> +        syscon = <&syscon>;
-> +
-> +        mdio {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +            compatible = "snps,dwmac-mdio";
-> +
-> +            phy0: ethernet-phy@0 {
-> +                reg = <0x0>;
-> +            };
-> +        };
-> +    };
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index ddf9522a5dc2..e1a956cf171e 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -66,6 +66,8 @@ properties:
->          - ingenic,x2000-mac
->          - loongson,ls2k-dwmac
->          - loongson,ls7a-dwmac
-> +        - loongson,ls1b-dwmac
-> +        - loongson,ls1c-dwmac
-
-You should not need it. Isn't snps,dwmac-3.50a already there? Anyway,
-not alphabetically ordered...
-
->          - qcom,qcs404-ethqos
->          - qcom,sa8775p-ethqos
->          - qcom,sc8280xp-ethqos
-
-Best regards,
-Krzysztof
-
+p.s. you call handshake cancel in the release flow so you should be
+fenced properly no?
 
