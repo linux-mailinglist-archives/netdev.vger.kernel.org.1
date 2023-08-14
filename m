@@ -1,51 +1,63 @@
-Return-Path: <netdev+bounces-27446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDA6D77C051
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:05:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B6277C055
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BACD81C2039F
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:05:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85A09281213
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FBECA64;
-	Mon, 14 Aug 2023 19:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A4ECA65;
+	Mon, 14 Aug 2023 19:06:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33049CA4B
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:05:39 +0000 (UTC)
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8F41703
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:05:35 -0700 (PDT)
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5221bd8f62eso1472643a12.1
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:05:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86664CA49
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:06:30 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35C510F7
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:06:28 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-522bd411679so6185196a12.0
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:06:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692039987; x=1692644787;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T5HtRk7v9N5XEliCZizIOYoda+POCp5Lvz3Wvapa2NQ=;
+        b=rDeKbTEZJKLZ9FP1roXmnxVr4jyE26Xz426JSxZdrzFWLD5ynNP3xL8sNjLcZU/yaL
+         56uzL+AXlE3EnhrMYYJZN356xVRsL+DBftaWVa5MdwnNPtTB/06e8PaKrxHHpwMVfRfM
+         Dsp69t/qPIE2on4qrEYQZfSRtWSPiRVAM5a887sF+w+hBCVqnycbtdnYngB+lHxLLy46
+         QaSiAGaZeqwj0iZ2S/TTfBYlt+kgL/KVZOr09/XGuys4tU09IOhFHylGoMYHVXxrB+IS
+         6IUxT0Z2anepZ/wN3DbVMWHvkX/h95uHAqig2E2Nmj97puU6DWSdv2Q7TercqwaTXKrk
+         e26w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692039934; x=1692644734;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1692039987; x=1692644787;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BDF226U8s20wd6YP8ikmSWH6z2gzB09wST2WRKhovQI=;
-        b=Xq6aeQsI/++pZGYhFW5g/Oekagwq8ic+IfaQQwhma0/Z9JmnWagZamrWqhdpXpHnsP
-         GP39cebY5LDZCv046Odm+fmbIl7kR+tlQq6FP71+To+v9ejAwk/jmT5inMe2Vis0prET
-         H6ea6FZAz7TPKu233zLymo0THZiswqh5K5lMD2RCV8HH/jdBiabsAmqtxn5M1r2qiW1A
-         /+iT7YUloayrMn4fw6PSACoo+QMynNSB6RkIcgstrjPaLFIXXHBNLZm6QQ1ou7hpAe4p
-         2+VQMFw683YY9WsJHFTYI79+MjDDSs09rDOe0l8x1/h/rgMD/m+AuRPB/1x5pXA0B0c2
-         bhgQ==
-X-Gm-Message-State: AOJu0Yzo1EBhkJ7CckZHNIe30v9QKikGtdNkTPb5iOB2KGwAh8SGpnGr
-	n4lgXjuWPQdSR+WGE13Mfwk=
-X-Google-Smtp-Source: AGHT+IFshae9uLDqcs3fwT3y7Y9Y0Q99ktIq4atrQ1uA+SbbrnZrfL2r3M0L0wS54JnFHSmVpifWrA==
-X-Received: by 2002:a17:906:1041:b0:99c:5711:da5 with SMTP id j1-20020a170906104100b0099c57110da5mr7729118ejj.5.1692039933918;
-        Mon, 14 Aug 2023 12:05:33 -0700 (PDT)
-Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
-        by smtp.gmail.com with ESMTPSA id a17-20020a170906671100b0099bd8c1f67esm5955053ejp.109.2023.08.14.12.05.31
+        bh=T5HtRk7v9N5XEliCZizIOYoda+POCp5Lvz3Wvapa2NQ=;
+        b=bRTXPO/lSOvp3ZEUZvOy9X4wHnJ9m/uMqI+PEUtPlM6OIeNUR7TpmQV0PlAtT9SLli
+         nMyH2GAttj3VtPjMA3uxvsgF0cs4i4Som8L55G/8DbTGgm+HBkeWsO9AigeU4D1R/ups
+         f1P8MXFDXdH6496wO41KNUO4gNqurxh8Mo2zJotN3eusu+3/s2UW0z47NZn1awsOLSfZ
+         Y8fakT59IY3Z1nyBEhrv9yuSaccncZW/v/b8pMchWBlEC5dcRkrIeiOZG1aU6E/VpbWh
+         nTQyYZ6G1QipJ0bwdjMlPt4rpB9dHNQuG117xkjOlM4ZWhsrWvCWb7W3lfmJftE6Wp/6
+         UNGw==
+X-Gm-Message-State: AOJu0YwarUbLev8g+oKvpr3tcuDLXdBldkQqq20EdFQ+6OGIqlObHVMp
+	TxS+wkWqkR7SnUs98QI7l2tcGQ==
+X-Google-Smtp-Source: AGHT+IFHiepWq3vTDb+HRBkxRdAsLmYtndO/QQpUJgvVSY+3A1b+srlVoCwN0ixgeEioddUXasf1pA==
+X-Received: by 2002:a05:6402:792:b0:51d:fa7c:c330 with SMTP id d18-20020a056402079200b0051dfa7cc330mr8460833edy.26.1692039987311;
+        Mon, 14 Aug 2023 12:06:27 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.214.188])
+        by smtp.gmail.com with ESMTPSA id t8-20020a056402020800b005236b47116asm5862939edv.70.2023.08.14.12.06.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 12:05:33 -0700 (PDT)
-Message-ID: <b9ec8b98-dcde-1d89-9431-4799240f0c80@grimberg.me>
-Date: Mon, 14 Aug 2023 22:05:30 +0300
+        Mon, 14 Aug 2023 12:06:26 -0700 (PDT)
+Message-ID: <fae2d136-28e3-d3a1-c789-8552e8f59a15@linaro.org>
+Date: Mon, 14 Aug 2023 21:06:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,52 +65,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 17/17] nvmet-tcp: peek icreq before starting TLS
+ Thunderbird/102.14.0
+Subject: Re: [PATCH 2/5] dt-bindings: mfd: syscon: Add compatibles for
+ Loongson-1 syscon
+To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Serge Semin <Sergey.Semin@baikalelectronics.ru>
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+ <20230812151135.1028780-3-keguang.zhang@gmail.com>
 Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230814111943.68325-1-hare@suse.de>
- <20230814111943.68325-18-hare@suse.de>
- <304bc2f7-5f77-6e08-bcdb-f382233f611b@grimberg.me>
- <f9ebbd9d-31be-8e2c-f8a2-1f5b95a83344@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <f9ebbd9d-31be-8e2c-f8a2-1f5b95a83344@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230812151135.1028780-3-keguang.zhang@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 8/14/23 16:18, Hannes Reinecke wrote:
-> On 8/14/23 14:11, Sagi Grimberg wrote:
->>
->>> Incoming connection might be either 'normal' NVMe-TCP connections
->>> starting with icreq or TLS handshakes. To ensure that 'normal'
->>> connections can still be handled we need to peek the first packet
->>> and only start TLS handshake if it's not an icreq.
->>
->> That depends if we want to do that.
->> Why should we let so called normal connections if tls1.3 is
->> enabled?
+On 12/08/2023 17:11, Keguang Zhang wrote:
+> Add Loongson LS1B and LS1C compatibles for system controller.
 > 
-> Because of the TREQ setting.
-> TREQ can be 'not specified, 'required', or 'not required'.
-> Consequently when TSAS is set to 'tls1.3', and TREQ to 'not required' 
-> the initiator can choose whether he wants to do TLS.
+> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/mfd/syscon.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> And we don't need this weird 'select TREQ required' when TLS is active;
-> never particularly liked that one.
+> diff --git a/Documentation/devicetree/bindings/mfd/syscon.yaml b/Documentation/devicetree/bindings/mfd/syscon.yaml
+> index 8103154bbb52..c77d7b155a4c 100644
+> --- a/Documentation/devicetree/bindings/mfd/syscon.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/syscon.yaml
+> @@ -49,6 +49,8 @@ properties:
+>                - hisilicon,peri-subctrl
+>                - hpe,gxp-sysreg
+>                - intel,lgm-syscon
+> +              - loongson,ls1b-syscon
+> +              - loongson,ls1c-syscon
 
-The guideline should be that treq 'not required' should be the explicit
-setting in tls and not the other way around. We should be strict by
-default and permissive only if the user explicitly chose it, and log
-a warning in the log.
+It seems each SoC has multiple syscons so using the same compatible is
+wrong. Different devices should have different compatibles.
+
+Best regards,
+Krzysztof
+
 
