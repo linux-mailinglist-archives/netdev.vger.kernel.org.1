@@ -1,140 +1,185 @@
-Return-Path: <netdev+bounces-27369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D13077BACD
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:00:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C2477BAD2
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 353651C20A5C
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 574E0280F6F
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC97DC132;
-	Mon, 14 Aug 2023 14:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75406C133;
+	Mon, 14 Aug 2023 14:00:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E195FBE68
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:00:22 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62B710F7
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:00:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692021618; x=1723557618;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ejv5hEf5eTJPWbPYhLKVJ6OdJcC5J7Oaww5h4B8uP5s=;
-  b=MzbO71wzzG98VrvBdfS9kfgVLv061jBY+fuuxQBrNVoMnKeJQYVBzKVN
-   RasyPeKYH3fwV9bzSMuU97xedXx/un2yuYaBQya580okZcu1bPXSIyRuj
-   lu6zrm0kq79oSbGHw0IG+hWZM2YwPLHKPsY6qz/FniYVw3E7bdKWSHm3M
-   SedoOIrnUSKUz5Cl5LODJYQO4xsGIF7T4C28tOwpzfLP+LA/xC2myM8/5
-   KGCWuFNnXdLl7raBLhIg5DlpFBVkNvl8oPyzABIE3PFolZldXuGfwe855
-   6z9t2JVvOABL5Y9XKuA1sL6QmwSQXdQD+EvcHCOpsjauIji601Msm9Seb
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="438374677"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="438374677"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 07:00:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="683315128"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="683315128"
-Received: from lkp-server02.sh.intel.com (HELO b5fb8d9e1ffc) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 14 Aug 2023 06:59:59 -0700
-Received: from kbuild by b5fb8d9e1ffc with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qVY6h-0000Aj-1O;
-	Mon, 14 Aug 2023 13:59:49 +0000
-Date: Mon, 14 Aug 2023 21:58:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Heng Qi <hengqi@linux.alibaba.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Cc: oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 6/8] virtio-net: support rx netdim
-Message-ID: <202308142100.l4cN4g6z-lkp@intel.com>
-References: <20230811065512.22190-7-hengqi@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69021C120
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 14:00:47 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C6C10DE;
+	Mon, 14 Aug 2023 07:00:45 -0700 (PDT)
+Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RPbYc00WpztS1G;
+	Mon, 14 Aug 2023 21:57:07 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 14 Aug 2023 22:00:41 +0800
+From: Dong Chenchen <dongchenchen2@huawei.com>
+To: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <fw@strlen.de>, <leon@kernel.org>
+CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<timo.teras@iki.fi>, <yuehaibing@huawei.com>, <weiyongjun1@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Dong Chenchen
+	<dongchenchen2@huawei.com>
+Subject: [Patch net, v2] net: xfrm: skip policies marked as dead while reinserting policies
+Date: Mon, 14 Aug 2023 22:00:13 +0800
+Message-ID: <20230814140013.712001-1-dongchenchen2@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811065512.22190-7-hengqi@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500026.china.huawei.com (7.221.188.247)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Heng,
+BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
+Read of size 1 at addr ffff8881051f3bf8 by task ip/668
 
-kernel test robot noticed the following build errors:
+CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x72/0xa0
+ print_report+0xd0/0x620
+ kasan_report+0xb6/0xf0
+ xfrm_policy_inexact_list_reinsert+0xb6/0x430
+ xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
+ xfrm_policy_inexact_alloc_chain+0x23f/0x320
+ xfrm_policy_inexact_insert+0x6b/0x590
+ xfrm_policy_insert+0x3b1/0x480
+ xfrm_add_policy+0x23c/0x3c0
+ xfrm_user_rcv_msg+0x2d0/0x510
+ netlink_rcv_skb+0x10d/0x2d0
+ xfrm_netlink_rcv+0x49/0x60
+ netlink_unicast+0x3fe/0x540
+ netlink_sendmsg+0x528/0x970
+ sock_sendmsg+0x14a/0x160
+ ____sys_sendmsg+0x4fc/0x580
+ ___sys_sendmsg+0xef/0x160
+ __sys_sendmsg+0xf7/0x1b0
+ do_syscall_64+0x3f/0x90
+ entry_SYSCALL_64_after_hwframe+0x73/0xdd
 
-[auto build test ERROR on net-next/main]
+The root cause is:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/virtio-net-initially-change-the-value-of-tx-frames/20230811-150529
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230811065512.22190-7-hengqi%40linux.alibaba.com
-patch subject: [PATCH net-next 6/8] virtio-net: support rx netdim
-config: microblaze-randconfig-r081-20230814 (https://download.01.org/0day-ci/archive/20230814/202308142100.l4cN4g6z-lkp@intel.com/config)
-compiler: microblaze-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230814/202308142100.l4cN4g6z-lkp@intel.com/reproduce)
+cpu 0			cpu1
+xfrm_dump_policy
+xfrm_policy_walk
+list_move_tail
+			xfrm_add_policy
+			... ...
+			xfrm_policy_inexact_list_reinsert
+			list_for_each_entry_reverse
+				if (!policy->bydst_reinsert)
+				//read non-existent policy
+xfrm_dump_policy_done
+xfrm_policy_walk_done
+list_del(&walk->walk.all);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308142100.l4cN4g6z-lkp@intel.com/
+If dump_one_policy() returns err (triggered by netlink socket),
+xfrm_policy_walk() will move walk initialized by socket to list
+net->xfrm.policy_all. so this socket becomes visible in the global
+policy list. The head *walk can be traversed when users add policies
+with different prefixlen and trigger xfrm_policy node merge.
 
-All errors (new ones prefixed by >>):
+The issue can also be triggered by policy list traversal while rehashing
+and flushing policies.
 
-   microblaze-linux-ld: drivers/net/virtio_net.o: in function `virtnet_rx_dim_work':
->> drivers/net/virtio_net.c:3269: undefined reference to `net_dim_get_rx_moderation'
-   microblaze-linux-ld: drivers/net/virtio_net.o: in function `virtnet_rx_dim_update':
->> drivers/net/virtio_net.c:1985: undefined reference to `net_dim'
+It can be fixed by skip such "policies" with walk.dead set to 1.
 
+Fixes: 9cf545ebd591 ("xfrm: policy: store inexact policies in a tree ordered by destination address")
+Fixes: 12a169e7d8f4 ("ipsec: Put dumpers on the dump list")
+Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+---
+v2: fix similiar similar while rehashing and flushing policies
+---
+ net/xfrm/xfrm_policy.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-vim +3269 drivers/net/virtio_net.c
-
-  3258	
-  3259	static void virtnet_rx_dim_work(struct work_struct *work)
-  3260	{
-  3261		struct dim *dim = container_of(work, struct dim, work);
-  3262		struct receive_queue *rq = container_of(dim,
-  3263				struct receive_queue, dim);
-  3264		struct virtnet_info *vi = rq->vq->vdev->priv;
-  3265		struct net_device *dev = vi->dev;
-  3266		struct dim_cq_moder update_moder;
-  3267		int qnum = rq - vi->rq, err;
-  3268	
-> 3269		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-  3270		err = virtnet_send_rx_notf_coal_vq_cmd(vi, qnum,
-  3271						       update_moder.usec,
-  3272						       update_moder.pkts);
-  3273		if (err)
-  3274			pr_debug("%s: Failed to send dim parameters on rxq%d\n",
-  3275				 dev->name, (int)(rq - vi->rq));
-  3276	
-  3277		dim->state = DIM_START_MEASURE;
-  3278	}
-  3279	
-
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index d6b405782b63..33efd46fb291 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -848,6 +848,9 @@ static void xfrm_policy_inexact_list_reinsert(struct net *net,
+ 	matched_d = 0;
+ 
+ 	list_for_each_entry_reverse(policy, &net->xfrm.policy_all, walk.all) {
++		if (policy->walk.dead)
++			continue;
++
+ 		struct hlist_node *newpos = NULL;
+ 		bool matches_s, matches_d;
+ 
+@@ -1253,11 +1256,14 @@ static void xfrm_hash_rebuild(struct work_struct *work)
+ 	 * we start with destructive action.
+ 	 */
+ 	list_for_each_entry(policy, &net->xfrm.policy_all, walk.all) {
++		if (policy->walk.dead)
++			continue;
++
+ 		struct xfrm_pol_inexact_bin *bin;
+ 		u8 dbits, sbits;
+ 
+ 		dir = xfrm_policy_id2dir(policy->index);
+-		if (policy->walk.dead || dir >= XFRM_POLICY_MAX)
++		if (dir >= XFRM_POLICY_MAX)
+ 			continue;
+ 
+ 		if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
+@@ -1823,9 +1829,11 @@ int xfrm_policy_flush(struct net *net, u8 type, bool task_valid)
+ 
+ again:
+ 	list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
++		if (pol->walk.dead)
++			continue;
++
+ 		dir = xfrm_policy_id2dir(pol->index);
+-		if (pol->walk.dead ||
+-		    dir >= XFRM_POLICY_MAX ||
++		if (dir >= XFRM_POLICY_MAX ||
+ 		    pol->type != type)
+ 			continue;
+ 
+@@ -1862,9 +1870,11 @@ int xfrm_dev_policy_flush(struct net *net, struct net_device *dev,
+ 
+ again:
+ 	list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
++		if (pol->walk.dead)
++			continue;
++
+ 		dir = xfrm_policy_id2dir(pol->index);
+-		if (pol->walk.dead ||
+-		    dir >= XFRM_POLICY_MAX ||
++		if (dir >= XFRM_POLICY_MAX ||
+ 		    pol->xdo.dev != dev)
+ 			continue;
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
 
