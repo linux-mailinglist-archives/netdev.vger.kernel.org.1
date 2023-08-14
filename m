@@ -1,116 +1,99 @@
-Return-Path: <netdev+bounces-27413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E402277BDC1
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 18:16:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B1A77BDCF
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 18:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 948B928115A
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:16:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33BFA281194
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 16:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756E1C8DB;
-	Mon, 14 Aug 2023 16:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423ECC8DD;
+	Mon, 14 Aug 2023 16:20:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF848C15C
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 16:16:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE590C433BD;
-	Mon, 14 Aug 2023 16:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692029807;
-	bh=XKO2xiTql41TuJLWtHYgWjPpFQF/Knxed55Bfd0sH6g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=N04TVlLA2sSYBppKAwbJPd63MGeg3lZCanL0qajx5zFZXwvmsxyuwQTVgYRHm/Mqs
-	 syaqNxvXLKpWuKfLPSN6fv/QV3sQKkawCCt9I2GdfCoK5laCBr5qH6t17hAUf01nUd
-	 yfXR0YGud2GcHSC85CpKfMzLS9bFhU6PwKsuwtu3KIdOmZ4vPAOW6GnIVdUIiJlRRN
-	 vKKWSs82TOdZiGvg+2C0StnxbSgV3mRshEO2/g+j86IU/8vswNcZnjhw+MsuvEYw3g
-	 PU6v6iN/ePYTVD0TPU6+jfphRXeLuD4k3rizkpy0xlC/lZiFsbo3996Weog9THEV1V
-	 htAhxBqooDLqg==
-Message-ID: <92d32852-17f0-099c-a2b5-12a29da14133@kernel.org>
-Date: Mon, 14 Aug 2023 10:16:46 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3620AC139
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 16:20:34 +0000 (UTC)
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B74F1
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 09:20:33 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 419023200928;
+	Mon, 14 Aug 2023 12:20:32 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Mon, 14 Aug 2023 12:20:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1692030031; x=1692116431; bh=wM1fHPx8XExjo
+	TqHktlrXh5pfaB7rRKBytCe/u/jb/M=; b=vzl5sV9jpCszK01Fbd0lQQ181lutk
+	/rmbKDl7m0expN3R/k95e1R9Ml3EEjtxILlMl6tH6wD5UVWbuLaCXC399SEzcZj7
+	LEUwF6jtYZ2dpFvleCNRDYj4H3iDimz+Yc82L3Ca3hfA5l3aQ7oXZCKT2TRYKaiC
+	0YTTpkdeSwLbNAfevvHBcxt8Pj0l19XVaZ7PGOF7rl26ErKCEVNv3fJMwA7z0oVs
+	U0r48wFNWFIhy/vuA/DVKNSbfeCtug5qj3RND5bPvf190n0TUOhTU7BSMsNfjEIS
+	oz8VyrC+YNQB+29bKfDhJ1ScDy65G+fMtKp/hZHpvFNrXSHf6hjRLS2DQ==
+X-ME-Sender: <xms:T1TaZAqIv0sdPmyHObSTglwKuMfytIZmz4MlmdH-f82nnKFIV_UlMg>
+    <xme:T1TaZGoE9LFSx6dqHgHkYzkxg0RAjEFKX7JTgY0ZOVsbaLZ-e7JEt5qNt7hNTVsRf
+    UaUy4zvOIwHAOQ>
+X-ME-Received: <xmr:T1TaZFN19fVBohESyU98Xj5NBKO0XrV4LhmcgsV-lPwHVNZG2jNSSO5Fmf56>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedruddtgedgleelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
+    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
+    guohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:T1TaZH7yUqghvzm0tijBF0j45HHccaTWCALcbFv-gEikHkFTzESzWg>
+    <xmx:T1TaZP43mj3tc-AXw4lCs7En4oYuw45L8zRxNFRwwzzrNks4AdRIqg>
+    <xmx:T1TaZHinBiwohEqQrxBTt3HNRa6r0wPql7OEQLrp1FqudsxsiD_6Zw>
+    <xmx:T1TaZFQ7DjJ0-vfNUwvuktOuSgiI2Mr1KFu_BsP0yfcpbrdR4nbkyg>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Aug 2023 12:20:30 -0400 (EDT)
+Date: Mon, 14 Aug 2023 19:20:28 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCHv5 net-next] ipv6: do not match device when remove source
+ route
+Message-ID: <ZNpUTLvUqtp5rEzR@shredder>
+References: <20230811095308.242489-1-liuhangbin@gmail.com>
+ <ZNkASnjqmAVg2vBg@shredder>
+ <ZNnm4UOszRN6TOHJ@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [net-next v2 1/2] seg6: add NEXT-C-SID support for SRv6 End.X
- behavior
-Content-Language: en-US
-To: Andrea Mayer <andrea.mayer@uniroma2.it>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Stefano Salsano <stefano.salsano@uniroma2.it>,
- Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
- Ahmed Abdelsalam <ahabdels.dev@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>
-References: <20230812180926.16689-1-andrea.mayer@uniroma2.it>
- <20230812180926.16689-2-andrea.mayer@uniroma2.it>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230812180926.16689-2-andrea.mayer@uniroma2.it>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZNnm4UOszRN6TOHJ@Laptop-X1>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/12/23 12:09 PM, Andrea Mayer wrote:
-> The NEXT-C-SID mechanism described in [1] offers the possibility of
-> encoding several SRv6 segments within a single 128 bit SID address. Such
-> a SID address is called a Compressed SID (C-SID) container. In this way,
-> the length of the SID List can be drastically reduced.
-> 
-> A SID instantiated with the NEXT-C-SID flavor considers an IPv6 address
-> logically structured in three main blocks: i) Locator-Block; ii)
-> Locator-Node Function; iii) Argument.
-> 
->                         C-SID container
-> +------------------------------------------------------------------+
-> |     Locator-Block      |Loc-Node|            Argument            |
-> |                        |Function|                                |
-> +------------------------------------------------------------------+
-> <--------- B -----------> <- NF -> <------------- A --------------->
-> 
->    (i) The Locator-Block can be any IPv6 prefix available to the provider;
-> 
->   (ii) The Locator-Node Function represents the node and the function to
->        be triggered when a packet is received on the node;
-> 
->  (iii) The Argument carries the remaining C-SIDs in the current C-SID
->        container.
-> 
-> This patch leverages the NEXT-C-SID mechanism previously introduced in the
-> Linux SRv6 subsystem [2] to support SID compression capabilities in the
-> SRv6 End.X behavior [3].
-> An SRv6 End.X behavior with NEXT-C-SID flavor works as an End.X behavior
-> but it is capable of processing the compressed SID List encoded in C-SID
-> containers.
-> 
-> An SRv6 End.X behavior with NEXT-C-SID flavor can be configured to support
-> user-provided Locator-Block and Locator-Node Function lengths. In this
-> implementation, such lengths must be evenly divisible by 8 (i.e. must be
-> byte-aligned), otherwise the kernel informs the user about invalid
-> values with a meaningful error code and message through netlink_ext_ack.
-> 
-> If Locator-Block and/or Locator-Node Function lengths are not provided
-> by the user during configuration of an SRv6 End.X behavior instance with
-> NEXT-C-SID flavor, the kernel will choose their default values i.e.,
-> 32-bit Locator-Block and 16-bit Locator-Node Function.
-> 
-> [1] - https://datatracker.ietf.org/doc/html/draft-ietf-spring-srv6-srh-compression
-> [2] - https://lore.kernel.org/all/20220912171619.16943-1-andrea.mayer@uniroma2.it/
-> [3] - https://datatracker.ietf.org/doc/html/rfc8986#name-endx-l3-cross-connect
-> 
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> ---
->  net/ipv6/seg6_local.c | 108 ++++++++++++++++++++++++++++++++++--------
->  1 file changed, 88 insertions(+), 20 deletions(-)
-> 
+On Mon, Aug 14, 2023 at 04:33:37PM +0800, Hangbin Liu wrote:
+> I will remove the tb id checking in next version. Another thing to confirm.
+> We need remove the "!rt->nh" checking, right. Because I saw you kept it in you
+> reply.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
+My understanding is that when the route uses a nexthop object (i.e.,
+rt->nh is not NULL), then rt->fib6_nh is invalid. So I think we need the
+check for now. Maybe it can be removed once the function learns to use
+nexthop_fib6_nh() for routes with a nexthop object, but that's another
+patch. Let's finish with the current problem first.
 
