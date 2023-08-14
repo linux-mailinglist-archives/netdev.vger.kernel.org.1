@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-27301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05F877B65B
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:17:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 828DC77B67C
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 291B91C209F2
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:17:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C071C2089B
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7153AD51;
-	Mon, 14 Aug 2023 10:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D17AAD52;
+	Mon, 14 Aug 2023 10:20:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9ECB8F77
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:17:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E340C433C8;
-	Mon, 14 Aug 2023 10:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0178DAD4C
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 10:20:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7278BC433CA;
+	Mon, 14 Aug 2023 10:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692008231;
-	bh=R4RIz0crQa3HblhWK5yDOqA+zzPG0nqc9QqBWCxcGHI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gjy5ImfY0I3gO3HW2Dty1baXzNqc8rndVVLUupda4zlAQmGtnl3k/8Fseibcc0PwR
-	 BSJFim8T79H3Cs3zgWRBmfht4rH7oyYicXR1XyBiFEylxL3esjlqSBjWZMjTJ+GXZ4
-	 IZMGBO+D9LMUxzF6BfNR4W40UoH/SDqwVv6/lWKJjcCsW4fWDsxzbot77XuWjpKOdn
-	 nOq34LBaC2Y2oHxnsjCHOoumxLq5xXJb+O0y/iuluwcF+Cxq82+gwpRDl1SCXQFZUu
-	 zFHD8Q8rjcd8WeMytdm7N3KsR9dN6D04hKn8ZpoSnoNGv3zOvbJlnEYY2QpRwD1yaF
-	 DUVG5VuRHiwyg==
-Date: Mon, 14 Aug 2023 13:17:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Ziyang Xuan <william.xuanziyang@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] tun: add __exit annotations to module exit func
- tun_cleanup()
-Message-ID: <20230814101707.GG3921@unreal>
-References: <20230814083000.3893589-1-william.xuanziyang@huawei.com>
+	s=k20201202; t=1692008420;
+	bh=omhiaIQCg1QJmj1eyUWrDni6tEobovW0oR5SWPfgMZM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FccaP32qoBPyWAm0mX+PvRxblQDj3E+pjW9DaOKPlTywOzlkAUHZr+dFbk3TEGseq
+	 ypqUpnzuMBTO9qLaFnTMWaB73HnzJdkEpUtrxdCcdPdHSwJKmLc0XXWjR1uqvvxlia
+	 IPF93UAd7UZ+AM7Kz/aIMGK2hVG4G+Y7FGmIOirZsYYqjRM5cpJEhKuyQsbTEID4Mx
+	 gWgy1oEdJ3xIehX5y2ZIqyk4syjD1G/xIEqKxcq3Q90/Zp+SKoDnOLYrVk1GynmPJc
+	 8TwXmixtKm0k6UU5tIrPsIxgLYB/48016XzTkiwXLOLbXMOe9Q7+ce/a5cIkYlEh7x
+	 HIcp7hfsIb8Dw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51113E93B34;
+	Mon, 14 Aug 2023 10:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230814083000.3893589-1-william.xuanziyang@huawei.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: mirror_gre_changes: Tighten up the TTL test
+ match
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169200842032.6338.4956098548156030129.git-patchwork-notify@kernel.org>
+Date: Mon, 14 Aug 2023 10:20:20 +0000
+References: <3ea00504d4fa00a4f3531044e3df20312d472a39.1691769262.git.petrm@nvidia.com>
+In-Reply-To: <3ea00504d4fa00a4f3531044e3df20312d472a39.1691769262.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, mlxsw@nvidia.com,
+ idosch@nvidia.com, jiri@resnulli.us, mirsad.todorovac@alu.unizg.hr
 
-On Mon, Aug 14, 2023 at 04:30:00PM +0800, Ziyang Xuan wrote:
-> Add missing __exit annotations to module exit func tun_cleanup().
-> 
-> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-> ---
->  drivers/net/tun.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 973b2fc74de3..291c118579a9 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -3740,7 +3740,7 @@ static int __init tun_init(void)
->  	return ret;
->  }
->  
-> -static void tun_cleanup(void)
-> +static void __exit tun_cleanup(void)
+Hello:
 
-Why __exit and not __net_exit?
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Thanks
+On Fri, 11 Aug 2023 17:59:27 +0200 you wrote:
+> This test verifies whether the encapsulated packets have the correct
+> configured TTL. It does so by sending ICMP packets through the test
+> topology and mirroring them to a gretap netdevice. On a busy host
+> however, more than just the test ICMP packets may end up flowing
+> through the topology, get mirrored, and counted. This leads to
+> potential spurious failures as the test observes much more mirrored
+> packets than the sent test packets, and assumes a bug.
+> 
+> [...]
 
->  {
->  	misc_deregister(&tun_miscdev);
->  	rtnl_link_unregister(&tun_link_ops);
-> -- 
-> 2.25.1
-> 
-> 
+Here is the summary with links:
+  - [net] selftests: mirror_gre_changes: Tighten up the TTL test match
+    https://git.kernel.org/netdev/net/c/855067defa36
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
