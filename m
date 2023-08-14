@@ -1,88 +1,107 @@
-Return-Path: <netdev+bounces-27396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B93EA77BCEE
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:25:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE2C777BD02
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 17:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7344E2810CC
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:25:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A81041C209D9
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 15:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0AEC2CB;
-	Mon, 14 Aug 2023 15:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012C3C2CC;
+	Mon, 14 Aug 2023 15:29:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0D4C154;
-	Mon, 14 Aug 2023 15:25:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2E6C433C7;
-	Mon, 14 Aug 2023 15:25:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1692026751;
-	bh=FO5zCQ9Aaqj1NS7OYkS2u8nCHSNUw8PdooF5SOw4v+E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i4tkYcxc+OPe6SWSa8P9ZhQtHCLm7sboRNJ7foxlBmZ2WcwsyPwVLCnH3nqGkLkDW
-	 B9c7nzOJBnW7q6t/ZV+WHiKHW3n6VC2hAXBHlPbuYkqrR0fEakVFpAzDBjLHeD9NTJ
-	 AiXUSkUOjkEuD6zI/fhLPaQg37APlAaOqcbvux4I=
-Date: Mon, 14 Aug 2023 17:25:49 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Michele Dalle Rive <dallerivemichele@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Davide Rovelli <davide.rovelli@usi.ch>,
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [RFC PATCH 0/7] Rust Socket abstractions
-Message-ID: <2023081411-apache-tubeless-7bb3@gregkh>
-References: <20230814092302.1903203-1-dallerivemichele@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93A5BA48
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 15:29:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C2F0C433C8;
+	Mon, 14 Aug 2023 15:29:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692026995;
+	bh=vCRlrdZqjMH67x3gjEky9BrHKTd04af3vMzFdJBho+o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UOKVLKXeqzrDG/Ysv9MCmP6d8Mjn6EYJLo22aw/neCTYsz34ZLEAf5gqnuYcYKz9o
+	 dF5UNOjCJRdzxhFOoo4ajc1kYg2Iq56mGtRGnYZR6pnyj1j2vtYWx8qCC4iSwPq57/
+	 APQ0Pn55+wZA4U4OjJdy5uHZwcPyx6y04s1dgAvyMqraCqvkO4ua7AVpTgRhhSGbxT
+	 Szx1hfl4fn72hCZBMQgVDIsdTRC8Er+Ggaj0K9cZTx9bbafkWxWWJDWfJN/yQ401zs
+	 vnwlZra/r9sxe1s2PBzgdiCm1PP84FvCXuM0lGOny0RFRk1NCkJVwYkk0eFz1kJe/H
+	 6iLPVvsKlMKPw==
+Date: Mon, 14 Aug 2023 08:29:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
+Cc: "vkoul@kernel.org" <vkoul@kernel.org>, "robh+dt@kernel.org"
+ <robh+dt@kernel.org>, "krzysztof.kozlowski+dt@linaro.org"
+ <krzysztof.kozlowski+dt@linaro.org>, "conor+dt@kernel.org"
+ <conor+dt@kernel.org>, "Simek, Michal" <michal.simek@amd.com>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+ "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "git (AMD-Xilinx)" <git@amd.com>
+Subject: Re: [PATCH net-next v5 10/10] net: axienet: Introduce dmaengine
+ support
+Message-ID: <20230814082953.747791ff@kernel.org>
+In-Reply-To: <MN0PR12MB5953A9FEC556D07494DB8E37B711A@MN0PR12MB5953.namprd12.prod.outlook.com>
+References: <1691387509-2113129-1-git-send-email-radhey.shyam.pandey@amd.com>
+	<1691387509-2113129-11-git-send-email-radhey.shyam.pandey@amd.com>
+	<20230808154853.0fafa7fc@kernel.org>
+	<MN0PR12MB5953A9FEC556D07494DB8E37B711A@MN0PR12MB5953.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230814092302.1903203-1-dallerivemichele@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 14, 2023 at 11:22:55AM +0200, Michele Dalle Rive wrote:
-> This patch series is intended to create Rust abstractions for Sockets
-> and other fundamental network entities. 
+On Sat, 12 Aug 2023 15:27:19 +0000 Pandey, Radhey Shyam wrote:
+> > Drop on error, you're not stopping the queue correctly, just drop, return OK
+> > and avoid bugs.  
 > 
-> Specifically, it was added:
-> - Ip address and Socket address wrappers (for `in_addr`, `in6_addr`,
->   `sockaddr_in`, `sockaddr_in6`, `sockaddr_storage`).
-> - Socket wrapper.
-> - Socket flags and options enums.
-> - TCP and UDP specific abstractions over the Rust Socket structure.
+> As I understand NETDEV_TX_OK returns means driver took care of packet.
+> So inline with non-dmaengine xmit (axienet_start_xmit_legacy) should
+> we stop the queue and return TX_BUSY?
+
+You should only return BUSY if there is no space. All other errors
+should lead to drops, and increment of tx_error. Otherwise problem
+with handling a single packet may stall the NIC forever.
+It is somewhat confusing that we return TX_OK in that case but it
+is what it is.
+
+> > Why create a cache ?
+> > Isn't it cleaner to create a fake ring buffer of sgl? Most packets will not have
+> > MAX_SKB_FRAGS of memory. On a ring buffer you can use only as many sg
+> > entries as the packet requires. Also no need to alloc/free.  
 > 
-> This series is a RFC because I would appreciate some feedback about:
-> - The structure of the module: is the division of the files and modules
->   appropriate or should it be more or less fine-grained?
->   Also, should the `net` module export all the structures of its
->   submodules? I noticed that it is done in the standard library.
-> - Whether the documentation is comprehensive enough.
-> - A few other specific questions, written in the individual patches.
+> The kmem_cache is used with intent to use slab cache interface and
+> make use of reusing objects in the kernel. slab cache maintains a 
+> cache of objects. When we free an object, instead of
+> deallocating it, it give it back to the cache. Next time, if we
+> want to create a new object, slab cache gives us one object from the
+> slab cache.
 > 
-> I would greatly appreciate any kind of feedback or opinion. 
-> I am pretty new to the patch/mailing list world, so please point out any
-> mistake I might make.
+> If we maintain custom circular buffer (struct circ_buf) ring buffer 
+> we have to create two such ring buffers one for TX and other for RX.
+> For multichannel this will multiply to * no of queues. Also we have to
+> ensure proper occupancy checks and head/tail pointer updates.
+> 
+> With kmem_cache pool we are offloading queue maintenance ops to
+> framework with a benefit of optimized alloc/dealloc. Let me know if it 
+> looks functionally fine and can retain it for this baseline dmaengine 
+> support version?
 
-The best feedback is "who will use these new interfaces?"  Without that,
-it's really hard to review a patchset as it's difficult to see how the
-bindings will be used, right?
-
-thanks,
-
-greg k-h
+The kmemcache is not the worst possible option but note that the
+objects you're allocating (with zeroing) are 512+ bytes. That's
+pretty large, when most packets will not have full 16 fragments.
+Ring buffer would allow to better match the allocation size to 
+the packets. Not to mention that it can be done fully locklessly.
 
