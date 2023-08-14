@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-27461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B448D77C11A
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:55:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60BE077C11F
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDA631C20B4F
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:55:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CDCF1C20B2D
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 19:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DECBD507;
-	Mon, 14 Aug 2023 19:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFA9D510;
+	Mon, 14 Aug 2023 19:56:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CCCCA4B
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:55:08 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F818FA
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:55:06 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9923833737eso627086366b.3
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:55:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5205D5687
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:56:47 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8266810F2
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:56:45 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99bccc9ec02so664171166b.2
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:56:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692042905; x=1692647705;
+        d=linaro.org; s=google; t=1692043004; x=1692647804;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=RykofCguml6rSMpJYe0VPw+oopELw4ZN/ghN42VwsP4=;
-        b=Md6ABwFmuunlVk+OyZekSEThFF9OwW/PY+wmBONune03X4WdEZk+I9BGLMPGrn1T26
-         7kzogeviAVaxf38nOX1up595rjblj8oaP0LLshPZ5a2rcxY9kbisZMr2WXgWGOl9S3Py
-         8n6D+ma22EtAAl79X6qXxsN0zag7Pa3N2Gc87NbTe9/N2ejQeKxtr0hXvBn2PCTy8tvV
-         6oY2khWUg+f9S6xz/plJOu/sxwyUt6btOnNcjsREEQK87Qkk/CpK8Y8ztJTn0+gTuAG8
-         +aJujmwl+tS/qWKkSItKBYW8f5J+7tS5Ab8OxJDyoUyiCv24wEYDDXBWlRi/FggwjtHq
-         c6PA==
+        bh=Nok+x4rAaoA66YfdKSul17+hSDqui/hoTkzkEnvOsak=;
+        b=LzejYZismv9otFUW9sYB9GRVEaob91IcaZzY149ALyRmA5jqtz9T23PAggKnM/v8z/
+         hsJlAc8Zu5Jtmg/lOwEZ/8xHdvCQMtCb7R9zxWVq8XmhEOkw6PHW5nlNf8hfCz5JpA/6
+         +KOgQbhRKtU4PLhIBDE4YYoQ/+lWbUUKYr99AgSMsNvzMsSCF7iitujt6wK+OIKDXpMy
+         Vr+cb8+xrYJT7V2tqcpxOW1/JvAhGTDGTuBDD9iLmPXCwEUkXArQeRen34niZJRdD3EH
+         blPMM1dYUsmMyHcXVxQdeLWI/TOBBHnrdW0rbGA1U8dh0+tDL+tsPmn5JvH+tG2zoYMI
+         xLdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692042905; x=1692647705;
+        d=1e100.net; s=20221208; t=1692043004; x=1692647804;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RykofCguml6rSMpJYe0VPw+oopELw4ZN/ghN42VwsP4=;
-        b=IJByIML3MgcWB2pH2RyDXPf5L7CJT51YueNkqdSk5gtMLdkka937BXj3aB8PLrUJea
-         fWrwZ1wQc8pRoxQGWZ9+r+wsY1Ff5K8scFWH92YheMAwe+YGAaqjmjEFnX5lNYSubQpn
-         V5gheE4b9KP+MO9+cPRpAIEJmRKQbCHp2bLBGhvX6UTW+iM88emQSJMXX/CyNrzkHv9C
-         GItoFizM6ZZOhBn/hQ2SxwNcD3bLgYUYXS4Op5Ru9yJskvCIQneh9uW1uydG3GtVe1Sl
-         x3Qa6i32fpfNsLEPO5onZLzporxeypIcj+5OciyxgfP387p6z8tMaudv7xd0cB5/opf+
-         Wo/Q==
-X-Gm-Message-State: AOJu0YxRI+BilI5oDwCHxd226M0Ic2vKm9gGZIeO4Njs+r3C3Hckt405
-	0OFjLfTdepD0eo0xP2ZjQ5M+BA==
-X-Google-Smtp-Source: AGHT+IFxdS8jB/vXR9RW8EAGNbjE/bRPZ4ed13Lyl3ZWTg86j0xk6ItclZVeE1vRwpbXZh8Gv0Ca6w==
-X-Received: by 2002:a17:906:315b:b0:99c:a23b:b4f5 with SMTP id e27-20020a170906315b00b0099ca23bb4f5mr9496008eje.53.1692042905042;
-        Mon, 14 Aug 2023 12:55:05 -0700 (PDT)
+        bh=Nok+x4rAaoA66YfdKSul17+hSDqui/hoTkzkEnvOsak=;
+        b=WsOoICgSyJ0LWb7s8cc7x/VRGRWETfzG6V/4mUaKscxCfy15RyVvXWNK11I+YVFYxN
+         X7XRkLXsSpB9hpeEWHp6DYVsVfeCno3BfKaJzIT9bMUTnTNtnMzm0OPu1CMklaustBGv
+         7SR4GQ56BlgRtBUQtY0gr4tj961Me+I2x8Et7fd6EdYQgOy6rqVbRPn0EQg0cTaf/cwN
+         pVSJ87G7MYa1l52SA7Y2qnmCmjH1AayIjVghar2NKeWwQOm51TP6ThVWhvhNbACRLL7z
+         OInI+4oerQCzBuaFuvJovL8fDlvSLCUseI+0QeDs2HH6zjpIWLv4R5NUWal4yKEacOba
+         FGDA==
+X-Gm-Message-State: AOJu0YwKeLGUYFwnQAzrBIOAdrBCHJ+t0dt5wrzZpa1h6WRiw1Jl/QRs
+	YLdtJ/E/OrgMznTBWJvjkA+U6Q==
+X-Google-Smtp-Source: AGHT+IF+xA1+FyUO9foiefiY3Jz8QtEmKZYsiJnOt9ZxqPDwExjQixI/+6KjrTEJTDYH2+oRvOg4pg==
+X-Received: by 2002:a17:906:32c6:b0:99b:415f:2e4f with SMTP id k6-20020a17090632c600b0099b415f2e4fmr8726890ejk.57.1692043003925;
+        Mon, 14 Aug 2023 12:56:43 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.214.188])
-        by smtp.gmail.com with ESMTPSA id os5-20020a170906af6500b00993a37aebc5sm5972415ejb.50.2023.08.14.12.55.03
+        by smtp.gmail.com with ESMTPSA id a11-20020a170906670b00b0099315454e76sm6021723ejp.211.2023.08.14.12.56.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 12:55:04 -0700 (PDT)
-Message-ID: <e3d2ff98-8d05-fdf7-7df6-a5450c6cdc21@linaro.org>
-Date: Mon, 14 Aug 2023 21:55:02 +0200
+        Mon, 14 Aug 2023 12:56:43 -0700 (PDT)
+Message-ID: <b3cd8115-b2bd-63dd-01d3-3cd27127d534@linaro.org>
+Date: Mon, 14 Aug 2023 21:56:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,200 +66,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH v2 4/4] arm64: dts: fsd: Add Ethernet support for PERIC
+Subject: Re: [PATCH v3 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
  Block of FSD SoC
 Content-Language: en-US
 To: Sriranjani P <sriranjani.p@samsung.com>, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, alexandre.torgue@foss.st.com,
- peppe.cavallaro@st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ richardcochran@gmail.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, mcoquelin.stm32@gmail.com, alim.akhtar@samsung.com,
+ linux-fsd@tesla.com, pankaj.dubey@samsung.com, swathi.ks@samsung.com,
+ ravi.patel@samsung.com
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, pankaj.dubey@samsung.com,
- alim.akhtar@samsung.com, ravi.patel@samsung.com,
- 'Jayati Sahu' <jayati.sahu@samsung.com>, swathi.ks@samsung.com
-References: <20230111075422.107173-1-sriranjani.p@samsung.com>
- <CGME20230111075455epcas5p1951d1981f15d252e09281621ef5fbf15@epcas5p1.samsung.com>
- <20230111075422.107173-5-sriranjani.p@samsung.com>
- <7d74a96e-e3a5-118c-04a9-e8ed95fffa54@linaro.org>
- <000101d9ce99$f454da20$dcfe8e60$@samsung.com>
+ linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Jayati Sahu <jayati.sahu@samsung.com>
+References: <20230814112539.70453-1-sriranjani.p@samsung.com>
+ <CGME20230814112617epcas5p1bc094e9cf29da5dd7d1706e3f509ac28@epcas5p1.samsung.com>
+ <20230814112539.70453-4-sriranjani.p@samsung.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <000101d9ce99$f454da20$dcfe8e60$@samsung.com>
+In-Reply-To: <20230814112539.70453-4-sriranjani.p@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 14/08/2023 12:27, Sriranjani P wrote:
+On 14/08/2023 13:25, Sriranjani P wrote:
+> The FSD SoC contains two instances of Synopsys DWC QoS Ethernet IP, one
+> in FSYS0 block and other in PERIC block.
 > 
+> Adds device tree node for Ethernet in FSYS0 Block and enables the same for
+> FSD platform.
 > 
->> -----Original Message-----
->> From: Krzysztof Kozlowski [mailto:krzysztof.kozlowski@linaro.org]
->> Sent: 12 January 2023 15:07
->> To: Sriranjani P <sriranjani.p@samsung.com>; davem@davemloft.net;
->> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
->> robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
->> alexandre.torgue@foss.st.com; peppe.cavallaro@st.com;
->> joabreu@synopsys.com; mcoquelin.stm32@gmail.com
->> Cc: netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-
->> kernel@vger.kernel.org; pankaj.dubey@samsung.com;
->> alim.akhtar@samsung.com; ravi.patel@samsung.com; Jayati Sahu
->> <jayati.sahu@samsung.com>
->> Subject: Re: [PATCH v2 4/4] arm64: dts: fsd: Add Ethernet support for PERIC
->> Block of FSD SoC
->>
->> On 11/01/2023 08:54, Sriranjani P wrote:
->>> The FSD SoC contains two instances of Synopsys DWC QoS Ethernet IP,
->>> one in
->>> FSYS0 block and other in PERIC block.
->>>
->>> Adds device tree node for Ethernet in PERIC Block and enables the same
->>> for FSD platform.
->>>
->>> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
->>> Signed-off-by: Jayati Sahu <jayati.sahu@samsung.com>
->>> Signed-off-by: Sriranjani P <sriranjani.p@samsung.com>
->>> ---
->>>  arch/arm64/boot/dts/tesla/fsd-evb.dts      |  9 ++++
->>>  arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi | 56
->> ++++++++++++++++++++++
->>>  arch/arm64/boot/dts/tesla/fsd.dtsi         | 29 +++++++++++
->>>  3 files changed, 94 insertions(+)
->>>
->>> diff --git a/arch/arm64/boot/dts/tesla/fsd-evb.dts
->>> b/arch/arm64/boot/dts/tesla/fsd-evb.dts
->>> index ca0c1a28d562..2c0cbe775e04 100644
->>> --- a/arch/arm64/boot/dts/tesla/fsd-evb.dts
->>> +++ b/arch/arm64/boot/dts/tesla/fsd-evb.dts
->>> @@ -39,6 +39,15 @@
->>>  	};
->>>  };
->>>
->>> +&ethernet_1 {
->>> +	status = "okay";
->>> +
->>> +	fixed-link {
->>> +		speed = <1000>;
->>> +		full-duplex;
->>> +	};
->>> +};
->>> +
->>>  &fin_pll {
->>>  	clock-frequency = <24000000>;
->>>  };
->>> diff --git a/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
->>> b/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
->>> index 7ccc0738a149..c955bf159786 100644
->>> --- a/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
->>> +++ b/arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi
->>> @@ -395,6 +395,62 @@
->>>  		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>>  		samsung,pin-drv = <FSD_PIN_DRV_LV1>;
->>>  	};
->>> +
->>> +	eth1_tx_clk: eth1-tx-clk-pins {
->>> +		samsung,pins = "gpf2-0";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_DOWN>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
->>> +	};
->>> +
->>> +	eth1_tx_data: eth1-tx-data-pins {
->>> +		samsung,pins = "gpf2-1", "gpf2-2", "gpf2-3", "gpf2-4";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
->>> +	};
->>> +
->>> +	eth1_tx_ctrl: eth1-tx-ctrl-pins {
->>> +		samsung,pins = "gpf2-5";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
->>> +	};
->>> +
->>> +	eth1_phy_intr: eth1-phy-intr-pins {
->>> +		samsung,pins = "gpf2-6";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV4>;
->>> +	};
->>> +
->>> +	eth1_rx_clk: eth1-rx-clk-pins {
->>> +		samsung,pins = "gpf3-0";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
->>> +	};
->>> +
->>> +	eth1_rx_data: eth1-rx-data-pins {
->>> +		samsung,pins = "gpf3-1", "gpf3-2", "gpf3-3", "gpf3-4";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
->>> +	};
->>> +
->>> +	eth1_rx_ctrl: eth1-rx-ctrl-pins {
->>> +		samsung,pins = "gpf3-5";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV6>;
->>> +	};
->>> +
->>> +	eth1_mdio: eth1-mdio-pins {
->>> +		samsung,pins = "gpf3-6", "gpf3-7";
->>> +		samsung,pin-function = <FSD_PIN_FUNC_2>;
->>> +		samsung,pin-pud = <FSD_PIN_PULL_UP>;
->>> +		samsung,pin-drv = <FSD_PIN_DRV_LV4>;
->>> +	};
->>>  };
->>>
->>>  &pinctrl_pmu {
->>> diff --git a/arch/arm64/boot/dts/tesla/fsd.dtsi
->>> b/arch/arm64/boot/dts/tesla/fsd.dtsi
->>> index ade707cc646b..8807055807dd 100644
->>> --- a/arch/arm64/boot/dts/tesla/fsd.dtsi
->>> +++ b/arch/arm64/boot/dts/tesla/fsd.dtsi
->>> @@ -33,6 +33,7 @@
->>>  		spi1 = &spi_1;
->>>  		spi2 = &spi_2;
->>>  		eth0 = &ethernet_0;
->>> +		eth1 = &ethernet_1;
->>
->> Nope for the reasons I explained last time.
-> Sorry somehow I'm not able to find my previous mail chain.
 
-If you reply like this after half a year, what can I say? Is that a
-reason to ignore the feedback? No.
+...
 
-Just use the lore and find it:
-https://lore.kernel.org/all/4fd9dabb-c8f3-b826-2eb2-ab8b5816102a@linaro.org/
+>  &pinctrl_peric {
+> diff --git a/arch/arm64/boot/dts/tesla/fsd.dtsi b/arch/arm64/boot/dts/tesla/fsd.dtsi
+> index 1c53c68efd53..9a991f021711 100644
+> --- a/arch/arm64/boot/dts/tesla/fsd.dtsi
+> +++ b/arch/arm64/boot/dts/tesla/fsd.dtsi
+> @@ -32,6 +32,7 @@
+>  		spi0 = &spi_0;
+>  		spi1 = &spi_1;
+>  		spi2 = &spi_2;
+> +		eth0 = &ethernet_0;
 
-> I had replied to your comment in the previous version of the mail.
-> In this case alias id is used to differentiate between Ethernet instance 0 and 1 in the driver code.
+One more thing - I said it two times already. Patch v1 and then in v2.
+You responded now without waiting for my further feedback and
+immediately sent the same stuff.
 
-NAK.
+Let's be clear:
 
->>
->>>  	};
->>>
->>>  	cpus {
->>> @@ -882,6 +883,34 @@
->>>  			phy-mode = "rgmii";
->>>  			status = "disabled";
->>>  		};
->>> +
->>> +		ethernet_1: ethernet@14300000 {
->>
->> Do not add nodes to the end.
-> If you mean to say that the nodes are supposed to be in the increasing order of physical address,
-> I can see that the existing file is not arranged in that format. If that is required I can first fix the
-> existing file and post the revised patch for the same. 
-
-You can drop it in some place more or less matching its address, just
-not to the end.
+NAK for the reasons I said multiple times.
 
 Best regards,
 Krzysztof
