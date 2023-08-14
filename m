@@ -1,125 +1,96 @@
-Return-Path: <netdev+bounces-27503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C453177C2A2
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:46:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EEC77C2B0
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:46:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C977281242
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FEF02812A5
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B0B11197;
-	Mon, 14 Aug 2023 21:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E2ADF6A;
+	Mon, 14 Aug 2023 21:45:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7A211CB2
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:42:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 465D5C43391;
-	Mon, 14 Aug 2023 21:42:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692049323;
-	bh=poCygf5KZOFk58h8CIxNtM8dhTjzJn3E9NOFzFJNA04=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZrU3+B+y1sHZR9vABnFtwk8RNrFeu8Q24xf1wJCENQqsSfE0s1UYKbFv/r2iiH0ot
-	 nOxw+okJbDl5JJ28KBtBC+u9x74XJO+KeHL6Dr2aEMiSmItGx8bQnVnIixGZ4V4w81
-	 8WUR8wmz4hOpvdKJ/NwzL0IhbbI8c9X0ezFtdAoP6VffX5nz5VPuiEAGhGxFFj2fbX
-	 vYq7dxsh+iVHOfKpd6haZBUCmnQMlWiJqCiDMFVgW8Xeys5n4A1v06vevmokeXCTR4
-	 TiByBMKczIXcz/jfrNuGS4axmezQuF7lNkoXq7y9hlS4ZiPGOsG/RkZKCmG0tXdkxv
-	 hIJBq/NMYw2ew==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>,
-	Maher Sanalla <msanalla@nvidia.com>
-Subject: [net-next 14/14] net/mlx5: Don't query MAX caps twice
-Date: Mon, 14 Aug 2023 14:41:44 -0700
-Message-ID: <20230814214144.159464-15-saeed@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230814214144.159464-1-saeed@kernel.org>
-References: <20230814214144.159464-1-saeed@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A687BCA4E
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:45:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A4AE4;
+	Mon, 14 Aug 2023 14:45:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZtiLIxUxettw/9WPmtk9jiRQnxhuPfVkvX66bN2dsfc=; b=n9xT7/JPtATflackQJVEhyYLmk
+	baUOEc4jwag8znz8+ttPq98EHFVtB7IVXV9ZvA39id95TgczEAu347l0fxvZBkzUbxTGqnZ40z2lA
+	0fp8nLyCXwOMRqCB2Zy4H5LYL8fQ3R0PPA8qDVsFR0uIDEL77JAzGeajW5R8bE/J84bo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qVfNF-0045vH-Tw; Mon, 14 Aug 2023 23:45:17 +0200
+Date: Mon, 14 Aug 2023 23:45:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Graeme Smecher <gsmecher@threespeedlogic.com>
+Cc: Grygorii Strashko <grygorii.strashko@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Shay Agroskin <shayagr@amazon.com>, Rob Herring <robh@kernel.org>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Marek Majtyka <alardam@gmail.com>, linux-omap@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ti/cpsw_new: Expose the same module parameters as
+ ti/cpsw.
+Message-ID: <e53ac28b-c896-4f8d-a8b0-371f92c4ad5a@lunn.ch>
+References: <20230814211323.3272487-1-gsmecher@threespeedlogic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230814211323.3272487-1-gsmecher@threespeedlogic.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Shay Drory <shayd@nvidia.com>
+On Mon, Aug 14, 2023 at 02:13:21PM -0700, Graeme Smecher wrote:
+> The "old" CPSW driver (cpsw.c) exports the following module parameters:
+> 
+> 	- ti_cpsw.debug_level
+> 	- ti_cpsw.ale_ageout
+> 	- ti_cpsw.rx_packet_max
+> 	- ti_cpsw.descs_pool_size
+> 
+> This patch exposes the same parameters for the "new" CPSW driver:
+> 
+> 	- ti_cpsw_new.debug_level
+> 	- ti_cpsw_new.ale_ageout
+> 	- ti_cpsw_new.rx_packet_max
+> 	- ti_cpsw_new.descs_pool_size
+> 
+> It seems like consistency between the two drivers is a reasonable goal.
 
-Whenever mlx5 driver is probed or reloaded, it queries some capabilities
-in MAX mode via set_hca_cap() API. Afterwards, the driver queries all
-capabilities in MAX mode via mlx5_query_hca_caps() API.
+The new driver was written because the old driver had a lot of bad
+practices. module parameters are bad practices, there are better APIs
+to use. So that is why they are not present.
 
-Since MAX caps are read only caps, querying them twice is redundant.
-Hence, delete the second query.
+ethtool has an API to set debug_level. descs_pool_size sounds a lot
+like ethtool --set-ring. I don't know what the other two do, but look
+to see if ethtool has an option to set them.
 
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Reviewed-by: Maher Sanalla <msanalla@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+    Andrew
+
 ---
- drivers/net/ethernet/mellanox/mlx5/core/fw.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw.c b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-index 0e394408af75..58f4c0d0fafa 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-@@ -143,18 +143,18 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
- {
- 	int err;
- 
--	err = mlx5_core_get_caps(dev, MLX5_CAP_GENERAL);
-+	err = mlx5_core_get_caps_mode(dev, MLX5_CAP_GENERAL, HCA_CAP_OPMOD_GET_CUR);
- 	if (err)
- 		return err;
- 
- 	if (MLX5_CAP_GEN(dev, port_selection_cap)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_PORT_SELECTION);
-+		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_PORT_SELECTION, HCA_CAP_OPMOD_GET_CUR);
- 		if (err)
- 			return err;
- 	}
- 
- 	if (MLX5_CAP_GEN(dev, hca_cap_2)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_GENERAL_2);
-+		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_GENERAL_2, HCA_CAP_OPMOD_GET_CUR);
- 		if (err)
- 			return err;
- 	}
-@@ -174,19 +174,19 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
- 	}
- 
- 	if (MLX5_CAP_GEN(dev, pg)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_ODP);
-+		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ODP, HCA_CAP_OPMOD_GET_CUR);
- 		if (err)
- 			return err;
- 	}
- 
- 	if (MLX5_CAP_GEN(dev, atomic)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_ATOMIC);
-+		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ATOMIC, HCA_CAP_OPMOD_GET_CUR);
- 		if (err)
- 			return err;
- 	}
- 
- 	if (MLX5_CAP_GEN(dev, roce)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_ROCE);
-+		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ROCE, HCA_CAP_OPMOD_GET_CUR);
- 		if (err)
- 			return err;
- 	}
--- 
-2.41.0
-
+pw-bot: cr
 
