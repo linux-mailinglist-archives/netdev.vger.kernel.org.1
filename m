@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-27314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB4377B772
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:21:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FE6B77B77B
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 13:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAE4E1C20A6D
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 11:21:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8013B1C20A64
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 11:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C28CBE50;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DDAC13D;
 	Mon, 14 Aug 2023 11:19:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3319BE4D
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 11:19:56 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71320E6A
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 04:19:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4DCC13A
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 11:19:57 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90A4FA
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 04:19:56 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out1.suse.de (Postfix) with ESMTP id 1A76721998;
+	by smtp-out2.suse.de (Postfix) with ESMTP id 1E6C51FD66;
 	Mon, 14 Aug 2023 11:19:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1692011992; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gFv1GNXmaQGmSM+mG7gy4jwJID6bSTZqne91i6RpXC0=;
-	b=oZKWff0dsitH1nS8g7qGNsB9q0LKQBrzg8aPxU4rxYyvO/xLNf99lfM7WYoY9hx6QtIDfx
-	2Xr2K3FIKl9Y+8fVp4vO5OYTMcTvgsfFW6AC/aFGdOEJvvUXJe9rb3HWtIAR1EQJOGemgU
-	+wByAgS3UN98Ra1kdS5aiCVGgrkFB2s=
+	bh=aYpMppRc3Um2x2Fg3sOcnpRtep0A2eFDujgh1gnRIxs=;
+	b=wgSXUB0aZVNl180xvvKBt12qcLqoZs1MKNOAtdQlKe4Sde1DvhTJ2z41I2kmgHzM5NtT1t
+	AfLCE2RLzlHBHeFIL6hZkIksqoa56+oSbMeOXsAF17x/EysYOAT7Yq7xqDwg8S6R+1CUwZ
+	M7qM9rOOVHanrrmJm41ZbljndasUVYg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1692011992;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gFv1GNXmaQGmSM+mG7gy4jwJID6bSTZqne91i6RpXC0=;
-	b=Q3hfiOEaRC2b0xxdnSm+49b+VgqRssIrXAis5Yt3kqYfgGL+Fw8dAb9iqY5x0J4w3op+Y3
-	3vKfFkF6aj+DFFCw==
+	bh=aYpMppRc3Um2x2Fg3sOcnpRtep0A2eFDujgh1gnRIxs=;
+	b=3ifrlc6geh2NRQ0HVnNlbQusYLPfOa2rxASwlnRnLXvL7qAHnUKJbIE3G3hh0jLV6FPZtV
+	tH2igLG5JgPOkuAA==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-	by relay2.suse.de (Postfix) with ESMTP id 059882C153;
+	by relay2.suse.de (Postfix) with ESMTP id 0CE9B2C146;
 	Mon, 14 Aug 2023 11:19:52 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-	id F1F1551CB0CB; Mon, 14 Aug 2023 13:19:51 +0200 (CEST)
+	id 0659751CB0CD; Mon, 14 Aug 2023 13:19:52 +0200 (CEST)
 From: Hannes Reinecke <hare@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Sagi Grimberg <sagi@grimberg.me>,
@@ -56,11 +56,10 @@ Cc: Sagi Grimberg <sagi@grimberg.me>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	David Howells <dhowells@redhat.com>
-Subject: [PATCH 06/17] security/keys: export key_lookup()
-Date: Mon, 14 Aug 2023 13:19:32 +0200
-Message-Id: <20230814111943.68325-7-hare@suse.de>
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 07/17] nvme-tcp: allocate socket file
+Date: Mon, 14 Aug 2023 13:19:33 +0200
+Message-Id: <20230814111943.68325-8-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230814111943.68325-1-hare@suse.de>
 References: <20230814111943.68325-1-hare@suse.de>
@@ -77,31 +76,60 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For in-kernel consumers one cannot readily assign a user (eg when
-running from a workqueue), so the normal key search permissions
-cannot be applied.
-This patch exports the 'key_lookup()' function for a simple lookup
-of keys without checking for permissions.
+When using the TLS upcall we need to allocate a socket file such
+that the userspace daemon is able to use the socket.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Acked-by: David Howells <dhowells@redhat.com>
 ---
- security/keys/key.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/nvme/host/tcp.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 5c0c7df833f8..0260a1902922 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -693,6 +693,7 @@ struct key *key_lookup(key_serial_t id)
- 	spin_unlock(&key_serial_lock);
- 	return key;
- }
-+EXPORT_SYMBOL(key_lookup);
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 9ce417cd32a7..324d3bce65b8 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -1338,7 +1338,9 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
+ 	}
  
- /*
-  * Find and lock the specified key type against removal.
+ 	noreclaim_flag = memalloc_noreclaim_save();
+-	sock_release(queue->sock);
++	/* ->sock will be released by fput() */
++	fput(queue->sock->file);
++	queue->sock = NULL;
+ 	memalloc_noreclaim_restore(noreclaim_flag);
+ 
+ 	kfree(queue->pdu);
+@@ -1512,6 +1514,7 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
+ 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
+ 	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
+ 	int ret, rcv_pdu_size;
++	struct file *sock_file;
+ 
+ 	mutex_init(&queue->queue_lock);
+ 	queue->ctrl = ctrl;
+@@ -1534,6 +1537,11 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
+ 		goto err_destroy_mutex;
+ 	}
+ 
++	sock_file = sock_alloc_file(queue->sock, O_CLOEXEC, NULL);
++	if (IS_ERR(sock_file)) {
++		ret = PTR_ERR(sock_file);
++		goto err_destroy_mutex;
++	}
+ 	nvme_tcp_reclassify_socket(queue->sock);
+ 
+ 	/* Single syn retry */
+@@ -1640,7 +1648,8 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl, int qid)
+ 	if (queue->hdr_digest || queue->data_digest)
+ 		nvme_tcp_free_crypto(queue);
+ err_sock:
+-	sock_release(queue->sock);
++	/* ->sock will be released by fput() */
++	fput(queue->sock->file);
+ 	queue->sock = NULL;
+ err_destroy_mutex:
+ 	mutex_destroy(&queue->send_mutex);
 -- 
 2.35.3
 
