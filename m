@@ -1,308 +1,255 @@
-Return-Path: <netdev+bounces-27252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 035D477B2D5
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E50A277B2D7
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 09:46:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8ACB1C209F2
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:45:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30171C20967
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 07:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECD48F53;
-	Mon, 14 Aug 2023 07:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E378F53;
+	Mon, 14 Aug 2023 07:46:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66321842;
-	Mon, 14 Aug 2023 07:45:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B0E5C433C8;
-	Mon, 14 Aug 2023 07:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1691999120;
-	bh=UKxzW+x4Bhe85PmCQpAj1NUbjaWZu2yOxA+zzBepsrE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=U+fU3YxMeUFcSIo7V3KmCJ2QTEc3AnZCdoNWjSghgVde7qgMy8l/dQzOTbk/ntBDP
-	 3KTqYUep+CFqdzcV07x8MUYit4roChSFCHX6BgrPdiuEkcuCgyDRI/27/95in9IG/R
-	 et6Rjp00/KXHufGqRtds2Abh1OPpVrCzcc+ivyhDtw1hSt/Ww/WaR1GZ6iy6zTrcw1
-	 EWrFsr1nRABg/B8Gk0YSJwHYN4pDoWwovImdPgnVoY/8yFg7hB0zLZ8azajnGM2qp7
-	 AByvzbPvevMO2D6vwg8gPSO0W8bbHCxQ9Xra2yTG02aGO2B0ve32Ry+tWrtqqIPcjn
-	 cfHJ2sd0PE8qw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>,
-	Yuval Mintz <Yuval.Mintz@qlogic.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH] qed: remove unused 'resp_size' calculation
-Date: Mon, 14 Aug 2023 09:45:03 +0200
-Message-Id: <20230814074512.1067715-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0C18484
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 07:46:14 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF4094;
+	Mon, 14 Aug 2023 00:46:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BbIwKUmcAtGGgGu/6+gb9X/6IsYPPqjR0rpDbGLNn746+fWRQ3Z8IbfhJ553xfkTQogacZsInmNatI03kZMM5UWwcvLC3aMUAS4sJCMKvxskyzNzVYi5zuM9A9/3LSShKM9/rMk2bBOFseFxlGxcQULVPOc+YkFQ+JrKzERrqqEre587g3qS73rD13yC5iTZJ0pXoqT9S36964h3tZ8ldt6+gGvr/8uWyE6VLrm0+2zhjnwmSowgrbMO7TPICw0QUDaTBUjA7xYdzmeSF1LWwUPWU7DqF6kNJP0KHmZdzfEJkqE81qScX+C6Si4Tv4nNTOQKPkRWr9Mt19ssDAKcfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JdFvQyk693fVqmIOaAwwFy/qgIKoizkoOGNT6QJXr9E=;
+ b=YMv89hGJ8MDdfhsU40Bjn9WokzUOduQm756naeAESnV9kR0OSby1Xsc1bYa8jL46JZx/0ReLa7hPA+H2b2I/6P9BC476bKVxOoM2464cDpjxv9K8LLNlAUW8twlJqzS+lRZAjHxbO69DYTHPXQnxuYBCxV+vDcFkT8b6PUsHY8D7N8hX2FRGTOEywQnp2wDT+191x4EY7Xogp5befXxqiLDtGyj2i7XiRL2BCkqvAF/9G08/34lxboqGt6CetDk/oRGAb8rUX3VAhlPtqhUdbXwcZLkCkphB7Tgy7I+gfk9/nPWAn3Sst2RVOXZz7xroAgli0V8PgbuV+hSRxrAZqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JdFvQyk693fVqmIOaAwwFy/qgIKoizkoOGNT6QJXr9E=;
+ b=c4+ebAWDg/+bv7cZRAE5VXirB04ZeyZahf/aQhWMfhTYf+ghiC43YgiPYMkAcTcBVj8dCeP37EBlsYZLCdnlbA3mAs5AetLpUrAqZGj01SLBsYmOes2bOJkmOIeisoeVCbLiJoeWJlrkdV0Vxo1jZAJ3DYuipwsh+kheXrTWLWI=
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com (2603:10b6:5:45::18) by
+ DM4PR12MB7694.namprd12.prod.outlook.com (2603:10b6:8:102::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6678.24; Mon, 14 Aug 2023 07:46:11 +0000
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::ed2a:4807:1825:170f]) by DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::ed2a:4807:1825:170f%5]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
+ 07:46:10 +0000
+From: "Quan, Evan" <Evan.Quan@amd.com>
+To: Simon Horman <horms@kernel.org>
+CC: "rafael@kernel.org" <rafael@kernel.org>, "lenb@kernel.org"
+	<lenb@kernel.org>, "Deucher, Alexander" <Alexander.Deucher@amd.com>, "Koenig,
+ Christian" <Christian.Koenig@amd.com>, "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+	"airlied@gmail.com" <airlied@gmail.com>, "daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "Limonciello, Mario"
+	<Mario.Limonciello@amd.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>, "hdegoede@redhat.com"
+	<hdegoede@redhat.com>, "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
+	"Lazar, Lijo" <Lijo.Lazar@amd.com>, "jim.cromie@gmail.com"
+	<jim.cromie@gmail.com>, "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
+	"andrealmeid@igalia.com" <andrealmeid@igalia.com>, "trix@redhat.com"
+	<trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de"
+	<arnd@arndb.de>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH V8 2/9] drivers core: add ACPI based WBRF mechanism
+ introduced by AMD
+Thread-Topic: [PATCH V8 2/9] drivers core: add ACPI based WBRF mechanism
+ introduced by AMD
+Thread-Index: AQHZy13cCCFdkuqP4kWyz/74g5zCw6/k2DIAgASXm2A=
+Date: Mon, 14 Aug 2023 07:46:10 +0000
+Message-ID:
+ <DM6PR12MB26197EFD7E9F1ACC6F52C40AE417A@DM6PR12MB2619.namprd12.prod.outlook.com>
+References: <20230810073803.1643451-1-evan.quan@amd.com>
+ <20230810073803.1643451-3-evan.quan@amd.com> <ZNYBYuUSaio66vLN@vergenet.net>
+In-Reply-To: <ZNYBYuUSaio66vLN@vergenet.net>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2023-08-14T07:46:07Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=3e316eeb-438d-4aa2-b94f-4442fa998ea8;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB2619:EE_|DM4PR12MB7694:EE_
+x-ms-office365-filtering-correlation-id: f303e7c8-1a2b-4d4a-9d37-08db9c9a86fa
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 8GFLli7fZetMbMiR3j1ooqzc7r+Rx4K0zgrD7IeJGBNBZ2BC2EtcIh+uQLqzdlq+deSH48U7bhNdOMxGDYVjPrABs/usrxZfgPfm/hOC3foAnov2Dg7+qvS2SsFYhiNxdmjggPaSTP6V3iPZllOHxmnlJfpWqHjoeInfJedNWlSaGWtoQmNaAl6FKIcRiXRx3Xf/0nH9X2RiP7zfryKvex1Z9gNyqfd/Y27XsL1ezQzoS/8WqO0X/sMbtY/mvgXaiWbqRHqqv5SIMa8GwHz9bpfifKcKkbRPtYb5pTeSdKD9iu2lUA0KuJZrmvwznRoXH67j+dGRRz06qH4OO1587cAG88BfthxGyTLjJnC71UXjuoYdlIq7ZkwhSVcFOIaGXzP0AUBh4gEhHGf4nUHPrlih7NTHJhHZpGRJhA2j1X3MvOR/Gb6S/+NbFk337PLC5pgCBFeLSpMqag5p7dQbGBR1oJvM2xW9DORZBQZwCQqstCiPtlE2X2RHljephgCCBvKPy9ISb+9AOwJL5qo1Vk3OISxuj9uiD0I2JdG7EwPc6sVwQiutVzpixXc7ujY7DSiUoy1nR+zPPjg9rmxeg3ZSFfk0XzOhPgUF4Afzu+0lEJXWzTEsA6MQZw2l00Je
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2619.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(136003)(396003)(366004)(376002)(39860400002)(1800799006)(186006)(451199021)(6506007)(53546011)(26005)(8936002)(41300700001)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(8676002)(316002)(9686003)(83380400001)(71200400001)(7696005)(122000001)(478600001)(38100700002)(55016003)(54906003)(33656002)(86362001)(6916009)(4326008)(5660300002)(2906002)(7416002)(38070700005)(52536014);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?T8ydrTOgW3G3EhajlAuvLaRhdCZ67Og7EOvIRl++EsZb0Txj0ga6pr48gC55?=
+ =?us-ascii?Q?wu1dtmM8Rk4mdoVU+kmEDiDpPrGQdeOjBm+AIHFq4+kHYVhEPa+2sGK1FaNY?=
+ =?us-ascii?Q?mTjAplBWUxq8Pf1jiu8CYr9lO+ER+zkal153L3vIVn1wUZioyIvk3ZSWwEoo?=
+ =?us-ascii?Q?LCkLTql+V19G59YO7+aTAGC1HLPVmkp+9l/7buNjr+mYEVA+MIqsKK9XIwGM?=
+ =?us-ascii?Q?dbk9SqTlTUNVZTLqcfuic36RPy36rRKe7p1X1N2XVu3rcVFJyZwl/smLz94i?=
+ =?us-ascii?Q?90OyP726tXYU31dnFEeDjj5Oil/mFxpAyp4IsKCDhVn/vq+UjsbhDqLwEIrs?=
+ =?us-ascii?Q?/jsB++QwxS9TbdgiRzNw493Kbn5jk7IdJTNmy4WmiWP2teikCUDc3onnPaVa?=
+ =?us-ascii?Q?jAwbcn962Otn1r2GsbbgmMTRg5+UK4bCQCLOjNMkng0dk5ik5iirUorvpzg+?=
+ =?us-ascii?Q?cA4oTJ57Nku6ZEDZtgSlJaUhz3WRWNb7klixDWFKz/uzQRTspyi1OiRUhRdk?=
+ =?us-ascii?Q?5afQ3FQf1Ua3+rtdjTlPKBT3PCKfAJ6UYyDqkdb6ZneBuXj+qhA451Y9Xo61?=
+ =?us-ascii?Q?v5BV1oPeyvI3fgzeGUQzkFYUoOitrLMX+0O8V0Wp37nQGtKRrv8yVLQB1QT1?=
+ =?us-ascii?Q?b7sgcT2RRL9pmLE+HiEVBUEPFbC00fqAsDgETCmS/6ESz9i20Rs/Yr9158/8?=
+ =?us-ascii?Q?MIiQA/BPIsOowJv1pb4fkDFuI2z/TDpozNlnPQouUL0WrzImmqhSiNREWGl4?=
+ =?us-ascii?Q?E4EcMmbfExHkJ4aov58hbGqjefOfgBnjwW7GDm0O7NgpMRCKCDWYNAw09Lcs?=
+ =?us-ascii?Q?xsGsaeHe25cYfCrGacVTb0ck9DYQ9JbHDVsvSKZjmg5EJgwyawdwIKg41u4E?=
+ =?us-ascii?Q?DeK+X3xUpP/GAuhSr6otI3Rgmna9RWy7/ESJC4bs8YTzANTREsUL//AP8CI2?=
+ =?us-ascii?Q?ulwfxUo2wjHYl8TW60Ukh0OCyuZaHz16ZBrnO+TLL5ATT2rFi4S3KpTNYqBr?=
+ =?us-ascii?Q?Q/iuQQGeTzUCiy3C25VyDQePLn1XYZDxcxmuET0G3siPi/rNDWtQe0gJwAv5?=
+ =?us-ascii?Q?EblfAVSgSzdSlhsCBlM735bUBlI1Pu9iE8NCosJSEoKdMQfy0DIVLVx0yBpd?=
+ =?us-ascii?Q?uLjOJpDmk5oIQ6LRLU04fQAFhlmJf1DuK/VbZcZWNH7YGgHPUSfRhL+Zs/aV?=
+ =?us-ascii?Q?0WPS6aPvBZPIm+WWbm2CCdxAwkr4rrV08h/jsacqZiTO4hCx7l3WOcMpFtNs?=
+ =?us-ascii?Q?9FcxwYwIwD9iAZPrHjijhoxOIMZWZthwqylOrX0EVaBQrDZISP/DJv7A8X15?=
+ =?us-ascii?Q?NVKBpRiOvdcsH1V4K+r0OA8/GHfQtzcH78Sk3nhY6jEV2TwI6w0qNj6jFrSV?=
+ =?us-ascii?Q?elNtJZHo0WIWtL3D61kquFDM3TCy4tJxqRnB3lSTVe8LBxVVSxKcw5rWAJjY?=
+ =?us-ascii?Q?o+8TwnjLZ0Bf3p3ryfQbyJiTTOw2LUlXG5IoD7EJ0UCsLufsu69UBkThu4Wt?=
+ =?us-ascii?Q?P2QKj+gi8oaApaPn382YnHqDWb7SkdfnKu/CSyB3epp9RvXnvUJundwvqC7L?=
+ =?us-ascii?Q?mY7c0LI4dgwDModjSwI=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2619.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f303e7c8-1a2b-4d4a-9d37-08db9c9a86fa
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2023 07:46:10.6428
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3qDDNDPjlC8m0GfXSN+AYeI09M2nwDasViMuZ+4+NYqtHq8/YRykSAe7x9lN4SRE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7694
+X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Arnd Bergmann <arnd@arndb.de>
+[AMD Official Use Only - General]
 
-Newer versions of clang warn about this variable being assigned but
-never used:
 
-drivers/net/ethernet/qlogic/qed/qed_vf.c:63:67: error: parameter 'resp_size' set but not used [-Werror,-Wunused-but-set-parameter]
 
-There is no indication in the git history on how this was ever
-meant to be used, so just remove the entire calculation and argument
-passing for it to avoid the warning.
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Friday, August 11, 2023 5:38 PM
+> To: Quan, Evan <Evan.Quan@amd.com>
+> Cc: rafael@kernel.org; lenb@kernel.org; Deucher, Alexander
+> <Alexander.Deucher@amd.com>; Koenig, Christian
+> <Christian.Koenig@amd.com>; Pan, Xinhui <Xinhui.Pan@amd.com>;
+> airlied@gmail.com; daniel@ffwll.ch; johannes@sipsolutions.net;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; Limonciello, Mario <Mario.Limonciello@amd.com>;
+> mdaenzer@redhat.com; maarten.lankhorst@linux.intel.com;
+> tzimmermann@suse.de; hdegoede@redhat.com; jingyuwang_vip@163.com;
+> Lazar, Lijo <Lijo.Lazar@amd.com>; jim.cromie@gmail.com;
+> bellosilicio@gmail.com; andrealmeid@igalia.com; trix@redhat.com;
+> jsg@jsg.id.au; arnd@arndb.de; andrew@lunn.ch; linux-
+> kernel@vger.kernel.org; linux-acpi@vger.kernel.org; amd-
+> gfx@lists.freedesktop.org; dri-devel@lists.freedesktop.org; linux-
+> wireless@vger.kernel.org; netdev@vger.kernel.org
+> Subject: Re: [PATCH V8 2/9] drivers core: add ACPI based WBRF mechanism
+> introduced by AMD
+>=20
+> On Thu, Aug 10, 2023 at 03:37:56PM +0800, Evan Quan wrote:
+> > AMD has introduced an ACPI based mechanism to support WBRF for some
+> > platforms with AMD dGPU + WLAN. This needs support from BIOS equipped
+> > with necessary AML implementations and dGPU firmwares.
+> >
+> > For those systems without the ACPI mechanism and developing solutions,
+> > user can use/fall-back the generic WBRF solution for diagnosing potenti=
+al
+> > interference issues.
+> >
+> > And for the platform which does not equip with the necessary AMD ACPI
+> > implementations but with CONFIG_WBRF_AMD_ACPI built as 'y', it will
+> > fall back to generic WBRF solution if the `wbrf` is set as "on".
+> >
+> > Co-developed-by: Mario Limonciello <mario.limonciello@amd.com>
+> > Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+> > Co-developed-by: Evan Quan <evan.quan@amd.com>
+> > Signed-off-by: Evan Quan <evan.quan@amd.com>
+>=20
+> ...
+>=20
+> > diff --git a/drivers/acpi/amd_wbrf.c b/drivers/acpi/amd_wbrf.c
+>=20
+> ...
+>=20
+> > +static bool check_acpi_wbrf(acpi_handle handle, u64 rev, u64 funcs)
+> > +{
+> > +	int i;
+> > +	u64 mask =3D 0;
+> > +	union acpi_object *obj;
+> > +
+> > +	if (funcs =3D=3D 0)
+> > +		return false;
+> > +
+> > +	obj =3D acpi_evaluate_wbrf(handle, rev, 0);
+> > +	if (!obj)
+> > +		return false;
+> > +
+> > +	if (obj->type !=3D ACPI_TYPE_BUFFER)
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * Bit vector providing supported functions information.
+> > +	 * Each bit marks support for one specific function of the WBRF
+> method.
+> > +	 */
+> > +	for (i =3D 0; i < obj->buffer.length && i < 8; i++)
+> > +		mask |=3D (((u64)obj->buffer.pointer[i]) << (i * 8));
+> > +
+> > +	ACPI_FREE(obj);
+> > +
+> > +	if ((mask & BIT(WBRF_ENABLED)) &&
+> > +	     (mask & funcs) =3D=3D funcs)
+>=20
+> Hi Evan,
+>=20
+> a minor nit from my side: the indentation of the line above seems odd.
+Thanks. Will update this.
 
-Fixes: 1408cc1fa48c5 ("qed: Introduce VFs")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ethernet/qlogic/qed/qed_vf.c | 45 +++++++++---------------
- 1 file changed, 17 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_vf.c b/drivers/net/ethernet/qlogic/qed/qed_vf.c
-index 7b0e390c0b07d..0e265ed1f501c 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_vf.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_vf.c
-@@ -60,7 +60,7 @@ static void qed_vf_pf_req_end(struct qed_hwfn *p_hwfn, int req_status)
- #define QED_VF_CHANNEL_MSLEEP_ITERATIONS	10
- #define QED_VF_CHANNEL_MSLEEP_DELAY		25
- 
--static int qed_send_msg2pf(struct qed_hwfn *p_hwfn, u8 *done, u32 resp_size)
-+static int qed_send_msg2pf(struct qed_hwfn *p_hwfn, u8 *done)
- {
- 	union vfpf_tlvs *p_req = p_hwfn->vf_iov_info->vf2pf_request;
- 	struct ustorm_trigger_vf_zone trigger;
-@@ -72,9 +72,6 @@ static int qed_send_msg2pf(struct qed_hwfn *p_hwfn, u8 *done, u32 resp_size)
- 	/* output tlvs list */
- 	qed_dp_tlv_list(p_hwfn, p_req);
- 
--	/* need to add the END TLV to the message size */
--	resp_size += sizeof(struct channel_list_end_tlv);
--
- 	/* Send TLVs over HW channel */
- 	memset(&trigger, 0, sizeof(struct ustorm_trigger_vf_zone));
- 	trigger.vf_pf_msg_valid = 1;
-@@ -172,7 +169,7 @@ static int _qed_vf_pf_release(struct qed_hwfn *p_hwfn, bool b_final)
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 
- 	if (!rc && resp->hdr.status != PFVF_STATUS_SUCCESS)
- 		rc = -EAGAIN;
-@@ -301,7 +298,7 @@ static int qed_vf_pf_acquire(struct qed_hwfn *p_hwfn)
- 		memset(p_iov->pf2vf_reply, 0, sizeof(union pfvf_tlvs));
- 
- 		/* send acquire request */
--		rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+		rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 
- 		/* Re-try acquire in case of vf-pf hw channel timeout */
- 		if (retry_cnt && rc == -EBUSY) {
-@@ -705,7 +702,7 @@ int qed_vf_pf_tunnel_param_update(struct qed_hwfn *p_hwfn,
- 		    sizeof(struct channel_list_end_tlv));
- 
- 	p_resp = &p_iov->pf2vf_reply->tunn_param_resp;
--	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status, sizeof(*p_resp));
-+	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status);
- 
- 	if (rc)
- 		goto exit;
-@@ -772,7 +769,7 @@ qed_vf_pf_rxq_start(struct qed_hwfn *p_hwfn,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->queue_start;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -822,7 +819,7 @@ int qed_vf_pf_rxq_stop(struct qed_hwfn *p_hwfn,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -867,7 +864,7 @@ qed_vf_pf_txq_start(struct qed_hwfn *p_hwfn,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->queue_start;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -918,7 +915,7 @@ int qed_vf_pf_txq_stop(struct qed_hwfn *p_hwfn, struct qed_queue_cid *p_cid)
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -968,7 +965,7 @@ int qed_vf_pf_vport_start(struct qed_hwfn *p_hwfn,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -997,7 +994,7 @@ int qed_vf_pf_vport_stop(struct qed_hwfn *p_hwfn)
- 	qed_add_tlv(p_hwfn, &p_iov->offset,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -1075,12 +1072,10 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 	struct vfpf_vport_update_tlv *req;
- 	struct pfvf_def_resp_tlv *resp;
- 	u8 update_rx, update_tx;
--	u32 resp_size = 0;
- 	u16 size, tlv;
- 	int rc;
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	resp_size = sizeof(*resp);
- 
- 	update_rx = p_params->update_vport_active_rx_flg;
- 	update_tx = p_params->update_vport_active_tx_flg;
-@@ -1096,7 +1091,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 		p_act_tlv = qed_add_tlv(p_hwfn, &p_iov->offset,
- 					CHANNEL_TLV_VPORT_UPDATE_ACTIVATE,
- 					size);
--		resp_size += sizeof(struct pfvf_def_resp_tlv);
- 
- 		if (update_rx) {
- 			p_act_tlv->update_rx = update_rx;
-@@ -1116,7 +1110,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 		tlv = CHANNEL_TLV_VPORT_UPDATE_TX_SWITCH;
- 		p_tx_switch_tlv = qed_add_tlv(p_hwfn, &p_iov->offset,
- 					      tlv, size);
--		resp_size += sizeof(struct pfvf_def_resp_tlv);
- 
- 		p_tx_switch_tlv->tx_switching = p_params->tx_switching_flg;
- 	}
-@@ -1127,7 +1120,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 		size = sizeof(struct vfpf_vport_update_mcast_bin_tlv);
- 		p_mcast_tlv = qed_add_tlv(p_hwfn, &p_iov->offset,
- 					  CHANNEL_TLV_VPORT_UPDATE_MCAST, size);
--		resp_size += sizeof(struct pfvf_def_resp_tlv);
- 
- 		memcpy(p_mcast_tlv->bins, p_params->bins,
- 		       sizeof(u32) * ETH_MULTICAST_MAC_BINS_IN_REGS);
-@@ -1142,7 +1134,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 		tlv = CHANNEL_TLV_VPORT_UPDATE_ACCEPT_PARAM;
- 		size = sizeof(struct vfpf_vport_update_accept_param_tlv);
- 		p_accept_tlv = qed_add_tlv(p_hwfn, &p_iov->offset, tlv, size);
--		resp_size += sizeof(struct pfvf_def_resp_tlv);
- 
- 		if (update_rx) {
- 			p_accept_tlv->update_rx_mode = update_rx;
-@@ -1166,7 +1157,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 		p_rss_tlv = qed_add_tlv(p_hwfn,
- 					&p_iov->offset,
- 					CHANNEL_TLV_VPORT_UPDATE_RSS, size);
--		resp_size += sizeof(struct pfvf_def_resp_tlv);
- 
- 		if (rss_params->update_rss_config)
- 			p_rss_tlv->update_rss_flags |=
-@@ -1203,7 +1193,6 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 		tlv = CHANNEL_TLV_VPORT_UPDATE_ACCEPT_ANY_VLAN;
- 		p_any_vlan_tlv = qed_add_tlv(p_hwfn, &p_iov->offset, tlv, size);
- 
--		resp_size += sizeof(struct pfvf_def_resp_tlv);
- 		p_any_vlan_tlv->accept_any_vlan = p_params->accept_any_vlan;
- 		p_any_vlan_tlv->update_accept_any_vlan_flg =
- 		    p_params->update_accept_any_vlan_flg;
-@@ -1213,7 +1202,7 @@ int qed_vf_pf_vport_update(struct qed_hwfn *p_hwfn,
- 	qed_add_tlv(p_hwfn, &p_iov->offset,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, resp_size);
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -1245,7 +1234,7 @@ int qed_vf_pf_reset(struct qed_hwfn *p_hwfn)
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -1303,7 +1292,7 @@ int qed_vf_pf_filter_ucast(struct qed_hwfn *p_hwfn,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -1332,7 +1321,7 @@ int qed_vf_pf_int_cleanup(struct qed_hwfn *p_hwfn)
- 	qed_add_tlv(p_hwfn, &p_iov->offset,
- 		    CHANNEL_TLV_LIST_END, sizeof(struct channel_list_end_tlv));
- 
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -1364,7 +1353,7 @@ int qed_vf_pf_get_coalesce(struct qed_hwfn *p_hwfn,
- 		    sizeof(struct channel_list_end_tlv));
- 	resp = &p_iov->pf2vf_reply->read_coal_resp;
- 
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
-@@ -1402,7 +1391,7 @@ qed_vf_pf_bulletin_update_mac(struct qed_hwfn *p_hwfn,
- 		    sizeof(struct channel_list_end_tlv));
- 
- 	p_resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status, sizeof(*p_resp));
-+	rc = qed_send_msg2pf(p_hwfn, &p_resp->hdr.status);
- 	qed_vf_pf_req_end(p_hwfn, rc);
- 	return rc;
- }
-@@ -1433,7 +1422,7 @@ qed_vf_pf_set_coalesce(struct qed_hwfn *p_hwfn,
- 		    sizeof(struct channel_list_end_tlv));
- 
- 	resp = &p_iov->pf2vf_reply->default_resp;
--	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status, sizeof(*resp));
-+	rc = qed_send_msg2pf(p_hwfn, &resp->hdr.status);
- 	if (rc)
- 		goto exit;
- 
--- 
-2.39.2
-
+Evan
+>=20
+> 	if ((mask & BIT(WBRF_ENABLED)) &&
+> 	    (mask & funcs) =3D=3D funcs)
+>=20
+> > +		return true;
+> > +
+> > +	return false;
+> > +}
+>=20
+> ...=
 
