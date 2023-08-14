@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-27501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 855FD77C29A
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:45:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B4E277C29B
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16D2B2804D9
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:45:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD5491C20B8B
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF1C111BA;
-	Mon, 14 Aug 2023 21:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2409F111A7;
+	Mon, 14 Aug 2023 21:42:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F04111A7
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:42:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33F02C433B7;
-	Mon, 14 Aug 2023 21:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A8311197
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:42:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40555C433AB;
+	Mon, 14 Aug 2023 21:42:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692049321;
-	bh=qwtWAcq398BF7b8zWRUOchoAzg2a13wqvWaBJISMH1Y=;
+	s=k20201202; t=1692049322;
+	bh=6YA5PETPbxnNgRSN/6ZMyfFv7qyyjjEd7FYgm1IguKg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cjbpOk/NFKDXlgOps0qCXhzVe5Jp6ARcShz5V4+yJuWbqNaFACmBx1WxZgs1Rax2r
-	 EFfAED4YfLrvuUBUNo4ANJDP/pjgtKwQJOv7XGV6b3lXwvbDlr0iWAJA6zPtGk1wO0
-	 UatI6yMgnwYkZUhspvR9+D57SMvNM0iQbFB2mpSmNWdW93GxwgE7RdtxwBLPGanLrg
-	 e0FfRpUyEBjOIvZJ84dbzBA0f+CuwKAjlwc8/YD9OXSH4oCEPQe0s+6Pi56qm53qjq
-	 Quvpt8STgexso+SDBwTpbAhTg/cpFZKT1KSaZheiNsUyxYghKxkBL2nMEb8Y/yJYmt
-	 igMX0AGzY2Aqw==
+	b=PPpTSoxr8l7k24eDo/SgMta5ANWh0yIVOih2eQm8RSaU+ZCRuSDmGvc9Qx0c036zO
+	 nKc3q6tyKm4tZbDrtuilw4Jf+S7Cs/QqPoYvYi9nJsO3oab5fV1GjJfWe6uSHKmDGn
+	 5lq9obeQ3ikN5dLoo3yMHipTpFhAp5HZxC7tSQXY85NgO+Q4iJhnPNqfGcfxhyNxeX
+	 Yrtvjfyemn7wAc5FZMu1TqTsvhLMKryTj1syUtTgoxe6fO6aWx6SJpFFNZ0qGurGin
+	 rIvUFbEXsx8sCm+ooIq2If6TEWFpITd1USOeVGzH9/B9M6J6ROv2h/AHWtnR0Xyfwx
+	 fpUNIDOZuQwmg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,9 +40,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Shay Drory <shayd@nvidia.com>,
 	Maher Sanalla <msanalla@nvidia.com>
-Subject: [net-next 12/14] net/mlx5: Remove unused CAPs
-Date: Mon, 14 Aug 2023 14:41:42 -0700
-Message-ID: <20230814214144.159464-13-saeed@kernel.org>
+Subject: [net-next 13/14] net/mlx5: Remove unused MAX HCA capabilities
+Date: Mon, 14 Aug 2023 14:41:43 -0700
+Message-ID: <20230814214144.159464-14-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230814214144.159464-1-saeed@kernel.org>
 References: <20230814214144.159464-1-saeed@kernel.org>
@@ -56,217 +56,334 @@ Content-Transfer-Encoding: 8bit
 
 From: Shay Drory <shayd@nvidia.com>
 
-mlx5 driver queries the device for VECTOR_CALC and SHAMPO caps, but
-there isn't any user who requires them.
-As well as, MLX5_MCAM_REGS_0x9080_0x90FF is queried but not used.
+Each device cap has two modes: MAX and CUR. The driver maintains a
+cache of both modes of the capabilities. For most device caps, the MAX
+cap mode is never used.
 
-Thus, drop all usages and definitions of the mentioned caps above.
+Hence, remove all driver queries of the MAX mode of the said caps as
+well as their helper MACROs.
 
 Signed-off-by: Shay Drory <shayd@nvidia.com>
 Reviewed-by: Maher Sanalla <msanalla@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/fw.c  | 13 ------
- .../net/ethernet/mellanox/mlx5/core/main.c    |  2 -
- include/linux/mlx5/device.h                   | 17 +-------
- include/linux/mlx5/mlx5_ifc.h                 | 43 -------------------
- 4 files changed, 1 insertion(+), 74 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c  | 34 ++++++------
+ .../net/ethernet/mellanox/mlx5/core/main.c    | 14 ++---
+ .../ethernet/mellanox/mlx5/core/mlx5_core.h   |  3 ++
+ include/linux/mlx5/device.h                   | 52 -------------------
+ include/linux/mlx5/driver.h                   |  1 -
+ 5 files changed, 30 insertions(+), 74 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw.c b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-index fb2035a5ec99..c982ce06d7a3 100644
+index c982ce06d7a3..0e394408af75 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/fw.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/fw.c
-@@ -206,12 +206,6 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
- 			return err;
+@@ -160,13 +160,15 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
  	}
  
--	if (MLX5_CAP_GEN(dev, vector_calc)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_VECTOR_CALC);
--		if (err)
--			return err;
--	}
--
- 	if (MLX5_CAP_GEN(dev, qos)) {
- 		err = mlx5_core_get_caps(dev, MLX5_CAP_QOS);
+ 	if (MLX5_CAP_GEN(dev, eth_net_offloads)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_ETHERNET_OFFLOADS);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ETHERNET_OFFLOADS,
++					      HCA_CAP_OPMOD_GET_CUR);
  		if (err)
-@@ -226,7 +220,6 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
- 
- 	if (MLX5_CAP_GEN(dev, mcam_reg)) {
- 		mlx5_get_mcam_access_reg_group(dev, MLX5_MCAM_REGS_FIRST_128);
--		mlx5_get_mcam_access_reg_group(dev, MLX5_MCAM_REGS_0x9080_0x90FF);
- 		mlx5_get_mcam_access_reg_group(dev, MLX5_MCAM_REGS_0x9100_0x917F);
- 	}
- 
-@@ -270,12 +263,6 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
  			return err;
  	}
  
--	if (MLX5_CAP_GEN(dev, shampo)) {
--		err = mlx5_core_get_caps(dev, MLX5_CAP_DEV_SHAMPO);
--		if (err)
--			return err;
--	}
--
+ 	if (MLX5_CAP_GEN(dev, ipoib_enhanced_offloads)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_IPOIB_ENHANCED_OFFLOADS);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_IPOIB_ENHANCED_OFFLOADS,
++					      HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -191,29 +193,30 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
+ 
+ 	if (MLX5_CAP_GEN(dev, nic_flow_table) ||
+ 	    MLX5_CAP_GEN(dev, ipoib_enhanced_offloads)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_FLOW_TABLE);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_FLOW_TABLE, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_ESWITCH_MANAGER(dev)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_ESWITCH_FLOW_TABLE);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ESWITCH_FLOW_TABLE,
++					      HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_ESWITCH);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ESWITCH, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, qos)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_QOS);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_QOS, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, debug))
+-		mlx5_core_get_caps(dev, MLX5_CAP_DEBUG);
++		mlx5_core_get_caps_mode(dev, MLX5_CAP_DEBUG, HCA_CAP_OPMOD_GET_CUR);
+ 
+ 	if (MLX5_CAP_GEN(dev, pcam_reg))
+ 		mlx5_get_pcam_reg(dev);
+@@ -227,51 +230,52 @@ int mlx5_query_hca_caps(struct mlx5_core_dev *dev)
+ 		mlx5_get_qcam_reg(dev);
+ 
+ 	if (MLX5_CAP_GEN(dev, device_memory)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_DEV_MEM);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_DEV_MEM, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, event_cap)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_DEV_EVENT);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_DEV_EVENT, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, tls_tx) || MLX5_CAP_GEN(dev, tls_rx)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_TLS);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_TLS, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN_64(dev, general_obj_types) &
+ 		MLX5_GENERAL_OBJ_TYPES_CAP_VIRTIO_NET_Q) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_VDPA_EMULATION);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_VDPA_EMULATION, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, ipsec_offload)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_IPSEC);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_IPSEC, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, crypto)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_CRYPTO);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_CRYPTO, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
  	if (MLX5_CAP_GEN_64(dev, general_obj_types) &
  	    MLX5_GENERAL_OBJ_TYPES_CAP_MACSEC_OFFLOAD) {
- 		err = mlx5_core_get_caps(dev, MLX5_CAP_MACSEC);
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_MACSEC);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_MACSEC, HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, adv_virtualization)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_ADV_VIRTUALIZATION);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ADV_VIRTUALIZATION,
++					      HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index f4fe06a5042e..cb77b5774aad 100644
+index cb77b5774aad..15561965d2af 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -1714,7 +1714,6 @@ static const int types[] = {
- 	MLX5_CAP_FLOW_TABLE,
- 	MLX5_CAP_ESWITCH_FLOW_TABLE,
- 	MLX5_CAP_ESWITCH,
--	MLX5_CAP_VECTOR_CALC,
- 	MLX5_CAP_QOS,
- 	MLX5_CAP_DEBUG,
- 	MLX5_CAP_DEV_MEM,
-@@ -1723,7 +1722,6 @@ static const int types[] = {
- 	MLX5_CAP_VDPA_EMULATION,
- 	MLX5_CAP_IPSEC,
- 	MLX5_CAP_PORT_SELECTION,
--	MLX5_CAP_DEV_SHAMPO,
- 	MLX5_CAP_MACSEC,
- 	MLX5_CAP_ADV_VIRTUALIZATION,
- 	MLX5_CAP_CRYPTO,
+@@ -361,9 +361,8 @@ void mlx5_core_uplink_netdev_event_replay(struct mlx5_core_dev *dev)
+ }
+ EXPORT_SYMBOL(mlx5_core_uplink_netdev_event_replay);
+ 
+-static int mlx5_core_get_caps_mode(struct mlx5_core_dev *dev,
+-				   enum mlx5_cap_type cap_type,
+-				   enum mlx5_cap_mode cap_mode)
++int mlx5_core_get_caps_mode(struct mlx5_core_dev *dev, enum mlx5_cap_type cap_type,
++			    enum mlx5_cap_mode cap_mode)
+ {
+ 	u8 in[MLX5_ST_SZ_BYTES(query_hca_cap_in)];
+ 	int out_sz = MLX5_ST_SZ_BYTES(query_hca_cap_out);
+@@ -1620,21 +1619,24 @@ static int mlx5_query_hca_caps_light(struct mlx5_core_dev *dev)
+ 		return err;
+ 
+ 	if (MLX5_CAP_GEN(dev, eth_net_offloads)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_ETHERNET_OFFLOADS);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_ETHERNET_OFFLOADS,
++					      HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN(dev, nic_flow_table) ||
+ 	    MLX5_CAP_GEN(dev, ipoib_enhanced_offloads)) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_FLOW_TABLE);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_FLOW_TABLE,
++					      HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+ 
+ 	if (MLX5_CAP_GEN_64(dev, general_obj_types) &
+ 		MLX5_GENERAL_OBJ_TYPES_CAP_VIRTIO_NET_Q) {
+-		err = mlx5_core_get_caps(dev, MLX5_CAP_VDPA_EMULATION);
++		err = mlx5_core_get_caps_mode(dev, MLX5_CAP_VDPA_EMULATION,
++					      HCA_CAP_OPMOD_GET_CUR);
+ 		if (err)
+ 			return err;
+ 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
+index 8e2028d20a9e..124352459c23 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
+@@ -174,6 +174,9 @@ static inline int mlx5_flexible_inlen(struct mlx5_core_dev *dev, size_t fixed,
+ #define MLX5_FLEXIBLE_INLEN(dev, fixed, item_size, num_items) \
+ 	mlx5_flexible_inlen(dev, fixed, item_size, num_items, __func__, __LINE__)
+ 
++int mlx5_core_get_caps(struct mlx5_core_dev *dev, enum mlx5_cap_type cap_type);
++int mlx5_core_get_caps_mode(struct mlx5_core_dev *dev, enum mlx5_cap_type cap_type,
++			    enum mlx5_cap_mode cap_mode);
+ int mlx5_query_hca_caps(struct mlx5_core_dev *dev);
+ int mlx5_query_board_id(struct mlx5_core_dev *dev);
+ int mlx5_query_module_num(struct mlx5_core_dev *dev, int *module_num);
 diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 80cc12a9a531..5041965250f6 100644
+index 5041965250f6..93399802ba77 100644
 --- a/include/linux/mlx5/device.h
 +++ b/include/linux/mlx5/device.h
-@@ -1208,9 +1208,7 @@ enum mlx5_cap_type {
- 	MLX5_CAP_FLOW_TABLE,
- 	MLX5_CAP_ESWITCH_FLOW_TABLE,
- 	MLX5_CAP_ESWITCH,
--	MLX5_CAP_RESERVED,
--	MLX5_CAP_VECTOR_CALC,
--	MLX5_CAP_QOS,
-+	MLX5_CAP_QOS = 0xc,
- 	MLX5_CAP_DEBUG,
- 	MLX5_CAP_RESERVED_14,
- 	MLX5_CAP_DEV_MEM,
-@@ -1220,7 +1218,6 @@ enum mlx5_cap_type {
- 	MLX5_CAP_DEV_EVENT = 0x14,
- 	MLX5_CAP_IPSEC,
- 	MLX5_CAP_CRYPTO = 0x1a,
--	MLX5_CAP_DEV_SHAMPO = 0x1d,
- 	MLX5_CAP_MACSEC = 0x1f,
- 	MLX5_CAP_GENERAL_2 = 0x20,
- 	MLX5_CAP_PORT_SELECTION = 0x25,
-@@ -1239,7 +1236,6 @@ enum mlx5_pcam_feature_groups {
+@@ -1275,10 +1275,6 @@ enum mlx5_qcam_feature_groups {
+ 	MLX5_GET(per_protocol_networking_offload_caps,\
+ 		 mdev->caps.hca[MLX5_CAP_ETHERNET_OFFLOADS]->cur, cap)
  
- enum mlx5_mcam_reg_groups {
- 	MLX5_MCAM_REGS_FIRST_128                    = 0x0,
--	MLX5_MCAM_REGS_0x9080_0x90FF                = 0x1,
- 	MLX5_MCAM_REGS_0x9100_0x917F                = 0x2,
- 	MLX5_MCAM_REGS_NUM                          = 0x3,
- };
-@@ -1416,10 +1412,6 @@ enum mlx5_qcam_feature_groups {
- #define MLX5_CAP_ODP_MAX(mdev, cap)\
- 	MLX5_GET(odp_cap, mdev->caps.hca[MLX5_CAP_ODP]->max, cap)
+-#define MLX5_CAP_ETH_MAX(mdev, cap) \
+-	MLX5_GET(per_protocol_networking_offload_caps,\
+-		 mdev->caps.hca[MLX5_CAP_ETHERNET_OFFLOADS]->max, cap)
+-
+ #define MLX5_CAP_IPOIB_ENHANCED(mdev, cap) \
+ 	MLX5_GET(per_protocol_networking_offload_caps,\
+ 		 mdev->caps.hca[MLX5_CAP_IPOIB_ENHANCED_OFFLOADS]->cur, cap)
+@@ -1301,77 +1297,40 @@ enum mlx5_qcam_feature_groups {
+ #define MLX5_CAP64_FLOWTABLE(mdev, cap) \
+ 	MLX5_GET64(flow_table_nic_cap, (mdev)->caps.hca[MLX5_CAP_FLOW_TABLE]->cur, cap)
  
--#define MLX5_CAP_VECTOR_CALC(mdev, cap) \
--	MLX5_GET(vector_calc_cap, \
--		 mdev->caps.hca[MLX5_CAP_VECTOR_CALC]->cur, cap)
+-#define MLX5_CAP_FLOWTABLE_MAX(mdev, cap) \
+-	MLX5_GET(flow_table_nic_cap, mdev->caps.hca[MLX5_CAP_FLOW_TABLE]->max, cap)
 -
- #define MLX5_CAP_QOS(mdev, cap)\
- 	MLX5_GET(qos_cap, mdev->caps.hca[MLX5_CAP_QOS]->cur, cap)
+ #define MLX5_CAP_FLOWTABLE_NIC_RX(mdev, cap) \
+ 	MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_receive.cap)
  
-@@ -1436,10 +1428,6 @@ enum mlx5_qcam_feature_groups {
- 	MLX5_GET(mcam_reg, (mdev)->caps.mcam[MLX5_MCAM_REGS_FIRST_128], \
- 		 mng_access_reg_cap_mask.access_regs.reg)
+-#define MLX5_CAP_FLOWTABLE_NIC_RX_MAX(mdev, cap) \
+-	MLX5_CAP_FLOWTABLE_MAX(mdev, flow_table_properties_nic_receive.cap)
+-
+ #define MLX5_CAP_FLOWTABLE_NIC_TX(mdev, cap) \
+ 		MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_transmit.cap)
  
--#define MLX5_CAP_MCAM_REG1(mdev, reg) \
--	MLX5_GET(mcam_reg, (mdev)->caps.mcam[MLX5_MCAM_REGS_0x9080_0x90FF], \
--		 mng_access_reg_cap_mask.access_regs1.reg)
+-#define MLX5_CAP_FLOWTABLE_NIC_TX_MAX(mdev, cap) \
+-	MLX5_CAP_FLOWTABLE_MAX(mdev, flow_table_properties_nic_transmit.cap)
 -
- #define MLX5_CAP_MCAM_REG2(mdev, reg) \
- 	MLX5_GET(mcam_reg, (mdev)->caps.mcam[MLX5_MCAM_REGS_0x9100_0x917F], \
- 		 mng_access_reg_cap_mask.access_regs2.reg)
-@@ -1485,9 +1473,6 @@ enum mlx5_qcam_feature_groups {
- #define MLX5_CAP_CRYPTO(mdev, cap)\
- 	MLX5_GET(crypto_cap, (mdev)->caps.hca[MLX5_CAP_CRYPTO]->cur, cap)
+ #define MLX5_CAP_FLOWTABLE_SNIFFER_RX(mdev, cap) \
+ 	MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_receive_sniffer.cap)
  
--#define MLX5_CAP_DEV_SHAMPO(mdev, cap)\
--	MLX5_GET(shampo_cap, mdev->caps.hca_cur[MLX5_CAP_DEV_SHAMPO], cap)
+-#define MLX5_CAP_FLOWTABLE_SNIFFER_RX_MAX(mdev, cap) \
+-	MLX5_CAP_FLOWTABLE_MAX(mdev, flow_table_properties_nic_receive_sniffer.cap)
 -
- #define MLX5_CAP_MACSEC(mdev, cap)\
- 	MLX5_GET(macsec_cap, (mdev)->caps.hca[MLX5_CAP_MACSEC]->cur, cap)
+ #define MLX5_CAP_FLOWTABLE_SNIFFER_TX(mdev, cap) \
+ 	MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_transmit_sniffer.cap)
  
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 9aed7e9b9f29..08dcb1f43be7 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -1314,33 +1314,6 @@ struct mlx5_ifc_odp_cap_bits {
- 	u8         reserved_at_120[0x6E0];
- };
+-#define MLX5_CAP_FLOWTABLE_SNIFFER_TX_MAX(mdev, cap) \
+-	MLX5_CAP_FLOWTABLE_MAX(mdev, flow_table_properties_nic_transmit_sniffer.cap)
+-
+ #define MLX5_CAP_FLOWTABLE_RDMA_RX(mdev, cap) \
+ 	MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_receive_rdma.cap)
  
--struct mlx5_ifc_calc_op {
--	u8        reserved_at_0[0x10];
--	u8        reserved_at_10[0x9];
--	u8        op_swap_endianness[0x1];
--	u8        op_min[0x1];
--	u8        op_xor[0x1];
--	u8        op_or[0x1];
--	u8        op_and[0x1];
--	u8        op_max[0x1];
--	u8        op_add[0x1];
--};
+-#define MLX5_CAP_FLOWTABLE_RDMA_RX_MAX(mdev, cap) \
+-	MLX5_CAP_FLOWTABLE_MAX(mdev, flow_table_properties_nic_receive_rdma.cap)
 -
--struct mlx5_ifc_vector_calc_cap_bits {
--	u8         calc_matrix[0x1];
--	u8         reserved_at_1[0x1f];
--	u8         reserved_at_20[0x8];
--	u8         max_vec_count[0x8];
--	u8         reserved_at_30[0xd];
--	u8         max_chunk_size[0x3];
--	struct mlx5_ifc_calc_op calc0;
--	struct mlx5_ifc_calc_op calc1;
--	struct mlx5_ifc_calc_op calc2;
--	struct mlx5_ifc_calc_op calc3;
--
--	u8         reserved_at_c0[0x720];
--};
--
- struct mlx5_ifc_tls_cap_bits {
- 	u8         tls_1_2_aes_gcm_128[0x1];
- 	u8         tls_1_3_aes_gcm_128[0x1];
-@@ -3435,20 +3408,6 @@ struct mlx5_ifc_roce_addr_layout_bits {
- 	u8         reserved_at_e0[0x20];
- };
+ #define MLX5_CAP_FLOWTABLE_RDMA_TX(mdev, cap) \
+ 	MLX5_CAP_FLOWTABLE(mdev, flow_table_properties_nic_transmit_rdma.cap)
  
--struct mlx5_ifc_shampo_cap_bits {
--	u8    reserved_at_0[0x3];
--	u8    shampo_log_max_reservation_size[0x5];
--	u8    reserved_at_8[0x3];
--	u8    shampo_log_min_reservation_size[0x5];
--	u8    shampo_min_mss_size[0x10];
+-#define MLX5_CAP_FLOWTABLE_RDMA_TX_MAX(mdev, cap) \
+-	MLX5_CAP_FLOWTABLE_MAX(mdev, flow_table_properties_nic_transmit_rdma.cap)
 -
--	u8    reserved_at_20[0x3];
--	u8    shampo_max_log_headers_entry_size[0x5];
--	u8    reserved_at_28[0x18];
+ #define MLX5_CAP_ESW_FLOWTABLE(mdev, cap) \
+ 	MLX5_GET(flow_table_eswitch_cap, \
+ 		 mdev->caps.hca[MLX5_CAP_ESWITCH_FLOW_TABLE]->cur, cap)
+ 
+-#define MLX5_CAP_ESW_FLOWTABLE_MAX(mdev, cap) \
+-	MLX5_GET(flow_table_eswitch_cap, \
+-		 mdev->caps.hca[MLX5_CAP_ESWITCH_FLOW_TABLE]->max, cap)
 -
--	u8    reserved_at_40[0x7c0];
--};
+ #define MLX5_CAP_ESW_FLOWTABLE_FDB(mdev, cap) \
+ 	MLX5_CAP_ESW_FLOWTABLE(mdev, flow_table_properties_nic_esw_fdb.cap)
+ 
+-#define MLX5_CAP_ESW_FLOWTABLE_FDB_MAX(mdev, cap) \
+-	MLX5_CAP_ESW_FLOWTABLE_MAX(mdev, flow_table_properties_nic_esw_fdb.cap)
 -
- struct mlx5_ifc_crypto_cap_bits {
- 	u8    reserved_at_0[0x3];
- 	u8    synchronize_dek[0x1];
-@@ -3484,14 +3443,12 @@ union mlx5_ifc_hca_cap_union_bits {
- 	struct mlx5_ifc_flow_table_eswitch_cap_bits flow_table_eswitch_cap;
- 	struct mlx5_ifc_e_switch_cap_bits e_switch_cap;
- 	struct mlx5_ifc_port_selection_cap_bits port_selection_cap;
--	struct mlx5_ifc_vector_calc_cap_bits vector_calc_cap;
- 	struct mlx5_ifc_qos_cap_bits qos_cap;
- 	struct mlx5_ifc_debug_cap_bits debug_cap;
- 	struct mlx5_ifc_fpga_cap_bits fpga_cap;
- 	struct mlx5_ifc_tls_cap_bits tls_cap;
- 	struct mlx5_ifc_device_mem_cap_bits device_mem_cap;
- 	struct mlx5_ifc_virtio_emulation_cap_bits virtio_emulation_cap;
--	struct mlx5_ifc_shampo_cap_bits shampo_cap;
- 	struct mlx5_ifc_macsec_cap_bits macsec_cap;
- 	struct mlx5_ifc_crypto_cap_bits crypto_cap;
- 	u8         reserved_at_0[0x8000];
+ #define MLX5_CAP_ESW_EGRESS_ACL(mdev, cap) \
+ 	MLX5_CAP_ESW_FLOWTABLE(mdev, flow_table_properties_esw_acl_egress.cap)
+ 
+-#define MLX5_CAP_ESW_EGRESS_ACL_MAX(mdev, cap) \
+-	MLX5_CAP_ESW_FLOWTABLE_MAX(mdev, flow_table_properties_esw_acl_egress.cap)
+-
+ #define MLX5_CAP_ESW_INGRESS_ACL(mdev, cap) \
+ 	MLX5_CAP_ESW_FLOWTABLE(mdev, flow_table_properties_esw_acl_ingress.cap)
+ 
+-#define MLX5_CAP_ESW_INGRESS_ACL_MAX(mdev, cap) \
+-	MLX5_CAP_ESW_FLOWTABLE_MAX(mdev, flow_table_properties_esw_acl_ingress.cap)
+-
+ #define MLX5_CAP_ESW_FT_FIELD_SUPPORT_2(mdev, cap) \
+ 	MLX5_CAP_ESW_FLOWTABLE(mdev, ft_field_support_2_esw_fdb.cap)
+ 
+-#define MLX5_CAP_ESW_FT_FIELD_SUPPORT_2_MAX(mdev, cap) \
+-	MLX5_CAP_ESW_FLOWTABLE_MAX(mdev, ft_field_support_2_esw_fdb.cap)
+-
+ #define MLX5_CAP_ESW(mdev, cap) \
+ 	MLX5_GET(e_switch_cap, \
+ 		 mdev->caps.hca[MLX5_CAP_ESWITCH]->cur, cap)
+@@ -1380,10 +1339,6 @@ enum mlx5_qcam_feature_groups {
+ 	MLX5_GET64(flow_table_eswitch_cap, \
+ 		(mdev)->caps.hca[MLX5_CAP_ESWITCH_FLOW_TABLE]->cur, cap)
+ 
+-#define MLX5_CAP_ESW_MAX(mdev, cap) \
+-	MLX5_GET(e_switch_cap, \
+-		 mdev->caps.hca[MLX5_CAP_ESWITCH]->max, cap)
+-
+ #define MLX5_CAP_PORT_SELECTION(mdev, cap) \
+ 	MLX5_GET(port_selection_cap, \
+ 		 mdev->caps.hca[MLX5_CAP_PORT_SELECTION]->cur, cap)
+@@ -1396,16 +1351,9 @@ enum mlx5_qcam_feature_groups {
+ 	MLX5_GET(adv_virtualization_cap, \
+ 		 mdev->caps.hca[MLX5_CAP_ADV_VIRTUALIZATION]->cur, cap)
+ 
+-#define MLX5_CAP_ADV_VIRTUALIZATION_MAX(mdev, cap) \
+-	MLX5_GET(adv_virtualization_cap, \
+-		 mdev->caps.hca[MLX5_CAP_ADV_VIRTUALIZATION]->max, cap)
+-
+ #define MLX5_CAP_FLOWTABLE_PORT_SELECTION(mdev, cap) \
+ 	MLX5_CAP_PORT_SELECTION(mdev, flow_table_properties_port_selection.cap)
+ 
+-#define MLX5_CAP_FLOWTABLE_PORT_SELECTION_MAX(mdev, cap) \
+-	MLX5_CAP_PORT_SELECTION_MAX(mdev, flow_table_properties_port_selection.cap)
+-
+ #define MLX5_CAP_ODP(mdev, cap)\
+ 	MLX5_GET(odp_cap, mdev->caps.hca[MLX5_CAP_ODP]->cur, cap)
+ 
+diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+index e1c7e502a4fc..c9d82e74daaa 100644
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@ -1022,7 +1022,6 @@ bool mlx5_cmd_is_down(struct mlx5_core_dev *dev);
+ void mlx5_core_uplink_netdev_set(struct mlx5_core_dev *mdev, struct net_device *netdev);
+ void mlx5_core_uplink_netdev_event_replay(struct mlx5_core_dev *mdev);
+ 
+-int mlx5_core_get_caps(struct mlx5_core_dev *dev, enum mlx5_cap_type cap_type);
+ void mlx5_health_cleanup(struct mlx5_core_dev *dev);
+ int mlx5_health_init(struct mlx5_core_dev *dev);
+ void mlx5_start_health_poll(struct mlx5_core_dev *dev);
 -- 
 2.41.0
 
