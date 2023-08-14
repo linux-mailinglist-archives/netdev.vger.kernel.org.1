@@ -1,171 +1,114 @@
-Return-Path: <netdev+bounces-27345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922F677B88D
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:23:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A08DD77B891
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DDCC2810F9
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:23:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AB6E28117E
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E08BE59;
-	Mon, 14 Aug 2023 12:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A06DBE5B;
+	Mon, 14 Aug 2023 12:23:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747FABA58
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:23:04 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 115DC171F;
-	Mon, 14 Aug 2023 05:22:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uA0zHN58YLJwUy5SMfVkBOc2cAA70lDak/EGMlEIPis=; b=sqLGHv1SU85tXgMpfwvHI/9nl+
-	uKBTOnLMJSw9PYJiCJ1DDdXo4WsRo7qMm0cTUEZdGo3WHFgu12/2xIOsLMaFBahaSvHa/HawAV9Yf
-	nlvNNkS+oTX4uoSMSa4QK+6qWL1pirzwpsYWoxTd07kw0R/12J9T/J5FIMFyW2HjVkbJx7HWG2khz
-	ygOY+12RlNefDjC7cDTa+jbjsxD63oIXBtLIO/b3hHnpE9yUJjo/43SosR+Ns151+y+SZ5v+2ZGZA
-	ChtZQUVUQXtJdyCjaUfkX9UQBi01f1/669X7g7alUcxf33MFxXxUfubzlaxt461Ml6aG1uol3p/s7
-	bP/VFeDg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41946)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qVWam-0000MW-0o;
-	Mon, 14 Aug 2023 13:22:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qVWak-0005xc-88; Mon, 14 Aug 2023 13:22:38 +0100
-Date: Mon, 14 Aug 2023 13:22:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Josua Mayer <josua@solid-run.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: sfp: handle 100G/25G active optical cables in
- sfp_parse_support
-Message-ID: <ZNocjl4+C5ql0bCC@shell.armlinux.org.uk>
-References: <20230810094817.29262-1-josua@solid-run.com>
- <ZNS+aqPiaNRJ+SK1@shell.armlinux.org.uk>
- <62adb14a-103d-4d29-9ecc-96203468e447@solid-run.com>
- <ZNTShohLvCQR5AlU@shell.armlinux.org.uk>
- <33a1c7b9-728c-46ac-840e-7aac0a725b7e@solid-run.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC1CAD58
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:23:42 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B059F5
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 05:23:40 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RPYSC5DxpzrS3g;
+	Mon, 14 Aug 2023 20:22:19 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 14 Aug 2023 20:23:37 +0800
+Subject: Re: [PATCH net-next] tun: add __exit annotations to module exit func
+ tun_cleanup()
+To: Leon Romanovsky <leon@kernel.org>
+CC: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+References: <20230814083000.3893589-1-william.xuanziyang@huawei.com>
+ <20230814101707.GG3921@unreal>
+ <0b8a2c5f-0d53-f5e5-f148-b333c0c89a14@huawei.com>
+ <20230814120515.GH3921@unreal>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <b0cbdac5-9518-225f-a607-90431f36fa2d@huawei.com>
+Date: Mon, 14 Aug 2023 20:23:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33a1c7b9-728c-46ac-840e-7aac0a725b7e@solid-run.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230814120515.GH3921@unreal>
+Content-Type: text/plain; charset="gbk"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 14, 2023 at 02:12:22PM +0200, Josua Mayer wrote:
-> Hi Russell,
+> On Mon, Aug 14, 2023 at 07:27:59PM +0800, Ziyang Xuan (William) wrote:
+>>> On Mon, Aug 14, 2023 at 04:30:00PM +0800, Ziyang Xuan wrote:
+>>>> Add missing __exit annotations to module exit func tun_cleanup().
+>>>>
+>>>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+>>>> ---
+>>>>  drivers/net/tun.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>> index 973b2fc74de3..291c118579a9 100644
+>>>> --- a/drivers/net/tun.c
+>>>> +++ b/drivers/net/tun.c
+>>>> @@ -3740,7 +3740,7 @@ static int __init tun_init(void)
+>>>>  	return ret;
+>>>>  }
+>>>>  
+>>>> -static void tun_cleanup(void)
+>>>> +static void __exit tun_cleanup(void)
+>>>
+>>> Why __exit and not __net_exit?
+>>
+>> tun_cleanup() is a module exit function. it corresponds to tun_init().
+>> tun_init() uses __init, so tun_cleanup() uses __exit.
 > 
-> Am 10.08.23 um 14:05 schrieb Russell King (Oracle):
-> > On Thu, Aug 10, 2023 at 01:38:13PM +0200, Josua Mayer wrote:
-> > > Hi Russell,
-> > > 
-> > > Am 10.08.23 um 12:39 schrieb Russell King (Oracle):
-> > > > On Thu, Aug 10, 2023 at 11:48:17AM +0200, Josua Mayer wrote:
-> > > > > Handle extended compliance code 0x1 (SFF8024_ECC_100G_25GAUI_C2M_AOC)
-> > > > > for active optical cables supporting 25G and 100G speeds.
-> > > > Thanks. I think I would like one extra change:
-> > > > 
-> > > > > +	case SFF8024_ECC_100G_25GAUI_C2M_AOC:
-> > > > >    	case SFF8024_ECC_100GBASE_SR4_25GBASE_SR:
-> > > > >    		phylink_set(modes, 100000baseSR4_Full);
-> > > > Since SFPs are single lane, SR4 doesn't make sense (which requires
-> > > > four lanes), and I shouldn't have added it when adding these modes.
-> > > > It would be a good idea to drop that, or at least for the
-> > > > addition of the SFF8024_ECC_100G_25GAUI_C2M_AOC case.
-> > > > 
-> > > Would it be okay changing 100000baseSR4 to 100000baseSR dropping the "4"?
-> > Not for SFF8024_ECC_100GBASE_SR4_25GBASE_SR. SFF-8024 states for this
-> > code:
-> > 
-> >           02h        100GBASE-SR4 or 25GBASE-SR
-> > 
-> > 100GBASE-SR4: IEEE 802.3 Physical Layer specification for 100 Gb/s using
-> > 100GBASE-R encoding over four lanes of multimode fiber, with reach
-> > up to at least 100 m. (See IEEE Std 802.3, Clause 95.)
-> > 
-> > 100GBASE-R encoding: The physical coding sublayer encoding defined in
-> > Clause 82 for 100 Gb/s operation. (See IEEE Std 802.3, Clause 82.)
-> > 
-> > 25GBASE-SR: IEEE 802.3 Physical Layer specification for 25 Gb/s using
-> > 25GBASE-R encoding over multimode fiber. (See IEEE Std 802.3, Clause 112.)
-> > 
-> > IEEE 802.3-2018 doesn't define 100GBASE-SR, so I assume that's a later
-> > development, which would be 100GBASE-R encoding over one lane of fiber.
-> > 
-> > So, 100GBASE-SR and 100GBASE-SR4 are not equivalent, and since
-> > SFF8024_ECC_100GBASE_SR4_25GBASE_SR specifies 100GBASE-SR4, that
-> > being _four_ lanes of fiber, and SFP form-factor modules only being
-> > capable of carrying a single lane, and sfp-bus.c only being for SFP
-> > modules, 100GBASE-SR4 is just not relevant for our purposes in
-> > sfp-bus.c - and it makes no sense to switch to 100GBASE-SR because
-> > that is not what this code tells us.
-> > 
-> > 
-> > For the SFF8024_ECC_100G_25GAUI_C2M_AOC in a SFP28 module, the SFP28
-> > form factor only supports up to 28Gb/s, so that means the module is
-> > definitely 25GBASE-R ethernet. So that also excludes 100G operation.
-> Okay. So probably the simple correct solution is to make a seperate
-> case SFF8024_ECC_100G_25GAUI_C2M_AO that only sets 25gbase-r, and
-> 25000baseSR_Full.
-> > 
-> > So, until we see a module in the SFP form factor (implying a single
-> > lane) that does operate at 100G speeds, I think we should omit it.
-> > 
-> > I'm also wondering whether we should check br_nom/br_max/br_min now,
-> > so that if we have to check that in the future, we don't start causing
-> > regressions. Knowing how module EEPROMs are randomly wrong, it would
-> > be a good idea to start with something sensible and see whether any
-> > fail. Bear in mind that br_nom doesn't always get set to the correct
-> > value - for example, 1G operates at 1250Mbps, and the SFP MSA specifies
-> > that br_nom should be 1300 for 1G ethernet, but some modules use 1200.
-> > I guess start at the correct value and then adjust to allow a range
-> > as we see more modules.
-> I don't fully understand how you would like to use br_nom.
-> I see e.g. in sfp-bus.c at the end of sfp_parse_support a mapping of bitrate
-> to 1000/2500 baseX modes.
-> Are you referring to this section?
+> __net_init is equal to __init.
+
+That is not. They are equal when CONFIG_NET_NS is not enabled.
+Refer to the definition of __net_init and __net_eixt in include/net/net_namespace.h.
+
 > 
-> However there are no baseX modes for 25Gbps in ethtool.h - only SR/KR/CR.
-
-I'm thinking something like:
-
-	case SFF8024_ECC_100G_25GAUI_C2M_AO:
-		if (br_min <= 28000 && br_max >= 25000) {
-			/* 25GBASE-R, possibly with FEC */
-			__set_bit(PHY_INTERFACE_MODE_25GBASER, interfaces);
-			/* Re-use 25000baseSR as there is no 25Gbase- suffix
-			 * for this
-			 */
-			phylink_set(modes, 25000baseSR_Full);
-		}
-		break;
-
-I don't know what the actual numerical values should be though.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>>
+>> Thank you!
+>> William Xuan
+>>>
+>>> Thanks
+>>>
+>>>>  {
+>>>>  	misc_deregister(&tun_miscdev);
+>>>>  	rtnl_link_unregister(&tun_link_ops);
+>>>> -- 
+>>>> 2.25.1
+>>>>
+>>>>
+>>> .
+>>>
+> .
+> 
 
