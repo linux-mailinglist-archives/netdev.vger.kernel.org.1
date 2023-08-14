@@ -1,85 +1,171 @@
-Return-Path: <netdev+bounces-27340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1D677B860
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:12:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922F677B88D
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 14:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFCFB1C20A67
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:12:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DDCC2810F9
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 12:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDA2BE60;
-	Mon, 14 Aug 2023 12:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E08BE59;
+	Mon, 14 Aug 2023 12:23:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16A4BE5F
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:12:01 +0000 (UTC)
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46C351702
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 05:12:00 -0700 (PDT)
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-99bcf3c8524so95441466b.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 05:12:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692015119; x=1692619919;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pWITk8Z4B3S93bToKNNnplWpD5UoUBOkLNngl+3yGN0=;
-        b=VrF+GgBHedJ+VrgKKuhM5G3FLsW1FtXxQURjNWj+LiVaHfdmrfvxIbbr7e5xRhNQ4d
-         Ow0Im4aJJjF4vbKfjvVVjj/tfXwidSSTSopGMRGNNLTbyiOzONLWnj2gfgn9nFAKiC9P
-         CNgDfiGW0TqqOKZ+7K+iMw7mVJqVuSbvsmmsSy0CpZjTTZm5ZPRUA4IQIyM4nUDjk63O
-         bpyL6sxvN+MS3FtIkdIFYRhGtLnzxtHlJM7BHLmnXgjuoniscZns9OeTkDXtEb8qkzv8
-         KwbQI6iS+ABoX0hJ7kDhklVoSxYkkjEY1V0A4gugsxdMOIBSarfBSnIW0lHyn9fN2G/l
-         NQDA==
-X-Gm-Message-State: AOJu0YyXI+NRNaM4U9dbVf6aZxYXpLDjHrMR4dgSxKelcRzvIYCSiZDN
-	P3vFPFoyIGTiOwBsjAvqlJE=
-X-Google-Smtp-Source: AGHT+IGSXFdwPPy7nFsH9UFmPaGv+ntJuqlBYquqXA4Cmx/Q5yiz0Et8j6euQgn14JCp1XXdjC9R0w==
-X-Received: by 2002:a17:906:51cb:b0:99b:d03e:76e8 with SMTP id v11-20020a17090651cb00b0099bd03e76e8mr6386560ejk.5.1692015118554;
-        Mon, 14 Aug 2023 05:11:58 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id kd28-20020a17090798dc00b009937e7c4e54sm5646877ejc.39.2023.08.14.05.11.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 05:11:58 -0700 (PDT)
-Message-ID: <304bc2f7-5f77-6e08-bcdb-f382233f611b@grimberg.me>
-Date: Mon, 14 Aug 2023 15:11:56 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747FABA58
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 12:23:04 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 115DC171F;
+	Mon, 14 Aug 2023 05:22:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uA0zHN58YLJwUy5SMfVkBOc2cAA70lDak/EGMlEIPis=; b=sqLGHv1SU85tXgMpfwvHI/9nl+
+	uKBTOnLMJSw9PYJiCJ1DDdXo4WsRo7qMm0cTUEZdGo3WHFgu12/2xIOsLMaFBahaSvHa/HawAV9Yf
+	nlvNNkS+oTX4uoSMSa4QK+6qWL1pirzwpsYWoxTd07kw0R/12J9T/J5FIMFyW2HjVkbJx7HWG2khz
+	ygOY+12RlNefDjC7cDTa+jbjsxD63oIXBtLIO/b3hHnpE9yUJjo/43SosR+Ns151+y+SZ5v+2ZGZA
+	ChtZQUVUQXtJdyCjaUfkX9UQBi01f1/669X7g7alUcxf33MFxXxUfubzlaxt461Ml6aG1uol3p/s7
+	bP/VFeDg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41946)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qVWam-0000MW-0o;
+	Mon, 14 Aug 2023 13:22:40 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qVWak-0005xc-88; Mon, 14 Aug 2023 13:22:38 +0100
+Date: Mon, 14 Aug 2023 13:22:38 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Josua Mayer <josua@solid-run.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: sfp: handle 100G/25G active optical cables in
+ sfp_parse_support
+Message-ID: <ZNocjl4+C5ql0bCC@shell.armlinux.org.uk>
+References: <20230810094817.29262-1-josua@solid-run.com>
+ <ZNS+aqPiaNRJ+SK1@shell.armlinux.org.uk>
+ <62adb14a-103d-4d29-9ecc-96203468e447@solid-run.com>
+ <ZNTShohLvCQR5AlU@shell.armlinux.org.uk>
+ <33a1c7b9-728c-46ac-840e-7aac0a725b7e@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 17/17] nvmet-tcp: peek icreq before starting TLS
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230814111943.68325-1-hare@suse.de>
- <20230814111943.68325-18-hare@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230814111943.68325-18-hare@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33a1c7b9-728c-46ac-840e-7aac0a725b7e@solid-run.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Aug 14, 2023 at 02:12:22PM +0200, Josua Mayer wrote:
+> Hi Russell,
+> 
+> Am 10.08.23 um 14:05 schrieb Russell King (Oracle):
+> > On Thu, Aug 10, 2023 at 01:38:13PM +0200, Josua Mayer wrote:
+> > > Hi Russell,
+> > > 
+> > > Am 10.08.23 um 12:39 schrieb Russell King (Oracle):
+> > > > On Thu, Aug 10, 2023 at 11:48:17AM +0200, Josua Mayer wrote:
+> > > > > Handle extended compliance code 0x1 (SFF8024_ECC_100G_25GAUI_C2M_AOC)
+> > > > > for active optical cables supporting 25G and 100G speeds.
+> > > > Thanks. I think I would like one extra change:
+> > > > 
+> > > > > +	case SFF8024_ECC_100G_25GAUI_C2M_AOC:
+> > > > >    	case SFF8024_ECC_100GBASE_SR4_25GBASE_SR:
+> > > > >    		phylink_set(modes, 100000baseSR4_Full);
+> > > > Since SFPs are single lane, SR4 doesn't make sense (which requires
+> > > > four lanes), and I shouldn't have added it when adding these modes.
+> > > > It would be a good idea to drop that, or at least for the
+> > > > addition of the SFF8024_ECC_100G_25GAUI_C2M_AOC case.
+> > > > 
+> > > Would it be okay changing 100000baseSR4 to 100000baseSR dropping the "4"?
+> > Not for SFF8024_ECC_100GBASE_SR4_25GBASE_SR. SFF-8024 states for this
+> > code:
+> > 
+> >           02h        100GBASE-SR4 or 25GBASE-SR
+> > 
+> > 100GBASE-SR4: IEEE 802.3 Physical Layer specification for 100 Gb/s using
+> > 100GBASE-R encoding over four lanes of multimode fiber, with reach
+> > up to at least 100 m. (See IEEE Std 802.3, Clause 95.)
+> > 
+> > 100GBASE-R encoding: The physical coding sublayer encoding defined in
+> > Clause 82 for 100 Gb/s operation. (See IEEE Std 802.3, Clause 82.)
+> > 
+> > 25GBASE-SR: IEEE 802.3 Physical Layer specification for 25 Gb/s using
+> > 25GBASE-R encoding over multimode fiber. (See IEEE Std 802.3, Clause 112.)
+> > 
+> > IEEE 802.3-2018 doesn't define 100GBASE-SR, so I assume that's a later
+> > development, which would be 100GBASE-R encoding over one lane of fiber.
+> > 
+> > So, 100GBASE-SR and 100GBASE-SR4 are not equivalent, and since
+> > SFF8024_ECC_100GBASE_SR4_25GBASE_SR specifies 100GBASE-SR4, that
+> > being _four_ lanes of fiber, and SFP form-factor modules only being
+> > capable of carrying a single lane, and sfp-bus.c only being for SFP
+> > modules, 100GBASE-SR4 is just not relevant for our purposes in
+> > sfp-bus.c - and it makes no sense to switch to 100GBASE-SR because
+> > that is not what this code tells us.
+> > 
+> > 
+> > For the SFF8024_ECC_100G_25GAUI_C2M_AOC in a SFP28 module, the SFP28
+> > form factor only supports up to 28Gb/s, so that means the module is
+> > definitely 25GBASE-R ethernet. So that also excludes 100G operation.
+> Okay. So probably the simple correct solution is to make a seperate
+> case SFF8024_ECC_100G_25GAUI_C2M_AO that only sets 25gbase-r, and
+> 25000baseSR_Full.
+> > 
+> > So, until we see a module in the SFP form factor (implying a single
+> > lane) that does operate at 100G speeds, I think we should omit it.
+> > 
+> > I'm also wondering whether we should check br_nom/br_max/br_min now,
+> > so that if we have to check that in the future, we don't start causing
+> > regressions. Knowing how module EEPROMs are randomly wrong, it would
+> > be a good idea to start with something sensible and see whether any
+> > fail. Bear in mind that br_nom doesn't always get set to the correct
+> > value - for example, 1G operates at 1250Mbps, and the SFP MSA specifies
+> > that br_nom should be 1300 for 1G ethernet, but some modules use 1200.
+> > I guess start at the correct value and then adjust to allow a range
+> > as we see more modules.
+> I don't fully understand how you would like to use br_nom.
+> I see e.g. in sfp-bus.c at the end of sfp_parse_support a mapping of bitrate
+> to 1000/2500 baseX modes.
+> Are you referring to this section?
+> 
+> However there are no baseX modes for 25Gbps in ethtool.h - only SR/KR/CR.
 
-> Incoming connection might be either 'normal' NVMe-TCP connections
-> starting with icreq or TLS handshakes. To ensure that 'normal'
-> connections can still be handled we need to peek the first packet
-> and only start TLS handshake if it's not an icreq.
+I'm thinking something like:
 
-That depends if we want to do that.
-Why should we let so called normal connections if tls1.3 is
-enabled?
+	case SFF8024_ECC_100G_25GAUI_C2M_AO:
+		if (br_min <= 28000 && br_max >= 25000) {
+			/* 25GBASE-R, possibly with FEC */
+			__set_bit(PHY_INTERFACE_MODE_25GBASER, interfaces);
+			/* Re-use 25000baseSR as there is no 25Gbase- suffix
+			 * for this
+			 */
+			phylink_set(modes, 25000baseSR_Full);
+		}
+		break;
+
+I don't know what the actual numerical values should be though.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
