@@ -1,99 +1,139 @@
-Return-Path: <netdev+bounces-27229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F28877AFEF
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 05:23:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D27E277B029
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 05:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC931C204F5
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 03:23:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC63280EBC
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 03:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A44020F1;
-	Mon, 14 Aug 2023 03:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D4D3D65;
+	Mon, 14 Aug 2023 03:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F357D1FCE
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:23:12 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5850E110
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:23:11 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RPKSb4tWgzrSDV;
-	Mon, 14 Aug 2023 11:21:51 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 14 Aug 2023 11:23:09 +0800
-From: Ziyang Xuan <william.xuanziyang@huawei.com>
-To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<idosch@idosch.org>
-CC: <kaber@trash.net>
-Subject: [PATCH net] team: Fix incorrect deletion of ETH_P_8021AD protocol vid from slaves
-Date: Mon, 14 Aug 2023 11:23:01 +0800
-Message-ID: <20230814032301.2804971-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D6C187C
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 03:32:49 +0000 (UTC)
+Received: from mail-pj1-f79.google.com (mail-pj1-f79.google.com [209.85.216.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB971BCB
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:32:48 -0700 (PDT)
+Received: by mail-pj1-f79.google.com with SMTP id 98e67ed59e1d1-26b3c15ffeeso2561090a91.0
+        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 20:32:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691983967; x=1692588767;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+cylwmDNW7JKQ6N6AHEkHm5tFBbzoC/Jb4px0DmBX8w=;
+        b=B+FvC/Sy1BYm84pegOiMM8x7qEBED5KxJorXo1RDANREfWjmRDdua0JXH7Sr+KTBvh
+         QNglARvZy2ZSL89P4MH0GD2U60ZTv96vKRhlRVESrPg19fL8Vv+hNeTdOjbTAefai2v1
+         V3V1UseSMXMpUcHgyxnIzgYf0krKWub9i4FttDPujvlwqMjrh4zdXa5NSfDUWjDDA2Y7
+         V58HMaPN7LWbIGMOZa6ABIo0csD56k36ub/jW+k/8w8d8mabNhcKEwlSQO2lIEQDVFIP
+         LqvpryK9qdRfVmFzppcF8yujTGNKVcLMIoCqTGhgES9GznCGJvtJn56fwWZAGzebZB8G
+         wymw==
+X-Gm-Message-State: AOJu0Yy91BxLjLuEi50rfofG9OUFRqNHzbYur1iqq+rD1fRyS1AdqTjc
+	9hEsFeX2uFboqu1+14NSrh+Wz80up9vq809+0hubQJZBUCIo
+X-Google-Smtp-Source: AGHT+IF3hEKWeg6Nn7BUbVcgrMEiMZ6b+TxzHlqPUoCaVcZRs5GQmTy9JjgReKIT1K/+An2otTENkaPYri5UqrjT6i5O1wrLSQoc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a17:90a:9907:b0:269:3c79:9b15 with SMTP id
+ b7-20020a17090a990700b002693c799b15mr1973060pjp.5.1691983967680; Sun, 13 Aug
+ 2023 20:32:47 -0700 (PDT)
+Date: Sun, 13 Aug 2023 20:32:47 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005bfece0602d9b7c8@google.com>
+Subject: [syzbot] [net?] WARNING in ip_tunnel_delete_nets (2)
+From: syzbot <syzbot+b7a5f4ad84b87ee1b3ae@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Similar to commit 01f4fd270870 ("bonding: Fix incorrect deletion of
-ETH_P_8021AD protocol vid from slaves"), we can trigger BUG_ON(!vlan_info)
-in unregister_vlan_dev() with the following testcase:
+Hello,
 
-  # ip netns add ns1
-  # ip netns exec ns1 ip link add team1 type team
-  # ip netns exec ns1 ip link add team_slave type veth peer veth2
-  # ip netns exec ns1 ip link set team_slave master team1
-  # ip netns exec ns1 ip link add link team_slave name team_slave.10 type vlan id 10 protocol 802.1ad
-  # ip netns exec ns1 ip link add link team1 name team1.10 type vlan id 10 protocol 802.1ad
-  # ip netns exec ns1 ip link set team_slave nomaster
-  # ip netns del ns1
+syzbot found the following issue on:
 
-Add S-VLAN tag related features support to team driver. So the team driver
-will always propagate the VLAN info to its slaves.
+HEAD commit:    2ccdd1b13c59 Linux 6.5-rc6
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16e56ef7a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8fc59e2140295873
+dashboard link: https://syzkaller.appspot.com/bug?extid=b7a5f4ad84b87ee1b3ae
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Fixes: 8ad227ff89a7 ("net: vlan: add 802.1ad support")
-Suggested-by: Ido Schimmel <idosch@idosch.org>
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e6e598627dd6/disk-2ccdd1b1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/486c6739d779/vmlinux-2ccdd1b1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5da0f3ac1d56/bzImage-2ccdd1b1.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b7a5f4ad84b87ee1b3ae@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 18960 at net/core/dev.c:10876 unregister_netdevice_many_notify+0x14d8/0x19a0 net/core/dev.c:10876
+Modules linked in:
+CPU: 0 PID: 18960 Comm: kworker/u4:2 Not tainted 6.5.0-rc6-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+Workqueue: netns cleanup_net
+RIP: 0010:unregister_netdevice_many_notify+0x14d8/0x19a0 net/core/dev.c:10876
+Code: b4 1a 00 00 48 c7 c6 e0 0e 81 8b 48 c7 c7 20 0f 81 8b c6 05 11 62 6c 06 01 e8 44 21 23 f9 0f 0b e9 64 f7 ff ff e8 d8 5f 5c f9 <0f> 0b e9 3b f7 ff ff e8 cc 8f af f9 e9 fc ec ff ff 4c 89 e7 e8 1f
+RSP: 0018:ffffc900002cfa28 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 000000007cf48c01 RCX: 0000000000000000
+RDX: ffff8880391ba080 RSI: ffffffff8828c0e8 RDI: 0000000000000001
+RBP: ffff888077db4000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 000000000000004e R12: ffff88802380c900
+R13: 0000000000000000 R14: 0000000000000002 R15: ffff88802380c900
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c001ac9010 CR3: 000000001ea93000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ip_tunnel_delete_nets+0x2bb/0x3a0 net/ipv4/ip_tunnel.c:1144
+ ops_exit_list+0x125/0x170 net/core/net_namespace.c:175
+ cleanup_net+0x505/0xb20 net/core/net_namespace.c:614
+ process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
+ worker_thread+0x687/0x1110 kernel/workqueue.c:2751
+ kthread+0x33a/0x430 kernel/kthread.c:389
+ ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
+
+
 ---
- drivers/net/team/team.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-index d3dc22509ea5..382756c3fb83 100644
---- a/drivers/net/team/team.c
-+++ b/drivers/net/team/team.c
-@@ -2200,7 +2200,9 @@ static void team_setup(struct net_device *dev)
- 
- 	dev->hw_features = TEAM_VLAN_FEATURES |
- 			   NETIF_F_HW_VLAN_CTAG_RX |
--			   NETIF_F_HW_VLAN_CTAG_FILTER;
-+			   NETIF_F_HW_VLAN_CTAG_FILTER |
-+			   NETIF_F_HW_VLAN_STAG_RX |
-+			   NETIF_F_HW_VLAN_STAG_FILTER;
- 
- 	dev->hw_features |= NETIF_F_GSO_ENCAP_ALL;
- 	dev->features |= dev->hw_features;
--- 
-2.25.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
