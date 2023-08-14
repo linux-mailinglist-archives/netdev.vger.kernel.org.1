@@ -1,188 +1,186 @@
-Return-Path: <netdev+bounces-27200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD40077AECA
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 01:08:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9A877AF0E
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 02:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8033F1C2099F
-	for <lists+netdev@lfdr.de>; Sun, 13 Aug 2023 23:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1AF6280EFA
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 00:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E48946E;
-	Sun, 13 Aug 2023 23:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E36B39D;
+	Mon, 14 Aug 2023 00:48:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065338F72
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 23:08:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F6E9E8
-	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 16:08:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1691968094;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AUa1QX/mJ1ef9VxwUsegnOGKLjQxThmW1L4mbjRAl5o=;
-	b=gAYdFQ/TBCNWCbrOzuFmK2+Vz4ns4QeDYNYSoIHdEwWzBOUq9I1ppLu/Z3O6oLAPjrto7B
-	oHPUhRcWo4mL6witR4/r+lAwnuI8zK51jSqK8Stw9KfPN1Rjzej6wJU39mdveEHbMk8jOK
-	IU4moGJmi2AdtzCng0wkUDhNr+AQj0A=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-227-BoMIYiDnN5a1O8DIVq6tGw-1; Sun, 13 Aug 2023 19:08:12 -0400
-X-MC-Unique: BoMIYiDnN5a1O8DIVq6tGw-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b9bf49342dso36612521fa.1
-        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 16:08:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F778EBE
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 00:48:49 +0000 (UTC)
+Received: from mail-pl1-f207.google.com (mail-pl1-f207.google.com [209.85.214.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03828E6D
+	for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 17:48:48 -0700 (PDT)
+Received: by mail-pl1-f207.google.com with SMTP id d9443c01a7336-1bbebf511abso45711115ad.1
+        for <netdev@vger.kernel.org>; Sun, 13 Aug 2023 17:48:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691968091; x=1692572891;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AUa1QX/mJ1ef9VxwUsegnOGKLjQxThmW1L4mbjRAl5o=;
-        b=H/4ki4bzRXIZ3dIDKmiCmeUXyO540SVb1apVC3fDAlU2qpv+9XIyAsQY0wqCOXMuO8
-         4PgZ19LgAKeMdGPT6J9mNw2DD4wl7tlW9Or2zi527D9ozFhH9ejiBYBBwtJLgV50IGw/
-         8Dw//0FdfNKOErnSysPX2UTti+VIqGlPUuuLNcjxy9wMjctw7k7L9K8ePbFPY1mOVrRT
-         c+hTVXtxSzsFfWNpXJIIeSkegMZm4UYqkX5e0wQvPm0OeAEUPV02nbjS0WqQ7yHSkt3b
-         PKVVTArRDH3mREOQY37qHR40BVCfmqtZxH9eEHTkokSZBs0BbWm1NEvq+A5pwSi8MBT6
-         VdnQ==
-X-Gm-Message-State: AOJu0Yxp4ahpY1MDZrGfiuMzWqu7E+vHoCdOIbWJ9iwCjN5DwY6NP4pY
-	rex9fjsZLdzhzhusiKHIvu+4+QyoQ8h9+gZ+ti9yc12Ozr9/J9TY/AgRl2dgV1FMINH9hbmSVBx
-	cuU53XusFNkH+CnYt
-X-Received: by 2002:a2e:8503:0:b0:2b7:1005:931b with SMTP id j3-20020a2e8503000000b002b71005931bmr5573400lji.0.1691968090805;
-        Sun, 13 Aug 2023 16:08:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHfB6KQC44UtzTvTIQLTU6WSArsFvqwFM/tL9oeOdLXdw+TuyKztZH0mu5DyTnZ3c9/bKtQHw==
-X-Received: by 2002:a2e:8503:0:b0:2b7:1005:931b with SMTP id j3-20020a2e8503000000b002b71005931bmr5573379lji.0.1691968090444;
-        Sun, 13 Aug 2023 16:08:10 -0700 (PDT)
-Received: from redhat.com ([2.55.42.146])
-        by smtp.gmail.com with ESMTPSA id jo19-20020a170906f6d300b0099bcd1fa5b0sm5002759ejb.192.2023.08.13.16.08.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Aug 2023 16:08:09 -0700 (PDT)
-Date: Sun, 13 Aug 2023 19:08:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	allen.hubbe@amd.com, andrew@daynix.com, david@redhat.com,
-	dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com,
-	gal@nvidia.com, jasowang@redhat.com, leiyang@redhat.com,
-	linma@zju.edu.cn, maxime.coquelin@redhat.com,
-	michael.christie@oracle.com, mst@redhat.com, rdunlap@infradead.org,
-	sgarzare@redhat.com, shannon.nelson@amd.com, stable@vger.kernel.org,
-	stable@vger.kernelorg, stefanha@redhat.com,
-	wsa+renesas@sang-engineering.com, xieyongji@bytedance.com,
-	yin31149@gmail.com
-Subject: [GIT PULL] virtio: bugfixes
-Message-ID: <20230813190803-mutt-send-email-mst@kernel.org>
+        d=1e100.net; s=20221208; t=1691974127; x=1692578927;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ffSiHmXmKvWjGufuXWAkAV+GTFU4ol0O8toxVI2rWJk=;
+        b=Hl9CmhWg1GwzdIH0iGjyHIILv9c2FwN+9HuU8yZQ/bobBRBhDLv13Us58Cuu7xgCQE
+         t261HH8opdqhrl3qcyS9GyObFyNTMKl2bRdkDczEuvv99gK3oLgsZN9unfWfoe6U8hmy
+         XXcXKfkxoLbrLKX+xNTimIah34LHLNsdrLG3MOZPWzSAEAguCo7/J1XO87ME4IzKW//v
+         RMvr8drUiX7bYNCJTjI+3NI8L0JMrusLNAfUzyk254TvMoSuKqaziN1UKLBNl/atYqYR
+         PnUHNLNLbttlq3PB3rWIDxENWOSQyGgeTcRDDbqE5SsdUF22DlsLmsD8WNjMMMHAGzhx
+         sYSQ==
+X-Gm-Message-State: AOJu0Yx2Mb7mLLmjAW8KGAVAAAkxOGW7qsd4g60mk7t1KcM4FIQspmQy
+	jSk4ZYYJKSFjtK5sk9st6EoalPSe2i+fLORBJMwzvxdIDhoX
+X-Google-Smtp-Source: AGHT+IGPgJJXdVh8mbvUoK5oesGeh9HjctSCCkMz4+0xqO4BQKMhfhx6Y1y1iuqFPeayyQFbPlzkZFTSzh8oVKrIKjkLtS9ZJD9H
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a17:902:ce84:b0:1b2:436b:931d with SMTP id
+ f4-20020a170902ce8400b001b2436b931dmr3390972plg.2.1691974127528; Sun, 13 Aug
+ 2023 17:48:47 -0700 (PDT)
+Date: Sun, 13 Aug 2023 17:48:47 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d730410602d76cf6@google.com>
+Subject: [syzbot] [net?] [wireless?] INFO: rcu detected stall in cfg80211_wiphy_work
+From: syzbot <syzbot+b904439e05f11f81ac62@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jiri@nvidia.com, 
+	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-All small, fairly safe changes.
+Hello,
 
-The following changes since commit 52a93d39b17dc7eb98b6aa3edb93943248e03b2f:
+syzbot found the following issue on:
 
-  Linux 6.5-rc5 (2023-08-06 15:07:51 -0700)
+HEAD commit:    cacc6e22932f tpm: Add a helper for checking hwrng enabled
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13b0b5c7a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3e670757e16affb
+dashboard link: https://syzkaller.appspot.com/bug?extid=b904439e05f11f81ac62
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a49fcda80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=136f8679a80000
 
-are available in the Git repository at:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c18b40f6d56d/disk-cacc6e22.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b270ef22b038/vmlinux-cacc6e22.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/aae3a8e7d564/bzImage-cacc6e22.xz
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+The issue was bisected to:
 
-for you to fetch changes up to f55484fd7be923b740e8e1fc304070ba53675cb4:
+commit c2368b19807affd7621f7c4638cd2e17fec13021
+Author: Jiri Pirko <jiri@nvidia.com>
+Date:   Fri Jul 29 07:10:35 2022 +0000
 
-  virtio-mem: check if the config changed before fake offlining memory (2023-08-10 15:51:46 -0400)
+    net: devlink: introduce "unregistering" mark and use it during devlinks iteration
 
-----------------------------------------------------------------
-virtio: bugfixes
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=123267c3a80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=113267c3a80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=163267c3a80000
 
-just a bunch of bugfixes all over the place.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b904439e05f11f81ac62@syzkaller.appspotmail.com
+Fixes: c2368b19807a ("net: devlink: introduce "unregistering" mark and use it during devlinks iteration")
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+rcu: INFO: rcu_preempt self-detected stall on CPU
+rcu: 	1-....: (10490 ticks this GP) idle=5a24/1/0x4000000000000000 softirq=8393/8393 fqs=5242
+rcu: 	         hardirqs   softirqs   csw/system
+rcu: 	 number:        0          0            0
+rcu: 	cputime:    25922      26566          195   ==> 52500(ms)
+rcu: 	(t=10502 jiffies g=5333 q=584 ncpus=2)
+CPU: 1 PID: 5054 Comm: kworker/1:4 Not tainted 6.5.0-rc5-syzkaller-00056-gcacc6e22932f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+Workqueue: events cfg80211_wiphy_work
+RIP: 0010:taprio_dequeue_tc_priority+0x266/0x4b0 net/sched/sch_taprio.c:798
+Code: 10 89 ef 44 89 f6 e8 39 b5 2c f9 44 39 f5 0f 84 40 ff ff ff e8 3b ba 2c f9 49 83 ff 0f 0f 87 e1 01 00 00 48 8b 04 24 0f b6 00 <38> 44 24 36 7c 08 84 c0 0f 85 bf 01 00 00 8b 33 8b 4c 24 30 48 8b
+RSP: 0018:ffffc900001e0d60 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: ffff88802b8e7394 RCX: 0000000000000100
+RDX: ffff888076ac0000 RSI: ffffffff88594e65 RDI: 0000000000000004
+RBP: 0000000000000008 R08: 0000000000000004 R09: 0000000000000008
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000010
+R13: ffff88807af8ab60 R14: 0000000000000000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000600 CR3: 0000000022134000 CR4: 0000000000350ee0
+Call Trace:
+ <IRQ>
+ taprio_dequeue+0x12e/0x5f0 net/sched/sch_taprio.c:868
+ dequeue_skb net/sched/sch_generic.c:292 [inline]
+ qdisc_restart net/sched/sch_generic.c:397 [inline]
+ __qdisc_run+0x1c4/0x19d0 net/sched/sch_generic.c:415
+ qdisc_run include/net/pkt_sched.h:125 [inline]
+ qdisc_run include/net/pkt_sched.h:122 [inline]
+ net_tx_action+0x71e/0xc80 net/core/dev.c:5049
+ __do_softirq+0x218/0x965 kernel/softirq.c:553
+ invoke_softirq kernel/softirq.c:427 [inline]
+ __irq_exit_rcu kernel/softirq.c:632 [inline]
+ irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
+ sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1109
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
+RIP: 0010:__ieee80211_link_release_channel+0x2/0x450 net/mac80211/chan.c:1778
+Code: 89 f7 e8 81 1f 21 f8 e9 44 e0 ff ff 4c 89 f7 e8 74 1f 21 f8 e9 fe fb ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 41 57 <41> 56 41 55 41 54 55 53 48 89 fb e8 3e 15 cd f7 48 89 da 48 b8 00
+RSP: 0018:ffffc90003cff768 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff888076ac0000 RSI: ffffffff89b909f5 RDI: ffff8880677463a8
+RBP: ffff8880677463a8 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffff888067744c80
+R13: ffffc90003cff890 R14: ffff888066980e20 R15: ffff888067746c82
+ ieee80211_link_use_channel+0x2dd/0x750 net/mac80211/chan.c:1849
+ __ieee80211_sta_join_ibss+0x5f3/0x17e0 net/mac80211/ibss.c:303
+ ieee80211_sta_create_ibss+0x206/0x410 net/mac80211/ibss.c:1352
+ ieee80211_sta_find_ibss net/mac80211/ibss.c:1482 [inline]
+ ieee80211_ibss_work+0xc19/0x15a0 net/mac80211/ibss.c:1709
+ ieee80211_iface_work+0xbb8/0xd40 net/mac80211/iface.c:1680
+ cfg80211_wiphy_work+0x24e/0x330 net/wireless/core.c:435
+ process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
+ worker_thread+0x687/0x1110 kernel/workqueue.c:2751
+ kthread+0x33a/0x430 kernel/kthread.c:389
+ ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
 
-----------------------------------------------------------------
-Allen Hubbe (2):
-      pds_vdpa: reset to vdpa specified mac
-      pds_vdpa: alloc irq vectors on DRIVER_OK
 
-David Hildenbrand (4):
-      virtio-mem: remove unsafe unplug in Big Block Mode (BBM)
-      virtio-mem: convert most offline_and_remove_memory() errors to -EBUSY
-      virtio-mem: keep retrying on offline_and_remove_memory() errors in Sub Block Mode (SBM)
-      virtio-mem: check if the config changed before fake offlining memory
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Dragos Tatulea (4):
-      vdpa: Enable strict validation for netlinks ops
-      vdpa/mlx5: Correct default number of queues when MQ is on
-      vdpa/mlx5: Fix mr->initialized semantics
-      vdpa/mlx5: Fix crash on shutdown for when no ndev exists
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Eugenio Pérez (1):
-      vdpa/mlx5: Delete control vq iotlb in destroy_mr only when necessary
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Feng Liu (1):
-      virtio-pci: Fix legacy device flag setting error in probe
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-Gal Pressman (1):
-      virtio-vdpa: Fix cpumask memory leak in virtio_vdpa_find_vqs()
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Hawkins Jiawei (1):
-      virtio-net: Zero max_tx_vq field for VIRTIO_NET_CTRL_MQ_HASH_CONFIG case
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
 
-Lin Ma (3):
-      vdpa: Add features attr to vdpa_nl_policy for nlattr length check
-      vdpa: Add queue index attr to vdpa_nl_policy for nlattr length check
-      vdpa: Add max vqp attr to vdpa_nl_policy for nlattr length check
-
-Maxime Coquelin (1):
-      vduse: Use proper spinlock for IRQ injection
-
-Mike Christie (3):
-      vhost-scsi: Fix alignment handling with windows
-      vhost-scsi: Rename vhost_scsi_iov_to_sgl
-      MAINTAINERS: add vhost-scsi entry and myself as a co-maintainer
-
-Shannon Nelson (4):
-      pds_vdpa: protect Makefile from unconfigured debugfs
-      pds_vdpa: always allow offering VIRTIO_NET_F_MAC
-      pds_vdpa: clean and reset vqs entries
-      pds_vdpa: fix up debugfs feature bit printing
-
-Wolfram Sang (1):
-      virtio-mmio: don't break lifecycle of vm_dev
-
- MAINTAINERS                        |  11 ++-
- drivers/net/virtio_net.c           |   2 +-
- drivers/vdpa/mlx5/core/mlx5_vdpa.h |   2 +
- drivers/vdpa/mlx5/core/mr.c        | 105 +++++++++++++++------
- drivers/vdpa/mlx5/net/mlx5_vnet.c  |  26 +++---
- drivers/vdpa/pds/Makefile          |   3 +-
- drivers/vdpa/pds/debugfs.c         |  15 ++-
- drivers/vdpa/pds/vdpa_dev.c        | 176 ++++++++++++++++++++++++----------
- drivers/vdpa/pds/vdpa_dev.h        |   5 +-
- drivers/vdpa/vdpa.c                |   9 +-
- drivers/vdpa/vdpa_user/vduse_dev.c |   8 +-
- drivers/vhost/scsi.c               | 187 ++++++++++++++++++++++++++++++++-----
- drivers/virtio/virtio_mem.c        | 168 ++++++++++++++++++++++-----------
- drivers/virtio/virtio_mmio.c       |   5 +-
- drivers/virtio/virtio_pci_common.c |   2 -
- drivers/virtio/virtio_pci_legacy.c |   1 +
- drivers/virtio/virtio_vdpa.c       |   2 +
- 17 files changed, 519 insertions(+), 208 deletions(-)
-
+If you want to undo deduplication, reply with:
+#syz undup
 
