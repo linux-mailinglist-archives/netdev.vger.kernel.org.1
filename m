@@ -1,71 +1,37 @@
-Return-Path: <netdev+bounces-27267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D874977B47C
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:44:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09EC977B485
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 10:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1763280DB9
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 08:44:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8438281056
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 08:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC394A925;
-	Mon, 14 Aug 2023 08:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2BBA926;
+	Mon, 14 Aug 2023 08:46:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A129FA921
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:44:42 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7BB10F7
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 01:44:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692002653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZnSmpMtBnju2Es/eNnXEAlLkCISBszhY2/ZRBT0PYVI=;
-	b=c9gThx0Aa3JjvyodfKE/M3f69x5C3KHwZ7XOki/dBVm4ffppDKfhTrqrpGu3O5ZNEx8qLN
-	hrtcEPT7lWHOR1A3xXzKojipaDddkdkZIkdp/ZGTOhpR1ok+U979XY8zNGap5Xr+8gMBRK
-	8s9hvY3krRDhx8V9j45BQmk0tZNImBE=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-402-FHWzloH_P6ey55Z1SARo7A-1; Mon, 14 Aug 2023 04:44:12 -0400
-X-MC-Unique: FHWzloH_P6ey55Z1SARo7A-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-4fe2631f5a6so3813258e87.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 01:44:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692002651; x=1692607451;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZnSmpMtBnju2Es/eNnXEAlLkCISBszhY2/ZRBT0PYVI=;
-        b=FdI57DnnHgKWkkMx6EJ4tWZPk+eNP4Jnw4/D+Evxm0RxlcF6tF9SAU24BEqJzERSG4
-         KOi1yDg2A+KcuZs+FjxVlCTHQHHkDTjzB2RBiecFOTApepnznvV/WeWgcs61Avre1Moq
-         rcaVyvXo7AFPCwFeQfE5CDOcbLXsM/aZ+7CSpen+Ni+VI1qejsbnQJZtnL//1tniGSJl
-         gLEvX/0pyQl8jKsb2ozUFHphSEE0x1B/B5Wv3ufY6fZc2Z2KD+k8yy8+RbIDkoJCJkM5
-         NBQDfnjaq5UN5ha1ccKiUCMCgJTOwCwbvjTkWkxgwcJYUbCo5zFE7QEsmjmZs1OpY2DJ
-         uzTQ==
-X-Gm-Message-State: AOJu0YwwNwSpWp4rTpnU2pgvp0+aCP4vWo41RBLgyUa2N8OjOB1pAw3M
-	I2kKttL9iP6uO4ouQpnhU85SkVj6AH3HXJz8mHXa1NBAIbHf+wRaXqeLw7FVNcz6Q+2Gn+KIoYw
-	WyDEqiO/mw6fyA6Vu
-X-Received: by 2002:a05:6512:b95:b0:4fb:9f24:bba9 with SMTP id b21-20020a0565120b9500b004fb9f24bba9mr7721376lfv.5.1692002650952;
-        Mon, 14 Aug 2023 01:44:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFWuGv18XCUJgMHhVarBxXjgbCqo+qcGaxWZJveWkq9lThhn9826Bwg+3yptDSMj29CcqAg3Q==
-X-Received: by 2002:a05:6512:b95:b0:4fb:9f24:bba9 with SMTP id b21-20020a0565120b9500b004fb9f24bba9mr7721355lfv.5.1692002650560;
-        Mon, 14 Aug 2023 01:44:10 -0700 (PDT)
-Received: from [192.168.42.222] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id c21-20020aa7c995000000b005234011bb44sm5312241edt.11.2023.08.14.01.44.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 01:44:10 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <88793701-f37e-000f-f659-6428ad03b345@redhat.com>
-Date: Mon, 14 Aug 2023 10:44:08 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6B88BEB
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 08:46:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9824C433C7;
+	Mon, 14 Aug 2023 08:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692002760;
+	bh=B3y8EHsDG3ckVBJqhMu+4wNcutKVET22OPIzB3BHlZ0=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=IAwz4csbyfvh6Sc60rY3F4KQBQhcpuI6oJ+2qyYb1X2EbPWPD3nk515LAGsCCsdua
+	 /RrfgQ8LZe60yxmHXmLqV2iNhQXTZt2yJNHTUAdt5j2LnL1x91+2f5crAXVuXr7I+M
+	 4yclnHX6puLJ4n3dhyx6fFlKoAJrUyCEJEOmcFpwYcb5oz6hDBAECRGUtxHoU2pTIO
+	 MFGXP339tDE3ExQFau5AQwyOMqlNhNAVCuVXJbJGJti/5BtYxFL5HOtTmPoxvb3ZI5
+	 /6NUgd6v072+ZFgYjyLs9xp0kxcFYsd108Ld5M+KyiFrmZ+S1cmRAt8Vy6EnHsgF6C
+	 14tNDLeY82NTw==
+Message-ID: <cceef8a4-6f38-bfd4-4f77-5dffa558b287@kernel.org>
+Date: Mon, 14 Aug 2023 10:45:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,56 +40,139 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Cc: brouer@redhat.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- alexander.duyck@gmail.com, ilias.apalodimas@linaro.org,
- linyunsheng@huawei.com, Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH net-next] page_pool: Set page pool size.
+Cc: hawk@kernel.org, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "jiawenwu@trustnetic.com" <jiawenwu@trustnetic.com>,
+ "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>,
+ "yang.lee@linux.alibaba.com" <yang.lee@linux.alibaba.com>,
+ "error27@gmail.com" <error27@gmail.com>,
+ "linyunsheng@huawei.com" <linyunsheng@huawei.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "kys@microsoft.com" <kys@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "longli@microsoft.com" <longli@microsoft.com>,
+ "shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+ "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+ "michael.chan@broadcom.com" <michael.chan@broadcom.com>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "jdelvare@suse.com" <jdelvare@suse.com>,
+ "linux@roeck-us.net" <linux@roeck-us.net>,
+ "yisen.zhuang@huawei.com" <yisen.zhuang@huawei.com>,
+ "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+ "nbd@nbd.name" <nbd@nbd.name>, "john@phrozen.org" <john@phrozen.org>,
+ "sean.wang@mediatek.com" <sean.wang@mediatek.com>,
+ "Mark-MC.Lee@mediatek.com" <Mark-MC.Lee@mediatek.com>,
+ "lorenzo@kernel.org" <lorenzo@kernel.org>,
+ "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+ "angelogioacchino.delregno@collabora.com"
+ <angelogioacchino.delregno@collabora.com>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org"
+ <leon@kernel.org>,
+ "gerhard@engleder-embedded.com" <gerhard@engleder-embedded.com>,
+ "maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
+ "alexanderduyck@fb.com" <alexanderduyck@fb.com>,
+ "wei.fang@nxp.com" <wei.fang@nxp.com>,
+ "shenwei.wang@nxp.com" <shenwei.wang@nxp.com>,
+ "xiaoning.wang@nxp.com" <xiaoning.wang@nxp.com>,
+ "linux-imx@nxp.com" <linux-imx@nxp.com>,
+ "lgirdwood@gmail.com" <lgirdwood@gmail.com>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "jaswinder.singh@linaro.org" <jaswinder.singh@linaro.org>,
+ "ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+ "UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
+ "horatiu.vultur@microchip.com" <horatiu.vultur@microchip.com>,
+ "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+ "grygorii.strashko@ti.com" <grygorii.strashko@ti.com>,
+ "simon.horman@corigine.com" <simon.horman@corigine.com>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
+ "joabreu@synopsys.com" <joabreu@synopsys.com>,
+ "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+ "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
+ "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
+ "mw@semihalf.com" <mw@semihalf.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ "jgross@suse.com" <jgross@suse.com>,
+ "sstabellini@kernel.org" <sstabellini@kernel.org>,
+ "oleksandr_tyshchenko@epam.com" <oleksandr_tyshchenko@epam.com>,
+ "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+ "ryder.lee@mediatek.com" <ryder.lee@mediatek.com>,
+ "shayne.chen@mediatek.com" <shayne.chen@mediatek.com>,
+ "kvalo@kernel.org" <kvalo@kernel.org>, "andrii@kernel.org"
+ <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "song@kernel.org" <song@kernel.org>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@google.com"
+ <sdf@google.com>, "haoluo@google.com" <haoluo@google.com>,
+ "jolsa@kernel.org" <jolsa@kernel.org>
+Subject: Re: [EXT] Re: [PATCH v1 net] page_pool: Cap queue size to 32k.
 Content-Language: en-US
-To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230809021920.913324-1-rkannoth@marvell.com>
-In-Reply-To: <20230809021920.913324-1-rkannoth@marvell.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20230814060411.2401817-1-rkannoth@marvell.com>
+ <8c6d19da5c4c38062b7a4e500de1d5dc1280fbc8.camel@sipsolutions.net>
+ <MWHPR1801MB1918230E007D7B2C5A768B37D317A@MWHPR1801MB1918.namprd18.prod.outlook.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <MWHPR1801MB1918230E007D7B2C5A768B37D317A@MWHPR1801MB1918.namprd18.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
 
-On 09/08/2023 04.19, Ratheesh Kannoth wrote:
-> https://lore.kernel.org/netdev/
-> 	15d32b22-22b0-64e3-a49e-88d780c24616@kernel.org/T/
+
+On 14/08/2023 10.05, Ratheesh Kannoth wrote:
+>> From: Johannes Berg <johannes@sipsolutions.net>
+>> Subject: [EXT] Re: [PATCH v1 net] page_pool: Cap queue size to 32k.
+>>> Please find discussion at
+>>> https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_l
+>>>
+>> I'm not the one who's going to apply this, but honestly, I don't think that will
+>> work as a commit message for such a change ...
+>> Sure, link to it by all means, but also summarize it and make sense of it for
+>> the commit message?
+> 
+> Why do you think it will not work ?. There is a long discussion about pros and cons of different approaches by
+> Page pool maintainers in the discussion link.  However I  summarize it here, as commit message, it will
+> Lead to some more questions by reviewers.
 > 
 
-For the record I like this code change better than changing page_pool
-core code. I like and agree with Olek's (Alexander Lobakin) suggestion.
+I agree with Johannes, this commit message is too thin.
 
-But the commit message need to be improved as it is too thin.
-(And link is getting split in two lines for some reason)
+It makes sense to give a summary of the discussion, because it show us
+(page_pool maintainers) what you concluded for the discussion.
 
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> ---
->   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> index 8336cea16aff..2986e238104e 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> @@ -1434,7 +1434,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
->   	}
->   
->   	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
-> -	pp_params.pool_size = numptrs;
-> +#define OTX2_PAGE_POOL_SIZE 2048
-> +	pp_params.pool_size = OTX2_PAGE_POOL_SIZE;
->   	pp_params.nid = NUMA_NO_NODE;
->   	pp_params.dev = pfvf->dev;
->   	pp_params.dma_dir = DMA_FROM_DEVICE;
+Further more, you also send another patch:
+  - "[PATCH net-next] page_pool: Set page pool size"
+  - 
+https://lore.kernel.org/all/20230809021920.913324-1-rkannoth@marvell.com/
+
+That patch solves the issue for your driver marvell/octeontx2 and I like
+than change.
+
+Why did you conclude that PP core should also change?
+
+--Jesper
+(p.s. Cc/To list have gotten excessive with 89 recipients)
+
+
 
 
