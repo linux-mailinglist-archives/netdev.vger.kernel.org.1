@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-27512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D89E77C2C3
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:49:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9116977C2C4
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 23:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 355E128124D
-	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:49:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EC61C209EF
+	for <lists+netdev@lfdr.de>; Mon, 14 Aug 2023 21:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4F71078D;
-	Mon, 14 Aug 2023 21:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707401078F;
+	Mon, 14 Aug 2023 21:47:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723A41078F
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:47:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8528C433B8;
-	Mon, 14 Aug 2023 21:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF671094B
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:47:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7323AC43391;
+	Mon, 14 Aug 2023 21:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692049651;
-	bh=huaLC91PYFoWp40umQDBC6xbiNhCHQhAQi13wgJ9WUw=;
+	s=k20201202; t=1692049652;
+	bh=2ZZ+zUVNaZynuIWvNSKOShsAJsNtNDVDxUyi952CB8w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KhG7BTI1biL+shG8Ieecsy0nxtwblXFB9mrlacZq301rqOiuvmdMC2kc5JIOeVoBq
-	 Bmdj2B8pg905TkKHpCjAPWjBCk9lLA2WhDDeBz0wRBpaaaplXuEdxte9WuZhV8WN6l
-	 QbL/+rUFzODbfIo/c6tXzzA0G9Vkv7FRMWwbKnjfXSn7Ewlh5FpLR44XtCrS+jQLFc
-	 gsuRmd24R7h57k8LRHVyqoHMNDJkN2JhNzruKtzX/j7RvpLRm4wrqQ3ydmq5NIab8Z
-	 yPi7XrlmXj9vphnYE0W+Guv3Ce8Vv0TpnNJ81nG38kWaClMUbUfGnsSCN5o1qIlmdj
-	 IawIEg75NyWIA==
+	b=R1YCi2U5ckONFLoYJ8BCoc2mKJnSVsxJw9EbFDt8p647LlQI9mjuVFv5yERhWnzlP
+	 jc7zwSQBahYTb9ixxFdzFHHl+vBVdJ8Vwls60xW7fHjQB+tANr634yxeSNVQyX7jKl
+	 lARS/q8ojSnnjhT6K7cCdgRO7q1K50uqUu+/c1rb4Gu3Z/xkl34B5P4OFehWjLJF4G
+	 2KPsQx7K2GbjmSb00zUCAge5+253+kEgEPcinvXovU/gJDXfhzyz+KFCMPgWfW7M9h
+	 gULbZTsiCeqXxjTWN1I8HDmDkgkdkFgqktkwYVk0l6hVIXAAGhQKXe4AKZDl44bIh/
+	 +i9EfiPeEnl6Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -38,10 +38,11 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	johannes@sipsolutions.net,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next v3 07/10] genetlink: add genlmsg_iput() API
-Date: Mon, 14 Aug 2023 14:47:20 -0700
-Message-ID: <20230814214723.2924989-8-kuba@kernel.org>
+	Jiri Pirko <jiri@nvidia.com>,
+	lorenzo@kernel.org
+Subject: [PATCH net-next v3 08/10] netdev-genl: use struct genl_info for reply construction
+Date: Mon, 14 Aug 2023 14:47:21 -0700
+Message-ID: <20230814214723.2924989-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230814214723.2924989-1-kuba@kernel.org>
 References: <20230814214723.2924989-1-kuba@kernel.org>
@@ -53,94 +54,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add some APIs and helpers required for convenient construction
-of replies and notifications based on struct genl_info.
+Use the just added APIs to make the code simpler.
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/net/genetlink.h | 54 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 1 deletion(-)
+CC: lorenzo@kernel.org
+---
+ net/core/netdev-genl.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/genetlink.h b/include/net/genetlink.h
-index 6b858c4cba5b..e18a4c0d69ee 100644
---- a/include/net/genetlink.h
-+++ b/include/net/genetlink.h
-@@ -113,7 +113,7 @@ struct genl_info {
- 	struct netlink_ext_ack *extack;
- };
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 797c813c7c77..c1aea8b756b6 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -10,11 +10,11 @@
  
--static inline struct net *genl_info_net(struct genl_info *info)
-+static inline struct net *genl_info_net(const struct genl_info *info)
+ static int
+ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+-		   u32 portid, u32 seq, int flags, u32 cmd)
++		   const struct genl_info *info)
  {
- 	return read_pnet(&info->_net);
- }
-@@ -270,6 +270,32 @@ genl_info_dump(struct netlink_callback *cb)
- 	return &genl_dumpit_info(cb)->info;
- }
+ 	void *hdr;
  
-+/**
-+ * genl_info_init_ntf() - initialize genl_info for notifications
-+ * @info:   genl_info struct to set up
-+ * @family: pointer to the genetlink family
-+ * @cmd:    command to be used in the notification
-+ *
-+ * Initialize a locally declared struct genl_info to pass to various APIs.
-+ * Intended to be used when creating notifications.
-+ */
-+static inline void
-+genl_info_init_ntf(struct genl_info *info, const struct genl_family *family,
-+		   u8 cmd)
-+{
-+	struct genlmsghdr *hdr = (void *) &info->user_ptr[0];
-+
-+	memset(info, 0, sizeof(*info));
-+	info->family = family;
-+	info->genlhdr = hdr;
-+	hdr->cmd = cmd;
-+}
-+
-+static inline bool genl_info_is_ntf(const struct genl_info *info)
-+{
-+	return !info->nlhdr;
-+}
-+
- int genl_register_family(struct genl_family *family);
- int genl_unregister_family(const struct genl_family *family);
- void genl_notify(const struct genl_family *family, struct sk_buff *skb,
-@@ -278,6 +304,32 @@ void genl_notify(const struct genl_family *family, struct sk_buff *skb,
- void *genlmsg_put(struct sk_buff *skb, u32 portid, u32 seq,
- 		  const struct genl_family *family, int flags, u8 cmd);
+-	hdr = genlmsg_put(rsp, portid, seq, &netdev_nl_family, flags, cmd);
++	hdr = genlmsg_iput(rsp, info);
+ 	if (!hdr)
+ 		return -EMSGSIZE;
  
-+static inline void *
-+__genlmsg_iput(struct sk_buff *skb, const struct genl_info *info, int flags)
-+{
-+	return genlmsg_put(skb, info->snd_portid, info->snd_seq, info->family,
-+			   flags, info->genlhdr->cmd);
-+}
+@@ -41,17 +41,20 @@ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+ static void
+ netdev_genl_dev_notify(struct net_device *netdev, int cmd)
+ {
++	struct genl_info info;
+ 	struct sk_buff *ntf;
+ 
+ 	if (!genl_has_listeners(&netdev_nl_family, dev_net(netdev),
+ 				NETDEV_NLGRP_MGMT))
+ 		return;
+ 
++	genl_info_init_ntf(&info, &netdev_nl_family, cmd);
 +
-+/**
-+ * genlmsg_iput - start genetlink message based on genl_info
-+ * @skb: skb in which message header will be placed
-+ * @info: genl_info as provided to do/dump handlers
-+ *
-+ * Convenience wrapper which starts a genetlink message based on
-+ * information in user request. @info should be either the struct passed
-+ * by genetlink core to do/dump handlers (when constructing replies to
-+ * such requests) or a struct initialized by genl_info_init_ntf()
-+ * when constructing notifications.
-+ *
-+ * Returns pointer to new genetlink header.
-+ */
-+static inline void *
-+genlmsg_iput(struct sk_buff *skb, const struct genl_info *info)
-+{
-+	return __genlmsg_iput(skb, info, 0);
-+}
-+
- /**
-  * genlmsg_nlhdr - Obtain netlink header from user specified header
-  * @user_hdr: user header as returned from genlmsg_put()
+ 	ntf = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!ntf)
+ 		return;
+ 
+-	if (netdev_nl_dev_fill(netdev, ntf, 0, 0, 0, cmd)) {
++	if (netdev_nl_dev_fill(netdev, ntf, &info)) {
+ 		nlmsg_free(ntf);
+ 		return;
+ 	}
+@@ -80,8 +83,7 @@ int netdev_nl_dev_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
+ 	if (netdev)
+-		err = netdev_nl_dev_fill(netdev, rsp, info->snd_portid,
+-					 info->snd_seq, 0, info->genlhdr->cmd);
++		err = netdev_nl_dev_fill(netdev, rsp, info);
+ 	else
+ 		err = -ENODEV;
+ 
+@@ -105,10 +107,7 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 	rtnl_lock();
+ 	for_each_netdev_dump(net, netdev, cb->args[0]) {
+-		err = netdev_nl_dev_fill(netdev, skb,
+-					 NETLINK_CB(cb->skb).portid,
+-					 cb->nlh->nlmsg_seq, 0,
+-					 NETDEV_CMD_DEV_GET);
++		err = netdev_nl_dev_fill(netdev, skb, genl_info_dump(cb));
+ 		if (err < 0)
+ 			break;
+ 	}
 -- 
 2.41.0
 
