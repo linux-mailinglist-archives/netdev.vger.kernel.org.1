@@ -1,415 +1,212 @@
-Return-Path: <netdev+bounces-27657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95BAA77CAED
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 12:08:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC57D77CAEE
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 12:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E0FB2813BF
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:08:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC5961C20CED
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F1E101D6;
-	Tue, 15 Aug 2023 10:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FB910788;
+	Tue, 15 Aug 2023 10:08:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E256FA9
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:07:57 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0947E65;
-	Tue, 15 Aug 2023 03:07:55 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37FA7ZDi011272;
-	Tue, 15 Aug 2023 05:07:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1692094055;
-	bh=T5O8Xumh2ZAtIDphE8yCXAmO2UvkuWH9IB425a+EsDM=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=gtw3rXwAT6F73oylUbCrAPmsHOi4eXyDfhZB9lKHhj/IC7o46cyXqcpk0BXu4+GTt
-	 Yxo/zA22Gd302ZBnF7jhdI5kc5rG9rhV/HM+isvcig+XrHAL4Yg09wFU1COC/R5TuS
-	 4BwFnPS9wLHoQXBOEwRPBnFQ/sR0zfOwgetG+YyY=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37FA7ZwL015682
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 15 Aug 2023 05:07:35 -0500
-Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 15
- Aug 2023 05:07:34 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 15 Aug 2023 05:07:34 -0500
-Received: from [10.249.135.225] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37FA7RfF017640;
-	Tue, 15 Aug 2023 05:07:27 -0500
-Message-ID: <e54b864a-12b8-0b3e-44a4-81c0e0f4c102@ti.com>
-Date: Tue, 15 Aug 2023 15:37:26 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CA4101D6;
+	Tue, 15 Aug 2023 10:08:06 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2052.outbound.protection.outlook.com [40.107.21.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31468E65;
+	Tue, 15 Aug 2023 03:08:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qxny30uj47ZfScJurxZBnDlw9dwN8mXgZzNTPPi4pSntKoO8ZVdNkPJORTuwo81W0oqc91DSbPpm2gEr9d/FUOMkchp8wKURtfB25iCrxFevtqoBLTHdrm6WtWjPqCL/3LLmJ+fy42N6X9rgo2QDVhWp7l02aKavuM1aOiXN6JT5xMoNB/Lzt5jr9/rnPEX9OaRwOyVCJ0zvUhqCMaqFbzgg96UYh4HsYNpm3+7f0XzAYCPkeT5p0bwZHbeV+O+DyCo5VM3WzNXfrhyPrLnapcvYJH3pHJ6Bwl9raJmVK59S/NjnUqS/vxtyFOQ0v/5L038XNBXCoOocRmbJDpbuPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VMOHZ/3ErHxlUPtp04s1cINgL/8IkCXNd8pGXxaSuVY=;
+ b=der/Tro9hRcGR9hFMpMN6lxVNPP9KW+omeWiU+Offkiq5teGok7C4HnIqbSoIqB5XMNjPKmgREzp5bv5alXov0ztX/my96M4nlqoVZyGA6MqoRoV6sgm6/X6oJIORHCZsolqrgkkC95D42esrMc/b3ElPuF16LYuQAluQliD9b091cXqoG/ZIiLo/f7RKCJss1hD6AcREIclO1HJMHhxaNZ/o+bxAQ8ngBIOTMyIjGPClRtU8CCBUe6CIlvA2ehmMAXCyqml3O9gYGFUU01qWkRjkl0JEXg6BrRvMUngVOiCbwadqfkaiItRXL33ldUN4mg9Z3fMW4VAi0yGlhQKdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VMOHZ/3ErHxlUPtp04s1cINgL/8IkCXNd8pGXxaSuVY=;
+ b=mzmjxeawqOcwMa0U8+X/UkkSFlwsc7G1Jb7UC3gqcqG+kvlD1OjeQRMaiBNMj0PVwOjYOJ9VgSICwtv+ap1KlL7Bhzg4YCiMYW7XtdxpyzVBZpR1pau/3SFeSpT53oQ5/DWOU1dFlHL+mBIhgjMJQuqEg1eGoaaTZAtSs5OLCZZckMC5nMOBYlMjhfL1MXme/Cia+6U9YGkuRcYPo9kkar2pMd6AROcL2tduTcCRgq4nP5AzYnaBcJEzhSn8gq0BEPYWXbHgmOwsNbZrs73ig2SCdhm9W6o2ppkQl9XaISTJi8oQE0euLiMyzTrgnw96bvT6kECsi//mfWkF145S5A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com (2603:10a6:7:83::14)
+ by AM9PR04MB8307.eurprd04.prod.outlook.com (2603:10a6:20b:3e6::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
+ 2023 10:08:00 +0000
+Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com
+ ([fe80::2867:7a72:20ac:5f71]) by HE1PR0402MB3497.eurprd04.prod.outlook.com
+ ([fe80::2867:7a72:20ac:5f71%3]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
+ 10:07:59 +0000
+Date: Tue, 15 Aug 2023 18:08:16 +0800
+From: Geliang Tang <geliang.tang@suse.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Florent Revest <revest@chromium.org>,
+	Brendan Jackman <jackmanb@chromium.org>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH mptcp-next v13 4/4] selftests/bpf: Add mptcpify test
+Message-ID: <20230815100816.GA24858@bogon>
+References: <cover.1691808484.git.geliang.tang@suse.com>
+ <15a618b03f65177166adf2850d4159cd4b77dfb1.1691808484.git.geliang.tang@suse.com>
+ <00809f4a-e7ca-bf53-7824-e22791ee6738@linux.dev>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00809f4a-e7ca-bf53-7824-e22791ee6738@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: TYAPR03CA0018.apcprd03.prod.outlook.com
+ (2603:1096:404:14::30) To HE1PR0402MB3497.eurprd04.prod.outlook.com
+ (2603:10a6:7:83::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v4 3/5] net: ti: icss-iep: Add IEP driver
-Content-Language: en-US
-To: Roger Quadros <rogerq@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Simon Horman
-	<simon.horman@corigine.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, Andrew
- Lunn <andrew@lunn.ch>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Conor
- Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20230814100847.3531480-1-danishanwar@ti.com>
- <20230814100847.3531480-4-danishanwar@ti.com>
- <a626c351-2c9b-1136-c31c-63cd695d9499@kernel.org>
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <a626c351-2c9b-1136-c31c-63cd695d9499@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: HE1PR0402MB3497:EE_|AM9PR04MB8307:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38f714a3-7a39-4486-d151-08db9d7780c5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	13un73JGoua+TN/ee01SBnIcpHFGPpCLx+lOxRNJlyyQevTWM3QE1Cm6n/bMWBO2j2+EXDS4hjrHGPdOSCh4NZ86HmowF8n4JziVV+HM5Tau7Y3JEpa32HzvsOWMahsPaPiH4SDhngtINB51gLRhTtbTDdY7xqU1BsSCw/RtwJE97Th5MqyzXzW44cWqVe5EVJ7K0ZUG9H0ON+ry4HvVZUguCXAKuJK9ix0N4758XiBEwnXQtU77IHMqbtudziEeBdP1N+LiQzZXlhIlYBUwdbRAEWYCOTboc4sVrV4edpMHwfw4bUBjVWnkPD7tmSJr4VYliweKjPGqlnKkLbRFjAQgh5FWRHooe7lTLejvBUbp3e8U0n5WtQ+5upOEvAYETzTc4A5oYPkHnwdkGRhK0cRbCY+6k9amnTR6MnEnDvh643KSHYf7KOUzXPLRV9vmWq6a08cWDEX/7TUzPOt5XCNygwstgjBQ48cSF44nszbZmNRp5m5qPwJA3ZWXRc58baVfal/79bF8QMRDdotLTHRcdlXGlKmd6dDCsWMlUn11z8KrqFNT62mlzUh34McU+KZ9FTtsSkgeEKqtpvoyPfgsWkvDVv1S2QnxvWKMoX3j0nu8U5gJXuMUO/DRwdtQ
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0402MB3497.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(346002)(366004)(396003)(376002)(39860400002)(136003)(186006)(1800799006)(451199021)(6486002)(6512007)(9686003)(6666004)(33656002)(86362001)(38100700002)(83380400001)(53546011)(6506007)(26005)(1076003)(44832011)(2906002)(54906003)(478600001)(33716001)(7416002)(41300700001)(66946007)(8936002)(66476007)(7406005)(8676002)(66556008)(5660300002)(6916009)(4326008)(316002)(13296009)(21314003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Xbq1jS0Wbd2H2DLM7DWy5mnT2Y8EtaBnpT5UeSjjdNXUWb70yI/e5Mb9zsST?=
+ =?us-ascii?Q?j0kqlx1b2wI4fMcb2KOvh+XTlz/j1ZlF30KcvYTBdmBJJ/EOOIFCQZG2fMlt?=
+ =?us-ascii?Q?+nTt43BpKxxWLrpHG4ubQn0+C2QGm7DyzXukkDwaYA91oo8ow8jeg6UYoG65?=
+ =?us-ascii?Q?pheif0O+ZiMKkQdhu6ra2011f/YIMBJqrfAj4g+GVahpJqMdSSnZLl9L5Ztn?=
+ =?us-ascii?Q?zvFSDe0FDkLwcDIXKpTRTgWW8BfYp0XK8B4vzmV3EvFO798b45mzJr976qhC?=
+ =?us-ascii?Q?EeqbWZbfHuah6ddaw31nwzatftrQfDWkPnDNsYwv0iJzXz8VkSE2wLhJbyzu?=
+ =?us-ascii?Q?jqbHghfDEV6XW15VRdFAGVsMbPe5zz81V3V+P6eM85tAz4mspHzMAMHAALG0?=
+ =?us-ascii?Q?AI3gzomoY4v7xGrmElaFdHTLQ476CTkOJAv0R0pEbBgMzJQD3iTQw4/GekBi?=
+ =?us-ascii?Q?0xY3xwuz08trElPkNlhLK2gueZARX2QWBU7g6gRSRZWnbNL0MZxKsfHMHr3u?=
+ =?us-ascii?Q?favLuNTnDHIt9v/mLY3y3xaItoKCXQL51HmZ/CWOOvhaut0okRC8D89HA3kE?=
+ =?us-ascii?Q?qtvKrZeVJNTVkSfhgmW6GxkBR3p6oG5FuqxcCnVe81X1Ah+Qb2QfoevorgPd?=
+ =?us-ascii?Q?MuSLbxbTOKW/j2ees8SMZTxLF1w9tSL1HZYbRMbshp6fNYe6ZcbGgofgV5Xu?=
+ =?us-ascii?Q?avi+AvVA3zBzcyLAfLaoUxEOHamC56GGvxPCKgB+tFesVm4ylM5SLwPLlulZ?=
+ =?us-ascii?Q?ywzkikF2HXq5QbZR3G3Y+n+zDW0Qx2hRgc4e+FdkWETCkAAAsZFIUdTZeWn+?=
+ =?us-ascii?Q?QmmCe3dFVgwv8bBk2nWG3DN7mpZUEi0l2k4ayi/zmnr+G84e25IFyvkw08uW?=
+ =?us-ascii?Q?9fTVlvhoPoAFooeZJloE+UNZw8pB+m4FX9dfBjBMKivipB/gH+mCuNKVRIhR?=
+ =?us-ascii?Q?0NuB0Ek34APVY6RT6RUQI6lDCdrgTPtD+T1tLnwpH1DXpMBe+tXqBLjenaFZ?=
+ =?us-ascii?Q?cLp8DS4hX0NnSZ67P16hn7SqGb3iY0bdjhoPzube3Sq28Ue6+fMYaYQ5iCOv?=
+ =?us-ascii?Q?zmvX04TctIFzb5VKaKxgiElV4Uy3oPIVwiR4F7D/eHOAYMpW1ShK2YFDGQdW?=
+ =?us-ascii?Q?olaFVsHSAprLDKacPZ74/zB/suNKN8FXtGdvyJrZnDdOSO4CfFqzN9ucpe3d?=
+ =?us-ascii?Q?W5ySom1S6oYn+rrENf3/XMJVbxSN4lomwjYkfWTxZus5w0VG+6fDXVDDW4/M?=
+ =?us-ascii?Q?yQaaSFynji1OY2oCRhd8eCvdFYbKtS4BciHG1Y6iqRnkZ0k12eBAr7GBdVIb?=
+ =?us-ascii?Q?ltt0j+zFCXDISdGEUCqCepJ4jmxHVPn8esU9DlAdltEYyQsBGWDV0osGsciZ?=
+ =?us-ascii?Q?Bu17Obu9bgJ22QDr1xmbInbntR5C7j/7bPfs4WTBbC5e5a1Fc5QrGRUBuQwl?=
+ =?us-ascii?Q?Ty7dNa2RkEberXND8mzvb1q2r5EZTLMMvQ8vzk3v7FbvY02DXqp4F5zufBSw?=
+ =?us-ascii?Q?/B+z2ZD3+ouWHkNgRrbmcXkLQcp3BJAgsTxoP87ES/tDUuYkBfcqOdhM/9uN?=
+ =?us-ascii?Q?qcEZwojQ78xb8zyJbwlXUJ9Rxsk+ptJztGqdKvMn6mjaNEWIdPUY0m72Ml5C?=
+ =?us-ascii?Q?EQ=3D=3D?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38f714a3-7a39-4486-d151-08db9d7780c5
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0402MB3497.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 10:07:59.4714
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nrtOYSC87Vb0M6KRJvACVGq6m+pZsABNVSsYPl6F75UsN4oaRLJwm1u/TzUEpdipMU3UReBu6gCKZkHGaJeTIA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8307
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Roger,
-
-On 8/15/2023 3:11 PM, Roger Quadros wrote:
-> Hi Danish,
+On Mon, Aug 14, 2023 at 11:23:49PM -0700, Martin KaFai Lau wrote:
+> On 8/11/23 7:54 PM, Geliang Tang wrote:
+> > +static int verify_mptcpify(int server_fd)
+> > +{
+> > +	socklen_t optlen;
+> > +	char cmd[256];
+> > +	int protocol;
+> > +	int err = 0;
+> > +
+> > +	optlen = sizeof(protocol);
+> > +	if (!ASSERT_OK(getsockopt(server_fd, SOL_SOCKET, SO_PROTOCOL, &protocol, &optlen),
+> > +		       "getsockopt(SOL_PROTOCOL)"))
+> > +		return -1;
+> > +
+> > +	if (!ASSERT_EQ(protocol, IPPROTO_MPTCP, "protocol isn't MPTCP"))
+> > +		err++;
+> > +
+> > +	/* Output of nstat:
+> > +	 *
+> > +	 * #kernel
+> > +	 * MPTcpExtMPCapableSYNACKRX       1                  0.0
+> > +	 */
+> > +	snprintf(cmd, sizeof(cmd),
+> > +		 "ip netns exec %s nstat -asz %s | awk '%s' | grep -q '%s'",
+> > +		 NS_TEST, "MPTcpExtMPCapableSYNACKRX",
+> > +		 "NR==1 {next} {print $2}", "1");
 > 
-> On 14/08/2023 13:08, MD Danish Anwar wrote:
->> From: Roger Quadros <rogerq@ti.com>
->>
->> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
->> support timestamping of ethernet packets and thus support PTP and PPS
->> for PRU ethernet ports.
->>
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
->> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
->> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>   drivers/net/ethernet/ti/Kconfig          |  11 +
->>   drivers/net/ethernet/ti/Makefile         |   1 +
->>   drivers/net/ethernet/ti/icssg/icss_iep.c | 921 +++++++++++++++++++++++
->>   drivers/net/ethernet/ti/icssg/icss_iep.h |  38 +
->>   4 files changed, 971 insertions(+)
->>   create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
->>   create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
->>
->> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
->> index 63e510b6860f..1af5a90720ec 100644
->> --- a/drivers/net/ethernet/ti/Kconfig
->> +++ b/drivers/net/ethernet/ti/Kconfig
->> @@ -196,4 +196,15 @@ config TI_ICSSG_PRUETH
->>   	  to support the Ethernet operation. Currently, it supports Ethernet
->>   	  with 1G and 100M link speed.
->>   
->> +config TI_ICSS_IEP
->> +	tristate "TI PRU ICSS IEP driver"
->> +	depends on TI_PRUSS
->> +	default TI_PRUSS
->> +	help
->> +	  This driver enables support for the PRU-ICSS Industrial Ethernet
->> +	  Peripheral within a PRU-ICSS subsystem present on various TI SoCs.
->> +
->> +	  To compile this driver as a module, choose M here. The module
->> +	  will be called icss_iep.
->> +
->>   endif # NET_VENDOR_TI
->> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
->> index 9176d79c36e1..34fd7a716ba6 100644
->> --- a/drivers/net/ethernet/ti/Makefile
->> +++ b/drivers/net/ethernet/ti/Makefile
->> @@ -38,3 +38,4 @@ icssg-prueth-y := k3-cppi-desc-pool.o \
->>   		  icssg/icssg_mii_cfg.o \
->>   		  icssg/icssg_stats.o \
->>   		  icssg/icssg_ethtool.o
->> +obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
->> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
->> new file mode 100644
->> index 000000000000..d123b8ba3f31
->> --- /dev/null
->> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
->> @@ -0,0 +1,921 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +/* Texas Instruments ICSSG Industrial Ethernet Peripheral (IEP) Driver
->> + *
->> + * Copyright (C) 2023 Texas Instruments Incorporated - https://www.ti.com
->> + *
->> + */
->> +
->> +#include <linux/bitops.h>
->> +#include <linux/clk.h>
->> +#include <linux/err.h>
->> +#include <linux/io.h>
->> +#include <linux/module.h>
->> +#include <linux/of.h>
->> +#include <linux/of_platform.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/timekeeping.h>
->> +#include <linux/interrupt.h>
->> +#include <linux/of_irq.h>
->> +
->> +#include "icss_iep.h"
->> +
->> +#define IEP_MAX_DEF_INC		0xf
->> +#define IEP_MAX_COMPEN_INC		0xfff
->> +#define IEP_MAX_COMPEN_COUNT	0xffffff
->> +
->> +#define IEP_GLOBAL_CFG_CNT_ENABLE	BIT(0)
->> +#define IEP_GLOBAL_CFG_DEFAULT_INC_MASK		GENMASK(7, 4)
->> +#define IEP_GLOBAL_CFG_DEFAULT_INC_SHIFT	4
->> +#define IEP_GLOBAL_CFG_COMPEN_INC_MASK		GENMASK(19, 8)
->> +#define IEP_GLOBAL_CFG_COMPEN_INC_SHIFT		8
->> +
->> +#define IEP_GLOBAL_STATUS_CNT_OVF	BIT(0)
->> +
->> +#define IEP_CMP_CFG_SHADOW_EN		BIT(17)
->> +#define IEP_CMP_CFG_CMP0_RST_CNT_EN	BIT(0)
->> +#define IEP_CMP_CFG_CMP_EN(cmp)		(GENMASK(16, 1) & (1 << ((cmp) + 1)))
->> +
->> +#define IEP_CMP_STATUS(cmp)		(1 << (cmp))
->> +
->> +#define IEP_SYNC_CTRL_SYNC_EN		BIT(0)
->> +#define IEP_SYNC_CTRL_SYNC_N_EN(n)	(GENMASK(2, 1) & (BIT(1) << (n)))
->> +
->> +#define IEP_MIN_CMP	0
->> +#define IEP_MAX_CMP	15
->> +
->> +#define ICSS_IEP_64BIT_COUNTER_SUPPORT		BIT(0)
->> +#define ICSS_IEP_SLOW_COMPEN_REG_SUPPORT	BIT(1)
->> +#define ICSS_IEP_SHADOW_MODE_SUPPORT		BIT(2)
->> +
->> +#define LATCH_INDEX(ts_index)			((ts_index) + 6)
->> +#define IEP_CAP_CFG_CAPNR_1ST_EVENT_EN(n)	BIT(LATCH_INDEX(n))
->> +#define IEP_CAP_CFG_CAP_ASYNC_EN(n)		BIT(LATCH_INDEX(n) + 10)
->> +
->> +enum {
->> +	ICSS_IEP_GLOBAL_CFG_REG,
->> +	ICSS_IEP_GLOBAL_STATUS_REG,
->> +	ICSS_IEP_COMPEN_REG,
->> +	ICSS_IEP_SLOW_COMPEN_REG,
->> +	ICSS_IEP_COUNT_REG0,
->> +	ICSS_IEP_COUNT_REG1,
->> +	ICSS_IEP_CAPTURE_CFG_REG,
->> +	ICSS_IEP_CAPTURE_STAT_REG,
->> +
->> +	ICSS_IEP_CAP6_RISE_REG0,
->> +	ICSS_IEP_CAP6_RISE_REG1,
->> +
->> +	ICSS_IEP_CAP7_RISE_REG0,
->> +	ICSS_IEP_CAP7_RISE_REG1,
->> +
->> +	ICSS_IEP_CMP_CFG_REG,
->> +	ICSS_IEP_CMP_STAT_REG,
->> +	ICSS_IEP_CMP0_REG0,
->> +	ICSS_IEP_CMP0_REG1,
->> +	ICSS_IEP_CMP1_REG0,
->> +	ICSS_IEP_CMP1_REG1,
->> +
->> +	ICSS_IEP_CMP8_REG0,
->> +	ICSS_IEP_CMP8_REG1,
->> +	ICSS_IEP_SYNC_CTRL_REG,
->> +	ICSS_IEP_SYNC0_STAT_REG,
->> +	ICSS_IEP_SYNC1_STAT_REG,
->> +	ICSS_IEP_SYNC_PWIDTH_REG,
->> +	ICSS_IEP_SYNC0_PERIOD_REG,
->> +	ICSS_IEP_SYNC1_DELAY_REG,
->> +	ICSS_IEP_SYNC_START_REG,
->> +	ICSS_IEP_MAX_REGS,
->> +};
->> +
->> +/**
->> + * struct icss_iep_plat_data - Plat data to handle SoC variants
->> + * @config: Regmap configuration data
->> + * @reg_offs: register offsets to capture offset differences across SoCs
->> + * @flags: Flags to represent IEP properties
->> + */
->> +struct icss_iep_plat_data {
->> +	struct regmap_config *config;
->> +	u32 reg_offs[ICSS_IEP_MAX_REGS];
->> +	u32 flags;
->> +};
->> +
->> +struct icss_iep {
->> +	struct device *dev;
->> +	void __iomem *base;
->> +	const struct icss_iep_plat_data *plat_data;
->> +	struct regmap *map;
->> +	struct device_node *client_np;
->> +	unsigned long refclk_freq;
->> +	int clk_tick_time;	/* one refclk tick time in ns */
->> +	struct ptp_clock_info ptp_info;
->> +	struct ptp_clock *ptp_clock;
->> +	struct mutex ptp_clk_mutex;	/* PHC access serializer */
->> +	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
->> +	u32 def_inc;
->> +	s16 slow_cmp_inc;
->> +	u32 slow_cmp_count;
->> +	const struct icss_iep_clockops *ops;
->> +	void *clockops_data;
->> +	u32 cycle_time_ns;
->> +	u32 perout_enabled;
->> +	bool pps_enabled;
->> +	int cap_cmp_irq;
->> +	u64 period;
->> +	u32 latch_enable;
->> +};
->> +
-> 
-> Where is the comment you agreed to add on why we are using readl/writel
-> instead of regmap in certain areas?
-> 
+> Is the mp-capable something that the regular mptcp user want to learn from a
+> fd also? Does it have a simpler way like to learn this, eg. getsockopt(fd,
+> SOL_MPTCP, MPTCP_xxx), instead of parsing text output?
 
-We agreed to add comment on why we are using readl/writel instead of 
-regmap in the documentation of the readl / writel helper APIs 
-(icss_iep_readl / writel ). But Andrew asked me to drop those helper 
-APIs, so I dropped them. Now no helper APIs are there and we are 
-directly using readl / writel in total 8 places. Previously with the 
-helper APIs, there was a way to document the use of readl / writel 
-before the declaration of heper APIs. Now with no helper APIs, I 
-couldn't find a good place to add this documentation as all 8 instances 
-using readl / writel seems similar. So I dropped it.
+Thanks Martin. Yes, you're right. A better one is using getsockopt
+(MPTCP_INFO) to get the mptcpi_flags, then test the FALLBACK bit to make
+sure this MPTCP connection didn't fallback. This is, in other word, this
+MPTCP connection has been established correctly. Something like this:
 
->> +/**
->> + * icss_iep_get_count_hi() - Get the upper 32 bit IEP counter
->> + * @iep: Pointer to structure representing IEP.
->> + *
->> + * Return: upper 32 bit IEP counter
->> + */
->> +int icss_iep_get_count_hi(struct icss_iep *iep)
->> +{
->> +	u32 val = 0;
->> +
->> +	if (iep && (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT))
->> +		val = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
->> +
->> +	return val;
->> +}
->> +EXPORT_SYMBOL_GPL(icss_iep_get_count_hi);
->> +
->> +/**
->> + * icss_iep_get_count_low() - Get the lower 32 bit IEP counter
->> + * @iep: Pointer to structure representing IEP.
->> + *
->> + * Return: lower 32 bit IEP counter
->> + */
->> +int icss_iep_get_count_low(struct icss_iep *iep)
->> +{
->> +	u32 val = 0;
->> +
->> +	if (iep)
->> +		val = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
->> +
->> +	return val;
->> +}
->> +EXPORT_SYMBOL_GPL(icss_iep_get_count_low);
->> +
->> +/**
->> + * icss_iep_get_ptp_clock_idx() - Get PTP clock index using IEP driver
->> + * @iep: Pointer to structure representing IEP.
->> + *
->> + * Return: PTP clock index, -1 if not registered
->> + */
->> +int icss_iep_get_ptp_clock_idx(struct icss_iep *iep)
->> +{
->> +	if (!iep || !iep->ptp_clock)
->> +		return -1;
->> +	return ptp_clock_index(iep->ptp_clock);
->> +}
->> +EXPORT_SYMBOL_GPL(icss_iep_get_ptp_clock_idx);
->> +
->> +static void icss_iep_set_counter(struct icss_iep *iep, u64 ns)
->> +{
->> +	if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
->> +		writel(upper_32_bits(ns), iep->base +
->> +		       iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
->> +	writel(upper_32_bits(ns), iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
->> +}
->> +
->> +static void icss_iep_update_to_next_boundary(struct icss_iep *iep, u64 start_ns);
->> +
->> +static void icss_iep_settime(struct icss_iep *iep, u64 ns)
->> +{
->> +	unsigned long flags;
->> +
->> +	if (iep->ops && iep->ops->settime) {
->> +		iep->ops->settime(iep->clockops_data, ns);
->> +		return;
->> +	}
->> +
->> +	spin_lock_irqsave(&iep->irq_lock, flags);
->> +	if (iep->pps_enabled || iep->perout_enabled)
->> +		writel(0, iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
->> +
->> +	icss_iep_set_counter(iep, ns);
->> +
->> +	if (iep->pps_enabled || iep->perout_enabled) {
->> +		icss_iep_update_to_next_boundary(iep, ns);
->> +		writel(IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN,
->> +		       iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
->> +	}
->> +	spin_unlock_irqrestore(&iep->irq_lock, flags);
->> +}
->> +
->> +static u64 icss_iep_gettime(struct icss_iep *iep,
->> +			    struct ptp_system_timestamp *sts)
->> +{
->> +	u32 ts_hi = 0, ts_lo;
->> +	unsigned long flags;
->> +
->> +	if (iep->ops && iep->ops->gettime)
->> +		return iep->ops->gettime(iep->clockops_data, sts);
->> +
->> +	/* use local_irq_x() to make it work for both RT/non-RT */
->> +	local_irq_save(flags);
->> +
->> +	/* no need to play with hi-lo, hi is latched when lo is read */
->> +	ptp_read_system_prets(sts);
->> +	ts_lo = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
->> +	ptp_read_system_postts(sts);
->> +	if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
->> +		ts_hi = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
->> +
->> +	local_irq_restore(flags);
->> +
->> +	return (u64)ts_lo | (u64)ts_hi << 32;
->> +}
->> +
->> +static void icss_iep_enable(struct icss_iep *iep)
->> +{
->> +	regmap_update_bits(iep->map, ICSS_IEP_GLOBAL_CFG_REG,
->> +			   IEP_GLOBAL_CFG_CNT_ENABLE,
->> +			   IEP_GLOBAL_CFG_CNT_ENABLE);
->> +}
->> +
-> <snip>
++       optlen = sizeof(info);
++       if (!ASSERT_OK(getsockopt(fd, SOL_MPTCP, MPTCP_INFO, &info, &optlen),
++                      "getsockopt(MPTCP_INFO)"))
++               return -1;
++
++       if (!ASSERT_FALSE(info.mptcpi_flags & MPTCP_INFO_FLAG_FALLBACK,
++                         "MPTCP fallback"))
++               err++;
+
+It's necessary to add this further check after the MPTCP protocol check
+using getsockopt(SOL_PROTOCOL). Since in some cases, the MPTCP protocol
+check is not enough. Say, if we change TCP protocol into MPTCP using
+"cgroup/sock_create", the hook of BPF_CGROUP_RUN_PROG_INET_SOCK in
+inet_create(), this place is too late to change the protocol. Although
+sk->sk_protocol is set to MPTCP correctly, and the MPTCP protocol check
+using getsockopt(SOL_PROTOCOL) will pass. This MPTCP connection will
+fallback to TCP connection. So this further check is needed.
+
+-Geliang
+
 > 
-
--- 
-Thanks and Regards,
-Md Danish Anwar
+> > +	if (!ASSERT_OK(system(cmd), "No MPTcpExtMPCapableSYNACKRX found!"))
+> 
+> 
 
