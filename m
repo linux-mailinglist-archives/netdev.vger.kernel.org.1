@@ -1,103 +1,130 @@
-Return-Path: <netdev+bounces-27681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9770877CD5C
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:38:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683AC77CD76
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22BE92814C1
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95F151C20D1F
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBE8125C6;
-	Tue, 15 Aug 2023 13:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3554312B67;
+	Tue, 15 Aug 2023 13:43:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C196FA9
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:38:30 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6F912E
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:38:29 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-14-jtYcrbScOx2nz_MMUvypow-1; Tue, 15 Aug 2023 14:38:26 +0100
-X-MC-Unique: jtYcrbScOx2nz_MMUvypow-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 15 Aug
- 2023 14:38:23 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Tue, 15 Aug 2023 14:38:23 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Mina Almasry' <almasrymina@google.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-media@vger.kernel.org"
-	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, Dan
- Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>, "sdf@google.com"
-	<sdf@google.com>
-Subject: RE: [RFC PATCH v2 00/11] Device Memory TCP
-Thread-Topic: [RFC PATCH v2 00/11] Device Memory TCP
-Thread-Index: AQHZyy4cCyylGqKvQkCWO9kOPAhLv6/rVx7w
-Date: Tue, 15 Aug 2023 13:38:23 +0000
-Message-ID: <58a93e4e8b8b4ca79c2678a3ae8281cd@AcuMS.aculab.com>
-References: <20230810015751.3297321-1-almasrymina@google.com>
-In-Reply-To: <20230810015751.3297321-1-almasrymina@google.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2258832
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:43:34 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC019199A;
+	Tue, 15 Aug 2023 06:43:32 -0700 (PDT)
+Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RQC921v0szVk3h;
+	Tue, 15 Aug 2023 21:41:26 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 15 Aug 2023 21:43:29 +0800
+From: Dong Chenchen <dongchenchen2@huawei.com>
+To: <leon@kernel.org>
+CC: <fw@strlen.de>, <steffen.klassert@secunet.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <timo.teras@iki.fi>,
+	<yuehaibing@huawei.com>, <weiyongjun1@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [Patch net, v2] net: xfrm: skip policies marked as dead while reinserting policies
+Date: Tue, 15 Aug 2023 21:43:28 +0800
+Message-ID: <20230815123233.GM22185@unreal>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230815091324.GL22185@unreal>
+References: <20230814140013.712001-1-dongchenchen2@huawei.com> <20230815060026.GE22185@unreal> <20230815091324.GL22185@unreal>
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500026.china.huawei.com (7.221.188.247)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RnJvbTogTWluYSBBbG1hc3J5DQo+IFNlbnQ6IDEwIEF1Z3VzdCAyMDIzIDAyOjU4DQouLi4NCj4g
-KiBUTDtEUjoNCj4gDQo+IERldmljZSBtZW1vcnkgVENQIChkZXZtZW0gVENQKSBpcyBhIHByb3Bv
-c2FsIGZvciB0cmFuc2ZlcnJpbmcgZGF0YSB0byBhbmQvb3INCj4gZnJvbSBkZXZpY2UgbWVtb3J5
-IGVmZmljaWVudGx5LCB3aXRob3V0IGJvdW5jaW5nIHRoZSBkYXRhIHRvIGEgaG9zdCBtZW1vcnkN
-Cj4gYnVmZmVyLg0KDQpEb2Vzbid0IHRoYXQgcmVhbGx5IHJlcXVpcmUgcGVlci10by1wZWVyIFBD
-SWUgdHJhbnNmZXJzPw0KSUlSQyB0aGVzZSBhcmVuJ3Qgc3VwcG9ydGVkIGJ5IG1hbnkgcm9vdCBo
-dWJzIGFuZCBoYXZlDQpmdW5kYW1lbnRhbCBmbG93IGNvbnRyb2wgYW5kL29yIFRMUCBjcmVkaXQg
-cHJvYmxlbXMuDQoNCkknZCBndWVzcyB0aGV5IGFyZSBhbHNvIHByZXR0eSBpbmNvbXBhdGlibGUg
-d2l0aCBJT01NVT8NCg0KSSBjYW4gc2VlIGhvdyB5b3UgbWlnaHQgbWFuYWdlIHRvIHRyYW5zbWl0
-IGZyYW1lcyBmcm9tDQpzb21lIGV4dGVybmFsIG1lbW9yeSAoZWcgYWZ0ZXIgZW5jcnlwdGlvbikg
-YnV0IHN1cmVseQ0KcHJvY2Vzc2luZyByZWNlaXZlIGRhdGEgdGhhdCB3YXkgbmVlZHMgdGhlIHBh
-Y2tldHMNCmJlIGZpbHRlcmVkIGJ5IGJvdGggSVAgYWRkcmVzc2VzIGFuZCBwb3J0IG51bWJlcnMg
-YmVmb3JlDQpiZWluZyByZWRpcmVjdGVkIHRvIHRoZSAocHJlc3VtYWJseSBsaW1pdGVkKSBleHRl
-cm5hbA0KbWVtb3J5Lg0KDQpPVE9IIGlzbid0IHRoZSBrZXJuZWwgZ29pbmcgdG8gbmVlZCB0byBy
-dW4gY29kZSBiZWZvcmUNCnRoZSBwYWNrZXQgaXMgYWN0dWFsbHkgc2VudCBhbmQganVzdCBhZnRl
-ciBpdCBpcyByZWNlaXZlZD8NClNvIGFsbCB5b3UgbWlnaHQgZ2FpbiBpcyBhIGJpdCBvZiBsYXRl
-bmN5Pw0KQW5kIGEgYml0IGxlc3MgdXRpbGlzYXRpb24gb2YgaG9zdCBtZW1vcnk/Pw0KQnV0IGlm
-IHlvdXIgc3lzdGVtIGlzIHJlYWxseSBsaW1pdGVkIGJ5IGNwdS1tZW1vcnkgYmFuZHdpZHRoDQp5
-b3UgbmVlZCBtb3JlIGNhY2hlIDotKQ0KDQpTbyBob3cgbXVjaCBiZW5lZml0IGlzIHRoZXJlIG92
-ZXIgZWZmaWNpZW50IHVzZSBvZiBob3N0DQptZW1vcnkgYm91bmNlIGJ1ZmZlcnM/Pw0KDQoJRGF2
-aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50
-IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTcz
-ODYgKFdhbGVzKQ0K
+On Tue, Aug 15, 2023 at 07:35:13PM +0800, Dong Chenchen wrote:
+>> >> The walker object initialized by xfrm_policy_walk_init() doesnt have policy. 
+>> >> list_for_each_entry() will use the walker offset to calculate policy address.
+>> >> It's nonexistent and different from invalid dead policy. It will read memory 
+>> >> that doesnt belong to walker if dereference policy->index.
+>> >> I think we should protect the memory.
+>> >
+>> >But all operations here are an outcome of "list_for_each_entry(policy,
+>> >&net->xfrm.policy_all, walk.all)" which stores in policy iterator
+>> >the pointer to struct xfrm_policy.
+>> >
+>> >How at the same time access to policy->walk.dead is valid while
+>> >policy->index is not?
+>> >
+>> >Thanks
+>> 1.walker init: its only a list head, no policy
+>> xfrm_dump_policy_start
+>> 	xfrm_policy_walk_init(walk, XFRM_POLICY_TYPE_ANY);
+>> 		INIT_LIST_HEAD(&walk->walk.all);
+>> 		walk->walk.dead = 1;
+>> 
+>> 2.add the walk head to net->xfrm.policy_all
+>> xfrm_policy_walk
+>>     list_for_each_entry_from(x, &net->xfrm.policy_all, all)
+>> 	if (error) {
+>> 		list_move_tail(&walk->walk.all, &x->all);
+>> 		//add the walk to list tail
+>> 
+>> 3.traverse the walk list
+>> xfrm_policy_flush
+>> list_for_each_entry(pol, &net->xfrm.policy_all, walk.all)
+>> 	 dir = xfrm_policy_id2dir(pol->index);
+>> 
+>> it gets policy by &net->xfrm.policy_all-0x130(offset of walk in policy)
+>> but when walk is head, we will read others memory by the calculated policy.
+>> such as:
+>>   walk addr  		policy addr
+>> 0xffff0000d7f3b530    0xffff0000d7f3b400 (non-existent) 
+>> 
+>> head walker of net->xfrm.policy_all can be skipped by  list_for_each_entry().
+>> but the walker created by socket is located list tail. so we should skip it. 
+>
+>list_for_each_entry_from(x, &net->xfrm.policy_all, all) gives you
+>pointer to "x", you can't access some of its fields and say they
+>exist and other doesn't. Once you can call to "x->...", you can 
+>call to "x->index" too.
+>
+>Thanks
+We get a pointer addr not actual variable from list_for_each_entry_from(),
+that calculated by walk address dec offset from struct xfrm_policy(0x130).
 
+walk addr: 0xffff0000d7f3b530 //allocated by socket, valid
+-> dec 0x130 (use macro container_of)
+policy_addr:0xffff0000d7f3b400 //only a pointer addr
+-> add 0x130 
+policy->walk:0xffff0000d7f3b530 //its still walker head
+
+I think its invalid to read policy->index from memory that maybe allocated
+by other user.
+
+Thanks!
+Dong Chenchen
 
