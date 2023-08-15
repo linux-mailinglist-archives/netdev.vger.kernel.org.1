@@ -1,101 +1,130 @@
-Return-Path: <netdev+bounces-27588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D310A77C76D
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD4177C7B8
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 976901C20BD1
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 06:07:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A621C20BF2
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 06:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697E95674;
-	Tue, 15 Aug 2023 06:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88205C9D;
+	Tue, 15 Aug 2023 06:20:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6C6525A
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:07:11 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5AF019A8
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 23:06:56 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fe2d218eedso47641235e9.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 23:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692079615; x=1692684415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SfZHt9AGbW5m+oJFEo8F2sAzlF55NyLhY5unHP1NaPk=;
-        b=vL0yDE8+1Z6kKdh23VvfzCh/W5rbdTeMgqPuI0yLIbLXRBxqBRpW10FcXEcjx+L3e6
-         0L2lB62uHwKDNkng7jgbNzcqz4rfdtkdr/8B1huEcF5Gc96SGOn0TPS+xsV05pAdaUf+
-         FxK75Dl27/a3GclUrAmGcBYcB/Bz/dt7LQ4FreWxbJVRxxyu8uSX2u8LrjLBAnOU4p8L
-         28HRCJmzcNPCcQKQ/9P8BfFvPC9AI5d9tjf+m3ZNjN8fmUk3TfLzXAXlZVkInT3TtMAp
-         bt79yDErNUq7+JoI8jC+uJioJjuv2OW9SL7gc3Zg6wTwLr2swAldG89fW0IYwJ6ulXzj
-         A8Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692079615; x=1692684415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SfZHt9AGbW5m+oJFEo8F2sAzlF55NyLhY5unHP1NaPk=;
-        b=N+r6+juaAQGYdOEzK7mPb+sTjU3iY0PWNBcOaqEeO81dmwwS8K6sWnmf1UikznAjSC
-         anS+v8ZqnV0VfEBhl/1qvqXSjVBHtJGA70tDxM+hVusNGhCXsmj8zsL+8oPFrWtqwTJI
-         zgDkhHlvki6XzOuN9kdSZVRAjohBWgym3vudRg+FTbnX44XV8Q1TsnxKWD9Ob3hJd0fG
-         cZz9pv67cnjvkxM+cPzOl/I/6gyt1baIMsaxxAqE807qIowfLxYTxQeIV8ufYiiLlypc
-         lUEcVyKIPfbZwVmgLOUO8SBqcFzYIb14WauwM9gDm+xSETpsti41d9vyO3ddfjYbgMFf
-         40pg==
-X-Gm-Message-State: AOJu0Ywe5Zu23QL7dlPdX2FowGxh04Lluzi7Q7UWSMkWaTc18TMesMNH
-	ig7dlB6109Eppgi1Ca3lqN0/4w==
-X-Google-Smtp-Source: AGHT+IGbI50iV8m1uisMq8Fy/7OU5vVVIwSWEnFrejSImWuLod6AiyVWm4wuXlVNG9xhaVDb1avQ0A==
-X-Received: by 2002:a05:6000:42:b0:317:5b32:b2c3 with SMTP id k2-20020a056000004200b003175b32b2c3mr7544265wrx.6.1692079614943;
-        Mon, 14 Aug 2023 23:06:54 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id z7-20020adfd0c7000000b00317afc7949csm16040076wrh.50.2023.08.14.23.06.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 23:06:54 -0700 (PDT)
-Date: Tue, 15 Aug 2023 08:06:53 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, johannes@sipsolutions.net,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, gal@nvidia.com,
-	tariqt@nvidia.com, lucien.xin@gmail.com, f.fainelli@gmail.com,
-	andrew@lunn.ch, simon.horman@corigine.com, linux@rempel-privat.de,
-	mkubecek@suse.cz
-Subject: Re: [PATCH net-next v3 10/10] ethtool: netlink: always pass
- genl_info to .prepare_data
-Message-ID: <ZNsV/ZFsixC2CRPW@nanopsycho>
-References: <20230814214723.2924989-1-kuba@kernel.org>
- <20230814214723.2924989-11-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45B567E
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:20:46 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D1F3C05
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 23:20:41 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5D20A21992;
+	Tue, 15 Aug 2023 06:20:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1692080440; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z4odYFRAf0mnDRB+A3xq3whLMLph3njV54CRH8KxPF4=;
+	b=vtEdqnfwK1QK9BePGHYn84vHHipyqL5S7qBma2OZxEY26dTyYVQyIAJSFETIGuvdqoTBgB
+	+7gl4sOME0NQUdgSuTOoqOUtQO86y+FgvG2exbb7BjV7G1d27GeLrcHok7xU8Y/GqTCoCG
+	pJo2GdLTyY6w+OaAiO9AEBi7vv1s0Cw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1692080440;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z4odYFRAf0mnDRB+A3xq3whLMLph3njV54CRH8KxPF4=;
+	b=IHpYArTeoTlWy1IjvBeSPc/oq4civzCxSId3lkeuOXzifiQjrbDs1Jv3bDhD/eDw/Wn5tT
+	gAuz7w/ZDp6DzjDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 329DC1353E;
+	Tue, 15 Aug 2023 06:20:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id SOMnCzgZ22SnagAAMHmgww
+	(envelope-from <hare@suse.de>); Tue, 15 Aug 2023 06:20:40 +0000
+Message-ID: <92692ffe-a83a-00a0-553a-7e7a1aa5e23a@suse.de>
+Date: Tue, 15 Aug 2023 08:20:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230814214723.2924989-11-kuba@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 17/17] nvmet-tcp: peek icreq before starting TLS
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230814111943.68325-1-hare@suse.de>
+ <20230814111943.68325-18-hare@suse.de>
+ <304bc2f7-5f77-6e08-bcdb-f382233f611b@grimberg.me>
+ <f9ebbd9d-31be-8e2c-f8a2-1f5b95a83344@suse.de>
+ <b9ec8b98-dcde-1d89-9431-4799240f0c80@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <b9ec8b98-dcde-1d89-9431-4799240f0c80@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mon, Aug 14, 2023 at 11:47:23PM CEST, kuba@kernel.org wrote:
->We had a number of bugs in the past because developers forgot
->to fully test dumps, which pass NULL as info to .prepare_data.
->.prepare_data implementations would try to access info->extack
->leading to a null-deref.
->
->Now that dumps and notifications can access struct genl_info
->we can pass it in, and remove the info null checks.
->
->Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
->Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com> # pause
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On 8/14/23 21:05, Sagi Grimberg wrote:
+> 
+> 
+> On 8/14/23 16:18, Hannes Reinecke wrote:
+>> On 8/14/23 14:11, Sagi Grimberg wrote:
+>>>
+>>>> Incoming connection might be either 'normal' NVMe-TCP connections
+>>>> starting with icreq or TLS handshakes. To ensure that 'normal'
+>>>> connections can still be handled we need to peek the first packet
+>>>> and only start TLS handshake if it's not an icreq.
+>>>
+>>> That depends if we want to do that.
+>>> Why should we let so called normal connections if tls1.3 is
+>>> enabled?
+>>
+>> Because of the TREQ setting.
+>> TREQ can be 'not specified, 'required', or 'not required'.
+>> Consequently when TSAS is set to 'tls1.3', and TREQ to 'not required' 
+>> the initiator can choose whether he wants to do TLS.
+>>
+>> And we don't need this weird 'select TREQ required' when TLS is active;
+>> never particularly liked that one.
+> 
+> The guideline should be that treq 'not required' should be the explicit
+> setting in tls and not the other way around. We should be strict by
+> default and permissive only if the user explicitly chose it, and log
+> a warning in the log.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Whatever you say. I'll modify the patch.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
 
