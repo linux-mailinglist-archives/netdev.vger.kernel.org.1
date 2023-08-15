@@ -1,103 +1,140 @@
-Return-Path: <netdev+bounces-27691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1B777CE3C
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:38:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDEAA77CE51
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CFD31C20D6F
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A74BA2814FA
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B7B134DE;
-	Tue, 15 Aug 2023 14:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E68134DE;
+	Tue, 15 Aug 2023 14:42:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46BF11CB2
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:38:30 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C2F1AE3;
-	Tue, 15 Aug 2023 07:38:25 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37FEbm1lB010673, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37FEbm1lB010673
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 15 Aug 2023 22:37:48 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Tue, 15 Aug 2023 22:38:07 +0800
-Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Tue, 15 Aug
- 2023 22:38:06 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Justin Lai
-	<justinlai0215@realtek.com>
-Subject: [PATCH net-next v3 2/2] MAINTAINERS: Add the rtase ethernet driver entry
-Date: Tue, 15 Aug 2023 22:37:56 +0800
-Message-ID: <20230815143756.106623-3-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230815143756.106623-1-justinlai0215@realtek.com>
-References: <20230815143756.106623-1-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4857134D9
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:42:14 +0000 (UTC)
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746CA93;
+	Tue, 15 Aug 2023 07:42:13 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-4496b17cccfso1003957137.2;
+        Tue, 15 Aug 2023 07:42:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692110532; x=1692715332;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9UZFaVlc1sczHQWHZJ9AjHZsRHt5PWt4JpBGZLlXeg0=;
+        b=pPleL2QungwV3N3GV8TI1ahpjqCncp51gnYfpvhhOplW891qdlMshtDs+IgT0IzjBl
+         aH8K8BwF5pYG7OngZkQaS0AvH3oE577jAmSSX4MW+Axt0EXU9ozPJySimW1pqaeSi8+M
+         11yfvvWj2VSawUbT0Y9PkmaBSuw8n/qBLaxKPTjIBKoLI9fjcfonXPLke4HnTrfXq2Bq
+         P4hgAYQOWwMryU68Se7CJVbkDXuFrZT5zXEmYIv5WIj62AZ7XLUbTEychVoKNEHMInpM
+         b0hq+dHf4oaWA35i6X3k4p1wE4swSej2PiRoHfDquatLYJPOHmt0P3o+G++ZtaUzPtYN
+         JlhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692110532; x=1692715332;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9UZFaVlc1sczHQWHZJ9AjHZsRHt5PWt4JpBGZLlXeg0=;
+        b=ai2f5Ps/1Orem0g95uBKuYVO205Va8uCYK8zk60mV2ZF2DCX7CxgynmE8dN6f5EBJ/
+         +Ovg7UnmlG4zojYA/xLb0ui3o40wmUKzsjsls6UZaVG1mjSJaoo+Q76vSl/YplaB62VR
+         UN+vpbfHmTdIBHL2IoZBL0eYxpZKCHMesmmtMMCZmTs1SdezWCtGJR86U+HUdqSjQuxQ
+         uWu4LdSQvTLhMKVaPI6h5l2TYIotr3HYfnT0MA5yMDwKcp77+JIwE5A4rdQ7Cs0MhIGG
+         rOTyKmFvSMdWQ35f1bG3Qa5koLDv1m5bwcwnYXsBJJhxaWvELCbX/dEGgaPC1hiEHTS8
+         OPPg==
+X-Gm-Message-State: AOJu0Yw6oGxMaSt9SagtNmEjR0eLBzi4qz7kM4marwq7hpQD/9/ychaj
+	Z9ufAquPUnLsO5GLfqke16MXs2s7/AjDN+2fJqM=
+X-Google-Smtp-Source: AGHT+IHkefxbWaWrxGL9lInv9tYLtV6RKC5Xhye/4zD/nSk4TJeMzlNk1n0Cbb5GRzuoSowhEPnqM6F//jPuzZ4WmLM=
+X-Received: by 2002:a05:6102:3014:b0:440:c4fb:f257 with SMTP id
+ s20-20020a056102301400b00440c4fbf257mr11215788vsa.0.1692110532489; Tue, 15
+ Aug 2023 07:42:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.21.210.160]
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+References: <20230810015751.3297321-1-almasrymina@google.com> <58a93e4e8b8b4ca79c2678a3ae8281cd@AcuMS.aculab.com>
+In-Reply-To: <58a93e4e8b8b4ca79c2678a3ae8281cd@AcuMS.aculab.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Tue, 15 Aug 2023 10:41:35 -0400
+Message-ID: <CAF=yD-KrkHo9QY2-cALosQHnZe=JWiRcmcvpfu3qov2J6kJPMQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/11] Device Memory TCP
+To: David Laight <David.Laight@aculab.com>
+Cc: Mina Almasry <almasrymina@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, 
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
+	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, 
+	"stephen@networkplumber.org" <stephen@networkplumber.org>, "sdf@google.com" <sdf@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add myself and Larry Chiu as the maintainer for the rtase ethernet driver.
+On Tue, Aug 15, 2023 at 9:38=E2=80=AFAM David Laight <David.Laight@aculab.c=
+om> wrote:
+>
+> From: Mina Almasry
+> > Sent: 10 August 2023 02:58
+> ...
+> > * TL;DR:
+> >
+> > Device memory TCP (devmem TCP) is a proposal for transferring data to a=
+nd/or
+> > from device memory efficiently, without bouncing the data to a host mem=
+ory
+> > buffer.
+>
+> Doesn't that really require peer-to-peer PCIe transfers?
+> IIRC these aren't supported by many root hubs and have
+> fundamental flow control and/or TLP credit problems.
+>
+> I'd guess they are also pretty incompatible with IOMMU?
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+Yes, this is a form of PCI_P2PDMA and all the limitations of that apply.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 53b7ca804465..239aae94dc0f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18476,6 +18476,13 @@ L:	linux-remoteproc@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/rpmsg_tty.c
- 
-+RTASE ETHERNET DRIVER
-+M:	Justin Lai <justinlai0215@realtek.com>
-+M:	Larry Chiu <larry.chiu@realtek.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/realtek/rtase/
-+
- RTL2830 MEDIA DRIVER
- M:	Antti Palosaari <crope@iki.fi>
- L:	linux-media@vger.kernel.org
--- 
-2.34.1
+> I can see how you might manage to transmit frames from
+> some external memory (eg after encryption) but surely
+> processing receive data that way needs the packets
+> be filtered by both IP addresses and port numbers before
+> being redirected to the (presumably limited) external
+> memory.
 
+This feature depends on NIC receive header split. The TCP/IP headers
+are stored to host memory, the payload to device memory.
+
+Optionally, on devices that do not support explicit header-split, but
+do support scatter-gather I/O, if the header size is constant and
+known, that can be used as a weak substitute. This has additional
+caveats wrt unexpected traffic for which payload must be host visible
+(e.g., ICMP).
+
+> OTOH isn't the kernel going to need to run code before
+> the packet is actually sent and just after it is received?
+> So all you might gain is a bit of latency?
+> And a bit less utilisation of host memory??
+> But if your system is really limited by cpu-memory bandwidth
+> you need more cache :-)
+>
+>
+> So how much benefit is there over efficient use of host
+> memory bounce buffers??
+
+Among other things, on a PCIe tree this makes it possible to load up
+machines with many NICs + GPUs.
 
