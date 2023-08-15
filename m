@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-27801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88CFA77D382
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 21:44:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7027A77D384
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 21:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1C991C20DF8
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:44:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A08BB1C20DD4
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D140419882;
-	Tue, 15 Aug 2023 19:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BB619899;
+	Tue, 15 Aug 2023 19:43:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66B51426C
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 19:43:38 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD8810C1;
-	Tue, 15 Aug 2023 12:43:37 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3fe2048c910so53309825e9.1;
-        Tue, 15 Aug 2023 12:43:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E642D18053
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 19:43:40 +0000 (UTC)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9801310EC;
+	Tue, 15 Aug 2023 12:43:38 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-307d20548adso5137299f8f.0;
+        Tue, 15 Aug 2023 12:43:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692128615; x=1692733415;
+        d=gmail.com; s=20221208; t=1692128617; x=1692733417;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qDx4UweuNbOniPGlCFbOuSXwgxgV3XvqIUyY5uAZbZI=;
-        b=jozvqTnHbUBkcZLEfQY4U3sMIaVGJ2e+StTjbeuPsbeZ/ozhisINZVC5OusOS6SOqB
-         hJMj75Ma20RAy2sAvnqFUBZxUqV2FvdJ5BW4qFFH537T7NEKLEC/XWcDPJzMQzzbXKKL
-         ICTKvPPcXe75rYF1B6RZAM5S8gwBWp6NhU7D+S98Z5RZqjoV4eSPxGbzVR1usqPg4DWt
-         P7+Z8kgdjG7kcNqzcEcTQ/zj2obVOYEtgn4oLs/MuSaWVMKlt+X++WHu3VTlBGJI195D
-         8uwhz7N6aQ14E8tMQEfNzAvJRErU2k2TkuytDlLaRB3G0TPhhWsRIYpS0qkBP43x7RG7
-         L3gQ==
+        bh=mFjY37lwo4N/hdruwu62FUgbt07yrT9B4CemMUeBHlg=;
+        b=deKmEK3EVC0relv6FoeLV/hBmopAbaf56boedCAzAk5jVleG3i48b5kPendYyM4b9x
+         S805j8zdqZHR0tPCt01xzPS8Xvh45mxSDpx/Z7+mPZ3rL742Oz2yQfilR/BURj06YVP1
+         ErLSjpu2jOYZ3Z4zufAPFR0spyq7rSI1ZQuM0Na1LB7S1pbOYd0mMlqU86STXjBQyk41
+         Iq0+4UzSCFC3TqOY3tGysi/Dfd3J/11c1bAOGUCIpiFHzDYFfPgIe+ZW19irhCxknenR
+         jjufLbn5gU0WA7ODpoDqB2pWmjydvGXYXUpSE314+qC+8IAxzEn6j5aQacduNI9fHFsk
+         UEXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692128615; x=1692733415;
+        d=1e100.net; s=20221208; t=1692128617; x=1692733417;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qDx4UweuNbOniPGlCFbOuSXwgxgV3XvqIUyY5uAZbZI=;
-        b=ChamTA2+QCp35lDx42R3giTtInA/GMMj9xVDyaRV5BHIx2Dls9Hu7UgVkp2JogJbV7
-         4CRBjnLUuUDHKZD68c8uXvqDKeB2unX++6XdRhdKreTenrrd9P4itUa80tj1o/ELYmfP
-         dGwyLpXB/CLv7kKKvvWCFq8y7tlAQveye2tt/ih1USX4lPxBB/gLQDVnjcjj53k3m74j
-         fTtrzwGZYu+0+CqPZ7/LwZs1QHsLQfSQc68VyRwIv9ri+l6RNdjIrixEVpZlZWRLGi84
-         r04+lpr3QGnoHCxiQ49vb94wYA4RyjpbZCgpycfSzu11UJ2Hds6zgefLPqujx7U8WW0Q
-         03GA==
-X-Gm-Message-State: AOJu0YzAqNVCt8eDPeQFNH/R7SsWttnGnQUsSRvgMrPNffbpbHKTBeiz
-	ozqKuabxor+BC8ezTsgdXBejrxnbEgU7NmJ2
-X-Google-Smtp-Source: AGHT+IECMUljCAPhztgn1+ddIKC9zxQJx97KyZhNkxLLOd+cVD2CN4DDVZU3cnQYXXZCZPVgxf4EmQ==
-X-Received: by 2002:a7b:cd97:0:b0:3fe:4900:db95 with SMTP id y23-20020a7bcd97000000b003fe4900db95mr11064524wmj.37.1692128615548;
-        Tue, 15 Aug 2023 12:43:35 -0700 (PDT)
+        bh=mFjY37lwo4N/hdruwu62FUgbt07yrT9B4CemMUeBHlg=;
+        b=GfwhOSA92o9ZdHkCo517/0E53JNLnZxN4uAbK0g9uh0z/NIW2BsnGOx/VwoKniVs4j
+         mFnbmwN5zi03a+GpvATls9a5ee1lPaBUsTDnwvj77oNMzE2WZ01p7B2L/yBzMMeuQcB7
+         HXGAWd+Dl4kjALUJqCeSAMljoEwvi5y7g0NyOR14awphAsaP9me5LAeYkmbQKo/E3ReY
+         BhWXohtiRu41HBQvLKEoUGpVAJN50//o+Pyxx/BdrFG4+oJ7GGJNXA1s7hXlJP4xobwG
+         k29sNC7douiGt5cC00G5mKfTH3NXwpSj6tiL0JlUF8vzXQDRNUrwfY85YfbqbbtdFRpA
+         LsEg==
+X-Gm-Message-State: AOJu0YxoIxw1QSLmhBZKOLb6gD6pHCrLc/dmOFk3pNjE5NlSPtYLH5Wy
+	DkML2M0qjUzZtHsEip5cGSr2K+2guG6Hbc89
+X-Google-Smtp-Source: AGHT+IH1n4EEnPCvQC0zMSUwJ7mYVnh7ge0qJgekyXhXDSefHl53GlcAN1nd13h90OBVbXn+1T4lig==
+X-Received: by 2002:a5d:5482:0:b0:319:8a21:6f9a with SMTP id h2-20020a5d5482000000b003198a216f9amr1730728wrv.63.1692128616694;
+        Tue, 15 Aug 2023 12:43:36 -0700 (PDT)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:9934:e2f7:cd0e:75a6])
-        by smtp.gmail.com with ESMTPSA id n16-20020a5d6610000000b003179d5aee67sm18814892wru.94.2023.08.15.12.43.34
+        by smtp.gmail.com with ESMTPSA id n16-20020a5d6610000000b003179d5aee67sm18814892wru.94.2023.08.15.12.43.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 12:43:35 -0700 (PDT)
+        Tue, 15 Aug 2023 12:43:36 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -68,9 +68,9 @@ To: netdev@vger.kernel.org,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 04/10] tools/ynl: Add mcast-group schema parsing to ynl
-Date: Tue, 15 Aug 2023 20:42:48 +0100
-Message-ID: <20230815194254.89570-5-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 05/10] tools/net/ynl: Refactor decode_fixed_header into NlMsg
+Date: Tue, 15 Aug 2023 20:42:49 +0100
+Message-ID: <20230815194254.89570-6-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230815194254.89570-1-donald.hunter@gmail.com>
 References: <20230815194254.89570-1-donald.hunter@gmail.com>
@@ -88,75 +88,88 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a SpecMcastGroup class to the nlspec lib.
+Move decode_fixed_header into NlMsg in preparation for adding
+netlink-raw support.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/lib/nlspec.py | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ tools/net/ynl/lib/ynl.py | 39 ++++++++++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 15 deletions(-)
 
-diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-index 0ff0d18666b2..a41ad89eb369 100644
---- a/tools/net/ynl/lib/nlspec.py
-+++ b/tools/net/ynl/lib/nlspec.py
-@@ -322,6 +322,21 @@ class SpecOperation(SpecElement):
-             self.attr_set = self.family.attr_sets[attr_set_name]
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 3ca28d4bcb18..4fa42a7c5955 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -189,6 +189,7 @@ class NlMsg:
+ 
+         self.error = 0
+         self.done = 0
++        self.fixed_header_attrs = []
+ 
+         extack_off = None
+         if self.nl_type == Netlink.NLMSG_ERROR:
+@@ -228,6 +229,19 @@ class NlMsg:
+                             desc += f" ({spec['doc']})"
+                         self.extack['miss-type'] = desc
+ 
++    def decode_fixed_header(self, ynl, name):
++        fixed_header_members = ynl.consts[name].members
++        self.fixed_header_attrs = dict()
++        offset = 0
++        for m in fixed_header_members:
++            format = NlAttr.get_format(m.type, m.byte_order)
++            [ value ] = format.unpack_from(self.raw, offset)
++            offset += format.size
++            if m.enum:
++                value = ynl._decode_enum(value, m)
++            self.fixed_header_attrs[m.name] = value
++        self.raw = self.raw[offset:]
++
+     def __repr__(self):
+         msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}\n"
+         if self.error:
+@@ -317,23 +331,18 @@ def _genl_load_families():
  
  
-+class SpecMcastGroup(SpecElement):
-+    """Netlink Multicast Group
-+
-+    Information about a multicast group.
-+
-+    Attributes:
-+        name      name of the mulitcast group
-+        value     numerical id of this multicast group for netlink-raw
-+        yaml      raw spec as loaded from the spec file
-+    """
-+    def __init__(self, family, yaml):
-+        super().__init__(family, yaml)
-+        self.value = self.yaml.get('value')
-+
-+
- class SpecFamily(SpecElement):
-     """ Netlink Family Spec class.
+ class GenlMsg:
+-    def __init__(self, nl_msg, fixed_header_members=[]):
+-        self.nl = nl_msg
++    def __init__(self, nl_msg, ynl=None):
++        self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
++        nl_msg.raw = nl_msg.raw[4:]
  
-@@ -343,6 +358,7 @@ class SpecFamily(SpecElement):
-         ntfs       dict of all async events
-         consts     dict of all constants/enums
-         fixed_header  string, optional name of family default fixed header struct
-+        mcast_groups  dict of all multicast groups (index by name)
-     """
-     def __init__(self, spec_path, schema_path=None, exclude_ops=None):
-         with open(spec_path, "r") as stream:
-@@ -384,6 +400,7 @@ class SpecFamily(SpecElement):
-         self.ops = collections.OrderedDict()
-         self.ntfs = collections.OrderedDict()
-         self.consts = collections.OrderedDict()
-+        self.mcast_groups = collections.OrderedDict()
+-        self.hdr = nl_msg.raw[0:4]
+-        offset = 4
+-
+-        self.genl_cmd, self.genl_version, _ = struct.unpack("BBH", self.hdr)
+-
+-        self.fixed_header_attrs = dict()
+-        for m in fixed_header_members:
+-            format = NlAttr.get_format(m.type, m.byte_order)
+-            decoded = format.unpack_from(nl_msg.raw, offset)
+-            offset += format.size
+-            self.fixed_header_attrs[m.name] = decoded[0]
++        if ynl:
++            op = ynl.rsp_by_value[self.genl_cmd]
++            if op.fixed_header:
++                nl_msg.decode_fixed_header(ynl, op.fixed_header)
  
-         last_exception = None
-         while len(self._resolution_list) > 0:
-@@ -416,6 +433,9 @@ class SpecFamily(SpecElement):
-     def new_operation(self, elem, req_val, rsp_val):
-         return SpecOperation(self, elem, req_val, rsp_val)
+-        self.raw = nl_msg.raw[offset:]
++        self.raw = nl_msg.raw
+         self.raw_attrs = NlAttrs(self.raw)
++        self.fixed_header_attrs = nl_msg.fixed_header_attrs
  
-+    def new_mcast_group(self, elem):
-+        return SpecMcastGroup(self, elem)
-+
-     def add_unresolved(self, elem):
-         self._resolution_list.append(elem)
+     def __repr__(self):
+         msg = repr(self.nl)
+@@ -596,7 +605,7 @@ class YnlFamily(SpecFamily):
+                     done = True
+                     break
  
-@@ -512,3 +532,9 @@ class SpecFamily(SpecElement):
-                 self.ops[op.name] = op
-             elif op.is_async:
-                 self.ntfs[op.name] = op
-+
-+        mcgs = self.yaml.get('mcast-groups')
-+        if mcgs:
-+            for elem in mcgs['list']:
-+                mcg = self.new_mcast_group(elem)
-+                self.mcast_groups[elem['name']] = mcg
+-                gm = GenlMsg(nl_msg, fixed_header_members)
++                gm = GenlMsg(nl_msg, self)
+                 # Check if this is a reply to our request
+                 if nl_msg.nl_seq != req_seq or gm.genl_cmd != op.rsp_value:
+                     if gm.genl_cmd in self.async_msg_ids:
 -- 
 2.41.0
 
