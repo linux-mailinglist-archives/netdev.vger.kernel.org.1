@@ -1,285 +1,258 @@
-Return-Path: <netdev+bounces-27756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13CAF77D19F
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:20:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4490277D1A2
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1E41281587
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:20:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68CAD1C20CEB
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDAD17FED;
-	Tue, 15 Aug 2023 18:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B250B18027;
+	Tue, 15 Aug 2023 18:20:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDEE815ACA
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:20:39 +0000 (UTC)
-Received: from out-22.mta1.migadu.com (out-22.mta1.migadu.com [IPv6:2001:41d0:203:375::16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B950819AF
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 11:20:37 -0700 (PDT)
-Message-ID: <ef2eca98-4fcc-b448-fecb-38695238f87b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692123635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rfj/I2U5lSypaHfr+RNkX86cmcJmTgFoRPPvni+deJM=;
-	b=SsD9mfnukB+vgW2iwRCL53+e3FiIO4/flFG93D/vSt5AaPzJKxNUivJbYTit35xOtN3+Vb
-	2afp6ZjXfCba+gBvI9RpcOeRNtGvar8QOR6pL68lfk6SgX4RQH2luWgjlDRtxeS8zJuBhb
-	o6nHSxC2klS59Pq3fri/tAak1oFkJJ8=
-Date: Tue, 15 Aug 2023 19:20:31 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F77C18026
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:20:40 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9CD91BC1
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 11:20:38 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-565ea69bb0cso602050a12.0
+        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 11:20:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692123638; x=1692728438;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oXIokqSHoHVJikQ0OTsHuVwuQJkAt9SyMe34Pt2DmXQ=;
+        b=weigtb1BCv2vrtlWHVPt3BGxcYsZC+Ss2/Grvk6O1ywQf03LxDksSKbI9n2lLR497g
+         hpgnE0k86YynWKfIn7JZ6j1p6VrHZCkIhZgfUOcDbxvjspIgeBANs4m1Whtph8LiInzm
+         tjwZl/TRVoIidwfhbdk1CUfy4W2rc5So5Ee48Msbg0UWRVW0MSG875TjwU8e/MeDlhjs
+         wtRbewY2dYQNng5vIRR45O27eU9nl8geDRmttEKaJ9vHCcrOhWT3t3bM064vbVXOIyER
+         /XU7XReqh7g8e2zcT+xCuDCNx/reUAcqU78fsxrsrITmwTz0aHj0u8Zj6mPTnp2BjL0s
+         ODfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692123638; x=1692728438;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oXIokqSHoHVJikQ0OTsHuVwuQJkAt9SyMe34Pt2DmXQ=;
+        b=E8PeiWgaxKhQMpBJeFxR/H2B+idYvs+AKU2kqvYby5GUV0iyiChGmbiyNUlowxpAGc
+         vwar/21ESrZFsIRTmkrHNPsMgYzAXrmq6WFtvtvmG6s8Ypo0gdgkbXKJ2ig91Vm1r5Xf
+         BB6juwtlDV5FFWSf7BeWzwRnNIu1JY3qIj4VLyr8OCCVHXTT2hbbysbl5atZeRGeEKF0
+         ECtnjTxqM+51tFyecbxdRjQ+BFoJwLJcRZ7yn4nTi3ndNCinS9i9RJbKIw4AUHd6+tBt
+         ya2/xVmlQKd5lbjZJKIZmUTSXqVaYB2oXGtqWJrGmFtyaHV4tNo9TZK/2qh3xNfg3K8i
+         d4dg==
+X-Gm-Message-State: AOJu0YyxbQNyXOrpP6UNCoczI5/VXLvXVwUadSQSZ3T1cSRQ8J33yALV
+	DLjp792jKNAIDxmJlaVR4uSyVd0=
+X-Google-Smtp-Source: AGHT+IEGhJT/Ml15gtxj+nd3+ADfuioUCVJlt1CZAZinybKEDS2+OsvJ0QZujjYfuHeVu14AhCawksc=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a63:3646:0:b0:565:e991:d1ca with SMTP id
+ d67-20020a633646000000b00565e991d1camr279543pga.11.1692123638420; Tue, 15 Aug
+ 2023 11:20:38 -0700 (PDT)
+Date: Tue, 15 Aug 2023 11:20:36 -0700
+In-Reply-To: <20230815150325.2010460-1-tirthendu.sarkar@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 3/9] dpll: core: Add DPLL framework base
- functions
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Milena Olech <milena.olech@intel.com>,
- Michal Michalik <michal.michalik@intel.com>,
- linux-arm-kernel@lists.infradead.org, poros@redhat.com, mschmidt@redhat.com,
- netdev@vger.kernel.org, linux-clk@vger.kernel.org,
- Bart Van Assche <bvanassche@acm.org>, intel-wired-lan@lists.osuosl.org,
- Jiri Pirko <jiri@nvidia.com>
-References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
- <20230811200340.577359-4-vadim.fedorenko@linux.dev>
- <20230814201709.655a24e2@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20230814201709.655a24e2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+References: <20230815150325.2010460-1-tirthendu.sarkar@intel.com>
+Message-ID: <ZNvB9AUzNIzwMW6+@google.com>
+Subject: Re: [PATCH bpf-next v2] xsk: fix xsk_build_skb() error: 'skb'
+ dereferencing possible ERR_PTR()
+From: Stanislav Fomichev <sdf@google.com>
+To: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev, 
+	dan.carpenter@linaro.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 15/08/2023 04:17, Jakub Kicinski wrote:
-> On Fri, 11 Aug 2023 21:03:34 +0100 Vadim Fedorenko wrote:
->> DPLL framework is used to represent and configure DPLL devices
->> in systems. Each device that has DPLL and can configure inputs
->> and outputs can use this framework.
->>
->> Implement core framework functions for further interactions
->> with device drivers implementing dpll subsystem, as well as for
->> interactions of DPLL netlink framework part with the subsystem
->> itself.
+On 08/15, Tirthendu Sarkar wrote:
+> xsk_build_skb_zerocopy() may return an error other than -EAGAIN and this
+> is received as skb and used later in xsk_set_destructor_arg() and
+> xsk_drop_skb() which must operate on a valid skb.
 > 
->> +static struct dpll_device *
->> +dpll_device_alloc(const u64 clock_id, u32 device_idx, struct module *module)
->> +{
->> +	struct dpll_device *dpll;
->> +	int ret;
->> +
->> +	dpll = kzalloc(sizeof(*dpll), GFP_KERNEL);
->> +	if (!dpll)
->> +		return ERR_PTR(-ENOMEM);
->> +	refcount_set(&dpll->refcount, 1);
->> +	INIT_LIST_HEAD(&dpll->registration_list);
->> +	dpll->device_idx = device_idx;
->> +	dpll->clock_id = clock_id;
->> +	dpll->module = module;
->> +	ret = xa_alloc(&dpll_device_xa, &dpll->id, dpll, xa_limit_16b,
->> +		       GFP_KERNEL);
+> Set -EOVERFLOW as error when MAX_SKB_FRAGS are exceeded and packet needs
+> to be dropped and use this to distinguish against all other error cases
+> where allocation needs to be retried.
 > 
-> Why only 16b and why not _cyclic?
->
-
-I cannot image systems with more than 65k of DPLL devices. We don't
-store any id's of last used DPLL device, so there is no easy way to
-restart the search from the last point. And it's not a hot path to
-optimize it.
-
->> +/**
->> + * dpll_device_register - register the dpll device in the subsystem
->> + * @dpll: pointer to a dpll
->> + * @type: type of a dpll
->> + * @ops: ops for a dpll device
->> + * @priv: pointer to private information of owner
->> + *
->> + * Make dpll device available for user space.
->> + *
->> + * Context: Acquires a lock (dpll_lock)
->> + * Return:
->> + * * 0 on success
->> + * * negative - error value
->> + */
->> +int dpll_device_register(struct dpll_device *dpll, enum dpll_type type,
->> +			 const struct dpll_device_ops *ops, void *priv)
->> +{
->> +	struct dpll_device_registration *reg;
->> +	bool first_registration = false;
->> +
->> +	if (WARN_ON(!ops))
->> +		return -EINVAL;
->> +	if (WARN_ON(!ops->mode_get))
->> +		return -EINVAL;
->> +	if (WARN_ON(!ops->lock_status_get))
->> +		return -EINVAL;
->> +	if (WARN_ON(type < DPLL_TYPE_PPS || type > DPLL_TYPE_MAX))
->> +		return -EINVAL;
->> +
->> +	mutex_lock(&dpll_lock);
->> +	reg = dpll_device_registration_find(dpll, ops, priv);
->> +	if (reg) {
->> +		mutex_unlock(&dpll_lock);
->> +		return -EEXIST;
->> +	}
->> +
->> +	reg = kzalloc(sizeof(*reg), GFP_KERNEL);
->> +	if (!reg) {
->> +		mutex_unlock(&dpll_lock);
->> +		return -ENOMEM;
->> +	}
->> +	reg->ops = ops;
->> +	reg->priv = priv;
->> +	dpll->type = type;
->> +	first_registration = list_empty(&dpll->registration_list);
->> +	list_add_tail(&reg->list, &dpll->registration_list);
->> +	if (!first_registration) {
->> +		mutex_unlock(&dpll_lock);
->> +		return 0;
->> +	}
->> +
->> +	xa_set_mark(&dpll_device_xa, dpll->id, DPLL_REGISTERED);
->> +	mutex_unlock(&dpll_lock);
->> +
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL_GPL(dpll_device_register);
+> Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/r/202307210434.OjgqFcbB-lkp@intel.com/
+> Fixes: cf24f5a5feea ("xsk: add support for AF_XDP multi-buffer on Tx path")
 > 
-> Is the registration flow documented? It's a bit atypical so we should
-> write some pseudocode somewhere.
+> Changelog:
+> 	v1 -> v2:
+> 	- Removed err as a parameter to xsk_build_skb_zerocopy()
+> 	[Stanislav Fomichev]
+> 	- use explicit error to distinguish packet drop vs retry
+> ---
+>  net/xdp/xsk.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
 > 
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index fcfc8472f73d..55f8b9b0e06d 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -602,7 +602,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+>  
+>  	for (copied = 0, i = skb_shinfo(skb)->nr_frags; copied < len; i++) {
+>  		if (unlikely(i >= MAX_SKB_FRAGS))
+> -			return ERR_PTR(-EFAULT);
+> +			return ERR_PTR(-EOVERFLOW);
+>  
+>  		page = pool->umem->pgs[addr >> PAGE_SHIFT];
+>  		get_page(page);
+> @@ -655,15 +655,17 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>  			skb_put(skb, len);
+>  
+>  			err = skb_store_bits(skb, 0, buffer, len);
+> -			if (unlikely(err))
+> +			if (unlikely(err)) {
+> +				kfree_skb(skb);
+>  				goto free_err;
+> +			}
+>  		} else {
+>  			int nr_frags = skb_shinfo(skb)->nr_frags;
+>  			struct page *page;
+>  			u8 *vaddr;
+>  
+>  			if (unlikely(nr_frags == (MAX_SKB_FRAGS - 1) && xp_mb_desc(desc))) {
+> -				err = -EFAULT;
+> +				err = -EOVERFLOW;
+>  				goto free_err;
+>  			}
+>  
+> @@ -690,12 +692,14 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>  	return skb;
+>  
+>  free_err:
+> -	if (err == -EAGAIN) {
+> -		xsk_cq_cancel_locked(xs, 1);
+> -	} else {
+> -		xsk_set_destructor_arg(skb);
+> -		xsk_drop_skb(skb);
+> +	if (err == -EOVERFLOW) {
 
-Yeah, I'll add it and point to the drivers as examples.
+Don't think this will work? We have some other error paths in xsk_build_skb
+that are not -EOVERFLOW that still need kfree_skb, right?
 
->> +/**
->> + * dpll_device_unregister - unregister dpll device
->> + * @dpll: registered dpll pointer
->> + * @ops: ops for a dpll device
->> + * @priv: pointer to private information of owner
->> + *
->> + * Unregister device, make it unavailable for userspace.
->> + * Note: It does not free the memory
->> + * Context: Acquires a lock (dpll_lock)
->> + */
->> +void dpll_device_unregister(struct dpll_device *dpll,
->> +			    const struct dpll_device_ops *ops, void *priv)
->> +{
->> +	struct dpll_device_registration *reg;
->> +
->> +	mutex_lock(&dpll_lock);
->> +	ASSERT_DPLL_REGISTERED(dpll);
->> +	reg = dpll_device_registration_find(dpll, ops, priv);
->> +	if (WARN_ON(!reg)) {
->> +		mutex_unlock(&dpll_lock);
->> +		return;
->> +	}
->> +	list_del(&reg->list);
->> +	kfree(reg);
->> +
->> +	if (!list_empty(&dpll->registration_list)) {
->> +		mutex_unlock(&dpll_lock);
->> +		return;
->> +	}
->> +	xa_clear_mark(&dpll_device_xa, dpll->id, DPLL_REGISTERED);
->> +	mutex_unlock(&dpll_lock);
->> +}
->> +EXPORT_SYMBOL_GPL(dpll_device_unregister);
-> 
->> +/**
->> + * struct dpll_pin - structure for a dpll pin
->> + * @id:			unique id number for pin given by dpll subsystem
->> + * @pin_idx:		index of a pin given by dev driver
->> + * @clock_id:		clock_id of creator
->> + * @module:		module of creator
->> + * @dpll_refs:		hold referencees to dplls pin was registered with
->> + * @parent_refs:	hold references to parent pins pin was registered with
->> + * @prop:		pointer to pin properties given by registerer
->> + * @rclk_dev_name:	holds name of device when pin can recover clock from it
->> + * @refcount:		refcount
->> + **/
->> +struct dpll_pin {
->> +	u32 id;
->> +	u32 pin_idx;
->> +	u64 clock_id;
->> +	struct module *module;
->> +	struct xarray dpll_refs;
->> +	struct xarray parent_refs;
->> +	const struct dpll_pin_properties *prop;
->> +	char *rclk_dev_name;
-> 
-> Where is rclk_dev_name filled in?
+I feel like we are trying to share some state between xsk_build_skb and
+xsk_build_skb_zerocopy which we really shouldn't share. So how about
+we try to have a separate cleanup path in xsk_build_skb_zerocopy?
 
-As Jiri said - left over, will remove it.
+Will something like the following (untested / uncompiled) work instead?
 
->> +struct dpll_pin_ops {
->> +	int (*frequency_set)(const struct dpll_pin *pin, void *pin_priv,
->> +			     const struct dpll_device *dpll, void *dpll_priv,
->> +			     const u64 frequency,
->> +			     struct netlink_ext_ack *extack);
->> +	int (*frequency_get)(const struct dpll_pin *pin, void *pin_priv,
->> +			     const struct dpll_device *dpll, void *dpll_priv,
->> +			     u64 *frequency, struct netlink_ext_ack *extack);
->> +	int (*direction_set)(const struct dpll_pin *pin, void *pin_priv,
->> +			     const struct dpll_device *dpll, void *dpll_priv,
->> +			     const enum dpll_pin_direction direction,
->> +			     struct netlink_ext_ack *extack);
->> +	int (*direction_get)(const struct dpll_pin *pin, void *pin_priv,
->> +			     const struct dpll_device *dpll, void *dpll_priv,
->> +			     enum dpll_pin_direction *direction,
->> +			     struct netlink_ext_ack *extack);
->> +	int (*state_on_pin_get)(const struct dpll_pin *pin, void *pin_priv,
->> +				const struct dpll_pin *parent_pin,
->> +				void *parent_pin_priv,
->> +				enum dpll_pin_state *state,
->> +				struct netlink_ext_ack *extack);
->> +	int (*state_on_dpll_get)(const struct dpll_pin *pin, void *pin_priv,
->> +				 const struct dpll_device *dpll,
->> +				 void *dpll_priv, enum dpll_pin_state *state,
->> +				 struct netlink_ext_ack *extack);
->> +	int (*state_on_pin_set)(const struct dpll_pin *pin, void *pin_priv,
->> +				const struct dpll_pin *parent_pin,
->> +				void *parent_pin_priv,
->> +				const enum dpll_pin_state state,
->> +				struct netlink_ext_ack *extack);
->> +	int (*state_on_dpll_set)(const struct dpll_pin *pin, void *pin_priv,
->> +				 const struct dpll_device *dpll,
->> +				 void *dpll_priv,
->> +				 const enum dpll_pin_state state,
->> +				 struct netlink_ext_ack *extack);
->> +	int (*prio_get)(const struct dpll_pin *pin,  void *pin_priv,
->> +			const struct dpll_device *dpll,  void *dpll_priv,
->> +			u32 *prio, struct netlink_ext_ack *extack);
->> +	int (*prio_set)(const struct dpll_pin *pin, void *pin_priv,
->> +			const struct dpll_device *dpll, void *dpll_priv,
->> +			const u32 prio, struct netlink_ext_ack *extack);
->> +};
-> 
-> The ops need a kdoc
+IOW, ideally, xsk_build_skb should look like:
 
-Ok, will add it.
+	if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
+		return xsk_build_skb_zerocopy(xs, desc);
+	} else {
+		return xsk_build_skb_copy(xs, desc);
+		/* ^^ current path that should really be a separate func */
+	}
 
-> 
->> +struct dpll_device
->> +*dpll_device_get(u64 clock_id, u32 dev_driver_id, struct module *module);
-> 
-> nit: * is part of the type, it goes on the previous line
-
-Fixed, thanks!
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 79a96019b7ef..747dd012afdb 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -578,6 +578,19 @@ static void xsk_drop_skb(struct sk_buff *skb)
+ 	xsk_consume_skb(skb);
+ }
+ 
++static struct sk_buff *xsk_cleanup_skb(int err, struct sk_buff *skb, struct xdp_sock *xs)
++{
++	if (err == -EAGAIN) {
++		xsk_cq_cancel_locked(xs, 1);
++	} else {
++		xsk_set_destructor_arg(skb);
++		xsk_drop_skb(skb);
++		xskq_cons_release(xs->tx);
++	}
++
++	return ERR_PTR(err);
++}
++
+ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 					      struct xdp_desc *desc)
+ {
+@@ -593,8 +606,10 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 		hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(xs->dev->needed_headroom));
+ 
+ 		skb = sock_alloc_send_skb(&xs->sk, hr, 1, &err);
+-		if (unlikely(!skb))
+-			return ERR_PTR(err);
++		if (unlikely(!skb)) {
++			err = ERR_PTR(err);
++			goto free_err;
++		}
+ 
+ 		skb_reserve(skb, hr);
+ 	}
+@@ -608,8 +623,10 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 	addr = buffer - pool->addrs;
+ 
+ 	for (copied = 0, i = skb_shinfo(skb)->nr_frags; copied < len; i++) {
+-		if (unlikely(i >= MAX_SKB_FRAGS))
+-			return ERR_PTR(-EFAULT);
++		if (unlikely(i >= MAX_SKB_FRAGS)) {
++			err = ERR_PTR(-EFAULT);
++			goto free_err;
++		}
+ 
+ 		page = pool->umem->pgs[addr >> PAGE_SHIFT];
+ 		get_page(page);
+@@ -629,6 +646,9 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 	refcount_add(ts, &xs->sk.sk_wmem_alloc);
+ 
+ 	return skb;
++
++free_err:
++	return xsk_cleanup_skb(err, skb, xs);
+ }
+ 
+ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+@@ -641,11 +661,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 	int err;
+ 
+ 	if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
+-		skb = xsk_build_skb_zerocopy(xs, desc);
+-		if (IS_ERR(skb)) {
+-			err = PTR_ERR(skb);
+-			goto free_err;
+-		}
++		return xsk_build_skb_zerocopy(xs, desc);
+ 	} else {
+ 		u32 hr, tr, len;
+ 		void *buffer;
+@@ -729,15 +745,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 	return skb;
+ 
+ free_err:
+-	if (err == -EAGAIN) {
+-		xsk_cq_cancel_locked(xs, 1);
+-	} else {
+-		xsk_set_destructor_arg(skb);
+-		xsk_drop_skb(skb);
+-		xskq_cons_release(xs->tx);
+-	}
+-
+-	return ERR_PTR(err);
++	return xsk_cleanup_skb(err, skb, xs);
+ }
+ 
+ static int __xsk_generic_xmit(struct sock *sk)
 
