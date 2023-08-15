@@ -1,84 +1,91 @@
-Return-Path: <netdev+bounces-27729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4194A77D084
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:02:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8FF77D09E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 447E11C20D40
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:02:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB35A28145A
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22489156DE;
-	Tue, 15 Aug 2023 17:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5DA15ACB;
+	Tue, 15 Aug 2023 17:06:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0256913AFD
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:02:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA68C433C7;
-	Tue, 15 Aug 2023 17:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692118924;
-	bh=r9KZfoAmpLHh60UciV5nylVVLkX7ks9J5Cw/wgBs6bw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ow3YXSqMksDmaueAVNUM5WBG5xKeQfFxfA2pH0oD3F3PvzxmMy6ICbHq6ZzgWRWGK
-	 aWiZcvJDavt+UHR9txOSRokZGJD9qnwxvM+4LGry273QbcF13RARMuqN/EpldDPYDz
-	 i0ZsYWxjZmeSzflU80014K/dHCmsJDX9fy9KMyTwcG/Vjl3cE75GCUZbpKO87T62yC
-	 3Bi7Za/j8N56fcVheaxGJPTdawjHf/fmoUf7FcSiHoSNE7yeJUf+tSLIC53h/zBXV4
-	 9qetQIWqiAAyj3tjag/Z1MIK3/yq837XwlBfjKN5VylEFFKiQduQPdj5489SdaCf8g
-	 k6H7+xF9YjAsQ==
-Date: Tue, 15 Aug 2023 10:02:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Milena Olech
- <milena.olech@intel.com>, Michal Michalik <michal.michalik@intel.com>,
- linux-arm-kernel@lists.infradead.org, poros@redhat.com,
- mschmidt@redhat.com, netdev@vger.kernel.org, linux-clk@vger.kernel.org,
- Bart Van Assche <bvanassche@acm.org>, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v4 0/9] Create common DPLL configuration API
-Message-ID: <20230815100203.4e45fc7e@kernel.org>
-In-Reply-To: <ZNtm6v+UuDIex1+s@nanopsycho>
-References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
-	<20230814194528.00baec23@kernel.org>
-	<43395307-9d11-7905-0eec-0a4c1b1fc62a@linux.dev>
-	<ZNtm6v+UuDIex1+s@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3299113AFD
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:06:34 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76F9B1990;
+	Tue, 15 Aug 2023 10:06:31 -0700 (PDT)
+Received: from linma$zju.edu.cn ( [112.5.88.102] ) by ajax-webmail-mail-app4
+ (Coremail) ; Wed, 16 Aug 2023 01:04:04 +0800 (GMT+08:00)
+X-Originating-IP: [112.5.88.102]
+Date: Wed, 16 Aug 2023 01:04:04 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Lin Ma" <linma@zju.edu.cn>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: corbet@lwn.net, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, rdunlap@infradead.org, void@manifault.com, 
+	jani.nikula@intel.com, horms@kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3] docs: net: add netlink attrs best practices
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
+ Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20230814085318.090c832d@kernel.org>
+References: <20230811031549.2011622-1-linma@zju.edu.cn>
+ <20230811152634.271608c5@kernel.org>
+ <54e9d6f6.106b1a.189e798f8ae.Coremail.linma@zju.edu.cn>
+ <20230814085318.090c832d@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-ID: <7cba74b5.10d19d.189fa27935c.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cS_KCgBHTQoFsNtkbKYYCw--.7107W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUIEmTa1vsUEQAAsK
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 15 Aug 2023 13:52:10 +0200 Jiri Pirko wrote:
-> >> Feels like we're lacking tests here. Is there a common subset of
-> >> stuff we can expect reasonable devices to support?
-> >> Anything you used in development that can be turned into tests?  
-> >
-> >Well, we were playing with the tool ynl/cli.py and it's stated in
-> >the cover letter. But needs proper hardware to run. I'm not sure
-> >we can easily create emulation device to run tests.  
-> 
-> Well, something like "dpllsim", similar to netdevsim would be certainly
-> possible, then you can use it to write selftests for the uapi testing.
-> But why don't we do that as a follow-up patchset?
-
-I was thinking about a test that can be run against real HW.
-Something that a new vendor implementing DPLL can run and
-validate that their implementation behaves as expected.
-And something that distributors and stable kernels could
-potentially use to validate the code still works.
-
-We don't have any well established user space to make use of this 
-new functionality, there's high risk that drivers will invent their
-own ways of interpreting the API.
-
-Perhaps something that Red Hat could help with? I'm guessing you'd 
-be writing test to validate this for RHEL, anyway?
+SGVsbG8gSmFrdWIsCgo+IAo+IE9uIFNhdCwgMTIgQXVnIDIwMjMgMTA6MzU6MDkgKzA4MDAgKEdN
+VCswODowMCkgTGluIE1hIHdyb3RlOgo+ID4gTW92aW5nIGZvcndhcmQsIEkgc3VnZ2VzdCB3ZSBj
+b25zaWRlciB0aGUgZm9sbG93aW5nIG9wdGlvbnM6Cj4gPiAKPiA+IDEuIFVwZGF0ZSB0aGUgZG9j
+dW1lbnQgdG8gYWRkcmVzcyB0aGUgY29uZnVzaW9uIGFuZCBtYWtlIGl0IG1vcmUgcmVsZXZhbnQK
+PiA+ICAgIHRvIHRoZSBjdXJyZW50IHN0YXRlIG9mIE5ldGxpbmsgZGV2ZWxvcG1lbnQuIE1heWJl
+IHRoZSBuZXdseSBhZGRlZAo+ID4gICAgc2VjdGlvbiBzZWVtcyBub3QgZW5vdWdoIGZvciB0aGF0
+LiBJIHdvdWxkIGdyZWF0bHkgYXBwcmVjaWF0ZSBhbnkKPiA+ICAgIHNwZWNpZmljIGd1aWRhbmNl
+Lgo+IAo+IFVubGVzcyB3ZSBoYXZlIGRvY3MgZm9yIGtlcm5lbCBzaWRlIG9mIG1vZGVybiBnZW5l
+dGxpbmsgYW55IHNvcnQgb2YKPiBpbmRpY2F0aW9uIHRoYXQgdGhpcyBkb2MgaXMgb25seSBhIGd1
+aWRlIGZvciBsb29raW5nIGF0IG9sZCBjb2RlIHdpbGwKPiBmYWxsIG9uIGRlYWYgZWFycy4KPiAK
+PiBTbyB5b3UnZCBuZWVkIHRvIHdyaXRlIGEgc2FtcGxlIGZhbWlseSBhbmQgZG9jcyBmb3IgbW9k
+ZXJuIHN0dWZmLgoKR3JlYXQsIEkgZ3Vlc3MgSSAoZmluYWxseSkgdW5kZXJzdGFuZCB0aGUgc2l0
+dWF0aW9uIGhlcmUuIEl0IHNlZW1zIHRoYXQKdGhpcyBkb2N1bWVudCBpcyBqdXN0IG9uZSBwaWVj
+ZSBvZiB0aGUgcHV6emxlIHdoZW4gaXQgY29tZXMgdG8gdGhlIG1vZGVybgpnZW5lcmljIE5ldGxp
+bmsuIEhlbmNlLCBJIHNob3VsZCB3cml0ZSBhIHNhbXBsZSBmYW1pbHkgYW5kIGRvY3MgZm9yIG1v
+ZGVybgpzdHVmZiAobWFpbmx5IHRoZSBrZXJuZWwgc2lkZSkgYW5kIHRoZW4gbWFrZSB0aGlzIGRv
+Y3VtZW50IG9uZSBwYXJ0IG9mIGl0LgoKPiAKPiA+IDIuIElmIHRoZSBkb2N1bWVudCBpcyBkZWVt
+ZWQgdG9vIG91dGRhdGVkIGZvciBiZWluZyBrZXJuZWwgZG9jdW1lbnRhdGlvbiwKPiA+ICAgIG1h
+eWJlIEkgc2hvdWxkIHB1Ymxpc2ggaXQgc29tZXdoZXJlIGVsc2UuIERvIHlvdSBoYXZlIGFueQo+
+ID4gICAgcmVjb21tZW5kYXRpb25zIG9uIHdoZXJlIGl0IGNvdWxkIGJlIGJldHRlciBzdWl0ZWQ/
+Cj4gCj4gR2l0SHViIGNvbWVzIHRvIG1pbmQgZm9yIHB1Ymxpc2hpbmcgUmVTVCBkb2NzLCBpbiB0
+aGUgbWVhbnRpbWU/CgpObyB3b3JyaWVzLiBJJ20ganVzdCBicmFpbnN0b3JtaW5nIHdheXMgdG8g
+bWFrZSB0aGVzZSBwcmFjdGljZXMgdXNlZnVsIGlmIHRoZXkKZGlkbid0IG1ha2UgaXQgaW50byB0
+aGUga2VybmVsIGRvY3VtZW50IDpELgpBbGwgaW4gYWxsLCBJJ2xsIGZvbGxvdyB1cCBvbiBvdXIg
+cHJldmlvdXMgZGlzY3Vzc2lvbiBhbmQgZmlsbCBpbiB0aGUgZ2FwcyBhcwpzb29uIGFzIHBvc3Np
+YmxlLgoKUmVnYXJkcwpMaW4K
 
