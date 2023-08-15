@@ -1,110 +1,163 @@
-Return-Path: <netdev+bounces-27535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6764577C526
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:38:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A3C77C56A
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D71281301
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 01:38:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18AC82812CF
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 01:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0093417CF;
-	Tue, 15 Aug 2023 01:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0341C17D0;
+	Tue, 15 Aug 2023 01:50:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A2717C4
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:38:36 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B9EC9E7;
-	Mon, 14 Aug 2023 18:38:33 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37F1bPoC5018456, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37F1bPoC5018456
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 15 Aug 2023 09:37:25 +0800
-Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Tue, 15 Aug 2023 09:36:54 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 15 Aug 2023 09:36:54 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
- RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
- 15.01.2375.007; Tue, 15 Aug 2023 09:36:54 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "Mario
- Limonciello" <mario.limonciello@amd.com>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
-Subject: RE: [PATCH net-next] eth: r8152: try to use a normal budget
-Thread-Topic: [PATCH net-next] eth: r8152: try to use a normal budget
-Thread-Index: AQHZzsT4UEeJMIn+UE+i+73nn0/m7a/qj0fw
-Date: Tue, 15 Aug 2023 01:36:54 +0000
-Message-ID: <1666467ba5ca480fb31f6507248f3476@realtek.com>
-References: <20230814153521.2697982-1-kuba@kernel.org>
-In-Reply-To: <20230814153521.2697982-1-kuba@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFDB17C4
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:50:45 +0000 (UTC)
+Received: from sonic301-23.consmr.mail.gq1.yahoo.com (sonic301-23.consmr.mail.gq1.yahoo.com [98.137.64.149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC4BB0
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 18:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=att.net; s=s1024; t=1692064242; bh=e3QLhortNOm7cxp8QR30xkckGB5D/eW4mdIxLYggzUk=; h=Date:Subject:To:References:From:In-Reply-To:From:Subject:Reply-To; b=t9EntMMkpe5u6mIaHIO/pBTiEIixyoobGvvNiHoeAZoZEwCiS97reA4Nu18Cc+F9h1P+AnaSg7BGNzGboHdI7aZsQJU/yFXrtUzeOUKox0hr48huO6kpp2WQDTzfwRsTcGWl0CrvRUJa6K+mode+eWsJFd8+zVmpwHyrV9VXzXI=
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1692064242; bh=cNn6J8MTh61kWFegHthFXMGDe8gtsxABFfg6K9tr/ES=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=PxrmUOrTEcJ33vxmOPNIz2v4p0pStSumJCbDh0/1RSvos/hv4ccwVZB0pUGX0wvHN2PPL/kU1PnRLxkmYUOLp9yFIIJJx4CNn6kpjldhXMW1/+cWZFMgf9Twe7tlKm7FLVjVhh5VmXZEU13wpOtx/PbT/GI4ZZbs6+uTjKO5yPp/XjJ0RWXfApRZT5xBKPCXqUqvgnwL5y8A/uGRtgrPalk6VFcfCm2YM8Pq8Q/Wd8EADKIwg7Bw3p10SPOq7m2d3NtHwb73UFwU3V5YY1bzMPeuhSs99fcknkRB0X+FjmrhxstegTL+J0GkV14HEf6gODcTs75IkDfeYxV/GvF+kw==
+X-YMail-OSG: oPHBU88VM1m7pmq9hs2B07J2UNGMUtFTMDfJEdnRuTlf4ixMCL.Oups8XwAjiVH
+ YP42ePGwtxjYr.fytEqULWqfUrzxCjHwSq7XcyxRt0kQJHqvK2i.ZjaNoSTH.nsmRElTEnkDTG6A
+ gIE9usjrJMIMDEwUY2LU3wkaG6MM5NKLtMHU0_c9rDLM.P.Sl1MC80zRGBZr945Sqk_i1I_umk8X
+ nfgMZO8_cuMZ5mFc7Ho_VNru.u5sr9VSiYKlL7uqHYO86MAHHi3Ts3fw7MV3voB1WHQG4vviW9DX
+ EFlBsIDX2WC.R7DOLvERtr3iaYIhFb6snObIy6Fmkt78_EAr6PRf2CBn0BLtvWh5FtH7MHGg4sWb
+ HzkergLf7.V71AgsCMX8sqsY4tErYN18qQ_I7lCPPbeWl3c9hCopQ_F_SOvyZlDecfqHuHyrfOlt
+ Ri.tMa8.E1GqIQYBKepQlVwpQS.KbEswzhhPHTSf4FeDgC.jUhIxQnmkffmWEC9ajlKeNKl0kaNT
+ EE0AwJ58KAk_yfPgjwFFqdW6VrT8ChGprpcGBJJVwljhxvu6HrZSK4Y2tjx.9qBLgDj.nZKlmJYh
+ SRijRgPBG2_7J.jWQ943yorF._HqYVVI9_NZNeRGM6s86.surHp7jpuh3oO4MlIxvoC4oLnkc_kI
+ 1bS85wSoYHw9V3vmSyxXlpZRzy9KQd7hnijtOJzCQO6XUf6UoNmkwU85SxbpxZbWa0yR8cQP2623
+ NY3aShH93woPWFlXJq_U71THchyPyUoIriy8wBdz92Efv4PUr78V0Sgeu9MVCJEopX37AAAGl1sg
+ fyfKvQYsrza6Ym6c2OGA6YCjMlTjwnoZatd7oCDDT.PuKCSq11t1kcmLY03QrCwD9ZV_qY_aITEL
+ 0KNhSa6FHGUyJPY3yPX.BD1R0YTzxdyC9xCJ.hKahQe1TZaPpzP5Vn6ZUXUHtbOu84dq.sgQ8xi4
+ _PS9m27es7t57rYrkaeCQaFzDyx5pBN2xTlQNWiWMYhO7LMmCEOI_f7ToEhdwkYWy4TQ1gWwCkSr
+ BD8MC87NR3FBAPD6DuRBRnzxdDwD5pRixpRvdQsdFVQZsUznx24o6r7fuz0HlrgAjq_ujjZtmOJN
+ 1WJ2rbLV0zA.o1scQ916gp.xo2gCaDYuhkVRwrCshD3sJ2igUAW0sTytzaqWo7TKlrcWu0tYNbYD
+ S.WQgP0dRDr88HqwkAYwxE7dZyf_XxZ3DYY4ZIkazlyFR_OttBm5NFvfDLW6wdK.ARPfKhQUpq9c
+ yBQIF7pwPiT61x9DaL8FDvExNP9BlP_fsuyuvW1UFngelhSWt1qvhdNnWM.kdeJ0bdmzlkyxBkZa
+ O9Q7K8L_Igd53dQIthOYMQer1HD3gXvlLC8eZBlOuD7F7oNh5AlI6exZtjCsWsJxA1bfTAGC7JDx
+ R5DvE19oXwQUxjE31aTMHIHN4ykW4n5W_aVCopH2S3BYBwaY1QE_1AmNsRIPcMdsoCD4dAmPCarB
+ cM45xyMX1PRIqmXbaCiF8inmCqux3Q.Z4XzO25p8dNYiJI8kHS96HxXG8l3Os6QsHTciJ7FNcR7y
+ cEZJYjjWeYMm5bs5VI0cd.nlBcwEPUrpYYW4oo16QPXtf7ynMnEB1RXEWOphaUeK8m.O5ndNlhl3
+ UcBq7AJaIx7Oy2AUlW_8RMqMNCXSdN2KuH9hfMzG3zWpPzkM9bL7PrxnzNTIEyU4UFQ_VlSUmxiN
+ lfdOsbl.oWaxThJVVecaUUd5sXm4CEHaegSnAzM28.tb3paDlYcYceoabnqS1lIWqFDtu6clNtEF
+ 4rLl1yXD7fDTPYIa_CJ4Ul2k2DlrwtXufmyoKyBDzjvsK6wQypUtEOg6N98XDkUnkobY1pD_rw.M
+ elptMLFZwYI8Xyja0yeije44T6_s0RAUuVPfe.T0TZNtGs.pHGvjuXsKqB12KxlT6XMmS.5I55ii
+ hT13s5ZhKhEGJroj2BplVGhs2FTYlgXixV70U4fqJlgGhMEFA4QaAp636r466qpdCG7X4VEW5WqJ
+ IARFjDZCTB6xXhXl3GrTrDXsmfX2vMmCM0l8h1xb2g1sghlpsug3Wszp.0QAG.BFNeK0TgNiGUyk
+ 4p_2Z3h12H1qYGlCU3OlP0N0X4XidEYygGKHLLd9QZE2kHu7dLAWB7h5oaQUCna9fuYuPRwbisXY
+ MuH4XbBrWDZQriUEAm.ttwnJOIUAmm1UQpJtq9476Q4KGdA0Ner7pnOTCY1BjAucXTneQ5wvFTWg
+ 67yJuhSnTjxbyoNTFxOdd5_1ebF0KJJMyTn.TdH49.4LVZM9qEK9U
+X-Sonic-MF: <lesrhorer@att.net>
+X-Sonic-ID: 18c4b4dc-ecf3-43f9-b31c-d850393f52d5
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.gq1.yahoo.com with HTTP; Tue, 15 Aug 2023 01:50:42 +0000
+Received: by hermes--production-bf1-865889d799-g7m4g (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ae2623078254bd6ae927e5f772d8cbf1;
+          Tue, 15 Aug 2023 01:50:40 +0000 (UTC)
+Message-ID: <edfeb028-02cb-35b1-e828-9b5931c8d65a@att.net>
+Date: Mon, 14 Aug 2023 20:50:36 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: Failing network hardware
+Content-Language: en-US
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>, Ariel Elior <aelior@marvell.com>
+References: <ddbed5c6-4ded-df22-fae0-bd256e40d6b3.ref@att.net>
+ <ddbed5c6-4ded-df22-fae0-bd256e40d6b3@att.net> <ZNrSwBqP1vPW8OKz@debian.me>
+From: Leslie Rhorer <lesrhorer@att.net>
+In-Reply-To: <ZNrSwBqP1vPW8OKz@debian.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.21695 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-akub Kicinski <kuba@kernel.org>
-> Sent: Monday, August 14, 2023 11:35 PM
-[...]
-> Mario reports that loading r8152 on his system leads to a:
->=20
->   netif_napi_add_weight() called with weight 256
->=20
-> warning getting printed. We don't have any solid data
-> on why such high budget was chosen, and it may cause
-> stalls in processing other softirqs and rt threads.
-> So try to switch back to the default (64) weight.
->=20
-> If this slows down someone's system we should investigate
-> which part of stopping starting the NAPI poll in this
-> driver are expensive.
->=20
-> Reported-by: Mario Limonciello <mario.limonciello@amd.com>
-> Link:
-> https://lore.kernel.org/all/0bfd445a-81f7-f702-08b0-bd5a72095e49@amd.com
-> /
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Acked-by: Hayes Wang <hayeswang@realtek.com>
 
-Best Regards,
-Hayes
+On 8/14/2023 8:20 PM, Bagas Sanjaya wrote:
+> (fixing up netdev address)
+> 
+> On Sun, Aug 13, 2023 at 01:53:58PM -0500, Leslie Rhorer wrote:
+>> Hello all,
+>>
+>> 	About a year or so ago, I upgraded one of my Debian servers to Bullseye,
+>> and it killed the 10G NIC on the server due to issues with the device driver
+>> in the Debian repository (it was missing).  I jumped through all sorts of
+>> loops and hoops to try to get it working, but I finally had to give up and
+>> resort to using the 1G interface.  Recently, I tried a new install on a
+>> different server to the new Debian Bookworm, and it worked for that server,
+>> so apparently the issue has been fixed in Bookworm.  I reported a bug
+>> against the Buster distribution, but it was never fixed.
+>>
+>> 	With that in mind, I went ahead and upgraded the original server to
+>> Bookworm, but the NIC remains dead.  Unfortunately, I cannot find my notes
+>> on what I did originally to try to get the 10G interface working and to shut
+>> it down in favor of a built-in port.  I do recall I tried compiling what was
+>> supposed to be the correct firmware driver and also changing the udev rules,
+>> but I do not recall the exact details.  I have tried several things,
+>> including re-installing the firmware, but nothing seems to work.  The
+>> Ethernet interface does not appear on the system in order to be able to
+>> specify it in /etc/network/interfaces.  What can I do in order to try to get
+>> the 10G card working?
+>>
+>> 	The card is an Asus MCB-10G_PEB-10G NIC and uses the bnx2x.ko driver. The
+>> system uses an Asus AMD-64 motherboard.  The bnx2x.ko driver is installed,
+>> and lspci shows the card in the system, but ifconfig does not see the
+>> interface.
+>>
+> 
+> Too many moving parts here, hence allow me to rule things out:
+> 
+> If there is any of your system haven't been dist-upgraded to bookworm, can you
+> confirm this issue on vanilla v6.1 kernel? 
 
+	One, named Backup, is a fresh install of Debian Bookworm.  The NIC on 
+Backup works just fine.  The other, named RAID-Server, was upgraded via 
+dist-upgrade from Buster to Bullseye, at which point the NIC quit 
+working, and then from Bullseye to Bookworm.
+
+	I identified the problem on Bullseye and submitted a bug report, but no 
+one ever bothered to fix the bug, which was simply the fact the driver 
+was missing from the Bullseye distro.
+
+	Both systems are now running kernel 6.1.0-10-AMD64.
+
+> And also, can you check latest mainline?
+
+	I don't know what you mean by that.
+
+> If all have been upgraded, though, you need to reinstall bullseye
+> first.
+
+	I take it by that, you are making the distinction between an upgrade 
+from an older distro and kernel to a new one and a fresh install of a 
+distro running a 6.1 kernel?
+
+	I definitely do not want to re-install Bullseye on either system.  It 
+would break Backup's NIC to do so, and it would be an incredible mess 
+with a potentially unacceptably long down time to try to back out of 
+Bookworm on RAID-Server.  If I follow your intent, however, this should 
+be unnecessary.  I have one working fresh install and one broken 
+dist-upgrade from a known broken distribution.
+
+> As a side note, when you reply to mailing lists, please don't top-post;
+> reply inline with appropriate context instead.
+
+	That is my usual practice.  It has been for many decades.
 
