@@ -1,112 +1,158 @@
-Return-Path: <netdev+bounces-27642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9974977CA98
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 11:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DDC477C96C
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9BF71C20B0B
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 09:39:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501B31C20CBF
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343A1100C2;
-	Tue, 15 Aug 2023 09:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7F25689;
+	Tue, 15 Aug 2023 08:37:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263B3C8E7
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 09:39:27 +0000 (UTC)
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CFC4E5F
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:39:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1692092366; x=1723628366;
-  h=references:from:to:cc:subject:date:in-reply-to:
-   message-id:mime-version;
-  bh=WFx61SnqjJqOlHouu+5TAkN2W5Xj0HIawBmP+tOMkn0=;
-  b=RMCVGBGtvCYgb47D5b98HpN1Dc+Iltfezezd9zsR+p1uD6Ygq4OgPzK2
-   DKTYF9PWjOXQz3Al/hRu1YosK0ul0Gmn8kRu6gS4BNvmF3MfEZrak9ElJ
-   XxmPXhlNssm7PEvlJVCpdpAslc3exl+NLQx1EAUx3soS9jRylGMSx4Zc/
-   c=;
-X-IronPort-AV: E=Sophos;i="6.01,174,1684800000"; 
-   d="scan'208";a="1148567237"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 09:39:19 +0000
-Received: from EX19D010EUA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id 4ABAB474DA;
-	Tue, 15 Aug 2023 09:39:16 +0000 (UTC)
-Received: from EX19D028EUB003.ant.amazon.com (10.252.61.31) by
- EX19D010EUA002.ant.amazon.com (10.252.50.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 15 Aug 2023 09:39:15 +0000
-Received: from u95c7fd9b18a35b.ant.amazon.com.amazon.com (10.13.248.51) by
- EX19D028EUB003.ant.amazon.com (10.252.61.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 15 Aug 2023 09:39:09 +0000
-References: <20230815024248.3519068-1-zhangjialin11@huawei.com>
-User-agent: mu4e 1.10.3; emacs 28.2
-From: Shay Agroskin <shayagr@amazon.com>
-To: Jialin Zhang <zhangjialin11@huawei.com>
-CC: <akiyano@amazon.com>, <darinzon@amazon.com>, <ndagan@amazon.com>,
-	<saeedb@amazon.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.kubiak@intel.com>,
-	<yuancan@huawei.com>, <netdev@vger.kernel.org>, <liwei391@huawei.com>,
-	<wangxiongfeng2@huawei.com>
-Subject: Re: [PATCH] net: ena: Use pci_dev_id() to simplify the code
-Date: Tue, 15 Aug 2023 11:31:19 +0300
-In-Reply-To: <20230815024248.3519068-1-zhangjialin11@huawei.com>
-Message-ID: <pj41zl1qg4wsp9.fsf@u95c7fd9b18a35b.ant.amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E8323CC
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:37:11 +0000 (UTC)
+Received: from out-30.mta0.migadu.com (out-30.mta0.migadu.com [91.218.175.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2ECC10F
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:37:08 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1692088626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uBmn5bY96EnmwKJFlv+WltFrhGvpjIbZEKIiYirKvRY=;
+	b=vz0KHcPQmyiJWfmlN0KqRtShPV8OO94S7Ve+8NAyKaJzlfD3l3Gwdcs50vzwkyJwFeNk42
+	wWmdUe83i5yu+zc+P73iwMyGZC6f36VMufdeZyZpMS2xcjecgpOeJWBucmjek3/RmzHbqM
+	Esg+z/IvqlGN9dYsqiRnMi0+1ICkj/k=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed
-X-Originating-IP: [10.13.248.51]
-X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
- EX19D028EUB003.ant.amazon.com (10.252.61.31)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v4 01/48] mm: move some shrinker-related function
+ declarations to mm/internal.h
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230807110936.21819-2-zhengqi.arch@bytedance.com>
+Date: Tue, 15 Aug 2023 16:36:31 +0800
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ david@fromorbit.com,
+ tkhai@ya.ru,
+ Vlastimil Babka <vbabka@suse.cz>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ djwong@kernel.org,
+ Christian Brauner <brauner@kernel.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ tytso@mit.edu,
+ steven.price@arm.com,
+ cel@kernel.org,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ yujie.liu@intel.com,
+ Greg KH <gregkh@linuxfoundation.org>,
+ simon.horman@corigine.com,
+ dlemoal@kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ Linux-MM <linux-mm@kvack.org>,
+ x86@kernel.org,
+ kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org,
+ linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com,
+ linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org,
+ rcu@vger.kernel.org,
+ netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com,
+ linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FC3AE898-443D-4ACB-BCB4-0F8F2F48CDD0@linux.dev>
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-2-zhengqi.arch@bytedance.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-Jialin Zhang <zhangjialin11@huawei.com> writes:
 
-> PCI core API pci_dev_id() can be used to get the BDF number for 
-> a pci
-> device. We don't need to compose it mannually. Use pci_dev_id() 
-> to
-> simplify the code a little bit.
->
-> Signed-off-by: Jialin Zhang <zhangjialin11@huawei.com>
-> ---
->  drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c 
-> b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> index d19593fae226..ad32ca81f7ef 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> @@ -3267,7 +3267,7 @@ static void ena_config_host_info(struct 
-> ena_com_dev *ena_dev, struct pci_dev *pd
->  
->  	host_info = ena_dev->host_attr.host_info;
->  
-> -	host_info->bdf = (pdev->bus->number << 8) | pdev->devfn;
-> +	host_info->bdf = pci_dev_id(pdev);
->  	host_info->os_type = ENA_ADMIN_OS_LINUX;
->  	host_info->kernel_ver = LINUX_VERSION_CODE;
->  	strscpy(host_info->kernel_ver_str, utsname()->version,
+> On Aug 7, 2023, at 19:08, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
+>=20
+> The following functions are only used inside the mm subsystem, so it's
+> better to move their declarations to the mm/internal.h file.
+>=20
+> 1. shrinker_debugfs_add()
+> 2. shrinker_debugfs_detach()
+> 3. shrinker_debugfs_remove()
+>=20
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
-Same as Leon's response. Otherwise lgtm
-Reviewed-by: Shay Agroskin <shayagr@amazon.com>
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+
+One nit bellow.
+
+[...]
+
+> +
+> +/*
+> + * shrinker related functions
+> + */
+
+This is a multi-comment format. "/* shrinker related functions. */" is
+the right one-line format of comment.
+
+> +
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +extern int shrinker_debugfs_add(struct shrinker *shrinker);
+> +extern struct dentry *shrinker_debugfs_detach(struct shrinker =
+*shrinker,
+> +      int *debugfs_id);
+> +extern void shrinker_debugfs_remove(struct dentry *debugfs_entry,
+> +    int debugfs_id);
+> +#else /* CONFIG_SHRINKER_DEBUG */
+> +static inline int shrinker_debugfs_add(struct shrinker *shrinker)
+> +{
+> +	return 0;
+> +}
+> +static inline struct dentry *shrinker_debugfs_detach(struct shrinker =
+*shrinker,
+> +     int *debugfs_id)
+> +{
+> +	*debugfs_id =3D -1;
+> +	return NULL;
+> +}
+> +static inline void shrinker_debugfs_remove(struct dentry =
+*debugfs_entry,
+> +	int debugfs_id)
+> +{
+> +}
+> +#endif /* CONFIG_SHRINKER_DEBUG */
+> +
+> #endif /* __MM_INTERNAL_H */
+> --=20
+> 2.30.2
+>=20
+
 
