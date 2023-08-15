@@ -1,109 +1,129 @@
-Return-Path: <netdev+bounces-27559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3233C77C67E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:52:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0307877C68E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35B0328127B
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:51:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FDB32812B1
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BC61FA8;
-	Tue, 15 Aug 2023 03:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082C21FA0;
+	Tue, 15 Aug 2023 03:57:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD61A1C13
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 03:51:56 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407E2183;
-	Mon, 14 Aug 2023 20:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692071513; x=1723607513;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0U5mVMBc7pOFHVeJVlzVG7Zb1up3kpgr5XH1w5CKdFQ=;
-  b=dJkIDYvZh2RWfJfpff76A3EB7lQDox3PLknJmHZlVZN3QworAVkgi0m4
-   FNfcN2lQ5Y7YAjQri0OTa7Iu8aBrG6bCa0YoMqcXa/F7z7gOf9UYekceY
-   pZUWCK7KgzBTKfzwKhlTKxofXtgVUrPd0ENVpPfDO/jusgfjhKj1gDZZ3
-   /yW3l0exBOzC9QVGaR1y9rKzWi1bvPJY7PDmCbpVKi6kg6D+VgPikiywn
-   FPvGXMWBbKeO1wNDqt6HzGjoGxHhMxXz6W55xooMH6GXe1bj55zW3JJly
-   Aabs/WlZM8dczck+HK8Tn7YHDIXSu264Ued9sX/KQO3ruMOoVr2D5WetK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="403176407"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="403176407"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 20:51:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="847904364"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="847904364"
-Received: from pglc00067.png.intel.com ([10.221.207.87])
-  by fmsmga002.fm.intel.com with ESMTP; 14 Aug 2023 20:51:48 -0700
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: Jose Abreu <joabreu@synopsys.com>
-Cc: alexandre.torgue@foss.st.com,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	edumazet@google.com,
-	krzysztof.kozlowski+dt@linaro.org,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	peppe.cavallaro@st.com,
-	robh+dt@kernel.org,
-	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: RE: [PATCH net-next v3 2/2] net: stmmac: Tx coe sw fallback
-Date: Tue, 15 Aug 2023 11:51:45 +0800
-Message-Id: <20230815035145.16990-1-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.19.0
-In-Reply-To: <20230814181354.8603-1-rohan.g.thomas@intel.com>
-References: <20230814181354.8603-1-rohan.g.thomas@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBFD1C13
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 03:57:41 +0000 (UTC)
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6306D4483;
+	Mon, 14 Aug 2023 20:57:36 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vpq6ttl_1692071851;
+Received: from 30.221.106.14(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Vpq6ttl_1692071851)
+          by smtp.aliyun-inc.com;
+          Tue, 15 Aug 2023 11:57:33 +0800
+Message-ID: <8c5d1a90-6965-f507-a54d-5c420c972306@linux.alibaba.com>
+Date: Tue, 15 Aug 2023 11:57:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [RFC PATCH v2 net-next 1/6] net/smc: support smc release version
+ negotiation in clc handshake
+To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
+ kgraul@linux.ibm.com, tonylu@linux.alibaba.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: horms@kernel.org, alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230807062720.20555-1-guangguan.wang@linux.alibaba.com>
+ <20230807062720.20555-2-guangguan.wang@linux.alibaba.com>
+ <ecafff58-c93a-5592-ddaa-d8724cf6bdcc@linux.ibm.com>
+Content-Language: en-US
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <ecafff58-c93a-5592-ddaa-d8724cf6bdcc@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-12.2 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-Date: Mon, Aug 14, 2023 at 15:06:37
-> > > +	bool tx_q_coe_lmt;
-> >
-> > Please use a flag here instead of "tx_q_coe_lmt". This is the
-> > preferrable method now.
-> >
-> > Thanks,
-> > Jose
-> 
-> Thanks Jose for the feedback. If I read that correctly, your suggestion is to
-> change " tx_q_coe_lmt" to something more readable, like "has_txcoe_limit".
-> Please correct me if I understand it wrongly.
-> 
-> BR,
-> Rohan
->
 
-Or, use int instead of bool?
 
-BR,
-Rohan
+On 2023/8/10 00:03, Wenjia Zhang wrote:
+> 
+> 
+> On 07.08.23 08:27, Guangguan Wang wrote:
+>> Support smc release version negotiation in clc handshake. And set
+>> the latest smc release version to 2.1.
+>>
+> 
+> Could you elaborate the changes? Without reading code, it is really difficult to know what you did, and why you did it. Sure, one can read the code and the support document, but the commit message should always be the quick reference. The following information I missed especially:
+> - This implementation is based on SMCv2 where no negotiation process for different releases, but for different versions.
+> - The Server makes the decision for which release will be used.
+
+Sorry for the lack of descriptions, more descriptions will be added in the next version.
+
+>>
+>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>> index a7f887d91d89..bac73eb0542d 100644
+>> --- a/net/smc/af_smc.c
+>> +++ b/net/smc/af_smc.c
+>> @@ -1187,6 +1187,11 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+>>               return SMC_CLC_DECL_NOINDIRECT;
+>>           }
+>>       }
+>> +
+>> +    if (fce->release > SMC_RELEASE)
+>> +        return SMC_CLC_DECL_VERSMISMAT;
+> I'm wondering if this check is necessary, how it could happen?
+
+You are right, I will remove the check.
+
+>>   -static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len)
+>> +static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len, int release_ver)
+>>   {
+>>       memset(fce, 0, sizeof(*fce));
+>>       fce->os_type = SMC_CLC_OS_LINUX;
+>> -    fce->release = SMC_RELEASE;
+>> +    fce->release = release_ver;
+>>       memcpy(fce->hostname, smc_hostname, sizeof(smc_hostname));
+>>       (*len) += sizeof(*fce);
+>>   }
+> 
+> Personally I'd like release_nr instead of release_ver.
+
+
+>>   @@ -382,7 +403,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini);
+>>   int smc_clc_send_confirm(struct smc_sock *smc, bool clnt_first_contact,
+>>                u8 version, u8 *eid, struct smc_init_info *ini);
+>>   int smc_clc_send_accept(struct smc_sock *smc, bool srv_first_contact,
+>> -            u8 version, u8 *negotiated_eid);
+>> +            u8 version, u8 *negotiated_eid, struct smc_init_info *ini);
+>>   void smc_clc_init(void) __init;
+>>   void smc_clc_exit(void);
+>>   void smc_clc_get_hostname(u8 **host);
+>> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
+>> index 3c1b31bfa1cf..1a97fef39127 100644
+>> --- a/net/smc/smc_core.h
+>> +++ b/net/smc/smc_core.h
+>> @@ -374,6 +374,7 @@ struct smc_init_info {
+>>       u8            is_smcd;
+>>       u8            smc_type_v1;
+>>       u8            smc_type_v2;
+>> +    u8            release_ver;
+> 
+> Also here, I'd like release_nr more.
+
+OK, I will modify it in the next version.
 
