@@ -1,87 +1,170 @@
-Return-Path: <netdev+bounces-27728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB87377D06F
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:55:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 384F777D08C
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB86B1C20D05
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:55:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D6422813E0
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709EE156D9;
-	Tue, 15 Aug 2023 16:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61761156EE;
+	Tue, 15 Aug 2023 17:06:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20212B98
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 16:55:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51967C433CD;
-	Tue, 15 Aug 2023 16:55:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692118520;
-	bh=0NoRpcHZaUX5im0cn9/N12oK9jNQtW6pqx60BrLK0cs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h/qtXebOTThtIYgLdqHqoNRqfFRfa9y/NntkWbmyTvfgyh9BOctmFKj8k3XAsH1JF
-	 aoJAGqTrHqidY5JCD+vm0ExK6+BLcxDLSq3p717eHvClBAxkaQSQRbfU1psUYJ74Bd
-	 kRbPS0rjZmAdOGYHTHVXNwPnKjpnhSFi0B1wAuRKNJLkChNkLAJtDl052iMqhiYfZN
-	 gLXuKq0MKFOl6PONyTJmxtK4SAvnRX8Q7p9ID1pGkSED5bp6y1rmkY83gbeufmn7as
-	 b20tSiNqCkYQIn2ljZnydCYVtFoTrK3QNRMZqB4owFbaLyN+qC3eEAVhaUSNzJt1Kk
-	 YrHv4JWLD1v1g==
-Date: Tue, 15 Aug 2023 09:55:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jiri Pirko <jiri@resnulli.us>, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Milena Olech
- <milena.olech@intel.com>, Michal Michalik <michal.michalik@intel.com>,
- linux-arm-kernel@lists.infradead.org, poros@redhat.com,
- mschmidt@redhat.com, netdev@vger.kernel.org, linux-clk@vger.kernel.org,
- Bart Van Assche <bvanassche@acm.org>, intel-wired-lan@lists.osuosl.org,
- Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next v4 4/9] dpll: netlink: Add DPLL framework base
- functions
-Message-ID: <20230815095519.76d06274@kernel.org>
-In-Reply-To: <d5c30de7-df89-18dd-3ad8-a5d99c1e7108@linux.dev>
-References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
-	<20230811200340.577359-5-vadim.fedorenko@linux.dev>
-	<20230814202441.349586b4@kernel.org>
-	<d5c30de7-df89-18dd-3ad8-a5d99c1e7108@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D8D13ADE
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:06:26 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36D21737
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:06:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692119184; x=1723655184;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vAay4aUIZuVTeeiacV1F/Nc32BXID36g7Uvf8bixLJg=;
+  b=kOxZOmlDEilhM5AtY4qIyQc6nWdWurwNZK7QdKwJ84JsyUFPoFr2HOkZ
+   EQFYozHhkvC/7AMNyzW3P4UZ6RWR+K61MAFz8/l1LByXbiFeUcKtg/m4P
+   4hTOCsCzBZKat6yFXBLJq9d9/m4ZnLTXn/bocGpceRKY8S2k09wPUuJ5m
+   3+yOGzAvoMz80YUA1KwuMd6RyOypyH20178BqolCaRhIdXzMXDpBsk/nz
+   p1qTNDA+G94hmIHlhRy2XlNgWfs+TNzrY1kKPcLOXln1liLOxo/S9EcQ+
+   RiEz/w4keTERT9Ap4aTHSIYv/qxx8QK3g0025GsclAS7IRq+bXAHGBSbk
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="362483531"
+X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
+   d="scan'208";a="362483531"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 10:04:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="733913243"
+X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
+   d="scan'208";a="733913243"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga002.jf.intel.com with ESMTP; 15 Aug 2023 10:04:47 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	paul.m.stillwell.jr@intel.com,
+	jacob.e.keller@intel.com,
+	horms@kernel.org
+Subject: [PATCH net-next v3 0/5][pull request] add v2 FW logging for ice driver
+Date: Tue, 15 Aug 2023 09:57:45 -0700
+Message-Id: <20230815165750.2789609-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 15 Aug 2023 16:18:16 +0100 Vadim Fedorenko wrote:
-> On 15/08/2023 04:24, Jakub Kicinski wrote:
-> > On Fri, 11 Aug 2023 21:03:35 +0100 Vadim Fedorenko wrote:  
-> >> +	xa_for_each(&pin->dpll_refs, i, ref) {
-> >> +		const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
-> >> +		struct dpll_device *dpll = ref->dpll;
-> >> +
-> >> +		if (!ops->frequency_set)
-> >> +			return -EOPNOTSUPP;
-> >> +		ret = ops->frequency_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
-> >> +					 dpll, dpll_priv(dpll), freq, extack);
-> >> +		if (ret)
-> >> +			return ret;
-> >> +		__dpll_pin_change_ntf(pin);
-> >> +	}  
-> > 
-> > only one freq is reported in get, AFAICT, so why send a notification
-> > after each ref is updated?  
-> 
-> The pin can be technically connected to several DPLLs and app may watch
-> for the specific DPLL messages only. We would like to inform all users 
-> on any DPLL which has this pin connected to.
+Paul Stillwell says:
 
-How does this end up looking in the notifications?
-__dpll_pin_change_ntf() only takes the pin object, from a quick read 
-it seems like it will generate the same notification multiple times.
+Firmware (FW) log support was added to the ice driver, but that version is
+no longer supported. There is a newer version of FW logging (v2) that
+adds more control knobs to get the exact data out of the FW
+for debugging.
+
+The interface for FW logging is debugfs. This was chosen based on a
+discussion here:
+https://lore.kernel.org/netdev/20230214180712.53fc8ba2@kernel.org/
+We talked about using devlink in a variety of ways, but none of those
+options made any sense for the way the FW reports data. We briefly talked
+about using ethtool, but that seemed to go by the wayside. Ultimately it
+seems like using debugfs is the way to go so re-implement the code to use
+that.
+
+FW logging is across all the PFs on the device so restrict the commands to
+only PF0.
+
+If FW logging is supported then a directory named 'fwlog' will be created
+under '/sys/kernel/debug/ice/<pci_dev>'. A variety of files will be created
+to manage the behavior of logging. The following files will be created:
+- modules
+- resolution
+- enable
+- nr_buffs
+- data
+
+where modules is used to read/write the configuration for FW logging
+
+resolution is used to determine how often to send FW logging events to the
+driver
+
+enable is used to start/stop FW logging. This is a boolean value so only 1
+or 0 are permissible values
+
+nr_buffs is used to configure the number of data buffers the driver uses
+for log data
+
+data is used to read/clear the log data
+
+Generally there is a lot of data and dumping that data to syslog will
+result in a loss of data. This causes problems when decoding the data and
+the user doesn't know that data is missing until later. Instead of dumping
+the FW log output to syslog use debugfs. This ensures that all the data the
+driver has gets retrieved correctly.
+
+The FW log data is binary data that the FW team decodes to determine what
+happened in firmware. The binary blob is sent to Intel for decoding.
+---
+v3:
+- Adjust error path cleanup in ice_module_init() for unreachable code.
+
+v2: https://lore.kernel.org/netdev/20230810170109.1963832-1-anthony.l.nguyen@intel.com/
+- Rewrote code to use debugfs instead of devlink
+
+v1: https://lore.kernel.org/netdev/20230209190702.3638688-1-anthony.l.nguyen@intel.com/
+
+Previous discussion:
+https://lore.kernel.org/netdev/fea3e7bc-db75-ce15-1330-d80483267ee2@intel.com/
+
+The following are changes since commit 479b322ee6feaff612285a0e7f22c022e8cd84eb:
+  net: dsa: mv88e6060: add phylink_get_caps implementation
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Paul M Stillwell Jr (5):
+  ice: remove FW logging code
+  ice: configure FW logging
+  ice: enable FW logging
+  ice: add ability to read FW log data and configure the number of log
+    buffers
+  ice: add documentation for FW logging
+
+ .../device_drivers/ethernet/intel/ice.rst     | 117 +++
+ drivers/net/ethernet/intel/ice/Makefile       |   4 +-
+ drivers/net/ethernet/intel/ice/ice.h          |  18 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   | 161 ++--
+ drivers/net/ethernet/intel/ice/ice_common.c   | 219 +----
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 -
+ drivers/net/ethernet/intel/ice/ice_debugfs.c  | 807 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_fwlog.c    | 450 ++++++++++
+ drivers/net/ethernet/intel/ice/ice_fwlog.h    |  78 ++
+ drivers/net/ethernet/intel/ice/ice_main.c     |  51 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |  23 +-
+ 11 files changed, 1614 insertions(+), 315 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_debugfs.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_fwlog.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_fwlog.h
+
+-- 
+2.38.1
+
 
