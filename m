@@ -1,105 +1,135 @@
-Return-Path: <netdev+bounces-27754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7196C77D19A
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:18:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B7D77D19E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5A9328159A
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:18:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86DC61C20DDD
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DFD17ABF;
-	Tue, 15 Aug 2023 18:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A1E17ACA;
+	Tue, 15 Aug 2023 18:19:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CF715AF6
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:18:22 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62676C6;
-	Tue, 15 Aug 2023 11:18:21 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2bb97f2c99cso995471fa.0;
-        Tue, 15 Aug 2023 11:18:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692123499; x=1692728299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y2mO/J1d7DrBY/NdIMdsnnPNhtFJpeppdqDUW01BnP8=;
-        b=JXm5LGs8ur0EZ6X7M3XCNyhkbVte6gAm48EkwWRvt23OLtGCd8/EPC0mI3kLzEHgoP
-         kk6q2STfobletEHX1zo5/EQOS7zx+IqUlq8PF4K0LLvyqes/qG6Z/clXghl9uPILgfz4
-         swFsoHSTFpLt52awmAE+hp42PSjwq3HilOhRXuiu6MarqeJRhcEzKgk/dRXv5VEI+F1s
-         281ghjxOlAm1MJ3usLFdcHSqzdKm7YQAthIepAEsAr9fTBbzShRkWydr5QoEhXQknpS2
-         A0V8T7srBOs0fuAvOjfLaIbEMbRN1L3VBjgRm/Kk3ngXqteqdBoaQJ75WpDGtEO0qxFv
-         MNxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692123499; x=1692728299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y2mO/J1d7DrBY/NdIMdsnnPNhtFJpeppdqDUW01BnP8=;
-        b=B3814fQNnXmJDwjbr9+wlX1MgmmTVlB5ga+0vMq/vwWGYBgCMGxsOI7xQhOk4cOppJ
-         ZOwacLVpMlLY3gw7vK90vsEsW2H0RAaujAhXQPMeZ6ODM8vh9kKOrdk1VKoaO2Zb08Lu
-         K9sXi5n6WLHOwrrFcWhwvwUNf+ruuCHIZw46GSxULDeXpsUNZes2tUa1quct9vmGSC7u
-         QnBPpUE7wPfUVo3QTuwxgRgi0CCDAF8rqBt1Qxwyik1upKWS/i7JBoFRvenSXeu39/4n
-         SdpJmkLTJImMyZP8dnEwrjPSNGvw2s0tmfAdmx/7vTi6jZTq/mV0hD+3FkQIfRpcuhGn
-         R2Uw==
-X-Gm-Message-State: AOJu0YyZ1pnKHKYRKne1b4/6/KpVlH3/QGG36e51aL28oGkVCW80Jg9w
-	hdWbU1ez88tir6qhgfxiNtyW0iIN2saXnyEt6dCrE/ta
-X-Google-Smtp-Source: AGHT+IGHMYWYnNV88mLhWgCgeaNMvN7CJwF68vczpVS6ail83z4icAJgjdltqouixBlQvMJiIwSoeN2ubDGOpO4+jOM=
-X-Received: by 2002:a2e:7d15:0:b0:2b9:ed84:b2bf with SMTP id
- y21-20020a2e7d15000000b002b9ed84b2bfmr9742338ljc.33.1692123499360; Tue, 15
- Aug 2023 11:18:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109EA13AFD
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:19:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDC6BC433C8;
+	Tue, 15 Aug 2023 18:19:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692123585;
+	bh=LxisV8f2urtyHho0Fhd/EnDIivuMoVIqPDjpt7QMK1g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=slGkrHpCW+Oh6UeFJMyeu7b3M/KFMnj5spDl+fP0Y5RDiD6p8xYwcCtUU5yWd7tpv
+	 Ai4orLB88U//sLXlBcCFD+zxFY35uCtpJswChaPySCIjdRnVtMnXqSldsr73LpzGFG
+	 JbHTWJCwch+q3nOdcyMl0zceHZu3y94i0JRwsoluWdP+i4GADrv+f7YHg7iMLvtTju
+	 IhjJvp/rERQmDAmZC6SnZPA9+K6nnDOjqrfeTHF4d8ut3eFHrAwYeag33HOjinA/rj
+	 otBACCG9jNEPG/hjZQQRJP33jonXTjAXTKDnWd5oZgXXb0N+Y03wlDwopytXuLfKgn
+	 8Y8Tevo/Hw3jw==
+Date: Tue, 15 Aug 2023 21:19:40 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: fw@strlen.de, steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, timo.teras@iki.fi, yuehaibing@huawei.com,
+	weiyongjun1@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Patch net, v2] net: xfrm: skip policies marked as dead while
+ reinserting policies
+Message-ID: <20230815181940.GO22185@unreal>
+References: <20230814140013.712001-1-dongchenchen2@huawei.com>
+ <20230815060026.GE22185@unreal>
+ <20230815091324.GL22185@unreal>
+ <20230815123233.GM22185@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230811192256.1988031-1-luiz.dentz@gmail.com>
- <20230814164546.71dbc695@kernel.org> <CABBYNZJmkOpPgF6oox-JAyGAZRxzX7Kn9JQpLPXi_FR=Cf-FOA@mail.gmail.com>
- <20230815111554.7ff6205e@kernel.org>
-In-Reply-To: <20230815111554.7ff6205e@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 15 Aug 2023 11:18:07 -0700
-Message-ID: <CABBYNZ+mnQ2gKOoezeKfM=CF4ANVGtjM0Zb4a-tnZKYvrw_F5A@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2023-08-11
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815123233.GM22185@unreal>
 
-Hi Jakub,
-
-On Tue, Aug 15, 2023 at 11:15=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Tue, 15 Aug 2023 10:59:35 -0700 Luiz Augusto von Dentz wrote:
-> > > As indicated by Stephen's complaint about lack of an SoB tag,
-> > > it appears that DaveM merged this PR over the weekend :)
+On Tue, Aug 15, 2023 at 09:43:28PM +0800, Dong Chenchen wrote:
+> On Tue, Aug 15, 2023 at 07:35:13PM +0800, Dong Chenchen wrote:
+> >> >> The walker object initialized by xfrm_policy_walk_init() doesnt have policy. 
+> >> >> list_for_each_entry() will use the walker offset to calculate policy address.
+> >> >> It's nonexistent and different from invalid dead policy. It will read memory 
+> >> >> that doesnt belong to walker if dereference policy->index.
+> >> >> I think we should protect the memory.
+> >> >
+> >> >But all operations here are an outcome of "list_for_each_entry(policy,
+> >> >&net->xfrm.policy_all, walk.all)" which stores in policy iterator
+> >> >the pointer to struct xfrm_policy.
+> >> >
+> >> >How at the same time access to policy->walk.dead is valid while
+> >> >policy->index is not?
+> >> >
+> >> >Thanks
+> >> 1.walker init: its only a list head, no policy
+> >> xfrm_dump_policy_start
+> >> 	xfrm_policy_walk_init(walk, XFRM_POLICY_TYPE_ANY);
+> >> 		INIT_LIST_HEAD(&walk->walk.all);
+> >> 		walk->walk.dead = 1;
+> >> 
+> >> 2.add the walk head to net->xfrm.policy_all
+> >> xfrm_policy_walk
+> >>     list_for_each_entry_from(x, &net->xfrm.policy_all, all)
+> >> 	if (error) {
+> >> 		list_move_tail(&walk->walk.all, &x->all);
+> >> 		//add the walk to list tail
+> >> 
+> >> 3.traverse the walk list
+> >> xfrm_policy_flush
+> >> list_for_each_entry(pol, &net->xfrm.policy_all, walk.all)
+> >> 	 dir = xfrm_policy_id2dir(pol->index);
+> >> 
+> >> it gets policy by &net->xfrm.policy_all-0x130(offset of walk in policy)
+> >> but when walk is head, we will read others memory by the calculated policy.
+> >> such as:
+> >>   walk addr  		policy addr
+> >> 0xffff0000d7f3b530    0xffff0000d7f3b400 (non-existent) 
+> >> 
+> >> head walker of net->xfrm.policy_all can be skipped by  list_for_each_entry().
+> >> but the walker created by socket is located list tail. so we should skip it. 
 > >
-> > Ok, since it has been applied what shall we do?
->
-> Not much we can do now. Make sure you run:
->
-> https://github.com/kuba-moo/nipa/blob/master/tests/patch/verify_signedoff=
-/verify_signedoff.sh
->
-> on the next PR.
+> >list_for_each_entry_from(x, &net->xfrm.policy_all, all) gives you
+> >pointer to "x", you can't access some of its fields and say they
+> >exist and other doesn't. Once you can call to "x->...", you can 
+> >call to "x->index" too.
+> >
+> >Thanks
+> We get a pointer addr not actual variable from list_for_each_entry_from(),
+> that calculated by walk address dec offset from struct xfrm_policy(0x130).
 
-Will try to incorporate this into our CI checks, btw any reason why
-this is not done by the likes of checkpatch?
+The thing is that you must get valid addr pointer and not some random
+memory address.
 
---=20
-Luiz Augusto von Dentz
+> 
+> walk addr: 0xffff0000d7f3b530 //allocated by socket, valid
+> -> dec 0x130 (use macro container_of)
+> policy_addr:0xffff0000d7f3b400 //only a pointer addr
+> -> add 0x130 
+> policy->walk:0xffff0000d7f3b530 //its still walker head
+> 
+> I think its invalid to read policy->index from memory that maybe allocated
+> by other user.
+
+This is not how pointers are expected to be used. Once you have pointer
+to the struct, the expectation is that all fields in that struct are
+accessible.
+
+Anyway, we discussed this topic a lot.
+
+Thanks
+
+> 
+> Thanks!
+> Dong Chenchen
+> 
 
