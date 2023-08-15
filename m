@@ -1,187 +1,182 @@
-Return-Path: <netdev+bounces-27685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE7B77CDBD
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:02:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE25477CDE8
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2070128149E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:02:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C082814A4
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098D112B99;
-	Tue, 15 Aug 2023 14:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82063134B9;
+	Tue, 15 Aug 2023 14:18:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B978832
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:02:17 +0000 (UTC)
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2160B1BE1;
-	Tue, 15 Aug 2023 07:01:55 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d682d2d1f0dso3575352276.1;
-        Tue, 15 Aug 2023 07:01:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692108114; x=1692712914;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RK8C+4M3WjyGo3AT2VvtieqZ4XHthCpGP/MjkwxxLRM=;
-        b=mlMQgWr/Dp5MwkbdLFShCAqd3TyV3HbRGsShw0D3S/3ERGy7RjA7AH3jHV62T7f28T
-         mR+hlmouQI1yK1i7lZ/Ge8Sy7/3rSgYwAPupxe2iUr3P6CzLbkSd3ACunxowfrLLgHMs
-         pLkUX8ulWVWBxcud/7iKf1whrcYfUffNrQcyqZ0a7ojf4o5Lwwg1HjP8yC6n3IGX9nRQ
-         TXvbZd8IEGW0MhQycFTGO6NevlMOg1c5t0+d3d+LhFSTssPtvd/bLkQN9s/b66O1VkSQ
-         EO9yvDOih9dHLWx8696BMUPsmUlbGxjkyTYCSqUTVCJLLdnufCd0DLSjiNSKgIsM8WZ3
-         +jmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692108114; x=1692712914;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RK8C+4M3WjyGo3AT2VvtieqZ4XHthCpGP/MjkwxxLRM=;
-        b=WWfMSQK0R+MDK68nZjxYrXUQvUaeJjUFBmpDfy2mI2rPlS5YOsiNgF4I8EXiWo2eoc
-         P9KlTAflOTe7kpVwaNsXgCSmZhJJRB+uzYMyrsJ/0EYFQFbQU25w9K/SjJ7q4BaXqCBn
-         WLHoK8omtSJJHbItzzPgCexdb1WX5tj4oWtKvmvvmLhqfAPmXLFPmDz1X+XoaXM6w33c
-         4CEG/U+DuFX4ERamLRtRtZ7ywW7xhSDc4AgAGRSkuWfckagfisKWO7bYjukUvYhyBrxK
-         8lj/t2qtzulIsdfJzWyq9Mi2U0kbKuKQ8X4ZjtorFZ8DjZ5+qREtdRwQTMCuk6+yOeeO
-         Da/w==
-X-Gm-Message-State: AOJu0YzYxLAkdbEOBaWj86pyfHk9vp/5h+ADySzLAeg3l/G/CH0Wnups
-	LIWogGKbdBnzK2LJGH5LET/l9akQUuddNu/Wxw0=
-X-Google-Smtp-Source: AGHT+IF8TUQMt1B1y90B2T47wqGqmk9jdn588FwleKe360sIPlp6Bx49haNYj+JFI0aZzeHKxURac8+OGaSiNGbqK8I=
-X-Received: by 2002:a25:dad7:0:b0:ced:6134:7606 with SMTP id
- n206-20020a25dad7000000b00ced61347606mr15277728ybf.30.1692108113957; Tue, 15
- Aug 2023 07:01:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BA35C9D
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:18:43 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2256A10FF;
+	Tue, 15 Aug 2023 07:18:41 -0700 (PDT)
+Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RQCvp2cK0ztS7Z;
+	Tue, 15 Aug 2023 22:15:02 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 15 Aug 2023 22:18:37 +0800
+From: Dong Chenchen <dongchenchen2@huawei.com>
+To: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <fw@strlen.de>, <leon@kernel.org>
+CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<timo.teras@iki.fi>, <yuehaibing@huawei.com>, <weiyongjun1@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Dong Chenchen
+	<dongchenchen2@huawei.com>
+Subject: [Patch net v3] net: xfrm: skip policies marked as dead while reinserting policies
+Date: Tue, 15 Aug 2023 22:18:34 +0800
+Message-ID: <20230815141834.1040646-1-dongchenchen2@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4e2e8aad9c4646ec3a51833cbbf95a006a98b756.1691945735.git.lucien.xin@gmail.com>
- <DBBP189MB1433FD875F0B6859676196489514A@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
-In-Reply-To: <DBBP189MB1433FD875F0B6859676196489514A@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 15 Aug 2023 10:01:41 -0400
-Message-ID: <CADvbK_eHOU1RCRxNFYTZ9GOwkeTFmSxtzmnGqUhOh-gh82Z8nQ@mail.gmail.com>
-Subject: Re: [PATCH nf] netfilter: set default timeout to 3 secs for sctp
- shutdown send and recv state
-To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-Cc: network dev <netdev@vger.kernel.org>, 
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>, 
-	"linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"kuba@kernel.org" <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500026.china.huawei.com (7.221.188.247)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 15, 2023 at 3:59=E2=80=AFAM Sriram Yagnaraman
-<sriram.yagnaraman@est.tech> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Xin Long <lucien.xin@gmail.com>
-> > Sent: Sunday, 13 August 2023 18:56
-> > To: network dev <netdev@vger.kernel.org>; netfilter-devel@vger.kernel.o=
-rg;
-> > linux-sctp@vger.kernel.org
-> > Cc: davem@davemloft.net; kuba@kernel.org; Eric Dumazet
-> > <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; Pablo Neira
-> > Ayuso <pablo@netfilter.org>; Jozsef Kadlecsik <kadlec@netfilter.org>; F=
-lorian
-> > Westphal <fw@strlen.de>; Marcelo Ricardo Leitner
-> > <marcelo.leitner@gmail.com>
-> > Subject: [PATCH nf] netfilter: set default timeout to 3 secs for sctp s=
-hutdown
-> > send and recv state
-> >
-> > In SCTP protocol, it is using the same timer (T2 timer) for SHUTDOWN an=
-d
-> > SHUTDOWN_ACK retransmission. However in sctp conntrack the default
-> > timeout value for SCTP_CONNTRACK_SHUTDOWN_ACK_SENT state is 3 secs
-> > while it's 300 msecs for SCTP_CONNTRACK_SHUTDOWN_SEND/RECV state.
-> >
-> > As Paolo Valerio noticed, this might cause unwanted expiration of the c=
-t entry.
-> > In my test, with 1s tc netem delay set on the NAT path, after the SHUTD=
-OWN is
-> > sent, the sctp ct entry enters SCTP_CONNTRACK_SHUTDOWN_SEND state.
-> > However, due to 300ms (too short) delay, when the SHUTDOWN_ACK is sent
-> > back from the peer, the sctp ct entry has expired and been deleted, and=
- then
-> > the SHUTDOWN_ACK has to be dropped.
-> >
-> > Also, it is confusing these two sysctl options always show 0 due to all=
- timeout
-> > values using sec as unit:
-> >
-> >   net.netfilter.nf_conntrack_sctp_timeout_shutdown_recd =3D 0
-> >   net.netfilter.nf_conntrack_sctp_timeout_shutdown_sent =3D 0
-> >
-> > This patch fixes it by also using 3 secs for sctp shutdown send and rec=
-v state in
-> > sctp conntrack, which is also RTO.initial value in SCTP protocol.
-> >
-> > Note that the very short time value for
-> > SCTP_CONNTRACK_SHUTDOWN_SEND/RECV was probably used for a rare
-> > scenario where SHUTDOWN is sent on 1st path but SHUTDOWN_ACK is replied
-> > on 2nd path, then a new connection started immediately on 1st path. So =
-this
-> > patch also moves from SHUTDOWN_SEND/RECV to CLOSE when receiving INIT
-> > in the ORIGINAL direction.
-> >
-> > Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
-> > Reported-by: Paolo Valerio <pvalerio@redhat.com>
-> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> > ---
-> >  net/netfilter/nf_conntrack_proto_sctp.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/netfilter/nf_conntrack_proto_sctp.c
-> > b/net/netfilter/nf_conntrack_proto_sctp.c
-> > index 91eacc9b0b98..b6bcc8f2f46b 100644
-> > --- a/net/netfilter/nf_conntrack_proto_sctp.c
-> > +++ b/net/netfilter/nf_conntrack_proto_sctp.c
-> > @@ -49,8 +49,8 @@ static const unsigned int
-> > sctp_timeouts[SCTP_CONNTRACK_MAX] =3D {
-> >       [SCTP_CONNTRACK_COOKIE_WAIT]            =3D 3 SECS,
-> >       [SCTP_CONNTRACK_COOKIE_ECHOED]          =3D 3 SECS,
-> >       [SCTP_CONNTRACK_ESTABLISHED]            =3D 210 SECS,
-> > -     [SCTP_CONNTRACK_SHUTDOWN_SENT]          =3D 300 SECS /
-> > 1000,
-> > -     [SCTP_CONNTRACK_SHUTDOWN_RECD]          =3D 300 SECS /
-> > 1000,
-> > +     [SCTP_CONNTRACK_SHUTDOWN_SENT]          =3D 3 SECS,
-> > +     [SCTP_CONNTRACK_SHUTDOWN_RECD]          =3D 3 SECS,
-> >       [SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]      =3D 3 SECS,
-> >       [SCTP_CONNTRACK_HEARTBEAT_SENT]         =3D 30 SECS,
-> >  };
-> > @@ -105,7 +105,7 @@ static const u8
-> > sctp_conntracks[2][11][SCTP_CONNTRACK_MAX] =3D {
-> >       {
-> >  /*   ORIGINAL        */
-> >  /*                  sNO, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS */
-> > -/* init         */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCW},
-> > +/* init         */ {sCL, sCL, sCW, sCE, sES, sCL, sCL, sSA, sCW},
-> >  /* init_ack     */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},
-> >  /* abort        */ {sCL, sCL, sCL, sCL, sCL, sCL, sCL, sCL, sCL},
-> >  /* shutdown     */ {sCL, sCL, sCW, sCE, sSS, sSS, sSR, sSA, sCL},
-> > --
-> > 2.39.1
->
-> FWIW, I like this patch. Should Documentation/networking/nf_conntrack-sys=
-ctl.rst be updated to reflect the new timeout values?
-Good catch, will post v2 with the 0.3 -> 3 change in nf_conntrack-sysctl.rs=
-t.
+BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
+Read of size 1 at addr ffff8881051f3bf8 by task ip/668
 
-Thanks for the review.
+CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x72/0xa0
+ print_report+0xd0/0x620
+ kasan_report+0xb6/0xf0
+ xfrm_policy_inexact_list_reinsert+0xb6/0x430
+ xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
+ xfrm_policy_inexact_alloc_chain+0x23f/0x320
+ xfrm_policy_inexact_insert+0x6b/0x590
+ xfrm_policy_insert+0x3b1/0x480
+ xfrm_add_policy+0x23c/0x3c0
+ xfrm_user_rcv_msg+0x2d0/0x510
+ netlink_rcv_skb+0x10d/0x2d0
+ xfrm_netlink_rcv+0x49/0x60
+ netlink_unicast+0x3fe/0x540
+ netlink_sendmsg+0x528/0x970
+ sock_sendmsg+0x14a/0x160
+ ____sys_sendmsg+0x4fc/0x580
+ ___sys_sendmsg+0xef/0x160
+ __sys_sendmsg+0xf7/0x1b0
+ do_syscall_64+0x3f/0x90
+ entry_SYSCALL_64_after_hwframe+0x73/0xdd
+
+The root cause is:
+
+cpu 0			cpu1
+xfrm_dump_policy
+xfrm_policy_walk
+list_move_tail
+			xfrm_add_policy
+			... ...
+			xfrm_policy_inexact_list_reinsert
+			list_for_each_entry_reverse
+				if (!policy->bydst_reinsert)
+				//read non-existent policy
+xfrm_dump_policy_done
+xfrm_policy_walk_done
+list_del(&walk->walk.all);
+
+If dump_one_policy() returns err (triggered by netlink socket),
+xfrm_policy_walk() will move walk initialized by socket to list
+net->xfrm.policy_all. so this socket becomes visible in the global
+policy list. The head *walk can be traversed when users add policies
+with different prefixlen and trigger xfrm_policy node merge.
+
+The issue can also be triggered by policy list traversal while rehashing
+and flushing policies.
+
+It can be fixed by skip such "policies" with walk.dead set to 1.
+
+Fixes: 9cf545ebd591 ("xfrm: policy: store inexact policies in a tree ordered by destination address")
+Fixes: 12a169e7d8f4 ("ipsec: Put dumpers on the dump list")
+Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+---
+v2: fix similiar similar while rehashing and flushing policies
+v3: check walk.dead after declaration of new variables
+---
+ net/xfrm/xfrm_policy.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index d6b405782b63..113fb7e9cdaf 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -851,7 +851,7 @@ static void xfrm_policy_inexact_list_reinsert(struct net *net,
+ 		struct hlist_node *newpos = NULL;
+ 		bool matches_s, matches_d;
+ 
+-		if (!policy->bydst_reinsert)
++		if (policy->walk.dead || !policy->bydst_reinsert)
+ 			continue;
+ 
+ 		WARN_ON_ONCE(policy->family != family);
+@@ -1256,8 +1256,11 @@ static void xfrm_hash_rebuild(struct work_struct *work)
+ 		struct xfrm_pol_inexact_bin *bin;
+ 		u8 dbits, sbits;
+ 
++		if (policy->walk.dead)
++			continue;
++
+ 		dir = xfrm_policy_id2dir(policy->index);
+-		if (policy->walk.dead || dir >= XFRM_POLICY_MAX)
++		if (dir >= XFRM_POLICY_MAX)
+ 			continue;
+ 
+ 		if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
+@@ -1823,9 +1826,11 @@ int xfrm_policy_flush(struct net *net, u8 type, bool task_valid)
+ 
+ again:
+ 	list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
++		if (pol->walk.dead)
++			continue;
++
+ 		dir = xfrm_policy_id2dir(pol->index);
+-		if (pol->walk.dead ||
+-		    dir >= XFRM_POLICY_MAX ||
++		if (dir >= XFRM_POLICY_MAX ||
+ 		    pol->type != type)
+ 			continue;
+ 
+@@ -1862,9 +1867,11 @@ int xfrm_dev_policy_flush(struct net *net, struct net_device *dev,
+ 
+ again:
+ 	list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
++		if (pol->walk.dead)
++			continue;
++
+ 		dir = xfrm_policy_id2dir(pol->index);
+-		if (pol->walk.dead ||
+-		    dir >= XFRM_POLICY_MAX ||
++		if (dir >= XFRM_POLICY_MAX ||
+ 		    pol->xdo.dev != dev)
+ 			continue;
+ 
+-- 
+2.25.1
+
 
