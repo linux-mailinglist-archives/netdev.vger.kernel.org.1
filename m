@@ -1,158 +1,110 @@
-Return-Path: <netdev+bounces-27534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D935077C4F8
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6764577C526
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82A442812FF
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 01:20:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D71281301
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 01:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B352817C8;
-	Tue, 15 Aug 2023 01:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0093417CF;
+	Tue, 15 Aug 2023 01:38:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A741D17C4
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:20:06 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA8781723;
-	Mon, 14 Aug 2023 18:20:03 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-686bc261111so3363128b3a.3;
-        Mon, 14 Aug 2023 18:20:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692062403; x=1692667203;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=50kNZu8aE9KP4TudZVTqOVOHGwRE3VIGmubW18jTrUQ=;
-        b=IrgbaCf+o6oj+RCfd/u4cnr3AMHuE08gbErfDEr8HVZYFbmwmRGgWocx4wxWG+DOtU
-         u9PWmkhUyYgatFM1duyiKagcDKkYV2XygkEdheuZkP5YsWTAuA0wKCnVPd0WiB4tF12n
-         LVsOnczPj9xiT8mDOeY08hv8H/ltcI9ItTxPndz4ELhCAeUClazuj2LQt9Wwo0iLgRt2
-         EVyOmWy13kZ/TeRfQx+xMat7BpWejTUBfbEkpQFDyV10EQPSoGJtVeTw08jXFJY1j7Dk
-         +mcHb3xeiaI3KYDpPiFNbTUfHB4gtkPlwbK6JvRfs0oVFpc3TBT8HmE07+NwY/LrZpYx
-         +pKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692062403; x=1692667203;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=50kNZu8aE9KP4TudZVTqOVOHGwRE3VIGmubW18jTrUQ=;
-        b=YFB+fdGNlxI4o/xvfPMMyZSPRzrL5zYYA85+Ail4u/j5+tL9G1EbUG/jWRMlO3HY0f
-         t4VE4JM7+V9+DtaTKevEzRWTmzvQCe9dXqjY9k9KOaq4GLGwrYeiiVLup5vyHyo+f+LW
-         TnXh4nbfoOMRYrBp6gs48l2fn2jPcnLvltCeLRf2TGwKANihPfPMta7e/QXpDYvKJSs8
-         n7c0O1RmUnfXcFkhqNhdmvcQ9twMTG55dJvMjkZWYSwY0cc4ljXESIhPd0HSyyMzwP4R
-         kQd3tCVQqeFbdqAABwjbF9ItN+QqB6v7SU+Xq1m+b20oesEJJgM4PjtVrM4X4Uq5Lqpz
-         G5fQ==
-X-Gm-Message-State: AOJu0YxH9G4qwiP23belPcwabDvUtnBbAbP4m1Yqsqro/l5gnRtM9sic
-	dCmiPlgaqZRUQaDOLGH1icuOHNrBgjE=
-X-Google-Smtp-Source: AGHT+IHxS0i5N6XHm2dT7e7NgwDDvGaOtG+i4GcYE8loK1y5XQS7S3aKZ6l+kYkD1dfbLK/CTCl0KA==
-X-Received: by 2002:a05:6a20:3d0d:b0:133:be9d:a8d3 with SMTP id y13-20020a056a203d0d00b00133be9da8d3mr13278551pzi.14.1692062403149;
-        Mon, 14 Aug 2023 18:20:03 -0700 (PDT)
-Received: from debian.me ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id jh15-20020a170903328f00b001bde77f3d0esm2506247plb.117.2023.08.14.18.20.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 18:20:02 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id BB45581A2F0A; Tue, 15 Aug 2023 08:20:00 +0700 (WIB)
-Date: Tue, 15 Aug 2023 08:20:00 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Leslie Rhorer <lesrhorer@att.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Ariel Elior <aelior@marvell.com>
-Subject: Re: Failing network hardware
-Message-ID: <ZNrSwBqP1vPW8OKz@debian.me>
-References: <ddbed5c6-4ded-df22-fae0-bd256e40d6b3.ref@att.net>
- <ddbed5c6-4ded-df22-fae0-bd256e40d6b3@att.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A2717C4
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:38:36 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B9EC9E7;
+	Mon, 14 Aug 2023 18:38:33 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37F1bPoC5018456, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37F1bPoC5018456
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 15 Aug 2023 09:37:25 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Tue, 15 Aug 2023 09:36:54 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Tue, 15 Aug 2023 09:36:54 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Tue, 15 Aug 2023 09:36:54 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "Mario
+ Limonciello" <mario.limonciello@amd.com>,
+        "bjorn@mork.no" <bjorn@mork.no>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: RE: [PATCH net-next] eth: r8152: try to use a normal budget
+Thread-Topic: [PATCH net-next] eth: r8152: try to use a normal budget
+Thread-Index: AQHZzsT4UEeJMIn+UE+i+73nn0/m7a/qj0fw
+Date: Tue, 15 Aug 2023 01:36:54 +0000
+Message-ID: <1666467ba5ca480fb31f6507248f3476@realtek.com>
+References: <20230814153521.2697982-1-kuba@kernel.org>
+In-Reply-To: <20230814153521.2697982-1-kuba@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Dy7BoKZkUw2j6BHX"
-Content-Disposition: inline
-In-Reply-To: <ddbed5c6-4ded-df22-fae0-bd256e40d6b3@att.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
---Dy7BoKZkUw2j6BHX
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-(fixing up netdev address)
-
-On Sun, Aug 13, 2023 at 01:53:58PM -0500, Leslie Rhorer wrote:
-> Hello all,
+akub Kicinski <kuba@kernel.org>
+> Sent: Monday, August 14, 2023 11:35 PM
+[...]
+> Mario reports that loading r8152 on his system leads to a:
 >=20
-> 	About a year or so ago, I upgraded one of my Debian servers to Bullseye,
-> and it killed the 10G NIC on the server due to issues with the device dri=
-ver
-> in the Debian repository (it was missing).  I jumped through all sorts of
-> loops and hoops to try to get it working, but I finally had to give up and
-> resort to using the 1G interface.  Recently, I tried a new install on a
-> different server to the new Debian Bookworm, and it worked for that serve=
-r,
-> so apparently the issue has been fixed in Bookworm.  I reported a bug
-> against the Buster distribution, but it was never fixed.
+>   netif_napi_add_weight() called with weight 256
 >=20
-> 	With that in mind, I went ahead and upgraded the original server to
-> Bookworm, but the NIC remains dead.  Unfortunately, I cannot find my notes
-> on what I did originally to try to get the 10G interface working and to s=
-hut
-> it down in favor of a built-in port.  I do recall I tried compiling what =
-was
-> supposed to be the correct firmware driver and also changing the udev rul=
-es,
-> but I do not recall the exact details.  I have tried several things,
-> including re-installing the firmware, but nothing seems to work.  The
-> Ethernet interface does not appear on the system in order to be able to
-> specify it in /etc/network/interfaces.  What can I do in order to try to =
-get
-> the 10G card working?
+> warning getting printed. We don't have any solid data
+> on why such high budget was chosen, and it may cause
+> stalls in processing other softirqs and rt threads.
+> So try to switch back to the default (64) weight.
 >=20
-> 	The card is an Asus MCB-10G_PEB-10G NIC and uses the bnx2x.ko driver. The
-> system uses an Asus AMD-64 motherboard.  The bnx2x.ko driver is installed,
-> and lspci shows the card in the system, but ifconfig does not see the
-> interface.
+> If this slows down someone's system we should investigate
+> which part of stopping starting the NAPI poll in this
+> driver are expensive.
 >=20
+> Reported-by: Mario Limonciello <mario.limonciello@amd.com>
+> Link:
+> https://lore.kernel.org/all/0bfd445a-81f7-f702-08b0-bd5a72095e49@amd.com
+> /
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Too many moving parts here, hence allow me to rule things out:
+Acked-by: Hayes Wang <hayeswang@realtek.com>
 
-If there is any of your system haven't been dist-upgraded to bookworm, can =
-you
-confirm this issue on vanilla v6.1 kernel? And also, can you check latest
-mainline? If all have been upgraded, though, you need to reinstall bullseye
-first.
+Best Regards,
+Hayes
 
-As a side note, when you reply to mailing lists, please don't top-post;
-reply inline with appropriate context instead.
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---Dy7BoKZkUw2j6BHX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZNrSwAAKCRD2uYlJVVFO
-ow6/AP4vueGUbpcCqCnpTwf4tvmv06d0rMEHk5d7Uc303mCl0AD+O49Z5fOrIroT
-3RqT4tSWg1iL5M+K+xYMq7cHnVcXhQc=
-=VNFs
------END PGP SIGNATURE-----
-
---Dy7BoKZkUw2j6BHX--
 
