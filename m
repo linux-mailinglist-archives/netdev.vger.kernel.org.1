@@ -1,150 +1,91 @@
-Return-Path: <netdev+bounces-27538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637B877C59F
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 04:08:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CD577C5A5
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 04:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D9912812E4
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:08:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ECEB1C20C12
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D892C17D8;
-	Tue, 15 Aug 2023 02:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4375717F9;
+	Tue, 15 Aug 2023 02:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA80A17C4
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:08:52 +0000 (UTC)
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ACCEE5F
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:08:51 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1c4cd0f6cb2so1350621fac.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692065329; x=1692670129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o2UDUvk9L4rk/sB1K5vj/z+huF5pPgKiu4Sa/NKmZL8=;
-        b=DqiKHqTB35P6yr9cocypAgK/MNggAr7HQaDgtauj/j0yn8ah/PnQmHcH6ERuyD98qh
-         RkwDgTXwEeQVQaJcX0LTwV56lanbEwrR5NbPMte4JeX2cIVq0knep38JWmkqEYTqs2Cj
-         TqipBaDv2Q4DSBLOhUZyLWS9thzPX+33luK94KKm207C1+SbKvUINA2I5B6Xm+DZw23e
-         ezIwzIe1wp/n6K5AG8+bGkM4ffAH7BZbEj1nCsA2kYl1lFDaKoHMtVO91wzW6gIcJPvZ
-         unE2fQTqdxdg1qm+BIpy1X+RNWFJwie50jwXo6KTDcDeJCzmNLal6+DRNluTV8jxO7eT
-         q/ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692065329; x=1692670129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o2UDUvk9L4rk/sB1K5vj/z+huF5pPgKiu4Sa/NKmZL8=;
-        b=UbKWue4+fuDM0udntwaA1fPQ50o57Qejm4BK6ARJXySvYQCtPil/E8CMCXeNn4YDwT
-         LrkaIz0grN3kreryr7Z1JZUOciXnfQ5SMjA2Vo6qpUobv33UvsaMpq2W+6sKScKHAjC2
-         sxr/ZKnGGvmeQhrOFQwZ2DgGmzM4FJhgqD0WGvC3Xpz4k9xuvjH3euqy7gk95x2Xd8Jr
-         ymHAaQAsWHbu57M77eUog8eH8PNRlc47ITm6szlDL8DVUoSCpg9viC5BjN1yjSspxTbO
-         2bPTll4rcVaTs71YeCoW0wifLmsDXWNNoYq7kk8mswEd5Zxid2g7dN0faMbUw7RxWb6W
-         veVQ==
-X-Gm-Message-State: AOJu0Yz8kDu/IEzzkOgnE6ULVlZWNUp0Q3S2FfH1vQtL/iQIodLr0OL6
-	p3rxJZKAuR+O8YbFPPtKUVNFHXyht5VqKLLNejQ=
-X-Google-Smtp-Source: AGHT+IFMY7eMLbidggEOSZIHqAyWzYP6Ywp3MC/It+5FDm0HFdnH8RsARLdDL4z0TpBDX5CAHRknj5/2dH3p46EIwgc=
-X-Received: by 2002:a05:6870:3294:b0:1bb:7f1d:10f5 with SMTP id
- q20-20020a056870329400b001bb7f1d10f5mr499080oac.20.1692065329318; Mon, 14 Aug
- 2023 19:08:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D1D17D8
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F856C433C8;
+	Tue, 15 Aug 2023 02:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692065421;
+	bh=tbPg7DsFXPXJCMD127YCWiLf9PqIgRw2qHXwDxEo2Ss=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VfFkcjWd0m2Xo0W8EabIhuRHNMzIMpbw2CiaP4eEzqYvmS7fN4qMVllKu7Xy+pGCF
+	 7KsaQ+kdZrI4LZxeJ6bA4K3pK2KdxV5g95ULb6CNRK1blOTjdLNYv6BN5bIZDjmMts
+	 o5xi0BcUaUCroDsIToDi3m/6+zqb8E9xvQPWo6yC1NsJT2sHGtDnQqCH3iuDb3Ptec
+	 UagDrCGeoWU6ul3b0nbn/corjFzjm+KG5a4D9HsIw0KYzS7uFW1AYBTcaBJJ/r4tfZ
+	 4d0HxfJURFyHd3E0De7UFCX/jx8sdNhCSnMtcdPnI434VKkJAF6Q9xiaqntqioHczR
+	 37JRCFnObOfWg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E080C395F3;
+	Tue, 15 Aug 2023 02:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230811023747.12065-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20230811023747.12065-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 15 Aug 2023 10:08:13 +0800
-Message-ID: <CAL+tcoArZtbDKFMCC=i+v3fE1iG+UOBn4KhPxB-85rJCh882Xg@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net: fix the RTO timer retransmitting skb every
- 1ms if linear option is enabled
-To: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com
-Cc: apetlund@simula.no, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/4] octeon_ep: fixes for error and remove paths
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169206542144.7478.11120643947171700041.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Aug 2023 02:10:21 +0000
+References: <20230810150114.107765-1-mschmidt@redhat.com>
+In-Reply-To: <20230810150114.107765-1-mschmidt@redhat.com>
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: netdev@vger.kernel.org, vburru@marvell.com, sedara@marvell.com,
+ davem@davemloft.net, aayarekar@marvell.com, sburla@marvell.com,
+ vimleshk@marvell.com
 
-On Fri, Aug 11, 2023 at 10:38=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> In the real workload, I encountered an issue which could cause the RTO
-> timer to retransmit the skb per 1ms with linear option enabled. The amoun=
-t
-> of lost-retransmitted skbs can go up to 1000+ instantly.
->
-> The root cause is that if the icsk_rto happens to be zero in the 6th roun=
-d
-> (which is the TCP_THIN_LINEAR_RETRIES value), then it will always be zero
-> due to the changed calculation method in tcp_retransmit_timer() as follow=
-s:
->
-> icsk->icsk_rto =3D min(icsk->icsk_rto << 1, TCP_RTO_MAX);
->
-> Above line could be converted to
-> icsk->icsk_rto =3D min(0 << 1, TCP_RTO_MAX) =3D 0
->
-> Therefore, the timer expires so quickly without any doubt.
->
-> I read through the RFC 6298 and found that the RTO value can be rounded
-> up to a certain value, in Linux, say TCP_RTO_MIN as default, which is
-> regarded as the lower bound in this patch as suggested by Eric.
->
-> Fixes: 36e31b0af587 ("net: TCP thin linear timeouts")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Hello:
 
-Hello maintainers,
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I wonder why someone in the patchwork[1] changed this v2 patch into
-Superseded status without comments? Should I convert it to a new
-status or something else?
+On Thu, 10 Aug 2023 17:01:10 +0200 you wrote:
+> I have an Octeon card that's misconfigured in a way that exposes a
+> couple of bugs in the octeon_ep driver's error paths. It can reproduce
+> the issues that patches 1 & 4 are fixing. Patches 2 & 3 are a result of
+> reviewing the nearby code.
+> 
+> Michal Schmidt (4):
+>   octeon_ep: fix timeout value for waiting on mbox response
+>   octeon_ep: cancel tx_timeout_task later in remove sequence
+>   octeon_ep: cancel ctrl_mbox_task after intr_poll_task
+>   octeon_ep: cancel queued works in probe error path
+> 
+> [...]
 
-[1]: https://patchwork.kernel.org/project/netdevbpf/patch/20230811023747.12=
-065-1-kerneljasonxing@gmail.com/
+Here is the summary with links:
+  - [net,1/4] octeon_ep: fix timeout value for waiting on mbox response
+    https://git.kernel.org/netdev/net/c/519b227904f0
+  - [net,2/4] octeon_ep: cancel tx_timeout_task later in remove sequence
+    https://git.kernel.org/netdev/net/c/28458c80006b
+  - [net,3/4] octeon_ep: cancel ctrl_mbox_task after intr_poll_task
+    https://git.kernel.org/netdev/net/c/607a7a45cdf3
+  - [net,4/4] octeon_ep: cancel queued works in probe error path
+    https://git.kernel.org/netdev/net/c/758c91078165
 
-Thanks,
-Jason
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> ---
-> v2:
-> 1) nit: alway->always and the indentation style suggested by Simon.
-> ---
->  net/ipv4/tcp_timer.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> index d45c96c7f5a4..69795b273419 100644
-> --- a/net/ipv4/tcp_timer.c
-> +++ b/net/ipv4/tcp_timer.c
-> @@ -599,7 +599,9 @@ void tcp_retransmit_timer(struct sock *sk)
->             tcp_stream_is_thin(tp) &&
->             icsk->icsk_retransmits <=3D TCP_THIN_LINEAR_RETRIES) {
->                 icsk->icsk_backoff =3D 0;
-> -               icsk->icsk_rto =3D min(__tcp_set_rto(tp), TCP_RTO_MAX);
-> +               icsk->icsk_rto =3D clamp(__tcp_set_rto(tp),
-> +                                      tcp_rto_min(sk),
-> +                                      TCP_RTO_MAX);
->         } else if (sk->sk_state !=3D TCP_SYN_SENT ||
->                    icsk->icsk_backoff >
->                    READ_ONCE(net->ipv4.sysctl_tcp_syn_linear_timeouts)) {
-> --
-> 2.37.3
->
+
 
