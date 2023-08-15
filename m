@@ -1,140 +1,85 @@
-Return-Path: <netdev+bounces-27544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 461F977C5D8
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 04:28:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D67D77C5E0
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 04:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8A52812FB
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C35AC281277
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B615117EF;
-	Tue, 15 Aug 2023 02:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45AEF15DA;
+	Tue, 15 Aug 2023 02:30:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A803E17C4
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:28:11 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D94810C1;
-	Mon, 14 Aug 2023 19:28:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1692066488;
-	bh=yn404caKCvYzrFWgHbLiy3+pIAut/KwIxxQePdoi2Nw=;
-	h=Date:From:To:Cc:Subject:From;
-	b=rj9NU/KPfFwRk1RbnkAeRjSUfYDPMVCHjlZz+NI6rVBEl7il1mUNf9nRfvKXSe3D8
-	 ynq5ODoCnL4v0ERdZz1vs7FZhxs7RhbeT5gr3iKAyz8r7bb5WGxe/NG0mKccwtWiRL
-	 ABEgf4plKhrOiqN3kFIyuvpyb4jWr2HaGpUR9W5pMKhr82L/3Vj9XkIXKlgHKteQpG
-	 eCeroH1XlBYbe/pugYBnNxRHQzUC7dggew74U9jimqBhKhKIFHYlT+FLm1SlfMgFzq
-	 SJBxlNc1xyvDcUc0DCHGY6Z4zUbHoz+BSJV5mYhzd3t4p2jyFatJ14K1bybIZNNhuy
-	 vSOsB8hqMe2qQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RPwD802qxz4wZx;
-	Tue, 15 Aug 2023 12:28:07 +1000 (AEST)
-Date: Tue, 15 Aug 2023 12:28:07 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Adham Faris <afaris@nvidia.com>,
- Jianbo Liu <jianbol@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Patrisious Haddad <phaddad@nvidia.com>, Saeed
- Mahameed <saeedm@nvidia.com>
-Subject: linux-next: manual merge of the mlx5-next tree with the net-next
- tree
-Message-ID: <20230815122807.7dddd4a3@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2B923CB
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:30:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8282FC433C9;
+	Tue, 15 Aug 2023 02:30:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692066619;
+	bh=Xj7GAA3+ACLe64FOcRuwMFYQ1DotugxX1/UDMjO6WS8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qthan4dIFt6I8UaxB2oQPxxMA+4VodA+4T31ABcQaUnQBZobwgYByth9Wx6brpIiP
+	 Bz3RfFzIpeoogR2hchugDmwIH942dFVKbc+e6l4iLJfUl6MVJ5McqmUAEWBfK6NcW4
+	 dJgJ1VTlH1i1dJrApVhf/iS4PkCbXKfqT5cZKETOWBc+Cubg0UChlKHDO1uk4iCLdd
+	 f/4t3xSsDDONqOLUDz0/F+qw2ryhxfSgdV9sysdLGbKbyrq2sinjUpVgpiGahYhOQ5
+	 kWDJT+q56lYzLLALYAGjQSjMurd/Sw1zcnOOohj+/CcFVgHSNs823bo69T3aaf9G9c
+	 7Tljxy4OZbEYg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 69351E93B32;
+	Tue, 15 Aug 2023 02:30:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/_+jTWPsYMUYkxIPJb6=edsH";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: veth: Page pool creation error handling for
+ existing pools only
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169206661942.16325.9389282746030868287.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Aug 2023 02:30:19 +0000
+References: <20230812023016.10553-1-liangchen.linux@gmail.com>
+In-Reply-To: <20230812023016.10553-1-liangchen.linux@gmail.com>
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: hawk@kernel.org, horms@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linyunsheng@huawei.com, ilias.apalodimas@linaro.org, daniel@iogearbox.net,
+ ast@kernel.org, netdev@vger.kernel.org
 
---Sig_/_+jTWPsYMUYkxIPJb6=edsH
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Today's linux-next merge of the mlx5-next tree got a conflict in:
+On Sat, 12 Aug 2023 10:30:16 +0800 you wrote:
+> The failure handling procedure destroys page pools for all queues,
+> including those that haven't had their page pool created yet. this patch
+> introduces necessary adjustments to prevent potential risks and
+> inconsistency with the error handling behavior.
+> 
+> Fixes: 0ebab78cbcbf ("net: veth: add page_pool for page recycling")
+> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> 
+> [...]
 
-  include/linux/mlx5/driver.h
+Here is the summary with links:
+  - [net-next,v2] net: veth: Page pool creation error handling for existing pools only
+    https://git.kernel.org/netdev/net/c/8a519a572598
 
-between commits:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  c8e350e62fc5 ("net/mlx5e: Make TC and IPsec offloads mutually exclusive o=
-n a netdev")
-  1f507e80c700 ("net/mlx5: Expose NIC temperature via hardware monitoring k=
-ernel API")
 
-from the net-next tree and commits:
-
-  e26051386a94 ("net/mlx5e: Move MACsec flow steering and statistics databa=
-se from ethernet to core")
-  17c5c415b9cb ("net/mlx5: Add RoCE MACsec steering infrastructure in core")
-
-from the mlx5-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc include/linux/mlx5/driver.h
-index e1c7e502a4fc,728bcd6d184c..000000000000
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@@ -806,9 -804,12 +806,14 @@@ struct mlx5_core_dev=20
-  	struct mlx5_rsc_dump    *rsc_dump;
-  	u32                      vsc_addr;
-  	struct mlx5_hv_vhca	*hv_vhca;
- -	struct mlx5_thermal	*thermal;
- +	struct mlx5_hwmon	*hwmon;
- +	u64			num_block_tc;
- +	u64			num_block_ipsec;
-+ #ifdef CONFIG_MLX5_MACSEC
-+ 	struct mlx5_macsec_fs *macsec_fs;
-+ 	/* MACsec notifier chain to sync MACsec core and IB database */
-+ 	struct blocking_notifier_head macsec_nh;
-+ #endif
-  };
- =20
-  struct mlx5_db {
-
---Sig_/_+jTWPsYMUYkxIPJb6=edsH
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTa4rcACgkQAVBC80lX
-0GwJYAf9HMqfXCGysiiD9uPkWD3jZqMCASMxQDItmcjxYy0A4jCKDKzX8LQarfKT
-7uuOZRmqAlB9MYo2QjZV1MNrxHRUT8Df/hf1tdd/RdSSWo0NWuQuw6i/DVZxdyM3
-uViQFp9h/Eg4LCTkDhdlr+i9Tccdi52O6PhcRnA7F9YmKjqlBXGKJoCd5rPtKm3h
-gJdef1Hp2m+efR+Kwu2Qj337HCY2nvEldD9FA9KB5SKcJ4TFo5HcttASU4FC4M8n
-GLJn0xUiaxU6NIx7kQUvg3PTnJF/59VGGjQogE5Yfjh8xhqAqAAY/1msRAkV88Qs
-q08Pv/Mw05PyWOwpRCp8DuqNRAJZVQ==
-=eB3f
------END PGP SIGNATURE-----
-
---Sig_/_+jTWPsYMUYkxIPJb6=edsH--
 
