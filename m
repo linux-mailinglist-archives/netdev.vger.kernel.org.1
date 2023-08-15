@@ -1,142 +1,109 @@
-Return-Path: <netdev+bounces-27630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D93077C97E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:42:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2359577C98B
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30561C20C7A
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:42:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5FD2813FB
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66244AD28;
-	Tue, 15 Aug 2023 08:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EA5AD5F;
+	Tue, 15 Aug 2023 08:45:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D3E7494
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:41:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA94FC433C7;
-	Tue, 15 Aug 2023 08:41:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692088916;
-	bh=WqQoOnB/jc8Ton23ktHqTDSvzOIg7daMCkV5SRI4gPM=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=KegzqopzoNJ3z0MXzToUFtlYs73e60whma4YHay7nEuhv6CqbmvVEVZsYukjEo0k1
-	 3oiwWcBeKrx4SVHyPvTgnCNI+SKL4KvBa7Q5T0l1g+86y5f10LccrcSSrKnMzcEmZ2
-	 i242c7r5Zig+XQNiqYIpZquKDc4U43oJrsyhm/FX31sQ00rwAYJC9tOQZWuS3Tjc8L
-	 1fVYK/u0kvv2XrDj8ajBqGKc2A5J+OKISGVDYEmvRgKJlzkHNZXAT44RbkyUAhqInY
-	 PNlqiXsYQ3bPAYEBElAEoaXyoP6+O2b1iqklhrw4wnY7Kafj6nEW2pZ1l0CClausIm
-	 skkqbr0EyhcrQ==
-Message-ID: <110797fb-fea6-cb4d-af3c-4665e8246479@kernel.org>
-Date: Tue, 15 Aug 2023 10:41:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DE123CC
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:45:15 +0000 (UTC)
+Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [IPv6:2001:41d0:203:375::20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B3A1998
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:45:09 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1692089107;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d2GQT27JBORMGN4q7RKbUYlAoigLeQM193KWTjK1+1c=;
+	b=FRL/ltyDk6h6CRg5cbkY9bVyLglBaTn6TN1AqP0hvLYmbCo7IPQK7K10OejYDI/exkfKch
+	6u6X9SpuAcMC1xJitcw9cZ/1rhmfJ5U48AMYSFpK2Bsy4fCi0AC+IGqXx9ZTbYi9bkVata
+	zUMcVl/PuRM8qvEN8trILpirtVGTVQA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: kuba@kernel.org, pabeni@redhat.cm, edumazet@google.com,
- aleksander.lobakin@intel.com, hawk@kernel.org, sgoutham@marvell.com,
- gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [PATCH v1 net] octeontx2-pf: fix page_pool creation fail for
- rings > 32k
-Content-Language: en-US
-To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230814132411.2475687-1-rkannoth@marvell.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20230814132411.2475687-1-rkannoth@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v4 02/48] mm: vmscan: move shrinker-related code into a
+ separate file
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230807110936.21819-3-zhengqi.arch@bytedance.com>
+Date: Tue, 15 Aug 2023 16:44:21 +0800
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ david@fromorbit.com,
+ tkhai@ya.ru,
+ Vlastimil Babka <vbabka@suse.cz>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ djwong@kernel.org,
+ Christian Brauner <brauner@kernel.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ tytso@mit.edu,
+ steven.price@arm.com,
+ cel@kernel.org,
+ senozhatsky@chromium.org,
+ yujie.liu@intel.com,
+ gregkh@linuxfoundation.org,
+ simon.horman@corigine.com,
+ dlemoal@kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org,
+ x86@kernel.org,
+ kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org,
+ linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com,
+ linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org,
+ rcu@vger.kernel.org,
+ netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com,
+ linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
 Content-Transfer-Encoding: 7bit
+Message-Id: <BEE5622B-8E74-405C-9A5B-0CF410F8344E@linux.dev>
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-3-zhengqi.arch@bytedance.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
 
-On 14/08/2023 15.24, Ratheesh Kannoth wrote:
-> octeontx2 driver calls page_pool_create() during driver probe()
-> and fails if queue size > 32k. Page pool infra uses these buffers
-> as shock absorbers for burst traffic. These pages are pinned
-> down as soon as page pool is created. 
-
-It isn't true that "pages are pinned down as soon as page pool is created".
-We need to improve this commit text.
-My suggestion:
-
-  These pages are pinned down over time as working sets varies, due to
-  the recycling nature of page pool, given page pool (currently) don't
-  have a shrinker mechanism, the pages remain pinned down in ptr_ring.
-
-> As page pool does direct
-> recycling way more aggressivelyi, often times ptr_ring is left
-                                  ^
-Typo
-(my suggestion already covers recycling)
-
-> unused at all. Instead of clamping page_pool size to 32k at
-> most, limit it even more to 2k to avoid wasting memory on much
-> less used ptr_ring.
-
-I would adjust and delete "much less used".
-
-I assume you have the octeontx2 hardware available (which I don't).
-Can you test that this adjustment to 2k doesn't cause a performance
-regression on your hardware?
-And then produce a statement in the commit desc like:
-
-  This have been tested on octeontx2 hardware (devel board xyz).
-  TCP and UDP tests using netperf shows not performance regressions.
-
-
-2K with page_size 4KiB is around 8MiB if PP gets full.
-
-It would be convincing if commit message said e.g. PP pool_size 2k can
-maximum pin down 8MiB per RX-queue (assuming page size 4K), but that is
-okay as systems using octeontx2 hardware often have many GB of memory.
-
+> On Aug 7, 2023, at 19:08, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
 > 
-> Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> The mm/vmscan.c file is too large, so separate the shrinker-related
+> code from it into a separate file. No functional changes.
 > 
-> ---
-> 
-> ChangeLogs:
-> 
-> v0->v1: Commit message changes.
-> ---
-> ---
->   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
->   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h | 2 ++
->   2 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> index 77c8f650f7ac..fc8a1220eb39 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> @@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
->   	}
->   
->   	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
-> -	pp_params.pool_size = numptrs;
-> +	pp_params.pool_size = OTX2_PAGE_POOL_SZ;
->   	pp_params.nid = NUMA_NO_NODE;
->   	pp_params.dev = pfvf->dev;
->   	pp_params.dma_dir = DMA_FROM_DEVICE;
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> index ba8091131ec0..f6fea43617ff 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> @@ -30,6 +30,8 @@
->   #include <rvu_trace.h>
->   #include "qos.h"
->   
-> +#define OTX2_PAGE_POOL_SZ 2048
-> +
->   /* IPv4 flag more fragment bit */
->   #define IPV4_FLAG_MORE				0x20
->   
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+
 
