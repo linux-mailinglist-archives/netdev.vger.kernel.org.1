@@ -1,115 +1,272 @@
-Return-Path: <netdev+bounces-27601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5260877C83C
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:59:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8CC77C83F
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 09:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D041C20C2D
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 06:59:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1649281386
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 07:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88BA6FA9;
-	Tue, 15 Aug 2023 06:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC68479DC;
+	Tue, 15 Aug 2023 07:01:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD961857
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:59:48 +0000 (UTC)
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A2219A0
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 23:59:44 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id e9e14a558f8ab-34ab3599df8so19075ab.0
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 23:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692082784; x=1692687584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oPApdsQIHjX5ZEMalsPZBQcxVIzaH6ygbukwtyI6E2o=;
-        b=GUFsP+WjmGRjNsI8S+wEJo5xg2pTrLmvtGgoK2iUlBrFGs5YT3iiM6yrMfGwETMW/Z
-         v00RoS6Jxy3ICz6eb6nutJ0pwpxDwZ++7NuSMHAHTo1zwLZqIVOKNsZT1p8HeSSJzOe/
-         OndWy+qBxWEosMRRgcJiVWPs/gL5zYvF4jzaAiU6ZkuXglvBULDdH5iCRCc4BbRM/N+7
-         Y7EalEx5mY8UOrTuyt9yOXREBzYNjSnnfj+DH2GL2Nf/+lGLL4B6/G1ltiYHr8pAcDGk
-         ulsJgj4mw5Rp0WPUq2xbkPnrFwCPGc8rlvNhmWQUjOEXSXxVIkGLeiW5BTaBrE4/FLyu
-         AzLg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F942185D
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 07:01:29 +0000 (UTC)
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D451FC9
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 00:01:27 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-99bded9d93dso110880066b.1
+        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 00:01:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692082784; x=1692687584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oPApdsQIHjX5ZEMalsPZBQcxVIzaH6ygbukwtyI6E2o=;
-        b=FfY2xsgDFp8ivGmz1s5rCF2q6fbMsKByUstxRNmrojFISdoRLcu5AxDIrZZfXcYH9v
-         TovE/Al7a5bPBpRjUKgfOY5NKHqdc+s2D+NjW4kidn9V4qkTnXCIxHZlZKmZ0MFt3Hd8
-         Wqs3oErhFbYWYP31fQ/rIGwA8u76BTQlC29ddR9fGUbhZp4t4WMfxFFm1jpxFEQwpD6K
-         TdPV/rcbCwAq6wnTP2PgSJJ/rTl7HussUIxwGNyZy5ECs0EtqTd0E5yszePdjrxaYIYm
-         h91MR+7eb0cbfNRkRPChkZyu65zisa4Zyr7CbwNPblLn/T2kXQtjnAVn0TvDVWLjS4aL
-         zupg==
-X-Gm-Message-State: AOJu0Yz99JaW2I+OBuosQi2jP24fcdBr6b65wCZCZPZ6wluWCJSEyyZc
-	Ak9TV6M4blReTtDiuCxqJGWKXa8F6vUo+/SgiiiDig==
-X-Google-Smtp-Source: AGHT+IHZakWR7fnuvNC605Ms2oumG3fmoNqdaL4iM2iv3HyGaf/orS3GKaJJIOxuYZN4XMAn8qW0bE705EIca9RB7K8=
-X-Received: by 2002:a05:6e02:214b:b0:349:1dfe:ff2a with SMTP id
- d11-20020a056e02214b00b003491dfeff2amr801645ilv.19.1692082784077; Mon, 14 Aug
- 2023 23:59:44 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692082885; x=1692687685;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kW5rUcBUNkKENpM5TxSALtfybP7YaSOa8PTQFN1lGLw=;
+        b=FyjdTkLDun48Phzv9bHwFXL+hB/mI11llfXEmzOs9zWnHvGYyZLeYxbgae2K8QsEn1
+         bpMB2LXrdWi4jmxg+NuLqieaotYfWK8qbxFpthfyHgYnIIPcqaC/gp7QLKcfvZw5ryfF
+         65Z1HXfVrMzg0c54A5iYr5md1/wvyoPuxeHm9kd8xuqLb505lIff4bB6RcxswqfF7CeC
+         cM2HpJU576v5hb+BxUweEk1TZXpMoGvQ/TIFszcND4Y9Zb3cDEohHl5h6wyJx4V2EW3X
+         wST/E0GB/4NDPP6RpHx6fgTa6KnmoNlLBM8JLhz40xHfxp5vTlK4I0CDP1UqAW4dH+3a
+         e9kw==
+X-Gm-Message-State: AOJu0YwrezznWjlNs7ENOdmh2gIb0crktxpwUVLBjF/qXKnEZCOkjmjk
+	pgEosZvSQYOfHE7mvI9n8Eo=
+X-Google-Smtp-Source: AGHT+IHbtKsmqwWTlucfMvubexMctgEqw9CNRShuZMwyRY9akQ145vMpCRn2GiEUzehunpWfLc9vTA==
+X-Received: by 2002:a17:906:19:b0:993:d0e1:f308 with SMTP id 25-20020a170906001900b00993d0e1f308mr8286680eja.2.1692082885262;
+        Tue, 15 Aug 2023 00:01:25 -0700 (PDT)
+Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id jo19-20020a170906f6d300b0099bcd1fa5b0sm6613092ejb.192.2023.08.15.00.01.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Aug 2023 00:01:24 -0700 (PDT)
+Message-ID: <ce3453f8-807b-301c-f18a-3d7a7bc0bca7@grimberg.me>
+Date: Tue, 15 Aug 2023 10:01:21 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230811023747.12065-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20230811023747.12065-1-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Aug 2023 08:59:32 +0200
-Message-ID: <CANn89i+RkWM6ZV4xzfTcPNG9o2J7bggTmzuOZi=MWMHxqdkauw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net: fix the RTO timer retransmitting skb every
- 1ms if linear option is enabled
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, apetlund@simula.no, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 15/17] nvmet-tcp: enable TLS handshake upcall
+Content-Language: en-US
+To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230814111943.68325-1-hare@suse.de>
+ <20230814111943.68325-16-hare@suse.de>
+ <cf21000c-177e-c882-ac30-fe3190748bae@grimberg.me>
+ <bebf00fb-be2d-d6da-bd7f-4e610095decc@suse.de>
+ <a7e01b78-52ba-9576-6d71-6d1f81aecd44@grimberg.me>
+ <fdb8caf7-78cc-c39b-3dda-2d9db4128a34@suse.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <fdb8caf7-78cc-c39b-3dda-2d9db4128a34@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 11, 2023 at 4:38=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> In the real workload, I encountered an issue which could cause the RTO
-> timer to retransmit the skb per 1ms with linear option enabled. The amoun=
-t
-> of lost-retransmitted skbs can go up to 1000+ instantly.
->
-> The root cause is that if the icsk_rto happens to be zero in the 6th roun=
-d
-> (which is the TCP_THIN_LINEAR_RETRIES value), then it will always be zero
-> due to the changed calculation method in tcp_retransmit_timer() as follow=
-s:
->
-> icsk->icsk_rto =3D min(icsk->icsk_rto << 1, TCP_RTO_MAX);
->
-> Above line could be converted to
-> icsk->icsk_rto =3D min(0 << 1, TCP_RTO_MAX) =3D 0
->
-> Therefore, the timer expires so quickly without any doubt.
->
-> I read through the RFC 6298 and found that the RTO value can be rounded
-> up to a certain value, in Linux, say TCP_RTO_MIN as default, which is
-> regarded as the lower bound in this patch as suggested by Eric.
->
-> Fixes: 36e31b0af587 ("net: TCP thin linear timeouts")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+>>>>> @@ -1864,6 +1877,14 @@ static struct config_group 
+>>>>> *nvmet_ports_make(struct config_group *group,
+>>>>>           return ERR_PTR(-ENOMEM);
+>>>>>       }
+>>>>> +    if (nvme_keyring_id()) {
+>>>>> +        port->keyring = key_lookup(nvme_keyring_id());
+>>>>> +        if (IS_ERR(port->keyring)) {
+>>>>> +            pr_warn("NVMe keyring not available, disabling TLS\n");
+>>>>> +            port->keyring = NULL;
+>>>>
+>>>> why setting this to NULL?
+>>>>
+>>> It's check when changing TSAS; we can only enable TLS if the nvme 
+>>> keyring is available.
+>>
+>> ok
+>>
+>>>
+>>>>> +        }
+>>>>> +    }
+>>>>> +
+>>>>>       for (i = 1; i <= NVMET_MAX_ANAGRPS; i++) {
+>>>>>           if (i == NVMET_DEFAULT_ANA_GRPID)
+>>>>>               port->ana_state[1] = NVME_ANA_OPTIMIZED;
+>>>>> diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+>>>>> index 8cfd60f3b564..7f9ae53c1df5 100644
+>>>>> --- a/drivers/nvme/target/nvmet.h
+>>>>> +++ b/drivers/nvme/target/nvmet.h
+>>>>> @@ -158,6 +158,7 @@ struct nvmet_port {
+>>>>>       struct config_group        ana_groups_group;
+>>>>>       struct nvmet_ana_group        ana_default_group;
+>>>>>       enum nvme_ana_state        *ana_state;
+>>>>> +    struct key            *keyring;
+>>>>>       void                *priv;
+>>>>>       bool                enabled;
+>>>>>       int                inline_data_size;
+>>>>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+>>>>> index f19ea9d923fd..77fa339008e1 100644
+>>>>> --- a/drivers/nvme/target/tcp.c
+>>>>> +++ b/drivers/nvme/target/tcp.c
+>>>>> @@ -8,9 +8,13 @@
+>>>>>   #include <linux/init.h>
+>>>>>   #include <linux/slab.h>
+>>>>>   #include <linux/err.h>
+>>>>> +#include <linux/key.h>
+>>>>>   #include <linux/nvme-tcp.h>
+>>>>> +#include <linux/nvme-keyring.h>
+>>>>>   #include <net/sock.h>
+>>>>>   #include <net/tcp.h>
+>>>>> +#include <net/tls.h>
+>>>>> +#include <net/handshake.h>
+>>>>>   #include <linux/inet.h>
+>>>>>   #include <linux/llist.h>
+>>>>>   #include <crypto/hash.h>
+>>>>> @@ -66,6 +70,16 @@ device_param_cb(idle_poll_period_usecs, 
+>>>>> &set_param_ops,
+>>>>>   MODULE_PARM_DESC(idle_poll_period_usecs,
+>>>>>           "nvmet tcp io_work poll till idle time period in usecs: 
+>>>>> Default 0");
+>>>>> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+>>>>> +/*
+>>>>> + * TLS handshake timeout
+>>>>> + */
+>>>>> +static int tls_handshake_timeout = 10;
+>>>>> +module_param(tls_handshake_timeout, int, 0644);
+>>>>> +MODULE_PARM_DESC(tls_handshake_timeout,
+>>>>> +         "nvme TLS handshake timeout in seconds (default 10)");
+>>>>> +#endif
+>>>>> +
+>>>>>   #define NVMET_TCP_RECV_BUDGET        8
+>>>>>   #define NVMET_TCP_SEND_BUDGET        8
+>>>>>   #define NVMET_TCP_IO_WORK_BUDGET    64
+>>>>> @@ -122,11 +136,13 @@ struct nvmet_tcp_cmd {
+>>>>>   enum nvmet_tcp_queue_state {
+>>>>>       NVMET_TCP_Q_CONNECTING,
+>>>>> +    NVMET_TCP_Q_TLS_HANDSHAKE,
+>>>>>       NVMET_TCP_Q_LIVE,
+>>>>>       NVMET_TCP_Q_DISCONNECTING,
+>>>>>   };
+>>>>>   struct nvmet_tcp_queue {
+>>>>> +    struct kref        kref;
+>>>>
+>>>> Why is kref the first member of the struct?
+>>>>
+>>> Habit.
+>>> I don't mind where it'll end up.
+>>
+>> Move it to the back together with the tls section.
+>>
+>>>
+>>>>>       struct socket        *sock;
+>>>>>       struct nvmet_tcp_port    *port;
+>>>>>       struct work_struct    io_work;
+>>>>> @@ -155,6 +171,10 @@ struct nvmet_tcp_queue {
+>>>>>       struct ahash_request    *snd_hash;
+>>>>>       struct ahash_request    *rcv_hash;
+>>>>> +    /* TLS state */
+>>>>> +    key_serial_t        tls_pskid;
+>>>>> +    struct delayed_work    tls_handshake_work;
+>>>>> +
+>>>>>       unsigned long           poll_end;
+>>>>>       spinlock_t        state_lock;
+>>>>> @@ -1283,12 +1303,21 @@ static int nvmet_tcp_try_recv(struct 
+>>>>> nvmet_tcp_queue *queue,
+>>>>>       return ret;
+>>>>>   }
+>>>>> +static void nvmet_tcp_release_queue(struct kref *kref)
+>>>>> +{
+>>>>> +    struct nvmet_tcp_queue *queue =
+>>>>> +        container_of(kref, struct nvmet_tcp_queue, kref);
+>>>>> +
+>>>>> +    WARN_ON(queue->state != NVMET_TCP_Q_DISCONNECTING);
+>>>>> +    queue_work(nvmet_wq, &queue->release_work);
+>>>>> +}
+>>>>> +
+>>>>>   static void nvmet_tcp_schedule_release_queue(struct 
+>>>>> nvmet_tcp_queue *queue)
+>>>>>   {
+>>>>>       spin_lock_bh(&queue->state_lock);
+>>>>>       if (queue->state != NVMET_TCP_Q_DISCONNECTING) {
+>>>>>           queue->state = NVMET_TCP_Q_DISCONNECTING;
+>>>>> -        queue_work(nvmet_wq, &queue->release_work);
+>>>>> +        kref_put(&queue->kref, nvmet_tcp_release_queue);
+>>>>>       }
+>>>>>       spin_unlock_bh(&queue->state_lock);
+>>>>>   }
+>>>>> @@ -1485,6 +1514,8 @@ static void 
+>>>>> nvmet_tcp_release_queue_work(struct work_struct *w)
+>>>>>       mutex_unlock(&nvmet_tcp_queue_mutex);
+>>>>>       nvmet_tcp_restore_socket_callbacks(queue);
+>>>>> +    tls_handshake_cancel(queue->sock->sk);
+>>>>> +    cancel_delayed_work_sync(&queue->tls_handshake_work);
+>>>>
+>>>> We should call it tls_handshake_tmo_work or something to make it
+>>>> clear it is a timeout work.
+>>>>
+>>> Okay.
+>>>
+>>>>>       cancel_work_sync(&queue->io_work);
+>>>>>       /* stop accepting incoming data */
+>>>>>       queue->rcv_state = NVMET_TCP_RECV_ERR;
+>>>>> @@ -1512,8 +1543,13 @@ static void nvmet_tcp_data_ready(struct sock 
+>>>>> *sk)
+>>>>>       read_lock_bh(&sk->sk_callback_lock);
+>>>>>       queue = sk->sk_user_data;
+>>>>> -    if (likely(queue))
+>>>>> -        queue_work_on(queue_cpu(queue), nvmet_tcp_wq, 
+>>>>> &queue->io_work);
+>>>>> +    if (likely(queue)) {
+>>>>> +        if (queue->data_ready)
+>>>>> +            queue->data_ready(sk);
+>>>>> +        if (queue->state != NVMET_TCP_Q_TLS_HANDSHAKE)
+>>>>> +            queue_work_on(queue_cpu(queue), nvmet_tcp_wq,
+>>>>> +                      &queue->io_work);
+>>>>> +    }
+>>>>>       read_unlock_bh(&sk->sk_callback_lock);
+>>>>>   }
+>>>>> @@ -1621,6 +1657,83 @@ static int nvmet_tcp_set_queue_sock(struct 
+>>>>> nvmet_tcp_queue *queue)
+>>>>>       return ret;
+>>>>>   }
+>>>>> +#ifdef CONFIG_NVME_TARGET_TCP_TLS
+>>>>> +static void nvmet_tcp_tls_handshake_done(void *data, int status,
+>>>>> +                     key_serial_t peerid)
+>>>>> +{
+>>>>> +    struct nvmet_tcp_queue *queue = data;
+>>>>> +
+>>>>> +    pr_debug("queue %d: TLS handshake done, key %x, status %d\n",
+>>>>> +         queue->idx, peerid, status);
+>>>>> +    spin_lock_bh(&queue->state_lock);
+>>>>> +    if (queue->state != NVMET_TCP_Q_TLS_HANDSHAKE) {
+>>>>
+>>>> Is this even possible?
+>>>>
+>>> I guess it can happen when the socket closes during handshake; the 
+>>> daemon might still be sending a 'done' event but 
+>>> nvmet_tcp_schedule_release_queue() has been called.
+>>
+>> Umm, if the socket closes during the handshake then the state
+>> is NVMET_TCP_Q_TLS_HANDSHAKE.
+>>
+> But there's a race window between setting it to 
+> NVMET_TCP_Q_DISCONNECTING and calling tls_handshake_cancel().
+> 
+>> p.s. you call handshake cancel in the release flow so you should be
+>> fenced properly no?
+> Not really. But I'll check if I can fix it up.
+
+The teardown handling feels complicated to me.
+
+How are you testing it btw?
 
