@@ -1,130 +1,131 @@
-Return-Path: <netdev+bounces-27682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683AC77CD76
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:43:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D552877CD9F
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95F151C20D1F
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16BAC2814E3
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3554312B67;
-	Tue, 15 Aug 2023 13:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55007134A3;
+	Tue, 15 Aug 2023 13:56:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2258832
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4609412B9D
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:56:44 +0000 (UTC)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC019199A;
-	Tue, 15 Aug 2023 06:43:32 -0700 (PDT)
-Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RQC921v0szVk3h;
-	Tue, 15 Aug 2023 21:41:26 +0800 (CST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A70EE;
+	Tue, 15 Aug 2023 06:56:42 -0700 (PDT)
+Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RQCQW2jjkzNm9h;
+	Tue, 15 Aug 2023 21:53:07 +0800 (CST)
 Received: from localhost.localdomain (10.175.104.82) by
  kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 15 Aug 2023 21:43:29 +0800
+ 15.1.2507.31; Tue, 15 Aug 2023 21:56:37 +0800
 From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <leon@kernel.org>
-CC: <fw@strlen.de>, <steffen.klassert@secunet.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <timo.teras@iki.fi>,
-	<yuehaibing@huawei.com>, <weiyongjun1@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [Patch net, v2] net: xfrm: skip policies marked as dead while reinserting policies
-Date: Tue, 15 Aug 2023 21:43:28 +0800
-Message-ID: <20230815123233.GM22185@unreal>
+To: <kernel@openeuler.org>
+CC: <duanzi@zju.edu.cn>, <yuehaibing@huawei.com>, <weiyongjun1@huawei.com>,
+	<liujian56@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Eric Dumazet
+	<edumazet@google.com>, Lorenzo Colitti <lorenzo@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Pietro Borrello <borrello@diag.uniroma1.it>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>, "David S . Miller"
+	<davem@davemloft.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dong
+ Chenchen <dongchenchen2@huawei.com>
+Subject: [PATCH OLK-5.10 v2 1/2] net: tun_chr_open(): set sk_uid from current_fsuid()
+Date: Tue, 15 Aug 2023 21:56:01 +0800
+Message-ID: <20230815135602.1014881-2-dongchenchen2@huawei.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230815091324.GL22185@unreal>
-References: <20230814140013.712001-1-dongchenchen2@huawei.com> <20230815060026.GE22185@unreal> <20230815091324.GL22185@unreal>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+In-Reply-To: <20230815135602.1014881-1-dongchenchen2@huawei.com>
+References: <20230815135602.1014881-1-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  kwepemi500026.china.huawei.com (7.221.188.247)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 15, 2023 at 07:35:13PM +0800, Dong Chenchen wrote:
->> >> The walker object initialized by xfrm_policy_walk_init() doesnt have policy. 
->> >> list_for_each_entry() will use the walker offset to calculate policy address.
->> >> It's nonexistent and different from invalid dead policy. It will read memory 
->> >> that doesnt belong to walker if dereference policy->index.
->> >> I think we should protect the memory.
->> >
->> >But all operations here are an outcome of "list_for_each_entry(policy,
->> >&net->xfrm.policy_all, walk.all)" which stores in policy iterator
->> >the pointer to struct xfrm_policy.
->> >
->> >How at the same time access to policy->walk.dead is valid while
->> >policy->index is not?
->> >
->> >Thanks
->> 1.walker init: its only a list head, no policy
->> xfrm_dump_policy_start
->> 	xfrm_policy_walk_init(walk, XFRM_POLICY_TYPE_ANY);
->> 		INIT_LIST_HEAD(&walk->walk.all);
->> 		walk->walk.dead = 1;
->> 
->> 2.add the walk head to net->xfrm.policy_all
->> xfrm_policy_walk
->>     list_for_each_entry_from(x, &net->xfrm.policy_all, all)
->> 	if (error) {
->> 		list_move_tail(&walk->walk.all, &x->all);
->> 		//add the walk to list tail
->> 
->> 3.traverse the walk list
->> xfrm_policy_flush
->> list_for_each_entry(pol, &net->xfrm.policy_all, walk.all)
->> 	 dir = xfrm_policy_id2dir(pol->index);
->> 
->> it gets policy by &net->xfrm.policy_all-0x130(offset of walk in policy)
->> but when walk is head, we will read others memory by the calculated policy.
->> such as:
->>   walk addr  		policy addr
->> 0xffff0000d7f3b530    0xffff0000d7f3b400 (non-existent) 
->> 
->> head walker of net->xfrm.policy_all can be skipped by  list_for_each_entry().
->> but the walker created by socket is located list tail. so we should skip it. 
->
->list_for_each_entry_from(x, &net->xfrm.policy_all, all) gives you
->pointer to "x", you can't access some of its fields and say they
->exist and other doesn't. Once you can call to "x->...", you can 
->call to "x->index" too.
->
->Thanks
-We get a pointer addr not actual variable from list_for_each_entry_from(),
-that calculated by walk address dec offset from struct xfrm_policy(0x130).
+From: Laszlo Ersek <lersek@redhat.com>
 
-walk addr: 0xffff0000d7f3b530 //allocated by socket, valid
--> dec 0x130 (use macro container_of)
-policy_addr:0xffff0000d7f3b400 //only a pointer addr
--> add 0x130 
-policy->walk:0xffff0000d7f3b530 //its still walker head
+stable inclusion
+from stable-v5.10.189
+commit 5ea23f1cb67e4468db7ff651627892c9217fec24
+category: bugfix
+bugzilla: 189104, https://gitee.com/src-openeuler/kernel/issues/I7QXHX
+CVE: CVE-2023-4194
 
-I think its invalid to read policy->index from memory that maybe allocated
-by other user.
+Reference: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=5ea23f1cb67e4468db7ff651627892c9217fec24
 
-Thanks!
-Dong Chenchen
+---------------------------
+
+commit 9bc3047374d5bec163e83e743709e23753376f0c upstream.
+
+Commit a096ccca6e50 initializes the "sk_uid" field in the protocol socket
+(struct sock) from the "/dev/net/tun" device node's owner UID. Per
+original commit 86741ec25462 ("net: core: Add a UID field to struct
+sock.", 2016-11-04), that's wrong: the idea is to cache the UID of the
+userspace process that creates the socket. Commit 86741ec25462 mentions
+socket() and accept(); with "tun", the action that creates the socket is
+open("/dev/net/tun").
+
+Therefore the device node's owner UID is irrelevant. In most cases,
+"/dev/net/tun" will be owned by root, so in practice, commit a096ccca6e50
+has no observable effect:
+
+- before, "sk_uid" would be zero, due to undefined behavior
+  (CVE-2023-1076),
+
+- after, "sk_uid" would be zero, due to "/dev/net/tun" being owned by root.
+
+What matters is the (fs)UID of the process performing the open(), so cache
+that in "sk_uid".
+
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Pietro Borrello <borrello@diag.uniroma1.it>
+Cc: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org
+Fixes: a096ccca6e50 ("tun: tun_chr_open(): correctly initialize socket uid")
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2173435
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+---
+ drivers/net/tun.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index f8feec522b32..50c2ce392cd1 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -3456,7 +3456,7 @@ static int tun_chr_open(struct inode *inode, struct file * file)
+ 	tfile->socket.file = file;
+ 	tfile->socket.ops = &tun_socket_ops;
+ 
+-	sock_init_data_uid(&tfile->socket, &tfile->sk, inode->i_uid);
++	sock_init_data_uid(&tfile->socket, &tfile->sk, current_fsuid());
+ 
+ 	tfile->sk.sk_write_space = tun_sock_write_space;
+ 	tfile->sk.sk_sndbuf = INT_MAX;
+-- 
+2.25.1
+
 
