@@ -1,174 +1,330 @@
-Return-Path: <netdev+bounces-27751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECEC677D181
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:08:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBACD77D190
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6B1E1C20D42
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:08:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 826232815D3
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709C8174E3;
-	Tue, 15 Aug 2023 18:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D7117AA8;
+	Tue, 15 Aug 2023 18:14:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659EB13AFD
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:08:52 +0000 (UTC)
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6C7106;
-	Tue, 15 Aug 2023 11:08:50 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-76c845dc5beso349174685a.1;
-        Tue, 15 Aug 2023 11:08:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3817E15AF9
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:14:15 +0000 (UTC)
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4224310DA;
+	Tue, 15 Aug 2023 11:14:14 -0700 (PDT)
+Received: by mail-vs1-xe2b.google.com with SMTP id ada2fe7eead31-4477b141804so2433212137.3;
+        Tue, 15 Aug 2023 11:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692122930; x=1692727730;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Vxb3z1IyIN9TwyIHVuiJGwsFwB19zV9fp6dkcldmjA=;
-        b=qRpYBpjBwulpss0QRfUXJOB9fnOl/4njSUxgWt8Z0iLYXxrSEvpm9Luw07J/wSUsJ7
-         UshR1GlpAjpuG2jJ+9bjQ0Wo2vqMsuIFbA9I7I+wfs9u6wF4XDXdu4dKE/hmi5De4fPP
-         mDExX4qTnkdP47pprV0E4cXII6lcqyD2cJD1jmcKIU3yucmQl0IL90RlWkLGbj0UGlww
-         jBmXwoKd/+wndytZKpCks2hmR6YTdmqZm0vOis5CdJJRrURWiPbgGbH3gCNU9l5ckGgl
-         EVqS1vWPhFkSLhJ2/yFuDpCpywkcBldC7IHjYuZpihFQ8mgbUQTuSykAFO4nhztRWVw/
-         mIAQ==
+        d=gmail.com; s=20221208; t=1692123253; x=1692728053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UZOfs+JDTQ4+3DRFCCDNSBcuJ2PAqaLR2VayYXscEA0=;
+        b=kvjJjLtsFzvjfYxkZejHrqzGzGFN6oxsg9J1+fjeQzkSzdTjwx0/mLrMKMovHEDsUi
+         EoEmRBSn06ViaIP/ujhPvD7JazEA+tVHLNM39PqYin5/K2EU08UG/ihhFHV0cofM3VAD
+         Re+5DTkkZsnGSbTmIOPC0+NACl34SrohXiwqtaYDlcVGAQ9uD7obuX1+SZ3Zu8xNU4ys
+         IuOt1cWjoCvIGQnayZdnvoLLIESuGJARZAwd/xrbEMYAuQ5Q+NN4StNAW1vIQpooxcfk
+         QH3w4+XAIP14us6L7ci7okbfi56hk9ninmT8J1ewkTRK8FCn/GkRm+0HWMKg6y8yMkNU
+         HFzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692122930; x=1692727730;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9Vxb3z1IyIN9TwyIHVuiJGwsFwB19zV9fp6dkcldmjA=;
-        b=Oom5/jTgxw/V5Ts2W57QL/CeW3eU9dMLblbkD8NrnbJN9iWRy0M5FfTgT8Js7UIk0Z
-         lfF6Je1wLbJGoQwde96j9/3COftmLyve/+3q80ARgcRI+FPQHe5Rj35Xe9HCWsRCMcYl
-         sHpHbr2HGSQ5zJEcO//+3cklrU4Za8jvQGeJXnRt2SquUbtCMFpexhqOWg7ydh8HyjGv
-         UqNWv88qFijVs0FtbGNBhY/d3DGrJxhzHnAS675gClwIognfKFofNh2NhEjFszQHTRZ+
-         KYMGzeVdbHn5oJ/KgpPbVxANIx+puqku7UzfMZL6D2G8jEZxOS/n1zjsuZSuwcfdW5Yd
-         GCxg==
-X-Gm-Message-State: AOJu0YxLrMe2LvMm8606Z4qXoPm1h+0jTOH040kRea4VBaXzou57TJKV
-	O8dovG2293yZV8PW2vbyJ61lrYqsoNNLVg==
-X-Google-Smtp-Source: AGHT+IHRA5lORqlA0Yf1DFvIYlvudekPcuFkO7x81IuuWMG6eZd+uQwGVZuHRUwp/XUz0Iu9zmcepw==
-X-Received: by 2002:a05:620a:4712:b0:76c:cb3c:30c with SMTP id bs18-20020a05620a471200b0076ccb3c030cmr13889648qkb.52.1692122929813;
-        Tue, 15 Aug 2023 11:08:49 -0700 (PDT)
-Received: from wsfd-netdev15.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id w7-20020ae9e507000000b00767d572d651sm3907916qkf.87.2023.08.15.11.08.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 11:08:49 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-Subject: [PATCHv2 nf] netfilter: set default timeout to 3 secs for sctp shutdown send and recv state
-Date: Tue, 15 Aug 2023 14:08:47 -0400
-Message-Id: <4f2f3f3e0402c41ed46483dc9254dc6d71f06ceb.1692122927.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.39.1
+        d=1e100.net; s=20221208; t=1692123253; x=1692728053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UZOfs+JDTQ4+3DRFCCDNSBcuJ2PAqaLR2VayYXscEA0=;
+        b=SxaE3w3Rm3KWWaJyv1Er3eCpo5fwqwnrtBMNhUFnExJc7LWDFZ+fEPiniuJC1PBI0K
+         vbPJKHlmYmAPwkVchDgtNaxTD+rmQ1LvULcpbyTUkppSFXAVlbEOvF+C5VrVwKcEUtuu
+         BCIEo60vrEbSCrHjy+IO3sBmkHjXp5jHRPeyxo4JzZFmatRIoDC32AJOh4lTVT+yKdyj
+         ubfsTx7jTw9WyfSBg/HWC0gjxjpwqLQtdkqgVxX+3Ds1JwQGbgV8FEhm40ykSDNXQS1n
+         TJQkdqhjLlS9aWVL44S5tCbEA/sZn5+mN7j4URe2ZpNNkPZ2Y2w3qNBpkgrrIAgIJd6B
+         u3rw==
+X-Gm-Message-State: AOJu0Yzxjt+xeCw+nuKXbBhmCGmjTw4VmeFrZDSA9udm+inb9pUmGnLB
+	6G+mhv5biAY53Tv93uhURwS4ki8UgVrN+3D+gq4=
+X-Google-Smtp-Source: AGHT+IECRziSqxda8Q6xU6Txx5TmbWe/AfWN2vBt/Fet2IM5yIw2GD2WwIBUZyIXD2pqePeX0zZVaMhj6gfl5wmdamI=
+X-Received: by 2002:a67:f80d:0:b0:443:6deb:2b4 with SMTP id
+ l13-20020a67f80d000000b004436deb02b4mr14457488vso.2.1692123253105; Tue, 15
+ Aug 2023 11:14:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230814171845.65930-1-feliu@nvidia.com> <ZNtYpohWyjnb883M@vergenet.net>
+ <05348d62-586c-4b1f-40bd-5541caca0947@nvidia.com> <ZNunz1hbqPKpcOgA@vergenet.net>
+In-Reply-To: <ZNunz1hbqPKpcOgA@vergenet.net>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Tue, 15 Aug 2023 14:13:36 -0400
+Message-ID: <CAF=yD-L+d34Uuvt3sOFOnxXhMmoMXNfHzcaSPk=t1PtiPUHZ1g@mail.gmail.com>
+Subject: Re: [PATCH net v1] virtio_net: Introduce skb_vnet_common_hdr to avoid typecasting
+To: Simon Horman <horms@kernel.org>
+Cc: Feng Liu <feliu@nvidia.com>, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Bodong Wang <bodong@nvidia.com>, 
+	Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In SCTP protocol, it is using the same timer (T2 timer) for SHUTDOWN and
-SHUTDOWN_ACK retransmission. However in sctp conntrack the default timeout
-value for SCTP_CONNTRACK_SHUTDOWN_ACK_SENT state is 3 secs while it's 300
-msecs for SCTP_CONNTRACK_SHUTDOWN_SEND/RECV state.
+On Tue, Aug 15, 2023 at 12:29=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Tue, Aug 15, 2023 at 11:09:02AM -0400, Feng Liu wrote:
+> >
+> >
+> > On 2023-08-15 a.m.6:51, Simon Horman wrote:
+> > > External email: Use caution opening links or attachments
+> > >
+> > >
+> > > On Mon, Aug 14, 2023 at 01:18:45PM -0400, Feng Liu wrote:
+> > >
+> > > + "David S. Miller" <davem@davemloft.net>
+> > >    Eric Dumazet <edumazet@google.com>
+> > >    Jakub Kicinski <kuba@kernel.org>
+> > >    Paolo Abeni <pabeni@redhat.com>
+> > >
+> > Thanks for adding David S. Miller.
+> >
+> > > > The virtio_net driver currently deals with different versions and t=
+ypes
+> > > > of virtio net headers, such as virtio_net_hdr_mrg_rxbuf,
+> > > > virtio_net_hdr_v1_hash, etc. Due to these variations, the code reli=
+es
+> > > > on multiple type casts to convert memory between different structur=
+es,
+> > > > potentially leading to bugs when there are changes in these structu=
+res.
+> > > >
+> > > > Introduces the "struct skb_vnet_common_hdr" as a unifying header
+> > > > structure using a union. With this approach, various virtio net hea=
+der
+> > > > structures can be converted by accessing different members of this
+> > > > structure, thus eliminating the need for type casting and reducing =
+the
+> > > > risk of potential bugs.
+> > > >
+> > > > For example following code:
+> > > > static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+> > > >                struct receive_queue *rq,
+> > > >                struct page *page, unsigned int offset,
+> > > >                unsigned int len, unsigned int truesize,
+> > > >                unsigned int headroom)
+> > > > {
+> > > > [...]
+> > > >        struct virtio_net_hdr_mrg_rxbuf *hdr;
+> > > > [...]
+> > > >        hdr_len =3D vi->hdr_len;
+> > > > [...]
+> > > > ok:
+> > > >        hdr =3D skb_vnet_hdr(skb);
+> > > >        memcpy(hdr, hdr_p, hdr_len);
+> > > > [...]
+> > > > }
+> > > >
+> > > > When VIRTIO_NET_F_HASH_REPORT feature is enabled, hdr_len =3D 20
+> > > > But the sizeof(*hdr) is 12,
+> > > > memcpy(hdr, hdr_p, hdr_len); will copy 20 bytes to the hdr,
+> > > > which make a potential risk of bug. And this risk can be avoided by
+> > > > introducing struct virtio_net_hdr_mrg_rxbuf.
+> > > >
+> > > > Signed-off-by: Feng Liu <feliu@nvidia.com>
+> > > > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> > >
+> > > I'm unsure if this is 'net' material.
+> > >
+> >
+> > It is about the modification of the virtio_net driver. I think it shoul=
+d be
+> > regarded as `net` material.
+>
+> To clarify: In general new Networking features go via the net-next tree,
+> while bug fixes go via the net tree. I was suggesting this
+> is more appropriate for net-next, and that should be reflected in the
+> subject.
+>
+>         Subject: [PATCH net-next] ...
+>
+> Sorry for not being clearer the first time around.
 
-As Paolo Valerio noticed, this might cause unwanted expiration of the ct
-entry. In my test, with 1s tc netem delay set on the NAT path, after the
-SHUTDOWN is sent, the sctp ct entry enters SCTP_CONNTRACK_SHUTDOWN_SEND
-state. However, due to 300ms (too short) delay, when the SHUTDOWN_ACK is
-sent back from the peer, the sctp ct entry has expired and been deleted,
-and then the SHUTDOWN_ACK has to be dropped.
+Right, this should go to net-next.
 
-Also, it is confusing these two sysctl options always show 0 due to all
-timeout values using sec as unit:
+>
+> >
+> > > > ---
+> > > >   drivers/net/virtio_net.c        | 29 ++++++++++++++++------------=
+-
+> > > >   include/uapi/linux/virtio_net.h |  7 +++++++
+> > > >   2 files changed, 23 insertions(+), 13 deletions(-)
+> > > >
+> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > index 1270c8d23463..6ce0fbcabda9 100644
+> > > > --- a/drivers/net/virtio_net.c
+> > > > +++ b/drivers/net/virtio_net.c
+> > > > @@ -344,9 +344,10 @@ static int rxq2vq(int rxq)
+> > > >        return rxq * 2;
+> > > >   }
+> > > >
+> > > > -static inline struct virtio_net_hdr_mrg_rxbuf *skb_vnet_hdr(struct=
+ sk_buff *skb)
+> > > > +static inline struct virtio_net_common_hdr *
+> > > > +skb_vnet_common_hdr(struct sk_buff *skb)
+> > > >   {
+> > > > -     return (struct virtio_net_hdr_mrg_rxbuf *)skb->cb;
+> > > > +     return (struct virtio_net_common_hdr *)skb->cb;
+> > > >   }
+> > > >
+> > > >   /*
+> > > > @@ -469,7 +470,7 @@ static struct sk_buff *page_to_skb(struct virtn=
+et_info *vi,
+> > > >                                   unsigned int headroom)
+> > > >   {
+> > > >        struct sk_buff *skb;
+> > > > -     struct virtio_net_hdr_mrg_rxbuf *hdr;
+> > > > +     struct virtio_net_common_hdr *hdr;
+> > > >        unsigned int copy, hdr_len, hdr_padded_len;
+> > > >        struct page *page_to_free =3D NULL;
+> > > >        int tailroom, shinfo_size;
+> > > > @@ -554,7 +555,7 @@ static struct sk_buff *page_to_skb(struct virtn=
+et_info *vi,
+> > > >                give_pages(rq, page);
+> > > >
+> > > >   ok:
+> > > > -     hdr =3D skb_vnet_hdr(skb);
+> > > > +     hdr =3D skb_vnet_common_hdr(skb);
+> > > >        memcpy(hdr, hdr_p, hdr_len);
+> > > >        if (page_to_free)
+> > > >                put_page(page_to_free);
+> > > > @@ -966,7 +967,7 @@ static struct sk_buff *receive_small_build_skb(=
+struct virtnet_info *vi,
+> > > >                return NULL;
+> > > >
+> > > >        buf +=3D header_offset;
+> > > > -     memcpy(skb_vnet_hdr(skb), buf, vi->hdr_len);
+> > > > +     memcpy(skb_vnet_common_hdr(skb), buf, vi->hdr_len);
+> > > >
+> > > >        return skb;
+> > > >   }
+> > > > @@ -1577,7 +1578,8 @@ static void receive_buf(struct virtnet_info *=
+vi, struct receive_queue *rq,
+> > > >   {
+> > > >        struct net_device *dev =3D vi->dev;
+> > > >        struct sk_buff *skb;
+> > > > -     struct virtio_net_hdr_mrg_rxbuf *hdr;
+> > > > +     struct virtio_net_common_hdr *common_hdr;
+> > > > +     struct virtio_net_hdr_mrg_rxbuf *mrg_hdr;
+> > > >
+> > > >        if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+> > > >                pr_debug("%s: short packet %i\n", dev->name, len);
+> > > > @@ -1597,18 +1599,19 @@ static void receive_buf(struct virtnet_info=
+ *vi, struct receive_queue *rq,
+> > > >        if (unlikely(!skb))
+> > > >                return;
+> > > >
+> > > > -     hdr =3D skb_vnet_hdr(skb);
+> > > > +     common_hdr =3D skb_vnet_common_hdr(skb);
+> > > >        if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_repor=
+t)
+> > > > -             virtio_skb_set_hash((const struct virtio_net_hdr_v1_h=
+ash *)hdr, skb);
+> > > > +             virtio_skb_set_hash(&common_hdr->hash_v1_hdr, skb);
+> > > >
+> > > > -     if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> > > > +     mrg_hdr =3D &common_hdr->mrg_hdr;
+> > > > +     if (mrg_hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> > > >                skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> > > >
+> > > > -     if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+> > > > +     if (virtio_net_hdr_to_skb(skb, &mrg_hdr->hdr,
+> > > >                                  virtio_is_little_endian(vi->vdev))=
+) {
+> > > >                net_warn_ratelimited("%s: bad gso: type: %u, size: %=
+u\n",
+> > > > -                                  dev->name, hdr->hdr.gso_type,
+> > > > -                                  hdr->hdr.gso_size);
+> > > > +                                  dev->name, mrg_hdr->hdr.gso_type=
+,
+> > > > +                                  mrg_hdr->hdr.gso_size);
+> > > >                goto frame_err;
+> > > >        }
+> > > >
+> > > > @@ -2105,7 +2108,7 @@ static int xmit_skb(struct send_queue *sq, st=
+ruct sk_buff *skb)
+> > > >        if (can_push)
+> > > >                hdr =3D (struct virtio_net_hdr_mrg_rxbuf *)(skb->dat=
+a - hdr_len);
+> > > >        else
+> > > > -             hdr =3D skb_vnet_hdr(skb);
+> > > > +             hdr =3D &skb_vnet_common_hdr(skb)->mrg_hdr;
+> > > >
+> > > >        if (virtio_net_hdr_from_skb(skb, &hdr->hdr,
+> > > >                                    virtio_is_little_endian(vi->vdev=
+), false,
+> > > > diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/v=
+irtio_net.h
+> > > > index 12c1c9699935..db40f93ae8b3 100644
+> > > > --- a/include/uapi/linux/virtio_net.h
+> > > > +++ b/include/uapi/linux/virtio_net.h
+> > > > @@ -201,6 +201,13 @@ struct virtio_net_hdr_mrg_rxbuf {
+> > > >        struct virtio_net_hdr hdr;
+> > > >        __virtio16 num_buffers; /* Number of merged rx buffers */
+> > > >   };
+> > > > +
+> > > > +struct virtio_net_common_hdr {
+> > > > +     union {
+> > > > +             struct virtio_net_hdr_mrg_rxbuf mrg_hdr;
+> > > > +             struct virtio_net_hdr_v1_hash hash_v1_hdr;
+> > > > +     };
+> > > > +};
+> > >
+> > > Does this belong in the UAPI?
+> > > I would have assumed it's a Kernel implementation detail.
+> > >
+> > The existing codes, virtio_net.h is in uapi/linux/, I added the new
+> > structure and followed existing code. My modification is related to Ker=
+nel
+> > implementation detail now.
+>
+> The header you have modified forms part of the userspace API (UAPI).
+> Perhaps there is something about virtio_net that makes this correct, but =
+it
+> seems to me that kernel-internal details don't belong there.
 
-  net.netfilter.nf_conntrack_sctp_timeout_shutdown_recd = 0
-  net.netfilter.nf_conntrack_sctp_timeout_shutdown_sent = 0
+FWIW, I ran into similar issues before in a draft that added timestamp
+support [1]
 
-This patch fixes it by also using 3 secs for sctp shutdown send and recv
-state in sctp conntrack, which is also RTO.initial value in SCTP protocol.
+If we're going to change this structure, we should do it in a way that
+is forward proof to future extensions to the virtio spec and with that
+the fields in this struct. Especially in UAPI.
 
-Note that the very short time value for SCTP_CONNTRACK_SHUTDOWN_SEND/RECV
-was probably used for a rare scenario where SHUTDOWN is sent on 1st path
-but SHUTDOWN_ACK is replied on 2nd path, then a new connection started
-immediately on 1st path. So this patch also moves from SHUTDOWN_SEND/RECV
-to CLOSE when receiving INIT in the ORIGINAL direction.
+Is virtio_net_hdr_v1_hash the latest virtio-spec compliant header? And
+do we expect for v1.3 to just add some fields to this?
 
-Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
-Reported-by: Paolo Valerio <pvalerio@redhat.com>
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-v1->v2:
-- fix sysctl nf_conntrack_sctp_timeout_shutdown_sent default value
-  described in nf_conntrack-sysctl.rst, as Sriram noticed.
----
- Documentation/networking/nf_conntrack-sysctl.rst | 4 ++--
- net/netfilter/nf_conntrack_proto_sctp.c          | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+The struct comment of virtio_net_hdr_v1 states "This is
+bitwise-equivalent to the legacy struct virtio_net_hdr_mrg_rxbuf, only
+flattened.". I don't quite understand what the flattening bought, vs
+having struct virtio_net_hdr as first member. Another difference may
+be the endianness between legacy (0.9) and v1.0+.
 
-diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
-index 8b1045c3b59e..c383a394c665 100644
---- a/Documentation/networking/nf_conntrack-sysctl.rst
-+++ b/Documentation/networking/nf_conntrack-sysctl.rst
-@@ -178,10 +178,10 @@ nf_conntrack_sctp_timeout_established - INTEGER (seconds)
- 	Default is set to (hb_interval * path_max_retrans + rto_max)
- 
- nf_conntrack_sctp_timeout_shutdown_sent - INTEGER (seconds)
--	default 0.3
-+	default 3
- 
- nf_conntrack_sctp_timeout_shutdown_recd - INTEGER (seconds)
--	default 0.3
-+	default 3
- 
- nf_conntrack_sctp_timeout_shutdown_ack_sent - INTEGER (seconds)
- 	default 3
-diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
-index 91eacc9b0b98..b6bcc8f2f46b 100644
---- a/net/netfilter/nf_conntrack_proto_sctp.c
-+++ b/net/netfilter/nf_conntrack_proto_sctp.c
-@@ -49,8 +49,8 @@ static const unsigned int sctp_timeouts[SCTP_CONNTRACK_MAX] = {
- 	[SCTP_CONNTRACK_COOKIE_WAIT]		= 3 SECS,
- 	[SCTP_CONNTRACK_COOKIE_ECHOED]		= 3 SECS,
- 	[SCTP_CONNTRACK_ESTABLISHED]		= 210 SECS,
--	[SCTP_CONNTRACK_SHUTDOWN_SENT]		= 300 SECS / 1000,
--	[SCTP_CONNTRACK_SHUTDOWN_RECD]		= 300 SECS / 1000,
-+	[SCTP_CONNTRACK_SHUTDOWN_SENT]		= 3 SECS,
-+	[SCTP_CONNTRACK_SHUTDOWN_RECD]		= 3 SECS,
- 	[SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]	= 3 SECS,
- 	[SCTP_CONNTRACK_HEARTBEAT_SENT]		= 30 SECS,
- };
-@@ -105,7 +105,7 @@ static const u8 sctp_conntracks[2][11][SCTP_CONNTRACK_MAX] = {
- 	{
- /*	ORIGINAL	*/
- /*                  sNO, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS */
--/* init         */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCW},
-+/* init         */ {sCL, sCL, sCW, sCE, sES, sCL, sCL, sSA, sCW},
- /* init_ack     */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},
- /* abort        */ {sCL, sCL, sCL, sCL, sCL, sCL, sCL, sCL, sCL},
- /* shutdown     */ {sCL, sCL, sCW, sCE, sSS, sSS, sSR, sSA, sCL},
--- 
-2.39.1
+Since legacy virtio will no longer be modified, I don't think there is
+much value is exposing this new union as UAPI. I do appreciate the
+benefit to the implementation.
 
+[1] https://patches.linaro.org/project/netdev/patch/20210208185558.995292-3=
+-willemdebruijn.kernel@gmail.com/
 
