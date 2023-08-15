@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-27763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA2F77D1C9
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:27:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D56B77D1D3
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:29:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10F1B1C209CA
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:27:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A282815B3
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E26318025;
-	Tue, 15 Aug 2023 18:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7CE18026;
+	Tue, 15 Aug 2023 18:28:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10822154AC
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:26:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09FABC433C7;
-	Tue, 15 Aug 2023 18:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F85B13AFD
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:28:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77F4BC433C8;
+	Tue, 15 Aug 2023 18:28:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692123991;
-	bh=YJ0/8zdnMDRXvPB3UfHtL9v7XyB4zHHumRxB3bDf6fc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ffs/R70x4VZ5W0eaFayjpGXQgeGGl3eHPoaM13QfOUscjLW86mkgTzKWJC6DqkAmJ
-	 bmYXXhiOXdnUHXiT/xDs/8h64qMRj5pEV4kL+XMcFE8zofd11C1ZuZF/+P2zeS0vdw
-	 jNt7MEmsDwI/CQ5dpUfdkQnDXBbzSVNRAuXpDMsW5mKNwNjg2SSsoS63hbJg/uiA+k
-	 ggxr2OimfFiEnpI5PRRQVCLpdlcKx+6DAT7YqeA6OTvCuHZqu1T1rhMhxijYOQk3Om
-	 FhT3QoK+pPy2gEELS4w5BK0zWMXwotBDd9LF9PPllAHX3P0w2KudZHuWKmPU8ONSre
-	 xoVGhM1AAY/hA==
-Date: Tue, 15 Aug 2023 21:26:27 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/4] net: hns3: fix wrong rpu tln reg issue
-Message-ID: <20230815182627.GS22185@unreal>
-References: <20230815060641.3551665-1-shaojijie@huawei.com>
- <20230815060641.3551665-5-shaojijie@huawei.com>
+	s=k20201202; t=1692124137;
+	bh=/qruM4K34GEGf+StPBYxRoP0CWoc0pHOT9PCxjD218c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OkWhtJDu7Is84Ym19H+u7zVakV0q6ehat1w8njTrbVRyuNIBSGUKya1FsZKQ2/3eW
+	 DCMU89Q5QfAXBmYOgL9v3lr5TIwMqLnG2VP6pt8CK1cbEp5uSEHRqclEBczftWsLyi
+	 /BsBBVdWN1g7Evw3haiLSPPXDRuBAlBcpnw8bM+kQFpQwpkQ/SV+zy1cQGHpG6sOqb
+	 4x7vKW0Q5ks7AriJBw3TXWEnENJyMLsXNM7EJHp6uBee46HUdEmkOqS3ak1P2TaxAl
+	 KAOeuT3+D2I6zWH5b8nCogW6hTDDU1SzzSEIyGkV3wJ+pmFrPiSFqCT0Udm15rDwGj
+	 XYnTmjxADj/XA==
+Date: Tue, 15 Aug 2023 11:28:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jiri Pirko <jiri@resnulli.us>, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Milena Olech
+ <milena.olech@intel.com>, Michal Michalik <michal.michalik@intel.com>,
+ linux-arm-kernel@lists.infradead.org, poros@redhat.com,
+ mschmidt@redhat.com, netdev@vger.kernel.org, linux-clk@vger.kernel.org,
+ Bart Van Assche <bvanassche@acm.org>, intel-wired-lan@lists.osuosl.org,
+ Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next v4 3/9] dpll: core: Add DPLL framework base
+ functions
+Message-ID: <20230815112856.1f1bd3ac@kernel.org>
+In-Reply-To: <ef2eca98-4fcc-b448-fecb-38695238f87b@linux.dev>
+References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
+	<20230811200340.577359-4-vadim.fedorenko@linux.dev>
+	<20230814201709.655a24e2@kernel.org>
+	<ef2eca98-4fcc-b448-fecb-38695238f87b@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230815060641.3551665-5-shaojijie@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 15, 2023 at 02:06:41PM +0800, Jijie Shao wrote:
-> In the original RPU query command, the status register values of
-> multiple RPU tunnels are accumulated by default, which is unreasonable.
-> This patch Fix it by querying the specified tunnel ID.
-> The tunnel number of the device can be obtained from firmware
-> during initialization.
+On Tue, 15 Aug 2023 19:20:31 +0100 Vadim Fedorenko wrote:
+> >> +	ret = xa_alloc(&dpll_device_xa, &dpll->id, dpll, xa_limit_16b,
+> >> +		       GFP_KERNEL);  
+> > 
+> > Why only 16b and why not _cyclic?
 > 
-> Fixes: ddb54554fa51 ("net: hns3: add DFX registers information for ethtool -d")
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
->  drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  1 +
->  .../hisilicon/hns3/hns3pf/hclge_cmd.h         |  4 +-
->  .../hisilicon/hns3/hns3pf/hclge_main.c        |  2 +
->  .../hisilicon/hns3/hns3pf/hclge_regs.c        | 66 ++++++++++++++++++-
->  4 files changed, 71 insertions(+), 2 deletions(-)
-> 
+> I cannot image systems with more than 65k of DPLL devices. We don't
+> store any id's of last used DPLL device, so there is no easy way to
+> restart the search from the last point. And it's not a hot path to
+> optimize it.
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+I think this gets used under the xa_lock() so you can just add a static
+variable inside the function to remember previous allocation.
+
+I don't expect >64k devices either, obviously, but what are we saving
+by not allowing the full u32 range?
 
