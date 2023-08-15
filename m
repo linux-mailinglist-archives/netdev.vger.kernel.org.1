@@ -1,214 +1,234 @@
-Return-Path: <netdev+bounces-27832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4836477D66C
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 00:51:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 310FA77D7E8
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 03:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E39FA28166F
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 22:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60E421C20D90
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 01:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC88198A3;
-	Tue, 15 Aug 2023 22:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC877EC3;
+	Wed, 16 Aug 2023 01:57:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2AE17733
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 22:51:50 +0000 (UTC)
-Received: from DM5PR00CU002.outbound.protection.outlook.com (mail-centralusazon11021024.outbound.protection.outlook.com [52.101.62.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DAF211C;
-	Tue, 15 Aug 2023 15:51:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E4P2ft47TVbQU4hQNegVJtD6GVJr0Iat+p+3VBd47tnGNkZW6FI66h1kp7MY8z5D5+ws705M1KGblqyrRDxYo4/Wj5sNrknSXOId8ExQzac4pYZvjfgi6NNgnPdagBcnGiruvT1Sj7qdbnOcUm+dsoH+rAf9XzEE8SsDurzBUYVFyd9OjiqsoyL++frKSRKAebM6J6XMIOgCUxVORSFLCuMCtx6qzdOGfqgmu2gEeARL763B19Oh0nYUfkbUola/dOOI8uIEcsjgFiyI77YAx1xCL9x98o92CwZjuvdUhdvFRdDO5D1pR5fsnswt0ahRFte/hTsEtsJg1IzbNlQhrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WXPWIDc6L7OeLycBa2Ea1R7dEtx+TYCxKs0yAlbUSAg=;
- b=Rp2Z65Fpwq4Fk/nAR5mvudJtc66ddc9hVSnZgaDuvs7c7D+mkzeLRnpc8MyJYtO0MSgOwQBQ2YAlGBiAZ0Ifg8ooE2pWL8H44Uo5k6W4y9s08sUddOK4x5c+H6R8VEUEZS2tPCONKcXf7nDAazXfG+2s4UytDmA5IDmqFJppb7Xl47VZDvRmvrGfoVPTocsiSUwDhRNDKUQkyIybkKOxj9YYhx2zTRK3VpkIML1KcTQiKd6J+YN8TynHcWwEJ9wH5rmkoteeUtf7hCLxPlMGX3mbs58o9l+D6SzsH2PyUqCIrPopJlgiG7UuFKEv9/ivjlaQ59ARqTpkjk2X0M2TWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WXPWIDc6L7OeLycBa2Ea1R7dEtx+TYCxKs0yAlbUSAg=;
- b=bsDxX/g4+1W7tNmQF+17lOOmGP6Nr1xZdeZjUGaVBZBkX53GNdZHDAcujp22TSVrfP8XGMOwXcsxqhSOIntgQ6sc0mX9mFDes3FOZNUsZclANc5zK098fh9BFSgk6ZCbW9HFlj7klGE7v+9MsrWS4y1UDGVMsVJkKd6zX+voEy0=
-Received: from PH7PR21MB3263.namprd21.prod.outlook.com (2603:10b6:510:1db::16)
- by CY5PR21MB3684.namprd21.prod.outlook.com (2603:10b6:930:e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.9; Tue, 15 Aug
- 2023 22:51:37 +0000
-Received: from PH7PR21MB3263.namprd21.prod.outlook.com
- ([fe80::2020:e1b6:9fd6:af9]) by PH7PR21MB3263.namprd21.prod.outlook.com
- ([fe80::2020:e1b6:9fd6:af9%5]) with mapi id 15.20.6699.009; Tue, 15 Aug 2023
- 22:51:37 +0000
-From: Long Li <longli@microsoft.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Ajay Sharma <sharmaajay@microsoft.com>
-CC: Wei Hu <weh@microsoft.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "leon@kernel.org" <leon@kernel.org>, KY
- Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, vkuznets <vkuznets@redhat.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH v4 1/1] RDMA/mana_ib: Add EQ interrupt
- support to mana ib driver.
-Thread-Topic: [EXTERNAL] Re: [PATCH v4 1/1] RDMA/mana_ib: Add EQ interrupt
- support to mana ib driver.
-Thread-Index:
- AQHZwXaGQzAGQ60n40m8kETKVcWbua/PcwgAgAAA1MCAAASUgIAAA6OQgAAGp4CABPLToIABrC+AgABKHACAAJY2gIAVEP2g
-Date: Tue, 15 Aug 2023 22:51:37 +0000
-Message-ID:
- <PH7PR21MB3263AF83AE1DD40F4B5D62EECE14A@PH7PR21MB3263.namprd21.prod.outlook.com>
-References: <20230728170749.1888588-1-weh@microsoft.com>
- <ZMP+MH7f/Vk9/J0b@ziepe.ca>
- <PH7PR21MB3263C134979B17F1C53D3E8DCE06A@PH7PR21MB3263.namprd21.prod.outlook.com>
- <ZMQCuQU+b/Ai9HcU@ziepe.ca>
- <PH7PR21MB326396D1782613FE406F616ACE06A@PH7PR21MB3263.namprd21.prod.outlook.com>
- <ZMQLW4elDj0vV1ld@ziepe.ca>
- <PH7PR21MB326367A455B78A1F230C5C34CE0AA@PH7PR21MB3263.namprd21.prod.outlook.com>
- <ZMmZO9IPmXNEB49t@ziepe.ca>
- <F17A4152-0715-4E73-B276-508354553413@microsoft.com>
- <ZMpVZwh9Y5W1XCsX@ziepe.ca>
-In-Reply-To: <ZMpVZwh9Y5W1XCsX@ziepe.ca>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=3b8f4580-e3ca-493e-8957-3771874fd867;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-08-15T22:51:10Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR21MB3263:EE_|CY5PR21MB3684:EE_
-x-ms-office365-filtering-correlation-id: 7eab5732-285e-41ce-ddfd-08db9de22edc
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- +lKVQYT8tvUEhGmjvMtnNvZMOODO0jXTkz0CY/xM760piqF5cn5nJiiksF8sGSA/tcw7yjxFsk4GprEAcsUEK0PCbLFiQXNok5n9quigszb0oGAX9H7SCPTSITuCmR8qiVpdixHFBoVXai5LWBscuHls4TSqgSro7rWa+u1R3uguqQZmmGHBVDNm9W4TBG0MDABdWfN303dVjWUsYcGquFJ2jJc7Co7KliNyexwTB2wpPwQFFTNCkECNBH3O7NOJiKp0z6PXE/i5UEVUm8yRVgTLna2wnoi0rNxd5AOwKadxX7UT+U6lErbv5q3Xn30ZurHnPX72ntVsIJyF0BcGwbXsVJZE4EBXGKgqUyJGwoJfbuRhhexhxHadY/CsNm716SvUntWq2zJcGlC8/BI4vhThcAYnChjuCq0FQ6F30hD3dVnqvVvo3auOG4DMHTVmBGtzF78FhcJRRDAfz0euP9Yc8mGoAIky6kFnoFTac2oIObPBhcxTihoE46bJJPRnn90RjVEZLF1fzfNKkJoq/uYgiip5/w9n++n1mRkKzI4JLL6JnrN+8C2sRZtmQR/fG0b/ZKGOcO4N0uHWx+Gwo71CcAWXLi2fqIdq/cM4gZcN2AuqR4Sb57w+Ig3TvL9vIDrgAYraPuKZw/YpI9Gsbn6DsnEy907qkAh3u2Pg8pnNfBAAqqLXIlqDSabZYIqECN8zUjBWW8JR1IqZnO2pJA==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3263.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(136003)(376002)(366004)(1800799009)(186009)(451199024)(12101799020)(9686003)(7696005)(478600001)(55016003)(38100700002)(41300700001)(10290500003)(110136005)(83380400001)(86362001)(316002)(8990500004)(6506007)(38070700005)(2906002)(54906003)(4326008)(107886003)(53546011)(122000001)(26005)(33656002)(66446008)(82950400001)(71200400001)(66556008)(8936002)(5660300002)(64756008)(66476007)(66946007)(6636002)(8676002)(76116006)(82960400001)(52536014)(7416002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?ZW8xMlFnOE9iSG90QnpMYnhETE4wcVFHcXVlYlNwNXBJeW9ZMTZPMFZ5eXBZ?=
- =?utf-8?B?TmpVRHQzVHFNTE9VQzZWTzY4cnh4dW9NSWt5K3gySEhEaVI2ZkhJU3VZbDcw?=
- =?utf-8?B?dGNUYkh3aDk4SER1RkFLYmFjc3hSNzY3K1ZyOU4vTVFLSkF1Ym5BWDc2ZjN5?=
- =?utf-8?B?SWhiM093QS9pVjZwd0wrckdQN0pETWRBeC8wZHgzN0JtMEpLWlYzd0RBNmpJ?=
- =?utf-8?B?cDlCdFFGdWxKbnl2OW5QbVBSZUZ5SzdmNXBiQUdwQzFVOFErWFZpbXd3K2Rx?=
- =?utf-8?B?Vm1rSEhBNFJWOXE3U3hkNnJjUjRpUndBWW8zdTc5cFFpQ3pzVm8rUERoUnhS?=
- =?utf-8?B?K0twSm1ZYlhxY1BydHhsM3d4MjRPTEJHUmJOOGpJL3J0S281UW9GVUR3b2pB?=
- =?utf-8?B?REJLR0V3OTVRM2pvSExOeHVnbzN6TENBa0tVbnBjV0xCTnkvRExoR0lVWkhC?=
- =?utf-8?B?SWVaNVEzMnNnY09IRVlxMTJCUWNRaU9HK2FCRm9wU0NwaHB1WEVHSDU3QmxZ?=
- =?utf-8?B?ZElONzYwM05rNzV4TnIrUEdsMjc5eUd5VjhCeXEzWHc1RXVqZVRweW9IbnRO?=
- =?utf-8?B?b0x1b0RESlBxZFpjeGlxZmhXQUNEbXZPaGNCVDVUQ2czYTcrZTIxa2hybEhI?=
- =?utf-8?B?Zm02ZFhUdm9td0FPeFEra0Z2QjdXYjlCTHgvZkpUMURXa2ZZbWNFT0plRTVi?=
- =?utf-8?B?dFB0V2pJK2VHWVQ5MllVK1Q1MnFSSVdQRkNnUnFGUGlXYlZvTkdoS2I0ajIy?=
- =?utf-8?B?MDQ1SWRlSGNrb2NFOEVEZ21RYXNZcm5IVWhQbi9WNktvMElvTFVobzFlcmlp?=
- =?utf-8?B?aVBDSmFFSzM4a2pXdDRVT3VyUjhINGExZk8vK0lpdld2VGFBR0dlNjc0YlVK?=
- =?utf-8?B?NFlacUpFZUh6K0tKUnFwMSt0aHkzbFRXbGdDUzVZbkorWkhvQURrTDVCYXhj?=
- =?utf-8?B?UVFpNVdpb0cvdFg0d1pJNE9sME51WU4yQmdVbm5oNTRVWEp3dlBYZlg0NDRJ?=
- =?utf-8?B?WkpDWlg0ZnRzOTd5WGZjRWhiemQxTkFlRzNJaFA2eEtTdXM5bVAvM2V5ei9I?=
- =?utf-8?B?TDlLdkxaSDJYQVBySGxkQmIxNmpYYVFtaEtlS3RlR2xrT0FlS2pPc1dOSGZF?=
- =?utf-8?B?LzlQcmM1QVZsUk9rcUtkKzdkVE8xOGtGRUpGSlJBMTNTNmMwRXQwOWxNcXUv?=
- =?utf-8?B?VWYxWEtDYVJhM1lPNlMrci80QUEvN3hwM1BucjcrNFZZU21nK2g2dzM5QXJO?=
- =?utf-8?B?MGcyaG02NE1mNCtaMm1VU1h1UzZFWW02MTg3ZU13SVArOFZuTFlzQUlpQng2?=
- =?utf-8?B?dW10Q002QUsrL1ZLQWQ4UFJKalNnaG1hZjN5cEJSdXJpM3kxNXk5YTJZY3M3?=
- =?utf-8?B?bUw2QUhmSUhob3dIOExMRHVObnNvNGphZU1HTk1qVVdGNlBLQlNUODlUajFH?=
- =?utf-8?B?SjUzdld4QXhyeGVReWd4dUFGT1NVdlQrdGx4NlFJdko5dDhKSW12VUE5YWVT?=
- =?utf-8?B?S3Z4RkZ0Uk51bzhCaFpDbzRUTVpyTmNOaUhxR3hJKzd6QUREUElUbWM3RDdh?=
- =?utf-8?B?Ymt0TThqd1Npa2JuVEJLK0h4aGZxaURyVGgrVDZXMC93bm1DdWVQZ240eTM3?=
- =?utf-8?B?TytBQzR5aGxqZXdFSEZIMisrSzRTVHFxN1g3aDdpQVcwUjF0Um41bVJKOUlX?=
- =?utf-8?B?YXozb241MFJoNlhFRHlwV2tLR3NhUWZGQ1JONWFtVktUekE4YmVnMUxQY3ND?=
- =?utf-8?B?NWd5RW9UZHk4MTZqeTJNS1BPaldpWTZJQTJnZkQrdHhpOWRJSWIrbWVCL2U4?=
- =?utf-8?B?L05MUjh6TFZwOUhIK05oMGtHK3hyaFpOUDdnNDBMdGxhVDFFcHp2emd3aW14?=
- =?utf-8?B?LytSZmNaM0VkL1NjWHNKM2lsN3BaNzZ5WjllMlZTNnEzcGdIOEpydDV1b1Yw?=
- =?utf-8?B?citZdXMzTGNIbnhMbGRlUHJSRnQ0bms0bmwvbWNGKzZFRUdEUzhOR1dzWXFa?=
- =?utf-8?B?YmxyU1ZiRWxka2hDY29Qak0yaU1NdG1USHZZNE5uLzBENDdWejBqYUQxZFcv?=
- =?utf-8?B?dDdFQ3RCOTZEZW9Ham9LMWxYMEdTWVRYNFlUOU1GWDdJMlFDN2JSRkZUZ1Zw?=
- =?utf-8?Q?GOWlFUuZk7NzcNRX0bijcYHw0?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8C3392
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:57:25 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC2010D1;
+	Tue, 15 Aug 2023 18:57:19 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 72AE1121AC;
+	Wed, 16 Aug 2023 04:57:18 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 5DFF4121AB;
+	Wed, 16 Aug 2023 04:57:18 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 965443C07D1;
+	Wed, 16 Aug 2023 04:57:08 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1692151028; bh=XcE1ptLktK3uyDhF6WKrZKptpn4/xt5YFEG2dA+VJOw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=JPkuukBASlvVKL1yNJnIrsZyqEjhMKJkhNin+U9S9X7CUofZMhFYgTtSrRU128w1/
+	 E57lfLX5Q+uqw7sixPaxqk54AQsk1vz35YjGQ/U0kGYXLoXsiS6fn4GCKj6+ixGtSI
+	 jjfzpdQkHWVjdkl33I75CpI7QiRCcaEWqfbuGx6g=
+Received: from ja.home.ssi.bg (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 37FHWGcP168627;
+	Tue, 15 Aug 2023 20:32:16 +0300
+Received: (from root@localhost)
+	by ja.home.ssi.bg (8.17.1/8.17.1/Submit) id 37FHWGrx168626;
+	Tue, 15 Aug 2023 20:32:16 +0300
+From: Julian Anastasov <ja@ssi.bg>
+To: Simon Horman <horms@verge.net.au>
+Cc: lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org, "Paul E . McKenney" <paulmck@kernel.org>,
+        rcu@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
+        Jiejian Wu <jiejian@linux.alibaba.com>,
+        Jiri Wiesner <jwiesner@suse.de>
+Subject: [PATCH RFC net-next 05/14] ipvs: do not keep dest_dst after dest is removed
+Date: Tue, 15 Aug 2023 20:30:22 +0300
+Message-ID: <20230815173031.168344-6-ja@ssi.bg>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230815173031.168344-1-ja@ssi.bg>
+References: <20230815173031.168344-1-ja@ssi.bg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3263.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7eab5732-285e-41ce-ddfd-08db9de22edc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2023 22:51:37.6974
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tXcRZbr3ahamH77QIN4qK+OSYVpCd6dGI8b9b/Gh9Zy+3++iEcVeMfmXv1QQfxo9i40zr7bJ98z71FbwnsnbKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR21MB3684
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PiBTdWJqZWN0OiBSZTogW0VYVEVSTkFMXSBSZTogW1BBVENIIHY0IDEvMV0gUkRNQS9tYW5hX2li
-OiBBZGQgRVENCj4gaW50ZXJydXB0IHN1cHBvcnQgdG8gbWFuYSBpYiBkcml2ZXIuDQo+IA0KPiBP
-biBXZWQsIEF1ZyAwMiwgMjAyMyBhdCAwNDoxMToxOEFNICswMDAwLCBBamF5IFNoYXJtYSB3cm90
-ZToNCj4gPg0KPiA+DQo+ID4gPiBPbiBBdWcgMSwgMjAyMywgYXQgNjo0NiBQTSwgSmFzb24gR3Vu
-dGhvcnBlIDxqZ2dAemllcGUuY2E+IHdyb3RlOg0KPiA+ID4NCj4gPiA+IO+7v09uIFR1ZSwgQXVn
-IDAxLCAyMDIzIGF0IDA3OjA2OjU3UE0gKzAwMDAsIExvbmcgTGkgd3JvdGU6DQo+ID4gPg0KPiA+
-ID4+IFRoZSBkcml2ZXIgaW50ZXJydXB0IGNvZGUgbGltaXRzIHRoZSBDUFUgcHJvY2Vzc2luZyB0
-aW1lIG9mIGVhY2ggRVENCj4gPiA+PiBieSByZWFkaW5nIGEgc21hbGwgYmF0Y2ggb2YgRVFFcyBp
-biB0aGlzIGludGVycnVwdC4gSXQgZ3VhcmFudGVlcw0KPiA+ID4+IGFsbCB0aGUgRVFzIGFyZSBj
-aGVja2VkIG9uIHRoaXMgQ1BVLCBhbmQgbGltaXRzIHRoZSBpbnRlcnJ1cHQNCj4gPiA+PiBwcm9j
-ZXNzaW5nIHRpbWUgZm9yIGFueSBnaXZlbiBFUS4gSW4gdGhpcyB3YXksIGEgYmFkIEVRICh3aGlj
-aCBpcw0KPiA+ID4+IHN0b3JtZWQgYnkgYSBiYWQgdXNlciBkb2luZyB1bnJlYXNvbmFibGUgcmUt
-YXJtaW5nIG9uIHRoZSBDUSkgY2FuJ3QNCj4gPiA+PiBzdG9ybSBvdGhlciBFUXMgb24gdGhpcyBD
-UFUuDQo+ID4gPg0KPiA+ID4gT2YgY291cnNlIGl0IGNhbiwgdGhlIGJhZCB1c2UganVzdCBjcmVh
-dGVzIGEgbWlsbGlvbiBFUXMgYW5kIHB1c2hlcw0KPiA+ID4gYSBiaXQgb2Ygd29yayB0aHJvdWdo
-IHRoZW0gY29uc3RhbnRseS4gSG93IGlzIHRoYXQgcmVhbGx5IGFueQ0KPiA+ID4gZGlmZmVyZW50
-IGZyb20gcHVzaGluZyBtb3JlIEVRRXMgaW50byBhIHNpbmdsZSBFUT8NCj4gPiA+DQo+ID4gPiBB
-bmQgaG93IGRvZXMgeW91ciBFUSBtdWx0aXBsZXhpbmcgd29yayBhbnlob3c/IERvIHlvdSBwb2xs
-IGV2ZXJ5IEVRDQo+ID4gPiBvbiBldmVyeSBpbnRlcnJ1cHQ/IFRoYXQgaXRzZWxmIGlzIGEgRE9T
-IHZlY3Rvci4NCj4gPg0KPiA+IFVzZXIgZG9lcyBub3QgY3JlYXRlIGVxcyBkaXJlY3RseSAuIEVR
-IGNyZWF0aW9uIGlzIGJ5IHByb2R1Y3Qgb2YNCj4gPiBvcGVuaW5nIGRldmljZSBpZSBhbGxvY2F0
-aW5nIGNvbnRleHQuDQo+IA0KPiBXaGljaCBpcyBkb25lIGRpcmVjdGx5IGJ5IHRoZSB1c2VyLg0K
-PiANCj4gPiBJIGFtIG5vdCBzdXJlIGlmIHRoZSBzYW1lDQo+ID4gcHJvY2VzcyBpcyBhbGxvd2Vk
-IHRvIG9wZW4gZGV2aWNlIG11bHRpcGxlIHRpbWVzDQo+IA0KPiBPZiBjb3Vyc2UgaXQgY2FuLg0K
-PiANCj4gPiBvZiBsb2NrIGltcGxlbWVudGVkLiBTbyBtaWxsaW9uIGVxcyBhcmUgcHJvYmFibHkg
-ZmFyIGZldGNoZWQgLg0KPiANCj4gVWgsIGhvdyBkbyB5b3UgY29uY2x1ZGUgdGhhdD8NCj4gDQo+
-ID4gIEFzIGZvciBob3cgdGhlIGVxIHNlcnZpY2luZyBpcyBkb25lIC0gb25seSB0aG9zZSBlceKA
-mXMgZm9yIHdoaWNoIHRoZQ0KPiA+IGludGVycnVwdCBpcyByYWlzZWQgYXJlIGNoZWNrZWQuIEFu
-ZCBlYWNoIGVxIGlzIHRpZWQgb25seSBvbmNlIGFuZA0KPiA+IG9ubHkgdG8gYSBzaW5nbGUgaW50
-ZXJydXB0Lg0KPiANCj4gU28geW91IGl0ZXJhdGUgb3ZlciBhIGxpc3Qgb2YgRVFzIGluIGV2ZXJ5
-IGludGVycnVwdD8NCj4gDQo+IEFsbG93aW5nIHVzZXJzcGFjZSB0byBpbmNyZWFzZSB0aGUgbnVt
-YmVyIG9mIEVRcyBvbiBhbiBpbnRlcnJ1cHQgaXMgYSBkaXJlY3QNCj4gRE9TIHZlY3Rvciwgbm8g
-c3BlY2lhbCBmdXNzaW5nIHJlcXVpcmVkLg0KPiANCj4gSWYgeW91IHdhbnQgdGhpcyB0byB3b3Jr
-IHByb3Blcmx5IHlvdSBuZWVkIHRvIGhhdmUgeW91ciBIVyBhcnJhbmdlIHRoaW5ncyBzbw0KPiB0
-aGVyZSBpcyBvbmx5IGV2ZXIgb25lIEVRRSBpbiB0aGUgRVEgZm9yIGEgZ2l2ZW4gQ1EgYXQgYW55
-IHRpbWUuIEFub3RoZXIgRVFFDQo+IGNhbm5vdCBiZSBzdHVmZmVkIGJ5IHRoZSBIVyB1bnRpbCB0
-aGUga2VybmVsIHJlYWRzIHRoZSBmaXJzdCBFUUUgYW5kIGFja3MgaXQNCj4gYmFjay4NCj4gDQo+
-IFlvdSBoYXZlIGFsbW9zdCBnb3QgdGhpcyByaWdodCwgdGhlIG1pc3Rha2UgaXMgdGhhdCB1c2Vy
-c3BhY2UgaXMgdGhlIHRoaW5nIHRoYXQNCj4gYWxsb3dzIHRoZSBIVyB0byBnZW5lcmF0ZSBhIG5l
-dyBFUUUuIElmIHlvdSBjYXJlIGFib3V0IERPUyB0aGVuIHRoaXMgaXMgdGhlDQo+IHdyb25nIGRl
-c2lnbiwgdGhlIGtlcm5lbCBhbmQgb25seSB0aGUga2VybmVsIG11c3QgYmUgYWJsZSB0byB0cmln
-Z2VyIGEgbmV3IEVRRQ0KPiBmb3IgdGhlIENRLg0KPiANCj4gSW4gZWZmZWN0IHlvdSBuZWVkIHR3
-byBDUSBkb29yYmVsbHMsIGEgdXNlcnNwYWNlIG9uZSB0aGF0IHJlLWFybXMgdGhlIENRLCBhbmQN
-Cj4gYSBrZXJuZWwgb25lIHRoYXQgYWxsb3dzIGEgQ1EgdGhhdCB0cmlnZ2VyZWQgb24gQVJNIHRv
-IGdlbmVyYXRlIGFuIEVRRS4NCj4gDQo+IFRodXMgdGhlIGtlcm5lbCBjYW4gc3RyaWN0bHkgbGlt
-aXQgdGhlIGZsb3cgb2YgRVFFcyB0aHJvdWdoIHRoZSBFUXMgc3VjaCB0aGF0IGFuDQo+IEVRIGNh
-biBuZXZlciBvdmVyZmxvdyBhbmQgYSBDUSBjYW4gbmV2ZXIgY29uc3VtZSBtb3JlIHRoYW4gb25l
-IEVRRS4NCj4gDQo+IFlvdSBjYW5ub3QgcmVhbGx5IGZpeCB0aGlzIGhhcmR3YXJlIHByb2JsZW0g
-d2l0aCBhIHNvZnR3YXJlIHNvbHV0aW9uLiBZb3Ugd2lsbA0KPiBhbHdheXMgaGF2ZSBhIERPUyBh
-dCBzb21lIHBvaW50Lg0KDQpXZSdsbCBhZGRyZXNzIHRoZSBjb21tZW50cyBhbmQgc2VuZCBhbm90
-aGVyIHBhdGNoLg0KDQpUaGFua3MsDQoNCkxvbmcNCg==
+Before now dest->dest_dst is not released when server is moved into
+dest_trash list after removal. As result, we can keep dst/dev
+references for long time without actively using them.
+
+It is better to avoid walking the dest_trash list when
+ip_vs_dst_event() receives dev events. So, make sure we do not
+hold dev references in dest_trash list. As packets can be flying
+while server is being removed, check the IP_VS_DEST_F_AVAILABLE
+flag in slow path to ensure we do not save new dev references to
+removed servers.
+
+Signed-off-by: Julian Anastasov <ja@ssi.bg>
+---
+ net/netfilter/ipvs/ip_vs_ctl.c  | 20 +++++++----------
+ net/netfilter/ipvs/ip_vs_xmit.c | 39 ++++++++++++++++++++++++---------
+ 2 files changed, 37 insertions(+), 22 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index 5b865c87e63d..475521af5530 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -810,7 +810,6 @@ static void ip_vs_dest_free(struct ip_vs_dest *dest)
+ {
+ 	struct ip_vs_service *svc = rcu_dereference_protected(dest->svc, 1);
+ 
+-	__ip_vs_dst_cache_reset(dest);
+ 	__ip_vs_svc_put(svc);
+ 	call_rcu(&dest->rcu_head, ip_vs_dest_rcu_free);
+ }
+@@ -1013,10 +1012,6 @@ __ip_vs_update_dest(struct ip_vs_service *svc, struct ip_vs_dest *dest,
+ 
+ 	dest->af = udest->af;
+ 
+-	spin_lock_bh(&dest->dst_lock);
+-	__ip_vs_dst_cache_reset(dest);
+-	spin_unlock_bh(&dest->dst_lock);
+-
+ 	if (add) {
+ 		list_add_rcu(&dest->n_list, &svc->destinations);
+ 		svc->num_dests++;
+@@ -1024,6 +1019,10 @@ __ip_vs_update_dest(struct ip_vs_service *svc, struct ip_vs_dest *dest,
+ 		if (sched && sched->add_dest)
+ 			sched->add_dest(svc, dest);
+ 	} else {
++		spin_lock_bh(&dest->dst_lock);
++		__ip_vs_dst_cache_reset(dest);
++		spin_unlock_bh(&dest->dst_lock);
++
+ 		sched = rcu_dereference_protected(svc->scheduler, 1);
+ 		if (sched && sched->upd_dest)
+ 			sched->upd_dest(svc, dest);
+@@ -1258,6 +1257,10 @@ static void __ip_vs_unlink_dest(struct ip_vs_service *svc,
+ {
+ 	dest->flags &= ~IP_VS_DEST_F_AVAILABLE;
+ 
++	spin_lock_bh(&dest->dst_lock);
++	__ip_vs_dst_cache_reset(dest);
++	spin_unlock_bh(&dest->dst_lock);
++
+ 	/*
+ 	 *  Remove it from the d-linked destination list.
+ 	 */
+@@ -1747,13 +1750,6 @@ static int ip_vs_dst_event(struct notifier_block *this, unsigned long event,
+ 	}
+ 	rcu_read_unlock();
+ 
+-	mutex_lock(&ipvs->service_mutex);
+-	spin_lock_bh(&ipvs->dest_trash_lock);
+-	list_for_each_entry(dest, &ipvs->dest_trash, t_list) {
+-		ip_vs_forget_dev(dest, dev);
+-	}
+-	spin_unlock_bh(&ipvs->dest_trash_lock);
+-	mutex_unlock(&ipvs->service_mutex);
+ 	return NOTIFY_DONE;
+ }
+ 
+diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+index 9193e109e6b3..d7499f1e3af2 100644
+--- a/net/netfilter/ipvs/ip_vs_xmit.c
++++ b/net/netfilter/ipvs/ip_vs_xmit.c
+@@ -317,9 +317,11 @@ __ip_vs_get_out_rt(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
+ 
+ 	if (dest) {
+ 		dest_dst = __ip_vs_dst_check(dest);
+-		if (likely(dest_dst))
++		if (likely(dest_dst)) {
+ 			rt = (struct rtable *) dest_dst->dst_cache;
+-		else {
++			if (ret_saddr)
++				*ret_saddr = dest_dst->dst_saddr.ip;
++		} else {
+ 			dest_dst = ip_vs_dest_dst_alloc();
+ 			spin_lock_bh(&dest->dst_lock);
+ 			if (!dest_dst) {
+@@ -335,14 +337,24 @@ __ip_vs_get_out_rt(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
+ 				ip_vs_dest_dst_free(dest_dst);
+ 				goto err_unreach;
+ 			}
+-			__ip_vs_dst_set(dest, dest_dst, &rt->dst, 0);
++			/* It is forbidden to attach dest->dest_dst if
++			 * server is deleted. We can see the flag going down,
++			 * for very short period and it must be checked under
++			 * dst_lock.
++			 */
++			if (dest->flags & IP_VS_DEST_F_AVAILABLE)
++				__ip_vs_dst_set(dest, dest_dst, &rt->dst, 0);
++			else
++				noref = 0;
+ 			spin_unlock_bh(&dest->dst_lock);
+ 			IP_VS_DBG(10, "new dst %pI4, src %pI4, refcnt=%d\n",
+ 				  &dest->addr.ip, &dest_dst->dst_saddr.ip,
+ 				  rcuref_read(&rt->dst.__rcuref));
++			if (ret_saddr)
++				*ret_saddr = dest_dst->dst_saddr.ip;
++			if (!noref)
++				ip_vs_dest_dst_free(dest_dst);
+ 		}
+-		if (ret_saddr)
+-			*ret_saddr = dest_dst->dst_saddr.ip;
+ 	} else {
+ 		__be32 saddr = htonl(INADDR_ANY);
+ 
+@@ -480,9 +492,11 @@ __ip_vs_get_out_rt_v6(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
+ 
+ 	if (dest) {
+ 		dest_dst = __ip_vs_dst_check(dest);
+-		if (likely(dest_dst))
++		if (likely(dest_dst)) {
+ 			rt = (struct rt6_info *) dest_dst->dst_cache;
+-		else {
++			if (ret_saddr)
++				*ret_saddr = dest_dst->dst_saddr.in6;
++		} else {
+ 			u32 cookie;
+ 
+ 			dest_dst = ip_vs_dest_dst_alloc();
+@@ -503,14 +517,19 @@ __ip_vs_get_out_rt_v6(struct netns_ipvs *ipvs, int skb_af, struct sk_buff *skb,
+ 			}
+ 			rt = (struct rt6_info *) dst;
+ 			cookie = rt6_get_cookie(rt);
+-			__ip_vs_dst_set(dest, dest_dst, &rt->dst, cookie);
++			if (dest->flags & IP_VS_DEST_F_AVAILABLE)
++				__ip_vs_dst_set(dest, dest_dst, &rt->dst, cookie);
++			else
++				noref = 0;
+ 			spin_unlock_bh(&dest->dst_lock);
+ 			IP_VS_DBG(10, "new dst %pI6, src %pI6, refcnt=%d\n",
+ 				  &dest->addr.in6, &dest_dst->dst_saddr.in6,
+ 				  rcuref_read(&rt->dst.__rcuref));
++			if (ret_saddr)
++				*ret_saddr = dest_dst->dst_saddr.in6;
++			if (!noref)
++				ip_vs_dest_dst_free(dest_dst);
+ 		}
+-		if (ret_saddr)
+-			*ret_saddr = dest_dst->dst_saddr.in6;
+ 	} else {
+ 		noref = 0;
+ 		dst = __ip_vs_route_output_v6(net, daddr, ret_saddr, do_xfrm,
+-- 
+2.41.0
+
+
 
