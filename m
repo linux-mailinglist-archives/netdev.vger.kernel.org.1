@@ -1,140 +1,226 @@
-Return-Path: <netdev+bounces-27693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDEAA77CE51
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:42:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C33877CE59
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:44:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A74BA2814FA
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:42:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9B7228151A
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E68134DE;
-	Tue, 15 Aug 2023 14:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C967D13AC7;
+	Tue, 15 Aug 2023 14:44:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4857134D9
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:42:14 +0000 (UTC)
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746CA93;
-	Tue, 15 Aug 2023 07:42:13 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-4496b17cccfso1003957137.2;
-        Tue, 15 Aug 2023 07:42:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B829B111B0
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:44:21 +0000 (UTC)
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52190AB;
+	Tue, 15 Aug 2023 07:44:20 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-3492c49c649so17561075ab.3;
+        Tue, 15 Aug 2023 07:44:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692110532; x=1692715332;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9UZFaVlc1sczHQWHZJ9AjHZsRHt5PWt4JpBGZLlXeg0=;
-        b=pPleL2QungwV3N3GV8TI1ahpjqCncp51gnYfpvhhOplW891qdlMshtDs+IgT0IzjBl
-         aH8K8BwF5pYG7OngZkQaS0AvH3oE577jAmSSX4MW+Axt0EXU9ozPJySimW1pqaeSi8+M
-         11yfvvWj2VSawUbT0Y9PkmaBSuw8n/qBLaxKPTjIBKoLI9fjcfonXPLke4HnTrfXq2Bq
-         P4hgAYQOWwMryU68Se7CJVbkDXuFrZT5zXEmYIv5WIj62AZ7XLUbTEychVoKNEHMInpM
-         b0hq+dHf4oaWA35i6X3k4p1wE4swSej2PiRoHfDquatLYJPOHmt0P3o+G++ZtaUzPtYN
-         JlhA==
+        d=gmail.com; s=20221208; t=1692110659; x=1692715459;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/dWsgr4GtSkhi8VZSePtyntV6DXxxLpj6twGQjDjRns=;
+        b=ketzm6o1YKS9I30ZqFNX7tos66OqYEI7qXUWz5gN2kKfE7YHj9QZoiSv2ZAPbFCb+W
+         qsWlCz0pv9bYziOGLoziGsgmQsJSpW0qWKPaaOOFDcboL+BMrL1ab0AJOVMtKDhLon/o
+         Nl3lC2wXFcroJjIsuwZAxcSNbcDYaxONmP3OXE9Wx7T4F1omcMpoGmtH2EXRH2N4BogQ
+         6dcgjUuLBD1Y3GMeAT20EjRUrJmYnTA/wrF+UKvhbBtHOX8/zSZopeRNa87RvohGdzwn
+         wkcTTlWPcpo8lcb7fcepaaVxq1vTYuB+w4dJOcAEw+rfr8wSirUcWxRWNuoEGpUYNtXU
+         HiEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692110532; x=1692715332;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1692110659; x=1692715459;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9UZFaVlc1sczHQWHZJ9AjHZsRHt5PWt4JpBGZLlXeg0=;
-        b=ai2f5Ps/1Orem0g95uBKuYVO205Va8uCYK8zk60mV2ZF2DCX7CxgynmE8dN6f5EBJ/
-         +Ovg7UnmlG4zojYA/xLb0ui3o40wmUKzsjsls6UZaVG1mjSJaoo+Q76vSl/YplaB62VR
-         UN+vpbfHmTdIBHL2IoZBL0eYxpZKCHMesmmtMMCZmTs1SdezWCtGJR86U+HUdqSjQuxQ
-         uWu4LdSQvTLhMKVaPI6h5l2TYIotr3HYfnT0MA5yMDwKcp77+JIwE5A4rdQ7Cs0MhIGG
-         rOTyKmFvSMdWQ35f1bG3Qa5koLDv1m5bwcwnYXsBJJhxaWvELCbX/dEGgaPC1hiEHTS8
-         OPPg==
-X-Gm-Message-State: AOJu0Yw6oGxMaSt9SagtNmEjR0eLBzi4qz7kM4marwq7hpQD/9/ychaj
-	Z9ufAquPUnLsO5GLfqke16MXs2s7/AjDN+2fJqM=
-X-Google-Smtp-Source: AGHT+IHkefxbWaWrxGL9lInv9tYLtV6RKC5Xhye/4zD/nSk4TJeMzlNk1n0Cbb5GRzuoSowhEPnqM6F//jPuzZ4WmLM=
-X-Received: by 2002:a05:6102:3014:b0:440:c4fb:f257 with SMTP id
- s20-20020a056102301400b00440c4fbf257mr11215788vsa.0.1692110532489; Tue, 15
- Aug 2023 07:42:12 -0700 (PDT)
+        bh=/dWsgr4GtSkhi8VZSePtyntV6DXxxLpj6twGQjDjRns=;
+        b=CGY544cIyZbYItEynGYkjrRGVrsS5Iw8b+WvAjrtWq1s/B4KVcz19EPRdvVF1Mcd3k
+         xK9Eo90dVexBsCfWzZXLat3MocJINHEG8mNFStd58A2oHuFiENY14ZN1ukNw2bW8ka+T
+         XkvWtM/cL4de1K+87FepEkqMvk8gmAbqiGF+5tqvTkAf3QgYYzpN14jlwu58YydErG1q
+         PnV5HuPjl7RyMmoMUUJL0NTgZitrGs4lSG8T40Ahl3nynINO4T6TL9rIXMC+ulKFfeWm
+         8Fd8r459UbXfLrE9oXtVkDuiVxEjcY6m7SEtPyXMRy5kVYRmIsni1IP/n62y5coVi/DL
+         QLdw==
+X-Gm-Message-State: AOJu0YzGzuxfw81gVNvJKTP+jtbEC7xK40MOUCAB0gRO7f8hXibNDTBK
+	Etv3gaX+7nblmhUi9kpU/1s=
+X-Google-Smtp-Source: AGHT+IFS/RPaAAaI2fymwbZJmbZPb4yPVwvMviDHZlHJHuE3kfzi5mY1KRTobFMi/MmtogTYr6CJzA==
+X-Received: by 2002:a05:6e02:b2d:b0:345:c8ce:ff49 with SMTP id e13-20020a056e020b2d00b00345c8ceff49mr20471735ilu.11.1692110659520;
+        Tue, 15 Aug 2023 07:44:19 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id y9-20020a92d209000000b0034a565bb9fasm2574548ily.57.2023.08.15.07.44.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Aug 2023 07:44:18 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Tue, 15 Aug 2023 07:44:16 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Jean Delvare <jdelvare@suse.com>, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH net-next 10/12] bnxt_en: Modify the driver to use
+ hwmon_device_register_with_info
+Message-ID: <d80f1ebd-303f-475d-8f30-90b62096e725@roeck-us.net>
+References: <20230815045658.80494-1-michael.chan@broadcom.com>
+ <20230815045658.80494-11-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810015751.3297321-1-almasrymina@google.com> <58a93e4e8b8b4ca79c2678a3ae8281cd@AcuMS.aculab.com>
-In-Reply-To: <58a93e4e8b8b4ca79c2678a3ae8281cd@AcuMS.aculab.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 15 Aug 2023 10:41:35 -0400
-Message-ID: <CAF=yD-KrkHo9QY2-cALosQHnZe=JWiRcmcvpfu3qov2J6kJPMQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/11] Device Memory TCP
-To: David Laight <David.Laight@aculab.com>
-Cc: Mina Almasry <almasrymina@google.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, 
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, 
-	"stephen@networkplumber.org" <stephen@networkplumber.org>, "sdf@google.com" <sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815045658.80494-11-michael.chan@broadcom.com>
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 15, 2023 at 9:38=E2=80=AFAM David Laight <David.Laight@aculab.c=
-om> wrote:
->
-> From: Mina Almasry
-> > Sent: 10 August 2023 02:58
-> ...
-> > * TL;DR:
-> >
-> > Device memory TCP (devmem TCP) is a proposal for transferring data to a=
-nd/or
-> > from device memory efficiently, without bouncing the data to a host mem=
-ory
-> > buffer.
->
-> Doesn't that really require peer-to-peer PCIe transfers?
-> IIRC these aren't supported by many root hubs and have
-> fundamental flow control and/or TLP credit problems.
->
-> I'd guess they are also pretty incompatible with IOMMU?
+On Mon, Aug 14, 2023 at 09:56:56PM -0700, Michael Chan wrote:
+> From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> 
+> The use of hwmon_device_register_with_groups() is deprecated.
+> Modified the driver to use hwmon_device_register_with_info().
+> 
+> Driver currently exports only temp1_input through hwmon sysfs
+> interface. But FW has been modified to report more threshold
+> temperatures and driver want to report them through the
+> hwmon interface.
+> 
+> Cc: Jean Delvare <jdelvare@suse.com>
+> Cc: Guenter Roeck <linux@roeck-us.net>
+> Cc: linux-hwmon@vger.kernel.org
+> Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>  .../net/ethernet/broadcom/bnxt/bnxt_hwmon.c   | 72 ++++++++++++++-----
+>  1 file changed, 56 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+> index 476616d97071..20381b7b1d78 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+> @@ -18,34 +18,74 @@
+>  #include "bnxt_hwrm.h"
+>  #include "bnxt_hwmon.h"
+>  
+> -static ssize_t bnxt_show_temp(struct device *dev,
+> -			      struct device_attribute *devattr, char *buf)
+> +static int bnxt_hwrm_temp_query(struct bnxt *bp, u8 *temp)
+>  {
+>  	struct hwrm_temp_monitor_query_output *resp;
+>  	struct hwrm_temp_monitor_query_input *req;
+> -	struct bnxt *bp = dev_get_drvdata(dev);
+> -	u32 len = 0;
+>  	int rc;
+>  
+>  	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
+>  	if (rc)
+>  		return rc;
+>  	resp = hwrm_req_hold(bp, req);
+> -	rc = hwrm_req_send(bp, req);
+> -	if (!rc)
+> -		len = sprintf(buf, "%u\n", resp->temp * 1000); /* display millidegree */
+> -	hwrm_req_drop(bp, req);
+> +	rc = hwrm_req_send_silent(bp, req);
+>  	if (rc)
+> +		goto err;
+> +
+> +	if (temp)
+> +		*temp = resp->temp;
 
-Yes, this is a form of PCI_P2PDMA and all the limitations of that apply.
+Why this NULL pointer check ? This is a static function,
+and it is never called with a NULL pointer.
 
-> I can see how you might manage to transmit frames from
-> some external memory (eg after encryption) but surely
-> processing receive data that way needs the packets
-> be filtered by both IP addresses and port numbers before
-> being redirected to the (presumably limited) external
-> memory.
+> +err:
+> +	hwrm_req_drop(bp, req);
+> +	return rc;
+> +}
+> +
+> +static umode_t bnxt_hwmon_is_visible(const void *_data, enum hwmon_sensor_types type,
+> +				     u32 attr, int channel)
+> +{
+> +	if (type != hwmon_temp)
+> +		return 0;
+> +
+> +	switch (attr) {
+> +	case hwmon_temp_input:
+> +		return 0444;
+> +	default:
+> +		return 0;
+> +	}
+> +}
+> +
+> +static int bnxt_hwmon_read(struct device *dev, enum hwmon_sensor_types type, u32 attr,
+> +			   int channel, long *val)
+> +{
+> +	struct bnxt *bp = dev_get_drvdata(dev);
+> +	u8 temp = 0;
+> +	int rc;
+> +
+> +	switch (attr) {
+> +	case hwmon_temp_input:
+> +		rc = bnxt_hwrm_temp_query(bp, &temp);
+> +		if (!rc)
+> +			*val = temp * 1000;
+>  		return rc;
+> -	return len;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+>  }
+> -static SENSOR_DEVICE_ATTR(temp1_input, 0444, bnxt_show_temp, NULL, 0);
+>  
+> -static struct attribute *bnxt_attrs[] = {
+> -	&sensor_dev_attr_temp1_input.dev_attr.attr,
+> +static const struct hwmon_channel_info *bnxt_hwmon_info[] = {
+> +	HWMON_CHANNEL_INFO(temp,
+> +			   HWMON_T_INPUT),
 
-This feature depends on NIC receive header split. The TCP/IP headers
-are stored to host memory, the payload to device memory.
+Nit: Unnecessary continuation line
 
-Optionally, on devices that do not support explicit header-split, but
-do support scatter-gather I/O, if the header size is constant and
-known, that can be used as a weak substitute. This has additional
-caveats wrt unexpected traffic for which payload must be host visible
-(e.g., ICMP).
+>  	NULL
+>  };
+> -ATTRIBUTE_GROUPS(bnxt);
+> +
+> +static const struct hwmon_ops bnxt_hwmon_ops = {
+> +	.is_visible     = bnxt_hwmon_is_visible,
+> +	.read           = bnxt_hwmon_read,
+> +};
+> +
+> +static const struct hwmon_chip_info bnxt_hwmon_chip_info = {
+> +	.ops    = &bnxt_hwmon_ops,
+> +	.info   = bnxt_hwmon_info,
+> +};
+>  
+>  void bnxt_hwmon_uninit(struct bnxt *bp)
+>  {
+> @@ -72,9 +112,9 @@ void bnxt_hwmon_init(struct bnxt *bp)
+>  	if (bp->hwmon_dev)
+>  		return;
+>  
+> -	bp->hwmon_dev = hwmon_device_register_with_groups(&pdev->dev,
+> -							  DRV_MODULE_NAME, bp,
+> -							  bnxt_groups);
+> +	bp->hwmon_dev = hwmon_device_register_with_info(&pdev->dev,
+> +							DRV_MODULE_NAME, bp,
+> +							&bnxt_hwmon_chip_info, NULL);
+>  	if (IS_ERR(bp->hwmon_dev)) {
+>  		bp->hwmon_dev = NULL;
+>  		dev_warn(&pdev->dev, "Cannot register hwmon device\n");
+> -- 
+> 2.30.1
+> 
 
-> OTOH isn't the kernel going to need to run code before
-> the packet is actually sent and just after it is received?
-> So all you might gain is a bit of latency?
-> And a bit less utilisation of host memory??
-> But if your system is really limited by cpu-memory bandwidth
-> you need more cache :-)
->
->
-> So how much benefit is there over efficient use of host
-> memory bounce buffers??
 
-Among other things, on a PCIe tree this makes it possible to load up
-machines with many NICs + GPUs.
 
