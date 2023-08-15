@@ -1,83 +1,85 @@
-Return-Path: <netdev+bounces-27529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD2977C454
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:14:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6783A77C48F
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:40:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C450C1C20BC0
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 00:14:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC311C20BA1
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 00:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A8019C;
-	Tue, 15 Aug 2023 00:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB7E630;
+	Tue, 15 Aug 2023 00:40:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CBC179
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 00:14:13 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB54172E;
-	Mon, 14 Aug 2023 17:14:11 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-68843478de1so677398b3a.2;
-        Mon, 14 Aug 2023 17:14:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9898A188;
+	Tue, 15 Aug 2023 00:40:07 +0000 (UTC)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBC1F4;
+	Mon, 14 Aug 2023 17:40:06 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1bddac1b7bfso11376735ad.0;
+        Mon, 14 Aug 2023 17:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692058451; x=1692663251;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yl5BFlBDcW+MGrE8+Ois62MVPDM6ryT0SugwmhUr5hA=;
-        b=HHN6LiExmLsPJXVPpAJmtI23OxwBJ8JHHD9Zq4K7VNYd2TkKIn+4y7J6Sd/ioCDNOl
-         XAK3Qy2rVYpIfHx+GQxYtgFbxYBnbv3gtYpaMlA1DJ8Whv1MvR6XjMZ7ASGEcbWoQYZU
-         ahupBrjhUGPwL1Wxv4oB5XfYPNr8EVjQDNBw3Rn9bk/6XerWWcJH0TkUXPQk5LVstlF6
-         /kFtg232qw21vd2zekAQyj5617RI939V4zsXKUqE9kBXTdOmdQNCnF3OK2qFhAQOCl2+
-         yymoC6dAKhEG7mvvKDU+61I3B+hmzJld8UdlXuGEOgO+vEu8EV5t5cycTByGR4jqZ06r
-         QILg==
+        d=gmail.com; s=20221208; t=1692060006; x=1692664806;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5fMH5NUxHJYKatAlHbaGz3MMvlMMEAIyijBcdg08U7I=;
+        b=O60H9O6duSSWPxF9+cT5wCCX/xo1hb8xou6gNN2DLR7KaHrWBG6be/XWHXfIDDc5Vj
+         SN/2RnNQgFkt1SZcMwpkBJvg2M/1uwPghQg3SY9oMfCN1eL5esGOLuT+HJ/6tpYb8c1h
+         6k71lDJSKco/flRnsoruqrdkrpFaMH3MTGBN1iti9E1BoeV9UZJCkmedsrU4c+bHdz9S
+         NZciqQ+U3Nf+FRToptOpb9jaQ8Mnz1DKpImdGoNJK1MLgyOL6fmMXsmBhWoin/vsHIYl
+         zpPhtMdQEOkmHJtCrV4Q5xDGdhjHMu0kTBAf3n0NS79xpv+vdmIUJyRAj5Y/C0hMCyCM
+         Xccw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692058451; x=1692663251;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yl5BFlBDcW+MGrE8+Ois62MVPDM6ryT0SugwmhUr5hA=;
-        b=ZKcEs6Wm0Hj/brhSn7gnuZMG79XyBipOMShW6pmvrNpuHAamR8jHm3qr8foTNOqz4h
-         RuJl3bVJsic4zrzXg/L/PJoE3/vQk5kMeqguTJokHseRBXNXraaQDuviF17VHhfS0AQr
-         HXlpR/KnRaT7R3hR+92dXTg9BiK6KgwWV1LqBujRNs0xCcB+i6gDa0Ad9RX5uLBrolAK
-         DgGaf7tYlEr3ceaaD0F4V1Kp11KP+BiRvOWI7Ej2Ss5BEK+bg4GqGmjKwwMCUzxoBeRZ
-         jRNiND6zU949J4E3pqbWdKeWnhD4DZ4ecalD/qPETc4trjOAD0SrVTscNqQPUeip27C7
-         knfg==
-X-Gm-Message-State: AOJu0Yy+OHEvpWvDI9/s627GxAzR/ZS2rFXV4yF71QntdUH+IwYmnQHL
-	z4F0+cRiOqLnSpUT/s3oC9wa2rkLJgbLnA==
-X-Google-Smtp-Source: AGHT+IELdZAh4H/VbI+BgvpFRCQhs7xh/6Udx+Y0VcHJpRQgabXjgg2VHc9qGxob3Kp9w45/P+DX8Q==
-X-Received: by 2002:a05:6a00:21d4:b0:686:bc23:e20a with SMTP id t20-20020a056a0021d400b00686bc23e20amr12351714pfj.21.1692058450748;
-        Mon, 14 Aug 2023 17:14:10 -0700 (PDT)
-Received: from alfred-laptop.ims.dom ([69.178.150.39])
-        by smtp.gmail.com with ESMTPSA id s11-20020a62e70b000000b0068746ab9aebsm8686403pfh.14.2023.08.14.17.14.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 17:14:10 -0700 (PDT)
-From: Alfred Lee <l00g33k@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	AVKrasnov@sberdevices.ru,
-	Alfred Lee <l00g33k@gmail.com>
-Subject: [PATCH net v3] net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset
-Date: Mon, 14 Aug 2023 17:13:23 -0700
-Message-ID: <20230815001323.24739-1-l00g33k@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20221208; t=1692060006; x=1692664806;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5fMH5NUxHJYKatAlHbaGz3MMvlMMEAIyijBcdg08U7I=;
+        b=S+CClxsWBH1Ac5xMEL71dwEFRcZCRstMtCwuHjjqwPjwWwMAg28O14pOQFR8fEmaWc
+         d+Mnx0hm7HOcsC8mz4MksbhSLgAWyJrEwV2qIJ5EfXsyVW+v4eIEMSRkY7LtH4QORnzI
+         ztr4FpkMULCWBy3xdjtdbJ3KGUQd31QxwIr/EHBYzO5LjFm4RmCTzZwcdXIaMLiePiCW
+         1Vn7i+6fkxNfXiJC/S5qgE01IR2Bk8jgr1NcqyFZlulrY16kSBXfhQdYkNjQwXKBly1N
+         qILxt1WsaicLGe0npwUi22CAwpWbEWyDdUEz7zKikvPmOJ8MkqBelVnt4I8MdVNtQrbY
+         gSNw==
+X-Gm-Message-State: AOJu0YwAc+C531oH9ulHI8TsEDLKHPry9T8M7vYWC8uyfkXF5e3SJjeK
+	CwrGWyFg1EnxtrdrKU4x3NLQdrMRL7I=
+X-Google-Smtp-Source: AGHT+IEEB6lflMWlhdrUmo5oN54WcibS/WJd1F77YfnrV1RIzKdDuvX9wskpOnr5e3Bi5m8h8e9QTA==
+X-Received: by 2002:a17:903:32d0:b0:1b8:8682:62fb with SMTP id i16-20020a17090332d000b001b8868262fbmr740355plr.4.1692060005978;
+        Mon, 14 Aug 2023 17:40:05 -0700 (PDT)
+Received: from [192.168.0.105] ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id f2-20020a170902ab8200b001bbbc655ca1sm10023858plr.219.2023.08.14.17.40.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 17:40:05 -0700 (PDT)
+Message-ID: <e75b57d9-9093-0a22-d53d-e510fd422279@gmail.com>
+Date: Tue, 15 Aug 2023 07:39:58 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Content-Language: en-US
+To: Ilya Maximets <i.maximets@ovn.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Joseph Vance Reilly <Joseph.Reilly@uga.edu>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux BPF <bpf@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>,
+ Linux IOMMU <iommu@lists.linux.dev>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Fwd: AF-XDP program in multi-process/multi-threaded configuration
+ IO_PAGEFAULT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -85,40 +87,41 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-If the switch is reset during active EEPROM transactions, as in
-just after an SoC reset after power up, the I2C bus transaction
-may be cut short leaving the EEPROM internal I2C state machine
-in the wrong state.  When the switch is reset again, the bad
-state machine state may result in data being read from the wrong
-memory location causing the switch to enter unexpected mode
-rendering it inoperational.
+Hi,
 
-Fixes: a3dcb3e7e70c ("net: dsa: mv88e6xxx: Wait for EEPROM done after HW reset")
-Signed-off-by: Alfred Lee <l00g33k@gmail.com>
----
- drivers/net/dsa/mv88e6xxx/chip.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+I notice a bug report on Bugzilla [1]. Quoting from it:
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index c7d51a539451..7af2f08a62f1 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3034,6 +3034,14 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
- 
- 	/* If there is a GPIO connected to the reset pin, toggle it */
- 	if (gpiod) {
-+		/* If the switch has just been reset and not yet completed
-+		 * loading EEPROM, the reset may interrupt the I2C transaction
-+		 * mid-byte, causing the first EEPROM read after the reset
-+		 * from the wrong location resulting in the switch booting
-+		 * to wrong mode and inoperable.
-+		 */
-+		mv88e6xxx_g1_wait_eeprom_done(chip);
-+
- 		gpiod_set_value_cansleep(gpiod, 1);
- 		usleep_range(10000, 20000);
- 		gpiod_set_value_cansleep(gpiod, 0);
+> Hello,
+> 
+> I am currently doing research on AF_XDP and I encountered a bug that is present in multi-process and multi-threaded configurations of AF_XDP programs. I believe there is a race condition that causes an IO_PAGEFAULT and the entire OS to crash when it is encountered. This bug can be reproduced using Suricata release 7.0.0-rc1, or another program where multiple user space processes each with an AF_XDP socket are created.
+> 
+> I have attached some sample code that has should be able to reproduce the bug. This code creates n processes where n is the number of RX queues specified by the user. In my experience the higher the number of processes/RX queues used, the higher the likelihood of triggering the crash. 
+> 
+> To change the number of RX queues, use Ethtool to set the number of combined RX queues, this may vary depending on network card:
+> sudo ethtool -L <interface> combined <number of RX queues>
+> 
+> Compile the code using make and run the code as such:
+> sudo -E ./xdp_main.o <interface> <number of child processes> consec
+> 
+> To get the crash to show up, lots of traffic needs to be sent to the network interface. In our experimental setup, a machine using Pktgen is sending traffic to the machine running the AF_XDP code at max line rate. Using Pktgen, vary the IP/MAC addresses of each packet to make sure the packets are somewhat evenly distributed across each RX queue. This may help with reproducing the bug. Also be sure the interface is set to promiscuous mode.
+> 
+> While sending traffic at max line rate, send a SIGINT to the AF_XDP program receiving the traffic to terminate the program. Sometimes an IO_PAGEFAULT will occur. This is more common than not. Also attached are some screen shots of the terminal and of the output our server gives.
+> 
+> The bug occurs because each process has the same STDIN file descriptor and as a result each child process gets the same SIGINT signal at the same time causing them all to terminate at once. During this, I believe a race condition is reached where the AF_XDP program is still receiving packets and is trying to write them to a UMEM that no longer exists. The order of operations to cause this would be:
+> 1. XDP program looks up AF_XDP socket in XSKS_MAP 
+> 2. User space program deletes UMEM and/or AF_XDP socket 
+> 3. XDP program tries to write packet to UMEM
+> 
+> This can also be reproduced with Suricata as stated earlier with a similar traffic load as described for my personal program.
+> 
+> If more clarification is needed, please reach out to me. I would also like to know if this is an intended design or the cause of this bug. I look forward to hearing from you!
+
+See Bugzilla for the full thread and attached reproducer code.
+
+Thanks.
+
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217712
+
 -- 
-2.41.0
-
+An old man doll... just what I always wanted! - Clara
 
