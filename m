@@ -1,102 +1,75 @@
-Return-Path: <netdev+bounces-27704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E4B377CEC0
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:13:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B81F77CECA
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E54228156B
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:13:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9CC028133E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82C51426C;
-	Tue, 15 Aug 2023 15:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3D41426C;
+	Tue, 15 Aug 2023 15:14:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF56713AEF;
-	Tue, 15 Aug 2023 15:13:09 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091121991;
-	Tue, 15 Aug 2023 08:13:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=3FVkfmimyGLe7ZQLw14Bh2D/6Fym3SH8k3h8yeiqRQU=; b=gmRUb9WNZ1BobTGE+WroBYMCGl
-	VnvndwBnm8gMluT/dcWJcPsQAD6bVncAtBXWdu7gVyMZhWErV/7upSyu62pyq2QmzlFetaQpEnh2M
-	UAb8l/5UoZkiUgaDvFfMjP1txW3ONUpohtdTUOj2IjbVjNAKiTqSls1orWH2rWDgiBtlpTidb38tr
-	Sfm7/fYiBxZBX6F2CE3zRq4QPl/LOKga/QCiqtVXwh15V/rVBINul+ZkaL9ZpWYH6IHhMb/rirGkS
-	V+I80XXGzu0dK1J6H1hWm1wG+n9pY2Z6MLNFBcyoeXBX7t3b1e10ibPoVQNVnOrrOkMxMoSAXPxi6
-	TabqlluQ==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qVviz-001pNO-13;
-	Tue, 15 Aug 2023 15:12:49 +0000
-Message-ID: <c52210ab-48a5-d6bf-26ee-b828df0f9408@infradead.org>
-Date: Tue, 15 Aug 2023 08:12:47 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391811097E
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 15:14:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6450DC433C7;
+	Tue, 15 Aug 2023 15:14:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1692112469;
+	bh=IzNwg4CCiiXIeHaRgVo+rMcufOaTDrxQF84slft88c4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fZVDGF95gT3XgkvMortxqlPKycWU/tqCecCZWMWBozMUUIe7MJpCPJ5FzINRNe3kK
+	 S8Zb0BlkIyU4i28Uf4oWsShtVGgEvvjAiqYUjjGGT1tEs0WBRML92De6umBQn3o2UX
+	 7TkZafajcamBg4RVfsf10BGAFrhOca1/wWzqHFe0=
+Date: Tue, 15 Aug 2023 17:14:27 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: kernel@openeuler.org, duanzi@zju.edu.cn, yuehaibing@huawei.com,
+	weiyongjun1@huawei.com, liujian56@huawei.com,
+	Laszlo Ersek <lersek@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pietro Borrello <borrello@diag.uniroma1.it>, netdev@vger.kernel.org,
+	stable@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH OLK-5.10 v2 1/2] net: tun_chr_open(): set sk_uid from
+ current_fsuid()
+Message-ID: <2023081559-excursion-passion-07a3@gregkh>
+References: <20230815135602.1014881-1-dongchenchen2@huawei.com>
+ <20230815135602.1014881-2-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v6 5/6] page_pool: update document about frag API
-Content-Language: en-US
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Liang Chen <liangchen.linux@gmail.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Eric Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>, linux-doc@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20230814125643.59334-1-linyunsheng@huawei.com>
- <20230814125643.59334-6-linyunsheng@huawei.com>
- <479a9c1f-9db7-61c8-3485-9b330f777930@infradead.org>
- <0cbf592e-2f21-30ca-799e-5cc15e89c3f8@huawei.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <0cbf592e-2f21-30ca-799e-5cc15e89c3f8@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815135602.1014881-2-dongchenchen2@huawei.com>
 
-
-
-On 8/15/23 05:24, Yunsheng Lin wrote:
-> On 2023/8/15 6:42, Randy Dunlap wrote:
->> Hi--
-> Thanks for the reviewing.
+On Tue, Aug 15, 2023 at 09:56:01PM +0800, Dong Chenchen wrote:
+> From: Laszlo Ersek <lersek@redhat.com>
 > 
-> ...
+> stable inclusion
+> from stable-v5.10.189
+> commit 5ea23f1cb67e4468db7ff651627892c9217fec24
+> category: bugfix
+> bugzilla: 189104, https://gitee.com/src-openeuler/kernel/issues/I7QXHX
+> CVE: CVE-2023-4194
 > 
->>> @@ -100,6 +115,14 @@ static inline struct page *page_pool_alloc_frag(struct page_pool *pool,
->>>       return __page_pool_alloc_frag(pool, offset, size, gfp);
->>>   }
->>>   +/**
->>> + * page_pool_dev_alloc_frag() - allocate a page frag.
->>> + * @pool[in]    pool from which to allocate
->>> + * @offset[out]    offset to the allocated page
->>> + * @size[in]    requested size
->> Please use kernel-doc syntax/notation here.
-> Will change to:
+> Reference: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=5ea23f1cb67e4468db7ff651627892c9217fec24
 
-Thanks. Those look good.
+Why are you not just merging directly from the LTS branches into your
+tree?  If you attempt to "cherry-pick" patches like this, you WILL miss
+valid bugfixes.
 
--- 
-~Randy
+thanks,
+
+greg k-h
 
