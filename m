@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-27721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005FB77D015
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:26:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FF477D016
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADD4D2814C7
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:26:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAC182814A8
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB540156E5;
-	Tue, 15 Aug 2023 16:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C9AF15AC6;
+	Tue, 15 Aug 2023 16:26:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5C6156E4
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 16:26:23 +0000 (UTC)
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA028EE
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 09:26:21 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-76d1c58ace6so288218685a.1
-        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 09:26:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2AA156FD
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 16:26:24 +0000 (UTC)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89A310D1
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 09:26:22 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-40ffa784eaeso28630571cf.0
+        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 09:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692116781; x=1692721581;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692116782; x=1692721582;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uoRTLxA83owuqHIF5w85em2MfTM3rO2JzFdkcwhTzpo=;
-        b=ogMciMFn2gZkrKs/gMwjvIs9QfrrkMlVMwuJDcxc48PZpADgWTQ09fy8225k8+iYy9
-         u8amT8pVo2uFuZxWXS6CtpGbqP7WOamihiMSTgHlBTseDXwoNEkb4RKxwqxNRwXkrDAl
-         nGlnvM6b9NMswRHPCJEWpTuHNxi3pDRO3A4+b9S2o9iJBf8iICMvwAw0kGcVWIEh8gAC
-         ctLoF6ISOOgfTDDgSjStQ0FqmR0COcgBfqgFOz2jHjvZsGeGXIReWFLL0KdyHa4qJLPb
-         HN/wkNodi6qBeG8HIbCzONnVgUHKmNKpm7DG00EOIoWNNKbmiRvVMqhw0viS5VHe9kZS
-         Xc0w==
+        bh=GjmZ3NeF/Ok7CZo49WbchZlg0SyWPJ1z32hVeimCtu8=;
+        b=C3980aITKSv8xzxwzSzD63kjJvFTPIhMMHecWJU8u3sdszNwJCK7wW8ncjq7yHg03p
+         ee4CTYFLOJZtNkYbIB0Yc8DN93+3lKQBPRnoSL4OAliduX6OB/djHpqEuG0w5fnK+aN6
+         3qvnAPzyrTDtxjlE0Q0CH6sEIOtZw0igXZwb1MVHSl0AO4ldvN/2c4RgYZVXnKy0Wbta
+         jXTqrUHLnK3bAsA3+GXrmOLACIzLEDOQEw8oQ/46DIlHYuvZRxqCRNazsB0isLLtXHcH
+         4s9EohlCpoutg3CKpHffB1yJBAw7LS6mexpnbdMS2LdjdEGU/vRf5OrqiZY5H9DMTO2g
+         X24w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692116781; x=1692721581;
+        d=1e100.net; s=20221208; t=1692116782; x=1692721582;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uoRTLxA83owuqHIF5w85em2MfTM3rO2JzFdkcwhTzpo=;
-        b=dHIzTRBMwVuh9JFynz8ODssWSd6lcmsWvceGF+vpRLLB1yvETa8ourSKALtBuIaTzZ
-         HYNherXZvsloJz4ko/wW6b20JAJEcysM4ogZOjVpxNmpCPZd7TNaoOQmhkTNndwRIMKP
-         FJZGvzHew7eOuDtZ7aCFj+GJfRP0A8ZLmpn9WSVXNxxkuqGYHO/w74oxC7BDyT8/VL+M
-         ju0ahhS76EISU12+LbyaKwAjlbaRaoW06pqj5fRu0Pf9bBuTlWxQZ8PoSWFrVnAEsRBp
-         1i3WuzVJelavj/lH1WyjTgaCy0yfBl0Jh/AGqBbS7xjarMJyi3G0zMnLvy21DcUssRA+
-         jVRQ==
-X-Gm-Message-State: AOJu0YyPbCxQms44qkIdU0i6HdT6pKAIogI7e7KqCfReX+zfEvaAZbZN
-	50mNx51TGLj8QUcA9WTr+2jFMw==
-X-Google-Smtp-Source: AGHT+IEtgCEWhGhkeVfGVFrkVu+c6z5e8LVCiYCw+JpcuLHL0GICBcANeatvwPc6HpwQVBbCjQSZIg==
-X-Received: by 2002:a05:620a:2982:b0:76c:e661:448b with SMTP id r2-20020a05620a298200b0076ce661448bmr3432368qkp.33.1692116781043;
-        Tue, 15 Aug 2023 09:26:21 -0700 (PDT)
+        bh=GjmZ3NeF/Ok7CZo49WbchZlg0SyWPJ1z32hVeimCtu8=;
+        b=Ur5wB7U+2fLDjiavekEhO2NfN5+vXXAwn3LJ7ddS0yW9fVfqUMglMPY1FfdZjsOexx
+         RzEZvVb8MEiNcL78QllPLtlezG4ft7VO30SLWW/8SAo0rmJ8qlokeG9q34vwXUsW6lMx
+         ev0G/M44sQ8hzHeoy3YRiArate7FKAmVF10XG6iMWbbHIuTQAKUvEACSKt/B0qmfHSjG
+         4lf6xU0rQmXfp+bw1Tocd2xWOAhl8P8h1+9+ejWciWm1saFD3BlQfYug/Npvgkb1Hatz
+         D4cK7EMLTzNPes4OKcFbZ35JDMdxL69YEWNkyBv3bwBHHtWlQsqAXLf1mEI/dv2HpISK
+         3D7Q==
+X-Gm-Message-State: AOJu0YyEgKn9/xxowI7FPtE53xDc0VSMkE/JwN2H6/9Otu+5AzQDR7/x
+	6MMyXuojfybFyOMuK+q/Bcz0ew==
+X-Google-Smtp-Source: AGHT+IGJZ3kDbWFYxkcUdW3XzedwvzL3kR8f/St9QPbgYa4k1O64K9yuolVY1i5iIPB8XLnbABtM2g==
+X-Received: by 2002:ac8:5f0f:0:b0:406:94af:c912 with SMTP id x15-20020ac85f0f000000b0040694afc912mr15257815qta.54.1692116782080;
+        Tue, 15 Aug 2023 09:26:22 -0700 (PDT)
 Received: from majuu.waya ([174.93.66.252])
-        by smtp.gmail.com with ESMTPSA id q5-20020ac87345000000b003fde3d63d22sm3874640qtp.69.2023.08.15.09.26.19
+        by smtp.gmail.com with ESMTPSA id q5-20020ac87345000000b003fde3d63d22sm3874640qtp.69.2023.08.15.09.26.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 09:26:20 -0700 (PDT)
+        Tue, 15 Aug 2023 09:26:21 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: jiri@resnulli.us
 Cc: xiyou.wangcong@gmail.com,
@@ -63,12 +63,11 @@ Cc: xiyou.wangcong@gmail.com,
 	vladbu@nvidia.com,
 	mleitner@redhat.com,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@nvidia.com>,
 	Victor Nogueira <victor@mojatatu.com>,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH RFC net-next 1/3] Introduce tc block netdev tracking infra
-Date: Tue, 15 Aug 2023 12:25:28 -0400
-Message-Id: <20230815162530.150994-2-jhs@mojatatu.com>
+Subject: [PATCH RFC net-next 2/3] Expose tc block ports to the datapath
+Date: Tue, 15 Aug 2023 12:25:29 -0400
+Message-Id: <20230815162530.150994-3-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815162530.150994-1-jhs@mojatatu.com>
 References: <20230815162530.150994-1-jhs@mojatatu.com>
@@ -85,266 +84,76 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The tc block is a collection of netdevs/ports which allow qdiscs to share filter
-block instances (as opposed to the traditional tc filter per port).
-Example:
-$ tc qdisc add dev ens7 ingress block 22
-$ tc qdisc add dev ens8 ingress block 22
+The datapath can now find the block of the port in which the packet arrived at.
+It can then use it for various activities.
 
-Now we can add a filter using the block index:
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 192.168.0.0/16 action drop
+In the next patch we show a simple action that multicast to all ports except for
+the port in which the packet arrived on.
 
-Upto this point, the block is unaware of its ports. This patch fixes that and
-makes the tc block ports available to the datapath as well as control path on
-offloading.
-
-Suggested-by: Jiri Pirko <jiri@nvidia.com>
 Co-developed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/sch_generic.h |  4 ++
- net/sched/cls_api.c       |  1 +
- net/sched/sch_api.c       | 82 +++++++++++++++++++++++++++++++++++++--
- net/sched/sch_generic.c   | 40 ++++++++++++++++++-
- 4 files changed, 121 insertions(+), 6 deletions(-)
+ include/net/sch_generic.h | 4 ++++
+ net/sched/cls_api.c       | 6 +++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index f232512505f8..f002b0423efc 100644
+index f002b0423efc..a99ac60426b3 100644
 --- a/include/net/sch_generic.h
 +++ b/include/net/sch_generic.h
-@@ -19,6 +19,7 @@
- #include <net/gen_stats.h>
- #include <net/rtnetlink.h>
- #include <net/flow_offload.h>
-+#include <linux/xarray.h>
- 
- struct Qdisc_ops;
- struct qdisc_walker;
-@@ -126,6 +127,8 @@ struct Qdisc {
- 
- 	struct rcu_head		rcu;
- 	netdevice_tracker	dev_tracker;
-+	netdevice_tracker	in_block_tracker;
-+	netdevice_tracker	eg_block_tracker;
- 	/* private data */
- 	long privdata[] ____cacheline_aligned;
- };
-@@ -458,6 +461,7 @@ struct tcf_chain {
+@@ -440,6 +440,8 @@ struct qdisc_skb_cb {
+ 	};
+ #define QDISC_CB_PRIV_LEN 20
+ 	unsigned char		data[QDISC_CB_PRIV_LEN];
++	/* This should allow eBPF to continue to align */
++	u32                     block_index;
  };
  
- struct tcf_block {
-+	struct xarray ports; /* datapath accessible */
- 	/* Lock protects tcf_block and lifetime-management data of chains
- 	 * attached to the block (refcnt, action_refcnt, explicitly_created).
- 	 */
+ typedef void tcf_chain_head_change_t(struct tcf_proto *tp_head, void *priv);
+@@ -488,6 +490,8 @@ struct tcf_block {
+ 	struct mutex proto_destroy_lock; /* Lock for proto_destroy hashtable. */
+ };
+ 
++struct tcf_block *tcf_block_lookup(struct net *net, u32 block_index);
++
+ static inline bool lockdep_tcf_chain_is_locked(struct tcf_chain *chain)
+ {
+ 	return lockdep_is_held(&chain->filter_chain_lock);
 diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index a193cc7b3241..a976792ef02f 100644
+index a976792ef02f..be4555714519 100644
 --- a/net/sched/cls_api.c
 +++ b/net/sched/cls_api.c
-@@ -1003,6 +1003,7 @@ static struct tcf_block *tcf_block_create(struct net *net, struct Qdisc *q,
- 	refcount_set(&block->refcnt, 1);
- 	block->net = net;
- 	block->index = block_index;
-+	xa_init(&block->ports);
- 
- 	/* Don't store q pointer for blocks which are shared */
- 	if (!tcf_block_shared(block))
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index aa6b1fe65151..744db6d50f77 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1180,6 +1180,73 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
- 	return 0;
+@@ -1011,12 +1011,13 @@ static struct tcf_block *tcf_block_create(struct net *net, struct Qdisc *q,
+ 	return block;
  }
  
-+//XXX: Does not seem necessary
-+static void qdisc_block_undo_set(struct Qdisc *sch, struct nlattr **tca)
-+{
-+	if (tca[TCA_INGRESS_BLOCK])
-+		sch->ops->ingress_block_set(sch, 0);
-+
-+	if (tca[TCA_EGRESS_BLOCK])
-+		sch->ops->egress_block_set(sch, 0);
-+}
-+
-+static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
-+			       struct nlattr **tca,
-+			       struct netlink_ext_ack *extack)
-+{
-+	const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
-+	struct tcf_block *in_block = NULL;
-+	struct tcf_block *eg_block = NULL;
-+	unsigned long cl = 0;
-+	int err;
-+
-+	if (tca[TCA_INGRESS_BLOCK]) {
-+		/* works for both ingress and clsact */
-+		cl = TC_H_MIN_INGRESS;
-+		in_block = cl_ops->tcf_block(sch, cl, NULL);
-+		if (!in_block) {
-+			NL_SET_ERR_MSG(extack, "Shared ingress block missing");
-+			return -EINVAL;
-+		}
-+
-+		err = xa_insert(&in_block->ports, dev->ifindex, dev, GFP_KERNEL);
-+		if (err) {
-+			NL_SET_ERR_MSG(extack, "ingress block dev insert failed");
-+			return err;
-+		}
-+
-+		netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
-+	}
-+
-+	if (tca[TCA_EGRESS_BLOCK]) {
-+		cl = TC_H_MIN_EGRESS;
-+		eg_block = cl_ops->tcf_block(sch, cl, NULL);
-+		if (!eg_block) {
-+			NL_SET_ERR_MSG(extack, "Shared egress block missing");
-+			err = -EINVAL;
-+			goto err_out;
-+		}
-+
-+		err = xa_insert(&eg_block->ports, dev->ifindex, dev, GFP_KERNEL);
-+		if (err) {
-+			netdev_put(dev, &sch->eg_block_tracker);
-+			NL_SET_ERR_MSG(extack, "Egress block dev insert failed");
-+			goto err_out;
-+		}
-+		netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
-+	}
-+
-+	return 0;
-+err_out:
-+	if (in_block) {
-+		xa_erase(&in_block->ports, dev->ifindex);
-+		netdev_put(dev, &sch->in_block_tracker);
-+		NL_SET_ERR_MSG(extack, "ingress block dev insert failed");
-+	}
-+	return err;
-+}
-+
-+//XXX: Should we reset INGRES if EGRESS fails?
- static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tca,
- 				   struct netlink_ext_ack *extack)
+-static struct tcf_block *tcf_block_lookup(struct net *net, u32 block_index)
++struct tcf_block *tcf_block_lookup(struct net *net, u32 block_index)
  {
-@@ -1270,7 +1337,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
- 	sch = qdisc_alloc(dev_queue, ops, extack);
- 	if (IS_ERR(sch)) {
- 		err = PTR_ERR(sch);
--		goto err_out2;
-+		goto err_out1;
- 	}
+ 	struct tcf_net *tn = net_generic(net, tcf_net_id);
  
- 	sch->parent = parent;
-@@ -1289,7 +1356,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
- 			if (handle == 0) {
- 				NL_SET_ERR_MSG(extack, "Maximum number of qdisc handles was exceeded");
- 				err = -ENOSPC;
--				goto err_out3;
-+				goto err_out2;
- 			}
- 		}
- 		if (!netif_is_multiqueue(dev))
-@@ -1311,7 +1378,7 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+ 	return idr_find(&tn->idr, block_index);
+ }
++EXPORT_SYMBOL(tcf_block_lookup);
  
- 	err = qdisc_block_indexes_set(sch, tca, extack);
- 	if (err)
--		goto err_out3;
-+		goto err_out2;
- 
- 	if (tca[TCA_STAB]) {
- 		stab = qdisc_get_stab(tca[TCA_STAB], extack);
-@@ -1350,6 +1417,10 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
- 	qdisc_hash_add(sch, false);
- 	trace_qdisc_create(ops, dev, parent);
- 
-+	err = qdisc_block_add_dev(sch, dev, tca, extack);
-+	if (err)
-+		goto err_out4;
-+
- 	return sch;
- 
- err_out4:
-@@ -1360,9 +1431,12 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
- 		ops->destroy(sch);
- 	qdisc_put_stab(rtnl_dereference(sch->stab));
- err_out3:
-+	//XXX: not sure if we need to do this
-+	qdisc_block_undo_set(sch, tca);
-+err_out2:
- 	netdev_put(dev, &sch->dev_tracker);
- 	qdisc_free(sch);
--err_out2:
-+err_out1:
- 	module_put(ops->owner);
- err_out:
- 	*errp = err;
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 5d7e23f4cc0e..c62583bba06f 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -1048,7 +1048,12 @@ static void qdisc_free_cb(struct rcu_head *head)
- 
- static void __qdisc_destroy(struct Qdisc *qdisc)
+ static struct tcf_block *tcf_block_refcnt_get(struct net *net, u32 block_index)
  {
--	const struct Qdisc_ops  *ops = qdisc->ops;
-+	struct net_device *dev = qdisc_dev(qdisc);
-+	const struct Qdisc_ops *ops = qdisc->ops;
-+	const struct Qdisc_class_ops *cops;
-+	struct tcf_block *block;
-+	unsigned long cl;
-+	u32 block_index;
+@@ -1737,9 +1738,12 @@ int tcf_classify(struct sk_buff *skb,
+ 		 const struct tcf_proto *tp,
+ 		 struct tcf_result *res, bool compat_mode)
+ {
++	struct qdisc_skb_cb *qdisc_cb = qdisc_skb_cb(skb);
+ #if !IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
+ 	u32 last_executed_chain = 0;
  
- #ifdef CONFIG_NET_SCHED
- 	qdisc_hash_del(qdisc);
-@@ -1059,11 +1064,42 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
- 
- 	qdisc_reset(qdisc);
- 
-+	cops = ops->cl_ops;
-+	if (ops->ingress_block_get) {
-+		block_index = ops->ingress_block_get(qdisc);
-+		if (block_index) {
-+			/* XXX: will only work for clsact and ingress, we need
-+			 *  a flag for qdiscs instead of depending on this hack
-+			 */
-+			cl = TC_H_MIN_INGRESS;
-+			block = cops->tcf_block(qdisc, cl, NULL);
-+			if (block) {
-+				if (xa_erase(&block->ports, dev->ifindex))
-+					netdev_put(dev, &qdisc->in_block_tracker);
-+			}
-+		}
-+	}
++	qdisc_cb->block_index = block->index;
 +
-+	if (ops->egress_block_get) {
-+		block_index = ops->egress_block_get(qdisc);
-+		if (block_index) {
-+			/* XXX: will only work for clsact, we need a flag for
-+			 * qdiscs instead of depending on this hack
-+			 */
-+			cl = TC_H_MIN_EGRESS;
-+			block = cops->tcf_block(qdisc, cl, NULL);
-+			if (block) {
-+				if (xa_erase(&block->ports, dev->ifindex))
-+					netdev_put(dev, &qdisc->eg_block_tracker);
-+			}
-+		}
-+	}
-+
- 	if (ops->destroy)
- 		ops->destroy(qdisc);
- 
- 	module_put(ops->owner);
--	netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
-+	netdev_put(dev, &qdisc->dev_tracker);
- 
- 	trace_qdisc_destroy(qdisc);
- 
+ 	return __tcf_classify(skb, tp, tp, res, compat_mode, NULL, 0,
+ 			      &last_executed_chain);
+ #else
 -- 
 2.34.1
 
