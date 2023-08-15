@@ -1,158 +1,142 @@
-Return-Path: <netdev+bounces-27629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DDC477C96C
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:37:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D93077C97E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501B31C20CBF
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:37:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30561C20C7A
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7F25689;
-	Tue, 15 Aug 2023 08:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66244AD28;
+	Tue, 15 Aug 2023 08:41:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E8323CC
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:37:11 +0000 (UTC)
-Received: from out-30.mta0.migadu.com (out-30.mta0.migadu.com [91.218.175.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2ECC10F
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:37:08 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692088626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uBmn5bY96EnmwKJFlv+WltFrhGvpjIbZEKIiYirKvRY=;
-	b=vz0KHcPQmyiJWfmlN0KqRtShPV8OO94S7Ve+8NAyKaJzlfD3l3Gwdcs50vzwkyJwFeNk42
-	wWmdUe83i5yu+zc+P73iwMyGZC6f36VMufdeZyZpMS2xcjecgpOeJWBucmjek3/RmzHbqM
-	Esg+z/IvqlGN9dYsqiRnMi0+1ICkj/k=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D3E7494
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:41:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA94FC433C7;
+	Tue, 15 Aug 2023 08:41:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692088916;
+	bh=WqQoOnB/jc8Ton23ktHqTDSvzOIg7daMCkV5SRI4gPM=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=KegzqopzoNJ3z0MXzToUFtlYs73e60whma4YHay7nEuhv6CqbmvVEVZsYukjEo0k1
+	 3oiwWcBeKrx4SVHyPvTgnCNI+SKL4KvBa7Q5T0l1g+86y5f10LccrcSSrKnMzcEmZ2
+	 i242c7r5Zig+XQNiqYIpZquKDc4U43oJrsyhm/FX31sQ00rwAYJC9tOQZWuS3Tjc8L
+	 1fVYK/u0kvv2XrDj8ajBqGKc2A5J+OKISGVDYEmvRgKJlzkHNZXAT44RbkyUAhqInY
+	 PNlqiXsYQ3bPAYEBElAEoaXyoP6+O2b1iqklhrw4wnY7Kafj6nEW2pZ1l0CClausIm
+	 skkqbr0EyhcrQ==
+Message-ID: <110797fb-fea6-cb4d-af3c-4665e8246479@kernel.org>
+Date: Tue, 15 Aug 2023 10:41:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 01/48] mm: move some shrinker-related function
- declarations to mm/internal.h
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230807110936.21819-2-zhengqi.arch@bytedance.com>
-Date: Tue, 15 Aug 2023 16:36:31 +0800
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- david@fromorbit.com,
- tkhai@ya.ru,
- Vlastimil Babka <vbabka@suse.cz>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- djwong@kernel.org,
- Christian Brauner <brauner@kernel.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- tytso@mit.edu,
- steven.price@arm.com,
- cel@kernel.org,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- yujie.liu@intel.com,
- Greg KH <gregkh@linuxfoundation.org>,
- simon.horman@corigine.com,
- dlemoal@kernel.org,
- LKML <linux-kernel@vger.kernel.org>,
- Linux-MM <linux-mm@kvack.org>,
- x86@kernel.org,
- kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org,
- linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com,
- linux-nfs@vger.kernel.org,
- linux-mtd@lists.infradead.org,
- rcu@vger.kernel.org,
- netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org,
- linux-arm-msm@vger.kernel.org,
- dm-devel@redhat.com,
- linux-raid@vger.kernel.org,
- linux-bcache@vger.kernel.org,
- virtualization@lists.linux-foundation.org,
- linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org,
- linux-xfs@vger.kernel.org,
- linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FC3AE898-443D-4ACB-BCB4-0F8F2F48CDD0@linux.dev>
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-2-zhengqi.arch@bytedance.com>
-To: Qi Zheng <zhengqi.arch@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: kuba@kernel.org, pabeni@redhat.cm, edumazet@google.com,
+ aleksander.lobakin@intel.com, hawk@kernel.org, sgoutham@marvell.com,
+ gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [PATCH v1 net] octeontx2-pf: fix page_pool creation fail for
+ rings > 32k
+Content-Language: en-US
+To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230814132411.2475687-1-rkannoth@marvell.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20230814132411.2475687-1-rkannoth@marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-> On Aug 7, 2023, at 19:08, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
->=20
-> The following functions are only used inside the mm subsystem, so it's
-> better to move their declarations to the mm/internal.h file.
->=20
-> 1. shrinker_debugfs_add()
-> 2. shrinker_debugfs_detach()
-> 3. shrinker_debugfs_remove()
->=20
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+On 14/08/2023 15.24, Ratheesh Kannoth wrote:
+> octeontx2 driver calls page_pool_create() during driver probe()
+> and fails if queue size > 32k. Page pool infra uses these buffers
+> as shock absorbers for burst traffic. These pages are pinned
+> down as soon as page pool is created. 
 
-Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+It isn't true that "pages are pinned down as soon as page pool is created".
+We need to improve this commit text.
+My suggestion:
 
-One nit bellow.
+  These pages are pinned down over time as working sets varies, due to
+  the recycling nature of page pool, given page pool (currently) don't
+  have a shrinker mechanism, the pages remain pinned down in ptr_ring.
 
-[...]
+> As page pool does direct
+> recycling way more aggressivelyi, often times ptr_ring is left
+                                  ^
+Typo
+(my suggestion already covers recycling)
 
+> unused at all. Instead of clamping page_pool size to 32k at
+> most, limit it even more to 2k to avoid wasting memory on much
+> less used ptr_ring.
+
+I would adjust and delete "much less used".
+
+I assume you have the octeontx2 hardware available (which I don't).
+Can you test that this adjustment to 2k doesn't cause a performance
+regression on your hardware?
+And then produce a statement in the commit desc like:
+
+  This have been tested on octeontx2 hardware (devel board xyz).
+  TCP and UDP tests using netperf shows not performance regressions.
+
+
+2K with page_size 4KiB is around 8MiB if PP gets full.
+
+It would be convincing if commit message said e.g. PP pool_size 2k can
+maximum pin down 8MiB per RX-queue (assuming page size 4K), but that is
+okay as systems using octeontx2 hardware often have many GB of memory.
+
+> 
+> Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> 
+> ---
+> 
+> ChangeLogs:
+> 
+> v0->v1: Commit message changes.
+> ---
+> ---
+>   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
+>   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h | 2 ++
+>   2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> index 77c8f650f7ac..fc8a1220eb39 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> @@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+>   	}
+>   
+>   	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+> -	pp_params.pool_size = numptrs;
+> +	pp_params.pool_size = OTX2_PAGE_POOL_SZ;
+>   	pp_params.nid = NUMA_NO_NODE;
+>   	pp_params.dev = pfvf->dev;
+>   	pp_params.dma_dir = DMA_FROM_DEVICE;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+> index ba8091131ec0..f6fea43617ff 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+> @@ -30,6 +30,8 @@
+>   #include <rvu_trace.h>
+>   #include "qos.h"
+>   
+> +#define OTX2_PAGE_POOL_SZ 2048
 > +
-> +/*
-> + * shrinker related functions
-> + */
-
-This is a multi-comment format. "/* shrinker related functions. */" is
-the right one-line format of comment.
-
-> +
-> +#ifdef CONFIG_SHRINKER_DEBUG
-> +extern int shrinker_debugfs_add(struct shrinker *shrinker);
-> +extern struct dentry *shrinker_debugfs_detach(struct shrinker =
-*shrinker,
-> +      int *debugfs_id);
-> +extern void shrinker_debugfs_remove(struct dentry *debugfs_entry,
-> +    int debugfs_id);
-> +#else /* CONFIG_SHRINKER_DEBUG */
-> +static inline int shrinker_debugfs_add(struct shrinker *shrinker)
-> +{
-> +	return 0;
-> +}
-> +static inline struct dentry *shrinker_debugfs_detach(struct shrinker =
-*shrinker,
-> +     int *debugfs_id)
-> +{
-> +	*debugfs_id =3D -1;
-> +	return NULL;
-> +}
-> +static inline void shrinker_debugfs_remove(struct dentry =
-*debugfs_entry,
-> +	int debugfs_id)
-> +{
-> +}
-> +#endif /* CONFIG_SHRINKER_DEBUG */
-> +
-> #endif /* __MM_INTERNAL_H */
-> --=20
-> 2.30.2
->=20
-
+>   /* IPv4 flag more fragment bit */
+>   #define IPV4_FLAG_MORE				0x20
+>   
 
