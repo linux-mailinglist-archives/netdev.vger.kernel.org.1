@@ -1,152 +1,109 @@
-Return-Path: <netdev+bounces-27634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C69F77C9C9
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:54:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 854B877C9CF
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F8411C20C7A
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:54:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2DBF1C20C2B
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 08:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DA5C8E6;
-	Tue, 15 Aug 2023 08:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5776DBE71;
+	Tue, 15 Aug 2023 08:56:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CF6BE71
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:54:19 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3139B2111
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:53:52 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b9e6cc93c6so78475831fa.2
-        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:53:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1692089630; x=1692694430;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Vs87HKrsdbyJ5hB+fbzGtDIkM6Q580dZbGEbWsN7GQ=;
-        b=h1Kj4Vv++QxwzfQK5nZb17y0iz9qPAaV65Ed2PSCtT/l46FlujKD3MAackCJX/IduH
-         I0iFLgP+yvYuANd/zJ9NPbEMstwg5JgqtYDJRDtM4V6oxVnW0SB9+C2+Q+GDxFp9AKvC
-         k508f1FN6NdkkGhB9ccmioBG4T4viMbFfLaX4rELUZZVYaA1IAJ3DMn0jMczk3796kyB
-         k0TSpc3qaI5+PaMMd4UNn3EId3MJzc+zZJc01BCvgTzybJvxWOEhR5YO2CrH6Qxvzs7i
-         WX2fLXXqu/VBW6FIZhG1Kv2NqaCnWhMHTLMVP7dGhOUc0EEBfO/Zi79QbqLkXjJj9MLG
-         36PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692089630; x=1692694430;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4Vs87HKrsdbyJ5hB+fbzGtDIkM6Q580dZbGEbWsN7GQ=;
-        b=JdRR1JI+tGu6eYdSJyUoInn7ByXGLPlF0Nx2SDYce+8PPRM6P5WG/T1NCKdaESmq1Z
-         AYfV0ZK/swv3bRxDsfBzzH72FARS4emyC/a+yCZMN1XdjFZlixcR3Wq+sGdg1/3fun6N
-         /RbLJ3RAB2tv4jgXjYXHLS3FJN0uCQgq8d4r10U/UynUuv/EWtUPLzezjNX9tayApSgK
-         dxfyqDOTWMTfTEqOKjNJl70AFuTo7obIBP+j6toYhFftjHfc2yHgY12bUBuBOPoNt81L
-         nYCpifTAVtWweCvXcAWEwrzJ0XSe9avpLaphK/0upMU2aPqV8MxsjuKPoGuq8Te1VE6k
-         jcQg==
-X-Gm-Message-State: AOJu0YzVXAdk7rekDxLMFJXUK/LJBRYh4ROUyiDqwHoxkA/byvKEXx74
-	CiUNO8nrUuzGABoAOhJdyFQCDQ==
-X-Google-Smtp-Source: AGHT+IE3r0FZO/UlxTbbEefaRKebasBru9eYcTIFRU80+0WF9KbVrbhV5Nk0igRdaIa3zAcVh8NTeg==
-X-Received: by 2002:a2e:9dcf:0:b0:2b6:e958:5700 with SMTP id x15-20020a2e9dcf000000b002b6e9585700mr8690050ljj.4.1692089630288;
-        Tue, 15 Aug 2023 01:53:50 -0700 (PDT)
-Received: from [192.168.1.193] (f.c.7.0.0.0.0.0.0.0.0.0.0.0.0.0.f.f.6.2.a.5.a.7.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:7a5a:26ff::7cf])
-        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003fc01495383sm20172457wmo.6.2023.08.15.01.53.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 01:53:49 -0700 (PDT)
-From: Lorenz Bauer <lmb@isovalent.com>
-Date: Tue, 15 Aug 2023 09:53:41 +0100
-Subject: [PATCH bpf-next v2] net: Fix slab-out-of-bounds in
- inet[6]_steal_sock
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D04423CC
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 08:56:59 +0000 (UTC)
+Received: from out-42.mta1.migadu.com (out-42.mta1.migadu.com [IPv6:2001:41d0:203:375::2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B3D2109
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 01:56:55 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1692089813;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P6bHve1nYg/bJoXU/AFGmk5Zl6IycrFBw1mdd3eghAw=;
+	b=ZboKTnDNrg6vIJPIGhqfQcqeDe/jt4ERjlf13Tk6VPjXBVQvvsAtANiKpbjOjVSgRfY40A
+	qV1OgTNlJhRtArT95ncotHyqj7m2j8VDwj2zwa0fIqDGhtCIIoQOUE7bkXfa+YKA3QuuoE
+	8EIeURUh5iYzv41wHSUftY3Kgi5uKPM=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH v4 12/48] gfs2: dynamically allocate the gfs2-qd shrinker
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230807110936.21819-13-zhengqi.arch@bytedance.com>
+Date: Tue, 15 Aug 2023 16:56:06 +0800
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ david@fromorbit.com,
+ tkhai@ya.ru,
+ Vlastimil Babka <vbabka@suse.cz>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ djwong@kernel.org,
+ Christian Brauner <brauner@kernel.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ tytso@mit.edu,
+ steven.price@arm.com,
+ cel@kernel.org,
+ senozhatsky@chromium.org,
+ yujie.liu@intel.com,
+ gregkh@linuxfoundation.org,
+ simon.horman@corigine.com,
+ dlemoal@kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org,
+ x86@kernel.org,
+ kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org,
+ linux-erofs@lists.ozlabs.org,
+ linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com,
+ linux-nfs@vger.kernel.org,
+ linux-mtd@lists.infradead.org,
+ rcu@vger.kernel.org,
+ netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ linux-arm-msm@vger.kernel.org,
+ dm-devel@redhat.com,
+ linux-raid@vger.kernel.org,
+ linux-bcache@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org,
+ linux-xfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230815-bpf-next-v2-1-95126eaa4c1b@isovalent.com>
-X-B4-Tracking: v=1; b=H4sIABQ922QC/0WNwQ7CIBAFf6XZsxigrVJP/ofpAerWbqLQACE1D
- f8uIRqPkzeZt0NATxjg0uzgMVEgZwvIQwPTou0DGd0Lg+Sy5YorZtaZWdwi010nNR/6/iQNFH3
- 1ONNWUzf4WTCWZaEQnX/XjyTq/s0N/1wSTLBJGMXPQqJqzZWCS/qJNh4n94Ix5/wBND/S2q4AA
- AA=
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
- Lorenz Bauer <lmb@isovalent.com>
-X-Mailer: b4 0.12.3
+Message-Id: <D38951C4-3BC6-409C-90C4-C72E772ECFF0@linux.dev>
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-13-zhengqi.arch@bytedance.com>
+To: Qi Zheng <zhengqi.arch@bytedance.com>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Kumar reported a KASAN splat in tcp_v6_rcv:
 
-  bash-5.2# ./test_progs -t btf_skc_cls_ingress
-  ...
-  [   51.810085] BUG: KASAN: slab-out-of-bounds in tcp_v6_rcv+0x2d7d/0x3440
-  [   51.810458] Read of size 2 at addr ffff8881053f038c by task test_progs/226
 
-The problem is that inet[6]_steal_sock accesses sk->sk_protocol without
-accounting for request or timewait sockets. To fix this we can't just
-check sock_common->skc_reuseport since that flag is present on timewait
-sockets.
+> On Aug 7, 2023, at 19:09, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
+> 
+> Use new APIs to dynamically allocate the gfs2-qd shrinker.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
-Instead, add a fullsock check to avoid the out of bands access of sk_protocol.
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
 
-Fixes: 9c02bec95954 ("bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign")
-Reported-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
----
-Changes in v2:
-- Do a sk_fullsock check instead (Martin Lau)
-- Link to v1: https://lore.kernel.org/r/20230809-bpf-next-v1-1-c1b80712e83b@isovalent.com
----
- include/net/inet6_hashtables.h | 2 +-
- include/net/inet_hashtables.h  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
-index 284b5ce7205d..533a7337865a 100644
---- a/include/net/inet6_hashtables.h
-+++ b/include/net/inet6_hashtables.h
-@@ -116,7 +116,7 @@ struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
- 	if (!sk)
- 		return NULL;
- 
--	if (!prefetched)
-+	if (!prefetched || !sk_fullsock(sk))
- 		return sk;
- 
- 	if (sk->sk_protocol == IPPROTO_TCP) {
-diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-index 1177effabed3..b277f7ef423a 100644
---- a/include/net/inet_hashtables.h
-+++ b/include/net/inet_hashtables.h
-@@ -462,7 +462,7 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
- 	if (!sk)
- 		return NULL;
- 
--	if (!prefetched)
-+	if (!prefetched || !sk_fullsock(sk))
- 		return sk;
- 
- 	if (sk->sk_protocol == IPPROTO_TCP) {
-
----
-base-commit: eb62e6aef940fcb1879100130068369d4638088f
-change-id: 20230808-bpf-next-a442a095562b
-
-Best regards,
--- 
-Lorenz Bauer <lmb@isovalent.com>
 
 
