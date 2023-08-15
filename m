@@ -1,91 +1,116 @@
-Return-Path: <netdev+bounces-27736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8FF77D09E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:08:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7556B77D0A1
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB35A28145A
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:08:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A47941C20DC7
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5DA15ACB;
-	Tue, 15 Aug 2023 17:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB7A156F7;
+	Tue, 15 Aug 2023 17:07:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3299113AFD
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:06:34 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76F9B1990;
-	Tue, 15 Aug 2023 10:06:31 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [112.5.88.102] ) by ajax-webmail-mail-app4
- (Coremail) ; Wed, 16 Aug 2023 01:04:04 +0800 (GMT+08:00)
-X-Originating-IP: [112.5.88.102]
-Date: Wed, 16 Aug 2023 01:04:04 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: corbet@lwn.net, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, rdunlap@infradead.org, void@manifault.com, 
-	jani.nikula@intel.com, horms@kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3] docs: net: add netlink attrs best practices
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20230814085318.090c832d@kernel.org>
-References: <20230811031549.2011622-1-linma@zju.edu.cn>
- <20230811152634.271608c5@kernel.org>
- <54e9d6f6.106b1a.189e798f8ae.Coremail.linma@zju.edu.cn>
- <20230814085318.090c832d@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9421313ADE
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:07:08 +0000 (UTC)
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 876011737
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:07:07 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3a7f74134e7so2130231b6e.1
+        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:07:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692119227; x=1692724027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q8DAFOOIcSljHTXBuhFKE9ilY2RRxTr9UnwnQAwhcxs=;
+        b=bgco/6HvDrxHLAxYnqRVcNVzgTeDbevphltliVqw7JrBfs+OveKP47B7H8t2GloLJN
+         osE9pvJ/2ARDoosTxubJWBk5XSOtPX8I+Y05+74h6FbVKt+EhEsQUkHA3NpJCHI10txf
+         fL4cuwpckVlf+7A5dL8HK3q8713wlE1sFL1uSFzV3knf0Rgbh5P+YwHPy4D6d5ginM69
+         iqUA/n7Xtqvcvkn9yVPE3MASZfNURqjMwwlORXtzeWh4qMf8tYRS5w5MH+3hZxa7UfRe
+         PMJk4BUWFM0dO4/vI+H53GSe5wF5uaxKl7QxhAXYMbKN2lH/FTQZ7n4W6BG//kycv6n7
+         sB5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692119227; x=1692724027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q8DAFOOIcSljHTXBuhFKE9ilY2RRxTr9UnwnQAwhcxs=;
+        b=YKXP36W2mMRgNu4hj/P94THuoISMUp1/XIHbRg9TUtn5rmyfiv437rVL2pLZWNh+4k
+         6Z3c2jXT361jEcGeQ/WSYuMaff71Tdl+gfEzpK9cFKZzu2Nbx0TeEwQR4E1lmshw/xpn
+         k+DwpQX/WThe7NHMEgaUAiarenX4W9J57En52FgNDlvWys+jLjguApMMjelifztRcK8Z
+         uINXQqdfCrwCmBuJ6Riv006BwpbRpoopY7kNNzQYWo+OQ2QbwPV//c3Qi7LNe5rld6xQ
+         VKcss5u4307LhqjzlpjMkS3GJPc53Yq34CWWoNeeZtWvalJ7gVk+rgOf5C9oZel6qpZc
+         v8nA==
+X-Gm-Message-State: AOJu0Yygf4vEIWZZCwZjcI6fZjsk46ykjYwy6eHLiuFDXYzUtjnUhl0F
+	DLLwcpxMTnEWmrlr0mS2AX5LGnu6Wx9FzptnxAs=
+X-Google-Smtp-Source: AGHT+IHnxfKaz4/z0LPlkCYGJZKWeeRD77MprHGOGe8Sveb/9jTXX9eD5jvnZQgrYSwLowGcgXpOUg4d0UKnBdtms4Y=
+X-Received: by 2002:a05:6358:2789:b0:134:ce45:b782 with SMTP id
+ l9-20020a056358278900b00134ce45b782mr12404429rwb.21.1692119226668; Tue, 15
+ Aug 2023 10:07:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <7cba74b5.10d19d.189fa27935c.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBHTQoFsNtkbKYYCw--.7107W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUIEmTa1vsUEQAAsK
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230811223938.997986-1-ziweixiao@google.com> <20230814192231.12e0c290@kernel.org>
+In-Reply-To: <20230814192231.12e0c290@kernel.org>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Tue, 15 Aug 2023 13:06:29 -0400
+Message-ID: <CAF=yD-JcWUhi3o==cQj5ByYosH0bQBxsyCk7fUAzMDXRX_fa9w@mail.gmail.com>
+Subject: Re: [PATCH net-next] gve: add header split support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ziwei Xiao <ziweixiao@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGVsbG8gSmFrdWIsCgo+IAo+IE9uIFNhdCwgMTIgQXVnIDIwMjMgMTA6MzU6MDkgKzA4MDAgKEdN
-VCswODowMCkgTGluIE1hIHdyb3RlOgo+ID4gTW92aW5nIGZvcndhcmQsIEkgc3VnZ2VzdCB3ZSBj
-b25zaWRlciB0aGUgZm9sbG93aW5nIG9wdGlvbnM6Cj4gPiAKPiA+IDEuIFVwZGF0ZSB0aGUgZG9j
-dW1lbnQgdG8gYWRkcmVzcyB0aGUgY29uZnVzaW9uIGFuZCBtYWtlIGl0IG1vcmUgcmVsZXZhbnQK
-PiA+ICAgIHRvIHRoZSBjdXJyZW50IHN0YXRlIG9mIE5ldGxpbmsgZGV2ZWxvcG1lbnQuIE1heWJl
-IHRoZSBuZXdseSBhZGRlZAo+ID4gICAgc2VjdGlvbiBzZWVtcyBub3QgZW5vdWdoIGZvciB0aGF0
-LiBJIHdvdWxkIGdyZWF0bHkgYXBwcmVjaWF0ZSBhbnkKPiA+ICAgIHNwZWNpZmljIGd1aWRhbmNl
-Lgo+IAo+IFVubGVzcyB3ZSBoYXZlIGRvY3MgZm9yIGtlcm5lbCBzaWRlIG9mIG1vZGVybiBnZW5l
-dGxpbmsgYW55IHNvcnQgb2YKPiBpbmRpY2F0aW9uIHRoYXQgdGhpcyBkb2MgaXMgb25seSBhIGd1
-aWRlIGZvciBsb29raW5nIGF0IG9sZCBjb2RlIHdpbGwKPiBmYWxsIG9uIGRlYWYgZWFycy4KPiAK
-PiBTbyB5b3UnZCBuZWVkIHRvIHdyaXRlIGEgc2FtcGxlIGZhbWlseSBhbmQgZG9jcyBmb3IgbW9k
-ZXJuIHN0dWZmLgoKR3JlYXQsIEkgZ3Vlc3MgSSAoZmluYWxseSkgdW5kZXJzdGFuZCB0aGUgc2l0
-dWF0aW9uIGhlcmUuIEl0IHNlZW1zIHRoYXQKdGhpcyBkb2N1bWVudCBpcyBqdXN0IG9uZSBwaWVj
-ZSBvZiB0aGUgcHV6emxlIHdoZW4gaXQgY29tZXMgdG8gdGhlIG1vZGVybgpnZW5lcmljIE5ldGxp
-bmsuIEhlbmNlLCBJIHNob3VsZCB3cml0ZSBhIHNhbXBsZSBmYW1pbHkgYW5kIGRvY3MgZm9yIG1v
-ZGVybgpzdHVmZiAobWFpbmx5IHRoZSBrZXJuZWwgc2lkZSkgYW5kIHRoZW4gbWFrZSB0aGlzIGRv
-Y3VtZW50IG9uZSBwYXJ0IG9mIGl0LgoKPiAKPiA+IDIuIElmIHRoZSBkb2N1bWVudCBpcyBkZWVt
-ZWQgdG9vIG91dGRhdGVkIGZvciBiZWluZyBrZXJuZWwgZG9jdW1lbnRhdGlvbiwKPiA+ICAgIG1h
-eWJlIEkgc2hvdWxkIHB1Ymxpc2ggaXQgc29tZXdoZXJlIGVsc2UuIERvIHlvdSBoYXZlIGFueQo+
-ID4gICAgcmVjb21tZW5kYXRpb25zIG9uIHdoZXJlIGl0IGNvdWxkIGJlIGJldHRlciBzdWl0ZWQ/
-Cj4gCj4gR2l0SHViIGNvbWVzIHRvIG1pbmQgZm9yIHB1Ymxpc2hpbmcgUmVTVCBkb2NzLCBpbiB0
-aGUgbWVhbnRpbWU/CgpObyB3b3JyaWVzLiBJJ20ganVzdCBicmFpbnN0b3JtaW5nIHdheXMgdG8g
-bWFrZSB0aGVzZSBwcmFjdGljZXMgdXNlZnVsIGlmIHRoZXkKZGlkbid0IG1ha2UgaXQgaW50byB0
-aGUga2VybmVsIGRvY3VtZW50IDpELgpBbGwgaW4gYWxsLCBJJ2xsIGZvbGxvdyB1cCBvbiBvdXIg
-cHJldmlvdXMgZGlzY3Vzc2lvbiBhbmQgZmlsbCBpbiB0aGUgZ2FwcyBhcwpzb29uIGFzIHBvc3Np
-YmxlLgoKUmVnYXJkcwpMaW4K
+On Mon, Aug 14, 2023 at 10:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Fri, 11 Aug 2023 15:39:38 -0700 Ziwei Xiao wrote:
+> > - Add header-split and strict-header-split ethtool priv flags. These
+> >   flags control header-split behavior. It can be turned on/off and it
+> >   can be set to 'strict' which will cause the driver to drop all the
+> >   packets that don't have a proper header split.
+> > - Add max-rx-buffer-size priv flag to allow user to switch the packet
+> >   buffer size between max and default(e.g. 4K <-> 2K).
+> > - Add reconfigure rx rings to support the header split and
+> >   max-rx-buffer-size enable/disable switch.
+
+The bulleted list is an indication that maybe this patch is combining
+too much in a single commit.
+
+> Someone on your team needs to participate upstream or you need
+> to get your patches reviewed from someone upstream-savvy before
+> posting.
+>
+> Anyone participating in netdev reviews would have told you that
+> private flags are unlikely to fly upstream.
+>
+> One part of an organization participating upstream while another
+> has no upstream understanding and throws code over the wall is
+> a common anti-pattern, and I intend to stop it.
+
+The one point I want to raise about private flags is that ethtool
+currently lacks an alternative for header-split.
+
+That probably requires a non-driver patch to add as a new ethtool feature.
+
+I had not given much thought on the two modes of header-split seen
+here until now: strict or not. We'll have to figure out whether both
+are really needed, especially if turning into ethtool ABI.
 
