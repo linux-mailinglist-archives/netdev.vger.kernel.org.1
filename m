@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-27576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A308577C703
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 07:23:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC3877C714
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 07:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCD671C20B55
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:23:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7C9528134A
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCB73D86;
-	Tue, 15 Aug 2023 05:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF7C3C27;
+	Tue, 15 Aug 2023 05:30:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293681864
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 05:23:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7D00C433C8;
-	Tue, 15 Aug 2023 05:23:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692076986;
-	bh=+/FXUiff9U2dvHx0FZl3BeA6ZvQozpS5ddrmrxlXxpM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OL4djTyHf23sj6ZTlXNUbaEbT+VYm2q9wYuPGm7YGWcOFw4p04wz9QlJvTrPGLIW4
-	 ZgzHisb9v1HazEltqXLqnTULF90luD5b6JB73yBLEwiDiUhT+rHj3q9zvOxFNu25Kw
-	 kf4gZ47+7FxxMJbx5LNphLubDjusRYaFnXgZI/L4OSaOQ9nar2wTuvAerQRVgb3l0w
-	 RgStbCcD5NanKXWPU48LynF4QmRiTGjZQK+OcWCgcBkiMWXGDRfFD4tSP+47sYMnmR
-	 msB+MJEXFTR6dpWzOLtBhWMB+LFAjHyq496Z6DNDj31IOEzDnKeiLwKaTuaB9iyJC9
-	 QyYZELK91oXaw==
-Date: Tue, 15 Aug 2023 08:23:01 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Alessio Igor Bogani <alessio.bogani@elettra.eu>,
-	richardcochran@gmail.com,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net-next 1/2] igb: Stop PTP related workqueues if aren't
- necessary
-Message-ID: <20230815052301.GC22185@unreal>
-References: <20230810175410.1964221-1-anthony.l.nguyen@intel.com>
- <20230810175410.1964221-2-anthony.l.nguyen@intel.com>
- <20230813090107.GE7707@unreal>
- <f8b9cd9e-651b-8488-5c4f-aacc03a3c9c8@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33524418
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 05:30:10 +0000 (UTC)
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C8AE199B
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 22:30:08 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-82-92.bstnma.fios.verizon.net [173.48.82.92])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 37F5TlsN002022
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Aug 2023 01:29:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1692077390; bh=KV8dziXjkt2w+JS9iEHu4PQQdHS/0krnQy5HzZLUJaE=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=HgRUJ5nFM8FqNUDGQuMtyqAjm6sgDHSZnNCFVsd4ImQ4jD0ZEIUlFu+gyzg6L54cx
+	 bCds0BnTMCc9ptxiyfi7Xk6riBcdjE1/c+mJZXSsdP7GVti85+bylqf0oXq+vTZRZg
+	 YJdxdK05EMkk6UCDBIK7ET0jROuNqpbJd1eXbQKNcfRufMS1zSa415kZOBX3oMcprT
+	 vNmH1nfIUPUDJO6u2qKoQOSBOniUHKt5y8Fr5SSmnhKKtQYyvKFwtgw3HRlI5mrM+T
+	 XLS7ZQP2K/lwDynTBXVMAGmY72VSegtRu2imOk0c9o0fOlgobDBVg5bHt7kkqOaXx/
+	 R4NeIyGj6ArXA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id A9D0615C0292; Tue, 15 Aug 2023 01:29:47 -0400 (EDT)
+Date: Tue, 15 Aug 2023 01:29:47 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, ksummit@lists.linux.dev
+Subject: Maintainers Summit 2023 Call for Topics
+Message-ID: <20230815052947.GA3214753@mit.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,93 +53,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f8b9cd9e-651b-8488-5c4f-aacc03a3c9c8@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Aug 14, 2023 at 03:16:05PM -0700, Tony Nguyen wrote:
-> 
-> 
-> On 8/13/2023 2:01 AM, Leon Romanovsky wrote:
-> > On Thu, Aug 10, 2023 at 10:54:09AM -0700, Tony Nguyen wrote:
-> > > From: Alessio Igor Bogani <alessio.bogani@elettra.eu>
-> > > 
-> > > The workqueues ptp_tx_work and ptp_overflow_work are unconditionally allocated
-> > > by igb_ptp_init(). Stop them if aren't necessary (ptp_clock_register() fails
-> > > and CONFIG_PTP is disabled).
-> > > 
-> > > Signed-off-by: Alessio Igor Bogani <alessio.bogani@elettra.eu>
-> > > Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-> > > Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> > > ---
-> > >   drivers/net/ethernet/intel/igb/igb_ptp.c | 6 ++++++
-> > >   1 file changed, 6 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> > > index 405886ee5261..02276c922ac0 100644
-> > > --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
-> > > +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> > > @@ -1406,7 +1406,13 @@ void igb_ptp_init(struct igb_adapter *adapter)
-> > >   		dev_info(&adapter->pdev->dev, "added PHC on %s\n",
-> > >   			 adapter->netdev->name);
-> > >   		adapter->ptp_flags |= IGB_PTP_ENABLED;
-> > > +		return;
-> > >   	}
-> > > +
-> > > +	if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
-> > > +		cancel_delayed_work_sync(&adapter->ptp_overflow_work);
-> > > +
-> > > +	cancel_work_sync(&adapter->ptp_tx_work);
-> > 
-> > Is it possible to move work initialization to be after call to ptp_clock_register()?
-> 
-> I'm under the impression that everything should be ready to go before
-> calling ptp_clock_register() so we shouldn't register until the workqueues
-> are set up.
+This year, the Maintainers Summit will be held in Richmond, VA on
+November 16th, 2023, just after the Linux Plumber's Conference
+(November 13--15th).
 
-I honestly don't know.
+As in previous years, the Maintainers Summit is invite-only, where the
+primary focus will be process issues around Linux Kernel Development.
+It will be limited to 30 invitees and a handful of sponsored
+attendees.
 
-Thanks
+Linus has generated a list of people for the program committee to
+consider.  People who suggest topics that should be discussed at the
+Maintainers Summit will also be added to the list for consideration.
+To make topic suggestions for the Maintainers Summit, please send
+e-mail to the ksummit@lists.linux.dev with a subject prefix of
+[MAINTAINERS SUMMIT].
 
-> 
-> Thanks,
-> Tony
-> 
-> > diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> > index 405886ee5261..56fd2b0fe70c 100644
-> > --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
-> > +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> > @@ -1386,11 +1386,6 @@ void igb_ptp_init(struct igb_adapter *adapter)
-> >          }
-> >          spin_lock_init(&adapter->tmreg_lock);
-> > -       INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
-> > -
-> > -       if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
-> > -               INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
-> > -                                 igb_ptp_overflow_check);
-> >          adapter->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
-> >          adapter->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
-> > @@ -1407,6 +1402,15 @@ void igb_ptp_init(struct igb_adapter *adapter)
-> >                           adapter->netdev->name);
-> >                  adapter->ptp_flags |= IGB_PTP_ENABLED;
-> >          }
-> > +
-> > +       if (!adapter->ptp_clock)
-> > +               return;
-> > +
-> > +       INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
-> > +
-> > +       if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
-> > +               INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
-> > +                                 igb_ptp_overflow_check);
-> >   }
-> >   /**
-> > 
-> > 
-> > 
-> > 
-> > >   }
-> > >   /**
-> > > -- 
-> > > 2.38.1
-> > > 
-> > > 
+For an examples of past Maintainers Summit topics, please see the
+these LWN articles:
+
+ * 2022 https://lwn.net/Articles/908320/
+ * 2021 https://lwn.net/Articles/870415/
+ * 2019 https://lwn.net/Articles/799060/
+
+Invites will be sent out on a rolling basis, with the first batch
+being sent out in roughly 2 weeks or so, so if you have some topics
+which you are burning to discuss, why not wait and submit them today?  :-)
+
+
+If you were not subscribed on to the kernel mailing list from
+last year (or if you had removed yourself after the kernel summit),
+you can subscribe by sending an e-mail to the address:
+
+   ksummit+subscribe@lists.linux.dev
+
+The program committee this year is composed of the following people:
+
+Christian Brauner
+Jon Corbet
+Greg KH
+Ted Ts'o
+Rafael J. Wysocki
 
