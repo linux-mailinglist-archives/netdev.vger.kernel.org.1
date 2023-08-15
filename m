@@ -1,131 +1,187 @@
-Return-Path: <netdev+bounces-27683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B059C77CD9E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:56:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE7B77CDBD
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2421C20CCE
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:56:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2070128149E
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B2F12B98;
-	Tue, 15 Aug 2023 13:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098D112B99;
+	Tue, 15 Aug 2023 14:02:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4A5111AD
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:56:44 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5612F198A;
-	Tue, 15 Aug 2023 06:56:43 -0700 (PDT)
-Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RQCSD6T8TzVjNL;
-	Tue, 15 Aug 2023 21:54:36 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 15 Aug 2023 21:56:40 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <kernel@openeuler.org>
-CC: <duanzi@zju.edu.cn>, <yuehaibing@huawei.com>, <weiyongjun1@huawei.com>,
-	<liujian56@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Eric Dumazet
-	<edumazet@google.com>, Lorenzo Colitti <lorenzo@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Pietro Borrello <borrello@diag.uniroma1.it>,
-	<netdev@vger.kernel.org>, <stable@vger.kernel.org>, "David S . Miller"
-	<davem@davemloft.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dong
- Chenchen <dongchenchen2@huawei.com>
-Subject: [PATCH OLK-5.10 v2 2/2] net: tap_open(): set sk_uid from current_fsuid()
-Date: Tue, 15 Aug 2023 21:56:02 +0800
-Message-ID: <20230815135602.1014881-3-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230815135602.1014881-1-dongchenchen2@huawei.com>
-References: <20230815135602.1014881-1-dongchenchen2@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B978832
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:02:17 +0000 (UTC)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2160B1BE1;
+	Tue, 15 Aug 2023 07:01:55 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d682d2d1f0dso3575352276.1;
+        Tue, 15 Aug 2023 07:01:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692108114; x=1692712914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RK8C+4M3WjyGo3AT2VvtieqZ4XHthCpGP/MjkwxxLRM=;
+        b=mlMQgWr/Dp5MwkbdLFShCAqd3TyV3HbRGsShw0D3S/3ERGy7RjA7AH3jHV62T7f28T
+         mR+hlmouQI1yK1i7lZ/Ge8Sy7/3rSgYwAPupxe2iUr3P6CzLbkSd3ACunxowfrLLgHMs
+         pLkUX8ulWVWBxcud/7iKf1whrcYfUffNrQcyqZ0a7ojf4o5Lwwg1HjP8yC6n3IGX9nRQ
+         TXvbZd8IEGW0MhQycFTGO6NevlMOg1c5t0+d3d+LhFSTssPtvd/bLkQN9s/b66O1VkSQ
+         EO9yvDOih9dHLWx8696BMUPsmUlbGxjkyTYCSqUTVCJLLdnufCd0DLSjiNSKgIsM8WZ3
+         +jmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692108114; x=1692712914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RK8C+4M3WjyGo3AT2VvtieqZ4XHthCpGP/MjkwxxLRM=;
+        b=WWfMSQK0R+MDK68nZjxYrXUQvUaeJjUFBmpDfy2mI2rPlS5YOsiNgF4I8EXiWo2eoc
+         P9KlTAflOTe7kpVwaNsXgCSmZhJJRB+uzYMyrsJ/0EYFQFbQU25w9K/SjJ7q4BaXqCBn
+         WLHoK8omtSJJHbItzzPgCexdb1WX5tj4oWtKvmvvmLhqfAPmXLFPmDz1X+XoaXM6w33c
+         4CEG/U+DuFX4ERamLRtRtZ7ywW7xhSDc4AgAGRSkuWfckagfisKWO7bYjukUvYhyBrxK
+         8lj/t2qtzulIsdfJzWyq9Mi2U0kbKuKQ8X4ZjtorFZ8DjZ5+qREtdRwQTMCuk6+yOeeO
+         Da/w==
+X-Gm-Message-State: AOJu0YzYxLAkdbEOBaWj86pyfHk9vp/5h+ADySzLAeg3l/G/CH0Wnups
+	LIWogGKbdBnzK2LJGH5LET/l9akQUuddNu/Wxw0=
+X-Google-Smtp-Source: AGHT+IF8TUQMt1B1y90B2T47wqGqmk9jdn588FwleKe360sIPlp6Bx49haNYj+JFI0aZzeHKxURac8+OGaSiNGbqK8I=
+X-Received: by 2002:a25:dad7:0:b0:ced:6134:7606 with SMTP id
+ n206-20020a25dad7000000b00ced61347606mr15277728ybf.30.1692108113957; Tue, 15
+ Aug 2023 07:01:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemi500026.china.huawei.com (7.221.188.247)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <4e2e8aad9c4646ec3a51833cbbf95a006a98b756.1691945735.git.lucien.xin@gmail.com>
+ <DBBP189MB1433FD875F0B6859676196489514A@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
+In-Reply-To: <DBBP189MB1433FD875F0B6859676196489514A@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 15 Aug 2023 10:01:41 -0400
+Message-ID: <CADvbK_eHOU1RCRxNFYTZ9GOwkeTFmSxtzmnGqUhOh-gh82Z8nQ@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: set default timeout to 3 secs for sctp
+ shutdown send and recv state
+To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+Cc: network dev <netdev@vger.kernel.org>, 
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>, 
+	"linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"kuba@kernel.org" <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Laszlo Ersek <lersek@redhat.com>
+On Tue, Aug 15, 2023 at 3:59=E2=80=AFAM Sriram Yagnaraman
+<sriram.yagnaraman@est.tech> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Xin Long <lucien.xin@gmail.com>
+> > Sent: Sunday, 13 August 2023 18:56
+> > To: network dev <netdev@vger.kernel.org>; netfilter-devel@vger.kernel.o=
+rg;
+> > linux-sctp@vger.kernel.org
+> > Cc: davem@davemloft.net; kuba@kernel.org; Eric Dumazet
+> > <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; Pablo Neira
+> > Ayuso <pablo@netfilter.org>; Jozsef Kadlecsik <kadlec@netfilter.org>; F=
+lorian
+> > Westphal <fw@strlen.de>; Marcelo Ricardo Leitner
+> > <marcelo.leitner@gmail.com>
+> > Subject: [PATCH nf] netfilter: set default timeout to 3 secs for sctp s=
+hutdown
+> > send and recv state
+> >
+> > In SCTP protocol, it is using the same timer (T2 timer) for SHUTDOWN an=
+d
+> > SHUTDOWN_ACK retransmission. However in sctp conntrack the default
+> > timeout value for SCTP_CONNTRACK_SHUTDOWN_ACK_SENT state is 3 secs
+> > while it's 300 msecs for SCTP_CONNTRACK_SHUTDOWN_SEND/RECV state.
+> >
+> > As Paolo Valerio noticed, this might cause unwanted expiration of the c=
+t entry.
+> > In my test, with 1s tc netem delay set on the NAT path, after the SHUTD=
+OWN is
+> > sent, the sctp ct entry enters SCTP_CONNTRACK_SHUTDOWN_SEND state.
+> > However, due to 300ms (too short) delay, when the SHUTDOWN_ACK is sent
+> > back from the peer, the sctp ct entry has expired and been deleted, and=
+ then
+> > the SHUTDOWN_ACK has to be dropped.
+> >
+> > Also, it is confusing these two sysctl options always show 0 due to all=
+ timeout
+> > values using sec as unit:
+> >
+> >   net.netfilter.nf_conntrack_sctp_timeout_shutdown_recd =3D 0
+> >   net.netfilter.nf_conntrack_sctp_timeout_shutdown_sent =3D 0
+> >
+> > This patch fixes it by also using 3 secs for sctp shutdown send and rec=
+v state in
+> > sctp conntrack, which is also RTO.initial value in SCTP protocol.
+> >
+> > Note that the very short time value for
+> > SCTP_CONNTRACK_SHUTDOWN_SEND/RECV was probably used for a rare
+> > scenario where SHUTDOWN is sent on 1st path but SHUTDOWN_ACK is replied
+> > on 2nd path, then a new connection started immediately on 1st path. So =
+this
+> > patch also moves from SHUTDOWN_SEND/RECV to CLOSE when receiving INIT
+> > in the ORIGINAL direction.
+> >
+> > Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
+> > Reported-by: Paolo Valerio <pvalerio@redhat.com>
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > ---
+> >  net/netfilter/nf_conntrack_proto_sctp.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/netfilter/nf_conntrack_proto_sctp.c
+> > b/net/netfilter/nf_conntrack_proto_sctp.c
+> > index 91eacc9b0b98..b6bcc8f2f46b 100644
+> > --- a/net/netfilter/nf_conntrack_proto_sctp.c
+> > +++ b/net/netfilter/nf_conntrack_proto_sctp.c
+> > @@ -49,8 +49,8 @@ static const unsigned int
+> > sctp_timeouts[SCTP_CONNTRACK_MAX] =3D {
+> >       [SCTP_CONNTRACK_COOKIE_WAIT]            =3D 3 SECS,
+> >       [SCTP_CONNTRACK_COOKIE_ECHOED]          =3D 3 SECS,
+> >       [SCTP_CONNTRACK_ESTABLISHED]            =3D 210 SECS,
+> > -     [SCTP_CONNTRACK_SHUTDOWN_SENT]          =3D 300 SECS /
+> > 1000,
+> > -     [SCTP_CONNTRACK_SHUTDOWN_RECD]          =3D 300 SECS /
+> > 1000,
+> > +     [SCTP_CONNTRACK_SHUTDOWN_SENT]          =3D 3 SECS,
+> > +     [SCTP_CONNTRACK_SHUTDOWN_RECD]          =3D 3 SECS,
+> >       [SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]      =3D 3 SECS,
+> >       [SCTP_CONNTRACK_HEARTBEAT_SENT]         =3D 30 SECS,
+> >  };
+> > @@ -105,7 +105,7 @@ static const u8
+> > sctp_conntracks[2][11][SCTP_CONNTRACK_MAX] =3D {
+> >       {
+> >  /*   ORIGINAL        */
+> >  /*                  sNO, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS */
+> > -/* init         */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCW},
+> > +/* init         */ {sCL, sCL, sCW, sCE, sES, sCL, sCL, sSA, sCW},
+> >  /* init_ack     */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},
+> >  /* abort        */ {sCL, sCL, sCL, sCL, sCL, sCL, sCL, sCL, sCL},
+> >  /* shutdown     */ {sCL, sCL, sCW, sCE, sSS, sSS, sSR, sSA, sCL},
+> > --
+> > 2.39.1
+>
+> FWIW, I like this patch. Should Documentation/networking/nf_conntrack-sys=
+ctl.rst be updated to reflect the new timeout values?
+Good catch, will post v2 with the 0.3 -> 3 change in nf_conntrack-sysctl.rs=
+t.
 
-stable inclusion
-from stable-v5.10.189
-commit 33a339e717be2c88b7ad11375165168d5b40e38e
-category: bugfix
-bugzilla: 189104, https://gitee.com/src-openeuler/kernel/issues/I7QXHX
-CVE: CVE-2023-4194
-
-Reference: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=33a339e717be2c88b7ad11375165168d5b40e38e
-
----------------------------
-
-commit 5c9241f3ceab3257abe2923a59950db0dc8bb737 upstream.
-
-Commit 66b2c338adce initializes the "sk_uid" field in the protocol socket
-(struct sock) from the "/dev/tapX" device node's owner UID. Per original
-commit 86741ec25462 ("net: core: Add a UID field to struct sock.",
-2016-11-04), that's wrong: the idea is to cache the UID of the userspace
-process that creates the socket. Commit 86741ec25462 mentions socket() and
-accept(); with "tap", the action that creates the socket is
-open("/dev/tapX").
-
-Therefore the device node's owner UID is irrelevant. In most cases,
-"/dev/tapX" will be owned by root, so in practice, commit 66b2c338adce has
-no observable effect:
-
-- before, "sk_uid" would be zero, due to undefined behavior
-  (CVE-2023-1076),
-
-- after, "sk_uid" would be zero, due to "/dev/tapX" being owned by root.
-
-What matters is the (fs)UID of the process performing the open(), so cache
-that in "sk_uid".
-
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Pietro Borrello <borrello@diag.uniroma1.it>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org
-Fixes: 66b2c338adce ("tap: tap_open(): correctly initialize socket uid")
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=2173435
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
----
- drivers/net/tap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index d9018d9fe310..2c9ae02ada3e 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -523,7 +523,7 @@ static int tap_open(struct inode *inode, struct file *file)
- 	q->sock.state = SS_CONNECTED;
- 	q->sock.file = file;
- 	q->sock.ops = &tap_socket_ops;
--	sock_init_data_uid(&q->sock, &q->sk, inode->i_uid);
-+	sock_init_data_uid(&q->sock, &q->sk, current_fsuid());
- 	q->sk.sk_write_space = tap_sock_write_space;
- 	q->sk.sk_destruct = tap_sock_destruct;
- 	q->flags = IFF_VNET_HDR | IFF_NO_PI | IFF_TAP;
--- 
-2.25.1
-
+Thanks for the review.
 
