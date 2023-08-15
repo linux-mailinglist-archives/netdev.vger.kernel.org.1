@@ -1,76 +1,39 @@
-Return-Path: <netdev+bounces-27817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24A377D5C0
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 00:05:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA9C77D5CA
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 00:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 080CC2815EC
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 22:05:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33D801C20E2F
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 22:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BFF19891;
-	Tue, 15 Aug 2023 22:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D8919892;
+	Tue, 15 Aug 2023 22:10:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E751015AD7
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 22:05:11 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B01101FEE;
-	Tue, 15 Aug 2023 15:05:10 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68876bbecb6so541648b3a.1;
-        Tue, 15 Aug 2023 15:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692137110; x=1692741910;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BXDgZz/jD99DkFlDIZATLGB9OwsRpjApl9oFam7+RBM=;
-        b=NABu+fOXGolFOl05xJvxflbrGDf4BfnAalAnL/Zj3Tja1rGyhViSJWl3Ua+H6sMnjI
-         l3ROf0gtB8wv8LYxucMJ80Qkzda9S6yAvvm9xq9xgUu6GYyuLJ7U1WY7vVA+Qc6oJyOb
-         i9K6CW0h0QG/pKXAwLFkLSCru48dTLyWy+iVW3HJDvpTYdDb26GfGPXiqBHKhUNKCEav
-         TmDHp0/mDiLIRwvF2rbaWRHpsxL4brs9Vk4RWXOA2YpmhB1T7YraYceYKx6PeO5fwGnu
-         a5vGP2L7iBQWY0Jv/quK4bJ5aVTJMIANro8/Xd7m0OIODYTLQRmtdGgoBD7k9r+O7YV7
-         mbyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692137110; x=1692741910;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BXDgZz/jD99DkFlDIZATLGB9OwsRpjApl9oFam7+RBM=;
-        b=UQeCWHGqpfC8Dla0hc92zobAtG3R+Bq9qNA6bHxDLnUerj3TVTbQgdq3rWUh9YexcW
-         jxcv9Ei0igwnLPgu6EyJx0KToArie8wWqmxbulz1lyvoGpmNSfOOB5enXJjb1kMdSfsY
-         Y3fT4v8xCE1Ubu89ee5vbmX7o19YNyke9LeWxGIJwXGJHVVoB5+79ofqDwhjNccD1oE3
-         AEcTtICRjyFLCBXrkNGgx10s3fqzOZvJR8VJWjhT+BeKqNYKNDymMK/acTETnRXY3QpR
-         4d2GCP1BDsHq7egA16xcnNArAIks8RykxqCN7I9bbm9fNntFKZmRcObuNTgO+ATiz4SM
-         eX0w==
-X-Gm-Message-State: AOJu0YwMc9IGrQhVUXk96KY5PLwN9O0z23+fDWHRdHz5vK0s4t4wRMHw
-	ZRMedAKZ+9IItrCSb1Xw5uId1ucXKMLXOg==
-X-Google-Smtp-Source: AGHT+IFAUPzAIN1iwipUTillakAMnN4+pit5sww25RmKstJJXGb/BJjZL0LNPIqmhS2qS7743vjR6A==
-X-Received: by 2002:a17:903:2595:b0:1b8:9f6a:39de with SMTP id jb21-20020a170903259500b001b89f6a39demr116374plb.65.1692137110009;
-        Tue, 15 Aug 2023 15:05:10 -0700 (PDT)
-Received: from alfred-laptop.ims.dom ([69.178.150.39])
-        by smtp.gmail.com with ESMTPSA id n12-20020a170903110c00b001bb97e51ad5sm11520355plh.99.2023.08.15.15.05.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 15:05:09 -0700 (PDT)
-From: Alfred Lee <l00g33k@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	AVKrasnov@sberdevices.ru,
-	Alfred Lee <l00g33k@gmail.com>
-Subject: [PATCH net v4] net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset
-Date: Tue, 15 Aug 2023 15:04:52 -0700
-Message-ID: <20230815220453.32035-1-l00g33k@gmail.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FDD17ACA
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 22:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1E4DC433C9;
+	Tue, 15 Aug 2023 22:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692137424;
+	bh=PNrJAPsiFzvufWi72j+2bROR9cQ+OYvyOXKcD14jSWo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dHeyICU+hLleDe2/Y3Cu4ULt4aK4tOxf2cCAWagIoIJACd66bXCQA9EZmX7CrGt1H
+	 TropFTm6dDF7z8upGbMSsQZ535ykJz7IbQv/EPhpjKfiGLw8tiGsh3KsnCo4zECnv+
+	 qi3oA2siDskkN/TDIYhLsq6zU0Vm5HRAdo6Edrt8aQNKoRH1LduElQ9osgRmlltLXz
+	 JBiDrQAmsGI7PwthT28byUUYg45HYkVNBhHRFkxZHz8FhvMMB1/7YJ5uCBBN4Wsc9Q
+	 2+51xtpvEPzmZ+uSBnNni7cx8J6lK1E/KiSTC22zWjD2JXjbu5tNvFFSsw8qm5GkB5
+	 6Le3bQ6Xt9qFw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B862BE93B37;
+	Tue, 15 Aug 2023 22:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,51 +41,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next v3 00/10] genetlink: provide struct genl_info to
+ dumps
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169213742475.30940.13714880161407370687.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Aug 2023 22:10:24 +0000
+References: <20230814214723.2924989-1-kuba@kernel.org>
+In-Reply-To: <20230814214723.2924989-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jiri@resnulli.us, johannes@sipsolutions.net
 
-If the switch is reset during active EEPROM transactions, as in
-just after an SoC reset after power up, the I2C bus transaction
-may be cut short leaving the EEPROM internal I2C state machine
-in the wrong state.  When the switch is reset again, the bad
-state machine state may result in data being read from the wrong
-memory location causing the switch to enter unexpected mode
-rendering it inoperational.
+Hello:
 
-Fixes: a3dcb3e7e70c ("net: dsa: mv88e6xxx: Wait for EEPROM done after HW reset")
-Signed-off-by: Alfred Lee <l00g33k@gmail.com>
----
-v2: moved Signed-off-by to the last line
-v3: used correct sha1sum for the Fixes: commit; changed to 'unexpected mode'
-v4: added submission history
----
- drivers/net/dsa/mv88e6xxx/chip.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index c7d51a539451..7af2f08a62f1 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3034,6 +3034,14 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
- 
- 	/* If there is a GPIO connected to the reset pin, toggle it */
- 	if (gpiod) {
-+		/* If the switch has just been reset and not yet completed
-+		 * loading EEPROM, the reset may interrupt the I2C transaction
-+		 * mid-byte, causing the first EEPROM read after the reset
-+		 * from the wrong location resulting in the switch booting
-+		 * to wrong mode and inoperable.
-+		 */
-+		mv88e6xxx_g1_wait_eeprom_done(chip);
-+
- 		gpiod_set_value_cansleep(gpiod, 1);
- 		usleep_range(10000, 20000);
- 		gpiod_set_value_cansleep(gpiod, 0);
+On Mon, 14 Aug 2023 14:47:13 -0700 you wrote:
+> One of the biggest (which is not to say only) annoyances with genetlink
+> handling today is that doit and dumpit need some of the same information,
+> but it is passed to them in completely different structs.
+> 
+> The implementations commonly end up writing a _fill() method which
+> populates a message and have to pass at least 6 parameters. 3 of which
+> are extracted manually from request info.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,01/10] genetlink: push conditional locking into dumpit/done
+    https://git.kernel.org/netdev/net-next/c/84817d8c6042
+  - [net-next,v3,02/10] genetlink: make genl_info->nlhdr const
+    https://git.kernel.org/netdev/net-next/c/fde9bd4a4d41
+  - [net-next,v3,03/10] genetlink: remove userhdr from struct genl_info
+    https://git.kernel.org/netdev/net-next/c/bffcc6882a1b
+  - [net-next,v3,04/10] genetlink: add struct genl_info to struct genl_dumpit_info
+    https://git.kernel.org/netdev/net-next/c/9272af109fe6
+  - [net-next,v3,05/10] genetlink: use attrs from struct genl_info
+    https://git.kernel.org/netdev/net-next/c/7288dd2fd488
+  - [net-next,v3,06/10] genetlink: add a family pointer to struct genl_info
+    https://git.kernel.org/netdev/net-next/c/5c670a010de4
+  - [net-next,v3,07/10] genetlink: add genlmsg_iput() API
+    https://git.kernel.org/netdev/net-next/c/5aa51d9f889c
+  - [net-next,v3,08/10] netdev-genl: use struct genl_info for reply construction
+    https://git.kernel.org/netdev/net-next/c/0e19d3108aea
+  - [net-next,v3,09/10] ethtool: netlink: simplify arguments to ethnl_default_parse()
+    https://git.kernel.org/netdev/net-next/c/ec0e5b09b834
+  - [net-next,v3,10/10] ethtool: netlink: always pass genl_info to .prepare_data
+    https://git.kernel.org/netdev/net-next/c/f946270d05c2
+
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
