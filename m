@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-27572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6953E77C6DF
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 07:00:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE86A77C6DE
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 07:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C2B11C20CDF
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:00:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88DE8281340
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA46AD57;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E8A8832;
 	Tue, 15 Aug 2023 04:57:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E27AD4D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DF4AD4C
 	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 04:57:28 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D32E7E
-	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:57:24 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-76c9334baedso309352485a.2
-        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:57:24 -0700 (PDT)
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD54BF
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:57:26 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-76ad842d12fso339565685a.3
+        for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 21:57:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1692075443; x=1692680243;
+        d=broadcom.com; s=google; t=1692075446; x=1692680246;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vV8uWnQihbCxJQIm7xEUFpHymx/SgfMH4yhfmqD7j0g=;
-        b=F4nHhv20+MZLETDzJ1a2mUYdnmPXO6cFpiSoHHRWAzvFxid988+L7bewEnWDGeNDux
-         sUs9PWC+e9lyIEURFdtL4LU0ez875i17WDCcLNQYJMQ3KW9CgbH97L2KKjajyzR/IwX9
-         j/kPGjeKWvlOU5gx4fVKJzaW6Fmu0pzwFyDUs=
+        bh=InsOVVZt2Zof1bKZ37VujXJEzgNk/U6q/HniJDeFnGc=;
+        b=PWtYfE2GbEn5eFkMP7sUIEEJZxQBN/HlM8EqLMYt1yyRvE3eXgbphTAysjJp6bAAt/
+         icpuFleMBD35TN+LS+aQPf2V/CNbl7P+mVIm74rH/c0npT61Min9zYxXJ2GybebuHarn
+         +zoUGWdIKo7qBUKZ41tYV4+aRXlj0AXNtTHiM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692075443; x=1692680243;
+        d=1e100.net; s=20221208; t=1692075446; x=1692680246;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vV8uWnQihbCxJQIm7xEUFpHymx/SgfMH4yhfmqD7j0g=;
-        b=I+ObibdR4/Rez3sJCYQTmt2r6SjowY4udc3N96c7S+QxMTSnViPtnjq8/fXEX7bnLf
-         /u1yJuygo90glRiwk71XrxR5Q9IfgE6lhIzUCdZ4OxK+xKasb10hZTGVsaaxYxlAz/Dx
-         4ZZ6clm/2vheM8r4u7+YLKztlkMuf6aCkzbgnC5LqZS1NhSMbC5i2ScJJn499HnZy8B+
-         +VxOc88Qm4a/Vv2w9Ci+YcDp7fv1LUDwUiMCD0QY7X2SjqWerlNpq8plkDAKh3yx5joq
-         wQvyHG/RwgQAo8bpTSs+w80cYqgosDMrEo2jeAFSLswsbNvntSCJ5WVSxwF7jU+Jf73m
-         lwLA==
-X-Gm-Message-State: AOJu0YxMLDpVnGbKhDz8BYt13/b1gk4YBAnDLIsuvXQfRqJld2Gn0NH6
-	lmgRNO1WE8WZOmJMpciPniicaQ==
-X-Google-Smtp-Source: AGHT+IFYpLJlooEWviCQCF+XqQIspXkrMVeOfeUHDa2n/OP0B2Zemidqo27TdpU67YyP6KhKa6e6Mg==
-X-Received: by 2002:a05:620a:668:b0:76c:ddf8:522b with SMTP id a8-20020a05620a066800b0076cddf8522bmr11017280qkh.37.1692075443379;
-        Mon, 14 Aug 2023 21:57:23 -0700 (PDT)
+        bh=InsOVVZt2Zof1bKZ37VujXJEzgNk/U6q/HniJDeFnGc=;
+        b=ZkkwLjsDDaMzohnQr8MmVajmrxJEd1lHjKM2+KDFzH2UnSP5NqOjaWLaS2qiGftnBG
+         ScCzeUp4BqE+tBqI/01SH2vgYctsBDmD9DkC7FvYhdDSleBJYbQJB1M14YlGIe6F31HA
+         Bnokn6rvbfRzkE+KNgEuZEQRqj5PnSqgbyKJ56CX1MiGRNScupLsHpUSoI2Uq9CWeGRw
+         2i7Pnfd6E/KD5F9Z1KbH6hQqmMMd5MlgxXiVgBiCCBjrPV7Myw8pW7k09pwWhG27REQY
+         pk5GAczrl9bb3X0vQ//i1ILdVWL8vAFDk7SOxFocezvMrzEx4L3wtpn9SqaTvfYGg/Vx
+         EyjQ==
+X-Gm-Message-State: AOJu0Yww7KKwhRoqMvEgdtf8qcWNcGLPWpifJjELLscAUvNP1qjCL354
+	or06Qvchh8/vfzlXvOwWE8zza5BchrIlWFFw2k0=
+X-Google-Smtp-Source: AGHT+IG2k4bBElh/8j4O0JVjBOPeNVlChbOdZ6io4Knd6qQwqwQ+Un8S8OO3BFupxCg3uTizPptwBQ==
+X-Received: by 2002:a05:620a:d95:b0:76d:1232:3731 with SMTP id q21-20020a05620a0d9500b0076d12323731mr13965392qkl.27.1692075445045;
+        Mon, 14 Aug 2023 21:57:25 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id k28-20020a05620a143c00b00767cbd5e942sm3516575qkj.72.2023.08.14.21.57.21
+        by smtp.gmail.com with ESMTPSA id k28-20020a05620a143c00b00767cbd5e942sm3516575qkj.72.2023.08.14.21.57.23
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Aug 2023 21:57:22 -0700 (PDT)
+        Mon, 14 Aug 2023 21:57:24 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -59,13 +59,12 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
 	Jean Delvare <jdelvare@suse.com>,
 	Guenter Roeck <linux@roeck-us.net>,
 	linux-hwmon@vger.kernel.org
-Subject: [PATCH net-next 09/12] bnxt_en: Move hwmon functions into a dedicated file
-Date: Mon, 14 Aug 2023 21:56:55 -0700
-Message-Id: <20230815045658.80494-10-michael.chan@broadcom.com>
+Subject: [PATCH net-next 10/12] bnxt_en: Modify the driver to use hwmon_device_register_with_info
+Date: Mon, 14 Aug 2023 21:56:56 -0700
+Message-Id: <20230815045658.80494-11-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20230815045658.80494-1-michael.chan@broadcom.com>
 References: <20230815045658.80494-1-michael.chan@broadcom.com>
@@ -76,7 +75,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c254780602ef0365"
+	boundary="000000000000e706e90602ef0368"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
@@ -84,264 +83,138 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000c254780602ef0365
+--000000000000e706e90602ef0368
 Content-Transfer-Encoding: 8bit
 
 From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-This is in preparation for upcoming patches in the series.
-Driver has to expose more threshold temperatures through the
-hwmon sysfs interface. More code will be added and do not
-want to overload bnxt.c.
+The use of hwmon_device_register_with_groups() is deprecated.
+Modified the driver to use hwmon_device_register_with_info().
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Driver currently exports only temp1_input through hwmon sysfs
+interface. But FW has been modified to report more threshold
+temperatures and driver want to report them through the
+hwmon interface.
+
 Cc: Jean Delvare <jdelvare@suse.com>
 Cc: Guenter Roeck <linux@roeck-us.net>
 Cc: linux-hwmon@vger.kernel.org
 Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/Makefile   |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 75 +----------------
- .../net/ethernet/broadcom/bnxt/bnxt_hwmon.c   | 82 +++++++++++++++++++
- .../net/ethernet/broadcom/bnxt/bnxt_hwmon.h   | 25 ++++++
- 4 files changed, 109 insertions(+), 74 deletions(-)
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h
+ .../net/ethernet/broadcom/bnxt/bnxt_hwmon.c   | 72 ++++++++++++++-----
+ 1 file changed, 56 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/Makefile b/drivers/net/ethernet/broadcom/bnxt/Makefile
-index 2bc2b707d6ee..ba6c239d52fa 100644
---- a/drivers/net/ethernet/broadcom/bnxt/Makefile
-+++ b/drivers/net/ethernet/broadcom/bnxt/Makefile
-@@ -4,3 +4,4 @@ obj-$(CONFIG_BNXT) += bnxt_en.o
- bnxt_en-y := bnxt.o bnxt_hwrm.o bnxt_sriov.o bnxt_ethtool.o bnxt_dcb.o bnxt_ulp.o bnxt_xdp.o bnxt_ptp.o bnxt_vfr.o bnxt_devlink.o bnxt_dim.o bnxt_coredump.o
- bnxt_en-$(CONFIG_BNXT_FLOWER_OFFLOAD) += bnxt_tc.o
- bnxt_en-$(CONFIG_DEBUG_FS) += bnxt_debugfs.o
-+bnxt_en-$(CONFIG_BNXT_HWMON) += bnxt_hwmon.o
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index f9bb66525d77..5e97a3d93e87 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -53,7 +53,6 @@
- #include <linux/cpumask.h>
- #include <net/pkt_cls.h>
- #include <linux/hwmon.h>
--#include <linux/hwmon-sysfs.h>
- #include <net/page_pool/helpers.h>
- #include <linux/align.h>
- #include <net/netdev_queues.h>
-@@ -71,6 +70,7 @@
- #include "bnxt_tc.h"
- #include "bnxt_devlink.h"
- #include "bnxt_debugfs.h"
-+#include "bnxt_hwmon.h"
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+index 476616d97071..20381b7b1d78 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
+@@ -18,34 +18,74 @@
+ #include "bnxt_hwrm.h"
+ #include "bnxt_hwmon.h"
  
- #define BNXT_TX_TIMEOUT		(5 * HZ)
- #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
-@@ -10245,79 +10245,6 @@ static void bnxt_get_wol_settings(struct bnxt *bp)
- 	} while (handle && handle != 0xffff);
- }
- 
--#ifdef CONFIG_BNXT_HWMON
 -static ssize_t bnxt_show_temp(struct device *dev,
 -			      struct device_attribute *devattr, char *buf)
--{
--	struct hwrm_temp_monitor_query_output *resp;
--	struct hwrm_temp_monitor_query_input *req;
++static int bnxt_hwrm_temp_query(struct bnxt *bp, u8 *temp)
+ {
+ 	struct hwrm_temp_monitor_query_output *resp;
+ 	struct hwrm_temp_monitor_query_input *req;
 -	struct bnxt *bp = dev_get_drvdata(dev);
 -	u32 len = 0;
--	int rc;
--
--	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
--	if (rc)
--		return rc;
--	resp = hwrm_req_hold(bp, req);
+ 	int rc;
+ 
+ 	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
+ 	if (rc)
+ 		return rc;
+ 	resp = hwrm_req_hold(bp, req);
 -	rc = hwrm_req_send(bp, req);
 -	if (!rc)
 -		len = sprintf(buf, "%u\n", resp->temp * 1000); /* display millidegree */
 -	hwrm_req_drop(bp, req);
--	if (rc)
--		return rc;
++	rc = hwrm_req_send_silent(bp, req);
+ 	if (rc)
++		goto err;
++
++	if (temp)
++		*temp = resp->temp;
++err:
++	hwrm_req_drop(bp, req);
++	return rc;
++}
++
++static umode_t bnxt_hwmon_is_visible(const void *_data, enum hwmon_sensor_types type,
++				     u32 attr, int channel)
++{
++	if (type != hwmon_temp)
++		return 0;
++
++	switch (attr) {
++	case hwmon_temp_input:
++		return 0444;
++	default:
++		return 0;
++	}
++}
++
++static int bnxt_hwmon_read(struct device *dev, enum hwmon_sensor_types type, u32 attr,
++			   int channel, long *val)
++{
++	struct bnxt *bp = dev_get_drvdata(dev);
++	u8 temp = 0;
++	int rc;
++
++	switch (attr) {
++	case hwmon_temp_input:
++		rc = bnxt_hwrm_temp_query(bp, &temp);
++		if (!rc)
++			*val = temp * 1000;
+ 		return rc;
 -	return len;
--}
++	default:
++		return -EOPNOTSUPP;
++	}
+ }
 -static SENSOR_DEVICE_ATTR(temp1_input, 0444, bnxt_show_temp, NULL, 0);
--
+ 
 -static struct attribute *bnxt_attrs[] = {
 -	&sensor_dev_attr_temp1_input.dev_attr.attr,
--	NULL
--};
++static const struct hwmon_channel_info *bnxt_hwmon_info[] = {
++	HWMON_CHANNEL_INFO(temp,
++			   HWMON_T_INPUT),
+ 	NULL
+ };
 -ATTRIBUTE_GROUPS(bnxt);
--
--static void bnxt_hwmon_uninit(struct bnxt *bp)
--{
--	if (bp->hwmon_dev) {
--		hwmon_device_unregister(bp->hwmon_dev);
--		bp->hwmon_dev = NULL;
--	}
--}
--
--static void bnxt_hwmon_init(struct bnxt *bp)
--{
--	struct hwrm_temp_monitor_query_input *req;
--	struct pci_dev *pdev = bp->pdev;
--	int rc;
--
--	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
--	if (!rc)
--		rc = hwrm_req_send_silent(bp, req);
--	if (rc == -EACCES || rc == -EOPNOTSUPP) {
--		bnxt_hwmon_uninit(bp);
--		return;
--	}
--
--	if (bp->hwmon_dev)
--		return;
--
++
++static const struct hwmon_ops bnxt_hwmon_ops = {
++	.is_visible     = bnxt_hwmon_is_visible,
++	.read           = bnxt_hwmon_read,
++};
++
++static const struct hwmon_chip_info bnxt_hwmon_chip_info = {
++	.ops    = &bnxt_hwmon_ops,
++	.info   = bnxt_hwmon_info,
++};
+ 
+ void bnxt_hwmon_uninit(struct bnxt *bp)
+ {
+@@ -72,9 +112,9 @@ void bnxt_hwmon_init(struct bnxt *bp)
+ 	if (bp->hwmon_dev)
+ 		return;
+ 
 -	bp->hwmon_dev = hwmon_device_register_with_groups(&pdev->dev,
 -							  DRV_MODULE_NAME, bp,
 -							  bnxt_groups);
--	if (IS_ERR(bp->hwmon_dev)) {
--		bp->hwmon_dev = NULL;
--		dev_warn(&pdev->dev, "Cannot register hwmon device\n");
--	}
--}
--#else
--static void bnxt_hwmon_uninit(struct bnxt *bp)
--{
--}
--
--static void bnxt_hwmon_init(struct bnxt *bp)
--{
--}
--#endif
--
- static bool bnxt_eee_config_ok(struct bnxt *bp)
- {
- 	struct ethtool_eee *eee = &bp->eee;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-new file mode 100644
-index 000000000000..476616d97071
---- /dev/null
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-@@ -0,0 +1,82 @@
-+/* Broadcom NetXtreme-C/E network driver.
-+ *
-+ * Copyright (c) 2023 Broadcom Limited
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation.
-+ */
-+
-+#include <linux/dev_printk.h>
-+#include <linux/errno.h>
-+#include <linux/hwmon.h>
-+#include <linux/hwmon-sysfs.h>
-+#include <linux/pci.h>
-+
-+#include "bnxt_hsi.h"
-+#include "bnxt.h"
-+#include "bnxt_hwrm.h"
-+#include "bnxt_hwmon.h"
-+
-+static ssize_t bnxt_show_temp(struct device *dev,
-+			      struct device_attribute *devattr, char *buf)
-+{
-+	struct hwrm_temp_monitor_query_output *resp;
-+	struct hwrm_temp_monitor_query_input *req;
-+	struct bnxt *bp = dev_get_drvdata(dev);
-+	u32 len = 0;
-+	int rc;
-+
-+	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
-+	if (rc)
-+		return rc;
-+	resp = hwrm_req_hold(bp, req);
-+	rc = hwrm_req_send(bp, req);
-+	if (!rc)
-+		len = sprintf(buf, "%u\n", resp->temp * 1000); /* display millidegree */
-+	hwrm_req_drop(bp, req);
-+	if (rc)
-+		return rc;
-+	return len;
-+}
-+static SENSOR_DEVICE_ATTR(temp1_input, 0444, bnxt_show_temp, NULL, 0);
-+
-+static struct attribute *bnxt_attrs[] = {
-+	&sensor_dev_attr_temp1_input.dev_attr.attr,
-+	NULL
-+};
-+ATTRIBUTE_GROUPS(bnxt);
-+
-+void bnxt_hwmon_uninit(struct bnxt *bp)
-+{
-+	if (bp->hwmon_dev) {
-+		hwmon_device_unregister(bp->hwmon_dev);
-+		bp->hwmon_dev = NULL;
-+	}
-+}
-+
-+void bnxt_hwmon_init(struct bnxt *bp)
-+{
-+	struct hwrm_temp_monitor_query_input *req;
-+	struct pci_dev *pdev = bp->pdev;
-+	int rc;
-+
-+	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
-+	if (!rc)
-+		rc = hwrm_req_send_silent(bp, req);
-+	if (rc == -EACCES || rc == -EOPNOTSUPP) {
-+		bnxt_hwmon_uninit(bp);
-+		return;
-+	}
-+
-+	if (bp->hwmon_dev)
-+		return;
-+
-+	bp->hwmon_dev = hwmon_device_register_with_groups(&pdev->dev,
-+							  DRV_MODULE_NAME, bp,
-+							  bnxt_groups);
-+	if (IS_ERR(bp->hwmon_dev)) {
-+		bp->hwmon_dev = NULL;
-+		dev_warn(&pdev->dev, "Cannot register hwmon device\n");
-+	}
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h
-new file mode 100644
-index 000000000000..af310066687c
---- /dev/null
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h
-@@ -0,0 +1,25 @@
-+/* Broadcom NetXtreme-C/E network driver.
-+ *
-+ * Copyright (c) 2023 Broadcom Limited
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation.
-+ */
-+
-+#ifndef BNXT_HWMON_H
-+#define BNXT_HWMON_H
-+
-+#ifdef CONFIG_BNXT_HWMON
-+void bnxt_hwmon_uninit(struct bnxt *bp);
-+void bnxt_hwmon_init(struct bnxt *bp);
-+#else
-+static inline void bnxt_hwmon_uninit(struct bnxt *bp)
-+{
-+}
-+
-+static inline void bnxt_hwmon_init(struct bnxt *bp)
-+{
-+}
-+#endif
-+#endif
++	bp->hwmon_dev = hwmon_device_register_with_info(&pdev->dev,
++							DRV_MODULE_NAME, bp,
++							&bnxt_hwmon_chip_info, NULL);
+ 	if (IS_ERR(bp->hwmon_dev)) {
+ 		bp->hwmon_dev = NULL;
+ 		dev_warn(&pdev->dev, "Cannot register hwmon device\n");
 -- 
 2.30.1
 
 
---000000000000c254780602ef0365
+--000000000000e706e90602ef0368
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -412,14 +285,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE+ySH43eZgbzcDPbyvK79ZD8M9NO2GO
-I2SGdlIod7/rMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
-NTA0NTcyM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJDMSCfo3kE1awZivj64ucGun9i9ttPc
+UxueKmntEmo2MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
+NTA0NTcyNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAOfD5j94iBI8OXcPeRuKykftzO5KLUoESKE7JIdqFOUsauZT2M
-awefKE6MkxTks1Kl8PmLAlyPKpwFfdJyvxY1vN8CKboLEr3uA/AqE6wagxJrzfOFsTu638hqNjxZ
-mKh+VB+GH7EhaS7jtoeydJf5uytNnVqNjWCZsQvJO8wZezCP+5e7zVnJitIzh1bbQcmJ1tkpM5rc
-gZRIsNwUf42XcIbBgmqb6RFjZaPCSUYam0hMHO4XgFG3ZzPwTpHOZGyugUJ37hgL2taEiAvRM7wK
-G2FEb21MF67Xo9I/e5unpjmaDcv1cyw/btr+OSpbE+m3wAwU536unoA8Lnkn9kpA
---000000000000c254780602ef0365--
+ATANBgkqhkiG9w0BAQEFAASCAQApDx27ejybyQol/NCQYH/vAhC1wCtBH4Hg0E1HJW230jTBgqWx
+SzroRV+4h9x+N5x7Fi1aF1r7B2fM6BOQvPJy7juvvG8fsxPZmfFQQ+b07irDdOnrqVe0Tid6V3ok
+os94xZx2IqWBn0BgWdmHQtKV7R4ueSzzoCdTOcK2YZ5+kIxpHF+FYjSzSUIx8XE6EPvjIPqxwcAN
+AKquOJBWgD7EtwfGjouujDqGnQDon6SjfPnIgr/CeFW9weiok0JMCo8IwHh+YJbo8APvM9kEYVkZ
+3eazFAJ+2k/d2Im6wP4SOPkBpyVm2pW7SH1vg2k5i59OIOWbRxooWRVaR6pCM5Iv
+--000000000000e706e90602ef0368--
 
