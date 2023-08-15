@@ -1,93 +1,103 @@
-Return-Path: <netdev+bounces-27680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA7977CD58
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:34:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9770877CD5C
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F5E91C20CFF
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:34:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22BE92814C1
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 13:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB68125B4;
-	Tue, 15 Aug 2023 13:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBE8125C6;
+	Tue, 15 Aug 2023 13:38:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECEE8832
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:34:39 +0000 (UTC)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B7E109
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:34:37 -0700 (PDT)
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3fe3194d21dso9326985e9.1
-        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:34:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692106476; x=1692711276;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLeu7IXVB9GuSEApvEJZew8ULFnMzW+UHkUIvjcoK10=;
-        b=ZNxvcoK6UjQ0UeOUymiwT+6cTE4TeFp/osMeypMdR4sef5+xfWjITW+749pboouCN1
-         G4tfu1WCHPEWkpaXEPAszFtndvhLrwr9bCuGL7ufvw+bb9GFgqX76pSlL/vdmiHt5Y06
-         nyOtKfzaMmGNQpUiSZXe4FjzUvlSslqIA3MgfXa0+e9bX5VHusdE42kkQd/Rc4j/MmXR
-         t3XzCpWQzBjoK/zY6c2yu5rCBJFq8sXVDLLdY54QVb4MfEyWK8sBAPpEa8VW6POX7iZX
-         vaXbqviH/pQIFiIG4kSjwCENALH01RY9udGriERIbJip5bJL3ePmyOURava7v6eVq7Df
-         74lw==
-X-Gm-Message-State: AOJu0Yyf3ogdfgO9PZ5gy9+72lsX6PBt660+9/Kp0P72hMMe+eObNXrd
-	Xtc5tjW5KxfgVlDhSOLUqQo=
-X-Google-Smtp-Source: AGHT+IELEQqgddEUQOFSj2CbYrqz9r4riJqQkHL6Uy4ACdg6juPicR5XwbIdVqZNe6JNO0g0Yr+dCQ==
-X-Received: by 2002:a05:600c:2258:b0:3f9:88d:9518 with SMTP id a24-20020a05600c225800b003f9088d9518mr11612100wmm.0.1692106475785;
-        Tue, 15 Aug 2023 06:34:35 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id e13-20020a5d500d000000b00317ddccb0d1sm17878409wrt.24.2023.08.15.06.34.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 06:34:34 -0700 (PDT)
-Message-ID: <6a0e9122-87f3-b0e9-0a54-dbcc4cd9d819@grimberg.me>
-Date: Tue, 15 Aug 2023 16:34:32 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C196FA9
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 13:38:30 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6F912E
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 06:38:29 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-14-jtYcrbScOx2nz_MMUvypow-1; Tue, 15 Aug 2023 14:38:26 +0100
+X-MC-Unique: jtYcrbScOx2nz_MMUvypow-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 15 Aug
+ 2023 14:38:23 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 15 Aug 2023 14:38:23 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Mina Almasry' <almasrymina@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-media@vger.kernel.org"
+	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, Dan
+ Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>, "sdf@google.com"
+	<sdf@google.com>
+Subject: RE: [RFC PATCH v2 00/11] Device Memory TCP
+Thread-Topic: [RFC PATCH v2 00/11] Device Memory TCP
+Thread-Index: AQHZyy4cCyylGqKvQkCWO9kOPAhLv6/rVx7w
+Date: Tue, 15 Aug 2023 13:38:23 +0000
+Message-ID: <58a93e4e8b8b4ca79c2678a3ae8281cd@AcuMS.aculab.com>
+References: <20230810015751.3297321-1-almasrymina@google.com>
+In-Reply-To: <20230810015751.3297321-1-almasrymina@google.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 15/17] nvmet-tcp: enable TLS handshake upcall
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230814111943.68325-1-hare@suse.de>
- <20230814111943.68325-16-hare@suse.de>
- <cf21000c-177e-c882-ac30-fe3190748bae@grimberg.me>
- <bebf00fb-be2d-d6da-bd7f-4e610095decc@suse.de>
- <a7e01b78-52ba-9576-6d71-6d1f81aecd44@grimberg.me>
- <fdb8caf7-78cc-c39b-3dda-2d9db4128a34@suse.de>
- <ce3453f8-807b-301c-f18a-3d7a7bc0bca7@grimberg.me>
- <1eca42a4-ee8e-dff3-adb0-0f4799e4f96f@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <1eca42a4-ee8e-dff3-adb0-0f4799e4f96f@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+RnJvbTogTWluYSBBbG1hc3J5DQo+IFNlbnQ6IDEwIEF1Z3VzdCAyMDIzIDAyOjU4DQouLi4NCj4g
+KiBUTDtEUjoNCj4gDQo+IERldmljZSBtZW1vcnkgVENQIChkZXZtZW0gVENQKSBpcyBhIHByb3Bv
+c2FsIGZvciB0cmFuc2ZlcnJpbmcgZGF0YSB0byBhbmQvb3INCj4gZnJvbSBkZXZpY2UgbWVtb3J5
+IGVmZmljaWVudGx5LCB3aXRob3V0IGJvdW5jaW5nIHRoZSBkYXRhIHRvIGEgaG9zdCBtZW1vcnkN
+Cj4gYnVmZmVyLg0KDQpEb2Vzbid0IHRoYXQgcmVhbGx5IHJlcXVpcmUgcGVlci10by1wZWVyIFBD
+SWUgdHJhbnNmZXJzPw0KSUlSQyB0aGVzZSBhcmVuJ3Qgc3VwcG9ydGVkIGJ5IG1hbnkgcm9vdCBo
+dWJzIGFuZCBoYXZlDQpmdW5kYW1lbnRhbCBmbG93IGNvbnRyb2wgYW5kL29yIFRMUCBjcmVkaXQg
+cHJvYmxlbXMuDQoNCkknZCBndWVzcyB0aGV5IGFyZSBhbHNvIHByZXR0eSBpbmNvbXBhdGlibGUg
+d2l0aCBJT01NVT8NCg0KSSBjYW4gc2VlIGhvdyB5b3UgbWlnaHQgbWFuYWdlIHRvIHRyYW5zbWl0
+IGZyYW1lcyBmcm9tDQpzb21lIGV4dGVybmFsIG1lbW9yeSAoZWcgYWZ0ZXIgZW5jcnlwdGlvbikg
+YnV0IHN1cmVseQ0KcHJvY2Vzc2luZyByZWNlaXZlIGRhdGEgdGhhdCB3YXkgbmVlZHMgdGhlIHBh
+Y2tldHMNCmJlIGZpbHRlcmVkIGJ5IGJvdGggSVAgYWRkcmVzc2VzIGFuZCBwb3J0IG51bWJlcnMg
+YmVmb3JlDQpiZWluZyByZWRpcmVjdGVkIHRvIHRoZSAocHJlc3VtYWJseSBsaW1pdGVkKSBleHRl
+cm5hbA0KbWVtb3J5Lg0KDQpPVE9IIGlzbid0IHRoZSBrZXJuZWwgZ29pbmcgdG8gbmVlZCB0byBy
+dW4gY29kZSBiZWZvcmUNCnRoZSBwYWNrZXQgaXMgYWN0dWFsbHkgc2VudCBhbmQganVzdCBhZnRl
+ciBpdCBpcyByZWNlaXZlZD8NClNvIGFsbCB5b3UgbWlnaHQgZ2FpbiBpcyBhIGJpdCBvZiBsYXRl
+bmN5Pw0KQW5kIGEgYml0IGxlc3MgdXRpbGlzYXRpb24gb2YgaG9zdCBtZW1vcnk/Pw0KQnV0IGlm
+IHlvdXIgc3lzdGVtIGlzIHJlYWxseSBsaW1pdGVkIGJ5IGNwdS1tZW1vcnkgYmFuZHdpZHRoDQp5
+b3UgbmVlZCBtb3JlIGNhY2hlIDotKQ0KDQpTbyBob3cgbXVjaCBiZW5lZml0IGlzIHRoZXJlIG92
+ZXIgZWZmaWNpZW50IHVzZSBvZiBob3N0DQptZW1vcnkgYm91bmNlIGJ1ZmZlcnM/Pw0KDQoJRGF2
+aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50
+IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTcz
+ODYgKFdhbGVzKQ0K
 
->> How are you testing it btw?
-> 
-> As outlined in the patchset description.
-> I've a target configuration running over the loopback interface.
-> 
-> Will expand to have two VMs talking to each other; however, that
-> needs more fiddling with the PSK deployment.
-
-Was referring to the timeout part. Would maybe make sense to
-run a very short timeouts to see that is behaving...
 
