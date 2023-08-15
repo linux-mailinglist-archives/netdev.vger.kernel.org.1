@@ -1,142 +1,391 @@
-Return-Path: <netdev+bounces-27660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0E577CB06
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 12:13:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2670D77CB07
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 12:14:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1758528145D
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:13:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDA711C20CAC
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 10:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D61101EB;
-	Tue, 15 Aug 2023 10:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE951101F2;
+	Tue, 15 Aug 2023 10:14:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DFBDF4C
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:13:27 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C7141BD7
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 03:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5HSHe/7xK9qfKzA+ud+1e59aq6q+P4D3FniFlYpAsRc=; b=K9Mgvpz/gKDPDipaDNa55c08Tm
-	qG3SnfcUCnU09qKWxCCx/NP7tzyx3v5IPIWLgm2xblVCjZ5yYqizqUXPBYRF/ci41jl2qYw7nxEHR
-	n0jFW4FT0WsZa/D9iyqsNtyRgogFq4rog+gsOEEGNM1kRtIKoMI4IKcWb7zg9GxajLhyUdMd4kzPG
-	iQXczgLOMW0a+PY4ajm6ZqyaSbkACTMsy37loRIPBo55k119q13VvqhcwxoWzagW6CZuEikqTxh8y
-	gr3XhGD8hueXL3ylmlL4kjz2APCoM+3m9LG57bw2Ii844rLXjBWhqgpocTIkBTUn439xOwaOco6Vq
-	gKQcp0Mg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37662)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qVr2y-0001QB-2s;
-	Tue, 15 Aug 2023 11:13:08 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qVr2x-0006uN-FZ; Tue, 15 Aug 2023 11:13:07 +0100
-Date: Tue, 15 Aug 2023 11:13:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
- switch drivers
-Message-ID: <ZNtPswQl8fvnlGyf@shell.armlinux.org.uk>
-References: <20230808135215.tqhw4mmfwp2c3zy2@skbuf>
- <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
- <20230810151617.wv5xt5idbfu7wkyn@skbuf>
- <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk>
- <20230814145948.u6ul5dgjpl5bnasp@skbuf>
- <ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk>
- <055be6c4-3c28-459d-bb52-5ac2ee24f1f1@lunn.ch>
- <ZNpWAsdS8tDv9qKp@shell.armlinux.org.uk>
- <8687110a-5ce8-474c-8c20-ca682a98a94c@lunn.ch>
- <ZNqklHxfH8sYaet7@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED536FA9
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:14:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5031AC433C7;
+	Tue, 15 Aug 2023 10:14:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692094487;
+	bh=fFuLt2KZ7JLXQTOznYRH3Fe4CCINQT1f2ml875TiBy8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kpaw+EHEme5rDzK1dgv91QpoGVWz4NbrF/h/rt1qFvpGbkctddNQqHBcXEUeC3IGU
+	 w6OxpuJIYJ73b/tkACtnwaHpLbJAZ1n2aEWzL26US4lZuNNi9RxBVzW2HI2zwaLx1m
+	 dRtV3ws2nopFlnpyP3u2+uqcwQLZShmxWmtBy5FNUBo79schNTjakAJnHQlB2ci4MC
+	 4mzzewBnJsTHtRTjEuwFo4TabRWvMaI0mNlR2+eO+eB74E/OJW21bDrOhoaMw56IxP
+	 lGu4IYgTeFex/kLltR4/K3X4gigEqvUIAR6oR6Tl8zcdo3dwmtHa45oXnKcHO/kjVF
+	 TpmBJKjcmz+PQ==
+Message-ID: <ff0ee500-8910-32e3-3933-2f9ca0981db3@kernel.org>
+Date: Tue, 15 Aug 2023 13:14:40 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNqklHxfH8sYaet7@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v4 3/5] net: ti: icss-iep: Add IEP driver
+Content-Language: en-US
+To: "Anwar, Md Danish" <a0501179@ti.com>, MD Danish Anwar
+ <danishanwar@ti.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Simon Horman <simon.horman@corigine.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20230814100847.3531480-1-danishanwar@ti.com>
+ <20230814100847.3531480-4-danishanwar@ti.com>
+ <a626c351-2c9b-1136-c31c-63cd695d9499@kernel.org>
+ <e54b864a-12b8-0b3e-44a4-81c0e0f4c102@ti.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <e54b864a-12b8-0b3e-44a4-81c0e0f4c102@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 14, 2023 at 11:03:00PM +0100, Russell King (Oracle) wrote:
-> Then we have the DSA side:
+
+
+On 15/08/2023 13:07, Anwar, Md Danish wrote:
+> Hi Roger,
 > 
->    DSA <------------------------------> Fixed-PHY
->     v					    v
-> dt-dsa-node {				No DT node
->   phy-mode = "rgmii-foo";
->   fixed-link {
->    ...
->   };
-> };
+> On 8/15/2023 3:11 PM, Roger Quadros wrote:
+>> Hi Danish,
+>>
+>> On 14/08/2023 13:08, MD Danish Anwar wrote:
+>>> From: Roger Quadros <rogerq@ti.com>
+>>>
+>>> Add a driver for Industrial Ethernet Peripheral (IEP) block of PRUSS to
+>>> support timestamping of ethernet packets and thus support PTP and PPS
+>>> for PRU ethernet ports.
+>>>
+>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>> ---
+>>>   drivers/net/ethernet/ti/Kconfig          |  11 +
+>>>   drivers/net/ethernet/ti/Makefile         |   1 +
+>>>   drivers/net/ethernet/ti/icssg/icss_iep.c | 921 +++++++++++++++++++++++
+>>>   drivers/net/ethernet/ti/icssg/icss_iep.h |  38 +
+>>>   4 files changed, 971 insertions(+)
+>>>   create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+>>>   create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+>>>
+>>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+>>> index 63e510b6860f..1af5a90720ec 100644
+>>> --- a/drivers/net/ethernet/ti/Kconfig
+>>> +++ b/drivers/net/ethernet/ti/Kconfig
+>>> @@ -196,4 +196,15 @@ config TI_ICSSG_PRUETH
+>>>         to support the Ethernet operation. Currently, it supports Ethernet
+>>>         with 1G and 100M link speed.
+>>>   +config TI_ICSS_IEP
+>>> +    tristate "TI PRU ICSS IEP driver"
+>>> +    depends on TI_PRUSS
+>>> +    default TI_PRUSS
+>>> +    help
+>>> +      This driver enables support for the PRU-ICSS Industrial Ethernet
+>>> +      Peripheral within a PRU-ICSS subsystem present on various TI SoCs.
+>>> +
+>>> +      To compile this driver as a module, choose M here. The module
+>>> +      will be called icss_iep.
+>>> +
+>>>   endif # NET_VENDOR_TI
+>>> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+>>> index 9176d79c36e1..34fd7a716ba6 100644
+>>> --- a/drivers/net/ethernet/ti/Makefile
+>>> +++ b/drivers/net/ethernet/ti/Makefile
+>>> @@ -38,3 +38,4 @@ icssg-prueth-y := k3-cppi-desc-pool.o \
+>>>             icssg/icssg_mii_cfg.o \
+>>>             icssg/icssg_stats.o \
+>>>             icssg/icssg_ethtool.o
+>>> +obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
+>>> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
+>>> new file mode 100644
+>>> index 000000000000..d123b8ba3f31
+>>> --- /dev/null
+>>> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
+>>> @@ -0,0 +1,921 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +
+>>> +/* Texas Instruments ICSSG Industrial Ethernet Peripheral (IEP) Driver
+>>> + *
+>>> + * Copyright (C) 2023 Texas Instruments Incorporated - https://www.ti.com
+>>> + *
+>>> + */
+>>> +
+>>> +#include <linux/bitops.h>
+>>> +#include <linux/clk.h>
+>>> +#include <linux/err.h>
+>>> +#include <linux/io.h>
+>>> +#include <linux/module.h>
+>>> +#include <linux/of.h>
+>>> +#include <linux/of_platform.h>
+>>> +#include <linux/platform_device.h>
+>>> +#include <linux/timekeeping.h>
+>>> +#include <linux/interrupt.h>
+>>> +#include <linux/of_irq.h>
+>>> +
+>>> +#include "icss_iep.h"
+>>> +
+>>> +#define IEP_MAX_DEF_INC        0xf
+>>> +#define IEP_MAX_COMPEN_INC        0xfff
+>>> +#define IEP_MAX_COMPEN_COUNT    0xffffff
+>>> +
+>>> +#define IEP_GLOBAL_CFG_CNT_ENABLE    BIT(0)
+>>> +#define IEP_GLOBAL_CFG_DEFAULT_INC_MASK        GENMASK(7, 4)
+>>> +#define IEP_GLOBAL_CFG_DEFAULT_INC_SHIFT    4
+>>> +#define IEP_GLOBAL_CFG_COMPEN_INC_MASK        GENMASK(19, 8)
+>>> +#define IEP_GLOBAL_CFG_COMPEN_INC_SHIFT        8
+>>> +
+>>> +#define IEP_GLOBAL_STATUS_CNT_OVF    BIT(0)
+>>> +
+>>> +#define IEP_CMP_CFG_SHADOW_EN        BIT(17)
+>>> +#define IEP_CMP_CFG_CMP0_RST_CNT_EN    BIT(0)
+>>> +#define IEP_CMP_CFG_CMP_EN(cmp)        (GENMASK(16, 1) & (1 << ((cmp) + 1)))
+>>> +
+>>> +#define IEP_CMP_STATUS(cmp)        (1 << (cmp))
+>>> +
+>>> +#define IEP_SYNC_CTRL_SYNC_EN        BIT(0)
+>>> +#define IEP_SYNC_CTRL_SYNC_N_EN(n)    (GENMASK(2, 1) & (BIT(1) << (n)))
+>>> +
+>>> +#define IEP_MIN_CMP    0
+>>> +#define IEP_MAX_CMP    15
+>>> +
+>>> +#define ICSS_IEP_64BIT_COUNTER_SUPPORT        BIT(0)
+>>> +#define ICSS_IEP_SLOW_COMPEN_REG_SUPPORT    BIT(1)
+>>> +#define ICSS_IEP_SHADOW_MODE_SUPPORT        BIT(2)
+>>> +
+>>> +#define LATCH_INDEX(ts_index)            ((ts_index) + 6)
+>>> +#define IEP_CAP_CFG_CAPNR_1ST_EVENT_EN(n)    BIT(LATCH_INDEX(n))
+>>> +#define IEP_CAP_CFG_CAP_ASYNC_EN(n)        BIT(LATCH_INDEX(n) + 10)
+>>> +
+>>> +enum {
+>>> +    ICSS_IEP_GLOBAL_CFG_REG,
+>>> +    ICSS_IEP_GLOBAL_STATUS_REG,
+>>> +    ICSS_IEP_COMPEN_REG,
+>>> +    ICSS_IEP_SLOW_COMPEN_REG,
+>>> +    ICSS_IEP_COUNT_REG0,
+>>> +    ICSS_IEP_COUNT_REG1,
+>>> +    ICSS_IEP_CAPTURE_CFG_REG,
+>>> +    ICSS_IEP_CAPTURE_STAT_REG,
+>>> +
+>>> +    ICSS_IEP_CAP6_RISE_REG0,
+>>> +    ICSS_IEP_CAP6_RISE_REG1,
+>>> +
+>>> +    ICSS_IEP_CAP7_RISE_REG0,
+>>> +    ICSS_IEP_CAP7_RISE_REG1,
+>>> +
+>>> +    ICSS_IEP_CMP_CFG_REG,
+>>> +    ICSS_IEP_CMP_STAT_REG,
+>>> +    ICSS_IEP_CMP0_REG0,
+>>> +    ICSS_IEP_CMP0_REG1,
+>>> +    ICSS_IEP_CMP1_REG0,
+>>> +    ICSS_IEP_CMP1_REG1,
+>>> +
+>>> +    ICSS_IEP_CMP8_REG0,
+>>> +    ICSS_IEP_CMP8_REG1,
+>>> +    ICSS_IEP_SYNC_CTRL_REG,
+>>> +    ICSS_IEP_SYNC0_STAT_REG,
+>>> +    ICSS_IEP_SYNC1_STAT_REG,
+>>> +    ICSS_IEP_SYNC_PWIDTH_REG,
+>>> +    ICSS_IEP_SYNC0_PERIOD_REG,
+>>> +    ICSS_IEP_SYNC1_DELAY_REG,
+>>> +    ICSS_IEP_SYNC_START_REG,
+>>> +    ICSS_IEP_MAX_REGS,
+>>> +};
+>>> +
+>>> +/**
+>>> + * struct icss_iep_plat_data - Plat data to handle SoC variants
+>>> + * @config: Regmap configuration data
+>>> + * @reg_offs: register offsets to capture offset differences across SoCs
+>>> + * @flags: Flags to represent IEP properties
+>>> + */
+>>> +struct icss_iep_plat_data {
+>>> +    struct regmap_config *config;
+>>> +    u32 reg_offs[ICSS_IEP_MAX_REGS];
+>>> +    u32 flags;
+>>> +};
+>>> +
+>>> +struct icss_iep {
+>>> +    struct device *dev;
+>>> +    void __iomem *base;
+>>> +    const struct icss_iep_plat_data *plat_data;
+>>> +    struct regmap *map;
+>>> +    struct device_node *client_np;
+>>> +    unsigned long refclk_freq;
+>>> +    int clk_tick_time;    /* one refclk tick time in ns */
+>>> +    struct ptp_clock_info ptp_info;
+>>> +    struct ptp_clock *ptp_clock;
+>>> +    struct mutex ptp_clk_mutex;    /* PHC access serializer */
+>>> +    spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
+>>> +    u32 def_inc;
+>>> +    s16 slow_cmp_inc;
+>>> +    u32 slow_cmp_count;
+>>> +    const struct icss_iep_clockops *ops;
+>>> +    void *clockops_data;
+>>> +    u32 cycle_time_ns;
+>>> +    u32 perout_enabled;
+>>> +    bool pps_enabled;
+>>> +    int cap_cmp_irq;
+>>> +    u64 period;
+>>> +    u32 latch_enable;
+>>> +};
+>>> +
+>>
+>> Where is the comment you agreed to add on why we are using readl/writel
+>> instead of regmap in certain areas?
+>>
 > 
-> parses phy mode
-> configures for RGMII mode
-> configures RGMII delays associated
->  with phy-mode
-> calls phy_attach(..., mode);
-> phylib sets phy_dev->interface
-> 					Generic PHY driver ignores
-> 					phy_dev->interface
+> We agreed to add comment on why we are using readl/writel instead of regmap in the documentation of the readl / writel helper APIs (icss_iep_readl / writel ). But Andrew asked me to drop those helper APIs, so I dropped them. Now no helper APIs are there and we are directly using readl / writel in total 8 places. Previously with the helper APIs, there was a way to document the use of readl / writel before the declaration of heper APIs. Now with no helper APIs, I couldn't find a good place to add this documentation as all 8 instances using readl / writel seems similar. So I dropped it.
 
-There is one case that I have missed, and it's totally screwed by
-this behaviour where a Marvell DSA switch is connected to a Marvell
-PHY via a RGMII connection:
+Please limit your reply to around 80 columns wide.
+https://people.kernel.org/tglx/notes-about-netiquette
 
-   DSA <---------------------------------> PHY
-    v					    v
-dt-dsa-node {				phy: dt-phy-node {
-  phy-handle = <&phy>;			  ...
-  phy-mode = "rgmii-foo";		};
-};
+You don't have to put the comment everywhere you use readl/writel
+but you need to put it at least once hopefully just before icss_iep_gettime()
+so future readers of this code know the reasoning why we are not
+using regmap API throughout.
 
-parses phy mode
-configures for RGMII mode
-configures RGMII delays associated
- with phy-mode
-calls phy_attach(..., mode);
-phylib sets phy_dev->interface
-					PHY driver looks at
-					phydev->interface and
-					configures delays
-
-In this case, we have *both* ends configuring the RGMII delays and it
-will not work - because having the DSA MAC end configure the delays
-breaks the phylib model where the MAC *shouldn't* be configuring the
-delays.
-
-So, should mv88e6xxx_mac_config() also be forcing all RGMII modes
-in state->interface to be PHY_INTERFACE_MODE_RGMII when passing
-that into mv88e6xxx_port_config_interface() if, and only if the
-port is a user port? Or maybe if and only if the port is actually
-connected to a real PHY?
+> 
+>>> +/**
+>>> + * icss_iep_get_count_hi() - Get the upper 32 bit IEP counter
+>>> + * @iep: Pointer to structure representing IEP.
+>>> + *
+>>> + * Return: upper 32 bit IEP counter
+>>> + */
+>>> +int icss_iep_get_count_hi(struct icss_iep *iep)
+>>> +{
+>>> +    u32 val = 0;
+>>> +
+>>> +    if (iep && (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT))
+>>> +        val = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
+>>> +
+>>> +    return val;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(icss_iep_get_count_hi);
+>>> +
+>>> +/**
+>>> + * icss_iep_get_count_low() - Get the lower 32 bit IEP counter
+>>> + * @iep: Pointer to structure representing IEP.
+>>> + *
+>>> + * Return: lower 32 bit IEP counter
+>>> + */
+>>> +int icss_iep_get_count_low(struct icss_iep *iep)
+>>> +{
+>>> +    u32 val = 0;
+>>> +
+>>> +    if (iep)
+>>> +        val = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+>>> +
+>>> +    return val;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(icss_iep_get_count_low);
+>>> +
+>>> +/**
+>>> + * icss_iep_get_ptp_clock_idx() - Get PTP clock index using IEP driver
+>>> + * @iep: Pointer to structure representing IEP.
+>>> + *
+>>> + * Return: PTP clock index, -1 if not registered
+>>> + */
+>>> +int icss_iep_get_ptp_clock_idx(struct icss_iep *iep)
+>>> +{
+>>> +    if (!iep || !iep->ptp_clock)
+>>> +        return -1;
+>>> +    return ptp_clock_index(iep->ptp_clock);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(icss_iep_get_ptp_clock_idx);
+>>> +
+>>> +static void icss_iep_set_counter(struct icss_iep *iep, u64 ns)
+>>> +{
+>>> +    if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
+>>> +        writel(upper_32_bits(ns), iep->base +
+>>> +               iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
+>>> +    writel(upper_32_bits(ns), iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+>>> +}
+>>> +
+>>> +static void icss_iep_update_to_next_boundary(struct icss_iep *iep, u64 start_ns);
+>>> +
+>>> +static void icss_iep_settime(struct icss_iep *iep, u64 ns)
+>>> +{
+>>> +    unsigned long flags;
+>>> +
+>>> +    if (iep->ops && iep->ops->settime) {
+>>> +        iep->ops->settime(iep->clockops_data, ns);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    spin_lock_irqsave(&iep->irq_lock, flags);
+>>> +    if (iep->pps_enabled || iep->perout_enabled)
+>>> +        writel(0, iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
+>>> +
+>>> +    icss_iep_set_counter(iep, ns);
+>>> +
+>>> +    if (iep->pps_enabled || iep->perout_enabled) {
+>>> +        icss_iep_update_to_next_boundary(iep, ns);
+>>> +        writel(IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN,
+>>> +               iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
+>>> +    }
+>>> +    spin_unlock_irqrestore(&iep->irq_lock, flags);
+>>> +}
+>>> +
+>>> +static u64 icss_iep_gettime(struct icss_iep *iep,
+>>> +                struct ptp_system_timestamp *sts)
+>>> +{
+>>> +    u32 ts_hi = 0, ts_lo;
+>>> +    unsigned long flags;
+>>> +
+>>> +    if (iep->ops && iep->ops->gettime)
+>>> +        return iep->ops->gettime(iep->clockops_data, sts);
+>>> +
+>>> +    /* use local_irq_x() to make it work for both RT/non-RT */
+>>> +    local_irq_save(flags);
+>>> +
+>>> +    /* no need to play with hi-lo, hi is latched when lo is read */
+>>> +    ptp_read_system_prets(sts);
+>>> +    ts_lo = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+>>> +    ptp_read_system_postts(sts);
+>>> +    if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
+>>> +        ts_hi = readl(iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
+>>> +
+>>> +    local_irq_restore(flags);
+>>> +
+>>> +    return (u64)ts_lo | (u64)ts_hi << 32;
+>>> +}
+>>> +
+>>> +static void icss_iep_enable(struct icss_iep *iep)
+>>> +{
+>>> +    regmap_update_bits(iep->map, ICSS_IEP_GLOBAL_CFG_REG,
+>>> +               IEP_GLOBAL_CFG_CNT_ENABLE,
+>>> +               IEP_GLOBAL_CFG_CNT_ENABLE);
+>>> +}
+>>> +
+>> <snip>
+>>
+> 
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+cheers,
+-roger
 
