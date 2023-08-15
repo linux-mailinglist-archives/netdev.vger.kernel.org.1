@@ -1,116 +1,198 @@
-Return-Path: <netdev+bounces-27737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7556B77D0A1
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:08:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9C877D10D
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 19:32:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A47941C20DC7
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:08:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 115D728143B
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB7A156F7;
-	Tue, 15 Aug 2023 17:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8F615ADF;
+	Tue, 15 Aug 2023 17:32:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9421313ADE
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:07:08 +0000 (UTC)
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 876011737
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:07:07 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3a7f74134e7so2130231b6e.1
-        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 10:07:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692119227; x=1692724027;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q8DAFOOIcSljHTXBuhFKE9ilY2RRxTr9UnwnQAwhcxs=;
-        b=bgco/6HvDrxHLAxYnqRVcNVzgTeDbevphltliVqw7JrBfs+OveKP47B7H8t2GloLJN
-         osE9pvJ/2ARDoosTxubJWBk5XSOtPX8I+Y05+74h6FbVKt+EhEsQUkHA3NpJCHI10txf
-         fL4cuwpckVlf+7A5dL8HK3q8713wlE1sFL1uSFzV3knf0Rgbh5P+YwHPy4D6d5ginM69
-         iqUA/n7Xtqvcvkn9yVPE3MASZfNURqjMwwlORXtzeWh4qMf8tYRS5w5MH+3hZxa7UfRe
-         PMJk4BUWFM0dO4/vI+H53GSe5wF5uaxKl7QxhAXYMbKN2lH/FTQZ7n4W6BG//kycv6n7
-         sB5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692119227; x=1692724027;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q8DAFOOIcSljHTXBuhFKE9ilY2RRxTr9UnwnQAwhcxs=;
-        b=YKXP36W2mMRgNu4hj/P94THuoISMUp1/XIHbRg9TUtn5rmyfiv437rVL2pLZWNh+4k
-         6Z3c2jXT361jEcGeQ/WSYuMaff71Tdl+gfEzpK9cFKZzu2Nbx0TeEwQR4E1lmshw/xpn
-         k+DwpQX/WThe7NHMEgaUAiarenX4W9J57En52FgNDlvWys+jLjguApMMjelifztRcK8Z
-         uINXQqdfCrwCmBuJ6Riv006BwpbRpoopY7kNNzQYWo+OQ2QbwPV//c3Qi7LNe5rld6xQ
-         VKcss5u4307LhqjzlpjMkS3GJPc53Yq34CWWoNeeZtWvalJ7gVk+rgOf5C9oZel6qpZc
-         v8nA==
-X-Gm-Message-State: AOJu0Yygf4vEIWZZCwZjcI6fZjsk46ykjYwy6eHLiuFDXYzUtjnUhl0F
-	DLLwcpxMTnEWmrlr0mS2AX5LGnu6Wx9FzptnxAs=
-X-Google-Smtp-Source: AGHT+IHnxfKaz4/z0LPlkCYGJZKWeeRD77MprHGOGe8Sveb/9jTXX9eD5jvnZQgrYSwLowGcgXpOUg4d0UKnBdtms4Y=
-X-Received: by 2002:a05:6358:2789:b0:134:ce45:b782 with SMTP id
- l9-20020a056358278900b00134ce45b782mr12404429rwb.21.1692119226668; Tue, 15
- Aug 2023 10:07:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8A615AC8
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:32:25 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343F61BD1;
+	Tue, 15 Aug 2023 10:32:24 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id CCE19FF88;
+	Tue, 15 Aug 2023 20:32:22 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id B5701FDF9;
+	Tue, 15 Aug 2023 20:32:22 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 1622A3C0442;
+	Tue, 15 Aug 2023 20:32:15 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1692120736; bh=ciWA8brsNRv34nXH41CnmPTsBdnHMooPT+UbIQizqUc=;
+	h=From:To:Cc:Subject:Date;
+	b=aFGrbT1aJwmJkeRUkMlRtAQTBv3jOJGta1Yht2evC39kygSg9KO/dj5cRnGY1vPV8
+	 13kUHJ8OVOsd85UPzs+xRr2beKZp1b7B/uyiWgFPRdEsv2lA5RF/6ZRNozZFRVTtAw
+	 K9mNty254iafFK+6rrLxJsKW/hGdHRMFOD/j64jo=
+Received: from ja.home.ssi.bg (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 37FHWFE3168605;
+	Tue, 15 Aug 2023 20:32:15 +0300
+Received: (from root@localhost)
+	by ja.home.ssi.bg (8.17.1/8.17.1/Submit) id 37FHWD5E168600;
+	Tue, 15 Aug 2023 20:32:13 +0300
+From: Julian Anastasov <ja@ssi.bg>
+To: Simon Horman <horms@verge.net.au>
+Cc: lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org, "Paul E . McKenney" <paulmck@kernel.org>,
+        rcu@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
+        Jiejian Wu <jiejian@linux.alibaba.com>,
+        Jiri Wiesner <jwiesner@suse.de>
+Subject: [PATCH RFC net-next 00/14] ipvs: per-net tables and optimizations
+Date: Tue, 15 Aug 2023 20:30:17 +0300
+Message-ID: <20230815173031.168344-1-ja@ssi.bg>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230811223938.997986-1-ziweixiao@google.com> <20230814192231.12e0c290@kernel.org>
-In-Reply-To: <20230814192231.12e0c290@kernel.org>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 15 Aug 2023 13:06:29 -0400
-Message-ID: <CAF=yD-JcWUhi3o==cQj5ByYosH0bQBxsyCk7fUAzMDXRX_fa9w@mail.gmail.com>
-Subject: Re: [PATCH net-next] gve: add header split support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ziwei Xiao <ziweixiao@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 14, 2023 at 10:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Fri, 11 Aug 2023 15:39:38 -0700 Ziwei Xiao wrote:
-> > - Add header-split and strict-header-split ethtool priv flags. These
-> >   flags control header-split behavior. It can be turned on/off and it
-> >   can be set to 'strict' which will cause the driver to drop all the
-> >   packets that don't have a proper header split.
-> > - Add max-rx-buffer-size priv flag to allow user to switch the packet
-> >   buffer size between max and default(e.g. 4K <-> 2K).
-> > - Add reconfigure rx rings to support the header split and
-> >   max-rx-buffer-size enable/disable switch.
+	Hello,
 
-The bulleted list is an indication that maybe this patch is combining
-too much in a single commit.
+	This patchset targets more netns isolation when IPVS
+is used in large setups and also includes some optimizations.
+This is a RFC submission to get wider review and comments.
 
-> Someone on your team needs to participate upstream or you need
-> to get your patches reviewed from someone upstream-savvy before
-> posting.
->
-> Anyone participating in netdev reviews would have told you that
-> private flags are unlikely to fly upstream.
->
-> One part of an organization participating upstream while another
-> has no upstream understanding and throws code over the wall is
-> a common anti-pattern, and I intend to stop it.
+	First patch adds useful wrappers to rculist_bl, the
+hlist_bl methods IPVS will use in the following patches. The other
+patches are IPVS-specific.
 
-The one point I want to raise about private flags is that ethtool
-currently lacks an alternative for header-split.
+	The following patches will:
 
-That probably requires a non-driver patch to add as a new ethtool feature.
+* Convert the global __ip_vs_mutex to per-net service_mutex and
+  switch the service tables to be per-net, cowork by Jiejian Wu and
+  Dust Li
 
-I had not given much thought on the two modes of header-split seen
-here until now: strict or not. We'll have to figure out whether both
-are really needed, especially if turning into ethtool ABI.
+* Convert some code that walks the service lists to use RCU instead of
+  the service_mutex
+
+* We used two tables for services (non-fwmark and fwmark), merge them
+  into single svc_table
+
+* The list for unavailable destinations (dest_trash) holds dsts and
+  thus dev references causing extra work for the ip_vs_dst_event() dev
+  notifier handler. Change this by dropping the reference when dest
+  is removed and saved into dest_trash. The dest_trash will need more
+  changes to make it light for lookups. TODO.
+
+* On new connection we can do multiple lookups for services by tryng
+  different fallback options. Add more counters for service types, so
+  that we can avoid unneeded lookups for services.
+
+* Add infrastructure for resizable hash tables based on hlist_bl
+  which we will use for services and connections: hlists with
+  per-bucket bit lock in the heads. The resizing delays RCU lookups
+  on a bucket level with seqcounts which are protected with spin locks.
+
+* Change the 256-bucket service hash table to be resizable in the
+  range of 4..20 bits depending on the added services and use jhash
+  hashing to reduce the collisions.
+
+* Change the global connection table to be per-net and resizable
+  in the range of 256..ip_vs_conn_tab_size. As the connections are
+  hashed by using remote addresses and ports, use siphash instead
+  of jhash for better security.
+
+* As the connection table is not fixed size, show its current size
+  to user space
+
+* As the connection table is not global anymore, the no_cport and
+  dropentry counters can be per-net
+
+* Make the connection hashing more secure for setups with multiple
+  services. Hashing only by remote address and port (client info)
+  is not enough. To reduce the possible hash collisions add the
+  used virtual address/port (local info) into the hash and as a side
+  effect the MASQ connections will be double hashed into the
+  hash table to match the traffic from real servers:
+    OLD:
+    - all methods: c_list node: proto, caddr:cport
+    NEW:
+    - all methods: hn0 node (dir 0): proto, caddr:cport -> vaddr:vport
+    - MASQ method: hn1 node (dir 1): proto, daddr:dport -> caddr:cport
+
+* Add /proc/net/ip_vs_status to show current state of IPVS, per-net
+
+cat /proc/net/ip_vs_status
+Conns:	9401
+Conn buckets:	524288 (19 bits, lfactor 5)
+Conn buckets empty:	505633 (96%)
+Conn buckets len-1:	18322 (98%)
+Conn buckets len-2:	329 (1%)
+Conn buckets len-3:	3 (0%)
+Conn buckets len-4:	1 (0%)
+Services:	12
+Service buckets:	128 (7 bits, lfactor 3)
+Service buckets empty:	116 (90%)
+Service buckets len-1:	12 (100%)
+Stats thread slots:	1 (max 16)
+Stats chain max len:	16
+Stats thread ests:	38400
+
+It shows the table size, the load factor, how many are the empty
+buckets, with percents from the all buckets, the number of buckets
+with length 1..7 where len-7 catches all len>=7 (zero values are
+not shown). The len-N percents ignore the empty buckets, so they
+are relative among all len-N buckets. It shows that large lfactor
+is needed to achieve len-1 buckets to be ~98%. Only real tests can
+show if relying on len-1 buckets is a better option because the
+hash table becomes too large with multiple connections. And as
+every table uses random key, the services may not avoid collision
+in all cases.
+
+* add conn_lfactor and svc_lfactor sysctl vars, so that one can tune
+  the connection/service hash table sizing
+
+Jiejian Wu (1):
+  ipvs: make ip_vs_svc_table and ip_vs_svc_fwm_table per netns
+
+Julian Anastasov (13):
+  rculist_bl: add hlist_bl_for_each_entry_continue_rcu
+  ipvs: some service readers can use RCU
+  ipvs: use single svc table
+  ipvs: do not keep dest_dst after dest is removed
+  ipvs: use more counters to avoid service lookups
+  ipvs: add resizable hash tables
+  ipvs: use resizable hash table for services
+  ipvs: switch to per-net connection table
+  ipvs: show the current conn_tab size to users
+  ipvs: no_cport and dropentry counters can be per-net
+  ipvs: use more keys for connection hashing
+  ipvs: add ip_vs_status info
+  ipvs: add conn_lfactor and svc_lfactor sysctl vars
+
+ Documentation/networking/ipvs-sysctl.rst |   31 +
+ include/linux/rculist_bl.h               |   17 +
+ include/net/ip_vs.h                      |  395 ++++++-
+ net/netfilter/ipvs/ip_vs_conn.c          | 1079 ++++++++++++++-----
+ net/netfilter/ipvs/ip_vs_core.c          |  171 ++-
+ net/netfilter/ipvs/ip_vs_ctl.c           | 1233 ++++++++++++++++------
+ net/netfilter/ipvs/ip_vs_est.c           |   18 +-
+ net/netfilter/ipvs/ip_vs_pe_sip.c        |    4 +-
+ net/netfilter/ipvs/ip_vs_xmit.c          |   39 +-
+ 9 files changed, 2304 insertions(+), 683 deletions(-)
+
+-- 
+2.41.0
+
+
 
