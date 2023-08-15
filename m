@@ -1,182 +1,119 @@
-Return-Path: <netdev+bounces-27686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE25477CDE8
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A79FE77CE00
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 16:23:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C082814A4
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:18:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20D242814C4
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82063134B9;
-	Tue, 15 Aug 2023 14:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196CE134CB;
+	Tue, 15 Aug 2023 14:23:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BA35C9D
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:18:43 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2256A10FF;
-	Tue, 15 Aug 2023 07:18:41 -0700 (PDT)
-Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RQCvp2cK0ztS7Z;
-	Tue, 15 Aug 2023 22:15:02 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 15 Aug 2023 22:18:37 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <fw@strlen.de>, <leon@kernel.org>
-CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<timo.teras@iki.fi>, <yuehaibing@huawei.com>, <weiyongjun1@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Dong Chenchen
-	<dongchenchen2@huawei.com>
-Subject: [Patch net v3] net: xfrm: skip policies marked as dead while reinserting policies
-Date: Tue, 15 Aug 2023 22:18:34 +0800
-Message-ID: <20230815141834.1040646-1-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D1E111B0
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 14:23:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EE06C433C7;
+	Tue, 15 Aug 2023 14:23:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692109411;
+	bh=G0wLK5bMRBZ3biEchEhetIoIiQUxmKkj//WHJ7fAgPk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ayT/rgQZ9gf6TrxVQT3sc+8xiMemB0kYDYqjjBJ4oZG7/pyrNlqvKMsiJacV7sfuw
+	 N1hyx9+1O7GWZYe3bMlssVLZsrWObOOFiammzaUsX+qM0eMBK5U62HwAfMjzTwnMm9
+	 Qs4kjUCb7YLtciKzj80gSQ1/wYb4i4nROV8qB+bpBYWe1oObvjTthdrEFTKppgVe4J
+	 bKAMp1vYydharH/5fI4ceiiGT+53TK0DBtWLkQOtaF8edOWmrHmwmErF2+MUleGEij
+	 FRMuREKDjQ+LutI+xUzfvqnZ+lNqHr8wytA4wc9lDJbMlfGDETJlUlFyE2duviPPJv
+	 uFClPDn9XM4kg==
+Date: Tue, 15 Aug 2023 15:23:25 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Rohan G Thomas <rohan.g.thomas@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] dt-bindings: net: snps,dwmac: Tx queues
+ with coe
+Message-ID: <20230815-reconcile-reshoot-1dfc9ab4a60f@spud>
+References: <20230814140637.27629-1-rohan.g.thomas@intel.com>
+ <20230814140637.27629-2-rohan.g.thomas@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemi500026.china.huawei.com (7.221.188.247)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="31EWOSqhpz72Q0+j"
+Content-Disposition: inline
+In-Reply-To: <20230814140637.27629-2-rohan.g.thomas@intel.com>
 
-BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
-Read of size 1 at addr ffff8881051f3bf8 by task ip/668
 
-CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x72/0xa0
- print_report+0xd0/0x620
- kasan_report+0xb6/0xf0
- xfrm_policy_inexact_list_reinsert+0xb6/0x430
- xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
- xfrm_policy_inexact_alloc_chain+0x23f/0x320
- xfrm_policy_inexact_insert+0x6b/0x590
- xfrm_policy_insert+0x3b1/0x480
- xfrm_add_policy+0x23c/0x3c0
- xfrm_user_rcv_msg+0x2d0/0x510
- netlink_rcv_skb+0x10d/0x2d0
- xfrm_netlink_rcv+0x49/0x60
- netlink_unicast+0x3fe/0x540
- netlink_sendmsg+0x528/0x970
- sock_sendmsg+0x14a/0x160
- ____sys_sendmsg+0x4fc/0x580
- ___sys_sendmsg+0xef/0x160
- __sys_sendmsg+0xf7/0x1b0
- do_syscall_64+0x3f/0x90
- entry_SYSCALL_64_after_hwframe+0x73/0xdd
+--31EWOSqhpz72Q0+j
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The root cause is:
+On Mon, Aug 14, 2023 at 10:06:36PM +0800, Rohan G Thomas wrote:
+> Add dt-bindings for the number of tx queues with coe support. Some
+> dwmac IPs support tx queues only for a few initial tx queues,
+> starting from tx queue 0.
+>=20
+> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
 
-cpu 0			cpu1
-xfrm_dump_policy
-xfrm_policy_walk
-list_move_tail
-			xfrm_add_policy
-			... ...
-			xfrm_policy_inexact_list_reinsert
-			list_for_each_entry_reverse
-				if (!policy->bydst_reinsert)
-				//read non-existent policy
-xfrm_dump_policy_done
-xfrm_policy_walk_done
-list_del(&walk->walk.all);
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-If dump_one_policy() returns err (triggered by netlink socket),
-xfrm_policy_walk() will move walk initialized by socket to list
-net->xfrm.policy_all. so this socket becomes visible in the global
-policy list. The head *walk can be traversed when users add policies
-with different prefixlen and trigger xfrm_policy node merge.
+Thanks,
+Conor.
 
-The issue can also be triggered by policy list traversal while rehashing
-and flushing policies.
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Docu=
+mentation/devicetree/bindings/net/snps,dwmac.yaml
+> index ddf9522a5dc2..0c6431c10cf9 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -313,6 +313,9 @@ properties:
+>        snps,tx-queues-to-use:
+>          $ref: /schemas/types.yaml#/definitions/uint32
+>          description: number of TX queues to be used in the driver
+> +      snps,tx-queues-with-coe:
+> +        $ref: /schemas/types.yaml#/definitions/uint32
+> +        description: number of TX queues that support TX checksum offloa=
+ding
+>        snps,tx-sched-wrr:
+>          type: boolean
+>          description: Weighted Round Robin
+> --=20
+> 2.19.0
+>=20
 
-It can be fixed by skip such "policies" with walk.dead set to 1.
+--31EWOSqhpz72Q0+j
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Fixes: 9cf545ebd591 ("xfrm: policy: store inexact policies in a tree ordered by destination address")
-Fixes: 12a169e7d8f4 ("ipsec: Put dumpers on the dump list")
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
----
-v2: fix similiar similar while rehashing and flushing policies
-v3: check walk.dead after declaration of new variables
----
- net/xfrm/xfrm_policy.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index d6b405782b63..113fb7e9cdaf 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -851,7 +851,7 @@ static void xfrm_policy_inexact_list_reinsert(struct net *net,
- 		struct hlist_node *newpos = NULL;
- 		bool matches_s, matches_d;
- 
--		if (!policy->bydst_reinsert)
-+		if (policy->walk.dead || !policy->bydst_reinsert)
- 			continue;
- 
- 		WARN_ON_ONCE(policy->family != family);
-@@ -1256,8 +1256,11 @@ static void xfrm_hash_rebuild(struct work_struct *work)
- 		struct xfrm_pol_inexact_bin *bin;
- 		u8 dbits, sbits;
- 
-+		if (policy->walk.dead)
-+			continue;
-+
- 		dir = xfrm_policy_id2dir(policy->index);
--		if (policy->walk.dead || dir >= XFRM_POLICY_MAX)
-+		if (dir >= XFRM_POLICY_MAX)
- 			continue;
- 
- 		if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
-@@ -1823,9 +1826,11 @@ int xfrm_policy_flush(struct net *net, u8 type, bool task_valid)
- 
- again:
- 	list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
-+		if (pol->walk.dead)
-+			continue;
-+
- 		dir = xfrm_policy_id2dir(pol->index);
--		if (pol->walk.dead ||
--		    dir >= XFRM_POLICY_MAX ||
-+		if (dir >= XFRM_POLICY_MAX ||
- 		    pol->type != type)
- 			continue;
- 
-@@ -1862,9 +1867,11 @@ int xfrm_dev_policy_flush(struct net *net, struct net_device *dev,
- 
- again:
- 	list_for_each_entry(pol, &net->xfrm.policy_all, walk.all) {
-+		if (pol->walk.dead)
-+			continue;
-+
- 		dir = xfrm_policy_id2dir(pol->index);
--		if (pol->walk.dead ||
--		    dir >= XFRM_POLICY_MAX ||
-+		if (dir >= XFRM_POLICY_MAX ||
- 		    pol->xdo.dev != dev)
- 			continue;
- 
--- 
-2.25.1
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNuKXQAKCRB4tDGHoIJi
+0kNYAQC89tAi2N1i1739qtPj8asdT8XtPs5imJ8IXuR77su/SgEAtdnyhxQ9FezS
+87c/00tTpw4Xbqxwe7wmDz5Hf5pSlAM=
+=gfdG
+-----END PGP SIGNATURE-----
 
+--31EWOSqhpz72Q0+j--
 
