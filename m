@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-27765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D29677D1E2
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:30:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DAB577D1EA
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 20:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 767C11C20E14
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:30:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 707D51C20E23
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 18:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CFB154AA;
-	Tue, 15 Aug 2023 18:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C7414AA1;
+	Tue, 15 Aug 2023 18:34:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8240D1804C
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:30:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0DD4C433C8;
-	Tue, 15 Aug 2023 18:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B735614276
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:34:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65444C433C7;
+	Tue, 15 Aug 2023 18:34:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692124234;
-	bh=t7b2VbdNw/i6NoJ0PKaswwPONEbGDaYAFFU00ewCL0s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rCj/2Y6gQzuQUEm4p24rQ8YcdhP7meWTQAd/cdATZRP8uqNPHguPTtQ4sXDLgeaR+
-	 ikmwQ7QHnQZSmEyPO6xmuBW3dW1gFsIgC3rXOToZLxYzDjSm2FVz6ZhekuI8wRYu4U
-	 TJpO2KAddd0LGGkFsxbv831BvQpjnUEsEpxuBUtiiJQImJ1Td0joNEv9Pi36dcc2ch
-	 6+Nr4msXMaSEzw0GHRJkfEZEAC0tYSFJBohrJnxFfcReiQPKcsc2ss5MNjDnFbdOZ5
-	 456wXDmRXlmODqc86KzNevco7J+Mpe2tm1/hXi6ImyivorOgDnxu6yFZjPAj0S2HtP
-	 s/mL5iRIiz5FQ==
-Date: Tue, 15 Aug 2023 11:30:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2023-08-11
-Message-ID: <20230815113033.7cdf64ff@kernel.org>
-In-Reply-To: <CABBYNZ+mnQ2gKOoezeKfM=CF4ANVGtjM0Zb4a-tnZKYvrw_F5A@mail.gmail.com>
-References: <20230811192256.1988031-1-luiz.dentz@gmail.com>
-	<20230814164546.71dbc695@kernel.org>
-	<CABBYNZJmkOpPgF6oox-JAyGAZRxzX7Kn9JQpLPXi_FR=Cf-FOA@mail.gmail.com>
-	<20230815111554.7ff6205e@kernel.org>
-	<CABBYNZ+mnQ2gKOoezeKfM=CF4ANVGtjM0Zb4a-tnZKYvrw_F5A@mail.gmail.com>
+	s=k20201202; t=1692124471;
+	bh=zMC6PsjUY3Yq7OJqlmuW8VvAtLE3VXwPHaS/2IG7fF0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NbCVnCQHd4Ol7D5gUzgfD38w3NXS6NxA1sxpFEJZqY/UDp3BtlLog7cBLVPFxDw7d
+	 eN5dFKQWbDvLzaCXeQ+jmIhr5VYWR8XQMg2iE4qTnl0UmTR+S6dsHlTq2WZUJaD+gq
+	 7Bws6aVH9HAK0XQ5uFOvrOFmC4e8ejnq0nkTwwKcWdH309kaiV864MwPPFLErjnzeg
+	 fxIwVaBuagoOuBwAhozuXA6ktaQqqoO+Llc94jJUCsnHuKbnqIBK9Rou31hTmrCfU3
+	 ty+18QFNFjQ5z+UpboLnyHeGqNsPkE0DxfuPFpOsmf6ydSuq0KtV0IYqMDjMvSy4y2
+	 R7ZYNDYxyq63A==
+Date: Tue, 15 Aug 2023 21:34:26 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
+	jacob.e.keller@intel.com, horms@kernel.org,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net-next v3 1/5] ice: remove FW logging code
+Message-ID: <20230815183426.GT22185@unreal>
+References: <20230815165750.2789609-1-anthony.l.nguyen@intel.com>
+ <20230815165750.2789609-2-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815165750.2789609-2-anthony.l.nguyen@intel.com>
 
-On Tue, 15 Aug 2023 11:18:07 -0700 Luiz Augusto von Dentz wrote:
-> On Tue, Aug 15, 2023 at 11:15=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > On Tue, 15 Aug 2023 10:59:35 -0700 Luiz Augusto von Dentz wrote: =20
-> > > Ok, since it has been applied what shall we do? =20
-> >
-> > Not much we can do now. Make sure you run:
-> >
-> > https://github.com/kuba-moo/nipa/blob/master/tests/patch/verify_signedo=
-ff/verify_signedoff.sh
-> >
-> > on the next PR. =20
->=20
-> Will try to incorporate this into our CI checks, btw any reason why
-> this is not done by the likes of checkpatch?
+On Tue, Aug 15, 2023 at 09:57:46AM -0700, Tony Nguyen wrote:
+> From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+> 
+> The FW logging code doesn't work because there is no way to set
+> cq_ena or uart_ena so remove the code. This code is the original
+> (v1) way of FW logging so it should be replaced with the v2 way.
+> 
+> Signed-off-by: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  78 -------
+>  drivers/net/ethernet/intel/ice/ice_common.c   | 217 ------------------
+>  drivers/net/ethernet/intel/ice/ice_common.h   |   1 -
+>  drivers/net/ethernet/intel/ice/ice_main.c     |   3 -
+>  drivers/net/ethernet/intel/ice/ice_type.h     |  20 --
+>  5 files changed, 319 deletions(-)
+> 
 
-No reason I can think of. The people who usually run this check will
-not want to switch to checkpatch because of its high false-positive
-rate. So I'm guessing nobody had the motivation to send a patch.
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
