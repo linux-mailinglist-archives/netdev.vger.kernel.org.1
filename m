@@ -1,95 +1,236 @@
-Return-Path: <netdev+bounces-27671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 244E977CC55
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:08:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8775377CC6F
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 14:19:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 426A428149E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 12:08:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ED4B1C20CF7
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 12:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5301E111B0;
-	Tue, 15 Aug 2023 12:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A465211731;
+	Tue, 15 Aug 2023 12:19:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CDC111AF
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 12:08:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA08C433C7;
-	Tue, 15 Aug 2023 12:08:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692101327;
-	bh=2I9zTsaTUj2cvyrEYEqTG4+Hu3ZlC/26ibNOomQI9tc=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=hYSx9CNl3kWclsqirsoWwQj7isJ+V3pCYqY17Cu0xyW/8/HNiwbnIAMHpdoAhnhf1
-	 9Pn5qNCUHgHdAF1R7caEJ7tI0j/FUrw/zZqQKBjBd4lNo/ZUKR286hD1pMjP+jNsni
-	 hBdTWOqMtlZVsW6tG4HGxlQyXrEJQ4kmuabjzvEgKIdcCpwjpGDGoUhvsd6yKKxIqt
-	 0RosjB5x6bnbbEBCIKu8RcE73qVUw7RqvER/4IApS75iK8dyMs6D/GcaltF8uSxtJ3
-	 aw0VvEJlD/4EI3OcwO9yLhtl+NldoZY/KlDO63ibud3Fne14YoIbKk8KDmLKMWBv4r
-	 wiLxGF+k86Hzw==
-Message-ID: <25de7655-6084-e6b9-1af6-c47b3d3b7dc1@kernel.org>
-Date: Tue, 15 Aug 2023 14:08:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E345C9D;
+	Tue, 15 Aug 2023 12:19:16 +0000 (UTC)
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02D3F12E;
+	Tue, 15 Aug 2023 05:19:15 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-64712741d5cso7978176d6.1;
+        Tue, 15 Aug 2023 05:19:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692101954; x=1692706754;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QUoMJvwvNDiWDbpEX8hXChfExLzmgKTcQbHp89OBZMs=;
+        b=dLw29zKrqoD2PGMb3iRNbMvVW9Ao5kN7FnTC/ZapK4csW7kpJKYrajq+QeUbDhr+1X
+         SwpC/tMarYSMQFpn/XgAurFXJZKPHVy7sDmo61muWTDyBcL/GXkspVS80IvKPSjwc/VC
+         ek+iNzFqz7NwX2B+IItLUaSky4Db7SvRfbgcdOILtCE8mp2GYVYnW9SoJRw+SRsAULYE
+         RTF4xAPfC6noYZd4QsQNLV0XBop0CKbE2eI8xiPbZE1WyQJWGmVB0ReykajBja59xRqW
+         tAcA6fCThCUmt5quC8aMcYUm8dRDpxhXSjvStvuCQXdrDaMmutztuSPThA33AASD0/DI
+         GGyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692101954; x=1692706754;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QUoMJvwvNDiWDbpEX8hXChfExLzmgKTcQbHp89OBZMs=;
+        b=kpYg/oJUXlZE3fMSSvw2Dpqdoz9408Lna7etFyVmqpWeA5Xl5q5aaMG89MImRraL0A
+         N+Vo36mSK2T1hE4ekSW0PjVllgSOI0hrRI5gOmiKDo01qEKJxLZKduIKx8oknvvkPonD
+         KtOAjpZHfZYsXJFCokZSzqI9+wueqQm/sk+u7zfUnov31ob8av7IWb3kdw4uLvi8VfEv
+         hq3OosU3EsH6JRDWF5wge/ylZCKeiKYNgZiU2/21zaEOI1IRPKf6ZqAWcrHr0v9kn3+g
+         m88JaOncUCfoxtMdTeagIjF4A1wWiNR9ZSkJFEcRwYBYygwoKAfpoQLUyKmNr3YS83Z0
+         orxg==
+X-Gm-Message-State: AOJu0YwQLFfA3fldRqFAdkC9OdD2odtzsU8b51jynOM7pYSgQe8Dtngl
+	TJMcSlTO1q5MhX/U70JSGrC5rtfx24rH6LeEOy4=
+X-Google-Smtp-Source: AGHT+IGAUWQgEDBbjZlUJhilsyn0HTT73s2jGPd8nSnSgtvj0hq/pGLJeKsGGOVaNjzL0E35+yiCXJg/jbX5WX5Dfrc=
+X-Received: by 2002:ad4:5c4c:0:b0:635:fa38:5216 with SMTP id
+ a12-20020ad45c4c000000b00635fa385216mr18797070qva.0.1692101954034; Tue, 15
+ Aug 2023 05:19:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: hawk@kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Wander Lairson Costa <wander@redhat.com>,
- kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC PATCH 2/2] softirq: Drop the warning from
- do_softirq_post_smp_call_flush().
-Content-Language: en-US
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814093528.117342-3-bigeasy@linutronix.de>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20230814093528.117342-3-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230809165418.2831456-1-sdf@google.com> <20230809165418.2831456-2-sdf@google.com>
+ <ZNoIdzdHQV6OUecF@boxer> <CAKH8qBv9jw_C1B_LRcnbGK90dfsS9bY7GqYJA5Nvyiug1VqRCQ@mail.gmail.com>
+ <CAKH8qBshXjc3rKgn6A-dfE4sXtk+ckSJx0qr=14t4heKXXEhcQ@mail.gmail.com>
+In-Reply-To: <CAKH8qBshXjc3rKgn6A-dfE4sXtk+ckSJx0qr=14t4heKXXEhcQ@mail.gmail.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 15 Aug 2023 14:19:03 +0200
+Message-ID: <CAJ8uoz0Hmru4XeVUJK=M97CSML2RMQbucLNTVDFPaZQRjJrgkg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/9] xsk: Support XDP_TX_METADATA_LEN
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	haoluo@google.com, jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, 
+	willemb@google.com, dsahern@kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, hawk@kernel.org, netdev@vger.kernel.org, 
+	xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+On Tue, 15 Aug 2023 at 00:25, Stanislav Fomichev <sdf@google.com> wrote:
+>
+> On Mon, Aug 14, 2023 at 11:05=E2=80=AFAM Stanislav Fomichev <sdf@google.c=
+om> wrote:
+> >
+> > On Mon, Aug 14, 2023 at 3:57=E2=80=AFAM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> > >
+> > > On Wed, Aug 09, 2023 at 09:54:10AM -0700, Stanislav Fomichev wrote:
+> > > > For zerocopy mode, tx_desc->addr can point to the arbitrary offset
+> > > > and carry some TX metadata in the headroom. For copy mode, there
+> > > > is no way currently to populate skb metadata.
+> > > >
+> > > > Introduce new XDP_TX_METADATA_LEN that indicates how many bytes
+> > > > to treat as metadata. Metadata bytes come prior to tx_desc address
+> > > > (same as in RX case).
+> > > >
+> > > > The size of the metadata has the same constraints as XDP:
+> > > > - less than 256 bytes
+> > > > - 4-byte aligned
+> > > > - non-zero
+> > > >
+> > > > This data is not interpreted in any way right now.
+> > > >
+> > > > Signed-off-by: Stanislav Fomichev <sdf@google.com>
+> > > > ---
+> > > >  include/net/xdp_sock.h      |  1 +
+> > > >  include/net/xsk_buff_pool.h |  1 +
+> > > >  include/uapi/linux/if_xdp.h |  1 +
+> > > >  net/xdp/xsk.c               | 20 ++++++++++++++++++++
+> > > >  net/xdp/xsk_buff_pool.c     |  1 +
+> > > >  net/xdp/xsk_queue.h         | 17 ++++++++++-------
+> > > >  6 files changed, 34 insertions(+), 7 deletions(-)
+> > > >
+> > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> > > > index 1617af380162..467b9fb56827 100644
+> > > > --- a/include/net/xdp_sock.h
+> > > > +++ b/include/net/xdp_sock.h
+> > > > @@ -51,6 +51,7 @@ struct xdp_sock {
+> > > >       struct list_head flush_node;
+> > > >       struct xsk_buff_pool *pool;
+> > > >       u16 queue_id;
+> > > > +     u8 tx_metadata_len;
+> > > >       bool zc;
+> > > >       bool sg;
+> > > >       enum {
+> > > > diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_poo=
+l.h
+> > > > index b0bdff26fc88..9c31e8d1e198 100644
+> > > > --- a/include/net/xsk_buff_pool.h
+> > > > +++ b/include/net/xsk_buff_pool.h
+> > > > @@ -77,6 +77,7 @@ struct xsk_buff_pool {
+> > > >       u32 chunk_size;
+> > > >       u32 chunk_shift;
+> > > >       u32 frame_len;
+> > > > +     u8 tx_metadata_len; /* inherited from xsk_sock */
+> > > >       u8 cached_need_wakeup;
+> > > >       bool uses_need_wakeup;
+> > > >       bool dma_need_sync;
+> > > > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xd=
+p.h
+> > > > index 8d48863472b9..b37b50102e1c 100644
+> > > > --- a/include/uapi/linux/if_xdp.h
+> > > > +++ b/include/uapi/linux/if_xdp.h
+> > > > @@ -69,6 +69,7 @@ struct xdp_mmap_offsets {
+> > > >  #define XDP_UMEM_COMPLETION_RING     6
+> > > >  #define XDP_STATISTICS                       7
+> > > >  #define XDP_OPTIONS                  8
+> > > > +#define XDP_TX_METADATA_LEN          9
+> > > >
+> > > >  struct xdp_umem_reg {
+> > > >       __u64 addr; /* Start of packet data area */
+> > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > > index 47796a5a79b3..28df3280501d 100644
+> > > > --- a/net/xdp/xsk.c
+> > > > +++ b/net/xdp/xsk.c
+> > > > @@ -1338,6 +1338,26 @@ static int xsk_setsockopt(struct socket *soc=
+k, int level, int optname,
+> > > >               mutex_unlock(&xs->mutex);
+> > > >               return err;
+> > > >       }
+> > > > +     case XDP_TX_METADATA_LEN:
+> > > > +     {
+> > > > +             int val;
+> > > > +
+> > > > +             if (optlen < sizeof(val))
+> > > > +                     return -EINVAL;
+> > > > +             if (copy_from_sockptr(&val, optval, sizeof(val)))
+> > > > +                     return -EFAULT;
+> > > > +             if (!val || val > 256 || val % 4)
+> > > > +                     return -EINVAL;
+> > > > +
+> > > > +             mutex_lock(&xs->mutex);
+> > > > +             if (xs->state !=3D XSK_READY) {
+> > > > +                     mutex_unlock(&xs->mutex);
+> > > > +                     return -EBUSY;
+> > > > +             }
+> > > > +             xs->tx_metadata_len =3D val;
+> > > > +             mutex_unlock(&xs->mutex);
+> > > > +             return 0;
+> > > > +     }
+> > > >       default:
+> > > >               break;
+> > > >       }
+> > > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> > > > index b3f7b310811e..b351732f1032 100644
+> > > > --- a/net/xdp/xsk_buff_pool.c
+> > > > +++ b/net/xdp/xsk_buff_pool.c
+> > > > @@ -85,6 +85,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(s=
+truct xdp_sock *xs,
+> > > >               XDP_PACKET_HEADROOM;
+> > > >       pool->umem =3D umem;
+> > > >       pool->addrs =3D umem->addrs;
+> > > > +     pool->tx_metadata_len =3D xs->tx_metadata_len;
+> > >
+> > > Hey Stan,
+> > >
+> > > what would happen in case when one socket sets pool->tx_metadata_len =
+say
+> > > to 16 and the other one that is sharing the pool to 24? If sockets sh=
+ould
+> > > and can have different padding, then this will not work unless the
+> > > metadata_len is on a per socket level.
+> >
+> > Hmm, good point. I didn't think about umem sharing :-/
+> > Maybe they all have to agree on the size? And once the size has been
+> > size by one socket, the same size should be set on the others? (or at
+> > least be implied that the other sockets will use the same metadata
+> > layout)
+>
+> Thinking about it a bit more: should that tx_metadata_len be part of a
+> umem then?
+> Users can provide it as part of xdp_umem_reg which is probably a
+> better place to pass it compared to the setsockopt?
 
+If all the sockets sharing the umem have to agree on the
+tx_metadata_len, then this is a better place than the setsockopt.
+IMHO, it sounds unlikely that multiple versions of the same program,
+or different programs, would like to share the same umem.
 
-On 14/08/2023 11.35, Sebastian Andrzej Siewior wrote:
-> This is an undesired situation and it has been attempted to avoid the
-> situation in which ksoftirqd becomes scheduled. This changed since
-> commit d15121be74856 ("Revert "softirq: Let ksoftirqd do its job"")
-> and now a threaded interrupt handler will handle soft interrupts at its
-> end even if ksoftirqd is pending. That means that they will be processed
-> in the context in which they were raised.
+Please note that some of the members of struct xdp_umem are copied out
+to the individual struct xsk_buff_pool even though they are the same
+between all of them (chunk_size and the size of the umem for example).
+The reason for this is performance, as to avoid having to access the
+umem struct in the fast path. Something similar might be a good idea
+here too, even though tx_metadata_len is fixed for a umem being
+shared. Might be worth trying.
 
-$ git describe --contains d15121be74856
-v6.5-rc1~232^2~4
-
-That revert basically removes the "overload" protection that was added
-to cope with DDoS situations in Aug 2016 (Cc. Cloudflare).  As described
-in https://git.kernel.org/torvalds/c/4cd13c21b207 ("softirq: Let
-ksoftirqd do its job") in UDP overload situations when UDP socket
-receiver runs on same CPU as ksoftirqd it "falls-off-an-edge" and almost
-doesn't process packets (because softirq steals CPU/sched time from UDP
-pid).  Warning Cloudflare (Cc) as this might affect their production
-use-cases, and I recommend getting involved to evaluate the effect of
-these changes.
-
-I do realize/acknowledge that the reverted patch caused other latency
-issues, given it was a "big-hammer" approach affecting other softirq
-processing (as can be seen by e.g. the watchdog fixes patches).
-Thus, the revert makes sense, but how to regain the "overload"
-protection such that RX networking cannot starve processes reading from
-the socket? (is this what Sebastian's patchset does?)
-
---Jesper
-
-Thread link for people Cc'ed: 
-https://lore.kernel.org/all/20230814093528.117342-1-bigeasy@linutronix.de/#r
+Again, thanks for working on this Stanislav.
 
