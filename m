@@ -1,309 +1,329 @@
-Return-Path: <netdev+bounces-27702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE41977CEA8
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:05:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70BBA77CEB4
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 17:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19578281544
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:05:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924841C20D9C
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 15:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB0713AFF;
-	Tue, 15 Aug 2023 15:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BFC13FE8;
+	Tue, 15 Aug 2023 15:09:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0B113AF3
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 15:05:05 +0000 (UTC)
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98596138;
-	Tue, 15 Aug 2023 08:05:03 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id ca18e2360f4ac-7910b9bb891so177731139f.2;
-        Tue, 15 Aug 2023 08:05:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692111903; x=1692716703;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C15dfbyaPCqUx0eSRs2F9I2Y/k4M/cVBWlOvNZGqVdo=;
-        b=dwCMArsZfYi5nteJatAUcHS7Ezg/Nxg2NbBJuZWyvH+kS3ebqtR8sJeI9hVHR59xu3
-         qO9YV5bkoEx956F/O5iEyM9VIj7GN7hKpt6AqZFQ+J18wb34W7EoGaL3MXdFiPXhyx/K
-         804grLRZEvMU3kxURVMoDHGEsoJTN0x32dSGQQVwZQ0Erqips7aDJ3SD3UrDy2BOijsI
-         OIuHw8N1Z85v5In/KGPCsSdtbntro0mNyMo9gCbEr+jZWIXtE4aWmR22M7HaVXXg2G+n
-         6q4YMxOct/dxOINlzhIckXJQR02lsdq8Frvcg1/oP5dovpz5dB/7mXWP699Wnk1wPdRy
-         fV8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692111903; x=1692716703;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C15dfbyaPCqUx0eSRs2F9I2Y/k4M/cVBWlOvNZGqVdo=;
-        b=fTdHcOp8qhRjLQvgMt7ivayf0LR7im+vhbYhtjyEbV/hnUI3WKBX+v54uzc115v0Dg
-         J62cC0ZpDXMZH4Y6FhrbHZkjg3lXIciyvt84IaZS55Hki/KIMBvaZDZIoHC6mQ4pKQlm
-         +MZbKtbd6eMbrVUan3Jn5DsRYTScLAN7ttVwCkKp3+RXd5t41c0yQGpxPCm0wl/D27LG
-         2GiaEGdGvJkEgACC8yQA3l3JzLRpAf8O1tSyHvCP643FJ3EX8a0GbL4NWxeNQ7N89TaO
-         mq+MKZgQ4pCQiZpie5PIWSSU/9DyWKmsvhL7b9qaM8BGUgngAhk/W9ah133rlqeqYkr6
-         qigg==
-X-Gm-Message-State: AOJu0YxBDxRiPB287TK+E65QkLHUmA8v8N3jwtAc4Cukc/KYlOZcedAI
-	Tmk3//yzdpoYmVV30yLoR6E=
-X-Google-Smtp-Source: AGHT+IFbh1lIZ1o+4tSmuL6NIEH8obSbxkyXTWfEyJ61hKXXXnFyoCadxxg6FsLMA3M19uJxDfdGdQ==
-X-Received: by 2002:a05:6e02:1be2:b0:348:1a1d:79a5 with SMTP id y2-20020a056e021be200b003481a1d79a5mr21058271ilv.15.1692111902612;
-        Tue, 15 Aug 2023 08:05:02 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id s17-20020a92cc11000000b00345d3f2bb6asm3980504ilp.56.2023.08.15.08.05.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 08:05:02 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Tue, 15 Aug 2023 08:05:00 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Jean Delvare <jdelvare@suse.com>, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH net-next 11/12] bnxt_en: Expose threshold temperatures
- through hwmon
-Message-ID: <c6f3a05e-f75c-4051-8892-1c2dee2804b0@roeck-us.net>
-References: <20230815045658.80494-1-michael.chan@broadcom.com>
- <20230815045658.80494-12-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2140B1097E
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 15:09:12 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A301986;
+	Tue, 15 Aug 2023 08:09:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l/eCZqzhkaSsCI5y4Zpa/pWRe0Q86agEMGKzVeGbgFfUIX1irhisq5B5VHwf0JTC/eKoBLPwBiLJ3napUWWZJ2+rNN4g/HOC8bn0u84IvCIL11MmZ7SZ7BOnMwoDPpvML06aZOBcP+QKhsd5Vpq0Kf7LCA0Pt3gaVBH8ttBCny6mX7Za614e370USDlwN9suA2lM+JfvR7By9wQDHGp+qc+lptJca0zjr5YUEJji43uYKDOki/QyiKWmzueWMDjph3KPGSALiYkUw2cB6E8Gvfip/7FOEXm/n3F4dxR+mh+u8NRxuLJAV+yF+4mUWkEFEc7DEJLwlZXHHKbbgebGUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GVN6Lh1OzCct/pmmPUfcrfHmgJKfG2veEmVL0TODDW4=;
+ b=JS5nbEJXiCjUgAbhwSRWPJTRCSgW4t6kgb1Q10Zd9ofD9V1z58GxDbvuGor8e1GSwbyVRw6ZhPxpstTSLVpdqq1yN5gJgYaPkTTCe5Q5ip6IQJrJ65kXB50KGN/5qVA2Aj5gv+Tc2IXcKTyVbKUeB8Fsqw5hn6K4w9JC981QSSfRCW/aBIaAqKYRJEWdA8cPqbiY7BNR59DCaRnqnwLwFYXnSKzqh1r7Lr3NOy65i4H+7h9xBywVRLgQqIGAId5tNrpvURmLrFqOXbktvF9ckwBtw5WdG1ZozlbjQ2Qm9hnPCHk8LRyvoLnL7xPkZ2wRuPJRg+1RqvVyMAmjWx+qTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GVN6Lh1OzCct/pmmPUfcrfHmgJKfG2veEmVL0TODDW4=;
+ b=tyK3BeRqLg+zbQjz1q7ejZxtOs51Grpps1jxTqcb8J7a3/oBbctsKuURvgL4iNtomVj8s2WIU8vqdb/CdcB0xCWfhWadpI195g3kUOOq+jjHRs/2B/gUWCCfRaOpBFtxZKV4gtYtKQ4fF1Xd3FdmJlAamUicO1y6vI8T49slcZEt4c/ob+HNboupciCLbmHKtpgDV5529ytPYnL23N6whqS0+vBTT0zxNYgwqIa062I1cBRPci9xYialyMuXYSoTyvMss9/nYP6xX96Df4uUEAQj2NqxNumEyTRNZn9apX+kjBDrgB92yIjtrChHPEyX3a30CVW25x0dFRPgMqVPFQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6201.namprd12.prod.outlook.com (2603:10b6:930:26::16)
+ by IA1PR12MB6604.namprd12.prod.outlook.com (2603:10b6:208:3a0::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
+ 2023 15:09:07 +0000
+Received: from CY5PR12MB6201.namprd12.prod.outlook.com
+ ([fe80::87fb:3736:7ec4:b260]) by CY5PR12MB6201.namprd12.prod.outlook.com
+ ([fe80::87fb:3736:7ec4:b260%4]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
+ 15:09:06 +0000
+Message-ID: <05348d62-586c-4b1f-40bd-5541caca0947@nvidia.com>
+Date: Tue, 15 Aug 2023 11:09:02 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH net v1] virtio_net: Introduce skb_vnet_common_hdr to avoid
+ typecasting
+To: Simon Horman <horms@kernel.org>
+Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Bodong Wang <bodong@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20230814171845.65930-1-feliu@nvidia.com>
+ <ZNtYpohWyjnb883M@vergenet.net>
+From: Feng Liu <feliu@nvidia.com>
+In-Reply-To: <ZNtYpohWyjnb883M@vergenet.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7PR04CA0167.namprd04.prod.outlook.com
+ (2603:10b6:806:125::22) To CY5PR12MB6201.namprd12.prod.outlook.com
+ (2603:10b6:930:26::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230815045658.80494-12-michael.chan@broadcom.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6201:EE_|IA1PR12MB6604:EE_
+X-MS-Office365-Filtering-Correlation-Id: cbf9321e-a5c2-4315-6898-08db9da191ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	GkbQe6p1EbjUwZGn98spfUvHHj3Q3MnrLDHQWrEp3/I3YiTKHGs29g2mPO/pLYTSgMRFrppzJs3IYFq4/MPhvQcQZQPQaWY2HwvHbYcqyEf0csZjC7nFhuh9vsAT0qM+uRCdOLGtMxs4i5XlofP3/kRyIc/AQFHQVPlenbTPMUCVccal5cNV+sclXmKSLlkXC8064oXRR1rcHBJGv4FQlFdWgqg9gp6GzA2J/6yUl8++TGKMOyoEDBdEbTR2aRuuKT//Czi9dHEJTcmTddco0kgSJse9K5EZRpz2gabNoOPxDCqcZGuQdHam3obgPXo0dMzDl76xJ8GdxpqxVDqaowVWoXXHAoNaYMInAjqXMmPq6YU/ExYsapR1s8IavTpp7mytSk1QEVhHWi6GVFKwCfljR3qzlC9KS7tztEWtBnefQik0XU/v0uT4K4LvUA62PB0GNHKqligY1cyUuD+1OTjzEMUEyTGje76rRzRmkh0Sb52mu0mfqGjlcv91+W887gxHoIYi006zo5vXMLM5bDP2/CZQ/jKHPm4XTZG7rkQyk+O2qF2K6b4xlJsVTLR6MSMitdoWdMDd/13FwQf4LbkZhHZ6D5HgLdZOlWT786EepTNIcFmgdBOW9wwB9sMLItjhWvfP6JxO1MJhlFdd5A==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6201.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(39860400002)(136003)(376002)(451199024)(1800799009)(186009)(66899024)(6512007)(26005)(66556008)(2616005)(31686004)(66476007)(66946007)(4326008)(316002)(54906003)(41300700001)(8936002)(83380400001)(6916009)(8676002)(86362001)(31696002)(2906002)(36756003)(5660300002)(6486002)(7416002)(6666004)(38100700002)(478600001)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MHhjaEh3Yk8wTngxMklLNm92V3hVamN6RTBYcGhIci9YVXp1eEhpa1ZuODNI?=
+ =?utf-8?B?b1g3WXRQaVBGczNmaGdKQS80S3JzT2ZJQ1hoaVE0bmxkTy8wOGhRUG44c3hn?=
+ =?utf-8?B?c1pmQVVIejYvZllucC9TWmlYbmVQRkxzdTd4bzJXblpBQ1A3eStqMjBMWE5M?=
+ =?utf-8?B?ZHJLSVN6VlJJNXV4ODlpbzJmcCt3Y2Z2Vi80Z2lsRmFOWEZKbWxiV3pHcFdZ?=
+ =?utf-8?B?dHZCOS9SWmtKYUxnRENoMTR3L00vSmRlMzlNeU05ajNhZlliY3ZUeDZhUng1?=
+ =?utf-8?B?RE5vUGtRU24zVDRrRVpTWEZFUHZpVnIvWHZLUWJVQW5CaldxUmpic0FEUTkx?=
+ =?utf-8?B?Sit2SUR6OE4vVlVVOTFQdkRCNzVlMkRrVmdnVTdTQTExalFMcGJHM2dhYUIr?=
+ =?utf-8?B?dVpsRFJhcU5DWEx1T296ZnFnN1pGOG1MQVJSN2pIUllrVjZvRERTbWRPWWN1?=
+ =?utf-8?B?QnJqcSs4bWMzUVh6QzZxbkp0a3E4cExHZWhuYnlUc2VINFdqTjFiOFhvOWZu?=
+ =?utf-8?B?d1Q1bk1yajVoT3lWN0p4NTR1cFh1emtCdS94b0hraUQ5eVZXOGZ6bldMdXV0?=
+ =?utf-8?B?c2VPNndacGFWSGlNc05oc1B4K0VwL3ZqQkxMZnE4enJHMEpHOVhoN1F4Rk9G?=
+ =?utf-8?B?SGw5OUo5aHBOWHkxK1k0R0JXbWlGM21tbVh3cCtxd3pCaCtWUU9yT3NqSjRP?=
+ =?utf-8?B?NDNQNUUvMjF3WTU2R2dHK2JYSTh6QmJBLytqb2NmUTZ5S2lJbmVocTJHNm9V?=
+ =?utf-8?B?aVJ1L0RocENMNHpLbi83NmdMVHdlNjNLdnZDZHNUMkxKVnlYMjFJaElyTE9a?=
+ =?utf-8?B?dUJFeFFNVFRQcnRaM1k1clR3WjJYeWZzTkl1bFo0Y0pHQVVXTXBvOTl3c3Zn?=
+ =?utf-8?B?TzlvY2taK1lsS2pRa05vTHhnNHhxemo4cjg3alNJbUtCSUxPU0dKd0JXSGZ5?=
+ =?utf-8?B?dWEzdjZhVWY0ZTBGYzNBWnNUbFRBOE1RcUt4bDlSemNMdFlpb0wzQU9Xem5Y?=
+ =?utf-8?B?ZDZGYVBBWkt6T3g4YXFCakt3b1hYOUF3YWltOU1zQmVUNEMxL1lTeHdxamZn?=
+ =?utf-8?B?NzhLOW5FT1lpOE5uSFFVN3VGZXJzSEhKejJDZ2JHTzNISkNnbjBNdG5LVE0v?=
+ =?utf-8?B?WTZQZDl2Vnp3RGs2WUR5RUV3WExRYjNkM2hCTHdmRDY2a29XV013ODYrdnlM?=
+ =?utf-8?B?SzFLYW5yWXU1ZHZ3bG9NUTBINUh6c1cwSDkyTFRHU2V1TVMrWkhxZzRYV3lj?=
+ =?utf-8?B?RWxlOUJFOVVPaWQybGFCU0pSSmpxdHc0SmVuWXpwOWkvdHNEcGtEeWdjamxo?=
+ =?utf-8?B?T2sxS1FmZUppNXFZOFY5WUZqNDA5OStqKzVlcTg1Z3F3U3FnNEl5cnkvNjFh?=
+ =?utf-8?B?RGlWTURKN3E2bUdPcHVITGlaMzdjbjVZanlabFFyL2tXTlAyajlMTUdFcElQ?=
+ =?utf-8?B?bTBoNlFNMjluRkJ6TGw0MjBMeVExSms3T2FiVldKY3piNzVNMHVVcGIzeDdL?=
+ =?utf-8?B?bG1iS1I5VHlUUVNUR0QrWlM2anZNZytrSlYram0xQnFpVGNPTDRHcCt2alBu?=
+ =?utf-8?B?K0Q0NGdjM1oyRHBQeWVTOU5ncDAvbFJzd0VlaGdtUEFwTW9JYVo1aXV4OEg3?=
+ =?utf-8?B?M0l1S3dwZld6WXN1d3RaQmxoUDM1Ymc1dDg5OW52QWJRSDVXS0hOa0F0ZllR?=
+ =?utf-8?B?MVU2YThJbjczNndkdFVidGxUTDAxc1ZnWThjN29BN1RmSjJkRGRwNjllc3hv?=
+ =?utf-8?B?bWtlbEZGZHFzRHJNVHZuK0o0c0hmYkFDeGk0MTZPSldmZkZjbmk0bjBCbGxp?=
+ =?utf-8?B?eFU3UUFoemJTUS9FbXdjTzFXMWFoVmVsQjUvbTNFZTJpUkR5d0xRSEZjNXdQ?=
+ =?utf-8?B?cmJlNkFTTDZNVkF3NUlYM1BySFN1dnluSURpakVtZW8xWjM1ditOSTk1MkJT?=
+ =?utf-8?B?dTVZY1hIcjJTSzFCbEpOeElSNFMxS1E4VEo3RnV4ZSt6SzJOWDlvWGNrSzhm?=
+ =?utf-8?B?TGxadFZLWnVNdExONnNmOW4xQlRQK2V5bHBQSnpHVllPYkxIN3VGNjI3bzFZ?=
+ =?utf-8?B?M0hscG93cTM3MGZnT2RiL0xFQTJiVFVmZHRubDdqdlF3ZmQwNXpCY2NrN0hO?=
+ =?utf-8?Q?CLr4Jpb8CVb2CsdGKZjsDr/pE?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbf9321e-a5c2-4315-6898-08db9da191ee
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6201.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 15:09:06.8226
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: f5q8VMglgOk/Nuy/NiWTgGSFQGpEBhkXRSEkN0dhjdLEYEfXH8soXnNvRu8Q4DvsdA/uo4ZanilHc1ksww7ZbA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6604
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 14, 2023 at 09:56:57PM -0700, Michael Chan wrote:
-> From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+
+
+On 2023-08-15 a.m.6:51, Simon Horman wrote:
+> External email: Use caution opening links or attachments
 > 
-> HWRM_TEMP_MONITOR_QUERY response now indicates various
-> threshold temperatures. Expose these threshold temperatures
-> through the hwmon sysfs.
-> Also, provide temp1_max_alarm through which the user can check
-> whether the threshold temperature has been reached or not.
 > 
-> Example:
-> cat /sys/class/hwmon/hwmon3/temp1_input
-> 75000
-> cat /sys/class/hwmon/hwmon3/temp1_max
-> 105000
-> cat /sys/class/hwmon/hwmon3/temp1_max_alarm
-> 0
+> On Mon, Aug 14, 2023 at 01:18:45PM -0400, Feng Liu wrote:
 > 
-> Cc: Jean Delvare <jdelvare@suse.com>
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Cc: linux-hwmon@vger.kernel.org
-> Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  7 ++
->  .../net/ethernet/broadcom/bnxt/bnxt_hwmon.c   | 71 +++++++++++++++++--
->  2 files changed, 73 insertions(+), 5 deletions(-)
+> + "David S. Miller" <davem@davemloft.net>
+>    Eric Dumazet <edumazet@google.com>
+>    Jakub Kicinski <kuba@kernel.org>
+>    Paolo Abeni <pabeni@redhat.com>
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> index 84cbcfa61bc1..43a07d84f815 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> @@ -2013,6 +2013,7 @@ struct bnxt {
->  	#define BNXT_FW_CAP_RING_MONITOR		BIT_ULL(30)
->  	#define BNXT_FW_CAP_DBG_QCAPS			BIT_ULL(31)
->  	#define BNXT_FW_CAP_PTP				BIT_ULL(32)
-> +	#define BNXT_FW_CAP_THRESHOLD_TEMP_SUPPORTED	BIT_ULL(33)
->  
->  	u32			fw_dbg_cap;
->  
-> @@ -2185,7 +2186,13 @@ struct bnxt {
->  	struct bnxt_tc_info	*tc_info;
->  	struct list_head	tc_indr_block_list;
->  	struct dentry		*debugfs_pdev;
-> +#ifdef CONFIG_BNXT_HWMON
->  	struct device		*hwmon_dev;
-> +	u8			warn_thresh_temp;
-> +	u8			crit_thresh_temp;
-> +	u8			fatal_thresh_temp;
-> +	u8			shutdown_thresh_temp;
-> +#endif
->  	enum board_idx		board_idx;
->  };
->  
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-> index 20381b7b1d78..f5affac1169a 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-> @@ -34,6 +34,15 @@ static int bnxt_hwrm_temp_query(struct bnxt *bp, u8 *temp)
->  
->  	if (temp)
->  		*temp = resp->temp;
-> +
-> +	if (resp->flags & TEMP_MONITOR_QUERY_RESP_FLAGS_THRESHOLD_VALUES_AVAILABLE) {
-> +		if (!temp)
-> +			bp->fw_cap |= BNXT_FW_CAP_THRESHOLD_TEMP_SUPPORTED;
+Thanks for adding David S. Miller.
 
-The if statement seems unnecessary. If the flag was not set
-during initialization, the limit attributes won't be visible anyway,
-so it doesn't make a difference if it is set now or not.
-
-> +		bp->warn_thresh_temp = resp->warn_threshold;
-> +		bp->crit_thresh_temp = resp->critical_threshold;
-> +		bp->fatal_thresh_temp = resp->fatal_threshold;
-> +		bp->shutdown_thresh_temp = resp->shutdown_threshold;
-
-Are those temperatures expected to change during runtime ? If not it might
-make sense to only execute the entire if condition if temp == NULL to
-avoid unnecessary reassignments whenever the temperature is read.
-
-> +	}
->  err:
->  	hwrm_req_drop(bp, req);
->  	return rc;
-> @@ -42,12 +51,30 @@ static int bnxt_hwrm_temp_query(struct bnxt *bp, u8 *temp)
->  static umode_t bnxt_hwmon_is_visible(const void *_data, enum hwmon_sensor_types type,
->  				     u32 attr, int channel)
->  {
-> +	const struct bnxt *bp = _data;
-> +
->  	if (type != hwmon_temp)
->  		return 0;
->  
->  	switch (attr) {
->  	case hwmon_temp_input:
->  		return 0444;
-> +	case hwmon_temp_lcrit:
-> +	case hwmon_temp_crit:
-> +	case hwmon_temp_emergency:
-> +	case hwmon_temp_lcrit_alarm:
-> +	case hwmon_temp_crit_alarm:
-> +	case hwmon_temp_emergency_alarm:
-> +		if (~bp->fw_cap & BNXT_FW_CAP_THRESHOLD_TEMP_SUPPORTED)
-
-Seems to me that
-		if (!(bp->fw_cap & BNXT_FW_CAP_THRESHOLD_TEMP_SUPPORTED))
-would be much easier to understand.
-
-> +			return 0;
-> +		return 0444;
-> +	/* Max temperature setting in NVM is optional */
-> +	case hwmon_temp_max:
-> +	case hwmon_temp_max_alarm:
-> +		if (~bp->fw_cap & BNXT_FW_CAP_THRESHOLD_TEMP_SUPPORTED ||
-> +		    !bp->shutdown_thresh_temp)
-> +			return 0;
-
-Wrong use of the 'max' attribute. More on that below.
-
-> +		return 0444;
->  	default:
->  		return 0;
->  	}
-> @@ -66,6 +93,38 @@ static int bnxt_hwmon_read(struct device *dev, enum hwmon_sensor_types type, u32
->  		if (!rc)
->  			*val = temp * 1000;
->  		return rc;
-> +	case hwmon_temp_lcrit:
-> +		*val = bp->warn_thresh_temp * 1000;
-> +		return 0;
-> +	case hwmon_temp_crit:
-> +		*val = bp->crit_thresh_temp * 1000;
-> +		return 0;
-> +	case hwmon_temp_emergency:
-> +		*val = bp->fatal_thresh_temp * 1000;
-> +		return 0;
-> +	case hwmon_temp_max:
-> +		*val = bp->shutdown_thresh_temp * 1000;
-> +		return 0;
-> +	case hwmon_temp_lcrit_alarm:
-> +		rc = bnxt_hwrm_temp_query(bp, &temp);
-> +		if (!rc)
-> +			*val = temp >= bp->warn_thresh_temp;
-
-That is wrong. lcrit is the _lower_ critical temperature, ie the
-temperature is critically low. This is not a "high temperature"
-alarm.
-
-> +		return rc;
-> +	case hwmon_temp_crit_alarm:
-> +		rc = bnxt_hwrm_temp_query(bp, &temp);
-> +		if (!rc)
-> +			*val = temp >= bp->crit_thresh_temp;
-> +		return rc;
-> +	case hwmon_temp_emergency_alarm:
-> +		rc = bnxt_hwrm_temp_query(bp, &temp);
-> +		if (!rc)
-> +			*val = temp >= bp->fatal_thresh_temp;
-> +		return rc;
-> +	case hwmon_temp_max_alarm:
-> +		rc = bnxt_hwrm_temp_query(bp, &temp);
-> +		if (!rc)
-> +			*val = temp >= bp->shutdown_thresh_temp;
-
-Hmm, that isn't really the purpose of alarm attributes. The expectation
-would be that the chip sets alarm flags and the driver reports it.
-I guess there is some value in having it, so I won't object.
-
-Anyway, the ordering is wrong. max_alarm should be the lowest
-alarm level, followed by crit and emergency. So
-		max_alarm -> temp >= bp->warn_thresh_temp
-		crit_alarm -> temp >= bp->crit_thresh_temp
-		emergency_alarm -> temp >= bp->fatal_thresh_temp
-				or temp >= bp->shutdown_thresh_temp
-
-There are only three levels of upper temperature alarms.
-Abusing lcrit as 4th upper alarm is most definitely wrong.
-
-> +		return rc;
->  	default:
->  		return -EOPNOTSUPP;
->  	}
-> @@ -73,7 +132,11 @@ static int bnxt_hwmon_read(struct device *dev, enum hwmon_sensor_types type, u32
->  
->  static const struct hwmon_channel_info *bnxt_hwmon_info[] = {
->  	HWMON_CHANNEL_INFO(temp,
-> -			   HWMON_T_INPUT),
-> +			   HWMON_T_INPUT |
-> +			   HWMON_T_MAX | HWMON_T_LCRIT |
-> +			   HWMON_T_CRIT | HWMON_T_EMERGENCY |
-> +			   HWMON_T_CRIT_ALARM | HWMON_T_LCRIT_ALARM |
-> +			   HWMON_T_MAX_ALARM | HWMON_T_EMERGENCY_ALARM),
->  	NULL
->  };
->  
-> @@ -97,13 +160,11 @@ void bnxt_hwmon_uninit(struct bnxt *bp)
->  
->  void bnxt_hwmon_init(struct bnxt *bp)
->  {
-> -	struct hwrm_temp_monitor_query_input *req;
->  	struct pci_dev *pdev = bp->pdev;
->  	int rc;
->  
-> -	rc = hwrm_req_init(bp, req, HWRM_TEMP_MONITOR_QUERY);
-> -	if (!rc)
-> -		rc = hwrm_req_send_silent(bp, req);
-> +	/* temp1_xxx is only sensor, ensure not registered if it will fail */
-> +	rc = bnxt_hwrm_temp_query(bp, NULL);
-
-Ah, that is the reason for the check in bnxt_hwrm_temp_query().
-The check in that function should really be added here, not in the
-previous patch.
-
->  	if (rc == -EACCES || rc == -EOPNOTSUPP) {
->  		bnxt_hwmon_uninit(bp);
->  		return;
-> -- 
-> 2.30.1
+>> The virtio_net driver currently deals with different versions and types
+>> of virtio net headers, such as virtio_net_hdr_mrg_rxbuf,
+>> virtio_net_hdr_v1_hash, etc. Due to these variations, the code relies
+>> on multiple type casts to convert memory between different structures,
+>> potentially leading to bugs when there are changes in these structures.
+>>
+>> Introduces the "struct skb_vnet_common_hdr" as a unifying header
+>> structure using a union. With this approach, various virtio net header
+>> structures can be converted by accessing different members of this
+>> structure, thus eliminating the need for type casting and reducing the
+>> risk of potential bugs.
+>>
+>> For example following code:
+>> static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+>>                struct receive_queue *rq,
+>>                struct page *page, unsigned int offset,
+>>                unsigned int len, unsigned int truesize,
+>>                unsigned int headroom)
+>> {
+>> [...]
+>>        struct virtio_net_hdr_mrg_rxbuf *hdr;
+>> [...]
+>>        hdr_len = vi->hdr_len;
+>> [...]
+>> ok:
+>>        hdr = skb_vnet_hdr(skb);
+>>        memcpy(hdr, hdr_p, hdr_len);
+>> [...]
+>> }
+>>
+>> When VIRTIO_NET_F_HASH_REPORT feature is enabled, hdr_len = 20
+>> But the sizeof(*hdr) is 12,
+>> memcpy(hdr, hdr_p, hdr_len); will copy 20 bytes to the hdr,
+>> which make a potential risk of bug. And this risk can be avoided by
+>> introducing struct virtio_net_hdr_mrg_rxbuf.
+>>
+>> Signed-off-by: Feng Liu <feliu@nvidia.com>
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> 
+> I'm unsure if this is 'net' material.
 > 
 
+It is about the modification of the virtio_net driver. I think it should 
+be regarded as `net` material.
 
+>> ---
+>>   drivers/net/virtio_net.c        | 29 ++++++++++++++++-------------
+>>   include/uapi/linux/virtio_net.h |  7 +++++++
+>>   2 files changed, 23 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 1270c8d23463..6ce0fbcabda9 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -344,9 +344,10 @@ static int rxq2vq(int rxq)
+>>        return rxq * 2;
+>>   }
+>>
+>> -static inline struct virtio_net_hdr_mrg_rxbuf *skb_vnet_hdr(struct sk_buff *skb)
+>> +static inline struct virtio_net_common_hdr *
+>> +skb_vnet_common_hdr(struct sk_buff *skb)
+>>   {
+>> -     return (struct virtio_net_hdr_mrg_rxbuf *)skb->cb;
+>> +     return (struct virtio_net_common_hdr *)skb->cb;
+>>   }
+>>
+>>   /*
+>> @@ -469,7 +470,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+>>                                   unsigned int headroom)
+>>   {
+>>        struct sk_buff *skb;
+>> -     struct virtio_net_hdr_mrg_rxbuf *hdr;
+>> +     struct virtio_net_common_hdr *hdr;
+>>        unsigned int copy, hdr_len, hdr_padded_len;
+>>        struct page *page_to_free = NULL;
+>>        int tailroom, shinfo_size;
+>> @@ -554,7 +555,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+>>                give_pages(rq, page);
+>>
+>>   ok:
+>> -     hdr = skb_vnet_hdr(skb);
+>> +     hdr = skb_vnet_common_hdr(skb);
+>>        memcpy(hdr, hdr_p, hdr_len);
+>>        if (page_to_free)
+>>                put_page(page_to_free);
+>> @@ -966,7 +967,7 @@ static struct sk_buff *receive_small_build_skb(struct virtnet_info *vi,
+>>                return NULL;
+>>
+>>        buf += header_offset;
+>> -     memcpy(skb_vnet_hdr(skb), buf, vi->hdr_len);
+>> +     memcpy(skb_vnet_common_hdr(skb), buf, vi->hdr_len);
+>>
+>>        return skb;
+>>   }
+>> @@ -1577,7 +1578,8 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>   {
+>>        struct net_device *dev = vi->dev;
+>>        struct sk_buff *skb;
+>> -     struct virtio_net_hdr_mrg_rxbuf *hdr;
+>> +     struct virtio_net_common_hdr *common_hdr;
+>> +     struct virtio_net_hdr_mrg_rxbuf *mrg_hdr;
+>>
+>>        if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+>>                pr_debug("%s: short packet %i\n", dev->name, len);
+>> @@ -1597,18 +1599,19 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>        if (unlikely(!skb))
+>>                return;
+>>
+>> -     hdr = skb_vnet_hdr(skb);
+>> +     common_hdr = skb_vnet_common_hdr(skb);
+>>        if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
+>> -             virtio_skb_set_hash((const struct virtio_net_hdr_v1_hash *)hdr, skb);
+>> +             virtio_skb_set_hash(&common_hdr->hash_v1_hdr, skb);
+>>
+>> -     if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+>> +     mrg_hdr = &common_hdr->mrg_hdr;
+>> +     if (mrg_hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+>>                skb->ip_summed = CHECKSUM_UNNECESSARY;
+>>
+>> -     if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+>> +     if (virtio_net_hdr_to_skb(skb, &mrg_hdr->hdr,
+>>                                  virtio_is_little_endian(vi->vdev))) {
+>>                net_warn_ratelimited("%s: bad gso: type: %u, size: %u\n",
+>> -                                  dev->name, hdr->hdr.gso_type,
+>> -                                  hdr->hdr.gso_size);
+>> +                                  dev->name, mrg_hdr->hdr.gso_type,
+>> +                                  mrg_hdr->hdr.gso_size);
+>>                goto frame_err;
+>>        }
+>>
+>> @@ -2105,7 +2108,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
+>>        if (can_push)
+>>                hdr = (struct virtio_net_hdr_mrg_rxbuf *)(skb->data - hdr_len);
+>>        else
+>> -             hdr = skb_vnet_hdr(skb);
+>> +             hdr = &skb_vnet_common_hdr(skb)->mrg_hdr;
+>>
+>>        if (virtio_net_hdr_from_skb(skb, &hdr->hdr,
+>>                                    virtio_is_little_endian(vi->vdev), false,
+>> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+>> index 12c1c9699935..db40f93ae8b3 100644
+>> --- a/include/uapi/linux/virtio_net.h
+>> +++ b/include/uapi/linux/virtio_net.h
+>> @@ -201,6 +201,13 @@ struct virtio_net_hdr_mrg_rxbuf {
+>>        struct virtio_net_hdr hdr;
+>>        __virtio16 num_buffers; /* Number of merged rx buffers */
+>>   };
+>> +
+>> +struct virtio_net_common_hdr {
+>> +     union {
+>> +             struct virtio_net_hdr_mrg_rxbuf mrg_hdr;
+>> +             struct virtio_net_hdr_v1_hash hash_v1_hdr;
+>> +     };
+>> +};
+> 
+> Does this belong in the UAPI?
+> I would have assumed it's a Kernel implementation detail.
+> 
+The existing codes, virtio_net.h is in uapi/linux/, I added the new 
+structure and followed existing code. My modification is related to 
+Kernel implementation detail now.
+
+>>   #endif /* ...VIRTIO_NET_NO_LEGACY */
+>>
+>>   /*
+>> --
+>> 2.37.1 (Apple Git-137.1)
+>>
+>>
 
