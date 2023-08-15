@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-27560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0307877C68E
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:57:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E9F77C690
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 05:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FDB32812B1
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:57:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BD4E1C20B59
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 03:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082C21FA0;
-	Tue, 15 Aug 2023 03:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BA41FA0;
+	Tue, 15 Aug 2023 03:59:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBFD1C13
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 03:57:41 +0000 (UTC)
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6306D4483;
-	Mon, 14 Aug 2023 20:57:36 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vpq6ttl_1692071851;
-Received: from 30.221.106.14(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Vpq6ttl_1692071851)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56151C13
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 03:59:51 +0000 (UTC)
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319911BF2;
+	Mon, 14 Aug 2023 20:59:50 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vpq8-GN_1692071986;
+Received: from 30.221.106.14(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Vpq8-GN_1692071986)
           by smtp.aliyun-inc.com;
-          Tue, 15 Aug 2023 11:57:33 +0800
-Message-ID: <8c5d1a90-6965-f507-a54d-5c420c972306@linux.alibaba.com>
-Date: Tue, 15 Aug 2023 11:57:25 +0800
+          Tue, 15 Aug 2023 11:59:47 +0800
+Message-ID: <01c03f48-3210-ff51-7e46-e4903c15e854@linux.alibaba.com>
+Date: Tue, 15 Aug 2023 11:59:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -35,8 +35,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [RFC PATCH v2 net-next 1/6] net/smc: support smc release version
- negotiation in clc handshake
+Subject: Re: [RFC PATCH v2 net-next 3/6] net/smc: support smc v2.x features
+ validate
+Content-Language: en-US
 To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
  kgraul@linux.ibm.com, tonylu@linux.alibaba.com, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
@@ -44,15 +45,14 @@ Cc: horms@kernel.org, alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
  linux-s390@vger.kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20230807062720.20555-1-guangguan.wang@linux.alibaba.com>
- <20230807062720.20555-2-guangguan.wang@linux.alibaba.com>
- <ecafff58-c93a-5592-ddaa-d8724cf6bdcc@linux.ibm.com>
-Content-Language: en-US
+ <20230807062720.20555-4-guangguan.wang@linux.alibaba.com>
+ <1f162370-5878-80fc-25b9-0de22ba2efe1@linux.ibm.com>
 From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <ecafff58-c93a-5592-ddaa-d8724cf6bdcc@linux.ibm.com>
+In-Reply-To: <1f162370-5878-80fc-25b9-0de22ba2efe1@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-12.2 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
 	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -64,66 +64,14 @@ On 2023/8/10 00:03, Wenjia Zhang wrote:
 > 
 > 
 > On 07.08.23 08:27, Guangguan Wang wrote:
->> Support smc release version negotiation in clc handshake. And set
->> the latest smc release version to 2.1.
+>> Support smc v2.x features validate for smc v2.1.
 >>
+> a bit more description?
 > 
-> Could you elaborate the changes? Without reading code, it is really difficult to know what you did, and why you did it. Sure, one can read the code and the support document, but the commit message should always be the quick reference. The following information I missed especially:
-> - This implementation is based on SMCv2 where no negotiation process for different releases, but for different versions.
-> - The Server makes the decision for which release will be used.
 
-Sorry for the lack of descriptions, more descriptions will be added in the next version.
+OK, more descriptions will be added in the next version.
 
->>
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index a7f887d91d89..bac73eb0542d 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -1187,6 +1187,11 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->>               return SMC_CLC_DECL_NOINDIRECT;
->>           }
->>       }
->> +
->> +    if (fce->release > SMC_RELEASE)
->> +        return SMC_CLC_DECL_VERSMISMAT;
-> I'm wondering if this check is necessary, how it could happen?
+>> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+>> Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
 
-You are right, I will remove the check.
-
->>   -static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len)
->> +static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len, int release_ver)
->>   {
->>       memset(fce, 0, sizeof(*fce));
->>       fce->os_type = SMC_CLC_OS_LINUX;
->> -    fce->release = SMC_RELEASE;
->> +    fce->release = release_ver;
->>       memcpy(fce->hostname, smc_hostname, sizeof(smc_hostname));
->>       (*len) += sizeof(*fce);
->>   }
-> 
-> Personally I'd like release_nr instead of release_ver.
-
-
->>   @@ -382,7 +403,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini);
->>   int smc_clc_send_confirm(struct smc_sock *smc, bool clnt_first_contact,
->>                u8 version, u8 *eid, struct smc_init_info *ini);
->>   int smc_clc_send_accept(struct smc_sock *smc, bool srv_first_contact,
->> -            u8 version, u8 *negotiated_eid);
->> +            u8 version, u8 *negotiated_eid, struct smc_init_info *ini);
->>   void smc_clc_init(void) __init;
->>   void smc_clc_exit(void);
->>   void smc_clc_get_hostname(u8 **host);
->> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
->> index 3c1b31bfa1cf..1a97fef39127 100644
->> --- a/net/smc/smc_core.h
->> +++ b/net/smc/smc_core.h
->> @@ -374,6 +374,7 @@ struct smc_init_info {
->>       u8            is_smcd;
->>       u8            smc_type_v1;
->>       u8            smc_type_v2;
->> +    u8            release_ver;
-> 
-> Also here, I'd like release_nr more.
-
-OK, I will modify it in the next version.
 
