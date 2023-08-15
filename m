@@ -1,39 +1,44 @@
-Return-Path: <netdev+bounces-27545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D67D77C5E0
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 04:30:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE41E77C60C
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 04:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C35AC281277
-	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:30:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF29E1C20BED
+	for <lists+netdev@lfdr.de>; Tue, 15 Aug 2023 02:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45AEF15DA;
-	Tue, 15 Aug 2023 02:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9274217EF;
+	Tue, 15 Aug 2023 02:45:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2B923CB
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:30:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8282FC433C9;
-	Tue, 15 Aug 2023 02:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692066619;
-	bh=Xj7GAA3+ACLe64FOcRuwMFYQ1DotugxX1/UDMjO6WS8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qthan4dIFt6I8UaxB2oQPxxMA+4VodA+4T31ABcQaUnQBZobwgYByth9Wx6brpIiP
-	 Bz3RfFzIpeoogR2hchugDmwIH942dFVKbc+e6l4iLJfUl6MVJ5McqmUAEWBfK6NcW4
-	 dJgJ1VTlH1i1dJrApVhf/iS4PkCbXKfqT5cZKETOWBc+Cubg0UChlKHDO1uk4iCLdd
-	 f/4t3xSsDDONqOLUDz0/F+qw2ryhxfSgdV9sysdLGbKbyrq2sinjUpVgpiGahYhOQ5
-	 kWDJT+q56lYzLLALYAGjQSjMurd/Sw1zcnOOohj+/CcFVgHSNs823bo69T3aaf9G9c
-	 7Tljxy4OZbEYg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 69351E93B32;
-	Tue, 15 Aug 2023 02:30:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D91622
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 02:45:56 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB521715
+	for <netdev@vger.kernel.org>; Mon, 14 Aug 2023 19:45:55 -0700 (PDT)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RPwXZ4KMbzNmrB;
+	Tue, 15 Aug 2023 10:42:22 +0800 (CST)
+Received: from localhost.localdomain (10.175.103.91) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 15 Aug 2023 10:45:52 +0800
+From: Jialin Zhang <zhangjialin11@huawei.com>
+To: <shayagr@amazon.com>, <akiyano@amazon.com>, <darinzon@amazon.com>,
+	<ndagan@amazon.com>, <saeedb@amazon.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<michal.kubiak@intel.com>, <yuancan@huawei.com>
+CC: <netdev@vger.kernel.org>, <liwei391@huawei.com>,
+	<wangxiongfeng2@huawei.com>
+Subject: [PATCH] net: ena: Use pci_dev_id() to simplify the code
+Date: Tue, 15 Aug 2023 10:42:48 +0800
+Message-ID: <20230815024248.3519068-1-zhangjialin11@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,45 +46,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: veth: Page pool creation error handling for
- existing pools only
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169206661942.16325.9389282746030868287.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Aug 2023 02:30:19 +0000
-References: <20230812023016.10553-1-liangchen.linux@gmail.com>
-In-Reply-To: <20230812023016.10553-1-liangchen.linux@gmail.com>
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: hawk@kernel.org, horms@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linyunsheng@huawei.com, ilias.apalodimas@linaro.org, daniel@iogearbox.net,
- ast@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500021.china.huawei.com (7.185.36.109)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+PCI core API pci_dev_id() can be used to get the BDF number for a pci
+device. We don't need to compose it mannually. Use pci_dev_id() to
+simplify the code a little bit.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Jialin Zhang <zhangjialin11@huawei.com>
+---
+ drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Sat, 12 Aug 2023 10:30:16 +0800 you wrote:
-> The failure handling procedure destroys page pools for all queues,
-> including those that haven't had their page pool created yet. this patch
-> introduces necessary adjustments to prevent potential risks and
-> inconsistency with the error handling behavior.
-> 
-> Fixes: 0ebab78cbcbf ("net: veth: add page_pool for page recycling")
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] net: veth: Page pool creation error handling for existing pools only
-    https://git.kernel.org/netdev/net/c/8a519a572598
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+index d19593fae226..ad32ca81f7ef 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
++++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+@@ -3267,7 +3267,7 @@ static void ena_config_host_info(struct ena_com_dev *ena_dev, struct pci_dev *pd
+ 
+ 	host_info = ena_dev->host_attr.host_info;
+ 
+-	host_info->bdf = (pdev->bus->number << 8) | pdev->devfn;
++	host_info->bdf = pci_dev_id(pdev);
+ 	host_info->os_type = ENA_ADMIN_OS_LINUX;
+ 	host_info->kernel_ver = LINUX_VERSION_CODE;
+ 	strscpy(host_info->kernel_ver_str, utsname()->version,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
