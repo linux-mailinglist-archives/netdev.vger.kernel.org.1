@@ -1,224 +1,145 @@
-Return-Path: <netdev+bounces-28145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1065277E5EA
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC5E77E5F4
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 400181C21138
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 074A71C2112F
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:04:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49F716417;
-	Wed, 16 Aug 2023 16:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D377A1641A;
+	Wed, 16 Aug 2023 16:04:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B1FDDD0
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:02:50 +0000 (UTC)
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB9010F0;
-	Wed, 16 Aug 2023 09:02:47 -0700 (PDT)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 033B717F61;
-	Wed, 16 Aug 2023 19:02:46 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id DA33A17F5C;
-	Wed, 16 Aug 2023 19:02:45 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id A79913C0325;
-	Wed, 16 Aug 2023 19:02:42 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1692201763; bh=wAKYWlRT1Luq45cPjoozO/I4AAx4gv4ALqkvKffGThE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=dj8yEXAMRiBMPMkeE9+vyD55NUQnN7IoNPEztg+XovLAyqRLB2cqWx5Aj0Nj5xOw0
-	 s6BKfx/xpIKln3Ye9k3uPi/WOJFIiV5653ZnCpYafiPXA435078ot4Z9gYHJ9d4JTX
-	 7b+pLnCbGaExK+K/mILQuSieqJhrgBn7DjtJw82s=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 37GG2djE170631;
-	Wed, 16 Aug 2023 19:02:39 +0300
-Date: Wed, 16 Aug 2023 19:02:39 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-cc: Simon Horman <horms@verge.net.au>, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-        rcu@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
-        Jiejian Wu <jiejian@linux.alibaba.com>,
-        Jiri Wiesner <jwiesner@suse.de>
-Subject: Re: [PATCH RFC net-next 01/14] rculist_bl: add
- hlist_bl_for_each_entry_continue_rcu
-In-Reply-To: <958d687d-9f7f-4baf-af26-2ec351ef8699@paulmck-laptop>
-Message-ID: <a3bba801-5253-5ab1-4dce-43c5b7cb407c@ssi.bg>
-References: <20230815173031.168344-1-ja@ssi.bg> <20230815173031.168344-2-ja@ssi.bg> <958d687d-9f7f-4baf-af26-2ec351ef8699@paulmck-laptop>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A86AC8FF
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:04:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90265C433C8;
+	Wed, 16 Aug 2023 16:04:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692201879;
+	bh=4Zp3gWJ/UNXl5LmVpCbTdj3eqr5kWiHHc7k0ReSn3hQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OdpNHr+CytMtoJpZeiAl2Xzi7+pDId7Xfjb/3bZi8Pk+XWouoXSg9a0POUmnKK8gK
+	 OcEephfmv973Ybjmgpmuw41k/dYlLPEoZBlRChm34EsmWn2GrifjY+cu6oGNAcj2iL
+	 yvl1HfXQFX1oVYxsFaFsda2FVI4l+03j9ERhPGMus+ri/E5ah7C1JLAadr/LTYE6NK
+	 r09mWMjaoFOrWOKTgJGMpmiRDwOzOIdg4JCkytUL61ndvuQYLeRJrJZXIYOIuBZw7T
+	 ew5tURaBN7HSkAWt7eFw8H8tSWC+0A3uKowil81GNaAOWA5a0ytyeF5GaWTP/fZZyA
+	 bVnJ+wQ04434g==
+Date: Wed, 16 Aug 2023 23:52:53 +0800
+From: Jisheng Zhang <jszhang@kernel.org>
+To: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v3 06/10] net: stmmac: xgmac: support
+ per-channel irq
+Message-ID: <ZNzw1cqmGQaKpfGi@xhacker>
+References: <20230809165007.1439-1-jszhang@kernel.org>
+ <20230809165007.1439-7-jszhang@kernel.org>
+ <a12b6d39-0e26-7bdc-4207-c767342ebcf6@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a12b6d39-0e26-7bdc-4207-c767342ebcf6@foss.st.com>
 
-
-	Hello,
-
-On Tue, 15 Aug 2023, Paul E. McKenney wrote:
-
-> On Tue, Aug 15, 2023 at 08:30:18PM +0300, Julian Anastasov wrote:
-> > Add hlist_bl_for_each_entry_continue_rcu and hlist_bl_next_rcu
+On Thu, Aug 10, 2023 at 04:52:01PM +0200, Alexandre TORGUE wrote:
+> On 8/9/23 18:50, Jisheng Zhang wrote:
+> > The IP supports per channel interrupt, add support for this usage case.
 > > 
-> > Signed-off-by: Julian Anastasov <ja@ssi.bg>
+> > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 > > ---
-> >  include/linux/rculist_bl.h | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
+> >   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 ++
+> >   .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 33 +++++++++++--------
+> >   2 files changed, 22 insertions(+), 13 deletions(-)
 > > 
-> > diff --git a/include/linux/rculist_bl.h b/include/linux/rculist_bl.h
-> > index 0b952d06eb0b..93a757793d83 100644
-> > --- a/include/linux/rculist_bl.h
-> > +++ b/include/linux/rculist_bl.h
-> > @@ -24,6 +24,10 @@ static inline struct hlist_bl_node *hlist_bl_first_rcu(struct hlist_bl_head *h)
-> >  		((unsigned long)rcu_dereference_check(h->first, hlist_bl_is_locked(h)) & ~LIST_BL_LOCKMASK);
-> >  }
-> >  
-> > +/* return the next element in an RCU protected list */
-> > +#define hlist_bl_next_rcu(node)	\
-> > +	(*((struct hlist_bl_node __rcu **)(&(node)->next)))
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > index 81cbb13a101d..12e1228ccf2a 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > @@ -327,6 +327,8 @@
+> >   /* DMA Registers */
+> >   #define XGMAC_DMA_MODE			0x00003000
+> > +#define XGMAC_INTM			GENMASK(13, 12)
+> > +#define XGMAC_INTM_MODE1		0x1
+> >   #define XGMAC_SWR			BIT(0)
+> >   #define XGMAC_DMA_SYSBUS_MODE		0x00003004
+> >   #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> > index b5ba4e0cca55..ef25af92d6cc 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> > @@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
+> >   		value |= XGMAC_EAME;
+> >   	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
 > > +
-> >  /**
-> >   * hlist_bl_del_rcu - deletes entry from hash list without re-initialization
-> >   * @n: the element to delete from the hash list.
-> > @@ -98,4 +102,17 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
-> >  		({ tpos = hlist_bl_entry(pos, typeof(*tpos), member); 1; }); \
-> >  		pos = rcu_dereference_raw(pos->next))
-> >  
-> > +/**
-> > + * hlist_bl_for_each_entry_continue_rcu - iterate over a list continuing after
-> > + *   current point
+> > +	if (dma_cfg->perch_irq_en) {
+> > +		value = readl(ioaddr + XGMAC_DMA_MODE);
+> > +		value &= ~XGMAC_INTM;
+> > +		value |= FIELD_PREP(XGMAC_INTM, XGMAC_INTM_MODE1);
+> > +		writel(value, ioaddr + XGMAC_DMA_MODE);
+> > +	}
+> >   }
+> >   static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
+> > @@ -365,20 +372,20 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+> >   	}
+> >   	/* TX/RX NORMAL interrupts */
+> > -	if (likely(intr_status & XGMAC_NIS)) {
 > 
-> Please add a comment to the effect that the element continued from
-> must have been either: (1) Iterated to within the same RCU read-side
-> critical section or (2) Nailed down using some lock, reference count,
-> or whatever suffices to keep the continued-from element from being freed
-> in the meantime.
+> No longer need to check NIS bit ?
 
-	I created 2nd version which has more changes. I'm not sure
-what are the desired steps for this patch, should I keep it as part
-of my patchset if accepted? Or should I post it separately? Here it
-is v2 for comments.
+Hi Alexandre,
 
-[PATCHv2 RFC] rculist_bl: add hlist_bl_for_each_entry_continue_rcu
+NIS is RI | TI | TBU, since we have checked these three
+bits we can ignore NIS. And dwmac4 behaves similarly.
 
-Change the old hlist_bl_first_rcu to hlist_bl_first_rcu_dereference
-to indicate that it is a RCU dereference.
+Thanks
 
-Add hlist_bl_next_rcu and hlist_bl_first_rcu to use RCU pointers
-and use them to fix sparse warnings.
-
-Add hlist_bl_for_each_entry_continue_rcu.
-
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
----
- include/linux/rculist_bl.h | 49 +++++++++++++++++++++++++++++++-------
- 1 file changed, 40 insertions(+), 9 deletions(-)
-
-diff --git a/include/linux/rculist_bl.h b/include/linux/rculist_bl.h
-index 0b952d06eb0b..36363b876e53 100644
---- a/include/linux/rculist_bl.h
-+++ b/include/linux/rculist_bl.h
-@@ -8,21 +8,31 @@
- #include <linux/list_bl.h>
- #include <linux/rcupdate.h>
- 
-+/* return the first ptr or next element in an RCU protected list */
-+#define hlist_bl_first_rcu(head)	\
-+	(*((struct hlist_bl_node __rcu **)(&(head)->first)))
-+#define hlist_bl_next_rcu(node)	\
-+	(*((struct hlist_bl_node __rcu **)(&(node)->next)))
-+
- static inline void hlist_bl_set_first_rcu(struct hlist_bl_head *h,
- 					struct hlist_bl_node *n)
- {
- 	LIST_BL_BUG_ON((unsigned long)n & LIST_BL_LOCKMASK);
- 	LIST_BL_BUG_ON(((unsigned long)h->first & LIST_BL_LOCKMASK) !=
- 							LIST_BL_LOCKMASK);
--	rcu_assign_pointer(h->first,
-+	rcu_assign_pointer(hlist_bl_first_rcu(h),
- 		(struct hlist_bl_node *)((unsigned long)n | LIST_BL_LOCKMASK));
- }
- 
--static inline struct hlist_bl_node *hlist_bl_first_rcu(struct hlist_bl_head *h)
--{
--	return (struct hlist_bl_node *)
--		((unsigned long)rcu_dereference_check(h->first, hlist_bl_is_locked(h)) & ~LIST_BL_LOCKMASK);
--}
-+#define hlist_bl_first_rcu_dereference(head)				\
-+({									\
-+	struct hlist_bl_head *__head = (head);				\
-+									\
-+	(struct hlist_bl_node *)					\
-+	((unsigned long)rcu_dereference_check(hlist_bl_first_rcu(__head), \
-+					      hlist_bl_is_locked(__head)) & \
-+					      ~LIST_BL_LOCKMASK);	\
-+})
- 
- /**
-  * hlist_bl_del_rcu - deletes entry from hash list without re-initialization
-@@ -73,7 +83,7 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
- {
- 	struct hlist_bl_node *first;
- 
--	/* don't need hlist_bl_first_rcu because we're under lock */
-+	/* don't need hlist_bl_first_rcu* because we're under lock */
- 	first = hlist_bl_first(h);
- 
- 	n->next = first;
-@@ -93,9 +103,30 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
-  *
-  */
- #define hlist_bl_for_each_entry_rcu(tpos, pos, head, member)		\
--	for (pos = hlist_bl_first_rcu(head);				\
-+	for (pos = hlist_bl_first_rcu_dereference(head);		\
- 		pos &&							\
- 		({ tpos = hlist_bl_entry(pos, typeof(*tpos), member); 1; }); \
--		pos = rcu_dereference_raw(pos->next))
-+		pos = rcu_dereference_raw(hlist_bl_next_rcu(pos)))
-+
-+/**
-+ * hlist_bl_for_each_entry_continue_rcu - continue iteration over list of given
-+ *   type
-+ * @tpos:	the type * to use as a loop cursor.
-+ * @pos:	the &struct hlist_bl_node to use as a loop cursor.
-+ * @member:	the name of the hlist_bl_node within the struct.
-+ *
-+ * Continue to iterate over list of given type, continuing after
-+ * the current position which must have been in the list when the RCU read
-+ * lock was taken.
-+ * This would typically require either that you obtained the node from a
-+ * previous walk of the list in the same RCU read-side critical section, or
-+ * that you held some sort of non-RCU reference (such as a reference count)
-+ * to keep the node alive *and* in the list.
-+ */
-+#define hlist_bl_for_each_entry_continue_rcu(tpos, pos, member)		\
-+	for (pos = rcu_dereference_raw(hlist_bl_next_rcu(&(tpos)->member)); \
-+	     pos &&							\
-+	     ({ tpos = hlist_bl_entry(pos, typeof(*tpos), member); 1; }); \
-+	     pos = rcu_dereference_raw(hlist_bl_next_rcu(pos)))
- 
- #endif
--- 
-2.41.0
-
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+> 
+> > -		if (likely(intr_status & XGMAC_RI)) {
+> > -			u64_stats_update_begin(&rx_q->rxq_stats.syncp);
+> > -			rx_q->rxq_stats.rx_normal_irq_n++;
+> > -			u64_stats_update_end(&rx_q->rxq_stats.syncp);
+> > -			ret |= handle_rx;
+> > -		}
+> > -		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
+> > -			u64_stats_update_begin(&tx_q->txq_stats.syncp);
+> > -			tx_q->txq_stats.tx_normal_irq_n++;
+> > -			u64_stats_update_end(&tx_q->txq_stats.syncp);
+> > -			ret |= handle_tx;
+> > -		}
+> > +	if (likely(intr_status & XGMAC_RI)) {
+> > +		u64_stats_update_begin(&rx_q->rxq_stats.syncp);
+> > +		rx_q->rxq_stats.rx_normal_irq_n++;
+> > +		u64_stats_update_end(&rx_q->rxq_stats.syncp);
+> > +		ret |= handle_rx;
+> > +	}
+> > +	if (likely(intr_status & XGMAC_TI)) {
+> > +		u64_stats_update_begin(&tx_q->txq_stats.syncp);
+> > +		tx_q->txq_stats.tx_normal_irq_n++;
+> > +		u64_stats_update_end(&tx_q->txq_stats.syncp);
+> > +		ret |= handle_tx;
+> >   	}
+> > +	if (unlikely(intr_status & XGMAC_TBU))
+> > +		ret |= handle_tx;
+> >   	/* Clear interrupts */
+> >   	writel(intr_en & intr_status, ioaddr + XGMAC_DMA_CH_STATUS(chan));
+> 
 
