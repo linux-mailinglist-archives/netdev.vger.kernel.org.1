@@ -1,112 +1,224 @@
-Return-Path: <netdev+bounces-28143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B18177E59A
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 17:50:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1065277E5EA
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:02:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15539281B5D
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 15:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 400181C21138
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3134316414;
-	Wed, 16 Aug 2023 15:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49F716417;
+	Wed, 16 Aug 2023 16:02:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254B4125B2
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 15:50:24 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7C92D58;
-	Wed, 16 Aug 2023 08:50:05 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 88A01E0008;
-	Wed, 16 Aug 2023 15:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1692201004;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U7qqsraPhv0yClgxA/hyk25/qkMt80mxh+Qel/Qxjxk=;
-	b=aTA9l5F6XqBRUIBDAk06nQK/nIEigxkLt66oO1lwGxbsCjnlCIksXy66MYVGgyPuPhY0NJ
-	vcgwSZPKuyDa3dpID6QwUfiGt+IN8msV8YcunSM7kYtF1MGNuhN3WTTVxkX+EPgysd5VQG
-	Y1STGp7KLgLqOUDDP+50lCSdlCa8KUV9rkbZbfyStWE5OcI3ADLgii1Ip6/MvbsBxhQlDj
-	6u2BmR71zqZy9okYfyhuIL6jZaEld4kQiGU7rMUIwVCh7I2/PYqV1NMKGK610szgjiBcZk
-	w7ZnmE8N4F7hjEK/ew8ZCi5q3X25mzwLmN2yTK1pO+C2UzINVFe4WGbLTiP2Kg==
-Date: Wed, 16 Aug 2023 17:49:58 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang
- <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
- <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li
- <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, Nicolin Chen
- <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 22/28] dt-bindings: net: Add the Lantiq PEF2256
- E1/T1/J1 framer
-Message-ID: <20230816174847.4709a428@bootlin.com>
-In-Reply-To: <CACRpkdZWHw7sL6EKe0EP0hX5TEsdhzgkPSdVtPPYhS3LqJRHFg@mail.gmail.com>
-References: <20230809132757.2470544-1-herve.codina@bootlin.com>
-	<20230809132757.2470544-23-herve.codina@bootlin.com>
-	<CACRpkdZWHw7sL6EKe0EP0hX5TEsdhzgkPSdVtPPYhS3LqJRHFg@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B1FDDD0
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:02:50 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB9010F0;
+	Wed, 16 Aug 2023 09:02:47 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 033B717F61;
+	Wed, 16 Aug 2023 19:02:46 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id DA33A17F5C;
+	Wed, 16 Aug 2023 19:02:45 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id A79913C0325;
+	Wed, 16 Aug 2023 19:02:42 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1692201763; bh=wAKYWlRT1Luq45cPjoozO/I4AAx4gv4ALqkvKffGThE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=dj8yEXAMRiBMPMkeE9+vyD55NUQnN7IoNPEztg+XovLAyqRLB2cqWx5Aj0Nj5xOw0
+	 s6BKfx/xpIKln3Ye9k3uPi/WOJFIiV5653ZnCpYafiPXA435078ot4Z9gYHJ9d4JTX
+	 7b+pLnCbGaExK+K/mILQuSieqJhrgBn7DjtJw82s=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 37GG2djE170631;
+	Wed, 16 Aug 2023 19:02:39 +0300
+Date: Wed, 16 Aug 2023 19:02:39 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+cc: Simon Horman <horms@verge.net.au>, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+        rcu@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
+        Jiejian Wu <jiejian@linux.alibaba.com>,
+        Jiri Wiesner <jwiesner@suse.de>
+Subject: Re: [PATCH RFC net-next 01/14] rculist_bl: add
+ hlist_bl_for_each_entry_continue_rcu
+In-Reply-To: <958d687d-9f7f-4baf-af26-2ec351ef8699@paulmck-laptop>
+Message-ID: <a3bba801-5253-5ab1-4dce-43c5b7cb407c@ssi.bg>
+References: <20230815173031.168344-1-ja@ssi.bg> <20230815173031.168344-2-ja@ssi.bg> <958d687d-9f7f-4baf-af26-2ec351ef8699@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Linus,
 
-On Thu, 10 Aug 2023 10:53:04 +0200
-Linus Walleij <linus.walleij@linaro.org> wrote:
+	Hello,
 
-> Hi Herve,
-> 
-> thanks for your patch!
-> 
-> On Wed, Aug 9, 2023 at 3:28 PM Herve Codina <herve.codina@bootlin.com> wrote:
-> 
-> > The Lantiq PEF2256 is a framer and line interface component designed to
-> > fulfill all required interfacing between an analog E1/T1/J1 line and the
-> > digital PCM system highway/H.100 bus.
-> >
-> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>  
-> (...)
-> > +    patternProperties:
-> > +      '-pins$':
-> > +        type: object
-> > +        $ref: /schemas/pinctrl/pincfg-node.yaml#  
-> 
-> Shouldn't that be pinmux-node.yaml?
-> 
+On Tue, 15 Aug 2023, Paul E. McKenney wrote:
 
-Indeed, it should be pinmux-node.yaml.
-This will be fixed in the next iteration.
+> On Tue, Aug 15, 2023 at 08:30:18PM +0300, Julian Anastasov wrote:
+> > Add hlist_bl_for_each_entry_continue_rcu and hlist_bl_next_rcu
+> > 
+> > Signed-off-by: Julian Anastasov <ja@ssi.bg>
+> > ---
+> >  include/linux/rculist_bl.h | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> > 
+> > diff --git a/include/linux/rculist_bl.h b/include/linux/rculist_bl.h
+> > index 0b952d06eb0b..93a757793d83 100644
+> > --- a/include/linux/rculist_bl.h
+> > +++ b/include/linux/rculist_bl.h
+> > @@ -24,6 +24,10 @@ static inline struct hlist_bl_node *hlist_bl_first_rcu(struct hlist_bl_head *h)
+> >  		((unsigned long)rcu_dereference_check(h->first, hlist_bl_is_locked(h)) & ~LIST_BL_LOCKMASK);
+> >  }
+> >  
+> > +/* return the next element in an RCU protected list */
+> > +#define hlist_bl_next_rcu(node)	\
+> > +	(*((struct hlist_bl_node __rcu **)(&(node)->next)))
+> > +
+> >  /**
+> >   * hlist_bl_del_rcu - deletes entry from hash list without re-initialization
+> >   * @n: the element to delete from the hash list.
+> > @@ -98,4 +102,17 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
+> >  		({ tpos = hlist_bl_entry(pos, typeof(*tpos), member); 1; }); \
+> >  		pos = rcu_dereference_raw(pos->next))
+> >  
+> > +/**
+> > + * hlist_bl_for_each_entry_continue_rcu - iterate over a list continuing after
+> > + *   current point
+> 
+> Please add a comment to the effect that the element continued from
+> must have been either: (1) Iterated to within the same RCU read-side
+> critical section or (2) Nailed down using some lock, reference count,
+> or whatever suffices to keep the continued-from element from being freed
+> in the meantime.
 
-Best regards,
-Hervé
+	I created 2nd version which has more changes. I'm not sure
+what are the desired steps for this patch, should I keep it as part
+of my patchset if accepted? Or should I post it separately? Here it
+is v2 for comments.
+
+[PATCHv2 RFC] rculist_bl: add hlist_bl_for_each_entry_continue_rcu
+
+Change the old hlist_bl_first_rcu to hlist_bl_first_rcu_dereference
+to indicate that it is a RCU dereference.
+
+Add hlist_bl_next_rcu and hlist_bl_first_rcu to use RCU pointers
+and use them to fix sparse warnings.
+
+Add hlist_bl_for_each_entry_continue_rcu.
+
+Signed-off-by: Julian Anastasov <ja@ssi.bg>
+---
+ include/linux/rculist_bl.h | 49 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 40 insertions(+), 9 deletions(-)
+
+diff --git a/include/linux/rculist_bl.h b/include/linux/rculist_bl.h
+index 0b952d06eb0b..36363b876e53 100644
+--- a/include/linux/rculist_bl.h
++++ b/include/linux/rculist_bl.h
+@@ -8,21 +8,31 @@
+ #include <linux/list_bl.h>
+ #include <linux/rcupdate.h>
+ 
++/* return the first ptr or next element in an RCU protected list */
++#define hlist_bl_first_rcu(head)	\
++	(*((struct hlist_bl_node __rcu **)(&(head)->first)))
++#define hlist_bl_next_rcu(node)	\
++	(*((struct hlist_bl_node __rcu **)(&(node)->next)))
++
+ static inline void hlist_bl_set_first_rcu(struct hlist_bl_head *h,
+ 					struct hlist_bl_node *n)
+ {
+ 	LIST_BL_BUG_ON((unsigned long)n & LIST_BL_LOCKMASK);
+ 	LIST_BL_BUG_ON(((unsigned long)h->first & LIST_BL_LOCKMASK) !=
+ 							LIST_BL_LOCKMASK);
+-	rcu_assign_pointer(h->first,
++	rcu_assign_pointer(hlist_bl_first_rcu(h),
+ 		(struct hlist_bl_node *)((unsigned long)n | LIST_BL_LOCKMASK));
+ }
+ 
+-static inline struct hlist_bl_node *hlist_bl_first_rcu(struct hlist_bl_head *h)
+-{
+-	return (struct hlist_bl_node *)
+-		((unsigned long)rcu_dereference_check(h->first, hlist_bl_is_locked(h)) & ~LIST_BL_LOCKMASK);
+-}
++#define hlist_bl_first_rcu_dereference(head)				\
++({									\
++	struct hlist_bl_head *__head = (head);				\
++									\
++	(struct hlist_bl_node *)					\
++	((unsigned long)rcu_dereference_check(hlist_bl_first_rcu(__head), \
++					      hlist_bl_is_locked(__head)) & \
++					      ~LIST_BL_LOCKMASK);	\
++})
+ 
+ /**
+  * hlist_bl_del_rcu - deletes entry from hash list without re-initialization
+@@ -73,7 +83,7 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
+ {
+ 	struct hlist_bl_node *first;
+ 
+-	/* don't need hlist_bl_first_rcu because we're under lock */
++	/* don't need hlist_bl_first_rcu* because we're under lock */
+ 	first = hlist_bl_first(h);
+ 
+ 	n->next = first;
+@@ -93,9 +103,30 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
+  *
+  */
+ #define hlist_bl_for_each_entry_rcu(tpos, pos, head, member)		\
+-	for (pos = hlist_bl_first_rcu(head);				\
++	for (pos = hlist_bl_first_rcu_dereference(head);		\
+ 		pos &&							\
+ 		({ tpos = hlist_bl_entry(pos, typeof(*tpos), member); 1; }); \
+-		pos = rcu_dereference_raw(pos->next))
++		pos = rcu_dereference_raw(hlist_bl_next_rcu(pos)))
++
++/**
++ * hlist_bl_for_each_entry_continue_rcu - continue iteration over list of given
++ *   type
++ * @tpos:	the type * to use as a loop cursor.
++ * @pos:	the &struct hlist_bl_node to use as a loop cursor.
++ * @member:	the name of the hlist_bl_node within the struct.
++ *
++ * Continue to iterate over list of given type, continuing after
++ * the current position which must have been in the list when the RCU read
++ * lock was taken.
++ * This would typically require either that you obtained the node from a
++ * previous walk of the list in the same RCU read-side critical section, or
++ * that you held some sort of non-RCU reference (such as a reference count)
++ * to keep the node alive *and* in the list.
++ */
++#define hlist_bl_for_each_entry_continue_rcu(tpos, pos, member)		\
++	for (pos = rcu_dereference_raw(hlist_bl_next_rcu(&(tpos)->member)); \
++	     pos &&							\
++	     ({ tpos = hlist_bl_entry(pos, typeof(*tpos), member); 1; }); \
++	     pos = rcu_dereference_raw(hlist_bl_next_rcu(pos)))
+ 
+ #endif
+-- 
+2.41.0
+
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
