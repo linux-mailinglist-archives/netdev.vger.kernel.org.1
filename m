@@ -1,103 +1,117 @@
-Return-Path: <netdev+bounces-28120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B8CC77E480
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 17:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10D2A77E489
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 17:02:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55DF71C21119
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 15:02:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4128A1C21086
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 15:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25868134CA;
-	Wed, 16 Aug 2023 15:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48EF14ABB;
+	Wed, 16 Aug 2023 15:02:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BF610957;
-	Wed, 16 Aug 2023 15:02:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB8FCC433C7;
-	Wed, 16 Aug 2023 15:02:03 +0000 (UTC)
-Date: Wed, 16 Aug 2023 11:02:06 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Manjusaka <me@manjusaka.me>
-Cc: Joe Perches <joe@perches.com>, edumazet@google.com, bpf@vger.kernel.org,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- mhiramat@kernel.org, ncardwell@google.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-Subject: Re: [PATCH v3] tracepoint: add new `tcp:tcp_ca_event` trace event
-Message-ID: <20230816110206.13980573@gandalf.local.home>
-In-Reply-To: <8b0f2d2b-c5a0-4654-9cc0-78873260a881@manjusaka.me>
-References: <CANn89iKQXhqgOTkSchH6Bz-xH--pAoSyEORBtawqBTvgG+dFig@mail.gmail.com>
-	<20230812201249.62237-1-me@manjusaka.me>
-	<20230812205905.016106c0@rorschach.local.home>
-	<20230812210140.117da558@rorschach.local.home>
-	<20230812210450.53464a78@rorschach.local.home>
-	<6bfa88099fe13b3fd4077bb3a3e55e3ae04c3b5d.camel@perches.com>
-	<20230812215327.1dbd30f3@rorschach.local.home>
-	<a587dac9e02cfde669743fd54ab41a3c6014c5e9.camel@perches.com>
-	<8b0f2d2b-c5a0-4654-9cc0-78873260a881@manjusaka.me>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CD7125D2
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 15:02:37 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64CEE272E
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:02:32 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bf092a16c9so305495ad.0
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:02:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1692198152; x=1692802952;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A3ovHL4vsZpaBC0Teekk8Hm69hMzF6WHsF7ZTf9695s=;
+        b=FVdpCXCQ/oguFtjMTqentpBSc8qPydSSGGSMI0rcBbdAZDj6ljjYr21rGjjOzOcdd3
+         F0f+nuAu+nq5gFMzsOL9z6+WBzQR6nevKgr98Nbqf+oJ6qoZ4zyKC9yBLTi7eAvnRjjk
+         dRvaXZvyTPl0c1Ae1EfKx9hXP8fQjKEwHTTmKHeM9JjbWdyyzVfiKVO27HAH2RBwWrMS
+         +QieW1785dbCpNrBM356U5zpCO5/iGCuHlSyLmLCKEk3UwFVlQ8zgbS1YDlVNTmREsfq
+         il7tSuVRSG7KE2JD080SyfRPw1eHQD2YXCx/ktC7jZjr8uO9YyRVpJr36yociuvCHMyt
+         f4ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692198152; x=1692802952;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A3ovHL4vsZpaBC0Teekk8Hm69hMzF6WHsF7ZTf9695s=;
+        b=INzlB8JFib+iEfgevl7vjOKAWA+KGjC2xxOTip+MTNrEtxpNjVSwY5kH5ygRrUp4mN
+         c9lRjyYQQkFslhKP9d2hlQl7JPEKJ5v38HVTrs2JEVE2M+xus8ZWFGk/03Tpl3PJjyJ8
+         AAPjPR878/UkIho3soOnJ9etkjBEvR2dlFcsywj3JDQEUfn3EgP1dDVZgFFBlmxP+qMS
+         EGNfmaukKDkJMOZv+52Rdlc+Eu2ZM6f0lMo4BL1zpQ/sFzUcusimLgHSKRwx1qIzXoOz
+         ugbjWozRLIZx7V02yRgxDcCEm95nHwqK5yMN09p3JOm8OHIVeDGuBMDwMtBUin8d0gzH
+         XPcw==
+X-Gm-Message-State: AOJu0YzLAZobScu5gzEebK5ZEH3qBq7T3mguqJ+6k3VWSHrSll6j+6Ye
+	wAbH3l20ygss868MZ1kToqwr4g==
+X-Google-Smtp-Source: AGHT+IFd8wPbgHCjMzOL8CkDvee20k8jdoTIdoknxF2Ky/fYUUuSYv9RKBVjvMD/hlTvX6o0gLlN5Q==
+X-Received: by 2002:a17:902:db0e:b0:1b9:de75:d5bb with SMTP id m14-20020a170902db0e00b001b9de75d5bbmr2660626plx.7.1692198151771;
+        Wed, 16 Aug 2023 08:02:31 -0700 (PDT)
+Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
+        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b001b9df74ba5asm8815352plg.210.2023.08.16.08.02.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 08:02:31 -0700 (PDT)
+Date: Wed, 16 Aug 2023 08:02:29 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Francois Michel <francois.michel@uclouvain.be>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 0/3] netem: use a seeded PRNG for loss and
+ corruption events
+Message-ID: <20230816080229.7d128695@hermes.local>
+In-Reply-To: <20230815092348.1449179-1-francois.michel@uclouvain.be>
+References: <20230815092348.1449179-1-francois.michel@uclouvain.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 16 Aug 2023 14:09:06 +0800
-Manjusaka <me@manjusaka.me> wrote:
+On Tue, 15 Aug 2023 11:23:37 +0200
+Francois Michel <francois.michel@uclouvain.be> wrote:
 
-> > +# trace include files use a completely different grammar
-> > +		next if ($realfile =~ m{(?:include/trace/events/|/trace\.h$/)});
-> > +
-> >  # check multi-line statement indentation matches previous line
-> >  		if ($perl_version_ok &&
-> >  		    $prevline =~ /^\+([ \t]*)((?:$c90_Keywords(?:\s+if)\s*)|(?:$Declare\s*)?(?:$Ident|\(\s*\*\s*$Ident\s*\))\s*|(?:\*\s*)*$Lval\s*=\s*$Ident\s*)\(.*(\&\&|\|\||,)\s*$/) {
-> > 
-> > 
-> >   
-> 
-> Actually, I'm not sure this is the checkpatch style issue or my code style issue.
-> 
-> Seems wired.
+> From: Fran=C3=A7ois Michel <francois.michel@uclouvain.be>
+>=20
+> In order to reproduce bugs or performance evaluation of
+> network protocols and applications, it is useful to have
+> reproducible test suites and tools. This patch adds
+> a way to specify a PRNG seed through the
+> TCA_NETEM_PRNG_SEED attribute for generating netem
+> loss and corruption events. Initializing the qdisc
+> with the same seed leads to the exact same loss
+> and corruption patterns. If no seed is explicitly
+> specified, the qdisc generates a random seed using
+> get_random_u64().
+>=20
+> This patch can be and has been tested using tc from
+> the following iproute2-next fork:
+> https://github.com/francoismichel/iproute2-next
+>=20
+> For instance, setting the seed 42424242 on the loopback
+> with a loss rate of 10% will systematically drop the 5th,
+> 12th and 24th packet when sending 25 packets.
+>=20
+> v1 -> v2: Address comments and directly use
+> prandom_u32_state() instead of get_random_u32() for
+> generating loss and corruption events. Generates a random
+> seed using get_random_u64() if none was provided explicitly.
 
-The TRACE_EVENT() macro has its own style. I need to document it, and
-perhaps one day get checkpatch to understand it as well.
-
-The TRACE_EVENT() typically looks like:
-
-
-TRACE_EVENT(name,
-
-	TP_PROTO(int arg1, struct foo *arg2, struct bar *arg3),
-
-	TP_ARGS(arg1, arg2, arg3),
-
-	TP_STRUCT__entry(
-		__field(	int,		field1				)
-		__array(	char,		mystring,	MYSTRLEN	)
-		__string(	filename,	arg3->name			)
-	),
-
-	TP_fast_assign(
-		__entry->field1 = arg1;
-		memcpy(__entry->mystring, arg2->string);
-		__assign_str(filename, arg3->name);
-	),
-
-	TP_printk("field1=%d mystring=%s filename=%s",
-		__entry->field1, __entry->mystring, __get_str(filename))
-);
-
-The TP_STRUCT__entry() should be considered more of a "struct" layout than
-a macro layout, and that's where checkpatch gets confused. The spacing
-makes it much easier to see the fields and their types.
-
--- Steve
+For series.
+Acked-by: Stephen Hemminger <stephen@networkplumber.org>
 
