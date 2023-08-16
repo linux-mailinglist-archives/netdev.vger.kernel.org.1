@@ -1,159 +1,245 @@
-Return-Path: <netdev+bounces-28095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B142577E373
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:22:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F7777E38A
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5DEF2818AC
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:22:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B03D1C210C4
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C558A11CBA;
-	Wed, 16 Aug 2023 14:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4109125C3;
+	Wed, 16 Aug 2023 14:27:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B38101F6
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:22:02 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27C2C2709
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:22:01 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58c561f4ac3so22073447b3.2
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:22:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692195720; x=1692800520;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TeC0ug8D1eXirPEbnRcyIBCYyPrnNhfPEDVTkTAG8fI=;
-        b=brEJSV9NWRaq2yl/Bru18oBOTAJXdR+6vh+gR/MIwPmIWKPOiwYZKi49IPCE48SDao
-         SJHLp02eASw/Rajzu4zLRAh2BQ3MBWYiQlQA9WoEAXIHxMXQllrgv79CRJZdCyuqhT4n
-         6ceZlTFr7Ir/YdCMUfxTBV2D9uoA6HGlbumaFtWyzElpl5HSNfwlVtEj87vYp21C97PI
-         TIaBlT+8zyRhdKeDP9ZMUbSigUXDHjtAugahNkTk4f/s6EevOzizciRGE3DJ5R/sLkxA
-         1CuILDG8vceKm+8cyCJfRDe+QyLYN0jZVnKRrKg9T2ualTHJG0tKGWsGgkSyWnbwo8HM
-         yehw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692195720; x=1692800520;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TeC0ug8D1eXirPEbnRcyIBCYyPrnNhfPEDVTkTAG8fI=;
-        b=jmRt9AUfzwrumhQQyA7nOheMJXrJmFl2dIdJfArNoT562P3j2VmDcM/DqEjAlsptu3
-         8UIu0eMmVJUVTqr75mH5a4PxNFTSPO7Nb+hEdv5C8ck3taB7iy6Miu8tD4I8MRAJs2MB
-         ibU5hq7DeNqakKCNiHEMFhg4CpcTRfPSVjBdmeHYkrPd9AnRrzuDxXvWfGmJZGeo44C6
-         f9EVhG06D+B2brKOG9cFiLu4V+Kj9gCbkbZ6vvFidM2sWx0AbJgRy5aoxLjs8UZEXZIB
-         8t8YXrsAjekgd5XLGyS/tY8qE28XdTONH5LqhL1glRX5iS1rkvo4lpp7Zosmp60pmpMq
-         wdyQ==
-X-Gm-Message-State: AOJu0Yy4L9arKDF6dskRj/6uh8la9XuSIIqIRGI3WHttd46Bc+L+Wqgx
-	itoG0/XcWwWWFjEQZ4xs0Jngy+oWCuuP9g==
-X-Google-Smtp-Source: AGHT+IGlheKjIdjPwhnpRvOjXxbkDq7HQgLn7IaWENom1flnn4VvNdmiGe/3/mABCHAXgQaXLxYMqmJkpk0FvQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1609:b0:d07:7001:495b with SMTP
- id bw9-20020a056902160900b00d077001495bmr30412ybb.11.1692195720373; Wed, 16
- Aug 2023 07:22:00 -0700 (PDT)
-Date: Wed, 16 Aug 2023 14:21:58 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A929111A4;
+	Wed, 16 Aug 2023 14:27:21 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CC72705;
+	Wed, 16 Aug 2023 07:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=12sOJIm+x6ia2Tol/RQD3pz06O8YQaOp4XAGIcYNGak=; b=MyKeOwO48f7aS0xKZYq2oCE+XL
+	O3p7bUIx8p1CkTKg72k5dzwt6hCMwQzY8UeEIfAGFp2uOQF9uiIGHwy6qFaRwBO6ktGkV6HjRWG+F
+	XXJMZfxo0RqVLpBFJ5rUdSctbOshpvw/OjkqTdONTBp6uz8mb3aioSQXOIW+XR1thxttIAO74qOPv
+	0AJd4k62UObsQCUKq64TWyCOGJaCDISEQ6HHRBeAjxYdLBlFpNf6A/kL6ZMNr3J7uILL9kAIRnOPW
+	wo0RZ8nzWDIrdBh4Ks6EyYnpPsukH2bxkSgymFQbua8+CewhucqAB32vtTE/eBoOOVHE6U2iOBL/w
+	1g1lqsJw==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qWHUS-000JaR-K5; Wed, 16 Aug 2023 16:27:16 +0200
+Received: from [85.1.206.226] (helo=pc-102.home)
+	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qWHUR-000Vt1-8R; Wed, 16 Aug 2023 16:27:15 +0200
+Subject: Re: [PATCH v5 bpf 0/4] lwt: fix return values of BPF ops
+To: Yan Zhai <yan@cloudflare.com>, bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ Thomas Graf <tgraf@suug.ch>, Jordan Griege <jgriege@cloudflare.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ stable@vger.kernel.org
+References: <cover.1692153515.git.yan@cloudflare.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <9ac9d459-9bc3-bcee-b912-3ab66d2a7fe7@iogearbox.net>
+Date: Wed, 16 Aug 2023 16:27:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230816142158.1779798-1-edumazet@google.com>
-Subject: [PATCH net] net: do not allow gso_size to be set to GSO_BY_FRAGS
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	Xin Long <lucien.xin@gmail.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+In-Reply-To: <cover.1692153515.git.yan@cloudflare.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/27002/Wed Aug 16 09:38:26 2023)
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-One missing check in virtio_net_hdr_to_skb() allowed
-syzbot to crash kernels again [1]
+Hi Yan,
 
-Do not allow gso_size to be set to GSO_BY_FRAGS (0xffff),
-because this magic value is used by the kernel.
+On 8/16/23 4:54 AM, Yan Zhai wrote:
+> lwt xmit hook does not expect positive return values in function
+> ip_finish_output2 and ip6_finish_output. However, BPF programs can
+> directly return positive statuses such like NET_XMIT_DROP, NET_RX_DROP,
+> and etc to the caller. Such return values would make the kernel continue
+> processing already freed skbs and eventually panic.
+> 
+> This set fixes the return values from BPF ops to unexpected continue
+> processing, and checks strictly on the correct continue condition for
+> future proof. In addition, add missing selftests for BPF_REDIRECT
+> and BPF_REROUTE cases for BPF-CI.
+> 
+> v4: https://lore.kernel.org/bpf/ZMD1sFTW8SFiex+x@debian.debian/T/
+> v3: https://lore.kernel.org/bpf/cover.1690255889.git.yan@cloudflare.com/
+> v2: https://lore.kernel.org/netdev/ZLdY6JkWRccunvu0@debian.debian/
+> v1: https://lore.kernel.org/bpf/ZLbYdpWC8zt9EJtq@debian.debian/
+> 
+> changes since v4:
+>   * fixed same error on BPF_REROUTE path
+>   * re-implemented selftests under BPF-CI requirement
 
-[1]
-general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
-CPU: 0 PID: 5039 Comm: syz-executor401 Not tainted 6.5.0-rc5-next-20230809-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:skb_segment+0x1a52/0x3ef0 net/core/skbuff.c:4500
-Code: 00 00 00 e9 ab eb ff ff e8 6b 96 5d f9 48 8b 84 24 00 01 00 00 48 8d 78 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e ea 21 00 00 48 8b 84 24 00 01
-RSP: 0018:ffffc90003d3f1c8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 000000000001fffe RCX: 0000000000000000
-RDX: 000000000000000e RSI: ffffffff882a3115 RDI: 0000000000000070
-RBP: ffffc90003d3f378 R08: 0000000000000005 R09: 000000000000ffff
-R10: 000000000000ffff R11: 5ee4a93e456187d6 R12: 000000000001ffc6
-R13: dffffc0000000000 R14: 0000000000000008 R15: 000000000000ffff
-FS: 00005555563f2380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020020000 CR3: 000000001626d000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-<TASK>
-udp6_ufo_fragment+0x9d2/0xd50 net/ipv6/udp_offload.c:109
-ipv6_gso_segment+0x5c4/0x17b0 net/ipv6/ip6_offload.c:120
-skb_mac_gso_segment+0x292/0x610 net/core/gso.c:53
-__skb_gso_segment+0x339/0x710 net/core/gso.c:124
-skb_gso_segment include/net/gso.h:83 [inline]
-validate_xmit_skb+0x3a5/0xf10 net/core/dev.c:3625
-__dev_queue_xmit+0x8f0/0x3d60 net/core/dev.c:4329
-dev_queue_xmit include/linux/netdevice.h:3082 [inline]
-packet_xmit+0x257/0x380 net/packet/af_packet.c:276
-packet_snd net/packet/af_packet.c:3087 [inline]
-packet_sendmsg+0x24c7/0x5570 net/packet/af_packet.c:3119
-sock_sendmsg_nosec net/socket.c:727 [inline]
-sock_sendmsg+0xd9/0x180 net/socket.c:750
-____sys_sendmsg+0x6ac/0x940 net/socket.c:2496
-___sys_sendmsg+0x135/0x1d0 net/socket.c:2550
-__sys_sendmsg+0x117/0x1e0 net/socket.c:2579
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7ff27cdb34d9
+BPF CI failed: https://github.com/kernel-patches/bpf/actions/runs/5874202507/job/15929012788
 
-Fixes: 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- include/linux/virtio_net.h | 4 ++++
- 1 file changed, 4 insertions(+)
+Looks like due to dummy device issue. Either you might need to add this to
+the tools/testing/selftests/bpf/config* or perhaps just use veth instead for
+link_err dev.
 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index bdf8de2cdd935d31449b78e1b9c67fdcdc537bf2..7b4dd69555e497497460dcf5d72737fe5c09fd53 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -155,6 +155,10 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		if (gso_type & SKB_GSO_UDP)
- 			nh_off -= thlen;
- 
-+		/* Kernel has a special handling for GSO_BY_FRAGS. */
-+		if (gso_size == GSO_BY_FRAGS)
-+			return -EINVAL;
-+
- 		/* Too small packets are not really GSO ones. */
- 		if (skb->len - nh_off > gso_size) {
- 			shinfo->gso_size = gso_size;
--- 
-2.41.0.694.ge786442a9b-goog
+Error from the above link:
 
+Notice: Success: 370/3177, Skipped: 21, Failed: 2
+Error: #131 lwt_redirect
+   Error: #131 lwt_redirect
+   test_lwt_redirect:PASS:pthread_create 0 nsec
+Error: #131/1 lwt_redirect/lwt_redirect_normal
+   Error: #131/1 lwt_redirect/lwt_redirect_normal
+   test_lwt_redirect_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_redirect_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup_redirect_target:PASS:open_tuntap 0 nsec
+   setup_redirect_target:PASS:if_nametoindex 0 nsec
+   setup_redirect_target:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   test_lwt_redirect_normal:FAIL:setup_redirect_target unexpected setup_redirect_target: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+Error: #131/2 lwt_redirect/lwt_redirect_normal_nomac
+   Error: #131/2 lwt_redirect/lwt_redirect_normal_nomac
+   test_lwt_redirect_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_redirect_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup_redirect_target:PASS:open_tuntap 0 nsec
+   setup_redirect_target:PASS:if_nametoindex 0 nsec
+   setup_redirect_target:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   test_lwt_redirect_normal_nomac:FAIL:setup_redirect_target unexpected setup_redirect_target: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+Error: #131/3 lwt_redirect/lwt_redirect_dev_down
+   Error: #131/3 lwt_redirect/lwt_redirect_dev_down
+   test_lwt_redirect_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_redirect_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup_redirect_target:PASS:open_tuntap 0 nsec
+   setup_redirect_target:PASS:if_nametoindex 0 nsec
+   setup_redirect_target:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   __test_lwt_redirect_dev_down:FAIL:setup_redirect_target unexpected setup_redirect_target: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+Error: #131/4 lwt_redirect/lwt_redirect_dev_down_nomac
+   Error: #131/4 lwt_redirect/lwt_redirect_dev_down_nomac
+   test_lwt_redirect_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_redirect_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup_redirect_target:PASS:open_tuntap 0 nsec
+   setup_redirect_target:PASS:if_nametoindex 0 nsec
+   setup_redirect_target:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   __test_lwt_redirect_dev_down:FAIL:setup_redirect_target unexpected setup_redirect_target: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+Error: #131/5 lwt_redirect/lwt_redirect_dev_carrier_down
+   Error: #131/5 lwt_redirect/lwt_redirect_dev_carrier_down
+   test_lwt_redirect_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_redirect_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup_redirect_target:PASS:open_tuntap 0 nsec
+   setup_redirect_target:PASS:if_nametoindex 0 nsec
+   setup_redirect_target:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   test_lwt_redirect_dev_carrier_down:FAIL:setup_redirect_target unexpected setup_redirect_target: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+   test_lwt_redirect:PASS:pthread_join 0 nsec
+Error: #132 lwt_reroute
+   Error: #132 lwt_reroute
+   test_lwt_reroute:PASS:pthread_create 0 nsec
+Error: #132/1 lwt_reroute/lwt_reroute_normal_xmit
+   Error: #132/1 lwt_reroute/lwt_reroute_normal_xmit
+   test_lwt_reroute_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_reroute_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup:PASS:open_tun 0 nsec
+   setup:PASS:if_nametoindex 0 nsec
+   setup:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   test_lwt_reroute_normal_xmit:FAIL:setup_reroute unexpected setup_reroute: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+Error: #132/2 lwt_reroute/lwt_reroute_qdisc_dropped
+   Error: #132/2 lwt_reroute/lwt_reroute_qdisc_dropped
+   test_lwt_reroute_run:PASS:netns_create 0 nsec
+   open_netns:PASS:malloc token 0 nsec
+   open_netns:PASS:open /proc/self/ns/net 0 nsec
+   open_netns:PASS:open netns fd 0 nsec
+   open_netns:PASS:setns 0 nsec
+   test_lwt_reroute_run:PASS:setns 0 nsec
+   open_tuntap:PASS:open(/dev/net/tun) 0 nsec
+   open_tuntap:PASS:ioctl(TUNSETIFF) 0 nsec
+   open_tuntap:PASS:fcntl(O_NONBLOCK) 0 nsec
+   setup:PASS:open_tun 0 nsec
+   setup:PASS:if_nametoindex 0 nsec
+   setup:FAIL:ip link add link_err type dummy unexpected error: 512 (errno 0)
+   test_lwt_reroute_qdisc_dropped:FAIL:setup_reroute unexpected setup_reroute: actual -1 < expected 0
+   close_netns:PASS:setns 0 nsec
+   test_lwt_reroute:PASS:pthread_join 0 nsec
+Test Results:
+              bpftool: PASS
+           test_progs: FAIL (returned 1)
+             shutdown: CLEAN
+Error: Process completed with exit code 1.
+
+Thanks,
+Daniel
 
