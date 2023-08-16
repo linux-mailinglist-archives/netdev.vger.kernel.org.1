@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-28283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE04977EE13
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 02:06:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90EEC77EE0D
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 02:04:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBE7F1C2126C
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 00:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48060281CDB
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 00:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E39718F;
-	Thu, 17 Aug 2023 00:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1322C190;
+	Thu, 17 Aug 2023 00:04:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC4F644
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 00:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043F618F
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 00:04:54 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62311FD
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 17:05:18 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A36173F
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 17:04:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692230718; x=1723766718;
+  t=1692230693; x=1723766693;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8UWDMSET60yRUlq9+3LE6ATf4kCHTJiKH91xV9MfxoM=;
-  b=iO3bB1qK/+vIipk3LGtL3xPBnUvlhPQ4+ytVfZYq3hGwwUam+ZayRR1t
-   PuBbZ19fCNlHA75V9JQDOc+X6ow3Tvqo+EQsFyYx1wCxFCZadRk/tyxTs
-   wxJjkQ7rtLhvP0dHb8a2lupE+QIhsvT8H5OF6lhACLdr1rlP5WRtxf6H5
-   dFzntQtRjDJJRidMQv0UtRo4n6BEEGCKIC4UC5V1TimR3GaTqD0E5Fv1O
-   SiXJzmZRnnj/8mKgGtQnjk3Rjh7Dk5Fot5WvUuQZJ+TupaM4TUf1S2dFs
-   CazqM71V+QaVzIMEunOWk7UoLQ7oCOQG+K3zVO0KVpefqrvUIpaY5mKCf
+  bh=PJHQJXNTEmQY/gNUbbB6CO7+7E2GDRCDC6ex15O9rhk=;
+  b=DyMMtJrAT9rT6s0AZbxLScM2Os9jWDJVOh4lpwj78QVbDn2X1UQZ89Qb
+   dxtgqfMYgOYUWC1j1FssCivGk2DCaMoAEM0KZfmdu3MP+ITDH14NQ1acX
+   2h0X54oAMW2eCLvVaNIPJUzrBS8wTzKAoUtQdqgp8ka0y/+3aVjQ3ZoQC
+   jNbR3WjBQvP7GQRHmmuUImEoWQkn9Gnd3QbH3Vdi2RVFIak+F4cBpaP2e
+   xgVNi8rAZr5qfsBllv4s2LFll0kXi1JprNHqfPB+CYz6jFXSJGuSlduoP
+   QkzkE0la0ZEgMtd6utVnrj+1c0UFon1JQYiLvKRomKSfsvITZhpmBcYDA
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="371570656"
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="371570653"
 X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="371570656"
+   d="scan'208";a="371570653"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 17:04:53 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="824422135"
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="824422140"
 X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="824422135"
+   d="scan'208";a="824422140"
 Received: from unknown (HELO localhost.jf.intel.com) ([10.166.244.168])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Aug 2023 17:04:51 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 16 Aug 2023 17:04:52 -0700
 From: Paul Greenwalt <paul.greenwalt@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	Alice Michael <alice.michael@intel.com>,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: [PATCH iwl-next 3/7] ice: Add 200G speed/phy type use
-Date: Wed, 16 Aug 2023 16:57:15 -0700
-Message-Id: <20230816235719.1120726-4-paul.greenwalt@intel.com>
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>
+Subject: [PATCH iwl-next 4/7] ice: Add ice_get_link_status_datalen
+Date: Wed, 16 Aug 2023 16:57:16 -0700
+Message-Id: <20230816235719.1120726-5-paul.greenwalt@intel.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230816235719.1120726-1-paul.greenwalt@intel.com>
 References: <20230816235719.1120726-1-paul.greenwalt@intel.com>
@@ -71,148 +71,109 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Alice Michael <alice.michael@intel.com>
+The Get Link Status data length can vary with different versions of
+ice_aqc_get_link_status_data. Add ice_get_link_status_datalen() to return
+datalen for the specific ice_aqc_get_link_status_data version.
+Add new link partner fields to ice_aqc_get_link_status_data; PHY type,
+FEC, and flow control.
 
-Add the support for 200G phy speeds and the mapping for their
-advertisement in link. Add the new PHY type bits for AQ command, as
-needed for 200G E830 controllers.
-
-Signed-off-by: Alice Michael <alice.michael@intel.com>
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Co-developed-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
 Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
 Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   | 11 +++++++-
- drivers/net/ethernet/intel/ice/ice_common.c   |  1 +
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 26 +++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_ethtool.h  |  8 ++++++
- 4 files changed, 43 insertions(+), 3 deletions(-)
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   | 37 +++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_common.c   | 22 ++++++++++-
+ 2 files changed, 53 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 90616750e779..d28c610b004d 100644
+index d28c610b004d..9ec96478ed44 100644
 --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
 +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1099,7 +1099,15 @@ struct ice_aqc_get_phy_caps {
- #define ICE_PHY_TYPE_HIGH_100G_CAUI2		BIT_ULL(2)
- #define ICE_PHY_TYPE_HIGH_100G_AUI2_AOC_ACC	BIT_ULL(3)
- #define ICE_PHY_TYPE_HIGH_100G_AUI2		BIT_ULL(4)
--#define ICE_PHY_TYPE_HIGH_MAX_INDEX		4
-+#define ICE_PHY_TYPE_HIGH_200G_CR4_PAM4		BIT_ULL(5)
-+#define ICE_PHY_TYPE_HIGH_200G_SR4		BIT_ULL(6)
-+#define ICE_PHY_TYPE_HIGH_200G_FR4		BIT_ULL(7)
-+#define ICE_PHY_TYPE_HIGH_200G_LR4		BIT_ULL(8)
-+#define ICE_PHY_TYPE_HIGH_200G_DR4		BIT_ULL(9)
-+#define ICE_PHY_TYPE_HIGH_200G_KR4_PAM4		BIT_ULL(10)
-+#define ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC	BIT_ULL(11)
-+#define ICE_PHY_TYPE_HIGH_200G_AUI4		BIT_ULL(12)
-+#define ICE_PHY_TYPE_HIGH_MAX_INDEX		12
- 
- struct ice_aqc_get_phy_caps_data {
- 	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
-@@ -1319,6 +1327,7 @@ struct ice_aqc_get_link_status_data {
- #define ICE_AQ_LINK_SPEED_40GB		BIT(8)
- #define ICE_AQ_LINK_SPEED_50GB		BIT(9)
+@@ -1329,10 +1329,39 @@ struct ice_aqc_get_link_status_data {
  #define ICE_AQ_LINK_SPEED_100GB		BIT(10)
-+#define ICE_AQ_LINK_SPEED_200GB		BIT(11)
+ #define ICE_AQ_LINK_SPEED_200GB		BIT(11)
  #define ICE_AQ_LINK_SPEED_UNKNOWN	BIT(15)
- 	__le32 reserved3; /* Aligns next field to 8-byte boundary */
- 	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
+-	__le32 reserved3; /* Aligns next field to 8-byte boundary */
+-	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
+-	__le64 phy_type_high; /* Use values from ICE_PHY_TYPE_HIGH_* */
+-};
++	/* Aligns next field to 8-byte boundary */
++	__le16 reserved3;
++	u8 ext_fec_status;
++	/* RS 272 FEC enabled */
++#define ICE_AQ_LINK_RS_272_FEC_EN      BIT(0)
++	u8 reserved4;
++	/* Use values from ICE_PHY_TYPE_LOW_* */
++	__le64 phy_type_low;
++	/* Use values from ICE_PHY_TYPE_HIGH_* */
++	__le64 phy_type_high;
++#define ICE_AQC_LS_DATA_SIZE_V1 \
++	offsetofend(struct ice_aqc_get_link_status_data, phy_type_high)
++	/* Get link status v2 link partner data */
++	__le64 lp_phy_type_low;
++	__le64 lp_phy_type_high;
++	u8 lp_fec_adv;
++#define ICE_AQ_LINK_LP_10G_KR_FEC_CAP  BIT(0)
++#define ICE_AQ_LINK_LP_25G_KR_FEC_CAP  BIT(1)
++#define ICE_AQ_LINK_LP_RS_528_FEC_CAP  BIT(2)
++#define ICE_AQ_LINK_LP_50G_KR_272_FEC_CAP BIT(3)
++#define ICE_AQ_LINK_LP_100G_KR_272_FEC_CAP BIT(4)
++#define ICE_AQ_LINK_LP_200G_KR_272_FEC_CAP BIT(5)
++	u8 lp_fec_req;
++#define ICE_AQ_LINK_LP_10G_KR_FEC_REQ  BIT(0)
++#define ICE_AQ_LINK_LP_25G_KR_FEC_REQ  BIT(1)
++#define ICE_AQ_LINK_LP_RS_528_FEC_REQ  BIT(2)
++#define ICE_AQ_LINK_LP_KR_272_FEC_REQ  BIT(3)
++	u8 lp_flowcontrol;
++#define ICE_AQ_LINK_LP_PAUSE_ADV       BIT(0)
++#define ICE_AQ_LINK_LP_ASM_DIR_ADV     BIT(1)
++#define ICE_AQC_LS_DATA_SIZE_V2 \
++	offsetofend(struct ice_aqc_get_link_status_data, lp_flowcontrol)
++} __packed;
+ 
+ /* Set event mask command (direct 0x0613) */
+ struct ice_aqc_set_event_mask {
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index a6c99ba31dc9..7992eaab94fe 100644
+index 7992eaab94fe..df4aa921aa9d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.c
 +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -5379,6 +5379,7 @@ static const u32 ice_aq_to_link_speed[] = {
- 	SPEED_40000,
- 	SPEED_50000,
- 	SPEED_100000,	/* BIT(10) */
-+	SPEED_200000,
- };
+@@ -576,6 +576,24 @@ static enum ice_media_type ice_get_media_type(struct ice_port_info *pi)
+ 	return ICE_MEDIA_UNKNOWN;
+ }
  
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 9a858d8ae26e..a1a64237cf19 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -400,6 +400,14 @@ static const u32 ice_adv_lnk_speed_100000[] __initconst = {
- 	ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
- };
- 
-+static const u32 ice_adv_lnk_speed_200000[] __initconst = {
-+	ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseDR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT,
-+};
-+
- struct ice_adv_lnk_speed_map {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(caps);
- 	const u32	*cap_arr;
-@@ -424,6 +432,7 @@ static struct ice_adv_lnk_speed_map ice_adv_lnk_speed_maps[] __ro_after_init = {
- 	ICE_ADV_LNK_SPEED_MAP(40000, 40GB),
- 	ICE_ADV_LNK_SPEED_MAP(50000, 50GB),
- 	ICE_ADV_LNK_SPEED_MAP(100000, 100GB),
-+	ICE_ADV_LNK_SPEED_MAP(200000, 200GB),
- };
- 
- void __init ice_adv_lnk_speed_maps_init(void)
-@@ -1732,6 +1741,15 @@ ice_get_ethtool_stats(struct net_device *netdev,
- 					 ICE_PHY_TYPE_HIGH_100G_AUI2_AOC_ACC | \
- 					 ICE_PHY_TYPE_HIGH_100G_AUI2)
- 
-+#define ICE_PHY_TYPE_HIGH_MASK_200G	(ICE_PHY_TYPE_HIGH_200G_CR4_PAM4 | \
-+					 ICE_PHY_TYPE_HIGH_200G_SR4 | \
-+					 ICE_PHY_TYPE_HIGH_200G_FR4 | \
-+					 ICE_PHY_TYPE_HIGH_200G_LR4 | \
-+					 ICE_PHY_TYPE_HIGH_200G_DR4 | \
-+					 ICE_PHY_TYPE_HIGH_200G_KR4_PAM4 | \
-+					 ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC | \
-+					 ICE_PHY_TYPE_HIGH_200G_AUI4)
++/**
++ * ice_get_link_status_datalen
++ * @hw: pointer to the HW struct
++ *
++ * Returns datalength for the Get Link Status AQ command, which is bigger for
++ * newer adapter families handled by ice driver.
++ */
++static u16 ice_get_link_status_datalen(struct ice_hw *hw)
++{
++	switch (hw->mac_type) {
++	case ICE_MAC_E830:
++		return ICE_AQC_LS_DATA_SIZE_V2;
++	case ICE_MAC_E810:
++	default:
++		return ICE_AQC_LS_DATA_SIZE_V1;
++	}
++}
 +
  /**
-  * ice_mask_min_supported_speeds
-  * @hw: pointer to the HW structure
-@@ -1746,8 +1764,9 @@ ice_mask_min_supported_speeds(struct ice_hw *hw,
- 			      u64 phy_types_high, u64 *phy_types_low)
- {
- 	/* if QSFP connection with 100G speed, minimum supported speed is 25G */
--	if (*phy_types_low & ICE_PHY_TYPE_LOW_MASK_100G ||
--	    phy_types_high & ICE_PHY_TYPE_HIGH_MASK_100G)
-+	if ((*phy_types_low & ICE_PHY_TYPE_LOW_MASK_100G) ||
-+	    (phy_types_high & ICE_PHY_TYPE_HIGH_MASK_100G) ||
-+	    (phy_types_high & ICE_PHY_TYPE_HIGH_MASK_200G))
- 		*phy_types_low &= ~ICE_PHY_TYPE_LOW_MASK_MIN_25G;
- 	else if (!ice_is_100m_speed_supported(hw))
- 		*phy_types_low &= ~ICE_PHY_TYPE_LOW_MASK_MIN_1G;
-@@ -1890,6 +1909,9 @@ ice_get_settings_link_up(struct ethtool_link_ksettings *ks,
- 	ice_phy_type_to_ethtool(netdev, ks);
+  * ice_aq_get_link_info
+  * @pi: port information structure
+@@ -614,8 +632,8 @@ ice_aq_get_link_info(struct ice_port_info *pi, bool ena_lse,
+ 	resp->cmd_flags = cpu_to_le16(cmd_flags);
+ 	resp->lport_num = pi->lport;
  
- 	switch (link_info->link_speed) {
-+	case ICE_AQ_LINK_SPEED_200GB:
-+		ks->base.speed = SPEED_200000;
-+		break;
- 	case ICE_AQ_LINK_SPEED_100GB:
- 		ks->base.speed = SPEED_100000;
- 		break;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-index b403ee79cd5e..b88e3da06f13 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-@@ -100,6 +100,14 @@ phy_type_high_lkup[] = {
- 	[2] = ICE_PHY_TYPE(100GB, 100000baseCR2_Full),
- 	[3] = ICE_PHY_TYPE(100GB, 100000baseSR2_Full),
- 	[4] = ICE_PHY_TYPE(100GB, 100000baseCR2_Full),
-+	[5] = ICE_PHY_TYPE(200GB, 200000baseCR4_Full),
-+	[6] = ICE_PHY_TYPE(200GB, 200000baseSR4_Full),
-+	[7] = ICE_PHY_TYPE(200GB, 200000baseLR4_ER4_FR4_Full),
-+	[8] = ICE_PHY_TYPE(200GB, 200000baseLR4_ER4_FR4_Full),
-+	[9] = ICE_PHY_TYPE(200GB, 200000baseDR4_Full),
-+	[10] = ICE_PHY_TYPE(200GB, 200000baseKR4_Full),
-+	[11] = ICE_PHY_TYPE(200GB, 200000baseSR4_Full),
-+	[12] = ICE_PHY_TYPE(200GB, 200000baseCR4_Full),
- };
+-	status = ice_aq_send_cmd(hw, &desc, &link_data, sizeof(link_data), cd);
+-
++	status = ice_aq_send_cmd(hw, &desc, &link_data,
++				 ice_get_link_status_datalen(hw), cd);
+ 	if (status)
+ 		return status;
  
- #endif /* !_ICE_ETHTOOL_H_ */
 -- 
 2.39.2
 
