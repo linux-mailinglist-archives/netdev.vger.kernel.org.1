@@ -1,146 +1,268 @@
-Return-Path: <netdev+bounces-28055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D561277E139
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:14:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1814477E163
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1239D1C20FEB
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 12:14:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D3CD281A03
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 12:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB52B107A5;
-	Wed, 16 Aug 2023 12:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F3B107B6;
+	Wed, 16 Aug 2023 12:22:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6871079D
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 12:13:59 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA342136;
-	Wed, 16 Aug 2023 05:13:58 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bc63ef9959so54020925ad.2;
-        Wed, 16 Aug 2023 05:13:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692188037; x=1692792837;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3qmXn2ewlnvZ6CiUg5F1hGWulWuQ6Cj0sIq/1TLnfZ4=;
-        b=nshUr+43amUm18xBi+a6Xyq5RDGpXvUTh+z2ta3KjeXa2R0DEU8SK68GnbRihpoui3
-         c5dqSO/ir2Yb0NViOhWN82buZvLvfqASbT3QKTWrwitizM5p14YunABpblQpcsSJSgZF
-         vbm3lj/AgGzPItttE5IWRT9tYENsGCrPHcEiP4F4Xf/3ic6cn/hQpHizQBr1m0K/6oDe
-         TsEUw4AwOEQHKvmAgv1lEOsBNv6wcIpf2sRckNLnCYTDZO/82TKk3hWcevb4g+3bY32Y
-         KpffUBt0wUfiSRAylfFyw1pLYdZeIL3+/xSMjojjxla9RdUwdugQgc/pSBNGlQ67yBa7
-         c5Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692188037; x=1692792837;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3qmXn2ewlnvZ6CiUg5F1hGWulWuQ6Cj0sIq/1TLnfZ4=;
-        b=GOI4/DBlpPK2ybM9Pxe0lFa2QXmVX82pVy5H9wkbtwD5i9kE5m5NVLVA55nu1lejlA
-         +B1KmexeCnLD9r4BjEDqmAwYKiUpu4w2sOSOys1PWb08sX03wE5+M7ogATYhor/MEw9X
-         VtRT+/qlUnfoJagQZ6smxMr2+dna7loHIQzk31ILPahf9qAfexdv24BzqEJMD0SPUA9b
-         emWq2sAqEvIOPMZUTin42IzQPCHQU6M4ET3pcr5yMLFsSJ+EeKTa9Fp1DlqH4Kkr3pEK
-         BKxVLaZGUrXyDAoJJr7s8DUza5uj9wHik5gXjE7+Q49QLvXbH1Dfv0AmBzdfuIAMtAJW
-         FmWg==
-X-Gm-Message-State: AOJu0YxQfMAzvLuk5T95CK35jZr7IGJjz+obEBv3OumzVvdl6r6ko8kT
-	HAOxToIi1DP1EEVLBPuxP74=
-X-Google-Smtp-Source: AGHT+IHY8C5UlhqoOQAHNfwLvADr+O5asQd9I8l4yWkocJeEVZd0V9lFFdt12ifwqtJwQABfUmpGww==
-X-Received: by 2002:a17:903:1208:b0:1be:eef7:98e0 with SMTP id l8-20020a170903120800b001beeef798e0mr1984099plh.35.1692188037272;
-        Wed, 16 Aug 2023 05:13:57 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id u9-20020a170902a60900b001b8b2b95068sm12937375plq.204.2023.08.16.05.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 05:13:56 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Wed, 16 Aug 2023 05:13:55 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, gospo@broadcom.com,
-	Jean Delvare <jdelvare@suse.com>, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH net-next 11/12] bnxt_en: Expose threshold temperatures
- through hwmon
-Message-ID: <3d70325b-6b6a-482f-8745-36aceb6b2818@roeck-us.net>
-References: <20230815045658.80494-1-michael.chan@broadcom.com>
- <20230815045658.80494-12-michael.chan@broadcom.com>
- <c6f3a05e-f75c-4051-8892-1c2dee2804b0@roeck-us.net>
- <CAH-L+nM4MvWODLcApzFB1Xjr4dauii+pBErOZ=frT+eiP8PgVg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4A8DF57;
+	Wed, 16 Aug 2023 12:22:42 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 801A92D47;
+	Wed, 16 Aug 2023 05:22:13 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37GCI0Mt023293;
+	Wed, 16 Aug 2023 12:21:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=q9AhJjcwrKeKKfGXDoGS/fZRNNeZiPjnBnZlx49JZZE=;
+ b=CQAt3X8kxN2EAREku8sHa9gObXjlHFW/wJy6cootO8gNEDmnGdBOjeS9LBzokrLCjArD
+ IYQgpqo9se7TDorSprHXFQm87bgOtFewMW7rzSUvB4u+Fi1IrqcjslC8jEvHY5zxaO/y
+ PP9tulkwOJQE8IEWSi5EN1nAw46LhaneKuSugbVBCdBsxZiTx9jKmL/t4pgY51fkKbJY
+ +Bj5Ghf7Kv/4IEl8z6jpBda0N3F6+MnIb/DVAVY0k43ZX30G+XikNHAPqB6h2FvoYu1V
+ vFYfPbZP2s94EQuVpLi9Yp44MFhKH51lkxxCMJb5VP8wy47hJO2f1olec7BSx2sYgLTz NA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgx048mmt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Aug 2023 12:21:48 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37GCB4UD021895;
+	Wed, 16 Aug 2023 12:21:48 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgx048mme-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Aug 2023 12:21:48 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37GAL6On003446;
+	Wed, 16 Aug 2023 12:21:46 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3semdsmjfb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Aug 2023 12:21:46 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37GCLhhI11600392
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Aug 2023 12:21:44 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DD50920040;
+	Wed, 16 Aug 2023 12:21:43 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D51D82004B;
+	Wed, 16 Aug 2023 12:21:39 +0000 (GMT)
+Received: from li-05afa54c-330e-11b2-a85c-e3f3aa0db1e9.in.ibm.com (unknown [9.204.206.180])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 16 Aug 2023 12:21:39 +0000 (GMT)
+From: Vishal Chourasia <vishalc@linux.ibm.com>
+To: srikar@linux.vnet.ibm.com
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+        daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com,
+        hawk@kernel.org, john.fastabend@gmail.com, jolsa@kernel.org,
+        kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+        martin.lau@linux.dev, netdev@vger.kernel.org, sachinp@linux.ibm.com,
+        sdf@google.com, song@kernel.org, yhs@fb.com, vishalc@linux.ibm.com
+Subject: [PATCH] Fix invalid escape sequence warnings
+Date: Wed, 16 Aug 2023 17:51:33 +0530
+Message-Id: <20230816122133.1231599-1-vishalc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20230811084739.GY3902@linux.vnet.ibm.com>
+References: <20230811084739.GY3902@linux.vnet.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH-L+nM4MvWODLcApzFB1Xjr4dauii+pBErOZ=frT+eiP8PgVg@mail.gmail.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Ni1vr0Yufmq6LHza8J1mtIR-9onUPdgp
+X-Proofpoint-GUID: FVG1B_V01_11AQzXP3Jz7yX5Vf0G_Skp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-16_10,2023-08-15_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 impostorscore=0 suspectscore=0 malwarescore=0
+ adultscore=0 phishscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
+ mlxscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2306200000 definitions=main-2308160105
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 03:58:34PM +0530, Kalesh Anakkur Purayil wrote:
-> Thank you Guenter for the review and the suggestions.
-> 
-> Please see my response inline.
-> 
-> On Tue, Aug 15, 2023 at 8:35 PM Guenter Roeck <linux@roeck-us.net> wrote:
-> 
-[ ... ]
+The Python script `bpf_doc.py` uses regular expressions with
+backslashes in string literals, which results in SyntaxWarnings
+during its execution.
 
-> >
-> > Hmm, that isn't really the purpose of alarm attributes. The expectation
-> > would be that the chip sets alarm flags and the driver reports it.
-> > I guess there is some value in having it, so I won't object.
-> >
-> > Anyway, the ordering is wrong. max_alarm should be the lowest
-> > alarm level, followed by crit and emergency. So
-> >                 max_alarm -> temp >= bp->warn_thresh_temp
-> >                 crit_alarm -> temp >= bp->crit_thresh_temp
-> >                 emergency_alarm -> temp >= bp->fatal_thresh_temp
-> >                                 or temp >= bp->shutdown_thresh_temp
-> >
-> > There are only three levels of upper temperature alarms.
-> > Abusing lcrit as 4th upper alarm is most definitely wrong.
-> >
-> [Kalesh]: Thank you for the clarification.
-> bnxt_en driver wants to expose 4 threshold temperatures to the user through
-> hwmon sysfs.
-> 1. warning threshold temperature
-> 2. critical threshold temperature
-> 3. fatal threshold temperature
-> 4. shutdown threshold temperature
-> 
-> I will use the following mapping:
-> 
-> hwmon_temp_max : warning threshold temperature
-> hwmon_temp_crit : critical threshold temperature
-> hwmon_temp_emergency : fatal threshold temperature
-> 
-> hwmon_temp_max_alarm : temp >= bp->warn_thresh_temp
-> hwmon_temp_crit_alarm : temp >= bp->crit_thresh_temp
-> hwmon_temp_emergency_alarm : temp >= bp->fatal_thresh_temp
-> 
-> Is it OK to map the shutdown threshold temperature to "hwmon_temp_fault"?
+This patch addresses these warnings by converting relevant string
+literals to raw strings, which interpret backslashes as literal
+characters. This ensures that the regular expressions are parsed
+correctly without causing any warnings.
 
-That is a flag, not a temperature, and it is intended to signal
-a problem ith the sensor.
+Signed-off-by: Vishal Chourasia <vishalc@linux.ibm.com>
+Reported-by: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
 
-> If not, can you please suggest an alternative?
-> 
+---
+ scripts/bpf_doc.py | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-The only one I can think of is to add non-standard attributes
-such as temp1_shutdown and temp1_shutdown_alarm.
+diff --git a/scripts/bpf_doc.py b/scripts/bpf_doc.py
+index eaae2ce78381..dfd819c952b2 100755
+--- a/scripts/bpf_doc.py
++++ b/scripts/bpf_doc.py
+@@ -59,9 +59,9 @@ class Helper(APIElement):
+         Break down helper function protocol into smaller chunks: return type,
+         name, distincts arguments.
+         """
+-        arg_re = re.compile('((\w+ )*?(\w+|...))( (\**)(\w+))?$')
++        arg_re = re.compile(r'((\w+ )*?(\w+|...))( (\**)(\w+))?$')
+         res = {}
+-        proto_re = re.compile('(.+) (\**)(\w+)\(((([^,]+)(, )?){1,5})\)$')
++        proto_re = re.compile(r'(.+) (\**)(\w+)\(((([^,]+)(, )?){1,5})\)$')
+ 
+         capture = proto_re.match(self.proto)
+         res['ret_type'] = capture.group(1)
+@@ -114,11 +114,11 @@ class HeaderParser(object):
+         return Helper(proto=proto, desc=desc, ret=ret)
+ 
+     def parse_symbol(self):
+-        p = re.compile(' \* ?(BPF\w+)$')
++        p = re.compile(r' \* ?(BPF\w+)$')
+         capture = p.match(self.line)
+         if not capture:
+             raise NoSyscallCommandFound
+-        end_re = re.compile(' \* ?NOTES$')
++        end_re = re.compile(r' \* ?NOTES$')
+         end = end_re.match(self.line)
+         if end:
+             raise NoSyscallCommandFound
+@@ -133,7 +133,7 @@ class HeaderParser(object):
+         #   - Same as above, with "const" and/or "struct" in front of type
+         #   - "..." (undefined number of arguments, for bpf_trace_printk())
+         # There is at least one term ("void"), and at most five arguments.
+-        p = re.compile(' \* ?((.+) \**\w+\((((const )?(struct )?(\w+|\.\.\.)( \**\w+)?)(, )?){1,5}\))$')
++        p = re.compile(r' \* ?((.+) \**\w+\((((const )?(struct )?(\w+|\.\.\.)( \**\w+)?)(, )?){1,5}\))$')
+         capture = p.match(self.line)
+         if not capture:
+             raise NoHelperFound
+@@ -141,7 +141,7 @@ class HeaderParser(object):
+         return capture.group(1)
+ 
+     def parse_desc(self, proto):
+-        p = re.compile(' \* ?(?:\t| {5,8})Description$')
++        p = re.compile(r' \* ?(?:\t| {5,8})Description$')
+         capture = p.match(self.line)
+         if not capture:
+             raise Exception("No description section found for " + proto)
+@@ -154,7 +154,7 @@ class HeaderParser(object):
+             if self.line == ' *\n':
+                 desc += '\n'
+             else:
+-                p = re.compile(' \* ?(?:\t| {5,8})(?:\t| {8})(.*)')
++                p = re.compile(r' \* ?(?:\t| {5,8})(?:\t| {8})(.*)')
+                 capture = p.match(self.line)
+                 if capture:
+                     desc_present = True
+@@ -167,7 +167,7 @@ class HeaderParser(object):
+         return desc
+ 
+     def parse_ret(self, proto):
+-        p = re.compile(' \* ?(?:\t| {5,8})Return$')
++        p = re.compile(r' \* ?(?:\t| {5,8})Return$')
+         capture = p.match(self.line)
+         if not capture:
+             raise Exception("No return section found for " + proto)
+@@ -180,7 +180,7 @@ class HeaderParser(object):
+             if self.line == ' *\n':
+                 ret += '\n'
+             else:
+-                p = re.compile(' \* ?(?:\t| {5,8})(?:\t| {8})(.*)')
++                p = re.compile(r' \* ?(?:\t| {5,8})(?:\t| {8})(.*)')
+                 capture = p.match(self.line)
+                 if capture:
+                     ret_present = True
+@@ -219,12 +219,12 @@ class HeaderParser(object):
+         self.seek_to('enum bpf_cmd {',
+                      'Could not find start of bpf_cmd enum', 0)
+         # Searches for either one or more BPF\w+ enums
+-        bpf_p = re.compile('\s*(BPF\w+)+')
++        bpf_p = re.compile(r'\s*(BPF\w+)+')
+         # Searches for an enum entry assigned to another entry,
+         # for e.g. BPF_PROG_RUN = BPF_PROG_TEST_RUN, which is
+         # not documented hence should be skipped in check to
+         # determine if the right number of syscalls are documented
+-        assign_p = re.compile('\s*(BPF\w+)\s*=\s*(BPF\w+)')
++        assign_p = re.compile(r'\s*(BPF\w+)\s*=\s*(BPF\w+)')
+         bpf_cmd_str = ''
+         while True:
+             capture = assign_p.match(self.line)
+@@ -239,7 +239,7 @@ class HeaderParser(object):
+                 break
+             self.line = self.reader.readline()
+         # Find the number of occurences of BPF\w+
+-        self.enum_syscalls = re.findall('(BPF\w+)+', bpf_cmd_str)
++        self.enum_syscalls = re.findall(r'(BPF\w+)+', bpf_cmd_str)
+ 
+     def parse_desc_helpers(self):
+         self.seek_to(helpersDocStart,
+@@ -263,7 +263,7 @@ class HeaderParser(object):
+         self.seek_to('#define ___BPF_FUNC_MAPPER(FN, ctx...)',
+                      'Could not find start of eBPF helper definition list')
+         # Searches for one FN(\w+) define or a backslash for newline
+-        p = re.compile('\s*FN\((\w+), (\d+), ##ctx\)|\\\\')
++        p = re.compile(r'\s*FN\((\w+), (\d+), ##ctx\)|\\\\')
+         fn_defines_str = ''
+         i = 0
+         while True:
+@@ -278,7 +278,7 @@ class HeaderParser(object):
+                 break
+             self.line = self.reader.readline()
+         # Find the number of occurences of FN(\w+)
+-        self.define_unique_helpers = re.findall('FN\(\w+, \d+, ##ctx\)', fn_defines_str)
++        self.define_unique_helpers = re.findall(r'FN\(\w+, \d+, ##ctx\)', fn_defines_str)
+ 
+     def validate_helpers(self):
+         last_helper = ''
+@@ -425,7 +425,7 @@ class PrinterRST(Printer):
+         try:
+             cmd = ['git', 'log', '-1', '--pretty=format:%cs', '--no-patch',
+                    '-L',
+-                   '/{}/,/\*\//:include/uapi/linux/bpf.h'.format(delimiter)]
++                   r'/{}/,/\*\//:include/uapi/linux/bpf.h'.format(delimiter)]
+             date = subprocess.run(cmd, cwd=linuxRoot,
+                                   capture_output=True, check=True)
+             return date.stdout.decode().rstrip()
+@@ -496,7 +496,7 @@ HELPERS
+                             date=lastUpdate))
+ 
+     def print_footer(self):
+-        footer = '''
++        footer = r'''
+ EXAMPLES
+ ========
+ 
+@@ -598,7 +598,7 @@ SEE ALSO
+             one_arg = '{}{}'.format(comma, a['type'])
+             if a['name']:
+                 if a['star']:
+-                    one_arg += ' {}**\ '.format(a['star'].replace('*', '\\*'))
++                    one_arg += r' {}**\ '.format(a['star'].replace('*', '\\*'))
+                 else:
+                     one_arg += '** '
+                 one_arg += '*{}*\\ **'.format(a['name'])
+-- 
+2.41.0
 
-Guenter
 
