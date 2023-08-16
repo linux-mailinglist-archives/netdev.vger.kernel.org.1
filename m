@@ -1,280 +1,266 @@
-Return-Path: <netdev+bounces-28031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6707777E05C
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 13:31:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC1777E0CA
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 13:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C29C1C20F65
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:31:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A40771C20F91
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5A9101FA;
-	Wed, 16 Aug 2023 11:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC0E10789;
+	Wed, 16 Aug 2023 11:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8050FFC17
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 11:31:18 +0000 (UTC)
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F01A1BFB
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 04:31:16 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4fe216edaf7so8703261e87.0
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 04:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692185475; x=1692790275;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WCTK0zK3Bw5BDEu4IrynRQ92ycf5U4VSe4BpKiJSfls=;
-        b=urn7jg/tgiWxyVoZ5ustoaDhw0zvT0vaJpscZq1HgtXwwM3b1tww/5SkWgB/mYG4Mt
-         IwICyZ+4596YkIxCzAyREgOY8PVwzhfowyPQBKcejIIn2UuhR7AB3RPH5gbx1Awq1SXO
-         mfcQWAuit/Im4JGeBL9TYwUd42f+VbV+oG+OEi3p7dRrnY+Yyr08Q0udwDYehgqKWRLO
-         PcDR7WHHnB4rjwJKRKIRoHaUOPhXCbGl3hsuAa2HJqsNQQYdfl0Sf9ug6qxQkYin7fUq
-         98a5KdKvS0YKoOhm8EYDqKRYzoyqx9LxD+3SvVyl6Ig88uO1Kzr/EAhMgVDZZn7u8zeY
-         qvQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692185475; x=1692790275;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WCTK0zK3Bw5BDEu4IrynRQ92ycf5U4VSe4BpKiJSfls=;
-        b=HTb30/z2kW6SNH/B/US0n97kVsIT1zbsO5wrUKI2ZbEVnq+5kCCPw3Z3jvj0jgQtQq
-         YFDXuSSh/ESRqG+D46ksy/yPhhKW7vXfeZxuV4JCOScP2Icew4nhxQGIi2/HtiLO8cOz
-         v1+4nocz2Epv2doiFNDddM4BM45Ho9lAydH//gIX0j9Cgn3GfGRKI1x2iRp8NBQbutxA
-         Dl//+39DW6Z21lEdjz0kAGdYWDx7GZlqY1vx6AsMjzi+FGPpb07E/ugWmO8K3vCpf5pf
-         yKTiWm547Ylw5HwDoq3FDPe9ZTl1MIASZjbKpcdSZ4W3g8O9s8iccsbQk5g0p65qDAiC
-         oGUA==
-X-Gm-Message-State: AOJu0YyNPKNZ0VusUdeHm1339UeAE8kC9XoFiPm81ShcPnNKIUXsaYhI
-	ByvK+cmqeUX39AOk/QtN91hPg5jM+q0cCFdW69L/eQ==
-X-Google-Smtp-Source: AGHT+IFzET1+R2i8QPp2+AKJiTWPp4JJpbW/ML9ibIXmt2P4lOHIOE4opeVu8RNW2AZB4wHpNBlg1guZ6ipUMCETbH8=
-X-Received: by 2002:ac2:4c53:0:b0:4f8:6d9d:abe0 with SMTP id
- o19-20020ac24c53000000b004f86d9dabe0mr658423lfk.33.1692185474643; Wed, 16 Aug
- 2023 04:31:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8447101C8
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 11:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 971DBC433C7;
+	Wed, 16 Aug 2023 11:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692186624;
+	bh=K5UuP55MZJ1xP8kfzlNmsJdJK6+0SZxeygX7UdDuRto=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DGh3cs+BJCw56/SjCfd/t2kcRfuW2stdrhNKzVlxvUIpSm84DL801VqE1y24l/nRW
+	 B/B/K9ypI5v0egh5hSN0jFd5d68a1tPAOzjAsOGzdY0ote8/AYnyQpi+nk0cY7Hl1D
+	 AVnlCEuK5PgDMv56fCPJmBj5j07hYZc4+IUfMQWmffUxKF6oFQme8b02Dx8EyDq9Qe
+	 SEPaREHZkxj9GS4ZOJBE0Pcy06fAM6EvxrJQmiNT37GTnfDmweZu4zh6c5JsBgGgD4
+	 NMGxadgT8yOrIIOM8r30F4Qr2Si7+4KnsaN85noTVkyzNmhnBsHR5njm1M44DrEoH+
+	 dIoNSZdckUFNw==
+Date: Wed, 16 Aug 2023 13:50:17 +0200
+From: Simon Horman <horms@kernel.org>
+To: Dmitry Safonov <dima@arista.com>
+Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Bob Gilligan <gilligan@arista.com>,
+	Dan Carpenter <error27@gmail.com>,
+	David Laight <David.Laight@aculab.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Donald Cassidy <dcassidy@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Ivan Delalande <colona@arista.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	"Nassiri, Mohammad" <mnassiri@ciena.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v10 net-next 08/23] net/tcp: Add AO sign to RST packets
+Message-ID: <ZNy3+f6ZtDKfsQ5C@vergenet.net>
+References: <20230815191455.1872316-1-dima@arista.com>
+ <20230815191455.1872316-9-dima@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816100113.41034-1-linyunsheng@huawei.com> <20230816100113.41034-3-linyunsheng@huawei.com>
-In-Reply-To: <20230816100113.41034-3-linyunsheng@huawei.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Wed, 16 Aug 2023 14:30:38 +0300
-Message-ID: <CAC_iWjLgDii_Y0p38w+Xs-nVb9uENG_-WyN7YTxxG5m7kn=bcQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 2/6] page_pool: unify frag_count handling in page_pool_is_last_frag()
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, 
-	Liang Chen <liangchen.linux@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815191455.1872316-9-dima@arista.com>
 
-On Wed, 16 Aug 2023 at 13:04, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->
-> Currently when page_pool_create() is called with
-> PP_FLAG_PAGE_FRAG flag, page_pool_alloc_pages() is only
-> allowed to be called under the below constraints:
-> 1. page_pool_fragment_page() need to be called to setup
->    page->pp_frag_count immediately.
-> 2. page_pool_defrag_page() often need to be called to drain
->    the page->pp_frag_count when there is no more user will
->    be holding on to that page.
->
-> Those constraints exist in order to support a page to be
-> split into multi frags.
->
-> And those constraints have some overhead because of the
-> cache line dirtying/bouncing and atomic update.
->
-> Those constraints are unavoidable for case when we need a
-> page to be split into more than one frag, but there is also
-> case that we want to avoid the above constraints and their
-> overhead when a page can't be split as it can only hold a big
-> frag as requested by user, depending on different use cases:
-> use case 1: allocate page without page splitting.
-> use case 2: allocate page with page splitting.
-> use case 3: allocate page with or without page splitting
->             depending on the frag size.
->
-> Currently page pool only provide page_pool_alloc_pages() and
-> page_pool_alloc_frag() API to enable the 1 & 2 separately,
-> so we can not use a combination of 1 & 2 to enable 3, it is
-> not possible yet because of the per page_pool flag
-> PP_FLAG_PAGE_FRAG.
->
+On Tue, Aug 15, 2023 at 08:14:37PM +0100, Dmitry Safonov wrote:
+> Wire up sending resets to TCP-AO hashing.
+> 
+> Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
+> Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
+> Co-developed-by: Salam Noureddine <noureddine@arista.com>
+> Signed-off-by: Salam Noureddine <noureddine@arista.com>
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> Acked-by: David Ahern <dsahern@kernel.org>
 
-I really think we are inventing problems to solve here.
-What would be more useful here would be an example with numbers.  Most
-of what you mention are true, but what % of the packets would split a
-page in a way that the remaining part cant be used is unknown.  Do you
-have a usecase in the hns3 driver?  Are there any numbers that justify
-the change?
-
-Thanks
-/Ilias
-> So in order to allow allocating unsplit page without the
-> overhead of split page while still allow allocating split
-> page we need to remove the per page_pool flag in
-> page_pool_is_last_frag(), as best as I can think of, it seems
-> there are two methods as below:
-> 1. Add per page flag/bit to indicate a page is split or
->    not, which means we might need to update that flag/bit
->    everytime the page is recycled, dirtying the cache line
->    of 'struct page' for use case 1.
-> 2. Unify the page->pp_frag_count handling for both split and
->    unsplit page by assuming all pages in the page pool is split
->    into a big frag initially.
->
-> As page pool already supports use case 1 without dirtying the
-> cache line of 'struct page' whenever a page is recyclable, we
-> need to support the above use case 3 with minimal overhead,
-> especially not adding any noticeable overhead for use case 1,
-> and we are already doing an optimization by not updating
-> pp_frag_count in page_pool_defrag_page() for the last frag
-> user, this patch chooses to unify the pp_frag_count handling
-> to support the above use case 3.
->
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> CC: Lorenzo Bianconi <lorenzo@kernel.org>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Liang Chen <liangchen.linux@gmail.com>
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
 > ---
->  include/net/page_pool/helpers.h | 54 +++++++++++++++++++++++----------
->  net/core/page_pool.c            | 10 +++++-
->  2 files changed, 47 insertions(+), 17 deletions(-)
->
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index cb18de55f239..19e8ba056868 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -134,7 +134,8 @@ inline enum dma_data_direction page_pool_get_dma_dir(struct page_pool *pool)
->   */
->  static inline void page_pool_fragment_page(struct page *page, long nr)
->  {
-> -       atomic_long_set(&page->pp_frag_count, nr);
-> +       if (!PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> +               atomic_long_set(&page->pp_frag_count, nr);
->  }
->
->  static inline long page_pool_defrag_page(struct page *page, long nr)
-> @@ -142,33 +143,54 @@ static inline long page_pool_defrag_page(struct page *page, long nr)
->         long ret;
->
->         /* If nr == pp_frag_count then we have cleared all remaining
-> -        * references to the page. No need to actually overwrite it, instead
-> -        * we can leave this to be overwritten by the calling function.
-> +        * references to the page:
-> +        * 1. 'n == 1': no need to actually overwrite it.
-> +        * 2. 'n != 1': overwrite it with one, which is the rare case
-> +        *              for frag draining.
->          *
-> -        * The main advantage to doing this is that an atomic_read is
-> -        * generally a much cheaper operation than an atomic update,
-> -        * especially when dealing with a page that may be partitioned
-> -        * into only 2 or 3 pieces.
-> +        * The main advantage to doing this is that not only we avoid a
-> +        * atomic update, as an atomic_read is generally a much cheaper
-> +        * operation than an atomic update, especially when dealing with
-> +        * a page that may be partitioned into only 2 or 3 pieces; but
-> +        * also unify the frag and non-frag handling by ensuring all
-> +        * pages have been split into one big frag initially, and only
-> +        * overwrite it when the page is split into more than one frag.
->          */
-> -       if (atomic_long_read(&page->pp_frag_count) == nr)
-> +       if (atomic_long_read(&page->pp_frag_count) == nr) {
-> +               /* As we have ensured nr is always one for constant case
-> +                * using the BUILD_BUG_ON(), only need to handle the
-> +                * non-constant case here for frag count draining, which
-> +                * is a rare case.
-> +                */
-> +               BUILD_BUG_ON(__builtin_constant_p(nr) && nr != 1);
-> +               if (!__builtin_constant_p(nr))
-> +                       atomic_long_set(&page->pp_frag_count, 1);
+>  include/net/tcp_ao.h |  12 +++++
+>  net/ipv4/tcp_ao.c    | 104 ++++++++++++++++++++++++++++++++++++++++++-
+>  net/ipv4/tcp_ipv4.c  |  69 ++++++++++++++++++++++------
+>  net/ipv6/tcp_ipv6.c  |  70 ++++++++++++++++++++++-------
+>  4 files changed, 225 insertions(+), 30 deletions(-)
+> 
+> diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+> index e685ad9db949..67f997aabd9c 100644
+> --- a/include/net/tcp_ao.h
+> +++ b/include/net/tcp_ao.h
+> @@ -117,12 +117,24 @@ int tcp_ao_hash_skb(unsigned short int family,
+>  		    const u8 *tkey, int hash_offset, u32 sne);
+>  int tcp_parse_ao(struct sock *sk, int cmd, unsigned short int family,
+>  		 sockptr_t optval, int optlen);
+> +struct tcp_ao_key *tcp_ao_established_key(struct tcp_ao_info *ao,
+> +					  int sndid, int rcvid);
+>  int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
+>  			    unsigned int len, struct tcp_sigpool *hp);
+>  void tcp_ao_destroy_sock(struct sock *sk);
+>  struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
+>  				    const union tcp_ao_addr *addr,
+>  				    int family, int sndid, int rcvid);
+> +int tcp_ao_hash_hdr(unsigned short family, char *ao_hash,
+> +		    struct tcp_ao_key *key, const u8 *tkey,
+> +		    const union tcp_ao_addr *daddr,
+> +		    const union tcp_ao_addr *saddr,
+> +		    const struct tcphdr *th, u32 sne);
+> +int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
+> +			 const struct tcp_ao_hdr *aoh, int l3index, u32 seq,
+> +			 struct tcp_ao_key **key, char **traffic_key,
+> +			 bool *allocated_traffic_key, u8 *keyid, u32 *sne);
 > +
->                 return 0;
-> +       }
->
->         ret = atomic_long_sub_return(nr, &page->pp_frag_count);
->         WARN_ON(ret < 0);
-> +
-> +       /* We are the last user here too, reset frag count back to 1 to
-> +        * ensure all pages have been split into one big frag initially,
-> +        * this should be the rare case when the last two frag users call
-> +        * page_pool_defrag_page() currently.
-> +        */
-> +       if (unlikely(!ret))
-> +               atomic_long_set(&page->pp_frag_count, 1);
-> +
->         return ret;
+>  /* ipv4 specific functions */
+>  int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen);
+>  struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
+> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+
+...
+
+> @@ -435,6 +495,46 @@ struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
+>  	return tcp_ao_do_lookup(sk, addr, AF_INET, sndid, rcvid);
 >  }
->
-> -static inline bool page_pool_is_last_frag(struct page_pool *pool,
-> -                                         struct page *page)
-> +static inline bool page_pool_is_last_frag(struct page *page)
->  {
->         /* We assume we are the last frag user that is still holding
->          * on to the page if:
-> -        * 1. Fragments aren't enabled.
-> -        * 2. We are running in 32-bit arch with 64-bit DMA.
-> -        * 3. page_pool_defrag_page() indicate we are the last user.
-> +        * 1. We are running in 32-bit arch with 64-bit DMA.
-> +        * 2. page_pool_defrag_page() indicate we are the last user.
->          */
-> -       return !(pool->p.flags & PP_FLAG_PAGE_FRAG) ||
-> -              PAGE_POOL_DMA_USE_PP_FRAG_COUNT ||
-> +       return PAGE_POOL_DMA_USE_PP_FRAG_COUNT ||
->                (page_pool_defrag_page(page, 1) == 0);
->  }
->
-> @@ -194,7 +216,7 @@ static inline void page_pool_put_page(struct page_pool *pool,
->          * allow registering MEM_TYPE_PAGE_POOL, but shield linker.
->          */
->  #ifdef CONFIG_PAGE_POOL
-> -       if (!page_pool_is_last_frag(pool, page))
-> +       if (!page_pool_is_last_frag(page))
->                 return;
->
->         page_pool_put_defragged_page(pool, page, dma_sync_size, allow_direct);
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 7d5f0512aa13..386e6d791e90 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -371,6 +371,14 @@ static void page_pool_set_pp_info(struct page_pool *pool,
->  {
->         page->pp = pool;
->         page->pp_magic |= PP_SIGNATURE;
+>  
+> +int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
+> +			 const struct tcp_ao_hdr *aoh, int l3index, u32 seq,
+> +			 struct tcp_ao_key **key, char **traffic_key,
+> +			 bool *allocated_traffic_key, u8 *keyid, u32 *sne)
+> +{
+> +	struct tcp_ao_info *ao_info;
 > +
-> +       /* Ensuring all pages have been split into one big frag initially:
-> +        * page_pool_set_pp_info() is only called once for every page when it
-> +        * is allocated from the page allocator and page_pool_fragment_page()
-> +        * is dirtying the same cache line as the page->pp_magic above, so
-> +        * the overhead is negligible.
-> +        */
-> +       page_pool_fragment_page(page, 1);
->         if (pool->p.init_callback)
->                 pool->p.init_callback(page, pool->p.init_arg);
+> +	*allocated_traffic_key = false;
+> +	/* If there's no socket - than initial sisn/disn are unknown.
+> +	 * Drop the segment. RFC5925 (7.7) advises to require graceful
+> +	 * restart [RFC4724]. Alternatively, the RFC5925 advises to
+> +	 * save/restore traffic keys before/after reboot.
+> +	 * Linux TCP-AO support provides TCP_AO_ADD_KEY and TCP_AO_REPAIR
+> +	 * options to restore a socket post-reboot.
+> +	 */
+> +	if (!sk)
+> +		return -ENOTCONN;
+> +
+> +	if ((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_NEW_SYN_RECV)) {
+> +		return -1;
+> +	} else {
+> +		struct tcp_ao_key *rnext_key;
+> +
+> +		if (sk->sk_state == TCP_TIME_WAIT)
+> +			return -1;
+> +		ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
+> +		if (!ao_info)
+> +			return -ENOENT;
+> +
+> +		*key = tcp_ao_established_key(ao_info, aoh->rnext_keyid, -1);
+> +		if (!*key)
+> +			return -ENOENT;
+> +		*traffic_key = snd_other_key(*key);
+> +		rnext_key = READ_ONCE(ao_info->rnext_key);
+> +		*keyid = rnext_key->rcvid;
+> +		*sne = 0;
+> +	}
+> +	return 0;
+> +}
+> +
+>  static int tcp_ao_cache_traffic_keys(const struct sock *sk,
+>  				     struct tcp_ao_info *ao,
+>  				     struct tcp_ao_key *ao_key)
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index 31169971cc56..f07a12f478d4 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -657,6 +657,52 @@ void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
 >  }
-> @@ -667,7 +675,7 @@ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
->                 struct page *page = virt_to_head_page(data[i]);
->
->                 /* It is not the last user for the page frag case */
-> -               if (!page_pool_is_last_frag(pool, page))
-> +               if (!page_pool_is_last_frag(page))
->                         continue;
->
->                 page = __page_pool_put_page(pool, page, -1, false);
-> --
-> 2.33.0
->
+>  EXPORT_SYMBOL(tcp_v4_send_check);
+>  
+> +#define REPLY_OPTIONS_LEN      (MAX_TCP_OPTION_SPACE / sizeof(__be32))
+> +
+> +static bool tcp_v4_ao_sign_reset(const struct sock *sk, struct sk_buff *skb,
+> +				 const struct tcp_ao_hdr *aoh,
+> +				 struct ip_reply_arg *arg, struct tcphdr *reply,
+> +				 __be32 reply_options[REPLY_OPTIONS_LEN])
+> +{
+> +#ifdef CONFIG_TCP_AO
+> +	int sdif = tcp_v4_sdif(skb);
+> +	int dif = inet_iif(skb);
+> +	int l3index = sdif ? dif : 0;
+> +	bool allocated_traffic_key;
+> +	struct tcp_ao_key *key;
+> +	char *traffic_key;
+> +	bool drop = true;
+> +	u32 ao_sne = 0;
+> +	u8 keyid;
+> +
+> +	rcu_read_lock();
+> +	if (tcp_ao_prepare_reset(sk, skb, aoh, l3index, reply->seq,
+> +				 &key, &traffic_key, &allocated_traffic_key,
+> +				 &keyid, &ao_sne))
+
+Hi Dmitry,
+
+The type of the 4th parameter of tcp_ao_prepare_reset() (seq) is u32,
+but here a __be32 value is passed.
+
+Also, it seems that parameter is unused by tcp_ao_prepare_reset().
+
+> +		goto out;
+> +
+> +	reply_options[0] = htonl((TCPOPT_AO << 24) | (tcp_ao_len(key) << 16) |
+> +				 (aoh->rnext_keyid << 8) | keyid);
+> +	arg->iov[0].iov_len += round_up(tcp_ao_len(key), 4);
+> +	reply->doff = arg->iov[0].iov_len / 4;
+> +
+> +	if (tcp_ao_hash_hdr(AF_INET, (char *)&reply_options[1],
+> +			    key, traffic_key,
+> +			    (union tcp_ao_addr *)&ip_hdr(skb)->saddr,
+> +			    (union tcp_ao_addr *)&ip_hdr(skb)->daddr,
+> +			    reply, ao_sne))
+> +		goto out;
+> +	drop = false;
+> +out:
+> +	rcu_read_unlock();
+> +	if (allocated_traffic_key)
+> +		kfree(traffic_key);
+> +	return drop;
+> +#else
+> +	return true;
+> +#endif
+> +}
+> +
+>  /*
+>   *	This routine will send an RST to the other tcp.
+>   *
+
+...
+
+> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+
+...
+
+> @@ -1064,6 +1088,19 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
+>  		ack_seq = ntohl(th->seq) + th->syn + th->fin + skb->len -
+>  			  (th->doff << 2);
+>  
+> +#ifdef CONFIG_TCP_AO
+> +	if (aoh) {
+> +		int l3index;
+> +
+> +		l3index = tcp_v6_sdif(skb) ? tcp_v6_iif_l3_slave(skb) : 0;
+> +		if (tcp_ao_prepare_reset(sk, skb, aoh, l3index, htonl(seq),
+
+Ditto.
+
+> +					 &ao_key, &traffic_key,
+> +					 &allocated_traffic_key,
+> +					 &rcv_next, &ao_sne))
+> +			goto out;
+> +	}
+> +#endif
+> +
+>  	if (sk) {
+>  		oif = sk->sk_bound_dev_if;
+>  		if (sk_fullsock(sk)) {
+
+...
 
