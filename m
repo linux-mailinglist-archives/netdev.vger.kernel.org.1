@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-27882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34AB77D827
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:11:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B694D77D828
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D5422816E0
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:11:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F4ED2816AB
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E240B3FDC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACF13FE6;
 	Wed, 16 Aug 2023 02:10:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E0717E9;
-	Wed, 16 Aug 2023 02:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ADB7CC4339A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C2B17EA
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A4E38C433CA;
 	Wed, 16 Aug 2023 02:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1692151822;
-	bh=LEZiyAZvEFf3DpLJrZwKPIG/qGDBJjfBRWr7FWdg6v4=;
+	bh=TvIcGdfs/e4rVml4DBfZeSRdAvc8xZa3p4ubeI6k6Zw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JoOoEOO8DdvoFLVXg0WWZwr2HzVw1Tp6xisYS2s61PcO6pHtdD+Z2+9ysQm9Y/d8d
-	 hScf63lQjbCqNflmQvPLRZIGqD63balgLlZkB7XMIzDUgiL5moEveLQQJljPFTq4vD
-	 1Vr2+QbJPPFBF0B27lxVuVqjtPNicCPdIJ8qsBXbNgi5vij1QFRLjPQ/5azjfomfU2
-	 +bfGgMFdc3mxWqXBGDuhOcFdPEbMMAwZLrS91lm8tis0hTk+Vdkqx7zUM5+Ue2ypBb
-	 GyCcthQbC3MALJ83ktiZ58vN3ClJ1tUVqsezMLEpeqToJhcZJ8kxe6qefsBIOOYfWY
-	 EIYl+WtKPVaZw==
+	b=RqlYx5H82mJJTuVHRJqQyRpvpzD67Chg7cjNxu7B59I7ymNWVpQvkXYUyDgpB5xQC
+	 MkARVpIgBu2BUTwXN9kmkpBNFylxhzjBkfX2h+6wLBcMSqx4Y0e3bi5egrW58Z/a+0
+	 aqn9aRSUap9/f10MyUH5mpCTpjSvCzYOmTdow1XKnizfSbSOQntHaf/GoWXCkac/qV
+	 p8HT/pvXr7UqyG8IzxwgNe1nbgTJHCnhkwPcPHtKfjy2BSQ/DFQl8SU3on/Rtw45Hu
+	 LnLfhp/YXduUXSmE3brfDZ4VH0ZMXHbigVj78CEtMd5AtgCvT69L04L198nKzOYdEB
+	 c38362cfKzmcg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92F15C395C5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8753DC691E1;
 	Wed, 16 Aug 2023 02:10:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,38 +41,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] qed: remove unused 'resp_size' calculation
+Subject: Re: [PATCH net-next] net: e1000e: Remove unused declarations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169215182259.21752.4980057098192603283.git-patchwork-notify@kernel.org>
+ <169215182255.21752.11821443988284205958.git-patchwork-notify@kernel.org>
 Date: Wed, 16 Aug 2023 02:10:22 +0000
-References: <20230814074512.1067715-1-arnd@kernel.org>
-In-Reply-To: <20230814074512.1067715-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: aelior@marvell.com, manishc@marvell.com, arnd@arndb.de,
+References: <20230814135821.4808-1-yuehaibing@huawei.com>
+In-Reply-To: <20230814135821.4808-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- nathan@kernel.org, ndesaulniers@google.com, trix@redhat.com,
- Yuval.Mintz@qlogic.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 14 Aug 2023 09:45:03 +0200 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Mon, 14 Aug 2023 21:58:21 +0800 you wrote:
+> Commit bdfe2da6aefd ("e1000e: cosmetic move of function prototypes to the new mac.h")
+> declared but never implemented them.
 > 
-> Newer versions of clang warn about this variable being assigned but
-> never used:
-> 
-> drivers/net/ethernet/qlogic/qed/qed_vf.c:63:67: error: parameter 'resp_size' set but not used [-Werror,-Wunused-but-set-parameter]
-> 
-> [...]
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  drivers/net/ethernet/intel/e1000e/mac.h | 2 --
+>  1 file changed, 2 deletions(-)
 
 Here is the summary with links:
-  - qed: remove unused 'resp_size' calculation
-    https://git.kernel.org/netdev/net-next/c/7a456b894ea5
+  - [net-next] net: e1000e: Remove unused declarations
+    https://git.kernel.org/netdev/net-next/c/3bfdcc324a04
 
 You are awesome, thank you!
 -- 
