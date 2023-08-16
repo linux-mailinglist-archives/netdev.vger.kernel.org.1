@@ -1,137 +1,115 @@
-Return-Path: <netdev+bounces-27999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62BB377DD70
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:39:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C3EC77DDDE
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:52:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3604A1C20F0C
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:39:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F3228187F
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAA7DF6F;
-	Wed, 16 Aug 2023 09:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B10FBE9;
+	Wed, 16 Aug 2023 09:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B91D52B
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:39:38 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BCC13E
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:39:37 -0700 (PDT)
-Received: from dggpeml500003.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RQjj52X8zzVk6v;
-	Wed, 16 Aug 2023 17:37:29 +0800 (CST)
-Received: from [10.174.177.173] (10.174.177.173) by
- dggpeml500003.china.huawei.com (7.185.36.200) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 16 Aug 2023 17:39:34 +0800
-Message-ID: <c232243d-0c5a-c253-5e3b-81be2479b776@huawei.com>
-Date: Wed, 16 Aug 2023 17:39:33 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15905DF71
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:52:23 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B994272C;
+	Wed, 16 Aug 2023 02:51:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vPIRm+r2j/XGNQXmGb4kJZdwIiaYA0yFVuKELbN9uLA=; b=oyNmb5IZWnRRDkvSc1JUzx4yvm
+	LaVAUu4hmkg/TtletDcU/VC5E9VSgwp03B4OVBq03ZPk+9afMC+7tKkb6yg7DQ50tiV3Q32RBjlx5
+	jeR3Rw5K6R0mjxEfyNijqOP5XGAf0NzOVA/uKpayTE89oWcTHQmQO+sakz4KsUffXIhCWrm2wrtxb
+	Gc394NOj28WCq8AAriIPnTOBwT+AEAl+rKWv36+WFggWjr+nYZzxORA7KY1u4gLIuMHaL5MOoJldG
+	pcmp7BwXNppsxj4wmtWUxDCkyAGJSFerBpDBHF/62zdR/GD5nIfag2cQ2POAyh9nvwN541AJ6p8TW
+	Ff48bYqQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45260)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qWDBn-0002b3-2d;
+	Wed, 16 Aug 2023 10:51:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qWDBl-0007ug-W6; Wed, 16 Aug 2023 10:51:42 +0100
+Date: Wed, 16 Aug 2023 10:51:41 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Justin Stitt <justinstitt@google.com>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] net: mdio: fix -Wvoid-pointer-to-enum-cast warning
+Message-ID: <ZNycLZCK4GGfayWg@shell.armlinux.org.uk>
+References: <20230815-void-drivers-net-mdio-mdio-xgene-v1-1-5304342e0659@google.com>
+ <cf3a36ea-d8d2-4560-9032-04ecc2ad7495@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH net-next] pds_core: remove redundant pci_clear_master()
-Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <liwei391@huawei.com>, Xiongfeng Wang
-	<wangxiongfeng2@huawei.com>
-References: <20230816013802.2985145-1-liaoyu15@huawei.com>
- <20230816063820.GV22185@unreal>
-From: Yu Liao <liaoyu15@huawei.com>
-In-Reply-To: <20230816063820.GV22185@unreal>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.177.173]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500003.china.huawei.com (7.185.36.200)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf3a36ea-d8d2-4560-9032-04ecc2ad7495@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/16 14:38, Leon Romanovsky wrote:
-> On Wed, Aug 16, 2023 at 09:38:02AM +0800, Yu Liao wrote:
->> pci_disable_device() involves disabling PCI bus-mastering. So remove
->> redundant pci_clear_master().
+On Tue, Aug 15, 2023 at 10:41:39PM +0200, Andrew Lunn wrote:
+> On Tue, Aug 15, 2023 at 08:35:59PM +0000, Justin Stitt wrote:
+> > When building with clang 18 I see the following warning:
+> > |       drivers/net/mdio/mdio-xgene.c:338:13: warning: cast to smaller integer
+> > |               type 'enum xgene_mdio_id' from 'const void *' [-Wvoid-pointer-to-enum-cast]
+> > |         338 |                 mdio_id = (enum xgene_mdio_id)of_id->data;
+> > 
+> > This is due to the fact that `of_id->data` is a void* while `enum
+> > xgene_mdio_id` has the size of an int. This leads to truncation and
+> > possible data loss.
+> > 
+> > Link: https://github.com/ClangBuiltLinux/linux/issues/1910
+> > Reported-by: Nathan Chancellor <nathan@kernel.org>
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
 > 
-> I would say that this commit message needs to be more descriptive and
-> explain why pci_disable_device() will actually disable PCI in these
-> flows.
-> 
-> According to the doc and code:
->   2263  * Note we don't actually disable the device until all callers of 
->   2264  * pci_enable_device() have called pci_disable_device().
-> 
-> Thanks
-> 
-Thank you for the review. My bad, I didn't describe it clearly in commit
-message. I will send the v2 version and add the following explanation:
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-do_pci_disable_device() disable PCI bus-mastering as following:
-static void do_pci_disable_device(struct pci_dev *dev)
-{
-		u16 pci_command;
+I wonder whether it would be better to use device_get_match_data()
+here? The whole of_match_device()...acpi_match_device() dance could
+become:
 
-		pci_read_config_word(dev, PCI_COMMAND, &pci_command);
-		if (pci_command & PCI_COMMAND_MASTER) {
-				pci_command &= ~PCI_COMMAND_MASTER;
-				pci_write_config_word(dev, PCI_COMMAND, pci_command);
-		}
++	mdio_id = (uintptr_t)device_get_match_data(&pdev->dev);
+	if (!mdio_id)
+		return -ENODEV;
 
-		pcibios_disable_device(dev);
-}
-And pci_disable_device() sets dev->is_busmaster to 0.
+It's probably something for a follow-up patch though.
 
-So for pci_dev that has called pci_enable_device(), pci_disable_device()
-involves disabling PCI bus-mastering. Remove redundant pci_clear_master() in
-the following places:
-- In error path 'err_out_clear_master' of pdsc_probe(), pci_enable_device()
-has already been called.
-- In pdsc_remove(), pci_enable_device() has already been called in pdsc_probe().
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Best regards,
-Yu
->>
->> Signed-off-by: Yu Liao <liaoyu15@huawei.com>
->> ---
->>  drivers/net/ethernet/amd/pds_core/main.c | 2 --
->>  1 file changed, 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
->> index 672757932246..ffe619cff413 100644
->> --- a/drivers/net/ethernet/amd/pds_core/main.c
->> +++ b/drivers/net/ethernet/amd/pds_core/main.c
->> @@ -374,7 +374,6 @@ static int pdsc_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->>  	return 0;
->>  
->>  err_out_clear_master:
->> -	pci_clear_master(pdev);
->>  	pci_disable_device(pdev);
->>  err_out_free_ida:
->>  	ida_free(&pdsc_ida, pdsc->uid);
->> @@ -439,7 +438,6 @@ static void pdsc_remove(struct pci_dev *pdev)
->>  		pci_release_regions(pdev);
->>  	}
->>  
->> -	pci_clear_master(pdev);
->>  	pci_disable_device(pdev);
->>  
->>  	ida_free(&pdsc_ida, pdsc->uid);
->> -- 
->> 2.25.1
->>
->>
+Thanks!
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
