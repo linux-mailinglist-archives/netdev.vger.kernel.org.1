@@ -1,155 +1,88 @@
-Return-Path: <netdev+bounces-28207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E457177EAE2
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:40:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F23E77EAE5
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A592A281BED
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:40:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBE22281C33
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A623617741;
-	Wed, 16 Aug 2023 20:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F2F17AA2;
+	Wed, 16 Aug 2023 20:41:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FB617E9
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:40:52 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33235270A
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 13:40:41 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-511-UVej7SCuNTaMZOsoaiiO-A-1; Wed, 16 Aug 2023 16:40:24 -0400
-X-MC-Unique: UVej7SCuNTaMZOsoaiiO-A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF6A2185A78B;
-	Wed, 16 Aug 2023 20:40:23 +0000 (UTC)
-Received: from hog (unknown [10.39.192.31])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C9E9140E962;
-	Wed, 16 Aug 2023 20:40:21 +0000 (UTC)
-Date: Wed, 16 Aug 2023 22:40:20 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v1 4/5] net: macsec: introduce mdo_insert_tx_tag
-Message-ID: <ZN00NB7RayXAl80f@hog>
-References: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
- <20230811153249.283984-5-radu-nicolae.pirea@oss.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDC317729
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:41:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45F07C433C8;
+	Wed, 16 Aug 2023 20:41:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692218474;
+	bh=RPmVwsWqJweI89XQGrUhcOSnhBGMBcv+aHzDZTWy+ls=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JNv8HuilN+YZZJlNwvkP/IP//4HHYMxK6gU1oTm1rubGhs0+d0jdpOzfPKLOrDURM
+	 xmnDo0YxjFMkyPjTUM2ZfE7RR45YHvnimsZU2oF+1qUpgbObs7Cu8McVbJEIm8ZU7M
+	 qwiAUsHNeywu8dqxvGXRMbYQ4yXznxrP5h9A4sl0kV4IOKdRW6jA5VZP/zYD8bg43h
+	 JDPBWnb28oK3x6IZQQ+ZT54FF7+TBoJPtV8pXFCf4ikishnYu4Niryf+5oidWd1PQs
+	 ijP1HI/bAcf3fqfhaLh5gXBC4i75EGqbuSKxEzLGm/FGlG9AX8mdAfJk7U/kROzMxk
+	 dv4t9bFdppEBA==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net 0/2] mlx5 fixes 2023-08-16
+Date: Wed, 16 Aug 2023 13:41:06 -0700
+Message-ID: <20230816204108.53819-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230811153249.283984-5-radu-nicolae.pirea@oss.nxp.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-2023-08-11, 18:32:48 +0300, Radu Pirea (NXP OSS) wrote:
-> Offloading MACsec in PHYs requires inserting the SecTAG and the ICV in
-> the ethernet frame. This operation will increase the frame size with 32
-> bytes.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-"up to 32 bytes"?
+This series provides bug fixes to mlx5 driver.
+Please pull and let me know if there is any problem.
 
-The SecTAG and ICV can both be shorter, at least with the software
-implementation.
+Thanks,
+Saeed.
 
 
-[...]
-> +static struct sk_buff *insert_tx_tag(struct sk_buff *skb,
-> +				     struct net_device *dev)
-> +{
-[...]
-> +
-> +	ctx.secy = &macsec->secy;
-> +	ctx.skb = skb;
+The following changes since commit de4c5efeeca7172306bdc2e3efc0c6c3953bb338:
 
-I think it would be a bit more readable to just pass the skb to
- ->mdo_insert_tx_tag instead of adding it to the context.
+  Merge tag 'nf-23-08-16' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2023-08-16 11:11:24 +0100)
 
-> +
-> +	err = ops->mdo_insert_tx_tag(&ctx);
-> +	if (err)
-> +		goto cleanup;
+are available in the Git repository at:
 
-[...]
-> @@ -3403,6 +3470,13 @@ static netdev_tx_t macsec_start_xmit(struct sk_buff *skb,
->  		skb_dst_drop(skb);
->  		dst_hold(&md_dst->dst);
->  		skb_dst_set(skb, &md_dst->dst);
-> +
-> +		skb = insert_tx_tag(skb, dev);
-> +		if (IS_ERR(skb)) {
-> +			dev->stats.tx_dropped++;
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-fixes-2023-08-16
 
-That should probably use DEV_STATS_INC (see commit
-32d0a49d36a2 ("macsec: use DEV_STATS_INC()")).
+for you to fetch changes up to 0fd23db0cc74cf6d28d26ce5e7802e982608d830:
 
-> +			return NETDEV_TX_OK;
-> +		}
-> +
->  		skb->dev = macsec->real_dev;
->  		return dev_queue_xmit(skb);
->  	}
-> @@ -4137,6 +4211,11 @@ static int macsec_newlink(struct net *net, struct net_device *dev,
->  			if (err)
->  				goto del_dev;
->  		}
-> +
-> +		dev->needed_headroom -= MACSEC_NEEDED_HEADROOM;
-> +		dev->needed_headroom += ops->needed_headroom;
-> +		dev->needed_tailroom -= MACSEC_NEEDED_TAILROOM;
-> +		dev->needed_tailroom += ops->needed_tailroom;
+  net/mlx5: Fix mlx5_cmd_update_root_ft() error flow (2023-08-16 13:39:28 -0700)
 
-If the driver doesn't set ops->needed_headroom, we'll subtract
-MACSEC_NEEDED_HEADROOM and not add anything back. Is that correct for
-all existing drivers? (and same for tailroom)
+----------------------------------------------------------------
+mlx5-fixes-2023-08-16
 
-You set needed_tailroom to 0 in your driver, but the commit message
-for this patch says that the HW needs space for the ICV. I'm a bit
-puzzled by this, especially since MACSEC_NEEDED_TAILROOM already
-reserves space for the ICV.
+----------------------------------------------------------------
+Dragos Tatulea (1):
+      net/mlx5e: XDP, Fix fifo overrun on XDP_REDIRECT
 
-Also, since this is pattern repeated twice more (with a sign change)
-in macsec_update_offload, we could probably stuff this into a helper
-(either modifying dev->needed_headroom directly, or returning the
-value to add/subtract).
+Shay Drory (1):
+      net/mlx5: Fix mlx5_cmd_update_root_ft() error flow
 
->  	}
->  
-
-[...]
-> @@ -302,6 +303,10 @@ struct macsec_ops {
->  	int (*mdo_get_tx_sa_stats)(struct macsec_context *ctx);
->  	int (*mdo_get_rx_sc_stats)(struct macsec_context *ctx);
->  	int (*mdo_get_rx_sa_stats)(struct macsec_context *ctx);
-> +	/* Offload tag */
-> +	int (*mdo_insert_tx_tag)(struct macsec_context *ctx);
-> +	int needed_headroom;
-> +	int needed_tailroom;
-
-unsigned?
-
->  };
-
--- 
-Sabrina
-
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.h  |  2 ++
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  8 +++++---
+ drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c  | 10 +++++++++-
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
