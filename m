@@ -1,39 +1,82 @@
-Return-Path: <netdev+bounces-27984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53AD377DCFE
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:10:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A0E77DD02
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAB71C20DBC
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:10:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB7B2281853
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCF5D536;
-	Wed, 16 Aug 2023 09:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12A7D539;
+	Wed, 16 Aug 2023 09:12:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56837D521
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:10:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 93202C433C9;
-	Wed, 16 Aug 2023 09:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692177021;
-	bh=bmFUkTY0/U/wRBaz9A+ggu1g77MT/EYx3l109QRL4HM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RvOwKvjRcA7MiOm605oQ9KfsL4JHhHFjSu22GxaW1nckK4a0MFIJG9M1wXjieUpgj
-	 khzB/PxGs+ZzoAppw58uMaPSARKauo+GQP6k0jS3bmXhxTlSq6uFyzHa7rsvNVINDZ
-	 CIkH16n9NTZ0LamMwFnYEtzaRY7EnlOrfAMBgagux+CRL/EvBuMbwoN37LGZ1aLFPA
-	 oyEbqJaDuM8QDUVcUafRUL3EdX5l3BPVtwT83rVQfAufBmex5dZ41ALFI/fnb5NCLh
-	 81Y7L+84TqwhBNNhA18cC64IEI0FGsAeAv//HEnt2ohi7LlqqPcVpD+SIwOwK/a2DB
-	 dGPunp7yioeUw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7540FC691E1;
-	Wed, 16 Aug 2023 09:10:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9233AD307
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:12:51 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692351FC1
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:12:49 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bc6535027aso53239515ad.2
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:12:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1692177169; x=1692781969;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+F832O1MonV9zoGUjcIJejeSoQ3hJAaI+0iai7pqbdQ=;
+        b=aEecXckP7vra0nLZVh5J+v5iJFeL/deIsacfTqmIgWMZS6GxfQjrtgRD8ZGxvNfCNC
+         6DDeY2goYhxglbyQ5f8RsbzcqNM7LhY+Rr8ylnQ+2n/biG2KA/ifYVWuPYmKoAn3KRWi
+         1S67/08oO069TudRASY8IVn9wcaphqGkR5Zl+fVKQV+nm2tzW7SAadL5B9qdZnpTTNgL
+         zla6SQLwoq1VHY5KzIzRgqlvHfMZac4/gmEqMgSeBWnpzRnqVZChf59cJT9yWXIqVaiH
+         1JGaGL4dtVH5a4dvl8++or/vRWjYpP/DESEYTC4q93GQyL1273HnCKbJ1nmJRFXtekSA
+         lSqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692177169; x=1692781969;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+F832O1MonV9zoGUjcIJejeSoQ3hJAaI+0iai7pqbdQ=;
+        b=cOrroRsSboy7vvvRsqnHccUcaW7d0Dx1bhD4R6bWH3HwNQe3YFo1cDHudQmg7oH0Pm
+         /oQvVgQl08coiqGfW8DEYB1CAIJQdidwhcUvkQnU/qAW81vQq4a5XXrK/UY+BzEjMhXo
+         qv3o73u9lI42CWZ1HxpdW2oDoHrq97SCbOoC38zLH3irmDGdYDi26aepYlzlrf/l3l9i
+         wO9NhSvsW6aB0FMMbAaxEF6l/jlDeae/REelutDmThEDo2wMaji8hIdkYSEd2frH5wJz
+         nwYNrCwEmcd6LUqJm45xlPwzeEq3Eid8/pjGPLvN1XSEYD7NqHLcP3R3NaXChtKwO+9j
+         coHA==
+X-Gm-Message-State: AOJu0YybXd89MawWNz5C8FeCsZRY4Rwbkfg+EJcjIkBO9sE581+qNryK
+	Ka6SXpFwbiqiP5jbCHPOkzPecg==
+X-Google-Smtp-Source: AGHT+IEL7B3gvo5NUfmmMlhYVZKdjtMYjohsMWpe+dAqaLbYkRSrdkxGQXA7IZtLQaHOjdUeOW4orQ==
+X-Received: by 2002:a17:902:da8b:b0:1b5:64a4:be8b with SMTP id j11-20020a170902da8b00b001b564a4be8bmr1633362plx.35.1692177168892;
+        Wed, 16 Aug 2023 02:12:48 -0700 (PDT)
+Received: from C02DV8HUMD6R.bytedance.net ([240e:694:e21:b::2])
+        by smtp.gmail.com with ESMTPSA id g14-20020a170902868e00b001bc2831e1a9sm12574066plo.90.2023.08.16.02.12.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 02:12:48 -0700 (PDT)
+From: Abel Wu <wuyun.abel@bytedance.com>
+To: Shakeel Butt <shakeelb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	David Howells <dhowells@redhat.com>,
+	Jason Xing <kernelxing@tencent.com>,
+	Glauber Costa <glommer@parallels.com>,
+	KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujtsu.com>
+Cc: Abel Wu <wuyun.abel@bytedance.com>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] sock: Fix misuse of sk_under_memory_pressure()
+Date: Wed, 16 Aug 2023 17:12:22 +0800
+Message-Id: <20230816091226.1542-1-wuyun.abel@bytedance.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,61 +84,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/5] net: Remove redundant of_match_ptr() macro
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169217702147.13419.3048871621351512255.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Aug 2023 09:10:21 +0000
-References: <20230814025447.2708620-1-ruanjinjie@huawei.com>
-In-Reply-To: <20230814025447.2708620-1-ruanjinjie@huawei.com>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- clement.leger@bootlin.com, ulli.kroll@googlemail.com, kvalo@kernel.org,
- bhupesh.sharma@linaro.org, robh@kernel.org, elder@linaro.org,
- wei.fang@nxp.com, nicolas.ferre@microchip.com, simon.horman@corigine.com,
- romieu@fr.zoreil.com, dmitry.torokhov@gmail.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-wireless@vger.kernel.org
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+The status of global socket memory pressure is updated when:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+  a) __sk_mem_raise_allocated():
 
-On Mon, 14 Aug 2023 10:54:42 +0800 you wrote:
-> Since these net drivers depend on CONFIG_OF, there is
-> no need to wrap the macro of_match_ptr() here.
-> 
-> Changes in v3:
-> - Collect responses from v1 and v2.
-> 
-> Ruan Jinjie (5):
->   net: dsa: realtek: Remove redundant of_match_ptr()
->   net: dsa: rzn1-a5psw: Remove redundant of_match_ptr()
->   net: gemini: Remove redundant of_match_ptr()
->   net: qualcomm: Remove redundant of_match_ptr()
->   wlcore: spi: Remove redundant of_match_ptr()
-> 
-> [...]
+	enter: sk_memory_allocated(sk) >  sysctl_mem[1]
+	leave: sk_memory_allocated(sk) <= sysctl_mem[0]
 
-Here is the summary with links:
-  - [net-next,v3,1/5] net: dsa: realtek: Remove redundant of_match_ptr()
-    https://git.kernel.org/netdev/net-next/c/aae249dfa089
-  - [net-next,v3,2/5] net: dsa: rzn1-a5psw: Remove redundant of_match_ptr()
-    https://git.kernel.org/netdev/net-next/c/81d463c02b91
-  - [net-next,v3,3/5] net: gemini: Remove redundant of_match_ptr()
-    https://git.kernel.org/netdev/net-next/c/21b566fda00f
-  - [net-next,v3,4/5] net: qualcomm: Remove redundant of_match_ptr()
-    https://git.kernel.org/netdev/net-next/c/537a6b992708
-  - [net-next,v3,5/5] wlcore: spi: Remove redundant of_match_ptr()
-    https://git.kernel.org/netdev/net-next/c/cf2abd872431
+  b) __sk_mem_reduce_allocated():
 
-You are awesome, thank you!
+	leave: sk_under_memory_pressure(sk) &&
+		sk_memory_allocated(sk) < sysctl_mem[0]
+
+So the conditions of leaving global pressure are inconstant, which
+may lead to the situation that one pressured net-memcg prevents the
+global pressure from being cleared when there is indeed no global
+pressure, thus the global constrains are still in effect unexpectedly
+on the other sockets.
+
+This patch fixes this by ignoring the net-memcg's pressure when
+deciding whether should leave global memory pressure.
+
+Fixes: e1aab161e013 ("socket: initial cgroup code.")
+Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+---
+ include/net/sock.h | 6 ++++++
+ net/core/sock.c    | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 2eb916d1ff64..e3d987b2ef12 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1420,6 +1420,12 @@ static inline bool sk_has_memory_pressure(const struct sock *sk)
+ 	return sk->sk_prot->memory_pressure != NULL;
+ }
+ 
++static inline bool sk_under_global_memory_pressure(const struct sock *sk)
++{
++	return sk->sk_prot->memory_pressure &&
++		!!*sk->sk_prot->memory_pressure;
++}
++
+ static inline bool sk_under_memory_pressure(const struct sock *sk)
+ {
+ 	if (!sk->sk_prot->memory_pressure)
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 732fc37a4771..c9cffb7acbea 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3159,7 +3159,7 @@ void __sk_mem_reduce_allocated(struct sock *sk, int amount)
+ 	if (mem_cgroup_sockets_enabled && sk->sk_memcg)
+ 		mem_cgroup_uncharge_skmem(sk->sk_memcg, amount);
+ 
+-	if (sk_under_memory_pressure(sk) &&
++	if (sk_under_global_memory_pressure(sk) &&
+ 	    (sk_memory_allocated(sk) < sk_prot_mem_limits(sk, 0)))
+ 		sk_leave_memory_pressure(sk);
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.37.3
 
 
