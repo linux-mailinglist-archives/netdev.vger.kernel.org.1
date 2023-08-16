@@ -1,85 +1,67 @@
-Return-Path: <netdev+bounces-27877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E37F77D816
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:01:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B4477D81A
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:06:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C5B61C20D72
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:01:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E4811C20DB8
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6771845;
-	Wed, 16 Aug 2023 02:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A826E138E;
+	Wed, 16 Aug 2023 02:06:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4F017FC
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7AD52C433CA;
-	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C46C1388
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:06:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C94CBC433C8;
+	Wed, 16 Aug 2023 02:06:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692151223;
-	bh=uo0dS05ehuNtp06FSMaefF4U3nuAKbJE2+PrD/C9v8I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tp3+KEOIUn1JbfzyR74BmpoqRjdwfkIGmw+HIhF8KrpB2YJuLxiRD5dAnta+ayLn7
-	 yQLqSsPz86oaH+gotC8y8nT6NBFUuvlATSnM2zUzzJYWtAjgd29ncgzbKyzkb47JoT
-	 zTdLfiOWiWaq8LPiLUZ5NrKxWVgUjFE+8VEF52iHsnel2zbAlBNbYLbenZz9a5z+4k
-	 ZtsdSLHzRhYg5RAt6LqrMZcT+FQMwhL8jsUOrmnuXXOubYlii+QfoKoEFqO5iOGM3X
-	 +vsljbAiRlukOYwH1MBsF/Nk1rdjqruZLr8xziwQfgGdenF563Pd8hUX07XmE6MWgd
-	 uqi+dvrSXosNA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6087BC691E1;
-	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692151604;
+	bh=CGNr34szINxLhBzT8NdUd8WHz2+azRMk174GL2+Z4hE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e9Ntgg0olOvNh+a5uKYokd8H7stTFDGNz/3BiOmxBZLfGP1z8fOCYBQoUocGIhiqh
+	 n4Y14Qujq4xkSJs3aBQAQD9g1rj2O5IBL6KIHgD/UuKMY26fLuaCGIaoLAxRJ1qrWV
+	 DMiQdxuvV86nTaenT5hVNE89q1pWsRqt5D+CNRsHDNwsrv2mhbUSpeXp8wS+hr4XBt
+	 YMfwFthRPru5Z2tfNOh11eFN2GjLy13PyUZgzOCWL+MJexHUO3ZGmv0bs1jlAaDXJ1
+	 24GWtneX/VSEnvCyaEBBkmdGZ3E1xvsJEokwQq5EzKKd6f9p00VEoYv/zUJlj+jQms
+	 5qv0LL5BWo9sQ==
+Date: Tue, 15 Aug 2023 19:06:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Yue Haibing <yuehaibing@huawei.com>, <jesse.brandeburg@intel.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: e1000e: Remove unused declarations
+Message-ID: <20230815190642.315fa2af@kernel.org>
+In-Reply-To: <2ef66ad0-d8d2-ae28-9624-04a3fbe94de4@intel.com>
+References: <20230814135821.4808-1-yuehaibing@huawei.com>
+	<2ef66ad0-d8d2-ae28-9624-04a3fbe94de4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] nexthop: Various cleanups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169215122338.15326.7689857909989223047.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Aug 2023 02:00:23 +0000
-References: <20230813164856.2379822-1-idosch@nvidia.com>
-In-Reply-To: <20230813164856.2379822-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, petrm@nvidia.com,
- mlxsw@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 13 Aug 2023 19:48:54 +0300 you wrote:
-> Benefit from recent bug fixes and simplify the nexthop dump code.
+On Mon, 14 Aug 2023 15:19:10 -0700 Tony Nguyen wrote:
+> On 8/14/2023 6:58 AM, Yue Haibing wrote:
+> > Commit bdfe2da6aefd ("e1000e: cosmetic move of function prototypes to the new mac.h")
+> > declared but never implemented them.
+> > 
+> > Signed-off-by: Yue Haibing <yuehaibing@huawei.com>  
 > 
-> No regressions in existing tests:
+> I believe netdev has been taking all these unused declaration patches 
+> directly so...
 > 
->  # ./fib_nexthops.sh
->  [...]
->  Tests passed: 234
->  Tests failed:   0
-> 
-> [...]
+> Reviewed-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 
-Here is the summary with links:
-  - [net-next,1/2] nexthop: Simplify nexthop bucket dump
-    https://git.kernel.org/netdev/net-next/c/23ab9324fd26
-  - [net-next,2/2] nexthop: Do not increment dump sentinel at the end of the dump
-    https://git.kernel.org/netdev/net-next/c/db1428f66a8c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks! We do have a bit of a mixed record either applying these 
+or deferring to maintainers...
 
