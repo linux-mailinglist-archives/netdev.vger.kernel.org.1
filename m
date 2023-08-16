@@ -1,108 +1,120 @@
-Return-Path: <netdev+bounces-27893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043C377D881
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:40:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D9877D88C
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 356291C20F18
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:40:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEEDC1C20E9A
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F6817F7;
-	Wed, 16 Aug 2023 02:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C27C38E;
+	Wed, 16 Aug 2023 02:49:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E139D361
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:40:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D43EC433C9;
-	Wed, 16 Aug 2023 02:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375CD361
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:49:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B9FAC433C7;
+	Wed, 16 Aug 2023 02:49:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692153625;
-	bh=WccexzMEdR6xhTldlrjPROKHEcM4qSHGZt6G/tQ+SlM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dM1VrSbIXBvmT+eaz64b+iPvHnznULmNwaIZdWTSSZBwT9bhfxwHjUpm7CAavIkSq
-	 c1akUbTtk3VMYwppW6E8UgTWgixCwVIOTeJENH52YO2uE5Dar6vdAv3ibO/exWA67J
-	 C620u5OvqKVClV0UlCI7TZXKqfVIxN9CarnC3H7fLLil6z6jGzw9L+XoZekZeW8U2d
-	 MbDmax8l43IB7NHGa6ODMQKZRZTnM26G6j9wFEfIwliasxQNg2buLlkTpuXte2gIEV
-	 4L2RGvQn3w/AEK4cBw3WjMjYo2CaZjONYJrnnB2ER1edwY+9z1ElmeMFneyC5bbVX/
-	 UTfom52dQf/9w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 33D6EC39562;
-	Wed, 16 Aug 2023 02:40:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692154143;
+	bh=qozDx4yh9HzHvylBjtuByJEJLEIBEect//jNiGGxz2o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EmK9Pe9lEdckeDcR2yMbK8nW64pC5mh1xQRUdHZHqZt1HfQkyIEa5o1/zIcNlnGMm
+	 tALfDHHZuyuAoTjGv8mxGbUpJcLmcyKEwN4Ii9EmE795/LqfFvSlv7ajrBBPSEFEXm
+	 T7JojkGNoDRlpxrNbW7DqPHKbd5WDFHa+Aomj0iR6zboxpN2Xdale/lKikBtMQS2JW
+	 y1dNoqP/nXnjaPc1DhohiXMTsn3VrCOAzsAHveddOnMlk+V2CYWAl+SuNGHf43Yt2f
+	 7ZsG+EXXa75bhnBv4PLvtKpeg07heUPxVjxDVGrAzBN0DE9owWTHEosSje9FTKmjA+
+	 xfcatpUdj89Nw==
+Date: Tue, 15 Aug 2023 19:49:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Stanislav Fomichev
+ <sdf@google.com>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 02/10] doc/netlink: Document the
+ genetlink-legacy schema extensions
+Message-ID: <20230815194902.6ce9ae12@kernel.org>
+In-Reply-To: <20230815194254.89570-3-donald.hunter@gmail.com>
+References: <20230815194254.89570-1-donald.hunter@gmail.com>
+	<20230815194254.89570-3-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next 01/14] net/mlx5: Consolidate devlink documentation in
- devlink/mlx5.rst
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169215362520.5089.13536736279401930023.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Aug 2023 02:40:25 +0000
-References: <20230814214144.159464-2-saeed@kernel.org>
-In-Reply-To: <20230814214144.159464-2-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com, rrameshbabu@nvidia.com, jiri@nvidia.com, gal@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Saeed Mahameed <saeedm@nvidia.com>:
-
-On Mon, 14 Aug 2023 14:41:31 -0700 you wrote:
-> From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+On Tue, 15 Aug 2023 20:42:46 +0100 Donald Hunter wrote:
+> Add description of genetlink-legacy specific attributes to the ynl spec
+> documentation.
 > 
-> De-duplicate documentation by removing mellanox/mlx5/devlink.rst. Instead,
-> only use the generic devlink documentation directory to document mlx5
-> devlink parameters. Avoid providing general devlink tool usage information
-> in mlx5-specific documentation.
-> 
-> [...]
+> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> ---
+>  Documentation/userspace-api/netlink/specs.rst | 47 +++++++++++++++++++
+>  1 file changed, 47 insertions(+)
 
-Here is the summary with links:
-  - [net-next,01/14] net/mlx5: Consolidate devlink documentation in devlink/mlx5.rst
-    https://git.kernel.org/netdev/net-next/c/b608dd670bb6
-  - [net-next,02/14] net/mlx5e: Make tx_port_ts logic resilient to out-of-order CQEs
-    https://git.kernel.org/netdev/net-next/c/3178308ad4ca
-  - [net-next,03/14] net/mlx5e: Add recovery flow for tx devlink health reporter for unhealthy PTP SQ
-    https://git.kernel.org/netdev/net-next/c/53b836a44db4
-  - [net-next,04/14] net/mlx5: Expose max possible SFs via devlink resource
-    https://git.kernel.org/netdev/net-next/c/6486c0f44ed8
-  - [net-next,05/14] net/mlx5: Check with FW that sync reset completed successfully
-    https://git.kernel.org/netdev/net-next/c/a9f168e4c6e1
-  - [net-next,06/14] net/mlx5: E-switch, Add checking for flow rule destinations
-    https://git.kernel.org/netdev/net-next/c/e0e22d59b47a
-  - [net-next,07/14] net/mlx5: Use auxiliary_device_uninit() instead of device_put()
-    https://git.kernel.org/netdev/net-next/c/2ad0160c02be
-  - [net-next,08/14] net/mlx5: Remove redundant SF supported check from mlx5_sf_hw_table_init()
-    https://git.kernel.org/netdev/net-next/c/ae80d7a06fdb
-  - [net-next,09/14] net/mlx5: Use mlx5_sf_start_function_id() helper instead of directly calling MLX5_CAP_GEN()
-    https://git.kernel.org/netdev/net-next/c/88074d81e5fe
-  - [net-next,10/14] net/mlx5: Remove redundant check of mlx5_vhca_event_supported()
-    https://git.kernel.org/netdev/net-next/c/b63f8bde2fba
-  - [net-next,11/14] net/mlx5: Fix error message in mlx5_sf_dev_state_change_handler()
-    https://git.kernel.org/netdev/net-next/c/36e5a0efc810
-  - [net-next,12/14] net/mlx5: Remove unused CAPs
-    https://git.kernel.org/netdev/net-next/c/0b4eb603d635
-  - [net-next,13/14] net/mlx5: Remove unused MAX HCA capabilities
-    https://git.kernel.org/netdev/net-next/c/a41cb59117fa
-  - [net-next,14/14] net/mlx5: Don't query MAX caps twice
-    https://git.kernel.org/netdev/net-next/c/bd3a2f77809b
+Should we merge this with genetlink-legacy.rst?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> diff --git a/Documentation/userspace-api/netlink/specs.rst b/Documentation/userspace-api/netlink/specs.rst
+> index 2e4acde890b7..dde70f9674d4 100644
+> --- a/Documentation/userspace-api/netlink/specs.rst
+> +++ b/Documentation/userspace-api/netlink/specs.rst
+> @@ -443,3 +443,50 @@ nest
+>  
+>  Attribute containing other (nested) attributes.
+>  ``nested-attributes`` specifies which attribute set is used inside.
+> +
+> +genetlink-legacy
+> +================
+> +
+> +The genetlink-legacy schema extends the genetlink schema with some additional
+> +properties that are needed to support legacy genetlink families.
+> +
+> +Globals
+> +-------
+> +
+> + - ``kernel-policy`` - Specify whether the kernel input policy is ``global``,
+> +   ``per-op`` or ``split``.
 
+Maybe a few more words:
 
+ Specify whether the kernel input policy is ``global`` i.e. the same for
+ all operation of the family, defined for each operation individually 
+ (``per-op``), or separately for each operation and operation type
+ (do vs dump) - ``split``.
+
+> +   ``per-op`` or ``split``.
+
+> +Struct definitions
+> +------------------
+> +
+> +There is a new type of definition called ``struct`` which is used for declaring
+> +the C struct format of fixed headers and binary attributes.
+> +
+> +members
+> +~~~~~~~
+> +
+> + - ``name`` - The attribute name of the struct member
+> + - ``type`` - One of the scalar types ``u8``, ``u16``, ``u32``, ``u64``, ``s8``,
+> +   ``s16``, ``s32``, ``s64``, ``string`` or ``binary``.
+> + - ``byte-order`` - ``big-endian`` or ``little-endian``
+> + - ``doc``, ``enum``, ``enum-as-flags``, ``display-hint`` - Same as for
+> +   attribute definitions.
+
+Hm, genetlink-legacy.rst has this:
+
+https://docs.kernel.org/next/userspace-api/netlink/genetlink-legacy.html#structures
+
+But the larger section is called "Other quirks (todo)"
+I guess you have tackled most of the items in this section
+so we shouldn't call it "todo" ?
 
