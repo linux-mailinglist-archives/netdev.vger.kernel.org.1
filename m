@@ -1,162 +1,88 @@
-Return-Path: <netdev+bounces-27886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BEB177D84A
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A16677D821
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:10:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D646928169E
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:16:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3D7328169E
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2968820FE;
-	Wed, 16 Aug 2023 02:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7861C1844;
+	Wed, 16 Aug 2023 02:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BE920E7;
-	Wed, 16 Aug 2023 02:16:28 +0000 (UTC)
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B89DE5;
-	Tue, 15 Aug 2023 19:16:08 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VptxGi0_1692152164;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VptxGi0_1692152164)
-          by smtp.aliyun-inc.com;
-          Wed, 16 Aug 2023 10:16:05 +0800
-Message-ID: <1692151724.9150448-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v13 05/12] virtio_ring: introduce virtqueue_dma_dev()
-Date: Wed, 16 Aug 2023 10:08:44 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-References: <20230810123057.43407-1-xuanzhuo@linux.alibaba.com>
- <20230810123057.43407-6-xuanzhuo@linux.alibaba.com>
- <CACGkMEsaYbsWyOKxA-xY=3dSmvzq9pMdYbypG9q+Ry2sMwAMPg@mail.gmail.com>
- <1692081029.4299796-8-xuanzhuo@linux.alibaba.com>
- <CACGkMEt5RyOy_6rTXon_7py=ZmdJD=e4dMOGpNOo3NOyahGvjg@mail.gmail.com>
- <1692091669.428807-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEsnW-+fqcxu6E-cbAtMduE_n82fu+RA162fX5gr=Ckf5A@mail.gmail.com>
-In-Reply-To: <CACGkMEsnW-+fqcxu6E-cbAtMduE_n82fu+RA162fX5gr=Ckf5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A251115
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2DCDC433C9;
+	Wed, 16 Aug 2023 02:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692151821;
+	bh=CaFpAjNCWcVRURgQgE8O4q7qg700dTldnwEhYYY+hmc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=I+psWdQvxW6Aatq7VPCb1Rr25p+/7Z4iwUPFaCWu7mXRJRd4l6cf1sJEuGgxnPwV1
+	 qMtShX8AVZbqxVLH1HbYdg0oDXrWLm4P9wfxfeqaT7ddHv8nb5+OoAO5hZeRNknNWS
+	 RsoN9nX7ABideVeYv2tf96OLi0tqZwWz/31nWttOsZTzQd/4ycFmS3uNcQOxtpFaBm
+	 l/CAO26AJBZjpUhyvrcc3Ipq7/PZ145pG/29LZ9PvAQoCS1XYXSXIqQ9j3mwFU2fKc
+	 DYaE5EvYg5PfmSx1oJSthxyIQpweI9CNuOrfYOnLPSrrh4yHBm72S9emdlaJpYyOpg
+	 4pc4nSFRao8Mw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5B34C395C5;
+	Wed, 16 Aug 2023 02:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: openvswitch: reject negative ifindex
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169215182174.21752.2733766231645812511.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Aug 2023 02:10:21 +0000
+References: <20230814203840.2908710-1-kuba@kernel.org>
+In-Reply-To: <20230814203840.2908710-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, syzbot+7456b5dcf65111553320@syzkaller.appspotmail.com,
+ pshelar@ovn.org, andrey.zhadchenko@virtuozzo.com, brauner@kernel.org,
+ dev@openvswitch.org
 
-On Wed, 16 Aug 2023 09:13:48 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Aug 15, 2023 at 5:40=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Tue, 15 Aug 2023 15:50:23 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Tue, Aug 15, 2023 at 2:32=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > >
-> > > > Hi, Jason
-> > > >
-> > > > Could you skip this patch?
-> > >
-> > > I'm fine with either merging or dropping this.
-> > >
-> > > >
-> > > > Let we review other patches firstly?
-> > >
-> > > I will be on vacation soon, and won't have time to do this until next=
- week.
-> >
-> > Have a happly vacation.
-> >
-> > >
-> > > But I spot two possible "issues":
-> > >
-> > > 1) the DMA metadata were stored in the headroom of the page, this
-> > > breaks frags coalescing, we need to benchmark it's impact
-> >
-> > Not every page, just the first page of the COMP pages.
-> >
-> > So I think there is no impact.
->
-> Nope, see this:
->
->         if (SKB_FRAG_PAGE_ORDER &&
->             !static_branch_unlikely(&net_high_order_alloc_disable_key)) {
->                 /* Avoid direct reclaim but allow kswapd to wake */
->                 pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
- |
->                                           __GFP_COMP | __GFP_NOWARN |
->                                           __GFP_NORETRY,
->                                           SKB_FRAG_PAGE_ORDER);
->                 if (likely(pfrag->page)) {
->                         pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
->                         return true;
->                 }
->         }
->
-> The comp page might be disabled due to the SKB_FRAG_PAGE_ORDER and
-> net_high_order_alloc_disable_key.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 14 Aug 2023 13:38:40 -0700 you wrote:
+> Recent changes in net-next (commit 759ab1edb56c ("net: store netdevs
+> in an xarray")) refactored the handling of pre-assigned ifindexes
+> and let syzbot surface a latent problem in ovs. ovs does not validate
+> ifindex, making it possible to create netdev ports with negative
+> ifindex values. It's easy to repro with YNL:
+> 
+> $ ./cli.py --spec netlink/specs/ovs_datapath.yaml \
+>          --do new \
+> 	 --json '{"upcall-pid": 1, "name":"my-dp"}'
+> $ ./cli.py --spec netlink/specs/ovs_vport.yaml \
+> 	 --do new \
+> 	 --json '{"upcall-pid": "00000001", "name": "some-port0", "dp-ifindex":3,"ifindex":4294901760,"type":2}'
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: openvswitch: reject negative ifindex
+    https://git.kernel.org/netdev/net/c/a552bfa16bab
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-YES.
-
-But if comp page is disabled. Then we only get one page each time. The page=
-s are
-not contiguous, so we don't have frags coalescing.
-
-If you mean the two pages got from alloc_page may be contiguous. The coales=
-cing
-may then be broken. It's a possibility, but I think the impact will be smal=
-l.
-
-Thanks.
-
-
->
-> >
-> >
-> > > 2) pre mapped DMA addresses were not reused in the case of XDP_TX/XDP=
-_REDIRECT
-> >
-> > Because that the tx is not the premapped mode.
->
-> Yes, we can optimize this on top.
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> > >
-> > > I see Michael has merge this series so I'm fine to let it go first.
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > > Thanks.
-> > > >
-> > >
-> >
->
 
