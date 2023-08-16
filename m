@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-28195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C46177EA39
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:00:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808C977EA3B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79F8F281BF7
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:00:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B16E51C211B0
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4FDC17AA0;
-	Wed, 16 Aug 2023 20:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA5E17AC6;
+	Wed, 16 Aug 2023 20:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9B81773C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B1817737
 	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:00:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 08465C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 143C9C433C8;
 	Wed, 16 Aug 2023 20:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1692216022;
-	bh=D7d6wuVGzkWQOCUZmhR9pJ/mB+VrH8L9Q24bxgQAm/k=;
+	bh=FqhxkuPdgVbJETSXDsWvg4mXVhYdn8SeQrY8c+xWq78=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TejQbEIwzkNlw9KtnPwOjt3+MJejbe/Vf9JLtbRzhBs50hdqAlD/Mq1lVecQpKMU0
-	 pCSmIOFj91b63UnUIoW6pBZZA0wILyP23UESMAVeqNb6UporYbQZfJ+JLigx80OtSn
-	 YlyK9FDyCIipNLsqMXBrTc79uUPPfjCi5PdINgDsZ9ljtn2sln8J7aTKwVKZx+oQV0
-	 AmAkTB96r8VJsaOUE1LvWP3PrjrkOGj9MT6dJkRrOclue52t6MLFiyh926C2V+SCuN
-	 9IRGQJNI7l7yLTG66+bAAT9In8stG1kn7mcssPRk8S4CEC0Zr2R2fuNIr2dNI8rz4n
-	 06MnFvfjtmM8A==
+	b=riEM3m7lIRonoMiBMuDX96KWnMnZ3fbs0J1JuZenDRx3CQ73U2CTT2VjIknevpnoR
+	 nO7YTuKKyyqBPZrE7brSIShfw0RJdniaL2w08VfTRrR8Eo+YjxvhZVrGU47iT3e9JX
+	 aanczv4Su2UTNPFM9HoAFrws9+wWuH9UnFPrno7OC/ZgY1k1IWdp4jeOPAxhPk9cxg
+	 6pokkr7KKg7fGFXjSHSrRXqMMHdHIVfZv129b+sz2zCk3OMELAv6h9iD6PWBsgIN+e
+	 ckJT6Skr+rRV+Q6CfnVZNYkHoixt0X+3p8BnJGWZ55mGTAL8wABQtKEXCMxflDvtuA
+	 Y5SzwKJ8WvgbQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD62AE93B30;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EA150C395C5;
 	Wed, 16 Aug 2023 20:00:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,13 +41,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/3] bluetooth: qca: enable WCN7850 support
+Subject: Re: [PATCH v4 0/3] Bluetooth: qca: enable WCN7850 support
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <169221602190.24089.3443584024796789580.git-patchwork-notify@kernel.org>
+ <169221602195.24089.4864640872066685763.git-patchwork-notify@kernel.org>
 Date: Wed, 16 Aug 2023 20:00:21 +0000
-References: <20230803-topic-sm8550-upstream-bt-v3-0-6874a1507288@linaro.org>
-In-Reply-To: <20230803-topic-sm8550-upstream-bt-v3-0-6874a1507288@linaro.org>
+References: <20230816-topic-sm8550-upstream-bt-v4-0-2ea2212719f6@linaro.org>
+In-Reply-To: <20230816-topic-sm8550-upstream-bt-v4-0-2ea2212719f6@linaro.org>
 To: Neil Armstrong <neil.armstrong@linaro.org>
 Cc: luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
  kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
@@ -63,7 +63,7 @@ Hello:
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 03 Aug 2023 10:45:25 +0200 you wrote:
+On Wed, 16 Aug 2023 10:06:45 +0200 you wrote:
 > This serie enables WCN7850 on the Qualcomm SM8550 QRD
 > reference platform.
 > 
@@ -75,11 +75,11 @@ On Thu, 03 Aug 2023 10:45:25 +0200 you wrote:
 > [...]
 
 Here is the summary with links:
-  - [v3,1/3] dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
+  - [v4,1/3] dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
     https://git.kernel.org/bluetooth/bluetooth-next/c/f38a5adcbd53
-  - [v3,2/3] bluetooth: qca: use switch case for soc type behavior
+  - [v4,2/3] Bluetooth: qca: use switch case for soc type behavior
     https://git.kernel.org/bluetooth/bluetooth-next/c/08292727a9fc
-  - [v3,3/3] bluetooth: qca: add support for WCN7850
+  - [v4,3/3] Bluetooth: qca: add support for WCN7850
     https://git.kernel.org/bluetooth/bluetooth-next/c/ef6d9b23aa58
 
 You are awesome, thank you!
