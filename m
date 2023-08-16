@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-27952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB3D77DBF4
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:18:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8732E77DBFD
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:18:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D8602817FB
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:18:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A14D41C20F93
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE903DDD8;
-	Wed, 16 Aug 2023 08:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D164DDB0;
+	Wed, 16 Aug 2023 08:16:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3657DDB0
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:16:04 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83819AB
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:03 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c647150c254so12287946276.1
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C386DF63
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:16:06 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6FEEE
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:05 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58caf216c55so7867227b3.0
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692173763; x=1692778563;
+        d=google.com; s=20221208; t=1692173764; x=1692778564;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dknavbcC9Bcz2gPLnQJEvTLf17mtwuofLK2BxquEIlw=;
-        b=su19vBNWGNh+8ilnYVRmodD+Xht4r0RNIN+ldxTY3wZG7OFGoknrFsGakCXVoEiFFS
-         tLtau92GYpnWN9GnwIrI5eK5w/QoN/o76YGx0OWoeYrxJgPI2/uQFkfRsHkXmDWXFwXK
-         gYY4HYwSjyWsVMe5efBfGxumpkME3huVQ7iJZhMuTlxfYfmTqCy/+q6qL86UNRz1ZaMi
-         cU5Ujr3UbfCOFL/7ZXKC2SkY3kP1WbWEF+YpNrllFo0BM68+KAfVc3aTCIQHsnY86lZn
-         H1Fingu5p7HdxA76smn7bOiKxN1A6RgHkIWaVp7L94NPXTtBtzBJ30uGvzpDxm8I3BxN
-         KxAg==
+        bh=3ut2gdlMxMipTUJiVTfxGKUxuhfwMJJcZFVowGZ4FtM=;
+        b=FtMBxB2eN3J2IgZrmLs9+2/Kfzg2dv9DME/PZz/bVl/AbqV+hMY5lDyQtUIafzJdX0
+         1ILxHAWkM+2BpRVxUAcQO0auTn/PCyZlhplrw9M3clevSUoP0yHiJNTzNP295VqLuewB
+         a5l5L7OiVr2zQ58luXjWlKbLcSumLjZf/gP96To31R/Tkw1fvqC/HCQmo3ms8YZpMFG6
+         VMFqLomrse92HTa3+TuyVcZWKskIshUgLG290p8KlVExaiYNooq5BOjoeZxnlqM8/HE5
+         UaemE+zIVbWAMJGnbcexHXz05Ck7RwpS19O11/4aCrLEhRStw9gxO6QlqWQVc+qGCoJN
+         /6tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692173763; x=1692778563;
+        d=1e100.net; s=20221208; t=1692173764; x=1692778564;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dknavbcC9Bcz2gPLnQJEvTLf17mtwuofLK2BxquEIlw=;
-        b=kBnM1Ws/bbG4mWuJJ7lAE23T1OPD2c8ieJZUYpPaWF0R2OX+E9gC6Sq/9NaGpYUtzG
-         YGIt/Xy579qqh0PsGEnHJOI+DCakj11MwgKE6Fvke4RA91OLQ4fYcO4RluDJY3KR7Gmc
-         f6V4HDmN9puQjD5OJjB74TTS5EnhVTwH2TqF7Fkm7FdzXeyGKe07R4CaS91DKlk9JJER
-         /vWClhhkA6wTOjz2rTaz44ftqxlLb71VayGiXUpoIC3Jj9eDy19k61/d+Y+w2sknuPcq
-         EA1beyGy3GVvMaypR6V13UNpYYX7V/87bT1sWCXXyS5bFMaUXeG9AC0XcLCUN08fea6J
-         b/Aw==
-X-Gm-Message-State: AOJu0YzSQvldEHWh3z50yJZ5AVQZlJZFUmVL1wBDAZnCLu6tCxvjh01u
-	sz8lDThlesMFPBCxmw3RH2/YtQIVYmaO3g==
-X-Google-Smtp-Source: AGHT+IFJhcyD+zubzKlTUOk0++DRPZx+1DVrd3Z2IS1sZ/Zeb/fJQ/WnYPB5Fb0olHoQAis63TIO3As4LBLhdw==
+        bh=3ut2gdlMxMipTUJiVTfxGKUxuhfwMJJcZFVowGZ4FtM=;
+        b=dSV+nRfanbN5V4GqBLJ/Ie8TjlT/MYb145gKVSaFFIYKbrgzSHwD8L+8z6PHQSTron
+         SrBaWrb80oYtl+Ul6ftD7K+Ek7/LJXEsdbQbBFjCYOfv5HgqFDuRdTjnNUxzb03dRKwz
+         N9usDJ3+VP6Ew7i0dy9X9MJ1ttCoS0XMPkLQ9ZMeAvinNPzwktBrG6v7gh5ZBLjKdfQ+
+         V5MQTVcLYj2OABITgQXoURttIeJrZkyWBKyU1UOQN0oqjmmJX0/TVflABAuyir45PHDf
+         MuhsjSGiRsmNFmLLBUPQ0v2VzPjfTtKtH207mMmL5GvBjbMmj3gpsxFdd6YVfVFyLvlq
+         0xZw==
+X-Gm-Message-State: AOJu0YxePKgFK+BBrpms9ZtkEf0odXqvOsZo7/B9f1Vd6cU4NVn35tBq
+	mAGCH8/Aj0NjgDevBruvKtNPxmZ9WCxnKA==
+X-Google-Smtp-Source: AGHT+IEo1Ju3cH81XpHmUUao+gIKJ8+ZHh8S9Hvi/pe79+abWKlfiyCWF97GbWDBe2Q2m+uHkyadnVIlycW9zQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1818:b0:d08:95:76d with SMTP id
- cf24-20020a056902181800b00d080095076dmr22058ybb.6.1692173762770; Wed, 16 Aug
- 2023 01:16:02 -0700 (PDT)
-Date: Wed, 16 Aug 2023 08:15:39 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:4113:0:b0:ceb:324c:ba8e with SMTP id
+ o19-20020a254113000000b00ceb324cba8emr19244yba.4.1692173764386; Wed, 16 Aug
+ 2023 01:16:04 -0700 (PDT)
+Date: Wed, 16 Aug 2023 08:15:40 +0000
 In-Reply-To: <20230816081547.1272409-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230816081547.1272409-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230816081547.1272409-8-edumazet@google.com>
-Subject: [PATCH v4 net-next 07/15] inet: move inet->mc_loop to inet->inet_frags
+Message-ID: <20230816081547.1272409-9-edumazet@google.com>
+Subject: [PATCH v4 net-next 08/15] inet: move inet->mc_all to inet->inet_frags
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -78,189 +78,133 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-IP_MULTICAST_LOOP socket option can now be set/read
+IP_MULTICAST_ALL socket option can now be set/read
 without locking the socket.
-
-v3: fix build bot error reported in ipvs set_mcast_loop()
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- include/net/inet_sock.h         |  2 +-
- net/core/sock.c                 |  2 +-
- net/ipv4/af_inet.c              |  2 +-
- net/ipv4/inet_diag.c            |  2 +-
- net/ipv4/ip_sockglue.c          | 16 ++++++++--------
- net/ipv4/udp_tunnel_core.c      |  2 +-
- net/ipv6/af_inet6.c             |  2 +-
- net/netfilter/ipvs/ip_vs_sync.c |  4 +---
- net/sctp/socket.c               |  2 +-
- 9 files changed, 16 insertions(+), 18 deletions(-)
+ include/net/inet_sock.h |  2 +-
+ net/ipv4/af_inet.c      |  2 +-
+ net/ipv4/igmp.c         |  2 +-
+ net/ipv4/inet_diag.c    |  2 +-
+ net/ipv4/ip_sockglue.c  | 22 +++++++++++-----------
+ 5 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index ad1895e32e7d9bbad4ce210bda9698328e026b18..6c4eeca59f608ff18e5f05dec33700189d6e2198 100644
+index 6c4eeca59f608ff18e5f05dec33700189d6e2198..fffd34fa6a7cb92a98e29bd6b36ccf907b5e3a6d 100644
 --- a/include/net/inet_sock.h
 +++ b/include/net/inet_sock.h
-@@ -231,7 +231,6 @@ struct inet_sock {
- 	__u8			mc_ttl;
+@@ -232,7 +232,6 @@ struct inet_sock {
  	__u8			pmtudisc;
  	__u8			is_icsk:1,
--				mc_loop:1,
  				transparent:1,
- 				mc_all:1,
+-				mc_all:1,
  				nodefrag:1;
+ 	__u8			bind_address_no_port:1,
+ 				defer_connect:1; /* Indicates that fastopen_connect is set
 @@ -271,6 +270,7 @@ enum {
- 	INET_FLAGS_RECVERR_RFC4884 = 10,
  	INET_FLAGS_FREEBIND	= 11,
  	INET_FLAGS_HDRINCL	= 12,
-+	INET_FLAGS_MC_LOOP	= 13,
+ 	INET_FLAGS_MC_LOOP	= 13,
++	INET_FLAGS_MC_ALL	= 14,
  };
  
  /* cmsg flags for inet */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 525619776c6f4945552d5c4117c5742fe7e14f5e..22d94394335fb75f12da65368e87c5a65167cc0e 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -767,7 +767,7 @@ bool sk_mc_loop(struct sock *sk)
- 		return true;
- 	switch (sk->sk_family) {
- 	case AF_INET:
--		return inet_sk(sk)->mc_loop;
-+		return inet_test_bit(MC_LOOP, sk);
- #if IS_ENABLED(CONFIG_IPV6)
- 	case AF_INET6:
- 		return inet6_sk(sk)->mc_loop;
 diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 5785fe9de58c2ef1ba8248afbfd3ef06aee4d107..e847822df9b6157d85379550e75c3cd6a6a82eb5 100644
+index e847822df9b6157d85379550e75c3cd6a6a82eb5..47c9cdd7687f96356eec251f9bc38d1b327b5375 100644
 --- a/net/ipv4/af_inet.c
 +++ b/net/ipv4/af_inet.c
-@@ -356,7 +356,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
- 	sk->sk_txrehash = READ_ONCE(net->core.sysctl_txrehash);
- 
+@@ -358,7 +358,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
  	inet->uc_ttl	= -1;
--	inet->mc_loop	= 1;
-+	inet_set_bit(MC_LOOP, sk);
+ 	inet_set_bit(MC_LOOP, sk);
  	inet->mc_ttl	= 1;
- 	inet->mc_all	= 1;
+-	inet->mc_all	= 1;
++	inet_set_bit(MC_ALL, sk);
  	inet->mc_index	= 0;
+ 	inet->mc_list	= NULL;
+ 	inet->rcv_tos	= 0;
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 48ff5f13e7979dc00da60b466ee2e74ddce0891b..0c9e768e5628b1c8fd7e87bebe528762ea4a6e1e 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -2658,7 +2658,7 @@ int ip_mc_sf_allow(const struct sock *sk, __be32 loc_addr, __be32 rmt_addr,
+ 		     (sdif && pmc->multi.imr_ifindex == sdif)))
+ 			break;
+ 	}
+-	ret = inet->mc_all;
++	ret = inet_test_bit(MC_ALL, sk);
+ 	if (!pmc)
+ 		goto unlock;
+ 	psl = rcu_dereference(pmc->sflist);
 diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 98f3eb0ce16ab32daccf3c2407630622e9cdb71d..cc797261893b902f626b5a36074e4b4bf7535063 100644
+index cc797261893b902f626b5a36074e4b4bf7535063..e009dab80c3546c5222c587531acd394f2eeff0d 100644
 --- a/net/ipv4/inet_diag.c
 +++ b/net/ipv4/inet_diag.c
-@@ -186,7 +186,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
- 	inet_sockopt.is_icsk	= inet->is_icsk;
- 	inet_sockopt.freebind	= inet_test_bit(FREEBIND, sk);
+@@ -188,7 +188,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
  	inet_sockopt.hdrincl	= inet_test_bit(HDRINCL, sk);
--	inet_sockopt.mc_loop	= inet->mc_loop;
-+	inet_sockopt.mc_loop	= inet_test_bit(MC_LOOP, sk);
+ 	inet_sockopt.mc_loop	= inet_test_bit(MC_LOOP, sk);
  	inet_sockopt.transparent = inet->transparent;
- 	inet_sockopt.mc_all	= inet->mc_all;
+-	inet_sockopt.mc_all	= inet->mc_all;
++	inet_sockopt.mc_all	= inet_test_bit(MC_ALL, sk);
  	inet_sockopt.nodefrag	= inet->nodefrag;
+ 	inet_sockopt.bind_address_no_port = inet->bind_address_no_port;
+ 	inet_sockopt.recverr_rfc4884 = inet_test_bit(RECVERR_RFC4884, sk);
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 763456fd4f4faac8e46d649a281f178be05a7cef..be569032b612bef1277e802400a1ee6ec20e877a 100644
+index be569032b612bef1277e802400a1ee6ec20e877a..2f27c30a4eccca5d23b70851daeb5115bcc1de16 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -993,6 +993,11 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 			return -ENOPROTOOPT;
- 		inet_assign_bit(HDRINCL, sk, val);
+@@ -998,6 +998,14 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 			return -EINVAL;
+ 		inet_assign_bit(MC_LOOP, sk, val);
  		return 0;
-+	case IP_MULTICAST_LOOP:
++	case IP_MULTICAST_ALL:
 +		if (optlen < 1)
 +			return -EINVAL;
-+		inet_assign_bit(MC_LOOP, sk, val);
++		if (val != 0 && val != 1)
++			return -EINVAL;
++		inet_assign_bit(MC_ALL, sk, val);
 +		return 0;
++
  	}
  
  	err = 0;
-@@ -1083,11 +1088,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 			goto e_inval;
- 		inet->mc_ttl = val;
+@@ -1303,14 +1311,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		else
+ 			err = ip_set_mcast_msfilter(sk, optval, optlen);
  		break;
--	case IP_MULTICAST_LOOP:
+-	case IP_MULTICAST_ALL:
 -		if (optlen < 1)
 -			goto e_inval;
--		inet->mc_loop = !!val;
+-		if (val != 0 && val != 1)
+-			goto e_inval;
+-		inet->mc_all = val;
 -		break;
- 	case IP_UNICAST_IF:
- 	{
- 		struct net_device *dev = NULL;
-@@ -1579,6 +1579,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_HDRINCL:
- 		val = inet_test_bit(HDRINCL, sk);
+-
+ 	case IP_IPSEC_POLICY:
+ 	case IP_XFRM_POLICY:
+ 		err = -EPERM;
+@@ -1582,6 +1582,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 	case IP_MULTICAST_LOOP:
+ 		val = inet_test_bit(MC_LOOP, sk);
  		goto copyval;
-+	case IP_MULTICAST_LOOP:
-+		val = inet_test_bit(MC_LOOP, sk);
++	case IP_MULTICAST_ALL:
++		val = inet_test_bit(MC_ALL, sk);
 +		goto copyval;
  	}
  
  	if (needs_rtnl)
-@@ -1653,9 +1656,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_MULTICAST_TTL:
- 		val = inet->mc_ttl;
- 		break;
--	case IP_MULTICAST_LOOP:
--		val = inet->mc_loop;
+@@ -1694,9 +1697,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 		else
+ 			err = ip_get_mcast_msfilter(sk, optval, optlen, len);
+ 		goto out;
+-	case IP_MULTICAST_ALL:
+-		val = inet->mc_all;
 -		break;
- 	case IP_UNICAST_IF:
- 		val = (__force int)htonl((__u32) inet->uc_index);
- 		break;
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index 5f8104cf082d0e25a204f1d7ae5c27d9961914ea..9b18f371af0d49bd3ee9a440f222d03efd8a4911 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -63,7 +63,7 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
- 	struct sock *sk = sock->sk;
- 
- 	/* Disable multicast loopback */
--	inet_sk(sk)->mc_loop = 0;
-+	inet_clear_bit(MC_LOOP, sk);
- 
- 	/* Enable CHECKSUM_UNNECESSARY to CHECKSUM_COMPLETE conversion */
- 	inet_inc_convert_csum(sk);
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index ed9d207080ac871690b2fec43676a2c1c7ea74ce..8e9d4c1f0e837cb0ba32af244576461c90d9d97a 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -229,7 +229,7 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
- 	 */
- 	inet->uc_ttl	= -1;
- 
--	inet->mc_loop	= 1;
-+	inet_set_bit(MC_LOOP, sk);
- 	inet->mc_ttl	= 1;
- 	inet->mc_index	= 0;
- 	RCU_INIT_POINTER(inet->mc_list, NULL);
-diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
-index 264f2f87a43760a459dbb3c3fe5354d89799c1cb..da5af28ff57b5254c0ec8976c4180113037c96a0 100644
---- a/net/netfilter/ipvs/ip_vs_sync.c
-+++ b/net/netfilter/ipvs/ip_vs_sync.c
-@@ -1297,11 +1297,9 @@ static void set_sock_size(struct sock *sk, int mode, int val)
-  */
- static void set_mcast_loop(struct sock *sk, u_char loop)
- {
--	struct inet_sock *inet = inet_sk(sk);
--
- 	/* setsockopt(sock, SOL_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)); */
- 	lock_sock(sk);
--	inet->mc_loop = loop ? 1 : 0;
-+	inet_assign_bit(MC_LOOP, sk, loop);
- #ifdef CONFIG_IP_VS_IPV6
- 	if (sk->sk_family == AF_INET6) {
- 		struct ipv6_pinfo *np = inet6_sk(sk);
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 6e3d28aa587cdb64f7a1ac384fa28a34d4c6739c..04b390892827b8abbb7e7433d71f4f54dd1dac21 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -9482,7 +9482,7 @@ void sctp_copy_sock(struct sock *newsk, struct sock *sk,
- 	newinet->inet_id = get_random_u16();
- 
- 	newinet->uc_ttl = inet->uc_ttl;
--	newinet->mc_loop = 1;
-+	inet_set_bit(MC_LOOP, newsk);
- 	newinet->mc_ttl = 1;
- 	newinet->mc_index = 0;
- 	newinet->mc_list = NULL;
+ 	case IP_PKTOPTIONS:
+ 	{
+ 		struct msghdr msg;
 -- 
 2.41.0.694.ge786442a9b-goog
 
