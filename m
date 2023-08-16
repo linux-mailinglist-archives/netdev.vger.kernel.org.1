@@ -1,344 +1,159 @@
-Return-Path: <netdev+bounces-28094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B982277E356
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:14:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B142577E373
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:22:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43391C2048F
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5DEF2818AC
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194F111CB4;
-	Wed, 16 Aug 2023 14:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C558A11CBA;
+	Wed, 16 Aug 2023 14:22:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B63B101F6
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:14:30 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C252426BF;
-	Wed, 16 Aug 2023 07:14:28 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37GECUUP022636;
-	Wed, 16 Aug 2023 14:14:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Sgg8lU8bmANYEflcOqPjMKSXG1Ue3wWCHKHsOjnK+C8=;
- b=nF8JrxM1MPw5klfmHUh3Z83OvpXHMFrIE65eQTFOBlbl3RFuByWOhD2TVKJM6Xy3hJav
- ha5fMRcylE7E5mnGgZ/ijh4/Vyii+01rz/cds2e429zHUttGv+z2HufgrytXUAlKdNQu
- aWw6hBMUeZmMfhYNrkEb441CC/cGZNhijNC8dhhZNlWvWtlhtIlLuUdO7JHujxjQtgIy
- DCTsQKEkFDon/tF7cRUVUhFwHutcOaeZWxUzgaGYI7dvyxBwIwcQMDNptT+0hN8EcVKd
- PyG1b2O34RW9ByeV3haxcF4pbphJ8YFP+GRX4+dz4pRjLf7+c5VNsFWZPkNV3PxAF0aT kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgych9erd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Aug 2023 14:14:22 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37GEChrU023509;
-	Wed, 16 Aug 2023 14:14:22 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgych9equ-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Aug 2023 14:14:22 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37GE7d2D007839;
-	Wed, 16 Aug 2023 14:14:21 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3senwkcx8n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Aug 2023 14:14:21 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37GEEIVb8651372
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Aug 2023 14:14:18 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0EED02004D;
-	Wed, 16 Aug 2023 14:14:18 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2FF572004B;
-	Wed, 16 Aug 2023 14:14:17 +0000 (GMT)
-Received: from [9.171.10.228] (unknown [9.171.10.228])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 16 Aug 2023 14:14:17 +0000 (GMT)
-Message-ID: <36db51b2-ff88-0419-1e9b-cae2b111e570@linux.ibm.com>
-Date: Wed, 16 Aug 2023 16:14:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B38101F6
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:22:02 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27C2C2709
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:22:01 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58c561f4ac3so22073447b3.2
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:22:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692195720; x=1692800520;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TeC0ug8D1eXirPEbnRcyIBCYyPrnNhfPEDVTkTAG8fI=;
+        b=brEJSV9NWRaq2yl/Bru18oBOTAJXdR+6vh+gR/MIwPmIWKPOiwYZKi49IPCE48SDao
+         SJHLp02eASw/Rajzu4zLRAh2BQ3MBWYiQlQA9WoEAXIHxMXQllrgv79CRJZdCyuqhT4n
+         6ceZlTFr7Ir/YdCMUfxTBV2D9uoA6HGlbumaFtWyzElpl5HSNfwlVtEj87vYp21C97PI
+         TIaBlT+8zyRhdKeDP9ZMUbSigUXDHjtAugahNkTk4f/s6EevOzizciRGE3DJ5R/sLkxA
+         1CuILDG8vceKm+8cyCJfRDe+QyLYN0jZVnKRrKg9T2ualTHJG0tKGWsGgkSyWnbwo8HM
+         yehw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692195720; x=1692800520;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TeC0ug8D1eXirPEbnRcyIBCYyPrnNhfPEDVTkTAG8fI=;
+        b=jmRt9AUfzwrumhQQyA7nOheMJXrJmFl2dIdJfArNoT562P3j2VmDcM/DqEjAlsptu3
+         8UIu0eMmVJUVTqr75mH5a4PxNFTSPO7Nb+hEdv5C8ck3taB7iy6Miu8tD4I8MRAJs2MB
+         ibU5hq7DeNqakKCNiHEMFhg4CpcTRfPSVjBdmeHYkrPd9AnRrzuDxXvWfGmJZGeo44C6
+         f9EVhG06D+B2brKOG9cFiLu4V+Kj9gCbkbZ6vvFidM2sWx0AbJgRy5aoxLjs8UZEXZIB
+         8t8YXrsAjekgd5XLGyS/tY8qE28XdTONH5LqhL1glRX5iS1rkvo4lpp7Zosmp60pmpMq
+         wdyQ==
+X-Gm-Message-State: AOJu0Yy4L9arKDF6dskRj/6uh8la9XuSIIqIRGI3WHttd46Bc+L+Wqgx
+	itoG0/XcWwWWFjEQZ4xs0Jngy+oWCuuP9g==
+X-Google-Smtp-Source: AGHT+IGlheKjIdjPwhnpRvOjXxbkDq7HQgLn7IaWENom1flnn4VvNdmiGe/3/mABCHAXgQaXLxYMqmJkpk0FvQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1609:b0:d07:7001:495b with SMTP
+ id bw9-20020a056902160900b00d077001495bmr30412ybb.11.1692195720373; Wed, 16
+ Aug 2023 07:22:00 -0700 (PDT)
+Date: Wed, 16 Aug 2023 14:21:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next 1/6] net/smc: support smc release version
- negotiation in clc handshake
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
-        kgraul@linux.ibm.com, tonylu@linux.alibaba.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: horms@kernel.org, alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230816083328.95746-1-guangguan.wang@linux.alibaba.com>
- <20230816083328.95746-2-guangguan.wang@linux.alibaba.com>
-From: Jan Karcher <jaka@linux.ibm.com>
-Organization: IBM - Network Linux on Z
-In-Reply-To: <20230816083328.95746-2-guangguan.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jP-ZOWTh52H7hIBgntMb6Ygc7F6nWOtE
-X-Proofpoint-GUID: rXDdrqPTm-nTvr9b9sFL4Mn7nzyb4u6v
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-16_13,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 clxscore=1011
- mlxlogscore=999 impostorscore=0 adultscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308160121
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
+Message-ID: <20230816142158.1779798-1-edumazet@google.com>
+Subject: [PATCH net] net: do not allow gso_size to be set to GSO_BY_FRAGS
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Xin Long <lucien.xin@gmail.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+One missing check in virtio_net_hdr_to_skb() allowed
+syzbot to crash kernels again [1]
 
+Do not allow gso_size to be set to GSO_BY_FRAGS (0xffff),
+because this magic value is used by the kernel.
 
-On 16/08/2023 10:33, Guangguan Wang wrote:
-> Support smc release version negotiation in clc handshake based on
-> SMC v2, where no negotiation process for different releases, but
-> for different versions. The latest smc release version was updated
-> to v2.1. And currently there are two release versions of SMCv2, v2.0
-> and v2.1. In the release version negotiation, client sends the preferred
-> release version by CLC Proposal Message, server makes decision for which
-> release version to use based on the client preferred release version and
-> self-supported release version (here choose the minimum release version
-> of the client preferred and server latest supported), then the decision
-> returns to client by CLC Accept Message. Client confirms the decision by
-> CLC Confirm Message.
-> 
-> Client                                    Server
->        Proposal(preferred release version)
->       ------------------------------------>
-> 
->        Accept(accpeted release version)
->   min(client preferred, server latest supported)
->       <------------------------------------
-> 
->        Confirm(accpeted release version)
->       ------------------------------------>
-> 
-> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-> Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
-> ---
->   net/smc/af_smc.c   | 18 ++++++++++++++++--
->   net/smc/smc.h      |  5 ++++-
->   net/smc/smc_clc.c  | 14 +++++++-------
->   net/smc/smc_clc.h  | 23 ++++++++++++++++++++++-
->   net/smc/smc_core.h |  1 +
->   5 files changed, 50 insertions(+), 11 deletions(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index a7f887d91d89..97265691bc95 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -1187,6 +1187,9 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->   			return SMC_CLC_DECL_NOINDIRECT;
->   		}
->   	}
-> +
-> +	ini->release_nr = fce->release;
-> +
+[1]
+general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+CPU: 0 PID: 5039 Comm: syz-executor401 Not tainted 6.5.0-rc5-next-20230809-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+RIP: 0010:skb_segment+0x1a52/0x3ef0 net/core/skbuff.c:4500
+Code: 00 00 00 e9 ab eb ff ff e8 6b 96 5d f9 48 8b 84 24 00 01 00 00 48 8d 78 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e ea 21 00 00 48 8b 84 24 00 01
+RSP: 0018:ffffc90003d3f1c8 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 000000000001fffe RCX: 0000000000000000
+RDX: 000000000000000e RSI: ffffffff882a3115 RDI: 0000000000000070
+RBP: ffffc90003d3f378 R08: 0000000000000005 R09: 000000000000ffff
+R10: 000000000000ffff R11: 5ee4a93e456187d6 R12: 000000000001ffc6
+R13: dffffc0000000000 R14: 0000000000000008 R15: 000000000000ffff
+FS: 00005555563f2380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020020000 CR3: 000000001626d000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+<TASK>
+udp6_ufo_fragment+0x9d2/0xd50 net/ipv6/udp_offload.c:109
+ipv6_gso_segment+0x5c4/0x17b0 net/ipv6/ip6_offload.c:120
+skb_mac_gso_segment+0x292/0x610 net/core/gso.c:53
+__skb_gso_segment+0x339/0x710 net/core/gso.c:124
+skb_gso_segment include/net/gso.h:83 [inline]
+validate_xmit_skb+0x3a5/0xf10 net/core/dev.c:3625
+__dev_queue_xmit+0x8f0/0x3d60 net/core/dev.c:4329
+dev_queue_xmit include/linux/netdevice.h:3082 [inline]
+packet_xmit+0x257/0x380 net/packet/af_packet.c:276
+packet_snd net/packet/af_packet.c:3087 [inline]
+packet_sendmsg+0x24c7/0x5570 net/packet/af_packet.c:3119
+sock_sendmsg_nosec net/socket.c:727 [inline]
+sock_sendmsg+0xd9/0x180 net/socket.c:750
+____sys_sendmsg+0x6ac/0x940 net/socket.c:2496
+___sys_sendmsg+0x135/0x1d0 net/socket.c:2550
+__sys_sendmsg+0x117/0x1e0 net/socket.c:2579
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7ff27cdb34d9
 
-why would we do this and vvvvv
->   	return 0;
->   }
->   
-> @@ -1355,6 +1358,13 @@ static int smc_connect_ism(struct smc_sock *smc,
->   		struct smc_clc_msg_accept_confirm_v2 *aclc_v2 =
->   			(struct smc_clc_msg_accept_confirm_v2 *)aclc;
->   
-> +		if (ini->first_contact_peer) {
-> +			struct smc_clc_first_contact_ext *fce =
-> +				smc_get_clc_first_contact_ext(aclc_v2, true);
-> +
-> +			ini->release_nr = fce->release;
-> +		}
-> +
+Fixes: 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+---
+ include/linux/virtio_net.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-this two times?
-Can't we put this together into __smc_connect where those functions get 
-called (via smc_connect_rdma and smc_connect_ism)?
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index bdf8de2cdd935d31449b78e1b9c67fdcdc537bf2..7b4dd69555e497497460dcf5d72737fe5c09fd53 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -155,6 +155,10 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		if (gso_type & SKB_GSO_UDP)
+ 			nh_off -= thlen;
+ 
++		/* Kernel has a special handling for GSO_BY_FRAGS. */
++		if (gso_size == GSO_BY_FRAGS)
++			return -EINVAL;
++
+ 		/* Too small packets are not really GSO ones. */
+ 		if (skb->len - nh_off > gso_size) {
+ 			shinfo->gso_size = gso_size;
+-- 
+2.41.0.694.ge786442a9b-goog
 
-Please provide reasoning, it might be that i oversaw the reasoning 
-behind this duplication.
-
-Also note: Even if there is a reason to set this information seperate 
-for SMC-D and SMC-R think about using your very neat helper function 
-(smc_get_clc_first_contact_ext) in smc_connect_rdma_v2_prepare as well.
-
->   		rc = smc_v2_determine_accepted_chid(aclc_v2, ini);
->   		if (rc)
->   			return rc;
-> @@ -1389,7 +1399,7 @@ static int smc_connect_ism(struct smc_sock *smc,
->   	}
->   
->   	rc = smc_clc_send_confirm(smc, ini->first_contact_local,
-> -				  aclc->hdr.version, eid, NULL);
-> +				  aclc->hdr.version, eid, ini);
->   	if (rc)
->   		goto connect_abort;
->   	mutex_unlock(&smc_server_lgr_pending);
-> @@ -1965,6 +1975,10 @@ static int smc_listen_v2_check(struct smc_sock *new_smc,
->   		}
->   	}
->   
-> +	ini->release_nr = pclc_v2_ext->hdr.flag.release;
-> +	if (pclc_v2_ext->hdr.flag.release > SMC_RELEASE)
-> +		ini->release_nr = SMC_RELEASE;
-> +
->   out:
->   	if (!ini->smcd_version && !ini->smcr_version)
->   		return rc;
-> @@ -2412,7 +2426,7 @@ static void smc_listen_work(struct work_struct *work)
->   	/* send SMC Accept CLC message */
->   	accept_version = ini->is_smcd ? ini->smcd_version : ini->smcr_version;
->   	rc = smc_clc_send_accept(new_smc, ini->first_contact_local,
-> -				 accept_version, ini->negotiated_eid);
-> +				 accept_version, ini->negotiated_eid, ini);
->   	if (rc)
->   		goto out_unlock;
->   
-> diff --git a/net/smc/smc.h b/net/smc/smc.h
-> index 2eeea4cdc718..9cce1a41e011 100644
-> --- a/net/smc/smc.h
-> +++ b/net/smc/smc.h
-> @@ -21,7 +21,10 @@
->   
->   #define SMC_V1		1		/* SMC version V1 */
->   #define SMC_V2		2		/* SMC version V2 */
-> -#define SMC_RELEASE	0
-> +
-> +#define SMC_RELEASE_0 0
-> +#define SMC_RELEASE_1 1
-> +#define SMC_RELEASE	SMC_RELEASE_1 /* the latest release version */
->   
->   #define SMCPROTO_SMC		0	/* SMC protocol, IPv4 */
->   #define SMCPROTO_SMC6		1	/* SMC protocol, IPv6 */
-> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
-> index b9b8b07aa702..7c5627c6abcc 100644
-> --- a/net/smc/smc_clc.c
-> +++ b/net/smc/smc_clc.c
-> @@ -420,11 +420,11 @@ smc_clc_msg_decl_valid(struct smc_clc_msg_decline *dclc)
->   	return true;
->   }
->   
-> -static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len)
-> +static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len, int release_nr)
->   {
->   	memset(fce, 0, sizeof(*fce));
->   	fce->os_type = SMC_CLC_OS_LINUX;
-> -	fce->release = SMC_RELEASE;
-> +	fce->release = release_nr;
->   	memcpy(fce->hostname, smc_hostname, sizeof(smc_hostname));
->   	(*len) += sizeof(*fce);
->   }
-> @@ -1019,7 +1019,7 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
->   				memcpy(clc_v2->d1.eid, eid, SMC_MAX_EID_LEN);
->   			len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
->   			if (first_contact)
-> -				smc_clc_fill_fce(&fce, &len);
-> +				smc_clc_fill_fce(&fce, &len, ini->release_nr);
->   			clc_v2->hdr.length = htons(len);
->   		}
->   		memcpy(trl.eyecatcher, SMCD_EYECATCHER,
-> @@ -1063,10 +1063,10 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
->   				memcpy(clc_v2->r1.eid, eid, SMC_MAX_EID_LEN);
->   			len = SMCR_CLC_ACCEPT_CONFIRM_LEN_V2;
->   			if (first_contact) {
-> -				smc_clc_fill_fce(&fce, &len);
-> +				smc_clc_fill_fce(&fce, &len, ini->release_nr);
->   				fce.v2_direct = !link->lgr->uses_gateway;
->   				memset(&gle, 0, sizeof(gle));
-> -				if (ini && clc->hdr.type == SMC_CLC_CONFIRM) {
-> +				if (clc->hdr.type == SMC_CLC_CONFIRM) {
->   					gle.gid_cnt = ini->smcrv2.gidlist.len;
->   					len += sizeof(gle);
->   					len += gle.gid_cnt * sizeof(gle.gid[0]);
-> @@ -1141,7 +1141,7 @@ int smc_clc_send_confirm(struct smc_sock *smc, bool clnt_first_contact,
->   
->   /* send CLC ACCEPT message across internal TCP socket */
->   int smc_clc_send_accept(struct smc_sock *new_smc, bool srv_first_contact,
-> -			u8 version, u8 *negotiated_eid)
-> +			u8 version, u8 *negotiated_eid, struct smc_init_info *ini)
->   {
->   	struct smc_clc_msg_accept_confirm_v2 aclc_v2;
->   	int len;
-> @@ -1149,7 +1149,7 @@ int smc_clc_send_accept(struct smc_sock *new_smc, bool srv_first_contact,
->   	memset(&aclc_v2, 0, sizeof(aclc_v2));
->   	aclc_v2.hdr.type = SMC_CLC_ACCEPT;
->   	len = smc_clc_send_confirm_accept(new_smc, &aclc_v2, srv_first_contact,
-> -					  version, negotiated_eid, NULL);
-> +					  version, negotiated_eid, ini);
->   	if (len < ntohs(aclc_v2.hdr.length))
->   		len = len >= 0 ? -EPROTO : -new_smc->clcsock->sk->sk_err;
->   
-> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-> index 5fee545c9a10..b923e89acafb 100644
-> --- a/net/smc/smc_clc.h
-> +++ b/net/smc/smc_clc.h
-> @@ -370,6 +370,27 @@ smc_get_clc_smcd_v2_ext(struct smc_clc_v2_extension *prop_v2ext)
->   		 ntohs(prop_v2ext->hdr.smcd_v2_ext_offset));
->   }
->   
-> +static inline struct smc_clc_first_contact_ext *
-> +smc_get_clc_first_contact_ext(struct smc_clc_msg_accept_confirm_v2 *clc_v2,
-> +			      bool is_smcd)
-> +{
-> +	int clc_v2_len;
-> +
-> +	if (clc_v2->hdr.version == SMC_V1 ||
-> +	    !(clc_v2->hdr.typev2 & SMC_FIRST_CONTACT_MASK))
-> +		return NULL;
-> +
-> +	if (is_smcd)
-> +		clc_v2_len =
-> +			offsetofend(struct smc_clc_msg_accept_confirm_v2, d1);
-> +	else
-> +		clc_v2_len =
-> +			offsetofend(struct smc_clc_msg_accept_confirm_v2, r1);
-> +
-> +	return (struct smc_clc_first_contact_ext *)(((u8 *)clc_v2) +
-> +						    clc_v2_len);
-> +}
-> +
->   struct smcd_dev;
->   struct smc_init_info;
->   
-> @@ -382,7 +403,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini);
->   int smc_clc_send_confirm(struct smc_sock *smc, bool clnt_first_contact,
->   			 u8 version, u8 *eid, struct smc_init_info *ini);
->   int smc_clc_send_accept(struct smc_sock *smc, bool srv_first_contact,
-> -			u8 version, u8 *negotiated_eid);
-> +			u8 version, u8 *negotiated_eid, struct smc_init_info *ini);
->   void smc_clc_init(void) __init;
->   void smc_clc_exit(void);
->   void smc_clc_get_hostname(u8 **host);
-> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
-> index 3c1b31bfa1cf..b6c68db61f23 100644
-> --- a/net/smc/smc_core.h
-> +++ b/net/smc/smc_core.h
-> @@ -374,6 +374,7 @@ struct smc_init_info {
->   	u8			is_smcd;
->   	u8			smc_type_v1;
->   	u8			smc_type_v2;
-> +	u8			release_nr;
->   	u8			first_contact_peer;
->   	u8			first_contact_local;
->   	unsigned short		vlan_id;
 
