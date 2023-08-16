@@ -1,61 +1,42 @@
-Return-Path: <netdev+bounces-27981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE5F77DCF4
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:07:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DE1377DCF5
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D027F1C20FB0
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:07:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 535FB1C20F99
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880EBD529;
-	Wed, 16 Aug 2023 09:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C3BD52A;
+	Wed, 16 Aug 2023 09:07:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9DBD51A
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:07:37 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB0D19A4;
-	Wed, 16 Aug 2023 02:07:36 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37G3jWvo017037;
-	Wed, 16 Aug 2023 02:07:26 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=a6w+d+NKHXM64yo+EW8SiLVMC8o1+XmhvT/M9ZyrlKk=;
- b=ladfCfTA3PEl8myWKtiRGdnwesfBZ4nzV2b12TOtfaO57P/IEhYpo11fMURJs0Qg9Ghf
- 2FrSfdgvryyMl/p6eGkT8ObPZ+ssO8BkYFhTPhfghoj2n+jdwcVre9CBk7TPa32Gnekr
- ni3kDXG+91SHfHPPY31uOZjpfhwTXV0jL+YYq6EfSIB4+jjgVvtH8uG3W5yER9AsZ0lA
- 1LvuvhLQyiXP5FqdS9yH+48zXJ/t4dqFQxTO5Qw74kZfHZ75V3gBnLzukDjuFQdrACXE
- i85XwR6AqjnO5es5iHwz4ryIIkBZmeG6WmNoljOIUdzoI5oA+/lAJxzin7mqm6VfF4df Hw== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sgptkrw8x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 16 Aug 2023 02:07:26 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 16 Aug
- 2023 02:07:24 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 16 Aug 2023 02:07:24 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 7D9643F7043;
-	Wed, 16 Aug 2023 02:07:20 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
-        "Alexander
- Lobakin" <aleksander.lobakin@intel.com>
-Subject: [PATCH v2 net] octeontx2-pf: fix page_pool creation fail for rings > 32k
-Date: Wed, 16 Aug 2023 14:37:18 +0530
-Message-ID: <20230816090718.2481252-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07111C2F0
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:07:57 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0593219A7
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:07:57 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RQhzY4JmHzFqck;
+	Wed, 16 Aug 2023 17:04:57 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 16 Aug
+ 2023 17:07:54 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH -next] net: dm9051: Use PTR_ERR_OR_ZERO() to simplify code
+Date: Wed, 16 Aug 2023 17:07:22 +0800
+Message-ID: <20230816090722.2308686-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,71 +45,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Sig4uvGjuF9BDwIfz_e4Frf2RFlURHnS
-X-Proofpoint-GUID: Sig4uvGjuF9BDwIfz_e4Frf2RFlURHnS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-16_07,2023-08-15_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-octeontx2 driver calls page_pool_create() during driver probe()
-and fails if queue size > 32k. Page pool infra uses these buffers
-as shock absorbers for burst traffic. These pages are pinned down
-over time as working sets varies, due to the recycling nature
-of page pool, given page pool (currently) don't have a shrinker
-mechanism, the pages remain pinned down in ptr_ring.
-Instead of clamping page_pool size to 32k at
-most, limit it even more to 2k to avoid wasting memory.
+Return PTR_ERR_OR_ZERO() instead of return 0 or PTR_ERR() to
+simplify code.
 
-This have been tested on octeontx2 CN10KA hardware.
-TCP and UDP tests using iperf shows not performance regressions.
-
-Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
 ---
+ drivers/net/ethernet/davicom/dm9051.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-ChangeLogs:
-
-vi->v2: Commit message changes and typo fixes
-v0->v1: Commit message changes.
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 77c8f650f7ac..fc8a1220eb39 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 	}
+diff --git a/drivers/net/ethernet/davicom/dm9051.c b/drivers/net/ethernet/davicom/dm9051.c
+index 70728b2e5f18..2caaf1e9f42f 100644
+--- a/drivers/net/ethernet/davicom/dm9051.c
++++ b/drivers/net/ethernet/davicom/dm9051.c
+@@ -510,10 +510,7 @@ static int dm9051_map_init(struct spi_device *spi, struct board_info *db)
  
- 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
--	pp_params.pool_size = numptrs;
-+	pp_params.pool_size = OTX2_PAGE_POOL_SZ;
- 	pp_params.nid = NUMA_NO_NODE;
- 	pp_params.dev = pfvf->dev;
- 	pp_params.dma_dir = DMA_FROM_DEVICE;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index ba8091131ec0..f6fea43617ff 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -30,6 +30,8 @@
- #include <rvu_trace.h>
- #include "qos.h"
+ 	regconfigdmbulk.lock_arg = db;
+ 	db->regmap_dmbulk = devm_regmap_init_spi(db->spidev, &regconfigdmbulk);
+-	if (IS_ERR(db->regmap_dmbulk))
+-		return PTR_ERR(db->regmap_dmbulk);
+-
+-	return 0;
++	return PTR_ERR_OR_ZERO(db->regmap_dmbulk);
+ }
  
-+#define OTX2_PAGE_POOL_SZ 2048
-+
- /* IPv4 flag more fragment bit */
- #define IPV4_FLAG_MORE				0x20
- 
+ static int dm9051_map_chipid(struct board_info *db)
 -- 
-2.25.1
+2.34.1
 
 
