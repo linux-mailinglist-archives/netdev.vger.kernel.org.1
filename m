@@ -1,92 +1,117 @@
-Return-Path: <netdev+bounces-28202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8091577EA8B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:16:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E48D77EA9F
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AA12281C24
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:16:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6ED61C21175
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB11617ACE;
-	Wed, 16 Aug 2023 20:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42ED617AD0;
+	Wed, 16 Aug 2023 20:24:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C508317AC0
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:16:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C3AEC433C7;
-	Wed, 16 Aug 2023 20:16:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692216973;
-	bh=RwMfdQoVMocHV8lsm9MWMyQ8RwAc9ankzFYtPPXLPQw=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=VTpMfbLkk3vKzcRHHAH+kqW0nDku7T7ICuxUnDpJw/wqY8DqklTKEKWYdpkzDtnvU
-	 TzRQTx2kw+C7pmmYTYxScIlLU0AHH0rZfgYzYvLWpDfLnLGy9FHbrlTT/eQ5FNAzra
-	 ZnN3WaWm1N/X2hedmAJyzM3ZJjIarXlCRI//ScRPWW/r+fhejxDWQqVpjZWE1ZsfA1
-	 rfnm/3SEZTzDGn94GehDsfWWBPsMtGuscnscvNbX0uPzb64R/oeNY0N1OpMaV0FmY/
-	 4sg4Hif72Ud0HrbRMMtLlNDt78P1Cf/yUQMMck+XAbeNm8NywUWwQGgTiOYLt+9vJB
-	 NpagraTM73ihA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3709817E9
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:24:59 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12EA32135;
+	Wed, 16 Aug 2023 13:24:58 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4fe4762173bso11380845e87.3;
+        Wed, 16 Aug 2023 13:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692217496; x=1692822296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SvYvmTlBw67pqTM/T/MeNG2dVCDXMrEV8YTwIlKj9dw=;
+        b=kM1Floy2sMZplCC4vze7Ged0MeP+RuHg8wKCXt+nWugN3w01AeE7TwCuDqVcVb4fLV
+         Vn85WkU8c8ivLwWYYFFgoXbK0sqhSPIIyhOHiSIQyxB93r+cX+8c7AdecN7dzcqiBXdK
+         MXGQj2ZvtOH4dbNHEWhKMszR0Oi1PM4458FRqyoo/EFuMcqvvakw9qsRTyfx3TzqAi/w
+         8hSBzXq7EstTIj20i3LXBw+kFeZM5Uw0+ZZOXcvKKNO5Gb7X1+PRgPiirXEK4awtS/xg
+         m8nFjeWTnbio+Lj6Cbbmj+Rm3sQM2OKLbNutrHmAvKF2DvFSaP10y8LXxcbweD2hNf/W
+         i2Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692217496; x=1692822296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SvYvmTlBw67pqTM/T/MeNG2dVCDXMrEV8YTwIlKj9dw=;
+        b=VQ78YHkTYkd5QpySDbm8a31c9ZbSJ7T6kn2WwITSVHOjbCvUhvVm8/0l7SwGO37r1Q
+         274CCldIUkHk17e24udEXYiU8TBf8Gz22wQmzcFC4at/20heELdFeUAWxgrmy8bAAvIT
+         aIYQ/MUO86ljRsTcdnsCEtogc89cWcLV8VcK40AfkxpNhYLaZ1HiCwLGxXKh52kw2XSa
+         OqA4g2FBsKPk8M8KrYrNWNSqKJCTMaXgfA9UK+ejNE/vUogRd6D8SfwxgQ+P4KawukqN
+         VxotZkQz8ZvOd/sRclisicMt5JmipbmnFOzRQ5GxtQiHgCYkpoIWCHwTz0NmO02B/AOD
+         +tSQ==
+X-Gm-Message-State: AOJu0YyxLgjS0NdpA4uq5GGd7/OwxUZ+CPk4sfATml1gyciOWdBdIPYC
+	Mjzoxbl4vbdMun8iD1d1zJQ=
+X-Google-Smtp-Source: AGHT+IGkln+W5HKIr6pdwkpd9iO3Wp4sWr0uwv+S2F687bdGK6PfhO+19vQtxapeTfIJ9rMZsMRDTQ==
+X-Received: by 2002:a05:6512:554:b0:4fb:9129:705b with SMTP id h20-20020a056512055400b004fb9129705bmr2488857lfl.6.1692217496231;
+        Wed, 16 Aug 2023 13:24:56 -0700 (PDT)
+Received: from mobilestation ([93.157.254.210])
+        by smtp.gmail.com with ESMTPSA id r25-20020ac252b9000000b004fe633bfcc7sm3070955lfm.17.2023.08.16.13.24.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 13:24:55 -0700 (PDT)
+Date: Wed, 16 Aug 2023 23:24:53 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Francesco Dolcini <francesco.dolcini@toradex.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC net] Revert "net: phy: Fix race condition on link status
+ change"
+Message-ID: <2r3cdvokyuylakhv7d6wjrytatvusdr46grrjuaiohcvnzclyf@ph3hc73wf5gv>
+References: <20230816180944.19262-1-fancer.lancer@gmail.com>
+ <b5ae4bc5-20cb-470b-988c-86353592f1c9@lunn.ch>
+ <ksgfr3o6nm4k5qhamsqhyardnpb5fm5xclhr4fwpgldhzjlax6@r5ry4ztkqx5c>
+ <01cf4367-1c2d-4920-a387-3ba38b83dd66@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 16 Aug 2023 23:16:08 +0300
-Message-Id: <CUU8UN9WOC56.1XCQH80U6OXYC@suppilovahvero>
-Cc: <linux-integrity@vger.kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
- "Peter Huewe" <peterhuewe@gmx.de>, "Jason Gunthorpe" <jgg@ziepe.ca>,
- "Richard Cochran" <richardcochran@gmail.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, "Catalin Marinas" <catalin.marinas@arm.com>, "Randy
- Dunlap" <rdunlap@infradead.org>, "Dave Hansen"
- <dave.hansen@linux.intel.com>, "Steven Rostedt (Google)"
- <rostedt@goodmis.org>, "Daniel Sneddon" <daniel.sneddon@linux.intel.com>,
- <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH] tpm_tis: Revert "tpm_tis: Disable interrupts on
- ThinkPad T490s"
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jerry Snitselaar" <jsnitsel@redhat.com>
-X-Mailer: aerc 0.14.0
-References: <20230814164054.64280-1-jarkko@kernel.org>
- <enaeow6numvzp74rrwpdqhjqs635ofqttj7o7gdoqfrsgbhihi@eb7ueum3r5w5>
-In-Reply-To: <enaeow6numvzp74rrwpdqhjqs635ofqttj7o7gdoqfrsgbhihi@eb7ueum3r5w5>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01cf4367-1c2d-4920-a387-3ba38b83dd66@lunn.ch>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue Aug 15, 2023 at 2:13 AM EEST, Jerry Snitselaar wrote:
-> On Mon, Aug 14, 2023 at 07:40:53PM +0300, Jarkko Sakkinen wrote:
-> > Since for MMIO driver using FIFO registers, also known as tpm_tis, the
-> > default (and tbh recommended) behaviour is now the polling mode, the
-> > "tristate" workaround is no longer for benefit.
-> >=20
-> > If someone wants to explicitly enable IRQs for a TPM chip that should b=
-e
-> > without question allowed. It could very well be a piece hardware in the
-> > existing deny list because of e.g. firmware update or something similar=
-.
-> >=20
-> > While at it, document the module parameter, as this was not done in 200=
-6
-> > when it first appeared in the mainline.
-> >=20
-> > Link: https://lore.kernel.org/linux-integrity/20201015214430.17937-1-js=
-nitsel@redhat.com/
-> > Link: https://lore.kernel.org/all/1145393776.4829.19.camel@localhost.lo=
-caldomain/
-> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
->
-> I was just typing an email to say that it looks like 6aaf663ee04a ("tpm_t=
-is: Opt-in interrupts") will require
-> updating tpm_tis_disable_irq(), but you are already dealing with it. :)
->
-> Reviewed-by: Jerry Snitselaar <jsnitsel@redhat.com>
+On Wed, Aug 16, 2023 at 10:13:10PM +0200, Andrew Lunn wrote:
+> > > So i suggest you change phy_process_error() to remove the lock.
+> > 
+> > This doable.
+> > 
+> > > Maybe
+> > > add a test to ensure the lock is actually held, and do a phydev_err()
+> > > if not.
+> > 
+> > This can't be done since phy_state_machine() calls phy_error_precise()
+> > which calls phy_process_error() with no phy_device.lock held. Printing the
+> > error in that case would mean an error in the Networking PHY subsystem
+> > itself.
+> > 
+> > Do you suggest to take the lock before calling phy_error_precise() then?
+> 
+> Thanks for digging into the details.
+> 
+> phy_error_precise() is used in exactly one place. So i would actually
+> put the lock inside it. And maybe move the comment about not using the
+> function with the lock already held here :-)
 
-Thanks!
+Ok. I'll resubmit the patch tomorrow with the RFC status dropped.
 
-BR, Jarkko
+-Serge(y)
+
+> 
+> 	 Andrew
 
