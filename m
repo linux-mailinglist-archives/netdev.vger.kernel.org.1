@@ -1,149 +1,91 @@
-Return-Path: <netdev+bounces-28194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2DC77E9DE
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:45:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C46177EA39
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A981F2817E5
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 19:45:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79F8F281BF7
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15D61775A;
-	Wed, 16 Aug 2023 19:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4FDC17AA0;
+	Wed, 16 Aug 2023 20:00:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2DA17738
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 19:45:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 122A8C433C8;
-	Wed, 16 Aug 2023 19:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9B81773C
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08465C433C9;
+	Wed, 16 Aug 2023 20:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692215117;
-	bh=jMLHFGC1zXcDINUDiyKXfSXD+P0geE2aFulULXegssM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RmVqtCAnkjvLENgirfohcj8c/+Z9RBH247FogKChlTivHMSJibwWabyP/QBRhxW69
-	 nDouXjM/2Sc7P1gtt8oYhA2d4rwjuNA6G+E1m319zEnIk2wioTl60uxzeOGjY8dj61
-	 Qr5SaNk0/QZXkuTf5I5mAzX5twSn2Wu1b9dcjx6YdGsdRI0FuM0dTyky81aYdIHbRF
-	 uehDAJpNBXAjLQIr83Pjc7XSm5+EmWbG7JyNacFJ2MrlHi4YYPAWGpKCAWmjPpjKiv
-	 UUlicXNE6Ohd+eG8OOxHm1X5bXXJvRZ0Gvcgn/p42gayjlPJyUsTT5HvB7kJlpYfiu
-	 n7Qo+UkhReRJQ==
-Date: Wed, 16 Aug 2023 21:45:06 +0200
-From: Simon Horman <horms@kernel.org>
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	"Nassiri, Mohammad" <mnassiri@ciena.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v10 net-next 10/23] net/tcp: Wire TCP-AO to request
- sockets
-Message-ID: <ZN0nQqIwXp5cQJTR@vergenet.net>
-References: <20230815191455.1872316-1-dima@arista.com>
- <20230815191455.1872316-11-dima@arista.com>
+	s=k20201202; t=1692216022;
+	bh=D7d6wuVGzkWQOCUZmhR9pJ/mB+VrH8L9Q24bxgQAm/k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TejQbEIwzkNlw9KtnPwOjt3+MJejbe/Vf9JLtbRzhBs50hdqAlD/Mq1lVecQpKMU0
+	 pCSmIOFj91b63UnUIoW6pBZZA0wILyP23UESMAVeqNb6UporYbQZfJ+JLigx80OtSn
+	 YlyK9FDyCIipNLsqMXBrTc79uUPPfjCi5PdINgDsZ9ljtn2sln8J7aTKwVKZx+oQV0
+	 AmAkTB96r8VJsaOUE1LvWP3PrjrkOGj9MT6dJkRrOclue52t6MLFiyh926C2V+SCuN
+	 9IRGQJNI7l7yLTG66+bAAT9In8stG1kn7mcssPRk8S4CEC0Zr2R2fuNIr2dNI8rz4n
+	 06MnFvfjtmM8A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD62AE93B30;
+	Wed, 16 Aug 2023 20:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230815191455.1872316-11-dima@arista.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 0/3] bluetooth: qca: enable WCN7850 support
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <169221602190.24089.3443584024796789580.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Aug 2023 20:00:21 +0000
+References: <20230803-topic-sm8550-upstream-bt-v3-0-6874a1507288@linaro.org>
+In-Reply-To: <20230803-topic-sm8550-upstream-bt-v3-0-6874a1507288@linaro.org>
+To: Neil Armstrong <neil.armstrong@linaro.org>
+Cc: luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, marcel@holtmann.org,
+ johan.hedberg@gmail.com, agross@kernel.org, andersson@kernel.org,
+ konrad.dybcio@linaro.org, quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, robh@kernel.org
 
-On Tue, Aug 15, 2023 at 08:14:39PM +0100, Dmitry Safonov wrote:
+Hello:
 
-...
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-> index 8dfa0959e403..7178e8bab922 100644
-> --- a/net/ipv6/tcp_ipv6.c
-> +++ b/net/ipv6/tcp_ipv6.c
+On Thu, 03 Aug 2023 10:45:25 +0200 you wrote:
+> This serie enables WCN7850 on the Qualcomm SM8550 QRD
+> reference platform.
+> 
+> The WCN7850 is close to the WCN6855 but uses different
+> firmware names.
+> 
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> 
+> [...]
 
-...
+Here is the summary with links:
+  - [v3,1/3] dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f38a5adcbd53
+  - [v3,2/3] bluetooth: qca: use switch case for soc type behavior
+    https://git.kernel.org/bluetooth/bluetooth-next/c/08292727a9fc
+  - [v3,3/3] bluetooth: qca: add support for WCN7850
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ef6d9b23aa58
 
-> @@ -1194,9 +1198,51 @@ static void tcp_v6_timewait_ack(struct sock *sk, struct sk_buff *skb)
->  static void tcp_v6_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
->  				  struct request_sock *req)
->  {
-> +	struct tcp_md5sig_key *md5_key = NULL;
-> +	const struct in6_addr *addr;
-> +	u8 *traffic_key = NULL;
->  	int l3index;
->  
->  	l3index = tcp_v6_sdif(skb) ? tcp_v6_iif_l3_slave(skb) : 0;
-> +	addr = &ipv6_hdr(skb)->saddr;
-> +
-> +	if (tcp_rsk_used_ao(req)) {
-> +#ifdef CONFIG_TCP_AO
-> +		struct tcp_ao_key *ao_key = NULL;
-> +		const struct tcp_ao_hdr *aoh;
-> +		u8 keyid = 0;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Hi Dmitry,
 
-keyid is declared and initialised here.
-
-> +
-> +		/* Invalid TCP option size or twice included auth */
-> +		if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
-> +			return;
-> +		if (!aoh)
-> +			return;
-> +		ao_key = tcp_v6_ao_do_lookup(sk, addr, aoh->rnext_keyid, -1);
-> +		if (unlikely(!ao_key)) {
-> +			/* Send ACK with any matching MKT for the peer */
-> +			ao_key = tcp_v6_ao_do_lookup(sk, addr, -1, -1);
-> +			/* Matching key disappeared (user removed the key?)
-> +			 * let the handshake timeout.
-> +			 */
-> +			if (!ao_key) {
-> +				net_info_ratelimited("TCP-AO key for (%pI6, %d)->(%pI6, %d) suddenly disappeared, won't ACK new connection\n",
-> +						     addr,
-> +						     ntohs(tcp_hdr(skb)->source),
-> +						     &ipv6_hdr(skb)->daddr,
-> +						     ntohs(tcp_hdr(skb)->dest));
-> +				return;
-> +			}
-> +		}
-> +		traffic_key = kmalloc(tcp_ao_digest_size(ao_key), GFP_ATOMIC);
-> +		if (!traffic_key)
-> +			return;
-> +
-> +		keyid = aoh->keyid;
-
-And reinitialised here.
-But is otherwise unused.
-
-Flagged in a W=1 build with both clang-16 and gcc-13.
-
-> +		tcp_v6_ao_calc_key_rsk(ao_key, traffic_key, req);
-> +#endif
-> +	} else {
-> +		md5_key = tcp_v6_md5_do_lookup(sk, addr, l3index);
-> +	}
->  
->  	/* sk->sk_state == TCP_LISTEN -> for regular TCP_SYN_RECV
->  	 * sk->sk_state == TCP_SYN_RECV -> for Fast Open.
-
-...
 
