@@ -1,99 +1,120 @@
-Return-Path: <netdev+bounces-28001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A93577DDF1
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D883077DDF9
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 754481C20F45
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:54:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1531F1C20FDF
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D034FBF0;
-	Wed, 16 Aug 2023 09:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EB5FBF3;
+	Wed, 16 Aug 2023 09:57:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524A1D52B
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:54:40 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82F42110
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:54:27 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RQk1C6DpVzFqgT;
-	Wed, 16 Aug 2023 17:51:27 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
- (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 16 Aug
- 2023 17:54:24 +0800
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-To: <netdev@vger.kernel.org>, =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?=
-	<rafal@milecki.pl>, Broadcom internal kernel review list
-	<bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Doug Berger
-	<opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH -next] net: broadcom: Use helper function IS_ERR_OR_NULL()
-Date: Wed, 16 Aug 2023 17:53:56 +0800
-Message-ID: <20230816095357.2896080-1-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6DFFBF1
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:57:12 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050B210F
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:57:10 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 028D620764;
+	Wed, 16 Aug 2023 11:57:09 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ejMLfn_qWZSq; Wed, 16 Aug 2023 11:57:08 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 6406F20520;
+	Wed, 16 Aug 2023 11:57:08 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id 5E34D80004A;
+	Wed, 16 Aug 2023 11:57:08 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 16 Aug 2023 11:57:08 +0200
+Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 16 Aug
+ 2023 11:57:07 +0200
+Date: Wed, 16 Aug 2023 11:57:01 +0200
+From: Antony Antony <antony.antony@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>
+CC: Eyal Birger <eyal.birger@gmail.com>, Antony Antony via Devel
+	<devel@linux-ipsec.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v4 ipsec-next 0/3] xfrm: Support GRO decapsulation for ESP in
+ UDP encapsulation
+Message-ID: <cover.1692172297.git.antony.antony@secunet.com>
+Reply-To: <antony.antony@secunet.com>
+References: <6dfd03c5fa0afb99f255f4a35772df19e33880db.1674156645.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <6dfd03c5fa0afb99f255f4a35772df19e33880db.1674156645.git.antony.antony@secunet.com>
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use IS_ERR_OR_NULL() instead of open-coding it
-to simplify the code.
+Hello,
+Here I re-worked this patch set and here is v4.
 
-Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
----
- drivers/net/ethernet/broadcom/bgmac.c        | 2 +-
- drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+v1->v2 fixed error path added skb_push
+        use is_fou instead of holding sk in skb.
+        user configurable option to enable GRO; using UDP_GRO
 
-diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
-index 10c7c232cc4e..4cd7c6abb548 100644
---- a/drivers/net/ethernet/broadcom/bgmac.c
-+++ b/drivers/net/ethernet/broadcom/bgmac.c
-@@ -1448,7 +1448,7 @@ int bgmac_phy_connect_direct(struct bgmac *bgmac)
- 	int err;
- 
- 	phy_dev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
--	if (!phy_dev || IS_ERR(phy_dev)) {
-+	if (IS_ERR_OR_NULL(phy_dev)) {
- 		dev_err(bgmac->dev, "Failed to register fixed PHY device\n");
- 		return -ENODEV;
- 	}
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-index 0092e46c46f8..aa9a436fb3ce 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-@@ -617,7 +617,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
- 		};
- 
- 		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
--		if (!phydev || IS_ERR(phydev)) {
-+		if (IS_ERR_OR_NULL(phydev)) {
- 			dev_err(kdev, "failed to register fixed PHY device\n");
- 			return -ENODEV;
- 		}
--- 
-2.34.1
+v2->v3 only support GRO for UDP_ENCAP_ESPINUDP and not
+        UDP_ENCAP_ESPINUDP_NON_IKE. The _NON_IKE is an IETF early draft
+        version and not widly used.
 
+v3->v4 removed refactoring since refactored function is only used once
+        removed refcount on sk, sk is not used any more.
+        fixed encap_type as Eyal recommended.
+        removed un-necessary else since there is a goto before that.
+
+We are not merging v4 and v6 functions at this moment. As it would
+need more work to do it cleanly.
+
+
+Steffen Klassert (3):
+  xfrm: Use the XFRM_GRO to indicate a GRO call on input.
+  xfrm: Support GRO for IPv4 ESP in UDP encapsulation.
+  xfrm: Support GRO for IPv6 ESP in UDP encapsulation.
+
+ include/net/gro.h        |  2 +-
+ include/net/ipv6_stubs.h |  3 ++
+ include/net/xfrm.h       |  4 ++
+ net/ipv4/esp4_offload.c  |  6 ++-
+ net/ipv4/udp.c           | 18 +++++++-
+ net/ipv4/xfrm4_input.c   | 98 ++++++++++++++++++++++++++++++++--------
+ net/ipv6/af_inet6.c      |  1 +
+ net/ipv6/esp6_offload.c  | 10 +++-
+ net/ipv6/xfrm6_input.c   | 98 ++++++++++++++++++++++++++++++++--------
+ net/xfrm/xfrm_input.c    |  6 +--
+ 10 files changed, 197 insertions(+), 49 deletions(-)
+
+--
+2.30.2
+
+-antony
 
