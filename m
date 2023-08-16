@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-28152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E9377E661
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:29:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B4C77E6BE
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3EC1C21054
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:29:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E15A281BC1
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731F716436;
-	Wed, 16 Aug 2023 16:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D61174D0;
+	Wed, 16 Aug 2023 16:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686F516414
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:29:35 +0000 (UTC)
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193F51980;
-	Wed, 16 Aug 2023 09:29:31 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-649921ec030so912886d6.1;
-        Wed, 16 Aug 2023 09:29:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692203370; x=1692808170;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XZoiawh33EN8egkU31l+X3dd1VdBtDLA5RvWoX+ot10=;
-        b=it+m/f27p3Xv9yPNgEvDmy8ksdTIyC3AP6snE7vGudLdFOFQRrfUr2MwJcCvN3JEAY
-         1Rd106fgNEJnl/ukfu1L9/JwsuBcJleYKjmkCL9sG7A3NwpK7KrIzhN01NBbA9ARM9hV
-         SJS0X/nJum0laNlaQ5ZGvZRZiLAwdpO2BfOx9AOGaTAKR5IEPTV2zN+vNv96eS18Ni5M
-         OQdwmEhPfXd2hJK2A9EROjJyevDr2gpVc2zo9GR/g0cMcibIcWxmB4Rr8Zudg6dP7kII
-         9FeSRWA5ZZF+cprOdTwRT+SJ9BaGaY29vrLCSiCHnj9r0CJDDhYa0pvGeEPhGARF1zAl
-         jJ8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692203370; x=1692808170;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XZoiawh33EN8egkU31l+X3dd1VdBtDLA5RvWoX+ot10=;
-        b=iGeVLxzSyi9I4BJ70thtGvWK/+QJGurZ6qoV2bYQ4k089HLvqTjn0WI1/riQs/sMr2
-         6KV/7Mmnb+oZ2U2lmI3mHiWrT3TiKo0xL8gt6iD2rbiqO4elPvK+dRIZaov8sxjTh4SK
-         AD39DGEVnYvASjrEYVgIOAaTWBCPKvdCQgk+e6jiYSLHXbYPUK8/I/kPdhNUS03LemSR
-         nUucGaLnaVL75WYBpj97OwfQdoS/gPRz4Y6XufmQLeMPE0HT24+vceVgHF539vSwW5fO
-         LzZqxHf82z5Pyr13HWSajNLqBJWzOywDOeb9hqFpKoUaUTOHUF92rDa+dSeiOGY6ANMY
-         IcJw==
-X-Gm-Message-State: AOJu0YylHGtCcxn4caoxYksEjxo1DlxoZ9HReTrtESDXPITvE2ygY/iE
-	5+1czohnfxKoa0nkv95qhTE=
-X-Google-Smtp-Source: AGHT+IH2zLks0E7Y4TfQ5mZXZCXk86892jlNYmBii+ktZG2i0ZIzA4KnSgdIUoi9+5AIZpP1uON+Zg==
-X-Received: by 2002:a0c:e44d:0:b0:636:f84f:f0c5 with SMTP id d13-20020a0ce44d000000b00636f84ff0c5mr1998219qvm.38.1692203369991;
-        Wed, 16 Aug 2023 09:29:29 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id p6-20020a0ce186000000b00632191a70aesm4949859qvl.88.2023.08.16.09.29.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Aug 2023 09:29:28 -0700 (PDT)
-Message-ID: <8fb144a7-92ac-2107-8a7c-19acc109bad8@gmail.com>
-Date: Wed, 16 Aug 2023 09:29:01 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D0314281
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:40:23 +0000 (UTC)
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46563271F
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:40:21 -0700 (PDT)
+Received: from kero.packetmixer.de (p200300FA272a67000Bb2D6DcAf57d46E.dip0.t-ipconnect.de [IPv6:2003:fa:272a:6700:bb2:d6dc:af57:d46e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 64368FB5B0;
+	Wed, 16 Aug 2023 18:33:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
+	s=09092022; t=1692203600; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=m1w6FoGMV+sfhD7tg4nzP8v3sE5qiFtEwg083Tmb81U=;
+	b=F3hUDqEbmJekyGRawjrUDrekktiIIGEiZO6ZqsP4F/8/5U4J5dyFVnlioGi3/wGXPzjzgF
+	OR2SUHwjZcGvyWslqMh78BrrJUwRZMrCIRJCJ/A8dSU8cdLkWdNTC5Qo9yuadLRGKgEnth
+	b1K+qzmZYSN6JYTdckO0eSgcn5yy023JSAz+aNqD+a/CFfNRYYNYXgrOKaOe5QFwvJak7H
+	DEpE3Jh6fQo3gPS7ZT9MnpeNCumRCc7QQIc7ak/3hBrF9w151B/bMOYH7bJZjF7YoEToSV
+	EVLt8GFuaOXMkFbbHrA9btUS4NOC3r9vo8J8BC0tRP3tIbdFQvZcw14An+xkMg==
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH 0/5] pull request for net: batman-adv 2023-08-16
+Date: Wed, 16 Aug 2023 18:33:13 +0200
+Message-Id: <20230816163318.189996-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: microchip,lan937x: add missing
- ethernet on example
-Content-Language: en-US
-To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=c5=a0ipraga?= <alsi@bang-olufsen.dk>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-2-arinc.unal@arinc9.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230812091708.34665-2-arinc.unal@arinc9.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=simonwunderlich.de; s=09092022; t=1692203600;
+	h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=m1w6FoGMV+sfhD7tg4nzP8v3sE5qiFtEwg083Tmb81U=;
+	b=w5zzxd2iYrgIPHMMWMgNsHPeyKEvPUrotjdrBAta2yBKE6sSzjtLbrjYlDLDs/BAl40U8I
+	orVg+3+SL2m2/rpRqQkdEx3u9wEm+Mmk09Z92g6SIcQfSAOZsFfByMv8tGqoMfKJsNZ0ZY
+	Iz2F0NltGKXXy0KED36TUEbn3R3gkeEBUvJvCPukc1KOpQjARrovFykxk757udt0nVr8qB
+	9bWiLyCBXznHQMYUi0nXeZJWFfZHBAgzDmFrGWblH6O8C3MNBD5gvrJvqulSy3ATCP0+tq
+	BiUFxxZc2nyT7iPziZNqnPdmPLDpdHIh66UDRSEWARwNU+IZa+WCwkUI0Mba2A==
+ARC-Seal: i=1; s=09092022; d=simonwunderlich.de; t=1692203600; a=rsa-sha256;
+	cv=none;
+	b=hi9As+oKAsM71PgOCV5+aZUmKgvQPNgiAe34JsFGZQ1zGoxISTlDI8Yn/CZAsVOMGSja8JQsPEMwFU6AZ3TdgagsoC485sq/0/dp87RH7mp0gze1JcNe0AdtXVTMJwaWNC3XGXUqXJGM7xM5EiyQpmekwsJixO6pPW8L1BysXvHjZuM3I6Or5Dno+V7460CSBK3riYxAyzs5k9PMUkbsKCSRxUHDzdLQ9sOMEX+Lxib4Vy6k359X7nAp+wfx2tSFuh9BJP7EJFD2Z18hJ9i7t2Pkh8bKHhqFoAOQ0RA1VWABfTcLrQczgXUdyKKB9Z4C7igbm3LWRoDTIA08w5HsSA==
+ARC-Authentication-Results: i=1;
+	mail.simonwunderlich.de;
+	auth=pass smtp.auth=sw@simonwunderlich.de smtp.mailfrom=sw@simonwunderlich.de
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/12/23 02:17, Arınç ÜNAL wrote:
-> The port@5 node on the example is missing the ethernet property. Add it.
-> Remove the MAC bindings on the example as they cannot be validated.
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+Hi David, hi Jakub,
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+here are a few bugfixes for batman-adv which we would like to have integrated into net.
 
+Please pull or let me know of any problem!
+
+Thank you,
+      Simon
+
+The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
+
+  Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
+
+are available in the Git repository at:
+
+  git://git.open-mesh.org/linux-merge.git tags/batadv-net-pullrequest-20230816
+
+for you to fetch changes up to 421d467dc2d483175bad4fb76a31b9e5a3d744cf:
+
+  batman-adv: Fix batadv_v_ogm_aggr_send memory leak (2023-08-09 17:33:03 +0200)
+
+----------------------------------------------------------------
+Here are some batman-adv bugfixes:
+
+ - Fix issues with adjusted MTUs (2 patches), by Sven Eckelmann
+
+ - Fix header access for memory reallocation case, by Remi Pommarel
+
+ - Fix two memory leaks (2 patches), by Remi Pommarel
+
+----------------------------------------------------------------
+Remi Pommarel (3):
+      batman-adv: Do not get eth header before batadv_check_management_packet
+      batman-adv: Fix TT global entry leak when client roamed back
+      batman-adv: Fix batadv_v_ogm_aggr_send memory leak
+
+Sven Eckelmann (2):
+      batman-adv: Trigger events for auto adjusted MTU
+      batman-adv: Don't increase MTU when set by user
+
+ net/batman-adv/bat_v_elp.c         |  3 ++-
+ net/batman-adv/bat_v_ogm.c         |  7 +++++--
+ net/batman-adv/hard-interface.c    | 14 +++++++++++++-
+ net/batman-adv/soft-interface.c    |  3 +++
+ net/batman-adv/translation-table.c |  1 -
+ net/batman-adv/types.h             |  6 ++++++
+ 6 files changed, 29 insertions(+), 5 deletions(-)
 
