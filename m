@@ -1,240 +1,196 @@
-Return-Path: <netdev+bounces-27916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFF077D9D4
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 07:38:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4929977D9DF
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 07:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4066B1C20EFD
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 05:38:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02D99281768
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 05:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B625CAC;
-	Wed, 16 Aug 2023 05:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51C55CBD;
+	Wed, 16 Aug 2023 05:40:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD35A210D
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 05:38:42 +0000 (UTC)
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2100E1FCE
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 22:38:39 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230816053836epoutp0362d7a548eafeef23ec99be27ed4bb0f9~7xnryidk81056510565epoutp03c
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 05:38:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230816053836epoutp0362d7a548eafeef23ec99be27ed4bb0f9~7xnryidk81056510565epoutp03c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1692164316;
-	bh=iC6z9KTXhMJJKJAifkpiD2z5zC2PU00ngNvG/1pLNSw=;
-	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-	b=pdRZ5MH0EHqmC5hl/CwwfXoh1ZuOmeuP7KjqlWltQlpObqe/P70IYNuyw/Apvp3wH
-	 HTooaRUEHu+OozaXddruLvN/IPW5EXkqrW0MkVMDCknMI5M67SGp6do5Ei+iXdBdFL
-	 2QZJ7yCbyO1DsJCPSuxXpSVMoeMGSwVAiMdKCB2A=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20230816053835epcas5p1324b989bf7fcb196862235201026e106~7xnq1lHHq1702017020epcas5p1t;
-	Wed, 16 Aug 2023 05:38:35 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4RQcPP3XCBz4x9Q9; Wed, 16 Aug
-	2023 05:38:33 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B6.54.06099.9D06CD46; Wed, 16 Aug 2023 14:38:33 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20230816053710epcas5p498d626cac93ea679af6003942f1504f3~7xmb1vekg3098830988epcas5p4B;
-	Wed, 16 Aug 2023 05:37:10 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20230816053710epsmtrp2776b05489f5d58352912df9d1c091dad~7xmb0k_RR1948119481epsmtrp2K;
-	Wed, 16 Aug 2023 05:37:10 +0000 (GMT)
-X-AuditID: b6c32a4b-d308d700000017d3-bd-64dc60d96338
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	96.1F.34491.6806CD46; Wed, 16 Aug 2023 14:37:10 +0900 (KST)
-Received: from FDSFTE302 (unknown [107.122.81.78]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20230816053707epsmtip23fb655503682b58fb08b19fd8c01e993~7xmY46zVo3213332133epsmtip2j;
-	Wed, 16 Aug 2023 05:37:07 +0000 (GMT)
-From: "Sriranjani P" <sriranjani.p@samsung.com>
-To: "'Rob Herring'" <robh@kernel.org>
-Cc: <edumazet@google.com>, <linux-kernel@vger.kernel.org>,
-	<alexandre.torgue@foss.st.com>, <ravi.patel@samsung.com>,
-	<alim.akhtar@samsung.com>, <linux-samsung-soc@vger.kernel.org>,
-	<linux-fsd@tesla.com>, <conor+dt@kernel.org>, <mcoquelin.stm32@gmail.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <pabeni@redhat.com>,
-	<robh+dt@kernel.org>, <pankaj.dubey@samsung.com>,
-	<richardcochran@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
-	<joabreu@synopsys.com>, <devicetree@vger.kernel.org>, <davem@davemloft.net>,
-	<swathi.ks@samsung.com>
-In-Reply-To: <169201998303.2086680.8457687937999615543.robh@kernel.org>
-Subject: RE: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
- bindings
-Date: Wed, 16 Aug 2023 11:06:51 +0530
-Message-ID: <000001d9d003$b3a9a8a0$1afcf9e0$@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9080649
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 05:40:28 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC7926B5
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 22:40:19 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so14833605a12.0
+        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 22:40:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692164418; x=1692769218;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=USJC4rpReyW+hwtVRVOdsjwJafjpOqRaJ3WmgpmCGIM=;
+        b=k5e/30EsXvfXpGX01sx0sXsAOLqB7+6MUKPHrEq4a3LTu8aE5E4v3XaYP+NeBXmySy
+         Ynnwvbr2wkMuJuPVWUA+vRnW6j6RIJqfpsHhbR9RYGl743YsIFzPJOiq0KDpZnZAK9Ll
+         Tz22ZDIEkXO9CaNwZFf1NWbRqQHXqXnuNs9VB7eK5nIdkJKA8+RQV0t6M43MxhmXmWMb
+         U0U9VDqTzkMSljTBN8FfbH0KKZ0lLUTErOdOCdE4iGbA4bu1jL3ct3xsqtFIjDNvuS5Z
+         1TY+vOpqpukE/JOwLf0URvnvR7AnDJLnRqb7y84t/vXPJq01Z9RRQ4WaLmCbnBwIlUgM
+         Ulfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692164418; x=1692769218;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=USJC4rpReyW+hwtVRVOdsjwJafjpOqRaJ3WmgpmCGIM=;
+        b=hKfJcyi+wC4r7Z7jtwMXyqfxvPWZee92GFM/tgHScrcI3xw35Iv1Vd/fwapT8SHP28
+         bn+K82yCxOVdkttgw/yvYf4xzBNkUt9o4ek67kMEkVWbA2wfd5wPBtamsB97YTZXP3CE
+         sEdYheGPu9PX80pxMwD8ugwhR518UyDTLukeQplMOAWuQe38KYyDz+XYd9w85YebeOH6
+         iS6TSmpKVuz1Hk2VXwWJx1Y4pmSM66gpcmlm3DO2qlCD7aTctGvb7D+fvUyKz7OCxpr7
+         /pvXJdF7yM+L3A2kqCHheU4fGiSRpZbodkSiq19cec6lrV0nQZ+N+o0EgdlYzxCKy+kT
+         OghQ==
+X-Gm-Message-State: AOJu0Yy0P0EgaL4I9rdSABN1KD0OhW9Sc7tsbRtWRTwBohzBGxSLfmv3
+	ZfQHx17nFEIn/QdXdlIJYBGBgQ==
+X-Google-Smtp-Source: AGHT+IH4DWL6x7gAbnrg5y+pHdZZyj3rUVGs96XdIkDFPXvPhUN+hMnhvwaeC1baPY9OqB7ySNqtkQ==
+X-Received: by 2002:aa7:df04:0:b0:522:4764:8baa with SMTP id c4-20020aa7df04000000b0052247648baamr1330178edy.12.1692164418258;
+        Tue, 15 Aug 2023 22:40:18 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.214.188])
+        by smtp.gmail.com with ESMTPSA id v17-20020aa7d9d1000000b0052563bff34bsm3783876eds.63.2023.08.15.22.40.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Aug 2023 22:40:17 -0700 (PDT)
+Message-ID: <bad3c49b-a571-bbba-4c20-d2c6f2d2ce46@linaro.org>
+Date: Wed, 16 Aug 2023 07:40:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQG0kE2cByMDcfrFjxkR49X5VWx9JAKGcKNgAXd78/0BAMIwYrAO8GWg
-Content-Language: en-in
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpll+LIzCtJLcpLzFFi42LZdlhTQ/dmwp0Ug2s3RSx+vpzGaPFg3jY2
-	izV7zzFZzDnfwmIx/8g5Vounxx6xW9xb9I7Vou/FQ2aLC9v6WC02Pb7GavHwVbjF5V1z2Cxm
-	nN/HZDHv71pWi2MLxCy+nX7DaLFo6xd2i4cf9rBbHDnzgtmide8Rdov/e3awW3zZeJPdQcxj
-	y8qbTB5P+7eye+ycdZfdY8GmUo9NqzrZPO5c28PmsXlJvcf7fVfZPPq2rGL02LL/M6PHv6a5
-	7B6fN8kF8ERl22SkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6
-	ZeYAPaykUJaYUwoUCkgsLlbSt7Mpyi8tSVXIyC8usVVKLUjJKTAp0CtOzC0uzUvXy0stsTI0
-	MDAyBSpMyM442LeYqeCBXMWf878ZGxgvSHUxcnJICJhIvFw/lamLkYtDSGA3o8TsXW9ZIJxP
-	jBJT722GynxjlPi8eh0LTMubHavZIBJ7GSX2XtzDCuE8Z5S4N3cHM0gVm4C+xOsV89lAbBEB
-	VYmmWQ/A5jILXGaR+Hh1FStIglPAXWLJ7AdMILawQKDEvGczgBo4OFiAGnrOe4KEeQUsJVau
-	7WGFsAUlTs58AnYFs4C2xLKFr5khLlKQ+Pl0GSvELjeJLXseMUPUiEsc/dnDDLJXQmA1p8SJ
-	M5PB5ksIuEjMOCEN0Sss8er4FnYIW0ri87u9bBB2usTmI5tZIewciY6mZqhd9hIHrsxhARnD
-	LKApsX6XPkRYVmLqqXVMEGv5JHp/P2GCiPNK7JgHY6tJLH7UCWXLSKx99Il1AqPSLCSfzULy
-	2SwkH8xC2LaAkWUVo2RqQXFuemqxaYFxXmo5PMKT83M3MYLzg5b3DsZHDz7oHWJk4mA8xCjB
-	wawkwtvDeytFiDclsbIqtSg/vqg0J7X4EKMpMLQnMkuJJucDM1ReSbyhiaWBiZmZmYmlsZmh
-	kjjv69a5KUIC6YklqdmpqQWpRTB9TBycUg1M3NyF3TLF5i4Fl6epv2vYFxX/bcnqJA2FW/+O
-	BwdyauvM81j3VfpnrXXMqynCn5qMNk/awqIdFpxjN/upgr+p6tdtxgLmZXHcZ9541kalTVWR
-	K3Iv2ORy4MAf/acOkWyHlVwP7de91OXfkeSaFby6P/0j/6726SorTDTTq4tbdZ+erJYpqJtW
-	tswzub6n584zK7/lVn5KAvXyuWxbtXz/eT9xWrtpx3p21WTxv/eLj1RMOboq+UBid7BvoOGV
-	mz7rE0TORfA1rz3M06Mv9s6gPOP37aAE2S5Fjr98Uspf6lKbtNY/sZfwfSRdezSgfadNiY3b
-	Fa07c3ad5T0cuvj+WrkbS18nb//zoV5ziRJLcUaioRZzUXEiABX7bpyYBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfVDLcRzHffd7XGd3v1anb6Uw4uQqw/EtDueOfpwJ6XSOmPa7ldrMZhjn
-	uMIpk86zyUq6HkaOn5ZowprOc3na3VxYaSmRPNuRhxqu/973eb9f78/njw+NibvxEDpdvZ7T
-	quWZEtIPr66XDIvatapZMb72VxDydh4GyG2uJtGZK/cFqKBxB44KHfcJ5GlopdDz4m4C5XW0
-	YKipOo9A/EsngVpeL0WPLheQ6GhjnQCZeysJ1FA0BH258wagYusnCrX02CjkuNuBoZ1XHBT6
-	Zauh0KfzLmrmELaqwiVgPfusFHvJ9Ixii3g9y1tySLbZaSPZCyXb2Hd1T0g2r8oC2KqrHwH7
-	M+sExX7kwxcOXuY3TcFlpm/gtDHTV/mlmUt5XNMctmmvzY5tBzeDc4GQhswk+KbmNJkL/Ggx
-	Uwugqb6d9BlD4S13CebTAbDi5yvKF/IAaDR24X0GycTArvLCfiCQiYBZJjfeF8KYThx+/V6G
-	+YgfADblfBD0pYRMPCw57u7XAUwCPFtz6A9N0/gf2tg4t28sYmJhRaWR8Gl/eOtYW/8yjBkH
-	PS7Pf116suvvdcOh11NK+I6YA6tsrZgvEwRveI1YPggwDagyDagyDagyDUCKAG4BwZxGp1Kq
-	dFKNVM1tjNbJVTq9WhmdulbFg/6XiBxbAy5aeqLtQEADO4A0JgkUGUVPFWKRQm7YzGnXrtTq
-	MzmdHYTSuCRIFNSxVyFmlPL1XAbHaTjtP1dAC0O2Cwwz4zVT8bz4yTvEPeuchjY61Dpyxf4F
-	sq2z69cUh6QaCJXee+pFU9ysjms62Zyt7yWybJx/bo1yIIehPGx5z5gL7S6Dxf+wc5b+1fvQ
-	PdfLzlq0EURyLRocVRC7+MykO11q6cYvMfqGea/JcdhSq7rSLLyYmr2o6cPDGRntaxJRivPE
-	qOZdcbvx7Jedox8G9p5LWrKaPkYFhnn3TeFDvt3rLdeQD2Ilabmr42KPJt9u/zye25w0IaWu
-	m0cZxBRSFp7U6z9Zw7Tac1Kmm/KFyrbd7HFplCwhoyLRNULz4F7iBqWhbv6RdSD/yCAq/PHp
-	qa6JB3LMo9x41sG3UtsWCa5Lk0sjMa1O/hsJNrQTgQMAAA==
-X-CMS-MailID: 20230816053710epcas5p498d626cac93ea679af6003942f1504f3
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Content-Language: en-US
+To: Sriranjani P <sriranjani.p@samsung.com>, 'Rob Herring' <robh@kernel.org>
+Cc: edumazet@google.com, linux-kernel@vger.kernel.org,
+ alexandre.torgue@foss.st.com, ravi.patel@samsung.com,
+ alim.akhtar@samsung.com, linux-samsung-soc@vger.kernel.org,
+ linux-fsd@tesla.com, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
+ kuba@kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, pabeni@redhat.com, robh+dt@kernel.org,
+ pankaj.dubey@samsung.com, richardcochran@gmail.com,
+ krzysztof.kozlowski+dt@linaro.org, joabreu@synopsys.com,
+ devicetree@vger.kernel.org, davem@davemloft.net, swathi.ks@samsung.com
 References: <20230814112539.70453-1-sriranjani.p@samsung.com>
-	<CGME20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66@epcas5p3.samsung.com>
-	<20230814112539.70453-2-sriranjani.p@samsung.com>
-	<169201998303.2086680.8457687937999615543.robh@kernel.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+ <CGME20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66@epcas5p3.samsung.com>
+ <20230814112539.70453-2-sriranjani.p@samsung.com>
+ <169201998303.2086680.8457687937999615543.robh@kernel.org>
+ <000001d9d003$b3a9a8a0$1afcf9e0$@samsung.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <000001d9d003$b3a9a8a0$1afcf9e0$@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 16/08/2023 07:36, Sriranjani P wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Rob Herring [mailto:robh@kernel.org]
+>> Sent: 14 August 2023 19:03
+>> To: Sriranjani P <sriranjani.p@samsung.com>
+>> Cc: edumazet@google.com; linux-kernel@vger.kernel.org;
+>> alexandre.torgue@foss.st.com; ravi.patel@samsung.com;
+>> alim.akhtar@samsung.com; linux-samsung-soc@vger.kernel.org; linux-
+>> fsd@tesla.com; conor+dt@kernel.org; mcoquelin.stm32@gmail.com;
+>> kuba@kernel.org; netdev@vger.kernel.org; linux-arm-
+>> kernel@lists.infradead.org; pabeni@redhat.com; robh+dt@kernel.org;
+>> pankaj.dubey@samsung.com; richardcochran@gmail.com;
+>> krzysztof.kozlowski+dt@linaro.org; joabreu@synopsys.com;
+>> devicetree@vger.kernel.org; davem@davemloft.net;
+>> swathi.ks@samsung.com
+>> Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
+>> bindings
+>>
+>>
+>> On Mon, 14 Aug 2023 16:55:36 +0530, Sriranjani P wrote:
+>>> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
+>>> Ethernet YAML schema to enable the DT validation.
+>>>
+>>> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
+>>> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
+>>> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
+>>> Signed-off-by: Sriranjani P <sriranjani.p@samsung.com>
+>>> ---
+>>>  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
+>>>  .../devicetree/bindings/net/tesla,ethqos.yaml | 114
+>>> ++++++++++++++++++
+>>>  2 files changed, 117 insertions(+), 2 deletions(-)  create mode
+>>> 100644 Documentation/devicetree/bindings/net/tesla,ethqos.yaml
+>>>
+>>
+>> My bot found errors running 'make DT_CHECKER_FLAGS=-m
+>> dt_binding_check'
+>> on your patch (DT_CHECKER_FLAGS is new in v5.13):
+>>
+>> yamllint warnings/errors:
+>>
+>> dtschema/dtc warnings/errors:
+>> /builds/robherring/dt-review-
+>> ci/linux/Documentation/devicetree/bindings/net/tesla,ethqos.yaml:
+>> properties:clock-names: {'minItems': 5, 'maxItems': 10, 'items': [{'const':
+>> 'ptp_ref'}, {'const': 'master_bus'}, {'const': 'slave_bus'}, {'const': 'tx'}, {'const':
+>> 'rx'}, {'const': 'master2_bus'}, {'const': 'slave2_bus'}, {'const':
+>> 'eqos_rxclk_mux'}, {'const': 'eqos_phyrxclk'}, {'const':
+>> 'dout_peric_rgmii_clk'}]} should not be valid under {'required': ['maxItems']}
+>> 	hint: "maxItems" is not needed with an "items" list
+>> 	from schema $id: https://protect2.fireeye.com/v1/url?k=f50e335d-
+>> aa950a44-f50fb812-000babff3793-de26ea17ef025418&q=1&e=897786e4-
+>> 5f9b-40d8-8a7f-399cb69c7ee8&u=http%3A%2F%2Fdevicetree.org%2Fmeta-
+>> schemas%2Fitems.yaml%23
+>> Documentation/devicetree/bindings/net/tesla,ethqos.example.dtb:
+>> /example-0/ethernet@14300000: failed to match any schema with
+>> compatible: ['tesla,dwc-qos-ethernet-4.21']
+>>
+> 
+> Thanks for review. Will fix this in v4.
+
+Test the patches before sending them.
+
+> 
+>> doc reference errors (make refcheckdocs):
+>>
+>> See https://protect2.fireeye.com/v1/url?k=ccb7f6d0-932ccfc9-ccb67d9f-
+>> 000babff3793-2137ac63fe6ddef8&q=1&e=897786e4-5f9b-40d8-8a7f-
+>> 399cb69c7ee8&u=https%3A%2F%2Fpatchwork.ozlabs.org%2Fproject%2Fdev
+>> icetree-bindings%2Fpatch%2F20230814112539.70453-2-
+>> sriranjani.p%40samsung.com
+>>
+>> The base for the series is generally the latest rc1. A different dependency
+>> should be noted in *this* patch.
+>>
+> 
+> Sorry, I could not get this comment, can you elaborate this. 
+
+What else to say? You did no stated any dependency here. The base is
+explained.
 
 
-> -----Original Message-----
-> From: Rob Herring =5Bmailto:robh=40kernel.org=5D
-> Sent: 14 August 2023 19:03
-> To: Sriranjani P <sriranjani.p=40samsung.com>
-> Cc: edumazet=40google.com; linux-kernel=40vger.kernel.org;
-> alexandre.torgue=40foss.st.com; ravi.patel=40samsung.com;
-> alim.akhtar=40samsung.com; linux-samsung-soc=40vger.kernel.org; linux-
-> fsd=40tesla.com; conor+dt=40kernel.org; mcoquelin.stm32=40gmail.com;
-> kuba=40kernel.org; netdev=40vger.kernel.org; linux-arm-
-> kernel=40lists.infradead.org; pabeni=40redhat.com; robh+dt=40kernel.org;
-> pankaj.dubey=40samsung.com; richardcochran=40gmail.com;
-> krzysztof.kozlowski+dt=40linaro.org; joabreu=40synopsys.com;
-> devicetree=40vger.kernel.org; davem=40davemloft.net;
-> swathi.ks=40samsung.com
-> Subject: Re: =5BPATCH v3 1/4=5D dt-bindings: net: Add FSD EQoS device tre=
-e
-> bindings
->=20
->=20
-> On Mon, 14 Aug 2023 16:55:36 +0530, Sriranjani P wrote:
-> > Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
-> > Ethernet YAML schema to enable the DT validation.
-> >
-> > Signed-off-by: Pankaj Dubey <pankaj.dubey=40samsung.com>
-> > Signed-off-by: Ravi Patel <ravi.patel=40samsung.com>
-> > Signed-off-by: Swathi K S <swathi.ks=40samsung.com>
-> > Signed-off-by: Sriranjani P <sriranjani.p=40samsung.com>
-> > ---
-> >  .../devicetree/bindings/net/snps,dwmac.yaml   =7C   5 +-
-> >  .../devicetree/bindings/net/tesla,ethqos.yaml =7C 114
-> > ++++++++++++++++++
-> >  2 files changed, 117 insertions(+), 2 deletions(-)  create mode
-> > 100644 Documentation/devicetree/bindings/net/tesla,ethqos.yaml
-> >
->=20
-> My bot found errors running 'make DT_CHECKER_FLAGS=3D-m
-> dt_binding_check'
-> on your patch (DT_CHECKER_FLAGS is new in v5.13):
->=20
-> yamllint warnings/errors:
->=20
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-
-> ci/linux/Documentation/devicetree/bindings/net/tesla,ethqos.yaml:
-> properties:clock-names: =7B'minItems': 5, 'maxItems': 10, 'items': =5B=7B=
-'const':
-> 'ptp_ref'=7D, =7B'const': 'master_bus'=7D, =7B'const': 'slave_bus'=7D, =
-=7B'const': 'tx'=7D, =7B'const':
-> 'rx'=7D, =7B'const': 'master2_bus'=7D, =7B'const': 'slave2_bus'=7D, =7B'c=
-onst':
-> 'eqos_rxclk_mux'=7D, =7B'const': 'eqos_phyrxclk'=7D, =7B'const':
-> 'dout_peric_rgmii_clk'=7D=5D=7D should not be valid under =7B'required': =
-=5B'maxItems'=5D=7D
-> 	hint: =22maxItems=22 is not needed with an =22items=22 list
-> 	from schema =24id: https://protect2.fireeye.com/v1/url?k=3Df50e335d-
-> aa950a44-f50fb812-000babff3793-de26ea17ef025418&q=3D1&e=3D897786e4-
-> 5f9b-40d8-8a7f-399cb69c7ee8&u=3Dhttp%3A%2F%2Fdevicetree.org%2Fmeta-
-> schemas%2Fitems.yaml%23
-> Documentation/devicetree/bindings/net/tesla,ethqos.example.dtb:
-> /example-0/ethernet=4014300000: failed to match any schema with
-> compatible: =5B'tesla,dwc-qos-ethernet-4.21'=5D
->=20
+> 
+>> If you already ran 'make dt_binding_check' and didn't see the above error(s),
+>> then make sure 'yamllint' is installed and dt-schema is up to
+>> date:
+>>
+>> pip3 install dtschema --upgrade
+>>
+> Sure will cross check.
 
-Thanks for review. Will fix this in v4.
+Why do you ask/comment to bot?
 
-> doc reference errors (make refcheckdocs):
->=20
-> See https://protect2.fireeye.com/v1/url?k=3Dccb7f6d0-932ccfc9-ccb67d9f-
-> 000babff3793-2137ac63fe6ddef8&q=3D1&e=3D897786e4-5f9b-40d8-8a7f-
-> 399cb69c7ee8&u=3Dhttps%3A%2F%2Fpatchwork.ozlabs.org%2Fproject%2Fdev
-> icetree-bindings%2Fpatch%2F20230814112539.70453-2-
-> sriranjani.p%40samsung.com
->=20
-> The base for the series is generally the latest rc1. A different dependen=
-cy
-> should be noted in *this* patch.
->=20
-
-Sorry, I could not get this comment, can you elaborate this.=20
-
-> If you already ran 'make dt_binding_check' and didn't see the above error=
-(s),
-> then make sure 'yamllint' is installed and dt-schema is up to
-> date:
->=20
-> pip3 install dtschema --upgrade
->=20
-Sure will cross check.
-
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your
-> schema.
-
+Best regards,
+Krzysztof
 
 
