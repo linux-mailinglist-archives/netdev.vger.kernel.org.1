@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-27907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF24977D90F
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 05:30:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267CF77D910
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 05:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE8E61C20ED8
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 03:30:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEFB1281787
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 03:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CD44432;
-	Wed, 16 Aug 2023 03:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0773443C;
+	Wed, 16 Aug 2023 03:29:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25257C2C0
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 03:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00DF3D70
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 03:29:54 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 866B92D4C
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 20:29:42 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62BF199D
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 20:29:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692156582; x=1723692582;
+  t=1692156588; x=1723692588;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=j0wgjcNVCJ5zRgTCdrgVv1+3vTY4mB9jUu7YmBacpJY=;
-  b=ibLIZrjWhVt4YgyEcG/IgcppMVktIlliSXWCbCeVhAuVZ0SkbvRwvE6+
-   6+61grqAdK4JOTc+lsjQrvfNrwzlTesGJomOiri0/yef6Gl99VE/bb4NL
-   mm0kzmtCR6emLbXSZR8n0M44vaCe9nBfZlkoLK01HxYszN1he6WkwtLWu
-   JaVNkgu1dCQijRNjiwGuGKD9dnjGvNBD9/0HluP0rq19XbEX92bdvUQkQ
-   PloEhF6vBguV01OvTptO2a2emorVZkYjWyyHZcceGB9Af/kJpy3kiMTW+
-   Wch//wXfsy9kM4cEtBpPuI2k2qqE537IXu99tthAes4EZ0aZgGzN7ijUx
+  bh=gyXmiazhK0lS4Mi2GSq5dcAu9HOPmkNnnNrBHe5ODaw=;
+  b=U3kwnT5Y8T0W0VpTfnMLLDQXmTqaIJUD7+7jT1+UwNRTfkeKlzDpfK7i
+   m/psHwHnAYO1dm3EQ6p7t/NP98QWfeALpO7Z8+EvAtmfk8M14KLGR+Gra
+   geWCol79BC8stMBRJW2/Io2JHjM1lrXBtn2kc1HmQc3wuOzXaK2IniNbA
+   4M2Ww+g4AXquvhr0KAulMf3CMOstUPyTKEptAvd+MXwhyKAr9rDX5cfOs
+   xv685quk8C/Om6CTx3jx98ni7AvDt1oHKlV+v3fRBYUlg16J3RF9MWqn7
+   Oi/J4DAOoTT7wgIcaxYOwbe3AIyd5mcIq47im4Lh7jV+RUs36x9SLksvN
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="372427788"
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="372427793"
 X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="372427788"
+   d="scan'208";a="372427793"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 20:29:42 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 20:29:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="710958649"
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="710958659"
 X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="710958649"
+   d="scan'208";a="710958659"
 Received: from dpdk-wuwenjun-icelake-ii.sh.intel.com ([10.67.110.152])
-  by orsmga006.jf.intel.com with ESMTP; 15 Aug 2023 20:29:40 -0700
+  by orsmga006.jf.intel.com with ESMTP; 15 Aug 2023 20:29:45 -0700
 From: Wenjun Wu <wenjun1.wu@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
@@ -52,9 +52,9 @@ Cc: xuejun.zhang@intel.com,
 	madhu.chittim@intel.com,
 	qi.z.zhang@intel.com,
 	anthony.l.nguyen@intel.com
-Subject: [PATCH iwl-next v3 4/5] iavf: Add devlink port function rate API support
-Date: Wed, 16 Aug 2023 11:33:52 +0800
-Message-Id: <20230816033353.94565-5-wenjun1.wu@intel.com>
+Subject: [PATCH iwl-next v3 5/5] iavf: Add VIRTCHNL Opcodes Support for Queue bw Setting
+Date: Wed, 16 Aug 2023 11:33:53 +0800
+Message-Id: <20230816033353.94565-6-wenjun1.wu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230816033353.94565-1-wenjun1.wu@intel.com>
 References: <20230727021021.961119-1-wenjun1.wu@intel.com>
@@ -75,376 +75,513 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jun Zhang <xuejun.zhang@intel.com>
 
-To allow user to configure queue based parameters, devlink port function
-rate api functions are added for setting node tx_max and tx_share
-parameters.
-
-iavf rate tree with root node and  queue nodes is created and registered
+iavf rate tree with root node and queue nodes is created and registered
 with devlink rate when iavf adapter is configured.
+
+User can configure the tx_max and tx_share of each queue. If any one of
+the queues have been fully updated by user, i.e. both tx_max and
+tx_share have been updated for that queue, VIRTCHNL opcodes of
+VIRTCHNL_OP_CONFIG_QUEUE_BW and VIRTCHNL_OP_CONFIG_QUANTA will be sent
+to PF to configure queues allocated to VF if PF indicates support of
+VIRTCHNL_VF_OFFLOAD_QOS through VF Resource / Capability Exchange.
 
 Signed-off-by: Jun Zhang <xuejun.zhang@intel.com>
 ---
- .../net/ethernet/intel/iavf/iavf_devlink.c    | 258 +++++++++++++++++-
- .../net/ethernet/intel/iavf/iavf_devlink.h    |  21 ++
- drivers/net/ethernet/intel/iavf/iavf_main.c   |   7 +-
- 3 files changed, 283 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/iavf/iavf.h        |  14 ++
+ .../net/ethernet/intel/iavf/iavf_devlink.c    |  29 +++
+ .../net/ethernet/intel/iavf/iavf_devlink.h    |   1 +
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  45 +++-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 230 +++++++++++++++++-
+ 5 files changed, 315 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index eec294b5a426..27a230f58816 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -252,6 +252,9 @@ struct iavf_cloud_filter {
+ #define IAVF_RESET_WAIT_DETECTED_COUNT 500
+ #define IAVF_RESET_WAIT_COMPLETE_COUNT 2000
+ 
++#define IAVF_MAX_QOS_TC_NUM		8
++#define IAVF_DEFAULT_QUANTA_SIZE	1024
++
+ /* board specific private data structure */
+ struct iavf_adapter {
+ 	struct workqueue_struct *wq;
+@@ -351,6 +354,9 @@ struct iavf_adapter {
+ #define IAVF_FLAG_AQ_DISABLE_CTAG_VLAN_INSERTION	BIT_ULL(36)
+ #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
+ #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
++#define IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW		BIT_ULL(39)
++#define IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE	BIT_ULL(40)
++#define IAVF_FLAG_AQ_GET_QOS_CAPS			BIT_ULL(41)
+ 
+ 	/* flags for processing extended capability messages during
+ 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
+@@ -374,6 +380,7 @@ struct iavf_adapter {
+ 	/* devlink & port data */
+ 	struct devlink *devlink;
+ 	struct devlink_port devlink_port;
++	bool devlink_update;
+ 
+ 	struct iavf_hw hw; /* defined in iavf_type.h */
+ 
+@@ -423,6 +430,8 @@ struct iavf_adapter {
+ 			       VIRTCHNL_VF_OFFLOAD_FDIR_PF)
+ #define ADV_RSS_SUPPORT(_a) ((_a)->vf_res->vf_cap_flags & \
+ 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
++#define QOS_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
++			 VIRTCHNL_VF_OFFLOAD_QOS)
+ 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
+ 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
+ 	struct virtchnl_version_info pf_version;
+@@ -431,6 +440,7 @@ struct iavf_adapter {
+ 	struct virtchnl_vlan_caps vlan_v2_caps;
+ 	u16 msg_enable;
+ 	struct iavf_eth_stats current_stats;
++	struct virtchnl_qos_cap_list *qos_caps;
+ 	struct iavf_vsi vsi;
+ 	u32 aq_wait_count;
+ 	/* RSS stuff */
+@@ -577,6 +587,10 @@ void iavf_notify_client_message(struct iavf_vsi *vsi, u8 *msg, u16 len);
+ void iavf_notify_client_l2_params(struct iavf_vsi *vsi);
+ void iavf_notify_client_open(struct iavf_vsi *vsi);
+ void iavf_notify_client_close(struct iavf_vsi *vsi, bool reset);
++void iavf_update_queue_config(struct iavf_adapter *adapter);
++void iavf_configure_queues_bw(struct iavf_adapter *adapter);
++void iavf_configure_queues_quanta_size(struct iavf_adapter *adapter);
++void iavf_get_qos_caps(struct iavf_adapter *adapter);
+ void iavf_enable_channels(struct iavf_adapter *adapter);
+ void iavf_disable_channels(struct iavf_adapter *adapter);
+ void iavf_add_cloud_filter(struct iavf_adapter *adapter);
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_devlink.c b/drivers/net/ethernet/intel/iavf/iavf_devlink.c
-index 991d041e5922..24ba3744859a 100644
+index 24ba3744859a..0ab9a0a9823e 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_devlink.c
 +++ b/drivers/net/ethernet/intel/iavf/iavf_devlink.c
-@@ -4,7 +4,261 @@
- #include "iavf.h"
- #include "iavf_devlink.h"
+@@ -96,6 +96,30 @@ void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter)
+ 	devl_unlock(adapter->devlink);
+ }
  
--static const struct devlink_ops iavf_devlink_ops = {};
 +/**
-+ * iavf_devlink_rate_init_rate_tree - export rate tree to devlink rate
++ * iavf_notify_queue_config_complete - notify updating queue completion
 + * @adapter: iavf adapter struct instance
 + *
-+ * This function builds Rate Tree based on iavf adapter configuration
-+ * and exports it's contents to devlink rate.
++ * This function sets the queue configuration update status when all
++ * queue parameters have been sent to PF
 + */
-+void iavf_devlink_rate_init_rate_tree(struct iavf_adapter *adapter)
++void iavf_notify_queue_config_complete(struct iavf_adapter *adapter)
 +{
 +	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+	struct iavf_dev_rate_node *iavf_r_node;
-+	struct iavf_dev_rate_node *iavf_q_node;
-+	struct devlink_rate *dl_root_node;
-+	struct devlink_rate *dl_tmp_node;
-+	int q_num, size, i;
++	int q_num = adapter->num_active_queues;
++	int i;
 +
-+	if (!adapter->devlink_port.registered)
-+		return;
-+
-+	iavf_r_node = &dl_priv->root_node;
-+	memset(iavf_r_node, 0, sizeof(*iavf_r_node));
-+	iavf_r_node->tx_max = adapter->link_speed;
-+	strscpy(iavf_r_node->name, "iavf_root", IAVF_RATE_NODE_NAME);
-+
-+	devl_lock(adapter->devlink);
-+	dl_root_node = devl_rate_node_create(adapter->devlink, iavf_r_node,
-+					     iavf_r_node->name, NULL);
-+	if (!dl_root_node || IS_ERR(dl_root_node))
-+		goto err_node;
-+
-+	iavf_r_node->rate_node = dl_root_node;
-+
-+	/* Allocate queue nodes, and chain them under root */
-+	q_num = adapter->num_active_queues;
-+	if (q_num > 0) {
-+		size = q_num * sizeof(struct iavf_dev_rate_node);
-+		dl_priv->queue_nodes = kzalloc(size, GFP_KERNEL);
-+		if (!dl_priv->queue_nodes)
-+			goto err_node;
-+
-+		memset(dl_priv->queue_nodes, 0, size);
-+
-+		for (i = 0; i < q_num; ++i) {
-+			iavf_q_node = &dl_priv->queue_nodes[i];
-+			snprintf(iavf_q_node->name, IAVF_RATE_NODE_NAME,
-+				 "txq_%d", i);
-+			dl_tmp_node = devl_rate_node_create(adapter->devlink,
-+							    iavf_q_node,
-+							    iavf_q_node->name,
-+							    dl_root_node);
-+			if (!dl_tmp_node || IS_ERR(dl_tmp_node)) {
-+				kfree(dl_priv->queue_nodes);
-+				goto err_node;
-+			}
-+
-+			iavf_q_node->rate_node = dl_tmp_node;
-+			iavf_q_node->tx_max = IAVF_TX_DEFAULT;
-+			iavf_q_node->tx_share = 0;
++	/* clean up rate tree update flags*/
++	for (i = 0; i < q_num; i++)
++		if (dl_priv->queue_nodes[i].tx_update_flag ==
++		    (IAVF_FLAG_TX_MAX_UPDATED | IAVF_FLAG_TX_SHARE_UPDATED)) {
++			dl_priv->queue_nodes[i].tx_update_flag = 0;
++			break;
 +		}
-+	}
 +
 +	dl_priv->update_in_progress = false;
-+	dl_priv->iavf_dev_rate_initialized = true;
-+	devl_unlock(adapter->devlink);
-+	return;
-+err_node:
-+	devl_rate_nodes_destroy(adapter->devlink);
-+	dl_priv->iavf_dev_rate_initialized = false;
-+	devl_unlock(adapter->devlink);
 +}
 +
-+/**
-+ * iavf_devlink_rate_deinit_rate_tree - Unregister rate tree with devlink rate
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function unregisters the current iavf rate tree registered with devlink
-+ * rate and frees resources.
-+ */
-+void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter)
-+{
-+	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+
-+	if (!dl_priv->iavf_dev_rate_initialized)
-+		return;
-+
-+	devl_lock(adapter->devlink);
-+	devl_rate_leaf_destroy(&adapter->devlink_port);
-+	devl_rate_nodes_destroy(adapter->devlink);
-+	kfree(dl_priv->queue_nodes);
-+	devl_unlock(adapter->devlink);
-+}
-+
-+/**
-+ * iavf_check_update_config - check if updating queue parameters needed
-+ * @adapter: iavf adapter struct instance
-+ * @node: iavf rate node struct instance
-+ *
-+ * This function sets queue bw & quanta size configuration if all
-+ * queue parameters are set
-+ */
-+static int iavf_check_update_config(struct iavf_adapter *adapter,
-+				    struct iavf_dev_rate_node *node)
-+{
-+	/* Update queue bw if any one of the queues have been fully updated by
-+	 * user, the other queues either use the default value or the last
-+	 * fully updated value
-+	 */
-+	if (node->tx_update_flag ==
-+	    (IAVF_FLAG_TX_MAX_UPDATED | IAVF_FLAG_TX_SHARE_UPDATED)) {
-+		node->tx_max = node->tx_max_temp;
-+		node->tx_share = node->tx_share_temp;
-+	} else {
-+		return 0;
-+	}
-+
-+	/* Reconfig queue bw only when iavf driver on running state */
-+	if (adapter->state != __IAVF_RUNNING)
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
-+/**
-+ * iavf_update_queue_tx_share - sets tx min parameter
-+ * @adapter: iavf adapter struct instance
-+ * @node: iavf rate node struct instance
-+ * @bw: bandwidth in bytes per second
-+ * @extack: extended netdev ack structure
-+ *
-+ * This function sets min BW limit.
-+ */
-+static int iavf_update_queue_tx_share(struct iavf_adapter *adapter,
-+				      struct iavf_dev_rate_node *node,
-+				      u64 bw, struct netlink_ext_ack *extack)
-+{
-+	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+	u64 tx_share_sum = 0;
-+
-+	/* Keep in kbps */
-+	node->tx_share_temp = div_u64(bw, IAVF_RATE_DIV_FACTOR);
-+
-+	if (ADV_LINK_SUPPORT(adapter)) {
-+		int i;
-+
-+		for (i = 0; i < adapter->num_active_queues; ++i) {
-+			if (node != &dl_priv->queue_nodes[i])
-+				tx_share_sum +=
-+					dl_priv->queue_nodes[i].tx_share;
-+			else
-+				tx_share_sum += node->tx_share_temp;
-+		}
-+
-+		if (tx_share_sum / 1000  > adapter->link_speed_mbps)
-+			return -EINVAL;
-+	}
-+
-+	node->tx_update_flag |= IAVF_FLAG_TX_SHARE_UPDATED;
-+	return iavf_check_update_config(adapter, node);
-+}
-+
-+/**
-+ * iavf_update_queue_tx_max - sets tx max parameter
-+ * @adapter: iavf adapter struct instance
-+ * @node: iavf rate node struct instance
-+ * @bw: bandwidth in bytes per second
-+ * @extack: extended netdev ack structure
-+ *
-+ * This function sets max BW limit.
-+ */
-+static int iavf_update_queue_tx_max(struct iavf_adapter *adapter,
-+				    struct iavf_dev_rate_node *node,
-+				    u64 bw, struct netlink_ext_ack *extack)
-+{
-+	/* Keep in kbps */
-+	node->tx_max_temp = div_u64(bw, IAVF_RATE_DIV_FACTOR);
-+	if (ADV_LINK_SUPPORT(adapter)) {
-+		if (node->tx_max_temp / 1000 > adapter->link_speed_mbps)
-+			return -EINVAL;
-+	}
-+
-+	node->tx_update_flag |= IAVF_FLAG_TX_MAX_UPDATED;
-+
-+	return iavf_check_update_config(adapter, node);
-+}
-+
-+static int iavf_devlink_rate_node_tx_max_set(struct devlink_rate *rate_node,
-+					     void *priv, u64 tx_max,
-+					     struct netlink_ext_ack *extack)
-+{
-+	struct iavf_dev_rate_node *node = priv;
-+	struct iavf_devlink *dl_priv;
-+	struct iavf_adapter *adapter;
-+
-+	if (!node)
-+		return 0;
-+
-+	dl_priv = devlink_priv(rate_node->devlink);
-+	adapter = dl_priv->devlink_ref;
-+
-+	/* Check if last update is in progress */
-+	if (dl_priv->update_in_progress)
-+		return -EBUSY;
-+
-+	if (node == &dl_priv->root_node)
-+		return 0;
-+
-+	return iavf_update_queue_tx_max(adapter, node, tx_max, extack);
-+}
-+
-+static int iavf_devlink_rate_node_tx_share_set(struct devlink_rate *rate_node,
-+					       void *priv, u64 tx_share,
-+					       struct netlink_ext_ack *extack)
-+{
-+	struct iavf_dev_rate_node *node = priv;
-+	struct iavf_devlink *dl_priv;
-+	struct iavf_adapter *adapter;
-+
-+	if (!node)
-+		return 0;
-+
-+	dl_priv = devlink_priv(rate_node->devlink);
-+	adapter = dl_priv->devlink_ref;
-+
-+	/* Check if last update is in progress */
-+	if (dl_priv->update_in_progress)
-+		return -EBUSY;
-+
-+	if (node == &dl_priv->root_node)
-+		return 0;
-+
-+	return iavf_update_queue_tx_share(adapter, node, tx_share, extack);
-+}
-+
-+static int iavf_devlink_rate_node_del(struct devlink_rate *rate_node,
-+				      void *priv,
-+				      struct netlink_ext_ack *extack)
-+{
-+	return -EINVAL;
-+}
-+
-+static int iavf_devlink_set_parent(struct devlink_rate *devlink_rate,
-+				   struct devlink_rate *parent,
-+				   void *priv, void *parent_priv,
-+				   struct netlink_ext_ack *extack)
-+{
-+	return -EINVAL;
-+}
-+
-+static const struct devlink_ops iavf_devlink_ops = {
-+	.rate_node_tx_share_set = iavf_devlink_rate_node_tx_share_set,
-+	.rate_node_tx_max_set = iavf_devlink_rate_node_tx_max_set,
-+	.rate_node_del = iavf_devlink_rate_node_del,
-+	.rate_leaf_parent_set = iavf_devlink_set_parent,
-+	.rate_node_parent_set = iavf_devlink_set_parent,
-+};
- 
  /**
-  * iavf_devlink_register - Register allocated devlink instance for iavf adapter
-@@ -30,7 +284,7 @@ int iavf_devlink_register(struct iavf_adapter *adapter)
+  * iavf_check_update_config - check if updating queue parameters needed
+  * @adapter: iavf adapter struct instance
+@@ -107,6 +131,8 @@ void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter)
+ static int iavf_check_update_config(struct iavf_adapter *adapter,
+ 				    struct iavf_dev_rate_node *node)
+ {
++	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
++
+ 	/* Update queue bw if any one of the queues have been fully updated by
+ 	 * user, the other queues either use the default value or the last
+ 	 * fully updated value
+@@ -123,6 +149,8 @@ static int iavf_check_update_config(struct iavf_adapter *adapter,
+ 	if (adapter->state != __IAVF_RUNNING)
+ 		return -EBUSY;
+ 
++	dl_priv->update_in_progress = true;
++	iavf_update_queue_config(adapter);
+ 	return 0;
+ }
+ 
+@@ -282,6 +310,7 @@ int iavf_devlink_register(struct iavf_adapter *adapter)
+ 
+ 	/* Init iavf adapter devlink */
  	adapter->devlink = devlink;
++	adapter->devlink_update = false;
  	ref = devlink_priv(devlink);
  	ref->devlink_ref = adapter;
--
-+	ref->iavf_dev_rate_initialized = false;
- 	devlink_register(devlink);
- 
- 	return 0;
+ 	ref->iavf_dev_rate_initialized = false;
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_devlink.h b/drivers/net/ethernet/intel/iavf/iavf_devlink.h
-index 5c122278611a..897ff5fc87af 100644
+index 897ff5fc87af..a8a41f343f56 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_devlink.h
 +++ b/drivers/net/ethernet/intel/iavf/iavf_devlink.h
-@@ -4,14 +4,35 @@
- #ifndef _IAVF_DEVLINK_H_
- #define _IAVF_DEVLINK_H_
- 
-+#define IAVF_RATE_NODE_NAME			12
-+struct iavf_dev_rate_node {
-+	char name[IAVF_RATE_NODE_NAME];
-+	struct devlink_rate *rate_node;
-+	u8 tx_update_flag;
-+#define IAVF_FLAG_TX_SHARE_UPDATED		BIT(0)
-+#define IAVF_FLAG_TX_MAX_UPDATED		BIT(1)
-+	u64 tx_max;
-+	u64 tx_share;
-+	u64 tx_max_temp;
-+	u64 tx_share_temp;
-+#define IAVF_RATE_DIV_FACTOR			125
-+#define IAVF_TX_DEFAULT				100000
-+};
-+
- /* iavf devlink structure pointing to iavf adapter */
- struct iavf_devlink {
- 	struct iavf_adapter *devlink_ref;	/* ref to iavf adapter */
-+	struct iavf_dev_rate_node root_node;
-+	struct iavf_dev_rate_node *queue_nodes;
-+	bool iavf_dev_rate_initialized;
-+	bool update_in_progress;
- };
- 
- int iavf_devlink_register(struct iavf_adapter *adapter);
- void iavf_devlink_unregister(struct iavf_adapter *adapter);
- int iavf_devlink_port_register(struct iavf_adapter *adapter);
+@@ -34,5 +34,6 @@ int iavf_devlink_port_register(struct iavf_adapter *adapter);
  void iavf_devlink_port_unregister(struct iavf_adapter *adapter);
-+void iavf_devlink_rate_init_rate_tree(struct iavf_adapter *adapter);
-+void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter);
+ void iavf_devlink_rate_init_rate_tree(struct iavf_adapter *adapter);
+ void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter);
++void iavf_notify_queue_config_complete(struct iavf_adapter *adapter);
  
  #endif /* _IAVF_DEVLINK_H_ */
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 1fb14f3f1ad0..2aec6427d5e2 100644
+index 2aec6427d5e2..58795a15c09b 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
 +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2038,6 +2038,7 @@ static void iavf_finish_config(struct work_struct *work)
- 				iavf_free_rss(adapter);
- 				iavf_free_misc_irq(adapter);
- 				iavf_reset_interrupt_capability(adapter);
-+				iavf_devlink_rate_deinit_rate_tree(adapter);
- 				iavf_devlink_port_unregister(adapter);
- 				iavf_change_state(adapter,
- 						  __IAVF_INIT_CONFIG_ADAPTER);
-@@ -2710,8 +2711,10 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
- 	if (err)
- 		goto err_sw_init;
- 
--	if (!adapter->netdev_registered)
-+	if (!adapter->netdev_registered) {
- 		iavf_devlink_port_register(adapter);
-+		iavf_devlink_rate_init_rate_tree(adapter);
-+	}
- 
- 	netif_carrier_off(netdev);
- 	adapter->link_up = false;
-@@ -2754,6 +2757,7 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
- err_mem:
- 	iavf_free_rss(adapter);
- 	iavf_free_misc_irq(adapter);
-+	iavf_devlink_rate_deinit_rate_tree(adapter);
- 	iavf_devlink_port_unregister(adapter);
- err_sw_init:
- 	iavf_reset_interrupt_capability(adapter);
-@@ -5151,6 +5155,7 @@ static void iavf_remove(struct pci_dev *pdev)
- 				 err);
+@@ -2131,6 +2131,21 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
+ 		return 0;
  	}
  
-+	iavf_devlink_rate_deinit_rate_tree(adapter);
++	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW) {
++		iavf_configure_queues_bw(adapter);
++		return 0;
++	}
++
++	if (adapter->aq_required & IAVF_FLAG_AQ_GET_QOS_CAPS) {
++		iavf_get_qos_caps(adapter);
++		return 0;
++	}
++
++	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE) {
++		iavf_configure_queues_quanta_size(adapter);
++		return 0;
++	}
++
+ 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES) {
+ 		iavf_configure_queues(adapter);
+ 		return 0;
+@@ -2713,7 +2728,9 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
+ 
+ 	if (!adapter->netdev_registered) {
+ 		iavf_devlink_port_register(adapter);
+-		iavf_devlink_rate_init_rate_tree(adapter);
++
++		if (QOS_ALLOWED(adapter))
++			iavf_devlink_rate_init_rate_tree(adapter);
+ 	}
+ 
+ 	netif_carrier_off(netdev);
+@@ -3136,6 +3153,19 @@ static void iavf_reset_task(struct work_struct *work)
+ 		err = iavf_reinit_interrupt_scheme(adapter, running);
+ 		if (err)
+ 			goto reset_err;
++
++		if (QOS_ALLOWED(adapter)) {
++			iavf_devlink_rate_deinit_rate_tree(adapter);
++			iavf_devlink_rate_init_rate_tree(adapter);
++		}
++	}
++
++	if (adapter->devlink_update) {
++		adapter->aq_required |= IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
++		adapter->aq_required |= IAVF_FLAG_AQ_GET_QOS_CAPS;
++		adapter->aq_required |=
++				IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE;
++		adapter->devlink_update = false;
+ 	}
+ 
+ 	if (RSS_AQ(adapter)) {
+@@ -4901,7 +4931,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	struct net_device *netdev;
+ 	struct iavf_adapter *adapter = NULL;
+ 	struct iavf_hw *hw = NULL;
+-	int err;
++	int err, len;
+ 
+ 	err = pci_enable_device(pdev);
+ 	if (err)
+@@ -5005,10 +5035,18 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* Setup the wait queue for indicating virtchannel events */
+ 	init_waitqueue_head(&adapter->vc_waitqueue);
+ 
++	len = struct_size(adapter->qos_caps, cap, IAVF_MAX_QOS_TC_NUM);
++	adapter->qos_caps = kzalloc(len, GFP_KERNEL);
++	if (!adapter->qos_caps)
++		goto err_ioremap;
++
+ 	/* Register iavf adapter with devlink */
+ 	err = iavf_devlink_register(adapter);
+-	if (err)
++	if (err) {
+ 		dev_err(&pdev->dev, "devlink registration failed: %d\n", err);
++		kfree(adapter->qos_caps);
++		goto err_ioremap;
++	}
+ 
+ 	/* Keep driver interface even on devlink registration failure */
+ 	return 0;
+@@ -5158,6 +5196,7 @@ static void iavf_remove(struct pci_dev *pdev)
+ 	iavf_devlink_rate_deinit_rate_tree(adapter);
  	iavf_devlink_port_unregister(adapter);
  	iavf_devlink_unregister(adapter);
++	kfree(adapter->qos_caps);
  
+ 	mutex_lock(&adapter->crit_lock);
+ 	dev_info(&adapter->pdev->dev, "Removing device\n");
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index f9727e9c3d63..146f06831bd3 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -148,7 +148,8 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
+ 	       VIRTCHNL_VF_OFFLOAD_USO |
+ 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
+ 	       VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF |
+-	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED;
++	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED |
++	       VIRTCHNL_VF_OFFLOAD_QOS;
+ 
+ 	adapter->current_op = VIRTCHNL_OP_GET_VF_RESOURCES;
+ 	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_CONFIG;
+@@ -1465,6 +1466,209 @@ iavf_set_adapter_link_speed_from_vpe(struct iavf_adapter *adapter,
+ 		adapter->link_speed = vpe->event_data.link_event.link_speed;
+ }
+ 
++/**
++ * iavf_get_qos_caps - get qos caps support
++ * @adapter: iavf adapter struct instance
++ *
++ * This function requests PF for Supported QoS Caps.
++ */
++void iavf_get_qos_caps(struct iavf_adapter *adapter)
++{
++	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
++		/* bail because we already have a command pending */
++		dev_err(&adapter->pdev->dev,
++			"Cannot get qos caps, command %d pending\n",
++			adapter->current_op);
++		return;
++	}
++
++	adapter->current_op = VIRTCHNL_OP_GET_QOS_CAPS;
++	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_QOS_CAPS;
++	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_QOS_CAPS, NULL, 0);
++}
++
++/**
++ * iavf_set_quanta_size - set quanta size of queue chunk
++ * @adapter: iavf adapter struct instance
++ * @quanta_size: quanta size in bytes
++ * @queue_index: starting index of queue chunk
++ * @num_queues: number of queues in the queue chunk
++ *
++ * This function requests PF to set quanta size of queue chunk
++ * starting at queue_index.
++ */
++static void
++iavf_set_quanta_size(struct iavf_adapter *adapter, u16 quanta_size,
++		     u16 queue_index, u16 num_queues)
++{
++	struct virtchnl_quanta_cfg quanta_cfg;
++
++	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
++		/* bail because we already have a command pending */
++		dev_err(&adapter->pdev->dev,
++			"Cannot set queue quanta size, command %d pending\n",
++			adapter->current_op);
++		return;
++	}
++
++	adapter->current_op = VIRTCHNL_OP_CONFIG_QUANTA;
++	quanta_cfg.quanta_size = quanta_size;
++	quanta_cfg.queue_select.type = VIRTCHNL_QUEUE_TYPE_TX;
++	quanta_cfg.queue_select.start_queue_id = queue_index;
++	quanta_cfg.queue_select.num_queues = num_queues;
++	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE;
++	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUANTA,
++			 (u8 *)&quanta_cfg, sizeof(quanta_cfg));
++}
++
++/**
++ * iavf_set_queue_bw - set bw of allocated queues
++ * @adapter: iavf adapter struct instance
++ *
++ * This function requests PF to set queue bw of tc0 queues
++ */
++static void iavf_set_queue_bw(struct iavf_adapter *adapter)
++{
++	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
++	struct virtchnl_queues_bw_cfg *queues_bw_cfg;
++	struct iavf_dev_rate_node *queue_rate;
++	size_t len;
++	int i;
++
++	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
++		/* bail because we already have a command pending */
++		dev_err(&adapter->pdev->dev,
++			"Cannot set tc queue bw, command %d pending\n",
++			adapter->current_op);
++		return;
++	}
++
++	len = struct_size(queues_bw_cfg, cfg, adapter->num_active_queues);
++	queues_bw_cfg = kzalloc(len, GFP_KERNEL);
++	if (!queues_bw_cfg)
++		return;
++
++	queue_rate = dl_priv->queue_nodes;
++	queues_bw_cfg->vsi_id = adapter->vsi.id;
++	queues_bw_cfg->num_queues = adapter->num_active_queues;
++
++	for (i = 0; i < queues_bw_cfg->num_queues; i++) {
++		queues_bw_cfg->cfg[i].queue_id = i;
++		queues_bw_cfg->cfg[i].shaper.peak = queue_rate[i].tx_max;
++		queues_bw_cfg->cfg[i].shaper.committed =
++						    queue_rate[i].tx_share;
++		queues_bw_cfg->cfg[i].tc = 0;
++	}
++
++	adapter->current_op = VIRTCHNL_OP_CONFIG_QUEUE_BW;
++	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
++	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUEUE_BW,
++			 (u8 *)queues_bw_cfg, len);
++	kfree(queues_bw_cfg);
++}
++
++/**
++ * iavf_set_tc_queue_bw - set bw of allocated tc/queues
++ * @adapter: iavf adapter struct instance
++ *
++ * This function requests PF to set queue bw of multiple tc(s)
++ */
++static void iavf_set_tc_queue_bw(struct iavf_adapter *adapter)
++{
++	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
++	struct virtchnl_queues_bw_cfg *queues_bw_cfg;
++	struct iavf_dev_rate_node *queue_rate;
++	u16 queue_to_tc[256];
++	size_t len;
++	int q_idx;
++	int i, j;
++	u16 tc;
++
++	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
++		/* bail because we already have a command pending */
++		dev_err(&adapter->pdev->dev,
++			"Cannot set tc queue bw, command %d pending\n",
++			adapter->current_op);
++		return;
++	}
++
++	len = struct_size(queues_bw_cfg, cfg, adapter->num_active_queues);
++	queues_bw_cfg = kzalloc(len, GFP_KERNEL);
++	if (!queues_bw_cfg)
++		return;
++
++	queue_rate = dl_priv->queue_nodes;
++	queues_bw_cfg->vsi_id = adapter->vsi.id;
++	queues_bw_cfg->num_queues = adapter->ch_config.total_qps;
++
++	/* build tc[queue] */
++	for (i = 0; i < adapter->num_tc; i++) {
++		for (j = 0; j < adapter->ch_config.ch_info[i].count; ++j) {
++			q_idx = j + adapter->ch_config.ch_info[i].offset;
++			queue_to_tc[q_idx] = i;
++		}
++	}
++
++	for (i = 0; i < queues_bw_cfg->num_queues; i++) {
++		tc = queue_to_tc[i];
++		queues_bw_cfg->cfg[i].queue_id = i;
++		queues_bw_cfg->cfg[i].shaper.peak = queue_rate[i].tx_max;
++		queues_bw_cfg->cfg[i].shaper.committed =
++						    queue_rate[i].tx_share;
++		queues_bw_cfg->cfg[i].tc = tc;
++	}
++
++	adapter->current_op = VIRTCHNL_OP_CONFIG_QUEUE_BW;
++	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
++	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUEUE_BW,
++			 (u8 *)queues_bw_cfg, len);
++	kfree(queues_bw_cfg);
++}
++
++/**
++ * iavf_configure_queues_bw - configure bw of allocated tc/queues
++ * @adapter: iavf adapter struct instance
++ *
++ * This function requests PF to configure queue bw of allocated
++ * tc/queues
++ */
++void iavf_configure_queues_bw(struct iavf_adapter *adapter)
++{
++	/* Set Queue bw */
++	if (adapter->ch_config.state == __IAVF_TC_INVALID)
++		iavf_set_queue_bw(adapter);
++	else
++		iavf_set_tc_queue_bw(adapter);
++}
++
++/**
++ * iavf_configure_queues_quanta_size - configure quanta size of queues
++ * @adapter: adapter structure
++ *
++ * Request that the PF configure quanta size of allocated queues.
++ **/
++void iavf_configure_queues_quanta_size(struct iavf_adapter *adapter)
++{
++	int quanta_size = IAVF_DEFAULT_QUANTA_SIZE;
++
++	/* Set Queue Quanta Size to default */
++	iavf_set_quanta_size(adapter, quanta_size, 0,
++			     adapter->num_active_queues);
++}
++
++/**
++ * iavf_update_queue_config - request queue configuration update
++ * @adapter: adapter structure
++ *
++ * Request that the PF configure queue quanta size and queue bw
++ * of allocated queues.
++ **/
++void iavf_update_queue_config(struct iavf_adapter *adapter)
++{
++	adapter->devlink_update = true;
++	iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
++}
++
+ /**
+  * iavf_enable_channels
+  * @adapter: adapter structure
+@@ -2124,6 +2328,18 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 			dev_warn(&adapter->pdev->dev, "Failed to add VLAN filter, error %s\n",
+ 				 iavf_stat_str(&adapter->hw, v_retval));
+ 			break;
++		case VIRTCHNL_OP_GET_QOS_CAPS:
++			dev_warn(&adapter->pdev->dev, "Failed to Get Qos CAPs, error %s\n",
++				 iavf_stat_str(&adapter->hw, v_retval));
++			break;
++		case VIRTCHNL_OP_CONFIG_QUANTA:
++			dev_warn(&adapter->pdev->dev, "Failed to Config Quanta, error %s\n",
++				 iavf_stat_str(&adapter->hw, v_retval));
++			break;
++		case VIRTCHNL_OP_CONFIG_QUEUE_BW:
++			dev_warn(&adapter->pdev->dev, "Failed to Config Queue BW, error %s\n",
++				 iavf_stat_str(&adapter->hw, v_retval));
++			break;
+ 		default:
+ 			dev_err(&adapter->pdev->dev, "PF returned error %d (%s) to our request %d\n",
+ 				v_retval, iavf_stat_str(&adapter->hw, v_retval),
+@@ -2456,6 +2672,18 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 		if (!v_retval)
+ 			iavf_netdev_features_vlan_strip_set(netdev, false);
+ 		break;
++	case VIRTCHNL_OP_GET_QOS_CAPS: {
++		u16 len = struct_size(adapter->qos_caps, cap,
++				      IAVF_MAX_QOS_TC_NUM);
++
++		memcpy(adapter->qos_caps, msg, min(msglen, len));
++		}
++		break;
++	case VIRTCHNL_OP_CONFIG_QUANTA:
++		iavf_notify_queue_config_complete(adapter);
++		break;
++	case VIRTCHNL_OP_CONFIG_QUEUE_BW:
++		break;
+ 	default:
+ 		if (adapter->current_op && (v_opcode != adapter->current_op))
+ 			dev_warn(&adapter->pdev->dev, "Expected response %d from PF, received %d\n",
 -- 
 2.34.1
 
