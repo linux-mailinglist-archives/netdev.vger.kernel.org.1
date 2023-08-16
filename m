@@ -1,201 +1,114 @@
-Return-Path: <netdev+bounces-27931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C42E77DA91
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:41:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C7C77DA9C
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C8E91C20F1B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 06:41:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA371C20F09
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 06:46:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939963D60;
-	Wed, 16 Aug 2023 06:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC2EC2EF;
+	Wed, 16 Aug 2023 06:46:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812D2C8CE
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 06:41:38 +0000 (UTC)
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461D5213A
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 23:41:36 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230816064134epoutp02723e8a90cc84a6f1feb40dba7ecf4c3b~7yeqruxhr0422604226epoutp02z
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 06:41:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230816064134epoutp02723e8a90cc84a6f1feb40dba7ecf4c3b~7yeqruxhr0422604226epoutp02z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1692168094;
-	bh=SOhYZsDP2Lg0eVQL9xjGQnNiIfQ6hpZwMVNw/iZqBg4=;
-	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-	b=tT1MYiMGsTuGJMJQM2t6fvNSS/0iyL4NjrwBdva+NDQ6eHQa3sE2t+NDdSjerXwlr
-	 SZU62AqmscRqDNz3IUzMWD/4jUc0bIC2/yc6Y9bilIv8sJh38StM4iWz4YSghEhhou
-	 9v1tHWfOBryF3uFa49ucLWh361CBemAfnSckm9Pg=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20230816064134epcas5p17ea935f22f2ccd47bdc8ab425a6504aa~7yeqFaN641088310883epcas5p18;
-	Wed, 16 Aug 2023 06:41:34 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.178]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4RQdp40wSZz4x9Q1; Wed, 16 Aug
-	2023 06:41:32 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	F3.0E.55522.B9F6CD46; Wed, 16 Aug 2023 15:41:31 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20230816064031epcas5p161bf015960cb5d4031eaf9bac1d3541c~7ydv2ILrz0916809168epcas5p1W;
-	Wed, 16 Aug 2023 06:40:31 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20230816064031epsmtrp220fa0fa8607e054aafdcaabfe278805e~7ydv07QNT2285722857epsmtrp2z;
-	Wed, 16 Aug 2023 06:40:31 +0000 (GMT)
-X-AuditID: b6c32a49-419ff7000000d8e2-0d-64dc6f9b5a8c
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	95.FB.64355.F5F6CD46; Wed, 16 Aug 2023 15:40:31 +0900 (KST)
-Received: from FDSFTE302 (unknown [107.122.81.78]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20230816064028epsmtip2fc43110ce47b75a5a6a0622e8087e4b7~7ydso76CJ0449704497epsmtip2T;
-	Wed, 16 Aug 2023 06:40:27 +0000 (GMT)
-From: "Sriranjani P" <sriranjani.p@samsung.com>
-To: "'Krzysztof Kozlowski'" <krzysztof.kozlowski@linaro.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<richardcochran@gmail.com>, <alexandre.torgue@foss.st.com>,
-	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>,
-	<alim.akhtar@samsung.com>, <linux-fsd@tesla.com>,
-	<pankaj.dubey@samsung.com>, <swathi.ks@samsung.com>,
-	<ravi.patel@samsung.com>
-Cc: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-samsung-soc@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, "'Jayati Sahu'"
-	<jayati.sahu@samsung.com>
-In-Reply-To: <b3cd8115-b2bd-63dd-01d3-3cd27127d534@linaro.org>
-Subject: RE: [PATCH v3 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
- Block of FSD SoC
-Date: Wed, 16 Aug 2023 12:10:26 +0530
-Message-ID: <001301d9d00c$8d427cb0$a7c77610$@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CD21840
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 06:46:52 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC84106
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 23:46:49 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9fa64db41so93887331fa.1
+        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 23:46:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692168407; x=1692773207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YfMA8d/EOg/li5lIqvSjinrv9s5gkR6xSHttMnq5lxw=;
+        b=CjjGG1D/lqtZ0NbuLk9OgP8rnmqvsZuiVwZfw4/kQqwxtj3E7vSbx9eQfupvWBstu7
+         JyL8nJ+o1oBgmAb6JacYGm7cN1Z18QWk23pfPi9+YB+q/TQRjfXvoH+yTejFuFdh+lHZ
+         LZP5Ug4TdJLa+uuq/RjKts+OgK5nQKX8QWiECSSMwJgZxmhsHeJuV1adBqkpsG727v8N
+         h1sAvfzuMVmJ/sRzJ0v/trkNju4E9PjVcQMcPtIzuCkQNa8FFd2hgeFFGjzHgAyck4qB
+         AOYSwK+yVGUxQkrbqNS2Y3iMRn0vSFjihezQ9JwaE/2puZx/Vb8IDEUj190vKWWVYT8G
+         Ylpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692168407; x=1692773207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YfMA8d/EOg/li5lIqvSjinrv9s5gkR6xSHttMnq5lxw=;
+        b=Zpq7vNqXkWbuQ7YXABZAlv8JVmyBVcaqMTli0aheBZ4L4GagEzZhIT1seN31fE2Cfz
+         sE+GNo/ibrP3yh6l3R6risCj60cHuaOLQT2KbR77WCtxkvOGr79R4ejZbeA2LOZ6P4O5
+         Bgrsb//8GXd00NkYHMbuFmXQNEYFOO5YoVJfklc5EdfxtmSIJfJHA5Po7BL3UgnhXjMj
+         Wpwm0o+iK6th3zOttnXqTmkJY+qDX50YDR9ybNUDVaBvNNajnoktg35MLoIsP/3d9PCS
+         mq6Jucbybxa/zmyzkkLHcq40Nx2xxMctdWuxmaYJgF1VbM42LuI4A5nFZVdNlm52Cqen
+         SzLw==
+X-Gm-Message-State: AOJu0YyJw+OG8k9NJ95dym94RJIDA4zqueMAHeHexlCmJARD4tg0ptTW
+	IIkI15qzcMspghZQVo4WITjbxQ==
+X-Google-Smtp-Source: AGHT+IHwi985yvTEWfaXcokQZtx39fVsYWxSYZB3E+6o1HGlHQVx00XLXgkak0vVxRalMbdmToTcig==
+X-Received: by 2002:a2e:8013:0:b0:2b9:d79e:7d45 with SMTP id j19-20020a2e8013000000b002b9d79e7d45mr641061ljg.50.1692168407488;
+        Tue, 15 Aug 2023 23:46:47 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id q9-20020a1ce909000000b003fbbe41fd78sm20159273wmc.10.2023.08.15.23.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Aug 2023 23:46:46 -0700 (PDT)
+Date: Wed, 16 Aug 2023 08:46:45 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	f@nanopsycho.smtp.subspace.kernel.org
+Cc: xiyou.wangcong@gmail.com, netdev@vger.kernel.org, vladbu@nvidia.com,
+	mleitner@redhat.com
+Subject: Re: [PATCH RFC net-next 0/3] Introduce tc block ports tracking and
+ use
+Message-ID: <ZNxw1eHBdVeGCWH2@nanopsycho>
+References: <20230815162530.150994-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQG0kE2cByMDcfrFjxkR49X5VWx9JAKuNFnTAVxbNBUDmCxvSq/54n2w
-Content-Language: en-in
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupil+LIzCtJLcpLzFFi42LZdlhTQ3d2/p0UgwvTrSx+vpzGaPFg3jY2
-	izV7zzFZzDnfwmIx/8g5Vounxx6xWxw5tYTJ4t6id6wWfS8eMlvsfb2V3eLCtj5Wi02Pr7Fa
-	PHwVbnF51xw2ixnn9zFZzPu7ltXi2AIxi2+n3zBaLNr6hd3i4Yc9QDPOvGC2aN17hN3iy8ab
-	7A7iHltW3mTyeNq/ld1j56y77B4LNpV6bFrVyeZx59oeNo/NS+o93u+7yubRt2UVo8eW/Z8Z
-	Pf41zWX3+LxJLoAnKtsmIzUxJbVIITUvOT8lMy/dVsk7ON453tTMwFDX0NLCXEkhLzE31VbJ
-	xSdA1y0zB+hrJYWyxJxSoFBAYnGxkr6dTVF+aUmqQkZ+cYmtUmpBSk6BSYFecWJucWleul5e
-	aomVoYGBkSlQYUJ2xqojb5kKPvJVnN75k72BcSlPFyMnh4SAicT0uTeZuhi5OIQEdjNKXJ86
-	gx3C+cQo8XzxOzY45+CHXewwLeev/2eBSOxklFg+eSaU85xR4u7qHlaQKjYBfYnXK+azgdgi
-	As+YJebNKwexmQVuMErcX+IEYnMK2EmsfzgNqJ6DQ1ggTmLZPB+QMIuAqkRHwxOwMbwClhJP
-	lixng7AFJU7OfMICMUZeYvvbOcwQBylI/Hy6jBVilZvE655PzBA14hJHf/Ywg9wmIbCdU2L5
-	+vVQH7hInHixA8oWlnh1fAuULSXx+d1eNgg7XWLzkc2sEHaOREdTM9Qye4kDV+awgNzMLKAp
-	sX6XPkRYVmLqqXVMEHv5JHp/P2GCiPNK7JgHY6tJLH7UCWXLSKx99Il1AqPSLCSvzULy2iwk
-	L8xC2LaAkWUVo2RqQXFuemqxaYFhXmo5PMKT83M3MYIzhZbnDsa7Dz7oHWJk4mA8xCjBwawk
-	wtvDeytFiDclsbIqtSg/vqg0J7X4EKMpMLwnMkuJJucDc1VeSbyhiaWBiZmZmYmlsZmhkjjv
-	69a5KUIC6YklqdmpqQWpRTB9TBycUg1MNpMnPFePjJypfW7xgdknW2cGTw8NeOMp0L3oZ7+r
-	kvKFLYmbNxQse7bPTydT7uD1xbIqib+dq7deLdcPmxYb0SU/W1O2Rvvibt0bPt8D6j+Wdbse
-	3R7Fx2s9w+Tb6anLgq573yyeeOdAuuem+g8atjuPq744OIXZTf3yi489BxTPqmQEvGQPrrl5
-	c2te1Valzy/PmOtNNkp1ijf9UOO9QHN1aFdS2495yffzGParsWxxEO00tzH6crRevfLnd68/
-	BoI/XK+5ddvPfLj/0+0D35J756qcKw/3cK43uamRI2/pdCrUT0v42PMpGyRvf42wUpTvD3x9
-	f9P+k70m5rvkLj+Lebkl4ZL6E6W5t5WNlFiKMxINtZiLihMBf1N+8J0EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrIIsWRmVeSWpSXmKPExsWy7bCSvG58/p0Ug0dfJCx+vpzGaPFg3jY2
-	izV7zzFZzDnfwmIx/8g5Vounxx6xWxw5tYTJ4t6id6wWfS8eMlvsfb2V3eLCtj5Wi02Pr7Fa
-	PHwVbnF51xw2ixnn9zFZzPu7ltXi2AIxi2+n3zBaLNr6hd3i4Yc9QDPOvGC2aN17hN3iy8ab
-	7A7iHltW3mTyeNq/ld1j56y77B4LNpV6bFrVyeZx59oeNo/NS+o93u+7yubRt2UVo8eW/Z8Z
-	Pf41zWX3+LxJLoAnissmJTUnsyy1SN8ugStj1ZG3TAUf+SpO7/zJ3sC4lKeLkZNDQsBE4vz1
-	/yxdjFwcQgLbGSVutc5lhkjISJx8sATKFpZY+e85O0TRU0aJPS8vs4Mk2AT0JV6vmM8GkhAR
-	+MYs8ej1DjCHWeAOo8TVuUtYIVo+M0rsOv6LBaSFU8BOYv3DaawgtrBAjETP/yZGEJtFQFWi
-	o+EJWJxXwFLiyZLlbBC2oMTJmU/AepkFtCWe3nwKZctLbH87B+o+BYmfT5eB9YoIuEm87vnE
-	DFEjLnH0Zw/zBEbhWUhGzUIyahaSUbOQtCxgZFnFKJpaUJybnptcYKhXnJhbXJqXrpecn7uJ
-	EZwqtIJ2MC5b/1fvECMTB+MhRgkOZiUR3h7eWylCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeZVz
-	OlOEBNITS1KzU1MLUotgskwcnFINTLMYstbnL685Pn9Wt96bzyxPFntJPvyol3g+rUiJW3DJ
-	xw4uM878TU464U/D7mo+/b/l9ZnrbF1zAvP2p55U3duaWH2v0U/65uUl/JmH6w6XMR6Ua2xm
-	Kq8pnej9tlJvX+ff9N2TnJQW8+2yVP0zv+nK409T2N/9eTWTd4byxcZVFV3KDKFfeLhdjNxn
-	fDyWHry3/ZPHi6MaZ/cWX1HYkMAmHndspULZtaPLlz467cZe91VDZLLMb+3FhV//B+lEL7i+
-	YLrq5sMXZxXFz1TZZ/35mWCmlVsi/1Lxo1J7OP88DqndttGxPF7+oEXHufnKuz/ZvxJZX/dN
-	12Suud6H93LCFyrk7HcnHXQObPuxykiJpTgj0VCLuag4EQCW3Mm2hAMAAA==
-X-CMS-MailID: 20230816064031epcas5p161bf015960cb5d4031eaf9bac1d3541c
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230814112617epcas5p1bc094e9cf29da5dd7d1706e3f509ac28
-References: <20230814112539.70453-1-sriranjani.p@samsung.com>
-	<CGME20230814112617epcas5p1bc094e9cf29da5dd7d1706e3f509ac28@epcas5p1.samsung.com>
-	<20230814112539.70453-4-sriranjani.p@samsung.com>
-	<b3cd8115-b2bd-63dd-01d3-3cd27127d534@linaro.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230815162530.150994-1-jhs@mojatatu.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Tue, Aug 15, 2023 at 06:25:27PM CEST, jhs@mojatatu.com wrote:
+>In this patchset we introduce tc block netdev tracking infra.
+>Patch 1 introduces the infra. Patch 2 exposes it to the datapath and patch 3
+>shows its usage via a new tc action "blockcast".
+
+This is very brief. Please describe motivation, how you solve the
+problem, provide examples, etc. From the cover letter, the reader should
+know what is going on without looking at the patches.
 
 
-> -----Original Message-----
-> From: Krzysztof Kozlowski [mailto:krzysztof.kozlowski@linaro.org]
-> Sent: 15 August 2023 01:27
-> To: Sriranjani P <sriranjani.p@samsung.com>; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
-> conor+dt@kernel.org; richardcochran@gmail.com;
-> alexandre.torgue@foss.st.com; joabreu@synopsys.com;
-> mcoquelin.stm32@gmail.com; alim.akhtar@samsung.com; linux-
-> fsd@tesla.com; pankaj.dubey@samsung.com; swathi.ks@samsung.com;
-> ravi.patel@samsung.com
-> Cc: netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-samsung-soc@vger.kernel.org; linux-arm-
-> kernel@lists.infradead.org; Jayati Sahu <jayati.sahu@samsung.com>
-> Subject: Re: [PATCH v3 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
-> Block of FSD SoC
-> 
-> On 14/08/2023 13:25, Sriranjani P wrote:
-> > The FSD SoC contains two instances of Synopsys DWC QoS Ethernet IP,
-> > one in FSYS0 block and other in PERIC block.
-> >
-> > Adds device tree node for Ethernet in FSYS0 Block and enables the same
-> > for FSD platform.
-> >
-> 
-> ...
-> 
-> >  &pinctrl_peric {
-> > diff --git a/arch/arm64/boot/dts/tesla/fsd.dtsi
-> > b/arch/arm64/boot/dts/tesla/fsd.dtsi
-> > index 1c53c68efd53..9a991f021711 100644
-> > --- a/arch/arm64/boot/dts/tesla/fsd.dtsi
-> > +++ b/arch/arm64/boot/dts/tesla/fsd.dtsi
-> > @@ -32,6 +32,7 @@
-> >  		spi0 = &spi_0;
-> >  		spi1 = &spi_1;
-> >  		spi2 = &spi_2;
-> > +		eth0 = &ethernet_0;
-> 
-> One more thing - I said it two times already. Patch v1 and then in v2.
-> You responded now without waiting for my further feedback and
-> immediately sent the same stuff.
-> 
-> Let's be clear:
-> 
-> NAK for the reasons I said multiple times.
-
-Got it, will move this alias in board specific dts file.
-
-> 
-> Best regards,
-> Krzysztof
-
-
+>
+>
+>Jamal Hadi Salim (3):
+>  Introduce tc block netdev tracking infra
+>  Expose tc block ports to the datapath
+>  Introduce blockcast tc action
+>
+> include/net/sch_generic.h |   8 +
+> include/net/tc_wrapper.h  |   5 +
+> net/sched/Kconfig         |  13 ++
+> net/sched/Makefile        |   1 +
+> net/sched/act_blockcast.c | 315 ++++++++++++++++++++++++++++++++++++++
+> net/sched/cls_api.c       |   7 +-
+> net/sched/sch_api.c       |  83 +++++++++-
+> net/sched/sch_generic.c   |  37 ++++-
+> 8 files changed, 463 insertions(+), 6 deletions(-)
+> create mode 100644 net/sched/act_blockcast.c
+>
+>-- 
+>2.34.1
+>
 
