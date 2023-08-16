@@ -1,41 +1,39 @@
-Return-Path: <netdev+bounces-27863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806D277D7CE
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 03:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D69B577D80D
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EB411C20D05
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 01:41:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 131731C20D72
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF6F7F0;
-	Wed, 16 Aug 2023 01:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB251115;
+	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26DA392
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:41:42 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E321FDE
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 18:41:40 -0700 (PDT)
-Received: from dggpeml500003.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RQW6V3FwGzrSLl;
-	Wed, 16 Aug 2023 09:40:18 +0800 (CST)
-Received: from huawei.com (10.175.103.91) by dggpeml500003.china.huawei.com
- (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 16 Aug
- 2023 09:41:38 +0800
-From: Yu Liao <liaoyu15@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <liaoyu15@huawei.com>, <liwei391@huawei.com>
-Subject: [PATCH net-next] pds_core: remove redundant pci_clear_master()
-Date: Wed, 16 Aug 2023 09:38:02 +0800
-Message-ID: <20230816013802.2985145-1-liaoyu15@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE137F2
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E670C433C9;
+	Wed, 16 Aug 2023 02:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692151221;
+	bh=8zy9tuJEYtTlTlsmU6yw8DxWnd3M4qAqXB5IZSXtOWM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jkyl5thNvoc2mEJC4kDmAiQcYEAOJ82knh1SV9Uyk1vXBiJwogLh8vmwvL+wyd20l
+	 HvqpIbuhmEYDZ3oAyogaGV//PRTfZ4XFb8AeqYr6KfAxNuER4Ur1Dn9YrFDF1pEmOF
+	 Zp0l2ZI82rUdo28tiJy5In92xwQSEunxB2rjUpcmvGzdVB0jErnKiZVFWN4JwRa4Lh
+	 +RituYE2rOIG57q6y/Df2kgtfFz9WP+jCasjTIp7ywhA/ShyJbJg43rbBpJMNQYc2t
+	 Wh/Ap4QTnY4L7wktJMsJVRsWDwca9p0eVcd78PYs0wmekHojjZIr7JMmUruwoWjI8K
+	 gwW2V6ZzZp+GA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83D5BC395C5;
+	Wed, 16 Aug 2023 02:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,47 +41,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500003.china.huawei.com (7.185.36.200)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net v2] net: phy: broadcom: stub c45 read/write for 54810
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169215122153.15326.4625429367970352671.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Aug 2023 02:00:21 +0000
+References: <1691901708-28650-1-git-send-email-justin.chen@broadcom.com>
+In-Reply-To: <1691901708-28650-1-git-send-email-justin.chen@broadcom.com>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jon.mason@broadcom.com,
+ linux-kernel@vger.kernel.org
 
-pci_disable_device() involves disabling PCI bus-mastering. So remove
-redundant pci_clear_master().
+Hello:
 
-Signed-off-by: Yu Liao <liaoyu15@huawei.com>
----
- drivers/net/ethernet/amd/pds_core/main.c | 2 --
- 1 file changed, 2 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
-index 672757932246..ffe619cff413 100644
---- a/drivers/net/ethernet/amd/pds_core/main.c
-+++ b/drivers/net/ethernet/amd/pds_core/main.c
-@@ -374,7 +374,6 @@ static int pdsc_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	return 0;
- 
- err_out_clear_master:
--	pci_clear_master(pdev);
- 	pci_disable_device(pdev);
- err_out_free_ida:
- 	ida_free(&pdsc_ida, pdsc->uid);
-@@ -439,7 +438,6 @@ static void pdsc_remove(struct pci_dev *pdev)
- 		pci_release_regions(pdev);
- 	}
- 
--	pci_clear_master(pdev);
- 	pci_disable_device(pdev);
- 
- 	ida_free(&pdsc_ida, pdsc->uid);
+On Sat, 12 Aug 2023 21:41:47 -0700 you wrote:
+> The 54810 does not support c45. The mmd_phy_indirect accesses return
+> arbirtary values leading to odd behavior like saying it supports EEE
+> when it doesn't. We also see that reading/writing these non-existent
+> MMD registers leads to phy instability in some cases.
+> 
+> Fixes: b14995ac2527 ("net: phy: broadcom: Add BCM54810 PHY entry")
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: phy: broadcom: stub c45 read/write for 54810
+    https://git.kernel.org/netdev/net/c/096516d092d5
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
