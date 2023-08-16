@@ -1,155 +1,106 @@
-Return-Path: <netdev+bounces-27985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A0E77DD02
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:12:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7941877DD0B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB7B2281853
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:12:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336672818A9
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12A7D539;
-	Wed, 16 Aug 2023 09:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BC4D53B;
+	Wed, 16 Aug 2023 09:14:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9233AD307
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:12:51 +0000 (UTC)
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692351FC1
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:12:49 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bc6535027aso53239515ad.2
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1692177169; x=1692781969;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+F832O1MonV9zoGUjcIJejeSoQ3hJAaI+0iai7pqbdQ=;
-        b=aEecXckP7vra0nLZVh5J+v5iJFeL/deIsacfTqmIgWMZS6GxfQjrtgRD8ZGxvNfCNC
-         6DDeY2goYhxglbyQ5f8RsbzcqNM7LhY+Rr8ylnQ+2n/biG2KA/ifYVWuPYmKoAn3KRWi
-         1S67/08oO069TudRASY8IVn9wcaphqGkR5Zl+fVKQV+nm2tzW7SAadL5B9qdZnpTTNgL
-         zla6SQLwoq1VHY5KzIzRgqlvHfMZac4/gmEqMgSeBWnpzRnqVZChf59cJT9yWXIqVaiH
-         1JGaGL4dtVH5a4dvl8++or/vRWjYpP/DESEYTC4q93GQyL1273HnCKbJ1nmJRFXtekSA
-         lSqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692177169; x=1692781969;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+F832O1MonV9zoGUjcIJejeSoQ3hJAaI+0iai7pqbdQ=;
-        b=cOrroRsSboy7vvvRsqnHccUcaW7d0Dx1bhD4R6bWH3HwNQe3YFo1cDHudQmg7oH0Pm
-         /oQvVgQl08coiqGfW8DEYB1CAIJQdidwhcUvkQnU/qAW81vQq4a5XXrK/UY+BzEjMhXo
-         qv3o73u9lI42CWZ1HxpdW2oDoHrq97SCbOoC38zLH3irmDGdYDi26aepYlzlrf/l3l9i
-         wO9NhSvsW6aB0FMMbAaxEF6l/jlDeae/REelutDmThEDo2wMaji8hIdkYSEd2frH5wJz
-         nwYNrCwEmcd6LUqJm45xlPwzeEq3Eid8/pjGPLvN1XSEYD7NqHLcP3R3NaXChtKwO+9j
-         coHA==
-X-Gm-Message-State: AOJu0YybXd89MawWNz5C8FeCsZRY4Rwbkfg+EJcjIkBO9sE581+qNryK
-	Ka6SXpFwbiqiP5jbCHPOkzPecg==
-X-Google-Smtp-Source: AGHT+IEL7B3gvo5NUfmmMlhYVZKdjtMYjohsMWpe+dAqaLbYkRSrdkxGQXA7IZtLQaHOjdUeOW4orQ==
-X-Received: by 2002:a17:902:da8b:b0:1b5:64a4:be8b with SMTP id j11-20020a170902da8b00b001b564a4be8bmr1633362plx.35.1692177168892;
-        Wed, 16 Aug 2023 02:12:48 -0700 (PDT)
-Received: from C02DV8HUMD6R.bytedance.net ([240e:694:e21:b::2])
-        by smtp.gmail.com with ESMTPSA id g14-20020a170902868e00b001bc2831e1a9sm12574066plo.90.2023.08.16.02.12.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 02:12:48 -0700 (PDT)
-From: Abel Wu <wuyun.abel@bytedance.com>
-To: Shakeel Butt <shakeelb@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	David Howells <dhowells@redhat.com>,
-	Jason Xing <kernelxing@tencent.com>,
-	Glauber Costa <glommer@parallels.com>,
-	KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujtsu.com>
-Cc: Abel Wu <wuyun.abel@bytedance.com>,
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] sock: Fix misuse of sk_under_memory_pressure()
-Date: Wed, 16 Aug 2023 17:12:22 +0800
-Message-Id: <20230816091226.1542-1-wuyun.abel@bytedance.com>
-X-Mailer: git-send-email 2.37.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E38D521
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:14:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F7EEC433CA;
+	Wed, 16 Aug 2023 09:14:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692177259;
+	bh=37eOs8xTqJRLNlEmM1vit1aHCveYzgXLxOs2wviDOjo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QhsipXjby4kC4pHODKOPzPF0Zf2SXinRhtfkaW9IYoex4TDg8I053r7cz1No0FDDz
+	 bOXun6q46fRwNL96AbLOqsNtnwcO8woSdpW0VEsGz5ueA+nRJ94cW+DDA9qRpt+iup
+	 ps3sa6y9u3VDuyNl3/Q1J0TK66AMddX2OWUkfTI7qVsDUrtPJtEZRrKO7L7hGoRhuB
+	 icv5Cb1+9dTEubm82JXTR3XK18DlZiX+xtzHg7JNPOwyquu1knfHYLmtVwP4DposeK
+	 ve9uQadkY3wP7HFDIVh4hZuPgobQroXV7CdhvjRGF8xNPW/NeOZsNScZQeJM1q4i85
+	 xlpm4QE1xyISQ==
+Date: Wed, 16 Aug 2023 11:14:16 +0200
+From: Simon Horman <horms@kernel.org>
+To: Wenjun Wu <wenjun1.wu@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	xuejun.zhang@intel.com, madhu.chittim@intel.com,
+	qi.z.zhang@intel.com, anthony.l.nguyen@intel.com
+Subject: Re: [PATCH iwl-next v3 5/5] iavf: Add VIRTCHNL Opcodes Support for
+ Queue bw Setting
+Message-ID: <ZNyTaPtGSsEIHLXe@vergenet.net>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+ <20230816033353.94565-1-wenjun1.wu@intel.com>
+ <20230816033353.94565-6-wenjun1.wu@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230816033353.94565-6-wenjun1.wu@intel.com>
 
-The status of global socket memory pressure is updated when:
+On Wed, Aug 16, 2023 at 11:33:53AM +0800, Wenjun Wu wrote:
+> From: Jun Zhang <xuejun.zhang@intel.com>
+> 
+> iavf rate tree with root node and queue nodes is created and registered
+> with devlink rate when iavf adapter is configured.
+> 
+> User can configure the tx_max and tx_share of each queue. If any one of
+> the queues have been fully updated by user, i.e. both tx_max and
+> tx_share have been updated for that queue, VIRTCHNL opcodes of
+> VIRTCHNL_OP_CONFIG_QUEUE_BW and VIRTCHNL_OP_CONFIG_QUANTA will be sent
+> to PF to configure queues allocated to VF if PF indicates support of
+> VIRTCHNL_VF_OFFLOAD_QOS through VF Resource / Capability Exchange.
+> 
+> Signed-off-by: Jun Zhang <xuejun.zhang@intel.com>
 
-  a) __sk_mem_raise_allocated():
+...
 
-	enter: sk_memory_allocated(sk) >  sysctl_mem[1]
-	leave: sk_memory_allocated(sk) <= sysctl_mem[0]
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
 
-  b) __sk_mem_reduce_allocated():
+...
 
-	leave: sk_under_memory_pressure(sk) &&
-		sk_memory_allocated(sk) < sysctl_mem[0]
+> @@ -5005,10 +5035,18 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	/* Setup the wait queue for indicating virtchannel events */
+>  	init_waitqueue_head(&adapter->vc_waitqueue);
+>  
+> +	len = struct_size(adapter->qos_caps, cap, IAVF_MAX_QOS_TC_NUM);
+> +	adapter->qos_caps = kzalloc(len, GFP_KERNEL);
+> +	if (!adapter->qos_caps)
 
-So the conditions of leaving global pressure are inconstant, which
-may lead to the situation that one pressured net-memcg prevents the
-global pressure from being cleared when there is indeed no global
-pressure, thus the global constrains are still in effect unexpectedly
-on the other sockets.
+Hi Jun Zhang and Wenjun Wu,
 
-This patch fixes this by ignoring the net-memcg's pressure when
-deciding whether should leave global memory pressure.
+The goto below leads to the function returning err.
+Should err be set to an error value here?
 
-Fixes: e1aab161e013 ("socket: initial cgroup code.")
-Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
----
- include/net/sock.h | 6 ++++++
- net/core/sock.c    | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+As flagged by Smatch and Coccinelle.
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 2eb916d1ff64..e3d987b2ef12 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1420,6 +1420,12 @@ static inline bool sk_has_memory_pressure(const struct sock *sk)
- 	return sk->sk_prot->memory_pressure != NULL;
- }
- 
-+static inline bool sk_under_global_memory_pressure(const struct sock *sk)
-+{
-+	return sk->sk_prot->memory_pressure &&
-+		!!*sk->sk_prot->memory_pressure;
-+}
-+
- static inline bool sk_under_memory_pressure(const struct sock *sk)
- {
- 	if (!sk->sk_prot->memory_pressure)
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 732fc37a4771..c9cffb7acbea 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3159,7 +3159,7 @@ void __sk_mem_reduce_allocated(struct sock *sk, int amount)
- 	if (mem_cgroup_sockets_enabled && sk->sk_memcg)
- 		mem_cgroup_uncharge_skmem(sk->sk_memcg, amount);
- 
--	if (sk_under_memory_pressure(sk) &&
-+	if (sk_under_global_memory_pressure(sk) &&
- 	    (sk_memory_allocated(sk) < sk_prot_mem_limits(sk, 0)))
- 		sk_leave_memory_pressure(sk);
- }
--- 
-2.37.3
+> +		goto err_ioremap;
+> +
+>  	/* Register iavf adapter with devlink */
+>  	err = iavf_devlink_register(adapter);
+> -	if (err)
+> +	if (err) {
+>  		dev_err(&pdev->dev, "devlink registration failed: %d\n", err);
+> +		kfree(adapter->qos_caps);
+> +		goto err_ioremap;
+> +	}
+>  
+>  	/* Keep driver interface even on devlink registration failure */
+>  	return 0;
 
+...
 
