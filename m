@@ -1,109 +1,103 @@
-Return-Path: <netdev+bounces-27964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD7C77DC50
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:33:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AAE577DC51
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB1902818EA
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9352281950
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D202CBA40;
-	Wed, 16 Aug 2023 08:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1671C2DF;
+	Wed, 16 Aug 2023 08:33:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C712B17F7
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:33:40 +0000 (UTC)
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6BE22706;
-	Wed, 16 Aug 2023 01:33:18 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-565ea1088fbso826904a12.2;
-        Wed, 16 Aug 2023 01:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692174798; x=1692779598;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G+0PVxwBEghPGirS4xN4p99bdGIsDm3H7t/XiQTGcd4=;
-        b=WYeG8mfH6+weMiZVg8Zg2vFnRK/f2tH8MEZf5fvQNfGNxyrHCW7+TTjid+PyIv7FNF
-         D9MjRR7O1KIHXaW5IvGY0is0HqsL4oo4uo9cysB5EFYzt2yzKfP3lPfYtppsb32gKpVJ
-         JFJAaER3v1/jRfSd40dyOnuLGChsqsr66Ol7d4+hg2nMP+JrvQ/jZmXmtQvm4KqeEfXS
-         J49+VDvk1IV8QkzbQpGF7yAuuHspb3DGwuF51X5a0q5oQqlrexkFVRtygzfqb427EYlx
-         oJf9hmedQP8EJ2h2ZckcZ21mBVp6i7bGuSnm3sv8YHSFoQ5B8wLjdvVPLducll6Sq80E
-         TzpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692174798; x=1692779598;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G+0PVxwBEghPGirS4xN4p99bdGIsDm3H7t/XiQTGcd4=;
-        b=deXCScNrr0ugZwBJnMZoLgEAIDRDY9rAG9zpVu//j2/cgoluba3jPpJSfp/cLOOqEe
-         Na8f6cKpc352DwKOvmPBGpDSKoaoKApcZ+kCSf0Q5lxpewSGO9PDC4xsHCFuk0I9e8G/
-         Dxfy7FePqgzVywJgxbOzm4OHB0co7n3qzk2r2QxEEa+cUByQoo5w8MWgt+vGw9SlXavr
-         MmEPO9C2KOTcWUypnQlWkJAOeVR/yb1C5scHrYzyWVHyk+ZWipNT8CgHp4Xc65p7UA9E
-         KFnf4PqttZwMQr2tCEeUguRjsfrTVVnZShz2NXLH+QtHrzfW2z0pMCZcKX8kJRMvXAzP
-         k8PA==
-X-Gm-Message-State: AOJu0YyP27clhZ4iODN1bFYzLjBqTJWxw1Y/z55dURNY9HD1TcdfSrTs
-	PFu0GlbRuyUQEseiN0syBwU=
-X-Google-Smtp-Source: AGHT+IG/mvk0WcBKHkr7hsPmymVoMRxdsNgw/GDpQvu7VUbLkMbGMXNThaJL5KU6P5b981UyBuoEFA==
-X-Received: by 2002:a05:6a20:5485:b0:140:a6ec:de6b with SMTP id i5-20020a056a20548500b00140a6ecde6bmr2024965pzk.51.1692174798235;
-        Wed, 16 Aug 2023 01:33:18 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 5-20020aa79145000000b00679b7d2bd57sm10596471pfi.192.2023.08.16.01.33.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 01:33:16 -0700 (PDT)
-Date: Wed, 16 Aug 2023 16:33:11 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: shaozhengchao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	shuah@kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net-next] selftests: bonding: remove redundant delete
- action of device link1_1
-Message-ID: <ZNyJx1HtXaUzOkNA@Laptop-X1>
-References: <20230812084036.1834188-1-shaozhengchao@huawei.com>
- <ZNxorHjkyjktoj9m@Laptop-X1>
- <a363d616-eadb-2136-a445-f946c24cd66d@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D6717F7
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:33:52 +0000 (UTC)
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2782D70;
+	Wed, 16 Aug 2023 01:33:35 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VpvH8jJ_1692174810;
+Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0VpvH8jJ_1692174810)
+          by smtp.aliyun-inc.com;
+          Wed, 16 Aug 2023 16:33:32 +0800
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	kgraul@linux.ibm.com,
+	tonylu@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	alibuda@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/6] net/smc: several features's implementation for smc v2.1
+Date: Wed, 16 Aug 2023 16:33:22 +0800
+Message-Id: <20230816083328.95746-1-guangguan.wang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a363d616-eadb-2136-a445-f946c24cd66d@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 03:55:30PM +0800, shaozhengchao wrote:
-> 
-> 
-> On 2023/8/16 14:11, Hangbin Liu wrote:
-> > On Sat, Aug 12, 2023 at 04:40:36PM +0800, Zhengchao Shao wrote:
-> > > When run command "ip netns delete client", device link1_1 has been
-> > > deleted. So, it is no need to delete link1_1 again. Remove it.
-> > 
-> Hi Hangbin:
-> > What if the test exit because the cmd execute failed before setting
-> > link1_1 to netns client?
-> > 
-> > Thanks
-> > Hangbin
-> > > 
-> 	Your consideration is indeed possible.
-> "ip link del link1_1 >/dev/null 2>&1" maybe looks better?
+This patch set implement several new features in SMC v2.1(https://
+www.ibm.com/support/pages/node/7009315), including vendor unique
+experimental options, max connections per lgr negotiation, max links
+per lgr negotiation.
 
-I have not objects to this. On the other side, this only omit the error
-message. It doesn't fix anything.
+I have removed the RFC tag and changed the patch series to formal
+patch series from this version.
 
-Thanks
-Hangbin
+RFC v2 - v1:
+ - more description in commit message
+ - modify SMC_CONN_PER_LGR_xxx and SMC_LINKS_ADD_LNK_xxx
+   macro defination and usage
+ - rename variable release_ver to release_nr
+ - remove redundant release version check in client
+ - explicitly set the rc value in smc_llc_cli/srv_add_link
+
+RFC v1 - RFC v2:
+ - Remove ini pointer NULL check and fix code style in
+   smc_clc_send_confirm_accept.
+ - Optimize the max_conns check in smc_clc_xxx_v2x_features_validate.
+
+Guangguan Wang (6):
+  net/smc: support smc release version negotiation in clc handshake
+  net/smc: add vendor unique experimental options area in clc handshake
+  net/smc: support smc v2.x features validate
+  net/smc: support max connections per lgr negotiation
+  net/smc: support max links per lgr negotiation in clc handshake
+  net/smc: Extend SMCR v2 linkgroup netlink attribute
+
+ include/uapi/linux/smc.h |   2 +
+ net/smc/af_smc.c         |  83 ++++++++++++++++------
+ net/smc/smc.h            |   5 +-
+ net/smc/smc_clc.c        | 150 ++++++++++++++++++++++++++++++++-------
+ net/smc/smc_clc.h        |  53 ++++++++++++--
+ net/smc/smc_core.c       |  13 +++-
+ net/smc/smc_core.h       |  25 +++++++
+ net/smc/smc_llc.c        |  25 +++++--
+ 8 files changed, 301 insertions(+), 55 deletions(-)
+
+-- 
+2.24.3 (Apple Git-128)
+
 
