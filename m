@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-28151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB9877E65E
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:28:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E9377E661
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:29:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55C0281B88
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3EC1C21054
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C683516438;
-	Wed, 16 Aug 2023 16:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731F716436;
+	Wed, 16 Aug 2023 16:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFA9C8FF
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:28:49 +0000 (UTC)
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD0410EC;
-	Wed, 16 Aug 2023 09:28:48 -0700 (PDT)
-Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-56cc461f34fso4310463eaf.0;
-        Wed, 16 Aug 2023 09:28:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686F516414
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:29:35 +0000 (UTC)
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193F51980;
+	Wed, 16 Aug 2023 09:29:31 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-649921ec030so912886d6.1;
+        Wed, 16 Aug 2023 09:29:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692203328; x=1692808128;
+        d=gmail.com; s=20221208; t=1692203370; x=1692808170;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=OXgjHTAdytoLgUZyHzzq4dyrdO9fvokMGFShZim/Sxs=;
-        b=qyw4CNHhKaU+ZrllPmAk3cWrbmVyZpXunhLa+YOqcH3nzzbq1D/DVyKIw2tKQB+8Ii
-         4ExeXVyehEL8JzztUlM2IasuE9W/bpPCi5Oy6nh8OYSDJM6Ja8fPZzt69RbfnHNk2ekH
-         RvoLxlm0LJqLVLCNEcLxJQnfxD9G1DkHbPlYwlKRg1+GRjV+ME7p5o/Dat4QRATgoYc4
-         g48Asy+rNv5T6ouXLT/hmD8D6eaqU/5+MhSNxgmtDq08O77AlQhyq+yzlM0C0INS3fTC
-         fpRth9QNiKiayu7KqDjn7TQOcnVI6Kud7adEhFsS0nnhNK0BKahchWp4eZMPjNPVNPL+
-         yQow==
+        bh=XZoiawh33EN8egkU31l+X3dd1VdBtDLA5RvWoX+ot10=;
+        b=it+m/f27p3Xv9yPNgEvDmy8ksdTIyC3AP6snE7vGudLdFOFQRrfUr2MwJcCvN3JEAY
+         1Rd106fgNEJnl/ukfu1L9/JwsuBcJleYKjmkCL9sG7A3NwpK7KrIzhN01NBbA9ARM9hV
+         SJS0X/nJum0laNlaQ5ZGvZRZiLAwdpO2BfOx9AOGaTAKR5IEPTV2zN+vNv96eS18Ni5M
+         OQdwmEhPfXd2hJK2A9EROjJyevDr2gpVc2zo9GR/g0cMcibIcWxmB4Rr8Zudg6dP7kII
+         9FeSRWA5ZZF+cprOdTwRT+SJ9BaGaY29vrLCSiCHnj9r0CJDDhYa0pvGeEPhGARF1zAl
+         jJ8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692203328; x=1692808128;
+        d=1e100.net; s=20221208; t=1692203370; x=1692808170;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OXgjHTAdytoLgUZyHzzq4dyrdO9fvokMGFShZim/Sxs=;
-        b=dcxIVD5jmskKeHn8VqZyL49H3fKCn/E6u5JsZoJ/wKVjEJu/gebFfhqzOTnDzdsZZc
-         cUTsHewyOzuE6dPMzMvlyeK9z2/oNZ+pNXuTmeta+c/idvamUR9nzPCUePX1PQ4YBfR/
-         5Ez+sKzbOPYvGB1j3MLfljqPpX107nIn2784HR+Unoxo14TmmtLwV5F+z01o9VweKZD4
-         AMOK4cCoN69xMcevi97PezT3dFqdUzXrrzAwZJeNHEeQLceQf3i98apbqCFAxnV/DWa/
-         yx/rkKfJREKd+jsDOlQjFfkYphqyq+0syJMjabJ4M3hO38cYrhhF7eg93gaHVfzFHJgX
-         IHUw==
-X-Gm-Message-State: AOJu0YzkXkGBdOJXak5dxc7IUWboQY8QUWO8pLTY9idl0umWfkq5PIDd
-	plHgxkHlAQI28NcBjWbtOMw=
-X-Google-Smtp-Source: AGHT+IE7gF6G+GXuQtpoM6J4S+ngEbixSrE1pG1ziA+I7vG4LD60n9fDC6EXepNmmTmiT3gmnjdQoA==
-X-Received: by 2002:a05:6358:7f04:b0:135:89d6:22e9 with SMTP id p4-20020a0563587f0400b0013589d622e9mr2669136rwn.13.1692203327824;
-        Wed, 16 Aug 2023 09:28:47 -0700 (PDT)
+        bh=XZoiawh33EN8egkU31l+X3dd1VdBtDLA5RvWoX+ot10=;
+        b=iGeVLxzSyi9I4BJ70thtGvWK/+QJGurZ6qoV2bYQ4k089HLvqTjn0WI1/riQs/sMr2
+         6KV/7Mmnb+oZ2U2lmI3mHiWrT3TiKo0xL8gt6iD2rbiqO4elPvK+dRIZaov8sxjTh4SK
+         AD39DGEVnYvASjrEYVgIOAaTWBCPKvdCQgk+e6jiYSLHXbYPUK8/I/kPdhNUS03LemSR
+         nUucGaLnaVL75WYBpj97OwfQdoS/gPRz4Y6XufmQLeMPE0HT24+vceVgHF539vSwW5fO
+         LzZqxHf82z5Pyr13HWSajNLqBJWzOywDOeb9hqFpKoUaUTOHUF92rDa+dSeiOGY6ANMY
+         IcJw==
+X-Gm-Message-State: AOJu0YylHGtCcxn4caoxYksEjxo1DlxoZ9HReTrtESDXPITvE2ygY/iE
+	5+1czohnfxKoa0nkv95qhTE=
+X-Google-Smtp-Source: AGHT+IH2zLks0E7Y4TfQ5mZXZCXk86892jlNYmBii+ktZG2i0ZIzA4KnSgdIUoi9+5AIZpP1uON+Zg==
+X-Received: by 2002:a0c:e44d:0:b0:636:f84f:f0c5 with SMTP id d13-20020a0ce44d000000b00636f84ff0c5mr1998219qvm.38.1692203369991;
+        Wed, 16 Aug 2023 09:29:29 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id k7-20020ac80747000000b0040378535dccsm4553854qth.43.2023.08.16.09.28.26
+        by smtp.googlemail.com with ESMTPSA id p6-20020a0ce186000000b00632191a70aesm4949859qvl.88.2023.08.16.09.29.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Aug 2023 09:28:46 -0700 (PDT)
-Message-ID: <7d44ebf9-3d1c-d405-5c1a-5ce721dc37e8@gmail.com>
-Date: Wed, 16 Aug 2023 09:28:18 -0700
+        Wed, 16 Aug 2023 09:29:28 -0700 (PDT)
+Message-ID: <8fb144a7-92ac-2107-8a7c-19acc109bad8@gmail.com>
+Date: Wed, 16 Aug 2023 09:29:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,8 +66,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH 3/4] dt-bindings: net: dsa: realtek: require compatible
- property under mdio node
+Subject: Re: [PATCH 1/4] dt-bindings: net: dsa: microchip,lan937x: add missing
+ ethernet on example
 Content-Language: en-US
 To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
@@ -88,9 +88,9 @@ Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
 References: <20230812091708.34665-1-arinc.unal@arinc9.com>
- <20230812091708.34665-4-arinc.unal@arinc9.com>
+ <20230812091708.34665-2-arinc.unal@arinc9.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230812091708.34665-4-arinc.unal@arinc9.com>
+In-Reply-To: <20230812091708.34665-2-arinc.unal@arinc9.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -101,7 +101,8 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 8/12/23 02:17, Arınç ÜNAL wrote:
-> The compatible property must be defined under the mdio node. Enforce it.
+> The port@5 node on the example is missing the ethernet property. Add it.
+> Remove the MAC bindings on the example as they cannot be validated.
 > 
 > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 
