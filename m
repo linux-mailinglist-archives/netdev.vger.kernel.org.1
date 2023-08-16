@@ -1,416 +1,282 @@
-Return-Path: <netdev+bounces-27900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A323977D8B0
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:57:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D8B77D8BC
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 05:01:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5F051C20EAC
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:57:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86EC0281775
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 03:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420AB1FD3;
-	Wed, 16 Aug 2023 02:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63793210C;
+	Wed, 16 Aug 2023 03:00:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F04361
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:57:30 +0000 (UTC)
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121D3212D
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 19:57:28 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-76d7179e63eso2564585a.3
-        for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 19:57:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1692154647; x=1692759447;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YSGdEnCqI6zb744rb3nN7Qwri65wFsNuiAOi4seAdmc=;
-        b=u8cfweM9p3FM+s756YlMsJ0fuQr8ukg7dueUa3JJLNQdPPFyaZbCSs4ccefaj1/nrB
-         06xrJB2KpDhj7NKdcmHtxZb1+LriH2ZkfnZdZ1i4GzAjV9ujS1Kg35AhZ9AwH1ytBXpZ
-         TshUcVzBwe92qWPX6hm0jYNjIfMyuACs5mtTA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692154647; x=1692759447;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YSGdEnCqI6zb744rb3nN7Qwri65wFsNuiAOi4seAdmc=;
-        b=SQ6k9vQ3o66cyMZIv0Ow7SasIe01CKrBMunRe89KfPsQPulmPwgRN8JeZudKnV9evi
-         nRdMrbsGodY3mJVA7yZCDqFs1UuEEz/+0shgpuMOENuShtXq3TQc2Z5Y1bXoo0tEA3KB
-         yLPNqey7dIx97CjYlSmyUp+pVH315wzdBhJel3uu2oxjP2r9kryX8QZz0muatDCJaX1H
-         O140LB28/Rln8TtkpfKYLv0SJce1LJN0JDqMa6O2QR3CaOTnbPpF8e5qEWHectABk8PY
-         4LsLsec9dlCYr6SSvJeebnwpKcQF/JULswQdfid/9ExNIpUoQQr1ynkGCNbfAtUvIFk9
-         q+9A==
-X-Gm-Message-State: AOJu0YxLM1Ur3f0RK0XW+NUIIP3nmZPdWINKlGMUn/ruNWIVhHj7X34n
-	gXfCcyIrXci+RSUenTwit3kM3Q==
-X-Google-Smtp-Source: AGHT+IG+B5NS32lthGUirYjWUP3Lv0I6Z9Ii988Ra+jZxvPldsot/LT2oAEmBFcInF/JgS6mgB5+yQ==
-X-Received: by 2002:a05:620a:4414:b0:767:edc0:64f8 with SMTP id v20-20020a05620a441400b00767edc064f8mr950843qkp.2.1692154647011;
-        Tue, 15 Aug 2023 19:57:27 -0700 (PDT)
-Received: from debian.debian ([140.141.197.139])
-        by smtp.gmail.com with ESMTPSA id q4-20020a05620a038400b0076639dfca8dsm4158014qkm.80.2023.08.15.19.57.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 19:57:26 -0700 (PDT)
-Date: Tue, 15 Aug 2023 19:57:24 -0700
-From: Yan Zhai <yan@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	Yan Zhai <yan@cloudflare.com>, Thomas Graf <tgraf@suug.ch>,
-	Jordan Griege <jgriege@cloudflare.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH v5 bpf 4/4] selftests/bpf: add lwt_xmit tests for BPF_REROUTE
-Message-ID: <db5f4baf2577d52ee6894286e35e3689ad21c22f.1692153515.git.yan@cloudflare.com>
-References: <cover.1692153515.git.yan@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55840361
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 03:00:58 +0000 (UTC)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2077.outbound.protection.outlook.com [40.107.96.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D1FE6B;
+	Tue, 15 Aug 2023 20:00:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=le/xzgpb35FDLKwVZKjXmctoK3ax5xC059cOhek+Uw6gAt9aWCnjh8b2PZOg+B3FEd8sR3AZcwQwB4MHXTqkIzS4JrvD6qlLJLtZwmFN1AYLyVUFtXojc3CV2okpHa5G64DWN6ouO6jij7t75n/b57bQGWMNKfelTaKxId83pi6NvjYzjOg1psV3rCPywR1iiM3YBbpdsG4rCohuuQ1DcCs9GwxSkr5j/bFzpO0fjpwbIM7zFbfhArjMMJT52NNwkhNCczd2YkYDGK1Igk6H6eRKsVUbxqtCpMQa3jImsJyQZr0drGjOfIOGbbKIrvFfuykG5JzQ4ZiycnA7q8FQdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XCyOIP/uyxVyZtyqLq9xfiQS29wIxXRBNMOAsqWVxyo=;
+ b=lSRPo3K0FWFvHAkf9PQ66D9OtS8jAkN5mlNFohAw/XneBgaK+cJzdzxHLQEaOGUOc6SCpWAa1wJP2nYTYdzPIiLGXSKNbk/65y1aNcFWabXQaOLeKfvV8PsLr50OA4oLGr46SvrvL16VayJe2Q0KjEKb6ZGRAkr0w74REWdXvURun3po/K31EBWbGrQLhT6XeS2vXGghxd4NnUNty7v6dbHNSe+S49tRrZAIN+fUzW/OL3OhYW5FfIiXWLihNArzfDCgRff1kzB4S8Qa7yQVy5Q0PrgPhz7DlQiMSQvOmrg///CFI7tqVDCSbSCm8ukO5SE+vOIar9AjYiFyHBFqpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XCyOIP/uyxVyZtyqLq9xfiQS29wIxXRBNMOAsqWVxyo=;
+ b=Z3Ac4P4s7ndhB6EsMpGR2p7pvYuyQRHyQgZOy37FyvXwhZJXJmQLJ9h3p/+wagMQtarAiO/FCeSCf9LMxROKN+Bj3ixcWJitRJn21wxCIVp1JvNH5NS6cGunbH6W7j4QI8c9BaxeWIHdmQfXlLdbX31BZsSkoKH0LJuGPmkQ/9CbVE1VYycvJ0h8QujVkbI6ITDOTYb9KF1hcrR/QIfCQZOdmXOteXkQIJqLPc0Pb7ekl7dgqDiNrXlhIfUw9UrUMeRDGNwZoCSGxfgPFa/hwooV78JIKUmDYT7N7whJo+94XYbvQ49r2wrt10V8YArBNHMxuAU6HIZWOezZBOvtXQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6201.namprd12.prod.outlook.com (2603:10b6:930:26::16)
+ by SA1PR12MB8093.namprd12.prod.outlook.com (2603:10b6:806:335::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Wed, 16 Aug
+ 2023 03:00:54 +0000
+Received: from CY5PR12MB6201.namprd12.prod.outlook.com
+ ([fe80::87fb:3736:7ec4:b260]) by CY5PR12MB6201.namprd12.prod.outlook.com
+ ([fe80::87fb:3736:7ec4:b260%4]) with mapi id 15.20.6678.029; Wed, 16 Aug 2023
+ 03:00:54 +0000
+Message-ID: <f9f3c150-2b5e-7bd0-1c1a-062bd1f16fcd@nvidia.com>
+Date: Tue, 15 Aug 2023 23:00:49 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.9.0
+Subject: Re: [PATCH net v1] virtio_net: Introduce skb_vnet_common_hdr to avoid
+ typecasting
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Simon Horman <horms@kernel.org>
+Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Bodong Wang <bodong@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20230814171845.65930-1-feliu@nvidia.com>
+ <ZNtYpohWyjnb883M@vergenet.net>
+ <05348d62-586c-4b1f-40bd-5541caca0947@nvidia.com>
+ <ZNunz1hbqPKpcOgA@vergenet.net>
+ <CAF=yD-L+d34Uuvt3sOFOnxXhMmoMXNfHzcaSPk=t1PtiPUHZ1g@mail.gmail.com>
+From: Feng Liu <feliu@nvidia.com>
+In-Reply-To: <CAF=yD-L+d34Uuvt3sOFOnxXhMmoMXNfHzcaSPk=t1PtiPUHZ1g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1P222CA0155.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c3::25) To CY5PR12MB6201.namprd12.prod.outlook.com
+ (2603:10b6:930:26::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1692153515.git.yan@cloudflare.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6201:EE_|SA1PR12MB8093:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6118c14-2cc0-4dfb-575f-08db9e050182
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2MhDqEIcGc9ltMPSS9IHEZFS7zoWTyjUpbTBTS5NjaUf7CVDXeG/wlHpTiY8jnbgV+BxnqBZlpMSyPaJ6anqRpaZkhEgk4OLc9oi+79TDmN4MIiaVlWBIbrIiKF6jVXh1ZePHwbNJxSsDZpXtPoRv/NrTJmxmuMsHAYadBtZMH1kiguYe+1RV3eeoUL/vG8a+SGCAy4KBivqPpQ+4EPsBm4Z1RXMNKgTMUvgc++jkkefrbU+A2uR7BaKbE83AVHOALjy1XHN3RaMQgVAZOVB9TCnJTTvH5bQ2/kFH5LB2N7GTrf1dt0HICb+QMJlpSPuCRYf/btg3Ac7xqkjnmFH9LwEOfj4j4zEYQPMAI8snMwSXHcGEcKZARGJ8UEV6P0CBDT0qlCOhLK8iH5giqETKzrZ4D0T4HD80EPncdL7tLPc8OIZslnJf4kbVKEAMYS4GczzLeNE+wn6KTC1aUvusMJBu4QRTHB+DXoW/yVikeXdgtPXNLJZw/vVrjAgoRftvULbrSMQvcoQlQr3/twO35ioreL7AEVnFzv5pQPGeJqfrYTn5krunjtpuwOXcZjZ05ehsKW7VKxevXvANOEuxttATrpMqjHhqCbWzax0cV2HJB4yhgu8fH57wgVilpGgXz0awADCohInuAF2xjpDjLZPpZ4AHnKG8lxkXVG3bnNCDwLsoQfAB65658RDJ5TB
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6201.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(39860400002)(396003)(346002)(136003)(1800799009)(451199024)(186009)(6666004)(54906003)(31686004)(66476007)(66556008)(66946007)(6512007)(6486002)(6506007)(2906002)(478600001)(966005)(26005)(110136005)(7416002)(5660300002)(2616005)(83380400001)(41300700001)(316002)(53546011)(8936002)(4326008)(8676002)(38100700002)(36756003)(86362001)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ekJnYWRuYWR4RDJsN3ZMeW1zdkRQSEluK2VEYW9WSS9Ua1NUeTIwQkZVN1Zx?=
+ =?utf-8?B?bHhHOFlvOWI5ZkpiVXZGRnQvVTlzVGEycWZFbmNPZ3lJL3N1UWZKa1ZQNWRy?=
+ =?utf-8?B?aFdVcVdDRHd5UlVoNUtvVldzckVNRFd3SkFYZWQ1TE5CRGIxaFkwTG1qK0RF?=
+ =?utf-8?B?bmFnL1FTQ3dveW50ZXgzazR5OUo0NDdaN2xLMmxiWU9iZjNWQTRlU1Ribmox?=
+ =?utf-8?B?UzltTTdRazlNcjUxNkRhVmY0cGMvWW5CdkVUSjZDUHRES1NxS0Q2RlJwMDZa?=
+ =?utf-8?B?SVMrVXRaQ3pRR0VNZTZ1QzRjcnZkeTJlU1p4NDBXdUJpU1p1aVVRUTNkVWda?=
+ =?utf-8?B?eUdwS2JsZ0ltMklBVUdYSjJSSkd4THlQdDFiNmVDWlVMTW1VbFdlQkU4Sit3?=
+ =?utf-8?B?SmxjUTFIMjVWVUFrV080YXQ1MEE0YStVbFI3QlRpM3FHYTZsUGpaK1F4Mjc2?=
+ =?utf-8?B?b0tNcWhPWmdscm9VOTI5cGNwQnZISTdQc0ZrYVcrY0xweWRpWXFuaDZYMVJK?=
+ =?utf-8?B?VW5UdUpKaGtlNEJTL25qSFpWcG5xMXNBdTlKRlQwZi8xTlRsc3N4TGVUTXVQ?=
+ =?utf-8?B?elhoT1BJKzRiTnR5Z2hqOGEwTU1iaEtCaU1wMG84UkFqZDJndG4xYjNDQVIy?=
+ =?utf-8?B?OElKVmN2Qmw3MVBWcGlZbkgwbkZmTFJveThhcDFrQUZnMDZnY1NudHluSVBK?=
+ =?utf-8?B?TmlndnZpcEpwdUlyZklaODBScGpydmRWTTE2VkFNYjBxM1k4YlJ1RjhUc3c1?=
+ =?utf-8?B?WXJ1enE3OHRBNnR1bG92R0ZxbHo1V0d2N0g0V1BObExpSTNzcVc2NG0vV3E4?=
+ =?utf-8?B?dlRwVmFMNlR5VFd5dXlrem5TdjNMU0hPazNqc01CY2UrUW5xSmNoTjl2clJV?=
+ =?utf-8?B?VGFtSGkrR3hXdjFSQ3huNTZQM045NjhBYzlXUWZoOTh6cW9lSldUMEdGQlht?=
+ =?utf-8?B?NjAvVEI2ZWxWVEFhMmZkOXVBb0UvZ0ZVZUY5MG9sbDhETVhYUFJyK1AwdUFa?=
+ =?utf-8?B?emtSODZZbmZnY0Z5OWY3UWs0VE9rNDF0eHF3QVhsUGFiMnBuSndoK0xNc1M3?=
+ =?utf-8?B?UzFEWWp1SWZiV2xBcTlSaTBKZjJPbGVSNVkrbExCZE1sUkQ5QzBzSXltNUpz?=
+ =?utf-8?B?OTdCV1lhai9Mclg0NUZqSEMxUzNlWWZFemVLRWJhZTQ1Tkh3NDF2TFRHNGEx?=
+ =?utf-8?B?NjdpMGM0cEF0WlhGL0VCTE56YlI3SE5aUjY2U1dlSEEyeXIrRHFRV0J3WEoy?=
+ =?utf-8?B?VVM1UDM5ZWp4N2krWm1tNXNFc0NSbUZ1b1BNdXhPWXp3MXpKelAyanBXZkU4?=
+ =?utf-8?B?Qy94QVZOK3poYnU1c3ArTmtYV3p5NXVKd0ZDTWpMZGVTMC9KSDZpSUxCVmY3?=
+ =?utf-8?B?YlZsQVpCWnpwSC9HUFVQdVZUVHhIZUh0U0k1UkNZTithQ0pOYmEvNUErMHk0?=
+ =?utf-8?B?bitUOTEyOW1Ba2JId0hjR2lSeU1VQ3J4ZlpNeXoyelhDdTNYT1NJTzAvMTBP?=
+ =?utf-8?B?aW5YbUNKcmFaek9jbVgvd1ROWlV6WDljdnNTU3BId2JLRXdwbjZySUZKaHNR?=
+ =?utf-8?B?RkpEUW5ydTE3Rm1pY2lSTGJ4TkZsc3BabFluMlJ2RjdsUUgzdXdmTkgrVzVm?=
+ =?utf-8?B?NVd0UE1jalJQN0VDbTVOQ2dpNW9nZWFYeU5Kd01HQUFVY3NEcFdRdWpiczZD?=
+ =?utf-8?B?elpZSythS3o4a1laK0J4T0hva0pXTGNLYjdIOHIvSy9HbmxUcjR4R21UdlB3?=
+ =?utf-8?B?T0pDTHEvd0FpamRRRVZBdTB1NDJmTURocnhaNytYUGhpZFFpdEJmUTJPSlZh?=
+ =?utf-8?B?MlREUGQxakhKWDdKbEtoM2dPblVNbGZ4aUJoejJpYmJRMEc4SGNOM2xiV2tB?=
+ =?utf-8?B?WGovNE9Rd0ZnK2NvTllCaWVtNm8xNE1VZ2F6NktnVXd0UDd1TGtDVFlkYTdD?=
+ =?utf-8?B?RTVOWTJtUXBRVCtSRFJzTklPUWhrSWhzY0piZ1dPNG1Jbzhhbm1GT3dadlda?=
+ =?utf-8?B?UXJTbnZIVlRXM096Q1B1cHNGQVpBMEd4dDdpYnlWbGVTVEMvM2RBWUx5SlJ4?=
+ =?utf-8?B?ZWVQakFtL043S001MTVrSUFtVmdZcEt1VkY1elp5bmlxZkM4SnpOdzQ0Mkxv?=
+ =?utf-8?Q?RuIwbAswTyz6jTa+CbOkffEYc?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6118c14-2cc0-4dfb-575f-08db9e050182
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6201.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 03:00:54.3308
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DXFke1T6OW4te5BenTAvAH9WCARbRsyWc1l/AJ6TITqjIIKfsYNurxnj6mCiN1+Gk2r++gWUp2RvsjZz92om1Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8093
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There is no lwt selftest for BPF_REROUTE yet. Add test cases for both
-normal and abnormal situations. The abnormal situation is set up with an
-fq qdisc on the reroute target device. Without proper fixes, BPF_REROUTE
-to this device and overflow this qdisc queue limit (to trigger a drop)
-would panic the kernel, so please run the test in a VM for safety.
 
-Signed-off-by: Yan Zhai <yan@cloudflare.com>
----
- .../selftests/bpf/prog_tests/lwt_reroute.c    | 256 ++++++++++++++++++
- .../selftests/bpf/progs/test_lwt_reroute.c    |  36 +++
- 2 files changed, 292 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_reroute.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_lwt_reroute.c
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/lwt_reroute.c b/tools/testing/selftests/bpf/prog_tests/lwt_reroute.c
-new file mode 100644
-index 000000000000..e5fa5451bd2c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/lwt_reroute.c
-@@ -0,0 +1,256 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+
-+/*
-+ * Test suite of lwt BPF programs that reroutes packets
-+ *   The file tests focus not only if these programs work as expected normally,
-+ *   but also if they can handle abnormal situations gracefully. This test
-+ *   suite currently only covers lwt_xmit hook. lwt_in tests have not been
-+ *   implemented.
-+ *
-+ * WARNING
-+ * -------
-+ *  This test suite can crash the kernel, thus should be run in a VM.
-+ *
-+ * Setup:
-+ * ---------
-+ *  all tests are performed in a single netns. A lwt encap route is setup for
-+ *  each subtest:
-+ *
-+ *    ip route add 10.0.0.0/24 encap bpf xmit <obj> sec "<section_N>" dev link_err
-+ *
-+ *  Here <obj> is statically defined to test_lwt_reroute.bpf.o, and it contains
-+ *  a single test program entry. This program sets packet mark by last byte of
-+ *  the IPv4 daddr. For example, a packet going to 1.2.3.4 will receive a skb
-+ *  mark 4. A packet will only be marked once, and IP x.x.x.0 will be skipped
-+ *  to avoid route loop. We didn't use generated BPF skeleton since the
-+ *  attachment for lwt programs are not supported by libbpf yet.
-+ *
-+ *  The test program will bring up a tun device, and sets up the following
-+ *  routes:
-+ *
-+ *    ip rule add pref 100 from all fwmark <tun_index> lookup 100
-+ *    ip route add table 100 default dev tun0
-+ *
-+ *  For normal testing, a ping command is running in the test netns:
-+ *
-+ *    ping 10.0.0.<tun_index> -c 1 -w 1 -s 100
-+ *
-+ *  For abnormal testing, fq is used as the qdisc of the tun device. Then a UDP
-+ *  socket will try to overflow the fq queue and trigger qdisc drop error.
-+ *
-+ * Scenarios:
-+ * --------------------------------
-+ *  1. Reroute to a running tun device
-+ *  2. Reroute to a device where qdisc drop
-+ *
-+ *  For case 1, ping packets should be received by the tun device.
-+ *
-+ *  For case 2, force UDP packets to overflow fq limit. As long as kernel
-+ *  is not crashed, it is considered successful.
-+ */
-+#include "lwt_helpers.h"
-+#include "network_helpers.h"
-+#include <linux/net_tstamp.h>
-+
-+#define BPF_OBJECT            "test_lwt_reroute.bpf.o"
-+#define LOCAL_SRC             "10.0.0.1"
-+#define TEST_CIDR             "10.0.0.0/24"
-+#define XMIT_HOOK             "xmit"
-+#define XMIT_SECTION          "lwt_xmit"
-+#define NSEC_PER_SEC          1000000000ULL
-+
-+/* send a ping to be rerouted to the target device */
-+static void ping_once(const char *ip)
-+{
-+	/* We won't get a reply. Don't fail here */
-+	SYS_NOFAIL("ping %s -c1 -w1 -s %d >/dev/null 2>&1",
-+		   ip, ICMP_PAYLOAD_SIZE);
-+}
-+
-+/* Send snd_target UDP packets to overflow the fq queue and trigger qdisc drop
-+ * error. This is done via TX tstamp to force buffering delayed packets.
-+ */
-+static int overflow_fq(int snd_target, const char *target_ip)
-+{
-+	struct sockaddr_in addr = {
-+		.sin_family = AF_INET,
-+		.sin_port = htons(1234),
-+	};
-+
-+	char data_buf[8]; /* only #pkts matter, so use a random small buffer */
-+	char control_buf[CMSG_SPACE(sizeof(uint64_t))];
-+	struct iovec iov = {
-+		.iov_base = data_buf,
-+		.iov_len = sizeof(data_buf),
-+	};
-+	int err = -1;
-+	int s = -1;
-+	struct sock_txtime txtime_on = {
-+		.clockid = CLOCK_MONOTONIC,
-+		.flags = 0,
-+	};
-+	struct msghdr msg = {
-+		.msg_name = &addr,
-+		.msg_namelen = sizeof(addr),
-+		.msg_control = control_buf,
-+		.msg_controllen = sizeof(control_buf),
-+		.msg_iovlen = 1,
-+		.msg_iov = &iov,
-+	};
-+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-+
-+	memset(data_buf, 0, sizeof(data_buf));
-+
-+	s = socket(AF_INET, SOCK_DGRAM, 0);
-+	if (!ASSERT_GE(s, 0, "socket"))
-+		goto out;
-+
-+	err = setsockopt(s, SOL_SOCKET, SO_TXTIME, &txtime_on, sizeof(txtime_on));
-+	if (!ASSERT_OK(err, "setsockopt(SO_TXTIME)"))
-+		goto out;
-+
-+	err = inet_pton(AF_INET, target_ip, &addr.sin_addr);
-+	if (!ASSERT_EQ(err, 1, "inet_pton"))
-+		goto out;
-+
-+	while (snd_target > 0) {
-+		struct timespec now;
-+
-+		memset(control_buf, 0, sizeof(control_buf));
-+		cmsg->cmsg_type = SCM_TXTIME;
-+		cmsg->cmsg_level = SOL_SOCKET;
-+		cmsg->cmsg_len = CMSG_LEN(sizeof(uint64_t));
-+
-+		err = clock_gettime(CLOCK_MONOTONIC, &now);
-+		if (!ASSERT_OK(err, "clock_gettime(CLOCK_MONOTONIC)")) {
-+			err = -1;
-+			goto out;
-+		}
-+
-+		*(uint64_t *)CMSG_DATA(cmsg) = (now.tv_nsec + 1) * NSEC_PER_SEC +
-+					       now.tv_nsec;
-+
-+		/* we will intentionally send more than fq limit, so ignore
-+		 * the error here.
-+		 */
-+		sendmsg(s, &msg, MSG_NOSIGNAL);
-+		snd_target--;
-+	}
-+
-+	/* no kernel crash so far is considered success */
-+	err = 0;
-+
-+out:
-+	if (s >= 0)
-+		close(s);
-+
-+	return err;
-+}
-+
-+static int setup(const char *tun_dev)
-+{
-+	int target_index = -1;
-+	int tap_fd = -1;
-+
-+	tap_fd = open_tuntap(tun_dev, false);
-+	if (!ASSERT_GE(tap_fd, 0, "open_tun"))
-+		return -1;
-+
-+	target_index = if_nametoindex(tun_dev);
-+	if (!ASSERT_GE(target_index, 0, "if_nametoindex"))
-+		return -1;
-+
-+	SYS(fail, "ip link add link_err type dummy");
-+	SYS(fail, "ip link set lo up");
-+	SYS(fail, "ip addr add dev lo " LOCAL_SRC "/32");
-+	SYS(fail, "ip link set link_err up");
-+	SYS(fail, "ip link set %s up", tun_dev);
-+
-+	SYS(fail, "ip route add %s dev link_err encap bpf xmit obj %s sec lwt_xmit",
-+	    TEST_CIDR, BPF_OBJECT);
-+
-+	SYS(fail, "ip rule add pref 100 from all fwmark %d lookup 100",
-+	    target_index);
-+	SYS(fail, "ip route add t 100 default dev %s", tun_dev);
-+
-+	return tap_fd;
-+
-+fail:
-+	if (tap_fd >= 0)
-+		close(tap_fd);
-+	return -1;
-+}
-+
-+static void test_lwt_reroute_normal_xmit(void)
-+{
-+	const char *tun_dev = "tun0";
-+	int tun_fd = -1;
-+	int ifindex = -1;
-+	char ip[256];
-+	struct timeval timeo = {
-+		.tv_sec = 0,
-+		.tv_usec = 250000,
-+	};
-+
-+	tun_fd = setup(tun_dev);
-+	if (!ASSERT_GE(tun_fd, 0, "setup_reroute"))
-+		return;
-+
-+	ifindex = if_nametoindex(tun_dev);
-+	snprintf(ip, 256, "10.0.0.%d", ifindex);
-+
-+	/* ping packets should be received by the tun device */
-+	ping_once(ip);
-+
-+	if (!ASSERT_EQ(wait_for_packet(tun_fd, __expect_icmp_ipv4, &timeo), 1,
-+		       "wait_for_packet"))
-+		log_err("%s xmit", __func__);
-+}
-+
-+/*
-+ * Test the failure case when the skb is dropped at the qdisc. This is a
-+ * regression prevention at the xmit hook only.
-+ */
-+static void test_lwt_reroute_qdisc_dropped(void)
-+{
-+	const char *tun_dev = "tun0";
-+	int tun_fd = -1;
-+	int ifindex = -1;
-+	char ip[256];
-+
-+	tun_fd = setup(tun_dev);
-+	if (!ASSERT_GE(tun_fd, 0, "setup_reroute"))
-+		goto fail;
-+
-+	SYS(fail, "tc qdisc replace dev %s root fq limit 5 flow_limit 5", tun_dev);
-+
-+	ifindex = if_nametoindex(tun_dev);
-+	snprintf(ip, 256, "10.0.0.%d", ifindex);
-+	ASSERT_EQ(overflow_fq(10, ip), 0, "overflow_fq");
-+
-+fail:
-+	if (tun_fd >= 0)
-+		close(tun_fd);
-+}
-+
-+static void *test_lwt_reroute_run(void *arg)
-+{
-+	netns_delete();
-+	RUN_TEST(lwt_reroute_normal_xmit);
-+	RUN_TEST(lwt_reroute_qdisc_dropped);
-+	return NULL;
-+}
-+
-+void test_lwt_reroute(void)
-+{
-+	pthread_t test_thread;
-+	int err;
-+
-+	/* Run the tests in their own thread to isolate the namespace changes
-+	 * so they do not affect the environment of other tests.
-+	 * (specifically needed because of unshare(CLONE_NEWNS) in open_netns())
-+	 */
-+	err = pthread_create(&test_thread, NULL, &test_lwt_reroute_run, NULL);
-+	if (ASSERT_OK(err, "pthread_create"))
-+		ASSERT_OK(pthread_join(test_thread, NULL), "pthread_join");
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_lwt_reroute.c b/tools/testing/selftests/bpf/progs/test_lwt_reroute.c
-new file mode 100644
-index 000000000000..1dc64351929c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_lwt_reroute.c
-@@ -0,0 +1,36 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <inttypes.h>
-+#include <linux/bpf.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+#include <linux/if_ether.h>
-+#include <linux/ip.h>
-+
-+/* This function extracts the last byte of the daddr, and uses it
-+ * as output dev index.
-+ */
-+SEC("lwt_xmit")
-+int test_lwt_reroute(struct __sk_buff *skb)
-+{
-+	struct iphdr *iph = NULL;
-+	void *start = (void *)(long)skb->data;
-+	void *end = (void *)(long)skb->data_end;
-+
-+	/* set mark at most once */
-+	if (skb->mark != 0)
-+		return BPF_OK;
-+
-+	if (start + sizeof(*iph) > end)
-+		return BPF_DROP;
-+
-+	iph = (struct iphdr *)start;
-+	skb->mark = bpf_ntohl(iph->daddr) & 0xff;
-+
-+	/* do not reroute x.x.x.0 packets */
-+	if (skb->mark == 0)
-+		return BPF_OK;
-+
-+	return BPF_LWT_REROUTE;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.30.2
+On 2023-08-15 p.m.2:13, Willem de Bruijn wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Tue, Aug 15, 2023 at 12:29 PM Simon Horman <horms@kernel.org> wrote:
+>>
+>> On Tue, Aug 15, 2023 at 11:09:02AM -0400, Feng Liu wrote:
+
+>> To clarify: In general new Networking features go via the net-next tree,
+>> while bug fixes go via the net tree. I was suggesting this
+>> is more appropriate for net-next, and that should be reflected in the
+>> subject.
+>>
+>>          Subject: [PATCH net-next] ...
+>>
+>> Sorry for not being clearer the first time around.
+> 
+> Right, this should go to net-next.
+> 
+Will do, thanks
+
+>>
+>>>
+
+>>>>> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+>>>>> index 12c1c9699935..db40f93ae8b3 100644
+>>>>> --- a/include/uapi/linux/virtio_net.h
+>>>>> +++ b/include/uapi/linux/virtio_net.h
+>>>>> @@ -201,6 +201,13 @@ struct virtio_net_hdr_mrg_rxbuf {
+>>>>>         struct virtio_net_hdr hdr;
+>>>>>         __virtio16 num_buffers; /* Number of merged rx buffers */
+>>>>>    };
+>>>>> +
+>>>>> +struct virtio_net_common_hdr {
+>>>>> +     union {
+>>>>> +             struct virtio_net_hdr_mrg_rxbuf mrg_hdr;
+>>>>> +             struct virtio_net_hdr_v1_hash hash_v1_hdr;
+>>>>> +     };
+>>>>> +};
+>>>>
+>>>> Does this belong in the UAPI?
+>>>> I would have assumed it's a Kernel implementation detail.
+>>>>
+>>> The existing codes, virtio_net.h is in uapi/linux/, I added the new
+>>> structure and followed existing code. My modification is related to Kernel
+>>> implementation detail now.
+>>
+>> The header you have modified forms part of the userspace API (UAPI).
+>> Perhaps there is something about virtio_net that makes this correct, but it
+>> seems to me that kernel-internal details don't belong there.
+> 
+> FWIW, I ran into similar issues before in a draft that added timestamp
+> support [1]
+> 
+> If we're going to change this structure, we should do it in a way that
+> is forward proof to future extensions to the virtio spec and with that
+> the fields in this struct. Especially in UAPI.
+> 
+> Is virtio_net_hdr_v1_hash the latest virtio-spec compliant header? And
+> do we expect for v1.3 to just add some fields to this?
+> 
+> The struct comment of virtio_net_hdr_v1 states "This is
+> bitwise-equivalent to the legacy struct virtio_net_hdr_mrg_rxbuf, only
+> flattened.". I don't quite understand what the flattening bought, vs
+> having struct virtio_net_hdr as first member. Another difference may
+> be the endianness between legacy (0.9) and v1.0+.
+> 
+> Since legacy virtio will no longer be modified, I don't think there is
+> much value is exposing this new union as UAPI. I do appreciate the
+> benefit to the implementation.
+> 
+> [1] https://patches.linaro.org/project/netdev/patch/20210208185558.995292-3-willemdebruijn.kernel@gmail.com/
+Hi, William and Simon
+
+Thanks for the detailed explanation.
+
+I kept virtio_net_hdr_mrg_rxbuf and virtio_net_hdr_v1_hash structures in 
+virtio_net.h, which can be forward compatible with existing user 
+applications which use these structures.
+
+After checking kernel code, the virtio_net_hdr_v1_hash structure does 
+only add new members to virtio_net_hdr_mrg_rxbuf, so the spec should 
+only add new members, otherwise there will be compatibility problems in 
+struct virtio_net_hdr_v1_hash structure.
+
+struct virtio_net_hdr_v1_hash {
+	struct virtio_net_hdr_v1 hdr; /*same size as virtio_net_hdr*/
+[...]
+	__le32 hash_value; /*new member*/
+	__le16 hash_report; /*new member*/
+	__le16 padding;	/*new member*/
+};
+
+virtio_net_hdr_v1_hash cannot use virtio_net_hdr as the first member, 
+because in virtio_net_hdr_v1, csum_start and csum_offset are stored in 
+union as a structure, and virtio_net_hdr cannot be used instead.
+
+struct virtio_net_hdr_v1 {
+[...]
+	union {
+		struct {
+			__virtio16 csum_start;
+			__virtio16 csum_offset;
+		};
+		[...]
+	};
+	__virtio16 num_buffers;	/* Number of merged rx buffers */
+};
+
+
+struct virtio_net_hdr {
+[...]
+	__virtio16 csum_start;	
+	__virtio16 csum_offset;	
+};
+
+
+
+In addition, I put this new structure virtio_net_common_hdr in uapi, 
+hoping it could be used in future user space application to avoid 
+potential risks caused by type coercion (such as the problems mentioned 
+in the patch description ). So I think it should be in this header file.
+What do you think?
+
+
+
+
+
+
+
 
 
