@@ -1,202 +1,167 @@
-Return-Path: <netdev+bounces-28169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811A177E70B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:57:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D11D77E719
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:58:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30E01281785
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:57:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9782281BBF
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE62415AE6;
-	Wed, 16 Aug 2023 16:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3B6168AC;
+	Wed, 16 Aug 2023 16:58:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABB320E7
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:56:57 +0000 (UTC)
-Received: from mail-pg1-f207.google.com (mail-pg1-f207.google.com [209.85.215.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17ADF19A7
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:56:56 -0700 (PDT)
-Received: by mail-pg1-f207.google.com with SMTP id 41be03b00d2f7-564fa3b49e1so59497a12.0
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:56:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692205015; x=1692809815;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pq13cnJasbv8djRVhp2bcs4ZOGirzCWQ2VqEdvLtad0=;
-        b=O2tD+sjT83xlIEeQ7dQxbcZWA+090uo5XuthjRO6Fz+8oYQCTlCa5wv7Fhrm1juRpK
-         HlO4FYJ6WC5RfqTJsGvEFlL/d+3RVi4/v/dHWpBFcYImqy7Lla1SGA6U6pCldCzyj9Ru
-         EUPg5aFh9grkdFkTCvoaYaZC4jGVTb8zxSQsCYYCJ7vv3mJtEzDwMGCUcPli8bV97jcH
-         I21vmG6hYaqdXTtXttv1gBhZpIGEpc48pkT9xsm+P2afhc1Zqj689CcMQ7g1ssWiKbDv
-         GgLuOgQDzSTNwrO4CtXBpFenfFEzCaNmktmSAw6E2cKQeWLgG7QcR2YLzWpDZz3ig78j
-         oAEQ==
-X-Gm-Message-State: AOJu0YwFtX269IUNnCNQPBVQwTgAVSaPXkIID+vqDXxGWGGtazuAL+7k
-	WhPMCmdibI/GpG1dXJzYMCmbZnRCnTcZeN+T5mtF8HJnc5NW
-X-Google-Smtp-Source: AGHT+IEzrcEQMA/8GvXNSdJnOKOmvEiOw3JdXZVzOWtetW/oNG4rKu0vEHo8zF4ovFoHFb1m9to9roX1OJENtH9dzJn6bMJr7bI7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFA310949;
+	Wed, 16 Aug 2023 16:58:34 +0000 (UTC)
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E64B81BE7;
+	Wed, 16 Aug 2023 09:58:31 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 082113200936;
+	Wed, 16 Aug 2023 12:58:26 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Wed, 16 Aug 2023 12:58:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjusaka.me; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
+	1692205106; x=1692291506; bh=bqqqxjVQXB11bXS2XPDSYy3H/z1FMuEH1+F
+	+yhBNcXM=; b=SpGcFI9tty5G9XxTIQp3m6j1v9g7Rc+qHIb5y47g7gC6r0+95eY
+	+X+ZSJi+X0Dxakt4z2FYC2C4DqK0ylAhgjHgVdEP2s4W3dL49EhSfVcu1VvvB/Yp
+	iHiffyxaZI6Qz8LlZeX5SwRgnapi5xZqp0wfYFk9C+BbySVny8N8wi+LFBysjpKB
+	LPI1VHIOzflT3dZmwW8wI0GIj1YlhKCQWpBy2mQ1qcnobS1Y1pgxEKcZHvM+HDGC
+	IAN8LTbyBQIHsmu87bLmJFcC0Ctu3mnGAO8N8t5MYvCUyFNApef30btJhD4+pjlx
+	3QDLHg7vCkw+mUodUjzm+oFT6va+yzeKciQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1692205106; x=1692291506; bh=bqqqxjVQXB11bXS2XPDSYy3H/z1FMuEH1+F
+	+yhBNcXM=; b=dSXAhvZyD1Sz+sOQ3jiijy0iUP53HYcBiZP2hGb3arMwbXBe7S8
+	KxRPuWgfAp0WTOQrJBRLRUDkLJ7DO0tXCBgODTGcaZU0FFONSpiIpiOilPzF2aJ4
+	ZcVMzU6OyGB4JshhmAoM9SmBQttKYuGubGqypLM0+c124+53N1Rb3qq75ECJJOFT
+	Nux9CJL6fjoiCPTY8k5dCL+sCfJZihdtEquH9S2GsPS+G2/javkjTdhTVRS8Bj3I
+	1tSyjvGtxnoHpwZH384e8BtvEe9VouYSvNsGKh2ZlnXOREIRuGVzTzDJWcdEPsuL
+	vCRTPD4+7620a0NJfy2EK6MMBkoF3mBPw6w==
+X-ME-Sender: <xms:MgDdZGJYKhzEkNmosz2m88L_QOMyOQHl5WZPng0N--h88yITaDq3Mg>
+    <xme:MgDdZOLJvceuiltx6y0I9R0j6gOlnWULTMtP8WlIWMGUP--z29YQiupKCP1X9xygF
+    ZKCbQzlbgzxZ5uz9tY>
+X-ME-Received: <xmr:MgDdZGtZ6J7ncVdtmCiy3Ltu2xHIZqL8wZsyuikDtO_hDDNp_-u8mRJIN2dMofbk9A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedruddtledguddtlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomhepofgr
+    nhhjuhhsrghkrgcuoehmvgesmhgrnhhjuhhsrghkrgdrmhgvqeenucggtffrrghtthgvrh
+    hnpeehheevjeeiudegledtleevuddufedttdekudfgteejjeetfeejleejffdtvdeugeen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvgesmh
+    grnhhjuhhsrghkrgdrmhgv
+X-ME-Proxy: <xmx:MgDdZLagy-aPeEAMS0OSIjhUPaOQntc9XLR_qTYYc2qVM_l34zZcng>
+    <xmx:MgDdZNa1Im85TOLkeBt9i3gWwp-qwmfxU6WxKY7CDNqcbmGB_-py6Q>
+    <xmx:MgDdZHBMVDd02v-SsyL6JXDEPT9AP77lQijOkPSa3Gwqcn1tIVyiJA>
+    <xmx:MgDdZDBbVpaQiNItVk7nTG8Ez2anmqSlo6xWg_kAVLEO4hJgL0-vWA>
+Feedback-ID: i3ea9498d:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 16 Aug 2023 12:58:19 -0400 (EDT)
+Message-ID: <82771f1c-9659-4aaa-bded-62bef6082bf8@manjusaka.me>
+Date: Thu, 17 Aug 2023 00:58:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a63:ee4b:0:b0:565:ed29:8244 with SMTP id
- n11-20020a63ee4b000000b00565ed298244mr24838pgk.3.1692205015582; Wed, 16 Aug
- 2023 09:56:55 -0700 (PDT)
-Date: Wed, 16 Aug 2023 09:56:55 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d74dd506030d2e4b@google.com>
-Subject: [syzbot] [mm?] kernel BUG in do_page_mkwrite
-From: syzbot <syzbot+cfba1abcb2cf7b39a320@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, javierm@redhat.com, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	richardcochran@gmail.com, suijingfeng@loongson.cn, 
-	syzkaller-bugs@googlegroups.com, tzimmermann@suse.de, zackr@vmware.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] tracepoint: add new `tcp:tcp_ca_event` trace event
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Joe Perches <joe@perches.com>, edumazet@google.com, bpf@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ mhiramat@kernel.org, ncardwell@google.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <CANn89iKQXhqgOTkSchH6Bz-xH--pAoSyEORBtawqBTvgG+dFig@mail.gmail.com>
+ <20230812201249.62237-1-me@manjusaka.me>
+ <20230812205905.016106c0@rorschach.local.home>
+ <20230812210140.117da558@rorschach.local.home>
+ <20230812210450.53464a78@rorschach.local.home>
+ <6bfa88099fe13b3fd4077bb3a3e55e3ae04c3b5d.camel@perches.com>
+ <20230812215327.1dbd30f3@rorschach.local.home>
+ <a587dac9e02cfde669743fd54ab41a3c6014c5e9.camel@perches.com>
+ <8b0f2d2b-c5a0-4654-9cc0-78873260a881@manjusaka.me>
+ <20230816110206.13980573@gandalf.local.home>
+Content-Language: en-US
+From: Manjusaka <me@manjusaka.me>
+In-Reply-To: <20230816110206.13980573@gandalf.local.home>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On 2023/8/16 23:02, Steven Rostedt wrote:
+> On Wed, 16 Aug 2023 14:09:06 +0800
+> Manjusaka <me@manjusaka.me> wrote:
+> 
+>>> +# trace include files use a completely different grammar
+>>> +		next if ($realfile =~ m{(?:include/trace/events/|/trace\.h$/)});
+>>> +
+>>>  # check multi-line statement indentation matches previous line
+>>>  		if ($perl_version_ok &&
+>>>  		    $prevline =~ /^\+([ \t]*)((?:$c90_Keywords(?:\s+if)\s*)|(?:$Declare\s*)?(?:$Ident|\(\s*\*\s*$Ident\s*\))\s*|(?:\*\s*)*$Lval\s*=\s*$Ident\s*)\(.*(\&\&|\|\||,)\s*$/) {
+>>>
+>>>
+>>>   
+>>
+>> Actually, I'm not sure this is the checkpatch style issue or my code style issue.
+>>
+>> Seems wired.
+> 
+> The TRACE_EVENT() macro has its own style. I need to document it, and
+> perhaps one day get checkpatch to understand it as well.
+> 
+> The TRACE_EVENT() typically looks like:
+> 
+> 
+> TRACE_EVENT(name,
+> 
+> 	TP_PROTO(int arg1, struct foo *arg2, struct bar *arg3),
+> 
+> 	TP_ARGS(arg1, arg2, arg3),
+> 
+> 	TP_STRUCT__entry(
+> 		__field(	int,		field1				)
+> 		__array(	char,		mystring,	MYSTRLEN	)
+> 		__string(	filename,	arg3->name			)
+> 	),
+> 
+> 	TP_fast_assign(
+> 		__entry->field1 = arg1;
+> 		memcpy(__entry->mystring, arg2->string);
+> 		__assign_str(filename, arg3->name);
+> 	),
+> 
+> 	TP_printk("field1=%d mystring=%s filename=%s",
+> 		__entry->field1, __entry->mystring, __get_str(filename))
+> );
+> 
+> The TP_STRUCT__entry() should be considered more of a "struct" layout than
+> a macro layout, and that's where checkpatch gets confused. The spacing
+> makes it much easier to see the fields and their types.
+> 
+> -- Steve
 
-syzbot found the following issue on:
+Thanks for the explain!
 
-HEAD commit:    2ccdd1b13c59 Linux 6.5-rc6
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=143b6d3ba80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8fc59e2140295873
-dashboard link: https://syzkaller.appspot.com/bug?extid=cfba1abcb2cf7b39a320
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1032446ba80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16576b4fa80000
+So could I keep the current code without any code style change?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e6e598627dd6/disk-2ccdd1b1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/486c6739d779/vmlinux-2ccdd1b1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5da0f3ac1d56/bzImage-2ccdd1b1.xz
-
-The issue was bisected to:
-
-commit a5b44c4adb1699661d22e5152fb26885f30a2e4c
-Author: Thomas Zimmermann <tzimmermann@suse.de>
-Date:   Mon Mar 20 15:07:44 2023 +0000
-
-    drm/fbdev-generic: Always use shadow buffering
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11349b73a80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13349b73a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15349b73a80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cfba1abcb2cf7b39a320@syzkaller.appspotmail.com
-Fixes: a5b44c4adb16 ("drm/fbdev-generic: Always use shadow buffering")
-
- vm_area_alloc_pages mm/vmalloc.c:3059 [inline]
- __vmalloc_area_node mm/vmalloc.c:3135 [inline]
- __vmalloc_node_range+0xa6e/0x1540 mm/vmalloc.c:3316
- __vmalloc_node mm/vmalloc.c:3381 [inline]
- vzalloc+0x6b/0x80 mm/vmalloc.c:3454
- drm_fbdev_generic_helper_fb_probe+0x300/0x6d0 drivers/gpu/drm/drm_fbdev_generic.c:97
- drm_fb_helper_single_fb_probe drivers/gpu/drm/drm_fb_helper.c:1668 [inline]
- __drm_fb_helper_initial_config_and_unlock+0xc31/0x1600 drivers/gpu/drm/drm_fb_helper.c:1846
- drm_fb_helper_initial_config drivers/gpu/drm/drm_fb_helper.c:1936 [inline]
- drm_fb_helper_initial_config+0x44/0x60 drivers/gpu/drm/drm_fb_helper.c:1928
- drm_fbdev_generic_client_hotplug+0x1a7/0x270 drivers/gpu/drm/drm_fbdev_generic.c:280
- drm_client_register+0x195/0x280 drivers/gpu/drm/drm_client.c:149
- drm_fbdev_generic_setup+0x11c/0x330 drivers/gpu/drm/drm_fbdev_generic.c:342
- vkms_create drivers/gpu/drm/vkms/vkms_drv.c:208 [inline]
- vkms_init+0x625/0x760 drivers/gpu/drm/vkms/vkms_drv.c:234
- do_one_initcall+0x117/0x630 init/main.c:1232
- do_initcall_level init/main.c:1294 [inline]
- do_initcalls init/main.c:1310 [inline]
- do_basic_setup init/main.c:1329 [inline]
- kernel_init_freeable+0x5bd/0x8f0 init/main.c:1546
-page_owner free stack trace missing
-------------[ cut here ]------------
-kernel BUG at mm/memory.c:2955!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 5026 Comm: syz-executor380 Not tainted 6.5.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:do_page_mkwrite+0x468/0x680 mm/memory.c:2955
-Code: de e8 cc 15 c2 ff 84 db 0f 85 c1 00 00 00 48 89 eb e9 76 fe ff ff e8 87 1a c2 ff 48 c7 c6 a0 b3 78 8a 48 89 ef e8 78 3d fe ff <0f> 0b 41 bc 02 00 00 00 e9 99 fe ff ff e8 66 1a c2 ff be d0 03 00
-RSP: 0018:ffffc900030efba8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff888079cec200 RSI: ffffffff81c30648 RDI: ffffffff8ac7eec0
-RBP: ffffea0005007780 R08: 0000000000000000 R09: fffffbfff1d55d7a
-R10: ffffffff8eaaebd7 R11: 0000000000000001 R12: 0000000000000200
-R13: ffffea0005007780 R14: 0000000000000a55 R15: 0000000000000000
-FS:  0000555557128380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fb85a07fe08 CR3: 0000000023b67000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- wp_page_shared mm/memory.c:3294 [inline]
- do_wp_page+0x3a0/0x3710 mm/memory.c:3376
- handle_pte_fault mm/memory.c:4955 [inline]
- __handle_mm_fault+0x1af7/0x3b80 mm/memory.c:5079
- handle_mm_fault+0x2ab/0x9d0 mm/memory.c:5233
- do_user_addr_fault+0x446/0xfc0 arch/x86/mm/fault.c:1392
- handle_page_fault arch/x86/mm/fault.c:1486 [inline]
- exc_page_fault+0x5c/0xd0 arch/x86/mm/fault.c:1542
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:570
-RIP: 0033:0x7fb859ff27a0
-Code: 00 41 b8 11 80 02 00 b9 06 00 00 01 ba 00 60 b3 00 be 00 00 00 20 bf 09 00 00 00 31 c0 48 c7 04 24 00 c0 2f 00 e8 30 fc 02 00 <c6> 04 25 08 00 00 20 00 45 31 c0 48 b8 2f 64 65 76 2f 66 62 30 b9
-RSP: 002b:00007ffeec409b10 EFLAGS: 00010217
-RAX: 0000000020000000 RBX: 00007ffeec409ce8 RCX: 00007fb85a0223e9
-RDX: 0000000001000006 RSI: 0000000000b36000 RDI: 0000000020000000
-RBP: 00007fb85a095610 R08: 0000000000000004 R09: 00000000002fc000
-R10: 0000000000028011 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffeec409cd8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:do_page_mkwrite+0x468/0x680 mm/memory.c:2955
-Code: de e8 cc 15 c2 ff 84 db 0f 85 c1 00 00 00 48 89 eb e9 76 fe ff ff e8 87 1a c2 ff 48 c7 c6 a0 b3 78 8a 48 89 ef e8 78 3d fe ff <0f> 0b 41 bc 02 00 00 00 e9 99 fe ff ff e8 66 1a c2 ff be d0 03 00
-RSP: 0018:ffffc900030efba8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff888079cec200 RSI: ffffffff81c30648 RDI: ffffffff8ac7eec0
-RBP: ffffea0005007780 R08: 0000000000000000 R09: fffffbfff1d55d7a
-R10: ffffffff8eaaebd7 R11: 0000000000000001 R12: 0000000000000200
-R13: ffffea0005007780 R14: 0000000000000a55 R15: 0000000000000000
-FS:  0000555557128380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fb85a07fe08 CR3: 0000000023b67000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+I think it would be a good idea to fix the checkpatch.pl script in another patch
 
