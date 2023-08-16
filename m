@@ -1,160 +1,176 @@
-Return-Path: <netdev+bounces-27960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BAD277DC07
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:21:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6974577DC08
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:21:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 608381C20FBD
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:20:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BB2C1C2040E
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF94101DB;
-	Wed, 16 Aug 2023 08:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F9CD305;
+	Wed, 16 Aug 2023 08:18:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44A6101CA
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:16:18 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBB6594
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:17 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-589c772be14so90577907b3.0
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692173777; x=1692778577;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rEC+E5TPz+/nIgmiseA3B21BwEML9CKbkuh11Wihp/Y=;
-        b=sS6Djgk6Ob6R+V5mPxIPu5p9rfofmqGpNgKh1GeqDRF9Vt4KgkNwfCm3Ftx0ytS76E
-         Jhl9qVu5z+Z8Fn0bXE2W5k4zb5ZlisymYhQntoCUzcz9kal1fu/3XKLE5QSeY/fY2E7S
-         fQPVLjxIUPNAJn3K6IA4yanI7rAmijAKnW3nHcKBCojd+M99Tx7Pv/Na40ex9Ja7TSd3
-         h2StSvufTRbY87yBYNyhSdrndxfg9vtqmMZ4yK8Kd6wmcmxOSIf1AWbQQNjhRBdQXQZA
-         6/0aEHcP/5IMrtbATlZvJixStF1cdmxfNAViV2m+1SSOH9bKHvwSvaCMxSAWEBeRbp98
-         qC1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692173777; x=1692778577;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rEC+E5TPz+/nIgmiseA3B21BwEML9CKbkuh11Wihp/Y=;
-        b=MqEV83Uadmw8o/QXuh+Ggx9ugu7+fZNCuxbDFfKeKvyskYINsH6ZoxvSVWp0XP+mIg
-         ZilVKYN+Cw0KsYvtBxEpbcRf37456fbpPDGd++AX/iqDqAqqLtNd+BJ1APw/2YTGHJT6
-         oyGmFQo8zcHuAGqplTRJU20+qP4FUNfB2N4IzCoECwH20tJA9Wpmo6ozeP0Ul5pAH+Id
-         TEsfHFe+cJQqfI/heRp/z1nS8zd34XxCpKZPcTnc7taeroqac0ymayHOS5FsO7hqdrcm
-         lHmOZwuqQFfBpYh4H4tKQUeEC6/ybMCJ5Qm917eARU9hD0okW0XtVPXsp8sjm9NmOXui
-         sKMA==
-X-Gm-Message-State: AOJu0YyzYZmbfYd0WKbeSK2vMVCwB5qzgBPneMUbywTcnTe1XV3efI6K
-	TUqX+e5YLbyCrkLLFkxoDwJ8BTiNKHEQ/g==
-X-Google-Smtp-Source: AGHT+IHGCcQMCJ+IQFAwZeNp5nS5w15o0o6SUwUmco6j5RWAp9hMk3+6Pa1ROYs4UbrvRLnz5TjGZm5WNI0bRA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:b706:0:b0:58d:f40:e69d with SMTP id
- v6-20020a81b706000000b0058d0f40e69dmr8994ywh.0.1692173776984; Wed, 16 Aug
- 2023 01:16:16 -0700 (PDT)
-Date: Wed, 16 Aug 2023 08:15:47 +0000
-In-Reply-To: <20230816081547.1272409-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D816C8F9
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:18:51 +0000 (UTC)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2057.outbound.protection.outlook.com [40.107.7.57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532A626BF;
+	Wed, 16 Aug 2023 01:18:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XiGt3TGnx0EhYbp6hHuiKFDYmD/PjFgSkfMw8ajE0yuehk4yHOJrOj61EsdvNYLl4w9VGQ8GTqE2vemj9h8pNwmlI5Q9Nx2yXsq2Z46PQPmgj50dcrz/wLTsd4WiUGDhCdBpuN0TRt5rMhxUEZ9zc1FFnf+BgChvNulDiKjU+GmdkiGgWPX4H66z6d8RmQHrVErwjuNSjbVeKLsAl6GgfDIBJ31Zll+KoPbvlHJnVZxael1nE+JgtCmaqNHpo4O+mR8slnTV0YffBRv3EDdjBMJ3ZpQYrQJVr0Vq1p1zmiC4xaOnCyprtNkDKwyTroIP+gXwcPfdY+v3BBro47vJKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aOwMutUxWKI+VSHCuuRhczNUP8GurrjsMUQeACgj29A=;
+ b=JhOcavgyt/B7zMJlV8w5TQ2fr1tOnCWAyxYyNFycIQfK6l5Lgv53yPM3pCz7sxsJ6tp1Pxd0mHeIezcoH76icRRwDSfzswuA32jHx5gMRTbpoQJtVZPNVXAkLhA2NgmEnWsLvnQ0WR9Ti5Gb7qnEPkxDJIk43bCa981eo5vjGNGO/VJrvuPyKdSo9bJE2KWfZqay0ibjxRMVc6VKnuRHeztXrL7GOt50mrpvllzUre5MNtEgnYiqVszyOOQ0U+wi/VI1W26+eSES/yZgVtdgxqWFY/G64uYrNkSfQvlCVHC8F3ehuFV+VFt1eathB113AfI82uuAkm09ehQmC2Mztg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aOwMutUxWKI+VSHCuuRhczNUP8GurrjsMUQeACgj29A=;
+ b=NQffuEEowghHxPEID3qxnsAB2qJUBnhqAhuqkXQFJ7pe6S/fMlA33FTNF1CfAi3LqdN3R6YuVHDHjjYzaMRnpTcVqyj0tLfDFZiW2MV0/9L1LlXzS3pW5BznRQrK/AeEPOSOdgnfoPd4CAzQNue7hY5ebrtMwJcBI+inupWFOLU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by AS4PR04MB9340.eurprd04.prod.outlook.com (2603:10a6:20b:4e8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Wed, 16 Aug
+ 2023 08:18:41 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50%5]) with mapi id 15.20.6678.029; Wed, 16 Aug 2023
+ 08:18:41 +0000
+Message-ID: <a72d3396-7f7b-c9a5-e4b9-e9335e0feba3@oss.nxp.com>
+Date: Wed, 16 Aug 2023 11:18:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC net-next v1 3/5] net: phy: nxp-c45-tja11xx add MACsec
+ support
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, sd@queasysnail.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230811153249.283984-4-radu-nicolae.pirea@oss.nxp.com>
+ <61f88d08-b741-48d0-90cb-9554907a9dec@lunn.ch>
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <61f88d08-b741-48d0-90cb-9554907a9dec@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AS4PR09CA0007.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::8) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230816081547.1272409-1-edumazet@google.com>
-X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230816081547.1272409-16-edumazet@google.com>
-Subject: [PATCH v4 net-next 15/15] inet: implement lockless IP_MINTTL
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <simon.horman@corigine.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|AS4PR04MB9340:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8c5cc339-883c-422e-3273-08db9e316655
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	E4qEadMLjUzyE3GMPgzXiPlRh9tKCFJD/R5eGvOBwnAAiyL8YuB89g/MppSTMKy9igCdR2aPtDtlMcbtwX7HXYh/hRJFn3E+ZL1YnILx9hkcT3jY3VPtO/RvBkdoeVzFz8njF2OstSfw5hS37djEoMkzUZUNGXf2ROZxebXAu6fQTUXZOBzV25BFq5UKeVFxwFe7pVhoUkXVjddR7GF5IX6OwJ762lrHfAL1q/nZyEWmdJZpFKIY4yIsWGb3SbUVYG1aLI3iQy3T+p1mxL+/D7xObgoLTudloqK6Xos0069p21pGIuSYhE9P91i3qRH1IXOEUZp8lBOcBzNYbJWHDEf/vXQkxLh7cp7tdYICTqi39VC+LDWu4N9Gv9rFPBWVmqEWQ5kJiyW4gfsFPNHUVXCdkdmLbtRJFzxuxhJLsosnnOa5Qll/vtMmksAGNKnPPewvvWeEpXeAi/5WugXt8ElbupGJS64bVTokwrpuJtTw/p4nK9UaV2xAN7zwG6vu3U/JONKylpD3EqRjSWz7ERebGtpYOZw/pOg5Ssk0N+cxt73fyOclLfNLu96DYSay8Wvpt8Qg5zX0RFDOnPRcQ+gFmTsjM9g/pBo6KxOiRfQ13mgYy8NUleDSV+d7pXUFMoZ9FyZtJ/ztAKAvj/CtUA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(39860400002)(396003)(346002)(136003)(1800799009)(451199024)(186009)(6666004)(31686004)(66476007)(66556008)(66946007)(6512007)(6486002)(6506007)(4744005)(2906002)(478600001)(26005)(6916009)(7416002)(5660300002)(2616005)(83380400001)(41300700001)(316002)(53546011)(8936002)(4326008)(8676002)(38100700002)(86362001)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bkhpZG03bzJWNEUrU0V4bktvdkNZck1UaFVpT2NWdk1wM3JHSkREc3kvaFlL?=
+ =?utf-8?B?ZWZDTGZMTVlaUDJITW1rckVNemM5WGhWWERQa1FQRUVQZjkzUFBuVndyeDdP?=
+ =?utf-8?B?cElLRzQ0N2FjaHNtRTR3UXlpbStneW9uY05ieEc4eVorc0lnVFhXRjIwbkR6?=
+ =?utf-8?B?WnlNa0k1UU9UL0VJdkU1NVNPd043bmZSZ2pTZFo3bnc5VlJQQzRPcnBLdzRj?=
+ =?utf-8?B?NDFYazNJWjk1eHN3UVNyMHJYYk1RblNrNGFLbWNpQ3dDN3poUUkyVmpMRGZi?=
+ =?utf-8?B?VWVHUHBUc2xsQms0UzJJK1ZOeEdZRFBkRkhBYjg0STZEYWt1TmJNdUprMndK?=
+ =?utf-8?B?S1dYMkJBbGUvM25ZWCtSM01uQ3NoWCtBZ0lDVzl5TUdxRUJYNjY5UXhLWlVa?=
+ =?utf-8?B?K2FIL1Z6bVJIV3FGSWFrUVBtZGFWUDZHUkZZSHcvU21xVGdobC9RNHoxSWJt?=
+ =?utf-8?B?eE5UOUtZQUZUdEF0ZDY0b05nK2MzNTErVEZZWkM4dWorZ2ZQSE1INDd2MDBV?=
+ =?utf-8?B?eUN6NC9hZEYwQWJuRE9KdWJPbWNDSnJrMGFJamFBMXhvOURoUkhSRGJWWG5L?=
+ =?utf-8?B?RDgxQ2loVVVVWUVNMUErU20xQWd1WCtsY2ZoeFdtQTBGQ1laTkttN0ZGSjMy?=
+ =?utf-8?B?dVZ4Y1V0ZFNmUU1MRWxRT2V0N2kvblJqSGIwQmJvZm1hOTMzdjVlVTFITVNa?=
+ =?utf-8?B?cU83MlBXbVRMc2xnQTNjQW9FSVB1TTBMTmJJU0FEQlpMcjQ4R1ZVQWNoNlEr?=
+ =?utf-8?B?YlhIY1lWUlNXV0l4cWR5SjBGRGxLaXVoTG1TSjY5SllKSnVuYUJla1B4ditD?=
+ =?utf-8?B?dmZpT2NpQlZ1b05LVUJmTmdPWFlpdGFHcERFeTNDVCtJREYveWR3ZXRKVHRF?=
+ =?utf-8?B?YXVTc1BVWi9Ea2VrMlBvWmphZGhEZFh4NWRYWEh1UE9hQ21TbUtEZkFqSGdX?=
+ =?utf-8?B?QytJYUxSTDlyd0NXbFNZQ1pSQVZTbkJlbTNIS1NwMUtDLzZqVXd3V3Rqem8x?=
+ =?utf-8?B?RVJMSnljVElQdVFmb2JLSTZSMWF0ZjRkTFRTbVd6SU1vYTU5a0dQVks5cUpq?=
+ =?utf-8?B?ZVhqRG84Ym9USUxFNUVOTWdoOWsrTmF2RVZOWXdLei9FL0piZDZyVXBhYUhW?=
+ =?utf-8?B?SWRVbkdVMGozN1hIVUFtTXZwM0MycVorNktZdjdLWmhlMmVQelJWZHF3M1Jn?=
+ =?utf-8?B?d3hHK0hGaXhyOTRqT1JtQzdLNTYxRnM2c2Z0TUx5aGw1L1NGN01MOHR6VGQx?=
+ =?utf-8?B?WUIxYnR2eVVIaVhGenFjd0dJN3ZUQjAyaGwrWGM3ZEJaa0FjVVRmRzNCN0pF?=
+ =?utf-8?B?dUNvU3YraFY0ZkJodlp0ai9zU2ZLanZGeGNKWGZDVHNadlUvcWF4NW1ZNzJh?=
+ =?utf-8?B?dVY1anpKOHVRWUs0SDRqZUVQVWYyUTRJN05HRHFYVUdBYXF6QUNtaTYwT3Z3?=
+ =?utf-8?B?ZDNuZyt1SXQzb254eVJrdFZ0YytlNVlId201RndFVXR1c3p0Rk4wT2JVRHlN?=
+ =?utf-8?B?djhubUhDSXNZcFZwd3pQVmxTeC9uTUhiKy9ZMFdmRnplMXU1U2J6V2FGOU96?=
+ =?utf-8?B?OEN0VjZsZ1lvVkR0RE5obFE0MDE1ekJ3Z3p0aGJpdEVFcTdud2JKdmNhM3g0?=
+ =?utf-8?B?clJ0c3FxMEhhOW9KOEF2cXNMdmFiejJ2UVVCV21XT2tEQWp5THYreWJLTWZ2?=
+ =?utf-8?B?Rm1zdDlHLzZPc1Y0Yit5eWRZNWpxdWRxdFExNTVrc0lVTkd6Y21PdWsyK3dy?=
+ =?utf-8?B?TEZ4bkVnV3BuV3ZZZ3FrSHk4VW5ZQWl4bERLN3RCOVhXNHNZMDNwVUlDQk45?=
+ =?utf-8?B?S2wvREZvd0pTaXlGTEw5WFovWE4yQWNOblZSaGN4WUtmSC9nSmpuUVN0SVVj?=
+ =?utf-8?B?Wktuc0drbCthdEUwUldmd1FaVEhWYlhlWHhJdXlCRHQxUDZBWnU4bTNHTUhY?=
+ =?utf-8?B?Lys1TWwwbmx0bW9temc5WEIvSFVRSTR6bmhOV3FscHE2MlJTcStpaFRMWGV6?=
+ =?utf-8?B?UDltcDJQSld6dGo3bW14bTRZTVRYSnNnU0NKLzJoMWxtdzZmbmRFOWVWb1VB?=
+ =?utf-8?B?VkJVMi8vajdTV1ZuVlp4Y1hpNHRFdVk3blJsalRCMHdDVzBqM0JkcEdKbFpC?=
+ =?utf-8?B?cG1IUWpUM2RvWHFlR3RvMHVGbjVFK0tEUWF6cWdLL3VCSEYvTEpqWDYzZnM5?=
+ =?utf-8?B?a1E9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c5cc339-883c-422e-3273-08db9e316655
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 08:18:41.3667
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: i9rj7r2TFqcW6sudGjn+lb4OiXq4XlWQA5a+PekeawEXIy5WOfkDLyqK/Q6IQHC9A9YkLIZdccdpYr6M9UlNpjyOGwVrOxnKjnOh2f6jOfU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9340
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-inet->min_ttl is already read with READ_ONCE().
 
-Implementing IP_MINTTL socket option set/read
-without holding the socket lock is easy.
+On 11.08.2023 20:10, Andrew Lunn wrote:
+>> +#define VEND1_MACSEC_BASE		0x9000
+>> +
+>> +#define MACSEC_CFG			0x0000
+>> +#define MACSEC_CFG_BYPASS		BIT(1)
+>> +#define MACSEC_CFG_S0I			BIT(0)
+>> +
+>> +#define MACSEC_TPNET			0x0044
+> 
+>> +static int nxp_c45_macsec_write(struct phy_device *phydev, u16 reg, u32 val)
+>> +{
+>> +	reg = reg / 2;
+> 
+> That is a bit odd. How does the data sheet describe these
+> registers. e.g. MACSEC_TPNET. Does it say 0x9022 and 0x9023?  It seems
+> it would be easy to mix this up and end up accessing 0x9011 and
+> 0x9012.
+> 
+> 	   Andrew
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- net/ipv4/ip_sockglue.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+According to the MACsec IP user manual, the registers are 32 bits wide 
+and the addresses are 4 byte aligned. The PHY translates two writes in 
+two consecutive registers in one write in the MACsec IP.
 
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index dbb2d2342ebf0c1f1366ee6b6b2158a6118b2659..61b2e7bc7031501ff5a3ebeffc3f90be180fa09e 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1030,6 +1030,17 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 			return -EINVAL;
- 		WRITE_ONCE(inet->uc_ttl, val);
- 		return 0;
-+	case IP_MINTTL:
-+		if (optlen < 1)
-+			return -EINVAL;
-+		if (val < 0 || val > 255)
-+			return -EINVAL;
-+
-+		if (val)
-+			static_branch_enable(&ip4_min_ttl);
-+
-+		WRITE_ONCE(inet->min_ttl, val);
-+		return 0;
- 	}
- 
- 	err = 0;
-@@ -1326,21 +1337,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 		err = xfrm_user_policy(sk, optname, optval, optlen);
- 		break;
- 
--	case IP_MINTTL:
--		if (optlen < 1)
--			goto e_inval;
--		if (val < 0 || val > 255)
--			goto e_inval;
--
--		if (val)
--			static_branch_enable(&ip4_min_ttl);
--
--		/* tcp_v4_err() and tcp_v4_rcv() might read min_ttl
--		 * while we are changint it.
--		 */
--		WRITE_ONCE(inet->min_ttl, val);
--		break;
--
- 	case IP_LOCAL_PORT_RANGE:
- 	{
- 		const __u16 lo = val;
-@@ -1595,6 +1591,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 		if (val < 0)
- 			val = READ_ONCE(sock_net(sk)->ipv4.sysctl_ip_default_ttl);
- 		goto copyval;
-+	case IP_MINTTL:
-+		val = READ_ONCE(inet->min_ttl);
-+		goto copyval;
- 	}
- 
- 	if (needs_rtnl)
-@@ -1731,9 +1730,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 		len -= msg.msg_controllen;
- 		return copy_to_sockptr(optlen, &len, sizeof(int));
- 	}
--	case IP_MINTTL:
--		val = inet->min_ttl;
--		break;
- 	case IP_LOCAL_PORT_RANGE:
- 		val = inet->local_port_range.hi << 16 | inet->local_port_range.lo;
- 		break;
+I agree. It's too easy to write the wrong address here. I should check 
+the address alignment.
+
 -- 
-2.41.0.694.ge786442a9b-goog
-
+Radu P.
 
