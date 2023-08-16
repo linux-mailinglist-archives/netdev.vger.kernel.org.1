@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-28234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585A677EB45
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:03:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1D977EB4A
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 891DF1C2123B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:03:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C28C7281CB4
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E191ADD4;
-	Wed, 16 Aug 2023 21:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC251BEFD;
+	Wed, 16 Aug 2023 21:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE6F1ADEC
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:01:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0423C433BB;
-	Wed, 16 Aug 2023 21:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED211BEEB
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:01:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03394C433BA;
+	Wed, 16 Aug 2023 21:01:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692219664;
-	bh=ITeW/DrgoN4KqWImStr2hyRkxD/UhmDxlkmgmrdgIA0=;
+	s=k20201202; t=1692219665;
+	bh=2epbzPUicPfxKSn/FR2IY0KmEQa+ussd19335ABtUek=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SpKXP2/aSnnVMyqDqbNMsm7cf92hxR3sY0idtRpPjMoUCmRImo16RJNxFHVNUqRgB
-	 65iyo0t9xCd7K7tVeF7JR/HMmN2wfYy8JNzxEB8fuuWscLtHiRWnec7E1KvV/+uXK7
-	 niyjQiHNLcoQONbNDjCvTkcjkc58zFlHXbi1chrGjx6WepSDJkB/9bMnzO5AItmXBA
-	 ostx5yEB6eOlI8olP5uZ3JyPJ7bPw+9/W+vwB2WTh0QzaqGjjVoBF1XsN0cK0m+qAZ
-	 Vh3j+jbJOKQSgP721jO6SQ9Mzc0CuT9uo/qZxQuUtPI8kF+gAl1KUSIwkkkt2icV3o
-	 b82gQYFcSN6lw==
+	b=RPZtLhFASUSadusACbk2w5U0kSQUyaopLwP0MjfI3zbTreMkXbfq2KpJW4pHLl0VZ
+	 yDeDZRg0e+slkm13ePTufMlMmIgJ7RRSwARbrDokHPdLIBzZMnnL3aCL2b1yAodufk
+	 +PseEZep2L8wg6Y/u2IwjVR/af7XO73uF49WTn1e04CogmDjG6IkmrMz8REfzLMAWG
+	 Oyug+K+CR3NmxANZv9tzLVcERULmn69ngxO4PjKmOBJzgNsPYJG3UGNpRTHzjMowTx
+	 RP4XSVg6miW4Rqw6MNPeuRJQJtkLICnlVJhK05ikOvbbDJ7rM/tFvPaUQwZ8PQ6m3E
+	 MazRautDcXVcQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,12 +38,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
 	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [net-next 08/15] net/mlx5: Remove health syndrome enum duplication
-Date: Wed, 16 Aug 2023 14:00:42 -0700
-Message-ID: <20230816210049.54733-9-saeed@kernel.org>
+	Gal Pressman <gal@nvidia.com>
+Subject: [net-next 09/15] net/mlx5: Update dead links in Kconfig documentation
+Date: Wed, 16 Aug 2023 14:00:43 -0700
+Message-ID: <20230816210049.54733-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230816210049.54733-1-saeed@kernel.org>
 References: <20230816210049.54733-1-saeed@kernel.org>
@@ -55,83 +54,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Gal Pressman <gal@nvidia.com>
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-Health syndrome enum values were duplicated in mlx5_ifc and health.c,
-the correct place for them is mlx5_ifc.
+Point to NVIDIA documentation for device specific information now that the
+Mellanox documentation site is deprecated. Refer to kernel documentation
+sources for generic information not specific to mlx5 devices.
 
-Signed-off-by: Gal Pressman <gal@nvidia.com>
-Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/health.c  | 36 ++++++-------------
- 1 file changed, 11 insertions(+), 25 deletions(-)
+ .../ethernet/mellanox/mlx5/kconfig.rst             | 14 +++++++-------
+ Documentation/networking/xfrm_device.rst           |  1 +
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/health.c b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-index 187cb2c464f8..2fb2598b775e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/health.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-@@ -49,20 +49,6 @@ enum {
- 	MAX_MISSES			= 3,
- };
+diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
+index 43b1f7e87ec4..0a42c3395ffa 100644
+--- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
++++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
+@@ -36,7 +36,7 @@ Enabling the driver and kconfig options
  
--enum {
--	MLX5_HEALTH_SYNDR_FW_ERR		= 0x1,
--	MLX5_HEALTH_SYNDR_IRISC_ERR		= 0x7,
--	MLX5_HEALTH_SYNDR_HW_UNRECOVERABLE_ERR	= 0x8,
--	MLX5_HEALTH_SYNDR_CRC_ERR		= 0x9,
--	MLX5_HEALTH_SYNDR_FETCH_PCI_ERR		= 0xa,
--	MLX5_HEALTH_SYNDR_HW_FTL_ERR		= 0xb,
--	MLX5_HEALTH_SYNDR_ASYNC_EQ_OVERRUN_ERR	= 0xc,
--	MLX5_HEALTH_SYNDR_EQ_ERR		= 0xd,
--	MLX5_HEALTH_SYNDR_EQ_INV		= 0xe,
--	MLX5_HEALTH_SYNDR_FFSER_ERR		= 0xf,
--	MLX5_HEALTH_SYNDR_HIGH_TEMP		= 0x10
--};
--
- enum {
- 	MLX5_DROP_HEALTH_WORK,
- };
-@@ -357,27 +343,27 @@ static int mlx5_health_try_recover(struct mlx5_core_dev *dev)
- static const char *hsynd_str(u8 synd)
- {
- 	switch (synd) {
--	case MLX5_HEALTH_SYNDR_FW_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_FW_INTERNAL_ERR:
- 		return "firmware internal error";
--	case MLX5_HEALTH_SYNDR_IRISC_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_DEAD_IRISC:
- 		return "irisc not responding";
--	case MLX5_HEALTH_SYNDR_HW_UNRECOVERABLE_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_HW_FATAL_ERR:
- 		return "unrecoverable hardware error";
--	case MLX5_HEALTH_SYNDR_CRC_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_FW_CRC_ERR:
- 		return "firmware CRC error";
--	case MLX5_HEALTH_SYNDR_FETCH_PCI_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_ICM_FETCH_PCI_ERR:
- 		return "ICM fetch PCI error";
--	case MLX5_HEALTH_SYNDR_HW_FTL_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_ICM_PAGE_ERR:
- 		return "HW fatal error\n";
--	case MLX5_HEALTH_SYNDR_ASYNC_EQ_OVERRUN_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_ASYNCHRONOUS_EQ_BUF_OVERRUN:
- 		return "async EQ buffer overrun";
--	case MLX5_HEALTH_SYNDR_EQ_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_EQ_IN_ERR:
- 		return "EQ error";
--	case MLX5_HEALTH_SYNDR_EQ_INV:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_EQ_INV:
- 		return "Invalid EQ referenced";
--	case MLX5_HEALTH_SYNDR_FFSER_ERR:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_FFSER_ERR:
- 		return "FFSER error";
--	case MLX5_HEALTH_SYNDR_HIGH_TEMP:
-+	case MLX5_INITIAL_SEG_HEALTH_SYNDROME_HIGH_TEMP_ERR:
- 		return "High temperature";
- 	default:
- 		return "unrecognized error";
+ **CONFIG_MLX5_CORE_EN_DCB=(y/n)**:
+ 
+-|    Enables `Data Center Bridging (DCB) Support <https://community.mellanox.com/s/article/howto-auto-config-pfc-and-ets-on-connectx-4-via-lldp-dcbx>`_.
++|    Enables `Data Center Bridging (DCB) Support <https://enterprise-support.nvidia.com/s/article/howto-auto-config-pfc-and-ets-on-connectx-4-via-lldp-dcbx>`_.
+ 
+ 
+ **CONFIG_MLX5_CORE_IPOIB=(y/n)**
+@@ -59,12 +59,12 @@ Enabling the driver and kconfig options
+ **CONFIG_MLX5_EN_ARFS=(y/n)**
+ 
+ |    Enables Hardware-accelerated receive flow steering (arfs) support, and ntuple filtering.
+-|    https://community.mellanox.com/s/article/howto-configure-arfs-on-connectx-4
++|    https://enterprise-support.nvidia.com/s/article/howto-configure-arfs-on-connectx-4
+ 
+ 
+ **CONFIG_MLX5_EN_IPSEC=(y/n)**
+ 
+-|    Enables `IPSec XFRM cryptography-offload acceleration <https://support.mellanox.com/s/article/ConnectX-6DX-Bluefield-2-IPsec-HW-Full-Offload-Configuration-Guide>`_.
++|    Enables :ref:`IPSec XFRM cryptography-offload acceleration <xfrm_device>`.
+ 
+ 
+ **CONFIG_MLX5_EN_MACSEC=(y/n)**
+@@ -87,8 +87,8 @@ Enabling the driver and kconfig options
+ 
+ |    Ethernet SRIOV E-Switch support in ConnectX NIC. E-Switch provides internal SRIOV packet steering
+ |    and switching for the enabled VFs and PF in two available modes:
+-|           1) `Legacy SRIOV mode (L2 mac vlan steering based) <https://community.mellanox.com/s/article/howto-configure-sr-iov-for-connectx-4-connectx-5-with-kvm--ethernet-x>`_.
+-|           2) `Switchdev mode (eswitch offloads) <https://www.mellanox.com/related-docs/prod_software/ASAP2_Hardware_Offloading_for_vSwitches_User_Manual_v4.4.pdf>`_.
++|           1) `Legacy SRIOV mode (L2 mac vlan steering based) <https://enterprise-support.nvidia.com/s/article/HowTo-Configure-SR-IOV-for-ConnectX-4-ConnectX-5-ConnectX-6-with-KVM-Ethernet>`_.
++|           2) :ref:`Switchdev mode (eswitch offloads) <switchdev>`.
+ 
+ 
+ **CONFIG_MLX5_FPGA=(y/n)**
+@@ -101,13 +101,13 @@ Enabling the driver and kconfig options
+ 
+ **CONFIG_MLX5_INFINIBAND=(y/n/m)** (module mlx5_ib.ko)
+ 
+-|    Provides low-level InfiniBand/RDMA and `RoCE <https://community.mellanox.com/s/article/recommended-network-configuration-examples-for-roce-deployment>`_ support.
++|    Provides low-level InfiniBand/RDMA and `RoCE <https://enterprise-support.nvidia.com/s/article/recommended-network-configuration-examples-for-roce-deployment>`_ support.
+ 
+ 
+ **CONFIG_MLX5_MPFS=(y/n)**
+ 
+ |    Ethernet Multi-Physical Function Switch (MPFS) support in ConnectX NIC.
+-|    MPFs is required for when `Multi-Host <http://www.mellanox.com/page/multihost>`_ configuration is enabled to allow passing
++|    MPFs is required for when `Multi-Host <https://www.nvidia.com/en-us/networking/multi-host/>`_ configuration is enabled to allow passing
+ |    user configured unicast MAC addresses to the requesting PF.
+ 
+ 
+diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
+index 83abdfef4ec3..535077cbeb07 100644
+--- a/Documentation/networking/xfrm_device.rst
++++ b/Documentation/networking/xfrm_device.rst
+@@ -1,4 +1,5 @@
+ .. SPDX-License-Identifier: GPL-2.0
++.. _xfrm_device:
+ 
+ ===============================================
+ XFRM device - offloading the IPsec computations
 -- 
 2.41.0
 
