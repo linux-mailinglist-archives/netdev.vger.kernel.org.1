@@ -1,154 +1,99 @@
-Return-Path: <netdev+bounces-28116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5468677E42B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:53:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A75F77E438
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E230281AA6
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:53:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B76EE281AB3
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99AE12B70;
-	Wed, 16 Aug 2023 14:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E5A12B7C;
+	Wed, 16 Aug 2023 14:54:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FF510957
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:53:45 +0000 (UTC)
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7502610FF;
-	Wed, 16 Aug 2023 07:53:40 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-76754b9eac0so447950385a.0;
-        Wed, 16 Aug 2023 07:53:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFD3101DA
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:54:45 +0000 (UTC)
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0066273C
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:54:35 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a7a180c3faso5364389b6e.2
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:54:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692197619; x=1692802419;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C/F+yO89r+58XA2jTJmqFV7AKNI1UXlByvHmUmA3sA4=;
-        b=hJ0JNR07O6hNfvI0xZ2K57RdwwA+zhGGvgN1u5MeIJpwg2g6A38rxQYYtjMTc+DrIQ
-         OQKQIzsh/kXj6LBcKPZHjh6TDJjQoyZR9sv/ZFs1MrH/0YQbtE8WdYpPg89JB9m9u9j8
-         y/u5h/wRwaSktqnNv6AeWOnq16To/G5M8xOsJ4xwE5+6U03REY4mPgeLMapCOdBPycHL
-         JEq5/GHZ+7CMff1ABYwHMm7pYN1NFal7znvXjmINFymH4O7Fe5T77dnWF9Ir/tCqjnF7
-         mqH+Pdma8Ou779VNhqk7dP7ET2SKLB2szR+/7oxYyeGGm6ZxG5QXiGhmus7LtSaOPOCl
-         7lcQ==
+        d=gmail.com; s=20221208; t=1692197675; x=1692802475;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=34ISkCUz1jnkCM9CzotxJ6PEzk8hIrTwfNJQkrqLEAA=;
+        b=MZvMhAnaM2pvbykBiB+xA36kD+rqxilRCG4J7Pj0OEZlLEhf3i7InhpYayvFizM0UK
+         drDZSgIoboMqzbNIB3KIGxRlxk5IbhgwbxN1NY9ryTwz8GVfm/8EgC6vQAzvRzRdGnJU
+         Y1tZKap70XvlLzdt7W0Txg411NdT1I+1sRIYe6XkEtT+g0xcEZzhfPpqiun2e2prMGIO
+         AvG74eNTzKlNr1ZTDGl0QpMIuiPLfW7HSQ0X7mjrwAWeikSqhrTGKMv8U2GSUrPX3kIW
+         efFdBJrghvO+Nb31ZJN7MKjpwy2nNLdLMQyGQpGaiCd44TPNncI9+19i4EI24IU4OfCU
+         ev6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692197619; x=1692802419;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=C/F+yO89r+58XA2jTJmqFV7AKNI1UXlByvHmUmA3sA4=;
-        b=TwJPZDWuQ6yYY3cc8JdtNTnPKLnQ5HMJxRVb5Tbcqp5vU9uTXeesq8k8d1XLfMCkL6
-         HTYXPE0c0+vOSezD1Fbzjbsv4Kdcl8FZy37ySmwhl/yPZ5sq6zCudMslHNq21dZZx+O8
-         IZ1GCJIO5voIS+ZsHBL0ygMyJvLWC/BtF1ZkPokbjG7ZeDMCytoMfRHpTWajCU26cLpc
-         27Dt93OTiewquyX96CHaxXQuup86akms3WyObXNv557ksbh7P88fgaLoBRhUGCWhAtQR
-         gNUTu1bu086oBc8u/Qtb4HY2gakPe4/doqBlsdVJDtxMTyZol8vZgJs+Azv+KxqZhkgW
-         8AEQ==
-X-Gm-Message-State: AOJu0Yx/S7N5QQyji3faY5MWaDCWgGkWBeKhv1RofwYMY4AgJs5LxVxm
-	GqZh9oqyulmIKnOtUXeS01A=
-X-Google-Smtp-Source: AGHT+IE/ongpvCQd3F2ohVavPqcLH2c3ICTQBale59UpK8GdXCBun10dc4tTmVJGODuMRW1RyyVMpQ==
-X-Received: by 2002:a05:620a:b8d:b0:76c:9ad6:8199 with SMTP id k13-20020a05620a0b8d00b0076c9ad68199mr1789963qkh.77.1692197619528;
-        Wed, 16 Aug 2023 07:53:39 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id f23-20020a05620a15b700b0076cf0c4eecbsm4469821qkk.0.2023.08.16.07.53.38
+        d=1e100.net; s=20221208; t=1692197675; x=1692802475;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=34ISkCUz1jnkCM9CzotxJ6PEzk8hIrTwfNJQkrqLEAA=;
+        b=FfYoBbK5llRudd7bUsCeSRqWKNB+ELkX1Zp0hEBgAgaN+vsh08lX/rm7wxgLPneDBj
+         e0XV9p8k7aqEqrK3sDIwDqm94tAmdmXyvoMIozJCszz2kDQxkic6KKPKCdLvLBON5ey4
+         wnAPUO+iTMoyvCseGqIDxlnR0Jf8afgiXD6lWVdvQ8Qerma1B+TpbNPbFlJ38KhVuo/d
+         wJ3aCqlGfc5D6tuNsYIy3VsOA9Z514N3vrObbULXUAVZqOEveTQZNjePBdyr7kZUaljA
+         U5o7dG+0mlbBeun0y/YHNfNv8KFM14uQrFtrXdlTT1c/Z4CDvykl5qrK6y5fix8d+jtm
+         7Wsg==
+X-Gm-Message-State: AOJu0YxQKSzQUcvKMWKUoi50i9xgXkXLb8cJcAeny2Mbio/hMk9dHg1j
+	Zfg4IxGT/DjeNW1y6H/ZxYs=
+X-Google-Smtp-Source: AGHT+IHwzSjE2j0Ai5bY6IPgpoKrIZUi2VPGFpfVW0x76kPjxFN7Yp9LAsKz87fMGtcVbWhAJeGrhA==
+X-Received: by 2002:a05:6808:9a3:b0:3a7:22f0:1fc2 with SMTP id e3-20020a05680809a300b003a722f01fc2mr2185973oig.13.1692197675047;
+        Wed, 16 Aug 2023 07:54:35 -0700 (PDT)
+Received: from t14s.localdomain ([177.220.180.11])
+        by smtp.gmail.com with ESMTPSA id et19-20020a056808281300b003a0619d78ebsm6547908oib.55.2023.08.16.07.54.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 07:53:38 -0700 (PDT)
-Date: Wed, 16 Aug 2023 10:53:38 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Feng Liu <feliu@nvidia.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Simon Horman <horms@kernel.org>
-Cc: virtualization@lists.linux-foundation.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Jason Wang <jasowang@redhat.com>, 
- "Michael S . Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Bodong Wang <bodong@nvidia.com>, 
- Jiri Pirko <jiri@nvidia.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Message-ID: <64dce2f2b99f5_23f1f82949f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <f9f3c150-2b5e-7bd0-1c1a-062bd1f16fcd@nvidia.com>
-References: <20230814171845.65930-1-feliu@nvidia.com>
- <ZNtYpohWyjnb883M@vergenet.net>
- <05348d62-586c-4b1f-40bd-5541caca0947@nvidia.com>
- <ZNunz1hbqPKpcOgA@vergenet.net>
- <CAF=yD-L+d34Uuvt3sOFOnxXhMmoMXNfHzcaSPk=t1PtiPUHZ1g@mail.gmail.com>
- <f9f3c150-2b5e-7bd0-1c1a-062bd1f16fcd@nvidia.com>
-Subject: Re: [PATCH net v1] virtio_net: Introduce skb_vnet_common_hdr to avoid
- typecasting
+        Wed, 16 Aug 2023 07:54:34 -0700 (PDT)
+Received: by t14s.localdomain (Postfix, from userid 1000)
+	id 9D0956E70AE; Wed, 16 Aug 2023 11:54:32 -0300 (-03)
+Date: Wed, 16 Aug 2023 11:54:32 -0300
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot <syzkaller@googlegroups.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] net: do not allow gso_size to be set to GSO_BY_FRAGS
+Message-ID: <ZNzjKM1F+a6PVRSr@t14s.localdomain>
+References: <20230816142158.1779798-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230816142158.1779798-1-edumazet@google.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > 
-> > Since legacy virtio will no longer be modified, I don't think there is
-> > much value is exposing this new union as UAPI. I do appreciate the
-> > benefit to the implementation.
-> > 
-> > [1] https://patches.linaro.org/project/netdev/patch/20210208185558.995292-3-willemdebruijn.kernel@gmail.com/
-> Hi, William and Simon
+On Wed, Aug 16, 2023 at 02:21:58PM +0000, Eric Dumazet wrote:
+> One missing check in virtio_net_hdr_to_skb() allowed
+> syzbot to crash kernels again [1]
 > 
-> Thanks for the detailed explanation.
-> 
-> I kept virtio_net_hdr_mrg_rxbuf and virtio_net_hdr_v1_hash structures in 
-> virtio_net.h, which can be forward compatible with existing user 
-> applications which use these structures.
+> Do not allow gso_size to be set to GSO_BY_FRAGS (0xffff),
+> because this magic value is used by the kernel.
 
-They're UAPI, so we cannot modify or remove them anyway.
-
-Which is exactly why we want to be careful with adding anything new.
- 
-> virtio_net_hdr_v1_hash cannot use virtio_net_hdr as the first member, 
-> because in virtio_net_hdr_v1, csum_start and csum_offset are stored in 
-> union as a structure, and virtio_net_hdr cannot be used instead.
-
-Oh right. That wasn't always the case, or the reason for this.
-Not super relevant but, commit ed9ecb0415b9 has the history
-
-    virtio: Don't expose legacy net features when VIRTIO_NET_NO_LEGACY defined.
-
-    In particular, the virtio header always has the u16 num_buffers field.
-    We define a new 'struct virtio_net_hdr_v1' for this (rather than
-    simply calling it 'struct virtio_net_hdr', to avoid nasty type errors
-    if some parts of a project define VIRTIO_NET_NO_LEGACY and some don't.
-
-    Transitional devices (which can't define VIRTIO_NET_NO_LEGACY) will
-    have to keep using struct virtio_net_hdr_mrg_rxbuf, which has the same
-    byte layout as struct virtio_net_hdr_v1.
-
-The union was added to overload csum use on tx with RSC use on rx, in
-commit 22b436c9b568. I don't quite follow why there now are three
-structs, rather than two. The first two seem to both implement csum
-partial. Anyway, not super important here.
-
-> In addition, I put this new structure virtio_net_common_hdr in uapi, 
-> hoping it could be used in future user space application to avoid 
-> potential risks caused by type coercion (such as the problems mentioned 
-> in the patch description ). So I think it should be in this header file.
-> What do you think?
-
-Adding anything to UAPI has a high bar. Do you have a concrete use
-case for this?
-
-This does seem mostly a helper to simplify kernel logic to me, which
-is better kept in non-UAPI headers.
+Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
