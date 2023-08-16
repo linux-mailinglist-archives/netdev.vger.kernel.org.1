@@ -1,152 +1,98 @@
-Return-Path: <netdev+bounces-27997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6DFC77DD67
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:36:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1AEB77DD64
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:36:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71A6E281948
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E4431C20D38
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68177DF4A;
-	Wed, 16 Aug 2023 09:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE425DF4A;
+	Wed, 16 Aug 2023 09:36:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D038F9E6
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:36:48 +0000 (UTC)
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCF826A4;
-	Wed, 16 Aug 2023 02:36:46 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RQjh84VPsz4f3kFB;
-	Wed, 16 Aug 2023 17:36:40 +0800 (CST)
-Received: from vm-fedora-38.huawei.com (unknown [10.67.174.164])
-	by APP3 (Coremail) with SMTP id _Ch0CgCHXcWmmNxkidopAw--.9644S2;
-	Wed, 16 Aug 2023 17:36:41 +0800 (CST)
-From: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F6BCA70
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:36:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB80EC433CA;
+	Wed, 16 Aug 2023 09:36:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692178592;
+	bh=WMb5MgJHMYvODEXXoXrLavxbTDf4vczIeJF+HfPmOgw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hLMawRYL5RQTZArXYzwlDV3Yss/ONrSi9ilW1iZsIXBYcW+YT5+1X31sai00ZOx1F
+	 ElNRloamoN3j//ij3+UoC3TON9L9UErH80ZD3FUDzBA5n7Ay8hYujdSqLh/X0Rf3IF
+	 EcHu06QZqFVZaJN7DWz4QhobeDQXat9WKp0OR8lTQwDAMXUxKMn8EqCvuiLvksKk9a
+	 vsR5hGjpDsJuGXtz1I7Ra7ZXIVTFnMVqhf/3L97V4EX7p2GVTiufrZgI9mHSBw/33s
+	 WziV3X0vhoMYZsDiXXTwGtgG3NwvJejSPyLu9kQ+vW7jg0SDX8Hv1rNWqloRh30F2U
+	 FxJS57oqxeseA==
+Date: Wed, 16 Aug 2023 11:36:28 +0200
+From: Simon Horman <horms@kernel.org>
+To: Francois Michel <francois.michel@uclouvain.be>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Kees Cook <keescook@chromium.org>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux-foundation.org,
-	gongruiqi1@huawei.com
-Subject: [PATCH net-next v2] netfilter: ebtables: replace zero-length array members
-Date: Wed, 16 Aug 2023 17:34:43 +0800
-Message-ID: <20230816093443.1460204-1-gongruiqi@huaweicloud.com>
-X-Mailer: git-send-email 2.41.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 0/3] netem: use a seeded PRNG for loss and
+ corruption events
+Message-ID: <ZNyYnLrA7bLMpM4O@vergenet.net>
+References: <20230815092348.1449179-1-francois.michel@uclouvain.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCHXcWmmNxkidopAw--.9644S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWFW7tr47ZFyDur15WFy7GFg_yoW5Gr48pF
-	yjka4qyrWUtay2grW7tay7ZF4avws5Gr17JrWxG34FyF90yay7WrWxKry5KFyq9rZ5uFsx
-	ArWftry8KFZ7taUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkYb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
-	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
-	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF
-	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
-	vE42xK8VAvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
-	aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1rMa5UUUUU==
-X-CM-SenderInfo: pjrqw2pxltxq5kxd4v5lfo033gof0z/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230815092348.1449179-1-francois.michel@uclouvain.be>
 
-From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
+On Tue, Aug 15, 2023 at 11:23:37AM +0200, Francois Michel wrote:
+> From: François Michel <francois.michel@uclouvain.be>
+> 
+> In order to reproduce bugs or performance evaluation of
+> network protocols and applications, it is useful to have
+> reproducible test suites and tools. This patch adds
+> a way to specify a PRNG seed through the
+> TCA_NETEM_PRNG_SEED attribute for generating netem
+> loss and corruption events. Initializing the qdisc
+> with the same seed leads to the exact same loss
+> and corruption patterns. If no seed is explicitly
+> specified, the qdisc generates a random seed using
+> get_random_u64().
+> 
+> This patch can be and has been tested using tc from
+> the following iproute2-next fork:
+> https://github.com/francoismichel/iproute2-next
+> 
+> For instance, setting the seed 42424242 on the loopback
+> with a loss rate of 10% will systematically drop the 5th,
+> 12th and 24th packet when sending 25 packets.
+> 
+> v1 -> v2: Address comments and directly use
+> prandom_u32_state() instead of get_random_u32() for
+> generating loss and corruption events. Generates a random
+> seed using get_random_u64() if none was provided explicitly.
+> 
+> François Michel (3):
+>   netem: add prng attribute to netem_sched_data
+>   netem: use a seeded PRNG for generating random losses
+>   netem: use seeded PRNG for correlated loss events
+> 
+>  include/uapi/linux/pkt_sched.h |  1 +
+>  net/sched/sch_netem.c          | 49 +++++++++++++++++++++++-----------
+>  2 files changed, 35 insertions(+), 15 deletions(-)
 
-As suggested by Kees[1], replace the old-style 0-element array members
-of multiple structs in ebtables.h with modern C99 flexible array.
+For series,
 
-[1]: https://lore.kernel.org/all/5E8E0F9C-EE3F-4B0D-B827-DC47397E2A4A@kernel.org/
-
-Link: https://github.com/KSPP/linux/issues/21
-Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
----
-
-v2: designate to net-next; cc more netdev maintainers
-
- include/uapi/linux/netfilter_bridge/ebtables.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/include/uapi/linux/netfilter_bridge/ebtables.h b/include/uapi/linux/netfilter_bridge/ebtables.h
-index b0caad82b693..673b00df162c 100644
---- a/include/uapi/linux/netfilter_bridge/ebtables.h
-+++ b/include/uapi/linux/netfilter_bridge/ebtables.h
-@@ -87,7 +87,7 @@ struct ebt_entries {
- 	/* nr. of entries */
- 	unsigned int nentries;
- 	/* entry list */
--	char data[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
-+	char data[] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
- };
- 
- /* used for the bitmask of struct ebt_entry */
-@@ -129,7 +129,7 @@ struct ebt_entry_match {
- 	} u;
- 	/* size of data */
- 	unsigned int match_size;
--	unsigned char data[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
-+	unsigned char data[] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
- };
- 
- struct ebt_entry_watcher {
-@@ -142,7 +142,7 @@ struct ebt_entry_watcher {
- 	} u;
- 	/* size of data */
- 	unsigned int watcher_size;
--	unsigned char data[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
-+	unsigned char data[] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
- };
- 
- struct ebt_entry_target {
-@@ -155,7 +155,7 @@ struct ebt_entry_target {
- 	} u;
- 	/* size of data */
- 	unsigned int target_size;
--	unsigned char data[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
-+	unsigned char data[] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
- };
- 
- #define EBT_STANDARD_TARGET "standard"
-@@ -190,7 +190,7 @@ struct ebt_entry {
- 		/* sizeof ebt_entry + matches + watchers + target */
- 		unsigned int next_offset;
- 	);
--	unsigned char elems[0] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
-+	unsigned char elems[] __attribute__ ((aligned (__alignof__(struct ebt_replace))));
- };
- 
- static __inline__ struct ebt_entry_target *
--- 
-2.41.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
