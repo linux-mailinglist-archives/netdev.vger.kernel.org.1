@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-28032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC1777E0CA
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 13:50:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 363E277E105
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:03:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A40771C20F91
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54E411C21005
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 12:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC0E10789;
-	Wed, 16 Aug 2023 11:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410B710795;
+	Wed, 16 Aug 2023 12:03:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8447101C8
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 11:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 971DBC433C7;
-	Wed, 16 Aug 2023 11:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F1FFBFA
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 12:03:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F2CC433C7;
+	Wed, 16 Aug 2023 12:03:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692186624;
-	bh=K5UuP55MZJ1xP8kfzlNmsJdJK6+0SZxeygX7UdDuRto=;
+	s=k20201202; t=1692187401;
+	bh=JZBhRJ852Cf42i6bqJCHNHsh4gGjICNxRBlUT5z4QLo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DGh3cs+BJCw56/SjCfd/t2kcRfuW2stdrhNKzVlxvUIpSm84DL801VqE1y24l/nRW
-	 B/B/K9ypI5v0egh5hSN0jFd5d68a1tPAOzjAsOGzdY0ote8/AYnyQpi+nk0cY7Hl1D
-	 AVnlCEuK5PgDMv56fCPJmBj5j07hYZc4+IUfMQWmffUxKF6oFQme8b02Dx8EyDq9Qe
-	 SEPaREHZkxj9GS4ZOJBE0Pcy06fAM6EvxrJQmiNT37GTnfDmweZu4zh6c5JsBgGgD4
-	 NMGxadgT8yOrIIOM8r30F4Qr2Si7+4KnsaN85noTVkyzNmhnBsHR5njm1M44DrEoH+
-	 dIoNSZdckUFNw==
-Date: Wed, 16 Aug 2023 13:50:17 +0200
+	b=uzkgzl6TyVoaezGH66hU7AyLY9HsEZRhPd5MGlezFUNKjSvydx9mpc2l6CdglZ321
+	 ZrBA5fHfWhPEiBbeSuwH1KOwgA9vhbRGS9Y8AfY2urZ97TKNSg1qU8gO1DZayte/MZ
+	 vx5KTBw+btXwDTMPuHxR0Yn/fe2KZ6eBei6Bc1uzaoj0qVkQUokYoapTLwE+4e8+EH
+	 J/jIEdmaAcsUizsMFEibRhCp6AzsKBIxgo0+oe2sJRna0nVMFxBM2TEwa1PnQXbC0v
+	 B/EcjrUztd0SoH9ytHzBcWSeIpa41xE8HCK8z6CL9icAMhbNhEEO6ekY0jXrUMpBQ5
+	 tWohHYfYinbyA==
+Date: Wed, 16 Aug 2023 14:03:15 +0200
 From: Simon Horman <horms@kernel.org>
 To: Dmitry Safonov <dima@arista.com>
 Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
@@ -55,10 +55,10 @@ Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
 	Salam Noureddine <noureddine@arista.com>,
 	Simon Horman <simon.horman@corigine.com>,
 	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v10 net-next 08/23] net/tcp: Add AO sign to RST packets
-Message-ID: <ZNy3+f6ZtDKfsQ5C@vergenet.net>
+Subject: Re: [PATCH v10 net-next 09/23] net/tcp: Add TCP-AO sign to twsk
+Message-ID: <ZNy7A17n3BrMuh1b@vergenet.net>
 References: <20230815191455.1872316-1-dima@arista.com>
- <20230815191455.1872316-9-dima@arista.com>
+ <20230815191455.1872316-10-dima@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,200 +67,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230815191455.1872316-9-dima@arista.com>
+In-Reply-To: <20230815191455.1872316-10-dima@arista.com>
 
-On Tue, Aug 15, 2023 at 08:14:37PM +0100, Dmitry Safonov wrote:
-> Wire up sending resets to TCP-AO hashing.
-> 
-> Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-> Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-> Co-developed-by: Salam Noureddine <noureddine@arista.com>
-> Signed-off-by: Salam Noureddine <noureddine@arista.com>
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> Acked-by: David Ahern <dsahern@kernel.org>
-
-> ---
->  include/net/tcp_ao.h |  12 +++++
->  net/ipv4/tcp_ao.c    | 104 ++++++++++++++++++++++++++++++++++++++++++-
->  net/ipv4/tcp_ipv4.c  |  69 ++++++++++++++++++++++------
->  net/ipv6/tcp_ipv6.c  |  70 ++++++++++++++++++++++-------
->  4 files changed, 225 insertions(+), 30 deletions(-)
-> 
-> diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-> index e685ad9db949..67f997aabd9c 100644
-> --- a/include/net/tcp_ao.h
-> +++ b/include/net/tcp_ao.h
-> @@ -117,12 +117,24 @@ int tcp_ao_hash_skb(unsigned short int family,
->  		    const u8 *tkey, int hash_offset, u32 sne);
->  int tcp_parse_ao(struct sock *sk, int cmd, unsigned short int family,
->  		 sockptr_t optval, int optlen);
-> +struct tcp_ao_key *tcp_ao_established_key(struct tcp_ao_info *ao,
-> +					  int sndid, int rcvid);
->  int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
->  			    unsigned int len, struct tcp_sigpool *hp);
->  void tcp_ao_destroy_sock(struct sock *sk);
->  struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
->  				    const union tcp_ao_addr *addr,
->  				    int family, int sndid, int rcvid);
-> +int tcp_ao_hash_hdr(unsigned short family, char *ao_hash,
-> +		    struct tcp_ao_key *key, const u8 *tkey,
-> +		    const union tcp_ao_addr *daddr,
-> +		    const union tcp_ao_addr *saddr,
-> +		    const struct tcphdr *th, u32 sne);
-> +int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
-> +			 const struct tcp_ao_hdr *aoh, int l3index, u32 seq,
-> +			 struct tcp_ao_key **key, char **traffic_key,
-> +			 bool *allocated_traffic_key, u8 *keyid, u32 *sne);
-> +
->  /* ipv4 specific functions */
->  int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen);
->  struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
-> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+On Tue, Aug 15, 2023 at 08:14:38PM +0100, Dmitry Safonov wrote:
 
 ...
 
-> @@ -435,6 +495,46 @@ struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
->  	return tcp_ao_do_lookup(sk, addr, AF_INET, sndid, rcvid);
->  }
->  
-> +int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
-> +			 const struct tcp_ao_hdr *aoh, int l3index, u32 seq,
-> +			 struct tcp_ao_key **key, char **traffic_key,
-> +			 bool *allocated_traffic_key, u8 *keyid, u32 *sne)
-> +{
-> +	struct tcp_ao_info *ao_info;
-> +
-> +	*allocated_traffic_key = false;
-> +	/* If there's no socket - than initial sisn/disn are unknown.
-> +	 * Drop the segment. RFC5925 (7.7) advises to require graceful
-> +	 * restart [RFC4724]. Alternatively, the RFC5925 advises to
-> +	 * save/restore traffic keys before/after reboot.
-> +	 * Linux TCP-AO support provides TCP_AO_ADD_KEY and TCP_AO_REPAIR
-> +	 * options to restore a socket post-reboot.
-> +	 */
-> +	if (!sk)
-> +		return -ENOTCONN;
-> +
-> +	if ((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_NEW_SYN_RECV)) {
-> +		return -1;
-> +	} else {
-> +		struct tcp_ao_key *rnext_key;
-> +
-> +		if (sk->sk_state == TCP_TIME_WAIT)
-> +			return -1;
-> +		ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
-> +		if (!ao_info)
-> +			return -ENOENT;
-> +
-> +		*key = tcp_ao_established_key(ao_info, aoh->rnext_keyid, -1);
-> +		if (!*key)
-> +			return -ENOENT;
-> +		*traffic_key = snd_other_key(*key);
-> +		rnext_key = READ_ONCE(ao_info->rnext_key);
-> +		*keyid = rnext_key->rcvid;
-> +		*sne = 0;
-> +	}
-> +	return 0;
-> +}
-> +
->  static int tcp_ao_cache_traffic_keys(const struct sock *sk,
->  				     struct tcp_ao_info *ao,
->  				     struct tcp_ao_key *ao_key)
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index 31169971cc56..f07a12f478d4 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -657,6 +657,52 @@ void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb)
->  }
->  EXPORT_SYMBOL(tcp_v4_send_check);
->  
-> +#define REPLY_OPTIONS_LEN      (MAX_TCP_OPTION_SPACE / sizeof(__be32))
-> +
-> +static bool tcp_v4_ao_sign_reset(const struct sock *sk, struct sk_buff *skb,
-> +				 const struct tcp_ao_hdr *aoh,
-> +				 struct ip_reply_arg *arg, struct tcphdr *reply,
-> +				 __be32 reply_options[REPLY_OPTIONS_LEN])
-> +{
-> +#ifdef CONFIG_TCP_AO
-> +	int sdif = tcp_v4_sdif(skb);
-> +	int dif = inet_iif(skb);
-> +	int l3index = sdif ? dif : 0;
-> +	bool allocated_traffic_key;
-> +	struct tcp_ao_key *key;
-> +	char *traffic_key;
-> +	bool drop = true;
-> +	u32 ao_sne = 0;
-> +	u8 keyid;
-> +
-> +	rcu_read_lock();
-> +	if (tcp_ao_prepare_reset(sk, skb, aoh, l3index, reply->seq,
-> +				 &key, &traffic_key, &allocated_traffic_key,
-> +				 &keyid, &ao_sne))
+> @@ -1183,6 +1216,7 @@ static void tcp_v6_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
+>  			ipv6_get_dsfield(ipv6_hdr(skb)), 0,
+>  			READ_ONCE(sk->sk_priority),
+>  			READ_ONCE(tcp_rsk(req)->txhash));
+> +			NULL, NULL, 0, 0);
 
 Hi Dmitry,
 
-The type of the 4th parameter of tcp_ao_prepare_reset() (seq) is u32,
-but here a __be32 value is passed.
-
-Also, it seems that parameter is unused by tcp_ao_prepare_reset().
-
-> +		goto out;
-> +
-> +	reply_options[0] = htonl((TCPOPT_AO << 24) | (tcp_ao_len(key) << 16) |
-> +				 (aoh->rnext_keyid << 8) | keyid);
-> +	arg->iov[0].iov_len += round_up(tcp_ao_len(key), 4);
-> +	reply->doff = arg->iov[0].iov_len / 4;
-> +
-> +	if (tcp_ao_hash_hdr(AF_INET, (char *)&reply_options[1],
-> +			    key, traffic_key,
-> +			    (union tcp_ao_addr *)&ip_hdr(skb)->saddr,
-> +			    (union tcp_ao_addr *)&ip_hdr(skb)->daddr,
-> +			    reply, ao_sne))
-> +		goto out;
-> +	drop = false;
-> +out:
-> +	rcu_read_unlock();
-> +	if (allocated_traffic_key)
-> +		kfree(traffic_key);
-> +	return drop;
-> +#else
-> +	return true;
-> +#endif
-> +}
-> +
->  /*
->   *	This routine will send an RST to the other tcp.
->   *
-
-...
-
-> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-
-...
-
-> @@ -1064,6 +1088,19 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
->  		ack_seq = ntohl(th->seq) + th->syn + th->fin + skb->len -
->  			  (th->doff << 2);
->  
-> +#ifdef CONFIG_TCP_AO
-> +	if (aoh) {
-> +		int l3index;
-> +
-> +		l3index = tcp_v6_sdif(skb) ? tcp_v6_iif_l3_slave(skb) : 0;
-> +		if (tcp_ao_prepare_reset(sk, skb, aoh, l3index, htonl(seq),
-
-Ditto.
-
-> +					 &ao_key, &traffic_key,
-> +					 &allocated_traffic_key,
-> +					 &rcv_next, &ao_sne))
-> +			goto out;
-> +	}
-> +#endif
-> +
->  	if (sk) {
->  		oif = sk->sk_bound_dev_if;
->  		if (sk_fullsock(sk)) {
+This seems to add a syntax error.
 
 ...
 
