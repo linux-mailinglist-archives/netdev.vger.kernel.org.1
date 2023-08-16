@@ -1,122 +1,165 @@
-Return-Path: <netdev+bounces-28250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B5777EC4C
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:56:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9DE77EC63
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:58:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13E3B281C8B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:56:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05DE4281CDA
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAFBF1AA73;
-	Wed, 16 Aug 2023 21:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B511AA76;
+	Wed, 16 Aug 2023 21:58:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBA215AE5
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:56:15 +0000 (UTC)
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4EB2713;
-	Wed, 16 Aug 2023 14:56:13 -0700 (PDT)
-Received: from pps.filterd (m0150241.ppops.net [127.0.0.1])
-	by mx0a-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37GK9ce8019826;
-	Wed, 16 Aug 2023 21:55:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : subject :
- date : message-id : in-reply-to : references; s=pps0720;
- bh=dk5k6u/sI9iN3+yUtFn5EJMT5UPXLcBIp9iFZkAqb9E=;
- b=YZ0DnxWy+ZnU+0Fo1y/Q8C2sePjaKkyTGDl+JKpU6f5M2AqsEV9GzSsVbCIn+KQp7g9k
- sknaewy0R0uK/7Jrsl/YTPTAKDo1lzxOTImzfe6zvMVCFTannHGW1kwLAploe6AH3Fog
- m5HHFQuRb2hVxAf7TdLGeOUlJOY8GnoeXa9mVejSIAVSCCNoqXLIpJ1AWvEkCRNMxc9i
- 29lSj/DL2isZjsVsa33my/H9ddy0CqVR9osEmxprHRu3U1FHTUtGhsDnEGutlPIHN45K
- RW9d3re/TGbaTTl2ddmXpBk+VdOjM4aNXto0bUuem17s2r4Q5y9lTyWFoDwu6+piL9UE wg== 
-Received: from p1lg14880.it.hpe.com ([16.230.97.201])
-	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3sh5880w89-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Aug 2023 21:55:49 +0000
-Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 0276D80171B;
-	Wed, 16 Aug 2023 21:55:49 +0000 (UTC)
-Received: from hpe.com (unknown [16.231.227.39])
-	by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 2A0CD80BA10;
-	Wed, 16 Aug 2023 21:55:48 +0000 (UTC)
-From: nick.hawkins@hpe.com
-To: christophe.jaillet@wanadoo.fr, simon.horman@corigine.com, andrew@lunn.ch,
-        verdun@hpe.com, nick.hawkins@hpe.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 5/5] MAINTAINERS: HPE: Add GXP UMAC Networking Files
-Date: Wed, 16 Aug 2023 16:52:20 -0500
-Message-Id: <20230816215220.114118-6-nick.hawkins@hpe.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230816215220.114118-1-nick.hawkins@hpe.com>
-References: <20230816215220.114118-1-nick.hawkins@hpe.com>
-X-Proofpoint-GUID: 8w6JR2cMxvQC3w6ckR4Y1JqMgnQZTf4Y
-X-Proofpoint-ORIG-GUID: 8w6JR2cMxvQC3w6ckR4Y1JqMgnQZTf4Y
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-16_19,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=957 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 clxscore=1015
- impostorscore=0 suspectscore=0 phishscore=0 mlxscore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308160195
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8833D60
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:58:11 +0000 (UTC)
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2057.outbound.protection.outlook.com [40.107.102.57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAF12D50
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:57:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cDzq97HgTlkI6cjv0e9dOUoCjJMgzL6Y3V9Lt57r5Etx+/c124PM2HPjfJ5tRkSp4FFyxTL0i7DfWOHdfXHHRdlRityVhJr3V6pgeiw9ZlCwfJcxuovTU0v6wXwth7W5Dz+Tv6Qy353eFS57WG1JYYi629lRV011SdsiBITYLjBbv3J1KnpoBI/NQ9oFlLhxGucbN3iqmKw+LxqdUzxSg3Xu++TuGVePY3XLupDw14wOzdWnb8va5LM4mG3Kqsk1nlOIUgeJi/mVKwiq/pux7uTwX7FWM6nTzpvQlqw9XzoBeSYPtySRhZu3BDzInrfIIaztL+vU9r48/mwpsWP4ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BEvOm6VZGIJ9jB1eQ3iGjYYRDwEsSryRdxnR0A4sjk0=;
+ b=ANk+Jfihuab3lbu9QYKyRlyZAriakfazHAt4f6F5uVeATELc2Mdcbr45cuMm6cjNpDFShL9rH+zQ2p71ibS7pXjEc7Cq6juTgtFyD5t0NqanglVjehLEu2DcSwtw7JiUnIWT367nCJNUcwTr6vZ1SDCWk73zDUaki1NQfnIMfGPhzm8/cn3WEHXePQfOrEn45ff9qyZ6BfRaYki/VZrFe7nzNmSyf9MGAoO4mnN2nU6rdcWohAkQZDIkJR1wAnpRjdNY74BnaMFzRzD6BB83p7xvqFtFzlfy+AWguLElMOs9lIrft7VYO2ncVA/53TsNuVYWOEdpPGqLPuLHyZoEdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BEvOm6VZGIJ9jB1eQ3iGjYYRDwEsSryRdxnR0A4sjk0=;
+ b=ULq9ILT/EJXb1+c2xTBlrt6TfrxXr9jxs692ksjcC38C9s1d8O+Q2/HQjp1f4DEIA+w8IRMbSWvE4ioGDEfdXfBcnKgD6urZ0lMJYgZrQg2hwcJ7m6IzVz6fXcTdMVIMJbIegdrIqo8Y/8pNz/t4nMzruPOsgUdp+krZLewP9LP+y2Nf46JeNWLAymFfbEsa+TVjhcvDKuas/nskO5lEjKp67SiRqpBjbCnpmHLngdcscmmJ/ldHQ3LikAa1H301ffu0bsmBRwgDdJp/sHohraMsct+7XsutDWMZrxsnnGvWfQRQbGMsjbFl9CDcDI+KXxtIFQauV+Wbx6qbRgmeyA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by BL0PR12MB4866.namprd12.prod.outlook.com (2603:10b6:208:1cf::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.29; Wed, 16 Aug
+ 2023 21:57:35 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::900c:af3b:6dbd:505f]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::900c:af3b:6dbd:505f%5]) with mapi id 15.20.6678.029; Wed, 16 Aug 2023
+ 21:57:34 +0000
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Gal Pressman <gal@nvidia.com>,  Bar Shapira <bshapira@nvidia.com>,
+  Vadim Fedorenko <vadim.fedorenko@linux.dev>,  Saeed Mahameed
+ <saeedm@nvidia.com>,  Jakub Kicinski <kuba@kernel.org>,  Richard Cochran
+ <richardcochran@gmail.com>,  <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] Revert "net/mlx5: Update cyclecounter shift value
+ to improve ptp free running mode precision"
+References: <20230815151507.3028503-1-vadfed@meta.com>
+	<875y5gl01k.fsf@nvidia.com>
+Date: Wed, 16 Aug 2023 14:57:26 -0700
+In-Reply-To: <875y5gl01k.fsf@nvidia.com> (Rahul Rameshbabu's message of "Tue,
+	15 Aug 2023 09:53:27 -0700")
+Message-ID: <87zg2qhcqh.fsf@nvidia.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR11CA0074.namprd11.prod.outlook.com
+ (2603:10b6:a03:f4::15) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|BL0PR12MB4866:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2173ae0-84c7-44ea-a485-08db9ea3cc0b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	XkP9+YEijldQ2cc357ln/cg6YqFgE92NU6ceNcG/ge/6xMCjmZfTNYGK/+RWQfbl5EFz0Kisqq0zESTlD0Jzpm3J9d8bViDZMP+p/Or7C2p13wFxT2Ft/K7CklqhILVFtKiCSq37UPtJJ0HmgYdg35oppKv4pTyqyhbUd0TzKb02tPYgZNj34sn51Ou/7PCXjXUaKr9esNCEG9Wn3o6++fDZO35dEqKfGmmx7IlAdgKTn0nAOCEBXYBWmHyubZvaKWsaB5bW+ilgZvAw8iC+ZOgd+aTBFkrSzWlKNmyE9LdTlKZmMlFY8FlsLwh7qwX5GN/3w6BbFVzVJ8vwq9c5EEVrGiSkDIMitLhWgF76n/AVaPXjfAT4ic2y3pCDwqPIfhXv41DWuHqK68IWdlC75ZAIM37H+ZvdvM3r4I249TFegb7qJGxwTeZ/E8OT9eLvv++kHGLKShfsJSfIcW+MpUPm6NSFc+SElBpm9kNaXAoPsNLyTRgXfE9vPRQ4bvnZYP1A55Sqo5Agv+/jKi6AD+p8kTi4eZaWXmVezeWJgSLtff+S/9/KBqf2H6pPGMtR
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(346002)(366004)(376002)(451199024)(1800799009)(186009)(316002)(54906003)(6916009)(66946007)(66556008)(66476007)(5660300002)(41300700001)(38100700002)(8676002)(4326008)(8936002)(66899024)(2906002)(15650500001)(83380400001)(26005)(478600001)(86362001)(6512007)(36756003)(6506007)(6666004)(6486002)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?55SulnSVEU4aDhibzad9G3HBGKe3dDWozyKnmyGi6x6j9ISW3JmW1BZhL130?=
+ =?us-ascii?Q?rCSybcMinYDbTafn1rKv+ykhoFG1mwKFBEQ2ucPtEhpnW/pY47QNJfK60yRP?=
+ =?us-ascii?Q?iYciWUKDisXBeXp8u3l0dBAq4MSKMH1D5jNspCyDizixcSZJjzkAyMKtjXyk?=
+ =?us-ascii?Q?llNQQ0ZLRDoSjplG/pOLNiWLmZsCMU638M/FmLgDkBgBaF6iW5reT48F3GNL?=
+ =?us-ascii?Q?lz8/Yuo8+de0Zmn/w82MJ9YMMdAsTomCVgISMRz3R2PU1d+lGCgXbmU+KTUS?=
+ =?us-ascii?Q?b0ADPpKxjlwqkXOw1jThQ/UCuvTPlDWkjzTykB0FiwWQlA8nQnZQZ1hBZgKL?=
+ =?us-ascii?Q?Ym9Qewa3KIu5M7InVxCGf6hGq3qAxQZfwULfIgPdA5Ksts3wO503hU9mVxsZ?=
+ =?us-ascii?Q?RFUZDJLDrWOypXAz/d86uefUODRFPBgZwUGx1gpQl7YBMipx3Zoiq6jyhMw8?=
+ =?us-ascii?Q?HJwNyjrX9j39uxXiqiteXJZOWVIREbKDho7QkKduLwafJuNVcTPeJIhO7yH7?=
+ =?us-ascii?Q?USCm0cQEMqPwPB92TC+6PN5/fi2Meg58NnL6aTzG/pJLkw7nLmsE4ZVfOJqC?=
+ =?us-ascii?Q?V0ImvQNbHWdLjwXPekBB7ATbf3cFz0A3oQ021RRUTFvxiwDUcOstNrNZDkTu?=
+ =?us-ascii?Q?MP+VLFHfTlEMS3M1J7NsDtwoI8OQIDH5UFoL1i0K1pSyQxZW6oWWZM6jfYNi?=
+ =?us-ascii?Q?xtlOmCdZWxixTdwwPKcmnGL3s6VMlPRKL248+2jZpZxUW7NFFQRrybmEddrV?=
+ =?us-ascii?Q?qXMWgiUdk2+ggTdx76vKByhsxSpeiZPzMXcoRCOgGpl9P509TQ+ts5vGieFq?=
+ =?us-ascii?Q?nkcqMNoEpN7gUrPqekOe2beFrTgHFVBPjlOXq8arshUYvqKr5JSAiaf4OUKU?=
+ =?us-ascii?Q?tfsnWEzXWAQqv0k42Erfi+qo418kqY+1/HRMXthD1NI9nDoDyC2DcaW+rqPa?=
+ =?us-ascii?Q?PZC6R61s+EGqnRCJ7I0RFys8SuBDfrRJkjZow17cKzB9wWn/9oA4WIM9PYur?=
+ =?us-ascii?Q?ix0hEftaGdb+rQabAaYw4xDqkNTzlL5Nj5hCPBS+oUYru/1fy8+Jyy/qgUKs?=
+ =?us-ascii?Q?9Y2rpblYzjMI2ew4XVH3YPBHFsha5PEwfTEH8ShJOK+1G6/YSbb5TnhxNhYV?=
+ =?us-ascii?Q?Mktzd+5DPoGOKAfDbc3a6PU9jAJ3siUv/1tLaAdaVs/Bljizg7zuM10D/WqF?=
+ =?us-ascii?Q?/wbcCZ2Zn29hrrbb9NBvRkrQpqRuiUVsJ3WnO2wSQn0knJbis/n3VN4+PXDT?=
+ =?us-ascii?Q?51+QxjKiFfwFRDuch8un1qxVg9xOrwuciNcUgYMR77HhCulb3d3n8TKF8Q84?=
+ =?us-ascii?Q?l3XL90lldvC6IRxluQck6z4KaE4O59bogseMRT47rlTh5NDCb8aCdnR05LIW?=
+ =?us-ascii?Q?J1tIVcSmEXIOF2Vl/fINrT/2xkc//iV+CSBB7s+1JkPr0Mi/3OenAxXwh4bE?=
+ =?us-ascii?Q?k3ec3PTf/ARcUC0hvUumZik18ZXfixHngMVXp8g1orTrRN04KmQ30FolXJRf?=
+ =?us-ascii?Q?Es2QbrxuUAitNo3q4HPDA5inQIOKNMtkbh9oAo96TnGvpqgvT8FjqLJNK2sk?=
+ =?us-ascii?Q?fhU1rL7Ugux5f83mS1EJckglf/n2ErX2q1TgaSI5aOT7szm/haE3zj35/uWq?=
+ =?us-ascii?Q?Dw=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2173ae0-84c7-44ea-a485-08db9ea3cc0b
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 21:57:34.4992
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: f7q33zzRlGlc7qqu4FsthamRaOZ7HbH3B0L4Wb6hBEH0/sjmSlAspaCqyho1HbC3YlRBUhbY1T44kjwQ/JoEHQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4866
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Nick Hawkins <nick.hawkins@hpe.com>
+On Tue, 15 Aug, 2023 09:53:27 -0700 Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
+> On Tue, 15 Aug, 2023 08:15:07 -0700 Vadim Fedorenko <vadfed@meta.com> wrote:
+>> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>
+>> This reverts commit 6a40109275626267ebf413ceda81c64719b5c431.
+>>
+>> There was an assumption in the original commit that all the devices
+>> supported by mlx5 advertise 1GHz as an internal timer frequency.
+>> Apparently at least ConnectX-4 Lx (MCX4431N-GCAN) provides 156.250Mhz
+>> as an internal frequency and the original commit breaks PTP
+>> synchronization on these cards.
+>>
+>> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> ---
+>
+> I agree with this revert. This change was made with the assumption that
+> all mlx5 compatible devices were running a 1Ghz internal timer. Will
+> sync with folks internally about how we can support higher precision
+> free running mode while accounting for the different device timer clock
+> speeds.
 
-List the files added for supporting the UMAC networking on GXP.
+I have prepared a patch that resolves the issue of selecting a valid
+shift constant based on the device frequency. The patch includes logic
+for picking the optimal shift constant for PTP frequency adjustment
+based on the device frequency. I have tested this against a variety of
+mlx5 devices and believe this solution would be ideal. I expect this
+patch to make its way to the mailing list by the end of the week.
 
-Signed-off-by: Nick Hawkins <nick.hawkins@hpe.com>
+--
+Thanks,
 
----
-v3:
- *No change
-v2:
- *Changed dt-binding net directory files to "hpe,gxp*"
----
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 27ef11624748..c0bb534bec97 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2243,6 +2243,7 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/arm/hpe,gxp.yaml
- F:	Documentation/devicetree/bindings/hwmon/hpe,gxp-fan-ctrl.yaml
- F:	Documentation/devicetree/bindings/i2c/hpe,gxp-i2c.yaml
-+F:	Documentation/devicetree/bindings/net/hpe,gxp*
- F:	Documentation/devicetree/bindings/spi/hpe,gxp-spifi.yaml
- F:	Documentation/devicetree/bindings/timer/hpe,gxp-timer.yaml
- F:	Documentation/hwmon/gxp-fan-ctrl.rst
-@@ -2252,6 +2253,7 @@ F:	arch/arm/mach-hpe/
- F:	drivers/clocksource/timer-gxp.c
- F:	drivers/hwmon/gxp-fan-ctrl.c
- F:	drivers/i2c/busses/i2c-gxp.c
-+F:	drivers/net/ethernet/hpe/
- F:	drivers/spi/spi-gxp.c
- F:	drivers/watchdog/gxp-wdt.c
- 
--- 
-2.17.1
-
+Rahul Rameshbabu
 
