@@ -1,44 +1,46 @@
-Return-Path: <netdev+bounces-28098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8863977E3A0
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:32:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C1A77E3A8
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4390B281AC1
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:32:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AA39281B02
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1403E107AA;
-	Wed, 16 Aug 2023 14:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF66A10961;
+	Wed, 16 Aug 2023 14:33:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3AA1079B
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:32:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F59FC433C7;
-	Wed, 16 Aug 2023 14:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8667F1079B
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:33:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDBBDC433C7;
+	Wed, 16 Aug 2023 14:33:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692196374;
-	bh=yz3mExc/Khw1bsByECExMmkjKVdaFcBkmberfyUhEi8=;
+	s=k20201202; t=1692196418;
+	bh=uBcRHsMTUoYVy2HBvf3JZKX9X9ZqfUDAJoCf9LSgY4o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pP60Lj0c3VxgEMvc1mPT6UhQR9MIJCwdiXXKZNUCUU+vSQvS/yIngU4xFbO6q5ULG
-	 1KMZEMLQGCTVTClpxcoyt3isxBH7+JmVpEpL4smmSegpYidqxn1RS+L7cc2V3bZF8o
-	 EtzbbxSDLqyPk2aBdvzPcJoNE69J1Udyzj0sEwQli+Fnlb+u6hR1E9VRRm52hhm+bS
-	 PWGEeyso7vKauNDoRgOPhRH9U3pfjk0WAkWS1ohYaAaifA1oceKiMEl8ogAtatNu9Z
-	 fgbKa72sW0NduqFGqtcOEeQ+MKdj3MLI7911/fEVYyp5dblDLfm9/AP7HUwFKQ7KI9
-	 ay//1UKCXbIgQ==
-Date: Wed, 16 Aug 2023 17:32:50 +0300
+	b=c+OGP/VbzXjXdrHswwh+/ZMzRMfZH70glJ3aHxAIl8BVDlkmq9cKSTtEEdSSFDMMt
+	 Tggi+SCGBQ0qYOfEtv05Y5xeTn1gdMy0DNElJMPDSHjWy8EIiQqToWIz+QBXUOczCV
+	 2eTF1WGoZkCqf9mOJZnWFrJ83rv4ovjx0qm7sI/KVadm8QAfIPFuiQjaV+G1BLZMJh
+	 D8od7XFusuqarcQ8y2kiVV1C5Uuze2TkoFORmGk9C942NDo/D8790SE9ur6u8lnkQG
+	 Y4EHBmpXBZnCiPag0gk2nhUeZNPUf9buvJzXTVlXF1yqb7Ecj8IUTVrUzrH6pkiSA4
+	 clzw1OAvO4hlA==
+Date: Wed, 16 Aug 2023 17:33:34 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH -next] net: dm9051: Use PTR_ERR_OR_ZERO() to simplify code
-Message-ID: <20230816143250.GY22185@unreal>
-References: <20230816090722.2308686-1-ruanjinjie@huawei.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alexander.duyck@gmail.com, xiaoning.wang@nxp.com,
+	shenwei.wang@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-imx@nxp.com
+Subject: Re: [PATCH net-next] net: fec: use napi_consume_skb() in
+ fec_enet_tx_queue()
+Message-ID: <20230816143334.GZ22185@unreal>
+References: <20230816090242.463822-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,18 +49,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230816090722.2308686-1-ruanjinjie@huawei.com>
+In-Reply-To: <20230816090242.463822-1-wei.fang@nxp.com>
 
-On Wed, Aug 16, 2023 at 05:07:22PM +0800, Ruan Jinjie wrote:
-> Return PTR_ERR_OR_ZERO() instead of return 0 or PTR_ERR() to
-> simplify code.
+On Wed, Aug 16, 2023 at 05:02:42PM +0800, Wei Fang wrote:
+> Now that the "budget" is passed into fec_enet_tx_queue(), one
+> optimization we can do is to use napi_consume_skb() to instead
+> of dev_kfree_skb_any().
 > 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Suggested-by: Alexander H Duyck <alexander.duyck@gmail.com>
 > ---
->  drivers/net/ethernet/davicom/dm9051.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-
-Patch subject needs to be [PATCH net-next] ....
+>  drivers/net/ethernet/freescale/fec_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
 Thanks,
 Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
