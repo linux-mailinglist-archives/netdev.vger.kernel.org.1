@@ -1,162 +1,169 @@
-Return-Path: <netdev+bounces-28186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368DE77E959
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:08:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D6777E99D
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4162B1C21193
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 19:08:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9340D1C2111B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 19:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D998217720;
-	Wed, 16 Aug 2023 19:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE5817734;
+	Wed, 16 Aug 2023 19:25:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB00214A80
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 19:08:00 +0000 (UTC)
-Received: from mail-pf1-f206.google.com (mail-pf1-f206.google.com [209.85.210.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60C4270A
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 12:07:58 -0700 (PDT)
-Received: by mail-pf1-f206.google.com with SMTP id d2e1a72fcca58-68877684da1so2225753b3a.1
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 12:07:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692212878; x=1692817678;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE8714A80
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 19:25:49 +0000 (UTC)
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F49270C;
+	Wed, 16 Aug 2023 12:25:44 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6887480109bso1574492b3a.0;
+        Wed, 16 Aug 2023 12:25:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692213944; x=1692818744;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=AHdogJFRX/HOEOhf9V11ILn0TfaNRuouoGFxj473o8g=;
-        b=lehEfvMygeTTBMT85iF9neb0/oCXJIepYQ/B+C8KYVXak9cDvnIFV8fk5ZzU7zs1UX
-         hdLjDH+yPTnunmmieS3FjwQb3BYhPBqeOJcX88Vb16kS4eEnde46aLkYQkqafcXHfENv
-         eWZgKW1WTS8Oa5pEUTYlK+j0NJzhTP2TsB4bYf8iuRMAK/EJmL6KNHVaEfAz+oHK7wox
-         r5fXWrZlXYgWtXZkJ3kPUmAv8+5YDkc5t/vqrkVPBcRWSq+XtBxgAVlaNCnnt5Cs6kA7
-         95aNDw5xhGnSX3MlMYOSifsdNI1rRNIhJvt6U91MyoEY0b5YNhWXA1qeiXJR0o7Ji0ZE
-         lS5w==
-X-Gm-Message-State: AOJu0Yx10j2jPfh7kwYv9ZsAeEiIHmw4NFI3/KHUfx016y0x4yrlmg4Y
-	y9hFruxcI4nSesr/3z5EyKJzFO4bREnDPJLb1bGSXzDcjnBq
-X-Google-Smtp-Source: AGHT+IHm/XS7DTLDnrzjhY3z868q0DeHF6IzSL0Ky5sCqQBvZCrA2lQnzYp6z3kkoc2L91nN0HxlkHp6ueSr6nMPU2+WOfunmXtp
+        bh=28lfdjuTNMCB2eFA7fWe/9KsZNdFPJBbWSQw/BHguRo=;
+        b=FXSe4iUTtT9IahcwX4Ui5pY3P85oMKTnLulhPl5tg9n6g/J5MzP2m1xU2JuoWWGgoY
+         d5HVnhhS3a2kTtNXw8mDaXRLwk11EmrmhKPYKNwZqsqJSpUWSRv/Spxi8p823Ry59S4M
+         hyvBc8UVlbaWZaDJWIsStulIk3HetFDTgiekajpx2mIdcig+Srif/Qrl0cyHUO10ysJq
+         9WZFBHhD6+VsntL6P4lKUritxzreITh3k5LG2FhkllGRCrAY7jORaZT6SCXCvtEwfZbf
+         akr62eLAKnSTrmzv6gWiQ1bupKijDNj019geOYwJd9UTMd4hsihf8MiBaLGDphCacUYo
+         Ppxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692213944; x=1692818744;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=28lfdjuTNMCB2eFA7fWe/9KsZNdFPJBbWSQw/BHguRo=;
+        b=LyY8kAvGSkN9oJx5TRArioKyY9JIgHouREG39X65aTMVdyAUxGhbPDEb3IHyV4DDVz
+         RMhYhIsBXe03VOpHH5LTrkgNbYh0kY6tIcnej40PFZWwPeO0g0owH7rjHAtpmfeQijbV
+         bmixmS8jgAktEeXZBpca2YDgfjXunSdoWvIduemzNbFJDKIjX32pc26EcJlT523gHgPq
+         7O5yi0pAp/tkzBCnGfBK5XtmAYXrf5LcDA/LS5xUYjbwv9ZUgRnKWUF731lloCJxI1BZ
+         kGV0Q02vykvgPf3b3g3ywLEkhMjCaoixlMirHMtPDVq6JDTJzJeszcgoqjpXuBKOeCgR
+         AXLQ==
+X-Gm-Message-State: AOJu0Yyma3pbJBWBbsvRb9QCn6lSJWJkXfsUEiAKd/222tzUpSWaotDa
+	+OGE990HTfy7bVvzLMYHi5M=
+X-Google-Smtp-Source: AGHT+IEi8dquvGw2J9dL3nqK6MeFQvttyfZsPsAS83u2sVGyOD6RctVJkC7mHmXdoz+lvI+3K6qi9Q==
+X-Received: by 2002:a05:6a21:7888:b0:140:f6c4:aa71 with SMTP id bf8-20020a056a21788800b00140f6c4aa71mr4214128pzc.8.1692213944029;
+        Wed, 16 Aug 2023 12:25:44 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id e12-20020a63ae4c000000b0055b44a901absm6344482pgp.70.2023.08.16.12.25.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 12:25:43 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Wed, 16 Aug 2023 12:25:42 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, gospo@broadcom.com,
+	Jean Delvare <jdelvare@suse.com>, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH net-next 11/12] bnxt_en: Expose threshold temperatures
+ through hwmon
+Message-ID: <d6e093d7-0ff3-4545-9ff8-1c342879fe40@roeck-us.net>
+References: <20230815045658.80494-1-michael.chan@broadcom.com>
+ <20230815045658.80494-12-michael.chan@broadcom.com>
+ <c6f3a05e-f75c-4051-8892-1c2dee2804b0@roeck-us.net>
+ <CAH-L+nM4MvWODLcApzFB1Xjr4dauii+pBErOZ=frT+eiP8PgVg@mail.gmail.com>
+ <3d70325b-6b6a-482f-8745-36aceb6b2818@roeck-us.net>
+ <CAH-L+nMSZUtDcG9qFSLMJ7ZGDNz91cp+nw0Le7yoxeMkQg9qyA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:22cb:b0:687:3110:7faa with SMTP id
- f11-20020a056a0022cb00b0068731107faamr1326078pfj.5.1692212878133; Wed, 16 Aug
- 2023 12:07:58 -0700 (PDT)
-Date: Wed, 16 Aug 2023 12:07:57 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007c506006030f0332@google.com>
-Subject: [syzbot] [net?] WARNING in dev_index_reserve
-From: syzbot <syzbot+5ba06978f34abb058571@syzkaller.appspotmail.com>
-To: ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	davem@davemloft.net, edumazet@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH-L+nMSZUtDcG9qFSLMJ7ZGDNz91cp+nw0Le7yoxeMkQg9qyA@mail.gmail.com>
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Wed, Aug 16, 2023 at 09:42:17PM +0530, Kalesh Anakkur Purayil wrote:
+> On Wed, Aug 16, 2023 at 5:43 PM Guenter Roeck <linux@roeck-us.net> wrote:
+> 
+> > On Wed, Aug 16, 2023 at 03:58:34PM +0530, Kalesh Anakkur Purayil wrote:
+> > > Thank you Guenter for the review and the suggestions.
+> > >
+> > > Please see my response inline.
+> > >
+> > > On Tue, Aug 15, 2023 at 8:35 PM Guenter Roeck <linux@roeck-us.net>
+> > wrote:
+> > >
+> > [ ... ]
+> >
+> > > >
+> > > > Hmm, that isn't really the purpose of alarm attributes. The expectation
+> > > > would be that the chip sets alarm flags and the driver reports it.
+> > > > I guess there is some value in having it, so I won't object.
+> > > >
+> > > > Anyway, the ordering is wrong. max_alarm should be the lowest
+> > > > alarm level, followed by crit and emergency. So
+> > > >                 max_alarm -> temp >= bp->warn_thresh_temp
+> > > >                 crit_alarm -> temp >= bp->crit_thresh_temp
+> > > >                 emergency_alarm -> temp >= bp->fatal_thresh_temp
+> > > >                                 or temp >= bp->shutdown_thresh_temp
+> > > >
+> > > > There are only three levels of upper temperature alarms.
+> > > > Abusing lcrit as 4th upper alarm is most definitely wrong.
+> > > >
+> > > [Kalesh]: Thank you for the clarification.
+> > > bnxt_en driver wants to expose 4 threshold temperatures to the user
+> > through
+> > > hwmon sysfs.
+> > > 1. warning threshold temperature
+> > > 2. critical threshold temperature
+> > > 3. fatal threshold temperature
+> > > 4. shutdown threshold temperature
+> > >
+> > > I will use the following mapping:
+> > >
+> > > hwmon_temp_max : warning threshold temperature
+> > > hwmon_temp_crit : critical threshold temperature
+> > > hwmon_temp_emergency : fatal threshold temperature
+> > >
+> > > hwmon_temp_max_alarm : temp >= bp->warn_thresh_temp
+> > > hwmon_temp_crit_alarm : temp >= bp->crit_thresh_temp
+> > > hwmon_temp_emergency_alarm : temp >= bp->fatal_thresh_temp
+> > >
+> > > Is it OK to map the shutdown threshold temperature to "hwmon_temp_fault"?
+> >
+> > That is a flag, not a temperature, and it is intended to signal
+> > a problem ith the sensor.
+> >
+> > > If not, can you please suggest an alternative?
+> > >
+> >
+> > The only one I can think of is to add non-standard attributes
+> > such as temp1_shutdown and temp1_shutdown_alarm.
+> >
+> [Kalesh]: Sorry, I don't quite get this part. I was looking at the kernel
+> hwmon code, but could not find any reference.
+> 
 
-syzbot found the following issue on:
+It would be non-standard attributes, so, correct, there is no reference.
 
-HEAD commit:    950fe35831af Merge branch 'ipv6-expired-routes'
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=13158a4ba80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fe63ad15dded26b6
-dashboard link: https://syzkaller.appspot.com/bug?extid=5ba06978f34abb058571
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11be0117a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14950727a80000
+> Can we add new attributes "shutdown" and "shutdown_alarm" for tempX? For
+> example:
+> 
+> #define HWMON_T_SHUTDOWN BIT(hwmon_temp_shutdown)
+> 
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d3d4f3ce986f/disk-950fe358.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d5afd9c7f284/vmlinux-950fe358.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1a203c65f0ae/bzImage-950fe358.xz
+Not for a single driver. You can implement the sysfs attributes
+directly in the driver and pass an extra attribute group to the
+hwmon core when registering the hwmon device.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5ba06978f34abb058571@syzkaller.appspotmail.com
-
-netlink: 24 bytes leftover after parsing attributes in process `syz-executor252'.
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5027 at net/core/dev.c:9593 dev_index_reserve+0x1a2/0x1c0 net/core/dev.c:9593
-Modules linked in:
-CPU: 0 PID: 5027 Comm: syz-executor252 Not tainted 6.5.0-rc5-syzkaller-01605-g950fe35831af #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:dev_index_reserve+0x1a2/0x1c0 net/core/dev.c:9593
-Code: 00 31 d2 4d 8d 45 50 b9 ff ff ff 7f 48 8d 74 24 20 e8 f2 05 02 02 4c 89 e7 89 c3 e8 48 01 11 02 e9 48 ff ff ff e8 5e 1a 5e f9 <0f> 0b bb ea ff ff ff e9 52 ff ff ff e8 cd 4f 0d 02 66 66 2e 0f 1f
-RSP: 0018:ffffc90003a2efa8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 00000000ffffffff RCX: 0000000000000000
-RDX: ffff88807d940000 RSI: ffffffff88280632 RDI: 0000000000000005
-RBP: 1ffff92000745df5 R08: 0000000000000005 R09: 0000000000000000
-R10: 00000000ffffffff R11: ffffffff8a40008b R12: ffff88823bd20010
-R13: ffffffff924d1180 R14: ffff88823bd20000 R15: ffff88823bd200f8
-FS:  00005555573a0380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055feb9a33020 CR3: 000000001eaea000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- register_netdevice+0x69a/0x1490 net/core/dev.c:10081
- veth_newlink+0x521/0xa50 drivers/net/veth.c:1938
- rtnl_newlink_create net/core/rtnetlink.c:3471 [inline]
- __rtnl_newlink+0x115e/0x18c0 net/core/rtnetlink.c:3688
- rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3701
- rtnetlink_rcv_msg+0x439/0xd30 net/core/rtnetlink.c:6427
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x536/0x810 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:728 [inline]
- sock_sendmsg+0xd9/0x180 net/socket.c:751
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2514
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2568
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2597
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7ff9080bb329
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc3ff5b078 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffc3ff5b248 RCX: 00007ff9080bb329
-RDX: 0000000000000000 RSI: 0000000020000040 RDI: 0000000000000003
-RBP: 00007ff90812e610 R08: 0000000000000000 R09: 00007ffc3ff5b248
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffc3ff5b238 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Guenter
 
