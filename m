@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-27875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD8677D80E
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:01:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD8177D80F
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:01:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47277281578
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:01:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01ABD1C203A8
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017311C01;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4F91C06;
 	Wed, 16 Aug 2023 02:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCD017E8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78D917FA
 	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 888A8C433CC;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69EAFC433C8;
 	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1692151223;
-	bh=/SivyJg8L6IR/Depj/t+YI1jAL7OVWimX+0Y3ciOitI=;
+	bh=NjdvKGLWlMm7qpdjzpjXl///wrEx0Ff//txitn47H6E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HoHHqUSN72uGtTeAaxsXXiAJnXHu18/C1a7kcmlmGPJvkOM1eo+FGYfN1R1Qs0dnB
-	 N3rvXM8HvY+vmHAOJMa2U9bFsWRWmZbQTrW0W4kz5IGNIx+l2vDEQJgqAEjNmjrCQR
-	 UM1bGxm+6W7ttums0RPEiqtLIwvfmWe1pjnZX3lm8Vf357FYnrKkQJODV7IdZegDr5
-	 PrNiM3GZqeVPTV8C4ny0u+jZVsb+feD1Thdvo+t8Qnn21GaFVIS1NvscTunEyztQz5
-	 ga0nvTbV2kH8AYgTgqn7R7DYNnUEe53Ub4a9pApc5DwMRLajDXUUpNXhqlbUwrTKFC
-	 G5S7F7hNxsKGA==
+	b=n4WmCbWX27u+ZIh/p0eXrmuek2LsQQdNPS0U/QI/6cWhLa2g9/rVxXAaQ0oa9RHRY
+	 GoSi/cj3OWEY3pqR5zI1CxgzCuufiZHHCL5gC/6ckxkfTMKilg5UHqHQuQ+7EXvF/w
+	 CqgroMJYG/7eX4hyZ+TrWpb4JqUKleVFpBrF9OmiI6NWNIens27z5MKQZPT9mxN/Pv
+	 IIuFjXYsUoCd7FtKuTYjr1chLocxIgXDWgQ4+B45xDf2u4YQE9jeXdoTnUfa0Oqk7W
+	 sZ4SHJXAJgE9vqLH6VDUY6oODnA2oAeOy/laAwhZeIUwuPIrgqSS8tgmufCIpju5+U
+	 KmkxsPxRH+g+w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6B29EC395C5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 53D55C39562;
 	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,41 +41,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: phy: mediatek-ge-soc: support PHY LEDs
+Subject: Re: [net-next v2 0/2] seg6: add NEXT-C-SID support for SRv6 End.X
+ behavior
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169215122343.15326.15132582167017916301.git-patchwork-notify@kernel.org>
+ <169215122333.15326.393610409728204600.git-patchwork-notify@kernel.org>
 Date: Wed, 16 Aug 2023 02:00:23 +0000
-References: <dc324d48c00cd7350f3a506eaa785324cae97372.1691977904.git.daniel@makrotopia.org>
-In-Reply-To: <dc324d48c00cd7350f3a506eaa785324cae97372.1691977904.git.daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: dqfext@gmail.com, SkyLake.Huang@mediatek.com, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20230812180926.16689-1-andrea.mayer@uniroma2.it>
+In-Reply-To: <20230812180926.16689-1-andrea.mayer@uniroma2.it>
+To: Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, shuah@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stefano.salsano@uniroma2.it,
+ paolo.lungaroni@uniroma2.it, ahabdels.dev@gmail.com, liuhangbin@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 14 Aug 2023 02:58:14 +0100 you wrote:
-> Implement netdev trigger and primitive bliking offloading as well as
-> simple set_brigthness function for both PHY LEDs of the in-SoC PHYs
-> found in MT7981 and MT7988.
+On Sat, 12 Aug 2023 20:09:24 +0200 you wrote:
+> In the Segment Routing (SR) architecture a list of instructions, called
+> segments, can be added to the packet headers to influence the forwarding and
+> processing of the packets in an SR enabled network.
 > 
-> For MT7988, read boottrap register and apply LED polarities accordingly
-> to get uniform behavior from all LEDs on MT7988.
-> This requires syscon phandle 'mediatek,pio' present in parenting MDIO bus
-> which should point to the syscon holding the boottrap register.
+> Considering the Segment Routing over IPv6 data plane (SRv6) [1], the segment
+> identifiers (SIDs) are IPv6 addresses (128 bits) and the segment list (SID
+> List) is carried in the Segment Routing Header (SRH). A segment may correspond
+> to a "behavior" that is executed by a node when the packet is received.
+> The Linux kernel currently supports a large subset of the behaviors described
+> in [2] (e.g., End, End.X, End.T and so on).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3] net: phy: mediatek-ge-soc: support PHY LEDs
-    https://git.kernel.org/netdev/net-next/c/c66937b0f8db
+  - [net-next,v2,1/2] seg6: add NEXT-C-SID support for SRv6 End.X behavior
+    https://git.kernel.org/netdev/net-next/c/7458575a07f1
+  - [net-next,v2,2/2] selftests: seg6: add selftest for NEXT-C-SID flavor in SRv6 End.X behavior
+    https://git.kernel.org/netdev/net-next/c/1c53717c8074
 
 You are awesome, thank you!
 -- 
