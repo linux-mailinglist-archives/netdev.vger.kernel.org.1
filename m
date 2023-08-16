@@ -1,159 +1,140 @@
-Return-Path: <netdev+bounces-28153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59DB77E68D
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:37:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6520977E697
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98A5F281B3C
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:37:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B7C11C21159
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D55010944;
-	Wed, 16 Aug 2023 16:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B1F1095F;
+	Wed, 16 Aug 2023 16:40:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FFD20E7
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:37:55 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473BD30EF;
-	Wed, 16 Aug 2023 09:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692203835; x=1723739835;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9UeH/chb7IQAwSssem/J/NF0SyQa1tgGe+NbjTKigpA=;
-  b=VF7tA2+TiHstkCrMg1n3e+8coMpF2iCcLR5vL3iVsLkFngqn3QPIY3Vb
-   0srclCOenzIjqEsiyxt9pQtS1pobGhe5HsrlMUu8+//TijnQtB6+KFj6s
-   MHJIWpgNUicIjOBnurmH/tqjHuOn69rAqOxwoIxKPxEj/5btEQ+57M3kK
-   0HhrhzRccJcwDcqt6mvkFFBap1jYd8YLVF6NICH1xi1Z+2yi8dIwCMtRY
-   sA86Es3VBPMEDJvMEEeqv0Pmebyv82XiO/7lUPtF6v5dBgoiQEKXjbGIQ
-   yLFlBSCjXAW0gBAncM969XIO8U7EaT40RebmWWry134QD7weyiq89iDeo
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="438931550"
-X-IronPort-AV: E=Sophos;i="6.01,177,1684825200"; 
-   d="scan'208";a="438931550"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 09:36:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="734289393"
-X-IronPort-AV: E=Sophos;i="6.01,177,1684825200"; 
-   d="scan'208";a="734289393"
-Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 16 Aug 2023 09:36:04 -0700
-Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qWJV5-0000RR-3B;
-	Wed, 16 Aug 2023 16:36:03 +0000
-Date: Thu, 17 Aug 2023 00:35:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	linux-hardening@vger.kernel.org, Steven Zou <steven.zou@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net-next v3 1/7] overflow: add DEFINE_FLEX() for on-stack
- allocs
-Message-ID: <202308170000.YqabIR9D-lkp@intel.com>
-References: <20230816140623.452869-2-przemyslaw.kitszel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9B32F52
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:40:07 +0000 (UTC)
+X-Greylist: delayed 401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 16 Aug 2023 09:40:03 PDT
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F2A3E4C
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:40:03 -0700 (PDT)
+Received: from kero.packetmixer.de (p200300fa272a67000Bb2D6Dcaf57D46e.dip0.t-ipconnect.de [IPv6:2003:fa:272a:6700:bb2:d6dc:af57:d46e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 81DBFFB5C2;
+	Wed, 16 Aug 2023 18:40:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
+	s=09092022; t=1692204001; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=I+eNQQSjj0fLqG+BSXaidpJmTR8Z/e+0zb1hTzjHxqM=;
+	b=Ymb+qXUCe/EpQCfCzLD60gxk9l9FBltIJdqEG1j0Q7+8r41cyUJPTn3jZJY0PJ5dAVApB3
+	bN7++gO+szqeYk4bJdDJosSebRarW4W/pxH4OpoEH4qgv+u7dxfqmSJOuu4CNicI+CkIMQ
+	SKiZuMmzTCUjJf6byAAw0iP9DBtoNv5pgH/c9ql2KxOJDqk8MPhftvPjZX+8Lh2zpMmRj7
+	wEJpoiVh1mbjaiyeNdOx0+oZOCfmIxtEcGjT0eF7T8jut+soaOu3gmbBPCBvwCeUm2qXzN
+	ps2/1l7FhpyKdL1p+vl+BKnu091kyTvoLEXw/Ie7poQ50RbALiOSdCrd3D3GHA==
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: kuba@kernel.org,
+	davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH 0/7] pull request for net-next: batman-adv 2023-08-16
+Date: Wed, 16 Aug 2023 18:39:53 +0200
+Message-Id: <20230816164000.190884-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230816140623.452869-2-przemyslaw.kitszel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=simonwunderlich.de; s=09092022; t=1692204001;
+	h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=I+eNQQSjj0fLqG+BSXaidpJmTR8Z/e+0zb1hTzjHxqM=;
+	b=ps4xuiNxZY+wGGy9p0uQd6t0RuOKMyhua+3vMXc4VzB86bpFX5TUENVufo7xXNirc1L78E
+	119FDLiEBG/bWOaoBZ4RF2PkNMatZMuZayOuNlr2yEyxMwZTQi9YRgu+tFX8HQXRBn6BW0
+	29yMN+kY91PPg3ID2YLx+1bNd8n2e7rTgxT4fo7rxkJT7GqCRq/UV8SWbWkDAFnuU0elYQ
+	T8VcLRfDRQGlyHPBh1+fww9Goo4dJYL22K0pOaYFu0gm8fIzoZOLsM9biohLtHn/S3Ig4F
+	7xEDF5nMkWxIrP8RLFwd/dSNYbWoGUGPPy419cLNfyWMPBRIeiW0Jz0buzLmrA==
+ARC-Seal: i=1; s=09092022; d=simonwunderlich.de; t=1692204001; a=rsa-sha256;
+	cv=none;
+	b=P+7j+XEL5cTgQM5CkLn64UVNnipyBjxTxAaZMIZ38zsY32s9vxmXonkM9sleXcYdVDRWxBJN3y8TfH9wCgkwdG2vvIHqLvhZHCYNeMwfElc4auPh8wLXYnE987dGLsMpSC+jMAMxRp9PvZ9KAA4pw2B2vyX3r7GeeoBvMZWVHwWLXnybVB6l5CZlYo1HLya33/37DnQ/fRxsuy5mexsZyUvTbvTE9JUzlS1v0nRpLECAQeniu2ARo5yyRqrj10rXkIjXSow/IjhT8+jkSU48qQB1LDfcekojUxgavxblLVqaaaWPS8phd/71tQChJYxT3tlEAFn+q+gLBlu7M2X10A==
+ARC-Authentication-Results: i=1;
+	mail.simonwunderlich.de;
+	auth=pass smtp.auth=sw@simonwunderlich.de smtp.mailfrom=sw@simonwunderlich.de
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Przemek,
+Hi Jakub, hi David,
 
-kernel test robot noticed the following build errors:
+here is a cleanup pull request of batman-adv to go into net-next.
 
-[auto build test ERROR on 479b322ee6feaff612285a0e7f22c022e8cd84eb]
+Please pull or let me know of any problem!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Przemek-Kitszel/overflow-add-DEFINE_FLEX-for-on-stack-allocs/20230816-221402
-base:   479b322ee6feaff612285a0e7f22c022e8cd84eb
-patch link:    https://lore.kernel.org/r/20230816140623.452869-2-przemyslaw.kitszel%40intel.com
-patch subject: [PATCH net-next v3 1/7] overflow: add DEFINE_FLEX() for on-stack allocs
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20230817/202308170000.YqabIR9D-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20230817/202308170000.YqabIR9D-lkp@intel.com/reproduce)
+Thank you,
+      Simon
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308170000.YqabIR9D-lkp@intel.com/
+The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
 
-All errors (new ones prefixed by >>):
+  Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
 
->> thread 'main' panicked at '"ftrace_branch_data_union_(anonymous_at_include/linux/compiler_types_h_144_2)" is not a valid Ident', /opt/cross/rustc-1.68.2-bindgen-0.56.0/cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.24/src/fallback.rs:693:9
-   stack backtrace:
-      0: rust_begin_unwind
-                at /rustc/9eb3afe9ebe9c7d2b84b71002d44f4a0edac95e0/library/std/src/panicking.rs:575:5
-      1: core::panicking::panic_fmt
-                at /rustc/9eb3afe9ebe9c7d2b84b71002d44f4a0edac95e0/library/core/src/panicking.rs:64:14
-      2: proc_macro2::fallback::Ident::_new
-      3: proc_macro2::Ident::new
-      4: bindgen::ir::context::BindgenContext::rust_ident
-      5: <bindgen::ir::comp::CompInfo as bindgen::codegen::CodeGenerator>::codegen
-      6: <bindgen::ir::ty::Type as bindgen::codegen::CodeGenerator>::codegen
-      7: <bindgen::ir::item::Item as bindgen::codegen::CodeGenerator>::codegen
-      8: <bindgen::ir::comp::CompInfo as bindgen::codegen::CodeGenerator>::codegen
-      9: <bindgen::ir::ty::Type as bindgen::codegen::CodeGenerator>::codegen
-     10: <bindgen::ir::item::Item as bindgen::codegen::CodeGenerator>::codegen
-     11: <bindgen::ir::module::Module as bindgen::codegen::CodeGenerator>::codegen
-     12: <bindgen::ir::item::Item as bindgen::codegen::CodeGenerator>::codegen
-     13: bindgen::ir::context::BindgenContext::gen
-     14: bindgen::Builder::generate
-     15: bindgen::main
-   note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
-   make[3]: *** [rust/Makefile:316: rust/uapi/uapi_generated.rs] Error 1
-   make[3]: *** Deleting file 'rust/uapi/uapi_generated.rs'
->> thread 'main' panicked at '"ftrace_branch_data_union_(anonymous_at_include/linux/compiler_types_h_144_2)" is not a valid Ident', /opt/cross/rustc-1.68.2-bindgen-0.56.0/cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-1.0.24/src/fallback.rs:693:9
-   stack backtrace:
-      0: rust_begin_unwind
-                at /rustc/9eb3afe9ebe9c7d2b84b71002d44f4a0edac95e0/library/std/src/panicking.rs:575:5
-      1: core::panicking::panic_fmt
-                at /rustc/9eb3afe9ebe9c7d2b84b71002d44f4a0edac95e0/library/core/src/panicking.rs:64:14
-      2: proc_macro2::fallback::Ident::_new
-      3: proc_macro2::Ident::new
-      4: bindgen::ir::context::BindgenContext::rust_ident
-      5: <bindgen::ir::comp::CompInfo as bindgen::codegen::CodeGenerator>::codegen
-      6: <bindgen::ir::ty::Type as bindgen::codegen::CodeGenerator>::codegen
-      7: <bindgen::ir::item::Item as bindgen::codegen::CodeGenerator>::codegen
-      8: <bindgen::ir::comp::CompInfo as bindgen::codegen::CodeGenerator>::codegen
-      9: <bindgen::ir::ty::Type as bindgen::codegen::CodeGenerator>::codegen
-     10: <bindgen::ir::item::Item as bindgen::codegen::CodeGenerator>::codegen
-     11: <bindgen::ir::module::Module as bindgen::codegen::CodeGenerator>::codegen
-     12: <bindgen::ir::item::Item as bindgen::codegen::CodeGenerator>::codegen
-     13: bindgen::ir::context::BindgenContext::gen
-     14: bindgen::Builder::generate
-     15: bindgen::main
-   note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
-   make[3]: *** [rust/Makefile:310: rust/bindings/bindings_generated.rs] Error 1
-   make[3]: *** Deleting file 'rust/bindings/bindings_generated.rs'
-   make[3]: Target 'rust/' not remade because of errors.
-   make[2]: *** [Makefile:1293: prepare] Error 2
-   make[1]: *** [Makefile:234: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:234: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+are available in the Git repository at:
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+  git://git.open-mesh.org/linux-merge.git tags/batadv-next-pullrequest-20230816
+
+for you to fetch changes up to 6f96d46f9a1ad1c02589b598c56ea881094129d8:
+
+  batman-adv: Drop per algo GW section class code (2023-08-14 18:01:21 +0200)
+
+----------------------------------------------------------------
+This cleanup patchset includes the following patches:
+
+ - bump version strings, by Simon Wunderlich
+
+ - Remove unused declarations, by Yue Haibing
+
+ - Clean up MTU handling, by Sven Eckelmann (2 patches)
+
+ - Clean up/remove (obsolete) functions, by Sven Eckelmann (3 patches)
+
+----------------------------------------------------------------
+Simon Wunderlich (1):
+      batman-adv: Start new development cycle
+
+Sven Eckelmann (5):
+      batman-adv: Avoid magic value for minimum MTU
+      batman-adv: Check hardif MTU against runtime MTU
+      batman-adv: Drop unused function batadv_gw_bandwidth_set
+      batman-adv: Keep batadv_netlink_notify_* static
+      batman-adv: Drop per algo GW section class code
+
+YueHaibing (1):
+      batman-adv: Remove unused declarations
+
+ net/batman-adv/bat_iv_ogm.c     |   1 +
+ net/batman-adv/bat_v.c          |  23 +-----
+ net/batman-adv/gateway_common.c | 162 +---------------------------------------
+ net/batman-adv/gateway_common.h |   7 --
+ net/batman-adv/hard-interface.c |  20 +++--
+ net/batman-adv/main.h           |   2 +-
+ net/batman-adv/netlink.c        |  15 ++--
+ net/batman-adv/netlink.h        |   6 --
+ net/batman-adv/routing.h        |   4 -
+ net/batman-adv/soft-interface.c |   2 +-
+ net/batman-adv/types.h          |   7 +-
+ 11 files changed, 28 insertions(+), 221 deletions(-)
 
