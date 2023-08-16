@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-27987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 243C177DD0E
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:14:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 245EC77DD10
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1CEE2816E6
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:14:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD59428189B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 09:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16701D53E;
-	Wed, 16 Aug 2023 09:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB39ED53F;
+	Wed, 16 Aug 2023 09:15:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0FAD539
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:14:46 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4FB1BF8
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:14:44 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3fe5695b180so57229795e9.2
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:14:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA24D53B
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:15:18 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E1E1BF8
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:15:17 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fe4cdb727cso64036585e9.0
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:15:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1692177283; x=1692782083;
+        d=tessares.net; s=google; t=1692177315; x=1692782115;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gVjWTBs70Hhob2JngnOgWWlZPi+W3BKkqOlo2nsVcvA=;
-        b=NXwXxzJFs7UvjLDEj+9sYcQCf/k+Zhf9EMbSGSdgOiS2KRABgbgRlcsTrEvhWZMMrJ
-         VZenX3vhPzGTCJkKdQ7uqDC83AJwsOk2+5jK8goITyDGJcO84tmJpLUy3i5Aily8ctvf
-         KmYwLKGZTqG9gt/PRvpPNrrXZ8hM/j+dy+LCT3IvnNVLFIdUzeOy99D6k/Y8AlE2jsxd
-         JnTkruv8jdcykrQ8TLXPS7oqFdxDLO+SYFbwDhQfhEaj90f83cXaLh7fyYCmzCaPF4x/
-         RHs2dZJyN5sdMma3udTV52q1n916CwUImYJGP57f/9Ev+2nAO5tQh5qQ2r6NvDenrwNo
-         FyGw==
+        bh=hVGddNtd/d4roBKWzuBEz2idKjWPRCM/rZpnruAEw/w=;
+        b=II+yN+zzlQpWFhDFnxde7Xpl0KO9ZX/SO1hOLTeB+RTPAtnt4fE/ZLIKyP7jZ67bAc
+         QASrKJNhB6Jnszky+ofLcirhId+cZC1rna4WjDiwhPqYNw4MMITgJBwxsSkxFmg5cPPH
+         vTm51eP+RSmzwCKbIU9/oXVQA8iLKNgLXYmgEVovQF1HWpZfgMY4QKYuqBAwLHpEu7Yp
+         8dBwiLzkXG2Dy1j9PPiYW713aCHezihcWn5nlfinwA8QxOQ0ADb4d/Xd5G/2zMZvq8Bv
+         FKQ/tZIUoPP78X0Sdpv62WkbAI4En+2lzAqF9BE+dU5JPTOuuw7yEFYOZHHPx2ZYshNv
+         yseg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692177283; x=1692782083;
+        d=1e100.net; s=20221208; t=1692177315; x=1692782115;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gVjWTBs70Hhob2JngnOgWWlZPi+W3BKkqOlo2nsVcvA=;
-        b=CBshgylQob+LBI5IhFUnh691klLM1UNWgqT6CrLgm9tUFawyd/1/rYiiIDKnj0rgTv
-         Dck1zuyqhY/DdcHy2dciefm+x4p78lzTsimNsw7Ln+Nv5/x/+sWpyqdeFc69bZoDlKL3
-         0mE9bJn3BT/muT64N4A0pwJn0CNlrWe12dM0D8QTCxdiffE5gL39zeQuhIRXz0RTBy2I
-         K1OhcNmOfUNkgR1pZOHty/TaXr/j82VguSxJpRYoGJDZUATAh7bqj3VAX36zdkw3Hhrh
-         1ftNzkUzKCfEqFO3FGyt6m6bwGTO0ZUzVIpe7yOCcDfl/4Qf6qXpL/ia5vfmFgzsFHwI
-         S/Lg==
-X-Gm-Message-State: AOJu0YxJyrNyAu5vE9y62hjguncEWCrrPUdqPoZXDh6Lh45Mc8GPyNn1
-	QLLUHhK4QWRf4rlZibAtNSTqWbc08Vx8wboUALA=
-X-Google-Smtp-Source: AGHT+IFm7ZZd+d+khKhc3L+1yJ0Sf6lv2AhGafE4UHL1w+aRKxbU78uBVlljnJrfS8F7sy4AigNjCQ==
-X-Received: by 2002:a05:600c:214f:b0:3fe:266f:fe28 with SMTP id v15-20020a05600c214f00b003fe266ffe28mr889662wml.14.1692177282681;
-        Wed, 16 Aug 2023 02:14:42 -0700 (PDT)
+        bh=hVGddNtd/d4roBKWzuBEz2idKjWPRCM/rZpnruAEw/w=;
+        b=ZG5NhLDdJtgBB9fQxRW1gb23wpySIdnHYNsmkCRDkeKfuXyAqSXQqEZCaUkcOpY28Y
+         CdIgv+EQjBcMjn7SLXQJml2XKcDt7gqZREMw81O7AmDl2Dz0biIFXlN0J0tLjpf1Nk2x
+         ZEz5TiaBnJROt7+f+9Yk6/NyGVmWUhQUR884DxLFdR2bLg13cVNukrdrgpvqprTZm2ve
+         cNAASp30rD6dHSKHmJuCPytSpe1W/17QxfllCZogszxoR7DZV0UeYkkdpnHDERBIQ7tO
+         KqQ15eZR1lLjuogZJWXSg3GzfWIGp7ELoBSFzLX24/JOh8C2qK5FMHZHGEEUf4WQl/AZ
+         uHaw==
+X-Gm-Message-State: AOJu0YzORP61hqDIuFfvghx+ivwZ83TBrbXQv8TQbS3Em3yMkGrGf5JV
+	aVcMBV22D8m7mwG3jrCvaEvxXvrKuZA/cKRXBjA=
+X-Google-Smtp-Source: AGHT+IFYOiTUOTWdP8a8/unHcPR/AEI8WOzRpbHfe5ubWgNk75hcXLAOv2kFSDyehbLKxbv6sThdWw==
+X-Received: by 2002:a1c:750a:0:b0:3fd:2d35:b96a with SMTP id o10-20020a1c750a000000b003fd2d35b96amr946381wmc.39.1692177315742;
+        Wed, 16 Aug 2023 02:15:15 -0700 (PDT)
 Received: from ?IPV6:2a02:578:8593:1200:8c09:b284:9ea1:cfb8? ([2a02:578:8593:1200:8c09:b284:9ea1:cfb8])
-        by smtp.gmail.com with ESMTPSA id y10-20020a1c4b0a000000b003fe2f3a89d4sm20563400wma.7.2023.08.16.02.14.40
+        by smtp.gmail.com with ESMTPSA id y10-20020a1c4b0a000000b003fe2f3a89d4sm20563400wma.7.2023.08.16.02.15.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Aug 2023 02:14:42 -0700 (PDT)
-Message-ID: <73bae72c-e706-4cb6-9836-64de560d4525@tessares.net>
-Date: Wed, 16 Aug 2023 11:14:33 +0200
+        Wed, 16 Aug 2023 02:15:15 -0700 (PDT)
+Message-ID: <2bc75e20-da61-4dbe-9cc5-fe87860c94d0@tessares.net>
+Date: Wed, 16 Aug 2023 11:15:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 05/15] inet: move inet->freebind to
+Subject: Re: [PATCH v4 net-next 09/15] inet: move inet->transparent to
  inet->inet_flags
 Content-Language: en-GB
 To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
@@ -76,7 +76,7 @@ Cc: Simon Horman <simon.horman@corigine.com>,
  eric.dumazet@gmail.com, Simon Horman <horms@kernel.org>,
  MPTCP Upstream <mptcp@lists.linux.dev>
 References: <20230816081547.1272409-1-edumazet@google.com>
- <20230816081547.1272409-6-edumazet@google.com>
+ <20230816081547.1272409-10-edumazet@google.com>
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
 Autocrypt: addr=matthieu.baerts@tessares.net; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -121,11 +121,11 @@ Autocrypt: addr=matthieu.baerts@tessares.net; keydata=
  xV1U0s853l+uo6+anPRWEUCU1ONTVXLQKe7FfcAznUnx2l03IbRLysAOHoLwAoIM59Sy2mrb
  z/qhNpC/tBl2B7Qljp2CXMYqcKL/Oyanb7XDnn1+vPj4gLuP+KC8kZfgoMMpSzSaWV3wna7a
  wFe/sIbF3NCgdrOXNVsV7t924dsAGZjP1x59Ck7vAMT9
-In-Reply-To: <20230816081547.1272409-6-edumazet@google.com>
+In-Reply-To: <20230816081547.1272409-10-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -136,74 +136,40 @@ Hi Eric,
 (+ Cc MPTCP ML)
 
 On 16/08/2023 10:15, Eric Dumazet wrote:
-> IP_FREEBIND socket option can now be set/read
+> IP_TRANSPARENT socket option can now be set/read
 > without locking the socket.
+> 
+> v2: removed unused issk variable in mptcp_setsockopt_sol_ip_set_transparent()
+> v4: rebased after commit 3f326a821b99 ("mptcp: change the mpc check helper to return a sk")
 
-Good idea, thank you for these modifications!
+Sorry for that, I didn't see your series sent to netdev was conflicting
+with the one for MPTCP I sent in parallel.
 
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Paolo Abeni <pabeni@redhat.com>
 > Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 > Reviewed-by: Simon Horman <horms@kernel.org>
 > ---
->  include/net/inet_sock.h  |  5 +++--
->  include/net/ipv6.h       |  3 ++-
->  net/ipv4/inet_diag.c     |  2 +-
->  net/ipv4/ip_sockglue.c   | 21 +++++++++------------
->  net/ipv6/ipv6_sockglue.c |  4 ++--
+>  include/net/inet_sock.h       |  6 +++---
+>  include/net/ipv6.h            |  2 +-
+>  include/net/route.h           |  2 +-
+>  include/net/tcp.h             |  2 +-
+>  net/ipv4/inet_diag.c          |  2 +-
+>  net/ipv4/inet_timewait_sock.c |  2 +-
+>  net/ipv4/ip_sockglue.c        | 28 +++++++++++++---------------
+>  net/ipv4/tcp_input.c          |  2 +-
+>  net/ipv4/tcp_minisocks.c      |  3 +--
+>  net/ipv6/ipv6_sockglue.c      |  4 ++--
 
 The modifications in MPTCP code...
 
->  net/mptcp/sockopt.c      |  7 ++++---
-... looks good to me!
+>  net/mptcp/sockopt.c           | 11 +++++------
+
+... look good to me!
 
 Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 
->  net/sctp/protocol.c      |  2 +-
->  7 files changed, 22 insertions(+), 22 deletions(-)
-
-(...)
-
-> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-> index 21bc46acbe38ee638a2111d717b158caa317d867..ffbe2f5f5b44c3aaf588eb4b8fb3e3594bf2f71c 100644
-> --- a/net/mptcp/sockopt.c
-> +++ b/net/mptcp/sockopt.c
-> @@ -419,7 +419,8 @@ static int mptcp_setsockopt_v6(struct mptcp_sock *msk, int optname,
->  			inet_sk(sk)->transparent = inet_sk(ssk)->transparent;
->  			break;
->  		case IPV6_FREEBIND:
-> -			inet_sk(sk)->freebind = inet_sk(ssk)->freebind;
-> +			inet_assign_bit(FREEBIND, sk,
-> +					inet_test_bit(FREEBIND, ssk));
->  			break;
->  		}
->  
-> @@ -704,7 +705,7 @@ static int mptcp_setsockopt_sol_ip_set_transparent(struct mptcp_sock *msk, int o
->  
->  	switch (optname) {
->  	case IP_FREEBIND:
-> -		issk->freebind = inet_sk(sk)->freebind;
-> +		inet_assign_bit(FREEBIND, ssk, inet_test_bit(FREEBIND, sk));
->  		break;
->  	case IP_TRANSPARENT:
->  		issk->transparent = inet_sk(sk)->transparent;
-
-FYI, we are looking at simplifying this not to modify these bits
-directly but rather calling tcp_setsockopt() on the different subflows,
-e.g.:
-
-https://patchwork.kernel.org/project/mptcp/patch/20230707-mptcp-unify-sockopt-issue-353-v1-5-693e15c06646@tessares.net/
-
-But the series this patch is from is not ready yet.
-
-> @@ -1441,7 +1442,7 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
->  	__tcp_sock_set_nodelay(ssk, !!msk->nodelay);
->  
->  	inet_sk(ssk)->transparent = inet_sk(sk)->transparent;
-> -	inet_sk(ssk)->freebind = inet_sk(sk)->freebind;
-> +	inet_assign_bit(FREEBIND, ssk, inet_test_bit(FREEBIND, sk));
->  }
->  
->  static void __mptcp_sockopt_sync(struct mptcp_sock *msk, struct sock *ssk)
+>  11 files changed, 30 insertions(+), 34 deletions(-)
 
 Cheers,
 Matt
