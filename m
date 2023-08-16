@@ -1,60 +1,39 @@
-Return-Path: <netdev+bounces-27865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF79E77D7E6
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 03:57:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADF6477D6E4
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F89C28168A
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 01:57:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EE65281680
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 00:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BC1A50;
-	Wed, 16 Aug 2023 01:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096A418E;
+	Wed, 16 Aug 2023 00:10:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E291385
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:57:19 +0000 (UTC)
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8AB2129;
-	Tue, 15 Aug 2023 18:57:16 -0700 (PDT)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 01EA612206;
-	Wed, 16 Aug 2023 04:57:15 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id DEFEA12205;
-	Wed, 16 Aug 2023 04:57:14 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 79BC73C07D0;
-	Wed, 16 Aug 2023 04:57:08 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1692151028; bh=YazX7hVaynCeD2nwGa3M0l3D0RDVSOrt/lYw/EJ1QRo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eZLapMqeEf+5uOZxUXQugARRBsrR51Ljy0Es5RuwTZ+zKzXcv/H8adOcEBdf2UsOO
-	 rxofGphD6tVPrVZG/xlQKA4egEJTuPJpkmt6kHxsngt+W1VLLvzPyBPGxlIaNinytA
-	 F24zNmmgLR5aRHcSIXuqDa0MpNk50ImRfDMjQRlU=
-Received: from ja.home.ssi.bg (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 37FHWIOo168669;
-	Tue, 15 Aug 2023 20:32:18 +0300
-Received: (from root@localhost)
-	by ja.home.ssi.bg (8.17.1/8.17.1/Submit) id 37FHWIZd168668;
-	Tue, 15 Aug 2023 20:32:18 +0300
-From: Julian Anastasov <ja@ssi.bg>
-To: Simon Horman <horms@verge.net.au>
-Cc: lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        netdev@vger.kernel.org, "Paul E . McKenney" <paulmck@kernel.org>,
-        rcu@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
-        Jiejian Wu <jiejian@linux.alibaba.com>,
-        Jiri Wiesner <jwiesner@suse.de>
-Subject: [PATCH RFC net-next 14/14] ipvs: add conn_lfactor and svc_lfactor sysctl vars
-Date: Tue, 15 Aug 2023 20:30:31 +0300
-Message-ID: <20230815173031.168344-15-ja@ssi.bg>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230815173031.168344-1-ja@ssi.bg>
-References: <20230815173031.168344-1-ja@ssi.bg>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4B017E
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 00:10:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D08CC433CA;
+	Wed, 16 Aug 2023 00:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692144628;
+	bh=LCVFsQO/jpBt8rbDuqXrAfRyw1i3D+P14bNEY5FvpM4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cIpKD2BuiaCwsDNNSPVJS8WiT0PDFnXV3EVj/dZOxfpuQdqhbP9Ttj8iGhErsyQQs
+	 oUflIVL/d2aedTB/djln7n5zrpw9eByWdQghqFGYJ4uPFHzdA23AOMFTk0I8kHEKcT
+	 RUS/Gsw3vLl0LCepWWlaRGG7QayA6vyK3Y8tm6xvN5ahHZG78CiQhBt/If8spPPm3R
+	 SJaDMaCqXJCWtVSCbnTBcqpRncnNKyooJplDextwR+hVwIER4w4vWbEdJQxawX+lqT
+	 hVlGZlSKps+U9aWZlxYaoNskZWy/z8Upd2MRdt27Fbs7AexNNVW0+39rmM4WNUfTW7
+	 sUFv4jygQ0rLw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E802EC691E1;
+	Wed, 16 Aug 2023 00:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,169 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: pull request: bluetooth-next 2023-08-11
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <169214462793.26309.7033762932004317499.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Aug 2023 00:10:27 +0000
+References: <20230811192256.1988031-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230811192256.1988031-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-Allow the default load factor for the connection and service tables
-to be configured.
+Hello:
 
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
----
- Documentation/networking/ipvs-sysctl.rst | 31 ++++++++++
- net/netfilter/ipvs/ip_vs_ctl.c           | 72 ++++++++++++++++++++++++
- 2 files changed, 103 insertions(+)
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/Documentation/networking/ipvs-sysctl.rst b/Documentation/networking/ipvs-sysctl.rst
-index 3fb5fa142eef..61fdc0ec4c39 100644
---- a/Documentation/networking/ipvs-sysctl.rst
-+++ b/Documentation/networking/ipvs-sysctl.rst
-@@ -29,6 +29,28 @@ backup_only - BOOLEAN
- 	If set, disable the director function while the server is
- 	in backup mode to avoid packet loops for DR/TUN methods.
- 
-+conn_lfactor - INTEGER
-+	4 - default
-+	Valid range: -8 (smaller table) .. 8 (larger table)
-+
-+	Controls the sizing of the connection hash table based on the
-+	load factor (number of connections per table buckets).
-+	As result, the table grows if load increases and shrinks when
-+	load decreases in the range of 2^8 - 2^conn_tab_bits (module
-+	parameter).
-+	The value is a shift count where positive values select
-+	buckets = (connection hash nodes << value) while negative
-+	values select buckets = (connection hash nodes >> value). The
-+	positive values reduce the collisions and reduce the time for
-+	lookups but increase the table size. Negative values will
-+	tolerate load above 100% when using smaller table is
-+	preferred. If using NAT connections consider increasing the
-+	value with one because they add two nodes in the hash table.
-+
-+	Example:
-+	4: grow if load goes above 6% (buckets = nodes * 16)
-+	-2: grow if load goes above 400% (buckets = nodes / 4)
-+
- conn_reuse_mode - INTEGER
- 	1 - default
- 
-@@ -219,6 +241,15 @@ secure_tcp - INTEGER
- 	The value definition is the same as that of drop_entry and
- 	drop_packet.
- 
-+svc_lfactor - INTEGER
-+	3 - default
-+	Valid range: -8 (smaller table) .. 8 (larger table)
-+
-+	Controls the sizing of the service hash table based on the
-+	load factor (number of services per table buckets). The table
-+	will grow and shrink in the range of 2^4 - 2^20.
-+	See conn_lfactor for explanation.
-+
- sync_threshold - vector of 2 INTEGERs: sync_threshold, sync_period
- 	default 3 50
- 
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 5b2a5e3bf309..ca21f4c64a45 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -2427,6 +2427,60 @@ static int ipvs_proc_run_estimation(struct ctl_table *table, int write,
- 	return ret;
- }
- 
-+static int ipvs_proc_conn_lfactor(struct ctl_table *table, int write,
-+				  void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct netns_ipvs *ipvs = table->extra2;
-+	int *valp = table->data;
-+	int val = *valp;
-+	int ret;
-+
-+	struct ctl_table tmp_table = {
-+		.data = &val,
-+		.maxlen = sizeof(int),
-+	};
-+
-+	ret = proc_dointvec(&tmp_table, write, buffer, lenp, ppos);
-+	if (write && ret >= 0) {
-+		if (val < -8 || val > 8) {
-+			ret = -EINVAL;
-+		} else {
-+			*valp = val;
-+			if (rcu_dereference_protected(ipvs->conn_tab, 1))
-+				mod_delayed_work(system_unbound_wq,
-+						 &ipvs->conn_resize_work, 0);
-+		}
-+	}
-+	return ret;
-+}
-+
-+static int ipvs_proc_svc_lfactor(struct ctl_table *table, int write,
-+				 void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct netns_ipvs *ipvs = table->extra2;
-+	int *valp = table->data;
-+	int val = *valp;
-+	int ret;
-+
-+	struct ctl_table tmp_table = {
-+		.data = &val,
-+		.maxlen = sizeof(int),
-+	};
-+
-+	ret = proc_dointvec(&tmp_table, write, buffer, lenp, ppos);
-+	if (write && ret >= 0) {
-+		if (val < -8 || val > 8) {
-+			ret = -EINVAL;
-+		} else {
-+			*valp = val;
-+			if (rcu_dereference_protected(ipvs->svc_table, 1))
-+				mod_delayed_work(system_unbound_wq,
-+						 &ipvs->svc_resize_work, 0);
-+		}
-+	}
-+	return ret;
-+}
-+
- /*
-  *	IPVS sysctl table (under the /proc/sys/net/ipv4/vs/)
-  *	Do not change order or insert new entries without
-@@ -2615,6 +2669,18 @@ static struct ctl_table vs_vars[] = {
- 		.mode		= 0644,
- 		.proc_handler	= ipvs_proc_est_nice,
- 	},
-+	{
-+		.procname	= "conn_lfactor",
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= ipvs_proc_conn_lfactor,
-+	},
-+	{
-+		.procname	= "svc_lfactor",
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= ipvs_proc_svc_lfactor,
-+	},
- #ifdef CONFIG_IP_VS_DEBUG
- 	{
- 		.procname	= "debug_level",
-@@ -4850,6 +4916,12 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
- 	tbl[idx].extra2 = ipvs;
- 	tbl[idx++].data = &ipvs->sysctl_est_nice;
- 
-+	tbl[idx].extra2 = ipvs;
-+	tbl[idx++].data = &ipvs->sysctl_conn_lfactor;
-+
-+	tbl[idx].extra2 = ipvs;
-+	tbl[idx++].data = &ipvs->sysctl_svc_lfactor;
-+
- #ifdef CONFIG_IP_VS_DEBUG
- 	/* Global sysctls must be ro in non-init netns */
- 	if (!net_eq(net, &init_net))
+On Fri, 11 Aug 2023 12:22:56 -0700 you wrote:
+> The following changes since commit 80f9ad046052509d0eee9b72e11d0e8ae31b665f:
+> 
+>   Merge branch 'rzn1-a5psw-vlan-port_bridge_flags' (2023-08-11 11:58:36 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-08-11
+> 
+> [...]
+
+Here is the summary with links:
+  - pull request: bluetooth-next 2023-08-11
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3d3829363bf7
+
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
