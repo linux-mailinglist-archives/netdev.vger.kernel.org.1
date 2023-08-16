@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-28236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E9377EB50
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:04:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4F9577EB51
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0006281C98
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:04:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AE811C2124B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BAE1BF0C;
-	Wed, 16 Aug 2023 21:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F5A1BEFC;
+	Wed, 16 Aug 2023 21:01:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729121BEFC
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:01:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FFC2C4339A;
-	Wed, 16 Aug 2023 21:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ED21BEEB
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:01:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BD29C433BB;
+	Wed, 16 Aug 2023 21:01:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692219666;
-	bh=4/MIB0upsVuKv9ZpV/ZfvtOckzD83c1l5nZHNp3cpH0=;
+	s=k20201202; t=1692219667;
+	bh=08e6l2sfmB84759b0qxju6mOBGxvdKx+biXIcWtKo4M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WHQTCPTz69grWn6A6hkh+d+TMovg9HxRNGJAM4E0am/9SCdEmCdztPBAbdedmgLK+
-	 lTnzSzhaZh0JP21yxqaltEHJJ10EWXqmvmH6h1TGnYPsDok+4hYPEducO1xFP19lPz
-	 CRFkKolTFwa5xrYQD7ypIjFOlpUebQWw0akgW1OZ00vok3b9uEhgGHbjYMBHtNf/ch
-	 fVmWF34O+4p3TMVFIkhZtYuFszTd3R9m6DBA9+xi72tsAKgI9HG/ClpAAAzSuwtXOD
-	 h/l/IrMY+05RG2TLNezZbNJVkcuxdrwy0PjNRg4QldVSFmWFo7R13hdE7ZQsw6h2KW
-	 9dA7+Ye2uqocw==
+	b=dVJcKUNarXxlg1buuOWB3ksZbTUeBHph6ylkJhlrhC48mNeopLQzKb9ittW3RVJwl
+	 VqzSW8up5EYjwGAIW+s8r7b2KaVYUxdq+DMsRh3xaRgJadyGzdFH+jrVtkr8K2thmZ
+	 SQfG4qP21Kfr9ip7kCOygLrN4TEG6Cim7BOPlWvpAo5M1cIFvtiHoL8Iy7l03Qm/8i
+	 S3jKilOxoCCJpDutQRrObobRRXqBnqqik6f3N1EUQwduFNbyyuUVkqWyZ4+iukEN6Y
+	 lMtT4mla6r8GSjjbRPriI8jpyVN6492iwk+e/s5k5KtkjzRu8DvW8qQLEtrmK/1oCX
+	 SWjJV1PwcDnnw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,9 +40,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Shay Drory <shayd@nvidia.com>
-Subject: [net-next 10/15] net/mlx5: Call mlx5_esw_offloads_rep_load/unload() for uplink port directly
-Date: Wed, 16 Aug 2023 14:00:44 -0700
-Message-ID: <20230816210049.54733-11-saeed@kernel.org>
+Subject: [net-next 11/15] net/mlx5: Remove VPORT_UPLINK handling from devlink_port.c
+Date: Wed, 16 Aug 2023 14:00:45 -0700
+Message-ID: <20230816210049.54733-12-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230816210049.54733-1-saeed@kernel.org>
 References: <20230816210049.54733-1-saeed@kernel.org>
@@ -56,85 +56,53 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-For uplink port, mlx5_esw_offloads_load/unload_rep() are currently
-called. There are 2 check inside, which effectively make the
-functions a simple wrappers of mlx5_esw_offloads_rep_load/unload()
-for uplink port. So avoid one check and indirection and call
-mlx5_esw_offloads_rep_load/unload() for uplink port directly.
+It is not possible that the functions in devlink_port.c are called for
+uplink port. Remove this leftover code.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/eswitch_offloads.c     | 20 ++++++++-----------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+ .../ethernet/mellanox/mlx5/core/esw/devlink_port.c   | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 46b8c60ac39a..c0b1b7b66cff 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -2542,11 +2542,9 @@ int mlx5_esw_offloads_load_rep(struct mlx5_eswitch *esw, u16 vport_num)
- 	if (esw->mode != MLX5_ESWITCH_OFFLOADS)
- 		return 0;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
+index 0313432d50a1..ccf8cdedeab4 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
+@@ -16,8 +16,7 @@ mlx5_esw_get_port_parent_id(struct mlx5_core_dev *dev, struct netdev_phys_item_i
  
--	if (vport_num != MLX5_VPORT_UPLINK) {
--		err = mlx5_esw_offloads_devlink_port_register(esw, vport_num);
--		if (err)
--			return err;
--	}
-+	err = mlx5_esw_offloads_devlink_port_register(esw, vport_num);
-+	if (err)
-+		return err;
- 
- 	err = mlx5_esw_offloads_rep_load(esw, vport_num);
- 	if (err)
-@@ -2554,8 +2552,7 @@ int mlx5_esw_offloads_load_rep(struct mlx5_eswitch *esw, u16 vport_num)
- 	return err;
- 
- load_err:
--	if (vport_num != MLX5_VPORT_UPLINK)
--		mlx5_esw_offloads_devlink_port_unregister(esw, vport_num);
-+	mlx5_esw_offloads_devlink_port_unregister(esw, vport_num);
- 	return err;
- }
- 
-@@ -2566,8 +2563,7 @@ void mlx5_esw_offloads_unload_rep(struct mlx5_eswitch *esw, u16 vport_num)
- 
- 	mlx5_esw_offloads_rep_unload(esw, vport_num);
- 
--	if (vport_num != MLX5_VPORT_UPLINK)
--		mlx5_esw_offloads_devlink_port_unregister(esw, vport_num);
-+	mlx5_esw_offloads_devlink_port_unregister(esw, vport_num);
- }
- 
- static int esw_set_slave_root_fdb(struct mlx5_core_dev *master,
-@@ -3471,7 +3467,7 @@ int esw_offloads_enable(struct mlx5_eswitch *esw)
- 			vport->info.link_state = MLX5_VPORT_ADMIN_STATE_DOWN;
- 
- 	/* Uplink vport rep must load first. */
--	err = mlx5_esw_offloads_load_rep(esw, MLX5_VPORT_UPLINK);
-+	err = mlx5_esw_offloads_rep_load(esw, MLX5_VPORT_UPLINK);
- 	if (err)
- 		goto err_uplink;
- 
-@@ -3482,7 +3478,7 @@ int esw_offloads_enable(struct mlx5_eswitch *esw)
- 	return 0;
- 
- err_vports:
--	mlx5_esw_offloads_unload_rep(esw, MLX5_VPORT_UPLINK);
-+	mlx5_esw_offloads_rep_unload(esw, MLX5_VPORT_UPLINK);
- err_uplink:
- 	esw_offloads_steering_cleanup(esw);
- err_steering_init:
-@@ -3520,7 +3516,7 @@ static int esw_offloads_stop(struct mlx5_eswitch *esw,
- void esw_offloads_disable(struct mlx5_eswitch *esw)
+ static bool mlx5_esw_devlink_port_supported(struct mlx5_eswitch *esw, u16 vport_num)
  {
- 	mlx5_eswitch_disable_pf_vf_vports(esw);
--	mlx5_esw_offloads_unload_rep(esw, MLX5_VPORT_UPLINK);
-+	mlx5_esw_offloads_rep_unload(esw, MLX5_VPORT_UPLINK);
- 	esw_set_passing_vport_metadata(esw, false);
- 	esw_offloads_steering_cleanup(esw);
- 	mapping_destroy(esw->offloads.reg_c0_obj_pool);
+-	return vport_num == MLX5_VPORT_UPLINK ||
+-	       (mlx5_core_is_ecpf(esw->dev) && vport_num == MLX5_VPORT_PF) ||
++	return (mlx5_core_is_ecpf(esw->dev) && vport_num == MLX5_VPORT_PF) ||
+ 	       mlx5_eswitch_is_vf_vport(esw, vport_num) ||
+ 	       mlx5_core_is_ec_vf_vport(esw->dev, vport_num);
+ }
+@@ -25,7 +24,6 @@ static bool mlx5_esw_devlink_port_supported(struct mlx5_eswitch *esw, u16 vport_
+ static struct devlink_port *mlx5_esw_dl_port_alloc(struct mlx5_eswitch *esw, u16 vport_num)
+ {
+ 	struct mlx5_core_dev *dev = esw->dev;
+-	struct devlink_port_attrs attrs = {};
+ 	struct netdev_phys_item_id ppid = {};
+ 	struct devlink_port *dl_port;
+ 	u32 controller_num = 0;
+@@ -42,13 +40,7 @@ static struct devlink_port *mlx5_esw_dl_port_alloc(struct mlx5_eswitch *esw, u16
+ 	if (external)
+ 		controller_num = dev->priv.eswitch->offloads.host_number + 1;
+ 
+-	if (vport_num == MLX5_VPORT_UPLINK) {
+-		attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
+-		attrs.phys.port_number = pfnum;
+-		memcpy(attrs.switch_id.id, ppid.id, ppid.id_len);
+-		attrs.switch_id.id_len = ppid.id_len;
+-		devlink_port_attrs_set(dl_port, &attrs);
+-	} else if (vport_num == MLX5_VPORT_PF) {
++	if (vport_num == MLX5_VPORT_PF) {
+ 		memcpy(dl_port->attrs.switch_id.id, ppid.id, ppid.id_len);
+ 		dl_port->attrs.switch_id.id_len = ppid.id_len;
+ 		devlink_port_attrs_pci_pf_set(dl_port, controller_num, pfnum, external);
 -- 
 2.41.0
 
