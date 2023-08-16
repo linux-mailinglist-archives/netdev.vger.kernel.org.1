@@ -1,148 +1,137 @@
-Return-Path: <netdev+bounces-28021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5915E77E001
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 13:09:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1E4077E009
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 13:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 204721C20D05
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:09:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6E5A1C20D35
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 11:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E1B101CE;
-	Wed, 16 Aug 2023 11:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A12C101D3;
+	Wed, 16 Aug 2023 11:13:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAD2DF6F
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 11:09:19 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FDD3B5
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 04:09:18 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-58d70c441d5so424957b3.2
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 04:09:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E84AD50B
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 11:13:37 +0000 (UTC)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3E0E40;
+	Wed, 16 Aug 2023 04:13:36 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-68706b39c4cso4621589b3a.2;
+        Wed, 16 Aug 2023 04:13:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692184158; x=1692788958;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=46MmpKCDeYPr+9gXsONMhrxsJist0H6yLChd8yUgMyU=;
-        b=OuuPQNbCg1QMqoM+zhRvoavtzRr1gThC4vkjQygT16D3DGb/0c4seiIBv1Omfh7K5o
-         Pgf1rgPccXu0+xiAL/VXjc9HJQ/5oobDCsEazHrGDat1Ez5SNDtoXuy0bjdyDtdX8Xoy
-         psQVSTt4fLhPlI/TJZqT3BwnrSackfz9LAXvA1/Dq1muCKZJ/MYMB3nB3YUOW98ax/25
-         pp5ARwZ8Vb3NOJwxLwaeOPT1gSTf0eDxYqEbRAEgfO3Zir0p1A7UCYg86HvO999/6VFG
-         wXCS5FyeeHbE5qZZH7Khr2IWNzHHEzFbmWP8+UC/r21TG4tVGWjw5Ykxri0SHEQuY8ZK
-         1GWA==
+        d=gmail.com; s=20221208; t=1692184415; x=1692789215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eSBjZcOTJy2eXVm/XkSIxwA5C0+XmtEjUZslwEUGHl0=;
+        b=KJ8rCY80WwxTbXcyh+gjS1GYyly+ntK9J2ynh3Qo7r6hatiwykn1YYxBq+htFiIYJo
+         t+YP9HTO+NlsfGLHVpYlVvHlMQzkfGZC2Jgqdid51TzG83A4npah8Q8x3Ve79yrvDGif
+         nDW8s4DKhO+zaenTAV3lefrJaBh/nwZrbxD9URJYUHGrxSBl2ilFWhdVNfqJ4eODkHx7
+         +zsIJZotay5aMpe92WZxDem8BN1ed7JTfaet+7ileJnrWfLpk28yK/1f1NZYwf8lBpHN
+         Og4pmzsJfjnNXQ1dWYLfVmJQPNh9OXJtI53GcCiV951sk1z7jbO/9gRuODrpLkvXqJfM
+         hjYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692184158; x=1692788958;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=46MmpKCDeYPr+9gXsONMhrxsJist0H6yLChd8yUgMyU=;
-        b=Wpnhz7qH4NBAaNvNf/nQSO95KXYhYuF23ir3fVZzPG6qJ4nZF4wrNi1ddqK/hqbnnJ
-         /WJYnyg8DLUAQrUFuDFMS8ma1hyIVF8001AGD4oaPzzfsBtE3sbGVTxtp935MCOvHoEQ
-         UkmSCj8QsvNIAltDUO1l4fEmj9b3otXsqpdlPVRXI2Cpbo7cAeLNQi6UqkHTP3S5BN//
-         Kpl9TeAs6V/dSQnxPSy8kL9Cflsw+QoUlYocz4r8zAIYaUc41hS8UO3h75O9HILGZrVb
-         p90AkiZNyJXymBtEZHwsxBa0SllVaqD81Hg3pcsGLts3268C44IXwEfQwBULnW1A+tOY
-         v+fQ==
-X-Gm-Message-State: AOJu0Yzp4qWs0Ev63S7T0eMaAoi2W/l/qupiS+0ZtCESxKmvzAkr05te
-	cqrN4is/gEUM2wpnwZFjltvBo/Skd07Rc65E53cPkg==
-X-Google-Smtp-Source: AGHT+IFOf9yihukhwPEIoe2yIyvvkSVRFkChdspISLy5wcP5WyiEhD3vlVy6EI6YHmvkr/EJUWXE7QOs4hTcdx48Fek=
-X-Received: by 2002:a0d:ca82:0:b0:576:916d:96b with SMTP id
- m124-20020a0dca82000000b00576916d096bmr1257470ywd.36.1692184157813; Wed, 16
- Aug 2023 04:09:17 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692184415; x=1692789215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eSBjZcOTJy2eXVm/XkSIxwA5C0+XmtEjUZslwEUGHl0=;
+        b=EjITisODL4KWuMR+1nVeawF9LoT1L2OZb2IVsEWJJBuMcZIcPGcRkIcLsxpzr9MEGr
+         tbayT0jrI9AhoPDFl5wZHDr5NINtA5MEoTrGHbtCVdyutu88ZkNx7xPRinTOasHRd31j
+         i465HKPFah80SlhXHNKYRCwUP4dLJ2Dd42VM/uOU6ipoX4XfMqTK1Zf+vA14lTTP6ObQ
+         aaCrpxZe2MgFLHoGJOhIqWIcf4OgmbCHurc3wPCXZztKHP63027sY3LPrKp4+R1swH32
+         kgIqKgUqbQTGUMMAB1s2NbJqd93ips3mJ7OjOgayN2TK9L6c/bwEL1TTul7cbNeSv1OJ
+         Uy3Q==
+X-Gm-Message-State: AOJu0YwGgs9+gos7jmOwSjZSwIGSVzpUfFNkmESTxYAcw5trX4TY7H1v
+	crEtmWwn2dWy3cs7Sdxt+6v7ZCw7AwN5GWqK
+X-Google-Smtp-Source: AGHT+IFWUErPVlP5682GLOgiwU48XugxogYfBtezH+idqJVmmax9mtxgiaR+BUBEuqNn6mi1UjRNJw==
+X-Received: by 2002:a05:6a00:399f:b0:686:2ad5:d11c with SMTP id fi31-20020a056a00399f00b006862ad5d11cmr1498244pfb.33.1692184414911;
+        Wed, 16 Aug 2023 04:13:34 -0700 (PDT)
+Received: from kelvin-ThinkPad-L14-Gen-1.. ([38.114.108.131])
+        by smtp.gmail.com with ESMTPSA id r8-20020a638f48000000b00563e1ef0491sm11750627pgn.8.2023.08.16.04.13.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 04:13:34 -0700 (PDT)
+From: Keguang Zhang <keguang.zhang@gmail.com>
+To: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lee Jones <lee@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+	Keguang Zhang <keguang.zhang@gmail.com>
+Subject: [PATCH v2 0/4] Move Loongson1 MAC arch-code to the driver dir
+Date: Wed, 16 Aug 2023 19:13:06 +0800
+Message-Id: <20230816111310.1656224-1-keguang.zhang@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230815162530.150994-1-jhs@mojatatu.com> <20230815162530.150994-4-jhs@mojatatu.com>
- <ZNyRsOB0nfqhZM1m@vergenet.net>
-In-Reply-To: <ZNyRsOB0nfqhZM1m@vergenet.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 16 Aug 2023 07:09:06 -0400
-Message-ID: <CAM0EoMnRkScQbp6eNDADZkOX-tgL__ZMcATwUyBQYnet8PzN8A@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 3/3] Introduce blockcast tc action
-To: Simon Horman <horms@kernel.org>
-Cc: jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
-	vladbu@nvidia.com, mleitner@redhat.com, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 5:07=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Tue, Aug 15, 2023 at 12:25:30PM -0400, Jamal Hadi Salim wrote:
-> > This action takes advantage of the presence of tc block ports set in th=
-e
-> > datapath and broadcast a packet to all ports on that set with exception=
- of
-> > the port in which it arrived on..
-> >
-> > Example usage:
-> >     $ tc qdisc add dev ens7 ingress block 22
-> >     $ tc qdisc add dev ens8 ingress block 22
-> >
-> > Now we can add a filter using the block index:
-> > $ tc filter add block 22 protocol ip pref 25 \
-> >   flower dst_ip 192.168.0.0/16 action blockcast
-> >
-> > Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> > Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> ...
->
-> > +//XXX: Refactor mirred code and reuse here before final version
-> > +static int cast_one(struct sk_buff *skb, const u32 ifindex)
-> > +{
-> > +     struct sk_buff *skb2 =3D skb;
-> > +     int retval =3D TC_ACT_PIPE;
-> > +     struct net_device *dev;
-> > +     unsigned int rec_level;
-> > +     bool expects_nh;
-> > +     int mac_len;
-> > +     bool at_nh;
-> > +     int err;
-> > +
-> > +     rec_level =3D __this_cpu_inc_return(redirect_rec_level);
-> > +     if (unlikely(rec_level > CAST_RECURSION_LIMIT)) {
-> > +             net_warn_ratelimited("blockcast: exceeded redirect recurs=
-ion limit on dev %s\n",
-> > +                                  netdev_name(skb->dev));
-> > +             __this_cpu_dec(redirect_rec_level);
-> > +             return TC_ACT_SHOT;
-> > +     }
-> > +
-> > +     dev =3D dev_get_by_index_rcu(dev_net(skb->dev), ifindex);
-> > +     if (unlikely(!dev)) {
-> > +             pr_notice_once("blockcast: target device %s is gone\n",
-> > +                            dev->name);
->
-> Hi Jamal,
->
-> This code is only executed if dev is NULL, but dev is dereferenced.
->
+In order to convert Loongson1 MAC platform devices to the devicetree
+nodes, Loongson1 MAC arch-code should be moved to the driver dir.
+Add dt-binding document and update MAINTAINERS file accordingly. 
+    
+In other words, this patchset is a preparation for converting
+Loongson1 platform devices to devicetree.
 
-good catch;-> Cutnpaste thing..
+Changelog
+V1 -> V2: Leave the Ethernet platform data for now
+          Make the syscon compatibles more specific
+          Fix "clock-names" and "interrupt-names" property
+          Rename the syscon property to "loongson,dwmac-syscon"
+          Drop "phy-handle" and "phy-mode" requirement
+          Revert adding loongson,ls1b-dwmac/loongson,ls1c-dwmac
+          to snps,dwmac.yaml
+          Fix the build errors due to CONFIG_OF being unset
+          Change struct reg_field definitions to const
+          Rename the syscon property to "loongson,dwmac-syscon"
+          Add MII PHY mode for LS1C
+          Improve the commit message
+
+Keguang Zhang (4):
+  dt-bindings: mfd: syscon: Add compatibles for Loongson-1 syscon
+  dt-bindings: net: Add Loongson-1 DWMAC glue layer
+  net: stmmac: Add glue layer for Loongson-1 SoC
+  MAINTAINERS: Update MIPS/LOONGSON1 entry
+
+ .../devicetree/bindings/mfd/syscon.yaml       |   2 +
+ .../bindings/net/loongson,ls1x-dwmac.yaml     |  98 +++++++
+ MAINTAINERS                                   |   2 +
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 273 ++++++++++++++++++
+ 6 files changed, 387 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
 
 
-cheers,
-jamal
-> > +             __this_cpu_dec(redirect_rec_level);
-> > +             return TC_ACT_SHOT;
-> > +     }
->
-> ...
+base-commit: ef66bf8aeb91fd331cf8f5dca8f9d7bca9ab2849
+-- 
+2.39.2
+
 
