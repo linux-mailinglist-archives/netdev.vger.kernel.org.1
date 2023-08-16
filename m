@@ -1,156 +1,154 @@
-Return-Path: <netdev+bounces-28115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6640E77E41A
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:49:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5468677E42B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:53:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE7C1C210F2
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:49:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E230281AA6
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0DE125CE;
-	Wed, 16 Aug 2023 14:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99AE12B70;
+	Wed, 16 Aug 2023 14:53:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C979101DA
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:49:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 838C5C433C7;
-	Wed, 16 Aug 2023 14:48:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692197340;
-	bh=5orDRygPlvZ4yVEGQF5hK8JtQyCELRkheE2WtCwrV/g=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=gtz89zNPXRQTDcGTXRk35M4L05w+jqnAaLlsIAJ1nt+JJEziAwoAkCIo56zeJpH6i
-	 /MekK3Q/ccbXyomfOYZY4hW9nqbr9tmAYrQ8jGkO68AftAt4mtmIkHubb53+74oZWl
-	 Tx59kJO5ij0DEpyH5D0nwRSw+ZDyxTtrY1pbe6IVPCaG6a3j9SDfnERGEmbvXtnOP0
-	 i2ZOCfSNDpOAtlSyO++T0ngAV2hHcpIoQZEY4cLX6wxp69uyVC6SRbUSiar5jKRht4
-	 mxz1Ru1ably6Z7zQCNDaxa0X4RTPqwQqsBp5sdA3A9XBtUy6tMuQlL0S/v0QY7Mgsy
-	 7rg+BYLvybQbw==
-Message-ID: <d1b510a0-139a-285d-1a80-2592ea98b0d6@kernel.org>
-Date: Wed, 16 Aug 2023 16:48:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FF510957
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:53:45 +0000 (UTC)
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7502610FF;
+	Wed, 16 Aug 2023 07:53:40 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-76754b9eac0so447950385a.0;
+        Wed, 16 Aug 2023 07:53:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692197619; x=1692802419;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C/F+yO89r+58XA2jTJmqFV7AKNI1UXlByvHmUmA3sA4=;
+        b=hJ0JNR07O6hNfvI0xZ2K57RdwwA+zhGGvgN1u5MeIJpwg2g6A38rxQYYtjMTc+DrIQ
+         OQKQIzsh/kXj6LBcKPZHjh6TDJjQoyZR9sv/ZFs1MrH/0YQbtE8WdYpPg89JB9m9u9j8
+         y/u5h/wRwaSktqnNv6AeWOnq16To/G5M8xOsJ4xwE5+6U03REY4mPgeLMapCOdBPycHL
+         JEq5/GHZ+7CMff1ABYwHMm7pYN1NFal7znvXjmINFymH4O7Fe5T77dnWF9Ir/tCqjnF7
+         mqH+Pdma8Ou779VNhqk7dP7ET2SKLB2szR+/7oxYyeGGm6ZxG5QXiGhmus7LtSaOPOCl
+         7lcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692197619; x=1692802419;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=C/F+yO89r+58XA2jTJmqFV7AKNI1UXlByvHmUmA3sA4=;
+        b=TwJPZDWuQ6yYY3cc8JdtNTnPKLnQ5HMJxRVb5Tbcqp5vU9uTXeesq8k8d1XLfMCkL6
+         HTYXPE0c0+vOSezD1Fbzjbsv4Kdcl8FZy37ySmwhl/yPZ5sq6zCudMslHNq21dZZx+O8
+         IZ1GCJIO5voIS+ZsHBL0ygMyJvLWC/BtF1ZkPokbjG7ZeDMCytoMfRHpTWajCU26cLpc
+         27Dt93OTiewquyX96CHaxXQuup86akms3WyObXNv557ksbh7P88fgaLoBRhUGCWhAtQR
+         gNUTu1bu086oBc8u/Qtb4HY2gakPe4/doqBlsdVJDtxMTyZol8vZgJs+Azv+KxqZhkgW
+         8AEQ==
+X-Gm-Message-State: AOJu0Yx/S7N5QQyji3faY5MWaDCWgGkWBeKhv1RofwYMY4AgJs5LxVxm
+	GqZh9oqyulmIKnOtUXeS01A=
+X-Google-Smtp-Source: AGHT+IE/ongpvCQd3F2ohVavPqcLH2c3ICTQBale59UpK8GdXCBun10dc4tTmVJGODuMRW1RyyVMpQ==
+X-Received: by 2002:a05:620a:b8d:b0:76c:9ad6:8199 with SMTP id k13-20020a05620a0b8d00b0076c9ad68199mr1789963qkh.77.1692197619528;
+        Wed, 16 Aug 2023 07:53:39 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id f23-20020a05620a15b700b0076cf0c4eecbsm4469821qkk.0.2023.08.16.07.53.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 07:53:38 -0700 (PDT)
+Date: Wed, 16 Aug 2023 10:53:38 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Feng Liu <feliu@nvidia.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: virtualization@lists.linux-foundation.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Jason Wang <jasowang@redhat.com>, 
+ "Michael S . Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Bodong Wang <bodong@nvidia.com>, 
+ Jiri Pirko <jiri@nvidia.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Message-ID: <64dce2f2b99f5_23f1f82949f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <f9f3c150-2b5e-7bd0-1c1a-062bd1f16fcd@nvidia.com>
+References: <20230814171845.65930-1-feliu@nvidia.com>
+ <ZNtYpohWyjnb883M@vergenet.net>
+ <05348d62-586c-4b1f-40bd-5541caca0947@nvidia.com>
+ <ZNunz1hbqPKpcOgA@vergenet.net>
+ <CAF=yD-L+d34Uuvt3sOFOnxXhMmoMXNfHzcaSPk=t1PtiPUHZ1g@mail.gmail.com>
+ <f9f3c150-2b5e-7bd0-1c1a-062bd1f16fcd@nvidia.com>
+Subject: Re: [PATCH net v1] virtio_net: Introduce skb_vnet_common_hdr to avoid
+ typecasting
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: hawk@kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Wander Lairson Costa <wander@redhat.com>, linux-kernel@vger.kernel.org,
- kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC PATCH 2/2] softirq: Drop the warning from
- do_softirq_post_smp_call_flush().
-Content-Language: en-US
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814093528.117342-3-bigeasy@linutronix.de>
- <25de7655-6084-e6b9-1af6-c47b3d3b7dc1@kernel.org>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <25de7655-6084-e6b9-1af6-c47b3d3b7dc1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-
-On 15/08/2023 14.08, Jesper Dangaard Brouer wrote:
+> > 
+> > Since legacy virtio will no longer be modified, I don't think there is
+> > much value is exposing this new union as UAPI. I do appreciate the
+> > benefit to the implementation.
+> > 
+> > [1] https://patches.linaro.org/project/netdev/patch/20210208185558.995292-3-willemdebruijn.kernel@gmail.com/
+> Hi, William and Simon
 > 
+> Thanks for the detailed explanation.
 > 
-> On 14/08/2023 11.35, Sebastian Andrzej Siewior wrote:
->> This is an undesired situation and it has been attempted to avoid the
->> situation in which ksoftirqd becomes scheduled. This changed since
->> commit d15121be74856 ("Revert "softirq: Let ksoftirqd do its job"")
->> and now a threaded interrupt handler will handle soft interrupts at its
->> end even if ksoftirqd is pending. That means that they will be processed
->> in the context in which they were raised.
-> 
-> $ git describe --contains d15121be74856
-> v6.5-rc1~232^2~4
-> 
-> That revert basically removes the "overload" protection that was added
-> to cope with DDoS situations in Aug 2016 (Cc. Cloudflare).  As described
-> in https://git.kernel.org/torvalds/c/4cd13c21b207 ("softirq: Let
-> ksoftirqd do its job") in UDP overload situations when UDP socket
-> receiver runs on same CPU as ksoftirqd it "falls-off-an-edge" and almost
-> doesn't process packets (because softirq steals CPU/sched time from UDP
-> pid).  Warning Cloudflare (Cc) as this might affect their production
-> use-cases, and I recommend getting involved to evaluate the effect of
-> these changes.
-> 
+> I kept virtio_net_hdr_mrg_rxbuf and virtio_net_hdr_v1_hash structures in 
+> virtio_net.h, which can be forward compatible with existing user 
+> applications which use these structures.
 
-I did some testing on net-next (with commit d15121be74856 ("Revert 
-"softirq: Let ksoftirqd do its job"") using UDP pktgen + udp_sink.
+They're UAPI, so we cannot modify or remove them anyway.
 
-And I observe the old overload issue occur again, where userspace 
-process (udp_sink) process very few packets when running on *same* CPU 
-as the NAPI-RX/IRQ processing.  The perf report "comm" clearly shows 
-that NAPI runs in the context of the "udp_sink" process, stealing its 
-sched time. (Same CPU around 3Kpps and diff CPU 1722Kpps, see details 
-below).
-What happens are that NAPI takes 64 packets and queue them to the 
-udp_sink process *socket*, the udp_sink process *wakeup* process 1 
-packet from socket queue and on exit (__local_bh_enable_ip) runs softirq 
-that starts NAPI (to again process 64 packets... repeat).
+Which is exactly why we want to be careful with adding anything new.
+ 
+> virtio_net_hdr_v1_hash cannot use virtio_net_hdr as the first member, 
+> because in virtio_net_hdr_v1, csum_start and csum_offset are stored in 
+> union as a structure, and virtio_net_hdr cannot be used instead.
 
+Oh right. That wasn't always the case, or the reason for this.
+Not super relevant but, commit ed9ecb0415b9 has the history
 
-> I do realize/acknowledge that the reverted patch caused other latency
-> issues, given it was a "big-hammer" approach affecting other softirq
-> processing (as can be seen by e.g. the watchdog fixes patches).
-> Thus, the revert makes sense, but how to regain the "overload"
-> protection such that RX networking cannot starve processes reading from
-> the socket? (is this what Sebastian's patchset does?)
-> 
+    virtio: Don't expose legacy net features when VIRTIO_NET_NO_LEGACY defined.
 
-I'm no expert in sched / softirq area of the kernel, but I'm willing to 
-help out testing different solution that can regain the "overload" 
-protection e.g. avoid packet processing "falls-of-an-edge" (and thus 
-opens the kernel to be DDoS'ed easily).
-Is this what Sebastian's patchset does?
+    In particular, the virtio header always has the u16 num_buffers field.
+    We define a new 'struct virtio_net_hdr_v1' for this (rather than
+    simply calling it 'struct virtio_net_hdr', to avoid nasty type errors
+    if some parts of a project define VIRTIO_NET_NO_LEGACY and some don't.
 
+    Transitional devices (which can't define VIRTIO_NET_NO_LEGACY) will
+    have to keep using struct virtio_net_hdr_mrg_rxbuf, which has the same
+    byte layout as struct virtio_net_hdr_v1.
 
-> 
-> Thread link for people Cc'ed: 
-> https://lore.kernel.org/all/20230814093528.117342-1-bigeasy@linutronix.de/#r
+The union was added to overload csum use on tx with RSC use on rx, in
+commit 22b436c9b568. I don't quite follow why there now are three
+structs, rather than two. The first two seem to both implement csum
+partial. Anyway, not super important here.
 
---Jesper
-(some testlab results below)
+> In addition, I put this new structure virtio_net_common_hdr in uapi, 
+> hoping it could be used in future user space application to avoid 
+> potential risks caused by type coercion (such as the problems mentioned 
+> in the patch description ). So I think it should be in this header file.
+> What do you think?
 
-[udp_sink] 
-https://github.com/netoptimizer/network-testing/blob/master/src/udp_sink.c
+Adding anything to UAPI has a high bar. Do you have a concrete use
+case for this?
 
-
-When udp_sink runs on same CPU and NAPI/softirq
-  - UdpInDatagrams: 2,948 packets/sec
-
-$ nstat -n && sleep 1 && nstat
-#kernel
-IpInReceives                    2831056            0.0
-IpInDelivers                    2831053            0.0
-UdpInDatagrams                  2948               0.0
-UdpInErrors                     2828118            0.0
-UdpRcvbufErrors                 2828118            0.0
-IpExtInOctets                   130206496          0.0
-IpExtInNoECTPkts                2830576            0.0
-
-When udp_sink runs on another CPU than NAPI-RX.
-  - UdpInDatagrams: 1,722,307 pps
-
-$ nstat -n && sleep 1 && nstat
-#kernel
-IpInReceives                    2318560            0.0
-IpInDelivers                    2318562            0.0
-UdpInDatagrams                  1722307            0.0
-UdpInErrors                     596280             0.0
-UdpRcvbufErrors                 596280             0.0
-IpExtInOctets                   106634256          0.0
-IpExtInNoECTPkts                2318136            0.0
-
-
+This does seem mostly a helper to simplify kernel logic to me, which
+is better kept in non-UAPI headers.
 
