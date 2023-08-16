@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-27949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE13877DBEE
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:17:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C345677DBEF
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 10:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B0791C20F68
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:17:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7906B28180B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 08:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6541ED51D;
-	Wed, 16 Aug 2023 08:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD39DD53E;
+	Wed, 16 Aug 2023 08:16:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A225D50C
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:16:00 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B35E7109
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:15:58 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d669fcad15cso5716758276.0
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:15:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF7BD50C
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 08:16:02 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651AB109
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:00 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58b7b5cc9d4so30280067b3.0
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 01:16:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692173758; x=1692778558;
+        d=google.com; s=20221208; t=1692173759; x=1692778559;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4RI/tkWyw0AdTe/w4s46g1Eo+n7a0TAjqn1GTzqzqg=;
-        b=wDVWhhUzmmwoD1NJ3Wp1N6aFoSf4Xz63263kup3S2tRKhzX5euJhaJPVoWXzntJm7c
-         FcMVerTNySzINVhZM6otfH8g/3rLdF0G5y55manPRPiuD4KznBz4un0mhVRH68Nzui2w
-         RM4/JlrXoL5GR0m/77L/LY7JFxPSWMJFg60fqiH9GwKs1r4tchII2xouZtdpxdehmOy/
-         oCEPyOKG3/5XpAs1frVvm/5W/u2eb2OEVKVajnLB8Xooq9I/uU/PsX6i2E0LGb0xqGIV
-         3eIfcQnpyBVo7UMpmM1PAMWSu8sWihA2Ksxt/DSHHIYJqBncaGHtW9Q7GOs9owF7GJXE
-         MTOw==
+        bh=Gn76jnFgegzsGhjlCNvMhiEfizmZY906QP3cRIdbTDY=;
+        b=EN3r7yJFXzRzMp/EQeT5bvQyMvJKVUytmQw/DCH9/XLLzmhjRC7Io4doUKhxu6euyW
+         e0byzVHlnv9soSAuNZpEJ9nUVwVtAN0NQqPi+lcb4SA7Y4ZHqIjCJPmX+7hMPxusnK8p
+         iz3s5GiM4Tb8iyoAuNSRZs6e10oc7AhFwCrvf3BRf2UohhS1HCWKgKXuI4N8FW447Rbf
+         NhWIXj7qtQPV59tt535akAotEI8Xk7W7NU47USAyx3RMPfqoGCA0xdzXOAjsw0FzKXxX
+         foz1LWmrhAV7tr05b58SWvgRAd1HkwxWcuMHZqUukIkw4L/1YVMieUzOp2YVcYSey2Vg
+         DLig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692173758; x=1692778558;
+        d=1e100.net; s=20221208; t=1692173759; x=1692778559;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4RI/tkWyw0AdTe/w4s46g1Eo+n7a0TAjqn1GTzqzqg=;
-        b=P89A+xaD8M2HEefImtZkOFUZZFbF6x/pyFfYyiEG6hN5I5X+qbBgGHI0y2o6oMTHDH
-         JOZAONc8/IXoCOWvLsdweeg16Fpv/8V60XFtlMKlCxcYtNOb7buvcP3JMHiGUktgTEhv
-         n5zW5Xoe1+w+mcL+A+dUtgmzStWH5F+enJauWohTCbWSAGz6XuhaCxs7q/5DtlJ10RqT
-         Ug23EY67Cp+Dl81hWaVxhPsZMfnZKoeKJIBz2SpnnA5C271dA0/MtQpAeJMrDhiHYdAj
-         JGPn+D5DI+XBOAJQ+ZY31d9I5B1DnFe3Eg3gd1HbfxAhegAehzjuP+mNuBS8VEVLrm3W
-         XCeg==
-X-Gm-Message-State: AOJu0Yx8tgaZQKM2WFzSXCrUN5GutG87YxGU1CQl9yA2TB7YwtvyZ+Gt
-	N95pxjPRazjRAAex/IBnWHiaFG2uDZnjyA==
-X-Google-Smtp-Source: AGHT+IFtlYpUZcHW9yRmMeWqB6QBJ/m5tJbZooznDuJqOhfTYTe2acva3+nOOy6+DnZO7HhiIKXoWFPo94RExA==
+        bh=Gn76jnFgegzsGhjlCNvMhiEfizmZY906QP3cRIdbTDY=;
+        b=JYlj2bZ/1wNVAJkpNZzAyV6HJrSdXol5uQZm8G2n2ztMoQ9P2YUZvgaKnQGfgK8G2f
+         cA7i2kFkalwq83rbN6j2s2eoyGRf4IAUf+Q0FthBckO9iva4hjpmhnBuCmN0RLYDm66w
+         liNdPnpHu2ZdNRe50FS2eQEM75dicglFA6o3Gk2eoatrdtL74prUgc/w9dB/N5p9xASB
+         8+sYY4M/SxhYEr00ouJikO8ohwNIHFSw8NckUKNWuBgZNdSsNLH+JP0IG7B8OrW+590i
+         QiVeA50hh2oN9M41pGeTh/sMbajyi+cMyzsIimqAKjxO3Xz/j5hP5vQtsDx+pamx6uGw
+         NDZA==
+X-Gm-Message-State: AOJu0YxJlqGfWTwJWcu2nUxHceqw9aKdLtldvCWLDc6L4FSHaSTZG342
+	R654bzjXtq0J0d5AJyNObrk/2WNT+7YqPw==
+X-Google-Smtp-Source: AGHT+IFNYcLav1c3rk1BciEeNy2NtyJfjA34Ey+lP5f+qAtFMz+HzheLvUbtY6ttr8uJcPWwphfdijOPiiEj1w==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a5b:90e:0:b0:c41:4696:e879 with SMTP id
- a14-20020a5b090e000000b00c414696e879mr12856ybq.7.1692173758046; Wed, 16 Aug
- 2023 01:15:58 -0700 (PDT)
-Date: Wed, 16 Aug 2023 08:15:36 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:e7c7:0:b0:d3f:5b2:e89e with SMTP id
+ e190-20020a25e7c7000000b00d3f05b2e89emr11356ybh.6.1692173759701; Wed, 16 Aug
+ 2023 01:15:59 -0700 (PDT)
+Date: Wed, 16 Aug 2023 08:15:37 +0000
 In-Reply-To: <20230816081547.1272409-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230816081547.1272409-1-edumazet@google.com>
 X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230816081547.1272409-5-edumazet@google.com>
-Subject: [PATCH v4 net-next 04/15] inet: move inet->recverr_rfc4884 to inet->inet_flags
+Message-ID: <20230816081547.1272409-6-edumazet@google.com>
+Subject: [PATCH v4 net-next 05/15] inet: move inet->freebind to inet->inet_flags
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -78,108 +78,206 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-IP_RECVERR_RFC4884 socket option can now be set/read
+IP_FREEBIND socket option can now be set/read
 without locking the socket.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- include/net/inet_sock.h |  2 +-
- net/ipv4/inet_diag.c    |  2 +-
- net/ipv4/ip_sockglue.c  | 18 +++++++++---------
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ include/net/inet_sock.h  |  5 +++--
+ include/net/ipv6.h       |  3 ++-
+ net/ipv4/inet_diag.c     |  2 +-
+ net/ipv4/ip_sockglue.c   | 21 +++++++++------------
+ net/ipv6/ipv6_sockglue.c |  4 ++--
+ net/mptcp/sockopt.c      |  7 ++++---
+ net/sctp/protocol.c      |  2 +-
+ 7 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index 552188aa5a2d2f968b1d95e963d48a063ec4fd59..c01f1f64a8617582c68079048f74e0db606e1834 100644
+index c01f1f64a8617582c68079048f74e0db606e1834..d6ba963534b4a5aa5dc6f88b94dd36f260be765b 100644
 --- a/include/net/inet_sock.h
 +++ b/include/net/inet_sock.h
-@@ -238,7 +238,6 @@ struct inet_sock {
- 				mc_all:1,
- 				nodefrag:1;
- 	__u8			bind_address_no_port:1,
--				recverr_rfc4884:1,
- 				defer_connect:1; /* Indicates that fastopen_connect is set
- 						  * and cookie exists so we defer connect
- 						  * until first data frame is written
+@@ -231,7 +231,6 @@ struct inet_sock {
+ 	__u8			mc_ttl;
+ 	__u8			pmtudisc;
+ 	__u8			is_icsk:1,
+-				freebind:1,
+ 				hdrincl:1,
+ 				mc_loop:1,
+ 				transparent:1,
 @@ -271,6 +270,7 @@ enum {
- 	INET_FLAGS_RECVFRAGSIZE	= 8,
  
  	INET_FLAGS_RECVERR	= 9,
-+	INET_FLAGS_RECVERR_RFC4884 = 10,
+ 	INET_FLAGS_RECVERR_RFC4884 = 10,
++	INET_FLAGS_FREEBIND	= 11,
  };
  
  /* cmsg flags for inet */
+@@ -423,7 +423,8 @@ static inline bool inet_can_nonlocal_bind(struct net *net,
+ 					  struct inet_sock *inet)
+ {
+ 	return READ_ONCE(net->ipv4.sysctl_ip_nonlocal_bind) ||
+-		inet->freebind || inet->transparent;
++		test_bit(INET_FLAGS_FREEBIND, &inet->inet_flags) ||
++		inet->transparent;
+ }
+ 
+ static inline bool inet_addr_valid_or_nonlocal(struct net *net,
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 22643ffc2df8c1037269e5feaa033c72b2785dfd..fd570d77588e7f7ebfe02ec88e69d0436b6425c4 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -937,7 +937,8 @@ static inline bool ipv6_can_nonlocal_bind(struct net *net,
+ 					  struct inet_sock *inet)
+ {
+ 	return net->ipv6.sysctl.ip_nonlocal_bind ||
+-		inet->freebind || inet->transparent;
++		test_bit(INET_FLAGS_FREEBIND, &inet->inet_flags) ||
++		inet->transparent;
+ }
+ 
+ /* Sysctl settings for net ipv6.auto_flowlabels */
 diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 25d5f76b66bd82be2c2abc6bd5206ec54f736be6..6255d6fdbc80d82904583a8fc6c439a25e875a0b 100644
+index 6255d6fdbc80d82904583a8fc6c439a25e875a0b..5a96f4f28eca6ae6e84cb3761531309e8da0be09 100644
 --- a/net/ipv4/inet_diag.c
 +++ b/net/ipv4/inet_diag.c
-@@ -191,7 +191,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
- 	inet_sockopt.mc_all	= inet->mc_all;
- 	inet_sockopt.nodefrag	= inet->nodefrag;
- 	inet_sockopt.bind_address_no_port = inet->bind_address_no_port;
--	inet_sockopt.recverr_rfc4884 = inet->recverr_rfc4884;
-+	inet_sockopt.recverr_rfc4884 = inet_test_bit(RECVERR_RFC4884, sk);
- 	inet_sockopt.defer_connect = inet->defer_connect;
- 	if (nla_put(skb, INET_DIAG_SOCKOPT, sizeof(inet_sockopt),
- 		    &inet_sockopt))
+@@ -184,7 +184,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
+ 	memset(&inet_sockopt, 0, sizeof(inet_sockopt));
+ 	inet_sockopt.recverr	= inet_test_bit(RECVERR, sk);
+ 	inet_sockopt.is_icsk	= inet->is_icsk;
+-	inet_sockopt.freebind	= inet->freebind;
++	inet_sockopt.freebind	= inet_test_bit(FREEBIND, sk);
+ 	inet_sockopt.hdrincl	= inet->hdrincl;
+ 	inet_sockopt.mc_loop	= inet->mc_loop;
+ 	inet_sockopt.transparent = inet->transparent;
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 8283d862a9dbb5040db4e419e9dff31bbd3cff81..f75f44ad7b11ac169b343b3c26d744cdc81d747c 100644
+index f75f44ad7b11ac169b343b3c26d744cdc81d747c..6af84310631288c07f26c19734c5abc0fd82dc23 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -433,7 +433,7 @@ void ip_icmp_error(struct sock *sk, struct sk_buff *skb, int err,
- 	serr->port = port;
+@@ -608,9 +608,7 @@ EXPORT_SYMBOL(ip_sock_set_tos);
  
- 	if (skb_pull(skb, payload - skb->data)) {
--		if (inet_sk(sk)->recverr_rfc4884)
-+		if (inet_test_bit(RECVERR_RFC4884, sk))
- 			ipv4_icmp_error_rfc4884(skb, &serr->ee.ee_rfc4884);
+ void ip_sock_set_freebind(struct sock *sk)
+ {
+-	lock_sock(sk);
+-	inet_sk(sk)->freebind = true;
+-	release_sock(sk);
++	inet_set_bit(FREEBIND, sk);
+ }
+ EXPORT_SYMBOL(ip_sock_set_freebind);
  
- 		skb_reset_transport_header(skb);
-@@ -980,6 +980,11 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 		if (!val)
- 			skb_queue_purge(&sk->sk_error_queue);
+@@ -985,6 +983,11 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 			return -EINVAL;
+ 		inet_assign_bit(RECVERR_RFC4884, sk, val);
  		return 0;
-+	case IP_RECVERR_RFC4884:
-+		if (val < 0 || val > 1)
++	case IP_FREEBIND:
++		if (optlen < 1)
 +			return -EINVAL;
-+		inet_assign_bit(RECVERR_RFC4884, sk, val);
++		inet_assign_bit(FREEBIND, sk, val);
 +		return 0;
  	}
  
  	err = 0;
-@@ -1066,11 +1071,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 			goto e_inval;
- 		inet->pmtudisc = val;
+@@ -1310,12 +1313,6 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		inet->mc_all = val;
  		break;
--	case IP_RECVERR_RFC4884:
--		if (val < 0 || val > 1)
+ 
+-	case IP_FREEBIND:
+-		if (optlen < 1)
 -			goto e_inval;
--		inet->recverr_rfc4884 = !!val;
+-		inet->freebind = !!val;
 -		break;
- 	case IP_MULTICAST_TTL:
- 		if (sk->sk_type == SOCK_STREAM)
- 			goto e_inval;
-@@ -1575,6 +1575,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_RECVERR:
- 		val = inet_test_bit(RECVERR, sk);
+-
+ 	case IP_IPSEC_POLICY:
+ 	case IP_XFRM_POLICY:
+ 		err = -EPERM;
+@@ -1578,6 +1575,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 	case IP_RECVERR_RFC4884:
+ 		val = inet_test_bit(RECVERR_RFC4884, sk);
  		goto copyval;
-+	case IP_RECVERR_RFC4884:
-+		val = inet_test_bit(RECVERR_RFC4884, sk);
++	case IP_FREEBIND:
++		val = inet_test_bit(FREEBIND, sk);
 +		goto copyval;
  	}
  
  	if (needs_rtnl)
-@@ -1649,9 +1652,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 		}
- 		break;
+@@ -1737,9 +1737,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 		len -= msg.msg_controllen;
+ 		return copy_to_sockptr(optlen, &len, sizeof(int));
  	}
--	case IP_RECVERR_RFC4884:
--		val = inet->recverr_rfc4884;
+-	case IP_FREEBIND:
+-		val = inet->freebind;
 -		break;
- 	case IP_MULTICAST_TTL:
- 		val = inet->mc_ttl;
+ 	case IP_TRANSPARENT:
+ 		val = inet->transparent;
  		break;
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index ca377159967c8aa9c18a80f9b189f4ef41398d01..3eb38436f8d431ca37200869bfe57ec33b46bf8b 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -641,7 +641,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		if (optlen < sizeof(int))
+ 			goto e_inval;
+ 		/* we also don't have a separate freebind bit for IPV6 */
+-		inet_sk(sk)->freebind = valbool;
++		inet_assign_bit(FREEBIND, sk, valbool);
+ 		retv = 0;
+ 		break;
+ 
+@@ -1334,7 +1334,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case IPV6_FREEBIND:
+-		val = inet_sk(sk)->freebind;
++		val = inet_test_bit(FREEBIND, sk);
+ 		break;
+ 
+ 	case IPV6_RECVORIGDSTADDR:
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index 21bc46acbe38ee638a2111d717b158caa317d867..ffbe2f5f5b44c3aaf588eb4b8fb3e3594bf2f71c 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -419,7 +419,8 @@ static int mptcp_setsockopt_v6(struct mptcp_sock *msk, int optname,
+ 			inet_sk(sk)->transparent = inet_sk(ssk)->transparent;
+ 			break;
+ 		case IPV6_FREEBIND:
+-			inet_sk(sk)->freebind = inet_sk(ssk)->freebind;
++			inet_assign_bit(FREEBIND, sk,
++					inet_test_bit(FREEBIND, ssk));
+ 			break;
+ 		}
+ 
+@@ -704,7 +705,7 @@ static int mptcp_setsockopt_sol_ip_set_transparent(struct mptcp_sock *msk, int o
+ 
+ 	switch (optname) {
+ 	case IP_FREEBIND:
+-		issk->freebind = inet_sk(sk)->freebind;
++		inet_assign_bit(FREEBIND, ssk, inet_test_bit(FREEBIND, sk));
+ 		break;
+ 	case IP_TRANSPARENT:
+ 		issk->transparent = inet_sk(sk)->transparent;
+@@ -1441,7 +1442,7 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+ 	__tcp_sock_set_nodelay(ssk, !!msk->nodelay);
+ 
+ 	inet_sk(ssk)->transparent = inet_sk(sk)->transparent;
+-	inet_sk(ssk)->freebind = inet_sk(sk)->freebind;
++	inet_assign_bit(FREEBIND, ssk, inet_test_bit(FREEBIND, sk));
+ }
+ 
+ static void __mptcp_sockopt_sync(struct mptcp_sock *msk, struct sock *ssk)
+diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
+index 33c0895e101c08d042f16adad7d6ea5ff2bc05c0..2185f44198deb002bc8ed7f1b0f3fe02d6bb9f09 100644
+--- a/net/sctp/protocol.c
++++ b/net/sctp/protocol.c
+@@ -360,7 +360,7 @@ static int sctp_v4_available(union sctp_addr *addr, struct sctp_sock *sp)
+ 	ret = inet_addr_type_table(net, addr->v4.sin_addr.s_addr, tb_id);
+ 	if (addr->v4.sin_addr.s_addr != htonl(INADDR_ANY) &&
+ 	   ret != RTN_LOCAL &&
+-	   !sp->inet.freebind &&
++	   !inet_test_bit(FREEBIND, sk) &&
+ 	    !READ_ONCE(net->ipv4.sysctl_ip_nonlocal_bind))
+ 		return 0;
+ 
 -- 
 2.41.0.694.ge786442a9b-goog
 
