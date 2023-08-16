@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-28110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3307F77E3F7
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:43:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C767C77E3FE
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:43:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EED1281A8B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:43:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C811C210C7
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3B316400;
-	Wed, 16 Aug 2023 14:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D4C125BA;
+	Wed, 16 Aug 2023 14:40:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB90E11CB4
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:40:28 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2125.outbound.protection.outlook.com [40.107.223.125])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FED0272C
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:40:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624F11640D
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 14:40:33 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2133.outbound.protection.outlook.com [40.107.223.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5BD2D47
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 07:40:30 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cUujMTf6po7vXmMFDpdybbNJzdrH5gtWw5x3aJHJdA4KZVFONj8ED8qY6epKoCqfqR8g2vcmWDC59zH7ZXuD4mRPqEocrlJjIApYXOBBYMdxktz1h+ouEQ0ov1cx87wONZABVnOefVZv7kW7mfJByhCvALIh6C8z/ANsuDQUgzbMH1+1XFttX/iFK/Fa9jnHgLl1MawGZrFpurQWNfL10pj5O98xHkfEGB/o1LOiQ0mKMEgwEyJ3xdrj60A5dtdeRsbkNJCwWago+aA2iUiKufIRP2k1mt/i9mPJneEJ+NWePk908ytNwfQwOXM0B9PbzPOfoQNWanzIslPkeB1h7Q==
+ b=JskBCqcUOeP1cTO+EfOJqcH3fi1FDcNRbYgpSCiF3qjBILdSiR55W0A2KguyFILtKiTM3Awfuqk2L0WfHJSJv+q1UPOZlPtIEzbKiP6XXnn7MY5Up/hfzLH3Iy4XWERI1AygnL9XvFYrNRGVhHeoc0LeMVguPBtnC1CyC6SNBF8iR/Ak0niju8GCIiraOcWK6yhdYqq0qb0jxjDrxl7oBtg8PDDWMkVKehNH+cUEhiu6OA/ohrSqqvAZtQHaGpUCPyN6YrPc6ws69Ro06C+nO1YQ1S05yhpEG2C6Pf25nF4Kf9DjKv4FIh64ZQQcEbbOtiAlfbxWqYUpHA2j0LMFbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RVUFfMqVp60K93bqETr9AAhjfji0GkRrh5Ikr8sz7F8=;
- b=O7jyOYD9SPQ42KdnwAlJahG6yF6DNiQpK2NzU5H3afQg1qDFM1T5ml55MAclYkY1yDb5cIiUrI2wkO7f28utDFAeUCJpXH/OZKjcyf98eR9JBiz5KKdDe1u+tqWjwYmVTJitmsNXXTxxB0UtkEuNXOELlUbee4RXKnosjMmFv0pdrKEwKlUua/AxW1qbnVJOFeVUWDN+sftka/OU6dE1STVbJmIgsNBe0krgoN4QWqrzzqKikPWb36/fIX8AVxV5p6swi72bfxfc7Wb5LHfv+i2SM96L8iZ+4V/mDtQgml60vKrhfrQduDvebawUD395Yux30bvwoMVbCDxkavrIUA==
+ bh=hPhWVA1wbxobRo4QVLXkLP4gZDZuwS/3TwtbdfZbRZs=;
+ b=lI0UKAIHPFon3CWmfcgWZH3Zu+vDfUL5JU1fM2Wb9N6s21VYTmzyVwIIgb1WIB97tBTiDDyilKqVqk9iOii/i7Q4IkaEp8rjS6dwgwRedo8Qux5LV408rNVb5H4a5i+fpDMQqut93dF3m0GdJW+Wv7Bkstiogaul7u6d4LMoBNp7iZ0MgilskLd0s7HZbsRAD/tj13GWNIFrDaRJ4WqrtE7tOMQzJs7E8L6NA94YozaKy8F1SNzI6kgs5gbdJoLmzaY2ES+icVMl5FgzpESFkPKLLgdaCLkcKpEdI03cGwqF94LVNr6TRQ7VQsRGSwGnw+rLYqip/4e2SyDMiIKxcw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RVUFfMqVp60K93bqETr9AAhjfji0GkRrh5Ikr8sz7F8=;
- b=Y/1MuXm15KpjEx4WNLlzG8fxf8sPykiVicUfGxrEc3NntSNP3JSqyifZ4bzOjc9LWZXcE7EkRv9uVRzf09+uLrVljT9rUu3xTj9jDfL9zkCMwomL4Mry79+04qDqi3XtGAVgWlM4aGlGTPRYY9yRIo3xomRvfiW2xhJiDeq8eLQ=
+ bh=hPhWVA1wbxobRo4QVLXkLP4gZDZuwS/3TwtbdfZbRZs=;
+ b=O9snCF4c8U40ous0LXoesp2I05EaGU33gQqBCHwnX7Fk4+gTBm1xgOflbI7qUho6IyOyPRGoLBv0eG2ZWmiJhyratjLc97ichbkwMSH64gbqPqGA/sr7i7PuWDT3odlFIG4HB1G942TSvQlREZ+arwfjZxk6LI231jZWt+i/i5I=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
  PH0PR13MB5004.namprd13.prod.outlook.com (2603:10b6:510:7b::20) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6678.30; Wed, 16 Aug 2023 14:40:25 +0000
+ 15.20.6678.30; Wed, 16 Aug 2023 14:40:28 +0000
 Received: from DM6PR13MB4249.namprd13.prod.outlook.com
  ([fe80::8de6:efe3:ad0f:2a23]) by DM6PR13MB4249.namprd13.prod.outlook.com
  ([fe80::8de6:efe3:ad0f:2a23%6]) with mapi id 15.20.6678.025; Wed, 16 Aug 2023
- 14:40:25 +0000
+ 14:40:28 +0000
 From: Louis Peens <louis.peens@corigine.com>
 To: David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -55,9 +55,9 @@ Cc: Simon Horman <simon.horman@corigine.com>,
 	Tianyu Yuan <tianyu.yuan@corigine.com>,
 	netdev@vger.kernel.org,
 	oss-drivers@corigine.com
-Subject: [PATCH net-next v2 09/13] nfp: apply one port per PF for multi-PF setup
-Date: Wed, 16 Aug 2023 16:39:08 +0200
-Message-Id: <20230816143912.34540-10-louis.peens@corigine.com>
+Subject: [PATCH net-next v2 10/13] nfp: enable multi-PF in application firmware if supported
+Date: Wed, 16 Aug 2023 16:39:09 +0200
+Message-Id: <20230816143912.34540-11-louis.peens@corigine.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230816143912.34540-1-louis.peens@corigine.com>
 References: <20230816143912.34540-1-louis.peens@corigine.com>
@@ -73,63 +73,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|PH0PR13MB5004:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5d305a88-a00e-4dec-7627-08db9e66ba00
+X-MS-Office365-Filtering-Correlation-Id: 3fb1aaea-7db4-42d8-1801-08db9e66bc33
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	/BKW6zQZC9L/FJ+5OSPRIMBIl+7CcHbitrOZv9ONt0wuBQRleHRHFyU67u41FtjiN3MZp/yO9y63ro1PkHEAmE8m1vJjgvZv3xdFERaHvAvaffxbJhH4Cw6IAJxLgbvbd2D7Vy+Kt7ikrohA3okYqz4t/Nts/ZoUHXi1i8EMIrm/y8Do1jD4ELvE1eBrfwX2SODTmpbW0MFjxm3fMd1le2L1K3H7aiBQpHBSCpqnZfPAxB6SZbcXlxsbsnPsAdHRuAf9pN7VMCZxEqByuXErZ3MK2gVzjHcYdo26DguML1QAR8TBZ4SRkWlP4y72yMtZoUTSxSUQxfxeBWgas0bYLM0DV0RkFyqivA/M4P3CS8uA/4sLcM31KbvBekO5hS3xcaCHxH4e8l65JwU7KrLx87XjNEe6NArSCFyi54on9Ebo2/ZeywIQJKf+NLifh1NVWoUtPC9aH3pKC0/rQRE9r0iesDsbYw7RM7C7/e6GnjjHMDVilDPZ695Nnar03MJ5aLfRKKW+2CbfV2T68ephd3wJ2+rEZP1H8rgVjDimBfpekhsqxIHO5cKCZCUtygb3PHl9UzGc2xBjcR/P6xZVvu51y4F4bzjZW3wPoJyNIthieAe7pI3or8vNEvUAuB7+PLzvyAntpg4VSnHFmiN9xDo/2kckOoIo2PHSlwMfcO6s4pro5ZDIHsYHQMsCGfwq
+	y4RNNeyBpQHoKpZNla9s6I4A0M2fWHB+AnliW7YLKEcUmKuYHbVltyge7YU0rGNR94w+jUHkufTNM6tAAdEV3LlUKhVYIosenO/hctI7o+Df9ISy9a9Vvb5asgjtidI2qqT6SoeIF/szRHHQHhT+YG5gKH56msw07IKHJHZBWOw60FVUon/AoJVfI2ITd5PQMR/l7TwaJK3KhbQqpIWg3ZrQ8fDlLezJ0tys3TgnnN4LA8hh1m6JOZ+LnvU321wI8Zi0JieNTnxqtDbUiSZAl9A2jPlFmDcNhQcideiq+0RxPgV3AmLeYs7M80rJ7+Th+IBIWQAIoxJYDCUwOYW/+/geb9aMN9GYIo2j2p5TgTECbCGndzdH4u57s2Wosic2BhdDzi/Iaee9wFSsjvzGpQxzLo2NPQutxuEgSMi9uPeD0nvg82KB0TZ0XqoVpq15HN0Zt8oUlfp9HyUoZaKQyTJj7PR4UBD5kQP/9S/lZYH+zeLKVokp4Fvaet7rAfWllDH7fA/0c+WWqFOHJZJQy+/Lpgw5cz81D+vKWGJ0EoURv6i1dq6+/CpV3BD8xi8WWrvuQEhjMFDDoMeVBdedXxacLNErDdNPimrt1rDKzbjl6R3YUvwz0HKqZmFOg5mrm/WXnfkT2zd2DJVmxf4pUZfrMYFhfDf6vOOHo7rkKbE3tjv9PDgb/a/hJtdkiRwtaZvohNtTVl9rURjO/wjKpQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(346002)(39840400004)(376002)(451199024)(1800799009)(186009)(316002)(54906003)(66946007)(110136005)(66476007)(66556008)(12101799020)(41300700001)(5660300002)(44832011)(8936002)(8676002)(38100700002)(38350700002)(4326008)(2906002)(83380400001)(26005)(478600001)(86362001)(6512007)(52116002)(107886003)(6666004)(1076003)(36756003)(2616005)(6486002)(6506007);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(346002)(39840400004)(376002)(451199024)(1800799009)(186009)(316002)(54906003)(66946007)(110136005)(66476007)(66556008)(12101799020)(41300700001)(5660300002)(44832011)(8936002)(8676002)(38100700002)(38350700002)(4326008)(66574015)(2906002)(83380400001)(26005)(478600001)(86362001)(6512007)(52116002)(107886003)(6666004)(1076003)(36756003)(2616005)(6486002)(6506007);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T1RpaERNY3VvWERTbHdUblV6S0E3RFdEem0vSEhRQjZvYXFHYXB0VGF0b2lH?=
- =?utf-8?B?N0EvOUUxc3BodnhnSGhUbXgwMkFkVEs2c3JSTjlORjNvbVl3WVNjTFpmNWZS?=
- =?utf-8?B?Z29oZEdtOUxQZHhpK29sWDJucXlLMGRlZ1N0aktIcGVKaUhLbmZsM1VsNmJl?=
- =?utf-8?B?cjI0NTBvYktiTWxIcGg1bnZubkJHSGlPL0FIYmd3dmFBeUFxS0RpTDM5eXhX?=
- =?utf-8?B?dHdpRWRaWlV3WU1DeUs3Q29kbXNaYUpOVmwyUERoaENtenVGWkJlY2owemNF?=
- =?utf-8?B?Ymp1UW9YV09CWFl2TnhZdWN6K3RxNkRKS0VIUm9NN0NIbUdvRWpCQkx1ZlJt?=
- =?utf-8?B?OExFOWlVK3FRbjdyb1J2YitHVE5kT1djM2w0dy9zdzRxdU55RFFwQTVvb1dH?=
- =?utf-8?B?YjUyU2RTVHBURjFDakFLaEdqYWQ5MjVOOVZMck9aQWNla29FMGNHei9objVF?=
- =?utf-8?B?dWtvd3hpVGJaK1hnNFZVVUY0NVd5N0cwZmJkaXRRSGdvWDNPMU05NFNrM1cz?=
- =?utf-8?B?MkpMRmQ2ME5nSnkvWGZOUkpZdCtxb2hXeFZNTEVNODVDdHBuNGJlRGJOeTNC?=
- =?utf-8?B?Zm90SUhyWGtZNWtpRTRXS2pJZWtSQ1R2NklSelA0dTg0L1RrNXozcUpnektr?=
- =?utf-8?B?NktUSEhGY2NON0c1MHNRbFh5ZEFEWWxRajliZFpvRnBhQzNJTG1iTzdKakdC?=
- =?utf-8?B?MWdtaHNtUm1XNWphR0cyWmFXRlV5Sk9DcForS1B5Qnd1bE1wdm01WFd4eGtK?=
- =?utf-8?B?WXlta3EvZVdSSU1lRnpzbXEyMmtUQUVvWlhLb1ZIOHNFMStEM21EMlBFa1hT?=
- =?utf-8?B?bkZmcVUyTzdQTVhmL3U5TmU1ZS9kc1lZT3VkUU4xZm9zYS9CYnZNa1VkVUlp?=
- =?utf-8?B?R1Q3UitLRXVtUnFpUVN4REozdkZ6M251eFVBVWtwSzFZMGg3cEUrWWNHb2VM?=
- =?utf-8?B?SlAxUEhTSms1SUc1RkxJcUkwNnQwVXhzS0VhNDRjengzNWlIMC8xNEVVOTh0?=
- =?utf-8?B?Nmgzb2p2YzUwdEJyL0tnTnRubVdlMkdCaGtZME54NzN4TWNBMDhuOXBGVzBP?=
- =?utf-8?B?Q3FVb2xoYWJSdkp2cjFOTkJJNk1WRjFySU9pSDJoWkFqK3QxVklHOEhJMlE2?=
- =?utf-8?B?c1MxbnNoYUx6T0JCZmgyMlZLeW9FOGFMYlJ5cGpvQTl3NGZHeFMyTnRqL09j?=
- =?utf-8?B?S3krWUR1RTRjZDZoM0xrek5ZR2w1RHF1WmFPa0s2OGp0MU5TUU5udWcyeEYx?=
- =?utf-8?B?QkJmUTBYQ1A1YWNCY0laQTY2OGh5RnJwYXpCNFR1QkFwWEIwUUhuMGRVK3FY?=
- =?utf-8?B?NVlSc2V6VEw3eDBaTStoOTRrR21ybys5UndOa1RkWkM3T0ZHenVEOEwwanVW?=
- =?utf-8?B?MElHTmlRRWlyc2xDWDhvSnNYME5qMHVqbmxVQ291UHllMlZkSG5qaXgwWWxy?=
- =?utf-8?B?cnlzUkE1aE5ob1BqWjNob1J1TFF4enlUVGRpMDJLM0IxOXZ6eTdjTVludlB6?=
- =?utf-8?B?bTU1Sy9uYXJPamxBSFczbVZ1Ujl6Wm8wM2xNNEtkV0xCRHFiTjc2cUFObFlV?=
- =?utf-8?B?Z1BnTmpBY3Rra3Q0d2dTblZyRUNQcURaRUx1bDR2SFhRR2J4SnVQSzJIVFQy?=
- =?utf-8?B?cCtqK1p0dnNkOTdJbURlM2FNMjdwbzdMZHV5Sk1udkNFWnV0RkJFSXp1Rmt6?=
- =?utf-8?B?N3ZnRTdZUlR4dHVObUt2Wm9ieXFZUWxveVZIZGxQQm9LWnk4bHVlVEpka2Ez?=
- =?utf-8?B?TEkrTkdmWERTeWd5Ukk3bnNkb0djcy9FdStxZ1VXd1hHRnp5LzlkbTN1UnBY?=
- =?utf-8?B?bHI4cGRjVVlpUG5tQXlGQUZtMWxwd1oxbnVIdWV6UzhVT0NiU1A4OXRCWXlm?=
- =?utf-8?B?NTViQktDa2ozU1FOSVZmejRSc0F3M3FUM0wyNm5WK2FSYlhiTzk1KytuNXMw?=
- =?utf-8?B?OWRKbWw1MTlUT1REYmhJUCtkak9DZGFHK2hGazZxZmJmYkxGWnEvMUhuL1A1?=
- =?utf-8?B?b0k1V0dBL0pDbEdpWUFoZDBTSmlVRGdKV0ZUaUlyMzhHS281UVZhSE4wTGtu?=
- =?utf-8?B?UDIrVHQvUWw4bTFmZE5mbm5SV3k3cGhwZWdmbWFmV0NITnZvUkZ1Yzd4cFpp?=
- =?utf-8?B?bGpSYjNSVmhIZzFQdi8rUlk5NUpUQkJXVDZpZWFOMFUrUEJTOVBvVk1tNnRj?=
- =?utf-8?B?ZUE9PQ==?=
+	=?utf-8?B?N3BQQ015YnV5Vm00RVc5RFZveFhsdHZBWXVWM0czejFOeXloYm1QNEI3Wlcx?=
+ =?utf-8?B?UnFGSzFYd1dCdTJFNVpxZUE4T00waS9HTyt1VEVhcVpJMCtSYndNRWFuQUtl?=
+ =?utf-8?B?eDBtcGRvU1ZHdUphQnNkd1ZQaHk1cmJyVHBuRDB4WHpmWjZtRG13ZG1DWU5q?=
+ =?utf-8?B?c2JocGM1bGhIWG8wd3pZUXlYSENZd3BjcTNuUDN6T0ZDTUt5TzgybG1yS0sv?=
+ =?utf-8?B?aXQ2REdvZk9wNTZWa3ZYMjFvS242TFd5aUZlcXpjQjJRYlYxb1c2cmx5K3Zz?=
+ =?utf-8?B?RkJzYjlrMGxOWjhyMHpibWRFOTVyMTVueEFaZWF3ZmJCWmwxdHQrOURZOHZI?=
+ =?utf-8?B?cWVvYlBVWkozOGlodjV6ZzEvYmFSWDZEUFUyYmxvM0lHSWZ1QURaTkJjOXJQ?=
+ =?utf-8?B?N1BSZmRpRDBZc0NPcFQ0YklVNm5CZmN3L05DU3RhY2NiQ0lEdFduRW9yTFJi?=
+ =?utf-8?B?ZGk2RThQQnA3dlE4dm9sZ3NWbjZkT09GQ1dTejBsVHVkSm9SOCtWUVcramUz?=
+ =?utf-8?B?WFMvbGxjNzNBeE8wQVNiQlZFNkJLNDg4cUNHbWRpZm1zSlBEVytlYWdaSXNB?=
+ =?utf-8?B?bUd3cEQ1T2xvcm91ZHV0S3FjYkVLM1pjNTV4L0hCMGhHMnZUcFZMZFREbStr?=
+ =?utf-8?B?ZENJeHpNbnVHbnVzcUdrc0JRVUU5ZUhOSkdncFJTUk4xd01BN1h3ajhVdlpS?=
+ =?utf-8?B?ZVZGaDc1WklqejV5Y01SUHlaQW5PSVE5ZTF1RER2Nk54MVlvUXp1Vk5neGRW?=
+ =?utf-8?B?aDQrb2MraVg2blBjeDd0M3kvb2hUSXp0L3hSZjluaHJydFdWTnAyNjY1WW40?=
+ =?utf-8?B?dkszdzNHRGpxdGJucUtZQ3dCQTE0RlFWT2sybm1aSEt2ay8yMDdPcmhua0Fz?=
+ =?utf-8?B?K0twdGNEVXI1NjRYcG53NERBRW15RlVxdThOZmNPYi9DNFNrWGVZN2dmdi8y?=
+ =?utf-8?B?QVBWbzJWK2JCQnJhMmlQak1vRlNQc2NmQ3phK05RRXZkQTZMRGJGcjF2aXht?=
+ =?utf-8?B?UXE0SnYwS053ZUdYUHRrSTVsMUxDcmVoSGE4NWNmRllpeVpDT0dvOXd0R3ZN?=
+ =?utf-8?B?TTlpb3kvQ3FLRFFRaHJwdTc3MzVDQnFWR1VvcEdUWW0zWExEVU9pbkxEZEdE?=
+ =?utf-8?B?eGFnRFE0WEgrZzVDa2pFOUwzU2psb2tsczJoZFJMbTF5NWc1SlhkVDN2VExh?=
+ =?utf-8?B?K1l3THR0Y0pYQmdJa0JtckczZzFWNlR1R2cvUzRRWXFpaHowWFVteTNXMWFL?=
+ =?utf-8?B?ZndCU3g4STM1dThWVWxRUFp4M3dHMGJxUjdDWU94Wi9DTHV5eDJWL2I5NVZO?=
+ =?utf-8?B?ZGJPL2VpVnk3S2JVdGdtSXJxWlhJQkliTWRFS0RWOTRVVXNkeU1KbVFCSDB0?=
+ =?utf-8?B?MHRmbEc1OVY4MHo4M0h6MDFybXUxZ0txR2RMNkZNT1l2YUNRMW5OdTNRdVl0?=
+ =?utf-8?B?K2crSGpOemU1WUJzNGZ0SW5pY3I5dWNuRWVDZDhUb09QbjkwNmtZV0syS2Fu?=
+ =?utf-8?B?QVBoYUk3YmVVM2dSZjM2NlhOUlhiaEc5TmpIdGNKY0RqeGtwOU8xaDZPcDd0?=
+ =?utf-8?B?eXRXVHJMK09xOTBHYjkwNldPY3d5WVRrMkVhdzN6MEFIbGMyM2pDbE9tcTZK?=
+ =?utf-8?B?M1loNkIzbjVPSEpMUXNBWlJObkxYNlE4NFRPRUxRVFJlQmhmeDR0YXpXQTRG?=
+ =?utf-8?B?bVFEQ1U2RkorWkJ6eFJEVHhBWlJ0cGhOcStSSjdhY0R4RC9aYkRoaWJnVmg3?=
+ =?utf-8?B?NlIyNXNOcmFINDkzQlBzcFIybWVnV1VYbTRhRmg4NnpmSE0yaFhrMVVUTEJr?=
+ =?utf-8?B?Wmd1Tnp1elZUWVhWRkZCbnZ6bmxocWQvNkRpTjkrSG5Bck0wUTMxZnBoU0lG?=
+ =?utf-8?B?eXg3ekFIeUZSL1hSZExVTk4vZ05YOXJGWE5yNmY1N2FrMlRJc3pQWWxTYmlq?=
+ =?utf-8?B?NzZhSXZiSkVGdUo5M2JiaEhXdlpzV0RXOFJHMENxVEZNdy9lWk9sU2xZM0Zt?=
+ =?utf-8?B?VzBKaExobnE0eDlJdVFIeEtwWlJKNi8zRHZyMTBMT3NSeEMvMTQ0MGlNT0NM?=
+ =?utf-8?B?NnRaOGt5R1NlR2V0MlFId1Z5SVpsNVRCeFFzdWphVGM5QVhxQkt4cEgrRThu?=
+ =?utf-8?B?allTLzMwSUdZWkx5eVM1Z2VFaXpZUW9RbGNJK2dVUW9CWWI4SHpzVis1Q3I3?=
+ =?utf-8?B?d1E9PQ==?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d305a88-a00e-4dec-7627-08db9e66ba00
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3fb1aaea-7db4-42d8-1801-08db9e66bc33
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 14:40:25.1645
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 14:40:28.5650
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i6K6pvfSlmKHTTNgAMUuu7ISI/qBZIj7+sMEIi2Mbk9++182SQFck86IclShmHlFlHxUXg+CN4WCPO0Ug1opMCifAoTyY2KkStpk15jQgxU=
+X-MS-Exchange-CrossTenant-UserPrincipalName: OG20jZ7Wxe8d+oRUYGSVR5VfIQW92FJS9Da9TAa4DrL/60EJn6m6wIx5K/j/Yqi9lI20F4cfo4AGgEnPov8u3g/WXvn1VpGazyJ6dwXmGy4=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5004
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
@@ -137,202 +137,196 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Tianyu Yuan <tianyu.yuan@corigine.com>
+From: Yinjun Zhang <yinjun.zhang@corigine.com>
 
-Only one port per PF is allowed in multi-PF setup. While eth_table
-still carries the total port info, each PF need bind itself with
-correct port according to PF id.
+For backward compatibility concern, the new application firmware
+is designed to support both single-PF setup and multi-PF setup.
+Thus driver should inform application firmware which setup current
+is. This should be done as early as possible since the setup may
+affect some configurations exposed by firmware.
 
-Signed-off-by: Tianyu Yuan <tianyu.yuan@corigine.com>
+Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
 Reviewed-by: Niklas Söderlund <niklas.soderlund@corigine.com>
 Acked-by: Simon Horman <simon.horman@corigine.com>
 Signed-off-by: Louis Peens <louis.peens@corigine.com>
 ---
- drivers/net/ethernet/netronome/nfp/abm/main.c   |  2 +-
- drivers/net/ethernet/netronome/nfp/bpf/main.c   |  2 +-
- .../net/ethernet/netronome/nfp/flower/main.c    | 17 ++++++++++-------
- drivers/net/ethernet/netronome/nfp/nfp_main.h   |  6 ++++++
- .../net/ethernet/netronome/nfp/nfp_net_main.c   | 11 ++++++++---
- drivers/net/ethernet/netronome/nfp/nfp_port.c   |  4 +++-
- drivers/net/ethernet/netronome/nfp/nic/main.c   |  3 ++-
- 7 files changed, 31 insertions(+), 14 deletions(-)
+ .../net/ethernet/netronome/nfp/nfp_net_ctrl.h |   1 +
+ .../net/ethernet/netronome/nfp/nfp_net_main.c | 129 ++++++++++++++----
+ 2 files changed, 100 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/netronome/nfp/abm/main.c b/drivers/net/ethernet/netronome/nfp/abm/main.c
-index 5d3df28c648f..d4acaa15629d 100644
---- a/drivers/net/ethernet/netronome/nfp/abm/main.c
-+++ b/drivers/net/ethernet/netronome/nfp/abm/main.c
-@@ -451,7 +451,7 @@ static int nfp_abm_init(struct nfp_app *app)
- 		nfp_err(pf->cpp, "ABM NIC requires ETH table\n");
- 		return -EINVAL;
- 	}
--	if (pf->max_data_vnics != pf->eth_tbl->count) {
-+	if (pf->max_data_vnics != pf->eth_tbl->count && !pf->multi_pf.en) {
- 		nfp_err(pf->cpp, "ETH entries don't match vNICs (%d vs %d)\n",
- 			pf->max_data_vnics, pf->eth_tbl->count);
- 		return -EINVAL;
-diff --git a/drivers/net/ethernet/netronome/nfp/bpf/main.c b/drivers/net/ethernet/netronome/nfp/bpf/main.c
-index f469950c7265..3d928dfba114 100644
---- a/drivers/net/ethernet/netronome/nfp/bpf/main.c
-+++ b/drivers/net/ethernet/netronome/nfp/bpf/main.c
-@@ -70,7 +70,7 @@ nfp_bpf_vnic_alloc(struct nfp_app *app, struct nfp_net *nn, unsigned int id)
- 		nfp_err(pf->cpp, "No ETH table\n");
- 		return -EINVAL;
- 	}
--	if (pf->max_data_vnics != pf->eth_tbl->count) {
-+	if (pf->max_data_vnics != pf->eth_tbl->count && !pf->multi_pf.en) {
- 		nfp_err(pf->cpp, "ETH entries don't match vNICs (%d vs %d)\n",
- 			pf->max_data_vnics, pf->eth_tbl->count);
- 		return -EINVAL;
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/main.c b/drivers/net/ethernet/netronome/nfp/flower/main.c
-index 565987f0a595..2e79b6d981de 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/main.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/main.c
-@@ -428,10 +428,10 @@ nfp_flower_spawn_vnic_reprs(struct nfp_app *app,
- 			goto err_reprs_clean;
- 		}
- 		if (repr_type == NFP_REPR_TYPE_PF) {
--			port->pf_id = i;
-+			port->pf_id = nfp_net_get_id(app->pf, i);
- 			port->vnic = priv->nn->dp.ctrl_bar;
- 		} else {
--			port->pf_id = 0;
-+			port->pf_id = nfp_net_get_id(app->pf, 0);
- 			port->vf_id = i;
- 			port->vnic =
- 				app->pf->vf_cfg_mem + i * NFP_NET_CFG_BAR_SZ;
-@@ -496,28 +496,31 @@ nfp_flower_spawn_phy_reprs(struct nfp_app *app, struct nfp_flower_priv *priv)
- 	struct nfp_eth_table *eth_tbl = app->pf->eth_tbl;
- 	atomic_t *replies = &priv->reify_replies;
- 	struct nfp_flower_repr_priv *repr_priv;
-+	int err, reify_cnt, phy_reprs_num;
- 	struct nfp_repr *nfp_repr;
- 	struct sk_buff *ctrl_skb;
- 	struct nfp_reprs *reprs;
--	int err, reify_cnt;
- 	unsigned int i;
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ctrl.h b/drivers/net/ethernet/netronome/nfp/nfp_net_ctrl.h
+index 3e63f6d6a563..d6b127f13ed3 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_net_ctrl.h
++++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ctrl.h
+@@ -268,6 +268,7 @@
+ #define   NFP_NET_CFG_CTRL_PKT_TYPE	  (0x1 << 0) /* Pkttype offload */
+ #define   NFP_NET_CFG_CTRL_IPSEC	  (0x1 << 1) /* IPsec offload */
+ #define   NFP_NET_CFG_CTRL_MCAST_FILTER	  (0x1 << 2) /* Multicast Filter */
++#define   NFP_NET_CFG_CTRL_MULTI_PF	  (0x1 << 5) /* Multi PF */
+ #define   NFP_NET_CFG_CTRL_FREELIST_EN	  (0x1 << 6) /* Freelist enable flag bit */
  
- 	ctrl_skb = nfp_flower_cmsg_mac_repr_start(app, eth_tbl->count);
- 	if (!ctrl_skb)
- 		return -ENOMEM;
- 
-+	phy_reprs_num = app->pf->multi_pf.en ? app->pf->max_data_vnics : eth_tbl->count;
- 	reprs = nfp_reprs_alloc(eth_tbl->max_index + 1);
- 	if (!reprs) {
- 		err = -ENOMEM;
- 		goto err_free_ctrl_skb;
- 	}
- 
--	for (i = 0; i < eth_tbl->count; i++) {
--		unsigned int phys_port = eth_tbl->ports[i].index;
-+	for (i = 0; i < phy_reprs_num; i++) {
-+		int idx = nfp_net_get_id(app->pf, i);
- 		struct net_device *repr;
-+		unsigned int phys_port;
- 		struct nfp_port *port;
- 		u32 cmsg_port_id;
- 
-+		phys_port = eth_tbl->ports[idx].index;
- 		repr = nfp_repr_alloc(app);
- 		if (!repr) {
- 			err = -ENOMEM;
-@@ -542,7 +545,7 @@ nfp_flower_spawn_phy_reprs(struct nfp_app *app, struct nfp_flower_priv *priv)
- 			nfp_repr_free(repr);
- 			goto err_reprs_clean;
- 		}
--		err = nfp_port_init_phy_port(app->pf, app, port, i);
-+		err = nfp_port_init_phy_port(app->pf, app, port, idx);
- 		if (err) {
- 			kfree(repr_priv);
- 			nfp_port_free(port);
-@@ -609,7 +612,7 @@ nfp_flower_spawn_phy_reprs(struct nfp_app *app, struct nfp_flower_priv *priv)
- static int nfp_flower_vnic_alloc(struct nfp_app *app, struct nfp_net *nn,
- 				 unsigned int id)
- {
--	if (id > 0) {
-+	if (id > 0 && !app->pf->multi_pf.en) {
- 		nfp_warn(app->cpp, "FlowerNIC doesn't support more than one data vNIC\n");
- 		goto err_invalid_port;
- 	}
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_main.h b/drivers/net/ethernet/netronome/nfp/nfp_main.h
-index 7f76c718fef8..4f6763ca1c92 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_main.h
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_main.h
-@@ -210,4 +210,10 @@ unsigned int nfp_net_lr2speed(unsigned int linkrate);
- unsigned int nfp_net_speed2lr(unsigned int speed);
- 
- u8 nfp_get_pf_id(struct nfp_pf *pf);
-+
-+static inline unsigned int nfp_net_get_id(const struct nfp_pf *pf, unsigned int id)
-+{
-+	return pf->multi_pf.en ? pf->multi_pf.id : id;
-+}
-+
- #endif /* NFP_MAIN_H */
+ #define NFP_NET_CFG_CAP_WORD1		0x00a4
 diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_main.c b/drivers/net/ethernet/netronome/nfp/nfp_net_main.c
-index cbe4972ba104..98e155d79eb8 100644
+index 98e155d79eb8..f6f4fea0a791 100644
 --- a/drivers/net/ethernet/netronome/nfp/nfp_net_main.c
 +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_main.c
-@@ -141,7 +141,7 @@ nfp_net_pf_init_vnic(struct nfp_pf *pf, struct nfp_net *nn, unsigned int id)
- {
- 	int err;
+@@ -684,15 +684,108 @@ int nfp_net_refresh_eth_port(struct nfp_port *port)
+ 	return ret;
+ }
  
--	nn->id = id;
-+	nn->id = nfp_net_get_id(pf, id);
- 
- 	if (nn->port) {
- 		err = nfp_devlink_port_register(pf->app, nn->port);
-@@ -183,8 +183,8 @@ nfp_net_pf_alloc_vnics(struct nfp_pf *pf, void __iomem *ctrl_bar,
- 	int err;
- 
- 	for (i = 0; i < pf->max_data_vnics; i++) {
--		nn = nfp_net_pf_alloc_vnic(pf, true, ctrl_bar, qc_bar,
--					   stride, i);
-+		nn = nfp_net_pf_alloc_vnic(pf, true, ctrl_bar, qc_bar, stride,
-+					   nfp_net_get_id(pf, i));
- 		if (IS_ERR(nn)) {
- 			err = PTR_ERR(nn);
- 			goto err_free_prev;
-@@ -707,6 +707,11 @@ int nfp_net_pci_probe(struct nfp_pf *pf)
- 	if ((int)pf->max_data_vnics < 0)
- 		return pf->max_data_vnics;
- 
-+	if (pf->multi_pf.en && pf->max_data_vnics != 1) {
-+		nfp_err(pf->cpp, "Only one data_vnic per PF is supported in multiple PF setup.\n");
-+		return -EINVAL;
++/**
++ * nfp_net_pre_init() - Some necessary check and configuration
++ * in firmware before fully utilizing it.
++ * @pf: NFP PF handler
++ * @stride: queue stride
++ *
++ * Return: 0 on success, a negative error code otherwise.
++ */
++static int nfp_net_pre_init(struct nfp_pf *pf, int *stride)
++{
++	struct nfp_net_fw_version fw_ver;
++	struct nfp_cpp_area *area;
++	u8 __iomem *ctrl_bar;
++	int err = 0;
++
++	ctrl_bar = nfp_pf_map_rtsym(pf, NULL, "_pf%d_net_bar0", NFP_PF_CSR_SLICE_SIZE, &area);
++	if (IS_ERR(ctrl_bar)) {
++		nfp_err(pf->cpp, "Failed to find data vNIC memory symbol\n");
++		return PTR_ERR(ctrl_bar);
 +	}
 +
- 	err = nfp_net_pci_map_mem(pf);
- 	if (err)
- 		return err;
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_port.c b/drivers/net/ethernet/netronome/nfp/nfp_port.c
-index 54640bcb70fb..c1612a464b5d 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_port.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_port.c
-@@ -189,7 +189,9 @@ int nfp_port_init_phy_port(struct nfp_pf *pf, struct nfp_app *app,
- 
- 	port->eth_port = &pf->eth_tbl->ports[id];
- 	port->eth_id = pf->eth_tbl->ports[id].index;
--	port->netdev->dev_port = id;
-+	if (!pf->multi_pf.en)
-+		port->netdev->dev_port = id;
++	nfp_net_get_fw_version(&fw_ver, ctrl_bar);
++	if (fw_ver.extend & NFP_NET_CFG_VERSION_RESERVED_MASK ||
++	    fw_ver.class != NFP_NET_CFG_VERSION_CLASS_GENERIC) {
++		nfp_err(pf->cpp, "Unknown Firmware ABI %d.%d.%d.%d\n",
++			fw_ver.extend, fw_ver.class,
++			fw_ver.major, fw_ver.minor);
++		err = -EINVAL;
++		goto end;
++	}
 +
- 	if (pf->mac_stats_mem)
- 		port->eth_stats =
- 			pf->mac_stats_mem + port->eth_id * NFP_MAC_STATS_SIZE;
-diff --git a/drivers/net/ethernet/netronome/nfp/nic/main.c b/drivers/net/ethernet/netronome/nfp/nic/main.c
-index 9dd5afe37f6e..e7a2d01bcbff 100644
---- a/drivers/net/ethernet/netronome/nfp/nic/main.c
-+++ b/drivers/net/ethernet/netronome/nfp/nic/main.c
-@@ -12,7 +12,8 @@ static int nfp_nic_init(struct nfp_app *app)
++	/* Determine stride */
++	if (nfp_net_fw_ver_eq(&fw_ver, 0, 0, 0, 1)) {
++		*stride = 2;
++		nfp_warn(pf->cpp, "OBSOLETE Firmware detected - VF isolation not available\n");
++	} else {
++		switch (fw_ver.major) {
++		case 1 ... 5:
++			*stride = 4;
++			break;
++		default:
++			nfp_err(pf->cpp, "Unsupported Firmware ABI %d.%d.%d.%d\n",
++				fw_ver.extend, fw_ver.class,
++				fw_ver.major, fw_ver.minor);
++			err = -EINVAL;
++			goto end;
++		}
++	}
++
++	if (!pf->multi_pf.en)
++		goto end;
++
++	/* Enable multi-PF. */
++	if (readl(ctrl_bar + NFP_NET_CFG_CAP_WORD1) & NFP_NET_CFG_CTRL_MULTI_PF) {
++		unsigned long long addr;
++		u32 cfg_q, cpp_id, ret;
++		unsigned long timeout;
++
++		writel(NFP_NET_CFG_CTRL_MULTI_PF, ctrl_bar + NFP_NET_CFG_CTRL_WORD1);
++		writel(NFP_NET_CFG_UPDATE_GEN, ctrl_bar + NFP_NET_CFG_UPDATE);
++
++		/* Config queue is next to txq. */
++		cfg_q = readl(ctrl_bar + NFP_NET_CFG_START_TXQ) + 1;
++		addr = nfp_qcp_queue_offset(pf->dev_info, cfg_q) + NFP_QCP_QUEUE_ADD_WPTR;
++		cpp_id = NFP_CPP_ISLAND_ID(0, NFP_CPP_ACTION_RW, 0, 0);
++		err = nfp_cpp_writel(pf->cpp, cpp_id, addr, 1);
++		if (err)
++			goto end;
++
++		timeout = jiffies + HZ * NFP_NET_POLL_TIMEOUT;
++		while ((ret = readl(ctrl_bar + NFP_NET_CFG_UPDATE))) {
++			if (ret & NFP_NET_CFG_UPDATE_ERR) {
++				nfp_err(pf->cpp, "Enable multi-PF failed\n");
++				err = -EIO;
++				break;
++			}
++
++			usleep_range(250, 500);
++			if (time_is_before_eq_jiffies(timeout)) {
++				nfp_err(pf->cpp, "Enable multi-PF timeout\n");
++				err = -ETIMEDOUT;
++				break;
++			}
++		};
++	} else {
++		nfp_err(pf->cpp, "Loaded firmware doesn't support multi-PF\n");
++		err = -EINVAL;
++	}
++
++end:
++	nfp_cpp_area_release_free(area);
++	return err;
++}
++
+ /*
+  * PCI device functions
+  */
+ int nfp_net_pci_probe(struct nfp_pf *pf)
  {
- 	struct nfp_pf *pf = app->pf;
+ 	struct devlink *devlink = priv_to_devlink(pf);
+-	struct nfp_net_fw_version fw_ver;
+ 	u8 __iomem *ctrl_bar, *qc_bar;
+-	int stride;
++	int stride = 0;
+ 	int err;
  
--	if (pf->eth_tbl && pf->max_data_vnics != pf->eth_tbl->count) {
-+	if (pf->eth_tbl && pf->max_data_vnics != pf->eth_tbl->count &&
-+	    !pf->multi_pf.en) {
- 		nfp_err(pf->cpp, "ETH entries don't match vNICs (%d vs %d)\n",
- 			pf->max_data_vnics, pf->eth_tbl->count);
+ 	INIT_WORK(&pf->port_refresh_work, nfp_net_refresh_vnics);
+@@ -703,6 +796,10 @@ int nfp_net_pci_probe(struct nfp_pf *pf)
  		return -EINVAL;
+ 	}
+ 
++	err = nfp_net_pre_init(pf, &stride);
++	if (err)
++		return err;
++
+ 	pf->max_data_vnics = nfp_net_pf_get_num_ports(pf);
+ 	if ((int)pf->max_data_vnics < 0)
+ 		return pf->max_data_vnics;
+@@ -723,34 +820,6 @@ int nfp_net_pci_probe(struct nfp_pf *pf)
+ 		goto err_unmap;
+ 	}
+ 
+-	nfp_net_get_fw_version(&fw_ver, ctrl_bar);
+-	if (fw_ver.extend & NFP_NET_CFG_VERSION_RESERVED_MASK ||
+-	    fw_ver.class != NFP_NET_CFG_VERSION_CLASS_GENERIC) {
+-		nfp_err(pf->cpp, "Unknown Firmware ABI %d.%d.%d.%d\n",
+-			fw_ver.extend, fw_ver.class,
+-			fw_ver.major, fw_ver.minor);
+-		err = -EINVAL;
+-		goto err_unmap;
+-	}
+-
+-	/* Determine stride */
+-	if (nfp_net_fw_ver_eq(&fw_ver, 0, 0, 0, 1)) {
+-		stride = 2;
+-		nfp_warn(pf->cpp, "OBSOLETE Firmware detected - VF isolation not available\n");
+-	} else {
+-		switch (fw_ver.major) {
+-		case 1 ... 5:
+-			stride = 4;
+-			break;
+-		default:
+-			nfp_err(pf->cpp, "Unsupported Firmware ABI %d.%d.%d.%d\n",
+-				fw_ver.extend, fw_ver.class,
+-				fw_ver.major, fw_ver.minor);
+-			err = -EINVAL;
+-			goto err_unmap;
+-		}
+-	}
+-
+ 	err = nfp_net_pf_app_init(pf, qc_bar, stride);
+ 	if (err)
+ 		goto err_unmap;
 -- 
 2.34.1
 
