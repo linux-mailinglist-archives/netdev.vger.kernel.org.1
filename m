@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-27874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69B577D80D
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:00:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD8677D80E
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 04:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 131731C20D72
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:00:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47277281578
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB251115;
-	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017311C01;
+	Wed, 16 Aug 2023 02:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE137F2
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:00:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E670C433C9;
-	Wed, 16 Aug 2023 02:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCD017E8
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 888A8C433CC;
+	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692151221;
-	bh=8zy9tuJEYtTlTlsmU6yw8DxWnd3M4qAqXB5IZSXtOWM=;
+	s=k20201202; t=1692151223;
+	bh=/SivyJg8L6IR/Depj/t+YI1jAL7OVWimX+0Y3ciOitI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jkyl5thNvoc2mEJC4kDmAiQcYEAOJ82knh1SV9Uyk1vXBiJwogLh8vmwvL+wyd20l
-	 HvqpIbuhmEYDZ3oAyogaGV//PRTfZ4XFb8AeqYr6KfAxNuER4Ur1Dn9YrFDF1pEmOF
-	 Zp0l2ZI82rUdo28tiJy5In92xwQSEunxB2rjUpcmvGzdVB0jErnKiZVFWN4JwRa4Lh
-	 +RituYE2rOIG57q6y/Df2kgtfFz9WP+jCasjTIp7ywhA/ShyJbJg43rbBpJMNQYc2t
-	 Wh/Ap4QTnY4L7wktJMsJVRsWDwca9p0eVcd78PYs0wmekHojjZIr7JMmUruwoWjI8K
-	 gwW2V6ZzZp+GA==
+	b=HoHHqUSN72uGtTeAaxsXXiAJnXHu18/C1a7kcmlmGPJvkOM1eo+FGYfN1R1Qs0dnB
+	 N3rvXM8HvY+vmHAOJMa2U9bFsWRWmZbQTrW0W4kz5IGNIx+l2vDEQJgqAEjNmjrCQR
+	 UM1bGxm+6W7ttums0RPEiqtLIwvfmWe1pjnZX3lm8Vf357FYnrKkQJODV7IdZegDr5
+	 PrNiM3GZqeVPTV8C4ny0u+jZVsb+feD1Thdvo+t8Qnn21GaFVIS1NvscTunEyztQz5
+	 ga0nvTbV2kH8AYgTgqn7R7DYNnUEe53Ub4a9pApc5DwMRLajDXUUpNXhqlbUwrTKFC
+	 G5S7F7hNxsKGA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83D5BC395C5;
-	Wed, 16 Aug 2023 02:00:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6B29EC395C5;
+	Wed, 16 Aug 2023 02:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,39 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: phy: broadcom: stub c45 read/write for 54810
+Subject: Re: [PATCH net-next v3] net: phy: mediatek-ge-soc: support PHY LEDs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169215122153.15326.4625429367970352671.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Aug 2023 02:00:21 +0000
-References: <1691901708-28650-1-git-send-email-justin.chen@broadcom.com>
-In-Reply-To: <1691901708-28650-1-git-send-email-justin.chen@broadcom.com>
-To: Justin Chen <justin.chen@broadcom.com>
-Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jon.mason@broadcom.com,
- linux-kernel@vger.kernel.org
+ <169215122343.15326.15132582167017916301.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Aug 2023 02:00:23 +0000
+References: <dc324d48c00cd7350f3a506eaa785324cae97372.1691977904.git.daniel@makrotopia.org>
+In-Reply-To: <dc324d48c00cd7350f3a506eaa785324cae97372.1691977904.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: dqfext@gmail.com, SkyLake.Huang@mediatek.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 12 Aug 2023 21:41:47 -0700 you wrote:
-> The 54810 does not support c45. The mmd_phy_indirect accesses return
-> arbirtary values leading to odd behavior like saying it supports EEE
-> when it doesn't. We also see that reading/writing these non-existent
-> MMD registers leads to phy instability in some cases.
+On Mon, 14 Aug 2023 02:58:14 +0100 you wrote:
+> Implement netdev trigger and primitive bliking offloading as well as
+> simple set_brigthness function for both PHY LEDs of the in-SoC PHYs
+> found in MT7981 and MT7988.
 > 
-> Fixes: b14995ac2527 ("net: phy: broadcom: Add BCM54810 PHY entry")
-> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+> For MT7988, read boottrap register and apply LED polarities accordingly
+> to get uniform behavior from all LEDs on MT7988.
+> This requires syscon phandle 'mediatek,pio' present in parenting MDIO bus
+> which should point to the syscon holding the boottrap register.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: phy: broadcom: stub c45 read/write for 54810
-    https://git.kernel.org/netdev/net/c/096516d092d5
+  - [net-next,v3] net: phy: mediatek-ge-soc: support PHY LEDs
+    https://git.kernel.org/netdev/net-next/c/c66937b0f8db
 
 You are awesome, thank you!
 -- 
