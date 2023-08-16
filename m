@@ -1,303 +1,153 @@
-Return-Path: <netdev+bounces-28224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF4777EB27
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 22:58:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF27A77EB2D
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 23:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 310971C2120B
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 20:58:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C40B1C2026E
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 21:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B126A1C9EF;
-	Wed, 16 Aug 2023 20:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C5A1802D;
+	Wed, 16 Aug 2023 21:00:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A622A1BF1F
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 20:54:38 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42976271D
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 13:54:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692219277; x=1723755277;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/7uCvLW/5rJBMEeABkZR2Hsw2QKJJKColBy4dhC6UFM=;
-  b=VOxIlXMgaZJUTSOQgmmA5eJQ0xp7a6P/2aDsEFmVk8rMGSM3e6uTm2rC
-   FPYT2wkahu4H9+tptW8FRQewtUHDFtGfuTBSkbYJq8L85/Du9/Gy0BszE
-   A6d6/fMxfrSwyZEcwlyURJAFEH1LVinj14a7apVtbA/k5zs7jgfRufAjn
-   wozxd2+9AUkd9JVemw5w1+DLB+OVqDifT1t604pFNfCrQDO2UuG1DwsEm
-   WAKHOkubpjvgA+1fdZXq/SSlkMS7xs1poJ8afVBmCKJwbL/sp8nJyxcE8
-   vB3fq0CYTwnV4Br8QslmoDeCke7yj/UgNjLi4PclQQTmCkBoJcgfxO2q6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="357604834"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="357604834"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 13:54:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="848626415"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="848626415"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Aug 2023 13:54:34 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 14/14] ice: split ice_aq_wait_for_event() func into two
-Date: Wed, 16 Aug 2023 13:47:36 -0700
-Message-Id: <20230816204736.1325132-15-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230816204736.1325132-1-anthony.l.nguyen@intel.com>
-References: <20230816204736.1325132-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CC015AC3
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 21:00:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50933C433C7;
+	Wed, 16 Aug 2023 21:00:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692219656;
+	bh=KCJqTBYLW3C3DXjuLZpaFMyx5hoGDFCcWYCbme/RaKo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TGzDj6IbBOsCnF70ygtaQJvHLVe3R3cP3rB6l1PbLZuxOiDztZpXyqp8Dc5IAoNIc
+	 ZloIxs6KUFXgPIvLCHAkC/k6HROrGRBf0q+7mZntko4x1v6WV0zA5XEQIxKUdo1UYX
+	 QBiesOU9SS56R0oK7doZFIteQoSCLJasJcXNYI8jEQdj1dxeSsa8xxa/mkJcaloFFw
+	 WMKEoHENTaGlse0ErlYtV9hW01D+VS1J0CVCHtY1RiVyqkfL5Zgl4sdR5h+OcgKkj5
+	 qdNrdGb5u2R1m/IgPddPxMPP+dZ7V9oHBXUaPiQ1JNRdY1TnuRHNmc5RN/Pk+Q9HzB
+	 GE4tpCynLboHg==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net-next 00/15] mlx5 updates 2023-08-16
+Date: Wed, 16 Aug 2023 14:00:34 -0700
+Message-ID: <20230816210049.54733-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-Mitigate race between registering on wait list and receiving
-AQ Response from FW.
+This series provides misc updates to mlx5 driver.
+For more information please see tag log below.
 
-ice_aq_prep_for_event() should be called before sending AQ command,
-ice_aq_wait_for_event() should be called after sending AQ command,
-to wait for AQ Response.
+Please pull and let me know if there is any problem.
 
-Please note, that this was found by reading the code,
-an actual race has not yet materialized.
+Thanks,
+Saeed.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h          |  5 +-
- .../net/ethernet/intel/ice/ice_fw_update.c    | 13 ++--
- drivers/net/ethernet/intel/ice/ice_main.c     | 67 ++++++++++++-------
- 3 files changed, 57 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 9a334287bd92..5022b036ca4f 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -919,6 +919,7 @@ void ice_fdir_replay_fltrs(struct ice_pf *pf);
- int ice_fdir_create_dflt_rules(struct ice_pf *pf);
- 
- enum ice_aq_task_state {
-+	ICE_AQ_TASK_NOT_PREPARED,
- 	ICE_AQ_TASK_WAITING,
- 	ICE_AQ_TASK_COMPLETE,
- 	ICE_AQ_TASK_CANCELED,
-@@ -931,8 +932,10 @@ struct ice_aq_task {
- 	u16 opcode;
- };
- 
-+void ice_aq_prep_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			   u16 opcode);
- int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
--			  u16 opcode, unsigned long timeout);
-+			  unsigned long timeout);
- int ice_open(struct net_device *netdev);
- int ice_open_internal(struct net_device *netdev);
- int ice_stop(struct net_device *netdev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-index 819b70823e9c..319a2d6fe26c 100644
---- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-@@ -302,6 +302,8 @@ ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	dev_dbg(dev, "Writing block of %u bytes for module 0x%02x at offset %u\n",
- 		block_size, module, offset);
- 
-+	ice_aq_prep_for_event(pf, &task, ice_aqc_opc_nvm_write);
-+
- 	err = ice_aq_update_nvm(hw, module, offset, block_size, block,
- 				last_cmd, 0, NULL);
- 	if (err) {
-@@ -318,7 +320,7 @@ ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	 * is conservative and is intended to prevent failure to update when
- 	 * firmware is slow to respond.
- 	 */
--	err = ice_aq_wait_for_event(pf, &task, ice_aqc_opc_nvm_write, 15 * HZ);
-+	err = ice_aq_wait_for_event(pf, &task, 15 * HZ);
- 	if (err) {
- 		dev_err(dev, "Timed out while trying to flash module 0x%02x with block of size %u at offset %u, err %d\n",
- 			module, block_size, offset, err);
-@@ -491,6 +493,8 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 
- 	devlink_flash_update_timeout_notify(devlink, "Erasing", component, ICE_FW_ERASE_TIMEOUT);
- 
-+	ice_aq_prep_for_event(pf, &task, ice_aqc_opc_nvm_erase);
-+
- 	err = ice_aq_erase_nvm(hw, module, NULL);
- 	if (err) {
- 		dev_err(dev, "Failed to erase %s (module 0x%02x), err %d aq_err %s\n",
-@@ -501,7 +505,7 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 		goto out_notify_devlink;
- 	}
- 
--	err = ice_aq_wait_for_event(pf, &task, ice_aqc_opc_nvm_erase, ICE_FW_ERASE_TIMEOUT * HZ);
-+	err = ice_aq_wait_for_event(pf, &task, ICE_FW_ERASE_TIMEOUT * HZ);
- 	if (err) {
- 		dev_err(dev, "Timed out waiting for firmware to respond with erase completion for %s (module 0x%02x), err %d\n",
- 			component, module, err);
-@@ -566,6 +570,8 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 	u8 response_flags;
- 	int err;
- 
-+	ice_aq_prep_for_event(pf, &task, ice_aqc_opc_nvm_write_activate);
-+
- 	err = ice_nvm_write_activate(hw, activate_flags, &response_flags);
- 	if (err) {
- 		dev_err(dev, "Failed to switch active flash banks, err %d aq_err %s\n",
-@@ -590,8 +596,7 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 		}
- 	}
- 
--	err = ice_aq_wait_for_event(pf, &task, ice_aqc_opc_nvm_write_activate,
--				    30 * HZ);
-+	err = ice_aq_wait_for_event(pf, &task, 30 * HZ);
- 	if (err) {
- 		dev_err(dev, "Timed out waiting for firmware to switch active flash banks, err %d\n",
- 			err);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index b08be6700b2a..81c1018b57d1 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -1251,30 +1251,24 @@ ice_handle_link_event(struct ice_pf *pf, struct ice_rq_event_info *event)
- }
- 
- /**
-- * ice_aq_wait_for_event - Wait for an AdminQ event from firmware
-+ * ice_aq_prep_for_event - Prepare to wait for an AdminQ event from firmware
-  * @pf: pointer to the PF private structure
-- * @task: ptr to task structure
-+ * @task: intermediate helper storage and identifier for waiting
-  * @opcode: the opcode to wait for
-- * @timeout: how long to wait, in jiffies
-  *
-- * Waits for a specific AdminQ completion event on the ARQ for a given PF. The
-- * current thread will be put to sleep until the specified event occurs or
-- * until the given timeout is reached.
-+ * Prepares to wait for a specific AdminQ completion event on the ARQ for
-+ * a given PF. Actual wait would be done by a call to ice_aq_wait_for_event().
-  *
-- * To obtain only the descriptor contents, pass an event without an allocated
-- * msg_buf. If the complete data buffer is desired, allocate the
-- * event->msg_buf with enough space ahead of time.
-+ * Calls are separated to allow caller registering for event before sending
-+ * the command, which mitigates a race between registering and FW responding.
-  *
-- * Returns: zero on success, or a negative error code on failure.
-+ * To obtain only the descriptor contents, pass an task->event with null
-+ * msg_buf. If the complete data buffer is desired, allocate the
-+ * task->event.msg_buf with enough space ahead of time.
-  */
--int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
--			  u16 opcode, unsigned long timeout)
-+void ice_aq_prep_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			   u16 opcode)
- {
--	struct device *dev = ice_pf_to_dev(pf);
--	unsigned long start;
--	long ret;
--	int err;
--
- 	INIT_HLIST_NODE(&task->entry);
- 	task->opcode = opcode;
- 	task->state = ICE_AQ_TASK_WAITING;
-@@ -1282,12 +1276,37 @@ int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
- 	spin_lock_bh(&pf->aq_wait_lock);
- 	hlist_add_head(&task->entry, &pf->aq_wait_list);
- 	spin_unlock_bh(&pf->aq_wait_lock);
-+}
- 
--	start = jiffies;
-+/**
-+ * ice_aq_wait_for_event - Wait for an AdminQ event from firmware
-+ * @pf: pointer to the PF private structure
-+ * @task: ptr prepared by ice_aq_prep_for_event()
-+ * @timeout: how long to wait, in jiffies
-+ *
-+ * Waits for a specific AdminQ completion event on the ARQ for a given PF. The
-+ * current thread will be put to sleep until the specified event occurs or
-+ * until the given timeout is reached.
-+ *
-+ * Returns: zero on success, or a negative error code on failure.
-+ */
-+int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
-+			  unsigned long timeout)
-+{
-+	enum ice_aq_task_state *state = &task->state;
-+	struct device *dev = ice_pf_to_dev(pf);
-+	unsigned long start = jiffies;
-+	long ret;
-+	int err;
- 
--	ret = wait_event_interruptible_timeout(pf->aq_wait_queue, task->state,
-+	ret = wait_event_interruptible_timeout(pf->aq_wait_queue,
-+					       *state != ICE_AQ_TASK_WAITING,
- 					       timeout);
--	switch (task->state) {
-+	switch (*state) {
-+	case ICE_AQ_TASK_NOT_PREPARED:
-+		WARN(1, "call to %s without ice_aq_prep_for_event()", __func__);
-+		err = -EINVAL;
-+		break;
- 	case ICE_AQ_TASK_WAITING:
- 		err = ret < 0 ? ret : -ETIMEDOUT;
- 		break;
-@@ -1298,7 +1317,7 @@ int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
- 		err = ret < 0 ? ret : 0;
- 		break;
- 	default:
--		WARN(1, "Unexpected AdminQ wait task state %u", task->state);
-+		WARN(1, "Unexpected AdminQ wait task state %u", *state);
- 		err = -EINVAL;
- 		break;
- 	}
-@@ -1306,7 +1325,7 @@ int ice_aq_wait_for_event(struct ice_pf *pf, struct ice_aq_task *task,
- 	dev_dbg(dev, "Waited %u msecs (max %u msecs) for firmware response to op 0x%04x\n",
- 		jiffies_to_msecs(jiffies - start),
- 		jiffies_to_msecs(timeout),
--		opcode);
-+		task->opcode);
- 
- 	spin_lock_bh(&pf->aq_wait_lock);
- 	hlist_del(&task->entry);
-@@ -1342,7 +1361,9 @@ static void ice_aq_check_events(struct ice_pf *pf, u16 opcode,
- 
- 	spin_lock_bh(&pf->aq_wait_lock);
- 	hlist_for_each_entry(task, &pf->aq_wait_list, entry) {
--		if (task->state || task->opcode != opcode)
-+		if (task->state != ICE_AQ_TASK_WAITING)
-+			continue;
-+		if (task->opcode != opcode)
- 			continue;
- 
- 		task_ev = &task->event;
--- 
-2.38.1
+The following changes since commit 950fe35831af0c1f9d87d4105843c3b7f1fbf09b:
 
+  Merge branch 'ipv6-expired-routes' (2023-08-16 12:26:44 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-08-16
+
+for you to fetch changes up to f749b6035a760d51a1d45ef053702d2d3065df3f:
+
+  net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event() (2023-08-16 13:22:34 -0700)
+
+----------------------------------------------------------------
+mlx5-updates-2023-08-16
+
+1) aRFS ethtool stats
+Improve aRFS observability by adding new set of counters. Each Rx
+ring will have this set of counters listed below.
+These counters are exposed through ethtool -S.
+
+1.1) arfs_add: number of times a new rule has been created.
+1.2) arfs_request_in: number of times a rule  was requested to move from
+   its current Rx ring to a new Rx ring (incremented on the destination
+   Rx ring).
+1.3) arfs_request_out: number of times a rule  was requested to move out
+   from its current Rx ring (incremented on source/current Rx ring).
+1.4) arfs_expired: number of times a rule has been expired by the
+   kernel and removed from HW.
+1.5) arfs_err: number of times a rule creation or modification has
+   failed.
+
+2) Supporting inline WQE when possible in SW steering
+
+3) Misc cleanups and fixups to net-next branch
+
+----------------------------------------------------------------
+Adham Faris (3):
+      net/mlx5e: aRFS, Prevent repeated kernel rule migrations requests
+      net/mlx5e: aRFS, Warn if aRFS table does not exist for aRFS rule
+      net/mlx5e: aRFS, Introduce ethtool stats
+
+Colin Ian King (1):
+      net/mlx5e: Fix spelling mistake "Faided" -> "Failed"
+
+Gal Pressman (1):
+      net/mlx5: Remove health syndrome enum duplication
+
+Ilpo Järvinen (1):
+      net/mlx5: Convert PCI error values to generic errnos
+
+Itamar Gozlan (1):
+      net/mlx5: DR, Supporting inline WQE when possible
+
+Jiri Pirko (3):
+      net/mlx5: Call mlx5_esw_offloads_rep_load/unload() for uplink port directly
+      net/mlx5: Remove VPORT_UPLINK handling from devlink_port.c
+      net/mlx5: Rename devlink port ops struct for PFs/VFs
+
+Li Zetao (1):
+      net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event()
+
+Rahul Rameshbabu (1):
+      net/mlx5: Update dead links in Kconfig documentation
+
+Saeed Mahameed (1):
+      net/mlx5: IRQ, consolidate irq and affinity mask allocation
+
+Yevgeny Kliteynik (2):
+      net/mlx5: DR, Fix code indentation
+      net/mlx5: DR, Remove unneeded local variable
+
+ .../ethernet/mellanox/mlx5/counters.rst            |  23 ++++-
+ .../ethernet/mellanox/mlx5/kconfig.rst             |  14 +--
+ Documentation/networking/xfrm_device.rst           |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c  |  21 +++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  22 +++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.h |  13 ++-
+ .../ethernet/mellanox/mlx5/core/esw/devlink_port.c |  16 +--
+ .../net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c |   2 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  20 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c |  12 +--
+ drivers/net/ethernet/mellanox/mlx5/core/health.c   |  36 ++-----
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |  14 ++-
+ .../mellanox/mlx5/core/steering/dr_action.c        |   1 -
+ .../ethernet/mellanox/mlx5/core/steering/dr_send.c | 115 ++++++++++++++++++---
+ .../ethernet/mellanox/mlx5/core/steering/fs_dr.c   |   2 +-
+ 16 files changed, 214 insertions(+), 101 deletions(-)
 
