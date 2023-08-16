@@ -1,52 +1,57 @@
-Return-Path: <netdev+bounces-28163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4B4C77E6BE
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:42:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF36777E6BD
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 18:42:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E15A281BC1
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:42:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C89301C211A9
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 16:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D61174D0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C45171DE;
 	Wed, 16 Aug 2023 16:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D0314281
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CCB1118C
 	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 16:40:23 +0000 (UTC)
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46563271F
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 09:40:21 -0700 (PDT)
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [IPv6:2a01:4f8:c17:e8c0::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4724C2724;
+	Wed, 16 Aug 2023 09:40:21 -0700 (PDT)
 Received: from kero.packetmixer.de (p200300FA272a67000Bb2D6DcAf57d46E.dip0.t-ipconnect.de [IPv6:2003:fa:272a:6700:bb2:d6dc:af57:d46e])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 64368FB5B0;
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id C0A49FB5B1;
 	Wed, 16 Aug 2023 18:33:20 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=simonwunderlich.de;
 	s=09092022; t=1692203600; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:references; bh=m1w6FoGMV+sfhD7tg4nzP8v3sE5qiFtEwg083Tmb81U=;
-	b=F3hUDqEbmJekyGRawjrUDrekktiIIGEiZO6ZqsP4F/8/5U4J5dyFVnlioGi3/wGXPzjzgF
-	OR2SUHwjZcGvyWslqMh78BrrJUwRZMrCIRJCJ/A8dSU8cdLkWdNTC5Qo9yuadLRGKgEnth
-	b1K+qzmZYSN6JYTdckO0eSgcn5yy023JSAz+aNqD+a/CFfNRYYNYXgrOKaOe5QFwvJak7H
-	DEpE3Jh6fQo3gPS7ZT9MnpeNCumRCc7QQIc7ak/3hBrF9w151B/bMOYH7bJZjF7YoEToSV
-	EVLt8GFuaOXMkFbbHrA9btUS4NOC3r9vo8J8BC0tRP3tIbdFQvZcw14An+xkMg==
+	 in-reply-to:in-reply-to:references:references;
+	bh=TDr4ApcYiSq7b1LH4pTlLUo+yJYCl799b+ZbteyLDqg=;
+	b=RNif1ElgLtX1XNgo34EMgkPcO5bvSJuM3smEAG7H32FxEb7chYcIVrae2OLivrI+qGX9K+
+	qhSu5jlg0SDB3jzGGv9zQVtIF6d9PZn2Mb4pumvvyy32Q0GeE8z1pnHZD7z0fVSRRD2NuX
+	boI/Cw6s1v3WsJgag07VuUl8bem2UYV1m9BbNEbtmiXHyHeyeSCvmmEtl53aYo6wE5JSnv
+	HxyAsX+rYBmHMmDPMhUyxSRJxDUQGZFLh2ZZEljSTNna3a0TsSZRWKzWotkPSxe7t3zjhO
+	1vheyMFebETNMepkbK1hCgtPedUky5vA0eR/oAcMXHRPYuimJs4LCRaV2iG62w==
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: davem@davemloft.net,
 	kuba@kernel.org
 Cc: netdev@vger.kernel.org,
 	b.a.t.m.a.n@lists.open-mesh.org,
+	Sven Eckelmann <sven@narfation.org>,
+	stable@vger.kernel.org,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH 0/5] pull request for net: batman-adv 2023-08-16
-Date: Wed, 16 Aug 2023 18:33:13 +0200
-Message-Id: <20230816163318.189996-1-sw@simonwunderlich.de>
+Subject: [PATCH 1/5] batman-adv: Trigger events for auto adjusted MTU
+Date: Wed, 16 Aug 2023 18:33:14 +0200
+Message-Id: <20230816163318.189996-2-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230816163318.189996-1-sw@simonwunderlich.de>
+References: <20230816163318.189996-1-sw@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,15 +64,16 @@ ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
 	h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:references; bh=m1w6FoGMV+sfhD7tg4nzP8v3sE5qiFtEwg083Tmb81U=;
-	b=w5zzxd2iYrgIPHMMWMgNsHPeyKEvPUrotjdrBAta2yBKE6sSzjtLbrjYlDLDs/BAl40U8I
-	orVg+3+SL2m2/rpRqQkdEx3u9wEm+Mmk09Z92g6SIcQfSAOZsFfByMv8tGqoMfKJsNZ0ZY
-	Iz2F0NltGKXXy0KED36TUEbn3R3gkeEBUvJvCPukc1KOpQjARrovFykxk757udt0nVr8qB
-	9bWiLyCBXznHQMYUi0nXeZJWFfZHBAgzDmFrGWblH6O8C3MNBD5gvrJvqulSy3ATCP0+tq
-	BiUFxxZc2nyT7iPziZNqnPdmPLDpdHIh66UDRSEWARwNU+IZa+WCwkUI0Mba2A==
+	 in-reply-to:in-reply-to:references:references;
+	bh=TDr4ApcYiSq7b1LH4pTlLUo+yJYCl799b+ZbteyLDqg=;
+	b=lY2tZcU3Oc7gr3m4vR+VbFmStW3bKrvzjD0zoTvWkAJrLM9sXyA9lelui69YIzNxgIvv5a
+	AWbZE4XLalZWSaM7KMvwVHaCFbSkh6u6D0MdzaAmnGKAOjR232tmJuV5bIFZAOvZ+Sa1Df
+	nAYThj5auLs8M2WQb3nsyLajr9pPMPFYPd7Wsyfbm+hJGi2fRixPa2RuWQVkLHGs2OLugc
+	THblU1YavYRkhedX9cGacj54kZtNhEEQ5CPMEmeJwz68si3mlYO41oG+Aods3gTMXcuZ2c
+	iMTIp6k0zW5hCQB9hnPL5J+F/3LH0jJJHH2Sglx6LdnXucAiQMPBnWxagEg98Q==
 ARC-Seal: i=1; s=09092022; d=simonwunderlich.de; t=1692203600; a=rsa-sha256;
 	cv=none;
-	b=hi9As+oKAsM71PgOCV5+aZUmKgvQPNgiAe34JsFGZQ1zGoxISTlDI8Yn/CZAsVOMGSja8JQsPEMwFU6AZ3TdgagsoC485sq/0/dp87RH7mp0gze1JcNe0AdtXVTMJwaWNC3XGXUqXJGM7xM5EiyQpmekwsJixO6pPW8L1BysXvHjZuM3I6Or5Dno+V7460CSBK3riYxAyzs5k9PMUkbsKCSRxUHDzdLQ9sOMEX+Lxib4Vy6k359X7nAp+wfx2tSFuh9BJP7EJFD2Z18hJ9i7t2Pkh8bKHhqFoAOQ0RA1VWABfTcLrQczgXUdyKKB9Z4C7igbm3LWRoDTIA08w5HsSA==
+	b=gi3BxAgYdVgaF7/GAmc3riqNqKa2RKe2eKZHU5kqbFwPdZ40JQlzZ+5RwZPzpr8HdHVhB3meZJ770phCT883HX7Z0rWSmrBTJAGLwq1ik7J4J6i3Q8Qzcj1LLdM6Q6lBwvYMALicQUDE221CxwCBteT7gZyLXA5xdb9Eekol5eOKRVMy8txqUFfQ61CvH4rqxxz637Ity0pdrY4M9lt/tWYzsOm2IBcifqr65LJoCWfkKSnBoCXaQGTXOnmArH/3P2gIMi4oMWJyOgNDwPJvGhgcUfTkR/x6jAP6invWK+fhJMxl0IvEA+vIBFrUCndlmlrQUl1c08KAl/SIKI9jDQ==
 ARC-Authentication-Results: i=1;
 	mail.simonwunderlich.de;
 	auth=pass smtp.auth=sw@simonwunderlich.de smtp.mailfrom=sw@simonwunderlich.de
@@ -78,51 +84,39 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub,
+From: Sven Eckelmann <sven@narfation.org>
 
-here are a few bugfixes for batman-adv which we would like to have integrated into net.
+If an interface changes the MTU, it is expected that an NETDEV_PRECHANGEMTU
+and NETDEV_CHANGEMTU notification events is triggered. This worked fine for
+.ndo_change_mtu based changes because core networking code took care of it.
+But for auto-adjustments after hard-interfaces changes, these events were
+simply missing.
 
-Please pull or let me know of any problem!
+Due to this problem, non-batman-adv components weren't aware of MTU changes
+and thus couldn't perform their own tasks correctly.
 
-Thank you,
-      Simon
+Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+---
+ net/batman-adv/hard-interface.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
+diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
+index 41c1ad33d009..ae5762af0146 100644
+--- a/net/batman-adv/hard-interface.c
++++ b/net/batman-adv/hard-interface.c
+@@ -630,7 +630,7 @@ int batadv_hardif_min_mtu(struct net_device *soft_iface)
+  */
+ void batadv_update_min_mtu(struct net_device *soft_iface)
+ {
+-	soft_iface->mtu = batadv_hardif_min_mtu(soft_iface);
++	dev_set_mtu(soft_iface, batadv_hardif_min_mtu(soft_iface));
+ 
+ 	/* Check if the local translate table should be cleaned up to match a
+ 	 * new (and smaller) MTU.
+-- 
+2.39.2
 
-  Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
-
-are available in the Git repository at:
-
-  git://git.open-mesh.org/linux-merge.git tags/batadv-net-pullrequest-20230816
-
-for you to fetch changes up to 421d467dc2d483175bad4fb76a31b9e5a3d744cf:
-
-  batman-adv: Fix batadv_v_ogm_aggr_send memory leak (2023-08-09 17:33:03 +0200)
-
-----------------------------------------------------------------
-Here are some batman-adv bugfixes:
-
- - Fix issues with adjusted MTUs (2 patches), by Sven Eckelmann
-
- - Fix header access for memory reallocation case, by Remi Pommarel
-
- - Fix two memory leaks (2 patches), by Remi Pommarel
-
-----------------------------------------------------------------
-Remi Pommarel (3):
-      batman-adv: Do not get eth header before batadv_check_management_packet
-      batman-adv: Fix TT global entry leak when client roamed back
-      batman-adv: Fix batadv_v_ogm_aggr_send memory leak
-
-Sven Eckelmann (2):
-      batman-adv: Trigger events for auto adjusted MTU
-      batman-adv: Don't increase MTU when set by user
-
- net/batman-adv/bat_v_elp.c         |  3 ++-
- net/batman-adv/bat_v_ogm.c         |  7 +++++--
- net/batman-adv/hard-interface.c    | 14 +++++++++++++-
- net/batman-adv/soft-interface.c    |  3 +++
- net/batman-adv/translation-table.c |  1 -
- net/batman-adv/types.h             |  6 ++++++
- 6 files changed, 29 insertions(+), 5 deletions(-)
 
