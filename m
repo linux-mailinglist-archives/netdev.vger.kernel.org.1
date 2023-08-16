@@ -1,191 +1,315 @@
-Return-Path: <netdev+bounces-27835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-27837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD87D77D70D
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:24:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2510A77D72F
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 02:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A73280216
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 00:24:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C98921C20E4A
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 00:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F36198;
-	Wed, 16 Aug 2023 00:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828CA39B;
+	Wed, 16 Aug 2023 00:49:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EA018E
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 00:24:38 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on20603.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::603])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B9EE26B7
-	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:24:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SRhI+jBAmJBcwOYl5vM7eGOzVj9ZLdj/7lN87WjhZq78W1yz/pfc3tEO2YBXGJPt3zAcZI6BHqwFDWq6KvbAWCuMI3Fxtgo6Jwg7nXJ5whb85p2x/dYRgzXAQ8ZDTrd950uo5ZrbXqLeL289lMQvrXkwGRXDqFZhf4TI6/0Bf/yl2B1vxOM/BFl1/MuU3xjKDe4twr9gfhJYJ4UMPnBvv0g/5WgjckpnvUD9KRC2fRMREX1HlzY49NBdbCDtIMf5PgzLrviUx6IE63tWPSg0Ccu67Jm/f9bFPwWgsyGxqpnit19Atq7in4HCMZKnYOzjajXyv7+8JPmgX1h+Fq6sWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GD7mIGmVYzChJtKQNqE5WJaX1q++tc2yKFzohdoRasg=;
- b=PvijlNFGP7HWixM7g4Lrv0YiIcFXjSFVR4f5X4vuLkqXPqVsyPqU3wCJfTx/wtWSqEr2w+K+Cpa3CqeC5nsr2g1tokXaaCJ4iytDuGISHaSElwmAe8kRM2A6CbRht7+VHO02F+q2lxMb8Ob36WDnQelxExic09mc31hAPxZwYp/NSNvj5tUcLLP3TFj9rBrKUT7mxcpbtJCA7wXGJnpxkcrNfKfAxDqs6vTchQskpkxaFM4DCu2MBbYq5yhP9liEBNevsh1BWdgTUgR51zRx3g1pa991PEHCLTVQRnguXgH50LeSmJljp6UfBY5Pr2/GsoCxAChLafWVH+POEaRYxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GD7mIGmVYzChJtKQNqE5WJaX1q++tc2yKFzohdoRasg=;
- b=EVumDkYHr8Brx1tcZmHH2gQWf6WwAZFVHPuNWwHy30ecNADy7E80iU7F0cs5bB/u98JJprbIb3sYJ/YhBM6NFN+L7G3gnC72eXYlaYdetF+YhWf+ht1LTxvHRoN/QJkek4KyV4NbWMvaZ2UsV08O6iGtceApk3bFXOCaZPPIvrTRnjKFyokr9aCVCHjWvNFlT483NhPx4TiJNWh33kyhpKzQ8H64/GpZ1hswgBNzXX4lqrKrlVdtd2AmWc10KnaA+v9Y5EAXUucDf1QGWD2GF2NkZtnVG7J8p1nIWUjNiY9zYwGVz+kwqF4ygRfCgocIzZbHRP6Vavv+Xvyb9kpTJg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by IA0PR12MB8088.namprd12.prod.outlook.com (2603:10b6:208:409::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Wed, 16 Aug
- 2023 00:24:26 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::4bf4:b77b:2985:1344]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::4bf4:b77b:2985:1344%4]) with mapi id 15.20.6678.025; Wed, 16 Aug 2023
- 00:24:25 +0000
-Message-ID: <ef2068aa-0732-820e-fbb4-299021ca54df@nvidia.com>
-Date: Wed, 16 Aug 2023 03:24:14 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v12 05/26] iov_iter: skip copy if src == dst for direct
- data placement
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
- axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Ben Ben-Ishay <benishay@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, borisp@nvidia.com, galshalom@nvidia.com
-References: <20230712161513.134860-1-aaptel@nvidia.com>
- <20230712161513.134860-6-aaptel@nvidia.com>
-Content-Language: en-US
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <20230712161513.134860-6-aaptel@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR06CA0179.eurprd06.prod.outlook.com
- (2603:10a6:803:c8::36) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E3B392
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 00:49:58 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6B52112
+	for <netdev@vger.kernel.org>; Tue, 15 Aug 2023 17:49:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692146996; x=1723682996;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fp2I6zIyNb0z3f6rqzbrJAOARlPh3bWDfGyHaVBJV5Q=;
+  b=NIhNX3zWACTZBaDUUBMl2VoVu7yac0GLpEyvMApVor2pKXU3xBXKRZ2/
+   XoLTeYzd0MEtBzqZXhXUNK0BW8y3pe/foqIyH2l4W1/qe5RpJK1iuOj0I
+   QEg1eWGRKXdivuT015TRrVs1SuO0kT4iiw+skX5WTt7c/ZfExCZRHk54X
+   ieqPovL2voPebnBk3ELOglRuQ4tHfCFTsOLQXt3XPiLFrvypGkvWVRwqK
+   5Z63pf1M54vS4TFL5UsKQs3LNQUbNVbv5myg+S2JsyHQWKaFRWh8Ze/Vt
+   9e3cF1x4HFXcEDdX882KZQWl0hdGpprjw1T4O05a0FSSYALXb6F8tHueP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="438755035"
+X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
+   d="scan'208";a="438755035"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 17:49:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="824044867"
+X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
+   d="scan'208";a="824044867"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by FMSMGA003.fm.intel.com with ESMTP; 15 Aug 2023 17:49:55 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	pavan.kumar.linga@intel.com,
+	emil.s.tantilov@intel.com,
+	jesse.brandeburg@intel.com,
+	sridhar.samudrala@intel.com,
+	shiraz.saleem@intel.com,
+	sindhu.devale@intel.com,
+	willemb@google.com,
+	decot@google.com,
+	andrew@lunn.ch,
+	leon@kernel.org,
+	mst@redhat.com,
+	simon.horman@corigine.com,
+	shannon.nelson@amd.com,
+	stephen@networkplumber.org
+Subject: [PATCH net-next v5 00/15][pull request] Introduce Intel IDPF driver
+Date: Tue, 15 Aug 2023 17:42:50 -0700
+Message-Id: <20230816004305.216136-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|IA0PR12MB8088:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f14b2a4-45eb-45ae-b3fe-08db9def2582
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	WgsXX8LA9PG2n/CeT9kDP0HuxcTmWTCSbEY5gGQHaGEZy4uY09BEBRSsht6oTS1dppabnfugLphCrjvkxEBk5vcnzRLAdHZ+mDcAidNfWw4XuEvQNJr0x/ZJtnSjTZw8bCQEZ2hB9rgZJz066UwXnwH4geOWWCq7fXbTX3vd8thh7Ok6KaIQ9XApWqUwtDwGCdb+eirr4FuITdJAwAUKVgkets+Xb9LUHpuNUo1jXSiY+kQTXSEcxA7W04YW/i/J+rFIrhC53HU7lVgY4JEicPhMmY6iBidXr5+fnmj7NHC8O5CpeeAL7xPKzXwRMqx8qFUbuVtlweq0ZJGg5MYyiwqwh1JR28xrh0A21JEV0WXEZPIQdmJ6KgEHs+GsNBYHVOw/5OfPriQRsUXE2D6AOLeWJw2vYSnI/GBl5VpM7I4kbQ9PlNNvvCopWJQYFlTXmAgNexVM4JIS/YpHWO6MQ5LYiy3jB+ab9+yF0Yzm9LPLQw03sx68pAiepA+HC1HuzlKcBjKcsLx1tGfIaoy4BT2Hu69Q3BQK9hLwjp1NTHb1HmeI6cIFTbpN6sz7TnLx4SBSDAY+3W/gSIWp+tBOUG2Lvv0+kEoIWlqge9PHwSQRvug1pLX3PNSpQ/4p5SMAWjK05z9gjfY2WOT+N3GKmlzgXisaIJpU4C0izy+yz4w=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(39860400002)(136003)(376002)(451199024)(186009)(1800799009)(6512007)(26005)(66556008)(2616005)(31686004)(66946007)(41300700001)(66476007)(4326008)(316002)(83380400001)(8936002)(8676002)(5660300002)(31696002)(6486002)(36756003)(38100700002)(2906002)(6666004)(7416002)(86362001)(478600001)(921005)(53546011)(6506007)(107886003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WHBaOGluQ0FpOVFTbXFLY0JuZVR3MjdtY0w3TTFxcHBMVlE3UHNyWW1xdHlm?=
- =?utf-8?B?bHhMRkQrcFFlQytTLzUrSjB0MGRuOWNEdG5NcFZwQU40aERDMytnS2VUQmdk?=
- =?utf-8?B?aHFlM0lkNFhlb1ZrMDBlUjlhMlJmdElZaWxBdGg0ZlNtOGpuK0c2OFBoVnNu?=
- =?utf-8?B?M2pqU2YyMnB3ejZlYlFyS0NvekpZRHZ3bEoxZVcxZDZYWkN2ZGtwY2JLK2Rq?=
- =?utf-8?B?b2JjMjdiSmdYRUtJa2lFckVORURuTit1RWZUaDhsaUNQMnZBTVU0cnRCOG9F?=
- =?utf-8?B?cGg2SmpKVERhanJzQVBZS28xMDM4YWpzbnRlWTJ4YVRibCs2bmJiL09mdEpQ?=
- =?utf-8?B?aFNXM0llMkw1V0JVSXcwSFpLYU5td05hMkpKTHNsc3ZCQUs3QVVtSW90L2pI?=
- =?utf-8?B?S3AwdWtIY0dLZEdnYTJQWjNKQmNtZzIzZDBOYWpXSTlaUERDcXlmOFFwV1Rt?=
- =?utf-8?B?cWlXdDZIL1l4YkRtTVVnNnZ2cVlPdEtQRU5BbUxqN09Tb3RVencrTEtZOWww?=
- =?utf-8?B?MTE5Q3MzRkU4WkRTcFN0YUpVSVR1UEcyQzVGSDNKRzV3NTNZL2xia0JaQUp5?=
- =?utf-8?B?UzExRHJDNWV1d0ltaGlmV3hXTWpjay94enhnNVZueGh5dERhY0tYSzJPdit4?=
- =?utf-8?B?OGhZK3JXR3JJd1FvVHd2anJScGgxTVhyUVV4R1pRZGwyNUN6dWRGQ0pjWjNJ?=
- =?utf-8?B?d2xCZnRvUzdOTUdkaloxTE51c0dUVjgreU0yemtDQTNEY0Rtb0VkKzg2dmts?=
- =?utf-8?B?a3FWSHk5OTU4VlpwRnlMYWRwREtoZTZZYk5kTFlkV1JINmdIMjE3NXNPRVNK?=
- =?utf-8?B?NHYwNWF3REUrd1dlWkxCLzJRZnNHMTNVZDJmWHc1V3R1VnN0WDRkZkRHVGp2?=
- =?utf-8?B?ck5vQUZPb0tDOGc5bXVWd2tiY0ZHN1A0c0ZyUDd5YUdNQXNpa2dvaDk3cTZu?=
- =?utf-8?B?VGI2Q04yMWFZUThwQ2UzWjcwZjFNUVJ3NmV6ZEs2QnpQeHFlL1Q5Rlo4akIv?=
- =?utf-8?B?R0xhRGNodDZnQ2hCVkJoU3pld3pDc3ZDbDAvNENDdWxRQ2p1cWFiWmRCQjBM?=
- =?utf-8?B?M09QUk1FTy8wcUIrcExzYUU3SFlOU0lkZTJjT0ZSdXg4bVVUTzNNR0h3c1o0?=
- =?utf-8?B?MHU3MlZGNmMwN29BVTQxdWFsOUZiK0hxeXJSbVQvTGNlWEJWcDZ6OWVmWE1S?=
- =?utf-8?B?WXdhMDBlSldLUVJLeUQ2Rmk0WjNNanNqQjdjUDAwQXlLL1JVd085eThGdVBZ?=
- =?utf-8?B?M3QzNnQwWjVrdTd3UDV1STV2QzNkdStrVU9LbWRUU2Y3OFVsYmtaNWhxN3Q0?=
- =?utf-8?B?cWZxV3d6Nno3cmRXRkZ3dDVrcFJqaktPQWlFcDAyMDAvL2lGTXpac3NQajVM?=
- =?utf-8?B?NUZyb0FXT3pEeUFJdzlCY2RmL09MNy9xV2Z5Rm5SQ2oxdGQ0c05iRlVIQUtP?=
- =?utf-8?B?Kzh4YWFDZFpURDVUS0Y2TjhwcXJqenFxZ09mTTBhYWxSWkVUdlZkbnZIVm93?=
- =?utf-8?B?aVJJM08rUmp1WE1aR1I5V1VNRnIxN3BqT3M0UnNyYjY3Umg0TUtMWml1NW05?=
- =?utf-8?B?VVYyRTJYVUZudytJV0M3dFdWd0xLa0xFaDJKdks0anFkYXl3bXpvMlRyL0pq?=
- =?utf-8?B?U2RjSWt6UkUwSGNmbkp1dTNicXFCUEM4aVlhUlpONFpqdkxLSElpZUZhd3VD?=
- =?utf-8?B?S0F0S1N5RlF1SFA0MXRka0Q1THo3dnd6RVpUK0JRVDA2Uk9nekdhcThwVHU4?=
- =?utf-8?B?bWlEQ2JVT2VQbVpkR2JDT0twalRiNDJld0RWemQ3SEViWEZ6OERhQkcrN2Vj?=
- =?utf-8?B?NmJodzMzSStVZmQ1aFFJM245TFc1eVpobnpMSkpXOTI5cE4xemlnZWY3U2FF?=
- =?utf-8?B?Z0xDQ241VjdyTHdnTGVFQlJDOHVQM1JEOWFaMXh0Kzd1d1FUbFF4bFAxd3J4?=
- =?utf-8?B?V29sMEJNeVhsVldSZ1pmdjRVbDR4R3djSFJMOUhtbXk1VEtZa2VQMG4rWm9M?=
- =?utf-8?B?R2FUd0RGWkVUU2pzZ3pud0YyVUgwZkJreW1MRGVZV2pSalJWZU5wM3RsMlFZ?=
- =?utf-8?B?aGZCWlFMeUpyQ3pEejk2b0NtcjllOWJyQWcxWVRHeGNjMzhxczJKV2JEam9u?=
- =?utf-8?Q?kO87ApxUfCzEGtvqvKlwSAAMX?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f14b2a4-45eb-45ae-b3fe-08db9def2582
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2023 00:24:25.8506
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dN8Y6Xn0IB8MZKI/jl2XBG++pT3JG8Pt9aldseJDtbEhnrV2sPdi6iyBUJ4sTy7Ybe/QtygFM9CpFiARNVat+g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8088
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Pavan Kumar Linga says:
 
+This patch series introduces the Intel Infrastructure Data Path Function
+(IDPF) driver. It is used for both physical and virtual functions. Except
+for some of the device operations the rest of the functionality is the
+same for both PF and VF. IDPF uses virtchnl version2 opcodes and
+structures defined in the virtchnl2 header file which helps the driver
+to learn the capabilities and register offsets from the device
+Control Plane (CP) instead of assuming the default values.
 
-On 12/07/2023 19:14, Aurelien Aptel wrote:
-> From: Ben Ben-Ishay <benishay@nvidia.com>
-> 
-> When using direct data placement (DDP) the NIC could write the payload
-> directly into the destination buffer and constructs SKBs such that
-> they point to this data. To skip copies when SKB data already resides
-> in the destination buffer we check if (src == dst), and skip the copy
-> when it's true.
-> 
-> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
-> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
-> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-> Signed-off-by: Shai Malin <smalin@nvidia.com>
-> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->   lib/iov_iter.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index b667b1e2f688..1c9b10e1e1c8 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -313,9 +313,15 @@ size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
->   		return 0;
->   	if (user_backed_iter(i))
->   		might_fault();
-> +	/*
-> +	 * When using direct data placement (DDP) the hardware writes
-> +	 * data directly to the destination buffer, and constructs
-> +	 * IOVs such that they point to this data.
-> +	 * Thus, when the src == dst we skip the memcpy.
-> +	 */
->   	iterate_and_advance(i, bytes, base, len, off,
->   		copyout(base, addr + off, len),
-> -		memcpy(base, addr + off, len)
-> +		(base != addr + off) && memcpy(base, addr + off, len)
->   	)
->   
->   	return bytes;
+The format of the series follows the driver init flow to interface open.
+To start with, probe gets called and kicks off the driver initialization
+by spawning the 'vc_event_task' work queue which in turn calls the
+'hard reset' function. As part of that, the mailbox is initialized which
+is used to send/receive the virtchnl messages to/from the CP. Once that is
+done, 'core init' kicks in which requests all the required global resources
+from the CP and spawns the 'init_task' work queue to create the vports.
 
-Looks good,
+Based on the capability information received, the driver creates the said
+number of vports (one or many) where each vport is associated to a netdev.
+Also, each vport has its own resources such as queues, vectors etc.
+From there, rest of the netdev_ops and data path are added.
 
-Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+IDPF implements both single queue which is traditional queueing model
+as well as split queue model. In split queue model, it uses separate queue
+for both completion descriptors and buffers which helps to implement
+out-of-order completions. It also helps to implement asymmetric queues,
+for example multiple RX completion queues can be processed by a single
+RX buffer queue and multiple TX buffer queues can be processed by a
+single TX completion queue. In single queue model, same queue is used
+for both descriptor completions as well as buffer completions. It also
+supports features such as generic checksum offload, generic receive
+offload (hardware GRO) etc.
+---
+Note:
+Reported kernel-doc issues regarding missing enum description and
+DEFINE_DMA_UNMAP_[ADDR|LEN] have fixes submitted to documentation tree:
+https://lore.kernel.org/linux-doc/20230815210417.98749-1-pavan.kumar.linga@intel.com/
+
+v5:
+Most Patches:
+ * wrapped line limit to 80 chars to those which don't effect readability
+Patch 12:
+ * in skb_add_rx_frag, offset 'headlen' w.r.t page_offset when adding a
+   frag to avoid adding the header again
+Patch 14:
+ * added NULL check for 'rxq' when dereferencing it in page_pool_get_stats
+
+v4: https://lore.kernel.org/netdev/20230808003416.3805142-1-anthony.l.nguyen@intel.com/
+Patch 1:
+ * s/virtcnl/virtchnl
+ * removed the kernel doc for the error code definitions that don't exist
+ * reworded the summary part in the virtchnl2 header
+Patch 3:
+ * don't set local variable to NULL on error
+ * renamed sq_send_command_out label with err_unlock
+ * don't use __GFP_ZERO in dma_alloc_coherent
+Patch 4:
+ * introduced mailbox workqueue to process mailbox interrupts
+Patch 3, 4, 5, 6, 7, 8, 9, 11, 15:
+ * removed unnecessary variable 0-init
+Patch 3, 5, 7, 8, 9, 15:
+ * removed defensive programming checks wherever applicable
+ * removed IDPF_CAP_FIELD_LAST as it can be treated as defensive
+   programming
+Patch 3, 4, 5, 6, 7:
+ * replaced IDPF_DFLT_MBX_BUF_SIZE with IDPF_CTLQ_MAX_BUF_LEN
+Patch 2 to 15:
+ * add kernel-doc for idpf.h and idpf_txrx.h enums and structures
+Patch 4, 5, 15:
+ * adjusted the destroy sequence of the workqueues as per the alloc
+   sequence
+Patch 4, 5, 9, 15:
+ * scrub unnecessary flags in 'idpf_flags'
+   - IDPF_REMOVE_IN_PROG flag can take care of the cases where
+     IDPF_REL_RES_IN_PROG is used, removed the later one
+   - IDPF_REQ_[TX|RX]_SPLITQ are replaced with struct variables
+   - IDPF_CANCEL_[SERVICE|STATS]_TASK are redundant as the work queue
+     doesn't get rescheduled again after 'cancel_delayed_work_sync'
+   - IDPF_HR_CORE_RESET is removed as there is no set_bit for this flag
+   - IDPF_MB_INTR_TRIGGER is removed as it is not needed anymore with the
+     mailbox workqueue implementation
+Patch 7 to 15:
+ * replaced the custom buffer recycling code with page pool API
+ * switched the header split buffer allocations from using a bunch of
+   pages to using one large chunk of DMA memory
+ * reordered some of the flows in vport_open to support page pool
+Patch 8, 12:
+ * don't suppress the alloc errors by using __GFP_NOWARN
+Patch 9:
+ * removed dyn_ctl_clrpba_m as it is not being used
+Patch 14:
+ * introduced enum idpf_vport_reset_cause instead of using vport flags
+ * introduced page pool stats
+
+v3: https://lore.kernel.org/netdev/20230616231341.2885622-1-anthony.l.nguyen@intel.com/
+Patch 5:
+ * instead of void, used 'struct virtchnl2_create_vport' type for
+   vport_params_recvd and vport_params_reqd and removed the typecasting
+ * used u16/u32 as needed instead of int for variables which cannot be
+   negative and updated in all the places whereever applicable
+Patch 6:
+ * changed the commit message to "add ptypes and MAC filter support"
+ * used the sender Signed-off-by as the last tag on all the patches
+ * removed unnecessary variables 0-init
+ * instead of fixing the code in this commit, fixed it in the commit
+   where the change was introduced first
+ * moved get_type_info struct on to the stack instead of memory alloc
+ * moved mutex_lock and ptype_info memory alloc outside while loop and
+   adjusted the return flow
+ * used 'break' instead of 'continue' in ptype id switch case
+
+v2: https://lore.kernel.org/netdev/20230614171428.1504179-1-anthony.l.nguyen@intel.com/
+Patch 2:
+ * added "Intel(R)" to the DRV_SUMMARY and Makefile.
+Patch 4, 5, 6, 15:
+ * replaced IDPF_VC_MSG_PENDING flag with mutex 'vc_buf_lock' for the
+   adapter related virtchnl opcodes.
+ * get the mutex lock in the virtchnl send thread itself instead of
+   in receive thread.
+Patch 5, 6, 7, 8, 9, 11, 14, 15:
+ * replaced IDPF_VPORT_VC_MSG_PENDING flag with mutex 'vc_buf_lock' for
+   the vport related virtchnl opcodes.
+ * get the mutex lock in the virtchnl send thread itself instead of
+   in receive thread.
+Patch 6:
+ * converted get_ptype_info logic from 1:N to 1:1 message exchange for
+   better handling of mutex lock.
+Patch 15:
+ * introduced 'stats_lock' spinlock to avoid concurrent stats update.
+
+v1: https://lore.kernel.org/netdev/20230530234501.2680230-1-anthony.l.nguyen@intel.com/
+
+iwl-next:
+v6 - https://lore.kernel.org/netdev/20230523002252.26124-1-pavan.kumar.linga@intel.com/
+v5 - https://lore.kernel.org/netdev/20230513225710.3898-1-emil.s.tantilov@intel.com/
+v4 - https://lore.kernel.org/netdev/20230508194326.482-1-emil.s.tantilov@intel.com/
+v3 - https://lore.kernel.org/netdev/20230427020917.12029-1-emil.s.tantilov@intel.com/
+v2 - https://lore.kernel.org/netdev/20230411011354.2619359-1-pavan.kumar.linga@intel.com/
+v1 - https://lore.kernel.org/netdev/20230329140404.1647925-1-pavan.kumar.linga@intel.com/
+
+The following are changes since commit 66244337512fbe51a32e7ebc8a5b5c5dc7a5421e:
+  Merge branch 'page_pool-a-couple-of-assorted-optimizations'
+and are available in the git repository at:
+This series contains updates to
+
+The following are changes since commit 479b322ee6feaff612285a0e7f22c022e8cd84eb:
+  net: dsa: mv88e6060: add phylink_get_caps implementation
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
+
+Alan Brady (4):
+  idpf: configure resources for TX queues
+  idpf: configure resources for RX queues
+  idpf: add RX splitq napi poll support
+  idpf: add ethtool callbacks
+
+Joshua Hay (5):
+  idpf: add controlq init and reset checks
+  idpf: add splitq start_xmit
+  idpf: add TX splitq napi poll support
+  idpf: add singleq start_xmit and napi poll
+  idpf: configure SRIOV and add other ndo_ops
+
+Pavan Kumar Linga (5):
+  virtchnl: add virtchnl version 2 ops
+  idpf: add core init and interrupt request
+  idpf: add create vport and netdev configuration
+  idpf: add ptypes and MAC filter support
+  idpf: initialize interrupts and enable vport
+
+Phani Burra (1):
+  idpf: add module register and probe functionality
+
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../device_drivers/ethernet/intel/idpf.rst    |  160 +
+ drivers/net/ethernet/intel/Kconfig            |   12 +
+ drivers/net/ethernet/intel/Makefile           |    1 +
+ drivers/net/ethernet/intel/idpf/Makefile      |   18 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |  934 ++++
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |  621 +++
+ .../net/ethernet/intel/idpf/idpf_controlq.h   |  130 +
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |  169 +
+ .../ethernet/intel/idpf/idpf_controlq_setup.c |  171 +
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  165 +
+ drivers/net/ethernet/intel/idpf/idpf_devids.h |   10 +
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 1364 ++++++
+ .../ethernet/intel/idpf/idpf_lan_pf_regs.h    |  124 +
+ .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |  293 ++
+ .../ethernet/intel/idpf/idpf_lan_vf_regs.h    |  128 +
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 2359 +++++++++
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |  285 ++
+ drivers/net/ethernet/intel/idpf/idpf_mem.h    |   20 +
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 1189 +++++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 4319 +++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 1023 ++++
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  163 +
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 3781 +++++++++++++++
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   | 1273 +++++
+ .../ethernet/intel/idpf/virtchnl2_lan_desc.h  |  451 ++
+ 26 files changed, 19164 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/intel/idpf.rst
+ create mode 100644 drivers/net/ethernet/intel/idpf/Makefile
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_setup.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_dev.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_devids.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_lan_pf_regs.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_lan_txrx.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_lan_vf_regs.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_lib.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_main.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_mem.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_txrx.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_txrx.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/virtchnl2.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/virtchnl2_lan_desc.h
+
+-- 
+2.38.1
+
 
