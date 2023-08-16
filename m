@@ -1,107 +1,114 @@
-Return-Path: <netdev+bounces-28058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B916E77E174
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:25:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E9877E1B3
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 14:32:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26BDD2819E2
-	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 12:25:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45A061C2109B
+	for <lists+netdev@lfdr.de>; Wed, 16 Aug 2023 12:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F007107BF;
-	Wed, 16 Aug 2023 12:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F9CDF60;
+	Wed, 16 Aug 2023 12:32:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FD7DF57
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 12:24:59 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8E9E56;
-	Wed, 16 Aug 2023 05:24:57 -0700 (PDT)
-Received: from dggpemm500016.china.huawei.com (unknown [172.30.72.54])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RQnNk3X8vz1GDcX;
-	Wed, 16 Aug 2023 20:23:34 +0800 (CST)
-Received: from [10.67.110.48] (10.67.110.48) by dggpemm500016.china.huawei.com
- (7.185.36.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 16 Aug
- 2023 20:24:54 +0800
-Message-ID: <e5624b47-52f1-e01c-6e5c-e8192132edf9@huawei.com>
-Date: Wed, 16 Aug 2023 20:24:53 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B8F1096A
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 12:32:44 +0000 (UTC)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D411B2
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 05:32:42 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bdfb11ea2aso10926375ad.2
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 05:32:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692189162; x=1692793962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rgx5N6H6hM4C9x/ItXoCkp885/IrXUuodxrLkhO9ks4=;
+        b=Jw1Vu6ZhYKqKSoO0kDDOjtBH/SeAptmZBYY3szMTq84YpjHUctysx6vkDcOudApaiu
+         QONylOdR/FrlnwHVJg2h6Y54J9Tu+DWkUlHyCL/OEjf2gBLFdB50uE5L2l07c7xoIbZ+
+         TYoAnJ8WbUfHTJ5MLypx9s/PTjjZO9XxdflxlTWMcb7qfrQ5sJNHBuiW2Ga0JCWPMa9v
+         Nstx4yaGKTTa844JJv8QnjJn+uVIOqhaM8wKNc5dTYV3VHheto/igxCEd637q2now86t
+         PSzgYR5cA2+itCmHsC54bpB+O1u+oWqHcSQs7wAR+9TYHxzURi3rWfUkdx+F9CrZsH3F
+         xY5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692189162; x=1692793962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Rgx5N6H6hM4C9x/ItXoCkp885/IrXUuodxrLkhO9ks4=;
+        b=V71yFmUqbD32Eu6LMiwyPpEJ7cAa7h/ZU+G5JA2VEr3eBwZCNEASm4rT1qM2sGs/Wk
+         ntFFILlTvyAuDC9v6Dn3vXtn4xOcnNrwsu9jAuIgDgOhappD6hFaWaarCZWAu0tYg/dL
+         yPaMlSpRPAbhAt0IYsUXiaIdyJkxL7f8FvvUh6aG7hH4Y5S04u3Cv6bvIeX4pRLqYwmL
+         PWvlrLRdoc+O5eV+pEblCUyQsNC89wAC2Jw81lWVQGof0m0VKw3dUt0YTfgnA71BIvQE
+         gqInpY/m9Tlc3LnB7Xc4wQ78YqX4MHoxRdTkBJyiapydFFxoEmQJEBHr5kjhOtNpfC54
+         J06g==
+X-Gm-Message-State: AOJu0YwGICUPnir+WijhP+6o8fKkdF9J2eGBk4sCfQuXR3qJCfU6SeRD
+	YnmCe2tkPllewjFoKBNZtWU=
+X-Google-Smtp-Source: AGHT+IGOH89TrkK7tMouEQwNbzU8Vs/ZgMl5CnRSGl2SVBAOuwYR5GbQdBG7Kbn0dln2fb1XsU1bNQ==
+X-Received: by 2002:a17:902:b283:b0:1bc:4f77:e34b with SMTP id u3-20020a170902b28300b001bc4f77e34bmr1571086plr.9.1692189162231;
+        Wed, 16 Aug 2023 05:32:42 -0700 (PDT)
+Received: from localhost.localdomain ([50.7.159.34])
+        by smtp.googlemail.com with ESMTPSA id x2-20020a170902ec8200b001bba669a7eesm13096539plg.52.2023.08.16.05.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 05:32:40 -0700 (PDT)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: hawk@kernel.org,
+	horms@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linyunsheng@huawei.com
+Cc: ilias.apalodimas@linaro.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	netdev@vger.kernel.org,
+	liangchen.linux@gmail.com
+Subject: [RFC PATCH net-next v3 0/2] net: veth: Optimizing page pool usage
+Date: Wed, 16 Aug 2023 20:30:27 +0800
+Message-Id: <20230816123029.20339-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net-next v2] netfilter: ebtables: replace zero-length
- array members
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
-CC: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, Roopa Prabhu
-	<roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
-	<keescook@chromium.org>, "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <coreteam@netfilter.org>,
-	<bridge@lists.linux-foundation.org>
-References: <20230816093443.1460204-1-gongruiqi@huaweicloud.com>
- <ZNywHiWhaL6pRZsd@vergenet.net>
-From: Gong Ruiqi <gongruiqi1@huawei.com>
-In-Reply-To: <ZNywHiWhaL6pRZsd@vergenet.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.110.48]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500016.china.huawei.com (7.185.36.25)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Page pool is supported for veth, but at the moment pages are not properly
+recyled for XDP_TX and XDP_REDIRECT. That prevents veth xdp from fully
+leveraging the advantages of the page pool. So this RFC patchset is mainly
+to make recycling work for those cases. With that in place, it can be
+further optimized by utilizing the napi skb cache. Detailed figures are
+presented in each commit message, and together they demonstrate a quite
+noticeable improvement.
 
+Changes from v2:
+- refactor the code to make it more readable
+- make use of the napi skb cache for further optimization 
+- take the Page pool creation error handling patch out for separate
+  submission
 
-On 2023/08/16 19:16, Simon Horman wrote:
-> On Wed, Aug 16, 2023 at 05:34:43PM +0800, GONG, Ruiqi wrote:
->> From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
->>
->> As suggested by Kees[1], replace the old-style 0-element array members
->> of multiple structs in ebtables.h with modern C99 flexible array.
->>
->> [1]: https://lore.kernel.org/all/5E8E0F9C-EE3F-4B0D-B827-DC47397E2A4A@kernel.org/
->>
->> Link: https://github.com/KSPP/linux/issues/21
->> Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
->> Reviewed-by: Kees Cook <keescook@chromium.org>
->> ---
->>
->> v2: designate to net-next; cc more netdev maintainers
-> 
-> It's slightly unclear to me if this should be targeting
-> net-next or nf-next. But regardless, it doesn't seem
-> to apply cleanly to the main branch of either tree.
+Liang Chen (2):
+  net: veth: Improving page pool recycling
+  net: veth: Optimizing skb reuse in NAPI Context
 
-I find out that it's because this patch depends on a previous patch I've
-just sent:
+ drivers/net/veth.c | 66 ++++++++++++++++++++++++++++++++++++++++------
+ net/core/skbuff.c  |  1 +
+ 2 files changed, 59 insertions(+), 8 deletions(-)
 
-[v4] netfilter: ebtables: fix fortify warnings in size_entry_mwt()
+-- 
+2.40.1
 
-Maybe I should make them two into a patch set? Otherwise if I adapt this
-patch to net-next, it won't be applied either if the above patch is
-applied ...
-
-> 
-> Please consider resolving that and posting again,
-> being sure to allow 24h before postings.
-> 
-> Link: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
->
 
