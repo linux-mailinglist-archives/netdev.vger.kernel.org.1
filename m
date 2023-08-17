@@ -1,114 +1,128 @@
-Return-Path: <netdev+bounces-28291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E061677EE8F
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 03:11:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E07C77EE9C
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 03:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93E2E281CE2
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 01:11:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006852819AB
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 01:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548A7382;
-	Thu, 17 Aug 2023 01:11:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D83384;
+	Thu, 17 Aug 2023 01:19:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49488379
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 01:11:06 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDAC51987
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 18:11:04 -0700 (PDT)
-Received: from dggpeml500003.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RR6Mr6BkpzVk8Q;
-	Thu, 17 Aug 2023 09:08:56 +0800 (CST)
-Received: from [10.174.177.173] (10.174.177.173) by
- dggpeml500003.china.huawei.com (7.185.36.200) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 17 Aug 2023 09:11:02 +0800
-Message-ID: <141862b6-e788-f16d-660b-e552b9fc4c6c@huawei.com>
-Date: Thu, 17 Aug 2023 09:11:02 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C57379
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 01:19:44 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E913026AB;
+	Wed, 16 Aug 2023 18:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=k5AnX52HD8DrL7Os7PUELSo5Kpp0aTUuVSiOe7uZSvA=; b=zJTv3OespTvnIpKqpdeTzp2Apm
+	rRuzIwgp6H8nV64WxkoetxEnVFauAI9aiNe6529+zOAFcL/3+Z0hl5k4KnwjtlxoXi805URdVwk1k
+	R6HZDUvpDIh3Xt5jHZxiqynp/sNZB6iMssAFh+DYMqa+xHxEKQO21dw4vf80S8NJI1xY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qWRfh-004Kkc-So; Thu, 17 Aug 2023 03:19:33 +0200
+Date: Thu, 17 Aug 2023 03:19:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: nick.hawkins@hpe.com
+Cc: christophe.jaillet@wanadoo.fr, simon.horman@corigine.com,
+	verdun@hpe.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/5] net: hpe: Add GXP UMAC MDIO
+Message-ID: <16d8e283-79f7-44bb-af5f-b84cdf7c9d79@lunn.ch>
+References: <20230816215220.114118-1-nick.hawkins@hpe.com>
+ <20230816215220.114118-3-nick.hawkins@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH net-next] pds_core: remove redundant pci_clear_master()
-Content-Language: en-US
-To: "Nelson, Shannon" <shannon.nelson@amd.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <liwei391@huawei.com>
-References: <20230816013802.2985145-1-liaoyu15@huawei.com>
- <0d644ce7-88e2-4e51-8e04-5a39b80df5b8@amd.com>
-From: Yu Liao <liaoyu15@huawei.com>
-In-Reply-To: <0d644ce7-88e2-4e51-8e04-5a39b80df5b8@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.177.173]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500003.china.huawei.com (7.185.36.200)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230816215220.114118-3-nick.hawkins@hpe.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/16 22:02, Nelson, Shannon wrote:
-> On 8/15/2023 6:38 PM, Yu Liao wrote:
->>
->> pci_disable_device() involves disabling PCI bus-mastering. So remove
->> redundant pci_clear_master().
->>
->> Signed-off-by: Yu Liao <liaoyu15@huawei.com>
->> ---
->>   drivers/net/ethernet/amd/pds_core/main.c | 2 --
->>   1 file changed, 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/amd/pds_core/main.c
->> b/drivers/net/ethernet/amd/pds_core/main.c
->> index 672757932246..ffe619cff413 100644
->> --- a/drivers/net/ethernet/amd/pds_core/main.c
->> +++ b/drivers/net/ethernet/amd/pds_core/main.c
->> @@ -374,7 +374,6 @@ static int pdsc_probe(struct pci_dev *pdev, const struct
->> pci_device_id *ent)
->>          return 0;
->>
->>   err_out_clear_master:
->> -       pci_clear_master(pdev);
+On Wed, Aug 16, 2023 at 04:52:17PM -0500, nick.hawkins@hpe.com wrote:
+> From: Nick Hawkins <nick.hawkins@hpe.com>
 > 
-> Sure, this seems to make sense.  However, if we're removing this call, then we
-> should change the name of the goto label to something like
-> err_out_disable_device.
+> The GXP contains two Universal Ethernet MACs that can be
+> connected externally to several physical devices. From an external
+> interface perspective the BMC provides two SERDES interface connections
+> capable of either SGMII or 1000Base-X operation. The BMC also provides
+> a RMII interface for sideband connections to external Ethernet controllers.
 > 
-> sln
-
-Right, I'll make changes in v2.
-
-Best regards,
-Yu
+> The primary MAC (umac0) can be mapped to either SGMII/1000-BaseX
+> SERDES interface.  The secondary MAC (umac1) can be mapped to only
+> the second SGMII/1000-Base X Serdes interface or it can be mapped for
+> RMII sideband.
 > 
->>          pci_disable_device(pdev);
->>   err_out_free_ida:
->>          ida_free(&pdsc_ida, pdsc->uid);
->> @@ -439,7 +438,6 @@ static void pdsc_remove(struct pci_dev *pdev)
->>                  pci_release_regions(pdev);
->>          }
->>
->> -       pci_clear_master(pdev);
->>          pci_disable_device(pdev);
->>
->>          ida_free(&pdsc_ida, pdsc->uid);
->> -- 
->> 2.25.1
->>
->>
+> The MDIO(mdio0) interface from the primary MAC (umac0) is used for
+> external PHY status and configuration. The MDIO(mdio1) interface from
+> the secondary MAC (umac1) is routed to the SGMII/100Base-X IP blocks
 
+I think that is a typo. 100BaseX does not exist, the nearest is 100BaseFX.
+
+> +config GXP_UMAC_MDIO
+> +	tristate "GXP UMAC mdio support"
+> +	depends on ARCH_HPE || COMPILE_TEST
+> +	depends on OF_MDIO && HAS_IOMEM
+> +	depends on MDIO_DEVRES
+> +	help
+> +	  Say y here to support the GXP UMAC MDIO bus. The
+> +	  MDIO (mdio0) interface from the primary MAC (umac0)
+> +	  is used for external PHY status and configuration.
+> +	  The MDIO (mdio1) interface from the secondary MAC
+> +	  (umac1) is routed to the SGMII/100Base-X IP blocks
+
+Same here.
+
+> --- a/drivers/net/mdio/Makefile
+> +++ b/drivers/net/mdio/Makefile
+> @@ -11,6 +11,7 @@ obj-$(CONFIG_MDIO_BCM_UNIMAC)		+= mdio-bcm-unimac.o
+>  obj-$(CONFIG_MDIO_BITBANG)		+= mdio-bitbang.o
+>  obj-$(CONFIG_MDIO_CAVIUM)		+= mdio-cavium.o
+>  obj-$(CONFIG_MDIO_GPIO)			+= mdio-gpio.o
+> +obj-$(CONFIG_GXP_UMAC_MDIO)		+= mdio-gxp-umac.o
+>  obj-$(CONFIG_MDIO_HISI_FEMAC)		+= mdio-hisi-femac.o
+
+Don't you think this looks out of place. The only one not CONFIG_MDIO ?
+
+> +static int umac_mdio_write(struct mii_bus *bus, int phy_id, int reg, u16 value)
+> +{
+> +	struct umac_mdio_priv *umac_mdio = bus->priv;
+> +	unsigned int status;
+> +	int ret;
+> +
+> +	writel(value, umac_mdio->base + UMAC_MII_DATA);
+
+...
+
+> +	if (ret)
+> +		dev_err(bus->parent, "mdio read time out\n");
+
+cut/paste error.
+
+
+    Andrew
+
+---
+pw-bot: cr
 
