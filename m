@@ -1,277 +1,141 @@
-Return-Path: <netdev+bounces-28382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2BE77F410
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:11:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BF9A77F454
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242701C21344
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 10:11:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5421C21384
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 10:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1588512B9B;
-	Thu, 17 Aug 2023 10:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C2C1C38;
+	Thu, 17 Aug 2023 10:31:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DB212B8F
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 10:10:35 +0000 (UTC)
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660442D5A;
-	Thu, 17 Aug 2023 03:10:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=D/VeZqbHWVUYZkOsppXhQk3Rq5983G47lAe3d6GP5/Y=; b=ijuMRbSXPWk0dieiYbCyGXWNIL
-	dGd8m59gWWh962Bz+Iq+ns8th5Y9WWFdjbn733vcSfoe2zeNOXok+YnrFfKUaoK0WgSgC7O9n6M/x
-	9se5Zd7JLzz4RCtbbC+q3C9xY93mgAyN14Mup6sA5kUBgbPZR2No1v/+kCSbTfRuRU6Jr1viigG1v
-	E0yoj+0x3d7dEtFLpIvGC7AlTCOYpBELRNruEzAwRWNzHTzhug/d/VAdkqs6ZFYgBiwHhA2gmi/7Z
-	DiCb2Xovv7KVN8OIUtrfhPVX7P0io41Az1m2X5/cfZ5TvSR0irIiYUG12IDN0gUiYCmZe8hnP0sE3
-	Jn8Q4UkA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <martin@geanix.com>)
-	id 1qWZxV-0009wm-LE; Thu, 17 Aug 2023 12:10:29 +0200
-Received: from [185.17.218.86] (helo=zen..)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <martin@geanix.com>)
-	id 1qWZxV-000TfR-3z; Thu, 17 Aug 2023 12:10:29 +0200
-From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
-To: Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>
-Cc: linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
-Subject: [PATCH 2/2] can: m_can: support setting hw filters
-Date: Thu, 17 Aug 2023 12:10:14 +0200
-Message-ID: <20230817101014.3484715-3-martin@geanix.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230817101014.3484715-1-martin@geanix.com>
-References: <20230817101014.3484715-1-martin@geanix.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CC5134BD
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 10:31:31 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9BC2D54
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 03:31:30 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-342-Nc7mE_lqP3uzAdE5X4GxPA-1; Thu, 17 Aug 2023 06:31:26 -0400
+X-MC-Unique: Nc7mE_lqP3uzAdE5X4GxPA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1528B3C100A2;
+	Thu, 17 Aug 2023 10:31:26 +0000 (UTC)
+Received: from hog (unknown [10.39.192.31])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 54F5CC15BAD;
+	Thu, 17 Aug 2023 10:31:24 +0000 (UTC)
+Date: Thu, 17 Aug 2023 12:31:23 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next v1 4/5] net: macsec: introduce mdo_insert_tx_tag
+Message-ID: <ZN32-0fwIMtrc9lu@hog>
+References: <20230811153249.283984-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230811153249.283984-5-radu-nicolae.pirea@oss.nxp.com>
+ <ZN00NB7RayXAl80f@hog>
+ <c28591b1-812f-b593-ef83-72e972d5b7bd@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: martin@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27003/Thu Aug 17 09:42:42 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c28591b1-812f-b593-ef83-72e972d5b7bd@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement the validate_hw_filter() callback to allow setting hardware
-filter for m_can-based devices, and configure the filters when starting
-the device.
+2023-08-17, 11:25:36 +0300, Radu Pirea (OSS) wrote:
+> 
+> 
+> On 16.08.2023 23:40, Sabrina Dubroca wrote:
+> > 2023-08-11, 18:32:48 +0300, Radu Pirea (NXP OSS) wrote:
+> > > Offloading MACsec in PHYs requires inserting the SecTAG and the ICV in
+> > > the ethernet frame. This operation will increase the frame size with 32
+> > > bytes.
+> > 
+> > "up to 32 bytes"?
+> 
+> Yes, up to 32 bytes.
+> 
+> > 
+> > The SecTAG and ICV can both be shorter, at least with the software
+> > implementation.
+> > 
+> > 
+> > [...]
+> > > +static struct sk_buff *insert_tx_tag(struct sk_buff *skb,
+> > > +				     struct net_device *dev)
+> > > +{
+> > [...]
+> > > +
+> > > +	ctx.secy = &macsec->secy;
+> > > +	ctx.skb = skb;
+> > 
+> > I think it would be a bit more readable to just pass the skb to
+> >   ->mdo_insert_tx_tag instead of adding it to the context.
+> 
+> Since this function requires only the skb and the phydev, I would move
+> mdo_insert_tx_tag from macsec_ops to a new structure called mascec_tag. What
+> do you think about this?
 
-The m_can chip requires separate configuration for standard and extended
-ID filters, so the implementation considers filters with an ID or a mask
-larger than 0x7ff to be an extended ID. Users needing to filter on the
-lower 11 bits on extended message IDs can do so by passing an ID greater
-than 0x7ff, while masking in the lower 11 bits only.
+I think it's ok to leave it in macsec_ops.
 
-The number of allowed filters depends on the MRAM configuration. See
-`sidf_elems` and `xidf_elems` elements in the bosch,mram-cfg device tree
-binding for further information.
+[...]
+> > > @@ -4137,6 +4211,11 @@ static int macsec_newlink(struct net *net, struct net_device *dev,
+> > >   			if (err)
+> > >   				goto del_dev;
+> > >   		}
+> > > +
+> > > +		dev->needed_headroom -= MACSEC_NEEDED_HEADROOM;
+> > > +		dev->needed_headroom += ops->needed_headroom;
+> > > +		dev->needed_tailroom -= MACSEC_NEEDED_TAILROOM;
+> > > +		dev->needed_tailroom += ops->needed_tailroom;
+> > 
+> > If the driver doesn't set ops->needed_headroom, we'll subtract
+> > MACSEC_NEEDED_HEADROOM and not add anything back. Is that correct for
+> > all existing drivers? (and same for tailroom)
+> 
+> It should be. However, I will do this operation only for the PHYs that needs
+> to parse a tag.
+> 
+> > 
+> > You set needed_tailroom to 0 in your driver, but the commit message
+> > for this patch says that the HW needs space for the ICV. I'm a bit
+> > puzzled by this, especially since MACSEC_NEEDED_TAILROOM already
+> > reserves space for the ICV.
+> 
+> The 32 bytes headroom will compensate for 0 bytes tailroom.
 
-Signed-off-by: Martin Hundebøll <martin@geanix.com>
----
- drivers/net/can/m_can/m_can.c | 137 +++++++++++++++++++++++++++++++++-
- 1 file changed, 133 insertions(+), 4 deletions(-)
+Ok.
 
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 16ecc11c7f62..7c8110076256 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -223,6 +223,52 @@ enum m_can_reg {
- #define ILE_EINT1	BIT(1)
- #define ILE_EINT0	BIT(0)
- 
-+/* Standard ID message filters (SIDF) */
-+#define SIDF_SFT_MASK		GENMASK(31, 30)
-+#define SIDF_SFEC_MASK		GENMASK(29, 27)
-+#define SIDF_SFID1_MASK		GENMASK(26, 16)
-+#define SIDF_SFID2_MASK		GENMASK(10, 0)
-+
-+/* Extended ID message filters (XIDF) */
-+#define XIDF_EFT_MASK		GENMASK_ULL(63, 62)
-+#define XIDF_EFID2_MASK		GENMASK_ULL(60, 32)
-+#define XIDF_EFEC_MASK		GENMASK_ULL(31, 29)
-+#define XIDF_EFID1_MASK		GENMASK_ULL(28, 0)
-+
-+/* Standard Filter Type */
-+#define SFT_RANGE	0x0
-+#define SFT_DUAL	0x1
-+#define SFT_CLASSIC	0x2
-+#define SFT_DISABLED	0x3
-+
-+/* Standard Filter Element Configuration */
-+#define SFEC_DISABLE	0x0
-+#define SFEC_RXF0	0x1
-+#define SFEC_RXF1	0x2
-+#define SFEC_REJECT	0x3
-+#define SFEC_PRIO	0x4
-+#define SFEC_PRIO_RXF0	0x5
-+#define SFEC_PRIO_RXF1	0x6
-+#define SFEC_DEBUG	0x7
-+
-+/* Global Filter Configuration Field */
-+#define GFC_ANFS	GENMASK(5, 4)
-+#define GFC_ANFE	GENMASK(3, 2)
-+#define GFC_RRFS	BIT(1)
-+#define GFC_RRFE	BIT(0)
-+
-+#define ANFS_ACCEPT_RXF0	0x0
-+#define ANFS_ACCEPT_RXF1	0x1
-+#define ANFS_REJECT		0x2
-+
-+/* Standard ID Filter Configuration */
-+#define SIDFC_LSS	GENMASK(23, 16)
-+#define SIDFC_FLSSA	GENMASK(15, 0)
-+
-+/* Extended ID Filter Configuration */
-+#define XIDFC_LSE	GENMASK(22, 16)
-+#define XIDFC_FLSAE	GENMASK(15, 0)
-+
- /* Rx FIFO 0/1 Configuration (RXF0C/RXF1C) */
- #define RXFC_FWM_MASK	GENMASK(30, 24)
- #define RXFC_FS_MASK	GENMASK(22, 16)
-@@ -382,6 +428,56 @@ static inline bool m_can_tx_fifo_full(struct m_can_classdev *cdev)
- 	return _m_can_tx_fifo_full(m_can_read(cdev, M_CAN_TXFQS));
- }
- 
-+static int m_can_validate_hw_filter(struct net_device *dev,
-+				    struct can_filter *hwf,
-+				    unsigned int hwf_cnt)
-+{
-+	struct m_can_classdev *cdev = netdev_priv(dev);
-+	size_t sff_filter_cnt = 0;
-+	size_t eff_filter_cnt = 0;
-+	int i;
-+
-+	for (i = 0; i < hwf_cnt; i++)
-+		if (hwf[i].can_id <= CAN_SFF_MASK || hwf[i].can_mask <= CAN_SFF_MASK)
-+			sff_filter_cnt++;
-+		else
-+			eff_filter_cnt++;
-+
-+	if (sff_filter_cnt > cdev->mcfg[MRAM_SIDF].num)
-+		return -EINVAL;
-+
-+	if (eff_filter_cnt > cdev->mcfg[MRAM_XIDF].num)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int m_can_sid_filter_write(struct m_can_classdev *cdev,
-+				  struct can_filter *filter,
-+				  size_t index)
-+{
-+	u32 addr_offset = cdev->mcfg[MRAM_SIDF].off + SIDF_ELEMENT_SIZE * index;
-+	u32 sidf = FIELD_PREP(SIDF_SFT_MASK, SFT_CLASSIC) |
-+		   FIELD_PREP(SIDF_SFEC_MASK, SFEC_RXF0) |
-+		   FIELD_PREP(SIDF_SFID1_MASK, filter->can_id) |
-+		   FIELD_PREP(SIDF_SFID2_MASK, filter->can_mask);
-+
-+	return cdev->ops->write_fifo(cdev, addr_offset, &sidf, sizeof(sidf));
-+}
-+
-+static int m_can_xid_filter_write(struct m_can_classdev *cdev,
-+				  struct can_filter *filter,
-+				  size_t index)
-+{
-+	u32 addr_offset = cdev->mcfg[MRAM_XIDF].off + XIDF_ELEMENT_SIZE * index;
-+	u64 xidf = FIELD_PREP(XIDF_EFT_MASK, SFT_CLASSIC) |
-+		   FIELD_PREP(XIDF_EFEC_MASK, SFEC_RXF0) |
-+		   FIELD_PREP(XIDF_EFID1_MASK, filter->can_id) |
-+		   FIELD_PREP(XIDF_EFID2_MASK, filter->can_mask);
-+
-+	return cdev->ops->write_fifo(cdev, addr_offset, &xidf, sizeof(xidf));
-+}
-+
- static void m_can_config_endisable(struct m_can_classdev *cdev, bool enable)
- {
- 	u32 cccr = m_can_read(cdev, M_CAN_CCCR);
-@@ -1266,8 +1362,10 @@ static int m_can_chip_config(struct net_device *dev)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
- 	u32 interrupts = IR_ALL_INT;
--	u32 cccr, test;
--	int err;
-+	size_t sff_filter_cnt = 0;
-+	size_t eff_filter_cnt = 0;
-+	u32 cccr, test, anfs;
-+	int err, i;
- 
- 	err = m_can_init_ram(cdev);
- 	if (err) {
-@@ -1288,8 +1386,38 @@ static int m_can_chip_config(struct net_device *dev)
- 		    FIELD_PREP(RXESC_F1DS_MASK, RXESC_64B) |
- 		    FIELD_PREP(RXESC_F0DS_MASK, RXESC_64B));
- 
--	/* Accept Non-matching Frames Into FIFO 0 */
--	m_can_write(cdev, M_CAN_GFC, 0x0);
-+	/* Configure HW filters and count standard vs extended id filters */
-+	for (i = 0; i < cdev->can.hw_filter_cnt; i++) {
-+		struct can_filter *filter = &cdev->can.hw_filter[i];
-+
-+		if (filter->can_id <= CAN_SFF_MASK ||
-+		    filter->can_mask <= CAN_SFF_MASK)
-+			err = m_can_sid_filter_write(cdev, filter,
-+						     sff_filter_cnt++);
-+		else
-+			err = m_can_xid_filter_write(cdev, filter,
-+						     eff_filter_cnt++);
-+
-+		if (err)
-+			return err;
-+	}
-+
-+	/* Configure offset to and number of standard id filters in MRAM */
-+	m_can_write(cdev, M_CAN_SIDFC,
-+		    FIELD_PREP(SIDFC_FLSSA, cdev->mcfg[MRAM_SIDF].off) |
-+		    FIELD_PREP(SIDFC_LSS, sff_filter_cnt));
-+	/* Configure offset to and number of extended id filters in MRAM */
-+	m_can_write(cdev, M_CAN_XIDFC,
-+		    FIELD_PREP(XIDFC_FLSAE, cdev->mcfg[MRAM_XIDF].off) |
-+		    FIELD_PREP(XIDFC_LSE, sff_filter_cnt));
-+
-+	/* If any filter is configured, the Global Filter Configuration is set
-+	 * to reject non-matching frames.
-+	 */
-+	anfs = cdev->can.hw_filter_cnt ? ANFS_REJECT : ANFS_ACCEPT_RXF0;
-+	m_can_write(cdev, M_CAN_GFC,
-+		    FIELD_PREP(GFC_ANFS, anfs) | FIELD_PREP(GFC_ANFE, anfs));
-+
- 
- 	if (cdev->version == 30) {
- 		/* only support one Tx Buffer currently */
-@@ -1524,6 +1652,7 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
- 	/* Shared properties of all M_CAN versions */
- 	cdev->version = m_can_version;
- 	cdev->can.do_set_mode = m_can_set_mode;
-+	cdev->can.validate_hw_filter = m_can_validate_hw_filter;
- 	cdev->can.do_get_berr_counter = m_can_get_berr_counter;
- 
- 	/* Set M_CAN supported operations */
+
+One more question about the ordering of patches in this series: is
+macsec offload with your device functional without this and the final
+patch? Otherwise, I would put this patch first, and then the driver
+patches (either collapsed into a single patch, or preferably split out
+if there's a reasonable way to do it -- patch 3 is really huge and
+hard to review).
+
 -- 
-2.41.0
+Sabrina
 
 
