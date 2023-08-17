@@ -1,118 +1,243 @@
-Return-Path: <netdev+bounces-28432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E43377F6CC
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:52:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1C4977F6DE
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EFB91C20F08
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:52:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 072241C213BC
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C982B13AF5;
-	Thu, 17 Aug 2023 12:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6C013FE0;
+	Thu, 17 Aug 2023 12:54:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA392907
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:52:47 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33302D5F
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:52:44 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fe2048c910so71202515e9.1
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692276763; x=1692881563;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HNH8jgIIjeoKstQpTEEzPTnWqsW8pg6m16x+9+66OeA=;
-        b=a8G8Ftm0/LSBlydRINwfX5C9EAGW7al3clx6LYmuog337/p9f54rkwvxRaxrikf9S4
-         3C+uxkPmAhl9Z5qz97Flrwv89OHtFXlwKOmoybqzhFtzQJwkQFYs1SFXJOVz5jJLsBB9
-         qTejhrIJweCdWA1SyNvwTGnIIxdyqtLw+6md5grwWV5w65CJAp0w8hVra2pjVINt640u
-         sunbdXwZCZ1Xs4mrkFqADHkLk+rGXUKFlwCffIURjJvoPwmvD7pDVjYdnGL7db8hwWIO
-         eEO8dsmkjhDauQ4nbkzS6/vO0UHbsQW/wzEYTIsQWfGVbkfGR1ZE0kRe9wu7TF7BGnBC
-         kx3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692276763; x=1692881563;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HNH8jgIIjeoKstQpTEEzPTnWqsW8pg6m16x+9+66OeA=;
-        b=ehjbjznKAQQ2JvWtcHkEjbiqkWNHdvI0mq28XJbanXJjDLGWlLFmtQMxvD+2H1U7F4
-         hI/JuGvwqiCKPlf2CxCGR/+2h0AAPelddXeE4jv/eiaT2QJoVt6wGurz0kqftZsfyzY3
-         foAwM+7TJyN6z1t9Mw9rxduzIKOvfG70NmOGtuZzxp+O7F9TNmIChZOzWZRsQSvVGlAn
-         La071NIwVT6yazKaR5Bku9Vst4yuFjTJBQxEuHtuJBCQ4qGkXI2wTkGJWGBzZkGZI0FV
-         fYs7CBYJJ2wXBKj0giekVYe+9UYHJBOxXrgSCHq/iH9mAC5nMtzs+awx/rk/1Y4narGu
-         pgWQ==
-X-Gm-Message-State: AOJu0YwvQ7cr0JoW6DKi3aIIkUHaiiYmMrYiqKhQDx/ngIGWnsYYFO9A
-	tn/eYEoNrpSTJs9b0G6Jj45oZKW7oI3ksSBbJM9tlw==
-X-Google-Smtp-Source: AGHT+IFEsKIVIlwDN2VV/XOksV1u5uUHdebA6Xw3EiySuFeDGb7He8XafUlmnKmgu2PIIZlRNBM4wg==
-X-Received: by 2002:a1c:f314:0:b0:3fe:201a:4b7b with SMTP id q20-20020a1cf314000000b003fe201a4b7bmr4833122wmq.27.1692276762709;
-        Thu, 17 Aug 2023 05:52:42 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id 16-20020a05600c231000b003fe2bea77ccsm2930846wmo.5.2023.08.17.05.52.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 05:52:41 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	idosch@nvidia.com,
-	petrm@nvidia.com
-Subject: [patch net-next] devlink: add missing unregister linecard notification
-Date: Thu, 17 Aug 2023 14:52:40 +0200
-Message-ID: <20230817125240.2144794-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DE4134BA
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:54:24 +0000 (UTC)
+Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc0a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 843922D70
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:54:21 -0700 (PDT)
+Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4RRQ1k5lxvzMq6cb;
+	Thu, 17 Aug 2023 12:54:18 +0000 (UTC)
+Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4RRQ1k2CJ9zMpnPp;
+	Thu, 17 Aug 2023 14:54:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1692276858;
+	bh=gWg5Au5qNjkmKNc2JaoMVUE3kXc5yOumLKtoxOkV/Lo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=xDMPiSE08gXVzmly5tGHSAcSTSAARAkOws6zkOlnV+Q71UNWdXj57nBM8klo9U92D
+	 uP2wC5/DHtzHnBiaVUtBuSTvAvQWbIR7XhBx7tdIM6cRsQAU30eroqJNIFBl7c2YvR
+	 k+rmIViKhELKhuI2uEg4Q924hsyr8/E7ciTfHaXo=
+Date: Thu, 17 Aug 2023 14:54:10 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+Cc: artem.kuzin@huawei.com, gnoack3000@gmail.com, 
+	willemdebruijn.kernel@gmail.com, yusongping@huawei.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Message-ID: <20230817.theivaoThia9@digikod.net>
+References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230706145543.1284007-1-mic@digikod.net>
+ <d261a7ae-fd9c-902a-10f7-61d08cab0435@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <d261a7ae-fd9c-902a-10f7-61d08cab0435@huawei.com>
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Sat, Aug 12, 2023 at 12:03:02AM +0300, Konstantin Meskhidze (A) wrote:
+> 
+> 
+> 7/6/2023 5:55 PM, Mickaël Salaün пишет:
+> > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> > 
+> > This patch is a revamp of the v11 tests [1] with new tests (see the
+> > "Changes since v11" description).  I (Mickaël) only added the following
+> > todo list and the "Changes since v11" sections in this commit message.
+> > I think this patch is good but it would appreciate reviews.
+> > You can find the diff of my changes here but it is not really readable:
+> > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
+> > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
+> > TODO:
+> > - Rename all "net_service" to "net_port".
+> > - Fix the two kernel bugs found with the new tests.
+> > - Update this commit message with a small description of all tests.
+> > 
+> > These test suites try to check edge cases for TCP sockets
+> > bind() and connect() actions.
+> > 
+> > inet:
+> > * bind: Tests with non-landlocked/landlocked ipv4 and ipv6 sockets.
+> > * connect: Tests with non-landlocked/landlocked ipv4 and ipv6 sockets.
+> > * bind_afunspec: Tests with non-landlocked/landlocked restrictions
+> > for bind action with AF_UNSPEC socket family.
+> > * connect_afunspec: Tests with non-landlocked/landlocked restrictions
+> > for connect action with AF_UNSPEC socket family.
+> > * ruleset_overlap: Tests with overlapping rules for one port.
+> > * ruleset_expanding: Tests with expanding rulesets in which rules are
+> > gradually added one by one, restricting sockets' connections.
+> > * inval_port_format: Tests with wrong port format for ipv4/ipv6 sockets
+> > and with port values more than U16_MAX.
+> > 
+> > port:
+> > * inval: Tests with invalid user space supplied data:
+> >      - out of range ruleset attribute;
+> >      - unhandled allowed access;
+> >      - zero port value;
+> >      - zero access value;
+> >      - legitimate access values;
+> > * bind_connect_inval_addrlen: Tests with invalid address length.
+> > * bind_connect_unix_*_socket: Tests to make sure unix sockets' actions
+> > are not restricted by Landlock rules applied to TCP ones.
+> > 
+> > layout1:
+> > * with_net: Tests with network bind() socket action within
+> > filesystem directory access test.
+> > 
+> > Test coverage for security/landlock is 94.8% of 934 lines according
+> > to gcc/gcov-11.
+> > 
+> > Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> > Co-developed-by: Mickaël Salaün <mic@digikod.net>
+> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
 
-Cited fixes commit introduced linecard notifications for register,
-however it didn't add them for unregister. Fix that by adding them.
+[...]
 
-Fixes: c246f9b5fd61 ("devlink: add support to create line card and expose to user")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- net/devlink/leftover.c | 3 +++
- 1 file changed, 3 insertions(+)
+> > +// Kernel FIXME: tcp_sandbox_with_tcp and tcp_sandbox_with_udp
+> 
+>      I debugged the code in qemu and came to a conclusion that we don't
+> check if socket's family equals to address's one in check_socket_access(...)
+> function in net.c
+> So I added the next lines (marked with !!!):
+> 
+> 	static int check_socket_access(struct socket *const sock,
+> 			       struct sockaddr *const address,
+> 			       const int addrlen,
+> 			       const access_mask_t access_request)
+> {
+> 	__be16 port;
+> 	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
+> 	const struct landlock_rule *rule;
+> 	access_mask_t handled_access;
+> 	struct landlock_id id = {
+> 		.type = LANDLOCK_KEY_NET_PORT,
+> 	};
+> 	const struct landlock_ruleset *const domain = 	
+>         get_current_net_domain();
+> 
+> 	if (!domain)
+> 		return 0;
+> 	if (WARN_ON_ONCE(domain->num_layers < 1))
+> 		return -EACCES;
+> 
+> 	/* FIXES network tests */ !!!
+> 	if (sock->sk->__sk_common.skc_family != address->sa_family) !!!
+> 		return 0; !!!
+> 	/* Checks if it's a TCP socket. */
+> 	if (sock->type != SOCK_STREAM)
+> 		return 0;
+> 	......
+> 
+> So now all network tests pass.
+> What do you think?
 
-diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index c26c63275b0b..e7f76cc58533 100644
---- a/net/devlink/leftover.c
-+++ b/net/devlink/leftover.c
-@@ -6630,6 +6630,7 @@ void devlink_notify_unregister(struct devlink *devlink)
- 	struct devlink_param_item *param_item;
- 	struct devlink_trap_item *trap_item;
- 	struct devlink_port *devlink_port;
-+	struct devlink_linecard *linecard;
- 	struct devlink_rate *rate_node;
- 	struct devlink_region *region;
- 	unsigned long port_index;
-@@ -6658,6 +6659,8 @@ void devlink_notify_unregister(struct devlink *devlink)
- 
- 	xa_for_each(&devlink->ports, port_index, devlink_port)
- 		devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
-+	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
-+		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
- 	devlink_notify(devlink, DEVLINK_CMD_DEL);
- }
- 
--- 
-2.41.0
+Good catch, we should indeed check this inconsistency, but this fix also
+adds two issues:
+- sa_family is read before checking if it is out of bound (see
+  offsetofend() check bellow). A simple fix is to move down the new
+  check.
+- access request with AF_UNSPEC on a bind operation doesn't go through
+  the specific AF_UNSPEC handling branch.  There are two things to fix
+  here: handle AF_UNSPEC specifically in this new af_family check, and
+  add a new test to make sure bind with AF_UNSPEC and INADDR_ANY is
+  properly restricted.
 
+I'll reply to this message with a patch extending your fix.
+
+
+> 
+> > +TEST_F(ipv4, from_unix_to_inet)
+> > +{
+> > +	int unix_stream_fd, unix_dgram_fd;
+> > +
+> > +	if (variant->sandbox == TCP_SANDBOX) {
+> > +		const struct landlock_ruleset_attr ruleset_attr = {
+> > +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+> > +					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> > +		};
+> > +		const struct landlock_net_service_attr tcp_bind_connect_p0 = {
+> > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+> > +					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> > +			.port = self->srv0.port,
+> > +		};
+> > +		int ruleset_fd;
+> > +
+> > +		/* Denies connect and bind to check errno value. */
+> > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+> > +						     sizeof(ruleset_attr), 0);
+> > +		ASSERT_LE(0, ruleset_fd);
+> > +
+> > +		/* Allows connect and bind for srv0.  */
+> > +		ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
+> > +					       LANDLOCK_RULE_NET_SERVICE,
+> > +					       &tcp_bind_connect_p0, 0));
+> > +
+> > +		enforce_ruleset(_metadata, ruleset_fd);
+> > +		EXPECT_EQ(0, close(ruleset_fd));
+> > +	}
+> > +
+> > +	unix_stream_fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+> > +	ASSERT_LE(0, unix_stream_fd);
+> > +
+> > +	unix_dgram_fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+> 
+>         Minor mistyping SOCK_STREAM -> SOCK_DGRAM.
+
+Good catch!
+
+> 
+> > +	ASSERT_LE(0, unix_dgram_fd);
+> > +
+> > +	/* Checks unix stream bind and connect for srv0. */
+> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_stream_fd, &self->srv0));
+> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_stream_fd, &self->srv0));
+> > +
+> > +	/* Checks unix stream bind and connect for srv1. */
+> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_stream_fd, &self->srv1))
+> > +	{
+> > +		TH_LOG("Wrong bind error: %s", strerror(errno));
+> > +	}
+> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_stream_fd, &self->srv1));
+> > +
+> > +	/* Checks unix datagram bind and connect for srv0. */
+> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_dgram_fd, &self->srv0));
+> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_dgram_fd, &self->srv0));
+> > +
+> > +	/* Checks unix datagram bind and connect for srv0. */
+> 
+>         Should be "Checks... for srv1."
+
+indeed
+
+> 
+> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_dgram_fd, &self->srv1));
+> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_dgram_fd, &self->srv1));
+> > +}
 
