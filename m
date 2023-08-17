@@ -1,84 +1,158 @@
-Return-Path: <netdev+bounces-28555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6567977FCCA
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 19:14:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115A077FCCE
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 19:14:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 209082820EF
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:14:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB084281DE8
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFC3171BF;
-	Thu, 17 Aug 2023 17:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC896171AD;
+	Thu, 17 Aug 2023 17:14:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562D91ADC4
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 17:11:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C5ABC433C7;
-	Thu, 17 Aug 2023 17:11:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692292268;
-	bh=QWb8uU7er4eHL3xqihUBmuM1/XOUYzoC3V7sc/KlG9c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q+JO2MaGQc9Tqfzykmd1ioCOc4USf7qcrXDEmggaGIopMW7+8DwezzUXXqUPnk6Qe
-	 3o7F+nBp0h8Jea3fOBptG4U2LTL4eQwjjCLk0i5PmJqiILEVY8dZ5q9NZs0aMuRcw0
-	 CnpjyJNlVhnRRHerXkHDylfbumgkIX9oWq437SUu7KChKFOG5FN/hUmKlIRgMDOYmu
-	 9liNRdWVN4U5oSFtAgI2BSWCU8V19kM5uBH+CS3h5NJrSCemTwbYxoYSP1wmRbw5Bl
-	 tH/6EiMijiaQaxBwn2ePIEhyf6zXq9bDfCagHSMqZlR5rLmdqdrAkjwD5OvWG4z3fw
-	 IgIicQu14V8kA==
-Date: Thu, 17 Aug 2023 20:11:04 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net-next 14/14] ice: split ice_aq_wait_for_event() func
- into two
-Message-ID: <20230817171104.GW22185@unreal>
-References: <20230816204736.1325132-1-anthony.l.nguyen@intel.com>
- <20230816204736.1325132-15-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F5814F7B;
+	Thu, 17 Aug 2023 17:14:40 +0000 (UTC)
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2472E30C5;
+	Thu, 17 Aug 2023 10:14:32 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-58e6c05f529so486987b3.3;
+        Thu, 17 Aug 2023 10:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692292471; x=1692897271;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9qX4G/OI6N2BYYRxDPA8JDeQVrYSPjpWaqZt/JBYrZs=;
+        b=omLREJo8UuQXEtOo+S3FkqpftCB/gC/4AiW72jvQdJSMVPbfwYBiZ2pOT8NM2Mb5kA
+         Bu3GT9tyi2gWO1yOOSjEsjhC8joxak8nCo6F9YK04CKI/ncLxMFs1fOm5qnCrRLFScnj
+         NvowKOE7N0dqsb77RJjjVm6b8MO1SigOZa4wB1ykpE8skHlQv20g6WHAHP6ZW1Po1/Nx
+         nYawNU3qWqDr2Aqe7fb5szwNFjeUNhmDqU/CHHaml1zCSxDMysYflPZH8huy4EV3l4xV
+         mfyhI8V38bNdNoMPGB/Agx4gG8tZZnaLMffXK8vZJRUeKDF8TdR86UQ4agv3y8hHBWW3
+         zXag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692292471; x=1692897271;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9qX4G/OI6N2BYYRxDPA8JDeQVrYSPjpWaqZt/JBYrZs=;
+        b=dq8Pg3ZJOPS0HwwYL+pvjNBv4+dOJIYGmqFMV0x8tk1/YLT9vMF9LxsjQ64PghcT/r
+         w8jBJy8p7vNeNiIcvYqYQJJ4TTebuh5nLI9tE7c9ZjHkIt96Q4ElUquCXdsc9PVM0wnf
+         4u6OwbkvOAyxP59FLc0AqRKABWSf1c/SkZ+uNv8T4kfz2vLsVeK08QGfZRwdbyeteMe9
+         wLILuzRud1qSLszyqs+SHEC3k0a/wLYW5bq0gbhU8V5vZ5oj8p1tBOLQdynW/kcXMIFp
+         npxsgxhQMh9hX5JWrqwQ5MNjNw7tcgGGU7BJdtrojMzVBODmvIdpvrzIvQ45qbakonzm
+         TWNw==
+X-Gm-Message-State: AOJu0YxEXqOPVEG9HbsQmO3HXF01wSh3d05frA+qAKyMnq2O39Ws8e4l
+	jwOeXcNJsa0VETC+OY6R1Wnofr/zh6hFmDq5BKs=
+X-Google-Smtp-Source: AGHT+IH2YMvFrKGCpJObtd+Jujx79UtRUHSU/oEY13hy1nwxFRasaZpMthnsdU1lAivOcInwYJWkXZpUNLSgzC70u4c=
+X-Received: by 2002:a25:d10a:0:b0:d12:3108:f931 with SMTP id
+ i10-20020a25d10a000000b00d123108f931mr133018ybg.56.1692292471238; Thu, 17 Aug
+ 2023 10:14:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230816204736.1325132-15-anthony.l.nguyen@intel.com>
+References: <20230814092302.1903203-1-dallerivemichele@gmail.com>
+ <2023081411-apache-tubeless-7bb3@gregkh> <0e91e3be-abbb-4bf7-be05-ba75c7522736@lunn.ch>
+ <CACETy0=V9B8UOCi+BKfyrX06ca=WvC0Gvo_ouR=DjX=_-jhAwg@mail.gmail.com>
+ <e3b4164a-5392-4209-99e5-560bf96df1df@lunn.ch> <CACETy0n0217=JOnHUWvxM_npDrdg4U=nzGYKqYbGFsvspjP6gg@mail.gmail.com>
+In-Reply-To: <CACETy0n0217=JOnHUWvxM_npDrdg4U=nzGYKqYbGFsvspjP6gg@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 17 Aug 2023 19:14:19 +0200
+Message-ID: <CANiq72=3z+FcyYGV0upsezGAkh2J4EmzbJ=5s374gf=10AYnUQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] Rust Socket abstractions
+To: Michele Dalle Rive <dallerivemichele@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Greg KH <gregkh@linuxfoundation.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	Davide Rovelli <davide.rovelli@usi.ch>, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 01:47:36PM -0700, Tony Nguyen wrote:
-> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> 
-> Mitigate race between registering on wait list and receiving
-> AQ Response from FW.
-> 
-> ice_aq_prep_for_event() should be called before sending AQ command,
-> ice_aq_wait_for_event() should be called after sending AQ command,
-> to wait for AQ Response.
-> 
-> Please note, that this was found by reading the code,
-> an actual race has not yet materialized.
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice.h          |  5 +-
->  .../net/ethernet/intel/ice/ice_fw_update.c    | 13 ++--
->  drivers/net/ethernet/intel/ice/ice_main.c     | 67 ++++++++++++-------
->  3 files changed, 57 insertions(+), 28 deletions(-)
-> 
+On Thu, Aug 17, 2023 at 4:53=E2=80=AFPM Michele Dalle Rive
+<dallerivemichele@gmail.com> wrote:
+>
+> The idea behind this patch is that, as of now, Rust is not a viable optio=
+n for
+> any OOT module that requires even the highest-level network support.
+>
+> I am wondering whether the `net` subsystem is interested in reviewing, gi=
+ving
+> feedback and eventually accepting code that is currently OOT-only.
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+It is unlikely kernel maintainers in general accept code intended for
+out-of-tree modules only.
+
+To be clear, Rust for Linux's focus has never been out-of-tree
+modules. In fact, the whole effort since the beginning was about
+adding support for Rust in-tree, unlike other projects that e.g.
+linked `rustc`-built object files into an out-of-tree kernel module.
+
+We do support out-of-tree modules, and have a sample of that, but that
+is just only to the degree that the kernel supports out-of-tree
+modules in general.
+
+The abstractions that have been upstreamed so far are those that have
+(or should soon have) a user in-tree. Sometimes we have had to bend a
+bit the rules in order to split the dependency chain or make things
+easier, but abstractions (in general) cannot be upstreamed that do not
+have at least an expected and public user that is going upstream too.
+Here, by user, we generally mean an actual driver or useful component
+(rather than a sample).
+
+If I understood correctly from Zulip, you cannot (right now) show your
+use case because it is confidential and therefore you cannot upstream
+it, so we will need another user (and, of course, that is a necessary
+but not sufficient condition for the code to be accepted).
+
+> Also, it would be interesting if you could provide us any module or
+> functionality you are planning to get in-tree which might use this interf=
+ace;
+> it could be useful in order to understand the applicability of these
+> abstractions and find a concrete in-kernel use-case.
+
+I think it is easier if it is the other way around :) That is, the
+people/companies that already have a use case for the abstractions
+should come forward and publish them so that the abstractions are
+justified.
+
+Of course, this does not preclude discussing about them or having a
+`rust-net` branch or sub-subsystem or similar. That could be quite
+useful so develop those users and to experiment. In fact, we are
+actively trying to onboard more people (and companies and other
+entities) to the Rust overall kernel effort, so please feel free to
+join us.
+
+> I included in the email a couple of sample OOT modules that showcase the
+> functionalities of the socket API; they will be attached as an actual pat=
+ch if
+> there will be a v2.
+
+The sample should not be an out-of-tree module, it should be an
+in-tree one. However, for upstreaming, just a sample is likely to not
+be enough for most kernel maintainers, as mentioned above.
+
+By the way, I am a bit confused -- the patch seems to add an in-tree
+sample, not an out-of-tree one.
+
+Cheers,
+Miguel
 
