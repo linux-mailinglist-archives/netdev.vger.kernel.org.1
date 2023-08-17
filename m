@@ -1,91 +1,84 @@
-Return-Path: <netdev+bounces-28564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D8BC77FD78
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 20:04:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B87A77FD7A
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 20:05:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49632282137
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 18:04:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 138DE282112
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 18:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035B5171DD;
-	Thu, 17 Aug 2023 18:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B201174C5;
+	Thu, 17 Aug 2023 18:05:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B1E171BB
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:04:27 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AFE519A1;
-	Thu, 17 Aug 2023 11:04:26 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52889bc61b6so95376a12.0;
-        Thu, 17 Aug 2023 11:04:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDFE14AA6
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:05:00 +0000 (UTC)
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16F0273C;
+	Thu, 17 Aug 2023 11:04:57 -0700 (PDT)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1bba7717d3bso5771206fac.1;
+        Thu, 17 Aug 2023 11:04:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692295465; x=1692900265;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UxvCrw/069KltoPZkQIYth4BBOJdgJ8sNaI0SyyMDnM=;
-        b=LlNp+0S95wa2DHWIhxZumDFmianXTCRMJjOitpuiuyKYp0AAZb4zHQT8ZXqFwgTr3M
-         TAcGjKr7A/7LbmvxCY8pqvLWzcywa017/uoZ3dhPRVfKQBpxe2Rx4JQVzmQMUv/lluNQ
-         8t/PjmueudVyVsA4+vkTHFn9Wg1EnP9GTqy6bCt1AIDvGSTkLDX8uzmkFWqf6cdFJtPf
-         KRm02KV0hef2hr/xa3gZ+j3wmJGjbj9dQaAlasQmWzrxH3IJ5JCWJI2/kGrxl9CivxpV
-         AvKdmfKLPT+4igVvanygECsKarn9iz35Qwe/ar6m/vTrTtCGRNAG2OY42t5fatoyv1PR
-         bXLw==
+        d=gmail.com; s=20221208; t=1692295497; x=1692900297;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TaFlLMUkgDXjGVWrM6IMPLCWNafFH2Z2cRH1t42kOXo=;
+        b=felDi4nQWlL8mZyo5zdcArWXov68g+JtjrpASHxx0I0jbgtcjrhZ06SAchxM4WGBPM
+         N57J+RyUxjhzQ5WRYEBnG0Xy3/4WtuDhQueWPX3SI5faqBh0KJbPfjWk84i/H4xhAqHa
+         2AMQAAesRgAEHYLoS4N22g4m+I2ZGYiJfV2nzcPLbucxxkdIUvB+2QjXoAohQUlzrnqY
+         8GDDW5oRLu74mGnCDM8JICurISFD2IlYFk68NUFe2J0G5a+wk7Sac6SyYM+NCWW4L28q
+         Er9wnyf69nwlfLQ79uAVxA+p1s+POZozaZFDNFqUDgClSQ4YUM5+NxGoQTAj6P8X0Qc8
+         FVAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692295465; x=1692900265;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UxvCrw/069KltoPZkQIYth4BBOJdgJ8sNaI0SyyMDnM=;
-        b=JhsFPpmYOuj4rYlE4N7b7MtGbrs0UOyyoUx/1bTrk8QwjNM8sQQvhEKDUnCtLIFRjP
-         dY6N+XWk4gTdEIs5/N2eUTHwlH/MIVHfJPpAhDoeuZaZxS4Gcb8IKUavge67hSu9oRW6
-         d1FuIXUx9mEXgnHnUUHidq316zlLklnxKsZ3fJq821CGg7hU7XQBSOhJXBeCaoHCRQ+s
-         xYknktqvERx6kD+ctmMhGQMFRh//7qX4SR5IKGDWkg6HModTy0OjDgAYKUUX5JvOHT+e
-         /+Ngdx+JgorUFfFBHh8Wg+phL47o6IyrFAMVabF1ZKz4hDXWWJAhGYBzSWWs8YjtCCwL
-         nRmg==
-X-Gm-Message-State: AOJu0YzyqJMlqryaVNhyuAu+NLcsWYOFRdj4Scdnyu72wBTPT9C4MKKr
-	vAk5H1TEcRxq6bAYA/GiHSk=
-X-Google-Smtp-Source: AGHT+IG0Woy+0POxg4sPHGGIdfrc456TaHlsCCBtEoEEY8ldQE+9Fdkgkm7V8IaZV79Aen7WtSv5Lw==
-X-Received: by 2002:a17:906:8a72:b0:99c:6692:7f76 with SMTP id hy18-20020a1709068a7200b0099c66927f76mr153247ejc.16.1692295464443;
-        Thu, 17 Aug 2023 11:04:24 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.129.159])
-        by smtp.gmail.com with ESMTPSA id h6-20020a1709063c0600b0099b921de301sm27628ejg.159.2023.08.17.11.04.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Aug 2023 11:04:23 -0700 (PDT)
-Message-ID: <7889b4f8-78d9-9a0a-e2cc-aae4ed8a80fd@gmail.com>
-Date: Thu, 17 Aug 2023 19:00:35 +0100
+        d=1e100.net; s=20221208; t=1692295497; x=1692900297;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TaFlLMUkgDXjGVWrM6IMPLCWNafFH2Z2cRH1t42kOXo=;
+        b=l2jUcyopOJrDc5LQ9HB11W7Prrzc+zZbNVB9Kw7/jnoLUGx2Xn6p9XIzXTmxQ1Hwey
+         WfofQz6t0tUoty+reejE5fk4AyER0gKG3T1fxAoZn05a8c/1B4ceYXnNdR5SfjBFF3Kh
+         b26hHYpgT26ezU+I36ry+MM3QW/ZU1wBY3j+haZTVrlIdv+uHUDJJKgbLME/A8L/wlmu
+         MnHx7YnoCPQDsOHQiNN8TrTrLh6cNVdO1cSL+eU7viokJM14FCy0u2eeVTmS/ZhmjTfR
+         em2WMYr+ELJDw5FeVuvndghq8V95blahEfMSWlhQfStC2KP8nxe4v0zmoB61a5Cf3wfV
+         6Y1w==
+X-Gm-Message-State: AOJu0YxosNReG5iOGBRWS8nQjiYBB7gEH5+78y37TQHepY/j3n5UivAj
+	qzhCP8XtNc7dnHOQ2oclj8zhSAchCknZu57P
+X-Google-Smtp-Source: AGHT+IG7XKzmhtjJcFe2XNUBnqrlQmkmBngWWXhZhvSeGfnkxoPJjTGpQPWOk+J1D/zK7nErhEO/SQ==
+X-Received: by 2002:a05:6870:a196:b0:1b7:3fd5:87cd with SMTP id a22-20020a056870a19600b001b73fd587cdmr155579oaf.48.1692295496972;
+        Thu, 17 Aug 2023 11:04:56 -0700 (PDT)
+Received: from t14s.localdomain ([2001:1284:f508:4042:ec37:326f:3dcd:fbfa])
+        by smtp.gmail.com with ESMTPSA id h17-20020a9d6a51000000b006af7580c84csm90321otn.60.2023.08.17.11.04.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 11:04:56 -0700 (PDT)
+Received: by t14s.localdomain (Postfix, from userid 1000)
+	id 937047339AC; Thu, 17 Aug 2023 15:04:54 -0300 (-03)
+Date: Thu, 17 Aug 2023 15:04:54 -0300
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, Simon Horman <horms@kernel.org>, 
+	Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+Subject: Re: [PATCHv2 nf] netfilter: set default timeout to 3 secs for sctp
+ shutdown send and recv state
+Message-ID: <ycoqoxkqgbhyudvhufzghix77yxymx6fdwccxltpo4vm7uvi6y@i4rak7os5des>
+References: <4f2f3f3e0402c41ed46483dc9254dc6d71f06ceb.1692122927.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 00/11] Device Memory TCP
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
- netdev@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>,
- Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>,
- stephen@networkplumber.org, sdf@google.com, David Wei <dw@davidwei.uk>
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <7dc4427f-ee99-e401-9ff8-d554999e60ca@kernel.org>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <7dc4427f-ee99-e401-9ff8-d554999e60ca@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f2f3f3e0402c41ed46483dc9254dc6d71f06ceb.1692122927.git.lucien.xin@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -93,46 +86,21 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/14/23 02:12, David Ahern wrote:
-> On 8/9/23 7:57 PM, Mina Almasry wrote:
->> Changes in RFC v2:
->> ------------------
+On Tue, Aug 15, 2023 at 02:08:47PM -0400, Xin Long wrote:
 ...
->> ** Test Setup
->>
->> Kernel: net-next with this RFC and memory provider API cherry-picked
->> locally.
->>
->> Hardware: Google Cloud A3 VMs.
->>
->> NIC: GVE with header split & RSS & flow steering support.
+> Note that the very short time value for SCTP_CONNTRACK_SHUTDOWN_SEND/RECV
+> was probably used for a rare scenario where SHUTDOWN is sent on 1st path
+> but SHUTDOWN_ACK is replied on 2nd path, then a new connection started
+> immediately on 1st path. So this patch also moves from SHUTDOWN_SEND/RECV
+> to CLOSE when receiving INIT in the ORIGINAL direction.
+
+Yeah.
+
 > 
-> This set seems to depend on Jakub's memory provider patches and a netdev
-> driver change which is not included. For the testing mentioned here, you
-> must have a tree + branch with all of the patches. Is it publicly available?
-> 
-> It would be interesting to see how well (easy) this integrates with
-> io_uring. Besides avoiding all of the syscalls for receiving the iov and
-> releasing the buffers back to the pool, io_uring also brings in the
-> ability to seed a page_pool with registered buffers which provides a
-> means to get simpler Rx ZC for host memory.
+> Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
+> Reported-by: Paolo Valerio <pvalerio@redhat.com>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-The patchset sounds pretty interesting. I've been working with David Wei
-(CC'ing) on io_uring zc rx (prototype polishing stage) all that is old
-similar approaches based on allocating an rx queue. It targets host
-memory and device memory as an extra feature, uapi is different, lifetimes
-are managed/bound to io_uring. Completions/buffers are returned to user via
-a separate queue instead of cmsg, and pushed back granularly to the kernel
-via another queue. I'll leave it to David to elaborate
-
-It sounds like we have space for collaboration here, if not merging then
-reusing internals as much as we can, but we'd need to look into the
-details deeper.
-
-> Overall I like the intent and possibilities for extensions, but a lot of
-> details are missing - perhaps some are answered by seeing an end-to-end
-> implementation.
-
--- 
-Pavel Begunkov
+Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
