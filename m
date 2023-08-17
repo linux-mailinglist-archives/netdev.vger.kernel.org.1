@@ -1,148 +1,125 @@
-Return-Path: <netdev+bounces-28630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F7078003D
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:58:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A4D780129
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 00:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2D3E282100
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:58:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FD9228224B
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 22:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C9A1BB5B;
-	Thu, 17 Aug 2023 21:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F84100B3;
+	Thu, 17 Aug 2023 22:39:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D5B1ADC8;
-	Thu, 17 Aug 2023 21:58:32 +0000 (UTC)
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FE302698;
-	Thu, 17 Aug 2023 14:58:31 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2685bcd046eso197854a91.3;
-        Thu, 17 Aug 2023 14:58:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692309511; x=1692914311;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GINBlOUN78JQAVZLCyadtlAejrOaDZvkhNHX3xHJbIA=;
-        b=RzMjdJdCUKJCTf7fI3fc/wIBGlIIjqaTWtwE9ycDNv2m4cNYvGJey6yihBIA3CAbkq
-         RmJPRgQ/h1E0dGNCahy9HGSwCSUkjx5bZP1OWUD4soUUZcQ3BL8GvPQQSWmkF74+5A2n
-         9E2KVwJrg6JyCABiL6N7KJ8f02G6VPVD+K9sUwXcJmRe/ck+UnlkNnrXJpQN6BaAvc0M
-         ycsNCRgH1KwYHVtqqtglQv6QR8M3QkBqWcMJi3zSe3NV3MRfx7CVo29qWqk/DQtfzsG4
-         LIptvRZrFGLHCByQ/VlMf3JX+6vGO/0bazj8auI1oWseGbKpn/zJqIcLVHI1e4Id4mrI
-         wyGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692309511; x=1692914311;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GINBlOUN78JQAVZLCyadtlAejrOaDZvkhNHX3xHJbIA=;
-        b=HB+fBejiL64z/bkOKug5ew70Q/T54WqbDhb+08QAA/4eadwdalcM93xFJzFH6/V5f+
-         aLdl5TDFHQfjtPtB8Os6Ne5FIfldw2Ji8BhMK0pyOKj48humGOwjWO+Y1nZk3veHis+D
-         e+6RYGcD2HD3MfbabYP7reKY0OTCG205d6feu8t/4Ta9vwDk0Qscuq0PIjdYAkqEZxIe
-         mlIAoxVS+jVqgPoK5vWl50LjFgVEvYLHaiY5Ebh6y26dxbvYO7WfrNSWR4dys+igg3tM
-         GR3wV4RAwtrOvX/4hJlEVjvYw1PPNHPFz1jmOMbwxblwUY1OQ0WfdO0Hgq8yu1may3Au
-         UhxQ==
-X-Gm-Message-State: AOJu0YxL4XsZ4qUlE6maCKLc5BbzsbPCwGqiF3OdCrzNnMEiifskghP6
-	wSKrMk4HRZ22qFYCt3Hlwew=
-X-Google-Smtp-Source: AGHT+IGxkIxUbdobemPAjFwPTFS1otmjb9kmh1krxv/YtvUP/c92nBH5UbW8yWyibu0MRQH+GWyjcA==
-X-Received: by 2002:a17:90a:2a01:b0:26b:e80:11de with SMTP id i1-20020a17090a2a0100b0026b0e8011demr734132pjd.25.1692309510832;
-        Thu, 17 Aug 2023 14:58:30 -0700 (PDT)
-Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:500::4:8d88])
-        by smtp.gmail.com with ESMTPSA id x14-20020a17090a6b4e00b00268320ab9f2sm1734599pjl.6.2023.08.17.14.58.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 14:58:30 -0700 (PDT)
-Date: Thu, 17 Aug 2023 14:58:26 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
-	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	Anatoly Burakov <anatoly.burakov@intel.com>,
-	Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
-	netdev@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH bpf-next v5 13/21] ice: Implement checksum hint
-Message-ID: <20230817215826.sx7t6mipx7pajuzo@macbook-pro-8.dhcp.thefacebook.com>
-References: <20230811161509.19722-1-larysa.zaremba@intel.com>
- <20230811161509.19722-14-larysa.zaremba@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB18B819
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 22:39:26 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DA5B9;
+	Thu, 17 Aug 2023 15:39:18 -0700 (PDT)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37HM0GHG008965;
+	Thu, 17 Aug 2023 22:03:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=dDbHUAQVLstzKjTzLnR27yiz9xz7bG0tn4s8Wa8jZC4=;
+ b=DoFD6ZygVE9A0oxF942Dz+tsdprZ1UGwyIeJrUvRxkj5HSWNCUk2PYEaDl3iasMMgybW
+ gPFbr8R8wF0Zk2FAZ5Ysq+bVAk0PVfOBZDWAaCWIWnE3PXA6FgKmN2jQ8/P2b3fNX1yU
+ FvSwJDAVrphxhdPQlFFTnSTv15mQ3MiKUQRzaEQ2+sCJ1/61efgLRcYijUQRdy7mhvKd
+ 44WYyhGVK/UkuY39Q3HUwY21KrmVBqRJJhUQTEcmGbDsWNp6vhh5KY793JOaqnJeVX6w
+ A1cjvsJBVC35MGykHzm3NtAuM6cmc7P1KBD3Ty9Nfjxe0qvtQpVxk0phYYZ1MBTiRdV1 bg== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sh2a3kf0f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Aug 2023 22:03:32 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37HM3Ube015648
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Aug 2023 22:03:30 GMT
+Received: from [10.48.241.213] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Thu, 17 Aug
+ 2023 15:03:30 -0700
+Message-ID: <c07d1893-5994-4a1d-b9a2-9f71c2598d98@quicinc.com>
+Date: Thu, 17 Aug 2023 15:03:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811161509.19722-14-larysa.zaremba@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/7] wifi: cfg80211: Annotate struct cfg80211_acl_data
+ with __counted_by
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>,
+        Johannes Berg
+	<johannes@sipsolutions.net>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+        Nick
+ Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <llvm@lists.linux.dev>,
+        <linux-hardening@vger.kernel.org>
+References: <20230817211114.never.208-kees@kernel.org>
+ <20230817211531.4193219-1-keescook@chromium.org>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20230817211531.4193219-1-keescook@chromium.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: fEVuMk04dtqHU5g-ubaMjlLfFGSGndlx
+X-Proofpoint-ORIG-GUID: fEVuMk04dtqHU5g-ubaMjlLfFGSGndlx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-17_18,2023-08-17_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 clxscore=1011 impostorscore=0 phishscore=0 priorityscore=1501
+ suspectscore=0 spamscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=825
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2308170196
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 11, 2023 at 06:15:01PM +0200, Larysa Zaremba wrote:
-> Implement .xmo_rx_csum callback to allow XDP code to determine,
-> whether HW has validated any checksums.
+On 8/17/2023 2:15 PM, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
 > 
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 26 +++++++++++++++++++
->  1 file changed, 26 insertions(+)
+> As found with Coccinelle[1], add __counted_by for struct cfg80211_acl_data.
+> Additionally, since the element count member must be set before accessing
+> the annotated flexible array member, move its initialization earlier.
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> index 6ae57a98a4d8..f11a245705bc 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> @@ -660,8 +660,34 @@ static int ice_xdp_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan_tci,
->  	return 0;
->  }
->  
-> +/**
-> + * ice_xdp_rx_csum - RX checksum XDP hint handler
-> + * @ctx: XDP buff pointer
-> + * @csum_status: status destination address
-> + * @csum: not used
-> + */
-> +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
-> +			   enum xdp_csum_status *csum_status, __wsum *csum)
-> +{
-> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
-> +	const union ice_32b_rx_flex_desc *eop_desc;
-> +	enum ice_rx_csum_status status;
-> +	u16 ptype;
-> +
-> +	eop_desc = xdp_ext->pkt_ctx.eop_desc;
-> +	ptype = ice_get_ptype(eop_desc);
-> +
-> +	status = ice_get_rx_csum_status(eop_desc, ptype);
-> +	if (status & ICE_RX_CSUM_FAIL)
-> +		return -ENODATA;
-> +
-> +	*csum_status = XDP_CHECKSUM_VERIFIED;
-> +	return 0;
-> +}
-> +
->  const struct xdp_metadata_ops ice_xdp_md_ops = {
->  	.xmo_rx_timestamp		= ice_xdp_rx_hw_ts,
->  	.xmo_rx_hash			= ice_xdp_rx_hash,
->  	.xmo_rx_vlan_tag		= ice_xdp_rx_vlan_tag,
-> +	.xmo_rx_csum			= ice_xdp_rx_csum,
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> 
+> Cc: Johannes Berg <johannes@sipsolutions.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: linux-wireless@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-timestamp hint is implemented by igc, mlx4, mlx5, stmmac
-hash hint is implemneted by igc, mlx4, mlx5.
-With above csum and vlan hints will be in ice only.
-I'd like to see at least one more driver to implement them as well to make sure
-the proposed API works for other vendors.
+Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+
+
 
