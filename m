@@ -1,143 +1,151 @@
-Return-Path: <netdev+bounces-28355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D03D477F2A3
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:02:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3A577F2B6
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C01A281DF4
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:01:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22268281E2A
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395F7100A9;
-	Thu, 17 Aug 2023 09:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7B3100B2;
+	Thu, 17 Aug 2023 09:05:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D954E55B
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:01:56 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E067EE7C
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:01:54 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRJq51tkbzVkvX;
-	Thu, 17 Aug 2023 16:59:45 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 17 Aug 2023 17:01:51 +0800
-Message-ID: <dd7e3f9a-1348-1d13-3b0b-5165070dd342@huawei.com>
-Date: Thu, 17 Aug 2023 17:01:51 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2EDE56C
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:05:49 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7871E7C;
+	Thu, 17 Aug 2023 02:05:47 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RRJtZ5Mj7zFr28;
+	Thu, 17 Aug 2023 17:02:46 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 17 Aug
+ 2023 17:05:45 +0800
+Subject: Re: [PATCH net-next v6 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
+	<liangchen.linux@gmail.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, <linux-rdma@vger.kernel.org>
+References: <20230814125643.59334-1-linyunsheng@huawei.com>
+ <20230814125643.59334-2-linyunsheng@huawei.com>
+ <CAC_iWjKMLoUu4bctrWtK46mpyhQ7LoKe4Nm2t8jZVMM0L9O2xA@mail.gmail.com>
+ <06e89203-9eaf-99eb-99de-e5209819b8b3@huawei.com>
+ <CAC_iWjJ4Pi7Pj9Rm13y4aXBB3RsP9pTsfRf_A-OraXKwaO_xGA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <b71d5f5f-0ea1-3a35-8c90-53ef4ae27e79@huawei.com>
+Date: Thu, 17 Aug 2023 17:05:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH -next] net: broadcom: Use helper function IS_ERR_OR_NULL()
+In-Reply-To: <CAC_iWjJ4Pi7Pj9Rm13y4aXBB3RsP9pTsfRf_A-OraXKwaO_xGA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>
-CC: <netdev@vger.kernel.org>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
-	<rafal@milecki.pl>, Broadcom internal kernel review list
-	<bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Doug Berger
-	<opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>
-References: <20230816095357.2896080-1-ruanjinjie@huawei.com>
- <20230817071923.GB22185@unreal>
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-In-Reply-To: <20230817071923.GB22185@unreal>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.109.254]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500008.china.huawei.com (7.221.188.139)
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 2023/8/17 15:19, Leon Romanovsky wrote:
-> On Wed, Aug 16, 2023 at 05:53:56PM +0800, Ruan Jinjie wrote:
->> Use IS_ERR_OR_NULL() instead of open-coding it
->> to simplify the code.
+On 2023/8/17 1:01, Ilias Apalodimas wrote:
+> On Wed, 16 Aug 2023 at 15:49, Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>
->> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
->> ---
->>  drivers/net/ethernet/broadcom/bgmac.c        | 2 +-
->>  drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
+>> On 2023/8/16 19:26, Ilias Apalodimas wrote:
+>>> Hi Yunsheng
+>>>
+>>> On Mon, 14 Aug 2023 at 15:59, Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>>
+>>>> Currently page_pool_alloc_frag() is not supported in 32-bit
+>>>> arch with 64-bit DMA because of the overlap issue between
+>>>> pp_frag_count and dma_addr_upper in 'struct page' for those
+>>>> arches, which seems to be quite common, see [1], which means
+>>>> driver may need to handle it when using frag API.
+>>>
+>>> That wasn't so common. IIRC it was a single TI platform that was breaking?
 >>
->> diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
->> index 10c7c232cc4e..4cd7c6abb548 100644
->> --- a/drivers/net/ethernet/broadcom/bgmac.c
->> +++ b/drivers/net/ethernet/broadcom/bgmac.c
->> @@ -1448,7 +1448,7 @@ int bgmac_phy_connect_direct(struct bgmac *bgmac)
->>  	int err;
->>  
->>  	phy_dev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
+>> I am not so sure about that as grepping 'ARM_LPAE' has a long
+>> list for that.
 > 
-> When can fixed_phy_register() return NULL?
-> It looks like it returns or valid phy_dev or ERR_PTR().
+> Shouldn't we be grepping for CONFIG_ARCH_DMA_ADDR_T_64BIT and
+> PHYS_ADDR_T_64BIT to find the affected platforms?  Why LPAE?
 
-It seems the following code has a problem:
 
-226 static struct phy_device *__fixed_phy_register(unsigned int irq,
-227                            struct fixed_phy_status *status,
-228                            struct device_node *np,
-229                            struct gpio_desc *gpiod)
-230 {
-231     struct fixed_mdio_bus *fmb = &platform_fmb;
-232     struct phy_device *phy;
-233     int phy_addr;
-234     int ret;
-235
-236     if (!fmb->mii_bus || fmb->mii_bus->state != MDIOBUS_REGISTERED)
-237         return ERR_PTR(-EPROBE_DEFER);
-238
-239     /* Check if we have a GPIO associated with this fixed phy */
-240     if (!gpiod) {
-241         gpiod = fixed_phy_get_gpiod(np);
-242         if (IS_ERR(gpiod))
-243             return ERR_CAST(gpiod);
-244     }
+I used the key in the  original report:
 
-fixed_phy_get_gpiod() return valid gpio_desc or NULL.If
-fixed_phy_get_gpiod(np) failed, the error can not be returned with
-IS_ERR(gpiod) is true, so the 243 line code is a dead code.
+https://www.spinics.net/lists/netdev/msg779890.html
+
+>> Please see the bisection report below about a boot failure on
+>> rk3288-rock2-square which is pointing to this patch.  The issue
+>> appears to only happen with CONFIG_ARM_LPAE=y.
+
+grepping the 'CONFIG_PHYS_ADDR_T_64BIT' seems to be more common?
+https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT
 
 > 
-> Thanks
-> 
-> 
->> -	if (!phy_dev || IS_ERR(phy_dev)) {
->> +	if (IS_ERR_OR_NULL(phy_dev)) {
->>  		dev_err(bgmac->dev, "Failed to register fixed PHY device\n");
->>  		return -ENODEV;
->>  	}
->> diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
->> index 0092e46c46f8..aa9a436fb3ce 100644
->> --- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
->> +++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
->> @@ -617,7 +617,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
->>  		};
->>  
->>  		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
->> -		if (!phydev || IS_ERR(phydev)) {
->> +		if (IS_ERR_OR_NULL(phydev)) {
->>  			dev_err(kdev, "failed to register fixed PHY device\n");
->>  			return -ENODEV;
->>  		}
->> -- 
->> 2.34.1
 >>
+>>>
+>>>>
+>>>> In order to simplify the driver's work when using frag API
+>>>> this patch allows page_pool_alloc_frag() to call
+>>>> page_pool_alloc_pages() to return pages for those arches.
+>>>
+>>> Do we have any use cases of people needing this?  Those architectures
+>>> should be long dead and although we have to support them in the
+>>> kernel,  I don't personally see the advantage of adjusting the API to
+>>> do that.  Right now we have a very clear separation between allocating
+>>> pages or fragments.   Why should we hide a page allocation under a
+>>> frag allocation?  A driver writer can simply allocate pages for those
+>>> boards.  Am I the only one not seeing a clean win here?
 >>
+>> It is also a part of removing the per page_pool PP_FLAG_PAGE_FRAG flag
+>> in this patchset.
+> 
+> Yes, that happens *because* of this patchset.  I am not against the
+> change.  In fact, I'll have a closer look tomorrow.  I am just trying
+> to figure out if we really need it.  When the recycling patches were
+> introduced into page pool we had a very specific reason.  Due to the
+> XDP verifier we *had* to allocate a packet per page.  That was
+
+Did you mean a xdp frame containing a frag page can not be passed to the
+xdp core?
+What is exact reason why the XDP verifier need a packet per page?
+Is there a code block that you can point me to?
+
+I wonder if it is still the case for now, as bnxt and mlx5 seems to be
+supporting frag page and xdp now.
+
+> expensive so we added the recycling capabilities to compensate and get
+> some performance back. Eventually we added page fragments and had a
+> very clear separation on the API.
+> 
+> Regards
+> /Ilias
+>>
+>>>
+>>> Thanks
+>>> /Ilias
+>>>
+> .
+> 
 
