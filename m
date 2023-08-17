@@ -1,110 +1,90 @@
-Return-Path: <netdev+bounces-28393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63F077F513
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6194077F52F
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:27:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBA6428157E
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9810B281E0D
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51C6134AF;
-	Thu, 17 Aug 2023 11:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B161112B9E;
+	Thu, 17 Aug 2023 11:27:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABA4134A2
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 11:24:48 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4F492D58;
-	Thu, 17 Aug 2023 04:24:47 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37H40ZA6017037;
-	Thu, 17 Aug 2023 04:24:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0220; bh=RyJ/uHSPDNaab5kS2BnFEMOg0mgJk4d9fXfN3jHpmp8=;
- b=Zk3fjeh1pm0rbIMHqwtdEgTRYwkl5AlkrsEEXyuhBa4hBPqbVLrvfH69qbF22m2hNQBV
- 3oKXN3W9R4ZG4vs2jCs3TKiiaCMHZnzUbmtkfe6a6hE2CgSk0sqmMzTCFIC0Ok3u06fH
- IcJgrGQ0a7Ly3kcFyHKb7vZzOtXscKjwxWW4hLsEX4UGCgp3eebVCOFesKgKo1LBbQIz
- isuApR/vMuHqkYmprJ/FCUYAJfZLm8QdZfr9i3vjvv+2kyPfruvwCBMCTH9JA+3IYIKU
- UwchTGliyrXcsv7jvtAJQMswy7X6GTjrzaKw6iZp02v3AWBXs90FijLDvK/pNzhqW1Cu CQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3sgptkwmg9-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 17 Aug 2023 04:24:40 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 17 Aug
- 2023 04:24:34 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 17 Aug 2023 04:24:34 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 81B783F705C;
-	Thu, 17 Aug 2023 04:24:29 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net-next Patch 5/5] octeontx2-af: print error message incase of invalid pf mapping
-Date: Thu, 17 Aug 2023 16:53:57 +0530
-Message-ID: <20230817112357.25874-6-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230817112357.25874-1-hkelam@marvell.com>
-References: <20230817112357.25874-1-hkelam@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7357BEACF
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 11:27:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D6B7C433C8;
+	Thu, 17 Aug 2023 11:27:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692271662;
+	bh=cAdGANd11zt0nBXjUykfWHU18ZtC3PJJD2FfMXVQ9+o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=occHl412prdo7j262UsCI+EjY4F+rOVumNKnYFF8YvfS4cWdQI+ibwUjyeOGNY4MO
+	 TEV1SxL1+QT3P8t8fqIXFX0ZScWYA7AdinMhxI0atxC/3/gvaQXRujplteR3uGrPf2
+	 DYQU60bPxgVsbLTu7SU7NxMsp6QZaWnu8LRtDCk661fG4DZy7U3T6jTonyMdBN/x9Z
+	 qikcdeiXELmu/WTFTZ6uhzbHxkdIhOFSAvQMw9Ftyp6x6Sweob4hGL6OUgUkZGC4e6
+	 M4e1MEfqqmEamnzeytqAaYQxkpk/jBecvVbiJ09C7BOFOVbl38Odg/CvqpMhykjCmk
+	 emL3jBEhpkzMQ==
+Date: Thu, 17 Aug 2023 14:27:38 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Piotr Gardocki <piotrx.gardocki@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: Re: [PATCH net 1/2] iavf: fix FDIR rule fields masks validation
+Message-ID: <20230817112738.GH22185@unreal>
+References: <20230816193308.1307535-1-anthony.l.nguyen@intel.com>
+ <20230816193308.1307535-2-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: YadIiLGREVF5O8x260eFhIRKafHUlGTK
-X-Proofpoint-GUID: YadIiLGREVF5O8x260eFhIRKafHUlGTK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-17_03,2023-08-17_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230816193308.1307535-2-anthony.l.nguyen@intel.com>
 
-During AF driver initialization, it creates a mapping between pf to
-cgx,lmac pair. Whenever there is a physical link change, using this
-mapping driver forwards the message to the associated netdev.
+On Wed, Aug 16, 2023 at 12:33:07PM -0700, Tony Nguyen wrote:
+> From: Piotr Gardocki <piotrx.gardocki@intel.com>
+> 
+> Return an error if a field's mask is neither full nor empty. When a mask
+> is only partial the field is not being used for rule programming but it
+> gives a wrong impression it is used. Fix by returning an error on any
+> partial mask to make it clear they are not supported.
+> The ip_ver assignment is moved earlier in code to allow using it in
+> iavf_validate_fdir_fltr_masks.
+> 
+> Fixes: 527691bf0682 ("iavf: Support IPv4 Flow Director filters")
+> Fixes: e90cbc257a6f ("iavf: Support IPv6 Flow Director filters")
+> Signed-off-by: Piotr Gardocki <piotrx.gardocki@intel.com>
+> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  .../net/ethernet/intel/iavf/iavf_ethtool.c    | 10 +++
+>  drivers/net/ethernet/intel/iavf/iavf_fdir.c   | 77 ++++++++++++++++++-
+>  drivers/net/ethernet/intel/iavf/iavf_fdir.h   |  2 +
+>  3 files changed, 85 insertions(+), 4 deletions(-)
 
-This patch prints error message incase of cgx,lmac pair is not
-associated with any pf netdev.
+<...>
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> +static const struct in6_addr ipv6_addr_zero_mask = {
+> +	.in6_u = {
+> +		.u6_addr8 = {
+> +			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> +		}
+> +	}
+> +};
+> +
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index c96a94303a54..8845d50c5b78 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -236,6 +236,11 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
- 
- 	linfo = &event->link_uinfo;
- 	pfmap = cgxlmac_to_pfmap(rvu, event->cgx_id, event->lmac_id);
-+	if (!pfmap) {
-+		dev_err(rvu->dev, "CGX port%d:%d not mapped with PF\n",
-+			event->cgx_id, event->lmac_id);
-+		return;
-+	}
- 
- 	do {
- 		pfid = find_first_bit(&pfmap,
--- 
-2.17.1
+Static variables are zeroed by default, there is no need in direct assignment of 0s.
 
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
