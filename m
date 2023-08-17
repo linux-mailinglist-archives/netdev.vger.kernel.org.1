@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-28515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09ACB77FAA8
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 861EC77FAAB
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4894282034
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:24:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35B7E28204A
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6085154A7;
-	Thu, 17 Aug 2023 15:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB9915494;
+	Thu, 17 Aug 2023 15:24:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DC91548B
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 15:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0F01548B
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 15:24:26 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2C8E55;
-	Thu, 17 Aug 2023 08:24:17 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE2DE56;
+	Thu, 17 Aug 2023 08:24:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692285857; x=1723821857;
+  t=1692285863; x=1723821863;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=HEUpET1bGjXyNVxq333FmKP9AFVYCQzhhjT7Z4aPAgQ=;
-  b=CnI8NXz759x86ba6/MwJTOLXcEGa9gZt4kvwxNxQck/VkfGff1oXIk+A
-   mBLHfAw9PEu4P8b5ZJmJjFdfSk9zptjSAfk5JvxhoYVK16olKNpyUO7zP
-   VrEpPHRArMeuglE7cQCQMqS1OjJ9sMb1BP4Q9nwcNxmpFWnnfldIrtAio
-   ArWrGzN8wvmtbUqfnwOU31xi+96+bXwsDvXOnruQETg3JrNvX3wuWCB6S
-   yig7e2UnClWfnd8mBq6oRKhMVBvw4yecsfsDlqmrcCOQU6n2IKzG2iopD
-   82bqrr8s89bQlJelpDVyzYwVqjQBHUC9IcBapM/lsjSiX/4RRrfvW73Nt
+  bh=6aX94Q99bZs4q9hs4IK0tTmzrNr2pLUa/TdLhwl6NPA=;
+  b=GeChW6W8GUy4mDOi8NLAaFoKnoWk2wyhFHFtm5n29ujBEAEVg33b/FuC
+   VKeY7gTVY5l5hKDaDQtjOokbLxPhleI99XvWW8tUeocINy0/8kE3s435I
+   KYdZDM+kQZVa+sfSPIsP0w0t1QcgrRlsbeSAwl7lpmuSK8oYsZXaoJC50
+   pgknDS5oObySx6oL4Oha0AZEH6KKtLX7crO3+33BUsCwWNGhzXmfZePFJ
+   wzqg9wZOAnno8KXkQ1VF0XsuDaSXfHWge47c6kfdg2cHtV782FU20Yeaz
+   6zSynT3wv2uIyqGY+spw7Wx2LAW/9L8H17CaFtcV6dWBBtLq/k0IiMxgy
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="436758756"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="436758822"
 X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="436758756"
+   d="scan'208";a="436758822"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 08:24:17 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 08:24:23 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="734694126"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="734694207"
 X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="734694126"
+   d="scan'208";a="734694207"
 Received: from mmichali-devpc.igk.intel.com ([10.211.235.239])
-  by orsmga002.jf.intel.com with ESMTP; 17 Aug 2023 08:24:13 -0700
+  by orsmga002.jf.intel.com with ESMTP; 17 Aug 2023 08:24:19 -0700
 From: Michal Michalik <michal.michalik@intel.com>
 To: netdev@vger.kernel.org
 Cc: vadim.fedorenko@linux.dev,
@@ -59,9 +59,9 @@ Cc: vadim.fedorenko@linux.dev,
 	linux-clk@vger.kernel.org,
 	bvanassche@acm.org,
 	Michal Michalik <michal.michalik@intel.com>
-Subject: [PATCH RFC net-next v1 1/2] selftests/dpll: add DPLL module for integration selftests
-Date: Thu, 17 Aug 2023 17:22:08 +0200
-Message-Id: <20230817152209.23868-2-michal.michalik@intel.com>
+Subject: [PATCH RFC net-next v1 2/2] selftests/dpll: add DPLL system integration selftests
+Date: Thu, 17 Aug 2023 17:22:09 +0200
+Message-Id: <20230817152209.23868-3-michal.michalik@intel.com>
 X-Mailer: git-send-email 2.9.5
 In-Reply-To: <20230817152209.23868-1-michal.michalik@intel.com>
 References: <20230817152209.23868-1-michal.michalik@intel.com>
@@ -77,728 +77,789 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-DPLL subsystem integration tests require a fake module which mimics the
-behavior of real driver which supports DPLL hardware. To fully test the
-subsystem two modules are added: dpll_test and dpll_test_other. Modules
-while system selftesting are loaded in different order to verify the
-logic implemented in DPLL subsystem.
+The tests are written in Python3 (3.7+) and pytest testing framework.
+Framework is basing on the ynl library available in the kernel tree
+at: tools/net/ynl
+
+High level flow of DPLL subsystem integration selftests:
+(after running run_dpll_tests.sh or 'make -C tools/testing/selftests')
+1) check if Python in correct version is installed,
+2) create temporary Python virtual environment,
+3) install all the required libraries,
+4) run the tests,
+5) do cleanup.
+
+The DPLL system integration tests are meant to be part of selftests, so
+they can be build and run using command:
+  make -C tools/testing/selftests
+  make -C tools/testing/selftests run_tests
+
+Alternatively, they can be run using single command [1]:
+  make kselftest
+
+If we want to run only DPLL tests, we should set the TARGETS variable:
+  make -C tools/testing/selftests TARGETS=dpll
+  make -C tools/testing/selftests TARGETS=dpll run_tests
+
+They can also be run standalone using starter script:
+  ./run_dpll_tests.sh
+
+There is a possibliy to set optional PYTEST_PARAMS environment variable
+to set the pytest options, like tests filtering ("-k <filter>") or
+verbose output ("-v").
+
+[1] https://www.kernel.org/doc/html/v5.0/dev-tools/kselftest.html
 
 Signed-off-by: Michal Michalik <michal.michalik@intel.com>
 ---
- tools/testing/selftests/dpll/dpll_modules/Makefile |  12 +
- .../selftests/dpll/dpll_modules/dpll_helpers.c     | 259 +++++++++++++++++++++
- .../selftests/dpll/dpll_modules/dpll_test.c        | 148 ++++++++++++
- .../selftests/dpll/dpll_modules/dpll_test.h        |  38 +++
- .../selftests/dpll/dpll_modules/dpll_test_other.c  |  93 ++++++++
- .../selftests/dpll/dpll_modules/dpll_test_other.h  |  27 +++
- tools/testing/selftests/dpll/modules_handler.sh    |  79 +++++++
- 7 files changed, 656 insertions(+)
- create mode 100644 tools/testing/selftests/dpll/dpll_modules/Makefile
- create mode 100644 tools/testing/selftests/dpll/dpll_modules/dpll_helpers.c
- create mode 100644 tools/testing/selftests/dpll/dpll_modules/dpll_test.c
- create mode 100644 tools/testing/selftests/dpll/dpll_modules/dpll_test.h
- create mode 100644 tools/testing/selftests/dpll/dpll_modules/dpll_test_other.c
- create mode 100644 tools/testing/selftests/dpll/dpll_modules/dpll_test_other.h
- create mode 100755 tools/testing/selftests/dpll/modules_handler.sh
+ tools/testing/selftests/Makefile                 |   1 +
+ tools/testing/selftests/dpll/Makefile            |  11 +
+ tools/testing/selftests/dpll/__init__.py         |   0
+ tools/testing/selftests/dpll/config              |   1 +
+ tools/testing/selftests/dpll/consts.py           |  34 ++
+ tools/testing/selftests/dpll/dpll_utils.py       | 104 ++++++
+ tools/testing/selftests/dpll/requirements.txt    |   3 +
+ tools/testing/selftests/dpll/run_dpll_tests.sh   |  75 +++++
+ tools/testing/selftests/dpll/test_dpll.py        | 385 +++++++++++++++++++++++
+ tools/testing/selftests/dpll/ynlfamilyhandler.py |  49 +++
+ 10 files changed, 663 insertions(+)
+ create mode 100644 tools/testing/selftests/dpll/Makefile
+ create mode 100644 tools/testing/selftests/dpll/__init__.py
+ create mode 100644 tools/testing/selftests/dpll/config
+ create mode 100644 tools/testing/selftests/dpll/consts.py
+ create mode 100644 tools/testing/selftests/dpll/dpll_utils.py
+ create mode 100644 tools/testing/selftests/dpll/requirements.txt
+ create mode 100755 tools/testing/selftests/dpll/run_dpll_tests.sh
+ create mode 100644 tools/testing/selftests/dpll/test_dpll.py
+ create mode 100644 tools/testing/selftests/dpll/ynlfamilyhandler.py
 
-diff --git a/tools/testing/selftests/dpll/dpll_modules/Makefile b/tools/testing/selftests/dpll/dpll_modules/Makefile
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 5c60a7c..0f75009 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -13,6 +13,7 @@ TARGETS += core
+ TARGETS += cpufreq
+ TARGETS += cpu-hotplug
+ TARGETS += damon
++TARGETS += dpll
+ TARGETS += drivers/dma-buf
+ TARGETS += drivers/s390x/uvdevice
+ TARGETS += drivers/net/bonding
+diff --git a/tools/testing/selftests/dpll/Makefile b/tools/testing/selftests/dpll/Makefile
 new file mode 100644
-index 0000000..d2816cd
+index 0000000..8a7b544
 --- /dev/null
-+++ b/tools/testing/selftests/dpll/dpll_modules/Makefile
-@@ -0,0 +1,12 @@
++++ b/tools/testing/selftests/dpll/Makefile
+@@ -0,0 +1,11 @@
 +ifndef KSRC
 +	KSRC:=${shell git rev-parse --show-toplevel}
 +endif
 +
-+obj-m += dpll_test.o
-+obj-m += dpll_test_other.o
++build:
++	./modules_handler.sh build
 +
-+all:
-+	make -C $(KSRC) M=$(PWD) modules
++run_tests:
++	./run_dpll_tests.sh
 +
-+clean:
-+	make -C $(KSRC) M=$(PWD) clean
-diff --git a/tools/testing/selftests/dpll/dpll_modules/dpll_helpers.c b/tools/testing/selftests/dpll/dpll_modules/dpll_helpers.c
++.PHONY: build run_tests
+\ No newline at end of file
+diff --git a/tools/testing/selftests/dpll/__init__.py b/tools/testing/selftests/dpll/__init__.py
 new file mode 100644
-index 0000000..c73fbd3
---- /dev/null
-+++ b/tools/testing/selftests/dpll/dpll_modules/dpll_helpers.c
-@@ -0,0 +1,259 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023, Intel Corporation.
-+ * Author: Michal Michalik <michal.michalik@intel.com>
-+ */
-+
-+struct dpll_pd {
-+	enum dpll_mode mode;
-+	int temperature;
-+};
-+
-+struct pin_pd {
-+	u64 frequency;
-+	enum dpll_pin_direction direction;
-+	enum dpll_pin_state state_pin;
-+	enum dpll_pin_state state_dpll;
-+	u32 prio;
-+};
-+
-+static struct dpll_pin_properties *
-+create_pin_properties(const char *label, enum dpll_pin_type type,
-+		      unsigned long caps, u32 freq_supp_num, u64 fmin, u64 fmax)
-+{
-+	struct dpll_pin_frequency *freq_supp;
-+	struct dpll_pin_properties *pp;
-+
-+	pp = kzalloc(sizeof(*pp), GFP_KERNEL);
-+	if (!pp)
-+		return pp;
-+
-+	freq_supp = kzalloc(sizeof(*freq_supp), GFP_KERNEL);
-+	if (!pp)
-+		goto err;
-+	*freq_supp =
-+		(struct dpll_pin_frequency)DPLL_PIN_FREQUENCY_RANGE(fmin, fmax);
-+
-+	pp->board_label = kasprintf(GFP_KERNEL, "%s_brd", label);
-+	pp->panel_label = kasprintf(GFP_KERNEL, "%s_pnl", label);
-+	pp->package_label = kasprintf(GFP_KERNEL, "%s_pcg", label);
-+	pp->freq_supported_num = freq_supp_num;
-+	pp->freq_supported = freq_supp;
-+	pp->capabilities = caps;
-+	pp->type = type;
-+
-+	return pp;
-+err:
-+	kfree(pp);
-+	return NULL;
-+}
-+
-+static struct dpll_pd *create_dpll_pd(int temperature, enum dpll_mode mode)
-+{
-+	struct dpll_pd *pd;
-+
-+	pd = kzalloc(sizeof(*pd), GFP_KERNEL);
-+	if (!pd)
-+		return pd;
-+
-+	pd->temperature = temperature;
-+	pd->mode = mode;
-+
-+	return pd;
-+}
-+
-+static struct pin_pd *create_pin_pd(u64 frequency, u32 prio,
-+				    enum dpll_pin_direction direction)
-+{
-+	struct pin_pd *pd;
-+
-+	pd = kzalloc(sizeof(*pd), GFP_KERNEL);
-+	if (!pd)
-+		return pd;
-+
-+	pd->state_dpll = DPLL_PIN_STATE_DISCONNECTED;
-+	pd->state_pin = DPLL_PIN_STATE_DISCONNECTED;
-+	pd->frequency = frequency;
-+	pd->direction = direction;
-+	pd->prio = prio;
-+
-+	return pd;
-+}
-+
-+static int
-+dds_ops_mode_get(const struct dpll_device *dpll, void *dpll_priv,
-+		 enum dpll_mode *mode, struct netlink_ext_ack *extack)
-+{
-+	*mode = ((struct dpll_pd *)(dpll_priv))->mode;
-+	return 0;
-+};
-+
-+static bool
-+dds_ops_mode_supported(const struct dpll_device *dpll, void *dpll_priv,
-+		       const enum dpll_mode mode,
-+		       struct netlink_ext_ack *extack)
-+{
-+	return true;
-+};
-+
-+static int
-+dds_ops_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
-+			enum dpll_lock_status *status,
-+			struct netlink_ext_ack *extack)
-+{
-+	if (((struct dpll_pd *)dpll_priv)->mode == DPLL_MODE_MANUAL)
-+		*status = DPLL_LOCK_STATUS_LOCKED;
-+	else
-+		*status = DPLL_LOCK_STATUS_UNLOCKED;
-+	return 0;
-+};
-+
-+static int
-+dds_ops_temp_get(const struct dpll_device *dpll, void *dpll_priv, s32 *temp,
-+		 struct netlink_ext_ack *extack)
-+{
-+	*temp = ((struct dpll_pd *)dpll_priv)->temperature;
-+	return 0;
-+};
-+
-+
-+static int
-+pin_frequency_set(const struct dpll_pin *pin, void *pin_priv,
-+		  const struct dpll_device *dpll, void *dpll_priv,
-+		  const u64 frequency, struct netlink_ext_ack *extack)
-+{
-+	((struct pin_pd *)pin_priv)->frequency = frequency;
-+	return 0;
-+};
-+
-+static int
-+pin_frequency_get(const struct dpll_pin *pin, void *pin_priv,
-+		  const struct dpll_device *dpll, void *dpll_priv,
-+		  u64 *frequency, struct netlink_ext_ack *extack)
-+{
-+	*frequency = ((struct pin_pd *)pin_priv)->frequency;
-+	return 0;
-+};
-+
-+static int
-+pin_direction_set(const struct dpll_pin *pin, void *pin_priv,
-+		  const struct dpll_device *dpll, void *dpll_priv,
-+		  const enum dpll_pin_direction direction,
-+		  struct netlink_ext_ack *extack)
-+{
-+	((struct pin_pd *)pin_priv)->direction = direction;
-+	return 0;
-+};
-+
-+static int
-+pin_direction_get(const struct dpll_pin *pin, void *pin_priv,
-+		  const struct dpll_device *dpll, void *dpll_priv,
-+		  enum dpll_pin_direction *direction,
-+		  struct netlink_ext_ack *extack)
-+{
-+	*direction = ((struct pin_pd *)pin_priv)->direction;
-+	return 0;
-+};
-+
-+static int
-+pin_state_on_pin_get(const struct dpll_pin *pin, void *pin_priv,
-+		     const struct dpll_pin *parent_pin, void *parent_priv,
-+		     enum dpll_pin_state *state,
-+		     struct netlink_ext_ack *extack)
-+{
-+	*state = ((struct pin_pd *)pin_priv)->state_pin;
-+	return 0;
-+};
-+
-+static int
-+pin_state_on_dpll_get(const struct dpll_pin *pin, void *pin_priv,
-+		      const struct dpll_device *dpll, void *dpll_priv,
-+		      enum dpll_pin_state *state,
-+		      struct netlink_ext_ack *extack)
-+{
-+	*state = ((struct pin_pd *)pin_priv)->state_dpll;
-+	return 0;
-+};
-+
-+static int
-+pin_state_on_pin_set(const struct dpll_pin *pin, void *pin_priv,
-+		     const struct dpll_pin *parent_pin, void *parent_priv,
-+		     const enum dpll_pin_state state,
-+		     struct netlink_ext_ack *extack)
-+{
-+	((struct pin_pd *)pin_priv)->state_pin = state;
-+	return 0;
-+};
-+
-+static int
-+pin_state_on_dpll_set(const struct dpll_pin *pin, void *pin_priv,
-+		      const struct dpll_device *dpll, void *dpll_priv,
-+		      const enum dpll_pin_state state,
-+		      struct netlink_ext_ack *extack)
-+{
-+	((struct pin_pd *)pin_priv)->state_dpll = state;
-+	return 0;
-+};
-+
-+static int
-+pin_prio_get(const struct dpll_pin *pin, void *pin_priv,
-+	     const struct dpll_device *dpll, void *dpll_priv,
-+	     u32 *prio, struct netlink_ext_ack *extack)
-+{
-+	*prio = ((struct pin_pd *)pin_priv)->prio;
-+	return 0;
-+};
-+
-+static int
-+pin_prio_set(const struct dpll_pin *pin, void *pin_priv,
-+	     const struct dpll_device *dpll, void *dpll_priv,
-+	     const u32 prio, struct netlink_ext_ack *extack)
-+{
-+	((struct pin_pd *)pin_priv)->prio = prio;
-+	return 0;
-+};
-+
-+static void
-+free_pin_data(struct dpll_pin_properties *pp, void *pd)
-+{
-+	/* Free pin properties */
-+	if (pp) {
-+		kfree(pp->board_label);
-+		kfree(pp->panel_label);
-+		kfree(pp->package_label);
-+		kfree(pp->freq_supported);
-+		kfree(pp);
-+	}
-+
-+	/* Free pin private data */
-+	kfree(pd);
-+}
-+
-+struct bus_type bus = {
-+	.name = DPLLS_BUS_NAME
-+};
-+
-+struct device dev = {
-+	.init_name = DPLLS_DEV_NAME,
-+	.bus = &bus
-+};
-+
-+struct dpll_device_ops dds_ops = {
-+	.mode_get = dds_ops_mode_get,
-+	.mode_supported = dds_ops_mode_supported,
-+	.lock_status_get = dds_ops_lock_status_get,
-+	.temp_get = dds_ops_temp_get,
-+};
-+
-+struct dpll_pin_ops pin_ops = {
-+	.frequency_set = pin_frequency_set,
-+	.frequency_get = pin_frequency_get,
-+	.direction_set = pin_direction_set,
-+	.direction_get = pin_direction_get,
-+	.state_on_pin_get = pin_state_on_pin_get,
-+	.state_on_dpll_get = pin_state_on_dpll_get,
-+	.state_on_pin_set = pin_state_on_pin_set,
-+	.state_on_dpll_set = pin_state_on_dpll_set,
-+	.prio_get = pin_prio_get,
-+	.prio_set = pin_prio_set,
-+};
-diff --git a/tools/testing/selftests/dpll/dpll_modules/dpll_test.c b/tools/testing/selftests/dpll/dpll_modules/dpll_test.c
+index 0000000..e69de29
+diff --git a/tools/testing/selftests/dpll/config b/tools/testing/selftests/dpll/config
 new file mode 100644
-index 0000000..afbdfac
+index 0000000..44df39b4
 --- /dev/null
-+++ b/tools/testing/selftests/dpll/dpll_modules/dpll_test.c
-@@ -0,0 +1,148 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023, Intel Corporation.
-+ * Author: Michal Michalik <michal.michalik@intel.com>
-+ */
-+
-+#include <linux/module.h>
-+
-+MODULE_AUTHOR("Michal Michalik");
-+MODULE_DESCRIPTION("DPLL interface test driver");
-+MODULE_LICENSE("GPL");
-+
-+#include <linux/types.h>
-+#include <linux/netlink.h>
-+
-+#include <linux/dpll.h>
-+#include <uapi/linux/dpll.h>
-+
-+#include "dpll_test.h"
-+#include "dpll_helpers.c"
-+
-+struct dpll_device *dpll_e;
-+struct dpll_pd *dpll_e_pd;
-+struct dpll_device *dpll_p;
-+struct dpll_pd *dpll_p_pd;
-+
-+struct dpll_pin_properties *pp_gnss;
-+struct dpll_pin *p_gnss;
-+struct pin_pd *p_gnss_pd;
-+
-+struct dpll_pin_properties *pp_pps;
-+struct dpll_pin *p_pps;
-+struct pin_pd *p_pps_pd;
-+
-+struct dpll_pin_properties *pp_rclk;
-+struct dpll_pin *p_rclk;
-+struct pin_pd *p_rclk_pd;
-+
-+
-+static int __init custom_init(void)
-+{
-+	/* Create EEC DPLL */
-+	dpll_e = dpll_device_get(DPLLS_CLOCK_ID, EEC_DPLL_DEV, THIS_MODULE);
-+	dpll_e_pd = create_dpll_pd(EEC_DPLL_TEMPERATURE, DPLL_MODE_AUTOMATIC);
-+	if (dpll_device_register(dpll_e, DPLL_TYPE_EEC, &dds_ops,
-+				 (void *) dpll_e_pd))
-+		goto ret;
-+
-+	/* Create PPS DPLL */
-+	dpll_p = dpll_device_get(DPLLS_CLOCK_ID, PPS_DPLL_DEV, THIS_MODULE);
-+	dpll_p_pd = create_dpll_pd(PPS_DPLL_TEMPERATURE, DPLL_MODE_MANUAL);
-+	if (dpll_device_register(dpll_p, DPLL_TYPE_PPS, &dds_ops,
-+				 (void *) dpll_p_pd))
-+		goto f_eec;
-+
-+	/* Create first pin (GNSS) */
-+	pp_gnss = create_pin_properties("GNSS", DPLL_PIN_TYPE_GNSS,
-+					PIN_GNSS_CAPABILITIES,
-+					1, DPLL_PIN_FREQUENCY_1_HZ,
-+					DPLL_PIN_FREQUENCY_1_HZ);
-+	p_gnss = dpll_pin_get(DPLLS_CLOCK_ID, PIN_GNSS, THIS_MODULE, pp_gnss);
-+	p_gnss_pd = create_pin_pd(DPLL_PIN_FREQUENCY_1_HZ, PIN_GNSS_PRIORITY,
-+				  DPLL_PIN_DIRECTION_INPUT);
-+	if (dpll_pin_register(dpll_e, p_gnss, &pin_ops, (void *)p_gnss_pd))
-+		goto f_dplls;
-+
-+	/* Create second pin (PPS) */
-+	pp_pps = create_pin_properties("PPS", DPLL_PIN_TYPE_EXT,
-+					PIN_PPS_CAPABILITIES,
-+					1, DPLL_PIN_FREQUENCY_1_HZ,
-+					DPLL_PIN_FREQUENCY_1_HZ);
-+	p_pps = dpll_pin_get(DPLLS_CLOCK_ID, PIN_PPS, THIS_MODULE, pp_pps);
-+	p_pps_pd = create_pin_pd(DPLL_PIN_FREQUENCY_1_HZ, PIN_PPS_PRIORITY,
-+				  DPLL_PIN_DIRECTION_INPUT);
-+	if (dpll_pin_register(dpll_e, p_pps, &pin_ops, (void *)p_pps_pd))
-+		goto f_gnss;
-+	if (dpll_pin_register(dpll_p, p_pps, &pin_ops, (void *)p_pps_pd))
-+		goto f_pps_e;
-+
-+	/* Create third pin (RCLK) */
-+	pp_rclk = create_pin_properties("RCLK", DPLL_PIN_TYPE_SYNCE_ETH_PORT,
-+					PIN_RCLK_CAPABILITIES, 1, 1e6, 125e6);
-+	p_rclk = dpll_pin_get(DPLLS_CLOCK_ID, PIN_RCLK, THIS_MODULE, pp_rclk);
-+	p_rclk_pd = create_pin_pd(DPLL_PIN_FREQUENCY_10_MHZ, PIN_RCLK_PRIORITY,
-+				  DPLL_PIN_DIRECTION_INPUT);
-+	if (dpll_pin_register(dpll_e, p_rclk, &pin_ops, (void *)p_rclk_pd))
-+		goto f_pps_p;
-+	if (dpll_pin_register(dpll_p, p_rclk, &pin_ops, (void *)p_rclk_pd))
-+		goto f_all;
-+
-+	return 0;
-+f_all:
-+	dpll_pin_unregister(dpll_e, p_rclk, &pin_ops, (void *)p_rclk_pd);
-+f_pps_p:
-+	dpll_pin_unregister(dpll_p, p_pps, &pin_ops, (void *)p_pps_pd);
-+f_pps_e:
-+	dpll_pin_unregister(dpll_e, p_pps, &pin_ops, (void *)p_pps_pd);
-+	dpll_pin_put(p_pps);
-+	free_pin_data(pp_pps, (void *)p_pps_pd);
-+f_gnss:
-+	dpll_pin_unregister(dpll_e, p_pps, &pin_ops, (void *)p_pps_pd);
-+	dpll_pin_unregister(dpll_p, p_pps, &pin_ops, (void *)p_pps_pd);
-+	dpll_pin_put(p_pps);
-+	free_pin_data(pp_pps, (void *)p_pps_pd);
-+f_dplls:
-+	dpll_device_unregister(dpll_p, &dds_ops, (void *) dpll_p_pd);
-+	dpll_device_put(dpll_p);
-+	kfree(dpll_p_pd);
-+f_eec:
-+	dpll_device_unregister(dpll_e, &dds_ops, (void *) dpll_e_pd);
-+	dpll_device_put(dpll_e);
-+	kfree(dpll_e_pd);
-+ret:
-+	return -1;
-+}
-+
-+static void __exit custom_exit(void)
-+{
-+	/* Free GNSS pin */
-+	dpll_pin_unregister(dpll_e, p_gnss, &pin_ops, (void *)p_gnss_pd);
-+	dpll_pin_put(p_gnss);
-+	free_pin_data(pp_gnss, (void *)p_gnss_pd);
-+
-+	/* Free PPS pin */
-+	dpll_pin_unregister(dpll_e, p_pps, &pin_ops, (void *)p_pps_pd);
-+	dpll_pin_unregister(dpll_p, p_pps, &pin_ops, (void *)p_pps_pd);
-+	dpll_pin_put(p_pps);
-+	free_pin_data(pp_pps, (void *)p_pps_pd);
-+
-+	/* Free RCLK pin */
-+	dpll_pin_unregister(dpll_e, p_rclk, &pin_ops, (void *)p_rclk_pd);
-+	dpll_pin_unregister(dpll_p, p_rclk, &pin_ops, (void *)p_rclk_pd);
-+	dpll_pin_put(p_rclk);
-+	free_pin_data(pp_rclk, (void *)p_rclk_pd);
-+
-+	/* Free DPLL EEC */
-+	dpll_device_unregister(dpll_e, &dds_ops, (void *) dpll_e_pd);
-+	dpll_device_put(dpll_e);
-+	kfree(dpll_e_pd);
-+
-+	/* Free DPLL PPS */
-+	dpll_device_unregister(dpll_p, &dds_ops, (void *) dpll_p_pd);
-+	dpll_device_put(dpll_p);
-+	kfree(dpll_p_pd);
-+}
-+
-+module_init(custom_init);
-+module_exit(custom_exit);
-diff --git a/tools/testing/selftests/dpll/dpll_modules/dpll_test.h b/tools/testing/selftests/dpll/dpll_modules/dpll_test.h
++++ b/tools/testing/selftests/dpll/config
+@@ -0,0 +1 @@
++CONFIG_DPLL=y
+\ No newline at end of file
+diff --git a/tools/testing/selftests/dpll/consts.py b/tools/testing/selftests/dpll/consts.py
 new file mode 100644
-index 0000000..c43e4c1
+index 0000000..838ce58
 --- /dev/null
-+++ b/tools/testing/selftests/dpll/dpll_modules/dpll_test.h
-@@ -0,0 +1,38 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2023, Intel Corporation.
-+ * Author: Michal Michalik <michal.michalik@intel.com>
-+ */
-+
-+#ifndef DPLL_TEST_H
-+#define DPLL_TEST_H
-+
-+#define EEC_DPLL_DEV 0
-+#define EEC_DPLL_TEMPERATURE 20
-+#define PPS_DPLL_DEV 1
-+#define PPS_DPLL_TEMPERATURE 30
-+#define DPLLS_CLOCK_ID 234
-+#define DPLLS_DEV_NAME "dpll_dev"
-+#define DPLLS_BUS_NAME "dpll_bus"
-+
-+#define PIN_GNSS 0
-+#define PIN_GNSS_CAPABILITIES 2 /* DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE */
-+#define PIN_GNSS_PRIORITY 5
-+
-+#define PIN_PPS 1
-+#define PIN_PPS_CAPABILITIES 7 /* DPLL_PIN_CAPS_DIRECTION_CAN_CHANGE
-+				* || DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE
-+				* || DPLL_PIN_CAPS_STATE_CAN_CHANGE
-+				*/
-+#define PIN_PPS_PRIORITY 6
-+
-+#define PIN_RCLK 2
-+#define PIN_RCLK_CAPABILITIES 6 /* DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE
-+				 * || DPLL_PIN_CAPS_STATE_CAN_CHANGE
-+				 */
-+#define PIN_RCLK_PRIORITY 7
-+
-+#define EEC_PINS_NUMBER 3
-+#define PPS_PINS_NUMBER 2
-+
-+#endif /* DPLL_TEST_H */
-diff --git a/tools/testing/selftests/dpll/dpll_modules/dpll_test_other.c b/tools/testing/selftests/dpll/dpll_modules/dpll_test_other.c
-new file mode 100644
-index 0000000..0929d4f
---- /dev/null
-+++ b/tools/testing/selftests/dpll/dpll_modules/dpll_test_other.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023, Intel Corporation.
-+ * Author: Michal Michalik <michal.michalik@intel.com>
-+ */
-+
-+#include <linux/module.h>
-+
-+MODULE_AUTHOR("Michal Michalik");
-+MODULE_DESCRIPTION("DPLL interface test driver (second)");
-+MODULE_LICENSE("GPL");
-+
-+#include <linux/types.h>
-+#include <linux/netlink.h>
-+
-+#include <linux/dpll.h>
-+#include <uapi/linux/dpll.h>
-+
-+#include "dpll_test_other.h"
-+#include "dpll_helpers.c"
-+
-+struct dpll_device *dpll_e;
-+struct dpll_pd *dpll_e_pd;
-+
-+struct dpll_pin_properties *pp_gnss;
-+struct dpll_pin *p_gnss;
-+struct pin_pd *p_gnss_pd;
-+
-+struct dpll_pin_properties *pp_pps;
-+struct dpll_pin *p_pps;
-+struct pin_pd *p_pps_pd;
-+
-+static int __init custom_init(void)
-+{
-+	/* Create EEC DPLL */
-+	dpll_e = dpll_device_get(DPLLS_CLOCK_ID, DPLL_1_DEV, THIS_MODULE);
-+	dpll_e_pd = create_dpll_pd(DPLLS_TEMPERATURE, DPLL_MODE_AUTOMATIC);
-+	if (dpll_device_register(dpll_e, DPLL_TYPE_EEC, &dds_ops,
-+				 (void *) dpll_e_pd))
-+		goto ret;
-+
-+	/* Create first pin (GNSS) */
-+	pp_gnss = create_pin_properties("GNSS", DPLL_PIN_TYPE_GNSS,
-+					PIN_GNSS_CAPABILITIES, 1, 1, 1);
-+	p_gnss = dpll_pin_get(DPLLS_CLOCK_ID, PIN_GNSS, THIS_MODULE, pp_gnss);
-+	p_gnss_pd = create_pin_pd(DPLL_PIN_FREQUENCY_1_HZ, PIN_GNSS_PRIORITY,
-+				  DPLL_PIN_DIRECTION_INPUT);
-+	if (dpll_pin_register(dpll_e, p_gnss, &pin_ops, (void *)p_gnss_pd))
-+		goto f_eec;
-+
-+	/* Create second pin (PPS) */
-+	pp_pps = create_pin_properties("PPS", DPLL_PIN_TYPE_EXT,
-+					PIN_PPS_CAPABILITIES, 1, 1, 1);
-+	p_pps = dpll_pin_get(DPLLS_CLOCK_ID, PIN_PPS, THIS_MODULE, pp_pps);
-+	p_pps_pd = create_pin_pd(DPLL_PIN_FREQUENCY_1_HZ, PIN_PPS_PRIORITY,
-+				  DPLL_PIN_DIRECTION_INPUT);
-+	if (dpll_pin_register(dpll_e, p_pps, &pin_ops, (void *)p_pps_pd))
-+		goto f_gnss;
-+
-+	return 0;
-+f_gnss:
-+	dpll_pin_unregister(dpll_e, p_gnss, &pin_ops, (void *)p_gnss_pd);
-+	dpll_pin_put(p_gnss);
-+	free_pin_data(pp_gnss, (void *)p_gnss_pd);
-+f_eec:
-+	dpll_device_unregister(dpll_e, &dds_ops, (void *) dpll_e_pd);
-+	dpll_device_put(dpll_e);
-+	kfree(dpll_e_pd);
-+ret:
-+	return -1;
-+}
-+
-+static void __exit custom_exit(void)
-+{
-+
-+	/* Free GNSS pin */
-+	dpll_pin_unregister(dpll_e, p_gnss, &pin_ops, (void *)p_gnss_pd);
-+	dpll_pin_put(p_gnss);
-+	free_pin_data(pp_gnss, (void *)p_gnss_pd);
-+
-+	/* Free PPS pins */
-+	dpll_pin_unregister(dpll_e, p_pps, &pin_ops, (void *)p_pps_pd);
-+	dpll_pin_put(p_pps);
-+	free_pin_data(pp_pps, (void *)p_pps_pd);
-+
-+	/* Free DPLL EEC */
-+	dpll_device_unregister(dpll_e, &dds_ops, (void *) dpll_e_pd);
-+	dpll_device_put(dpll_e);
-+	kfree(dpll_e_pd);
-+}
-+
-+module_init(custom_init);
-+module_exit(custom_exit);
-diff --git a/tools/testing/selftests/dpll/dpll_modules/dpll_test_other.h b/tools/testing/selftests/dpll/dpll_modules/dpll_test_other.h
-new file mode 100644
-index 0000000..9585840
---- /dev/null
-+++ b/tools/testing/selftests/dpll/dpll_modules/dpll_test_other.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2023, Intel Corporation.
-+ * Author: Michal Michalik <michal.michalik@intel.com>
-+ */
-+
-+#ifndef DPLL_TEST_OTHER_H
-+#define DPLL_TEST_OTHER_H
-+
-+#define DPLL_1_DEV 2
-+#define DPLL_2_DEV 3
-+#define DPLLS_CLOCK_ID 678
-+#define DPLLS_TEMPERATURE 21
-+#define DPLLS_DEV_NAME "dpll_sec_dev"
-+#define DPLLS_BUS_NAME "dpll_sec_bus"
-+
-+#define PIN_GNSS 0
-+#define PIN_GNSS_CAPABILITIES 2 /* DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE */
-+#define PIN_GNSS_PRIORITY 4
-+#define PIN_PPS 1
-+#define PIN_PPS_CAPABILITIES 7 /* DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE
-+				* || DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE
-+				* || DPLL_PIN_CAPS_STATE_CAN_CHANGE
-+				*/
-+#define PIN_PPS_PRIORITY 5
-+
-+#endif /* DPLL_TEST_OTHER_H */
-diff --git a/tools/testing/selftests/dpll/modules_handler.sh b/tools/testing/selftests/dpll/modules_handler.sh
-new file mode 100755
-index 0000000..d8e8116
---- /dev/null
-+++ b/tools/testing/selftests/dpll/modules_handler.sh
-@@ -0,0 +1,79 @@
-+#!/usr/bin/bash
++++ b/tools/testing/selftests/dpll/consts.py
+@@ -0,0 +1,34 @@
 +# SPDX-License-Identifier: GPL-2.0
 +#
-+# Helper script for building, loading and unloading modules used in system
-+# integration tests.
++# Constants useful in DPLL system integration testing.
 +#
 +# Copyright (c) 2023, Intel Corporation.
 +# Author: Michal Michalik <michal.michalik@intel.com>
 +
-+ACTION=${1:-build}
-+MODULE_NAME=${2:-dpll_test}
-+MODULE_DIR=${3:-dpll_modules}
++import os
++from enum import Enum
++
++
++KSRC = os.environ.get('KSRC', '')
++YNLPATH = 'tools/net/ynl/'
++YNLSPEC = 'Documentation/netlink/specs/dpll.yaml'
++
++
++class DPLL_TYPE(Enum):
++    PPS = 1
++    EEC = 2
++
++
++class DPLL_LOCK_STATUS(Enum):
++    UNLOCKED = 1
++    LOCKED = 2
++    LOCKED_HO_ACK = 3
++    HOLDOVER = 4
++
++
++class DPLL_PIN_TYPE(Enum):
++    MUX = 1,
++    EXT = 2
++    SYNCE_ETH_PORT = 3
++    INT_OSCILLATOR = 4
++    GNSS = 5
+diff --git a/tools/testing/selftests/dpll/dpll_utils.py b/tools/testing/selftests/dpll/dpll_utils.py
+new file mode 100644
+index 0000000..4f56fa83
+--- /dev/null
++++ b/tools/testing/selftests/dpll/dpll_utils.py
+@@ -0,0 +1,104 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Utilities useful in DPLL system integration testing.
++#
++# Copyright (c) 2023, Intel Corporation.
++# Author: Michal Michalik <michal.michalik@intel.com>
++
++import re
++import pytest
++import subprocess
++
++from .ynlfamilyhandler import YnlFamilyHandler
++
++
++def parse_header(filepath):
++    FILTER = ('(u32)', '(u64)', '(', ')')
++
++    with open(filepath) as f:
++        header = f.read()
++
++    items = {}
++    matches = re.findall(r'''\#define
++                             \s+?
++                             ([\w\d]*)  # key
++                             \s+?
++                             ([\w\d)()"]+)  # value
++                          ''', header, re.MULTILINE | re.VERBOSE)
++    for key, value in matches:
++        for f in FILTER:
++            value = value.replace(f, '')
++        if value.isnumeric():
++            items[key] = int(value)
++        elif not value:
++            items[key] = True  # let's just treat it as a flag
++        else:
++            items[key] = value
++
++    return items
++
++
++def load_driver(script, driver):
++    try:
++        subprocess.run([script, 'load', driver], check=True)
++    except subprocess.CalledProcessError as e:
++        pytest.exit(f'Failed to load the test module: "{e}"')
++
++
++def unload_driver(script, driver):
++    try:
++        subprocess.run([script, 'unload', driver], check=True)
++    except subprocess.CalledProcessError as e:
++        pytest.exit(f'Failed to unload the test module: "{e}"')
++
++
++def get_dpll_id(clock_id, test_module, type):
++    yfh = YnlFamilyHandler()
++    yfh.do = 'device-id-get'
++    yfh.attrs = {
++        'module-name': test_module,
++        'clock-id': clock_id,
++        'type': type
++        }
++    return yfh.execute()['id']
++
++
++def get_dpll(clock_id, test_module, type):
++    _id = get_dpll_id(clock_id, test_module, type)
++    yfh = YnlFamilyHandler()
++    yfh.do = 'device-get'
++    yfh.attrs = {'id': _id}
++    return yfh.execute()
++
++
++def get_all_pins():
++    yfh = YnlFamilyHandler()
++    yfh.dump = 'pin-get'
++    return yfh.execute()
++
++
++def get_pin_id(test_module, clock_id, board_l, panel_l, package, type):
++    yfh = YnlFamilyHandler()
++    yfh.do = 'pin-id-get'
++    yfh.attrs = {'module-name': test_module,
++                 'clock-id': clock_id,
++                 'pin-board-label': board_l,
++                 'pin-panel-label': panel_l,
++                 'pin-package-label': package,
++                 'pin-type': type}
++    return yfh.execute()['pin-id']
++
++
++def get_pin(_id):
++    yfh = YnlFamilyHandler()
++    yfh.do = 'pin-get'
++    yfh.attrs = {'pin-id': _id}
++    return yfh.execute()
++
++
++def set_pin(_id, params):
++    yfh = YnlFamilyHandler()
++    yfh.do = 'pin-set'
++    yfh.attrs = params
++    yfh.attrs['pin-id'] = _id
++    return yfh.execute()
+diff --git a/tools/testing/selftests/dpll/requirements.txt b/tools/testing/selftests/dpll/requirements.txt
+new file mode 100644
+index 0000000..73180b8
+--- /dev/null
++++ b/tools/testing/selftests/dpll/requirements.txt
+@@ -0,0 +1,3 @@
++jsonschema==4.*
++PyYAML==6.*
++pytest==7.*
+diff --git a/tools/testing/selftests/dpll/run_dpll_tests.sh b/tools/testing/selftests/dpll/run_dpll_tests.sh
+new file mode 100755
+index 0000000..c701d40
+--- /dev/null
++++ b/tools/testing/selftests/dpll/run_dpll_tests.sh
+@@ -0,0 +1,75 @@
++#!/usr/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Wraper script for running the DPLL system integration tests.
++#
++# The script check if all the requirements are fulfilled before running pytest.
++#
++# Copyright (c) 2023, Intel Corporation.
++# Author: Michal Michalik <michal.michalik@intel.com>
++
++ENOPKG=65  # Package not installed
++TEMP_VENV=$(mktemp -u)
 +KSRC=${KSRC:-$(git rev-parse --show-toplevel)}
++PYTHON=${PYTHON:-python3}
 +
-+build() {
-+    # Kernel sources are necessary for the module build
-+    if [ -z "$KSRC" ]; then
-+        echo "ERROR: Set the KSRC environment variable pointing target kernel source"
-+        exit 1
-+    fi
++cleanup() {
++    [ -n "$VIRTUAL_ENV" ] && deactivate
 +
-+    pushd ${MODULE_DIR}
-+
-+    make clean
-+
-+    if make; then
-+        echo "INFO: Successfully build driver"
++    if [[ -d "$TEMP_VENV" ]]; then
++        echo "Removing temporary virtual environment ($TEMP_VENV)"
++        rm -r "$TEMP_VENV"
 +    else
-+        echo "ERROR: Failed to build driver"
-+        exit 2
-+    fi
-+
-+    popd
-+}
-+
-+load()
-+{
-+    pushd ${MODULE_DIR}
-+
-+    if insmod ${MODULE_NAME}.ko; then
-+        echo "INFO: Successfully loaded driver"
-+    else
-+        echo "ERROR: Failed to load driver"
-+        exit 3
-+    fi
-+
-+    popd
-+}
-+
-+unload()
-+{
-+    if rmmod ${MODULE_NAME}; then
-+            echo "INFO: Successfully unloaded driver"
-+    else
-+        echo "ERROR: Failed to unload driver"
-+        exit 4
++        echo "Temporary virtual environment does not exist"
 +    fi
 +}
 +
-+case $ACTION in
-+    build)
-+        echo "INFO: Run build of the $MODULE_DIR/$MODULE_NAME"
-+        build
-+        ;;
-+    load)
-+        echo "INFO: Run load of the $MODULE_DIR/$MODULE_NAME"
-+        load
-+        ;;
-+    unload)
-+        echo "INFO: Run unload of the $MODULE_DIR/$MODULE_NAME"
-+        unload
-+        ;;
-+    *)
-+        echo "ERROR: Bad action: $ACTION"
-+        exit 1;
-+        ;;
-+esac
++skip () {
++    cleanup
++    echo "SKIP: $1"
++    exit $2
++}
 +
-+exit 0
++# 1) To run tests, we need Python 3 installed
++which $PYTHON 2>&1 1> /dev/null
++if [[ $? -ne 0 ]]; then
++    skip "Python 3 is not installed" $ENOPKG
++fi
++
++# 2) ...at least Python 3.7 (2018)
++$PYTHON -c "import sys;vi=sys.version_info;
++sys.exit(0) if vi[0] == 3 and vi[1] >= 7 else sys.exit(1)"
++if [[ $? -ne 0 ]]; then
++    skip "At least Python 3.7 is required (set PYTHON for custom path)" $ENOPKG
++fi
++
++# 3) Let's make sure we have controlled environment (virtual environment)
++#   a) Create venv
++$PYTHON -m venv $TEMP_VENV
++if [[ $? -ne 0 ]]; then
++    skip "Could not create virtual environment" $ENOPKG
++fi
++
++#   b) Activate venv
++source $TEMP_VENV/bin/activate
++if [[ $? -ne 0 ]]; then
++    skip "Could not activate the virtual environment" $ENOPKG
++fi
++
++#   c) Install the exact packages versions we need
++pip install -r requirements.txt
++if [[ $? -ne 0 ]]; then
++    skip "Could not install the required packages" $ENOPKG
++fi
++
++# 4) Finally, run the tests!
++KSRC=$KSRC pytest $PYTEST_PARAMS
++result=$?
++if [[ $result -ne 0 ]]; then
++    echo "ERROR: Some of the DPLL tests failed"
++fi
++
++# 5) Clean up after execution
++cleanup
++
++exit $result
+diff --git a/tools/testing/selftests/dpll/test_dpll.py b/tools/testing/selftests/dpll/test_dpll.py
+new file mode 100644
+index 0000000..4f70c07
+--- /dev/null
++++ b/tools/testing/selftests/dpll/test_dpll.py
+@@ -0,0 +1,385 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# System integration tests for DPLL interface.
++#
++# Can be used directly, but strongly suggest using wrapper: run_dpll_tests.sh
++# The wrapper takes care about fulfilling all the requirements needed to
++# run all the tests.
++#
++# Copyright (c) 2023, Intel Corporation.
++# Author: Michal Michalik <michal.michalik@intel.com>
++
++import pytest
++import subprocess
++from pathlib import Path
++
++from .consts import DPLL_TYPE, DPLL_LOCK_STATUS, DPLL_PIN_TYPE
++from .dpll_utils import parse_header, load_driver, unload_driver, \
++    get_dpll, get_dpll_id, get_pin_id, get_all_pins, get_pin, set_pin
++from .ynlfamilyhandler import YnlFamilyHandler
++from lib.ynl import NlError
++
++
++SCRIPT_PATH = './modules_handler.sh'
++TEST_MODULE_DIR = 'dpll_modules'
++TEST_MODULE = 'dpll_test'
++
++
++class TestDPLL:
++    @classmethod
++    def setup_class(cls):
++        cls.module_consts = parse_header(Path(TEST_MODULE_DIR) / f'{TEST_MODULE}.h')
++        load_driver(SCRIPT_PATH, TEST_MODULE)
++
++    @classmethod
++    def teardown_class(cls):
++        unload_driver(SCRIPT_PATH, TEST_MODULE)
++
++    def test_if_module_is_loaded(self):
++        '''
++        Checks if the module is successfully loaded at all. It should be already
++        covered in the class setup (raise exception) - but just to make sure.
++        '''
++        s = subprocess.run(['lsmod'], check=True, capture_output=True)
++        assert TEST_MODULE in str(s.stdout)
++
++    def test_get_two_dplls(self):
++        '''
++        Checks if the netlink is returning the expected DPLLs. We need to make
++        sure that even if "other" DPLLs exist in the system we check only ours.
++        '''
++        yfh = YnlFamilyHandler()
++        yfh.dump = 'device-get'
++        reply = yfh.execute()
++
++        dplls = filter(lambda i: TEST_MODULE == i['module-name'], reply)
++        assert len(list(dplls)) == 2
++
++    def test_get_two_distinct_dplls(self):
++        '''
++        Checks if the netlink is returning the expected, distinct DPLLs created
++        by the tested module. We expect EEC and PPS ones.
++        '''
++        yfh = YnlFamilyHandler()
++        yfh.dump = 'device-get'
++        reply = yfh.execute()
++
++        dplls = filter(lambda i: TEST_MODULE in i['module-name'], reply)
++        types = set(i['type'] for i in dplls)
++
++        assert types == {'eec', 'pps'}
++
++    @pytest.mark.parametrize("dtype", [DPLL_TYPE.EEC, DPLL_TYPE.PPS])
++    def test_finding_dpll_id(self, dtype):
++        '''
++        Checks if we are able to find the DPLL id using 'device-id-get' do cmd.
++        '''
++        _id = get_dpll_id(self.module_consts['DPLLS_CLOCK_ID'], TEST_MODULE,
++                          dtype.value)
++        assert isinstance(_id, int)
++
++    @pytest.mark.parametrize("clk,dtype,exc", [(123, DPLL_TYPE.EEC.value, KeyError),
++                                               (234, 4, NlError),
++                                               (123, 4, NlError)])
++    def test_finding_fails_correctly(self, clk, dtype, exc):
++        '''
++        Make sure the DPLL interface does not return any garbage on incorrect
++        input like wrong DPLL type or clock id.
++        '''
++        with pytest.raises(exc):
++            get_dpll_id(clk, TEST_MODULE, dtype)
++
++    @pytest.mark.parametrize("dtype", [DPLL_TYPE.EEC, DPLL_TYPE.PPS])
++    def test_get_only_one_dpll(self, dtype):
++        '''
++        Checks if the netlink is returning the expected DPLLs created
++        by the tested module, filtered on input. We expect EEC and PPS here.
++        '''
++        _id = get_dpll_id(self.module_consts['DPLLS_CLOCK_ID'], TEST_MODULE,
++                          dtype.value)
++
++        yfh = YnlFamilyHandler()
++        yfh.do = 'device-get'
++        yfh.attrs = {'id': _id}
++        reply = yfh.execute()
++
++        assert reply['type'] == dtype.name.lower()
++
++    @pytest.mark.parametrize("dtype", [DPLL_TYPE.EEC, DPLL_TYPE.PPS])
++    def test_get_temperature(self, dtype):
++        '''
++        Checks if we are able to get correct DPLL temperature for both DPLLs.
++        '''
++        if dtype == DPLL_TYPE.EEC:
++            desired_temp = self.module_consts['EEC_DPLL_TEMPERATURE']
++        else:
++            desired_temp = self.module_consts['PPS_DPLL_TEMPERATURE']
++
++        dpll = get_dpll(self.module_consts['DPLLS_CLOCK_ID'], TEST_MODULE,
++                        dtype.value)
++
++        assert dpll['temp'] == desired_temp
++
++    @pytest.mark.parametrize("dtype, lock", [(DPLL_TYPE.EEC, DPLL_LOCK_STATUS.UNLOCKED),
++                                             (DPLL_TYPE.PPS, DPLL_LOCK_STATUS.LOCKED)])
++    def test_get_lock(self, dtype, lock):
++        '''
++        Checks if we are able to get correct DPLL lock status for both DPLLs.
++        '''
++        dpll = get_dpll(self.module_consts['DPLLS_CLOCK_ID'], TEST_MODULE,
++                        dtype.value)
++        assert dpll['lock-status'] == lock.name.lower()
++
++    @pytest.mark.parametrize("dtype", [DPLL_TYPE.EEC, DPLL_TYPE.PPS])
++    def test_dump_pins_in_each_dpll(self, dtype):
++        '''
++        Checks if we are able to dump all pins for each DPLL separetely,
++        filtered on output.
++        '''
++        if dtype == DPLL_TYPE.EEC:
++            desired_pins = self.module_consts['EEC_PINS_NUMBER']
++        else:
++            desired_pins = self.module_consts['PPS_PINS_NUMBER']
++
++        dpll = get_dpll(self.module_consts['DPLLS_CLOCK_ID'], TEST_MODULE,
++                        dtype.value)
++
++        yfh = YnlFamilyHandler()
++        yfh.dump = 'pin-get'
++        reply = yfh.execute()
++
++        pins = filter(lambda p: any(i['id'] == dpll['id']
++                      for i in p.get('pin-parent-device', [])), reply)
++
++        assert len(list(pins)) == desired_pins
++
++    def test_dump_all_pins_in_both_dplls(self):
++        '''
++        Checks if we are able to dump all pins for both DPLLs, filtered by
++        clock id on output.
++        '''
++        desired_pins = self.module_consts['EEC_PINS_NUMBER']  # all are in EEC
++        clock_id = self.module_consts['DPLLS_CLOCK_ID']
++
++        reply = get_all_pins()
++
++        pins = filter(lambda p: p['clock-id'] == clock_id, reply)
++
++        assert len(list(pins)) == desired_pins
++
++    @pytest.mark.parametrize("pin, pin_name", [(DPLL_PIN_TYPE.EXT, 'PPS'),
++                                               (DPLL_PIN_TYPE.GNSS, 'GNSS'),
++                                               (DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK')])
++    def test_get_a_single_pin_from_dump(self, pin, pin_name):
++        '''
++        Checks if we are able to get all distinct pins for both DPLLs, filtered
++        by clock id and type on output. Additionally, verify if the priority is
++        assigned correctly and not mixed up.
++        '''
++        clock_id = self.module_consts['DPLLS_CLOCK_ID']
++        priority = self.module_consts[f'PIN_{pin_name}_PRIORITY']
++        caps = self.module_consts[f'PIN_{pin_name}_CAPABILITIES']
++
++        reply = get_all_pins()
++
++        pin_name = pin.name.lower().replace('_', '-')
++        pins = filter(lambda p:
++                      p['clock-id'] == clock_id and p['pin-type'] == pin_name, reply)
++        pins = list(pins)
++
++        assert len(pins) == 1
++        assert pins[0]['pin-dpll-caps'] == caps
++        for p in pins[0]['pin-parent-device']:
++            assert p['pin-prio'] == priority
++
++    @pytest.mark.parametrize("pin, pin_name",
++                             [(DPLL_PIN_TYPE.EXT, 'PPS'),
++                              (DPLL_PIN_TYPE.GNSS, 'GNSS'),
++                              (DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK')])
++    def test_get_a_single_pin_id(self, pin, pin_name):
++        '''
++        Checks if we are able to get single pins using 'get-pin-id' do command.
++        '''
++        clock_id = self.module_consts['DPLLS_CLOCK_ID']
++        board_l = f'{pin_name}_brd'
++        panel_l = f'{pin_name}_pnl'
++        package = f'{pin_name}_pcg'
++
++        _id = get_pin_id(TEST_MODULE, clock_id, board_l, panel_l, package, pin.value)
++        assert isinstance(_id, int)
++
++    @pytest.mark.parametrize("pin, pin_name, param, value",
++                             [(DPLL_PIN_TYPE.EXT, 'PPS', 'pin-prio', 1),
++                              (DPLL_PIN_TYPE.GNSS, 'GNSS', 'pin-prio', 2),
++                              (DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK', 'pin-prio', 3)])
++    def test_set_a_single_pin_prio(self, pin, pin_name, param, value):
++        '''
++        Checks if we are able to set pins priority using 'set-pin' do command.
++        '''
++        clock_id = self.module_consts['DPLLS_CLOCK_ID']
++        board_l = f'{pin_name}_brd'
++        panel_l = f'{pin_name}_pnl'
++        package = f'{pin_name}_pcg'
++
++        _id = get_pin_id(TEST_MODULE, clock_id, board_l, panel_l, package, pin.value)
++
++        pins_before = get_all_pins()
++        pin_before = get_pin(_id)
++
++        # both DPLL's are handled the same in the test module
++        first_dpll_id = pin_before['pin-parent-device'][0]['id']
++        set_pin(_id, {"pin-parent-device": {"id": first_dpll_id, param: value}})
++
++        pins_after = get_all_pins()
++
++        # assume same order, if that might change - test need to be updated
++        for i in range(len(pins_before)):
++            if pins_after[i]['pin-id'] != _id:
++                assert pins_after[i] == pins_before[i]
++            else:
++                assert pins_after[i]["pin-parent-device"][0][param] == value
++
++        # set the original value back to leave the same state after test
++        original_value = pin_before["pin-parent-device"][0][param]
++        set_pin(_id, {"pin-parent-device": {"id": first_dpll_id, param: original_value}})
++
++    @pytest.mark.parametrize("pin, pin_name, param, value",
++                             [(DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK', 'pin-frequency', int(1e6)),
++                              (DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK', 'pin-frequency', int(12e6))])
++    def test_set_a_single_pin_freq(self, pin, pin_name, param, value):
++        '''
++        Checks if we are able to set pins frequency using 'set-pin' do command.
++        '''
++        clock_id = self.module_consts['DPLLS_CLOCK_ID']
++        board_l = f'{pin_name}_brd'
++        panel_l = f'{pin_name}_pnl'
++        package = f'{pin_name}_pcg'
++
++        _id = get_pin_id(TEST_MODULE, clock_id, board_l, panel_l, package, pin.value)
++
++        pins_before = get_all_pins()
++        pin_before = get_pin(_id)
++
++        set_pin(_id, {param: value})
++
++        pins_after = get_all_pins()
++
++        # assume same order, if that might change - test need to be updated
++        for i in range(len(pins_before)):
++            if pins_after[i]['pin-id'] != _id:
++                assert pins_after[i] == pins_before[i]
++            else:
++                assert pins_after[i][param] == value
++
++        # set the original value back to leave the same state after test
++        set_pin(_id, {param: pin_before[param]})
++
++    @pytest.mark.parametrize("pin, pin_name, param, value",
++                             [(DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK', 'pin-frequency', int(1e5)),
++                              (DPLL_PIN_TYPE.SYNCE_ETH_PORT, 'RCLK', 'pin-frequency', int(130e6))])
++    def test_set_a_single_pin_fail(self, pin, pin_name, param, value):
++        '''
++        Checks if we fail correctly trying to set incorrect pin frequency.
++        '''
++        clock_id = self.module_consts['DPLLS_CLOCK_ID']
++        board_l = f'{pin_name}_brd'
++        panel_l = f'{pin_name}_pnl'
++        package = f'{pin_name}_pcg'
++
++        _id = get_pin_id(TEST_MODULE, clock_id, board_l, panel_l, package, pin.value)
++
++        with pytest.raises(NlError):
++            set_pin(_id, {param: value})
++
++
++class TestTwoDPLLsOtherFirst(TestDPLL):
++    '''
++    Add a second module to the environment, which registers other DPLLs to make
++    sure the references are not mixed together. Other driver first.
++    '''
++    OTHER_MODULE = 'dpll_test_other'
++
++    @classmethod
++    def setup_class(cls):
++        # Load another module first
++        load_driver(SCRIPT_PATH, cls.OTHER_MODULE)
++        super().setup_class()
++
++    @classmethod
++    def teardown_class(cls):
++        unload_driver(SCRIPT_PATH, cls.OTHER_MODULE)
++        super().teardown_class()
++
++
++class TestTwoDPLLsTestedFirst(TestDPLL):
++    '''
++    Add a second module to the environment, which registers other DPLLs to make
++    sure the references are not mixed together. Tested driver first.
++    '''
++    OTHER_MODULE = 'dpll_test_other'
++
++    @classmethod
++    def setup_class(cls):
++        # Load the tested module first
++        super().setup_class()
++        load_driver(SCRIPT_PATH, cls.OTHER_MODULE)
++
++    @classmethod
++    def teardown_class(cls):
++        super().teardown_class()
++        unload_driver(SCRIPT_PATH, cls.OTHER_MODULE)
++
++
++class TestDPLLsNTF:
++    MULTICAST_GROUP = 'monitor'
++
++    @classmethod
++    def setup_class(cls):
++        '''
++        This test suite prepares the environment by arming the event tracking,
++        loading the driver, changing pin, unloading the driver and gathering
++        logs for further processing.
++        '''
++        cls.module_consts = parse_header(Path(TEST_MODULE_DIR) / f'{TEST_MODULE}.h')
++
++        yfh = YnlFamilyHandler(ntf=cls.MULTICAST_GROUP)
++
++        load_driver(SCRIPT_PATH, TEST_MODULE)
++
++        pin = DPLL_PIN_TYPE.GNSS
++        clock_id = cls.module_consts['DPLLS_CLOCK_ID']
++        board_l = f'{pin.name}_brd'
++        panel_l = f'{pin.name}_pnl'
++        package = f'{pin.name}_pcg'
++
++        _id = get_pin_id(TEST_MODULE, clock_id, board_l, panel_l, package, pin.value)
++
++        g_pin = get_pin(_id)
++
++        # both DPLL's are handled the same in the test module
++        first_dpll_id = g_pin['pin-parent-device'][0]['id']
++        set_pin(_id, {"pin-parent-device": {"id": first_dpll_id, 'pin-prio': 2}})
++
++        unload_driver(SCRIPT_PATH, TEST_MODULE)
++        yfh.ynl.check_ntf()
++        cls.events = yfh.ynl.async_msg_queue
++
++    @classmethod
++    def teardown_class(cls):
++        # Cleanup, in case something in the setup_class failed
++        lsmod = subprocess.run(['lsmod'], capture_output=True)
++        if TEST_MODULE in str(lsmod.stdout):
++            unload_driver(SCRIPT_PATH, TEST_MODULE)
++
++    @pytest.mark.parametrize(('event', 'count'), [('device-create-ntf', 2),
++                                                  ('device-delete-ntf', 2),
++                                                  ('pin-change-ntf', 1),
++                                                  ('pin-create-ntf', 5),
++                                                  ('pin-delete-ntf', 5)])
++    def test_number_of_events(self, event, count):
++        '''
++        Checks if we are getting exact number of events that we expect to be
++        gathered while monitoring the DPLL subsystem.
++        '''
++        f_events = filter(lambda i: i['name'] == event, self.events)
++        assert len(list(f_events)) == count
+diff --git a/tools/testing/selftests/dpll/ynlfamilyhandler.py b/tools/testing/selftests/dpll/ynlfamilyhandler.py
+new file mode 100644
+index 0000000..f7d6dca
+--- /dev/null
++++ b/tools/testing/selftests/dpll/ynlfamilyhandler.py
+@@ -0,0 +1,49 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Wraper for the YNL library used to interact with the netlink interface.
++#
++# Copyright (c) 2023, Intel Corporation.
++# Author: Michal Michalik <michal.michalik@intel.com>
++
++import sys
++from pathlib import Path
++from dataclasses import dataclass
++
++from .consts import KSRC, YNLSPEC, YNLPATH
++
++
++try:
++    ynl_full_path = Path(KSRC) / YNLPATH
++    sys.path.append(ynl_full_path.as_posix())
++    from lib import YnlFamily
++except ModuleNotFoundError:
++    print("Failed importing `ynl` library from kernel sources, please set KSRC")
++    sys.exit(1)
++
++
++@dataclass
++class YnlFamilyHandler:
++    spec: str = Path(KSRC) / YNLSPEC
++    schema: str = ''
++    dump: str = ''
++    ntf: str = ''
++    do: str = ''
++    attrs = {}
++
++    def __post_init__(self):
++        self.ynl = YnlFamily(self.spec, self.schema)
++
++        if self.ntf:
++            self.ynl.ntf_subscribe(self.ntf)
++
++    def execute(self):
++        if self.do and self.dump:
++            raise ValueError('Both "do" or "dump" set simultaneously - clear either of them')
++        elif self.do:
++            reply = self.ynl.do(self.do, self.attrs)
++        elif self.dump:
++            reply = self.ynl.dump(self.dump, self.attrs)
++        else:
++            raise ValueError('Wrong command - Set either "do" or "dump" before executing')
++
++        return reply
 -- 
 2.9.5
 
