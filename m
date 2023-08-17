@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-28479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D8A77F8A2
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 16:20:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1AA77F8A4
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 16:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA181C213D3
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:20:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54F5E282011
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D71914F64;
-	Thu, 17 Aug 2023 14:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E78156CC;
+	Thu, 17 Aug 2023 14:18:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6276A154B1
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8695814A9D
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:18:30 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBDD2D75
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:18:27 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27B62D78
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:18:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692281906; x=1723817906;
+  t=1692281908; x=1723817908;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=giipaLoZJtWOF+eXX5DQZEX1s+B7EAEpVth7YV6Gq0M=;
-  b=YhXWYu/4vitoSvlQ9nuvMSLR5aLXPqlpRnmpowg8ew7JaibEmToZC+hF
-   vX3MVrn2Uuy9jxpMVRSVquojUr1UMs/3+R8a9bzUlKdSHlt8HMfEC3kzk
-   D64c9DdGjWX6k/Rk8xAYPM57+4Pzq2OraszaQaRvq6QujS6dXpkH0KCpO
-   RwaDW34Gkm8gSj/ra8u5NKs9GEiXXeXmI+IS7lIpPj8n/Xnuaa6vZamvI
-   XaKUlKWSZpuakn0lax2KDSgx6N2p9vy7tEyV42fgJFfRc3+bfLVFgyx/H
-   xhi3P8pWheZr1w2EsS3H7RqPwf/5+4+nuSAAiDvDdo4GeLmhZ3O/fqyUU
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="403804233"
+  bh=OQRsx3WqqFpFWASfOUWVu0juRDG7sqTUcQ0lEcE6lLw=;
+  b=U3LJeU2mcp5bsQs0HCgBbvWI5EBs6XPPZco1hM19CjHu2L+qaheBkct/
+   5djSEYVn+4dV3jNf+PvmVkznaZciW789oxyII79YGOycG+HlYHCpGBbf5
+   Tsu0einsx5jOQjUShaYTLqtjc3AMgmBt69uGjrhpNBdtxZvFn8gN/keW/
+   bNEz3xpkGbNKBADCrElUt5QiyMy4VJZycEcA1Ztr9DRoaHesN5n86ypqN
+   Qut8+X5RRwRtxaXC6WfPY2rdj1SjpV2HXF7+VqEEJTJrq62+0AaCwTPLH
+   08jXP2MhJCqIESWdsn3jGCxkxznRFZRBQ+BIUTvXpGv0EZpl+dcJJhcMo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="403804242"
 X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="403804233"
+   d="scan'208";a="403804242"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 07:18:26 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 07:18:28 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="981189750"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="981189759"
 X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="981189750"
+   d="scan'208";a="981189759"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by fmsmga006.fm.intel.com with ESMTP; 17 Aug 2023 07:18:25 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 17 Aug 2023 07:18:26 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	jesse.brandeburg@intel.com,
 	Karol Kolacinski <karol.kolacinski@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH v2 iwl-next 7/9] ice: modify tstamp_config only during TS mode set
-Date: Thu, 17 Aug 2023 16:17:44 +0200
-Message-Id: <20230817141746.18726-8-karol.kolacinski@intel.com>
+Subject: [PATCH v2 iwl-next 8/9] ice: restore timestamp configuration after reset
+Date: Thu, 17 Aug 2023 16:17:45 +0200
+Message-Id: <20230817141746.18726-9-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230817141746.18726-1-karol.kolacinski@intel.com>
 References: <20230817141746.18726-1-karol.kolacinski@intel.com>
@@ -73,82 +73,224 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The driver stores the current Tx and Rx timestamping configuration in
-pf->ptp.tstamp_config. This structure is supposed to represent the
-currently requested configuration from userspace that we've applied to
-the device.
+The driver calls ice_ptp_cfg_timestamp() during
+ice_ptp_prepare_for_reset() to disable timestamping while the device is
+resetting. It then attempts to restore timestamp configuration at the
+end of ice_rebuild(). However, it currently forcibly calls
+ice_ptp_cfg_timestamp() with a value of true when the device is not E810
+and is the clock owner, while calling ice_ptp_cfg_timestamp() with a
+value of false for all other devices.
 
-The values of this structure are modified within the low level
-ice_set_tx_tstamp() and ice_set_rx_tstamp() functions. These functions
-*are* called by ice_ptp_set_timestamp_mode. However, they are also
-called during the driver reset and rebuild flow. Because of this, the
-driver overwrites user configuration during reset, preventing itself
-from being able to properly restore the configuration after a reset.
+This incorrectly forcibly disables timestamping on all ports except the
+clock owner.
 
-Instead, stop modifying this saved configuration state outside of
-ice_ptp_set_timestamp_mode. Instead, set the values directly within this
-function. This avoids losing the configuration data.
+This was not detected previously due to a quirk of the LinuxPTP ptp4l
+application. If ptp4l detects a missing timestamp, it enters a fault
+state and performs recovery logic which includes executing SIOCSHWTSTAMP
+again, restoring the now accidentally cleared configuration.
 
-A following change will refactor the rebuild flow to properly restore
-the configuration after a PF reset.
+Not every application does this, and for these applications, timestamps
+will mysteriously stop after a PF reset, without being restored until an
+application restart.
+
+Fix this by replacing ice_ptp_cfg_timestamp() with two new functions:
+
+1) ice_ptp_disable_timestamp_mode() which unconditionally disables the
+   timestamping logic in ice_ptp_prepare_for_reset() and
+   ice_ptp_release()
+
+2) ice_ptp_restore_timestamp_mode() which calls
+   ice_ptp_restore_tx_interrupt() to restore Tx timestamping
+   configuration, calls ice_set_rx_tstamp() to restore Rx timestamping
+   configuration, and issues an immediate TSYN_TX interrupt to ensure
+   that timestamps which may have occurred during the device reset get
+   processed.
+
+This obsoletes the ice_set_tx_tstamp() function which can now be safely
+removed.
+
+With this change, all devices should now restore Tx and Rx timestamping
+functionality correctly after a PF reset without application
+intervention.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c | 10 +---
+ drivers/net/ethernet/intel/ice/ice_ptp.c  | 72 +++++++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp.h  |  4 +-
+ 3 files changed, 59 insertions(+), 27 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 8bf632de0a34..3a8ba04c8e19 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -7415,14 +7415,8 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 		goto err_vsi_rebuild;
+ 	}
+ 
+-	/* configure PTP timestamping after VSI rebuild */
+-	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags)) {
+-		if (pf->ptp.tx_interrupt_mode == ICE_PTP_TX_INTERRUPT_SELF)
+-			ice_ptp_cfg_timestamp(pf, false);
+-		else if (pf->ptp.tx_interrupt_mode == ICE_PTP_TX_INTERRUPT_ALL)
+-			/* for E82x PHC owner always need to have interrupts */
+-			ice_ptp_cfg_timestamp(pf, true);
+-	}
++	/* Restore timestamp mode settings after VSI rebuild */
++	ice_ptp_restore_timestamp_mode(pf);
+ 
+ 	err = ice_vsi_rebuild_by_type(pf, ICE_VSI_SWITCHDEV_CTRL);
+ 	if (err) {
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 2635ca7e6036..321d1e681d2c 100644
+index 321d1e681d2c..373ca79803af 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -307,8 +307,6 @@ static void ice_set_tx_tstamp(struct ice_pf *pf, bool on)
+@@ -299,14 +299,27 @@ static void ice_ptp_cfg_tx_interrupt(struct ice_pf *pf, bool on)
+ }
+ 
+ /**
+- * ice_set_tx_tstamp - Enable or disable Tx timestamping
+- * @pf: The PF pointer to search in
+- * @on: bool value for whether timestamps are enabled or disabled
++ * ice_ptp_restore_tx_interrupt - Restore Tx timestamp interrupt after reset
++ * @pf: Board private structure
+  */
+-static void ice_set_tx_tstamp(struct ice_pf *pf, bool on)
++static void ice_ptp_restore_tx_interrupt(struct ice_pf *pf)
  {
- 	if (pf->ptp.tx_interrupt_mode == ICE_PTP_TX_INTERRUPT_SELF)
- 		ice_ptp_cfg_tx_interrupt(pf, on);
--
--	pf->ptp.tstamp_config.tx_type = on ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
+-	if (pf->ptp.tx_interrupt_mode == ICE_PTP_TX_INTERRUPT_SELF)
+-		ice_ptp_cfg_tx_interrupt(pf, on);
++	bool enable;
++
++	switch (pf->ptp.tx_interrupt_mode) {
++	case ICE_PTP_TX_INTERRUPT_ALL:
++		enable = true;
++		break;
++	case ICE_PTP_TX_INTERRUPT_NONE:
++		enable = false;
++		break;
++	case ICE_PTP_TX_INTERRUPT_SELF:
++	default:
++		enable = pf->ptp.tstamp_config.tx_type == HWTSTAMP_TX_ON;
++		break;
++	}
++
++	ice_ptp_cfg_tx_interrupt(pf, enable);
  }
  
  /**
-@@ -331,9 +329,6 @@ static void ice_set_rx_tstamp(struct ice_pf *pf, bool on)
- 			continue;
- 		vsi->rx_rings[i]->ptp_rx = on;
- 	}
--
--	pf->ptp.tstamp_config.rx_filter = on ? HWTSTAMP_FILTER_ALL :
--					       HWTSTAMP_FILTER_NONE;
+@@ -332,17 +345,41 @@ static void ice_set_rx_tstamp(struct ice_pf *pf, bool on)
  }
  
  /**
-@@ -2054,9 +2049,11 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
+- * ice_ptp_cfg_timestamp - Configure timestamp for init/deinit
++ * ice_ptp_disable_timestamp_mode - Disable current timestamp mode
+  * @pf: Board private structure
+- * @ena: bool value to enable or disable time stamp
+  *
+- * This function will configure timestamping during PTP initialization
+- * and deinitialization
++ * Called during preparation for reset to temporarily disable timestamping on
++ * the device. Called during remove to disable timestamping while cleaning up
++ * driver resources.
+  */
+-void ice_ptp_cfg_timestamp(struct ice_pf *pf, bool ena)
++static void ice_ptp_disable_timestamp_mode(struct ice_pf *pf)
+ {
+-	ice_set_tx_tstamp(pf, ena);
+-	ice_set_rx_tstamp(pf, ena);
++	ice_ptp_cfg_tx_interrupt(pf, false);
++	ice_set_rx_tstamp(pf, false);
++}
++
++/**
++ * ice_ptp_restore_timestamp_mode - Restore timestamp configuration
++ * @pf: Board private structure
++ *
++ * Called at the end of rebuild to restore timestamp configuration after
++ * a device reset.
++ */
++void ice_ptp_restore_timestamp_mode(struct ice_pf *pf)
++{
++	struct ice_hw *hw = &pf->hw;
++	bool enable_rx;
++
++	ice_ptp_restore_tx_interrupt(pf);
++
++	enable_rx = pf->ptp.tstamp_config.rx_filter == HWTSTAMP_FILTER_ALL;
++	ice_set_rx_tstamp(pf, enable_rx);
++
++	/* Trigger an immediate software interrupt to ensure that timestamps
++	 * which occurred during reset are handled now.
++	 */
++	wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
++	ice_flush(hw);
+ }
+ 
+ /**
+@@ -2048,11 +2085,9 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
+ {
  	switch (config->tx_type) {
  	case HWTSTAMP_TX_OFF:
- 		ice_set_tx_tstamp(pf, false);
-+		pf->ptp.tstamp_config.tx_type = HWTSTAMP_TX_OFF;
+-		ice_set_tx_tstamp(pf, false);
+ 		pf->ptp.tstamp_config.tx_type = HWTSTAMP_TX_OFF;
  		break;
  	case HWTSTAMP_TX_ON:
- 		ice_set_tx_tstamp(pf, true);
-+		pf->ptp.tstamp_config.tx_type = HWTSTAMP_TX_ON;
+-		ice_set_tx_tstamp(pf, true);
+ 		pf->ptp.tstamp_config.tx_type = HWTSTAMP_TX_ON;
  		break;
  	default:
+@@ -2085,6 +2120,9 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
  		return -ERANGE;
-@@ -2065,6 +2062,7 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
- 	switch (config->rx_filter) {
- 	case HWTSTAMP_FILTER_NONE:
- 		ice_set_rx_tstamp(pf, false);
-+		pf->ptp.tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
- 		break;
- 	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
- 	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-@@ -2081,6 +2079,7 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
- 	case HWTSTAMP_FILTER_NTP_ALL:
- 	case HWTSTAMP_FILTER_ALL:
- 		ice_set_rx_tstamp(pf, true);
-+		pf->ptp.tstamp_config.rx_filter = HWTSTAMP_FILTER_ALL;
- 		break;
- 	default:
- 		return -ERANGE;
+ 	}
+ 
++	/* Make sure interrupt settings are restored */
++	ice_ptp_restore_tx_interrupt(pf);
++
+ 	return 0;
+ }
+ 
+@@ -2462,7 +2500,7 @@ ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	ptp->state = ICE_PTP_RESETTING;
+ 
+ 	/* Disable timestamping for both Tx and Rx */
+-	ice_ptp_cfg_timestamp(pf, false);
++	ice_ptp_disable_timestamp_mode(pf);
+ 
+ 	kthread_cancel_delayed_work_sync(&ptp->work);
+ 
+@@ -3115,7 +3153,7 @@ void ice_ptp_release(struct ice_pf *pf)
+ 	pf->ptp.state = ICE_PTP_UNINIT;
+ 
+ 	/* Disable timestamping for both Tx and Rx */
+-	ice_ptp_cfg_timestamp(pf, false);
++	ice_ptp_disable_timestamp_mode(pf);
+ 
+ 	ice_ptp_remove_auxbus_device(pf);
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 210e2a1b35a5..bd5826ba3576 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -306,7 +306,7 @@ int ice_ptp_clock_index(struct ice_pf *pf);
+ struct ice_pf;
+ int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr);
+ int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr);
+-void ice_ptp_cfg_timestamp(struct ice_pf *pf, bool ena);
++void ice_ptp_restore_timestamp_mode(struct ice_pf *pf);
+ 
+ void ice_ptp_extts_event(struct ice_pf *pf);
+ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
+@@ -332,7 +332,7 @@ static inline int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr)
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline void ice_ptp_cfg_timestamp(struct ice_pf *pf, bool ena) { }
++static inline void ice_ptp_restore_timestamp_mode(struct ice_pf *pf) { }
+ 
+ static inline void ice_ptp_extts_event(struct ice_pf *pf) { }
+ static inline s8
 -- 
 2.39.2
 
