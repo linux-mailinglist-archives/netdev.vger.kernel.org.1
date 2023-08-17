@@ -1,151 +1,143 @@
-Return-Path: <netdev+bounces-28356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A3A577F2B6
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:05:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45ED177F2CC
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22268281E2A
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:05:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72E281C20F65
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7B3100B2;
-	Thu, 17 Aug 2023 09:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78E2100B3;
+	Thu, 17 Aug 2023 09:09:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2EDE56C
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:05:49 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7871E7C;
-	Thu, 17 Aug 2023 02:05:47 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RRJtZ5Mj7zFr28;
-	Thu, 17 Aug 2023 17:02:46 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 17 Aug
- 2023 17:05:45 +0800
-Subject: Re: [PATCH net-next v6 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, <linux-rdma@vger.kernel.org>
-References: <20230814125643.59334-1-linyunsheng@huawei.com>
- <20230814125643.59334-2-linyunsheng@huawei.com>
- <CAC_iWjKMLoUu4bctrWtK46mpyhQ7LoKe4Nm2t8jZVMM0L9O2xA@mail.gmail.com>
- <06e89203-9eaf-99eb-99de-e5209819b8b3@huawei.com>
- <CAC_iWjJ4Pi7Pj9Rm13y4aXBB3RsP9pTsfRf_A-OraXKwaO_xGA@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <b71d5f5f-0ea1-3a35-8c90-53ef4ae27e79@huawei.com>
-Date: Thu, 17 Aug 2023 17:05:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83AD100A9
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:09:28 +0000 (UTC)
+Received: from chg.server2.ideacentral.com (unknown [108.163.232.234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963B0271B
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:09:27 -0700 (PDT)
+Received: from mailnull by ns-196.awsdns-24.com with local (Exim 4.96)
+	id 1qWZ0Q-001HVg-3A
+	for netdev@vger.kernel.org;
+	Thu, 17 Aug 2023 04:09:27 -0500
+X-Failed-Recipients: netdev@vger.kernel.org
+Auto-Submitted: auto-replied
+From: Mail Delivery System <Mailer-Daemon@ns-196.awsdns-24.com>
+To: netdev@vger.kernel.org
+References: <20230817100924.49044D6518A44C49@vger.kernel.org>
+Content-Type: multipart/report; report-type=delivery-status; boundary=1692263366-eximdsn-494131582
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAC_iWjJ4Pi7Pj9Rm13y4aXBB3RsP9pTsfRf_A-OraXKwaO_xGA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Subject: Mail delivery failed: returning message to sender
+Message-Id: <E1qWZ0Q-001HVg-3A@ns-196.awsdns-24.com>
+Date: Thu, 17 Aug 2023 04:09:26 -0500
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ns-196.awsdns-24.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - 
+X-Get-Message-Sender-Via: ns-196.awsdns-24.com: sender_ident via received_protocol == local: mailnull/primary_hostname/system user
+X-Authenticated-Sender: ns-196.awsdns-24.com: mailnull
+X-Spam-Status: No, score=3.0 required=5.0 tests=BAYES_50,HTML_MESSAGE,
+	MAY_BE_FORGED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,
+	RCVD_IN_MSPIKE_L3,SPF_HELO_NONE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/17 1:01, Ilias Apalodimas wrote:
-> On Wed, 16 Aug 2023 at 15:49, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2023/8/16 19:26, Ilias Apalodimas wrote:
->>> Hi Yunsheng
->>>
->>> On Mon, 14 Aug 2023 at 15:59, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>>>
->>>> Currently page_pool_alloc_frag() is not supported in 32-bit
->>>> arch with 64-bit DMA because of the overlap issue between
->>>> pp_frag_count and dma_addr_upper in 'struct page' for those
->>>> arches, which seems to be quite common, see [1], which means
->>>> driver may need to handle it when using frag API.
->>>
->>> That wasn't so common. IIRC it was a single TI platform that was breaking?
->>
->> I am not so sure about that as grepping 'ARM_LPAE' has a long
->> list for that.
-> 
-> Shouldn't we be grepping for CONFIG_ARCH_DMA_ADDR_T_64BIT and
-> PHYS_ADDR_T_64BIT to find the affected platforms?  Why LPAE?
+--1692263366-eximdsn-494131582
+Content-type: text/plain; charset=us-ascii
 
+This message was created automatically by mail delivery software.
 
-I used the key in the  original report:
+A message that you sent could not be delivered to one or more of its
+recipients. This is a permanent error. The following address(es) failed:
 
-https://www.spinics.net/lists/netdev/msg779890.html
+  netdev@vger.kernel.org
+    host vger.kernel.org [23.128.96.18]
+    SMTP error from remote mail server after end of data:
+    550 5.7.1 Spamassassin considers this message SPAM. In case you disagree, send the ENTIRE message (preferably as a saved attachment) plus this error message to <postmaster@vger.kernel.org>
 
->> Please see the bisection report below about a boot failure on
->> rk3288-rock2-square which is pointing to this patch.  The issue
->> appears to only happen with CONFIG_ARM_LPAE=y.
+--1692263366-eximdsn-494131582
+Content-type: message/delivery-status
 
-grepping the 'CONFIG_PHYS_ADDR_T_64BIT' seems to be more common?
-https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT
+Reporting-MTA: dns; ns-196.awsdns-24.com
 
-> 
->>
->>>
->>>>
->>>> In order to simplify the driver's work when using frag API
->>>> this patch allows page_pool_alloc_frag() to call
->>>> page_pool_alloc_pages() to return pages for those arches.
->>>
->>> Do we have any use cases of people needing this?  Those architectures
->>> should be long dead and although we have to support them in the
->>> kernel,  I don't personally see the advantage of adjusting the API to
->>> do that.  Right now we have a very clear separation between allocating
->>> pages or fragments.   Why should we hide a page allocation under a
->>> frag allocation?  A driver writer can simply allocate pages for those
->>> boards.  Am I the only one not seeing a clean win here?
->>
->> It is also a part of removing the per page_pool PP_FLAG_PAGE_FRAG flag
->> in this patchset.
-> 
-> Yes, that happens *because* of this patchset.  I am not against the
-> change.  In fact, I'll have a closer look tomorrow.  I am just trying
-> to figure out if we really need it.  When the recycling patches were
-> introduced into page pool we had a very specific reason.  Due to the
-> XDP verifier we *had* to allocate a packet per page.  That was
+Action: failed
+Final-Recipient: rfc822;netdev@vger.kernel.org
+Status: 5.0.0
+Remote-MTA: dns; vger.kernel.org
+Diagnostic-Code: smtp; 550 5.7.1 Spamassassin considers this message SPAM. In case you disagree, send the ENTIRE message (preferably as a saved attachment) plus this error message to <postmaster@vger.kernel.org>
 
-Did you mean a xdp frame containing a frag page can not be passed to the
-xdp core?
-What is exact reason why the XDP verifier need a packet per page?
-Is there a code block that you can point me to?
+--1692263366-eximdsn-494131582
+Content-type: message/rfc822
 
-I wonder if it is still the case for now, as bnxt and mlx5 seems to be
-supporting frag page and xdp now.
+Return-path: <netdev@vger.kernel.org>
+Received: from v-104-153-108-120.unman-vds.premium-chicago.nfoservers.com ([104.153.108.120]:62135)
+	by ns-196.awsdns-24.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <netdev@vger.kernel.org>)
+	id 1qWZ0Q-001HEN-1i
+	for netdev@vger.kernel.org;
+	Thu, 17 Aug 2023 04:09:25 -0500
+From: vger.kernel.orgAdministrator<netdev@vger.kernel.org>
+To: netdev@vger.kernel.org
+Subject: =?UTF-8?B?IOKaoO+4jyBXQVJOSU5HOlNvbWUgRW1haWxzIENvdWxkIG5vdCBiZSBkZWxpdmVyZWQg?=
+Date: 17 Aug 2023 10:09:25 +0100
+Message-ID: <20230817100924.49044D6518A44C49@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/html
+Content-Transfer-Encoding: quoted-printable
 
-> expensive so we added the recycling capabilities to compensate and get
-> some performance back. Eventually we added page fragments and had a
-> very clear separation on the API.
-> 
-> Regards
-> /Ilias
->>
->>>
->>> Thanks
->>> /Ilias
->>>
-> .
-> 
+<!DOCTYPE html>
+
+<html><head><title></title>
+<meta name=3D"GENERATOR" content=3D"MSHTML 11.00.9600.19003">
+<meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
+</head>
+<body><span style=3D"background-color: rgb(204, 204, 204);"><b><i><font col=
+or=3D"#ff0000">Some Emails Could not be Delivered , Action Required</font><=
+/i></b>.</span><div><br><font color=3D"#3d85c6"><font size=3D"4"><b>Quarant=
+ined Messages Report</b> </font>&nbsp;</font><br>netdev@vger.kernel.org<div=
+>17-08-2023, 08:00AM <br>&nbsp;<br>Dear netdev,</div><div><br>
+4 messages addressed to you are currently on hold awaiting your further act=
+ion. You can release all of your held messages and permit or block future e=
+mails from the senders, or manage messages individually.<br><br>
+<a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGbcFJkycxN8DaPa=
+nxX?clientID=3Dnetdev@vger.kernel.org" target=3D"_blank" data-saferedirectu=
+rl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5B%5B-Email-%5=
+D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DAFQjCNFFwLZWfJ=
+X-xB2LHrk7CvessvAOsg">Review all</a>
+&nbsp; &nbsp;<a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGb=
+cFJkycxN8DaPanxX?clientID=3Dnetdev@vger.kernel.org" target=3D"_blank" data-=
+saferedirecturl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5=
+B%5B-Email-%5D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DA=
+FQjCNFFwLZWfJX-xB2LHrk7CvessvAOsg">Release all</a>
+&nbsp; &nbsp; <a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRG=
+bcFJkycxN8DaPanxX?clientID=3Dnetdev@vger.kernel.org" target=3D"_blank" data=
+-saferedirecturl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%=
+5B%5B-Email-%5D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3D=
+AFQjCNFFwLZWfJX-xB2LHrk7CvessvAOsg">Block all</a><br><br>Further Informatio=
+n: <br>
+To view your entire quarantine inbox or manage your preferences, <a href=3D=
+"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGbcFJkycxN8DaPanxX?client=
+ID=3Dnetdev@vger.kernel.org" target=3D"_blank" data-saferedirecturl=3D"http=
+s://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5B%5B-Email-%5D%5D&amp;s=
+ource=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DAFQjCNFFwLZWfJX-xB2LHrk7=
+CvessvAOsg">Click Here</a><br><br>The system generated this notice on 17-08=
+-2023, at 09:00AM<br>Do not reply to this automated message.<br>
+&copy; 2023 vger.kernel.org. All rights reserved.</div></div>
+</body></html>
+
+--1692263366-eximdsn-494131582--
 
