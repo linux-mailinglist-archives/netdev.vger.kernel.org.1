@@ -1,92 +1,91 @@
-Return-Path: <netdev+bounces-28563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1F377FD68
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 20:01:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D8BC77FD78
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 20:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 342E21C213E3
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 18:01:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49632282137
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 18:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 959D0171DB;
-	Thu, 17 Aug 2023 18:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035B5171DD;
+	Thu, 17 Aug 2023 18:04:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B5C14AA6
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:01:36 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3518D19A1
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 11:01:34 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b9b5ee9c5aso1006941fa.1
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 11:01:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B1E171BB
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:04:27 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AFE519A1;
+	Thu, 17 Aug 2023 11:04:26 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52889bc61b6so95376a12.0;
+        Thu, 17 Aug 2023 11:04:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692295292; x=1692900092;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cou3dyLffzWYYQt/a0NITOi/SkByjV0K0gTVHwjkrIU=;
-        b=hVWOlyP/bUnEqW/iWB3pUNyUMFoGjeen62eOIUqMtSNtLue1JbWDWnwbBLJCtv65hf
-         tIH+vIfxUaafvpYYznGhckVQqZ/gK/Ja2atUuJJjCQSR758ydv8lk37FKD8e/UJhFXY0
-         tSZ1uz0Yx7rv9wGwV0rQwjPqXamqNneGDeGGl1tHUUEHxyRYzEg3v/XLVOUa5u10f1Hb
-         8gZqFhJulSuplctrYxpj9VOss3Cqm1baXiJxBxZzPCWHO++1ZsPebUMBaGLJ1426kRwh
-         k8A9dAbpQny/DAv5CJFwEKQ0kZw4bAlFe3lWo1jGVDwBo25E9oqq99SFmNIBfGbZPGyV
-         FBVw==
+        d=gmail.com; s=20221208; t=1692295465; x=1692900265;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UxvCrw/069KltoPZkQIYth4BBOJdgJ8sNaI0SyyMDnM=;
+        b=LlNp+0S95wa2DHWIhxZumDFmianXTCRMJjOitpuiuyKYp0AAZb4zHQT8ZXqFwgTr3M
+         TAcGjKr7A/7LbmvxCY8pqvLWzcywa017/uoZ3dhPRVfKQBpxe2Rx4JQVzmQMUv/lluNQ
+         8t/PjmueudVyVsA4+vkTHFn9Wg1EnP9GTqy6bCt1AIDvGSTkLDX8uzmkFWqf6cdFJtPf
+         KRm02KV0hef2hr/xa3gZ+j3wmJGjbj9dQaAlasQmWzrxH3IJ5JCWJI2/kGrxl9CivxpV
+         AvKdmfKLPT+4igVvanygECsKarn9iz35Qwe/ar6m/vTrTtCGRNAG2OY42t5fatoyv1PR
+         bXLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692295292; x=1692900092;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cou3dyLffzWYYQt/a0NITOi/SkByjV0K0gTVHwjkrIU=;
-        b=SYsG7Whu3/t2bICFQ/5L9b8lPg90QxMCLWforRN/9FMTWLwjdOHO/+SmgCaOfcSE3D
-         dp6PuYqRKGk05sfuWM2AwLWV0glJ8clCzOm8OkWQWcsLEOH3zZboP7rCZzjGYQD0U3Cv
-         ZUDESm6nddUY3LWjAijAR6r+M1FMXw9e2TNc4twqWTDWE4J0lUODzCPl5R9TgVpa3zbp
-         rN1s4tlXONQiDRHJhnDrEG3B4ngBkLQ3yBK63Ez7/o27HE6YDtlNWflKv5s8pPaiIz9j
-         iXXWpuWUjrxSlJAQqQL55YP7+9GT039Np1cfLjAnJTVNsEg3/r1j2b/WnpygH3zXGcN5
-         wpDQ==
-X-Gm-Message-State: AOJu0YzBH1m+ovY5Z7Y/Kz+HZYtpr1Qsb2k2ymUYvggSz6mzcmEhJknb
-	2jAzUbEEOj66vWhSEGRm2B8=
-X-Google-Smtp-Source: AGHT+IEV1D4vqbnZkB1CHMc137SfsiQtkVjaZOBu9qoLNC3G1NvT+tgDcD0su6BpHjvoupOxjx4h4Q==
-X-Received: by 2002:a2e:995a:0:b0:2b9:e15f:e780 with SMTP id r26-20020a2e995a000000b002b9e15fe780mr73859ljj.26.1692295292134;
-        Thu, 17 Aug 2023 11:01:32 -0700 (PDT)
-Received: from skbuf ([188.25.231.206])
-        by smtp.gmail.com with ESMTPSA id hb13-20020a170906b88d00b0099de082442esm32640ejb.70.2023.08.17.11.01.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 11:01:31 -0700 (PDT)
-Date: Thu, 17 Aug 2023 21:01:29 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Linus Walleij <linus.walleij@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
- switch drivers
-Message-ID: <20230817180129.krlht3anaa752w46@skbuf>
-References: <ZNJO6JQm2g+hv/EX@shell.armlinux.org.uk>
- <20230810151617.wv5xt5idbfu7wkyn@skbuf>
- <ZNd4AJlLLmszeOxg@shell.armlinux.org.uk>
- <20230814145948.u6ul5dgjpl5bnasp@skbuf>
- <ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk>
- <055be6c4-3c28-459d-bb52-5ac2ee24f1f1@lunn.ch>
- <ZNpWAsdS8tDv9qKp@shell.armlinux.org.uk>
- <8687110a-5ce8-474c-8c20-ca682a98a94c@lunn.ch>
- <ZNqklHxfH8sYaet7@shell.armlinux.org.uk>
- <ZNtPswQl8fvnlGyf@shell.armlinux.org.uk>
+        d=1e100.net; s=20221208; t=1692295465; x=1692900265;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UxvCrw/069KltoPZkQIYth4BBOJdgJ8sNaI0SyyMDnM=;
+        b=JhsFPpmYOuj4rYlE4N7b7MtGbrs0UOyyoUx/1bTrk8QwjNM8sQQvhEKDUnCtLIFRjP
+         dY6N+XWk4gTdEIs5/N2eUTHwlH/MIVHfJPpAhDoeuZaZxS4Gcb8IKUavge67hSu9oRW6
+         d1FuIXUx9mEXgnHnUUHidq316zlLklnxKsZ3fJq821CGg7hU7XQBSOhJXBeCaoHCRQ+s
+         xYknktqvERx6kD+ctmMhGQMFRh//7qX4SR5IKGDWkg6HModTy0OjDgAYKUUX5JvOHT+e
+         /+Ngdx+JgorUFfFBHh8Wg+phL47o6IyrFAMVabF1ZKz4hDXWWJAhGYBzSWWs8YjtCCwL
+         nRmg==
+X-Gm-Message-State: AOJu0YzyqJMlqryaVNhyuAu+NLcsWYOFRdj4Scdnyu72wBTPT9C4MKKr
+	vAk5H1TEcRxq6bAYA/GiHSk=
+X-Google-Smtp-Source: AGHT+IG0Woy+0POxg4sPHGGIdfrc456TaHlsCCBtEoEEY8ldQE+9Fdkgkm7V8IaZV79Aen7WtSv5Lw==
+X-Received: by 2002:a17:906:8a72:b0:99c:6692:7f76 with SMTP id hy18-20020a1709068a7200b0099c66927f76mr153247ejc.16.1692295464443;
+        Thu, 17 Aug 2023 11:04:24 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.129.159])
+        by smtp.gmail.com with ESMTPSA id h6-20020a1709063c0600b0099b921de301sm27628ejg.159.2023.08.17.11.04.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Aug 2023 11:04:23 -0700 (PDT)
+Message-ID: <7889b4f8-78d9-9a0a-e2cc-aae4ed8a80fd@gmail.com>
+Date: Thu, 17 Aug 2023 19:00:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNtPswQl8fvnlGyf@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 00/11] Device Memory TCP
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ netdev@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>,
+ Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>,
+ stephen@networkplumber.org, sdf@google.com, David Wei <dw@davidwei.uk>
+References: <20230810015751.3297321-1-almasrymina@google.com>
+ <7dc4427f-ee99-e401-9ff8-d554999e60ca@kernel.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <7dc4427f-ee99-e401-9ff8-d554999e60ca@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -94,60 +93,46 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Russell,
-
-On Tue, Aug 15, 2023 at 11:13:07AM +0100, Russell King (Oracle) wrote:
-> There is one case that I have missed, and it's totally screwed by
-> this behaviour where a Marvell DSA switch is connected to a Marvell
-> PHY via a RGMII connection:
+On 8/14/23 02:12, David Ahern wrote:
+> On 8/9/23 7:57 PM, Mina Almasry wrote:
+>> Changes in RFC v2:
+>> ------------------
+...
+>> ** Test Setup
+>>
+>> Kernel: net-next with this RFC and memory provider API cherry-picked
+>> locally.
+>>
+>> Hardware: Google Cloud A3 VMs.
+>>
+>> NIC: GVE with header split & RSS & flow steering support.
 > 
->    DSA <---------------------------------> PHY
->     v					    v
-> dt-dsa-node {				phy: dt-phy-node {
->   phy-handle = <&phy>;			  ...
->   phy-mode = "rgmii-foo";		};
-> };
+> This set seems to depend on Jakub's memory provider patches and a netdev
+> driver change which is not included. For the testing mentioned here, you
+> must have a tree + branch with all of the patches. Is it publicly available?
 > 
-> parses phy mode
-> configures for RGMII mode
-> configures RGMII delays associated
->  with phy-mode
-> calls phy_attach(..., mode);
-> phylib sets phy_dev->interface
-> 					PHY driver looks at
-> 					phydev->interface and
-> 					configures delays
-> 
-> In this case, we have *both* ends configuring the RGMII delays and it
-> will not work - because having the DSA MAC end configure the delays
-> breaks the phylib model where the MAC *shouldn't* be configuring the
-> delays.
-> 
-> So, should mv88e6xxx_mac_config() also be forcing all RGMII modes
-> in state->interface to be PHY_INTERFACE_MODE_RGMII when passing
-> that into mv88e6xxx_port_config_interface() if, and only if the
-> port is a user port? Or maybe if and only if the port is actually
-> connected to a real PHY?
+> It would be interesting to see how well (easy) this integrates with
+> io_uring. Besides avoiding all of the syscalls for receiving the iov and
+> releasing the buffers back to the pool, io_uring also brings in the
+> ability to seed a page_pool with registered buffers which provides a
+> means to get simpler Rx ZC for host memory.
 
-I'd tend to believe that you're right, this would be broken (and not
-just with Marvell RGMII PHYs).
+The patchset sounds pretty interesting. I've been working with David Wei
+(CC'ing) on io_uring zc rx (prototype polishing stage) all that is old
+similar approaches based on allocating an rx queue. It targets host
+memory and device memory as an extra feature, uapi is different, lifetimes
+are managed/bound to io_uring. Completions/buffers are returned to user via
+a separate queue instead of cmsg, and pushed back granularly to the kernel
+via another queue. I'll leave it to David to elaborate
 
-I was under the impression that mv88e6xxx_mac_config() will only
-configure the RGMII delays associated with phy-mode if the port is in
-fixed-link mode.
+It sounds like we have space for collaboration here, if not merging then
+reusing internals as much as we can, but we'd need to look into the
+details deeper.
 
-But looking at the actual condition upon which mv88e6xxx_mac_config()
-decides to call mv88e6xxx_port_config_interface(), that is:
+> Overall I like the intent and possibilities for extensions, but a lot of
+> details are missing - perhaps some are answered by seeing an end-to-end
+> implementation.
 
-	if (mode != MLO_AN_PHY || !mv88e6xxx_phy_is_internal(chip, port))
-		mv88e6xxx_port_config_interface()
-
-and thus, an external PHY would return false for the first term of the
-OR operation, but true for the second, and it would proceed to configure
-the MAC-side RGMII delays, resulting in a double delay.
-
-However, I am not fully confident in my analysis, since I don't have
-mv88e6xxx hardware with an RGMII port to confirm.
-
-It's interesting that we haven't seen reports?
+-- 
+Pavel Begunkov
 
