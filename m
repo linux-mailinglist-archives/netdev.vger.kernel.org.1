@@ -1,345 +1,111 @@
-Return-Path: <netdev+bounces-28471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5AF677F86D
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 16:13:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BCD777F88A
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 16:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1041D281FC2
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:13:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E953D281FE9
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B660414AB3;
-	Thu, 17 Aug 2023 14:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F6114ABF;
+	Thu, 17 Aug 2023 14:18:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD861097B
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:13:33 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00794E55;
-	Thu, 17 Aug 2023 07:13:31 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.226])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RRRhT2tnNz6J7VM;
-	Thu, 17 Aug 2023 22:09:29 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 17 Aug 2023 15:13:29 +0100
-Message-ID: <110dc71f-ff83-b87f-10ae-7f6f9bd7c1df@huawei.com>
-Date: Thu, 17 Aug 2023 17:13:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E978B14AB2
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:18:15 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B69C2D78
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:18:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692281894; x=1723817894;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vYHA8+xlmi6PcYK2fPUjjFdwfUFUyHGGPF//QgxjG+Q=;
+  b=oEeEz2eHCPF01n54TLN/jlRTw9Gx1lwom2CzHRqXcYbtNqgvOsBO8ipN
+   kJswMksixtQG5bzY+eFGJnNqKh3NeTAQElQxdn49lkOu6Z8+KtIBzwm+c
+   +9OR5APLG3jpm70mwYH56g/5llI25bq+7qD1uBE0V+fBUjIMgMHWFDvP9
+   UWuLjOSwhNxJI6LgYMkKZUdCqrdUSmQ4IyvJTwS4Nylqi4ZUAWvF4iwPQ
+   ZFqE5tfqvII40OXJI26jM3K7gYe21k/OGCPOTcIu05jaspARGBVDQb1Bd
+   opiopVALLkSzYtWhdFUQOb0kpn2D8NxIvgx/pkODbTXeTlapzIZKgYti0
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="403804186"
+X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
+   d="scan'208";a="403804186"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 07:18:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="981189642"
+X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
+   d="scan'208";a="981189642"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by fmsmga006.fm.intel.com with ESMTP; 17 Aug 2023 07:18:12 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH v2 iwl-next 0/9] ice: fix timestamping in reset process
+Date: Thu, 17 Aug 2023 16:17:37 +0200
+Message-Id: <20230817141746.18726-1-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH] landlock: Fix and test network AF inconsistencies
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <artem.kuzin@huawei.com>, <gnoack3000@gmail.com>,
-	<willemdebruijn.kernel@gmail.com>, <yusongping@huawei.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>
-References: <20230817.theivaoThia9@digikod.net>
- <20230817130001.1493321-1-mic@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20230817130001.1493321-1-mic@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+PTP reset process has multiple places where timestamping can end up in
+an incorrect state.
 
+This series introduces a proper state machine for PTP and refactors
+a large part of the code to ensure that timestamping does not break.
 
-8/17/2023 4:00 PM, Mickaël Salaün пишет:
-> Check af_family consistency while handling AF_UNSPEC specifically.
-> 
-> This patch should be squashed into the "Network support for Landlock"
-> v11 patch series.
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Thank you so much.
-Can I find this patch in 
-https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux ???
-> 
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> ---
->   security/landlock/net.c                     |  29 ++++-
->   tools/testing/selftests/landlock/net_test.c | 124 +++++++++++++-------
->   2 files changed, 108 insertions(+), 45 deletions(-)
-> 
-> diff --git a/security/landlock/net.c b/security/landlock/net.c
-> index f8d2be53ac0d..ea5373f774f9 100644
-> --- a/security/landlock/net.c
-> +++ b/security/landlock/net.c
-> @@ -80,11 +80,11 @@ static int check_socket_access(struct socket *const sock,
->   	if (WARN_ON_ONCE(domain->num_layers < 1))
->   		return -EACCES;
->   
-> -	/* Checks if it's a TCP socket. */
-> +	/* Checks if it's a (potential) TCP socket. */
->   	if (sock->type != SOCK_STREAM)
->   		return 0;
->   
-> -	/* Checks for minimal header length. */
-> +	/* Checks for minimal header length to safely read sa_family. */
->   	if (addrlen < offsetofend(struct sockaddr, sa_family))
->   		return -EINVAL;
->   
-> @@ -106,7 +106,6 @@ static int check_socket_access(struct socket *const sock,
->   		return 0;
->   	}
->   
-> -	/* Specific AF_UNSPEC handling. */
->   	if (address->sa_family == AF_UNSPEC) {
->   		/*
->   		 * Connecting to an address with AF_UNSPEC dissolves the TCP
-> @@ -114,6 +113,10 @@ static int check_socket_access(struct socket *const sock,
->   		 * connection while retaining the socket object (i.e., the file
->   		 * descriptor).  As for dropping privileges, closing
->   		 * connections is always allowed.
-> +		 *
-> +		 * For a TCP access control system, this request is legitimate.
-> +		 * Let the network stack handle potential inconsistencies and
-> +		 * return -EINVAL if needed.
->   		 */
->   		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP)
->   			return 0;
-> @@ -124,14 +127,34 @@ static int check_socket_access(struct socket *const sock,
->   		 * INADDR_ANY (cf. __inet_bind).  Checking the address is
->   		 * required to not wrongfully return -EACCES instead of
->   		 * -EAFNOSUPPORT.
-> +		 *
-> +		 *  We could return 0 and let the network stack handle these
-> +		 *  checks, but it is safer to return a proper error and test
-> +		 *  consistency thanks to kselftest.
->   		 */
->   		if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP) {
-> +			/* addrlen has already been checked for AF_UNSPEC. */
->   			const struct sockaddr_in *const sockaddr =
->   				(struct sockaddr_in *)address;
->   
-> +			if (sock->sk->__sk_common.skc_family != AF_INET)
-> +				return -EINVAL;
-> +
->   			if (sockaddr->sin_addr.s_addr != htonl(INADDR_ANY))
->   				return -EAFNOSUPPORT;
->   		}
-> +	} else {
-> +		/*
-> +		 * Checks sa_family consistency to not wrongfully return
-> +		 * -EACCES instead of -EINVAL.  Valid sa_family changes are
-> +		 *  only (from AF_INET or AF_INET6) to AF_UNSPEC.
-> +		 *
-> +		 *  We could return 0 and let the network stack handle this
-> +		 *  check, but it is safer to return a proper error and test
-> +		 *  consistency thanks to kselftest.
-> +		 */
-> +		if (address->sa_family != sock->sk->__sk_common.skc_family)
-> +			return -EINVAL;
->   	}
->   
->   	id.key.data = (__force uintptr_t)port;
-> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-> index 12dc127ea7d1..504a26c63fd9 100644
-> --- a/tools/testing/selftests/landlock/net_test.c
-> +++ b/tools/testing/selftests/landlock/net_test.c
-> @@ -233,7 +233,7 @@ static int connect_variant(const int sock_fd,
->   
->   FIXTURE(protocol)
->   {
-> -	struct service_fixture srv0, srv1, srv2, unspec_any, unspec_srv0;
-> +	struct service_fixture srv0, srv1, srv2, unspec_any0, unspec_srv0;
->   };
->   
->   FIXTURE_VARIANT(protocol)
-> @@ -257,8 +257,8 @@ FIXTURE_SETUP(protocol)
->   
->   	ASSERT_EQ(0, set_service(&self->unspec_srv0, prot_unspec, 0));
->   
-> -	ASSERT_EQ(0, set_service(&self->unspec_any, prot_unspec, 0));
-> -	self->unspec_any.ipv4_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-> +	ASSERT_EQ(0, set_service(&self->unspec_any0, prot_unspec, 0));
-> +	self->unspec_any0.ipv4_addr.sin_addr.s_addr = htonl(INADDR_ANY);
->   
->   	setup_loopback(_metadata);
->   };
-> @@ -615,20 +615,18 @@ TEST_F(protocol, connect)
->   // Kernel FIXME: tcp_sandbox_with_ipv6_tcp and tcp_sandbox_with_unix_stream
->   TEST_F(protocol, bind_unspec)
->   {
-> +	const struct landlock_ruleset_attr ruleset_attr = {
-> +		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
-> +	};
-> +	const struct landlock_net_service_attr tcp_bind = {
-> +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
-> +		.port = self->srv0.port,
-> +	};
->   	int bind_fd, ret;
->   
->   	if (variant->sandbox == TCP_SANDBOX) {
-> -		const struct landlock_ruleset_attr ruleset_attr = {
-> -			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
-> -		};
-> -		const struct landlock_net_service_attr tcp_bind = {
-> -			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
-> -			.port = self->srv0.port,
-> -		};
-> -		int ruleset_fd;
-> -
-> -		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-> -						     sizeof(ruleset_attr), 0);
-> +		const int ruleset_fd = landlock_create_ruleset(
-> +			&ruleset_attr, sizeof(ruleset_attr), 0);
->   		ASSERT_LE(0, ruleset_fd);
->   
->   		/* Allows bind. */
-> @@ -642,8 +640,8 @@ TEST_F(protocol, bind_unspec)
->   	bind_fd = socket_variant(&self->srv0);
->   	ASSERT_LE(0, bind_fd);
->   
-> -	/* Binds on AF_UNSPEC/INADDR_ANY. */
-> -	ret = bind_variant(bind_fd, &self->unspec_any);
-> +	/* Allowed bind on AF_UNSPEC/INADDR_ANY. */
-> +	ret = bind_variant(bind_fd, &self->unspec_any0);
->   	if (variant->prot.domain == AF_INET) {
->   		EXPECT_EQ(0, ret)
->   		{
-> @@ -655,6 +653,33 @@ TEST_F(protocol, bind_unspec)
->   	}
->   	EXPECT_EQ(0, close(bind_fd));
->   
-> +	if (variant->sandbox == TCP_SANDBOX) {
-> +		const int ruleset_fd = landlock_create_ruleset(
-> +			&ruleset_attr, sizeof(ruleset_attr), 0);
-> +		ASSERT_LE(0, ruleset_fd);
-> +
-> +		/* Denies bind. */
-> +		enforce_ruleset(_metadata, ruleset_fd);
-> +		EXPECT_EQ(0, close(ruleset_fd));
-> +	}
-> +
-> +	bind_fd = socket_variant(&self->srv0);
-> +	ASSERT_LE(0, bind_fd);
-> +
-> +	/* Denied bind on AF_UNSPEC/INADDR_ANY. */
-> +	ret = bind_variant(bind_fd, &self->unspec_any0);
-> +	if (variant->prot.domain == AF_INET) {
-> +		if (is_restricted(&variant->prot, variant->sandbox)) {
-> +			EXPECT_EQ(-EACCES, ret);
-> +		} else {
-> +			EXPECT_EQ(0, ret);
-> +		}
-> +	} else {
-> +		EXPECT_EQ(-EINVAL, ret);
-> +	}
-> +	EXPECT_EQ(0, close(bind_fd));
-> +
-> +	/* Checks bind with AF_UNSPEC and the loopback address. */
->   	bind_fd = socket_variant(&self->srv0);
->   	ASSERT_LE(0, bind_fd);
->   	ret = bind_variant(bind_fd, &self->unspec_srv0);
-> @@ -671,34 +696,16 @@ TEST_F(protocol, bind_unspec)
->   
->   TEST_F(protocol, connect_unspec)
->   {
-> +	const struct landlock_ruleset_attr ruleset_attr = {
-> +		.handled_access_net = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +	};
-> +	const struct landlock_net_service_attr tcp_connect = {
-> +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		.port = self->srv0.port,
-> +	};
->   	int bind_fd, client_fd, status;
->   	pid_t child;
->   
-> -	if (variant->sandbox == TCP_SANDBOX) {
-> -		const struct landlock_ruleset_attr ruleset_attr = {
-> -			.handled_access_net = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> -		};
-> -		const struct landlock_net_service_attr tcp_connect = {
-> -			.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> -			.port = self->srv0.port,
-> -		};
-> -		int ruleset_fd;
-> -
-> -		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-> -						     sizeof(ruleset_attr), 0);
-> -		ASSERT_LE(0, ruleset_fd);
-> -
-> -		/* Allows connect. */
-> -		ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
-> -					       LANDLOCK_RULE_NET_SERVICE,
-> -					       &tcp_connect, 0));
-> -		enforce_ruleset(_metadata, ruleset_fd);
-> -		EXPECT_EQ(0, close(ruleset_fd));
-> -	}
-> -
-> -	/* Generic connection tests. */
-> -	test_bind_and_connect(_metadata, &self->srv0, false, false);
-> -
->   	/* Specific connection tests. */
->   	bind_fd = socket_variant(&self->srv0);
->   	ASSERT_LE(0, bind_fd);
-> @@ -726,8 +733,22 @@ TEST_F(protocol, connect_unspec)
->   			EXPECT_EQ(0, ret);
->   		}
->   
-> +		if (variant->sandbox == TCP_SANDBOX) {
-> +			const int ruleset_fd = landlock_create_ruleset(
-> +				&ruleset_attr, sizeof(ruleset_attr), 0);
-> +			ASSERT_LE(0, ruleset_fd);
-> +
-> +			/* Allows connect. */
-> +			ASSERT_EQ(0,
-> +				  landlock_add_rule(ruleset_fd,
-> +						    LANDLOCK_RULE_NET_SERVICE,
-> +						    &tcp_connect, 0));
-> +			enforce_ruleset(_metadata, ruleset_fd);
-> +			EXPECT_EQ(0, close(ruleset_fd));
-> +		}
-> +
->   		/* Disconnects already connected socket, or set peer. */
-> -		ret = connect_variant(connect_fd, &self->unspec_any);
-> +		ret = connect_variant(connect_fd, &self->unspec_any0);
->   		if (self->srv0.protocol.domain == AF_UNIX &&
->   		    self->srv0.protocol.type == SOCK_STREAM) {
->   			EXPECT_EQ(-EINVAL, ret);
-> @@ -744,6 +765,25 @@ TEST_F(protocol, connect_unspec)
->   			EXPECT_EQ(0, ret);
->   		}
->   
-> +		if (variant->sandbox == TCP_SANDBOX) {
-> +			const int ruleset_fd = landlock_create_ruleset(
-> +				&ruleset_attr, sizeof(ruleset_attr), 0);
-> +			ASSERT_LE(0, ruleset_fd);
-> +
-> +			/* Denies connect. */
-> +			enforce_ruleset(_metadata, ruleset_fd);
-> +			EXPECT_EQ(0, close(ruleset_fd));
-> +		}
-> +
-> +		ret = connect_variant(connect_fd, &self->unspec_any0);
-> +		if (self->srv0.protocol.domain == AF_UNIX &&
-> +		    self->srv0.protocol.type == SOCK_STREAM) {
-> +			EXPECT_EQ(-EINVAL, ret);
-> +		} else {
-> +			/* Always allowed to disconnect. */
-> +			EXPECT_EQ(0, ret);
-> +		}
-> +
->   		EXPECT_EQ(0, close(connect_fd));
->   		_exit(_metadata->passed ? EXIT_SUCCESS : EXIT_FAILURE);
->   		return;
+Jacob Keller (8):
+  ice: use ice_pf_src_tmr_owned where available
+  ice: pass reset type to PTP reset functions
+  ice: rename PTP functions and fields
+  ice: factor out ice_ptp_rebuild_owner()
+  ice: remove ptp_tx ring parameter flag
+  ice: modify tstamp_config only during TS mode set
+  ice: restore timestamp configuration after reset
+  ice: stop destroying and reinitalizing Tx tracker during reset
+
+Karol Kolacinski (1):
+  ice: introduce PTP state machine
+
+---
+V1 -> V2: Adjusted commit S-o-bs and messages
+  
+ drivers/net/ethernet/intel/ice/ice.h         |   1 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c    |  16 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 331 ++++++++++++-------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  36 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c    |   3 -
+ drivers/net/ethernet/intel/ice/ice_txrx.h    |   1 -
+ 7 files changed, 247 insertions(+), 143 deletions(-)
+
+-- 
+2.39.2
+
 
