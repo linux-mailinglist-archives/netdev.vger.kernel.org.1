@@ -1,89 +1,136 @@
-Return-Path: <netdev+bounces-28438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E3577F740
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:02:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED16177F747
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B371281FC0
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:02:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B9F1281F62
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308E914015;
-	Thu, 17 Aug 2023 13:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3020514019;
+	Thu, 17 Aug 2023 13:05:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251A51400C
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:02:42 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E521D3A90
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:02:13 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRQ7J6pxMzVjv1;
-	Thu, 17 Aug 2023 20:59:08 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 17 Aug 2023 21:01:15 +0800
-Message-ID: <8474ac51-9906-4b2a-6eb8-92fd19869bba@huawei.com>
-Date: Thu, 17 Aug 2023 21:01:14 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2187F1400C
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:05:19 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 097A335A5;
+	Thu, 17 Aug 2023 06:04:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2O+oMCc4tCMfBiIfp7tXuumeCBqFXKjABtwXyZskEPw=; b=xGhRgbFnSSNHr2vcTGi9qICnPQ
+	wnFJyD4mcsojgjl7m4A6TH6Vbd2KqJRj9YCbHhk1+a7ohdxeMUyW8J9EpgS8n/y+AOlxbHy//a3fq
+	RzchlP+XTJE+uRAtv2yoyRwUu78eUUuoJ72uw3Qkd5/0DgZz8BVWZFtOs4+cpNSb8cNvwTrNoBYCX
+	C/2YY8tb70oZjsIIoWwE1KUdu78y4obXNDEMxzsUvDr7ho1kzBUvfobuL3x4BwLR90wgq5GD+LYNp
+	2+smJFaErreGkcpezH0dGQJqyVnw3ADQIa1R3mZWW6YTQHZSI/RyvhVd5ZaWiFMJruaqfIkfZ1oFD
+	P+z76Ftw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46006)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qWcf7-0004CA-2Y;
+	Thu, 17 Aug 2023 14:03:41 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qWcf6-0000cG-FX; Thu, 17 Aug 2023 14:03:40 +0100
+Date: Thu, 17 Aug 2023 14:03:40 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Alexander Couzens <lynxis@fe80.eu>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next] net: pcs: lynxi: fully reconfigure if link is
+ down
+Message-ID: <ZN4arCVzdszcIBX0@shell.armlinux.org.uk>
+References: <e9831ec99acd5a8ab03c76fce87fa750c7041e60.1692273723.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH net-next v2 2/4] net: bgmac: Fix return value check for
- fixed_phy_register()
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <rafal@milecki.pl>, <bcm-kernel-feedback-list@broadcom.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <opendmb@gmail.com>, <florian.fainelli@broadcom.com>,
-	<bryan.whitehead@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <mdf@kernel.org>, <pgynther@google.com>,
-	<Pavithra.Sathyanarayanan@microchip.com>, <netdev@vger.kernel.org>
-References: <20230817121631.1878897-1-ruanjinjie@huawei.com>
- <20230817121631.1878897-3-ruanjinjie@huawei.com>
- <039324dd-96ae-41df-974a-6519ff8f8983@lunn.ch>
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-In-Reply-To: <039324dd-96ae-41df-974a-6519ff8f8983@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.109.254]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-8.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9831ec99acd5a8ab03c76fce87fa750c7041e60.1692273723.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Aug 17, 2023 at 01:04:06PM +0100, Daniel Golle wrote:
+> On MT7988 When switching from 10GBase-R/5GBase-R/USXGMII to one of the
+> interface modes provided by mtk-pcs-lynxi we need to make sure to
+> always perform a full configuration of the PHYA.
+> As the idea behind not doing that was mostly to prevent an existing link
+> going down without any need for it to do so. Hence we can just always
+> perform a full confinguration in case the link is down.
 
+And this is racy - because in the case with inband signalling, the link
+can come up between reading the status and acting on it. It could even
+be already up, but the link status indicates it is not. Lastly, reading
+the BMSR has side effects: the link status bit latches low until a read.
 
-On 2023/8/17 20:41, Andrew Lunn wrote:
-> On Thu, Aug 17, 2023 at 08:16:29PM +0800, Ruan Jinjie wrote:
->> The fixed_phy_register() function returns error pointers and never
->> returns NULL. Update the checks accordingly.
->>
->> And it also returns -EPROBE_DEFER, -EINVAL and -EBUSY, etc, in addition to
->> -ENODEV, just return -ENODEV is not sensible, use
->> PTR_ERR to fix the issue.
-> 
-> I would recommend changing not sensible to best practice, as i
-> suggested in one of your other patches.
+Basically, do not read the BMSR here, it's buggy to read it any place
+other than pcs_get_state.
 
-Thank you again! I'll watch the wording next time.
+I think what we need to do instead are:
 
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> ---
-> pw-bot: cr
+1) mtk_mac_select_pcs() returns the SGMII PCS or NULL. Presumably this
+   is the driver which supports 10GBase-R/5GBase-R/USXGMII, and thus
+   this returns NULL for 10GBase-R/5GBase-R/USXGMII.
+
+   Phylink doesn't cater for mac_select_pcs() returning non-NULL for
+   some modes and NULL for others, mainly because the presence of a PCS
+   _used_ to cause phylink to change its behaviour (see
+   https://lore.kernel.org/netdev/YZRLQqLblRurUd4V@shell.armlinux.org.uk/).
+   That has now changed (we've got rid of the legacy stuff at last!) so
+   there is no technical reason not to now allow that.
+
+   Vladimir did have some arguments for not allowing it when we had the
+   phylink_set_pcs() interface:
+   https://lore.kernel.org/netdev/20211123181515.qqo7e4xbuu2ntwgt@skbuf/
+   I'm assuming that your requirement now provides sufficient
+   justification for allowing this.
+
+   There is one bug that does need fixing first:
+   phylink_change_inband_advert() checks pl->pcs->neg_mode without
+   first checking whether pl->pcs is non-NULL.
+
+   To allow this, phylink_major_config() needs:
+
+   	pcs_changed = pcs && pl->pcs != pcs;
+
+   to become:
+
+   	pcs_changed = pl->pcs != pcs;
+
+2) with (1) solved, there are a couple of callbacks that can be used to
+   solve this - I think pcs_disable() is the one you want, which will
+   be called when we switch to a mode where _this_ PCS will no longer
+   be used (thus you can reset mpcs->interface to _NA, ready for when
+   it is next brought into use.)
+
+Would that work for you?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
