@@ -1,67 +1,71 @@
-Return-Path: <netdev+bounces-28645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C17780191
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:19:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B45780192
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:19:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08CB8282224
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:19:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A736A281ED1
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7EF41B7CD;
-	Thu, 17 Aug 2023 23:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0045E1BB5A;
+	Thu, 17 Aug 2023 23:19:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6706F9D5
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:19:31 +0000 (UTC)
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2397F35A5
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:30 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-76d1dc1ebfdso70871485a.0
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E104F1BB58
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:19:32 +0000 (UTC)
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ADD635A9
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:31 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-6471744acb6so1378546d6.1
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1692314369; x=1692919169;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hMk8cdSWQQZFU7718mVsPCACbcsNojZr3E1M7NEgjjg=;
-        b=ghgsAEegI8BYyN7TAJhL7ua+u4pOQjbTrOLzF8dDmmW65guqRmPZUwFkH43eXOQ5GF
-         n8KbfVAo4SMxf9um9+KsUPaKtJuZ8qUpiVKsYRtdmk6gukJ3e1YmmNC/FaaFWZyGIZX0
-         9suX9OxRkqkRsaEhsG70AcD+6eOS7bx00XMx0=
+        d=broadcom.com; s=google; t=1692314370; x=1692919170;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ru4757kfjbk/0JhWzGeR/d/cJvK9i8BGTKAHBj2anHE=;
+        b=UOjLHtWXML3ygUPPlqRExL8qsNjB21C0WI4I26o5CqEUpOblCn+f7MttvuCsa2khF1
+         pJul+pGX7VYkKOg1XsOJudhJbBqYTndQwKeOBIalUcARNkl4XbKJpLa5x9uvvceQ/Hqk
+         21oG0zHzVr5UkzzSrnjWHBsf/Hkul86HrbTM8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692314369; x=1692919169;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hMk8cdSWQQZFU7718mVsPCACbcsNojZr3E1M7NEgjjg=;
-        b=hIh8CfzLWKj9FQ5TjNv+xvDc9F6fWbOCnr0nE+0tR9xb3bK3B7hcu/pnt909IacPnd
-         l/SHj5yFE1md84OL9xhkyrlGEm7c+muOKyFR60f7s5cpy47NGO3rGrAr/k15Kn7guhYV
-         nTtbApMEQg7VhKKGHpSZVsoUWrjyYcSEvz/2dnrKnMgKiDE1EgODIVOWFq7G1+Enb/7E
-         4O7E/FH6EPDwdLRG3lB8qcM8VQcwZUcVbovuSxTGFXOXxjPeRW2buzeCb0ftFn2wMqNK
-         YfTiYO4yWZnDn+NWonBNBXZV3c6uaWXXHvpbc5Uvdg/VS2EQZrK98qfPJrcm6hwK8euq
-         iuAw==
-X-Gm-Message-State: AOJu0YxC0dSEADddxjb/sha7T014USRbqEzaEyPE2JCSItsemzJvXg21
-	+GaYidXIS140Qza38jCrXPwscQ==
-X-Google-Smtp-Source: AGHT+IGD21xnjHVQx8eu7BJxlXZlDPuLNKVD0otrtCagJ4w+jEaDsecQmb7Oq3YClBm32/Hztbc8OA==
-X-Received: by 2002:a05:620a:3705:b0:76d:24ea:21a8 with SMTP id de5-20020a05620a370500b0076d24ea21a8mr1196536qkb.13.1692314368775;
-        Thu, 17 Aug 2023 16:19:28 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692314370; x=1692919170;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ru4757kfjbk/0JhWzGeR/d/cJvK9i8BGTKAHBj2anHE=;
+        b=FeBKRO5jBBYKzS8INGDLWttqRHPEVgwYKApyv+fu9C2FpE05+1HLQC/FiPYmS3BcC8
+         /lUJoVMYbw92odqH0kHYdydLF/IvSvnWTRnnNtnOnbCQ0Hs2ieF/Yw2Rmd4Wr42GFQCb
+         8XleAsUOJvjETxPa9FKPrrbGAjSLATHuSoIqnVxQligdT1wQCLRdcblYumKFDFdKG9ZN
+         Q3U3mpARfgB4XnwNGBBfBWb80qf2WTwKmAVuAU367ZLmn5JloWRXBC3f+wxbRQrvXAFL
+         cvESBlGKMD5DPVw/xRlJVDd0t033q5e6Tre+rSe3ok5Qtqj1Q85kN2HEXDUoawm/IGFx
+         MaPQ==
+X-Gm-Message-State: AOJu0Ywh/21QQOXpsKOb+pnryhCd3iA+essAnhL9C2ydu8T17jpBhiGg
+	KnpdDeZ+3YVZMbsFSWPpZ9uxqmBe0O6S7EXvFxI=
+X-Google-Smtp-Source: AGHT+IGJ2CkOYVXn7l+Ev1IgGxDAZ0RGjA9TjpL3LvZoPCOmHifCz/snjpn4AgxwejGTwKJRG75J3g==
+X-Received: by 2002:a0c:b25e:0:b0:63f:90b8:6a30 with SMTP id k30-20020a0cb25e000000b0063f90b86a30mr1163395qve.26.1692314370271;
+        Thu, 17 Aug 2023 16:19:30 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id w27-20020a05620a149b00b0076d25b11b62sm145516qkj.38.2023.08.17.16.19.27
+        by smtp.gmail.com with ESMTPSA id w27-20020a05620a149b00b0076d25b11b62sm145516qkj.38.2023.08.17.16.19.28
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Aug 2023 16:19:28 -0700 (PDT)
+        Thu, 17 Aug 2023 16:19:29 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net-next v2 0/6] bnxt_en: Update for net-next
-Date: Thu, 17 Aug 2023 16:19:05 -0700
-Message-Id: <20230817231911.165035-1-michael.chan@broadcom.com>
+	gospo@broadcom.com,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v2 1/6] bnxt_en: Use the unified RX page pool buffers for XDP and non-XDP
+Date: Thu, 17 Aug 2023 16:19:06 -0700
+Message-Id: <20230817231911.165035-2-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20230817231911.165035-1-michael.chan@broadcom.com>
+References: <20230817231911.165035-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,46 +73,171 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d7f54c060326a464"
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
+	boundary="000000000000ea93e6060326a4fa"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000d7f54c060326a464
+--000000000000ea93e6060326a4fa
 Content-Transfer-Encoding: 8bit
 
-This patchset contains 2 features:
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-- The page pool implementation for the normal RX path (non-XDP) for
-paged buffers in the aggregation ring.
+Convert to use the page pool buffers for the aggregation ring when
+running in non-XDP mode.  This simplifies the driver and we benefit
+from the recycling of pages.  Adjust the page pool size to account
+for the aggregation ring size.
 
-- Saving of the ring error counters across reset.  
+Cc: bpf@vger.kernel.org
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 71 +++++------------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  3 -
+ 2 files changed, 14 insertions(+), 60 deletions(-)
 
-v2: The hwmon patches are dropped for now while Kalesh is reworking them.
-
-Michael Chan (4):
-  bnxt_en: Increment rx_resets counter in bnxt_disable_napi()
-  bnxt_en: Save ring error counters across reset
-  bnxt_en: Display the ring error counters under ethtool -S
-  bnxt_en: Add tx_resets ring counter
-
-Somnath Kotur (2):
-  bnxt_en: Use the unified RX page pool buffers for XDP and non-XDP
-  bnxt_en: Let the page pool manage the DMA mapping
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 144 ++++++++----------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  24 ++-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  49 +++---
- 3 files changed, 107 insertions(+), 110 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 7be917a8da48..6b815a2288e2 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -877,48 +877,15 @@ static inline int bnxt_alloc_rx_page(struct bnxt *bp,
+ 	struct rx_bd *rxbd =
+ 		&rxr->rx_agg_desc_ring[RX_RING(prod)][RX_IDX(prod)];
+ 	struct bnxt_sw_rx_agg_bd *rx_agg_buf;
+-	struct pci_dev *pdev = bp->pdev;
+ 	struct page *page;
+ 	dma_addr_t mapping;
+ 	u16 sw_prod = rxr->rx_sw_agg_prod;
+ 	unsigned int offset = 0;
+ 
+-	if (BNXT_RX_PAGE_MODE(bp)) {
+-		page = __bnxt_alloc_rx_page(bp, &mapping, rxr, &offset, gfp);
+-
+-		if (!page)
+-			return -ENOMEM;
+-
+-	} else {
+-		if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
+-			page = rxr->rx_page;
+-			if (!page) {
+-				page = alloc_page(gfp);
+-				if (!page)
+-					return -ENOMEM;
+-				rxr->rx_page = page;
+-				rxr->rx_page_offset = 0;
+-			}
+-			offset = rxr->rx_page_offset;
+-			rxr->rx_page_offset += BNXT_RX_PAGE_SIZE;
+-			if (rxr->rx_page_offset == PAGE_SIZE)
+-				rxr->rx_page = NULL;
+-			else
+-				get_page(page);
+-		} else {
+-			page = alloc_page(gfp);
+-			if (!page)
+-				return -ENOMEM;
+-		}
++	page = __bnxt_alloc_rx_page(bp, &mapping, rxr, &offset, gfp);
+ 
+-		mapping = dma_map_page_attrs(&pdev->dev, page, offset,
+-					     BNXT_RX_PAGE_SIZE, DMA_FROM_DEVICE,
+-					     DMA_ATTR_WEAK_ORDERING);
+-		if (dma_mapping_error(&pdev->dev, mapping)) {
+-			__free_page(page);
+-			return -EIO;
+-		}
+-	}
++	if (!page)
++		return -ENOMEM;
+ 
+ 	if (unlikely(test_bit(sw_prod, rxr->rx_agg_bmap)))
+ 		sw_prod = bnxt_find_next_agg_idx(rxr, sw_prod);
+@@ -1204,6 +1171,7 @@ static struct sk_buff *bnxt_rx_agg_pages_skb(struct bnxt *bp,
+ 	total_frag_len = __bnxt_rx_agg_pages(bp, cpr, shinfo, idx,
+ 					     agg_bufs, tpa, NULL);
+ 	if (!total_frag_len) {
++		skb_mark_for_recycle(skb);
+ 		dev_kfree_skb(skb);
+ 		return NULL;
+ 	}
+@@ -1794,6 +1762,7 @@ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
+ 		return;
+ 	}
+ 	skb_record_rx_queue(skb, bnapi->index);
++	skb_mark_for_recycle(skb);
+ 	napi_gro_receive(&bnapi->napi, skb);
+ }
+ 
+@@ -3002,30 +2971,16 @@ static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
+ 		if (!page)
+ 			continue;
+ 
+-		if (BNXT_RX_PAGE_MODE(bp)) {
+-			dma_unmap_page_attrs(&pdev->dev, rx_agg_buf->mapping,
+-					     BNXT_RX_PAGE_SIZE, bp->rx_dir,
+-					     DMA_ATTR_WEAK_ORDERING);
+-			rx_agg_buf->page = NULL;
+-			__clear_bit(i, rxr->rx_agg_bmap);
+-
+-			page_pool_recycle_direct(rxr->page_pool, page);
+-		} else {
+-			dma_unmap_page_attrs(&pdev->dev, rx_agg_buf->mapping,
+-					     BNXT_RX_PAGE_SIZE, DMA_FROM_DEVICE,
+-					     DMA_ATTR_WEAK_ORDERING);
+-			rx_agg_buf->page = NULL;
+-			__clear_bit(i, rxr->rx_agg_bmap);
++		dma_unmap_page_attrs(&pdev->dev, rx_agg_buf->mapping,
++				     BNXT_RX_PAGE_SIZE, bp->rx_dir,
++				     DMA_ATTR_WEAK_ORDERING);
++		rx_agg_buf->page = NULL;
++		__clear_bit(i, rxr->rx_agg_bmap);
+ 
+-			__free_page(page);
+-		}
++		page_pool_recycle_direct(rxr->page_pool, page);
+ 	}
+ 
+ skip_rx_agg_free:
+-	if (rxr->rx_page) {
+-		__free_page(rxr->rx_page);
+-		rxr->rx_page = NULL;
+-	}
+ 	map = rxr->rx_tpa_idx_map;
+ 	if (map)
+ 		memset(map->agg_idx_bmap, 0, sizeof(map->agg_idx_bmap));
+@@ -3244,7 +3199,9 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+ {
+ 	struct page_pool_params pp = { 0 };
+ 
+-	pp.pool_size = bp->rx_ring_size;
++	pp.pool_size = bp->rx_agg_ring_size;
++	if (BNXT_RX_PAGE_MODE(bp))
++		pp.pool_size += bp->rx_ring_size;
+ 	pp.nid = dev_to_node(&bp->pdev->dev);
+ 	pp.napi = &rxr->bnapi->napi;
+ 	pp.dev = &bp->pdev->dev;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 362918876d3c..d6a1eaa69774 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -919,9 +919,6 @@ struct bnxt_rx_ring_info {
+ 	unsigned long		*rx_agg_bmap;
+ 	u16			rx_agg_bmap_size;
+ 
+-	struct page		*rx_page;
+-	unsigned int		rx_page_offset;
+-
+ 	dma_addr_t		rx_desc_mapping[MAX_RX_PAGES];
+ 	dma_addr_t		rx_agg_desc_mapping[MAX_RX_AGG_PAGES];
+ 
 -- 
 2.30.1
 
 
---000000000000d7f54c060326a464
+--000000000000ea93e6060326a4fa
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -179,14 +308,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJq1selTUOOMeCBQxUZZWzjpnlJS5U0X
-xDmLDca3ngQyMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
-NzIzMTkyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKfACHAkRqer//riuB7hog1eC2tMC/RO
+pzChDHda1QI8MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
+NzIzMTkzMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCURwdQ+UVP1r0prUsNQkM5Vqnl26jkUxURYwgzJpTb1srlmBdK
-DMe3PLevqjxgqfY2GT49I3iamfmQHcn/zz6Kr3kUPNjVtq8b/HXAR2nivWFxXM4yzexBvtp9etTl
-G8W4oFEVFigR7+ol9AMAtRO8yg5fVAVrkaDveMnzqVLqN/xtETjgEtCfr2J9HbKjWfVEhA6xaoW7
-/A/JTQ56fpznqDXDAqYtjh3ZNplA47J/8POi4cCd1w89lJLDfLUguykJxpHVaLxyDyTRJ3ds/Gd0
-LiR/hoabzRld6TUL70wm6uYz9Y+7Oag/sy7glAo8HccGHCq4Avq9qiNz0jYt0GQN
---000000000000d7f54c060326a464--
+ATANBgkqhkiG9w0BAQEFAASCAQBZlhv/iVhvYf6+ZLAdVj88/UOHT5UZmC5dOl8ruvqqaET0nzSc
++NxY7nukxbW2jSq0SS/BOHZ5PHemRXFuebJ71GDuWIfazfXL+/YFMsCSKymrbNxlhbgrBbMGyTvT
+JHmLEK80olq+FVTJCJ6kSzKUWCUTbotLIwU5RPv/dVZUnLwc5bFg4k/E2OMxcWrU/0mFpgJws7WE
+iTnL5gNbAtkmHRHGIhwr+43/Gdl+ZPdaWRP3z8Oii6z1r2nqf3tZNM7SclEKPqqT7iwD0wk5FUcx
+SAL8YIA34j7XzEV4tn6LIJoOY+H/NpQJ6HlmVko0Ss+dHz/tyHW+qNFFD7wfQLTI
+--000000000000ea93e6060326a4fa--
 
