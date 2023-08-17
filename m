@@ -1,135 +1,233 @@
-Return-Path: <netdev+bounces-28456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2068377F7D0
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D918977F841
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 16:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2ADF1C2140C
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:34:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F24061C2131C
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9608A1428D;
-	Thu, 17 Aug 2023 13:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CC214AA0;
+	Thu, 17 Aug 2023 14:04:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8917413AFE
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:34:11 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD84114;
-	Thu, 17 Aug 2023 06:34:00 -0700 (PDT)
-Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRQs26t64zVk4s;
-	Thu, 17 Aug 2023 21:31:50 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemi500015.china.huawei.com
- (7.221.188.92) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 17 Aug
- 2023 21:33:57 +0800
-From: Lu Wei <luwei32@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <wsa+renesas@sang-engineering.com>,
-	<tglx@linutronix.de>, <peterz@infradead.org>, <maheshb@google.com>,
-	<fw@strlen.de>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net] ipvlan: Fix a reference count leak warning in ipvlan_ns_exit()
-Date: Thu, 17 Aug 2023 22:54:49 +0800
-Message-ID: <20230817145449.141827-1-luwei32@huawei.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3AF3C13
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:04:12 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E651B19E;
+	Thu, 17 Aug 2023 07:04:06 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.226])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RRRYh29c4z6HJZY;
+	Thu, 17 Aug 2023 22:03:36 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 17 Aug 2023 15:04:01 +0100
+Message-ID: <b0bfa45a-c2bd-545e-ec51-02eeeab0677d@huawei.com>
+Date: Thu, 17 Aug 2023 17:04:00 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <artem.kuzin@huawei.com>, <gnoack3000@gmail.com>,
+	<willemdebruijn.kernel@gmail.com>, <yusongping@huawei.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230706145543.1284007-1-mic@digikod.net>
+ <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
+ <30e2bacd-2e48-9056-5950-1974b9373ee3@huawei.com>
+ <20230817.EiHicha5shei@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20230817.EiHicha5shei@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500015.china.huawei.com (7.221.188.92)
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There are two network devices(veth1 and veth3) in ns1, and ipvlan1 with
-L3S mode and ipvlan2 with L2 mode are created based on them as
-figure (1). In this case, ipvlan_register_nf_hook() will be called to
-register nf hook which is needed by ipvlans in L3S mode in ns1 and value
-of ipvl_nf_hook_refcnt is set to 1.
 
-(1)
-           ns1                           ns2
-      ------------                  ------------
 
-   veth1--ipvlan1 (L3S)
+8/17/2023 4:19 PM, Mickaël Salaün пишет:
+> On Sun, Aug 13, 2023 at 11:09:59PM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 7/12/2023 10:02 AM, Mickaël Salaün пишет:
+>> > 
+>> > On 06/07/2023 16:55, Mickaël Salaün wrote:
+>> > > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> > > 
+>> > > This patch is a revamp of the v11 tests [1] with new tests (see the
+>> > > "Changes since v11" description).  I (Mickaël) only added the following
+>> > > todo list and the "Changes since v11" sections in this commit message.
+>> > > I think this patch is good but it would appreciate reviews.
+>> > > You can find the diff of my changes here but it is not really readable:
+>> > > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
+>> > > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
+>> > > TODO:
+>> > > - Rename all "net_service" to "net_port".
+>> > > - Fix the two kernel bugs found with the new tests.
+>> > > - Update this commit message with a small description of all tests.
+>> > 
+>> > [...]
+> 
+>> > > +FIXTURE(inet)
+>> > > +{
+>> > > +	struct service_fixture srv0, srv1;
+>> > > +};
+>> > 
+>> > The "inet" variants are useless and should be removed. The "inet"
+>> > fixture can then be renamed to "ipv4_tcp".
+>> > 
+>>   Maybe its better to name it "tcp". So we dont need to copy TEST_F(tcp,
+>> port_endianness) for ipv6 and ipv4.
+>> What do you think?
+> 
+> I don't see any need to test with IPv4 and IPv6, hence the "inet" name
+> (and without variants). You can rename it to "inet_tcp" to highlight the
+> specificities of this fixture.
+> 
 
-   veth3--ipvlan2 (L2)
-
-(2)
-           ns1                           ns2
-      ------------                  ------------
-
-   veth1--ipvlan1 (L3S)
-
-         ipvlan2 (L2)                  veth3
-     |                                  |
-     |------->-------->--------->--------
-                    migrate
-
-When veth3 migrates from ns1 to ns2 as figure (2), veth3 will register in
-ns2 and calls call_netdevice_notifiers with NETDEV_REGISTER event:
-
-dev_change_net_namespace
-    call_netdevice_notifiers
-        ipvlan_device_event
-            ipvlan_migrate_l3s_hook
-                ipvlan_register_nf_hook(newnet)      (I)
-                ipvlan_unregister_nf_hook(oldnet)    (II)
-
-In function ipvlan_migrate_l3s_hook(), ipvl_nf_hook_refcnt in ns1 is not 0
-since veth1 with ipvlan1 still in ns1, (I) and (II) will be called to
-register nf_hook in ns2 and unregister nf_hook in ns1. As a result,
-ipvl_nf_hook_refcnt in ns1 is decreased incorrectly and this in ns2
-is increased incorrectly. When the second net namespace is removed, a
-reference count leak warning in ipvlan_ns_exit() will be triggered.
-
-This patch add a check before ipvlan_migrate_l3s_hook() is called. The
-warning can be triggered as follows:
-
-$ ip netns add ns1
-$ ip netns add ns2
-$ ip netns exec ns1 ip link add veth1 type veth peer name veth2
-$ ip netns exec ns1 ip link add veth3 type veth peer name veth4
-$ ip netns exec ns1 ip link add ipv1 link veth1 type ipvlan mode l3s
-$ ip netns exec ns1 ip link add ipv2 link veth3 type ipvlan mode l2
-$ ip netns exec ns1 ip link set veth3 netns ns2
-$ ip net del ns2
-
-Fixes: 3133822f5ac1 ("ipvlan: use pernet operations and restrict l3s hooks to master netns")
-Signed-off-by: Lu Wei <luwei32@huawei.com>
----
- drivers/net/ipvlan/ipvlan_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index b15dd9a3ad54..1b55928e89b8 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -748,7 +748,8 @@ static int ipvlan_device_event(struct notifier_block *unused,
- 
- 		write_pnet(&port->pnet, newnet);
- 
--		ipvlan_migrate_l3s_hook(oldnet, newnet);
-+		if (port->mode == IPVLAN_MODE_L3S)
-+			ipvlan_migrate_l3s_hook(oldnet, newnet);
- 		break;
- 	}
- 	case NETDEV_UNREGISTER:
--- 
-2.31.1
-
+  I think there was some misunderstanding from my side. So I will rename
+inet to inet_tcp and keep all fixture variants:
+	- no_sandbox_with_ipv4.
+	- sandbox_with_ipv4.
+	- no_sandbox_with_ipv6.
+	- sandbox_with_ipv6.
+Correct?
+			
+>> 
+>> > 
+>> > > +
+>> > > +FIXTURE_VARIANT(inet)
+>> > > +{
+>> > > +	const bool is_sandboxed;
+>> > > +	const struct protocol_variant prot;
+>> > > +};
+>> > > +
+>> > > +/* clang-format off */
+>> > > +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv4) {
+>> > > +	/* clang-format on */
+>> > > +	.is_sandboxed = false,
+>> > > +	.prot = {
+>> > > +		.domain = AF_INET,
+>> > > +		.type = SOCK_STREAM,
+>> > > +	},
+>> > > +};
+>> > > +
+>> > > +/* clang-format off */
+>> > > +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv4) {
+>> > > +	/* clang-format on */
+>> > > +	.is_sandboxed = true,
+>> > > +	.prot = {
+>> > > +		.domain = AF_INET,
+>> > > +		.type = SOCK_STREAM,
+>> > > +	},
+>> > > +};
+>> > > +
+>> > > +/* clang-format off */
+>> > > +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv6) {
+>> > > +	/* clang-format on */
+>> > > +	.is_sandboxed = false,
+>> > > +	.prot = {
+>> > > +		.domain = AF_INET6,
+>> > > +		.type = SOCK_STREAM,
+>> > > +	},
+>> > > +};
+>> > > +
+>> > > +/* clang-format off */
+>> > > +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv6) {
+>> > > +	/* clang-format on */
+>> > > +	.is_sandboxed = true,
+>> > > +	.prot = {
+>> > > +		.domain = AF_INET6,
+>> > > +		.type = SOCK_STREAM,
+>> > > +	},
+>> > > +};
+>> > > +
+>> > > +FIXTURE_SETUP(inet)
+>> > > +{
+>> > > +	const struct protocol_variant ipv4_tcp = {
+>> > > +		.domain = AF_INET,
+>> > > +		.type = SOCK_STREAM,
+>> > > +	};
+>> > > +
+>> > > +	disable_caps(_metadata);
+>> > > +
+>> > > +	ASSERT_EQ(0, set_service(&self->srv0, ipv4_tcp, 0));
+>> > > +	ASSERT_EQ(0, set_service(&self->srv1, ipv4_tcp, 1));
+>> > > +
+>> > > +	setup_loopback(_metadata);
+>> > > +};
+>> > > +
+>> > > +FIXTURE_TEARDOWN(inet)
+>> > > +{
+>> > > +}
+>> > > +
+>> > > +TEST_F(inet, port_endianness)
+>> > > +{
+>> > > +	const struct landlock_ruleset_attr ruleset_attr = {
+>> > > +		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > +				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > +	};
+>> > > +	const struct landlock_net_service_attr bind_host_endian_p0 = {
+>> > > +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>> > > +		/* Host port format. */
+>> > > +		.port = self->srv0.port,
+>> > > +	};
+>> > > +	const struct landlock_net_service_attr connect_big_endian_p0 = {
+>> > > +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > +		/* Big endian port format. */
+>> > > +		.port = htons(self->srv0.port),
+>> > > +	};
+>> > > +	const struct landlock_net_service_attr bind_connect_host_endian_p1 = {
+>> > > +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > +				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > +		/* Host port format. */
+>> > > +		.port = self->srv1.port,
+>> > > +	};
+>> > > +	const unsigned int one = 1;
+>> > > +	const char little_endian = *(const char *)&one;
+>> > > +	int ruleset_fd;
+>> > > +
+>> > > +	ruleset_fd =
+>> > > +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>> > > +	ASSERT_LE(0, ruleset_fd);
+>> > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+>> > > +				       &bind_host_endian_p0, 0));
+>> > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+>> > > +				       &connect_big_endian_p0, 0));
+>> > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+>> > > +				       &bind_connect_host_endian_p1, 0));
+>> > > +	enforce_ruleset(_metadata, ruleset_fd);
+>> > > +
+>> > > +	/* No restriction for big endinan CPU. */
+>> > > +	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
+>> > > +
+>> > > +	/* No restriction for any CPU. */
+>> > > +	test_bind_and_connect(_metadata, &self->srv1, false, false);
+>> > > +}
+>> > > +
+>> > > +TEST_HARNESS_MAIN
+>> > .
+> .
 
