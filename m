@@ -1,111 +1,278 @@
-Return-Path: <netdev+bounces-28512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2303C77FA7C
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:15:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B8E77FA94
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1F61C21380
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:15:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEF7E1C2143E
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C9B154A4;
-	Thu, 17 Aug 2023 15:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3BD15486;
+	Thu, 17 Aug 2023 15:20:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8873A154A3
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 15:14:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31172D7E
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 08:14:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692285289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rMcUmL6AXhc8fjvYYEPQQR3T2MZJhmm7V1iY9JABclU=;
-	b=CqtVmSpIVCDc3X0vn8qeW2PX0JmY+QXIkpnjEcwOn3ovtJgCwK2Sj7M3l6n98eCUBnUUiY
-	GbNMBGsROuUj50R+bmdhlQ7LWc/3z2c68t0f4asmIYRr10QHF5TSBcwtQtAn3G6y6LGxfg
-	aUHFiksdMbv31A4u+qtXroB4sOfFYb8=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-tbDB-H3qORid67dZA04t0g-1; Thu, 17 Aug 2023 11:14:47 -0400
-X-MC-Unique: tbDB-H3qORid67dZA04t0g-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-589f7d66f22so47758617b3.3
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 08:14:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692285287; x=1692890087;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rMcUmL6AXhc8fjvYYEPQQR3T2MZJhmm7V1iY9JABclU=;
-        b=bEBqqWMRMB1sz+x/WCLATTWni4o0VrMVmjU1mDIMNz9IdPsIqqA1LMvkJ4VklyF4VE
-         w4i5TXL3gEEJR/85qFCUx2eztLM9xJuZdzZKIhsSIbOvNaDBdzFrNHOtEVag8THWjnZ3
-         aUjRAdoL6IBUcvnqODyTZ/LjqIbjKoUrET+sPQ1TU1uuDtXczBXKjLb56P5hYPxT/Sft
-         jdhQ74nTcVWD5+eZ1PAb1XGIMZANu06PaQGS49hiHbGxmKCNxGepp8+xanJyA6Ruo2AY
-         mVn0dT62y02sc2hs6rkvozeDIeVTcd6TApeTypj/CU38U7dq32rnPJh9bliLP19u2W2x
-         pgMw==
-X-Gm-Message-State: AOJu0YxFe8/Z63rMWjQRA/YeuSGezhHfIATyDNq4lDXsvHkALGWB7UNd
-	6XCRASbSgyDVju7u8Hf6iqDhmAmajNSXewjJtqnzGboPON6Fmu76TQff2IIIUPc8Ijl0RYRcU66
-	GHf8hO9P9kCE3+D3TaroSHRElCAUtJOPp
-X-Received: by 2002:a0d:e815:0:b0:583:d9de:8509 with SMTP id r21-20020a0de815000000b00583d9de8509mr5208739ywe.27.1692285286917;
-        Thu, 17 Aug 2023 08:14:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF6kNYiYSV9JRT0QmwiIjzWEUy91weshJK4xrpmANQe+cYDzBWzL6xtqQmHQZdAJ3FxjPQjPHtSEClWX7mtyo4=
-X-Received: by 2002:a0d:e815:0:b0:583:d9de:8509 with SMTP id
- r21-20020a0de815000000b00583d9de8509mr5208724ywe.27.1692285286693; Thu, 17
- Aug 2023 08:14:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C95914F65
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 15:20:13 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2045.outbound.protection.outlook.com [40.107.92.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE9B2724;
+	Thu, 17 Aug 2023 08:20:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U0KiH7C3b6RGGTUJElSSqL/l6QQI6LMUpNliftsZTh4iCd5x+W0f/1HcyQj7lAaHHcwpxBLOitHZ2M7NNrDwXDSA8LhQmpUM7J2aDlUxFq/HwW2hzhJmejbuj8KQQpUvJOFniGa/TvYwwGevnJomZK5TZYGL2mKWYnUHOEz2NDbO+Fxr7eMVs35H3L/IkEKLKMhQ0kjoPmrlQUxvxGkxRyJ5EPXorObmE9cVs5nGzrtp/2dbDnd7fAfk/DGe7eWOIo1IJPSmhRy1bQ2sFJwwof0sB/08b55qk0Qu2Ryaxq3ypOGAifvf1pRhykPRxo00k9lIhJsbZx3vjF3KwG/k+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mt/Xj65PR+YIPfDNvgLmk8G3xBlGhdtyCxeS78iYbpE=;
+ b=VUsBJLXOU9woZsEajgH1spawEQVf8SamWwstg8fX6jNxWPih7fnsx2miPV9YHyXWa7xQMPIaNV89C2JVqt4HsiAsVkTr8UGH5QRozcsAq6IqEuxdnC+1yVDcz5FxUNhRYukZjnsyyielxgBaOv7hzf2WxZ4SdvLqA9ajP9y+GXnGS0tJwAJmxOo1bL9YWSGuRrK7jCmYcpN6WCabQQEGTOoMr3GFfWo/zTRCYrI2rAdkgx/5VM2pqOAf5Bkyu7OW/AWONgjpalk1WrKhPQqDT39kGN1cbQCvymvwRX5jkhnVdWcTFufkpsO72sUUotFMM8+pvH0J5xhnzTaWZeQ4Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lists.linux-foundation.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mt/Xj65PR+YIPfDNvgLmk8G3xBlGhdtyCxeS78iYbpE=;
+ b=HdIxqAR+qRKUJlz7AEDtYNfDh+DMvsAoHMgBCssd++9Eo00gbMPEja3Hj50HoiekvuCChLqgySsLouc3Mw2AOZ4FS4vcOHUBU1bJM3tlgTVrocxvR7lTmPsVJLUOziLAIUGwqZAcM3S31l6GmEirAMeSOSA83dsFdeIhg7TP++csSNfzFh06G3GmFV0GvoaK0dwQB5Bp8s2SWdUSj6staCDSYzJeVUXjSBgch1JsH+sQ+MlzKk4XoLCiOXnZjslLtXuoH3drebPvSleiEuQCRXXflbHVxu8UF9RebP2ixFLxdUAkLj5EvzpCmXU80jnH9ggDL++eCpe+cOh8v1K0og==
+Received: from MW4PR04CA0061.namprd04.prod.outlook.com (2603:10b6:303:6b::6)
+ by DS0PR12MB6558.namprd12.prod.outlook.com (2603:10b6:8:d2::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Thu, 17 Aug
+ 2023 15:20:08 +0000
+Received: from CO1PEPF000042A9.namprd03.prod.outlook.com
+ (2603:10b6:303:6b:cafe::79) by MW4PR04CA0061.outlook.office365.com
+ (2603:10b6:303:6b::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.33 via Frontend
+ Transport; Thu, 17 Aug 2023 15:20:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000042A9.mail.protection.outlook.com (10.167.243.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.14 via Frontend Transport; Thu, 17 Aug 2023 15:20:07 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 17 Aug 2023
+ 08:19:45 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 17 Aug
+ 2023 08:19:45 -0700
+Received: from vdi.nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.986.37 via Frontend Transport; Thu, 17 Aug
+ 2023 08:19:43 -0700
+From: Feng Liu <feliu@nvidia.com>
+To: <virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S .
+ Miller" <davem@davemloft.net>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Simon Horman <horms@kernel.org>, "Bodong
+ Wang" <bodong@nvidia.com>, Feng Liu <feliu@nvidia.com>, Jiri Pirko
+	<jiri@nvidia.com>
+Subject: [PATCH net-next v2] virtio_net: Introduce skb_vnet_common_hdr to avoid typecasting
+Date: Thu, 17 Aug 2023 11:19:41 -0400
+Message-ID: <20230817151941.18692-1-feliu@nvidia.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230815194254.89570-1-donald.hunter@gmail.com>
- <20230815194254.89570-6-donald.hunter@gmail.com> <20230816082030.5c716f37@kernel.org>
-In-Reply-To: <20230816082030.5c716f37@kernel.org>
-From: Donald Hunter <donald.hunter@redhat.com>
-Date: Thu, 17 Aug 2023 16:14:35 +0100
-Message-ID: <CAAf2yc=C4N=QT6hpxmLi-uywc+MhuLdAsbfPRORv5ms9k1JAfQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 05/10] tools/net/ynl: Refactor
- decode_fixed_header into NlMsg
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, 
-	Stanislav Fomichev <sdf@google.com>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A9:EE_|DS0PR12MB6558:EE_
+X-MS-Office365-Filtering-Correlation-Id: a38757b1-86e9-4cb4-921b-08db9f357100
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2N4X2I3BADtDpGtKDzEjbqQSQ/HgyU991D0Vsnz7QBPCgtLQ3X6LSUoe2Rp1EzagTbbPy7wDxNZzryw7ueteGOXq1Mhqm0sEBL4vvHLlYxr6uv+xvEUkCioBLPLeC59QDfS4EUb3uTbTK7b4/1G2HfHOPw1mXvWIJFze774vtL6jO32HVka54MnUq/qUrzEBQ1YDMDY72Jf23rUI4Wp/Fzp8hh5F0NQAoGbSIUzmeucGsT8IHwn5ILU8aRhuysyYBlO7Z5a/w6tfdzmoFh7gka9LTO8ByVEiVoUS4H4jGXZrbO+gZA8YZlZVyjcr/9SGuW2aG/Ax2rvF3ZIq8IBPhgItBzC9Y3xFvgRssfhRi4hf9I3z4pfkvP34nOjaEWjj5ry8FlGKdBwuhKR7pAZLdWe+vgBwi5MhixyD590Rjvq9wfectFWRMN4QpE0x/P8WbnYEO0sGJVBIY2xH99ngSrp4uiyyFsBGE/05vzRF/t2aNWOKRWZ095uh0qLI0vB/3EupyPRw5zyoJmW2aenQYOGLUXQrPrnc/3QS1jwqiqZBfi4YkpcXsh8a+E4Hp9fYr6IHV4rjJFWJtgR4F0iVzMCHircxRHbISMAIopch4eeAbHtBkrn6Lzb9effbiEkSzFcfFyJEuvjdpLMT58+IYO58Hc1sogPTMWLolZVIZq0lxiKmex22NyPvU4Y07ULnHEOJZoxhdLt6oMTuqNyLPKFGSUx8cuLTz2izwku2tOeP+a4zeqNekT3D+LBZS+28
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(376002)(396003)(39860400002)(451199024)(186009)(1800799009)(82310400011)(46966006)(40470700004)(36840700001)(86362001)(36756003)(82740400003)(356005)(7636003)(40480700001)(478600001)(5660300002)(107886003)(2616005)(110136005)(70206006)(70586007)(316002)(26005)(7696005)(54906003)(1076003)(4326008)(8676002)(41300700001)(8936002)(40460700003)(47076005)(66899024)(336012)(36860700001)(7416002)(426003)(2906002)(83380400001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2023 15:20:07.9440
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a38757b1-86e9-4cb4-921b-08db9f357100
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042A9.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6558
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 16 Aug 2023 at 16:20, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue, 15 Aug 2023 20:42:49 +0100 Donald Hunter wrote:
-> > +    def __init__(self, nl_msg, ynl=None):
-> > +        self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
-> > +        nl_msg.raw = nl_msg.raw[4:]
->
-> It's a bit of a layering violation that we are futzing with the raw
-> member of NlMsg inside GenlMsg, no?
->
-> Should we add "fixed hdrs len" argument to NlMsg? Either directly or
-> pass ynl and let get the expected len from ynl? That way NlMsg can
-> split itself into hdr, userhdrs and attrs without GenlMsg "fixing it
-> up"?
+The virtio_net driver currently deals with different versions and types
+of virtio net headers, such as virtio_net_hdr_mrg_rxbuf,
+virtio_net_hdr_v1_hash, etc. Due to these variations, the code relies
+on multiple type casts to convert memory between different structures,
+potentially leading to bugs when there are changes in these structures.
 
-I agree, it breaks the layering. The issue is that GenlMsg gets created at
-some point after NlMsg, only when we know the nl_msg is suitable for
-decoding. The fixed header bit is quite well encapsulated in NlMsg,
-it's the genl header that needs pulled out and NlMsg shouldn't know
-anything about it. How about I add a take_bytes(length) method or a
-generic decode_subheader(format, length) method to NlMsg?
+Introduces the "struct skb_vnet_common_hdr" as a unifying header
+structure using a union. With this approach, various virtio net header
+structures can be converted by accessing different members of this
+structure, thus eliminating the need for type casting and reducing the
+risk of potential bugs.
+
+For example following code:
+static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+		struct receive_queue *rq,
+		struct page *page, unsigned int offset,
+		unsigned int len, unsigned int truesize,
+		unsigned int headroom)
+{
+[...]
+	struct virtio_net_hdr_mrg_rxbuf *hdr;
+[...]
+	hdr_len = vi->hdr_len;
+[...]
+ok:
+	hdr = skb_vnet_hdr(skb);
+	memcpy(hdr, hdr_p, hdr_len);
+[...]
+}
+
+When VIRTIO_NET_F_HASH_REPORT feature is enabled, hdr_len = 20
+But the sizeof(*hdr) is 12,
+memcpy(hdr, hdr_p, hdr_len); will copy 20 bytes to the hdr,
+which make a potential risk of bug. And this risk can be avoided by
+introducing struct virtio_net_hdr_mrg_rxbuf.
+
+Change log
+v1->v2
+feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+feedback from Simon Horman <horms@kernel.org>
+1. change to use net-next tree.
+2. move skb_vnet_common_hdr inside kernel file instead of the UAPI header.
+
+Signed-off-by: Feng Liu <feliu@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+---
+ drivers/net/virtio_net.c | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 1270c8d23463..03cf744de512 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -303,6 +303,13 @@ struct padded_vnet_hdr {
+ 	char padding[12];
+ };
+ 
++struct virtio_net_common_hdr {
++	union {
++		struct virtio_net_hdr_mrg_rxbuf	mrg_hdr;
++		struct virtio_net_hdr_v1_hash hash_v1_hdr;
++	};
++};
++
+ static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
+ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
+ 
+@@ -344,9 +351,10 @@ static int rxq2vq(int rxq)
+ 	return rxq * 2;
+ }
+ 
+-static inline struct virtio_net_hdr_mrg_rxbuf *skb_vnet_hdr(struct sk_buff *skb)
++static inline struct virtio_net_common_hdr *
++skb_vnet_common_hdr(struct sk_buff *skb)
+ {
+-	return (struct virtio_net_hdr_mrg_rxbuf *)skb->cb;
++	return (struct virtio_net_common_hdr *)skb->cb;
+ }
+ 
+ /*
+@@ -469,7 +477,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+ 				   unsigned int headroom)
+ {
+ 	struct sk_buff *skb;
+-	struct virtio_net_hdr_mrg_rxbuf *hdr;
++	struct virtio_net_common_hdr *hdr;
+ 	unsigned int copy, hdr_len, hdr_padded_len;
+ 	struct page *page_to_free = NULL;
+ 	int tailroom, shinfo_size;
+@@ -554,7 +562,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+ 		give_pages(rq, page);
+ 
+ ok:
+-	hdr = skb_vnet_hdr(skb);
++	hdr = skb_vnet_common_hdr(skb);
+ 	memcpy(hdr, hdr_p, hdr_len);
+ 	if (page_to_free)
+ 		put_page(page_to_free);
+@@ -966,7 +974,7 @@ static struct sk_buff *receive_small_build_skb(struct virtnet_info *vi,
+ 		return NULL;
+ 
+ 	buf += header_offset;
+-	memcpy(skb_vnet_hdr(skb), buf, vi->hdr_len);
++	memcpy(skb_vnet_common_hdr(skb), buf, vi->hdr_len);
+ 
+ 	return skb;
+ }
+@@ -1577,7 +1585,8 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+ {
+ 	struct net_device *dev = vi->dev;
+ 	struct sk_buff *skb;
+-	struct virtio_net_hdr_mrg_rxbuf *hdr;
++	struct virtio_net_common_hdr *common_hdr;
++	struct virtio_net_hdr_mrg_rxbuf	*mrg_hdr;
+ 
+ 	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+ 		pr_debug("%s: short packet %i\n", dev->name, len);
+@@ -1597,18 +1606,19 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+ 	if (unlikely(!skb))
+ 		return;
+ 
+-	hdr = skb_vnet_hdr(skb);
++	common_hdr = skb_vnet_common_hdr(skb);
+ 	if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
+-		virtio_skb_set_hash((const struct virtio_net_hdr_v1_hash *)hdr, skb);
++		virtio_skb_set_hash(&common_hdr->hash_v1_hdr, skb);
+ 
+-	if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
++	mrg_hdr = &common_hdr->mrg_hdr;
++	if (mrg_hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 
+-	if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
++	if (virtio_net_hdr_to_skb(skb, &mrg_hdr->hdr,
+ 				  virtio_is_little_endian(vi->vdev))) {
+ 		net_warn_ratelimited("%s: bad gso: type: %u, size: %u\n",
+-				     dev->name, hdr->hdr.gso_type,
+-				     hdr->hdr.gso_size);
++				     dev->name, mrg_hdr->hdr.gso_type,
++				     mrg_hdr->hdr.gso_size);
+ 		goto frame_err;
+ 	}
+ 
+@@ -2105,7 +2115,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
+ 	if (can_push)
+ 		hdr = (struct virtio_net_hdr_mrg_rxbuf *)(skb->data - hdr_len);
+ 	else
+-		hdr = skb_vnet_hdr(skb);
++		hdr = &skb_vnet_common_hdr(skb)->mrg_hdr;
+ 
+ 	if (virtio_net_hdr_from_skb(skb, &hdr->hdr,
+ 				    virtio_is_little_endian(vi->vdev), false,
+-- 
+2.37.1 (Apple Git-137.1)
 
 
