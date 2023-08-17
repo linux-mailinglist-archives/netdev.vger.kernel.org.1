@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-28606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B66377FFC7
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:24:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62B7F77FFCF
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:24:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC2AF1C214F0
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:24:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 940441C214F4
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26CF31B7C7;
-	Thu, 17 Aug 2023 21:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D101B7ED;
+	Thu, 17 Aug 2023 21:23:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C281ADDE
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:23:45 +0000 (UTC)
-Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035EC198C
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:23:35 -0700 (PDT)
-Received: from eig-obgw-5004a.ext.cloudfilter.net ([10.0.29.221])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF391ADDE
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:23:50 +0000 (UTC)
+Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3233E56
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:23:44 -0700 (PDT)
+Received: from eig-obgw-6009a.ext.cloudfilter.net ([10.0.30.184])
 	by cmsmtp with ESMTP
-	id WjxEqmvtyez0CWkSfq4zjE; Thu, 17 Aug 2023 21:23:21 +0000
+	id WgHsqdAJxEoVsWkT2qAWfk; Thu, 17 Aug 2023 21:23:44 +0000
 Received: from gator4166.hostgator.com ([108.167.133.22])
 	by cmsmtp with ESMTPS
-	id WkSsqbxYmD5qiWkSsqX2jB; Thu, 17 Aug 2023 21:23:35 +0000
-X-Authority-Analysis: v=2.4 cv=dMe1JcVb c=1 sm=1 tr=0 ts=64de8fd7
+	id WkT1qRV0F9DJVWkT2qIIxM; Thu, 17 Aug 2023 21:23:44 +0000
+X-Authority-Analysis: v=2.4 cv=UaxC9YeN c=1 sm=1 tr=0 ts=64de8fe0
  a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=WzbPXH4gqzPVN0x6HrNMNA==:17
  a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
  a=IkcTkHD0fZMA:10 a=UttIx32zK-AA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
@@ -41,20 +41,20 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lT3feiVIpeNet918Ell0Rq1r93eWPu5j+HiAoKEVFCI=; b=ZnFvo0kH3g/zYMBV+pe/GUWJJh
-	g69NFHO3tC89luq4eNxnJP8R02MSCWYFLLAA27vaqElCGjFeEBSW0TPwR45eQAq9ERWOspC3uNjqD
-	9gzvIkrdr5goFP+Vda4W3p47QP80KxptBhXHuO+/6zIrtuLxW9944dR1kCaoqpYO7jnIBbGWXevya
-	RTN8TIU3gPQyyq3B0NfQTfL29j//AXDevgiKnnNV54zBguu6tzYjrlaT8vvCKWLP8XGRlX8FB9CA3
-	Qdclt9XjIQ99IIWaKw3/hWg3L9LHjIf2VSctqUat9+Hop3S51PkZ8DqJdQ712OullIeIkTqgD74am
-	CmX6aktA==;
-Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:32884 helo=[192.168.15.8])
+	bh=S6whqa+M23G5ApcMat6ySVUsYfZB0XAvFOmn2QGSBl4=; b=afD8QmYGaFohyrASnjI26m4N4g
+	6k5Uo+rNYwEnWFw2Zh/aJ+MYy9cKtZXIwGPYHQ0GNi6vLPaFhNREXPNN6ZopzJamd0WDz/nnd5qFu
+	WtO0d1CNFBWOuQucAR4Ogna4aWSV4Hbgxb73wYJdPdxJM8B0o86EeryEtAWdXJD59woZLt4iPVCX6
+	0ZrscN73h0jwepWAQtvP1z6VeYJ9d9VQJki/9r/esZB97B4k77zH5oWDOmEMKKvJ0+nalsmp1FBrE
+	rNgKGXG8jUhTaQHU1+hU9p84Dr0dZ97gX8i/Y3q/SlOlNzDbb+WnvBFjAyI/bmgaLTeEvIn2QyS+t
+	01G7tM4A==;
+Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:59978 helo=[192.168.15.8])
 	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.96)
 	(envelope-from <gustavo@embeddedor.com>)
-	id 1qWkSr-001lTl-1O;
-	Thu, 17 Aug 2023 16:23:33 -0500
-Message-ID: <6a6fff5b-f060-2d31-976d-9eea491bffae@embeddedor.com>
-Date: Thu, 17 Aug 2023 15:24:35 -0600
+	id 1qWkT0-001ldl-27;
+	Thu, 17 Aug 2023 16:23:42 -0500
+Message-ID: <c691293e-4753-2a64-3a71-9ba3f4ff97e7@embeddedor.com>
+Date: Thu, 17 Aug 2023 15:24:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH 6/7] wifi: cfg80211: Annotate struct cfg80211_scan_request
+Subject: Re: [PATCH 7/7] wifi: cfg80211: Annotate struct cfg80211_tid_config
  with __counted_by
 Content-Language: en-US
 To: Kees Cook <keescook@chromium.org>,
@@ -76,9 +76,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
  linux-hardening@vger.kernel.org
 References: <20230817211114.never.208-kees@kernel.org>
- <20230817211531.4193219-6-keescook@chromium.org>
+ <20230817211531.4193219-7-keescook@chromium.org>
 From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20230817211531.4193219-6-keescook@chromium.org>
+In-Reply-To: <20230817211531.4193219-7-keescook@chromium.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
@@ -89,22 +89,22 @@ X-AntiAbuse: Sender Address Domain - embeddedor.com
 X-BWhitelist: no
 X-Source-IP: 187.162.21.192
 X-Source-L: No
-X-Exim-ID: 1qWkSr-001lTl-1O
+X-Exim-ID: 1qWkT0-001ldl-27
 X-Source: 
 X-Source-Args: 
 X-Source-Dir: 
-X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.8]) [187.162.21.192]:32884
+X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.8]) [187.162.21.192]:59978
 X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 124
+X-Email-Count: 138
 X-Org: HG=hgshared;ORG=hostgator;
 X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
 X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfM4Vvv4Wyr9jp9SdE0+S8RShVcRM4Bm7GXHYTdc2SdiyVpTmzr6IJ+vYRK4W+zdVJxltbPuiJ/RiDy6dv4GrU4Oeguj4Sve2d/ufFQKSLia10JgVGm0C
- 9vGk4zGxnwGisOno/3SV1+CjXqjLsmdGYHi2QNhUiQHQ+BS6RjFj07KPbqJz7SMMB6PBbKv3kEBRht7EDDf7uC8hdbj9+pGfT7s=
+X-CMAE-Envelope: MS4xfC+VKCimgrfxLRzCIvXt+2V0CCQ7n7gZgllK4WgsdBHManG/JAME6SwAM5TLLGyYIU7dOZeo57P2QQl0tia5y13rCPjtZdjmdjevU+2XF11s7duCdfns
+ n7jnSQk3VlT1bTVq78xWHA6dd6cGXkOGkdVT/6sPCCAuDq4AoM50jhIGh5LD8eLn8dVBZ8CgGM9Z83i7EAJNKoJ2bsFmY8Ps/LM=
 X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -117,9 +117,7 @@ On 8/17/23 15:15, Kees Cook wrote:
 > (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
 > functions).
 > 
-> As found with Coccinelle[1], add __counted_by for struct cfg80211_scan_request.
-> Additionally, since the element count member must be set before accessing
-> the annotated flexible array member, move its initialization earlier.
+> As found with Coccinelle[1], add __counted_by for struct cfg80211_tid_config.
 > 
 > [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
 > 
@@ -143,16 +141,16 @@ Gustavo
 >   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-> index 6efe216c01d2..a2afc94a5408 100644
+> index a2afc94a5408..423fe9b85cb0 100644
 > --- a/include/net/cfg80211.h
 > +++ b/include/net/cfg80211.h
-> @@ -2544,7 +2544,7 @@ struct cfg80211_scan_request {
->   	struct cfg80211_scan_6ghz_params *scan_6ghz_params;
->   
->   	/* keep last */
-> -	struct ieee80211_channel *channels[];
-> +	struct ieee80211_channel *channels[] __counted_by(n_channels);
+> @@ -811,7 +811,7 @@ struct cfg80211_tid_cfg {
+>   struct cfg80211_tid_config {
+>   	const u8 *peer;
+>   	u32 n_tid_conf;
+> -	struct cfg80211_tid_cfg tid_conf[];
+> +	struct cfg80211_tid_cfg tid_conf[] __counted_by(n_tid_conf);
 >   };
 >   
->   static inline void get_random_mask_addr(u8 *buf, const u8 *addr, const u8 *mask)
+>   /**
 
