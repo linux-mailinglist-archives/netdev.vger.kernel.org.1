@@ -1,104 +1,77 @@
-Return-Path: <netdev+bounces-28327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B773D77F119
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:19:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F22477F11A
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3821281CEB
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 07:19:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A571C2109B
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 07:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBE01FD2;
-	Thu, 17 Aug 2023 07:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82EB1FD6;
+	Thu, 17 Aug 2023 07:20:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B061C2F
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:19:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2426FC433C7;
-	Thu, 17 Aug 2023 07:19:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692256767;
-	bh=5AF+khJ/zO9MH/Zd0dHfg08/t7h8ETv+nNrgkrDMhXU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PW8Ey1/jojir8VRvWZm/aj9UPZ9yigPLejXepqYwikFpuM1PMMBPlvxx7x0KNHLFD
-	 NUb6jDE52lRe1hEqmOwG052FdjAmvzm6ozOo9EkTXph4SOlulrdN78fbqrQ9eGJEiJ
-	 12PFRvEmpQgUFuq9BBc2TWPrAdtwi3o8AY1xGs8csYfAF9BoBfYTa8HHzGi7Kwc+aN
-	 A6NLYyNjXheVzWEHjwXWHSySklbZ7buBGLgx5ySjtm/CtSzmEnGutW9++DYRyoHqmE
-	 77XlE0ZuLqRtai6hqz1g9hJzXDRNe50ESRT4YpE4ZvGjuEmZOK5SQDzIaflcG4gNzo
-	 vmzpR37IqQ0Fg==
-Date: Thu, 17 Aug 2023 10:19:23 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: netdev@vger.kernel.org,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: Re: [PATCH -next] net: broadcom: Use helper function IS_ERR_OR_NULL()
-Message-ID: <20230817071923.GB22185@unreal>
-References: <20230816095357.2896080-1-ruanjinjie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC866138A
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:20:20 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021A1FE
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 00:20:19 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRGYs3g7PzVkkh;
+	Thu, 17 Aug 2023 15:18:09 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 17 Aug
+ 2023 15:20:15 +0800
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<alexandre.torgue@foss.st.com>, <joabreu@synopsys.com>,
+	<mcoquelin.stm32@gmail.com>, <horatiu.vultur@microchip.com>,
+	<simon.horman@corigine.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH net-next 0/2] net: Use helper function IS_ERR_OR_NULL()
+Date: Thu, 17 Aug 2023 15:19:39 +0800
+Message-ID: <20230817071941.346590-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230816095357.2896080-1-ruanjinjie@huawei.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 05:53:56PM +0800, Ruan Jinjie wrote:
-> Use IS_ERR_OR_NULL() instead of open-coding it
-> to simplify the code.
-> 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
-> ---
->  drivers/net/ethernet/broadcom/bgmac.c        | 2 +-
->  drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
-> index 10c7c232cc4e..4cd7c6abb548 100644
-> --- a/drivers/net/ethernet/broadcom/bgmac.c
-> +++ b/drivers/net/ethernet/broadcom/bgmac.c
-> @@ -1448,7 +1448,7 @@ int bgmac_phy_connect_direct(struct bgmac *bgmac)
->  	int err;
->  
->  	phy_dev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
+Use IS_ERR_OR_NULL() instead of open-coding it
+to simplify the code.
 
-When can fixed_phy_register() return NULL?
-It looks like it returns or valid phy_dev or ERR_PTR().
+Ruan Jinjie (2):
+  net: microchip: sparx5: Use helper function IS_ERR_OR_NULL()
+  net: stmmac: Use helper function IS_ERR_OR_NULL()
 
-Thanks
+ drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+-- 
+2.34.1
 
-> -	if (!phy_dev || IS_ERR(phy_dev)) {
-> +	if (IS_ERR_OR_NULL(phy_dev)) {
->  		dev_err(bgmac->dev, "Failed to register fixed PHY device\n");
->  		return -ENODEV;
->  	}
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-> index 0092e46c46f8..aa9a436fb3ce 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-> @@ -617,7 +617,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
->  		};
->  
->  		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
-> -		if (!phydev || IS_ERR(phydev)) {
-> +		if (IS_ERR_OR_NULL(phydev)) {
->  			dev_err(kdev, "failed to register fixed PHY device\n");
->  			return -ENODEV;
->  		}
-> -- 
-> 2.34.1
-> 
-> 
 
