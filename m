@@ -1,89 +1,69 @@
-Return-Path: <netdev+bounces-28295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662BB77EF07
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 04:24:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 071F477EF15
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 04:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3A02281CDC
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 02:24:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C76671C21185
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 02:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9842397;
-	Thu, 17 Aug 2023 02:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787A4397;
+	Thu, 17 Aug 2023 02:29:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABC8379
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:24:52 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 541E0269F
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 19:24:51 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RR7zC5PgdztRsj;
-	Thu, 17 Aug 2023 10:21:11 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
- (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 17 Aug
- 2023 10:24:48 +0800
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-To: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v2] net: dm9051: Use PTR_ERR_OR_ZERO() to simplify code
-Date: Thu, 17 Aug 2023 10:24:18 +0800
-Message-ID: <20230817022418.3588831-1-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69167379
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:29:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15A01C433C8;
+	Thu, 17 Aug 2023 02:29:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692239356;
+	bh=MU/nBpIEM5zOGcfZKwamin6GRaWleLDz+5CUYP7mSGM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cdurCLhpKtLZoGwX5GMSknQNngnVJ4b4ptD7EFr1+Xgz7zMAOHe2YuDntOfSrC9KZ
+	 1nn5pnmFHbo0avtQ11QOUmjdsSxcSOUcq+fuwx9ssjl3A7WguUaGDnorq72qgfsgHn
+	 2aTge8LuuIB+MuFA7huLjIp42NWDSoNX0ti/P4YTuGhAUJoqYDiTU/DEwQb0Vs/BYx
+	 fNr+iJVDDoVn9PojuQ5qwAdn1BtjoJjI8rurqM0DapRW53HY5mh5CPx00z+gEiB5P2
+	 3hJbdZrVgyZe8gPQHIXXBdLIvMJ5lioto+WjgrUTR/2CAPkiU1a5dyhVJaZbwBKND4
+	 BtEOaYNWycZlw==
+Date: Wed, 16 Aug 2023 19:29:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, linux-rdma@vger.kernel.org, Maor Gottlieb
+ <maorg@nvidia.com>, Mark Zhang <markzhang@nvidia.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [GIT PULL] Please pull mlx5 MACsec RoCEv2 support
+Message-ID: <20230816192915.7286828c@kernel.org>
+In-Reply-To: <ZN1N6WOpHUkhQspA@x130>
+References: <20230813064703.574082-1-leon@kernel.org>
+	<ZN1N6WOpHUkhQspA@x130>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Return PTR_ERR_OR_ZERO() instead of return 0 or PTR_ERR() to
-simplify code.
+On Wed, 16 Aug 2023 15:30:01 -0700 Saeed Mahameed wrote:
+> Are you planing to pull this into net-next? 
+> 
+> There's a very minor conflict as described below and I a would like to
+> avoid this on merge window.
 
-Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
----
-v2:
-- Update the subject prefix.
----
- drivers/net/ethernet/davicom/dm9051.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/davicom/dm9051.c b/drivers/net/ethernet/davicom/dm9051.c
-index 70728b2e5f18..2caaf1e9f42f 100644
---- a/drivers/net/ethernet/davicom/dm9051.c
-+++ b/drivers/net/ethernet/davicom/dm9051.c
-@@ -510,10 +510,7 @@ static int dm9051_map_init(struct spi_device *spi, struct board_info *db)
- 
- 	regconfigdmbulk.lock_arg = db;
- 	db->regmap_dmbulk = devm_regmap_init_spi(db->spidev, &regconfigdmbulk);
--	if (IS_ERR(db->regmap_dmbulk))
--		return PTR_ERR(db->regmap_dmbulk);
--
--	return 0;
-+	return PTR_ERR_OR_ZERO(db->regmap_dmbulk);
- }
- 
- static int dm9051_map_chipid(struct board_info *db)
--- 
-2.34.1
-
+I'm not planning not to pull it.
+It's just a matter of trying to work down the queue from the highest
+priority stuff. I have to limit the time I spent on ML & patch mgmt,
+because it can easily consume 24h a day. And then stuff that's not 
+the highest priority gets stuck for a little longer than it would 
+in an ideal world :(
 
