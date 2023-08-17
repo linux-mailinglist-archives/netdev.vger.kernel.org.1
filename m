@@ -1,342 +1,142 @@
-Return-Path: <netdev+bounces-28463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 013A477F829
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:58:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 307F577F833
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:59:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247721C2137D
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CF21C21380
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE24314A88;
-	Thu, 17 Aug 2023 13:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C81914A8B;
+	Thu, 17 Aug 2023 13:59:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABED11427B
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:57:56 +0000 (UTC)
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492ED2724
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:57:54 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4ff8f2630e3so3344968e87.1
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:57:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692280672; x=1692885472;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uvmSOUXpiz1hQHD3uDcTEd6SliWuMzO8rXci/gNt+SY=;
-        b=tO6ZWF9yYsK+Cm9Udt+XOPR9kUg+lGGV0vZX7iIdLVIzegbSsprB2knqWZI55akNAX
-         0nC2jfoVk9NwYJk1Tqd03M5/yqehTtrSvkey/HYTvL/YCl6UhFnP0CM3xdJRKDKhbKVy
-         DjveF++3aRliqCNoCU85M8YIULhUiolUhLjderHghZcErC+FAgw2GNm6U+RojHvgeZPC
-         1eGgNSysCiEedxXF6s4koG/2JAGVVdVhINXfX0X9oGy1fJ0V8i6KjRJ8w57YZIQdlwCJ
-         G9PxZ5GTfdbvHOLmdCUZcTIkYv1i4ujwFWVjNCq3F2fc3k2Ocxji1l2Pkq53vPI7eMMt
-         53yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692280672; x=1692885472;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uvmSOUXpiz1hQHD3uDcTEd6SliWuMzO8rXci/gNt+SY=;
-        b=iQoAPEmRE/8xe9fVhT3CyJ7Z0XJ7pBEtfQJHdB/1ckUOqi3jCyD/deCwDKC7HKlWk2
-         QPJRBc31qVgsjxjW15++nu9eQIrbqZVG9B6sgmeeSCJB6d8u9U332kLgYLvwQhVp0Qzx
-         lFR3ruPrCuVfhMvgBi5M+nYA3I3vntfs0G7nIpnrJusqBa5NC6d1WLacdeDQuc+508y6
-         qJgDirTbg1JxI5iipgcGIcJ9t5+crtlPgPpRmULwRIJtT/nFfRLQ0EibqNoOdNQdDj2X
-         35z5sBhSsUcdVO7896+xPPdZGGKBHXNoWYc21uYKF8gedJHb6xVXIkWUrJOeh0PzqOwl
-         dD5A==
-X-Gm-Message-State: AOJu0YwuCEO0hh4ApWmSWEha36EMh0dJrAcI+bHKytsB8VPs9+OAnS7N
-	zvD6HLoyK4iIsO7/1gtlAnPRrA22TusxUbWVUNKZeg==
-X-Google-Smtp-Source: AGHT+IFWaMBxjD3lLr1Zkgp3SmT+ftoMpsi6tHM21HM2rYD440CJR9DxKB3j9JAPM0X53iqvZzH1LKraNa1Gmuqk23M=
-X-Received: by 2002:a05:6512:3b8d:b0:4f9:54f0:b6db with SMTP id
- g13-20020a0565123b8d00b004f954f0b6dbmr5138266lfv.13.1692280672390; Thu, 17
- Aug 2023 06:57:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9FD1428D
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:59:18 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D51B2D5A
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:59:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PIBJCciP2eaGQSy+AiLDdm2AfFc5m/7SGDn5yN1if7ZEqrCYQDs3A9NoCcVxLZIEUk3UzRJXLcvPGpOjL808g1Tr1bH4jR8Rx645IbLacPSIERHx2xvxAo29jT2kC629h8o1In/cL7DuAU2TcNkm9iA1mzGdZw1LmMX98TV/92EnPvDgfh7bgYkJNXd1pQo6op9RAsjWNc9lGjhZwod0TTAd76Xabvpf6GACz6lOG9TZXvkic+4G5BP8P+jRQ99Vz3HRPnFhb13vRH6gaUCJ/eslULHAIkMXeLLw7G96zg6zcQo+eOsPKKTm1v0Z/gqOIJ0NZIZOC20T7uHpAWCfhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=124aZ+PgR4MiHGR6mcp0Jp3w35nt8rrRMMJnaqQPyH0=;
+ b=D26+wYzCKcsFveaR+rLZnhiO+4WQ43HUdweQaJtAsBshF4rcnzlpJtAvJ7/IfE4iZpshA+6z1yi51rtux5e6SP1KasNa9U3+Lgn2l88UjrOsVVlzumBbd7F6GGXQMxzvfM/mJdWbooBv0uC+nb70y767XlxQeQ5dV7+EJVKD5HF5CdVNsmqHrY+ninDy+NyxYiLLF+MIjoi4Gh6wOzYvuHJ8Bv1UqgkIfh6je2hRo7luEfwddR/RREn6N0enEN3K8PPxAsxmvtES07PvAZ4huqMETFKVZHYFPfdD6iI77sHWqccFov4pR53+vco/mJL+ryW4XdAJZ2fzFrDRnrBjlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=124aZ+PgR4MiHGR6mcp0Jp3w35nt8rrRMMJnaqQPyH0=;
+ b=ptgzrwPKJeAPeBpyWzUQ64svhXeSh6QTvxBn8sLuAJXSHEX0lLojBZ2dRIxUGSlv6Vbb2IXfaBsywBkwJ58c/YheMkP2146P/EEss7OrI+5SllpVGAiGhacuUcVaPRqcle/Tc+mV1kNjPct3TVs5oKlUdzPQmoLFK25GiqLqoMz/BKZ3g84rYLQpV6OsqHTu8wp/6GNUZz4XFrpybxbxeu8SUMxSdGxjGODTAsxFCMKonAZ2Qb5WhIxy7YtvudXcXqrhfUYT/tkQa3o3Lhw3Nl9wUrm6H4yJm6BQQ6pAKnPyTSpY12x2hVYNtq3Gz9a8a0M+cAnOmTSIgdQOMyPPXg==
+Received: from MW4P220CA0006.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::11)
+ by CY8PR12MB7364.namprd12.prod.outlook.com (2603:10b6:930:50::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Thu, 17 Aug
+ 2023 13:59:15 +0000
+Received: from MWH0EPF000971E9.namprd02.prod.outlook.com
+ (2603:10b6:303:115:cafe::74) by MW4P220CA0006.outlook.office365.com
+ (2603:10b6:303:115::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.17 via Frontend
+ Transport; Thu, 17 Aug 2023 13:59:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MWH0EPF000971E9.mail.protection.outlook.com (10.167.243.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.14 via Frontend Transport; Thu, 17 Aug 2023 13:59:14 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 17 Aug 2023
+ 06:59:03 -0700
+Received: from localhost.localdomain (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 17 Aug
+ 2023 06:59:00 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
+ Cohen" <amcohen@nvidia.com>, Danielle Ratson <danieller@nvidia.com>,
+	<mlxsw@nvidia.com>
+Subject: [PATCH net 0/4] mlxsw: Fixes for Spectrum-4
+Date: Thu, 17 Aug 2023 15:58:21 +0200
+Message-ID: <cover.1692268427.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816100113.41034-1-linyunsheng@huawei.com> <20230816100113.41034-2-linyunsheng@huawei.com>
-In-Reply-To: <20230816100113.41034-2-linyunsheng@huawei.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Thu, 17 Aug 2023 16:57:16 +0300
-Message-ID: <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, 
-	Liang Chen <liangchen.linux@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.37]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000971E9:EE_|CY8PR12MB7364:EE_
+X-MS-Office365-Filtering-Correlation-Id: faf4978b-fa44-4a95-7b97-08db9f2a2401
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	RObv57QH4vgOzwZ44+tHEIkEL2e8YwOTKexW3CWeAsn2WQU9NuyzZKoFuoMUCPLi9l5zkdQaKPWGaC0ErqN1Y7CrZWUMBF+0TuhgUNOchccuF/0nGorULlXVrvK3Xtc/zAN6aHsfmlrytdBs5Nfcf+pnI1YByWh5ftVOCt0g157vL3zxpmi+j3FuOqvkXqN39aDWB9IETnzWK2Aig7jHtXKu4jAhB10NF3yO8wOw/oCarqQ8YPVWsQn0N8Kfyx40QoyGnMoqfVq8O8qa7iXYlzBEM1OMbBjHbufKLbS+uLbOBPOMaHkuSPA0ooMEE1najxMeHGyYMGmKmIsMzKSpOTH1yKu77YnrlcdBVymztft5h2tzDT/fo8phYPi001uv8BhW3HsmvFArXXMOi8ZF6eyJnCg7AyhSzNgR+LcDfoc350diBDykZYX8JOeP/7oZZeq3mUxGXZ961crEGwKUUi0vaiPFYa430IDhg/BfQz+tu0v6TF3HwKmzaMbxYjpR7pa6emkWLLkr4eeSamJen34Kn0798drqFHxP6wClmYShXpO3uutshSX5kF2c+Uu79W+0NNDd5aPSI7gdcmEBlWT0B1VDgH+71CdQ6PAWR0/DtbVp1KZXjJJKpaS9kYXK25WUKnO7AjsKMjxAV/PqzNHzBcJWLJIkiewh1oXtsexjMZA2F5WN9Oh4DdFvaZ7zCOppGOD1sQdAwv+lCo/95LlnVBaQHBMmGheFLOZQWcXe2yeCXC/ZG3Be71YSYV0D
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(346002)(39860400002)(396003)(186009)(451199024)(82310400011)(1800799009)(36840700001)(40470700004)(46966006)(36756003)(86362001)(83380400001)(40460700003)(40480700001)(8936002)(5660300002)(8676002)(4326008)(4744005)(2906002)(41300700001)(26005)(336012)(16526019)(6666004)(2616005)(107886003)(47076005)(66574015)(36860700001)(426003)(478600001)(7636003)(82740400003)(356005)(54906003)(316002)(70206006)(110136005)(70586007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2023 13:59:14.3639
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: faf4978b-fa44-4a95-7b97-08db9f2a2401
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000971E9.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7364
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Yunsheng,
+This patchset contains an assortment of fixes for mlxsw Spectrum-4 support.
 
-On Wed, 16 Aug 2023 at 13:04, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->
-> Currently page_pool_alloc_frag() is not supported in 32-bit
-> arch with 64-bit DMA because of the overlap issue between
-> pp_frag_count and dma_addr_upper in 'struct page' for those
-> arches, which seems to be quite common, see [1], which means
-> driver may need to handle it when using frag API.
->
-> In order to simplify the driver's work when using frag API
-> this patch allows page_pool_alloc_frag() to call
-> page_pool_alloc_pages() to return pages for those arches.
->
-> Add a PP_FLAG_PAGE_SPLIT_IN_DRIVER flag in order to fail the
-> page_pool creation for 32-bit arch with 64-bit DMA when driver
-> tries to do the page splitting itself.
+Amit Cohen (1):
+  mlxsw: Fix the size of 'VIRT_ROUTER_MSB'
 
-Why should we care about this?  Even an architecture that's 32-bit and
-has a 64bit DMA should be allowed to split the pages internally if it
-decides to do so.  The trick that drivers usually do is elevate the
-page refcnt and deal with that internally.
+Danielle Ratson (1):
+  mlxsw: pci: Set time stamp fields also when its type is MIRROR_UTC
 
-Thanks
-/Ilias
->
-> Note that it may aggravate truesize underestimate problem for
-> skb as there is no page splitting for those pages, if driver
-> need a accurate truesize, it may calculate that according to
-> frag size, page order and PAGE_POOL_DMA_USE_PP_FRAG_COUNT
-> being true or not. And we may provide a helper for that if it
-> turns out to be helpful.
->
-> 1. https://lore.kernel.org/all/20211117075652.58299-1-linyunsheng@huawei.com/
->
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> CC: Lorenzo Bianconi <lorenzo@kernel.org>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Liang Chen <liangchen.linux@gmail.com>
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/en_main.c |  3 +-
->  include/net/page_pool/helpers.h               | 38 +++++++++++++++--
->  include/net/page_pool/types.h                 | 42 ++++++++++++-------
->  net/core/page_pool.c                          | 15 +++----
->  4 files changed, 68 insertions(+), 30 deletions(-)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index bc9d5a5bea01..ec9c5a8cbda6 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -834,7 +834,8 @@ static int mlx5e_alloc_rq(struct mlx5e_params *params,
->                 struct page_pool_params pp_params = { 0 };
->
->                 pp_params.order     = 0;
-> -               pp_params.flags     = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV | PP_FLAG_PAGE_FRAG;
-> +               pp_params.flags     = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV |
-> +                                       PP_FLAG_PAGE_SPLIT_IN_DRIVER;
->                 pp_params.pool_size = pool_size;
->                 pp_params.nid       = node;
->                 pp_params.dev       = rq->pdev;
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index 94231533a369..cb18de55f239 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -29,8 +29,12 @@
->  #ifndef _NET_PAGE_POOL_HELPERS_H
->  #define _NET_PAGE_POOL_HELPERS_H
->
-> +#include <linux/dma-mapping.h>
->  #include <net/page_pool/types.h>
->
-> +#define PAGE_POOL_DMA_USE_PP_FRAG_COUNT        \
-> +               (sizeof(dma_addr_t) > sizeof(unsigned long))
-> +
->  #ifdef CONFIG_PAGE_POOL_STATS
->  int page_pool_ethtool_stats_get_count(void);
->  u8 *page_pool_ethtool_stats_get_strings(u8 *data);
-> @@ -73,6 +77,29 @@ static inline struct page *page_pool_dev_alloc_pages(struct page_pool *pool)
->         return page_pool_alloc_pages(pool, gfp);
->  }
->
-> +static inline struct page *page_pool_alloc_frag(struct page_pool *pool,
-> +                                               unsigned int *offset,
-> +                                               unsigned int size, gfp_t gfp)
-> +{
-> +       unsigned int max_size = PAGE_SIZE << pool->p.order;
-> +
-> +       size = ALIGN(size, dma_get_cache_alignment());
-> +
-> +       if (WARN_ON(size > max_size))
-> +               return NULL;
-> +
-> +       /* Don't allow page splitting and allocate one big frag
-> +        * for 32-bit arch with 64-bit DMA, corresponding to
-> +        * the checking in page_pool_is_last_frag().
-> +        */
-> +       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT) {
-> +               *offset = 0;
-> +               return page_pool_alloc_pages(pool, gfp);
-> +       }
-> +
-> +       return __page_pool_alloc_frag(pool, offset, size, gfp);
-> +}
-> +
->  static inline struct page *page_pool_dev_alloc_frag(struct page_pool *pool,
->                                                     unsigned int *offset,
->                                                     unsigned int size)
-> @@ -134,8 +161,14 @@ static inline long page_pool_defrag_page(struct page *page, long nr)
->  static inline bool page_pool_is_last_frag(struct page_pool *pool,
->                                           struct page *page)
->  {
-> -       /* If fragments aren't enabled or count is 0 we were the last user */
-> +       /* We assume we are the last frag user that is still holding
-> +        * on to the page if:
-> +        * 1. Fragments aren't enabled.
-> +        * 2. We are running in 32-bit arch with 64-bit DMA.
-> +        * 3. page_pool_defrag_page() indicate we are the last user.
-> +        */
->         return !(pool->p.flags & PP_FLAG_PAGE_FRAG) ||
-> +              PAGE_POOL_DMA_USE_PP_FRAG_COUNT ||
->                (page_pool_defrag_page(page, 1) == 0);
->  }
->
-> @@ -197,9 +230,6 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
->         page_pool_put_full_page(pool, page, true);
->  }
->
-> -#define PAGE_POOL_DMA_USE_PP_FRAG_COUNT        \
-> -               (sizeof(dma_addr_t) > sizeof(unsigned long))
-> -
->  /**
->   * page_pool_get_dma_addr() - Retrieve the stored DMA address.
->   * @page:      page allocated from a page pool
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index 887e7946a597..079337c42aa6 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -6,21 +6,29 @@
->  #include <linux/dma-direction.h>
->  #include <linux/ptr_ring.h>
->
-> -#define PP_FLAG_DMA_MAP                BIT(0) /* Should page_pool do the DMA
-> -                                       * map/unmap
-> -                                       */
-> -#define PP_FLAG_DMA_SYNC_DEV   BIT(1) /* If set all pages that the driver gets
-> -                                       * from page_pool will be
-> -                                       * DMA-synced-for-device according to
-> -                                       * the length provided by the device
-> -                                       * driver.
-> -                                       * Please note DMA-sync-for-CPU is still
-> -                                       * device driver responsibility
-> -                                       */
-> -#define PP_FLAG_PAGE_FRAG      BIT(2) /* for page frag feature */
-> +/* Should page_pool do the DMA map/unmap */
-> +#define PP_FLAG_DMA_MAP                        BIT(0)
-> +
-> +/* If set all pages that the driver gets from page_pool will be
-> + * DMA-synced-for-device according to the length provided by the device driver.
-> + * Please note DMA-sync-for-CPU is still device driver responsibility
-> + */
-> +#define PP_FLAG_DMA_SYNC_DEV           BIT(1)
-> +
-> +/* for page frag feature */
-> +#define PP_FLAG_PAGE_FRAG              BIT(2)
-> +
-> +/* If set driver will do the page splitting itself. This is used to fail the
-> + * page_pool creation because there is overlap issue between pp_frag_count and
-> + * dma_addr_upper in 'struct page' for some arches with
-> + * PAGE_POOL_DMA_USE_PP_FRAG_COUNT being true.
-> + */
-> +#define PP_FLAG_PAGE_SPLIT_IN_DRIVER   BIT(3)
-> +
->  #define PP_FLAG_ALL            (PP_FLAG_DMA_MAP |\
->                                  PP_FLAG_DMA_SYNC_DEV |\
-> -                                PP_FLAG_PAGE_FRAG)
-> +                                PP_FLAG_PAGE_FRAG |\
-> +                                PP_FLAG_PAGE_SPLIT_IN_DRIVER)
->
->  /*
->   * Fast allocation side cache array/stack
-> @@ -45,7 +53,8 @@ struct pp_alloc_cache {
->
->  /**
->   * struct page_pool_params - page pool parameters
-> - * @flags:     PP_FLAG_DMA_MAP, PP_FLAG_DMA_SYNC_DEV, PP_FLAG_PAGE_FRAG
-> + * @flags:     PP_FLAG_DMA_MAP, PP_FLAG_DMA_SYNC_DEV, PP_FLAG_PAGE_FRAG,
-> + *             PP_FLAG_PAGE_SPLIT_IN_DRIVER
->   * @order:     2^order pages on allocation
->   * @pool_size: size of the ptr_ring
->   * @nid:       NUMA node id to allocate from pages from
-> @@ -183,8 +192,9 @@ struct page_pool {
->  };
->
->  struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
-> -struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
-> -                                 unsigned int size, gfp_t gfp);
-> +struct page *__page_pool_alloc_frag(struct page_pool *pool,
-> +                                   unsigned int *offset, unsigned int size,
-> +                                   gfp_t gfp);
->  struct page_pool *page_pool_create(const struct page_pool_params *params);
->
->  struct xdp_mem_info;
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 77cb75e63aca..7d5f0512aa13 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -14,7 +14,6 @@
->  #include <net/xdp.h>
->
->  #include <linux/dma-direction.h>
-> -#include <linux/dma-mapping.h>
->  #include <linux/page-flags.h>
->  #include <linux/mm.h> /* for put_page() */
->  #include <linux/poison.h>
-> @@ -212,7 +211,7 @@ static int page_pool_init(struct page_pool *pool,
->         }
->
->         if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
-> -           pool->p.flags & PP_FLAG_PAGE_FRAG)
-> +           pool->p.flags & PP_FLAG_PAGE_SPLIT_IN_DRIVER)
->                 return -EINVAL;
->
->  #ifdef CONFIG_PAGE_POOL_STATS
-> @@ -737,18 +736,16 @@ static void page_pool_free_frag(struct page_pool *pool)
->         page_pool_return_page(pool, page);
->  }
->
-> -struct page *page_pool_alloc_frag(struct page_pool *pool,
-> -                                 unsigned int *offset,
-> -                                 unsigned int size, gfp_t gfp)
-> +struct page *__page_pool_alloc_frag(struct page_pool *pool,
-> +                                   unsigned int *offset,
-> +                                   unsigned int size, gfp_t gfp)
->  {
->         unsigned int max_size = PAGE_SIZE << pool->p.order;
->         struct page *page = pool->frag_page;
->
-> -       if (WARN_ON(!(pool->p.flags & PP_FLAG_PAGE_FRAG) ||
-> -                   size > max_size))
-> +       if (WARN_ON(!(pool->p.flags & PP_FLAG_PAGE_FRAG)))
->                 return NULL;
->
-> -       size = ALIGN(size, dma_get_cache_alignment());
->         *offset = pool->frag_offset;
->
->         if (page && *offset + size > max_size) {
-> @@ -781,7 +778,7 @@ struct page *page_pool_alloc_frag(struct page_pool *pool,
->         alloc_stat_inc(pool, fast);
->         return page;
->  }
-> -EXPORT_SYMBOL(page_pool_alloc_frag);
-> +EXPORT_SYMBOL(__page_pool_alloc_frag);
->
->  static void page_pool_empty_ring(struct page_pool *pool)
->  {
-> --
-> 2.33.0
->
+Ido Schimmel (2):
+  mlxsw: reg: Fix SSPR register layout
+  selftests: mlxsw: Fix test failure on Spectrum-4
+
+ .../ethernet/mellanox/mlxsw/core_acl_flex_keys.c |  4 ++--
+ drivers/net/ethernet/mellanox/mlxsw/pci.c        |  8 ++++++--
+ drivers/net/ethernet/mellanox/mlxsw/reg.h        |  9 ---------
+ .../ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c  |  2 +-
+ .../mellanox/mlxsw/spectrum_acl_flex_keys.c      |  4 ++--
+ .../selftests/drivers/net/mlxsw/sharedbuffer.sh  | 16 ++++++----------
+ 6 files changed, 17 insertions(+), 26 deletions(-)
+
+-- 
+2.41.0
+
 
