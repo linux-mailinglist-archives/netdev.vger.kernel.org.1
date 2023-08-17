@@ -1,198 +1,193 @@
-Return-Path: <netdev+bounces-28316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC7A77F06E
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 08:18:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0F877F088
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 08:29:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD041C2127C
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 06:18:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 897DB281D8B
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 06:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEEE395;
-	Thu, 17 Aug 2023 06:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AC8A5B;
+	Thu, 17 Aug 2023 06:29:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439D6A4A
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:18:09 +0000 (UTC)
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7682C12B
-	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 23:18:07 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-407db3e9669so130011cf.1
-        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 23:18:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BED3A45
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:28:59 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6477D30C2
+	for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 23:28:28 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-51cff235226so1288720a12.0
+        for <netdev@vger.kernel.org>; Wed, 16 Aug 2023 23:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692253086; x=1692857886;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ujWPUDxBGgKL9MASr9SW4G6iTD5c2hfYcHFvHs4Wsg=;
-        b=vpOonIuky7VObM4fnOuJ2GDlM9cq1PWXAJniajWEWbTR3nszlucRhv0Vt6bqk2y4oH
-         H4/9MP8R4wTCHbw5jy0DbN3qkTZ8cwN7dloCUL2SkM8Rg3tyANscpOZCvDZm72pNALwp
-         HuSXM3osHsqIzihwIK1YrC77cL+zchyblMp9DiKrwZDm7DNgIugi334Nf2NrdXVhlwYd
-         zGuu2S/tQj5bIrDC2jdhgQxaK24mOkIEin0UGFFFis0tMZqzRa5k2ClgxuR2B5JHlR7M
-         7N+b2WJGFhnw/4JaNPU2z+cbJNNhiuuPDMyugZgl6rJmF73KCy6hmOjpdvyXRqh5v7bI
-         qfcA==
+        d=broadcom.com; s=google; t=1692253699; x=1692858499;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=n3IzBx9p8hF/6+7D1R5NUC0lW+xFR0k2l3p69bMDHMU=;
+        b=KX/4qfTtJyF63n7nvOI3JvJyEGMgvvb4d5wLrOGAQn4iIQinX6HV8SUdG1JTdVKmqb
+         vUYRw/FMeu8vnz4f7GKJIKoFXBaD6gOzPVzuRnQGyFYLBCLy5Irat4HuB+nsZu/p9WCi
+         T9bq3pPHyBI9au5A00t1m7DmtoDfIxMG607iI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692253086; x=1692857886;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ujWPUDxBGgKL9MASr9SW4G6iTD5c2hfYcHFvHs4Wsg=;
-        b=SVd1Yc1Xerv/xu3uyTUBIHCKY2RTmrAzMUKDQ6vDBq52CDXolSUTCsw5Q+pFgwbRxs
-         H9TTFIvU3hQ59pK1mVVsWcxDOhty1qnDSGqG557MD2FehLuqJk8g5d3uu7YmI7UwQl13
-         HclSZSF3f8ekUcBHX4aEzquG6d9OP1xuzX0r3UnTU0sIWfMmvWFTrv6P6SdmfCdTMoVH
-         A2csdW03gUkpwGOqWbSWBtL8RNbHGte3LczREBMxxUZZ19fx16UxxEqDGtE+3EyAGJ5L
-         8jp6Ha0wU5bBNrrTzOPPeRogo0h2sJJnJzYwDD6ayEP8mKxz8Lbv1Kogu1urrduirsJw
-         4e4w==
-X-Gm-Message-State: AOJu0Yww4v6sUDBUZdie7/GNzWLEITzUgqYgmk1PRzrNzPrksNmLAFmJ
-	E+1kb8TiFwhIjApvaF8CR/S/oDvHDMHz65knnZsvqBU9s5QtwcCYY20=
-X-Google-Smtp-Source: AGHT+IHDIVO1yVcwJZgGDlkd99+NZde5k3wxaWWA348E57o28+1Y8doTEvwIHcQJXmXZ84RVrJrUMdjIoOuAJaJ+uN0=
-X-Received: by 2002:a05:622a:1488:b0:40f:db89:5246 with SMTP id
- t8-20020a05622a148800b0040fdb895246mr106756qtx.21.1692253086322; Wed, 16 Aug
- 2023 23:18:06 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692253699; x=1692858499;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n3IzBx9p8hF/6+7D1R5NUC0lW+xFR0k2l3p69bMDHMU=;
+        b=PtOUbmBx4Y7aY25myVvFEHMgG52qrecGoCvgOTB9ZwhvVTKZxd3SQkyv9IYSWA/7lM
+         Jm/52rr3KqqEE78pv33gpmueygmP163TykEvdgBs/KnCH45ndHaQImfj1XW78amNKv0q
+         z70xjAWKsaNwEzNPCU+0Ww4SxG2I66bleO8hdisdvVBRscciHy++yCiUS3rF50YB9pST
+         E7gOo8w9cc0Q35ZzHAhvo/c2Vl/nY2ERLiW+RF4/u3bX56drzCdQ73xH+x8OlYJwV8xw
+         Sih11EtVyz1u9OTpf4rlGT1HtwBHQuTPA+ryLzUw/obT3LtydF62U+KCFTZbcQsFRqTw
+         apjQ==
+X-Gm-Message-State: AOJu0YzgLB97Q6PMwieR0yMB6EdwFO13cxe8GkFl25xcqQ4EIRQd3vCr
+	gxXEBlaCfoPndmP6e05JyYaeHHtHF8hZv570dPkkRg==
+X-Google-Smtp-Source: AGHT+IHndspxWv9HKJx9nStPWPdXwKwHdEgXcz46QxSmpLjU5WNB9+9GCg0MnSNeh9lOK3fVw5YjyDWc5cs6oiQdbT4=
+X-Received: by 2002:a05:6402:1b01:b0:522:582c:f427 with SMTP id
+ by1-20020a0564021b0100b00522582cf427mr2035367edb.14.1692253698560; Wed, 16
+ Aug 2023 23:28:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816142158.1779798-1-edumazet@google.com> <1692238784.742549-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1692238784.742549-1-xuanzhuo@linux.alibaba.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 17 Aug 2023 08:17:55 +0200
-Message-ID: <CANn89iLNH2_kL8SeAdr84Am9nW4tgk0XQC37mEWkaCf8n6hf7w@mail.gmail.com>
-Subject: Re: [PATCH net] net: do not allow gso_size to be set to GSO_BY_FRAGS
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Xin Long <lucien.xin@gmail.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Willem de Bruijn <willemb@google.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+References: <20230815045658.80494-1-michael.chan@broadcom.com>
+ <20230815045658.80494-12-michael.chan@broadcom.com> <c6f3a05e-f75c-4051-8892-1c2dee2804b0@roeck-us.net>
+ <CAH-L+nM4MvWODLcApzFB1Xjr4dauii+pBErOZ=frT+eiP8PgVg@mail.gmail.com>
+ <3d70325b-6b6a-482f-8745-36aceb6b2818@roeck-us.net> <CAH-L+nMSZUtDcG9qFSLMJ7ZGDNz91cp+nw0Le7yoxeMkQg9qyA@mail.gmail.com>
+ <d6e093d7-0ff3-4545-9ff8-1c342879fe40@roeck-us.net>
+In-Reply-To: <d6e093d7-0ff3-4545-9ff8-1c342879fe40@roeck-us.net>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 16 Aug 2023 23:28:07 -0700
+Message-ID: <CACKFLi=o9g8iBeJHzhCYHXBQvdwT+sy6PKCDRGaqATZL0jMurA@mail.gmail.com>
+Subject: Re: [PATCH net-next 11/12] bnxt_en: Expose threshold temperatures
+ through hwmon
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>, davem@davemloft.net, 
+	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, gospo@broadcom.com, Jean Delvare <jdelvare@suse.com>, 
+	linux-hwmon@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009a45360603188494"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 17, 2023 at 4:27=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Wed, 16 Aug 2023 14:21:58 +0000, Eric Dumazet <edumazet@google.com> wr=
-ote:
-> > One missing check in virtio_net_hdr_to_skb() allowed
-> > syzbot to crash kernels again [1]
-> >
-> > Do not allow gso_size to be set to GSO_BY_FRAGS (0xffff),
-> > because this magic value is used by the kernel.
-> >
-> > [1]
-> > general protection fault, probably for non-canonical address 0xdffffc00=
-0000000e: 0000 [#1] PREEMPT SMP KASAN
-> > KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
-> > CPU: 0 PID: 5039 Comm: syz-executor401 Not tainted 6.5.0-rc5-next-20230=
-809-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
- Google 07/26/2023
-> > RIP: 0010:skb_segment+0x1a52/0x3ef0 net/core/skbuff.c:4500
-> > Code: 00 00 00 e9 ab eb ff ff e8 6b 96 5d f9 48 8b 84 24 00 01 00 00 48=
- 8d 78 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 =
-84 c0 74 08 3c 03 0f 8e ea 21 00 00 48 8b 84 24 00 01
-> > RSP: 0018:ffffc90003d3f1c8 EFLAGS: 00010202
-> > RAX: dffffc0000000000 RBX: 000000000001fffe RCX: 0000000000000000
-> > RDX: 000000000000000e RSI: ffffffff882a3115 RDI: 0000000000000070
-> > RBP: ffffc90003d3f378 R08: 0000000000000005 R09: 000000000000ffff
-> > R10: 000000000000ffff R11: 5ee4a93e456187d6 R12: 000000000001ffc6
-> > R13: dffffc0000000000 R14: 0000000000000008 R15: 000000000000ffff
-> > FS: 00005555563f2380(0000) GS:ffff8880b9800000(0000) knlGS:000000000000=
-0000
-> > CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000000020020000 CR3: 000000001626d000 CR4: 00000000003506f0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> > <TASK>
-> > udp6_ufo_fragment+0x9d2/0xd50 net/ipv6/udp_offload.c:109
-> > ipv6_gso_segment+0x5c4/0x17b0 net/ipv6/ip6_offload.c:120
-> > skb_mac_gso_segment+0x292/0x610 net/core/gso.c:53
-> > __skb_gso_segment+0x339/0x710 net/core/gso.c:124
-> > skb_gso_segment include/net/gso.h:83 [inline]
-> > validate_xmit_skb+0x3a5/0xf10 net/core/dev.c:3625
-> > __dev_queue_xmit+0x8f0/0x3d60 net/core/dev.c:4329
-> > dev_queue_xmit include/linux/netdevice.h:3082 [inline]
-> > packet_xmit+0x257/0x380 net/packet/af_packet.c:276
-> > packet_snd net/packet/af_packet.c:3087 [inline]
-> > packet_sendmsg+0x24c7/0x5570 net/packet/af_packet.c:3119
-> > sock_sendmsg_nosec net/socket.c:727 [inline]
-> > sock_sendmsg+0xd9/0x180 net/socket.c:750
-> > ____sys_sendmsg+0x6ac/0x940 net/socket.c:2496
-> > ___sys_sendmsg+0x135/0x1d0 net/socket.c:2550
-> > __sys_sendmsg+0x117/0x1e0 net/socket.c:2579
-> > do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> > do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-> > entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > RIP: 0033:0x7ff27cdb34d9
-> >
-> > Fixes: 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes")
-> > Reported-by: syzbot <syzkaller@googlegroups.com>
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Xin Long <lucien.xin@gmail.com>
-> > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> > Cc: Willem de Bruijn <willemb@google.com>
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Jason Wang <jasowang@redhat.com>
-> > Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  include/linux/virtio_net.h | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> > index bdf8de2cdd935d31449b78e1b9c67fdcdc537bf2..7b4dd69555e497497460dcf=
-5d72737fe5c09fd53 100644
-> > --- a/include/linux/virtio_net.h
-> > +++ b/include/linux/virtio_net.h
-> > @@ -155,6 +155,10 @@ static inline int virtio_net_hdr_to_skb(struct sk_=
-buff *skb,
-> >               if (gso_type & SKB_GSO_UDP)
-> >                       nh_off -=3D thlen;
-> >
-> > +             /* Kernel has a special handling for GSO_BY_FRAGS. */
-> > +             if (gso_size =3D=3D GSO_BY_FRAGS)
-> > +                     return -EINVAL;
-> > +
->
->
-> I guess the crash happens when user sends packets via af_packet and gso i=
-s set
-> to GSO_BY_FRAGS by user.
->
-> But I wonder is 0xffff also an invalid value on the rx path?
->
-> We know that this function virtio_net_hdr_to_skb is also used by the virt=
-io-net
-> driver on the rx path. This change means that virtio-net devices should n=
-ot set
-> gso to 0xffff. But the virtio spec doesn't say that the rx gso value 0xff=
-ff is
-> invalid.
->
-> So I think we should not add check in this function.
+--0000000000009a45360603188494
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Aug 16, 2023 at 12:25=E2=80=AFPM Guenter Roeck <linux@roeck-us.net>=
+ wrote:
+>
+> On Wed, Aug 16, 2023 at 09:42:17PM +0530, Kalesh Anakkur Purayil wrote:
+> > [Kalesh]: Sorry, I don't quite get this part. I was looking at the kern=
+el
+> > hwmon code, but could not find any reference.
+> >
+>
+> It would be non-standard attributes, so, correct, there is no reference.
+>
+> > Can we add new attributes "shutdown" and "shutdown_alarm" for tempX? Fo=
+r
+> > example:
+> >
+> > #define HWMON_T_SHUTDOWN BIT(hwmon_temp_shutdown)
+> >
+>
+> Not for a single driver. You can implement the sysfs attributes
+> directly in the driver and pass an extra attribute group to the
+> hwmon core when registering the hwmon device.
 
-I think we do.
+Thanks for the review.  I will drop these hwmon patches for now and
+respin the others for v2.  Kalesh will rework these hwmon patches.
 
-Think about it, how gso_size =3D=3D 0xffff , or even 0xfff0 could be valid =
-?
+--0000000000009a45360603188494
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-We are not going to add more core in core network fast path, for
-something that can not happen with kernel stacks.
-
-It is time someone clarifies virtio_specs, because 0xffff is
-absolutely a no go, even before blamed commit.
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIA5nxExdUxOOQ9BseG2j9hT+jx1jFDyG
+P8v0/vGHhiYIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
+NzA2MjgxOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCzeGp8zMFx9wXy4HIFHaQCJg0UazUXq8w6FZDu9DUIlthXCxAe
+DBeWkQHIPeowQBHsCOZiiPEKL33nbksjhV9Lo2j+SbaOxnkE/ixG9Ts4jwC6a6YbCBJ456KFs6ej
+hXinWVLc/YJE0/YUqTUNZMg5ssvtPPR1FvxSqC+EUkLzzZmK9ZNEO4hO5IhvzikJ4duVQ+ywABgx
+Gsl/Kxt8RzPgm+8TmNGdmPEOvJ2SZZTBTqOQvdmqz27kRi12xAWVrU//v3zqhJLyEL336YdmvNH6
+59SIgt7wZmWp+iAY/0hL/LM2eJ2sUSGdvT52VySNyeey+5OzHNU0Btv/THBDLfZ9
+--0000000000009a45360603188494--
 
