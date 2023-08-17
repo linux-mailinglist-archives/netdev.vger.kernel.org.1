@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-28429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976B177F683
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:39:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E738077F68F
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50474281F2D
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:39:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF54A1C213BD
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42AB412B7D;
-	Thu, 17 Aug 2023 12:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F2D134BA;
+	Thu, 17 Aug 2023 12:42:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3771912B73
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCFA2907
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:42:16 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E019D2D71
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:39:48 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369E62D5F
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:42:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zKCohhNBZilA6BqA2yXOwMjFv+jyhhjNfp3vuxcwPQo=; b=oM7k/1SeKKDOkWdvW2JTwkRWbC
-	nemn4jTpVx4sAmZ5V+ALkc7UTbr0GUfsYyejh7G44Q70seYsqF+/0pxHyHVx1hy7/vWKvg4UxN8Dt
-	YpuPK+DSpVcafP56vLUhmrvLLe/1BqzGXU/tqLl7ZlCjXKO/iMz+TiVk6GOPbYGjSTr0=;
+	bh=VO4EpR2CS4ifSa9fZSZIQ7o7gsJKZ/yPTTtnlb4VJiI=; b=HO0PeURfwQmoli1LTkWnuaGife
+	co1q/CUebcnuEEyLfJaK/wsJU0LnesouQuVR5W2YQOO6dNF3ou06i6qZuOFbAjXbHzPBjIK43uOHm
+	eZyWgmDapmFEOn0+jSyJNcMZzMaaWQ0qrWjSvnO6mNMpBnckfczLtxw9hqJLyd4u1KI4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qWcHd-004NGy-GZ; Thu, 17 Aug 2023 14:39:25 +0200
-Date: Thu, 17 Aug 2023 14:39:25 +0200
+	id 1qWcK0-004NHv-B9; Thu, 17 Aug 2023 14:41:52 +0200
+Date: Thu, 17 Aug 2023 14:41:52 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Ruan Jinjie <ruanjinjie@huawei.com>
 Cc: rafal@milecki.pl, bcm-kernel-feedback-list@broadcom.com,
@@ -41,11 +41,11 @@ Cc: rafal@milecki.pl, bcm-kernel-feedback-list@broadcom.com,
 	bryan.whitehead@microchip.com, hkallweit1@gmail.com,
 	linux@armlinux.org.uk, mdf@kernel.org, pgynther@google.com,
 	Pavithra.Sathyanarayanan@microchip.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/4] net: phy: fixed_phy: Fix return value
- check for fixed_phy_get_gpiod
-Message-ID: <28f38d27-31a0-4369-b11d-69e94ad91e0c@lunn.ch>
+Subject: Re: [PATCH net-next v2 2/4] net: bgmac: Fix return value check for
+ fixed_phy_register()
+Message-ID: <039324dd-96ae-41df-974a-6519ff8f8983@lunn.ch>
 References: <20230817121631.1878897-1-ruanjinjie@huawei.com>
- <20230817121631.1878897-2-ruanjinjie@huawei.com>
+ <20230817121631.1878897-3-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,22 +54,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230817121631.1878897-2-ruanjinjie@huawei.com>
+In-Reply-To: <20230817121631.1878897-3-ruanjinjie@huawei.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 17, 2023 at 08:16:28PM +0800, Ruan Jinjie wrote:
-> Since fixed_phy_get_gpiod() return NULL instead of ERR_PTR(),
-> if it fails, the IS_ERR() can never return the error. So check NULL
-> and return ERR_PTR(-EINVAL) if fails.
+On Thu, Aug 17, 2023 at 08:16:29PM +0800, Ruan Jinjie wrote:
+> The fixed_phy_register() function returns error pointers and never
+> returns NULL. Update the checks accordingly.
 > 
-> Fixes: 71bd106d2567 ("net: fixed-phy: Add fixed_phy_register_with_gpiod() API")
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> And it also returns -EPROBE_DEFER, -EINVAL and -EBUSY, etc, in addition to
+> -ENODEV, just return -ENODEV is not sensible, use
+> PTR_ERR to fix the issue.
+
+I would recommend changing not sensible to best practice, as i
+suggested in one of your other patches.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-    Andrew
+---
+pw-bot: cr
 
