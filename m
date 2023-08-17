@@ -1,121 +1,118 @@
-Return-Path: <netdev+bounces-28431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E23CF77F691
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:43:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E43377F6CC
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:52:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BF6A281F3E
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:43:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EFB91C20F08
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFA0134C2;
-	Thu, 17 Aug 2023 12:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C982B13AF5;
+	Thu, 17 Aug 2023 12:52:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E2E134BA
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:43:14 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA7F2D61
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:43:13 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so1900903a12.0
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:43:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA392907
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:52:47 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33302D5F
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:52:44 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fe2048c910so71202515e9.1
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:52:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692276191; x=1692880991;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jCf5q5yQe8Z4hHkCQL2AhutzJh9apDTJNFFPSf/zknk=;
-        b=HsCWdPiKcTm2ACIUDYtoBJH+fioJdsn4qB2ZczgpLf6RqdfFqdqcl7eh5gMAnKRSrK
-         wYord/BjTSOwPrG7sTDhH8WhOMzbSgrW8NZaXAmhYXI7bN/ZeUSi2nyxc3CCfVU6I7Sp
-         Vr8EthC//oifbqtzAWxppPel/YUBc+1EGuLNbuSKXaSQrKQBHXD6QUGjGgcdLPz2gKcP
-         o+v9yYh+WFC5T1KgY1Vyot9sKXWrmWI5HoNBC/VneXFPhthhnb3N8FgFSdRIRcCwSIfU
-         BW+2w/UoOq+3aULW3OwirQyrqdHE0NixgApiox13QX9mfA4kRkTxiG0mLfLZqsY9bmrx
-         +m1A==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692276763; x=1692881563;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HNH8jgIIjeoKstQpTEEzPTnWqsW8pg6m16x+9+66OeA=;
+        b=a8G8Ftm0/LSBlydRINwfX5C9EAGW7al3clx6LYmuog337/p9f54rkwvxRaxrikf9S4
+         3C+uxkPmAhl9Z5qz97Flrwv89OHtFXlwKOmoybqzhFtzQJwkQFYs1SFXJOVz5jJLsBB9
+         qTejhrIJweCdWA1SyNvwTGnIIxdyqtLw+6md5grwWV5w65CJAp0w8hVra2pjVINt640u
+         sunbdXwZCZ1Xs4mrkFqADHkLk+rGXUKFlwCffIURjJvoPwmvD7pDVjYdnGL7db8hwWIO
+         eEO8dsmkjhDauQ4nbkzS6/vO0UHbsQW/wzEYTIsQWfGVbkfGR1ZE0kRe9wu7TF7BGnBC
+         kx3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692276191; x=1692880991;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jCf5q5yQe8Z4hHkCQL2AhutzJh9apDTJNFFPSf/zknk=;
-        b=SHQ7cj78rtFi6BlqezXvdGF6g3nGB0MvdCuHHqrZtS3G7rEiDfNOTHQ2Zu6AoIp/w1
-         svkoOmhKAHAbIKt0561NSNDdkn6Zkgf++ncLuQBJgJlkHWmv8ZkUkrBIJoY3UHG2IXjR
-         Xw/a23lTwBnFBOL/xGiWwKonr34QE70B3FdAeZ61tcYuUS7mCiVZTHBihs+paUlrK6Fz
-         EgpJtIpJyUw+cXU+cw273aTS6Bm0GF8nIrmg+l4HCYeIyLIHxSEGTUCZ2swDi263kYgA
-         Mw22WsGeotiX1pReVbQoQ8tU+iEpU6Zt+ic6vwd4p2iNr5o42EC38sbG76LcGEQWl5zj
-         +SlA==
-X-Gm-Message-State: AOJu0YzgCBpmOx1IaCrxNZ3tr79MfkNu/lGFrG3t48aHhtw6nJBzOaXh
-	ndtkDTkdy/nAavGt6Fms62ULJ/WD074=
-X-Google-Smtp-Source: AGHT+IHANn8J79Ld6+1oY6u9204lsiRyVmszPYfM450hgmiFcBJauvj6HoZ0mWQ5MZZADkReh4MnCg==
-X-Received: by 2002:a05:6402:3494:b0:525:4d74:be8c with SMTP id v20-20020a056402349400b005254d74be8cmr3031960edc.14.1692276191341;
-        Thu, 17 Aug 2023 05:43:11 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7a3c:5e00:c9d3:59d1:96ab:8b21? (dynamic-2a01-0c22-7a3c-5e00-c9d3-59d1-96ab-8b21.c22.pool.telefonica.de. [2a01:c22:7a3c:5e00:c9d3:59d1:96ab:8b21])
-        by smtp.googlemail.com with ESMTPSA id n21-20020a05640204d500b005233885d0c6sm9693204edw.41.2023.08.17.05.43.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Aug 2023 05:43:10 -0700 (PDT)
-Message-ID: <db0fd284-0b5b-3290-6661-f159908e9918@gmail.com>
-Date: Thu, 17 Aug 2023 14:43:08 +0200
+        d=1e100.net; s=20221208; t=1692276763; x=1692881563;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HNH8jgIIjeoKstQpTEEzPTnWqsW8pg6m16x+9+66OeA=;
+        b=ehjbjznKAQQ2JvWtcHkEjbiqkWNHdvI0mq28XJbanXJjDLGWlLFmtQMxvD+2H1U7F4
+         hI/JuGvwqiCKPlf2CxCGR/+2h0AAPelddXeE4jv/eiaT2QJoVt6wGurz0kqftZsfyzY3
+         foAwM+7TJyN6z1t9Mw9rxduzIKOvfG70NmOGtuZzxp+O7F9TNmIChZOzWZRsQSvVGlAn
+         La071NIwVT6yazKaR5Bku9Vst4yuFjTJBQxEuHtuJBCQ4qGkXI2wTkGJWGBzZkGZI0FV
+         fYs7CBYJJ2wXBKj0giekVYe+9UYHJBOxXrgSCHq/iH9mAC5nMtzs+awx/rk/1Y4narGu
+         pgWQ==
+X-Gm-Message-State: AOJu0YwvQ7cr0JoW6DKi3aIIkUHaiiYmMrYiqKhQDx/ngIGWnsYYFO9A
+	tn/eYEoNrpSTJs9b0G6Jj45oZKW7oI3ksSBbJM9tlw==
+X-Google-Smtp-Source: AGHT+IFEsKIVIlwDN2VV/XOksV1u5uUHdebA6Xw3EiySuFeDGb7He8XafUlmnKmgu2PIIZlRNBM4wg==
+X-Received: by 2002:a1c:f314:0:b0:3fe:201a:4b7b with SMTP id q20-20020a1cf314000000b003fe201a4b7bmr4833122wmq.27.1692276762709;
+        Thu, 17 Aug 2023 05:52:42 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id 16-20020a05600c231000b003fe2bea77ccsm2930846wmo.5.2023.08.17.05.52.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 05:52:41 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	idosch@nvidia.com,
+	petrm@nvidia.com
+Subject: [patch net-next] devlink: add missing unregister linecard notification
+Date: Thu, 17 Aug 2023 14:52:40 +0200
+Message-ID: <20230817125240.2144794-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v2 4/4] net: lan743x: Fix return value check for
- fixed_phy_register()
-Content-Language: en-US
-To: Ruan Jinjie <ruanjinjie@huawei.com>, rafal@milecki.pl,
- bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, opendmb@gmail.com,
- florian.fainelli@broadcom.com, bryan.whitehead@microchip.com,
- andrew@lunn.ch, linux@armlinux.org.uk, mdf@kernel.org, pgynther@google.com,
- Pavithra.Sathyanarayanan@microchip.com, netdev@vger.kernel.org
-References: <20230817121631.1878897-1-ruanjinjie@huawei.com>
- <20230817121631.1878897-5-ruanjinjie@huawei.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20230817121631.1878897-5-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 17.08.2023 14:16, Ruan Jinjie wrote:
-> fixed_phy_register() function returns -EPROBE_DEFER, -EINVAL and -EBUSY,
-> etc, but not return -EIO. use PTR_ERR to fix the issue.
-> 
-> Fixes: 624864fbff92 ("net: lan743x: add fixed phy support for LAN7431 device")
+From: Jiri Pirko <jiri@nvidia.com>
 
-This isn't a fix. Returning -EIO isn't wrong. Returning the original errno values
-may be better, but that's an improvement.
-Also combining "net-next" with a Fixes tag is wrong, except the functionality
-was added very recently.
+Cited fixes commit introduced linecard notifications for register,
+however it didn't add them for unregister. Fix that by adding them.
 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
-> ---
->  drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index a36f6369f132..c81cdeb4d4e7 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> @@ -1515,7 +1515,7 @@ static int lan743x_phy_open(struct lan743x_adapter *adapter)
->  							    &fphy_status, NULL);
->  				if (IS_ERR(phydev)) {
->  					netdev_err(netdev, "No PHY/fixed_PHY found\n");
-> -					return -EIO;
-> +					return PTR_ERR(phydev);
->  				}
->  			} else {
->  				goto return_error;
+Fixes: c246f9b5fd61 ("devlink: add support to create line card and expose to user")
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ net/devlink/leftover.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index c26c63275b0b..e7f76cc58533 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -6630,6 +6630,7 @@ void devlink_notify_unregister(struct devlink *devlink)
+ 	struct devlink_param_item *param_item;
+ 	struct devlink_trap_item *trap_item;
+ 	struct devlink_port *devlink_port;
++	struct devlink_linecard *linecard;
+ 	struct devlink_rate *rate_node;
+ 	struct devlink_region *region;
+ 	unsigned long port_index;
+@@ -6658,6 +6659,8 @@ void devlink_notify_unregister(struct devlink *devlink)
+ 
+ 	xa_for_each(&devlink->ports, port_index, devlink_port)
+ 		devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
++	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
+ 	devlink_notify(devlink, DEVLINK_CMD_DEL);
+ }
+ 
+-- 
+2.41.0
 
 
