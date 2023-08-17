@@ -1,66 +1,69 @@
-Return-Path: <netdev+bounces-28648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CFF780199
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:20:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F0978019B
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61DD828226F
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:20:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B6A8282265
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E481C294;
-	Thu, 17 Aug 2023 23:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B84E1B7F1;
+	Thu, 17 Aug 2023 23:19:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D551B7CD
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:19:35 +0000 (UTC)
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DBF235AB
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:34 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-64721b1bae3so1309486d6.1
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0CC1BEED
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:19:38 +0000 (UTC)
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A0335B6
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:35 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-649a653479bso1548236d6.0
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1692314373; x=1692919173;
+        d=broadcom.com; s=google; t=1692314375; x=1692919175;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ALhtleGpAsiGqCc4v25CO+zEa1N6vpILUpx2q/wzENw=;
-        b=VpHCLqZt68DixkFqSL21ytGj7Z2pgEIHmoT2uP2Sw2fIJesVYZ0p4EC9tz5U/+/O3t
-         ZC1UNKUnY9wgpU9LYoFwsG7tL5IcqJjoru4jmwOe158I0vhRbaiJeVIIIt4mvtPShKE3
-         qRPzSQGqawJckPmy1ea2guLM9aqAGKsQuWE+E=
+        bh=8EWyq1r19DhGAnjFNpY9GVV2NzodNlGhYizDI6pq9cI=;
+        b=XdxaQf7CN3Gm48sdeJFG3tKrpRTJ+LHl+hBVi6pT60SeoPN8vRxOcBUAdUSvchd1QN
+         AWtTZa3fEk2K/hDtC8K8tTdlqXnk5U9iQ14QEtNKUD0irmIlA+9wGbmwtSsHyItAen+O
+         IrpWdgWBDrkUZlQ7m/PUy9LRnu7JpPlpb9bjo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692314373; x=1692919173;
+        d=1e100.net; s=20221208; t=1692314375; x=1692919175;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ALhtleGpAsiGqCc4v25CO+zEa1N6vpILUpx2q/wzENw=;
-        b=VKE4v917WIli0LCujIIo8hMjarqJMptYtwgFhzx4lAOE4uNa+mcPFi1lA85W8aCjxU
-         bKZQ31SzvqkTiLNIbS7HzbU517o94jHff+97tEH8iMVerMC+kcsPF2MhSH0SdKqQt1pP
-         hHB8UGSigSPkAVje5TSDz4w3z4P08G/8/3lyc4ELLm6NMGWG3ForywA2q3UQLnGvfhgz
-         KkbhAaeWtqI4Sv1aL5VVJhX4VkGz21LqR7h+uWrTr0Jd3vBUMwDb4biXp8R+39t0k5qz
-         cSR0VKTO2ELjOyGKDNaiqwkvyZXQTblBQpBJmuyIxDO6mOaWXdLnkbG9maQXpY1tO2w4
-         7C/Q==
-X-Gm-Message-State: AOJu0YxMDCv4v1yDSlp0ZGUWLCU504Rf/HwOBqgAgDirm2a8OgIKQT01
-	9OEmcM3WybBVHFiORVjpPdrVew==
-X-Google-Smtp-Source: AGHT+IEsavE2F3BL6WhRc7OT29n2YoJoDd5WQZ3/XRg1Y8ongj5RdR7fJG/H2HrN7XfP3UB8dF/17A==
-X-Received: by 2002:a05:6214:2b81:b0:635:e4ed:b6c9 with SMTP id kr1-20020a0562142b8100b00635e4edb6c9mr1236197qvb.24.1692314372898;
-        Thu, 17 Aug 2023 16:19:32 -0700 (PDT)
+        bh=8EWyq1r19DhGAnjFNpY9GVV2NzodNlGhYizDI6pq9cI=;
+        b=BleT2VVgS0FmFmcpE0IzcJClFuT3gjFNdQHvfJnV3c0FFJF7upkWh2oyYOeC22q7n0
+         dSPvc4mwBMHKYXNmcS8haFydjVLDHS7mc+0WDXgl0wDn76wGJQ2L94Rc9QcZ4jihuzAA
+         kLmEyjzFTk7pNwPHzkd5UQCTNH4EPMEA6Yamt/Op0IQqOFgQIEhqbKh9LO/MFV/hudDJ
+         sKWtViTsslZfLn32TKsHjfJTDpYm19zSd0m8QSdeD+r8nzAbpQRVc1AFayJl4c8PJNKq
+         YCUvKMtXIjH6itnXCChvbXspYqQnH+brZOK44BP8c+koO3mvA9hP+tKwmi6vcrxu9eLt
+         7uzw==
+X-Gm-Message-State: AOJu0YwhItFtXRyo0/N0ZfQuw0KnGzlWk/D9IAq4Dxi2XUaaMnbw0YvJ
+	MotFhVnTcbiUgWe+GrgzYnKcFw==
+X-Google-Smtp-Source: AGHT+IG6+FdmdqCQY3jxPZef1U+/jORNUcKqyhIKa6BrpQO98OQ4+X7dsKMTOV4X50A65NLeIqqapQ==
+X-Received: by 2002:a0c:e282:0:b0:62d:eda3:4335 with SMTP id r2-20020a0ce282000000b0062deda34335mr1052114qvl.29.1692314374497;
+        Thu, 17 Aug 2023 16:19:34 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id w27-20020a05620a149b00b0076d25b11b62sm145516qkj.38.2023.08.17.16.19.31
+        by smtp.gmail.com with ESMTPSA id w27-20020a05620a149b00b0076d25b11b62sm145516qkj.38.2023.08.17.16.19.33
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Aug 2023 16:19:32 -0700 (PDT)
+        Thu, 17 Aug 2023 16:19:34 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net-next v2 3/6] bnxt_en: Increment rx_resets counter in bnxt_disable_napi()
-Date: Thu, 17 Aug 2023 16:19:08 -0700
-Message-Id: <20230817231911.165035-4-michael.chan@broadcom.com>
+	gospo@broadcom.com,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next v2 4/6] bnxt_en: Save ring error counters across reset
+Date: Thu, 17 Aug 2023 16:19:09 -0700
+Message-Id: <20230817231911.165035-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20230817231911.165035-1-michael.chan@broadcom.com>
 References: <20230817231911.165035-1-michael.chan@broadcom.com>
@@ -71,7 +74,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001399cd060326a512"
+	boundary="0000000000002fdcb4060326a585"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -79,61 +82,124 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000001399cd060326a512
+--0000000000002fdcb4060326a585
 Content-Transfer-Encoding: 8bit
 
-If we are doing a complete reset with irq_re_init set to true in
-bnxt_close_nic(), all the ring structures will be freed.  New
-structures will be allocated in bnxt_open_nic().  The current code
-increments rx_resets counter in bnxt_enable_napi() if bnapi->in_reset
-is true.  In a complete reset, bnapi->in_reset will never be true
-since the structure is just allocated.
+Currently, the ring counters are stored in the per ring datastructure.
+During reset, all the rings are freed together with the associated
+datastructures.  As a result, all the ring error counters will be reset
+to zero.
 
-Increment the rx_resets counter in bnxt_disable_napi() instead.  This
-will allow us to save all the ring error counters including the
-rx_resets counters in the next patch.
+Add logic to keep track of the total error counts of all the rings
+and save them before reset (including ifdown).  The next patch will
+display these total ring error counters under ethtool -S.
 
+Link: https://lore.kernel.org/netdev/CACKFLimD-bKmJ1tGZOLYRjWzEwxkri-Mw7iFme1x2Dr0twdCeg@mail.gmail.com/
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 32 ++++++++++++++++++++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 15 +++++++++++
+ 2 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 73a3936ee498..34c3d231946e 100644
+index 34c3d231946e..bea562d08d6c 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -9393,10 +9393,14 @@ static void bnxt_disable_napi(struct bnxt *bp)
- 		return;
+@@ -10685,8 +10685,10 @@ static void __bnxt_close_nic(struct bnxt *bp, bool irq_re_init,
+ 	bnxt_free_skbs(bp);
  
- 	for (i = 0; i < bp->cp_nr_rings; i++) {
--		struct bnxt_cp_ring_info *cpr = &bp->bnapi[i]->cp_ring;
-+		struct bnxt_napi *bnapi = bp->bnapi[i];
-+		struct bnxt_cp_ring_info *cpr;
- 
--		napi_disable(&bp->bnapi[i]->napi);
--		if (bp->bnapi[i]->rx_ring)
-+		cpr = &bnapi->cp_ring;
-+		if (bnapi->in_reset)
-+			cpr->sw_stats.rx.rx_resets++;
-+		napi_disable(&bnapi->napi);
-+		if (bnapi->rx_ring)
- 			cancel_work_sync(&cpr->dim.work);
- 	}
+ 	/* Save ring stats before shutdown */
+-	if (bp->bnapi && irq_re_init)
++	if (bp->bnapi && irq_re_init) {
+ 		bnxt_get_ring_stats(bp, &bp->net_stats_prev);
++		bnxt_get_ring_err_stats(bp, &bp->ring_err_stats_prev);
++	}
+ 	if (irq_re_init) {
+ 		bnxt_free_irq(bp);
+ 		bnxt_del_napi(bp);
+@@ -10935,6 +10937,34 @@ bnxt_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+ 	clear_bit(BNXT_STATE_READ_STATS, &bp->state);
  }
-@@ -9413,8 +9417,6 @@ static void bnxt_enable_napi(struct bnxt *bp)
- 		bnapi->tx_fault = 0;
  
- 		cpr = &bnapi->cp_ring;
--		if (bnapi->in_reset)
--			cpr->sw_stats.rx.rx_resets++;
- 		bnapi->in_reset = false;
++static void bnxt_get_one_ring_err_stats(struct bnxt *bp,
++					struct bnxt_total_ring_err_stats *stats,
++					struct bnxt_cp_ring_info *cpr)
++{
++	struct bnxt_sw_stats *sw_stats = &cpr->sw_stats;
++	u64 *hw_stats = cpr->stats.sw_stats;
++
++	stats->rx_total_l4_csum_errors += sw_stats->rx.rx_l4_csum_errors;
++	stats->rx_total_resets += sw_stats->rx.rx_resets;
++	stats->rx_total_buf_errors += sw_stats->rx.rx_buf_errors;
++	stats->rx_total_oom_discards += sw_stats->rx.rx_oom_discards;
++	stats->rx_total_netpoll_discards += sw_stats->rx.rx_netpoll_discards;
++	stats->rx_total_ring_discards +=
++		BNXT_GET_RING_STATS64(hw_stats, rx_discard_pkts);
++	stats->tx_total_ring_discards +=
++		BNXT_GET_RING_STATS64(hw_stats, tx_discard_pkts);
++	stats->total_missed_irqs += sw_stats->cmn.missed_irqs;
++}
++
++void bnxt_get_ring_err_stats(struct bnxt *bp,
++			     struct bnxt_total_ring_err_stats *stats)
++{
++	int i;
++
++	for (i = 0; i < bp->cp_nr_rings; i++)
++		bnxt_get_one_ring_err_stats(bp, stats, &bp->bnapi[i]->cp_ring);
++}
++
+ static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask)
+ {
+ 	struct net_device *dev = bp->dev;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index d6a1eaa69774..7287fd3c0763 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -948,6 +948,17 @@ struct bnxt_sw_stats {
+ 	struct bnxt_cmn_sw_stats cmn;
+ };
  
- 		bnapi->tx_pkts = 0;
++struct bnxt_total_ring_err_stats {
++	u64			rx_total_l4_csum_errors;
++	u64			rx_total_resets;
++	u64			rx_total_buf_errors;
++	u64			rx_total_oom_discards;
++	u64			rx_total_netpoll_discards;
++	u64			rx_total_ring_discards;
++	u64			tx_total_ring_discards;
++	u64			total_missed_irqs;
++};
++
+ struct bnxt_stats_mem {
+ 	u64		*sw_stats;
+ 	u64		*hw_masks;
+@@ -2018,6 +2029,8 @@ struct bnxt {
+ 	u8			pri2cos_idx[8];
+ 	u8			pri2cos_valid;
+ 
++	struct bnxt_total_ring_err_stats ring_err_stats_prev;
++
+ 	u16			hwrm_max_req_len;
+ 	u16			hwrm_max_ext_req_len;
+ 	unsigned int		hwrm_cmd_timeout;
+@@ -2344,6 +2357,8 @@ int bnxt_half_open_nic(struct bnxt *bp);
+ void bnxt_half_close_nic(struct bnxt *bp);
+ void bnxt_reenable_sriov(struct bnxt *bp);
+ int bnxt_close_nic(struct bnxt *, bool, bool);
++void bnxt_get_ring_err_stats(struct bnxt *bp,
++			     struct bnxt_total_ring_err_stats *stats);
+ int bnxt_dbg_hwrm_rd_reg(struct bnxt *bp, u32 reg_off, u16 num_words,
+ 			 u32 *reg_buf);
+ void bnxt_fw_exception(struct bnxt *bp);
 -- 
 2.30.1
 
 
---0000000000001399cd060326a512
+--0000000000002fdcb4060326a585
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -204,14 +270,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIApOwXT4MmEHs6eTrEFIlC6m8XtW3XCg
-j3HlIIY4rkjkMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
-NzIzMTkzM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP7VrFMEPaY5CUJHHjK3cK3D9IMv41kF
+S7asFJPvcIGNMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
+NzIzMTkzNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBwTeMYHSoc1Q66qxHs/X083EPIUjV16vJpbiX3J7nZxBFr15Wf
-7snW9uIHUyIkwENm70BnnxHd905/bwLbouWo8eBLkLMafewgHUkbjKTPvth3dQ0juEghks8tmuOZ
-BLu8PH8mZOx2Todwc5bthC9Fzg9NUl3QBmmBDy3VmpcB5uiPG5qDDktLR8xgYiNavgdBBsOM0ao9
-qIVmCtQO4XvH2yfo+wnIGDP8Rco3J6HaLFH9MQBmVtJdOe+xUyQAPfhYHjmyiGw0ouqLF5SROREI
-FX516K6waxJYWTqnmxt2Qe2FQGCMZW+REJcMoejuf2zZjtroTIOT1QONHzt8ONEn
---0000000000001399cd060326a512--
+ATANBgkqhkiG9w0BAQEFAASCAQC2H018wiDnSDRC64wyJ6ZUZCtumI0FBJqi6rRYFmoYtSUvPZOG
+Vf2uOvfX+zkQHGQmigLEnt4Akio/SgdCst/An6zmnkymPKP2RNvnPGys0Z7MhmgfwwSIYUmAY2pf
+UqHKgX+QVE+fXUlyMq8omUu6KBh/2ai1CERaWi4scMMBrZJ6W2DmkUUx8EtjZ1A4Z+4pjJtZNDxo
+crrminLzvpNGo3vGtdf7umkmiXVXtaheL4igBUVn1JrTw7dfVw0OWNxGm+WtQmYwHNWufx7+JP7h
+lRwj4y7zVdXF3TcOjnIdGtJrDMALo0XBjRGvejN7muPpF4oxL6/58kcpp+20DGB7
+--0000000000002fdcb4060326a585--
 
