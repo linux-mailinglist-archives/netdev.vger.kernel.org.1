@@ -1,151 +1,116 @@
-Return-Path: <netdev+bounces-28551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF42777FCC2
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 19:13:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2F877FC6E
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 19:00:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AA2A1C214BE
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:13:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB92F1C2147D
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AC618035;
-	Thu, 17 Aug 2023 17:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992E6168C0;
+	Thu, 17 Aug 2023 17:00:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7094A19893
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 17:10:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 795D1C433CC;
-	Thu, 17 Aug 2023 17:09:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692292202;
-	bh=IR6gUNrGlpvXPqUl6ePu23Yb6z5yLdZcfdC0Vl1Tk5c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TOgqtLSvVE7GaAYuEOY1QQVKqR/aWnRL6qArTZKkIzyUuFnur3EN4pXVMdXyyIYOF
-	 MpqH4+lNowBpEX69kkTJ9u5ZRywciLVWgwl58JF6KcwE8CXAZCWSKv8akgnm9KvVxf
-	 yNfhZUEHyw6xMo4a4XSkbD1ghvJV1XNN4nPgxyQ+MlyjTfoLbEjXswY1YTgBPRunkR
-	 vtU2EkuO5Izs/qJlL5qkomGoI/SkEn0NMwh3mJ7Ng/BM3BXMlp/NkeEtgIYaEC1Oo4
-	 KmxizblmMKBLZvZu5b2KGdEL3jZwCsRAGNSKI3lJUK8gdDoKfgIXLxCuki8g8wnyJb
-	 piBqRfmbMcSWw==
-From: Jisheng Zhang <jszhang@kernel.org>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v5 9/9] net: stmmac: platform: support parsing per channel irq from DT
-Date: Fri, 18 Aug 2023 00:57:49 +0800
-Message-Id: <20230817165749.672-10-jszhang@kernel.org>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230817165749.672-1-jszhang@kernel.org>
-References: <20230817165749.672-1-jszhang@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896EB154AD
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 17:00:16 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA06E2D72
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 10:00:14 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4fe61ae020bso12430631e87.2
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 10:00:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692291613; x=1692896413;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=HzWFuUiwmjTArnOAh04WG3dlDugXiORSBHNiTqgRyl4=;
+        b=wCVCuabfCpuzdOJguyhLNnKNGmKv2elJrSr74FE2LreiTJAQW/Hj8ZFqcAQXwXGw5S
+         561Vvo1ToqOiL0YuQMUv2U9U60D8ym+yxFPBYXpG+HBkS/9RIPDYZ2jW+SpJct44tKmD
+         tt1bCBQPaRGOhAYFM5Nj/wdoKVyWNkPwNT+7vTFy7JzZsuaEGZGG5xYTzJWQIOzaGqO0
+         MQa18wzWuuGM/23QvuMwr9tVsCfCAD10pt9CEYq/9tuk24StqBcUU/egouuKv2n/qgZR
+         jy7HRFNfRK+YOWP8PTtBeR0xwAfJ47K2MYg57y4dMvUGr126sfmaDgNq0PLDxmWnf0Vx
+         zNxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692291613; x=1692896413;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HzWFuUiwmjTArnOAh04WG3dlDugXiORSBHNiTqgRyl4=;
+        b=L+ihfc8/SzKfGnbtA9M33nw5HlPNHw4OBxHIkZfsugYRn/PXzYzXbCWpX4qEXMGEpK
+         GFRZYKy/klM++aKVlWWxZmR2IZLr2Uy1FObc5ikpQV2z+/K4/wUGjlLxyfewz8Z4cVIZ
+         B67MWJx6B/fO2q7DsiERDGVOMesMtqsrVbz0yXNSRZonMlXBEReFLsvnLKyF3zum+6Zi
+         5uJWtG4HWaaU5CT716Sk409aYbBQxSBG5+tAT/+FPglBxIivOC8YQokBOqM1zLUpxWLN
+         0MJfEhXtVnBfiBL/xmqEIv4Yhi8p5a8S5lnIFIySgA05KxB11BHCRCgGFaN3trlwlCsK
+         eThQ==
+X-Gm-Message-State: AOJu0YzM2tvpN9C1+epgBReJBKym2/QUkcJrOKmSY3l740AG46vwbiHQ
+	AUAlY5frEnPQDZhmlgbF6KW0+sItfw25P9VQDuVSYA==
+X-Google-Smtp-Source: AGHT+IFQutPOg+NOkZPJDGNGDURbkonRFuWocVa0Ell2GSQDJBihcX1ZfG9EQKhZuO5MbhjQLGQ86PB8TMt6jOmiI1M=
+X-Received: by 2002:a05:6512:3288:b0:4fd:d538:b97b with SMTP id
+ p8-20020a056512328800b004fdd538b97bmr3627878lfe.29.1692291613161; Thu, 17 Aug
+ 2023 10:00:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230816100113.41034-1-linyunsheng@huawei.com>
+ <20230816100113.41034-2-linyunsheng@huawei.com> <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
+ <20230817091554.31bb3600@kernel.org>
+In-Reply-To: <20230817091554.31bb3600@kernel.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Thu, 17 Aug 2023 19:59:37 +0300
+Message-ID: <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, 
+	Liang Chen <liangchen.linux@gmail.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The snps dwmac IP may support per channel interrupt. Add support to
-parse the per channel irq from DT.
+Hi Jakub,
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 10 ++++----
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++++++++++++++++++
- 2 files changed, 29 insertions(+), 4 deletions(-)
+On Thu, 17 Aug 2023 at 19:15, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Thu, 17 Aug 2023 16:57:16 +0300 Ilias Apalodimas wrote:
+> > Why should we care about this?  Even an architecture that's 32-bit and
+> > has a 64bit DMA should be allowed to split the pages internally if it
+> > decides to do so.  The trick that drivers usually do is elevate the
+> > page refcnt and deal with that internally.
+>
+> Can we assume the DMA mapping of page pool is page aligned? We should
+> be, right?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 64c55024d69d..d4a8d7b48ad2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3619,7 +3619,7 @@ static int stmmac_request_irq_multi_channel(struct net_device *dev)
- 	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
- 		if (i >= MTL_MAX_RX_QUEUES)
- 			break;
--		if (priv->rx_irq[i] == 0)
-+		if (priv->rx_irq[i] <= 0)
- 			continue;
- 
- 		int_name = priv->int_name_rx_irq[i];
-@@ -3644,7 +3644,7 @@ static int stmmac_request_irq_multi_channel(struct net_device *dev)
- 	for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
- 		if (i >= MTL_MAX_TX_QUEUES)
- 			break;
--		if (priv->tx_irq[i] == 0)
-+		if (priv->tx_irq[i] <= 0)
- 			continue;
- 
- 		int_name = priv->int_name_tx_irq[i];
-@@ -7300,8 +7300,10 @@ int stmmac_dvr_probe(struct device *device,
- 	priv->plat = plat_dat;
- 	priv->ioaddr = res->addr;
- 	priv->dev->base_addr = (unsigned long)res->addr;
--	priv->plat->dma_cfg->perch_irq_en =
--		(priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN);
-+	if (res->rx_irq[0] > 0 && res->tx_irq[0] > 0) {
-+		priv->plat->flags |= STMMAC_FLAG_PERCH_IRQ_EN;
-+		priv->plat->dma_cfg->perch_irq_en = true;
-+	}
- 
- 	priv->dev->irq = res->irq;
- 	priv->wol_irq = res->wol_irq;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 4a2002eea870..0fb9868aeffc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -704,6 +704,9 @@ EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
- int stmmac_get_platform_resources(struct platform_device *pdev,
- 				  struct stmmac_resources *stmmac_res)
- {
-+	char irq_name[8];
-+	int i;
-+
- 	memset(stmmac_res, 0, sizeof(*stmmac_res));
- 
- 	/* Get IRQ information early to have an ability to ask for deferred
-@@ -737,6 +740,26 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
- 		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
- 	}
- 
-+	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
-+		snprintf(irq_name, sizeof(irq_name), "rx%i", i);
-+		stmmac_res->rx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
-+		if (stmmac_res->rx_irq[i] < 0) {
-+			if (stmmac_res->rx_irq[i] == -EPROBE_DEFER)
-+				return -EPROBE_DEFER;
-+			break;
-+		}
-+	}
-+
-+	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
-+		snprintf(irq_name, sizeof(irq_name), "tx%i", i);
-+		stmmac_res->tx_irq[i] = platform_get_irq_byname_optional(pdev, irq_name);
-+		if (stmmac_res->tx_irq[i] < 0) {
-+			if (stmmac_res->tx_irq[i] == -EPROBE_DEFER)
-+				return -EPROBE_DEFER;
-+			break;
-+		}
-+	}
-+
- 	stmmac_res->sfty_ce_irq = platform_get_irq_byname_optional(pdev, "sfty_ce");
- 	if (stmmac_res->sfty_ce_irq < 0) {
- 		if (stmmac_res->sfty_ce_irq == -EPROBE_DEFER)
--- 
-2.40.1
+Yes
 
+> That means we're storing 12 bits of 0 at the lower end.
+> So even with 32b of space we can easily store addresses for 32b+12b =>
+> 16TB of memory. "Ought to be enough" to paraphrase Bill G, and the
+> problem is only in our heads?
+
+Do you mean moving the pp_frag_count there?  I was questioning the
+need to have PP_FLAG_PAGE_SPLIT_IN_DRIVER overall.  With Yunshengs
+patches such a platform would allocate a page, so why should we
+prevent it from splitting it internally?
+
+Thanks
+/Ilias
+>
+> Before we go that way - Mina, are the dma-buf "chunks" you're working
+> with going to be fragment-able? Or rather can driver and/or core take
+> multiple references on a single buffer?
 
