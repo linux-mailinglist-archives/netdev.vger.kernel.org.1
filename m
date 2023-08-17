@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-28543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBED677FCB2
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 19:10:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC20177FCB4
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 19:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0C11C21516
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:10:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3265D2817AF
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 17:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE29D171C1;
-	Thu, 17 Aug 2023 17:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0479A171BF;
+	Thu, 17 Aug 2023 17:09:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860C0171A4
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 17:09:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 918D7C433CC;
-	Thu, 17 Aug 2023 17:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18F6171A4
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 17:09:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2106C433CD;
+	Thu, 17 Aug 2023 17:09:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692292180;
-	bh=nrZBBHIvwoY7+NGVTUVo+wQxGv/rQfcOhG+8CHuUfbw=;
+	s=k20201202; t=1692292183;
+	bh=txwgc7mnnsmcD2eGCJ5tky3C5uEWpaD5DMyct9tbf5w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fqfCowDBfSqLcVFjlD11GFJSUH0EMWxlBxuC4kwhPdNDkLiKR0O6jOv0xZTf62WnD
-	 ZVIrCBskydJV8vy56PW6FFBvq0cgiCXysSwL2NsKI6T3LCl3EqiARFrhRlFDel3q/H
-	 cX8DEnsTqwPxIg2MvmM+0FMqZIa4gb34YemcxM1qXptwCQP4g0ZKeOH1qGfLwL7qxc
-	 IAOMRahGFT1GeOIUHyE5RaHiXUzIEeQnlX5kGc+fqE+e+NNj1HlX1qV2SF1ILg11Iv
-	 D5SmzcZnnRMJ4K7l0sHH8qy2k1i6BK/JRJZvk1uO3QzCZHe9brEn9vs9EffWhy0yV4
-	 5O2iuhBRfHMqw==
+	b=KGFOMjSyshRYy3S7XmxI5nPwYr+UR97M+Uh9kYY13NwiaS+05J/F2VA8eBRBJ+h4g
+	 NwVxLm2D4MtYAqWJgx0cxNBFZ+XmiIyaMJKnKfxwYQBmkgCrWo1pVgkmAVjjeaNs7I
+	 f8+/jGpS8e+4JeAt6WdDPZ93j2ckQIcov4iPDj1KhSYQgRSWrNc1LdQwRlO+HBP0n2
+	 4wg1UdU4Ue4cpSGbnhMZZ21Sikktib0l3Hfsl7itDJZkueJfK6AgcAoVYSBnYPO8pf
+	 Ku6lmXDAQi17J6N1E2v6F3BWBCvKninvj6L6lseyqsi8w37BH3ZBebKR9xKhkpyH7x
+	 xF0FHfQHOK8jw==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -46,9 +46,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v5 2/9] net: stmmac: xgmac: add more feature parsing from hw cap
-Date: Fri, 18 Aug 2023 00:57:42 +0800
-Message-Id: <20230817165749.672-3-jszhang@kernel.org>
+Subject: [PATCH net-next v5 3/9] net: stmmac: enlarge max rx/tx queues and channels to 16
+Date: Fri, 18 Aug 2023 00:57:43 +0800
+Message-Id: <20230817165749.672-4-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230817165749.672-1-jszhang@kernel.org>
 References: <20230817165749.672-1-jszhang@kernel.org>
@@ -60,27 +60,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The XGMAC_HWFEAT_GMIISEL bit also indicates whether support 10/100Mbps
-or not.
+xgmac supports up to 16 rx/tx queues and up to 16 channels.
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 Acked-by: Alexandre TORGUE <alexandre.torgue@foss.st.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 5 ++---
+ include/linux/stmmac.h                              | 6 +++---
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-index 3aacf791efeb..1ef8fc132c2d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-@@ -410,6 +410,7 @@ static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
- 	dma_cap->vlhash = (hw_cap & XGMAC_HWFEAT_VLHASH) >> 4;
- 	dma_cap->half_duplex = (hw_cap & XGMAC_HWFEAT_HDSEL) >> 3;
- 	dma_cap->mbps_1000 = (hw_cap & XGMAC_HWFEAT_GMIISEL) >> 1;
-+	dma_cap->mbps_10_100 = (hw_cap & XGMAC_HWFEAT_GMIISEL) >> 1;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index 38782662ff98..8ac994553bc1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -232,9 +232,8 @@ static void dwxgmac2_map_mtl_to_dma(struct mac_device_info *hw, u32 queue,
+ 	void __iomem *ioaddr = hw->pcsr;
+ 	u32 value, reg;
  
- 	/* MAC HW feature 1 */
- 	hw_cap = readl(ioaddr + XGMAC_HW_FEATURE1);
+-	reg = (queue < 4) ? XGMAC_MTL_RXQ_DMA_MAP0 : XGMAC_MTL_RXQ_DMA_MAP1;
+-	if (queue >= 4)
+-		queue -= 4;
++	reg = XGMAC_MTL_RXQ_DMA_MAP0 + (queue & ~0x3);
++	queue &= 0x3;
+ 
+ 	value = readl(ioaddr + reg);
+ 	value &= ~XGMAC_QxMDMACH(queue);
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 784277d666eb..9c90e2e295d4 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -15,9 +15,9 @@
+ #include <linux/platform_device.h>
+ #include <linux/phy.h>
+ 
+-#define MTL_MAX_RX_QUEUES	8
+-#define MTL_MAX_TX_QUEUES	8
+-#define STMMAC_CH_MAX		8
++#define MTL_MAX_RX_QUEUES	16
++#define MTL_MAX_TX_QUEUES	16
++#define STMMAC_CH_MAX		16
+ 
+ #define STMMAC_RX_COE_NONE	0
+ #define STMMAC_RX_COE_TYPE1	1
 -- 
 2.40.1
 
