@@ -1,255 +1,148 @@
-Return-Path: <netdev+bounces-28629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1361780039
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:56:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F7078003D
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:58:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA6E1C21520
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:56:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2D3E282100
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8017B1BB57;
-	Thu, 17 Aug 2023 21:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C9A1BB5B;
+	Thu, 17 Aug 2023 21:58:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED85168D1
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:56:28 +0000 (UTC)
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 925C035A4
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:56:13 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id 46e09a7af769-6bd3317144fso302772a34.1
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:56:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D5B1ADC8;
+	Thu, 17 Aug 2023 21:58:32 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FE302698;
+	Thu, 17 Aug 2023 14:58:31 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2685bcd046eso197854a91.3;
+        Thu, 17 Aug 2023 14:58:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692309373; x=1692914173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G991xsJ0MaYsy7ZznlOsR6Q7hnUWa5OuJRGDstV5zlc=;
-        b=mBdcNF9buzxMoOaS7k9e9BJigIwwWDNbiSJaz9Iq43ODU9Jufwefu9irMnEVGifn1T
-         jdOrczZIwsUVcpeactMohRFrY+66jZpegAbH8KmmEjQAr3xTam0aEpTK/iYTkLgMWPHq
-         QBMiPpk1f8gG51cvnp04uT1b8jNalGHDxZd04NqlQC6leYks/Z953Tucrc5mZF0cyrFW
-         j+7pdahaGxA7Oxq1JdzSnimo2docc6Lwi+MAJfsBUaYHb45A6dxvLYARgaTCLfpg/XkT
-         Xf/Uo8g1ad880+dboCPfyWfEWbGj8c3yYIuI4siaPbkw+kejthEVIiJqM6b+TPbXwAXw
-         COcA==
+        d=gmail.com; s=20221208; t=1692309511; x=1692914311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GINBlOUN78JQAVZLCyadtlAejrOaDZvkhNHX3xHJbIA=;
+        b=RzMjdJdCUKJCTf7fI3fc/wIBGlIIjqaTWtwE9ycDNv2m4cNYvGJey6yihBIA3CAbkq
+         RmJPRgQ/h1E0dGNCahy9HGSwCSUkjx5bZP1OWUD4soUUZcQ3BL8GvPQQSWmkF74+5A2n
+         9E2KVwJrg6JyCABiL6N7KJ8f02G6VPVD+K9sUwXcJmRe/ck+UnlkNnrXJpQN6BaAvc0M
+         ycsNCRgH1KwYHVtqqtglQv6QR8M3QkBqWcMJi3zSe3NV3MRfx7CVo29qWqk/DQtfzsG4
+         LIptvRZrFGLHCByQ/VlMf3JX+6vGO/0bazj8auI1oWseGbKpn/zJqIcLVHI1e4Id4mrI
+         wyGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692309373; x=1692914173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G991xsJ0MaYsy7ZznlOsR6Q7hnUWa5OuJRGDstV5zlc=;
-        b=RbOMDyVyyHiBneSFNIfNoVEqZh3wDxH5Sgaw/S54PRAIHf+kHmka7okbtiFaOw2YJP
-         a5iUlj4gdMYHfoxhWybMwEzpN+j31lH/B5GK2ADR02d/E+A+nlQ+Z8t4E9kmxiX1DErl
-         jQYLwyreNrsJZiuDetHT1QjNXlmY0/W3KHOLxLJq7dQtmJWDaJVeS0HryEdinCxXQ7kj
-         8uqZcUyVjtSSJGw3Sqsgx+xs8F551t2RDdgyZ3cwZi71DCxp7VOhqIbMgPbKjuZ5DbFB
-         CDN6i0I0gXFc8jX5lZNW0RBKOLXNII7e3ht18uapD3747FMI6PgwT6qaSSzCTumxcK3A
-         fO4w==
-X-Gm-Message-State: AOJu0YxYS9bDWFuGDHJJczfJmc/JvfXzPPbH6F5iAzX6EA9uMx4OyGsx
-	5BnElL/V+3wawIm0F7OBvwcMZdyNyL1h6/UnODx8rw==
-X-Google-Smtp-Source: AGHT+IG/209dW0yUmXupZ7afJCSjfA40L9NxMyag3Y0PHCNaY7lWyER2S5rEwgbA2Ix9+wk5azlYqq8Ngw7d+udkzjA=
-X-Received: by 2002:a05:6358:70c:b0:13a:6cb:4d91 with SMTP id
- e12-20020a056358070c00b0013a06cb4d91mr948365rwj.7.1692309372641; Thu, 17 Aug
- 2023 14:56:12 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692309511; x=1692914311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GINBlOUN78JQAVZLCyadtlAejrOaDZvkhNHX3xHJbIA=;
+        b=HB+fBejiL64z/bkOKug5ew70Q/T54WqbDhb+08QAA/4eadwdalcM93xFJzFH6/V5f+
+         aLdl5TDFHQfjtPtB8Os6Ne5FIfldw2Ji8BhMK0pyOKj48humGOwjWO+Y1nZk3veHis+D
+         e+6RYGcD2HD3MfbabYP7reKY0OTCG205d6feu8t/4Ta9vwDk0Qscuq0PIjdYAkqEZxIe
+         mlIAoxVS+jVqgPoK5vWl50LjFgVEvYLHaiY5Ebh6y26dxbvYO7WfrNSWR4dys+igg3tM
+         GR3wV4RAwtrOvX/4hJlEVjvYw1PPNHPFz1jmOMbwxblwUY1OQ0WfdO0Hgq8yu1may3Au
+         UhxQ==
+X-Gm-Message-State: AOJu0YxL4XsZ4qUlE6maCKLc5BbzsbPCwGqiF3OdCrzNnMEiifskghP6
+	wSKrMk4HRZ22qFYCt3Hlwew=
+X-Google-Smtp-Source: AGHT+IGxkIxUbdobemPAjFwPTFS1otmjb9kmh1krxv/YtvUP/c92nBH5UbW8yWyibu0MRQH+GWyjcA==
+X-Received: by 2002:a17:90a:2a01:b0:26b:e80:11de with SMTP id i1-20020a17090a2a0100b0026b0e8011demr734132pjd.25.1692309510832;
+        Thu, 17 Aug 2023 14:58:30 -0700 (PDT)
+Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:500::4:8d88])
+        by smtp.gmail.com with ESMTPSA id x14-20020a17090a6b4e00b00268320ab9f2sm1734599pjl.6.2023.08.17.14.58.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 14:58:30 -0700 (PDT)
+Date: Thu, 17 Aug 2023 14:58:26 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
+	netdev@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH bpf-next v5 13/21] ice: Implement checksum hint
+Message-ID: <20230817215826.sx7t6mipx7pajuzo@macbook-pro-8.dhcp.thefacebook.com>
+References: <20230811161509.19722-1-larysa.zaremba@intel.com>
+ <20230811161509.19722-14-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816234303.3786178-1-kuba@kernel.org> <20230816234303.3786178-5-kuba@kernel.org>
-In-Reply-To: <20230816234303.3786178-5-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 17 Aug 2023 14:56:01 -0700
-Message-ID: <CAHS8izOu=DxeRdD7Gdt-N2qvH_Nnwpcem1KkNgjOLeWzHZ_5JQ@mail.gmail.com>
-Subject: Re: [RFC net-next 04/13] net: page_pool: id the page pools
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	aleksander.lobakin@intel.com, linyunsheng@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811161509.19722-14-larysa.zaremba@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 4:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> To give ourselves the flexibility of creating netlink commands
-> and ability to refer to page pool instances in uAPIs create
-> IDs for page pools.
->
-
-Sorry maybe I'm missing something, but it's a bit curious to me that
-this ID is needed. An rx queue can only ever have 1 page-pool
-associated with it at a time, right? Could you instead add a pointer
-to the page_pool into 'struct netdev_rx_queue', and then page-pool can
-be referred to by the netdev id & the rx-queue number? Wouldn't that
-make the implementation much simpler? I also believe the userspace
-refers to the rx-queue by its index number for the ethtool APIs like
-adding flow steering rules, so extending that to here maybe makes
-sense.
-
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Fri, Aug 11, 2023 at 06:15:01PM +0200, Larysa Zaremba wrote:
+> Implement .xmo_rx_csum callback to allow XDP code to determine,
+> whether HW has validated any checksums.
+> 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 > ---
->  include/net/page_pool/types.h |  4 ++++
->  net/core/Makefile             |  2 +-
->  net/core/page_pool.c          | 21 +++++++++++++++-----
->  net/core/page_pool_priv.h     |  9 +++++++++
->  net/core/page_pool_user.c     | 36 +++++++++++++++++++++++++++++++++++
->  5 files changed, 66 insertions(+), 6 deletions(-)
->  create mode 100644 net/core/page_pool_priv.h
->  create mode 100644 net/core/page_pool_user.c
->
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.=
-h
-> index 1ac7ce25fbd4..9fadf15dadfa 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -189,6 +189,10 @@ struct page_pool {
->
->         /* Slow/Control-path information follows */
->         struct page_pool_params_slow slow;
-> +       /* User-facing fields, protected by page_pools_lock */
-> +       struct {
-> +               u32 id;
-> +       } user;
->  };
->
->  struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
-> diff --git a/net/core/Makefile b/net/core/Makefile
-> index 731db2eaa610..4ae3d83f67d5 100644
-> --- a/net/core/Makefile
-> +++ b/net/core/Makefile
-> @@ -18,7 +18,7 @@ obj-y              +=3D dev.o dev_addr_lists.o dst.o ne=
-tevent.o \
->  obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) +=3D dev_addr_lists_test.o
->
->  obj-y +=3D net-sysfs.o
-> -obj-$(CONFIG_PAGE_POOL) +=3D page_pool.o
-> +obj-$(CONFIG_PAGE_POOL) +=3D page_pool.o page_pool_user.o
->  obj-$(CONFIG_PROC_FS) +=3D net-procfs.o
->  obj-$(CONFIG_NET_PKTGEN) +=3D pktgen.o
->  obj-$(CONFIG_NETPOLL) +=3D netpoll.o
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 8e71e116224d..de199c356043 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -23,6 +23,8 @@
->
->  #include <trace/events/page_pool.h>
->
-> +#include "page_pool_priv.h"
-> +
->  #define DEFER_TIME (msecs_to_jiffies(1000))
->  #define DEFER_WARN_INTERVAL (60 * HZ)
->
-> @@ -264,13 +266,21 @@ struct page_pool *page_pool_create(const struct pag=
-e_pool_params *params)
->                 return ERR_PTR(-ENOMEM);
->
->         err =3D page_pool_init(pool, params);
-> -       if (err < 0) {
-> -               pr_warn("%s() gave up with errno %d\n", __func__, err);
-> -               kfree(pool);
-> -               return ERR_PTR(err);
-> -       }
-> +       if (err < 0)
-> +               goto err_free;
-> +
-> +       err =3D page_pool_list(pool);
-> +       if (err)
-> +               goto err_uninit;
->
->         return pool;
-> +
-> +err_uninit:
-> +       page_pool_uninit(pool);
-> +err_free:
-> +       pr_warn("%s() gave up with errno %d\n", __func__, err);
-> +       kfree(pool);
-> +       return ERR_PTR(err);
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 26 +++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> index 6ae57a98a4d8..f11a245705bc 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> @@ -660,8 +660,34 @@ static int ice_xdp_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan_tci,
+>  	return 0;
 >  }
->  EXPORT_SYMBOL(page_pool_create);
->
-> @@ -818,6 +828,7 @@ static void page_pool_free(struct page_pool *pool)
->         if (pool->disconnect)
->                 pool->disconnect(pool);
->
-> +       page_pool_unlist(pool);
->         page_pool_uninit(pool);
->         kfree(pool);
->  }
-> diff --git a/net/core/page_pool_priv.h b/net/core/page_pool_priv.h
-> new file mode 100644
-> index 000000000000..6c4e4aeed02a
-> --- /dev/null
-> +++ b/net/core/page_pool_priv.h
-> @@ -0,0 +1,9 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#ifndef __PAGE_POOL_PRIV_H
-> +#define __PAGE_POOL_PRIV_H
-> +
-> +int page_pool_list(struct page_pool *pool);
-> +void page_pool_unlist(struct page_pool *pool);
-> +
-> +#endif
-> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-> new file mode 100644
-> index 000000000000..af4ac38a2de1
-> --- /dev/null
-> +++ b/net/core/page_pool_user.c
-> @@ -0,0 +1,36 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#include <linux/mutex.h>
-> +#include <linux/xarray.h>
-> +#include <net/page_pool/types.h>
-> +
-> +#include "page_pool_priv.h"
-> +
-> +static DEFINE_XARRAY_FLAGS(page_pools, XA_FLAGS_ALLOC1);
-> +static DEFINE_MUTEX(page_pools_lock);
-> +
-> +int page_pool_list(struct page_pool *pool)
+>  
+> +/**
+> + * ice_xdp_rx_csum - RX checksum XDP hint handler
+> + * @ctx: XDP buff pointer
+> + * @csum_status: status destination address
+> + * @csum: not used
+> + */
+> +static int ice_xdp_rx_csum(const struct xdp_md *ctx,
+> +			   enum xdp_csum_status *csum_status, __wsum *csum)
 > +{
-> +       static u32 id_alloc_next;
-> +       int err;
+> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
+> +	const union ice_32b_rx_flex_desc *eop_desc;
+> +	enum ice_rx_csum_status status;
+> +	u16 ptype;
 > +
-> +       mutex_lock(&page_pools_lock);
-> +       err =3D xa_alloc_cyclic(&page_pools, &pool->user.id, pool, xa_lim=
-it_32b,
-> +                             &id_alloc_next, GFP_KERNEL);
-> +       if (err < 0)
-> +               goto err_unlock;
+> +	eop_desc = xdp_ext->pkt_ctx.eop_desc;
+> +	ptype = ice_get_ptype(eop_desc);
 > +
-> +       mutex_unlock(&page_pools_lock);
-> +       return 0;
+> +	status = ice_get_rx_csum_status(eop_desc, ptype);
+> +	if (status & ICE_RX_CSUM_FAIL)
+> +		return -ENODATA;
 > +
-> +err_unlock:
-> +       mutex_unlock(&page_pools_lock);
-> +       return err;
+> +	*csum_status = XDP_CHECKSUM_VERIFIED;
+> +	return 0;
 > +}
 > +
-> +void page_pool_unlist(struct page_pool *pool)
-> +{
-> +       mutex_lock(&page_pools_lock);
-> +       xa_erase(&page_pools, pool->user.id);
-> +       mutex_unlock(&page_pools_lock);
-> +}
-> --
-> 2.41.0
->
+>  const struct xdp_metadata_ops ice_xdp_md_ops = {
+>  	.xmo_rx_timestamp		= ice_xdp_rx_hw_ts,
+>  	.xmo_rx_hash			= ice_xdp_rx_hash,
+>  	.xmo_rx_vlan_tag		= ice_xdp_rx_vlan_tag,
+> +	.xmo_rx_csum			= ice_xdp_rx_csum,
 
-
---=20
-Thanks,
-Mina
+timestamp hint is implemented by igc, mlx4, mlx5, stmmac
+hash hint is implemneted by igc, mlx4, mlx5.
+With above csum and vlan hints will be in ice only.
+I'd like to see at least one more driver to implement them as well to make sure
+the proposed API works for other vendors.
 
