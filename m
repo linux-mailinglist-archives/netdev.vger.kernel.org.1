@@ -1,129 +1,143 @@
-Return-Path: <netdev+bounces-28354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4400C77F283
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 10:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D03D477F2A3
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 724B3281E17
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 08:56:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C01A281DF4
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A544FC0E;
-	Thu, 17 Aug 2023 08:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395F7100A9;
+	Thu, 17 Aug 2023 09:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3855D2C9C
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 08:56:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6AA5C433C8;
-	Thu, 17 Aug 2023 08:56:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692262564;
-	bh=9bDuY4CAwq3emi0LWvjJSZGJSZqOemRjjqVz1VixD10=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aDuAsDMmGzdgrTKeCwZIXfYjfwCOla4Adogr507rJhu5hwxy70453WMRqb6kDbGin
-	 084kqXUPx3hLfcm5089YuN4yUmNJ31dtreSK52kJjyBZjDaqqWVF6tKLgzPNxISWkS
-	 y5zuLjcSLauHN/E5KFBIUKmgdf46CYveBpYIjAbFI/Rfmgoqs2UxUZFt28tlLrq1CA
-	 sQfZ7jAbrOx7U9tJOHagYKL/wiragV5BTz0ar5G8KyozStfp3RL2c6TKJwSDmWgtJV
-	 P5lyPa5CWOE3K9e1A64kMjVomLtVZFMAQEDTmmXjA/B0ApeCWINd4tBW0B/n77mtTq
-	 v/MCkWrIKXcAA==
-Date: Thu, 17 Aug 2023 09:55:59 +0100
-From: Conor Dooley <conor@kernel.org>
-To: "Hawkins, Nick" <nick.hawkins@hpe.com>
-Cc: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-	"simon.horman@corigine.com" <simon.horman@corigine.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"Verdun, Jean-Marie" <verdun@hpe.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 3/5] dt-bindings: net: Add HPE GXP UMAC
-Message-ID: <20230817-animate-aerosol-5c857b4ff9a9@spud>
-References: <20230802201824.3683-1-nick.hawkins@hpe.com>
- <20230802201824.3683-4-nick.hawkins@hpe.com>
- <20230803-balance-octopus-3d36f784f776@spud>
- <AF599C90-1257-4C13-AF60-8680A812421A@hpe.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D954E55B
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:01:56 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E067EE7C
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:01:54 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRJq51tkbzVkvX;
+	Thu, 17 Aug 2023 16:59:45 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 17 Aug 2023 17:01:51 +0800
+Message-ID: <dd7e3f9a-1348-1d13-3b0b-5165070dd342@huawei.com>
+Date: Thu, 17 Aug 2023 17:01:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gJ6NujNNSkAlOeiD"
-Content-Disposition: inline
-In-Reply-To: <AF599C90-1257-4C13-AF60-8680A812421A@hpe.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH -next] net: broadcom: Use helper function IS_ERR_OR_NULL()
+Content-Language: en-US
+To: Leon Romanovsky <leon@kernel.org>
+CC: <netdev@vger.kernel.org>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
+	<rafal@milecki.pl>, Broadcom internal kernel review list
+	<bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Doug Berger
+	<opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>
+References: <20230816095357.2896080-1-ruanjinjie@huawei.com>
+ <20230817071923.GB22185@unreal>
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <20230817071923.GB22185@unreal>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
---gJ6NujNNSkAlOeiD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 16, 2023 at 04:26:09PM +0000, Hawkins, Nick wrote:
-> Hi Conor,
->=20
-> Thanks for your feedback. I will provide an explanation below.
->=20
-> > > +description:
-> > > + HPE GXP 802.3 10/100/1000T Ethernet Unifed MAC controller.
-> > > + Device node of the controller has following properties.
-> > > +
-> > > +properties:
-> > > + compatible:
-> > > + const: hpe,gxp-umac
-> > > +
->=20
->=20
-> > > + use-ncsi:
-> > > + type: boolean
-> > > + description:
-> > > + Indicates if the device should use NCSI (Network Controlled
-> > > + Sideband Interface).
->=20
->=20
-> > How is one supposed to know if the device should use NCSI? If the
-> > property is present does that mean that the mac hardware supports
-> > it? Or is it determined by what board this mac is on?
-> > Or is this software configuration?
->=20
-> Hi Conor,
->=20
-> There are two MAC's available in the ASIC but only one can support
-> NCSI. Even though it supports NCSI does not mean the board has
-> been physically wired to support it. In terms of the device tree I would
-> expect the "use-ncsi" to be present in the dts board specific file.
->=20
-> There will be hardware configurations where both MAC0 and MAC1
-> will be using the SERDES connections. In that case there will be no
-> NCSI available.
->=20
-> Is a better description needed here to explain this?
+On 2023/8/17 15:19, Leon Romanovsky wrote:
+> On Wed, Aug 16, 2023 at 05:53:56PM +0800, Ruan Jinjie wrote:
+>> Use IS_ERR_OR_NULL() instead of open-coding it
+>> to simplify the code.
+>>
+>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+>> ---
+>>  drivers/net/ethernet/broadcom/bgmac.c        | 2 +-
+>>  drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
+>> index 10c7c232cc4e..4cd7c6abb548 100644
+>> --- a/drivers/net/ethernet/broadcom/bgmac.c
+>> +++ b/drivers/net/ethernet/broadcom/bgmac.c
+>> @@ -1448,7 +1448,7 @@ int bgmac_phy_connect_direct(struct bgmac *bgmac)
+>>  	int err;
+>>  
+>>  	phy_dev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
+> 
+> When can fixed_phy_register() return NULL?
+> It looks like it returns or valid phy_dev or ERR_PTR().
 
-Ah crap, I missed this yesterday - I think this came in as I was doing
-my queue sweep. The improved description seems good to me, thanks for
-adding to it.
+It seems the following code has a problem:
 
---gJ6NujNNSkAlOeiD
-Content-Type: application/pgp-signature; name="signature.asc"
+226 static struct phy_device *__fixed_phy_register(unsigned int irq,
+227                            struct fixed_phy_status *status,
+228                            struct device_node *np,
+229                            struct gpio_desc *gpiod)
+230 {
+231     struct fixed_mdio_bus *fmb = &platform_fmb;
+232     struct phy_device *phy;
+233     int phy_addr;
+234     int ret;
+235
+236     if (!fmb->mii_bus || fmb->mii_bus->state != MDIOBUS_REGISTERED)
+237         return ERR_PTR(-EPROBE_DEFER);
+238
+239     /* Check if we have a GPIO associated with this fixed phy */
+240     if (!gpiod) {
+241         gpiod = fixed_phy_get_gpiod(np);
+242         if (IS_ERR(gpiod))
+243             return ERR_CAST(gpiod);
+244     }
 
------BEGIN PGP SIGNATURE-----
+fixed_phy_get_gpiod() return valid gpio_desc or NULL.If
+fixed_phy_get_gpiod(np) failed, the error can not be returned with
+IS_ERR(gpiod) is true, so the 243 line code is a dead code.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZN3gnwAKCRB4tDGHoIJi
-0rKVAQDPJoKAqlpV7Q1t6ED5S659aQuuZhr/DdhyowGt8aRpVwEA3LWLW16B+M6I
-vz/Rwt5DU2t/EondExnJr/SQgyAHHgY=
-=KkRV
------END PGP SIGNATURE-----
-
---gJ6NujNNSkAlOeiD--
+> 
+> Thanks
+> 
+> 
+>> -	if (!phy_dev || IS_ERR(phy_dev)) {
+>> +	if (IS_ERR_OR_NULL(phy_dev)) {
+>>  		dev_err(bgmac->dev, "Failed to register fixed PHY device\n");
+>>  		return -ENODEV;
+>>  	}
+>> diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+>> index 0092e46c46f8..aa9a436fb3ce 100644
+>> --- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
+>> +++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+>> @@ -617,7 +617,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
+>>  		};
+>>  
+>>  		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
+>> -		if (!phydev || IS_ERR(phydev)) {
+>> +		if (IS_ERR_OR_NULL(phydev)) {
+>>  			dev_err(kdev, "failed to register fixed PHY device\n");
+>>  			return -ENODEV;
+>>  		}
+>> -- 
+>> 2.34.1
+>>
+>>
 
