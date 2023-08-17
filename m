@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-28617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8416677FFEE
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:31:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA3B77FFEF
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E1E3282210
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:31:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F1A11C214EB
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC3A1C9EC;
-	Thu, 17 Aug 2023 21:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043261DA20;
+	Thu, 17 Aug 2023 21:29:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6872B1C9E3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95B31D308
 	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:29:40 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402DD10C7
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CC6E4F
 	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692307779; x=1723843779;
+  t=1692307780; x=1723843780;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WgBTWYmlyY1f4Hm79yLAsGqBmQxxsnRZRJNqYO/lC0o=;
-  b=EGAREDFn47W9iwTu+NOsJKr+o1IekSC7FknzevarJAn/qJ5/vbDV4pQs
-   4dXRvAeOr+XuGSjIAk3KaxWgDDCrwO+pOJZs7I5w7a9ONXuxInJYhZug6
-   srF4vTnuTegSjDQg6QG2CoEJSXdI3mv0MmC6cWTiHpc+/nhR/lvYpa/Sa
-   Aub3HM4yIbRjvmV5JVTeh8ScueYRDkkT7ac92lKQyVQ8c0U707tJmTZmi
-   SfdKc4RZ+8lowLjFnJMerSTCkstpUwpxSDaMNbEMHN54xZFg7Pk/cRjuP
-   HLuSyu+imDcOPyOlDyL+G2ZTkYBGi4YIFkcOuzIN226oWZ6PBgYNB6Q4P
+  bh=vqZnPCweTzl3DZaa9x6LLYk45/LnwSmleyyLBF3dd8g=;
+  b=S7iWVlHRnrJE2K0bbpbn7mbVd9VYaojbvLt6iGWMkI9mGvTpKA2ZW5+n
+   VlFulLWEYn/irBVchyGNOvqN1GZ5B1FQVS4VAlzK2nT0nH/NC3Gfev8vb
+   RuCrq1MXCt/OGnSS630Mu5exgV6n6ozSdfJCVN83WfKiuqFq1PzMmvh5s
+   iBwRFn3H4okEqAFvHjfQMmnWxCx2yIsvRWA+3iBkpgqZE7YRKzcRjF49L
+   eoo+ID/nLD5QkPakll/FftPCpRbdaLpH9kvIgK9F/JBzURtUeDFlX/xxX
+   6eDBkFLgVrBauKDzGez9sFOq/kWHhVcRMdjvzMrwvD3GF3AzoVV9qQQzi
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="363095076"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="363095083"
 X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
-   d="scan'208";a="363095076"
+   d="scan'208";a="363095083"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 14:29:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="824813718"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="824813721"
 X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
-   d="scan'208";a="824813718"
+   d="scan'208";a="824813721"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Aug 2023 14:29:36 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Aug 2023 14:29:37 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -56,9 +56,9 @@ Cc: Jan Sokolowski <jan.sokolowski@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH net-next v2 07/15] ice: refactor ice_ptp_hw to make functions static
-Date: Thu, 17 Aug 2023 14:22:31 -0700
-Message-Id: <20230817212239.2601543-8-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v2 08/15] ice: refactor ice_vsi_is_vlan_pruning_ena
+Date: Thu, 17 Aug 2023 14:22:32 -0700
+Message-Id: <20230817212239.2601543-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230817212239.2601543-1-anthony.l.nguyen@intel.com>
 References: <20230817212239.2601543-1-anthony.l.nguyen@intel.com>
@@ -78,11 +78,9 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jan Sokolowski <jan.sokolowski@intel.com>
 
-As following methods are not used outside ice_ptp_hw,
-they can be made static:
-ice_read_phy_reg_e822
-ice_write_phy_reg_e822
-ice_ptp_prep_port_adj_e822
+As this method became static, and is already called
+with check for vsi being non-null, an unnecessary check along
+with superfluous parentheses is removed.
 
 Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
@@ -90,55 +88,23 @@ Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 6 +++---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 3 ---
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_lib.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index a0da1bb55ba1..68e2d5ca01f3 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -293,7 +293,7 @@ static bool ice_is_40b_phy_reg_e822(u16 low_addr, u16 *high_addr)
-  *
-  * Read a PHY register for the given port over the device sideband queue.
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index d3fb2b7535e7..201570cd2e0b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1235,10 +1235,7 @@ ice_chnl_vsi_setup_q_map(struct ice_vsi *vsi, struct ice_vsi_ctx *ctxt)
   */
--int
-+static int
- ice_read_phy_reg_e822(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
+ static bool ice_vsi_is_vlan_pruning_ena(struct ice_vsi *vsi)
  {
- 	struct ice_sbq_msg_input msg = {0};
-@@ -370,7 +370,7 @@ ice_read_64b_phy_reg_e822(struct ice_hw *hw, u8 port, u16 low_addr, u64 *val)
-  *
-  * Write a PHY register for the given port over the device sideband queue.
-  */
--int
-+static int
- ice_write_phy_reg_e822(struct ice_hw *hw, u8 port, u16 offset, u32 val)
- {
- 	struct ice_sbq_msg_input msg = {0};
-@@ -1079,7 +1079,7 @@ ice_ptp_prep_phy_time_e822(struct ice_hw *hw, u32 time)
-  *
-  * Negative adjustments are supported using 2s complement arithmetic.
-  */
--int
-+static int
- ice_ptp_prep_port_adj_e822(struct ice_hw *hw, u8 port, s64 time)
- {
- 	u32 l_time, u_time;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 07cd023b0efd..13547707b8e3 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -141,11 +141,8 @@ int ice_ptp_init_phc(struct ice_hw *hw);
- int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready);
- 
- /* E822 family functions */
--int ice_read_phy_reg_e822(struct ice_hw *hw, u8 port, u16 offset, u32 *val);
--int ice_write_phy_reg_e822(struct ice_hw *hw, u8 port, u16 offset, u32 val);
- int ice_read_quad_reg_e822(struct ice_hw *hw, u8 quad, u16 offset, u32 *val);
- int ice_write_quad_reg_e822(struct ice_hw *hw, u8 quad, u16 offset, u32 val);
--int ice_ptp_prep_port_adj_e822(struct ice_hw *hw, u8 port, s64 time);
- void ice_ptp_reset_ts_memory_quad_e822(struct ice_hw *hw, u8 quad);
+-	if (!vsi)
+-		return false;
+-
+-	return (vsi->info.sw_flags2 & ICE_AQ_VSI_SW_FLAG_RX_VLAN_PRUNE_ENA);
++	return vsi->info.sw_flags2 & ICE_AQ_VSI_SW_FLAG_RX_VLAN_PRUNE_ENA;
+ }
  
  /**
 -- 
