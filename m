@@ -1,60 +1,51 @@
-Return-Path: <netdev+bounces-28443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 774FA77F77F
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:16:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A57777F785
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F975281F72
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:16:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A8A22815D2
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628B614266;
-	Thu, 17 Aug 2023 13:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483E614269;
+	Thu, 17 Aug 2023 13:19:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CBB14005
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:16:25 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77A7103;
-	Thu, 17 Aug 2023 06:16:17 -0700 (PDT)
-Date: Thu, 17 Aug 2023 15:16:12 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1692278175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4XsU42DM/msA/Cd5i5m/J+bQMyWNBvE8v4MIojmkpuw=;
-	b=d48XWJt3B4sHnmLZskkGirccMizqbqs99ML19Gt8vNuTpvwHHgK0qDv8LwO+x2Rk8WVvuA
-	wpA3kTiVE19SLdbi9N2k0/fdYIYQrJpPRHan9iYlN9l309crHPX5uLKdhSWTkjSa7Z0/4j
-	C6OeSmhZpqpOrHvctYP2vxrNiBLXo/HfRMQUDFqfO9T2xdcf8IiwByxdj9LqgBJpQes30a
-	jlTzAnaExixQbMicm3uh9yD3IiTk2LKWlS1Ut1ZUh8s5DzjIqUTuXXYirRZ02chiaAtSqU
-	cmKDPasN0v210JPCILgMsoexKi/6q3w32wNJi8TnHIiTBecvom31dQBIImlnWA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1692278175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4XsU42DM/msA/Cd5i5m/J+bQMyWNBvE8v4MIojmkpuw=;
-	b=H/3Lwjw4RY5zrazKziA3e4yQKbhpvO4c2rFkNu5MZFvj73HNeWUACNTBWGFl2wVOhjTjQ4
-	6JCHm6ybYD8RhHCQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: Re: [RFC PATCH net-next 0/2] net: Use SMP threads for backlog NAPI.
-Message-ID: <20230817131612.M_wwTr7m@linutronix.de>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814112421.5a2fa4f6@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAB614266
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:19:39 +0000 (UTC)
+Received: from smtp-bc0b.mail.infomaniak.ch (smtp-bc0b.mail.infomaniak.ch [45.157.188.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70DBE1FF3
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:19:38 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4RRQZt5N9gzMpr0Y;
+	Thu, 17 Aug 2023 13:19:34 +0000 (UTC)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4RRQZt17Lbz3g;
+	Thu, 17 Aug 2023 15:19:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1692278374;
+	bh=NlAc03++bHIVmlDNwWhKfwI39aBxaLiWuuKgwfCGLWc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NrO0XvfU+ED5tpXGVZVYIMZSs6kwcQ8sv57N8wLimLIjXaq9lU2BVyJWoaPAGZq5W
+	 7UKlLRrm5Orm72UjfPM67PEwuTexlKjFVoruHtQlC6lSGmk4Zh4VGcgx8X+5agWV2p
+	 1pSAt1gSaIFo/UUu2C+ySFkUo3vTDoZKqZuao4Zc=
+Date: Thu, 17 Aug 2023 15:19:29 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+Cc: artem.kuzin@huawei.com, gnoack3000@gmail.com, 
+	willemdebruijn.kernel@gmail.com, yusongping@huawei.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Message-ID: <20230817.EiHicha5shei@digikod.net>
+References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230706145543.1284007-1-mic@digikod.net>
+ <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
+ <30e2bacd-2e48-9056-5950-1974b9373ee3@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,45 +54,166 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230814112421.5a2fa4f6@kernel.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <30e2bacd-2e48-9056-5950-1974b9373ee3@huawei.com>
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-14 11:24:21 [-0700], Jakub Kicinski wrote:
-> On Mon, 14 Aug 2023 11:35:26 +0200 Sebastian Andrzej Siewior wrote:
-> > The RPS code and "deferred skb free" both send IPI/ function call
-> > to a remote CPU in which a softirq is raised. This leads to a warning on
-> > PREEMPT_RT because raising softiqrs from function call led to undesired
-> > behaviour in the past. I had duct tape in RT for the "deferred skb free"
-> > and Wander Lairson Costa reported the RPS case.
+On Sun, Aug 13, 2023 at 11:09:59PM +0300, Konstantin Meskhidze (A) wrote:
 > 
-> Could you find a less invasive solution?
-> backlog is used by veth == most containerized environments.
-> This change has a very high risk of regression for a lot of people.
+> 
+> 7/12/2023 10:02 AM, Mickaël Salaün пишет:
+> > 
+> > On 06/07/2023 16:55, Mickaël Salaün wrote:
+> > > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> > > 
+> > > This patch is a revamp of the v11 tests [1] with new tests (see the
+> > > "Changes since v11" description).  I (Mickaël) only added the following
+> > > todo list and the "Changes since v11" sections in this commit message.
+> > > I think this patch is good but it would appreciate reviews.
+> > > You can find the diff of my changes here but it is not really readable:
+> > > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
+> > > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
+> > > TODO:
+> > > - Rename all "net_service" to "net_port".
+> > > - Fix the two kernel bugs found with the new tests.
+> > > - Update this commit message with a small description of all tests.
+> > 
+> > [...]
 
-Looking at the cloudflare ppl here in the thread, I doubt they use
-backlog but have proper NAPI so they might not need this.
+> > > +FIXTURE(inet)
+> > > +{
+> > > +	struct service_fixture srv0, srv1;
+> > > +};
+> > 
+> > The "inet" variants are useless and should be removed. The "inet"
+> > fixture can then be renamed to "ipv4_tcp".
+> > 
+>   Maybe its better to name it "tcp". So we dont need to copy TEST_F(tcp,
+> port_endianness) for ipv6 and ipv4.
+> What do you think?
 
-There is no threaded NAPI for backlog and RPS. This was suggested as the
-mitigation for the highload/ DoS case. Can this become a problem or
-- backlog is used only by old drivers so they can move to proper NAPI if
-  it becomes a problem.
-- RPS spreads the load across multiple CPUs so it unlikely to become a
-  problem.
+I don't see any need to test with IPv4 and IPv6, hence the "inet" name
+(and without variants). You can rename it to "inet_tcp" to highlight the
+specificities of this fixture.
 
-Making this either optional in general or mandatory for threaded
-interrupts or PREEMPT_RT will probably not make the maintenance of this
-code any simpler.
-
-I've been looking at veth. In the xdp case it has its own NAPI instance.
-In the non-xdp it uses backlog. This should be called from
-ndo_start_xmit and user's write() so BH is off and interrupts are
-enabled at this point and it should be kind of rate-limited. Couldn't we
-bypass backlog in this case and deliver the packet directly to the
-stack?
-
-Sebastian
+> 
+> > 
+> > > +
+> > > +FIXTURE_VARIANT(inet)
+> > > +{
+> > > +	const bool is_sandboxed;
+> > > +	const struct protocol_variant prot;
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv4) {
+> > > +	/* clang-format on */
+> > > +	.is_sandboxed = false,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv4) {
+> > > +	/* clang-format on */
+> > > +	.is_sandboxed = true,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv6) {
+> > > +	/* clang-format on */
+> > > +	.is_sandboxed = false,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv6) {
+> > > +	/* clang-format on */
+> > > +	.is_sandboxed = true,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +FIXTURE_SETUP(inet)
+> > > +{
+> > > +	const struct protocol_variant ipv4_tcp = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +	};
+> > > +
+> > > +	disable_caps(_metadata);
+> > > +
+> > > +	ASSERT_EQ(0, set_service(&self->srv0, ipv4_tcp, 0));
+> > > +	ASSERT_EQ(0, set_service(&self->srv1, ipv4_tcp, 1));
+> > > +
+> > > +	setup_loopback(_metadata);
+> > > +};
+> > > +
+> > > +FIXTURE_TEARDOWN(inet)
+> > > +{
+> > > +}
+> > > +
+> > > +TEST_F(inet, port_endianness)
+> > > +{
+> > > +	const struct landlock_ruleset_attr ruleset_attr = {
+> > > +		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+> > > +				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> > > +	};
+> > > +	const struct landlock_net_service_attr bind_host_endian_p0 = {
+> > > +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+> > > +		/* Host port format. */
+> > > +		.port = self->srv0.port,
+> > > +	};
+> > > +	const struct landlock_net_service_attr connect_big_endian_p0 = {
+> > > +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> > > +		/* Big endian port format. */
+> > > +		.port = htons(self->srv0.port),
+> > > +	};
+> > > +	const struct landlock_net_service_attr bind_connect_host_endian_p1 = {
+> > > +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+> > > +				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> > > +		/* Host port format. */
+> > > +		.port = self->srv1.port,
+> > > +	};
+> > > +	const unsigned int one = 1;
+> > > +	const char little_endian = *(const char *)&one;
+> > > +	int ruleset_fd;
+> > > +
+> > > +	ruleset_fd =
+> > > +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+> > > +	ASSERT_LE(0, ruleset_fd);
+> > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+> > > +				       &bind_host_endian_p0, 0));
+> > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+> > > +				       &connect_big_endian_p0, 0));
+> > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+> > > +				       &bind_connect_host_endian_p1, 0));
+> > > +	enforce_ruleset(_metadata, ruleset_fd);
+> > > +
+> > > +	/* No restriction for big endinan CPU. */
+> > > +	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
+> > > +
+> > > +	/* No restriction for any CPU. */
+> > > +	test_bind_and_connect(_metadata, &self->srv1, false, false);
+> > > +}
+> > > +
+> > > +TEST_HARNESS_MAIN
+> > .
 
