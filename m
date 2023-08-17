@@ -1,143 +1,159 @@
-Return-Path: <netdev+bounces-28357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45ED177F2CC
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:09:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E00577F2D2
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:12:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72E281C20F65
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:09:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ABE82816D2
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78E2100B3;
-	Thu, 17 Aug 2023 09:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D7110950;
+	Thu, 17 Aug 2023 09:12:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83AD100A9
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:09:28 +0000 (UTC)
-Received: from chg.server2.ideacentral.com (unknown [108.163.232.234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963B0271B
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:09:27 -0700 (PDT)
-Received: from mailnull by ns-196.awsdns-24.com with local (Exim 4.96)
-	id 1qWZ0Q-001HVg-3A
-	for netdev@vger.kernel.org;
-	Thu, 17 Aug 2023 04:09:27 -0500
-X-Failed-Recipients: netdev@vger.kernel.org
-Auto-Submitted: auto-replied
-From: Mail Delivery System <Mailer-Daemon@ns-196.awsdns-24.com>
-To: netdev@vger.kernel.org
-References: <20230817100924.49044D6518A44C49@vger.kernel.org>
-Content-Type: multipart/report; report-type=delivery-status; boundary=1692263366-eximdsn-494131582
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B078EDDAB
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:12:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49897C433C8;
+	Thu, 17 Aug 2023 09:12:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692263534;
+	bh=DLoyjbNkUwEQs6ep3zBlQrrq0CYWr45RAZu4SBmHcbk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EpYNUZytcscVjRlQBSwGDHn5tDuv4Q+wvNBjaF4hMmrpoV1VOOVDAk2wow5v2thZ0
+	 MqE9HxYHDkVpH1ZGXAF0gYvqqnXlNOr5AbbAKbX7H869/4p/y2oJs7IEJHb6EKmrID
+	 S0PkPA1P0QGTsyffPPiB8VLXnZi6d5JYPuo8tQW1k6Xev13rr29+E5NJBIk22Fj8nq
+	 ul7ha773CXVYT0t08z4SMIF6U2wuP8tkPK7CFT1ZAJAtmfIqM6LF1Nh1norkG3yyDq
+	 fDaNxyZu7FKCjFsJB49AR+U6VNnDdM5SYCeXHuVEiQ8hp8j9wrqjOm7daDVxhabpUY
+	 RKZiSwLR1EJ4Q==
+From: Leon Romanovsky <leon@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Dima Chumak <dchumak@nvidia.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: [PATCH net-next v3 0/8] devlink: Add port function attributes
+Date: Thu, 17 Aug 2023 12:11:22 +0300
+Message-ID: <cover.1692262560.git.leonro@nvidia.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Mail delivery failed: returning message to sender
-Message-Id: <E1qWZ0Q-001HVg-3A@ns-196.awsdns-24.com>
-Date: Thu, 17 Aug 2023 04:09:26 -0500
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - ns-196.awsdns-24.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - 
-X-Get-Message-Sender-Via: ns-196.awsdns-24.com: sender_ident via received_protocol == local: mailnull/primary_hostname/system user
-X-Authenticated-Sender: ns-196.awsdns-24.com: mailnull
-X-Spam-Status: No, score=3.0 required=5.0 tests=BAYES_50,HTML_MESSAGE,
-	MAY_BE_FORGED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,
-	RCVD_IN_MSPIKE_L3,SPF_HELO_NONE autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: ***
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
---1692263366-eximdsn-494131582
-Content-type: text/plain; charset=us-ascii
+From: Leon Romanovsky <leonro@nvidia.com>
 
-This message was created automatically by mail delivery software.
+v3:
+ - Changed newly introduced IPsec blocking routine
+   and as an outcome of testing already existing one.
+   I'm sending them together to avoid merge conflicts.
+ - Refactored patches to separate IFC part
+ - Simplified 
+v2: https://lore.kernel.org/netdev/20230421104901.897946-1-dchumak@nvidia.com/
+ - Improve docs of ipsec_crypto vs ipsec_packet devlink attributes
+ - also see patches 2,4 for the changelog.
 
-A message that you sent could not be delivered to one or more of its
-recipients. This is a permanent error. The following address(es) failed:
+---------------------------------------------------------------------------------
+From Dima:
 
-  netdev@vger.kernel.org
-    host vger.kernel.org [23.128.96.18]
-    SMTP error from remote mail server after end of data:
-    550 5.7.1 Spamassassin considers this message SPAM. In case you disagree, send the ENTIRE message (preferably as a saved attachment) plus this error message to <postmaster@vger.kernel.org>
+Introduce hypervisor-level control knobs to set the functionality of PCI
+VF devices passed through to guests. The administrator of a hypervisor
+host may choose to change the settings of a port function from the
+defaults configured by the device firmware.
 
---1692263366-eximdsn-494131582
-Content-type: message/delivery-status
+The software stack has two types of IPsec offload - crypto and packet.
+Specifically, the ip xfrm command has sub-commands for "state" and
+"policy" that have an "offload" parameter. With ip xfrm state, both
+crypto and packet offload types are supported, while ip xfrm policy can
+only be offloaded in packet mode.
 
-Reporting-MTA: dns; ns-196.awsdns-24.com
+The series introduces two new boolean attributes of a port function:
+ipsec_crypto and ipsec_packet. The goal is to provide a similar level of
+granularity for controlling VF IPsec offload capabilities, which would
+be aligned with the software model. This will allow users to decide if
+they want both types of offload enabled for a VF, just one of them, or
+none at all (which is the default).
 
-Action: failed
-Final-Recipient: rfc822;netdev@vger.kernel.org
-Status: 5.0.0
-Remote-MTA: dns; vger.kernel.org
-Diagnostic-Code: smtp; 550 5.7.1 Spamassassin considers this message SPAM. In case you disagree, send the ENTIRE message (preferably as a saved attachment) plus this error message to <postmaster@vger.kernel.org>
+At a high level, the difference between the two knobs is that with
+ipsec_crypto, only XFRM state can be offloaded. Specifically, only the
+crypto operation (Encrypt/Decrypt) is offloaded. With ipsec_packet, both
+XFRM state and policy can be offloaded. Furthermore, in addition to
+crypto operation offload, IPsec encapsulation is also offloaded. For
+XFRM state, choosing between crypto and packet offload types is
+possible. From the HW perspective, different resources may be required
+for each offload type.
 
---1692263366-eximdsn-494131582
-Content-type: message/rfc822
+Examples of when a user prefers to enable IPsec packet offload for a VF
+when using switchdev mode:
 
-Return-path: <netdev@vger.kernel.org>
-Received: from v-104-153-108-120.unman-vds.premium-chicago.nfoservers.com ([104.153.108.120]:62135)
-	by ns-196.awsdns-24.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <netdev@vger.kernel.org>)
-	id 1qWZ0Q-001HEN-1i
-	for netdev@vger.kernel.org;
-	Thu, 17 Aug 2023 04:09:25 -0500
-From: vger.kernel.orgAdministrator<netdev@vger.kernel.org>
-To: netdev@vger.kernel.org
-Subject: =?UTF-8?B?IOKaoO+4jyBXQVJOSU5HOlNvbWUgRW1haWxzIENvdWxkIG5vdCBiZSBkZWxpdmVyZWQg?=
-Date: 17 Aug 2023 10:09:25 +0100
-Message-ID: <20230817100924.49044D6518A44C49@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/html
-Content-Transfer-Encoding: quoted-printable
+  $ devlink port show pci/0000:06:00.0/1
+      pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+          function:
+          hw_addr 00:00:00:00:00:00 roce enable migratable disable ipsec_crypto disable ipsec_packet disable
 
-<!DOCTYPE html>
+  $ devlink port function set pci/0000:06:00.0/1 ipsec_packet enable
 
-<html><head><title></title>
-<meta name=3D"GENERATOR" content=3D"MSHTML 11.00.9600.19003">
-<meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge">
-</head>
-<body><span style=3D"background-color: rgb(204, 204, 204);"><b><i><font col=
-or=3D"#ff0000">Some Emails Could not be Delivered , Action Required</font><=
-/i></b>.</span><div><br><font color=3D"#3d85c6"><font size=3D"4"><b>Quarant=
-ined Messages Report</b> </font>&nbsp;</font><br>netdev@vger.kernel.org<div=
->17-08-2023, 08:00AM <br>&nbsp;<br>Dear netdev,</div><div><br>
-4 messages addressed to you are currently on hold awaiting your further act=
-ion. You can release all of your held messages and permit or block future e=
-mails from the senders, or manage messages individually.<br><br>
-<a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGbcFJkycxN8DaPa=
-nxX?clientID=3Dnetdev@vger.kernel.org" target=3D"_blank" data-saferedirectu=
-rl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5B%5B-Email-%5=
-D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DAFQjCNFFwLZWfJ=
-X-xB2LHrk7CvessvAOsg">Review all</a>
-&nbsp; &nbsp;<a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGb=
-cFJkycxN8DaPanxX?clientID=3Dnetdev@vger.kernel.org" target=3D"_blank" data-=
-saferedirecturl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5=
-B%5B-Email-%5D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DA=
-FQjCNFFwLZWfJX-xB2LHrk7CvessvAOsg">Release all</a>
-&nbsp; &nbsp; <a href=3D"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRG=
-bcFJkycxN8DaPanxX?clientID=3Dnetdev@vger.kernel.org" target=3D"_blank" data=
--saferedirecturl=3D"https://www.google.com/url?q=3Dhttps://bentdree.ga/%23%=
-5B%5B-Email-%5D%5D&amp;source=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3D=
-AFQjCNFFwLZWfJX-xB2LHrk7CvessvAOsg">Block all</a><br><br>Further Informatio=
-n: <br>
-To view your entire quarantine inbox or manage your preferences, <a href=3D=
-"https://ipfs.io/ipfs/Qmak1oxePK5rUrFTQbZYckBAUWmRGbcFJkycxN8DaPanxX?client=
-ID=3Dnetdev@vger.kernel.org" target=3D"_blank" data-saferedirecturl=3D"http=
-s://www.google.com/url?q=3Dhttps://bentdree.ga/%23%5B%5B-Email-%5D%5D&amp;s=
-ource=3Dgmail&amp;ust=3D1620160588649000&amp;usg=3DAFQjCNFFwLZWfJX-xB2LHrk7=
-CvessvAOsg">Click Here</a><br><br>The system generated this notice on 17-08=
--2023, at 09:00AM<br>Do not reply to this automated message.<br>
-&copy; 2023 vger.kernel.org. All rights reserved.</div></div>
-</body></html>
+  $ devlink port show pci/0000:06:00.0/1
+      pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+          function:
+          hw_addr 00:00:00:00:00:00 roce enable migratable disable ipsec_crypto disable ipsec_packet enable
 
---1692263366-eximdsn-494131582--
+This enables the corresponding IPsec capability of the function before
+it's enumerated, so when the driver reads the capability from the device
+firmware, it is enabled. The driver is then able to configure
+corresponding features and ops of the VF net device to support IPsec
+state and policy offloading.
+
+Thanks
+
+Dima Chumak (4):
+  devlink: Expose port function commands to control IPsec crypto
+    offloads
+  devlink: Expose port function commands to control IPsec packet
+    offloads
+  net/mlx5: Implement devlink port function cmds to control ipsec_crypto
+  net/mlx5: Implement devlink port function cmds to control ipsec_packet
+
+Leon Romanovsky (4):
+  net/mlx5: Drop extra layer of locks in IPsec
+  net/mlx5e: Rewrite IPsec vs. TC block interface
+  net/mlx5: Add IFC bits to support IPsec enable/disable
+  net/mlx5: Provide an interface to block change of IPsec capabilities
+
+ .../ethernet/mellanox/mlx5/switchdev.rst      |  20 +
+ .../networking/devlink/devlink-port.rst       |  55 +++
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+ .../mellanox/mlx5/core/en_accel/ipsec.c       |  20 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    |  63 ++-
+ .../mellanox/mlx5/core/esw/devlink_port.c     |   6 +
+ .../ethernet/mellanox/mlx5/core/esw/ipsec.c   | 369 ++++++++++++++++++
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |  41 ++
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  48 ++-
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 259 +++++++++---
+ include/linux/mlx5/driver.h                   |   1 +
+ include/linux/mlx5/mlx5_ifc.h                 |   3 +
+ include/net/devlink.h                         |  30 ++
+ include/uapi/linux/devlink.h                  |   4 +
+ net/devlink/leftover.c                        | 104 +++++
+ 15 files changed, 917 insertions(+), 108 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec.c
+
+-- 
+2.41.0
+
 
