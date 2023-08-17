@@ -1,196 +1,140 @@
-Return-Path: <netdev+bounces-28413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2125077F5E3
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:01:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861B077F5E7
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 523CC1C21381
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:01:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5690A1C2137B
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1872A13AD4;
-	Thu, 17 Aug 2023 12:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF65613AEA;
+	Thu, 17 Aug 2023 12:02:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD1613AD3
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:01:31 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2060f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7d00::60f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB742133;
-	Thu, 17 Aug 2023 05:01:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UYvTkb8T4kxWhWrt/rlkMnywBpkPYmf+xWsbcq7sbPJWTpB4ix3/5/a2iM6ZO1lvpa5qHEsWYer7XohwHuqBhqdwPvyrfPKoaeXI3y4lQjEMg9BnDE+PDNCkU0aAN3hFmV4TeDcLiAplTPGQRgz29zsqLI3u8gOBUGg23J7JqCdszVyrdt64a+/7mJlleSgKJnnhN/aakiO8fiw0Vimxt2073GKNX7K5L7RH2f5u9BherEnrcLKiOWV+hhaSy0qY4KePDZeMbK2CVNkYAJWQ5jE7zjVVwpjHd4lDfnBplYCx8VMvh890qSmh8BLinkdimbONQcKMu/6BfFoUBNGGdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1hvsMwEdERH43HjLjc6LGRt/cy/uxcRTDgxAYqtreUA=;
- b=D/SM6LMZBSzLb5Ajs3NhzXVLnFtwFSsWW0BU5X+Yh13i6hPOGOkKFvi8n0DIILcwH8y+sX2+4PQa3DrgoctXM6vhfxcl+mvuWD69u+Q2ULVLm6HeCWQGBQgDyMCudcscszicWK+YjgiyvMqEgGL0gAd/wEeMQNulTQQJqEFPO+I2K/gBUxQx3E+AKLf/PP0/MIN/it5jP7whxGcMbNejoC8ZWRmH6ays4B//RfMuYOAw8SiS4YQGIdotBOQ6stTK8losNyfU+u+Vq1ai36/xH/m7Bq1El2nSYdPU7TPzds6qV3DRp9dIDyL3JQQKOQMPOdhiefJ/U7GBjF8xVv8Wtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1hvsMwEdERH43HjLjc6LGRt/cy/uxcRTDgxAYqtreUA=;
- b=YqodbYgjWFPgZ5oJTCISBKDPuNSGFb3D+0i9o/4IpTqv7nZVo3Lu1nSrbsdhVaFTCxAQ92GWMwTQ9QIrq5qa7Dj4kIndVsTTFUzOoL/hRkpmQL/3wGToRuWDE19T5YJy6FlWZaFWt5wbddvi5aKHh8mx29Cl5kBhA2nRAJGRmgU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by PAXPR04MB9253.eurprd04.prod.outlook.com (2603:10a6:102:2bd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.29; Thu, 17 Aug
- 2023 12:01:25 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf%7]) with mapi id 15.20.6678.031; Thu, 17 Aug 2023
- 12:01:25 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D8E13AE9
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:02:26 +0000 (UTC)
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C627B2D65
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:02:17 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 9B281320094C;
+	Thu, 17 Aug 2023 08:02:15 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Thu, 17 Aug 2023 08:02:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1692273734; x=1692360134; bh=I+p3R/kSgY3RO
+	7p5DuAoJ4o8+P0+J51nm4r/CnuNdhA=; b=ljjH7iQMdAe2JDpwGrIrL2enWiosf
+	C0a1sphxHHYYQV2cVxXIToXjsynN8ujURMOPTdxKd+OlpwgskWJwrNReFP2nf8mD
+	UCnh6r6cKG19EGqlisHFswCBBRlfJLK0L2zZaHN7JbgdW5UG0p/MAxzukvDrSHot
+	Vk/jboHQilMucuzvRDhPwoe2LUWhBhpAsGmrgeJdtc99Fm+wwYWK6UqyGO57s8iC
+	7Gu37UUq+rHxrocc5A05XP15eGKCcgSJtebf4Ar5JcSTLqpu5AeYj3pjiFp7WXuc
+	TOALY7PjS6cvVXWpIxVjYsOqH/zJhAIzRRcMXc+rYHJqVfQjWFSyJwNOA==
+X-ME-Sender: <xms:RQzeZIMfa7_OfbFDajMmSKImpLyS8wqn1Hi0yB4fikXWcLp88lOYMw>
+    <xme:RQzeZO84pq1MMDLups4UjXveYCcQkIPei_9OK25UzRnNuHllPkjCo9FrgMezDPqfM
+    qkLjQaCM3nd3O8>
+X-ME-Received: <xmr:RQzeZPRPofxSX5ytcdJKfGUWxYCnKGhiER4xdj0mNUhpntICa7h3iIgCqPz7A662MhjcmBNsRXh5PpeIca3z2Yu5EtluPA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudduuddggeejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepueelgfegleelvdehteekleejgffgjefgjeejiedtgfekjeffhedvheeutedv
+    udeinecuffhomhgrihhnpehrvgguhhgrthdrtghomhenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:RgzeZAuvVxAt2C-BfEftCKGQpPVb8I3Z89bPux4c-i6bqSXLndI4Qg>
+    <xmx:RgzeZAcuAeHbc2lxBZM-XARwnjCVPCLYVOebrrRgI_bjnmO4p3bE1Q>
+    <xmx:RgzeZE1_Nd55tklad2LS9YnL5MXtZqIdR9CQf9AekiLAh9FwllIJjw>
+    <xmx:RgzeZFHiAAs1NjUbfFmR2Qa4s7OrVnYUbEjqjBiVAYOfCDRBiNUoAA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 17 Aug 2023 08:02:13 -0400 (EDT)
+Date: Thu, 17 Aug 2023 15:02:07 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Michael Walle <michael@walle.cc>,
-	Richie Pearn <richard.pearn@nxp.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: dsa: felix: fix oversize frame dropping for always closed tc-taprio gates
-Date: Thu, 17 Aug 2023 15:01:11 +0300
-Message-Id: <20230817120111.3522827-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::15) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCHv6 net-next 1/2] ipv6: do not match device when remove
+ source route
+Message-ID: <ZN4MP+9wi5w9AL7h@shredder>
+References: <20230816060724.1398842-1-liuhangbin@gmail.com>
+ <20230816060724.1398842-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PAXPR04MB9253:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e1a6394-3793-46ae-3a1b-08db9f19ae35
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	iUTkBn5KVok4iW7GYnagcUPX+emwxls4Z4BjNIUcdCmr/B2HZSsnv44Xyjs17TTy4+HiQCSpSPReNQv/4ImmdypH3DtFeEtMLImtE2loD2ubM2CSSiHhRer6fg8wZm73jCqMrmTBFz80HpOcsx/DMJnIpgh6fJNyvo8Grx1ce+IhesBCtQtZN9RcXHJQzpM1acfrnadWObqrrOnYMdfahksM9ccEHsxFgzD1VWJ0YzqmI0QkQbgU1ggaUPpDcp7BD217L76jufu6juJZBPdr5R5vf+ltlI4SEjoJtauL0bu0C5eVv4wHDep7NbYdxKJ0ow0LQfACHqBNffA9o5tjTQWGmjTphpf9JoW1Ig5LPVW9qYI/BTx6YbLhyfZJD4c/lUr4yATE9GfZhkbv1hQDrw8x46cZ7N/dVhJGB7cxQLz4HMlE4h5X1najuwN2DAtqhroH6VlKkqQp6o4MiRK0EI0/GMus6K57T4ZB/aYNIBv1JEZU5kg1CblNwgMDR0eG4aEi5jF3ab1zLB7ylVXvZNyyba8WGJgNm6tCzMk/OTBBiGDdv7QgcBqD8GfTlAJ8GYqcJJM56ELRMVIGuNXu3ZeKG6iU9MAln5pBFIyK05QvsMLMP8dr2KXJMkkYgxa0
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(396003)(346002)(136003)(376002)(1800799009)(451199024)(186009)(316002)(54906003)(66946007)(66476007)(66556008)(6916009)(5660300002)(41300700001)(44832011)(38100700002)(38350700002)(4326008)(8936002)(8676002)(26005)(2906002)(83380400001)(478600001)(7416002)(86362001)(6512007)(52116002)(6486002)(6506007)(36756003)(6666004)(1076003)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?N5JuaT6Uu25lo/K5gGaW6bmd+lY4I+Rc9rQUcMKu99CTjjL0P/yru+yP3zwE?=
- =?us-ascii?Q?gfB9vwHioGN4IwhU//TolaxyFvxdclAS3DPYj+PvR/1XoxL/V/R1S9rmbZTv?=
- =?us-ascii?Q?dxE1oHPsIOKcKJhoKcbUxJ9dJgwPZ86nzZTPiOuM9ku1l7rphPURUv1Lo3A/?=
- =?us-ascii?Q?R6UWTJlyKKuVQ7gH8+H3GoQK1BDjjiNjED2ehTywd+dSxvKOapEZ7aJZmYaf?=
- =?us-ascii?Q?43zVNIy3cvcn04h74Xt1ASj7Ay1StkhAvyn/wS243Qi39sdQ7ZNx9mj35JIk?=
- =?us-ascii?Q?S0XOdVU2Cq/M5oslQ7v+kvWU+xD947u9Le3KXjnvbAfILOVjQLpWaEochJLs?=
- =?us-ascii?Q?N1FuH2m3M6Y+pHdaSd89/FT+wX/8Vp40Z5MAlXVBDmX8CcYRSJKoBpUjswDu?=
- =?us-ascii?Q?7wWHP0QaJPDc3HkToDV1yksR2l1kIFlRACMoH/ZnY2PehZMlicG/oJwu/8G6?=
- =?us-ascii?Q?dz8gdMGVlxThUTGWuaHPm1vHVI+AkOdyL2Dlqam96crr0eBoLj7qKWOXfOZR?=
- =?us-ascii?Q?/JKlno5jojtTOoLGvx8uZZLDWjKa9S0IbaxJhK6FSmYTYsWuouBmr3Y55lEV?=
- =?us-ascii?Q?ilUYY6b9lJAZaNcYPJKZth08/AQ/thgP5awHLnC8K8Pu6q715pnMnYpYXXpf?=
- =?us-ascii?Q?W6FoSCw/heFgaeUGCmnRk8zSZGtokV8BdRQS9GEMy3+THraIB3+N7yCce8Yi?=
- =?us-ascii?Q?XXVHwVaUwXjGk7OiAvs/TAzxtN8TIqnVA4Ku+2Ri5enQMqD3sMlD5VuYyKzc?=
- =?us-ascii?Q?qLyy5ApIpDEt1PKy8pXgASqBhoZyvo421Ido92UFW3OZG0kP0hzzfP97p0qg?=
- =?us-ascii?Q?3SAyzpS8BLMMmFQOcHN4Xe+dF+WulKkEkh00xKqIbITpcy14NgwGdBn+rEsM?=
- =?us-ascii?Q?zhZoD9wazwYXToHxNdElrOFLRG7ZP1uciBDIbBZGA8NRtDP8niO6TOOFjvQt?=
- =?us-ascii?Q?wCnnk+1OlUp0q3KDvUpC/AqsvmO/KUF2cDdvubHNX1CDwpSVkwD6pIYPV5vy?=
- =?us-ascii?Q?7CYaG1DpxfR02eYm2gOC9qVL9F/ob0DPZHP/zRRCNn3LtVp9EsgBAmVFfWXb?=
- =?us-ascii?Q?iewOQDGm0bIEN9vo6rQRKn23v1zB2uvKH62sv4LMHQCSsOlqfzZhtaoc/7h4?=
- =?us-ascii?Q?Y5CECF85N43g8BWVhAp4dI7f8/Syuhk5ps8ZeDCDUF3yBPrsNwwbMDEei/sZ?=
- =?us-ascii?Q?NWyVJV0S7WrpAUq1rv2Dl0wmnKo688YRkfMmsjq8ZL1AkGQqRHKsiYO314O/?=
- =?us-ascii?Q?b12a+0zgbTNc5Og4gUffeEJOC3VKhkJDJNwWtwXM54aQxyYr+i6W9kEJAdeG?=
- =?us-ascii?Q?Z3zlKb6cUR4a6CPnty25N/BFc2expy8cYUms+uVXSONYa/v8Bmf/Zfz+tn9I?=
- =?us-ascii?Q?K2bTgAz7ll8CEjqVdvZXwMJP0IVJo60cWSHZqhKqGkJ2Fhm881DnyYQg9qGt?=
- =?us-ascii?Q?QGOKgCRk/1TyJVETGEaNh9fonGLK66huhFjCn4c6wAcuxNtlcx/V3+uA/k1n?=
- =?us-ascii?Q?/n8ZB7pL8AIETBAtMDofRd1s3XxpFJDgc6oi3T5fYjbdFjKGSlLX/hrf7yyr?=
- =?us-ascii?Q?2ir83XZ61WZ8Qk8X2zWsi7ci5DP2FcQsJXx2zSLgwm6kfJYRCmDMZfqy015s?=
- =?us-ascii?Q?Jw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e1a6394-3793-46ae-3a1b-08db9f19ae35
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2023 12:01:25.0721
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3Ky9iVfOENQQM1pACm5Eh29cGmCn7ltpH3myE30aRyAeOzGs3Ka4O4Tq4VBEa6xfdJ+unXWCFLXy9AFJMCC45Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9253
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,T_SPF_PERMERROR autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230816060724.1398842-2-liuhangbin@gmail.com>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The blamed commit resolved a bug where frames would still get stuck at
-egress, even though they're smaller than the maxSDU[tc], because the
-driver did not take into account the extra 33 ns that the queue system
-needs for scheduling the frame.
+On Wed, Aug 16, 2023 at 02:07:23PM +0800, Hangbin Liu wrote:
+> After deleting an IPv6 address on an interface and cleaning up the
+> related preferred source entries, it is important to ensure that all
+> routes associated with the deleted address are properly cleared. The
+> current implementation of rt6_remove_prefsrc() only checks the preferred
+> source addresses bound to the current device. However, there may be
+> routes that are bound to other devices but still utilize the same
+> preferred source address.
+> 
+> To address this issue, it is necessary to also delete entries that are
+> bound to other interfaces but share the same source address with the
+> current device. Failure to delete these entries would leave routes that
+> are bound to the deleted address unclear. Here is an example reproducer
+> (I have omitted unrelated routes):
+> 
+> + ip link add dummy1 type dummy
+> + ip link add dummy2 type dummy
+> + ip link set dummy1 up
+> + ip link set dummy2 up
+> + ip addr add 1:2:3:4::5/64 dev dummy1
+> + ip route add 7:7:7:0::1 dev dummy1 src 1:2:3:4::5
+> + ip route add 7:7:7:0::2 dev dummy2 src 1:2:3:4::5
+> + ip -6 route show
+> 1:2:3:4::/64 dev dummy1 proto kernel metric 256 pref medium
+> 7:7:7::1 dev dummy1 src 1:2:3:4::5 metric 1024 pref medium
+> 7:7:7::2 dev dummy2 src 1:2:3:4::5 metric 1024 pref medium
+> + ip addr del 1:2:3:4::5/64 dev dummy1
+> + ip -6 route show
+> 7:7:7::1 dev dummy1 metric 1024 pref medium
+> 7:7:7::2 dev dummy2 src 1:2:3:4::5 metric 1024 pref medium
+> 
+> As Ido reminds, in IPv6, the preferred source address is looked up in
+> the same VRF as the first nexthop device, which is different with IPv4.
+> So, while removing the device checking, we also need to add an
+> ipv6_chk_addr() check to make sure the address does not exist on the other
+> devices of the rt nexthop device's VRF.
+> 
+> After fix:
+> + ip addr del 1:2:3:4::5/64 dev dummy1
+> + ip -6 route show
+> 7:7:7::1 dev dummy1 metric 1024 pref medium
+> 7:7:7::2 dev dummy2 metric 1024 pref medium
+> 
+> Reported-by: Thomas Haller <thaller@redhat.com>
+> Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2170513
+> Fixes: c3968a857a6b ("ipv6: RTA_PREFSRC support for ipv6 route source address selection")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-It now takes that into account, but the arithmetic that we perform in
-vsc9959_tas_remaining_gate_len_ps() is buggy, because we operate on
-64-bit unsigned integers, so gate_len_ns - VSC9959_TAS_MIN_GATE_LEN_NS
-may become a very large integer if gate_len_ns < 33 ns.
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-In practice, this means that we've introduced a regression where all
-traffic class gates which are permanently closed will not get detected
-by the driver, and we won't enable oversize frame dropping for them.
-
-Before:
-mscc_felix 0000:00:00.5: port 0: max frame size 1526 needs 12400000 ps, 1152000 ps for mPackets at speed 1000
-mscc_felix 0000:00:00.5: port 0 tc 0 min gate len 1000000, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 1 min gate len 0, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 2 min gate len 0, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 3 min gate len 0, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 4 min gate len 0, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 5 min gate len 0, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 6 min gate len 0, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 7 min gate length 5120 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 615 octets including FCS
-
-After:
-mscc_felix 0000:00:00.5: port 0: max frame size 1526 needs 12400000 ps, 1152000 ps for mPackets at speed 1000
-mscc_felix 0000:00:00.5: port 0 tc 0 min gate len 1000000, sending all frames
-mscc_felix 0000:00:00.5: port 0 tc 1 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-mscc_felix 0000:00:00.5: port 0 tc 2 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-mscc_felix 0000:00:00.5: port 0 tc 3 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-mscc_felix 0000:00:00.5: port 0 tc 4 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-mscc_felix 0000:00:00.5: port 0 tc 5 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-mscc_felix 0000:00:00.5: port 0 tc 6 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-mscc_felix 0000:00:00.5: port 0 tc 7 min gate length 5120 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 615 octets including FCS
-
-Fixes: 11afdc6526de ("net: dsa: felix: tc-taprio intervals smaller than MTU should send at least one packet")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/dsa/ocelot/felix_vsc9959.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/dsa/ocelot/felix_vsc9959.c b/drivers/net/dsa/ocelot/felix_vsc9959.c
-index 4a6e52929d25..3c5509e75a54 100644
---- a/drivers/net/dsa/ocelot/felix_vsc9959.c
-+++ b/drivers/net/dsa/ocelot/felix_vsc9959.c
-@@ -1070,6 +1070,9 @@ static u64 vsc9959_tas_remaining_gate_len_ps(u64 gate_len_ns)
- 	if (gate_len_ns == U64_MAX)
- 		return U64_MAX;
- 
-+	if (gate_len_ns < VSC9959_TAS_MIN_GATE_LEN_NS)
-+		return 0;
-+
- 	return (gate_len_ns - VSC9959_TAS_MIN_GATE_LEN_NS) * PSEC_PER_NSEC;
- }
- 
--- 
-2.34.1
-
+But I suggest removing the Fixes tag given the patch is targeted at
+net-next and does not fix a regression (never worked).
 
