@@ -1,182 +1,267 @@
-Return-Path: <netdev+bounces-28368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF0D77F304
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:15:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3CA277F31B
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 11:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00EC0281AA5
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:15:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03180281E00
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EBD125D8;
-	Thu, 17 Aug 2023 09:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900D111CBF;
+	Thu, 17 Aug 2023 09:20:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59FF125D3
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:15:27 +0000 (UTC)
-Received: from mail-pg1-f205.google.com (mail-pg1-f205.google.com [209.85.215.205])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CAFE2D68
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:15:08 -0700 (PDT)
-Received: by mail-pg1-f205.google.com with SMTP id 41be03b00d2f7-565aba2e397so6347764a12.3
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:15:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1823C10
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 09:20:45 +0000 (UTC)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB52271B
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:20:42 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-523029050d0so1900581a12.0
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 02:20:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692263707; x=1692868507;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CaAEoaqZiKgdatVqeSM6rwKu+YRM0SW+qEnc7EKsc7A=;
-        b=bHuygVsQqqKQDLQDEqNvzOpjuL1Izt7trsyb014MRyf5B+5yufV2VR8+TZUOJ1r0Yx
-         ne5fga2DHKDhZtAP5s8xlOWP6J/0XY4BkZ2rHCaJlZIv6TYWuQu04nc+Wjs/gGv/GsPp
-         9qzdrPmR5QDpHwuT8zULXjcuZguELyavZmSFv9+nwjjES8s5Y/tig/iVtT4YYqdm3/UJ
-         sUy57IeKuLyRPPzcKT7UZ0GQyfZABB2YIJfQHg4wUJTnLgqv6BvS1LKLVjbh5nxqHiis
-         R7IR40o84jYgjG1XGdtkiYy/9dLTmr9RkJh8wdjZu6uCwva/mTiJpdCJ+8P0OlB+WPr6
-         bkyQ==
-X-Gm-Message-State: AOJu0Yx0j2omp+GJo7q80xTKKewIc/kJDqW/jCy3M6EXnjSU7m9PySB+
-	PrW+lJomMbv0SxQV/mCF/DORoANkDLVK1GvVP9P5baFtDy+K
-X-Google-Smtp-Source: AGHT+IEBGTiaTahQVxmEjCY2+VkgLpeBeP0bwIw7K41J6xrN6u3JZwXK6cS9ZFnywTkAFP3y1MWGMvTR+Wq4Qf4XEzvpxH+ErLWu
+        d=1e100.net; s=20221208; t=1692264041; x=1692868841;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IIebZwojAKXZwO37JWETlKiaDFkVEjvbBEdVxz873MI=;
+        b=CpMh+mbRv7tVz18MSS2lUqn54kCCBcGu3YmiGmZmZcEKi4VI1UfI8hEK5o/T0Tg7nl
+         b0JTXqzYny9VuO2nMPvCW1sSdyixdl9mTnzoUdjSHRDoerFtIrVqsAiZVb/iQzOZ7LTX
+         Vk1yWDI+Nc36epcn9tTl6rpLbU8NVOjp5ztpbJTPUKE2rtwm2pRorgAltvgh4oNUouK4
+         gybNSTzTS/DTvO6lGm8mM+lVb4G9VNTNSFOTSOzUopuAc9wxaYFvFZU4SFBwd0I+io1y
+         2Vdz+NclqzbGP/ClSJbvhJt8+VwDbiYqrjAGJ0/X1CPXsm0GXHlWtNzoNM2EFoUF0QY2
+         NFeA==
+X-Gm-Message-State: AOJu0YxCGDTaqsgtbjTIJDh8ZKnZfBlsZs+6qz1mKFWLx/TEg8Ph92cO
+	ttwkeCt4Y6kWd7iRDpO8X24=
+X-Google-Smtp-Source: AGHT+IEr+1KO7wYR0yvfbMijYLcyIbVVOH2d3phvgYskk0bC3zzyzjxbQBixVT3Ft7NzxOgP749uFw==
+X-Received: by 2002:a17:906:1d8:b0:99d:ddae:f75d with SMTP id 24-20020a17090601d800b0099dddaef75dmr3166894ejj.4.1692264041185;
+        Thu, 17 Aug 2023 02:20:41 -0700 (PDT)
+Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id kk9-20020a170907766900b0099cc36c4681sm9797768ejc.157.2023.08.17.02.20.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Aug 2023 02:20:40 -0700 (PDT)
+Message-ID: <f250deb1-90d9-f9c4-667f-9e6ad580cb6b@grimberg.me>
+Date: Thu, 17 Aug 2023 12:20:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:903:41ca:b0:1b8:9eca:d6a7 with SMTP id
- u10-20020a17090341ca00b001b89ecad6a7mr1486530ple.7.1692263707666; Thu, 17 Aug
- 2023 02:15:07 -0700 (PDT)
-Date: Thu, 17 Aug 2023 02:15:07 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000029708206031ad94a@google.com>
-Subject: [syzbot] [kernel?] INFO: rcu detected stall in toggle_allocation_gate
-From: syzbot <syzbot+52d2f6feb48dc7328968@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 11/18] nvme-fabrics: parse options 'keyring' and 'tls_key'
+Content-Language: en-US
+To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20230816120608.37135-1-hare@suse.de>
+ <20230816120608.37135-12-hare@suse.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230816120608.37135-12-hare@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    950fe35831af Merge branch 'ipv6-expired-routes'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13cc856ba80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fe63ad15dded26b6
-dashboard link: https://syzkaller.appspot.com/bug?extid=52d2f6feb48dc7328968
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13d34703a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a9a040680000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d3d4f3ce986f/disk-950fe358.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d5afd9c7f284/vmlinux-950fe358.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1a203c65f0ae/bzImage-950fe358.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+52d2f6feb48dc7328968@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt self-detected stall on CPU
-rcu: 	0-....: (1128 ticks this GP) idle=7504/1/0x4000000000000000 softirq=9033/9035 fqs=2245
-rcu: 	         hardirqs   softirqs   csw/system
-rcu: 	 number:        0          0            0
-rcu: 	cputime:    33937      18602         3669   ==> 52480(ms)
-rcu: 	(t=10500 jiffies g=8777 q=327 ncpus=2)
-CPU: 0 PID: 2848 Comm: kworker/u4:6 Not tainted 6.5.0-rc5-syzkaller-01605-g950fe35831af #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-Workqueue: events_unbound toggle_allocation_gate
-RIP: 0010:__sanitizer_cov_trace_pc+0x60/0x70 kernel/kcov.c:225
-Code: 82 e0 15 00 00 83 f8 02 75 20 48 8b 8a e8 15 00 00 8b 92 e4 15 00 00 48 8b 01 48 83 c0 01 48 39 d0 73 07 48 89 01 48 89 34 c1 <c3> 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 f3 0f 1e fa 41 57
-RSP: 0018:ffffc90000007cf8 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffff888067717000 RCX: 0000000000000100
-RDX: ffff888029910000 RSI: ffffffff885ba5a0 RDI: ffff8880677938d8
-RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: ffffc90000007ff8 R12: ffff888067793800
-R13: 0000000000000000 R14: ffff88806b62a000 R15: ffff888067793818
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f5e85f05748 CR3: 0000000021fc2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- taprio_dequeue_from_txq+0x3c0/0x8d0 net/sched/sch_taprio.c:726
- taprio_dequeue_tc_priority+0x289/0x4b0 net/sched/sch_taprio.c:798
- taprio_dequeue+0x12e/0x5f0 net/sched/sch_taprio.c:868
- dequeue_skb net/sched/sch_generic.c:292 [inline]
- qdisc_restart net/sched/sch_generic.c:397 [inline]
- __qdisc_run+0x1c4/0x19d0 net/sched/sch_generic.c:415
- qdisc_run include/net/pkt_sched.h:125 [inline]
- qdisc_run include/net/pkt_sched.h:122 [inline]
- net_tx_action+0x71e/0xc80 net/core/dev.c:5183
- __do_softirq+0x218/0x965 kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu kernel/softirq.c:632 [inline]
- irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1109
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
-RIP: 0010:__sanitizer_cov_trace_pc+0x3b/0x70 kernel/kcov.c:207
-Code: 81 e1 00 01 00 00 65 48 8b 14 25 80 b9 03 00 a9 00 01 ff 00 74 0e 85 c9 74 35 8b 82 04 16 00 00 85 c0 74 2b 8b 82 e0 15 00 00 <83> f8 02 75 20 48 8b 8a e8 15 00 00 8b 92 e4 15 00 00 48 8b 01 48
-RSP: 0018:ffffc9000c5af920 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffffc9000c5afa70 RCX: 0000000000000000
-RDX: ffff888029910000 RSI: ffffffff8a2aa9a3 RDI: 0000000000000005
-RBP: ffffc9000c5afa94 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000c5afabc
-R13: 0000000000000000 R14: 000000000000b000 R15: ffffffff903ba200
- insn_get_modrm+0x203/0x730 arch/x86/lib/insn.c:363
- insn_get_sib+0x1ad/0x320 arch/x86/lib/insn.c:421
- insn_get_displacement+0x23a/0x680 arch/x86/lib/insn.c:464
- insn_get_immediate+0x550/0x1c50 arch/x86/lib/insn.c:632
- insn_get_length arch/x86/lib/insn.c:707 [inline]
- insn_decode+0x2ae/0x340 arch/x86/lib/insn.c:747
- text_poke_loc_init+0xc2/0x4d0 arch/x86/kernel/alternative.c:2315
- arch_jump_label_transform_queue+0x97/0x100 arch/x86/kernel/jump_label.c:138
- __jump_label_update+0x125/0x420 kernel/jump_label.c:475
- jump_label_update+0x32e/0x410 kernel/jump_label.c:829
- static_key_enable_cpuslocked+0x1b5/0x270 kernel/jump_label.c:205
- static_key_enable+0x1a/0x20 kernel/jump_label.c:218
- toggle_allocation_gate mm/kfence/core.c:831 [inline]
- toggle_allocation_gate+0xf4/0x250 mm/kfence/core.c:823
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:389
- ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On 8/16/23 15:06, Hannes Reinecke wrote:
+> Parse the fabrics options 'keyring' and 'tls_key' and store the
+> referenced keys in the options structure.
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>   drivers/nvme/host/fabrics.c | 52 ++++++++++++++++++++++++++++++++++++-
+>   drivers/nvme/host/fabrics.h |  6 +++++
+>   drivers/nvme/host/tcp.c     | 14 +++++++---
+>   3 files changed, 67 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+> index ddad482c3537..e453c3871cb1 100644
+> --- a/drivers/nvme/host/fabrics.c
+> +++ b/drivers/nvme/host/fabrics.c
+> @@ -622,6 +622,23 @@ static struct nvmf_transport_ops *nvmf_lookup_transport(
+>   	return NULL;
+>   }
+>   
+> +static struct key *nvmf_parse_key(int key_id, char *key_type)
+> +{
+> +	struct key *key;
+> +
+> +	if (!IS_ENABLED(CONFIG_NVME_TCP_TLS)) {
+> +		pr_err("TLS is not supported\n");
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	key = key_lookup(key_id);
+> +	if (IS_ERR(key))
+> +		pr_err("%s %08x not found\n", key_type, key_id);
+> +	else
+> +		pr_debug("Using %s %08x\n", key_type, key_id);
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+I think that the key_type string is unneeded as an argument solely for
+the log print.
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+I think that you can move the error print to the call-site. Keep
+the debug print here, but you don't need the type...
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+> +	return key;
+> +}
+> +
+>   static const match_table_t opt_tokens = {
+>   	{ NVMF_OPT_TRANSPORT,		"transport=%s"		},
+>   	{ NVMF_OPT_TRADDR,		"traddr=%s"		},
+> @@ -643,6 +660,10 @@ static const match_table_t opt_tokens = {
+>   	{ NVMF_OPT_NR_WRITE_QUEUES,	"nr_write_queues=%d"	},
+>   	{ NVMF_OPT_NR_POLL_QUEUES,	"nr_poll_queues=%d"	},
+>   	{ NVMF_OPT_TOS,			"tos=%d"		},
+> +#ifdef CONFIG_NVME_TCP_TLS
+> +	{ NVMF_OPT_KEYRING,		"keyring=%d"		},
+> +	{ NVMF_OPT_TLS_KEY,		"tls_key=%d"		},
+> +#endif
+>   	{ NVMF_OPT_FAIL_FAST_TMO,	"fast_io_fail_tmo=%d"	},
+>   	{ NVMF_OPT_DISCOVERY,		"discovery"		},
+>   	{ NVMF_OPT_DHCHAP_SECRET,	"dhchap_secret=%s"	},
+> @@ -660,9 +681,10 @@ static int nvmf_parse_options(struct nvmf_ctrl_options *opts,
+>   	char *options, *o, *p;
+>   	int token, ret = 0;
+>   	size_t nqnlen  = 0;
+> -	int ctrl_loss_tmo = NVMF_DEF_CTRL_LOSS_TMO;
+> +	int ctrl_loss_tmo = NVMF_DEF_CTRL_LOSS_TMO, key_id;
+>   	uuid_t hostid;
+>   	char hostnqn[NVMF_NQN_SIZE];
+> +	struct key *key;
+>   
+>   	/* Set defaults */
+>   	opts->queue_size = NVMF_DEF_QUEUE_SIZE;
+> @@ -928,6 +950,32 @@ static int nvmf_parse_options(struct nvmf_ctrl_options *opts,
+>   			}
+>   			opts->tos = token;
+>   			break;
+> +		case NVMF_OPT_KEYRING:
+> +			if (match_int(args, &key_id) || key_id <= 0) {
+> +				ret = -EINVAL;
+> +				goto out;
+> +			}
+> +			key = nvmf_parse_key(key_id, "Keyring");
+> +			if (IS_ERR(key)) {
+> +				ret = PTR_ERR(key);
+> +				goto out;
+> +			}
+> +			key_put(opts->keyring);
 
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Don't understand how keyring/tls_key are pre-populated though...
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
+> +			opts->keyring = key;
+> +			break;
+> +		case NVMF_OPT_TLS_KEY:
+> +			if (match_int(args, &key_id) || key_id <= 0) {
+> +				ret = -EINVAL;
+> +				goto out;
+> +			}
+> +			key = nvmf_parse_key(key_id, "Key");
+> +			if (IS_ERR(key)) {
+> +				ret = PTR_ERR(key);
+> +				goto out;
+> +			}
+> +			key_put(opts->tls_key);
+> +			opts->tls_key = key;
+> +			break;
+>   		case NVMF_OPT_DISCOVERY:
+>   			opts->discovery_nqn = true;
+>   			break;
+> @@ -1168,6 +1216,8 @@ static int nvmf_check_allowed_opts(struct nvmf_ctrl_options *opts,
+>   void nvmf_free_options(struct nvmf_ctrl_options *opts)
+>   {
+>   	nvmf_host_put(opts->host);
+> +	key_put(opts->keyring);
+> +	key_put(opts->tls_key);
+>   	kfree(opts->transport);
+>   	kfree(opts->traddr);
+>   	kfree(opts->trsvcid);
+> diff --git a/drivers/nvme/host/fabrics.h b/drivers/nvme/host/fabrics.h
+> index dac17c3fee26..fbaee5a7be19 100644
+> --- a/drivers/nvme/host/fabrics.h
+> +++ b/drivers/nvme/host/fabrics.h
+> @@ -71,6 +71,8 @@ enum {
+>   	NVMF_OPT_DHCHAP_SECRET	= 1 << 23,
+>   	NVMF_OPT_DHCHAP_CTRL_SECRET = 1 << 24,
+>   	NVMF_OPT_TLS		= 1 << 25,
+> +	NVMF_OPT_KEYRING	= 1 << 26,
+> +	NVMF_OPT_TLS_KEY	= 1 << 27,
+>   };
+>   
+>   /**
+> @@ -103,6 +105,8 @@ enum {
+>    * @dhchap_secret: DH-HMAC-CHAP secret
+>    * @dhchap_ctrl_secret: DH-HMAC-CHAP controller secret for bi-directional
+>    *              authentication
+> + * @keyring:    Keyring to use for key lookups
+> + * @tls_key:    TLS key for encrypted connections (TCP)
+>    * @tls:        Start TLS encrypted connections (TCP)
+>    * @disable_sqflow: disable controller sq flow control
+>    * @hdr_digest: generate/verify header digest (TCP)
+> @@ -130,6 +134,8 @@ struct nvmf_ctrl_options {
+>   	struct nvmf_host	*host;
+>   	char			*dhchap_secret;
+>   	char			*dhchap_ctrl_secret;
+> +	struct key		*keyring;
+> +	struct key		*tls_key;
+>   	bool			tls;
+>   	bool			disable_sqflow;
+>   	bool			hdr_digest;
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index ef9cf8c7a113..f48797fcc4ee 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -1589,6 +1589,8 @@ static int nvme_tcp_start_tls(struct nvme_ctrl *nctrl,
+>   
+>   	dev_dbg(nctrl->device, "queue %d: start TLS with key %x\n",
+>   		qid, pskid);
+> +	if (nctrl->opts->keyring)
+> +		keyring = key_serial(nctrl->opts->keyring);
 
-If you want to undo deduplication, reply with:
-#syz undup
+Maybe populate opts->keyring with nvme_keyring_id() to begin
+with and then you don't need this?
+
+>   	memset(&args, 0, sizeof(args));
+>   	args.ta_sock = queue->sock;
+>   	args.ta_done = nvme_tcp_tls_done;
+> @@ -1914,9 +1916,12 @@ static int nvme_tcp_alloc_admin_queue(struct nvme_ctrl *ctrl)
+>   	key_serial_t pskid = 0;
+>   
+>   	if (ctrl->opts->tls) {
+> -		pskid = nvme_tls_psk_default(NULL,
+> -					      ctrl->opts->host->nqn,
+> -					      ctrl->opts->subsysnqn);
+> +		if (ctrl->opts->tls_key)
+> +			pskid = key_serial(ctrl->opts->tls_key);
+> +		else
+> +			pskid = nvme_tls_psk_default(ctrl->opts->keyring,
+> +						      ctrl->opts->host->nqn,
+> +						      ctrl->opts->subsysnqn);
+>   		if (!pskid) {
+>   			dev_err(ctrl->device, "no valid PSK found\n");
+>   			ret = -ENOKEY;
+> @@ -2776,7 +2781,8 @@ static struct nvmf_transport_ops nvme_tcp_transport = {
+>   			  NVMF_OPT_HOST_TRADDR | NVMF_OPT_CTRL_LOSS_TMO |
+>   			  NVMF_OPT_HDR_DIGEST | NVMF_OPT_DATA_DIGEST |
+>   			  NVMF_OPT_NR_WRITE_QUEUES | NVMF_OPT_NR_POLL_QUEUES |
+> -			  NVMF_OPT_TOS | NVMF_OPT_HOST_IFACE | NVMF_OPT_TLS,
+> +			  NVMF_OPT_TOS | NVMF_OPT_HOST_IFACE | NVMF_OPT_TLS |
+> +			  NVMF_OPT_KEYRING | NVMF_OPT_TLS_KEY,
+>   	.create_ctrl	= nvme_tcp_create_ctrl,
+>   };
+>   
 
