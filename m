@@ -1,243 +1,89 @@
-Return-Path: <netdev+bounces-28433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C4977F6DE
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:54:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B48377F6E3
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 14:54:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 072241C213BC
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:54:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC24C1C213C3
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 12:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6C013FE0;
-	Thu, 17 Aug 2023 12:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF8B13FF6;
+	Thu, 17 Aug 2023 12:54:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DE4134BA
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:54:24 +0000 (UTC)
-Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc0a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 843922D70
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:54:21 -0700 (PDT)
-Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4RRQ1k5lxvzMq6cb;
-	Thu, 17 Aug 2023 12:54:18 +0000 (UTC)
-Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4RRQ1k2CJ9zMpnPp;
-	Thu, 17 Aug 2023 14:54:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1692276858;
-	bh=gWg5Au5qNjkmKNc2JaoMVUE3kXc5yOumLKtoxOkV/Lo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=xDMPiSE08gXVzmly5tGHSAcSTSAARAkOws6zkOlnV+Q71UNWdXj57nBM8klo9U92D
-	 uP2wC5/DHtzHnBiaVUtBuSTvAvQWbIR7XhBx7tdIM6cRsQAU30eroqJNIFBl7c2YvR
-	 k+rmIViKhELKhuI2uEg4Q924hsyr8/E7ciTfHaXo=
-Date: Thu, 17 Aug 2023 14:54:10 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-Cc: artem.kuzin@huawei.com, gnoack3000@gmail.com, 
-	willemdebruijn.kernel@gmail.com, yusongping@huawei.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
- dedicated to network
-Message-ID: <20230817.theivaoThia9@digikod.net>
-References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
- <20230706145543.1284007-1-mic@digikod.net>
- <d261a7ae-fd9c-902a-10f7-61d08cab0435@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B8B13FF5
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 12:54:28 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E095F30C6
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 05:54:26 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RRPyP5PHHzFqZx;
+	Thu, 17 Aug 2023 20:51:25 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 17 Aug 2023 20:54:23 +0800
+Message-ID: <8bf301db-83ff-ba93-f69e-092789e7177b@huawei.com>
+Date: Thu, 17 Aug 2023 20:54:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d261a7ae-fd9c-902a-10f7-61d08cab0435@huawei.com>
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH net-next 2/3] amd-xgbe: Return proper error code for
+ get_phy_device()
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <Shyam-sundar.S-k@amd.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <iyappan@os.amperecomputing.com>,
+	<keyur@os.amperecomputing.com>, <quan@os.amperecomputing.com>,
+	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <yankejian@huawei.com>,
+	<netdev@vger.kernel.org>
+References: <20230817074000.355564-1-ruanjinjie@huawei.com>
+ <20230817074000.355564-3-ruanjinjie@huawei.com>
+ <b1887aa8-3327-497a-bd23-680b533f6356@lunn.ch>
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <b1887aa8-3327-497a-bd23-680b533f6356@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-8.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 12, 2023 at 12:03:02AM +0300, Konstantin Meskhidze (A) wrote:
-> 
-> 
-> 7/6/2023 5:55 PM, Mickaël Salaün пишет:
-> > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > 
-> > This patch is a revamp of the v11 tests [1] with new tests (see the
-> > "Changes since v11" description).  I (Mickaël) only added the following
-> > todo list and the "Changes since v11" sections in this commit message.
-> > I think this patch is good but it would appreciate reviews.
-> > You can find the diff of my changes here but it is not really readable:
-> > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
-> > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
-> > TODO:
-> > - Rename all "net_service" to "net_port".
-> > - Fix the two kernel bugs found with the new tests.
-> > - Update this commit message with a small description of all tests.
-> > 
-> > These test suites try to check edge cases for TCP sockets
-> > bind() and connect() actions.
-> > 
-> > inet:
-> > * bind: Tests with non-landlocked/landlocked ipv4 and ipv6 sockets.
-> > * connect: Tests with non-landlocked/landlocked ipv4 and ipv6 sockets.
-> > * bind_afunspec: Tests with non-landlocked/landlocked restrictions
-> > for bind action with AF_UNSPEC socket family.
-> > * connect_afunspec: Tests with non-landlocked/landlocked restrictions
-> > for connect action with AF_UNSPEC socket family.
-> > * ruleset_overlap: Tests with overlapping rules for one port.
-> > * ruleset_expanding: Tests with expanding rulesets in which rules are
-> > gradually added one by one, restricting sockets' connections.
-> > * inval_port_format: Tests with wrong port format for ipv4/ipv6 sockets
-> > and with port values more than U16_MAX.
-> > 
-> > port:
-> > * inval: Tests with invalid user space supplied data:
-> >      - out of range ruleset attribute;
-> >      - unhandled allowed access;
-> >      - zero port value;
-> >      - zero access value;
-> >      - legitimate access values;
-> > * bind_connect_inval_addrlen: Tests with invalid address length.
-> > * bind_connect_unix_*_socket: Tests to make sure unix sockets' actions
-> > are not restricted by Landlock rules applied to TCP ones.
-> > 
-> > layout1:
-> > * with_net: Tests with network bind() socket action within
-> > filesystem directory access test.
-> > 
-> > Test coverage for security/landlock is 94.8% of 934 lines according
-> > to gcc/gcov-11.
-> > 
-> > Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > Co-developed-by: Mickaël Salaün <mic@digikod.net>
-> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-
-[...]
-
-> > +// Kernel FIXME: tcp_sandbox_with_tcp and tcp_sandbox_with_udp
-> 
->      I debugged the code in qemu and came to a conclusion that we don't
-> check if socket's family equals to address's one in check_socket_access(...)
-> function in net.c
-> So I added the next lines (marked with !!!):
-> 
-> 	static int check_socket_access(struct socket *const sock,
-> 			       struct sockaddr *const address,
-> 			       const int addrlen,
-> 			       const access_mask_t access_request)
-> {
-> 	__be16 port;
-> 	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
-> 	const struct landlock_rule *rule;
-> 	access_mask_t handled_access;
-> 	struct landlock_id id = {
-> 		.type = LANDLOCK_KEY_NET_PORT,
-> 	};
-> 	const struct landlock_ruleset *const domain = 	
->         get_current_net_domain();
-> 
-> 	if (!domain)
-> 		return 0;
-> 	if (WARN_ON_ONCE(domain->num_layers < 1))
-> 		return -EACCES;
-> 
-> 	/* FIXES network tests */ !!!
-> 	if (sock->sk->__sk_common.skc_family != address->sa_family) !!!
-> 		return 0; !!!
-> 	/* Checks if it's a TCP socket. */
-> 	if (sock->type != SOCK_STREAM)
-> 		return 0;
-> 	......
-> 
-> So now all network tests pass.
-> What do you think?
-
-Good catch, we should indeed check this inconsistency, but this fix also
-adds two issues:
-- sa_family is read before checking if it is out of bound (see
-  offsetofend() check bellow). A simple fix is to move down the new
-  check.
-- access request with AF_UNSPEC on a bind operation doesn't go through
-  the specific AF_UNSPEC handling branch.  There are two things to fix
-  here: handle AF_UNSPEC specifically in this new af_family check, and
-  add a new test to make sure bind with AF_UNSPEC and INADDR_ANY is
-  properly restricted.
-
-I'll reply to this message with a patch extending your fix.
 
 
+On 2023/8/17 20:28, Andrew Lunn wrote:
+> On Thu, Aug 17, 2023 at 03:39:59PM +0800, Ruan Jinjie wrote:
+>> get_phy_device() returns -EIO on bus access error and -ENOMEM
+>> on kzalloc failure in addition to -ENODEV, just return -ENODEV is not
+>> sensible, use PTR_ERR(phydev) to fix the issue.
 > 
-> > +TEST_F(ipv4, from_unix_to_inet)
-> > +{
-> > +	int unix_stream_fd, unix_dgram_fd;
-> > +
-> > +	if (variant->sandbox == TCP_SANDBOX) {
-> > +		const struct landlock_ruleset_attr ruleset_attr = {
-> > +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
-> > +					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> > +		};
-> > +		const struct landlock_net_service_attr tcp_bind_connect_p0 = {
-> > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
-> > +					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> > +			.port = self->srv0.port,
-> > +		};
-> > +		int ruleset_fd;
-> > +
-> > +		/* Denies connect and bind to check errno value. */
-> > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-> > +						     sizeof(ruleset_attr), 0);
-> > +		ASSERT_LE(0, ruleset_fd);
-> > +
-> > +		/* Allows connect and bind for srv0.  */
-> > +		ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
-> > +					       LANDLOCK_RULE_NET_SERVICE,
-> > +					       &tcp_bind_connect_p0, 0));
-> > +
-> > +		enforce_ruleset(_metadata, ruleset_fd);
-> > +		EXPECT_EQ(0, close(ruleset_fd));
-> > +	}
-> > +
-> > +	unix_stream_fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> > +	ASSERT_LE(0, unix_stream_fd);
-> > +
-> > +	unix_dgram_fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> 
->         Minor mistyping SOCK_STREAM -> SOCK_DGRAM.
+> Rather than say 'not sensible', it would be better to say 'Best
+> practice is to return these error codes'.
 
-Good catch!
+Thank you! I'll watch the wording next time.
 
 > 
-> > +	ASSERT_LE(0, unix_dgram_fd);
-> > +
-> > +	/* Checks unix stream bind and connect for srv0. */
-> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_stream_fd, &self->srv0));
-> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_stream_fd, &self->srv0));
-> > +
-> > +	/* Checks unix stream bind and connect for srv1. */
-> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_stream_fd, &self->srv1))
-> > +	{
-> > +		TH_LOG("Wrong bind error: %s", strerror(errno));
-> > +	}
-> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_stream_fd, &self->srv1));
-> > +
-> > +	/* Checks unix datagram bind and connect for srv0. */
-> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_dgram_fd, &self->srv0));
-> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_dgram_fd, &self->srv0));
-> > +
-> > +	/* Checks unix datagram bind and connect for srv0. */
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > 
->         Should be "Checks... for srv1."
-
-indeed
-
 > 
-> > +	EXPECT_EQ(-EINVAL, bind_variant(unix_dgram_fd, &self->srv1));
-> > +	EXPECT_EQ(-EINVAL, connect_variant(unix_dgram_fd, &self->srv1));
-> > +}
+>     Andrew
+> 
+> ---
+> pw-bot: cr
 
