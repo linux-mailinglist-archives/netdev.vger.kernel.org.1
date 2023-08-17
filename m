@@ -1,46 +1,49 @@
-Return-Path: <netdev+bounces-28326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E60877F0F1
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:11:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B773D77F119
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 09:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5694281D9F
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 07:11:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3821281CEB
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 07:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B0B138A;
-	Thu, 17 Aug 2023 07:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBE01FD2;
+	Thu, 17 Aug 2023 07:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A518615AB
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:11:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D087C433C7;
-	Thu, 17 Aug 2023 07:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B061C2F
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 07:19:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2426FC433C7;
+	Thu, 17 Aug 2023 07:19:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692256301;
-	bh=yv2TAjno/2XSqR01RSo83cWXb8Ohcy5ubt63pFTBP08=;
+	s=k20201202; t=1692256767;
+	bh=5AF+khJ/zO9MH/Zd0dHfg08/t7h8ETv+nNrgkrDMhXU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L/To5bK/mHhMFGnVc16virPz8qxig0+v5u8nfohVKP7TlQWZFC+RGDeCsPrzY070u
-	 Pr2mYyskfZ0i86DjrX6IK8lLhbrpZrwdJ+vpokolHUM3PBBHLNSZFP8ATsW8JII97h
-	 zwz/H3dYSyhuKsit1eeka/GKOQ04LRzzqXJGU6XzoRAosoE0tN/KQ26S+akys+69L7
-	 nEXhQW1l/IMFyPwaV9ILuMWZtS8CIomoj5J+pdWpuyFRJt7bi0oM8bzeoOW1nnNqzv
-	 03R7uvl6SFcW5wAHYmS4yhT5I7t2fn4gxOm2QqczI+24G+wLQPyTJ8u6NrttlaZd49
-	 itR5X0Zi6YcOg==
-Date: Thu, 17 Aug 2023 09:11:36 +0200
-From: Simon Horman <horms@kernel.org>
-To: Manish Chopra <manishc@marvell.com>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, aelior@marvell.com,
-	palok@marvell.com, njavali@marvell.com, skashyap@marvell.com,
-	jmeneghi@redhat.com, yuval.mintz@qlogic.com, skalluru@marvell.com,
-	pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
-	David Miller <davem@davemloft.net>
-Subject: Re: [PATCH v3 net] qede: fix firmware halt over suspend and resume
-Message-ID: <ZN3IKMw/lz0Extx0@vergenet.net>
-References: <20230816150711.59035-1-manishc@marvell.com>
+	b=PW8Ey1/jojir8VRvWZm/aj9UPZ9yigPLejXepqYwikFpuM1PMMBPlvxx7x0KNHLFD
+	 NUb6jDE52lRe1hEqmOwG052FdjAmvzm6ozOo9EkTXph4SOlulrdN78fbqrQ9eGJEiJ
+	 12PFRvEmpQgUFuq9BBc2TWPrAdtwi3o8AY1xGs8csYfAF9BoBfYTa8HHzGi7Kwc+aN
+	 A6NLYyNjXheVzWEHjwXWHSySklbZ7buBGLgx5ySjtm/CtSzmEnGutW9++DYRyoHqmE
+	 77XlE0ZuLqRtai6hqz1g9hJzXDRNe50ESRT4YpE4ZvGjuEmZOK5SQDzIaflcG4gNzo
+	 vmzpR37IqQ0Fg==
+Date: Thu, 17 Aug 2023 10:19:23 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: netdev@vger.kernel.org,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH -next] net: broadcom: Use helper function IS_ERR_OR_NULL()
+Message-ID: <20230817071923.GB22185@unreal>
+References: <20230816095357.2896080-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,29 +52,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230816150711.59035-1-manishc@marvell.com>
+In-Reply-To: <20230816095357.2896080-1-ruanjinjie@huawei.com>
 
-On Wed, Aug 16, 2023 at 08:37:11PM +0530, Manish Chopra wrote:
-> While performing certain power-off sequences, PCI drivers are
-> called to suspend and resume their underlying devices through
-> PCI PM (power management) interface. However this NIC hardware
-> does not support PCI PM suspend/resume operations so system wide
-> suspend/resume leads to bad MFW (management firmware) state which
-> causes various follow-up errors in driver when communicating with
-> the device/firmware afterwards.
+On Wed, Aug 16, 2023 at 05:53:56PM +0800, Ruan Jinjie wrote:
+> Use IS_ERR_OR_NULL() instead of open-coding it
+> to simplify the code.
 > 
-> To fix this driver implements PCI PM suspend handler to indicate
-> unsupported operation to the PCI subsystem explicitly, thus avoiding
-> system to go into suspended/standby mode.
+> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> ---
+>  drivers/net/ethernet/broadcom/bgmac.c        | 2 +-
+>  drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> Without this fix device/firmware does not recover unless system
-> is power cycled.
-> 
-> Fixes: 2950219d87b0 ("qede: Add basic network device support")
-> Cc: David Miller <davem@davemloft.net>
-> Signed-off-by: Manish Chopra <manishc@marvell.com>
-> Signed-off-by: Alok Prasad <palok@marvell.com>
+> diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
+> index 10c7c232cc4e..4cd7c6abb548 100644
+> --- a/drivers/net/ethernet/broadcom/bgmac.c
+> +++ b/drivers/net/ethernet/broadcom/bgmac.c
+> @@ -1448,7 +1448,7 @@ int bgmac_phy_connect_direct(struct bgmac *bgmac)
+>  	int err;
+>  
+>  	phy_dev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+When can fixed_phy_register() return NULL?
+It looks like it returns or valid phy_dev or ERR_PTR().
 
+Thanks
+
+
+> -	if (!phy_dev || IS_ERR(phy_dev)) {
+> +	if (IS_ERR_OR_NULL(phy_dev)) {
+>  		dev_err(bgmac->dev, "Failed to register fixed PHY device\n");
+>  		return -ENODEV;
+>  	}
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+> index 0092e46c46f8..aa9a436fb3ce 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+> @@ -617,7 +617,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
+>  		};
+>  
+>  		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
+> -		if (!phydev || IS_ERR(phydev)) {
+> +		if (IS_ERR_OR_NULL(phydev)) {
+>  			dev_err(kdev, "failed to register fixed PHY device\n");
+>  			return -ENODEV;
+>  		}
+> -- 
+> 2.34.1
+> 
+> 
 
