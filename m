@@ -1,253 +1,107 @@
-Return-Path: <netdev+bounces-28448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29AB477F79A
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:21:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971BF77F788
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 15:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A5F01C213DA
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:21:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBC88281EE5
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 13:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFEAE14A84;
-	Thu, 17 Aug 2023 13:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77571426F;
+	Thu, 17 Aug 2023 13:20:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52861426F
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:20:44 +0000 (UTC)
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B4E2135;
-	Thu, 17 Aug 2023 06:20:41 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vq.3QPh_1692278437;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Vq.3QPh_1692278437)
-          by smtp.aliyun-inc.com;
-          Thu, 17 Aug 2023 21:20:37 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	kgraul@linux.ibm.com,
-	tonylu@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/6] net/smc: add vendor unique experimental options area in clc handshake
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1B914005
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 13:20:33 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0981FF3
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 06:20:32 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RRQXW2z3GzFqYm;
+	Thu, 17 Aug 2023 21:17:31 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 17 Aug 2023 21:20:29 +0800
+Message-ID: <d9b2e230-b5d4-312a-eb38-18300762a61c@huawei.com>
 Date: Thu, 17 Aug 2023 21:20:28 +0800
-Message-Id: <20230817132032.23397-3-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20230817132032.23397-1-guangguan.wang@linux.alibaba.com>
-References: <20230817132032.23397-1-guangguan.wang@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH net-next v2 4/4] net: lan743x: Fix return value check for
+ fixed_phy_register()
+Content-Language: en-US
+To: Heiner Kallweit <hkallweit1@gmail.com>, <rafal@milecki.pl>,
+	<bcm-kernel-feedback-list@broadcom.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<opendmb@gmail.com>, <florian.fainelli@broadcom.com>,
+	<bryan.whitehead@microchip.com>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
+	<mdf@kernel.org>, <pgynther@google.com>,
+	<Pavithra.Sathyanarayanan@microchip.com>, <netdev@vger.kernel.org>
+References: <20230817121631.1878897-1-ruanjinjie@huawei.com>
+ <20230817121631.1878897-5-ruanjinjie@huawei.com>
+ <db0fd284-0b5b-3290-6661-f159908e9918@gmail.com>
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <db0fd284-0b5b-3290-6661-f159908e9918@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-8.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add vendor unique experimental options area in clc handshake. In clc
-accept and confirm msg, vendor unique experimental options use the
-16-Bytes reserved field, which defined in struct smc_clc_fce_gid_ext
-in previous version. Because of the struct smc_clc_first_contact_ext
-is widely used and limit the scope of modification, this patch moves
-the 16-Bytes reserved field out of struct smc_clc_fce_gid_ext, and
-followed with the struct smc_clc_first_contact_ext in a new struct
-names struct smc_clc_first_contact_ext_v2x.
 
-For SMC-R first connection, in previous version, the struct smc_clc_
-first_contact_ext and the 16-Bytes reserved field has already been
-included in clc accept and confirm msg. Thus, this patch use struct
-smc_clc_first_contact_ext_v2x instead of the struct smc_clc_first_
-contact_ext and the 16-Bytes reserved field in SMC-R clc accept and
-confirm msg is compatible with previous version.
 
-For SMC-D first connection, in previous version, only the struct smc_
-clc_first_contact_ext is included in clc accept and confirm msg, and
-the 16-Bytes reserved field is not included. Thus, when the negotiated
-smc release version is the version before v2.1, we still use struct
-smc_clc_first_contact_ext for compatible consideration. If the negotiated
-smc release version is v2.1 or later, use struct smc_clc_first_contact_
-ext_v2x instead.
+On 2023/8/17 20:43, Heiner Kallweit wrote:
+> On 17.08.2023 14:16, Ruan Jinjie wrote:
+>> fixed_phy_register() function returns -EPROBE_DEFER, -EINVAL and -EBUSY,
+>> etc, but not return -EIO. use PTR_ERR to fix the issue.
+>>
+>> Fixes: 624864fbff92 ("net: lan743x: add fixed phy support for LAN7431 device")
+> 
+> This isn't a fix. Returning -EIO isn't wrong. Returning the original errno values
+> may be better, but that's an improvement.
 
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
----
- net/smc/af_smc.c  |  2 +-
- net/smc/smc_clc.c | 44 +++++++++++++++++++++++---------------------
- net/smc/smc_clc.h | 15 +++++++++++++--
- 3 files changed, 37 insertions(+), 24 deletions(-)
+Sorry! I'll remove this fix tag in the next version.
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index c99ac371b5b1..10bec585983f 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -1113,7 +1113,7 @@ static int smc_connect_ism_vlan_cleanup(struct smc_sock *smc,
- 
- #define SMC_CLC_MAX_ACCEPT_LEN \
- 	(sizeof(struct smc_clc_msg_accept_confirm_v2) + \
--	 sizeof(struct smc_clc_first_contact_ext) + \
-+	 sizeof(struct smc_clc_first_contact_ext_v2x) + \
- 	 sizeof(struct smc_clc_msg_trail))
- 
- /* CLC handshake during connect */
-diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
-index 7c5627c6abcc..728f88616266 100644
---- a/net/smc/smc_clc.c
-+++ b/net/smc/smc_clc.c
-@@ -391,9 +391,7 @@ smc_clc_msg_acc_conf_valid(struct smc_clc_msg_accept_confirm_v2 *clc_v2)
- 			return false;
- 	} else {
- 		if (hdr->typev1 == SMC_TYPE_D &&
--		    ntohs(hdr->length) != SMCD_CLC_ACCEPT_CONFIRM_LEN_V2 &&
--		    (ntohs(hdr->length) != SMCD_CLC_ACCEPT_CONFIRM_LEN_V2 +
--				sizeof(struct smc_clc_first_contact_ext)))
-+		    ntohs(hdr->length) < SMCD_CLC_ACCEPT_CONFIRM_LEN_V2)
- 			return false;
- 		if (hdr->typev1 == SMC_TYPE_R &&
- 		    ntohs(hdr->length) < SMCR_CLC_ACCEPT_CONFIRM_LEN_V2)
-@@ -420,13 +418,19 @@ smc_clc_msg_decl_valid(struct smc_clc_msg_decline *dclc)
- 	return true;
- }
- 
--static void smc_clc_fill_fce(struct smc_clc_first_contact_ext *fce, int *len, int release_nr)
-+static int smc_clc_fill_fce(struct smc_clc_first_contact_ext_v2x *fce,
-+			    struct smc_init_info *ini)
- {
-+	int ret = sizeof(*fce);
-+
- 	memset(fce, 0, sizeof(*fce));
--	fce->os_type = SMC_CLC_OS_LINUX;
--	fce->release = release_nr;
--	memcpy(fce->hostname, smc_hostname, sizeof(smc_hostname));
--	(*len) += sizeof(*fce);
-+	fce->fce_v2_base.os_type = SMC_CLC_OS_LINUX;
-+	fce->fce_v2_base.release = ini->release_nr;
-+	memcpy(fce->fce_v2_base.hostname, smc_hostname, sizeof(smc_hostname));
-+	if (ini->is_smcd && ini->release_nr < SMC_RELEASE_1)
-+		ret = sizeof(struct smc_clc_first_contact_ext);
-+
-+	return ret;
- }
- 
- /* check if received message has a correct header length and contains valid
-@@ -986,13 +990,13 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
- 				       u8 *eid, struct smc_init_info *ini)
- {
- 	struct smc_connection *conn = &smc->conn;
-+	struct smc_clc_first_contact_ext_v2x fce;
- 	struct smc_clc_msg_accept_confirm *clc;
--	struct smc_clc_first_contact_ext fce;
- 	struct smc_clc_fce_gid_ext gle;
- 	struct smc_clc_msg_trail trl;
-+	int i, len, fce_len;
- 	struct kvec vec[5];
- 	struct msghdr msg;
--	int i, len;
- 
- 	/* send SMC Confirm CLC msg */
- 	clc = (struct smc_clc_msg_accept_confirm *)clc_v2;
-@@ -1018,8 +1022,10 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
- 			if (eid && eid[0])
- 				memcpy(clc_v2->d1.eid, eid, SMC_MAX_EID_LEN);
- 			len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
--			if (first_contact)
--				smc_clc_fill_fce(&fce, &len, ini->release_nr);
-+			if (first_contact) {
-+				fce_len = smc_clc_fill_fce(&fce, ini);
-+				len += fce_len;
-+			}
- 			clc_v2->hdr.length = htons(len);
- 		}
- 		memcpy(trl.eyecatcher, SMCD_EYECATCHER,
-@@ -1063,15 +1069,14 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
- 				memcpy(clc_v2->r1.eid, eid, SMC_MAX_EID_LEN);
- 			len = SMCR_CLC_ACCEPT_CONFIRM_LEN_V2;
- 			if (first_contact) {
--				smc_clc_fill_fce(&fce, &len, ini->release_nr);
--				fce.v2_direct = !link->lgr->uses_gateway;
--				memset(&gle, 0, sizeof(gle));
-+				fce_len = smc_clc_fill_fce(&fce, ini);
-+				len += fce_len;
-+				fce.fce_v2_base.v2_direct = !link->lgr->uses_gateway;
- 				if (clc->hdr.type == SMC_CLC_CONFIRM) {
-+					memset(&gle, 0, sizeof(gle));
- 					gle.gid_cnt = ini->smcrv2.gidlist.len;
- 					len += sizeof(gle);
- 					len += gle.gid_cnt * sizeof(gle.gid[0]);
--				} else {
--					len += sizeof(gle.reserved);
- 				}
- 			}
- 			clc_v2->hdr.length = htons(len);
-@@ -1094,7 +1099,7 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
- 				   sizeof(trl);
- 	if (version > SMC_V1 && first_contact) {
- 		vec[i].iov_base = &fce;
--		vec[i++].iov_len = sizeof(fce);
-+		vec[i++].iov_len = fce_len;
- 		if (!conn->lgr->is_smcd) {
- 			if (clc->hdr.type == SMC_CLC_CONFIRM) {
- 				vec[i].iov_base = &gle;
-@@ -1102,9 +1107,6 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
- 				vec[i].iov_base = &ini->smcrv2.gidlist.list;
- 				vec[i++].iov_len = gle.gid_cnt *
- 						   sizeof(gle.gid[0]);
--			} else {
--				vec[i].iov_base = &gle.reserved;
--				vec[i++].iov_len = sizeof(gle.reserved);
- 			}
- 		}
- 	}
-diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-index b923e89acafb..bd75382f374d 100644
---- a/net/smc/smc_clc.h
-+++ b/net/smc/smc_clc.h
-@@ -147,7 +147,9 @@ struct smc_clc_msg_proposal_prefix {	/* prefix part of clc proposal message*/
- struct smc_clc_msg_smcd {	/* SMC-D GID information */
- 	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requestor */
- 	__be16 v2_ext_offset;	/* SMC Version 2 Extension Offset */
--	u8 reserved[28];
-+	u8 vendor_oui[3];	/* vendor organizationally unique identifier */
-+	u8 vendor_exp_options[5];
-+	u8 reserved[20];
- };
- 
- struct smc_clc_smcd_v2_extension {
-@@ -231,8 +233,17 @@ struct smc_clc_first_contact_ext {
- 	u8 hostname[SMC_MAX_HOSTNAME_LEN];
- };
- 
-+struct smc_clc_first_contact_ext_v2x {
-+	struct smc_clc_first_contact_ext fce_v2_base;
-+	u8 reserved3[4];
-+	__be32 vendor_exp_options;
-+	u8 reserved4[8];
-+} __packed;		/* format defined in
-+			 * IBM Shared Memory Communications Version 2 (Third Edition)
-+			 * (https://www.ibm.com/support/pages/node/7009315)
-+			 */
-+
- struct smc_clc_fce_gid_ext {
--	u8 reserved[16];
- 	u8 gid_cnt;
- 	u8 reserved2[3];
- 	u8 gid[][SMC_GID_SIZE];
--- 
-2.24.3 (Apple Git-128)
+> Also combining "net-next" with a Fixes tag is wrong, except the functionality
+> was added very recently.
 
+Thank you! I'll keep an eye on these in the future.
+
+> 
+>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+>> ---
+>>  drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+>> index a36f6369f132..c81cdeb4d4e7 100644
+>> --- a/drivers/net/ethernet/microchip/lan743x_main.c
+>> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+>> @@ -1515,7 +1515,7 @@ static int lan743x_phy_open(struct lan743x_adapter *adapter)
+>>  							    &fphy_status, NULL);
+>>  				if (IS_ERR(phydev)) {
+>>  					netdev_err(netdev, "No PHY/fixed_PHY found\n");
+>> -					return -EIO;
+>> +					return PTR_ERR(phydev);
+>>  				}
+>>  			} else {
+>>  				goto return_error;
+> 
 
