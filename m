@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-28649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F0978019B
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:21:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC1878019D
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:21:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B6A8282265
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:21:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E14028224B
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B84E1B7F1;
-	Thu, 17 Aug 2023 23:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A61D1C2A8;
+	Thu, 17 Aug 2023 23:19:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0CC1BEED
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:19:38 +0000 (UTC)
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A0335B6
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:35 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-649a653479bso1548236d6.0
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF361BEED
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:19:39 +0000 (UTC)
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3F335AE
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:37 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-76d77da274eso21490285a.1
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 16:19:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1692314375; x=1692919175;
+        d=broadcom.com; s=google; t=1692314376; x=1692919176;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8EWyq1r19DhGAnjFNpY9GVV2NzodNlGhYizDI6pq9cI=;
-        b=XdxaQf7CN3Gm48sdeJFG3tKrpRTJ+LHl+hBVi6pT60SeoPN8vRxOcBUAdUSvchd1QN
-         AWtTZa3fEk2K/hDtC8K8tTdlqXnk5U9iQ14QEtNKUD0irmIlA+9wGbmwtSsHyItAen+O
-         IrpWdgWBDrkUZlQ7m/PUy9LRnu7JpPlpb9bjo=
+        bh=y6skaNLV/RRvreKXpowrVaHK5+/nU9FaAVxFgHO2mOU=;
+        b=Jc83VQNn+q9YwbKlbtCiuNwKI9C0qe4h2r5/2MSiAMsLbBUNZ7Z9dnA1fTVWDdwnfQ
+         q+N/c5x4raSkAv6xIvEPq8Y/ldSH5/ieg0Oxp+G6QXDWB8bZfaQq3l4ik73NmF1SJWRn
+         ikwo6O7uNKlhMZklpkR2iMwq+Ik5r7FDNYolQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692314375; x=1692919175;
+        d=1e100.net; s=20221208; t=1692314376; x=1692919176;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8EWyq1r19DhGAnjFNpY9GVV2NzodNlGhYizDI6pq9cI=;
-        b=BleT2VVgS0FmFmcpE0IzcJClFuT3gjFNdQHvfJnV3c0FFJF7upkWh2oyYOeC22q7n0
-         dSPvc4mwBMHKYXNmcS8haFydjVLDHS7mc+0WDXgl0wDn76wGJQ2L94Rc9QcZ4jihuzAA
-         kLmEyjzFTk7pNwPHzkd5UQCTNH4EPMEA6Yamt/Op0IQqOFgQIEhqbKh9LO/MFV/hudDJ
-         sKWtViTsslZfLn32TKsHjfJTDpYm19zSd0m8QSdeD+r8nzAbpQRVc1AFayJl4c8PJNKq
-         YCUvKMtXIjH6itnXCChvbXspYqQnH+brZOK44BP8c+koO3mvA9hP+tKwmi6vcrxu9eLt
-         7uzw==
-X-Gm-Message-State: AOJu0YwhItFtXRyo0/N0ZfQuw0KnGzlWk/D9IAq4Dxi2XUaaMnbw0YvJ
-	MotFhVnTcbiUgWe+GrgzYnKcFw==
-X-Google-Smtp-Source: AGHT+IG6+FdmdqCQY3jxPZef1U+/jORNUcKqyhIKa6BrpQO98OQ4+X7dsKMTOV4X50A65NLeIqqapQ==
-X-Received: by 2002:a0c:e282:0:b0:62d:eda3:4335 with SMTP id r2-20020a0ce282000000b0062deda34335mr1052114qvl.29.1692314374497;
-        Thu, 17 Aug 2023 16:19:34 -0700 (PDT)
+        bh=y6skaNLV/RRvreKXpowrVaHK5+/nU9FaAVxFgHO2mOU=;
+        b=mHAGZRZFyrocZ1uc3OE3vC+d07rUnZ8zTWRFOOD4GR4HD80rAqD6ToVbMYRD9FPkOu
+         GfVDA4wz2XBa1n/AYESne2EGAcOo7mD7qCdEN1QefL+Y+SkfpJjnTWhHWqdJgPyKN7L8
+         Jj3C2AkJ2vsgG63Vw2wzrlCC4KYvG1OSwjl3lP4teEek9M3TuBTl3vXjkoKih1haOPbC
+         SQPhqbb9MApvIn3COKZd3HfTDeZwIKWhfUea6fTwX75IKcEVrw4uzeCPodxAg/sJSJt6
+         i1KCyBqM6y9lucfzBVAWdFx4QbYbrvUEotg+5vgRkwV9iIS4fVsbSNMjFgQ/tOsb9sfx
+         SqKQ==
+X-Gm-Message-State: AOJu0YybHNbgGDccel2sXLCCKb/tAJohi4gW0l4MpE0xfUWs+GbRCFke
+	CUAnIM2A79Db2WaEb5nJuHLD/g==
+X-Google-Smtp-Source: AGHT+IGRuJPY2pKzzZWWObZQsbiccCSqG45hR4Q2VvCl23+blWnq4tCAau1RdxDkkSsHg+tPbEU+kg==
+X-Received: by 2002:ad4:4bc8:0:b0:647:21a8:19b2 with SMTP id l8-20020ad44bc8000000b0064721a819b2mr977282qvw.19.1692314376082;
+        Thu, 17 Aug 2023 16:19:36 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id w27-20020a05620a149b00b0076d25b11b62sm145516qkj.38.2023.08.17.16.19.33
+        by smtp.gmail.com with ESMTPSA id w27-20020a05620a149b00b0076d25b11b62sm145516qkj.38.2023.08.17.16.19.34
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Aug 2023 16:19:34 -0700 (PDT)
+        Thu, 17 Aug 2023 16:19:35 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,12 +58,12 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next v2 4/6] bnxt_en: Save ring error counters across reset
-Date: Thu, 17 Aug 2023 16:19:09 -0700
-Message-Id: <20230817231911.165035-5-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 5/6] bnxt_en: Display the ring error counters under ethtool -S
+Date: Thu, 17 Aug 2023 16:19:10 -0700
+Message-Id: <20230817231911.165035-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20230817231911.165035-1-michael.chan@broadcom.com>
 References: <20230817231911.165035-1-michael.chan@broadcom.com>
@@ -74,7 +74,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000002fdcb4060326a585"
+	boundary="00000000000041e598060326a5c9"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -82,124 +82,136 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000002fdcb4060326a585
+--00000000000041e598060326a5c9
 Content-Transfer-Encoding: 8bit
 
-Currently, the ring counters are stored in the per ring datastructure.
-During reset, all the rings are freed together with the associated
-datastructures.  As a result, all the ring error counters will be reset
-to zero.
+The existing driver displays the sum of 4 ring counters under ethtool -S.
+These counters are in the array bnxt_sw_func_stats.  These counters are
+summed at the time of ethtool -S and will be lost when the device is reset.
 
-Add logic to keep track of the total error counts of all the rings
-and save them before reset (including ifdown).  The next patch will
-display these total ring error counters under ethtool -S.
+Replace these counters with the new total ring error counters added in the
+last patch.  These new counters are saved before reset.  ethtool -S will
+now display the sum of the saved counters plus the current counters.
 
 Link: https://lore.kernel.org/netdev/CACKFLimD-bKmJ1tGZOLYRjWzEwxkri-Mw7iFme1x2Dr0twdCeg@mail.gmail.com/
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 32 ++++++++++++++++++++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h | 15 +++++++++++
- 2 files changed, 46 insertions(+), 1 deletion(-)
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 48 +++++++++----------
+ 1 file changed, 23 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 34c3d231946e..bea562d08d6c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10685,8 +10685,10 @@ static void __bnxt_close_nic(struct bnxt *bp, bool irq_re_init,
- 	bnxt_free_skbs(bp);
- 
- 	/* Save ring stats before shutdown */
--	if (bp->bnapi && irq_re_init)
-+	if (bp->bnapi && irq_re_init) {
- 		bnxt_get_ring_stats(bp, &bp->net_stats_prev);
-+		bnxt_get_ring_err_stats(bp, &bp->ring_err_stats_prev);
-+	}
- 	if (irq_re_init) {
- 		bnxt_free_irq(bp);
- 		bnxt_del_napi(bp);
-@@ -10935,6 +10937,34 @@ bnxt_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 	clear_bit(BNXT_STATE_READ_STATS, &bp->state);
- }
- 
-+static void bnxt_get_one_ring_err_stats(struct bnxt *bp,
-+					struct bnxt_total_ring_err_stats *stats,
-+					struct bnxt_cp_ring_info *cpr)
-+{
-+	struct bnxt_sw_stats *sw_stats = &cpr->sw_stats;
-+	u64 *hw_stats = cpr->stats.sw_stats;
-+
-+	stats->rx_total_l4_csum_errors += sw_stats->rx.rx_l4_csum_errors;
-+	stats->rx_total_resets += sw_stats->rx.rx_resets;
-+	stats->rx_total_buf_errors += sw_stats->rx.rx_buf_errors;
-+	stats->rx_total_oom_discards += sw_stats->rx.rx_oom_discards;
-+	stats->rx_total_netpoll_discards += sw_stats->rx.rx_netpoll_discards;
-+	stats->rx_total_ring_discards +=
-+		BNXT_GET_RING_STATS64(hw_stats, rx_discard_pkts);
-+	stats->tx_total_ring_discards +=
-+		BNXT_GET_RING_STATS64(hw_stats, tx_discard_pkts);
-+	stats->total_missed_irqs += sw_stats->cmn.missed_irqs;
-+}
-+
-+void bnxt_get_ring_err_stats(struct bnxt *bp,
-+			     struct bnxt_total_ring_err_stats *stats)
-+{
-+	int i;
-+
-+	for (i = 0; i < bp->cp_nr_rings; i++)
-+		bnxt_get_one_ring_err_stats(bp, stats, &bp->bnapi[i]->cp_ring);
-+}
-+
- static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask)
- {
- 	struct net_device *dev = bp->dev;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index d6a1eaa69774..7287fd3c0763 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -948,6 +948,17 @@ struct bnxt_sw_stats {
- 	struct bnxt_cmn_sw_stats cmn;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 8fd5071d8b09..a9f1eede24e9 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -339,13 +339,15 @@ enum {
+ 	RX_NETPOLL_DISCARDS,
  };
  
-+struct bnxt_total_ring_err_stats {
-+	u64			rx_total_l4_csum_errors;
-+	u64			rx_total_resets;
-+	u64			rx_total_buf_errors;
-+	u64			rx_total_oom_discards;
-+	u64			rx_total_netpoll_discards;
-+	u64			rx_total_ring_discards;
-+	u64			tx_total_ring_discards;
-+	u64			total_missed_irqs;
-+};
-+
- struct bnxt_stats_mem {
- 	u64		*sw_stats;
- 	u64		*hw_masks;
-@@ -2018,6 +2029,8 @@ struct bnxt {
- 	u8			pri2cos_idx[8];
- 	u8			pri2cos_valid;
+-static struct {
+-	u64			counter;
+-	char			string[ETH_GSTRING_LEN];
+-} bnxt_sw_func_stats[] = {
+-	{0, "rx_total_discard_pkts"},
+-	{0, "tx_total_discard_pkts"},
+-	{0, "rx_total_netpoll_discards"},
++static const char *const bnxt_ring_err_stats_arr[] = {
++	"rx_total_l4_csum_errors",
++	"rx_total_resets",
++	"rx_total_buf_errors",
++	"rx_total_oom_discards",
++	"rx_total_netpoll_discards",
++	"rx_total_ring_discards",
++	"tx_total_ring_discards",
++	"total_missed_irqs",
+ };
  
-+	struct bnxt_total_ring_err_stats ring_err_stats_prev;
+ #define NUM_RING_RX_SW_STATS		ARRAY_SIZE(bnxt_rx_sw_stats_str)
+@@ -495,7 +497,7 @@ static const struct {
+ 	BNXT_TX_STATS_PRI_ENTRIES(tx_packets),
+ };
+ 
+-#define BNXT_NUM_SW_FUNC_STATS	ARRAY_SIZE(bnxt_sw_func_stats)
++#define BNXT_NUM_RING_ERR_STATS	ARRAY_SIZE(bnxt_ring_err_stats_arr)
+ #define BNXT_NUM_PORT_STATS ARRAY_SIZE(bnxt_port_stats_arr)
+ #define BNXT_NUM_STATS_PRI			\
+ 	(ARRAY_SIZE(bnxt_rx_bytes_pri_arr) +	\
+@@ -532,7 +534,7 @@ static int bnxt_get_num_stats(struct bnxt *bp)
+ {
+ 	int num_stats = bnxt_get_num_ring_stats(bp);
+ 
+-	num_stats += BNXT_NUM_SW_FUNC_STATS;
++	num_stats += BNXT_NUM_RING_ERR_STATS;
+ 
+ 	if (bp->flags & BNXT_FLAG_PORT_STATS)
+ 		num_stats += BNXT_NUM_PORT_STATS;
+@@ -583,18 +585,17 @@ static bool is_tx_ring(struct bnxt *bp, int ring_num)
+ static void bnxt_get_ethtool_stats(struct net_device *dev,
+ 				   struct ethtool_stats *stats, u64 *buf)
+ {
+-	u32 i, j = 0;
++	struct bnxt_total_ring_err_stats ring_err_stats = {0};
+ 	struct bnxt *bp = netdev_priv(dev);
++	u64 *curr, *prev;
+ 	u32 tpa_stats;
++	u32 i, j = 0;
+ 
+ 	if (!bp->bnapi) {
+-		j += bnxt_get_num_ring_stats(bp) + BNXT_NUM_SW_FUNC_STATS;
++		j += bnxt_get_num_ring_stats(bp);
+ 		goto skip_ring_stats;
+ 	}
+ 
+-	for (i = 0; i < BNXT_NUM_SW_FUNC_STATS; i++)
+-		bnxt_sw_func_stats[i].counter = 0;
+-
+ 	tpa_stats = bnxt_get_num_tpa_ring_stats(bp);
+ 	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		struct bnxt_napi *bnapi = bp->bnapi[i];
+@@ -631,19 +632,16 @@ static void bnxt_get_ethtool_stats(struct net_device *dev,
+ 		sw = (u64 *)&cpr->sw_stats.cmn;
+ 		for (k = 0; k < NUM_RING_CMN_SW_STATS; j++, k++)
+ 			buf[j] = sw[k];
+-
+-		bnxt_sw_func_stats[RX_TOTAL_DISCARDS].counter +=
+-			BNXT_GET_RING_STATS64(sw_stats, rx_discard_pkts);
+-		bnxt_sw_func_stats[TX_TOTAL_DISCARDS].counter +=
+-			BNXT_GET_RING_STATS64(sw_stats, tx_discard_pkts);
+-		bnxt_sw_func_stats[RX_NETPOLL_DISCARDS].counter +=
+-			cpr->sw_stats.rx.rx_netpoll_discards;
+ 	}
+ 
+-	for (i = 0; i < BNXT_NUM_SW_FUNC_STATS; i++, j++)
+-		buf[j] = bnxt_sw_func_stats[i].counter;
++	bnxt_get_ring_err_stats(bp, &ring_err_stats);
+ 
+ skip_ring_stats:
++	curr = &ring_err_stats.rx_total_l4_csum_errors;
++	prev = &bp->ring_err_stats_prev.rx_total_l4_csum_errors;
++	for (i = 0; i < BNXT_NUM_RING_ERR_STATS; i++, j++, curr++, prev++)
++		buf[j] = *curr + *prev;
 +
- 	u16			hwrm_max_req_len;
- 	u16			hwrm_max_ext_req_len;
- 	unsigned int		hwrm_cmd_timeout;
-@@ -2344,6 +2357,8 @@ int bnxt_half_open_nic(struct bnxt *bp);
- void bnxt_half_close_nic(struct bnxt *bp);
- void bnxt_reenable_sriov(struct bnxt *bp);
- int bnxt_close_nic(struct bnxt *, bool, bool);
-+void bnxt_get_ring_err_stats(struct bnxt *bp,
-+			     struct bnxt_total_ring_err_stats *stats);
- int bnxt_dbg_hwrm_rd_reg(struct bnxt *bp, u32 reg_off, u16 num_words,
- 			 u32 *reg_buf);
- void bnxt_fw_exception(struct bnxt *bp);
+ 	if (bp->flags & BNXT_FLAG_PORT_STATS) {
+ 		u64 *port_stats = bp->port_stats.sw_stats;
+ 
+@@ -745,8 +743,8 @@ static void bnxt_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
+ 				buf += ETH_GSTRING_LEN;
+ 			}
+ 		}
+-		for (i = 0; i < BNXT_NUM_SW_FUNC_STATS; i++) {
+-			strcpy(buf, bnxt_sw_func_stats[i].string);
++		for (i = 0; i < BNXT_NUM_RING_ERR_STATS; i++) {
++			strscpy(buf, bnxt_ring_err_stats_arr[i], ETH_GSTRING_LEN);
+ 			buf += ETH_GSTRING_LEN;
+ 		}
+ 
 -- 
 2.30.1
 
 
---0000000000002fdcb4060326a585
+--00000000000041e598060326a5c9
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -270,14 +282,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP7VrFMEPaY5CUJHHjK3cK3D9IMv41kF
-S7asFJPvcIGNMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
-NzIzMTkzNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDh2d9g8KiXBQr9b03tOwCNMhn2jZ5bm
+lUJCLiR0L7IcMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgx
+NzIzMTkzNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQC2H018wiDnSDRC64wyJ6ZUZCtumI0FBJqi6rRYFmoYtSUvPZOG
-Vf2uOvfX+zkQHGQmigLEnt4Akio/SgdCst/An6zmnkymPKP2RNvnPGys0Z7MhmgfwwSIYUmAY2pf
-UqHKgX+QVE+fXUlyMq8omUu6KBh/2ai1CERaWi4scMMBrZJ6W2DmkUUx8EtjZ1A4Z+4pjJtZNDxo
-crrminLzvpNGo3vGtdf7umkmiXVXtaheL4igBUVn1JrTw7dfVw0OWNxGm+WtQmYwHNWufx7+JP7h
-lRwj4y7zVdXF3TcOjnIdGtJrDMALo0XBjRGvejN7muPpF4oxL6/58kcpp+20DGB7
---0000000000002fdcb4060326a585--
+ATANBgkqhkiG9w0BAQEFAASCAQC3nMNTpwMLhrDmrDCqQT0YC4jgo1tSJ4AW5jyCWNP/pNI45Ici
+jce6Ai1ycJec1pSsl+5frwhfpR1PSyNfCHzcDgtD8QGzDSXzgba35ZGl3bevOEjWfJl8z7iOXyMT
+j5f2o17Pl+xjr0VrgJ09zmZitiuGcl/j0xl7ZNkyNrxkVq40Q2FD9RdyDIi0pjTrW8MpCohriD3e
+V5FTkGiuUVjlAPXplCLWSElFXJxsDk3V/SAg2ZbsRHN68QL/2cb3x+Do9mEGFrv2p1Lvr8BmOoOk
+ERVNJZZeY1D8D355U2Zsiz9VGDDfufK0dlaQwx/xQGhO3uo4dOkSJjJRyT+qypAy
+--00000000000041e598060326a5c9--
 
