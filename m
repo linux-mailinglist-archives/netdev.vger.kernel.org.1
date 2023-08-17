@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-28603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD4D077FFC1
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:23:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D95977FFC2
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 23:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0931C21537
-	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:23:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E972821D1
+	for <lists+netdev@lfdr.de>; Thu, 17 Aug 2023 21:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2601B7C5;
-	Thu, 17 Aug 2023 21:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30D81B7C5;
+	Thu, 17 Aug 2023 21:23:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379BB1ADDE
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:23:17 +0000 (UTC)
-Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171372D69
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:23:05 -0700 (PDT)
-Received: from eig-obgw-5009a.ext.cloudfilter.net ([10.0.29.176])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58E31427B
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:23:23 +0000 (UTC)
+Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15724173F
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 14:23:15 -0700 (PDT)
+Received: from eig-obgw-5008a.ext.cloudfilter.net ([10.0.29.246])
 	by cmsmtp with ESMTP
-	id WgHjq1JY2bK1VWkSOqe7tR; Thu, 17 Aug 2023 21:23:04 +0000
+	id Wjctqmp5Tez0CWkSLq4zI5; Thu, 17 Aug 2023 21:23:01 +0000
 Received: from gator4166.hostgator.com ([108.167.133.22])
 	by cmsmtp with ESMTPS
-	id WkSNqEbnq0LVOWkSOqi1NJ; Thu, 17 Aug 2023 21:23:04 +0000
-X-Authority-Analysis: v=2.4 cv=BvCOfKb5 c=1 sm=1 tr=0 ts=64de8fb8
+	id WkSYqY6F0DHerWkSYqlGfN; Thu, 17 Aug 2023 21:23:15 +0000
+X-Authority-Analysis: v=2.4 cv=MN5zJeVl c=1 sm=1 tr=0 ts=64de8fc3
  a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=WzbPXH4gqzPVN0x6HrNMNA==:17
  a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
  a=IkcTkHD0fZMA:10 a=UttIx32zK-AA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
@@ -41,20 +41,20 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ncQPyTanjkgJpvE8Nr60owQtOO2OScUkTrk+xfEuoxE=; b=MEqiqAclgUqEcMW3J/WcZCoDLv
-	cSUNwa4YjIPM+6ylX53i9mrmlWaUYbVgXtuUCVqkSQT4cmkYtnYe1ae/igRwUDkobKXStXDlzRajb
-	Y90B/N79ZUbSDx8ofipZECqQIGUG4rEW9w6BiWa6ucJPG4vzm6WwS6YciWwCg0KZ2VKsnU4dfYtJP
-	UBvlD9WZ1klaJINPFrMrLeSRA+UQe0DiJlYNGw51jQluREAOyzamg2PYq0TA1ieALLQXLl4TEMi2Z
-	XEqo6Z5kr0WiUjZQOxoH0HlYJJ6epgSKsuBd0CjI16Hoyji4Ylyf0GEDvqS5S0QNAwiYN20sWelg8
-	F16VdpAg==;
-Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:46450 helo=[192.168.15.8])
+	bh=67XmJhrJZPK7WnW7Dqnj65qFJ7gTmNMnn76qKwY3QWk=; b=JzMrfIt16qqhA7uzLnsR8pH9F3
+	Gi/zexaVQyk7KbPV2LudUzW0nGp1Uizd8bKYT3TDsB/xnNHTT+3H+0/k6bbryzmf9eRoTmhu4+WBb
+	nl6aALgd8SdxJrQaFHOSVe8O0kZV1krmCHmWfTblcQWDnjKVLLg2jFYS3yIBUaWO40hfQRFYktMVM
+	VotA2oyE9NFHOY9CLRd2agm2dFtvbz3LYipjpipVTrYFdytOMCRwd0kXOCaAmgqVpyZ4AKQR9VE+a
+	z4fmEe/1eEkQHl8uoXAiz/hyB7rayNIPLOYZP9tuQevOP3Cw5Ith3FGR5pp4ceqPXFcf7lkErGHnp
+	r0eGPypA==;
+Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:37514 helo=[192.168.15.8])
 	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.96)
 	(envelope-from <gustavo@embeddedor.com>)
-	id 1qWkSM-001ksK-2H;
-	Thu, 17 Aug 2023 16:23:02 -0500
-Message-ID: <343b8571-28e4-665c-7652-15920d91cb4d@embeddedor.com>
-Date: Thu, 17 Aug 2023 15:24:04 -0600
+	id 1qWkSX-001l52-1M;
+	Thu, 17 Aug 2023 16:23:13 -0500
+Message-ID: <2be0a7d9-c671-e014-0814-842d52d9f1e4@embeddedor.com>
+Date: Thu, 17 Aug 2023 15:24:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH 3/7] wifi: cfg80211: Annotate struct cfg80211_mbssid_elems
+Subject: Re: [PATCH 4/7] wifi: cfg80211: Annotate struct cfg80211_pmsr_request
  with __counted_by
 Content-Language: en-US
 To: Kees Cook <keescook@chromium.org>,
@@ -76,9 +76,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
  linux-hardening@vger.kernel.org
 References: <20230817211114.never.208-kees@kernel.org>
- <20230817211531.4193219-3-keescook@chromium.org>
+ <20230817211531.4193219-4-keescook@chromium.org>
 From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20230817211531.4193219-3-keescook@chromium.org>
+In-Reply-To: <20230817211531.4193219-4-keescook@chromium.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
@@ -89,22 +89,22 @@ X-AntiAbuse: Sender Address Domain - embeddedor.com
 X-BWhitelist: no
 X-Source-IP: 187.162.21.192
 X-Source-L: No
-X-Exim-ID: 1qWkSM-001ksK-2H
+X-Exim-ID: 1qWkSX-001l52-1M
 X-Source: 
 X-Source-Args: 
 X-Source-Dir: 
-X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.8]) [187.162.21.192]:46450
+X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.8]) [187.162.21.192]:37514
 X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 82
+X-Email-Count: 96
 X-Org: HG=hgshared;ORG=hostgator;
 X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
 X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfHD0GvG+vLXHd+deQ/FaLqYiZtf20Klg673iWHyNZC7ZSxVt8R0ccTLYBWLsguIS1QRuTNsrWzMP6BUiX3wDoqxwURVzHGC9Se3HaUnfovzg5Gdynx1X
- NC/dl0rThKQxWBHTuFwbwIAvMAtLMwjwQfR1RtrwE3nyIjhSun/ExGVxu3IH/iSEyIbJcoRElR2DnvE5iPKHEbLTGGJcfS08+uY=
+X-CMAE-Envelope: MS4xfH8ypuXeMr+2+vuC3eGPKEE2qDZ4nm8s2h/JG2EaiMxdYwQgIC4XBpLUsmwCAGJDP5YFjUJRCWvgJmzmic4PwNU+pbKc9sTVXM92InT/42MKMqYHZfMc
+ Yxiv7uzbqsoiGfwPl2KxcDQk6Pv6OoXCgxj5KGPQRl93/p+RzNWSD7pPTrDpIucHvaT2kq5o7wqR9Vlc7jrM2i86wCdh/C/C858=
 X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -117,7 +117,7 @@ On 8/17/23 15:15, Kees Cook wrote:
 > (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
 > functions).
 > 
-> As found with Coccinelle[1], add __counted_by for struct cfg80211_mbssid_elems.
+> As found with Coccinelle[1], add __counted_by for struct cfg80211_pmsr_request.
 > Additionally, since the element count member must be set before accessing
 > the annotated flexible array member, move its initialization earlier.
 > 
@@ -140,39 +140,41 @@ Gustavo
 
 > ---
 >   include/net/cfg80211.h | 2 +-
->   net/wireless/nl80211.c | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
+>   net/wireless/pmsr.c    | 3 +--
+>   2 files changed, 2 insertions(+), 3 deletions(-)
 > 
 > diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-> index eb73b5af5d04..5c7d091b3925 100644
+> index 5c7d091b3925..e9ca4726a732 100644
 > --- a/include/net/cfg80211.h
 > +++ b/include/net/cfg80211.h
-> @@ -1187,7 +1187,7 @@ struct cfg80211_mbssid_elems {
->   	struct {
->   		const u8 *data;
->   		size_t len;
-> -	} elem[];
-> +	} elem[] __counted_by(cnt);
+> @@ -3948,7 +3948,7 @@ struct cfg80211_pmsr_request {
+>   
+>   	struct list_head list;
+>   
+> -	struct cfg80211_pmsr_request_peer peers[];
+> +	struct cfg80211_pmsr_request_peer peers[] __counted_by(n_peers);
 >   };
 >   
 >   /**
-> diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-> index 80633e815311..9ba4266368db 100644
-> --- a/net/wireless/nl80211.c
-> +++ b/net/wireless/nl80211.c
-> @@ -5438,13 +5438,13 @@ nl80211_parse_mbssid_elems(struct wiphy *wiphy, struct nlattr *attrs)
->   	elems = kzalloc(struct_size(elems, elem, num_elems), GFP_KERNEL);
->   	if (!elems)
->   		return ERR_PTR(-ENOMEM);
-> +	elems->cnt = num_elems;
+> diff --git a/net/wireless/pmsr.c b/net/wireless/pmsr.c
+> index 77000a264855..9611aa0bd051 100644
+> --- a/net/wireless/pmsr.c
+> +++ b/net/wireless/pmsr.c
+> @@ -291,6 +291,7 @@ int nl80211_pmsr_start(struct sk_buff *skb, struct genl_info *info)
+>   	req = kzalloc(struct_size(req, peers, count), GFP_KERNEL);
+>   	if (!req)
+>   		return -ENOMEM;
+> +	req->n_peers = count;
 >   
->   	nla_for_each_nested(nl_elems, attrs, rem_elems) {
->   		elems->elem[i].data = nla_data(nl_elems);
->   		elems->elem[i].len = nla_len(nl_elems);
->   		i++;
+>   	if (info->attrs[NL80211_ATTR_TIMEOUT])
+>   		req->timeout = nla_get_u32(info->attrs[NL80211_ATTR_TIMEOUT]);
+> @@ -321,8 +322,6 @@ int nl80211_pmsr_start(struct sk_buff *skb, struct genl_info *info)
+>   			goto out_err;
+>   		idx++;
 >   	}
-> -	elems->cnt = num_elems;
->   	return elems;
->   }
+> -
+> -	req->n_peers = count;
+>   	req->cookie = cfg80211_assign_cookie(rdev);
+>   	req->nl_portid = info->snd_portid;
 >   
 
