@@ -1,158 +1,223 @@
-Return-Path: <netdev+bounces-28717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E047805D6
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:12:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920137805EA
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F29CD28226E
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 06:12:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1C451C2155B
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 06:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D57C1428C;
-	Fri, 18 Aug 2023 06:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C77C847D;
+	Fri, 18 Aug 2023 06:41:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8FF812
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 06:12:49 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733F2359D
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:12:47 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4ffa4f4769fso298733e87.0
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:12:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BE8A5D
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 06:41:02 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431CE3A95
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:41:01 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99bf8e5ab39so67352966b.2
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:41:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692339166; x=1692943966;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=k17LecZQkR5FnBBqAVVrYfSgelENhBd5qnGq5/zqZhc=;
-        b=GuMZInSvMka9jx6sMPATR4W1DcsQNyxZbi7o2o53SHgKLk0d3qbgNyH3OebQDdy622
-         GREmSk8CtUc9IzIXVjbw9OIn83xFU4g3AAEDd7bK3Rkgy2B+iE9l9B3Ak2E9d06F+TnZ
-         uYJzmZSrtc9m8DJqOI+XRp5KbBU/ZV5g+wT7kyoXPsvdeX70iswcdim7kbquzj3mL6ce
-         U2ysQ+T/QCx6DcjERJRxT3LZXTARLYM0Fa3eCGSk+lOU/G+ugY/L3TAakb69FYwdbb7n
-         YZOEi0xn2i5owpPkLx38Y1Vtdsc9RHQXw0pXNgA5Bx4RIy6A+5vxYsqzBxP+hmjYaxxN
-         wntg==
+        d=gmail.com; s=20221208; t=1692340860; x=1692945660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DgLQ/Kxxgyg7POvQlUQU9loZngfTVG7JRdTOQb+0nck=;
+        b=fSTujn59id9Xk5kpEhs7fOvA8yjYAv48xtsh3tNMBl/NZ5Hr4A7lyEjIFzySQei3q5
+         HCFzsWYlgyTyyoRp5kqIBNIyYLqAFrFAkBNpTimkXpB2/iLW7vN5VUDFipc5ZxyvMMXi
+         XU2KB10q+yNzS6e4UoL0b7ELBikNxK+JO7QuWQ+ovYPyMR6e7Ev93yHzmu86XCO5t9j6
+         qyqjuk27VMFEEsgTbLYfTOEBIx5za9N9HSBsFzZUNfvZaTM2rqRQV6WBM0/ZTqK/E6Ds
+         2AL6kzPYk5NfPi32v0nF0/hen5mZ/NhobpnJIPI84lKPWERshWikHpzCMuRBykoxjvxb
+         jsSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692339166; x=1692943966;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=k17LecZQkR5FnBBqAVVrYfSgelENhBd5qnGq5/zqZhc=;
-        b=dP4SNqiBPazxSj4M3LTlfBs+cpYC5j0pQ2myV16RwNlnCb6oVlUruRNhbnUSUbZ4Q9
-         p6HSVaAhMgJhtSDwMv/dW4ubDluHGH9NtsUcywpgbf83egldV+1GkGP8b7BCdS87GFTk
-         dGRix65jFn7aDNXENEKbXMrBz5SXyZHJ87sd79PnPIURDtpzrKXK6CuO9B7xfK4SZg6C
-         tIj4rAiqOQekmucXnoTRuAh47zXrOcS5kdt/y4WE7wM/uZs9lPnfzoOVrE7k0p07rMfx
-         n4Ei7P9SOLtwpnuipwTOLg+0nA/mNEVN+/AQ2tRU0xsJ40OhUcNFMBoRhmYJAWLpVaLG
-         /gwA==
-X-Gm-Message-State: AOJu0Yxo91Foeto0mXEv7Z0QRpNhUKsRc3OGqz9cqdbRUosrPmLkx4Lz
-	HGoRTv8kl08Z/1a9ydUyrd08fvynXm6MrYH4zKoGNA==
-X-Google-Smtp-Source: AGHT+IGx5YFS7qfg8rzhiiw+9qHifg22wmvkoY5p7YangoYwNqNV8gzzriX7+9DIkhRNrcJAc3/65eICUwZBmjsjK5w=
-X-Received: by 2002:a19:ca1d:0:b0:4fe:958:88ac with SMTP id
- a29-20020a19ca1d000000b004fe095888acmr829609lfg.6.1692339165491; Thu, 17 Aug
- 2023 23:12:45 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692340860; x=1692945660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DgLQ/Kxxgyg7POvQlUQU9loZngfTVG7JRdTOQb+0nck=;
+        b=HyJ+RUVjqKnZog/1jeXiegpTmstTZ2rHRmBsRC2boOeVMrCr5rnxjJpeFmT28r2oEw
+         kwJh6UiNlKaE//l7ryklFsSxkbuDvG1GDDm+wHXKMYe93Av+e5AGAwsAzMHgs1IdfmKy
+         6p1Vu7HhWUBt0Bkmu0PYsCkPuvkkvRwAh9HYZlQbz6BRrL7qz2nBxSpk5EhWrMShSUkw
+         feQq5a9SI6yXWBHMgCTIyK06uXMF2cxMSmSKIolQFC0UcvlJAslTta2FEYvmK51jsZGb
+         YPQnmsxKhIJqE9lb+hlLWZYJMkkz8/qrx91JJVyjF7VakwKo95lC+h3fC5WpQ/BFz6Sc
+         JBDw==
+X-Gm-Message-State: AOJu0YwreyINKZu5c2d/HzONf2Pm4rVQFUz0485H0MoVfeYYx9a384mo
+	slsmlyiht/x/FQ0+HJ3gI8lNSljkPmlXGEdZ5ntVNouFydY2jg==
+X-Google-Smtp-Source: AGHT+IGMgL+98YJlDHlNt+eNrxQquwGoJg1A12Bryxhmse8azoJ4nvaIqgjuk2wa7z8Ek2Sol/hjplUVNnzSB8yZPJw=
+X-Received: by 2002:a17:906:2254:b0:99e:8a1:9df7 with SMTP id
+ 20-20020a170906225400b0099e08a19df7mr1265438ejr.74.1692340859551; Thu, 17 Aug
+ 2023 23:40:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816100113.41034-1-linyunsheng@huawei.com>
- <20230816100113.41034-2-linyunsheng@huawei.com> <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
- <20230817091554.31bb3600@kernel.org> <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
- <20230817165744.73d61fb6@kernel.org>
-In-Reply-To: <20230817165744.73d61fb6@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Fri, 18 Aug 2023 09:12:09 +0300
-Message-ID: <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mina Almasry <almasrymina@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, 
-	Liang Chen <liangchen.linux@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>
+References: <20230818021132.2796092-1-edumazet@google.com>
+In-Reply-To: <20230818021132.2796092-1-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 18 Aug 2023 14:40:22 +0800
+Message-ID: <CAL+tcoDGuVNie-mAzU6t61pQPqt24PWKP88JG-kVM6ZhttUZEg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: annotate data-races around sk->sk_lingertime
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 18 Aug 2023 at 02:57, Jakub Kicinski <kuba@kernel.org> wrote:
+On Fri, Aug 18, 2023 at 10:11=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
 >
-> On Thu, 17 Aug 2023 19:59:37 +0300 Ilias Apalodimas wrote:
-> > > Can we assume the DMA mapping of page pool is page aligned? We should
-> > > be, right?
-> >
-> > Yes
-> >
-> > > That means we're storing 12 bits of 0 at the lower end.
-> > > So even with 32b of space we can easily store addresses for 32b+12b =>
-> > > 16TB of memory. "Ought to be enough" to paraphrase Bill G, and the
-> > > problem is only in our heads?
-> >
-> > Do you mean moving the pp_frag_count there?
+> sk_getsockopt() runs locklessly. This means sk->sk_lingertime
+> can be read while other threads are changing its value.
 >
-> Right, IIUC we don't have enough space to fit dma_addr_t and the
-> refcount, but if we store the dma addr on a shifted u32 instead
-> of using dma_addr_t explicitly - the refcount should fit?
-
-struct page looks like this:
-
-unsigned long dma_addr;
-union {
-      unsigned long dma_addr_upper;
-      atomic_long_t pp_frag_count;
-};
-
-So, on 32bit platforms with 64bit dma we can't support a frag count at all.
-We could either use the lower 12 bits (and have support for 4096 frags
-'only') or do what you suggest.
-TBH I don't love any of these and since those platforms are rare (or
-at least that's what I think), I prefer not supporting them at all.
-
+> Other reads also happen without socket lock being held,
+> and must be annotated.
 >
-> > I was questioning the need to have PP_FLAG_PAGE_SPLIT_IN_DRIVER
-> > overall.  With Yunshengs patches such a platform would allocate a
-> > page, so why should we prevent it from splitting it internally?
+> Remove preprocessor logic using BITS_PER_LONG, compilers
+> are smart enough to figure this by themselves.
 >
-> Splitting it is fine, the problem is that the refcount AKA
-> page->pp_frag_count** counts outstanding PP-aware references
-> and page->refcount counts PP-unaware references.
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+
+Thanks!
+
+> ---
+>  net/bluetooth/iso.c |  2 +-
+>  net/bluetooth/sco.c |  2 +-
+>  net/core/sock.c     | 18 +++++++++---------
+>  net/sched/em_meta.c |  2 +-
+>  net/smc/af_smc.c    |  2 +-
+>  5 files changed, 13 insertions(+), 13 deletions(-)
 >
-> If we want to use page->refcount directly we'd need to unmap
-> the page whenever drivers calls page_pool_defrag_page().
-> But the driver may assume the page is still mapped afterwards.
-
-What I am suggesting here is to not add the new
-PP_FLAG_PAGE_SPLIT_IN_DRIVER flag.  If a driver wants to split pages
-internally it should create a pool without
-PP_FLAG_DMA_SYNC_DEV to begin with.  The only responsibility the
-driver would have is to elevate the page refcnt so page pool would not
-try to free/recycle it.  Since it won't be able to allocate fragments
-we don't have to worry about the rest.
-
-> We can change the API to make this behavior explicit. Although
-> IMHO that's putting the burden of rare platforms on non-rare
-> platforms which we should avoid.
-
-Yep, agree here.
-
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 6b66d6a88b9a22adf208b24e0a31d6f236355d9b..3c03e49422c7519167a0a2a6f=
+5bdc8af5b2c0cd0 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1475,7 +1475,7 @@ static int iso_sock_release(struct socket *sock)
 >
-> ** I said it before and I will keep saying this until someone gets
->    angry at me - I really think we should rename this field because
->    the association with frags is a coincidence.
-
-I had similar confusions everytime I had to re-read our code hence git
-show 4d4266e3fd32
-Any suggestions?
-
-Thanks
-/Ilias
+>         iso_sock_close(sk);
+>
+> -       if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
+> +       if (sock_flag(sk, SOCK_LINGER) && READ_ONCE(sk->sk_lingertime) &&
+>             !(current->flags & PF_EXITING)) {
+>                 lock_sock(sk);
+>                 err =3D bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingerti=
+me);
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 50ad5935ae47a31cb3d11a8b56f7d462cbaf2366..c736186aba26beadccd76c66f=
+0af72835d740551 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -1245,7 +1245,7 @@ static int sco_sock_release(struct socket *sock)
+>
+>         sco_sock_close(sk);
+>
+> -       if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
+> +       if (sock_flag(sk, SOCK_LINGER) && READ_ONCE(sk->sk_lingertime) &&
+>             !(current->flags & PF_EXITING)) {
+>                 lock_sock(sk);
+>                 err =3D bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingerti=
+me);
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 22d94394335fb75f12da65368e87c5a65167cc0e..e11952aee3777a5df51abdf70=
+d30fbd3ec3a50fc 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -797,7 +797,7 @@ EXPORT_SYMBOL(sock_set_reuseport);
+>  void sock_no_linger(struct sock *sk)
+>  {
+>         lock_sock(sk);
+> -       sk->sk_lingertime =3D 0;
+> +       WRITE_ONCE(sk->sk_lingertime, 0);
+>         sock_set_flag(sk, SOCK_LINGER);
+>         release_sock(sk);
+>  }
+> @@ -1230,15 +1230,15 @@ int sk_setsockopt(struct sock *sk, int level, int=
+ optname,
+>                         ret =3D -EFAULT;
+>                         break;
+>                 }
+> -               if (!ling.l_onoff)
+> +               if (!ling.l_onoff) {
+>                         sock_reset_flag(sk, SOCK_LINGER);
+> -               else {
+> -#if (BITS_PER_LONG =3D=3D 32)
+> -                       if ((unsigned int)ling.l_linger >=3D MAX_SCHEDULE=
+_TIMEOUT/HZ)
+> -                               sk->sk_lingertime =3D MAX_SCHEDULE_TIMEOU=
+T;
+> +               } else {
+> +                       unsigned int t_sec =3D ling.l_linger;
+> +
+> +                       if (t_sec >=3D MAX_SCHEDULE_TIMEOUT / HZ)
+> +                               WRITE_ONCE(sk->sk_lingertime, MAX_SCHEDUL=
+E_TIMEOUT);
+>                         else
+> -#endif
+> -                               sk->sk_lingertime =3D (unsigned int)ling.=
+l_linger * HZ;
+> +                               WRITE_ONCE(sk->sk_lingertime, t_sec * HZ)=
+;
+>                         sock_set_flag(sk, SOCK_LINGER);
+>                 }
+>                 break;
+> @@ -1692,7 +1692,7 @@ int sk_getsockopt(struct sock *sk, int level, int o=
+ptname,
+>         case SO_LINGER:
+>                 lv              =3D sizeof(v.ling);
+>                 v.ling.l_onoff  =3D sock_flag(sk, SOCK_LINGER);
+> -               v.ling.l_linger =3D sk->sk_lingertime / HZ;
+> +               v.ling.l_linger =3D READ_ONCE(sk->sk_lingertime) / HZ;
+>                 break;
+>
+>         case SO_BSDCOMPAT:
+> diff --git a/net/sched/em_meta.c b/net/sched/em_meta.c
+> index 6fdba069f6bfd306fa68fc2e68bdcaf0cf4d4e9e..da34fd4c92695f453f1d6547c=
+6e4e8d3afe7a116 100644
+> --- a/net/sched/em_meta.c
+> +++ b/net/sched/em_meta.c
+> @@ -502,7 +502,7 @@ META_COLLECTOR(int_sk_lingertime)
+>                 *err =3D -1;
+>                 return;
+>         }
+> -       dst->value =3D sk->sk_lingertime / HZ;
+> +       dst->value =3D READ_ONCE(sk->sk_lingertime) / HZ;
+>  }
+>
+>  META_COLLECTOR(int_sk_err_qlen)
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index f5834af5fad535c420381827548cecdf0d03b0d5..7c77565c39d19c7f1baf1184c=
+4a5bf950c9cfe33 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -1820,7 +1820,7 @@ void smc_close_non_accepted(struct sock *sk)
+>         lock_sock(sk);
+>         if (!sk->sk_lingertime)
+>                 /* wait for peer closing */
+> -               sk->sk_lingertime =3D SMC_MAX_STREAM_WAIT_TIMEOUT;
+> +               WRITE_ONCE(sk->sk_lingertime, SMC_MAX_STREAM_WAIT_TIMEOUT=
+);
+>         __smc_release(smc);
+>         release_sock(sk);
+>         sock_put(sk); /* sock_hold above */
+> --
+> 2.42.0.rc1.204.g551eb34607-goog
+>
+>
 
