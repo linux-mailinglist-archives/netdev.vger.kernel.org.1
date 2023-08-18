@@ -1,276 +1,310 @@
-Return-Path: <netdev+bounces-28770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E37780A5C
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:40:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2491A780A5E
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8242F1C215D3
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:40:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469DB1C215D8
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0979B1774D;
-	Fri, 18 Aug 2023 10:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67661800C;
+	Fri, 18 Aug 2023 10:43:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA622A52
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:40:35 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E9A44B6
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 03:40:34 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5840ea40c59so9357487b3.2
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 03:40:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89D8182A0
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:43:02 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E024512C;
+	Fri, 18 Aug 2023 03:43:00 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fe8c3b5ca0so1095484e87.1;
+        Fri, 18 Aug 2023 03:43:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692355233; x=1692960033;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8jecKAXy9R20MMnJ9bMcQno6PS+W44FRomuumv1MGTE=;
-        b=e4sIrkGk2Kn9Z6yBFg3IZ1IhLvbH962W1wMvHNaBygcY9x7prE69Dd6m03f1M8m0D5
-         NwgynEP9RuNIHNrz+vQ+M8unAErdtYgZsvy/0SFWR5ybDFpv+3iVYZh4VL2bBxmfq4Ng
-         /ZR6+lXiNLwTpgBHbJVsHvHvSI8/BLGJgicv1hxIqcgy4ivri7EQOgiY/huWm8skbfEg
-         9MPkwUSTibkKG2CxIj6DEVzoTW3KQ6EazKtjV5EpYzsZKpbiokQGezQDBB1JMsTivhXJ
-         IkFMmNcpCzM+VA+gs5YdlwQk6OCMmVqkrIeQDV+g4XNsa0xoCIfL4epnFa35d/maJUyJ
-         sQvA==
+        d=gmail.com; s=20221208; t=1692355379; x=1692960179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hmojBrhkjd/n3ZABKjh8jVqFFmKl05oPxBkFw3tuw2M=;
+        b=WTK3ZwoTm92r5RsUNXAZ8viP2iNvWv7u3Xv+LTIF2AH3+UXC1Ta29pTmFotVdRuYnJ
+         FU4DQePVhzf8GrENu5/hZvBaoUOC/lqI3IWDm3azpqHvif63MNksPiFyFUwGKm7H5VCl
+         7A3S+1EDyUFvBl2YGpft/pZgbah8cKAvPMkzvY3RspvNJJD+/eSaYYtfVuYVF1DxRGAf
+         LALN2s/wy2YQcVAWMgALYYkL9HYiGWHJ+PGzCjOLf7NqVh5q4t3mlY5SHuYHG5x/QkBH
+         BQCeWrR72tAcV3mVrFIFTC4wkWxEBpreyk4vSaqH7Zgtwg9XnInvaJEKRDAZXdyxociK
+         JvOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692355233; x=1692960033;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8jecKAXy9R20MMnJ9bMcQno6PS+W44FRomuumv1MGTE=;
-        b=AK0WrtiiphgXSZlgTMjF2JLu2ZKk2/Y+Gzh35cjuEgWg8ZkOO7lRrwEXqy8qW6KHvR
-         5eyx1eb7eyZuY9pXaFp5uabSjoZ4EuCVmOZ7q1epWUaIR2W6cR9h9+k/FZgkeErhRSRN
-         jzRen+fEvRDNyhZO0E5PRmwpnuPucSgF/ngy+tRbPHmTw00IdWTXFo5NuRK7OfUihg+D
-         xZ1jm21Z1DJaAIHlwzmUSl/rakBpTTlPMOK3zTLkz/8dObRNh7hIR72fCwuOZu7RzCxo
-         MnHnKjJLNvhFRobtEX8BbwT2VQkQ1xNXbabfLqUEVYtAc0sAU+3Skywp0EyFZYgrThW+
-         OloA==
-X-Gm-Message-State: AOJu0YwtiQ63YwtQaR+orrvk2zXOY0+OpXXR3QoY5Ki6jZ7NE5vR13nR
-	b/ne4BsLWKsACJPU8yeQSAhn9FtWv8CkSQ==
-X-Google-Smtp-Source: AGHT+IFKDf9CkSEiAy6ysiTjWVsNY2NdolU+OFJXMMKw/ck47BfKOcKQ6rv27+DQX0MhaCkv448gwSehTjdpwg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:e7ca:0:b0:d74:347:1e3 with SMTP id
- e193-20020a25e7ca000000b00d74034701e3mr24332ybh.9.1692355233249; Fri, 18 Aug
- 2023 03:40:33 -0700 (PDT)
-Date: Fri, 18 Aug 2023 10:40:31 +0000
+        d=1e100.net; s=20221208; t=1692355379; x=1692960179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hmojBrhkjd/n3ZABKjh8jVqFFmKl05oPxBkFw3tuw2M=;
+        b=fzVg6L021C1zpeJR5LWHmDpMkwlFm3aRBWXYf66m0MecDmQa5AK96Vetnyu1eVZJyD
+         OJR10PzZi0xUb280SdX61j37rTW3Dx0aGkFH2Jj93GyxauPdJ7IFtkQiEeEPXwYy6eIK
+         ywkP5UubWSLI+96iH5j3Ty8hLDgstTyoPAkwRKXi+quS9HYp4YCVII7n1oV7zrEMID0B
+         DAiZPyc/SxGR+TtFBbcpURumijby13AXRzDfSy65zhXBTAQLRn40pzHoPGHKkhEPPbES
+         wcZ17aYFgh3HFpxA/8bk7RiIncHK7utdi6FW591e7njEJ0ROGDAzJPQHetPgerPPQGUs
+         XvBg==
+X-Gm-Message-State: AOJu0YzqqZ6EpPXBGiBoNoyxJ9cLZ/LkeUmPXhN9F73ZmRoXxPPdZ96b
+	CbCZJjK9jEzDEOebKFiyMGZg1tVS4ZczSEAmzmI=
+X-Google-Smtp-Source: AGHT+IFOm57VwaBrIJpj7TS7y6COoMgXNYSDbhXNO3d7922dFGXs0GQGrNjXeJyKNcuAwodKuMTsMW4596TYfSe88rc=
+X-Received: by 2002:a19:6714:0:b0:4fe:5051:f253 with SMTP id
+ b20-20020a196714000000b004fe5051f253mr1240003lfc.9.1692355378825; Fri, 18 Aug
+ 2023 03:42:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230818104031.3890323-1-edumazet@google.com>
-Subject: [PATCH net] ipv4: fix data-races around inet->inet_id
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+MIME-Version: 1.0
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+ <20230812151135.1028780-4-keguang.zhang@gmail.com> <thdwhlbs5salnufag24tqk4txqs3skidhq5nmzdeyxt3ni5pos@duj55rpqskl3>
+In-Reply-To: <thdwhlbs5salnufag24tqk4txqs3skidhq5nmzdeyxt3ni5pos@duj55rpqskl3>
+From: Keguang Zhang <keguang.zhang@gmail.com>
+Date: Fri, 18 Aug 2023 18:42:42 +0800
+Message-ID: <CAJhJPsV9g2hSu4Ga8bH573JsJsrA_3dwi8T0oQBtq0FydHKrPg@mail.gmail.com>
+Subject: Re: [PATCH 3/5] dt-bindings: net: Add Loongson-1 DWMAC glue layer
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-UDP sendmsg() is lockless, so ip_select_ident_segs()
-can very well be run from multiple cpus [1]
+On Wed, Aug 16, 2023 at 8:54=E2=80=AFPM Serge Semin <fancer.lancer@gmail.co=
+m> wrote:
+>
+> Hi Keguang
+>
+> On Sat, Aug 12, 2023 at 11:11:33PM +0800, Keguang Zhang wrote:
+> > Add devicetree binding document for Loongson-1 DWMAC glue layer.
+> >
+> > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> > ---
+> >  .../bindings/net/loongson,ls1x-dwmac.yaml     | 98 +++++++++++++++++++
+> >  .../devicetree/bindings/net/snps,dwmac.yaml   |  2 +
+> >  2 files changed, 100 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x=
+-dwmac.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.=
+yaml b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> > new file mode 100644
+> > index 000000000000..150799460599
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> > @@ -0,0 +1,98 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/loongson,ls1x-dwmac.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+>
+> > +title: Loongson-1 DWMAC glue layer
+>
+> DT-schemas describe a device. It has nothing to do with the glue
+> driver/layer/whatever.
+>
+OK. But what about the MODULE_DESCRIPTION in dwmac-loongson1.c
+MODULE_DESCRIPTION("Loongson1 DWMAC glue layer");
+Should the two parts be aligned with each other?
+If not, what's your suggestion then?
 
-Convert inet->inet_id to an atomic_t, but implement
-a dedicated path for TCP, avoiding cost of a locked
-instruction (atomic_add_return())
+> Also I suggest to add a brief device description in the
+> "description:" property and add there a brief info regarding the SoCs
+> the controllers can be found on, the DW (G)MAC IP-core version the
+> ethernet controllers are based on and if possible some data about the
+> synthesize parameters: SMA (MDIO-bus), Tx/Rx COE, DMA FIFOs size,
+> perfect and hash MAC-filters size, L3L4 frame filters availability,
+> PHY interfaces (MII, RMII, RGMII, etc), EEE support, IEEE 1588(-2008)
+> Timestamping support, PMT and Wake-up frame support, MAC Management
+> counters (MMC).
+>
+> Note DMA FIFO sizes can be also constrained in the properties
+> "rx-fifo-depth" and "tx-fifo-depth"; perfect and hash MAC-filter sizes -
+> in "snps,perfect-filter-entries" and "snps,multicast-filter-bins".
+>
+OK. The description could be added in next version.
 
-Note that this patch will cause a trivial merge conflict
-because we added inet->flags in net-next tree.
+> > +
+> > +maintainers:
+> > +  - Keguang Zhang <keguang.zhang@gmail.com>
+> > +
+> > +select:
+> > +  properties:
+> > +    compatible:
+> > +      contains:
+> > +        enum:
+> > +          - loongson,ls1b-dwmac
+> > +          - loongson,ls1c-dwmac
+> > +  required:
+> > +    - compatible
+> > +
+> > +properties:
+> > +  compatible:
+> > +    items:
+> > +      - enum:
+> > +          - loongson,ls1b-dwmac
+> > +          - loongson,ls1c-dwmac
+> > +      - const: snps,dwmac-3.50a
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    maxItems: 1
+> > +
+> > +  clock-names:
+> > +    const: stmmaceth
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+> > +  interrupt-names:
+> > +    const: macirq
+> > +
+>
+> > +  syscon:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > +    description:
+> > +      Phandle to the syscon containing some extra configurations
+> > +      including PHY interface mode.
+>
+> I believe the property is supposed to have a vendor-specific name like
+> "loongson,ls1-syscon" or similar.
 
-[1]
+This has been fixed in v2.
+Could you please review v2?
+Thanks!
+>
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - clocks
+> > +  - clock-names
+> > +  - interrupts
+> > +  - interrupt-names
+> > +  - phy-handle
+>
+> > +  - phy-mode
+>
+> You may want to specify the enum-constraints with the value permitted
+> for the particular Loongson (G)MAC controller. Seeing ls1b and ls1c
+> imply different sets of the PHY-modes the constraints are better to be
+> defined in the allOf sub-schemas. Alternatively you can split the
+> DT-schema file into two: one for ls1b-dwmac, another one for
+> ls1c-dwmac. IMO the later option seems better.
+>
+The "phy-mode", as pointed by Krzysztof, is defined in
+ethernet-controller and already required by snps,dwmac.
+So I have dropped it in v2.
+For allOf sub-schemas, do you mean something below?
+allOf:
+ - $ref: snps,dwmac.yaml#
 
-BUG: KCSAN: data-race in __ip_make_skb / __ip_make_skb
+ - if:
+     properties:
+       compatible:
+         contains:
+           const: loongson,ls1b-dwmac
+   then:
+     properties:
+       phy-mode:
+         enum:
+           - mii
+           - rgmii
 
-read-write to 0xffff888145af952a of 2 bytes by task 7803 on cpu 1:
-ip_select_ident_segs include/net/ip.h:542 [inline]
-ip_select_ident include/net/ip.h:556 [inline]
-__ip_make_skb+0x844/0xc70 net/ipv4/ip_output.c:1446
-ip_make_skb+0x233/0x2c0 net/ipv4/ip_output.c:1560
-udp_sendmsg+0x1199/0x1250 net/ipv4/udp.c:1260
-inet_sendmsg+0x63/0x80 net/ipv4/af_inet.c:830
-sock_sendmsg_nosec net/socket.c:725 [inline]
-sock_sendmsg net/socket.c:748 [inline]
-____sys_sendmsg+0x37c/0x4d0 net/socket.c:2494
-___sys_sendmsg net/socket.c:2548 [inline]
-__sys_sendmmsg+0x269/0x500 net/socket.c:2634
-__do_sys_sendmmsg net/socket.c:2663 [inline]
-__se_sys_sendmmsg net/socket.c:2660 [inline]
-__x64_sys_sendmmsg+0x57/0x60 net/socket.c:2660
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+ - if:
+     properties:
+       compatible:
+         contains:
+           const: loongson,ls1c-dwmac
+   then:
+     properties:
+       phy-mode:
+         enum:
+           - mii
+           - rmii
 
-read to 0xffff888145af952a of 2 bytes by task 7804 on cpu 0:
-ip_select_ident_segs include/net/ip.h:541 [inline]
-ip_select_ident include/net/ip.h:556 [inline]
-__ip_make_skb+0x817/0xc70 net/ipv4/ip_output.c:1446
-ip_make_skb+0x233/0x2c0 net/ipv4/ip_output.c:1560
-udp_sendmsg+0x1199/0x1250 net/ipv4/udp.c:1260
-inet_sendmsg+0x63/0x80 net/ipv4/af_inet.c:830
-sock_sendmsg_nosec net/socket.c:725 [inline]
-sock_sendmsg net/socket.c:748 [inline]
-____sys_sendmsg+0x37c/0x4d0 net/socket.c:2494
-___sys_sendmsg net/socket.c:2548 [inline]
-__sys_sendmmsg+0x269/0x500 net/socket.c:2634
-__do_sys_sendmmsg net/socket.c:2663 [inline]
-__se_sys_sendmmsg net/socket.c:2660 [inline]
-__x64_sys_sendmmsg+0x57/0x60 net/socket.c:2660
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> -Serge(y)
+>
+> > +  - syscon
+> > +
+> > +allOf:
+> > +  - $ref: snps,dwmac.yaml#
+> > +
+> > +unevaluatedProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
+> > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > +
+> > +    gmac0: ethernet@1fe10000 {
+> > +        compatible =3D "loongson,ls1b-dwmac", "snps,dwmac-3.50a";
+> > +        reg =3D <0x1fe10000 0x10000>;
+> > +
+> > +        clocks =3D <&clkc LS1X_CLKID_AHB>;
+> > +        clock-names =3D "stmmaceth";
+> > +
+> > +        interrupt-parent =3D <&intc1>;
+> > +        interrupts =3D <2 IRQ_TYPE_LEVEL_HIGH>;
+> > +        interrupt-names =3D "macirq";
+> > +
+> > +        phy-handle =3D <&phy0>;
+> > +        phy-mode =3D "mii";
+> > +
+> > +        snps,pbl =3D <1>;
+> > +        syscon =3D <&syscon>;
+> > +
+> > +        mdio {
+> > +            #address-cells =3D <1>;
+> > +            #size-cells =3D <0>;
+> > +            compatible =3D "snps,dwmac-mdio";
+> > +
+> > +            phy0: ethernet-phy@0 {
+> > +                reg =3D <0x0>;
+> > +            };
+> > +        };
+> > +    };
+> > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Do=
+cumentation/devicetree/bindings/net/snps,dwmac.yaml
+> > index ddf9522a5dc2..e1a956cf171e 100644
+> > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > @@ -66,6 +66,8 @@ properties:
+> >          - ingenic,x2000-mac
+> >          - loongson,ls2k-dwmac
+> >          - loongson,ls7a-dwmac
+> > +        - loongson,ls1b-dwmac
+> > +        - loongson,ls1c-dwmac
+> >          - qcom,qcs404-ethqos
+> >          - qcom,sa8775p-ethqos
+> >          - qcom,sc8280xp-ethqos
+> > --
+> > 2.39.2
+> >
 
-value changed: 0x184d -> 0x184e
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 PID: 7804 Comm: syz-executor.1 Not tainted 6.5.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-==================================================================
 
-Fixes: 23f57406b82d ("ipv4: avoid using shared IP generator for connected sockets")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/inet_sock.h |  2 +-
- include/net/ip.h        | 15 +++++++++++++--
- net/dccp/ipv4.c         |  4 ++--
- net/ipv4/af_inet.c      |  2 +-
- net/ipv4/datagram.c     |  2 +-
- net/ipv4/tcp_ipv4.c     |  4 ++--
- net/sctp/socket.c       |  2 +-
- 7 files changed, 21 insertions(+), 10 deletions(-)
+--
+Best regards,
 
-diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index 0bb32bfc61832dd787abcb2db3ee85d55c83f2c9..491ceb7ebe5d1c6cb502fbcae46c3369f4cb2681 100644
---- a/include/net/inet_sock.h
-+++ b/include/net/inet_sock.h
-@@ -222,8 +222,8 @@ struct inet_sock {
- 	__s16			uc_ttl;
- 	__u16			cmsg_flags;
- 	struct ip_options_rcu __rcu	*inet_opt;
-+	atomic_t		inet_id;
- 	__be16			inet_sport;
--	__u16			inet_id;
- 
- 	__u8			tos;
- 	__u8			min_ttl;
-diff --git a/include/net/ip.h b/include/net/ip.h
-index 332521170d9b86ab8cf53e134e199d4312e298cf..19adacd5ece031547e3ad70d524e89d8a6301a55 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -538,8 +538,19 @@ static inline void ip_select_ident_segs(struct net *net, struct sk_buff *skb,
- 	 * generator as much as we can.
- 	 */
- 	if (sk && inet_sk(sk)->inet_daddr) {
--		iph->id = htons(inet_sk(sk)->inet_id);
--		inet_sk(sk)->inet_id += segs;
-+		int val;
-+
-+		/* avoid atomic operations for TCP,
-+		 * as we hold socket lock at this point.
-+		 */
-+		if (sk_is_tcp(sk)) {
-+			sock_owned_by_me(sk);
-+			val = atomic_read(&inet_sk(sk)->inet_id);
-+			atomic_set(&inet_sk(sk)->inet_id, val + segs);
-+		} else {
-+			val = atomic_add_return(segs, &inet_sk(sk)->inet_id);
-+		}
-+		iph->id = htons(val);
- 		return;
- 	}
- 	if ((iph->frag_off & htons(IP_DF)) && !skb->ignore_df) {
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index fa8079303cb060aadb50ec1ae822876198c4ef4a..a545ad71201c87e5a1744c3d6ff8a25e621bca24 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -130,7 +130,7 @@ int dccp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- 						    inet->inet_daddr,
- 						    inet->inet_sport,
- 						    inet->inet_dport);
--	inet->inet_id = get_random_u16();
-+	atomic_set(&inet->inet_id, get_random_u16());
- 
- 	err = dccp_connect(sk);
- 	rt = NULL;
-@@ -432,7 +432,7 @@ struct sock *dccp_v4_request_recv_sock(const struct sock *sk,
- 	RCU_INIT_POINTER(newinet->inet_opt, rcu_dereference(ireq->ireq_opt));
- 	newinet->mc_index  = inet_iif(skb);
- 	newinet->mc_ttl	   = ip_hdr(skb)->ttl;
--	newinet->inet_id   = get_random_u16();
-+	atomic_set(&newinet->inet_id, get_random_u16());
- 
- 	if (dst == NULL && (dst = inet_csk_route_child_sock(sk, newsk, req)) == NULL)
- 		goto put_and_exit;
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 9b2ca2fcc5a1176ffcaab4abee1492c6466ce5ca..02736b83c30320124cf64721fbe60bb29084e109 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -340,7 +340,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
- 	else
- 		inet->pmtudisc = IP_PMTUDISC_WANT;
- 
--	inet->inet_id = 0;
-+	atomic_set(&inet->inet_id, 0);
- 
- 	sock_init_data(sock, sk);
- 
-diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
-index 4d1af0cd7d99e3f76a4202a91e2a4f5869e9aa2f..cb5dbee9e018fbba1bc1e5705e8bec6c4203af56 100644
---- a/net/ipv4/datagram.c
-+++ b/net/ipv4/datagram.c
-@@ -73,7 +73,7 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len
- 	reuseport_has_conns_set(sk);
- 	sk->sk_state = TCP_ESTABLISHED;
- 	sk_set_txhash(sk);
--	inet->inet_id = get_random_u16();
-+	atomic_set(&inet->inet_id, get_random_u16());
- 
- 	sk_dst_set(sk, &rt->dst);
- 	err = 0;
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a59cc4b8386113577d966a3efce53a13f51e8b06..2dbdc26da86e4389e0debdc46fe4d3acb3df8873 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -312,7 +312,7 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- 					     inet->inet_daddr));
- 	}
- 
--	inet->inet_id = get_random_u16();
-+	atomic_set(&inet->inet_id, get_random_u16());
- 
- 	if (tcp_fastopen_defer_connect(sk, &err))
- 		return err;
-@@ -1596,7 +1596,7 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
- 	inet_csk(newsk)->icsk_ext_hdr_len = 0;
- 	if (inet_opt)
- 		inet_csk(newsk)->icsk_ext_hdr_len = inet_opt->opt.optlen;
--	newinet->inet_id = get_random_u16();
-+	atomic_set(&newinet->inet_id, get_random_u16());
- 
- 	/* Set ToS of the new socket based upon the value of incoming SYN.
- 	 * ECT bits are set later in tcp_init_transfer().
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 9388d98aebc033f195e56d5295fd998996d41f7e..f791b9c83bf76ab7c5b1541d740c4ebcb5575328 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -9479,7 +9479,7 @@ void sctp_copy_sock(struct sock *newsk, struct sock *sk,
- 	newinet->inet_rcv_saddr = inet->inet_rcv_saddr;
- 	newinet->inet_dport = htons(asoc->peer.port);
- 	newinet->pmtudisc = inet->pmtudisc;
--	newinet->inet_id = get_random_u16();
-+	atomic_set(&newinet->inet_id, get_random_u16());
- 
- 	newinet->uc_ttl = inet->uc_ttl;
- 	newinet->mc_loop = 1;
--- 
-2.42.0.rc1.204.g551eb34607-goog
-
+Keguang Zhang
 
