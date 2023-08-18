@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-28905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3487811F9
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 19:29:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E827811D3
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 19:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0F2C1C208F8
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 17:29:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54135282419
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 17:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D5E198BB;
-	Fri, 18 Aug 2023 17:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F259198A9;
+	Fri, 18 Aug 2023 17:20:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05134525F
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 17:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7CF198A6
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 17:20:55 +0000 (UTC)
 Received: from pegase1.c-s.fr (unknown [90.115.179.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC9F49EA;
-	Fri, 18 Aug 2023 10:23:45 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9434220;
+	Fri, 18 Aug 2023 10:20:51 -0700 (PDT)
 Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
-	by localhost (Postfix) with ESMTP id 4RS6zq0k5bz9vhr;
-	Fri, 18 Aug 2023 18:40:07 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4RS6zx101Sz9vj7;
+	Fri, 18 Aug 2023 18:40:13 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase1.c-s.fr ([192.168.12.234])
 	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e3sU6JfKIHrC; Fri, 18 Aug 2023 18:40:07 +0200 (CEST)
+	with ESMTP id Vq0nZ22zTOTC; Fri, 18 Aug 2023 18:40:13 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase1.c-s.fr (Postfix) with ESMTP id 4RS6zl1B1vz9vhJ;
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4RS6zl3Tzmz9vhS;
 	Fri, 18 Aug 2023 18:40:03 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 1F1E78B763;
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6CFD28B76D;
 	Fri, 18 Aug 2023 18:40:03 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id WAQGydDBpqb7; Fri, 18 Aug 2023 18:40:03 +0200 (CEST)
+	with ESMTP id FkBysxlO6_lW; Fri, 18 Aug 2023 18:40:03 +0200 (CEST)
 Received: from PO20335.IDSI0.si.c-s.fr (PO17626.IDSI0.si.c-s.fr [172.19.54.29])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6CC5C8B774;
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 785AF8B778;
 	Fri, 18 Aug 2023 18:40:01 +0200 (CEST)
 Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
-	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 37IGduIu141961
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 37IGduZa141965
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Fri, 18 Aug 2023 18:39:56 +0200
 Received: (from chleroy@localhost)
-	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 37IGduB3141960;
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 37IGduW0141964;
 	Fri, 18 Aug 2023 18:39:56 +0200
 X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
@@ -71,9 +71,9 @@ Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         alsa-devel@alsa-project.org,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v4 05/28] soc: fsl: cpm1: qmc: Remove inline function specifiers
-Date: Fri, 18 Aug 2023 18:38:59 +0200
-Message-ID: <5e4f6d8ae6c6f4e51fdc8d6b8cdbdd42bbdbfcf9.1692376361.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v4 06/28] dt-bindings: net: Add support for QMC HDLC
+Date: Fri, 18 Aug 2023 18:39:00 +0200
+Message-ID: <817d1418fa1e9e689375177bee4bdc68ceeab7be.1692376361.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1692376360.git.christophe.leroy@csgroup.eu>
 References: <cover.1692376360.git.christophe.leroy@csgroup.eu>
@@ -83,79 +83,86 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1692376734; l=1927; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=kk1Ixhq/BCVZyT9VsSP1IQf1Jw/ahn3zn+6m9m/YV/k=; b=M13QAt9aKgtJFw7MZl2TkKG6g2k3N0uDUJTk2EdWY9JLBRDZmNcT9oDY3wzhySPbXAyFxNXoY x7esQx7fdcsCaW8Ax7sFVrnxgjZrj6JI8RD7HBT011D+N3DB98fNoye
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1692376734; l=2185; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=Rhuf0RNV4GJcMGFMFtbF5khE6XrVnFMNx4Jm/4p0AlQ=; b=l58NOiJaH/3m2dMO1c4zAyIFYfua+VAE//+mdzcjYAj/fVr74OpMAeaProCJ8fUOhXQdDyPJg z6CfXTIavP+BbLXn6OGqtdM03JBlGJZPnWeD5eXih1eKu3KroYFr3T4
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,SPF_FAIL,
-	SPF_HELO_NONE autolearn=no autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Herve Codina <herve.codina@bootlin.com>
 
-The inline function specifier is present on some functions but it is
-better to let the compiler decide inlining or not these functions.
+The QMC (QUICC mutichannel controller) is a controller present in some
+PowerQUICC SoC such as MPC885.
+The QMC HDLC uses the QMC controller to transfer HDLC data.
 
-Remove inline specifiers.
+Additionally, a framer can be connected to the QMC HDLC.
+If present, this framer is the interface between the TDM bus used by the
+QMC HDLC and the E1/T1 line.
+The QMC HDLC can use this framer to get information about the E1/T1 line
+and configure the E1/T1 line.
 
-Fixes: 3178d58e0b97 ("soc: fsl: cpm1: Add support for QMC")
 Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- drivers/soc/fsl/qe/qmc.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ .../devicetree/bindings/net/fsl,qmc-hdlc.yaml | 46 +++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
 
-diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
-index 2d2a9d88ba6c..459e0bbd723d 100644
---- a/drivers/soc/fsl/qe/qmc.c
-+++ b/drivers/soc/fsl/qe/qmc.c
-@@ -218,37 +218,37 @@ struct qmc {
- 	struct qmc_chan *chans[64];
- };
- 
--static inline void qmc_write16(void __iomem *addr, u16 val)
-+static void qmc_write16(void __iomem *addr, u16 val)
- {
- 	iowrite16be(val, addr);
- }
- 
--static inline u16 qmc_read16(void __iomem *addr)
-+static u16 qmc_read16(void __iomem *addr)
- {
- 	return ioread16be(addr);
- }
- 
--static inline void qmc_setbits16(void __iomem *addr, u16 set)
-+static void qmc_setbits16(void __iomem *addr, u16 set)
- {
- 	qmc_write16(addr, qmc_read16(addr) | set);
- }
- 
--static inline void qmc_clrbits16(void __iomem *addr, u16 clr)
-+static void qmc_clrbits16(void __iomem *addr, u16 clr)
- {
- 	qmc_write16(addr, qmc_read16(addr) & ~clr);
- }
- 
--static inline void qmc_write32(void __iomem *addr, u32 val)
-+static void qmc_write32(void __iomem *addr, u32 val)
- {
- 	iowrite32be(val, addr);
- }
- 
--static inline u32 qmc_read32(void __iomem *addr)
-+static u32 qmc_read32(void __iomem *addr)
- {
- 	return ioread32be(addr);
- }
- 
--static inline void qmc_setbits32(void __iomem *addr, u32 set)
-+static void qmc_setbits32(void __iomem *addr, u32 set)
- {
- 	qmc_write32(addr, qmc_read32(addr) | set);
- }
+diff --git a/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml b/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
+new file mode 100644
+index 000000000000..13f3572f0feb
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/fsl,qmc-hdlc.yaml
+@@ -0,0 +1,46 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/fsl,qmc-hdlc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Freescale/NXP QUICC Multichannel Controller (QMC) HDLC
++
++maintainers:
++  - Herve Codina <herve.codina@bootlin.com>
++
++description: |
++  The QMC HDLC uses a QMC (QUICC Multichannel Controller) channel to transfer
++  HDLC data.
++
++properties:
++  compatible:
++    const: fsl,qmc-hdlc
++
++  fsl,qmc-chan:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    items:
++      - items:
++          - description: phandle to QMC node
++          - description: Channel number
++    description:
++      Should be a phandle/number pair. The phandle to QMC node and the QMC
++      channel to use.
++
++  framer:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      phandle to the framer node
++
++required:
++  - compatible
++  - fsl,qmc-chan
++
++additionalProperties: false
++
++examples:
++  - |
++    hdlc {
++        compatible = "fsl,qmc-hdlc";
++        fsl,qmc-chan = <&qmc 16>;
++    };
 -- 
 2.41.0
 
