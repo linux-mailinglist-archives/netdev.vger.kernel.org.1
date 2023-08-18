@@ -1,110 +1,106 @@
-Return-Path: <netdev+bounces-28827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA2F780E58
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:55:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48109780E64
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DB541C2163B
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:55:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8116E2823C4
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD09318C1A;
-	Fri, 18 Aug 2023 14:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E454318C1B;
+	Fri, 18 Aug 2023 14:57:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2B77ED;
-	Fri, 18 Aug 2023 14:55:14 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9E235BB;
-	Fri, 18 Aug 2023 07:55:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=V+hKc+AoclIVijYb9tmyVJ/kpz+nndvmM+7r5NohFGM=; b=YQFHFXUW7thyrRLdoBV6PkHHUY
-	+Izgr6kblP9lpp9CeaaszXl+zCv1ct06LH/F7CWHLEozVREy9eVDSlZKKLGlEl44ejM4FIuMNpOhD
-	FXbjPMzZI99NisfZlfG5rnzpoLVcep+8tSM07FY/Vn7A82ZZOfOfImLJmsbHBAgeukiyJ3BGQNKaP
-	RaSqrNzOORXT3t6LdNrnbR/VviLO+oExT++BH+Wn0W/bEz5qb3SRWwQupA74LAzkb4jto56EmkEr8
-	nZFVo6wjuDl9MebfyuM+6HJA6T1K27EtwMZDgq4M4URgtoCcx/WEUbC+jI0G5Q2X0EijO22lH1ZFn
-	TuNAKURw==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qX0sX-000GVQ-IT; Fri, 18 Aug 2023 16:55:09 +0200
-Received: from [85.1.206.226] (helo=pc-102.home)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qX0sW-000XLM-7l; Fri, 18 Aug 2023 16:55:08 +0200
-Subject: Re: [PATCH v6 bpf 0/4] lwt: fix return values of BPF ops
-To: Yan Zhai <yan@cloudflare.com>, bpf@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- Thomas Graf <tgraf@suug.ch>, Jordan Griege <jgriege@cloudflare.com>,
- Dan Carpenter <dan.carpenter@linaro.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <cover.1692326837.git.yan@cloudflare.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <10b3dff2-7be4-ab98-e4a5-968ebb93c25f@iogearbox.net>
-Date: Fri, 18 Aug 2023 16:55:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09E4182BC
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 14:57:40 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72B63C20;
+	Fri, 18 Aug 2023 07:57:39 -0700 (PDT)
+Date: Fri, 18 Aug 2023 16:57:34 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1692370658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mOwQQ0BPTC+PDHYiDUDtHcpcTB1NW9+8Ld9PAqkgYDE=;
+	b=FNe5wH1BmMCD+MYpBezKbUNnxSJQwz+0juzDFjP1Ux27ZYt3zA95YnugM11pxLOdPuoL3p
+	TReycNr5gM+zkPFkMeaRGaRGFDl/FoahCWrdnnFXjubbCSH/4QLxHZTuCCRKifFtPa3FjU
+	YAvLbBjrFecDiL0ycfnLfBFQSXJ2onXzj6sq15KP6MmTNaIFQOKiZLY6eKMxyzh6QyoGMY
+	fRRCFWIaHgibY0cBjHYHEEzT44P1wGzxk5izX0mm5SOWd081WZfbMZUKpzqYeAXSaP2bPg
+	3k2Fk6KGq7Rr9cznBC8b5Eduma5I40oy7vHi1tvq8mk6tyHBPAs11c4mHJKTDg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1692370658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mOwQQ0BPTC+PDHYiDUDtHcpcTB1NW9+8Ld9PAqkgYDE=;
+	b=mlEiYqnAcq5FNW/cwFF73Qm56hxG4sEB5LfPKCvQS+VRaTzA9gk6QYzn8XkGWvISOlhFK8
+	Fv4WpZNat8DP0TBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Subject: Re: [RFC PATCH net-next 0/2] net: Use SMP threads for backlog NAPI.
+Message-ID: <20230818145734.OgLYhPh1@linutronix.de>
+References: <20230814093528.117342-1-bigeasy@linutronix.de>
+ <20230814112421.5a2fa4f6@kernel.org>
+ <20230817131612.M_wwTr7m@linutronix.de>
+ <CAO3-Pbo7q6Y-xzP=3f58Y3MyWT2Vruy6UhKiam2=mAKArxgMag@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1692326837.git.yan@cloudflare.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27004/Fri Aug 18 09:41:49 2023)
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAO3-Pbo7q6Y-xzP=3f58Y3MyWT2Vruy6UhKiam2=mAKArxgMag@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/18/23 4:58 AM, Yan Zhai wrote:
-> lwt xmit hook does not expect positive return values in function
-> ip_finish_output2 and ip6_finish_output. However, BPF programs can
-> directly return positive statuses such like NET_XMIT_DROP, NET_RX_DROP,
-> and etc to the caller. Such return values would make the kernel continue
-> processing already freed skbs and eventually panic.
-> 
-> This set fixes the return values from BPF ops to unexpected continue
-> processing, checks strictly on the correct continue condition for
-> future proof. In addition, add missing selftests for BPF redirect
-> and reroute cases for BPF-CI.
-> 
-> v5: https://lore.kernel.org/bpf/cover.1692153515.git.yan@cloudflare.com/
-> v4: https://lore.kernel.org/bpf/ZMD1sFTW8SFiex+x@debian.debian/T/
-> v3: https://lore.kernel.org/bpf/cover.1690255889.git.yan@cloudflare.com/
-> v2: https://lore.kernel.org/netdev/ZLdY6JkWRccunvu0@debian.debian/
-> v1: https://lore.kernel.org/bpf/ZLbYdpWC8zt9EJtq@debian.debian/
-> 
-> changes since v5:
->   * fix BPF-CI failures due to missing config and busybox ping issue
+On 2023-08-18 09:43:08 [-0500], Yan Zhai wrote:
+> > Looking at the cloudflare ppl here in the thread, I doubt they use
+> > backlog but have proper NAPI so they might not need this.
+> >
+> Cloudflare does have backlog usage. On some veths we have to turn GRO
 
-Series looks good, thanks! Given we're fairly close to merge window and
-this has been broken for quite some time, I took this into bpf-next.
+Oh. Okay.
 
-Thanks,
-Daniel
+> off to cope with multi-layer encapsulation, and there is also no XDP
+> attached on these interfaces, thus the backlog is used. There are also
+> other usage of backlog, tuntap, loopback and bpf-redirect ingress.
+> Frankly speaking, making a NAPI instance "threaded" itself is not a
+> concern. We have threaded NAPI running on some veth for quite a while,
+> and it performs pretty well. The concern, if any, would be the
+> maturity of new code. I am happy to help derisk with some lab tests
+> and dogfooding if generic agreement is reached to proceed with this
+> idea.
+
+If you have threaded NAPI for veth then you wouldn't be affected by this
+code. However, if you _are_ affected by this and you use veth it would
+be helpful to figure out if you have problems as of net-next and if this
+helps or makes it worse.
+
+As of now Jakub isn't eager to have it and my testing/ convincing is
+quite limited. If nobody else yells that something like that would be
+helpful I would simply go and convince PeterZ/tglx to apply 2/2 of this
+series.
+
+> Yan
+
+Sebastian
 
