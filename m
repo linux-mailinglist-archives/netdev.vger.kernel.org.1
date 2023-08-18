@@ -1,133 +1,197 @@
-Return-Path: <netdev+bounces-28673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124327803AA
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:10:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59977803AF
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:11:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD4621C21523
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:10:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25ADB2821C2
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A65808;
-	Fri, 18 Aug 2023 02:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A68808;
+	Fri, 18 Aug 2023 02:11:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7CB398;
-	Fri, 18 Aug 2023 02:10:42 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73EAC30FE;
-	Thu, 17 Aug 2023 19:10:41 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-689e6fce70dso387546b3a.1;
-        Thu, 17 Aug 2023 19:10:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35FF39C
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 02:11:37 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47653358A
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 19:11:35 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58419550c3aso5662117b3.0
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 19:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692324641; x=1692929441;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wsj2zNj3xkOCvdWvIxiq3aCWKIVsXzUeqck+9IunsAc=;
-        b=jHlL0o0V1LTQeWAo+KNlFfRAv/jd6lTaog8cCSKfDTDEwHOrkaTqcPmoUmqRJBJjls
-         lZBL8YRCVda8i+gbzx816gCP7Sib/Ek+8MvlP5aDXSNmo9vncFdWDfQl8RiWsCMpl125
-         JpK7jG+A93A8bO36o0hQybAkud2Xf8AdSRijcTWLpr6I6ms83Ja9ANwehcp3s1zdxZIQ
-         uNSDYtGfmxVJ3LINfFmA/DkciALcdfU6W6yd6wjvvt9Vjm6JdRF1ZQCt7QNWpAK7d3xB
-         vFbcQGr+qItjkOtnK23pyxVCOKVjsPSAjC9v+QV15VTKz+8FjJbN3+OZAxGXnG0U7kRm
-         1f/Q==
+        d=google.com; s=20221208; t=1692324694; x=1692929494;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PmH8D6GkN3nklyb+azpwGjYz507MrAs8w+OMyYT4eP4=;
+        b=1DARFPf/NsOIzRCRy/H6bqipERm1aaIIQHKGycS4xuOO/YXTrtm32E2R0YaD5o/PTP
+         GCy4IRpNoOXWT1LAjdsxlNjJA/F9h/2eOeaIBIAK7CQuExzEKxUn2atlYuBqD6iocKCM
+         Xauo6N97U1pu+ZWvKc1u6ROpG4FAKUwUjPjHaKsVSVyGR1nKjNkG84sRsBfJtm2nUlZp
+         FOiDDnhtxw3AQCE0pLS3/sPGg/iEoasQ4dTnbM6kok/kA4lRlmLztgLWrfbdYYufFu8O
+         +0aS4fAPqfO4hfeLEgCuwR/ik+JqD7lhXoJeVPvkrrW2qKVN5Gg+fbtZ5Dj2HCHoCqaL
+         BwSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692324641; x=1692929441;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wsj2zNj3xkOCvdWvIxiq3aCWKIVsXzUeqck+9IunsAc=;
-        b=O8b2KmrfXN0rKVY2WVP+6Iys9kalHJ9tGAIvKi1EBlJc6ImvLOnY/TI1UVt+h/xGwL
-         N8AnP4uglqARk7U62PB8CdcvKVlIeWR8U4rovQm4Hd5Tm0GMIUS5nzsTAF2etqpzE37M
-         t3Zai0feOx780+EqD/fLHwL5/j1kuHipzGdk6Wp1Rz9vwCMpFRfJXSy+ri75qxhA5CiJ
-         x2wWGtVs8QefRBaNatfpw9UdjlXlsH/AiyRaa3eQS/wFueMsvrHnQZTmGsKt2OAsJ0wr
-         t1a/IU56dIINWnk7+85javWa2oBnZwbZGHe3L93cSZ5i/onjslxNu2bZ/ZiOYFJIzB+9
-         2GCw==
-X-Gm-Message-State: AOJu0Yzvca/Shk+hj2W3E1EMwAQdhwn/Kme90yJBGuetfl57AQ+uhleU
-	SF4ha1TJAqoGXlAGBnicQMo=
-X-Google-Smtp-Source: AGHT+IGuSeE4KmfNgan/3FH0662SMQS1YQkxWfN4l4PzfLryD1ZsnCd7EuNnUHT56oa64CZ8k00oaQ==
-X-Received: by 2002:a05:6a00:134a:b0:687:e02b:e3c with SMTP id k10-20020a056a00134a00b00687e02b0e3cmr1630698pfu.17.1692324640752;
-        Thu, 17 Aug 2023 19:10:40 -0700 (PDT)
-Received: from [10.22.68.146] ([122.11.166.8])
-        by smtp.gmail.com with ESMTPSA id n22-20020a62e516000000b006870ccfbb54sm400622pff.196.2023.08.17.19.10.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Aug 2023 19:10:40 -0700 (PDT)
-Message-ID: <fea59b79-3f28-c580-185b-8c64dc21a399@gmail.com>
-Date: Fri, 18 Aug 2023 10:10:33 +0800
+        d=1e100.net; s=20221208; t=1692324694; x=1692929494;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PmH8D6GkN3nklyb+azpwGjYz507MrAs8w+OMyYT4eP4=;
+        b=KW/Qs+Z0efhpF15Y7yCFI9jDLkVHIw7RbOCmA1BGrm+4mLk2TwXjRm281PbtizzZ6X
+         NkfE+8JfjisI6uphISdfHYkRrgqmMmdEQb5CMS0KQxaaDCkHMZVJY3U2p/v6hHTgmWS2
+         EW9BkRcc37WZIdUvWfw/CZ8afzOjE2ESiJVWnEdjueECKyK70Z05FhMCvTgpjtI5TaMi
+         UW1KrquMxB66toDhsj9GuKCG+C2akhuo7mv4TtXOWLXAZaLL7y7xb3EXxs9Oi2lUHBs1
+         6OT2BEHZGuWg4DChgHOkxn2Jihk5vf1E/UcbCYA88Ai/YWaez7gOIXRc6pUiexexmDyf
+         YrQA==
+X-Gm-Message-State: AOJu0Yz1xuqPaZT5Rl7DkK3Bxu4DM+1oDhRejRmr+hFpsUFEy6grEsMy
+	B9QHptAz0kZZryy+hikEU9EoXZrrMxs0rw==
+X-Google-Smtp-Source: AGHT+IGBtbu4AycyFeeM/kNeL+1+AD+U78sW/w7XNvDA0vbcI9wgjVAvlEENcrF/NRn+76rlfJ+WQUow3qmQJg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:4420:0:b0:583:a8dc:1165 with SMTP id
+ r32-20020a814420000000b00583a8dc1165mr15079ywa.10.1692324694421; Thu, 17 Aug
+ 2023 19:11:34 -0700 (PDT)
+Date: Fri, 18 Aug 2023 02:11:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [RFC PATCH bpf-next 1/2] bpf, x64: Fix tailcall infinite loop bug
-Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, x86@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, mykolal@fb.com,
- shuah@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com,
- maciej.fijalkowski@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20230814134147.70289-1-hffilwlqm@gmail.com>
- <20230814134147.70289-2-hffilwlqm@gmail.com>
- <20230817223143.jyclrtf3a6kmtgh5@macbook-pro-8.dhcp.thefacebook.com>
-From: Leon Hwang <hffilwlqm@gmail.com>
-In-Reply-To: <20230817223143.jyclrtf3a6kmtgh5@macbook-pro-8.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230818021132.2796092-1-edumazet@google.com>
+Subject: [PATCH net-next] net: annotate data-races around sk->sk_lingertime
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+sk_getsockopt() runs locklessly. This means sk->sk_lingertime
+can be read while other threads are changing its value.
 
+Other reads also happen without socket lock being held,
+and must be annotated.
 
-On 18/8/23 06:31, Alexei Starovoitov wrote:
-> On Mon, Aug 14, 2023 at 09:41:46PM +0800, Leon Hwang wrote:
->> @@ -1147,6 +1152,7 @@ struct bpf_attach_target_info {
->>  	struct module *tgt_mod;
->>  	const char *tgt_name;
->>  	const struct btf_type *tgt_type;
->> +	bool tail_call_ctx;
-> 
-> Instead of extra flag here can you check tgt_prog->aux->tail_call_reachable in check_attach_btf_id()
-> and set tr->flags there?
+Remove preprocessor logic using BITS_PER_LONG, compilers
+are smart enough to figure this by themselves.
 
-Should we check tgt_prog->aux->func[subprog]->is_func? Or, tgt_prog->aux->tail_call_reachable
-is enough?
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/bluetooth/iso.c |  2 +-
+ net/bluetooth/sco.c |  2 +-
+ net/core/sock.c     | 18 +++++++++---------
+ net/sched/em_meta.c |  2 +-
+ net/smc/af_smc.c    |  2 +-
+ 5 files changed, 13 insertions(+), 13 deletions(-)
 
-I think tgt_prog->aux->func[subprog]->is_func is required to check. It's because it's a bug
-about subprog instead of tgt_prog.
-
-In check_attach_btf_id():
-
-bool tail_call_ctx;
-// ...
-ret = bpf_check_attach_target(&env->log, prog, tgt_prog, btf_id, &tgt_info, &tail_call_ctx);
-// ...
-tr->flags = (tail_call_ctx ? BPF_TRAMP_F_TAIL_CALL_CTX : 0);
-
-How about changing like this? However, it's bad to change bpf_check_attach_target() declaration.
-
-> Other than this the fix makes sense.
-> Please trim your cc list when you respin.> Just maintainers, Maciej (author of fixes tag) and bpf@vger is enough.
-
-I'll trim it.
-
-Thanks,
-Leon
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 6b66d6a88b9a22adf208b24e0a31d6f236355d9b..3c03e49422c7519167a0a2a6f5bdc8af5b2c0cd0 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1475,7 +1475,7 @@ static int iso_sock_release(struct socket *sock)
+ 
+ 	iso_sock_close(sk);
+ 
+-	if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
++	if (sock_flag(sk, SOCK_LINGER) && READ_ONCE(sk->sk_lingertime) &&
+ 	    !(current->flags & PF_EXITING)) {
+ 		lock_sock(sk);
+ 		err = bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingertime);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 50ad5935ae47a31cb3d11a8b56f7d462cbaf2366..c736186aba26beadccd76c66f0af72835d740551 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1245,7 +1245,7 @@ static int sco_sock_release(struct socket *sock)
+ 
+ 	sco_sock_close(sk);
+ 
+-	if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
++	if (sock_flag(sk, SOCK_LINGER) && READ_ONCE(sk->sk_lingertime) &&
+ 	    !(current->flags & PF_EXITING)) {
+ 		lock_sock(sk);
+ 		err = bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingertime);
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 22d94394335fb75f12da65368e87c5a65167cc0e..e11952aee3777a5df51abdf70d30fbd3ec3a50fc 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -797,7 +797,7 @@ EXPORT_SYMBOL(sock_set_reuseport);
+ void sock_no_linger(struct sock *sk)
+ {
+ 	lock_sock(sk);
+-	sk->sk_lingertime = 0;
++	WRITE_ONCE(sk->sk_lingertime, 0);
+ 	sock_set_flag(sk, SOCK_LINGER);
+ 	release_sock(sk);
+ }
+@@ -1230,15 +1230,15 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 			ret = -EFAULT;
+ 			break;
+ 		}
+-		if (!ling.l_onoff)
++		if (!ling.l_onoff) {
+ 			sock_reset_flag(sk, SOCK_LINGER);
+-		else {
+-#if (BITS_PER_LONG == 32)
+-			if ((unsigned int)ling.l_linger >= MAX_SCHEDULE_TIMEOUT/HZ)
+-				sk->sk_lingertime = MAX_SCHEDULE_TIMEOUT;
++		} else {
++			unsigned int t_sec = ling.l_linger;
++
++			if (t_sec >= MAX_SCHEDULE_TIMEOUT / HZ)
++				WRITE_ONCE(sk->sk_lingertime, MAX_SCHEDULE_TIMEOUT);
+ 			else
+-#endif
+-				sk->sk_lingertime = (unsigned int)ling.l_linger * HZ;
++				WRITE_ONCE(sk->sk_lingertime, t_sec * HZ);
+ 			sock_set_flag(sk, SOCK_LINGER);
+ 		}
+ 		break;
+@@ -1692,7 +1692,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 	case SO_LINGER:
+ 		lv		= sizeof(v.ling);
+ 		v.ling.l_onoff	= sock_flag(sk, SOCK_LINGER);
+-		v.ling.l_linger	= sk->sk_lingertime / HZ;
++		v.ling.l_linger	= READ_ONCE(sk->sk_lingertime) / HZ;
+ 		break;
+ 
+ 	case SO_BSDCOMPAT:
+diff --git a/net/sched/em_meta.c b/net/sched/em_meta.c
+index 6fdba069f6bfd306fa68fc2e68bdcaf0cf4d4e9e..da34fd4c92695f453f1d6547c6e4e8d3afe7a116 100644
+--- a/net/sched/em_meta.c
++++ b/net/sched/em_meta.c
+@@ -502,7 +502,7 @@ META_COLLECTOR(int_sk_lingertime)
+ 		*err = -1;
+ 		return;
+ 	}
+-	dst->value = sk->sk_lingertime / HZ;
++	dst->value = READ_ONCE(sk->sk_lingertime) / HZ;
+ }
+ 
+ META_COLLECTOR(int_sk_err_qlen)
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index f5834af5fad535c420381827548cecdf0d03b0d5..7c77565c39d19c7f1baf1184c4a5bf950c9cfe33 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -1820,7 +1820,7 @@ void smc_close_non_accepted(struct sock *sk)
+ 	lock_sock(sk);
+ 	if (!sk->sk_lingertime)
+ 		/* wait for peer closing */
+-		sk->sk_lingertime = SMC_MAX_STREAM_WAIT_TIMEOUT;
++		WRITE_ONCE(sk->sk_lingertime, SMC_MAX_STREAM_WAIT_TIMEOUT);
+ 	__smc_release(smc);
+ 	release_sock(sk);
+ 	sock_put(sk); /* sock_hold above */
+-- 
+2.42.0.rc1.204.g551eb34607-goog
 
 
