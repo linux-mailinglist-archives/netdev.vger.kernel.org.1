@@ -1,217 +1,221 @@
-Return-Path: <netdev+bounces-28771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8F6780A5D
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:42:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F277809CD
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:15:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFD5328234C
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:42:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BAF282325
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B6A1800C;
-	Fri, 18 Aug 2023 10:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A0018018;
+	Fri, 18 Aug 2023 10:15:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B278E168B7
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:42:37 +0000 (UTC)
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE6412C
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 03:42:34 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230818104230epoutp02fe2fc8c67cc82c0597ea64bf3c1adca8~8dDmaSnm-2057820578epoutp02A
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:42:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230818104230epoutp02fe2fc8c67cc82c0597ea64bf3c1adca8~8dDmaSnm-2057820578epoutp02A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1692355350;
-	bh=cRAmN/o7KmxwYBkmYyEqUt7JLUOQKCQnyrj9UHrYzzc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bOcMVxnT5MezlG7maAiHj5iN0kjWbWPfTx+0L0kHjhM1E5MXIh1d7/c5zFvrOYYIZ
-	 B78Vbd57luRQr5OYptMOi1exKQt+Kk3I3BSVHeeEeVnMdoDm68ad++OrbfjtvyZtVH
-	 Xx/dEll3FYrgLClGg1d1ahZfuJyvEMu/Z221rgaU=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20230818104230epcas5p17a8de9a3e27fff7829a54a4128689991~8dDl6Y7HX1668516685epcas5p1s;
-	Fri, 18 Aug 2023 10:42:30 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4RRz382Vq6z4x9Pw; Fri, 18 Aug
-	2023 10:42:28 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B6.FF.29345.41B4FD46; Fri, 18 Aug 2023 19:42:28 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20230818100233epcas5p2b5f459a525d26b110ba92410f366c563~8cgtglpIW3040830408epcas5p26;
-	Fri, 18 Aug 2023 10:02:33 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20230818100233epsmtrp2e9d523c684e3e4fad466bdffdc1e594f~8cgtf1I_R1793817938epsmtrp2a;
-	Fri, 18 Aug 2023 10:02:33 +0000 (GMT)
-X-AuditID: b6c32a49-d91ff700000172a1-7a-64df4b1420fd
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	5D.26.64355.9B14FD46; Fri, 18 Aug 2023 19:02:33 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20230818100231epsmtip1e2ce055fb0b95bd82af86503b0c4dde6~8cgsB09LL0691306913epsmtip1B;
-	Fri, 18 Aug 2023 10:02:31 +0000 (GMT)
-Date: Fri, 18 Aug 2023 15:29:09 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Keith
-	Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org, Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 13/18] nvmet-tcp: make nvmet_tcp_alloc_queue() a void
- function
-Message-ID: <20230818095909.tgar6n5yokwy7sah@green245>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118AC18011
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:15:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A1730FE;
+	Fri, 18 Aug 2023 03:15:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692353749; x=1723889749;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9qYxS/Hshg1byasx3Nq6t293IFvkuQZruwweU8iKwH4=;
+  b=EqfPbAXLikkarPNeGfQMoL7FFP4P2ucz8ivbjT0l7usHJukmqtqzy711
+   EptghB3MpfgFffbDUj4eFBgNr3S2NUPGV9yAfCWPgkszxQTu2QFWgoScR
+   ifOhESsikLkxe8BODGFsWmMemVkVslsTr+ZJM4AQ6Y87o30CiscvI0TWF
+   uFSko9jXuiTtbqNj8Bd7YuTucxn8wXSHuzV5XVtAS8z26YqgzEklrraTo
+   H8676lB3oKcm2AHcJOFXU4Z5hp23vwlNXYmv2iKyydOKF1eWkTwvMFVPG
+   myT11o0ah2XsxbtLQWZN8WpxUP0mOLwxI56UX2N3sk45Ui20DrLhAMetB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="363227175"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="363227175"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 03:15:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="711944517"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="711944517"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga006.jf.intel.com with ESMTP; 18 Aug 2023 03:15:48 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 18 Aug 2023 03:15:48 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 18 Aug 2023 03:15:48 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 18 Aug 2023 03:15:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f8VXqU6ZBZ5kYXkNJHUfH4HImqApT5BAPSqxAspPQaRfUqYiMrjuBATXxuZ9kHtAG2sMtrTzWg/le8cdfHY6bBKg+i0O35PsgstBVB2VnOxsICD8vllvlwYTwQ0k5KU7hctsWzUwc3KhVbHGtE5wjMfZsajFTCNBltaH/Gsf30xGVfu5upqL+MK8zJNurgNGLmBS3pPu6tIXuZegMxqzvS/ZzK49z7GGGIAQwlnsQr33VJQe4I9z5U0Ma6ymwcoe3onAdY9HOqUEGXvdERqU8H8mLSWGxEcBG42DE2oMRu5/8dmuJ45qBXd947v7jL0NX8XzsxPuVtER16adYag1SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9qYxS/Hshg1byasx3Nq6t293IFvkuQZruwweU8iKwH4=;
+ b=EOpNujO7BNTW1g1UcX+7K8LoIYLST+9a5O0pvCU8CHhYQfHjmthlEbIZhtYKsuGSMpgIv7rpm7S7OUJd8tW22Jhvs4CPvG0FC/bpavYxiHXi2qkNQo4/x84Epo8D25QKb4rf4oKqRgEr49y17wk59NWIRee80aAZ+Y5BO+WJkSU9ys7xY75jQqMAitaXf5jGlQcB7sbbGE8FYCA8NrnnANW0+FQA1MaUYmeoWbF/e0fali6iBFBv0U6Fd3AbsENbKP/xPR7e/IkeNrvJVrYk4G9CDFUqVn/FQDlKkdym8aU+oc2xLmceFvuMrP8wcgehe+qgc79Qg/lkbXUpFZlF9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ PH7PR11MB7100.namprd11.prod.outlook.com (2603:10b6:510:20f::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6678.32; Fri, 18 Aug 2023 10:15:34 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::c3cd:b8d0:5231:33a8]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::c3cd:b8d0:5231:33a8%5]) with mapi id 15.20.6699.020; Fri, 18 Aug 2023
+ 10:15:34 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jonathan Lemon
+	<jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, "Olech, Milena"
+	<milena.olech@intel.com>, "Michalik, Michal" <michal.michalik@intel.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
+	<mschmidt@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, Bart Van Assche
+	<bvanassche@acm.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+Subject: RE: [PATCH net-next v4 0/9] Create common DPLL configuration API
+Thread-Topic: [PATCH net-next v4 0/9] Create common DPLL configuration API
+Thread-Index: AQHZzI8M3L/+HbfEUkKmdDAnVNAwxa/qq/sAgACUSICAAAR3AIAAVpSAgAQzeAA=
+Date: Fri, 18 Aug 2023 10:15:34 +0000
+Message-ID: <DM6PR11MB4657374BF0A9361647444D239B1BA@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
+	<20230814194528.00baec23@kernel.org>
+	<43395307-9d11-7905-0eec-0a4c1b1fc62a@linux.dev>
+	<ZNtm6v+UuDIex1+s@nanopsycho> <20230815100203.4e45fc7e@kernel.org>
+In-Reply-To: <20230815100203.4e45fc7e@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|PH7PR11MB7100:EE_
+x-ms-office365-filtering-correlation-id: 9013cf2f-b069-40f7-829d-08db9fd40f65
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pDShzggiwn7NTJKLn13BJP7SOsgTsd6fA2JjtIHvUQYbFYKsM1wxWJaHqkNRYFfZg0qeti6G3DU7bXufwUO8IsfeAKVtvWWUYgVL29/sb9tEYSMyJa33ZLraud2xkPlgAnGubKc5hUzS2rUgWBp0Ky6FyJDcYrTkmgjUSusUH3vFhOmUuxKZZhaAAo+st7bVIhlg+0v/s9WPuTThl8t6W6LvTqRHwxPHM1XCEUixjHNi4RNqpI/qTPca9RKfopQXvIQRLhdJzQNn8RS73281d9QflryLrKojBUVxMNQEsE7SRFARRIrMoxVo21+ZIlExuV5vsN2G0es9jEAoH48T3ogftxF4m7Gcf9WjZM719y3xjrrwDzIM1NIU6sFMU4fjo+En/VTPO3kokNNZ4cXlUCERr8kS7+uVUfSPZNCcnW4diDizLLi17kqRVPj7x2DrWSZQEGKpR0MNFY4LCURzhhISOCy9Fy66nXjhnjD8b62jhwZJlrehZ1ez9h71WMX3OsB3jpgzs3t9+7HlzLqqMhm8cLYwMsJh6W1QgZtTx22r2N4LAz0WPu47N8YsKUX+YgTb3y2S6bvp04cYw1TusCwlnVT4ya2RcDVNXufGz8c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(136003)(396003)(39860400002)(186009)(451199024)(1800799009)(33656002)(86362001)(83380400001)(55016003)(4326008)(52536014)(8676002)(5660300002)(8936002)(2906002)(41300700001)(26005)(6506007)(71200400001)(7696005)(9686003)(76116006)(966005)(478600001)(7416002)(316002)(122000001)(54906003)(66946007)(82960400001)(110136005)(66446008)(66476007)(66556008)(38100700002)(38070700005)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?E255i9lb1k1bWahwYR+YoG9zbLcvhOVZsbkvT3yIIe/dFoiEubVIBUB3teu1?=
+ =?us-ascii?Q?hlAKxsQ2P2YHj3MfhnAQTaOim2OAgCqPWV4UiShWqgLQq6qJSkPwCOh1uN8Y?=
+ =?us-ascii?Q?muGVYDJs2900Un0wmf8P2VjeB8gVyoo0euQJqXlS5HmPhBxxKzCEAPaWKk3l?=
+ =?us-ascii?Q?aFXhvrqypzEsK7NhQ9Aui62kSEAhYWfL8zG3Ev7teLH/uDWvhHAlkcSsxU/e?=
+ =?us-ascii?Q?Xb+SqOh6AsEQoWVfsGXaFuOr36L7uxPH/s+w8BPYcwo5hJUiJj3SZw5eBJ/9?=
+ =?us-ascii?Q?93nTAqnLqhW+05OgXAVr9Ryz4/cm+p+5McSvMUl8nxm8fwwkrvWkttene5xR?=
+ =?us-ascii?Q?BUNocBSJYMrRJpjxSVoUKjVdj9wGOOxvtn4OyphzML1lJjcCvK72qR3Jqjwe?=
+ =?us-ascii?Q?+EbK6ripbU2XAUMnwfWpbfNiY917M4CdY0fHpQkg6NrsxjwcpEm2O7Mtw9yr?=
+ =?us-ascii?Q?QiY2yZo0MKnwvlI7M3HUl1egJTVdC1zkUZZfdes99nNF+SDbR7xsfTsITScw?=
+ =?us-ascii?Q?63uctv/0eH5ZxYwduS+SYmVWyoaomsPUD7bsg6N5oa7WztF2imKW39xoG1mz?=
+ =?us-ascii?Q?n0mnqDTnftU8lJ4RpSOgQZgUaCBV/c4rUH3hl3W1PwgdpgP8ufDBpI3UXUjP?=
+ =?us-ascii?Q?/iX/qX+JdOHBG780vetloWDf06Vfit0QB7XxnICFsIykxRkLoqyU+G8YGcgo?=
+ =?us-ascii?Q?Q5tnqmzI+0yfMa9IaHFl2DWbFTVIKWSRDzZwFuqxHMd5oc5RjAoILv8/tfuZ?=
+ =?us-ascii?Q?4SGhP+jdjehzofFCTt8G2JU+EG61tmj+7kIKWRv+nPb6EqKAL4n6+PZ0QrBv?=
+ =?us-ascii?Q?bMjYlAve/AjdARb7GqQNobZEJZFmQ6F56XjQ0cW5IAGgafQq5ZEHuyZuMgoO?=
+ =?us-ascii?Q?jDdZTgkTChDum/YZ2UlZpXJ9S99KCM/yVasK9+uYYk+XVQuG9vnctOcu24jT?=
+ =?us-ascii?Q?B9mK3LnWiaPqgIGGgDVuZISNWD/imp3EOuD3FTxo5n17B9hPtPUKKqcjQ+7+?=
+ =?us-ascii?Q?VJms2dDRsvXC+GWZHkyLEq8ge+T1FzRJWzUiXmNj20WACA2K4CZkvKF8mXjT?=
+ =?us-ascii?Q?Rpt4UOs3d84a9n3Q+ynLs1unUcbYbOr+IMDRBkPJ0niEV28C1T8nG7c4vi7p?=
+ =?us-ascii?Q?xzues0kcSMps2KjXx3SQL/rDmI6WmhX4ji/axAMN2dDD/NLRtx3zh38lqDgM?=
+ =?us-ascii?Q?1a9ytAzC8wiTs2PzKB4iUTDDelYH3IxsiOnCTdjvqhLCsQyCKJGXx7+UASRf?=
+ =?us-ascii?Q?aN0IfFAddRloRxPmMH4tbdDT3QI5MXRKEbUPlA0UHniaodpFrnSDdaw+Lx1c?=
+ =?us-ascii?Q?doFxCmBp3WxefWNORkTPWuJMpfA30VXdJ9Ltjh6On6/y51h0a0ulmxAxIvra?=
+ =?us-ascii?Q?vlftqykT77XsOh+ZUlzfkHZ4ckSd4gu/3Qxw69PcCo53tossjEcp03jbQV/c?=
+ =?us-ascii?Q?TXA/A9Z6QWHYt+NRJeScjSN9esnzKyJf1vANUWcwTus83crWhDmoshtCJV0K?=
+ =?us-ascii?Q?iIcLtzNAYlSMRb5zFNRjCCDwsueQ08aGi1Dyd6mlWj/RNjk6A1mdZJUEy/km?=
+ =?us-ascii?Q?ViZxrNVfZ6cLYwyK1WuyNtOFNu/FrWktBRD0B2FWO/ZzRTpfO/FxYaqdfHgj?=
+ =?us-ascii?Q?Yg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230816120608.37135-14-hare@suse.de>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrEJsWRmVeSWpSXmKPExsWy7bCmhq6I9/0Ug4v7eSyeHnvEbrFn0SQm
-	i5WrjzJZTDp0jdHiwrY+Vov5y56yWxxbIGbx7fQbRot1r9+zOHB6LNhU6nH+3kYWj02rOtk8
-	Ni+p99h9s4HN4/2+q0De6WqPz5vkAjiism0yUhNTUosUUvOS81My89JtlbyD453jTc0MDHUN
-	LS3MlRTyEnNTbZVcfAJ03TJzgG5TUihLzCkFCgUkFhcr6dvZFOWXlqQqZOQXl9gqpRak5BSY
-	FOgVJ+YWl+al6+WlllgZGhgYmQIVJmRnHO8wKTgsUtE35xtLA+NWwS5GTg4JAROJ+/e2MXcx
-	cnEICexmlNi/dgU7hPOJUWL+52MscM63lZ/YYVrOHL8HVbWTUWLm7wNQ/c8YJZZ/OAJWxSKg
-	KjF16logm4ODTUBb4vR/DpCwiICSxMf2Q2DNzAJdTBLrVm1jBEkIC4RITHv9GczmFTCT2D7p
-	NiuELShxcuYTFhCbU8BYYvesbWBxUQEZiRlLv4ItlhCYyiGx4uwXqPNcJJ5desQCYQtLvDq+
-	BSouJfH53V42CLtcYuWUFWwQzS2MErOuz2KESNhLtJ7qZwaxmQUyJCZf3QIVl5WYemodE0Sc
-	T6L39xMmiDivxI55MLayxJr1C6AWSEpc+94IZXtIHDo2kQ0SROsYJdpWf2abwCg/C8l3s5Ds
-	g7CtJDo/NLHOAoYes4C0xPJ/HBCmpsT6XfoLGFlXMUqmFhTnpqcWmxYY5qWWw6M8OT93EyM4
-	8Wp57mC8++CD3iFGJg7GQ4wSHMxKIrwWTPdShHhTEiurUovy44tKc1KLDzGaAmNrIrOUaHI+
-	MPXnlcQbmlgamJiZmZlYGpsZKonzvm6dmyIkkJ5YkpqdmlqQWgTTx8TBKdXAVNGwSaKh4EBf
-	n8Rizvtvdp1eq/1330OFvl1rNa0SArf6LekX0LcMqOi82i6s8mv2w4SAvS8dq6d3av1Jmxdj
-	1+SXrKwRqcCzZNL1S5Fca35zPJv+58l2/esPpM7KCqXNVnn/wnRX8v/C5HfbEjY/kvsRKC9w
-	oHqdZtVxr1k66WFbvNtSHiwKeBHRzJFS/tT5eOwB542OXmfXzW97eyZJ0XGe0itD1/R9jNMP
-	mp7nVX2rpyRnwpl6h8niwFYJvk0Xmovn6UquvRYbVff0zP0iS+/k7sbjdYUfFZctWGVxId8o
-	a2lRzea2NfLeUxdeOnn20I6lJXaS5/96b14iPP2xj9zeeULG51fKxLpy26j9U2Ipzkg01GIu
-	Kk4EAPr1j25FBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHLMWRmVeSWpSXmKPExsWy7bCSnO5Ox/spBlfvsFk8PfaI3WLPoklM
-	FitXH2WymHToGqPFhW19rBbzlz1ltzi2QMzi2+k3jBbrXr9nceD0WLCp1OP8vY0sHptWdbJ5
-	bF5S77H7ZgObx/t9V4G809UenzfJBXBEcdmkpOZklqUW6dslcGVs+XOPveCrYMWR9gVMDYyN
-	/F2MnBwSAiYSZ47fY+9i5OIQEtjOKNE+7RU7REJSYtnfI8wQtrDEyn/PoYqeABV1NbGBJFgE
-	VCWmTl0LlODgYBPQljj9nwMkLCKgJPGx/RBYPbNAD5PE6X2LWUESwgIhEtNef2YEsXkFzCS2
-	T7oNFhcSiJLoXXmJHSIuKHFy5hMWEJsZqGbe5ofMIPOZBaQllv8Dm88pYCyxe9Y2sFZRARmJ
-	GUu/Mk9gFJyFpHsWku5ZCN0LGJlXMYqmFhTnpucmFxjqFSfmFpfmpesl5+duYgRHiVbQDsZl
-	6//qHWJk4mA8xCjBwawkwmvBdC9FiDclsbIqtSg/vqg0J7X4EKM0B4uSOK9yTmeKkEB6Yklq
-	dmpqQWoRTJaJg1OqgWltbuuJvF17b/jEpn6cnGujlV6/84rDhy8nDyneU/8pNlclpXDuWcPN
-	1c17hYOzXKcVrcz4aTi1+vfchqfPpzN4XXov/u19xtct3+f2r/fte91VE+i35qexeGKuueuZ
-	HfJisxvdljCnOv/7rrvaZK5aAAevF8ebaIVlV8/liE7jvq1yQP/0wTshWvd/HJ8qJq2Z48Fw
-	rix30oGeLh+FK+cm39TV7965aV+Lt8Ddt2ZBFzdWchYtfhpkZlLse0dm8oUaYUeRwOqJm+dn
-	JhScedamUqtke+L3LScmCaH86SLlLM3rMy9EVEnpp5TldS6yv/eT75XD14997Zcfb01JFq3r
-	eX1xbcLN+4Vyp08eklFiKc5INNRiLipOBAADEaTYAQMAAA==
-X-CMS-MailID: 20230818100233epcas5p2b5f459a525d26b110ba92410f366c563
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_6a499_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230818100233epcas5p2b5f459a525d26b110ba92410f366c563
-References: <20230816120608.37135-1-hare@suse.de>
-	<20230816120608.37135-14-hare@suse.de>
-	<CGME20230818100233epcas5p2b5f459a525d26b110ba92410f366c563@epcas5p2.samsung.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9013cf2f-b069-40f7-829d-08db9fd40f65
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Aug 2023 10:15:34.3076
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: s4WAgpD97At5Ny8IgXw+uPLZ+D9XF3bMJRmA74F1v01idS1AGN9JW42hLvEztDr2SLMt4lU2c18L2S/pC/9Qx5+f59Ztg+tiezTPpgLNhsY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7100
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_6a499_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+>From: Jakub Kicinski <kuba@kernel.org>
+>Sent: Tuesday, August 15, 2023 7:02 PM
+>
+>On Tue, 15 Aug 2023 13:52:10 +0200 Jiri Pirko wrote:
+>> >> Feels like we're lacking tests here. Is there a common subset of
+>> >> stuff we can expect reasonable devices to support?
+>> >> Anything you used in development that can be turned into tests?
+>> >
+>> >Well, we were playing with the tool ynl/cli.py and it's stated in
+>> >the cover letter. But needs proper hardware to run. I'm not sure
+>> >we can easily create emulation device to run tests.
+>>
+>> Well, something like "dpllsim", similar to netdevsim would be certainly
+>> possible, then you can use it to write selftests for the uapi testing.
+>> But why don't we do that as a follow-up patchset?
+>
+>I was thinking about a test that can be run against real HW.
+>Something that a new vendor implementing DPLL can run and
+>validate that their implementation behaves as expected.
+>And something that distributors and stable kernels could
+>potentially use to validate the code still works.
+>
+>We don't have any well established user space to make use of this
+>new functionality, there's high risk that drivers will invent their
+>own ways of interpreting the API.
+>
+>Perhaps something that Red Hat could help with? I'm guessing you'd
+>be writing test to validate this for RHEL, anyway?
 
-On 23/08/16 02:06PM, Hannes Reinecke wrote:
->The return value from nvmet_tcp_alloc_queue() are just used to
->figure out if sock_release() need to be called. So this patch
->moves sock_release() into nvmet_tcp_alloc_queue() and make it
->a void function.
->
->Signed-off-by: Hannes Reinecke <hare@suse.de>
->Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
->---
-> drivers/nvme/target/tcp.c | 20 ++++++++++----------
-> 1 file changed, 10 insertions(+), 10 deletions(-)
->
->diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
->index 97d07488072d..d44e9051ddd9 100644
->--- a/drivers/nvme/target/tcp.c
->+++ b/drivers/nvme/target/tcp.c
->@@ -1621,15 +1621,17 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
-> 	return ret;
-> }
->
->-static int nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
->+static void nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
-> 		struct socket *newsock)
-> {
-> 	struct nvmet_tcp_queue *queue;
-> 	int ret;
->
-> 	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
->-	if (!queue)
->-		return -ENOMEM;
->+	if (!queue) {
->+		ret = -ENOMEM;
->+		goto out_release;
->+	}
->
-> 	INIT_WORK(&queue->release_work, nvmet_tcp_release_queue_work);
-> 	INIT_WORK(&queue->io_work, nvmet_tcp_io_work);
->@@ -1666,7 +1668,7 @@ static int nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
-> 	if (ret)
-> 		goto out_destroy_sq;
->
->-	return 0;
->+	return;
-> out_destroy_sq:
-> 	mutex_lock(&nvmet_tcp_queue_mutex);
-> 	list_del_init(&queue->queue_list);
->@@ -1678,7 +1680,9 @@ static int nvmet_tcp_alloc_queue(struct nvmet_tcp_port *port,
-> 	ida_free(&nvmet_tcp_queue_ida, queue->idx);
-> out_free_queue:
-> 	kfree(queue);
->-	return ret;
->+out_release:
->+	pr_err("failed to allocate queue, error %d\n", ret);
->+	sock_release(newsock);
-> }
->
-> static void nvmet_tcp_accept_work(struct work_struct *w)
->@@ -1695,11 +1699,7 @@ static void nvmet_tcp_accept_work(struct work_struct *w)
-> 				pr_warn("failed to accept err=%d\n", ret);
-> 			return;
-> 		}
->-		ret = nvmet_tcp_alloc_queue(port, newsock);
->-		if (ret) {
->-			pr_err("failed to allocate queue\n");
->-			sock_release(newsock);
->-		}
->+		nvmet_tcp_alloc_queue(port, newsock);
-> 	}
-> }
->
->-- 
->2.35.3
->
+RH is doing some manual tests on their own, but also works with Intel's
+Validation. Usually our Validation team works with end-user point of view,
+but here we had to engage them to work with cli.py and confirm that
+control over dpll works as expected.
 
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+HW agnostic tests were submitted by Michal as RFC for test framework
+with fake modules implemented here:
+https://lore.kernel.org/netdev/20230817152209.23868-1-michal.michalik@intel=
+.com/#t
+We had an agreement on latest dpll-meeting that we will follow up with
+patches that would test dpll over fake modules, and we have started it.
+As there was no requests to add HW-aware tests yet, we are not ready for
+such submission yet. We could probably extended Michal's framework to
+make it possible test real HW, but Michal's patches were just submitted,
+we do expect some review/changes there, thus we could think of adding
+something simpler for now..
 
-------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_6a499_
-Content-Type: text/plain; charset="utf-8"
+Is simple bash script wrapping around cli.py and talking to ice dpll
+while verifying the outputs, an acceptable solution?
 
-
-------2jlpTr02XJ1Dz0Ro0nWDo60KkQ.efMTj2bJXEJ.ys0a_1.o3=_6a499_--
+Thank you!
+Arkadiusz
 
