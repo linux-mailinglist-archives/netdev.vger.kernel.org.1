@@ -1,73 +1,91 @@
-Return-Path: <netdev+bounces-28971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B28778148B
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 23:08:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC20778149B
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 23:16:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B4F8281C8C
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 21:08:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90F47281BCA
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 21:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC691B7D2;
-	Fri, 18 Aug 2023 21:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919181BB25;
+	Fri, 18 Aug 2023 21:16:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F8346B0
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 21:08:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0058EC433C8;
-	Fri, 18 Aug 2023 21:08:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692392883;
-	bh=9PW7XD5R4LZ4P7zabAS3qiTayGngkSCuqnZCmVwe9dw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aaf9BDExt36VfZBMPPSdidpXdIQoWZcYO305X6BlL1BIDK6MPWxaHcg+b8IYb8dbH
-	 GuozxVDvqiapYSYqzErQsKtMxlWCho62w5jTKa/zw7MDvVim4GFWQSsnFf/T0LhWnw
-	 ULBINfw7xg5bJLfxNtx1CpXKZlvAWW5+y8q5xLRocs0/Aoi0VoZ1yTx3iOJ78H2s1y
-	 MlogIWvRT7Dzor55QsJAiziDU7IF8IeNqOsrRUZ0iDM+1wKs0AnGxL+3QyGlSVeom7
-	 lRE9C0IuDkewd5MTGhOQR/OW1W/RC+LJvH7Ud1m7LQQBYrnI6jHWwwNEr3fVISmX1u
-	 qp89I7UvF1DTQ==
-Date: Fri, 18 Aug 2023 14:08:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Michalik <michal.michalik@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
- arkadiusz.kubalewski@intel.com, jonathan.lemon@gmail.com,
- pabeni@redhat.com, poros@redhat.com, milena.olech@intel.com,
- mschmidt@redhat.com, linux-clk@vger.kernel.org, bvanassche@acm.org
-Subject: Re: [PATCH RFC net-next v1 2/2] selftests/dpll: add DPLL system
- integration selftests
-Message-ID: <20230818140802.063aae1f@kernel.org>
-In-Reply-To: <20230817152209.23868-3-michal.michalik@intel.com>
-References: <20230817152209.23868-1-michal.michalik@intel.com>
-	<20230817152209.23868-3-michal.michalik@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D9F2C9A
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 21:16:17 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40DD34216;
+	Fri, 18 Aug 2023 14:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=rL+yCFTqPV6vMaMpVLPjexEK3wO35JlGcBYvNLZoT7E=; b=jbDWgCkIrMUikDz6bhEugXcErF
+	mMyjF2iydXoHmA1pHiydHiNm+ju+V7seWdcM+o2OVUSrgoUxUoadMNDdMNS863H9otR0RS7jg5MV3
+	QHQgCbfM/Axwev5MO1wxXUlYK4Mnh+6wsgISKfpOeK8MI4VGDTSmkvNcBN8P2E8JHHnw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qX6p5-004XJU-Io; Fri, 18 Aug 2023 23:15:59 +0200
+Date: Fri, 18 Aug 2023 23:15:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Hawkins, Nick" <nick.hawkins@hpe.com>
+Cc: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+	"simon.horman@corigine.com" <simon.horman@corigine.com>,
+	"Verdun, Jean-Marie" <verdun@hpe.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
+Message-ID: <1b8058e1-6e7f-4a4a-a191-09a9b8010e0a@lunn.ch>
+References: <20230816215220.114118-1-nick.hawkins@hpe.com>
+ <20230816215220.114118-5-nick.hawkins@hpe.com>
+ <01e96219-4f0c-4259-9398-bc2e6bc1794f@lunn.ch>
+ <88B3833C-19FB-4E4C-A398-E7EF3143ED02@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88B3833C-19FB-4E4C-A398-E7EF3143ED02@hpe.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 17 Aug 2023 17:22:09 +0200 Michal Michalik wrote:
-> High level flow of DPLL subsystem integration selftests:
-> (after running run_dpll_tests.sh or 'make -C tools/testing/selftests')
-> 1) check if Python in correct version is installed,
-> 2) create temporary Python virtual environment,
-> 3) install all the required libraries,
-> 4) run the tests,
-> 5) do cleanup.
+> Would this be the #include <linux/dmapool.h> library?
 
-How fragile do you reckon this setup will be?
-I mean will it work reliably across distros and various VM setups?
-I have tried writing tests based on ynl.py and the C codegen, and
-I can't decide whether the python stuff is easy enough to deploy.
-Much easier to scp over to the test host a binary based on the 
-C code. But typing tests in python is generally quicker...
-What are your thoughts?
+<include/net/page_pool/helpers.h>
 
-Thanks for posting the tests!
+Take a look at driver/net/ethernet/freescale/fec_main.c That
+driver/device is of similar complexity to yours. It had a recent
+change from its own buffer management to page pool. It
+started with
+
+commit 95698ff6177b5f1f13f251da60e7348413046ae4
+Author: Shenwei Wang <shenwei.wang@nxp.com>
+Date:   Fri Sep 30 15:44:27 2022 -0500
+
+    net: fec: using page pool to manage RX buffers
+
+but there are additional patches later.
+
+    Andrew
 
