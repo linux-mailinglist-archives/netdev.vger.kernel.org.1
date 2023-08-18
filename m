@@ -1,169 +1,140 @@
-Return-Path: <netdev+bounces-28825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21EE1780E01
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:27:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34F80780E32
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:43:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB7AF2823DC
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:27:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645482823E5
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00F218C1F;
-	Fri, 18 Aug 2023 14:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217EB182BC;
+	Fri, 18 Aug 2023 14:43:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EE27ED
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 14:27:28 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334743AA4;
-	Fri, 18 Aug 2023 07:27:27 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2ba0f27a4c2so14398021fa.2;
-        Fri, 18 Aug 2023 07:27:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1011C374
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 14:43:47 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3C9449E
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 07:43:24 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-51d95aed33aso1289806a12.3
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 07:43:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692368845; x=1692973645;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nICDKRwKMQkqe3HwAbJtM6Bw2V+q3zLOKjsFDW01ra4=;
-        b=AU47LW5+I/EbL8MV01rBcH3Ob7wkYjXFsx/cRI9MJQxbuDOxjgSr/c0XTuVeglogzU
-         JvPZS94xQNLsLcUf1a1VOJ96d7064ckBmJxicT1/wgcIi7RHBS8byjqD18s6HTHOKR8O
-         0BbJ2zOYojrvqizOvhFns4fBJVRdpF5rJvhsSJC3VUhFrHooLmjiJTzAS7ycoHiFVHVk
-         OSMbeZCNaJIDKj1L4CRLDKuE9/sOd8ATROWpNpN+LTc/giS525+5tHGQiNkdxJfkBJ47
-         2VLr8SX4rackx22R7DYZrt5UoE5O5UPAHir1GRDfQ6Gw6W043YuZTuP0nqDBgxzEcq6p
-         lPpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692368845; x=1692973645;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=cloudflare.com; s=google; t=1692369799; x=1692974599;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nICDKRwKMQkqe3HwAbJtM6Bw2V+q3zLOKjsFDW01ra4=;
-        b=Lr6zOifY5O0ER5zyLCDzrK0xeg561MS/xp5LJcnwhyJfsgX+vEbFHLgEVU5TkC1Gjj
-         p9Mroe+Bqk0PvYtCfGt8RvpdXGFuJpMbtZFN3SHUB55No7QEsvsbMuzzdMA8kU95t4rD
-         pWzFSY0r+mlpBj12bd1Px1J1JsryMilESlTaIF/R7LVVAhOYUmel2bUYEQN+sAEHMPhV
-         DSkfwKAX7vH5TlVXM65ZnGByKo8//zGoA0UmZqp55UCSug7RvEBu0nlVAXF3ZG62ALqO
-         314lSe5L4392v5OcZdS8uEU8amIgm9ldNjguoUdE6pbJ0wi35gdmoajGxaKhJsE8tytF
-         vixg==
-X-Gm-Message-State: AOJu0YzRH9vUEO9QiBBUW9E41j47tcuAUYGE4itZV8lTq9HbxJP9Jltc
-	Qkzeug0TR9cJUf6Sfwos7w4=
-X-Google-Smtp-Source: AGHT+IE1rMg1r5m+sggiJZoK18DpySxLsUpndg9+6FcuR87MfeypkypRS62hRUnz7MG1A1vtPWuK6w==
-X-Received: by 2002:a2e:3304:0:b0:2b9:e40a:30bc with SMTP id d4-20020a2e3304000000b002b9e40a30bcmr1959890ljc.19.1692368845278;
-        Fri, 18 Aug 2023 07:27:25 -0700 (PDT)
-Received: from mobilestation ([93.157.254.210])
-        by smtp.gmail.com with ESMTPSA id n13-20020a2e720d000000b002b9e0aeff68sm453953ljc.95.2023.08.18.07.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 07:27:24 -0700 (PDT)
-Date: Fri, 18 Aug 2023 17:27:22 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Francesco Dolcini <francesco.dolcini@toradex.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: Fix deadlocking in phy_error() invocation
-Message-ID: <mk5yter5d6pvdyahfhfruszwp54immvfb3bb7a7chofyhauksb@7vkgyxevt2yv>
-References: <20230818125449.32061-1-fancer.lancer@gmail.com>
- <6e52f88e-73ad-4e2a-90ca-ada471f30b9d@lunn.ch>
+        bh=dI9ZQNzqe2W46MHEhQwh22zo1t4+PZrthdWYrt5Eodk=;
+        b=lEMPxIe+SwoHD55SXzQjuumUhef+DSOxSuOl1NMigACxe7Fg/k3ximhHk8R6euFctL
+         IyoPPpthixM/I7MHvOYNCpOkoLqCUtO7i1hcUhfODapb+9f6k7yxgqYUGs0JfQRTaJLh
+         sS3oPKGwyjYTm00C1bsylGOGmAGyetzYzE578=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692369799; x=1692974599;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dI9ZQNzqe2W46MHEhQwh22zo1t4+PZrthdWYrt5Eodk=;
+        b=Myv6hkPDWSKEIjZxzFVQlQXXGROoXKljsc03HIvtC+EFbFGteTvgkvmo8Zq3bbm8mq
+         MV0udPGh6fByzoEe3s+NG2wzwJ5LKnPioWuSfmEXc2hGRvn4L0r1xxUPFxFP7qx4oA5b
+         rjXsCsL1DVctU9OvJO4aQgaqTIQzLD6gMTvlODVpDH0/26SAJPjqVC68Qf3CO+jgKPQ8
+         bVMiJ3miWqZB6mZPBvL8f33jPBlMu6sq7cjMgpSMqi4lYp9ZZ9DcKgPKLFmruJpEd0nl
+         63F0FB0/3d1BIfEc7JbX6lldywtCpmKanSne3Xa28Zvh8MBQyPc4QejBvac1tC27zPQ5
+         Nw6Q==
+X-Gm-Message-State: AOJu0YxjHersbyK8V/Fe4I6dcZ8d7il4kWuEDb4yzJ8s6tua1mv541aV
+	Ij/chWbEcOVGpSHnRmeywsYekDPnTLo+ibbzZPxXAQ==
+X-Google-Smtp-Source: AGHT+IErHdVC7BYjFNhSlGtL/JSumk+79LBrrHCwUljiKbscXCNIYXKYIf9tkkXe3Ol1yvp/wSfzQfcwKfD1l4TAlaU=
+X-Received: by 2002:aa7:d742:0:b0:525:45dc:40b7 with SMTP id
+ a2-20020aa7d742000000b0052545dc40b7mr2170575eds.17.1692369799061; Fri, 18 Aug
+ 2023 07:43:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e52f88e-73ad-4e2a-90ca-ada471f30b9d@lunn.ch>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230814093528.117342-1-bigeasy@linutronix.de>
+ <20230814112421.5a2fa4f6@kernel.org> <20230817131612.M_wwTr7m@linutronix.de>
+In-Reply-To: <20230817131612.M_wwTr7m@linutronix.de>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 18 Aug 2023 09:43:08 -0500
+Message-ID: <CAO3-Pbo7q6Y-xzP=3f58Y3MyWT2Vruy6UhKiam2=mAKArxgMag@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 0/2] net: Use SMP threads for backlog NAPI.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Wander Lairson Costa <wander@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 18, 2023 at 03:07:49PM +0200, Andrew Lunn wrote:
-> On Fri, Aug 18, 2023 at 03:54:45PM +0300, Serge Semin wrote:
-> >  static void phy_process_error(struct phy_device *phydev)
-> >  {
-> > -	mutex_lock(&phydev->lock);
-> > +	/* phydev->lock must be held for the state change to be safe */
-> > +	if (!mutex_is_locked(&phydev->lock))
-> > +		phydev_err(phydev, "PHY-device data unsafe context\n");
-> > +
-> >  	phydev->state = PHY_ERROR;
-> > -	mutex_unlock(&phydev->lock);
-> >  
-> >  	phy_trigger_machine(phydev);
-> >  }
-> 
-> Thanks for the patch Serge. It looks like a good implementation of
-> what i suggested. But thinking about it further, if the error ever
-> appears in somebodies kernel log, there is probably not enough
-> information to actually fix it. There is no call path. So i think it
-> should actually use WARN_ON_ONCE() so we get a stack trace.
+On Thu, Aug 17, 2023 at 8:16=E2=80=AFAM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> On 2023-08-14 11:24:21 [-0700], Jakub Kicinski wrote:
+> > On Mon, 14 Aug 2023 11:35:26 +0200 Sebastian Andrzej Siewior wrote:
+> > > The RPS code and "deferred skb free" both send IPI/ function call
+> > > to a remote CPU in which a softirq is raised. This leads to a warning=
+ on
+> > > PREEMPT_RT because raising softiqrs from function call led to undesir=
+ed
+> > > behaviour in the past. I had duct tape in RT for the "deferred skb fr=
+ee"
+> > > and Wander Lairson Costa reported the RPS case.
+> >
+> > Could you find a less invasive solution?
+> > backlog is used by veth =3D=3D most containerized environments.
+> > This change has a very high risk of regression for a lot of people.
+>
+> Looking at the cloudflare ppl here in the thread, I doubt they use
+> backlog but have proper NAPI so they might not need this.
+>
+Cloudflare does have backlog usage. On some veths we have to turn GRO
+off to cope with multi-layer encapsulation, and there is also no XDP
+attached on these interfaces, thus the backlog is used. There are also
+other usage of backlog, tuntap, loopback and bpf-redirect ingress.
+Frankly speaking, making a NAPI instance "threaded" itself is not a
+concern. We have threaded NAPI running on some veth for quite a while,
+and it performs pretty well. The concern, if any, would be the
+maturity of new code. I am happy to help derisk with some lab tests
+and dogfooding if generic agreement is reached to proceed with this
+idea.
 
-A trace is already printed by means of WARN()/WARN_ON()
-in the phy_process_error() method callers:
-phy_error_precise()
-and
-phy_error()
-Wouldn't it be too much to print it twice in a row?
+Yan
 
-We can redefine phy_error_precise() and phy_process_error() functions
-to something like this:
+> There is no threaded NAPI for backlog and RPS. This was suggested as the
+> mitigation for the highload/ DoS case. Can this become a problem or
+> - backlog is used only by old drivers so they can move to proper NAPI if
+>   it becomes a problem.
+> - RPS spreads the load across multiple CPUs so it unlikely to become a
+>   problem.
+>
+> Making this either optional in general or mandatory for threaded
+> interrupts or PREEMPT_RT will probably not make the maintenance of this
+> code any simpler.
+>
+> I've been looking at veth. In the xdp case it has its own NAPI instance.
+> In the non-xdp it uses backlog. This should be called from
+> ndo_start_xmit and user's write() so BH is off and interrupts are
+> enabled at this point and it should be kind of rate-limited. Couldn't we
+> bypass backlog in this case and deliver the packet directly to the
+> stack?
+>
+> Sebastian
 
-static void phy_process_error(struct phy_device *phydev,
-			      const void *func, int err)
-{
-	if (__ONCE_LITE_IF(!mutex_is_locked(&phydev->lock)))
-		WARN(1, "PHY-device data unsafe context\n");
-	else if (func)
-		WARN(1, "%pS: returned: %d\n", func, err);
-	else
-		WARN_ON(1);
 
-	phydev->state = PHY_ERROR;
 
-	phy_trigger_machine(phydev);
-}
+--=20
 
-static void phy_error_precise(struct phy_device *phydev,
-			      const void *func, int err)
-{
-        mutex_lock(&phydev->lock);
-        phy_process_error(phydev, func, err);
-        mutex_unlock(&phydev->lock);
-}
-
-void phy_error(struct phy_device *phydev)
-{
-	phy_process_error(phydev, NULL, 0);
-}
-EXPORT_SYMBOL(phy_error);
-
-Though in such implementation phy_error_precise() looks redundant. We
-can freely move its body to the single user - phy_state_machine()
-function.
-
-Note a positive side effect of this implementation is that potentially
-phy_error() can be converted to accepting a function pointer caused
-the error (phy_read(), phy_write(), etc). Alternatively if the
-conversion would look too bulky, phy_error_preciseI() could be just
-EXPORT_SYMBOL()-ed with the PHY-device mutex locking being moved to
-phy_state_machine().
-
-> 
-> Sorry for changing my mind.
-
-No worries.
-
--Serge(y)
-
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+Yan
 
