@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-28864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5F0781076
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:37:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D253781079
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:37:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6326B2821EC
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:37:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD6021C20E1B
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C41EECE;
-	Fri, 18 Aug 2023 16:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B954C6135;
+	Fri, 18 Aug 2023 16:36:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313D36110
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:36:28 +0000 (UTC)
-Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE1A3AAE
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:27 -0700 (PDT)
-Received: by mail-oo1-xc2a.google.com with SMTP id 006d021491bc7-56d6dfa1f3cso690326eaf.0
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE566110
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:36:31 +0000 (UTC)
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF30D3AAE
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:30 -0700 (PDT)
+Received: by mail-oo1-xc33.google.com with SMTP id 006d021491bc7-56d455462c2so719634eaf.2
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692376586; x=1692981386;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692376590; x=1692981390;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WLmjnO5KUtCrD/gaeJk57IaZoZ7aWFu8I5CCnY6/uVk=;
-        b=XU7JYY0TnevfzpItaBh75PH5kC5FAnGNsSJfJdBypXtBNDMgLqqWIipjjbzZIPmkeI
-         fWxu/fEIGsWmdzUqib7TE9QTgz0BhKSED1Eqn2BRUsTmWbpbWuus5sRlBTNgeInzl8Jf
-         cATGykyZPAkwt2TUdRCnaGNmzbjYXC15lspOsnLn4XC0wpiQOU9McqlI9y4JmTOrmnCr
-         ieOE3blJnOIbPXf+EEgwzNCJMKJ3kcjjVdzs8uXKlpBEn06zdQ++3z9wPW4F56OV6BSh
-         UFUP5hq7+rih0zg6JkYUzB6Ewr4HORmC1D2myowDSj48Mvua5srMY3MVR7z43vB9CCrT
-         DwWQ==
+        bh=emxBtvBizp53ATR2wa3AwEpTdXwAhDnSB3z3aMLT9nc=;
+        b=Wax79MQD6Ul2/+RFyLa59dv0fDV3OgJjnjumnvHUmjrE8bXvKtrj6m+JeRtantaoug
+         V8OMFg6A7hs5ht+xnmgwDoUkfzcrvZM8Ee1UlaN3sQPCCYH1dOKyv2N8U0tPDye/Oup8
+         V5XRhEsY5ujGQ/4FE/t6Cc6Ns3kf50337uJz8VaJqv3FxSc7DD9gl0HhAo4GNnDtX5w/
+         UXVF/tvDdDxuQZ2AUqyFQXssZtHK2UBPf68E45wSBPB45k13bcXANiz1a3S9QZ2WmzXZ
+         MNGnes9eS/d6UoraAJtbnfh3K71s8cWhpYgHMJv0/N706w09wGYKs9KT7tRURyht6g/4
+         tMJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692376586; x=1692981386;
+        d=1e100.net; s=20221208; t=1692376590; x=1692981390;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WLmjnO5KUtCrD/gaeJk57IaZoZ7aWFu8I5CCnY6/uVk=;
-        b=i9FR/w9FVhwCPsyWM3M7vLavk9tUz629qcyHAlHpm7W8Q3NTSJNH/NjyqH+/0CFyNK
-         IjBFR+bJM8UUXdeIIXXwXWYXGPhCi/U8Y9FcMLm8t28wupcIZiQqUSlzi3waqhfadxfw
-         70kbIwzNwB4NAcsxz1TTiffrVVu+jYrSqm0hR9fVkIxPyMzxN921oGGD+xRa55qFoK4r
-         R2nNXZY/4mmV+/I7/XdpmeF5Mb6VZe9PSk0GQSq81vSKU9x8FVYPrGR7orHiaVQdMnbn
-         sHy7kvgf84MdVXmpUHuwCMwmhWr7fcSZMKTSeI+z2zM/JsWYaAReba2Nw8WoYsu49Luq
-         gCPw==
-X-Gm-Message-State: AOJu0Yz9mUZh/ZtkXIYvwOIF3VTd3EkmR0LhwJpl+iqgQS+RO3kJGb4D
-	iAgrOkVnPVdrIPji16eBvv5r1HlyGjr43BGCx50=
-X-Google-Smtp-Source: AGHT+IFv39JRhX7Y5v45WIPO8y+vQVffZpfNA/IW1o6clNhy5C/pp0Rzbhy2bOmItoU0P4b3Bh29MA==
-X-Received: by 2002:a05:6820:292:b0:56d:e414:d14 with SMTP id q18-20020a056820029200b0056de4140d14mr3592929ood.8.1692376586162;
-        Fri, 18 Aug 2023 09:36:26 -0700 (PDT)
+        bh=emxBtvBizp53ATR2wa3AwEpTdXwAhDnSB3z3aMLT9nc=;
+        b=Hbh7lLuVx/7Fzz3SNVtpp9NCLB6kOec7vVGalCn/cRJxLBgnrbSlJVdMpKmCxUJeqJ
+         xDovZEaPLd9CZTKoTvmZC0MclNnrPkhNSHwb5S5eB56h2HkZfld1C2tcla5mQuSNptnG
+         TsSngNqPArO2sG9fIODw1TdbSnfr0Et1sYsJTb86ShKfH+UP4/h7UwBPQaQiKBRvonfG
+         QV8lTwt5dWZVgHnh7Prckz7vWGQT0yn9n8zLB01cXCWkEXFQYQKVnIQD1Uo6alrRvEdF
+         aC2zBba6WzzJdZodR/L+I0tcc7o7urPH5h1OEDjbqKSZ9LCY1xRNcItDMxj8lyp/Zflo
+         1DZA==
+X-Gm-Message-State: AOJu0YyCr+wgsqNvVmypYP+ANmakbUzzMAwt9tbLUs18eIdhgLWub5+8
+	vZEIesGEM5miGei9HzBbUJxT3j1j2W1DpPegSY8=
+X-Google-Smtp-Source: AGHT+IG3A6+qYo3A2jUDdbnnMKzzTMxmmlB2aRQAH2YrOCdMIelpN2MMS4qZksaobs72YKSyDsCFIw==
+X-Received: by 2002:a4a:6c16:0:b0:56e:a14a:f04e with SMTP id q22-20020a4a6c16000000b0056ea14af04emr957539ooc.9.1692376589947;
+        Fri, 18 Aug 2023 09:36:29 -0700 (PDT)
 Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:bdfa:b54a:9d12:de38])
-        by smtp.gmail.com with ESMTPSA id f200-20020a4a58d1000000b005634e8c4bbdsm561531oob.11.2023.08.18.09.36.22
+        by smtp.gmail.com with ESMTPSA id f200-20020a4a58d1000000b005634e8c4bbdsm561531oob.11.2023.08.18.09.36.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 09:36:25 -0700 (PDT)
+        Fri, 18 Aug 2023 09:36:29 -0700 (PDT)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -69,9 +69,9 @@ Cc: jhs@mojatatu.com,
 	shaozhengchao@huawei.com,
 	victor@mojatatu.com,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next 4/5] net/sched: cls_route: make netlink errors meaningful
-Date: Fri, 18 Aug 2023 13:35:43 -0300
-Message-Id: <20230818163544.351104-5-pctammela@mojatatu.com>
+Subject: [PATCH net-next 5/5] selftests/tc-testing: cls_u32: update tests
+Date: Fri, 18 Aug 2023 13:35:44 -0300
+Message-Id: <20230818163544.351104-6-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230818163544.351104-1-pctammela@mojatatu.com>
 References: <20230818163544.351104-1-pctammela@mojatatu.com>
@@ -88,83 +88,62 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use netlink extended ack and parsing policies to return more meaningful
-errors instead of the relying solely on errnos.
+Update the u32 tests to conform to the new syntax of a terminal flowid
 
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- net/sched/cls_route.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ .../selftests/tc-testing/tc-tests/filters/u32.json     | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
-index 1e20bbd687f1..b34cf02c6c51 100644
---- a/net/sched/cls_route.c
-+++ b/net/sched/cls_route.c
-@@ -400,30 +400,32 @@ static int route4_set_parms(struct net *net, struct tcf_proto *tp,
- 		if (new && handle & 0x8000)
- 			return -EINVAL;
- 		to = nla_get_u32(tb[TCA_ROUTE4_TO]);
--		if (to > 0xFF)
--			return -EINVAL;
- 		nhandle = to;
- 	}
- 
-+	if (tb[TCA_ROUTE4_FROM] && tb[TCA_ROUTE4_IIF]) {
-+		NL_SET_ERR_MSG(extack,
-+			       "'from' and 'fromif' are mutually exclusive");
-+		return -EINVAL;
-+	}
-+
- 	if (tb[TCA_ROUTE4_FROM]) {
--		if (tb[TCA_ROUTE4_IIF])
--			return -EINVAL;
- 		id = nla_get_u32(tb[TCA_ROUTE4_FROM]);
--		if (id > 0xFF)
--			return -EINVAL;
- 		nhandle |= id << 16;
- 	} else if (tb[TCA_ROUTE4_IIF]) {
- 		id = nla_get_u32(tb[TCA_ROUTE4_IIF]);
--		if (id > 0x7FFF)
--			return -EINVAL;
- 		nhandle |= (id | 0x8000) << 16;
- 	} else
- 		nhandle |= 0xFFFF << 16;
- 
- 	if (handle && new) {
- 		nhandle |= handle & 0x7F00;
--		if (nhandle != handle)
-+		if (nhandle != handle) {
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "Unexpected handle %x (expected %x)",
-+					   handle, nhandle);
- 			return -EINVAL;
-+		}
- 	}
- 
- 	if (!nhandle) {
-@@ -478,7 +480,6 @@ static int route4_change(struct net *net, struct sk_buff *in_skb,
- 	struct route4_filter __rcu **fp;
- 	struct route4_filter *fold, *f1, *pfp, *f = NULL;
- 	struct route4_bucket *b;
--	struct nlattr *opt = tca[TCA_OPTIONS];
- 	struct nlattr *tb[TCA_ROUTE4_MAX + 1];
- 	unsigned int h, th;
- 	int err;
-@@ -489,10 +490,12 @@ static int route4_change(struct net *net, struct sk_buff *in_skb,
- 		return -EINVAL;
- 	}
- 
--	if (opt == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tca, TCA_OPTIONS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "missing options");
- 		return -EINVAL;
-+	}
- 
--	err = nla_parse_nested_deprecated(tb, TCA_ROUTE4_MAX, opt,
-+	err = nla_parse_nested_deprecated(tb, TCA_ROUTE4_MAX, tca[TCA_OPTIONS],
- 					  route4_policy, NULL);
- 	if (err < 0)
- 		return err;
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+index ddc7c355be0a..d4b4c767d6c9 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+@@ -15,7 +15,7 @@
+         "cmdUnderTest": "$TC filter add dev $DEV1 ingress protocol ip prio 1 u32 match ip src 127.0.0.1/32 flowid 1:1 action ok",
+         "expExitCode": "0",
+         "verifyCmd": "$TC filter show dev $DEV1 ingress",
+-        "matchPattern": "filter protocol ip pref 1 u32 chain (0[ ]+$|0 fh 800: ht divisor 1|0 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:1.*match 7f000001/ffffffff at 12)",
++        "matchPattern": "filter protocol ip pref 1 u32 chain (0[ ]+$|0 fh 800: ht divisor 1|0 fh 800::800 order 2048 key ht 800 bkt 0 \\*flowid 1:1.*match 7f000001/ffffffff at 12)",
+         "matchCount": "3",
+         "teardown": [
+             "$TC qdisc del dev $DEV1 ingress"
+@@ -60,7 +60,7 @@
+         "cmdUnderTest": "$TC filter replace dev $DEV1 ingress protocol ip prio 1 u32 match ip src 127.0.0.2/32 indev notexist20 flowid 1:2 action ok",
+         "expExitCode": "2",
+         "verifyCmd": "$TC filter show dev $DEV1 ingress",
+-        "matchPattern": "filter protocol ip pref 1 u32 chain (0[ ]+$|0 fh 800: ht divisor 1|0 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:3.*match 7f000003/ffffffff at 12)",
++        "matchPattern": "filter protocol ip pref 1 u32 chain (0[ ]+$|0 fh 800: ht divisor 1|0 fh 800::800 order 2048 key ht 800 bkt 0 \\*flowid 1:3.*match 7f000003/ffffffff at 12)",
+         "matchCount": "3",
+         "teardown": [
+             "$TC qdisc del dev $DEV1 ingress"
+@@ -196,7 +196,7 @@
+         "cmdUnderTest": "$TC filter replace dev $DEV1 ingress protocol ip prio 98 u32 ht 43:1 match tcp src 23 FFFF classid 1:4",
+         "expExitCode": "2",
+         "verifyCmd": "$TC filter show dev $DEV1 ingress",
+-        "matchPattern": "filter protocol ip pref 99 u32 chain (0[ ]+$|0 fh (43|800): ht divisor 1|0 fh 43::800 order 2048 key ht 43 bkt 0 flowid 1:3.*match 00160000/ffff0000 at nexthdr\\+0)",
++        "matchPattern": "filter protocol ip pref 99 u32 chain (0[ ]+$|0 fh (43|800): ht divisor 1|0 fh 43::800 order 2048 key ht 43 bkt 0 \\*flowid 1:3.*match 00160000/ffff0000 at nexthdr\\+0)",
+         "matchCount": "4",
+         "teardown": [
+             "$TC qdisc del dev $DEV1 ingress"
+@@ -219,7 +219,7 @@
+         "cmdUnderTest": "bash -c \"for mask in ff ffff ffffff ffffffff ff00ff ff0000ff ffff00ff; do $TC filter add dev $DEV1 ingress prio 99 u32 ht 1: sample u32 0x10203040 \\$mask match u8 0 0 classid 1:1; done\"",
+         "expExitCode": "0",
+         "verifyCmd": "$TC filter show dev $DEV1 ingress",
+-        "matchPattern": "filter protocol all pref 99 u32( (chain|fh|order) [0-9:]+){3} key ht 1 bkt 40 flowid 1:1",
++        "matchPattern": "filter protocol all pref 99 u32( (chain|fh|order) [0-9:]+){3} key ht 1 bkt 40 \\*flowid 1:1",
+         "matchCount": "7",
+         "teardown": [
+             "$TC qdisc del dev $DEV1 ingress"
+@@ -242,7 +242,7 @@
+         "cmdUnderTest": "bash -c \"for mask in 70 f0 ff0 fff0 ff00f0; do $TC filter add dev $DEV1 ingress prio 99 u32 ht 1: sample u32 0x10203040 \\$mask match u8 0 0 classid 1:1; done\"",
+         "expExitCode": "0",
+         "verifyCmd": "$TC filter show dev $DEV1 ingress",
+-        "matchPattern": "filter protocol all pref 99 u32( (chain|fh|order) [0-9:]+){3} key ht 1 bkt 4 flowid 1:1",
++        "matchPattern": "filter protocol all pref 99 u32( (chain|fh|order) [0-9:]+){3} key ht 1 bkt 4 \\*flowid 1:1",
+         "matchCount": "5",
+         "teardown": [
+             "$TC qdisc del dev $DEV1 ingress"
 -- 
 2.39.2
 
