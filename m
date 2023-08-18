@@ -1,93 +1,69 @@
-Return-Path: <netdev+bounces-28715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA627780566
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 07:13:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18688780590
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 07:18:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 936F1282210
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 05:13:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48F101C215C2
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 05:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C9C13AD8;
-	Fri, 18 Aug 2023 05:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6722C13ADA;
+	Fri, 18 Aug 2023 05:18:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6ED14AB8
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 05:12:54 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AF2E48
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 22:12:53 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRqfk2GVLzNmgv;
-	Fri, 18 Aug 2023 13:09:18 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
- (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 18 Aug
- 2023 13:12:50 +0800
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-To: <rafal@milecki.pl>, <bcm-kernel-feedback-list@broadcom.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <opendmb@gmail.com>, <florian.fainelli@broadcom.com>,
-	<pgynther@google.com>, <netdev@vger.kernel.org>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net v3 2/2] net: bcmgenet: Fix return value check for fixed_phy_register()
-Date: Fri, 18 Aug 2023 13:12:21 +0800
-Message-ID: <20230818051221.3634844-3-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230818051221.3634844-1-ruanjinjie@huawei.com>
-References: <20230818051221.3634844-1-ruanjinjie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F955134D3
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 05:18:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 81D14C433C8;
+	Fri, 18 Aug 2023 05:18:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692335895;
+	bh=QdLqdIjISuh8OpzVyyaN3TMdoeWkEO26hO5xJu8AK1A=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=NHD0ybKzCBDIXsTHCiOujm3GI3XMpKP5JtJbugpPX0dY+g9lX36ed8TZYODxShPUN
+	 pU/QtklVEkYT1HgnDtNv1P9JZbNfN52PdTi9hnrJA16nfox0eu15drpqKqGPyhblzF
+	 bLDoUkCLb5LA9qXhuosjCQ+XrYyuKMwDWjbGvSDxvdcpveKoPC9AjaP1XnZiHIflT9
+	 KgGQlg+sxf5Kt7tRUtmLiZCQpuPz1ZofLXMWnllsBHncFfn8+p5hsRjhHF0FVRjNVB
+	 zcLEsY6Ddo8EAeLisVQ7uAb3Nf6Zt/Qq7fzvNjl1HO3FgRxbUA1JMdvUR2WQvbl5O3
+	 tkX8UHcAwLqoQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6EFC5E93B34;
+	Fri, 18 Aug 2023 05:18:15 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.5-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20230817221129.1014945-1-kuba@kernel.org>
+References: <20230817221129.1014945-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20230817221129.1014945-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc7
+X-PR-Tracked-Commit-Id: 820a38d8f2cb3a749ffb7bbde206acec9a387411
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0e8860d2125f51ba9bca67a520d826cb8f66cf42
+Message-Id: <169233589544.13368.883924351693507238.pr-tracker-bot@kernel.org>
+Date: Fri, 18 Aug 2023 05:18:15 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-The fixed_phy_register() function returns error pointers and never
-returns NULL. Update the checks accordingly.
+The pull request you sent on Thu, 17 Aug 2023 15:11:29 -0700:
 
-Fixes: b0ba512e25d7 ("net: bcmgenet: enable driver to work without a device tree")
-Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
----
-v3:
-- Split the err code update code into another patch set as suggested.
-v2:
-- Remove redundant NULL check and fix the return value.
-- Update the commit title and message.
-- Add the fix tag.
----
- drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc7
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-index 0092e46c46f8..cc3afb605b1e 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-@@ -617,7 +617,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
- 		};
- 
- 		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
--		if (!phydev || IS_ERR(phydev)) {
-+		if (IS_ERR(phydev)) {
- 			dev_err(kdev, "failed to register fixed PHY device\n");
- 			return -ENODEV;
- 		}
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0e8860d2125f51ba9bca67a520d826cb8f66cf42
+
+Thank you!
+
 -- 
-2.34.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
