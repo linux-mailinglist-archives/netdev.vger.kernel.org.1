@@ -1,162 +1,68 @@
-Return-Path: <netdev+bounces-28685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5765E78040C
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:59:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F1478040F
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FBFF2822BD
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:59:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05E111C2156B
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD92883E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECEA9101E7;
 	Fri, 18 Aug 2023 02:58:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078648BF5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67448BF0
 	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 02:58:17 +0000 (UTC)
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECAF41706
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 19:58:16 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-76d7bcefe8bso30038585a.1
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 19:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1692327496; x=1692932296;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t1rveI8qZCR4C4wEbefcxj73KFhEoSnYcRQTDwgiQK4=;
-        b=WQimjvM94ux9B2GBJcDjxNN5CkfPSEt71Ija0YYQ3vdFMYAD9FTBOwEw7+LGPn2WXw
-         /jP2CNqXbUtqXqJ6bDq/sqomHkPUSAde1yqm7ATlWBGqpYwyKtBBhUy0dbwBVKp6erAL
-         Jzn59/doHMy+T6peWT9DJZLX+CC4ogZgBYM9A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692327496; x=1692932296;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t1rveI8qZCR4C4wEbefcxj73KFhEoSnYcRQTDwgiQK4=;
-        b=Xfxz680cXq8ng98N/zWshRKd3NgHB3HNtjXM+VoKlpK2AwCYrfneI4v+TRbUUTrYb9
-         3zSqfN2dk8aoBWSfydWb3P1i+6yXuhfTb1co101D5LJwucduj7q9wsvY/XI7IEmIgUw3
-         7lScUi5cTuvfJ09239tV/JzVE34ShVO7QiQgaDOtjesQVFtBfoORGdajn98bw289grNx
-         p7umy0g/MF2nCktvOKDdoS7ADn81An67ckK/6j4GuiLZcDI3AYfE+XCL4iY2x2SLTY0Q
-         2ehs0aISEANZt1zYR9PHBOqBPK3XD7OgOsMc7j68roFGMXg5q7AYTpSmt/kHVbjrFnAT
-         tWDQ==
-X-Gm-Message-State: AOJu0YzXP4Q9miGjFYHeRRRU1t9U9mL40bL19VMI6EjVQlVDgK7kghAt
-	RLtIG5ufxvAc6OQtmmkwWfxkpQ==
-X-Google-Smtp-Source: AGHT+IE/X2UwchhA+IgpKCTMnMGUnKCh5ViUxP8U7VUsaqTciMUXsTSkymEdxNhNHL25ffS47NYOiA==
-X-Received: by 2002:ad4:4ba4:0:b0:64a:bff7:90e6 with SMTP id i4-20020ad44ba4000000b0064abff790e6mr1258205qvw.65.1692327496080;
-        Thu, 17 Aug 2023 19:58:16 -0700 (PDT)
-Received: from debian.debian ([140.141.197.139])
-        by smtp.gmail.com with ESMTPSA id w14-20020a0ce10e000000b006427145590csm347998qvk.48.2023.08.17.19.58.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 19:58:15 -0700 (PDT)
-Date: Thu, 17 Aug 2023 19:58:14 -0700
-From: Yan Zhai <yan@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	Yan Zhai <yan@cloudflare.com>, Thomas Graf <tgraf@suug.ch>,
-	Jordan Griege <jgriege@cloudflare.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v6 bpf 2/4] lwt: check LWTUNNEL_XMIT_CONTINUE strictly
-Message-ID: <96b939b85eda00e8df4f7c080f770970a4c5f698.1692326837.git.yan@cloudflare.com>
-References: <cover.1692326837.git.yan@cloudflare.com>
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 148FCC433AD;
+	Fri, 18 Aug 2023 02:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692327497;
+	bh=oJkscY7k8ETbOBb5btkcsowLOEUU91ez5liTuP6HHl0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O4wnYOln0ukb/XfENTUH4VGsVeu45Jd3RkU5zqAzKccWOQl/qar9jne1IYGHRiuPs
+	 1rYHIBEXhxaLDYNalzA4tGYabalLBM1yx6AGj8MkwluL8wKV0+Q7Fjky9EGtuRWemj
+	 x9/fnmuEggU1IFvE9xAncZxxrRzYZ62wphniX/4VD+yeL0DH+UcNP3QtyJGhoLcNMk
+	 nUDMuX+3wYlbT/59BxPG5+Z3iXZBr1Ow/o4cZ+EKvpMuVIazuDJXHpisVFC4WlbOkm
+	 uW7q99kvPnJ/GYgPF4DITX0IJaYMXyhsufKVLj2uzZ3tLK95p+U5nEuUFCamT4oEy0
+	 81e19HJRAOh+A==
+Date: Thu, 17 Aug 2023 19:58:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, Alan Brady <alan.brady@intel.com>,
+ pavan.kumar.linga@intel.com, emil.s.tantilov@intel.com,
+ jesse.brandeburg@intel.com, sridhar.samudrala@intel.com,
+ shiraz.saleem@intel.com, sindhu.devale@intel.com, willemb@google.com,
+ decot@google.com, andrew@lunn.ch, leon@kernel.org, mst@redhat.com,
+ simon.horman@corigine.com, shannon.nelson@amd.com,
+ stephen@networkplumber.org, Alice Michael <alice.michael@intel.com>, Joshua
+ Hay <joshua.a.hay@intel.com>, Madhu Chittim <madhu.chittim@intel.com>,
+ Phani Burra <phani.r.burra@intel.com>
+Subject: Re: [PATCH net-next v5 08/15] idpf: configure resources for RX
+ queues
+Message-ID: <20230817195815.4bf4f2b4@kernel.org>
+In-Reply-To: <20230816004305.216136-9-anthony.l.nguyen@intel.com>
+References: <20230816004305.216136-1-anthony.l.nguyen@intel.com>
+	<20230816004305.216136-9-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1692326837.git.yan@cloudflare.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-LWTUNNEL_XMIT_CONTINUE is implicitly assumed in ip(6)_finish_output2,
-such that any positive return value from a xmit hook could cause
-unexpected continue behavior, despite that related skb may have been
-freed. This could be error-prone for future xmit hook ops. One of the
-possible errors is to return statuses of dst_output directly.
+On Tue, 15 Aug 2023 17:42:58 -0700 Tony Nguyen wrote:
+> +	page_pool_put_page(rxq->pp, rx_buf->page, rx_buf->truesize, false);
 
-To make the code safer, redefine LWTUNNEL_XMIT_CONTINUE value to
-distinguish from dst_output statuses and check the continue
-condition explicitly.
+I think the truesize here is incorrect, there's new documentation 
+for this very case:
 
-Fixes: 3a0af8fd61f9 ("bpf: BPF for lightweight tunnel infrastructure")
-Suggested-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Yan Zhai <yan@cloudflare.com>
----
- include/net/lwtunnel.h | 5 ++++-
- net/ipv4/ip_output.c   | 2 +-
- net/ipv6/ip6_output.c  | 2 +-
- 3 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
-index 6f15e6fa154e..53bd2d02a4f0 100644
---- a/include/net/lwtunnel.h
-+++ b/include/net/lwtunnel.h
-@@ -16,9 +16,12 @@
- #define LWTUNNEL_STATE_INPUT_REDIRECT	BIT(1)
- #define LWTUNNEL_STATE_XMIT_REDIRECT	BIT(2)
- 
-+/* LWTUNNEL_XMIT_CONTINUE should be distinguishable from dst_output return
-+ * values (NET_XMIT_xxx and NETDEV_TX_xxx in linux/netdevice.h) for safety.
-+ */
- enum {
- 	LWTUNNEL_XMIT_DONE,
--	LWTUNNEL_XMIT_CONTINUE,
-+	LWTUNNEL_XMIT_CONTINUE = 0x100,
- };
- 
- 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 6ba1a0fafbaa..a6e4c82615d7 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -216,7 +216,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
- 	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
- 		int res = lwtunnel_xmit(skb);
- 
--		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
-+		if (res != LWTUNNEL_XMIT_CONTINUE)
- 			return res;
- 	}
- 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 1e8c90e97608..016b0a513259 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -113,7 +113,7 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
- 	if (lwtunnel_xmit_redirect(dst->lwtstate)) {
- 		int res = lwtunnel_xmit(skb);
- 
--		if (res < 0 || res == LWTUNNEL_XMIT_DONE)
-+		if (res != LWTUNNEL_XMIT_CONTINUE)
- 			return res;
- 	}
- 
--- 
-2.30.2
-
-
+https://docs.kernel.org/next/networking/page_pool.html#dma-sync
 
