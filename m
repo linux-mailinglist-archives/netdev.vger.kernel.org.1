@@ -1,122 +1,179 @@
-Return-Path: <netdev+bounces-28874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD07781110
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:57:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87637781148
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 19:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FA2282291
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:57:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C13CC1C20ED0
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 17:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2DB6110;
-	Fri, 18 Aug 2023 16:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2736131;
+	Fri, 18 Aug 2023 17:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3065362B
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:57:13 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9512D69
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:57:12 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-525656acf4bso1458291a12.0
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:57:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AE6648
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 17:10:28 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A04C3C2D;
+	Fri, 18 Aug 2023 10:10:26 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fe85fd3d27so1810294e87.0;
+        Fri, 18 Aug 2023 10:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1692377831; x=1692982631;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BsyKfMya3T2IG5CsphBG2f1KZVRfw1A44jYZYuUf32w=;
-        b=OSdk3FCzOMhI/OH7Tx/fJFVN5dScVuA5+lhY8Dc6KTAzM4L5hXxr6R/t/iwM+s+RFY
-         maDf4UXSEsRxmrgqNcb81xU3eXxOknhsm05Gle6GtYgOVq4kW22Ca9olD1KVqEQEGjBU
-         SmVjGgqXpugx1FudR52ylhevyrJnGveMBDoVg=
+        d=gmail.com; s=20221208; t=1692378625; x=1692983425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qZncaXQLSh9js0I4WjpTSahy4Bvx67wGvUaNA9X9QL4=;
+        b=mWiVtgsWZW2NgtZV2B1VWpSdYomDbnE5IM3I8NwhrcqW1ICl6KDFCrHBvLEuRWsiw4
+         h68dv3P2mof7Uvn0W27wQKaU+szILp/iQk+ZZ7NCHMVhJhaaxYk1+a6IgcFBFaY8cReV
+         hvVjg6Cg+nEmYiod4CbK7H4JM4/8z4fuiu3u9xolueCbV5aqABwD/8/5V7g2I2feoYCR
+         G5ILCR+KA5LzRYlbIJJR4nNGFEdPFRL7j0QSshp/zTF4GjzyaXgW7MjbGUrCcX5PuhQv
+         Ye3hwRCyudxym7NAyPZZLQ5am6U3HSWki/kp7aWRPkMXCwRq46p0gkXyFdFG+B5oJG4d
+         a9GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692377831; x=1692982631;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BsyKfMya3T2IG5CsphBG2f1KZVRfw1A44jYZYuUf32w=;
-        b=BWgxrPJkPODJcBKQaOKQGUh+oAqtY0bSpsT+ggpcjieivpBp2No1UqP65+brV1iXB9
-         vR+ZHB/ODpDwY1emLSa4lLY63j6K0TqQCDe0yiwPoDWh9gChr+MQQL5yHFwNcn59uU8Y
-         eJVgeFw6wJ2msKefkXo7bU5mFBadn+IdUfkF0Nxk3fUzPk5ceHdt+PeYQdD0eW0WkMPg
-         keitxL6sgVWoYGMSrt22hs1UlJ4yTUCu4y2DUpo/rXYDZgCy3ElzF6TENzx8SbsY69cm
-         ZT/TBweko33QNJqceqeIpjBWQ2cOUmJKpLFyghX+3+I1YSUBo5WIcg3ThXwq+ZTUFtJt
-         do9A==
-X-Gm-Message-State: AOJu0Yz+UZmNVLY1guzrdLySP4ScpUzgaB5gGa13xwgd4QmjUPNwcM4I
-	rQ1tlpkNjpkPIl7z8hRRhzjzuJIcqkaDKRCLbnkIXQ==
-X-Google-Smtp-Source: AGHT+IHuOU5N11Lk5NSSYlDBPWcuphNEBeKr4AafLZ//Dqr/oS4Z1OLTqRF+Ba0oQRXzsmr48VWP6veE7DkGlw9yygo=
-X-Received: by 2002:aa7:c58c:0:b0:522:2a0c:d254 with SMTP id
- g12-20020aa7c58c000000b005222a0cd254mr2605082edq.33.1692377830908; Fri, 18
- Aug 2023 09:57:10 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692378625; x=1692983425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qZncaXQLSh9js0I4WjpTSahy4Bvx67wGvUaNA9X9QL4=;
+        b=Qozq4dgkE4kcxKEk2ycHumjRQ/xLNoZg6VwmiWfVEIZ355q82sRmczw+rK/9rGHwrQ
+         UHUH3UU81Mbc2zh0ZsZzdiNIVFA8q1dZVctsW6ekri3yhpwZXP/tJLQTO1aw6kkxew8q
+         bRZrUo42bG8dM4lma+pjnpY+3tSSnu61BvmXuMmMufWwm09gMulrcnyh8yeUzQhWW5MW
+         mZQGYJ9ErPJ2P9qtMtJKwBUgGe/tSZVdnvY8U+wqv9k8kb+lpK4Iam715jH/5Lsq0oUQ
+         rR3b27dvZCS5Nq/Xv6geJVIvuPTLmY38BV0VncwFZbMEamILgEkv8s3DaEO6VAsmbv36
+         bXrQ==
+X-Gm-Message-State: AOJu0Ywn/Nxtj7Sar8VjLZpWCWDICumAgzrhYVbz9wqNtd32ePTcT389
+	px6NIgzgZFHs1ACj3kMrQgI=
+X-Google-Smtp-Source: AGHT+IHsEr3WOE514VOmtMPl7fzHNR2vgMsIyU//tQb/ScBsu4i9rGSZix1w2kzZUdJX/qwEfDWk5Q==
+X-Received: by 2002:a05:6512:477:b0:4f8:49a7:2deb with SMTP id x23-20020a056512047700b004f849a72debmr2118416lfd.8.1692378624613;
+        Fri, 18 Aug 2023 10:10:24 -0700 (PDT)
+Received: from mobilestation ([93.157.254.210])
+        by smtp.gmail.com with ESMTPSA id v20-20020ac25934000000b004faf6a87d63sm417332lfi.38.2023.08.18.10.10.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 10:10:24 -0700 (PDT)
+Date: Fri, 18 Aug 2023 20:10:21 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v5 5/9] net: stmmac: xgmac: support per-channel
+ irq
+Message-ID: <k57laovdsomy4eblyu5neujkkcqinitfmdvojcph3zh2ygn4jt@iton4m73y6nz>
+References: <20230817165749.672-1-jszhang@kernel.org>
+ <20230817165749.672-6-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814112421.5a2fa4f6@kernel.org> <20230817131612.M_wwTr7m@linutronix.de>
- <CAO3-Pbo7q6Y-xzP=3f58Y3MyWT2Vruy6UhKiam2=mAKArxgMag@mail.gmail.com> <20230818145734.OgLYhPh1@linutronix.de>
-In-Reply-To: <20230818145734.OgLYhPh1@linutronix.de>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 18 Aug 2023 11:56:59 -0500
-Message-ID: <CAO3-Pbr4u8+UsmmN+kHF4Yv+-THAnUxSgROLyK3Tvjb9W5gHZQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next 0/2] net: Use SMP threads for backlog NAPI.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Wander Lairson Costa <wander@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230817165749.672-6-jszhang@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 18, 2023 at 9:57=E2=80=AFAM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> On 2023-08-18 09:43:08 [-0500], Yan Zhai wrote:
-> > > Looking at the cloudflare ppl here in the thread, I doubt they use
-> > > backlog but have proper NAPI so they might not need this.
-> > >
-> > Cloudflare does have backlog usage. On some veths we have to turn GRO
->
-> Oh. Okay.
->
-> > off to cope with multi-layer encapsulation, and there is also no XDP
-> > attached on these interfaces, thus the backlog is used. There are also
-> > other usage of backlog, tuntap, loopback and bpf-redirect ingress.
-> > Frankly speaking, making a NAPI instance "threaded" itself is not a
-> > concern. We have threaded NAPI running on some veth for quite a while,
-> > and it performs pretty well. The concern, if any, would be the
-> > maturity of new code. I am happy to help derisk with some lab tests
-> > and dogfooding if generic agreement is reached to proceed with this
-> > idea.
->
-> If you have threaded NAPI for veth then you wouldn't be affected by this
-> code. However, if you _are_ affected by this and you use veth it would
-> be helpful to figure out if you have problems as of net-next and if this
-> helps or makes it worse.
->
-yes we are still impacted on non-NAPI veths and other scenarios. But
-net-next sounds good, still plenty of time to evaluate if it has any
-negative impact.
+On Fri, Aug 18, 2023 at 12:57:45AM +0800, Jisheng Zhang wrote:
+> The IP supports per channel interrupt, add support for this usage case.
+> 
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  2 ++
+>  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 33 +++++++++++--------
+>  2 files changed, 22 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> index 7f68bef456b7..18a042834d75 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> @@ -340,6 +340,8 @@
+>  
+>  /* DMA Registers */
+>  #define XGMAC_DMA_MODE			0x00003000
+> +#define XGMAC_INTM			GENMASK(13, 12)
+> +#define XGMAC_INTM_MODE1		0x1
+>  #define XGMAC_SWR			BIT(0)
+>  #define XGMAC_DMA_SYSBUS_MODE		0x00003004
+>  #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> index 1ef8fc132c2d..ce228c362403 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+> @@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
+>  		value |= XGMAC_EAME;
+>  
+>  	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
+> +
+> +	if (dma_cfg->perch_irq_en) {
+> +		value = readl(ioaddr + XGMAC_DMA_MODE);
+> +		value &= ~XGMAC_INTM;
+> +		value |= FIELD_PREP(XGMAC_INTM, XGMAC_INTM_MODE1);
+> +		writel(value, ioaddr + XGMAC_DMA_MODE);
+> +	}
+>  }
+>  
+>  static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
+> @@ -365,20 +372,20 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+>  	}
+>  
+>  	/* TX/RX NORMAL interrupts */
 
-Yan
+> -	if (likely(intr_status & XGMAC_NIS)) {
+> -		if (likely(intr_status & XGMAC_RI)) {
+> -			u64_stats_update_begin(&rx_q->rxq_stats.syncp);
+> -			rx_q->rxq_stats.rx_normal_irq_n++;
+> -			u64_stats_update_end(&rx_q->rxq_stats.syncp);
+> -			ret |= handle_rx;
+> -		}
+> -		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
+> -			u64_stats_update_begin(&tx_q->txq_stats.syncp);
+> -			tx_q->txq_stats.tx_normal_irq_n++;
+> -			u64_stats_update_end(&tx_q->txq_stats.syncp);
+> -			ret |= handle_tx;
+> -		}
+> +	if (likely(intr_status & XGMAC_RI)) {
+> +		u64_stats_update_begin(&rx_q->rxq_stats.syncp);
+> +		rx_q->rxq_stats.rx_normal_irq_n++;
+> +		u64_stats_update_end(&rx_q->rxq_stats.syncp);
+> +		ret |= handle_rx;
+> +	}
+> +	if (likely(intr_status & XGMAC_TI)) {
+> +		u64_stats_update_begin(&tx_q->txq_stats.syncp);
+> +		tx_q->txq_stats.tx_normal_irq_n++;
+> +		u64_stats_update_end(&tx_q->txq_stats.syncp);
+> +		ret |= handle_tx;
+>  	}
+> +	if (unlikely(intr_status & XGMAC_TBU))
+> +		ret |= handle_tx;
 
-> As of now Jakub isn't eager to have it and my testing/ convincing is
-> quite limited. If nobody else yells that something like that would be
-> helpful I would simply go and convince PeterZ/tglx to apply 2/2 of this
-> series.
->
-> > Yan
->
-> Sebastian
+Just curious. Is this change really necessary seeing NIS IRQ is
+unmasked and it is unmasked-OR of the RI/TI/TBU flags in the
+DMA_CHx_Status register? Moreover based on the HW manual,
+DMA_CHx_Status reflects raw IRQ flags status except NIS and AIS which
+are the masked OR of the respective flags. So AFAIU NIS will be set in
+anyway if you have RI/TI/TBU IRQs enabled.
+
+-Serge(y)
+
+>  
+>  	/* Clear interrupts */
+>  	writel(intr_en & intr_status, ioaddr + XGMAC_DMA_CH_STATUS(chan));
+> -- 
+> 2.40.1
+> 
+> 
 
