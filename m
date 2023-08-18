@@ -1,96 +1,64 @@
-Return-Path: <netdev+bounces-28973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF977814AB
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 23:20:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21BAD7814B4
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 23:24:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 070EE1C209FF
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 21:20:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA3B4281E03
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 21:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6736C1BB26;
-	Fri, 18 Aug 2023 21:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB3A1BB2E;
+	Fri, 18 Aug 2023 21:24:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0EB46B0
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 21:20:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62D84C433C7;
-	Fri, 18 Aug 2023 21:20:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692393608;
-	bh=RGoItvf8/5pJAf7mFwfWcz9JiaulcCOpFoXlUzUNleI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SGyFcOez9V9UGDTJtmv+QVpvoTZAOUIEpj7xFhdBzRcDDOh4j8TTxYsvg930MO6Kr
-	 t8uLznKS+hSX10d6hD2wmnGmBgVwrCzWP6kCt+ABdWdOFMO0gNtZzF1tjkVgl1b1ZJ
-	 UD1Rb/S15v/cAppSUJXGi/3Oa5tsPsMHiybPbHA8kG0CyOpBUpJlxDjUNtdQm8ZBKF
-	 cdhDdInSB27LuHsLnO7bmvPM0A9fMEVqBynEnOcWIaIFqFwwkTt5HlKV2UX4CHUD2F
-	 jdUqgU18fbYUBBZyqluKrLvufeYEq+EKAaNbEOgrOL7EpJ+V6ZKyAFWW0QRu4QPu94
-	 8Lda91xsuQ1OA==
-Date: Fri, 18 Aug 2023 14:20:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com, shayd@nvidia.com,
- leon@kernel.org
-Subject: Re: [patch net-next 0/4] net/mlx5: expose peer SF devlink instance
-Message-ID: <20230818142007.206eeb13@kernel.org>
-In-Reply-To: <ZN8eCeDGcQSCi1D6@nanopsycho>
-References: <20230815145155.1946926-1-jiri@resnulli.us>
-	<20230817193420.108e9c26@kernel.org>
-	<ZN8eCeDGcQSCi1D6@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810DA1AA90
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 21:24:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E71C433C7;
+	Fri, 18 Aug 2023 21:24:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1692393876;
+	bh=Wdz4oVuBLe9dL/FbEM8zLUrqIvKI32lgagofb0qvY6o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qCq6FBHKwur8aDhPsmBJ8x7a/pO6VKC1iTCOZWMlrV+nEghj+H0DqAjTnOlZUR00P
+	 OdozVSYiigsj0UhUy+ly+qwBkX+RJEOGfUzAj4Hwm6GEpTCj7+gItKltc+AVOsfrqs
+	 5g3zd+1+RH9uR0hpRVYfZeJOm9UwkwF1061rIaxY=
+Date: Fri, 18 Aug 2023 23:24:33 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Evan Quan <evan.quan@amd.com>
+Cc: rafael@kernel.org, lenb@kernel.org, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alexander.deucher@amd.com, andrew@lunn.ch,
+	rdunlap@infradead.org, quic_jjohnson@quicinc.com, horms@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: Re: [V9 1/9] drivers core: Add support for Wifi band RF mitigations
+Message-ID: <2023081806-rounding-distract-b695@gregkh>
+References: <20230818032619.3341234-1-evan.quan@amd.com>
+ <20230818032619.3341234-2-evan.quan@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230818032619.3341234-2-evan.quan@amd.com>
 
-On Fri, 18 Aug 2023 09:30:17 +0200 Jiri Pirko wrote:
-> >The devlink instance of the SF stays in the same network namespace 
-> >as the PF?  
-> 
-> SF devlink instance is created in init_ns and can move to another one.
-> So no.
-> 
-> I was thinking about this, as with the devlink handles we are kind of in
-> between sysfs and network. We have concept of network namespace in
-> devlink, but mainly because of the related netdevices.
-> 
-> There is no possibility of collision of devlink handles in between
-> separate namespaces, the handle is ns-unaware. Therefore the linkage to
-> instance in different ns is okay, I believe. Even more, It is handy as
-> the user knows that there exists such linkage.
-> 
-> What do you think?
+On Fri, Aug 18, 2023 at 11:26:11AM +0800, Evan Quan wrote:
+>  drivers/base/Makefile                         |   1 +
+>  drivers/base/wbrf.c                           | 280 ++++++++++++++++++
 
-The way I was thinking about it is that the placement of the dl
-instance should correspond to the entity which will be configuring it.
+Why is a wifi-specific thing going into drivers/base/?
 
-Assume a typical container setup where app has net admin in its
-netns and there is an orchestration daemon with root in init_net 
-which sets the containers up.
+confused,
 
-Will we ever want the app inside the netns to configure the interface
-via the dl instance? Given that the SF is like giving the container
-full access to the HW it seems to me that we should also delegate 
-the devlink control to the app, i.e. move it to the netns?
-
-Same thing for devlink instances of VFs.
-
-The orchestration daemon has access to the "PF" / main dl instance of
-the device, and to the ports / port fns so it has other ways to control
-the HW. While the app would otherwise have no devlink access.
-
-So my intuition is that the devlink instance should follow the SF
-netdev into a namespace.
-
-And then the next question is - once the devlink instances are in
-different namespaces - do we still show the "nested_devlink" attribute?
-Probably yes but we need to add netns id / link as well?
+greg k-h
 
