@@ -1,102 +1,107 @@
-Return-Path: <netdev+bounces-28741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00075780741
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:37:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF6D3780768
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9346328232B
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:37:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C8701C21552
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C37B14285;
-	Fri, 18 Aug 2023 08:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DAA817728;
+	Fri, 18 Aug 2023 08:46:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C413EAF1
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:37:24 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D743A94
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 01:37:22 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fe2ba3e260so6496965e9.2
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 01:37:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692347841; x=1692952641;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+O4WPWfoXsCzBGstfczdeT9Y09dSmyx72ksm2QeEmas=;
-        b=HpFcsdWNhimYDwYSG2jAOAbvXy6epAZS7dsJs7+HlGxf0yBlILkzZuch9iB7NtoQGb
-         N4mpTy/W732BBhl7xH2f5wLdj6BE79Y89XyGNAOt8MnCKX0hDeVAMxsFbpZipMihPMUN
-         /MMeXDPZtnxDmHzq/4TWx1ZvQy0bEaBpXOl8JoSvMfo2bjcjHTpK5MKqpffSohdtUoII
-         j16P2dzDHBN0K1eZjlmM/R7b2xicoT3nJkH0tKeI58yuldczauPcw0nHFm7dX0xkIvpX
-         kpoAPuM7zTC9IoYxWskTNi4fPcfFtPmGkTXW0LXzQah4F3rYC/BASGIh8WG8hTgajSYx
-         PyHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692347841; x=1692952641;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+O4WPWfoXsCzBGstfczdeT9Y09dSmyx72ksm2QeEmas=;
-        b=bvlfOYgIilKZwvaN+JwzPI5AZrMtQCmKIO+Do/4m1m2jg9GOHIJ1jcpyGYrDVuDCeM
-         H86U44hYj5RLXqDDSgKJ6XuPc5by7TOueO2nOD/ec5d+it383RoiIMirjI8Ty3msIM1u
-         Cx+/fYxeghjEult9Qwgi+9Eu9OI9XHTwdUpKySXRLVIRTGU3KptuNLVQD3wQQ8J9BTQD
-         WzPTyu2cp0HJj5F99DHPKoaAws+o1WWpHRlaK9SJMcmGETa2ZPQj8mC1Yp2npdfWJA5d
-         vzDkmfIkQ6tsP+/IBn4azQgt4br/SnksBbRx6MZvkFCI36Jh3d8tay7b6Ktf5dn8qAze
-         PUCA==
-X-Gm-Message-State: AOJu0YwMM5t+8MFtGdPC2HprtXvd1o7HEhb5dxGjwnVUYm7XttHQKKBO
-	fPoUz5G6NAqd+/T3FCEHqeXqshC0BqxFJPlzKbyPHQ==
-X-Google-Smtp-Source: AGHT+IG1SQQAIEs7U3yIgYGoM7W2iYcrwJ0SpNOEPdmJlvXwVfGcDleUQx6wefkRff19mKfth7J99Q==
-X-Received: by 2002:a05:600c:21d5:b0:3fe:173e:4a54 with SMTP id x21-20020a05600c21d500b003fe173e4a54mr1563518wmj.17.1692347840817;
-        Fri, 18 Aug 2023 01:37:20 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id u10-20020a05600c210a00b003fed70fb09dsm286879wml.26.2023.08.18.01.37.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 01:37:20 -0700 (PDT)
-Date: Fri, 18 Aug 2023 10:37:19 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: ynl - mutiple policies for one nested attr used in multiple cmds
-Message-ID: <ZN8tv9bH1Bq8s7SS@nanopsycho>
-References: <ZM01ezEkJw4D27Xl@nanopsycho>
- <20230804125816.11431885@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2323D7F
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:46:20 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36323AAC;
+	Fri, 18 Aug 2023 01:46:06 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RRwNb0KLbztSBV;
+	Fri, 18 Aug 2023 16:42:23 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 18 Aug
+ 2023 16:46:01 +0800
+Subject: Re: [PATCH net-next v6 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
+	<liangchen.linux@gmail.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, <linux-rdma@vger.kernel.org>
+References: <20230814125643.59334-1-linyunsheng@huawei.com>
+ <20230814125643.59334-2-linyunsheng@huawei.com>
+ <CAC_iWjKMLoUu4bctrWtK46mpyhQ7LoKe4Nm2t8jZVMM0L9O2xA@mail.gmail.com>
+ <06e89203-9eaf-99eb-99de-e5209819b8b3@huawei.com>
+ <CAC_iWjJ4Pi7Pj9Rm13y4aXBB3RsP9pTsfRf_A-OraXKwaO_xGA@mail.gmail.com>
+ <b71d5f5f-0ea1-3a35-8c90-53ef4ae27e79@huawei.com>
+ <CAC_iWjJbrwSTT9OT3VjzXkCTdcwShWWaaPJUVC0aG2hR5sbkWg@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <b8efc2ce-8856-2c9b-2a8c-edf2a819ebe5@huawei.com>
+Date: Fri, 18 Aug 2023 16:46:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230804125816.11431885@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <CAC_iWjJbrwSTT9OT3VjzXkCTdcwShWWaaPJUVC0aG2hR5sbkWg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Aug 04, 2023 at 09:58:16PM CEST, kuba@kernel.org wrote:
->On Fri, 4 Aug 2023 19:29:31 +0200 Jiri Pirko wrote:
->> I need to have one nested attribute but according to what cmd it is used
->> with, there will be different nested policy.
->> 
->> If I'm looking at the codes correctly, that is not currenly supported,
->> correct?
->> 
->> If not, why idea how to format this in yaml file?
->
->I'm not sure if you'll like it but my first choice would be to skip
->the selector attribute. Put the attributes directly into the message.
->There is no functional purpose the wrapping serves, right?
+On 2023/8/17 19:43, Ilias Apalodimas wrote:
+>>>>>>
+>>>>>> In order to simplify the driver's work when using frag API
+>>>>>> this patch allows page_pool_alloc_frag() to call
+>>>>>> page_pool_alloc_pages() to return pages for those arches.
+>>>>>
+>>>>> Do we have any use cases of people needing this?  Those architectures
+>>>>> should be long dead and although we have to support them in the
+>>>>> kernel,  I don't personally see the advantage of adjusting the API to
+>>>>> do that.  Right now we have a very clear separation between allocating
+>>>>> pages or fragments.   Why should we hide a page allocation under a
+>>>>> frag allocation?  A driver writer can simply allocate pages for those
+>>>>> boards.  Am I the only one not seeing a clean win here?
+>>>>
+>>>> It is also a part of removing the per page_pool PP_FLAG_PAGE_FRAG flag
+>>>> in this patchset.
+>>>
+>>> Yes, that happens *because* of this patchset.  I am not against the
+>>> change.  In fact, I'll have a closer look tomorrow.  I am just trying
+>>> to figure out if we really need it.  When the recycling patches were
+>>> introduced into page pool we had a very specific reason.  Due to the
+>>> XDP verifier we *had* to allocate a packet per page.  That was
+>>
+>> Did you mean a xdp frame containing a frag page can not be passed to the
+>> xdp core?
+>> What is exact reason why the XDP verifier need a packet per page?
+>> Is there a code block that you can point me to?
+> 
+> It's been a while since I looked at this, but doesn't __xdp_return()
+> still sync the entire page if the mem type comes from page_pool?
 
-I have another variation of a similar problem.
-There might be a different policy for nested attribute for get and set.
-Example nest: DEVLINK_ATTR_PORT_FUNCTION
-
-Any suggestion how to resolve this?
-
-Thanks!
+Yes, I checked that too.
+It is supposed to sync the entire page if the mem type comes from page_pool,
+as it depend on the last freed frag to do the sync_for_device operation.
 
