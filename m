@@ -1,107 +1,72 @@
-Return-Path: <netdev+bounces-28742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6D3780768
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:46:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBC9978076E
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C8701C21552
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:46:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7669C282318
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DAA817728;
-	Fri, 18 Aug 2023 08:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2E117747;
+	Fri, 18 Aug 2023 08:47:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2323D7F
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:46:20 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36323AAC;
-	Fri, 18 Aug 2023 01:46:06 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RRwNb0KLbztSBV;
-	Fri, 18 Aug 2023 16:42:23 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 18 Aug
- 2023 16:46:01 +0800
-Subject: Re: [PATCH net-next v6 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, <linux-rdma@vger.kernel.org>
-References: <20230814125643.59334-1-linyunsheng@huawei.com>
- <20230814125643.59334-2-linyunsheng@huawei.com>
- <CAC_iWjKMLoUu4bctrWtK46mpyhQ7LoKe4Nm2t8jZVMM0L9O2xA@mail.gmail.com>
- <06e89203-9eaf-99eb-99de-e5209819b8b3@huawei.com>
- <CAC_iWjJ4Pi7Pj9Rm13y4aXBB3RsP9pTsfRf_A-OraXKwaO_xGA@mail.gmail.com>
- <b71d5f5f-0ea1-3a35-8c90-53ef4ae27e79@huawei.com>
- <CAC_iWjJbrwSTT9OT3VjzXkCTdcwShWWaaPJUVC0aG2hR5sbkWg@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <b8efc2ce-8856-2c9b-2a8c-edf2a819ebe5@huawei.com>
-Date: Fri, 18 Aug 2023 16:46:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626D13D7F
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:47:40 +0000 (UTC)
+Received: from [192.168.42.3] (194-45-78-10.static.kviknet.net [194.45.78.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPSA id 21695C433C8;
+	Fri, 18 Aug 2023 08:47:37 +0000 (UTC)
+Subject: [PATCH] softirq: Adjust comment for CONFIG_PREEMPT_RT in #else
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ netdev@vger.kernel.org
+Date: Fri, 18 Aug 2023 10:47:35 +0200
+Message-ID: <169234845563.1636130.4897344550692792117.stgit@firesoul>
+User-Agent: StGit/1.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAC_iWjJbrwSTT9OT3VjzXkCTdcwShWWaaPJUVC0aG2hR5sbkWg@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 2023/8/17 19:43, Ilias Apalodimas wrote:
->>>>>>
->>>>>> In order to simplify the driver's work when using frag API
->>>>>> this patch allows page_pool_alloc_frag() to call
->>>>>> page_pool_alloc_pages() to return pages for those arches.
->>>>>
->>>>> Do we have any use cases of people needing this?  Those architectures
->>>>> should be long dead and although we have to support them in the
->>>>> kernel,  I don't personally see the advantage of adjusting the API to
->>>>> do that.  Right now we have a very clear separation between allocating
->>>>> pages or fragments.   Why should we hide a page allocation under a
->>>>> frag allocation?  A driver writer can simply allocate pages for those
->>>>> boards.  Am I the only one not seeing a clean win here?
->>>>
->>>> It is also a part of removing the per page_pool PP_FLAG_PAGE_FRAG flag
->>>> in this patchset.
->>>
->>> Yes, that happens *because* of this patchset.  I am not against the
->>> change.  In fact, I'll have a closer look tomorrow.  I am just trying
->>> to figure out if we really need it.  When the recycling patches were
->>> introduced into page pool we had a very specific reason.  Due to the
->>> XDP verifier we *had* to allocate a packet per page.  That was
->>
->> Did you mean a xdp frame containing a frag page can not be passed to the
->> xdp core?
->> What is exact reason why the XDP verifier need a packet per page?
->> Is there a code block that you can point me to?
-> 
-> It's been a while since I looked at this, but doesn't __xdp_return()
-> still sync the entire page if the mem type comes from page_pool?
+The #ifdef CONFIG_PREEMPT_RT #else statement had a comment
+that made me think the code below #else statement was RT code.
+After reading the code closer I realized it was not RT code.
+Adjust comment to !RT to helper future readers of the code.
 
-Yes, I checked that too.
-It is supposed to sync the entire page if the mem type comes from page_pool,
-as it depend on the last freed frag to do the sync_for_device operation.
+Fixes: 8b1c04acad08 ("softirq: Make softirq control and processing RT aware")
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+ kernel/softirq.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/softirq.c b/kernel/softirq.c
+index 807b34ccd797..b9a8384821b9 100644
+--- a/kernel/softirq.c
++++ b/kernel/softirq.c
+@@ -292,7 +292,7 @@ void do_softirq_post_smp_call_flush(unsigned int was_pending)
+ 		invoke_softirq();
+ }
+ 
+-#else /* CONFIG_PREEMPT_RT */
++#else /* !CONFIG_PREEMPT_RT */
+ 
+ /*
+  * This one is for softirq.c-internal use, where hardirqs are disabled
+
+
 
