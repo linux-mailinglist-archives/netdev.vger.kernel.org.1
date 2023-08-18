@@ -1,68 +1,155 @@
-Return-Path: <netdev+bounces-28681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331DD7803D8
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:34:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567807803FD
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1D852822C8
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:34:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9C3A28223A
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CC9398;
-	Fri, 18 Aug 2023 02:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34D963BD;
+	Fri, 18 Aug 2023 02:58:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3A6380
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 02:34:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFB9BC433C8;
-	Fri, 18 Aug 2023 02:34:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692326061;
-	bh=Jit2iBJ4BNzRU3skxq3T6hpxaHNcdhICAiZQt175AHY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ihqR8ljnhsJYVkfUVrQ9HavnkFPqWj7j7Rz1uoVMQVZsDKlXKIgOMruwA13bynKu4
-	 QNuA5MxDrmZRkqKvv2/FwxSTQA28PdBpiZE69cHpLAd0ctEGwz+OsTRc363xY+uYyf
-	 jDC4wG8vJ6lkyVZABb/9oGKJ505foAtHnPOJ5BSFwpi7BgaqUuK/KvNMuJr1J6ltu0
-	 67dwbOfEOvX98L+fLcH4hnZ7RKAvPQZOiENcMV7dTZG4ezhcEGArHla2W+35NswoiM
-	 JSJ07BrB9lbFQLCHTRl4r4tVK+r8nRNANB0JORH7ZZz1H12eLt+BLNhDIJ7YuVvc5f
-	 /wSeSCc0pTFZw==
-Date: Thu, 17 Aug 2023 19:34:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com, shayd@nvidia.com,
- leon@kernel.org
-Subject: Re: [patch net-next 0/4] net/mlx5: expose peer SF devlink instance
-Message-ID: <20230817193420.108e9c26@kernel.org>
-In-Reply-To: <20230815145155.1946926-1-jiri@resnulli.us>
-References: <20230815145155.1946926-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DB2398
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 02:58:13 +0000 (UTC)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B811BB
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 19:58:12 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-407ff54164dso3431191cf.2
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 19:58:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1692327491; x=1692932291;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=USI75m3o9913jLduDnux9TyqJuP1aOQC3kWrDolYXiI=;
+        b=hGonSGAnNEu4PNUFh9oLEr6YIiZQRdqQBcMq5Gneqf9avC86i+dWuZR3/EmNPbUlSr
+         rOpBTRPpzBEgdjOsHlSjUP5+3ruR98DL42+BPmum0xa1Xv/vTiUHCvEyeZinlHlIlFxx
+         ZBjt87cnX9lGXtj1dk47cG3y2yM25guJIFSTk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692327491; x=1692932291;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=USI75m3o9913jLduDnux9TyqJuP1aOQC3kWrDolYXiI=;
+        b=AG88dSdd+la+PkXPRs1vsVW3FpKiVBNJWC72GNFLCBDT3gdhbLf99RhoeVAQ1OIUYu
+         SOPaQEudVofNl/L8CltQaJJIwa8hZlGSHZ65sCv4iq8yHR+HJAILR/ujHQ8E7+7T0fbp
+         exZAnHiqzMq3qX/hwmgQ1NOJnCiVYcIpkxY6W4Xr2wwzTFvVoQLFUw7YrQiLyaY6DRfC
+         obbycWB5c7mEw8dQxY+hsQ6Q7P7w7A4Mho+4ObzhuFjxtwH24nViTawJk9p411ejc9jf
+         GkRn/zgFSzru1ijOONo93ao+WwvpMHlcB1Y9LQhzdY238rl/fi1ztAK4THpN+jUBdnCa
+         7Grw==
+X-Gm-Message-State: AOJu0Ywxp1tKAAsY5oRJMDuGr2ZKWcCtDcwSQrpuDfqVAcHl8Kp6qddN
+	H3Vl75frlybDJIKQhLKC5DUVPg==
+X-Google-Smtp-Source: AGHT+IFl/FzdHp0SEjIbm5LtZ1Y7zEZh+XmJH76j4McfsP6Qu5b5bJuZ5unpVnZrN8vPsm8hfynOdg==
+X-Received: by 2002:ac8:5b43:0:b0:40f:4cfd:7158 with SMTP id n3-20020ac85b43000000b0040f4cfd7158mr1921453qtw.27.1692327491415;
+        Thu, 17 Aug 2023 19:58:11 -0700 (PDT)
+Received: from debian.debian ([140.141.197.139])
+        by smtp.gmail.com with ESMTPSA id z4-20020a05622a124400b00403c82c609asm268339qtx.14.2023.08.17.19.58.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 19:58:10 -0700 (PDT)
+Date: Thu, 17 Aug 2023 19:58:09 -0700
+From: Yan Zhai <yan@cloudflare.com>
+To: bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	Yan Zhai <yan@cloudflare.com>, Thomas Graf <tgraf@suug.ch>,
+	Jordan Griege <jgriege@cloudflare.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v6 bpf 0/4] lwt: fix return values of BPF ops
+Message-ID: <cover.1692326837.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 15 Aug 2023 16:51:51 +0200 Jiri Pirko wrote:
-> Currently, the user can instantiate new SF using "devlink port add"
-> command. That creates an E-switch representor devlink port.
-> 
-> When user activates this SF, there is an auxiliary device created and
-> probed for it which leads to SF devlink instance creation.
-> 
-> There is 1:1 relationship between E-switch representor devlink port and
-> the SF auxiliary device devlink instance.
-> 
-> Expose the relation to the user by introducing new netlink attribute
-> DEVLINK_PORT_FN_ATTR_DEVLINK which contains the devlink instance related
-> to devlink port function. This is done by patch #3.
+lwt xmit hook does not expect positive return values in function
+ip_finish_output2 and ip6_finish_output. However, BPF programs can
+directly return positive statuses such like NET_XMIT_DROP, NET_RX_DROP,
+and etc to the caller. Such return values would make the kernel continue
+processing already freed skbs and eventually panic.
 
-The devlink instance of the SF stays in the same network namespace 
-as the PF?
+This set fixes the return values from BPF ops to unexpected continue
+processing, checks strictly on the correct continue condition for
+future proof. In addition, add missing selftests for BPF redirect
+and reroute cases for BPF-CI.
+
+v5: https://lore.kernel.org/bpf/cover.1692153515.git.yan@cloudflare.com/ 
+v4: https://lore.kernel.org/bpf/ZMD1sFTW8SFiex+x@debian.debian/T/ 
+v3: https://lore.kernel.org/bpf/cover.1690255889.git.yan@cloudflare.com/ 
+v2: https://lore.kernel.org/netdev/ZLdY6JkWRccunvu0@debian.debian/ 
+v1: https://lore.kernel.org/bpf/ZLbYdpWC8zt9EJtq@debian.debian/ 
+
+changes since v5:
+ * fix BPF-CI failures due to missing config and busybox ping issue
+
+changes since v4:
+ * fixed same error on BPF_REROUTE path
+ * re-implemented selftests under BPF-CI requirement
+
+changes since v3:
+ * minor change in commit message and changelogs
+ * tested by Jakub Sitnicki
+
+changes since v2:
+ * subject name changed
+ * also covered redirect to ingress case
+ * added selftests
+
+changes since v1:
+ * minor code style changes
+
+Yan Zhai (4):
+  lwt: fix return values of BPF xmit ops
+  lwt: check LWTUNNEL_XMIT_CONTINUE strictly
+  selftests/bpf: add lwt_xmit tests for BPF_REDIRECT
+  selftests/bpf: add lwt_xmit tests for BPF_REROUTE
+
+ include/net/lwtunnel.h                        |   5 +-
+ net/core/lwt_bpf.c                            |   7 +-
+ net/ipv4/ip_output.c                          |   2 +-
+ net/ipv6/ip6_output.c                         |   2 +-
+ tools/testing/selftests/bpf/config            |   2 +
+ .../selftests/bpf/prog_tests/lwt_helpers.h    | 139 ++++++++
+ .../selftests/bpf/prog_tests/lwt_redirect.c   | 330 ++++++++++++++++++
+ .../selftests/bpf/prog_tests/lwt_reroute.c    | 262 ++++++++++++++
+ .../selftests/bpf/progs/test_lwt_redirect.c   |  90 +++++
+ .../selftests/bpf/progs/test_lwt_reroute.c    |  36 ++
+ 10 files changed, 868 insertions(+), 7 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_redirect.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_reroute.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_lwt_redirect.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_lwt_reroute.c
+
+-- 
+2.30.2
+
+
 
