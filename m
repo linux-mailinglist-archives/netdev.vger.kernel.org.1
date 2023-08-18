@@ -1,82 +1,124 @@
-Return-Path: <netdev+bounces-28970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1575E781481
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 23:03:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC43C7814C4
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 23:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AAEC1C20E2E
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 21:03:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18FBD1C20C0D
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 21:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78081B7C1;
-	Fri, 18 Aug 2023 21:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F141BB2F;
+	Fri, 18 Aug 2023 21:30:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E41D2C9A
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 21:03:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C68C433C8;
-	Fri, 18 Aug 2023 21:03:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692392585;
-	bh=HHxNOIqgqP6yYIqo8lV6m5wy51W8npjOcTEiKx/jJO0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UQ1G45rnUtbvnxhcsWbx94oyx/wuL9JR9EKknlg1Rfs7gLKRAS21Q1lpWqWQvVRC2
-	 iOmH4tn0t06UkvIGfIt+2qfahKr1Kz03lQErN6upF0ZVjlOvvnUINWvnIpjnCzbm3B
-	 RaAlSN+ps5J0EQHtpdCz20fhEHxYKPQesS9UOYpobQyA84U55WUl3u/Lm0bdY22FlQ
-	 oZYz1T7zmnqkYOAEPY2jRBxMOPmdMuLw74TamIhMLB+kdrQiUtI1bxD8a/znjgNI8E
-	 qJYqUziTnO9PQbKD3EoJqkvBNygwT85YbrzZzFfLp6OuVrrp6SK/x00Qcw0CUzCqnU
-	 LPis6trKOy8ew==
-Date: Fri, 18 Aug 2023 14:03:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Paolo Abeni <pabeni@redhat.com>, "Olech, Milena" <milena.olech@intel.com>,
- "Michalik, Michal" <michal.michalik@intel.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, poros <poros@redhat.com>, mschmidt
- <mschmidt@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, Bart Van Assche
- <bvanassche@acm.org>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>
-Subject: Re: [PATCH net-next v4 0/9] Create common DPLL configuration API
-Message-ID: <20230818140304.11f316c9@kernel.org>
-In-Reply-To: <DM6PR11MB4657374BF0A9361647444D239B1BA@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
-	<20230814194528.00baec23@kernel.org>
-	<43395307-9d11-7905-0eec-0a4c1b1fc62a@linux.dev>
-	<ZNtm6v+UuDIex1+s@nanopsycho>
-	<20230815100203.4e45fc7e@kernel.org>
-	<DM6PR11MB4657374BF0A9361647444D239B1BA@DM6PR11MB4657.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989E22C9A
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 21:30:05 +0000 (UTC)
+X-Greylist: delayed 1323 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Aug 2023 14:30:02 PDT
+Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7E41421F;
+	Fri, 18 Aug 2023 14:30:02 -0700 (PDT)
+Received: from in01.mta.xmission.com ([166.70.13.51]:54812)
+	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1qX6hJ-00Eec7-E9; Fri, 18 Aug 2023 15:07:57 -0600
+Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:41716 helo=email.froward.int.ebiederm.org.xmission.com)
+	by in01.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1qX6hI-005584-F4; Fri, 18 Aug 2023 15:07:57 -0600
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jeff Layton <jlayton@kernel.org>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Jann Horn <jannh@google.com>,
+  linux-hardening@vger.kernel.org,  Elena Reshetova
+ <elena.reshetova@intel.com>,  David Windsor <dwindsor@gmail.com>,  Hans
+ Liljestrand <ishkamiel@gmail.com>,  Trond Myklebust
+ <trond.myklebust@hammerspace.com>,  Anna Schumaker <anna@kernel.org>,
+  Chuck Lever <chuck.lever@oracle.com>,  Neil Brown <neilb@suse.de>,  Olga
+ Kornievskaia <kolga@netapp.com>,  Dai Ngo <Dai.Ngo@oracle.com>,  Tom
+ Talpey <tom@talpey.com>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Sergey Senozhatsky <senozhatsky@chromium.org>,
+  Alexey Gladkov <legion@kernel.org>,  Yu Zhao <yuzhao@google.com>,
+  linux-kernel@vger.kernel.org,  linux-nfs@vger.kernel.org,
+  netdev@vger.kernel.org
+References: <20230818041740.gonna.513-kees@kernel.org>
+	<20230818105542.a6b7c41c47d4c6b9ff2e8839@linux-foundation.org>
+	<CAG48ez3mNk8yryV3XHdWZBHC_4vFswJPx1yww+uDi68J=Lepdg@mail.gmail.com>
+	<202308181146.465B4F85@keescook>
+	<20230818123148.801b446cfdbd932787d47612@linux-foundation.org>
+	<e5234e7bd9fbd2531b32d64bc7c23f4753401cee.camel@kernel.org>
+	<202308181317.66E6C9A5@keescook>
+Date: Fri, 18 Aug 2023 16:07:49 -0500
+In-Reply-To: <202308181317.66E6C9A5@keescook> (Kees Cook's message of "Fri, 18
+	Aug 2023 13:24:58 -0700")
+Message-ID: <87zg2o5aai.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-XM-SPF: eid=1qX6hI-005584-F4;;;mid=<87zg2o5aai.fsf@email.froward.int.ebiederm.org>;;;hst=in01.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX1+62MLGNsy+flFj/dTZm7oQeFgbyj85fUg=
+X-SA-Exim-Connect-IP: 68.227.168.167
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: ;Kees Cook <keescook@chromium.org>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 407 ms - load_scoreonly_sql: 0.08 (0.0%),
+	signal_user_changed: 11 (2.7%), b_tie_ro: 9 (2.2%), parse: 1.27 (0.3%),
+	 extract_message_metadata: 14 (3.4%), get_uri_detail_list: 1.00 (0.2%),
+	 tests_pri_-2000: 13 (3.2%), tests_pri_-1000: 4.5 (1.1%),
+	tests_pri_-950: 1.41 (0.3%), tests_pri_-900: 1.19 (0.3%),
+	tests_pri_-200: 0.93 (0.2%), tests_pri_-100: 4.4 (1.1%),
+	tests_pri_-90: 68 (16.6%), check_bayes: 66 (16.2%), b_tokenize: 8
+	(2.1%), b_tok_get_all: 8 (2.0%), b_comp_prob: 2.7 (0.7%),
+	b_tok_touch_all: 43 (10.5%), b_finish: 0.97 (0.2%), tests_pri_0: 193
+	(47.3%), check_dkim_signature: 0.68 (0.2%), check_dkim_adsp: 2.5
+	(0.6%), poll_dns_idle: 77 (18.9%), tests_pri_10: 2.1 (0.5%),
+	tests_pri_500: 89 (21.9%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v2] creds: Convert cred.usage to refcount_t
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
 
-On Fri, 18 Aug 2023 10:15:34 +0000 Kubalewski, Arkadiusz wrote:
-> HW agnostic tests were submitted by Michal as RFC for test framework
-> with fake modules implemented here:
-> https://lore.kernel.org/netdev/20230817152209.23868-1-michal.michalik@intel.com/#t
-> We had an agreement on latest dpll-meeting that we will follow up with
-> patches that would test dpll over fake modules, and we have started it.
-> As there was no requests to add HW-aware tests yet, we are not ready for
-> such submission yet. We could probably extended Michal's framework to
-> make it possible test real HW, but Michal's patches were just submitted,
-> we do expect some review/changes there, thus we could think of adding
-> something simpler for now..
-> 
-> Is simple bash script wrapping around cli.py and talking to ice dpll
-> while verifying the outputs, an acceptable solution?
+Kees Cook <keescook@chromium.org> writes:
 
-Okay, it is what it is, let's leave tests as follow up.
+> On Fri, Aug 18, 2023 at 04:10:49PM -0400, Jeff Layton wrote:
+>> [...]
+>> extra checks (supposedly) compile down to nothing. It should be possible
+>> to build alternate refcount_t handling functions that are just wrappers
+>> around atomic_t with no extra checks, for folks who want to really run
+>> "fast and loose".
+>
+> No -- there's no benefit for this. We already did all this work years
+> ago with the fast vs full break-down. All that got tossed out since it
+> didn't matter. We did all the performance benchmarking and there was no
+> meaningful difference -- refcount _is_ atomic with an added check that
+> is branch-predicted away. Peter Zijlstra and Will Deacon spent a lot of
+> time making it run smoothly. :)
 
-I'll reply to Michal on the RFC thread/
+Since you did all of the work should the text size of be growing by a
+kilobyte for this change?
+
+Is that expected?
+
+That is a valid concern with this change and it really should be
+justified in the change long as someone brought it up.
+
+Eric
 
