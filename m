@@ -1,188 +1,242 @@
-Return-Path: <netdev+bounces-28820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD84780D12
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 15:54:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16433780D66
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D69B1C21617
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 13:54:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 288461C21392
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB33318C1E;
-	Fri, 18 Aug 2023 13:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FAB18C0F;
+	Fri, 18 Aug 2023 14:05:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5E018C0E
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 13:54:11 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD214FC;
-	Fri, 18 Aug 2023 06:54:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692366850; x=1723902850;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JDFUtXRUDrxtVzEusowNhWGcSf1zOgP5VGknWG1AdaE=;
-  b=hDYMaQZ+SLHHh6e+pa0/FLPeW61PJSlKyQOkS+ORBGcaUJVDWjk7DL+C
-   AR21AkX0w8SV6NecmukyuyxznrhaSj9hqxQKWwcfq4hQsaaCclHtI82cr
-   8uhWYiQjKfHKYemwEPzzTfa8b5RX+E2kemxoE3MsAj6QXbZx4mlMpLvcj
-   thkUIRIz8B+Fyg1Y04GHKEyogy5zpnISGUML+USngB7NOtS2e/3ZJ0Nj4
-   /4CAANA9yHkMUv2ZuU28ujm7N7cUVFlTCW6fGFsjuHVZo1/WqYZvwyGjM
-   cwCfPVnOjvq/I6q6k4EmOZUE5ExBcisNMeBbr1dQs/dIwqYUYliaHpH0V
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="353408041"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="353408041"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 06:54:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="849307172"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="849307172"
-Received: from pglc00067.png.intel.com ([10.221.207.87])
-  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 06:54:06 -0700
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: [PATCH net-next v4 2/2] net: stmmac: Tx coe sw fallback
-Date: Fri, 18 Aug 2023 21:53:50 +0800
-Message-Id: <20230818135350.12474-3-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20230818135350.12474-1-rohan.g.thomas@intel.com>
-References: <20230818135350.12474-1-rohan.g.thomas@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC52171AF
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 14:05:27 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 352253C31;
+	Fri, 18 Aug 2023 07:05:24 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RS3SS4P1Yz6J6Y4;
+	Fri, 18 Aug 2023 22:01:12 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 18 Aug 2023 15:05:21 +0100
+Message-ID: <a31a0cc8-cf2f-5fe3-3efc-f817b8a5c6db@huawei.com>
+Date: Fri, 18 Aug 2023 17:05:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <artem.kuzin@huawei.com>, <gnoack3000@gmail.com>,
+	<willemdebruijn.kernel@gmail.com>, <yusongping@huawei.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230706145543.1284007-1-mic@digikod.net>
+ <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
+ <30e2bacd-2e48-9056-5950-1974b9373ee3@huawei.com>
+ <20230817.EiHicha5shei@digikod.net>
+ <b0bfa45a-c2bd-545e-ec51-02eeeab0677d@huawei.com>
+ <20230817.geraipi9teiB@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20230817.geraipi9teiB@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add sw fallback of tx checksum calculation for those tx queues that
-don't support tx checksum offloading. Because, some DWMAC IPs support
-tx checksum offloading only for a few initial tx queues, starting
-from tx queue 0.
 
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  5 +++++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 19 +++++++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  4 ++++
- include/linux/stmmac.h                        |  1 +
- 4 files changed, 29 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 3401e888a9f6..64d7dbe474bd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -210,12 +210,17 @@ struct stmmac_dma_conf {
- 	unsigned int dma_tx_size;
- };
- 
-+#define STMMAC_PRIV_FLG_TXQ_COE_LIMIT	BIT(0)
-+
- struct stmmac_priv {
- 	/* Frequently used values are kept adjacent for cache effect */
- 	u32 tx_coal_frames[MTL_MAX_TX_QUEUES];
- 	u32 tx_coal_timer[MTL_MAX_TX_QUEUES];
- 	u32 rx_coal_frames[MTL_MAX_TX_QUEUES];
- 
-+	u32 flags;
-+
-+	u32 tx_q_with_coe;
- 	int hwts_tx_en;
- 	bool tx_path_in_lpi_mode;
- 	bool tso;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 733b5e900817..f9ab6635218c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4409,6 +4409,17 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	WARN_ON(tx_q->tx_skbuff[first_entry]);
- 
- 	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
-+	/* Some DWMAC IPs support tx coe only for a few initial tx queues,
-+	 * starting from tx queue 0. So checksum offloading for those queues
-+	 * that don't support tx coe needs to fallback to software checksum
-+	 * calculation.
-+	 */
-+	if (csum_insertion && (priv->flags & STMMAC_PRIV_FLG_TXQ_COE_LIMIT) &&
-+	    queue >= priv->tx_q_with_coe) {
-+		if (unlikely(skb_checksum_help(skb)))
-+			goto dma_map_err;
-+		csum_insertion = !csum_insertion;
-+	}
- 
- 	if (likely(priv->extend_desc))
- 		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
-@@ -7401,6 +7412,14 @@ int stmmac_dvr_probe(struct device *device,
- 		dev_info(priv->device, "SPH feature enabled\n");
- 	}
- 
-+	if (priv->plat->tx_coe &&
-+	    priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use) {
-+		priv->flags |= STMMAC_PRIV_FLG_TXQ_COE_LIMIT;
-+		priv->tx_q_with_coe = priv->plat->tx_queues_with_coe;
-+		dev_info(priv->device, "TX COE limited to %u tx queues\n",
-+			 priv->tx_q_with_coe);
-+	}
-+
- 	/* Ideally our host DMA address width is the same as for the
- 	 * device. However, it may differ and then we have to use our
- 	 * host DMA width for allocation and the device DMA width for
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index be8e79c7aa34..0138b7c9c7ab 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -225,6 +225,10 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 				 &plat->tx_queues_to_use))
- 		plat->tx_queues_to_use = 1;
- 
-+	if (of_property_read_u32(tx_node, "snps,tx-queues-with-coe",
-+				 &plat->tx_queues_with_coe))
-+		plat->tx_queues_with_coe = plat->tx_queues_to_use;
-+
- 	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
- 		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
- 	else if (of_property_read_bool(tx_node, "snps,tx-sched-wfq"))
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 784277d666eb..cb508164eaea 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -252,6 +252,7 @@ struct plat_stmmacenet_data {
- 	u32 host_dma_width;
- 	u32 rx_queues_to_use;
- 	u32 tx_queues_to_use;
-+	u32 tx_queues_with_coe;
- 	u8 rx_sched_algorithm;
- 	u8 tx_sched_algorithm;
- 	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
--- 
-2.19.0
-
+8/17/2023 6:34 PM, Mickaël Salaün пишет:
+> On Thu, Aug 17, 2023 at 05:04:00PM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 8/17/2023 4:19 PM, Mickaël Salaün пишет:
+>> > On Sun, Aug 13, 2023 at 11:09:59PM +0300, Konstantin Meskhidze (A) wrote:
+>> > > 
+>> > > 
+>> > > 7/12/2023 10:02 AM, Mickaël Salaün пишет:
+>> > > > > On 06/07/2023 16:55, Mickaël Salaün wrote:
+>> > > > > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> > > > > > > This patch is a revamp of the v11 tests [1] with new tests
+>> > > (see the
+>> > > > > "Changes since v11" description).  I (Mickaël) only added the following
+>> > > > > todo list and the "Changes since v11" sections in this commit message.
+>> > > > > I think this patch is good but it would appreciate reviews.
+>> > > > > You can find the diff of my changes here but it is not really readable:
+>> > > > > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
+>> > > > > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
+>> > > > > TODO:
+>> > > > > - Rename all "net_service" to "net_port".
+>> > > > > - Fix the two kernel bugs found with the new tests.
+>> > > > > - Update this commit message with a small description of all tests.
+>> > > > > [...]
+>> > 
+>> > > > > +FIXTURE(inet)
+>> > > > > +{
+>> > > > > +	struct service_fixture srv0, srv1;
+>> > > > > +};
+>> > > > > The "inet" variants are useless and should be removed. The
+>> > > "inet"
+>> > > > fixture can then be renamed to "ipv4_tcp".
+>> > > >   Maybe its better to name it "tcp". So we dont need to copy
+>> > > TEST_F(tcp,
+>> > > port_endianness) for ipv6 and ipv4.
+>> > > What do you think?
+>> > 
+>> > I don't see any need to test with IPv4 and IPv6, hence the "inet" name
+>> > (and without variants). You can rename it to "inet_tcp" to highlight the
+>> > specificities of this fixture.
+>> > 
+>> 
+>>  I think there was some misunderstanding from my side. So I will rename
+>> inet to inet_tcp and keep all fixture variants:
+>> 	- no_sandbox_with_ipv4.
+>> 	- sandbox_with_ipv4.
+>> 	- no_sandbox_with_ipv6.
+>> 	- sandbox_with_ipv6.
+>> Correct?
+> 
+> No, you just need to remove the FIXTURE_VARIANT and the four
+> FIXTURE_VARIANT_ADD blocks bellow.  And according to another reply,
+> "ipv4_tcp" seems more appropriate.
+> 
+   Ok. Got it. Thank you.
+> 
+>> > > > > > +
+>> > > > > +FIXTURE_VARIANT(inet)
+>> > > > > +{
+>> > > > > +	const bool is_sandboxed;
+>> > > > > +	const struct protocol_variant prot;
+>> > > > > +};
+>> > > > > +
+>> > > > > +/* clang-format off */
+>> > > > > +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv4) {
+>> > > > > +	/* clang-format on */
+>> > > > > +	.is_sandboxed = false,
+>> > > > > +	.prot = {
+>> > > > > +		.domain = AF_INET,
+>> > > > > +		.type = SOCK_STREAM,
+>> > > > > +	},
+>> > > > > +};
+>> > > > > +
+>> > > > > +/* clang-format off */
+>> > > > > +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv4) {
+>> > > > > +	/* clang-format on */
+>> > > > > +	.is_sandboxed = true,
+>> > > > > +	.prot = {
+>> > > > > +		.domain = AF_INET,
+>> > > > > +		.type = SOCK_STREAM,
+>> > > > > +	},
+>> > > > > +};
+>> > > > > +
+>> > > > > +/* clang-format off */
+>> > > > > +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv6) {
+>> > > > > +	/* clang-format on */
+>> > > > > +	.is_sandboxed = false,
+>> > > > > +	.prot = {
+>> > > > > +		.domain = AF_INET6,
+>> > > > > +		.type = SOCK_STREAM,
+>> > > > > +	},
+>> > > > > +};
+>> > > > > +
+>> > > > > +/* clang-format off */
+>> > > > > +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv6) {
+>> > > > > +	/* clang-format on */
+>> > > > > +	.is_sandboxed = true,
+>> > > > > +	.prot = {
+>> > > > > +		.domain = AF_INET6,
+>> > > > > +		.type = SOCK_STREAM,
+>> > > > > +	},
+>> > > > > +};
+>> > > > > +
+>> > > > > +FIXTURE_SETUP(inet)
+>> > > > > +{
+>> > > > > +	const struct protocol_variant ipv4_tcp = {
+>> > > > > +		.domain = AF_INET,
+>> > > > > +		.type = SOCK_STREAM,
+>> > > > > +	};
+>> > > > > +
+>> > > > > +	disable_caps(_metadata);
+>> > > > > +
+>> > > > > +	ASSERT_EQ(0, set_service(&self->srv0, ipv4_tcp, 0));
+>> > > > > +	ASSERT_EQ(0, set_service(&self->srv1, ipv4_tcp, 1));
+>> > > > > +
+>> > > > > +	setup_loopback(_metadata);
+>> > > > > +};
+>> > > > > +
+>> > > > > +FIXTURE_TEARDOWN(inet)
+>> > > > > +{
+>> > > > > +}
+>> > > > > +
+>> > > > > +TEST_F(inet, port_endianness)
+>> > > > > +{
+>> > > > > +	const struct landlock_ruleset_attr ruleset_attr = {
+>> > > > > +		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > > > +				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > > > +	};
+>> > > > > +	const struct landlock_net_service_attr bind_host_endian_p0 = {
+>> > > > > +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>> > > > > +		/* Host port format. */
+>> > > > > +		.port = self->srv0.port,
+>> > > > > +	};
+>> > > > > +	const struct landlock_net_service_attr connect_big_endian_p0 = {
+>> > > > > +		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > > > +		/* Big endian port format. */
+>> > > > > +		.port = htons(self->srv0.port),
+>> > > > > +	};
+>> > > > > +	const struct landlock_net_service_attr bind_connect_host_endian_p1 = {
+>> > > > > +		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > > > +				  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > > > +		/* Host port format. */
+>> > > > > +		.port = self->srv1.port,
+>> > > > > +	};
+>> > > > > +	const unsigned int one = 1;
+>> > > > > +	const char little_endian = *(const char *)&one;
+>> > > > > +	int ruleset_fd;
+>> > > > > +
+>> > > > > +	ruleset_fd =
+>> > > > > +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>> > > > > +	ASSERT_LE(0, ruleset_fd);
+>> > > > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+>> > > > > +				       &bind_host_endian_p0, 0));
+>> > > > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+>> > > > > +				       &connect_big_endian_p0, 0));
+>> > > > > +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
+>> > > > > +				       &bind_connect_host_endian_p1, 0));
+>> > > > > +	enforce_ruleset(_metadata, ruleset_fd);
+>> > > > > +
+>> > > > > +	/* No restriction for big endinan CPU. */
+>> > > > > +	test_bind_and_connect(_metadata, &self->srv0, false, little_endian);
+>> > > > > +
+>> > > > > +	/* No restriction for any CPU. */
+>> > > > > +	test_bind_and_connect(_metadata, &self->srv1, false, false);
+>> > > > > +}
+>> > > > > +
+>> > > > > +TEST_HARNESS_MAIN
+>> > > > .
+>> > .
+> .
 
