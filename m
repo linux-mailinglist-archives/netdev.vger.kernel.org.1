@@ -1,228 +1,193 @@
-Return-Path: <netdev+bounces-28703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7025B7804AB
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 05:30:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD94D780508
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 06:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECCE128122C
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 03:30:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0EB1C21535
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3FD11C84;
-	Fri, 18 Aug 2023 03:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D5011CA3;
+	Fri, 18 Aug 2023 04:10:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D266134D3
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 03:29:18 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2040.outbound.protection.outlook.com [40.107.220.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7001982;
-	Thu, 17 Aug 2023 20:28:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q59sZV0h8vgJco3xyXWywWGF022qF6Jz+h1nMMT/QSkNdxofHQS+bqezmex9Lnsh1H1L0dJ9egfbnAopT6AANfb7m8UirXwLxFVUeGI1am7fX+ijT0LEYlJR23TyktDoF/jdkEmzyP+zwZ+J0e5UsKXPCXX5EZKCr+6m0whopVh7jhrQOfuwmzdoXssIzkTBeXuI3X4N+gd9GokuBfjZ1t3HCDKd2tpt9ehvDT+51JM4pUJ/BoeZdetEVglBayHSjqxxLEy4H0nf9SXVFxa5j7qgBUy3bqxG87hokHBXFLk7Nw5gclpM9ifKi4lqGtyUVcfs/lrU2xOG7tyadNYi/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oBMyP5sjBldwqJ3K6uKO9aVAXKYlirNWck9M6BuMFVM=;
- b=oEFdqbrtoGlcjhmDDU8reNuzagSCuEcUoXllXj4VuQAY+QoFmRKaR3S/LIXvL8K3HVzwYOhJyVQvzcHr6qyPlWaDzhMtrC/cgADnW/r7e12KS8PRsM0noABkp24J/0hj1XaDlBpbUd4F7d/8psN4BBeGmTXixyeUz4TdP4TgiDlCMkFwyIUUxJPt9T5eO7nWnLEIbTvceG3t+2goFMvJFCFbmmDzWqQsSnkPfLGCKXSeQD5OfpEDvSCW7Ss5w2krPkaOvlTIAk5Jsi8USGutE6b2Sg0bpVwXq6v44gKHigXUBRuMY/ZkBHO6kIhSaIigHvuj7UZhiN9Sa9G0byH2vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=linuxfoundation.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oBMyP5sjBldwqJ3K6uKO9aVAXKYlirNWck9M6BuMFVM=;
- b=itAqSOwhCJEA/Z3elDq7tA+6t86fofZCsZ+O7wgjd2Hcs8D6r7WYDpoZEb+jp0CkR7AzTzuINo4P55KKkr6gy/APm0xK5qaAMa10S6HsyaDzwi12xgYfKBfRUh87KLKfzOzr+2wwtKtz8+SPXHVDJLAYcZxWsD44efhaovuFm1M=
-Received: from SA0PR11CA0055.namprd11.prod.outlook.com (2603:10b6:806:d0::30)
- by DS0PR12MB8785.namprd12.prod.outlook.com (2603:10b6:8:14c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Fri, 18 Aug
- 2023 03:28:35 +0000
-Received: from SN1PEPF0002636A.namprd02.prod.outlook.com
- (2603:10b6:806:d0:cafe::7a) by SA0PR11CA0055.outlook.office365.com
- (2603:10b6:806:d0::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.17 via Frontend
- Transport; Fri, 18 Aug 2023 03:28:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002636A.mail.protection.outlook.com (10.167.241.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6699.14 via Frontend Transport; Fri, 18 Aug 2023 03:28:35 +0000
-Received: from equan-buildpc.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 17 Aug
- 2023 22:28:29 -0500
-From: Evan Quan <evan.quan@amd.com>
-To: <gregkh@linuxfoundation.org>, <rafael@kernel.org>, <lenb@kernel.org>,
-	<johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <alexander.deucher@amd.com>,
-	<andrew@lunn.ch>, <rdunlap@infradead.org>, <quic_jjohnson@quicinc.com>,
-	<horms@kernel.org>
-CC: <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-acpi@vger.kernel.org>, <amd-gfx@lists.freedesktop.org>,
-	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, Evan Quan
-	<evan.quan@amd.com>, Mario Limonciello <mario.limonciello@amd.com>
-Subject: [V9 9/9] drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
-Date: Fri, 18 Aug 2023 11:26:19 +0800
-Message-ID: <20230818032619.3341234-10-evan.quan@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230818032619.3341234-1-evan.quan@amd.com>
-References: <20230818032619.3341234-1-evan.quan@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F79EAEC
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 04:10:49 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 554753A89;
+	Thu, 17 Aug 2023 21:10:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692331847; x=1723867847;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Y2djJBYqGtFodSH9SQOROqUVVnPYUs6bFkWU16CvT7w=;
+  b=Q/RsIkP80wRTaVc+3LNxd+OGTdqoOLrzsa4ER62mAoMRBbti0dL53caE
+   r+q8ES+RKPMQagy+zoIHR8pt8kzFfRXATDje5WNVmQY/EF/URoU1PXdwK
+   w5haT5qiYqQn+RYgGMmv7OaHroY9PUOAnAV1nagM9M7u5osJU1BNvjXdc
+   ZTu1bJpowxnGCDIp9kMJLKv5d0ESBWOEjKhigtvqSSK1+wUzr+Tcz2RTK
+   8MSd3qvmHPkCAKyuo/wywGHhTj/HQ9qNCtciEywYhAcnmnUrx0yaAW9jz
+   pqXnsWej+klOX3inQITcOBV4DBXFeJfnNntnm1bz5jcQPB7O5dEKK6KKd
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="363167365"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="363167365"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 21:10:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="684717365"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="684717365"
+Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 17 Aug 2023 21:10:44 -0700
+Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qWqot-00025G-1l;
+	Fri, 18 Aug 2023 04:10:43 +0000
+Date: Fri, 18 Aug 2023 12:09:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, alex.williamson@redhat.com, jgg@nvidia.com,
+	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com
+Cc: oe-kbuild-all@lists.linux.dev, shannon.nelson@amd.com,
+	brett.creeley@amd.com
+Subject: Re: [PATCH vfio] pds_core: Fix function header descriptions
+Message-ID: <202308181138.U4cZ1nIO-lkp@intel.com>
+References: <20230817224212.14266-1-brett.creeley@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636A:EE_|DS0PR12MB8785:EE_
-X-MS-Office365-Filtering-Correlation-Id: b25620ae-9e20-435f-befc-08db9f9b34b9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Umn1oYGDFgJ/55mze+LvMfff/fxXyQqbGgAOOXYG1fsJaU9QIu6JISQ2SeLWZH9RxGlIa+p1Q/YIB6Xqx3sfPXR/n0ubtxPWkWnKYEqZ5PPQkuP0/5OzcjOIhymrxG8zCsCIWpbjC3FWo7dxzSHZnQq53OnGWu+8x1TcYAShr+n1xMcUu6GEL3eiSe6kwokP93QcVxjoTlXAIl5Jtd7N+ZsVAsNpXXvo/HN3qPFOrIFQN8KLW/lb8rAPZtovvMmqIneZ7tLWepAnvYAKYkRSomfxslxL2n9U1MWLVs0/KJwzxtRrNSIlmsvZDasfwNlT0W/YAZuBB9SQNtOMZ7N8mJb9r2dREPCBPA+MdHTC2kDD/1QEt6NwnQECl9TA6WsXBMZ5ONGNtamfeiVbSAeDdKriGBGDUHyqqn2mRJym1l9lGX5W0DyHdHiw521rVxxJqlwD5WyQW90wFmlerkuoiB3EuObasI3NbvU0225Xk18kqQx4YMwrj8AUz42fWnJDJ+eeg8TaiL8KAeTcQLtSFiKiERUfy9PWUNYbDdAmszjgR1/lEwMk36bqLuGH85UW+QYB96SgM6m5gVzRFUlToo6xMoM3FdLytiIbP4eSbuvJqiNRBF5QhbUBH5wAyK9yqkLjhCvD6L7WS78dxteCz8mBBMI0OBLEkecOH2K8b5ZSJ8oOPyasQageUvjbf2Iq/fymw646ayjjQzE2ipKtok4tAc75xN69dMTcE6Vh9k/ZaqaGGSCbMAdGWSBYcSze8F29I2qTwZTO6a7aVZq0fikZwqN00c6gRuJZQcnnehfVEEKnLzYPkvW6DAKwSnYoC8OFZpx3jTr4Oqvw4LeEvQ==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(136003)(396003)(39860400002)(451199024)(1800799009)(82310400011)(186009)(40470700004)(36840700001)(46966006)(86362001)(36756003)(82740400003)(356005)(921005)(81166007)(40480700001)(2616005)(5660300002)(44832011)(110136005)(16526019)(70586007)(478600001)(70206006)(7696005)(6666004)(54906003)(316002)(26005)(1076003)(4326008)(8676002)(8936002)(41300700001)(40460700003)(47076005)(336012)(36860700001)(83380400001)(7416002)(426003)(2906002)(2101003)(83996005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2023 03:28:35.5767
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b25620ae-9e20-435f-befc-08db9f9b34b9
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636A.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8785
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230817224212.14266-1-brett.creeley@amd.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fulfill the SMU13.0.7 support for Wifi RFI mitigation feature.
+Hi Brett,
 
-Signed-off-by: Evan Quan <evan.quan@amd.com>
-Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
----
- .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  | 59 +++++++++++++++++++
- 1 file changed, 59 insertions(+)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-index b1f0937ccade..d02fe284b05d 100644
---- a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-+++ b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-@@ -126,6 +126,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] =
- 	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
- 	MSG_MAP(GetPptLimit,			PPSMC_MSG_GetPptLimit,                 0),
- 	MSG_MAP(NotifyPowerSource,		PPSMC_MSG_NotifyPowerSource,           0),
-+	MSG_MAP(EnableUCLKShadow,		PPSMC_MSG_EnableUCLKShadow,            0),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
-@@ -207,6 +208,7 @@ static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
- 	TAB_MAP(ACTIVITY_MONITOR_COEFF),
- 	[SMU_TABLE_COMBO_PPTABLE] = {1, TABLE_COMBO_PPTABLE},
- 	TAB_MAP(OVERDRIVE),
-+	TAB_MAP(WIFIBAND),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_pwr_src_map[SMU_POWER_SOURCE_COUNT] = {
-@@ -497,6 +499,9 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
- 	               AMDGPU_GEM_DOMAIN_VRAM);
- 	SMU_TABLE_INIT(tables, SMU_TABLE_COMBO_PPTABLE, MP0_MP1_DATA_REGION_SIZE_COMBOPPTABLE,
- 			PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
-+	SMU_TABLE_INIT(tables, SMU_TABLE_WIFIBAND,
-+		       sizeof(WifiBandEntryTable_t), PAGE_SIZE,
-+		       AMDGPU_GEM_DOMAIN_VRAM);
- 
- 	smu_table->metrics_table = kzalloc(sizeof(SmuMetricsExternal_t), GFP_KERNEL);
- 	if (!smu_table->metrics_table)
-@@ -2173,6 +2178,57 @@ static int smu_v13_0_7_set_df_cstate(struct smu_context *smu,
- 					       NULL);
- }
- 
-+static bool smu_v13_0_7_wbrf_support_check(struct smu_context *smu)
-+{
-+	return smu->smc_fw_version > 0x00524600;
-+}
-+
-+static int smu_v13_0_7_set_wbrf_exclusion_ranges(struct smu_context *smu,
-+						 struct exclusion_range *exclusion_ranges)
-+{
-+	WifiBandEntryTable_t wifi_bands;
-+	int valid_entries = 0;
-+	int ret, i;
-+
-+	memset(&wifi_bands, 0, sizeof(wifi_bands));
-+	for (i = 0; i < ARRAY_SIZE(wifi_bands.WifiBandEntry); i++) {
-+		if (!exclusion_ranges[i].start &&
-+		    !exclusion_ranges[i].end)
-+			break;
-+
-+		/* PMFW expects the inputs to be in Mhz unit */
-+		wifi_bands.WifiBandEntry[valid_entries].LowFreq =
-+			DIV_ROUND_DOWN_ULL(exclusion_ranges[i].start, HZ_IN_MHZ);
-+		wifi_bands.WifiBandEntry[valid_entries++].HighFreq =
-+			DIV_ROUND_UP_ULL(exclusion_ranges[i].end, HZ_IN_MHZ);
-+	}
-+	wifi_bands.WifiBandEntryNum = valid_entries;
-+
-+	/*
-+	 * Per confirm with PMFW team, WifiBandEntryNum = 0 is a valid setting.
-+	 * Considering the scenarios below:
-+	 * - At first the wifi device adds an exclusion range e.g. (2400,2500) to
-+	 *   BIOS and our driver gets notified. We will set WifiBandEntryNum = 1
-+	 *   and pass the WifiBandEntry (2400, 2500) to PMFW.
-+	 *
-+	 * - Later the wifi device removes the wifiband list added above and
-+	 *   our driver gets notified again. At this time, driver will set
-+	 *   WifiBandEntryNum = 0 and pass an empty WifiBandEntry list to PMFW.
-+	 *   - PMFW may still need to do some uclk shadow update(e.g. switching
-+	 *     from shadow clock back to primary clock) on receiving this.
-+	 */
-+
-+	ret = smu_cmn_update_table(smu,
-+				   SMU_TABLE_WIFIBAND,
-+				   0,
-+				   (void *)(&wifi_bands),
-+				   true);
-+	if (ret)
-+		dev_err(smu->adev->dev, "Failed to set wifiband!");
-+
-+	return ret;
-+}
-+
- static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.get_allowed_feature_mask = smu_v13_0_7_get_allowed_feature_mask,
- 	.set_default_dpm_table = smu_v13_0_7_set_default_dpm_table,
-@@ -2241,6 +2297,9 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.set_mp1_state = smu_v13_0_7_set_mp1_state,
- 	.set_df_cstate = smu_v13_0_7_set_df_cstate,
- 	.gpo_control = smu_v13_0_gpo_control,
-+	.is_asic_wbrf_supported = smu_v13_0_7_wbrf_support_check,
-+	.enable_uclk_shadow = smu_v13_0_enable_uclk_shadow,
-+	.set_wbrf_exclusion_ranges = smu_v13_0_7_set_wbrf_exclusion_ranges,
- };
- 
- void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.5-rc6 next-20230817]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Brett-Creeley/pds_core-Fix-function-header-descriptions/20230818-064424
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20230817224212.14266-1-brett.creeley%40amd.com
+patch subject: [PATCH vfio] pds_core: Fix function header descriptions
+config: powerpc-allyesconfig (https://download.01.org/0day-ci/archive/20230818/202308181138.U4cZ1nIO-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230818/202308181138.U4cZ1nIO-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308181138.U4cZ1nIO-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Function parameter or member 'pf_pdev' not described in 'pds_client_register'
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Excess function parameter 'pf' description in 'pds_client_register'
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:63: warning: Function parameter or member 'pf_pdev' not described in 'pds_client_unregister'
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:63: warning: Excess function parameter 'pf' description in 'pds_client_unregister'
+
+
+vim +18 drivers/net/ethernet/amd/pds_core/auxbus.c
+
+4569cce43bc61e Shannon Nelson 2023-04-19   8  
+10659034c62273 Shannon Nelson 2023-04-19   9  /**
+10659034c62273 Shannon Nelson 2023-04-19  10   * pds_client_register - Link the client to the firmware
+5808b1c50a443e Brett Creeley  2023-08-17  11   * @pf:		ptr to the PF driver's private data struct
+10659034c62273 Shannon Nelson 2023-04-19  12   * @devname:	name that includes service into, e.g. pds_core.vDPA
+10659034c62273 Shannon Nelson 2023-04-19  13   *
+10659034c62273 Shannon Nelson 2023-04-19  14   * Return: 0 on success, or
+10659034c62273 Shannon Nelson 2023-04-19  15   *         negative for error
+10659034c62273 Shannon Nelson 2023-04-19  16   */
+10659034c62273 Shannon Nelson 2023-04-19  17  int pds_client_register(struct pci_dev *pf_pdev, char *devname)
+10659034c62273 Shannon Nelson 2023-04-19 @18  {
+10659034c62273 Shannon Nelson 2023-04-19  19  	union pds_core_adminq_comp comp = {};
+10659034c62273 Shannon Nelson 2023-04-19  20  	union pds_core_adminq_cmd cmd = {};
+10659034c62273 Shannon Nelson 2023-04-19  21  	struct pdsc *pf;
+10659034c62273 Shannon Nelson 2023-04-19  22  	int err;
+10659034c62273 Shannon Nelson 2023-04-19  23  	u16 ci;
+10659034c62273 Shannon Nelson 2023-04-19  24  
+10659034c62273 Shannon Nelson 2023-04-19  25  	pf = pci_get_drvdata(pf_pdev);
+10659034c62273 Shannon Nelson 2023-04-19  26  	if (pf->state)
+10659034c62273 Shannon Nelson 2023-04-19  27  		return -ENXIO;
+10659034c62273 Shannon Nelson 2023-04-19  28  
+10659034c62273 Shannon Nelson 2023-04-19  29  	cmd.client_reg.opcode = PDS_AQ_CMD_CLIENT_REG;
+10659034c62273 Shannon Nelson 2023-04-19  30  	strscpy(cmd.client_reg.devname, devname,
+10659034c62273 Shannon Nelson 2023-04-19  31  		sizeof(cmd.client_reg.devname));
+10659034c62273 Shannon Nelson 2023-04-19  32  
+10659034c62273 Shannon Nelson 2023-04-19  33  	err = pdsc_adminq_post(pf, &cmd, &comp, false);
+10659034c62273 Shannon Nelson 2023-04-19  34  	if (err) {
+10659034c62273 Shannon Nelson 2023-04-19  35  		dev_info(pf->dev, "register dev_name %s with DSC failed, status %d: %pe\n",
+10659034c62273 Shannon Nelson 2023-04-19  36  			 devname, comp.status, ERR_PTR(err));
+10659034c62273 Shannon Nelson 2023-04-19  37  		return err;
+10659034c62273 Shannon Nelson 2023-04-19  38  	}
+10659034c62273 Shannon Nelson 2023-04-19  39  
+10659034c62273 Shannon Nelson 2023-04-19  40  	ci = le16_to_cpu(comp.client_reg.client_id);
+10659034c62273 Shannon Nelson 2023-04-19  41  	if (!ci) {
+10659034c62273 Shannon Nelson 2023-04-19  42  		dev_err(pf->dev, "%s: device returned null client_id\n",
+10659034c62273 Shannon Nelson 2023-04-19  43  			__func__);
+10659034c62273 Shannon Nelson 2023-04-19  44  		return -EIO;
+10659034c62273 Shannon Nelson 2023-04-19  45  	}
+10659034c62273 Shannon Nelson 2023-04-19  46  
+10659034c62273 Shannon Nelson 2023-04-19  47  	dev_dbg(pf->dev, "%s: device returned client_id %d for %s\n",
+10659034c62273 Shannon Nelson 2023-04-19  48  		__func__, ci, devname);
+10659034c62273 Shannon Nelson 2023-04-19  49  
+10659034c62273 Shannon Nelson 2023-04-19  50  	return ci;
+10659034c62273 Shannon Nelson 2023-04-19  51  }
+10659034c62273 Shannon Nelson 2023-04-19  52  EXPORT_SYMBOL_GPL(pds_client_register);
+10659034c62273 Shannon Nelson 2023-04-19  53  
+10659034c62273 Shannon Nelson 2023-04-19  54  /**
+10659034c62273 Shannon Nelson 2023-04-19  55   * pds_client_unregister - Unlink the client from the firmware
+5808b1c50a443e Brett Creeley  2023-08-17  56   * @pf:		ptr to the PF driver's private data struct
+10659034c62273 Shannon Nelson 2023-04-19  57   * @client_id:	id returned from pds_client_register()
+10659034c62273 Shannon Nelson 2023-04-19  58   *
+10659034c62273 Shannon Nelson 2023-04-19  59   * Return: 0 on success, or
+10659034c62273 Shannon Nelson 2023-04-19  60   *         negative for error
+10659034c62273 Shannon Nelson 2023-04-19  61   */
+10659034c62273 Shannon Nelson 2023-04-19  62  int pds_client_unregister(struct pci_dev *pf_pdev, u16 client_id)
+10659034c62273 Shannon Nelson 2023-04-19 @63  {
+10659034c62273 Shannon Nelson 2023-04-19  64  	union pds_core_adminq_comp comp = {};
+10659034c62273 Shannon Nelson 2023-04-19  65  	union pds_core_adminq_cmd cmd = {};
+10659034c62273 Shannon Nelson 2023-04-19  66  	struct pdsc *pf;
+10659034c62273 Shannon Nelson 2023-04-19  67  	int err;
+10659034c62273 Shannon Nelson 2023-04-19  68  
+10659034c62273 Shannon Nelson 2023-04-19  69  	pf = pci_get_drvdata(pf_pdev);
+10659034c62273 Shannon Nelson 2023-04-19  70  	if (pf->state)
+10659034c62273 Shannon Nelson 2023-04-19  71  		return -ENXIO;
+10659034c62273 Shannon Nelson 2023-04-19  72  
+10659034c62273 Shannon Nelson 2023-04-19  73  	cmd.client_unreg.opcode = PDS_AQ_CMD_CLIENT_UNREG;
+10659034c62273 Shannon Nelson 2023-04-19  74  	cmd.client_unreg.client_id = cpu_to_le16(client_id);
+10659034c62273 Shannon Nelson 2023-04-19  75  
+10659034c62273 Shannon Nelson 2023-04-19  76  	err = pdsc_adminq_post(pf, &cmd, &comp, false);
+10659034c62273 Shannon Nelson 2023-04-19  77  	if (err)
+10659034c62273 Shannon Nelson 2023-04-19  78  		dev_info(pf->dev, "unregister client_id %d failed, status %d: %pe\n",
+10659034c62273 Shannon Nelson 2023-04-19  79  			 client_id, comp.status, ERR_PTR(err));
+10659034c62273 Shannon Nelson 2023-04-19  80  
+10659034c62273 Shannon Nelson 2023-04-19  81  	return err;
+10659034c62273 Shannon Nelson 2023-04-19  82  }
+10659034c62273 Shannon Nelson 2023-04-19  83  EXPORT_SYMBOL_GPL(pds_client_unregister);
+10659034c62273 Shannon Nelson 2023-04-19  84  
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
