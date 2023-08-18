@@ -1,127 +1,206 @@
-Return-Path: <netdev+bounces-28917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E372781299
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 20:11:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C45AA7812A1
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 20:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56F6B282267
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:11:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF6921C210D7
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AD71AA9A;
-	Fri, 18 Aug 2023 18:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2863B1ADCA;
+	Fri, 18 Aug 2023 18:14:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0733463A0
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 18:11:23 +0000 (UTC)
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 105B02D70
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 11:11:21 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-31ad9155414so1039590f8f.3
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 11:11:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144BE19BC0
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 18:14:48 +0000 (UTC)
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8FB3C3D
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 11:14:46 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-76d7fcae611so75614785a.2
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 11:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692382279; x=1692987079;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yx7ydbFXOFOcbgp6wjE1tfbmEGixjYufuR1BaVyq6Qg=;
-        b=4Znm6XI+3sxP48r2SnWfj0/LO4ED0zSYKa4kec4msVxHbUe7S5M98WvTMJ97ButMuk
-         um2TlxNYEY4vD/gfF0xaoBMEyDoesC6z7JyZk9yk2OITXg2PznbmqgI51IFZmdYiXCHp
-         0sh4WFrAZF+11c76mi/WVAfq8W2HxxB9f/2jItE/z5wq0RJr/f1yw/y58MHaQsJOzrr1
-         JhZu/lQtVIWPEK/jxaJIOmWue00oomdnwdoTiMndBCQMzqCNJv9gfiYsubUTUkpieQ7a
-         P1jwsAh1YYBCmPQdv+IA1quTmG/tP743kuygAp+eDWFxhrRHQBqUbwvDD3kLlW9Rr2bL
-         9Vtg==
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692382485; x=1692987285;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ts5GMJjU01jbQ5PVsz14tQBnp6LPaCJuc2bNeweoxqI=;
+        b=SukpCX95qSWqj9Rr9/4RuxY4gdtlfiQYj8h+L+zKecfymyjkSKqFsi2t+P2Myktwew
+         f0Ri7NQYabJfeCjHZNVVirOun8rMUvew0pt6DEhplhty3IG5I3b34cQZcO3lsVcXB1/x
+         N7JEAdq8DPzsWdTi6N1+K3JZgXAmx8g0QNfafMMPIc4fvGOL5WkFL5/Ks1TYMhcN/w63
+         CkO4xlF5HKEQ6FadKlxJknYOGs4fu8JcYdO3BSj08iSn1QVRnPcTX0LY89ll4d7NrvQj
+         DLbVaZsiuLaRd0u5oz/fWAxeVu9n4bBltdN2bslHRsW4bC7VofFcCmr73x7F4iPMRIjI
+         D1/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692382279; x=1692987079;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yx7ydbFXOFOcbgp6wjE1tfbmEGixjYufuR1BaVyq6Qg=;
-        b=KMcYxlwL+fDVXqX4wCo6dZQWfarDRXWGoMTwwY+kyONTGZka7LvdQY4++0KcNIBtKm
-         kzYwavYNeAmTOwwGZ4BRim1c8pFOAtxaI/hlWjEkbcDlOc5PWoO+L9TjDPMhYyrELVr3
-         5RzJAP8gy9QI/cn+o2SjmLA/QlLHXMLeRvfHyxQjT3pk1cFuLPL3EG3oPLQ51ftrcSa9
-         edXVa7PdvnfWewfJEKtW/6iophMeACzaMONq9NtviJ4eRX16WCLDymEUcUN3f6zVb6dE
-         w7CKrHkHNOYprQcA1wmf8B4176Nh5vtt+vgqVPcQq83K8WxoXSHtxDDTKYcQrwSanMqR
-         QyoA==
-X-Gm-Message-State: AOJu0Yzo/0BnkBCF5py4GEnFZz/KfxlPHc1mgSJCqOtfysk0rbzlQlS7
-	E5s/T+rVyiEFTecQjhKOQY9SHg==
-X-Google-Smtp-Source: AGHT+IE6zcyFZqjwKp+V6KIu+pyviQnRV+i3HFVtFzLu+kToM1BrvabjT1hHHluXGMXwwl9tRyOW5g==
-X-Received: by 2002:a5d:4f8e:0:b0:317:e04c:6791 with SMTP id d14-20020a5d4f8e000000b00317e04c6791mr2708827wru.62.1692382279306;
-        Fri, 18 Aug 2023 11:11:19 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id e12-20020a5d594c000000b00317878d83c6sm3540276wri.72.2023.08.18.11.11.17
+        d=1e100.net; s=20221208; t=1692382485; x=1692987285;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ts5GMJjU01jbQ5PVsz14tQBnp6LPaCJuc2bNeweoxqI=;
+        b=duuLFNwAFmm7yxJz6/p0cekQx5e9jmfdf26hTyv0Q8VKZderZi81s7/iWWiZfPcid/
+         KLvoIEQfUqBiHnBHi5kseeXR6yMvyRhlm9r8pUmlTgJJyL3LxET9Cmxl/1U536l2fSkO
+         +u+Wxm3rTMJyaCU5DYQOurN1GZudATAJWIpjDAxEYCR1w8l8eZonREulX0PgjX8Svrde
+         jbaAPGGfsObMhVn3RvJEdlEFto4lHlC35qJSyCjPMFY4k2g9waAC6EpcMipZqsLRncaX
+         UIgaaEm/UMGqMa3fcDxpdUSzgcMDkQgF9VNjh2pcyr1JwQw3seLYuKHM6yYK8QdA3f4O
+         PR+g==
+X-Gm-Message-State: AOJu0YzGp5WcYOlXXpga7f0ZU0UAsjeW8Fe68EWPxiwMi63whkh15vxH
+	Sced287QpdB4pHDisY32lF9NHg==
+X-Google-Smtp-Source: AGHT+IGzVAdONCRybVRCgnELkK+w8qX+Q9oiEiGoqAL9mPtBgNqUXWy2EMZDv9XlT1nyRWzIKADUeA==
+X-Received: by 2002:a0c:f112:0:b0:63f:89d3:bf51 with SMTP id i18-20020a0cf112000000b0063f89d3bf51mr3814741qvl.55.1692382485341;
+        Fri, 18 Aug 2023 11:14:45 -0700 (PDT)
+Received: from majuu.waya ([174.93.66.252])
+        by smtp.gmail.com with ESMTPSA id j17-20020a0cf511000000b006418daf9ac5sm844824qvm.132.2023.08.18.11.14.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 11:11:17 -0700 (PDT)
-Date: Fri, 18 Aug 2023 20:11:16 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: ynl - mutiple policies for one nested attr used in multiple cmds
-Message-ID: <ZN+0RCxWBL74Ff+C@nanopsycho>
-References: <ZM01ezEkJw4D27Xl@nanopsycho>
- <20230804125816.11431885@kernel.org>
- <ZN8tv9bH1Bq8s7SS@nanopsycho>
- <20230818085535.3826f133@kernel.org>
+        Fri, 18 Aug 2023 11:14:44 -0700 (PDT)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	netdev@vger.kernel.org,
+	vladimir.oltean@nxp.com,
+	syzkaller-bugs@googlegroups.com,
+	linux-kernel@vger.kernel.org,
+	shaozhengchao@huawei.com,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com
+Subject: [PATCH net 1/1] net/sched: fix a qdisc modification with ambigous command request
+Date: Fri, 18 Aug 2023 14:14:32 -0400
+Message-Id: <20230818181432.54283-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230818085535.3826f133@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Aug 18, 2023 at 05:55:35PM CEST, kuba@kernel.org wrote:
->On Fri, 18 Aug 2023 10:37:19 +0200 Jiri Pirko wrote:
->> >I'm not sure if you'll like it but my first choice would be to skip
->> >the selector attribute. Put the attributes directly into the message.
->> >There is no functional purpose the wrapping serves, right?  
->> 
->> I have another variation of a similar problem.
->> There might be a different policy for nested attribute for get and set.
->> Example nest: DEVLINK_ATTR_PORT_FUNCTION
->> 
->> Any suggestion how to resolve this?
->
->You mean something like:
->
->GET:
-> [NEST_X]
->   [ATTR_A]
->   [ATTR_B]
->
->GET:
-> [NEST_X]
->   [ATTR_A]
->   [ATTR_C]
->
->Where ATTR_A, ATTR_B and ATTR_C are from the same set but depending 
->on the command the nest can either contain A,C or A,B?
->
->That can happen in legit ways :( I don't have a good solution for it.
+When replacing an existing root qdisc, with one that is of the same kind, the
+request boils down to essentially a paremeterization change  i.e not one that
+requires allocation and grafting of a new qdisc. syzbot was able to create a
+scenario which resulted in a taprio qdisc replacing an existing taprio qdisc
+with a combination of NLM_F_CREATE, NLM_F_REPLACE and NLM_F_EXCL leading to
+create and graft scenario.
+The fix ensures that only when the qdisc kinds are different that we should
+allow a create and graft, otherwise it goes into the "change" codepath.
 
-More precisely, it is:
-GET:
- [NEST_X]
-   [ATTR_A]
-   [ATTR_B]
-   [ATTR_C]
-   [ATTR_D]
+While at it, fix the code and comments to improve readability.
 
-SET:
- [NEST_X]
-   [ATTR_A]
-   [ATTR_C]
+While syzbot was able to create the issue, it did not zone on the root cause.
+Analysis from Vladimir Oltean <vladimir.oltean@nxp.com> helped narrow it down.
 
-Okay, you don't have good solution, do you have at least the least bad
-one? :)
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com
+Closes:https://lore.kernel.org/netdev/20230816225759.g25x76kmgzya2gei@skbuf/T/
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/sch_api.c | 55 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 42 insertions(+), 13 deletions(-)
+
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index aa6b1fe65151..dd3db8608275 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1547,10 +1547,28 @@ static int tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 	return 0;
+ }
+ 
++static inline bool cmd_create_or_replace(struct nlmsghdr *n)
++{
++	return (n->nlmsg_flags & NLM_F_CREATE &&
++		n->nlmsg_flags & NLM_F_REPLACE);
++}
++
++static inline bool cmd_create_exclusive(struct nlmsghdr *n)
++{
++	return (n->nlmsg_flags & NLM_F_CREATE &&
++		n->nlmsg_flags & NLM_F_EXCL);
++}
++
++static inline bool cmd_change(struct nlmsghdr *n)
++{
++	return (!(n->nlmsg_flags & NLM_F_CREATE) &&
++		!(n->nlmsg_flags & NLM_F_REPLACE) &&
++		!(n->nlmsg_flags & NLM_F_EXCL));
++}
++
+ /*
+  * Create/change qdisc.
+  */
+-
+ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 			   struct netlink_ext_ack *extack)
+ {
+@@ -1644,27 +1662,37 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 				 *
+ 				 *   We know, that some child q is already
+ 				 *   attached to this parent and have choice:
+-				 *   either to change it or to create/graft new one.
++				 *   1) change it or 2) create/graft new one.
++				 *   If the requested qdisc kind is different
++				 *   than the existing one, then we choose graft.
++				 *   If they are the same then this is "change"
++				 *   operation - just let it fallthrough..
+ 				 *
+ 				 *   1. We are allowed to create/graft only
+-				 *   if CREATE and REPLACE flags are set.
++				 *   if the request is explicitly stating
++				 *   "please create if it doesn't exist".
+ 				 *
+-				 *   2. If EXCL is set, requestor wanted to say,
+-				 *   that qdisc tcm_handle is not expected
++				 *   2. If the request is to exclusive create
++				 *   then the qdisc tcm_handle is not expected
+ 				 *   to exist, so that we choose create/graft too.
+ 				 *
+ 				 *   3. The last case is when no flags are set.
++				 *   This will happen when for example tc
++				 *   utility issues a "change" command.
+ 				 *   Alas, it is sort of hole in API, we
+ 				 *   cannot decide what to do unambiguously.
+-				 *   For now we select create/graft, if
+-				 *   user gave KIND, which does not match existing.
++				 *   For now we select create/graft.
+ 				 */
+-				if ((n->nlmsg_flags & NLM_F_CREATE) &&
+-				    (n->nlmsg_flags & NLM_F_REPLACE) &&
+-				    ((n->nlmsg_flags & NLM_F_EXCL) ||
+-				     (tca[TCA_KIND] &&
+-				      nla_strcmp(tca[TCA_KIND], q->ops->id))))
+-					goto create_n_graft;
++				if (tca[TCA_KIND] &&
++				    nla_strcmp(tca[TCA_KIND], q->ops->id)) {
++					if (cmd_create_or_replace(n) ||
++					    cmd_create_exclusive(n)) {
++						goto create_n_graft;
++					} else {
++						if (cmd_change(n))
++							goto create_n_graft2;
++					}
++				}
+ 			}
+ 		}
+ 	} else {
+@@ -1698,6 +1726,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 		NL_SET_ERR_MSG(extack, "Qdisc not found. To create specify NLM_F_CREATE flag");
+ 		return -ENOENT;
+ 	}
++create_n_graft2:
+ 	if (clid == TC_H_INGRESS) {
+ 		if (dev_ingress_queue(dev)) {
+ 			q = qdisc_create(dev, dev_ingress_queue(dev),
+-- 
+2.34.1
+
 
