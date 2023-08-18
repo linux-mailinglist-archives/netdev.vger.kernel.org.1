@@ -1,189 +1,116 @@
-Return-Path: <netdev+bounces-28755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02ADD7807F2
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 11:06:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F2C7807F5
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 11:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF3F4281DF4
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 09:06:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 937B81C20AE4
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 09:06:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA6317ACB;
-	Fri, 18 Aug 2023 09:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCD417FE7;
+	Fri, 18 Aug 2023 09:03:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D62C18AFB;
-	Fri, 18 Aug 2023 09:02:28 +0000 (UTC)
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F8B30E6;
-	Fri, 18 Aug 2023 02:02:05 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bdc8081147so12820445ad.1;
-        Fri, 18 Aug 2023 02:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692349321; x=1692954121;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1bdHXPT29PLcOi1vozCQ/EzZC5w7NFhRztdG1ykd4oE=;
-        b=nsCgvHiP+FrG/IK1ExNqDBiNFM+CpDi9hpD3yi8xjmyoW1rIiMgslaR8UHU/UUltyT
-         sEZydwK+IcMh8xII60zHmRnqiGu26aeTEmjrNyyIu9X5sp8YAgPmMLUtXl+TH4YKzE7+
-         LWn5WFE8jpeSMMdVjj1+LOrMMJcFnVihNCgYnowgeivWDH7L9A4p/FX1FK0kp+bjvKvr
-         DMY/Ic+gX0PA4AI+SxDWxvuyFi+hU3CF7Nx7YGfcmvw9ndFS+p0ICLxfhDdc4k02qGu6
-         4nGaoKafwTOfG/2KcqnCcWZ+tqz8H5mOZvS5QrUTl1IHNENsZXnQzr2aiWZb8Tdj1jub
-         9SDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692349321; x=1692954121;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1bdHXPT29PLcOi1vozCQ/EzZC5w7NFhRztdG1ykd4oE=;
-        b=V9PxDZsqOQjp3GyoFzpSy15rKPLewwGe2sSmPPfXVCpl/npO8508YSDLKiZsbhKa4p
-         4YIJYQeB7xoXjNiJvckwkNfPq/nXcP4+RvdSeU/7vRLnHtax6zTvNnVQAdxD9A9l3arb
-         gJv19LbASlfbMG1hRtMPhSqgjp1yA8LcXZSrK3JPbKLBn7oxJrpQRvVYMHxVeFb99MIO
-         oN0cgYzXfHQtod+rhd0sJinNkRTdPmna686Mavwv6jxN3v00brYgQi0+klIz/C7VFMMK
-         fwHIjEqmLFsg6qUgOjNnOBMXwNSeCG7ZvOizFm5pX/lnh3U88V7T+irZiJaInOiv095G
-         bIMA==
-X-Gm-Message-State: AOJu0YxbiAQm3SxJWFCRIsPO1OIrgMnlG12T00hhcXAEULuipC93OjsB
-	hcB70Z70zb11pFp/AMJ41A==
-X-Google-Smtp-Source: AGHT+IE5EJZwZG81iNI9tvl+TF4KG5vD6y6dzBIGtxQwwckSkdZXBECEjPKWwnrC/um6iI2PErCx7Q==
-X-Received: by 2002:a17:902:db05:b0:1be:e851:c076 with SMTP id m5-20020a170902db0500b001bee851c076mr2951149plx.27.1692349321496;
-        Fri, 18 Aug 2023 02:02:01 -0700 (PDT)
-Received: from dell-sscc.. ([114.71.48.94])
-        by smtp.gmail.com with ESMTPSA id q6-20020a170902a3c600b001b89045ff03sm1217130plb.233.2023.08.18.02.01.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 02:02:01 -0700 (PDT)
-From: "Daniel T. Lee" <danieltimlee@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4BE15495
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:03:47 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D485830E9;
+	Fri, 18 Aug 2023 02:03:18 -0700 (PDT)
+Date: Fri, 18 Aug 2023 11:03:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1692349397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wQkP0pemHtODz4ZTwfs9hNzhoQAZlrY+GIvOT5+K/D4=;
+	b=KCAYm42tCBcBewe/qz9VwI0+j8bTKggVcI7qA1kaPqkzZG1KxydgLobI6P/Tx1ppSVIfc4
+	LDsXSTyv66abg4fTjBK8NpNix0STW3DBgQm+84uHoRYQwKJj9W1Cu/N6qvF0LmfWe0vXpP
+	IduLGOLq70Jyxio+0HaqpXd/WAzUjwjVak98g5hQATYXTlHcS+z3vaR5Am3CPUX9uyXAdA
+	b6ATUpBU9SSpR2Lk3ksj/b1gDAQPkkDjiZENanUmcptjjLoPwK+j5sI79B79S8hocyLFak
+	F1CncGvfUNNGXfb0IPs++YkYjJcv3AI6uSukeGJnqbh/8YZhN13pbKEqqN8CHw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1692349397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wQkP0pemHtODz4ZTwfs9hNzhoQAZlrY+GIvOT5+K/D4=;
+	b=m5tDM4DS+C9nPRCnWFyYbh2PblvK7fEaQGpLNC3yiJIzY87YPXXw7INeCkFG6JgKG56AD1
+	kpDhCFP/+PCkw5DA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [bpf-next 9/9] samples/bpf: simplify spintest with kprobe.multi
-Date: Fri, 18 Aug 2023 18:01:19 +0900
-Message-Id: <20230818090119.477441-10-danieltimlee@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230818090119.477441-1-danieltimlee@gmail.com>
-References: <20230818090119.477441-1-danieltimlee@gmail.com>
+	Martin KaFai Lau <martin.lau@linux.dev>
+Subject: Re: [RFC PATCH net-next 0/2] net: Use SMP threads for backlog NAPI.
+Message-ID: <20230818090316.jxj-rd8f@linutronix.de>
+References: <20230814093528.117342-1-bigeasy@linutronix.de>
+ <20230814112421.5a2fa4f6@kernel.org>
+ <20230817131612.M_wwTr7m@linutronix.de>
+ <20230817083025.2e8047fa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230817083025.2e8047fa@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-With the introduction of kprobe.multi, it is now possible to attach
-multiple kprobes to a single BPF program without the need for multiple
-definitions. Additionally, this method supports wildcard-based
-matching, allowing for further simplification of BPF programs. In here,
-an asterisk (*) wildcard is used to map to all symbols relevant to
-spin_{lock|unlock}.
+On 2023-08-17 08:30:25 [-0700], Jakub Kicinski wrote:
+> On Thu, 17 Aug 2023 15:16:12 +0200 Sebastian Andrzej Siewior wrote:
+> > I've been looking at veth. In the xdp case it has its own NAPI instance.
+> > In the non-xdp it uses backlog. This should be called from
+> > ndo_start_xmit and user's write() so BH is off and interrupts are
+> > enabled at this point and it should be kind of rate-limited. Couldn't we
+> > bypass backlog in this case and deliver the packet directly to the
+> > stack?
+>=20
+> The backlog in veth eats measurable percentage points of RPS of real
+> workloads, and I think number of people looked at getting rid of it.
+> So worthy goal for sure, but may not be a trivial fix.
 
-Furthermore, since kprobe.multi handles symbol matching, this commit
-eliminates the need for the previous logic of reading the ksym table to
-verify the existence of symbols.
+We could separate RPS from backlog but then we still process RPS after
+backlog so not sure if this gains anything. Letting veth always use its
+NAPI in this case would probably do that. Not sure if it helps=E2=80=A6
 
-Signed-off-by: Daniel T. Lee <danieltimlee@gmail.com>
----
- samples/bpf/spintest.bpf.c  | 17 +++--------------
- samples/bpf/spintest_user.c | 22 +++++++---------------
- 2 files changed, 10 insertions(+), 29 deletions(-)
+> To my knowledge the two main problems are:
+>  - we don't want to charge the sending application the processing for
+>    both "sides" of the connection and all the switching costs.
 
-diff --git a/samples/bpf/spintest.bpf.c b/samples/bpf/spintest.bpf.c
-index 15740b16a3f7..cba5a9d50783 100644
---- a/samples/bpf/spintest.bpf.c
-+++ b/samples/bpf/spintest.bpf.c
-@@ -47,20 +47,9 @@ int foo(struct pt_regs *ctx) \
- }
- 
- /* add kprobes to all possible *spin* functions */
--SEC("kprobe/spin_unlock")PROG(p1)
--SEC("kprobe/spin_lock")PROG(p2)
--SEC("kprobe/mutex_spin_on_owner")PROG(p3)
--SEC("kprobe/rwsem_spin_on_owner")PROG(p4)
--SEC("kprobe/spin_unlock_irqrestore")PROG(p5)
--SEC("kprobe/_raw_spin_unlock_irqrestore")PROG(p6)
--SEC("kprobe/_raw_spin_unlock_bh")PROG(p7)
--SEC("kprobe/_raw_spin_unlock")PROG(p8)
--SEC("kprobe/_raw_spin_lock_irqsave")PROG(p9)
--SEC("kprobe/_raw_spin_trylock_bh")PROG(p10)
--SEC("kprobe/_raw_spin_lock_irq")PROG(p11)
--SEC("kprobe/_raw_spin_trylock")PROG(p12)
--SEC("kprobe/_raw_spin_lock")PROG(p13)
--SEC("kprobe/_raw_spin_lock_bh")PROG(p14)
-+SEC("kprobe.multi/spin_*lock*")PROG(spin_lock)
-+SEC("kprobe.multi/*_spin_on_owner")PROG(spin_on_owner)
-+SEC("kprobe.multi/_raw_spin_*lock*")PROG(raw_spin_lock)
- 
- /* and to inner bpf helpers */
- SEC("kprobe/htab_map_update_elem")PROG(p15)
-diff --git a/samples/bpf/spintest_user.c b/samples/bpf/spintest_user.c
-index 8c77600776fb..55971edb1088 100644
---- a/samples/bpf/spintest_user.c
-+++ b/samples/bpf/spintest_user.c
-@@ -9,13 +9,12 @@
- 
- int main(int ac, char **argv)
- {
--	char filename[256], symbol[256];
- 	struct bpf_object *obj = NULL;
- 	struct bpf_link *links[20];
- 	long key, next_key, value;
- 	struct bpf_program *prog;
- 	int map_fd, i, j = 0;
--	const char *section;
-+	char filename[256];
- 	struct ksym *sym;
- 
- 	if (load_kallsyms()) {
-@@ -44,20 +43,13 @@ int main(int ac, char **argv)
- 	}
- 
- 	bpf_object__for_each_program(prog, obj) {
--		section = bpf_program__section_name(prog);
--		if (sscanf(section, "kprobe/%s", symbol) != 1)
--			continue;
--
--		/* Attach prog only when symbol exists */
--		if (ksym_get_addr(symbol)) {
--			links[j] = bpf_program__attach(prog);
--			if (libbpf_get_error(links[j])) {
--				fprintf(stderr, "bpf_program__attach failed\n");
--				links[j] = NULL;
--				goto cleanup;
--			}
--			j++;
-+		links[j] = bpf_program__attach(prog);
-+		if (libbpf_get_error(links[j])) {
-+			fprintf(stderr, "bpf_program__attach failed\n");
-+			links[j] = NULL;
-+			goto cleanup;
- 		}
-+		j++;
- 	}
- 
- 	for (i = 0; i < 5; i++) {
--- 
-2.34.1
+The packet is injected by the user and softirq is served once BH gets
+back to 0. So it is served within the task's context and might be
+accounted on softirq/ system (might as I think it needs to be observed
+by the timer interrupt for the accounting).
 
+>  - we may get an AA deadlock if the packet ends up looping in any way.
+
+Right, forgot about that one.
+
+> Or at least that's what I remember the problem being at 8am in the
+> morning :) Adding Daniel and Martin to CC, Paolo would also know this
+> better than me but I think he's AFK for the rest of the week.
+
+Sebastian
 
