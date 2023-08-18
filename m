@@ -1,138 +1,86 @@
-Return-Path: <netdev+bounces-28662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3281D780310
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 03:22:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D423E780383
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 03:49:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCF1328228B
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:22:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06E0D281C65
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FEB395;
-	Fri, 18 Aug 2023 01:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE47651;
+	Fri, 18 Aug 2023 01:49:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FEA375
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 01:22:54 +0000 (UTC)
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2124203;
-	Thu, 17 Aug 2023 18:22:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1692321720;
-	bh=J91y43CUV4wpm0FlW1qXk5Ftau/aRI4MIw2cmxJLr60=;
-	h=Date:From:To:Cc:Subject:From;
-	b=JzGGRFHpLI3bGcO8I+iEcT/l4ptJfOmsIjfRKzxc71gZuhyGApXRPBku/sJlhdxdP
-	 fKlYMR9Wz7YYIunlLsZzpLgwYsVfxUBJvfDiF8eFpoCuvmw3aRwN4AzijAzCLzNN+/
-	 tLPkjm/wBHbbzznjlQxEWMNNtaTlebBeXH0+jl7D1tHkq8eRH3dlDZjKNYDmNYcpmW
-	 Y7mamIqVVqIRXx3HEg2JOWA3y0x97CQ4/DWyxi2QHAxbZx2knfmMWr3tQ7cr9Qv7MP
-	 mC8k8xVrnY5RWS4a9/tqLSezLI9MPJtSC08D+L7gkg9LHjwOkfmjXDPlk/6JOR3KF/
-	 4iFoD13x4/KHw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RRkcS3V3Lz4wZJ;
-	Fri, 18 Aug 2023 11:22:00 +1000 (AEST)
-Date: Fri, 18 Aug 2023 11:21:59 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Edward Cree
- <ecree.xilinx@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20230818112159.7430e9b4@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8CB398
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 01:49:40 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B9E42D58
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:49:36 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RRkcL6K24ztRnv;
+	Fri, 18 Aug 2023 09:21:54 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 18 Aug 2023 09:25:32 +0800
+Message-ID: <9ed913e1-2e2a-cf8d-4382-d9799e11a072@huawei.com>
+Date: Fri, 18 Aug 2023 09:25:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/4x=_vmcY6dv.NiOPuZaOiYG";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH net-next] net: lan966x: Fix return value check for
+ vcap_get_rule()
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux@armlinux.org.uk>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>
+References: <20230817123726.1885512-1-ruanjinjie@huawei.com>
+ <ZN5oUpbbRWie9676@vergenet.net>
+From: Ruan Jinjie <ruanjinjie@huawei.com>
+In-Reply-To: <ZN5oUpbbRWie9676@vergenet.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.109.254]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/4x=_vmcY6dv.NiOPuZaOiYG
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-Today's linux-next merge of the net-next tree got a conflict in:
+On 2023/8/18 2:34, Simon Horman wrote:
+> On Thu, Aug 17, 2023 at 08:37:26PM +0800, Ruan Jinjie wrote:
+>> Since vcap_get_rule() return NULL or ERR_PTR(), just check NULL
+>> is not correct. So use IS_ERR_OR_NULL() to fix the issue.
+>>
+>> Fixes: 72df3489fb10 ("net: lan966x: Add ptp trap rules")
+>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+>> ---
+>>  drivers/net/ethernet/microchip/lan966x/lan966x_ptp.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Hi Ruan Jinjie,
+> 
+> Could we consider updating vcap_get_rule() to always return an ERR_PTR()
+> and update the error detection conditions to use IS_ERR()?
+> It seems to me that would be somewhat cleaner in this case.
 
-  drivers/net/ethernet/sfc/tc.c
-
-between commit:
-
-  fa165e194997 ("sfc: don't unregister flow_indr if it was never registered=
-")
-
-from the net tree and commit:
-
-  3bf969e88ada ("sfc: add MAE table machinery for conntrack table")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc drivers/net/ethernet/sfc/tc.c
-index fe268b6c1cac,246657222958..000000000000
---- a/drivers/net/ethernet/sfc/tc.c
-+++ b/drivers/net/ethernet/sfc/tc.c
-@@@ -1657,11 -2087,17 +2087,17 @@@ int efx_init_tc(struct efx_nic *efx
-  	rc =3D efx_tc_configure_fallback_acts_reps(efx);
-  	if (rc)
-  		return rc;
-- 	rc =3D flow_indr_dev_register(efx_tc_indr_setup_cb, efx);
-+ 	rc =3D efx_mae_get_tables(efx);
-  	if (rc)
-  		return rc;
- -	efx->tc->up =3D true;
-+ 	rc =3D flow_indr_dev_register(efx_tc_indr_setup_cb, efx);
-+ 	if (rc)
-+ 		goto out_free;
- +	efx->tc->up =3D true;
-  	return 0;
-+ out_free:
-+ 	efx_mae_free_tables(efx);
-+ 	return rc;
-  }
- =20
-  void efx_fini_tc(struct efx_nic *efx)
-
---Sig_/4x=_vmcY6dv.NiOPuZaOiYG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTex7cACgkQAVBC80lX
-0GyVTAgApL7cdEzEbkTkd3JPQ6bkSiv5gMEWKD6cg4ClpNAwVrbCNL0lSpHUamqD
-ukvtZKetjrvGYSpAnnJuxP/9PlZEk3YVp6WwQSDa87MG8E1xndsCzFzzjb8iKgHE
-DWLdjObxK+w2asWW0M/5WjiG/93FlfSQTllxaozMfWT/UAV71tmD01pmNRkV9Rix
-gceupG81QEEqQEyoZq2cqGYU9VUJPrCFdoeBtQpoJaInNv8KeCnW6yBof9zdpx/c
-ytm5bRIrbdNgEiZe9BRJXLkK5xyN0VbyhcyB5PQAmboBd5dYx5m9f5CstSNnMp2F
-h1NXqadc5CqCg40WxRoCkT4hIXWXbQ==
-=O70f
------END PGP SIGNATURE-----
-
---Sig_/4x=_vmcY6dv.NiOPuZaOiYG--
+Sure, I'll try to do it. Thank you!
 
