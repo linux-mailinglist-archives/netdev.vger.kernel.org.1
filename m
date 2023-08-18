@@ -1,210 +1,357 @@
-Return-Path: <netdev+bounces-28960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD6EA781425
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 22:11:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A683078142B
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 22:12:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6E6A1C21674
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 20:11:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FB4C2823C5
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 20:12:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D81F1BB4D;
-	Fri, 18 Aug 2023 20:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1930E1BB51;
+	Fri, 18 Aug 2023 20:12:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8820519BCC
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 20:11:30 +0000 (UTC)
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA633C06;
-	Fri, 18 Aug 2023 13:11:29 -0700 (PDT)
-Received: from pps.filterd (m0148664.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37IJUX3g008625;
-	Fri, 18 Aug 2023 20:11:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=pps0720;
- bh=W/EOyQz2SK/L9nyANzwRavjHXH3IzRN7xw0E5nQnlWg=;
- b=fCL9YodghbO0aIdiERuE/nUgTUhKO1f8xdoBrPwlsMTe4uclE+rxD7SaiLvIdLV+cii2
- RDgPfEX/JTzu+3nx9RscPGpPxHQFKvoA+76IVmCY0u9Ua6Q+cl9ToFkVstvaeyCRJzpy
- zYkKJglKUl60najWoTKctTWdrPVOV4ix8+q4WjSuUOCaOpWvskM/kmplOjmbXiAyDc4g
- PbGW5GhGq8InBZh+khXToWcS6V70qfVwSsk+701yzPkHuZKUcSfu3hLLq2vxx88FXSC3
- iz0rFpKn6DvvRWAt6F8zd5NG+MqYfHSaWN63HDoDS5lWexTv5Xrxn9AUUGtjhk0iAO5I Sg== 
-Received: from p1lg14878.it.hpe.com ([16.230.97.204])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3shn5h71ut-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Aug 2023 20:11:12 +0000
-Received: from p1wg14926.americas.hpqcorp.net (unknown [10.119.18.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id F1C2CD2F8;
-	Fri, 18 Aug 2023 20:11:10 +0000 (UTC)
-Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
- p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Fri, 18 Aug 2023 08:11:10 -1200
-Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
- p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
- via Frontend Transport; Fri, 18 Aug 2023 08:11:10 -1200
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (192.58.206.35)
- by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Fri, 18 Aug 2023 08:11:07 -1200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kwFb6di+1nr32BjTfLkuuwmgQUJLqtOsz1Sv4huq7LF0cek5ZvMeBcz+GAoiF6Q7uVwQBRGfY2rKa28/5RmarUuzHosqMxPByc+WGS7KhrcKyYf+4lWvBPiJqYU9kQNTWOQdtMhQV26WXIGlFwItHvWCYgYeC4lxcOIPh6Dq1264OortKM4JQ2f5LO8+LYO4I7c8OH/NT4t75u7RmopNpr1Ux23R5GIcbsVjw1Erj7hRpO1F63rgBEl/ze6YD2SENs2MZ0v9ZZpi5wqUYt/wMTR9tH3QaHDd/svkcrB0y+XvuzOXd1J9nGI2GbZ9bJIJ2U3Ce03n6MAx2cKpNWIXfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W/EOyQz2SK/L9nyANzwRavjHXH3IzRN7xw0E5nQnlWg=;
- b=SYuA0sw+mLNftyfyuxH5l+H6AUbGLBWW6fCcrTOeun5KF+VoZYOtIgJSMY+3xyajQwTiIr0+ZWRNJmsBRU0xZ0ZCsXjVmUKX2dywGC8UlRAJ7+DMJ/MLMrFFJ+equ1BweieSGcDyryzCA8nLOG3TgeX0jymT6dj5hSlRjyuTFb6NbzXTbyoX5OhHks0e5DweFhhHwAlkaANGmvXVJ45jci3TyoMNoF6evZwIeIkaLg5XhHMLHaiXNHMY9VsVX6UQLYc23UGcLTeaNU2H/8DAhF9Jigy+c5CMaaEeqDFEyfqrvQYL+2uGZUqmB6odnGtAnm8HNwZhmUKY9Djki7f1Gw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from MW5PR84MB1914.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::9)
- by PH0PR84MB1647.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:173::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Fri, 18 Aug
- 2023 20:11:06 +0000
-Received: from MW5PR84MB1914.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::3f85:d893:5637:278e]) by MW5PR84MB1914.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::3f85:d893:5637:278e%3]) with mapi id 15.20.6678.029; Fri, 18 Aug 2023
- 20:11:05 +0000
-From: "Hawkins, Nick" <nick.hawkins@hpe.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-        "simon.horman@corigine.com" <simon.horman@corigine.com>,
-        "Verdun, Jean-Marie"
-	<verdun@hpe.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-        "conor+dt@kernel.org" <conor+dt@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
-Thread-Topic: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
-Thread-Index: AQHZ0Ixvto7vnAASrEiTAeghAafYu6/tuDUAgAJzHIA=
-Date: Fri, 18 Aug 2023 20:11:05 +0000
-Message-ID: <88B3833C-19FB-4E4C-A398-E7EF3143ED02@hpe.com>
-References: <20230816215220.114118-1-nick.hawkins@hpe.com>
- <20230816215220.114118-5-nick.hawkins@hpe.com>
- <01e96219-4f0c-4259-9398-bc2e6bc1794f@lunn.ch>
-In-Reply-To: <01e96219-4f0c-4259-9398-bc2e6bc1794f@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Microsoft-MacOutlook/16.75.23071400
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW5PR84MB1914:EE_|PH0PR84MB1647:EE_
-x-ms-office365-filtering-correlation-id: 9a37fd0b-99e7-4828-7670-08dba0274115
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jwbbJdQrWE4Q47aHfOEY23xyDAMywzeVVPQZFNbJ5ILW8y0nsZjLrXCbk8eCIp++eMaNOpdrQ5C2Eqc5ao17OvaJDuH23Y5jepkDBExis5WLQsS8kaFsZw3z3RXE7giFZFUCTu1F3RVP8QTy9ZsOqL7J/MG8l9BvXx+iomXWhUOz7Wq9nvzVkPu1Drl71OcDyjUiZ8AjmrVvdjg0SGPD0ANBQRljuD0iDSk6QxzMKToJk1lGxcUBcVwxh02PopzCONe+UXIIytsZACyeB7yWQYF0bDDjMLZjNWPYWg6vREKbbZxSJ/Mm6IobpS7FH3eYN48bagN4yyxkMs20QkVfngaFQAfkocMqesrh5MS3uE0A7bj88g2RWeFRlEHIZxLyFz18MHtE29s3VLvQv1f6G2ZSEkzy5AE4e237gN6VwHuwjZmEspA/U5taxYdj/Vt2hLapXSt84DYZ/K5Qk5FxzOJqCRIoSYRmt3Dtbe8yLa+SZfLpdgTEO9EPaNfNW3iW7lrDxc3qHzUXam9aPaNEq9OYYs9cWoiy6CtlQmFODhvmvHAyNyLuJ6KgANqP8Nqr2HKEXaMz6cyTYGpSAO9x8cOygujJosQFeHfPi952I+GRUeIT6ODP0aQpuQg348EUusy6VaUPLvsW1vy1ZkxQNw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1914.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(376002)(39860400002)(346002)(1800799009)(186009)(451199024)(4744005)(7416002)(2906002)(83380400001)(6486002)(478600001)(316002)(71200400001)(66476007)(66946007)(6506007)(6916009)(64756008)(66556008)(91956017)(66446008)(76116006)(5660300002)(2616005)(6512007)(8936002)(41300700001)(8676002)(4326008)(54906003)(86362001)(36756003)(33656002)(38100700002)(38070700005)(122000001)(82960400001)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZWh6ZGRmcmI5QUY0bm45bHppVGdHUVBkaW45TWFuS09OUXVZTFJzYnJCQjhZ?=
- =?utf-8?B?cE95SVlsUXJrWk5ZRGRhMnJFOTh4K0ZrM0lIcjdXMlg2bFVLY1JKQ3BBVUkz?=
- =?utf-8?B?OTRxdVoxTDBMWmE3TXVsSWcxcytOVnozUHRkVUtRUkpPMGw5WHBET1NxOUFn?=
- =?utf-8?B?WnpHck9qazd1TWlza3J5dkN6VlJNVXdxWHI5blIrVUU1SFJHbWQ2azBtb3hO?=
- =?utf-8?B?b2x0UjJFUUFzbUN0VzhhaFZOY1dPeDNlc2JiZ2dPRTZXa29rS2R3WnJKMklz?=
- =?utf-8?B?cjgxeWg1cnBpODkzRUdFRFJjOUhWWEF2cVNSQysyZFZpN0RSZVRKem5IVHYv?=
- =?utf-8?B?SUFmUnhQZEpDbGhpQU5JR0VsMEtTRkVBeTZmNWZSOUI0L3Z6YTg0RUZjR3cw?=
- =?utf-8?B?MHcrdzg5WWdzS0tRQ2VBYi9KdlZSN2hJSS9zckpiaDhzMmdOcWFJb0RiQTNQ?=
- =?utf-8?B?bDRsK2RWV1JQT3FYakpIUUl4cXpNMlJHaVkyb2ZnVGJpZXJua3JQeGZXdDhN?=
- =?utf-8?B?QjYrT1FCT1NoUGdzREt0WGlzYytkWnVhbnd0ZVJoZkg5VldBSHhha0x2cDFF?=
- =?utf-8?B?cHNwbjNFSFpOMnE2ZlVJb2kvVFdXNEFUbk1uYVJXUWxvOG9CaFJPbjhpQ05q?=
- =?utf-8?B?MUtXRFJKYnZCRmw3S2Rha3VjMXNpbmJqUE1lVHVId05rT3VVN1pVM0NrZVZQ?=
- =?utf-8?B?d0hHOFJRd1lmS0xyL0d5YXNqb3F6emRUbEE1TUd1SVNvaG1FM2I0T3YrOW9r?=
- =?utf-8?B?L2ZzUHZvamwzeW1BaWVBcFVPRTFZY3cwNlhUZDI3VFRZYjhMRWdWeDZJU1pl?=
- =?utf-8?B?SThuVGVYcFBzS1IvT2RqOVFobXVMN1A4NU8yQjF4RDkxaVhlMkhuWWZVaU0r?=
- =?utf-8?B?V0hFWHNzaCtVRTRQaFRPS1FxUWEyOVAwOS9pSFFmUXRxQUQ4NVFxR3c4aXNv?=
- =?utf-8?B?TzFFbWdUUTV2U0UyUGI4V0xzdmdvcjluSzJHNHNaWWpPZU5yWkVOQUs1WTFH?=
- =?utf-8?B?MXNVaW9zdHE4aTRvemw4bUlnYXpMUUR4N0phNkpUQnB0RFBuc1lMTnJ6SWNU?=
- =?utf-8?B?bDNQckEzWjM4NkhHZENjcExhTFdtVmhMbzlud1hKQUtPSU1FNzlaTTB0bWZi?=
- =?utf-8?B?SVhsM1I2R0pzV1BGK1VFdDhieENiYkgvSVVzRWdmSnFyNUxqSjZQRzRTQzBi?=
- =?utf-8?B?TDhKUnVUbkRRK1ZDaDNJanBsZDNjTGZ3bkJJTU4xWE80Y2FSWXlvS0YxMHRQ?=
- =?utf-8?B?SVVaWmF5ZHNCTTN3ZzZsTVBtVTI5dnRpM1JrZHBPb1VpNm0wUnMvZXRsVG5N?=
- =?utf-8?B?ckZFcFJ2TGQyTkJZVE1RZndaeExkZkhMSVIyVzZWZ2VXSUVMb2Q0SGtwWWFj?=
- =?utf-8?B?V053MmNaTkh1Zm9USmY1NEowakZrdWNuR1BLb2RMSXovVkJmM0pWR2hxTmhO?=
- =?utf-8?B?aXVISGVscnVBUHY2RytoSG5ZNFZwUU1RdU9JeitCQnpGUkNNNXlxd1pvajU5?=
- =?utf-8?B?QmtZdmxiZ1lPMlNIZzRRYTg3cnFkQ2pHeTJvMVB3enk2WmdjVDhlWW0xbjJQ?=
- =?utf-8?B?QlNlUlUydHFIZFVBTG9iYWx4SncyOFJ1bjNSczdRRWpReU9tVEFTYXVLdjdK?=
- =?utf-8?B?SnlRSzQzNnB1S2lsWTBMK2xFTmhkSUY3UzdCNWlxM2ZoVUhvU2RrUFc3Q0RO?=
- =?utf-8?B?eTBQVFFnSmhwS1c5c0gyUFk5TmswUXZmTmlVdHdES2tCQ1ZITGxnOWlOcFdy?=
- =?utf-8?B?SUJHSWUwQ0w5c3FJQVFsLzNCbGxpVllRYzQyZjFkOENvbUhsdWNXRURXalBs?=
- =?utf-8?B?WHlVdlRGY2NjVUd6TExRMERmUkRpL2drOFp1dDUyQ3FEZEliS0pFWml6WEh5?=
- =?utf-8?B?eHJRa3JxV3BnQ0hoaC9nZGNVQWJuZW9OQThwVkFUcHMvZVZOZ0NCUGRsT1hR?=
- =?utf-8?B?eE9VdmRvWUtVL3pjeVAvU3dybFBBaGxnMkdodEtxOGdXUHlLZ01jVWFPVTVs?=
- =?utf-8?B?KzFodzJtVEFZYmVnaW1kbW1VSEdCVGg3NHg5QUVMc0tmZ3FTVkJvMlVML1ox?=
- =?utf-8?B?TjZkU054dkwyYzFPZGVuektPbTd2Vk9aQWx2MThaRTJneWlBRnlDZjVXcWdw?=
- =?utf-8?B?aEQ3UE96MExXZnFiT2tLajcyUEllSXhicG1PeHpkVGdKQWZUbTNtbXFpTTYz?=
- =?utf-8?B?T2FPZ09tRHBIWDhKaEZ6ZS9XQlFSZHJvaEpZNlQ3ZTZMS1lRSkwvcUhnZ1ZJ?=
- =?utf-8?B?aWFRRVhVb05uVkNTQVFaWnZsNUJRPT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4FA8331DFE3A8943982D568AE0774279@NAMPRD84.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464AC19BCC
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 20:12:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72932C433C7;
+	Fri, 18 Aug 2023 20:12:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692389545;
+	bh=2J9mZCtn5b7jC6cUUud8wEYdOLbQaF+FTWWcksyybP0=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=Q7nyzk6y/dp4w5fAHbKd7dOd8LkjaNdz0lvBb7SSja6hSN1JrgzEwWfZNW2MQzkzX
+	 ej2/aLt+npkuzlbv3WSpKUIL6L3qg0oCDSNNVGIyJbSNQgxiJoHLtCsQeT5NsGxzdw
+	 rtxO5t1PBnNs7B1m5aVLXbrWFwggmAT+LtwsyqMJXkt+RIGJCCAVSv1ngFuzP1MVmP
+	 RuhKKmA0qzwqYS7YnFeq7ZYCiOswp1dvvURpIZBWnFoLElvKou1qgJtiBRxv6v7JFN
+	 7/z+2nFy8IEKmwvq+5nMIETlS4GE/uCMtDWxykymlZG/NjW6vxbO+KkoUE4cVC+yPF
+	 7o84cpxiTUb6A==
+Message-ID: <a32e7ee72f47f5e25abd95d4db2fc6d50e32d5a2.camel@kernel.org>
+Subject: Re: [PATCH v2] creds: Convert cred.usage to refcount_t
+From: Jeff Layton <jlayton@kernel.org>
+To: Kees Cook <keescook@chromium.org>, linux-hardening@vger.kernel.org
+Cc: Elena Reshetova <elena.reshetova@intel.com>, David Windsor
+ <dwindsor@gmail.com>, Hans Liljestrand <ishkamiel@gmail.com>, Trond
+ Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
+ <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Neil Brown
+ <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,  Dai Ngo
+ <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Sergey Senozhatsky
+ <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Alexey Gladkov <legion@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Yu Zhao <yuzhao@google.com>,
+ linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+ netdev@vger.kernel.org
+Date: Fri, 18 Aug 2023 16:12:22 -0400
+In-Reply-To: <20230818041740.gonna.513-kees@kernel.org>
+References: <20230818041740.gonna.513-kees@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1914.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a37fd0b-99e7-4828-7670-08dba0274115
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Aug 2023 20:11:05.8593
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Huq4N4+X9zXVSUVSGpQ6ADRXBfA+b62i5tiQnkB1ovMFdVtrceUK/EJ4Env9qlAhCDo4aa0ey5pCBo6NXcCYLw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR84MB1647
-X-OriginatorOrg: hpe.com
-X-Proofpoint-ORIG-GUID: FJntL7voDYBIxWvvVtPrM6qsHeVUfH1s
-X-Proofpoint-GUID: FJntL7voDYBIxWvvVtPrM6qsHeVUfH1s
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-18_25,2023-08-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0 bulkscore=0
- mlxlogscore=903 adultscore=0 malwarescore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308180183
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-SGkgQW5kcmV3LA0K77u/DQo+ID4gKyBsZW5ndGggPSAxNTE0Ow0KPiA+ICsgfQ0KPiA+ICsNCj4g
-PiArIG1lbXNldChwZnJhbWUsIDAsIFVNQUNfTUFYX0ZSQU1FX1NJWkUpOw0KPiA+ICsgbWVtY3B5
-KHBmcmFtZSwgc2tiLT5kYXRhLCBsZW5ndGgpOw0KDQoNCj4gSXMgdGhpcyBjYWNoZWQgb3IgdW5j
-YWNoZWQgbWVtb3J5PyB1bmNhY2hlZCBpcyBleHBhbnNpdmUgc28geW91IHdhbnQNCj4gdG8gYXZv
-aWQgdG91Y2hpbmcgaXQgdHdpY2UuIERlcGVuZGluZyBvbiBob3cgYnVzeSB5b3VyIGNhY2hlIGlz
-LA0KPiB0b3VjaGluZyBpdCB0d2ljZSBtaWdodCBjYXVzZSBpdCB0byBleHBlbGxlZCBmcm9tIEwx
-IG9uIHRoZSBmaXJzdA0KPiB3cml0ZSwgc28geW91IGNvdWxkIGJlIHdyaXRpbmcgdG8gTDIgdHdp
-Y2UgZm9yIG5vIHJlYXNvbi4gRG8gdGhlIG1hdGgNCj4gYW5kIGNhbGN1bGF0ZSB0aGUgdGFpbCBz
-cGFjZSB5b3UgbmVlZCB0byB6ZXJvLg0KDQo+IEkgd291bGQgYWxzbyBzdWdnZXN0IHlvdSBsb29r
-IGF0IHRoZSBwYWdlIHBvb2wgY29kZSBhbmQgdXNlIHRoYXQgZm9yDQo+IGFsbCB5b3UgYnVmZmVy
-IGhhbmRsaW5nLiBJdCBpcyBsaWtlbHkgdG8gYmUgbW9yZSBlZmZpY2llbnQgdGhhbiB3aGF0DQo+
-IHlvdSBoYXZlIGhlcmUuDQoNCldvdWxkIHRoaXMgYmUgdGhlICNpbmNsdWRlIDxsaW51eC9kbWFw
-b29sLmg+IGxpYnJhcnk/DQoNClRoYW5rIHlvdSBmb3IgdGhlIGFzc2lzdGFuY2UsDQoNCi1OaWNr
-IEhhd2tpbnMNCg0K
+On Thu, 2023-08-17 at 21:17 -0700, Kees Cook wrote:
+> From: Elena Reshetova <elena.reshetova@intel.com>
+>=20
+> atomic_t variables are currently used to implement reference counters
+> with the following properties:
+>  - counter is initialized to 1 using atomic_set()
+>  - a resource is freed upon counter reaching zero
+>  - once counter reaches zero, its further
+>    increments aren't allowed
+>  - counter schema uses basic atomic operations
+>    (set, inc, inc_not_zero, dec_and_test, etc.)
+>=20
+> Such atomic variables should be converted to a newly provided
+> refcount_t type and API that prevents accidental counter overflows and
+> underflows. This is important since overflows and underflows can lead
+> to use-after-free situation and be exploitable.
+>=20
+> The variable cred.usage is used as pure reference counter. Convert it
+> to refcount_t and fix up the operations.
+>=20
+> **Important note for maintainers:
+>=20
+> Some functions from refcount_t API defined in refcount.h have different
+> memory ordering guarantees than their atomic counterparts. Please check
+> Documentation/core-api/refcount-vs-atomic.rst for more information.
+>=20
+> Normally the differences should not matter since refcount_t provides
+> enough guarantees to satisfy the refcounting use cases, but in some
+> rare cases it might matter.  Please double check that you don't have
+> some undocumented memory guarantees for this variable usage.
+>=20
+> For the cred.usage it might make a difference in following places:
+>  - get_task_cred(): increment in refcount_inc_not_zero() only
+>    guarantees control dependency on success vs. fully ordered atomic
+>    counterpart
+>  - put_cred(): decrement in refcount_dec_and_test() only
+>    provides RELEASE ordering and ACQUIRE ordering on success vs. fully
+>    ordered atomic counterpart
+>=20
+> Suggested-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+> Reviewed-by: David Windsor <dwindsor@gmail.com>
+> Reviewed-by: Hans Liljestrand <ishkamiel@gmail.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+> v2: rebase
+> v1: https://lore.kernel.org/lkml/20200612183450.4189588-4-keescook@chromi=
+um.org/
+> ---
+>  include/linux/cred.h |  8 ++++----
+>  kernel/cred.c        | 42 +++++++++++++++++++++---------------------
+>  net/sunrpc/auth.c    |  2 +-
+>  3 files changed, 26 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/include/linux/cred.h b/include/linux/cred.h
+> index 8661f6294ad4..bf1c142afcec 100644
+> --- a/include/linux/cred.h
+> +++ b/include/linux/cred.h
+> @@ -109,7 +109,7 @@ static inline int groups_search(const struct group_in=
+fo *group_info, kgid_t grp)
+>   * same context as task->real_cred.
+>   */
+>  struct cred {
+> -	atomic_t	usage;
+> +	refcount_t	usage;
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	atomic_t	subscribers;	/* number of processes subscribed */
+>  	void		*put_addr;
+> @@ -229,7 +229,7 @@ static inline bool cap_ambient_invariant_ok(const str=
+uct cred *cred)
+>   */
+>  static inline struct cred *get_new_cred(struct cred *cred)
+>  {
+> -	atomic_inc(&cred->usage);
+> +	refcount_inc(&cred->usage);
+>  	return cred;
+>  }
+> =20
+> @@ -261,7 +261,7 @@ static inline const struct cred *get_cred_rcu(const s=
+truct cred *cred)
+>  	struct cred *nonconst_cred =3D (struct cred *) cred;
+>  	if (!cred)
+>  		return NULL;
+> -	if (!atomic_inc_not_zero(&nonconst_cred->usage))
+> +	if (!refcount_inc_not_zero(&nonconst_cred->usage))
+>  		return NULL;
+>  	validate_creds(cred);
+>  	nonconst_cred->non_rcu =3D 0;
+> @@ -285,7 +285,7 @@ static inline void put_cred(const struct cred *_cred)
+> =20
+>  	if (cred) {
+>  		validate_creds(cred);
+> -		if (atomic_dec_and_test(&(cred)->usage))
+> +		if (refcount_dec_and_test(&(cred)->usage))
+>  			__put_cred(cred);
+>  	}
+>  }
+> diff --git a/kernel/cred.c b/kernel/cred.c
+> index bed458cfb812..33090c43bcac 100644
+> --- a/kernel/cred.c
+> +++ b/kernel/cred.c
+> @@ -39,7 +39,7 @@ static struct group_info init_groups =3D { .usage =3D R=
+EFCOUNT_INIT(2) };
+>   * The initial credentials for the initial task
+>   */
+>  struct cred init_cred =3D {
+> -	.usage			=3D ATOMIC_INIT(4),
+> +	.usage			=3D REFCOUNT_INIT(4),
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	.subscribers		=3D ATOMIC_INIT(2),
+>  	.magic			=3D CRED_MAGIC,
+> @@ -99,17 +99,17 @@ static void put_cred_rcu(struct rcu_head *rcu)
+> =20
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	if (cred->magic !=3D CRED_MAGIC_DEAD ||
+> -	    atomic_read(&cred->usage) !=3D 0 ||
+> +	    refcount_read(&cred->usage) !=3D 0 ||
+>  	    read_cred_subscribers(cred) !=3D 0)
+>  		panic("CRED: put_cred_rcu() sees %p with"
+>  		      " mag %x, put %p, usage %d, subscr %d\n",
+>  		      cred, cred->magic, cred->put_addr,
+> -		      atomic_read(&cred->usage),
+> +		      refcount_read(&cred->usage),
+>  		      read_cred_subscribers(cred));
+>  #else
+> -	if (atomic_read(&cred->usage) !=3D 0)
+> +	if (refcount_read(&cred->usage) !=3D 0)
+>  		panic("CRED: put_cred_rcu() sees %p with usage %d\n",
+> -		      cred, atomic_read(&cred->usage));
+> +		      cred, refcount_read(&cred->usage));
+>  #endif
+> =20
+>  	security_cred_free(cred);
+> @@ -135,10 +135,10 @@ static void put_cred_rcu(struct rcu_head *rcu)
+>  void __put_cred(struct cred *cred)
+>  {
+>  	kdebug("__put_cred(%p{%d,%d})", cred,
+> -	       atomic_read(&cred->usage),
+> +	       refcount_read(&cred->usage),
+>  	       read_cred_subscribers(cred));
+> =20
+> -	BUG_ON(atomic_read(&cred->usage) !=3D 0);
+> +	BUG_ON(refcount_read(&cred->usage) !=3D 0);
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	BUG_ON(read_cred_subscribers(cred) !=3D 0);
+>  	cred->magic =3D CRED_MAGIC_DEAD;
+> @@ -162,7 +162,7 @@ void exit_creds(struct task_struct *tsk)
+>  	struct cred *cred;
+> =20
+>  	kdebug("exit_creds(%u,%p,%p,{%d,%d})", tsk->pid, tsk->real_cred, tsk->c=
+red,
+> -	       atomic_read(&tsk->cred->usage),
+> +	       refcount_read(&tsk->cred->usage),
+>  	       read_cred_subscribers(tsk->cred));
+> =20
+>  	cred =3D (struct cred *) tsk->real_cred;
+> @@ -221,7 +221,7 @@ struct cred *cred_alloc_blank(void)
+>  	if (!new)
+>  		return NULL;
+> =20
+> -	atomic_set(&new->usage, 1);
+> +	refcount_set(&new->usage, 1);
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	new->magic =3D CRED_MAGIC;
+>  #endif
+> @@ -267,7 +267,7 @@ struct cred *prepare_creds(void)
+>  	memcpy(new, old, sizeof(struct cred));
+> =20
+>  	new->non_rcu =3D 0;
+> -	atomic_set(&new->usage, 1);
+> +	refcount_set(&new->usage, 1);
+>  	set_cred_subscribers(new, 0);
+>  	get_group_info(new->group_info);
+>  	get_uid(new->user);
+> @@ -356,7 +356,7 @@ int copy_creds(struct task_struct *p, unsigned long c=
+lone_flags)
+>  		get_cred(p->cred);
+>  		alter_cred_subscribers(p->cred, 2);
+>  		kdebug("share_creds(%p{%d,%d})",
+> -		       p->cred, atomic_read(&p->cred->usage),
+> +		       p->cred, refcount_read(&p->cred->usage),
+>  		       read_cred_subscribers(p->cred));
+>  		inc_rlimit_ucounts(task_ucounts(p), UCOUNT_RLIMIT_NPROC, 1);
+>  		return 0;
+> @@ -450,7 +450,7 @@ int commit_creds(struct cred *new)
+>  	const struct cred *old =3D task->real_cred;
+> =20
+>  	kdebug("commit_creds(%p{%d,%d})", new,
+> -	       atomic_read(&new->usage),
+> +	       refcount_read(&new->usage),
+>  	       read_cred_subscribers(new));
+> =20
+>  	BUG_ON(task->cred !=3D old);
+> @@ -459,7 +459,7 @@ int commit_creds(struct cred *new)
+>  	validate_creds(old);
+>  	validate_creds(new);
+>  #endif
+> -	BUG_ON(atomic_read(&new->usage) < 1);
+> +	BUG_ON(refcount_read(&new->usage) < 1);
+> =20
+>  	get_cred(new); /* we will require a ref for the subj creds too */
+> =20
+> @@ -533,13 +533,13 @@ EXPORT_SYMBOL(commit_creds);
+>  void abort_creds(struct cred *new)
+>  {
+>  	kdebug("abort_creds(%p{%d,%d})", new,
+> -	       atomic_read(&new->usage),
+> +	       refcount_read(&new->usage),
+>  	       read_cred_subscribers(new));
+> =20
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	BUG_ON(read_cred_subscribers(new) !=3D 0);
+>  #endif
+> -	BUG_ON(atomic_read(&new->usage) < 1);
+> +	BUG_ON(refcount_read(&new->usage) < 1);
+>  	put_cred(new);
+>  }
+>  EXPORT_SYMBOL(abort_creds);
+> @@ -556,7 +556,7 @@ const struct cred *override_creds(const struct cred *=
+new)
+>  	const struct cred *old =3D current->cred;
+> =20
+>  	kdebug("override_creds(%p{%d,%d})", new,
+> -	       atomic_read(&new->usage),
+> +	       refcount_read(&new->usage),
+>  	       read_cred_subscribers(new));
+> =20
+>  	validate_creds(old);
+> @@ -579,7 +579,7 @@ const struct cred *override_creds(const struct cred *=
+new)
+>  	alter_cred_subscribers(old, -1);
+> =20
+>  	kdebug("override_creds() =3D %p{%d,%d}", old,
+> -	       atomic_read(&old->usage),
+> +	       refcount_read(&old->usage),
+>  	       read_cred_subscribers(old));
+>  	return old;
+>  }
+> @@ -597,7 +597,7 @@ void revert_creds(const struct cred *old)
+>  	const struct cred *override =3D current->cred;
+> =20
+>  	kdebug("revert_creds(%p{%d,%d})", old,
+> -	       atomic_read(&old->usage),
+> +	       refcount_read(&old->usage),
+>  	       read_cred_subscribers(old));
+> =20
+>  	validate_creds(old);
+> @@ -728,7 +728,7 @@ struct cred *prepare_kernel_cred(struct task_struct *=
+daemon)
+> =20
+>  	*new =3D *old;
+>  	new->non_rcu =3D 0;
+> -	atomic_set(&new->usage, 1);
+> +	refcount_set(&new->usage, 1);
+>  	set_cred_subscribers(new, 0);
+>  	get_uid(new->user);
+>  	get_user_ns(new->user_ns);
+> @@ -843,7 +843,7 @@ static void dump_invalid_creds(const struct cred *cre=
+d, const char *label,
+>  	printk(KERN_ERR "CRED: ->magic=3D%x, put_addr=3D%p\n",
+>  	       cred->magic, cred->put_addr);
+>  	printk(KERN_ERR "CRED: ->usage=3D%d, subscr=3D%d\n",
+> -	       atomic_read(&cred->usage),
+> +	       refcount_read(&cred->usage),
+>  	       read_cred_subscribers(cred));
+>  	printk(KERN_ERR "CRED: ->*uid =3D { %d,%d,%d,%d }\n",
+>  		from_kuid_munged(&init_user_ns, cred->uid),
+> @@ -917,7 +917,7 @@ void validate_creds_for_do_exit(struct task_struct *t=
+sk)
+>  {
+>  	kdebug("validate_creds_for_do_exit(%p,%p{%d,%d})",
+>  	       tsk->real_cred, tsk->cred,
+> -	       atomic_read(&tsk->cred->usage),
+> +	       refcount_read(&tsk->cred->usage),
+>  	       read_cred_subscribers(tsk->cred));
+> =20
+>  	__validate_process_creds(tsk, __FILE__, __LINE__);
+> diff --git a/net/sunrpc/auth.c b/net/sunrpc/auth.c
+> index 2f16f9d17966..f9f406249e7d 100644
+> --- a/net/sunrpc/auth.c
+> +++ b/net/sunrpc/auth.c
+> @@ -39,7 +39,7 @@ static LIST_HEAD(cred_unused);
+>  static unsigned long number_cred_unused;
+> =20
+>  static struct cred machine_cred =3D {
+> -	.usage =3D ATOMIC_INIT(1),
+> +	.usage =3D REFCOUNT_INIT(1),
+>  #ifdef CONFIG_DEBUG_CREDENTIALS
+>  	.magic =3D CRED_MAGIC,
+>  #endif
+
+I wonder what sort of bugs this will uncover.
+
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
 
