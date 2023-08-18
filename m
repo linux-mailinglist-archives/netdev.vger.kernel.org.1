@@ -1,60 +1,70 @@
-Return-Path: <netdev+bounces-28783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16429780AE1
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 13:14:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B3CC780AED
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 13:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366021C20EF7
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 11:14:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 448F7282362
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 11:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B347182B3;
-	Fri, 18 Aug 2023 11:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22B8182B7;
+	Fri, 18 Aug 2023 11:19:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F227BA52
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 11:14:48 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7D535B8
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 04:14:42 -0700 (PDT)
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1692357280;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5RWtMebPINc9nlpUdigpR3AXP20xj3BkWdGCH5BcDhc=;
-	b=PYyJTQZtcWaCylg0JZVHYt/1SsAmfXrwCU9WLhiCEngNvVuugWZ+WoQoaXmA1rol+opcWa
-	X/AXYrtkHzvKeectvEwcDIaDNHqQGkmwIpnlWeSsWHyD5FjblgYIwRf/OutoMCNLFNrY/G
-	sNGRQGSO2ucZlFx5jAE5xIh0DvtciVn/OQTrlvxdjUsEChFtIIhUyPA67rT3Ii7jpWCi8R
-	TlrAJG5S5Hs3CJyyzZMTHi3mZJeN0FOUZSqxp5dOEX/Mcn/rY/G/zyOxoBencn6EZo78Q2
-	eslBbSHg5qhsp13QOqg6l6fmVFlfK+Fdu61jQhOWMY+8Q0zBgjfir3fvlBOj4A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1692357280;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5RWtMebPINc9nlpUdigpR3AXP20xj3BkWdGCH5BcDhc=;
-	b=kOzWYmUbnD5Psdigr7xXFuQ9b3CmrdXdCYPwICda/4OsOplVnkpsNrVL7oEWe4V3yyzpmD
-	huzdn2fjuKp3bDDA==
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Johannes Zink <j.zink@pengutronix.de>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>
-Subject: [PATCH net-next] stmmac: intel: Enable correction of MAC propagation delay
-Date: Fri, 18 Aug 2023 13:14:01 +0200
-Message-Id: <20230818111401.77962-1-kurt@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DC918031
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 11:19:34 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0BB03AB4
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 04:19:30 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fe12820bffso7624665e9.3
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 04:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692357569; x=1692962369;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=keSkFVFOG1xXMD2Ss8XWjzvdB6PzmAvHeqofcO2CUFU=;
+        b=uF9HSyxZdrU8bMAF+Hzbpr5904qQqBl/bJ+w/Xlq1Szx8/pgjrc5B0jSfwTFRzEm4N
+         XPWJRRuSZQ4NbQA9MV3ljVOVgj+dhGrcsmIvMT1bhEqyqKX1CFmW464ZtsWxuWToZlss
+         vEXt1UZ2x7V5c0GKsfzR5xoLu0jKoZX5rU/J+EqhT3r281DbsYI1P0wlsHeAhnvZMiUH
+         AN2+/UEvcthbvIe4bLTRL59WU4QEqZ2RC4m1neyCxMmZxxxsvjhZhn3UjqKwKVAONTVw
+         ZloNNrlvWWC6ny+ljiO4Xxta32uAZU3eq4qI8Sl8pj6fMwR8WTeVmUK43RIuVtIwCs/x
+         gR0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692357569; x=1692962369;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=keSkFVFOG1xXMD2Ss8XWjzvdB6PzmAvHeqofcO2CUFU=;
+        b=ekq7nFsCLpcbC8nK4ODDrsVqNajaY/zPyFLtcfEqbb/9QeJ1/DHVKSfolBeHJTNfhD
+         m/pEowc90Q6UJhQHqibC3vm/DvLOdtur6pHR+j2CE7KpdOSeRxkWuiIgjxxR+tb+JT9x
+         jIcpO6d+UkO3YFGWPk4yi/FcVS9+Jp0XXTBCYeKFWZ8IKkhu3fY9jTJqEE6Zwnn+mxWK
+         MQtwygfqy+diivqrRLqWrAKth8lLovWKXzMv4BnNikM5Cm/YKfVAtu/rET8OnJURt3gi
+         /D3DH9pE8dhA2ABaNGe4hC/kT6voh76Cpye48ueTdWtT/8jWx3//FSbhV3PKD67epLMD
+         qh3Q==
+X-Gm-Message-State: AOJu0YzphJKbzm6FjndWUFsEolekbdCi2TUD0luBVFx4jo83FqTjsbQD
+	YbatFkPpLRAfEYXIe4bkIuv5v6UJrud07zuRRC68gA==
+X-Google-Smtp-Source: AGHT+IEL9qpTUTqbLAc37QmG92g2/q9Aj7NqbyV1SMtgwOskN/MaN7F7sFmFZsC68bx0slhKNwZK7Q==
+X-Received: by 2002:a5d:5109:0:b0:317:5b1b:1a40 with SMTP id s9-20020a5d5109000000b003175b1b1a40mr1626683wrt.49.1692357569025;
+        Fri, 18 Aug 2023 04:19:29 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id b14-20020a5d4b8e000000b0031434c08bb7sm2430454wrt.105.2023.08.18.04.19.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 04:19:28 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: [patch net-next] tools: ynl-gen: use temporary file for rendering
+Date: Fri, 18 Aug 2023 13:19:27 +0200
+Message-ID: <20230818111927.2237134-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,44 +72,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-All captured timestamps should be corrected by PHY, MAC and CDC introduced
-latency/errors. The CDC correction is already used. Enable MAC propagation delay
-correction as well which is available since commit 26cfb838aa00 ("net: stmmac:
-correct MAC propagation delay").
+From: Jiri Pirko <jiri@nvidia.com>
 
-Before:
-|ptp4l[390.458]: rms    7 max   21 freq   +177 +/-  14 delay   357 +/-   1
+Currently any error during render leads to output an empty file.
+That is quite annoying when using tools/net/ynl/ynl-regen.sh
+which git greps files with content of "YNL-GEN.." and therefore ignores
+empty files. So once you fail to regen, you have to checkout the file.
 
-After:
-|ptp4l[620.012]: rms    7 max   20 freq   +195 +/-  14 delay   345 +/-   1
+Avoid that by rendering to a temporary file first, only at the end
+copy the content to the actual destination.
 
-Tested on Intel Elkhart Lake.
-
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/net/ynl/ynl-gen-c.py | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index 979c755964b1..a3a249c63598 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -627,6 +627,7 @@ static int ehl_common_data(struct pci_dev *pdev,
- 	plat->rx_queues_to_use = 8;
- 	plat->tx_queues_to_use = 8;
- 	plat->flags |= STMMAC_FLAG_USE_PHY_WOL;
-+	plat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY;
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 5f39d2490655..bdff8dfc29c9 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -5,6 +5,8 @@ import argparse
+ import collections
+ import os
+ import re
++import shutil
++import tempfile
+ import yaml
  
- 	plat->safety_feat_cfg->tsoee = 1;
- 	plat->safety_feat_cfg->mrxpee = 1;
+ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, SpecEnumEntry
+@@ -2304,7 +2306,7 @@ def main():
+     parser.add_argument('-o', dest='out_file', type=str)
+     args = parser.parse_args()
+ 
+-    out_file = open(args.out_file, 'w+') if args.out_file else os.sys.stdout
++    tmp_file = tempfile.TemporaryFile('w+') if args.out_file else os.sys.stdout
+ 
+     if args.header is None:
+         parser.error("--header or --source is required")
+@@ -2329,7 +2331,7 @@ def main():
+         print(f'Message enum-model {parsed.msg_id_model} not supported for {args.mode} generation')
+         os.sys.exit(1)
+ 
+-    cw = CodeWriter(BaseNlLib(), out_file)
++    cw = CodeWriter(BaseNlLib(), tmp_file)
+ 
+     _, spec_kernel = find_kernel_root(args.spec)
+     if args.mode == 'uapi' or args.header:
+@@ -2578,6 +2580,10 @@ def main():
+     if args.header:
+         cw.p(f'#endif /* {hdr_prot} */')
+ 
++    if args.out_file:
++        out_file = open(args.out_file, 'w+')
++        tmp_file.seek(0)
++        shutil.copyfileobj(tmp_file, out_file)
+ 
+ if __name__ == "__main__":
+     main()
 -- 
-2.39.2
+2.41.0
 
 
