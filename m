@@ -1,52 +1,71 @@
-Return-Path: <netdev+bounces-28799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 606B3780B96
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:15:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA2D780B99
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:16:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1580D28239C
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:15:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2762F2823AA
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC19C182DF;
-	Fri, 18 Aug 2023 12:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52DA18AE2;
+	Fri, 18 Aug 2023 12:15:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F230F182B1
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 12:14:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4960C433C8;
-	Fri, 18 Aug 2023 12:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692360897;
-	bh=w6FNTVBuQt9tbVAVP1ItJQdCLgQiAdvFQrWq6PaI3kU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gcJ3C3ny9mIZx0FXxtuJwFKaw8F61tdSt/SjB6QmDoWk6rDxJFsHMR1oUl/8KL/hg
-	 rZLPVvMa1oKLNtV6LTr6h2GOupMcxQD4CQYtIaBngSFgUn18CIsfuJyf1xLa6aqu5+
-	 25SWoITQRwIe1IlDTrIeII1zdclqhbptChES3erfaisJjIXBhvsj2/rvPQQbDj6pLz
-	 SLVSkCRW5SQA6ndKG5pkK8kOpALN1wleFWWlTMuwc3izyKwVfujrkqGuINwvsCiJaP
-	 J4d5erWPIc5q0mbY29LXC1U2AkhddHu2lcJenzpir6o90afDwNV8xdFfzxAPfW73Nm
-	 vrmBtMkotoYpw==
-Date: Fri, 18 Aug 2023 14:14:52 +0200
-From: Simon Horman <horms@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Michael Walle <michael@walle.cc>,
-	Richie Pearn <richard.pearn@nxp.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: felix: fix oversize frame dropping for
- always closed tc-taprio gates
-Message-ID: <ZN9gvGTV4qXnFs3c@vergenet.net>
-References: <20230817120111.3522827-1-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B0D17FE9
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 12:15:59 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 677262705
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 05:15:57 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fe426b8583so8148445e9.2
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 05:15:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692360956; x=1692965756;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCgI6ch4syeqbbC+MLzIQRbozJOcNueG12S2nRvRB3g=;
+        b=KGYGlhrItx4oMmSB4E4B2wzb/G5KqQ+DsiHE/S2E0Fcdb9M514IWvfAz5bWmX0kkkU
+         jA6Q9fXG/1WBSkflFBiyKUzwkCoHyCkH+TussngbRS/pOyuUtXjAeXXDX2Gy2q79867U
+         Zk68Huw/zSfGKac6Y/MyBpp4WxU8YB9QhsqVN0P9A5juNcfJYVTP8xOPb0fW6LW0Yael
+         eyHelAdxY2PXhdS6Dt+Zqdti4GPzcatjq6JKVPuCZNYVu1hnfmPqPaiPC0/LuIJNPe6w
+         1owBgxnKUAVkvlv7pRAWfMEn2bkzMYl/jKDsjKTDqy3uAExEjtBw0DkDFnTPxAhSHIrv
+         qTCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692360956; x=1692965756;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OCgI6ch4syeqbbC+MLzIQRbozJOcNueG12S2nRvRB3g=;
+        b=Gpvv0nlwSeRJqmoKPnfCEPoU2YxOhA13BaRYIqFyeAwKdPfAUT2hYstwJaw7l35vYM
+         jBT3RAY7WtVj7FnBgqz13W05RmQ8ziqlLOFOlhB4w0tVEC60ewL5GqUGzn34Wt24fAXX
+         82fUfuNn40km2TMEnMtugi3VipRd/1CM8SYp4NtigFhhbc8WHELvJKua0mGidN+p3lN5
+         kcZArl4HnAPUFiDd/VgqelFCIUYo5mDwGnafVAvIM5jnOV1EO7zMS3R0H4+aOOWZJYW6
+         0CM61XNbPLBylK1dhejl+FQegvlf7BvechgtyCrdGyFiI5cIQSA1yZh7W8ZqhAx5pluT
+         mW4Q==
+X-Gm-Message-State: AOJu0YxeKUfftt8mV9tx4cKXWzqrtYDNebn+DuQhITLN285YIQkaQYV5
+	maMExdUyfZBJFNTSfoG9ZodmTw==
+X-Google-Smtp-Source: AGHT+IGuKAK1hI1Rcu2KUZAzVgDhRfKGsoGfU42JO4C95xXOaGB/6yg7KFCSGqBCGUdbFR2BZLMhPg==
+X-Received: by 2002:a5d:650f:0:b0:317:5eb8:b1c4 with SMTP id x15-20020a5d650f000000b003175eb8b1c4mr2436993wru.2.1692360955747;
+        Fri, 18 Aug 2023 05:15:55 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id l13-20020a5d410d000000b003142e438e8csm2629268wrp.26.2023.08.18.05.15.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 05:15:55 -0700 (PDT)
+Date: Fri, 18 Aug 2023 14:15:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/2] net/ethernet/realtek: Add Realtek
+ automotive PCIe driver code
+Message-ID: <ZN9g+dwZcqaX8hTO@nanopsycho>
+References: <20230818115501.209945-1-justinlai0215@realtek.com>
+ <20230818115501.209945-2-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,48 +74,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230817120111.3522827-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20230818115501.209945-2-justinlai0215@realtek.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 17, 2023 at 03:01:11PM +0300, Vladimir Oltean wrote:
-> The blamed commit resolved a bug where frames would still get stuck at
-> egress, even though they're smaller than the maxSDU[tc], because the
-> driver did not take into account the extra 33 ns that the queue system
-> needs for scheduling the frame.
-> 
-> It now takes that into account, but the arithmetic that we perform in
-> vsc9959_tas_remaining_gate_len_ps() is buggy, because we operate on
-> 64-bit unsigned integers, so gate_len_ns - VSC9959_TAS_MIN_GATE_LEN_NS
-> may become a very large integer if gate_len_ns < 33 ns.
-> 
-> In practice, this means that we've introduced a regression where all
-> traffic class gates which are permanently closed will not get detected
-> by the driver, and we won't enable oversize frame dropping for them.
-> 
-> Before:
-> mscc_felix 0000:00:00.5: port 0: max frame size 1526 needs 12400000 ps, 1152000 ps for mPackets at speed 1000
-> mscc_felix 0000:00:00.5: port 0 tc 0 min gate len 1000000, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 1 min gate len 0, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 2 min gate len 0, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 3 min gate len 0, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 4 min gate len 0, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 5 min gate len 0, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 6 min gate len 0, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 7 min gate length 5120 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 615 octets including FCS
-> 
-> After:
-> mscc_felix 0000:00:00.5: port 0: max frame size 1526 needs 12400000 ps, 1152000 ps for mPackets at speed 1000
-> mscc_felix 0000:00:00.5: port 0 tc 0 min gate len 1000000, sending all frames
-> mscc_felix 0000:00:00.5: port 0 tc 1 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-> mscc_felix 0000:00:00.5: port 0 tc 2 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-> mscc_felix 0000:00:00.5: port 0 tc 3 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-> mscc_felix 0000:00:00.5: port 0 tc 4 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-> mscc_felix 0000:00:00.5: port 0 tc 5 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-> mscc_felix 0000:00:00.5: port 0 tc 6 min gate length 0 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 1 octets including FCS
-> mscc_felix 0000:00:00.5: port 0 tc 7 min gate length 5120 ns not enough for max frame size 1526 at 1000 Mbps, dropping frames over 615 octets including FCS
-> 
-> Fixes: 11afdc6526de ("net: dsa: felix: tc-taprio intervals smaller than MTU should send at least one packet")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Fri, Aug 18, 2023 at 01:55:00PM CEST, justinlai0215@realtek.com wrote:
+V>This patch is to add the ethernet device driver for the PCIe interface of Realtek Automotive Ethernet Switch,
+>applicable to RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
+>
+>Below is a simplified block diagram of the chip and its relevant interfaces.
+>
+>          *************************
+>          *                       *
+>          *  CPU network device   *
+>          *    ____________       *
+>          *   |            |      *
+>          *   |  PCIE Host |      *
+>          *************************
+>                    ||
+>                   PCIE
+>                    ||
+>  ****************************************
+>  *          | PCIE Endpoint |           *
+>  *          |---------------|           *
+>  *              | GMAC |                *
+>  *              |------|  Realtek       *
+>  *                 ||   RTL90xx Series  *
+>  *                 ||                   *
+>  *    _____________||______________     *
+>  *   |            |MAC|            |    *
+>  *   |            |---|            |    *
+>  *   |                             |    *
+>  *   |     Ethernet Switch Core    |    *
+>  *   |                             |    *
+>  *   |  -----             -----    |    *
+>  *   |  |MAC| ............|MAC|    |    *
+>  *   |__|___|_____________|___|____|    *
+>  *      |PHY| ............|PHY|         *
+>  *      -----             -----         *
+>  *********||****************||***********
+>
+>The block of the Realtek RTL90xx series is our entire chip architecture, the GMAC is connected to the switch core,
+>and there is no PHY in between. In addition, this driver is mainly used to control GMAC, but does not control the switch core,
+>so it is not the same as DSA.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+[..]
 
+
+>+
+>+#define NETIF_F_ALL_CSUM NETIF_F_CSUM_MASK
+>+
+>+#define NETIF_F_HW_VLAN_RX NETIF_F_HW_VLAN_CTAG_RX
+>+#define NETIF_F_HW_VLAN_TX NETIF_F_HW_VLAN_CTAG_TX
+
+[..]
+
+I see 3 essentials wrong from 10sec review:
+1) You don't cc people who commented your previous versions
+2) You don't respect 72cols for patch description text (checkpatch did
+   warn you, didn't it?)
+3) You are defining very odd macros like these 3
+
+No need to read any longer... Really, can't you please ask someone who
+knows to help you with the submission preparation? You are vasting
+time of people :/
 
