@@ -1,106 +1,158 @@
-Return-Path: <netdev+bounces-28828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48109780E64
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:57:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27F39780EC0
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 17:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8116E2823C4
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:57:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D41BB28240A
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 15:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E454318C1B;
-	Fri, 18 Aug 2023 14:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E165218C22;
+	Fri, 18 Aug 2023 15:13:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09E4182BC
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 14:57:40 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72B63C20;
-	Fri, 18 Aug 2023 07:57:39 -0700 (PDT)
-Date: Fri, 18 Aug 2023 16:57:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1692370658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CD818AF0
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 15:13:24 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1569F3A99
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:13:23 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 963E81F8AE;
+	Fri, 18 Aug 2023 15:13:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1692371601; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mOwQQ0BPTC+PDHYiDUDtHcpcTB1NW9+8Ld9PAqkgYDE=;
-	b=FNe5wH1BmMCD+MYpBezKbUNnxSJQwz+0juzDFjP1Ux27ZYt3zA95YnugM11pxLOdPuoL3p
-	TReycNr5gM+zkPFkMeaRGaRGFDl/FoahCWrdnnFXjubbCSH/4QLxHZTuCCRKifFtPa3FjU
-	YAvLbBjrFecDiL0ycfnLfBFQSXJ2onXzj6sq15KP6MmTNaIFQOKiZLY6eKMxyzh6QyoGMY
-	fRRCFWIaHgibY0cBjHYHEEzT44P1wGzxk5izX0mm5SOWd081WZfbMZUKpzqYeAXSaP2bPg
-	3k2Fk6KGq7Rr9cznBC8b5Eduma5I40oy7vHi1tvq8mk6tyHBPAs11c4mHJKTDg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1692370658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	bh=LxdYcr1vnJw+b1odbztSYmbKBmTxptS12hgcw0XnFlk=;
+	b=bLgw2AXFMjajtWdgM7cPDAd2k3jLV8+fi7vj53wEpLBiey45fKuGKYSodENP4arseU87S7
+	ruumuuxlXrwsaDIUDPZ3Z9AJjLheRmsTUoicbYvsEJKWgxHx9mKydyYfpA0XEt5E9nsN5U
+	b547n8xF8eERR7OWCcLSwos0sWWaUKA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1692371601;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mOwQQ0BPTC+PDHYiDUDtHcpcTB1NW9+8Ld9PAqkgYDE=;
-	b=mlEiYqnAcq5FNW/cwFF73Qm56hxG4sEB5LfPKCvQS+VRaTzA9gk6QYzn8XkGWvISOlhFK8
-	Fv4WpZNat8DP0TBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: Re: [RFC PATCH net-next 0/2] net: Use SMP threads for backlog NAPI.
-Message-ID: <20230818145734.OgLYhPh1@linutronix.de>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814112421.5a2fa4f6@kernel.org>
- <20230817131612.M_wwTr7m@linutronix.de>
- <CAO3-Pbo7q6Y-xzP=3f58Y3MyWT2Vruy6UhKiam2=mAKArxgMag@mail.gmail.com>
+	bh=LxdYcr1vnJw+b1odbztSYmbKBmTxptS12hgcw0XnFlk=;
+	b=BbjDnshtBpNGRaXM1PV3iJEPBfNJuc0QFyVAm/m3gXf+iDTDMFEKNz6hZv/fgQttBrdEmZ
+	E7U+xhpg52/GEhBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DC656138F0;
+	Fri, 18 Aug 2023 15:13:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id N24kM5CK32SRWAAAMHmgww
+	(envelope-from <vbabka@suse.cz>); Fri, 18 Aug 2023 15:13:20 +0000
+Message-ID: <0154b070-8741-5d72-8a45-ea62356991d2@suse.cz>
+Date: Fri, 18 Aug 2023 17:15:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAO3-Pbo7q6Y-xzP=3f58Y3MyWT2Vruy6UhKiam2=mAKArxgMag@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net] net: use SLAB_NO_MERGE for kmem_cache
+ skbuff_head_cache
+Content-Language: en-US
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org
+Cc: Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Mel Gorman <mgorman@techsingularity.net>, Christoph Lameter <cl@linux.com>,
+ roman.gushchin@linux.dev, dsterba@suse.com
+References: <169211265663.1491038.8580163757548985946.stgit@firesoul>
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <169211265663.1491038.8580163757548985946.stgit@firesoul>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-18 09:43:08 [-0500], Yan Zhai wrote:
-> > Looking at the cloudflare ppl here in the thread, I doubt they use
-> > backlog but have proper NAPI so they might not need this.
-> >
-> Cloudflare does have backlog usage. On some veths we have to turn GRO
+On 8/15/23 17:17, Jesper Dangaard Brouer wrote:
+> Since v6.5-rc1 MM-tree is merged and contains a new flag SLAB_NO_MERGE
+> in commit d0bf7d5759c1 ("mm/slab: introduce kmem_cache flag SLAB_NO_MERGE")
+> now is the time to use this flag for networking as proposed
+> earlier see link.
+> 
+> The SKB (sk_buff) kmem_cache slab is critical for network performance.
+> Network stack uses kmem_cache_{alloc,free}_bulk APIs to gain
+> performance by amortising the alloc/free cost.
+> 
+> For the bulk API to perform efficiently the slub fragmentation need to
+> be low. Especially for the SLUB allocator, the efficiency of bulk free
+> API depend on objects belonging to the same slab (page).
+> 
+> When running different network performance microbenchmarks, I started
+> to notice that performance was reduced (slightly) when machines had
+> longer uptimes. I believe the cause was 'skbuff_head_cache' got
+> aliased/merged into the general slub for 256 bytes sized objects (with
+> my kernel config, without CONFIG_HARDENED_USERCOPY).
+> 
+> For SKB kmem_cache network stack have other various reasons for
+> not merging, but it varies depending on kernel config (e.g.
+> CONFIG_HARDENED_USERCOPY). We want to explicitly set SLAB_NO_MERGE
+> for this kmem_cache to get most out of kmem_cache_{alloc,free}_bulk APIs.
+> 
+> When CONFIG_SLUB_TINY is configured the bulk APIs are essentially
+> disabled. Thus, for this case drop the SLAB_NO_MERGE flag.
+> 
+> Link: https://lore.kernel.org/all/167396280045.539803.7540459812377220500.stgit@firesoul/
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Oh. Okay.
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
 
-> off to cope with multi-layer encapsulation, and there is also no XDP
-> attached on these interfaces, thus the backlog is used. There are also
-> other usage of backlog, tuntap, loopback and bpf-redirect ingress.
-> Frankly speaking, making a NAPI instance "threaded" itself is not a
-> concern. We have threaded NAPI running on some veth for quite a while,
-> and it performs pretty well. The concern, if any, would be the
-> maturity of new code. I am happy to help derisk with some lab tests
-> and dogfooding if generic agreement is reached to proceed with this
-> idea.
-
-If you have threaded NAPI for veth then you wouldn't be affected by this
-code. However, if you _are_ affected by this and you use veth it would
-be helpful to figure out if you have problems as of net-next and if this
-helps or makes it worse.
-
-As of now Jakub isn't eager to have it and my testing/ convincing is
-quite limited. If nobody else yells that something like that would be
-helpful I would simply go and convince PeterZ/tglx to apply 2/2 of this
-series.
-
-> Yan
-
-Sebastian
+> ---
+>  net/core/skbuff.c |   13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index a298992060e6..92aee3e0376a 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4750,12 +4750,23 @@ static void skb_extensions_init(void)
+>  static void skb_extensions_init(void) {}
+>  #endif
+>  
+> +/* The SKB kmem_cache slab is critical for network performance.  Never
+> + * merge/alias the slab with similar sized objects.  This avoids fragmentation
+> + * that hurts performance of kmem_cache_{alloc,free}_bulk APIs.
+> + */
+> +#ifndef CONFIG_SLUB_TINY
+> +#define FLAG_SKB_NO_MERGE	SLAB_NO_MERGE
+> +#else /* CONFIG_SLUB_TINY - simple loop in kmem_cache_alloc_bulk */
+> +#define FLAG_SKB_NO_MERGE	0
+> +#endif
+> +
+>  void __init skb_init(void)
+>  {
+>  	skbuff_cache = kmem_cache_create_usercopy("skbuff_head_cache",
+>  					      sizeof(struct sk_buff),
+>  					      0,
+> -					      SLAB_HWCACHE_ALIGN|SLAB_PANIC,
+> +					      SLAB_HWCACHE_ALIGN|SLAB_PANIC|
+> +						FLAG_SKB_NO_MERGE,
+>  					      offsetof(struct sk_buff, cb),
+>  					      sizeof_field(struct sk_buff, cb),
+>  					      NULL);
+> 
+> 
 
