@@ -1,85 +1,78 @@
-Return-Path: <netdev+bounces-28816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C279780CB5
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 15:44:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E639780CE6
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 15:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82DD41C215FD
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 13:44:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B73172823B7
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 13:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D5B18B07;
-	Fri, 18 Aug 2023 13:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9252718B08;
+	Fri, 18 Aug 2023 13:49:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FB817AC1
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 13:44:25 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 950B030F5
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 06:44:23 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99c47ef365cso123678666b.0
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 06:44:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E52A182A2
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 13:49:05 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4D44239;
+	Fri, 18 Aug 2023 06:48:40 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9a2033978so14124511fa.0;
+        Fri, 18 Aug 2023 06:48:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692366262; x=1692971062;
+        d=gmail.com; s=20221208; t=1692366513; x=1692971313;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=qNGk7iBvefHQ+A4wocKw0ga+y4CdjtBME57eex7SSrI=;
-        b=QfB5N5eaScrdz8PxarIvo2/CXwDHCb5kNeGCq/1bLWsiLnGKeolAHxBSe+mRfHssFv
-         0OVS4gXek4tAnMkbF7tb6nvfKZkJRLf2LHzGGCw/1bH+FD3DuX+3zHEkJnD+t1ZSeFfa
-         uihUNh87YHUB9HDYrZPbAWpTKdK3l3zLFLrlkFMq1M2D3D+6tRUPCIVUHuPgYgy3Dl5s
-         4eonIAU5WYpS3oLEfraAdYyrpXM6VS71cf+OPwAYsNrCc8YFSHLuKtoCj04c8DBnl/c8
-         NplsGGsR5sKI/oNbYFpqtXBMGF63Fz/PJp9w1QJnsusqSfxAbBenV0tBGNkfTOJ9GQ/A
-         JftA==
+        bh=8p1t0RZ95jeS2zeC4D78C4tIt/Yes0/wvtovg+NSpYM=;
+        b=jGcQwDa3staytUm1JSrRNxLkT6hplqb505kNhpsOlIas3CeNkJio+E+Luk8QDy77Mb
+         glrRLZfBTHnHuQumm0qvkUTQrxlaeVWYICqxcz2NhebBP/yTTr+RBx5rkJGFY5eX0vyA
+         QrsCS507AsOxVXktYntMbioPWZRU94mxneC33Dsuoql37MHPb+zjHf0IJYFEig6PR/nd
+         IE1MJbXXDpXbaLaV/1DmMQFQLT61NdwjKHWNEb0gJZjehCbajtmspMutwdehR2S6Mn4b
+         PXUyNy/D71+5i0uSO7Rp2x0Jp7S3SuXG0QKlMVN/dFqODfUnI4/4qshiC8r7kMDY+myA
+         /WOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692366262; x=1692971062;
+        d=1e100.net; s=20221208; t=1692366513; x=1692971313;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qNGk7iBvefHQ+A4wocKw0ga+y4CdjtBME57eex7SSrI=;
-        b=J5nrXVpmR9ZDWjYd+ArzLGNSa+DPC7IgVYUy7Jkl6sRBSDGN9b4vpAi0JpzSaNHnWX
-         L7jS62Qo0yQ05sLwqWqmUy+tDoxIfxwaelQffmrB2sgGT6xxxCnKw1TC9MIibO3Bj2b6
-         8v5zAdWgxq85U3utE+uVwiPtYxkOcOJf31GWlhd+a/OiOMCxobl4t4Epxy11NiUdyke1
-         Shz+NfBerY+1ePcyyHfY+AsXT6pOmSS0nc9TXho203enkf7vhZ6x4x0/izdycvctaF5j
-         e25RBgg77BB5t3hhuatQAu/BZqBzGWcRzzTtvS08ouAeslJlRtD4nZMSjU76fuYbmXZv
-         uEDA==
-X-Gm-Message-State: AOJu0Yw63OAAz/6Wizq+UM3vH1o9NXFx8pG9I8gwuDG0SHCIKwS2UXWY
-	A2r+JXDedjDtyC5fiIsYUWg=
-X-Google-Smtp-Source: AGHT+IGsdT/Ycgdgu7q3CnXFOnW6OxJInQL89D22+FZUwJBVvQf8XYG+yWhHRyqWCKthj4E0JAXiGQ==
-X-Received: by 2002:a17:906:3145:b0:99c:f966:9ea2 with SMTP id e5-20020a170906314500b0099cf9669ea2mr2037540eje.25.1692366261769;
-        Fri, 18 Aug 2023 06:44:21 -0700 (PDT)
-Received: from skbuf ([188.25.255.94])
-        by smtp.gmail.com with ESMTPSA id sa17-20020a170906edb100b00997d76981e0sm1193354ejb.208.2023.08.18.06.44.20
+        bh=8p1t0RZ95jeS2zeC4D78C4tIt/Yes0/wvtovg+NSpYM=;
+        b=llGihGJWsEFMJS82ilgwYtIjStraJemWAUXvAZdnz1TBexWJxh0CCdsSWeNjMSWQWD
+         sC/BWPgf2eHnAjqgbuB7/nJ7Ie4wWqKsa1yq6SPIoG5KGKE0+JroQZOPtKr23WeFdmYn
+         Hupo1yerJA6S1fQbFlc0S4uCTAM+39tib8OptAiv4YdZocCTXJoIL2vhe9rEOr5ex6MO
+         q0c/jjQcmQpAs/k3Gt6JmAjBea0YN+Js624UjxchfLcvvK7logtlcKDWAlC1JyjoY+ei
+         OrLG0NJWesvJd6neMTlPBqbKHr9SDhqFdZ6n7SYONjSlx2iMuuyrvstrFri0i0Gl62UM
+         2xiQ==
+X-Gm-Message-State: AOJu0Ywsm8iGR2a/t3mk1iPaImk+IkL6I1YqDBFF1njx0fmOWuPhrauu
+	lsFMxRdya3LWF5kAfJNICdj/dgwdP48=
+X-Google-Smtp-Source: AGHT+IGNhePezB7fGFqcm3jFS17KdmuqP8H4ii/Sj5hZgvVgIQN2C4AeBu94IGEBOuVXJLyp4MWMlw==
+X-Received: by 2002:a2e:8386:0:b0:2b6:da1e:d063 with SMTP id x6-20020a2e8386000000b002b6da1ed063mr1577129ljg.45.1692366512799;
+        Fri, 18 Aug 2023 06:48:32 -0700 (PDT)
+Received: from mobilestation ([93.157.254.210])
+        by smtp.gmail.com with ESMTPSA id z23-20020a2e8857000000b002b9ff8450aesm444095ljj.91.2023.08.18.06.48.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 06:44:21 -0700 (PDT)
-Date: Fri, 18 Aug 2023 16:44:19 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mark parsed interface mode for legacy
- switch drivers
-Message-ID: <20230818134419.mcnq7d4aj74yedum@skbuf>
-References: <ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk>
- <055be6c4-3c28-459d-bb52-5ac2ee24f1f1@lunn.ch>
- <ZNpWAsdS8tDv9qKp@shell.armlinux.org.uk>
- <8687110a-5ce8-474c-8c20-ca682a98a94c@lunn.ch>
- <20230817182729.q6rf327t7dfzxiow@skbuf>
- <65657a0e-0b54-4af4-8a38-988b7393a9f5@lunn.ch>
- <20230817191754.vopvjus6gjkojyjz@skbuf>
- <ZN9R00LPUPlkb9sV@shell.armlinux.org.uk>
- <20230818114055.ovuh33cxanwgc63u@skbuf>
- <CACRpkdYf-VwCUFigjb1ZHJfieXkxqLSwVmG_S-SKJQY1bciCHA@mail.gmail.com>
+        Fri, 18 Aug 2023 06:48:32 -0700 (PDT)
+Date: Fri, 18 Aug 2023 16:48:29 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH 3/5] dt-bindings: net: Add Loongson-1 DWMAC glue layer
+Message-ID: <jjpwnfc3bjpw44fdzqmekbxqaqeus34aeuezas3fqrfbsvp4gp@yhv4ig5ypj3g>
+References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
+ <20230812151135.1028780-4-keguang.zhang@gmail.com>
+ <thdwhlbs5salnufag24tqk4txqs3skidhq5nmzdeyxt3ni5pos@duj55rpqskl3>
+ <CAJhJPsV9g2hSu4Ga8bH573JsJsrA_3dwi8T0oQBtq0FydHKrPg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,211 +82,291 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdYf-VwCUFigjb1ZHJfieXkxqLSwVmG_S-SKJQY1bciCHA@mail.gmail.com>
+In-Reply-To: <CAJhJPsV9g2hSu4Ga8bH573JsJsrA_3dwi8T0oQBtq0FydHKrPg@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 18, 2023 at 03:08:52PM +0200, Linus Walleij wrote:
-> On Fri, Aug 18, 2023 at 1:40 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> 
-> > Though, to have more confidence in the validity of the change, I'd need
-> > the phy-mode of the &gmac0 node from arch/arm/boot/dts/gemini/gemini-dlink-dir-685.dts,
-> > and I'm not seeing it.
-> 
-> The assignment of the gmac0 label is in the top-level DTSI:
-> 
-> (...)
->                 ethernet: ethernet@60000000 {
->                         compatible = "cortina,gemini-ethernet";
-> (...)
->                         gmac0: ethernet-port@0 {
->                                 compatible = "cortina,gemini-ethernet-port";
-> (...)
-> 
-> Then in the DIR-685 overlay DTS It looks like this:
-> 
->                 ethernet@60000000 {
->                         status = "okay";
-> 
->                         ethernet-port@0 {
->                                 phy-mode = "rgmii";
->                                 fixed-link {
->                                         speed = <1000>;
->                                         full-duplex;
->                                         pause;
->                                 };
->                         };
->                         ethernet-port@1 {
->                                 /* Not used in this platform */
->                         };
->                 };
-> 
-> Russell pointed out that this style with overlays of nodes are
-> confusing. I agree. If I did it today I would use &gmac0 to
-> configure it. There is a bit of development history here.
+On Fri, Aug 18, 2023 at 06:42:42PM +0800, Keguang Zhang wrote:
+> On Wed, Aug 16, 2023 at 8:54 PM Serge Semin <fancer.lancer@gmail.com> wrote:
+> >
+> > Hi Keguang
+> >
+> > On Sat, Aug 12, 2023 at 11:11:33PM +0800, Keguang Zhang wrote:
+> > > Add devicetree binding document for Loongson-1 DWMAC glue layer.
+> > >
+> > > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> > > ---
+> > >  .../bindings/net/loongson,ls1x-dwmac.yaml     | 98 +++++++++++++++++++
+> > >  .../devicetree/bindings/net/snps,dwmac.yaml   |  2 +
+> > >  2 files changed, 100 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> > > new file mode 100644
+> > > index 000000000000..150799460599
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
+> > > @@ -0,0 +1,98 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/net/loongson,ls1x-dwmac.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> >
+> > > +title: Loongson-1 DWMAC glue layer
+> >
+> > DT-schemas describe a device. It has nothing to do with the glue
+> > driver/layer/whatever.
+> >
 
-Yikes. I totally missed that.
+> OK. But what about the MODULE_DESCRIPTION in dwmac-loongson1.c
+> MODULE_DESCRIPTION("Loongson1 DWMAC glue layer");
+> Should the two parts be aligned with each other?
 
-> > Looking at its driver (drivers/net/ethernet/cortina/gemini.c), I don't
-> > see any handling of RGMII delays, and it accepts any RGMII phy-mode.
-> 
-> The handling of the delays exist and is done orthogonally, from
-> the pin controller, which can assign skewing to pins on the chip.
-> 
-> There are also SoCs that will do clock skewing in the external
-> bus controller, from a driver in drivers/bus such as what
-> drivers/bus/intel-ixp4xx-eb.c is doing for IXP4xx. So there
-> are even several different places where clock skewing/transmit
-> delays can be handled.
-> 
-> For DIR-685 is looks like this:
-> 
->                                 pinctrl-gmii {
->                                         mux {
->                                                 function = "gmii";
->                                                 groups = "gmii_gmac0_grp";
->                                         };
->                                         conf0 {
->                                                 pins = "V8 GMAC0 RXDV", "T10 GMAC1 RXDV",
->                                                      "Y7 GMAC0 RXC", "Y11 GMAC1 RXC",
->                                                      "T8 GMAC0 TXEN", "W11 GMAC1 TXEN",
->                                                      "U8 GMAC0 TXC", "V11 GMAC1 TXC",
->                                                      "W8 GMAC0 RXD0", "V9 GMAC0 RXD1",
->                                                      "Y8 GMAC0 RXD2", "U9 GMAC0 RXD3",
->                                                      "T7 GMAC0 TXD0", "U6 GMAC0 TXD1",
->                                                      "V7 GMAC0 TXD2", "U7 GMAC0 TXD3",
->                                                      "Y12 GMAC1 RXD0", "V12 GMAC1 RXD1",
->                                                      "T11 GMAC1 RXD2", "W12 GMAC1 RXD3",
->                                                      "U10 GMAC1 TXD0", "Y10 GMAC1 TXD1",
->                                                      "W10 GMAC1 TXD2", "T9 GMAC1 TXD3";
->                                                 skew-delay = <7>;
->                                         };
->                                         /* Set up drive strength on GMAC0 to 16 mA */
->                                         conf1 {
->                                                 groups = "gmii_gmac0_grp";
->                                                 drive-strength = <16>;
->                                         };
->                                 };
-> 
-> So skew-delay of 7 steps, each step is ~0.2ns so all pins have a delay
-> of 7*0.2 = 1.4ns.
+No they shouldn't. MODULE_DESCRIPTION() describes the driver module.
+"Loongson1 (G)MAC glue layer" is a correct description of the kernel
+driver module.
 
-Ohhhh, I saw the pinctrl-gmii explanation before, but I didn't understand it.
-I get it now. Sorry.
+> If not, what's your suggestion then?
+
+Something like "Loongson-1 Ethernet controller" or "Loongson-1 (G)MAC
+controller". A name which would refer to the device itself
+irrespective to the driver name, driver design, etc.
+
+* Note the already available DW (XG)MAC vendor-specific DT-bindings
+* referring to the glue layer/driver in the title property are wrong
+* in doing that.
 
 > 
-> > So, if neither the Ethernet controller nor the RTL8366RB switch are
-> > adding RGMII delays,
+> > Also I suggest to add a brief device description in the
+> > "description:" property and add there a brief info regarding the SoCs
+> > the controllers can be found on, the DW (G)MAC IP-core version the
+> > ethernet controllers are based on and if possible some data about the
+> > synthesize parameters: SMA (MDIO-bus), Tx/Rx COE, DMA FIFOs size,
+> > perfect and hash MAC-filters size, L3L4 frame filters availability,
+> > PHY interfaces (MII, RMII, RGMII, etc), EEE support, IEEE 1588(-2008)
+> > Timestamping support, PMT and Wake-up frame support, MAC Management
+> > counters (MMC).
+> >
+> > Note DMA FIFO sizes can be also constrained in the properties
+> > "rx-fifo-depth" and "tx-fifo-depth"; perfect and hash MAC-filter sizes -
+> > in "snps,perfect-filter-entries" and "snps,multicast-filter-bins".
+> >
+> OK. The description could be added in next version.
 > 
-> Actually the SoC is. When the ethernet is probed, it asks for its
-> default pin configuration, and it will applied from the device tree
-> from the above node. It's just that the registers to control them
-> are not in the ethernet hardware block, but in the pin controller.
-> > it becomes plausible that there are skews added
-> > through PCB traces.
+> > > +
+> > > +maintainers:
+> > > +  - Keguang Zhang <keguang.zhang@gmail.com>
+> > > +
+> > > +select:
+> > > +  properties:
+> > > +    compatible:
+> > > +      contains:
+> > > +        enum:
+> > > +          - loongson,ls1b-dwmac
+> > > +          - loongson,ls1c-dwmac
+> > > +  required:
+> > > +    - compatible
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    items:
+> > > +      - enum:
+
+> > > +          - loongson,ls1b-dwmac
+> > > +          - loongson,ls1c-dwmac
+
+BTW referring to the DW IP-core in the compatible string isn't very
+much useful especially seeing you have a generic fallback compatible.
+
+The next names would be more descriptive:
+loongson,ls1b-gmac - seeing MAC supports 10/100/1000 speed modes
+loongson,ls1c-mac - seeing MAC support 10/100 speed modes only
+
+
+> > > +      - const: snps,dwmac-3.50a
+> > > +
+> > > +  reg:
+> > > +    maxItems: 1
+> > > +
+> > > +  clocks:
+> > > +    maxItems: 1
+> > > +
+> > > +  clock-names:
+> > > +    const: stmmaceth
+> > > +
+> > > +  interrupts:
+> > > +    maxItems: 1
+> > > +
+> > > +  interrupt-names:
+> > > +    const: macirq
+> > > +
+> >
+> > > +  syscon:
+> > > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > > +    description:
+> > > +      Phandle to the syscon containing some extra configurations
+> > > +      including PHY interface mode.
+> >
+> > I believe the property is supposed to have a vendor-specific name like
+> > "loongson,ls1-syscon" or similar.
 > 
-> In the DIR-685 example I think it is *both* (yeah...) because it
-> makes no sense that all delays are 1.4ns. I think the PCB
-> routing influence it *too*.
 
-I think that as long as the delays aren't added by the other end
-("PHY"), then phy-mode = "rgmii" would be the adequate mode to describe
-this (even if it only has an informative purpose).
+> This has been fixed in v2.
 
-The delays, even if added by the local system, are added externally to
-the MAC block (given its current bindings). Similar in that regard to
-PCB delays. Which makes the device tree basically correct/consistent in
-that particular aspect.
+The name "loongson,dwmac-syscon" doesn't look correct because "dwmac-"
+prefix refer to some DWMAC system controller meanwhile the phandle
+passed to the device is a generic Loongson1 SoC system controller. So
+"loongson,ls1-syscon" looks more suitable.
 
-> However the D-Link DNS-313 makes more elaborate use of
-> these settings:
+> Could you please review v2?
+> Thanks!
+
+I'll have a look at v3 since v2 doesn't have my comments taken into
+account. BTW don't rush with resubmitting your series. Give it at
+least one week or so to hang out in the reviewers mail boxes as the
+Linux kernel patches review process suggests.
+
+> >
+> > > +
+> > > +required:
+> > > +  - compatible
+> > > +  - reg
+> > > +  - clocks
+> > > +  - clock-names
+> > > +  - interrupts
+> > > +  - interrupt-names
+> > > +  - phy-handle
+> >
+> > > +  - phy-mode
+> >
+> > You may want to specify the enum-constraints with the value permitted
+> > for the particular Loongson (G)MAC controller. Seeing ls1b and ls1c
+> > imply different sets of the PHY-modes the constraints are better to be
+> > defined in the allOf sub-schemas. Alternatively you can split the
+> > DT-schema file into two: one for ls1b-dwmac, another one for
+> > ls1c-dwmac. IMO the later option seems better.
+> >
+
+> The "phy-mode", as pointed by Krzysztof, is defined in
+> ethernet-controller and already required by snps,dwmac.
+> So I have dropped it in v2.
+
+My point was in specifying a particular constraints on the "phy-mode"
+property. Krzysztof correctly suggested to drop the property from the
+"required" list since it's already required by the snps,dwmac.yaml
+schema. One doesn't contradict to another.
+
+> For allOf sub-schemas, do you mean something below?
+> allOf:
+>  - $ref: snps,dwmac.yaml#
 > 
->                                 pinctrl-gmii {
->                                         mux {
->                                                 function = "gmii";
->                                                 groups = "gmii_gmac0_grp";
->                                         };
->                                         /*
->                                          * In the vendor Linux tree, these values are set for the C3
->                                          * version of the SL3512 ASIC with the comment "benson suggest"
->                                          */
->                                         conf0 {
->                                                 pins = "R8 GMAC0 RXDV", "U11 GMAC1 RXDV";
->                                                 skew-delay = <0>;
->                                         };
->                                         conf1 {
->                                                 pins = "T8 GMAC0 RXC";
->                                                 skew-delay = <10>;
->                                         };
->                                         conf2 {
->                                                 pins = "T11 GMAC1 RXC";
->                                                 skew-delay = <15>;
->                                         };
->                                         conf3 {
->                                                 pins = "P8 GMAC0 TXEN", "V11 GMAC1 TXEN";
->                                                 skew-delay = <7>;
->                                         };
->                                         conf4 {
->                                                 pins = "V7 GMAC0 TXC", "P10 GMAC1 TXC";
->                                                 skew-delay = <10>;
->                                         };
->                                         conf5 {
->                                                 /* The data lines all have default skew */
->                                                 pins = "U8 GMAC0 RXD0", "V8 GMAC0 RXD1",
->                                                        "P9 GMAC0 RXD2", "R9 GMAC0 RXD3",
->                                                        "R11 GMAC1 RXD0", "P11 GMAC1 RXD1",
->                                                        "V12 GMAC1 RXD2", "U12 GMAC1 RXD3",
->                                                        "R10 GMAC1 TXD0", "T10 GMAC1 TXD1",
->                                                        "U10 GMAC1 TXD2", "V10 GMAC1 TXD3";
->                                                 skew-delay = <7>;
->                                         };
->                                         conf6 {
->                                                 pins = "U7 GMAC0 TXD0", "T7 GMAC0 TXD1",
->                                                        "R7 GMAC0 TXD2", "P7 GMAC0 TXD3";
->                                                 skew-delay = <5>;
->                                         };
->                                         /* Set up drive strength on GMAC0 to 16 mA */
->                                         conf7 {
->                                                 groups = "gmii_gmac0_grp";
->                                                 drive-strength = <16>;
->                                         };
->                                 };
+>  - if:
+>      properties:
+>        compatible:
+>          contains:
+>            const: loongson,ls1b-dwmac
+>    then:
+>      properties:
+>        phy-mode:
+>          enum:
+>            - mii
+>            - rgmii
 > 
-> So there are definitely systems doing this.
+>  - if:
+>      properties:
+>        compatible:
+>          contains:
+>            const: loongson,ls1c-dwmac
+>    then:
+>      properties:
+>        phy-mode:
+>          enum:
+>            - mii
+>            - rmii
+
+Yes. But IMO in order to prevent having such complicated multi-level
+schemas you can just split up your bindings into two:
+loongson,ls1b-dwmac.yaml
+and
+loongson,ls1c-dwmac.yaml
+
+Thus you'll be able to have a device-specific generic "title" and
+"description" in each of them (especially seeing LS1-C MAC lacks of
+1000Mbps mode support which you said you would add to the bindings
+description), simpler "compatible" and "phy-mode" property
+constraints.
+
+-Serge(y)
+
 > 
-> > In that case, the current phy-mode = "rgmii" would
-> > be the correct choice, and changing that would be invalid. Some more
-> > documentary work would be needed.
+> > -Serge(y)
+> >
+> > > +  - syscon
+> > > +
+> > > +allOf:
+> > > +  - $ref: snps,dwmac.yaml#
+> > > +
+> > > +unevaluatedProperties: false
+> > > +
+> > > +examples:
+> > > +  - |
+> > > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
+> > > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > > +
+> > > +    gmac0: ethernet@1fe10000 {
+> > > +        compatible = "loongson,ls1b-dwmac", "snps,dwmac-3.50a";
+> > > +        reg = <0x1fe10000 0x10000>;
+> > > +
+> > > +        clocks = <&clkc LS1X_CLKID_AHB>;
+> > > +        clock-names = "stmmaceth";
+> > > +
+> > > +        interrupt-parent = <&intc1>;
+> > > +        interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
+> > > +        interrupt-names = "macirq";
+> > > +
+> > > +        phy-handle = <&phy0>;
+> > > +        phy-mode = "mii";
+> > > +
+> > > +        snps,pbl = <1>;
+> > > +        syscon = <&syscon>;
+> > > +
+> > > +        mdio {
+> > > +            #address-cells = <1>;
+> > > +            #size-cells = <0>;
+> > > +            compatible = "snps,dwmac-mdio";
+> > > +
+> > > +            phy0: ethernet-phy@0 {
+> > > +                reg = <0x0>;
+> > > +            };
+> > > +        };
+> > > +    };
+> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > index ddf9522a5dc2..e1a956cf171e 100644
+> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > @@ -66,6 +66,8 @@ properties:
+> > >          - ingenic,x2000-mac
+> > >          - loongson,ls2k-dwmac
+> > >          - loongson,ls7a-dwmac
+> > > +        - loongson,ls1b-dwmac
+> > > +        - loongson,ls1c-dwmac
+> > >          - qcom,qcs404-ethqos
+> > >          - qcom,sa8775p-ethqos
+> > >          - qcom,sc8280xp-ethqos
+> > > --
+> > > 2.39.2
+> > >
 > 
-> Does the above help or did I make it even more confusing :D
-
-It helped a lot, thank you for clarifying.
-
-> If guess I could imagine the delays being configured directly
-> from the ethernet driver if that is highly desired. For the IXP4xx
-> ATA controller (that has similar needs to a network phy) I just
-> shortcut the whole "this goes into the external memory
-> controller" and look up the address space for the delay
-> settings and control these settings directly from the driver.
-> It's not very encapsulated but sometimes the world out there
-> is ugly, and the ATA drivers really want to control this
-> see drivers/ata/pata_ixp4xx_cf.c,
-> ixp4xx_set_8bit_timing() etc.
 > 
-> To do delay set-up fully from the ethernet controller, for Gemini,
-> I would just pull this register range out from the pin controller,
-> remove the pin control stuff in the device tree, and poke it
-> directly from the ethernet driver. It can be done for sure.
-> It's just two different ways to skin the cat.
-
-I'm not sure that making changes there would become necessary.
-
-> I suppose it fully confirms the view that the phy-mode in
-> the ethernet controller is 100% placebo though!
-
-Which is what it should be, IMO.
+> 
+> --
+> Best regards,
+> 
+> Keguang Zhang
 
