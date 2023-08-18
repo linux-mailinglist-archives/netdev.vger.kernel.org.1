@@ -1,145 +1,194 @@
-Return-Path: <netdev+bounces-28832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FADB780EEC
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 17:18:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F31A3780F1E
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 17:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95FA3280DF3
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 15:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB6BA2823F7
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 15:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7965F18C28;
-	Fri, 18 Aug 2023 15:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793F618C3A;
+	Fri, 18 Aug 2023 15:26:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D400182BC
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 15:18:36 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCCE13C1F
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:18:34 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5D9D121890;
-	Fri, 18 Aug 2023 15:18:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1692371913; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6367D18C36
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 15:26:24 +0000 (UTC)
+Received: from out-22.mta1.migadu.com (out-22.mta1.migadu.com [95.215.58.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4805A4204
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:26:22 -0700 (PDT)
+Message-ID: <a1a18bec-e694-9a51-9d88-753baf0e6d2b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1692372380; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nqiekH2F0E2/DDRwg3KGVqWkE2aBPtHmUQq2Q3oCfR8=;
-	b=EpRBuI8IZ7N4y+Fb1IC81VfFtAE0lnIg8bO2Pdtle8MMmVibh8YZauSSqc9T8l79wnWMUQ
-	nIQdLIZDCThqJUJpNdN3tS9dqIFqHEy8Oz5fuudmds1y82cr58EixAkWsJA3LTtBXlBR1w
-	ARoGyE0CJDbM85BTQorWFikMxwKwKvw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1692371913;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nqiekH2F0E2/DDRwg3KGVqWkE2aBPtHmUQq2Q3oCfR8=;
-	b=JbQjzaDCyT9y0UIMBO2L1auErX+f71DPH1ntDCw8bZA9FATVWk+/cadv+eT25ryTxi0yFC
-	/9L85ZCZTGyRAbBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 837A8138F0;
-	Fri, 18 Aug 2023 15:18:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id MXhvHciL32QQWwAAMHmgww
-	(envelope-from <vbabka@suse.cz>); Fri, 18 Aug 2023 15:18:32 +0000
-Message-ID: <7fa57517-cf32-79b9-405d-251997d25414@suse.cz>
-Date: Fri, 18 Aug 2023 17:20:16 +0200
+	bh=rpOkpEVZn5CL5W7EAycreIplkq31utU1vc2qT8RLF0I=;
+	b=eBSx5X1E+DVJxnvdttP+6LGiobNZ2bXieBHa4SYqjjpROll57ltjQHcGaqQuIsY2HRil/w
+	H4f++ByqLdjgVDSFB1I2rb2uicMilticELsV3OLADKQ70uGWAuPiZHzEWRH4CGdc4JfiOB
+	7MMqkNOEj6wpi9+abF+K/C+jZFB5YIg=
+Date: Fri, 18 Aug 2023 08:26:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net] net: use SLAB_NO_MERGE for kmem_cache
- skbuff_head_cache
+Reply-To: yonghong.song@linux.dev
+Subject: Re: [PATCH bpf-next v14 1/4] bpf: Add update_socket_protocol hook
 Content-Language: en-US
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>,
- Matthew Wilcox <willy@infradead.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: brouer@redhat.com, netdev@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Mel Gorman <mgorman@techsingularity.net>, Christoph Lameter <cl@linux.com>,
- roman.gushchin@linux.dev, dsterba@suse.com
-References: <169211265663.1491038.8580163757548985946.stgit@firesoul>
- <ZNufkkauiS20IIJw@casper.infradead.org>
- <0f77001b-8bd3-f72e-7837-cc0d3485aaf8@redhat.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <0f77001b-8bd3-f72e-7837-cc0d3485aaf8@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+To: Geliang Tang <geliang.tang@suse.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Florent Revest <revest@chromium.org>, Brendan Jackman
+ <jackmanb@chromium.org>, Matthieu Baerts <matthieu.baerts@tessares.net>,
+ Mat Martineau <martineau@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ John Johansen <john.johansen@canonical.com>, Paul Moore
+ <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Eric Paris <eparis@parisplace.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <cover.1692147782.git.geliang.tang@suse.com>
+ <ac84be00f97072a46f8a72b4e2be46cbb7fa5053.1692147782.git.geliang.tang@suse.com>
+ <20230818082417.GA20274@bogon>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20230818082417.GA20274@bogon>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/18/23 14:32, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 15/08/2023 17.53, Matthew Wilcox wrote:
->> On Tue, Aug 15, 2023 at 05:17:36PM +0200, Jesper Dangaard Brouer wrote:
->>> For the bulk API to perform efficiently the slub fragmentation need to
->>> be low. Especially for the SLUB allocator, the efficiency of bulk free
->>> API depend on objects belonging to the same slab (page).
+
+
+On 8/18/23 1:24 AM, Geliang Tang wrote:
+> On Wed, Aug 16, 2023 at 09:11:56AM +0800, Geliang Tang wrote:
+>> Add a hook named update_socket_protocol in __sys_socket(), for bpf
+>> progs to attach to and update socket protocol. One user case is to
+>> force legacy TCP apps to create and use MPTCP sockets instead of
+>> TCP ones.
 >>
->> Hey Jesper,
+>> Define a fmod_ret set named bpf_mptcp_fmodret_ids, add the hook
+>> update_socket_protocol into this set, and register it in
+>> bpf_mptcp_kfunc_init().
 >>
->> You probably haven't seen this patch series from Vlastimil:
+>> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/79
+>> Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+>> Acked-by: Yonghong Song <yonghong.song@linux.dev>
+>> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
+>> ---
+>>   net/mptcp/bpf.c | 15 +++++++++++++++
+>>   net/socket.c    | 26 +++++++++++++++++++++++++-
+>>   2 files changed, 40 insertions(+), 1 deletion(-)
 >>
->> https://lore.kernel.org/linux-mm/20230810163627.6206-9-vbabka@suse.cz/
->>
->> I wonder if you'd like to give it a try?  It should provide some immunity
->> to this problem, and might even be faster than the current approach.
->> If it isn't, it'd be good to understand why, and if it could be improved.
-
-I didn't Cc Jesper on that yet, as the initial attempt was focused on
-the maple tree nodes use case. But you'll notice using the percpu array
-requires the cache to be created with SLAB_NO_MERGE anyway, so this
-patch would be still necessary :)
-
-> I took a quick look at:
->  -
-> https://lore.kernel.org/linux-mm/20230810163627.6206-11-vbabka@suse.cz/#Z31mm:slub.c
+>> diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
+>> index 5a0a84ad94af..8a16672b94e2 100644
+>> --- a/net/mptcp/bpf.c
+>> +++ b/net/mptcp/bpf.c
+>> @@ -19,3 +19,18 @@ struct mptcp_sock *bpf_mptcp_sock_from_subflow(struct sock *sk)
+>>   
+>>   	return NULL;
+>>   }
+>> +
+>> +BTF_SET8_START(bpf_mptcp_fmodret_ids)
+>> +BTF_ID_FLAGS(func, update_socket_protocol)
+>> +BTF_SET8_END(bpf_mptcp_fmodret_ids)
+>> +
+>> +static const struct btf_kfunc_id_set bpf_mptcp_fmodret_set = {
+>> +	.owner = THIS_MODULE,
+>> +	.set   = &bpf_mptcp_fmodret_ids,
+>> +};
+>> +
+>> +static int __init bpf_mptcp_kfunc_init(void)
+>> +{
+>> +	return register_btf_fmodret_id_set(&bpf_mptcp_fmodret_set);
+>> +}
+>> +late_initcall(bpf_mptcp_kfunc_init);
+>> diff --git a/net/socket.c b/net/socket.c
+>> index 5d4e37595e9a..fdb5233bf560 100644
+>> --- a/net/socket.c
+>> +++ b/net/socket.c
+>> @@ -1657,12 +1657,36 @@ struct file *__sys_socket_file(int family, int type, int protocol)
+>>   	return sock_alloc_file(sock, flags, NULL);
+>>   }
+>>   
+>> +/*	A hook for bpf progs to attach to and update socket protocol.
+>> + *
+>> + *	A static noinline declaration here could cause the compiler to
+>> + *	optimize away the function. A global noinline declaration will
+>> + *	keep the definition, but may optimize away the callsite.
+>> + *	Therefore, __weak is needed to ensure that the call is still
+>> + *	emitted, by telling the compiler that we don't know what the
+>> + *	function might eventually be.
+>> + *
+>> + *	__diag_* below are needed to dismiss the missing prototype warning.
+>> + */
+>> +
+>> +__diag_push();
+>> +__diag_ignore_all("-Wmissing-prototypes",
+>> +		  "A fmod_ret entry point for BPF programs");
 > 
-> To Vlastimil, sorry but I don't think this approach with spin_lock will
-> be faster than SLUB's normal fast-path using this_cpu_cmpxchg.
+> Hi Martin & Yonghong,
 > 
-> My experience is that SLUB this_cpu_cmpxchg trick is faster than spin_lock.
+> I got a sparse warning for this new added 'update_socket_protocol':
 > 
-> On my testlab CPU E5-1650 v4 @ 3.60GHz:
->  - spin_lock+unlock : 34 cycles(tsc) 9.485 ns
->  - this_cpu_cmpxchg :  5 cycles(tsc) 1.585 ns
->  - locked cmpxchg   : 18 cycles(tsc) 5.006 ns
+>   > touch net/socket.c && make C=1 net/socket.o
+> 
+>   net/socket.c:1676:21: warning: symbol 'update_socket_protocol' was not declared. Should it be static?
 
-Hm that's unexpected difference between spin_lock+unlock where AFAIK
-spin_lock is basically a locked cmpxchg and unlock a simple write, and I
-assume these measurements are on uncontended lock?
+This is a sparse warning. Let us ignore it for now. We already have
+__diag_ignore for missing prototypes in the above, but sparse won't 
+recognize them. Also, 'static' is conflict with '__weak' attribute,
+and we cannot remove '__weak' attribute.
 
-> SLUB does use a cmpxchg_double which I don't have a microbench for.
-
-Yeah it's possible the _double will be slower. Yeah the locking will
-have to be considered more thoroughly for the percpu array.
-
->> No objection to this patch going in for now, of course.
+> 
+> What should I do to fix it, or should I just leave it here? Please give
+> me some suggestions.
+> 
+> Thanks,
+> -Geliang
+> 
+>> +
+>> +__weak noinline int update_socket_protocol(int family, int type, int protocol)
+>> +{
+>> +	return protocol;
+>> +}
+>> +
+>> +__diag_pop();
+>> +
+>>   int __sys_socket(int family, int type, int protocol)
+>>   {
+>>   	struct socket *sock;
+>>   	int flags;
+>>   
+>> -	sock = __sys_socket_create(family, type, protocol);
+>> +	sock = __sys_socket_create(family, type,
+>> +				   update_socket_protocol(family, type, protocol));
+>>   	if (IS_ERR(sock))
+>>   		return PTR_ERR(sock);
+>>   
+>> -- 
+>> 2.35.3
 >>
 > 
 
