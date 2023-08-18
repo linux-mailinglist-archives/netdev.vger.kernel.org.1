@@ -1,83 +1,70 @@
-Return-Path: <netdev+bounces-28729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9932780646
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 09:23:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EB378065A
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 09:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D58428230A
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 07:23:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 413651C2159E
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 07:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCCE914F93;
-	Fri, 18 Aug 2023 07:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8978714F9A;
+	Fri, 18 Aug 2023 07:30:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF0714F70
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 07:23:37 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0984D30E6
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 00:23:34 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fe2d152f62so856407e87.0
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 00:23:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C0014F72
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 07:30:22 +0000 (UTC)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE6430DF
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 00:30:20 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3fe5c0e587eso6059965e9.0
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 00:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692343412; x=1692948212;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692343819; x=1692948619;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+nrlvGLSZrLTAidXKYdnf+IMABQtnX9eIwf7feDIRl4=;
-        b=gUkgEFdIUbCRiIovcKuPSXsz2jIBb04GMmR/D3yc0PsZNNvQX94puOhOfFRBicMod9
-         FV75KNTBfswt/NUNYIl1BqJy7KRs3S3YAIGngmEcU5TovnqTTcy9aXhsxqPZdIWRXmEM
-         KtbCL3yxYGA+YCAMtZmuqJ1ngjumWyHgt292mGY+f43e/fzIwMte2JtKjLmYORwpgGTC
-         wE0h78ODD3iiAW0fW7CN/SEAWHZdFAWD/BJ3VsOsurCbmh0IhX82V89Gvry5s6dfXWsY
-         UkRy3/h5kT2IwVboIXZHHLuCH3lq20jEzrdr86vQfSmiM5PqstmAICwpAS/ow0JHRMf4
-         0k8Q==
+        bh=VeNdkErbl4pXDesfGI7sfXJOs6yIzvoXVqW+VCY5JVM=;
+        b=eVvE8PPxupteSU911JS3sG3VtNvXMTgZixjoClw0r6VaWWHNiQl1tyyKwnrobtGnzY
+         v2mah+T8jSTcXRAzps4j9RtjcSIwlGc3Z6hcfkxpymQI4OZmiZ63K1Z7nHuocgkzXCT+
+         NUkU/pBNdlVPzNqhRGxt/PK2rGzEqVm9AXOEnalC8e7LyupnClWkm1VE/0yVUwPL/Vkf
+         wGfBKyr7Sn8fiBZNrBmdm+pHPX1RJgEDrK/RVXgEUnn4nwZiHlIcyEW4fzNe0C7Ak4D1
+         r2sFEkgi3cwdQnRwsCCKAswguzudRKo57X5TnJ6e/a3vmlx04jSpxQHTa70XfLXPCsrN
+         rA/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692343412; x=1692948212;
+        d=1e100.net; s=20221208; t=1692343819; x=1692948619;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+nrlvGLSZrLTAidXKYdnf+IMABQtnX9eIwf7feDIRl4=;
-        b=CXCM8MdB4L+4uEmIwbXMj0472qBut3wc+Fpe5rwudh//7YXir39GnDcWJlUzKba9lN
-         8Di1QP3X8G3Mde1yd2qeJbhnD1tM9A82VCalQWN5+97r2O8LZ0+gxSBlI6R0zXe4+PwT
-         lMiLd+KXlmfm2scg3J4NIdwy707+HmsewQDvNAj9a/lp4xJfBVCZbRsn9OtGWLbwt7Rm
-         yFTWk78XfZXytLBk8vyVGxrc1rhp9DAPhgDj8clCPCf+7wLaqQoIMPjzgrtD3jFl5oXH
-         odOeAoF59gZXhooGhGLgaQ1G23+Xe2iYPMBmk9oUWEIxaacpzjZ1GtYKJIL77BuKp06y
-         qYfg==
-X-Gm-Message-State: AOJu0YxaGWaCZnfYiMBSRA3np4E2NLv2Nh2vic/pUCXLKGgMi0BH/wZU
-	WjLyF1lmFEsU+jPlLAb9j9EYfw==
-X-Google-Smtp-Source: AGHT+IEOeJMn8/EoRozhoQagPj2QryyIspkPS5PyFAvnzRmg9yRI8DoPXKyuJg63xi4Xks3gO4wgAQ==
-X-Received: by 2002:a05:6512:2356:b0:4ff:6fa3:63ce with SMTP id p22-20020a056512235600b004ff6fa363cemr1126718lfu.10.1692343412057;
-        Fri, 18 Aug 2023 00:23:32 -0700 (PDT)
+        bh=VeNdkErbl4pXDesfGI7sfXJOs6yIzvoXVqW+VCY5JVM=;
+        b=BcuYgzCyd19p6Y1omLCOMfV7vZxtJlhq7/EqYd3LXHam8p3UITzOPhJbHiisTW1Inw
+         1scqLXkQ1deOLWdRB4hVDrIkvaTz+L++ukB0QNtFBXXyCfXA9ZuhfizZjXm3M3OvrrM7
+         iBbxzaVwWMw3gA1dbs5dSf/yhYT+ExD/adktiN3t7HWsGbce1wW4q1q70jeQLeveFJJ5
+         uDTuUrFtECN8nx3zz5p108OIu7XOrFOYZUNDyB/jtNIwhPkNY20MrWhdtsSDb29uXcfd
+         2U+svGeGdWA/vX6tedm1QfpXvXsUAVGEhrAJYOSxhpBP+KP/2bU2F/kPcLz4ENiHheCz
+         BoaA==
+X-Gm-Message-State: AOJu0Yyiq/rvwdarlFqba79tgcfNTwop8j4M+fhJ32KtYxrN5+Yvgrys
+	Kp/G2SbOFLT8lN9dwYULRncTDg==
+X-Google-Smtp-Source: AGHT+IEwMexq/hye6IAH4Zldly2KJC4VPUmaiT75NytACekRcywunxWpZW91SRTHbe0vHnUTb7MlIQ==
+X-Received: by 2002:a7b:c3d7:0:b0:3fe:ad3:b066 with SMTP id t23-20020a7bc3d7000000b003fe0ad3b066mr1505860wmj.41.1692343818931;
+        Fri, 18 Aug 2023 00:30:18 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id 16-20020a05600c231000b003fc00212c1esm1882608wmo.28.2023.08.18.00.23.31
+        by smtp.gmail.com with ESMTPSA id u8-20020a05600c00c800b003fe2b081661sm5383987wmm.30.2023.08.18.00.30.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 00:23:31 -0700 (PDT)
-Date: Fri, 18 Aug 2023 09:23:30 +0200
+        Fri, 18 Aug 2023 00:30:18 -0700 (PDT)
+Date: Fri, 18 Aug 2023 09:30:17 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next v4 2/9] dpll: spec: Add Netlink spec in YAML
-Message-ID: <ZN8ccoE8X5J6yysk@nanopsycho>
-References: <20230811200340.577359-1-vadim.fedorenko@linux.dev>
- <20230811200340.577359-3-vadim.fedorenko@linux.dev>
- <20230814194336.55642f34@kernel.org>
- <DM6PR11MB4657AD95547A14234941F9399B1AA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <20230817163640.2ad33a4b@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
+	shayd@nvidia.com, leon@kernel.org
+Subject: Re: [patch net-next 0/4] net/mlx5: expose peer SF devlink instance
+Message-ID: <ZN8eCeDGcQSCi1D6@nanopsycho>
+References: <20230815145155.1946926-1-jiri@resnulli.us>
+ <20230817193420.108e9c26@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,148 +73,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230817163640.2ad33a4b@kernel.org>
+In-Reply-To: <20230817193420.108e9c26@kernel.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Aug 18, 2023 at 01:36:40AM CEST, kuba@kernel.org wrote:
->On Thu, 17 Aug 2023 18:40:00 +0000 Kubalewski, Arkadiusz wrote:
->> >Why are all attributes in a single attr space? :(
->> >More than half of them are prefixed with a pin- does it really
->> >not scream to you that they belong to a different space?
+Fri, Aug 18, 2023 at 04:34:20AM CEST, kuba@kernel.org wrote:
+>On Tue, 15 Aug 2023 16:51:51 +0200 Jiri Pirko wrote:
+>> Currently, the user can instantiate new SF using "devlink port add"
+>> command. That creates an E-switch representor devlink port.
 >> 
->> I agree, but there is an issue with this, currently:
+>> When user activates this SF, there is an auxiliary device created and
+>> probed for it which leads to SF devlink instance creation.
 >> 
->> name: pin-parent-device
->> subset-of: dpll
->> attributes:
->>   -
->>     name: id
->>     type: u32
->>   -
->>     name: pin-direction
->>     type: u32
->>   -
->>     name: pin-prio
->>     type: u32
->>   -
->>     name: pin-state
->>     type: u32
+>> There is 1:1 relationship between E-switch representor devlink port and
+>> the SF auxiliary device devlink instance.
 >> 
->> Where "id" is a part of device space, rest attrs would be a pin space..
->> Shall we have another argument for device id in a pin space?
+>> Expose the relation to the user by introducing new netlink attribute
+>> DEVLINK_PORT_FN_ATTR_DEVLINK which contains the devlink instance related
+>> to devlink port function. This is done by patch #3.
 >
->Why would pin and device not have separate spaces?
->
->When referring to a pin from a "device mostly" command you can
->usually wrap the pin attributes in a nest, and vice versa.
->But it may not be needed at all here? Let's look at the commands:
->
->+    -
->+      name: device-id-get
->+        request:
->+          attributes:
->+            - module-name
->+            - clock-id
->+            - type
->+        reply:
->+          attributes:
->+            - id
->
->All attributes are in "device" space, no mixing.
->
->+      name: device-get
->+        request:
->+          attributes:
->+            - id
->+        reply: &dev-attrs
->+          attributes:
->+            - id
->+            - module-name
->+            - mode
->+            - mode-supported
->+            - lock-status
->+            - temp
->+            - clock-id
->+            - type
->
->Again, no pin attributes, so pin can be separate?
->
->+    -
->+      name: device-set
->+        request:
->+          attributes:
->+            - id
->
->Herm, this one looks like it's missing attrs :S
->
->+    -
->+      name: pin-id-get
->+        request:
->+          attributes:
->+            - module-name
->+            - clock-id
->+            - pin-board-label
->+            - pin-panel-label
->+            - pin-package-label
->+            - pin-type
->+        reply:
->+          attributes:
->+            - pin-id
->
->Mostly pin stuff. I guess the module-name and clock-id attrs can be
->copy/pasted between device and pin, or put them in a separate set
->and add that set as an attr here. Copy paste is likely much simpler.
+>The devlink instance of the SF stays in the same network namespace 
+>as the PF?
 
-Agreed for the copy.
+SF devlink instance is created in init_ns and can move to another one.
+So no.
 
-Honestly, I wound thing that shared ATTR space is fine for DPLL,
-the split is an overkill here. But up to you Jakub :)
+I was thinking about this, as with the devlink handles we are kind of in
+between sysfs and network. We have concept of network namespace in
+devlink, but mainly because of the related netdevices.
 
+There is no possibility of collision of devlink handles in between
+separate namespaces, the handle is ns-unaware. Therefore the linkage to
+instance in different ns is okay, I believe. Even more, It is handy as
+the user knows that there exists such linkage.
 
->
->+    -
->+      name: pin-get
->+        request:
->+          attributes:
->+            - pin-id
->+        reply: &pin-attrs
->+          attributes:
->+            - pin-id
->+            - pin-board-label
->+            - pin-panel-label
->+            - pin-package-label
->+            - pin-type
->+            - pin-frequency
->+            - pin-frequency-supported
->+            - pin-dpll-caps
->+            - pin-parent-device
-
-The ID of device is inside this nest.
-
-
->+            - pin-parent-pin
->
->All pin.
->
->+    -
->+      name: pin-set
->+        request:
->+          attributes:
->+            - pin-id
->+            - pin-frequency
->+            - pin-direction
->+            - pin-prio
->+            - pin-state
->+            - pin-parent-device
-
-Same here.
-
-
->+            - pin-parent-pin
->
->And all pin.
+What do you think?
 
