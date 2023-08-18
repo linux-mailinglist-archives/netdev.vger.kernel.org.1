@@ -1,150 +1,163 @@
-Return-Path: <netdev+bounces-28808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F82780C05
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:44:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B48780C2A
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:55:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 844F32823DE
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:44:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D06631C2161C
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E17182A2;
-	Fri, 18 Aug 2023 12:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8C7182B7;
+	Fri, 18 Aug 2023 12:54:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464D67ED
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 12:44:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E3A0C433C8;
-	Fri, 18 Aug 2023 12:44:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692362675;
-	bh=FNb2SVuYvlLFocySdsYx+8V0njmhNeTW7yGsOfooywE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=G/drKLHCSyueU5bKmxxpqyI4simi9nIfnkAxFxjDnWAniy4/SW59YhZB9c7hxU8H2
-	 TF77VqXAL/qerdtEQP+r71icmKSmAdrntcWqtYyLWud7BzEm9Nr4OvcKJwYBT6qREv
-	 lwu9i3m4can4mSm42grJPlIlf2HDGUGpUDmIw4/72fylZVasltJm4Ka97d6YAW7yU+
-	 2+0wYTB+ddEtBwL479wUrr6OTx8nZcmBD20Gn/w2Y2C3ghYUfaA/7a38PNOGAN3RSy
-	 heAC5qwf0I4O2dsWL1ObTTWynLwnq75wWBq5V3Ms8JZX3IY1pauRmTDoK9QX0up7au
-	 52COAK2wvxoZA==
-Message-ID: <5d077342-435f-2829-ba2a-cdf763b6b8e1@kernel.org>
-Date: Fri, 18 Aug 2023 15:44:26 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712C563B4
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 12:54:59 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E67F30F6;
+	Fri, 18 Aug 2023 05:54:56 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fe8c3b5ca0so1295310e87.1;
+        Fri, 18 Aug 2023 05:54:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692363295; x=1692968095;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=67vQ/7mBcvvdfmCbFxtyg3zPIiXbP/aBRSw9NykcPYQ=;
+        b=de+OCZbgrWDgijwJTI1s/t4gopxklWXkSAc0gJKXlzmGlbpjvfu2wVMnKQ33d7u2cq
+         0/x0ma2djv9bzNli+YCbqQmNqprxfqztchy2ttMahuIt9Aliorq0DWCrmqeR70kHA5S3
+         frq3o1zloYTV4t2uxOIcHkkFFJ4KwfTsf0IpZW1shMzrGa7XJKNUOregmuBCg5RpxprS
+         6NXyBG3N8pRy5w2sJ6or7ZZUqrpSQMpA3P0GPmoqMVleAHBUTLWtmZaZ57evbXob9mQ/
+         m5PjRgH1OKDjW07ezkpbPbG+Ht5Mu1waTJygKnkQ1Zdgfmd1QOjVl1Wf5mEmQbBS4F/M
+         8cHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692363295; x=1692968095;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=67vQ/7mBcvvdfmCbFxtyg3zPIiXbP/aBRSw9NykcPYQ=;
+        b=C4/BR35F1VwITWjpJn8tTjwI61xUYTMDBxotzxcXvoLBFT4pt2knlJYDHaJQDwbaIu
+         knVg0UFpD2JdN2j10KjHSnihK4WTFeHeE8yxzj6pUA/SUChzqoYcTMIE8f6qnTSdlLz2
+         xt78MM4EF3IkyRy8blqf9ZYgu6J9dUQwNPEhgNH2hyhtwodbnhuifhoO5jrNYIGlcPLR
+         lWN4KTOn/x99d+97rckxM+gPg67GC0aQkgKTDWJkfRnJdLz9aYZdMpU5H5cJXO/jf+Iu
+         1V6epAnPSireFMlgji/e3sFtuD5Lg5sOBOIcMdvrMX9XrwrzQwbblTWZpV4JqT2rIgZf
+         Hh3w==
+X-Gm-Message-State: AOJu0YxqH8IsJx11Ekz39fHN+17enuyrqgASsKHsRjal74Zgjre4kWBC
+	/h5amogHd8B624pxSNLnpWU=
+X-Google-Smtp-Source: AGHT+IGoP8nkkUCENgMRwAGy7olq9sqV8gE/z7Ae8FR7k0BWN0v0FtuWlYbDu/1ipG0ZzJpvhVWs5g==
+X-Received: by 2002:a05:6512:3f03:b0:4fe:19ef:8794 with SMTP id y3-20020a0565123f0300b004fe19ef8794mr2028379lfa.28.1692363294572;
+        Fri, 18 Aug 2023 05:54:54 -0700 (PDT)
+Received: from localhost ([93.157.254.210])
+        by smtp.gmail.com with ESMTPSA id b25-20020ac247f9000000b004fe509970dasm328154lfp.250.2023.08.18.05.54.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 05:54:54 -0700 (PDT)
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: phy: Fix deadlocking in phy_error() invocation
+Date: Fri, 18 Aug 2023 15:54:45 +0300
+Message-ID: <20230818125449.32061-1-fancer.lancer@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v5 0/5] Introduce IEP driver and packet timestamping
- support
-To: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
- <rdunlap@infradead.org>, Simon Horman <simon.horman@corigine.com>,
- Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
- Richard Cochran <richardcochran@gmail.com>,
- Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>
-Cc: nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20230817114527.1585631-1-danishanwar@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20230817114527.1585631-1-danishanwar@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Since commit 91a7cda1f4b8 ("net: phy: Fix race condition on link status
+change") all the phy_error() method invocations have been causing the
+nested-mutex-lock deadlock because it's normally done in the PHY-driver
+threaded IRQ handlers which since that change have been called with the
+phydev->lock mutex held. Here is the calls thread:
 
+IRQ: phy_interrupt()
+     +-> mutex_lock(&phydev->lock); <--------------------+
+         drv->handle_interrupt()                         | Deadlock due
+         +-> ERROR: phy_error()                          + to the nested
+                    +-> phy_process_error()              | mutex lock
+                        +-> mutex_lock(&phydev->lock); <-+
+                            phydev->state = PHY_ERROR;
+                            mutex_unlock(&phydev->lock);
+         mutex_unlock(&phydev->lock);
 
-On 17/08/2023 14:45, MD Danish Anwar wrote:
-> This series introduces Industrial Ethernet Peripheral (IEP) driver to
-> support timestamping of ethernet packets and thus support PTP and PPS
-> for PRU ICSSG ethernet ports.
-> 
-> This series also adds 10M full duplex support for ICSSG ethernet driver.
-> 
-> There are two IEP instances. IEP0 is used for packet timestamping while IEP1
-> is used for 10M full duplex support.
-> 
-> This is v5 of the series [v1]. It addresses comments made on [v4].
-> This series is based on linux-next(#next-20230817).
-> 
-> Changes from v4 to v5:
-> *) Added comments on why we are using readl / writel instead of regmap_read()
->    / write() in icss_iep_gettime() / settime() APIs as asked by Roger.
-> 
-> Change from v3 to v4:
-> *) Changed compatible in iep dt bindings. Now each SoC has their own compatible
->    in the binding with "ti,am654-icss-iep" as a fallback as asked by Conor.
-> *) Addressed Andew's comments and removed helper APIs icss_iep_readl() / 
->    writel(). Now the settime/gettime APIs directly use readl() / writel().
-> *) Moved selecting TI_ICSS_IEP in Kconfig from patch 3 to patch 4.
-> *) Removed forward declaration of icss_iep_of_match in patch 3.
-> *) Replaced use of of_device_get_match_data() to device_get_match_data() in
->    patch 3.
-> *) Removed of_match_ptr() from patch 3 as it is not needed.
-> 
-> Changes from v2 to v3:
-> *) Addressed Roger's comment and moved IEP1 related changes in patch 5.
-> *) Addressed Roger's comment and moved icss_iep.c / .h changes from patch 4
->    to patch 3.
-> *) Added support for multiple timestamping in patch 4 as asked by Roger.
-> *) Addressed Andrew's comment and added comment in case SPEED_10 in
->    icssg_config_ipg() API.
-> *) Kept compatible as "ti,am654-icss-iep" for all TI K3 SoCs
-> 
-> Changes from v1 to v2:
-> *) Addressed Simon's comment to fix reverse xmas tree declaration. Some APIs
->    in patch 3 and 4 were not following reverse xmas tree variable declaration.
->    Fixed it in this version.
-> *) Addressed Conor's comments and removed unsupported SoCs from compatible
->    comment in patch 1. 
-> *) Addded patch 2 which was not part of v1. Patch 2, adds IEP node to dt
->    bindings for ICSSG.
-> 
-> [v1] https://lore.kernel.org/all/20230803110153.3309577-1-danishanwar@ti.com/
-> [v2] https://lore.kernel.org/all/20230807110048.2611456-1-danishanwar@ti.com/
-> [v3] https://lore.kernel.org/all/20230809114906.21866-1-danishanwar@ti.com/
-> [v4] https://lore.kernel.org/all/20230814100847.3531480-1-danishanwar@ti.com/
-> 
-> Thanks and Regards,
-> Md Danish Anwar
-> 
-> Grygorii Strashko (1):
->   net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
-> 
-> MD Danish Anwar (2):
->   dt-bindings: net: Add ICSS IEP
->   dt-bindings: net: Add IEP property in ICSSG DT binding
-> 
-> Roger Quadros (2):
->   net: ti: icss-iep: Add IEP driver
->   net: ti: icssg-prueth: add packet timestamping and ptp support
-> 
->  .../devicetree/bindings/net/ti,icss-iep.yaml  |  61 ++
->  .../bindings/net/ti,icssg-prueth.yaml         |   7 +
->  drivers/net/ethernet/ti/Kconfig               |  12 +
->  drivers/net/ethernet/ti/Makefile              |   1 +
->  drivers/net/ethernet/ti/icssg/icss_iep.c      | 965 ++++++++++++++++++
->  drivers/net/ethernet/ti/icssg/icss_iep.h      |  41 +
->  drivers/net/ethernet/ti/icssg/icssg_config.c  |   7 +
->  drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  21 +
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 451 +++++++-
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  28 +-
->  10 files changed, 1586 insertions(+), 8 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
->  create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
->  create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
-> 
+The problem can be easily reproduced just by calling phy_error() from any
+PHY-device threaded interrupt handler. Fix it by dropping the phydev->lock
+mutex lock from the phy_process_error() method and printing a nasty error
+message to the system log if the mutex isn't held in the caller execution
+context.
 
-For this series:
+Note for the fix to work correctly in the PHY-subsystem itself the
+phydev->lock mutex locking must be added to the phy_error_precise()
+function.
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+Link: https://lore.kernel.org/netdev/20230816180944.19262-1-fancer.lancer@gmail.com
+Fixes: 91a7cda1f4b8 ("net: phy: Fix race condition on link status change")
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+---
+ drivers/net/phy/phy.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index bdf00b2b2c1d..a9ecfdd19624 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1184,9 +1184,11 @@ void phy_stop_machine(struct phy_device *phydev)
+ 
+ static void phy_process_error(struct phy_device *phydev)
+ {
+-	mutex_lock(&phydev->lock);
++	/* phydev->lock must be held for the state change to be safe */
++	if (!mutex_is_locked(&phydev->lock))
++		phydev_err(phydev, "PHY-device data unsafe context\n");
++
+ 	phydev->state = PHY_ERROR;
+-	mutex_unlock(&phydev->lock);
+ 
+ 	phy_trigger_machine(phydev);
+ }
+@@ -1195,7 +1197,9 @@ static void phy_error_precise(struct phy_device *phydev,
+ 			      const void *func, int err)
+ {
+ 	WARN(1, "%pS: returned: %d\n", func, err);
++	mutex_lock(&phydev->lock);
+ 	phy_process_error(phydev);
++	mutex_unlock(&phydev->lock);
+ }
+ 
+ /**
+@@ -1204,8 +1208,7 @@ static void phy_error_precise(struct phy_device *phydev,
+  *
+  * Moves the PHY to the ERROR state in response to a read
+  * or write error, and tells the controller the link is down.
+- * Must not be called from interrupt context, or while the
+- * phydev->lock is held.
++ * Must be called with phydev->lock held.
+  */
+ void phy_error(struct phy_device *phydev)
+ {
+-- 
+2.41.0
+
 
