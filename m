@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-28863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8863C781074
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:37:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA5F0781076
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 442CF282495
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:37:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6326B2821EC
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37532563;
-	Fri, 18 Aug 2023 16:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C41EECE;
+	Fri, 18 Aug 2023 16:36:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8787A38
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:36:24 +0000 (UTC)
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475B93C0A
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:23 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-56e99f97f0fso365411eaf.0
-        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313D36110
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:36:28 +0000 (UTC)
+Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE1A3AAE
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:27 -0700 (PDT)
+Received: by mail-oo1-xc2a.google.com with SMTP id 006d021491bc7-56d6dfa1f3cso690326eaf.0
+        for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 09:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692376582; x=1692981382;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692376586; x=1692981386;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hSDSdR8lYA3CyRQ61SRbC2eytywvaKi5Vn+nvHm9A2c=;
-        b=ZKE09onA+xh5BBzDDYx6s2/RJu7RLre5B4pAKK3VbWcV+UT0Bs0PQLNlruQ03Nat3g
-         Qzshd4G1AtNk711JCl5CeY6hbuHK2StjR9/5s0MTTcXYJMukw/wYOANnX4zGJ2nrJTNy
-         qbBq70JW74SRMtOVTXA0wIKXxIdc4O+EFgcj7ZZkxoQNaBkFJ3fLwCL/bpdTxPwtiw3b
-         mE+oZCYniRt8fnlRrkF7bKqwHiqw5ODfMFkxfcv5H4EERDmGRWjmkVlasDXcwBRm1AEK
-         8ih3o34ChwawQf2wO5ojE38LvqCBau3cara+00zakZV2ITRkgQHa6DBulpPuk/zwbRyN
-         +eDA==
+        bh=WLmjnO5KUtCrD/gaeJk57IaZoZ7aWFu8I5CCnY6/uVk=;
+        b=XU7JYY0TnevfzpItaBh75PH5kC5FAnGNsSJfJdBypXtBNDMgLqqWIipjjbzZIPmkeI
+         fWxu/fEIGsWmdzUqib7TE9QTgz0BhKSED1Eqn2BRUsTmWbpbWuus5sRlBTNgeInzl8Jf
+         cATGykyZPAkwt2TUdRCnaGNmzbjYXC15lspOsnLn4XC0wpiQOU9McqlI9y4JmTOrmnCr
+         ieOE3blJnOIbPXf+EEgwzNCJMKJ3kcjjVdzs8uXKlpBEn06zdQ++3z9wPW4F56OV6BSh
+         UFUP5hq7+rih0zg6JkYUzB6Ewr4HORmC1D2myowDSj48Mvua5srMY3MVR7z43vB9CCrT
+         DwWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692376582; x=1692981382;
+        d=1e100.net; s=20221208; t=1692376586; x=1692981386;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hSDSdR8lYA3CyRQ61SRbC2eytywvaKi5Vn+nvHm9A2c=;
-        b=BRMsdp8dSiBwmc4wt6syZSn7BySIIxnmwXTRDxzbmyunEx00+up5i9Qbk7RbX7hlM1
-         gV1IhzX+vlsTA/FgHjuLwWcfw2iKckywjg4PskY9XzSgIaHpVGwOqui44O4du0/+pyQS
-         9oQWveVE3Op6x9CgxuYa+iOIbnQLoi3jx3UyQOFi32TVUEa8wpOeNDnmhLlM5Cw/ILBw
-         p6x0vGokwoV5AZUCfRWZSxpbS6k/xjuNzHhNtXYzzYcMjGltF6jUIeCgCK0WwpgPDuxB
-         4I7OEfcVKq8vXMrFJkfwYCX6pE8wlzt05cSCdmRnCDEtmtfkW7j1NzCDP2B3pFnwuT30
-         EkPQ==
-X-Gm-Message-State: AOJu0YxF6EQ6sNxoLyM2K/CzqGJ+RQ3vkgM/9lPpRFhCMld4WBGyU3VP
-	TRtvqqVZbMawfQcRYAzcTDY/q41pZPRLOrdzfHE=
-X-Google-Smtp-Source: AGHT+IHxEGi+Bg3KG1HayON9OocqFOjyqBUNVB1u03CkEbJKEPbgNLnYzAnAM3lY1tq85s2xdtY4nw==
-X-Received: by 2002:a4a:2559:0:b0:56e:68a8:7f5d with SMTP id v25-20020a4a2559000000b0056e68a87f5dmr3567569ooe.3.1692376582516;
-        Fri, 18 Aug 2023 09:36:22 -0700 (PDT)
+        bh=WLmjnO5KUtCrD/gaeJk57IaZoZ7aWFu8I5CCnY6/uVk=;
+        b=i9FR/w9FVhwCPsyWM3M7vLavk9tUz629qcyHAlHpm7W8Q3NTSJNH/NjyqH+/0CFyNK
+         IjBFR+bJM8UUXdeIIXXwXWYXGPhCi/U8Y9FcMLm8t28wupcIZiQqUSlzi3waqhfadxfw
+         70kbIwzNwB4NAcsxz1TTiffrVVu+jYrSqm0hR9fVkIxPyMzxN921oGGD+xRa55qFoK4r
+         R2nNXZY/4mmV+/I7/XdpmeF5Mb6VZe9PSk0GQSq81vSKU9x8FVYPrGR7orHiaVQdMnbn
+         sHy7kvgf84MdVXmpUHuwCMwmhWr7fcSZMKTSeI+z2zM/JsWYaAReba2Nw8WoYsu49Luq
+         gCPw==
+X-Gm-Message-State: AOJu0Yz9mUZh/ZtkXIYvwOIF3VTd3EkmR0LhwJpl+iqgQS+RO3kJGb4D
+	iAgrOkVnPVdrIPji16eBvv5r1HlyGjr43BGCx50=
+X-Google-Smtp-Source: AGHT+IFv39JRhX7Y5v45WIPO8y+vQVffZpfNA/IW1o6clNhy5C/pp0Rzbhy2bOmItoU0P4b3Bh29MA==
+X-Received: by 2002:a05:6820:292:b0:56d:e414:d14 with SMTP id q18-20020a056820029200b0056de4140d14mr3592929ood.8.1692376586162;
+        Fri, 18 Aug 2023 09:36:26 -0700 (PDT)
 Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:bdfa:b54a:9d12:de38])
-        by smtp.gmail.com with ESMTPSA id f200-20020a4a58d1000000b005634e8c4bbdsm561531oob.11.2023.08.18.09.36.19
+        by smtp.gmail.com with ESMTPSA id f200-20020a4a58d1000000b005634e8c4bbdsm561531oob.11.2023.08.18.09.36.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Aug 2023 09:36:22 -0700 (PDT)
+        Fri, 18 Aug 2023 09:36:25 -0700 (PDT)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -69,9 +69,9 @@ Cc: jhs@mojatatu.com,
 	shaozhengchao@huawei.com,
 	victor@mojatatu.com,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next 3/5] selftest/tc-testing: cls_u32: add tests for classid
-Date: Fri, 18 Aug 2023 13:35:42 -0300
-Message-Id: <20230818163544.351104-4-pctammela@mojatatu.com>
+Subject: [PATCH net-next 4/5] net/sched: cls_route: make netlink errors meaningful
+Date: Fri, 18 Aug 2023 13:35:43 -0300
+Message-Id: <20230818163544.351104-5-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230818163544.351104-1-pctammela@mojatatu.com>
 References: <20230818163544.351104-1-pctammela@mojatatu.com>
@@ -88,50 +88,83 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As discussed in '3044b16e7c6f', cls_u32 was handling the use of classid
-incorrectly. Add a test to check if it's conforming to the correct
-behaviour.
+Use netlink extended ack and parsing policies to return more meaningful
+errors instead of the relying solely on errnos.
 
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- .../tc-testing/tc-tests/filters/u32.json      | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ net/sched/cls_route.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
-index bd64a4bf11ab..ddc7c355be0a 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
-@@ -247,5 +247,30 @@
-         "teardown": [
-             "$TC qdisc del dev $DEV1 ingress"
-         ]
-+    },
-+    {
-+        "id": "0c37",
-+        "name": "Try to delete class referenced by u32 after a replace",
-+        "category": [
-+            "filter",
-+            "u32"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 parent root handle 10: drr",
-+            "$TC class add dev $DEV1 parent root classid 1 drr",
-+            "$TC filter add dev $DEV1 parent 10: prio 1 u32 match icmp type 1 0xff classid 10:1 action ok",
-+            "$TC filter replace dev $DEV1 parent 10: prio 1 u32 match icmp type 1 0xff classid 10:1 action drop"
-+        ],
-+        "cmdUnderTest": "$TC class delete dev $DEV1 parent 10: classid 10:1",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC class show dev $DEV1",
-+        "matchPattern": "class drr 10:1",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 parent root drr"
-+        ]
-     }
- ]
+diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
+index 1e20bbd687f1..b34cf02c6c51 100644
+--- a/net/sched/cls_route.c
++++ b/net/sched/cls_route.c
+@@ -400,30 +400,32 @@ static int route4_set_parms(struct net *net, struct tcf_proto *tp,
+ 		if (new && handle & 0x8000)
+ 			return -EINVAL;
+ 		to = nla_get_u32(tb[TCA_ROUTE4_TO]);
+-		if (to > 0xFF)
+-			return -EINVAL;
+ 		nhandle = to;
+ 	}
+ 
++	if (tb[TCA_ROUTE4_FROM] && tb[TCA_ROUTE4_IIF]) {
++		NL_SET_ERR_MSG(extack,
++			       "'from' and 'fromif' are mutually exclusive");
++		return -EINVAL;
++	}
++
+ 	if (tb[TCA_ROUTE4_FROM]) {
+-		if (tb[TCA_ROUTE4_IIF])
+-			return -EINVAL;
+ 		id = nla_get_u32(tb[TCA_ROUTE4_FROM]);
+-		if (id > 0xFF)
+-			return -EINVAL;
+ 		nhandle |= id << 16;
+ 	} else if (tb[TCA_ROUTE4_IIF]) {
+ 		id = nla_get_u32(tb[TCA_ROUTE4_IIF]);
+-		if (id > 0x7FFF)
+-			return -EINVAL;
+ 		nhandle |= (id | 0x8000) << 16;
+ 	} else
+ 		nhandle |= 0xFFFF << 16;
+ 
+ 	if (handle && new) {
+ 		nhandle |= handle & 0x7F00;
+-		if (nhandle != handle)
++		if (nhandle != handle) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "Unexpected handle %x (expected %x)",
++					   handle, nhandle);
+ 			return -EINVAL;
++		}
+ 	}
+ 
+ 	if (!nhandle) {
+@@ -478,7 +480,6 @@ static int route4_change(struct net *net, struct sk_buff *in_skb,
+ 	struct route4_filter __rcu **fp;
+ 	struct route4_filter *fold, *f1, *pfp, *f = NULL;
+ 	struct route4_bucket *b;
+-	struct nlattr *opt = tca[TCA_OPTIONS];
+ 	struct nlattr *tb[TCA_ROUTE4_MAX + 1];
+ 	unsigned int h, th;
+ 	int err;
+@@ -489,10 +490,12 @@ static int route4_change(struct net *net, struct sk_buff *in_skb,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (opt == NULL)
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tca, TCA_OPTIONS)) {
++		NL_SET_ERR_MSG_MOD(extack, "missing options");
+ 		return -EINVAL;
++	}
+ 
+-	err = nla_parse_nested_deprecated(tb, TCA_ROUTE4_MAX, opt,
++	err = nla_parse_nested_deprecated(tb, TCA_ROUTE4_MAX, tca[TCA_OPTIONS],
+ 					  route4_policy, NULL);
+ 	if (err < 0)
+ 		return err;
 -- 
 2.39.2
 
