@@ -1,193 +1,394 @@
-Return-Path: <netdev+bounces-28704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD94D780508
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 06:10:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D02378050F
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 06:17:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0EB1C21535
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:10:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D6BF2822DE
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D5011CA3;
-	Fri, 18 Aug 2023 04:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E24711CA5;
+	Fri, 18 Aug 2023 04:17:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F79EAEC
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 04:10:49 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 554753A89;
-	Thu, 17 Aug 2023 21:10:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692331847; x=1723867847;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y2djJBYqGtFodSH9SQOROqUVVnPYUs6bFkWU16CvT7w=;
-  b=Q/RsIkP80wRTaVc+3LNxd+OGTdqoOLrzsa4ER62mAoMRBbti0dL53caE
-   r+q8ES+RKPMQagy+zoIHR8pt8kzFfRXATDje5WNVmQY/EF/URoU1PXdwK
-   w5haT5qiYqQn+RYgGMmv7OaHroY9PUOAnAV1nagM9M7u5osJU1BNvjXdc
-   ZTu1bJpowxnGCDIp9kMJLKv5d0ESBWOEjKhigtvqSSK1+wUzr+Tcz2RTK
-   8MSd3qvmHPkCAKyuo/wywGHhTj/HQ9qNCtciEywYhAcnmnUrx0yaAW9jz
-   pqXnsWej+klOX3inQITcOBV4DBXFeJfnNntnm1bz5jcQPB7O5dEKK6KKd
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="363167365"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="363167365"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 21:10:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="684717365"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="684717365"
-Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 17 Aug 2023 21:10:44 -0700
-Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qWqot-00025G-1l;
-	Fri, 18 Aug 2023 04:10:43 +0000
-Date: Fri, 18 Aug 2023 12:09:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, alex.williamson@redhat.com, jgg@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, shannon.nelson@amd.com,
-	brett.creeley@amd.com
-Subject: Re: [PATCH vfio] pds_core: Fix function header descriptions
-Message-ID: <202308181138.U4cZ1nIO-lkp@intel.com>
-References: <20230817224212.14266-1-brett.creeley@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03A58BE2
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 04:17:47 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83863A8D
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:17:43 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6889350bc2bso498465b3a.0
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 21:17:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1692332263; x=1692937063;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xzp8o6UVJ89VPkesQr5UYvC4BZNN7PmnH0yRN5wQzOY=;
+        b=P1GBev/HuDrl1xjHX/tUjSgVcWYLjOrOl2gLQktwERatrrSj0nSyB3sy6xi3nZ1FEk
+         kVNiBOq31f6A9AUOho6oXUGkLrym+9uAh1WbakRR6Yk8F20NnoPRaOLidAqrQf72hdXA
+         yxY9MToP4JM5znfm8woDAelQMI3wRx2QQtJgE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692332263; x=1692937063;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xzp8o6UVJ89VPkesQr5UYvC4BZNN7PmnH0yRN5wQzOY=;
+        b=Nfa591kAde6UdxG6/6QmZDvUf5BD8+3NSHb7euCH5epbAW/00djyJyhYrYoPHc0xPQ
+         tQRyrb7MEK52MWZIRUjTIbWbelUAViSUBQEEnEUsDp2YRwCpTiygP5iFckEds5JrsNdF
+         pMW1kok3h1gBP04chJ3c+TmyYKyODezHABcofUQvdCuY03e4QEEczMnDfVhMoZlaxqWD
+         Dyan4+SVvf8ErxES2u+Eoluguy7VZ9+BUj9cQkUdZ7fqX/gDuz7GxVz1UtlnXz+gRIV3
+         F4czoXcXeyP07d9P1Pm30dkWgJKRQqbGrqkJL1OiXdGTePK/vTj3SfAZqY2vHV14GZkH
+         scBA==
+X-Gm-Message-State: AOJu0YwArc/PJCuR8ac04CU4UFa/TFjGY2Cw/NgyXgGIfTpEzkG7kESb
+	8NxhVRXGUsnynjarGLDCctqTDw==
+X-Google-Smtp-Source: AGHT+IE66JR3uF9G+6hcM/yWjaiQ9USFm/rzMs+hAp8EYk6TzUEu01etOchOC0NfF1Vsh+aOOkQc5w==
+X-Received: by 2002:a05:6a00:2314:b0:67b:2eba:bed4 with SMTP id h20-20020a056a00231400b0067b2ebabed4mr1833081pfh.14.1692332263184;
+        Thu, 17 Aug 2023 21:17:43 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id z12-20020aa785cc000000b0068783a2dfdasm543927pfn.104.2023.08.17.21.17.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 21:17:42 -0700 (PDT)
+From: Kees Cook <keescook@chromium.org>
+To: linux-hardening@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	David Windsor <dwindsor@gmail.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexey Gladkov <legion@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Yu Zhao <yuzhao@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2] creds: Convert cred.usage to refcount_t
+Date: Thu, 17 Aug 2023 21:17:41 -0700
+Message-Id: <20230818041740.gonna.513-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817224212.14266-1-brett.creeley@amd.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9969; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=P/gn9IgZypDJ5qwwLhQ+xDx4moQ5ZSbGFbT+n4eucKs=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBk3vDk6rSsQ/jFsjnairlrUT16tGA2jg31CZMgK
+ qPEhf0iaJCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZN7w5AAKCRCJcvTf3G3A
+ JseuD/sFXdKJv4DiiwAp1ck5kvFAusJjPnJj/mmKDke5s6XIUv6ZN/7Rpv9U3ixpfIWvqAdGfU+
+ UfUVj6KOziQXGaMXmvon8PaTvU5XkqcgN4C5FuUYQ+fc2Ep9pto0cl0gHA0/HVwoA0AQGcsLlzn
+ H/fZbxxSuAPxrKm3hQaYbNEfGgzk3AHJ/npoqLcfsMTIiVhNKjaywNtrekvb5WNF2gHaYlofj9M
+ taxPm6qE/tJJwS4Gb2sUu/TXMt7w54vg6+w/b2vNm9idmD0JvD0N35ES9Yu4iP4oCJDW4BknIRb
+ RM35arC8ZYi81og2lNdCkvaqpgxZYXIY/VOGHSWUIigNtjWEqQJG4665brLN3/jsgsbThIOPSIg
+ k6/bLqJ/980bu07yHdSREmJX6nI/jCViGPHQZ04n0szVi4jAdQlIsIZdg7qYM/DnRj+Y0dKM84j
+ /wemkLxmLvniG3KKMiLxixiAsCN4lBRLwt9tWUug8V2alizNFS0OVQrutgxRBSWxj+aw0TV32gp
+ IzjOgKydleHLKRmNaxZ6bBRpcGYRcNrR0jA71embhtEg6xhy3QS5tGVdHT0tfFUN2KX6NLFTKT/
+ i0cLPsk9sjzhPhE7lPtQh4I8HmjzhD82vl6dXt2MdxZQzJbZ7iLRwzf7uySAEnefSomaAKNx98R
+ 0NQ19p/ AqOA4Ybg==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Brett,
+From: Elena Reshetova <elena.reshetova@intel.com>
 
-kernel test robot noticed the following build warnings:
+atomic_t variables are currently used to implement reference counters
+with the following properties:
+ - counter is initialized to 1 using atomic_set()
+ - a resource is freed upon counter reaching zero
+ - once counter reaches zero, its further
+   increments aren't allowed
+ - counter schema uses basic atomic operations
+   (set, inc, inc_not_zero, dec_and_test, etc.)
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.5-rc6 next-20230817]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Such atomic variables should be converted to a newly provided
+refcount_t type and API that prevents accidental counter overflows and
+underflows. This is important since overflows and underflows can lead
+to use-after-free situation and be exploitable.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Brett-Creeley/pds_core-Fix-function-header-descriptions/20230818-064424
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20230817224212.14266-1-brett.creeley%40amd.com
-patch subject: [PATCH vfio] pds_core: Fix function header descriptions
-config: powerpc-allyesconfig (https://download.01.org/0day-ci/archive/20230818/202308181138.U4cZ1nIO-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230818/202308181138.U4cZ1nIO-lkp@intel.com/reproduce)
+The variable cred.usage is used as pure reference counter. Convert it
+to refcount_t and fix up the operations.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308181138.U4cZ1nIO-lkp@intel.com/
+**Important note for maintainers:
 
-All warnings (new ones prefixed by >>):
+Some functions from refcount_t API defined in refcount.h have different
+memory ordering guarantees than their atomic counterparts. Please check
+Documentation/core-api/refcount-vs-atomic.rst for more information.
 
->> drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Function parameter or member 'pf_pdev' not described in 'pds_client_register'
->> drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Excess function parameter 'pf' description in 'pds_client_register'
->> drivers/net/ethernet/amd/pds_core/auxbus.c:63: warning: Function parameter or member 'pf_pdev' not described in 'pds_client_unregister'
->> drivers/net/ethernet/amd/pds_core/auxbus.c:63: warning: Excess function parameter 'pf' description in 'pds_client_unregister'
+Normally the differences should not matter since refcount_t provides
+enough guarantees to satisfy the refcounting use cases, but in some
+rare cases it might matter.  Please double check that you don't have
+some undocumented memory guarantees for this variable usage.
 
+For the cred.usage it might make a difference in following places:
+ - get_task_cred(): increment in refcount_inc_not_zero() only
+   guarantees control dependency on success vs. fully ordered atomic
+   counterpart
+ - put_cred(): decrement in refcount_dec_and_test() only
+   provides RELEASE ordering and ACQUIRE ordering on success vs. fully
+   ordered atomic counterpart
 
-vim +18 drivers/net/ethernet/amd/pds_core/auxbus.c
+Suggested-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Reviewed-by: David Windsor <dwindsor@gmail.com>
+Reviewed-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+v2: rebase
+v1: https://lore.kernel.org/lkml/20200612183450.4189588-4-keescook@chromium.org/
+---
+ include/linux/cred.h |  8 ++++----
+ kernel/cred.c        | 42 +++++++++++++++++++++---------------------
+ net/sunrpc/auth.c    |  2 +-
+ 3 files changed, 26 insertions(+), 26 deletions(-)
 
-4569cce43bc61e Shannon Nelson 2023-04-19   8  
-10659034c62273 Shannon Nelson 2023-04-19   9  /**
-10659034c62273 Shannon Nelson 2023-04-19  10   * pds_client_register - Link the client to the firmware
-5808b1c50a443e Brett Creeley  2023-08-17  11   * @pf:		ptr to the PF driver's private data struct
-10659034c62273 Shannon Nelson 2023-04-19  12   * @devname:	name that includes service into, e.g. pds_core.vDPA
-10659034c62273 Shannon Nelson 2023-04-19  13   *
-10659034c62273 Shannon Nelson 2023-04-19  14   * Return: 0 on success, or
-10659034c62273 Shannon Nelson 2023-04-19  15   *         negative for error
-10659034c62273 Shannon Nelson 2023-04-19  16   */
-10659034c62273 Shannon Nelson 2023-04-19  17  int pds_client_register(struct pci_dev *pf_pdev, char *devname)
-10659034c62273 Shannon Nelson 2023-04-19 @18  {
-10659034c62273 Shannon Nelson 2023-04-19  19  	union pds_core_adminq_comp comp = {};
-10659034c62273 Shannon Nelson 2023-04-19  20  	union pds_core_adminq_cmd cmd = {};
-10659034c62273 Shannon Nelson 2023-04-19  21  	struct pdsc *pf;
-10659034c62273 Shannon Nelson 2023-04-19  22  	int err;
-10659034c62273 Shannon Nelson 2023-04-19  23  	u16 ci;
-10659034c62273 Shannon Nelson 2023-04-19  24  
-10659034c62273 Shannon Nelson 2023-04-19  25  	pf = pci_get_drvdata(pf_pdev);
-10659034c62273 Shannon Nelson 2023-04-19  26  	if (pf->state)
-10659034c62273 Shannon Nelson 2023-04-19  27  		return -ENXIO;
-10659034c62273 Shannon Nelson 2023-04-19  28  
-10659034c62273 Shannon Nelson 2023-04-19  29  	cmd.client_reg.opcode = PDS_AQ_CMD_CLIENT_REG;
-10659034c62273 Shannon Nelson 2023-04-19  30  	strscpy(cmd.client_reg.devname, devname,
-10659034c62273 Shannon Nelson 2023-04-19  31  		sizeof(cmd.client_reg.devname));
-10659034c62273 Shannon Nelson 2023-04-19  32  
-10659034c62273 Shannon Nelson 2023-04-19  33  	err = pdsc_adminq_post(pf, &cmd, &comp, false);
-10659034c62273 Shannon Nelson 2023-04-19  34  	if (err) {
-10659034c62273 Shannon Nelson 2023-04-19  35  		dev_info(pf->dev, "register dev_name %s with DSC failed, status %d: %pe\n",
-10659034c62273 Shannon Nelson 2023-04-19  36  			 devname, comp.status, ERR_PTR(err));
-10659034c62273 Shannon Nelson 2023-04-19  37  		return err;
-10659034c62273 Shannon Nelson 2023-04-19  38  	}
-10659034c62273 Shannon Nelson 2023-04-19  39  
-10659034c62273 Shannon Nelson 2023-04-19  40  	ci = le16_to_cpu(comp.client_reg.client_id);
-10659034c62273 Shannon Nelson 2023-04-19  41  	if (!ci) {
-10659034c62273 Shannon Nelson 2023-04-19  42  		dev_err(pf->dev, "%s: device returned null client_id\n",
-10659034c62273 Shannon Nelson 2023-04-19  43  			__func__);
-10659034c62273 Shannon Nelson 2023-04-19  44  		return -EIO;
-10659034c62273 Shannon Nelson 2023-04-19  45  	}
-10659034c62273 Shannon Nelson 2023-04-19  46  
-10659034c62273 Shannon Nelson 2023-04-19  47  	dev_dbg(pf->dev, "%s: device returned client_id %d for %s\n",
-10659034c62273 Shannon Nelson 2023-04-19  48  		__func__, ci, devname);
-10659034c62273 Shannon Nelson 2023-04-19  49  
-10659034c62273 Shannon Nelson 2023-04-19  50  	return ci;
-10659034c62273 Shannon Nelson 2023-04-19  51  }
-10659034c62273 Shannon Nelson 2023-04-19  52  EXPORT_SYMBOL_GPL(pds_client_register);
-10659034c62273 Shannon Nelson 2023-04-19  53  
-10659034c62273 Shannon Nelson 2023-04-19  54  /**
-10659034c62273 Shannon Nelson 2023-04-19  55   * pds_client_unregister - Unlink the client from the firmware
-5808b1c50a443e Brett Creeley  2023-08-17  56   * @pf:		ptr to the PF driver's private data struct
-10659034c62273 Shannon Nelson 2023-04-19  57   * @client_id:	id returned from pds_client_register()
-10659034c62273 Shannon Nelson 2023-04-19  58   *
-10659034c62273 Shannon Nelson 2023-04-19  59   * Return: 0 on success, or
-10659034c62273 Shannon Nelson 2023-04-19  60   *         negative for error
-10659034c62273 Shannon Nelson 2023-04-19  61   */
-10659034c62273 Shannon Nelson 2023-04-19  62  int pds_client_unregister(struct pci_dev *pf_pdev, u16 client_id)
-10659034c62273 Shannon Nelson 2023-04-19 @63  {
-10659034c62273 Shannon Nelson 2023-04-19  64  	union pds_core_adminq_comp comp = {};
-10659034c62273 Shannon Nelson 2023-04-19  65  	union pds_core_adminq_cmd cmd = {};
-10659034c62273 Shannon Nelson 2023-04-19  66  	struct pdsc *pf;
-10659034c62273 Shannon Nelson 2023-04-19  67  	int err;
-10659034c62273 Shannon Nelson 2023-04-19  68  
-10659034c62273 Shannon Nelson 2023-04-19  69  	pf = pci_get_drvdata(pf_pdev);
-10659034c62273 Shannon Nelson 2023-04-19  70  	if (pf->state)
-10659034c62273 Shannon Nelson 2023-04-19  71  		return -ENXIO;
-10659034c62273 Shannon Nelson 2023-04-19  72  
-10659034c62273 Shannon Nelson 2023-04-19  73  	cmd.client_unreg.opcode = PDS_AQ_CMD_CLIENT_UNREG;
-10659034c62273 Shannon Nelson 2023-04-19  74  	cmd.client_unreg.client_id = cpu_to_le16(client_id);
-10659034c62273 Shannon Nelson 2023-04-19  75  
-10659034c62273 Shannon Nelson 2023-04-19  76  	err = pdsc_adminq_post(pf, &cmd, &comp, false);
-10659034c62273 Shannon Nelson 2023-04-19  77  	if (err)
-10659034c62273 Shannon Nelson 2023-04-19  78  		dev_info(pf->dev, "unregister client_id %d failed, status %d: %pe\n",
-10659034c62273 Shannon Nelson 2023-04-19  79  			 client_id, comp.status, ERR_PTR(err));
-10659034c62273 Shannon Nelson 2023-04-19  80  
-10659034c62273 Shannon Nelson 2023-04-19  81  	return err;
-10659034c62273 Shannon Nelson 2023-04-19  82  }
-10659034c62273 Shannon Nelson 2023-04-19  83  EXPORT_SYMBOL_GPL(pds_client_unregister);
-10659034c62273 Shannon Nelson 2023-04-19  84  
-
+diff --git a/include/linux/cred.h b/include/linux/cred.h
+index 8661f6294ad4..bf1c142afcec 100644
+--- a/include/linux/cred.h
++++ b/include/linux/cred.h
+@@ -109,7 +109,7 @@ static inline int groups_search(const struct group_info *group_info, kgid_t grp)
+  * same context as task->real_cred.
+  */
+ struct cred {
+-	atomic_t	usage;
++	refcount_t	usage;
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	atomic_t	subscribers;	/* number of processes subscribed */
+ 	void		*put_addr;
+@@ -229,7 +229,7 @@ static inline bool cap_ambient_invariant_ok(const struct cred *cred)
+  */
+ static inline struct cred *get_new_cred(struct cred *cred)
+ {
+-	atomic_inc(&cred->usage);
++	refcount_inc(&cred->usage);
+ 	return cred;
+ }
+ 
+@@ -261,7 +261,7 @@ static inline const struct cred *get_cred_rcu(const struct cred *cred)
+ 	struct cred *nonconst_cred = (struct cred *) cred;
+ 	if (!cred)
+ 		return NULL;
+-	if (!atomic_inc_not_zero(&nonconst_cred->usage))
++	if (!refcount_inc_not_zero(&nonconst_cred->usage))
+ 		return NULL;
+ 	validate_creds(cred);
+ 	nonconst_cred->non_rcu = 0;
+@@ -285,7 +285,7 @@ static inline void put_cred(const struct cred *_cred)
+ 
+ 	if (cred) {
+ 		validate_creds(cred);
+-		if (atomic_dec_and_test(&(cred)->usage))
++		if (refcount_dec_and_test(&(cred)->usage))
+ 			__put_cred(cred);
+ 	}
+ }
+diff --git a/kernel/cred.c b/kernel/cred.c
+index bed458cfb812..33090c43bcac 100644
+--- a/kernel/cred.c
++++ b/kernel/cred.c
+@@ -39,7 +39,7 @@ static struct group_info init_groups = { .usage = REFCOUNT_INIT(2) };
+  * The initial credentials for the initial task
+  */
+ struct cred init_cred = {
+-	.usage			= ATOMIC_INIT(4),
++	.usage			= REFCOUNT_INIT(4),
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	.subscribers		= ATOMIC_INIT(2),
+ 	.magic			= CRED_MAGIC,
+@@ -99,17 +99,17 @@ static void put_cred_rcu(struct rcu_head *rcu)
+ 
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	if (cred->magic != CRED_MAGIC_DEAD ||
+-	    atomic_read(&cred->usage) != 0 ||
++	    refcount_read(&cred->usage) != 0 ||
+ 	    read_cred_subscribers(cred) != 0)
+ 		panic("CRED: put_cred_rcu() sees %p with"
+ 		      " mag %x, put %p, usage %d, subscr %d\n",
+ 		      cred, cred->magic, cred->put_addr,
+-		      atomic_read(&cred->usage),
++		      refcount_read(&cred->usage),
+ 		      read_cred_subscribers(cred));
+ #else
+-	if (atomic_read(&cred->usage) != 0)
++	if (refcount_read(&cred->usage) != 0)
+ 		panic("CRED: put_cred_rcu() sees %p with usage %d\n",
+-		      cred, atomic_read(&cred->usage));
++		      cred, refcount_read(&cred->usage));
+ #endif
+ 
+ 	security_cred_free(cred);
+@@ -135,10 +135,10 @@ static void put_cred_rcu(struct rcu_head *rcu)
+ void __put_cred(struct cred *cred)
+ {
+ 	kdebug("__put_cred(%p{%d,%d})", cred,
+-	       atomic_read(&cred->usage),
++	       refcount_read(&cred->usage),
+ 	       read_cred_subscribers(cred));
+ 
+-	BUG_ON(atomic_read(&cred->usage) != 0);
++	BUG_ON(refcount_read(&cred->usage) != 0);
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	BUG_ON(read_cred_subscribers(cred) != 0);
+ 	cred->magic = CRED_MAGIC_DEAD;
+@@ -162,7 +162,7 @@ void exit_creds(struct task_struct *tsk)
+ 	struct cred *cred;
+ 
+ 	kdebug("exit_creds(%u,%p,%p,{%d,%d})", tsk->pid, tsk->real_cred, tsk->cred,
+-	       atomic_read(&tsk->cred->usage),
++	       refcount_read(&tsk->cred->usage),
+ 	       read_cred_subscribers(tsk->cred));
+ 
+ 	cred = (struct cred *) tsk->real_cred;
+@@ -221,7 +221,7 @@ struct cred *cred_alloc_blank(void)
+ 	if (!new)
+ 		return NULL;
+ 
+-	atomic_set(&new->usage, 1);
++	refcount_set(&new->usage, 1);
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	new->magic = CRED_MAGIC;
+ #endif
+@@ -267,7 +267,7 @@ struct cred *prepare_creds(void)
+ 	memcpy(new, old, sizeof(struct cred));
+ 
+ 	new->non_rcu = 0;
+-	atomic_set(&new->usage, 1);
++	refcount_set(&new->usage, 1);
+ 	set_cred_subscribers(new, 0);
+ 	get_group_info(new->group_info);
+ 	get_uid(new->user);
+@@ -356,7 +356,7 @@ int copy_creds(struct task_struct *p, unsigned long clone_flags)
+ 		get_cred(p->cred);
+ 		alter_cred_subscribers(p->cred, 2);
+ 		kdebug("share_creds(%p{%d,%d})",
+-		       p->cred, atomic_read(&p->cred->usage),
++		       p->cred, refcount_read(&p->cred->usage),
+ 		       read_cred_subscribers(p->cred));
+ 		inc_rlimit_ucounts(task_ucounts(p), UCOUNT_RLIMIT_NPROC, 1);
+ 		return 0;
+@@ -450,7 +450,7 @@ int commit_creds(struct cred *new)
+ 	const struct cred *old = task->real_cred;
+ 
+ 	kdebug("commit_creds(%p{%d,%d})", new,
+-	       atomic_read(&new->usage),
++	       refcount_read(&new->usage),
+ 	       read_cred_subscribers(new));
+ 
+ 	BUG_ON(task->cred != old);
+@@ -459,7 +459,7 @@ int commit_creds(struct cred *new)
+ 	validate_creds(old);
+ 	validate_creds(new);
+ #endif
+-	BUG_ON(atomic_read(&new->usage) < 1);
++	BUG_ON(refcount_read(&new->usage) < 1);
+ 
+ 	get_cred(new); /* we will require a ref for the subj creds too */
+ 
+@@ -533,13 +533,13 @@ EXPORT_SYMBOL(commit_creds);
+ void abort_creds(struct cred *new)
+ {
+ 	kdebug("abort_creds(%p{%d,%d})", new,
+-	       atomic_read(&new->usage),
++	       refcount_read(&new->usage),
+ 	       read_cred_subscribers(new));
+ 
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	BUG_ON(read_cred_subscribers(new) != 0);
+ #endif
+-	BUG_ON(atomic_read(&new->usage) < 1);
++	BUG_ON(refcount_read(&new->usage) < 1);
+ 	put_cred(new);
+ }
+ EXPORT_SYMBOL(abort_creds);
+@@ -556,7 +556,7 @@ const struct cred *override_creds(const struct cred *new)
+ 	const struct cred *old = current->cred;
+ 
+ 	kdebug("override_creds(%p{%d,%d})", new,
+-	       atomic_read(&new->usage),
++	       refcount_read(&new->usage),
+ 	       read_cred_subscribers(new));
+ 
+ 	validate_creds(old);
+@@ -579,7 +579,7 @@ const struct cred *override_creds(const struct cred *new)
+ 	alter_cred_subscribers(old, -1);
+ 
+ 	kdebug("override_creds() = %p{%d,%d}", old,
+-	       atomic_read(&old->usage),
++	       refcount_read(&old->usage),
+ 	       read_cred_subscribers(old));
+ 	return old;
+ }
+@@ -597,7 +597,7 @@ void revert_creds(const struct cred *old)
+ 	const struct cred *override = current->cred;
+ 
+ 	kdebug("revert_creds(%p{%d,%d})", old,
+-	       atomic_read(&old->usage),
++	       refcount_read(&old->usage),
+ 	       read_cred_subscribers(old));
+ 
+ 	validate_creds(old);
+@@ -728,7 +728,7 @@ struct cred *prepare_kernel_cred(struct task_struct *daemon)
+ 
+ 	*new = *old;
+ 	new->non_rcu = 0;
+-	atomic_set(&new->usage, 1);
++	refcount_set(&new->usage, 1);
+ 	set_cred_subscribers(new, 0);
+ 	get_uid(new->user);
+ 	get_user_ns(new->user_ns);
+@@ -843,7 +843,7 @@ static void dump_invalid_creds(const struct cred *cred, const char *label,
+ 	printk(KERN_ERR "CRED: ->magic=%x, put_addr=%p\n",
+ 	       cred->magic, cred->put_addr);
+ 	printk(KERN_ERR "CRED: ->usage=%d, subscr=%d\n",
+-	       atomic_read(&cred->usage),
++	       refcount_read(&cred->usage),
+ 	       read_cred_subscribers(cred));
+ 	printk(KERN_ERR "CRED: ->*uid = { %d,%d,%d,%d }\n",
+ 		from_kuid_munged(&init_user_ns, cred->uid),
+@@ -917,7 +917,7 @@ void validate_creds_for_do_exit(struct task_struct *tsk)
+ {
+ 	kdebug("validate_creds_for_do_exit(%p,%p{%d,%d})",
+ 	       tsk->real_cred, tsk->cred,
+-	       atomic_read(&tsk->cred->usage),
++	       refcount_read(&tsk->cred->usage),
+ 	       read_cred_subscribers(tsk->cred));
+ 
+ 	__validate_process_creds(tsk, __FILE__, __LINE__);
+diff --git a/net/sunrpc/auth.c b/net/sunrpc/auth.c
+index 2f16f9d17966..f9f406249e7d 100644
+--- a/net/sunrpc/auth.c
++++ b/net/sunrpc/auth.c
+@@ -39,7 +39,7 @@ static LIST_HEAD(cred_unused);
+ static unsigned long number_cred_unused;
+ 
+ static struct cred machine_cred = {
+-	.usage = ATOMIC_INIT(1),
++	.usage = REFCOUNT_INIT(1),
+ #ifdef CONFIG_DEBUG_CREDENTIALS
+ 	.magic = CRED_MAGIC,
+ #endif
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
