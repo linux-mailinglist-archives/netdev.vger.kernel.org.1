@@ -1,148 +1,266 @@
-Return-Path: <netdev+bounces-28671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88EE780395
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 03:58:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0597803A9
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 04:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45694282286
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 01:58:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 122381C2156A
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 02:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB96F65E;
-	Fri, 18 Aug 2023 01:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD4B801;
+	Fri, 18 Aug 2023 02:10:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C54398
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 01:58:23 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305581AE
-	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:58:22 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d66d85403f5so540676276.2
-        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 18:58:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692323901; x=1692928701;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UR1USQJU6O719ydnoedciRN+N7OIWd2UwSz37wPOIuQ=;
-        b=AWe6Tw/NIIomWjOQkaS6PzSI9+a//hPRkZynEhiFqMMoVpFpnkDKhzF/LAusiGhl/O
-         xBnMfUoquoqokFzAbQ34nmQSFIkTNX4Dc7VAzbNmMGgeA3Mip/0pbU8jyGebw5QHwe05
-         f06tyOZGDyFzyLBO+7o+usdiPNsvjt8Yjkn7EobcWHtEGAFM4vpfNXMIrA1if6NSOZZC
-         46511+0kp5TDJRf+HPrkMOdd0S4ZhqBttLtsMw50CHXebO+zhVdBAqh0R3llQkfvvYOa
-         t+zt8JydYkXYN4TYckZiGFOCNqCDWcdrq5Zf5fTCggoN8F2Cl5+cPPUSsWV68+YdHKsM
-         1Lsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692323901; x=1692928701;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UR1USQJU6O719ydnoedciRN+N7OIWd2UwSz37wPOIuQ=;
-        b=ASWBr+UyOzRco//1SOogZNo1prdOzi1WFlmKo2Cdw4yZTUVuWWj4PIgdwqmSVvzZik
-         SaaDkuUlystvDTESkHRQck2fv43TsLanKMsAb+cBISXKEdhpqVQ/pxXPvwS8czCdNgdm
-         S34izoVFLpFPtig2h9Q1BhX++FxYV0HjHet2zXxKpgV5mjCPRCkfNn6GhsSEFBPUWWCS
-         J6BB/27EfVOJL4caAEa2Lugi8ZUlVHRb/AyUlkO/O3LQP4MP27PRHR9CAR/aqiqk6zQx
-         7HDeGmzbts8PWgBFY9JZIxqd0pWlxwCZyTx0D0yCc+P7J7iGke1Tyj7cWBY3nR6Uk+bl
-         wiLw==
-X-Gm-Message-State: AOJu0Yw4xN24PtsDIBkOTQ/VP5/GIYacHqw3MlEFR7Sx5RRqT6ZPN3yk
-	pyBOE5YGWeD35Xga40q0jjLno6N3SSS2gg==
-X-Google-Smtp-Source: AGHT+IFCAdtyBFHOW5C5acMAiEWLmeDsUQH9cQW4OIy+KK+oMFalLAezi8AIfrj8l374+KcgVAet3DE0ZsxPDw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1103:b0:d51:577e:425d with SMTP
- id o3-20020a056902110300b00d51577e425dmr20764ybu.12.1692323901487; Thu, 17
- Aug 2023 18:58:21 -0700 (PDT)
-Date: Fri, 18 Aug 2023 01:58:20 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A1D39C
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 02:09:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54782C433C7;
+	Fri, 18 Aug 2023 02:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692324598;
+	bh=3fB+vAoFtqXbB6GVaM4eS1td9RpyllU4lr6gezSpNIA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cikJWNOI36FGPE2ohzmBfqWtYQgDe5bj93Rqcn5YnQ17xoKLYj3rlGmvY/jReQ8zG
+	 JRnwC5W5XDGDui5GkGsukBotbiV2Dg5ab8hwLilLNmDnnPHmkHGGt51b3JjMarzVTO
+	 jPxbnzKXLe/bBDAIzNtQPP6rvzYH30Gr3HLAmSlwfnFZELp2rz+GbyZbGgNbhl33O6
+	 8rGhKiXnpk6K7OQHDI+oHS9sqv+fNq9zv1flYOu28qWHwYHLqlzn1L4ktmE9JqlqJc
+	 K/xmJRp7qO9iHfcGTXZhj8+qvvsNaivUL7y57W2S9HcIpP2zicjHq9+8zWsI56vImf
+	 U96wT8dMd1zEA==
+Date: Thu, 17 Aug 2023 19:09:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Mina Almasry
+ <almasrymina@google.com>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, sdf@google.com, Willem de
+ Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
+ dma-buf to netdevice
+Message-ID: <20230817190957.571ab350@kernel.org>
+In-Reply-To: <c47219db-abf9-8a5c-9b26-61f65ae4dd26@kernel.org>
+References: <20230810015751.3297321-1-almasrymina@google.com>
+	<20230810015751.3297321-3-almasrymina@google.com>
+	<7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
+	<20230815171638.4c057dcd@kernel.org>
+	<64dcf5834c4c8_23f1f8294fa@willemb.c.googlers.com.notmuch>
+	<c47219db-abf9-8a5c-9b26-61f65ae4dd26@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230818015820.2701595-1-edumazet@google.com>
-Subject: [PATCH net] dccp: annotate data-races in dccp_poll()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-We changed tcp_poll() over time, bug never updated dccp.
+On Thu, 17 Aug 2023 19:33:47 -0600 David Ahern wrote:
+> [ sorry for the delayed response; very busy 2 days ]
 
-Note that we also could remove dccp instead of maintaining it.
+Tell me about it :)
 
-Fixes: 7c657876b63c ("[DCCP]: Initial implementation")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/dccp/proto.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+> On 8/16/23 10:12 AM, Willem de Bruijn wrote:
+> > Jakub Kicinski wrote:  
+> >> Let's start sketching out the design for queue config.
+> >> Without sliding into scope creep, hopefully.
+> >>
+> >> Step one - I think we can decompose the problem into:
+> >>  A) flow steering
+> >>  B) object lifetime and permissions
+> >>  C) queue configuration (incl. potentially creating / destroying queues)
+> >>
+> >> These come together into use scenarios like:
+> >>  #1 - partitioning for containers - when high perf containers share
+> >>       a machine each should get an RSS context on the physical NIC
+> >>       to have predictable traffic<>CPU placement, they may also have
+> >>       different preferences on how the queues are configured, maybe
+> >>       XDP, too?  
+> 
+> subfunctions are a more effective and simpler solution for containers, no?
 
-diff --git a/net/dccp/proto.c b/net/dccp/proto.c
-index 4e3266e4d7c3c4595ac7f0f8e5e48c0cc98724de..fcc5c9d64f4661774ec20e78cb007ddd47662286 100644
---- a/net/dccp/proto.c
-+++ b/net/dccp/proto.c
-@@ -315,11 +315,15 @@ EXPORT_SYMBOL_GPL(dccp_disconnect);
- __poll_t dccp_poll(struct file *file, struct socket *sock,
- 		       poll_table *wait)
- {
--	__poll_t mask;
- 	struct sock *sk = sock->sk;
-+	__poll_t mask;
-+	u8 shutdown;
-+	int state;
- 
- 	sock_poll_wait(file, sock, wait);
--	if (sk->sk_state == DCCP_LISTEN)
-+
-+	state = inet_sk_state_load(sk);
-+	if (state == DCCP_LISTEN)
- 		return inet_csk_listen_poll(sk);
- 
- 	/* Socket is not locked. We are protected from async events
-@@ -328,20 +332,21 @@ __poll_t dccp_poll(struct file *file, struct socket *sock,
- 	 */
- 
- 	mask = 0;
--	if (sk->sk_err)
-+	if (READ_ONCE(sk->sk_err))
- 		mask = EPOLLERR;
-+	shutdown = READ_ONCE(sk->sk_shutdown);
- 
--	if (sk->sk_shutdown == SHUTDOWN_MASK || sk->sk_state == DCCP_CLOSED)
-+	if (shutdown == SHUTDOWN_MASK || state == DCCP_CLOSED)
- 		mask |= EPOLLHUP;
--	if (sk->sk_shutdown & RCV_SHUTDOWN)
-+	if (shutdown & RCV_SHUTDOWN)
- 		mask |= EPOLLIN | EPOLLRDNORM | EPOLLRDHUP;
- 
- 	/* Connected? */
--	if ((1 << sk->sk_state) & ~(DCCPF_REQUESTING | DCCPF_RESPOND)) {
-+	if ((1 << state) & ~(DCCPF_REQUESTING | DCCPF_RESPOND)) {
- 		if (atomic_read(&sk->sk_rmem_alloc) > 0)
- 			mask |= EPOLLIN | EPOLLRDNORM;
- 
--		if (!(sk->sk_shutdown & SEND_SHUTDOWN)) {
-+		if (!(shutdown & SEND_SHUTDOWN)) {
- 			if (sk_stream_is_writeable(sk)) {
- 				mask |= EPOLLOUT | EPOLLWRNORM;
- 			} else {  /* send SIGIO later */
-@@ -359,7 +364,6 @@ __poll_t dccp_poll(struct file *file, struct socket *sock,
- 	}
- 	return mask;
- }
--
- EXPORT_SYMBOL_GPL(dccp_poll);
- 
- int dccp_ioctl(struct sock *sk, int cmd, int *karg)
--- 
-2.42.0.rc1.204.g551eb34607-goog
+Maybe, subfunctions offload a lot, let's not go too far into the weeds
+on production and flexibility considerations but they wouldn't be my
+first choice.
 
+> >>  #2 - fancy page pools within the host (e.g. huge pages)
+> >>  #3 - very fancy page pools not within the host (Mina's work)
+> >>  #4 - XDP redirect target (allowing XDP_REDIRECT without installing XDP
+> >>       on the target)
+> >>  #5 - busy polling - admittedly a bit theoretical, I don't know of
+> >>       anyone busy polling in real life, but one of the problems today
+> >>       is that setting it up requires scraping random bits of info from
+> >>       sysfs and a lot of hoping.
+> >>
+> >> Flow steering (A) is there today, to a sufficient extent, I think,
+> >> so we can defer on that. Sooner or later we should probably figure
+> >> out if we want to continue down the unruly path of TC offloads or
+> >> just give up and beef up ethtool.  
+> 
+> Flow steering to TC offloads -- more details on what you were thinking here?
+
+I think TC flower can do almost everything ethtool -N can.
+So do we continue to developer for both APIs or pick one?
+
+> >> I don't have a good sense of what a good model for cleanup and
+> >> permissions is (B). All I know is that if we need to tie things to
+> >> processes netlink can do it, and we shouldn't have to create our
+> >> own FS and special file descriptors...  
+> 
+> From my perspective the main sticking point that has not been handled is
+> flushing buffers from the RxQ, but there is 100% tied to queue
+> management and a process' ability to effect a flush or queue tear down -
+> and that is the focus of your list below:
+
+If you're thinking about it from the perspective of "application died
+give me back all the buffers" - the RxQ is just one piece, right?
+As we discovered with page pool - packets may get stuck in stack for
+ever.
+
+> >> And then there's (C) which is the main part to talk about.
+> >> The first step IMHO is to straighten out the configuration process.
+> >> Currently we do:
+> >>
+> >>  user -> thin ethtool API --------------------> driver
+> >>                               netdev core <---'
+> >>
+> >> By "straighten" I mean more of a:
+> >>
+> >>  user -> thin ethtool API ---> netdev core ---> driver
+> >>
+> >> flow. This means core maintains the full expected configuration,
+> >> queue count and their parameters and driver creates those queues
+> >> as instructed.
+> >>
+> >> I'd imagine we'd need 4 basic ops:
+> >>  - queue_mem_alloc(dev, cfg) -> queue_mem
+> >>  - queue_mem_free(dev, cfg, queue_mem)
+> >>  - queue_start(dev, queue info, cfg, queue_mem) -> errno
+> >>  - queue_stop(dev, queue info, cfg)
+> >>
+> >> The mem_alloc/mem_free takes care of the commonly missed requirement to
+> >> not take the datapath down until resources are allocated for new config.  
+> 
+> sounds reasonable.
+> 
+> >>
+> >> Core then sets all the queues up after ndo_open, and tears down before
+> >> ndo_stop. In case of an ethtool -L / -G call or enabling / disabling XDP
+> >> core can handle the entire reconfiguration dance.  
+> 
+> `ethtool -L/-G` and `ip link set {up/down}` pertain to the "general OS"
+> queues managed by a driver for generic workloads and networking
+> management (e.g., neigh discovery, icmp, etc). The discussions here
+> pertains to processes wanting to use their own memory or GPU memory in a
+> queue. Processes will come and go and the queue management needs to
+> align with that need without affecting all of the other queues managed
+> by the driver.
+
+For sure, I'm just saying that both the old uAPI can be translated to
+the new driver API, and so should the new uAPIs. I focused on the
+driver facing APIs because I think that it's the hard part. We have
+many drivers, the uAPI is more easily dreamed up, no?
+
+> >> The cfg object needs to contain all queue configuration, including 
+> >> the page pool parameters.
+> >>
+> >> If we have an abstract model of the configuration in the core we can
+> >> modify it much more easily, I hope. I mean - the configuration will be
+> >> somewhat detached from what's instantiated in the drivers.
+> >>
+> >> I'd prefer to go as far as we can without introducing a driver callback
+> >> to "check if it can support a config change", and try to rely on
+> >> (static) capabilities instead. This allows more of the validation to
+> >> happen in the core and also lends itself naturally to exporting the
+> >> capabilities to the user.
+> >>
+> >> Checking the use cases:
+> >>
+> >>  #1 - partitioning for containers - storing the cfg in the core gives
+> >>       us a neat ability to allow users to set the configuration on RSS
+> >>       context
+> >>  #2, #3 - page pools - we can make page_pool_create take cfg and read whatever
+> >>       params we want from there, memory provider, descriptor count, recycling
+> >>       ring size etc. Also for header-data-split we may want different settings
+> >>       per queue so again cfg comes in handy
+> >>  #4 - XDP redirect target - we should spawn XDP TX queues independently from
+> >>       the XDP configuration
+> >>
+> >> That's all I have thought up in terms of direction.
+> >> Does that make sense? What are the main gaps? Other proposals?  
+> > 
+> > More on (A) and (B):
+> > 
+> > I expect most use cases match the containerization that you mention.
+> > Where a privileged process handles configuration.
+> > 
+> > For that, the existing interfaces of ethtool -G/-L-/N/-K/-X suffice.
+> > 
+> > A more far-out approach could infer the ntuple 5-tuple connection or
+> > 3-tuple listener rule from a socket itself, no ethtool required. But
+> > let's ignore that for now.
+> > 
+> > Currently we need to use ethtool -X to restrict the RSS indirection
+> > table to a subset of queues. It is not strictly necessary to
+> > reconfigure the device on each new container, if pre-allocation a
+> > sufficient set of non-RSS queues.  
+> 
+> This is an interesting approach: This scheme here is along the lines of
+> you have N cpus in the server, so N queue sets (or channels). The
+> indirection table means M queue sets are used for RSS leaving N-M queues
+> for flows with "fancy memory providers". Such a model can work but it is
+> quite passive, needs careful orchestration and has a lot of moving,
+> disjointed pieces - with some race conditions around setup vs first data
+> packet arriving.
+> 
+> I was thinking about a more generic design where H/W queues are created
+> and destroyed - e.g., queues unique to a process which makes the cleanup
+> so much easier.
+
+FWIW what Willem describes is what we were telling people to do for
+AF_XDP for however many years it existed.
+
+> > Then only ethtool -N is needed to drive data towards one of the
+> > non-RSS queues. Or one of the non context 0 RSS contexts if that is
+> > used.
+> > 
+> > The main part that is missing is memory allocation. Memory is stranded
+> > on unused queues, and there is no explicit support for special
+> > allocators.
+> > 
+> > A poor man's solution might be to load a ring with minimal sized
+> > buffers (assuming devices accept that, say a zero length buffer),
+> > attach a memory provider before inserting an ntuple rule, and refill
+> > from the memory provider. This requires accepting that a whole ring of
+> > packets is lost before refilled slots get filled..
+> > 
+> > (I'm messing with that with AF_XDP right now: a process that xsk_binds
+> >  before filling the FILL queue..)
+> > 
+> > Ideally, we would have a way to reconfigure a single queue, without
+> > having to down/up the entire device..
+> > 
+> > I don't know if the kernel needs an explicit abstract model, or can
+> > leave that to the userspace privileged daemon that presses the ethtool
+> > buttons.  
+> 
+> The kernel has that in the IB verbs S/W APIs. Yes, I realize that
+> comment amounts to profanity on this mailing list, but it should not be.
+> There are existing APIs for creating, managing and destroying queues -
+> open source, GPL'ed, *software* APIs that are open for all to use.
+> 
+> That said, I have no religion here. If the netdev stack wants new APIs
+> to manage queues - including supplying buffers - drivers will have APIs
+> that can be adapted to some new ndo to create, configure, and destroy
+> queues. The ethtool API can be updated to manage that. Ultimately I
+> believe anything short of dynamic queue management will be a band-aid
+> approach that will have a lot of problems.
+
+No religion here either, but the APIs we talk about are not
+particularly complex. Having started hacking things together 
+with page pools, huge pages, RSS etc - IMHO the reuse and convergence
+would be very superficial.
 
