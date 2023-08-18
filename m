@@ -1,140 +1,150 @@
-Return-Path: <netdev+bounces-28807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FC4780C00
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:42:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F82780C05
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 14:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22D331C21614
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:42:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 844F32823DE
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FF61801D;
-	Fri, 18 Aug 2023 12:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E17182A2;
+	Fri, 18 Aug 2023 12:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B06E63B4;
-	Fri, 18 Aug 2023 12:42:42 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B463AAF;
-	Fri, 18 Aug 2023 05:42:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0jubvQH8s1Fv3I0hA9yIVmKUUm71HOUT3IKIhSEZ3X4=; b=FkjGN3Mt84nVTJEssTzZgpuMqS
-	IONqYjZCL0Tb9PIidAXYLXAavuj7MYtwicOS31Cfq3fTRVebeWUPIwJ1lVzgwWgfsJTPMtnoyeDBx
-	RSqcSEOSaFOEcaw+r9r50ptK/vj3zUzHZGXmdreXyb7HUgmOgXZCJxL0pJCqzaIi+ffw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qWyo6-004UYT-Rv; Fri, 18 Aug 2023 14:42:26 +0200
-Date: Fri, 18 Aug 2023 14:42:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Davide Rovelli <roveld@usi.ch>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Michele Dalle Rive <dallerivemichele@gmail.com>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Davide Rovelli <davide.rovelli@usi.ch>,
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [RFC PATCH 0/7] Rust Socket abstractions
-Message-ID: <c61a60ef-fa9d-44ea-9852-ae7b18bc1ab1@lunn.ch>
-References: <20230814092302.1903203-1-dallerivemichele@gmail.com>
- <2023081411-apache-tubeless-7bb3@gregkh>
- <0e91e3be-abbb-4bf7-be05-ba75c7522736@lunn.ch>
- <CACETy0=V9B8UOCi+BKfyrX06ca=WvC0Gvo_ouR=DjX=_-jhAwg@mail.gmail.com>
- <e3b4164a-5392-4209-99e5-560bf96df1df@lunn.ch>
- <CACETy0n0217=JOnHUWvxM_npDrdg4U=nzGYKqYbGFsvspjP6gg@mail.gmail.com>
- <CANiq72=3z+FcyYGV0upsezGAkh2J4EmzbJ=5s374gf=10AYnUQ@mail.gmail.com>
- <bddea099-4468-4f96-2e06-2b207b608485@usi.ch>
- <0ba551eb-480e-4327-b62f-fc105d280821@lunn.ch>
- <c9c63da7-bc8a-7307-63f1-1f393b017da2@usi.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464D67ED
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 12:44:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E3A0C433C8;
+	Fri, 18 Aug 2023 12:44:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692362675;
+	bh=FNb2SVuYvlLFocySdsYx+8V0njmhNeTW7yGsOfooywE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=G/drKLHCSyueU5bKmxxpqyI4simi9nIfnkAxFxjDnWAniy4/SW59YhZB9c7hxU8H2
+	 TF77VqXAL/qerdtEQP+r71icmKSmAdrntcWqtYyLWud7BzEm9Nr4OvcKJwYBT6qREv
+	 lwu9i3m4can4mSm42grJPlIlf2HDGUGpUDmIw4/72fylZVasltJm4Ka97d6YAW7yU+
+	 2+0wYTB+ddEtBwL479wUrr6OTx8nZcmBD20Gn/w2Y2C3ghYUfaA/7a38PNOGAN3RSy
+	 heAC5qwf0I4O2dsWL1ObTTWynLwnq75wWBq5V3Ms8JZX3IY1pauRmTDoK9QX0up7au
+	 52COAK2wvxoZA==
+Message-ID: <5d077342-435f-2829-ba2a-cdf763b6b8e1@kernel.org>
+Date: Fri, 18 Aug 2023 15:44:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c9c63da7-bc8a-7307-63f1-1f393b017da2@usi.ch>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v5 0/5] Introduce IEP driver and packet timestamping
+ support
+To: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Simon Horman <simon.horman@corigine.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20230817114527.1585631-1-danishanwar@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20230817114527.1585631-1-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 18, 2023 at 09:50:45AM +0200, Davide Rovelli wrote:
-> 
-> 
-> On 8/18/23 03:30, Andrew Lunn wrote:
-> 
-> > So you have an application in user space wanting to use this
-> > protocol. I assume it is using BSD sockets to communicate with the
-> > kernel and the protocol.
-> 
-> No, at the moment it uses procfs or a shared mmap'd chardev buffer.
 
-O.K, so that will never be accepted. There is support for zero copy in
-sockets. Look at the work Eric did. And you should look at netlink,
-which might be needed for the control plane.
- 
-> > So you need an API below sockets to get this
-> > traffic, i assume a whole new protocol family? But you have an API on
-> > top of sockets for TCP/UDP. So i guess your protocol somehow
-> > encapsulate the traffic and then uses the API your are proposing to
-> > send over TCP or UDP?
+
+On 17/08/2023 14:45, MD Danish Anwar wrote:
+> This series introduces Industrial Ethernet Peripheral (IEP) driver to
+> support timestamping of ethernet packets and thus support PTP and PPS
+> for PRU ICSSG ethernet ports.
 > 
-> Yes, we take a message/value from a user space app and send it to
-> other nodes via UDP according to the chosen protocol. Mind that
-> the term "protocol" might be misleading here as it can be confused
-> with classic network protocols. Our API offers distributed services
-> such as failure detectors, consensus etc.
+> This series also adds 10M full duplex support for ICSSG ethernet driver.
 > 
-> > Which makes me think:
-> > 
-> > Why go through sockets twice for a low jitter networking protocol?
+> There are two IEP instances. IEP0 is used for packet timestamping while IEP1
+> is used for 10M full duplex support.
 > 
-> The idea behind the system is to be split: user space apps are
-> normal apps that can present arbitrary jitter, kernel space services
-> are isolated to provide low jitter. The same applies in the network
-> via a SDN based protocol which prioritises our traffic. By having
-> end-to-end timely communication and processing, we can achieve
-> new efficient distributed services.
+> This is v5 of the series [v1]. It addresses comments made on [v4].
+> This series is based on linux-next(#next-20230817).
+> 
+> Changes from v4 to v5:
+> *) Added comments on why we are using readl / writel instead of regmap_read()
+>    / write() in icss_iep_gettime() / settime() APIs as asked by Roger.
+> 
+> Change from v3 to v4:
+> *) Changed compatible in iep dt bindings. Now each SoC has their own compatible
+>    in the binding with "ti,am654-icss-iep" as a fallback as asked by Conor.
+> *) Addressed Andew's comments and removed helper APIs icss_iep_readl() / 
+>    writel(). Now the settime/gettime APIs directly use readl() / writel().
+> *) Moved selecting TI_ICSS_IEP in Kconfig from patch 3 to patch 4.
+> *) Removed forward declaration of icss_iep_of_match in patch 3.
+> *) Replaced use of of_device_get_match_data() to device_get_match_data() in
+>    patch 3.
+> *) Removed of_match_ptr() from patch 3 as it is not needed.
+> 
+> Changes from v2 to v3:
+> *) Addressed Roger's comment and moved IEP1 related changes in patch 5.
+> *) Addressed Roger's comment and moved icss_iep.c / .h changes from patch 4
+>    to patch 3.
+> *) Added support for multiple timestamping in patch 4 as asked by Roger.
+> *) Addressed Andrew's comment and added comment in case SPEED_10 in
+>    icssg_config_ipg() API.
+> *) Kept compatible as "ti,am654-icss-iep" for all TI K3 SoCs
+> 
+> Changes from v1 to v2:
+> *) Addressed Simon's comment to fix reverse xmas tree declaration. Some APIs
+>    in patch 3 and 4 were not following reverse xmas tree variable declaration.
+>    Fixed it in this version.
+> *) Addressed Conor's comments and removed unsupported SoCs from compatible
+>    comment in patch 1. 
+> *) Addded patch 2 which was not part of v1. Patch 2, adds IEP node to dt
+>    bindings for ICSSG.
+> 
+> [v1] https://lore.kernel.org/all/20230803110153.3309577-1-danishanwar@ti.com/
+> [v2] https://lore.kernel.org/all/20230807110048.2611456-1-danishanwar@ti.com/
+> [v3] https://lore.kernel.org/all/20230809114906.21866-1-danishanwar@ti.com/
+> [v4] https://lore.kernel.org/all/20230814100847.3531480-1-danishanwar@ti.com/
+> 
+> Thanks and Regards,
+> Md Danish Anwar
+> 
+> Grygorii Strashko (1):
+>   net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
+> 
+> MD Danish Anwar (2):
+>   dt-bindings: net: Add ICSS IEP
+>   dt-bindings: net: Add IEP property in ICSSG DT binding
+> 
+> Roger Quadros (2):
+>   net: ti: icss-iep: Add IEP driver
+>   net: ti: icssg-prueth: add packet timestamping and ptp support
+> 
+>  .../devicetree/bindings/net/ti,icss-iep.yaml  |  61 ++
+>  .../bindings/net/ti,icssg-prueth.yaml         |   7 +
+>  drivers/net/ethernet/ti/Kconfig               |  12 +
+>  drivers/net/ethernet/ti/Makefile              |   1 +
+>  drivers/net/ethernet/ti/icssg/icss_iep.c      | 965 ++++++++++++++++++
+>  drivers/net/ethernet/ti/icssg/icss_iep.h      |  41 +
+>  drivers/net/ethernet/ti/icssg/icssg_config.c  |   7 +
+>  drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  21 +
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 451 +++++++-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  28 +-
+>  10 files changed, 1586 insertions(+), 8 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>  create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.c
+>  create mode 100644 drivers/net/ethernet/ti/icssg/icss_iep.h
+> 
 
-Having the services running in kernel space is going to limit what
-services you can actually offer, if you need to go through getting
-them merged every time. If you only have one or two, yes it can be
-done. But anything general purpose is not going to be practical.  The
-answer might be to write your services using eBPF. They can then be
-loaded from user space and do pretty much anything which eBPF can do.
+For this series:
 
-There is often a huge step from academic code to production
-code. Academic code just needs to implement enough to prove the
-concept. It can take all sort of short cuts. Production code to be
-merged into the kernel needs to follow the usual development
-processes, code quality guidelines, and most importantly,
-architecture.
-
-If you want to make that step to production code, we can help you, but
-i don't think it makes any sense to merge API code until you have the
-correct basic architecture. That architecture will define what APIs
-you need, and sitting on top of sockets might not be correct.
-
-	Andrew
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
