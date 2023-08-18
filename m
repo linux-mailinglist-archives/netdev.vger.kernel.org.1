@@ -1,69 +1,158 @@
-Return-Path: <netdev+bounces-28716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18688780590
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 07:18:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8E047805D6
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48F101C215C2
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 05:18:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F29CD28226E
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 06:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6722C13ADA;
-	Fri, 18 Aug 2023 05:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D57C1428C;
+	Fri, 18 Aug 2023 06:12:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F955134D3
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 05:18:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 81D14C433C8;
-	Fri, 18 Aug 2023 05:18:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692335895;
-	bh=QdLqdIjISuh8OpzVyyaN3TMdoeWkEO26hO5xJu8AK1A=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=NHD0ybKzCBDIXsTHCiOujm3GI3XMpKP5JtJbugpPX0dY+g9lX36ed8TZYODxShPUN
-	 pU/QtklVEkYT1HgnDtNv1P9JZbNfN52PdTi9hnrJA16nfox0eu15drpqKqGPyhblzF
-	 bLDoUkCLb5LA9qXhuosjCQ+XrYyuKMwDWjbGvSDxvdcpveKoPC9AjaP1XnZiHIflT9
-	 KgGQlg+sxf5Kt7tRUtmLiZCQpuPz1ZofLXMWnllsBHncFfn8+p5hsRjhHF0FVRjNVB
-	 zcLEsY6Ddo8EAeLisVQ7uAb3Nf6Zt/Qq7fzvNjl1HO3FgRxbUA1JMdvUR2WQvbl5O3
-	 tkX8UHcAwLqoQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6EFC5E93B34;
-	Fri, 18 Aug 2023 05:18:15 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.5-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20230817221129.1014945-1-kuba@kernel.org>
-References: <20230817221129.1014945-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230817221129.1014945-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc7
-X-PR-Tracked-Commit-Id: 820a38d8f2cb3a749ffb7bbde206acec9a387411
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0e8860d2125f51ba9bca67a520d826cb8f66cf42
-Message-Id: <169233589544.13368.883924351693507238.pr-tracker-bot@kernel.org>
-Date: Fri, 18 Aug 2023 05:18:15 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8FF812
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 06:12:49 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733F2359D
+	for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:12:47 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4ffa4f4769fso298733e87.0
+        for <netdev@vger.kernel.org>; Thu, 17 Aug 2023 23:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692339166; x=1692943966;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=k17LecZQkR5FnBBqAVVrYfSgelENhBd5qnGq5/zqZhc=;
+        b=GuMZInSvMka9jx6sMPATR4W1DcsQNyxZbi7o2o53SHgKLk0d3qbgNyH3OebQDdy622
+         GREmSk8CtUc9IzIXVjbw9OIn83xFU4g3AAEDd7bK3Rkgy2B+iE9l9B3Ak2E9d06F+TnZ
+         uYJzmZSrtc9m8DJqOI+XRp5KbBU/ZV5g+wT7kyoXPsvdeX70iswcdim7kbquzj3mL6ce
+         U2ysQ+T/QCx6DcjERJRxT3LZXTARLYM0Fa3eCGSk+lOU/G+ugY/L3TAakb69FYwdbb7n
+         YZOEi0xn2i5owpPkLx38Y1Vtdsc9RHQXw0pXNgA5Bx4RIy6A+5vxYsqzBxP+hmjYaxxN
+         wntg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692339166; x=1692943966;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k17LecZQkR5FnBBqAVVrYfSgelENhBd5qnGq5/zqZhc=;
+        b=dP4SNqiBPazxSj4M3LTlfBs+cpYC5j0pQ2myV16RwNlnCb6oVlUruRNhbnUSUbZ4Q9
+         p6HSVaAhMgJhtSDwMv/dW4ubDluHGH9NtsUcywpgbf83egldV+1GkGP8b7BCdS87GFTk
+         dGRix65jFn7aDNXENEKbXMrBz5SXyZHJ87sd79PnPIURDtpzrKXK6CuO9B7xfK4SZg6C
+         tIj4rAiqOQekmucXnoTRuAh47zXrOcS5kdt/y4WE7wM/uZs9lPnfzoOVrE7k0p07rMfx
+         n4Ei7P9SOLtwpnuipwTOLg+0nA/mNEVN+/AQ2tRU0xsJ40OhUcNFMBoRhmYJAWLpVaLG
+         /gwA==
+X-Gm-Message-State: AOJu0Yxo91Foeto0mXEv7Z0QRpNhUKsRc3OGqz9cqdbRUosrPmLkx4Lz
+	HGoRTv8kl08Z/1a9ydUyrd08fvynXm6MrYH4zKoGNA==
+X-Google-Smtp-Source: AGHT+IGx5YFS7qfg8rzhiiw+9qHifg22wmvkoY5p7YangoYwNqNV8gzzriX7+9DIkhRNrcJAc3/65eICUwZBmjsjK5w=
+X-Received: by 2002:a19:ca1d:0:b0:4fe:958:88ac with SMTP id
+ a29-20020a19ca1d000000b004fe095888acmr829609lfg.6.1692339165491; Thu, 17 Aug
+ 2023 23:12:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20230816100113.41034-1-linyunsheng@huawei.com>
+ <20230816100113.41034-2-linyunsheng@huawei.com> <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
+ <20230817091554.31bb3600@kernel.org> <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
+ <20230817165744.73d61fb6@kernel.org>
+In-Reply-To: <20230817165744.73d61fb6@kernel.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Fri, 18 Aug 2023 09:12:09 +0300
+Message-ID: <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, 
+	Liang Chen <liangchen.linux@gmail.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The pull request you sent on Thu, 17 Aug 2023 15:11:29 -0700:
+On Fri, 18 Aug 2023 at 02:57, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Thu, 17 Aug 2023 19:59:37 +0300 Ilias Apalodimas wrote:
+> > > Can we assume the DMA mapping of page pool is page aligned? We should
+> > > be, right?
+> >
+> > Yes
+> >
+> > > That means we're storing 12 bits of 0 at the lower end.
+> > > So even with 32b of space we can easily store addresses for 32b+12b =>
+> > > 16TB of memory. "Ought to be enough" to paraphrase Bill G, and the
+> > > problem is only in our heads?
+> >
+> > Do you mean moving the pp_frag_count there?
+>
+> Right, IIUC we don't have enough space to fit dma_addr_t and the
+> refcount, but if we store the dma addr on a shifted u32 instead
+> of using dma_addr_t explicitly - the refcount should fit?
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc7
+struct page looks like this:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0e8860d2125f51ba9bca67a520d826cb8f66cf42
+unsigned long dma_addr;
+union {
+      unsigned long dma_addr_upper;
+      atomic_long_t pp_frag_count;
+};
 
-Thank you!
+So, on 32bit platforms with 64bit dma we can't support a frag count at all.
+We could either use the lower 12 bits (and have support for 4096 frags
+'only') or do what you suggest.
+TBH I don't love any of these and since those platforms are rare (or
+at least that's what I think), I prefer not supporting them at all.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+>
+> > I was questioning the need to have PP_FLAG_PAGE_SPLIT_IN_DRIVER
+> > overall.  With Yunshengs patches such a platform would allocate a
+> > page, so why should we prevent it from splitting it internally?
+>
+> Splitting it is fine, the problem is that the refcount AKA
+> page->pp_frag_count** counts outstanding PP-aware references
+> and page->refcount counts PP-unaware references.
+>
+> If we want to use page->refcount directly we'd need to unmap
+> the page whenever drivers calls page_pool_defrag_page().
+> But the driver may assume the page is still mapped afterwards.
+
+What I am suggesting here is to not add the new
+PP_FLAG_PAGE_SPLIT_IN_DRIVER flag.  If a driver wants to split pages
+internally it should create a pool without
+PP_FLAG_DMA_SYNC_DEV to begin with.  The only responsibility the
+driver would have is to elevate the page refcnt so page pool would not
+try to free/recycle it.  Since it won't be able to allocate fragments
+we don't have to worry about the rest.
+
+> We can change the API to make this behavior explicit. Although
+> IMHO that's putting the burden of rare platforms on non-rare
+> platforms which we should avoid.
+
+Yep, agree here.
+
+>
+> ** I said it before and I will keep saying this until someone gets
+>    angry at me - I really think we should rename this field because
+>    the association with frags is a coincidence.
+
+I had similar confusions everytime I had to re-read our code hence git
+show 4d4266e3fd32
+Any suggestions?
+
+Thanks
+/Ilias
 
