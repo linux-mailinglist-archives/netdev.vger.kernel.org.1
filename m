@@ -1,173 +1,170 @@
-Return-Path: <netdev+bounces-28744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435FB780798
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:59:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B4C7807AE
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 11:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1620282214
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:59:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D6E2281670
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 09:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A1E17758;
-	Fri, 18 Aug 2023 08:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A306417ABC;
+	Fri, 18 Aug 2023 09:01:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BB817728
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:59:20 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42337358D;
-	Fri, 18 Aug 2023 01:59:18 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RRwjZ6NptzVkVR;
-	Fri, 18 Aug 2023 16:57:06 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 18 Aug
- 2023 16:59:15 +0800
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jakub Kicinski
-	<kuba@kernel.org>
-CC: Mina Almasry <almasrymina@google.com>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>
-References: <20230816100113.41034-1-linyunsheng@huawei.com>
- <20230816100113.41034-2-linyunsheng@huawei.com>
- <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
- <20230817091554.31bb3600@kernel.org>
- <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
- <20230817165744.73d61fb6@kernel.org>
- <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <f71d9448-70c8-8793-dc9a-0eb48a570300@huawei.com>
-Date: Fri, 18 Aug 2023 16:59:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A22D3D7F;
+	Fri, 18 Aug 2023 09:01:44 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A11284220;
+	Fri, 18 Aug 2023 02:01:26 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bf3a2f44f0so2684935ad.2;
+        Fri, 18 Aug 2023 02:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692349286; x=1692954086;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJoz3PtBj0tgsgAYmTm9m0ONju3KodXFSb4TAk7iyHc=;
+        b=nsAqb23x9LvRAM/Qsc0FGms30df3zUQzVyHSLlVMVDwfwezaKI+NLfNbJB78NckTW8
+         pw3StMxfi4CqUWfGR5oQNcfMfDDzCOaSIsdW8jwAyZS0UPnoMuz9k0gs45qtMrmuOLf2
+         Se/nY3tW00jmucvsoKE61880Tw502aks0L9gNVcbc/hP+B/ypYqmQ9WXM8aydaLtGqK4
+         hnAfFsuzpT7FIoddeUTh57CXqcslgkbQP/gWjoiC+EckGokToGHiF+9YUIbh8rq0obzV
+         9OtY6LoQP1L0Fuw42cK8FsiqgwU1h4YXWsEiSPtWhAfOCgnDVgbUKONptdkW+UxYc5c+
+         MsoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692349286; x=1692954086;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zJoz3PtBj0tgsgAYmTm9m0ONju3KodXFSb4TAk7iyHc=;
+        b=IDSiJIqo6hTsN6QDO6Fnxd2Rq6sFCwkMxIxAlO3RATpQr1r6O90H3oYW9oyk/eNDEs
+         ISwN35cASIyCOAxSahymg7rdHXPfkyF8igIGs854bxOzJeEHv3MYcmcc88NOBu1IHEWN
+         WlG4z8WThW1hRrAKsYQF1GyTRRajIm+3kYr34C3zGcgrZaMqDcExQ8LBsbNPhkLf490b
+         TMB1p+WVZqFHoDW8yfrAYbqN+TIdGtmV2+Q+83RZ+ZPIxXWbP+Auvg4IZQbGkzGO1DyE
+         5Lo2zeZ7T3heqwwbj1/CsHsAv66pyMa2vQMamTnsLlQl0BGOnmbdD+ChRRHLY2PvLP9G
+         3yZw==
+X-Gm-Message-State: AOJu0YwbdZo5VQb8QsoW1NJppNzTR+ucZN0NadM+rrX8APT6MFYwEqMT
+	qBy70XhzZhXmXghBZzvHKQ==
+X-Google-Smtp-Source: AGHT+IFI7YMTorhw2aWPWsZPZEK0MELc8EUmxWAzBjBvpFrfTpLV1rVy97AzS+4uAsyn8uLp37aqrQ==
+X-Received: by 2002:a17:903:2306:b0:1b8:a720:f513 with SMTP id d6-20020a170903230600b001b8a720f513mr2417383plh.30.1692349285593;
+        Fri, 18 Aug 2023 02:01:25 -0700 (PDT)
+Received: from dell-sscc.. ([114.71.48.94])
+        by smtp.gmail.com with ESMTPSA id q6-20020a170902a3c600b001b89045ff03sm1217130plb.233.2023.08.18.02.01.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 02:01:25 -0700 (PDT)
+From: "Daniel T. Lee" <danieltimlee@gmail.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [bpf-next 0/9] samples/bpf: make BPF programs more libbpf aware
+Date: Fri, 18 Aug 2023 18:01:10 +0900
+Message-Id: <20230818090119.477441-1-danieltimlee@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/18 14:12, Ilias Apalodimas wrote:
-> On Fri, 18 Aug 2023 at 02:57, Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Thu, 17 Aug 2023 19:59:37 +0300 Ilias Apalodimas wrote:
->>>> Can we assume the DMA mapping of page pool is page aligned? We should
->>>> be, right?
->>>
->>> Yes
->>>
->>>> That means we're storing 12 bits of 0 at the lower end.
->>>> So even with 32b of space we can easily store addresses for 32b+12b =>
->>>> 16TB of memory. "Ought to be enough" to paraphrase Bill G, and the
->>>> problem is only in our heads?
->>>
->>> Do you mean moving the pp_frag_count there?
->>
->> Right, IIUC we don't have enough space to fit dma_addr_t and the
->> refcount, but if we store the dma addr on a shifted u32 instead
->> of using dma_addr_t explicitly - the refcount should fit?
-> 
-> struct page looks like this:
-> 
-> unsigned long dma_addr;
-> union {
->       unsigned long dma_addr_upper;
->       atomic_long_t pp_frag_count;
-> };
-> 
-> So, on 32bit platforms with 64bit dma we can't support a frag count at all.
-> We could either use the lower 12 bits (and have support for 4096 frags
-> 'only') or do what you suggest.
+The existing tracing programs have been developed for a considerable
+period of time and, as a result, do not properly incorporate the
+features of the current libbpf, such as CO-RE. This is evident in
+frequent usage of functions like PT_REGS* and the persistence of "hack"
+methods using underscore-style bpf_probe_read_kernel from the past. 
+These programs are far behind the current level of libbpf and can
+potentially confuse users.
 
-Maybe we can rethink about defining a new memdesc for page used by
-the network stack. As I took a glance at the Device Memory TCP v2
-patchset from Mina, we may use the new memdesc to support more new
-memory types, to decupple page_pool from the spcae limitation of
-'stuct page', and to support frag page for 32bit platforms with
-64bit dma too.
+The kernel has undergone significant changes, and some of these changes
+have broken these programs, but on the other hand, more robust APIs have
+been developed for increased stableness.
 
-> TBH I don't love any of these and since those platforms are rare (or
-> at least that's what I think), I prefer not supporting them at all.
-> 
->>
->>> I was questioning the need to have PP_FLAG_PAGE_SPLIT_IN_DRIVER
->>> overall.  With Yunshengs patches such a platform would allocate a
->>> page, so why should we prevent it from splitting it internally?
->>
->> Splitting it is fine, the problem is that the refcount AKA
->> page->pp_frag_count** counts outstanding PP-aware references
->> and page->refcount counts PP-unaware references.
->>
->> If we want to use page->refcount directly we'd need to unmap
->> the page whenever drivers calls page_pool_defrag_page().
->> But the driver may assume the page is still mapped afterwards.
-> 
-> What I am suggesting here is to not add the new
-> PP_FLAG_PAGE_SPLIT_IN_DRIVER flag.  If a driver wants to split pages
-> internally it should create a pool without
-> PP_FLAG_DMA_SYNC_DEV to begin with.  The only responsibility the
+To list some of the kernel changes that this patch set is focusing on,
+- symbol mismatch occurs due to compiler optimization [1]
+- inline of blk_account_io* breaks BPF kprobe program [2]
+- new tracepoints for the block_io_start/done are introduced [3]
+- map lookup probes can't be triggered (bpf_disable_instrumentation)[4]
+- BPF_KSYSCALL has been introduced to simplify argument fetching [5]
+- convert to vmlinux.h and use tp argument structure within it
+- make tracing programs to be more CO-RE centric
 
-I am not sure why using PP_FLAG_DMA_SYNC_DEV is conflicted with page
-split if the frag page is freed with dma_sync_size being -1 and the
-pool->p.max_len is setup correctly.
+In this regard, this patch set aims not only to integrate the latest
+features of libbpf into BPF programs but also to reduce confusion and
+clarify the BPF programs. This will help with the potential confusion
+among users and make the programs more intutitive.
 
-I was thinking about defining page_pool_put_frag() which corresponds
-to page_pool_dev_alloc_frag() and page_pool_free() which corresponds
-to page_pool_dev_alloc(), so that driver author does not misuse the
-dma_sync_size parameter for page_pool_put_page() related API.
+[1]: https://github.com/iovisor/bcc/issues/1754
+[2]: https://github.com/iovisor/bcc/issues/4261
+[3]: commit 5a80bd075f3b ("block: introduce block_io_start/block_io_done tracepoints")
+[4]: commit 7c4cd051add3 ("bpf: Fix syscall's stackmap lookup potential deadlock")
+[5]: commit 6f5d467d55f0 ("libbpf: improve BPF_KPROBE_SYSCALL macro and rename it to BPF_KSYSCALL")
 
-And PP_FLAG_PAGE_SPLIT_IN_DRIVER is used to fail the page_pool creation
-when driver is using page->pp_frag_count to split page itself in 32-bit
-arch with 64-bit DMA.
+Daniel T. Lee (9):
+  samples/bpf: fix warning with ignored-attributes
+  samples/bpf: convert to vmlinux.h with tracing programs
+  samples/bpf: unify bpf program suffix to .bpf with tracing programs
+  samples/bpf: fix symbol mismatch by compiler optimization
+  samples/bpf: make tracing programs to be more CO-RE centric
+  samples/bpf: fix bio latency check with tracepoint
+  samples/bpf: fix broken map lookup probe
+  samples/bpf: refactor syscall tracing programs using BPF_KSYSCALL
+    macro
+  samples/bpf: simplify spintest with kprobe.multi
 
-> driver would have is to elevate the page refcnt so page pool would not
-> try to free/recycle it.  Since it won't be able to allocate fragments
-> we don't have to worry about the rest.
-> 
->> We can change the API to make this behavior explicit. Although
->> IMHO that's putting the burden of rare platforms on non-rare
->> platforms which we should avoid.
-> 
-> Yep, agree here.
-> 
->>
->> ** I said it before and I will keep saying this until someone gets
->>    angry at me - I really think we should rename this field because
->>    the association with frags is a coincidence.
+ samples/bpf/Makefile                          | 20 +++++-----
+ samples/bpf/net_shared.h                      |  2 +
+ .../{offwaketime_kern.c => offwaketime.bpf.c} | 39 +++++-------------
+ samples/bpf/offwaketime_user.c                |  2 +-
+ .../bpf/{spintest_kern.c => spintest.bpf.c}   | 27 +++++--------
+ samples/bpf/spintest_user.c                   | 24 ++++-------
+ samples/bpf/test_map_in_map.bpf.c             | 10 ++---
+ samples/bpf/test_overhead_kprobe.bpf.c        | 20 ++++------
+ samples/bpf/test_overhead_tp.bpf.c            | 29 +-------------
+ samples/bpf/{tracex1_kern.c => tracex1.bpf.c} | 25 +++++-------
+ samples/bpf/tracex1_user.c                    |  2 +-
+ samples/bpf/{tracex3_kern.c => tracex3.bpf.c} | 40 ++++++++++++-------
+ samples/bpf/tracex3_user.c                    |  2 +-
+ samples/bpf/{tracex4_kern.c => tracex4.bpf.c} |  3 +-
+ samples/bpf/tracex4_user.c                    |  2 +-
+ samples/bpf/{tracex5_kern.c => tracex5.bpf.c} | 12 +++---
+ samples/bpf/tracex5_user.c                    |  2 +-
+ samples/bpf/{tracex6_kern.c => tracex6.bpf.c} | 20 ++++++++--
+ samples/bpf/tracex6_user.c                    |  2 +-
+ samples/bpf/{tracex7_kern.c => tracex7.bpf.c} |  3 +-
+ samples/bpf/tracex7_user.c                    |  2 +-
+ 21 files changed, 117 insertions(+), 171 deletions(-)
+ rename samples/bpf/{offwaketime_kern.c => offwaketime.bpf.c} (76%)
+ rename samples/bpf/{spintest_kern.c => spintest.bpf.c} (67%)
+ rename samples/bpf/{tracex1_kern.c => tracex1.bpf.c} (60%)
+ rename samples/bpf/{tracex3_kern.c => tracex3.bpf.c} (70%)
+ rename samples/bpf/{tracex4_kern.c => tracex4.bpf.c} (95%)
+ rename samples/bpf/{tracex5_kern.c => tracex5.bpf.c} (90%)
+ rename samples/bpf/{tracex6_kern.c => tracex6.bpf.c} (71%)
+ rename samples/bpf/{tracex7_kern.c => tracex7.bpf.c} (82%)
 
-As my understanding, currently the naming is fine as it is because
-page->pp_frag_count is used to indicate the number of frags a page
-is split, there is only one user holding onto one frag for now.
+-- 
+2.34.1
 
-But if there are more than one user holding onto one frag, then we
-should probably rename it to something like page->pp_ref_count as
-Jakub suggested before, for example below patch may enable more than
-one user holding onto one frag.
-
-https://patchwork.kernel.org/project/netdevbpf/patch/20230628121150.47778-1-liangchen.linux@gmail.com/
 
