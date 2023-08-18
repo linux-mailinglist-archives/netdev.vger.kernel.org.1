@@ -1,68 +1,83 @@
-Return-Path: <netdev+bounces-28736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3474780718
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E8E97806D8
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8559A1C21546
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:25:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A84F51C215B4
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 08:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495EB174D8;
-	Fri, 18 Aug 2023 08:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071A6168BC;
+	Fri, 18 Aug 2023 08:06:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3F8E56C
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:25:16 +0000 (UTC)
-X-Greylist: delayed 600 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Aug 2023 01:25:14 PDT
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E032A2684;
-	Fri, 18 Aug 2023 01:25:13 -0700 (PDT)
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 6705042627;
-	Fri, 18 Aug 2023 10:05:17 +0200 (CEST)
-Message-ID: <1bd4cb9c-4eb8-3bdb-3e05-8689817242d1@proxmox.com>
-Date: Fri, 18 Aug 2023 10:05:11 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BA314AA7
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 08:06:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2948AC433C8;
+	Fri, 18 Aug 2023 08:06:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692345968;
+	bh=DfL6ELNpmiDiKZgEEu9kk86DoHbt3AbGnuiaZBqEfzc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=er/nFVBlQXYKGAhI98JCOsNprVwbhZD5YmsrEp8uG4KNxT0JOHJYqZOCi8lwhhaxV
+	 y4SEiKc0M8mFonSRZnTqG0aEteyYrgscDelNYOI6hn7Sj425/Q753DcA4RjgftjaLQ
+	 9eWNNJHlBdm65CxSU7AEGdZHOr0OdVVXt1LiZJyasDDdhNvnGKhdUiuYiDKENGHDBm
+	 P8/Q/zORxkTNMX+IPB4Y2xsaUernZwXlBhXRvkYDC/RaDT6UihMASluuR7Zeix31YX
+	 n8zlSCExAqOwI5X8TW3g3OT6OcF9b+ZcvdIUEMLuKjRM3S0vE63Emg0gjRYVVZEHma
+	 S9NwsosO0FVNw==
+Date: Fri, 18 Aug 2023 10:06:04 +0200
+From: Simon Horman <horms@kernel.org>
+To: Patrick Rohr <prohr@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Network Development Mailing List <netdev@vger.kernel.org>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [netdev-next] net: release reference to inet6_dev pointer
+Message-ID: <ZN8mbEnFGBCr3YLj@vergenet.net>
+References: <20230816220203.1865432-1-prohr@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Content-Language: en-US
-From: Fiona Ebner <f.ebner@proxmox.com>
-To: linux-kernel@vger.kernel.org
-Cc: siva.kallam@broadcom.com, prashant@broadcom.com, mchan@broadcom.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, jdelvare@suse.com,
- Guenter Roeck <linux@roeck-us.net>, netdev@vger.kernel.org,
- linux-hwmon@vger.kernel.org, keescook@chromium.org
-Subject: "Use slab_build_skb() instead" deprecation warning triggered by tg3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230816220203.1865432-1-prohr@google.com>
 
-Hi,
-we've got a user report about the WARN_ONCE introduced by ce098da1497c
-("skbuff: Introduce slab_build_skb()") [0]. The stack trace indicates
-that the call comes from the tg3 module. While this is still kernel 6.2
-and I can't verify that the issue is still there with newer kernels, I
-don't see related changes in drivers/net/ethernet/broadcom/tg3.* after
-ce098da1497c, so I thought I should let you know.
+On Wed, Aug 16, 2023 at 03:02:03PM -0700, Patrick Rohr wrote:
+> addrconf_prefix_rcv returned early without releasing the inet6_dev
+> pointer when the PIO lifetime is less than accept_ra_min_lft.
+> 
+> Fixes: 5027d54a9c30 ("net: change accept_ra_min_rtr_lft to affect all RA lifetimes")
+> Cc: Maciej Żenczykowski <maze@google.com>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Cc: David Ahern <dsahern@kernel.org>
+> Signed-off-by: Patrick Rohr <prohr@google.com>
 
-[0]: https://forum.proxmox.com/threads/132338/
+Hi Patrick,
 
-Best Regards,
-Fiona
+this patch looks good to me, but unfortunately our CI got a bit
+confused and tried to apply it to net, where it does not apply
+because the cited commit is not present there, rather than
+net-next, where it does apply. This creates a process issue for us.
 
+I think it would be useful if you could repost the patch with
+it targeted at net-next:
+
+	Subject: [PATCH net-next] ...
+
+Please feel free to include:
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+-- 
+pw-bot: changes-requested
 
