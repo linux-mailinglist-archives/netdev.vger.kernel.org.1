@@ -1,310 +1,157 @@
-Return-Path: <netdev+bounces-28772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2491A780A5E
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:43:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2CE9780A6F
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 12:48:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469DB1C215D8
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E9A282361
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 10:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67661800C;
-	Fri, 18 Aug 2023 10:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BDD1801F;
+	Fri, 18 Aug 2023 10:48:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89D8182A0
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:43:02 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E024512C;
-	Fri, 18 Aug 2023 03:43:00 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fe8c3b5ca0so1095484e87.1;
-        Fri, 18 Aug 2023 03:43:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CCDA52
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 10:48:05 +0000 (UTC)
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2065.outbound.protection.outlook.com [40.107.104.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8111273C;
+	Fri, 18 Aug 2023 03:48:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i4w1EqHjSZ9g+yh0c7o0ufgIp3tgfCjAe5JcQI+sa6BhXA8SZWRdiLLUQKkmBdaMZKYYH2/ZUVYHfY5nYSZQ8y5wNhbndJKZUOZtA2p6Z6D99TeM/DgA0rB/q180I0wTUkiN5xWY6HX9lQtMfLLG46Vo9kaYveTg/GV0ypgqkNflLDvGuJydCED3EdmixKtGWAY/bcwfKA1SB+0zLT3u5VG/BHjf/330HWxQh2L+VdaGk8Tu4395GLw5zwU+CTemC5xguWgg4w6S4iSSC/4tX1ebRoHjo1t30BdV5fgrFJpOJg3G1B3lJQZ4JuloPyx1W+p+L5ijh+PHNPvt5+Ex7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M0oAo3kdZXUHF9aQTHUM2fgmHoogJ+qmk++YrwKeFuE=;
+ b=e5L21oyvIQA423CRGRQufRA7v9NQXLzdt++UmTFDfxJTR/2CNbNiVPddB8q0+yq6kkcA3qcOBSQv3UF23S0qbM7o1VTsvtdYFgebY+U0ZyCDRJsNz6NfbQbzInmLoc2GzOZa7DE7XakHD+35+fb0bmSPng1KY17yIEls8Z/1ONl7PW1EyUNnLNzj0SpFfbYtMxVwVXwAUSOy0HhS7eOHJC4LRp4PTjsZld3ivuNovwr88dOP9HU2UMJwxFxog0BfEjPTKLjO3kto4O8DFtkkDHXzcIsLTYi75vbZ0jflg2WOI7tWSjDUh0Lz4oY8fjdDuvL6uv9RPkop+8Zrliz1Mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=solid-run.com; dmarc=pass action=none
+ header.from=solid-run.com; dkim=pass header.d=solid-run.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692355379; x=1692960179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hmojBrhkjd/n3ZABKjh8jVqFFmKl05oPxBkFw3tuw2M=;
-        b=WTK3ZwoTm92r5RsUNXAZ8viP2iNvWv7u3Xv+LTIF2AH3+UXC1Ta29pTmFotVdRuYnJ
-         FU4DQePVhzf8GrENu5/hZvBaoUOC/lqI3IWDm3azpqHvif63MNksPiFyFUwGKm7H5VCl
-         7A3S+1EDyUFvBl2YGpft/pZgbah8cKAvPMkzvY3RspvNJJD+/eSaYYtfVuYVF1DxRGAf
-         LALN2s/wy2YQcVAWMgALYYkL9HYiGWHJ+PGzCjOLf7NqVh5q4t3mlY5SHuYHG5x/QkBH
-         BQCeWrR72tAcV3mVrFIFTC4wkWxEBpreyk4vSaqH7Zgtwg9XnInvaJEKRDAZXdyxociK
-         JvOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692355379; x=1692960179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hmojBrhkjd/n3ZABKjh8jVqFFmKl05oPxBkFw3tuw2M=;
-        b=fzVg6L021C1zpeJR5LWHmDpMkwlFm3aRBWXYf66m0MecDmQa5AK96Vetnyu1eVZJyD
-         OJR10PzZi0xUb280SdX61j37rTW3Dx0aGkFH2Jj93GyxauPdJ7IFtkQiEeEPXwYy6eIK
-         ywkP5UubWSLI+96iH5j3Ty8hLDgstTyoPAkwRKXi+quS9HYp4YCVII7n1oV7zrEMID0B
-         DAiZPyc/SxGR+TtFBbcpURumijby13AXRzDfSy65zhXBTAQLRn40pzHoPGHKkhEPPbES
-         wcZ17aYFgh3HFpxA/8bk7RiIncHK7utdi6FW591e7njEJ0ROGDAzJPQHetPgerPPQGUs
-         XvBg==
-X-Gm-Message-State: AOJu0YzqqZ6EpPXBGiBoNoyxJ9cLZ/LkeUmPXhN9F73ZmRoXxPPdZ96b
-	CbCZJjK9jEzDEOebKFiyMGZg1tVS4ZczSEAmzmI=
-X-Google-Smtp-Source: AGHT+IFOm57VwaBrIJpj7TS7y6COoMgXNYSDbhXNO3d7922dFGXs0GQGrNjXeJyKNcuAwodKuMTsMW4596TYfSe88rc=
-X-Received: by 2002:a19:6714:0:b0:4fe:5051:f253 with SMTP id
- b20-20020a196714000000b004fe5051f253mr1240003lfc.9.1692355378825; Fri, 18 Aug
- 2023 03:42:58 -0700 (PDT)
+ d=solidrn.onmicrosoft.com; s=selector1-solidrn-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=M0oAo3kdZXUHF9aQTHUM2fgmHoogJ+qmk++YrwKeFuE=;
+ b=JxC2+I4HOwEdGdYqNeekIRsQZ45gOOJIDna2Jn7j2KSGrcyapXXZBrYiz6Q6MRav6Evj8+WNn0Iv8NkYa1disVG9cGfgD2aFaC51v9vzbbNFn0TrjHQFw6n7LZ3Cph6bJD/7j/0TWMdwXJGrZJu0uBxUHhviQ4VnbWalbXUxsNo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=solid-run.com;
+Received: from AS8PR04MB8963.eurprd04.prod.outlook.com (2603:10a6:20b:42e::18)
+ by AS8PR04MB7814.eurprd04.prod.outlook.com (2603:10a6:20b:2a1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Fri, 18 Aug
+ 2023 10:48:02 +0000
+Received: from AS8PR04MB8963.eurprd04.prod.outlook.com
+ ([fe80::c19e:3b5a:c081:ce3b]) by AS8PR04MB8963.eurprd04.prod.outlook.com
+ ([fe80::c19e:3b5a:c081:ce3b%4]) with mapi id 15.20.6678.031; Fri, 18 Aug 2023
+ 10:48:01 +0000
+Message-ID: <6daa226c-4dc8-4c40-8e98-196695839b50@solid-run.com>
+Date: Fri, 18 Aug 2023 12:47:50 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: sfp: handle 100G/25G active optical cables in
+ sfp_parse_support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20230814141739.25552-1-josua@solid-run.com>
+ <20230817093047.28a2b11d@kernel.org>
+Content-Language: en-US
+From: Josua Mayer <josua@solid-run.com>
+In-Reply-To: <20230817093047.28a2b11d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DO0P289CA0008.QATP289.PROD.OUTLOOK.COM
+ (2603:1096:790:20::14) To AS8PR04MB8963.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42e::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230812151135.1028780-1-keguang.zhang@gmail.com>
- <20230812151135.1028780-4-keguang.zhang@gmail.com> <thdwhlbs5salnufag24tqk4txqs3skidhq5nmzdeyxt3ni5pos@duj55rpqskl3>
-In-Reply-To: <thdwhlbs5salnufag24tqk4txqs3skidhq5nmzdeyxt3ni5pos@duj55rpqskl3>
-From: Keguang Zhang <keguang.zhang@gmail.com>
-Date: Fri, 18 Aug 2023 18:42:42 +0800
-Message-ID: <CAJhJPsV9g2hSu4Ga8bH573JsJsrA_3dwi8T0oQBtq0FydHKrPg@mail.gmail.com>
-Subject: Re: [PATCH 3/5] dt-bindings: net: Add Loongson-1 DWMAC glue layer
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8963:EE_|AS8PR04MB7814:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2a699615-bc98-4cb7-5f49-08db9fd897fe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	exHpH5cDux2iWtMYmZJh30BnYLhNBTg4AKc/Z4S3zkwt5Kf9eJU72id6Asm9+G5+C25/8TRCqypuXtuYayBTCzOr178gn8nugYtyI3NCn9Zf+1CakiULTARBrhLnu5SSferJewN08VJxxaWZn8bARCP2lM2d2dKep7oxVkrxs1fUEcfZwh6QDmNyk+hixBp2al2CBFqSzTs0SNtV78toEvABuJCLTO4xFxsw1JDmQUlI1Tqr/FFPuDhlKWkLcnytE8Dq1aaDAJLcLF8FBlmJUWNKm2YhvEEqHQVpb1KwsehMzAudKOOg+wFLr1DeBr1wyGhBpLdKtGaK7B3vCBGZOAUwmDQqFAwOR1vFAUntYKgcexstyYe42wK4KNBnMCpbmPVDs0dlrYIeML56H1eontPtMMJIWlfRhQomwu/Z4GlW9KEdCLMl6Mcy/V3IZVI7xuZvZpLyOrpawjUA5YkZJsGa5jwNQ4bFyJCgkYEcQhB4a/J44rlKvt8c3ty3QKsA8Ze5jvkq4lOg0v/WdZ2lSa8sLyEzpCjxgcirCJdcl3QTvDGUPY8cI/T0cOq86hvde0sBJSegYOrureOyMUK3q7BkWeigy1HoIXUV3dkvfwB6s4AsNhOSWv2PqdExREtM0MeC73lqssKofCy4onR20A==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8963.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(39840400004)(136003)(1800799009)(186009)(451199024)(6666004)(6506007)(6486002)(6512007)(83380400001)(38100700002)(31696002)(86362001)(36756003)(2906002)(6916009)(316002)(41300700001)(4744005)(66946007)(54906003)(66476007)(66556008)(5660300002)(2616005)(8936002)(4326008)(8676002)(31686004)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Wmg4ZUhhaXpLRXFmZElFRFlOYWtuQ0FJSkJ6V2E5OUV1NTd0SjRvdVg1V1RG?=
+ =?utf-8?B?emtockpCZEFLTHhNODJPR0l1RXBBNFd2VTRDMFVEU0J1aWJDZ1dyNmduQ3NQ?=
+ =?utf-8?B?c1VtdVRXS0E0QU1NNkd2ejVlWmtXY0V5TUEzUjd2YSttNXVJN1RaR1JONXBn?=
+ =?utf-8?B?RmF0VVVpN2xxMXlHWmNuU2t5QzNDNGppYTJRM3FVYzJQckwyYWlZYjhsZUlE?=
+ =?utf-8?B?dTk5NHFKQzVNbzlsKzlYV2U0RWx6ZGN5L09mNzB4ekREMjlkblVDQmJkZnI3?=
+ =?utf-8?B?a3pXL1N0K1NITkJMTVE0bWI2c2RsVFNlemVBaVRyWGhwOXpZaGJUTExtZEFU?=
+ =?utf-8?B?REd3K1h2WDkvUE5XZ1YrRXBXYUt6U3ZFbUdZNk9jMzlxVU40Y2pzaGJ2SGN0?=
+ =?utf-8?B?ZWRsbXFSYkJGcVBjSTZUSWJjcHhjQVRPWk93Q1NOVlVGTm1xeCtyV3ZuVkRt?=
+ =?utf-8?B?ZkptU1hrbU9Xc1AzWVQ3OFhqT0dSQkdEWUo3UmJpUTMwRDVqZXM1U1F6S1hG?=
+ =?utf-8?B?S1RXcDdRWmkyVjFucm1rY3FGdS9aU0k0N3FjbHVoQlRrSGVEUkhzWXh0d3hB?=
+ =?utf-8?B?amU2cWhpRnVTWExSREROQXFyT3RKYVBFaVhLWDhUR3ZBVUkyemxxSU1jWG9O?=
+ =?utf-8?B?UE9QcnJtaUNBdzBJb3VIbEtOUkV0ZmJDdmVwUXJUdE5URVRwWkZqQkM5RCtw?=
+ =?utf-8?B?L1dtcWFtemYzS2VZVFREekdxK3NwdVlxdDhYM21tMTBsQUhwZ0MydzFzTDJG?=
+ =?utf-8?B?QUVxVWxjeVdtWUhaR2JidmV1STUrZ0ZOalQvdjV4L09rWjluTEQ3QVRuL2dU?=
+ =?utf-8?B?K08ybHZwcWx4QWxqZkhHT0x5MXpBQUd0bXNma1JOUzc0OFZqSVFiRVE3aFNa?=
+ =?utf-8?B?UnBFTHBMNUc3d0hEb1lxZTYveGZqU0NaVnBNc0EyMnIwVFNLTW1zTTdxWE5t?=
+ =?utf-8?B?SWdaUkZkWS9HL3ZYdng1OG5uOGhoM1dvYk1kSWg2MEpLNGIwczlVcDBWYm5v?=
+ =?utf-8?B?YXhjTS9JMlFNLzlrRVQ3aUF2OWs5WC80eEJSWEM3VGNnYTlGcTJuNTcyblda?=
+ =?utf-8?B?aW9pSkhMUmVXTUFhaUo2RFBsMmZzc0pZOFk0NDV0ZGwzNm1Ca0RScktxMTdk?=
+ =?utf-8?B?eHlUOENHK1NkTFA2ODNKL2hmUXlTSWpReEh4Q2xxM3JUOHYwZFcyMWlmZ2JT?=
+ =?utf-8?B?eVBVdFpuTnF1eUhEVnV0YjFRSmJCV1JLWTVQaWF2K3YrbkVZdm5DRytxcFRB?=
+ =?utf-8?B?NW1Za2xBVUdTMU1jL3loaUhXODg1cGdrSURMNXhEMmsvT29oTTUvOU1aUlUx?=
+ =?utf-8?B?VG1xeUYrTnZ3NGRteTVyTGxYUDhRa2VkcjBNUkVKYkJ4YXFiQnV5NHp3N1VK?=
+ =?utf-8?B?UUdObWNNank3RnBWTmFxVkZEbm14TU5rQ1dvTDBza3l4bFpqblJtRnJtSjYz?=
+ =?utf-8?B?UFZBMjVaVS83YmF2TXJSY01KN0JscmpDSDNZTE1FL29SR1lLb1YremJBOTM2?=
+ =?utf-8?B?RDVsbnJnTCtiRUVuSEJlUlA1amswZitVcVVwWU5md2ovZlBIUlMvaWFrUXRp?=
+ =?utf-8?B?bTJZQThXVFlzSmJxTndpUTlDSnB3djVPa3FYTk5sTnNwMVhXd3lVeGRmR3hl?=
+ =?utf-8?B?SWI2RzZlL0tZOWthNmhYdkhLL08zeVRmekw2bXZUUUJHay9CNzdHUEFnVW5F?=
+ =?utf-8?B?Tkc5ZFRHVmJWTzRLbnZ6bUUyMWpNUElINHRSWkJHZDZDejJ3Ui8yc3BVYVo4?=
+ =?utf-8?B?RnIvOENjSlBTZ3FjZjFHZjF0bU1lV2gxRm9rQnlhTEkzZ3VZLzZRMEtzbjJ0?=
+ =?utf-8?B?NERPL0hsT25JRkR6Z2xaQVp3MXlHWnJiZmI1cXYvTnRvNHBJM1dpRmNKclJI?=
+ =?utf-8?B?bXk2SUhVRjVTenczeCtUYTVPK2c1MGtaclc5NitBTXgyekhVQjJTcXBON0NH?=
+ =?utf-8?B?bzU5UHFJVGtvTWZUdG84K0NiYnRQZlFlZkhTMzR1S3FPemxManRsZkF2NEtW?=
+ =?utf-8?B?NEQ2ZGFTWE92a1hlS1FpZnJUQnQ5Z3oxRVIyelhEV0U0bzMwTktsaHEyWWxq?=
+ =?utf-8?B?WGlpbnh0UUpWbFM2c09ZREFvUG9lSmlHMHRWSkUxbXJhV2xsZ3lESksxd283?=
+ =?utf-8?B?TjhiUll2RkdiL2ZVeU1wRXM1UWxud3F4K0RKTXc1SmtiSEplNkJsS3NueTRX?=
+ =?utf-8?Q?DUyVhgL0SKPUD19sA/pCZmA=3D?=
+X-OriginatorOrg: solid-run.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a699615-bc98-4cb7-5f49-08db9fd897fe
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8963.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2023 10:48:01.8370
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a4a8aaf3-fd27-4e27-add2-604707ce5b82
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 96D/A8Q8s6qOSiSkGrlouzDH164GX/L0pTiry9CmtfTikR6Lum4Eempk6FLUjSOIXppMg/avm+3so6VOFEDVxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7814
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 16, 2023 at 8:54=E2=80=AFPM Serge Semin <fancer.lancer@gmail.co=
-m> wrote:
->
-> Hi Keguang
->
-> On Sat, Aug 12, 2023 at 11:11:33PM +0800, Keguang Zhang wrote:
-> > Add devicetree binding document for Loongson-1 DWMAC glue layer.
-> >
-> > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
-> > ---
-> >  .../bindings/net/loongson,ls1x-dwmac.yaml     | 98 +++++++++++++++++++
-> >  .../devicetree/bindings/net/snps,dwmac.yaml   |  2 +
-> >  2 files changed, 100 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1x=
--dwmac.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.=
-yaml b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
-> > new file mode 100644
-> > index 000000000000..150799460599
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/loongson,ls1x-dwmac.yaml
-> > @@ -0,0 +1,98 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/loongson,ls1x-dwmac.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
->
-> > +title: Loongson-1 DWMAC glue layer
->
-> DT-schemas describe a device. It has nothing to do with the glue
-> driver/layer/whatever.
->
-OK. But what about the MODULE_DESCRIPTION in dwmac-loongson1.c
-MODULE_DESCRIPTION("Loongson1 DWMAC glue layer");
-Should the two parts be aligned with each other?
-If not, what's your suggestion then?
+Hi Jakub,
 
-> Also I suggest to add a brief device description in the
-> "description:" property and add there a brief info regarding the SoCs
-> the controllers can be found on, the DW (G)MAC IP-core version the
-> ethernet controllers are based on and if possible some data about the
-> synthesize parameters: SMA (MDIO-bus), Tx/Rx COE, DMA FIFOs size,
-> perfect and hash MAC-filters size, L3L4 frame filters availability,
-> PHY interfaces (MII, RMII, RGMII, etc), EEE support, IEEE 1588(-2008)
-> Timestamping support, PMT and Wake-up frame support, MAC Management
-> counters (MMC).
->
-> Note DMA FIFO sizes can be also constrained in the properties
-> "rx-fifo-depth" and "tx-fifo-depth"; perfect and hash MAC-filter sizes -
-> in "snps,perfect-filter-entries" and "snps,multicast-filter-bins".
->
-OK. The description could be added in next version.
-
-> > +
-> > +maintainers:
-> > +  - Keguang Zhang <keguang.zhang@gmail.com>
-> > +
-> > +select:
-> > +  properties:
-> > +    compatible:
-> > +      contains:
-> > +        enum:
-> > +          - loongson,ls1b-dwmac
-> > +          - loongson,ls1c-dwmac
-> > +  required:
-> > +    - compatible
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - loongson,ls1b-dwmac
-> > +          - loongson,ls1c-dwmac
-> > +      - const: snps,dwmac-3.50a
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +  clock-names:
-> > +    const: stmmaceth
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  interrupt-names:
-> > +    const: macirq
-> > +
->
-> > +  syscon:
-> > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > +    description:
-> > +      Phandle to the syscon containing some extra configurations
-> > +      including PHY interface mode.
->
-> I believe the property is supposed to have a vendor-specific name like
-> "loongson,ls1-syscon" or similar.
-
-This has been fixed in v2.
-Could you please review v2?
-Thanks!
->
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - clock-names
-> > +  - interrupts
-> > +  - interrupt-names
-> > +  - phy-handle
->
-> > +  - phy-mode
->
-> You may want to specify the enum-constraints with the value permitted
-> for the particular Loongson (G)MAC controller. Seeing ls1b and ls1c
-> imply different sets of the PHY-modes the constraints are better to be
-> defined in the allOf sub-schemas. Alternatively you can split the
-> DT-schema file into two: one for ls1b-dwmac, another one for
-> ls1c-dwmac. IMO the later option seems better.
->
-The "phy-mode", as pointed by Krzysztof, is defined in
-ethernet-controller and already required by snps,dwmac.
-So I have dropped it in v2.
-For allOf sub-schemas, do you mean something below?
-allOf:
- - $ref: snps,dwmac.yaml#
-
- - if:
-     properties:
-       compatible:
-         contains:
-           const: loongson,ls1b-dwmac
-   then:
-     properties:
-       phy-mode:
-         enum:
-           - mii
-           - rgmii
-
- - if:
-     properties:
-       compatible:
-         contains:
-           const: loongson,ls1c-dwmac
-   then:
-     properties:
-       phy-mode:
-         enum:
-           - mii
-           - rmii
-
-> -Serge(y)
->
-> > +  - syscon
-> > +
-> > +allOf:
-> > +  - $ref: snps,dwmac.yaml#
-> > +
-> > +unevaluatedProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
-> > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > +
-> > +    gmac0: ethernet@1fe10000 {
-> > +        compatible =3D "loongson,ls1b-dwmac", "snps,dwmac-3.50a";
-> > +        reg =3D <0x1fe10000 0x10000>;
-> > +
-> > +        clocks =3D <&clkc LS1X_CLKID_AHB>;
-> > +        clock-names =3D "stmmaceth";
-> > +
-> > +        interrupt-parent =3D <&intc1>;
-> > +        interrupts =3D <2 IRQ_TYPE_LEVEL_HIGH>;
-> > +        interrupt-names =3D "macirq";
-> > +
-> > +        phy-handle =3D <&phy0>;
-> > +        phy-mode =3D "mii";
-> > +
-> > +        snps,pbl =3D <1>;
-> > +        syscon =3D <&syscon>;
-> > +
-> > +        mdio {
-> > +            #address-cells =3D <1>;
-> > +            #size-cells =3D <0>;
-> > +            compatible =3D "snps,dwmac-mdio";
-> > +
-> > +            phy0: ethernet-phy@0 {
-> > +                reg =3D <0x0>;
-> > +            };
-> > +        };
-> > +    };
-> > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Do=
-cumentation/devicetree/bindings/net/snps,dwmac.yaml
-> > index ddf9522a5dc2..e1a956cf171e 100644
-> > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > @@ -66,6 +66,8 @@ properties:
-> >          - ingenic,x2000-mac
-> >          - loongson,ls2k-dwmac
-> >          - loongson,ls7a-dwmac
-> > +        - loongson,ls1b-dwmac
-> > +        - loongson,ls1c-dwmac
-> >          - qcom,qcs404-ethqos
-> >          - qcom,sa8775p-ethqos
-> >          - qcom,sc8280xp-ethqos
-> > --
-> > 2.39.2
-> >
-
-
-
---
-Best regards,
-
-Keguang Zhang
+Am 17.08.23 um 18:30 schrieb Jakub Kicinski:
+> On Mon, 14 Aug 2023 16:17:39 +0200 Josua Mayer wrote:
+>> Handle extended compliance code 0x1 (SFF8024_ECC_100G_25GAUI_C2M_AOC)
+>> for active optical cables supporting 25G and 100G speeds.
+>>
+>> Since the specification makes no statement about transmitter range, and
+>> as the specific sfp module that had been tested features only 2m fiber -
+>> short-range (SR) modes are selected.
+> FWIW this got marked as "changes requested" in patchwork by DaveM.
+> Since we didn't get an Ack from Russell, would you mind fixing
+> the comment style and reposting?
+I will post a v3 soon!
 
