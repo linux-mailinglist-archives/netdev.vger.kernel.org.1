@@ -1,171 +1,357 @@
-Return-Path: <netdev+bounces-28870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-28871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B5897810AA
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:43:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8677810AF
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 18:43:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C38B1C2137D
-	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:43:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83F991C20995
+	for <lists+netdev@lfdr.de>; Fri, 18 Aug 2023 16:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05AB4691;
-	Fri, 18 Aug 2023 16:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05B24691;
+	Fri, 18 Aug 2023 16:43:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB65581B
-	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:43:14 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on20612.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eb2::612])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B5D44BC;
-	Fri, 18 Aug 2023 09:42:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mAbdpzClXVLNTORxZHPOh/az5REhQWW+JMD7ym5dHZ7W5OKcKayqEXrAVtn81LSVFmHNCXcWpS40Zzs5r3TLNDIh8c5GdIKrfLLLi/1cx5qwBAP+o0oQupL1XmSb4dR4OM0r2YZARPNlTLnpY7sNELNs4TsDQpLGr67fOAqFt858SvIzRFt/BY7pYY/G8Ki2wEJmzr+hAc4nC4xHJG0r+ecAmJrE3Eg93UR91mgVlEVvZVrj7PrF+yfLsoEpfOQK4G8/fctRj+1aUKL6M7bBI2GNGKGh9YvTg9gWHis/oLQ7I/Oyu29Evemyq+I0clheZZc4f83Y3dWMAq56htVCig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UUGhKfKgncdauN0m2mh6/kmGc8GQiq4LdVKKLwI0Jlw=;
- b=IYVCgncxgUv6OOs9R+LxZ5BgYfq9NOLi5cT4F+m5Xe9M7EQ9HQjp4/zkxlB+kWbxoEveiPL9tYQWORa2+IpmG4eCqWPz9HkSDpz3jUARTpDhPaak71O6Kzi1hhRMC5GYd8aKHBBCaR5JgUo2SqnY7QEQsuqnmv/wP9TnkR/VLmp7KWA6MX4lgiXNGhl5mRQB+Z2UaDdnpSVtBzqcd9wuy8hepah8cSTtYJQ7F+fHm+XADXFDx+5BAzHcuWhjpNFSRpiX0IMgXYLpgAc64c2Jb5BkJ4Rrv7ut6RCD8/PKjQrG5juG89Vfg9CiNXFGZkLztdAUQuZPgX5Z+ESsesl/GA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UUGhKfKgncdauN0m2mh6/kmGc8GQiq4LdVKKLwI0Jlw=;
- b=ft/j57qmUxe0zSHGdsRyKP8zwOgdQTgsgQtdyf2Jrnm0EyjWc97tnrPhAlduqrAFYoj/K8Z0xj95Cm8x42B8IyYRonO6rgADLqoeYK2Gimcy9uFai1k6HftRjSVF327aXHmpWw0fAAvniTti55sGD+/0sOPPQRychj9cIIp8AwwrXuyCNXcnAKRuFMumy1e3UhbBb88U2uDp5Aax5nLIQrx/NkEUSjE7ubcdmv7FrWJiwAb2urCk4tVwnb6Ic4BYs+h4GoqB+MWxllaJVq9XVqBmCugVW2wF2HfFCQftYc1TYclIt9iix1/B6jaEqhobRzRtVEu4a+7yBX6S8dJs+A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB8879.namprd12.prod.outlook.com (2603:10b6:610:171::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Fri, 18 Aug
- 2023 16:42:32 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6678.031; Fri, 18 Aug 2023
- 16:42:32 +0000
-Date: Fri, 18 Aug 2023 13:42:30 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Mark Bloch <mbloch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	Mark Zhang <markzhang@nvidia.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [PATCH rdma-next 1/2] RDMA/mlx5: Get upper device only if device
- is lagged
-Message-ID: <ZN+fdgo4givpj12R@nvidia.com>
-References: <cover.1692168533.git.leon@kernel.org>
- <117b591f5e6e130aeccc871888084fb92fb43b5a.1692168533.git.leon@kernel.org>
- <ZN+dX1hkUbEIHid4@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZN+dX1hkUbEIHid4@nvidia.com>
-X-ClientProxiedBy: BLAPR03CA0028.namprd03.prod.outlook.com
- (2603:10b6:208:32b::33) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4A45664
+	for <netdev@vger.kernel.org>; Fri, 18 Aug 2023 16:43:51 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B753C2D;
+	Fri, 18 Aug 2023 09:43:27 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4ff8f2630e3so1748128e87.1;
+        Fri, 18 Aug 2023 09:43:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692376992; x=1692981792;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oYtXL0NSPo2Sx9mZURNXbPMFWhwK0lv2QJZL2BTRUR4=;
+        b=qSJtTnZdvdHBXYcPooneO8b/Ois76IP5qr2V0N+pftktfru7hy/+IqaQOH36SIFBcq
+         /FRBqwVcmGy9mAcp9yxq7Ve6tILFgFEnoMG/qDpjlZQJdeWabDW0jW3/h9pEcmTDW2jL
+         acb2LtP0RZ3yYT/1ffiu303p+l6MfYtjpPipJZtHUnD92sqRPRNk/+PgCCGZks1GSViE
+         +EDZL2eXeNGtixTYeG4JJMGCEV82Qg6I7IdXFQPjCQWeHZ/HhmCKC9hX8cUwoVWnIrmM
+         XE0nC1nN1lbBqaYkRhfA4IgoN/SHLxMuYqT6LfZe/AuFpscEc77j3V3fNncVauzd5Ass
+         zapw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692376992; x=1692981792;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oYtXL0NSPo2Sx9mZURNXbPMFWhwK0lv2QJZL2BTRUR4=;
+        b=GHrm9+e7cb0Ogwp9xkTD1PRdzdyCxCA7iNkoPRsB7+DDq8IkGKRffAngNb1lIXMDgo
+         EgVFnMhOnNQWGDWp5479Hiv8gtbxzFyB/ovy+DtOMW/N64GQ1kS0qf5VB9DgT/kNPpcY
+         j1tCYD+CbuLPmjEiPxu8V4H98lXhh/aLiOovibFyLFRhjPqYUVUzytbu5/qPLJ5vjH1L
+         o2UTafk2ixRwb9uIZcBwyVRnpS98Ei+jjgZqCWhm8qFAVz9IeL3f/iS/Attsl9a9S60M
+         h+ldbifMQCXXXt9f38L9eQN23rEI4qtUIpORMuz7iKP/61EsxOJwhSrGTMLbQYFRghSI
+         TXow==
+X-Gm-Message-State: AOJu0YyLeY8DnL82xU2FLQV//VSPYIIOlFxEZ0iI0N7Ng96R8VWlLD9H
+	9WF+HEzINqkEo1Yv9FwLTIc=
+X-Google-Smtp-Source: AGHT+IGAin2MuYLMw4/ElZJGC5Y7V0/Bh6UYFLMRHQ0asjIQ5A5+tP96g/fElaSRBVDsPKv9acRDMQ==
+X-Received: by 2002:a05:6512:2391:b0:4fb:9168:1fce with SMTP id c17-20020a056512239100b004fb91681fcemr2747631lfv.59.1692376992068;
+        Fri, 18 Aug 2023 09:43:12 -0700 (PDT)
+Received: from mobilestation ([93.157.254.210])
+        by smtp.gmail.com with ESMTPSA id w14-20020a19c50e000000b004fbb610c354sm414084lfe.0.2023.08.18.09.43.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 09:43:11 -0700 (PDT)
+Date: Fri, 18 Aug 2023 19:43:09 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v5 4/9] net: stmmac: reflect multi irqs for
+ tx/rx channels and mac and safety
+Message-ID: <qowgzrratv3xpjavyjlht4fhz3kviifzcznmnftenzactvldcp@l4nzozjltmty>
+References: <20230817165749.672-1-jszhang@kernel.org>
+ <20230817165749.672-5-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB8879:EE_
-X-MS-Office365-Filtering-Correlation-Id: a7e7b112-78a5-4f37-f61e-08dba00a1e21
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	QsLtDqD7CxoYo6G6Vs6gt6FKOFY8UGTxyHFNTggIyzeVlHDSR1CcA3lXt7Bdgj96348wGEdz60fmjlnNoesMMvF8FaYLcUvuXQEYTQejKTnTvF/e9mWU08dWxQLSjuTxPxG3bUrRi9G/3m9JmiQtYHKHsTxOFqk4t9HzZe5hxpUBm4ypcBXJQRBdhKfwqB2x9TUTatFM7Vv0Zf8M35seuBWLMthfIMEVMhDuALWID3DNb8BfdDDDvccqYMBIXRZbFX5VPgRMuSqNBKfwnRUFHvjs5VeKtSiG3MQUyQ+u2vR6M35odWt1VwE+3lKEwuxSEo8QMZmR6eF7qwaV20Sp8JoALdF1Ogcq0t8BBl9EQ4MILMGBmICv0zdemqE1C7OiPSVqURcrpfknVsT+Q7MY/8r53PvwcUsX3fpeY2Uts/eXUcEoibMCQI6WEEn9SVSCLubdfJVI1m0fgP22GHeIXh5CAPl70Yus05hbwZd8StcXkF+nVzEXZB92hI2fSblDP2N6u3v/oqwJ5T3ZRzcQWJpeF2t5dITRS4+B+27M0Db8tuXg/haUWnaaH9fX+eCuo1mgSjTKNQLYhyIuahwjjOsCL17jZdxNGm62BDJL7Zs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(396003)(39860400002)(136003)(451199024)(186009)(1800799009)(2616005)(107886003)(6486002)(26005)(6512007)(6506007)(83380400001)(5660300002)(4326008)(8936002)(8676002)(2906002)(478600001)(41300700001)(54906003)(66476007)(66556008)(316002)(6916009)(66946007)(38100700002)(36756003)(86362001)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?39xTEAOKjVlLm4brY8dwRePUKNr1V7X+MxeyqGxxCcrEreB2vgLA2XBJltiW?=
- =?us-ascii?Q?TbSkKFkeTewb/LSIxCW7DLxzG8J9l4R7yJQ2rznllKumGSo2mIl0hUpiqEIn?=
- =?us-ascii?Q?yHdzCzTxa6FqAkwwsA0eiVahq+Ps//oCarkwa1pu0Kine2OGk8Fe6wLpwHIp?=
- =?us-ascii?Q?TU+odQBKS0iFVlWDCifm1GxrK7TI0j+zYbC8uBbs31dSbA6xaixHn5Ha5hjJ?=
- =?us-ascii?Q?+RO2SUK+5XU3cOyyZ/0ZkL2oVGtoZW+p73DvbHT745poGyz+Q1rbfffQ6XZe?=
- =?us-ascii?Q?GnjGrlbsO/OXLvP+oVMqE7IKAYAY9qhK4t2VNFt5AG4VmkmnqveZrC30xsMa?=
- =?us-ascii?Q?xrienjz6RfTkni8f5AKwN8VLRml/OP9swzXIgCBJNjG9AafJYLaY5nCcG2P4?=
- =?us-ascii?Q?mz6WQ/N2zO8+b8Ifw4DSBnymG49VUJOrMdAQ8BSj1en+I4VisukZV/wOHMT0?=
- =?us-ascii?Q?Kjf+lW2TKTwFOSIdB4GKsPkdHRBwpIcvW49RYXZPSqv+J/0sfds02aIgSQN9?=
- =?us-ascii?Q?DecEJLQ6odVqy3qrUz5AUszdXRKs3qxeigJ6g+MuhTH8E8Sh7gT8Cz3qvrpS?=
- =?us-ascii?Q?vCr06q3ZhjbRQFDuFVRPvxBOMtexFvdiDfiac1jLlZiQ8x2BS+epxkZlXOqZ?=
- =?us-ascii?Q?qTnPptIUIL+J17kUp0TuwIx1n4n04AU9PIIiySkOWmkebE9eQ3UwZq6Yzr5D?=
- =?us-ascii?Q?8GpIM1qAz0hf4U7dRqhsLr+YSc/VxKeozt7xsNXyfpLINnsfiTXh8fTj/k1Z?=
- =?us-ascii?Q?L5Sl6F6/oo4eDVOi3n+tKCTTMYvJJm1qCgTh/M4Vz4Iz4DrzwU4OtRch7z+4?=
- =?us-ascii?Q?TssotFW6Nhu8SAkfoeL0C/MJgJYtJpC1rQgG8S5VwBkiVCLMuGLPxBvxXknV?=
- =?us-ascii?Q?hrpesIltND0d8ebJHJPBjkO3qljyOuJ1870QKRFaNLBtRhhXxwaBxFCeJkRz?=
- =?us-ascii?Q?FWxy898kLgaU8eXs1mNJm3N5TNPXabF0eIwGmGzbESAWpAQXvT3fSoBwaquR?=
- =?us-ascii?Q?x/t6qMpkYLTmvuTuGpCXQfjoJKWbTOrv4gnAoyfQ5Pt7J3YwcU8joS+eJ8v6?=
- =?us-ascii?Q?7kmYBLSo8w5WpHejeQkwrQON/RKXLNF1RDe7a5IJscluwYAxuHNwQ+4HxsGt?=
- =?us-ascii?Q?Kwd78hJlRLoplNlH9T28Y6rPeI8mGGOIQjly78Uv3L4+IG61BEevC+bWUjqt?=
- =?us-ascii?Q?rpPID/eIkpzmelMnycd0bkpswswoHn6MFREE4BdR8D9z/gtnqo6wPqtFY9cZ?=
- =?us-ascii?Q?0V38MaMEoGhZPRytUH3LOdm8dq5K+17PGKuJpCGtQkoBdQryGYrit4JIQgjP?=
- =?us-ascii?Q?bV0stND3nuSmm8KHL7QZG6sFN4BlFT1nJ1STHepsIgYaHEMEtfoZhbLQT3dY?=
- =?us-ascii?Q?YTdB+hQBtgt+Hru/8f3Gh/mV7BJ8a9bH0pXggJ9NNLMsyeBFZwMocP5ptDI1?=
- =?us-ascii?Q?c4EjhBD67N2c/AfDfE7HLf1YpDrkiD/SsUBPHjXMDCZbB9tnjMem9wiQEnNP?=
- =?us-ascii?Q?YVJ2n9L6pPVjQJUnSvhvA3nBo4ROqhCNu0VJbquOnGXCtKVmAZpC7sE45VEc?=
- =?us-ascii?Q?vsuaSZnZBiKePHbiEl6BPYDApwgogRHMpwUxkNNs?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7e7b112-78a5-4f37-f61e-08dba00a1e21
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2023 16:42:31.9633
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7QEtvOtkKv9wqZfU+rL94kCOGLMG+Ms7GqVayjkt7XTPPTifhKjByCqjMb6UQYdG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8879
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230817165749.672-5-jszhang@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 18, 2023 at 01:33:35PM -0300, Jason Gunthorpe wrote:
-> On Wed, Aug 16, 2023 at 09:52:23AM +0300, Leon Romanovsky wrote:
-> > From: Mark Bloch <mbloch@nvidia.com>
-> > 
-> > If the RDMA device isn't in LAG mode there is no need
-> > to try to get the upper device.
-> > 
-> > Signed-off-by: Mark Bloch <mbloch@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/infiniband/hw/mlx5/main.c | 22 +++++++++++++++-------
-> >  1 file changed, 15 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-> > index f0b394ed7452..215d7b0add8f 100644
-> > --- a/drivers/infiniband/hw/mlx5/main.c
-> > +++ b/drivers/infiniband/hw/mlx5/main.c
-> > @@ -195,12 +195,18 @@ static int mlx5_netdev_event(struct notifier_block *this,
-> >  	case NETDEV_CHANGE:
-> >  	case NETDEV_UP:
-> >  	case NETDEV_DOWN: {
-> > -		struct net_device *lag_ndev = mlx5_lag_get_roce_netdev(mdev);
-> >  		struct net_device *upper = NULL;
-> >  
-> > -		if (lag_ndev) {
-> > -			upper = netdev_master_upper_dev_get(lag_ndev);
-> > -			dev_put(lag_ndev);
-> > +		if (ibdev->lag_active) {
+On Fri, Aug 18, 2023 at 12:57:44AM +0800, Jisheng Zhang wrote:
+> The IP supports per channel interrupt, when intel adds the per channel
+> interrupt support, the per channel irq is from MSI vector, but this
+> feature can also be supported on non-MSI platforms. Do some necessary
+> renaming to reflects this fact.
 > 
-> Needs locking to read lag_active
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  4 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 48 +++++++++----------
+>  include/linux/stmmac.h                        |  4 +-
+>  4 files changed, 29 insertions(+), 29 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> index 979c755964b1..9050de31ed76 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> @@ -952,7 +952,7 @@ static int stmmac_config_single_msi(struct pci_dev *pdev,
+>  
+>  	res->irq = pci_irq_vector(pdev, 0);
+>  	res->wol_irq = res->irq;
+> -	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+> +	plat->flags &= ~STMMAC_FLAG_PERCH_IRQ_EN;
+>  	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+>  		 __func__);
+>  
+> @@ -1004,7 +1004,7 @@ static int stmmac_config_multi_msi(struct pci_dev *pdev,
+>  	if (plat->msi_sfty_ue_vec < STMMAC_MSI_VEC_MAX)
+>  		res->sfty_ue_irq = pci_irq_vector(pdev, plat->msi_sfty_ue_vec);
+>  
+> -	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> +	plat->flags |= STMMAC_FLAG_PERCH_IRQ_EN;
+>  	dev_info(&pdev->dev, "%s: multi MSI enablement successful\n", __func__);
+>  
+>  	return 0;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> index 84d3a8551b03..9bf8adf466a2 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> @@ -175,7 +175,7 @@ static void dwmac4_dma_init(void __iomem *ioaddr,
+>  
+>  	value = readl(ioaddr + DMA_BUS_MODE);
+>  
+> -	if (dma_cfg->multi_msi_en) {
+> +	if (dma_cfg->perch_irq_en) {
+>  		value &= ~DMA_BUS_MODE_INTM_MASK;
+>  		value |= (DMA_BUS_MODE_INTM_MODE1 << DMA_BUS_MODE_INTM_SHIFT);
+>  	}
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 3d90ca983389..64c55024d69d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -126,11 +126,11 @@ module_param(chain_mode, int, 0444);
+>  MODULE_PARM_DESC(chain_mode, "To use chain instead of ring mode");
+>  
+>  static irqreturn_t stmmac_interrupt(int irq, void *dev_id);
+> -/* For MSI interrupts handling */
+> +/* For multi channel interrupts handling */
+>  static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id);
+>  static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id);
 
-Specifically the use of the bitfield looks messed up.. If lag_active
-and some others were set only during probe it could be OK.
+> -static irqreturn_t stmmac_msi_intr_tx(int irq, void *data);
+> -static irqreturn_t stmmac_msi_intr_rx(int irq, void *data);
 
-But mixing other stuff that is being written concurrently is not OK to
-do like this. (eg ib_active via a mlx5 notifier)
+What about
 
-Jason
++static irqreturn_t stmmac_tx_queue_interrupt(int irq, void *data);
++static irqreturn_t stmmac_rx_queue_interrupt(int irq, void *data);
+
+to have the names similar to stmmac_mac_interrupt() and
+stmmac_safety_interrupt().
+
+BTW are you aware that the IRQs in subject are actually
+per-DMA-channel interrupts, not per-MTL-queue interrupts?
+
+>  static void stmmac_reset_rx_queue(struct stmmac_priv *priv, u32 queue);
+>  static void stmmac_reset_tx_queue(struct stmmac_priv *priv, u32 queue);
+>  static void stmmac_reset_queues_param(struct stmmac_priv *priv);
+> @@ -3520,7 +3520,7 @@ static void stmmac_free_irq(struct net_device *dev,
+>  	}
+>  }
+>  
+
+> -static int stmmac_request_irq_multi_msi(struct net_device *dev)
+> +static int stmmac_request_irq_multi_channel(struct net_device *dev)
+
+What about stmmac_request_irq_perch() to shorten out the name and have
+a unified "perch" suffix like in the flag STMMAC_FLAG_PERCH_IRQ_EN?
+
+-Serge(y)
+
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  	enum request_irq_err irq_err;
+> @@ -3537,7 +3537,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  			  0, int_name, dev);
+>  	if (unlikely(ret < 0)) {
+>  		netdev_err(priv->dev,
+> -			   "%s: alloc mac MSI %d (error: %d)\n",
+> +			   "%s: alloc mac irq %d (error: %d)\n",
+>  			   __func__, dev->irq, ret);
+>  		irq_err = REQ_IRQ_ERR_MAC;
+>  		goto irq_error;
+> @@ -3554,7 +3554,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  				  0, int_name, dev);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> -				   "%s: alloc wol MSI %d (error: %d)\n",
+> +				   "%s: alloc wol irq %d (error: %d)\n",
+>  				   __func__, priv->wol_irq, ret);
+>  			irq_err = REQ_IRQ_ERR_WOL;
+>  			goto irq_error;
+> @@ -3572,7 +3572,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  				  0, int_name, dev);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> -				   "%s: alloc lpi MSI %d (error: %d)\n",
+> +				   "%s: alloc lpi irq %d (error: %d)\n",
+>  				   __func__, priv->lpi_irq, ret);
+>  			irq_err = REQ_IRQ_ERR_LPI;
+>  			goto irq_error;
+> @@ -3590,7 +3590,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  				  0, int_name, dev);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> -				   "%s: alloc sfty ce MSI %d (error: %d)\n",
+> +				   "%s: alloc sfty ce irq %d (error: %d)\n",
+>  				   __func__, priv->sfty_ce_irq, ret);
+>  			irq_err = REQ_IRQ_ERR_SFTY_CE;
+>  			goto irq_error;
+> @@ -3608,14 +3608,14 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  				  0, int_name, dev);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> -				   "%s: alloc sfty ue MSI %d (error: %d)\n",
+> +				   "%s: alloc sfty ue irq %d (error: %d)\n",
+>  				   __func__, priv->sfty_ue_irq, ret);
+>  			irq_err = REQ_IRQ_ERR_SFTY_UE;
+>  			goto irq_error;
+>  		}
+>  	}
+>  
+> -	/* Request Rx MSI irq */
+> +	/* Request Rx queue irq */
+>  	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
+>  		if (i >= MTL_MAX_RX_QUEUES)
+>  			break;
+> @@ -3625,11 +3625,11 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  		int_name = priv->int_name_rx_irq[i];
+>  		sprintf(int_name, "%s:%s-%d", dev->name, "rx", i);
+>  		ret = request_irq(priv->rx_irq[i],
+> -				  stmmac_msi_intr_rx,
+> +				  stmmac_queue_intr_rx,
+>  				  0, int_name, &priv->dma_conf.rx_queue[i]);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> -				   "%s: alloc rx-%d  MSI %d (error: %d)\n",
+> +				   "%s: alloc rx-%d irq %d (error: %d)\n",
+>  				   __func__, i, priv->rx_irq[i], ret);
+>  			irq_err = REQ_IRQ_ERR_RX;
+>  			irq_idx = i;
+> @@ -3640,7 +3640,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  		irq_set_affinity_hint(priv->rx_irq[i], &cpu_mask);
+>  	}
+>  
+> -	/* Request Tx MSI irq */
+> +	/* Request Tx queue irq */
+>  	for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
+>  		if (i >= MTL_MAX_TX_QUEUES)
+>  			break;
+> @@ -3650,11 +3650,11 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  		int_name = priv->int_name_tx_irq[i];
+>  		sprintf(int_name, "%s:%s-%d", dev->name, "tx", i);
+>  		ret = request_irq(priv->tx_irq[i],
+> -				  stmmac_msi_intr_tx,
+> +				  stmmac_queue_intr_tx,
+>  				  0, int_name, &priv->dma_conf.tx_queue[i]);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> -				   "%s: alloc tx-%d  MSI %d (error: %d)\n",
+> +				   "%s: alloc tx-%d irq %d (error: %d)\n",
+>  				   __func__, i, priv->tx_irq[i], ret);
+>  			irq_err = REQ_IRQ_ERR_TX;
+>  			irq_idx = i;
+> @@ -3729,8 +3729,8 @@ static int stmmac_request_irq(struct net_device *dev)
+>  	int ret;
+>  
+>  	/* Request the IRQ lines */
+> -	if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN)
+> -		ret = stmmac_request_irq_multi_msi(dev);
+> +	if (priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN)
+> +		ret = stmmac_request_irq_multi_channel(dev);
+>  	else
+>  		ret = stmmac_request_irq_single(dev);
+>  
+> @@ -5945,7 +5945,7 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> -static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+> +static irqreturn_t stmmac_queue_intr_tx(int irq, void *data)
+>  {
+>  	struct stmmac_tx_queue *tx_q = (struct stmmac_tx_queue *)data;
+>  	struct stmmac_dma_conf *dma_conf;
+> @@ -5977,7 +5977,7 @@ static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> -static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
+> +static irqreturn_t stmmac_queue_intr_rx(int irq, void *data)
+>  {
+>  	struct stmmac_rx_queue *rx_q = (struct stmmac_rx_queue *)data;
+>  	struct stmmac_dma_conf *dma_conf;
+> @@ -6014,12 +6014,12 @@ static void stmmac_poll_controller(struct net_device *dev)
+>  	if (test_bit(STMMAC_DOWN, &priv->state))
+>  		return;
+>  
+> -	if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN) {
+> +	if (priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN) {
+>  		for (i = 0; i < priv->plat->rx_queues_to_use; i++)
+> -			stmmac_msi_intr_rx(0, &priv->dma_conf.rx_queue[i]);
+> +			stmmac_queue_intr_rx(0, &priv->dma_conf.rx_queue[i]);
+>  
+>  		for (i = 0; i < priv->plat->tx_queues_to_use; i++)
+> -			stmmac_msi_intr_tx(0, &priv->dma_conf.tx_queue[i]);
+> +			stmmac_queue_intr_tx(0, &priv->dma_conf.tx_queue[i]);
+>  	} else {
+>  		disable_irq(dev->irq);
+>  		stmmac_interrupt(dev->irq, dev);
+> @@ -7300,8 +7300,8 @@ int stmmac_dvr_probe(struct device *device,
+>  	priv->plat = plat_dat;
+>  	priv->ioaddr = res->addr;
+>  	priv->dev->base_addr = (unsigned long)res->addr;
+> -	priv->plat->dma_cfg->multi_msi_en =
+> -		(priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN);
+> +	priv->plat->dma_cfg->perch_irq_en =
+> +		(priv->plat->flags & STMMAC_FLAG_PERCH_IRQ_EN);
+>  
+>  	priv->dev->irq = res->irq;
+>  	priv->wol_irq = res->wol_irq;
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 9c90e2e295d4..c052c222fa3e 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -98,7 +98,7 @@ struct stmmac_dma_cfg {
+>  	int mixed_burst;
+>  	bool aal;
+>  	bool eame;
+> -	bool multi_msi_en;
+> +	bool perch_irq_en;
+>  	bool dche;
+>  };
+>  
+> @@ -213,7 +213,7 @@ struct dwmac4_addrs {
+>  #define STMMAC_FLAG_TSO_EN			BIT(4)
+>  #define STMMAC_FLAG_SERDES_UP_AFTER_PHY_LINKUP	BIT(5)
+>  #define STMMAC_FLAG_VLAN_FAIL_Q_EN		BIT(6)
+> -#define STMMAC_FLAG_MULTI_MSI_EN		BIT(7)
+> +#define STMMAC_FLAG_PERCH_IRQ_EN		BIT(7)
+>  #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
+>  #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
+>  #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+> -- 
+> 2.40.1
+> 
+> 
 
