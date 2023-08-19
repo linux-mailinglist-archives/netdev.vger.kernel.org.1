@@ -1,121 +1,109 @@
-Return-Path: <netdev+bounces-29097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086F97819B5
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 15:29:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A748F7819D5
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 15:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 394371C2099B
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:29:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 617D4281AE6
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BC86131;
-	Sat, 19 Aug 2023 13:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB61C6AB1;
+	Sat, 19 Aug 2023 13:52:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59BB33FA
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 13:29:46 +0000 (UTC)
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1074212761;
-	Sat, 19 Aug 2023 06:29:31 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-56546b45f30so1429895a12.3;
-        Sat, 19 Aug 2023 06:29:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692451770; x=1693056570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FBvCJLgdbds9yMG1zJ/sZSFWfzBUh6K/ALsYYt3rpTY=;
-        b=S7Nv72YLp9CPkp/wEe8NG7NKHXcVilBVMZ4dz320VCIx00S8MKYiTkgyxP8rvrJOai
-         uid1Q72FceFzV4cCOHVaLG2Fptdjk19Ggc9uTK3BvEdA4zX9uMbIMr6+5HJKIx0qfzt+
-         Pt0LT4u2RAmk7X3dFdLrepbYdgtOk2WxOfrCHUEh5ByZt+mUSbDdh3G6/d1+njMYmMFo
-         q5qeHq7wdpwzh/3hevJA6Qg5R00+3HYfEprGP2wKOayB40qHh0q4EjdAJ4UGeNajWSwr
-         DA7Et1/HfoHrzXFX9Wz3H134eksl/JzCegrn859sPVmRbrgBWiCmjqpnTa0qzTmIK+6I
-         2LFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692451770; x=1693056570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FBvCJLgdbds9yMG1zJ/sZSFWfzBUh6K/ALsYYt3rpTY=;
-        b=OYkCCCq6IK4zX5zTM+Tvp327h4jm89SL9ltTgr09DKCb+QkVx5I8ADDSxrL1lg/4Yn
-         wHELdnjAQjvq75AJenYD/yTkMKIqtDfB9zQ35IaD3H/0Cm/Zbg5BR6W4v95j5B5HaqT+
-         fmaQOJm30i2XKIxwXop7r8N/+jZ2Rl2zb1L0b/+zHihQnnofSJcMSOJ4MuD8DWyTKMEm
-         n0GpX4gbqveIcsIvNyFETC6m3b8bPm/m6QACEEJ4xzsUq4VG1Jwprir4iTWDR7lkbzk7
-         AgFpYWBcq7xKUrWSxkghkPUg2kwd56keTEQ6b2/QJ/OuJzBYVJkZUr3urB8Y4sYUDwi7
-         AOrQ==
-X-Gm-Message-State: AOJu0YyxDiMj4xGhe5eiu+2F+3t5JqKGG8o7WmQ/SlB3hDLyTw3hyPTa
-	GIQ8YDp2CxjuW6eH6XUfw5+lwzIkUsBy7OKMI1g=
-X-Google-Smtp-Source: AGHT+IGPAyLCY1zvg2b23YnGGAM6I9p5N/1WAnaqwnxts/NroHHI/nabZDMaNf5oWv1Xvg2pPgdB/A0cdEMcDxq5ZXw=
-X-Received: by 2002:a17:90a:9ac:b0:268:60d9:92cc with SMTP id
- 41-20020a17090a09ac00b0026860d992ccmr1708534pjo.43.1692451770416; Sat, 19 Aug
- 2023 06:29:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B920346B1
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 13:52:21 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DF4926AFD
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 06:52:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692453132; x=1723989132;
+  h=from:to:cc:subject:date:message-id;
+  bh=LgBTQjLoGAIGJfx4euGq4bhsXXYEwJRUIPf9oNcVRj0=;
+  b=kjfukgZaug8ZbIf6L17uA3OMZ7rrOsKevGpSRiPrGApwPUUnsIuEo1cK
+   3QUogSiOZaXHxIu8V67Mgw3YcL4SCvx8l0Zwrnd/o3Gtf+Gch46kPXmhf
+   Nu0tsONll1qgM/WntQk8/sUc1Nl1jA7ad+ybtBdBJ6j4DSKtzkOtMUhDe
+   r9gKFKuyQ0voC6PiTCXEHyUKE1sy6OKczYmXVtVGOv4aHLqyDqoD+oFwT
+   n/2kkinigRDl/VicGOrrvuDFj9JLh33SWln1I5KLd0TEOMb2EkM2bBnRJ
+   pdVKUE9H8l60pEcfcY7pURCyiipk6drTWZ4JVzTWW4YKXDzAcDUeHoyBT
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10807"; a="363463616"
+X-IronPort-AV: E=Sophos;i="6.01,186,1684825200"; 
+   d="scan'208";a="363463616"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2023 06:52:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10807"; a="805452173"
+X-IronPort-AV: E=Sophos;i="6.01,186,1684825200"; 
+   d="scan'208";a="805452173"
+Received: from zulkifl3-ilbpg0.png.intel.com ([10.88.229.82])
+  by fmsmga004.fm.intel.com with ESMTP; 19 Aug 2023 06:52:08 -0700
+From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+To: intel-wired-lan@osuosl.org
+Cc: sasha.neftin@intel.com,
+	bcreeley@amd.com,
+	horms@kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	muhammad.husaini.zulkifli@intel.com,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	naamax.meir@linux.intel.com,
+	anthony.l.nguyen@intel.com
+Subject: [PATCH iwl-net v4 0/2] Enhance the tx-usecs coalesce setting implementation
+Date: Sat, 19 Aug 2023 21:50:49 +0800
+Message-Id: <20230819135051.29390-1-muhammad.husaini.zulkifli@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=0.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230817101014.3484715-1-martin@geanix.com> <20230817101014.3484715-2-martin@geanix.com>
- <20230817094529.68ae1083@kernel.org> <CAMZ6RqLvbp8EStaSRFQUimhUMpn75=3pkQZYspnP1gYRsspv-g@mail.gmail.com>
-In-Reply-To: <CAMZ6RqLvbp8EStaSRFQUimhUMpn75=3pkQZYspnP1gYRsspv-g@mail.gmail.com>
-From: Vincent Mailhol <vincent.mailhol@gmail.com>
-Date: Sat, 19 Aug 2023 22:29:19 +0900
-Message-ID: <CAMZ6RqLmNJ0zL9XO9zGCu=CbUHgm68M42fwqkSKk-rSAosCWzg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] can: netlink: support setting hardware filters
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?Q?Martin_Hundeb=C3=B8ll?= <martin@geanix.com>, 
-	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	linux-can <linux-can@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Sat. 19 Aug. 2023 at 22:10, Vincent Mailhol
-<vincent.mailhol@gmail.com> wrote:
-> On Sat. 19 Aug. 2023, 01:19, Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Thu, 17 Aug 2023 12:10:13 +0200 Martin Hundeb=C3=B8ll wrote:
-> > > +             int len =3D nla_len(data[IFLA_CAN_HW_FILTER]);
-> > > +             int num_filter =3D len / sizeof(struct can_filter);
-> > > +             struct can_filter *filter =3D nla_data(data[IFLA_CAN_HW=
-_FILTER]);
-> >
-> > This will prevent you from ever extending struct can_filter in
-> > a backward-compatible fashion, right? I obviously know very little
-> > about CAN but are you confident a more bespoke API to manipulate
-> > filters individually and allow extensibility is not warranted?
->
-> I follow Jakub's point of view.
->
-> The current struct can_filter is not sound. Some devices such as the
-> ES582.1 supports filtering of the CAN frame based on the flags (i.e.
-> SFF/EFF, RTR, FDF).
+The current tx-usecs coalesce setting implementation in the driver code is
+improved by this patch series. The implementation of the current driver
+code may have previously been a copy of the legacy code i210.
 
-I wrote too fast. The EFF and RTR flags are contained in the canid_t,
-so the current struct can_filter is able to handle these two flags.
-But it remains true that the CAN-FD flags (FDF and BRS) are currently
-not handled. Not to mention that more flags will come with the
-upcoming CAN XL.
+Patch 1:
+Allow the user to see the tx-usecs coalesce setting's current value when
+using the ethtool command. The previous value was 0.
 
-> I think that each of the fields of the filter should have its own NLA
-> declaration with the whole thing wrapped within a NLA_NESTED_ARRAY.
->
-> I also think that there should then be a method to report the precise
-> filtering capabilities of the hardware.
->
->
-> Yours sincerely,
-> Vincent Mailhol
+Patch 2:
+Give the user the ability to modify the tx-usecs coalesce setting's value.
+Previously, it was restricted to rx-usecs.
+
+V3 -> V4:
+- Implement the helper function, as recommended by Brett Creely.
+- Fix typo in cover letter.
+
+V2 -> V3:
+- Refactor the code, as Simon suggested, to make it more readable.
+
+V1 -> V2:
+- Split the patch file into two, like Anthony suggested.
+
+Muhammad Husaini Zulkifli (2):
+  igc: Expose tx-usecs coalesce setting to user
+  igc: Modify the tx-usecs coalesce setting
+
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 58 +++++++++++++-------
+ 1 file changed, 37 insertions(+), 21 deletions(-)
+
+--
+2.17.1
+
 
