@@ -1,276 +1,107 @@
-Return-Path: <netdev+bounces-29107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC8C781A15
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:30:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8A6781A21
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19F6A281AEE
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:30:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C350281B4C
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849424A16;
-	Sat, 19 Aug 2023 14:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466F64A16;
+	Sat, 19 Aug 2023 14:33:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F251ADE3
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:30:26 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2060.outbound.protection.outlook.com [40.107.21.60])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1A691B338;
-	Sat, 19 Aug 2023 07:30:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=agvWq/IEcTDJJfensoCkPFSVgr6vbxpCFkD+wvbwvGcWvxbE7FZ4PEtQYw2+L0U9UAZOxNWtWjzqKKvUPPCogIVmm8+L9elO+RxkKlwWmK73jOR1/SXEKeq9N46jP3smXbt6dBJ57B5snZM3X+g/R6HSdnvuBMWHYXujaMY0k6XsT74adAw+jehaXYBPS1ootCY0OG0o9SF5I/L0xItCAZpHH4lSrVwGpOcW7j1Eu40XKlj9EcDIF0FopqAekKY35My2gbYivZ40KR33K/Qhn+sCmfj++f335lch49hCQieLWPXnffGovHBhSWo9jo7SGQ65WgEgTH5dPZJ4d52dqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FwRsGC0pkh7ZNo5dj32ltMyxAlOZspa65WWYe5x3StM=;
- b=JeLldyk5aBZbKY+wkZNeYt5l3OAXAgHnYNhUCrI/u1Q4civ+mAkl0B3O1MNUqJBn5t6uiaRV5nRqADfq/58FWRpfMlAmX4r+QY6oQiuTTkC6tieDdyTqPBQA3ALXUXKojslyn63xPYdmBJqGG1RJ8hbIqcyYcnCQgfcZ/UnGgnl9oJM1oacTNBCHHV3NlOORt5D6HCPR7/gUE9Mi3leBOYxpjZfhX9tr4kp7k2PkomrR7Sfzuod0nqmZjSB4/ymbCVBkZeC4tTTI1WcosF6KYJiRl78o7KPi2IzqKUkofb/q9iZLd0TqZBaM4itHmfBHsdxVCNCH+MZbPN2ba4RQHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FwRsGC0pkh7ZNo5dj32ltMyxAlOZspa65WWYe5x3StM=;
- b=iGoakm2OQJXcdxrH98ih3esm5MRguIVz0ugowtpsQotCEBvI0BIw95fjyKXkwYOyXLEJTy8kseoN8F5/yFJiw7eu9CV98Z6i7f70NWVAJEY9u0elzM+8u8VkoRF6uNWfO6qB3XZeGD8lvyvdPgzbCkK5VRX8I+Wnd3l/bBTn0jM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM9PR04MB8745.eurprd04.prod.outlook.com (2603:10a6:20b:43e::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Sat, 19 Aug
- 2023 14:30:20 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf%7]) with mapi id 15.20.6699.020; Sat, 19 Aug 2023
- 14:30:19 +0000
-Date: Sat, 19 Aug 2023 17:30:15 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	linux-kernel@vger.kernel.org, shaozhengchao@huawei.com,
-	syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com
-Subject: Re: [PATCH net 1/1] net/sched: fix a qdisc modification with
- ambigous command request
-Message-ID: <20230819143015.yjegbsu32ddsp3fb@skbuf>
-References: <20230818181432.54283-1-jhs@mojatatu.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230818181432.54283-1-jhs@mojatatu.com>
-X-ClientProxiedBy: FR3P281CA0104.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a1::20) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB334A0F
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:33:51 +0000 (UTC)
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9113C10
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:33:49 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d7485d37283so280199276.1
+        for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:33:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692455629; x=1693060429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BFVyJcG7VjoXmbWzRwKLX5v0Z6m+qJ6RfIWifPUhgDc=;
+        b=PKHN5JCpBUno6/8uc1UHXr49bD0JiNARpbXYs8VUbvDNDkq0Z8tCowq/V6EGyAOGOQ
+         TyXuLZSzXeBPcv4Lnj7tFRGzofx3JcploYA40BiUeZ/aPxE8WhRBugv02r9OEMi/Qql3
+         e2tf7p2mtCgbzHhhUkKUC5GTf7jMT0HTbyv4R5+hk1ANKX9haLk8H7W3kMcuQCbqnoPp
+         O3PcwynlBtsnxxMei2HYNciP+gAczGH1GoA3fI7C4MRXAdjYiuOweeHmcpGPZ3mBO2W4
+         xsSMFtMzNhDtYdNlRisaHE9yNIniP3F7BexviNcOBe+ExDDC93CUdWBCsLIFg4JxUhal
+         NhEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692455629; x=1693060429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BFVyJcG7VjoXmbWzRwKLX5v0Z6m+qJ6RfIWifPUhgDc=;
+        b=gO5+zVSGBFqMrZCNKOljdph8UXrUrIAgaze2U5gmpWy7mto8JP9YAP+FIdmSnN4s+0
+         b3MI9WN8gT0hr1HQk6zb3InFS+n0pOBmjK+u0/xGipuBZFY0cxcIGYy1WpMOyeFdaeQm
+         y+FWGhQ8fWQ0NSUZyUYiiXp73KXTSHJaF3LcClTIHNoSkTYcG9HM+FHfX6eCgdSTe5m3
+         Q8y8WWn25zZkyNZh5T00NTZ4ouK9D9QQuzad0P+xJfxQRsVrnC20CmS4ylmr38KNOaUF
+         CqJJ3cCqHt/qCFa/Qm5SwL/y445fEzX7El2JWbkvokqi2Up/Tfx91/KU2gkg7yyuynm9
+         cFRA==
+X-Gm-Message-State: AOJu0Yz+9+D/KPsrK5P0PIV+P9MpnB7atG5p8dVX40Dsd583FHWPCFzf
+	HiCLWagtIqamqJDSMPfPRgfVUgGIGiqdqmxcuvgezQ==
+X-Google-Smtp-Source: AGHT+IE2moXgpoqFI5sFJ9IfH8ebeouITzyauQMCBYNuzUii8OjS7uo1YUkWN907Jm7R98eoIePdU3lBP0EVwvaxY70=
+X-Received: by 2002:a25:81c5:0:b0:ba8:2e05:3e9c with SMTP id
+ n5-20020a2581c5000000b00ba82e053e9cmr2493744ybm.24.1692455628833; Sat, 19 Aug
+ 2023 07:33:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB8745:EE_
-X-MS-Office365-Filtering-Correlation-Id: 411084b8-06e6-4152-4066-08dba0c0d07b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IwXb+Aa5umGKkmtdI3LkClSq1vIzXYfWUkr1UewMefVrqNfHmux1VJtBcQyAakmWJeu6cNYSezJpxVezANUdhNUEgt3t1JMoQpjNH8Vle+Me3VfaP21Amjx9c9EV4iO3f02RfzP3egO9F74/yx5gJPOmB5CXYRRHP0oAZXp6v3IuETY2ON7f7tf0nwXnz7nU8CsV5yJJjYCp09XBuu22N3j8EeMT4Aj2oTkPzqXE9HIv/RiWuZ6Xlu+vb6yTt+BG2XLMIPV0sgqBt8/j999249OIWtV/k5dAfC2/GY/xlpgl7VxX3pzfsFXSQfSjJpVFFEfxSMttkwqy9McPjucy6JsdL2oY44/Ix1LLcM+UzZi/u6pMr0IcFWFZoPiURgKko75iwscYBphcDiDHnn68z66dDmXYqL82/NS0NM53YrX1KobY9eIjraDFUarEu3wV9UQ/sFE7BHn5nDqzCY75JdA1XMDgwU41wtht6whqW8gmpwfmRoF1J9Kd7QSJMMIzbdLgnG/Uf+3shC8tM6JaNm0C0pi9Ii4WgdJwokgEDto=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(396003)(136003)(346002)(366004)(39860400002)(186009)(1800799009)(451199024)(7416002)(2906002)(83380400001)(4326008)(6486002)(66556008)(6916009)(66476007)(6666004)(26005)(6506007)(316002)(478600001)(5660300002)(44832011)(41300700001)(8676002)(6512007)(66946007)(9686003)(8936002)(1076003)(86362001)(33716001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4v4jRiFLpXfsnKFIDGrd/MuJ0w4zc9oopBTJrAoIFdhUY8myXwRfyNb621m4?=
- =?us-ascii?Q?+xAgBrLDJQ8VDXI+ETV8YQ4FD3FdRV0L1UHg3crxLv3qwqHXDrJxAlzE5wO1?=
- =?us-ascii?Q?mQhmE9LHBhBGcqmxMgr6AWcGtp213Gqzg3zAQ3K4M6jdQqSwA+QXNyGwH8uc?=
- =?us-ascii?Q?cBtcuGbLRzKmUJVk5xktZT1BJFgfroW1L3Qrl0zyXtWPHKoOj7MDzkIRQUgx?=
- =?us-ascii?Q?b7Drtd692NMh6whIRo8U2+MXQB+NpPr2NNwyh9hMIAxUw9swkYEQ8mJ2U7l1?=
- =?us-ascii?Q?qrZENuPnD07/yRccdZHgOjuksNHUSv6GDudvPG/a4r+OLw7pg7SU7UIkhxgr?=
- =?us-ascii?Q?6elJeRlAEhDmwbh26mRpJoHqToGNt6IVEY+16XxtF+eqyvlbMkNtvk0bU3Ji?=
- =?us-ascii?Q?q4e/2zpCiok4EGxueKxWhcHtJrUtiE4HZXpN213kL1UXtw5wfrVOkoPSMFHG?=
- =?us-ascii?Q?bLSIe5aE5c1EJAGWbuDDAfo9a9Ethj2dEgGSqcHYdIQ47iljBit2swOQHcEi?=
- =?us-ascii?Q?pzJ4La/K1XquRXKqigueZ2v5gvPkwAim+s6Zamiwg2uA4mMPjdbgGHmlDaMv?=
- =?us-ascii?Q?hmtQDUuuC+tcPLXUDF8WqKC18SKb/6iR3t48O/+sMkvF/XY3JItCdaXQeRkZ?=
- =?us-ascii?Q?ROaAeIOAPRl+F+XK1AZA6aEoc/O/6JItNSwHpcnchI4351Ol+OmTT31yjzth?=
- =?us-ascii?Q?LFZ8vj/arCok8ihz2q3BDL5OBGHFFI8H0VmQnEPHqOMRWqJcL0eQHDqhkvvm?=
- =?us-ascii?Q?yA2a3W5DKXMubbwC3E+mhq/ZaaDOY0oY6XO/PWvLqAel0qSDdKX/R0Ypuux/?=
- =?us-ascii?Q?WuoJl2ZT1UFushOObYsu+LShRPnr6PgHJeEWvbAtjnNgmm4oJVZP6jk7u+SE?=
- =?us-ascii?Q?PQJZmKLnx/4gceUeOVqaREwKr4CLjYxcXK/B+QdYEcdT10PSDQ2bBcxs1Jav?=
- =?us-ascii?Q?YGLiVI6gyQvED5iukZPNERjjMnaHRFwjeGSR0IhLUm9/i6VfLUYIE8Nvfw02?=
- =?us-ascii?Q?jc2HJLkARP4t8qD9TYx9xxM2TahsSXYX82QS/Hhw4sl+ZNdj0h+7j+U/SMyU?=
- =?us-ascii?Q?9uvRTd9SWlcXdR6DXzXbqpZGB7jP/BDtcZAlVpn2/c4UkVyxSax8kLlV2YHV?=
- =?us-ascii?Q?uYL8uUvnSIF2cIWzETfhsmhXCYEd7Zf/XRKdJyUUGTTaWxnHBb81DEgw/N/5?=
- =?us-ascii?Q?Y+oM9VIR2ldeHfXuQJBL0JMtXPWm8JH7W4ch33osVeBrX8mY0xKyQt29VVvo?=
- =?us-ascii?Q?alMzM7s3Gkza/aQLbfhWECOFpBuhlvSIgWZCSEZDgxyn70nMSzFgX+IjCxoL?=
- =?us-ascii?Q?9lHloQlJ9DSx67MYbGmSfFdzNj7bgcwe/CFWpcb2CLmwFnmLjwcry3TucQ5f?=
- =?us-ascii?Q?1Wwe2KzowPHo6R4qS5xHQ3iMldvDuZX2CK3MpOuhaeU2Y6tXEuLj4wKQOodi?=
- =?us-ascii?Q?jPoQAt9nrF/2WYbeKS4LNISZz5EpjQqN1zqC+x2rwscedpH8OmnZgSm2qtyd?=
- =?us-ascii?Q?XzTJjfCo6T8dQOv/UQL1nd+JF44NFhIKZFe9qqryH3v9YJCg/EZ4TwHfC7Uu?=
- =?us-ascii?Q?jlG1ZfBjYpAoS2fwgx6cCfcQLt2f25omyxcXfaC2fEOAQQWgOxaoRc2ylto9?=
- =?us-ascii?Q?Ow=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 411084b8-06e6-4152-4066-08dba0c0d07b
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2023 14:30:19.8791
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7NtfuwJ/m6MPhjpgUEKEBCkU8HPLLLrP8894v32yUA4Z8PkDjDWBAcUmMkZm09BQZs3zkarQnyasIVYr4R7hFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8745
+References: <E1qXJrG-005Oey-10@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1qXJrG-005Oey-10@rmk-PC.armlinux.org.uk>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 19 Aug 2023 16:33:37 +0200
+Message-ID: <CACRpkdaeds3vP4JBFTcf6zjcNZBnmaCFUF6teYaHDZoJ5ALioA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: realtek: add phylink_get_caps implementation
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alvin __ipraga <alsi@bang-olufsen.dk>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jamal,
+On Sat, Aug 19, 2023 at 1:11=E2=80=AFPM Russell King (Oracle)
+<rmk+kernel@armlinux.org.uk> wrote:
 
-There's a typo in the title: ambigous -> ambiguous
-
-On Fri, Aug 18, 2023 at 02:14:32PM -0400, Jamal Hadi Salim wrote:
-> When replacing an existing root qdisc, with one that is of the same kind, the
-> request boils down to essentially a paremeterization change  i.e not one that
-> requires allocation and grafting of a new qdisc. syzbot was able to create a
-> scenario which resulted in a taprio qdisc replacing an existing taprio qdisc
-> with a combination of NLM_F_CREATE, NLM_F_REPLACE and NLM_F_EXCL leading to
-> create and graft scenario.
-> The fix ensures that only when the qdisc kinds are different that we should
-> allow a create and graft, otherwise it goes into the "change" codepath.
-> 
-> While at it, fix the code and comments to improve readability.
-> 
-> While syzbot was able to create the issue, it did not zone on the root cause.
-> Analysis from Vladimir Oltean <vladimir.oltean@nxp.com> helped narrow it down.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com
-> Closes:https://lore.kernel.org/netdev/20230816225759.g25x76kmgzya2gei@skbuf/T/
-
-Space between Closes: tag and link.
-
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-
-> ---
->  net/sched/sch_api.c | 55 ++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 42 insertions(+), 13 deletions(-)
-> 
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index aa6b1fe65151..dd3db8608275 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -1547,10 +1547,28 @@ static int tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
->  	return 0;
->  }
->  
-> +static inline bool cmd_create_or_replace(struct nlmsghdr *n)
-
-We tend to use "static inline" functions only when defining them in headers.
-In C files, we drop "inline" and let the compiler decide whether to inline or not.
-
-> +{
-> +	return (n->nlmsg_flags & NLM_F_CREATE &&
-> +		n->nlmsg_flags & NLM_F_REPLACE);
-> +}
-> +
-> +static inline bool cmd_create_exclusive(struct nlmsghdr *n)
-> +{
-> +	return (n->nlmsg_flags & NLM_F_CREATE &&
-> +		n->nlmsg_flags & NLM_F_EXCL);
-> +}
-> +
-> +static inline bool cmd_change(struct nlmsghdr *n)
-> +{
-> +	return (!(n->nlmsg_flags & NLM_F_CREATE) &&
-> +		!(n->nlmsg_flags & NLM_F_REPLACE) &&
-> +		!(n->nlmsg_flags & NLM_F_EXCL));
-> +}
-> +
->  /*
->   * Create/change qdisc.
->   */
-> -
->  static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
->  			   struct netlink_ext_ack *extack)
->  {
-> @@ -1644,27 +1662,37 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
->  				 *
->  				 *   We know, that some child q is already
->  				 *   attached to this parent and have choice:
-> -				 *   either to change it or to create/graft new one.
-> +				 *   1) change it or 2) create/graft new one.
-> +				 *   If the requested qdisc kind is different
-> +				 *   than the existing one, then we choose graft.
-> +				 *   If they are the same then this is "change"
-> +				 *   operation - just let it fallthrough..
->  				 *
->  				 *   1. We are allowed to create/graft only
-> -				 *   if CREATE and REPLACE flags are set.
-> +				 *   if the request is explicitly stating
-> +				 *   "please create if it doesn't exist".
->  				 *
-> -				 *   2. If EXCL is set, requestor wanted to say,
-> -				 *   that qdisc tcm_handle is not expected
-> +				 *   2. If the request is to exclusive create
-> +				 *   then the qdisc tcm_handle is not expected
->  				 *   to exist, so that we choose create/graft too.
->  				 *
->  				 *   3. The last case is when no flags are set.
-> +				 *   This will happen when for example tc
-> +				 *   utility issues a "change" command.
->  				 *   Alas, it is sort of hole in API, we
->  				 *   cannot decide what to do unambiguously.
-> -				 *   For now we select create/graft, if
-> -				 *   user gave KIND, which does not match existing.
-> +				 *   For now we select create/graft.
->  				 */
-> -				if ((n->nlmsg_flags & NLM_F_CREATE) &&
-> -				    (n->nlmsg_flags & NLM_F_REPLACE) &&
-> -				    ((n->nlmsg_flags & NLM_F_EXCL) ||
-> -				     (tca[TCA_KIND] &&
-> -				      nla_strcmp(tca[TCA_KIND], q->ops->id))))
-> -					goto create_n_graft;
-> +				if (tca[TCA_KIND] &&
-> +				    nla_strcmp(tca[TCA_KIND], q->ops->id)) {
-> +					if (cmd_create_or_replace(n) ||
-> +					    cmd_create_exclusive(n)) {
-> +						goto create_n_graft;
-> +					} else {
-> +						if (cmd_change(n))
-
-else if cmd_change()
-
-thus the code block under the qdisc kind comparison can become:
-
-					if (cmd_create_or_replace(n) ||
-					    cmd_create_exclusive(n))
-						goto create_n_graft;
-					else if (cmd_change(n))
-						goto create_n_graft2;
-
-(no extra brackets are needed)
-
-> +							goto create_n_graft2;
-> +					}
-> +				}
->  			}
->  		}
->  	} else {
-> @@ -1698,6 +1726,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
->  		NL_SET_ERR_MSG(extack, "Qdisc not found. To create specify NLM_F_CREATE flag");
->  		return -ENOENT;
->  	}
-> +create_n_graft2:
->  	if (clid == TC_H_INGRESS) {
->  		if (dev_ingress_queue(dev)) {
->  			q = qdisc_create(dev, dev_ingress_queue(dev),
-> -- 
-> 2.34.1
+> The user ports use RSGMII, but we don't have that, and DT doesn't
+> specify a phy interface mode, so phylib defaults to GMII. These support
+> 1G, 100M and 10M with flow control. It is unknown whether asymetric
+> pause is supported at all speeds.
 >
+> The CPU port uses MII/GMII/RGMII/REVMII by hardware pin strapping,
+> and support speeds specific to each, with full duplex only supported
+> in some modes. Flow control may be supported again by hardware pin
+> strapping, and theoretically is readable through a register but no
+> information is given in the datasheet for that.
+>
+> So, we do a best efforts - and be lenient.
+>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Looks good to me!
+Also tested it with an additional patch in the earlier version.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
 
