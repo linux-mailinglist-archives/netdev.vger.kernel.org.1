@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-29029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416C07816D3
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 04:50:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518A67816D4
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 04:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64D631C20C6F
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 02:50:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7C8281C95
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 02:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FEBA3F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D079DA4F;
 	Sat, 19 Aug 2023 02:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A7063C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A42634
 	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 02:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2EC4C433CB;
-	Sat, 19 Aug 2023 02:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 05AC7C433CA;
+	Sat, 19 Aug 2023 02:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1692413425;
-	bh=PhfRIEz1S0Jg3MoXhK7iolerhlMr6r0OudB70E+1gig=;
+	bh=REZcT6OCq8rKpZyNV8QPKgvyY2ocm/CsTmMQlPPBQKE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DWj0hq7bu3Ta8B8oZZlzC3xIGt+yDTvVP/8iknwRlf88URPk+8p3j7jM34IRUQsmF
-	 3yZFzfzOzvrcwfl4C8utpNYOn/1HEyN9Dy0m5nhA7le4LR5xeqYYDgmym+Flruuek2
-	 dnNPLBgoKVIcqyiXjAEjersY3SD/MOENM16YKX3CQePzt9nwWzxrIUgwZ+i1Rmu4BX
-	 5Bq0/TfbueK/L/Kr4+EcXWY/0PbrK0MfLWpHXtV3iUreSQRCKztLVD9ErAxIU0fHcI
-	 GTcAP57ZqvB4ptTJ0f0YO3YtW0mOZ47si2i+7k1EAD64acrcpl32qaFWJh+FsRgkmQ
-	 ipakJx94WItJQ==
+	b=dIjXKAA/pWwPrlse9G0EJFA4i1V3EeaHCp+8wuGcp9pDG0CfLIEsbgtYEVka6qZA2
+	 QKa0PaX+gnouhxsQoTcF4ocboxvTq/mIWEcx8E14qdd61GYnGOr7N9MkCsU250yHQN
+	 FfHJRN5ir/gJgOI1zDwIpbVXTjyUFgrfCTaRjLLrzQHUZteMvo8JTCHMoA4O9kR3PG
+	 eA9GcYXx8fZu01J78Q1+DFDZ2I38In79/edgxlKjRmwnbBwUclv4Vx+/JvJWLcXEgk
+	 kui37v4XrsF3vg+zYRXAOZ7El3ukJg0wTiRTVRgdvEXSjPpQOE819aNt5GqDkp90hK
+	 D6u8MWo6vlaJw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8D00E26D34;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E3CC1E1F65A;
 	Sat, 19 Aug 2023 02:50:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,40 +41,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipvlan: Fix a reference count leak warning in
- ipvlan_ns_exit()
+Subject: Re: [PATCH net] dccp: annotate data-races in dccp_poll()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169241342488.21912.14677082854350120327.git-patchwork-notify@kernel.org>
+ <169241342492.21912.15469319930098215627.git-patchwork-notify@kernel.org>
 Date: Sat, 19 Aug 2023 02:50:24 +0000
-References: <20230817145449.141827-1-luwei32@huawei.com>
-In-Reply-To: <20230817145449.141827-1-luwei32@huawei.com>
-To: Lu Wei <luwei32@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wsa+renesas@sang-engineering.com, tglx@linutronix.de,
- peterz@infradead.org, maheshb@google.com, fw@strlen.de,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230818015820.2701595-1-edumazet@google.com>
+In-Reply-To: <20230818015820.2701595-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Aug 2023 22:54:49 +0800 you wrote:
-> There are two network devices(veth1 and veth3) in ns1, and ipvlan1 with
-> L3S mode and ipvlan2 with L2 mode are created based on them as
-> figure (1). In this case, ipvlan_register_nf_hook() will be called to
-> register nf hook which is needed by ipvlans in L3S mode in ns1 and value
-> of ipvl_nf_hook_refcnt is set to 1.
+On Fri, 18 Aug 2023 01:58:20 +0000 you wrote:
+> We changed tcp_poll() over time, bug never updated dccp.
 > 
-> (1)
->            ns1                           ns2
+> Note that we also could remove dccp instead of maintaining it.
+> 
+> Fixes: 7c657876b63c ("[DCCP]: Initial implementation")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ipvlan: Fix a reference count leak warning in ipvlan_ns_exit()
-    https://git.kernel.org/netdev/net/c/043d5f68d0cc
+  - [net] dccp: annotate data-races in dccp_poll()
+    https://git.kernel.org/netdev/net/c/cba3f1786916
 
 You are awesome, thank you!
 -- 
