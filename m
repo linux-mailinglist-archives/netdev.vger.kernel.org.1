@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-29130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9806B781AC3
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 20:34:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E69781AC5
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 20:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8739E1C209DA
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 18:34:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 015D02816B4
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 18:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EB819BDD;
-	Sat, 19 Aug 2023 18:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16891ADE5;
+	Sat, 19 Aug 2023 18:34:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E3F62D
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 18:34:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2D9EC433C8;
-	Sat, 19 Aug 2023 18:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8022BED3
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 18:34:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 02DDFC433C7;
+	Sat, 19 Aug 2023 18:34:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692470062;
-	bh=Y4Zns78+cJfLS978OPLxTr9B/6Op6cnG5Zjax3Kt1Zg=;
+	s=k20201202; t=1692470065;
+	bh=gfhWesNZR8t19aIZrropqAXyuN5wftiUYNMRwaq/gwE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u9EzD78DeXlOj+JCB41gMuZxgbeVmUGOdwBrT8HrI/UD6IyLgtDaHI/zhez/PIj7w
-	 VoLcaAK/eb+pUcbQQI9e40CuKvkVwKBsP4bC0rX/lP8ASoVCjxAJQM4eq34GF3wn5u
-	 klxT0PbaauGrQV3CwQCfK1Tn9cNt/ugRbpTnZI4MD3MZujF7Mj9Bz/yfnrGZtIfVOb
-	 vWP62fbcTPDSb/E5nxdYiqA5oq5DTJiboeo+cORBqrmo133A2M7UTPjM6FeaYFjNi/
-	 J3zXRb2jHRZFyaIMifKg7CvT63R/ik+rw6XwYhNovS3YiPTQDjTv1e7rPtuixIgmFY
-	 y7eTv7p2AJWTQ==
+	b=b+kQFtDdXqP0KzKcsoLqYTZFNloGali6UBIJSPWoHvWn79JUsBHPdsxrj8RPe7nK9
+	 RanRDLhUpzGMzgQ2ITq657ERwOHaz+ZQIuOb8lEm8PIKqCpNn9Qb6kkbu9AtdtwHNI
+	 AGPi0z8i/HaW/KHLMipmlcF2gbprl3QXAd1dT9TB1CnLhaBu3m6fjy50q7kFnEUKtk
+	 CEhfX93G9Wzidy4KroNB7+yWCobgolkPt1hu/TVqUZ7KBvoKoxaH6s70LKuZ3n6h+9
+	 rc2n3lT+2d5r83OCYaUnuKdLPh83yf/PI3IlkI3px6aHBOwugidZitZp1J5CtvzJIn
+	 6zWFttyNvYusA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9B94C395DC;
-	Sat, 19 Aug 2023 18:34:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E4196E26D32;
+	Sat, 19 Aug 2023 18:34:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,37 +41,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net: sfp: handle 100G/25G active optical cables in
- sfp_parse_support
+Subject: Re: [PATCH net-next] net: mdio: xgene: remove useless xgene_mdio_status
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169247006188.18695.13360615227785939934.git-patchwork-notify@kernel.org>
-Date: Sat, 19 Aug 2023 18:34:21 +0000
-References: <20230818110556.10300-1-josua@solid-run.com>
-In-Reply-To: <20230818110556.10300-1-josua@solid-run.com>
-To: Josua Mayer <josua@solid-run.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+ <169247006493.18695.8324634375298592126.git-patchwork-notify@kernel.org>
+Date: Sat, 19 Aug 2023 18:34:24 +0000
+References: <E1qWxjI-0056nx-CU@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1qWxjI-0056nx-CU@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
+ quan@os.amperecomputing.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 18 Aug 2023 13:05:56 +0200 you wrote:
-> Handle extended compliance code 0x1 (SFF8024_ECC_100G_25GAUI_C2M_AOC)
-> for active optical cables supporting 25G and 100G speeds.
+On Fri, 18 Aug 2023 12:33:24 +0100 you wrote:
+> xgene_mdio_status is declared static, and is only written once by the
+> driver. It appears to have been this way since the driver was first
+> added to the kernel tree. No other users can be found, so let's remove
+> it.
 > 
-> Since the specification makes no statement about transmitter range, and
-> as the specific sfp module that had been tested features only 2m fiber -
-> short-range (SR) modes are selected.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] net: sfp: handle 100G/25G active optical cables in sfp_parse_support
-    https://git.kernel.org/netdev/net/c/db1a6ad77c18
+  - [net-next] net: mdio: xgene: remove useless xgene_mdio_status
+    https://git.kernel.org/netdev/net-next/c/44a696de720d
 
 You are awesome, thank you!
 -- 
