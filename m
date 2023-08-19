@@ -1,88 +1,93 @@
-Return-Path: <netdev+bounces-29134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8EC9781AC8
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 20:43:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E161781ACA
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 20:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01E76281616
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 18:43:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5AC11C208E5
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 18:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA73117740;
-	Sat, 19 Aug 2023 18:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E6A18AE4;
+	Sat, 19 Aug 2023 18:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3871398
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 18:43:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A648C433C9;
-	Sat, 19 Aug 2023 18:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14AC6FB2
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 18:47:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2923FC433C7;
+	Sat, 19 Aug 2023 18:47:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692470605;
-	bh=UpBN9Gf78piujGrFdKz6/w84WEkjfVvhqbG8SMAy9vo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nGE6by7Yd+pZyFp+bhIpTSWZeKNuI/Pz1mly9sKbwyoCWRUlMUJG3//PFTTbOS13d
-	 sui9iHJ52x9cb38wwuVhJaTdbL+QQQ4xAR0sNZRw+95AGxTXoeTP6X5nPXacHCO2gD
-	 i8rD1M4YCcQ2q4RYduTDepoR+4SJ+Y9sR2L7LhzsbKMGkbbClX8l+BEMezucZPOnPd
-	 kjLGstSxI7iFLblzEUygKZiW6xF8uCM21gFU2dLy8wLGMfMMGz4in2OSZ4vO85KibD
-	 wFee10X3OFYIoGVnDkoa9VhXE3MDCwf4jebHsKU9EzWI9gGdjiWb8eRCg4HnLkTEbN
-	 AXC332lRDGkIg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 60BDDE26D32;
-	Sat, 19 Aug 2023 18:43:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692470865;
+	bh=BJ+Vmrf2zETrsPhc4tGOLa/FWnQ8dNlT9QP+rgPwfHY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=THTYi+mvO1xz5BPBZvFPagh18tF3MYpWU55ZWn495+qTH8hn+p3euCHJgEf6BoudZ
+	 l1aAEL236HAJmvXdbBFUliFaCbugh99FUfY4fwg+uzoGsAmYIcCe9wMv6JYgoWPpox
+	 yFQOeiKaE2mmm64YB1ssJft23ApU+vjdIAQ44S73keqzdNKbunCxkm00tLSx6r5zOW
+	 WbHhA3qhwJwqBymDKNPykXoqQYwigo2HfNpO+0W/XfKETOhUOdFsbSEgVhkmcic7wd
+	 Djgo5TxGV7V4y8WyEN+XcVoVFMGrSv6fToEeauUWM8oWNoMwg9MjZ1HDvzgQfr31xO
+	 OCL/rhX0tCBdg==
+Date: Sat, 19 Aug 2023 20:47:39 +0200
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 3/3] net: l2tp_eth: use generic dev->stats fields
+Message-ID: <ZOEOS5Qf4o2xw1Gj@vergenet.net>
+References: <20230819044059.833749-1-edumazet@google.com>
+ <20230819044059.833749-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] net: Update and fix return value check for
- vcap_get_rule()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169247060539.23973.13349509787024032773.git-patchwork-notify@kernel.org>
-Date: Sat, 19 Aug 2023 18:43:25 +0000
-References: <20230818050505.3634668-1-ruanjinjie@huawei.com>
-In-Reply-To: <20230818050505.3634668-1-ruanjinjie@huawei.com>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: horatiu.vultur@microchip.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, lars.povlsen@microchip.com,
- Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
- richardcochran@gmail.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230819044059.833749-4-edumazet@google.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 18 Aug 2023 13:05:02 +0800 you wrote:
-> As Simon Horman suggests, update vcap_get_rule() to always
-> return an ERR_PTR() and update the error detection conditions to
-> use IS_ERR(), which would be more cleaner.
+On Sat, Aug 19, 2023 at 04:40:59AM +0000, Eric Dumazet wrote:
+> Core networking has opt-in atomic variant of dev->stats,
+> simply use DEV_STATS_INC(), DEV_STATS_ADD() and DEV_STATS_READ().
 > 
-> So se IS_ERR() to update the return value and fix the issue
-> in lan966x_ptp_add_trap().
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/l2tp/l2tp_eth.c | 32 ++++++++++++--------------------
+>  1 file changed, 12 insertions(+), 20 deletions(-)
 > 
-> [...]
+> diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
 
-Here is the summary with links:
-  - [net-next,v2,1/3] net: microchip: vcap api: Always return ERR_PTR for vcap_get_rule()
-    https://git.kernel.org/netdev/net-next/c/093db9cda7b6
-  - [net-next,v2,2/3] net: lan966x: Fix return value check for vcap_get_rule()
-    https://git.kernel.org/netdev/net-next/c/ab104318f639
-  - [net-next,v2,3/3] net: microchip: sparx5: Update return value check for vcap_get_rule()
-    https://git.kernel.org/netdev/net-next/c/95b358e4d9c7
+...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> @@ -146,10 +138,10 @@ static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb,
+>  
+>  	priv = netdev_priv(dev);
+>  	if (dev_forward_skb(dev, skb) == NET_RX_SUCCESS) {
+> -		atomic_long_inc(&priv->rx_packets);
+> -		atomic_long_add(data_len, &priv->rx_bytes);
+> +		DEV_STATS_INC(dev, rx_packets);
+> +		DEV_STATS_ADD(dev, rx_bytes, data_len);
 
+Hi Eric,
 
+W=1 builds with clang-16 and gcc-13 tell me that priv
+is set but unused if this branch is taken.
+
+>  	} else {
+> -		atomic_long_inc(&priv->rx_errors);
+> +		DEV_STATS_INC(dev, rx_errors);
+>  	}
+>  	rcu_read_unlock();
+>  
+> -- 
+> 2.42.0.rc1.204.g551eb34607-goog
+> 
+> 
 
