@@ -1,52 +1,47 @@
-Return-Path: <netdev+bounces-29054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E8F7817B9
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 08:57:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E5487817BB
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 09:03:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3FC91C2099F
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 06:57:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB4121C20B0A
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 07:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B76DED0;
-	Sat, 19 Aug 2023 06:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6A7110D;
+	Sat, 19 Aug 2023 07:03:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E631B362
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 06:57:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F12FC433C7;
-	Sat, 19 Aug 2023 06:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05972634
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:03:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B0C7C433C8;
+	Sat, 19 Aug 2023 07:03:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692428256;
-	bh=NJ+AzEErbCS9Uj2GmaQZ/wrbE6c9H2qORM9U8sYbwSc=;
+	s=k20201202; t=1692428619;
+	bh=zaCiXBQ9Im6UJf9wKSq8d9Iu/HdAEmZZBSgF+FKSMHk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=INaR/I8iU3IbGQDU94rliksjxWziuXDqnC9Jnq5nAMRg1AaDpg86WgrTbTnMdlfTN
-	 TkGM56cqN9GQMUQgSmGgf7h/vVLstHdEyikRSYJ8naChN54OhtsrygQwSkz6/49hHO
-	 KPObH40gdfoktYdrq1yTgFW36X++c2EnTWqG8O79H4o5Ev5AWuutX7sicPYxiUSzrV
-	 X+imAjAz59fiAkfXZHesbyV7gWPEamh/dT0tnJl6+k1k7ne8yBZ85Qkp7hGI8W5DFc
-	 uNYyFpzS5jMB4bov+DqKA5bXrQ/4dceSiKG/yTPgZMnBQaU+bHnDP99qy1dwei1lcD
-	 AoRHrc5Gyoaig==
-Date: Sat, 19 Aug 2023 08:57:31 +0200
+	b=F1yuBtk7hz9AuosnOhN1SU2tUPCMI6xCApiWPhXop5LlN9ktTnXskwRjUf2YczQ84
+	 v+rGAXf9rAvjIzxKQDPvDgaWz0R9pLsoNCoNI5s8yfCf7sAcEkQ2SlSMZZG7ckFhL5
+	 gL5/2LAhOqDlABRsR1gN+nmGOGnBrD/e/LbGw2vsqGezyzWb3nwX5XYMOXYhv353/m
+	 JZ6vFGGWHpUcChCmfJ61RkAQeBJVTQmeBh+dLHxEsLgOKAopctQXKwoVqW/KckLVpn
+	 dCs0Szg5suXVXqXTmLkM7rImOopJ+7TzvbRWHLL97yI3ow/S6b/ffuODEF5KEc9bK/
+	 2k/bEpyqWTEuQ==
+Date: Sat, 19 Aug 2023 09:03:34 +0200
 From: Simon Horman <horms@kernel.org>
-To: Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net-next 1/1] net: stmmac: Check more MAC HW features for
- XGMAC Core 3.20
-Message-ID: <ZOBn22NT/GYbZKxY@vergenet.net>
-References: <20230818094832.179420-1-0x1207@gmail.com>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: horatiu.vultur@microchip.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, lars.povlsen@microchip.com,
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+	richardcochran@gmail.com, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 0/3] net: Update and fix return value check
+ for vcap_get_rule()
+Message-ID: <ZOBpRmHXndkvFcnA@vergenet.net>
+References: <20230818050505.3634668-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,29 +50,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230818094832.179420-1-0x1207@gmail.com>
+In-Reply-To: <20230818050505.3634668-1-ruanjinjie@huawei.com>
 
-On Fri, Aug 18, 2023 at 05:48:32PM +0800, Furong Xu wrote:
-> 1. XGMAC core does not have hash_filter definition, it uses
-> vlhash(VLAN Hash Filtering) instead, skip hash_filter when XGMAC.
-> 2. Show exact size of Hash Table instead of raw register value.
-> 3. Show full description of safety features defined by Synopsys Databook.
-> 4. When safety feature is configured with no parity, or ECC only,
-> keep FSM Parity Checking disabled.
+On Fri, Aug 18, 2023 at 01:05:02PM +0800, Ruan Jinjie wrote:
+> As Simon Horman suggests, update vcap_get_rule() to always
+> return an ERR_PTR() and update the error detection conditions to
+> use IS_ERR(), which would be more cleaner.
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> So se IS_ERR() to update the return value and fix the issue
+> in lan966x_ptp_add_trap().
+> 
+> Changes in v2:
+> - Update vcap_get_rule() to always return an ERR_PTR().
+> - Update the return value fix in lan966x_ptp_add_trap().
+> - Update the return value check in sparx5_tc_free_rule_resources().
+> 
+> Ruan Jinjie (3):
+>   net: microchip: vcap api: Always return ERR_PTR for vcap_get_rule()
+>   net: lan966x: Fix return value check for vcap_get_rule()
+>   net: microchip: sparx5: Update return value check for vcap_get_rule()
 
-Hi Furong Xu,
+Thanks.
 
-thanks for your patch.
+For the series,
 
-Unfortunately it does not apply cleanly to net-next,
-which means that it isn't run through the upstream  CI and
-creates a process issue for the maintainers.
-
-Please consider rebasing on net-next and reposting.
-
--- 
-pw-bot: changes-requested
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
