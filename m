@@ -1,89 +1,129 @@
-Return-Path: <netdev+bounces-29005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F38BE78161B
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 02:33:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C254781626
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 02:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24C4E281E28
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 00:33:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28801281DF4
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 00:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA772372;
-	Sat, 19 Aug 2023 00:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86B062A;
+	Sat, 19 Aug 2023 00:53:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB80360
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 00:33:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A427C433C8;
-	Sat, 19 Aug 2023 00:33:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692405231;
-	bh=vUjnQGhyaB0gt6Wc1RmtrTdJ8QP1mqq37z1ZCTcry0s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JILInZZ8ELM3axcA4Q+5QEP0KmEu1cVbJyyiWPc17emzdIm74MyM9tkHlogBeGMr3
-	 +fSnKaYtpuBo36qbpBzL/7rXiWG5a1fPe0JEPDnk/BCRbzKZ1dREM5GzoZqG3UmJY6
-	 nITEryFl8fsSKBJv+c7C1A8InF4zbUNIy5SUd7fUNxGjH8Tz1l/+gBaYNhR3NmD3hs
-	 if6LBO3yQYg748X3w/wwdZAxpIYabwFO0aN5ou7QfeJG9CEXSkCMHX1OfPjrvf2Svz
-	 PNv5/9/98FBPPqnvdnNyVM5TExkC5vjBAbzl85Q+Q+vsHxim6V5ihLK9vKj4Iy9ohZ
-	 UX1vQ81cXPlCA==
-Message-ID: <012be13c-b18c-b548-9d0a-f820a8ebfc8f@kernel.org>
-Date: Fri, 18 Aug 2023 18:33:50 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA769360
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 00:53:38 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8851448D;
+	Fri, 18 Aug 2023 17:53:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692406415; x=1723942415;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=TpUo5Edi6QFUhdJVj1ej9UvxlhacliszgVQIhmTKSe0=;
+  b=YRlNur6KXSGvypmwfJ2zXMS6iTLXB1NBHS8LTaohqmxkw44gfp5sUmJ6
+   UKTwNlt+5C2EDUO5DipwpoGgJoEnJ93zVNbf/yxLdUnUmaG3Lajg6e1/J
+   ft2luc0IjjoPz9Lt8MOB9DvQOa1RONLq4X2T0ixpynFjPIeAdAoNGw1pV
+   Ude2AtVzn5c+GQRWWdX0HM6WWOtz832lMO0RV/J8X7vGzyX/rcTEqEA3r
+   EwZ8GHEYNKs8aasMV51GpQQVODBvmjpEKxiiCcshC9mXe8hGDm6V5Vrgv
+   zc7T18Nz9ml6e4X20ik51XxPPv7HcZ/S39fw+2e1sfqGGli9i46m2mWi8
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="373209892"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="373209892"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 17:53:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="770311176"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="770311176"
+Received: from pglc00067.png.intel.com ([10.221.207.87])
+  by orsmga001.jf.intel.com with ESMTP; 18 Aug 2023 17:53:29 -0700
+From: Rohan G Thomas <rohan.g.thomas@intel.com>
+To: fancer.lancer@gmail.com
+Cc: alexandre.torgue@foss.st.com,
+	conor+dt@kernel.org,
+	davem@davemloft.net,
+	devicetree@vger.kernel.org,
+	edumazet@google.com,
+	joabreu@synopsys.com,
+	krzysztof.kozlowski+dt@linaro.org,
+	kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	peppe.cavallaro@st.com,
+	robh+dt@kernel.org,
+	rohan.g.thomas@intel.com
+Subject: [PATCH net-next v4 2/2] net: stmmac: Tx coe sw fallback
+Date: Sat, 19 Aug 2023 08:53:26 +0800
+Message-Id: <20230819005326.22204-1-rohan.g.thomas@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <trcp4f77dv2e36zpe53s7sjoyevgd5qtpv6m4a75ryalglqnev@trcsnsmvtijy>
+References: <trcp4f77dv2e36zpe53s7sjoyevgd5qtpv6m4a75ryalglqnev@trcsnsmvtijy>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCHv2 net-next] IPv4: add extack info for IPv4 address
- add/delete
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@idosch.org>
-References: <20230818082523.1972307-1-liuhangbin@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230818082523.1972307-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/18/23 2:25 AM, Hangbin Liu wrote:
-> Add extack info for IPv4 address add/delete, which would be useful for
-> users to understand the problem without having to read kernel code.
-> 
-> No extack message for the ifa_local checking in __inet_insert_ifa() as
-> it has been checked in find_matching_ifa().
-> 
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> v2: Lowercase all ipv4 prefix. use one extack msg for ifa_valid checking.
-> ---
->  net/ipv4/devinet.c | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-> index 5deac0517ef7..c3658b8755bc 100644
-> --- a/net/ipv4/devinet.c
-> +++ b/net/ipv4/devinet.c
-> @@ -509,6 +509,7 @@ static int __inet_insert_ifa(struct in_ifaddr *ifa, struct nlmsghdr *nlh,
->  				return -EEXIST;
->  			}
->  			if (ifa1->ifa_scope != ifa->ifa_scope) {
-> +				NL_SET_ERR_MSG(extack, "ipv4: Invalid scope value");
+On Fri, Aug 18, 2023 at 09:53:50PM +0800, Rohan G Thomas wrote:
+>> +	u32 flags;
+>
+>This looks redundant. See my last comment.
+>
+>> +
+>
+>> +	u32 tx_q_with_coe;
+>
+>This one too. Can't you just use the
+>plat_stmmacenet_data.tx_queues_with_coe field?
+>
+>> +	if (priv->plat->tx_coe &&
+>> +	    priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use) {
+>> +		priv->flags |= STMMAC_PRIV_FLG_TXQ_COE_LIMIT;
+>> +		priv->tx_q_with_coe = priv->plat->tx_queues_with_coe;
+>> +		dev_info(priv->device, "TX COE limited to %u tx queues\n",
+>> +			 priv->tx_q_with_coe);
+>> +	}
+>
+>What about:
+>+	if (priv->plat->tx_coe && !priv->plat->tx_queues_with_coe)
+>+		priv->plat->tx_queues_with_coe = priv->plat->tx_queues_to_use;
+>+	else if (!priv->plat->tx_coe)
+>+		priv->plat->tx_queues_with_coe = 0;
+>+	else if (priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use)
+>+		dev_info(priv->device, "TX COE is available for %u queues\n", priv->plat->tx_queues_with_coe);
+>
+>?
+>
+>-Serge(y)
 
-It's not necessarily an invalid scope, but rather it differs from other
-configured addresses on the device. That check goes back to the
-beginning of git history, and I do not really get why it matters.
+Hi Serge,
 
-Overall looks ok to me:
+Agreed.
+Thanks for the suggestion. Will rework in next version.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+BR,
+Rohan
 
+>> 
+>>
 
