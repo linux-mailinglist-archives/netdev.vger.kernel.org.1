@@ -1,79 +1,348 @@
-Return-Path: <netdev+bounces-29055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E5487817BB
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 09:03:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A2378181A
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 09:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB4121C20B0A
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 07:03:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87574281D2F
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 07:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6A7110D;
-	Sat, 19 Aug 2023 07:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC3C1870;
+	Sat, 19 Aug 2023 07:48:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05972634
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:03:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B0C7C433C8;
-	Sat, 19 Aug 2023 07:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B217A57
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:48:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FA45C433C8;
+	Sat, 19 Aug 2023 07:48:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692428619;
-	bh=zaCiXBQ9Im6UJf9wKSq8d9Iu/HdAEmZZBSgF+FKSMHk=;
+	s=k20201202; t=1692431285;
+	bh=gIy6yc3rpRO+ZpOnV1d1ea8VdXNefO9kKXZEqnuE+k8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F1yuBtk7hz9AuosnOhN1SU2tUPCMI6xCApiWPhXop5LlN9ktTnXskwRjUf2YczQ84
-	 v+rGAXf9rAvjIzxKQDPvDgaWz0R9pLsoNCoNI5s8yfCf7sAcEkQ2SlSMZZG7ckFhL5
-	 gL5/2LAhOqDlABRsR1gN+nmGOGnBrD/e/LbGw2vsqGezyzWb3nwX5XYMOXYhv353/m
-	 JZ6vFGGWHpUcChCmfJ61RkAQeBJVTQmeBh+dLHxEsLgOKAopctQXKwoVqW/KckLVpn
-	 dCs0Szg5suXVXqXTmLkM7rImOopJ+7TzvbRWHLL97yI3ow/S6b/ffuODEF5KEc9bK/
-	 2k/bEpyqWTEuQ==
-Date: Sat, 19 Aug 2023 09:03:34 +0200
-From: Simon Horman <horms@kernel.org>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: horatiu.vultur@microchip.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, lars.povlsen@microchip.com,
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v2 0/3] net: Update and fix return value check
- for vcap_get_rule()
-Message-ID: <ZOBpRmHXndkvFcnA@vergenet.net>
-References: <20230818050505.3634668-1-ruanjinjie@huawei.com>
+	b=L6oNGQimc42TajW8Isq9Ep/y9xdS2g6YuCHn/SI6f026gOdDtCLgC7YaKo4BbhumZ
+	 Jvbk4aNQx99vneHTpAfLMYKOXuoBP7017K4jrRjtAqmskTt6aerWjbx/hzPWTaY8oJ
+	 4j2FHITbDbbEVxAkSisZBXEM01yTUe6N32zQhO6klazgDdcnC47uADc/Cy+TsYt+X3
+	 fQO6EkjOsfJMsFWW55v4U50Mm30HUwgiesuztj0NR16M+004peRkEPuIZE1AdMVzrp
+	 oafyNMZ53LCtPgtqto6NMWAolGZskHzZSRANUOKN7Xjxz80CkboKZkghmTXKL/TArb
+	 NY1r8a/NHwVTg==
+Date: Sat, 19 Aug 2023 09:48:01 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next 3/4] net: ethernet: mtk_eth_soc: add support for
+ in-SoC SRAM
+Message-ID: <ZOBzsUIM1Thfw+yl@lore-desk>
+References: <cover.1692400170.git.daniel@makrotopia.org>
+ <f24cefa3f0f1ead90ab8552099d6ceeeb12ba997.1692400170.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="U+qIIYHU7IgoXdym"
+Content-Disposition: inline
+In-Reply-To: <f24cefa3f0f1ead90ab8552099d6ceeeb12ba997.1692400170.git.daniel@makrotopia.org>
+
+
+--U+qIIYHU7IgoXdym
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230818050505.3634668-1-ruanjinjie@huawei.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 18, 2023 at 01:05:02PM +0800, Ruan Jinjie wrote:
-> As Simon Horman suggests, update vcap_get_rule() to always
-> return an ERR_PTR() and update the error detection conditions to
-> use IS_ERR(), which would be more cleaner.
-> 
-> So se IS_ERR() to update the return value and fix the issue
-> in lan966x_ptp_add_trap().
-> 
-> Changes in v2:
-> - Update vcap_get_rule() to always return an ERR_PTR().
-> - Update the return value fix in lan966x_ptp_add_trap().
-> - Update the return value check in sparx5_tc_free_rule_resources().
-> 
-> Ruan Jinjie (3):
->   net: microchip: vcap api: Always return ERR_PTR for vcap_get_rule()
->   net: lan966x: Fix return value check for vcap_get_rule()
->   net: microchip: sparx5: Update return value check for vcap_get_rule()
+> MT7981, MT7986 and MT7988 come with in-SoC SRAM dedicated for Ethernet
+> DMA rings. Support using the SRAM without breaking existing device tree
+> bindings, ie. only new SoC starting from MT7988 will have the SRAM
+> declared as additional resource in device tree. For MT7981 and MT7986
+> an offset on top of the main I/O base is used.
+>=20
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 84 ++++++++++++++++-----
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.h | 12 ++-
+>  2 files changed, 74 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/et=
+hernet/mediatek/mtk_eth_soc.c
+> index 2482f47313085..eea3a7e578831 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -1135,10 +1135,13 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
+>  	dma_addr_t dma_addr;
+>  	int i;
+> =20
+> -	eth->scratch_ring =3D dma_alloc_coherent(eth->dma_dev,
+> -					       cnt * soc->txrx.txd_size,
+> -					       &eth->phy_scratch_ring,
+> -					       GFP_KERNEL);
+> +	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM))
+> +		eth->scratch_ring =3D eth->sram_base;
 
-Thanks.
+Hi Daniel,
 
-For the series,
+scratch_ring is now an __iomem pointer while before was just a void one. We
+need to fix it.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Regards,
+Lorenzo
 
+> +	else
+> +		eth->scratch_ring =3D dma_alloc_coherent(eth->dma_dev,
+> +						       cnt * soc->txrx.txd_size,
+> +						       &eth->phy_scratch_ring,
+> +						       GFP_KERNEL);
+>  	if (unlikely(!eth->scratch_ring))
+>  		return -ENOMEM;
+> =20
+> @@ -2446,8 +2449,14 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
+>  	if (!ring->buf)
+>  		goto no_tx_mem;
+> =20
+> -	ring->dma =3D dma_alloc_coherent(eth->dma_dev, ring_size * sz,
+> -				       &ring->phys, GFP_KERNEL);
+> +	if (MTK_HAS_CAPS(soc->caps, MTK_SRAM)) {
+> +		ring->dma =3D eth->sram_base + ring_size * sz;
+> +		ring->phys =3D eth->phy_scratch_ring + ring_size * (dma_addr_t)sz;
+> +	} else {
+> +		ring->dma =3D dma_alloc_coherent(eth->dma_dev, ring_size * sz,
+> +					       &ring->phys, GFP_KERNEL);
+> +	}
+> +
+>  	if (!ring->dma)
+>  		goto no_tx_mem;
+> =20
+> @@ -2546,8 +2555,7 @@ static void mtk_tx_clean(struct mtk_eth *eth)
+>  		kfree(ring->buf);
+>  		ring->buf =3D NULL;
+>  	}
+> -
+> -	if (ring->dma) {
+> +	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && ring->dma) {
+>  		dma_free_coherent(eth->dma_dev,
+>  				  ring->dma_size * soc->txrx.txd_size,
+>  				  ring->dma, ring->phys);
+> @@ -2566,9 +2574,14 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int r=
+ing_no, int rx_flag)
+>  {
+>  	const struct mtk_reg_map *reg_map =3D eth->soc->reg_map;
+>  	struct mtk_rx_ring *ring;
+> -	int rx_data_len, rx_dma_size;
+> +	int rx_data_len, rx_dma_size, tx_ring_size;
+>  	int i;
+> =20
+> +	if (MTK_HAS_CAPS(eth->soc->caps, MTK_QDMA))
+> +		tx_ring_size =3D MTK_QDMA_RING_SIZE;
+> +	else
+> +		tx_ring_size =3D MTK_DMA_SIZE;
+> +
+>  	if (rx_flag =3D=3D MTK_RX_FLAGS_QDMA) {
+>  		if (ring_no)
+>  			return -EINVAL;
+> @@ -2603,9 +2616,20 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int r=
+ing_no, int rx_flag)
+>  		ring->page_pool =3D pp;
+>  	}
+> =20
+> -	ring->dma =3D dma_alloc_coherent(eth->dma_dev,
+> -				       rx_dma_size * eth->soc->txrx.rxd_size,
+> -				       &ring->phys, GFP_KERNEL);
+> +	if (!MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM) ||
+> +	    rx_flag !=3D MTK_RX_FLAGS_NORMAL) {
+> +		ring->dma =3D dma_alloc_coherent(eth->dma_dev,
+> +					       rx_dma_size * eth->soc->txrx.rxd_size,
+> +					       &ring->phys, GFP_KERNEL);
+> +	} else {
+> +		struct mtk_tx_ring *tx_ring =3D &eth->tx_ring;
+> +
+> +		ring->dma =3D tx_ring->dma + tx_ring_size *
+> +			    eth->soc->txrx.txd_size * (ring_no + 1);
+> +		ring->phys =3D tx_ring->phys + tx_ring_size *
+> +			     eth->soc->txrx.txd_size * (ring_no + 1);
+> +	}
+> +
+>  	if (!ring->dma)
+>  		return -ENOMEM;
+> =20
+> @@ -2690,7 +2714,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ri=
+ng_no, int rx_flag)
+>  	return 0;
+>  }
+> =20
+> -static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring)
+> +static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, =
+bool in_sram)
+>  {
+>  	int i;
+> =20
+> @@ -2713,7 +2737,7 @@ static void mtk_rx_clean(struct mtk_eth *eth, struc=
+t mtk_rx_ring *ring)
+>  		ring->data =3D NULL;
+>  	}
+> =20
+> -	if (ring->dma) {
+> +	if (!in_sram && ring->dma) {
+>  		dma_free_coherent(eth->dma_dev,
+>  				  ring->dma_size * eth->soc->txrx.rxd_size,
+>  				  ring->dma, ring->phys);
+> @@ -3073,7 +3097,7 @@ static void mtk_dma_free(struct mtk_eth *eth)
+>  	for (i =3D 0; i < MTK_MAX_DEVS; i++)
+>  		if (eth->netdev[i])
+>  			netdev_reset_queue(eth->netdev[i]);
+> -	if (eth->scratch_ring) {
+> +	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && eth->scratch_ring) {
+>  		dma_free_coherent(eth->dma_dev,
+>  				  MTK_QDMA_RING_SIZE * soc->txrx.txd_size,
+>  				  eth->scratch_ring, eth->phy_scratch_ring);
+> @@ -3081,13 +3105,13 @@ static void mtk_dma_free(struct mtk_eth *eth)
+>  		eth->phy_scratch_ring =3D 0;
+>  	}
+>  	mtk_tx_clean(eth);
+> -	mtk_rx_clean(eth, &eth->rx_ring[0]);
+> -	mtk_rx_clean(eth, &eth->rx_ring_qdma);
+> +	mtk_rx_clean(eth, &eth->rx_ring[0], MTK_HAS_CAPS(soc->caps, MTK_SRAM));
+> +	mtk_rx_clean(eth, &eth->rx_ring_qdma, false);
+> =20
+>  	if (eth->hwlro) {
+>  		mtk_hwlro_rx_uninit(eth);
+>  		for (i =3D 1; i < MTK_MAX_RX_RING_NUM; i++)
+> -			mtk_rx_clean(eth, &eth->rx_ring[i]);
+> +			mtk_rx_clean(eth, &eth->rx_ring[i], false);
+>  	}
+> =20
+>  	kfree(eth->scratch_head);
+> @@ -4676,7 +4700,7 @@ static int mtk_sgmii_init(struct mtk_eth *eth)
+> =20
+>  static int mtk_probe(struct platform_device *pdev)
+>  {
+> -	struct resource *res =3D NULL;
+> +	struct resource *res =3D NULL, *res_sram;
+>  	struct device_node *mac_np;
+>  	struct mtk_eth *eth;
+>  	int err, i;
+> @@ -4696,6 +4720,16 @@ static int mtk_probe(struct platform_device *pdev)
+>  	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
+>  		eth->ip_align =3D NET_IP_ALIGN;
+> =20
+> +	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
+> +		if (mtk_is_netsys_v3_or_greater(eth)) {
+> +			eth->sram_base =3D devm_platform_ioremap_resource(pdev, 1);
+> +			if (IS_ERR(eth->sram_base))
+> +				return PTR_ERR(eth->sram_base);
+> +		} else {
+> +			eth->sram_base =3D eth->base + MTK_ETH_SRAM_OFFSET;
+> +		}
+> +	}
+> +
+>  	spin_lock_init(&eth->page_lock);
+>  	spin_lock_init(&eth->tx_irq_lock);
+>  	spin_lock_init(&eth->rx_irq_lock);
+> @@ -4759,6 +4793,18 @@ static int mtk_probe(struct platform_device *pdev)
+>  			err =3D -EINVAL;
+>  			goto err_destroy_sgmii;
+>  		}
+> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
+> +			if (mtk_is_netsys_v3_or_greater(eth)) {
+> +				res_sram =3D platform_get_resource(pdev, IORESOURCE_MEM, 1);
+> +				if (!res_sram) {
+> +					err =3D -EINVAL;
+> +					goto err_destroy_sgmii;
+> +				}
+> +				eth->phy_scratch_ring =3D res_sram->start;
+> +			} else {
+> +				eth->phy_scratch_ring =3D res->start + MTK_ETH_SRAM_OFFSET;
+> +			}
+> +		}
+>  	}
+> =20
+>  	if (eth->soc->offload_version) {
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/et=
+hernet/mediatek/mtk_eth_soc.h
+> index cf9381a3d68b7..0e513f41ad477 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> @@ -139,6 +139,9 @@
+>  #define MTK_GDMA_MAC_ADRH(x)	({ typeof(x) _x =3D (x); (_x =3D=3D MTK_GMA=
+C3_ID) ?	\
+>  				   0x54C : 0x50C + (_x * 0x1000); })
+> =20
+> +/* Internal SRAM offset */
+> +#define MTK_ETH_SRAM_OFFSET	0x40000
+> +
+>  /* FE global misc reg*/
+>  #define MTK_FE_GLO_MISC         0x124
+> =20
+> @@ -938,6 +941,7 @@ enum mkt_eth_capabilities {
+>  	MTK_RSTCTRL_PPE1_BIT,
+>  	MTK_RSTCTRL_PPE2_BIT,
+>  	MTK_U3_COPHY_V2_BIT,
+> +	MTK_SRAM_BIT,
+> =20
+>  	/* MUX BITS*/
+>  	MTK_ETH_MUX_GDM1_TO_GMAC1_ESW_BIT,
+> @@ -973,6 +977,7 @@ enum mkt_eth_capabilities {
+>  #define MTK_RSTCTRL_PPE1	BIT_ULL(MTK_RSTCTRL_PPE1_BIT)
+>  #define MTK_RSTCTRL_PPE2	BIT_ULL(MTK_RSTCTRL_PPE2_BIT)
+>  #define MTK_U3_COPHY_V2		BIT_ULL(MTK_U3_COPHY_V2_BIT)
+> +#define MTK_SRAM		BIT_ULL(MTK_SRAM_BIT)
+> =20
+>  #define MTK_ETH_MUX_GDM1_TO_GMAC1_ESW		\
+>  	BIT_ULL(MTK_ETH_MUX_GDM1_TO_GMAC1_ESW_BIT)
+> @@ -1048,14 +1053,14 @@ enum mkt_eth_capabilities {
+>  #define MT7981_CAPS  (MTK_GMAC1_SGMII | MTK_GMAC2_SGMII | MTK_GMAC2_GEPH=
+Y | \
+>  		      MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | \
+>  		      MTK_MUX_U3_GMAC2_TO_QPHY | MTK_U3_COPHY_V2 | \
+> -		      MTK_RSTCTRL_PPE1)
+> +		      MTK_RSTCTRL_PPE1 | MTK_SRAM)
+> =20
+>  #define MT7986_CAPS  (MTK_GMAC1_SGMII | MTK_GMAC2_SGMII | \
+>  		      MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | \
+> -		      MTK_RSTCTRL_PPE1)
+> +		      MTK_RSTCTRL_PPE1 | MTK_SRAM)
+> =20
+>  #define MT7988_CAPS  (MTK_GDM1_ESW | MTK_QDMA | MTK_RSTCTRL_PPE1 | \
+> -		      MTK_RSTCTRL_PPE2)
+> +		      MTK_RSTCTRL_PPE2 | MTK_SRAM)
+> =20
+>  struct mtk_tx_dma_desc_info {
+>  	dma_addr_t	addr;
+> @@ -1215,6 +1220,7 @@ struct mtk_eth {
+>  	struct device			*dev;
+>  	struct device			*dma_dev;
+>  	void __iomem			*base;
+> +	void __iomem			*sram_base;
+>  	spinlock_t			page_lock;
+>  	spinlock_t			tx_irq_lock;
+>  	spinlock_t			rx_irq_lock;
+> --=20
+> 2.41.0
+
+--U+qIIYHU7IgoXdym
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZOBzsQAKCRA6cBh0uS2t
+rFdPAQDbZjLVS9cvk2P1LCkAzRD1HLVGWbHHJoXiJMrB3jUCZAEA6Ffj1/+lsScS
+VPj+8WcsBcr0xSnntaRkGur8GDvuLQ0=
+=1h0Y
+-----END PGP SIGNATURE-----
+
+--U+qIIYHU7IgoXdym--
 
