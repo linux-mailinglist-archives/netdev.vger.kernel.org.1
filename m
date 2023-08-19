@@ -1,199 +1,126 @@
-Return-Path: <netdev+bounces-29057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDBD3781841
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 10:11:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61188781847
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 10:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C8A5281B7B
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 08:11:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7401D1C20CA0
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 08:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E901C15;
-	Sat, 19 Aug 2023 08:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040311C36;
+	Sat, 19 Aug 2023 08:15:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27224ED0
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 08:11:09 +0000 (UTC)
-Received: from sonic309-20.consmr.mail.gq1.yahoo.com (sonic309-20.consmr.mail.gq1.yahoo.com [98.137.65.146])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E94C619F
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 01:11:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1692432663; bh=yZlxb67YxQ05+BNzviKsC0qXM3c0kTm174EVaqNUEZg=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=VKAAhKpulkouLhZw744eXwSXec+lnLkU238lhZGIIzwuuiZJo/mkRCBp3q42tIyQdshVLHqeff9GvrppsRqCWKIApM70vFGIHrcW+619QxFQDQmXs8EEEmTR7OMfgdFzb0E4kY7NxZ1eiNUSHJVyubZelp6FRoRM3xUdXQQ1ZRxMeo9LG25/rGw/Ft7MGh60taVdsykD+BsBnDM5jPShoQA+zy8FmI5xbg5LPm+K7k3TJCNLLVuEr6wj//Omv3YrnbnTtC5PEGQmVsjOW1AXr57+dNioom3x40eoaznhLfQcy3jZ+D8SfaESO4YI/a9Z/05btkb/QHnZvH/KAGd4gQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1692432663; bh=4RcbK+DuNlnZ1XkIjxJ9vyJiOMsXWBJ1/U2POT/0ZLx=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=JjCyNm7F4iX0oBRfFKD9RqijckpCh4e6SH1foAM++hPzx41jV+yhWkAbXIhKOPIzWQRLhAEgXJSEJBuCx2oemuvGednQLQ01EamnMSRrEcf1kA7hhf+cXeJHvxQhllkbwA+M4COjJksKV+qRJ/QV9wu46rDrFnayy3W4YqIaNBdL1lBrEAniEsLwRRuO9e7+tnAHROtGTCCRtI6EzQQJt64Fo+wQRK2/EtsRRfE+2VRF25BayZauKHax75mpI7+HP4k1zon8UiB7FclUd7p3g61qtm0tW58vE3UtRhbkrCRo8nK5Y1VdfjYbhTs/kRpScZs8qLJPCiC4HnmBHkMIaA==
-X-YMail-OSG: hXoHxZcVM1nxLdP9NN_iXTc2CvyCmjRg3H0uZ1kDTq9M9AywWLE97yUv.LE4Nbr
- GPqSkIwHU.Tm_8tz..dzPceNTxkdcJhkAZDzi6H6TdltmIXDKw8VpSB1YlvHgDl8AwWNyv1GLtJK
- wLJoalxLB2VE0HVMKk9erTgpmJE5Qz..NoK9Fp3Ay0U5N3ZXXcYM5KGo7ajQw7kb3IcuZFbjNKPk
- MWzbsRNsye8ii.GssJroaBJxHkdlOzc1n_s9D0HcXtZYowcRgZubh5EUXTDDkkIgkFmjHz.UMpMY
- XWx3O3Gvgm_USqZTkZW5yNR8m5026h3sp.tctEfnsBx_YGGoMUYPeXa2DTADBBG.00Z_tKirPQqh
- b0QjLEas8uR5mntaCQyku5RPDxUIGU.oxU2.7l6_g1nZv3Os9Yk.45VOYdgKpOI1Ggout4CbcXqE
- l3DWDPgaLncPitGlw5xf1CcNCCSOepeFHONx14hg4m1B4FXfZji180TRR_Sagc0lfi7gkbcAlD7j
- lbtn6DHiuqFUREVY2hKtXtbcYvfzbeg_lfjbGrBUphjJI4eQXZzppkVw1vy6kYB1xfu.mVy__Rm_
- 68aP_YiT3wf9wLJzD9vh3rthgu3o82Fe9mfiiuLqEXMNCvCVRMTSmrBhxOOndANN_eIajhOPfGYV
- DEESlkFrAyJrEqF3AQqQa5lHHWJ4tVhxS_Z9sSF0Qo1suAI5xLkiIKj3ykPAgwXt69UXe9Dh6_IK
- Hkm3u7z9NEAPokTnMC4q2ldIvB51idwAfD8XPFQ4QciGJQqELOiTH4CEcDdlCvoRRCEkHSUcZaID
- cFJt0Uq8Y5DWs.8_Zo2yajrw6FzUFyNT7dPcx0hNkznZz1d30ATJIkSg894f7l5O4qvnCPxdFT0j
- OvxwqsqiBO2oEmkI39lYfpsIx0UWu_GPv.sir_MYjO86j5Fw8Hol5JQI.dOYKaCK9ErO61NdmbJ7
- ymthxKA1VSCbxCVVXDcNrchP.zcLu7D0tFJ3XnPRXEeIOOneiupRgQAyducwJsOqfXIzymI23awT
- TFLvTid0.2RhYzXxfan2j7aV0h_bEHLFp_7LwS4zLjz8.MkZcS7glet09c.VGF_5XKzlWifk5DoZ
- Se96q7kzVjxTdd_CFwGg9P3voanEGvH_kvh_qRjbj0_LRSbwbSS3gSMefWgRYnSVAGPWgOcSXYck
- mJ2T7SeRFSZ2k9t7C.sXxG8bdWpGy23IM8DtPIBv2HrnoC20alJHdyfb764E5ql2QKlYvFJ2Vo4L
- f0euti.IomUJ9O0du1KaAKwdVl4f2cdjHw50zhxbZZTDrLxJTf72Z6iKNA6RUUJYH2znJHBF1567
- VEdRmEwhP_Va_OKjtlTNsOcDtFK7cUeoVCGElqy7UF8CcFUVUtFv3NJ_qGNvFJzI8J7W9OrBOh13
- hMcjao7TZilD2wmn8G1iJO3cYwGTJmno3acZXKSn6WlFi1i.MxgImIBbjWQ0IseTlwwWxZf5J9_w
- CNIQ_oix5IJpTo0XLUwX0vhFAsvpVPA3i8861oafthzyMR0tVmHvzWr8BnWTIyE1NNKfr2AZ7UGU
- TDnwBGhfjzd.CP5_6_SoFAZTmSq8P17t1Qa6GU1RKhKODT7z8pcF41sNy54KiHQdihhLKg.cdFgF
- 8Kjtk0JC0g6YsdvGbF9zlqPimKlifgcp_ph5LBCqRpNTJh147FFgmZzRSuU2Xzlpypjtp2zk8QuC
- 1.l93_LkaAphNYnRPo86reKBIbs5ESmOIFJH7S_oS.P4FDkaGfMp9_FsPxbj1tgGm3EXBEBhb9AE
- GjdWp1Swyf2jYrfhtbLfHSuAMNnJ_HWfQfwYJoHKc5CVaGg_nEJnQFznsNexXi8FO4Gw8lTkcxBl
- 7sxHUVtoCvX4tD657tepBH8IGg5bQRJY_bVVNCQakIKMOmArSOkt3igwl2G4XcL.WdcPXR.ex9ta
- zZ8CvN2TNpEmxAaYAXfwvaX8GNjmUMO.k9V4seutDkICYR7QIsdm.rbGCMjbUew9UiOfQPwm7R10
- OnYsa.ZLzZ8LMc74u3D5ECzaQM19YSXmwVXfmVpHgejHS.kDiWaN7GnnQ5PmsSL0YSUSfZnLylBK
- sehQmF8oH6ystVjUiFt4fXiWHTsrxUkImIh_8iEFZ8dtzFhZoV5e3YmLB5B.j6l_oWmk2lad.bwR
- NA_XfQO.laFV6jg_D.tP9WPQomuTtSkGv96z4JYBBwjnqONhALIgjuKNSTx1xS1vRNwTiDZNvNzO
- tz1RVAbw6XEF3SJ6LI8dmIw4wBrM4XmrfDJ1_Htg-
-X-Sonic-MF: <astrajoan@yahoo.com>
-X-Sonic-ID: aae89fdf-f5b6-4f6e-8180-58cc6d04aeae
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.gq1.yahoo.com with HTTP; Sat, 19 Aug 2023 08:11:03 +0000
-Received: by hermes--production-gq1-6b7c87dcf5-rj56s (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 86923299112c9f4d4ee777d306e9d8ee;
-          Sat, 19 Aug 2023 08:11:01 +0000 (UTC)
-From: Ziqi Zhao <astrajoan@yahoo.com>
-To: arnd@arndb.de,
-	bridge@lists.linux-foundation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	f.fainelli@gmail.com,
-	ivan.orlov0322@gmail.com,
-	keescook@chromium.org,
-	kuba@kernel.org,
-	hkallweit1@gmail.com,
-	mudongliangabcd@gmail.com,
-	nikolay@nvidia.com,
-	pabeni@redhat.com,
-	razor@blackwall.org,
-	roopa@nvidia.com,
-	skhan@linuxfoundation.org,
-	syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com,
-	vladimir.oltean@nxp.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Ziqi Zhao <astrajoan@yahoo.com>
-Subject: [PATCH] net: bridge: Fix refcnt issues in dev_ioctl
-Date: Sat, 19 Aug 2023 01:10:57 -0700
-Message-Id: <20230819081057.330728-1-astrajoan@yahoo.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <00000000000051197705fdbc7e54@google.com>
-References: <00000000000051197705fdbc7e54@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ADBA57;
+	Sat, 19 Aug 2023 08:15:24 +0000 (UTC)
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97E82710;
+	Sat, 19 Aug 2023 01:15:22 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id DD4BA320010B;
+	Sat, 19 Aug 2023 04:15:17 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Sat, 19 Aug 2023 04:15:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjusaka.me; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
+	1692432917; x=1692519317; bh=mVg7+z/59hMefv6EatBj5KT4jPl/Nf37DQy
+	lbZT0lF0=; b=l7+Idw7IXTlvGLWtkX4Yk9YD3/pIkjlXypJGt7S8HC/9liI1Cdj
+	AbiC77K/z0YBVQ/FVPplg+bytdlQ+dCc6NLsE/mqDY3v3d5deNXUK+iCoPqLoR4m
+	7KEnWqflPdY4rVYIZ2nrq0D4B9axmUmMzkaWbpOCHFtDQHYcLbg7HnL9XIIq2f0a
+	mK3zqk15aTNX0cHqWpDSzQHd7FW/4LyCfysFsUH2Dm9exVtC1p5Wo5QNbC+o51R2
+	rJg3xLibAhOvJd9AOLlO0dwSv/nxgjI2n7dRMLqBJ4h5gtIzWF7nWo66Nkl2HcVZ
+	5u2GV2DhRUor71Xr+SsbHXQYqCUb3sNoSfQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1692432917; x=1692519317; bh=mVg7+z/59hMefv6EatBj5KT4jPl/Nf37DQy
+	lbZT0lF0=; b=t6N2GC4hYniQXEfaTz2EuUH27T0sH45C1jfxLNXZxFos7HH40gT
+	KBtE6edJ+rySMY3zSRjIO+7Ks3Pdn6URlSpydJymaYRu4IqS7rdz+hTuOSX0GrPa
+	xKP3tHtONDVXgCKm/BZKpEKPFkPZcKDiOk48Ur3IL9ysISycJdFRi1weyZmQwy3h
+	V9P4P56zaIQKJwLkFbLN29w95tx/fWeStGG89LaHLpAMdP3z5TMObUbIHBo5o0RO
+	S5dA4M6DY7W7sInbbXOGEMqSICvCzeQLTOSQs4HdjoJvLGm7r4PlLJNiQkMnpam7
+	ZRRY6EBwhtMkX+9Z6+l1qC2Xusq2Rb7AvdQ==
+X-ME-Sender: <xms:FXrgZPjnB5QfQ4PRwkdTFgVeaN_4v5hYrLgtB-SJsuYC3ocaUzD-3Q>
+    <xme:FXrgZMCwXFK_V-4i3OOVNf8ITegB7tIIpKZs8YUj1S3Fv25-7Non3G_GcgMY_6Hi6
+    7GzKbd4pYIFh-cE32Q>
+X-ME-Received: <xmr:FXrgZPEZpMAo-2JYx9rLLvwfHLhNQpGBXAIgu6gVwQYTx5VBle0A3_1kfvalUHNvSA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudduhedgtddvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtkeertddtvdejnecuhfhrohhmpeforghn
+    jhhushgrkhgruceomhgvsehmrghnjhhushgrkhgrrdhmvgeqnecuggftrfgrthhtvghrnh
+    epudevveejhfejvdegvedvuedtueekleejlefhfedtheekhfefiedvgfdukeeuieelnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgvsehmrg
+    hnjhhushgrkhgrrdhmvg
+X-ME-Proxy: <xmx:FXrgZMT9PKKTCwesqnzedCRN4dcTB3WJCdpowJ9jyEKcW-jGGDCsnQ>
+    <xmx:FXrgZMzo6QRDBv_SO0sjkjULJLR_oeGvE0uv8NMAs_s9b9nyiD7Y6w>
+    <xmx:FXrgZC4DtkP2j10vgUQw1TzrGZXDMQJlTsCl6A_-0FWiMZqWSUrKPA>
+    <xmx:FXrgZBpGDKAfRw10usHn5sM9lmFylMEI84bEKe7Ptud62Aq7v7D6dQ>
+Feedback-ID: i3ea9498d:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 19 Aug 2023 04:15:13 -0400 (EDT)
+Message-ID: <3b997205-bca6-4dba-94fe-65facb84015e@manjusaka.me>
+Date: Sat, 19 Aug 2023 16:15:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] tracepoint: add new `tcp:tcp_ca_event` trace event
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ mhiramat@kernel.org, ncardwell@google.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, rostedt@goodmis.org
+References: <CANn89iKQXhqgOTkSchH6Bz-xH--pAoSyEORBtawqBTvgG+dFig@mail.gmail.com>
+ <20230812201249.62237-1-me@manjusaka.me> <20230818185156.5bb662db@kernel.org>
+ <CANn89iLYsfD0tFryzCn2GbhrX4n+e0CPTXB6Vc=_m=U9Qi_CzA@mail.gmail.com>
+Content-Language: en-US
+From: Manjusaka <me@manjusaka.me>
+In-Reply-To: <CANn89iLYsfD0tFryzCn2GbhrX4n+e0CPTXB6Vc=_m=U9Qi_CzA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In the bug reported by Syzbot, certain bridge devices would have a
-leaked reference created by race conditions in dev_ioctl, specifically,
-under SIOCBRADDIF or SIOCBRDELIF operations. The reference leak would
-be shown in the periodic unregister_netdevice call, which throws a
-warning and cause Syzbot to report a crash. Upon inspection of the
-logic in dev_ioctl, it seems the reference was introduced to ensure
-proper access to the bridge device after rtnl_unlock. and the latter
-function is necessary to maintain the following lock order in any
-bridge related ioctl calls:
+On 2023/8/19 11:10, Eric Dumazet wrote:
+> On Sat, Aug 19, 2023 at 3:52 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Sat, 12 Aug 2023 20:12:50 +0000 Zheao Li wrote:
+>>> In normal use case, the tcp_ca_event would be changed in high frequency.
+>>>
+>>> The developer can monitor the network quality more easier by tracing
+>>> TCP stack with this TP event.
+>>>
+>>> So I propose to add a `tcp:tcp_ca_event` trace event
+>>> like `tcp:tcp_cong_state_set` to help the people to
+>>> trace the TCP connection status
+>>
+>> Ah, I completely missed v3 somehow and we got no ack from Eric so maybe
+>> he missed it, too. Could you please resend not as part of this thread
+>> but as a new thread?
+> 
+> I was waiting for a v4, because Steven asked for additional spaces in the macros
+> for readability ?
 
-1) br_ioctl_mutex => 2) rtnl_lock
+I think the additional spaces should not be added in this patch. Because there will
+be two code style in one file.
 
-Conceptually, though, br_ioctl_mutex could be considered more specific
-than rtnl_lock given their usages, hence swapping their order would be
-a reasonable proposal. This patch changes all related call sites to
-maintain the reversed order of the two locks:
-
-1) rtnl_lock => 2) br_ioctl_mutex
-
-By doing so, the extra reference introduced in dev_ioctl is no longer
-needed, and hence the reference leak bug is now resolved.
-
-Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
-Fixes: ad2f99aedf8f ("net: bridge: move bridge ioctls out of .ndo_do_ioctl")
-Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
----
- net/bridge/br_ioctl.c | 4 ----
- net/core/dev_ioctl.c  | 8 +-------
- net/socket.c          | 2 ++
- 3 files changed, 3 insertions(+), 11 deletions(-)
-
-diff --git a/net/bridge/br_ioctl.c b/net/bridge/br_ioctl.c
-index f213ed108361..291dbc5d2a99 100644
---- a/net/bridge/br_ioctl.c
-+++ b/net/bridge/br_ioctl.c
-@@ -399,8 +399,6 @@ int br_ioctl_stub(struct net *net, struct net_bridge *br, unsigned int cmd,
- {
- 	int ret = -EOPNOTSUPP;
- 
--	rtnl_lock();
--
- 	switch (cmd) {
- 	case SIOCGIFBR:
- 	case SIOCSIFBR:
-@@ -434,7 +432,5 @@ int br_ioctl_stub(struct net *net, struct net_bridge *br, unsigned int cmd,
- 		break;
- 	}
- 
--	rtnl_unlock();
--
- 	return ret;
- }
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 3730945ee294..17df956df8cb 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -336,7 +336,6 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 	int err;
- 	struct net_device *dev = __dev_get_by_name(net, ifr->ifr_name);
- 	const struct net_device_ops *ops;
--	netdevice_tracker dev_tracker;
- 
- 	if (!dev)
- 		return -ENODEV;
-@@ -405,12 +404,7 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 			return -ENODEV;
- 		if (!netif_is_bridge_master(dev))
- 			return -EOPNOTSUPP;
--		netdev_hold(dev, &dev_tracker, GFP_KERNEL);
--		rtnl_unlock();
--		err = br_ioctl_call(net, netdev_priv(dev), cmd, ifr, NULL);
--		netdev_put(dev, &dev_tracker);
--		rtnl_lock();
--		return err;
-+		return br_ioctl_call(net, netdev_priv(dev), cmd, ifr, NULL);
- 
- 	case SIOCDEVPRIVATE ... SIOCDEVPRIVATE + 15:
- 		return dev_siocdevprivate(dev, ifr, data, cmd);
-diff --git a/net/socket.c b/net/socket.c
-index 2b0e54b2405c..6b7a9df9a326 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1258,7 +1258,9 @@ static long sock_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 		case SIOCSIFBR:
- 		case SIOCBRADDBR:
- 		case SIOCBRDELBR:
-+			rtnl_lock();
- 			err = br_ioctl_call(net, NULL, cmd, NULL, argp);
-+			rtnl_unlock();
- 			break;
- 		case SIOCGIFVLAN:
- 		case SIOCSIFVLAN:
--- 
-2.34.1
-
+I think it would be a good idea for another patch to adjust the space in this file
 
