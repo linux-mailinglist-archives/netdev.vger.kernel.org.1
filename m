@@ -1,37 +1,63 @@
-Return-Path: <netdev+bounces-29043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CC278172E
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 05:32:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 172A0781738
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 05:38:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697521C209AA
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 03:32:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC86E1C20E3D
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 03:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6D5136B;
-	Sat, 19 Aug 2023 03:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1D7137F;
+	Sat, 19 Aug 2023 03:38:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9595463C
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 03:32:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B775C433C7;
-	Sat, 19 Aug 2023 03:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692415924;
-	bh=yb+WTKigRqsT3NL8XsjWB0mVhvoeR9rc6p1B8UMrwj4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lVR7jzD55nKAN9SB30QOM8fdtMQgI8W1LAw346/wQ86LIFFPY/Wy2RssNYEuiHtZ1
-	 TYlgIJwfC7mCDV/3YrlAaiF0sW2Rwz89AfDlEk2xxYd0Jg0e8vEjkQH6ii3e6Dm8oG
-	 vIYl14F9bDF9cLFTWrBtqh/KSZST9wNqvsyMM+unK1sO6FBDzwhlZODgBnNH4S9jkc
-	 w9ORmySkl0mPBA1BpeLGFQCnAgWMVCUsKAMsEnCNtUnDsFsLA3srqZamAZIyYg9VKu
-	 OMitLyKjILEnwviZTo9PH+WkFYjFkNw9CRBzAL4h13QwlHH19TLZ+d9m+F3T397Sv5
-	 TeqDC1R/rg3OA==
-Message-ID: <99759d9b-4c56-5006-2686-cf39fffa9e50@kernel.org>
-Date: Fri, 18 Aug 2023 21:32:03 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D72763C;
+	Sat, 19 Aug 2023 03:38:21 +0000 (UTC)
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE859B;
+	Fri, 18 Aug 2023 20:38:19 -0700 (PDT)
+Received: by mail-ot1-x332.google.com with SMTP id 46e09a7af769-6bd0a0a675dso1234619a34.2;
+        Fri, 18 Aug 2023 20:38:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692416299; x=1693021099;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dmTd9LPLzzWYKe3BqlMTtEt2CsxGySX/14bhS+6KcNo=;
+        b=g/LRQqKy++m0sndFrKKwqZAMccTOZ0/tvSbN1sxEsR29MIRiyXp0YIHl+DaLSJgklD
+         jF5IBX8YLz9/4UUrAGAjTlzoYLSqmW/3AXwn9GekCH4zU0w4yIgBzcV9q8K0cntkSlLm
+         2+KSeAhHcAm50zuaY/FIYh+Jc7GCjloxTka1vX9+eFMKS7l0FBvFqiQ+JB3vu3WUsJoR
+         hBGRJNjNBnFMG8zJbvvIs8DqRnQKr7G2JlYXeaaq6SAiHb+bhtj3gzb8sSc6CvfcOQBn
+         VcDleBIip5m4isw213VzpTshW5/exltZGgpG8mMlO6t+O35WL9nn9jiD8cEcY34ORtkf
+         bqBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692416299; x=1693021099;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmTd9LPLzzWYKe3BqlMTtEt2CsxGySX/14bhS+6KcNo=;
+        b=eVQ407k4TO4KegclkXaWftxTMwezIRC4mWgX4jEQ/UCmGiBNeOn7CHrk3xiSdaa9uC
+         21259h7XSTl49xJxAOc0ubuVs1qFc6Vba8xzolJ8ydGy9jTLXSNT1JNaxg1eihOroab0
+         kEcB8LP3fxTE2tLFKC2+jhgm8oS98Z1IaQaPNMHGqoRu70NE0emygbF8IqZ8sDEbYBoK
+         1s8bRg9HDi++BTZkh47wLdDwSMlo09DLALp6/rw41eHkwo0Sbz280j48jnftdPHupXXy
+         98Kapu/W1SXlQ7zE7pMFzCxvGUDS5LbtzAzK2nORrcfI8xG9HqVtJgSdj5X6Uo5e8tAV
+         qMvA==
+X-Gm-Message-State: AOJu0Yx8z+5m+sH8AmkxNORyqJZpFD/YTrJW8jTpnhAlRVPYylwyA/pX
+	hlIkQjy+ugP26/RXlRy5NQI=
+X-Google-Smtp-Source: AGHT+IHONxuWE7fXMBMP5Zji20fF4bK2e+h+CQmlY3olaUvkTvy4kiBwPWfbYAjc1gzQv7zmLiQdFA==
+X-Received: by 2002:a05:6870:2051:b0:1c0:219b:17f4 with SMTP id l17-20020a056870205100b001c0219b17f4mr1437619oad.5.1692416299037;
+        Fri, 18 Aug 2023 20:38:19 -0700 (PDT)
+Received: from [192.168.1.12] (bb219-74-209-211.singnet.com.sg. [219.74.209.211])
+        by smtp.gmail.com with ESMTPSA id 20-20020a17090a199400b00262d6ac0140sm2434749pji.9.2023.08.18.20.38.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Aug 2023 20:38:18 -0700 (PDT)
+Message-ID: <fb6ec982-a0b4-2217-fda3-151cc37ad9a4@gmail.com>
+Date: Sat, 19 Aug 2023 11:38:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,99 +66,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v2 net] ipv4: fix data-races around inet->inet_id
+Subject: Re: [RFC PATCH bpf-next 1/2] bpf, x64: Fix tailcall infinite loop bug
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot <syzkaller@googlegroups.com>
-References: <20230819031707.312225-1-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230819031707.312225-1-edumazet@google.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, X86 ML <x86@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Yizhou Tang <tangyeechou@gmail.com>,
+ kernel-patches-bot@fb.com, "Fijalkowski, Maciej"
+ <maciej.fijalkowski@intel.com>, Network Development
+ <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+References: <20230814134147.70289-1-hffilwlqm@gmail.com>
+ <20230814134147.70289-2-hffilwlqm@gmail.com>
+ <20230817223143.jyclrtf3a6kmtgh5@macbook-pro-8.dhcp.thefacebook.com>
+ <fea59b79-3f28-c580-185b-8c64dc21a399@gmail.com>
+ <CAADnVQKVKPpbMNV9XNc+yJCuaWRupsB5EBjghv++jGqYTnv6QQ@mail.gmail.com>
+From: Leon Hwang <hffilwlqm@gmail.com>
+In-Reply-To: <CAADnVQKVKPpbMNV9XNc+yJCuaWRupsB5EBjghv++jGqYTnv6QQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 8/18/23 9:17 PM, Eric Dumazet wrote:
-> UDP sendmsg() is lockless, so ip_select_ident_segs()
-> can very well be run from multiple cpus [1]
-> 
-> Convert inet->inet_id to an atomic_t, but implement
-> a dedicated path for TCP, avoiding cost of a locked
-> instruction (atomic_add_return())
-> 
-> Note that this patch will cause a trivial merge conflict
-> because we added inet->flags in net-next tree.
-> 
-> v2: added missing change in
-> drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
-> (David Ahern)
-> 
-> [1]
-> 
-> BUG: KCSAN: data-race in __ip_make_skb / __ip_make_skb
-> 
-> read-write to 0xffff888145af952a of 2 bytes by task 7803 on cpu 1:
-> ip_select_ident_segs include/net/ip.h:542 [inline]
-> ip_select_ident include/net/ip.h:556 [inline]
-> __ip_make_skb+0x844/0xc70 net/ipv4/ip_output.c:1446
-> ip_make_skb+0x233/0x2c0 net/ipv4/ip_output.c:1560
-> udp_sendmsg+0x1199/0x1250 net/ipv4/udp.c:1260
-> inet_sendmsg+0x63/0x80 net/ipv4/af_inet.c:830
-> sock_sendmsg_nosec net/socket.c:725 [inline]
-> sock_sendmsg net/socket.c:748 [inline]
-> ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2494
-> ___sys_sendmsg net/socket.c:2548 [inline]
-> __sys_sendmmsg+0x269/0x500 net/socket.c:2634
-> __do_sys_sendmmsg net/socket.c:2663 [inline]
-> __se_sys_sendmmsg net/socket.c:2660 [inline]
-> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2660
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> read to 0xffff888145af952a of 2 bytes by task 7804 on cpu 0:
-> ip_select_ident_segs include/net/ip.h:541 [inline]
-> ip_select_ident include/net/ip.h:556 [inline]
-> __ip_make_skb+0x817/0xc70 net/ipv4/ip_output.c:1446
-> ip_make_skb+0x233/0x2c0 net/ipv4/ip_output.c:1560
-> udp_sendmsg+0x1199/0x1250 net/ipv4/udp.c:1260
-> inet_sendmsg+0x63/0x80 net/ipv4/af_inet.c:830
-> sock_sendmsg_nosec net/socket.c:725 [inline]
-> sock_sendmsg net/socket.c:748 [inline]
-> ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2494
-> ___sys_sendmsg net/socket.c:2548 [inline]
-> __sys_sendmmsg+0x269/0x500 net/socket.c:2634
-> __do_sys_sendmmsg net/socket.c:2663 [inline]
-> __se_sys_sendmmsg net/socket.c:2660 [inline]
-> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2660
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> value changed: 0x184d -> 0x184e
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 0 PID: 7804 Comm: syz-executor.1 Not tainted 6.5.0-rc6-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-> ==================================================================
-> 
-> Fixes: 23f57406b82d ("ipv4: avoid using shared IP generator for connected sockets")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  .../chelsio/inline_crypto/chtls/chtls_cm.c        |  2 +-
->  include/net/inet_sock.h                           |  2 +-
->  include/net/ip.h                                  | 15 +++++++++++++--
->  net/dccp/ipv4.c                                   |  4 ++--
->  net/ipv4/af_inet.c                                |  2 +-
->  net/ipv4/datagram.c                               |  2 +-
->  net/ipv4/tcp_ipv4.c                               |  4 ++--
->  net/sctp/socket.c                                 |  2 +-
->  8 files changed, 22 insertions(+), 11 deletions(-)
-> 
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
+
+On 2023/8/19 03:59, Alexei Starovoitov wrote:
+> On Thu, Aug 17, 2023 at 7:10 PM Leon Hwang <hffilwlqm@gmail.com> wrote:
+>>
+>>
+>>
+>> On 18/8/23 06:31, Alexei Starovoitov wrote:
+>>> On Mon, Aug 14, 2023 at 09:41:46PM +0800, Leon Hwang wrote:
+>>>> @@ -1147,6 +1152,7 @@ struct bpf_attach_target_info {
+>>>>      struct module *tgt_mod;
+>>>>      const char *tgt_name;
+>>>>      const struct btf_type *tgt_type;
+>>>> +    bool tail_call_ctx;
+>>>
+>>> Instead of extra flag here can you check tgt_prog->aux->tail_call_reachable in check_attach_btf_id()
+>>> and set tr->flags there?
+>>
+>> Should we check tgt_prog->aux->func[subprog]->is_func? Or, tgt_prog->aux->tail_call_reachable
+>> is enough?
+> 
+> Please let the thread continue to a logical conclusion before resending
+> new version. Will reply there.
+
+Sorry for the new version without logical conclusion.
+
+I'll do it better in the future.
+
+Additionally, I'm looking forward to fix it, and then planning to add a
+feature to trace tailcalls with trampoline.
+
+Thanks,
+Leon
 
