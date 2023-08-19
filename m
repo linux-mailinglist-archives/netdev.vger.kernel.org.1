@@ -1,501 +1,145 @@
-Return-Path: <netdev+bounces-29065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C4AF7818D0
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 12:39:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514587818D5
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 12:40:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5209281C6D
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 10:39:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EDCE1C2095F
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 10:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D208C4429;
-	Sat, 19 Aug 2023 10:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E56F4429;
+	Sat, 19 Aug 2023 10:39:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4B2A51
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 10:39:42 +0000 (UTC)
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2049.outbound.protection.outlook.com [40.107.7.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7548237FF;
-	Sat, 19 Aug 2023 02:20:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n58tSsE4dZe4hPIFipWBCplhQO8GKS4OXiuLtT9k3xNk01ouR8pa6A2f5IXHIMQPqXaqrOuGTq5Jg3wX6eASqtgypjKaDSoapBqmIsO+E6lSlAdh+7LsqqDr5kXyOUTKNQn/CxbmKWQZ2GHZiqfxi/BrW18dXzr2UMayFaLld3HVGcJIkCmQksg1QIhNv/L8rY0frhIOccEe8u53YJ6aFqIfWKRbupOUxbsUGwpBWLy7QIPuDX6r7+4zwwzPWUY14E2kLBQXbgnytr1cCxVlr1Xphav0kUKdBB4uAhgZwLL0vV1Lw5AWyh0aY5BJCTz/cxHWeDHibwxIjFqS+I9xZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VPxUtZWySbiGTGrRPvA0DUF9rBbptj/lgYAwolGRsTo=;
- b=Wes0t5HdFXHKNQqzjXNOcJxK1eux1RA+lr1AxZgNmqG9zFEsxU3/Lb+Oji050bNXp7gRDAA66iNglDj9E8IZSbCGBYdcTbnxY0PJ0oaDmFepAKvgyFFY6DF/Owe7pbkBMsnc7o0SuwBYoCJYLdA34qJgKXYb8jXtBBoHqulVmMBN/SE2PtZ/xza06isUR/zp8wBPHb2q4Hw1/53Mb/eC9tBM3W9XP6yYyaxhHJMzKoQADLzzk0d+hu77wB6D806BSKRb/kxeKDAVOIaB4261wu8/guwfLQ3KYsSt2iVcHNqw5LHqViA4udFeU8zwkALO40YtcQtvdWGEebVFIq9/nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VPxUtZWySbiGTGrRPvA0DUF9rBbptj/lgYAwolGRsTo=;
- b=fy0Cz9fdb6Z1x0PQfztO8QPOgeLUmGymo6Bmj4BnhrJdz0gXqQJL7MvZdmsHsmShSuxxdfHLKEJbRd+aZJnbu+kdOq/LbdUaKVsZvXVV9CIxxBAR+oSpJS2/fNfYpZxk+eaFkRYI+vvW5auMuRG6JKsqF0Xb+1vusECOYCqrJ4xj76tGe9JAR97sNzS9l/mFt45G7ynDnOSjRKS+JrYrp8CwD7n6jOljRJOzzKBdYCNlZa98b8mlKBnhxRSVvUVfAXNSH9hMrX5ZCB+GO6AiVZYRlm5ot5iIjWo2311rpe3IqNUqRHuoptNnoZcJGSIr6V7AtiBQwNRRqBgNGgUyiQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from AM0PR0402MB3395.eurprd04.prod.outlook.com
- (2603:10a6:208:1a::16) by VI1PR04MB6990.eurprd04.prod.outlook.com
- (2603:10a6:803:138::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Sat, 19 Aug
- 2023 09:19:59 +0000
-Received: from AM0PR0402MB3395.eurprd04.prod.outlook.com
- ([fe80::da23:cf17:3db5:8010]) by AM0PR0402MB3395.eurprd04.prod.outlook.com
- ([fe80::da23:cf17:3db5:8010%3]) with mapi id 15.20.6699.020; Sat, 19 Aug 2023
- 09:19:59 +0000
-Message-ID: <93326217-3d6a-7b2b-023e-d7725f1523b3@suse.com>
-Date: Sat, 19 Aug 2023 11:19:56 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 03/10] mlx4: Replace the mlx4_interface.event
- callback with a notifier
-Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>
-Cc: tariqt@nvidia.com, yishaih@nvidia.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jgg@ziepe.ca,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230813145127.10653-1-petr.pavlu@suse.com>
- <20230813145127.10653-4-petr.pavlu@suse.com> <20230813165449.GL7707@unreal>
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20230813165449.GL7707@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR06CA0197.eurprd06.prod.outlook.com
- (2603:10a6:802:2c::18) To AM0PR0402MB3395.eurprd04.prod.outlook.com
- (2603:10a6:208:1a::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316011C17
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 10:39:53 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F87626081
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 02:25:19 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51d95aed33aso2149358a12.3
+        for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 02:25:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1692437117; x=1693041917;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qp+p88acw4RYdUK5z2c5JXRcScXCLt4N2yRM056qyZI=;
+        b=VRR5HDmZ87vfAsOdbfbSMy3DH2tEGsp2n37sFPGHgHf6WJE6uIG4yAWcDCPiimPf9Y
+         g5xXFg7TPYdKcb5jl7DplAamSO61UWaTu/PSgQ4Oc2VdSKqhz5y2imgL1SGTUGce7DhW
+         YkIld5h6JkxGQ4xBy1o2SvHqcy982wGk0ZNtngsGuIVTuMB1IhHThiyKJ8YI4Fw7NuxC
+         fPhsJzKOHsmaIq+vUlkq7v+ZjfFG+h3uvMucYasHduWlSim2hBKkjMQ96TYQvhUFxhvK
+         8TzlZGlFBzKsohUfKrApwHBiQoo7Mh+s9wU2IPUg9P5FV8yqsBs/mPXujg2UV4whPYLv
+         PgsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692437117; x=1693041917;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qp+p88acw4RYdUK5z2c5JXRcScXCLt4N2yRM056qyZI=;
+        b=U1FOh+fZoSeOg2YN82IVt1rEdJsc/glxkVrLi3fMdpHG41QDN0+ou6FxXPohbSPiDz
+         /Ca4DlMZ9LFaMzJCqnmWLFnncw7AGbyLt33xUWDqCDoAQzZtFqFxFiIvnd9LWiwUUhk/
+         8E9lWwQ4+BnASCxnZ2aUewtrSxhF5I2jbccRdua9u2zZxmqnYL4G4AymJF8n9OMd+zvw
+         Tv7TAulAQaYRXk0rQTnd4MjP0plANEr8QpSz51xiUNcGa/+SzqTFpu4Ylzyo3epc6dI/
+         xZ8qcXx08ZQZ923jnPd5rcefzKQz6kQ1AvT1o9AkZSv1eE9JVnAD9wrpCr3VhBTK1/2A
+         /HSQ==
+X-Gm-Message-State: AOJu0Yz5LX1EdOiYjY80RrcV3FUZ2qBUj/lPZe+t7+dhBvuLC7Q6M6li
+	/CfmcwBKRVjlCG7W+rqqMm2hZQ==
+X-Google-Smtp-Source: AGHT+IEXf4Cdoa+8NauX37PHYq+yLXIhUdj4BWAkAzLxSuxit4Crlmzvd6GPituu3hkr9P+D2ExGow==
+X-Received: by 2002:aa7:db4a:0:b0:525:501d:9bd3 with SMTP id n10-20020aa7db4a000000b00525501d9bd3mr992991edt.32.1692437117544;
+        Sat, 19 Aug 2023 02:25:17 -0700 (PDT)
+Received: from [192.168.1.2] (handbookness.lineup.volia.net. [93.73.104.44])
+        by smtp.gmail.com with ESMTPSA id w9-20020a056402070900b00525683f9b2fsm2214842edx.5.2023.08.19.02.25.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 19 Aug 2023 02:25:17 -0700 (PDT)
+Message-ID: <df28eac7-ee6e-431c-acee-36a1c29a4ae0@blackwall.org>
+Date: Sat, 19 Aug 2023 12:25:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR0402MB3395:EE_|VI1PR04MB6990:EE_
-X-MS-Office365-Filtering-Correlation-Id: fe75bd72-fe1d-409b-65f5-08dba09575b9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	LOUU6eEgd66QE8cYQuZmw7mTKe6vpKm9DQ0RvnEIP1w/WXaJUaC5YydmdV4tQZ5NKfhUokIOcuxuWtcunxI3/hyseq7ywybvY5hUYYhtot7NkXeUeNTjuIRDQV8AbqUrMdceUm9+XVmBmFw+iRIKkvvPG7cysLFW4wKtnvo0xdx/1i5jkbwQ3/MBV110XPsPXugrWIjtfe4LcAXH6dPnNRMs01pMn5WiieGD3WcikDXULevIS5wLQ3gJ7+wFTk45CUDYa4WVNeo8w+9rhrg7QsqG43eIkPDfWpFKTO+14W542eJRmJOEyMYD5+Fy3xEKxjf1QKUm+Ack4f7VtiJyz9XQxeLymBXwozPfszedp8vta0v8FVqCpNWUXnkMucKbnSrrt8IBR0Lpp9Oj05xc1D4Tzm8ttJpVQHoNMidVnDeImqoY16eEVa3Hl5cfzJH/dmYCfXn4Zb7ROhQ51vJkL/E5Yv0c3J6a/h3g9zkJBithWlsvXMCMs9cVj2Y/wkX2r4EU0foE6bfX7hW1VkriPIU8ppmToljqI2cwoJEg0B55GT3THFQ/cgkZQspN8kAZafGsZCieTdXiMgh//83W8YtbhltJp9NoqBjdWdL2fnskbyct8VfKOU9ovE+mVBX9dkUXFwPK8cGRWyIQHUTbKA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR0402MB3395.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(366004)(136003)(396003)(39850400004)(1800799009)(186009)(451199024)(8936002)(8676002)(4326008)(44832011)(66899024)(5660300002)(86362001)(38100700002)(31696002)(2616005)(53546011)(478600001)(6512007)(26005)(6666004)(55236004)(6506007)(6486002)(83380400001)(41300700001)(30864003)(7416002)(66556008)(66476007)(66946007)(36756003)(316002)(2906002)(6916009)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L3NlbXhiZDlaU3h6VGhVdzBDT0tSdS95dlQ5bUVJQUpGOTgwMmxXMzdyUi9v?=
- =?utf-8?B?UUlmbnZZMDZ2cEFXa0V0SlloYUJBWTBHelNOTURCY3lITTVrWE5ydStnbFFG?=
- =?utf-8?B?N0VxTnhSc3J1enhIS2JNK3VNbTFCSElBQ3lZd0JicUhMN3NsWmJ6S3lScDA2?=
- =?utf-8?B?K1FMcGtVbVAwdUJ3WWJWOFh1OXJ1dUdrMGpObUxLRlRDU3hGS2dXWGQ1UUVl?=
- =?utf-8?B?aWV1OVVncWdwdU41NUNOc1o0WVltbldSZDhJZ2VnRWNGSWZBb1o1SUxHU08v?=
- =?utf-8?B?Y2RZYnJCVTBYK0lOQWVwRVFhNzdtYi9nUDJpS213YlNybmt5aWV3T1F2and2?=
- =?utf-8?B?SW5UUGJtTlljK2lVT1lQZGJmU1J4REw5SzF0Y3FuODR2N0JtTG8za21Kd2RI?=
- =?utf-8?B?anNZY0dOSGlRd3RFKzkxbUhKemp0WUhTay8xMUYwalNjYy92bDV2Q1NXUytQ?=
- =?utf-8?B?MWhGY0Vpay9OQWNVdS9oK1hhS2NKZys3TkpvdTN4SEtCUGVocUpBTVVKTnB4?=
- =?utf-8?B?MGxBMjBPRE10b0htY1UvQXRVenF4d3NER3EwY1R0dVo5UVZHWEVRMi85LzhO?=
- =?utf-8?B?YlRzTXFHZHNvRHdoanhpbUpYd0d4RUZTWVRvMW02UjZNVUV1M0lhUDNzVG5D?=
- =?utf-8?B?Uk5pL3lLU0xmQU5vUXYvbkp6bGx4Wk90OUtheGR2TEV1OE5LZ1U3Z2VSVytH?=
- =?utf-8?B?ZWRSSEtSblFFOWJZbkxGRDFxbTNIQVFnZ1hzVHZ2czFiZGIrYlAvWnNORmwx?=
- =?utf-8?B?T3ZiWGNyQUczZXJJQW93czduTzFhRW11RU40RmFiWC9YUXkwMlJCQ3A3aFQw?=
- =?utf-8?B?TDRXTXlPUm9maFNPblEvVC9leTJaN0crbEU4Y0ljRmVSV2hVTUFtM1hBK1JI?=
- =?utf-8?B?Yk4vdmFuc3kvUTVxUGNLRThVYWgvWHVJazFWM0QxVlluUVFCZkxuc3R3SzlY?=
- =?utf-8?B?NUgxeFByY3ZFWXZabzBsdXVHdUM1NDhUa1llekxtNjJYS2pVVTkxUFh2Yzlv?=
- =?utf-8?B?NlBUMGlYR1pPMHl1VFV6YTBBOEE2cXFxUTIzR2s4WGNPNVNzd2FMbFRQaXNn?=
- =?utf-8?B?YmViQlRWall5bWw0WDNrOTlvSzIrRE13WFJpU3BlOVZaNkM4dEVrZWpyZEN5?=
- =?utf-8?B?d2tyK2Y4ZFRLUXYzbXNkM0FJbTBiRFlNaWZ6OWpQUG0rZ2ViSk05NmJSYjRN?=
- =?utf-8?B?WXJxeTRhRXJKbzRHa1IraXNWTzZwc2RDclQ0akM0YkR4ektmcXlxSldHR1Ax?=
- =?utf-8?B?RHBZZHlLUlIxTnpmVjJXK09rY1ZYVUptelBCYUMvL0NjNmlVVlVPNmNuQzhO?=
- =?utf-8?B?YzlNQjlTdFkzN25wbUNYaFlUNlZtUTc0amRROFU3RHMxYXBNNzBOeDREelB6?=
- =?utf-8?B?Y3N6NG16QzlsNnZTM1kza0p2ckNmQmJvMDZkTlNyY0RRb1pZeEFpZlZ0c1Bs?=
- =?utf-8?B?dlhvc2pjWlpJYlN4cUt3NTBXc2VXWi9FT29vekNpMUQyOUJnaFNhTWhRdno5?=
- =?utf-8?B?aFFNODBIRFhkUDkrcmZhY2ttOS93NTR1MlI0aFlmSjVUZm1Cc2RUOXlxamYr?=
- =?utf-8?B?TDJNTUgwaWhpNWgrL0JDRVhpQ1VoaTRiTllZclBLYTMzQlozaFZ4bEltMU4r?=
- =?utf-8?B?dXZtWFFLbVNaUXpIS1h3N2VrOVpEeXgvOVhPdW5KMC9JbEdNQ3hWKzRzZlZZ?=
- =?utf-8?B?TTRZbGxmL05uTnBaWlJQVDdxdUJyRjJYMktjak1aOFNyK2xHK3MrSTUvT1hu?=
- =?utf-8?B?TGJzRXJhU0dKcFFXR21WbEwzZTJmdzhlcVFXVnJSREZJWlpiQUJOOXcrbGY1?=
- =?utf-8?B?Vnc5d2JtR2UwNjVKSDdTN2gyVXFxTmR2SjRjQXUzZnUvLzF6UzduUW1LVWJJ?=
- =?utf-8?B?Y2NjT0pKdDhTT01YNjNGT3VtN0piUlNxNVhmNjVRZVU3a3drd3gvckJ0VTFP?=
- =?utf-8?B?d1RDUnBoYkhxMWZiUlYvV1VseFF0akxhcmZGUVRCZzhyblp3VUtTbWl1clha?=
- =?utf-8?B?OFFZR0FjTGVmNnZscGcrSThKZFA3N1lkcGZoY1ZRR0U1d3Y0OXAzY2Z6V1Z1?=
- =?utf-8?B?MUNnSWUweHRZbG8zV0F1SHJMVzdmWXlNdVcvdDVYUzVtNUdOUHdFMGdac1Np?=
- =?utf-8?Q?E+phk0GE6I01GZhX1Gcl/Z4Iz?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe75bd72-fe1d-409b-65f5-08dba09575b9
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR0402MB3395.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2023 09:19:59.0420
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q7idl8XDTXKxl1yMtU7j3QwkpIoA6auEbix+brHtbRVyzKur6KNjgzR07Dp/SQKg2ygadMfLf+vzrVKBdvaWWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6990
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] net: bridge: Fix refcnt issues in dev_ioctl
+Content-Language: en-US
+To: Ziqi Zhao <astrajoan@yahoo.com>, arnd@arndb.de,
+ bridge@lists.linux-foundation.org, davem@davemloft.net, edumazet@google.com,
+ f.fainelli@gmail.com, ivan.orlov0322@gmail.com, keescook@chromium.org,
+ kuba@kernel.org, hkallweit1@gmail.com, mudongliangabcd@gmail.com,
+ nikolay@nvidia.com, pabeni@redhat.com, roopa@nvidia.com,
+ skhan@linuxfoundation.org,
+ syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com,
+ vladimir.oltean@nxp.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <00000000000051197705fdbc7e54@google.com>
+ <20230819081057.330728-1-astrajoan@yahoo.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230819081057.330728-1-astrajoan@yahoo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/13/23 18:54, Leon Romanovsky wrote:
-> On Sun, Aug 13, 2023 at 04:51:20PM +0200, Petr Pavlu wrote:
->> Use a notifier to implement mlx4_dispatch_event() in preparation to
->> switch mlx4_en and mlx4_ib to be an auxiliary device.
->>
->> A problem is that if the mlx4_interface.event callback was replaced with
->> something as mlx4_adrv.event then the implementation of
->> mlx4_dispatch_event() would need to acquire a lock on a given device
->> before executing this callback. That is necessary because otherwise
->> there is no guarantee that the associated driver cannot get unbound when
->> the callback is running. However, taking this lock is not possible
->> because mlx4_dispatch_event() can be invoked from the hardirq context.
->> Using an atomic notifier allows the driver to accurately record when it
->> wants to receive these events and solves this problem.
->>
->> A handler registration is done by both mlx4_en and mlx4_ib at the end of
->> their mlx4_interface.add callback. This matches the current situation
->> when mlx4_add_device() would enable events for a given device
->> immediately after this callback, by adding the device on the
->> mlx4_priv.list.
->>
->> Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
->> Tested-by: Leon Romanovsky <leonro@nvidia.com>
->> Acked-by: Tariq Toukan <tariqt@nvidia.com>
->> ---
->>  drivers/infiniband/hw/mlx4/main.c            | 41 +++++++++++++-------
->>  drivers/infiniband/hw/mlx4/mlx4_ib.h         |  2 +
->>  drivers/net/ethernet/mellanox/mlx4/en_main.c | 27 +++++++++----
->>  drivers/net/ethernet/mellanox/mlx4/intf.c    | 24 ++++++++----
->>  drivers/net/ethernet/mellanox/mlx4/main.c    |  2 +
->>  drivers/net/ethernet/mellanox/mlx4/mlx4.h    |  2 +
->>  drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  2 +
->>  include/linux/mlx4/driver.h                  |  8 +++-
->>  8 files changed, 77 insertions(+), 31 deletions(-)
->>
->> diff --git a/drivers/infiniband/hw/mlx4/main.c b/drivers/infiniband/hw/mlx4/main.c
->> index 7dd70d778b6b..0761c465120b 100644
->> --- a/drivers/infiniband/hw/mlx4/main.c
->> +++ b/drivers/infiniband/hw/mlx4/main.c
->> @@ -82,6 +82,8 @@ static const char mlx4_ib_version[] =
->>  static void do_slave_init(struct mlx4_ib_dev *ibdev, int slave, int do_init);
->>  static enum rdma_link_layer mlx4_ib_port_link_layer(struct ib_device *device,
->>  						    u32 port_num);
->> +static int mlx4_ib_event(struct notifier_block *this, unsigned long event,
->> +			 void *ptr);
->>  
->>  static struct workqueue_struct *wq;
->>  
->> @@ -2836,6 +2838,12 @@ static void *mlx4_ib_add(struct mlx4_dev *dev)
->>  				do_slave_init(ibdev, j, 1);
->>  		}
->>  	}
->> +
->> +	/* register mlx4 core notifier */
->> +	ibdev->mlx_nb.notifier_call = mlx4_ib_event;
->> +	err = mlx4_register_event_notifier(dev, &ibdev->mlx_nb);
->> +	WARN(err, "failed to register mlx4 event notifier (%d)", err);
->> +
->>  	return ibdev;
->>  
->>  err_notif:
->> @@ -2953,6 +2961,8 @@ static void mlx4_ib_remove(struct mlx4_dev *dev, void *ibdev_ptr)
->>  	int p;
->>  	int i;
->>  
->> +	mlx4_unregister_event_notifier(dev, &ibdev->mlx_nb);
->> +
->>  	mlx4_foreach_port(i, dev, MLX4_PORT_TYPE_IB)
->>  		devlink_port_type_clear(mlx4_get_devlink_port(dev, i));
->>  	ibdev->ib_active = false;
->> @@ -3173,11 +3183,14 @@ void mlx4_sched_ib_sl2vl_update_work(struct mlx4_ib_dev *ibdev,
->>  	}
->>  }
->>  
->> -static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
->> -			  enum mlx4_dev_event event, unsigned long param)
->> +static int mlx4_ib_event(struct notifier_block *this, unsigned long event,
->> +			 void *ptr)
->>  {
->> +	struct mlx4_ib_dev *ibdev =
->> +		container_of(this, struct mlx4_ib_dev, mlx_nb);
->> +	struct mlx4_dev *dev = ibdev->dev;
->> +	unsigned long param = *(unsigned long *)ptr;
+Hi Ziqi,
+On 8/19/23 11:10, Ziqi Zhao wrote:
+> In the bug reported by Syzbot, certain bridge devices would have a
+> leaked reference created by race conditions in dev_ioctl, specifically,
+> under SIOCBRADDIF or SIOCBRDELIF operations. The reference leak would
+
+How would it leak a reference, could you elaborate?
+The reference is always taken and always released after the call.
+
+> be shown in the periodic unregister_netdevice call, which throws a
+> warning and cause Syzbot to report a crash. Upon inspection of the
+
+If you reproduced it, is the device later removed or is it really stuck?
+
+> logic in dev_ioctl, it seems the reference was introduced to ensure
+> proper access to the bridge device after rtnl_unlock. and the latter
+> function is necessary to maintain the following lock order in any
+> bridge related ioctl calls:
 > 
-> You don't need this assignment here as later, you will cast param again,
-> in your next patches:
+> 1) br_ioctl_mutex => 2) rtnl_lock
 > 
->   3227         if (event == MLX4_DEV_EVENT_PORT_MGMT_CHANGE)
->   3228                 eqe = (struct mlx4_eqe *)param;
->   3229         else
->   3230                 p = (int) param;
+> Conceptually, though, br_ioctl_mutex could be considered more specific
+> than rtnl_lock given their usages, hence swapping their order would be
+> a reasonable proposal. This patch changes all related call sites to
+> maintain the reversed order of the two locks:
 > 
-> so use ptr directly:
+> 1) rtnl_lock => 2) br_ioctl_mutex
 > 
->          if (event == MLX4_DEV_EVENT_PORT_MGMT_CHANGE)
->                  eqe = param;
->          else
->                  p = *(int *) param;
+> By doing so, the extra reference introduced in dev_ioctl is no longer
+> needed, and hence the reference leak bug is now resolved.
 
-Function mlx4_dispatch_event() currently takes an 'unsigned long' as its
-event parameter. The patch updates the function to use
-atomic_notifier_call_chain() which however expects 'void *' as the
-'param' value. To solve the mismatch, mlx4_dispatch_event() passes to
-atomic_notifier_call_chain() an address of the original 'param'. This
-creates one additional level of indirection which the handlers, such as
-mlx4_ib_event(), need to deal with. Line
-'unsigned long param = *(unsigned long *)ptr;' is added for that.
+IIRC there was no bug, it was a false-positive. The reference is held a 
+bit longer but then released, so the device is deleted later.
+I might be remembering wrong, but I think I briefly looked into this 
+when it was reported. If that's not the case I'd be interested to see
+a new report/trace because the bug might be somewhere else.
 
-I think the best way to avoid this complexity would be for
-mlx4_dispatch_event() to take 'void *' as its 'param' in the first
-place. I would add the following patch before this one in v3 of the
-series.
+> 
+> Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+> Fixes: ad2f99aedf8f ("net: bridge: move bridge ioctls out of .ndo_do_ioctl")
+> Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
+> ---
+>   net/bridge/br_ioctl.c | 4 ----
+>   net/core/dev_ioctl.c  | 8 +-------
+>   net/socket.c          | 2 ++
+>   3 files changed, 3 insertions(+), 11 deletions(-)
+> 
 
+Thanks,
+  Nik
 
-From e17d6b8fb32e6caeba2929764ad0249a2e136049 Mon Sep 17 00:00:00 2001
-From: Petr Pavlu <petr.pavlu@suse.com>
-Date: Fri, 18 Aug 2023 12:55:30 +0200
-Subject: [PATCH] mlx4: Use 'void *' as the event param of
- mlx4_dispatch_event()
-
-Function mlx4_dispatch_event() takes an 'unsigned long' as its event
-parameter. The actual value is none (MLX4_DEV_EVENT_CATASTROPHIC_ERROR),
-a pointer to mlx4_eqe (MLX4_DEV_EVENT_PORT_MGMT_CHANGE), or a 32-bit
-integer (remaining events).
-
-In preparation to switch mlx4_en and mlx4_ib to be an auxiliary device,
-the mlx4_interface.event callback is replaced with a notifier and
-function mlx4_dispatch_event() gets updated to invoke
-atomic_notifier_call_chain(). This requires forwarding the input 'param'
-value from the former function to the latter. A problem is that the
-notifier call takes 'void *' as its 'param' value, compared to
-'unsigned long' used by mlx4_dispatch_event(). Re-passing the value
-would need either punning it to 'void *' or passing down the address of
-the input 'param'. Both approaches create a number of unnecessary casts.
-
-Change instead the input 'param' of mlx4_dispatch_event() from
-'unsigned long' to 'void *'. A mlx4_eqe pointer can be passed directly,
-callers using an int value are adjusted to pass its address.
-
-Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
----
- drivers/infiniband/hw/mlx4/main.c            | 14 ++++++++++----
- drivers/net/ethernet/mellanox/mlx4/catas.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx4/cmd.c     |  4 ++--
- drivers/net/ethernet/mellanox/mlx4/en_main.c | 17 +++++++++++++++--
- drivers/net/ethernet/mellanox/mlx4/eq.c      | 15 ++++++++-------
- drivers/net/ethernet/mellanox/mlx4/intf.c    |  2 +-
- drivers/net/ethernet/mellanox/mlx4/mlx4.h    |  2 +-
- include/linux/mlx4/driver.h                  |  2 +-
- 8 files changed, 39 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/infiniband/hw/mlx4/main.c b/drivers/infiniband/hw/mlx4/main.c
-index 7dd70d778b6b..2c5fd8174b3c 100644
---- a/drivers/infiniband/hw/mlx4/main.c
-+++ b/drivers/infiniband/hw/mlx4/main.c
-@@ -3174,7 +3174,7 @@ void mlx4_sched_ib_sl2vl_update_work(struct mlx4_ib_dev *ibdev,
- }
- 
- static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
--			  enum mlx4_dev_event event, unsigned long param)
-+			  enum mlx4_dev_event event, void *param)
- {
- 	struct ib_event ibev;
- 	struct mlx4_ib_dev *ibdev = to_mdev((struct ib_device *) ibdev_ptr);
-@@ -3194,10 +3194,16 @@ static void mlx4_ib_event(struct mlx4_dev *dev, void *ibdev_ptr,
- 		return;
- 	}
- 
--	if (event == MLX4_DEV_EVENT_PORT_MGMT_CHANGE)
-+	switch (event) {
-+	case MLX4_DEV_EVENT_CATASTROPHIC_ERROR:
-+		break;
-+	case MLX4_DEV_EVENT_PORT_MGMT_CHANGE:
- 		eqe = (struct mlx4_eqe *)param;
--	else
--		p = (int) param;
-+		break;
-+	default:
-+		p = *(int *)param;
-+		break;
-+	}
- 
- 	switch (event) {
- 	case MLX4_DEV_EVENT_PORT_UP:
-diff --git a/drivers/net/ethernet/mellanox/mlx4/catas.c b/drivers/net/ethernet/mellanox/mlx4/catas.c
-index 0eb7b83637d8..0d8a362c2673 100644
---- a/drivers/net/ethernet/mellanox/mlx4/catas.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/catas.c
-@@ -194,7 +194,7 @@ void mlx4_enter_error_state(struct mlx4_dev_persistent *persist)
- 	mutex_unlock(&persist->device_state_mutex);
- 
- 	/* At that step HW was already reset, now notify clients */
--	mlx4_dispatch_event(dev, MLX4_DEV_EVENT_CATASTROPHIC_ERROR, 0);
-+	mlx4_dispatch_event(dev, MLX4_DEV_EVENT_CATASTROPHIC_ERROR, NULL);
- 	mlx4_cmd_wake_completions(dev);
- 	return;
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/cmd.c b/drivers/net/ethernet/mellanox/mlx4/cmd.c
-index c56d2194cbfc..f5b1f8c7834f 100644
---- a/drivers/net/ethernet/mellanox/mlx4/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/cmd.c
-@@ -2113,7 +2113,7 @@ static void mlx4_master_do_cmd(struct mlx4_dev *dev, int slave, u8 cmd,
- 		if (MLX4_COMM_CMD_FLR == slave_state[slave].last_cmd)
- 			goto inform_slave_state;
- 
--		mlx4_dispatch_event(dev, MLX4_DEV_EVENT_SLAVE_SHUTDOWN, slave);
-+		mlx4_dispatch_event(dev, MLX4_DEV_EVENT_SLAVE_SHUTDOWN, &slave);
- 
- 		/* write the version in the event field */
- 		reply |= mlx4_comm_get_version();
-@@ -2152,7 +2152,7 @@ static void mlx4_master_do_cmd(struct mlx4_dev *dev, int slave, u8 cmd,
- 		if (mlx4_master_activate_admin_state(priv, slave))
- 				goto reset_slave;
- 		slave_state[slave].active = true;
--		mlx4_dispatch_event(dev, MLX4_DEV_EVENT_SLAVE_INIT, slave);
-+		mlx4_dispatch_event(dev, MLX4_DEV_EVENT_SLAVE_INIT, &slave);
- 		break;
- 	case MLX4_COMM_CMD_VHCR_POST:
- 		if ((slave_state[slave].last_cmd != MLX4_COMM_CMD_VHCR_EN) &&
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_main.c b/drivers/net/ethernet/mellanox/mlx4/en_main.c
-index be8ba34c9025..83dae886ade6 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_main.c
-@@ -184,10 +184,22 @@ static void mlx4_en_get_profile(struct mlx4_en_dev *mdev)
- }
- 
- static void mlx4_en_event(struct mlx4_dev *dev, void *endev_ptr,
--			  enum mlx4_dev_event event, unsigned long port)
-+			  enum mlx4_dev_event event, void *param)
- {
- 	struct mlx4_en_dev *mdev = (struct mlx4_en_dev *) endev_ptr;
- 	struct mlx4_en_priv *priv;
-+	int port;
-+
-+	switch (event) {
-+	case MLX4_DEV_EVENT_CATASTROPHIC_ERROR:
-+	case MLX4_DEV_EVENT_PORT_MGMT_CHANGE:
-+	case MLX4_DEV_EVENT_SLAVE_INIT:
-+	case MLX4_DEV_EVENT_SLAVE_SHUTDOWN:
-+		break;
-+	default:
-+		port = *(int *)param;
-+		break;
-+	}
- 
- 	switch (event) {
- 	case MLX4_DEV_EVENT_PORT_UP:
-@@ -205,6 +217,7 @@ static void mlx4_en_event(struct mlx4_dev *dev, void *endev_ptr,
- 		mlx4_err(mdev, "Internal error detected, restarting device\n");
- 		break;
- 
-+	case MLX4_DEV_EVENT_PORT_MGMT_CHANGE:
- 	case MLX4_DEV_EVENT_SLAVE_INIT:
- 	case MLX4_DEV_EVENT_SLAVE_SHUTDOWN:
- 		break;
-@@ -213,7 +226,7 @@ static void mlx4_en_event(struct mlx4_dev *dev, void *endev_ptr,
- 		    !mdev->pndev[port])
- 			return;
- 		mlx4_warn(mdev, "Unhandled event %d for port %d\n", event,
--			  (int) port);
-+			  port);
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/eq.c b/drivers/net/ethernet/mellanox/mlx4/eq.c
-index 414e390e6b48..6598b10a9ff4 100644
---- a/drivers/net/ethernet/mellanox/mlx4/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/eq.c
-@@ -501,7 +501,7 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
- 	int port;
- 	int slave = 0;
- 	int ret;
--	u32 flr_slave;
-+	int flr_slave;
- 	u8 update_slave_state;
- 	int i;
- 	enum slave_port_gen_event gen_event;
-@@ -606,8 +606,8 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
- 			port = be32_to_cpu(eqe->event.port_change.port) >> 28;
- 			slaves_port = mlx4_phys_to_slaves_pport(dev, port);
- 			if (eqe->subtype == MLX4_PORT_CHANGE_SUBTYPE_DOWN) {
--				mlx4_dispatch_event(dev, MLX4_DEV_EVENT_PORT_DOWN,
--						    port);
-+				mlx4_dispatch_event(
-+					dev, MLX4_DEV_EVENT_PORT_DOWN, &port);
- 				mlx4_priv(dev)->sense.do_sense_port[port] = 1;
- 				if (!mlx4_is_master(dev))
- 					break;
-@@ -647,7 +647,8 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
- 					}
- 				}
- 			} else {
--				mlx4_dispatch_event(dev, MLX4_DEV_EVENT_PORT_UP, port);
-+				mlx4_dispatch_event(dev, MLX4_DEV_EVENT_PORT_UP,
-+						    &port);
- 
- 				mlx4_priv(dev)->sense.do_sense_port[port] = 0;
- 
-@@ -758,7 +759,7 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
- 			}
- 			spin_unlock_irqrestore(&priv->mfunc.master.slave_state_lock, flags);
- 			mlx4_dispatch_event(dev, MLX4_DEV_EVENT_SLAVE_SHUTDOWN,
--					    flr_slave);
-+					    &flr_slave);
- 			queue_work(priv->mfunc.master.comm_wq,
- 				   &priv->mfunc.master.slave_flr_event_work);
- 			break;
-@@ -787,8 +788,8 @@ static int mlx4_eq_int(struct mlx4_dev *dev, struct mlx4_eq *eq)
- 			break;
- 
- 		case MLX4_EVENT_TYPE_PORT_MNG_CHG_EVENT:
--			mlx4_dispatch_event(dev, MLX4_DEV_EVENT_PORT_MGMT_CHANGE,
--					    (unsigned long) eqe);
-+			mlx4_dispatch_event(
-+				dev, MLX4_DEV_EVENT_PORT_MGMT_CHANGE, eqe);
- 			break;
- 
- 		case MLX4_EVENT_TYPE_RECOVERABLE_ERROR_EVENT:
-diff --git a/drivers/net/ethernet/mellanox/mlx4/intf.c b/drivers/net/ethernet/mellanox/mlx4/intf.c
-index 28d7da925d36..a761971cd0c4 100644
---- a/drivers/net/ethernet/mellanox/mlx4/intf.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/intf.c
-@@ -180,7 +180,7 @@ int mlx4_do_bond(struct mlx4_dev *dev, bool enable)
- }
- 
- void mlx4_dispatch_event(struct mlx4_dev *dev, enum mlx4_dev_event type,
--			 unsigned long param)
-+			 void *param)
- {
- 	struct mlx4_priv *priv = mlx4_priv(dev);
- 	struct mlx4_device_context *dev_ctx;
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4.h b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-index 6ccf340660d9..de5699a4ddaa 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-@@ -1048,7 +1048,7 @@ int mlx4_restart_one(struct pci_dev *pdev);
- int mlx4_register_device(struct mlx4_dev *dev);
- void mlx4_unregister_device(struct mlx4_dev *dev);
- void mlx4_dispatch_event(struct mlx4_dev *dev, enum mlx4_dev_event type,
--			 unsigned long param);
-+			 void *param);
- 
- struct mlx4_dev_cap;
- struct mlx4_init_hca_param;
-diff --git a/include/linux/mlx4/driver.h b/include/linux/mlx4/driver.h
-index 923951e19300..032d7f5bfef6 100644
---- a/include/linux/mlx4/driver.h
-+++ b/include/linux/mlx4/driver.h
-@@ -58,7 +58,7 @@ struct mlx4_interface {
- 	void *			(*add)	 (struct mlx4_dev *dev);
- 	void			(*remove)(struct mlx4_dev *dev, void *context);
- 	void			(*event) (struct mlx4_dev *dev, void *context,
--					  enum mlx4_dev_event event, unsigned long param);
-+					  enum mlx4_dev_event event, void *param);
- 	void			(*activate)(struct mlx4_dev *dev, void *context);
- 	struct list_head	list;
- 	enum mlx4_protocol	protocol;
--- 
-2.35.3
 
 
