@@ -1,113 +1,112 @@
-Return-Path: <netdev+bounces-29093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C3D7819AA
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 15:11:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2123C7819AD
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 15:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E32DB1C209AD
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:11:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F5DD281A6B
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C60C4C8D;
-	Sat, 19 Aug 2023 13:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD51611E;
+	Sat, 19 Aug 2023 13:23:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF6033FA
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 13:11:44 +0000 (UTC)
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 003A51CABC;
-	Sat, 19 Aug 2023 06:10:48 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-26b56cc7896so1091538a91.3;
-        Sat, 19 Aug 2023 06:10:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207D246B6
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 13:23:47 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E90D8
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 06:21:56 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-5280ef23593so2192379a12.3
+        for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 06:21:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692450648; x=1693055448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1e+/XnsKbjswDuOJErNhCCCCiL5iSSWZ7RF7mQ7/+3w=;
-        b=dwid1HtELpcOUIDba9rowZithC342CaX+0ngTuoCeNcueWxXGFhoWXugu7R4ecOTrC
-         I+wpq1K4TlPwvXLxFp0FL+Jx2nhNrnQEEPH2gRsIlEomRiDDMB9gbyNxudIc+ZRIZkYB
-         Wu9dJW491DFNgAWornGvxBIeDQuarRvCYe96XBUCuxy0q87R4/NGT5cbbgbS1sPCybAW
-         eNpTlNirDvufASE2ol3xIdQfreVVxmzuIAToa1evJG21qld3oNtSbCWRZ/x0XRTU1yG6
-         0VofgmdvBMsdxKjzpRRE2PnbiIiLzWXYbbbmDV64y8ZBXxO7mKYVLTwuBxOaxSqflQQM
-         9QQg==
+        d=gmail.com; s=20221208; t=1692451315; x=1693056115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OlxwKd3Lo+momKyLWahfpvHnxwMdFdNkqNGUZuaXSUg=;
+        b=XRQc0xQXK60NPpoK/7rIIuZCjiewxXxvaICwNu5Eb94ZDVFTuW5frhaZMYIUEEJ1Ts
+         9yWMw6zVB41r7Q11XrZ0rJIYnUb9T9bmCjaBIwQssmrVZ3t2ONDeuPZgQCsVAidR57/4
+         oZn/VXXsC5LsrxBTbK5IxBjoKXvqwO6j3tBYjiF089lVzIghjRj5ntnPzm+0DEYFl/MU
+         /TizvThjtYKLk1XdMIytFERFZBzDjHBpjSKSvIl4BETmxCSyrtC+jcslLwCULfozC4aP
+         sRc3e23vxz32kTWRZicH/zL5DRzX2zZ1hMzfb51mvkyZXJCAdEIvf+nfUlxa6OtQk5nA
+         UeJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692450648; x=1693055448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1e+/XnsKbjswDuOJErNhCCCCiL5iSSWZ7RF7mQ7/+3w=;
-        b=RqcxFsBQDgiKObc75lFu4GAK6+EJ+A4o9x62FDYNmyWht95Au8U8J8m5krTChXDJFr
-         DQ3dQCz+h9aKgqT7kO+Ocuqgbjh/MP6sgnBwGpRfg3anCzJp4GF5BETbh4kbytqrW8IJ
-         otTWDkPYhPFjnGcnH+ci1pQpFQuQm7WfMKkdrJYcm8SySYj3pX4g73o0mo2GES1FP0LJ
-         qItc0F4ip66wxc3TyEmPwL+3HyvH4SWA5ON+wQR0wCxpM5hIwc+lYaVkjKDaao8oiH4A
-         8YCWVxMGKztWvmDsPoSYzLl+SPb6l4diR0rPcYiNeHmb7hj6XjB3AUixOztsAIylLJUG
-         gWzA==
-X-Gm-Message-State: AOJu0Yw48ilyojxvBcO5qKXjCrF5t15fHcSvz9I5mSbF3XGVj9WMEwZB
-	6BQvt6qrsINYZCcEmA9Ykv2JgRoejU39A92/dt8=
-X-Google-Smtp-Source: AGHT+IEi7ryax+7gcMZllWjyl1lEZYP/Sxe6jDorLDrYSUoJSuj5qN0WtumtQ6/fR+4XZPf4+VbMKLip+gBwMC4uYcY=
-X-Received: by 2002:a17:90a:f98a:b0:268:2d92:55d3 with SMTP id
- cq10-20020a17090af98a00b002682d9255d3mr1120669pjb.39.1692450647831; Sat, 19
- Aug 2023 06:10:47 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692451315; x=1693056115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OlxwKd3Lo+momKyLWahfpvHnxwMdFdNkqNGUZuaXSUg=;
+        b=Yb0SBTi5gqJE2odSZfFj5vShX0RPdMUigodr/xdUdHBuokS8r/Vwnftfsmod3JnVia
+         UD0oxOnucoeaDIFQyL+ieXrjb0DTDragLr2obtKNY/6HIukQpismImnnVjbKiUv+ByBR
+         5brVXJl+U4ebk1G53gh9RR815WgpiT4kUCI128o1q0iR4wSOf9xzIGdJrpAk/12Y68yt
+         YxrQsCPZM4/lrjDybdrhtCbK4kRvt296NT/ly1WxZXpJ36Oi8r5yvJ5ptQcZ7hgcZKyT
+         hW8lLfwGZI/CWGnxCzRZsjkJpyy5DmhsL/DZn3OoxVDKD7CLGilRrFtoo7B+T7Yh+NuU
+         ZaLg==
+X-Gm-Message-State: AOJu0Yza4AxNaAaAOU3+8w7YK4G3pZEv69VdzC1tifBDcZQ2dCOT/LE1
+	aSbc5GrGcVQg+8RijMtQZME=
+X-Google-Smtp-Source: AGHT+IHxdeYeEjqhMQW3TuMWIznFEVvrsqaFC8gRxfbvKVpt5G3Yg/8kWlYbJAZgDpsub9Pv/idt2g==
+X-Received: by 2002:aa7:d78d:0:b0:523:c35:c209 with SMTP id s13-20020aa7d78d000000b005230c35c209mr1509359edq.12.1692451314415;
+        Sat, 19 Aug 2023 06:21:54 -0700 (PDT)
+Received: from skbuf ([188.25.255.94])
+        by smtp.gmail.com with ESMTPSA id d5-20020aa7d5c5000000b00521953ce6e0sm2519605eds.93.2023.08.19.06.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Aug 2023 06:21:53 -0700 (PDT)
+Date: Sat, 19 Aug 2023 16:21:51 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin __ipraga <alsi@bang-olufsen.dk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: realtek: add phylink_get_caps
+ implementation
+Message-ID: <20230819132151.pgxsgfbaf2jg6u4y@skbuf>
+References: <E1qXJrG-005Oey-10@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230817101014.3484715-1-martin@geanix.com> <20230817101014.3484715-2-martin@geanix.com>
- <20230817094529.68ae1083@kernel.org>
-In-Reply-To: <20230817094529.68ae1083@kernel.org>
-From: Vincent Mailhol <vincent.mailhol@gmail.com>
-Date: Sat, 19 Aug 2023 22:10:36 +0900
-Message-ID: <CAMZ6RqLvbp8EStaSRFQUimhUMpn75=3pkQZYspnP1gYRsspv-g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] can: netlink: support setting hardware filters
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?Q?Martin_Hundeb=C3=B8ll?= <martin@geanix.com>, 
-	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	linux-can <linux-can@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1qXJrG-005Oey-10@rmk-PC.armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat. 19 Aug. 2023, 01:19, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Thu, 17 Aug 2023 12:10:13 +0200 Martin Hundeb=C3=B8ll wrote:
-> > +             int len =3D nla_len(data[IFLA_CAN_HW_FILTER]);
-> > +             int num_filter =3D len / sizeof(struct can_filter);
-> > +             struct can_filter *filter =3D nla_data(data[IFLA_CAN_HW_F=
-ILTER]);
->
-> This will prevent you from ever extending struct can_filter in
-> a backward-compatible fashion, right? I obviously know very little
-> about CAN but are you confident a more bespoke API to manipulate
-> filters individually and allow extensibility is not warranted?
+On Sat, Aug 19, 2023 at 12:11:06PM +0100, Russell King (Oracle) wrote:
+> The user ports use RSGMII, but we don't have that, and DT doesn't
+> specify a phy interface mode, so phylib defaults to GMII. These support
+> 1G, 100M and 10M with flow control. It is unknown whether asymetric
+> pause is supported at all speeds.
+> 
+> The CPU port uses MII/GMII/RGMII/REVMII by hardware pin strapping,
+> and support speeds specific to each, with full duplex only supported
+> in some modes. Flow control may be supported again by hardware pin
+> strapping, and theoretically is readable through a register but no
+> information is given in the datasheet for that.
+> 
+> So, we do a best efforts - and be lenient.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> First posted in
+> https://lore.kernel.org/r/ZNd4AJlLLmszeOxg@shell.armlinux.org.uk
+> and fixed up Vladimir's feedback slightly differently from proposed.
 
-I follow Jakub's point of view.
+LGTM.
 
-The current struct can_filter is not sound. Some devices such as the
-ES582.1 supports filtering of the CAN frame based on the flags (i.e.
-SFF/EFF, RTR, FDF).
-
-I think that each of the fields of the filter should have its own NLA
-declaration with the whole thing wrapped within a NLA_NESTED_ARRAY.
-
-I also think that there should then be a method to report the precise
-filtering capabilities of the hardware.
-
-
-Yours sincerely,
-Vincent Mailhol
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
