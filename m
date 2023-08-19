@@ -1,104 +1,111 @@
-Return-Path: <netdev+bounces-29091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA9CA781960
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:52:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E722A781963
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:53:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9346F281C39
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 11:52:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1DCE281BE6
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 11:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E2C611F;
-	Sat, 19 Aug 2023 11:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C38C6117;
+	Sat, 19 Aug 2023 11:52:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AD9611E
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 11:51:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D05F0C43391;
-	Sat, 19 Aug 2023 11:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDA9136B
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 11:52:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E32BAC433C8;
+	Sat, 19 Aug 2023 11:52:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692445903;
-	bh=GyFU6T0F2OLpd6ALmXN+jAt+vbRAupCEOdTo8blHr2A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t3Hq3ZLeskmN+egFuL4uTPl3pS4N5Pan9mqN2RTBePrAs2EHkWtv/6OIanl57V49l
-	 KAe9YLvKHnO85BqGHZzv4+HpSrYDSdQ1Q57rn+MVi/p3H2OPmTX9TtN1eWN7iYHec2
-	 rt8DUEgAJk+uDqGvQHfhYk8b/PCiyd+qTlV/xzWQ+LJ6jKcRW24LuwQsCPDO/uwhml
-	 m4mNwWl1pgjiCoXiU7SubfJYR7ywJ2Cx4nEXGOCPjw0WtMoJn9qyrCP0eptVA3qs1o
-	 2B2Yik6e8jq/J6MYlFAHVhyTWyVNGRhHFRQSCgZdyjwc7hwAPTJVdxG56ip/9eKMsh
-	 UdrQj/O+h721Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AB93FC395DC;
-	Sat, 19 Aug 2023 11:51:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692445974;
+	bh=p80tG6Msagq3qG3K3mTzridTHLNJ86Q45EqvFAMqETk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Cjls2mjf/Zsmdq35f259rjkIdz4rLF5YbLThk3yRpsmYugPw8aiKe36V1BKuynfdI
+	 OzI4NHHhpQHsEinL6Jz4ZJl3Tt77YAOML/UResLEunzWNaXEwG1+gJi0wHV9lXTsQe
+	 5ppUbtOIjjht92+Mtxdc/hA1hahqhPt9NNcvZnXSfdrkKT/+CJKt0v5RsLUuXljjlS
+	 zoy/qAX6Twl20meTg9KYuYVm1OgJffR+pvkvDDZGB+FwXiALVAhnySrN85FIdYvq0q
+	 PwGE0CF+jM1BoASa1YAE4nn4AVTsJklLcpzn6VHbNRzbWRrWU2Qrd9KyV+FvaV5TxR
+	 0U4GsZWElnnow==
+Date: Sat, 19 Aug 2023 14:52:49 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH v2 iwl-next 1/9] ice: use ice_pf_src_tmr_owned where
+ available
+Message-ID: <20230819115249.GP22185@unreal>
+References: <20230817141746.18726-1-karol.kolacinski@intel.com>
+ <20230817141746.18726-2-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] net/smc: several features's implementation
- for smc v2.1
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169244590269.30754.2401576809256028711.git-patchwork-notify@kernel.org>
-Date: Sat, 19 Aug 2023 11:51:42 +0000
-References: <20230817132032.23397-1-guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20230817132032.23397-1-guangguan.wang@linux.alibaba.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, kgraul@linux.ibm.com,
- tonylu@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+In-Reply-To: <20230817141746.18726-2-karol.kolacinski@intel.com>
 
-Hello:
+On Thu, Aug 17, 2023 at 04:17:38PM +0200, Karol Kolacinski wrote:
+> The ice_pf_src_tmr_owned() macro exists to check the function capability
+> bit indicating if the current function owns the PTP hardware clock.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+This is first patch in the series, but I can't find mentioned macro.
+My net-next is based on 5b0a1414e0b0 ("Merge branch 'smc-features'")
+➜  kernel git:(net-next) git grep ice_pf_src_tmr_owned
+shows nothing.
 
-On Thu, 17 Aug 2023 21:20:26 +0800 you wrote:
-> This patch set implement several new features in SMC v2.1(https://
-> www.ibm.com/support/pages/node/7009315), including vendor unique
-> experimental options, max connections per lgr negotiation, max links
-> per lgr negotiation.
+On which branch is it based?
+
+Thanks
+
+
 > 
-> v1 - v2:
->  - rename field fce_v20 to fce_v2_base in struct
->    smc_clc_first_contact_ext_v2x
->  - use smc_get_clc_first_contact_ext in smc_connect
->    _rdma_v2_prepare
->  - adding comment about field vendor_oui in struct
->    smc_clc_msg_smcd
->  - remove comment about SMC_CONN_PER_LGR_MAX in smc_
->    clc_srv_v2x_features_validate
->  - rename smc_clc_clnt_v2x_features_validate
+> This is slightly shorter than the more verbose access via
+> hw.func_caps.ts_func_info.src_tmr_owned. Be consistent and use this
+> where possible rather than open coding its equivalent.
 > 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/6] net/smc: support smc release version negotiation in clc handshake
-    https://git.kernel.org/netdev/net-next/c/1e700948c9db
-  - [net-next,v2,2/6] net/smc: add vendor unique experimental options area in clc handshake
-    https://git.kernel.org/netdev/net-next/c/7290178a82fc
-  - [net-next,v2,3/6] net/smc: support smc v2.x features validate
-    https://git.kernel.org/netdev/net-next/c/6ac1e6563f59
-  - [net-next,v2,4/6] net/smc: support max connections per lgr negotiation
-    https://git.kernel.org/netdev/net-next/c/7f0620b9940b
-  - [net-next,v2,5/6] net/smc: support max links per lgr negotiation in clc handshake
-    https://git.kernel.org/netdev/net-next/c/69b888e3bb4b
-  - [net-next,v2,6/6] net/smc: Extend SMCR v2 linkgroup netlink attribute
-    https://git.kernel.org/netdev/net-next/c/bbed596c74a5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
+>  drivers/net/ethernet/intel/ice/ice_ptp.c  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index a6dd336d2500..b6858f04152c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -3185,7 +3185,7 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
+>  
+>  		ena_mask &= ~PFINT_OICR_TSYN_EVNT_M;
+>  
+> -		if (hw->func_caps.ts_func_info.src_tmr_owned) {
+> +		if (ice_pf_src_tmr_owned(pf)) {
+>  			/* Save EVENTs from GLTSYN register */
+>  			pf->ptp.ext_ts_irq |= gltsyn_stat &
+>  					      (GLTSYN_STAT_EVENT0_M |
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index 97b8581ae931..0669ca905c46 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -2447,7 +2447,7 @@ void ice_ptp_reset(struct ice_pf *pf)
+>  	if (test_bit(ICE_PFR_REQ, pf->state))
+>  		goto pfr;
+>  
+> -	if (!hw->func_caps.ts_func_info.src_tmr_owned)
+> +	if (!ice_pf_src_tmr_owned(pf))
+>  		goto reset_ts;
+>  
+>  	err = ice_ptp_init_phc(hw);
+> -- 
+> 2.39.2
+> 
+> 
 
