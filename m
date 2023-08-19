@@ -1,111 +1,113 @@
-Return-Path: <netdev+bounces-29092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E722A781963
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:53:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3C3D7819AA
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 15:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1DCE281BE6
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 11:52:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E32DB1C209AD
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 13:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C38C6117;
-	Sat, 19 Aug 2023 11:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C60C4C8D;
+	Sat, 19 Aug 2023 13:11:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDA9136B
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 11:52:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E32BAC433C8;
-	Sat, 19 Aug 2023 11:52:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692445974;
-	bh=p80tG6Msagq3qG3K3mTzridTHLNJ86Q45EqvFAMqETk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Cjls2mjf/Zsmdq35f259rjkIdz4rLF5YbLThk3yRpsmYugPw8aiKe36V1BKuynfdI
-	 OzI4NHHhpQHsEinL6Jz4ZJl3Tt77YAOML/UResLEunzWNaXEwG1+gJi0wHV9lXTsQe
-	 5ppUbtOIjjht92+Mtxdc/hA1hahqhPt9NNcvZnXSfdrkKT/+CJKt0v5RsLUuXljjlS
-	 zoy/qAX6Twl20meTg9KYuYVm1OgJffR+pvkvDDZGB+FwXiALVAhnySrN85FIdYvq0q
-	 PwGE0CF+jM1BoASa1YAE4nn4AVTsJklLcpzn6VHbNRzbWRrWU2Qrd9KyV+FvaV5TxR
-	 0U4GsZWElnnow==
-Date: Sat, 19 Aug 2023 14:52:49 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH v2 iwl-next 1/9] ice: use ice_pf_src_tmr_owned where
- available
-Message-ID: <20230819115249.GP22185@unreal>
-References: <20230817141746.18726-1-karol.kolacinski@intel.com>
- <20230817141746.18726-2-karol.kolacinski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF6033FA
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 13:11:44 +0000 (UTC)
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 003A51CABC;
+	Sat, 19 Aug 2023 06:10:48 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-26b56cc7896so1091538a91.3;
+        Sat, 19 Aug 2023 06:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692450648; x=1693055448;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1e+/XnsKbjswDuOJErNhCCCCiL5iSSWZ7RF7mQ7/+3w=;
+        b=dwid1HtELpcOUIDba9rowZithC342CaX+0ngTuoCeNcueWxXGFhoWXugu7R4ecOTrC
+         I+wpq1K4TlPwvXLxFp0FL+Jx2nhNrnQEEPH2gRsIlEomRiDDMB9gbyNxudIc+ZRIZkYB
+         Wu9dJW491DFNgAWornGvxBIeDQuarRvCYe96XBUCuxy0q87R4/NGT5cbbgbS1sPCybAW
+         eNpTlNirDvufASE2ol3xIdQfreVVxmzuIAToa1evJG21qld3oNtSbCWRZ/x0XRTU1yG6
+         0VofgmdvBMsdxKjzpRRE2PnbiIiLzWXYbbbmDV64y8ZBXxO7mKYVLTwuBxOaxSqflQQM
+         9QQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692450648; x=1693055448;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1e+/XnsKbjswDuOJErNhCCCCiL5iSSWZ7RF7mQ7/+3w=;
+        b=RqcxFsBQDgiKObc75lFu4GAK6+EJ+A4o9x62FDYNmyWht95Au8U8J8m5krTChXDJFr
+         DQ3dQCz+h9aKgqT7kO+Ocuqgbjh/MP6sgnBwGpRfg3anCzJp4GF5BETbh4kbytqrW8IJ
+         otTWDkPYhPFjnGcnH+ci1pQpFQuQm7WfMKkdrJYcm8SySYj3pX4g73o0mo2GES1FP0LJ
+         qItc0F4ip66wxc3TyEmPwL+3HyvH4SWA5ON+wQR0wCxpM5hIwc+lYaVkjKDaao8oiH4A
+         8YCWVxMGKztWvmDsPoSYzLl+SPb6l4diR0rPcYiNeHmb7hj6XjB3AUixOztsAIylLJUG
+         gWzA==
+X-Gm-Message-State: AOJu0Yw48ilyojxvBcO5qKXjCrF5t15fHcSvz9I5mSbF3XGVj9WMEwZB
+	6BQvt6qrsINYZCcEmA9Ykv2JgRoejU39A92/dt8=
+X-Google-Smtp-Source: AGHT+IEi7ryax+7gcMZllWjyl1lEZYP/Sxe6jDorLDrYSUoJSuj5qN0WtumtQ6/fR+4XZPf4+VbMKLip+gBwMC4uYcY=
+X-Received: by 2002:a17:90a:f98a:b0:268:2d92:55d3 with SMTP id
+ cq10-20020a17090af98a00b002682d9255d3mr1120669pjb.39.1692450647831; Sat, 19
+ Aug 2023 06:10:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230817141746.18726-2-karol.kolacinski@intel.com>
+References: <20230817101014.3484715-1-martin@geanix.com> <20230817101014.3484715-2-martin@geanix.com>
+ <20230817094529.68ae1083@kernel.org>
+In-Reply-To: <20230817094529.68ae1083@kernel.org>
+From: Vincent Mailhol <vincent.mailhol@gmail.com>
+Date: Sat, 19 Aug 2023 22:10:36 +0900
+Message-ID: <CAMZ6RqLvbp8EStaSRFQUimhUMpn75=3pkQZYspnP1gYRsspv-g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] can: netlink: support setting hardware filters
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?Q?Martin_Hundeb=C3=B8ll?= <martin@geanix.com>, 
+	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	linux-can <linux-can@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 17, 2023 at 04:17:38PM +0200, Karol Kolacinski wrote:
-> The ice_pf_src_tmr_owned() macro exists to check the function capability
-> bit indicating if the current function owns the PTP hardware clock.
+On Sat. 19 Aug. 2023, 01:19, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Thu, 17 Aug 2023 12:10:13 +0200 Martin Hundeb=C3=B8ll wrote:
+> > +             int len =3D nla_len(data[IFLA_CAN_HW_FILTER]);
+> > +             int num_filter =3D len / sizeof(struct can_filter);
+> > +             struct can_filter *filter =3D nla_data(data[IFLA_CAN_HW_F=
+ILTER]);
+>
+> This will prevent you from ever extending struct can_filter in
+> a backward-compatible fashion, right? I obviously know very little
+> about CAN but are you confident a more bespoke API to manipulate
+> filters individually and allow extensibility is not warranted?
 
-This is first patch in the series, but I can't find mentioned macro.
-My net-next is based on 5b0a1414e0b0 ("Merge branch 'smc-features'")
-➜  kernel git:(net-next) git grep ice_pf_src_tmr_owned
-shows nothing.
+I follow Jakub's point of view.
 
-On which branch is it based?
+The current struct can_filter is not sound. Some devices such as the
+ES582.1 supports filtering of the CAN frame based on the flags (i.e.
+SFF/EFF, RTR, FDF).
 
-Thanks
+I think that each of the fields of the filter should have its own NLA
+declaration with the whole thing wrapped within a NLA_NESTED_ARRAY.
+
+I also think that there should then be a method to report the precise
+filtering capabilities of the hardware.
 
 
-> 
-> This is slightly shorter than the more verbose access via
-> hw.func_caps.ts_func_info.src_tmr_owned. Be consistent and use this
-> where possible rather than open coding its equivalent.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
->  drivers/net/ethernet/intel/ice/ice_ptp.c  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index a6dd336d2500..b6858f04152c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -3185,7 +3185,7 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
->  
->  		ena_mask &= ~PFINT_OICR_TSYN_EVNT_M;
->  
-> -		if (hw->func_caps.ts_func_info.src_tmr_owned) {
-> +		if (ice_pf_src_tmr_owned(pf)) {
->  			/* Save EVENTs from GLTSYN register */
->  			pf->ptp.ext_ts_irq |= gltsyn_stat &
->  					      (GLTSYN_STAT_EVENT0_M |
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index 97b8581ae931..0669ca905c46 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -2447,7 +2447,7 @@ void ice_ptp_reset(struct ice_pf *pf)
->  	if (test_bit(ICE_PFR_REQ, pf->state))
->  		goto pfr;
->  
-> -	if (!hw->func_caps.ts_func_info.src_tmr_owned)
-> +	if (!ice_pf_src_tmr_owned(pf))
->  		goto reset_ts;
->  
->  	err = ice_ptp_init_phc(hw);
-> -- 
-> 2.39.2
-> 
-> 
+Yours sincerely,
+Vincent Mailhol
 
