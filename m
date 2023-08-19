@@ -1,155 +1,82 @@
-Return-Path: <netdev+bounces-29110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2B6781A33
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:41:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86F6F781A36
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:46:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCE51C209B5
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:41:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B71811C209E6
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00306ADB;
-	Sat, 19 Aug 2023 14:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CCE6FAF;
+	Sat, 19 Aug 2023 14:46:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537F8A57
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:41:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5515C433C9;
-	Sat, 19 Aug 2023 14:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FDF5667
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:46:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 51FB4C433C7;
+	Sat, 19 Aug 2023 14:46:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692456074;
-	bh=s/6tz1ntVu9WHcizXMkOFm+PqgGopb/sQCUQJgN/UCw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RspyVU2C22Gq4717Y75wZ72mw3oilJhDHzF06iNK7vIzIfhkYMC9p3Dl2ictYYcGa
-	 Pj8PGuyGFy+ibtb5heSsWapbk8AbmxSkJ/Fb25XVQm55KTGpkxvLPHyOwNeie2tePw
-	 rNelyoxgP6jWnHQTvbhRRuyGSALKNez1mGv3j1bmC6xO0dfxZe3YOmraEBSqzLGaoe
-	 UVJga9KYMG5ebcm3/1WhLNmrUBt4GplifCR1HcJrkbK8VnZ84veRbtuyXqi1rESuDx
-	 Dxu/jLbp8ezbIPP154mbSd6uPmD60Mnbv9OQeXKGBSL4dQqbN592FuHAdql9b58/9g
-	 3FaXaeINNMAsQ==
-Date: Sat, 19 Aug 2023 16:41:09 +0200
-From: Simon Horman <horms@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: add reset bits for MT7988
-Message-ID: <ZODUhbw9SDOifv49@vergenet.net>
-References: <b983a3adf5184a30e4ce620fbbf028c9c76648ae.1692382239.git.daniel@makrotopia.org>
+	s=k20201202; t=1692456375;
+	bh=pFMNSh+oham7YlCm9hgU6C0Fijw4+NjfjaXvuFhyAfY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JgZJM8IklNl3LAYf1/3iVimv4tWqtCC/0q5NzflHtZZpe4EWew7r8e5sP/OrgTQ/l
+	 QZuFHDmuekU5AlZGoNucsLNvJZJyrew9v20FBXQ12a61MI0+TDUU9ZVXG84gAtSuAU
+	 +Gbt2xtx97/SiB/WQ28sNHJbLzBtbCvbx3k3O5IfXbrtDTZfTItCmgprqWOw2prKaY
+	 iy6RFxhRiE6vE7UVURXPKxlySgF50fT9gu6vYpRDd64qmBsBeEHxS2GtBdqCQK0gsE
+	 NX/bampViTTe+32TK3i3v8FffolvU89FFbNSG5Mzrmo02EV3rZeQSJkvZH/EJhDtch
+	 spuHn0fMjsJoA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 350D8E1F65A;
+	Sat, 19 Aug 2023 14:46:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b983a3adf5184a30e4ce620fbbf028c9c76648ae.1692382239.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: add skb_queue_purge_reason and
+ __skb_queue_purge_reason
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169245637521.6706.1674595017775095618.git-patchwork-notify@kernel.org>
+Date: Sat, 19 Aug 2023 14:46:15 +0000
+References: <20230818094039.3630187-1-edumazet@google.com>
+In-Reply-To: <20230818094039.3630187-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-On Fri, Aug 18, 2023 at 07:15:24PM +0100, Daniel Golle wrote:
-> Add bits needed to reset the frame engine on MT7988.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 18 Aug 2023 09:40:39 +0000 you wrote:
+> skb_queue_purge() and __skb_queue_purge() become wrappers
+> around the new generic functions.
 > 
-> Fixes: 445eb6448ed3 ("net: ethernet: mtk_eth_soc: add basic support for MT7988 SoC")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 76 +++++++++++++++------
->  drivers/net/ethernet/mediatek/mtk_eth_soc.h | 11 ++-
->  2 files changed, 64 insertions(+), 23 deletions(-)
+> New SKB_DROP_REASON_QUEUE_PURGE drop reason is added,
+> but users can start adding more specific reasons.
 > 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> index fe05c90202699..2482f47313085 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -3613,19 +3613,34 @@ static void mtk_hw_reset(struct mtk_eth *eth)
->  {
->  	u32 val;
->  
-> -	if (mtk_is_netsys_v2_or_greater(eth)) {
-> +	if (mtk_is_netsys_v2_or_greater(eth))
->  		regmap_write(eth->ethsys, ETHSYS_FE_RST_CHK_IDLE_EN, 0);
-> +
-> +	if (mtk_is_netsys_v3_or_greater(eth)) {
-> +		val = RSTCTRL_PPE0_V3;
-> +
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-> +			val |= RSTCTRL_PPE1_V3;
-> +
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-> +			val |= RSTCTRL_PPE2;
-> +
-> +		val |= RSTCTRL_WDMA0 | RSTCTRL_WDMA1 | RSTCTRL_WDMA2;
-> +	} else if (mtk_is_netsys_v2_or_greater(eth)) {
->  		val = RSTCTRL_PPE0_V2;
-> +
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-> +			val |= RSTCTRL_PPE1;
->  	} else {
->  		val = RSTCTRL_PPE0;
->  	}
->  
-> -	if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-> -		val |= RSTCTRL_PPE1;
-> -
->  	ethsys_reset(eth, RSTCTRL_ETH | RSTCTRL_FE | val);
->  
-> -	if (mtk_is_netsys_v2_or_greater(eth))
-> +	if (mtk_is_netsys_v3_or_greater(eth))
-> +		regmap_write(eth->ethsys, ETHSYS_FE_RST_CHK_IDLE_EN,
-> +			     0x6f8ff);
-> +	else if (mtk_is_netsys_v2_or_greater(eth))
->  		regmap_write(eth->ethsys, ETHSYS_FE_RST_CHK_IDLE_EN,
->  			     0x3ffffff);
->  }
-> @@ -3651,13 +3666,21 @@ static void mtk_hw_warm_reset(struct mtk_eth *eth)
->  		return;
->  	}
->  
-> -	if (mtk_is_netsys_v2_or_greater(eth))
-> +	if (mtk_is_netsys_v3_or_greater(eth)) {
-> +		rst_mask = RSTCTRL_ETH | RSTCTRL_PPE0_V3;
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-> +			rst_mask |= RSTCTRL_PPE1_V3;
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-> +			rst_mask |= RSTCTRL_PPE2;
-> +
-> +		rst_mask |= RSTCTRL_WDMA0 | RSTCTRL_WDMA1 | RSTCTRL_WDMA2;
-> +	} else if (mtk_is_netsys_v2_or_greater(eth)) {
->  		rst_mask = RSTCTRL_ETH | RSTCTRL_PPE0_V2;
-> -	else
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-> +			rst_mask |= RSTCTRL_PPE1;
-> +	} else {
->  		rst_mask = RSTCTRL_ETH | RSTCTRL_PPE0;
-> -
-> -	if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-> -		rst_mask |= RSTCTRL_PPE1;
-> +	}
->  
->  	regmap_update_bits(eth->ethsys, ETHSYS_RSTCTRL, rst_mask, rst_mask);
->  
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> 
+> [...]
 
-Hi Daniel,
+Here is the summary with links:
+  - [net-next] net: add skb_queue_purge_reason and __skb_queue_purge_reason
+    https://git.kernel.org/netdev/net-next/c/4025d3e73abd
 
-The bits set by the code in the above two hunks seem both complex
-and similar. At the risk of suggesting excessive complexity,
-I do wonder if they can be consolidated somehow.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Maybe the approach you have taken is best as a fix for net.
-But a follow-up could be considered for net-next.
-Just an idea.
-
-...
 
 
