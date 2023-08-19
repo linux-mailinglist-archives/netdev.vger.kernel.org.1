@@ -1,107 +1,128 @@
-Return-Path: <netdev+bounces-29108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E8A6781A21
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:33:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90DFE781A29
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C350281B4C
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:33:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A952281B24
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466F64A16;
-	Sat, 19 Aug 2023 14:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4066ADB;
+	Sat, 19 Aug 2023 14:35:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB334A0F
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:33:51 +0000 (UTC)
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9113C10
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:33:49 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d7485d37283so280199276.1
-        for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:33:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508AB46BC;
+	Sat, 19 Aug 2023 14:35:41 +0000 (UTC)
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D2461FD39;
+	Sat, 19 Aug 2023 07:35:35 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-76d9a79e2fdso40392885a.1;
+        Sat, 19 Aug 2023 07:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692455629; x=1693060429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1692455734; x=1693060534;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BFVyJcG7VjoXmbWzRwKLX5v0Z6m+qJ6RfIWifPUhgDc=;
-        b=PKHN5JCpBUno6/8uc1UHXr49bD0JiNARpbXYs8VUbvDNDkq0Z8tCowq/V6EGyAOGOQ
-         TyXuLZSzXeBPcv4Lnj7tFRGzofx3JcploYA40BiUeZ/aPxE8WhRBugv02r9OEMi/Qql3
-         e2tf7p2mtCgbzHhhUkKUC5GTf7jMT0HTbyv4R5+hk1ANKX9haLk8H7W3kMcuQCbqnoPp
-         O3PcwynlBtsnxxMei2HYNciP+gAczGH1GoA3fI7C4MRXAdjYiuOweeHmcpGPZ3mBO2W4
-         xsSMFtMzNhDtYdNlRisaHE9yNIniP3F7BexviNcOBe+ExDDC93CUdWBCsLIFg4JxUhal
-         NhEA==
+        bh=FuDrenDtPLv9suOFUYr8VZtzBqfanUGuWEDfBaaD+9s=;
+        b=KorI84h9e6x/55Ewd65XgG4WaBgoBzHkVmxHXKImA14LLKP9VfaBDNG+SDJe4etsB5
+         Ztbz1r4KetxZ8Q4N1J1gYf2gTXXlNVsPLqdG8YywaCrUrQcrtoGIPNcgTN1a7QgKH3Na
+         OIv+kxE3ysav/goa23ceSCnMu1f1725ixXDtsqdw44qGEGnJak/GEEDfeScfQhIOBgOI
+         86ca9Osxo09eCKYI5qqvxYy5y2raDLB9nXO+ZkQzucILF/ba/No2ntzGvyL/a0YJ5N8m
+         4mpDcMdNGh0y9HiOHmKyWxJ/6iBLVaWcGG31+deVga0Y03rDIKFop063O+rr708+J3h5
+         dmJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692455629; x=1693060429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BFVyJcG7VjoXmbWzRwKLX5v0Z6m+qJ6RfIWifPUhgDc=;
-        b=gO5+zVSGBFqMrZCNKOljdph8UXrUrIAgaze2U5gmpWy7mto8JP9YAP+FIdmSnN4s+0
-         b3MI9WN8gT0hr1HQk6zb3InFS+n0pOBmjK+u0/xGipuBZFY0cxcIGYy1WpMOyeFdaeQm
-         y+FWGhQ8fWQ0NSUZyUYiiXp73KXTSHJaF3LcClTIHNoSkTYcG9HM+FHfX6eCgdSTe5m3
-         Q8y8WWn25zZkyNZh5T00NTZ4ouK9D9QQuzad0P+xJfxQRsVrnC20CmS4ylmr38KNOaUF
-         CqJJ3cCqHt/qCFa/Qm5SwL/y445fEzX7El2JWbkvokqi2Up/Tfx91/KU2gkg7yyuynm9
-         cFRA==
-X-Gm-Message-State: AOJu0Yz+9+D/KPsrK5P0PIV+P9MpnB7atG5p8dVX40Dsd583FHWPCFzf
-	HiCLWagtIqamqJDSMPfPRgfVUgGIGiqdqmxcuvgezQ==
-X-Google-Smtp-Source: AGHT+IE2moXgpoqFI5sFJ9IfH8ebeouITzyauQMCBYNuzUii8OjS7uo1YUkWN907Jm7R98eoIePdU3lBP0EVwvaxY70=
-X-Received: by 2002:a25:81c5:0:b0:ba8:2e05:3e9c with SMTP id
- n5-20020a2581c5000000b00ba82e053e9cmr2493744ybm.24.1692455628833; Sat, 19 Aug
- 2023 07:33:48 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692455734; x=1693060534;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FuDrenDtPLv9suOFUYr8VZtzBqfanUGuWEDfBaaD+9s=;
+        b=I0D9PdSPLlb5ud+gUd3I5POwcq39gD+gpuSkil9EFi8w7o25SQAJ89oXtEerKwSGn1
+         kpEPHVsmq2A9cx4VVyHdiPywdy/ZR+TdhMen8C2s/C4ZDRyNzn/1u1KKw2152TPDPJ4A
+         1knmqvAysLwGYv+AViMI7htpXMUXnTdjeMyQB5TtVSfDzgAmljTdWjjBRvQw9PVQ/WMV
+         MD+mhhS8CY54X28SneWwZwWp+h5cNezbwxRO0Ks4DSWYxg9haWqz6Ym8CPq+QHZ/BYJS
+         IbBl61Si5sR2XmCpSd3HpfTyXSJUhlWAVtZ41CnNk43DeAdO1BCJKhrEWVtpFyhloBYw
+         wn9A==
+X-Gm-Message-State: AOJu0Yz2CkYHIZsC/pwf/C/s9pUcG6l9uRe5JovZ4CSLSFpjX5P75h8M
+	NB7c3IowbzQtcN3Ir+53j44=
+X-Google-Smtp-Source: AGHT+IHUfCRk72PwjeVuBOWBcFXHgymftEe/Hdt5hXm5EXRD1gYwRSCuak1cCc7S+MkscDQB/OWxUg==
+X-Received: by 2002:a05:620a:1999:b0:76d:25b5:6e9b with SMTP id bm25-20020a05620a199900b0076d25b56e9bmr2954283qkb.23.1692455734229;
+        Sat, 19 Aug 2023 07:35:34 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id g16-20020a05620a109000b0076ceb5eb309sm1210424qkk.74.2023.08.19.07.35.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Aug 2023 07:35:33 -0700 (PDT)
+Date: Sat, 19 Aug 2023 10:35:33 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ sdf@google.com, 
+ axboe@kernel.dk, 
+ asml.silence@gmail.com, 
+ willemdebruijn.kernel@gmail.com, 
+ martin.lau@linux.dev, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ io-uring@vger.kernel.org, 
+ krisman@suse.de
+Message-ID: <64e0d3359f90d_3119e32942c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230817145554.892543-4-leitao@debian.org>
+References: <20230817145554.892543-1-leitao@debian.org>
+ <20230817145554.892543-4-leitao@debian.org>
+Subject: Re: [PATCH v3 3/9] net/socket: Break down __sys_setsockopt
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <E1qXJrG-005Oey-10@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1qXJrG-005Oey-10@rmk-PC.armlinux.org.uk>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 19 Aug 2023 16:33:37 +0200
-Message-ID: <CACRpkdaeds3vP4JBFTcf6zjcNZBnmaCFUF6teYaHDZoJ5ALioA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: dsa: realtek: add phylink_get_caps implementation
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Alvin __ipraga <alsi@bang-olufsen.dk>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 19, 2023 at 1:11=E2=80=AFPM Russell King (Oracle)
-<rmk+kernel@armlinux.org.uk> wrote:
+Breno Leitao wrote:
+> Split __sys_setsockopt() into two functions by removing the core
+> logic into a sub-function (do_sock_setsockopt()). This will avoid
+> code duplication when doing the same operation in other callers, for
+> instance.
+> 
+> do_sock_setsockopt() will be called by io_uring setsockopt() command
+> operation in the following patch.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-> The user ports use RSGMII, but we don't have that, and DT doesn't
-> specify a phy interface mode, so phylib defaults to GMII. These support
-> 1G, 100M and 10M with flow control. It is unknown whether asymetric
-> pause is supported at all speeds.
->
-> The CPU port uses MII/GMII/RGMII/REVMII by hardware pin strapping,
-> and support speeds specific to each, with full duplex only supported
-> in some modes. Flow control may be supported again by hardware pin
-> strapping, and theoretically is readable through a register but no
-> information is given in the datasheet for that.
->
-> So, we do a best efforts - and be lenient.
->
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+>  include/net/sock.h |  2 ++
+>  net/socket.c       | 39 +++++++++++++++++++++++++--------------
+>  2 files changed, 27 insertions(+), 14 deletions(-)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 2eb916d1ff64..2a0324275347 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1853,6 +1853,8 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+>  		  sockptr_t optval, unsigned int optlen);
+>  int sock_setsockopt(struct socket *sock, int level, int op,
+>  		    sockptr_t optval, unsigned int optlen);
+> +int do_sock_setsockopt(struct socket *sock, bool compat, int level,
+> +		       int optname, sockptr_t optval, int optlen);
 
-Looks good to me!
-Also tested it with an additional patch in the earlier version.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+Somewhat surprising that optlen type differs between __sys_setsockopt
+and sock_setsockopt. But agreed that this code should follow
+__sys_setsockopt.
 
