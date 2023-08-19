@@ -1,155 +1,64 @@
-Return-Path: <netdev+bounces-29117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4082A781A74
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 18:13:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1065781A75
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 18:13:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 925AD281983
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:12:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B1E12819C8
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC63A174FF;
-	Sat, 19 Aug 2023 16:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3111772E;
+	Sat, 19 Aug 2023 16:13:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05E9125A6
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 16:12:55 +0000 (UTC)
-Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3B46195;
-	Sat, 19 Aug 2023 09:12:54 -0700 (PDT)
-Received: by mail-vk1-xa29.google.com with SMTP id 71dfb90a1353d-48d0db157efso57271e0c.1;
-        Sat, 19 Aug 2023 09:12:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692461573; x=1693066373;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pHplbIquQyqQFzUN09CWVXVZgBdbvA0qztADJp9Jgt0=;
-        b=d6P1pBvTIvQc1AKT2WN8J2FoWD+l0ohoQBoYerXwFkor+zfa86W9ZqpQ90qvKPA3Ks
-         DmJ52VsTZDARZlP0oeB5PKiVeEdkMfDXs0tHKa+kQmjKn24t35RCBwKPHVq0h0m4UCGP
-         kokXHppGzL3kc93CY4BGfzZeZ619W/yOWMlpPtvaTTPvjF+Odx9ZTTCNfoGdvoO7GDSi
-         x2crI/qD/ih/RTTiQIYNazeXcfIjKzht6s17MLaKQMWv93FRMRe9QTHj9YOZcJAhuhLE
-         0av4gHqPD73RCRD/SBUth3RM0RxUIlH268AhrcHA5N4McEWg1QEtKc6zruUWT6lBZjDB
-         WSUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692461573; x=1693066373;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pHplbIquQyqQFzUN09CWVXVZgBdbvA0qztADJp9Jgt0=;
-        b=gaIIO7EYoH6N6HDRMu+kbn/NJkgMO6dBXjnBXItRNBaz9tMpPDUsVqgUv2Ck4oB0xI
-         vKb+Rl9/47y9n52eiWMaYXrX9eSeXKmYxlGcj+Vfe6yDscgg7iKKtqFHek590Fpn/nqs
-         Pk/MEfLlA9f/88cn5364Hpjo6r16l24y1dz/GvJ6pRfJcIfA9Ki4XzrspznEf7a/v3jq
-         X4lw5DIATO5S9o+fdPwXF2FOIAaI3PWmaK9SLPKbbQ2KT8G4ow0sItKHApwGdlENV90S
-         WNDM4WqT/YAdz9PQnQhuoti5tE1udyxlpY6aJpC1oSTV0+J1YBz6qA+4D3L2Izd6lNRe
-         oJcg==
-X-Gm-Message-State: AOJu0YwKVsgtqSqsNis6tRwgd5pAj16hAzmQYxaGtdxaY/ThdfM6X44o
-	SYpmEDL0K99gxdSjQ5FDyJrszbIG9uT21jzxcbg=
-X-Google-Smtp-Source: AGHT+IHml63XQJifUq6TukqroKgh1irkYJc5zutoZfWbNyCx6upCQCtONuf3+IVCRXH5C9AA39xbv5oXumN8Pz0ssMk=
-X-Received: by 2002:a1f:c904:0:b0:48d:9a8:e2f0 with SMTP id
- z4-20020a1fc904000000b0048d09a8e2f0mr1012516vkf.5.1692461573080; Sat, 19 Aug
- 2023 09:12:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE7AA57
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 16:13:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DB7BC433C7;
+	Sat, 19 Aug 2023 16:13:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692461609;
+	bh=9A60vYcuHVQ0JVnVn9Fac8bDwlC317uaEYCYeR5BViA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ELKcx8IhchMOLXFPA3nJ1J0+PT7hnIOdNz6ZSgNn5hpdkppabM4u/bNIAU/EnCILX
+	 Y252q8xwZxwEK5uHL9dkcUCvpEBwF9uAuaS+SlMUrLKqc+t+39g7AKqL5OkTiHFsGJ
+	 wEXSXsFKQkFeNc1t6/Wb08vgicx8nBM1RNDa8m3+HMXm7XDcKHWUrZmH9ydi6tyRnF
+	 qlj9ZQQHrC973owN6sWrohpnhHEJ63Qz4AzPw9wNga47iWuAs28q+uwh+rrm0Qk3k6
+	 npPBreBLNHxAdCEu8tSpeP24z7BX94Z/tTln0gN4zfiQmpnShvLWqZS+/TBSXhmT1F
+	 rG2ChLYw7h6CA==
+Date: Sat, 19 Aug 2023 18:13:26 +0200
+From: Simon Horman <horms@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, davem@davemloft.net,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net] MAINTAINERS: add entry for macsec
+Message-ID: <ZODqJkA7VxJjxUpc@vergenet.net>
+References: <7824cdb3ca9162719d3869390de45a2fc7a3c73d.1692391971.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-7-almasrymina@google.com> <6adafb5d-0bc5-cb9a-5232-6836ab7e77e6@redhat.com>
- <CAF=yD-L0ajGVrexnOVvvhC-A7vw6XP9tq5T3HCDTjQMS0mXdTQ@mail.gmail.com>
- <8f4d276e-470d-6ce8-85d5-a6c08fa22147@redhat.com> <4f19143d-5975-05d4-3697-0218ed2881c6@kernel.org>
-In-Reply-To: <4f19143d-5975-05d4-3697-0218ed2881c6@kernel.org>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sat, 19 Aug 2023 12:12:16 -0400
-Message-ID: <CAF=yD-+wXynvcntVccUAM2+PAumZbRE9E6f3MS6X6qkGrG7_Ow@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 06/11] page-pool: add device memory support
-To: David Ahern <dsahern@kernel.org>
-Cc: Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com, 
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org, 
-	sdf@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7824cdb3ca9162719d3869390de45a2fc7a3c73d.1692391971.git.sd@queasysnail.net>
 
-On Sat, Aug 19, 2023 at 11:49=E2=80=AFAM David Ahern <dsahern@kernel.org> w=
-rote:
->
-> On 8/19/23 9:22 AM, Jesper Dangaard Brouer wrote:
-> >
-> > I do see the problem of depending on having a struct page, as the
-> > page_pool_iov isn't related to struct page.  Having "page" in the name
-> > of "page_pool_iov" is also confusing (hardest problem is CS is naming,
-> > as we all know).
-> >
-> > To support more allocator types, perhaps skb->pp_recycle bit need to
-> > grow another bit (and be renamed skb->recycle), so we can tell allocato=
-r
-> > types apart, those that are page based and those whom are not.
-> >
-> >
-> >> I think the feedback has been strong to not multiplex yet another
-> >> memory type into that struct, that is not a real page. Which is why
-> >> we went into this direction. This latest series limits the impact larg=
-ely
-> >> to networking structures and code.
-> >>
-> >
-> > Some what related what I'm objecting to: the "page_pool_iov" is not a
-> > real page, but this getting recycled into something called "page_pool",
-> > which funny enough deals with struct-pages internally and depend on the
-> > struct-page-refcnt.
-> >
-> > Given the approach changed way from using struct page, then I also don'=
-t
-> > see the connection with the page_pool. Sorry.
->
-> I do not care for the page_pool_iov name either; I presumed it was least
-> change to prove an idea and the name and details would evolve.
->
-> How about something like buffer_pool or netdev_buf_pool that can operate
-> with either pages, dma addresses, or something else in the future?
+On Fri, Aug 18, 2023 at 10:57:49PM +0200, Sabrina Dubroca wrote:
+> Jakub asked if I'd be willing to be the maintainer of the macsec code
+> and review the driver code adding macsec offload, so let's add the
+> corresponding entry.
+> 
+> The keyword lines are meant to catch selftests and patches adding HW
+> offload support to other drivers.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Sounds good. I suggested this name, but I see how using page in the
-name is not very clear.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> >
-> >> As for the LSB trick: that avoided adding a lot of boilerplate churn
-> >> with new type and helper functions.
-> >>
-> >
-> > Says the lazy programmer :-P ... sorry could not resist ;-)
-
-:-) For the record, there is a prior version that added a separate type.
-
-I did not like the churn it brought and asked for this.
-
->
-> Use of the LSB (or bits depending on alignment expectations) is a common
-> trick and already done in quite a few places in the networking stack.
-> This trick is essential to any realistic change here to incorporate gpu
-> memory; way too much code will have unnecessary churn without it.
->
-> I do prefer my earlier suggestion though where the skb_frag_t has a
-> union of relevant types though. Instead of `struct page *page` it could
-> be `void *addr` with the helpers indicating page, iov, or other.
-
-Okay. I think that is how we did it previously.
 
