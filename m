@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-29070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692107818F7
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 12:41:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3AA7818F8
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 12:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CA632807BC
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 10:41:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 400BF281CB6
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 10:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8200D4A07;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A386123;
 	Sat, 19 Aug 2023 10:40:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB2E46AD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08AD4A0C
 	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 10:40:36 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8549F149674
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 02:46:17 -0700 (PDT)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D0A14967E
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 02:47:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692438377; x=1723974377;
+  t=1692438429; x=1723974429;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=Bg45xemrTG1jNz7kRjSU6eI8AXxvzu5F4uB2Ey+UzeE=;
-  b=Om3Y01TgsnJK2fFADlSIFKP54HaIgjYHBeSNS+OV7JaYwQJoWf13x6Ao
-   iJga3OKDfPH8fZzu6IA0cvA/e7tnbLQDw2Y+zYvknuv+jvhnXi557U3IV
-   M9D7ft3jHNBuZknLTctyJ0bx68sgxFU1aWBf+bqLnMqXUZRhj6FITXmYX
-   BnRhqiwUNUk+/tUKQ3VkL4PhDIy1PJXJiXJdwuZupZpPj3ZF30H1scc3W
-   LZtqdwdF45M9XF4qK5R+/Ck7XOabgqivJJzYSKr/h8stO04OIeCF6RWYs
-   Y0914GdYiE0jZosOOKWQyvAwKQjWWoUZfD+lQlCuRw2Qa3Ic9C45mA9bO
+  bh=lwYiVxcmKpuCofKbhZQM/f+edCMMthkqE79Fl1YTomc=;
+  b=ngzyEbMmwWir/k14Z8rLWGNJ+4fU22uM47+wbSe7Q9Diabu82qWi76aD
+   sfxz0vfYfhectjeg891psFqlFP2WBAIoqjunynsikp6A1CN4dO6Dd6Hx8
+   D5uHn6LTTrbiTIP80pxJd9fGlWNYdYB92rK2H7DSHtrEZSoMgGWESeyi0
+   zsh7pNRTMHiNImGmIK0FiyInAAE/sX4SZ0WCei94RcwMKaeOEZlQP0wPT
+   Nn2MUXWFg35QCdHOl7O4PF+Viv8Gu6f1E6NvDy20Vbsm3Zi6QxKhV1p+E
+   nHwRpjZEOczevcAz67dAl70nKtcY5Wn/Qk2wFoG0e8Xx3+zQlx5XL90hD
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="358250829"
+X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="459641095"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="358250829"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2023 02:46:16 -0700
+   d="scan'208";a="459641095"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2023 02:47:07 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="738382868"
+X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="800719379"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="738382868"
+   d="scan'208";a="800719379"
 Received: from unknown (HELO localhost.jf.intel.com) ([10.166.244.168])
-  by fmsmga007.fm.intel.com with ESMTP; 19 Aug 2023 02:46:14 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 19 Aug 2023 02:47:07 -0700
 From: Paul Greenwalt <paul.greenwalt@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	pawel.chmielewski@intel.com,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Dan Nowlin <dan.nowlin@intel.com>,
-	Scott Taylor <scott.w.taylor@intel.com>
-Subject: [PATCH iwl-next v2 1/9] ice: Add E830 device IDs, MAC type and registers
-Date: Sat, 19 Aug 2023 02:38:49 -0700
-Message-Id: <20230819093849.15130-1-paul.greenwalt@intel.com>
+	andrew@lunn.ch,
+	aelior@marvell.com,
+	manishc@marvell.com,
+	Paul Greenwalt <paul.greenwalt@intel.com>
+Subject: [PATCH iwl-next v2 2/9] ethtool: Add forced speed to supported link modes maps
+Date: Sat, 19 Aug 2023 02:39:41 -0700
+Message-Id: <20230819093941.15163-1-paul.greenwalt@intel.com>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,469 +64,258 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-E830 is the 200G NIC family which uses the ice driver.
+The need to map Ethtool forced speeds to  Ethtool supported link modes is
+common among drivers. To support this move the supported link modes maps
+implementation from the qede driver. This is an efficient solution
+introduced in commit 1d4e4ecccb11 ("qede: populate supported link modes
+maps on module init") for qede driver.
 
-Add specific E830 registers. Embed macros to use proper register based on
-(hw)->mac_type & name those macros to [ORIGINAL]_BY_MAC(hw). Registers
-only available on one of the macs will need to be explicitly referred to
-as E800_NAME instead of just NAME. PTP is not yet supported.
+ethtool_forced_speed_maps_init() should be called during driver init
+with an array of struct ethtool_forced_speed_map to populate the
+mapping. The macro ETHTOOL_FORCED_SPEED_MAP is a helper to initialized
+the struct ethtool_forced_speed_map.
 
-Co-developed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
-Co-developed-by: Dan Nowlin <dan.nowlin@intel.com>
-Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
-Co-developed-by: Scott Taylor <scott.w.taylor@intel.com>
-Signed-off-by: Scott Taylor <scott.w.taylor@intel.com>
-Co-developed-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
+The qede driver was compile tested only.
+
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c   | 71 ++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_devids.h   | 10 ++-
- .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 24 ++++---
- .../net/ethernet/intel/ice/ice_hw_autogen.h   | 52 ++++++++++----
- drivers/net/ethernet/intel/ice/ice_main.c     | 13 ++--
- drivers/net/ethernet/intel/ice/ice_type.h     |  3 +-
- .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 29 +++++---
- 7 files changed, 141 insertions(+), 61 deletions(-)
+v2: move qede Ethtool speed to link modes mapping to be shared by other
+drivers (Andrew)
+---
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   | 92 +++----------------
+ include/linux/ethtool.h                       | 74 +++++++++++++++
+ net/ethtool/ioctl.c                           | 15 +++
+ 3 files changed, 100 insertions(+), 81 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 2652e4f5c4a2..a6c99ba31dc9 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright (c) 2018, Intel Corporation. */
-+/* Copyright (c) 2018-2023, Intel Corporation. */
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
+index 95820cf1cd6c..a01acd48f7eb 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
+@@ -201,90 +201,20 @@ static const char qede_tests_str_arr[QEDE_ETHTOOL_TEST_MAX][ETH_GSTRING_LEN] = {
  
- #include "ice_common.h"
- #include "ice_sched.h"
-@@ -153,6 +153,12 @@ static int ice_set_mac_type(struct ice_hw *hw)
- 	case ICE_DEV_ID_E823L_SFP:
- 		hw->mac_type = ICE_MAC_GENERIC;
- 		break;
-+	case ICE_DEV_ID_E830_BACKPLANE:
-+	case ICE_DEV_ID_E830_QSFP56:
-+	case ICE_DEV_ID_E830_SFP:
-+	case ICE_DEV_ID_E830_SFP_DD:
-+		hw->mac_type = ICE_MAC_E830;
-+		break;
- 	default:
- 		hw->mac_type = ICE_MAC_UNKNOWN;
- 		break;
-@@ -684,8 +690,7 @@ static void
- ice_fill_tx_timer_and_fc_thresh(struct ice_hw *hw,
- 				struct ice_aqc_set_mac_cfg *cmd)
- {
--	u16 fc_thres_val, tx_timer_val;
--	u32 val;
-+	u32 val, fc_thres_m;
+ /* Forced speed capabilities maps */
  
- 	/* We read back the transmit timer and FC threshold value of
- 	 * LFC. Thus, we will use index =
-@@ -694,19 +699,32 @@ ice_fill_tx_timer_and_fc_thresh(struct ice_hw *hw,
- 	 * Also, because we are operating on transmit timer and FC
- 	 * threshold of LFC, we don't turn on any bit in tx_tmr_priority
- 	 */
--#define IDX_OF_LFC PRTMAC_HSEC_CTL_TX_PAUSE_QUANTA_MAX_INDEX
+-struct qede_forced_speed_map {
+-	u32		speed;
+-	__ETHTOOL_DECLARE_LINK_MODE_MASK(caps);
 -
--	/* Retrieve the transmit timer */
--	val = rd32(hw, PRTMAC_HSEC_CTL_TX_PAUSE_QUANTA(IDX_OF_LFC));
--	tx_timer_val = val &
--		PRTMAC_HSEC_CTL_TX_PAUSE_QUANTA_HSEC_CTL_TX_PAUSE_QUANTA_M;
--	cmd->tx_tmr_value = cpu_to_le16(tx_timer_val);
+-	const u32	*cap_arr;
+-	u32		arr_size;
+-};
 -
--	/* Retrieve the FC threshold */
--	val = rd32(hw, PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER(IDX_OF_LFC));
--	fc_thres_val = val & PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_M;
+-#define QEDE_FORCED_SPEED_MAP(value)					\
+-{									\
+-	.speed		= SPEED_##value,				\
+-	.cap_arr	= qede_forced_speed_##value,			\
+-	.arr_size	= ARRAY_SIZE(qede_forced_speed_##value),	\
+-}
 -
--	cmd->fc_refresh_threshold = cpu_to_le16(fc_thres_val);
-+#define E800_IDX_OF_LFC E800_PRTMAC_HSEC_CTL_TX_PS_QNT_MAX
-+#define E800_REFRESH_TMR E800_PRTMAC_HSEC_CTL_TX_PS_RFSH_TMR
-+
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		/* Retrieve the transmit timer */
-+		val = rd32(hw, E830_PRTMAC_CL01_PS_QNT);
-+		cmd->tx_tmr_value =
-+			le16_encode_bits(val, E830_PRTMAC_CL01_PS_QNT_CL0_M);
-+
-+		/* Retrieve the fc threshold */
-+		val = rd32(hw, E830_PRTMAC_CL01_QNT_THR);
-+		fc_thres_m = E830_PRTMAC_CL01_QNT_THR_CL0_M;
-+	} else {
-+		/* Retrieve the transmit timer */
-+		val = rd32(hw,
-+			   E800_PRTMAC_HSEC_CTL_TX_PS_QNT(E800_IDX_OF_LFC));
-+		cmd->tx_tmr_value =
-+			le16_encode_bits(val,
-+					 E800_PRTMAC_HSEC_CTL_TX_PS_QNT_M);
-+
-+		/* Retrieve the fc threshold */
-+		val = rd32(hw,
-+			   E800_REFRESH_TMR(E800_IDX_OF_LFC));
-+		fc_thres_m = E800_PRTMAC_HSEC_CTL_TX_PS_RFSH_TMR_M;
-+	}
-+	cmd->fc_refresh_threshold = le16_encode_bits(val, fc_thres_m);
- }
- 
- /**
-@@ -2177,16 +2195,21 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- static void
- ice_parse_fdir_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p)
- {
--	u32 reg_val, val;
-+	u32 reg_val, gsize, bsize;
- 
- 	reg_val = rd32(hw, GLQF_FD_SIZE);
--	val = (reg_val & GLQF_FD_SIZE_FD_GSIZE_M) >>
--		GLQF_FD_SIZE_FD_GSIZE_S;
--	func_p->fd_fltr_guar =
--		ice_get_num_per_func(hw, val);
--	val = (reg_val & GLQF_FD_SIZE_FD_BSIZE_M) >>
--		GLQF_FD_SIZE_FD_BSIZE_S;
--	func_p->fd_fltr_best_effort = val;
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E830:
-+		gsize = FIELD_GET(E830_GLQF_FD_SIZE_FD_GSIZE_M, reg_val);
-+		bsize = FIELD_GET(E830_GLQF_FD_SIZE_FD_BSIZE_M, reg_val);
-+		break;
-+	case ICE_MAC_E810:
-+	default:
-+		gsize = FIELD_GET(E800_GLQF_FD_SIZE_FD_GSIZE_M, reg_val);
-+		bsize = FIELD_GET(E800_GLQF_FD_SIZE_FD_BSIZE_M, reg_val);
-+	}
-+	func_p->fd_fltr_guar = ice_get_num_per_func(hw, gsize);
-+	func_p->fd_fltr_best_effort = bsize;
- 
- 	ice_debug(hw, ICE_DBG_INIT, "func caps: fd_fltr_guar = %d\n",
- 		  func_p->fd_fltr_guar);
-diff --git a/drivers/net/ethernet/intel/ice/ice_devids.h b/drivers/net/ethernet/intel/ice/ice_devids.h
-index 6d560d1c74a4..a2d384dbfc76 100644
---- a/drivers/net/ethernet/intel/ice/ice_devids.h
-+++ b/drivers/net/ethernet/intel/ice/ice_devids.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright (c) 2018, Intel Corporation. */
-+/* Copyright (c) 2018-2023, Intel Corporation. */
- 
- #ifndef _ICE_DEVIDS_H_
- #define _ICE_DEVIDS_H_
-@@ -16,6 +16,14 @@
- #define ICE_DEV_ID_E823L_1GBE		0x124F
- /* Intel(R) Ethernet Connection E823-L for QSFP */
- #define ICE_DEV_ID_E823L_QSFP		0x151D
-+/* Intel(R) Ethernet Controller E830-C for backplane */
-+#define ICE_DEV_ID_E830_BACKPLANE	0x12D1
-+/* Intel(R) Ethernet Controller E830-C for QSFP */
-+#define ICE_DEV_ID_E830_QSFP56		0x12D2
-+/* Intel(R) Ethernet Controller E830-C for SFP */
-+#define ICE_DEV_ID_E830_SFP		0x12D3
-+/* Intel(R) Ethernet Controller E830-C for SFP-DD */
-+#define ICE_DEV_ID_E830_SFP_DD		0x12D4
- /* Intel(R) Ethernet Controller E810-C for backplane */
- #define ICE_DEV_ID_E810C_BACKPLANE	0x1591
- /* Intel(R) Ethernet Controller E810-C for QSFP */
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index 8c6e13f87b7d..d151e5bacfec 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright (C) 2018-2020, Intel Corporation. */
-+/* Copyright (C) 2018-2023, Intel Corporation. */
- 
- /* flow director ethtool support for ice */
- 
-@@ -540,16 +540,24 @@ static int ice_fdir_num_avail_fltr(struct ice_hw *hw, struct ice_vsi *vsi)
- 	/* total guaranteed filters assigned to this VSI */
- 	num_guar = vsi->num_gfltr;
- 
--	/* minus the guaranteed filters programed by this VSI */
--	num_guar -= (rd32(hw, VSIQF_FD_CNT(vsi_num)) &
--		     VSIQF_FD_CNT_FD_GCNT_M) >> VSIQF_FD_CNT_FD_GCNT_S;
+-static const u32 qede_forced_speed_1000[] __initconst = {
+-	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+-	ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
+-	ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
+-};
 -
- 	/* total global best effort filters */
- 	num_be = hw->func_caps.fd_fltr_best_effort;
- 
--	/* minus the global best effort filters programmed */
--	num_be -= (rd32(hw, GLQF_FD_CNT) & GLQF_FD_CNT_FD_BCNT_M) >>
--		   GLQF_FD_CNT_FD_BCNT_S;
-+	/* Subtract the number of programmed filters from the global values */
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E830:
-+		num_guar -= FIELD_GET(E830_VSIQF_FD_CNT_FD_GCNT_M,
-+				      rd32(hw, VSIQF_FD_CNT(vsi_num)));
-+		num_be -= FIELD_GET(E830_GLQF_FD_CNT_FD_BCNT_M,
-+				    rd32(hw, GLQF_FD_CNT));
-+		break;
-+	case ICE_MAC_E810:
-+	default:
-+		num_guar -= FIELD_GET(E800_VSIQF_FD_CNT_FD_GCNT_M,
-+				      rd32(hw, VSIQF_FD_CNT(vsi_num)));
-+		num_be -= FIELD_GET(E800_GLQF_FD_CNT_FD_BCNT_M,
-+				    rd32(hw, GLQF_FD_CNT));
-+	}
- 
- 	return num_guar + num_be;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index 6756f3d51d14..86936b758ade 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright (c) 2018, Intel Corporation. */
-+/* Copyright (c) 2018-2023, Intel Corporation. */
- 
- /* Machine-generated file */
- 
-@@ -285,11 +285,11 @@
- #define VPLAN_TX_QBASE_VFNUMQ_M			ICE_M(0xFF, 16)
- #define VPLAN_TXQ_MAPENA(_VF)			(0x00073800 + ((_VF) * 4))
- #define VPLAN_TXQ_MAPENA_TX_ENA_M		BIT(0)
--#define PRTMAC_HSEC_CTL_TX_PAUSE_QUANTA(_i)	(0x001E36E0 + ((_i) * 32))
--#define PRTMAC_HSEC_CTL_TX_PAUSE_QUANTA_MAX_INDEX 8
--#define PRTMAC_HSEC_CTL_TX_PAUSE_QUANTA_HSEC_CTL_TX_PAUSE_QUANTA_M ICE_M(0xFFFF, 0)
--#define PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER(_i) (0x001E3800 + ((_i) * 32))
--#define PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_M ICE_M(0xFFFF, 0)
-+#define E800_PRTMAC_HSEC_CTL_TX_PS_QNT(_i)	(0x001E36E0 + ((_i) * 32))
-+#define E800_PRTMAC_HSEC_CTL_TX_PS_QNT_MAX	8
-+#define E800_PRTMAC_HSEC_CTL_TX_PS_QNT_M	GENMASK(15, 0)
-+#define E800_PRTMAC_HSEC_CTL_TX_PS_RFSH_TMR(_i)	(0x001E3800 + ((_i) * 32))
-+#define E800_PRTMAC_HSEC_CTL_TX_PS_RFSH_TMR_M	GENMASK(15, 0)
- #define GL_MDCK_TX_TDPU				0x00049348
- #define GL_MDCK_TX_TDPU_RCU_ANTISPOOF_ITR_DIS_M BIT(1)
- #define GL_MDET_RX				0x00294C00
-@@ -312,7 +312,11 @@
- #define GL_MDET_TX_PQM_MAL_TYPE_S		26
- #define GL_MDET_TX_PQM_MAL_TYPE_M		ICE_M(0x1F, 26)
- #define GL_MDET_TX_PQM_VALID_M			BIT(31)
--#define GL_MDET_TX_TCLAN			0x000FC068
-+#define GL_MDET_TX_TCLAN_BY_MAC(hw)				  \
-+	((hw)->mac_type == ICE_MAC_E830 ? E830_GL_MDET_TX_TCLAN : \
-+	 E800_GL_MDET_TX_TCLAN)
-+#define E800_GL_MDET_TX_TCLAN			0x000FC068
-+#define E830_GL_MDET_TX_TCLAN			0x000FCCC0
- #define GL_MDET_TX_TCLAN_QNUM_S			0
- #define GL_MDET_TX_TCLAN_QNUM_M			ICE_M(0x7FFF, 0)
- #define GL_MDET_TX_TCLAN_VF_NUM_S		15
-@@ -326,7 +330,11 @@
- #define PF_MDET_RX_VALID_M			BIT(0)
- #define PF_MDET_TX_PQM				0x002D2C80
- #define PF_MDET_TX_PQM_VALID_M			BIT(0)
--#define PF_MDET_TX_TCLAN			0x000FC000
-+#define PF_MDET_TX_TCLAN_BY_MAC(hw)				  \
-+	((hw)->mac_type == ICE_MAC_E830 ? E830_PF_MDET_TX_TCLAN : \
-+	 E800_PF_MDET_TX_TCLAN)
-+#define E800_PF_MDET_TX_TCLAN			0x000FC000
-+#define E830_PF_MDET_TX_TCLAN			0x000FCC00
- #define PF_MDET_TX_TCLAN_VALID_M		BIT(0)
- #define VP_MDET_RX(_VF)				(0x00294400 + ((_VF) * 4))
- #define VP_MDET_RX_VALID_M			BIT(0)
-@@ -336,6 +344,8 @@
- #define VP_MDET_TX_TCLAN_VALID_M		BIT(0)
- #define VP_MDET_TX_TDPU(_VF)			(0x00040000 + ((_VF) * 4))
- #define VP_MDET_TX_TDPU_VALID_M			BIT(0)
-+#define E800_GL_MNG_FWSM_FW_MODES_M		GENMASK(2, 0)
-+#define E830_GL_MNG_FWSM_FW_MODES_M		GENMASK(1, 0)
- #define GL_MNG_FWSM				0x000B6134
- #define GL_MNG_FWSM_FW_LOADING_M		BIT(30)
- #define GLNVM_FLA				0x000B6108
-@@ -364,13 +374,18 @@
- #define GL_PWR_MODE_CTL_CAR_MAX_BW_S		30
- #define GL_PWR_MODE_CTL_CAR_MAX_BW_M		ICE_M(0x3, 30)
- #define GLQF_FD_CNT				0x00460018
-+#define E800_GLQF_FD_CNT_FD_GCNT_M		GENMASK(14, 0)
-+#define E830_GLQF_FD_CNT_FD_GCNT_M		GENMASK(15, 0)
- #define GLQF_FD_CNT_FD_BCNT_S			16
--#define GLQF_FD_CNT_FD_BCNT_M			ICE_M(0x7FFF, 16)
-+#define E800_GLQF_FD_CNT_FD_BCNT_M		GENMASK(30, 16)
-+#define E830_GLQF_FD_CNT_FD_BCNT_M		GENMASK(31, 16)
- #define GLQF_FD_SIZE				0x00460010
- #define GLQF_FD_SIZE_FD_GSIZE_S			0
--#define GLQF_FD_SIZE_FD_GSIZE_M			ICE_M(0x7FFF, 0)
-+#define E800_GLQF_FD_SIZE_FD_GSIZE_M		GENMASK(14, 0)
-+#define E830_GLQF_FD_SIZE_FD_GSIZE_M		GENMASK(15, 0)
- #define GLQF_FD_SIZE_FD_BSIZE_S			16
--#define GLQF_FD_SIZE_FD_BSIZE_M			ICE_M(0x7FFF, 16)
-+#define E800_GLQF_FD_SIZE_FD_BSIZE_M		GENMASK(30, 16)
-+#define E830_GLQF_FD_SIZE_FD_BSIZE_M		GENMASK(31, 16)
- #define GLQF_FDINSET(_i, _j)			(0x00412000 + ((_i) * 4 + (_j) * 512))
- #define GLQF_FDMASK(_i)				(0x00410800 + ((_i) * 4))
- #define GLQF_FDMASK_MAX_INDEX			31
-@@ -389,6 +404,10 @@
- #define GLQF_HMASK_SEL(_i)			(0x00410000 + ((_i) * 4))
- #define GLQF_HMASK_SEL_MAX_INDEX		127
- #define GLQF_HMASK_SEL_MASK_SEL_S		0
-+#define E800_PFQF_FD_CNT_FD_GCNT_M		GENMASK(14, 0)
-+#define E830_PFQF_FD_CNT_FD_GCNT_M		GENMASK(15, 0)
-+#define E800_PFQF_FD_CNT_FD_BCNT_M		GENMASK(30, 16)
-+#define E830_PFQF_FD_CNT_FD_BCNT_M		GENMASK(31, 16)
- #define PFQF_FD_ENA				0x0043A000
- #define PFQF_FD_ENA_FD_ENA_M			BIT(0)
- #define PFQF_FD_SIZE				0x00460100
-@@ -479,6 +498,7 @@
- #define GLTSYN_SYNC_DLAY			0x00088818
- #define GLTSYN_TGT_H_0(_i)			(0x00088930 + ((_i) * 4))
- #define GLTSYN_TGT_L_0(_i)			(0x00088928 + ((_i) * 4))
-+#define GLTSYN_TIME_0(_i)			(0x000888C8 + ((_i) * 4))
- #define GLTSYN_TIME_H(_i)			(0x000888D8 + ((_i) * 4))
- #define GLTSYN_TIME_L(_i)			(0x000888D0 + ((_i) * 4))
- #define PFHH_SEM				0x000A4200 /* Reset Source: PFR */
-@@ -487,9 +507,11 @@
- #define PFTSYN_SEM_BUSY_M			BIT(0)
- #define VSIQF_FD_CNT(_VSI)			(0x00464000 + ((_VSI) * 4))
- #define VSIQF_FD_CNT_FD_GCNT_S			0
--#define VSIQF_FD_CNT_FD_GCNT_M			ICE_M(0x3FFF, 0)
-+#define E800_VSIQF_FD_CNT_FD_GCNT_M		GENMASK(13, 0)
-+#define E830_VSIQF_FD_CNT_FD_GCNT_M		GENMASK(15, 0)
- #define VSIQF_FD_CNT_FD_BCNT_S			16
--#define VSIQF_FD_CNT_FD_BCNT_M			ICE_M(0x3FFF, 16)
-+#define E800_VSIQF_FD_CNT_FD_BCNT_M		GENMASK(29, 16)
-+#define E830_VSIQF_FD_CNT_FD_BCNT_M		GENMASK(31, 16)
- #define VSIQF_FD_SIZE(_VSI)			(0x00462000 + ((_VSI) * 4))
- #define VSIQF_HKEY_MAX_INDEX			12
- #define PFPM_APM				0x000B8080
-@@ -501,6 +523,10 @@
- #define PFPM_WUS_MAG_M				BIT(1)
- #define PFPM_WUS_MNG_M				BIT(3)
- #define PFPM_WUS_FW_RST_WK_M			BIT(31)
-+#define E830_PRTMAC_CL01_PS_QNT			0x001E32A0
-+#define E830_PRTMAC_CL01_PS_QNT_CL0_M		GENMASK(15, 0)
-+#define E830_PRTMAC_CL01_QNT_THR		0x001E3320
-+#define E830_PRTMAC_CL01_QNT_THR_CL0_M		GENMASK(15, 0)
- #define VFINT_DYN_CTLN(_i)			(0x00003800 + ((_i) * 4))
- #define VFINT_DYN_CTLN_CLEARPBA_M		BIT(1)
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index a6dd336d2500..356bf8884a63 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright (c) 2018, Intel Corporation. */
-+/* Copyright (c) 2018-2023, Intel Corporation. */
- 
- /* Intel(R) Ethernet Connection E800 Series Linux Driver */
- 
-@@ -1784,7 +1784,7 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
- 		wr32(hw, GL_MDET_TX_PQM, 0xffffffff);
- 	}
- 
--	reg = rd32(hw, GL_MDET_TX_TCLAN);
-+	reg = rd32(hw, GL_MDET_TX_TCLAN_BY_MAC(hw));
- 	if (reg & GL_MDET_TX_TCLAN_VALID_M) {
- 		u8 pf_num = (reg & GL_MDET_TX_TCLAN_PF_NUM_M) >>
- 				GL_MDET_TX_TCLAN_PF_NUM_S;
-@@ -1798,7 +1798,7 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
- 		if (netif_msg_tx_err(pf))
- 			dev_info(dev, "Malicious Driver Detection event %d on TX queue %d PF# %d VF# %d\n",
- 				 event, queue, pf_num, vf_num);
--		wr32(hw, GL_MDET_TX_TCLAN, 0xffffffff);
-+		wr32(hw, GL_MDET_TX_TCLAN_BY_MAC(hw), U32_MAX);
- 	}
- 
- 	reg = rd32(hw, GL_MDET_RX);
-@@ -1826,9 +1826,9 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
- 			dev_info(dev, "Malicious Driver Detection event TX_PQM detected on PF\n");
- 	}
- 
--	reg = rd32(hw, PF_MDET_TX_TCLAN);
-+	reg = rd32(hw, PF_MDET_TX_TCLAN_BY_MAC(hw));
- 	if (reg & PF_MDET_TX_TCLAN_VALID_M) {
--		wr32(hw, PF_MDET_TX_TCLAN, 0xFFFF);
-+		wr32(hw, PF_MDET_TX_TCLAN_BY_MAC(hw), 0xffff);
- 		if (netif_msg_tx_err(pf))
- 			dev_info(dev, "Malicious Driver Detection event TX_TCLAN detected on PF\n");
- 	}
-@@ -3896,7 +3896,8 @@ static void ice_set_pf_caps(struct ice_pf *pf)
- 	}
- 
- 	clear_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags);
--	if (func_caps->common_cap.ieee_1588)
-+	if (func_caps->common_cap.ieee_1588 &&
-+	    !(pf->hw.mac_type == ICE_MAC_E830))
- 		set_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags);
- 
- 	pf->max_pf_txqs = func_caps->common_cap.num_txq;
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index f6061b508857..d6bcd83f1aed 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright (c) 2018, Intel Corporation. */
-+/* Copyright (c) 2018-2023, Intel Corporation. */
- 
- #ifndef _ICE_TYPE_H_
- #define _ICE_TYPE_H_
-@@ -130,6 +130,7 @@ enum ice_set_fc_aq_failures {
- enum ice_mac_type {
- 	ICE_MAC_UNKNOWN = 0,
- 	ICE_MAC_E810,
-+	ICE_MAC_E830,
- 	ICE_MAC_GENERIC,
+-static const u32 qede_forced_speed_10000[] __initconst = {
+-	ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseR_FEC_BIT,
+-	ETHTOOL_LINK_MODE_10000baseCR_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseSR_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseLR_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT,
+-};
+-
+-static const u32 qede_forced_speed_20000[] __initconst = {
+-	ETHTOOL_LINK_MODE_20000baseKR2_Full_BIT,
+-};
+-
+-static const u32 qede_forced_speed_25000[] __initconst = {
+-	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
+-	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
+-	ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
+-};
+-
+-static const u32 qede_forced_speed_40000[] __initconst = {
+-	ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT,
+-	ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
+-	ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
+-	ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT,
+-};
+-
+-static const u32 qede_forced_speed_50000[] __initconst = {
+-	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
+-	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
+-	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
+-};
+-
+-static const u32 qede_forced_speed_100000[] __initconst = {
+-	ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
+-	ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
+-	ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
+-	ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
+-};
+-
+-static struct qede_forced_speed_map qede_forced_speed_maps[] __ro_after_init = {
+-	QEDE_FORCED_SPEED_MAP(1000),
+-	QEDE_FORCED_SPEED_MAP(10000),
+-	QEDE_FORCED_SPEED_MAP(20000),
+-	QEDE_FORCED_SPEED_MAP(25000),
+-	QEDE_FORCED_SPEED_MAP(40000),
+-	QEDE_FORCED_SPEED_MAP(50000),
+-	QEDE_FORCED_SPEED_MAP(100000),
++struct ethtool_forced_speed_map qede_forced_speed_maps[] __ro_after_init = {
++	ETHTOOL_FORCED_SPEED_MAP(1000),
++	ETHTOOL_FORCED_SPEED_MAP(10000),
++	ETHTOOL_FORCED_SPEED_MAP(20000),
++	ETHTOOL_FORCED_SPEED_MAP(25000),
++	ETHTOOL_FORCED_SPEED_MAP(40000),
++	ETHTOOL_FORCED_SPEED_MAP(50000),
++	ETHTOOL_FORCED_SPEED_MAP(100000),
  };
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-index daa6a1e894cf..24b23b7ef04a 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright (C) 2021, Intel Corporation. */
-+/* Copyright (C) 2021-2023, Intel Corporation. */
- 
- #include "ice.h"
- #include "ice_base.h"
-@@ -1422,8 +1422,8 @@ ice_vc_fdir_irq_handler(struct ice_vsi *ctrl_vsi,
-  */
- static void ice_vf_fdir_dump_info(struct ice_vf *vf)
+ void __init qede_forced_speed_maps_init(void)
  {
-+	u32 fd_size, fd_cnt, fd_size_g, fd_cnt_g, fd_size_b, fd_cnt_b;
- 	struct ice_vsi *vf_vsi;
--	u32 fd_size, fd_cnt;
- 	struct device *dev;
- 	struct ice_pf *pf;
- 	struct ice_hw *hw;
-@@ -1442,12 +1442,25 @@ static void ice_vf_fdir_dump_info(struct ice_vf *vf)
- 
- 	fd_size = rd32(hw, VSIQF_FD_SIZE(vsi_num));
- 	fd_cnt = rd32(hw, VSIQF_FD_CNT(vsi_num));
--	dev_dbg(dev, "VF %d: space allocated: guar:0x%x, be:0x%x, space consumed: guar:0x%x, be:0x%x\n",
--		vf->vf_id,
--		(fd_size & VSIQF_FD_CNT_FD_GCNT_M) >> VSIQF_FD_CNT_FD_GCNT_S,
--		(fd_size & VSIQF_FD_CNT_FD_BCNT_M) >> VSIQF_FD_CNT_FD_BCNT_S,
--		(fd_cnt & VSIQF_FD_CNT_FD_GCNT_M) >> VSIQF_FD_CNT_FD_GCNT_S,
--		(fd_cnt & VSIQF_FD_CNT_FD_BCNT_M) >> VSIQF_FD_CNT_FD_BCNT_S);
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E830:
-+		fd_size_g = FIELD_GET(E830_VSIQF_FD_CNT_FD_GCNT_M, fd_size);
-+		fd_size_b = FIELD_GET(E830_VSIQF_FD_CNT_FD_BCNT_M, fd_size);
-+		fd_cnt_g = FIELD_GET(E830_VSIQF_FD_CNT_FD_GCNT_M, fd_cnt);
-+		fd_cnt_b = FIELD_GET(E830_VSIQF_FD_CNT_FD_BCNT_M, fd_cnt);
-+		break;
-+	case ICE_MAC_E810:
-+	default:
-+		fd_size_g = FIELD_GET(E800_VSIQF_FD_CNT_FD_GCNT_M, fd_size);
-+		fd_size_b = FIELD_GET(E800_VSIQF_FD_CNT_FD_BCNT_M, fd_size);
-+		fd_cnt_g = FIELD_GET(E800_VSIQF_FD_CNT_FD_GCNT_M, fd_cnt);
-+		fd_cnt_b = FIELD_GET(E800_VSIQF_FD_CNT_FD_BCNT_M, fd_cnt);
-+	}
-+
-+	dev_dbg(dev, "VF %d: Size in the FD table: guaranteed:0x%x, best effort:0x%x\n",
-+		vf->vf_id, fd_size_g, fd_size_b);
-+	dev_dbg(dev, "VF %d: Filter counter in the FD table: guaranteed:0x%x, best effort:0x%x\n",
-+		vf->vf_id, fd_cnt_g, fd_cnt_b);
+-	struct qede_forced_speed_map *map;
+-	u32 i;
+-
+-	for (i = 0; i < ARRAY_SIZE(qede_forced_speed_maps); i++) {
+-		map = qede_forced_speed_maps + i;
+-
+-		linkmode_set_bit_array(map->cap_arr, map->arr_size, map->caps);
+-		map->cap_arr = NULL;
+-		map->arr_size = 0;
+-	}
++	ethtool_forced_speed_maps_init(qede_forced_speed_maps,
++				       ARRAY_SIZE(qede_forced_speed_maps));
  }
  
- /**
+ /* Ethtool callbacks */
+@@ -564,8 +494,8 @@ static int qede_set_link_ksettings(struct net_device *dev,
+ 				   const struct ethtool_link_ksettings *cmd)
+ {
+ 	const struct ethtool_link_settings *base = &cmd->base;
++	const struct ethtool_forced_speed_map *map;
+ 	struct qede_dev *edev = netdev_priv(dev);
+-	const struct qede_forced_speed_map *map;
+ 	struct qed_link_output current_link;
+ 	struct qed_link_params params;
+ 	u32 i;
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 62b61527bcc4..245fd4a8d85b 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -1052,4 +1052,78 @@ static inline int ethtool_mm_frag_size_min_to_add(u32 val_min, u32 *val_add,
+  * next string.
+  */
+ extern __printf(2, 3) void ethtool_sprintf(u8 **data, const char *fmt, ...);
++
++/* Link mode to forced speed capabilities maps */
++struct ethtool_forced_speed_map {
++	u32		speed;
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(caps);
++
++	const u32	*cap_arr;
++	u32		arr_size;
++};
++
++#define ETHTOOL_FORCED_SPEED_MAP(value)					\
++{									\
++	.speed		= SPEED_##value,				\
++	.cap_arr	= ethtool_forced_speed_##value,			\
++	.arr_size	= ARRAY_SIZE(ethtool_forced_speed_##value),	\
++}
++
++static const u32 ethtool_forced_speed_1000[] __initconst = {
++	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
++	ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
++	ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
++};
++
++static const u32 ethtool_forced_speed_10000[] __initconst = {
++	ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
++	ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
++	ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT,
++	ETHTOOL_LINK_MODE_10000baseR_FEC_BIT,
++	ETHTOOL_LINK_MODE_10000baseCR_Full_BIT,
++	ETHTOOL_LINK_MODE_10000baseSR_Full_BIT,
++	ETHTOOL_LINK_MODE_10000baseLR_Full_BIT,
++	ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT,
++};
++
++static const u32 ethtool_forced_speed_20000[] __initconst = {
++	ETHTOOL_LINK_MODE_20000baseKR2_Full_BIT,
++};
++
++static const u32 ethtool_forced_speed_25000[] __initconst = {
++	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
++	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
++	ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
++};
++
++static const u32 ethtool_forced_speed_40000[] __initconst = {
++	ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT,
++	ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
++	ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
++	ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT,
++};
++
++static const u32 ethtool_forced_speed_50000[] __initconst = {
++	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
++	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
++	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
++};
++
++static const u32 ethtool_forced_speed_100000[] __initconst = {
++	ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
++	ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
++	ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
++	ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
++};
++
++/**
++ * ethtool_forced_speed_maps_init
++ * @maps: Pointer to an array of Ethtool forced speed map
++ * @size: Array size
++ *
++ * Initialize an array of Ethtool forced speed map to Ethtool link modes. This
++ * should be called during driver module init.
++ */
++void ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps,
++				    u32 size);
+ #endif /* _LINUX_ETHTOOL_H */
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 0b0ce4f81c01..ac1fdd636bc1 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -3388,3 +3388,18 @@ void ethtool_rx_flow_rule_destroy(struct ethtool_rx_flow_rule *flow)
+ 	kfree(flow);
+ }
+ EXPORT_SYMBOL(ethtool_rx_flow_rule_destroy);
++
++void ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps,
++				    u32 size)
++{
++	u32 i;
++
++	for (i = 0; i < size; i++) {
++		struct ethtool_forced_speed_map *map = &maps[i];
++
++		linkmode_set_bit_array(map->cap_arr, map->arr_size, map->caps);
++		map->cap_arr = NULL;
++		map->arr_size = 0;
++	}
++}
++EXPORT_SYMBOL(ethtool_forced_speed_maps_init);
 -- 
 2.39.2
 
