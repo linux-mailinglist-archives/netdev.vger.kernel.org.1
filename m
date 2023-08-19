@@ -1,124 +1,128 @@
-Return-Path: <netdev+bounces-29104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC1B77819F2
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:20:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23AB67819FE
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 16:23:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72A90281AF0
-	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:20:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB001281B06
+	for <lists+netdev@lfdr.de>; Sat, 19 Aug 2023 14:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E9A6AB7;
-	Sat, 19 Aug 2023 14:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A5D6ADE;
+	Sat, 19 Aug 2023 14:23:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BD64C8D
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:19:59 +0000 (UTC)
-Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F01B93FA
-	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:19:35 -0700 (PDT)
-Received: by mail-vk1-xa35.google.com with SMTP id 71dfb90a1353d-48d0b7ef29eso38464e0c.1
-        for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:19:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FB246BC
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 14:23:46 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17BB8BA8C
+	for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:23:43 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-5259cf39154so2348829a12.2
+        for <netdev@vger.kernel.org>; Sat, 19 Aug 2023 07:23:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692454774; x=1693059574;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VjOVC9IkT0MB1FDxlPUtjBJdqgqvAfiP6j2YnGrdafU=;
-        b=VFk4ZKV2Lz6aRQlmTNeOhUx1ebG2gA9jDGBWMzvWpJeipAtY9itIScmB4UqNfn6xkD
-         lVW2EaYU4ozDW2XwZ2t6vuII7HzGqHJhHmEyCqfeCniUg0iH25Fkm1pW0v6mwi5I2odl
-         JvY2dnpjedOnpS/rnYc6vK/p46UaOpb1FkhXgIbQGs5bezCePknq8V2O9bILg2vC60zL
-         Nq2fJl0OXMFiWqtOJV1El2CuDF1JnUvFfS6o+irOMuo91Y5yXJ1nF4xM06wI8A41GLhp
-         zpSndDisNxBU2qy63hrMeeMz536mOCsVvW4P6xZ/NkRaacsMH12uTgN22fOlu3j3cmgx
-         TE7w==
+        d=linaro.org; s=google; t=1692455021; x=1693059821;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L+H6LiI1fuzN7XDYYZHmb/bhyxb5oDWpcZV5MPYgeNM=;
+        b=cdwgqQ2/540qB6iDOetvo5+7VCwQmYK4ucktUn2S6tKhleFEfC1EpTZ4JYACvovMTs
+         q80w44G8zoYpOEESt9mribtnkSPAHijp742ibvWl8G2spBUc7A2iyJpbe/+hSxq1JiLX
+         VvttIM0PsbTvRlYBAFBKAbcmgwA9etZvKcfnollWct4wPA0vhah6KZEW2ZD6QuU7zPN2
+         NWFsh418VeYs6g5dM9/AzGVVFrneFiV7dBvS2oVMsPO3IkEoH9oLi6HM9FA+Fl6QJLwC
+         XmB91+4b+nQ3SNqUIn062zB3z3DnD8GY7VgF1SO/tA9mYy1gS8dq8ebRWlR97rZ67gAC
+         tDIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692454774; x=1693059574;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VjOVC9IkT0MB1FDxlPUtjBJdqgqvAfiP6j2YnGrdafU=;
-        b=Crneu5dtMBX00uZ5c816tB0hAMrbSrfMCZqoD9roMhF3s4fLGzCp0cjvh5jFxH9DSp
-         WFbQ5kW1l/g3NrsXIrru4wd96ua3TM+l+Sp8C9bsMd+8qAkzCbGzjza5JySth9nMRWLn
-         whatzsoWx1JCdOWnUWyboml5BleL06ATupAzpxnfGkn7qPoYJRc8hQ1rlaw1nGlQH3aE
-         XxiRkUAL72ee3f85rkdwMzWH2AlHUTiextPU8PFcIBsxjn+YoO4Y81xUMB8+FTVAsxez
-         jiPNDbn+0gBvIOb3UOEVVsGkv7sycR5u4s23cjD3ccFHZfN5ODDgPOzI2F+ZRmsdFmE0
-         cy0Q==
-X-Gm-Message-State: AOJu0Yya+ByMB5Ke0VhIG6yl017hO/lHLsBwfKyGqhW8jvch2S8T9Jv3
-	H00iBQqYJDC3IyC/OSpIdZYosHXf1EBMO6yXl30=
-X-Google-Smtp-Source: AGHT+IHq5uFyi15xGa7ufRt534sj7o6etpua9/f+5hI3qu06ovMkH26mwkNMAXmIzgr61oq0vAewrnigy/Lr4LqNi8M=
-X-Received: by 2002:a67:fe0e:0:b0:447:6596:11d2 with SMTP id
- l14-20020a67fe0e000000b00447659611d2mr1011573vsr.23.1692454774241; Sat, 19
- Aug 2023 07:19:34 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692455021; x=1693059821;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+H6LiI1fuzN7XDYYZHmb/bhyxb5oDWpcZV5MPYgeNM=;
+        b=Fyzy67c/yx1CRctmKtxBECHCQGCtu+qK7+tIYnVqTIrdgYYSYYbr9X8O1X9iLQ5dUL
+         YWQLCJMfok1PhbC8/yM7kr9YK9MfUCA9kwQmpfXT9fs+VpQ+EhDPIzY+F8rokPQCh4uN
+         6+NK+5vJ/1a5EQtq3nZx+Hm6MVZKfNJnNXzcCb3AgVA2QVDAJ+KfEmrNOX1gzBSFQvFU
+         /qmcdTVK09LxJVI7vGZxFUAA2HbCiJYXwPVcx9QbV1F+7rjjNz9GykL0LZvJqmpd59oI
+         Kxy7jbwuZMXEnT8tBY8zs0YNyikPKCG4MzFt/XqD+J0FS721SdjvD/HUSMjHptkjkLv4
+         Qsxg==
+X-Gm-Message-State: AOJu0Yz4h9aHYxBqkRK0Ab0P8Np7IK5qBi6HV7rEGJPzJBTZtT4zsafA
+	j82WrOLRHHjyIjQkYVLpuqNrKg==
+X-Google-Smtp-Source: AGHT+IHfb3IPptZFQYePiW40IL2RA9ejCLE2dfITH1lklobH/LC3t12t/Nl9vvFFC1Zf4mKowMUWvA==
+X-Received: by 2002:a05:6402:1610:b0:525:70b3:72c2 with SMTP id f16-20020a056402161000b0052570b372c2mr1608371edv.14.1692455021626;
+        Sat, 19 Aug 2023 07:23:41 -0700 (PDT)
+Received: from [192.168.0.22] ([77.252.47.198])
+        by smtp.gmail.com with ESMTPSA id m10-20020aa7c2ca000000b005257580f5ddsm2606079edp.71.2023.08.19.07.23.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 19 Aug 2023 07:23:40 -0700 (PDT)
+Message-ID: <a9a7b65c-ef0b-9f66-b197-548733728d44@linaro.org>
+Date: Sat, 19 Aug 2023 16:23:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-3-almasrymina@google.com> <7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
- <20230815171638.4c057dcd@kernel.org> <64dcf5834c4c8_23f1f8294fa@willemb.c.googlers.com.notmuch>
- <c47219db-abf9-8a5c-9b26-61f65ae4dd26@kernel.org> <20230817190957.571ab350@kernel.org>
- <CAHS8izN26snAvM5DsGj+bhCUDjtAxCA7anAkO7Gm6JQf=w-CjA@mail.gmail.com>
- <7cac1a2d-6184-7cd6-116c-e2d80c502db5@kernel.org> <20230818190653.78ca6e5a@kernel.org>
- <38a06656-b6bf-e6b7-48a1-c489d2d76db8@kernel.org>
-In-Reply-To: <38a06656-b6bf-e6b7-48a1-c489d2d76db8@kernel.org>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sat, 19 Aug 2023 10:18:57 -0400
-Message-ID: <CAF=yD-KgNDzv3-MhOMOTe2bTw4T73t-M7D65MpeG6vDBqHzrtA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
- dma-buf to netdevice
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, sdf@google.com, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v2 1/4] dt-bindings: mfd: syscon: Add compatibles for
+ Loongson-1 syscon
+Content-Language: en-US
+To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Serge Semin <Sergey.Semin@baikalelectronics.ru>
+References: <20230816111310.1656224-1-keguang.zhang@gmail.com>
+ <20230816111310.1656224-2-keguang.zhang@gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230816111310.1656224-2-keguang.zhang@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 18, 2023 at 11:30=E2=80=AFPM David Ahern <dsahern@kernel.org> w=
-rote:
->
-> On 8/18/23 8:06 PM, Jakub Kicinski wrote:
-> > On Fri, 18 Aug 2023 19:34:32 -0600 David Ahern wrote:
-> >> On 8/18/23 3:52 PM, Mina Almasry wrote:
-> >>> The sticking points are:
-> >>> 1. From David: this proposal doesn't give an application the ability
-> >>> to flush an rx queue, which means that we have to rely on a driver
-> >>> reset that affects all queues to refill the rx queue buffers.
-> >>
-> >> Generically, the design needs to be able to flush (or invalidate) all
-> >> references to the dma-buf once the process no longer "owns" it.
-> >
-> > Are we talking about the ability for the app to flush the queue
-> > when it wants to (do no idea what)? Or auto-flush when app crashes?
->
-> If a buffer reference can be invalidated such that a posted buffer is
-> ignored by H/W, then no flush is needed per se. Either way the key point
-> is that posted buffers can no longer be filled by H/W once a process no
-> longer owns the dma-buf reference. I believe the actual mechanism here
-> will vary by H/W.
+On 16/08/2023 13:13, Keguang Zhang wrote:
+> Add Loongson LS1B and LS1C compatibles for system controller.
 
-Right. Many devices only allow bringing all queues down at the same time.
+I asked not to use the same compatible for different blocks. Compatible
+is dwmac, but are you still going to use for other blocks? Please write
+proper description of the hardware.
 
-Once a descriptor is posted and the ring head is written, there is no
-way to retract that. Since waiting for the device to catch up is not
-acceptable, the only option is to bring down the queue, right? Which
-will imply bringing down the entire device on many devices. Not ideal,
-but acceptable short term, imho.
+> 
+> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> ---
+> V1 -> V2: Make the syscon compatibles more specific
+> 
+>  Documentation/devicetree/bindings/mfd/syscon.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/mfd/syscon.yaml b/Documentation/devicetree/bindings/mfd/syscon.yaml
+> index 8103154bbb52..d701fff02abe 100644
+> --- a/Documentation/devicetree/bindings/mfd/syscon.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/syscon.yaml
+> @@ -49,6 +49,8 @@ properties:
+>                - hisilicon,peri-subctrl
+>                - hpe,gxp-sysreg
+>                - intel,lgm-syscon
+> +              - loongson,ls1b-dwmac-syscon
+> +              - loongson,ls1c-dwmac-syscon
 
-That may be an incentive for vendors to support per-queue
-start/stop/alloc/free. Maybe the ones that support RDMA already do?
+
+Best regards,
+Krzysztof
+
 
