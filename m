@@ -1,189 +1,239 @@
-Return-Path: <netdev+bounces-29168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3B1A781ED9
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 18:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1998E781EF2
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 19:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44123280FA9
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 16:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12F8A280EFE
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 17:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212B423BB;
-	Sun, 20 Aug 2023 16:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D755C89;
+	Sun, 20 Aug 2023 17:15:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEBF17F8
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 16:40:59 +0000 (UTC)
-Received: from sonic301-25.consmr.mail.gq1.yahoo.com (sonic301-25.consmr.mail.gq1.yahoo.com [98.137.64.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C074644A9
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 09:38:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=att.net; s=s1024; t=1692549500; bh=RQGOnXuvG5OiED/amDx02JcIwlPS15cUAfcJ3OWkzrM=; h=Date:From:Subject:To:References:In-Reply-To:From:Subject:Reply-To; b=yqMoqQ2pzC9PTh8WLEOnQX9kU0ihsrO5PfBGdFjG4ETsFSTGHjVwC/qviQdbLC/YqGT+1TQjElEd4w7Dd54ayr7H2W+QatanHFXo1JORAM2Gyb/7xUlunIXSRIKrtxUTwgXPSeyg2aZnrQkje2bsrkRMnqhbCrXIhFt/Yqwx0e4=
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1692549500; bh=RZ9BDKaiFYgcvc3ho47H/euU8Za+mFy0qCs2PGunYvC=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=ZMRN6IsQ4DojHt1WyWgWzavuaT3onBI8/2kFVnzTJWwD0B3KL35T9WXINKUX9gRPp+4jGJklUoSgWizOxPO1TDRNvQVej+L0Rwltc7+9/5fM5yGNZzbSJ9WZhpNgF18t+gj4pDBYbfYs1qin5pDMqHCOcmguPjaB3V8ayLvkRno/1EetQx8ZT4PaQFO5feA3DrpPJx6/6I8S8GFqT03fVYuy+EilbTa+4S3Z4f1ERy8THpmZfOplLeEns7yliXdZddxkHfV3obndeMoFN0IuSPJnmKOksGTdVH9Ai8Ovjs1K6wD+w7JBBUk2drm5I33xA4mptQM61m3hSZSjHH7k/g==
-X-YMail-OSG: JewAgyAVM1mghxv.aOOmZxM3TCqrIlYI5zufzbRTDAbfdCg7Y1QAgx6VAcT5Mqo
- 4WotVkZaSWwD8csfNFyKNNGUwQFNLQixNsTPT_44vlaUan18KpyeBMR5GPnjOTMlLteTBe0DM1QU
- ivuV23wXaAA53KCk_hLMgNzFDxt7KY9Q0Ijh77kmywQZqjszLOLV7t_Rn8p632WN6M3Qblns5w_L
- H3C7zctZt8qXwYwzyvtV9f16BKfcrS_hMnfkWRRkh0bB0rbpv1KW6M40AhxZicPW5my6VRGAAn.B
- w7Rp2yKSMAWPRJlLVNq8mex2mqcOrrrLxwJLBQyfBePpBEP9jceq6slOxBgro.MW.0AcBrV79Qn1
- saLsQTzicr9x1Jw.NeKq8K4as511qC1_zOyBtMrbbqVdxOYIrvSJmYe3xfLA4rj8OV3rMWkO6G1B
- Zg6IN99GL37zJ7K0I_ptMulOTDHaPg8xmUc8d5I0QyaRW88yQncGziZ1uRonpiwJA.To35cqnh0X
- lLuRtPRqo7hJzed_18eH8qdYFhRx7fANbnxcNvScQC4XUt3_fRkONnqKC2C_wCYPTX.kk5ZUskg4
- 5Y8dD4hJYvGn5BBOVA0CWxr2MPOxSEa7zVWQgKma057N_IpN8xnxVSPapuIv8JStE7N1FgMCtPj.
- f.cMgN_MCJziykYVMCYwGCFvWGV8WowWnwujHBeykyhhMAJQ2eQTP3i7hdMLURnDWv74LjQFFgX2
- aIc8zMjaJuIzkvTBxK12.5GGFadAcI5tMnM2LbpIF7O89z_9rkdsT0fZFXMC6Hyj_9FGZzw1njQB
- p.Qb_d4wpVul4ZUtyZhC..FJEXmXvHkQLuOwJNiCDA4DKCXIzwcnXzUuv75kOxwu2PkJROi6_zkE
- E09uTykCAYTDi5e2BEVXY6_66WSiAhOe3vnhSdTkpVCh69AzKfrb308hcHSI7vM1.JCJm_vnj.8z
- TKmati0Zn_7GFU_fvs0mXNA9AnWFUrjwZwmRJcpBqEOH4kgH5gLxeI3wF4MQnHM4h_RFUeSt6fn7
- AcSPtAhgKZa.m3ggA60_T5JsIROFRXU_vjf89YoYbOQMv19ey8uqShe2U5OnPBG9a.oaZBhlFgsl
- dCK0XYDeBuYW9ZlkiCcwR9ZNRDLs7NWtgsVmzRkdckMKDmrbhh_oPYRRsjGRoSSuNSapUEspfN4p
- XF1mW_jxj.tAu1mxeS8FyEYV42kSjearsdzQMvsOvWimmZ.sLkoAzhRB514S.rgWYu.x8EKqPfd_
- 1irO0qFD31yMQ2ODAA_rtP4KUDZ7fjIOXuynHXIwUKWYajqeEQ0NB4Ecikp7DkgTpRm3RK7R84gY
- .rbg5m6Kt4iXOT2RAHNxTeGwvIsiWwY09zQxZfhnaSBtdwssQtGDg2HyhyZvAJsQY3OWL93Iuip0
- YVijb_7xrmjEKtDEHxnRYGohWZvzZ3M5EANkwoFivCKrjgAOeCv0MnsYrLpQ9dM2zUSLIZu2kK5T
- fW57PIxgUJ9JTA8hdsCIKWXgHPtloxrz6s8ICMFgjpgVOqQj.FNlGGz5gxzkuIxMnNlhdseuIKWG
- PlFFSUVywBi3Jckxm5PEovwmj4w.Zq3UAoLOEOuO_fOVTAi3nmOHOBK9.gHMx6YV7rFxnbKhdp5y
- xDjruvy2xk4RYgQ_XhXXbObXy_kfrvd3b_qPMEVKYvrda8O7I2EjH0sAGrx8_W7caZFCPVcUojpl
- rGc8L9qIGhJj5XLu_r0fN4ZKDbspx1GujWDbHuJ9EMnWt0lHdRFM3LlhcbJdZNtezH67e71naXWp
- DPQYpElbUt8zJ_Jh_1YgyU06dvcX7SL7S4NTuR3iJ13N5jDwKrWuKKGwn91Z5P5XGhxR3I9SOEAy
- hUN.pdssCJNwaZfPWXYhew.ZZGCp99KioLPDJ4sHDhNH9Vy8MUlu37cLPXGNSy7tdiTVQ_cmJJ8Y
- QKGvJF36l4ynn.PUCx7dkEWn_A8wU77ZYvAgx37GUjTB9KY1d4.eCrFKUywuf7_S6Lec5ZmcYBLw
- cAB9LjVbMNT9_Gnf3MGNtcincfmfxvkN8ZKTK_qSdS0wfauX5AwSQu1I4Yn9GCDo_WahNSsgr3eX
- hltjaia4Mt2txUoJ6H32RNtnJhbratFTVFDJs.cij43QS36hT5Q5HAsRPLg_6LKYHHBgqQ2wK9xw
- XynGJmzu0_KmMYbA2cWtaY0d2qali62IJH5Mta3GS1.rLciBW5BVsvc__PJ8eVDtzeuyXKOQLp50
- Yduc3ascWSkrE6Y8Pe77AekVZoUC6xfypcnFA8rO_JR6fhg--
-X-Sonic-MF: <lesrhorer@att.net>
-X-Sonic-ID: 0b297b99-4b15-4757-b411-2be9d1177d66
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.gq1.yahoo.com with HTTP; Sun, 20 Aug 2023 16:38:20 +0000
-Received: by hermes--production-bf1-865889d799-k7hdq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 65a72c385c026970582942b127cd9e64;
-          Sun, 20 Aug 2023 16:38:15 +0000 (UTC)
-Message-ID: <a5db211c-f862-aa3a-f6ef-5b724891c74d@att.net>
-Date: Sun, 20 Aug 2023 11:38:12 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4BA17F8
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 17:15:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AD4FC433C8;
+	Sun, 20 Aug 2023 17:15:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692551718;
+	bh=Zkfqr6SI88EBqD7f2xXuMdFWLsYnT+jNapbN+UhZwXU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qcYbvMBsLDLwA0p1ML9ed9neCvmJ7zBgkux6racwXUMZZVDiaH6DY9dKrCsPxqXmm
+	 jDmoSSrcwPzwxcuWvZw8JCmaPiP4+CkWMr63Gbzs6NFLNMjuT3uykobNYXv/bk+lqc
+	 PvRARadbFhoxXh7t6NUX5W+JSv3/q9DN7V9zNkrWs4p2FyyMFFyaNRPelyeRE0svQF
+	 CjdUagjVJdChTfi0yau4sv+w7+4JN7aqsDX/VBmzisOeEGKLhcOnDs2bPj09ocok7N
+	 m+/l7EwNYsxKIpPD/Aj+fi236KH5xRkpGKO95YhLHsvvTIxsLtU7ugi4QHPX0OrFaU
+	 pKtT9hUh4Mn2Q==
+Date: Sun, 20 Aug 2023 19:15:11 +0200
+From: Simon Horman <horms@kernel.org>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Herve Codina <herve.codina@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Shengjiu Wang <shengjiu.wang@gmail.com>,
+	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
+	Nicolin Chen <nicoleotsuka@gmail.com>,
+	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v4 21/28] net: wan: Add framer framework support
+Message-ID: <ZOJKH0xHpQc4HdUP@vergenet.net>
+References: <cover.1692376360.git.christophe.leroy@csgroup.eu>
+ <5f671caf19be0a9bb7ea7b96a6c86381e243ca4c.1692376361.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-From: Leslie Rhorer <lesrhorer@att.net>
-Subject: Re: Failing network hardware
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>, Ariel Elior <aelior@marvell.com>
-References: <ddbed5c6-4ded-df22-fae0-bd256e40d6b3.ref@att.net>
- <ddbed5c6-4ded-df22-fae0-bd256e40d6b3@att.net> <ZNrSwBqP1vPW8OKz@debian.me>
- <edfeb028-02cb-35b1-e828-9b5931c8d65a@att.net>
-Content-Language: en-US
-In-Reply-To: <edfeb028-02cb-35b1-e828-9b5931c8d65a@att.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.21732 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f671caf19be0a9bb7ea7b96a6c86381e243ca4c.1692376361.git.christophe.leroy@csgroup.eu>
 
-     I haven't seen any response to this.  Note I can pretty much 
-guarantee this is not an issue with any distribution of kernel version 
-at this point.  This is almost certainly an issue of my own making, but 
-that does not mean I need to get it resolved any less.  I strongly 
-suspect the problem is something I did in the udev rules that is now 
-preventing the network system from recognizing the presence of the  
-network card.  Assuming for the time being this is the case, how do I 
-get the system to recognize the presence of the card in order to get it 
-to assign a network interface to it?
+On Fri, Aug 18, 2023 at 06:39:15PM +0200, Christophe Leroy wrote:
+> From: Herve Codina <herve.codina@bootlin.com>
+> 
+> A framer is a component in charge of an E1/T1 line interface.
+> Connected usually to a TDM bus, it converts TDM frames to/from E1/T1
+> frames. It also provides information related to the E1/T1 line.
+> 
+> The framer framework provides a set of APIs for the framer drivers
+> (framer provider) to create/destroy a framer and APIs for the framer
+> users (framer consumer) to obtain a reference to the framer, and
+> use the framer.
+> 
+> This basic implementation provides a framer abstraction for:
+>  - power on/off the framer
+>  - get the framer status (line state)
+>  - be notified on framer status changes
+>  - get/set the framer configuration
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-On 8/14/2023 8:50 PM, Leslie Rhorer wrote:
->
->
-> On 8/14/2023 8:20 PM, Bagas Sanjaya wrote:
->> (fixing up netdev address)
->>
->> On Sun, Aug 13, 2023 at 01:53:58PM -0500, Leslie Rhorer wrote:
->>> Hello all,
->>>
->>>     About a year or so ago, I upgraded one of my Debian servers to 
->>> Bullseye,
->>> and it killed the 10G NIC on the server due to issues with the 
->>> device driver
->>> in the Debian repository (it was missing).  I jumped through all 
->>> sorts of
->>> loops and hoops to try to get it working, but I finally had to give 
->>> up and
->>> resort to using the 1G interface.  Recently, I tried a new install on a
->>> different server to the new Debian Bookworm, and it worked for that 
->>> server,
->>> so apparently the issue has been fixed in Bookworm.  I reported a bug
->>> against the Buster distribution, but it was never fixed.
->>>
->>>     With that in mind, I went ahead and upgraded the original server to
->>> Bookworm, but the NIC remains dead.  Unfortunately, I cannot find my 
->>> notes
->>> on what I did originally to try to get the 10G interface working and 
->>> to shut
->>> it down in favor of a built-in port.  I do recall I tried compiling 
->>> what was
->>> supposed to be the correct firmware driver and also changing the 
->>> udev rules,
->>> but I do not recall the exact details.  I have tried several things,
->>> including re-installing the firmware, but nothing seems to work.  The
->>> Ethernet interface does not appear on the system in order to be able to
->>> specify it in /etc/network/interfaces.  What can I do in order to 
->>> try to get
->>> the 10G card working?
->>>
->>>     The card is an Asus MCB-10G_PEB-10G NIC and uses the bnx2x.ko 
->>> driver. The
->>> system uses an Asus AMD-64 motherboard.  The bnx2x.ko driver is 
->>> installed,
->>> and lspci shows the card in the system, but ifconfig does not see the
->>> interface.
->>>
->>
->> Too many moving parts here, hence allow me to rule things out:
->>
->> If there is any of your system haven't been dist-upgraded to 
->> bookworm, can you
->> confirm this issue on vanilla v6.1 kernel? 
->
->     One, named Backup, is a fresh install of Debian Bookworm.  The NIC 
-> on Backup works just fine.  The other, named RAID-Server, was upgraded 
-> via dist-upgrade from Buster to Bullseye, at which point the NIC quit 
-> working, and then from Bullseye to Bookworm.
->
->     I identified the problem on Bullseye and submitted a bug report, 
-> but no one ever bothered to fix the bug, which was simply the fact the 
-> driver was missing from the Bullseye distro.
->
->     Both systems are now running kernel 6.1.0-10-AMD64.
->
->> And also, can you check latest mainline?
->
->     I don't know what you mean by that.
->
->> If all have been upgraded, though, you need to reinstall bullseye
->> first.
->
->     I take it by that, you are making the distinction between an 
-> upgrade from an older distro and kernel to a new one and a fresh 
-> install of a distro running a 6.1 kernel?
->
->     I definitely do not want to re-install Bullseye on either system.  
-> It would break Backup's NIC to do so, and it would be an incredible 
-> mess with a potentially unacceptably long down time to try to back out 
-> of Bookworm on RAID-Server.  If I follow your intent, however, this 
-> should be unnecessary.  I have one working fresh install and one 
-> broken dist-upgrade from a known broken distribution.
->
->> As a side note, when you reply to mailing lists, please don't top-post;
->> reply inline with appropriate context instead.
->
->     That is my usual practice.  It has been for many decades.
->
+Hi Christophe and Herve,
+
+some minor feedback from my side.
+
+...
+
+> diff --git a/drivers/net/wan/framer/framer-core.c b/drivers/net/wan/framer/framer-core.c
+
+...
+
+> +/**
+> + * framer_create() - create a new framer
+> + * @dev: device that is creating the new framer
+> + * @node: device node of the framer. default to dev->of_node.
+> + * @ops: function pointers for performing framer operations
+> + *
+> + * Called to create a framer using framer framework.
+> + */
+> +struct framer *framer_create(struct device *dev, struct device_node *node,
+> +			     const struct framer_ops *ops)
+> +{
+> +	int ret;
+> +	int id;
+> +	struct framer *framer;
+
+Please arrange local variable declarations for Networking code
+using reverse xmas tree order - longest line to shortest.
+
+https://github.com/ecree-solarflare/xmastree is helpful here.
+
+...
+
+> diff --git a/include/linux/framer/framer-provider.h b/include/linux/framer/framer-provider.h
+
+...
+
+> +/**
+> + * struct framer_ops - set of function pointers for performing framer operations
+> + * @init: operation to be performed for initializing the framer
+> + * @exit: operation to be performed while exiting
+> + * @power_on: powering on the framer
+> + * @power_off: powering off the framer
+> + * @flags: OR-ed flags (FRAMER_FLAG_*) to ask for core functionality
+> + *          - @FRAMER_FLAG_POLL_STATUS:
+> + *            Ask the core to perfom a polling to get the framer status and
+
+nit: perfom -> perform
+
+     checkpatch.pl --codespell is your friend here
+
+> + *            notify consumers on change.
+> + *            The framer should call @framer_notify_status_change() when it
+> + *            detects a status change. This is usally done using interrutps.
+
+nit: usally -> usually
+     interrutps -> interrupts
+
+...
+
+> diff --git a/include/linux/framer/framer.h b/include/linux/framer/framer.h
+> new file mode 100644
+> index 000000000000..0bee7135142f
+> --- /dev/null
+> +++ b/include/linux/framer/framer.h
+> @@ -0,0 +1,199 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * Generic framer header file
+> + *
+> + * Copyright 2023 CS GROUP France
+> + *
+> + * Author: Herve Codina <herve.codina@bootlin.com>
+> + */
+> +
+> +#ifndef __DRIVERS_FRAMER_H
+> +#define __DRIVERS_FRAMER_H
+> +
+> +#include <linux/err.h>
+> +#include <linux/mutex.h>
+> +#include <linux/notifier.h>
+> +#include <linux/of.h>
+> +#include <linux/device.h>
+> +#include <linux/workqueue.h>
+> +
+> +/**
+> + * enum framer_iface - Framer interface
+
+As this is a kernel-doc, please include documentation for
+the defined constants: FRAMER_IFACE_E1 and FRAMER_IFACE_T1.
+
+As flagged by: ./scripts/kernel-doc -none
+
+> + */
+> +enum framer_iface {
+> +	FRAMER_IFACE_E1,      /* E1 interface */
+> +	FRAMER_IFACE_T1,      /* T1 interface */
+> +};
+> +
+> +/**
+> + * enum framer_clock_mode - Framer clock mode
+
+Likewise here too.
+
+Also, nit: framer_clock_mode -> framer_clock_type
+
+> + */
+> +enum framer_clock_type {
+> +	FRAMER_CLOCK_EXT, /* External clock */
+> +	FRAMER_CLOCK_INT, /* Internal clock */
+> +};
+> +
+> +/**
+> + * struct framer_configuration - Framer configuration
+
+nit: framer_configuration -> framer_config
+
+> + * @line_iface: Framer line interface
+> + * @clock_mode: Framer clock type
+> + * @clock_rate: Framer clock rate
+> + */
+> +struct framer_config {
+> +	enum framer_iface iface;
+> +	enum framer_clock_type clock_type;
+> +	unsigned long line_clock_rate;
+> +};
+> +
+> +/**
+> + * struct framer_status - Framer status
+> + * @link_is_on: Framer link state. true, the link is on, false, the link is off.
+> + */
+> +struct framer_status {
+> +	bool link_is_on;
+> +};
+> +
+> +/**
+> + * framer_event - event available for notification
+
+nit: framer_event -> enum framer_event
+
+A~d please document FRAMER_EVENT_STATUS in the kernel doc too.
+
+> + */
+> +enum framer_event {
+> +	FRAMER_EVENT_STATUS,	/* Event notified on framer_status changes */
+> +};
+
+...
 
