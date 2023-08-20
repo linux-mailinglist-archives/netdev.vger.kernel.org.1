@@ -1,152 +1,141 @@
-Return-Path: <netdev+bounces-29166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4477781E7D
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 17:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3289781ECE
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 18:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 212741C204AB
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 15:19:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E241C2087F
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 16:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE05612A;
-	Sun, 20 Aug 2023 15:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ACA63A9;
+	Sun, 20 Aug 2023 16:10:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D09D568E
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 15:19:54 +0000 (UTC)
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA17E8;
-	Sun, 20 Aug 2023 08:15:02 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3a751d2e6ecso2006793b6e.0;
-        Sun, 20 Aug 2023 08:15:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692544502; x=1693149302;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/hSZIhmkHGzjNtkdqhrKis5XPDMMe45VDbgxuLxmNpc=;
-        b=afk2Ucb3vmpuLfYssTTfFt+0EA6p/DPQhSYRmg91/OavyjhqQLYy8dJCwNgvKd02G6
-         NqUhAB/BPDYPlu7A2iIF9Jlw7nbstwks0mJ0wOZtOOcmWwM+MOkgWUQAti3VZ3+TLNyP
-         1todpDNBj42CVsA4XmZg4np6e8nXYKnIAqpSL8hnWotP5betbKeaxajgHd6jy3qLzCgF
-         Ws1RiKIn+OAqjeI5HTz49Frkciwr8UjaLbE3EB6QccxVogvQTeeBGmJVmyscFbNzAQgr
-         +QMIbFOYGaxCEMk0I7EsB2c12qfhFi8rqoShfqo+NHNuqnGhzz1ilynNjRZCVdN64uTd
-         9kNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692544502; x=1693149302;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/hSZIhmkHGzjNtkdqhrKis5XPDMMe45VDbgxuLxmNpc=;
-        b=e/yQ93bwmK/GzJbs1p6SQsN60fTVMKkw1k8c5WT6V3JVYvxZqQ8UIaCgDBdcZmSeWQ
-         uigf46uuteGrXTMRfg1YjhHgd+6ZFsdOlR0aQqDEHSN+n0FG5E0eFGOeRyowfp73cipK
-         L7RhfHL62KS1jPqr7JwBWtn4NYmeieUggLhAIuvwn7BHygAqxsUMlfveQdLEtVKgxx2u
-         GPRvd5cVKtDQt4mTXTrBfmjhR6plexXfTisJP32s09azwbozvU5LuU05pr2SgUbm/Rbb
-         Wfsvr7KVLzIfQIwPzvb9MwBGBXcTUeTh2i8Rf+i8uT0dGU80VTjvrvWRKxURV5lgmHE1
-         susg==
-X-Gm-Message-State: AOJu0YzjRPdulzfRfZ4V0ElkTUkJSRoAT2bVImylUMLkFmLLKs3bDFjj
-	yIG5MOa3Zz+zoPrJJRMPw+E=
-X-Google-Smtp-Source: AGHT+IFeVM78TX6uAGcng2/uDfZQ4CAtx3zUD+6/o8h5qq1zmlLCrnu/Cdu8RbfcHK890LMj+EtFGw==
-X-Received: by 2002:a05:6358:9920:b0:13a:6cb:4d91 with SMTP id w32-20020a056358992000b0013a06cb4d91mr4301834rwa.7.1692544501787;
-        Sun, 20 Aug 2023 08:15:01 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id i3-20020a0cf483000000b00646e0411e8csm2251406qvm.30.2023.08.20.08.15.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Aug 2023 08:15:01 -0700 (PDT)
-Date: Sun, 20 Aug 2023 11:15:01 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- kuba@kernel.org, 
- netdev@vger.kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- davem@davemloft.net, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- shuah@kernel.org
-Cc: linux-kernel-mentees@lists.linuxfoundation.org, 
- Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
-Message-ID: <64e22df53d1e6_3580162945b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230819195005.99387-2-mahmoudmatook.mm@gmail.com>
-References: <20230819195005.99387-1-mahmoudmatook.mm@gmail.com>
- <20230819195005.99387-2-mahmoudmatook.mm@gmail.com>
-Subject: Re: [PATCH 1/2] selftests: Provide local define of min() and max()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5662F48
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 16:10:49 +0000 (UTC)
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A864208;
+	Sun, 20 Aug 2023 09:08:21 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 1CBC95C00CC;
+	Sun, 20 Aug 2023 12:08:19 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Sun, 20 Aug 2023 12:08:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1692547699; x=1692634099; bh=BxzZ+9NJUrzNh
+	ki5lVNYAAEL7wZfwcHLqKEFYyFd67g=; b=ArXDzhOaajpJz7sTJsp08Gfgcm9Ya
+	G9hTfk34jR5/XaoP0fm3bZFjmSUSNwnKc8VVJb9OgG68HwDnT5F/0O7ZacSLA5V1
+	UmDTX9t9e6QHi2lerh7IgpD4LUa4gJqa0duOzOyPG90dMeO2ZtwPBah1QAxLoChK
+	bZyhqrNQv8tIPJrPPneNoOKj7fJpFfgLRnt9zEYBJaIcGNLhGN5rlJ+wOeXD8O8a
+	kE1JCoZxR+JdA2uvOVhRQ15hKfeckff8Wss5uI24BwZhNDv0L1jdZmXIDjap82yx
+	iO23Ej435mhWvJjgFdfyWl5hyOftIP9AMjtnb+JzUwU6yCRfUx4ZW+fcA==
+X-ME-Sender: <xms:cjriZKKcYEsF3K0ufFNYJgfmdGDT2GOKoHU7WEyHhQtrmY5m3TVugA>
+    <xme:cjriZCJZKg5IXCxVt8heXlIO9Qr5AvSd8M0PtLi7WThIEI3XvLg74EzUtH3_3JY1W
+    CfFOYbBFvgmTi8>
+X-ME-Received: <xmr:cjriZKvX1LImLGNoPALVQXEgbBf-hg9JiSkE4GezA1BWnAJM_wWl-ZD-dcpO>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedruddujedguddttdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkfhggtggujgesth
+    dtredttddtvdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehi
+    ughoshgthhdrohhrgheqnecuggftrfgrthhtvghrnhepveeggeeugfduueduueevleeggf
+    ejfedtleegfffgjeejudduffefffdttdehtdetnecuffhomhgrihhnpehshiiikhgrlhhl
+    vghrrdgrphhpshhpohhtrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:cjriZPbh6r4zu272K5cwPOMEXJ17oOO1otswR7tT8A5M22MJSZNOyQ>
+    <xmx:cjriZBb-EDBQpQzaxUWrHIYHP-YtzsgAPnpAtf3ifxDi__Gk0lzk4w>
+    <xmx:cjriZLCPsox_tsKkoJmM41l3j5tHa2daAL188wVSJ1JsLRbnecFwhg>
+    <xmx:czriZORBq0hlwPHbHSM5AuhztSLdxRkqWnrma-XvDvTx2PLdCrpjtw>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 20 Aug 2023 12:08:17 -0400 (EDT)
+Date: Sun, 20 Aug 2023 19:08:13 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com,
+	syzbot+5ba06978f34abb058571@syzkaller.appspotmail.com,
+	wg@grandegger.com, mkl@pengutronix.de, idosch@nvidia.com,
+	lucien.xin@gmail.com, xemul@parallels.com, socketcan@hartkopp.net,
+	linux-can@vger.kernel.org
+Subject: Re: [PATCH net] net: validate veth and vxcan peer ifindexes
+Message-ID: <ZOI6bf86B1fVb1sF@shredder>
+References: <20230819012602.239550-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230819012602.239550-1-kuba@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mahmoud Maatuq wrote:
-> to avoid manual calculation of min and max values
-> and fix coccinelle warnings such WARNING opportunity for min()/max()
-> adding one common definition that could be used in multiple files
-> under selftests.
-> there are also some defines for min/max scattered locally inside sources
-> under selftests.
-> this also prepares for cleaning up those redundant defines and include
-> kselftest.h instead.
+On Fri, Aug 18, 2023 at 06:26:02PM -0700, Jakub Kicinski wrote:
+> veth and vxcan need to make sure the ifindexes of the peer
+> are not negative, core does not validate this.
 > 
-> Signed-off-by: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
-> ---
->  tools/testing/selftests/kselftest.h | 7 +++++++
->  1 file changed, 7 insertions(+)
+> Using iproute2 with user-space-level checking removed:
 > 
-> diff --git a/tools/testing/selftests/kselftest.h b/tools/testing/selftests/kselftest.h
-> index 829be379545a..e8eb7e9afbc6 100644
-> --- a/tools/testing/selftests/kselftest.h
-> +++ b/tools/testing/selftests/kselftest.h
-> @@ -55,6 +55,13 @@
->  #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
->  #endif
->  
-> +#ifndef min
-> +# define min(x, y) ((x) < (y) ? (x) : (y))
-> +#endif
-> +#ifndef max
-> +# define max(x, y) ((x) < (y) ? (y) : (x))
-> +#endif
-> +
+> Before:
+> 
+>   # ./ip link add index 10 type veth peer index -1
+>   # ip link show
+>   1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+>     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+>   2: enp1s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+>     link/ether 52:54:00:74:b2:03 brd ff:ff:ff:ff:ff:ff
+>   10: veth1@veth0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>     link/ether 8a:90:ff:57:6d:5d brd ff:ff:ff:ff:ff:ff
+>   -1: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>     link/ether ae:ed:18:e6:fa:7f brd ff:ff:ff:ff:ff:ff
+> 
+> Now:
+> 
+>   $ ./ip link add index 10 type veth peer index -1
+>   Error: ifindex can't be negative.
+> 
+> This problem surfaced in net-next because an explicit WARN()
+> was added, the root cause is older.
+> 
+> Fixes: e6f8f1a739b6 ("veth: Allow to create peer link with given ifindex")
+> Fixes: a8f820a380a2 ("can: add Virtual CAN Tunnel driver (vxcan)")
+> Reported-by: syzbot+5ba06978f34abb058571@syzkaller.appspotmail.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Should this more closely follow include/linux/minmax.h, which is a lot
-more strict?
+There is another report here [1] with a reproducer [2]. Even with this
+patch, the reproducer can still trigger the warning on net-next. Don't
+we also need to reject a negative ifindex in the ancillary header? At
+least with the following diff the warning does not trigger anymore:
 
-I'm fine with this simpler, more relaxed, version for testing, but
-calling it out for people to speak up.
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 7aba4d63b069..4a2ec33bfb51 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3560,6 +3560,9 @@ static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+        if (ifm->ifi_index > 0) {
+                link_specified = true;
+                dev = __dev_get_by_index(net, ifm->ifi_index);
++       } else if (ifm->ifi_index < 0) {
++               NL_SET_ERR_MSG(extack, "ifindex can't be negative");
++               return -EINVAL;
+        } else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME]) {
+                link_specified = true;
+                dev = rtnl_dev_get(net, tb);
 
-Only the first two of these comments in minmax.h apply to this
-userspace code.
-
-/*
- * min()/max()/clamp() macros must accomplish three things:
- *
- * - avoid multiple evaluations of the arguments (so side-effects like
- *   "x++" happen only once) when non-constant.
- * - perform strict type-checking (to generate warnings instead of
- *   nasty runtime surprises). See the "unnecessary" pointer comparison
- *   in __typecheck().
- * - retain result as a constant expressions when called with only
- *   constant expressions (to avoid tripping VLA warnings in stack
- *   allocation usage).
- */
-
-Note that a more strict version that includes __typecheck would
-warn on the type difference between total_len and cfg_mss. Fine
-with changing the type of cfg_mss in the follow-on patch to address
-that.
-
+[1] https://syzkaller.appspot.com/text?tag=CrashReport&x=178edad3a80000
+[2] https://syzkaller.appspot.com/text?tag=ReproC&x=166ed6bba80000
 
