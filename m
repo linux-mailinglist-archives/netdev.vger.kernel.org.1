@@ -1,422 +1,94 @@
-Return-Path: <netdev+bounces-29161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D32781DBC
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 14:15:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E639781E5A
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 16:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67B8B281012
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 12:15:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A6E31C20896
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 14:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE88B5675;
-	Sun, 20 Aug 2023 12:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8153E53B8;
+	Sun, 20 Aug 2023 14:45:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0FC2573
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 12:14:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4441DC433C9;
-	Sun, 20 Aug 2023 12:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3868617C1
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 14:45:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93C3BC433C7;
+	Sun, 20 Aug 2023 14:45:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692533656;
-	bh=Den5dFS0MXDAQfMUN5eWruNGI0pHi2wHRF4CX/oFhPU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WAWeleQQXgSnGBz+bKec0yrb1T+7jeNMDNsHql0UcfYmV0J77tSPOorMEJwMpeu6C
-	 AWHfiUp2W0gq60d3KViN4Iqg14fabrwtSp1W5XtuvHI8Ididi4UkRHvydQXFMSX82o
-	 pCN7l+cGuosKiNXqjyiX29D6KEVXvNGvtLpY6ck5hHGA4z2Cq44Zv1ysG3jVbhL9/M
-	 TLGWRRXeGMtv71YF2JoecVmuEOFK4JqYUNyK63ePNUOmsnDzUAd8nuFz1iOqbjexeP
-	 01SGbXzbBTsZCp6MjeSZh6DwG82+UZOTNHWPUmkNJx6Cu6NsEQ+zvLMTpzZaDs8agH
-	 7ifgar5a/FxKw==
-From: Jisheng Zhang <jszhang@kernel.org>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH net-next 3/3] net: stmmac: add glue layer for T-HEAD TH1520 SoC
-Date: Sun, 20 Aug 2023 20:02:13 +0800
-Message-Id: <20230820120213.2054-4-jszhang@kernel.org>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230820120213.2054-1-jszhang@kernel.org>
-References: <20230820120213.2054-1-jszhang@kernel.org>
+	s=k20201202; t=1692542709;
+	bh=2axdRh5qNFWVk1PGIYs/8FdjmE93UURhhLvGBII6n04=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZehVKQCGSTVV0QT5my+3O+2oaYpeZVhuTkm7giu/cM2nPp1BYNMVfQCNF9D85Vkpa
+	 iDpfcZN8mjcUmmqmiqIz7H8PdRxrtjkLjxAWKtnsXfSUO0fGO/vnyOURb+uQkOCQ1U
+	 ARvjoLQm1o0MwltmcFtkuve2VP5lpttfz1pnR49KJTzmM/xnYL90My9SkPBjistH7Y
+	 yCrxKAigsOseD6Qc+wEVtnP74RlEqLqzXvgVRpNTpQ6Ga0DhiG2rp9p2GP5K3Y/UK3
+	 CI3cH2eCVxIyUjLWturIrIsGMyUiJkh4sPg0FgRF1XEmz5OREPErfhi3MR1QgStCYT
+	 w+c6JPCMXLXNA==
+Date: Sun, 20 Aug 2023 16:45:05 +0200
+From: Simon Horman <horms@kernel.org>
+To: Paul Greenwalt <paul.greenwalt@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com, andrew@lunn.ch, aelior@marvell.com,
+	manishc@marvell.com
+Subject: Re: [PATCH iwl-next v2 2/9] ethtool: Add forced speed to supported
+ link modes maps
+Message-ID: <ZOIm8TJz/ykcI+PR@vergenet.net>
+References: <20230819093941.15163-1-paul.greenwalt@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230819093941.15163-1-paul.greenwalt@intel.com>
 
-Add dwmac glue driver to support the dwmac on the T-HEAD TH1520 SoC.
+On Sat, Aug 19, 2023 at 02:39:41AM -0700, Paul Greenwalt wrote:
+> The need to map Ethtool forced speeds to  Ethtool supported link modes is
+> common among drivers. To support this move the supported link modes maps
+> implementation from the qede driver. This is an efficient solution
+> introduced in commit 1d4e4ecccb11 ("qede: populate supported link modes
+> maps on module init") for qede driver.
+> 
+> ethtool_forced_speed_maps_init() should be called during driver init
+> with an array of struct ethtool_forced_speed_map to populate the
+> mapping. The macro ETHTOOL_FORCED_SPEED_MAP is a helper to initialized
+> the struct ethtool_forced_speed_map.
+> 
+> The qede driver was compile tested only.
+> 
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> ---
+> v2: move qede Ethtool speed to link modes mapping to be shared by other
+> drivers (Andrew)
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../net/ethernet/stmicro/stmmac/dwmac-thead.c | 304 ++++++++++++++++++
- 3 files changed, 316 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+Hi Paul,
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 06c6871f8788..1bf71804c270 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -216,6 +216,17 @@ config DWMAC_SUN8I
- 	  stmmac device driver. This driver is used for H3/A83T/A64
- 	  EMAC ethernet controller.
- 
-+config DWMAC_THEAD
-+	tristate "T-HEAD dwmac support"
-+	depends on OF && (ARCH_THEAD || COMPILE_TEST)
-+	select MFD_SYSCON
-+	help
-+	  Support for ethernet controllers on T-HEAD RISC-V SoCs
-+
-+	  This selects the T-HEAD platform specific glue layer support for
-+	  the stmmac device driver. This driver is used for T-HEAD TH1520
-+	  ethernet controller.
-+
- config DWMAC_IMX8
- 	tristate "NXP IMX8 DWMAC support"
- 	default ARCH_MXC
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index 5b57aee19267..d73171ed6ad7 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -27,6 +27,7 @@ obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
- obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
- obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
- obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
-+obj-$(CONFIG_DWMAC_THEAD)	+= dwmac-thead.o
- obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
- obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
- obj-$(CONFIG_DWMAC_GENERIC)	+= dwmac-generic.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-new file mode 100644
-index 000000000000..1a5a174b88ff
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-@@ -0,0 +1,304 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * T-HEAD DWMAC platform driver
-+ *
-+ * Copyright (C) 2023 Jisheng Zhang <jszhang@kernel.org>
-+ * Copyright (C) 2021 Alibaba Group Holding Limited.
-+ *
-+ */
-+
-+#include <linux/mfd/syscon.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_device.h>
-+#include <linux/of_net.h>
-+#include <linux/platform_device.h>
-+#include <linux/regmap.h>
-+
-+#include "stmmac_platform.h"
-+
-+#define GMAC_CLK_EN			0x00
-+#define  GMAC_TX_CLK_EN			BIT(1)
-+#define  GMAC_TX_CLK_N_EN		BIT(2)
-+#define  GMAC_TX_CLK_OUT_EN		BIT(3)
-+#define  GMAC_RX_CLK_EN			BIT(4)
-+#define  GMAC_RX_CLK_N_EN		BIT(5)
-+#define  GMAC_EPHY_REF_CLK_EN		BIT(6)
-+#define GMAC_RXCLK_DELAY_CTRL		0x04
-+#define  GMAC_RXCLK_BYPASS		BIT(15)
-+#define  GMAC_RXCLK_INVERT		BIT(14)
-+#define  GMAC_RXCLK_DELAY_MASK		GENMASK(4, 0)
-+#define  GMAC_RXCLK_DELAY_VAL(x)	FIELD_PREP(GMAC_RXCLK_DELAY_MASK, (x))
-+#define GMAC_TXCLK_DELAY_CTRL		0x08
-+#define  GMAC_TXCLK_BYPASS		BIT(15)
-+#define  GMAC_TXCLK_INVERT		BIT(14)
-+#define  GMAC_TXCLK_DELAY_MASK		GENMASK(4, 0)
-+#define  GMAC_TXCLK_DELAY_VAL(x)	FIELD_PREP(GMAC_RXCLK_DELAY_MASK, (x))
-+#define GMAC_PLLCLK_DIV			0x0c
-+#define  GMAC_PLLCLK_DIV_EN		BIT(31)
-+#define  GMAC_PLLCLK_DIV_MASK		GENMASK(7, 0)
-+#define  GMAC_PLLCLK_DIV_NUM(x)		FIELD_PREP(GMAC_PLLCLK_DIV_MASK, (x))
-+#define GMAC_GTXCLK_SEL			0x18
-+#define  GMAC_GTXCLK_SEL_PLL		BIT(0)
-+#define GMAC_INTF_CTRL			0x1c
-+#define  PHY_INTF_MASK			BIT(0)
-+#define  PHY_INTF_RGMII			FIELD_PREP(PHY_INTF_MASK, 1)
-+#define  PHY_INTF_MII_GMII		FIELD_PREP(PHY_INTF_MASK, 0)
-+#define GMAC_TXCLK_OEN			0x20
-+#define  TXCLK_DIR_MASK			BIT(0)
-+#define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
-+#define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
-+
-+#define GMAC_GMII_RGMII_RATE	125000000
-+#define GMAC_MII_RATE		25000000
-+
-+struct thead_dwmac {
-+	struct plat_stmmacenet_data *plat;
-+	struct regmap *apb_regmap;
-+	struct device *dev;
-+	struct clk *clk_axi;
-+	u32 rx_delay;
-+	u32 tx_delay;
-+};
-+
-+static int thead_dwmac_set_phy_if(struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	u32 phyif;
-+
-+	switch (plat->interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		phyif = PHY_INTF_MII_GMII;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		phyif = PHY_INTF_RGMII;
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->interface);
-+		return -EINVAL;
-+	};
-+
-+	regmap_write(dwmac->apb_regmap, GMAC_INTF_CTRL, phyif);
-+
-+	return 0;
-+}
-+
-+static int thead_dwmac_set_txclk_dir(struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	u32 txclk_dir;;
-+
-+	switch (plat->interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		txclk_dir = TXCLK_DIR_INPUT;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		txclk_dir = TXCLK_DIR_OUTPUT;
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->interface);
-+		return -EINVAL;
-+	};
-+
-+	regmap_write(dwmac->apb_regmap, GMAC_TXCLK_OEN, txclk_dir);
-+
-+	return 0;
-+}
-+
-+static void thead_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mode)
-+{
-+	struct thead_dwmac *dwmac = priv;
-+	struct plat_stmmacenet_data *plat = dwmac->plat;
-+	unsigned long rate;
-+	u32 div;
-+
-+	switch (plat->interface) {
-+	/* For MII, rxc/txc is provided by phy */
-+	case PHY_INTERFACE_MODE_MII:
-+		return;
-+
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		rate = clk_get_rate(plat->stmmac_clk);
-+		if (!rate || rate % GMAC_GMII_RGMII_RATE != 0 ||
-+		    rate % GMAC_MII_RATE != 0) {
-+			dev_err(dwmac->dev, "invalid gmac rate %ld\n", rate);
-+			return;
-+		}
-+
-+		regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV, GMAC_PLLCLK_DIV_EN, 0);
-+
-+		switch (speed) {
-+		case SPEED_1000:
-+			div = rate / GMAC_GMII_RGMII_RATE;
-+			break;
-+		case SPEED_100:
-+			div = rate / GMAC_MII_RATE;
-+			break;
-+		case SPEED_10:
-+			div = rate * 10 / GMAC_MII_RATE;
-+			break;
-+		default:
-+			dev_err(dwmac->dev, "invalid speed %u\n", speed);
-+			break;
-+		}
-+		regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV,
-+				   GMAC_PLLCLK_DIV_MASK, GMAC_PLLCLK_DIV_NUM(div));
-+
-+		regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV,
-+				   GMAC_PLLCLK_DIV_EN, GMAC_PLLCLK_DIV_EN);
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->interface);
-+		return;
-+	}
-+}
-+
-+static int thead_dwmac_enable_clk(struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	u32 reg;
-+
-+	switch (plat->interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		reg = GMAC_RX_CLK_EN | GMAC_TX_CLK_EN;
-+		break;
-+
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		/* use pll */
-+		regmap_write(dwmac->apb_regmap, GMAC_GTXCLK_SEL, GMAC_GTXCLK_SEL_PLL);
-+
-+		reg = GMAC_TX_CLK_EN | GMAC_TX_CLK_N_EN | GMAC_TX_CLK_OUT_EN |
-+		      GMAC_RX_CLK_EN | GMAC_RX_CLK_N_EN;
-+		break;
-+
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->interface);
-+		return -EINVAL;
-+	}
-+
-+	regmap_write(dwmac->apb_regmap, GMAC_CLK_EN, reg);
-+
-+	return 0;
-+}
-+
-+static int thead_dwmac_init(struct platform_device *pdev,
-+			    struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	int ret;
-+
-+	ret = thead_dwmac_set_phy_if(plat);
-+	if (ret)
-+		return ret;
-+
-+	ret = thead_dwmac_set_txclk_dir(plat);
-+	if (ret)
-+		return ret;
-+
-+	regmap_write(dwmac->apb_regmap, GMAC_RXCLK_DELAY_CTRL,
-+		     GMAC_RXCLK_DELAY_VAL(dwmac->rx_delay));
-+	regmap_write(dwmac->apb_regmap, GMAC_TXCLK_DELAY_CTRL,
-+		     GMAC_TXCLK_DELAY_VAL(dwmac->tx_delay));
-+
-+	thead_dwmac_fix_speed(dwmac, SPEED_1000, 0);
-+
-+	return thead_dwmac_enable_clk(plat);
-+}
-+
-+static int thead_dwmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat;
-+	struct stmmac_resources stmmac_res;
-+	struct thead_dwmac *dwmac;
-+	struct device_node *np = pdev->dev.of_node;
-+	u32 delay_ps;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "failed to get resources\n");
-+
-+	plat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(plat),
-+				     "dt configuration failed\n");
-+
-+	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
-+	if (!dwmac)
-+		return -ENOMEM;
-+
-+	dwmac->clk_axi = devm_clk_get_enabled(&pdev->dev, "axi");
-+	if (IS_ERR(dwmac->clk_axi))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(dwmac->clk_axi),
-+				     "error getting axi clock\n");
-+
-+	if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay_ps))
-+		dwmac->rx_delay = delay_ps;
-+	if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay_ps))
-+		dwmac->tx_delay = delay_ps;
-+
-+	dwmac->apb_regmap = syscon_regmap_lookup_by_phandle(np, "thead,gmacapb");
-+	if (IS_ERR(dwmac->apb_regmap)) {
-+		dev_err(&pdev->dev, "Failed to get gmac apb syscon\n");
-+		return PTR_ERR(dwmac->apb_regmap);
-+	}
-+
-+	dwmac->dev = &pdev->dev;
-+	dwmac->plat = plat;
-+	plat->bsp_priv = dwmac;
-+	plat->fix_mac_speed = thead_dwmac_fix_speed;
-+
-+	ret = thead_dwmac_init(pdev, plat);
-+	if (ret)
-+		goto err_dvr_probe;
-+
-+	ret = stmmac_dvr_probe(&pdev->dev, plat, &stmmac_res);
-+	if (ret)
-+		goto err_dvr_probe;
-+
-+	return 0;
-+
-+err_dvr_probe:
-+	stmmac_remove_config_dt(pdev, plat);
-+
-+	return ret;
-+}
-+
-+static const struct of_device_id thead_dwmac_match[] = {
-+	{ .compatible = "thead,th1520-dwmac" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, thead_dwmac_match);
-+
-+static struct platform_driver thead_dwmac_driver = {
-+	.probe = thead_dwmac_probe,
-+	.remove_new = stmmac_pltfr_remove,
-+	.driver = {
-+		.name = "thead-dwmac",
-+		.pm = &stmmac_pltfr_pm_ops,
-+		.of_match_table = thead_dwmac_match,
-+	},
-+};
-+module_platform_driver(thead_dwmac_driver);
-+
-+MODULE_AUTHOR("T-HEAD");
-+MODULE_AUTHOR("Jisheng Zhang <jszhang@kernel.org>");
-+MODULE_DESCRIPTION("T-HEAD dwmac platform driver");
-+MODULE_LICENSE("GPL");
--- 
-2.40.1
+thanks for your efforts in adding a mechanism to share code.
+It's a great step in the right direction.
 
+Perhaps I am on the wrong track here, but it seems to me that the approach
+you have taken, which is to move the definitions of the symbols into a
+header file, is, perhaps, not the best. For one thing it will end up with
+duplicate definitions of the symbols - one for each object in which they
+are included.
+
+For another, and this more a symtom than an actual problem,
+a (W=1) build now complains about symbols that are defined but not used.
+
+./include/linux/ethtool.h:1190:18: warning: 'ethtool_forced_speed_800000' defined but not used [-Wunused-const-variable=]  1190 | static const u32 ethtool_forced_speed_800000[] __initconst = {
+...
+
+I suspect a better approach is to leave the symbol definitions in
+a .c file, one that is linked in such a way that it is available
+to code that uses it - be it modules or built-in. And to make
+declarations of those symbols available via a header file.
 
