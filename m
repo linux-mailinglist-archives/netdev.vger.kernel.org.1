@@ -1,127 +1,121 @@
-Return-Path: <netdev+bounces-29188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77948781FA2
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 21:52:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60178781FAC
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 22:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AF1C280F7F
-	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 19:52:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C8CA1C20899
+	for <lists+netdev@lfdr.de>; Sun, 20 Aug 2023 20:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD416FBA;
-	Sun, 20 Aug 2023 19:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA226FC5;
+	Sun, 20 Aug 2023 20:12:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACD37E6
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 19:52:39 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7895210DD;
-	Sun, 20 Aug 2023 12:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=n6Nriy9y1QGK+aN6W7CXzj6VGKuJeaOqJSwIfNghFso=; b=ekRsQSuj716j10CXNiOb2CSmYq
-	DRxAAxejcpIDPyiIUB5CsBHPqb/6wBnL1tarMzs95y8x0eCFqm4UKYlmvbTORt7HAEhKUdLz937bc
-	w0SdeGRVuIpRldKcTQm5ml9s2EZtuHphBupIttx2tjbXyXRUv9ONZds/IUGSdMo8IlR/D/FiZH8XH
-	WsLiGbh5a/nTlsE4AbaLXHqFfpJwc12ZkkztSnjKyuuTX62BLvKNz0oDpG1q36ayB9ZKEwgsya3x+
-	Xvx5o2YdzxJUZb1dbYmFyvDBZOjewxtVebysjmZLM78rEq1CSgSI+rMavH9lv9l7g60agO0anFlUc
-	M7TMv9uQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33380)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qXoSe-0007mx-1P;
-	Sun, 20 Aug 2023 20:51:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qXoSb-00041h-Fa; Sun, 20 Aug 2023 20:51:41 +0100
-Date: Sun, 20 Aug 2023 20:51:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jisheng Zhang <jszhang@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v4 2/9] net: stmmac: xgmac: add more feature
- parsing from hw cap
-Message-ID: <ZOJuzakni1youMtX@shell.armlinux.org.uk>
-References: <20230816152926.4093-1-jszhang@kernel.org>
- <20230816152926.4093-3-jszhang@kernel.org>
- <9e55fd03-6b05-46de-874e-01d9cdbf4524@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCE27E6
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 20:12:48 +0000 (UTC)
+Received: from authsmtp.register.it (authsmtp24.register.it [81.88.48.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE73D10EB
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 13:07:46 -0700 (PDT)
+Received: from [192.168.1.243] ([213.230.62.249])
+	by cmsmtp with ESMTPSA
+	id Xoi5q5eKUODRcXoi5qZaNg; Sun, 20 Aug 2023 22:07:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schroetersa.ch;
+	s=key_mmumrc8kf9; t=1692562062;
+	bh=JPS9pi3pKZ4eP300PosgCdMwv63ZQ5aOWWW7Obq4CJQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=TxgYbh3e/RcDYl5Yuq1iw8sbS7k6ne5AbRYeeMKi4w7D72yepWu8vVlCET5YoIATh
+	 0cURcV4SDJm4PWthA+qZCuvvy/xeqYhesL1ASrYRor5rYKRFIoAKovUzReDycf02O4
+	 wSc5vTkqBmMXHAKP2o5VFOw4qyMVlgWZrHEwn8oWuQ3aqMUOTs8JTqCKjIlfsBFM2m
+	 sngiNa1q0+KEXRNqxdLDHHTwb4iFzuSVhroVlUJ+v7tTJSNmx2Fa9jNeW42FDZE+Nn
+	 h7SM+aZzuHM/9GQDe9orb54yLkO/GU/dgY0FvTC2+mZy4BcOlTGVI3eQNCFDkma3xk
+	 fI1AllyMWGQqA==
+X-Rid: mathieu@schroetersa.ch@213.230.62.249
+Message-ID: <ca7f140f-1717-456f-0385-c3d2ff71f95c@schroetersa.ch>
+Date: Sun, 20 Aug 2023 22:07:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e55fd03-6b05-46de-874e-01d9cdbf4524@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH iproute2-next] utils: fix get_integer() logic
+To: Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, dsahern@gmail.com
+References: <20230819205448.428253-1-pctammela@mojatatu.com>
+Content-Language: en-US
+From: Mathieu Schroeter <mathieu@schroetersa.ch>
+In-Reply-To: <20230819205448.428253-1-pctammela@mojatatu.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------X0hev60z16KuIg1KAlmsUti9"
+X-CMAE-Envelope: MS4xfPcXJkffhBL5kzXL+MevBalGsO/wzloE6dSxL04Y4uM7WSdzkdgzc4D4OP4O3h75fjYkLos1QQmT4CI+B5gcU6JxFZ7XaD2LNc8FQ8F7xrn0Z0M2I0I6
+ 57E6K9MHznWaDpkCGZC4rpaBDiggkwSzi6fDVHLj2nHWX+Oh0FQoL+an7Mo3THP5v2Ck//1/eZ5QnnHuyd0dLp8a06vpw39lN28tLMJX9BGwt/Pk4I4TqQlw
+ hLvaeDg2qxn9BP6M3tXBNcNHj30pC7RUTeY7q4x1WdYTdM9zQyxy62T4qkz5oI+naFI7+w58VUHj2+yfCrdYXw==
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 20, 2023 at 09:15:06PM +0200, Andrew Lunn wrote:
-> On Wed, Aug 16, 2023 at 11:29:19PM +0800, Jisheng Zhang wrote:
-> > The XGMAC_HWFEAT_GMIISEL bit also indicates whether support 10/100Mbps
-> > or not.
-> 
-> The commit message fails to explain the 'Why?' question. GMII does
-> normally imply 10/100/1000, so i would expect dma_cap->mbps_1000 also
-> implies 10/100/1000? So why also set dma_cap->mbps_10_100?
-> 
-> Maybe a better change would be to modify:
-> 
->         seq_printf(seq, "\t1000 Mbps: %s\n",
->                    (priv->dma_cap.mbps_1000) ? "Y" : "N");
-> 
-> to actually say 10/100/1000 Mbps? It does not appear this is used for
-> anything other than debugfs?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------X0hev60z16KuIg1KAlmsUti9
+Content-Type: multipart/mixed; boundary="------------e0hLC8iKNnEjBnKpDKqsozxN";
+ protected-headers="v1"
+From: Mathieu Schroeter <mathieu@schroetersa.ch>
+To: Pedro Tammela <pctammela@mojatatu.com>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, dsahern@gmail.com
+Message-ID: <ca7f140f-1717-456f-0385-c3d2ff71f95c@schroetersa.ch>
+Subject: Re: [PATCH iproute2-next] utils: fix get_integer() logic
+References: <20230819205448.428253-1-pctammela@mojatatu.com>
+In-Reply-To: <20230819205448.428253-1-pctammela@mojatatu.com>
 
-Indeed, it also looks to me like mbps_1000 and mbps_10_100 are only
-used to print things in the debugfs file, and do not have any effect
-on the driver.
+--------------e0hLC8iKNnEjBnKpDKqsozxN
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Moreover:
+TGUgMTkuMDguMjMgw6AgMjI6NTQsIFBlZHJvIFRhbW1lbGEgYSDDqWNyaXTCoDoNCj4gQWZ0
+ZXIgM2E0NjNjMTUsIGdldF9pbnRlZ2VyKCkgZG9lc24ndCByZXR1cm4gdGhlIGNvbnZlcnRl
+ZCB2YWx1ZSBhbmQNCj4gYWx3YXlzIHdyaXRlcyAwIGluICd2YWwnIGluIGNhc2Ugb2Ygc3Vj
+Y2Vzcy4NCj4gRml4IHRoZSBsb2dpYyBzbyBpdCB3cml0ZXMgdGhlIGNvbnZlcnRlZCB2YWx1
+ZSBpbiAndmFsJy4NCj4NCj4gRml4ZXM6IDNhNDYzYzE1ICgiQWRkIGdldF9sb25nIHV0aWxp
+dHkgYW5kIGFkYXB0IGdldF9pbnRlZ2VyIGFjY29yZGluZ2x5Ig0KPiBTaWduZWQtb2ZmLWJ5
+OiBQZWRybyBUYW1tZWxhIDxwY3RhbW1lbGFAbW9qYXRhdHUuY29tPg0KPiAtLS0NCj4gICBs
+aWIvdXRpbHMuYyB8IDMgKystDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygr
+KSwgMSBkZWxldGlvbigtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvbGliL3V0aWxzLmMgYi9saWIv
+dXRpbHMuYw0KPiBpbmRleCBlZmEwMTY2OC4uOTliYTdhMjMgMTAwNjQ0DQo+IC0tLSBhL2xp
+Yi91dGlscy5jDQo+ICsrKyBiL2xpYi91dGlscy5jDQo+IEBAIC0xNDIsNyArMTQyLDggQEAg
+aW50IGdldF9pbnRlZ2VyKGludCAqdmFsLCBjb25zdCBjaGFyICphcmcsIGludCBiYXNlKQ0K
+PiAgIHsNCj4gICAJbG9uZyByZXM7DQo+ICAgDQo+IC0JcmVzID0gZ2V0X2xvbmcoTlVMTCwg
+YXJnLCBiYXNlKTsNCj4gKwlpZiAoZ2V0X2xvbmcoJnJlcywgYXJnLCBiYXNlKSA8IDApDQo+
+ICsJCXJldHVybiAtMTsNCj4gICANCj4gICAJLyogT3V0c2lkZSByYW5nZSBvZiBpbnQgKi8N
+Cj4gICAJaWYgKHJlcyA8IElOVF9NSU4gfHwgcmVzID4gSU5UX01BWCkNCg0KbXkgYmFkDQoN
+ClRoYW5rIHlvdSAhDQoNCg==
 
-drivers/net/ethernet/stmicro/stmmac/dwmac4.h:#define GMAC_HW_FEAT_GMIISEL      BIT(1)
-drivers/net/ethernet/stmicro/stmmac/common.h:#define DMA_HW_FEAT_GMIISEL       0x00000002       /* 1000 Mbps Support */
-drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h:#define XGMAC_HWFEAT_GMIISEL    BIT(1)
+--------------e0hLC8iKNnEjBnKpDKqsozxN--
 
-Seems to be all the same bit, and:
+--------------X0hev60z16KuIg1KAlmsUti9
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
-drivers/net/ethernet/stmicro/stmmac/dwmac4.h:#define GMAC_HW_FEAT_MIISEL       BIT(0)
-drivers/net/ethernet/stmicro/stmmac/common.h:#define DMA_HW_FEAT_MIISEL 0x00000001      /* 10/100 Mbps Support */
+-----BEGIN PGP SIGNATURE-----
 
-So, if everyone defines the first few bits of the hw_cap identically,
-is there any point to decoding this separately in each driver? Couldn't
-the debugfs "show" function just parse the hw_cap directly? Wouldn't it
-make more sense to print MII / GMII rather than 10/100 and 1000 ?
+wsB5BAABCAAjFiEEPxpdP3aajPAoLxrbi5FFpfqdqKgFAmTicowFAwAAAAAACgkQi5FFpfqdqKh9
+Rwf+NfJNg7GpPcz6mfeaF7D25E/bwXuuD8v598B+mhuDm1eYtmIuhwP2X7lqBDJOda1/SyA+91ik
+gAoP50JX2KmvGVUNk1RGukAP/9NP3E34f/moAAvyy2VdSmln6pz88giAU8bSHu41ye/NzzlfFn0j
+W8pnlG2vL/jhjDijN1tna36v2aqL6fSAc8b06Y9OxNuZu8bt9Un0VnGl6IQSdiDGDUKewZ1laK0s
+odSH+o7sNMBFe2i8969Uw9OezJ0Bfg5sgrDXKDxvM1GqywQIwDRqYAg2/OrSdrIrweqRgFZUURZh
+RuDKVSkn1UzPWYykb/Hki7uxqlHP93Cgj4+sST8Fbg==
+=P/sO
+-----END PGP SIGNATURE-----
 
-It does bring up one last question though: if the driver makes no use
-of these hw_cap bits, then is there any point in printing them in the
-debugfs file?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--------------X0hev60z16KuIg1KAlmsUti9--
 
