@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-29206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679E578219D
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 04:41:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A604778219C
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 04:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EFA71C20818
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 02:41:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63790280DC6
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 02:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCC41C37;
-	Mon, 21 Aug 2023 02:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F7BEA1;
+	Mon, 21 Aug 2023 02:39:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F111C08
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 02:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189691C08
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 02:39:20 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E2AA0
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 19:39:19 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5D5B9C
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 19:39:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692585559; x=1724121559;
+  t=1692585558; x=1724121558;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=18hYRxldcX2Fw4CBFYb6CDcJqBdohZbuC7X7e4X6rqo=;
-  b=ddL/ElhYvFPBoXeJb9j7fBWOpRZYF+jyC4BxnarGBulHkhQHPZGNcjzZ
-   +jIcFr6QRw8heFbZpSDksSzOOG+pLdaShnzvqUP1WFUPxipo7NLC59WDd
-   4/0yJT4aXsvRAdkxmamfIiaNGiKpSyueRnTBuEcBaATLPMM4ivE8ID6KC
-   Nxkm9k55yHJ6sXf7nMEmzPcOBtlVucAeBmhMh6OFRWVV2Fw8gr7HjcXAq
-   WrO+Cf/rXHx2qbBRtethQYuxbxLv7lcBPcYkZOZuGmHe98wJ5ePcBwZ8w
-   MCGS49KLSvi9Nw5IgddEn9xRDo3JaAWDytMEK9CgF8yuZLZPsk4Xc+u/u
+  bh=cnR099NOF4O6zQNwMan3G0/kN7ZEMBNqP53WzEa1UD0=;
+  b=bFtOkNriS9x9WhS7ssor13wbFrHcNzJ4nMW0ZvmJZJhpbNgCyMEhssS+
+   HXu/T+mP6BWEsW0gSbCnQgyS8U6YW57zC4shp7mEaWEfEXN6F7jqVq48D
+   cxcEQTd7viTY020lYNH8uYL0hl2cGOekz1gXIE8q3KVYTOql9UPosSssn
+   NjjCFIEOp5CaOMUNABYEmPaqmCqP2NEqSSzfAceFXtRKUlKCSzFAy7PC6
+   3TYsN/A9alss5zUg8WRuxxd5Qw/Lege4YgkDsOhgltoZbW3bY2qD2oGin
+   DkU2J9llc/inPB7q7LxVQQK8aG0dvFH1HMSPKQwPcFl0v1WAxgVGsQNnz
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="377216736"
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="377216733"
 X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="377216736"
+   d="scan'208";a="377216733"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2023 19:39:18 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="982326639"
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="982326648"
 X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="982326639"
+   d="scan'208";a="982326648"
 Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
-  by fmsmga006.fm.intel.com with ESMTP; 20 Aug 2023 19:39:10 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 20 Aug 2023 19:39:14 -0700
 From: Junfeng Guo <junfeng.guo@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	ivecera@redhat.com,
 	sridhar.samudrala@intel.com,
 	Junfeng Guo <junfeng.guo@intel.com>
-Subject: [PATCH iwl-next v5 07/15] ice: init marker and protocol group tables for parser
-Date: Mon, 21 Aug 2023 10:38:25 +0800
-Message-Id: <20230821023833.2700902-8-junfeng.guo@intel.com>
+Subject: [PATCH iwl-next v5 08/15] ice: init flag redirect table for parser
+Date: Mon, 21 Aug 2023 10:38:26 +0800
+Message-Id: <20230821023833.2700902-9-junfeng.guo@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230821023833.2700902-1-junfeng.guo@intel.com>
 References: <20230605054641.2865142-1-junfeng.guo@intel.com>
@@ -75,31 +75,38 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Parse DDP section ICE_SID_RXPARSER_MARKER_GRP into an array of
-ice_mk_grp_item.
-Parse DDP section ICE_SID_RXPARSER_PROTO_GRP into an array of
-ice_proto_grp_item.
+Parse DDP section ICE_SID_RXPARSER_FLAG_REDIR into an array of
+ice_flag_rd_item.
 
 Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_mk_grp.c   | 51 +++++++++++
- drivers/net/ethernet/intel/ice/ice_mk_grp.h   | 17 ++++
- drivers/net/ethernet/intel/ice/ice_parser.c   | 20 +++++
- drivers/net/ethernet/intel/ice/ice_parser.h   |  8 ++
- .../net/ethernet/intel/ice/ice_proto_grp.c    | 90 +++++++++++++++++++
- .../net/ethernet/intel/ice/ice_proto_grp.h    | 31 +++++++
- 6 files changed, 217 insertions(+)
- create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.h
+ drivers/net/ethernet/intel/ice/ice_ddp.h    |  1 +
+ drivers/net/ethernet/intel/ice/ice_flg_rd.c | 50 +++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_flg_rd.h | 23 ++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.c | 10 +++++
+ drivers/net/ethernet/intel/ice/ice_parser.h |  4 ++
+ 5 files changed, 88 insertions(+)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.h
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_mk_grp.c b/drivers/net/ethernet/intel/ice/ice_mk_grp.c
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.h b/drivers/net/ethernet/intel/ice/ice_ddp.h
+index da5dfeed3b1f..45beed8b4415 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.h
+@@ -261,6 +261,7 @@ struct ice_meta_sect {
+ #define ICE_SID_CDID_KEY_BUILDER_PE 87
+ #define ICE_SID_CDID_REDIR_PE 88
+ 
++#define ICE_SID_RXPARSER_FLAG_REDIR	97
+ /* Label Metadata section IDs */
+ #define ICE_SID_LBL_FIRST 0x80000010
+ #define ICE_SID_LBL_RXPARSER_TMEM 0x80000018
+diff --git a/drivers/net/ethernet/intel/ice/ice_flg_rd.c b/drivers/net/ethernet/intel/ice/ice_flg_rd.c
 new file mode 100644
-index 000000000000..395e43343165
+index 000000000000..9d5d66d0c773
 --- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_mk_grp.c
-@@ -0,0 +1,51 @@
++++ b/drivers/net/ethernet/intel/ice/ice_flg_rd.c
+@@ -0,0 +1,50 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Copyright (C) 2023 Intel Corporation */
 +
@@ -107,102 +114,98 @@ index 000000000000..395e43343165
 +#include "ice_parser_util.h"
 +
 +/**
-+ * ice_mk_grp_dump - dump an marker group item info
++ * ice_flg_rd_dump - dump a flag redirect item info
 + * @hw: pointer to the hardware structure
-+ * @item: marker group item to dump
++ * @item: flag redirect item to dump
 + */
-+void ice_mk_grp_dump(struct ice_hw *hw, struct ice_mk_grp_item *item)
++void ice_flg_rd_dump(struct ice_hw *hw, struct ice_flg_rd_item *item)
 +{
-+	int i;
-+
 +	dev_info(ice_hw_to_dev(hw), "index = %d\n", item->idx);
-+	dev_info(ice_hw_to_dev(hw), "markers: ");
-+	for (i = 0; i < ICE_MK_COUNT_PER_GRP; i++)
-+		dev_info(ice_hw_to_dev(hw), "%d ", item->markers[i]);
-+	dev_info(ice_hw_to_dev(hw), "\n");
++	dev_info(ice_hw_to_dev(hw), "expose = %d\n", item->expose);
++	dev_info(ice_hw_to_dev(hw), "intr_flg_id = %d\n", item->intr_flg_id);
 +}
 +
-+static void _ice_mk_grp_parse_item(struct ice_hw *hw, u16 idx, void *item,
++/** The function parses a 8 bits Flag Redirect Table entry with below format:
++ *  BIT 0:	Expose			(rdi->expose)
++ *  BIT 1-6:	Internal Flag ID	(rdi->intr_flg_id)
++ *  BIT 7:	reserved
++ */
++static void _ice_flg_rd_parse_item(struct ice_hw *hw, u16 idx, void *item,
 +				   void *data, int size)
 +{
-+	struct ice_mk_grp_item *grp = item;
-+	u8 *buf = data;
-+	int i;
++	struct ice_flg_rd_item *rdi = item;
++	u8 d8 = *(u8 *)data;
 +
-+	grp->idx = idx;
-+
-+	for (i = 0; i < ICE_MK_COUNT_PER_GRP; i++)
-+		grp->markers[i] = buf[i];
++	rdi->idx		= idx;
++	rdi->expose		= !!(d8 & ICE_RDI_EXP_M);
++	rdi->intr_flg_id	= (u8)((d8 >> ICE_RDI_IFD_S) & ICE_RDI_IFD_M);
 +
 +	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_mk_grp_dump(hw, grp);
++		ice_flg_rd_dump(hw, rdi);
 +}
 +
 +/**
-+ * ice_mk_grp_table_get - create a marker group table
++ * ice_flg_rd_table_get - create a flag redirect table
 + * @hw: pointer to the hardware structure
 + */
-+struct ice_mk_grp_item *ice_mk_grp_table_get(struct ice_hw *hw)
++struct ice_flg_rd_item *ice_flg_rd_table_get(struct ice_hw *hw)
 +{
-+	return (struct ice_mk_grp_item *)
-+		ice_parser_create_table(hw, ICE_SID_RXPARSER_MARKER_GRP,
-+					sizeof(struct ice_mk_grp_item),
-+					ICE_MK_GRP_TABLE_SIZE,
++	return (struct ice_flg_rd_item *)
++		ice_parser_create_table(hw, ICE_SID_RXPARSER_FLAG_REDIR,
++					sizeof(struct ice_flg_rd_item),
++					ICE_FLG_RD_TABLE_SIZE,
 +					ice_parser_sect_item_get,
-+					_ice_mk_grp_parse_item, false);
++					_ice_flg_rd_parse_item, false);
 +}
-diff --git a/drivers/net/ethernet/intel/ice/ice_mk_grp.h b/drivers/net/ethernet/intel/ice/ice_mk_grp.h
+diff --git a/drivers/net/ethernet/intel/ice/ice_flg_rd.h b/drivers/net/ethernet/intel/ice/ice_flg_rd.h
 new file mode 100644
-index 000000000000..c5c8734b9d3e
+index 000000000000..b3b4fd7a9002
 --- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_mk_grp.h
-@@ -0,0 +1,17 @@
++++ b/drivers/net/ethernet/intel/ice/ice_flg_rd.h
+@@ -0,0 +1,23 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/* Copyright (C) 2023 Intel Corporation */
 +
-+#ifndef _ICE_MK_GRP_H_
-+#define _ICE_MK_GRP_H_
++#ifndef _ICE_FLG_RD_H_
++#define _ICE_FLG_RD_H_
 +
-+#define ICE_MK_GRP_TABLE_SIZE	128
-+#define ICE_MK_COUNT_PER_GRP	8
++#define ICE_FLG_RD_TABLE_SIZE	64
++#define ICE_FLG_RDT_SIZE	64
 +
-+struct ice_mk_grp_item {
-+	int idx;
-+	u8 markers[ICE_MK_COUNT_PER_GRP];
++#define ICE_RDI_EXP_S		0
++#define ICE_RDI_EXP_M		BITMAP_MASK(1)
++#define ICE_RDI_IFD_S		1
++#define ICE_RDI_IFD_M		BITMAP_MASK(6)
++
++struct ice_flg_rd_item {
++	u16 idx;
++	bool expose;
++	u8 intr_flg_id;
 +};
 +
-+void ice_mk_grp_dump(struct ice_hw *hw, struct ice_mk_grp_item *item);
-+struct ice_mk_grp_item *ice_mk_grp_table_get(struct ice_hw *hw);
-+#endif /* _ICE_MK_GRP_H_ */
++void ice_flg_rd_dump(struct ice_hw *hw, struct ice_flg_rd_item *item);
++struct ice_flg_rd_item *ice_flg_rd_table_get(struct ice_hw *hw);
++#endif /* _ICE_FLG_RD_H_ */
 diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
-index 787af0498bdc..a47b21bb104c 100644
+index a47b21bb104c..2b3c4b44d1f2 100644
 --- a/drivers/net/ethernet/intel/ice/ice_parser.c
 +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
-@@ -62,6 +62,12 @@ void *ice_parser_sect_item_get(u32 sect_type, void *section,
- 	case ICE_SID_RXPARSER_MARKER_PTYPE:
- 		size = ICE_SID_RXPARSER_MARKER_TYPE_ENTRY_SIZE;
+@@ -68,6 +68,9 @@ void *ice_parser_sect_item_get(u32 sect_type, void *section,
+ 	case ICE_SID_RXPARSER_PROTO_GRP:
+ 		size = ICE_SID_RXPARSER_PROTO_GRP_ENTRY_SIZE;
  		break;
-+	case ICE_SID_RXPARSER_MARKER_GRP:
-+		size = ICE_SID_RXPARSER_MARKER_GRP_ENTRY_SIZE;
-+		break;
-+	case ICE_SID_RXPARSER_PROTO_GRP:
-+		size = ICE_SID_RXPARSER_PROTO_GRP_ENTRY_SIZE;
++	case ICE_SID_RXPARSER_FLAG_REDIR:
++		size = ICE_SID_RXPARSER_FLAG_REDIR_ENTRY_SIZE;
 +		break;
  	default:
  		return NULL;
  	}
-@@ -203,6 +209,18 @@ int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr)
+@@ -221,6 +224,12 @@ int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr)
  		goto err;
  	}
  
-+	p->mk_grp_table = ice_mk_grp_table_get(hw);
-+	if (!p->mk_grp_table) {
-+		status = -EINVAL;
-+		goto err;
-+	}
-+
-+	p->proto_grp_table = ice_proto_grp_table_get(hw);
-+	if (!p->proto_grp_table) {
++	p->flg_rd_table = ice_flg_rd_table_get(hw);
++	if (!p->flg_rd_table) {
 +		status = -EINVAL;
 +		goto err;
 +	}
@@ -210,181 +213,43 @@ index 787af0498bdc..a47b21bb104c 100644
  	*psr = p;
  	return 0;
  err:
-@@ -225,6 +243,8 @@ void ice_parser_destroy(struct ice_parser *psr)
- 	devm_kfree(ice_hw_to_dev(psr->hw), psr->bst_tcam_table);
- 	devm_kfree(ice_hw_to_dev(psr->hw), psr->bst_lbl_table);
+@@ -245,6 +254,7 @@ void ice_parser_destroy(struct ice_parser *psr)
  	devm_kfree(ice_hw_to_dev(psr->hw), psr->ptype_mk_tcam_table);
-+	devm_kfree(ice_hw_to_dev(psr->hw), psr->mk_grp_table);
-+	devm_kfree(ice_hw_to_dev(psr->hw), psr->proto_grp_table);
+ 	devm_kfree(ice_hw_to_dev(psr->hw), psr->mk_grp_table);
+ 	devm_kfree(ice_hw_to_dev(psr->hw), psr->proto_grp_table);
++	devm_kfree(ice_hw_to_dev(psr->hw), psr->flg_rd_table);
  
  	devm_kfree(ice_hw_to_dev(psr->hw), psr);
  }
 diff --git a/drivers/net/ethernet/intel/ice/ice_parser.h b/drivers/net/ethernet/intel/ice/ice_parser.h
-index c0ac4b2a9a6e..4038833450f2 100644
+index 4038833450f2..62123788e0a2 100644
 --- a/drivers/net/ethernet/intel/ice/ice_parser.h
 +++ b/drivers/net/ethernet/intel/ice/ice_parser.h
-@@ -9,6 +9,8 @@
- #include "ice_pg_cam.h"
- #include "ice_bst_tcam.h"
+@@ -11,6 +11,7 @@
  #include "ice_ptype_mk.h"
-+#include "ice_mk_grp.h"
-+#include "ice_proto_grp.h"
+ #include "ice_mk_grp.h"
+ #include "ice_proto_grp.h"
++#include "ice_flg_rd.h"
  
  #define ICE_SEC_DATA_OFFSET				4
  #define ICE_SID_RXPARSER_IMEM_ENTRY_SIZE		48
-@@ -19,6 +21,8 @@
- #define ICE_SID_RXPARSER_NOMATCH_SPILL_ENTRY_SIZE	13
- #define ICE_SID_RXPARSER_BOOST_TCAM_ENTRY_SIZE		88
+@@ -23,6 +24,7 @@
  #define ICE_SID_RXPARSER_MARKER_TYPE_ENTRY_SIZE		24
-+#define ICE_SID_RXPARSER_MARKER_GRP_ENTRY_SIZE		8
-+#define ICE_SID_RXPARSER_PROTO_GRP_ENTRY_SIZE		24
+ #define ICE_SID_RXPARSER_MARKER_GRP_ENTRY_SIZE		8
+ #define ICE_SID_RXPARSER_PROTO_GRP_ENTRY_SIZE		24
++#define ICE_SID_RXPARSER_FLAG_REDIR_ENTRY_SIZE		1
  
  #define ICE_SEC_LBL_DATA_OFFSET				2
  #define ICE_SID_LBL_ENTRY_SIZE				66
-@@ -44,6 +48,10 @@ struct ice_parser {
- 	struct ice_lbl_item *bst_lbl_table;
- 	/* load data from section ICE_SID_RXPARSER_MARKER_PTYPE */
- 	struct ice_ptype_mk_tcam_item *ptype_mk_tcam_table;
-+	/* load data from section ICE_SID_RXPARSER_MARKER_GRP */
-+	struct ice_mk_grp_item *mk_grp_table;
-+	/* load data from section ICE_SID_RXPARSER_PROTO_GRP */
-+	struct ice_proto_grp_item *proto_grp_table;
+@@ -52,6 +54,8 @@ struct ice_parser {
+ 	struct ice_mk_grp_item *mk_grp_table;
+ 	/* load data from section ICE_SID_RXPARSER_PROTO_GRP */
+ 	struct ice_proto_grp_item *proto_grp_table;
++	/* load data from section ICE_SID_RXPARSER_FLAG_REDIR */
++	struct ice_flg_rd_item *flg_rd_table;
  };
  
  int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr);
-diff --git a/drivers/net/ethernet/intel/ice/ice_proto_grp.c b/drivers/net/ethernet/intel/ice/ice_proto_grp.c
-new file mode 100644
-index 000000000000..c53970b47029
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_proto_grp.c
-@@ -0,0 +1,90 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2023 Intel Corporation */
-+
-+#include "ice_common.h"
-+#include "ice_parser_util.h"
-+
-+static void _ice_proto_off_dump(struct ice_hw *hw, struct ice_proto_off *po,
-+				int idx)
-+{
-+	dev_info(ice_hw_to_dev(hw), "proto %d\n", idx);
-+	dev_info(ice_hw_to_dev(hw), "\tpolarity = %d\n", po->polarity);
-+	dev_info(ice_hw_to_dev(hw), "\tproto_id = %d\n", po->proto_id);
-+	dev_info(ice_hw_to_dev(hw), "\toffset = %d\n", po->offset);
-+}
-+
-+/**
-+ * ice_proto_grp_dump - dump a proto group item info
-+ * @hw: pointer to the hardware structure
-+ * @item: proto group item to dump
-+ */
-+void ice_proto_grp_dump(struct ice_hw *hw, struct ice_proto_grp_item *item)
-+{
-+	int i;
-+
-+	dev_info(ice_hw_to_dev(hw), "index = %d\n", item->idx);
-+
-+	for (i = 0; i < ICE_PROTO_COUNT_PER_GRP; i++)
-+		_ice_proto_off_dump(hw, &item->po[i], i);
-+}
-+
-+/** The function parses a 22 bits Protocol entry with below format:
-+ *  BIT 0:	Polarity of Protocol Offset	(po->polarity)
-+ *  BIT 1-8:	Protocol ID			(po->proto_id)
-+ *  BIT 9-11:	reserved
-+ *  BIT 12-21:	Protocol Offset			(po->offset)
-+ */
-+static void _ice_proto_off_parse(struct ice_proto_off *po, u32 data)
-+{
-+	po->polarity	= !!(data & ICE_PO_POL_M);
-+	po->proto_id	= (u8)((data >> ICE_PO_PID_S) & ICE_PO_PID_M);
-+	po->offset	= (u16)((data >> ICE_PO_OFF_S) & ICE_PO_OFF_M);
-+}
-+
-+/** The function parses a 192 bits Protocol Group Table entry with below
-+ *  format:
-+ *  BIT 0-21:	Protocol 0	(grp->po[0])
-+ *  BIT 22-43:	Protocol 1	(grp->po[1])
-+ *  BIT 44-65:	Protocol 2	(grp->po[2])
-+ *  BIT 66-87:	Protocol 3	(grp->po[3])
-+ *  BIT 88-109:	Protocol 4	(grp->po[4])
-+ *  BIT 110-131:Protocol 5	(grp->po[5])
-+ *  BIT 132-153:Protocol 6	(grp->po[6])
-+ *  BIT 154-175:Protocol 7	(grp->po[7])
-+ *  BIT 176-191:reserved
-+ */
-+static void _ice_proto_grp_parse_item(struct ice_hw *hw, u16 idx, void *item,
-+				      void *data, int size)
-+{
-+	struct ice_proto_grp_item *grp = item;
-+	u8 *buf = (u8 *)data;
-+	u8 idd, off;
-+	u32 d32;
-+	int i;
-+
-+	grp->idx = idx;
-+
-+	for (i = 0; i < ICE_PROTO_COUNT_PER_GRP; i++) {
-+		idd = (ICE_PROTO_GRP_ITEM_SIZE * i) / BITS_PER_BYTE;
-+		off = (ICE_PROTO_GRP_ITEM_SIZE * i) % BITS_PER_BYTE;
-+		d32 = *((u32 *)&buf[idd]) >> off;
-+		_ice_proto_off_parse(&grp->po[i], d32);
-+	}
-+
-+	if (hw->debug_mask & ICE_DBG_PARSER)
-+		ice_proto_grp_dump(hw, grp);
-+}
-+
-+/**
-+ * ice_proto_grp_table_get - create a proto group table
-+ * @hw: pointer to the hardware structure
-+ */
-+struct ice_proto_grp_item *ice_proto_grp_table_get(struct ice_hw *hw)
-+{
-+	return (struct ice_proto_grp_item *)
-+		ice_parser_create_table(hw, ICE_SID_RXPARSER_PROTO_GRP,
-+					sizeof(struct ice_proto_grp_item),
-+					ICE_PROTO_GRP_TABLE_SIZE,
-+					ice_parser_sect_item_get,
-+					_ice_proto_grp_parse_item, false);
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_proto_grp.h b/drivers/net/ethernet/intel/ice/ice_proto_grp.h
-new file mode 100644
-index 000000000000..6e2b39151a92
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_proto_grp.h
-@@ -0,0 +1,31 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2023 Intel Corporation */
-+
-+#ifndef _ICE_PROTO_GRP_H_
-+#define _ICE_PROTO_GRP_H_
-+
-+#define ICE_PROTO_COUNT_PER_GRP		8
-+#define ICE_PROTO_GRP_TABLE_SIZE	192
-+#define ICE_PROTO_GRP_ITEM_SIZE		22
-+
-+#define ICE_PO_POL_S	0
-+#define ICE_PO_POL_M	BITMAP_MASK(1)
-+#define ICE_PO_PID_S	1
-+#define ICE_PO_PID_M	BITMAP_MASK(8)
-+#define ICE_PO_OFF_S	12
-+#define ICE_PO_OFF_M	BITMAP_MASK(10)
-+
-+struct ice_proto_off {
-+	bool polarity; /* true: positive, false: nagtive */
-+	u8 proto_id;
-+	u16 offset;
-+};
-+
-+struct ice_proto_grp_item {
-+	u16 idx;
-+	struct ice_proto_off po[ICE_PROTO_COUNT_PER_GRP];
-+};
-+
-+void ice_proto_grp_dump(struct ice_hw *hw, struct ice_proto_grp_item *item);
-+struct ice_proto_grp_item *ice_proto_grp_table_get(struct ice_hw *hw);
-+#endif /* _ICE_PROTO_GRP_H_ */
 -- 
 2.25.1
 
