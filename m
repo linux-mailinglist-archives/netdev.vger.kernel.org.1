@@ -1,133 +1,114 @@
-Return-Path: <netdev+bounces-29192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C79C782103
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 03:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0874B782108
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 03:14:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FDDF1C2081D
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 01:06:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA9E51C20371
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 01:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBAE637;
-	Mon, 21 Aug 2023 01:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E58264B;
+	Mon, 21 Aug 2023 01:14:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1142627
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:06:40 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A6399;
-	Sun, 20 Aug 2023 18:06:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1692579996;
-	bh=U+DoApGrhEYg9skyatke/aQbjC6SuS7jT2aVsr2aNFM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=cnwZ4QkQrq52IGnD4GkcoBLXy/aJp+DGfSlUvnW4mE06SB/VL+aGF70EkPekzScbU
-	 mzW/j2yAHPhjocCBkdcBEduOxibdhWeudkUiNbmza+IjGOkD4ZiV/2dc+dpC1BplpB
-	 CpLcRyZtA6h8zc+R0jYg2JEFwuZfJ+2QJ+FiGUlwBxum2eJI6LoHQ28aOfgATq+tUt
-	 W0wAyaDhA6PeCnHYfm2DN1OQpmUgVQYG8hxlyPcazJc3A0oDoCMv01cdG0nzr2R9B7
-	 qJDYX9V9ih/d9Lx7Y8Km3YGra74vOaI+L+BoayvwFxgG41QYRHrIy/JTibcLKKOpfw
-	 v4Y85jR253zAw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RTZ7H66zcz4wZn;
-	Mon, 21 Aug 2023 11:06:35 +1000 (AEST)
-Date: Mon, 21 Aug 2023 11:06:33 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20230821110633.432a1599@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F98627
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:14:21 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3972DA0
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 18:14:20 -0700 (PDT)
+Received: from dggpeml500003.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RTZGV702TzrSDD;
+	Mon, 21 Aug 2023 09:12:50 +0800 (CST)
+Received: from huawei.com (10.175.103.91) by dggpeml500003.china.huawei.com
+ (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 21 Aug
+ 2023 09:14:17 +0800
+From: Yu Liao <liaoyu15@huawei.com>
+To: <dhowells@redhat.com>, <marc.dionne@auristor.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <liaoyu15@huawei.com>, <linux-afs@lists.infradead.org>,
+	<netdev@vger.kernel.org>, <liwei391@huawei.com>
+Subject: [PATCH net-next] rxrpc: use timer_shutdown_sync() for cleanup operations
+Date: Mon, 21 Aug 2023 09:10:41 +0800
+Message-ID: <20230821011041.3186528-1-liaoyu15@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ei2v3GXqxFAT/qw0=ZB97_Q";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500003.china.huawei.com (7.185.36.200)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/ei2v3GXqxFAT/qw0=ZB97_Q
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+There was a race [1] between timer and rxrpc_exit_net() which was solved by
+calling del_timer_sync() before and after cancel_work_sync(). A better
+solution is to use timer_shutdown_sync() [2] to solve the circular
+dependency problem. The correct ordering of calls in this case is:
 
-Hi all,
+  timer_shutdown_sync(&mything->timer);
+  workqueue_destroy(&mything->workqueue);
 
-Today's linux-next merge of the net-next tree got a conflict in:
+After calling timer_shutdown_sync(), timer won't be rearmed from the
+workqueue.
 
-  include/net/inet_sock.h
+[1] https://lore.kernel.org/164984498582.2000115.4023190177137486137.stgit@warthog.procyon.org.uk
+[2] https://lore.kernel.org/r/20221123201625.314230270@linutronix.de
 
-between commit:
+Signed-off-by: Yu Liao <liaoyu15@huawei.com>
+---
+ net/rxrpc/conn_object.c | 5 ++---
+ net/rxrpc/net_ns.c      | 4 +---
+ 2 files changed, 3 insertions(+), 6 deletions(-)
 
-  f866fbc842de ("ipv4: fix data-races around inet->inet_id")
+diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
+index ac85d4644a3c..1afd677848af 100644
+--- a/net/rxrpc/conn_object.c
++++ b/net/rxrpc/conn_object.c
+@@ -317,9 +317,8 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
+ 	       !conn->channels[3].call);
+ 	ASSERT(list_empty(&conn->cache_link));
+ 
+-	del_timer_sync(&conn->timer);
+-	cancel_work_sync(&conn->processor); /* Processing may restart the timer */
+-	del_timer_sync(&conn->timer);
++	timer_shutdown_sync(&conn->timer);
++	cancel_work_sync(&conn->processor);
+ 
+ 	write_lock(&rxnet->conn_lock);
+ 	list_del_init(&conn->proc_link);
+diff --git a/net/rxrpc/net_ns.c b/net/rxrpc/net_ns.c
+index a0319c040c25..38cfbd2c7991 100644
+--- a/net/rxrpc/net_ns.c
++++ b/net/rxrpc/net_ns.c
+@@ -101,10 +101,8 @@ static __net_exit void rxrpc_exit_net(struct net *net)
+ 	struct rxrpc_net *rxnet = rxrpc_net(net);
+ 
+ 	rxnet->live = false;
+-	del_timer_sync(&rxnet->peer_keepalive_timer);
++	timer_shutdown_sync(&rxnet->peer_keepalive_timer);
+ 	cancel_work_sync(&rxnet->peer_keepalive_work);
+-	/* Remove the timer again as the worker may have restarted it. */
+-	del_timer_sync(&rxnet->peer_keepalive_timer);
+ 	rxrpc_destroy_all_calls(rxnet);
+ 	rxrpc_destroy_all_connections(rxnet);
+ 	rxrpc_destroy_all_peers(rxnet);
+-- 
+2.25.1
 
-from the net tree and commit:
-
-  c274af224269 ("inet: introduce inet->inet_flags")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc include/net/inet_sock.h
-index 491ceb7ebe5d,acbb93d7607a..000000000000
---- a/include/net/inet_sock.h
-+++ b/include/net/inet_sock.h
-@@@ -218,12 -218,12 +218,12 @@@ struct inet_sock=20
-  #define inet_dport		sk.__sk_common.skc_dport
-  #define inet_num		sk.__sk_common.skc_num
- =20
-+ 	unsigned long		inet_flags;
-  	__be32			inet_saddr;
-  	__s16			uc_ttl;
-- 	__u16			cmsg_flags;
-- 	struct ip_options_rcu __rcu	*inet_opt;
-- 	atomic_t		inet_id;
-  	__be16			inet_sport;
-++	atomic_t		inet_id;
-+ 	struct ip_options_rcu __rcu	*inet_opt;
- -	__u16			inet_id;
- =20
-  	__u8			tos;
-  	__u8			min_ttl;
-
---Sig_/ei2v3GXqxFAT/qw0=ZB97_Q
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTiuJoACgkQAVBC80lX
-0Gxzmwf6A7r8T2PfS2DmKexlBnvaqDgXR3Zr6XHwLlfGcUH9+9uzEGLU4Lcck3ZE
-Bagl8MZQrl200AtZG4ycOvvbS13ZR8S0OCHV6VbQXRkQ27I2YGJuf3Gna0BPdfgp
-7gjx90aQHE1DGB404Tc2FOXn61ErOVXUBximGaKwRlqT818N1E78XwpXrXjLe2+W
-d/AuKY8evmIuRGbZNEM/tR+M8RqtQevio8m/ZFrZfUI6MKIBt+jwZe8kp1mPWPjZ
-RoPkQvOULtQPYjf6jCt77ObtraDc+xtkeqHyMglkVl5M4+6XX8t+VML1CMbuxcO1
-k0fdUiTRnDjoHWlDhWeg7nvK8Z2WYQ==
-=t4U7
------END PGP SIGNATURE-----
-
---Sig_/ei2v3GXqxFAT/qw0=ZB97_Q--
 
