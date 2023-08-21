@@ -1,108 +1,91 @@
-Return-Path: <netdev+bounces-29335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78087782AFB
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:53:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F4A782AF1
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A844D1C20908
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:53:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9411C208E8
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAAC7481;
-	Mon, 21 Aug 2023 13:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6237480;
+	Mon, 21 Aug 2023 13:52:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1A7747F
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:53:26 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33B0DD7
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 06:53:02 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RTv2x0yDPzNn2v;
-	Mon, 21 Aug 2023 21:48:57 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 21 Aug
- 2023 21:52:30 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <shannon.nelson@amd.com>, <brett.creeley@amd.com>, <drivers@pensando.io>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<yuehaibing@huawei.com>
-CC: <netdev@vger.kernel.org>
-Subject: [PATCH net-next] ionic: Remove unused declarations
-Date: Mon, 21 Aug 2023 21:47:17 +0800
-Message-ID: <20230821134717.51936-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AAB747F
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:52:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFF3CC433C7;
+	Mon, 21 Aug 2023 13:52:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692625931;
+	bh=7mKKDVgdF/2Lo4ZD2YTNmgRHjnTYf27kHrdSorA5ROQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=r9EvY2UWj59CzzUSJ81GU5AT3FoAi8QcJGa4BoUIuMFZMLgh0b4Fx10hYphRpiX93
+	 YP6eC9VzzWRAjnFtEYi6FMrim8nOFqSHLR3L8/8AZHsFYGqmJWVHQ3j2gwmE9Zrrpl
+	 MktFl9aT18tX37sQ3WZGYd8w+Ay5qULO7BMaIjHMgFgT+AE/sWA6/2Gaebm5VUOAKQ
+	 WQtMteLaEnmj4PeZGktK0jIULNavJj3LBQe9v6UCZwL3tOclOEgfxPnQc+3g1vqDvY
+	 d2xflXeqLwZAT1V+uGe/KjO3qcbB6AcyzQImo7re2W6A8+i/v/dB/dqv4Fq3Awda75
+	 6lhyEoR0GQRlg==
+From: Vinod Koul <vkoul@kernel.org>
+To: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+ conor+dt@kernel.org, michal.simek@amd.com, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+ linux@armlinux.org.uk, Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Cc: dmaengine@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, git@amd.com
+In-Reply-To: <1691387509-2113129-1-git-send-email-radhey.shyam.pandey@amd.com>
+References: <1691387509-2113129-1-git-send-email-radhey.shyam.pandey@amd.com>
+Subject: Re: (subset) [PATCH net-next v5 00/10] net: axienet: Introduce
+ dmaengine
+Message-Id: <169262592741.224153.9100272726584790594.b4-ty@kernel.org>
+Date: Mon, 21 Aug 2023 19:22:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.12.3
 
-Commit fbfb8031533c ("ionic: Add hardware init and device commands")
-declared but never implemented ionic_q_rewind()/ionic_set_dma_mask().
-Commit 969f84394604 ("ionic: sync the filters in the work task")
-declared but never implemented ionic_rx_filters_need_sync().
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- drivers/net/ethernet/pensando/ionic/ionic.h           | 1 -
- drivers/net/ethernet/pensando/ionic/ionic_dev.h       | 1 -
- drivers/net/ethernet/pensando/ionic/ionic_rx_filter.h | 1 -
- 3 files changed, 3 deletions(-)
+On Mon, 07 Aug 2023 11:21:39 +0530, Radhey Shyam Pandey wrote:
+> The axiethernet driver can use the dmaengine framework to communicate
+> with the xilinx DMAengine driver(AXIDMA, MCDMA). The inspiration behind
+> this dmaengine adoption is to reuse the in-kernel xilinx dma engine
+> driver[1] and remove redundant dma programming sequence[2] from the
+> ethernet driver. This simplifies the ethernet driver and also makes
+> it generic to be hooked to any complaint dma IP i.e AXIDMA, MCDMA
+> without any modification.
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic.h b/drivers/net/ethernet/pensando/ionic/ionic.h
-index 602f4d45d529..2453a40f6ee8 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic.h
-@@ -81,7 +81,6 @@ int ionic_dev_cmd_wait(struct ionic *ionic, unsigned long max_wait);
- int ionic_dev_cmd_wait_nomsg(struct ionic *ionic, unsigned long max_wait);
- void ionic_dev_cmd_dev_err_print(struct ionic *ionic, u8 opcode, u8 status,
- 				 int err);
--int ionic_set_dma_mask(struct ionic *ionic);
- int ionic_setup(struct ionic *ionic);
- 
- int ionic_identify(struct ionic *ionic);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 0bea208bfba2..6aac98bcb9f4 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -376,7 +376,6 @@ void ionic_q_cmb_map(struct ionic_queue *q, void __iomem *base, dma_addr_t base_
- void ionic_q_sg_map(struct ionic_queue *q, void *base, dma_addr_t base_pa);
- void ionic_q_post(struct ionic_queue *q, bool ring_doorbell, ionic_desc_cb cb,
- 		  void *cb_arg);
--void ionic_q_rewind(struct ionic_queue *q, struct ionic_desc_info *start);
- void ionic_q_service(struct ionic_queue *q, struct ionic_cq_info *cq_info,
- 		     unsigned int stop_index);
- int ionic_heartbeat_check(struct ionic *ionic);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.h b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.h
-index 87b2666f248b..ee9e99cd1b5e 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.h
-@@ -43,7 +43,6 @@ struct ionic_rx_filter *ionic_rx_filter_by_addr(struct ionic_lif *lif, const u8
- struct ionic_rx_filter *ionic_rx_filter_rxsteer(struct ionic_lif *lif);
- void ionic_rx_filter_sync(struct ionic_lif *lif);
- int ionic_lif_list_addr(struct ionic_lif *lif, const u8 *addr, bool mode);
--int ionic_rx_filters_need_sync(struct ionic_lif *lif);
- int ionic_lif_vlan_add(struct ionic_lif *lif, const u16 vid);
- int ionic_lif_vlan_del(struct ionic_lif *lif, const u16 vid);
- 
+Applied, thanks!
+
+[01/10] dt-bindings: dmaengine: xilinx_dma:Add xlnx,axistream-connected property
+        commit: 94afcfb819b3a07e55d463c29e2d594316f40b4a
+[02/10] dt-bindings: dmaengine: xilinx_dma: Add xlnx,irq-delay property
+        commit: e8cfa385054c6aa7ae8dd743d8ea980039a0fc0b
+[03/10] dmaengine: xilinx_dma: Pass AXI4-Stream control words to dma client
+        commit: d8a3f65f6c1de1028b9af6ca31d9dd3738fda97e
+[04/10] dmaengine: xilinx_dma: Increase AXI DMA transaction segment count
+        commit: 491e9d409629964457d094ac2b99e319d428dd1d
+[05/10] dmaengine: xilinx_dma: Freeup active list based on descriptor completion bit
+        commit: 7bcdaa65810212c999d21e5c3019d03da37b3be3
+[06/10] dmaengine: xilinx_dma: Use tasklet_hi_schedule for timing critical usecase
+        commit: c77d4c5081aa6508623be876afebff003a2e5875
+[07/10] dmaengine: xilinx_dma: Program interrupt delay timeout
+        commit: 84b798fedf3fa8f0ab0c096593ba817abc454fe5
+
+Best regards,
 -- 
-2.34.1
+~Vinod
+
 
 
