@@ -1,129 +1,126 @@
-Return-Path: <netdev+bounces-29355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C290782CD6
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:59:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70AD0782CED
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:08:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41A02280E79
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:59:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A26D11C2031B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:08:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196DF79F7;
-	Mon, 21 Aug 2023 14:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49D079FB;
+	Mon, 21 Aug 2023 15:08:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE0979EA
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:59:54 +0000 (UTC)
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19DACD1
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1692629994; x=1724165994;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5aiMbaX/4VSDejJTn/2xw0bcoOzCqmNyQGBG/O2t7i8=;
-  b=g0KJm0SyUKl/LzgVjTmi08WZ/H9Mz+t3b9bsbuKZLvDofADtVkOvBC1r
-   o8P6tjWGjb7wYd9AvRNGMRxYSE8pyZEZOyvbzYGpZHVy3NhQnkk6osDiC
-   Gzs7pfilizFpaz6QEeXp0zSx2Xfq6WF8sis1xafztThqTf5tUqIKn27xk
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.01,190,1684800000"; 
-   d="scan'208";a="603150875"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 14:59:51 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com (Postfix) with ESMTPS id 9B71440DA2;
-	Mon, 21 Aug 2023 14:59:49 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 21 Aug 2023 14:59:44 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.135.203.70) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 21 Aug 2023 14:59:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jrife@google.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH] net: Avoid address overwrite in kernel_connect
-Date: Mon, 21 Aug 2023 07:59:33 -0700
-Message-ID: <20230821145933.98511-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230821100007.559638-1-jrife@google.com>
-References: <20230821100007.559638-1-jrife@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FB879EA
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 15:08:21 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2A529BC;
+	Mon, 21 Aug 2023 08:08:19 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37LF7WwyC031950, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37LF7WwyC031950
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 21 Aug 2023 23:07:32 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Mon, 21 Aug 2023 23:07:54 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Mon, 21 Aug 2023 23:07:53 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Mon, 21 Aug 2023 23:07:53 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek automotive PCIe driver code
+Thread-Topic: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek
+ automotive PCIe driver code
+Thread-Index: AQHZz4Ya38d07ViN20S7bf3O9T4Qta/q9pcAgAMgk2D//87KAIABzfpQ///CfgCABJnu0IAALOEAgACljtA=
+Date: Mon, 21 Aug 2023 15:07:53 +0000
+Message-ID: <4db3248874d64418b63fdf5c5e8a0f79@realtek.com>
+References: <20230815143756.106623-1-justinlai0215@realtek.com>
+ <20230815143756.106623-2-justinlai0215@realtek.com>
+ <95f079a4-19f9-4501-90d9-0bcd476ce68d@lunn.ch>
+ <4955506dbf6b4ebdb67cbb738750fbc8@realtek.com>
+ <eb245c85-0909-4a75-830d-afb96ccd5d38@lunn.ch>
+ <4951391892534eaeb2da96f052364e4c@realtek.com>
+ <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
+ <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
+ <97f3744d-afbf-4562-9168-5b9e211fac1f@lunn.ch>
+In-Reply-To: <97f3744d-afbf-4562-9168-5b9e211fac1f@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.135.203.70]
-X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,T_SPF_PERMERROR autolearn=ham
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jordan Rife <jrife@google.com>
-Date: Mon, 21 Aug 2023 05:00:06 -0500
-> BPF programs that run on connect can rewrite the connect address. For
-> the connect system call this isn't a problem, because a copy of the address
-> is made when it is moved into kernel space. However, kernel_connect
-> simply passes through the address it is given, so the caller may observe
-> its address value unexpectedly change.
-> 
-> A practical example where this is problematic is where NFS is combined
-> with a system such as Cilium which implements BPF-based load balancing.
-> A common pattern in software-defined storage systems is to have an NFS
-> mount that connects to a persistent virtual IP which in turn maps to an
-> ephemeral server IP. This is usually done to achieve high availability:
-> if your server goes down you can quickly spin up a replacement and remap
-> the virtual IP to that endpoint. With BPF-based load balancing, mounts
-> will forget the virtual IP address when the address rewrite occurs
-> because a pointer to the only copy of that address is passed down the
-> stack. Server failover then breaks, because clients have forgotten the
-> virtual IP address. Reconnects fail and mounts remain broken. This patch
-> was tested by setting up a scenario like this and ensuring that NFS
-> reconnects worked after applying the patch.
-> 
-> Signed-off-by: Jordan Rife <jrife@google.com>
-> ---
->  net/socket.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/socket.c b/net/socket.c
-> index 2b0e54b2405c8..f49edb9b49185 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -3519,7 +3519,11 @@ EXPORT_SYMBOL(kernel_accept);
->  int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
->  		   int flags)
->  {
-> -	return sock->ops->connect(sock, addr, addrlen, flags);
-> +	struct sockaddr_storage address;
-> +
-> +	memcpy(&address, addr, addrlen);
-> +
-> +	return sock->ops->connect(sock, (struct sockaddr *)&address, addrlen, flags);
+> > Sorry, please allow me to explain again.
+> > The RTL90xx Series supports I2C, MDC/MDIO and SPI slave to access the
+> registers of Ethernet Switch Core and the external CPU could manage it vi=
+a
+> these pins.
+>=20
+> I was wondering if you had mis-understood my question. The bus 'master' i=
+s
+> the device which controls the bus. SPI and MDIO has one bus master, and t=
+here
+> can be multiple clients on the bus. I2C in theory can have multiple bus m=
+asters
+> on one bus, bit it is not done too often. Your switch is a client.
+>=20
+> So my question was, are the bus masters also on PCIE enpoints within the =
+chip.
+> From an architecture standpoint, it would make sense they are, all you ne=
+ed is
+> one 4x PCIE slot, and this chip gives you everything you need. But you ca=
+n also
+> make use of the SoCs I2C, SPI or MDIO bus.
+>=20
+>     Andrew
 
-Could you rebase on net-next.git ?  I think this patch conflicts with
-1ded5e5a5931 ("net: annotate data-races around sock->ops").
-
-
->  }
->  EXPORT_SYMBOL(kernel_connect);
->  
-> -- 
-> 2.42.0.rc1.204.g551eb34607-goog
+Thanks, I understand what you mean.
+But I2C, SPI, MDIO are connected to the SoC through this chip's external pi=
+ns, not on the PCIe bus.
+Actually, there is the other function in the PCIe GMAC(Multiple function) t=
+o manage the registers of Switch Core.
+Should they be integrated into the MFD driver?
+Not everyone will use this function.
 
