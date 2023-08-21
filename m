@@ -1,150 +1,265 @@
-Return-Path: <netdev+bounces-29226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3BE4782331
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:32:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954EB78233B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94EFD1C2085D
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 05:32:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB6F4280EDD
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 05:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD95C15B3;
-	Mon, 21 Aug 2023 05:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C75F15B6;
+	Mon, 21 Aug 2023 05:40:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5341389
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 05:32:30 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3DF0A3;
-	Sun, 20 Aug 2023 22:32:27 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37L5VLoK4004057, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37L5VLoK4004057
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 21 Aug 2023 13:31:21 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Mon, 21 Aug 2023 13:31:10 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Mon, 21 Aug 2023 13:31:10 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
- RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
- 15.01.2375.007; Mon, 21 Aug 2023 13:31:10 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek automotive PCIe driver code
-Thread-Topic: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek
- automotive PCIe driver code
-Thread-Index: AQHZz4Ya38d07ViN20S7bf3O9T4Qta/q9pcAgAMgk2D//87KAIABzfpQ///CfgCABJnu0A==
-Date: Mon, 21 Aug 2023 05:31:09 +0000
-Message-ID: <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
-References: <20230815143756.106623-1-justinlai0215@realtek.com>
- <20230815143756.106623-2-justinlai0215@realtek.com>
- <95f079a4-19f9-4501-90d9-0bcd476ce68d@lunn.ch>
- <4955506dbf6b4ebdb67cbb738750fbc8@realtek.com>
- <eb245c85-0909-4a75-830d-afb96ccd5d38@lunn.ch>
- <4951391892534eaeb2da96f052364e4c@realtek.com>
- <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
-In-Reply-To: <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.21.210.185]
-x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CD11389
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 05:40:40 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-18.smtpout.orange.fr [80.12.242.18])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A2F9A3
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 22:40:32 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id XxeMq9U0KKn2vXxeMqn6t5; Mon, 21 Aug 2023 07:40:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1692596430;
+	bh=sqsur9/V8lzNvOyY7Q4srq+nuW4UAVI2dRK9lKF30hA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=cvFmdh0XQW7aXg4c8XmStHAD09SgGQWiPxaNPSHqhGE9G9ESooqQUAj/Bu3VbdI2t
+	 yZAsrmqzNcdmNIA/fGtpzVLeeA6VCjI//mUluuFG7mLrX/MT3EGsNW1DDCITZVahii
+	 4vKV97wUbaM1iTX/OOCL4l88UQHdJJvov2Ww5lRBZ93QzCSq1QmN3TviwKThJpeECs
+	 HaZzt23zkQhAwTp6qvegwE4Y3I4ZQ805c3TIqm1CFEHXCSMdtWIsL/KUp3AuEHBrZW
+	 YzOuRznLMok7PFSiI97jnNYIG9NGirRWEznZq1oXdx0wlKKUhbjmwts58tc6qegXdj
+	 xmx5CZYxwKfKw==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Mon, 21 Aug 2023 07:40:30 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <cbdcf645-f473-f10c-a76e-feb6316d2a47@wanadoo.fr>
+Date: Mon, 21 Aug 2023 07:40:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v4 20/28] wan: qmc_hdlc: Add runtime timeslots changes
+ support
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>,
+ Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>,
+ Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
+ Nicolin Chen <nicoleotsuka@gmail.com>
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <cover.1692376360.git.christophe.leroy@csgroup.eu>
+ <1364a0742fc76e7d275273dbbc4c97b008ec70a5.1692376361.git.christophe.leroy@csgroup.eu>
+Content-Language: fr
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <1364a0742fc76e7d275273dbbc4c97b008ec70a5.1692376361.git.christophe.leroy@csgroup.eu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FORGED_SPF_HELO,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,T_SPF_TEMPERROR
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > > Is the 'line' speed of the MAC fixed? It operates at one speed, and t=
-hat is
-> it?
-> >
-> > Hi, Andrew
-> >
->=20
-> > The "line" speed of the MAC is fixed 5G, but the throughput will be
-> > determined according to the speed of the PCIe link. For example, if
-> > the link speed is gen 3, the throughput will be 5G. if the link speed
-> > is gen 2, the throughput will be 2.5G. if the link speed is gen 1, the
-> > throughput will be 1G.
->=20
-> ksettings does not return throughput, it returns the line speed. throughp=
-ut is
-> determined by a lot of different things, can the CPU handle frames fast e=
-nough,
-> is the memory bandwidth high enough, what is happening on other ports of
-> the PCIe switch etc.
->=20
-> There is at least one driver i know of which reports a warning at probe t=
-ime, if
-> it finds the device is on a bus which cannot support the full bandwidth. =
-Maybe
-> copy that.
->=20
+Le 18/08/2023 à 18:39, Christophe Leroy a écrit :
+> From: Herve Codina <herve.codina@bootlin.com>
+> 
+> QMC channels support runtime timeslots changes but nothing is done at
+> the QMC HDLC driver to handle these changes.
+> 
+> Use existing IFACE ioctl in order to configure the timeslots to use.
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> ---
 
-Hi, Andrew
+Hi,
 
-Thanks for your guidance, we have represented the actual connection speed i=
-n the next version.
+a few nits below, should there be a v5.
 
-> > There is no extra fields in DMA descriptors for tagging protocol. The
-> > tag added by switch hardware instead of this driver.
->=20
-> > > Are the I2C, MDIO and SPI bus masters also hanging off a PCIE
-> > > endpoint? Can they probe independently? I'm just want to check this
-> > > should not be part of an MFD driver.
-> >
->=20
-> > The I2C, MDIO and SPI bus masters are not hanging off the PCIE
-> > endpoints, but on the switch core.
->=20
-> So the switch core is also an PCIE endpoint?
+>   drivers/net/wan/fsl_qmc_hdlc.c | 169 ++++++++++++++++++++++++++++++++-
+>   1 file changed, 168 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
+> index 4f84ac5fc63e..4b8cb5761fd1 100644
+> --- a/drivers/net/wan/fsl_qmc_hdlc.c
+> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
+> @@ -32,6 +32,7 @@ struct qmc_hdlc {
+>   	struct qmc_hdlc_desc tx_descs[8];
+>   	unsigned int tx_out;
+>   	struct qmc_hdlc_desc rx_descs[4];
+> +	u32 slot_map;
+>   };
+>   
+>   static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
+> @@ -202,6 +203,162 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
+>   	return NETDEV_TX_OK;
+>   }
+>   
+> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
+> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
+> +{
+> +	u64 ts_mask_avail;
+> +	unsigned int bit;
+> +	unsigned int i;
+> +	u64 ts_mask;
+> +	u64 map = 0;
 
-Sorry, please allow me to explain again.
-The RTL90xx Series supports I2C, MDC/MDIO and SPI slave to access the regis=
-ters of Ethernet Switch Core and the external CPU could manage it via these=
- pins.
-You are right, there is a tag protocol in the switch core. But It's for the=
- other ports, usually the cpu port, not this pcie gmac interface.
-You can think of this pcie gmac as a NIC connecting to the external etherne=
-t switch directly.
+This init looks useless.
 
->=20
->    Andrew
-> .
+> +
+> +	/* Tx and Rx masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> +	ts_mask = 0;
+> +	map = slot_map;
+> +	bit = 0;
+> +	for (i = 0; i < 64; i++) {
+> +		if (ts_mask_avail & BIT_ULL(i)) {
+> +			if (map & BIT_ULL(bit))
+> +				ts_mask |= BIT_ULL(i);
+> +			bit++;
+> +		}
+> +	}
+> +
+> +	if (hweight64(ts_mask) != hweight64(map)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots 0x%llx -> (0x%llx,0x%llx)\n",
+> +			map, ts_mask_avail, ts_mask);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ts_info->tx_ts_mask = ts_mask;
+> +	ts_info->rx_ts_mask = ts_mask;
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
+> +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
+> +{
+> +	u64 ts_mask_avail;
+> +	unsigned int bit;
+> +	unsigned int i;
+> +	u64 ts_mask;
+> +	u64 map = 0;
+
+This init looks useless.
+
+> +
+> +	/* Tx and Rx masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +	if (ts_info->rx_ts_mask != ts_info->tx_ts_mask) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask, ts_info->tx_ts_mask);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> +	ts_mask = ts_info->rx_ts_mask;
+> +	map = 0;
+> +	bit = 0;
+> +	for (i = 0; i < 64; i++) {
+> +		if (ts_mask_avail & BIT_ULL(i)) {
+> +			if (ts_mask & BIT_ULL(i))
+> +				map |= BIT_ULL(bit);
+> +			bit++;
+> +		}
+> +	}
+> +
+> +	if (hweight64(ts_mask) != hweight64(map)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots (0x%llx,0x%llx) -> 0x%llx\n",
+> +			ts_mask_avail, ts_mask, map);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (map >= BIT_ULL(32)) {
+> +		dev_err(qmc_hdlc->dev, "Slot map out of 32bit (0x%llx,0x%llx) -> 0x%llx\n",
+> +			ts_mask_avail, ts_mask, map);
+> +		return -EINVAL;
+> +	}
+> +
+> +	*slot_map = map;
+> +	return 0;
+> +}
+
+...
+
+> +static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
+> +{
+> +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
+> +	te1_settings te1;
+> +
+> +	switch (ifs->type) {
+> +	case IF_GET_IFACE:
+> +		ifs->type = IF_IFACE_E1;
+> +		if (ifs->size < sizeof(te1)) {
+> +			if (!ifs->size)
+> +				return 0; /* only type requested */
+> +
+> +			ifs->size = sizeof(te1); /* data size wanted */
+> +			return -ENOBUFS;
+> +		}
+> +
+> +		memset(&te1, 0, sizeof(te1));
+> +
+> +		/* Update slot_map */
+> +		te1.slot_map = qmc_hdlc->slot_map;
+> +
+> +		if (copy_to_user(ifs->ifs_ifsu.te1, &te1,  sizeof(te1)))
+
+                                                          ~~
+Extra space.
+
+> +			return -EFAULT;
+> +		return 0;
+> +
+> +	case IF_IFACE_E1:
+> +	case IF_IFACE_T1:
+> +		if (!capable(CAP_NET_ADMIN))
+> +			return -EPERM;
+> +
+> +		if (netdev->flags & IFF_UP)
+> +			return -EBUSY;
+> +
+> +		if (copy_from_user(&te1, ifs->ifs_ifsu.te1, sizeof(te1)))
+> +			return -EFAULT;
+> +
+> +		return qmc_hdlc_set_iface(qmc_hdlc, ifs->type, &te1);
+> +
+> +	default:
+> +		return hdlc_ioctl(netdev, ifs);
+> +	}
+> +}
+
+...
+
 
