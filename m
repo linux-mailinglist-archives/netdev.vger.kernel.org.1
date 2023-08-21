@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-29481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D6A78363C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 01:29:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C71478363F
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 01:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 998AA1C20A03
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 23:29:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE6E3280CB5
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 23:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEF61ADE9;
-	Mon, 21 Aug 2023 23:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF551ADF0;
+	Mon, 21 Aug 2023 23:29:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741E318AE1
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127FA1ADEA
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:29:42 +0000 (UTC)
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19019189;
-	Mon, 21 Aug 2023 16:29:19 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D39B186;
+	Mon, 21 Aug 2023 16:29:40 -0700 (PDT)
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.96)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1qYEKU-0004Ta-2s;
-	Mon, 21 Aug 2023 23:29:03 +0000
-Date: Tue, 22 Aug 2023 00:28:44 +0100
+	id 1qYEKw-0004U0-2Z;
+	Mon, 21 Aug 2023 23:29:31 +0000
+Date: Tue, 22 Aug 2023 00:29:17 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
 	Sean Wang <sean.wang@mediatek.com>,
@@ -41,9 +41,10 @@ To: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
 	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v2 0/4] net: ethernet: mtk_eth_soc: improve support
- for MT7988
-Message-ID: <cover.1692660046.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v2 1/4] net: ethernet: mtk_eth_soc: fix register
+ definitions for MT7988
+Message-ID: <bb3632987f1f68d3fd69c6454c92332703f5c02e.1692660046.git.daniel@makrotopia.org>
+References: <cover.1692660046.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,33 +53,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1692660046.git.daniel@makrotopia.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This series fixes and completes commit 445eb6448ed3b ("net: ethernet:
-mtk_eth_soc: add basic support for MT7988 SoC") and also adds support
-for using the in-SoC SRAM to previous MT7986 and MT7981 SoCs.
+More register macros need to be adjusted for the 3rd GMAC on MT7988.
+Account for added bit in SYSCFG0_SGMII_MASK.
 
-Changes since v1:
- * SRAM is actual memory and doesn't require __iomem
- * Introduce stub ADDR64 operations on 32-bit platforms to avoid
-   compiler warning
+Fixes: 445eb6448ed3 ("net: ethernet: mtk_eth_soc: add basic support for MT7988 SoC")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Daniel Golle (4):
-  net: ethernet: mtk_eth_soc: fix register definitions for MT7988
-  net: ethernet: mtk_eth_soc: add reset bits for MT7988
-  net: ethernet: mtk_eth_soc: add support for in-SoC SRAM
-  net: ethernet: mtk_eth_soc: support 36-bit DMA addressing on MT7988
-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 194 +++++++++++++++-----
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  53 +++++-
- 2 files changed, 197 insertions(+), 50 deletions(-)
-
-
-base-commit: 7eb6deb3f55678216a6a0e956846c04958093ea5
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+index 4a2470fbad2cf..8d2d35b322351 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+@@ -133,10 +133,12 @@
+ #define MTK_GDMA_XGDM_SEL	BIT(31)
+ 
+ /* Unicast Filter MAC Address Register - Low */
+-#define MTK_GDMA_MAC_ADRL(x)	(0x508 + (x * 0x1000))
++#define MTK_GDMA_MAC_ADRL(x)	({ typeof(x) _x = (x); (_x == MTK_GMAC3_ID) ?	\
++				   0x548 : 0x508 + (_x * 0x1000); })
+ 
+ /* Unicast Filter MAC Address Register - High */
+-#define MTK_GDMA_MAC_ADRH(x)	(0x50C + (x * 0x1000))
++#define MTK_GDMA_MAC_ADRH(x)	({ typeof(x) _x = (x); (_x == MTK_GMAC3_ID) ?	\
++				   0x54C : 0x50C + (_x * 0x1000); })
+ 
+ /* FE global misc reg*/
+ #define MTK_FE_GLO_MISC         0x124
+@@ -503,7 +505,7 @@
+ #define ETHSYS_SYSCFG0		0x14
+ #define SYSCFG0_GE_MASK		0x3
+ #define SYSCFG0_GE_MODE(x, y)	(x << (12 + (y * 2)))
+-#define SYSCFG0_SGMII_MASK     GENMASK(9, 8)
++#define SYSCFG0_SGMII_MASK     GENMASK(9, 7)
+ #define SYSCFG0_SGMII_GMAC1    ((2 << 8) & SYSCFG0_SGMII_MASK)
+ #define SYSCFG0_SGMII_GMAC2    ((3 << 8) & SYSCFG0_SGMII_MASK)
+ #define SYSCFG0_SGMII_GMAC1_V2 BIT(9)
 -- 
 2.41.0
 
