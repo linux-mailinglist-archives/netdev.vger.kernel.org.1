@@ -1,203 +1,177 @@
-Return-Path: <netdev+bounces-29268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDAD17825AC
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:39:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CE27825A0
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97A4A280F43
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65FE11C208C6
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6506C3D6D;
-	Mon, 21 Aug 2023 08:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29E61C10;
+	Mon, 21 Aug 2023 08:37:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592C7185B
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:39:24 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78ADF2
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:39:10 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4ff8f2630e3so4752481e87.1
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:39:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692607149; x=1693211949;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KCAks9RwozvRJpX+QX0ILjL7a4y4gtGfSt+E1DcOdRA=;
-        b=TswRyY7az3TMHUPsPfN3K8mRhp5AupbNizwslgQ9BjmYhg3U1fXkPSyPGboy1hRx5L
-         aVI2RuPLg/VNtz8DUMGPFbxAfsR6AyznkuGteIo7Ke7jFXIL9T89B+QSjwBKojSl+LiN
-         zcropkbeVIwis3XNbSmBrpGyTILzzZ3CRMJhkYYRQpSRhPo9NtX11NWLXv0Rtyht6VWQ
-         dpKYSPtHPK7cuIUhYIpv1w47xhZAXCsA/3VwnrHsCYRPldnpij6MgAbIPmJVwAYV2RUt
-         5wJRRSFyJt/bC4piANNswOkBGhcn3CC577NP9Q/U8rdcMGKoXgYqA7yyosLscZOD2Mgi
-         ju7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692607149; x=1693211949;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KCAks9RwozvRJpX+QX0ILjL7a4y4gtGfSt+E1DcOdRA=;
-        b=Dvb/gm4SvNPYEQmz9S0lW7hcz8C4Lc2swkmjecf4W/lMgXy3KN+PJxVkXZ/K76xt/r
-         e2CSGyA13Vziu3jt66xi3xwBXcW9+RnoKXU12W3DkglXxx0Xz7sv64D6mQ/6ba3iLiGn
-         1hL6inqMbSyFEYMnLYm6I2xFSWnUKWlkoinQXtCfxpUAIvd5oC2Ip35+76mGG9wMTs+W
-         M8QydgWKXjEeARX0j0aAUXqz0+8JFi9dltZgnD3fNhUblnnN+mbXvEMxhNsFEdkWLE0L
-         wtUZNqx5znEfDW9u/VJkK99+ztccI0+LaOIvkJBYYxe5IyFngVB5t30BZsn9GbhcrXjU
-         /OQQ==
-X-Gm-Message-State: AOJu0Yzt+1s3ph623YlmbZb8KzjsEkOMjwPg4uDfEUPR7Zil13Bu8SfV
-	LBQh1933sU8cR6h5vqdy3vUuPNikhs3GYF8OW3NSDA==
-X-Google-Smtp-Source: AGHT+IFT8Gpe8aC0gV08a4N0ZFmjyC8jiHHEkt6AWLAhMSdtMGkNUN0OaSNUAsvEZpIKsY+hAiy8NVA6Mw6qleHN1LM=
-X-Received: by 2002:ac2:4ad1:0:b0:500:7f51:d129 with SMTP id
- m17-20020ac24ad1000000b005007f51d129mr1570409lfp.34.1692607148905; Mon, 21
- Aug 2023 01:39:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A2D20EE
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:37:44 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4723E7
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:37:12 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RTm2s2TG2zNn6n;
+	Mon, 21 Aug 2023 16:33:25 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 21 Aug
+ 2023 16:36:58 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <steffen.klassert@secunet.com>,
+	<herbert@gondor.apana.org.au>, <dsahern@kernel.org>
+CC: <eyal.birger@gmail.com>, <paulmck@kernel.org>, <joel@joelfernandes.org>,
+	<tglx@linutronix.de>, <mbizon@freebox.fr>, <jmaxwell37@gmail.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
+Subject: [PATCH net-next] net: remove unnecessary input parameter 'how' in ifdown function
+Date: Mon, 21 Aug 2023 16:41:04 +0800
+Message-ID: <20230821084104.3812233-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816100113.41034-1-linyunsheng@huawei.com>
- <20230816100113.41034-2-linyunsheng@huawei.com> <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
- <20230817091554.31bb3600@kernel.org> <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
- <20230817165744.73d61fb6@kernel.org> <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
- <20230818145145.4b357c89@kernel.org>
-In-Reply-To: <20230818145145.4b357c89@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Mon, 21 Aug 2023 11:38:32 +0300
-Message-ID: <CAC_iWjKp_NKofQQTSgA810+bOt84Hgbm3YV=X=JWH9t=DHuzqQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mina Almasry <almasrymina@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, 
-	Liang Chen <liangchen.linux@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-resending for the mailing list apologies for the noise.
+When the ifdown function in the dst_ops structure is referenced, the input
+parameter 'how' is always true. In the current implementation of the
+ifdown interface, ip6_dst_ifdown does not use the input parameter 'how',
+xfrm6_dst_ifdown and xfrm4_dst_ifdown functions use the input parameter
+'unregister'. But false judgment on 'unregister' in xfrm6_dst_ifdown and
+xfrm4_dst_ifdown is false, so remove the input parameter 'how' in ifdown
+function.
 
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+---
+ include/net/dst_ops.h   |  2 +-
+ net/core/dst.c          |  2 +-
+ net/ipv4/xfrm4_policy.c | 11 +----------
+ net/ipv6/route.c        |  5 ++---
+ net/ipv6/xfrm6_policy.c |  6 +-----
+ 5 files changed, 6 insertions(+), 20 deletions(-)
 
-On Sat, 19 Aug 2023 at 00:51, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Fri, 18 Aug 2023 09:12:09 +0300 Ilias Apalodimas wrote:
-> > > Right, IIUC we don't have enough space to fit dma_addr_t and the
-> > > refcount, but if we store the dma addr on a shifted u32 instead
-> > > of using dma_addr_t explicitly - the refcount should fit?
-> >
-> > struct page looks like this:
-> >
-> > unsigned long dma_addr;
-> > union {
-> >       unsigned long dma_addr_upper;
-> >       atomic_long_t pp_frag_count;
-> > };
->
-> I could be completely misunderstanding the problem.
+diff --git a/include/net/dst_ops.h b/include/net/dst_ops.h
+index 632086b2f644..6d1c8541183d 100644
+--- a/include/net/dst_ops.h
++++ b/include/net/dst_ops.h
+@@ -23,7 +23,7 @@ struct dst_ops {
+ 	u32 *			(*cow_metrics)(struct dst_entry *, unsigned long);
+ 	void			(*destroy)(struct dst_entry *);
+ 	void			(*ifdown)(struct dst_entry *,
+-					  struct net_device *dev, int how);
++					  struct net_device *dev);
+ 	struct dst_entry *	(*negative_advice)(struct dst_entry *);
+ 	void			(*link_failure)(struct sk_buff *);
+ 	void			(*update_pmtu)(struct dst_entry *dst, struct sock *sk,
+diff --git a/net/core/dst.c b/net/core/dst.c
+index 79d9306ad1ee..980e2fd2f013 100644
+--- a/net/core/dst.c
++++ b/net/core/dst.c
+@@ -152,7 +152,7 @@ void dst_dev_put(struct dst_entry *dst)
+ 
+ 	dst->obsolete = DST_OBSOLETE_DEAD;
+ 	if (dst->ops->ifdown)
+-		dst->ops->ifdown(dst, dev, true);
++		dst->ops->ifdown(dst, dev);
+ 	dst->input = dst_discard;
+ 	dst->output = dst_discard_out;
+ 	dst->dev = blackhole_netdev;
+diff --git a/net/ipv4/xfrm4_policy.c b/net/ipv4/xfrm4_policy.c
+index 57ea394ffa8c..c33bca2c3841 100644
+--- a/net/ipv4/xfrm4_policy.c
++++ b/net/ipv4/xfrm4_policy.c
+@@ -124,22 +124,13 @@ static void xfrm4_dst_destroy(struct dst_entry *dst)
+ 	xfrm_dst_destroy(xdst);
+ }
+ 
+-static void xfrm4_dst_ifdown(struct dst_entry *dst, struct net_device *dev,
+-			     int unregister)
+-{
+-	if (!unregister)
+-		return;
+-
+-	xfrm_dst_ifdown(dst, dev);
+-}
+-
+ static struct dst_ops xfrm4_dst_ops_template = {
+ 	.family =		AF_INET,
+ 	.update_pmtu =		xfrm4_update_pmtu,
+ 	.redirect =		xfrm4_redirect,
+ 	.cow_metrics =		dst_cow_metrics_generic,
+ 	.destroy =		xfrm4_dst_destroy,
+-	.ifdown =		xfrm4_dst_ifdown,
++	.ifdown =		xfrm_dst_ifdown,
+ 	.local_out =		__ip_local_out,
+ 	.gc_thresh =		32768,
+ };
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 6b46abe0b7da..e82bcfde5bf9 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -90,7 +90,7 @@ unsigned int		ip6_mtu(const struct dst_entry *dst);
+ static struct dst_entry *ip6_negative_advice(struct dst_entry *);
+ static void		ip6_dst_destroy(struct dst_entry *);
+ static void		ip6_dst_ifdown(struct dst_entry *,
+-				       struct net_device *dev, int how);
++				       struct net_device *dev);
+ static void		 ip6_dst_gc(struct dst_ops *ops);
+ 
+ static int		ip6_pkt_discard(struct sk_buff *skb);
+@@ -371,8 +371,7 @@ static void ip6_dst_destroy(struct dst_entry *dst)
+ 	fib6_info_release(from);
+ }
+ 
+-static void ip6_dst_ifdown(struct dst_entry *dst, struct net_device *dev,
+-			   int how)
++static void ip6_dst_ifdown(struct dst_entry *dst, struct net_device *dev)
+ {
+ 	struct rt6_info *rt = (struct rt6_info *)dst;
+ 	struct inet6_dev *idev = rt->rt6i_idev;
+diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+index 8f931e46b460..41a680c76d2e 100644
+--- a/net/ipv6/xfrm6_policy.c
++++ b/net/ipv6/xfrm6_policy.c
+@@ -124,14 +124,10 @@ static void xfrm6_dst_destroy(struct dst_entry *dst)
+ 	xfrm_dst_destroy(xdst);
+ }
+ 
+-static void xfrm6_dst_ifdown(struct dst_entry *dst, struct net_device *dev,
+-			     int unregister)
++static void xfrm6_dst_ifdown(struct dst_entry *dst, struct net_device *dev)
+ {
+ 	struct xfrm_dst *xdst;
+ 
+-	if (!unregister)
+-		return;
+-
+ 	xdst = (struct xfrm_dst *)dst;
+ 	if (xdst->u.rt6.rt6i_idev->dev == dev) {
+ 		struct inet6_dev *loopback_idev =
+-- 
+2.34.1
 
-You aren't!
-
-> Let me show you the diff of what I was thinking more or less.
->
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 5e74ce4a28cd..58ffa8dc745f 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -126,11 +126,6 @@ struct page {
->                         unsigned long _pp_mapping_pad;
->                         unsigned long dma_addr;
->                         union {
-> -                               /**
-> -                                * dma_addr_upper: might require a 64-bit
-> -                                * value on 32-bit architectures.
-> -                                */
-> -                               unsigned long dma_addr_upper;
->                                 /**
->                                  * For frag page support, not supported in
->                                  * 32-bit architectures with 64-bit DMA.
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index 94231533a369..6f87a0fa2178 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -212,16 +212,24 @@ static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
->         dma_addr_t ret = page->dma_addr;
->
->         if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> -               ret |= (dma_addr_t)page->dma_addr_upper << 16 << 16;
-> +               ret <<= PAGE_SHIFT;
->
->         return ret;
->  }
->
-> -static inline void page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
-> +static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
->  {
-> +       bool failed = false;
-> +
->         page->dma_addr = addr;
-> -       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> -               page->dma_addr_upper = upper_32_bits(addr);
-> +       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT) {
-> +               page->dma_addr >>= PAGE_SHIFT;
-> +               /* We assume page alignment to shave off bottom bits,
-> +                * if this "compression" doesn't work we need to drop.
-> +                */
-> +               failed = addr != page->dma_addr << PAGE_SHIFT;
-> +       }
-> +       return failed;
->  }
->
->  static inline bool page_pool_put(struct page_pool *pool)
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 77cb75e63aca..9ea42e242a89 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -211,10 +211,6 @@ static int page_pool_init(struct page_pool *pool,
->                  */
->         }
->
-> -       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
-> -           pool->p.flags & PP_FLAG_PAGE_FRAG)
-> -               return -EINVAL;
-> -
->  #ifdef CONFIG_PAGE_POOL_STATS
->         pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
->         if (!pool->recycle_stats)
-> @@ -359,12 +355,19 @@ static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
->         if (dma_mapping_error(pool->p.dev, dma))
->                 return false;
->
-> -       page_pool_set_dma_addr(page, dma);
-> +       if (page_pool_set_dma_addr(page, dma))
-> +               goto unmap_failed;
->
->         if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
->                 page_pool_dma_sync_for_device(pool, page, pool->p.max_len);
->
->         return true;
-> +
-> +unmap_failed:
-> +       dma_unmap_page_attrs(pool->p.dev, dma,
-> +                            PAGE_SIZE << pool->p.order, pool->p.dma_dir,
-> +                            DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
-> +       return false;
->  }
-
-That seems reasonable and would work for pages > 4k as well. But is
-16TB enough?  I am more familiar with embedded than large servers,
-which do tend to scale that high.
-
-Regards
-/Ilias
->
->  static void page_pool_set_pp_info(struct page_pool *pool,
 
