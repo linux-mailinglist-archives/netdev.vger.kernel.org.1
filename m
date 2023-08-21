@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-29382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7B5782FA7
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:48:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F8A782FB0
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36A1E280E94
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:48:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45709280E10
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1127F8F48;
-	Mon, 21 Aug 2023 17:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65218F49;
+	Mon, 21 Aug 2023 17:53:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062C88C16
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:48:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBB59C433C7;
-	Mon, 21 Aug 2023 17:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2E2320F
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:53:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F4DC433C7;
+	Mon, 21 Aug 2023 17:53:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692640126;
-	bh=XZDt43brnFTJkb8ScLQNvWMVfoRbXfvHIPbaNmZldAg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F6yDjvDCIsPvanRvMO9iP5ovPq8w7hv8wc9g7fkg0xbVHYVnJTD+KMBrgLS5lVWTH
-	 znqU9oXtTt+NfkBsSq3y+2AVLdXvIXqBp8iUwB8HR7x9mGi1TzhwCmBK3cO4B6HRS7
-	 E+T4PJXm1v6bhzzbs2O8uPBHaaYEsESUeE3HavF4sXHAK+uXw2x3xnbETG/N8SvJ6q
-	 Q5t5YU8mIqIVHWRS7D/eySV230GwrXA7iSEAJRHtL4Xd47ecpMG1JbybOQOPHIDqJ1
-	 bQOyBOmoxbwMBvek8X5nOA2ptpja3emOax+vjUvWswoTL+nsoaIETxXarARXgyEoxJ
-	 yVcQH2bSjL8rQ==
-Date: Mon, 21 Aug 2023 10:48:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, syzbot+5ba06978f34abb058571@syzkaller.appspotmail.com,
- wg@grandegger.com, mkl@pengutronix.de, idosch@nvidia.com,
- lucien.xin@gmail.com, xemul@parallels.com, socketcan@hartkopp.net,
- linux-can@vger.kernel.org
-Subject: Re: [PATCH net] net: validate veth and vxcan peer ifindexes
-Message-ID: <20230821104844.19dd4563@kernel.org>
-In-Reply-To: <ZOI6bf86B1fVb1sF@shredder>
-References: <20230819012602.239550-1-kuba@kernel.org>
-	<ZOI6bf86B1fVb1sF@shredder>
+	s=k20201202; t=1692640409;
+	bh=Eu4xMibsspcitVnv+IIV/Kx019f1TZ1UkcODOoyqgV4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lpCqkMyQ+gt1LpYBem+D7uY4ZoncSoP1FIaKg75t+C5wRcoWjGwzMsBGrfSNzQDNs
+	 FIzvfLcjTaG1icKsnEuJoxghy+QYKOXmYkQVnhFW2gUZ0if2gMMQytu+RFOxNTHouk
+	 d1jr/eTUbuqmG/Sz8zWK+qNX4vXhax6RTJKhmL1rVrB6PvxIsPNNp8tSrfVbZXOiu2
+	 8Bye11DLq7Wmy6neiMbbdZnl7Is08Mm2afyyTF4WdId9M7jXDG6A8QCp0mncjhpSfV
+	 VFQnrliN0PLeaX996jlBxWLvflfJb2sz8rTo18ZGRHNnOMAnJdgn6xapz6DyPI568n
+	 MqrXEn6JIm69g==
+Date: Mon, 21 Aug 2023 10:53:27 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: Re: [net-next 14/15] net/mlx5: Convert PCI error values to generic
+ errnos
+Message-ID: <ZOOkl76HBMqYbDfH@x130>
+References: <20230816210049.54733-1-saeed@kernel.org>
+ <20230816210049.54733-15-saeed@kernel.org>
+ <20230818152853.54a07be1@kernel.org>
+ <20230818195502.22b416b3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230818195502.22b416b3@kernel.org>
 
-On Sun, 20 Aug 2023 19:08:13 +0300 Ido Schimmel wrote:
-> There is another report here [1] with a reproducer [2]. Even with this
-> patch, the reproducer can still trigger the warning on net-next. Don't
-> we also need to reject a negative ifindex in the ancillary header? At
-> least with the following diff the warning does not trigger anymore:
+On 18 Aug 19:55, Jakub Kicinski wrote:
+>On Fri, 18 Aug 2023 15:28:53 -0700 Jakub Kicinski wrote:
+>> LMK if you want me to apply from the list and skip 14.
+>
 
-Yeah, definitely, please go ahead and submit.
+I will push a new PR without this patch, since the series is already
+marked as Changes Requested.
 
-Is "ancillary header" used more commonly as a term? in gnel we usually
-call this thing "user header" or "fixed header".
+>-110
 
