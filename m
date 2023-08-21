@@ -1,114 +1,125 @@
-Return-Path: <netdev+bounces-29289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1518E78281B
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:39:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A47EB78288D
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFFB6280E80
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 11:39:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C687F1C208CC
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BAE525B;
-	Mon, 21 Aug 2023 11:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50018538F;
+	Mon, 21 Aug 2023 12:06:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6F84A3B
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 11:39:30 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5ECC3;
-	Mon, 21 Aug 2023 04:39:28 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 507585C274F;
-	Mon, 21 Aug 2023 07:39:28 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Mon, 21 Aug 2023 07:39:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1692617968; x=1692704368; bh=L8L1QtzKhNCEw
-	R/2bL5QtRE2Pi9Wv5JGehO3UrLRIFE=; b=QMIPMZW3xTf9RjwygzvlG2PPqDkEa
-	F+n9EvdBHhvqcRdrAjyMlePtpmTsWJsWEJp/bbe84/f8MVcjMKFhjVBuLwQt82da
-	ZF0wdbi8e5Z9NYC4sl83qIwS9tebqA+Xd8OcTodUnsphkM88YVj5R/41bT0zQRvK
-	6V1tFNrF0xl3m3ziB+px3p/t1N3rujUNuDkxu2ajZRED0JJg2+ul00NQVA2npeYh
-	aWtmvwAuYcVTBUKgAO1hQ4HhjX9CUmhDxRrutS90HK6V267jtnVeqceOCjDKsZGV
-	iqJ1hKv01KdPKpgR7IpKavZANj1d864YZpQIxUBFfg4DuP3Z7Yrm/gWtg==
-X-ME-Sender: <xms:8EzjZPxh2wXQJu5Wv6SMlVru2Lwbwx6b8UHTAWy2XjCFnP1x-W6HHg>
-    <xme:8EzjZHQ8t7zqWgIvzJIGETYVJs50zJCd4peqXFu8R8ldsGYXkHZIoLzdryEI8hSBS
-    C1aJ1XseyQVlPk>
-X-ME-Received: <xmr:8EzjZJVNpUQCAqekLCkmlxMg06U-4uj0aJeANLCyL4I3IGJna9pXFRY6gsR2>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudduledggeefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfh
-    jeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:8EzjZJhSVb6phvhgU3xRYAF_kYa30DYe1bVyGtT_R_KCpBYQxJqebQ>
-    <xmx:8EzjZBB_7OIMXUepYQJmNpJw9Rm4OPOJT0z5duGyF85gpVgMaZWBaw>
-    <xmx:8EzjZCIWgZxXHtpOL66t3Sio8rgY9jh_jHe5aqQ1-vhzsLMEGH2KmQ>
-    <xmx:8EzjZLDL-C-hg5H7mKbt-px65a5y5cxJ5DG-SpQJieWUca4bs-7pZA>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 21 Aug 2023 07:39:27 -0400 (EDT)
-Date: Mon, 21 Aug 2023 14:39:24 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH 1/3] ipv4: ignore dst hint for multipath routes
-Message-ID: <ZONM7BkQPuPGaYz0@shredder>
-References: <20230819114825.30867-1-sriram.yagnaraman@est.tech>
- <20230819114825.30867-2-sriram.yagnaraman@est.tech>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF1A538A
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:06:46 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D926CD
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 05:06:45 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-5280ef23593so3907871a12.3
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 05:06:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692619603; x=1693224403;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2S+WETvfAyrCVF8DP9tvmJJ5EWf71P/PjeMnXn7n6Lo=;
+        b=AKZiy1IcmrTnS8t3Aj69f9szwT2W6buD4JdkJG4PhzNFd6RC8DEOEnJzG38wHiY0Ct
+         lmbiwczvEAh2uxmGvZAgXbiZ017Oi4wm9iR7//3Zuuf7YMYcMNn1aUN82CmnWaEzEQIg
+         ZhBKp2uSyMsg1I9vn/xFo1RVwdnSQA6OtyXdtESjctJucwdoOQ9sn2Nb/5uw9G7DlkqG
+         qloCTWdZbnsV72yu1caka78IiEqhakoJYJKc60vARtuWBqeL7KqzEXi13BSS9L90bhTF
+         angIuJ2m55GyWnP4ZlERe4CPo6mqJtDkwRVBdSh7h7nCsvmDBiJsGgxCo54DH/y+MXo6
+         ou3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692619603; x=1693224403;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2S+WETvfAyrCVF8DP9tvmJJ5EWf71P/PjeMnXn7n6Lo=;
+        b=H0lG/T5j3jZSCCcl77Gv5b6pgz6/R4nyZyA+sFrZ966OHCD0+4OYNCNqyRFLaF6U51
+         1L2OAaN1eJhXJJp6Xq6VC1/Q3QBYKUQxAoGWmzNgnAXZ48povdWKHGTCtYn5XXBgZOTn
+         aN/t+6s6M5Pbx04qu2F7aKoil1vRjJe5GjAodcOxTofPUV9sDhhAEkPXeR0nuSdsANdv
+         g1Zl2lCIVqjPpOef/EEASz5CZy1hSEgr32o8kgpk8SFAF1Eu1YJxZKfwI6dp6lw3jcgs
+         dLLnOkzeh2L6LtvHzl7lZ0Ct9yLHYcyfTLMEuIs7nyoUi05ps9JlhHCZ9A0Z0i6WdOB9
+         liKw==
+X-Gm-Message-State: AOJu0YwUqu70PK9VKtqCA99AaOxQy8brwFrLeT83i6WP5xCqT+HWIbfR
+	duItBt2muVwjuTkz884cW5OjPg==
+X-Google-Smtp-Source: AGHT+IGA3fcwCUwoHfQmYSY/wtDyAlgOxfO0or6c6j0Qcinb4t2/XgeaIcZi4syQvHqfZpMf9jNYmQ==
+X-Received: by 2002:a50:fa93:0:b0:525:d95b:cd46 with SMTP id w19-20020a50fa93000000b00525d95bcd46mr4674958edr.2.1692619603593;
+        Mon, 21 Aug 2023 05:06:43 -0700 (PDT)
+Received: from [192.168.0.22] ([77.252.47.198])
+        by smtp.gmail.com with ESMTPSA id g4-20020a056402180400b00525727db542sm5974464edy.54.2023.08.21.05.06.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Aug 2023 05:06:43 -0700 (PDT)
+Message-ID: <ebad4f91-3d4e-c50f-0bde-f11f16061214@linaro.org>
+Date: Mon, 21 Aug 2023 14:06:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230819114825.30867-2-sriram.yagnaraman@est.tech>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v2 1/4] dt-bindings: mfd: syscon: Add compatibles for
+ Loongson-1 syscon
+Content-Language: en-US
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Serge Semin <Sergey.Semin@baikalelectronics.ru>
+References: <20230816111310.1656224-1-keguang.zhang@gmail.com>
+ <20230816111310.1656224-2-keguang.zhang@gmail.com>
+ <a9a7b65c-ef0b-9f66-b197-548733728d44@linaro.org>
+ <CAJhJPsXEf0Yuxasq24X=x_JtUJZrNC1aowfeuu9QM2kz+A=asQ@mail.gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <CAJhJPsXEf0Yuxasq24X=x_JtUJZrNC1aowfeuu9QM2kz+A=asQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 19, 2023 at 01:48:23PM +0200, Sriram Yagnaraman wrote:
-> Route hints when the next hop is part of a multipath group causes
-> packets in the same receive batch to the same next hop irrespective of
+On 21/08/2023 13:00, Keguang Zhang wrote:
+> On Sat, Aug 19, 2023 at 10:23 PM Krzysztof Kozlowski
+> <krzysztof.kozlowski@linaro.org> wrote:
+>>
+>> On 16/08/2023 13:13, Keguang Zhang wrote:
+>>> Add Loongson LS1B and LS1C compatibles for system controller.
+>>
+>> I asked not to use the same compatible for different blocks. Compatible
+>> is dwmac, but are you still going to use for other blocks? Please write
+>> proper description of the hardware.
+>>
+> Sorry. I didn't make myself clear.
+> The SoC only has one syscon with two registers.
+> And Each register contains settings for multiple devices.
+> Besides DWMAC, this syscon will be used for other devices.
+> Should I keep using loongson,ls1b-syscon/loongson,ls1c-syscon?
 
-Looks like you are missing a word here. "causes packets in the same
-receive batch to the same next hop" ?
+Ah, ok, then the naming of the compatible should reflect the name of
+this syscon block. If it does not have any name and it is the only
+syscon, then name like "loongson,ls1b-syscon" is good. If the block has
+some name - use it in compatible.
 
-> multipath hash of the packet. So, do not extract route hint for packets
-> whose destination is part of multipath group.
+Best regards,
+Krzysztof
 
-The commit message should also explain how this is done.
-
-> 
-> Fixes: 02b24941619f ("ipv4: use dst hint for ipv4 list receive")
-> 
-
-No blank line between the fixes tag and the SoB.
-
-In addition, patch prefix should be "PATCH net". See:
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-Same comments for the IPv6 patch.
-
-Thanks
-
-> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
 
