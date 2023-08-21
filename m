@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-29247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2709878251E
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E33D8782526
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:15:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8AC8280EC2
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:14:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133031C2085B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC231FB3;
-	Mon, 21 Aug 2023 08:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137BC1FDB;
+	Mon, 21 Aug 2023 08:14:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E772185A
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C261FB3
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:14:52 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162AE93
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:14:47 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B2E93
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:14:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692605687; x=1724141687;
+  t=1692605691; x=1724141691;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ssyXh7Eo+nV994uxkYP746bnpbkmYjteurYZN3CbbMo=;
-  b=RCWuh2DR30t4GEzp4tvpJI5Kq2iTrbok6/qLk8enyZHDp5wMC/TqmL6s
-   ET+x4rp9XaU0Ex+QMBsz8duj21v7r75BXqg9/ouvu/89HiKX+jhCkttXv
-   S/G0qL13zeaJ8y0LXAD6WqxIPvAjeb0fr2Jx7MaL3E+NtT+jh/Mt+L+TY
-   iga9HMdWU8LxdiXJ2fMmcYM5M5ZYmQdm+TG4ktBYvNskrh1XLBB73Cxr+
-   HVvnEC+1amsA4HcPvIpCNMj81W0/l5oGJIuplqnMiqwVOmQW6+4z/GsCj
-   QBJkiCRRWlf11vdnpg3fTzKjYmaSDVIY4lQ0RfMTEb4r8iPEm+zT1vfL3
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="376280312"
+  bh=K9x8FDf/YdpQXwHLWBnorxtFd/JUNWyZ5i86X1WOEOs=;
+  b=Wt8jSW9LugTg4cZf0Ksm9vDZmrgvVoI5E2NiwmJ8Xzcz9BWfGyVvk7UM
+   jw2MVHGZJ/FMHE9OF+blOlKL3fZC2HK8e2a2G59AYRcCwdSLvHubGzXaG
+   /brvbPil5OOGAs4XhxayxNT19OC6wqhaKQgC1/gPWQjasTK/H8Doa8lEq
+   qeNOdvX6RGHQi4+YrE9dx83Tyskk/NLT7D7qZksGFbNXJvik+QxbQGEYc
+   nROqBBZX+JSJzAu1gn6ONlQ2QF9ZBA7wNXI5aWjVNvwR+s+fIQP37bZuD
+   wvg9uGNZ6HnPZ9jvyufhD7YBmbFzHIK3L79VQJLmxudEAkbURTJcswOGx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="376280345"
 X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="376280312"
+   d="scan'208";a="376280345"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 01:14:46 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 01:14:51 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="685577350"
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="685577375"
 X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="685577350"
+   d="scan'208";a="685577375"
 Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
-  by orsmga003.jf.intel.com with ESMTP; 21 Aug 2023 01:14:42 -0700
+  by orsmga003.jf.intel.com with ESMTP; 21 Aug 2023 01:14:46 -0700
 From: Junfeng Guo <junfeng.guo@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -55,12 +55,13 @@ Cc: netdev@vger.kernel.org,
 	sridhar.samudrala@intel.com,
 	horms@kernel.org,
 	Junfeng Guo <junfeng.guo@intel.com>
-Subject: [PATCH iwl-next v6 00/15] Introduce the Parser Library
-Date: Mon, 21 Aug 2023 16:14:23 +0800
-Message-Id: <20230821081438.2937934-1-junfeng.guo@intel.com>
+Subject: [PATCH iwl-next v6 01/15] ice: add parser create and destroy skeleton
+Date: Mon, 21 Aug 2023 16:14:24 +0800
+Message-Id: <20230821081438.2937934-2-junfeng.guo@intel.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230821023833.2700902-1-junfeng.guo@intel.com>
+In-Reply-To: <20230821081438.2937934-1-junfeng.guo@intel.com>
 References: <20230821023833.2700902-1-junfeng.guo@intel.com>
+ <20230821081438.2937934-1-junfeng.guo@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,144 +76,159 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Current software architecture for flow filtering offloading limited
-the capability of Intel Ethernet 800 Series Dynamic Device
-Personalization (DDP) Package. The flow filtering offloading in the
-driver is enabled based on the naming parsers, each flow pattern is
-represented by a protocol header stack. And there are multiple layers
-(e.g., virtchnl) to maintain their own enum/macro/structure
-to represent a protocol header (IP, TCP, UDP ...), thus the extra
-parsers to verify if a pattern is supported by hardware or not as
-well as the extra converters that to translate represents between
-different layers. Every time a new protocol/field is requested to be
-supported, the corresponding logic for the parsers and the converters
-needs to be modified accordingly. Thus, huge & redundant efforts are
-required to support the increasing flow filtering offloading features,
-especially for the tunnel types flow filtering.
+Add new parser module which can parse a packet in binary
+and generate information like ptype, protocol/offset pairs
+and flags which can be used to feed the FXP profile creation
+directly.
 
-This patch set provides a way for applications to send down training
-packets & masks (in binary) to the driver. Then these binary data
-would be used by the driver to generate certain data that are needed
-to create a filter rule in the filtering stage of switch/RSS/FDIR.
+The patch added skeleton of the create and destroy APIs:
+ice_parser_create
+ice_parser_destroy
 
-Note that the impact of a malicious rule in the raw packet filter is
-limited to performance rather than functionality. It may affect the
-performance of the workload, similar to other limitations in FDIR/RSS
-on AVF. For example, there is no resource boundary for VF FDIR/RSS
-rules, so one malicious VF could potentially make other VFs
-inefficient in offloading.
-
-The parser library is expected to include boundary checks to prevent
-critical errors such as infinite loops or segmentation faults.
-However, only implementing and validating the parser emulator in a
-sandbox environment (like ebpf) presents a challenge.
-
-The idea is to make the driver be able to learn from the DDP package
-directly to understand how the hardware parser works (i.e., the
-Parser Library), so that it can process on the raw training packet
-(in binary) directly and create the filter rule accordingly.
-
-Based on this Parser Library, the raw flow filtering of
-switch/RSS/FDIR could be enabled to allow new flow filtering
-offloading features to be supported without any driver changes (only
-need to update the DDP package).
-
-
-v6:
-- Move `rt` field setting to the correct commit (first introduced).
-
-v5:
-- Update copyrights of new files to be 2023 only.
-- Update patch set series prefix.
-- Fix typo on patch 2 commit message.
-
-v4:
-- Update cover letter series title.
-
-v3:
-- Replace magic hardcoded values with macros.
-- Use size_t to avoid superfluous type cast to uintptr_t in function
- ice_parser_sect_item_get.
-- Prefix for static local function names to avoid namespace pollution.
-- Use strstarts() function instead of self implementation.
-
-v2:
-- Fix build warnings.
-
-
-
-Junfeng Guo (15):
-  ice: add parser create and destroy skeleton
-  ice: init imem table for parser
-  ice: init metainit table for parser
-  ice: init parse graph cam tables for parser
-  ice: init boost tcam and label tables for parser
-  ice: init ptype marker tcam table for parser
-  ice: init marker and protocol group tables for parser
-  ice: init flag redirect table for parser
-  ice: init XLT key builder for parser
-  ice: add parser runtime skeleton
-  ice: add internal help functions
-  ice: add parser execution main loop
-  ice: support double vlan mode configure for parser
-  ice: add tunnel port support for parser
-  ice: add API for parser profile initialization
-
- drivers/net/ethernet/intel/ice/Makefile       |  11 +
- drivers/net/ethernet/intel/ice/ice_bst_tcam.c | 313 +++++++
- drivers/net/ethernet/intel/ice/ice_bst_tcam.h |  52 ++
- drivers/net/ethernet/intel/ice/ice_common.h   |   4 +
- drivers/net/ethernet/intel/ice/ice_ddp.c      |  10 +-
- drivers/net/ethernet/intel/ice/ice_ddp.h      |  14 +
- drivers/net/ethernet/intel/ice/ice_flg_rd.c   |  73 ++
- drivers/net/ethernet/intel/ice/ice_flg_rd.h   |  24 +
- drivers/net/ethernet/intel/ice/ice_imem.c     | 279 ++++++
- drivers/net/ethernet/intel/ice/ice_imem.h     | 217 +++++
- drivers/net/ethernet/intel/ice/ice_metainit.c | 181 ++++
- drivers/net/ethernet/intel/ice/ice_metainit.h | 104 +++
- drivers/net/ethernet/intel/ice/ice_mk_grp.c   |  51 +
- drivers/net/ethernet/intel/ice/ice_mk_grp.h   |  17 +
- drivers/net/ethernet/intel/ice/ice_parser.c   | 562 +++++++++++
- drivers/net/ethernet/intel/ice/ice_parser.h   | 140 +++
- .../net/ethernet/intel/ice/ice_parser_rt.c    | 877 ++++++++++++++++++
- .../net/ethernet/intel/ice/ice_parser_rt.h    |  73 ++
- .../net/ethernet/intel/ice/ice_parser_util.h  |  37 +
- drivers/net/ethernet/intel/ice/ice_pg_cam.c   | 397 ++++++++
- drivers/net/ethernet/intel/ice/ice_pg_cam.h   | 142 +++
- .../net/ethernet/intel/ice/ice_proto_grp.c    |  90 ++
- .../net/ethernet/intel/ice/ice_proto_grp.h    |  31 +
- drivers/net/ethernet/intel/ice/ice_ptype_mk.c |  73 ++
- drivers/net/ethernet/intel/ice/ice_ptype_mk.h |  23 +
- drivers/net/ethernet/intel/ice/ice_tmatch.h   |  40 +
- drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
- drivers/net/ethernet/intel/ice/ice_xlt_kb.c   | 262 ++++++
- drivers/net/ethernet/intel/ice/ice_xlt_kb.h   |  80 ++
- 29 files changed, 4173 insertions(+), 5 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/ice/ice_bst_tcam.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_bst_tcam.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_imem.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_imem.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_metainit.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_metainit.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.h
+Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_common.h |  4 +++
+ drivers/net/ethernet/intel/ice/ice_ddp.c    | 10 +++----
+ drivers/net/ethernet/intel/ice/ice_ddp.h    | 13 ++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.c | 33 +++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h | 13 ++++++++
+ 5 files changed, 68 insertions(+), 5 deletions(-)
  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_util.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_pg_cam.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_pg_cam.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_ptype_mk.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_ptype_mk.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_tmatch.h
- create mode 100644 drivers/net/ethernet/intel/ice/ice_xlt_kb.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_xlt_kb.h
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 8ba5f935a092..528dde976373 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -9,10 +9,14 @@
+ #include "ice_type.h"
+ #include "ice_nvm.h"
+ #include "ice_flex_pipe.h"
++#include "ice_parser.h"
+ #include <linux/avf/virtchnl.h>
+ #include "ice_switch.h"
+ #include "ice_fdir.h"
+ 
++#define BITS_PER_WORD	16
++#define BITMAP_MASK(n)	GENMASK(((n) - 1), 0)
++
+ #define ICE_SQ_SEND_DELAY_TIME_MS	10
+ #define ICE_SQ_SEND_MAX_EXECUTE		3
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+index d71ed210f9c4..3bdf03b9ee71 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+@@ -288,11 +288,11 @@ void *ice_pkg_enum_section(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
+  * indicates a base offset of 10, and the index for the entry is 2, then
+  * section handler function should set the offset to 10 + 2 = 12.
+  */
+-static void *ice_pkg_enum_entry(struct ice_seg *ice_seg,
+-				struct ice_pkg_enum *state, u32 sect_type,
+-				u32 *offset,
+-				void *(*handler)(u32 sect_type, void *section,
+-						 u32 index, u32 *offset))
++void *ice_pkg_enum_entry(struct ice_seg *ice_seg,
++			 struct ice_pkg_enum *state, u32 sect_type,
++			 u32 *offset,
++			 void *(*handler)(u32 sect_type, void *section,
++					  u32 index, u32 *offset))
+ {
+ 	void *entry;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.h b/drivers/net/ethernet/intel/ice/ice_ddp.h
+index 37eadb3d27a8..da5dfeed3b1f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.h
+@@ -238,10 +238,18 @@ struct ice_meta_sect {
+ #define ICE_SID_CDID_KEY_BUILDER_RSS 47
+ #define ICE_SID_CDID_REDIR_RSS 48
+ 
++#define ICE_SID_RXPARSER_CAM		50
++#define ICE_SID_RXPARSER_NOMATCH_CAM	51
++#define ICE_SID_RXPARSER_IMEM		52
+ #define ICE_SID_RXPARSER_MARKER_PTYPE 55
+ #define ICE_SID_RXPARSER_BOOST_TCAM 56
++#define ICE_SID_RXPARSER_PROTO_GRP	57
+ #define ICE_SID_RXPARSER_METADATA_INIT 58
++#define ICE_SID_TXPARSER_NOMATCH_CAM	61
+ #define ICE_SID_TXPARSER_BOOST_TCAM 66
++#define ICE_SID_RXPARSER_MARKER_GRP	72
++#define ICE_SID_RXPARSER_PG_SPILL	76
++#define ICE_SID_RXPARSER_NOMATCH_SPILL	78
+ 
+ #define ICE_SID_XLT0_PE 80
+ #define ICE_SID_XLT_KEY_BUILDER_PE 81
+@@ -437,6 +445,11 @@ int ice_update_pkg(struct ice_hw *hw, struct ice_buf *bufs, u32 count);
+ 
+ int ice_pkg_buf_reserve_section(struct ice_buf_build *bld, u16 count);
+ u16 ice_pkg_buf_get_active_sections(struct ice_buf_build *bld);
++void *
++ice_pkg_enum_entry(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
++		   u32 sect_type, u32 *offset,
++		   void *(*handler)(u32 sect_type, void *section,
++				    u32 index, u32 *offset));
+ void *ice_pkg_enum_section(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
+ 			   u32 sect_type);
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
+new file mode 100644
+index 000000000000..747dfad66db2
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_parser.c
+@@ -0,0 +1,33 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2023 Intel Corporation */
++
++#include "ice_common.h"
++
++/**
++ * ice_parser_create - create a parser instance
++ * @hw: pointer to the hardware structure
++ * @psr: output parameter for a new parser instance be created
++ */
++int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr)
++{
++	struct ice_parser *p;
++
++	p = devm_kzalloc(ice_hw_to_dev(hw), sizeof(struct ice_parser),
++			 GFP_KERNEL);
++	if (!p)
++		return -ENOMEM;
++
++	p->hw = hw;
++
++	*psr = p;
++	return 0;
++}
++
++/**
++ * ice_parser_destroy - destroy a parser instance
++ * @psr: pointer to a parser instance
++ */
++void ice_parser_destroy(struct ice_parser *psr)
++{
++	devm_kfree(ice_hw_to_dev(psr->hw), psr);
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_parser.h b/drivers/net/ethernet/intel/ice/ice_parser.h
+new file mode 100644
+index 000000000000..85c470235e67
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_parser.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2023 Intel Corporation */
++
++#ifndef _ICE_PARSER_H_
++#define _ICE_PARSER_H_
++
++struct ice_parser {
++	struct ice_hw *hw; /* pointer to the hardware structure */
++};
++
++int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr);
++void ice_parser_destroy(struct ice_parser *psr);
++#endif /* _ICE_PARSER_H_ */
 -- 
 2.25.1
 
