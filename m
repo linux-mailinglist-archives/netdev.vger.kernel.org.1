@@ -1,144 +1,171 @@
-Return-Path: <netdev+bounces-29364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023A1782EC5
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 18:50:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC50A782F01
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F16CB1C2091D
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:50:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05E621C208CB
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C627491;
-	Mon, 21 Aug 2023 16:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844488BF7;
+	Mon, 21 Aug 2023 17:03:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488EB320F
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 16:50:17 +0000 (UTC)
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26A9CC;
-	Mon, 21 Aug 2023 09:50:15 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-56a3e6bce68so745206a12.1;
-        Mon, 21 Aug 2023 09:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692636615; x=1693241415;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XR2yyunJzTVylJd0O9OMot2bWsAj0OOysrvklSnCbu4=;
-        b=awZ8EcWECM2Gf+b7+fHdgw7ooZozUCf5/xbrV8Ub3ayWY6HpgbjDxyBaftAx1939KQ
-         8FdzvU5QvNOhM0GVlZSjFPyIQcAvKd5R9bEPOvOnrlf/okLkmNHBnx68cRIk1VhsaJiJ
-         npsotZm3pgEy2PPoIRVeNmERJX2icwmibmwnyON8jH62HlZVgjURKt3tA32bdWv014UF
-         5PzaLSFwLs8lemgh8PpYr/+qs/ZbN8leBkT4yqPyEHxmCz255vES8MNIg/TWcmOuDIeN
-         p9FPHH9NuuZk5YA1GMgZzOqWhFKWbmnfi6IAsvlBNBRrzaEjcT0BosLYUj7MXMXjpQD5
-         K6PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692636615; x=1693241415;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XR2yyunJzTVylJd0O9OMot2bWsAj0OOysrvklSnCbu4=;
-        b=h239MUI0lUFM0wqH3ljN5NdcUmZw+uwjievFU/58TkpBItA3Aeq6WEV9eVNdixFDwK
-         Q9TGqiFj2FyR2eKPVOHHZ7D6fBI0K5Tb+Nsce6pste1xVvw8N80faAdjVGKNMu7/Xb48
-         zg14Ea2wAQXfweQatDkWqYMgPQ3yIrzu+HpoO93EXy+ctFNCg7G2n2mhCN+0xDGVJb/X
-         2u3Tpxj48Svk99SlSMAQjEM3wJaQSgPAxQpWfFbLMgBJulaDSGrVJvwO1GVv9sM7WQji
-         CA4GgSK0YPYmB3BXVlCcTEUTewOrfFl7ginTB6wulgaW3xGHKz+Al3AVqFhXMnRbkI79
-         Ogxg==
-X-Gm-Message-State: AOJu0Yx5ZQjpblt9TkprHTim79GN3g0fiqqHTf5V6qzmGtxSmQLu3+hS
-	MKLIZ9E3n4H+IO9JLTkewn2dw+IV1e2cvyaH5Kw=
-X-Google-Smtp-Source: AGHT+IHiuWf7GBuYIkxaCdpdgJmZc6c20f/H/tO0At/LUg3HH4ULaGaMZtK6LsAajICuZKR1GOO0Hq8s4upJ2qM2zYU=
-X-Received: by 2002:a17:90a:a389:b0:269:7eea:d7f6 with SMTP id
- x9-20020a17090aa38900b002697eead7f6mr3862231pjp.49.1692636615233; Mon, 21 Aug
- 2023 09:50:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF582F2B;
+	Mon, 21 Aug 2023 17:03:13 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BFFAEE;
+	Mon, 21 Aug 2023 10:03:11 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 13DAC22C36;
+	Mon, 21 Aug 2023 17:03:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1692637390; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SLJykvxuZvqJ+C4mN0x9FvUi2rRqmrHd1orjK7FFMsI=;
+	b=fr+7s4BC6VeEFmYTKeLSlLmCmG4kqom83BSHYONhbsPm/dy0Z7tC+7gbjWSoPBFyHpycNq
+	efbc0AwMv4JeFOILdc4qEKvaUHA7b1ZXRdhGl+jtrsv8DOjWFdCh6ihMNpuWM7zsGxE7ew
+	rcedEbMxJUH31F6sEzqcihuDPleH9n0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1692637390;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SLJykvxuZvqJ+C4mN0x9FvUi2rRqmrHd1orjK7FFMsI=;
+	b=cMNGb62gPZo/M23xiXN3LVNbAaeKgjjWWp6dJudi7Q3YjsA/Fh7TOX31foIq4KAURCLVgm
+	naLMFN4SvWRf5sAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CF9FA13421;
+	Mon, 21 Aug 2023 17:03:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id YTjtLM2Y42TsSAAAMHmgww
+	(envelope-from <krisman@suse.de>); Mon, 21 Aug 2023 17:03:09 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: Breno Leitao <leitao@debian.org>
+Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
+  willemdebruijn.kernel@gmail.com,  martin.lau@linux.dev,
+  bpf@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  netdev@vger.kernel.org,  io-uring@vger.kernel.org,  kuba@kernel.org,
+  pabeni@redhat.com
+Subject: Re: [PATCH v3 8/9] io_uring/cmd: BPF hook for getsockopt cmd
+In-Reply-To: <ZOMrD1DHeys0nFwt@gmail.com> (Breno Leitao's message of "Mon, 21
+	Aug 2023 02:14:55 -0700")
+Organization: SUSE
+References: <20230817145554.892543-1-leitao@debian.org>
+	<20230817145554.892543-9-leitao@debian.org> <87pm3l32rk.fsf@suse.de>
+	<ZOMrD1DHeys0nFwt@gmail.com>
+Date: Mon, 21 Aug 2023 13:03:08 -0400
+Message-ID: <875y58nx9v.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230817101014.3484715-1-martin@geanix.com> <20230817101014.3484715-2-martin@geanix.com>
- <20230817094529.68ae1083@kernel.org> <CAMZ6RqLvbp8EStaSRFQUimhUMpn75=3pkQZYspnP1gYRsspv-g@mail.gmail.com>
- <CAMZ6RqLmNJ0zL9XO9zGCu=CbUHgm68M42fwqkSKk-rSAosCWzg@mail.gmail.com> <cca27b04-8b06-78d1-fe0a-50a10dcbebe2@hartkopp.net>
-In-Reply-To: <cca27b04-8b06-78d1-fe0a-50a10dcbebe2@hartkopp.net>
-From: Vincent Mailhol <vincent.mailhol@gmail.com>
-Date: Tue, 22 Aug 2023 01:50:04 +0900
-Message-ID: <CAMZ6RqJGjEMfst=4ksGeTnxovbALpSH4DX0fnajqKrO8Jivgag@mail.gmail.com>
-Subject: Re: [PATCH 1/2] can: netlink: support setting hardware filters
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?Martin_Hundeb=C3=B8ll?= <martin@geanix.com>, 
-	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	linux-can <linux-can@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon. 21 Aug. 2023 at 04:21, Oliver Hartkopp <socketcan@hartkopp.net> wro=
-te:
-> On 19.08.23 15:29, Vincent Mailhol wrote:
-> > On Sat. 19 Aug. 2023 at 22:10, Vincent Mailhol
-> > <vincent.mailhol@gmail.com> wrote:
-> >> On Sat. 19 Aug. 2023, 01:19, Jakub Kicinski <kuba@kernel.org> wrote:
-> >>>
-> >>> On Thu, 17 Aug 2023 12:10:13 +0200 Martin Hundeb=C3=B8ll wrote:
-> >>>> +             int len =3D nla_len(data[IFLA_CAN_HW_FILTER]);
-> >>>> +             int num_filter =3D len / sizeof(struct can_filter);
-> >>>> +             struct can_filter *filter =3D nla_data(data[IFLA_CAN_H=
-W_FILTER]);
-> >>>
-> >>> This will prevent you from ever extending struct can_filter in
-> >>> a backward-compatible fashion, right? I obviously know very little
-> >>> about CAN but are you confident a more bespoke API to manipulate
-> >>> filters individually and allow extensibility is not warranted?
-> >>
-> >> I follow Jakub's point of view.
-> >>
-> >> The current struct can_filter is not sound. Some devices such as the
-> >> ES582.1 supports filtering of the CAN frame based on the flags (i.e.
-> >> SFF/EFF, RTR, FDF).
-> >
-> > I wrote too fast. The EFF and RTR flags are contained in the canid_t,
-> > so the current struct can_filter is able to handle these two flags.
-> > But it remains true that the CAN-FD flags (FDF and BRS) are currently
-> > not handled. Not to mention that more flags will come with the
-> > upcoming CAN XL.
+Breno Leitao <leitao@debian.org> writes:
+
+> On Thu, Aug 17, 2023 at 03:08:47PM -0400, Gabriel Krisman Bertazi wrote:
+>> Breno Leitao <leitao@debian.org> writes:
+>> 
+>> > Add BPF hook support for getsockopts io_uring command. So, BPF cgroups
+>> > programs can run when SOCKET_URING_OP_GETSOCKOPT command is executed
+>> > through io_uring.
+>> >
+>> > This implementation follows a similar approach to what
+>> > __sys_getsockopt() does, but, using USER_SOCKPTR() for optval instead of
+>> > kernel pointer.
+>> >
+>> > Signed-off-by: Breno Leitao <leitao@debian.org>
+>> > ---
+>> >  io_uring/uring_cmd.c | 18 +++++++++++++-----
+>> >  1 file changed, 13 insertions(+), 5 deletions(-)
+>> >
+>> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+>> > index a567dd32df00..9e08a14760c3 100644
+>> > --- a/io_uring/uring_cmd.c
+>> > +++ b/io_uring/uring_cmd.c
+>> > @@ -5,6 +5,8 @@
+>> >  #include <linux/io_uring.h>
+>> >  #include <linux/security.h>
+>> >  #include <linux/nospec.h>
+>> > +#include <linux/compat.h>
+>> > +#include <linux/bpf-cgroup.h>
+>> >  
+>> >  #include <uapi/linux/io_uring.h>
+>> >  #include <uapi/asm-generic/ioctls.h>
+>> > @@ -184,17 +186,23 @@ static inline int io_uring_cmd_getsockopt(struct socket *sock,
+>> >  	if (err)
+>> >  		return err;
+>> >  
+>> > -	if (level == SOL_SOCKET) {
+>> > +	err = -EOPNOTSUPP;
+>> > +	if (level == SOL_SOCKET)
+>> >  		err = sk_getsockopt(sock->sk, level, optname,
+>> >  				    USER_SOCKPTR(optval),
+>> >  				    KERNEL_SOCKPTR(&optlen));
+>> > -		if (err)
+>> > -			return err;
+>> >  
+>> > +	if (!(issue_flags & IO_URING_F_COMPAT))
+>> > +		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
+>> > +						     optname,
+>> > +						     USER_SOCKPTR(optval),
+>> > +						     KERNEL_SOCKPTR(&optlen),
+>> > +						     optlen, err);
+>> > +
+>> > +	if (!err)
+>> >  		return optlen;
+>> > -	}
+>> 
+>> Shouldn't you call sock->ops->getsockopt for level!=SOL_SOCKET prior to
+>> running the hook?
+>> Before this patch, it would bail out with EOPNOTSUPP,
+>> but now the bpf hook gets called even for level!=SOL_SOCKET, which
+>> doesn't fit __sys_getsockopt. Am I misreading the code?
 >
-> You are right with FDF where we could use the former CAN_ERR_FLAG value
-> which is not needed for hw filter API.
-
-And what about the BRS flag?
-
-> But regarding CAN XL we could use the Standard 11 bit ID handling with
-> another flag inside the remaining 18 bits.
-
-Then, wouldn't you still need one more flag to indicate that this is a
-CAN XL filter?
-
-> The general concept of re-using the struct can_filter makes sense to me
-> as this follows the widely used pattern in the af_can.c core and CAN_RAW
-> sockets.
+> Not really, sock->ops->getsockopt() does not suport sockptr_t, but
+> __user addresses, differently from setsockopt()
 >
-> Best regards,
-> Oliver
+>           int             (*setsockopt)(struct socket *sock, int level,
+>                                         int optname, sockptr_t optval,
+>                                         unsigned int optlen);
+>           int             (*getsockopt)(struct socket *sock, int level,
+>                                         int optname, char __user *optval, int __user *optlen);
 >
-> >
-> >> I think that each of the fields of the filter should have its own NLA
-> >> declaration with the whole thing wrapped within a NLA_NESTED_ARRAY.
-> >>
-> >> I also think that there should then be a method to report the precise
-> >> filtering capabilities of the hardware.
-> >>
-> >>
-> >> Yours sincerely,
-> >> Vincent Mailhol
+> In order to be able to call sock->ops->getsockopt(), the callback
+> function will need to accepted sockptr.
+
+So, it seems you won't support !SOL_SOCKETs here.  Then, I think you
+shouldn't call the hook for those sockets. My main concern is that we
+remain compatible to __sys_getsockopt when invoking the hook.
+
+I think you should just have the following as the very first thing in
+the function (but after the security_ check).
+
+if (level != SOL_SOCKET)
+   return -EOPNOTSUPP;
+
+-- 
+Gabriel Krisman Bertazi
 
