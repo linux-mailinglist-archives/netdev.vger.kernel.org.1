@@ -1,281 +1,227 @@
-Return-Path: <netdev+bounces-29243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4258978247C
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:34:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7032A78248A
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D9D280E83
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:34:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FB0B280EBC
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95DC1877;
-	Mon, 21 Aug 2023 07:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3206B187A;
+	Mon, 21 Aug 2023 07:38:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70D41867
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:34:50 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 685BCB1
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:34:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692603288; x=1724139288;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WtSnmcbcg19OEqPuXSIiwOWp3QjhVfRJqrkigivug/M=;
-  b=Cr0HL9Qw4sY+gEU84l60vcpeKJ15hjaXnAIdgPyfiSoXDvHYU4LUFTiN
-   MOBbSoTAycZLt+r/oMUVIac2YSsIe7pTylSdiQGMpkRwOoyBkeTp6Z5ke
-   sOwjHOWgEUUYYd3jtcYZSMo483tN1uvmYI48CvKK2UemP4xYrKX4EDhRt
-   Ya0/ZmHWL/ngGVzY+2+8OdCPRESW/1eGHKPQQC3Kv2JbwM7De0IyM/Zt0
-   1Yumfrqw2R4Uct4+UjZiBQKWI8oVmEl3zpPMEYGg349w6mL3G4HmvWDht
-   eh2A9mDYMuZRgThFULJpxgLnF/9uQLeIe1zHxf3f5mjFPKkDP9wBllGlv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="459885996"
-X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="459885996"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 00:34:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="801161690"
-X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="801161690"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Aug 2023 00:34:47 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 21 Aug 2023 00:34:47 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 21 Aug 2023 00:34:47 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 21 Aug 2023 00:34:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PvF9Nfk0Ggl4IgQR79PPzchNXOOFAcwvULS8ZR3G+YWeGER3S9aRWoWndtul3jVvFlpWZuM4co+gcilUQIGu5+xEYhfQo9feT7T6KrEcBMcIoI+mOsY88xSf3KanypYuuqx8MvZlhNEaubGU5JqB5B0hGXqaTXD6rNyTAOxuUb7+2UQ+SKpkLRRshOnqsVjTM0QHwgF5CkJ8L7JBTaVd5bSxo91ZfpXarVwwgqtNK5eiKhpG3xTd2EkAhvESx3nZPE0UcLk0I7qyxT4dh4e860DS1RIJrgOCI20SBhl1TuK8ScM+US2xOUIb0vKClQOyzk8ooE/taTK1R76QZrys6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ALm7rFozSS3TtyFkGsahKXYvvv2u0stDgoJiOzDsQAM=;
- b=Y4DWz5vatVuEFWAfCNrVkHR7wpJbcyPQas/5ItqWdJKuj8G4NrG9YSUC8rc2V+pGO8PCdzfsvLpFIY8dAkZdM3znrYfeI3Qf+Z+4tjM4IdG0qDGO5nGWzM4WkYwGITMG3CUlbpUcvgJLzoM6wORYt1hejmZHG/k7AAAqR5xcAHR1LVN0fjIu9wSLTIwTdI41fSy4Rwdj9modACI03dMmM0yNUiAosUHW39UYnbhT1pPngcd4HYFC3/2i8iUGuzDhChKyHuLz71C9hL9Ywgcoy+9eP2H66vj5T+YhLu5wfjDhDD+yMvwSJ9Lu3AcG/zTZg/x70iKn3Pzf996nXQQn3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB3723.namprd11.prod.outlook.com (2603:10b6:5:13f::25)
- by MW4PR11MB7102.namprd11.prod.outlook.com (2603:10b6:303:22b::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Mon, 21 Aug
- 2023 07:34:45 +0000
-Received: from DM6PR11MB3723.namprd11.prod.outlook.com
- ([fe80::ce6:bce1:eaf8:ad80]) by DM6PR11MB3723.namprd11.prod.outlook.com
- ([fe80::ce6:bce1:eaf8:ad80%7]) with mapi id 15.20.6699.020; Mon, 21 Aug 2023
- 07:34:38 +0000
-From: "Guo, Junfeng" <junfeng.guo@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Zhang, Qi Z" <qi.z.zhang@intel.com>, ivecera
-	<ivecera@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Subject: RE: [PATCH iwl-next v5 01/15] ice: add parser create and destroy
- skeleton
-Thread-Topic: [PATCH iwl-next v5 01/15] ice: add parser create and destroy
- skeleton
-Thread-Index: AQHZ09ijYFelMPzDika6yBhxTGMJEq/0WEWAgAACnwCAAAB9oA==
-Date: Mon, 21 Aug 2023 07:34:38 +0000
-Message-ID: <DM6PR11MB3723437003B055BB7C74AF63E71EA@DM6PR11MB3723.namprd11.prod.outlook.com>
-References: <20230605054641.2865142-1-junfeng.guo@intel.com>
- <20230821023833.2700902-1-junfeng.guo@intel.com>
- <20230821023833.2700902-2-junfeng.guo@intel.com>
- <20230821072037.GB2711035@kernel.org> <20230821073000.GC2711035@kernel.org>
-In-Reply-To: <20230821073000.GC2711035@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB3723:EE_|MW4PR11MB7102:EE_
-x-ms-office365-filtering-correlation-id: 40141e7e-2def-4ac9-df66-08dba2191324
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: e4+4YB9+YA/galQiQnn00X6wr7IzfvSkGtV5bNugkvKGqOcr1xZcRkuEYPpHmSJmezceDUzHyPj/x5z1uUCtR+qdQpaTkb6L0tH5vxrxq3IZA+b2UUmOEcTzWPGD8st/w+IFHDbttH0s1+KgpCbUkbT0cJ7HLoteoLK+OQObFZsDC8OCwwvAMQafrrFhIxL7Xj/wK0j+Z7mhEiMtUcyRKUL8RX8lHUjIzf5P8LgR4jieHm4s+OSwYpS/qDpFzFQ+ZGh8KfKYfXWdl4jIoUI76zJTy3BGZdnlFDuLNXmEIbpeWeXZbMcMR7q11FCn8zVCaNO7MET6dygMQEly1jWimPiTArk1qB3InkDCv90b1KTvUJfx0P33CoEtyZfMdn8ClpKAeysBJL9T9oaudm/rIkwY5lhrRqxPE7jJthcO9aRMiPgWaqocp4AIkORGN2amNditJUtaXQgU/rKO+Zu/A3geQmdjL8Z8Pmjm4aYEHQi0flwnhCnBucnaWMQMU28Yvk2boQvkPtTjiI8T0NmwU9eCImmzw/MFVYXCqBYLpIWMBYDYRFTVU48L2eHIW9KcuQJ6QKd5mD7mkmQd0KiYD5PjiRaNRxjbSGGzcQW8Avo1q+Mo7CKhBsAtuYlyXdZ0
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3723.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(396003)(136003)(346002)(451199024)(186009)(1800799009)(54906003)(76116006)(66946007)(316002)(66476007)(122000001)(64756008)(66446008)(6916009)(5660300002)(41300700001)(52536014)(66556008)(38100700002)(38070700005)(4326008)(8676002)(8936002)(82960400001)(26005)(2906002)(83380400001)(55016003)(478600001)(86362001)(33656002)(9686003)(53546011)(6506007)(71200400001)(7696005)(107886003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?a1EPc1PXewZYrtkZxA9NiFNXvpqjqT78igdu6OAjFZ9vDSZ3Gt4g440R2JOF?=
- =?us-ascii?Q?GAy+B0kAMrWJMcMlto23Dz1hB8xQ9my59Kp2oV6U+r1F7QApRekpcY/kR+7S?=
- =?us-ascii?Q?mmSecz2nmC79nrwbPyG8TsjurwDkkIt45N3qFegId/Yqu/cnAri/ZCcByHme?=
- =?us-ascii?Q?HdK8WqQnoZJ2nRwnGKmVaOST6LckcGRYng1oN4Gu8C9my2iCCQXFzWOS5GFe?=
- =?us-ascii?Q?98I6gFlo8MDqlJqSxTxf8zM8uMnzoOgZ+c+MMDGDTuTonXGUjykjgyqtqQeb?=
- =?us-ascii?Q?jqqhqJxkxRAlLq9ev4L9JPFIvsIl3WP+nKmZc9Xt/bPL7TW12hSaycpNNBke?=
- =?us-ascii?Q?7bppQsqCQF+yWRgAGZ2bzEVeVxRvo4fuEMXBqdM6b61ecobqMGZYMc9Yt++C?=
- =?us-ascii?Q?UD/viMQDd+88n8LtzIuabX51QDxejgxTEYpteLOsglkdawekPHvSmi0pKmcH?=
- =?us-ascii?Q?t9JjrmYx0RJ41UbULbFO5zVsikbz6t3dM5lBMIqy1yp2zHpH3T0BYPrqVkmZ?=
- =?us-ascii?Q?WJKiBwfybpHPs8cpztVB3hb1U3lwuUQxitbomyTm866VrGRKfdwOvbozD3Lz?=
- =?us-ascii?Q?MJjBk875xLqyLipRjZoCoqTo39LzsBo4fGXSd/iA/W2I4E1q8erQoq9P5rK2?=
- =?us-ascii?Q?zo9Uuu4RI6ZSpdhCm/lOzD9kLbWja2qTNE/mOC2pLdbu3Q7vnmnOKz6MeT5r?=
- =?us-ascii?Q?XVRrR6oz+1kRd/lB767sO2kxDUVRyTopstcLqUuRM0BvrEMc4xNtGIFnliT7?=
- =?us-ascii?Q?XUTQ7gq4ZyS8fwHh8+71R68+si5dbNz3q1E3ePOHJW5t4IqDxUp/3vN+LFkZ?=
- =?us-ascii?Q?z9IK/ShvaDm2riMWlmls8LKJxVXfViMYQIgRShFk2b1RPptVF8lv43nPVcpQ?=
- =?us-ascii?Q?KiQIWx7zWzSZagyny10YuUqZKbW2FfZeUqmsRe2BbdwrnczJ2f6VYTnl4RDR?=
- =?us-ascii?Q?ky9GkBYAbp0TLZTNxBrriNXV+Y4KskW4g7008XpkudTyfAm3VWcT9OHzJ5JX?=
- =?us-ascii?Q?dTjKfTLn4wOOpo1TMDGfGi1DsJsAJ4lZg2qrcKwwiuBG47/4vYpr8RqHuZVV?=
- =?us-ascii?Q?jZGUKxJjxbECOa6q4F0NMMNlytwMY/fajs/sZSEVWTNIEWxFGKVDX0fAFnS9?=
- =?us-ascii?Q?94MepFd8PTFErZM2HULcQnHMeGXFzCfkMdDJIvgEuyW2aV6cSMFXJPTe4Vbe?=
- =?us-ascii?Q?YzoTGUak3kkHu8rcI1GkQvzIejoAAg2IUOfsxyFSKFqPeETr8ple/bO39a2B?=
- =?us-ascii?Q?S65hwwwRmEkPPjOcuu+70cjlb9XjHCrKa7fvcu+8GdFtYN3e8T6wDIqn/Eda?=
- =?us-ascii?Q?E62b6p6iQH88vRyiu+HSTmC3VPDj/nEPjw0YUw8/EnIR+/+3sGwygsp+ryAC?=
- =?us-ascii?Q?Ad2JQMd47tF7kRyKQ2CYY8N9dV8NzvznJIC7Rj1XC0fBx+13ICYrg3Lq+6FK?=
- =?us-ascii?Q?8hwC1FsFPLRcyDmqYRRMrA/uvBkq8jBN5VQOGYV65oDiju4ueBjcHVR0Fu+R?=
- =?us-ascii?Q?T1yLyZnUnqHXc+X6MjPnDETqXLEV4CLVszWS4wcEN7t3z4+QkUWurNEVMvap?=
- =?us-ascii?Q?yaHGeV/Oro2CwC+htchd0A5H4soyIKbFOtjsXp85?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9219B1848
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:38:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4B7C433C7;
+	Mon, 21 Aug 2023 07:38:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692603532;
+	bh=ZdOlhyOJyytlSWORZProTiZcowwhgh5LZ6v+BAvnMts=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UzaU59giFr1nRQt8GOXJtkrCBVPRulg+rz590RgKum7EXDXQHSvuTut5oYVTOTZSY
+	 zlnf5X6VQNAHw60apeqP0qGwcoCkhkYLISIabTwVqJ0lg3lfQ2d0uFfGaI6FO7ZXpO
+	 0Sb4Y8mvorQ0Q3wrSdf/ajbOj4hwf9Q8AaGb5OeXjfyyBwUM9JaRasNmofVLh/yJW2
+	 XM9PrJAO8qPJ3nzrhI99fWXKRz5uKpbKyNAKSPj/m/wuxGQeYWxahNJzS6nQvya95r
+	 3y1C3fP1AVtmALwNGjKd2BhMU3MtOGUbqMc9SDNUsjInUXjwcycIq+fEBRd0+T4h3J
+	 xikUZ2lPxzdQg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	linux-rdma@vger.kernel.org,
+	Maor Gottlieb <maorg@nvidia.com>,
+	Mark Zhang <markzhang@nvidia.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Raed Salem <raeds@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [GIT PULL v1] Please pull mlx5 MACsec RoCEv2 support
+Date: Mon, 21 Aug 2023 10:38:25 +0300
+Message-ID: <20230821073833.59042-1-leon@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3723.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40141e7e-2def-4ac9-df66-08dba2191324
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2023 07:34:38.1562
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: oYWCjvXv4O/XSZpvuZULWetaxLgn149qllC/qeFX9ODQ4o7TEbkyVw0/PmMCwOZ31ArtRdpdABAv2CPouFhuzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7102
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Changelog:
+v1:
+ * Removed NULL check in first macsec patch as it is not needed.
+ * Added more information about potential merge conflict.
+v0: https://lore.kernel.org/netdev/20230813064703.574082-1-leon@kernel.org/
+----------------------------------------------------------------
 
+Hi,
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: Monday, August 21, 2023 15:30
-> To: Guo, Junfeng <junfeng.guo@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen,
-> Anthony L <anthony.l.nguyen@intel.com>; Brandeburg, Jesse
-> <jesse.brandeburg@intel.com>; Zhang, Qi Z <qi.z.zhang@intel.com>;
-> ivecera <ivecera@redhat.com>; Samudrala, Sridhar
-> <sridhar.samudrala@intel.com>
-> Subject: Re: [PATCH iwl-next v5 01/15] ice: add parser create and
-> destroy skeleton
->=20
-> On Mon, Aug 21, 2023 at 09:20:37AM +0200, Simon Horman wrote:
-> > On Mon, Aug 21, 2023 at 10:38:19AM +0800, Junfeng Guo wrote:
-> > > Add new parser module which can parse a packet in binary
-> > > and generate information like ptype, protocol/offset pairs
-> > > and flags which can be used to feed the FXP profile creation
-> > > directly.
-> > >
-> > > The patch added skeleton of the create and destroy APIs:
-> > > ice_parser_create
-> > > ice_parser_destroy
-> > >
-> > > Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
-> >
-> > Hi Junfeng Guo,
-> >
-> > some minor feedback from my side.
-> >
-> > > ---
-> > >  drivers/net/ethernet/intel/ice/ice_common.h |  4 +++
-> > >  drivers/net/ethernet/intel/ice/ice_ddp.c    | 10 +++---
-> > >  drivers/net/ethernet/intel/ice/ice_ddp.h    | 13 ++++++++
-> > >  drivers/net/ethernet/intel/ice/ice_parser.c | 34
-> +++++++++++++++++++++
-> >
-> > Perhaps I am missing something, but it seems that although
-> > ice_parser.c is added by this patch-set, it is not added to
-> > the build by this patch-set. This seems a little odd to me.
->=20
-> Sorry, somehow I wasn't looking at the entire series.
-> I now see that ice_parser.c is compiled as of patch 12/15 of this series.
+This PR is collected from https://lore.kernel.org/all/cover.1691569414.git.leon@kernel.org
+and contains patches to support mlx5 MACsec RoCEv2.
 
-Yes, thanks for the carefully review!
+It is based on -rc4 and such has minor conflict with net-next due to existance of IPsec packet offlosd
+in eswitch code and hwmon. The resolution for netdev is as follows:
 
->=20
-> >
-> > >  drivers/net/ethernet/intel/ice/ice_parser.h | 13 ++++++++
-> > >  5 files changed, 69 insertions(+), 5 deletions(-)
-> > >  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
-> > >  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
-> >
-> > ...
-> >
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c
-> b/drivers/net/ethernet/intel/ice/ice_parser.c
-> > > new file mode 100644
-> > > index 000000000000..42602cac7e45
-> > > --- /dev/null
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
-> > > @@ -0,0 +1,34 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +/* Copyright (C) 2023 Intel Corporation */
-> > > +
-> > > +#include "ice_common.h"
-> > > +
-> > > +/**
-> > > + * ice_parser_create - create a parser instance
-> > > + * @hw: pointer to the hardware structure
-> > > + * @psr: output parameter for a new parser instance be created
-> > > + */
-> > > +int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr)
-> > > +{
-> > > +	struct ice_parser *p;
-> > > +
-> > > +	p =3D devm_kzalloc(ice_hw_to_dev(hw), sizeof(struct ice_parser),
-> > > +			 GFP_KERNEL);
-> > > +	if (!p)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	p->hw =3D hw;
-> > > +	p->rt.psr =3D p;
-> >
-> > It is, perhaps academic if this file isn't compiled, but the rt field o=
-f
-> > struct ice_parser doesn't exist at this point of the patch-set: it is
-> added
-> > by the last patch of the patch-set.
->=20
-> And I see this field is added in patch 10/15, rather than the last patch
-> (15/15) as I previously stated.
+Before:
+➜  kernel git:(net-next) git merge mlx5-next
+...
+Unmerged paths:
+  (use "git add/rm <file>..." as appropriate to mark resolution)
+	deleted by them: drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
+	both modified:   include/linux/mlx5/driver.h
 
-Thanks for the comments!
-Yes, the setting for rt field should be moved to patch 10/15.
-Will update in the new version patch set. Thanks!
+➜  kernel git:(net-next) ✗ git diff
+diff --cc include/linux/mlx5/driver.h
+index c9d82e74daaa,728bcd6d184c..000000000000
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@@ -806,9 -804,12 +806,18 @@@ struct mlx5_core_dev 
+        struct mlx5_rsc_dump    *rsc_dump;
+        u32                      vsc_addr;
+        struct mlx5_hv_vhca     *hv_vhca;
+++<<<<<<< HEAD
+ +      struct mlx5_hwmon       *hwmon;
+ +      u64                     num_block_tc;
+ +      u64                     num_block_ipsec;
+++=======
++       struct mlx5_thermal     *thermal;
++ #ifdef CONFIG_MLX5_MACSEC
++       struct mlx5_macsec_fs *macsec_fs;
++       /* MACsec notifier chain to sync MACsec core and IB database */
++       struct blocking_notifier_head macsec_nh;
++ #endif
+++>>>>>>> mlx5-next
+  };
+  
+  struct mlx5_db {
+* Unmerged path drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
 
->=20
-> >
-> > > +
-> > > +	*psr =3D p;
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +/**
-> > > + * ice_parser_destroy - destroy a parser instance
-> > > + * @psr: pointer to a parser instance
-> > > + */
-> > > +void ice_parser_destroy(struct ice_parser *psr)
-> > > +{
-> > > +	devm_kfree(ice_hw_to_dev(psr->hw), psr);
-> > > +}
-> >
+After:
+➜  kernel git:(net-next) ✗ git diff
+diff --cc include/linux/mlx5/driver.h
+index c9d82e74daaa,728bcd6d184c..000000000000
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@@ -806,9 -804,12 +806,14 @@@ struct mlx5_core_dev 
+        struct mlx5_rsc_dump    *rsc_dump;
+        u32                      vsc_addr;
+        struct mlx5_hv_vhca     *hv_vhca;
+ -      struct mlx5_thermal     *thermal;
+ +      struct mlx5_hwmon       *hwmon;
+ +      u64                     num_block_tc;
+ +      u64                     num_block_ipsec;
++ #ifdef CONFIG_MLX5_MACSEC
++       struct mlx5_macsec_fs *macsec_fs;
++       /* MACsec notifier chain to sync MACsec core and IB database */
++       struct blocking_notifier_head macsec_nh;
++ #endif
+  };
+  
+  struct mlx5_db {
+* Unmerged path drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
+
+----------------------------------------------------------------
+
+From Patrisious:
+
+This series extends previously added MACsec offload support
+to cover RoCE traffic either.
+
+In order to achieve that, we need configure MACsec with offload between
+the two endpoints, like below:
+
+REMOTE_MAC=10:70:fd:43:71:c0
+
+* ip addr add 1.1.1.1/16 dev eth2
+* ip link set dev eth2 up
+* ip link add link eth2 macsec0 type macsec encrypt on
+* ip macsec offload macsec0 mac
+* ip macsec add macsec0 tx sa 0 pn 1 on key 00 dffafc8d7b9a43d5b9a3dfbbf6a30c16
+* ip macsec add macsec0 rx port 1 address $REMOTE_MAC
+* ip macsec add macsec0 rx port 1 address $REMOTE_MAC sa 0 pn 1 on key 01 ead3664f508eb06c40ac7104cdae4ce5
+* ip addr add 10.1.0.1/16 dev macsec0
+* ip link set dev macsec0 up
+
+And in a similar manner on the other machine, while noting the keys order
+would be reversed and the MAC address of the other machine.
+
+RDMA traffic is separated through relevant GID entries and in case of IP ambiguity
+issue - meaning we have a physical GIDs and a MACsec GIDs with the same IP/GID, we
+disable our physical GID in order to force the user to only use the MACsec GID.
+
+Thanks
+
+The following changes since commit 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4:
+
+  Linux 6.5-rc4 (2023-07-30 13:23:47 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
+
+for you to fetch changes up to 58dbd6428a6819e55a3c52ec60126b5d00804a38:
+
+  RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion (2023-08-20 12:35:24 +0300)
+
+----------------------------------------------------------------
+Patrisious Haddad (14):
+      macsec: add functions to get macsec real netdevice and check offload
+      net/mlx5e: Move MACsec flow steering operations to be used as core library
+      net/mlx5: Remove dependency of macsec flow steering on ethernet
+      net/mlx5e: Rename MACsec flow steering functions/parameters to suit core naming style
+      net/mlx5e: Move MACsec flow steering and statistics database from ethernet to core
+      net/mlx5: Remove netdevice from MACsec steering
+      net/mlx5: Maintain fs_id xarray per MACsec device inside macsec steering
+      RDMA/mlx5: Implement MACsec gid addition and deletion
+      net/mlx5: Add MACsec priorities in RDMA namespaces
+      IB/core: Reorder GID delete code for RoCE
+      net/mlx5: Configure MACsec steering for egress RoCEv2 traffic
+      net/mlx5: Configure MACsec steering for ingress RoCEv2 traffic
+      net/mlx5: Add RoCE MACsec steering infrastructure in core
+      RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion
+
+ drivers/infiniband/core/cache.c                    |    6 +-
+ drivers/infiniband/hw/mlx5/Makefile                |    1 +
+ drivers/infiniband/hw/mlx5/macsec.c                |  364 +++
+ drivers/infiniband/hw/mlx5/macsec.h                |   29 +
+ drivers/infiniband/hw/mlx5/main.c                  |   41 +-
+ drivers/infiniband/hw/mlx5/mlx5_ib.h               |   17 +
+ drivers/net/ethernet/mellanox/mlx5/core/Kconfig    |    2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile   |    2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |    2 +-
+ .../mellanox/mlx5/core/en_accel/en_accel.h         |    4 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/macsec.c  |  176 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/macsec.h  |   26 +-
+ .../mellanox/mlx5/core/en_accel/macsec_fs.c        | 1393 -----------
+ .../mellanox/mlx5/core/en_accel/macsec_fs.h        |   47 -
+ .../mellanox/mlx5/core/en_accel/macsec_stats.c     |   22 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |    2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c   |    1 +
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |   37 +-
+ .../ethernet/mellanox/mlx5/core/lib/macsec_fs.c    | 2410 ++++++++++++++++++++
+ .../ethernet/mellanox/mlx5/core/lib/macsec_fs.h    |   64 +
+ drivers/net/macsec.c                               |   12 +
+ include/linux/mlx5/device.h                        |    2 +
+ include/linux/mlx5/driver.h                        |   51 +
+ include/linux/mlx5/fs.h                            |    2 +
+ include/linux/mlx5/macsec.h                        |   32 +
+ include/net/macsec.h                               |    2 +
+ 26 files changed, 3118 insertions(+), 1629 deletions(-)
+ create mode 100644 drivers/infiniband/hw/mlx5/macsec.c
+ create mode 100644 drivers/infiniband/hw/mlx5/macsec.h
+ delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
+ delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.h
+ create mode 100644 include/linux/mlx5/macsec.h
 
