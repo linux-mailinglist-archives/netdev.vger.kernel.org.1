@@ -1,64 +1,96 @@
-Return-Path: <netdev+bounces-29431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3547833B5
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 22:36:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFD27833C7
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 22:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBAE31C209E1
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:36:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 287761C209D6
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B3311715;
-	Mon, 21 Aug 2023 20:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FC811718;
+	Mon, 21 Aug 2023 20:40:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF35B8468
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:36:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5BE5C433C8;
-	Mon, 21 Aug 2023 20:36:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692650184;
-	bh=K/xF+93uPq0auz1mTESGR8Ar8vwak7/ibe2h9dVVD/w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=atFXh4WrO0oDRofMsbGeGYNDRyw1Z+bahIpXV3JivQSyf6pSSM3yG4N8ms+YvtUTE
-	 mYbhOBXTg0h6Jz5TgMutKi+71bGQUuO2B/5Eqr4f3r8ARI0afTEadi8vHfB4Lx0OnW
-	 Q/efGJmE/wau+RL/5jl+PGUfeWl9nvPXRLc8QlcZxuHNzYWllU6oXfuAj9Nrxk8KRu
-	 QNiFOIY2SwqV1bvvlgqwDNQIxUOU+4ibCFReMdDxGFt+kN35F/fjUtarYrHJbzAoGi
-	 I2OrmUlpgg+wT9xP9ZO6v0uRUj7s/nm1hw8yBv3Mg63pR3NMTDlBxWTXJxwwSiwzy6
-	 WPcXmR1tIZIxg==
-Date: Mon, 21 Aug 2023 22:36:16 +0200
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next] net: microchip: Remove unused declarations
-Message-ID: <20230821203522.GG2711035@kernel.org>
-References: <20230821135556.43224-1-yuehaibing@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527E14C9E
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:40:56 +0000 (UTC)
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40573E5C
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:40:52 -0700 (PDT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1bdba3f0e73so41740325ad.1
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:40:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692650451; x=1693255251;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/T2AYPyC3yfWbi3PEYaCinp56m3vESMG0m502j5yMho=;
+        b=iyNJRnx/hnkFhNVq09YxDi6QI9kpKH7D0lR8dgPqfSBeK1x7wWz3C7251vdEwBtx+Y
+         3L801IUMk+cgun6NW0Lrh6AI1Z7t3306QsRtK7bXDB2fUDR5iiHnMJYPaWDh9dqj1RgG
+         y8y110KkIUpk5VTnHXyI7jrdJnMfFjLzM3eQaqXVgK3EwgXQHoI7e22yT68AobMjvXPC
+         /iOveWhbmaJcbeOhpv19wtYDC32avb+nvy7Mo3m/KoIH6UP/HDGuEcWVoIlazNOX2rbQ
+         a1RKSEE29NLFTmA69Q8PK3zHZ/F/vwj5TlHc7oiAU0VjVke06dsTiQprx4USN17A5zal
+         IjRg==
+X-Gm-Message-State: AOJu0YwMTJuxf8Y7wmkVY2fQzfG5NMZfayOBnNMP3SippCEViVLl92dt
+	kZ5uagQwP8RCHocDTzhkpftyFxNkXQNc9DKTj8hNLgToKfEw
+X-Google-Smtp-Source: AGHT+IEn4C5Vlf4RAcUhGmKEP1v3/zFcihV101yhFdEzDdyCM7Sqwf89T9PX8fk9hOPa7BylFUjis/o3CvUzQaEw5b2t/R+QjVuR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230821135556.43224-1-yuehaibing@huawei.com>
+X-Received: by 2002:a17:902:ce8e:b0:1b8:95fc:d0f with SMTP id
+ f14-20020a170902ce8e00b001b895fc0d0fmr3724050plg.7.1692650451820; Mon, 21 Aug
+ 2023 13:40:51 -0700 (PDT)
+Date: Mon, 21 Aug 2023 13:40:51 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e8eb14060374e429@google.com>
+Subject: [syzbot] Monthly wireguard report (Aug 2023)
+From: syzbot <syzbot+listd934ed408c9f32a4a743@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Aug 21, 2023 at 09:55:56PM +0800, Yue Haibing wrote:
-> Commit 264a9c5c9dff ("net: sparx5: Remove unused GLAG handling in PGID")
-> removed sparx5_pgid_alloc_glag() but not its declaration.
-> Commit 27d293cceee5 ("net: microchip: sparx5: Add support for rule count by cookie")
-> removed vcap_rule_iter() but not its declaration.
-> Commit 8beef08f4618 ("net: microchip: sparx5: Adding initial VCAP API support")
-> declared but never implemented vcap_api_set_client().
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+Hello wireguard maintainers/developers,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This is a 31-day syzbot report for the wireguard subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireguard
+
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 14 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 763     No    KCSAN: data-race in wg_packet_send_staged_packets / wg_packet_send_staged_packets (3)
+                  https://syzkaller.appspot.com/bug?extid=6ba34f16b98fe40daef1
+<2> 511     No    KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll (2)
+                  https://syzkaller.appspot.com/bug?extid=d1de830e4ecdaac83d89
+<3> 3       Yes   INFO: rcu detected stall in wg_ratelimiter_gc_entries (2)
+                  https://syzkaller.appspot.com/bug?extid=c1cc0083f159b67cb192
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
