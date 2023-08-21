@@ -1,270 +1,128 @@
-Return-Path: <netdev+bounces-29345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F4EA782BBD
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:27:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125F8782BF5
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61A951C20927
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:27:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5257C280F28
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0955779CB;
-	Mon, 21 Aug 2023 14:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1338B6D3F;
+	Mon, 21 Aug 2023 14:35:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC396FB8
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:27:42 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2044.outbound.protection.outlook.com [40.107.93.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F11DB;
-	Mon, 21 Aug 2023 07:27:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CVepZWNXMItoKjvFEYQLmKR9S7DdNQV45ZDTW+p0ZRI4KmYsBzurLP4/xx7e/WRMZvDsL5G+tNBs726w2nz5+XJNV6AVligu37zBexf+b/qb6BlzOMCw14ININjDKOx5CqefPaJWQY+CkqDEvI67rnEt0k2JUG9UqmUBpoPr+3wehyalp5F3AAvTpWchwyo9FI8pqeY8mdW75NwmcroL7tT4kIWJuZU3mgR3kYm/qeDqFyAW3jj5ve+8tV9iPWYfYGP9hU6WTCMyqjLpgiSCTd8vhBqwpQRrYtXDS4sfNb3OS2KN1Cytvfsc19iXFPlYQgshT21v7uxS9gKToCrglQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8TmHZWpKDbM3g6DM4pIChvrvZgw5lqutj+pnXOHawh8=;
- b=ArWPcKkeWMSBrC5OuDHksvBxt8YEJwlUR3CVb3vgH8jMdth84bmeqdxbIOpYJSWekWNrPkZwRu4ldoCmaehUkL1KQfGGXA1YhEC7DGKq9mdWz0cFFSeh0VkaozE8V2NsvLugrlYO4gRKHeBWQWXr55nAnLUem6Hxet0IR2vaC/P3Ba2pjZeUpk7mVMgOs+OxqMsnQfdR25H0C0X25kbO+Vn6kvXrTmu6fhIP+22lwmuzQG7weI4DvDptv1kYgUVeLqJGc24pnhqEury9mZL95Oe3YIwlwsBfHto+N7yhwq82J1oCv0oojXXPrsEtEiMPCHn7Avmp6MGGc3PvECLD5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=lists.linux-foundation.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8TmHZWpKDbM3g6DM4pIChvrvZgw5lqutj+pnXOHawh8=;
- b=QzWOEs0x5lWnxygaxRmo3Dd6nGhTYe8MHC1skPHDD0ZKX3O5Prp7i4eAsB+BT4PBsP9M5q0OBHYnpYxgb2ruS3IMpepUA/rJBqirSPtBC2Hh2ZkzPagUjUeWeRTfsy0wp3sMKCEDjR1rcAcHI9KZyp1Q66ZgJ01WIbeicTExbbH+yAN6/Qdc61PxjuSjjGL8p7VjoEFVx1jM1GxktNrzATFIDG+q2U7aKmyXO2NF5WLRGpgKH5W2MXaqCR3VlOGzl2nQEztp/vbD4iOsliHJso3rIriWBy7ABHUtX8CPTDyEwU5qA0TthTXwBy7uUyWO/C4m0RsGFYWt9rumVTNlxA==
-Received: from MW4PR02CA0022.namprd02.prod.outlook.com (2603:10b6:303:16d::15)
- by SA1PR12MB7441.namprd12.prod.outlook.com (2603:10b6:806:2b9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Mon, 21 Aug
- 2023 14:27:39 +0000
-Received: from MWH0EPF000989E8.namprd02.prod.outlook.com
- (2603:10b6:303:16d:cafe::84) by MW4PR02CA0022.outlook.office365.com
- (2603:10b6:303:16d::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
- Transport; Mon, 21 Aug 2023 14:27:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- MWH0EPF000989E8.mail.protection.outlook.com (10.167.241.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6699.14 via Frontend Transport; Mon, 21 Aug 2023 14:27:37 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 21 Aug 2023
- 07:27:22 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Mon, 21 Aug 2023 07:27:21 -0700
-Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.126.190.180)
- with Microsoft SMTP Server id 15.2.986.37 via Frontend Transport; Mon, 21 Aug
- 2023 07:27:19 -0700
-From: Feng Liu <feliu@nvidia.com>
-To: <virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S .
- Miller" <davem@davemloft.net>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>, Simon Horman <horms@kernel.org>, "Bodong
- Wang" <bodong@nvidia.com>, Feng Liu <feliu@nvidia.com>, Jiri Pirko
-	<jiri@nvidia.com>
-Subject: [PATCH net-next v3] virtio_net: Introduce skb_vnet_common_hdr to avoid typecasting
-Date: Mon, 21 Aug 2023 10:27:13 -0400
-Message-ID: <20230821142713.5062-1-feliu@nvidia.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056C915C0
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:35:42 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D9CE2
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:35:41 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-58e6c05f529so38230967b3.3
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:35:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692628540; x=1693233340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n4b53Dt95uy0fYaSBvKqTMmQI/Jg+tUp+Lr7nWAEjFQ=;
+        b=22U+T63rr3IJQB7X/OAN1jX9o1iucJy6N4RiqqE6GUYVZPm2LNMK4jWqnY77X3QFte
+         glT7Tgt90rkTK4aH+vYedoLBlACNsC+Wp7eLU800PaBifJSeo9bPBM8jjQRcz6kCnS1u
+         Cj5suf/1TzWPA+vKE0lRs+zHLM4OnGaD5DFm2oJIA1wXo5YEogDZLrHVs8wVfHijZPxG
+         DCdlprTWYjYk2GpDKKWKrBluTqGk9SFjNKBNQWrnhAH8TSfY8P4zIDAN/N+nS6Xemx74
+         y+hhO/3RjX2MLan9o1yVW2QK32BdGsDtsDA1j3pw1zMnneLn/D5i+YWUx8icVeo20tRY
+         c9aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692628540; x=1693233340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n4b53Dt95uy0fYaSBvKqTMmQI/Jg+tUp+Lr7nWAEjFQ=;
+        b=I43Ag5vC2N9E3iJNc8016ExUrMMcwCFsFSXQf3BT1XvuZVeOImrw673IaPEhzAAU6q
+         RiGX3oLgYlPJ4YIm12uKpOQXrvVewpX+Fjiv3TdbIdaR999VkxXJGQC1P3k5G13wwIFS
+         Wts3woDaRNas7WDoKi3tknbDxmvb7AwicoJ7YkJ+NJP8VUam06rLtZxVbWdTMRE/E7f8
+         HF28MWnQudh6p5AB7KAs6d2g9n+UsPi5qkopvwWk3H+d4aH7er1tRayqcwMwaTYITh5x
+         /4BSevUzJwEsf97Zimo/zPzNhjum9rJ3fy0LHfQzh9P2VadhtZIMMgpg0O9OGb4jQA7h
+         XBjg==
+X-Gm-Message-State: AOJu0YzSdQkmuaJtDMG2duGoOrVjS4EeVIJJktZzeZXi+esbWkGv7nSt
+	PWAVTN1NiCbHX+hrdyT6wxQUjyGAbqz1zZf3k9dEjg==
+X-Google-Smtp-Source: AGHT+IGc4t2KXVvvpf/b+ACln5ICMXYLNE8r9zPyYmYSkxHisyF3ZUrdWwvWQW72lw997s97O0AXtDbGgIfpDltOfHM=
+X-Received: by 2002:a81:a194:0:b0:585:5fbf:1bf1 with SMTP id
+ y142-20020a81a194000000b005855fbf1bf1mr6948644ywg.48.1692628540654; Mon, 21
+ Aug 2023 07:35:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989E8:EE_|SA1PR12MB7441:EE_
-X-MS-Office365-Filtering-Correlation-Id: a87c3a00-093e-4bb6-266f-08dba252c4fe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ptiyvSKCXyyodgxUjcOEFgagSYOotDlHxbZZQ8aTVBzjm2cHvDSiyPX4j+Rqnpj3Ccj5BOOWVWz9oBIJUxFGPBajFgJvKrn4GfQFs7ql2GteOBTrN+4Opg2tZWvHf4sc9hJkOeS7JIh55gBBlWzc6/9Ho7P1eMuB5NWCrD1Jnl/lttb7O9Ixi1j4lPIdSehfIZ3QwXXPzXN329P30G93dFh+zELrok8AklfYLWuNgquoZSRv7JnIaFue21nGavGy1kiYl3qMNiT1WhoQ4MrxYCrxTUQRDX2kIG+q3WWmvdoXUPUosdrRKbPixSXoHlhV72KIreasp/Q3BKweUXkjVlRkedY6FUOlrJVmJJhqDT3Lqx0TepIH/vE+BuhB9rzzZXJUCO8PXG7anmZqwOzjJ1IXYEp4uvysbKsLQKFKTmCexAoO7oWwyJTd/dxK5N7YvDRGm09ao9uzRHh/yM9hubXKcP4Sd0U5lN1C+h5ujRZ/nKTQG+WcknMV5c7Eoe9/zX7CPwOMjUJgHkyMjdC+/xAqwxutKtMbUANi1qLMlg/gDy0FTmdL6s01FslEeco0jKIau0rkYzGbjRi1FZfC+NLxbzMasFCDJEK7gvyqrTDzeeiC8IJwH4J6POc8JRwHayyg5CSLVeNnrJLHbAZKGP1zn5Lu9QP6Y/f9ZBSdF4496AA+kUIZqQqKXbtCO1tBSPfiDAMApovm0IuMseZm2J1I8+PjL3IM+v2lOSPtO0WwIrIrUX2MoLm4IdZV4Dwx
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(376002)(346002)(39860400002)(186009)(82310400011)(1800799009)(451199024)(40470700004)(36840700001)(46966006)(54906003)(70586007)(316002)(66899024)(110136005)(8676002)(2616005)(8936002)(4326008)(107886003)(70206006)(1076003)(36756003)(40460700003)(41300700001)(356005)(82740400003)(478600001)(6666004)(7696005)(40480700001)(7636003)(2906002)(7416002)(83380400001)(86362001)(47076005)(36860700001)(426003)(336012)(5660300002)(26005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 14:27:37.7971
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a87c3a00-093e-4bb6-266f-08dba252c4fe
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989E8.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7441
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <ZN5DvRyq6JNz20l1@work> <20230818193810.102a2581@kernel.org>
+In-Reply-To: <20230818193810.102a2581@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 21 Aug 2023 10:35:29 -0400
+Message-ID: <CAM0EoM=fZVr4ROKZ+tA9A=yxcx6LnNVFzTb+_brFv9c-CiRfdA@mail.gmail.com>
+Subject: Re: [PATCH][next] net: sched: cls_u32: Fix allocation in u32_init()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The virtio_net driver currently deals with different versions and types
-of virtio net headers, such as virtio_net_hdr_mrg_rxbuf,
-virtio_net_hdr_v1_hash, etc. Due to these variations, the code relies
-on multiple type casts to convert memory between different structures,
-potentially leading to bugs when there are changes in these structures.
+On Fri, Aug 18, 2023 at 10:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Thu, 17 Aug 2023 09:58:53 -0600 Gustavo A. R. Silva wrote:
+> > Subject: [PATCH][next] net: sched: cls_u32: Fix allocation in u32_init(=
+)
+> > Date: Thu, 17 Aug 2023 09:58:53 -0600
+> >
+> > Replace struct_size() with sizeof(), and avoid allocating 8 too many
+> > bytes.
+>
+> What are you fixing?
+>
+> > The following difference in binary output is expected and reflects the
+> > desired change:
+> >
+> > | net/sched/cls_u32.o
+> > | @@ -6148,7 +6148,7 @@
+> > | include/linux/slab.h:599
+> > |     2cf5:      mov    0x0(%rip),%rdi        # 2cfc <u32_init+0xfc>
+> > |                        2cf8: R_X86_64_PC32     kmalloc_caches+0xc
+> > |-    2cfc:      mov    $0x98,%edx
+> > |+    2cfc:      mov    $0x90,%edx
+>
+> Sure, but why are you doing this? And how do you know the change is
+> correct?
+>
+> There are 2 other instances where we allocate 1 entry or +1 entry.
+> Are they not all wrong?
+>
+> Also some walking code seems to walk <=3D divisor, divisor IIUC being
+> the array bound - 1?
+>
+> Jamal acked so changes are this is right, but I'd really like to
+> understand what's going on, and I shouldn't have to ask you all
+> these questions :S
 
-Introduces the "struct skb_vnet_common_hdr" as a unifying header
-structure using a union. With this approach, various virtio net header
-structures can be converted by accessing different members of this
-structure, thus eliminating the need for type casting and reducing the
-risk of potential bugs.
+This is a "bug fix" given that the structure had no zero array
+construct as was implied by d61491a51f7e . I didnt want to call it out
+as a bug fix (for -net) because existing code was not harmful but
+allocated extra memory which this patch gives back.
+The other instances have a legit need for "flexible array".
 
-For example following code:
-static struct sk_buff *page_to_skb(struct virtnet_info *vi,
-		struct receive_queue *rq,
-		struct page *page, unsigned int offset,
-		unsigned int len, unsigned int truesize,
-		unsigned int headroom)
-{
-[...]
-	struct virtio_net_hdr_mrg_rxbuf *hdr;
-[...]
-	hdr_len = vi->hdr_len;
-[...]
-ok:
-	hdr = skb_vnet_hdr(skb);
-	memcpy(hdr, hdr_p, hdr_len);
-[...]
-}
-
-When VIRTIO_NET_F_HASH_REPORT feature is enabled, hdr_len = 20
-But the sizeof(*hdr) is 12,
-memcpy(hdr, hdr_p, hdr_len); will copy 20 bytes to the hdr,
-which make a potential risk of bug. And this risk can be avoided by
-introducing struct skb_vnet_common_hdr.
-
-Change log
-v1->v2
-feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-feedback from Simon Horman <horms@kernel.org>
-1. change to use net-next tree.
-2. move skb_vnet_common_hdr inside kernel file instead of the UAPI header.
-
-v2->v3
-feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-1. fix typo in commit message.
-2. add original struct virtio_net_hdr into union
-3. remove virtio_net_hdr_mrg_rxbuf variable in receive_buf;
-
-Signed-off-by: Feng Liu <feliu@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/net/virtio_net.c | 27 ++++++++++++++++++---------
- 1 file changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 8e9f4cfe941f..8c74bc8cfe68 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -303,6 +303,14 @@ struct padded_vnet_hdr {
- 	char padding[12];
- };
- 
-+struct virtio_net_common_hdr {
-+	union {
-+		struct virtio_net_hdr hdr;
-+		struct virtio_net_hdr_mrg_rxbuf	mrg_hdr;
-+		struct virtio_net_hdr_v1_hash hash_v1_hdr;
-+	};
-+};
-+
- static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
- static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
- 
-@@ -344,9 +352,10 @@ static int rxq2vq(int rxq)
- 	return rxq * 2;
- }
- 
--static inline struct virtio_net_hdr_mrg_rxbuf *skb_vnet_hdr(struct sk_buff *skb)
-+static inline struct virtio_net_common_hdr *
-+skb_vnet_common_hdr(struct sk_buff *skb)
- {
--	return (struct virtio_net_hdr_mrg_rxbuf *)skb->cb;
-+	return (struct virtio_net_common_hdr *)skb->cb;
- }
- 
- /*
-@@ -469,7 +478,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
- 				   unsigned int headroom)
- {
- 	struct sk_buff *skb;
--	struct virtio_net_hdr_mrg_rxbuf *hdr;
-+	struct virtio_net_common_hdr *hdr;
- 	unsigned int copy, hdr_len, hdr_padded_len;
- 	struct page *page_to_free = NULL;
- 	int tailroom, shinfo_size;
-@@ -554,7 +563,7 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
- 		give_pages(rq, page);
- 
- ok:
--	hdr = skb_vnet_hdr(skb);
-+	hdr = skb_vnet_common_hdr(skb);
- 	memcpy(hdr, hdr_p, hdr_len);
- 	if (page_to_free)
- 		put_page(page_to_free);
-@@ -966,7 +975,7 @@ static struct sk_buff *receive_small_build_skb(struct virtnet_info *vi,
- 		return NULL;
- 
- 	buf += header_offset;
--	memcpy(skb_vnet_hdr(skb), buf, vi->hdr_len);
-+	memcpy(skb_vnet_common_hdr(skb), buf, vi->hdr_len);
- 
- 	return skb;
- }
-@@ -1577,7 +1586,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- {
- 	struct net_device *dev = vi->dev;
- 	struct sk_buff *skb;
--	struct virtio_net_hdr_mrg_rxbuf *hdr;
-+	struct virtio_net_common_hdr *hdr;
- 
- 	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
- 		pr_debug("%s: short packet %i\n", dev->name, len);
-@@ -1597,9 +1606,9 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- 	if (unlikely(!skb))
- 		return;
- 
--	hdr = skb_vnet_hdr(skb);
-+	hdr = skb_vnet_common_hdr(skb);
- 	if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
--		virtio_skb_set_hash((const struct virtio_net_hdr_v1_hash *)hdr, skb);
-+		virtio_skb_set_hash(&hdr->hash_v1_hdr, skb);
- 
- 	if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
-@@ -2105,7 +2114,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
- 	if (can_push)
- 		hdr = (struct virtio_net_hdr_mrg_rxbuf *)(skb->data - hdr_len);
- 	else
--		hdr = skb_vnet_hdr(skb);
-+		hdr = &skb_vnet_common_hdr(skb)->mrg_hdr;
- 
- 	if (virtio_net_hdr_from_skb(skb, &hdr->hdr,
- 				    virtio_is_little_endian(vi->vdev), false,
--- 
-2.37.1 (Apple Git-137.1)
-
+cheers,
+jamal
+> --
+> pw-bot: cr
 
