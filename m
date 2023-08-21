@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-29385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42341782FC0
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:57:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDF32782FC2
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:58:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B3E71C2091B
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:57:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F0E280E56
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08775C8C0;
-	Mon, 21 Aug 2023 17:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AACCF4F5;
+	Mon, 21 Aug 2023 17:57:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9546C320F
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:57:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A94CC433C7;
-	Mon, 21 Aug 2023 17:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B608F4E
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:57:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A534C433C9;
+	Mon, 21 Aug 2023 17:57:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692640670;
-	bh=1gk73k93cVq0C1SN0v2zsZvmVsB7SYNNWzHc9H+GN4c=;
-	h=From:To:Cc:Subject:Date:From;
-	b=nZ/x+AvqkKBpBoPMEUa457ldaYnVsCqgpbLDeyYtP8pcVFYLo82qcjVgrle4nkYjE
-	 VSAoZgPp900z3vC2g6f5JWTxEF6GfNijTPVbi8RZRPcPJ/S/rgLeudTU5dfBuzrQYG
-	 gxa25f5P78p4GRUwkGxBdnZHBmEL6dOXPLzADxTGhdLC7WQ2fL+eCoTLppfyVenXmF
-	 0bU7g3EE6JzdRGg8ZvxCpuxWtsOVLUUgGi2bGgLJ4wz8jVhCNtHwDEa0LUQiSCSyiN
-	 dWF/Ey3Gj+sB388LAXYOjQRp11BqE7dawsxBc2c7UF0h4FiNEX46tpsLzqp/2qKEgk
-	 6aL4VUtyZ5CSQ==
+	s=k20201202; t=1692640671;
+	bh=cagxIgDEhFzsHUWP8eDol4BGAvO4+/KXBtfv1u8Ev1g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TKjF2AZT8ehO4tsKVdgZL5sYAlUfSGp4IU22hEP3Jzhabz9LEFRR16KtJ863LERoZ
+	 /MDcqQoaLmyyMKrjVxGgf+qkD2kyk5181SfLPWZbJj7W/udgCVCnFaXt7qr+ImUp8E
+	 ix/TjhtrRV3yOu4kXNW6Fs5A/nHA9dmqYz+1kmea68QC4g9iTwsX4DZUSBcnOm7PL9
+	 8nunqZn6FlLKaoQE7BK2C204BbhVHtcI1Lkl6/Or6+0+qSuN9SpIAbpM318G01CnIu
+	 KVUNClid7gZQxdCoOh86KffGBTClXz3ltXyzGcSlOlvxY9GJ1/QbJ9rvsGcqkn/deE
+	 VP2xYPGqbElog==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -37,11 +37,14 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [pull request][net-next V2 00/14] mlx5 updates 2023-08-16
-Date: Mon, 21 Aug 2023 10:57:25 -0700
-Message-ID: <20230821175739.81188-1-saeed@kernel.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Adham Faris <afaris@nvidia.com>
+Subject: [net-next V2 01/14] net/mlx5e: aRFS, Prevent repeated kernel rule migrations requests
+Date: Mon, 21 Aug 2023 10:57:26 -0700
+Message-ID: <20230821175739.81188-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230821175739.81188-1-saeed@kernel.org>
+References: <20230821175739.81188-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,103 +53,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Adham Faris <afaris@nvidia.com>
 
-v1-v2:
-- Toss patch #14: Convert PCI error values to generic errnos
-  it will be sent via pci subsystem.
+aRFS rule movement requests from one Rx ring to other Rx ring arrive
+from the kernel to ensure that packets are steered to the right Rx ring.
+In the time interval until satisfying such a request, several more
+requests might follow, for the same flow.
 
-This series provides misc updates to mlx5 driver.
-For more information please see tag log below.
+This patch detects and prevents repeated aRFS rules movement requests.
 
-Please pull and let me know if there is any problem.
+In mlx5e_rx_flow_steer() ndo, after finding the aRFS rule that have been
+requested to move by the kernel, check if it's already requested to move
+by calling work_busy(&arfs_rule->arfs_work) handler. IOW, if this
+request is pending to be executed (in the work queue) or it's executing
+now but hasn't finished yet, return current filter ID and don't issue a
+new transition work.
 
-Thanks,
-Saeed.
+Signed-off-by: Adham Faris <afaris@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+index 5aa51d74f8b4..67d8b198a014 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+@@ -740,7 +740,7 @@ int mlx5e_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	spin_lock_bh(&arfs->arfs_lock);
+ 	arfs_rule = arfs_find_rule(arfs_t, &fk);
+ 	if (arfs_rule) {
+-		if (arfs_rule->rxq == rxq_index) {
++		if (arfs_rule->rxq == rxq_index || work_busy(&arfs_rule->arfs_work)) {
+ 			spin_unlock_bh(&arfs->arfs_lock);
+ 			return arfs_rule->filter_id;
+ 		}
+-- 
+2.41.0
 
-The following changes since commit cb39c35783f26892bb1a72b1115c94fa2e77f4c5:
-
-  pds_core: Fix some kernel-doc comments (2023-08-21 07:48:34 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-08-16
-
-for you to fetch changes up to 7d7c6e8c5fe4e8cceea7f66e93cee1c951670836:
-
-  net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event() (2023-08-21 10:55:17 -0700)
-
-----------------------------------------------------------------
-mlx5-updates-2023-08-16
-
-1) aRFS ethtool stats
-Improve aRFS observability by adding new set of counters. Each Rx
-ring will have this set of counters listed below.
-These counters are exposed through ethtool -S.
-
-1.1) arfs_add: number of times a new rule has been created.
-1.2) arfs_request_in: number of times a rule  was requested to move from
-   its current Rx ring to a new Rx ring (incremented on the destination
-   Rx ring).
-1.3) arfs_request_out: number of times a rule  was requested to move out
-   from its current Rx ring (incremented on source/current Rx ring).
-1.4) arfs_expired: number of times a rule has been expired by the
-   kernel and removed from HW.
-1.5) arfs_err: number of times a rule creation or modification has
-   failed.
-
-2) Supporting inline WQE when possible in SW steering
-
-3) Misc cleanups and fixups to net-next branch
-
-----------------------------------------------------------------
-Adham Faris (3):
-      net/mlx5e: aRFS, Prevent repeated kernel rule migrations requests
-      net/mlx5e: aRFS, Warn if aRFS table does not exist for aRFS rule
-      net/mlx5e: aRFS, Introduce ethtool stats
-
-Colin Ian King (1):
-      net/mlx5e: Fix spelling mistake "Faided" -> "Failed"
-
-Gal Pressman (1):
-      net/mlx5: Remove health syndrome enum duplication
-
-Itamar Gozlan (1):
-      net/mlx5: DR, Supporting inline WQE when possible
-
-Jiri Pirko (3):
-      net/mlx5: Call mlx5_esw_offloads_rep_load/unload() for uplink port directly
-      net/mlx5: Remove VPORT_UPLINK handling from devlink_port.c
-      net/mlx5: Rename devlink port ops struct for PFs/VFs
-
-Li Zetao (1):
-      net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event()
-
-Rahul Rameshbabu (1):
-      net/mlx5: Update dead links in Kconfig documentation
-
-Saeed Mahameed (1):
-      net/mlx5: IRQ, consolidate irq and affinity mask allocation
-
-Yevgeny Kliteynik (2):
-      net/mlx5: DR, Fix code indentation
-      net/mlx5: DR, Remove unneeded local variable
-
- .../ethernet/mellanox/mlx5/counters.rst            |  23 ++++-
- .../ethernet/mellanox/mlx5/kconfig.rst             |  14 +--
- Documentation/networking/xfrm_device.rst           |   1 +
- drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c  |  21 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  22 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.h |  13 ++-
- .../ethernet/mellanox/mlx5/core/esw/devlink_port.c |  16 +--
- .../net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c |   2 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  20 ++--
- drivers/net/ethernet/mellanox/mlx5/core/health.c   |  36 ++-----
- .../net/ethernet/mellanox/mlx5/core/lib/devcom.c   |   3 +-
- drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |  14 ++-
- .../mellanox/mlx5/core/steering/dr_action.c        |   1 -
- .../ethernet/mellanox/mlx5/core/steering/dr_send.c | 115 ++++++++++++++++++---
- .../ethernet/mellanox/mlx5/core/steering/fs_dr.c   |   2 +-
- 15 files changed, 208 insertions(+), 95 deletions(-)
 
