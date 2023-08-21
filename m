@@ -1,154 +1,167 @@
-Return-Path: <netdev+bounces-29351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF608782C73
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:47:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F3F782C88
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A899C280EDD
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:47:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C86C280F06
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D340A79EC;
-	Mon, 21 Aug 2023 14:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDCE79F9;
+	Mon, 21 Aug 2023 14:47:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74916FAA
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:47:00 +0000 (UTC)
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E59CE9;
-	Mon, 21 Aug 2023 07:46:59 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-64f3ad95ec0so9950676d6.1;
-        Mon, 21 Aug 2023 07:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692629218; x=1693234018;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WuA3TdNjVttC4ENEMTU7iIB13TPKbbPgEw4DfONfOIg=;
-        b=nzOfc/+3vPkk+2xcoHixT2qig/KVfSfruaE8oC/BHOhj4Vj8zK9wQl/YBsovUfjuyE
-         zzdUfx0F+1nY+xEONrt5yI8FWOp1QrAohZ3IkYZyY94D8Nb0lF63snqV0onxX8UJbdRS
-         W1OENcVQ/wPS91JuWs6rzqCuSYu2pCwXc2MvCLhv1xAQf/GW34/3Xok29hzwDsUcEWri
-         K6RBfHFWHDQw3zBVPMEemIuhjd5J2WirIGF8kiJIV2fCCwk1JLsGdgid8sas/T3c1R7D
-         ClfsowvOP6bADW4XnuMdfydqJvFH70N4COIOkZ7NSD8UaocdbL6/2rMcwVI7BOjmq2gJ
-         pIfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692629218; x=1693234018;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WuA3TdNjVttC4ENEMTU7iIB13TPKbbPgEw4DfONfOIg=;
-        b=Dtgl+cU6IarnX6x0DtTSzWlPce41S1QtxadCguUNKQ6c3EjkkEJJofC+ZTZOZHWZ2B
-         DwsOtGuYAzHyvXp/XVj3abuOOB2WF868+hcWwiyVCg68FJ6eFCnpG30voMe1p2F0FeqZ
-         v/OgtXrj0NpBpNh8HaoNnuO9Bxu2F0ovmHDZOYy89OJCj+9dI2cdrwlv+6Pwlq2uVkJX
-         m9b0J+OvkjTnx7F2KeWZKxkYcmjkkDgsTLR9uyeYQ+C3wGI00Rk/3dpmI7HWAWe2efgz
-         +d4xBgjX1cd1+usXDwuCf0DBijr1+dtIkPmCQHg+w8AeZkJZhcnbEclTmxGbs1XB1hvq
-         KBNQ==
-X-Gm-Message-State: AOJu0YwX9fing7Csb0owXjQIv2f0xumUT+bk70KC7D1d7IJLRZS00/3E
-	1dF13cqOMvfbOM/DQy5CQMQ=
-X-Google-Smtp-Source: AGHT+IG/I4x/uX5zBHwBZnZQvnI1/jXeEL+zKtLEb5rhbvBKzlFssu9Ud/GZZNrEpLvz+FrLSwB56A==
-X-Received: by 2002:a0c:e084:0:b0:64f:3e27:1e4a with SMTP id l4-20020a0ce084000000b0064f3e271e4amr3752794qvk.19.1692629218377;
-        Mon, 21 Aug 2023 07:46:58 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id t3-20020a0ce2c3000000b0064729e5b2d9sm2950385qvl.14.2023.08.21.07.46.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 07:46:58 -0700 (PDT)
-Date: Mon, 21 Aug 2023 10:46:57 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Feng Liu <feliu@nvidia.com>, 
- virtualization@lists.linux-foundation.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>, 
- "Michael S . Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Simon Horman <horms@kernel.org>, 
- Bodong Wang <bodong@nvidia.com>, 
- Feng Liu <feliu@nvidia.com>, 
- Jiri Pirko <jiri@nvidia.com>
-Message-ID: <64e378e1c7fed_1b7a7294fd@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230821142713.5062-1-feliu@nvidia.com>
-References: <20230821142713.5062-1-feliu@nvidia.com>
-Subject: Re: [PATCH net-next v3] virtio_net: Introduce skb_vnet_common_hdr to
- avoid typecasting
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E62B79F8
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:47:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E8D6C433C7;
+	Mon, 21 Aug 2023 14:47:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692629262;
+	bh=ohAcEJTeRNpfSePyAT88M5+2s0rI40PRRuwjdeOMi14=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fMiWpotesV+64iRnHBzBQddVetyPg+SDSgnsFMkX+mx1EeBC8uTmzFyta2dwIe9ns
+	 YYqb+b/DY0eKEWJx+Nq3PipjGEfBMMS/ONxHTc0rh3unOS62tYgVCCax4DreLhDLeQ
+	 87ZG5i5G20XSr9/hkcKccEG1FqXAg6rnJWdDCKfLiJy/CxsXg+FB4WNXrXNU99lSnm
+	 pHW5OOrw5WQaHGdOgEZNUTnBERgJaeEipehR1PB3CjL2nQo43F729pZXXUr3zXq0Xz
+	 HBbUpLcgKWamzwU6UyeL1oTD1GVU3cEZDmAzs3NKX7ppok5hOi5qbmn3kwfBtixpqg
+	 4T+W2tiFet8eQ==
+Date: Mon, 21 Aug 2023 16:47:38 +0200
+From: Simon Horman <horms@kernel.org>
+To: "Guo, Junfeng" <junfeng.guo@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Zhang, Qi Z" <qi.z.zhang@intel.com>, ivecera <ivecera@redhat.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Subject: Re: [PATCH iwl-next v5 01/15] ice: add parser create and destroy
+ skeleton
+Message-ID: <20230821144738.GD2711035@kernel.org>
+References: <20230605054641.2865142-1-junfeng.guo@intel.com>
+ <20230821023833.2700902-1-junfeng.guo@intel.com>
+ <20230821023833.2700902-2-junfeng.guo@intel.com>
+ <20230821072037.GB2711035@kernel.org>
+ <20230821073000.GC2711035@kernel.org>
+ <DM6PR11MB3723437003B055BB7C74AF63E71EA@DM6PR11MB3723.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB3723437003B055BB7C74AF63E71EA@DM6PR11MB3723.namprd11.prod.outlook.com>
 
-Feng Liu wrote:
-> The virtio_net driver currently deals with different versions and types
-> of virtio net headers, such as virtio_net_hdr_mrg_rxbuf,
-> virtio_net_hdr_v1_hash, etc. Due to these variations, the code relies
-> on multiple type casts to convert memory between different structures,
-> potentially leading to bugs when there are changes in these structures.
+On Mon, Aug 21, 2023 at 07:34:38AM +0000, Guo, Junfeng wrote:
 > 
-> Introduces the "struct skb_vnet_common_hdr" as a unifying header
-> structure using a union. With this approach, various virtio net header
-> structures can be converted by accessing different members of this
-> structure, thus eliminating the need for type casting and reducing the
-> risk of potential bugs.
 > 
-> For example following code:
-> static struct sk_buff *page_to_skb(struct virtnet_info *vi,
-> 		struct receive_queue *rq,
-> 		struct page *page, unsigned int offset,
-> 		unsigned int len, unsigned int truesize,
-> 		unsigned int headroom)
-> {
-> [...]
-> 	struct virtio_net_hdr_mrg_rxbuf *hdr;
-> [...]
-> 	hdr_len = vi->hdr_len;
-> [...]
-> ok:
-> 	hdr = skb_vnet_hdr(skb);
-> 	memcpy(hdr, hdr_p, hdr_len);
-> [...]
-> }
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: Monday, August 21, 2023 15:30
+> > To: Guo, Junfeng <junfeng.guo@intel.com>
+> > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen,
+> > Anthony L <anthony.l.nguyen@intel.com>; Brandeburg, Jesse
+> > <jesse.brandeburg@intel.com>; Zhang, Qi Z <qi.z.zhang@intel.com>;
+> > ivecera <ivecera@redhat.com>; Samudrala, Sridhar
+> > <sridhar.samudrala@intel.com>
+> > Subject: Re: [PATCH iwl-next v5 01/15] ice: add parser create and
+> > destroy skeleton
+> > 
+> > On Mon, Aug 21, 2023 at 09:20:37AM +0200, Simon Horman wrote:
+> > > On Mon, Aug 21, 2023 at 10:38:19AM +0800, Junfeng Guo wrote:
+> > > > Add new parser module which can parse a packet in binary
+> > > > and generate information like ptype, protocol/offset pairs
+> > > > and flags which can be used to feed the FXP profile creation
+> > > > directly.
+> > > >
+> > > > The patch added skeleton of the create and destroy APIs:
+> > > > ice_parser_create
+> > > > ice_parser_destroy
+> > > >
+> > > > Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> > >
+> > > Hi Junfeng Guo,
+> > >
+> > > some minor feedback from my side.
+> > >
+> > > > ---
+> > > >  drivers/net/ethernet/intel/ice/ice_common.h |  4 +++
+> > > >  drivers/net/ethernet/intel/ice/ice_ddp.c    | 10 +++---
+> > > >  drivers/net/ethernet/intel/ice/ice_ddp.h    | 13 ++++++++
+> > > >  drivers/net/ethernet/intel/ice/ice_parser.c | 34
+> > +++++++++++++++++++++
+> > >
+> > > Perhaps I am missing something, but it seems that although
+> > > ice_parser.c is added by this patch-set, it is not added to
+> > > the build by this patch-set. This seems a little odd to me.
+> > 
+> > Sorry, somehow I wasn't looking at the entire series.
+> > I now see that ice_parser.c is compiled as of patch 12/15 of this series.
 > 
-> When VIRTIO_NET_F_HASH_REPORT feature is enabled, hdr_len = 20
-> But the sizeof(*hdr) is 12,
-> memcpy(hdr, hdr_p, hdr_len); will copy 20 bytes to the hdr,
-> which make a potential risk of bug. And this risk can be avoided by
-> introducing struct skb_vnet_common_hdr.
+> Yes, thanks for the carefully review!
 > 
-> Change log
-> v1->v2
-> feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> feedback from Simon Horman <horms@kernel.org>
-> 1. change to use net-next tree.
-> 2. move skb_vnet_common_hdr inside kernel file instead of the UAPI header.
+> > 
+> > >
+> > > >  drivers/net/ethernet/intel/ice/ice_parser.h | 13 ++++++++
+> > > >  5 files changed, 69 insertions(+), 5 deletions(-)
+> > > >  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+> > > >  create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+> > >
+> > > ...
+> > >
+> > > > diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c
+> > b/drivers/net/ethernet/intel/ice/ice_parser.c
+> > > > new file mode 100644
+> > > > index 000000000000..42602cac7e45
+> > > > --- /dev/null
+> > > > +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
+> > > > @@ -0,0 +1,34 @@
+> > > > +// SPDX-License-Identifier: GPL-2.0
+> > > > +/* Copyright (C) 2023 Intel Corporation */
+> > > > +
+> > > > +#include "ice_common.h"
+> > > > +
+> > > > +/**
+> > > > + * ice_parser_create - create a parser instance
+> > > > + * @hw: pointer to the hardware structure
+> > > > + * @psr: output parameter for a new parser instance be created
+> > > > + */
+> > > > +int ice_parser_create(struct ice_hw *hw, struct ice_parser **psr)
+> > > > +{
+> > > > +	struct ice_parser *p;
+> > > > +
+> > > > +	p = devm_kzalloc(ice_hw_to_dev(hw), sizeof(struct ice_parser),
+> > > > +			 GFP_KERNEL);
+> > > > +	if (!p)
+> > > > +		return -ENOMEM;
+> > > > +
+> > > > +	p->hw = hw;
+> > > > +	p->rt.psr = p;
+> > >
+> > > It is, perhaps academic if this file isn't compiled, but the rt field of
+> > > struct ice_parser doesn't exist at this point of the patch-set: it is
+> > added
+> > > by the last patch of the patch-set.
+> > 
+> > And I see this field is added in patch 10/15, rather than the last patch
+> > (15/15) as I previously stated.
 > 
-> v2->v3
-> feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> 1. fix typo in commit message.
-> 2. add original struct virtio_net_hdr into union
-> 3. remove virtio_net_hdr_mrg_rxbuf variable in receive_buf;
-> 
-> Signed-off-by: Feng Liu <feliu@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Thanks for the comments!
+> Yes, the setting for rt field should be moved to patch 10/15.
+> Will update in the new version patch set. Thanks!
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Likewise, thanks.
 
-A similar solution as tpacket_uhdr.
+If you are going to address this you may also
+want to look at what seems to be similar problem with
+both ICE_PARSER_FLG_NUM and ICE_ERR_NOT_IMPL appearing
+in code before they are defined.
+
+...
 
