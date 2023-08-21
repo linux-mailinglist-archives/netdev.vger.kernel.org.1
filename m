@@ -1,140 +1,150 @@
-Return-Path: <netdev+bounces-29339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B38782B18
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:03:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555A8782B39
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61AA61C2042F
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:03:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A83D1C208C4
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72A47489;
-	Mon, 21 Aug 2023 14:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA315748E;
+	Mon, 21 Aug 2023 14:11:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B635258
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:03:01 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5147DC2;
-	Mon, 21 Aug 2023 07:03:00 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3197808bb08so3148219f8f.2;
-        Mon, 21 Aug 2023 07:03:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AC4747C
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:11:41 +0000 (UTC)
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B55E6;
+	Mon, 21 Aug 2023 07:11:40 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-26d60e6fe19so1156869a91.1;
+        Mon, 21 Aug 2023 07:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692626579; x=1693231379;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/R3tuyhTy1dIqh36B++R19xvH0q9egrvUaY90xCKCrM=;
-        b=lcLkVmPKeYIoBi3yqk/p67iN2weyBsttNN/w9mUVAD8cYrkIHFFzaQGAT883LTykmc
-         BhZE/9HNpKm6UakRpTNnjEg3mw0wnKE0xpgbZ6DsrTcNZtutuEwNVm3rOlYs62imq5F/
-         JlFTG2aDiwyFIfK5Rp2wEGwZ4LHaby02iv+voZn/dapFgNyNngXQ2xUcdRSK18TGt7Si
-         gAHAJ7AmK/ifCYXJ7YGLIr0pLMQkvvgOVgi16lMS2QfyuJIxLrcuYztnNrHhn67xY7TX
-         f25n68GQGnouf95ZG2QLfk8+hFegvO/GYaAKliXJXzoJgvj7984RsEF/QgO2AX8mwceg
-         Xlpg==
+        d=gmail.com; s=20221208; t=1692627100; x=1693231900;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dNZIrk8cdTlP5FxvTPOvR6yau8NHeOzj6hC5/gPKFo=;
+        b=NI4VdfEs+S4ba51EOwI21Y8k5Sn6J4avI0XCxfVgfT4tLh3RmZg2jYOnpZtAGVJ+Yt
+         2ggneJcbkcPCYa3xm2KhcRTn1lFr9vVxV3QLKSO0tl1SZJctE7O9G0yY4jovD/u4lQu/
+         vDi3zr3PEgqnhLcf0WPvUs/93doTNVe17Ij2fzy6hUBMd/R0DPPpWfyB4RslLvWljAEs
+         D6D9YghJdkt0TBnKNvCcIXZ1X0tm0PkGpPhympJHEpiyy8RgaI4vrxaGFAN7Vrxooq3a
+         Ue0vA73HTPF++6fQM/JisRY7xBKgDYkdGpUyhieMCQguD6GKG8erPgIVGlgWwHtXxUps
+         5/pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692626579; x=1693231379;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20221208; t=1692627100; x=1693231900;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/R3tuyhTy1dIqh36B++R19xvH0q9egrvUaY90xCKCrM=;
-        b=MGpW333UHxU+zRXEEreKxrotErphe4dmd6nxLu96jZWPA6n40g8OsNQpXumhcnHNMZ
-         VbEtmvo/hwo5aj8L8juYE+TNp5zIBDaZ8eR8WMt4UxwXxz5iL59xwZvF6iYUGiJPV9h0
-         BOdoEmaBJmoEh9cehqMOnxmDtM9M6ubK02xAap6AQLduOdUF2s5gVQ4vROSdA5kc7L9y
-         H96ewIGdb55hTcHWFV2aYAwMGbmYlIV6ejx7IdOzPJD6Pu/LXGryEeX+7n/atBrHpro+
-         uO55YJQvTJW9Um/hg43leCANRw2qBry6QaW+smlG1lkXf6kPoxkW4boxR0nZOwotD7EQ
-         WZ3g==
-X-Gm-Message-State: AOJu0Yw6CDTlEmkK3eNbjWrGeTfYwmXB7ULaav01+s4wUxGmY96qFcJ9
-	oEshmMW/gTH3HiWJoIw5B2Q=
-X-Google-Smtp-Source: AGHT+IGlnNBEMu/xWI+NfVQ7xMln6KdV8bEYtCVyXEHDJcw2ukJnRciEu29meeT7u5JtD+KK4FQw+Q==
-X-Received: by 2002:a5d:4a06:0:b0:317:5e73:7594 with SMTP id m6-20020a5d4a06000000b003175e737594mr4511136wrq.28.1692626578369;
-        Mon, 21 Aug 2023 07:02:58 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:18ac:90b7:a4b7:83f8])
-        by smtp.gmail.com with ESMTPSA id e4-20020adffc44000000b00317ddccb0d1sm12620352wrs.24.2023.08.21.07.02.56
+        bh=3dNZIrk8cdTlP5FxvTPOvR6yau8NHeOzj6hC5/gPKFo=;
+        b=k1dx6O7nMbTVC7vifYI3vhVZza55l2Iy+FYelgAdmv1DqzSKklfkLVgMK8YELElKmQ
+         koew53YJTOuqPle8O7OMxLcwDtJONCa+1M49Q5QTNZv/g6pK2gfkCWdF9VNGo9Rukup+
+         vG6eVcz0srOIuvxc4tri659sUVgZby0yYzk47hDlB9WEtVXjBxLjkCmnviuYunJD8MiG
+         FvIcnUGLN3DdWnptNOsmciMIvTjsVOmLmAzZzhoe6OGy4fOzAI+uJuWKZsjNYqBUbghl
+         cV4z8yCsJNT0uiBLQEptE9v2bD2uxgADEspQHFa/iKcRKBhlP5e5c8CO+5IebcvPTxpU
+         x0/w==
+X-Gm-Message-State: AOJu0YxHIJSgE86Z66WEZ+/felVWWv5ndoIicWElmAhdHw+tZM4j4Puo
+	sUQ80RCRiE91uToI52KGVnk=
+X-Google-Smtp-Source: AGHT+IEkFYv67zZssZZUgDaFEIb6DG5zWbc+68lZRn7X+KyaH7nWoP4kkpaBT1HxtyXvlhNQB2C8yQ==
+X-Received: by 2002:a17:90b:3884:b0:268:3b8b:140d with SMTP id mu4-20020a17090b388400b002683b8b140dmr3480681pjb.35.1692627099506;
+        Mon, 21 Aug 2023 07:11:39 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090aca8d00b002693505391csm7786734pjt.37.2023.08.21.07.11.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 07:02:57 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Stanislav Fomichev
- <sdf@google.com>,  Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 06/10] tools/net/ynl: Add support for
- netlink-raw families
-In-Reply-To: <20230817181828.76ac2c11@kernel.org> (Jakub Kicinski's message of
-	"Thu, 17 Aug 2023 18:18:28 -0700")
-Date: Mon, 21 Aug 2023 15:00:14 +0100
-Message-ID: <m24jksijgx.fsf@gmail.com>
-References: <20230815194254.89570-1-donald.hunter@gmail.com>
-	<20230815194254.89570-7-donald.hunter@gmail.com>
-	<20230816082908.1365f287@kernel.org> <m2cyzmhw50.fsf@gmail.com>
-	<20230817181828.76ac2c11@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Mon, 21 Aug 2023 07:11:38 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id B1C5B81961C9; Mon, 21 Aug 2023 21:11:34 +0700 (WIB)
+Date: Mon, 21 Aug 2023 21:11:34 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Turritopsis Dohrnii Teo En Ming <tdtemccnp@gmail.com>,
+	cluster-devel.redhat.com@debian.me
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Netfilter <netfilter-devel@vger.kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [Cluster-devel] I have been given the guide with full network
+ diagram on configuring High Availability (HA) Cluster and SD-WAN for
+ Fortigate firewalls by my boss on 10 May 2023 Wed
+Message-ID: <ZONwlkirjv2iBFiA@debian.me>
+References: <CAD3upLsRxrvG0GAcFZj+BfAb6jbwd-vc2170sZHguWu4mRJpog@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="9id3nzJVoXz9daxh"
+Content-Disposition: inline
+In-Reply-To: <CAD3upLsRxrvG0GAcFZj+BfAb6jbwd-vc2170sZHguWu4mRJpog@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> On Thu, 17 Aug 2023 10:10:35 +0100 Donald Hunter wrote:
->> > Looks good, but do we also need some extra plumbing to decode extack
->> > for classic netlink correctly?  Basically shouldn't _decode_extack()
->> > also move to proto? Or we can parameterize it? All we really need there
->> > is to teach it how much of fixed headers parser needs to skip to get to
->> > attributes, really (which, BTW is already kinda buggy for genl families
->> > with fixed headers).  
->> 
->> I have been working on the assumption that extack responses don't
->> include any fixed headers. I have seen extack messages decoded correctly
->> for classic netlink, here with RTM_NEWROUTE:
->> 
->> lib.ynl.NlError: Netlink error: Invalid argument
->> nl_len = 80 (64) nl_flags = 0x300 nl_type = 2
->>   error: -22  extack: {'msg': 'Invalid prefix for given prefix length'}
->> 
->> Is there something I am missing?
->
-> I'm thinking of extack messages carrying offsets in addition to the 
-> textual error message. NLMSGERR_ATTR_OFFS or NLMSGERR_ATTR_MISS_NEST.
->
-> In that case ynl will try to re-parse its own message via
-> _decode_extack_path() to resolve from the offset to what attribute
-> was there. See the commit message on a552bfa16:
->
->     lib.ynl.NlError: Netlink error: Numerical result out of range
->     nl_len = 108 (92) nl_flags = 0x300 nl_type = 2
->             error: -34      extack: {'msg': 'integer out of range',...
->                                      'bad-attr': '.ifindex'}
->
-> I mean the "bad-attr" thing.
->
-> I think it works out of sheer luck here, we happen to skip over 
-> the fixed header because it looks like a 0-length attribute?
+--9id3nzJVoXz9daxh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You're right, sheer luck, and maybe only for some values of dp-ifindex.
-When I tried to reproduce your test in commit a552bfa16, with a value of
-dp-ifindex = 5, then ynl goes into an infinite loop trying to read a
-zero length nlattr.
+On Wed, May 10, 2023 at 11:12:26PM +0800, Turritopsis Dohrnii Teo En Ming w=
+rote:
+> Good day from Singapore,
+>=20
+> I have been given the guide with full network diagram on configuring
+> High Availability (HA) Cluster and SD-WAN for Fortigate firewalls by
+> my boss on 10 May 2023 Wed. This involves 2 ISPs, 2 identical
+> Fortigate firewalls and 3 network switches.
+>=20
+> Reference guide: SD-WAN with FGCP HA
+> Link: https://docs.fortinet.com/document/fortigate/6.2.14/cookbook/23145/=
+sd-wan-with-fgcp-ha
+>=20
+> I have managed to deploy HA cluster and SD-WAN for a nursing home at
+> Serangoon Singapore on 9 May 2023 Tue, with some minor hiccups. The
+> hiccup is due to M1 ISP ONT not accepting connections from 2 Fortigate
+> firewalls. Singtel ISP ONT accepts connections from 2 Fortigate
+> firewalls without any problems though. On 9 May 2023 Tue, I was
+> following the network diagram drawn by my team leader KKK. My team
+> leader KKK's network diagram matches the network diagram in Fortinet's
+> guide shown in the link above.
+>=20
+> The nursing home purchased the following network equipment:
+>=20
+> [1] 2 units of Fortigate 101F firewalls with firmware upgraded to version=
+ 7.2.4
+>=20
+> [2] 3 units of Aruba Instant On 1830 8-port network switches
+>=20
+> [3] Multiple 5-meter LAN cables
+>=20
 
-As you say, I'll need to rework the extack handling to account for fixed
-headers. At a minimum _decode_extack will need to use nlproto.decode()
-and needs to learn to skip the fixed header.
+Then why did you post Fortigate stuffs here in LKML when these are (obvious=
+ly)
+off-topic? Why don't you try netfilter instead? And do you have any
+kernel-related problems?
 
-Apologies for being slow to catch up with you on this. Failing to grok
-that _decode_extack is decoding the request, not the response.
+Confused...
 
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--9id3nzJVoXz9daxh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZONwkAAKCRD2uYlJVVFO
+o2v9APwLSkYfNhrIlWLvqv1XaVd4D6YSmC1QEaYhXa7Nf2pcewEAmXXstMCWZtZt
+6l62/RN1wYSQNNh+HfJNE5+KG3YXDQ4=
+=tY/a
+-----END PGP SIGNATURE-----
+
+--9id3nzJVoXz9daxh--
 
