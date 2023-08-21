@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-29294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB267828C1
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:15:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 011E17828C7
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 283DF280D27
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:15:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A74F1C208C4
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A766E53AB;
-	Mon, 21 Aug 2023 12:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40FC53B1;
+	Mon, 21 Aug 2023 12:15:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989FA5678
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:15:08 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343B5CD;
-	Mon, 21 Aug 2023 05:15:07 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe27849e6aso4859635e87.1;
-        Mon, 21 Aug 2023 05:15:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9227185B
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:15:54 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249A4DB;
+	Mon, 21 Aug 2023 05:15:53 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2bcb89b4767so17752601fa.3;
+        Mon, 21 Aug 2023 05:15:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692620105; x=1693224905;
+        d=gmail.com; s=20221208; t=1692620151; x=1693224951;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=avV2BsJ1FLhhu79KeKfN0Ev+8booIHw8n+ZXD8aCVnA=;
-        b=c5jpnXtPZchTfPtdD+NAyZpcNupHdzZV+pD84WcKk8uJIBSzC7W1uWaXcccQNUEBSO
-         5RW55hM5m3dVq2HkVNUtqKXqlmOfsNHVAvzchVdF6GZoJQjqJfqs/Gw67knXOYQowLdV
-         LdNjX6y0JW92cKc1mOUaxROW1X/wWgR6Of0J268IYa/shHy87Uj+HaWIw7bkl7YgJ39D
-         DmQwsSFdoYQfZQmzNRT5HsdjJ6szG4pclaEtD5HxGThVrlPLK54aFQQwsAVVwsFfJurM
-         PmgGflAJQjZ+DRQzel2z2SyeMqW14fq2QjNy/KKu8AIe1Ve3cKeB2IcCfFIAWkL/QN1q
-         ZEAA==
+        bh=w291kJh6Uu4i4etCsCc/KObNvq4GhOSiMKf8RO4JKwI=;
+        b=liw57Uk0Mr3v9AE32HoCED+Z+eGisXzD1N2TWMBDG7+2J7cZASovAwzpbehu5BECoJ
+         5kxctTz67o5i9WB2Q1OW3g24p2644aigARruVJ9BlfHAEeyUr8Q/534H3YquXrNoSy3e
+         K0OywqMJYD6dC1J61zJlEt0QrkuZbJkaOcxQXgg0vQhFWRmGcnhdcymwtx1zZg5B39FD
+         ovVT87klInKXCp2Q6qDOGGuhvlUcM7YVKZSFN8CtTWRuclX+Y79zB0lErGQld+1pt/0P
+         +tcmDoDM3jiqph/FeJMiwm6acjbQgeXnrlT9VaIZuCm8Ec+jQlB/86yoZ/WaOpPEISCA
+         iC0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692620105; x=1693224905;
+        d=1e100.net; s=20221208; t=1692620151; x=1693224951;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=avV2BsJ1FLhhu79KeKfN0Ev+8booIHw8n+ZXD8aCVnA=;
-        b=FRk1vUmMDh3lc1a2U1NH6y7TbeiCsICpfDidn+74PRjvafO4ciSjv/GONoPJ8g47YG
-         Ph4uxMDyXZOfivhuVSNdos63kdWaaMfLPDtW4+IZQuu+E6dkEOKZzeouoD5xEih5Gat1
-         4s6hcnxIH+D0nYWjYDKOOn8eKkZMWetS+/mmNVsPiL+31QypgW191d0NxuR5Qp6KPCOY
-         JWsav3kXgom4wleoDgX3xzQ/mdXzs3DQGUWNWgDWuagxUal7QSBmWnHCAjulc/0JFqvc
-         ZxJnL50a/7VMFAqgfa57WNQnLS4QDYMGmJFMUcG4inM0rb1ig6N/ZQKIyWCLXUMYsJz+
-         xhVw==
-X-Gm-Message-State: AOJu0Yy3nQBeeyQbjTnFnDzBcIVmE7o3tGlp48Bb2gJSsKqsIn+SxCJn
-	U4XIyvx1zesZB940Yfv/CYk=
-X-Google-Smtp-Source: AGHT+IFNc61eHU9PArAyDrvV6DY1c2fksC/mbLMjK3WEsB9bq38x5BVHfXfD69uaWKpqHoHiv+Yn6Q==
-X-Received: by 2002:a05:6512:3da0:b0:4fd:faa2:884c with SMTP id k32-20020a0565123da000b004fdfaa2884cmr5901431lfv.29.1692620105055;
-        Mon, 21 Aug 2023 05:15:05 -0700 (PDT)
+        bh=w291kJh6Uu4i4etCsCc/KObNvq4GhOSiMKf8RO4JKwI=;
+        b=IGgW7BKLMGB7NwrtxaqTWrXPkUAvDEzRa7eAw6K9ArrcaUE0cKh5S5+/ZTM+bzS+3C
+         anTKlgssVY47z0Tq82q+1hdCyBhdOwVZDGfuXTvL3xu2lsU1GlIFQ/OmTruS/NzeGfzY
+         25AjoeE2WNMkhurLd6/6hxGOx3oh6s6ons9eiKcWDvRIBnHvz4pCe2g3F5cVzLy02JJC
+         ogKioR9MX8WRroHoJiT2BPDgdiFGxj18fw9X8QQWwiXTCnm1nmYKtIAxtVC8Xpt4MZtE
+         HFtiwatiOLgdXsasRrdpZfifCJ29TTyCRf36eKed1yb6UW6Xaf9xAzso5z53mzSb56Zi
+         sLEQ==
+X-Gm-Message-State: AOJu0YyBWDzXLnA3/QUaUQebUq83aOJea+0DlYChvLN8oujFlwFtLKlf
+	5B0AFhBwlamM1NhoWCIgynjVGerXcpFVIA==
+X-Google-Smtp-Source: AGHT+IHkdl1866Q0i9AdsppGYbOCZ6YcrUSM97FL7UV/7xWTfPO8VGxEiDCIbt+a16mcLybwg7FGnQ==
+X-Received: by 2002:a2e:9b8e:0:b0:2b4:6f0c:4760 with SMTP id z14-20020a2e9b8e000000b002b46f0c4760mr4707503lji.11.1692620151262;
+        Mon, 21 Aug 2023 05:15:51 -0700 (PDT)
 Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id p28-20020ac246dc000000b004ff9ea1ad91sm1700132lfo.216.2023.08.21.05.15.03
+        by smtp.gmail.com with ESMTPSA id h16-20020a2e3a10000000b002b9ccbe074bsm2250181lja.73.2023.08.21.05.15.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 05:15:04 -0700 (PDT)
-Date: Mon, 21 Aug 2023 15:15:02 +0300
+        Mon, 21 Aug 2023 05:15:50 -0700 (PDT)
+Date: Mon, 21 Aug 2023 15:15:48 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
 To: Rohan G Thomas <rohan.g.thomas@intel.com>
 Cc: "David S . Miller" <davem@davemloft.net>, 
@@ -65,11 +65,13 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
 	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
 	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/2] net: stmmac: Tx coe sw fallback
-Message-ID: <yayy6d3zfewgljwstunyl44qgsco3t5kdipbbb2sibx65honva@jobrmiqnhnhx>
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: Re: [PATCH net-next v5 1/2] dt-bindings: net: snps,dwmac: Tx queues
+ with coe
+Message-ID: <amprmav76sigvwr3vfxhb4sw4srzpld7qn3yrtue2cpxw7qsh7@qlnwdnjv4os5>
 References: <20230819023132.23082-1-rohan.g.thomas@intel.com>
- <20230819023132.23082-3-rohan.g.thomas@intel.com>
+ <20230819023132.23082-2-rohan.g.thomas@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,7 +80,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230819023132.23082-3-rohan.g.thomas@intel.com>
+In-Reply-To: <20230819023132.23082-2-rohan.g.thomas@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -86,88 +88,36 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 19, 2023 at 10:31:32AM +0800, Rohan G Thomas wrote:
-> Add sw fallback of tx checksum calculation for those tx queues that
-> don't support tx checksum offloading. Because, some DWMAC IPs support
-> tx checksum offloading only for a few initial tx queues, starting
-> from tx queue 0.
+On Sat, Aug 19, 2023 at 10:31:31AM +0800, Rohan G Thomas wrote:
+> Add dt-bindings for the number of tx queues with coe support. Some
+> dwmac IPs support tx queues only for a few initial tx queues,
+> starting from tx queue 0.
 > 
 > Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-LGTM,
 Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
 -Serge(y)
 
 > ---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++++++++++
->  .../ethernet/stmicro/stmmac/stmmac_platform.c  |  4 ++++
->  include/linux/stmmac.h                         |  1 +
->  3 files changed, 23 insertions(+)
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 733b5e900817..3ffef45a2861 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4409,6 +4409,16 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
->  	WARN_ON(tx_q->tx_skbuff[first_entry]);
->  
->  	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
-> +	/* Some DWMAC IPs support tx coe only for a few initial tx queues,
-> +	 * starting from tx queue 0. So checksum offloading for those queues
-> +	 * that don't support tx coe needs to fallback to software checksum
-> +	 * calculation.
-> +	 */
-> +	if (csum_insertion && queue >= priv->plat->tx_queues_with_coe) {
-> +		if (unlikely(skb_checksum_help(skb)))
-> +			goto dma_map_err;
-> +		csum_insertion = !csum_insertion;
-> +	}
->  
->  	if (likely(priv->extend_desc))
->  		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
-> @@ -7401,6 +7411,14 @@ int stmmac_dvr_probe(struct device *device,
->  		dev_info(priv->device, "SPH feature enabled\n");
->  	}
->  
-> +	if (priv->plat->tx_coe && !priv->plat->tx_queues_with_coe)
-> +		priv->plat->tx_queues_with_coe = priv->plat->tx_queues_to_use;
-> +	else if (!priv->plat->tx_coe)
-> +		priv->plat->tx_queues_with_coe = 0;
-> +	else if (priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use)
-> +		dev_info(priv->device, "TX COE only available for %u queues\n",
-> +			 priv->plat->tx_queues_with_coe);
-> +
->  	/* Ideally our host DMA address width is the same as for the
->  	 * device. However, it may differ and then we have to use our
->  	 * host DMA width for allocation and the device DMA width for
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index be8e79c7aa34..0138b7c9c7ab 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -225,6 +225,10 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
->  				 &plat->tx_queues_to_use))
->  		plat->tx_queues_to_use = 1;
->  
-> +	if (of_property_read_u32(tx_node, "snps,tx-queues-with-coe",
-> +				 &plat->tx_queues_with_coe))
-> +		plat->tx_queues_with_coe = plat->tx_queues_to_use;
-> +
->  	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
->  		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
->  	else if (of_property_read_bool(tx_node, "snps,tx-sched-wfq"))
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index 784277d666eb..cb508164eaea 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -252,6 +252,7 @@ struct plat_stmmacenet_data {
->  	u32 host_dma_width;
->  	u32 rx_queues_to_use;
->  	u32 tx_queues_to_use;
-> +	u32 tx_queues_with_coe;
->  	u8 rx_sched_algorithm;
->  	u8 tx_sched_algorithm;
->  	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index ddf9522a5dc2..0c6431c10cf9 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -313,6 +313,9 @@ properties:
+>        snps,tx-queues-to-use:
+>          $ref: /schemas/types.yaml#/definitions/uint32
+>          description: number of TX queues to be used in the driver
+> +      snps,tx-queues-with-coe:
+> +        $ref: /schemas/types.yaml#/definitions/uint32
+> +        description: number of TX queues that support TX checksum offloading
+>        snps,tx-sched-wrr:
+>          type: boolean
+>          description: Weighted Round Robin
 > -- 
 > 2.19.0
 > 
