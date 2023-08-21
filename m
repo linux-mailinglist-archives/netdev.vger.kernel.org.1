@@ -1,127 +1,120 @@
-Return-Path: <netdev+bounces-29195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898FC78210B
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 03:15:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6F5D78212E
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 03:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBD8D1C20403
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 01:15:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C61541C2084C
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 01:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EB364B;
-	Mon, 21 Aug 2023 01:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DF564B;
+	Mon, 21 Aug 2023 01:27:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E51A627
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:15:54 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 161CA99
-	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 18:15:53 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RTZFs50G6zNn0V;
-	Mon, 21 Aug 2023 09:12:17 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 21 Aug 2023 09:15:50 +0800
-Message-ID: <2d12cdb3-e6ef-46d2-3bfb-58b5c54f6ab3@huawei.com>
-Date: Mon, 21 Aug 2023 09:15:50 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C55627
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:27:42 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 768779D;
+	Sun, 20 Aug 2023 18:27:41 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RTZbW2s3Wz4f3p1H;
+	Mon, 21 Aug 2023 09:27:35 +0800 (CST)
+Received: from ubuntu20.huawei.com (unknown [10.67.174.33])
+	by APP4 (Coremail) with SMTP id gCh0CgCHXJ+AveJkpS7TBA--.56653S2;
+	Mon, 21 Aug 2023 09:27:36 +0800 (CST)
+From: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
+To: Chris Snook <chris.snook@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	gongruiqi1@huawei.com
+Subject: [PATCH RESEND net-next] alx: fix OOB-read compiler warning
+Date: Mon, 21 Aug 2023 09:32:18 +0800
+Message-Id: <20230821013218.1614265-1-gongruiqi@huaweicloud.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH net-next v3 2/3] net: bcmgenet: Return PTR_ERR() for
- fixed_phy_register()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-CC: <rafal@milecki.pl>, <bcm-kernel-feedback-list@broadcom.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <opendmb@gmail.com>, <florian.fainelli@broadcom.com>,
-	<bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>
-References: <20230818070707.3670245-1-ruanjinjie@huawei.com>
- <20230818070707.3670245-3-ruanjinjie@huawei.com>
- <ZOD2hylmo1/HgaYO@vergenet.net> <ZOD3nl+dOA39cVg5@vergenet.net>
-From: Ruan Jinjie <ruanjinjie@huawei.com>
-In-Reply-To: <ZOD3nl+dOA39cVg5@vergenet.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.109.254]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500008.china.huawei.com (7.221.188.139)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCHXJ+AveJkpS7TBA--.56653S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr1kJr1DGr45KrW3GrWrGrg_yoW8Aw4xpF
+	WDGayDCa48urnrZa1UXay8Zry5ZanIq3yjkFyxA3yrZF1UtrZ8CF17Kryjkr1UJ3y09r1F
+	qr1DAF9rJFZ8ZaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUk2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28I
+	cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+	IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+	42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+	IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+	87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
+X-CM-SenderInfo: pjrqw2pxltxq5kxd4v5lfo033gof0z/
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
 
+The following message shows up when compiling with W=1:
 
-On 2023/8/20 1:10, Simon Horman wrote:
-> On Sat, Aug 19, 2023 at 07:06:15PM +0200, Simon Horman wrote:
->> On Fri, Aug 18, 2023 at 03:07:06PM +0800, Ruan Jinjie wrote:
->>> fixed_phy_register() returns -EPROBE_DEFER, -EINVAL and -EBUSY,
->>> etc, in addition to -ENODEV. The Best practice is to return these
->>> error codes with PTR_ERR().
->>>
->>> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
->>> ---
->>> v3:
->>> - Split the return value check into another patch set.
->>> - Update the commit title and message.
->>> ---
->>>  drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
->>> index 0092e46c46f8..4012a141a229 100644
->>> --- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
->>> +++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
->>> @@ -619,7 +619,7 @@ static int bcmgenet_mii_pd_init(struct bcmgenet_priv *priv)
->>>  		phydev = fixed_phy_register(PHY_POLL, &fphy_status, NULL);
->>>  		if (!phydev || IS_ERR(phydev)) {
->>>  			dev_err(kdev, "failed to register fixed PHY device\n");
->>> -			return -ENODEV;
->>> +			return PTR_ERR(phydev);
->>
->> Hi Ruan,
->>
->> thanks for your patch.
->>
->> Perhaps I am missing something, but this doesn't seem right to me.
->> In the case where phydev is NULL will return 0.
->> But bcmgenet_mii_pd_init() also returns 0 on success.
->>
->> Perhaps this is better?
->>
->> 		if (!phydev || IS_ERR(phydev)) {
->> 			dev_err(kdev, "failed to register fixed PHY device\n");
->> 			return physdev ? PTR_ERR(phydev) : -ENODEV;
->> 		}
->>
->> I have a similar concern for patch 1/3 of this series.
->> Patch 3/3 seems fine in this regard.
-> 
-> Sorry for the noise.
-> 
-> I now see that fixed_phy_register() never returns NULL,
-> and that condition is being removed by another patchset [1].
-> 
-> I'm fine with this, other than that I suspect your two series
-> conflict with each other.
+In function ‘fortify_memcpy_chk’,
+    inlined from ‘alx_get_ethtool_stats’ at drivers/net/ethernet/atheros/alx/ethtool.c:297:2:
+./include/linux/fortify-string.h:592:4: error: call to ‘__read_overflow2_field’
+declared with attribute warning: detected read beyond size of field (2nd parameter);
+maybe use struct_group()? [-Werror=attribute-warning]
+  592 |    __read_overflow2_field(q_size_field, size);
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Thank you! I'll resend this patch to be consistent.
+In order to get alx stats altogether, alx_get_ethtool_stats() reads
+beyond hw->stats.rx_ok. Fix this warning by directly copying hw->stats,
+and refactor the unnecessarily complicated BUILD_BUG_ON btw.
 
-> 
-> [1] https://lore.kernel.org/all/20230818051221.3634844-1-ruanjinjie@huawei.com/
-> 
+Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
+---
+
+RESEND: forget to cc netdev mail list
+
+ drivers/net/ethernet/atheros/alx/ethtool.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/atheros/alx/ethtool.c b/drivers/net/ethernet/atheros/alx/ethtool.c
+index b716adacd815..7f6b69a52367 100644
+--- a/drivers/net/ethernet/atheros/alx/ethtool.c
++++ b/drivers/net/ethernet/atheros/alx/ethtool.c
+@@ -292,9 +292,8 @@ static void alx_get_ethtool_stats(struct net_device *netdev,
+ 	spin_lock(&alx->stats_lock);
+ 
+ 	alx_update_hw_stats(hw);
+-	BUILD_BUG_ON(sizeof(hw->stats) - offsetof(struct alx_hw_stats, rx_ok) <
+-		     ALX_NUM_STATS * sizeof(u64));
+-	memcpy(data, &hw->stats.rx_ok, ALX_NUM_STATS * sizeof(u64));
++	BUILD_BUG_ON(sizeof(hw->stats) != ALX_NUM_STATS * sizeof(u64));
++	memcpy(data, &hw->stats, sizeof(hw->stats));
+ 
+ 	spin_unlock(&alx->stats_lock);
+ }
+-- 
+2.25.1
+
 
