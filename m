@@ -1,113 +1,194 @@
-Return-Path: <netdev+bounces-29336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF871782B07
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:56:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D9D782B0E
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B872B1C20899
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:56:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 947251C20914
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D497483;
-	Mon, 21 Aug 2023 13:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F6D7488;
+	Mon, 21 Aug 2023 13:58:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C7A5258
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:56:03 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AB6BC
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 06:56:02 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RTv7X4Qn2zLpTS;
-	Mon, 21 Aug 2023 21:52:56 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 21 Aug
- 2023 21:55:59 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<lars.povlsen@microchip.com>, <Steen.Hegelund@microchip.com>,
-	<daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] net: microchip: Remove unused declarations
-Date: Mon, 21 Aug 2023 21:55:56 +0800
-Message-ID: <20230821135556.43224-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BC47487
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:58:13 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF788BE;
+	Mon, 21 Aug 2023 06:58:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=OS0lvFtBNyEGIlutfKlsCWdNAR/9cLg3EU19hb5EGS8=; b=jE8MlowF16n1coowOyKHA4y6IP
+	JO8g855XJWA5YmPRVfJyL7wNalLKXyjsvgddIXWBItbYicbzliIxJ/eHxxbnS2WuuPtjKoqFZub66
+	pMTJkzvNSNMIRLICjtgIsHPP2qVpf1eZEJ3I9cphKJrP/Qleaxxsj6TGnkkTfvZHD0MIxsfjapkUl
+	umzBZawKst490OPX539UaqcbIc31cxoy/Z+SwXZD42Ne5aSBauqe/7Cv/7eptQx07vbwqGLEsQPlw
+	rz35ZEfuefm8w8GKHoYSmz6YVXlUMxuB/qpj3XhMAhR82/zhHQgPb/szLBhSdUtugqInXep0Ix4vj
+	naThhy7Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36514)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qY5Pm-00007q-29;
+	Mon, 21 Aug 2023 14:57:54 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qY5Pk-0004p0-0l; Mon, 21 Aug 2023 14:57:52 +0100
+Date: Mon, 21 Aug 2023 14:57:51 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jisheng Zhang <jszhang@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v4 2/9] net: stmmac: xgmac: add more feature
+ parsing from hw cap
+Message-ID: <ZONtX8EMXnmHQFnD@shell.armlinux.org.uk>
+References: <20230816152926.4093-1-jszhang@kernel.org>
+ <20230816152926.4093-3-jszhang@kernel.org>
+ <9e55fd03-6b05-46de-874e-01d9cdbf4524@lunn.ch>
+ <ZOJuzakni1youMtX@shell.armlinux.org.uk>
+ <dmfhl4ptoytmconczdkccli5qlkct33tgfqaoigygrzak52g63@qw7pwoa5m2x3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dmfhl4ptoytmconczdkccli5qlkct33tgfqaoigygrzak52g63@qw7pwoa5m2x3>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 264a9c5c9dff ("net: sparx5: Remove unused GLAG handling in PGID")
-removed sparx5_pgid_alloc_glag() but not its declaration.
-Commit 27d293cceee5 ("net: microchip: sparx5: Add support for rule count by cookie")
-removed vcap_rule_iter() but not its declaration.
-Commit 8beef08f4618 ("net: microchip: sparx5: Adding initial VCAP API support")
-declared but never implemented vcap_api_set_client().
+On Mon, Aug 21, 2023 at 04:25:42PM +0300, Serge Semin wrote:
+> Hi Russel, Andrew
+> 
+> On Sun, Aug 20, 2023 at 08:51:41PM +0100, Russell King (Oracle) wrote:
+> > On Sun, Aug 20, 2023 at 09:15:06PM +0200, Andrew Lunn wrote:
+> > > On Wed, Aug 16, 2023 at 11:29:19PM +0800, Jisheng Zhang wrote:
+> 
+> > > > The XGMAC_HWFEAT_GMIISEL bit also indicates whether support 10/100Mbps
+> > > > or not.
+> 
+> > > 
+> > > The commit message fails to explain the 'Why?' question. GMII does
+> > > normally imply 10/100/1000, so i would expect dma_cap->mbps_1000 also
+> > > implies 10/100/1000? So why also set dma_cap->mbps_10_100?
+> 
+> Regarding DW XGMAC. I can't say for sure. Based on DW XGMAC v2.10
+> IP-core HW manual it has MAC_HW_Feature0.GMIISEL(1) flag indicating
+> whether there is GMII interface besides of the XGMII interface. But in
+> my databook MAC_HW_Feature0.BIT(0) is marked as reserved and
+> MAC_Tx_Configuration.SS field doesn't have 10/100Mbps modes despite of
+> what is defined in dwxgmac2.h by means of the XGMAC_CONFIG_SS_10_MII
+> and XGMAC_CONFIG_SS_1000_GMII macros.
+> 
+> But DW GMAC or DW Eth QoS can be synthesized with the 1000-only
+> mode enabled. GMIISEL and MIISEL flags reflect the OP_MODE IP-core
+> synthesize parameter state. It can have three different values:
+> 
+> Mode of Operation	Description: Configures the MAC to work in
+> 			10/100/1000 Mbps mode. Select 10/100/1000
+> 			Mbps for enabling both Fast Ethernet and Gigabit
+> 			operations, 10/100 Mbps for Fast Ethernet-only
+> 			operations, and 1000 Mbps for Gigabit-only operations.
+> !!!			Value Range: 10/100/1000 Mbps, 10/100 Mbps, or 1000 Mbps
+> 			Default Value:
+> 				10/100/1000 Mbps with Gigabit License
+> 				10/100 with Fast Ethernet license
+> HDL Parameter Name: OP_MODE
+> 
+> > > 
+> > > Maybe a better change would be to modify:
+> > > 
+> > >         seq_printf(seq, "\t1000 Mbps: %s\n",
+> > >                    (priv->dma_cap.mbps_1000) ? "Y" : "N");
+> > > 
+> > > to actually say 10/100/1000 Mbps? It does not appear this is used for
+> > > anything other than debugfs?
+> > 
+> 
+> > Indeed, it also looks to me like mbps_1000 and mbps_10_100 are only
+> > used to print things in the debugfs file, and do not have any effect
+> > on the driver.
+> 
+> They should have been utilized somehow in the stmmac_mac_link_up() and
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- drivers/net/ethernet/microchip/sparx5/sparx5_main.h   | 1 -
- drivers/net/ethernet/microchip/vcap/vcap_api.h        | 3 ---
- drivers/net/ethernet/microchip/vcap/vcap_api_client.h | 3 ---
- 3 files changed, 7 deletions(-)
+No, definitely not in mac_link_up(). If these flags indicate what speeds
+are available, then what would mac_link_up() do if, e.g. the core says
+"I don't support 1G" and phylink determines that the result of
+negotiation is 1G?
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-index 89a9a7afa32c..6f565c0c0c3d 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-@@ -414,7 +414,6 @@ enum sparx5_pgid_type {
- };
- 
- void sparx5_pgid_init(struct sparx5 *spx5);
--int sparx5_pgid_alloc_glag(struct sparx5 *spx5, u16 *idx);
- int sparx5_pgid_alloc_mcast(struct sparx5 *spx5, u16 *idx);
- int sparx5_pgid_free(struct sparx5 *spx5, u16 idx);
- 
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api.h b/drivers/net/ethernet/microchip/vcap/vcap_api.h
-index 62db270f65af..9eccfa633c1a 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api.h
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api.h
-@@ -277,7 +277,4 @@ struct vcap_control {
- 	struct list_head list; /* list of vcap instances */
- };
- 
--/* Set client control interface on the API */
--int vcap_api_set_client(struct vcap_control *vctrl);
--
- #endif /* __VCAP_API__ */
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-index d9d1f7c9d762..88641508f885 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-@@ -226,9 +226,6 @@ int vcap_chain_offset(struct vcap_control *vctrl, int from_cid, int to_cid);
- bool vcap_is_next_lookup(struct vcap_control *vctrl, int cur_cid, int next_cid);
- /* Is this chain id the last lookup of all VCAPs */
- bool vcap_is_last_chain(struct vcap_control *vctrl, int cid, bool ingress);
--/* Provide all rules via a callback interface */
--int vcap_rule_iter(struct vcap_control *vctrl,
--		   int (*callback)(void *, struct vcap_rule *), void *arg);
- /* Match a list of keys against the keysets available in a vcap type */
- bool vcap_rule_find_keysets(struct vcap_rule *rule,
- 			    struct vcap_keyset_list *matches);
+This is clearly not the right place. The right place is when
+initialising the phylink MAC capabilities, which is currently done in
+stmmac_phy_setup() without *any* regard what so ever for what speeds
+are actually supported, with the exception of "oh, is that the maximum
+speed".
+
+> > It does bring up one last question though: if the driver makes no use
+> > of these hw_cap bits, then is there any point in printing them in the
+> > debugfs file?
+> 
+> This question can be applied to almost the half of the dma_feature
+> structure fields.) One more patch extends it with even more mainly
+> unused fields:
+> https://lore.kernel.org/netdev/20230819105440.226892-1-0x1207@gmail.com/
+
+If the hw_cap field is specific, then how about some hardware specific
+data giving something like an enum listing the capabilties, the enum
+used to index a string table of capabilities, and an array of bit
+numbers in hw_cap for those fields, or an array of masks? This data
+could be const, which means that stmmac_dma_cap_show() only needs
+the hw_cap value and the struct.
+
+That also means that stmmac_phy_setup() could also index the
+array of bit numbers to test for e.g. GMII/MII support to determine
+whether 10/100 and 1000 capabilities should be added for phylink.
+
+If we look at the "half_duplex" dma capability, things are similarly
+stupid. Pulling out of dwmac4:
+
+        dma_cap->half_duplex = (hw_cap & GMAC_HW_FEAT_HDSEL) >> 2;
+
+This is not tested elsewhere from what I can find - neither the
+hwcap nor the half_duplex field except for reporting in debugfs.
+It isn't used to restrict the phylink capabilities for HD, since
+the only test is this:
+
+        /* Half-Duplex can only work with single queue */
+        if (priv->plat->tx_queues_to_use > 1)
+                priv->phylink_config.mac_capabilities &=
+                        ~(MAC_10HD | MAC_100HD | MAC_1000HD);
+
+So, the reporting of "half duplex" mode in debugfs has absolutely
+nothing to do with whether we try to use half duplex modes in the
+driver.
+
+This is rubbish. Utter rubbish.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
