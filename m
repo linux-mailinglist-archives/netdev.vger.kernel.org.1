@@ -1,167 +1,174 @@
-Return-Path: <netdev+bounces-29293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7776A7828BA
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:15:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB267828C1
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B04280E4C
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:15:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 283DF280D27
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5093C53AB;
-	Mon, 21 Aug 2023 12:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A766E53AB;
+	Mon, 21 Aug 2023 12:15:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76F3524C
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:14:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C87C433C8;
-	Mon, 21 Aug 2023 12:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692620097;
-	bh=r1NIOj8bIDAh7N5rqHvucaHlDZ9m0bo3+9/KsHUS0f0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=kJeSiVRBXpIgURglLgEnyiQ3ek1Opg40Oj9rDnfwwHQe0n+nyz0yFSr1lSWUAjBye
-	 Jf89+DgJeaNPB4Bx20YuK3skcX0nPVoSYRemtDc6YoDT63b9w+dsbBiHsgar+i3pti
-	 AH0q8/YGve/EgrmNHSkMA69fSwrze0ZxPGJnsryE3E4091lRZAIpvOqLdXk4glJrJr
-	 w9omOgrFf89Owsn93h7N6EWoQVdLJmpZAzbE0L1Jn9yKDKn41IskIqAc8v1a/FVik1
-	 FZikJ2238k7PWSiTJp4f/ghCx/xrDDgskMOTjSNqikx07ugMVCNW0Q19ydFyZvWhuZ
-	 cdEVsCFIwOF4w==
-From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Christian Marangi <ansuelsmth@gmail.com>
-Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net] leds: trigger: netdev: rename 'hw_control' sysfs entry to 'offloaded'
-Date: Mon, 21 Aug 2023 14:14:53 +0200
-Message-ID: <20230821121453.30203-1-kabel@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989FA5678
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:15:08 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343B5CD;
+	Mon, 21 Aug 2023 05:15:07 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe27849e6aso4859635e87.1;
+        Mon, 21 Aug 2023 05:15:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692620105; x=1693224905;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=avV2BsJ1FLhhu79KeKfN0Ev+8booIHw8n+ZXD8aCVnA=;
+        b=c5jpnXtPZchTfPtdD+NAyZpcNupHdzZV+pD84WcKk8uJIBSzC7W1uWaXcccQNUEBSO
+         5RW55hM5m3dVq2HkVNUtqKXqlmOfsNHVAvzchVdF6GZoJQjqJfqs/Gw67knXOYQowLdV
+         LdNjX6y0JW92cKc1mOUaxROW1X/wWgR6Of0J268IYa/shHy87Uj+HaWIw7bkl7YgJ39D
+         DmQwsSFdoYQfZQmzNRT5HsdjJ6szG4pclaEtD5HxGThVrlPLK54aFQQwsAVVwsFfJurM
+         PmgGflAJQjZ+DRQzel2z2SyeMqW14fq2QjNy/KKu8AIe1Ve3cKeB2IcCfFIAWkL/QN1q
+         ZEAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692620105; x=1693224905;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=avV2BsJ1FLhhu79KeKfN0Ev+8booIHw8n+ZXD8aCVnA=;
+        b=FRk1vUmMDh3lc1a2U1NH6y7TbeiCsICpfDidn+74PRjvafO4ciSjv/GONoPJ8g47YG
+         Ph4uxMDyXZOfivhuVSNdos63kdWaaMfLPDtW4+IZQuu+E6dkEOKZzeouoD5xEih5Gat1
+         4s6hcnxIH+D0nYWjYDKOOn8eKkZMWetS+/mmNVsPiL+31QypgW191d0NxuR5Qp6KPCOY
+         JWsav3kXgom4wleoDgX3xzQ/mdXzs3DQGUWNWgDWuagxUal7QSBmWnHCAjulc/0JFqvc
+         ZxJnL50a/7VMFAqgfa57WNQnLS4QDYMGmJFMUcG4inM0rb1ig6N/ZQKIyWCLXUMYsJz+
+         xhVw==
+X-Gm-Message-State: AOJu0Yy3nQBeeyQbjTnFnDzBcIVmE7o3tGlp48Bb2gJSsKqsIn+SxCJn
+	U4XIyvx1zesZB940Yfv/CYk=
+X-Google-Smtp-Source: AGHT+IFNc61eHU9PArAyDrvV6DY1c2fksC/mbLMjK3WEsB9bq38x5BVHfXfD69uaWKpqHoHiv+Yn6Q==
+X-Received: by 2002:a05:6512:3da0:b0:4fd:faa2:884c with SMTP id k32-20020a0565123da000b004fdfaa2884cmr5901431lfv.29.1692620105055;
+        Mon, 21 Aug 2023 05:15:05 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id p28-20020ac246dc000000b004ff9ea1ad91sm1700132lfo.216.2023.08.21.05.15.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 05:15:04 -0700 (PDT)
+Date: Mon, 21 Aug 2023 15:15:02 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Rohan G Thomas <rohan.g.thomas@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/2] net: stmmac: Tx coe sw fallback
+Message-ID: <yayy6d3zfewgljwstunyl44qgsco3t5kdipbbb2sibx65honva@jobrmiqnhnhx>
+References: <20230819023132.23082-1-rohan.g.thomas@intel.com>
+ <20230819023132.23082-3-rohan.g.thomas@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230819023132.23082-3-rohan.g.thomas@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Commit b655892ffd6d ("leds: trigger: netdev: expose hw_control status
-via sysfs") exposed to sysfs the flag that tells whether the LED trigger
-is offloaded to hardware, under the name "hw_control", since that is the
-name under which this setting is called in the code.
+On Sat, Aug 19, 2023 at 10:31:32AM +0800, Rohan G Thomas wrote:
+> Add sw fallback of tx checksum calculation for those tx queues that
+> don't support tx checksum offloading. Because, some DWMAC IPs support
+> tx checksum offloading only for a few initial tx queues, starting
+> from tx queue 0.
+> 
+> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
 
-Everywhere else in kernel when some work that is normally done in
-software can be made to be done by hardware instead, we use the word
-"offloading" to describe this, e.g. "LED blinking is offloaded to
-hardware".
+LGTM,
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-Normally renaming sysfs entries is a no-go because of backwards
-compatibility. But since this patch was not yet released in a stable
-kernel, I think it is still possible to rename it, if there is
-consensus.
+-Serge(y)
 
-Fixes: b655892ffd6d ("leds: trigger: netdev: expose hw_control status via sysfs")
-Signed-off-by: Marek Behún <kabel@kernel.org>
----
-Andrew, Ansuel, Jakub: since I came late to this show, I will understand
-if you do not agree with this.
-
-Marek
----
- .../testing/sysfs-class-led-trigger-netdev    | 20 +++++++++----------
- drivers/leds/trigger/ledtrig-netdev.c         |  8 ++++----
- 2 files changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/Documentation/ABI/testing/sysfs-class-led-trigger-netdev b/Documentation/ABI/testing/sysfs-class-led-trigger-netdev
-index 78b62a23b14a..f6d9d72ce77b 100644
---- a/Documentation/ABI/testing/sysfs-class-led-trigger-netdev
-+++ b/Documentation/ABI/testing/sysfs-class-led-trigger-netdev
-@@ -13,7 +13,7 @@ Description:
- 		Specifies the duration of the LED blink in milliseconds.
- 		Defaults to 50 ms.
- 
--		With hw_control ON, the interval value MUST be set to the
-+		When offloaded is true, the interval value MUST be set to the
- 		default value and cannot be changed.
- 		Trying to set any value in this specific mode will return
- 		an EINVAL error.
-@@ -44,8 +44,8 @@ Description:
- 		If set to 1, the LED will blink for the milliseconds specified
- 		in interval to signal transmission.
- 
--		With hw_control ON, the blink interval is controlled by hardware
--		and won't reflect the value set in interval.
-+		When offloaded is true, the blink interval is controlled by
-+		hardware and won't reflect the value set in interval.
- 
- What:		/sys/class/leds/<led>/rx
- Date:		Dec 2017
-@@ -59,21 +59,21 @@ Description:
- 		If set to 1, the LED will blink for the milliseconds specified
- 		in interval to signal reception.
- 
--		With hw_control ON, the blink interval is controlled by hardware
--		and won't reflect the value set in interval.
-+		When offloaded is true, the blink interval is controlled by
-+		hardware and won't reflect the value set in interval.
- 
--What:		/sys/class/leds/<led>/hw_control
-+What:		/sys/class/leds/<led>/offloaded
- Date:		Jun 2023
- KernelVersion:	6.5
- Contact:	linux-leds@vger.kernel.org
- Description:
--		Communicate whether the LED trigger modes are driven by hardware
--		or software fallback is used.
-+		Communicate whether the LED trigger modes are offloaded to
-+		hardware or whether software fallback is used.
- 
- 		If 0, the LED is using software fallback to blink.
- 
--		If 1, the LED is using hardware control to blink and signal the
--		requested modes.
-+		If 1, the LED blinking in requested mode is offloaded to
-+		hardware.
- 
- What:		/sys/class/leds/<led>/link_10
- Date:		Jun 2023
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index c9bc5a91ec83..03c58e50cc44 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -406,15 +406,15 @@ static ssize_t interval_store(struct device *dev,
- 
- static DEVICE_ATTR_RW(interval);
- 
--static ssize_t hw_control_show(struct device *dev,
--			       struct device_attribute *attr, char *buf)
-+static ssize_t offloaded_show(struct device *dev,
-+			      struct device_attribute *attr, char *buf)
- {
- 	struct led_netdev_data *trigger_data = led_trigger_get_drvdata(dev);
- 
- 	return sprintf(buf, "%d\n", trigger_data->hw_control);
- }
- 
--static DEVICE_ATTR_RO(hw_control);
-+static DEVICE_ATTR_RO(offloaded);
- 
- static struct attribute *netdev_trig_attrs[] = {
- 	&dev_attr_device_name.attr,
-@@ -427,7 +427,7 @@ static struct attribute *netdev_trig_attrs[] = {
- 	&dev_attr_rx.attr,
- 	&dev_attr_tx.attr,
- 	&dev_attr_interval.attr,
--	&dev_attr_hw_control.attr,
-+	&dev_attr_offloaded.attr,
- 	NULL
- };
- ATTRIBUTE_GROUPS(netdev_trig);
--- 
-2.41.0
-
+> ---
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++++++++++
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c  |  4 ++++
+>  include/linux/stmmac.h                         |  1 +
+>  3 files changed, 23 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 733b5e900817..3ffef45a2861 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -4409,6 +4409,16 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	WARN_ON(tx_q->tx_skbuff[first_entry]);
+>  
+>  	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
+> +	/* Some DWMAC IPs support tx coe only for a few initial tx queues,
+> +	 * starting from tx queue 0. So checksum offloading for those queues
+> +	 * that don't support tx coe needs to fallback to software checksum
+> +	 * calculation.
+> +	 */
+> +	if (csum_insertion && queue >= priv->plat->tx_queues_with_coe) {
+> +		if (unlikely(skb_checksum_help(skb)))
+> +			goto dma_map_err;
+> +		csum_insertion = !csum_insertion;
+> +	}
+>  
+>  	if (likely(priv->extend_desc))
+>  		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
+> @@ -7401,6 +7411,14 @@ int stmmac_dvr_probe(struct device *device,
+>  		dev_info(priv->device, "SPH feature enabled\n");
+>  	}
+>  
+> +	if (priv->plat->tx_coe && !priv->plat->tx_queues_with_coe)
+> +		priv->plat->tx_queues_with_coe = priv->plat->tx_queues_to_use;
+> +	else if (!priv->plat->tx_coe)
+> +		priv->plat->tx_queues_with_coe = 0;
+> +	else if (priv->plat->tx_queues_with_coe < priv->plat->tx_queues_to_use)
+> +		dev_info(priv->device, "TX COE only available for %u queues\n",
+> +			 priv->plat->tx_queues_with_coe);
+> +
+>  	/* Ideally our host DMA address width is the same as for the
+>  	 * device. However, it may differ and then we have to use our
+>  	 * host DMA width for allocation and the device DMA width for
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index be8e79c7aa34..0138b7c9c7ab 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -225,6 +225,10 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+>  				 &plat->tx_queues_to_use))
+>  		plat->tx_queues_to_use = 1;
+>  
+> +	if (of_property_read_u32(tx_node, "snps,tx-queues-with-coe",
+> +				 &plat->tx_queues_with_coe))
+> +		plat->tx_queues_with_coe = plat->tx_queues_to_use;
+> +
+>  	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
+>  		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
+>  	else if (of_property_read_bool(tx_node, "snps,tx-sched-wfq"))
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 784277d666eb..cb508164eaea 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -252,6 +252,7 @@ struct plat_stmmacenet_data {
+>  	u32 host_dma_width;
+>  	u32 rx_queues_to_use;
+>  	u32 tx_queues_to_use;
+> +	u32 tx_queues_with_coe;
+>  	u8 rx_sched_algorithm;
+>  	u8 tx_sched_algorithm;
+>  	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
+> -- 
+> 2.19.0
+> 
 
