@@ -1,217 +1,182 @@
-Return-Path: <netdev+bounces-29412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F3507830D4
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 21:13:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03D347830FB
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 21:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A74C91C20985
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9267F280ECC
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40ECBF515;
-	Mon, 21 Aug 2023 19:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532CA11705;
+	Mon, 21 Aug 2023 19:36:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357EA4A10
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 19:13:28 +0000 (UTC)
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2903CF5
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:13:26 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-570e88ee36aso405420eaf.1
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 12:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692645205; x=1693250005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7EstROD8uz4uXiA68mQeo6YsgbGEyVjJFFa0L6CFnaU=;
-        b=WeNU4B2leSXZINpoiOYo8M+EyED7N1MfX5Y+vkoESrlM1nFR+RD5C0wdRitIhYzCST
-         mc8DnukMp2pUkdRPrfo30/q8Db1GkkNvZlLNy2MwXMnHOPm8oZQsCtGYyVgf4Hrfmyz3
-         GDhuYnYZF+12GwzeItkqKtDvEtWkKSQmpph81Jii/DyESm6res8fpXp1AZdT7L7EWEMH
-         eCczWuQXVZjiPgbWdA51sHdklKVT3LYzvF6lWOBNNzS0t5cCoTSSInaoSVqYUeMDCB4p
-         s+rH4e9WzUirWp3bG+gP/TkIXClFmkJlh0GpVSV3FJMwllGChhEUU4cuyWrT03OdXdIs
-         jNmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692645205; x=1693250005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7EstROD8uz4uXiA68mQeo6YsgbGEyVjJFFa0L6CFnaU=;
-        b=ScbtT+3NF1qPVb8LfiIQ9KPmnXxbQFN0bZxuRBRrYHQ+DdNr+gOwDjIGsb2TZiTprJ
-         8c2HOCg5prwcI+ayKBT7D37K8a35Ji6u3VJfR1NtTENGON47NVcie2fXt/DD2AlYXtHC
-         9TK4IYYXsrmlx0zoR1yafMnUG2sVTSPM0eXbG8vhEcJzB35JjehcFM62CAJDxHixMD0I
-         BV9k1Hq+KtEwvP7Ag3CQ46vQaBmNZqAM4ducESy0+dSyOmRdUgXUwAQKjP6+dUjga3iA
-         cf+9ll4dg7e5QG/SR+MmXLzQkTIstGBgJXzlvYp64eTT8AMqKhT4xdwxfH6PQgiQJzqq
-         ZXBA==
-X-Gm-Message-State: AOJu0YwSYeEX2h/leLheoSBqGYhl0s2TrbRHkS+yeVnjjsnbAjOSIt1S
-	AzVijGzPY53E+mUNXyH09vTEtijRXqntTyE0b6c=
-X-Google-Smtp-Source: AGHT+IEIpzubud6XDJgv1HqN7u4ViOWnVR9zgI1WOqzLodQnTZjuSlUIlftwEu67GCUftVFHsrV8qQ==
-X-Received: by 2002:a05:6358:98a9:b0:139:be3d:d047 with SMTP id q41-20020a05635898a900b00139be3dd047mr5662531rwa.17.1692645205677;
-        Mon, 21 Aug 2023 12:13:25 -0700 (PDT)
-Received: from majuu.waya ([174.93.66.252])
-        by smtp.gmail.com with ESMTPSA id ih14-20020a05622a6a8e00b00400a99b8b38sm2482011qtb.78.2023.08.21.12.13.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 12:13:25 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	syzkaller-bugs@googlegroups.com,
-	linux-kernel@vger.kernel.org,
-	shaozhengchao@huawei.com,
-	syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net v2 1/1] net/sched: fix a qdisc modification with ambiguous command request
-Date: Mon, 21 Aug 2023 15:13:05 -0400
-Message-Id: <20230821191305.68275-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4724A5684
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 19:36:52 +0000 (UTC)
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2091.outbound.protection.outlook.com [40.107.105.91])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF95DC2;
+	Mon, 21 Aug 2023 12:36:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eEFQMCVVSuoDwEJdcMTdJB9pa1yjDNXAQ0V6R5OUWcIMEFDwBgJTiY6ZdQ9UAAP0lrPdLvjqOWObYwPGXkaDw6yDzMHTT297b6FzIsT3JqbU/ljCkPO1A8+PvuY+JRmgi1kfXMNbO5qDM1mj4L9LHslYLMoIChNFV0NsnTk05iVV0zrBZAjnYvGCtzXIXz8N3Ch71Q8Dl931OxyAvirKV+jthvUUzFdIwCZ8qR6KMHPZ0/f+zbjndkIEk43WmA5yd5JqcNdO3qQ+70JK8Op7x7TTJp+VUTFbsuhl0rAUjIKnef9IOLSf9jNQDbzMQCs50LD+HKVIlw6Ovo9J6efPHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x839lx/pjEUJ9bRSygHkBwRfR+kOtWxNjLlCAd5834E=;
+ b=Dyq10LFGcUrAASOIEW/N1Bjz68rk5x/UmPRpjiXP1kPymN+iGC+Ttx1WTocn/nc+39/R4bAGUfUSko3nDtGwjIXoXWs+hRn2dqXlMzYGytWnhXuVevujUg1Rp2vMpWwKAkt75VqPAJgXay1JYkqO7y+z4SYRhtFrKYRAuA9HWhVQ0kc4IB+RKftM8onmQN5xrEzki8Wi9+p2jcbDFJIdl6JFvjmb91OxSsajCMFJ98W9ruj1ELMumVcblvLzFOUUlBHSsKdDAdpiKIJhWLkVXnzWklJB1vc3OS9tS9d+X+2ScTv9ZZmMFAe4sHKqOrp2KbWpzozu5ZXplNpnBIodEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=estab.onmicrosoft.com;
+ s=selector2-estab-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x839lx/pjEUJ9bRSygHkBwRfR+kOtWxNjLlCAd5834E=;
+ b=hGuMg0guW9cGvuHxwQ45hTfj1rhXq+KP7HOrGkKpW/sf2d8715Eok5/uaqnXKrYbKCV4voJxXpGaustwZjv1rDr44rJRoyetFrPcqZExGu7pLN+Jm7aHl7zln5eGnsheRyAnjcZFrgK9YAVPTAdvfCNhRAt9+qfZndZ/OFAziPc=
+Received: from DBBP189MB1433.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:1e7::15)
+ by PAWP189MB2611.EURP189.PROD.OUTLOOK.COM (2603:10a6:102:336::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Mon, 21 Aug
+ 2023 19:36:48 +0000
+Received: from DBBP189MB1433.EURP189.PROD.OUTLOOK.COM
+ ([fe80::759b:94eb:c2e8:c670]) by DBBP189MB1433.EURP189.PROD.OUTLOOK.COM
+ ([fe80::759b:94eb:c2e8:c670%6]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
+ 19:36:47 +0000
+From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+To: Ido Schimmel <idosch@idosch.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+	<dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan
+	<shuah@kernel.org>
+Subject: RE: [PATCH 3/3] selftests: forwarding: Add test for load-balancing
+ between multiple servers
+Thread-Topic: [PATCH 3/3] selftests: forwarding: Add test for load-balancing
+ between multiple servers
+Thread-Index: AQHZ0pMUlNN+cgUkKUqzv/5j/AbJm6/0ocqAgACCNMA=
+Date: Mon, 21 Aug 2023 19:36:47 +0000
+Message-ID:
+ <DBBP189MB1433714989BBE41321848336951EA@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
+References: <20230819114825.30867-1-sriram.yagnaraman@est.tech>
+ <20230819114825.30867-4-sriram.yagnaraman@est.tech>
+ <ZONLz5IyaG+XnUSJ@shredder>
+In-Reply-To: <ZONLz5IyaG+XnUSJ@shredder>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DBBP189MB1433:EE_|PAWP189MB2611:EE_
+x-ms-office365-filtering-correlation-id: feab7b78-17d4-4294-cd33-08dba27df59b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 0+XhQExWFsKWtkbTAwH1xrXcBTVIwQAYYqfKWoPlln8SqKT3ae2oCSnW6lyvStcxcmv+haYDWQ5IIT4X013QWC4IqFsRoa32ho6oLzV25zAAecu960DbdB0lDQXf3swmWOYtPslLSYpTEPeE72zbxOeDAvdQmnY4ab2MSJSzR/zw8bBAcYr1O4Pmq6BkAqSVZ/JflHGXfTJYF5f4qmYyuyB1aPiFFHFoKpOgr6GeySqOdMlzCR0e3j804+xBQPIdTbHkSbn2kChZNqHFvI+rg2/zf1uIWQB93PUxI0sbDKSWuMxCbj2m0OE8p4Q9OPbD7oQDjzV0OG96RZej4IHhH5lH2mE7ojfwtOaf+lt6D7aeFgt9vhL4U2ipnWXarbsd68qwT/ypL0piRBDGSkVD7LMFbm6C7INFc3IfYs3niFAPaaA91cf3h5PVYGmHV8KzCfU/zelyjoOc1ukHK+XwFMuy8Wd3qt9zysSFERgraNn687EerOnv1RKdIs7elApb9d7o+wv+hxMM9YJF0y65psrOmoCbDN8CKjYHHd5wn+/6G3dFON2+BNabdw7W/V3qga4O24bCOkUpal7o5tdBVAHlKWAokSu5PoXYS9OyF90=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBP189MB1433.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(396003)(136003)(39840400004)(346002)(186009)(1800799009)(451199024)(26005)(9686003)(33656002)(66574015)(122000001)(55016003)(38070700005)(86362001)(38100700002)(83380400001)(41300700001)(316002)(8936002)(8676002)(66946007)(6916009)(66476007)(66446008)(64756008)(54906003)(66556008)(2906002)(52536014)(44832011)(5660300002)(4326008)(76116006)(7416002)(71200400001)(7696005)(6506007)(966005)(53546011)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Y0RRRFZhZ21WdDNoMkZUQ2ZSOWxCS0cxWXlKQ2drRFo3anVNRmNLU1pPOWw3?=
+ =?utf-8?B?dE5DVTlHc2FyYU5YVXBud2d0a1FRcHJuNU51ck9VMDFJbzFSQ21lbnFJRHdR?=
+ =?utf-8?B?UWhibnBwSkt5cE9xekFxeXI4UG12RHhkaVdTTjVxTDJjQVltS2JrRDBpRk45?=
+ =?utf-8?B?ZUxVNFE2TFlMc1VoV25wZWsyNzJLcnI4dVVlc0lnQnZIWmUxanhlOEphaU5k?=
+ =?utf-8?B?VUJBMkRtbFhQZTdsRGFsd2VDTE9yYjg1YUJWV2VMSUNINzY3QmxldGs0bmFo?=
+ =?utf-8?B?aWVPRTkxY1VKNHdXek5mQkNmR1ZtRGszSGNEY0xpTjBLcDhnK1FVdnoxMVk2?=
+ =?utf-8?B?UWVKQ3VNNDFyVjlpL0R6WHVaemFQcjE0WTF1UjFMQ3k2LzgvNGp1aFlSMW1E?=
+ =?utf-8?B?TVhidnFUWUxYdjBrZ0pvQ1BSZ2hyaWs4VHlFSjU4MnpKVDM0ZUc0cWZ0cDhC?=
+ =?utf-8?B?V3p2VXVIQkRqeUFhTFVUY2xGREFhRnJ4OW5KZEhYL1dFUmNFZmtWcnZuaE5R?=
+ =?utf-8?B?OUJwZDdZVHRaR0hYaDBYc0FxcUJrTlo2ZTByTlZoZnkzVHhyVTZrUjVnOEd0?=
+ =?utf-8?B?eklJTkxPajZEYzM0MkplVE5JMU5CTlZWMnZUVVRGRTVZd0ZsQmpsa3hoTFpa?=
+ =?utf-8?B?c0oxdkV0ZDhtOTRXRzg2VnVZZy9jMTlMaVZVa3RXdktyQmtScjFTQzNlSDRz?=
+ =?utf-8?B?bmNvSGlYaUNLTFZxRkc2eDVLUk5HakppSUEzRkx3RDRtSlNYRGt1UjE1dlU5?=
+ =?utf-8?B?bjljaCt0akZ6TkcxS0lPSDBRM3Fwek9TQXNYeFNNaXNYTGRteHUyQlRzYkIw?=
+ =?utf-8?B?bXVFQUtic3lkR2RyUnpIRER0dVFCOXc1a3ROZ3o3ekVkZ0tGM1kxdlhEV1hP?=
+ =?utf-8?B?QXpoS2ttQkxhV2YvYmtFeFlPRDZSR3cvVzZXajNta1R6LzJBVndkb1lDVStK?=
+ =?utf-8?B?cVFBMjNyQUluMGdxRTBPTnM2VVBjdmp0OGpIQ3ZZM1dmdHQ2UVFEMVYyMzRH?=
+ =?utf-8?B?WEExR2JXMFFJQWxzU29jOFlQUmpRM2dNa2daRW5oVXQ3UUJKUW44Q1ZNNVIw?=
+ =?utf-8?B?WTZQeVVYemxXaXRYRlR0elpRUVRnYmwyWlVzNnpzT0Z4MUo3c21hTExldG1v?=
+ =?utf-8?B?WVpIeGIrd0xSaUg1QjdYWnUyWVZnSmcwV2NLWnlVdjBudWdjbnhSZ0sxSm1o?=
+ =?utf-8?B?a0d5c1BEdVJxTGtjeG1xeVJwVm5TUGN4SUxnR2RxMUlnb2t6YjN0TzVBVDY2?=
+ =?utf-8?B?a2c4VVJoOVJzV1FSZGlBSDhwUFlQa2hac05ySjdrdDhZTWZTamU5eVNjY3l4?=
+ =?utf-8?B?N05FMVNqQTM5L3BnSDY2dU4xMVk5WE1YNFM0WE4vYzRUQzl3T21zRlF0WHFj?=
+ =?utf-8?B?QzBYZ2VBNjBrVkFlL0c3UU41bDZjVXpWdWJhUmJqZlJGSUZEUnZKejRQbDhL?=
+ =?utf-8?B?UkhQa3B5aFpwWGxTVXBUWjB3cStma3d0NTI3c3hSeHNESklyTm9Ib0NwUGps?=
+ =?utf-8?B?MlorUFdNQjZmd1ZBT2t5OUNVd1gzMEtXNExPemtBb1NtKzFNTGFlTG5ZY1l5?=
+ =?utf-8?B?OVNtc295alhJRE9hRzlWQ3hBei95NWVHemgvVU5CV2F1cjUvWjQybGdRa204?=
+ =?utf-8?B?NkdzekJoMSszbGpERlBoaDFQYXZnbU5neU44V3J6WUM4MXBvcmhrQjR0S0po?=
+ =?utf-8?B?OERGcEZ4MXY3ZHFwMzhpVXkwaVpQdURKdGR0V2ozYUk3Y05oUjZVZGdqeDlQ?=
+ =?utf-8?B?bnhBb21XZDlzOWlMTDlGa0o0azhTbCtjMkliRGlBZ0RKdlRMbVF0cTNYNURF?=
+ =?utf-8?B?QVhFS05YN3ZiZGZRZE1xWFJUV2pkZlNOeHljWUE3dXdDMmdMRHA4ZU9yd1RD?=
+ =?utf-8?B?U1ozbEt4NXJoRnRneWNEMDJnQlF4YmNjdWtMQmYvTFRTMU5TWTlEbVd1dTdB?=
+ =?utf-8?B?YnRPVWpVZXh6UnZFQzgzQndzQ2tuS2VEbUdLRldtTzdlb2R6VTBBUGk1Z2dF?=
+ =?utf-8?B?Zjc1V2pmNitlQVY1dEIyeU00dzk1cEdyMUNmcmhRNFBtVnVwdHAzZXpsZmtJ?=
+ =?utf-8?B?VUNoaHlwSlg0cXhNTVZkb29MSVdhNVpsRUJKd0tlN2xpOCtWMG5JUTB2OXRt?=
+ =?utf-8?Q?NSI8p1/3ZITnfnFJ6HmOLQtjz?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DBBP189MB1433.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: feab7b78-17d4-4294-cd33-08dba27df59b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2023 19:36:47.4426
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LDkRw2JTV5xiAGtCufYLi2H7CQ34E3bmRq+NqndA3I99QoGgW7R9FD3pHC9fXGCq0C0OMFieTBPXRZe9S6S6WmnPPQCHF/CHZFcNva6WPSk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWP189MB2611
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When replacing an existing root qdisc, with one that is of the same kind, the
-request boils down to essentially a parameterization change  i.e not one that
-requires allocation and grafting of a new qdisc. syzbot was able to create a
-scenario which resulted in a taprio qdisc replacing an existing taprio qdisc
-with a combination of NLM_F_CREATE, NLM_F_REPLACE and NLM_F_EXCL leading to
-create and graft scenario.
-The fix ensures that only when the qdisc kinds are different that we should
-allow a create and graft, otherwise it goes into the "change" codepath.
-
-While at it, fix the code and comments to improve readability.
-
-While syzbot was able to create the issue, it did not zone on the root cause.
-Analysis from Vladimir Oltean <vladimir.oltean@nxp.com> helped narrow it down.
-
-v1->V2 changes:
-- remove "inline" function definition (Vladmir)
-- remove extrenous braces in branches (Vladmir)
-- change inline function names (Pedro)
-- Run tdc tests (Victor)
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/20230816225759.g25x76kmgzya2gei@skbuf/T/
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Victor Nogueira <victor@mojatatu.com>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-Reviewed-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/sch_api.c | 54 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 41 insertions(+), 13 deletions(-)
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index aa6b1fe65151..4c51b8bef1b8 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1547,10 +1547,28 @@ static int tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 	return 0;
- }
- 
-+static bool req_create_or_replace(struct nlmsghdr *n)
-+{
-+	return (n->nlmsg_flags & NLM_F_CREATE &&
-+		n->nlmsg_flags & NLM_F_REPLACE);
-+}
-+
-+static bool req_create_exclusive(struct nlmsghdr *n)
-+{
-+	return (n->nlmsg_flags & NLM_F_CREATE &&
-+		n->nlmsg_flags & NLM_F_EXCL);
-+}
-+
-+static bool req_change(struct nlmsghdr *n)
-+{
-+	return (!(n->nlmsg_flags & NLM_F_CREATE) &&
-+		!(n->nlmsg_flags & NLM_F_REPLACE) &&
-+		!(n->nlmsg_flags & NLM_F_EXCL));
-+}
-+
- /*
-  * Create/change qdisc.
-  */
--
- static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 			   struct netlink_ext_ack *extack)
- {
-@@ -1644,27 +1662,36 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 				 *
- 				 *   We know, that some child q is already
- 				 *   attached to this parent and have choice:
--				 *   either to change it or to create/graft new one.
-+				 *   1) change it or 2) create/graft new one.
-+				 *   If the requested qdisc kind is different
-+				 *   than the existing one, then we choose graft.
-+				 *   If they are the same then this is "change"
-+				 *   operation - just let it fallthrough..
- 				 *
- 				 *   1. We are allowed to create/graft only
--				 *   if CREATE and REPLACE flags are set.
-+				 *   if the request is explicitly stating
-+				 *   "please create if it doesn't exist".
- 				 *
--				 *   2. If EXCL is set, requestor wanted to say,
--				 *   that qdisc tcm_handle is not expected
-+				 *   2. If the request is to exclusive create
-+				 *   then the qdisc tcm_handle is not expected
- 				 *   to exist, so that we choose create/graft too.
- 				 *
- 				 *   3. The last case is when no flags are set.
-+				 *   This will happen when for example tc
-+				 *   utility issues a "change" command.
- 				 *   Alas, it is sort of hole in API, we
- 				 *   cannot decide what to do unambiguously.
--				 *   For now we select create/graft, if
--				 *   user gave KIND, which does not match existing.
-+				 *   For now we select create/graft.
- 				 */
--				if ((n->nlmsg_flags & NLM_F_CREATE) &&
--				    (n->nlmsg_flags & NLM_F_REPLACE) &&
--				    ((n->nlmsg_flags & NLM_F_EXCL) ||
--				     (tca[TCA_KIND] &&
--				      nla_strcmp(tca[TCA_KIND], q->ops->id))))
--					goto create_n_graft;
-+				if (tca[TCA_KIND] &&
-+				    nla_strcmp(tca[TCA_KIND], q->ops->id)) {
-+					if (req_create_or_replace(n) ||
-+					    req_create_exclusive(n))
-+						goto create_n_graft;
-+					else
-+						if (req_change(n))
-+							goto create_n_graft2;
-+				}
- 			}
- 		}
- 	} else {
-@@ -1698,6 +1725,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 		NL_SET_ERR_MSG(extack, "Qdisc not found. To create specify NLM_F_CREATE flag");
- 		return -ENOENT;
- 	}
-+create_n_graft2:
- 	if (clid == TC_H_INGRESS) {
- 		if (dev_ingress_queue(dev)) {
- 			q = qdisc_create(dev, dev_ingress_queue(dev),
--- 
-2.34.1
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSWRvIFNjaGltbWVsIDxp
+ZG9zY2hAaWRvc2NoLm9yZz4NCj4gU2VudDogTW9uZGF5LCAyMSBBdWd1c3QgMjAyMyAxMzozNQ0K
+PiBUbzogU3JpcmFtIFlhZ25hcmFtYW4gPHNyaXJhbS55YWduYXJhbWFuQGVzdC50ZWNoPg0KPiBD
+YzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgta3NlbGZ0ZXN0QHZnZXIua2VybmVsLm9y
+ZzsgRGF2aWQgUyAuIE1pbGxlcg0KPiA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IEVyaWMgRHVtYXpl
+dCA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47IEpha3ViDQo+IEtpY2luc2tpIDxrdWJhQGtlcm5lbC5v
+cmc+OyBQYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+OyBEYXZpZCBBaGVybg0KPiA8ZHNh
+aGVybkBrZXJuZWwub3JnPjsgSWRvIFNjaGltbWVsIDxpZG9zY2hAbnZpZGlhLmNvbT47IFNodWFo
+IEtoYW4NCj4gPHNodWFoQGtlcm5lbC5vcmc+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMy8zXSBz
+ZWxmdGVzdHM6IGZvcndhcmRpbmc6IEFkZCB0ZXN0IGZvciBsb2FkLWJhbGFuY2luZw0KPiBiZXR3
+ZWVuIG11bHRpcGxlIHNlcnZlcnMNCj4gDQo+IE9uIFNhdCwgQXVnIDE5LCAyMDIzIGF0IDAxOjQ4
+OjI1UE0gKzAyMDAsIFNyaXJhbSBZYWduYXJhbWFuIHdyb3RlOg0KPiA+IENyZWF0ZSBhIHRvcG9s
+b2d5IHdpdGggMyBob3N0cywgYSByb3V0ZXIgZWFjaCBpbiBpdCdzIG93biBuZXR3b3JrDQo+ID4g
+bmFtZXNwYWNlLiBUZXN0IElQdjQgYW5kIElQdjYgbXVsdGlwYXRoIHJvdXRpbmcgZnJvbSBoMSB0
+byBoMi9oMyB2aWENCj4gPiByb3V0ZXIgcjEgd2hlcmUgYSBtdWx0aXBhdGggcm91dGUgaXMgc2V0
+dXAgdG8gbG9hZC1iYWxhbmNlIGJldHdlZW4gaDINCj4gPiBhbmQgaDMuDQo+ID4NCj4gPiBTZWUg
+ZGlhZ3JhbSBpbiB0aGUgdGVzdCBmb3IgbW9yZSBpbmZvcm1hdGlvbi4NCj4gDQo+IEhvdyBhcmUg
+eW91IHJ1bm5pbmcgdGhpcyB0ZXN0PyBBdCBsZWFzdCB3aXRoIHZldGggcGFpcnMgaXQgaXMgcGFz
+c2luZyBib3RoIGJlZm9yZQ0KPiBhbmQgYWZ0ZXIgdGhlIHBhdGNoZXMuIEkgZGlkbid0IGxvb2sg
+aW50byB0aGUgdmV0aCBkcml2ZXIsIGl0IG1pZ2h0IG5vdCBldmVuIHVzZQ0KPiB0aGUgbGlzdGlm
+aWVkIHBhdGguDQoNCkkgYWdyZWUsIHRoZSB0ZXN0IGlzIGZsYWt5LCBhbmQgaXQgZG9lc24ndCBk
+ZWZpbml0aXZlbHkgZmFpbCBiZWZvcmUgdGhlIHBhdGNoLCBub3IgZG9lcyBpdCBkZWZpbml0aXZl
+bHkgcGFzcyBhZnRlciB0aGUgcGF0Y2guIENoZWNraW5nIHRoZSBwYWNrZXQgdHJhbnNtaXQgY291
+bnRlcnMgaXMgcHJvYmFibHkgbm90IHRoZSBiZXN0IHdheSB0byB0ZXN0IHRoaXMuIEkgd2lsbCB0
+cnkgdG8gcmV3cml0ZSB0aGlzIHNlbGZ0ZXN0IHVzaW5nIG5jYXQuDQpJIHVzZSBtY29ubmVjdCBb
+MF0sIGFub3RoZXIgdGVzdCB1dGlsaXR5IHRvIHRlc3QgdGhhdCBhIFRDUCBjb25uZWN0aW9uIHN1
+Y2NlZWRzIGZvciBteSBvd24gdGVzdGluZywgYnV0IEkgZ3Vlc3MgdXNpbmcgdGhhdCBpbiBzZWxm
+dGVzdCBpcyBub3QgYW4gb3B0aW9uLg0KDQpEbyB5b3UgdGhpbmsgaXQgd291bGQgYmUgT0sgdG8g
+ZHJvcCB0aGlzIHBhdGNoIGZyb20gdGhlIHNlcmllcyBmb3Igbm93PyBJIGNhbiBjb21lIGJhY2sg
+d2l0aCB0aGUgc2VsZnRlc3Qgd2hlbiBJIGhhdmUgc29tZXRoaW5nIHdvcmtpbmcgY29ycmVjdGx5
+Pw0KDQo+IA0KPiBBbHNvLCBJJ20gc2VlaW5nIHRoZSBmb2xsb3dpbmcgZXJyb3JzIGR1cmluZyB0
+aGUgdGVzdDoNCj4gDQo+IHN5c2N0bDogc2V0dGluZyBrZXkgIm5ldC5pcHY0LmZpYl9tdWx0aXBh
+dGhfaGFzaF9wb2xpY3kiOiBJbnZhbGlkIGFyZ3VtZW50DQo+IHN5c2N0bDogc2V0dGluZyBrZXkg
+Im5ldC5pcHY2LmZpYl9tdWx0aXBhdGhfaGFzaF9wb2xpY3kiOiBJbnZhbGlkIGFyZ3VtZW50DQoN
+ClswXTogaHR0cHM6Ly9naXRodWIuY29tL05vcmRpeC9tY29ubmVjdA0K
 
