@@ -1,177 +1,228 @@
-Return-Path: <netdev+bounces-29400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F57782FE5
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:04:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD0DC78300B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:14:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99671280F38
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 18:04:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D9A280F13
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 18:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60636E574;
-	Mon, 21 Aug 2023 18:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02740F4F5;
+	Mon, 21 Aug 2023 18:14:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5179D8F48
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 18:04:48 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6625E114
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 11:04:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40D98C17
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 18:13:59 +0000 (UTC)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2044.outbound.protection.outlook.com [40.107.14.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18AD10E;
+	Mon, 21 Aug 2023 11:13:57 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oKeGJ77s9dFOZdmD0ON9+LREZeM3EF/CYNEHyqgUNw88ySXHA4aOPirYz8O4Cau8QrZWWfoiXVFP6p3Why3k2EBariqFf0O4E8PQbfFwP13MEKXUyh5Qs0vJdUQw1aqZ9iGggq18ytoZI2mU8wg1wTB1Ht6/9jsXZjkDI+9WzUUk/QaaDutDTgYHwygUzqA4aq1h7dEf/dUvZpp4lm2XW62fdGGvNFlSz8LaEkiICrVT6Ry+RUbk3QrL09PW1wSGw6Uq9yUlYB3PAh/5Byz3QbuYHbutSMU68RwfAb3SxxpWUk4e64kjG938/mqIQxo+OVHu8oEUf2DIX8u58Mj+wg==
+ b=cH5lLd5G5zv/jg/HCmaFgzZ7DisW5bAO2fwMbtahAHjyJtJB1+Qp1QCrsceVBmQEq2cX0S+kverRYLewP8f+y8BUb82T4h4nRB/rxWhz82mTPhHNhP+CSjiDFLvRtD4ymGfczQdHDYFLNcPFTD1yHm4EPuwpZ/dmI5uIdUJ2LRCHq5q3ZDeWlwDLdQVP/raj4oPP8p3wAdacghZIHGLxJNN9gB6IIcv8AzRt/JP1rgkRHnnlrHd4Q/SsxglBKdYs9Di+W3Z1t6KMfPUWSHrYulQvoEc28xMhjEk7ItrcHCDWwhXSjERrPngEwACqiPm+iC0rzvTOR1C84XWIu5OiGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BNbe5tlajVYCsUJWPMWUJ/C5M+bxku2TedsTdqPdcgc=;
- b=K3zxUBwkHZ9id9F/kw2xRo+BsfFXoePwKQUq0myiQyraTNgM32mrLrmr4VDewWd5CaJvCtnNhH500FX5SWt8YFgYWG6SMgOY8q0MED3lwi4P+RwOTIozcJZTTeuntrDiDPNfT5pf5Lszj2KTANLkSLP3QEv3sm+Z7e2gdNh8I61GiijAWGv02W1DUxAKG8iHOeZ+SD/HliYao+Gn2Gy8wEiycva1s21nNfR7MNkYJ6bKNwDL3IbrP926gsYC6Z47DPr/5AVgxsz2PGPKUIkSTMLXjBfo4VzBaBsGsPa73ZTE4rEKyCk0rwvv9q707SCIQ2IGdi283/wmjNvDlucTrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=TJAW5hjZFPKXjr4Ef8g8Ya3pB//VHZXKmLUp/pH5Bfk=;
+ b=h9LtM1na5orXntWqinQeX6DOV7p+On6zTvu0gosWXXNsWbUwBExLv1MvSwvJNw77I+nH3RhqawQH5Csz11lhqoYzN+YdhpdXv/m4L7Mwz+hM2qV9eUtcWXMiAmGI266BQywPsa3WsbOmjVkiBA5tBDPzwHs/6XEPDoAxHGeBSBavAg/TOhHpCZMTKZtdMCuKXbz23Qj8xAfRkpUL585qIJN/iLJDOY6ddh1B9LCmpcGEhEdfnYFtNyTC4elOTIHBDHnM4q7nC/GygWvoyITAwS0upQkLxfkj7yGH7gyCL8VxLUq46Qw+R4s8Ij2ByBagpZsPaTjU0hOHzW1Ve322Pg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BNbe5tlajVYCsUJWPMWUJ/C5M+bxku2TedsTdqPdcgc=;
- b=vEGHyIx2qqwN1us8pXHqaspJxMvqqW4pGs8sHLxjMj29m2E0Qkt1uhkGSYvz+0DHmauESiEr0C9X9nCY4UKaoKRaEkrcEMbFcZrc0oOjFAB+DnUPu5MSJpMM9Uo2VNlnPiK/Drv+HZqG8pNbtj+r/wVWWZKAruPH9oqm2NzMfpg=
-Received: from CY5PR16CA0017.namprd16.prod.outlook.com (2603:10b6:930:10::6)
- by BL1PR12MB5253.namprd12.prod.outlook.com (2603:10b6:208:30b::22) with
+ bh=TJAW5hjZFPKXjr4Ef8g8Ya3pB//VHZXKmLUp/pH5Bfk=;
+ b=OKXiXHlgjrKqp5OrXOkWODs0kQyxW1tOEn/f66T71kE/t4io+tEo190D/ANflcVB3jgRPpYWsxA78cwF1XE9FdK5RTC5O3fhoJXUyMuWbB2CIPOT9UJvg4M75CzjPV3ukzWKyXr/El6kDaz/fkQL6Dj/H+n1A5HQ9Lfx15Y9Y48=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM9PR04MB7538.eurprd04.prod.outlook.com (2603:10a6:20b:2d8::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Mon, 21 Aug
- 2023 18:04:40 +0000
-Received: from CY4PEPF0000E9D7.namprd05.prod.outlook.com
- (2603:10b6:930:10:cafe::e1) by CY5PR16CA0017.outlook.office365.com
- (2603:10b6:930:10::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.23 via Frontend
- Transport; Mon, 21 Aug 2023 18:04:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000E9D7.mail.protection.outlook.com (10.167.241.78) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6699.14 via Frontend Transport; Mon, 21 Aug 2023 18:04:40 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 21 Aug
- 2023 13:04:39 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 21 Aug
- 2023 13:04:39 -0500
-Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Mon, 21 Aug 2023 13:04:38 -0500
-From: <edward.cree@amd.com>
-To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
-	<habetsm.xilinx@gmail.com>, Andy Moreton <andy.moreton@amd.com>
-Subject: [PATCH net] sfc: allocate a big enough SKB for loopback selftest packet
-Date: Mon, 21 Aug 2023 19:01:53 +0100
-Message-ID: <20230821180153.18652-1-edward.cree@amd.com>
-X-Mailer: git-send-email 2.27.0
+ 2023 18:13:54 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::d4ed:20a0:8c0a:d9cf%7]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
+ 18:13:54 +0000
+Date: Mon, 21 Aug 2023 21:13:50 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Sean Anderson <sean.anderson@seco.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH net-next 2/8] phy: introduce the
+ PHY_MODE_ETHERNET_PHY mode for phy_set_mode_ext()
+Message-ID: <20230821181350.akn5mir2woj2ioke@skbuf>
+References: <20230817150644.3605105-1-vladimir.oltean@nxp.com>
+ <20230817150644.3605105-3-vladimir.oltean@nxp.com>
+ <2c8cb48c-5b0f-5712-8c50-ea285df829ec@seco.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2c8cb48c-5b0f-5712-8c50-ea285df829ec@seco.com>
+X-ClientProxiedBy: AM0PR01CA0085.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::26) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D7:EE_|BL1PR12MB5253:EE_
-X-MS-Office365-Filtering-Correlation-Id: e81987cc-9c60-4b5c-d4b8-08dba27116ec
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB7538:EE_
+X-MS-Office365-Filtering-Correlation-Id: ecf2dfbb-8a44-4ee6-028c-08dba272610c
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	IvCOthuz7E927+eWoZ1+sVtmSp9Hja4cQC7xXyAqIJmyH5MPZCrWqiK2kRaqceb2iRqUyrnKIJ9HszLX9l11lbEilENXWv1HHndagkaTXs9g2DRNgRI4cHbaotRB38+9zauyOnNEQBZ83M8ttpaKgOBc2itQ9m7YERyYX6oHNQnidT/GQwj00QDzRkMPxos7jVEwQpYF04xUnzIdSt8Vg4cSap78vcwlxGFsv5/zlKYjzy6TKt5TIFX7+DJWmq9y7oCpY3kuso3jL58t+KoozxdduMjYaiC7BUyXrBP3aBTqJH1UjmNfORYgtXaL/rc7sAaOKNndB62FvANp0L41Psk4LXjYbOMumHid6Bv2v3Jppp76XDW5Vhd3fgSmZdFI92TzDejFxVFjGVFKuBFVouGvdTd2CIpfCF9dopuW3DM1AeMam2QHd05LlFTDe/KLgqFQRtfxfuA1JSQAOI1saXP7pRx7rLyopXl7ZI+wJHUhsqbrZiQOrOaB4MEBKNPZQvTeIYT26BFjI7GXWVq8YA2TReCi2q7iNXpeYMh0sQhr5u3kW0MfHBAc7e8hCzIUNolHjb6TLH3r+ErXPg+uSC/tswsibo2DxUgmStu8xRutcFhwjPMBwK7BdgNoGUL7DVjXRDUpXgRPwhsXyzxqOhV7LHyPy7RjrfSPUaf5SaSoXBVE+ord2M545+tk5X6zc+6JjhxJjeh+qYaDntCJoxcCoZoxXCpJE39Vj8Ll6TDL/NmwfB+wqWwp2o5r2mamYSafihskza/hZ75oC+AYkA==
+ Tbg5ZjxzUmxbIBhKaFd8+k662j8v4eEM56sl/J+LRoGQTQXuRfXR0LG2F1/wVTMEXnc3J1trGo2+EogM9BIUeJBT4yYw55q8qyngTWPTPBaJ4nVGKy7sQ7g4waM7qYpfL46ppXD/MeiZ8n5EMwT0E2SXF68f41D3UtD2qaVc3qYL2YRhllOqo+JmiA6Kt2xjEXu4QPNnIfcKf6R/+wtTk+6YO4xAZ0flgq7A4sL0ZNWMDciPsiFxW0deVcR6kjWTaKd1gdJWBlX4K9Nu3UBIq7gLXbuggwvULK9PVa4ofOqMs7VHepGKdFRDSIfv9pi3DQ+eQsttO6byA+N8O9mILLZl2cHq8KHv+LohFkH7FIxRzIlZpa5orQk6u29kUq6PScO0YIH+z+YtGs7c/gOV0aVXB8H6uon+jfbs2IZoCc4a5lG10ayrYzbRbfl4qGOzoxokv9ggHY8aDaenOQdR01vdXa8SWT4KcjW2hULriuJllUshtKGQinA+N2USo3cWb+E4S2zcYeOJLYCT/RKH8ZcKSFVE02n9SiIgXFF+Pd4gm/W3CH+jenhIiTQoQmkh
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(346002)(39860400002)(186009)(1800799009)(82310400011)(451199024)(46966006)(36840700001)(40470700004)(54906003)(70586007)(70206006)(316002)(110136005)(8676002)(8936002)(2616005)(4326008)(1076003)(36756003)(41300700001)(40460700003)(356005)(82740400003)(81166007)(478600001)(6666004)(40480700001)(83380400001)(2876002)(2906002)(86362001)(47076005)(36860700001)(336012)(426003)(5660300002)(26005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 18:04:40.1587
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(376002)(136003)(346002)(39860400002)(366004)(186009)(1800799009)(451199024)(54906003)(6916009)(66476007)(66556008)(316002)(9686003)(66946007)(6512007)(8676002)(8936002)(4326008)(1076003)(33716001)(41300700001)(478600001)(19627235002)(6666004)(38100700002)(53546011)(6506007)(6486002)(83380400001)(2906002)(7416002)(86362001)(44832011)(5660300002)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?gpTIKJRwAnvo40WREUICZBxqA4YOaVrItBNZ0l4xtCMIIqV9eWCZK8O+YixQ?=
+ =?us-ascii?Q?ZZvZ5Gjt0MSzahza/q3VusqhdXl4iLh34sjdY4XMtuu5p4a+K7ZjZNx0kcGI?=
+ =?us-ascii?Q?vCY/kzEP5D9GaXgZ/CEWsU5LJZS7wiKZmLbpMYlnFcUdhSBtqlnHyexvNAkJ?=
+ =?us-ascii?Q?iF5dP2OGDlOwj3N9lDERYEGlgdUVPuXOezXNgSnxqx7Kdv43KEnFl5TuAqcR?=
+ =?us-ascii?Q?WmS+LURq3VDPolw+fI952R72N3uQK+v0hbRtF6mqfXXkZVUWKNpZmFRTyS/B?=
+ =?us-ascii?Q?F7OOb1evPhWd5jNl8p7LsEyOLNpiCQ3PpvoUZWyFTb/S449me0vfwkrXtSVS?=
+ =?us-ascii?Q?qG6nQxlyIVjq/W5cvVKZIbgcuvvK29/eklTrWHq1BaNiqdfmM2Tg59D+1b6E?=
+ =?us-ascii?Q?4UeDblfvtUhCjG/pr/6pGJ0LYwPcUrqCrAhbUo9SSctQOcmT38hKVCpMhOHg?=
+ =?us-ascii?Q?cqNuh44/ccFUIs5EFgN1J2z0FUj1SbTAPJXKfWm5NEhKCmvPr2kg6SoYhBAf?=
+ =?us-ascii?Q?ieRFy7FVdv5CEKQgmHUuW265+GjU24bUj5REkgb1vnn0FKeiKMPh2u5/XUvV?=
+ =?us-ascii?Q?rCGsfkN9IxkX+EoF7ZnkMbKNe5+i5G8/OGDjggswGmaBhQwV5W6ZsCtkULqC?=
+ =?us-ascii?Q?My6I0CMjcumCnFZyi2Pz69mldeTeQ9tcEI/EvUyzZ5rlEwiwuZwWu0bomTQE?=
+ =?us-ascii?Q?vLzc9RsFDxnqL1V1swjJXwJAbIm1ZhexxT8OpsD6gYaeJbBHT8RXc2sv/kHc?=
+ =?us-ascii?Q?NrXXoNNoOIFwBsmtMMYz8mKbqKC0PP7zvdA7diyBt2K3jwj1AvQiMjksu4nO?=
+ =?us-ascii?Q?QKD19nlKn0231LK36IiWcHCWonBw8lvjgV5fA+7JPnpgRt39IRbs1qhhoB+p?=
+ =?us-ascii?Q?Nv/8/uJyEQFcl6qCLw/NGR78SrM49ge9icz9huepwkX2mcCsW03VpJxgPpyr?=
+ =?us-ascii?Q?At3YMbTP9BwcNoSqlI9FH/6RbEK3DihnAZyT83lGwq+Y44k5aePcl21qF7I2?=
+ =?us-ascii?Q?eax7wO9NX8mIgAM8sUro2CMc5s/cQver3ncvzGemBr9Jnl1WzQnyZx6o/b0N?=
+ =?us-ascii?Q?Pbgc7DR2SOjfjJDLySMZQGEZqglOSDE5XxvFdpNcWgo5hwL0v74YjzuzY1+P?=
+ =?us-ascii?Q?AROnGBWd3jEcPVIdzhoHqF50XiQ4axXehH2r15ghx9pogTZdMlQs7qdahIey?=
+ =?us-ascii?Q?Y4ay/Kau4cmlO2HCw0Ps6nA8erHzpgkolCnyhLKMJ7r/SqzS1G+jG1Tc5YEt?=
+ =?us-ascii?Q?JF5qP3Q/cT9x2Gh2Por2FiEJCYb1Tn07EdvkX9mUwjk/PR64eU11gm5iGDd8?=
+ =?us-ascii?Q?kwcECAv5933GThK+a5wCm8y1XamrC7cej1NnqQSCjcaxs7TRAWoEsaUweL4e?=
+ =?us-ascii?Q?qxKlZlQuALzyoZMMJfqrLPL8s8daLE+mSU6TakqY3/dRf7JKii6UaTTGTYsb?=
+ =?us-ascii?Q?DwHRnOlvj0imEtW9c7rhH3DXPQSPvu8uzY3beyAlpL3T8wwxsUPdUU0nIqKf?=
+ =?us-ascii?Q?pYzdWVjrRj5FTF2pDPiPl0XGjXNuebL9HI9mEkilxgXS4u0lAaA5SshKpFKz?=
+ =?us-ascii?Q?GYDwlf+LUR2CpiCFlpUq7kVSkz45UasDGeiWi0P+C2q1MSH8F9cqsh5I4Zc2?=
+ =?us-ascii?Q?Rg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecf2dfbb-8a44-4ee6-028c-08dba272610c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 18:13:54.3852
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e81987cc-9c60-4b5c-d4b8-08dba27116ec
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D7.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5253
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qj5pxyznjiL18bonQR2pX9eJY0cSKxpk1fVD17rkv2rF0K10if4LlRsmQ2FagjIP76GlW9Fdq4D6impfSA4+NQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7538
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Edward Cree <ecree.xilinx@gmail.com>
+Hi Sean,
 
-Cited commits passed a size to alloc_skb that was only big enough for
- the actual packet contents, but the following skb_put + memcpy writes
- the whole struct efx_loopback_payload including leading and trailing
- padding bytes (which are then stripped off with skb_pull/skb_trim).
-This could cause an skb_over_panic, although in practice we get saved
- by kmalloc_size_roundup.
-Pass the entire size we use, instead of the size of the final packet.
+On Mon, Aug 21, 2023 at 01:30:46PM -0400, Sean Anderson wrote:
+> On 8/17/23 11:06, Vladimir Oltean wrote:
+> > As opposed to PHY_MODE_ETHERNET which takes a phy_interface_t as is
+> > expected to be used by an Ethernet MAC driver, PHY_MODE_ETHERNET takes
+> > an enum ethtool_link_mode_bit_indices and expects to be used by an
+> > Ethernet PHY driver.
+> > 
+> > It is true that the phy_interface_t type also contains definitions for
+> > PHY_INTERFACE_MODE_10GKR and PHY_INTERFACE_MODE_1000BASEKX, but those
+> > were deemed to be mistakes, and shouldn't be used going forward, when
+> > 10GBase-KR and 1GBase-KX are really link modes. Thus, I believe that the
+> > distinction is necessary, rather than hacking more improper PHY modes.
+> 
+> 10GBase-KR and 1000Base-KX are both electrically (e.g. link mode) and
+> functionally (e.g. phy mode) different from 10GBase-R and 1000Base-X due
+> to differing autonegotiation. So the phy modes are still relevant, and
+> should still be used to ensure the correct form of autonegotiation is
+> selected.
+> 
+> That said, I do agree that from the phy's (serdes's) point of view,
+> there are only electrical differences between these modes.
+> 
+> However, I'm not sure we need to have a separate mode here. I think this
+> would only be necessary if there were electrically-incompatible modes
+> which shared the same signalling. E.g. if 802.3 decided that they wanted
+> a "long range backplane ethernet" or somesuch with different
+> drive/equalization requirements from 1000BASE-KX et al. but with the
+> same signalling. Otherwise, we can infer the link mode from the phy
+> mode.
+> 
+> --Sean
 
-Reported-by: Andy Moreton <andy.moreton@amd.com>
-Fixes: cf60ed469629 ("sfc: use padding to fix alignment in loopback test")
-Fixes: 30c24dd87f3f ("sfc: siena: use padding to fix alignment in loopback test")
-Fixes: 1186c6b31ee1 ("sfc: falcon: use padding to fix alignment in loopback test")
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
----
- drivers/net/ethernet/sfc/falcon/selftest.c | 2 +-
- drivers/net/ethernet/sfc/selftest.c        | 2 +-
- drivers/net/ethernet/sfc/siena/selftest.c  | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Thanks for taking the time to look at this RFC.
 
-diff --git a/drivers/net/ethernet/sfc/falcon/selftest.c b/drivers/net/ethernet/sfc/falcon/selftest.c
-index cf1d67b6d86d..c3dc88e6c26c 100644
---- a/drivers/net/ethernet/sfc/falcon/selftest.c
-+++ b/drivers/net/ethernet/sfc/falcon/selftest.c
-@@ -428,7 +428,7 @@ static int ef4_begin_loopback(struct ef4_tx_queue *tx_queue)
- 	for (i = 0; i < state->packet_count; i++) {
- 		/* Allocate an skb, holding an extra reference for
- 		 * transmit completion counting */
--		skb = alloc_skb(EF4_LOOPBACK_PAYLOAD_LEN, GFP_KERNEL);
-+		skb = alloc_skb(sizeof(state->payload), GFP_KERNEL);
- 		if (!skb)
- 			return -ENOMEM;
- 		state->skbs[i] = skb;
-diff --git a/drivers/net/ethernet/sfc/selftest.c b/drivers/net/ethernet/sfc/selftest.c
-index 19a0b8584afb..563c1e317ce9 100644
---- a/drivers/net/ethernet/sfc/selftest.c
-+++ b/drivers/net/ethernet/sfc/selftest.c
-@@ -426,7 +426,7 @@ static int efx_begin_loopback(struct efx_tx_queue *tx_queue)
- 	for (i = 0; i < state->packet_count; i++) {
- 		/* Allocate an skb, holding an extra reference for
- 		 * transmit completion counting */
--		skb = alloc_skb(EFX_LOOPBACK_PAYLOAD_LEN, GFP_KERNEL);
-+		skb = alloc_skb(sizeof(state->payload), GFP_KERNEL);
- 		if (!skb)
- 			return -ENOMEM;
- 		state->skbs[i] = skb;
-diff --git a/drivers/net/ethernet/sfc/siena/selftest.c b/drivers/net/ethernet/sfc/siena/selftest.c
-index b55fd3346972..526da43d4b61 100644
---- a/drivers/net/ethernet/sfc/siena/selftest.c
-+++ b/drivers/net/ethernet/sfc/siena/selftest.c
-@@ -426,7 +426,7 @@ static int efx_begin_loopback(struct efx_tx_queue *tx_queue)
- 	for (i = 0; i < state->packet_count; i++) {
- 		/* Allocate an skb, holding an extra reference for
- 		 * transmit completion counting */
--		skb = alloc_skb(EFX_LOOPBACK_PAYLOAD_LEN, GFP_KERNEL);
-+		skb = alloc_skb(sizeof(state->payload), GFP_KERNEL);
- 		if (!skb)
- 			return -ENOMEM;
- 		state->skbs[i] = skb;
+I will ask a clarification question. When you say "I'm not sure we need
+to have a separate mode here", what do you mean?
+
+The lynx-28g implementation (not shown here) will need to distinguish
+between 1000Base-X and 1000Base-KX, and between 10GBase-R and 10GBase-KR
+respectively, to configure the number of electrical equalization taps in
+the LNmTECR registers, and to allocate memory for the ("K"-specific)
+link training algorithm. Also, in the particular case of BaseX vs
+BaseKX, we need to modify the PCCR8 register depending on whether the
+C22 BaseX PCS or the C45 PCS + AN/LT blocks need to be available over
+MDIO.
+
+So, passing PHY_INTERFACE_MODE_1000BASEX when we intend 1000Base-KX is
+simply not possible, because the dpaa2-mac consumer already uses
+PHY_INTERFACE_MODE_1000BASEX to mean a very different (and legit) thing.
+
+Do you mean instead that we could use the PHY_INTERFACE_MODE_1000BASEKX
+that you've added to phy_interface_t? It's not clear that this is what
+you're suggesting, so feel free to stop reading here if it isn't.
+
+But mtip_backplane uses linkmode_c73_priority_resolution() (a function
+added by me, sure, but nonetheless, it operates in the linkmode namespace,
+as a PHY driver helper should) to figure out the proper argument to pass
+to phy_set_mode_ext(). That argument has the enum ethtool_link_mode_bit_indices.
+
+So, a translation between enum ethtool_link_mode_bit_indices and
+phy_interface_t would be needed. That would be more or less doable for
+1000Base-KX and 10GBase-KR, but it needs more phy_interface_t additions
+for:
+
+static const enum ethtool_link_mode_bit_indices c73_linkmodes[] = {
+	ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
+	ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
+	/* ETHTOOL_LINK_MODE_100000baseKP4_Full_BIT not supported */
+	/* ETHTOOL_LINK_MODE_100000baseCR10_Full_BIT not supported */
+	ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
+	ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
+	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
+	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
+	/* ETHTOOL_LINK_MODE_25000baseKRS_Full_BIT not supported */
+	/* ETHTOOL_LINK_MODE_25000baseCRS_Full_BIT not supported */
+	ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
+	ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT,
+	ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
+};
+
+I guess that network PHY maintainers will need to chime in and say
+whether that's the path forward or not.
 
