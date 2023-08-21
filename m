@@ -1,197 +1,60 @@
-Return-Path: <netdev+bounces-29269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E29DD7825D7
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:53:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5709B782662
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 11:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 225081C20429
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:53:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7EE280E82
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A75210F;
-	Mon, 21 Aug 2023 08:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FB946A8;
+	Mon, 21 Aug 2023 09:37:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A207D1C39
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:53:08 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB511BB;
-	Mon, 21 Aug 2023 01:53:06 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E45E71BF212;
-	Mon, 21 Aug 2023 08:52:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1692607985;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2u3cwdVeZNhkOv9TOWa0j73za+v+76Zl0BGUHMHrVGY=;
-	b=Pw6nSFfdiOisSj+WMY5M3ZsEMgxPS6eI8NcjgqJFyD8ZOW/TclklJJI628KQ+02hU41BX/
-	a22UYSqill8y0F7ygScE2M9RrCD1kiA8Wrf48+TEIm6hXxjVbt4wYb+3my0PhS30hOyXrd
-	kagQ6ccVMC9ipD8C0DxkX3VYZa1iU55JYINksiVlZjuvz1L/ydBZqMIUNHQQGYXPipH5VP
-	xRJ/qpqo/280+oFKdV/WqpW8GQVa+N9bFpBULsk+/0zWZsKYf7Bjjn0ekzZPQKiT4NhiqP
-	QqSlJgVJt0s5aJ6+BDMNg0qJh6tCsoDowgZyKBPiyZ/CEDldoaq2fBbZYQbLTQ==
-Date: Mon, 21 Aug 2023 10:52:59 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <aahringo@redhat.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
- Despres <romuald.despres@qorvo.com>, Frederic Blain
- <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
- Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 07/11] mac802154: Handle association requests
- from peers
-Message-ID: <20230821105259.4659dd74@xps-13>
-In-Reply-To: <CAK-6q+hWsLSy8vx_Hiwo0gRDYsW4Y7U=sQbAi5Na7BXQoOHWhw@mail.gmail.com>
-References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
- <20230601154817.754519-8-miquel.raynal@bootlin.com>
- <CAK-6q+hWsLSy8vx_Hiwo0gRDYsW4Y7U=sQbAi5Na7BXQoOHWhw@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7803FC8
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 09:37:20 +0000 (UTC)
+Received: from mail.bioind.com (unknown [212.199.63.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BF291
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 02:37:18 -0700 (PDT)
+Received: from [94.156.102.149] (94.156.102.149) by mail.bioind.com
+ (192.168.20.202) with Microsoft SMTP Server (TLS) id 14.3.408.0; Mon, 21 Aug
+ 2023 11:58:51 +0300
+Reply-To: <davbrennanb@gmail.com>
+From: David Brennan <info@bioind.com>
+To: <netdev@vger.kernel.org>
+Subject: Investment Consultation
+Date: Mon, 21 Aug 2023 01:58:51 -0700
+Message-ID: <20230821015851.0D97310B28A7FF24@bioind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [94.156.102.149]
+X-Spam-Status: No, score=4.5 required=5.0 tests=BAYES_50,
+	FREEMAIL_FORGED_REPLYTO,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL,
+	RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Alexander,
+Attn:
+I'm an Investment Consultant in the United Kingdom, I specialize=20
+in searching for potential investments opportunities for high=20
+net-worth clients worldwide.
+Should this be of interest to you, please do not hesitate to=20
+email me for further information.=20
+Kind regards,
+David Brennan
+eMail:davbrennanb@gmail.com
 
-aahringo@redhat.com wrote on Sat, 3 Jun 2023 07:28:25 -0400:
-
-> Hi,
->=20
-> On Thu, Jun 1, 2023 at 11:50=E2=80=AFAM Miquel Raynal <miquel.raynal@boot=
-lin.com> wrote:
-> >
-> > Coordinators may have to handle association requests from peers which
-> > want to join the PAN. The logic involves:
-> > - Acknowledging the request (done by hardware)
-> > - If requested, a random short address that is free on this PAN should
-> >   be chosen for the device.
-> > - Sending an association response with the short address allocated for
-> >   the peer and expecting it to be ack'ed.
-> >
-> > If anything fails during this procedure, the peer is considered not
-> > associated.
-> >
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  include/net/cfg802154.h         |   7 ++
-> >  include/net/ieee802154_netdev.h |   6 ++
-> >  net/ieee802154/core.c           |   7 ++
-> >  net/ieee802154/pan.c            |  27 ++++++
-> >  net/mac802154/ieee802154_i.h    |   2 +
-> >  net/mac802154/rx.c              |   8 ++
-> >  net/mac802154/scan.c            | 147 ++++++++++++++++++++++++++++++++
-> >  7 files changed, 204 insertions(+)
-> >
-> > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> > index 01bc6c2da7b9..4404072365e7 100644
-> > --- a/include/net/cfg802154.h
-> > +++ b/include/net/cfg802154.h
-> > @@ -582,4 +582,11 @@ struct ieee802154_pan_device *
-> >  cfg802154_device_is_child(struct wpan_dev *wpan_dev,
-> >                           struct ieee802154_addr *target);
-> >
-> > +/**
-> > + * cfg802154_get_free_short_addr - Get a free address among the known =
-devices
-> > + * @wpan_dev: the wpan device
-> > + * @return: a random short address expectedly unused on our PAN
-> > + */
-> > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev);
-> > +
-> >  #endif /* __NET_CFG802154_H */
-> > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_n=
-etdev.h
-> > index 16194356cfe7..4de858f9929e 100644
-> > --- a/include/net/ieee802154_netdev.h
-> > +++ b/include/net/ieee802154_netdev.h
-> > @@ -211,6 +211,12 @@ struct ieee802154_association_req_frame {
-> >         struct ieee802154_assoc_req_pl assoc_req_pl;
-> >  };
-> >
-> > +struct ieee802154_association_resp_frame {
-> > +       struct ieee802154_hdr mhr;
-> > +       struct ieee802154_mac_cmd_pl mac_pl;
-> > +       struct ieee802154_assoc_resp_pl assoc_resp_pl;
-> > +};
-> > +
-> >  struct ieee802154_disassociation_notif_frame {
-> >         struct ieee802154_hdr mhr;
-> >         struct ieee802154_mac_cmd_pl mac_pl;
-> > diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-> > index 8bf01bb7e858..39674db64336 100644
-> > --- a/net/ieee802154/core.c
-> > +++ b/net/ieee802154/core.c
-> > @@ -200,11 +200,18 @@ EXPORT_SYMBOL(wpan_phy_free);
-> >
-> >  static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
-> >  {
-> > +       struct ieee802154_pan_device *child, *tmp;
-> > +
-> >         mutex_lock(&wpan_dev->association_lock);
-> >
-> >         if (wpan_dev->parent)
-> >                 kfree(wpan_dev->parent);
-> >
-> > +       list_for_each_entry_safe(child, tmp, &wpan_dev->children, node)=
- {
-> > +               list_del(&child->node);
-> > +               kfree(child);
-> > +       }
-> > +
-> >         wpan_dev->association_generation++;
-> >
-> >         mutex_unlock(&wpan_dev->association_lock);
-> > diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
-> > index 477e8dad0cf0..7756906c201d 100644
-> > --- a/net/ieee802154/pan.c
-> > +++ b/net/ieee802154/pan.c
-> > @@ -66,3 +66,30 @@ cfg802154_device_is_child(struct wpan_dev *wpan_dev,
-> >         return NULL;
-> >  }
-> >  EXPORT_SYMBOL_GPL(cfg802154_device_is_child);
-> > +
-> > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
-> > +{
-> > +       struct ieee802154_pan_device *child;
-> > +       __le16 addr;
-> > +
-> > +       lockdep_assert_held(&wpan_dev->association_lock);
-> > +
-> > +       do {
-> > +               get_random_bytes(&addr, 2); =20
->=20
-> This is combined with the max associations setting? I am not sure if
-> this is the best way to get free values from a u16 value where we have
-> some data structure of "given" addresses to a node. I recently was
-> looking into idr/xarray data structure... maybe we can use something
-> from there.
-
-I actually thought about using an increasing index, but the pseudo
-random generator seemed appropriate because of its "unpredictability",
-but there is not real use for that (besides maybe testing purposes). I
-can definitely switch to another solution.
-
-Thanks,
-Miqu=C3=A8l
 
