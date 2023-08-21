@@ -1,233 +1,154 @@
-Return-Path: <netdev+bounces-29350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 208C7782C71
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:47:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF608782C73
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5484C280ECC
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:47:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A899C280EDD
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 14:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5C979C0;
-	Mon, 21 Aug 2023 14:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D340A79EC;
+	Mon, 21 Aug 2023 14:47:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238466FB8
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:46:45 +0000 (UTC)
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154ACE8;
-	Mon, 21 Aug 2023 07:46:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1692629175; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=aQCsGcbRfmfGl/q+7g/wiE3yu2ZOGOFEVInQsXO9r6FMTkJKfOUtJq+UAO17jPVNpW
-    3hzLQelvILzXckVToJgk3XwaUk7Wr6i2SeO7laZvqtfFrICy1s483Kv+rg7XiHQ2elln
-    iyqHkdJ4j4bkPT92lHR8OEQpJunUeIZl6mTvgIaIiJA1TCVdDLt/Wcn0LkOVOJoef8nh
-    04e9+Dwv4P8gXpsu7I+FWkcUTQ3uzzlWkGvelyPXiuReSd/CFzOPLI0TYp33zKKIhmDc
-    w1J493+xITBwM50nlgA7Pkp3yxlvRJRz+wo64csjwt0RfiHtwkSmgbHJwOY8R2Bjslkb
-    uizQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1692629175;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=TOZWLA4hvvYY6SCL4NWlwxYl/OkEsC4lztwb1CXM6WY=;
-    b=IfQ6/8pLx6fGv9YnZ0T/XUaROlpvoNURZk3I71r2RtF6NvOSyVZb9hZTaB83hIHLcQ
-    +FZQGS0OTSat/QGrDy9LromM1f22BiUqv/VIzIjby4FVWCjJjvoaGcQRahzyFf6hYjMo
-    24P10BO75PX5mXb+IJGCUMkFslo8EaYK6+xZDsliDOF3CG31W4EG900jq/EKi550HBcR
-    GiUcBmImyhUB0yu1HkN86ANnnmofSiSYZuc9vQT7kAxQzwGHSRdqugZuXASrZHZjcJRT
-    6DZVo/Nay8DGI/6mPNCxC1WgYj1/z43rYxcPZBm2EEleuM8HhFnnzQdIOEQmAXye+hGp
-    +WTQ==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1692629175;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=TOZWLA4hvvYY6SCL4NWlwxYl/OkEsC4lztwb1CXM6WY=;
-    b=WmPY7xK2R2H0huC4K0Rf4f1O7WuCuXIs4T0SakviJ6szLCLcA50DUj5jTpOyknEvT5
-    aStSjGH5ZYyX31ILUDk8lX0Csf6AztaAXYNkLchDCHVnnjyYn43J73AVomWtJa8cTIil
-    oKbhySum0J7Tl3WeX6OOjN5CYZFCQVL380LvfpgE2Pyq8O20AgBwpcwuGWzrEPkGxafe
-    cBadKiOb55OzxCYM2KPibC/Fmit1CaM5k8ufnPFG/+KhSXuOSNhUZSUss7pm3I2lLsgL
-    4f21eGl6y9s20rlxlHiqtXo5EHr+ypP3064md7/swKdtHxV4Gr3kq0CIhwu3XMteaWV4
-    eSig==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1692629175;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=TOZWLA4hvvYY6SCL4NWlwxYl/OkEsC4lztwb1CXM6WY=;
-    b=l247Gq9qYmr8QE1AkRo5IeCaeeVPAesYLY/E0FizI0xez8YRrOr7CkVzRrbe7MM4My
-    00NTYv7Dl3iSpsvJj2Dw==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjGrp7owjzFK3JbFk1mS/xvEBL7X5sbo3VYpXsQi7qV3cmcZPR3l4"
-Received: from silver.lan
-    by smtp.strato.de (RZmta 49.8.1 AUTH)
-    with ESMTPSA id K723f1z7LEkE0hO
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Mon, 21 Aug 2023 16:46:14 +0200 (CEST)
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-To: linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	edumazet@google.com,
-	mkl@pengutronix.de
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Ziyang Xuan <william.xuanziyang@huawei.com>
-Subject: [NET 2/2] can: raw: add missing refcount for memory leak fix
-Date: Mon, 21 Aug 2023 16:45:47 +0200
-Message-Id: <20230821144547.6658-3-socketcan@hartkopp.net>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230821144547.6658-1-socketcan@hartkopp.net>
-References: <20230821144547.6658-1-socketcan@hartkopp.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74916FAA
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 14:47:00 +0000 (UTC)
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E59CE9;
+	Mon, 21 Aug 2023 07:46:59 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-64f3ad95ec0so9950676d6.1;
+        Mon, 21 Aug 2023 07:46:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692629218; x=1693234018;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WuA3TdNjVttC4ENEMTU7iIB13TPKbbPgEw4DfONfOIg=;
+        b=nzOfc/+3vPkk+2xcoHixT2qig/KVfSfruaE8oC/BHOhj4Vj8zK9wQl/YBsovUfjuyE
+         zzdUfx0F+1nY+xEONrt5yI8FWOp1QrAohZ3IkYZyY94D8Nb0lF63snqV0onxX8UJbdRS
+         W1OENcVQ/wPS91JuWs6rzqCuSYu2pCwXc2MvCLhv1xAQf/GW34/3Xok29hzwDsUcEWri
+         K6RBfHFWHDQw3zBVPMEemIuhjd5J2WirIGF8kiJIV2fCCwk1JLsGdgid8sas/T3c1R7D
+         ClfsowvOP6bADW4XnuMdfydqJvFH70N4COIOkZ7NSD8UaocdbL6/2rMcwVI7BOjmq2gJ
+         pIfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692629218; x=1693234018;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WuA3TdNjVttC4ENEMTU7iIB13TPKbbPgEw4DfONfOIg=;
+        b=Dtgl+cU6IarnX6x0DtTSzWlPce41S1QtxadCguUNKQ6c3EjkkEJJofC+ZTZOZHWZ2B
+         DwsOtGuYAzHyvXp/XVj3abuOOB2WF868+hcWwiyVCg68FJ6eFCnpG30voMe1p2F0FeqZ
+         v/OgtXrj0NpBpNh8HaoNnuO9Bxu2F0ovmHDZOYy89OJCj+9dI2cdrwlv+6Pwlq2uVkJX
+         m9b0J+OvkjTnx7F2KeWZKxkYcmjkkDgsTLR9uyeYQ+C3wGI00Rk/3dpmI7HWAWe2efgz
+         +d4xBgjX1cd1+usXDwuCf0DBijr1+dtIkPmCQHg+w8AeZkJZhcnbEclTmxGbs1XB1hvq
+         KBNQ==
+X-Gm-Message-State: AOJu0YwX9fing7Csb0owXjQIv2f0xumUT+bk70KC7D1d7IJLRZS00/3E
+	1dF13cqOMvfbOM/DQy5CQMQ=
+X-Google-Smtp-Source: AGHT+IG/I4x/uX5zBHwBZnZQvnI1/jXeEL+zKtLEb5rhbvBKzlFssu9Ud/GZZNrEpLvz+FrLSwB56A==
+X-Received: by 2002:a0c:e084:0:b0:64f:3e27:1e4a with SMTP id l4-20020a0ce084000000b0064f3e271e4amr3752794qvk.19.1692629218377;
+        Mon, 21 Aug 2023 07:46:58 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id t3-20020a0ce2c3000000b0064729e5b2d9sm2950385qvl.14.2023.08.21.07.46.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 07:46:58 -0700 (PDT)
+Date: Mon, 21 Aug 2023 10:46:57 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Feng Liu <feliu@nvidia.com>, 
+ virtualization@lists.linux-foundation.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Cc: Jason Wang <jasowang@redhat.com>, 
+ "Michael S . Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Bodong Wang <bodong@nvidia.com>, 
+ Feng Liu <feliu@nvidia.com>, 
+ Jiri Pirko <jiri@nvidia.com>
+Message-ID: <64e378e1c7fed_1b7a7294fd@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230821142713.5062-1-feliu@nvidia.com>
+References: <20230821142713.5062-1-feliu@nvidia.com>
+Subject: Re: [PATCH net-next v3] virtio_net: Introduce skb_vnet_common_hdr to
+ avoid typecasting
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit ee8b94c8510c ("can: raw: fix receiver memory leak") introduced
-a new reference to the CAN netdevice that has assigned CAN filters.
-But this new ro->dev reference did not maintain its own refcount which
-lead to another KASAN use-after-free splat found by Eric Dumazet.
+Feng Liu wrote:
+> The virtio_net driver currently deals with different versions and types
+> of virtio net headers, such as virtio_net_hdr_mrg_rxbuf,
+> virtio_net_hdr_v1_hash, etc. Due to these variations, the code relies
+> on multiple type casts to convert memory between different structures,
+> potentially leading to bugs when there are changes in these structures.
+> 
+> Introduces the "struct skb_vnet_common_hdr" as a unifying header
+> structure using a union. With this approach, various virtio net header
+> structures can be converted by accessing different members of this
+> structure, thus eliminating the need for type casting and reducing the
+> risk of potential bugs.
+> 
+> For example following code:
+> static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+> 		struct receive_queue *rq,
+> 		struct page *page, unsigned int offset,
+> 		unsigned int len, unsigned int truesize,
+> 		unsigned int headroom)
+> {
+> [...]
+> 	struct virtio_net_hdr_mrg_rxbuf *hdr;
+> [...]
+> 	hdr_len = vi->hdr_len;
+> [...]
+> ok:
+> 	hdr = skb_vnet_hdr(skb);
+> 	memcpy(hdr, hdr_p, hdr_len);
+> [...]
+> }
+> 
+> When VIRTIO_NET_F_HASH_REPORT feature is enabled, hdr_len = 20
+> But the sizeof(*hdr) is 12,
+> memcpy(hdr, hdr_p, hdr_len); will copy 20 bytes to the hdr,
+> which make a potential risk of bug. And this risk can be avoided by
+> introducing struct skb_vnet_common_hdr.
+> 
+> Change log
+> v1->v2
+> feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> feedback from Simon Horman <horms@kernel.org>
+> 1. change to use net-next tree.
+> 2. move skb_vnet_common_hdr inside kernel file instead of the UAPI header.
+> 
+> v2->v3
+> feedback from Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> 1. fix typo in commit message.
+> 2. add original struct virtio_net_hdr into union
+> 3. remove virtio_net_hdr_mrg_rxbuf variable in receive_buf;
+> 
+> Signed-off-by: Feng Liu <feliu@nvidia.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
-This patch ensures a proper refcount for the CAN nedevice.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Fixes: ee8b94c8510c ("can: raw: fix receiver memory leak")
-Reported-by: Eric Dumazet <edumazet@google.com>
-Cc: Ziyang Xuan <william.xuanziyang@huawei.com>
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
- net/can/raw.c | 35 ++++++++++++++++++++++++++---------
- 1 file changed, 26 insertions(+), 9 deletions(-)
-
-diff --git a/net/can/raw.c b/net/can/raw.c
-index e10f59375659..d50c3f3d892f 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -83,10 +83,11 @@ struct uniqframe {
- struct raw_sock {
- 	struct sock sk;
- 	int bound;
- 	int ifindex;
- 	struct net_device *dev;
-+	netdevice_tracker dev_tracker;
- 	struct list_head notifier;
- 	int loopback;
- 	int recv_own_msgs;
- 	int fd_frames;
- 	int xl_frames;
-@@ -283,12 +284,14 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
- 
- 	switch (msg) {
- 	case NETDEV_UNREGISTER:
- 		lock_sock(sk);
- 		/* remove current filters & unregister */
--		if (ro->bound)
-+		if (ro->bound) {
- 			raw_disable_allfilters(dev_net(dev), dev, sk);
-+			netdev_put(dev, &ro->dev_tracker);
-+		}
- 
- 		if (ro->count > 1)
- 			kfree(ro->filter);
- 
- 		ro->ifindex = 0;
-@@ -389,14 +392,16 @@ static int raw_release(struct socket *sock)
- 	rtnl_lock();
- 	lock_sock(sk);
- 
- 	/* remove current filters & unregister */
- 	if (ro->bound) {
--		if (ro->dev)
-+		if (ro->dev) {
- 			raw_disable_allfilters(dev_net(ro->dev), ro->dev, sk);
--		else
-+			netdev_put(ro->dev, &ro->dev_tracker);
-+		} else {
- 			raw_disable_allfilters(sock_net(sk), NULL, sk);
-+		}
- 	}
- 
- 	if (ro->count > 1)
- 		kfree(ro->filter);
- 
-@@ -443,44 +448,56 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
- 		if (!dev) {
- 			err = -ENODEV;
- 			goto out;
- 		}
- 		if (dev->type != ARPHRD_CAN) {
--			dev_put(dev);
- 			err = -ENODEV;
--			goto out;
-+			goto out_put_dev;
- 		}
-+
- 		if (!(dev->flags & IFF_UP))
- 			notify_enetdown = 1;
- 
- 		ifindex = dev->ifindex;
- 
- 		/* filters set by default/setsockopt */
- 		err = raw_enable_allfilters(sock_net(sk), dev, sk);
--		dev_put(dev);
-+		if (err)
-+			goto out_put_dev;
-+
- 	} else {
- 		ifindex = 0;
- 
- 		/* filters set by default/setsockopt */
- 		err = raw_enable_allfilters(sock_net(sk), NULL, sk);
- 	}
- 
- 	if (!err) {
- 		if (ro->bound) {
- 			/* unregister old filters */
--			if (ro->dev)
-+			if (ro->dev) {
- 				raw_disable_allfilters(dev_net(ro->dev),
- 						       ro->dev, sk);
--			else
-+				/* drop reference to old ro->dev */
-+				netdev_put(ro->dev, &ro->dev_tracker);
-+			} else {
- 				raw_disable_allfilters(sock_net(sk), NULL, sk);
-+			}
- 		}
- 		ro->ifindex = ifindex;
- 		ro->bound = 1;
-+		/* bind() ok -> hold a reference for new ro->dev */
- 		ro->dev = dev;
-+		if (ro->dev)
-+			netdev_hold(ro->dev, &ro->dev_tracker, GFP_KERNEL);
- 	}
- 
-- out:
-+out_put_dev:
-+	/* remove potential reference from dev_get_by_index() */
-+	if (dev)
-+		dev_put(dev);
-+out:
- 	release_sock(sk);
- 	rtnl_unlock();
- 
- 	if (notify_enetdown) {
- 		sk->sk_err = ENETDOWN;
--- 
-2.39.2
-
+A similar solution as tpacket_uhdr.
 
