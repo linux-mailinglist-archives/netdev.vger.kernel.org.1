@@ -1,391 +1,86 @@
-Return-Path: <netdev+bounces-29319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04DF3782A3F
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:15:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F92782A44
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 15:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD391280ED1
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:15:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C121C20938
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3E979D9;
-	Mon, 21 Aug 2023 13:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DE36FCA;
+	Mon, 21 Aug 2023 13:14:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13A68477
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:12:55 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB9BCFF;
-	Mon, 21 Aug 2023 06:12:49 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 872EC22183;
-	Mon, 21 Aug 2023 13:12:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1692623563; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rbz4u7oCmPMNJcykidjw87NvSWL/0d2WcDQJ9atnf6U=;
-	b=MBrQKC7AGsE8Y3bUEPoIL8B6H1Qyl+zDFp8IyKqJaM4FKZ1qmczAscraw/2+6OcMW+MuT3
-	u9+PNVQdGOod2zh+2Y1mGPBLYBAQwMSr/Rz+t592m9yElLhlCt9+dk4G+K5VL2W0kdJoF3
-	sT2oYSca9I+CKeYcUl2sUlC0eqjHl+k=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3FE5D139BC;
-	Mon, 21 Aug 2023 13:12:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id 2BGyDsti42QUVgAAMHmgww
-	(envelope-from <petr.pavlu@suse.com>); Mon, 21 Aug 2023 13:12:43 +0000
-From: Petr Pavlu <petr.pavlu@suse.com>
-To: tariqt@nvidia.com,
-	yishaih@nvidia.com,
-	leon@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jgg@ziepe.ca,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH net-next v3 11/11] mlx4: Delete custom device management logic
-Date: Mon, 21 Aug 2023 15:12:25 +0200
-Message-Id: <20230821131225.11290-12-petr.pavlu@suse.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230821131225.11290-1-petr.pavlu@suse.com>
-References: <20230821131225.11290-1-petr.pavlu@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8818E6FA7
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:14:18 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073DE135;
+	Mon, 21 Aug 2023 06:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=D+Evs2ldTgHIJLnwm1dUWAxe+Hr0v4gc4CgnDjem250=; b=WH3lLGhTpskfQMFY1y8k4SsKZp
+	H7PpPcR0SJgpeou8r0qY3vusN9fkIuBT1whM7vwqtURxYVCJmeeXGEDukeelygBVkn6vUsrUDzf+6
+	d8Nz6UE/wVpwajht70R4QERgTYwK8tW3L2Yyiq519XiBbPTOf4YsJG3PHLxu1K3roq4c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qY4iE-004goS-3A; Mon, 21 Aug 2023 15:12:54 +0200
+Date: Mon, 21 Aug 2023 15:12:54 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek
+ automotive PCIe driver code
+Message-ID: <97f3744d-afbf-4562-9168-5b9e211fac1f@lunn.ch>
+References: <20230815143756.106623-1-justinlai0215@realtek.com>
+ <20230815143756.106623-2-justinlai0215@realtek.com>
+ <95f079a4-19f9-4501-90d9-0bcd476ce68d@lunn.ch>
+ <4955506dbf6b4ebdb67cbb738750fbc8@realtek.com>
+ <eb245c85-0909-4a75-830d-afb96ccd5d38@lunn.ch>
+ <4951391892534eaeb2da96f052364e4c@realtek.com>
+ <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
+ <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-After the conversion to use the auxiliary bus, the custom device
-management is not needed anymore and can be deleted.
+> Sorry, please allow me to explain again.
+> The RTL90xx Series supports I2C, MDC/MDIO and SPI slave to access the registers of Ethernet Switch Core and the external CPU could manage it via these pins.
 
-Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
-Tested-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx4/intf.c | 125 ----------------------
- drivers/net/ethernet/mellanox/mlx4/main.c |  28 -----
- drivers/net/ethernet/mellanox/mlx4/mlx4.h |   3 -
- include/linux/mlx4/driver.h               |  10 --
- 4 files changed, 166 deletions(-)
+I was wondering if you had mis-understood my question. The bus
+'master' is the device which controls the bus. SPI and MDIO has one
+bus master, and there can be multiple clients on the bus. I2C in
+theory can have multiple bus masters on one bus, bit it is not done
+too often. Your switch is a client.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/intf.c b/drivers/net/ethernet/mellanox/mlx4/intf.c
-index 7579031786ac..a371b970ac1e 100644
---- a/drivers/net/ethernet/mellanox/mlx4/intf.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/intf.c
-@@ -38,15 +38,6 @@
- 
- #include "mlx4.h"
- 
--struct mlx4_device_context {
--	struct list_head	list;
--	struct list_head	bond_list;
--	struct mlx4_interface  *intf;
--	void		       *context;
--};
--
--static LIST_HEAD(intf_list);
--static LIST_HEAD(dev_list);
- static DEFINE_MUTEX(intf_mutex);
- static DEFINE_IDA(mlx4_adev_ida);
- 
-@@ -156,77 +147,6 @@ static void del_adev(struct auxiliary_device *adev)
- 	auxiliary_device_uninit(adev);
- }
- 
--static void mlx4_add_device(struct mlx4_interface *intf, struct mlx4_priv *priv)
--{
--	struct mlx4_device_context *dev_ctx;
--
--	dev_ctx = kmalloc(sizeof(*dev_ctx), GFP_KERNEL);
--	if (!dev_ctx)
--		return;
--
--	dev_ctx->intf    = intf;
--	dev_ctx->context = intf->add(&priv->dev);
--
--	if (dev_ctx->context) {
--		spin_lock_irq(&priv->ctx_lock);
--		list_add_tail(&dev_ctx->list, &priv->ctx_list);
--		spin_unlock_irq(&priv->ctx_lock);
--	} else
--		kfree(dev_ctx);
--
--}
--
--static void mlx4_remove_device(struct mlx4_interface *intf, struct mlx4_priv *priv)
--{
--	struct mlx4_device_context *dev_ctx;
--
--	list_for_each_entry(dev_ctx, &priv->ctx_list, list)
--		if (dev_ctx->intf == intf) {
--			spin_lock_irq(&priv->ctx_lock);
--			list_del(&dev_ctx->list);
--			spin_unlock_irq(&priv->ctx_lock);
--
--			intf->remove(&priv->dev, dev_ctx->context);
--			kfree(dev_ctx);
--			return;
--		}
--}
--
--int mlx4_register_interface(struct mlx4_interface *intf)
--{
--	struct mlx4_priv *priv;
--
--	if (!intf->add || !intf->remove)
--		return -EINVAL;
--
--	mutex_lock(&intf_mutex);
--
--	list_add_tail(&intf->list, &intf_list);
--	list_for_each_entry(priv, &dev_list, dev_list) {
--		mlx4_add_device(intf, priv);
--	}
--
--	mutex_unlock(&intf_mutex);
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(mlx4_register_interface);
--
--void mlx4_unregister_interface(struct mlx4_interface *intf)
--{
--	struct mlx4_priv *priv;
--
--	mutex_lock(&intf_mutex);
--
--	list_for_each_entry(priv, &dev_list, dev_list)
--		mlx4_remove_device(intf, priv);
--
--	list_del(&intf->list);
--
--	mutex_unlock(&intf_mutex);
--}
--EXPORT_SYMBOL_GPL(mlx4_unregister_interface);
--
- int mlx4_register_auxiliary_driver(struct mlx4_adrv *madrv)
- {
- 	return auxiliary_driver_register(&madrv->adrv);
-@@ -242,10 +162,7 @@ EXPORT_SYMBOL_GPL(mlx4_unregister_auxiliary_driver);
- int mlx4_do_bond(struct mlx4_dev *dev, bool enable)
- {
- 	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_device_context *dev_ctx = NULL, *temp_dev_ctx;
--	unsigned long flags;
- 	int i, ret;
--	LIST_HEAD(bond_list);
- 
- 	if (!(dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_PORT_REMAP))
- 		return -EOPNOTSUPP;
-@@ -267,36 +184,6 @@ int mlx4_do_bond(struct mlx4_dev *dev, bool enable)
- 		dev->flags &= ~MLX4_FLAG_BONDED;
- 	}
- 
--	spin_lock_irqsave(&priv->ctx_lock, flags);
--	list_for_each_entry_safe(dev_ctx, temp_dev_ctx, &priv->ctx_list, list) {
--		if (!(dev_ctx->intf->flags & MLX4_INTFF_BONDING))
--			continue;
--
--		if (mlx4_is_mfunc(dev)) {
--			mlx4_dbg(dev,
--				 "SRIOV, disabled HA mode for intf proto %d\n",
--				 dev_ctx->intf->protocol);
--			continue;
--		}
--
--		list_add_tail(&dev_ctx->bond_list, &bond_list);
--		list_del(&dev_ctx->list);
--	}
--	spin_unlock_irqrestore(&priv->ctx_lock, flags);
--
--	list_for_each_entry(dev_ctx, &bond_list, bond_list) {
--		dev_ctx->intf->remove(dev, dev_ctx->context);
--		dev_ctx->context =  dev_ctx->intf->add(dev);
--
--		spin_lock_irqsave(&priv->ctx_lock, flags);
--		list_add_tail(&dev_ctx->list, &priv->ctx_list);
--		spin_unlock_irqrestore(&priv->ctx_lock, flags);
--
--		mlx4_dbg(dev, "Interface for protocol %d restarted with bonded mode %s\n",
--			 dev_ctx->intf->protocol, enable ?
--			 "enabled" : "disabled");
--	}
--
- 	mutex_lock(&intf_mutex);
- 
- 	for (i = 0; i < ARRAY_SIZE(mlx4_adev_devices); i++) {
-@@ -447,16 +334,11 @@ static int rescan_drivers_locked(struct mlx4_dev *dev)
- 
- int mlx4_register_device(struct mlx4_dev *dev)
- {
--	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_interface *intf;
- 	int ret;
- 
- 	mutex_lock(&intf_mutex);
- 
- 	dev->persist->interface_state |= MLX4_INTERFACE_STATE_UP;
--	list_add_tail(&priv->dev_list, &dev_list);
--	list_for_each_entry(intf, &intf_list, list)
--		mlx4_add_device(intf, priv);
- 
- 	ret = rescan_drivers_locked(dev);
- 
-@@ -474,9 +356,6 @@ int mlx4_register_device(struct mlx4_dev *dev)
- 
- void mlx4_unregister_device(struct mlx4_dev *dev)
- {
--	struct mlx4_priv *priv = mlx4_priv(dev);
--	struct mlx4_interface *intf;
--
- 	if (!(dev->persist->interface_state & MLX4_INTERFACE_STATE_UP))
- 		return;
- 
-@@ -495,10 +374,6 @@ void mlx4_unregister_device(struct mlx4_dev *dev)
- 	}
- 	mutex_lock(&intf_mutex);
- 
--	list_for_each_entry(intf, &intf_list, list)
--		mlx4_remove_device(intf, priv);
--
--	list_del(&priv->dev_list);
- 	dev->persist->interface_state &= ~MLX4_INTERFACE_STATE_UP;
- 
- 	rescan_drivers_locked(dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
-index c4ec7377aa71..2581226836b5 100644
---- a/drivers/net/ethernet/mellanox/mlx4/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/main.c
-@@ -42,7 +42,6 @@
- #include <linux/slab.h>
- #include <linux/io-mapping.h>
- #include <linux/delay.h>
--#include <linux/kmod.h>
- #include <linux/etherdevice.h>
- #include <net/devlink.h>
- 
-@@ -1091,27 +1090,6 @@ static int mlx4_slave_cap(struct mlx4_dev *dev)
- 	return err;
- }
- 
--static void mlx4_request_modules(struct mlx4_dev *dev)
--{
--	int port;
--	int has_ib_port = false;
--	int has_eth_port = false;
--#define EN_DRV_NAME	"mlx4_en"
--#define IB_DRV_NAME	"mlx4_ib"
--
--	for (port = 1; port <= dev->caps.num_ports; port++) {
--		if (dev->caps.port_type[port] == MLX4_PORT_TYPE_IB)
--			has_ib_port = true;
--		else if (dev->caps.port_type[port] == MLX4_PORT_TYPE_ETH)
--			has_eth_port = true;
--	}
--
--	if (has_eth_port)
--		request_module_nowait(EN_DRV_NAME);
--	if (has_ib_port || (dev->caps.flags & MLX4_DEV_CAP_FLAG_IBOE))
--		request_module_nowait(IB_DRV_NAME);
--}
--
- /*
-  * Change the port configuration of the device.
-  * Every user of this function must hold the port mutex.
-@@ -1147,7 +1125,6 @@ int mlx4_change_port_types(struct mlx4_dev *dev,
- 			mlx4_err(dev, "Failed to register device\n");
- 			goto out;
- 		}
--		mlx4_request_modules(dev);
- 	}
- 
- out:
-@@ -3426,9 +3403,6 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
- 	devl_assert_locked(devlink);
- 	dev = &priv->dev;
- 
--	INIT_LIST_HEAD(&priv->ctx_list);
--	spin_lock_init(&priv->ctx_lock);
--
- 	err = mlx4_adev_init(dev);
- 	if (err)
- 		return err;
-@@ -3732,8 +3706,6 @@ static int mlx4_load_one(struct pci_dev *pdev, int pci_dev_data,
- 	if (err)
- 		goto err_port;
- 
--	mlx4_request_modules(dev);
--
- 	mlx4_sense_init(dev);
- 	mlx4_start_sense(dev);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4.h b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-index 36de79c8d053..d7d856d1758a 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4.h
-@@ -882,9 +882,6 @@ enum {
- struct mlx4_priv {
- 	struct mlx4_dev		dev;
- 
--	struct list_head	dev_list;
--	struct list_head	ctx_list;
--	spinlock_t		ctx_lock;
- 	struct mlx4_adev	**adev;
- 	int			adev_idx;
- 	struct atomic_notifier_head event_nh;
-diff --git a/include/linux/mlx4/driver.h b/include/linux/mlx4/driver.h
-index 9cf157d381c6..69825223081f 100644
---- a/include/linux/mlx4/driver.h
-+++ b/include/linux/mlx4/driver.h
-@@ -58,22 +58,12 @@ enum {
- 	MLX4_INTFF_BONDING	= 1 << 0
- };
- 
--struct mlx4_interface {
--	void *			(*add)	 (struct mlx4_dev *dev);
--	void			(*remove)(struct mlx4_dev *dev, void *context);
--	struct list_head	list;
--	enum mlx4_protocol	protocol;
--	int			flags;
--};
--
- struct mlx4_adrv {
- 	struct auxiliary_driver	adrv;
- 	enum mlx4_protocol	protocol;
- 	int			flags;
- };
- 
--int mlx4_register_interface(struct mlx4_interface *intf);
--void mlx4_unregister_interface(struct mlx4_interface *intf);
- int mlx4_register_auxiliary_driver(struct mlx4_adrv *madrv);
- void mlx4_unregister_auxiliary_driver(struct mlx4_adrv *madrv);
- 
--- 
-2.35.3
+So my question was, are the bus masters also on PCIE enpoints within
+the chip. From an architecture standpoint, it would make sense they
+are, all you need is one 4x PCIE slot, and this chip gives you
+everything you need. But you can also make use of the SoCs I2C, SPI or
+MDIO bus.
 
+    Andrew
 
