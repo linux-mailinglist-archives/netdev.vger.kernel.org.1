@@ -1,177 +1,197 @@
-Return-Path: <netdev+bounces-29267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35CE27825A0
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E29DD7825D7
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65FE11C208C6
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:37:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 225081C20429
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 08:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29E61C10;
-	Mon, 21 Aug 2023 08:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A75210F;
+	Mon, 21 Aug 2023 08:53:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A2D20EE
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:37:44 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4723E7
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:37:12 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RTm2s2TG2zNn6n;
-	Mon, 21 Aug 2023 16:33:25 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 21 Aug
- 2023 16:36:58 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <steffen.klassert@secunet.com>,
-	<herbert@gondor.apana.org.au>, <dsahern@kernel.org>
-CC: <eyal.birger@gmail.com>, <paulmck@kernel.org>, <joel@joelfernandes.org>,
-	<tglx@linutronix.de>, <mbizon@freebox.fr>, <jmaxwell37@gmail.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH net-next] net: remove unnecessary input parameter 'how' in ifdown function
-Date: Mon, 21 Aug 2023 16:41:04 +0800
-Message-ID: <20230821084104.3812233-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A207D1C39
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 08:53:08 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB511BB;
+	Mon, 21 Aug 2023 01:53:06 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E45E71BF212;
+	Mon, 21 Aug 2023 08:52:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1692607985;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2u3cwdVeZNhkOv9TOWa0j73za+v+76Zl0BGUHMHrVGY=;
+	b=Pw6nSFfdiOisSj+WMY5M3ZsEMgxPS6eI8NcjgqJFyD8ZOW/TclklJJI628KQ+02hU41BX/
+	a22UYSqill8y0F7ygScE2M9RrCD1kiA8Wrf48+TEIm6hXxjVbt4wYb+3my0PhS30hOyXrd
+	kagQ6ccVMC9ipD8C0DxkX3VYZa1iU55JYINksiVlZjuvz1L/ydBZqMIUNHQQGYXPipH5VP
+	xRJ/qpqo/280+oFKdV/WqpW8GQVa+N9bFpBULsk+/0zWZsKYf7Bjjn0ekzZPQKiT4NhiqP
+	QqSlJgVJt0s5aJ6+BDMNg0qJh6tCsoDowgZyKBPiyZ/CEDldoaq2fBbZYQbLTQ==
+Date: Mon, 21 Aug 2023 10:52:59 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
+ Despres <romuald.despres@qorvo.com>, Frederic Blain
+ <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
+ Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 07/11] mac802154: Handle association requests
+ from peers
+Message-ID: <20230821105259.4659dd74@xps-13>
+In-Reply-To: <CAK-6q+hWsLSy8vx_Hiwo0gRDYsW4Y7U=sQbAi5Na7BXQoOHWhw@mail.gmail.com>
+References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
+ <20230601154817.754519-8-miquel.raynal@bootlin.com>
+ <CAK-6q+hWsLSy8vx_Hiwo0gRDYsW4Y7U=sQbAi5Na7BXQoOHWhw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When the ifdown function in the dst_ops structure is referenced, the input
-parameter 'how' is always true. In the current implementation of the
-ifdown interface, ip6_dst_ifdown does not use the input parameter 'how',
-xfrm6_dst_ifdown and xfrm4_dst_ifdown functions use the input parameter
-'unregister'. But false judgment on 'unregister' in xfrm6_dst_ifdown and
-xfrm4_dst_ifdown is false, so remove the input parameter 'how' in ifdown
-function.
+Hi Alexander,
 
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- include/net/dst_ops.h   |  2 +-
- net/core/dst.c          |  2 +-
- net/ipv4/xfrm4_policy.c | 11 +----------
- net/ipv6/route.c        |  5 ++---
- net/ipv6/xfrm6_policy.c |  6 +-----
- 5 files changed, 6 insertions(+), 20 deletions(-)
+aahringo@redhat.com wrote on Sat, 3 Jun 2023 07:28:25 -0400:
 
-diff --git a/include/net/dst_ops.h b/include/net/dst_ops.h
-index 632086b2f644..6d1c8541183d 100644
---- a/include/net/dst_ops.h
-+++ b/include/net/dst_ops.h
-@@ -23,7 +23,7 @@ struct dst_ops {
- 	u32 *			(*cow_metrics)(struct dst_entry *, unsigned long);
- 	void			(*destroy)(struct dst_entry *);
- 	void			(*ifdown)(struct dst_entry *,
--					  struct net_device *dev, int how);
-+					  struct net_device *dev);
- 	struct dst_entry *	(*negative_advice)(struct dst_entry *);
- 	void			(*link_failure)(struct sk_buff *);
- 	void			(*update_pmtu)(struct dst_entry *dst, struct sock *sk,
-diff --git a/net/core/dst.c b/net/core/dst.c
-index 79d9306ad1ee..980e2fd2f013 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -152,7 +152,7 @@ void dst_dev_put(struct dst_entry *dst)
- 
- 	dst->obsolete = DST_OBSOLETE_DEAD;
- 	if (dst->ops->ifdown)
--		dst->ops->ifdown(dst, dev, true);
-+		dst->ops->ifdown(dst, dev);
- 	dst->input = dst_discard;
- 	dst->output = dst_discard_out;
- 	dst->dev = blackhole_netdev;
-diff --git a/net/ipv4/xfrm4_policy.c b/net/ipv4/xfrm4_policy.c
-index 57ea394ffa8c..c33bca2c3841 100644
---- a/net/ipv4/xfrm4_policy.c
-+++ b/net/ipv4/xfrm4_policy.c
-@@ -124,22 +124,13 @@ static void xfrm4_dst_destroy(struct dst_entry *dst)
- 	xfrm_dst_destroy(xdst);
- }
- 
--static void xfrm4_dst_ifdown(struct dst_entry *dst, struct net_device *dev,
--			     int unregister)
--{
--	if (!unregister)
--		return;
--
--	xfrm_dst_ifdown(dst, dev);
--}
--
- static struct dst_ops xfrm4_dst_ops_template = {
- 	.family =		AF_INET,
- 	.update_pmtu =		xfrm4_update_pmtu,
- 	.redirect =		xfrm4_redirect,
- 	.cow_metrics =		dst_cow_metrics_generic,
- 	.destroy =		xfrm4_dst_destroy,
--	.ifdown =		xfrm4_dst_ifdown,
-+	.ifdown =		xfrm_dst_ifdown,
- 	.local_out =		__ip_local_out,
- 	.gc_thresh =		32768,
- };
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 6b46abe0b7da..e82bcfde5bf9 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -90,7 +90,7 @@ unsigned int		ip6_mtu(const struct dst_entry *dst);
- static struct dst_entry *ip6_negative_advice(struct dst_entry *);
- static void		ip6_dst_destroy(struct dst_entry *);
- static void		ip6_dst_ifdown(struct dst_entry *,
--				       struct net_device *dev, int how);
-+				       struct net_device *dev);
- static void		 ip6_dst_gc(struct dst_ops *ops);
- 
- static int		ip6_pkt_discard(struct sk_buff *skb);
-@@ -371,8 +371,7 @@ static void ip6_dst_destroy(struct dst_entry *dst)
- 	fib6_info_release(from);
- }
- 
--static void ip6_dst_ifdown(struct dst_entry *dst, struct net_device *dev,
--			   int how)
-+static void ip6_dst_ifdown(struct dst_entry *dst, struct net_device *dev)
+> Hi,
+>=20
+> On Thu, Jun 1, 2023 at 11:50=E2=80=AFAM Miquel Raynal <miquel.raynal@boot=
+lin.com> wrote:
+> >
+> > Coordinators may have to handle association requests from peers which
+> > want to join the PAN. The logic involves:
+> > - Acknowledging the request (done by hardware)
+> > - If requested, a random short address that is free on this PAN should
+> >   be chosen for the device.
+> > - Sending an association response with the short address allocated for
+> >   the peer and expecting it to be ack'ed.
+> >
+> > If anything fails during this procedure, the peer is considered not
+> > associated.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  include/net/cfg802154.h         |   7 ++
+> >  include/net/ieee802154_netdev.h |   6 ++
+> >  net/ieee802154/core.c           |   7 ++
+> >  net/ieee802154/pan.c            |  27 ++++++
+> >  net/mac802154/ieee802154_i.h    |   2 +
+> >  net/mac802154/rx.c              |   8 ++
+> >  net/mac802154/scan.c            | 147 ++++++++++++++++++++++++++++++++
+> >  7 files changed, 204 insertions(+)
+> >
+> > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > index 01bc6c2da7b9..4404072365e7 100644
+> > --- a/include/net/cfg802154.h
+> > +++ b/include/net/cfg802154.h
+> > @@ -582,4 +582,11 @@ struct ieee802154_pan_device *
+> >  cfg802154_device_is_child(struct wpan_dev *wpan_dev,
+> >                           struct ieee802154_addr *target);
+> >
+> > +/**
+> > + * cfg802154_get_free_short_addr - Get a free address among the known =
+devices
+> > + * @wpan_dev: the wpan device
+> > + * @return: a random short address expectedly unused on our PAN
+> > + */
+> > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev);
+> > +
+> >  #endif /* __NET_CFG802154_H */
+> > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_n=
+etdev.h
+> > index 16194356cfe7..4de858f9929e 100644
+> > --- a/include/net/ieee802154_netdev.h
+> > +++ b/include/net/ieee802154_netdev.h
+> > @@ -211,6 +211,12 @@ struct ieee802154_association_req_frame {
+> >         struct ieee802154_assoc_req_pl assoc_req_pl;
+> >  };
+> >
+> > +struct ieee802154_association_resp_frame {
+> > +       struct ieee802154_hdr mhr;
+> > +       struct ieee802154_mac_cmd_pl mac_pl;
+> > +       struct ieee802154_assoc_resp_pl assoc_resp_pl;
+> > +};
+> > +
+> >  struct ieee802154_disassociation_notif_frame {
+> >         struct ieee802154_hdr mhr;
+> >         struct ieee802154_mac_cmd_pl mac_pl;
+> > diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+> > index 8bf01bb7e858..39674db64336 100644
+> > --- a/net/ieee802154/core.c
+> > +++ b/net/ieee802154/core.c
+> > @@ -200,11 +200,18 @@ EXPORT_SYMBOL(wpan_phy_free);
+> >
+> >  static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
+> >  {
+> > +       struct ieee802154_pan_device *child, *tmp;
+> > +
+> >         mutex_lock(&wpan_dev->association_lock);
+> >
+> >         if (wpan_dev->parent)
+> >                 kfree(wpan_dev->parent);
+> >
+> > +       list_for_each_entry_safe(child, tmp, &wpan_dev->children, node)=
  {
- 	struct rt6_info *rt = (struct rt6_info *)dst;
- 	struct inet6_dev *idev = rt->rt6i_idev;
-diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
-index 8f931e46b460..41a680c76d2e 100644
---- a/net/ipv6/xfrm6_policy.c
-+++ b/net/ipv6/xfrm6_policy.c
-@@ -124,14 +124,10 @@ static void xfrm6_dst_destroy(struct dst_entry *dst)
- 	xfrm_dst_destroy(xdst);
- }
- 
--static void xfrm6_dst_ifdown(struct dst_entry *dst, struct net_device *dev,
--			     int unregister)
-+static void xfrm6_dst_ifdown(struct dst_entry *dst, struct net_device *dev)
- {
- 	struct xfrm_dst *xdst;
- 
--	if (!unregister)
--		return;
--
- 	xdst = (struct xfrm_dst *)dst;
- 	if (xdst->u.rt6.rt6i_idev->dev == dev) {
- 		struct inet6_dev *loopback_idev =
--- 
-2.34.1
+> > +               list_del(&child->node);
+> > +               kfree(child);
+> > +       }
+> > +
+> >         wpan_dev->association_generation++;
+> >
+> >         mutex_unlock(&wpan_dev->association_lock);
+> > diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
+> > index 477e8dad0cf0..7756906c201d 100644
+> > --- a/net/ieee802154/pan.c
+> > +++ b/net/ieee802154/pan.c
+> > @@ -66,3 +66,30 @@ cfg802154_device_is_child(struct wpan_dev *wpan_dev,
+> >         return NULL;
+> >  }
+> >  EXPORT_SYMBOL_GPL(cfg802154_device_is_child);
+> > +
+> > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
+> > +{
+> > +       struct ieee802154_pan_device *child;
+> > +       __le16 addr;
+> > +
+> > +       lockdep_assert_held(&wpan_dev->association_lock);
+> > +
+> > +       do {
+> > +               get_random_bytes(&addr, 2); =20
+>=20
+> This is combined with the max associations setting? I am not sure if
+> this is the best way to get free values from a u16 value where we have
+> some data structure of "given" addresses to a node. I recently was
+> looking into idr/xarray data structure... maybe we can use something
+> from there.
 
+I actually thought about using an increasing index, but the pseudo
+random generator seemed appropriate because of its "unpredictability",
+but there is not real use for that (besides maybe testing purposes). I
+can definitely switch to another solution.
+
+Thanks,
+Miqu=C3=A8l
 
