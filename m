@@ -1,61 +1,47 @@
-Return-Path: <netdev+bounces-29384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2641B782FBA
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:55:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42341782FC0
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:57:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE877280E22
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:55:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B3E71C2091B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DB78F4E;
-	Mon, 21 Aug 2023 17:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08775C8C0;
+	Mon, 21 Aug 2023 17:57:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDB18C16
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:55:27 +0000 (UTC)
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A0E10F;
-	Mon, 21 Aug 2023 10:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1692640526; x=1724176526;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hwsRMeGO5NiRzUAt90Z0YqRq2lvKsjLJQEmSWjaaN0s=;
-  b=D7IV3UORg+8wTPWY99Udb97IfjonUVsMCe7fSQ9bqgHPfLjuFBcqgPz/
-   B3VnAFjomd6Po8Pr2IFJ+tcflZi/9Lt20KAVjGkChpeLaV0nzMjCeJJ3p
-   IpMwOo1uwgYNdtC7qm2YkufUP2tg4n0q0TdYH8AfySKnawfGFGf7tHCqi
-   4=;
-X-IronPort-AV: E=Sophos;i="6.01,190,1684800000"; 
-   d="scan'208";a="353747689"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-189d700f.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 17:55:22 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2b-m6i4x-189d700f.us-west-2.amazon.com (Postfix) with ESMTPS id 1D75040DBE;
-	Mon, 21 Aug 2023 17:55:21 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 21 Aug 2023 17:55:20 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.135.203.70) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 21 Aug 2023 17:55:18 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Hannes Frederic Sowa <hannes@stressinduktion.org>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<stable@vger.kernel.org>, <netdev@vger.kernel.org>, Bing-Jhong Billy Jheng
-	<billy@starlabs.sg>, Linus Torvalds <torvalds@linux-foundation.org>
-Subject: [PATCH stable v4.14.y - v6.4.y] af_unix: Fix null-ptr-deref in unix_stream_sendpage().
-Date: Mon, 21 Aug 2023 10:55:05 -0700
-Message-ID: <20230821175505.23107-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9546C320F
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:57:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A94CC433C7;
+	Mon, 21 Aug 2023 17:57:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692640670;
+	bh=1gk73k93cVq0C1SN0v2zsZvmVsB7SYNNWzHc9H+GN4c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nZ/x+AvqkKBpBoPMEUa457ldaYnVsCqgpbLDeyYtP8pcVFYLo82qcjVgrle4nkYjE
+	 VSAoZgPp900z3vC2g6f5JWTxEF6GfNijTPVbi8RZRPcPJ/S/rgLeudTU5dfBuzrQYG
+	 gxa25f5P78p4GRUwkGxBdnZHBmEL6dOXPLzADxTGhdLC7WQ2fL+eCoTLppfyVenXmF
+	 0bU7g3EE6JzdRGg8ZvxCpuxWtsOVLUUgGi2bGgLJ4wz8jVhCNtHwDEa0LUQiSCSyiN
+	 dWF/Ey3Gj+sB388LAXYOjQRp11BqE7dawsxBc2c7UF0h4FiNEX46tpsLzqp/2qKEgk
+	 6aL4VUtyZ5CSQ==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net-next V2 00/14] mlx5 updates 2023-08-16
+Date: Mon, 21 Aug 2023 10:57:25 -0700
+Message-ID: <20230821175739.81188-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,148 +49,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.135.203.70]
-X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Bing-Jhong Billy Jheng reported null-ptr-deref in unix_stream_sendpage()
-with detailed analysis and a nice repro.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-unix_stream_sendpage() tries to add data to the last skb in the peer's
-recv queue without locking the queue.
+v1-v2:
+- Toss patch #14: Convert PCI error values to generic errnos
+  it will be sent via pci subsystem.
 
-If the peer's FD is passed to another socket and the socket's FD is
-passed to the peer, there is a loop between them.  If we close both
-sockets without receiving FD, the sockets will be cleaned up by garbage
-collection.
+This series provides misc updates to mlx5 driver.
+For more information please see tag log below.
 
-The garbage collection iterates such sockets and unlinks skb with
-FD from the socket's receive queue under the queue's lock.
+Please pull and let me know if there is any problem.
 
-So, there is a race where unix_stream_sendpage() could access an skb
-locklessly that is being released by garbage collection, resulting in
-use-after-free.
+Thanks,
+Saeed.
 
-To avoid the issue, unix_stream_sendpage() must lock the peer's recv
-queue.
 
-Note the issue does not exist in 6.5+ thanks to the recent sendpage()
-refactoring.
+The following changes since commit cb39c35783f26892bb1a72b1115c94fa2e77f4c5:
 
-This patch is originally written by Linus Torvalds.
+  pds_core: Fix some kernel-doc comments (2023-08-21 07:48:34 +0100)
 
-BUG: unable to handle page fault for address: ffff988004dd6870
-PF: supervisor read access in kernel mode
-PF: error_code(0x0000) - not-present page
-PGD 0 P4D 0
-PREEMPT SMP PTI
-CPU: 4 PID: 297 Comm: garbage_uaf Not tainted 6.1.46 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:kmem_cache_alloc_node+0xa2/0x1e0
-Code: c0 0f 84 32 01 00 00 41 83 fd ff 74 10 48 8b 00 48 c1 e8 3a 41 39 c5 0f 85 1c 01 00 00 41 8b 44 24 28 49 8b 3c 24 48 8d 4a 40 <49> 8b 1c 06 4c 89 f0 65 48 0f c7 0f 0f 94 c0 84 c0 74 a1 41 8b 44
-RSP: 0018:ffffc9000079fac0 EFLAGS: 00000246
-RAX: 0000000000000070 RBX: 0000000000000005 RCX: 000000000001a284
-RDX: 000000000001a244 RSI: 0000000000400cc0 RDI: 000000000002eee0
-RBP: 0000000000400cc0 R08: 0000000000400cc0 R09: 0000000000000003
-R10: 0000000000000001 R11: 0000000000000000 R12: ffff888003970f00
-R13: 00000000ffffffff R14: ffff988004dd6800 R15: 00000000000000e8
-FS:  00007f174d6f3600(0000) GS:ffff88807db00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffff988004dd6870 CR3: 00000000092be000 CR4: 00000000007506e0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __die_body.cold+0x1a/0x1f
- ? page_fault_oops+0xa9/0x1e0
- ? fixup_exception+0x1d/0x310
- ? exc_page_fault+0xa8/0x150
- ? asm_exc_page_fault+0x22/0x30
- ? kmem_cache_alloc_node+0xa2/0x1e0
- ? __alloc_skb+0x16c/0x1e0
- __alloc_skb+0x16c/0x1e0
- alloc_skb_with_frags+0x48/0x1e0
- sock_alloc_send_pskb+0x234/0x270
- unix_stream_sendmsg+0x1f5/0x690
- sock_sendmsg+0x5d/0x60
- ____sys_sendmsg+0x210/0x260
- ___sys_sendmsg+0x83/0xd0
- ? kmem_cache_alloc+0xc6/0x1c0
- ? avc_disable+0x20/0x20
- ? percpu_counter_add_batch+0x53/0xc0
- ? alloc_empty_file+0x5d/0xb0
- ? alloc_file+0x91/0x170
- ? alloc_file_pseudo+0x94/0x100
- ? __fget_light+0x9f/0x120
- __sys_sendmsg+0x54/0xa0
- do_syscall_64+0x3b/0x90
- entry_SYSCALL_64_after_hwframe+0x69/0xd3
-RIP: 0033:0x7f174d639a7d
-Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 8a c1 f4 ff 8b 54 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 33 44 89 c7 48 89 44 24 08 e8 de c1 f4 ff 48
-RSP: 002b:00007ffcb563ea50 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f174d639a7d
-RDX: 0000000000000000 RSI: 00007ffcb563eab0 RDI: 0000000000000007
-RBP: 00007ffcb563eb10 R08: 0000000000000000 R09: 00000000ffffffff
-R10: 00000000004040a0 R11: 0000000000000293 R12: 00007ffcb563ec28
-R13: 0000000000401398 R14: 0000000000403e00 R15: 00007f174d72c000
- </TASK>
+are available in the Git repository at:
 
-Fixes: 869e7c62486e ("net: af_unix: implement stream sendpage support")
-Reported-by: Bing-Jhong Billy Jheng <billy@starlabs.sg>
-Reviewed-by:  Bing-Jhong Billy Jheng <billy@starlabs.sg>
-Co-developed-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/af_unix.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-08-16
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 10615878e396..714bd87f12d9 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2291,6 +2291,7 @@ static ssize_t unix_stream_sendpage(struct socket *socket, struct page *page,
- 
- 	if (false) {
- alloc_skb:
-+		spin_unlock(&other->sk_receive_queue.lock);
- 		unix_state_unlock(other);
- 		mutex_unlock(&unix_sk(other)->iolock);
- 		newskb = sock_alloc_send_pskb(sk, 0, 0, flags & MSG_DONTWAIT,
-@@ -2330,6 +2331,7 @@ static ssize_t unix_stream_sendpage(struct socket *socket, struct page *page,
- 		init_scm = false;
- 	}
- 
-+	spin_lock(&other->sk_receive_queue.lock);
- 	skb = skb_peek_tail(&other->sk_receive_queue);
- 	if (tail && tail == skb) {
- 		skb = newskb;
-@@ -2360,14 +2362,11 @@ static ssize_t unix_stream_sendpage(struct socket *socket, struct page *page,
- 	refcount_add(size, &sk->sk_wmem_alloc);
- 
- 	if (newskb) {
--		err = unix_scm_to_skb(&scm, skb, false);
--		if (err)
--			goto err_state_unlock;
--		spin_lock(&other->sk_receive_queue.lock);
-+		unix_scm_to_skb(&scm, skb, false);
- 		__skb_queue_tail(&other->sk_receive_queue, newskb);
--		spin_unlock(&other->sk_receive_queue.lock);
- 	}
- 
-+	spin_unlock(&other->sk_receive_queue.lock);
- 	unix_state_unlock(other);
- 	mutex_unlock(&unix_sk(other)->iolock);
- 
--- 
-2.30.2
+for you to fetch changes up to 7d7c6e8c5fe4e8cceea7f66e93cee1c951670836:
 
+  net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event() (2023-08-21 10:55:17 -0700)
+
+----------------------------------------------------------------
+mlx5-updates-2023-08-16
+
+1) aRFS ethtool stats
+Improve aRFS observability by adding new set of counters. Each Rx
+ring will have this set of counters listed below.
+These counters are exposed through ethtool -S.
+
+1.1) arfs_add: number of times a new rule has been created.
+1.2) arfs_request_in: number of times a rule  was requested to move from
+   its current Rx ring to a new Rx ring (incremented on the destination
+   Rx ring).
+1.3) arfs_request_out: number of times a rule  was requested to move out
+   from its current Rx ring (incremented on source/current Rx ring).
+1.4) arfs_expired: number of times a rule has been expired by the
+   kernel and removed from HW.
+1.5) arfs_err: number of times a rule creation or modification has
+   failed.
+
+2) Supporting inline WQE when possible in SW steering
+
+3) Misc cleanups and fixups to net-next branch
+
+----------------------------------------------------------------
+Adham Faris (3):
+      net/mlx5e: aRFS, Prevent repeated kernel rule migrations requests
+      net/mlx5e: aRFS, Warn if aRFS table does not exist for aRFS rule
+      net/mlx5e: aRFS, Introduce ethtool stats
+
+Colin Ian King (1):
+      net/mlx5e: Fix spelling mistake "Faided" -> "Failed"
+
+Gal Pressman (1):
+      net/mlx5: Remove health syndrome enum duplication
+
+Itamar Gozlan (1):
+      net/mlx5: DR, Supporting inline WQE when possible
+
+Jiri Pirko (3):
+      net/mlx5: Call mlx5_esw_offloads_rep_load/unload() for uplink port directly
+      net/mlx5: Remove VPORT_UPLINK handling from devlink_port.c
+      net/mlx5: Rename devlink port ops struct for PFs/VFs
+
+Li Zetao (1):
+      net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event()
+
+Rahul Rameshbabu (1):
+      net/mlx5: Update dead links in Kconfig documentation
+
+Saeed Mahameed (1):
+      net/mlx5: IRQ, consolidate irq and affinity mask allocation
+
+Yevgeny Kliteynik (2):
+      net/mlx5: DR, Fix code indentation
+      net/mlx5: DR, Remove unneeded local variable
+
+ .../ethernet/mellanox/mlx5/counters.rst            |  23 ++++-
+ .../ethernet/mellanox/mlx5/kconfig.rst             |  14 +--
+ Documentation/networking/xfrm_device.rst           |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c  |  21 +++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  22 +++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.h |  13 ++-
+ .../ethernet/mellanox/mlx5/core/esw/devlink_port.c |  16 +--
+ .../net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c |   2 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  20 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/health.c   |  36 ++-----
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.c   |   3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |  14 ++-
+ .../mellanox/mlx5/core/steering/dr_action.c        |   1 -
+ .../ethernet/mellanox/mlx5/core/steering/dr_send.c | 115 ++++++++++++++++++---
+ .../ethernet/mellanox/mlx5/core/steering/fs_dr.c   |   2 +-
+ 15 files changed, 208 insertions(+), 95 deletions(-)
 
