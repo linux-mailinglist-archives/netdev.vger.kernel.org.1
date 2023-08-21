@@ -1,263 +1,211 @@
-Return-Path: <netdev+bounces-29281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30870782755
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98BE778275B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:48:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01C9C1C203AE
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:46:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA6081C20865
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935854C67;
-	Mon, 21 Aug 2023 10:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4611C4C75;
+	Mon, 21 Aug 2023 10:48:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F744C60
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 10:46:14 +0000 (UTC)
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9663DC;
-	Mon, 21 Aug 2023 03:46:12 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-76daeaded2aso4071185a.3;
-        Mon, 21 Aug 2023 03:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692614772; x=1693219572;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=91+NJvb3XeUy21mbV0egFTNhqjvg3UgNfxu2JF/jzAs=;
-        b=iybxIAy1nVsUJ21WCTmZRj+r16uzxExYBDSin/BR3sN0NAlpR6QfOZvV9Luv2XV5Sq
-         9bRlqoRtotuBnOZY1AzI68w3mF4mrtzF0vz7OCBK4GtBkzG55zKGkN0prHFIN6G8rsKP
-         LgaGdwrm6HTP97Hj8WKuwvZRdexIfTscvlPNhT+HaE6C1gZzEIFl8dEbxZM+YnRTGA/9
-         LDGhkuISyCs9A8ozp0c2VSt85IgrtUREmsYa0rfQ06S2RFK7WG0NZQ3cW4PXvkT5Nl5/
-         Dn26VxENC8avfYTVgKNblOYPsWAaDzs5WC4dvOLbMsC3XhJpwmpCzJJppDya6WblMaqi
-         fs0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692614772; x=1693219572;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=91+NJvb3XeUy21mbV0egFTNhqjvg3UgNfxu2JF/jzAs=;
-        b=VJesPdYZnZnGVFBYnNtCHL27eF7vNuhb2H2c7+Q2qAU94NknN+umEBHE8/tHaooTiz
-         q6rKdJm72L6r7tDpYqbe+Id30tMYlLA5pMK2VEa9MWp0j49efhEccWUdbOEPLqslmVMI
-         SJMv+K4SE74b4BY6POyZhptBH66WHJIK7wkgImJpDqbnnsrDXMAgzAQeJQj+laE6/O5C
-         ZLflqumrWBaKI1pQ6Jnj77+X29AYHDZkN2xxTJyNweK2cvgeuiVWPpBWPoJKTk1mfUAS
-         wgNia+8iyCWjaeUs1ODol4I3fZnjLtyCL7fDPVc69UP+xfuxte3oFJMNKAmUikvbSwQy
-         PxZw==
-X-Gm-Message-State: AOJu0YzxOICLJf7IOB1KMgkxQbi8nCMQwaIZdy0lI8KpIGDl1igeIdef
-	rOm3RGeUnzuqXuXIuxdKjkvY6RVR4OBadngylxY=
-X-Google-Smtp-Source: AGHT+IF7uB7Vd8228/OsdKlUTAWtHZWG03cwsC9jguXp+IBvSvrAdw16P2M7u8CrkTRzfJNPlbLm97u0VKDH88ZvX3s=
-X-Received: by 2002:a0c:e1d4:0:b0:64d:254a:63dc with SMTP id
- v20-20020a0ce1d4000000b0064d254a63dcmr6699128qvl.19.1692614771594; Mon, 21
- Aug 2023 03:46:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A4E1848
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 10:48:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773DAD9
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692614932; x=1724150932;
+  h=message-id:date:from:subject:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=FF+6Asnpoew7HAS7c0lltLzHJf5vKswnc/+2MXxkwVc=;
+  b=b5Dy63goqcuJ3gWYWdBVthsHXSD2h7OVzq6XjsUb2S67whkAhfECHLNJ
+   9OWGB7r4VMpj1yVlseqyO58w1VYvhVO2BrCja1P84ro99M0a4BYXeW19q
+   tTrPhGnSAfEh2JCsQbc8r4HDo2LzJ4iXb4TMwDV6r5YMbDy4T0vJsDW6/
+   QRUYIql/tEFXiIbp3Gc8aHGMbNibvKQ8cKxTQXCgKSS5kdkY/6fMLie/4
+   /fYhg4Id9ZcT5mvw0uLwWIurJIs2JNVbHbEMKl9m8pUi8BJMJzb58dgNb
+   coedJioj9qmRNGqOM2NMUQskdXogRd8ZcT7Ayui86j93agJX7pGiUKV2u
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="372457657"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="372457657"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 03:48:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="801232479"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="801232479"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga008.fm.intel.com with ESMTP; 21 Aug 2023 03:48:51 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 21 Aug 2023 03:48:51 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 21 Aug 2023 03:48:51 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 21 Aug 2023 03:48:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gcrPJ5KMEXvaYjPKEwiXG4wQ1ubkbeyDYHhT9+1Ek442GStlBIqtYCrcuapM0XveLYImw8SfydjB1zNDEVYZC0DsDPhH+S0MoQrOSewu2ST5kEazYax7+JAGeERucTkUdKp2bzNfYjElicjraYXExIM12eobS0pSmpyRpwnE8OkmZdO/pMJ+sBzHRvsZ0A4qqP92NhxOlop4JYm9iRFgaLpaUywdPDGh7aVS9RA0DcEEPH8+9+YIEpHlEprP23YtzlAFuoiCt+pAPKixsclVgi99CMyQHnW1R1+mGPmICx1Q2aswTvHiiUF/lT3R+PvVCRFZ2MCe005P8OxIdfy9Kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WIDBPzLN2U/xiYdbvoVwvLTaR8HK+FRCeB4jOvrvoiM=;
+ b=bgrpBMfFfXPDmnWw6pFQdicyqWn75CvcishQ8g10kdtGwSOwT8nvdvg/PGEdasTJiSYbdxPX6MMLGz76U2qtlqbgc37yQWOlFf6ZgmOYX7FtqfPbovRIWCCXDNUxxKdIvCWjwp776sVAHCQiSWos4MFkwjKFo0tyWt1SqYyJD4Gkz1pX1OpgnDjs1sqTPli9uhPaKm6f/s4+JhrNeBU4GTbZhzm/IcP4Mi2i3J2cmw3U6Phrn3vHdtKnU5tA9FJjgCPpsc+S8WxuZL4EmkCYsyZsdTxQpX61s4L8dTUcvBqRBaJ3VFqMm8th5RWYH5xhNwcEPBu9xCvp6QYuE+I9LQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by LV8PR11MB8536.namprd11.prod.outlook.com (2603:10b6:408:1ec::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.24; Mon, 21 Aug
+ 2023 10:48:48 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::c45d:d61e:8d13:cb29]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::c45d:d61e:8d13:cb29%3]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
+ 10:48:48 +0000
+Message-ID: <12025d38-a5e2-5ddd-721f-c1c083785d22@intel.com>
+Date: Mon, 21 Aug 2023 12:48:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next] ice: store VF's pci_dev ptr in ice_vf
+To: Leon Romanovsky <leon@kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+References: <20230816085454.235440-1-przemyslaw.kitszel@intel.com>
+ <20230816143148.GX22185@unreal>
+ <c1f65aa1-3e20-9e21-1994-1190bf0086b7@intel.com>
+ <20230818182059.GZ22185@unreal>
+Content-Language: en-US
+In-Reply-To: <20230818182059.GZ22185@unreal>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0115.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a8::14) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230611080505.17393-1-ansuelsmth@gmail.com> <878rcjbaqs.fsf@kernel.org>
- <648cdebb.5d0a0220.be7f8.a096@mx.google.com> <648ded2a.df0a0220.b78de.4603@mx.google.com>
-In-Reply-To: <648ded2a.df0a0220.b78de.4603@mx.google.com>
-From: Ansuel Smith <ansuelsmth@gmail.com>
-Date: Mon, 21 Aug 2023 12:46:00 +0200
-Message-ID: <CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
-Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
- various chipsets
-To: Kalle Valo <kvalo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, Sebastian Gottschall <s.gottschall@dd-wrt.com>, 
-	Steve deRosier <derosier@cal-sierra.com>, Stefan Lippers-Hollmann <s.l-h@gmx.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|LV8PR11MB8536:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41e57746-b549-49a4-a8e6-08dba234330d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FLQAQyeocbtM5DCnhEK8E4f/yoyZgvMdKBqYBc/TIN/fHhQ1O9NqdMuIQ3zut5l7ZqIO+/avOA7kZW+6YRaZpEtpvqzdTwgjnmtrMlzKmPj9N7XNNC/SaZA9BybDlXMd7CCw0LAgecojcuzMxCJP6RgxTPAVdFyN2TVoWD0NohvECc+8GsqkQzJQhmUKNXYWd2AXAdZJ+YbtTNVpgucLjctnRXfu4fwuCREtXhn1q8silEHDVdNbynCHYEoObtLzFdofxM2rs8K0CCcGAMUDaqPT0nwjD+OgUN60JeejEiTW+N8d2vOFQMd8PMzd0tn/mX9iHfWPZ3/H6zUM4gTlK9DX95Z6bvVwC9iftrOmZ14iCLxN+m8cQGuz2/Ru7FOig2xbcPbHu4Bq3BjVwxixUF5AwHoCscz5BCbzDv0VM/IHdDEG+OkUl6SITp8p+h+qq7EBLAnOauAJnNAaId/CkAmAaI0SkiJ2jTUB2YHHsVbBkNeZYNUdpCZmD1kEgOUu7VoLZ3Q+4E2PCVyNeKtuxLaOIEhISW5jfvSzknIhG7bqigGy/OCO5XcbQ4eiomtLxJRgx8Zz0IeENKOgOTK2aC5Co/G9xk+wFp88Lf+1pkX/kn98a7okvof1IT0/L1aEdL1YvBo8gIb4e+AVgSh95g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(396003)(39860400002)(186009)(451199024)(1800799009)(31696002)(2906002)(83380400001)(26005)(86362001)(478600001)(6486002)(6506007)(6666004)(107886003)(36756003)(2616005)(6512007)(53546011)(66556008)(5660300002)(41300700001)(66476007)(316002)(54906003)(66946007)(6916009)(31686004)(4326008)(8936002)(8676002)(82960400001)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cDFLeHZSeWkvMDR6ZnFkYUdYeXBIdVdzQXBzVUlwRXJpV2JXbWF0TWFLTFJS?=
+ =?utf-8?B?Qi84dGlyZktzNzBxL0JrSm1pSmE2V2Z1akhnb2RuQlFua2haaXgzR1A1Nm1B?=
+ =?utf-8?B?R1JuTHlVQ0V5RGdobTczRUlMRUduVG5uSGtCMUxqa2RXd2l6NFBseXp1SFRn?=
+ =?utf-8?B?QWN5YUhlcWlhMVp6WDllR1U5WUp6T0pWREVwVktQTGE2YWxLdTlGVzJpYlBJ?=
+ =?utf-8?B?ZTlBRzZtVitRS3dSWXFYbGV0S0ZHbFJiLzRwd3JDYjU3bGlCRUtHR3piODFi?=
+ =?utf-8?B?N2w2czZEMFF4WklCMVowN0VHL2pOb3pQemtwRHd2RkxMTXo5SnB3L0VHVDJ0?=
+ =?utf-8?B?ODUvNTVpZDd0RC9Eck9HWTBNa0hrc2F1VURJeXpsNStLTXBVY2JHYlVUZVIw?=
+ =?utf-8?B?cUtTNGNpemZLVHkzanRTbzRlMmdEbm9KVGJoREY3TFo1K2FOdWZSNUttMnVi?=
+ =?utf-8?B?U0NXMFh1REdWMmN5TFE2cEROQWdoZmV4VlFHMmhSUElYeExCMGRJM0hSS295?=
+ =?utf-8?B?bW1pNW0zRWlQei9aaFhOT3RVUVlhV0daUnV6ZDFwUzV5ZUZNenBLRCthVTlH?=
+ =?utf-8?B?UXdWd0ZINWFJYlVlTHREOS9mdHM2dS91Z1Y3cmd3K0k0dEY2UWVRSXhaQVdH?=
+ =?utf-8?B?OTdVSFdmUi95Z085U2pUeUhHK2tVYjdTclQzQnNHWnplNnZ2QjRONEl1T0hM?=
+ =?utf-8?B?QVJVQVNqREhJZm12UkNWd3d2L1YrRTJ5bFJuOTV2eEJtL1pTSjlsZ0QwV3Za?=
+ =?utf-8?B?UFBCTE1hbHc4bzdIR1RZbGxoNVhWY0FTQUZLOUhnZWNheFZEM3ptT3MzWjNv?=
+ =?utf-8?B?VXo5eHVMNHV3Z01JQ1dxSFFqaDhKZTRVL2FXemNEeWx1bms0TSs2RDN6VUQw?=
+ =?utf-8?B?RGVNYy9QV09mdVZnZE5ZOThrU0Y5YURQMTRhazRxTm5wRFBpOWwreTFHd0Zk?=
+ =?utf-8?B?Ti9PcUc1U0JwMURSR2RpQVY1RTlxTGIxenlOWlNqWG1CNE9VaTlFclQyenBM?=
+ =?utf-8?B?U3NWQ2N2NlFRM3ZydDlJNmlOOW1Fc3A0TUZqTEk5RjFVOHFtbHAvQ0V0WXB1?=
+ =?utf-8?B?S2Y0U0t0Q1FscG8yMFhsZ0h2c1hmOVd3VkN3Z084MG41VXozWWhEMXI5MmFG?=
+ =?utf-8?B?azZPRXhDQ29QeFRPYk51Q3ZVNm1iellXbHYvRUNFa2lyRnJvZjYyMlNTcEx4?=
+ =?utf-8?B?aHZ2b2NJL0I1L0lnMDNKV2pqN1k5Qmpyb1FaY1Byay9ydktlbGErTysrNmE0?=
+ =?utf-8?B?a0pPVEkxWkI2SnR5dWJ1YTcwczNpQlkydlBkODN4aUp5Q3N0WWY2TTIwRE5L?=
+ =?utf-8?B?a01iUTNaS3dkbmVnVDFlK3BMZ2tUQ09KVk50V25YZjZnMHlrdGpxT3ZweXBn?=
+ =?utf-8?B?NWlUYmFWaG1PTk1ZTmx1RVRTVWNWZVRvS1UzS01wREl3S3F1MHNWOGdRdWtF?=
+ =?utf-8?B?cWdNbUVCWG91VmJReGt3YURVczdwdUxPZTZ6WEo3UDBldGVmS3Q2Q0hlOU9o?=
+ =?utf-8?B?UmZMalN4c2xMWHNIWW9Ha241c2ttVEY1Tm4rZ25Md1pFVlc4aXNZc3QreHB2?=
+ =?utf-8?B?Y3YxWXdESmxrWm9acXF3NUdOR3NWVFFLSnJsYzY5VXl4NXU2aVFBdjlMTm5p?=
+ =?utf-8?B?cFFFdVVmRFhUUWVDTVI4QXV4Nit4WHdPdG8xaVJVS1NQb1Y4bGJYeU83Unpy?=
+ =?utf-8?B?V2lCcG91MmxhdEpBZHBFRzZqbjJnQ0ZMTzVuQWQrNm1pdTN2amg4MTNEd2VE?=
+ =?utf-8?B?QW9NQ0dMeXpVcEt0VDRvNVBpK3hZbFlKNml5Uk00MndvNlZVU29hejN5TE8z?=
+ =?utf-8?B?QVE4UVdmZUZsN2RiUnlSOW5NTm1IVmNaaUwzMWpiQVFRODZ4bXVlTGt0K3h0?=
+ =?utf-8?B?TFZzYnF3cnlPQWdRckRwa2p3WHM1bzcrVU8vd0FKZC8rcWdITEVEWVpDbHNx?=
+ =?utf-8?B?dnlDZW5GRzJGSmpsbDVNdTBZZVlVbVVhVlBPdHJ0VVo3azR4NEdKaVNHeUxu?=
+ =?utf-8?B?QXFMV1lFQkJlY1IySndqWmpsL1pIY0gzSU1Hb2plQ24ySG5HM0dSaTdjdnVQ?=
+ =?utf-8?B?K08vM3dFVGQwYnF4SFJUOXcyMDg1aXdNd1NROWwzcVM5a2xWQ0VSd2NjZEEv?=
+ =?utf-8?B?WkQzYWt1QTYwb0xDaUI1cHhibHRwemNrVW9FWjJsbGFrd25vOGRJVFZ1ZHJD?=
+ =?utf-8?B?YWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41e57746-b549-49a4-a8e6-08dba234330d
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 10:48:48.4369
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CpW84nmqzTBw8/XxpXvUzT5SoJlHWzrUYz40c6zH63PGSVmUx0D+3v026jj2/gczJU7uhcMW/gztUV++eryRiuwbF3Q/hJIIMlGIwHgDANY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8536
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Il giorno sab 17 giu 2023 alle ore 19:28 Christian Marangi
-<ansuelsmth@gmail.com> ha scritto:
->
-> On Fri, Jun 16, 2023 at 01:35:04PM +0200, Christian Marangi wrote:
-> > On Fri, Jun 16, 2023 at 08:03:23PM +0300, Kalle Valo wrote:
-> > > Christian Marangi <ansuelsmth@gmail.com> writes:
-> > >
-> > > > From: Sebastian Gottschall <s.gottschall@dd-wrt.com>
-> > > >
-> > > > Adds LED and GPIO Control support for 988x, 9887, 9888, 99x0, 9984
-> > > > based chipsets with on chipset connected led's using WMI Firmware API.
-> > > > The LED device will get available named as "ath10k-phyX" at sysfs and
-> > > > can be controlled with various triggers.
-> > > > Adds also debugfs interface for gpio control.
-> > > >
-> > > > Signed-off-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
-> > > > Reviewed-by: Steve deRosier <derosier@cal-sierra.com>
-> > > > [kvalo: major reorg and cleanup]
-> > > > Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
-> > > > [ansuel: rebase and small cleanup]
-> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > > Tested-by: Stefan Lippers-Hollmann <s.l-h@gmx.de>
-> > > > ---
-> > > >
-> > > > Hi,
-> > > > this is a very old patch from 2018 that somehow was talked till 2020
-> > > > with Kavlo asked to rebase and resubmit and nobody did.
-> > > > So here we are in 2023 with me trying to finally have this upstream.
-> > > >
-> > > > A summarize of the situation.
-> > > > - The patch is from years in OpenWRT. Used by anything that has ath10k
-> > > >   card and a LED connected.
-> > > > - This patch is also used by the fw variant from Candela Tech with no
-> > > >   problem reported.
-> > > > - It was pointed out that this caused some problem with ipq4019 SoC
-> > > >   but the problem was actually caused by a different bug related to
-> > > >   interrupts.
-> > > >
-> > > > I honestly hope we can have this feature merged since it's really
-> > > > funny to have something that was so near merge and jet still not
-> > > > present and with devices not supporting this simple but useful
-> > > > feature.
-> > >
-> > > Indeed, we should finally get this in. Thanks for working on it.
-> > >
-> > > I did some minor changes to the patch, they are in my pending branch:
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=686464864538158f22842dc49eddea6fa50e59c1
-> > >
-> > > My comments below, please review my changes. No need to resend because
-> > > of these.
-> > >
-> >
-> > Hi,
-> > very happy this is going further.
-> >
-> > > > --- a/drivers/net/wireless/ath/ath10k/Kconfig
-> > > > +++ b/drivers/net/wireless/ath/ath10k/Kconfig
-> > > > @@ -67,6 +67,23 @@ config ATH10K_DEBUGFS
-> > > >
-> > > >     If unsure, say Y to make it easier to debug problems.
-> > > >
-> > > > +config ATH10K_LEDS
-> > > > + bool "Atheros ath10k LED support"
-> > > > + depends on ATH10K
-> > > > + select MAC80211_LEDS
-> > > > + select LEDS_CLASS
-> > > > + select NEW_LEDS
-> > > > + default y
-> > > > + help
-> > > > +   This option enables LEDs support for chipset LED pins.
-> > > > +   Each pin is connected via GPIO and can be controlled using
-> > > > +   WMI Firmware API.
-> > > > +
-> > > > +   The LED device will get available named as "ath10k-phyX" at sysfs and
-> > > > +           can be controlled with various triggers.
-> > > > +
-> > > > +   Say Y, if you have LED pins connected to the ath10k wireless card.
-> > >
-> > > I'm not sure anymore if we should ask anything from the user, better to
-> > > enable automatically if LED support is enabled in the kernel. So I
-> > > simplified this to:
-> > >
-> > > config ATH10K_LEDS
-> > >     bool
-> > >     depends on ATH10K
-> > >     depends on LEDS_CLASS=y || LEDS_CLASS=MAC80211
-> > >     default y
-> > >
-> > > This follows what mt76 does:
-> > >
-> > > config MT76_LEDS
-> > >     bool
-> > >     depends on MT76_CORE
-> > >     depends on LEDS_CLASS=y || MT76_CORE=LEDS_CLASS
-> > >     default y
-> > >
-> >
-> > I remember there was the same discussion in a previous series. OK for me
-> > for making this by default, only concern is any buildbot error (if any)
-> >
-> > Anyway OK for the change.
-> >
-> > > > @@ -65,6 +66,7 @@ static const struct ath10k_hw_params ath10k_hw_params_list[] = {
-> > > >           .dev_id = QCA988X_2_0_DEVICE_ID,
-> > > >           .bus = ATH10K_BUS_PCI,
-> > > >           .name = "qca988x hw2.0",
-> > > > +         .led_pin = 1,
-> > > >           .patch_load_addr = QCA988X_HW_2_0_PATCH_LOAD_ADDR,
-> > > >           .uart_pin = 7,
-> > > >           .cc_wraparound_type = ATH10K_HW_CC_WRAP_SHIFTED_ALL,
-> > >
-> > > I prefer following the field order from struct ath10k_hw_params
-> > > declaration and also setting fields explicitly to zero (even though
-> > > there are gaps still) so I changed that for every entry.
-> > >
-> >
-> > Thanks for the change, np for me.
-> >
-> > > > +int ath10k_leds_register(struct ath10k *ar)
-> > > > +{
-> > > > + int ret;
-> > > > +
-> > > > + if (ar->hw_params.led_pin == 0)
-> > > > +         /* leds not supported */
-> > > > +         return 0;
-> > > > +
-> > > > + snprintf(ar->leds.label, sizeof(ar->leds.label), "ath10k-%s",
-> > > > +          wiphy_name(ar->hw->wiphy));
-> > > > + ar->leds.wifi_led.active_low = 1;
-> > > > + ar->leds.wifi_led.gpio = ar->hw_params.led_pin;
-> > > > + ar->leds.wifi_led.name = ar->leds.label;
-> > > > + ar->leds.wifi_led.default_state = LEDS_GPIO_DEFSTATE_KEEP;
-> > > > +
-> > > > + ar->leds.cdev.name = ar->leds.label;
-> > > > + ar->leds.cdev.brightness_set_blocking = ath10k_leds_set_brightness_blocking;
-> > > > +
-> > > > + /* FIXME: this assignment doesn't make sense as it's NULL, remove it? */
-> > > > + ar->leds.cdev.default_trigger = ar->leds.wifi_led.default_trigger;
-> > >
-> > > But what to do with this FIXME?
-> > >
-> >
-> > It was pushed by you in v13.
-> >
-> > I could be wrong but your idea was to prepare for future support of
-> > other patch that would set the default_trigger to the mac80211 tpt.
-> >
-> > We might got both confused by default_trigger and default_state.
-> > default_trigger is actually never set and is NULL (actually it's 0)
-> >
-> > We have other 2 patch that adds tpt rates for the mac80211 LED trigger
-> > and set this trigger as the default one but honestly I would chose a
-> > different implementation than hardcoding everything.
-> >
-> > If it's ok for you, I would drop the comment and the default_trigger and
-> > I will send a follow-up patch to this adding DT support by using
-> > led_classdev_register_ext and defining init_data.
-> > (and this indirectly would permit better LED naming and defining of
-> > default-trigger in DT)
-> >
-> > Also ideally I will also send a patch for default_state following
-> > standard LED implementation. (to set default_state in DT)
-> >
-> > I would prefer this approach as the LED patch already took way too much
-> > time and I think it's better to merge this initial version and then
-> > improve it.
->
-> If you want to check out I attached the 2 patch (one dt-bindings and the
-> one for the code) that I will submit when this will be merged (the
-> change is with the assumption that the FIXME line is dropped)
->
-> Tested and works correctly with my use case of wifi card attached with
-> pcie. This implementation permits to declare the default trigger in DT
-> instead of hardcoding.
->
+On 8/18/23 20:20, Leon Romanovsky wrote:
+> On Fri, Aug 18, 2023 at 02:20:51PM +0200, Przemek Kitszel wrote:
+>> On 8/16/23 16:31, Leon Romanovsky wrote:
+>>> On Wed, Aug 16, 2023 at 04:54:54AM -0400, Przemek Kitszel wrote:
+>>>> Extend struct ice_vf by vfdev.
+>>>> Calculation of vfdev falls more nicely into ice_create_vf_entries().
+>>>>
+>>>> Caching of vfdev enables simplification of ice_restore_all_vfs_msi_state().
+>>>
+>>> I see that old code had access to pci_dev * of VF without any locking
+>>> from concurrent PCI core access. How is it protected? How do you make
+>>> sure that vfdev is valid?
+>>>
+>>> Generally speaking, it is rarely good idea to cache VF pci_dev pointers
+>>> inside driver.
+>>>
+>>> Thanks
+>>
+>> Overall, I do agree that ice driver, as a whole, has room for improvement in
+>> terms of synchronization, objects lifetime, and similar.
+>>
+>> In this particular case, I don't see any reason of PCI reconfiguration
+>> during VF lifetime, but likely I'm missing something?
+> 
+> You are caching VF pointer in PF, 
 
-Any news with this? Did I notice the LEDs patch are still in pending...
-Since I notice the process is a bit slow I wonder if we can also queue
-the 2 patch i attached in the previous email so we can speed things up?
+that's correct that the driver is PF/ice
+
+> and you are subjected to PF lifetime
+> and not VF lifetime.
+
+this belongs to struct ice_vf, which should have VF lifetime,
+otherwise it's already at risk
+
+> 
+> Thanks
+
+Thank you!
 
