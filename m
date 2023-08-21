@@ -1,157 +1,95 @@
-Return-Path: <netdev+bounces-29377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EEF7782F5C
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C1A782F50
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C4E6280E26
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:26:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68621280E58
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7C98C16;
-	Mon, 21 Aug 2023 17:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403AC8C07;
+	Mon, 21 Aug 2023 17:21:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9367B8C09
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:26:32 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40010EE
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 10:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692638791; x=1724174791;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HaXmJM7DeQhDOqV42e9Kvb36fYBtC0M8TdINJMFqb7Y=;
-  b=T9jAGkBngpBx2wi0BuaCN6KPNPf6Ec0LORXOowcsM+UR3T1KVOBXr6e4
-   dImLxulZb1+nAfQQ3G8vWyJfASgqDuxkwEqNsTHdkgKvATSl/+WKxA1jY
-   Q9K8Wt7Rg+0ZDBexSomCxNB/5GuDHBdr8G5GgxsWv1Nz5UxP2fHO7QoQ1
-   3vqvS4lZTA94LDvTqdlowwiHZW12TJRXlZkXvwOOygJnjnF+K35jQOHp9
-   7DuOhYQpo4jMdp8d3qRec4w1msS5C9XUQOyK/te9LveSzLG2FZhCm8OTA
-   TRGgXy+MHmSUxFxX/uK66Nx5d192MSOvSoYKlgQt65elRzwQ/cgnwuzfm
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="363821169"
-X-IronPort-AV: E=Sophos;i="6.01,190,1684825200"; 
-   d="scan'208";a="363821169"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 10:26:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="879604726"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga001.fm.intel.com with ESMTP; 21 Aug 2023 10:26:34 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Alessio Igor Bogani <alessio.bogani@elettra.eu>,
-	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	leon@kernel.org,
-	rrameshbabu@nvidia.com,
-	Arpana Arland <arpanax.arland@intel.com>
-Subject: [PATCH net] igb: Avoid starting unnecessary workqueues
-Date: Mon, 21 Aug 2023 10:19:27 -0700
-Message-Id: <20230821171927.2203644-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E702F2B
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:21:50 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68F8D100;
+	Mon, 21 Aug 2023 10:21:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=21ttcASDit1/izQa88pggG+/P1z9FA9nVd9gaOmu3SE=; b=jt11wQeV+vzprrJafgV+HsB7wB
+	dvWl1Taokhk77L27avBNIVApE7ZPwNq1J/a15/7PSa9VWYLGv+3avcevw82wN0H0HK3QqrKFz2B25
+	lJUx6DiKWu9MlGffYR+02cC961K+j+obzv5FTADvLOk99PuZGXEwHKDmwHQmZ6TPxobM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qY8av-004hwA-W0; Mon, 21 Aug 2023 19:21:37 +0200
+Date: Mon, 21 Aug 2023 19:21:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek
+ automotive PCIe driver code
+Message-ID: <3e5b2f0a-3661-4147-bc4e-784eecf41364@lunn.ch>
+References: <20230815143756.106623-1-justinlai0215@realtek.com>
+ <20230815143756.106623-2-justinlai0215@realtek.com>
+ <95f079a4-19f9-4501-90d9-0bcd476ce68d@lunn.ch>
+ <4955506dbf6b4ebdb67cbb738750fbc8@realtek.com>
+ <eb245c85-0909-4a75-830d-afb96ccd5d38@lunn.ch>
+ <4951391892534eaeb2da96f052364e4c@realtek.com>
+ <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
+ <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
+ <97f3744d-afbf-4562-9168-5b9e211fac1f@lunn.ch>
+ <4db3248874d64418b63fdf5c5e8a0f79@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4db3248874d64418b63fdf5c5e8a0f79@realtek.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Alessio Igor Bogani <alessio.bogani@elettra.eu>
+> But I2C, SPI, MDIO are connected to the SoC through this chip's
+> external pins, not on the PCIe bus.
 
-If ptp_clock_register() fails or CONFIG_PTP isn't enabled, avoid starting
-PTP related workqueues.
+Thanks, that was the information i was trying to get at.
 
-In this way we can fix this:
- BUG: unable to handle page fault for address: ffffc9000440b6f8
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
- PGD 100000067 P4D 100000067 PUD 1001e0067 PMD 107dc5067 PTE 0
- Oops: 0000 [#1] PREEMPT SMP
- [...]
- Workqueue: events igb_ptp_overflow_check
- RIP: 0010:igb_rd32+0x1f/0x60
- [...]
- Call Trace:
-  igb_ptp_read_82580+0x20/0x50
-  timecounter_read+0x15/0x60
-  igb_ptp_overflow_check+0x1a/0x50
-  process_one_work+0x1cb/0x3c0
-  worker_thread+0x53/0x3f0
-  ? rescuer_thread+0x370/0x370
-  kthread+0x142/0x160
-  ? kthread_associate_blkcg+0xc0/0xc0
-  ret_from_fork+0x1f/0x30
+> Actually, there is the other function in the PCIe GMAC(Multiple
+> function) to manage the registers of Switch Core.  Should they be
+> integrated into the MFD driver?
 
-Fixes: 1f6e8178d685 ("igb: Prevent dropped Tx timestamps via work items and interrupts.")
-Fixes: d339b1331616 ("igb: add PTP Hardware Clock code")
-Signed-off-by: Alessio Igor Bogani <alessio.bogani@elettra.eu>
-Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igb/igb_ptp.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+Can you cleanly attach another PCI driver to those functions?
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
-index 405886ee5261..319c544b9f04 100644
---- a/drivers/net/ethernet/intel/igb/igb_ptp.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
-@@ -1385,18 +1385,6 @@ void igb_ptp_init(struct igb_adapter *adapter)
- 		return;
- 	}
- 
--	spin_lock_init(&adapter->tmreg_lock);
--	INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
--
--	if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
--		INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
--				  igb_ptp_overflow_check);
--
--	adapter->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
--	adapter->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
--
--	igb_ptp_reset(adapter);
--
- 	adapter->ptp_clock = ptp_clock_register(&adapter->ptp_caps,
- 						&adapter->pdev->dev);
- 	if (IS_ERR(adapter->ptp_clock)) {
-@@ -1406,6 +1394,18 @@ void igb_ptp_init(struct igb_adapter *adapter)
- 		dev_info(&adapter->pdev->dev, "added PHC on %s\n",
- 			 adapter->netdev->name);
- 		adapter->ptp_flags |= IGB_PTP_ENABLED;
-+
-+		spin_lock_init(&adapter->tmreg_lock);
-+		INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
-+
-+		if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
-+			INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
-+					  igb_ptp_overflow_check);
-+
-+		adapter->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
-+		adapter->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
-+
-+		igb_ptp_reset(adapter);
- 	}
- }
- 
--- 
-2.38.1
+You need to use an MFD when there is a single top level addressable
+block of hardware which has multiple functions. Thank of an I2C
+device, which has a single address on the bus, but multiple functions.
+Access to that one address needs to be shared via multiple
+drivers. The MFD framework provides the glue to share access to the
+hardware.
 
+However, PCI identification and addressing is more flexible. So long
+as they are separate PCI functions, you should be able to load two
+drivers and not have problems. Then you don't need an MFD.
+
+	Andrew
 
