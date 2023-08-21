@@ -1,81 +1,71 @@
-Return-Path: <netdev+bounces-29424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3E787831B8
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 22:12:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF6557831B9
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 22:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BA79280F51
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:12:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B34A280F51
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F235011724;
-	Mon, 21 Aug 2023 20:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F348211725;
+	Mon, 21 Aug 2023 20:14:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0E01171A
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:11:56 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2068.outbound.protection.outlook.com [40.107.22.68])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6737611C;
-	Mon, 21 Aug 2023 13:11:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC81D1171A
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:14:07 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EEE9125
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:14:06 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Frpxx/6693w8sIFDDNagF7igud/ecSO73t3gtQQzc/nvMvcS2aVIpra8V2eWx3kjRLvlx2oIqZcqliz+kfxvzsVoPiY7eRcf/BQ7cHwg+l6GVQu4kwpLDIXv2CJAFUriRqeYIPh5BVbA7gOR+9wmwgN/p+J1RHZRahAdVPBZkeNsFOwRLX0eknHaPB44TzlhYvfQY0zqlrRHrLfQ0ddgO0WYEGToWLsGuxK0TJmPzXKNryp6qrWCT8Ua2915Y6K/8UN+sEAglArN7vfASed/G+0wI4b54UqZS8dSxiRamNrWS9U0+0bCL4oFWvKhijVZWmgv1D1yqOJoK5a+WNQgfg==
+ b=LVXmMlIrFrMNLltlHtr72vB47DHZIsJ3eSpK78fkzKPTBRsU8dB9wzoycw/LIIXkJSeAHVUwDMqReDFM/igKY7ARmMTgzeC7VbPmlFQd4BEvSG8MYNnj14ju/NEISZhw2l3uwasM6aQONc5OWF77S6oh272JQA8/C4uOT/w8kFHvCOCL2fAtiA1L9g5KBFsoaMk5R6Pmg8bbGO3u8FaJ+8UAycc9gKsrBiIX3ApfRIIWMRvGOZ7Sbgrt5MiUOHPUt/sY9O1wr7blmzNGEZGZWRQPH+nhkEHULEtgGX83wFDvZB6DmmaiFLauWbpXP40wMbInP6CtOfuAQvcrERSURw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nTigH1Rz7Fg9fpXCT8Kq1uo19CO+JSX4xrtdbD1+rbY=;
- b=M7X6LYlebvJGf6k9JzAu/Q4a/esc4FLFR21dRDZCKE9lP2KcaBGqD7aP+Y21aymgJ1gWLx/o9piUsTr+9iFwjI/HCI3cz/z4E5JjkqYvWxdnvzyw0A3dDNuP368dLdZ+yd9NWaBRSUKxN8cZaa+uCqN2zQ0d2rJ0xujPCLDZE7P/eOQmi7wsZHAwVqyG3a6EoK/MaRu9WN9zQ/g4gcY2riwMi4KgRHr9ZBZIPGPdRQm7ujPo14dLd27NVV7n+kiAzb3xEj9/b+TBEOSJYstfhJw3mfattENujV3pZPrs7f+g4TDwF/FnHf4sAppwJDV+u9ywA5MUN9LoxYdIJWVmVw==
+ bh=G+HJLcZpGGctxezmD5XHRmy99phvvD8PzrZWJSXSFPQ=;
+ b=JLOrjA/TKTm54+IMKqXRWqX57cxzMHeZBCwz1n63+p6uqGY99Knf/XszivT/7lhHHyypXAIQXDC/CT8p4waGi70eWONfeJI+hlqXQ1OApeN1BuSeiaxUOgI93F5NXJLz1+HZ0TCIyuyp3QxBZVsW/ZL5kBdaQ6Ph5LxjfiaGW4ajuEph+PxfRnPzev97nMX9TbFPIo2VW5xa3Q8Cla+MBwpECCtsOVBso0vCRwHnJPRjIPkBTN4vrkW2vWQ2JWfEW2d3xakPvLGJGgUzpziPRoXMXJfLO/e1W7OWQ/nFWgvozmilOG/shIkAidaJvaoQ2L8QuLDMDPuOv1fm+BebtA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nTigH1Rz7Fg9fpXCT8Kq1uo19CO+JSX4xrtdbD1+rbY=;
- b=W0sh7LTwqgxLfKeb2Ff69cotHZ6mnNhgSizwFIrS/M0MZs7T9QKuljn8319cHkg0wDXXGWfFSM4O9S3Mv1hIH0Zrfrt5SmNuFLfRBmxmqwb28D8XwQiAJOPyn+3wr+pLxMBo31JaqbfyGvB91kDWVommR9RYZPSHgT9zYfg3fwc=
+ bh=G+HJLcZpGGctxezmD5XHRmy99phvvD8PzrZWJSXSFPQ=;
+ b=YeBgVMVZ7nn850NPAXlydsy8JuN1bPSEO9e2hCF1LkBjJGYFYCmPZZLUJuEHF8U/Wwir+fnBoRlI3mf/1VxoXq+0d8DnuFwDdKVqbpH+qd9tOjKSdcpWfaLS76rfZdDsF7CD7YMX42e8piYsWyEQlvzUdRcrL9rS98Gwoy4WZfU=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB7606.eurprd04.prod.outlook.com (2603:10a6:20b:23e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Mon, 21 Aug
- 2023 20:11:51 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::d4ed:20a0:8c0a:d9cf%7]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
- 20:11:51 +0000
-Date: Mon, 21 Aug 2023 23:11:46 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Rob Herring <robh@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor@kernel.org>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>
-Subject: Re: [RFC PATCH net-next 8/8] dt-bindings: net: fsl,backplane-anlt:
- new binding document
-Message-ID: <20230821201146.hudnk5v2zugz726p@skbuf>
-References: <20230817150644.3605105-1-vladimir.oltean@nxp.com>
- <20230817150644.3605105-9-vladimir.oltean@nxp.com>
- <20230821195840.GA2181626-robh@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230821195840.GA2181626-robh@kernel.org>
-X-ClientProxiedBy: AM0PR10CA0077.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:15::30) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ DM4PR12MB5817.namprd12.prod.outlook.com (2603:10b6:8:60::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.24; Mon, 21 Aug 2023 20:14:03 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
+ 20:14:03 +0000
+Message-ID: <0a2f116a-0569-4562-a34a-53438a5665fc@amd.com>
+Date: Mon, 21 Aug 2023 13:14:00 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ionic: Remove unused declarations
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yue Haibing <yuehaibing@huawei.com>, brett.creeley@amd.com,
+ drivers@pensando.io, davem@davemloft.net, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20230821134717.51936-1-yuehaibing@huawei.com>
+ <46c62232-9a00-4a9f-b1ea-288c53ae47c3@amd.com>
+ <20230821123927.4806075c@kernel.org>
+ <b113a610-15b0-460a-a439-3e8461ae3f60@amd.com>
+ <20230821130512.27d0265e@kernel.org>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20230821130512.27d0265e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH7PR13CA0019.namprd13.prod.outlook.com
+ (2603:10b6:510:174::16) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,383 +73,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7606:EE_
-X-MS-Office365-Filtering-Correlation-Id: c3bf8233-de5c-45cb-d80d-08dba282db1e
-X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|DM4PR12MB5817:EE_
+X-MS-Office365-Filtering-Correlation-Id: 842ae886-f444-4615-2663-08dba28329f9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
- o9t6+yE3TCIBvcrKFCRbbKWiFExXtVQ44VBGhT9q4KR1VZMUSd4h5cU9KZz3QElnV3V4CNyVr/yJavlXu+u2By9vMAQq7JpnjVx/imo2PVZa9PjK/CrkR8WTkkMggIemHg3KjaA9DD6xnGmPkWGW9TJpBuIWgm5DRQnjatvsIGmwwn6HpFXmN21iqa3V/p4+tuKNTwEhK53G7Fd9CadAOgCNbKqeznwjHcRs4JYD3smqrMR8z1LjdtCFkng+VVpwIWKVl8JmXS7TFER0RvOsEcMZRRP2NbyxiNyfODKZmt2+4dMNAzj+o3dmE7H7zBV3yJ6VeRgXUUCQ/3j303JwbiH4fuxuYYe2SOnwcso0OKW+qslnqsIGuskYGCjTQPfhb6L7aIvQGDq1A0qE1nbviYpKPSnl5XcEaF6M2K6eJvUzLC2kTheNM1MSiWQ5WSC9hEj1SeBC088j438hLuvn3el+mCmENZJZWB6xWI9oZYdG8yPv13fkexoq8Y5QUxGbJv4jd7udeMYp/uA8kejaz1UDtt3jo3iJxTTWfxTH4yOjt4G5pllYD0y16V4QMsfJn+uKZAsmEaIGP+HibLNRxw==
+	ugIy3TqJz9pYZnhySrfdI5zxDlKnOF474hU6S1NrAlPCfJif5ThAIe3qVlCx5nFLqrydUPaZVnUpV0B5k7iuWbRZ46uIOPg5s8ykpMzqhgppLgQOf45q1SV2nS8ujQ0ziHBBiY8k4nZKjd0eoaHbUeXpjt6uI1dV6GzVwTEtGrXhkfktqRiZDT/pl8ECIu4zaxd+5wTf8+9HUcLyD+soE3LJieb4hhIV11sMQmDYjSRTfwnANfLDpWRYBUOG/RJstsVDl0WLuc4YhbRhdVgWNxSag/LwPJU2JPWpReEJeEMwb9F+yqnc99GbLOtvlr0Wfw/Zn6vBeRvVtti6+Cqsu/uV0ahrzVvMS1UFgneZZkBm6LB1nVPqhbJqLSmV+5fZJNSzYQ3S3tACdb1OzphQrG2z9yD/sTvbFKee8s5VGqDWIg2HFKNFSTUGV2yiINrZqxZDiF0OfyykTA5DELaIYEnm1qFtuiniINWXDVPOV8P8XU+DlMb2Pbp1mT7lJyp1Ou8ylCuUSN7gahlqh8D3UlNaT9xSBLLn1J+z6w0ZBN58BzDeisUEwSZtgl+jV2xCAfahc2PQeN2A3Muzvo3LJrrv+KB/OYD86l1hkDeZa4BLfj+swTVwZy5rfB/v2GM7xiQ3Yznm+dhLwjDhvs8DyA==
 X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(376002)(136003)(346002)(39860400002)(366004)(186009)(1800799009)(451199024)(54906003)(6916009)(66476007)(66556008)(316002)(9686003)(66946007)(6512007)(8676002)(8936002)(4326008)(1076003)(33716001)(41300700001)(966005)(478600001)(6666004)(38100700002)(6506007)(6486002)(83380400001)(30864003)(2906002)(7416002)(86362001)(44832011)(5660300002)(26005);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(39860400002)(366004)(186009)(1800799009)(451199024)(6916009)(66476007)(66556008)(316002)(66946007)(6512007)(8676002)(8936002)(2616005)(4326008)(36756003)(41300700001)(478600001)(38100700002)(53546011)(6506007)(6486002)(45080400002)(83380400001)(4744005)(2906002)(86362001)(31686004)(31696002)(5660300002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?55Uh9qZPbE74bZR24by7HSpcmW2ajf1hOI2RX0T0/tq3VPBEHODYLX+bfbxL?=
- =?us-ascii?Q?+vLOgOxObFfrWxLqTR9ZnrBcIgLjnqzPKebg0MP/LeqXnhCwnCGDPBS1Vu5+?=
- =?us-ascii?Q?2NhPYTjyASd61SW+LZBPnht//ovvI8icF0T8s2GDrFXC2YgWglbaUeR8DbIl?=
- =?us-ascii?Q?QpoU1coa7MDZMbLCeCggloybv4qA7tX+R9wTw1M7imEku/QPYwGFAABDi64b?=
- =?us-ascii?Q?LwOjYWiDEsANzCQVnPgN8h4HOol86utIE5dQGlnuoDSpuykWVPBzLFGkoeK0?=
- =?us-ascii?Q?vPHnk1vnjXmNoO1que87T10TONDizEaMxXdxG8rXYjLGKJEVxGYSbEuyv8oD?=
- =?us-ascii?Q?NbhtwZfb82Alp1TZnMVqx9kxDMt/GkY0sVt+J3WfCXVrYYioSH3NS6kg+WR1?=
- =?us-ascii?Q?nMDgAw36vmHFqeetGiEhF+ad6lkgA7ErnV6b3bv+Gmy2j+VV2XKv3sPmwFeH?=
- =?us-ascii?Q?YLelP1nsX5SE9jobeGBE8axCw4OCF2uoK0jX6iXe8ipCNizxmnutVkc7Az/g?=
- =?us-ascii?Q?xgX/tHrLEXjCFHkjQ33GQdlEFSxYyzndxNgJgQb4YSbHhZFMP6+Z4MylT7QB?=
- =?us-ascii?Q?IAby7vRFDLcZBblrkIw7rw6LLNXb7F7fRz3r1+BWnlhK8eGEMbU45Scbg7zX?=
- =?us-ascii?Q?tedtOgSTXCPzU6t8OHbgoMdLv2jlC28iQ6pxJpNBw3IeDYnkE6+C197BTbGb?=
- =?us-ascii?Q?P+Xt8GOs4yi1C/sz2K45D7Q7Hqjvx6jRwItx4NQByNc3oILGytfthAvTH3GM?=
- =?us-ascii?Q?v/oHJ4P4LkvId7VQFvpJwyDQbfU7MSkUM6IBe4txbWwcD0MQTY367CrX5iBS?=
- =?us-ascii?Q?dQ1fmB80OAv7koBoonweKXm0qK0/LowrW0EX9gb4vwdIWw/rrCO0xJ9wCxjU?=
- =?us-ascii?Q?eBrlYawdbNayAFHvGU+am0EMgj6mzcaTpAlA02RRvT4TTLctKirI/l3iwIEt?=
- =?us-ascii?Q?2dSPr+RiYxHF4P7hb0bol9ZaomnbjBRLzaOJig9yFO63tnWPw56GuLuglnhg?=
- =?us-ascii?Q?+ilrvakj4yzLzQKcZNvbip/PDF4xstm/nFZygL/AtgbxrSo3bHhuPPqj8n2n?=
- =?us-ascii?Q?6Q02r2Mu1HTDwwDmZghrSBYpzuUIs7U6qOkkg/y0NUzaDiBdJ+OfQXzrGUsE?=
- =?us-ascii?Q?TAjxNUEMm+VrMDdvsPxrS7g9lyb4q3A6eMOTTBzdItf+xZs6jdYZToyDfRTP?=
- =?us-ascii?Q?jlqjDeN0k3dgvhLQfGi2vnZL9u0TOmevFQLhKdlviki4lpBn8nVtzZweUlb0?=
- =?us-ascii?Q?wHGPQsqN1OJWJMZMC5/nwZ6cWGcyTD/1dBXTx3rLSxfq+U0PlfA9QILVMARn?=
- =?us-ascii?Q?bJ6mGW6ECj/3iJ4lBIPl+ZT/hz9i3HNzVJu4eCUvNP5oUn7qMbYxC/c71SFx?=
- =?us-ascii?Q?ZuQwg7m5VTvLzQCYP6yGINNwAcRAbAtTeWg03B6oDDo7teAHWqVN11gzIfzF?=
- =?us-ascii?Q?6uzha7ERv9tZ9hr/9FB11fCAnLXLHAxPimWQH+c/o25efxRglriABOO2WATo?=
- =?us-ascii?Q?aROogmP4wVwXiwPaAyCpqiockLjt2krpbx9YYAC8NzIkgAKGFqHldY/vyh8Q?=
- =?us-ascii?Q?q/h12eBO5Gf/YwZA6nt/PgH35rZVXCHh4F5vY1lHT4zLSmQEF32U1mJJa+DP?=
- =?us-ascii?Q?Mw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3bf8233-de5c-45cb-d80d-08dba282db1e
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+	=?utf-8?B?WE9jbDJyZ1pReGliRzlTeTdUNG9yNytobldTVkkyaDNJbW9HMTNXTXFwc3Yz?=
+ =?utf-8?B?T3cwS2hNMS84Sm5UbVBvRHhFdG1CSEZmVXF5dVQxd2VTaHZ0azl5ZzVuUldw?=
+ =?utf-8?B?NEpZS1RaL041U3VUZi9ORzUrT0RVN2ozTllXbXp3VzRQSlF2WVRkdjhodXhh?=
+ =?utf-8?B?cnIzSkFBejNDUEtzeEZwdmpmcEtvVVkxd0JuN2lCd0Z3VUhyRjZwSjcxeVlY?=
+ =?utf-8?B?dGtrZ1hqN1AwY2VHMEllVGN2d0M5aUxkMU94SXZINFJ3QkhBd2tzcXdJZEgw?=
+ =?utf-8?B?OTY0WW5wYzNraWdKSWQ1RHdaL3l3a0xQVVQ3cWhwTisxNmgwOFNoODA2MDNj?=
+ =?utf-8?B?cDFxNW5DbjRhbHNJNDR2Y2xXRnpIWEp5a1lUZEpIWEszY09ZODRTTEI3aWNj?=
+ =?utf-8?B?U3ZzQ004TTRvTHdUUEc1MWRuc01veGJheWpGMUVMSUZ1amNKamVCWGRmOEVK?=
+ =?utf-8?B?T0dRV3BXaGlmVmVXd2pNUFczNmdWYmpFWXVXUWFtclF3YkFBNmxsUDhNWkV5?=
+ =?utf-8?B?d043RnVnakhKYk5HcHBzbDBUcW5yRkJOMHR1dHNpVGlQSk9uQ3RIZzUzVzg4?=
+ =?utf-8?B?NkgwcFlHdyt3SUJvNTBRbFdPZGZuL3VMeFR0YnJadmFKYmZUdHN3YkhPS3dj?=
+ =?utf-8?B?MkdNUUI1dXV4STJmN3BMeVlMUWxVMzhSSnlNMjVjVnN2c0NvdmhvWVhoUUE1?=
+ =?utf-8?B?cVpQb2dTQnY4UWhpdzJxbEVGbThwQWZ2NXg1cVF4YUhYMFJwc3cxN21TNFdQ?=
+ =?utf-8?B?UEh5RnpBUCtiVGlmRkc0WkxsV25YOU1LWkhYeG55YWVQWFd6SDFQallYZTBT?=
+ =?utf-8?B?RndVYno1aUJRRkFFV1I0Tmd0ZTYrMWE0MGZuTlkweHdGOGNZQk5QL21naFA1?=
+ =?utf-8?B?UU5rYjRCTTMva0dSZnZnbHR2WG53dEVwS3Rlam11cVU5cUpxZmljVGxMWFJI?=
+ =?utf-8?B?UGdRelNYeDBCejBZMDhweU8rOXFxcFBQZkFRWjdwVE8vendFVU0zVVdUbjhX?=
+ =?utf-8?B?NkFqdEJqNUxuYlJVMFpLNUxOYXhpSnVGdEdjc0t6dWw2Q0FyUW5DUlRaOVdQ?=
+ =?utf-8?B?NmZkVjhrZUJlTEE5clpEUFltQXBUVjVGcEJ2cGlxemxQY1drRWpkOHJqQnhD?=
+ =?utf-8?B?YzZSVHk2c1dXaGtQblVKeEVjc0ExT1pENmFkOHpzL0NLTGFsRzVxNS84WnBm?=
+ =?utf-8?B?SHI5Rjh0MXZ0UnlGdjczeHQ1VWM1UnFNTEZpSjZJMG50Lzk3TlVZazJLZ2RV?=
+ =?utf-8?B?ekhiUWdSUk10NGdPQ2ZiZTg2NExoQ3ZESUJBS0F3TXlGREo4cHBvSGU1WXJi?=
+ =?utf-8?B?b3MrUkR6U0JXN2tGRHYxUnF6cEczUk5wYTd3Mko4UFF1QUxaVGNUUWVEdE9v?=
+ =?utf-8?B?OEJWeDJBejN2Rmp2UHk5S0dTWUhwejJrbGU5clFkbEs3SFV0UVQ5Nk1RWE8y?=
+ =?utf-8?B?YTlPNFdYUFB5RUd5WDE4TFk2QURNaWswcjNtckhsS0xRZG5TWDJQYWtHUXhI?=
+ =?utf-8?B?bXdaMVFDMldXYmlZTkxzTVAwZVpMZTAvaUNhMGh1b3ZiZk5iekpTZDJBbFdv?=
+ =?utf-8?B?aDBFWkxNNEQ2Q1VlcmR2UFIxL20wWXlraU5paFAwZE44ZHkzcWM2Tm0yU2c5?=
+ =?utf-8?B?aStmYUVlTWcySWdRa0NFbDh6aHpWbWJWK1JKNXM4dExwd2xEWC92VitDb3Zs?=
+ =?utf-8?B?dTFER25GZ2swdUhOWjJPSGtmMFFGRnRwamZIUTE3YTFzKzRHWk1kK1lzZlNZ?=
+ =?utf-8?B?U1F4ZzhzWEFmNWtaNmtFY2EvaWtZdW9vN1VPU0RITUdRcFFoRm1WUCswbGJM?=
+ =?utf-8?B?LzBqNnZiNU5qMXAwV0huVG5HRUNvTVFIbDRZYVRJRHBNZHRXSkFMNlVBSlgw?=
+ =?utf-8?B?SFo4Z1NhWEVBV2JiUmZremxiMTZUVGJmQXk5ZjRacFIrQ1lNUnJBNHZMOGor?=
+ =?utf-8?B?ZWpQK240UkF0dktHZlA0MURJNnlWZDJOSStzMk96USszNnF3bnFYL3hvTTM5?=
+ =?utf-8?B?aWFMQnJTcnhDMEJoMW1kRy9xS1V1UHIyL2tMbDU1bDFYR0VpTTY5QXpGZGRp?=
+ =?utf-8?B?UVFFNkNqTi82VFBUaUFKNDRrK0dLdXVCeGRYTEdZVU1jTG10dXVSOW82aGVs?=
+ =?utf-8?Q?ur26FH1Kzj6Jv4dVDFTqp2Zkt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 842ae886-f444-4615-2663-08dba28329f9
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 20:11:50.9948
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 20:14:03.2801
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T0jrba2ewEBlauf2oTMkrxQA88bYAhVA4yNTJyipBeL53GPhPgfwbwvbZTN5JgH3JjY3JF/HuzOwNFssc7QUmg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7606
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0FhHZnUEPo3rOOW2/UL+ZOwcBWoDGZifBzX3rkcfYCQNu29RmFYXbbAg/6mOqeakwhUdWragwGpGFSnnDnNiCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5817
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rob,
-
-On Mon, Aug 21, 2023 at 02:58:40PM -0500, Rob Herring wrote:
-> On Thu, Aug 17, 2023 at 06:06:44PM +0300, Vladimir Oltean wrote:
-> > Illustrate how the backplane AN/LT blocks can be instantiated on the
-> > LX2160A SoC with SerDes protocol 19.
-> > 
-> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > ---
-> >  .../devicetree/bindings/net/ethernet-phy.yaml |   8 +
-> >  .../bindings/net/fsl,backplane-anlt.yaml      | 238 ++++++++++++++++++
-> >  2 files changed, 246 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/fsl,backplane-anlt.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > index c1241c8a3b77..96fa672e4786 100644
-> > --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > @@ -49,6 +49,14 @@ properties:
-> >        - items:
-> >            - pattern: "^ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$"
-> >            - const: ethernet-phy-ieee802.3-c45
-> > +      - items:
-> > +          - const: fsl,lx2160a-backplane-anlt
-> > +          - const: ethernet-phy-ieee802.3-c45
+On 8/21/2023 1:05 PM, Jakub Kicinski wrote:
 > 
-> What's the benefit of having ethernet-phy-ieee802.3-c45? Will it work if 
-> the OS only understands that and not fsl,lx2160a-backplane-anlt?
-
-No. The "is_c45" bool won't get set correctly in fwnode_mdiobus_register_phy().
-
-	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
-
-With that bool set incorrectly, the MDIO protocol cannot access the device's
-registers.
-
-> > +        description:
-> > +          Some C45 PHYs have no PHY ID in the standard location, and there is
-> > +          also no PHY ID allocated for them to fake. They are identified by the
-> > +          primary compatible string, plus the secondary one to distinguish them
-> > +          from a raw MDIO device.
-> >  
-> >    reg:
-> >      minimum: 0
-> > diff --git a/Documentation/devicetree/bindings/net/fsl,backplane-anlt.yaml b/Documentation/devicetree/bindings/net/fsl,backplane-anlt.yaml
-> > new file mode 100644
-> > index 000000000000..7282e93b1dd4
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/fsl,backplane-anlt.yaml
-> > @@ -0,0 +1,238 @@
-> > +# SPDX-License-Identifier: GPL-2.0+
+> On Mon, 21 Aug 2023 12:42:52 -0700 Nelson, Shannon wrote:
+>>> Nope, it's harmless, no Fixes needed.
+>>> Fixes is for backporting, why would we backport this.
+>>
+>> Okay.
+>>
+>> Unfortunately I experimented with sending the "changes requested"
+>> message to the pw bot just before receiving your note...
 > 
-> Not the right license.
+> As luck would have it - seems like something in the copious Outlook
+> headers confuses python's email library:
 
-What's wrong with it?
+Well, "lucky" me?
 
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/fsl,backplane-anlt.yaml
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml
-> > +
-> > +title: Freescale Backplane Ethernet PHY
-> > +
-> > +maintainers:
-> > +  - Vladimir Oltean <vladimir.oltean@nxp.com>
-> > +
-> > +description: |
-> > +  Some QorIQ and Layerscape SoCs have an additional block on each SerDes
-> > +  networking lane, based on an IP core from MoreThanIP, which performs IEEE
-> > +  802.3 clause 73 base page exchanges (for auto-negotiation) and clause 72
-> > +  training frame exchanges (for link training).
-> > +
-> > +  By default, this AN/LT block comes up with auto-negotiation disabled, and
-> > +  in that case it allows itself to be quickly bypassed from the data path and
-> > +  for the PCS link to come up without its involvement.
-> > +
-> > +  Software can optionally make use of it, to turn the PCS, AN/LT block and lane
-> > +  (PMA/PMD) into a full copper backplane internal PHY.
-> > +
-> > +  As a warning, the binding for the multi-lane link modes (40GBase-KR4) is not
-> > +  currently backed up by a driver implementation.
-> > +
-> > +allOf:
-> > +  - if:
-> > +      properties:
-> > +        compatible:
-> > +          - items:
-> > +              - const: fsl,lx2160a-backplane-anlt
-> > +              - const: ethernet-phy-ieee802.3-c45
-> 
-> Use "contains" and drop ethernet-phy-ieee802.3-c45.
+Fine...
 
-Thanks, I'll try it.
+Acked-by: Shannon Nelson <shannon.nelson@amd.com>
 
-> > +    then:
-> > +      $ref: ethernet-phy.yaml#
-> > +
-> > +properties:
-> > +  compatible:
-> > +    oneOf:
-> > +      - items:
-> > +          - const: fsl,lx2160a-backplane-anlt
-> > +          - const: ethernet-phy-ieee802.3-c45
-> > +      - const: fsl,lx2160a-secondary-anlt
-> > +
-> > +  reg:
-> > +    minimum: 0
-> > +    maximum: 31
-> > +    description: |
-> > +      The address of the AN/LT block within the internal MDIO bus of the MAC it
-> > +      is attached to.
-> > +
-> > +      In the 1000Base-KX and 10GBase-KR link modes, the AN/LT block responds at
-> > +      the same MDIO address as the PCS (determined by the SGMIInCR1[MDEV_PORT]
-> > +      or SXGMIInCR1[MDEV_PORT] registers of the SerDes block, by default 0).
-> > +      The PCS and AN/LT block respond to different MMDs, though.
-> > +
-> > +      In the 25GBase-KR and higher link modes, the AN/LT block responds at a
-> > +      different MDIO address than the PCS, determined by the
-> > +      ANLTnCR1[MDEV_PORT] register of the SerDes block. By default this is 4
-> > +      for lanes A and E, 5 for lanes B and F, 6 for lanes C and G, 7 for lanes
-> > +      D and H.
-> > +
-> > +      The PCS responds in all cases at the address determined by the MDEV_PORT
-> > +      field of the SGMIInCR1, SXGMIIaCR1, E25GaCR1, E40GaCR1, E50GaCR1 or
-> > +      E100GaCR1 registers of the SerDes block.
-> > +
-> > +  phys:
-> > +    maxItems: 1
-> > +    description:
-> > +      phandle for the generic PHY (SerDes lane) that acts as PMA/PMD layer
-> > +
-> > +  pcs-handle:
-> > +    maxItems: 1
-> > +    description:
-> > +      phandle for the technology-dependent PCS block corresponding to the
-> > +      initial (RCW-based) configuration of the port. Must be omitted for the
-> > +      link modes where the PCS and AN/LT block respond at the same MDIO
-> > +      address. Must be specified otherwise.
-> > +
-> > +  secondary-anlt-handle:
-> 
-> Needs a vendor prefix and type.
 
-Ok (assuming this will remain in the final solution, after PHY maintainers' review)
-
-> > +    maxItems: 1
-> > +    description:
-> > +      In case this is the primary (first) lane of a multi-lane link mode, this
-> > +      property holds an array of phandles for the other AN/LT blocks, that are
-> > +      involved in link training but not in auto-negotiation. These have the
-> > +      "fsl,lx2160a-secondary-anlt" compatible string.
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - phys
-> > +
-> > +unevaluatedProperties: false
-> > +
-> > +examples:
-> > +
-> > +  # LX2160A lanes A, B, C, D with SerDes 1 protocol 19: dpmac2 uses 40GBase-KR4
-> > +  - |
-> > +    dpmac2 {
-> > +        phy-handle = <&mac2_backplane_anlt>;
-> > +        phy-connection-type = "internal";
-> > +    };
-> > +
-> > +    pcs_mdio2 {
-> 
-> mdio {
-
-Hmm, is it bad if I can keep the name? (it's actually important for documentary purposes)
-Actually I wanted to put a label like "pcs_mdio2: mdio {", but I couldn't,
-and this is what led me to the compromise.
-
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +        status = "okay";
-> 
-> Don't need status in examples.
-
-Ok.
-
-> > +
-> > +        pcs2: ethernet-phy@0 {
-> > +            reg = <0>;
-> > +        };
-> > +
-> > +        mac2_backplane_anlt: ethernet-phy@7 {
-> > +            compatible = "fsl,lx2160a-backplane-anlt",
-> > +                          "ethernet-phy-ieee802.3-c45";
-> > +            reg = <7>; /* according to ANLTDCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 3>; /* lane D */
-> > +            max-speed = <40000>;
-> > +            pcs-handle = <&pcs2>;
-> > +            secondary-anlt-handle = <&mac2_lane2_anlt>, <&mac2_lane3_anlt>,
-> > +                                    <&mac2_lane4_anlt>;
-> > +        };
-> > +
-> > +        mac2_lane2_anlt: ethernet-backplane-anlt@6 {
-> > +            compatible = "fsl,lx2160a-secondary-anlt";
-> > +            reg = <6>; /* according to ANLTCCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 2>; /* lane C */
-> > +        };
-> > +
-> > +        mac2_lane3_anlt: ethernet-backplane-anlt@5 {
-> > +            compatible = "fsl,lx2160a-secondary-anlt";
-> > +            reg = <5>; /* according to ANLTBCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 1>; /* lane B */
-> > +        };
-> > +
-> > +        mac2_lane4_anlt: ethernet-backplane-anlt@4 {
-> > +            compatible = "fsl,lx2160a-secondary-anlt";
-> > +            reg = <4>; /* according to ANLTACR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 0>; /* lane A */
-> > +        };
-> > +    };
-> > +
-> > +  # LX2160A lane E with SerDes 1 protocol 19: dpmac6 uses 25GBase-KR
-> > +  - |
-> > +    dpmac6 {
-> > +        phy-handle = <&mac6_backplane_anlt>;
-> > +        phy-connection-type = "internal";
-> > +    };
-> > +
-> > +    pcs_mdio6 {
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +        status = "okay";
-> > +
-> > +        pcs6: ethernet-phy@0 {
-> > +            reg = <0>;
-> > +        };
-> > +
-> > +        mac6_backplane_anlt: ethernet-phy@4 {
-> > +            compatible = "fsl,lx2160a-backplane-anlt",
-> > +                          "ethernet-phy-ieee802.3-c45";
-> > +            reg = <4>; /* according to ANLTFCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 4>; /* lane E */
-> > +            max-speed = <25000>;
-> > +            pcs-handle = <&pcs6>;
-> > +        };
-> > +    };
-> > +
-> > +  # LX2160A lane F with SerDes 1 protocol 19: dpmac5 uses 25GBase-KR
-> > +  - |
-> > +    dpmac5 {
-> > +        phy-handle = <&mac5_backplane_anlt>;
-> > +        phy-connection-type = "internal";
-> > +    };
-> > +
-> > +    pcs_mdio5 {
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +        status = "okay";
-> > +
-> > +        pcs5: ethernet-phy@0 {
-> > +            reg = <0>;
-> > +        };
-> > +
-> > +        mac5_backplane_anlt: ethernet-phy@5 {
-> > +            compatible = "fsl,lx2160a-backplane-anlt",
-> > +                         "ethernet-phy-ieee802.3-c45";
-> > +            reg = <5>; /* according to ANLTFCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 5>; /* lane F */
-> > +            max-speed = <25000>;
-> > +            pcs-handle = <&pcs5>;
-> > +        };
-> > +    };
-> > +
-> > +  # LX2160A lane G with SerDes 1 protocol 19: dpmac4 uses 10GBase-KR
-> > +  - |
-> > +    dpmac4 {
-> > +        phy-handle = <&mac4_backplane_anlt>;
-> > +        phy-connection-type = "internal";
-> > +    };
-> > +
-> > +    pcs_mdio4 {
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +        status = "okay";
-> > +
-> > +        mac4_backplane_anlt: ethernet-phy@0 {
-> > +            compatible = "fsl,lx2160a-backplane-anlt",
-> > +                         "ethernet-phy-ieee802.3-c45";
-> > +            reg = <0>; /* merged with PCS SXGMIIGCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 7>; /* lane G */
-> > +            max-speed = <10000>;
-> > +            /* no pcs-handle to &pcs4 */
-> > +        };
-> > +    };
-> > +
-> > +  # LX2160A lane H with SerDes 1 protocol 19: dpmac3 uses 10GBase-KR
-> > +  - |
-> > +    dpmac3 {
-> > +        phy-handle = <&mac3_backplane_anlt>;
-> > +        phy-connection-type = "internal";
-> > +    };
-> > +
-> > +    pcs_mdio3 {
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +        status = "okay";
-> > +
-> > +        mac3_backplane_anlt: ethernet-phy@0 {
-> > +            compatible = "fsl,lx2160a-backplane-anlt",
-> > +                         "ethernet-phy-ieee802.3-c45";
-> > +            reg = <0>; /* merged with PCS SXGMIIHCR1[MDEV_PORT] */
-> > +            phys = <&serdes_1 7>; /* lane H */
-> > +            max-speed = <10000>;
-> > +            /* no pcs-handle to &pcs3 */
-> > +        };
-> > +    };
-> 
-> 5 examples yet not one for "fsl,lx2160a-secondary-anlt"
-
-Are you sure? They're in the first one:
-"LX2160A lanes A, B, C, D with SerDes 1 protocol 19: dpmac2 uses 40GBase-KR4"
-(and still not trimmed from this email)
 
