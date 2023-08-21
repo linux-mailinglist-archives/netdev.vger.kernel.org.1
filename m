@@ -1,177 +1,136 @@
-Return-Path: <netdev+bounces-29283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85CE778275F
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:50:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DB078277C
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 13:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45640280E80
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:50:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54247280E74
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 11:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2124C7D;
-	Mon, 21 Aug 2023 10:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C574C9F;
+	Mon, 21 Aug 2023 11:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E434C6D
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 10:50:00 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E7DDC
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:49:57 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fe12820bffso31433075e9.3
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:49:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279F94A28
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 11:00:23 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213E4DB;
+	Mon, 21 Aug 2023 04:00:22 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-525656acf4bso4077385a12.0;
+        Mon, 21 Aug 2023 04:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692614996; x=1693219796;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B+lN0+IGayThxnga723PyHme0lBxDtILznlbkbp2uxY=;
-        b=x2vY/3yrfaqI0g1mx1krIhF4Yq80+wTphOBNWYwbvpipXFjkdsSLuAVcymK11K301R
-         iWNrzXuy3FEpg3S9OUgpwWlhqXkYFQeAUcUSebuLHyHt/Jz6EvMQVRoR79Xmshx8FVWI
-         zmmZAZFIy4iFDdtxwvKzGF2cugSi7lM9C04h07oiT1wFUnvRcxil0bmH2pWLyF56LxxC
-         WCqZKUb57KaQnUDPN+lU5i05us0rjfH7lE5kQU3zqcLQwaox3+S8s8WrkmtZRFyATfep
-         tD5c7rT5EjuOpc47CcxnAX68X6DRYJl9kRvZCc3QvHJqo5tKxBVV4OyWF1Nh8LR6UnOs
-         8QJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692614996; x=1693219796;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1692615620; x=1693220420;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=B+lN0+IGayThxnga723PyHme0lBxDtILznlbkbp2uxY=;
-        b=AKIGaobwDafGzQfUQD1+QQ27LGRxTTyArWgf8sOgoy8kqkZgaIejyVmid+7jsczmbW
-         6c8O3opJudroZhNwP/va4FY8g4OPtXxMxbPBZ1ttI9rUc2b6hPRwBzWX0XCDSHXGUYn5
-         v/mkdWAOu8Tul+o99ZxJJBMGW8D1bu5c+5MPyWDQTIklFd/4HeNg0aUvb/FfXJnb5tqa
-         TYQOvOHtGFoSMFopS20ta4zg7MdrMcv3srfYE+bYmqJkDVi5C8mIELQOHPIK71nqNT+n
-         dKPqUO9925Vrizb0UANkuWqCVaTPeNmhOwqHgM+NBWFIPdqzVyNbLO8LrnuxiTX+9aFX
-         VNKw==
-X-Gm-Message-State: AOJu0Yz3AjHYAYm/I7N9ofH///FKPNkY91ggW49Lm2q3afP8EuvxqPr7
-	tloJaZIvvh1aMA//dfOOYP1+0w==
-X-Google-Smtp-Source: AGHT+IHuDn/WthxXrTIBs44zVpSkx5/xH6waEg2bdGG9q24sAZELKvNkvSLYJh580rBDwwpdp9VhUg==
-X-Received: by 2002:a05:6000:11:b0:319:8436:d77d with SMTP id h17-20020a056000001100b003198436d77dmr4891208wrx.37.1692614996024;
-        Mon, 21 Aug 2023 03:49:56 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id q16-20020a05600000d000b0031c56218984sm2209661wrx.104.2023.08.21.03.49.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 03:49:55 -0700 (PDT)
-Date: Mon, 21 Aug 2023 12:49:54 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, moshe@nvidia.com, saeedm@nvidia.com,
-	shayd@nvidia.com, leon@kernel.org
-Subject: Re: [patch net-next 0/4] net/mlx5: expose peer SF devlink instance
-Message-ID: <ZONBUuF1krmcSjoM@nanopsycho>
-References: <20230815145155.1946926-1-jiri@resnulli.us>
- <20230817193420.108e9c26@kernel.org>
- <ZN8eCeDGcQSCi1D6@nanopsycho>
- <20230818142007.206eeb13@kernel.org>
+        bh=oGlPkN5vR6/cXafRltT2qDHXCkNMNiZanfUv1AGHWHA=;
+        b=cX28qcpIpFYdPtU2I6lF4if5HSOmOSyw06W7Tg050kD8WyF6yNDeNL6Giqf5ThEeC6
+         e+CybgtXogLy1uRbi3c2NTFpPb5+3FW9KLQrNffSu/E6SPRzwYDMuY8Fcl1jjelnB6hR
+         DFLIIRXbErUnGoMwvNH+BRWPPrt5r9E6jM637DJfAtF+pSo1wfQjUyTd81EER2Kqzowt
+         TA7gQR12TEiAhwSKfUZf+PY/xsazKqKfnuidzBMw5rdtX+ubvcts6oeOoiLv40ADR5w1
+         8j4LyLq3ky5XjGj+mflB7wCBqjeEGJ+gL9SxRArHrORVqCi6+T+FsZz6eM8gLMUsgGzV
+         bG/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692615620; x=1693220420;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oGlPkN5vR6/cXafRltT2qDHXCkNMNiZanfUv1AGHWHA=;
+        b=TmKumA7K2KnXcypxvBwn0I7eQf9Ol93IaCbok9WkpeVssrezKCFHkH/W0l2BHKMHJV
+         GACnAv9N0CuT7N+d2AZhwzP2fglIE/5bX982WZtFC6E3HGrOVZQnPRgKeJYC9+uRujEZ
+         aihHuQ8bAT87abz/jSrce3H8x2fYAC9ef1qYSihUCkzzmCB2w52htYplM7Z6L97GZjsV
+         +bzxZ7Qq8cOeB5JbTDoi/RDZAFUkKNgIcWIksvYZZw2/ObP0dvwp3tQEyHXgY+PeuA4k
+         FzjxPOuZOBk6UOGNFIdp/K/ZMC1Rl4y1hcQ0khAYkZ1q0Izxz29DW7kOs+W2San+bOOx
+         ck0Q==
+X-Gm-Message-State: AOJu0YyUr2FA1HGJIhHk/2bAleSwJUj1WeCCciSJLpr9lEI4tTYiTx/O
+	ielDl0YB8GSlilTvCux7bDgCXVjNoj7veFWJI98=
+X-Google-Smtp-Source: AGHT+IG+XWmQXevDO4t9KhuUGEuXpHar0oV8iglmHHAb/6YvZIzsSvu2qUz631d6EAz7jMsg2rQMSqh3+Q8bPUyHvoE=
+X-Received: by 2002:a17:906:1dd:b0:99b:dd1d:bc58 with SMTP id
+ 29-20020a17090601dd00b0099bdd1dbc58mr5612591ejj.41.1692615620275; Mon, 21 Aug
+ 2023 04:00:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230818142007.206eeb13@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230816111310.1656224-1-keguang.zhang@gmail.com>
+ <20230816111310.1656224-2-keguang.zhang@gmail.com> <a9a7b65c-ef0b-9f66-b197-548733728d44@linaro.org>
+In-Reply-To: <a9a7b65c-ef0b-9f66-b197-548733728d44@linaro.org>
+From: Keguang Zhang <keguang.zhang@gmail.com>
+Date: Mon, 21 Aug 2023 19:00:03 +0800
+Message-ID: <CAJhJPsXEf0Yuxasq24X=x_JtUJZrNC1aowfeuu9QM2kz+A=asQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] dt-bindings: mfd: syscon: Add compatibles for
+ Loongson-1 syscon
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Aug 18, 2023 at 11:20:07PM CEST, kuba@kernel.org wrote:
->On Fri, 18 Aug 2023 09:30:17 +0200 Jiri Pirko wrote:
->> >The devlink instance of the SF stays in the same network namespace 
->> >as the PF?  
->> 
->> SF devlink instance is created in init_ns and can move to another one.
->> So no.
->> 
->> I was thinking about this, as with the devlink handles we are kind of in
->> between sysfs and network. We have concept of network namespace in
->> devlink, but mainly because of the related netdevices.
->> 
->> There is no possibility of collision of devlink handles in between
->> separate namespaces, the handle is ns-unaware. Therefore the linkage to
->> instance in different ns is okay, I believe. Even more, It is handy as
->> the user knows that there exists such linkage.
->> 
->> What do you think?
+On Sat, Aug 19, 2023 at 10:23=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> On 16/08/2023 13:13, Keguang Zhang wrote:
+> > Add Loongson LS1B and LS1C compatibles for system controller.
+>
+> I asked not to use the same compatible for different blocks. Compatible
+> is dwmac, but are you still going to use for other blocks? Please write
+> proper description of the hardware.
+>
+Sorry. I didn't make myself clear.
+The SoC only has one syscon with two registers.
+And Each register contains settings for multiple devices.
+Besides DWMAC, this syscon will be used for other devices.
+Should I keep using loongson,ls1b-syscon/loongson,ls1c-syscon?
+
+
+> >
+> > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> > ---
+> > V1 -> V2: Make the syscon compatibles more specific
+> >
+> >  Documentation/devicetree/bindings/mfd/syscon.yaml | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/mfd/syscon.yaml b/Docume=
+ntation/devicetree/bindings/mfd/syscon.yaml
+> > index 8103154bbb52..d701fff02abe 100644
+> > --- a/Documentation/devicetree/bindings/mfd/syscon.yaml
+> > +++ b/Documentation/devicetree/bindings/mfd/syscon.yaml
+> > @@ -49,6 +49,8 @@ properties:
+> >                - hisilicon,peri-subctrl
+> >                - hpe,gxp-sysreg
+> >                - intel,lgm-syscon
+> > +              - loongson,ls1b-dwmac-syscon
+> > +              - loongson,ls1c-dwmac-syscon
+>
+>
+> Best regards,
+> Krzysztof
 >
 
-First of all, I'm having difficulties to understand exactly what you
-say. I'll try my best with the reply :)
 
+--
+Best regards,
 
->The way I was thinking about it is that the placement of the dl
->instance should correspond to the entity which will be configuring it.
->
->Assume a typical container setup where app has net admin in its
->netns and there is an orchestration daemon with root in init_net 
->which sets the containers up.
->
->Will we ever want the app inside the netns to configure the interface
->via the dl instance? Given that the SF is like giving the container
->full access to the HW it seems to me that we should also delegate 
-
-Nope. SF has limitations that could be set by devlink port function
-caps. So no full HW access.
-
-
->the devlink control to the app, i.e. move it to the netns?
->
->Same thing for devlink instances of VFs.
-
-Like VFs, SFs are getting probed by mlx5 driver. Both create the devlink
-instances in init_ns. For both the user can reload them to a different
-netns. It's consistent approach.
-
-I see a possibility to provide user another ATTR to pass during SF
-activation that would indicate the netns new instance is going to be
-created in (of course only if it is local). That would provide
-the flexibility to solve the case you are looking for I believe.
-***
-
->
->The orchestration daemon has access to the "PF" / main dl instance of
->the device, and to the ports / port fns so it has other ways to control
->the HW. While the app would otherwise have no devlink access.
->
->So my intuition is that the devlink instance should follow the SF
->netdev into a namespace.
-
-It works the other way around. The only way to change devlink netns is
-to reload the instance to a different netns. The related
-netdevice/netdevices are reinstantiated to that netns. If later on the
-user decides to move a netdev to a different netns, he can do it.
-
-This behavious is consistent for all devlink instances, devlink port and
-related netdevice/netdevices, no matter if there is only one netdevice
-of more. What you suggest, I can't see how that could work when instance
-have multiple netdevices.
-
-
->
->And then the next question is - once the devlink instances are in
->different namespaces - do we still show the "nested_devlink" attribute?
->Probably yes but we need to add netns id / link as well?
-
-Not sure what is the usecase. Currently, once VFs/SFs/ could be probed
-and devlink instance created in init_ns, the orchestrator does not need
-this info.
-
-In future, if the extension I suggested above (***) would be
-implemented, the orchestrator still knows the netns he asked the
-instance to be created in.
-
-So I would say is it not needed for anything. Plus it would make code
-more complex making sure the notifications are coming in case of SF
-devlink instance netns changes.
-
-So do you see the usecase? If not, I would like to go with what I have
-in this patchset version.
-
+Keguang Zhang
 
