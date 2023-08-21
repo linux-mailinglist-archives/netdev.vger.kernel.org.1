@@ -1,166 +1,134 @@
-Return-Path: <netdev+bounces-29245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D557824EF
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:53:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5B87824F2
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579861C2085B
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:53:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05639280EC9
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2721C08;
-	Mon, 21 Aug 2023 07:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CE21C32;
+	Mon, 21 Aug 2023 07:55:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6861867
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:53:26 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE23DBC
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:53:24 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99cce6f7de2so407589966b.3
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:53:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017F61848
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:55:04 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CFCB1
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:55:02 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bee82fad0fso17038055ad.2
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:55:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google; t=1692604403; x=1693209203;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=y62hmR88pA4UtBccW8+hc1HjFNxlERoi2gFRG58Bjhg=;
-        b=keHVNwAzoo2O5cW0dwMpaYHIxCoQzBVBie0Kf6ztRcRLG0V7GZmVAF+kOOplQLE2Oj
-         J0coR4tCtvOowauZuHU7gV3zZcE2ft5dzT/j/qTW8c+bZfFaPTJpBWLnjwRVtlFpIje7
-         LaX33AIS7xHEAVHAOgKnVLX4lTmQ4R/XjYHr4=
+        d=gmail.com; s=20221208; t=1692604502; x=1693209302;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VxU+EyqkkEcnemfr3bCpvA3lQfG1XU+OjBC6Fi8m8Ec=;
+        b=lr4LGv5pq6xpRKLKjltisnMe6JAeSZaONGAeCvgRFRVuSQMLiHtaX8iVuwIfbwLrfg
+         Pmk6y76zFhnobcINF6RKWqoWHdjcc7uF4p6jjK9DKBOE0nag+5MI9+kNFQyK9qIyQJZe
+         c/X/qQ9uCPYA7Lfb/HCEKOe9J9k7Z61L3QA1gAY+kDJDRaqk//hMpA4yMtVYDoicJXEJ
+         Q0j63BJlkIH+9oq8IEiRoFgKxExjktKUMsAwY18nhyWbwSq1JlD+vVt+MZadQ6SV00r2
+         BQ4gnZPO+gwGopftxaHfzIfAzurSynI4p2SclCZy14Kc4EhCYc1HNZfOVAHug8opQCvR
+         Bj4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692604403; x=1693209203;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y62hmR88pA4UtBccW8+hc1HjFNxlERoi2gFRG58Bjhg=;
-        b=YXhX2Efr/ZrU+wD6v9Ch+XK6vQGWvVVWiV/wvbA+Doo4Hxixk2cvinJz2ylQkAGtdT
-         kKu//YkSkLzRs8BWyYUyXP2LZdutZTNn3e3L1mYRpz2WAS1LI17K8Lr8pnt+uGeN1ZT5
-         aSmFNorYnSKZIUbr8mAz9cc6Jz65jD3m3H7kjyJhZ5C9Gm45wU30xHeN/nhcPGgBP5mw
-         9JMuHUcxMjMWB8APNMBTgMDsTmpucpqPaC0rYlNtzR7Wgdch1v+v0yciQ8nRQ8zeTtw1
-         VVQFwcrF8uqXm/m3cn8mPeiEga27ek9HDrHJ1JhJ4iRU3AVtZ9MRwEEXaeHUE6O5O3QN
-         NPQQ==
-X-Gm-Message-State: AOJu0Ywa2jnXbm2P/fqxLwQReJvABl/6e9+T/w1TLduxf4R8qSowWUI8
-	eGtJEGJ2ozt/bwuJffq/D0iZQg==
-X-Google-Smtp-Source: AGHT+IF8q7WBQx+MjQNIY8NaJ47ngN0QsagP+g4zPvfBnvOHiCIPVI55m+6w9wRePX8L/MGpe6e/gw==
-X-Received: by 2002:a17:907:7897:b0:993:f15f:efb7 with SMTP id ku23-20020a170907789700b00993f15fefb7mr4514534ejc.8.1692604403208;
-        Mon, 21 Aug 2023 00:53:23 -0700 (PDT)
-Received: from cloudflare.com (79.184.134.65.ipv4.supernova.orange.pl. [79.184.134.65])
-        by smtp.gmail.com with ESMTPSA id t3-20020a170906a10300b00993860a6d37sm6051184ejy.40.2023.08.21.00.53.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 00:53:22 -0700 (PDT)
-References: <20230811093237.3024459-1-liujian56@huawei.com>
- <20230811093237.3024459-2-liujian56@huawei.com>
-User-agent: mu4e 1.6.10; emacs 28.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Liu Jian <liujian56@huawei.com>
-Cc: john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 1/7] bpf, sockmap: add BPF_F_PERMANENTLY
- flag for skmsg redirect
-Date: Mon, 21 Aug 2023 09:40:45 +0200
-In-reply-to: <20230811093237.3024459-2-liujian56@huawei.com>
-Message-ID: <87v8d86dce.fsf@cloudflare.com>
+        d=1e100.net; s=20221208; t=1692604502; x=1693209302;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VxU+EyqkkEcnemfr3bCpvA3lQfG1XU+OjBC6Fi8m8Ec=;
+        b=TYEP+8D1PoaBZANKdXuUM/UQLE23MukhztoERslqD2bIMw7tA7g0KnAiznqAuN0eyz
+         fzvPOIVGPKvLAy/eqqSHbA3XTc01HwfW7oc9cam01B5cKJr5Y9ZC51WlGDWsuKf9INl1
+         auyXhpLcDFvQY2HBRYLVHHMbbpdzACeIqTlzVOxX0DnP7OegiJPQhntbwCEcTQ5d3Dpa
+         pMNG4FhP9cYlfH+y1hvu1fF/l8OSw73R0OY6oViCKmB46381hLdvLLJdI9Qy6jXXE0LQ
+         /JlTJLQvThM8k5poDVov/vzlocWP/ocfLaR5RXoB0Gtdp8xwiap/AChwzXsDui0eaS88
+         84PA==
+X-Gm-Message-State: AOJu0YycM6mxZRTS/lmi9ipWuRWbWToKElXSus0a0fSIfFODj9fAzemY
+	/vPol1oVnI29EcRhbIIzLg0=
+X-Google-Smtp-Source: AGHT+IHqKJIY80ZEZvac4WYxJkk1R5lDQ4xnmaDsAhR7Vk50qjSG4wR2iw1DrJK+t6lC5kXFNPCtww==
+X-Received: by 2002:a17:902:6807:b0:1b8:94e9:e7b0 with SMTP id h7-20020a170902680700b001b894e9e7b0mr3494961plk.9.1692604502177;
+        Mon, 21 Aug 2023 00:55:02 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id j15-20020a170902da8f00b001bba7aab826sm6348838plx.163.2023.08.21.00.54.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Aug 2023 00:55:01 -0700 (PDT)
+Message-ID: <df77249e-3ac1-e933-fdfb-464f37a19df6@gmail.com>
+Date: Mon, 21 Aug 2023 15:54:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH net V2] virtio-net: set queues after driver_ok
+Content-Language: en-US
+To: Jason Wang <jasowang@redhat.com>,
+ "Michael S.Tsirkin, Red Hat" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, xuanzhuo@linux.alibaba.com
+References: <20230810031256.813284-1-jasowang@redhat.com>
+From: Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230810031256.813284-1-jasowang@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 11, 2023 at 05:32 PM +08, Liu Jian wrote:
-> If the sockmap msg redirection function is used only to forward packets
-> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
-> program is the same each time. In this case, the BPF program only needs to
-> be run once. Add BPF_F_PERMANENTLY flag to bpf_msg_redirect_map() and
-> bpf_msg_redirect_hash() to implement this ability.
->
-> Then we can enable this function in the bpf program as follows:
-> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENTLY);
->
-> Test results using netperf  TCP_STREAM mode:
-> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
-> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
-> done
->
-> before:
-> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
-> after:
-> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
->
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
+On 10/8/2023 11:12 am, Jason Wang wrote:
+> Commit 25266128fe16 ("virtio-net: fix race between set queues and
+> probe") tries to fix the race between set queues and probe by calling
+> _virtnet_set_queues() before DRIVER_OK is set. This violates virtio
+> spec. Fixing this by setting queues after virtio_device_ready().
+> 
+> Note that rtnl needs to be held for userspace requests to change the
+> number of queues. So we are serialized in this way.
+> 
+> Fixes: 25266128fe16 ("virtio-net: fix race between set queues and probe")
+> Reported-by: Dragos Tatulea <dtatulea@nvidia.com>
+
+I had the same issue to report and this fix helped me out.
+Tested-by: Like Xu <likexu@tencent.com>
+
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  include/linux/skmsg.h          |  1 +
->  include/uapi/linux/bpf.h       |  7 +++++--
->  net/core/skmsg.c               |  1 +
->  net/core/sock_map.c            |  4 ++--
->  net/ipv4/tcp_bpf.c             | 21 +++++++++++++++------
->  tools/include/uapi/linux/bpf.h |  7 +++++--
->  6 files changed, 29 insertions(+), 12 deletions(-)
->
-
-[...]
-
-> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-> index 81f0dff69e0b..36cf2b0fa6f8 100644
-> --- a/net/ipv4/tcp_bpf.c
-> +++ b/net/ipv4/tcp_bpf.c
-> @@ -419,8 +419,10 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->  		if (!psock->apply_bytes) {
->  			/* Clean up before releasing the sock lock. */
->  			eval = psock->eval;
-> -			psock->eval = __SK_NONE;
-> -			psock->sk_redir = NULL;
-> +			if (!psock->eval_permanently) {
-> +				psock->eval = __SK_NONE;
-> +				psock->sk_redir = NULL;
-> +			}
->  		}
->  		if (psock->cork) {
->  			cork = true;
-> @@ -433,9 +435,15 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->  		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
->  					    msg, tosend, flags);
->  		sent = origsize - msg->sg.size;
-> +		/* disable the ability when something wrong */
-> +		if (unlikely(ret < 0))
-> +			psock->eval_permanently = 0;
->  
-> -		if (eval == __SK_REDIRECT)
-> +		if (!psock->eval_permanently && eval == __SK_REDIRECT) {
->  			sock_put(sk_redir);
-> +			psock->sk_redir = NULL;
-> +			psock->eval = __SK_NONE;
-> +		}
->  
->  		lock_sock(sk);
->  		if (unlikely(ret < 0)) {
-
-Looking at the above changes, I'm wondering - have you considered
-introducing a dedicated a __sk_action for this? Like
-__SK_REDIRECT_PERMANENT?
-
-Just a gut feeling. Maybe it would make the code easier to ready if we
-don't have to have another flag remember about.
-
-Also, eval_permenently is not a great name, IMHO, because eval can be
-also PASS or NONE, to which this flag does not apply. If the flag needs
-to stay, it could be named something like redir_permanent so it's
-obvious that it applies just to REDIRECT action.
-
-[...]
+> The patch is needed for -stable.
+> Changes since V1: Tweak the commit log.
+> ---
+>   drivers/net/virtio_net.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 1270c8d23463..ff03921e46df 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -4219,8 +4219,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+>   	if (vi->has_rss || vi->has_rss_hash_report)
+>   		virtnet_init_default_rss(vi);
+>   
+> -	_virtnet_set_queues(vi, vi->curr_queue_pairs);
+> -
+>   	/* serialize netdev register + virtio_device_ready() with ndo_open() */
+>   	rtnl_lock();
+>   
+> @@ -4233,6 +4231,8 @@ static int virtnet_probe(struct virtio_device *vdev)
+>   
+>   	virtio_device_ready(vdev);
+>   
+> +	_virtnet_set_queues(vi, vi->curr_queue_pairs);
+> +
+>   	/* a random MAC address has been assigned, notify the device.
+>   	 * We don't fail probe if VIRTIO_NET_F_CTRL_MAC_ADDR is not there
+>   	 * because many devices work fine without getting MAC explicitly
 
