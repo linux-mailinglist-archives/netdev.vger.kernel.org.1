@@ -1,227 +1,166 @@
-Return-Path: <netdev+bounces-29244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7032A78248A
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:38:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D557824EF
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 09:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FB0B280EBC
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579861C2085B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 07:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3206B187A;
-	Mon, 21 Aug 2023 07:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2721C08;
+	Mon, 21 Aug 2023 07:53:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9219B1848
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:38:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4B7C433C7;
-	Mon, 21 Aug 2023 07:38:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692603532;
-	bh=ZdOlhyOJyytlSWORZProTiZcowwhgh5LZ6v+BAvnMts=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UzaU59giFr1nRQt8GOXJtkrCBVPRulg+rz590RgKum7EXDXQHSvuTut5oYVTOTZSY
-	 zlnf5X6VQNAHw60apeqP0qGwcoCkhkYLISIabTwVqJ0lg3lfQ2d0uFfGaI6FO7ZXpO
-	 0Sb4Y8mvorQ0Q3wrSdf/ajbOj4hwf9Q8AaGb5OeXjfyyBwUM9JaRasNmofVLh/yJW2
-	 XM9PrJAO8qPJ3nzrhI99fWXKRz5uKpbKyNAKSPj/m/wuxGQeYWxahNJzS6nQvya95r
-	 3y1C3fP1AVtmALwNGjKd2BhMU3MtOGUbqMc9SDNUsjInUXjwcycIq+fEBRd0+T4h3J
-	 xikUZ2lPxzdQg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-rdma@vger.kernel.org,
-	Maor Gottlieb <maorg@nvidia.com>,
-	Mark Zhang <markzhang@nvidia.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Raed Salem <raeds@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [GIT PULL v1] Please pull mlx5 MACsec RoCEv2 support
-Date: Mon, 21 Aug 2023 10:38:25 +0300
-Message-ID: <20230821073833.59042-1-leon@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6861867
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 07:53:26 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE23DBC
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:53:24 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99cce6f7de2so407589966b.3
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 00:53:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1692604403; x=1693209203;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=y62hmR88pA4UtBccW8+hc1HjFNxlERoi2gFRG58Bjhg=;
+        b=keHVNwAzoo2O5cW0dwMpaYHIxCoQzBVBie0Kf6ztRcRLG0V7GZmVAF+kOOplQLE2Oj
+         J0coR4tCtvOowauZuHU7gV3zZcE2ft5dzT/j/qTW8c+bZfFaPTJpBWLnjwRVtlFpIje7
+         LaX33AIS7xHEAVHAOgKnVLX4lTmQ4R/XjYHr4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692604403; x=1693209203;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y62hmR88pA4UtBccW8+hc1HjFNxlERoi2gFRG58Bjhg=;
+        b=YXhX2Efr/ZrU+wD6v9Ch+XK6vQGWvVVWiV/wvbA+Doo4Hxixk2cvinJz2ylQkAGtdT
+         kKu//YkSkLzRs8BWyYUyXP2LZdutZTNn3e3L1mYRpz2WAS1LI17K8Lr8pnt+uGeN1ZT5
+         aSmFNorYnSKZIUbr8mAz9cc6Jz65jD3m3H7kjyJhZ5C9Gm45wU30xHeN/nhcPGgBP5mw
+         9JMuHUcxMjMWB8APNMBTgMDsTmpucpqPaC0rYlNtzR7Wgdch1v+v0yciQ8nRQ8zeTtw1
+         VVQFwcrF8uqXm/m3cn8mPeiEga27ek9HDrHJ1JhJ4iRU3AVtZ9MRwEEXaeHUE6O5O3QN
+         NPQQ==
+X-Gm-Message-State: AOJu0Ywa2jnXbm2P/fqxLwQReJvABl/6e9+T/w1TLduxf4R8qSowWUI8
+	eGtJEGJ2ozt/bwuJffq/D0iZQg==
+X-Google-Smtp-Source: AGHT+IF8q7WBQx+MjQNIY8NaJ47ngN0QsagP+g4zPvfBnvOHiCIPVI55m+6w9wRePX8L/MGpe6e/gw==
+X-Received: by 2002:a17:907:7897:b0:993:f15f:efb7 with SMTP id ku23-20020a170907789700b00993f15fefb7mr4514534ejc.8.1692604403208;
+        Mon, 21 Aug 2023 00:53:23 -0700 (PDT)
+Received: from cloudflare.com (79.184.134.65.ipv4.supernova.orange.pl. [79.184.134.65])
+        by smtp.gmail.com with ESMTPSA id t3-20020a170906a10300b00993860a6d37sm6051184ejy.40.2023.08.21.00.53.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 00:53:22 -0700 (PDT)
+References: <20230811093237.3024459-1-liujian56@huawei.com>
+ <20230811093237.3024459-2-liujian56@huawei.com>
+User-agent: mu4e 1.6.10; emacs 28.2
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Liu Jian <liujian56@huawei.com>
+Cc: john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2 1/7] bpf, sockmap: add BPF_F_PERMANENTLY
+ flag for skmsg redirect
+Date: Mon, 21 Aug 2023 09:40:45 +0200
+In-reply-to: <20230811093237.3024459-2-liujian56@huawei.com>
+Message-ID: <87v8d86dce.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Changelog:
-v1:
- * Removed NULL check in first macsec patch as it is not needed.
- * Added more information about potential merge conflict.
-v0: https://lore.kernel.org/netdev/20230813064703.574082-1-leon@kernel.org/
-----------------------------------------------------------------
+On Fri, Aug 11, 2023 at 05:32 PM +08, Liu Jian wrote:
+> If the sockmap msg redirection function is used only to forward packets
+> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
+> program is the same each time. In this case, the BPF program only needs to
+> be run once. Add BPF_F_PERMANENTLY flag to bpf_msg_redirect_map() and
+> bpf_msg_redirect_hash() to implement this ability.
+>
+> Then we can enable this function in the bpf program as follows:
+> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENTLY);
+>
+> Test results using netperf  TCP_STREAM mode:
+> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
+> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
+> done
+>
+> before:
+> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
+> after:
+> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
+>
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> ---
+>  include/linux/skmsg.h          |  1 +
+>  include/uapi/linux/bpf.h       |  7 +++++--
+>  net/core/skmsg.c               |  1 +
+>  net/core/sock_map.c            |  4 ++--
+>  net/ipv4/tcp_bpf.c             | 21 +++++++++++++++------
+>  tools/include/uapi/linux/bpf.h |  7 +++++--
+>  6 files changed, 29 insertions(+), 12 deletions(-)
+>
 
-Hi,
+[...]
 
-This PR is collected from https://lore.kernel.org/all/cover.1691569414.git.leon@kernel.org
-and contains patches to support mlx5 MACsec RoCEv2.
+> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> index 81f0dff69e0b..36cf2b0fa6f8 100644
+> --- a/net/ipv4/tcp_bpf.c
+> +++ b/net/ipv4/tcp_bpf.c
+> @@ -419,8 +419,10 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>  		if (!psock->apply_bytes) {
+>  			/* Clean up before releasing the sock lock. */
+>  			eval = psock->eval;
+> -			psock->eval = __SK_NONE;
+> -			psock->sk_redir = NULL;
+> +			if (!psock->eval_permanently) {
+> +				psock->eval = __SK_NONE;
+> +				psock->sk_redir = NULL;
+> +			}
+>  		}
+>  		if (psock->cork) {
+>  			cork = true;
+> @@ -433,9 +435,15 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>  		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
+>  					    msg, tosend, flags);
+>  		sent = origsize - msg->sg.size;
+> +		/* disable the ability when something wrong */
+> +		if (unlikely(ret < 0))
+> +			psock->eval_permanently = 0;
+>  
+> -		if (eval == __SK_REDIRECT)
+> +		if (!psock->eval_permanently && eval == __SK_REDIRECT) {
+>  			sock_put(sk_redir);
+> +			psock->sk_redir = NULL;
+> +			psock->eval = __SK_NONE;
+> +		}
+>  
+>  		lock_sock(sk);
+>  		if (unlikely(ret < 0)) {
 
-It is based on -rc4 and such has minor conflict with net-next due to existance of IPsec packet offlosd
-in eswitch code and hwmon. The resolution for netdev is as follows:
+Looking at the above changes, I'm wondering - have you considered
+introducing a dedicated a __sk_action for this? Like
+__SK_REDIRECT_PERMANENT?
 
-Before:
-➜  kernel git:(net-next) git merge mlx5-next
-...
-Unmerged paths:
-  (use "git add/rm <file>..." as appropriate to mark resolution)
-	deleted by them: drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
-	both modified:   include/linux/mlx5/driver.h
+Just a gut feeling. Maybe it would make the code easier to ready if we
+don't have to have another flag remember about.
 
-➜  kernel git:(net-next) ✗ git diff
-diff --cc include/linux/mlx5/driver.h
-index c9d82e74daaa,728bcd6d184c..000000000000
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@@ -806,9 -804,12 +806,18 @@@ struct mlx5_core_dev 
-        struct mlx5_rsc_dump    *rsc_dump;
-        u32                      vsc_addr;
-        struct mlx5_hv_vhca     *hv_vhca;
-++<<<<<<< HEAD
- +      struct mlx5_hwmon       *hwmon;
- +      u64                     num_block_tc;
- +      u64                     num_block_ipsec;
-++=======
-+       struct mlx5_thermal     *thermal;
-+ #ifdef CONFIG_MLX5_MACSEC
-+       struct mlx5_macsec_fs *macsec_fs;
-+       /* MACsec notifier chain to sync MACsec core and IB database */
-+       struct blocking_notifier_head macsec_nh;
-+ #endif
-++>>>>>>> mlx5-next
-  };
-  
-  struct mlx5_db {
-* Unmerged path drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
+Also, eval_permenently is not a great name, IMHO, because eval can be
+also PASS or NONE, to which this flag does not apply. If the flag needs
+to stay, it could be named something like redir_permanent so it's
+obvious that it applies just to REDIRECT action.
 
-After:
-➜  kernel git:(net-next) ✗ git diff
-diff --cc include/linux/mlx5/driver.h
-index c9d82e74daaa,728bcd6d184c..000000000000
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@@ -806,9 -804,12 +806,14 @@@ struct mlx5_core_dev 
-        struct mlx5_rsc_dump    *rsc_dump;
-        u32                      vsc_addr;
-        struct mlx5_hv_vhca     *hv_vhca;
- -      struct mlx5_thermal     *thermal;
- +      struct mlx5_hwmon       *hwmon;
- +      u64                     num_block_tc;
- +      u64                     num_block_ipsec;
-+ #ifdef CONFIG_MLX5_MACSEC
-+       struct mlx5_macsec_fs *macsec_fs;
-+       /* MACsec notifier chain to sync MACsec core and IB database */
-+       struct blocking_notifier_head macsec_nh;
-+ #endif
-  };
-  
-  struct mlx5_db {
-* Unmerged path drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
-
-----------------------------------------------------------------
-
-From Patrisious:
-
-This series extends previously added MACsec offload support
-to cover RoCE traffic either.
-
-In order to achieve that, we need configure MACsec with offload between
-the two endpoints, like below:
-
-REMOTE_MAC=10:70:fd:43:71:c0
-
-* ip addr add 1.1.1.1/16 dev eth2
-* ip link set dev eth2 up
-* ip link add link eth2 macsec0 type macsec encrypt on
-* ip macsec offload macsec0 mac
-* ip macsec add macsec0 tx sa 0 pn 1 on key 00 dffafc8d7b9a43d5b9a3dfbbf6a30c16
-* ip macsec add macsec0 rx port 1 address $REMOTE_MAC
-* ip macsec add macsec0 rx port 1 address $REMOTE_MAC sa 0 pn 1 on key 01 ead3664f508eb06c40ac7104cdae4ce5
-* ip addr add 10.1.0.1/16 dev macsec0
-* ip link set dev macsec0 up
-
-And in a similar manner on the other machine, while noting the keys order
-would be reversed and the MAC address of the other machine.
-
-RDMA traffic is separated through relevant GID entries and in case of IP ambiguity
-issue - meaning we have a physical GIDs and a MACsec GIDs with the same IP/GID, we
-disable our physical GID in order to force the user to only use the MACsec GID.
-
-Thanks
-
-The following changes since commit 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4:
-
-  Linux 6.5-rc4 (2023-07-30 13:23:47 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
-
-for you to fetch changes up to 58dbd6428a6819e55a3c52ec60126b5d00804a38:
-
-  RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion (2023-08-20 12:35:24 +0300)
-
-----------------------------------------------------------------
-Patrisious Haddad (14):
-      macsec: add functions to get macsec real netdevice and check offload
-      net/mlx5e: Move MACsec flow steering operations to be used as core library
-      net/mlx5: Remove dependency of macsec flow steering on ethernet
-      net/mlx5e: Rename MACsec flow steering functions/parameters to suit core naming style
-      net/mlx5e: Move MACsec flow steering and statistics database from ethernet to core
-      net/mlx5: Remove netdevice from MACsec steering
-      net/mlx5: Maintain fs_id xarray per MACsec device inside macsec steering
-      RDMA/mlx5: Implement MACsec gid addition and deletion
-      net/mlx5: Add MACsec priorities in RDMA namespaces
-      IB/core: Reorder GID delete code for RoCE
-      net/mlx5: Configure MACsec steering for egress RoCEv2 traffic
-      net/mlx5: Configure MACsec steering for ingress RoCEv2 traffic
-      net/mlx5: Add RoCE MACsec steering infrastructure in core
-      RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion
-
- drivers/infiniband/core/cache.c                    |    6 +-
- drivers/infiniband/hw/mlx5/Makefile                |    1 +
- drivers/infiniband/hw/mlx5/macsec.c                |  364 +++
- drivers/infiniband/hw/mlx5/macsec.h                |   29 +
- drivers/infiniband/hw/mlx5/main.c                  |   41 +-
- drivers/infiniband/hw/mlx5/mlx5_ib.h               |   17 +
- drivers/net/ethernet/mellanox/mlx5/core/Kconfig    |    2 +-
- drivers/net/ethernet/mellanox/mlx5/core/Makefile   |    2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h       |    2 +-
- .../mellanox/mlx5/core/en_accel/en_accel.h         |    4 +-
- .../ethernet/mellanox/mlx5/core/en_accel/macsec.c  |  176 +-
- .../ethernet/mellanox/mlx5/core/en_accel/macsec.h  |   26 +-
- .../mellanox/mlx5/core/en_accel/macsec_fs.c        | 1393 -----------
- .../mellanox/mlx5/core/en_accel/macsec_fs.h        |   47 -
- .../mellanox/mlx5/core/en_accel/macsec_stats.c     |   22 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |    2 +-
- drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c   |    1 +
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |   37 +-
- .../ethernet/mellanox/mlx5/core/lib/macsec_fs.c    | 2410 ++++++++++++++++++++
- .../ethernet/mellanox/mlx5/core/lib/macsec_fs.h    |   64 +
- drivers/net/macsec.c                               |   12 +
- include/linux/mlx5/device.h                        |    2 +
- include/linux/mlx5/driver.h                        |   51 +
- include/linux/mlx5/fs.h                            |    2 +
- include/linux/mlx5/macsec.h                        |   32 +
- include/net/macsec.h                               |    2 +
- 26 files changed, 3118 insertions(+), 1629 deletions(-)
- create mode 100644 drivers/infiniband/hw/mlx5/macsec.c
- create mode 100644 drivers/infiniband/hw/mlx5/macsec.h
- delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.c
- delete mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec_fs.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/macsec_fs.h
- create mode 100644 include/linux/mlx5/macsec.h
+[...]
 
