@@ -1,163 +1,116 @@
-Return-Path: <netdev+bounces-29440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF856783426
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 22:59:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125D578342B
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 23:02:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DE8B280D61
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:59:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF4891C20909
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 21:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8D3125A2;
-	Mon, 21 Aug 2023 20:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5484811CAB;
+	Mon, 21 Aug 2023 21:02:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8F711737
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:59:28 +0000 (UTC)
-Received: from out-38.mta1.migadu.com (out-38.mta1.migadu.com [IPv6:2001:41d0:203:375::26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02639CE
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 13:59:25 -0700 (PDT)
-Message-ID: <59278e71-3a88-5da9-b46e-9992987d258d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692651564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fe40UAqHy2mSuHq32lY+2IGEBxta1jrbqGlWmnXdHbg=;
-	b=N5I0skx59JzXu2baJXbF38imzDjl43wA/zkHuZpM2JUs8BsEU+frZFEWx4uCLnx9NBL6qc
-	INNWA6aXZMMOVEGHPE3PnqS+69ABvQNoDFOaldOjkRxc4p9eMOsl2Zs34xzX4ncdXfQhW4
-	8Xjh+GYHPKguFsHq3g5NFCJKbi5wEkI=
-Date: Mon, 21 Aug 2023 13:59:12 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8044C9E
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 21:02:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AF61C433C7;
+	Mon, 21 Aug 2023 21:02:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692651727;
+	bh=gB2ytj3wFcjOc7INZ/jOObKGQyEl+qPZEUtXpCWGRnk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gFJBYbf3Ad/ZYPHvxcB4P34kM2LlcHRd2+lplCl+ODFEhFQ+D04GoYD7u2+/2ld9l
+	 x84X+Ujzr51lI1JQEUd9oD5NcBK6BvSy9/qW+uVWs1l4LBIauuy1lHIDmgeELBg710
+	 1KXHyynwojVxk7QxtNi+JBZMIDZOqsPVja5M7qi5g1ym6myWEiwLKhH77um6vWl8yZ
+	 z3rQG++nCimlhKGvOsJWvfI81hsGO2dtXfxC1jsRLn8oEmf1gBzX+9TG0s5xmvhFiO
+	 K3N8LKR4yWxD8VDXjRjc9ms81p8gQHV4yI9nEoWa4edPoB3LN9KWor4t4XmadYIbsk
+	 vPzA5QCQy4/aA==
+Date: Mon, 21 Aug 2023 14:02:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>, Alan
+ Brady <alan.brady@intel.com>, <emil.s.tantilov@intel.com>,
+ <jesse.brandeburg@intel.com>, <sridhar.samudrala@intel.com>,
+ <shiraz.saleem@intel.com>, <sindhu.devale@intel.com>, <willemb@google.com>,
+ <decot@google.com>, <andrew@lunn.ch>, <leon@kernel.org>, <mst@redhat.com>,
+ <simon.horman@corigine.com>, <shannon.nelson@amd.com>,
+ <stephen@networkplumber.org>, Alice Michael <alice.michael@intel.com>,
+ Joshua Hay <joshua.a.hay@intel.com>, Phani Burra <phani.r.burra@intel.com>
+Subject: Re: [PATCH net-next v5 14/15] idpf: add ethtool callbacks
+Message-ID: <20230821140205.4d3bc797@kernel.org>
+In-Reply-To: <b12c2182-484f-249f-1fd6-8cc8fafb1c6a@intel.com>
+References: <20230816004305.216136-1-anthony.l.nguyen@intel.com>
+	<20230816004305.216136-15-anthony.l.nguyen@intel.com>
+	<20230818115824.446d1ea7@kernel.org>
+	<b12c2182-484f-249f-1fd6-8cc8fafb1c6a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 9/9] selftests/bpf/sockopt: Add io_uring support
-Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, io-uring@vger.kernel.org, kuba@kernel.org,
- pabeni@redhat.com, krisman@suse.de, Wang Yufen <wangyufen@huawei.com>,
- =?UTF-8?Q?Daniel_M=c3=bcller?= <deso@posteo.net>,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
- willemdebruijn.kernel@gmail.com, Andrii Nakryiko <andrii@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
-References: <20230817145554.892543-1-leitao@debian.org>
- <20230817145554.892543-10-leitao@debian.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20230817145554.892543-10-leitao@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 8/17/23 7:55 AM, Breno Leitao wrote:
-> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-> index 538df8fb8c42..4da04242b848 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -362,6 +362,7 @@ CLANG_CFLAGS = $(CLANG_SYS_INCLUDES) \
->   
->   $(OUTPUT)/test_l4lb_noinline.o: BPF_CFLAGS += -fno-inline
->   $(OUTPUT)/test_xdp_noinline.o: BPF_CFLAGS += -fno-inline
-> +$(OUTPUT)/test_progs.o: CFLAGS += -I../../../include/
+On Mon, 21 Aug 2023 13:41:15 -0700 Linga, Pavan Kumar wrote:
+> On 8/18/2023 11:58 AM, Jakub Kicinski wrote:
+> > On Tue, 15 Aug 2023 17:43:04 -0700 Tony Nguyen wrote:  
+> >> +static u32 idpf_get_rxfh_indir_size(struct net_device *netdev)
+> >> +{
+> >> +	struct idpf_vport *vport = idpf_netdev_to_vport(netdev);
+> >> +	struct idpf_vport_user_config_data *user_config;
+> >> +
+> >> +	if (!vport)
+> >> +		return -EINVAL;  
+> > 
+> > defensive programming? how do we have a netdev and no vport?
+> 
+> During a hardware reset, the control plane will reinitialize its vport 
+> configuration along with the hardware resources which in turn requires 
+> the driver to reallocate the vports as well. For this reason the vports 
+> will be freed, but the netdev will be preserved.
 
-This is the tools/include? Is it really needed? iirc, some of the prog_tests/*.c 
-has already been using files from tools/include.
+HW reset path should take appropriate locks so that the normal control
+path can't be exposed to transient errors.
 
->   
->   $(OUTPUT)/flow_dissector_load.o: flow_dissector_load.h
->   $(OUTPUT)/cgroup_getset_retval_hooks.o: cgroup_getset_retval_hooks.h
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockopt.c b/tools/testing/selftests/bpf/prog_tests/sockopt.c
-> index 9e6a5e3ed4de..4693ad8bfe8f 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockopt.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockopt.c
-> @@ -1,5 +1,6 @@
->   // SPDX-License-Identifier: GPL-2.0
->   #include <test_progs.h>
-> +#include <io_uring/mini_liburing.h>
->   #include "cgroup_helpers.h"
->   
->   static char bpf_log_buf[4096];
-> @@ -38,6 +39,7 @@ static struct sockopt_test {
->   	socklen_t			get_optlen_ret;
->   
->   	enum sockopt_test_error		error;
-> +	bool				io_uring_support;
->   } tests[] = {
->   
->   	/* ==================== getsockopt ====================  */
-> @@ -53,6 +55,7 @@ static struct sockopt_test {
->   		.attach_type = BPF_CGROUP_GETSOCKOPT,
->   		.expected_attach_type = 0,
->   		.error = DENY_LOAD,
-> +		.io_uring_support = true,
+User space will 100% not know what to do with a GET reporting EINVAL.
 
-DENY_LOAD probably won't be an intersting test. The set/getsockopt won't be called.
+> >> +	dev = &vport->adapter->pdev->dev;
+> >> +	if (!(ch->combined_count || (ch->rx_count && ch->tx_count))) {
+> >> +		dev_err(dev, "Please specify at least 1 Rx and 1 Tx channel\n");  
+> > 
+> > The error msg doesn't seem to fit the second part of the condition.
+> >
+> 
+> The negation part is to the complete check which means it takes 0 
+> [tx|rx]_count into consideration.
 
-The existing test does not seem to have SOL_SOCKET for getsockopt also.
+Ah, missed the negation. In that case I think the check is not needed,
+pretty sure core checks this.
 
-> -static int run_test(int cgroup_fd, struct sockopt_test *test)
-> +/* Core function that handles io_uring ring initialization,
-> + * sending SQE with sockopt command and waiting for the CQE.
-> + */
-> +static int uring_sockopt(int op, int fd, int level, int optname,
-> +			 const void *optval, socklen_t optlen)
-> +{
-> +	struct io_uring_cqe *cqe;
-> +	struct io_uring_sqe *sqe;
-> +	struct io_uring ring;
-> +	int err;
-> +
-> +	err = io_uring_queue_init(1, &ring, 0);
-> +	if (err) {
-> +		log_err("Failed to initialize io_uring ring");
-> +		return err;
-> +	}
-> +
-> +	sqe = io_uring_get_sqe(&ring);
-> +	if (!sqe) {
-> +		log_err("Failed to get an SQE");
-> +		return -1;
+> >> +		return -EINVAL;
+> >> +	}
+> >> +
+> >> +	num_req_tx_q = ch->combined_count + ch->tx_count;
+> >> +	num_req_rx_q = ch->combined_count + ch->rx_count;
+> >> +
+> >> +	dev = &vport->adapter->pdev->dev;
+> >> +	/* It's possible to specify number of queues that exceeds max in a way
+> >> +	 * that stack won't catch for us, this should catch that.
+> >> +	 */  
+> > 
+> > How, tho?
+> 
+> If the user tries to pass the combined along with the txq or rxq values, 
+> then it is possbile to cross the max supported values. So the following 
+> checks are needed to protect those cases. Core checks the max values for 
+> the individual arguments but not the combined + [tx|rx].
 
-No need to io_uring_queue_exit() on the error path?
-
-
-> +	}
-> +
-> +	io_uring_prep_cmd(sqe, op, fd, level, optname, optval, optlen);
-> +
-> +	err = io_uring_submit(&ring);
-> +	if (err != 1) {
-> +		log_err("Failed to submit SQE");
-
-Use ASSERT_* instead.
-
-Regarding how to land this set,
-it will be useful to have the selftest running in the bpf CI. While there is 
-iouring changes, some of the changes is in bpf and/or netdev also. eg. Patch 3 
-already has a conflict with the net-next and bpf-next tree because of a recent 
-commit in socket.c on Aug 9.
-
-May be Alexi and Daniel can advise how was similar patch managed before ?
-
-
+I see, please add something along those lines to the comment.
 
