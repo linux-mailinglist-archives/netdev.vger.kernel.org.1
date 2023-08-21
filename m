@@ -1,143 +1,144 @@
-Return-Path: <netdev+bounces-29362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BDE4782E81
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 18:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 023A1782EC5
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 18:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC8E11C208E9
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:37:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F16CB1C2091D
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 16:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E957476;
-	Mon, 21 Aug 2023 16:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C627491;
+	Mon, 21 Aug 2023 16:50:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F9C6FDA
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 16:36:59 +0000 (UTC)
-Received: from mail-pg1-f208.google.com (mail-pg1-f208.google.com [209.85.215.208])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9BEAFF
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 09:36:57 -0700 (PDT)
-Received: by mail-pg1-f208.google.com with SMTP id 41be03b00d2f7-565aee93236so3803452a12.1
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 09:36:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488EB320F
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 16:50:17 +0000 (UTC)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26A9CC;
+	Mon, 21 Aug 2023 09:50:15 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-56a3e6bce68so745206a12.1;
+        Mon, 21 Aug 2023 09:50:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692636615; x=1693241415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XR2yyunJzTVylJd0O9OMot2bWsAj0OOysrvklSnCbu4=;
+        b=awZ8EcWECM2Gf+b7+fHdgw7ooZozUCf5/xbrV8Ub3ayWY6HpgbjDxyBaftAx1939KQ
+         8FdzvU5QvNOhM0GVlZSjFPyIQcAvKd5R9bEPOvOnrlf/okLkmNHBnx68cRIk1VhsaJiJ
+         npsotZm3pgEy2PPoIRVeNmERJX2icwmibmwnyON8jH62HlZVgjURKt3tA32bdWv014UF
+         5PzaLSFwLs8lemgh8PpYr/+qs/ZbN8leBkT4yqPyEHxmCz255vES8MNIg/TWcmOuDIeN
+         p9FPHH9NuuZk5YA1GMgZzOqWhFKWbmnfi6IAsvlBNBRrzaEjcT0BosLYUj7MXMXjpQD5
+         K6PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692635817; x=1693240617;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DscXzbPNxTBR1mFGaAB02zyy+OW3MXcEY6WXJZDd5nU=;
-        b=KKafzYcfCPr7j0+IEEkA1gmZlcQCbsTy8uQWPE5HSfFhbrD0HX1Cl6H9mOL9La9tGz
-         gB76t4PuWnTZve17coTgBSw/LdBXTPsO/d9dAVhvsK+kJXZGsvhwoLxJx0m1hlq/VzoS
-         6tmPoliNoQyh0eFsSUPOpV0Kdn6wR8RTQs4wYrpUXSdG23UlQwAaVPmsG/CHTVQAAC9P
-         Pa6Kxo7Tp/ILRoz7qXjTQbQF/OZ+mSbOPhx4RseLvBxV/gpxLl8i49mh1AgJO6M/WETI
-         q7wGE0X2d3VRB5Oc5ZkIJCk/SXgMP+Of8cBe4bTp71L/JQqO79hny4sVHAXBZ09A3+Mo
-         trNA==
-X-Gm-Message-State: AOJu0YyubxXO/GChfDLa+ul6lKYuvqjh+rF1SC/TG/VxWOIeuRFw9yxP
-	OTb2Fn+ZkHFdYgVC6wcgv66YOxizo21RFV3a+gvjLr5Lci/k
-X-Google-Smtp-Source: AGHT+IEQDWXwjb92oMzfXVoJdYwEHSi8DF11A7NLabTRacYoPPK2B/zbPpb4aoA/KqQaIFuvq1P2bXDHwug+ycWqbGfLzVMcjuKK
+        d=1e100.net; s=20221208; t=1692636615; x=1693241415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XR2yyunJzTVylJd0O9OMot2bWsAj0OOysrvklSnCbu4=;
+        b=h239MUI0lUFM0wqH3ljN5NdcUmZw+uwjievFU/58TkpBItA3Aeq6WEV9eVNdixFDwK
+         Q9TGqiFj2FyR2eKPVOHHZ7D6fBI0K5Tb+Nsce6pste1xVvw8N80faAdjVGKNMu7/Xb48
+         zg14Ea2wAQXfweQatDkWqYMgPQ3yIrzu+HpoO93EXy+ctFNCg7G2n2mhCN+0xDGVJb/X
+         2u3Tpxj48Svk99SlSMAQjEM3wJaQSgPAxQpWfFbLMgBJulaDSGrVJvwO1GVv9sM7WQji
+         CA4GgSK0YPYmB3BXVlCcTEUTewOrfFl7ginTB6wulgaW3xGHKz+Al3AVqFhXMnRbkI79
+         Ogxg==
+X-Gm-Message-State: AOJu0Yx5ZQjpblt9TkprHTim79GN3g0fiqqHTf5V6qzmGtxSmQLu3+hS
+	MKLIZ9E3n4H+IO9JLTkewn2dw+IV1e2cvyaH5Kw=
+X-Google-Smtp-Source: AGHT+IHiuWf7GBuYIkxaCdpdgJmZc6c20f/H/tO0At/LUg3HH4ULaGaMZtK6LsAajICuZKR1GOO0Hq8s4upJ2qM2zYU=
+X-Received: by 2002:a17:90a:a389:b0:269:7eea:d7f6 with SMTP id
+ x9-20020a17090aa38900b002697eead7f6mr3862231pjp.49.1692636615233; Mon, 21 Aug
+ 2023 09:50:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a63:a319:0:b0:565:e467:ef5e with SMTP id
- s25-20020a63a319000000b00565e467ef5emr1099865pge.5.1692635817459; Mon, 21 Aug
- 2023 09:36:57 -0700 (PDT)
-Date: Mon, 21 Aug 2023 09:36:57 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a249880603717c15@google.com>
-Subject: [syzbot] [net?] [wireless?] INFO: task hung in reg_process_self_managed_hints
-From: syzbot <syzbot+1f16507d9ec05f64210a@syzkaller.appspotmail.com>
-To: bigeasy@linutronix.de, davem@davemloft.net, edumazet@google.com, 
-	johannes@sipsolutions.net, kerneljasonxing@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de
+References: <20230817101014.3484715-1-martin@geanix.com> <20230817101014.3484715-2-martin@geanix.com>
+ <20230817094529.68ae1083@kernel.org> <CAMZ6RqLvbp8EStaSRFQUimhUMpn75=3pkQZYspnP1gYRsspv-g@mail.gmail.com>
+ <CAMZ6RqLmNJ0zL9XO9zGCu=CbUHgm68M42fwqkSKk-rSAosCWzg@mail.gmail.com> <cca27b04-8b06-78d1-fe0a-50a10dcbebe2@hartkopp.net>
+In-Reply-To: <cca27b04-8b06-78d1-fe0a-50a10dcbebe2@hartkopp.net>
+From: Vincent Mailhol <vincent.mailhol@gmail.com>
+Date: Tue, 22 Aug 2023 01:50:04 +0900
+Message-ID: <CAMZ6RqJGjEMfst=4ksGeTnxovbALpSH4DX0fnajqKrO8Jivgag@mail.gmail.com>
+Subject: Re: [PATCH 1/2] can: netlink: support setting hardware filters
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?Martin_Hundeb=C3=B8ll?= <martin@geanix.com>, 
+	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	linux-can <linux-can@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Mon. 21 Aug. 2023 at 04:21, Oliver Hartkopp <socketcan@hartkopp.net> wro=
+te:
+> On 19.08.23 15:29, Vincent Mailhol wrote:
+> > On Sat. 19 Aug. 2023 at 22:10, Vincent Mailhol
+> > <vincent.mailhol@gmail.com> wrote:
+> >> On Sat. 19 Aug. 2023, 01:19, Jakub Kicinski <kuba@kernel.org> wrote:
+> >>>
+> >>> On Thu, 17 Aug 2023 12:10:13 +0200 Martin Hundeb=C3=B8ll wrote:
+> >>>> +             int len =3D nla_len(data[IFLA_CAN_HW_FILTER]);
+> >>>> +             int num_filter =3D len / sizeof(struct can_filter);
+> >>>> +             struct can_filter *filter =3D nla_data(data[IFLA_CAN_H=
+W_FILTER]);
+> >>>
+> >>> This will prevent you from ever extending struct can_filter in
+> >>> a backward-compatible fashion, right? I obviously know very little
+> >>> about CAN but are you confident a more bespoke API to manipulate
+> >>> filters individually and allow extensibility is not warranted?
+> >>
+> >> I follow Jakub's point of view.
+> >>
+> >> The current struct can_filter is not sound. Some devices such as the
+> >> ES582.1 supports filtering of the CAN frame based on the flags (i.e.
+> >> SFF/EFF, RTR, FDF).
+> >
+> > I wrote too fast. The EFF and RTR flags are contained in the canid_t,
+> > so the current struct can_filter is able to handle these two flags.
+> > But it remains true that the CAN-FD flags (FDF and BRS) are currently
+> > not handled. Not to mention that more flags will come with the
+> > upcoming CAN XL.
+>
+> You are right with FDF where we could use the former CAN_ERR_FLAG value
+> which is not needed for hw filter API.
 
-syzbot found the following issue on:
+And what about the BRS flag?
 
-HEAD commit:    d4ddefee5160 Merge tag 'arm64-fixes' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1653bc65a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aa796b6080b04102
-dashboard link: https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13e59507a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16cd6137a80000
+> But regarding CAN XL we could use the Standard 11 bit ID handling with
+> another flag inside the remaining 18 bits.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6187f26c7496/disk-d4ddefee.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8bb63089fdb5/vmlinux-d4ddefee.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1579fb12e27b/bzImage-d4ddefee.xz
+Then, wouldn't you still need one more flag to indicate that this is a
+CAN XL filter?
 
-The issue was bisected to:
-
-commit d15121be7485655129101f3960ae6add40204463
-Author: Paolo Abeni <pabeni@redhat.com>
-Date:   Mon May 8 06:17:44 2023 +0000
-
-    Revert "softirq: Let ksoftirqd do its job"
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=115fece3a80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=135fece3a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=155fece3a80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1f16507d9ec05f64210a@syzkaller.appspotmail.com
-Fixes: d15121be7485 ("Revert "softirq: Let ksoftirqd do its job"")
-
-INFO: task syz-executor296:5042 blocked for more than 143 seconds.
-      Not tainted 6.5.0-rc6-syzkaller-00200-gd4ddefee5160 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor296 state:D stack:24336 pid:5042  ppid:5038   flags:0x00004002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5381 [inline]
- __schedule+0xee1/0x59f0 kernel/sched/core.c:6710
- schedule+0xe7/0x1b0 kernel/sched/core.c:6786
- schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6845
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0x967/0x1340 kernel/locking/mutex.c:747
- wiphy_lock include/net/cfg80211.h:5776 [inline]
- reg_process_self_managed_hints+0x78/0x170 net/wireless/reg.c:3181
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> The general concept of re-using the struct can_filter makes sense to me
+> as this follows the widely used pattern in the af_can.c core and CAN_RAW
+> sockets.
+>
+> Best regards,
+> Oliver
+>
+> >
+> >> I think that each of the fields of the filter should have its own NLA
+> >> declaration with the whole thing wrapped within a NLA_NESTED_ARRAY.
+> >>
+> >> I also think that there should then be a method to report the precise
+> >> filtering capabilities of the hardware.
+> >>
+> >>
+> >> Yours sincerely,
+> >> Vincent Mailhol
 
