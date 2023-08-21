@@ -1,171 +1,183 @@
-Return-Path: <netdev+bounces-29365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC50A782F01
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:03:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED22782F09
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:05:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05E621C208CB
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:03:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD9CF280DEB
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 17:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844488BF7;
-	Mon, 21 Aug 2023 17:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADE78BFA;
+	Mon, 21 Aug 2023 17:05:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF582F2B;
-	Mon, 21 Aug 2023 17:03:13 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BFFAEE;
-	Mon, 21 Aug 2023 10:03:11 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 13DAC22C36;
-	Mon, 21 Aug 2023 17:03:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1692637390; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SLJykvxuZvqJ+C4mN0x9FvUi2rRqmrHd1orjK7FFMsI=;
-	b=fr+7s4BC6VeEFmYTKeLSlLmCmG4kqom83BSHYONhbsPm/dy0Z7tC+7gbjWSoPBFyHpycNq
-	efbc0AwMv4JeFOILdc4qEKvaUHA7b1ZXRdhGl+jtrsv8DOjWFdCh6ihMNpuWM7zsGxE7ew
-	rcedEbMxJUH31F6sEzqcihuDPleH9n0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1692637390;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SLJykvxuZvqJ+C4mN0x9FvUi2rRqmrHd1orjK7FFMsI=;
-	b=cMNGb62gPZo/M23xiXN3LVNbAaeKgjjWWp6dJudi7Q3YjsA/Fh7TOX31foIq4KAURCLVgm
-	naLMFN4SvWRf5sAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CF9FA13421;
-	Mon, 21 Aug 2023 17:03:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id YTjtLM2Y42TsSAAAMHmgww
-	(envelope-from <krisman@suse.de>); Mon, 21 Aug 2023 17:03:09 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Breno Leitao <leitao@debian.org>
-Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
-  willemdebruijn.kernel@gmail.com,  martin.lau@linux.dev,
-  bpf@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org,  io-uring@vger.kernel.org,  kuba@kernel.org,
-  pabeni@redhat.com
-Subject: Re: [PATCH v3 8/9] io_uring/cmd: BPF hook for getsockopt cmd
-In-Reply-To: <ZOMrD1DHeys0nFwt@gmail.com> (Breno Leitao's message of "Mon, 21
-	Aug 2023 02:14:55 -0700")
-Organization: SUSE
-References: <20230817145554.892543-1-leitao@debian.org>
-	<20230817145554.892543-9-leitao@debian.org> <87pm3l32rk.fsf@suse.de>
-	<ZOMrD1DHeys0nFwt@gmail.com>
-Date: Mon, 21 Aug 2023 13:03:08 -0400
-Message-ID: <875y58nx9v.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD37A8BE5
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 17:05:29 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2066.outbound.protection.outlook.com [40.107.220.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD23102;
+	Mon, 21 Aug 2023 10:05:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cbGDJUjhkYxjhP9JhdBJCICYbq20cp998ntNQxq3zR84cKylmt2bA+MmR+QKq1P85/uGQD/BTNgZMxVQoRAk0zdLZq9dc9athojCRQ6etT6nRWlZUy4PUXnu8MstGPJT5lvnT7BvzBjGqIzJVUl2C7ugCg4XXOJ7mnjJf7zakfj6gyNd3r1gCN99RrdxqujnFHbdobmh83OyjfzvX+BHjpjB2jSt4o4NKgXWbaqzB3b7OBmTJYeIx/6y5iExLW5jQhTvLFmO8eAaxVjbHjK+ubpRRYOJDg1XQa34g9NG9Vkh0SkHE7BB1wncELm7GZlX3owhfFTYxOx/CRaU1V0wlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nBx9a1R26KoyU2Y6R+fZSzGpeK5xR+XZo0LWQuDYmQ4=;
+ b=HbKev5kJxOCiaBaqzIw3JUGZRjnH1cFIuC1kodozOE2UiuricXRJFHxf+4zNM4AcxDmKw0f5qzo5BLgNdkzzgAlSk5mHgmLSc/aoyxqQPqh0inYykJqopm0+aeJuD329UyiozVb5zN/qW+ttQRogVlxMekG2AHLshDJSMsrwZYlZsROnkbiyrVIhQO55kljqb9TzjhvbZ2UJ//MAo4F6W3KnUCU4d+G+F+aUdvFqP4W6HBIQ268H7i7Fh7unQcKrCgwUJg8TsGo4o685I2XvbJIASDSyD4iqSWLlM6FGKDi6k9lFyZUcNG7umlWFHfQZF9ns5J9edZ5VmfvCGhHFcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nBx9a1R26KoyU2Y6R+fZSzGpeK5xR+XZo0LWQuDYmQ4=;
+ b=XZbWNe/K086VkCC4qKXjNprAu6pkIl7kYG960v8N5i/sEPUrIOsqJmS0HU0HVoDtR9aHv8EyekMEYC935g47vm25sniLMfPuGiRb4lQTQ3usZeXqIlr6KMqxll6NiV1dkFTDecOY3dFrNn+86MVyylw+CoMFC7axSpMdoIXv4dI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by MW6PR12MB8760.namprd12.prod.outlook.com (2603:10b6:303:23a::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Mon, 21 Aug
+ 2023 17:05:25 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
+ 17:05:25 +0000
+Message-ID: <ed1bd63a-a992-5aef-f4da-eb7d2bc64652@amd.com>
+Date: Mon, 21 Aug 2023 10:05:21 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net-next] pds_core: Fix some kernel-doc comments
+Content-Language: en-US
+To: patchwork-bot+netdevbpf@kernel.org, Yang Li <yang.lee@linux.alibaba.com>
+Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, shannon.nelson@amd.com, brett.creeley@amd.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <20230821015537.116268-1-yang.lee@linux.alibaba.com>
+ <169260062287.23906.5426313863970879559.git-patchwork-notify@kernel.org>
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <169260062287.23906.5426313863970879559.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0045.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c2::20) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MW6PR12MB8760:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62904ae0-b0f8-461e-830f-08dba268cfef
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	omPxb0nPlWK6GCduiGvw2YnW44CRTXn94GwQJwNFK18Fr7nW5Msk8nqzd4VncK7hBsSof2Lh2dCoXtaqfsvv7wszay5zMYnu21gt1EjGBC8D0kgDb7qXCsW16MVl2XlwQAQLGbgIAu7notPztab9kbHvCmLdbyJO2pb3Sb36dyfy3TYZQcr1yXeBKLgsUiBzd1J3sz0kaplablLxSE9SOLbn0tAwMzpkuNX5CB0RJnqAniFNXq/cAH5Zf391lVuKcRmUChOxZosm3k5cLx0C4tplbFdx5DNeH73vZUigAqkOtuoKkEToY5jv9Ts3RGUpLnYN3jkkGnbIsY0eQc+Xa1chy9x45PRuh9i8WB7nqdGX45e9LnJJbY1qCh1EY4mrDLExeDx81q2rpXXGPeCFx/G3vyrvzkPWoTNZvftQ8b5PCfzvkhIYSm/hrzddT070Ud6cCIWDgv5YhyO4LAIATZQzGhB7qih+e+cbOvdG1sH6vRjZOYwFAO7N610pXiB6yST0gzYOU9KsfUEpBnsY1H8vSfdRiGLod57yXBR1opZX/h0Mg+HcXGWKgrmVcfs6VRBApCCodYXSzQnUS15kAYuWk2gX0WOQX32v4an6a4KpNWhy6X+nQKem7dmTygebw9pFNyWsZfU/86lJGgZHOw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(39860400002)(366004)(186009)(1800799009)(451199024)(6916009)(66476007)(66556008)(316002)(66946007)(6512007)(8676002)(8936002)(2616005)(4326008)(36756003)(41300700001)(966005)(478600001)(6666004)(38100700002)(53546011)(6506007)(6486002)(83380400001)(2906002)(31686004)(31696002)(5660300002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MHZuL0NJemRXN29VUDhpRlZoVFVWMlpwMW1WMVZZd1ZsTGVKZm0zK3QvSzQx?=
+ =?utf-8?B?ekhicDIvdkU4cXg5d05rVmNFeEpvYnJTbEQvSWlYTE5LSDBENUpPTlJ3U2dy?=
+ =?utf-8?B?RTk2K0NIRUM2ekxKbkVndS8wZXhTYTl2ZCtPNWJIUlAvSUlERVFTZDVaN2lR?=
+ =?utf-8?B?TGFWemtYZUFjYWwyekxTZ1l6WXVUNEFMdkVxbjFDNFNFZ0tTUytjcmQ1bklW?=
+ =?utf-8?B?VUhTMlNnbWdwc3h3NFBNUm5FVUR0WmdlMUZMclhJd0xBU1hXUG5GYmdYY3M1?=
+ =?utf-8?B?ZEFZUllYRHdGbGNVM2xNcC9zbjdweTJMQnZiMlFmUUlhUFF5b1N4SzloU3lW?=
+ =?utf-8?B?UWxOemZsRStIVThIWkViSDkwTktmdFFlYysybjRkdFE1OG5hTGhYME15akFm?=
+ =?utf-8?B?L3F4bThjaS9oalNJTERSTFZZNTFtNHlGL2RKUU15dk9obS80MmJEQWRxaHQ3?=
+ =?utf-8?B?TU52bGpTWXQrZThEU3Vid1pCQVRHb1QvMWNrWDVGTlVtNkp3bGRnb2tyZWtX?=
+ =?utf-8?B?OGo2YWtEWTZIWEowZWVTRHFJYnpTdDZpaFgxcUEzWjg1R0lhQ3dJSEpFaG5V?=
+ =?utf-8?B?NHpPUHpzeWtUWTNWM0c1azREV2cvQVJzYXZzT2NlTXRxZGVQeERnTWEwUUo4?=
+ =?utf-8?B?Y1VDQ1grMHY3UmxLY21oRGVqa1B2MzZ2Q0tqajF6MktwdjA3Kyt4L1NRWXNx?=
+ =?utf-8?B?K0p2a3cvK0s5RVV2UXZSUnhEa0RjRE13QjFKUUNZTjlES0tPemxSZmpFUFIr?=
+ =?utf-8?B?aDJLRUQ3TG0vK29sMzlGY1IxdE1YOFpNMVdybnR2WlRIQ1VTa05XNFM1ZlZy?=
+ =?utf-8?B?U1N2NWF6ZUZVcU9JVkFFNTAwWjkrcC9UaDhRL1lnZitvOTF4OTF1Q1lybG9w?=
+ =?utf-8?B?SVFRd3FpaHVIVENZb1dWUEpibjZTd0hud1BlZ3RlYzJxaitjeHRZSURHd2JJ?=
+ =?utf-8?B?ME9DeUxUQXRWdGxLbWdiU2FucWV4NktGUkdmbk1YUndhNFV6bkwxNDJmZ3FN?=
+ =?utf-8?B?RXhmakp6dDBZZTBQd3B6SjNSVGFJTzI2akZNcmhqUDFUSWFXcHhHWW14YkdC?=
+ =?utf-8?B?bWF1Q3d6UkVSZ2RBVnNETFB1V1FreGVJNW0xVTVJYzZvSHJnemtiMDMxWjBZ?=
+ =?utf-8?B?OHVtNkNxRlc2Q2hHM1VJckpWS244dWh6bHdOMzMzbkR1dGZHQ3JZb2Z3a25u?=
+ =?utf-8?B?NWphbUZZbk5PNWlBUXJwWSsxREl5cURMelZkcEl4akE0NitaUDEvSjd4N3cv?=
+ =?utf-8?B?aHp3aDVWM2Z0MTcwTG5QNS9nR0d6VnZkeS83S2pRV1NuK2xueDBhNVg1NEYz?=
+ =?utf-8?B?N1I4bFQ0VS80OHNjcExlSjBxaFlia2J6T3ZrK3J4RXR4Q1EvdXo1Q3pIWHZs?=
+ =?utf-8?B?UFhQbnBSRDZOK0RtRlBEZHVJL2NjZ1lmNFVhNnhRNUZjdXFUMlZHMTJvbXZD?=
+ =?utf-8?B?aGdKUEpQdExYMHZSd01vL1dZd0JsdTFDUnQ2RzhCWkdwSjVRWENPZENUcmc5?=
+ =?utf-8?B?ckZ0OXZ1eGZEaUVUeXlTempZQUlMK2RFTGU5K3JIQW8wYzlRU3dsYmNRblp1?=
+ =?utf-8?B?NUt1UVhJZzFJQUtJa0NlbjRyNXJobUxCc0c2UEkzREpITm1VTmFYL3NaeWdw?=
+ =?utf-8?B?S1dTQ05naXRvVFJBZmw1alloVnpqMEl4TzBOWlY4dzRTVk9zQnZ1cEorZHVh?=
+ =?utf-8?B?cUp2OThvbUtGWEhIUVNqRDFGRDdIR2l3djZhandiaHN5aWc5bng4OTNuWjgw?=
+ =?utf-8?B?YVVDMGhuZkZzSURaallMR2t4ek0xZmxGUER6c2M5VGF6TEUzeGJGSTI2SWZi?=
+ =?utf-8?B?OWxWdGJuL2svNlhZcEpWb0ViR20xbHgzSTFBN21Pd0tZNUxpWlRuRjF2cjho?=
+ =?utf-8?B?eXBSRjlQNVU2WUZiSzVhSnBVSmlSMVNqSDlWNnFrQlJHc2VzdEo5aCtBQllC?=
+ =?utf-8?B?N2JZTytDVk96WHNaNlgrZEYya2grSnE2OGcyczBPeFhqN1FXclY0SWU3UUp1?=
+ =?utf-8?B?YnlwaG9lbVhET2VkbzNaQXRRbmN2WVcyMEsyWGF4MThiMlkwMXZOQWRLSFN1?=
+ =?utf-8?B?dVNEUlM3akYvUGhTck5ZZmREbXFaNnE0Vm1kSElHMWwrcVE1Rks2WnMxVmRK?=
+ =?utf-8?Q?7N29ilqVSxOmEuZEUvhHGlB9X?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62904ae0-b0f8-461e-830f-08dba268cfef
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 17:05:25.3325
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TKUJFEdyBMxFbGZqUooS04yhHKakhcrS5e4FjHQRICITcl45uyHkO1VWWHBO4aaqpsEk48bqFIG4C/wqPWU4Aw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8760
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Breno Leitao <leitao@debian.org> writes:
+On 8/20/2023 11:50 PM, patchwork-bot+netdevbpf@kernel.org wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> Hello:
+> 
+> This patch was applied to netdev/net-next.git (main)
+> by David S. Miller <davem@davemloft.net>:
+> 
+> On Mon, 21 Aug 2023 09:55:37 +0800 you wrote:
+>> Fix some kernel-doc comments to silence the warnings:
+>>
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Function parameter or member 'pf' not described in 'pds_client_register'
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Excess function parameter 'pf_pdev' description in 'pds_client_register'
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:58: warning: Function parameter or member 'pf' not described in 'pds_client_unregister'
+>> drivers/net/ethernet/amd/pds_core/auxbus.c:58: warning: Excess function parameter 'pf_pdev' description in 'pds_client_unregister'
+>>
+>> [...]
+> 
+> Here is the summary with links:
+>    - [net-next] pds_core: Fix some kernel-doc comments
+>      https://git.kernel.org/netdev/net-next/c/cb39c35783f2
+> 
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+> 
 
-> On Thu, Aug 17, 2023 at 03:08:47PM -0400, Gabriel Krisman Bertazi wrote:
->> Breno Leitao <leitao@debian.org> writes:
->> 
->> > Add BPF hook support for getsockopts io_uring command. So, BPF cgroups
->> > programs can run when SOCKET_URING_OP_GETSOCKOPT command is executed
->> > through io_uring.
->> >
->> > This implementation follows a similar approach to what
->> > __sys_getsockopt() does, but, using USER_SOCKPTR() for optval instead of
->> > kernel pointer.
->> >
->> > Signed-off-by: Breno Leitao <leitao@debian.org>
->> > ---
->> >  io_uring/uring_cmd.c | 18 +++++++++++++-----
->> >  1 file changed, 13 insertions(+), 5 deletions(-)
->> >
->> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
->> > index a567dd32df00..9e08a14760c3 100644
->> > --- a/io_uring/uring_cmd.c
->> > +++ b/io_uring/uring_cmd.c
->> > @@ -5,6 +5,8 @@
->> >  #include <linux/io_uring.h>
->> >  #include <linux/security.h>
->> >  #include <linux/nospec.h>
->> > +#include <linux/compat.h>
->> > +#include <linux/bpf-cgroup.h>
->> >  
->> >  #include <uapi/linux/io_uring.h>
->> >  #include <uapi/asm-generic/ioctls.h>
->> > @@ -184,17 +186,23 @@ static inline int io_uring_cmd_getsockopt(struct socket *sock,
->> >  	if (err)
->> >  		return err;
->> >  
->> > -	if (level == SOL_SOCKET) {
->> > +	err = -EOPNOTSUPP;
->> > +	if (level == SOL_SOCKET)
->> >  		err = sk_getsockopt(sock->sk, level, optname,
->> >  				    USER_SOCKPTR(optval),
->> >  				    KERNEL_SOCKPTR(&optlen));
->> > -		if (err)
->> > -			return err;
->> >  
->> > +	if (!(issue_flags & IO_URING_F_COMPAT))
->> > +		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level,
->> > +						     optname,
->> > +						     USER_SOCKPTR(optval),
->> > +						     KERNEL_SOCKPTR(&optlen),
->> > +						     optlen, err);
->> > +
->> > +	if (!err)
->> >  		return optlen;
->> > -	}
->> 
->> Shouldn't you call sock->ops->getsockopt for level!=SOL_SOCKET prior to
->> running the hook?
->> Before this patch, it would bail out with EOPNOTSUPP,
->> but now the bpf hook gets called even for level!=SOL_SOCKET, which
->> doesn't fit __sys_getsockopt. Am I misreading the code?
->
-> Not really, sock->ops->getsockopt() does not suport sockptr_t, but
-> __user addresses, differently from setsockopt()
->
->           int             (*setsockopt)(struct socket *sock, int level,
->                                         int optname, sockptr_t optval,
->                                         unsigned int optlen);
->           int             (*getsockopt)(struct socket *sock, int level,
->                                         int optname, char __user *optval, int __user *optlen);
->
-> In order to be able to call sock->ops->getsockopt(), the callback
-> function will need to accepted sockptr.
+FYI - there might be some conflicts here as this was already fixed on 
+Alex Williamson's vfio next branch. I don't fully understand how all 
+things get merged into v6.6, so I just wanted to update here.
 
-So, it seems you won't support !SOL_SOCKETs here.  Then, I think you
-shouldn't call the hook for those sockets. My main concern is that we
-remain compatible to __sys_getsockopt when invoking the hook.
+On vfio's next branch this was fixed by: 06d220f13b1f ("pds_core: Fix 
+function header descriptions"). It also has a pre-requisite patch that 
+actually introduced the warning: b021d05e106e ("pds_core: Require 
+callers of register/unregister to pass PF drvdata").
 
-I think you should just have the following as the very first thing in
-the function (but after the security_ check).
+Thanks,
 
-if (level != SOL_SOCKET)
-   return -EOPNOTSUPP;
-
--- 
-Gabriel Krisman Bertazi
+Brett
 
