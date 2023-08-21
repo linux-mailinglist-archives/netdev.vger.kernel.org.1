@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-29441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125D578342B
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 23:02:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089AC7834B1
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 23:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF4891C20909
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 21:02:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4FFA280DC2
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 21:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5484811CAB;
-	Mon, 21 Aug 2023 21:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C887125AA;
+	Mon, 21 Aug 2023 21:10:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8044C9E
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 21:02:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AF61C433C7;
-	Mon, 21 Aug 2023 21:02:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692651727;
-	bh=gB2ytj3wFcjOc7INZ/jOObKGQyEl+qPZEUtXpCWGRnk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gFJBYbf3Ad/ZYPHvxcB4P34kM2LlcHRd2+lplCl+ODFEhFQ+D04GoYD7u2+/2ld9l
-	 x84X+Ujzr51lI1JQEUd9oD5NcBK6BvSy9/qW+uVWs1l4LBIauuy1lHIDmgeELBg710
-	 1KXHyynwojVxk7QxtNi+JBZMIDZOqsPVja5M7qi5g1ym6myWEiwLKhH77um6vWl8yZ
-	 z3rQG++nCimlhKGvOsJWvfI81hsGO2dtXfxC1jsRLn8oEmf1gBzX+9TG0s5xmvhFiO
-	 K3N8LKR4yWxD8VDXjRjc9ms81p8gQHV4yI9nEoWa4edPoB3LN9KWor4t4XmadYIbsk
-	 vPzA5QCQy4/aA==
-Date: Mon, 21 Aug 2023 14:02:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>, Alan
- Brady <alan.brady@intel.com>, <emil.s.tantilov@intel.com>,
- <jesse.brandeburg@intel.com>, <sridhar.samudrala@intel.com>,
- <shiraz.saleem@intel.com>, <sindhu.devale@intel.com>, <willemb@google.com>,
- <decot@google.com>, <andrew@lunn.ch>, <leon@kernel.org>, <mst@redhat.com>,
- <simon.horman@corigine.com>, <shannon.nelson@amd.com>,
- <stephen@networkplumber.org>, Alice Michael <alice.michael@intel.com>,
- Joshua Hay <joshua.a.hay@intel.com>, Phani Burra <phani.r.burra@intel.com>
-Subject: Re: [PATCH net-next v5 14/15] idpf: add ethtool callbacks
-Message-ID: <20230821140205.4d3bc797@kernel.org>
-In-Reply-To: <b12c2182-484f-249f-1fd6-8cc8fafb1c6a@intel.com>
-References: <20230816004305.216136-1-anthony.l.nguyen@intel.com>
-	<20230816004305.216136-15-anthony.l.nguyen@intel.com>
-	<20230818115824.446d1ea7@kernel.org>
-	<b12c2182-484f-249f-1fd6-8cc8fafb1c6a@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919C5F9C1
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 21:10:33 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2275FBC;
+	Mon, 21 Aug 2023 14:10:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6YAGYc+gu+qlxGlxjiPaMjWsQ010TzGyUv0/2pq1FBE=; b=KCLs3HQYE3H9GrtX9omI5lH7Zx
+	NJzg2+JhkWxrNj17x6oqDsWSERoB+l4UnR4BOU3hkhg9Yz+pARM7wZqqxO+tsyTNQY8lPSgvc/cp3
+	DJErsW3/c3y+V3HrEvs7wUjGyAZEEKqXYEU5lAchOoAt4BdNrZbAp61YifJx8SEtfvv0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qYCAN-004j3g-JL; Mon, 21 Aug 2023 23:10:27 +0200
+Date: Mon, 21 Aug 2023 23:10:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Rob Herring <robh@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH net-next 8/8] dt-bindings: net: fsl,backplane-anlt:
+ new binding document
+Message-ID: <842f7ff0-d376-4f55-b72d-2db7ea827792@lunn.ch>
+References: <20230817150644.3605105-1-vladimir.oltean@nxp.com>
+ <20230817150644.3605105-9-vladimir.oltean@nxp.com>
+ <20230821195840.GA2181626-robh@kernel.org>
+ <20230821201146.hudnk5v2zugz726p@skbuf>
+ <e3afb3d5-6efe-46de-81ca-7f0163c4b04d@lunn.ch>
+ <20230821203433.ysulh2bixfypbhsk@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230821203433.ysulh2bixfypbhsk@skbuf>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 21 Aug 2023 13:41:15 -0700 Linga, Pavan Kumar wrote:
-> On 8/18/2023 11:58 AM, Jakub Kicinski wrote:
-> > On Tue, 15 Aug 2023 17:43:04 -0700 Tony Nguyen wrote:  
-> >> +static u32 idpf_get_rxfh_indir_size(struct net_device *netdev)
-> >> +{
-> >> +	struct idpf_vport *vport = idpf_netdev_to_vport(netdev);
-> >> +	struct idpf_vport_user_config_data *user_config;
-> >> +
-> >> +	if (!vport)
-> >> +		return -EINVAL;  
-> > 
-> > defensive programming? how do we have a netdev and no vport?
+> But, there's already something else at those MDIO registers (where the
+> standard PHY ID location is), in the MMD that the AN/LT block responds to.
+> And that would be:
 > 
-> During a hardware reset, the control plane will reinitialize its vport 
-> configuration along with the hardware resources which in turn requires 
-> the driver to reallocate the vports as well. For this reason the vports 
-> will be freed, but the netdev will be preserved.
-
-HW reset path should take appropriate locks so that the normal control
-path can't be exposed to transient errors.
-
-User space will 100% not know what to do with a GET reporting EINVAL.
-
-> >> +	dev = &vport->adapter->pdev->dev;
-> >> +	if (!(ch->combined_count || (ch->rx_count && ch->tx_count))) {
-> >> +		dev_err(dev, "Please specify at least 1 Rx and 1 Tx channel\n");  
-> > 
-> > The error msg doesn't seem to fit the second part of the condition.
-> >
+> /* Auto-Negotiation Control and Status Registers are on page 0: 0x0 */
+> static const u16 mtip_lx2160a_an_regs[] = {
+> 	[AN_CTRL] = 0,
+> 	[AN_STAT] = 1,
+> 	[AN_ADV_0] = 2, // overlaps with MII_PHYSID1
+> 	[AN_ADV_1] = 3, // overlaps with MII_PHYSID2
+> 	[AN_ADV_2] = 4,
+> 	[AN_LPA_0] = 5, // overlaps with MDIO_DEVS1
+> 	[AN_LPA_1] = 6, // overlaps with MDIO_DEVS2
+> 	[AN_LPA_2] = 7,
+> 	[AN_MS_CNT] = 8,
+> 	[AN_ADV_XNP_0] = 9,
+> 	[AN_ADV_XNP_1] = 10,
+> 	[AN_ADV_XNP_2] = 11,
+> 	[AN_LPA_XNP_0] = 12,
+> 	[AN_LPA_XNP_1] = 13,
+> 	[AN_LPA_XNP_2] = 14,
+> 	[AN_BP_ETH_STAT] = 15,
+> };
 > 
-> The negation part is to the complete check which means it takes 0 
-> [tx|rx]_count into consideration.
+> The AN advertisement registers are kinda important to the operation of
+> the driver, so I wouldn't want to mask them with fake PHY ID values
+> reported by the MDIO controller.
 
-Ah, missed the negation. In that case I think the check is not needed,
-pretty sure core checks this.
+O.K, not ideal. For C22, you could just put the ID values in the
+compatible, which is enough to get a driver loaded which supports that
+ID. But somebody recently commented that that does not work for C45. I
+assume NXP has an OUI, and could allocate an ID to this device in
+retrospect. So maybe it makes sense to make C45 work with an ID in the
+compatible? And get the driver loaded that way?
 
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	num_req_tx_q = ch->combined_count + ch->tx_count;
-> >> +	num_req_rx_q = ch->combined_count + ch->rx_count;
-> >> +
-> >> +	dev = &vport->adapter->pdev->dev;
-> >> +	/* It's possible to specify number of queues that exceeds max in a way
-> >> +	 * that stack won't catch for us, this should catch that.
-> >> +	 */  
-> > 
-> > How, tho?
-> 
-> If the user tries to pass the combined along with the txq or rxq values, 
-> then it is possbile to cross the max supported values. So the following 
-> checks are needed to protect those cases. Core checks the max values for 
-> the individual arguments but not the combined + [tx|rx].
-
-I see, please add something along those lines to the comment.
+	Andrew
 
