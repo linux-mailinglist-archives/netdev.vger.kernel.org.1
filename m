@@ -1,122 +1,117 @@
-Return-Path: <netdev+bounces-29276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 408B97826B4
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:00:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4017826CD
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 12:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75C761C2085B
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13A63280E98
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 10:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059EF4A23;
-	Mon, 21 Aug 2023 10:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67504A29;
+	Mon, 21 Aug 2023 10:10:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD78185B
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 10:00:34 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B12CCA
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:00:33 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d71f505d21dso4184837276.3
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:00:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F861848
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 10:10:34 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7CAE8
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:10:24 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bdbf10333bso24534585ad.1
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 03:10:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692612032; x=1693216832;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=swvi3ieojHhCvQQpx72cte4QxiiCM5j7oYg+ZxiM74E=;
-        b=cvgU8FXTpKdCtwoTjxNnX6sQPFfAsNgppPSATw18C9q9ZaC4k5npg8x6dxPcLxL1KS
-         dTxkw+LK6LKhAfeyzFkwSJHS5/kcNMhSfAbE9KtkXQB/0VPVDKypOpu0y5EVbPknePDR
-         qXqu36LVxgbrXh8XmHGhMNd4ObnWG70CBsIOl7xkB9CosgVSKtc8bAb20loCxZxZV7tt
-         HiEHWzcV790qHpp7jqxZLyCnTqQbOALu6hLDy1gkNDgqIIWxc0ObBKO5eistYVblpCK/
-         vhegaK98mBXHqObY7qw48cS6aoXf72CiORQ/WQhRPxhyKNqASClfSnwVBC62JvZXJZTI
-         3fHQ==
+        d=gmail.com; s=20221208; t=1692612623; x=1693217423;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XuHt4TfV1yG9DGNii0ZXojePwRxZX9n2cAdIFRcUEps=;
+        b=JdxNgtNHdf4wyecVlX49vfQcBwvqUmG1Qt5qsOTfKGthL8UlVa7eIStD3tmnsHsc4y
+         QA3hd5Uy1hOLGY94WNSHBoyegxmTJbM1Qatrt5d3yMefDbiE8fGYwNPBmwGk9zV3A40O
+         BgxtnadeSXBzEzoZyzlQ22tubs/VuSwCvrzgkWGAzpZahPiFJvRP57wkm8vBx5VQWuJ7
+         5P6BfsQ1sGzgako2zXnzGUx5uMV6FPeSaYbzvczOyJZMx0XJHijliUKvHG2F2k/n6/Xs
+         EkPIzv/MiJA8DKPQxzK0HLzDEjhrr+FDXksWkkeCGn2GlJ7fZOvjEAiuGpAsdWzKc5zg
+         Mc7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692612032; x=1693216832;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=swvi3ieojHhCvQQpx72cte4QxiiCM5j7oYg+ZxiM74E=;
-        b=iLyiPcWv/H3B6rK84DrwvaSbYlOIqoB4a6n6LCB+Za+O1QN4maumyweGfRYv60wjzJ
-         SKcEhGTuWwhGLW/WGjpleoGLBnqaIRjJzRsxfR8n0qLETkE1FvqtRcV6F90IcuOkiFrc
-         bSg8SAvIFGvBpNWWRVSi/q9j//+fue9CRiYfl/ePp/lmr/9MeKS17JZlHfi30BHa/lPv
-         O9YBuXMMkjgPEsWO5LUmyEPy8ZHrJTIEfknAr/BtBBOlqqV32PXpgkt8Xqqv/ddlDiGT
-         fsj9iN0vc/jn6T/eEjfieuacEUOwis3G3RA6DlsRYG3EGuADuBW+CoXhCNXXjqJTD4w2
-         oAUA==
-X-Gm-Message-State: AOJu0Yzt+daghFX+6dTsQDyZgjRI5MlLs2vYkL70ji4jPy/lA/ifGPev
-	p6iPzNqZQ22EQdvXPpsWgW45xsdd+g==
-X-Google-Smtp-Source: AGHT+IFwLl6U5xfzq5IjUGIq/3QDZbdd+TbKCCLmc1xALIyYwiiWimhpsga1UQ4xW2wdvWixBxUedn6snQ==
-X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a25:25d7:0:b0:d4b:99ce:5e51 with SMTP id
- l206-20020a2525d7000000b00d4b99ce5e51mr41387ybl.6.1692612032776; Mon, 21 Aug
- 2023 03:00:32 -0700 (PDT)
-Date: Mon, 21 Aug 2023 05:00:06 -0500
+        d=1e100.net; s=20221208; t=1692612623; x=1693217423;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XuHt4TfV1yG9DGNii0ZXojePwRxZX9n2cAdIFRcUEps=;
+        b=AmKKZCYTtGVyfxpzM0Zip58aiW+b9R6eacCQeUu2ewysGB/EtIN4pu+xg28BCE/vgw
+         lrHCI04CGpkcn1qCPzg+2KycJDysShwsaqpcXBOUCcM/lKoOEUWwX2Otj4DHPjgVk7gD
+         G0/t7UvzyhuZsQ+je/F3KTtcwTUqqnZDolVyTzNpjsqR6v0afkOo/nNzplsPJvFO/L9F
+         BAFS+lADFWrDzPby+HoyhxLblX48WUlh4/TZxeptUW9L/Mk0tMHnf/w7TeDUXP04nSOj
+         Rh6coNkXP3o6WauH199btMQ4JjvS7ZQR5P2q0soNRFzEDMFhmDNH0vbLGc04il0O1lJN
+         zG6A==
+X-Gm-Message-State: AOJu0Yz0gwDIMAZPBB+dg8MMfVg0n/4H7PsVCOcINVmULVlqpvxNJQUr
+	s+LBTkvk5JxaGmT4Kyy8tFcvOwhuXVbMRA==
+X-Google-Smtp-Source: AGHT+IHFoB4SdQm2SpKTP2kdEJbMzSRDg3bZmm7eXr+sEwezL2kH0mtAO2g8Us3mP8J2VMstlnMsmw==
+X-Received: by 2002:a17:902:7c94:b0:1bb:cf58:531d with SMTP id y20-20020a1709027c9400b001bbcf58531dmr6687434pll.10.1692612623451;
+        Mon, 21 Aug 2023 03:10:23 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d12-20020a170902cecc00b001b7f40a8959sm6650995plg.76.2023.08.21.03.10.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 03:10:17 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Jiri Pirko <jiri@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Andrew Schorr <ajschorr@alumni.princeton.edu>
+Subject: [PATCH net-next] bonding: update port speed when getting bond speed
+Date: Mon, 21 Aug 2023 18:10:08 +0800
+Message-ID: <20230821101008.797482-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230821100007.559638-1-jrife@google.com>
-Subject: [PATCH] net: Avoid address overwrite in kernel_connect
-From: Jordan Rife <jrife@google.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org, Jordan Rife <jrife@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-BPF programs that run on connect can rewrite the connect address. For
-the connect system call this isn't a problem, because a copy of the address
-is made when it is moved into kernel space. However, kernel_connect
-simply passes through the address it is given, so the caller may observe
-its address value unexpectedly change.
+Andrew reported a bonding issue that if we put an active-back bond on top
+of a 802.3ad bond interface. When the 802.3ad bond's speed/duplex changed
+dynamically. The upper bonding interface's speed/duplex can't be changed at
+the same time, which will show incorrect speed.
 
-A practical example where this is problematic is where NFS is combined
-with a system such as Cilium which implements BPF-based load balancing.
-A common pattern in software-defined storage systems is to have an NFS
-mount that connects to a persistent virtual IP which in turn maps to an
-ephemeral server IP. This is usually done to achieve high availability:
-if your server goes down you can quickly spin up a replacement and remap
-the virtual IP to that endpoint. With BPF-based load balancing, mounts
-will forget the virtual IP address when the address rewrite occurs
-because a pointer to the only copy of that address is passed down the
-stack. Server failover then breaks, because clients have forgotten the
-virtual IP address. Reconnects fail and mounts remain broken. This patch
-was tested by setting up a scenario like this and ensuring that NFS
-reconnects worked after applying the patch.
+Fix it by updating the port speed when calling ethtool.
 
-Signed-off-by: Jordan Rife <jrife@google.com>
+Reported-by: Andrew Schorr <ajschorr@alumni.princeton.edu>
+Closes: https://lore.kernel.org/netdev/ZEt3hvyREPVdbesO@Laptop-X1/
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- net/socket.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/net/bonding/bond_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/socket.c b/net/socket.c
-index 2b0e54b2405c8..f49edb9b49185 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -3519,7 +3519,11 @@ EXPORT_SYMBOL(kernel_accept);
- int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
- 		   int flags)
- {
--	return sock->ops->connect(sock, addr, addrlen, flags);
-+	struct sockaddr_storage address;
-+
-+	memcpy(&address, addr, addrlen);
-+
-+	return sock->ops->connect(sock, (struct sockaddr *)&address, addrlen, flags);
- }
- EXPORT_SYMBOL(kernel_connect);
- 
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 447b06ea4fc9..07c2e46d27a8 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -5706,6 +5706,7 @@ static int bond_ethtool_get_link_ksettings(struct net_device *bond_dev,
+ 	 */
+ 	bond_for_each_slave(bond, slave, iter) {
+ 		if (bond_slave_can_tx(slave)) {
++			bond_update_speed_duplex(slave);
+ 			if (slave->speed != SPEED_UNKNOWN) {
+ 				if (BOND_MODE(bond) == BOND_MODE_BROADCAST)
+ 					speed = bond_mode_bcast_speed(slave,
 -- 
-2.42.0.rc1.204.g551eb34607-goog
+2.41.0
 
 
