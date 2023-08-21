@@ -1,44 +1,65 @@
-Return-Path: <netdev+bounces-29197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742F6782144
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 03:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB74782184
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 04:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9DE280F10
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 01:55:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63960280F14
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 02:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33064EA1;
-	Mon, 21 Aug 2023 01:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C6FEDD;
+	Mon, 21 Aug 2023 02:38:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24EB0627
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 01:55:43 +0000 (UTC)
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6055C9C;
-	Sun, 20 Aug 2023 18:55:42 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0Vq9G.uy_1692582938;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0Vq9G.uy_1692582938)
-          by smtp.aliyun-inc.com;
-          Mon, 21 Aug 2023 09:55:39 +0800
-From: Yang Li <yang.lee@linux.alibaba.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shannon.nelson@amd.com,
-	brett.creeley@amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE134EA1
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 02:38:52 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E43A9C
+	for <netdev@vger.kernel.org>; Sun, 20 Aug 2023 19:38:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692585531; x=1724121531;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BMVYls4TtlSzQipYQNrpOaTsQk8b06C9iKNIKItUM1I=;
+  b=mIswgFMYo4n5kajsr+eXFn8tDLfj5/dmaUcyFyOkQdLuAJc7BbS8bBo9
+   tKs/otMb54BKH18xvHnbqsihlOtWbbwGsa2JLfOyZYxFHETM7bWeLF2pQ
+   jnm8dmf7ZyDFGTcSHf0zfSIvR+Sd4M1Wg+JcDzdS6NE6Q1hTTwgXNMKSc
+   cOcP2d3+op7SaeKeIGe1GDn5KPDrpbp4O/OyWCqVXnBufLTBTNOTzpGZz
+   67g1p+ru32L2D76RxcyZjTCvGVgX/13tex9WnCd9UuGcP5Ld9aRXJjDdQ
+   9JTtR4Ol9tY/12oNpuquREBZ9TzsmQNiQG2ukHcwSeDvpASkd5iE73Xy+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="377216587"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="377216587"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2023 19:38:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="982326585"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="982326585"
+Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
+  by fmsmga006.fm.intel.com with ESMTP; 20 Aug 2023 19:38:47 -0700
+From: Junfeng Guo <junfeng.guo@intel.com>
+To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH net-next] pds_core: Fix some kernel-doc comments
-Date: Mon, 21 Aug 2023 09:55:37 +0800
-Message-Id: <20230821015537.116268-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	qi.z.zhang@intel.com,
+	ivecera@redhat.com,
+	sridhar.samudrala@intel.com,
+	Junfeng Guo <junfeng.guo@intel.com>
+Subject: [PATCH iwl-next v5 00/15] Introduce the Parser Library
+Date: Mon, 21 Aug 2023 10:38:18 +0800
+Message-Id: <20230821023833.2700902-1-junfeng.guo@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230605054641.2865142-1-junfeng.guo@intel.com>
+References: <20230605054641.2865142-1-junfeng.guo@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,48 +67,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix some kernel-doc comments to silence the warnings:
+Current software architecture for flow filtering offloading limited
+the capability of Intel Ethernet 800 Series Dynamic Device
+Personalization (DDP) Package. The flow filtering offloading in the
+driver is enabled based on the naming parsers, each flow pattern is
+represented by a protocol header stack. And there are multiple layers
+(e.g., virtchnl) to maintain their own enum/macro/structure
+to represent a protocol header (IP, TCP, UDP ...), thus the extra
+parsers to verify if a pattern is supported by hardware or not as
+well as the extra converters that to translate represents between
+different layers. Every time a new protocol/field is requested to be
+supported, the corresponding logic for the parsers and the converters
+needs to be modified accordingly. Thus, huge & redundant efforts are
+required to support the increasing flow filtering offloading features,
+especially for the tunnel types flow filtering.
 
-drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Function parameter or member 'pf' not described in 'pds_client_register'
-drivers/net/ethernet/amd/pds_core/auxbus.c:18: warning: Excess function parameter 'pf_pdev' description in 'pds_client_register'
-drivers/net/ethernet/amd/pds_core/auxbus.c:58: warning: Function parameter or member 'pf' not described in 'pds_client_unregister'
-drivers/net/ethernet/amd/pds_core/auxbus.c:58: warning: Excess function parameter 'pf_pdev' description in 'pds_client_unregister'
+This patch set provides a way for applications to send down training
+packets & masks (in binary) to the driver. Then these binary data
+would be used by the driver to generate certain data that are needed
+to create a filter rule in the filtering stage of switch/RSS/FDIR.
 
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- drivers/net/ethernet/amd/pds_core/auxbus.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Note that the impact of a malicious rule in the raw packet filter is
+limited to performance rather than functionality. It may affect the
+performance of the workload, similar to other limitations in FDIR/RSS
+on AVF. For example, there is no resource boundary for VF FDIR/RSS
+rules, so one malicious VF could potentially make other VFs
+inefficient in offloading.
 
-diff --git a/drivers/net/ethernet/amd/pds_core/auxbus.c b/drivers/net/ethernet/amd/pds_core/auxbus.c
-index 8ff21d36ea42..e0d4b8d5159f 100644
---- a/drivers/net/ethernet/amd/pds_core/auxbus.c
-+++ b/drivers/net/ethernet/amd/pds_core/auxbus.c
-@@ -8,7 +8,7 @@
- 
- /**
-  * pds_client_register - Link the client to the firmware
-- * @pf_pdev:	ptr to the PF driver struct
-+ * @pf:	a pointer to the pdsc structure
-  * @devname:	name that includes service into, e.g. pds_core.vDPA
-  *
-  * Return: positive client ID (ci) on success, or
-@@ -48,7 +48,7 @@ EXPORT_SYMBOL_GPL(pds_client_register);
- 
- /**
-  * pds_client_unregister - Unlink the client from the firmware
-- * @pf_pdev:	ptr to the PF driver struct
-+ * @pf:	a pointer to the pdsc structure
-  * @client_id:	id returned from pds_client_register()
-  *
-  * Return: 0 on success, or
+The parser library is expected to include boundary checks to prevent
+critical errors such as infinite loops or segmentation faults.
+However, only implementing and validating the parser emulator in a
+sandbox environment (like ebpf) presents a challenge.
+
+The idea is to make the driver be able to learn from the DDP package
+directly to understand how the hardware parser works (i.e., the
+Parser Library), so that it can process on the raw training packet
+(in binary) directly and create the filter rule accordingly.
+
+Based on this Parser Library, the raw flow filtering of
+switch/RSS/FDIR could be enabled to allow new flow filtering
+offloading features to be supported without any driver changes (only
+need to update the DDP package).
+
+
+v5:
+- Update copyrights of new files to be 2023 only.
+- Update patch set series prefix.
+- Fix typo on patch 2 commit message.
+
+v4:
+- Update cover letter series title.
+
+v3:
+- Replace magic hardcoded values with macros.
+- Use size_t to avoid superfluous type cast to uintptr_t in function
+  ice_parser_sect_item_get.
+- Prefix for static local function names to avoid namespace pollution.
+- Use strstarts() function instead of self implementation.
+
+v2:
+- Fix build warnings.
+
+
+Junfeng Guo (15):
+  ice: add parser create and destroy skeleton
+  ice: init imem table for parser
+  ice: init metainit table for parser
+  ice: init parse graph cam tables for parser
+  ice: init boost tcam and label tables for parser
+  ice: init ptype marker tcam table for parser
+  ice: init marker and protocol group tables for parser
+  ice: init flag redirect table for parser
+  ice: init XLT key builder for parser
+  ice: add parser runtime skeleton
+  ice: add internal help functions
+  ice: add parser execution main loop
+  ice: support double vlan mode configure for parser
+  ice: add tunnel port support for parser
+  ice: add API for parser profile initialization
+
+ drivers/net/ethernet/intel/ice/Makefile       |  11 +
+ drivers/net/ethernet/intel/ice/ice_bst_tcam.c | 313 +++++++
+ drivers/net/ethernet/intel/ice/ice_bst_tcam.h |  52 ++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   4 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |  10 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |  14 +
+ drivers/net/ethernet/intel/ice/ice_flg_rd.c   |  73 ++
+ drivers/net/ethernet/intel/ice/ice_flg_rd.h   |  24 +
+ drivers/net/ethernet/intel/ice/ice_imem.c     | 279 ++++++
+ drivers/net/ethernet/intel/ice/ice_imem.h     | 217 +++++
+ drivers/net/ethernet/intel/ice/ice_metainit.c | 181 ++++
+ drivers/net/ethernet/intel/ice/ice_metainit.h | 104 +++
+ drivers/net/ethernet/intel/ice/ice_mk_grp.c   |  51 +
+ drivers/net/ethernet/intel/ice/ice_mk_grp.h   |  17 +
+ drivers/net/ethernet/intel/ice/ice_parser.c   | 562 +++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h   | 140 +++
+ .../net/ethernet/intel/ice/ice_parser_rt.c    | 877 ++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_parser_rt.h    |  73 ++
+ .../net/ethernet/intel/ice/ice_parser_util.h  |  37 +
+ drivers/net/ethernet/intel/ice/ice_pg_cam.c   | 397 ++++++++
+ drivers/net/ethernet/intel/ice/ice_pg_cam.h   | 142 +++
+ .../net/ethernet/intel/ice/ice_proto_grp.c    |  90 ++
+ .../net/ethernet/intel/ice/ice_proto_grp.h    |  31 +
+ drivers/net/ethernet/intel/ice/ice_ptype_mk.c |  73 ++
+ drivers/net/ethernet/intel/ice/ice_ptype_mk.h |  23 +
+ drivers/net/ethernet/intel/ice/ice_tmatch.h   |  40 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_xlt_kb.c   | 262 ++++++
+ drivers/net/ethernet/intel/ice/ice_xlt_kb.h   |  80 ++
+ 29 files changed, 4173 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_bst_tcam.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_bst_tcam.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_imem.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_imem.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_metainit.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_metainit.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_util.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_pg_cam.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_pg_cam.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_ptype_mk.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_ptype_mk.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_tmatch.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_xlt_kb.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_xlt_kb.h
+
 -- 
-2.20.1.7.g153144c
+2.25.1
 
 
