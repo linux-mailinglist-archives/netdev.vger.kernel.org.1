@@ -1,189 +1,156 @@
-Return-Path: <netdev+bounces-29409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18847783081
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 21:02:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC66C78307F
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 20:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39DE3280EBF
-	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 19:02:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 890FD280EF8
+	for <lists+netdev@lfdr.de>; Mon, 21 Aug 2023 18:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4C18C1D;
-	Mon, 21 Aug 2023 19:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F1C8833;
+	Mon, 21 Aug 2023 18:54:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A4E4A10
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 19:01:57 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C822B64;
-	Mon, 21 Aug 2023 12:01:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692644489; x=1724180489;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Wld6UNWWckrcMq4kcCWkjtCXxw/5IjJuPmlfVgjAk5g=;
-  b=OGCJBEeMDNtri4twUK+p4UbFcTjPw7CpYVDRAF0CBTgmK5HZbJt1QhK2
-   KyjoBGVlIsyGknFnLsg+fNWcKoYYhkjAQ/tnlPTbwiZwc0AI+v9DLSIBB
-   YL1a9aD2FLKhFo3EBLStBnRY/+/W0Jfd7JJ+T9aJVDpJkc5eyOxyA/jti
-   kV1w3MfI0t070qPpJyajcycrIT6ltTa8F8i901Bme+H9gsu9a0PdbN8Iq
-   JXR3rbsV/NFbPH9BW+mAPRmeTycIkq41ZNrsUZQDR3kca29k5eFiifJsu
-   JYefun3i5SW/UlbEbdTzi1jPJ8RVjXbSE7DUIBvTtlP+hO2PEI3DV7nta
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="358657242"
-X-IronPort-AV: E=Sophos;i="6.01,190,1684825200"; 
-   d="scan'208";a="358657242"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 11:38:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="909801641"
-X-IronPort-AV: E=Sophos;i="6.01,190,1684825200"; 
-   d="scan'208";a="909801641"
-Received: from lkp-server02.sh.intel.com (HELO 6809aa828f2a) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 21 Aug 2023 11:38:31 -0700
-Received: from kbuild by 6809aa828f2a with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qY9nH-0000nd-0k;
-	Mon, 21 Aug 2023 18:38:27 +0000
-Date: Tue, 22 Aug 2023 02:38:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Golle <daniel@makrotopia.org>, Felix Fietkau <nbd@nbd.name>,
-	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: add reset bits for MT7988
-Message-ID: <202308220205.gbt5lcAY-lkp@intel.com>
-References: <b983a3adf5184a30e4ce620fbbf028c9c76648ae.1692382239.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5457C79FD
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 18:54:41 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B28D6197;
+	Mon, 21 Aug 2023 11:53:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EPpEbADWFKLFeyI9dRHb/zYSXedoo2Fb2TiXMWWtF5+0tS8iaV7MAYHKEjF8lB64svKDWOY5AaSYL2iufrxEWPianzAkPcdIT7bmVlNLkaQghUFIy2hmKQMaO4b/Osj0B1yYNGDbmMAKBbl+147yFWX6ZobN71I6XL4mq7PSQy/DTpe5xjoJ+Fd5Ms65Bd0rfD8plyMUmZYBADBSDsdxdkeCoh5Qs/q0ijFN40U9K47KmUijlK7r29bwTTHGxsWw6y7kdFkWeZhpZa7lta5ghw7wSFZ5Lhi1iaHgPzFxvVgvpIiM+p9jdfLaW9nnO1EdoCvFlEVVdX22LqT9+lzrMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZsqodBPlHICZeA0Di90ywJwxQrWxoZmk8tO1ZcAUejo=;
+ b=R4L/ABSxbBmWlPZblYjUnvcooZCiPcOfPub2iGy0s3bfS2e/QZbHabwGO+sHlv8wQmmk2ZerFZ1u4x6rNmOjxdIjyV2giWU8Qv50Bi+2z9W40nnbA+R/XuckHXYM5cKind1NrH5zcq5pInK9MNcyoQU99Eqfr7df/r4rYtJ56m2E9FGkRU0HY1nS+ANWFvwglIx9RLPdJQmFqxnVAih7htevZzAAY3qgyXhFVJu/37faJ4lUq9NrEAQ1P9K4LzAOU5PBnjbRzOp1ZlOvDlqaIMCo5qBuDwrVf+oQ/Hqwrqc+kM/JrZV30TNS1YTG/YYP8cdF/hmYHRGVVHCBu8tCng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZsqodBPlHICZeA0Di90ywJwxQrWxoZmk8tO1ZcAUejo=;
+ b=haUAvzY29dxMw6U1DjBY6+ZoAbP5RaGj2q41o12eRBJFA3wz78CLa9UK3ETFcxl1ayZtQmrZDIwTvtZLij7E7/eVXHSGhrMDO9YzUpbZAT5QNYZQgkLtmzt1iDyEZJnRmLq4ROjz0KxYVOnLps9N79tV1prm1eWv/50MaydJnyE=
+Received: from SJ0PR03CA0142.namprd03.prod.outlook.com (2603:10b6:a03:33c::27)
+ by DS7PR12MB8345.namprd12.prod.outlook.com (2603:10b6:8:e5::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.24; Mon, 21 Aug 2023 18:42:27 +0000
+Received: from CO1PEPF000042AC.namprd03.prod.outlook.com
+ (2603:10b6:a03:33c:cafe::ab) by SJ0PR03CA0142.outlook.office365.com
+ (2603:10b6:a03:33c::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
+ Transport; Mon, 21 Aug 2023 18:42:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000042AC.mail.protection.outlook.com (10.167.243.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6699.14 via Frontend Transport; Mon, 21 Aug 2023 18:42:26 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 21 Aug
+ 2023 13:42:25 -0500
+From: Brett Creeley <brett.creeley@amd.com>
+To: <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<alex.williamson@redhat.com>, <jgg@nvidia.com>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>
+CC: <brett.creeley@amd.com>, <shannon.nelson@amd.com>
+Subject: [PATCH vfio] vfio/pds: Send type for SUSPEND_STATUS command
+Date: Mon, 21 Aug 2023 11:42:15 -0700
+Message-ID: <20230821184215.34564-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b983a3adf5184a30e4ce620fbbf028c9c76648ae.1692382239.git.daniel@makrotopia.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042AC:EE_|DS7PR12MB8345:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38bf6946-1657-4195-50e4-08dba2765e10
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LS+EzyWnoEBIxH98tpds5a84eMSKfHQP/EAlmICOZpBoeBY59Ndur7HO26/wr47SqmF3a4hXTXjrr0kfprUY1CIK6CKUwdL/3j2/iLP7K4JNvkWC5eN8VXFvScPuMlq7lrCTIjWjj7tiWdVEUq18EtmUcT67Xjmz0jc4EYZOdodJel6BEx1f6tWcSODYekajz+Ub2R436/5LNPe68oUzFnkLx48QqU7zh4NnyTDp4aktI1xaf38SXOEAntXUKIOy28jCi560NW6oXE/HI1coOlS2vHF5an4e2kA9PA2COOgNqRZWGGX5kMiUNZqqsloAICTYx0dYMGCwUGF39TLBJu83Umdi+HDDES96NLtPXZBe3oI4ALpCuJ+IhxE8ijspa4aU7HRTBfIAkPJ+hJV9BfniZ9TrFZA0hacsopVB9wVksGvvra6xrm/PuUMRVyLUzIgM1AMD/42TFwy9xvBbc8mgFHVYAbTyM2jTEOOeQ3n/H89PUKOGKdb7e/8xLGqFfdbdgspy45648GO0y0DR7NmK98VOt79UJ1kC5jKtlJJN4mqWVG09ejn714/lavGnxGon8MSILK8Vi63WsMUYuVEAjoserVh8WvMvV3CZrHp0j5Nhu7f2nA/1wNGNcHWWxuepxwC7NWC1rnLCdspTQh2Gff/vF4TkPkM7rUVbI0PyZDpKFtqqig3B95nhOTJ+GN1FyTpHsuYI7sE45u/DcX+QWeDHKBVErtSne7qQIV4pR3xSMkYQxgYGfXHUaTCOzX8Tot59MNS+QSQ7b00GEA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(39860400002)(396003)(82310400011)(451199024)(1800799009)(186009)(46966006)(36840700001)(40470700004)(2906002)(83380400001)(40480700001)(15650500001)(5660300002)(44832011)(336012)(426003)(26005)(16526019)(86362001)(36860700001)(47076005)(8676002)(8936002)(2616005)(4326008)(70206006)(316002)(54906003)(70586007)(110136005)(478600001)(356005)(82740400003)(81166007)(6666004)(40460700003)(41300700001)(36756003)(1076003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 18:42:26.9462
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38bf6946-1657-4195-50e4-08dba2765e10
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042AC.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8345
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Daniel,
+Commit bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
+added live migration support for the pds-vfio-pci driver. When
+sending the SUSPEND command to the device, the driver sets the
+type of suspend (i.e. P2P or FULL). However, the driver isn't
+sending the type of suspend for the SUSPEND_STATUS command, which
+will result in failures. Fix this by also sending the suspend type
+in the SUSPEND_STATUS command.
 
-kernel test robot noticed the following build errors:
+Fixes: bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+---
+ drivers/vfio/pci/pds/cmds.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-[auto build test ERROR on linux-next/master]
-[cannot apply to net/main linus/master v6.5-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-ethernet-mtk_eth_soc-add-reset-bits-for-MT7988/20230821-102205
-base:   linux-next/master
-patch link:    https://lore.kernel.org/r/b983a3adf5184a30e4ce620fbbf028c9c76648ae.1692382239.git.daniel%40makrotopia.org
-patch subject: [PATCH net] net: ethernet: mtk_eth_soc: add reset bits for MT7988
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230822/202308220205.gbt5lcAY-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230822/202308220205.gbt5lcAY-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308220205.gbt5lcAY-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/mediatek/mtk_eth_soc.c:31:
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c: In function 'mtk_hw_reset':
->> drivers/net/ethernet/mediatek/mtk_eth_soc.c:3625:50: error: 'MTK_RSTCTRL_PPE2' undeclared (first use in this function); did you mean 'MTK_RSTCTRL_PPE1'?
-    3625 |                 if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-         |                                                  ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.h:1022:53: note: in definition of macro 'MTK_HAS_CAPS'
-    1022 | #define MTK_HAS_CAPS(caps, _x)          (((caps) & (_x)) == (_x))
-         |                                                     ^~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c:3625:50: note: each undeclared identifier is reported only once for each function it appears in
-    3625 |                 if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-         |                                                  ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.h:1022:53: note: in definition of macro 'MTK_HAS_CAPS'
-    1022 | #define MTK_HAS_CAPS(caps, _x)          (((caps) & (_x)) == (_x))
-         |                                                     ^~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c: In function 'mtk_hw_warm_reset':
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c:3673:50: error: 'MTK_RSTCTRL_PPE2' undeclared (first use in this function); did you mean 'MTK_RSTCTRL_PPE1'?
-    3673 |                 if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-         |                                                  ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.h:1022:53: note: in definition of macro 'MTK_HAS_CAPS'
-    1022 | #define MTK_HAS_CAPS(caps, _x)          (((caps) & (_x)) == (_x))
-         |                                                     ^~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c: In function 'mtk_prepare_for_reset':
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c:4042:50: error: 'MTK_RSTCTRL_PPE2' undeclared (first use in this function); did you mean 'MTK_RSTCTRL_PPE1'?
-    4042 |                 if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-         |                                                  ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.h:1022:53: note: in definition of macro 'MTK_HAS_CAPS'
-    1022 | #define MTK_HAS_CAPS(caps, _x)          (((caps) & (_x)) == (_x))
-         |                                                     ^~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c: In function 'mtk_pending_work':
-   drivers/net/ethernet/mediatek/mtk_eth_soc.c:4113:50: error: 'MTK_RSTCTRL_PPE2' undeclared (first use in this function); did you mean 'MTK_RSTCTRL_PPE1'?
-    4113 |                 if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-         |                                                  ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/mediatek/mtk_eth_soc.h:1022:53: note: in definition of macro 'MTK_HAS_CAPS'
-    1022 | #define MTK_HAS_CAPS(caps, _x)          (((caps) & (_x)) == (_x))
-         |                                                     ^~
-
-
-vim +3625 drivers/net/ethernet/mediatek/mtk_eth_soc.c
-
-  3611	
-  3612	static void mtk_hw_reset(struct mtk_eth *eth)
-  3613	{
-  3614		u32 val;
-  3615	
-  3616		if (mtk_is_netsys_v2_or_greater(eth))
-  3617			regmap_write(eth->ethsys, ETHSYS_FE_RST_CHK_IDLE_EN, 0);
-  3618	
-  3619		if (mtk_is_netsys_v3_or_greater(eth)) {
-  3620			val = RSTCTRL_PPE0_V3;
-  3621	
-  3622			if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-  3623				val |= RSTCTRL_PPE1_V3;
-  3624	
-> 3625			if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE2))
-  3626				val |= RSTCTRL_PPE2;
-  3627	
-  3628			val |= RSTCTRL_WDMA0 | RSTCTRL_WDMA1 | RSTCTRL_WDMA2;
-  3629		} else if (mtk_is_netsys_v2_or_greater(eth)) {
-  3630			val = RSTCTRL_PPE0_V2;
-  3631	
-  3632			if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSTCTRL_PPE1))
-  3633				val |= RSTCTRL_PPE1;
-  3634		} else {
-  3635			val = RSTCTRL_PPE0;
-  3636		}
-  3637	
-  3638		ethsys_reset(eth, RSTCTRL_ETH | RSTCTRL_FE | val);
-  3639	
-  3640		if (mtk_is_netsys_v3_or_greater(eth))
-  3641			regmap_write(eth->ethsys, ETHSYS_FE_RST_CHK_IDLE_EN,
-  3642				     0x6f8ff);
-  3643		else if (mtk_is_netsys_v2_or_greater(eth))
-  3644			regmap_write(eth->ethsys, ETHSYS_FE_RST_CHK_IDLE_EN,
-  3645				     0x3ffffff);
-  3646	}
-  3647	
-
+diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
+index b0d88442b091..36463ccc3df9 100644
+--- a/drivers/vfio/pci/pds/cmds.c
++++ b/drivers/vfio/pci/pds/cmds.c
+@@ -86,12 +86,13 @@ void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+ }
+ 
+ static int
+-pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio)
++pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
+ {
+ 	union pds_core_adminq_cmd cmd = {
+ 		.lm_suspend_status = {
+ 			.opcode = PDS_LM_CMD_SUSPEND_STATUS,
+ 			.vf_id = cpu_to_le16(pds_vfio->vf_id),
++			.type = type,
+ 		},
+ 	};
+ 	struct device *dev = pds_vfio_to_dev(pds_vfio);
+@@ -156,7 +157,7 @@ int pds_vfio_suspend_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
+ 	 * The subsequent suspend status request(s) check if the firmware has
+ 	 * completed the device suspend process.
+ 	 */
+-	return pds_vfio_suspend_wait_device_cmd(pds_vfio);
++	return pds_vfio_suspend_wait_device_cmd(pds_vfio, type);
+ }
+ 
+ int pds_vfio_resume_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.17.1
+
 
