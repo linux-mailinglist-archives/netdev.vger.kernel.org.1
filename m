@@ -1,104 +1,158 @@
-Return-Path: <netdev+bounces-29581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA52C783E06
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:40:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF5FD783E0D
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8F31C20B43
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:39:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DF77281013
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9558A7498;
-	Tue, 22 Aug 2023 10:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752738479;
+	Tue, 22 Aug 2023 10:40:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8788F8479
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 10:39:44 +0000 (UTC)
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CFDFB;
-	Tue, 22 Aug 2023 03:39:42 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.west.internal (Postfix) with ESMTP id BD2B2320092E;
-	Tue, 22 Aug 2023 06:39:33 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Tue, 22 Aug 2023 06:39:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1692700773; x=1692787173; bh=TYcehPDeyWrpL
-	ZI5nP9k0xeqXJO/gx+RoM3vlGRe1m0=; b=vxFbAE0yutGX+jZWygqwFfC9EQ3z/
-	CqINau8nxSRe0lN/K161c5bu3rDwH+4jaxorjkcUrp/Qqgl1P8WGj2q0EiEE9Pi7
-	hoYHiPNJh9KcL5Z+7mAgFh9VYj6fljpMxXSy2GpRyMERKZavPUop8gmcdz8qkwjT
-	8JhniTUCSeB54rNgo+S/Ya2NSzWGngky5cwBxlQGNd3M3gm9lLJxkNR+Ku461nGw
-	cDhfkB0AeZ5PVKYNkH3+YBjqmM4dm01cqhLAePed6H+x/whs4rqZqWBxiAOdNAb8
-	1EAWlqs2AqQES93sqBfXpHiMBMc6dJKTBD/LT6xICvU+DMCkROfqJDxNg==
-X-ME-Sender: <xms:ZJDkZHpzk1vzxcQeNTxuKacqQhN2HvVwdj1KdTTgpv_QEHiz8ZDTtA>
-    <xme:ZJDkZBrj9f8bS7sqwrJpUxhJ7vg6ZHje6obW5oBMYfwxeMayjc4tC9t2iVGDOYsBc
-    kS6EJTHk-ylk6k>
-X-ME-Received: <xmr:ZJDkZENmE8WuAl3Qv4_b2pjbB9nuSkbHwuf7PwRTIfV9yGKrpFpclzm8klDSYEzo3ov3rqr79_DfWg28GCXCeTpQP99Ffw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedruddvuddgfedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttd
-    ertddttddvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihgu
-    ohhstghhrdhorhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgf
-    duieefudeifefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecu
-    rfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:ZJDkZK4oyvtDv9vONxzsmVhYbmthUoMPMlZYdulCyAfbXOmdOrU11w>
-    <xmx:ZJDkZG5qS3a8raM6n88JfT9EerGmQzR4TPDfZODap8DF60tlQj86Lw>
-    <xmx:ZJDkZCjBCSJ8C4jEQ9yL4t4htrhvsF7lwQ17K-DjqT1AQfeblGL3nw>
-    <xmx:ZZDkZDx0OaoUA68RJ2LcgVXo_KwYYqRjbhMU3vOnTciviT5dVQI_Zg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 22 Aug 2023 06:39:31 -0400 (EDT)
-Date: Tue, 22 Aug 2023 13:39:27 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com,
-	syzbot+5ba06978f34abb058571@syzkaller.appspotmail.com,
-	wg@grandegger.com, mkl@pengutronix.de, idosch@nvidia.com,
-	lucien.xin@gmail.com, xemul@parallels.com, socketcan@hartkopp.net,
-	linux-can@vger.kernel.org
-Subject: Re: [PATCH net] net: validate veth and vxcan peer ifindexes
-Message-ID: <ZOSQX1iXMzNOOhXP@shredder>
-References: <20230819012602.239550-1-kuba@kernel.org>
- <ZOI6bf86B1fVb1sF@shredder>
- <20230821104844.19dd4563@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FE779C2
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 10:40:50 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE536FB
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:40:48 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so11087064a12.0
+        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:40:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1692700847; x=1693305647;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EtkRY1jmYwwZKGUT6GKi2lYbs/rnolItz7yunjkfTUE=;
+        b=vRqJyMPwpBjcl3tf+EYFWQTPiMQZEvD7T6FvKLjABWSOeGSosWuDdjxcvTGKHDmeAt
+         Q1oYCxFJBgQBK8pxgazV1n7AlbQ1AP5g3j9REhoJoT2vD0iLM52qYXTZMFj10/vD4MVe
+         HY4AQzOMvAjZR/nE8MWjpx72nHJzAxy0Oa2XBOqKRU7XjxmcYfkuHwzUxbv0k/f61RhQ
+         r34ZEJnvFi0OwC2hxjTOLj8HiCVdsfe2HHB1xeOzshBeiD7wQRZED/mIGbs6rbHQAMhz
+         AHVFSbytRMvaaC45Hr+PGVuLlEPLzd2/7a/9EzHagqYjb3IxPxAMsOn+sIf+pkL9C3V4
+         ljBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692700847; x=1693305647;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EtkRY1jmYwwZKGUT6GKi2lYbs/rnolItz7yunjkfTUE=;
+        b=TyrhW1jRiA3E+vGj67xhnRbzeDvfz/Ej9cI6lv5VZC4mdXgk5eO+prjj/WsPj/S2zi
+         3f5qcE/1J3UPxrlrB2tvYRgEPgC2z8lNlfT8Lg+0kkF3Ifgs92QcyN5scm7kkqOZCIqk
+         55FtjraYv58frRGsyLXXUVshSyJl1ASln5Ef2GmkFRpKG8Ytb38F06l5ms+peBPhnESG
+         Z7EQK6/Sl4NNw3zjLvk8CWb9xjTobo9bv7OL0pMvauik40594NzdSLWpQs3xyPt4cGHE
+         8PTkR1ow+mTI61K0JVovlKbcI8RYGJ8vt1xKCZAm8NN6wDEptvbEIRimG1jOY+Qh+QQx
+         Nezg==
+X-Gm-Message-State: AOJu0YxlaaXah/BIoxTRLTs/Caj8BEIcXlCOtZlU8jmOC0seRDayiFRi
+	5FEU5SJ/y+S0Hp2SYGh4ee+PMQ==
+X-Google-Smtp-Source: AGHT+IGejXQyuL6OmLUot7fp4FTAfapXJLUoNfcjAlSAoXH1hauFGBP5F41yvVrVMpRMtc6ydrKTug==
+X-Received: by 2002:a17:907:7da3:b0:982:a022:a540 with SMTP id oz35-20020a1709077da300b00982a022a540mr10182356ejc.11.1692700847182;
+        Tue, 22 Aug 2023 03:40:47 -0700 (PDT)
+Received: from [192.168.1.2] (handbookness.lineup.volia.net. [93.73.104.44])
+        by smtp.gmail.com with ESMTPSA id n12-20020a170906688c00b00982be08a9besm8162023ejr.172.2023.08.22.03.40.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 03:40:46 -0700 (PDT)
+Message-ID: <c81340d8-25f3-4014-b881-5afe01b56f6b@blackwall.org>
+Date: Tue, 22 Aug 2023 13:40:45 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230821104844.19dd4563@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] net: bridge: Fix refcnt issues in dev_ioctl
+Content-Language: en-US
+To: Ziqi Zhao <astrajoan@yahoo.com>
+Cc: arnd@arndb.de, bridge@lists.linux-foundation.org, davem@davemloft.net,
+ edumazet@google.com, f.fainelli@gmail.com, ivan.orlov0322@gmail.com,
+ keescook@chromium.org, kuba@kernel.org, hkallweit1@gmail.com,
+ mudongliangabcd@gmail.com, nikolay@nvidia.com, pabeni@redhat.com,
+ roopa@nvidia.com, skhan@linuxfoundation.org,
+ syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com,
+ vladimir.oltean@nxp.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <00000000000051197705fdbc7e54@google.com>
+ <20230819081057.330728-1-astrajoan@yahoo.com>
+ <df28eac7-ee6e-431c-acee-36a1c29a4ae0@blackwall.org>
+ <20230819225048.dxxzv47fo64g24qx@Astras-Ubuntu>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230819225048.dxxzv47fo64g24qx@Astras-Ubuntu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 21, 2023 at 10:48:44AM -0700, Jakub Kicinski wrote:
-> On Sun, 20 Aug 2023 19:08:13 +0300 Ido Schimmel wrote:
-> > There is another report here [1] with a reproducer [2]. Even with this
-> > patch, the reproducer can still trigger the warning on net-next. Don't
-> > we also need to reject a negative ifindex in the ancillary header? At
-> > least with the following diff the warning does not trigger anymore:
+On 8/20/23 01:50, Ziqi Zhao wrote:
+> On Sat, Aug 19, 2023 at 12:25:15PM +0300, Nikolay Aleksandrov wrote:
+> Hi Nik,
 > 
-> Yeah, definitely, please go ahead and submit.
+> Thank you so much for reviewing the patch and getting back to me!
+> 
+>> IIRC there was no bug, it was a false-positive. The reference is held a bit
+>> longer but then released, so the device is deleted later.
+> 
+>> If you reproduced it, is the device later removed or is it really stuck?
+> 
+> I ran the reproducer again without the patch and it seems you are
+> correct. It was trying to create a very short-lived bridge, then delete
+> it immediately in the next call. The device in question "wpan4" never
+> showed up when I polled with `ip link` in the VM, so I'd say it did not
+> get stuck.
+> 
+>> How would it leak a reference, could you elaborate?
+>> The reference is always taken and always released after the call.
+> 
+> This was where I got a bit confused too. The system had a timeout of
+> 140 seconds for the unregister_netdevice check. If the bridge in
+> question was created and deleted repeatedly, the warning would indeed
+> not be an actual reference leak. But how could its reference show up
+> after 140 seconds if the bridge's creation and deletion were all within
+> a couple of milliseconds?
+> 
+> So I let the system run for a bit longer with the reproducer, and after
+> ~200 seconds, the kernel crashed and complained that some tasks had
+> been waiting for too long (more than 143 seconds) trying to get hold of
+> the br_ioctl_mutex. This was also quite strange to me, since on the
+> surface it definitely looked like a deadlock, but the strict locking
+> order as I described previously should prevent any deadlocks from
+> happening.
+> 
+> Anyways, I decided to test switching up the lock order, since both the
+> refcnt warning and the task stall seemed closely related to the above
+> mentioned locks. When I ran the reproducer again after the patch, both
+> the warning and the stall issue went away. So I guess the patch is
+> still relevant in preventing bugs in some extreme cases -- although the
+> scenario created by the reproducer would probably never happen in real
+> usages?
+> 
 
-Sure, will submit tomorrow morning.
+Thank you for testing, but we really need to understand what is going on 
+and why the device isn't getting deleted for so long. Currently I don't 
+have the time to debug it properly (I'll be able to next week at the 
+earliest). We can't apply the patch based only on tests without 
+understanding the underlying issue. I'd look into what
+the reproducer is doing exactly and also check the system state while 
+the deadlock has happened. Also you can list the currently held locks 
+(if CONFIG_LOCKDEP is enabled) via magic sysrq + d for example. See 
+which process is holding them, what are their priorities and so on.
+Try to build some theory of how a deadlock might happen and then go
+about proving it. Does the 8021q module have the same problem? It uses
+similar code to set its hook.
 
-> Is "ancillary header" used more commonly as a term? in gnel we usually
-> call this thing "user header" or "fixed header".
+> Please let me know whether you have any thoughts on how the above
+> issues were triggered, and what other information I could gather to
+> further demystify this bug. Thank you again for your help!
+> 
+> Best regards,
+> Ziqi
 
-I honestly don't know. IIRC I saw David using the term a few years ago
-and decided to adopt it.
 
