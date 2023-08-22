@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-29695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED35784601
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:44:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC565784619
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B8391C209EE
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:44:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862D82810F7
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232B31DA4E;
-	Tue, 22 Aug 2023 15:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679371DA31;
+	Tue, 22 Aug 2023 15:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166CC1DA3A
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:43:52 +0000 (UTC)
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB2BCC1
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 08:43:51 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3a7d7df4e67so3209710b6e.1
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 08:43:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1692719031; x=1693323831;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ajclIQzbFdLlcdP9DjU7hg1vGqAEUCYg70OjfFGvT24=;
-        b=JxGERZVkKqQ2Bmy744D9Ru33N1TutZgya1ICAPiWiy1+kZu9uIq/45eAhuI588k3Q9
-         3WYvWs/v2mL26UOfAWP28lWs/9r2cbjttb+HT8ciqwZuv3RUe418lst3bn6jcVELlfUd
-         nsybwzla2xh9crYQE8O/PszyoyUPv0nB43NFloLjnP8AGHKLAzi7TbmgIzWPOb+vlilT
-         H8BoGwMLJNxiHNuS9/55811fl383GiSGA22YqrjNWgCQwRNt5gd37kYpgtBDlV5FoaHA
-         driPC268eqJrAeYt9Zfe2X00/PNwSeTMAVG5AZA7doKCH+p2d8W04kuT1zA0YDZ0jo2i
-         wRkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692719031; x=1693323831;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ajclIQzbFdLlcdP9DjU7hg1vGqAEUCYg70OjfFGvT24=;
-        b=GzxsjhohRkeZ6IhNm3uAOnwwx9fkIRLIj8a8kr8M8DSI7PhsRHgd1zgz8J5wBdTBiN
-         ya38SDjCzaIhNKd5sX474imLgO8yd88clZ1VeKjH2SGIZQGb1K8Q7IoPQpQvrEQHIc9S
-         K7dlu+NalVphRXVsOfWbD414V9S05+/0MSri+oWUsXJ3mGB23+YCEpG37BrTlA1w1blU
-         H4hHU9tbJXJp0tU1uUolSbN2EqkFxwvxHLk/U4gpsew/Z8kYenySHp5HuxDuW83sK2iS
-         iFqCyAVdNY81OfxDbRyr2+BSKpNHQ9mTwcs+wWi5p/dj2eQA3m6/iGZ/yMry11s5v7qH
-         pLHA==
-X-Gm-Message-State: AOJu0Yw5CaZEwvotOgztsVVGdMA+sJ7rI6x54QrgzZ3HG+wco632g++T
-	WVdTvTmjMT6h07Av7gHO6SovTaE1vRXq7XVjo/N92g==
-X-Google-Smtp-Source: AGHT+IGIbCz2EPzaat+n3tE+k02t5ph3R+v0j1IIsyrO1oNkN6ryEVeGqp0m4ienBAy8vKeH+Tn8Ow==
-X-Received: by 2002:a05:6808:492:b0:3a3:7a28:f841 with SMTP id z18-20020a056808049200b003a37a28f841mr10613242oid.41.1692719030872;
-        Tue, 22 Aug 2023 08:43:50 -0700 (PDT)
-Received: from hermes.local (204-195-127-207.wavecable.com. [204.195.127.207])
-        by smtp.gmail.com with ESMTPSA id m65-20020a633f44000000b0056601f864aesm8171583pga.2.2023.08.22.08.43.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 08:43:50 -0700 (PDT)
-Date: Tue, 22 Aug 2023 08:43:48 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: francois.michel@uclouvain.be
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next 1/2] tc: support the netem seed parameter
- for loss and corruption events
-Message-ID: <20230822084348.48ebc808@hermes.local>
-In-Reply-To: <20230822140417.44504-2-francois.michel@uclouvain.be>
-References: <20230822140417.44504-1-francois.michel@uclouvain.be>
-	<20230822140417.44504-2-francois.michel@uclouvain.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD481C28D
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:47:47 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32BEBCDF;
+	Tue, 22 Aug 2023 08:47:46 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1174)
+	id 7F6E22126CC2; Tue, 22 Aug 2023 08:47:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7F6E22126CC2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1692719265;
+	bh=HVGBPOnzeTlh8V57DK7yO/EoCj0a9cS67LN7UjxUnq0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XRyLgiNLWUjgs7IQZBoYir0iiyhMOHKFX444y3j82Bqsm3H175ySMUAt3hb1pFGIe
+	 CaH/3rL2WOii3wuiGttyL0cWqtbvGQQaKUaNwQuMeEyzoy0zInScw0QVcVfuvsESS2
+	 DpIE0si7LYBeL8f+qXUN4Wez1Nn2dzBU6y5m8C6k=
+From: sharmaajay@linuxonhyperv.com
+To: Long Li <longli@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ajay Sharma <sharmaajay@microsoft.com>
+Subject: [Patch v4 0/4] RDMA/mana_ib
+Date: Tue, 22 Aug 2023 08:47:31 -0700
+Message-Id: <1692719255-20183-1-git-send-email-sharmaajay@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-9.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Tue, 22 Aug 2023 16:04:02 +0200
-francois.michel@uclouvain.be wrote:
+From: Ajay Sharma <sharmaajay@microsoft.com>
 
-> +	if (seed_present)
-> +		print_u64(PRINT_ANY, "seed", " seed %llu", seed);
-> +
+This patch series introduces some cleanup changes and resource control
+changes. The mana and mana_ib devices are used at common places so a
+consistent naming is introduced. Adapter object container to have a
+common point of object release for resources and query the management
+software to prevent resource overflow. It also introduces async
+channel for management to notify the clients in case of 
+errors/info.
 
-Since seed is after slot in the manual, you might want to put
-it after slot in the output.
+
+
+Ajay Sharma (4):
+  RDMA/mana_ib : Rename all mana_ib_dev type variables to mib_dev
+  RDMA/mana_ib : Register Mana IB  device with Management SW
+  RDMA/mana_ib : Create adapter and Add error eq
+  RDMA/mana_ib : Query adapter capabilities
+
+ drivers/infiniband/hw/mana/cq.c               |  12 +-
+ drivers/infiniband/hw/mana/device.c           |  72 +++--
+ drivers/infiniband/hw/mana/main.c             | 283 +++++++++++++-----
+ drivers/infiniband/hw/mana/mana_ib.h          |  96 +++++-
+ drivers/infiniband/hw/mana/mr.c               |  42 ++-
+ drivers/infiniband/hw/mana/qp.c               |  84 +++---
+ drivers/infiniband/hw/mana/wq.c               |  21 +-
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 151 ++++++----
+ drivers/net/ethernet/microsoft/mana/mana_en.c |   3 +
+ include/net/mana/gdma.h                       |  16 +-
+ 10 files changed, 525 insertions(+), 255 deletions(-)
+
+-- 
+2.25.1
+
 
