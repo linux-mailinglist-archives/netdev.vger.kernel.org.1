@@ -1,226 +1,154 @@
-Return-Path: <netdev+bounces-29724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1005F7847BC
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:33:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 665A47847D1
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE301C20936
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:33:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965C71C20B26
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD271E539;
-	Tue, 22 Aug 2023 16:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B452B549;
+	Tue, 22 Aug 2023 16:37:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76C31E536
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 16:33:36 +0000 (UTC)
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F20CCE4;
-	Tue, 22 Aug 2023 09:33:27 -0700 (PDT)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1qYUJi-0000JD-2K;
-	Tue, 22 Aug 2023 16:33:18 +0000
-Date: Tue, 22 Aug 2023 17:33:12 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v3 4/4] net: ethernet: mtk_eth_soc: support 36-bit
- DMA addressing on MT7988
-Message-ID: <95b919c98876c9e49761e44662e7c937479eecb8.1692721443.git.daniel@makrotopia.org>
-References: <cover.1692721443.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406202B540
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 16:37:30 +0000 (UTC)
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62E9319A;
+	Tue, 22 Aug 2023 09:37:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1692722240; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=VrMPXu126qA1zWg4T1cHKT67k4Mrm+mLMeWmykui9qpSLhbudlToJMAydjo0zrcsH8
+    0CWua1x9ZQVCniasSw8s8VaV1/gXMCM5B0zZhdke1wxyXcGI1Wo3QbRHgWaKx4evO76J
+    w8oZwFjLRNmQpNGudeYFFzw1px7fD9AP/3PZZV96jMhNREYm2TDrPZK98V0lEuekFRiB
+    AsGrB4TmBWZo4dZDLPpzveS9RQ9sp7EJ5qYOAs5eorIo4r8XDaWWqZVur8Ms2IdjEeq3
+    l+bY6Huy0OR+6eks7NhzggfnHnek9L/hdzWli3E1OK1aO+m4mwmCvActl3uCHz3EHxYz
+    983g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1692722240;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=3UwJzMbkLFZw0nZ0onj9BUDO1u+iqWdju5iLoQEeJmA=;
+    b=ps3in1mETE8GmhYcqIeypfXdTHD3fBRM0tVLqmmj3bUBwIiLJVXfkeksxudMrzfAky
+    bFpL7XjNIQbpChGniPyf4iGnY8C6e1H64wsrJSKfM6IcnS6kJdY0mpNuCP03XDDsGXOa
+    pfITe6VHuz0FSkCHDnyGI3snZlUQpT8/IEqmgR1ZI91VMsumEyU3WLWIlsTE4Gb+jbGz
+    JQIe+vPyaH/bA66CyQnT5SGZzea0GbC/Z5F8lAx6aEOZdz/t95CxnPFK1S5s/htRp6xm
+    TDVNXfq3E+AXvihXMsKPjmCfhHVbd8DY7lTXoht2jTMoXjXa7XnFBCncNWNEIJJGQ71t
+    Nknw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1692722240;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=3UwJzMbkLFZw0nZ0onj9BUDO1u+iqWdju5iLoQEeJmA=;
+    b=PgouducNIKqjoEDrVlxhxebFSFBhQpj1IYN05CYgdfet3ODykxU559rLGi30v/EyUu
+    8uh9LHUTkhXITXOQ5Q04AFi5NV690++Hy+BJENSXA0Jmemt8z1CXvwkxSU7W47LlcKo2
+    +ktARgzEPV0D2kqS/xzHxbf/cutXICOQeurKWoo47349muDmJCj4r0AdqKwnwY6mwbaG
+    FPmxmmpk23h1rbs5bI0pWfzkFI9QibNb294zUaDNNYLU4RpoDtWEyQV3BGn77h2und52
+    QbgkSVUEIycVXg/VBtQmFTc5BlNSDwvBczZizL8NMbgmvKmGD60j3t8nPASA51Q3NJaN
+    82lg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1692722240;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=3UwJzMbkLFZw0nZ0onj9BUDO1u+iqWdju5iLoQEeJmA=;
+    b=3mGb9sYCCWhaTkmznNezAs5xfK2/JM3XiM2Wh4OCzDT0D9NwPsEqx2gVDWs/Qra1jV
+    /bSzEasiFELCb67o1aCA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq1USEbMhpqw=="
+Received: from [IPV6:2a00:6020:4a8e:5004::923]
+    by smtp.strato.de (RZmta 49.8.1 AUTH)
+    with ESMTPSA id K723f1z7MGbJ3h5
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 22 Aug 2023 18:37:19 +0200 (CEST)
+Message-ID: <04fd32bc-b1c4-b9c3-3f8b-7987704a1f85@hartkopp.net>
+Date: Tue, 22 Aug 2023 18:37:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1692721443.git.daniel@makrotopia.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: can: isotp: epoll breaks isotp_sendmsg
+To: Lukas Magel <lukas.magel@posteo.net>, Michal Sojka
+ <michal.sojka@cvut.cz>, Maxime Jayat <maxime.jayat@mobile-devices.fr>,
+ Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "Dae R. Jeong" <threeearcat@gmail.com>,
+ Hillf Danton <hdanton@sina.com>
+References: <11328958-453f-447f-9af8-3b5824dfb041@munic.io>
+ <87cz1czihl.fsf@steelpick.2x.cz>
+ <2d8a4d46-f1e4-4e2a-819d-6c28ad37273f@posteo.net>
+ <577b6372-47b0-4009-b83c-706f9bc7abe7@posteo.net>
+ <f39ae7f2-6216-e5b4-1f4d-e01bdee7cf7c@hartkopp.net>
+ <f4221e5e-8fee-4ed6-af54-46b8ac0e5c03@posteo.net>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <f4221e5e-8fee-4ed6-af54-46b8ac0e5c03@posteo.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Systems having 4 GiB of RAM and more require DMA addressing beyond the
-current 32-bit limit. Starting from MT7988 the hardware now supports
-36-bit DMA addressing, let's use that new capability in the driver to
-avoid running into swiotlb on systems with 4 GiB of RAM or more.
+Hi Lukas,
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 30 +++++++++++++++++++--
- drivers/net/ethernet/mediatek/mtk_eth_soc.h | 22 +++++++++++++--
- 2 files changed, 48 insertions(+), 4 deletions(-)
+On 22.08.23 08:51, Lukas Magel wrote:
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index ec6a251a0f026..6ad42e3b488f7 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -1328,6 +1328,10 @@ static void mtk_tx_set_dma_desc_v2(struct net_device *dev, void *txd,
- 	data = TX_DMA_PLEN0(info->size);
- 	if (info->last)
- 		data |= TX_DMA_LS0;
-+
-+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
-+		data |= TX_DMA_PREP_ADDR64(info->addr);
-+
- 	WRITE_ONCE(desc->txd3, data);
- 
- 	 /* set forward port */
-@@ -1997,6 +2001,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 	bool xdp_flush = false;
- 	int idx;
- 	struct sk_buff *skb;
-+	u64 addr64 = 0;
- 	u8 *data, *new_data;
- 	struct mtk_rx_dma_v2 *rxd, trxd;
- 	int done = 0, bytes = 0;
-@@ -2112,7 +2117,10 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 				goto release_desc;
- 			}
- 
--			dma_unmap_single(eth->dma_dev, trxd.rxd1,
-+			if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
-+				addr64 = RX_DMA_GET_ADDR64(trxd.rxd2);
-+
-+			dma_unmap_single(eth->dma_dev, ((u64)trxd.rxd1 | addr64),
- 					 ring->buf_size, DMA_FROM_DEVICE);
- 
- 			skb = build_skb(data, ring->frag_size);
-@@ -2178,6 +2186,9 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 		else
- 			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size);
- 
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
-+			rxd->rxd2 |= RX_DMA_PREP_ADDR64(dma_addr);
-+
- 		ring->calc_idx = idx;
- 		done++;
- 	}
-@@ -2670,6 +2681,9 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 		else
- 			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size);
- 
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
-+			rxd->rxd2 |= RX_DMA_PREP_ADDR64(dma_addr);
-+
- 		rxd->rxd3 = 0;
- 		rxd->rxd4 = 0;
- 		if (mtk_is_netsys_v2_or_greater(eth)) {
-@@ -2716,6 +2730,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 
- static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_sram)
- {
-+	u64 addr64 = 0;
- 	int i;
- 
- 	if (ring->data && ring->dma) {
-@@ -2729,7 +2744,10 @@ static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_
- 			if (!rxd->rxd1)
- 				continue;
- 
--			dma_unmap_single(eth->dma_dev, rxd->rxd1,
-+			if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
-+				addr64 = RX_DMA_GET_ADDR64(rxd->rxd2);
-+
-+			dma_unmap_single(eth->dma_dev, ((u64)rxd->rxd1 | addr64),
- 					 ring->buf_size, DMA_FROM_DEVICE);
- 			mtk_rx_put_buff(ring, ring->data[i], false);
- 		}
-@@ -4734,6 +4752,14 @@ static int mtk_probe(struct platform_device *pdev)
- 		}
- 	}
- 
-+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
-+		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(36));
-+		if (err) {
-+			dev_err(&pdev->dev, "Wrong DMA config\n");
-+			return -EINVAL;
-+		}
-+	}
-+
- 	spin_lock_init(&eth->page_lock);
- 	spin_lock_init(&eth->tx_irq_lock);
- 	spin_lock_init(&eth->rx_irq_lock);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 7e961fff94f35..403219d987eff 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -331,6 +331,14 @@
- #define TX_DMA_PLEN1(x)		((x) & eth->soc->txrx.dma_max_len)
- #define TX_DMA_SWC		BIT(14)
- #define TX_DMA_PQID		GENMASK(3, 0)
-+#define TX_DMA_ADDR64_MASK	GENMASK(3, 0)
-+#if IS_ENABLED(CONFIG_64BIT)
-+# define TX_DMA_GET_ADDR64(x)	(((u64)FIELD_GET(TX_DMA_ADDR64_MASK, (x))) << 32)
-+# define TX_DMA_PREP_ADDR64(x)	FIELD_PREP(TX_DMA_ADDR64_MASK, ((x) >> 32))
-+#else
-+# define TX_DMA_GET_ADDR64(x)	(0)
-+# define TX_DMA_PREP_ADDR64(x)	(0)
-+#endif
- 
- /* PDMA on MT7628 */
- #define TX_DMA_DONE		BIT(31)
-@@ -343,6 +351,14 @@
- #define RX_DMA_PREP_PLEN0(x)	(((x) & eth->soc->txrx.dma_max_len) << eth->soc->txrx.dma_len_offset)
- #define RX_DMA_GET_PLEN0(x)	(((x) >> eth->soc->txrx.dma_len_offset) & eth->soc->txrx.dma_max_len)
- #define RX_DMA_VTAG		BIT(15)
-+#define RX_DMA_ADDR64_MASK	GENMASK(3, 0)
-+#if IS_ENABLED(CONFIG_64BIT)
-+# define RX_DMA_GET_ADDR64(x)	(((u64)FIELD_GET(RX_DMA_ADDR64_MASK, (x))) << 32)
-+# define RX_DMA_PREP_ADDR64(x)	FIELD_PREP(RX_DMA_ADDR64_MASK, ((x) >> 32))
-+#else
-+# define RX_DMA_GET_ADDR64(x)	(0)
-+# define RX_DMA_PREP_ADDR64(x)	(0)
-+#endif
- 
- /* QDMA descriptor rxd3 */
- #define RX_DMA_VID(x)		((x) & VLAN_VID_MASK)
-@@ -942,6 +958,7 @@ enum mkt_eth_capabilities {
- 	MTK_RSTCTRL_PPE2_BIT,
- 	MTK_U3_COPHY_V2_BIT,
- 	MTK_SRAM_BIT,
-+	MTK_36BIT_DMA_BIT,
- 
- 	/* MUX BITS*/
- 	MTK_ETH_MUX_GDM1_TO_GMAC1_ESW_BIT,
-@@ -978,6 +995,7 @@ enum mkt_eth_capabilities {
- #define MTK_RSTCTRL_PPE2	BIT_ULL(MTK_RSTCTRL_PPE2_BIT)
- #define MTK_U3_COPHY_V2		BIT_ULL(MTK_U3_COPHY_V2_BIT)
- #define MTK_SRAM		BIT_ULL(MTK_SRAM_BIT)
-+#define MTK_36BIT_DMA	BIT_ULL(MTK_36BIT_DMA_BIT)
- 
- #define MTK_ETH_MUX_GDM1_TO_GMAC1_ESW		\
- 	BIT_ULL(MTK_ETH_MUX_GDM1_TO_GMAC1_ESW_BIT)
-@@ -1059,8 +1077,8 @@ enum mkt_eth_capabilities {
- 		      MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | \
- 		      MTK_RSTCTRL_PPE1 | MTK_SRAM)
- 
--#define MT7988_CAPS  (MTK_GDM1_ESW | MTK_QDMA | MTK_RSTCTRL_PPE1 | \
--		      MTK_RSTCTRL_PPE2 | MTK_SRAM)
-+#define MT7988_CAPS  (MTK_36BIT_DMA | MTK_GDM1_ESW | MTK_QDMA | \
-+		      MTK_RSTCTRL_PPE1 | MTK_RSTCTRL_PPE2 | MTK_SRAM)
- 
- struct mtk_tx_dma_desc_info {
- 	dma_addr_t	addr;
--- 
-2.41.0
+>>> @Oliver I adjusted the exit path for the case where the initial wait is
+>>> interrupted to return immediately instead of jumping to err_event_drop.
+>>> Could you please check if you would agree with this change?
+>> The code has really won with your change! Thanks!
+>>
+>> But as you already assumed I have a problem with the handling of the
+>> cleanup when a signal interrupts the wait_event_interruptible() statement.
+>>
+>> I think it should still be:
+>>
+>> /* wait for complete transmission of current pdu */
+>> err = wait_event_interruptible(so->wait, so->tx.state == ISOTP_IDLE);
+>> if (err)
+>>           goto err_event_drop;
+>>
+>> as we need to make sure that the state machine is set to defined values
+>> and states for the next isotp_sendmsg() attempt.
+>>
+>> Best regards,
+>> Oliver
+> 
+> 
+> Thank you for the feedback! Can you elaborate why the state needs to be
+> reset here? For me, the loop is basically a "let's wait until we win
+> arbitration for the tx.state", which means that the task is allowed
+> to send. I'm imagining an application that has two threads, both sending
+> at the same time (because maybe they don't care about reading). So one
+> would always be waiting in the loop until the send operation of the other
+> has concluded. My motivation for not going to err_event_drop was that if
+> one thread was interrupted in its wait_event_interruptible, why would we
+> need to change tx.state that is currently being occupied by the other
+> thread? The thread waiting in the loop has not done any state manipulation
+> of the socket.
+
+Please don't only look at the isotp_sendmsg() function but the other 
+possibilities e.g. from timeouts.
+
+Look for the documentation from the commit 051737439eaee. This patch has 
+been added recently as it was needed.
+
+Best regards,
+Oliver
 
