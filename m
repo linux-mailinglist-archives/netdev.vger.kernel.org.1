@@ -1,61 +1,93 @@
-Return-Path: <netdev+bounces-29684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72F13784530
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:13:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D447D78454C
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BB7D281104
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10ADD1C209C5
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00941D307;
-	Tue, 22 Aug 2023 15:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44561D30A;
+	Tue, 22 Aug 2023 15:20:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4EF61FD0
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:12:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB7CC433C7;
-	Tue, 22 Aug 2023 15:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692717177;
-	bh=SDTz5ot6TCb02ZDMISMKb+snwaqJ5DTq12W2yyBuf38=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jADm5rj0BUxJdpJEZeOBC/lvTE585n4ykOkZs7/TvcOXdl35W2CAYPk15xRMDj9aX
-	 RfKaOl4qN6VHAsKO70+0J+zRLcfZUwYyVQZXuVxzPkBRb56UTEX6yLC7R2VKoX7Ii3
-	 Mr1JBSifFsR4uEL61cJdQFF9FloTrc1oNyslGPIz+1Bbwo5swxe+bu/2tc148uQ58t
-	 ggi3E6CbMe9xfXDzF0A6CmcA7GMTCg3BOxnyt6S5vUdy7y03rHbOi9bT6yeC0CM7OX
-	 TPAIAeDNowtAEzNf4KtOivvbaGtgVOdLg3FaXjYSVqX1ZfkvQyL1DEZGMLSTUJ/LvY
-	 qUlfBLmHfyoVw==
-Date: Tue, 22 Aug 2023 08:12:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Wenjun Wu <wenjun1.wu@intel.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, xuejun.zhang@intel.com, madhu.chittim@intel.com,
- qi.z.zhang@intel.com, anthony.l.nguyen@intel.com
-Subject: Re: [PATCH iwl-next v4 0/5] iavf: Add devlink and devlink rate
- support
-Message-ID: <20230822081255.7a36fa4d@kernel.org>
-In-Reply-To: <ZORRzEBcUDEjMniz@nanopsycho>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
-	<20230822034003.31628-1-wenjun1.wu@intel.com>
-	<ZORRzEBcUDEjMniz@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70DC1FD0
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:20:49 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19340CD9;
+	Tue, 22 Aug 2023 08:20:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=j7dccOxm/oPivTdOBSmOXPPu0sVwTdHd1TVVg6mfImQ=; b=jtLyJAjm9RaGoQDTEOw/dfKFkT
+	6DW7BdJSJcJQUt4xUWRDvj7XoY2GOUltc9Th4srekp3SDPZeVRUW9GRQyyWm096X0Ya0EoCOye164
+	jJKhrXWzAtjxxqPDWdr0trqb4PFFaMKIHEzFpw5joJCtwj/AwtjpZUp/QatWKRs5EWtQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qYTBL-004nDz-T5; Tue, 22 Aug 2023 17:20:35 +0200
+Date: Tue, 22 Aug 2023 17:20:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH v2 3/4] net: stmmac: Add glue layer for Loongson-1 SoC
+Message-ID: <150ae6c1-8a2f-4fd7-b012-a53a909919d4@lunn.ch>
+References: <20230816111310.1656224-1-keguang.zhang@gmail.com>
+ <20230816111310.1656224-4-keguang.zhang@gmail.com>
+ <c3454ad9-1874-4301-b1b1-4f76886802fb@lunn.ch>
+ <CAJhJPsWVRJg7zNeXPDovkBM4pm7hD+RP21DRxt0726VXtzvCHw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJhJPsWVRJg7zNeXPDovkBM4pm7hD+RP21DRxt0726VXtzvCHw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 22 Aug 2023 08:12:28 +0200 Jiri Pirko wrote:
-> NACK! Port function is there to configure the VF/SF from the eswitch
-> side. Yet you use it for the configureation of the actual VF, which is
-> clear misuse. Please don't
+> > What about the other three RGMII modes? Plain rgmii is pretty unusual,
+> > rgmii-id is the most used.
+> >
+> According to the LS1B datasheet, only RGMII and MII are supported.
+> And I can confirm that MII mode does work for LS1B.
 
-Stating where they are supposed to configure the rate would be helpful.
+What does your device tree look like? What are you setting phy-mode to
+in the rgmii case? As i said, "rgmii" is pretty unusual, you normally
+need "rgmii-id".
+
+Something in the system needs to add 2ns delays to the RGMII clock
+lines. Generally in device tree you pass phy-mode = "rgmii-id"; The
+MAC configures itself for RGMII, and passes
+PHY_INTERFACE_MODE_RGMII_ID to the PHY when it is attached. The PHY
+then inserts the delays.
+
+What is inserting the delays in your system?
+
+     Andrew
+
 
