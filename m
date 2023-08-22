@@ -1,222 +1,172 @@
-Return-Path: <netdev+bounces-29628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEDC178417C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:03:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9121C784187
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:05:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDEE21C20AE7
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:03:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 480EA281062
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5BD1C9E0;
-	Tue, 22 Aug 2023 13:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6291C9E2;
+	Tue, 22 Aug 2023 13:05:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED4B7F;
-	Tue, 22 Aug 2023 13:03:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C5FCC6;
-	Tue, 22 Aug 2023 06:03:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692709387; x=1724245387;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=bfVisHuGty7CrsDVwRFiLIBfH1x+UYA4SHJJdhO+dqA=;
-  b=fiIeLLG6bvceBjL5/SOoRa5W1iRCS8h3UEHfPAUPB3/oxd1JGucu3h7d
-   5tOyYh6Hun89AZK2JEhBa4krpusxjJAP18Gv6dQ8V2auBhEZ5mgEOufvc
-   dPQSUIUAS68Pt/n/TleMuFc81d352M/q2zKXmuBkJrBnRks1gmZzjpi2M
-   6//uqqh9FWkkhbtXuPLlR2F9pTzk/38BhCURry0cKmx8a2xK++Von5Eyz
-   z9opbXowf+KK/umisf4H1Ve8cLTtKqQy7JS9tnCnzgimApIUszvLfV7I5
-   DIp6lOcQKh6kQYSfIgp/Gdk50CjlldijHDCFof1/zIx5XJxKfwQuhs0Sv
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="364039429"
-X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
-   d="scan'208";a="364039429"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 06:02:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="982862392"
-X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
-   d="scan'208";a="982862392"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga006.fm.intel.com with ESMTP; 22 Aug 2023 06:02:54 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 22 Aug 2023 06:02:54 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 22 Aug 2023 06:02:54 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 22 Aug 2023 06:02:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Is28yHQaV9LV/w4pod5NA4oX+JHxG/BFaj09HiRSRT8H1Y4yGAaxOdqMC1S5/63PmV7hxHXpJLNgEdD0C9ddn8om/q+MQGY8P1yjtdaST9b9WjTe0GpNk2BbQCLvtXIbncdCu3AmDF39F5P6omqrON3UHouP44vmH0GgbtYa4ZD4TA0+8b6G9n1q5BZWceyI8EqCnohOsHfLeEQ5/h+VPBMD0e622HIRz52XWyo8QhxnKJyPdRd2GTxWwKS0rDBlB2YpTkGFjHdkytlmYwVav0aS5Xk2jDH28KYUmYJfVSqoPCKgnfbr8eBpDyyA9t+jPbmIOcTJ27olilY8ocY3fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LXnZLvv9uS0skWk5bH7BrUjncyfD44GEZIWK8ZK3+O4=;
- b=NO53hRn8EIGgdPifsysAftfcZWWCvPf+SBTr/BBan50Yhn95Ce2AwuE2HJ6eb+lut/hLGZccrrCYBpfDtY3Z6KLevYl91qyBjbFKCcwtiXUIYiEffcPwn2NbUYN+5pLNcgrtr/6AZXox90bGUZ8xF9NixkansRkvb5mx8XjuvugbeJd18y8JPd1fp1UN5JIj1FuK0seqCc3TqedySRQkH1aSqQk6pLhi3fzmrc/60WcetF8XYV2aoXMEJF3fhXbNgyNXfi8iyQemFVUwDOw+SIQqDVbaILUUg1qGfftcZo0wsY1tP7vgJgSG15l/pZ2rWYgi47u+BVPWqqLbFQJbNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- SJ1PR11MB6153.namprd11.prod.outlook.com (2603:10b6:a03:488::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Tue, 22 Aug
- 2023 13:02:51 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::c1f9:b4eb:f57e:5c3d]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::c1f9:b4eb:f57e:5c3d%3]) with mapi id 15.20.6699.022; Tue, 22 Aug 2023
- 13:02:51 +0000
-Date: Tue, 22 Aug 2023 15:02:38 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-CC: <magnus.karlsson@intel.com>, <bjorn@kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<yhs@fb.com>, <andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>,
-	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
-	<haoluo@google.com>, <jolsa@kernel.org>
-Subject: Re: [PATCH bpf-next 10/10] selftests/xsk: display command line
- options with -h
-Message-ID: <ZOSx7rZ4NcRBX/MR@boxer>
-References: <20230809124343.12957-1-magnus.karlsson@gmail.com>
- <20230809124343.12957-11-magnus.karlsson@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230809124343.12957-11-magnus.karlsson@gmail.com>
-X-ClientProxiedBy: FR3P281CA0182.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a4::17) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213A47F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 13:05:53 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F94CDD
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:05:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692709551;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G7FAYdoJwloLrv0UGWz5p4dSAOg5t5Yw2PfUQOXhwCU=;
+	b=Hxv92FxjrLVASy4agzebWpN0fcNQ4KMFn8B7e2ESBD9R8zp5e1AiYE3g5t4fMFbdJ9RmHE
+	178ayEEWzhmgA8iD+5w34S1kffCCckd6Ei+CAAt07NoccgQddoD0FKWvyMWVXQkdnDkMAS
+	/Zpv0A3uHE+Cxjyj8NMRI52XKXR7hFM=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-183-gi1LhVfjOm2p9KCPikQFug-1; Tue, 22 Aug 2023 09:05:50 -0400
+X-MC-Unique: gi1LhVfjOm2p9KCPikQFug-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2bba9a3d63fso45077101fa.0
+        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:05:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692709548; x=1693314348;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G7FAYdoJwloLrv0UGWz5p4dSAOg5t5Yw2PfUQOXhwCU=;
+        b=VNF1ToNbp9LcAB8gaLJ87igrE6DjeEBHIyADk8ID2RJf2mCsGTnEloKUdwtLCcaMgx
+         oLms4+KPksy8Z6JHexFI9f5HwF5Q8vM8D3emIqr9aEG7B6dV/vwpIScKZEd3YaUF4z6y
+         QZRz1iqHjgAW4jPN734xwwTud8YYTIz/WH37Eq1WiXgP131fpFczYPCN+7H6W1fezbF3
+         /OEw9VoTKrxeKoDnmD6tdrFkN5MrCp3OeTh18lUCY8J1H8RK5RQFcrbxwDlydqir0VrW
+         5/ZoXz8p9alaXMOmZA0ynbmvdVyR4m71IyqdKLKjVBQYSNmFy+pVBh3+mtDRhAllSDwN
+         o1Kw==
+X-Gm-Message-State: AOJu0YwekCGqB4mj0PuZEBCpjiEztU56XmUvfk3xTVoB2R4HttQuHVCq
+	pXb4yGQQIa0mxF7KtSjMOLtAH7B+zphEiQ7gePETnwixjF2jX42knMxJ16exkWHoNdKOAB5S07h
+	ALjbrtOOOwJvtbces
+X-Received: by 2002:a2e:9dcd:0:b0:2b6:e105:6174 with SMTP id x13-20020a2e9dcd000000b002b6e1056174mr7134457ljj.47.1692709548645;
+        Tue, 22 Aug 2023 06:05:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEN/2HdvHP/tbRs13x2YKwx3LDsEjKHDcO/3micVZQ4thN1wkq5rYdyuRU4M1SJnlVojS4sWA==
+X-Received: by 2002:a2e:9dcd:0:b0:2b6:e105:6174 with SMTP id x13-20020a2e9dcd000000b002b6e1056174mr7134433ljj.47.1692709548169;
+        Tue, 22 Aug 2023 06:05:48 -0700 (PDT)
+Received: from [192.168.42.222] (83-90-141-187-cable.dk.customer.tdc.net. [83.90.141.187])
+        by smtp.gmail.com with ESMTPSA id l20-20020a17090615d400b009930308425csm8138891ejd.31.2023.08.22.06.05.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 06:05:47 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <ef4ca8d3-3127-f6dd-032a-e04d367fd49c@redhat.com>
+Date: Tue, 22 Aug 2023 15:05:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SJ1PR11MB6153:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7126fea0-babf-487e-2894-08dba310175d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UPTmfviT+LiQsoQSySdPa9b4OP/gt9yKgyVlOw3M5FdvmNst0iJjGMWgIA5HY4ghS5ityuJ8zEb1l1WNmqO2so8+b/QPxk3wW+XpXCYMMhwIps7NYD2ysvcXL16X1BtM1DV+drNgQ3HXdT8j7pjl8+1WyQ+GqnyJ9eZ1rHS0u15XWjPZkwosLzK6jUzS3uwWnPDvXpaIxzk52icKEAfRw+PLkzzE0KHezIR54+YJtBbNzuxxj1sdIvjBcV/His2WJwAd8rp7eJOdejPFwg1g5JK6P+6YAPC6nYgaBHDk9dHSEpop8jWRdjYOnXRAQSN4F8KqMa3JIWdfM+LrUnpEqES+eAVb/KYU0J8BLCifLrZwvLS5MQOUtdNqtFhAZ++yl1j47UwiOEnwNdTBWzyzJCMi5FR/F8ETbrNIjcZYFAuZTTWbI+Uy5+lsK/YwpljLaDDTVbn+kTAuU70LAyBdVckpzr6Wy+P+/sOWrgiajiFyeULolhSGZedN8Z0w5zT18vZz3eg02aC22aWIH6c0Bz2CxDJ3ipGXGqWElIIykhYKqIDIo6Mo5T61SrttJCtv
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(376002)(396003)(366004)(39860400002)(346002)(1800799009)(186009)(451199024)(6916009)(66476007)(66556008)(316002)(9686003)(66946007)(6512007)(82960400001)(8676002)(8936002)(4326008)(33716001)(41300700001)(478600001)(6666004)(38100700002)(6486002)(6506007)(83380400001)(2906002)(7416002)(86362001)(44832011)(5660300002)(26005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZMQRdmra4V8o4/4hTlbjCBVd5oICgHHDoeoNg51OxCvHYEtn8bhVdDFY+8uD?=
- =?us-ascii?Q?861f0Dga9hoCJs1yS6cbo+F3kLhuS2HHICRxVRNA/1Xc+stw9mnSAIFyBiGN?=
- =?us-ascii?Q?wTav8EbO0o9bVJAdqyZyxPzIDx/oWulkPM0k0lJSW/DFWEproo3v56/sOA90?=
- =?us-ascii?Q?kJjS0H4HouHSW25j7XH1MVKlnlJ+d1IqUU3DivWaVBFq5qgxphFK12yOhvgi?=
- =?us-ascii?Q?MegE8BRJOdcI5/st2VW7ml5AQaObkieC/M4idDHznk5P5MxKhtLLTPH3XoVc?=
- =?us-ascii?Q?ZzLt0kBZn7T44ahNwb5WdfbG/QIrs1YtiB7YMvvxKezmIzQh2uBduxy+HC78?=
- =?us-ascii?Q?QYRrGRfSHOs+r5us4jatONxQ2BjLkUi0FAoB/Rs2I0XhcFdvE2i6+IWGvz8+?=
- =?us-ascii?Q?aenAV9Z8UJ/Rceq1jyBkgz1kGtbiB1JzkwDjK9xteZ/+vV8MsuNk1rvC5HV3?=
- =?us-ascii?Q?SBPb2OiagpWe+3Q5DC6MdfUiPCs/ub9T3yxFX82SexMSuaYtWTXLbr7LzSaR?=
- =?us-ascii?Q?U+4iiSu4je0VJuRcP2/QaSoHLSh455gWH0IzVDCqiTmVH5/Ox8Zo6KPXEoL/?=
- =?us-ascii?Q?Frf3RgLAeJ1DwS4hEMuZ5KB6VHmUiWiuSIuB1Eo/feb0TyNbfE/MAzXwOAvW?=
- =?us-ascii?Q?jHB7cHo7XHnJ8TK++2SmggUZNzTrhqQmtaGqvErL5uaxGNswWm0aSx74eiB2?=
- =?us-ascii?Q?Xw7ZOkmyfwDliCF8xTsbYIWvHuLhWGo+NAh85ExtVstBHPTjddt5sAM02Rf5?=
- =?us-ascii?Q?MFJG6Hi+LEyrnWSyp3npwQ23IDcKoEV8qAufR5EZ0UsmebZ/3m7OZAXJQieK?=
- =?us-ascii?Q?EVVn/xfkNzPKpaX97fbkyTxxfMstrOOnzK/lANhM8jYQwuuB1lI8cDfUuiIq?=
- =?us-ascii?Q?mbjsJFmpIcKjWMrsvKu5jAosm/sDjrs6Ihoeh/RVC0QYT0Fqe7RLQk5InJSc?=
- =?us-ascii?Q?rFo/DPxO32NZMtOqJrhZK+R7dI8kgmZJqG5tQseXg4TwUG8BOv95vJMOf14t?=
- =?us-ascii?Q?PRaE0zNqAVie8RvPnZTWJ0ZE2WKetJXlzqbkba4pXnjcdBhDo+ty/Ukfgb+W?=
- =?us-ascii?Q?FEL1RcvZ0jEm4WlI6PUAMRz9T9cmeDIH1MlPQZK1Y3xU3mehMGt0W2QKfNXu?=
- =?us-ascii?Q?cPJR59OIqi5JJNGECSPqrZNvjmKcNKIb2AaeTlyxjiNeEUVTDQAaQQjjwinQ?=
- =?us-ascii?Q?RdMSwL/8UFwQHiX+DX7zsUlW+anuO9hlmtVoUD4caLSyMCAClhjwZs906ww3?=
- =?us-ascii?Q?K3BIQHqt/qM1dH9EQ8IPb51poUabzoOrJiYPIcmC+DWcuyKWnF9OdCMnKtJ4?=
- =?us-ascii?Q?y2qhgA5r5EcozOkWx2yfD1D7I0AyPrTqVMj9vwBjmOxRaL/Hp+EhKVm7pK38?=
- =?us-ascii?Q?EAIDtWp2AOkSU5lOepHusFv2pIwQSV6pQwdQ2WhsASys5+iZZrCrf223lxvp?=
- =?us-ascii?Q?Ps38cb6M+/Z6PsZ6yGDhd+0VFfloSSmIKNlMaOOTmyTCSe+uhGpbwJKN/Uql?=
- =?us-ascii?Q?vKISaqNKwAF7belCSHOjQP6lLRC2kcFcwm672BLEiNro3Y6iuytvClanUYck?=
- =?us-ascii?Q?8As/Yk4r+IhObNAnJojpCNysV0FXYG1kM9mVoPMbmU4QBRk5Z347dqHRj2CI?=
- =?us-ascii?Q?Cg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7126fea0-babf-487e-2894-08dba310175d
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2023 13:02:51.1923
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: J6M1z5Q38KBs0ZiUEkErVHvdP656Lq/JdmX4gcxCxHp1QnoPq8AEgVj2GBgbI/7EQjVTHoFZ9sNpGF/M4OpCZkaMoVpGca3Ss/yR2rKj4U8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6153
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: brouer@redhat.com, ilias.apalodimas@linaro.org, daniel@iogearbox.net,
+ ast@kernel.org, netdev@vger.kernel.org,
+ Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+ Stanislav Fomichev <sdf@google.com>, Maryam Tahhan <mtahhan@redhat.com>
+Subject: Re: [RFC PATCH net-next v3 0/2] net: veth: Optimizing page pool usage
+Content-Language: en-US
+To: Yunsheng Lin <linyunsheng@huawei.com>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>,
+ Liang Chen <liangchen.linux@gmail.com>, hawk@kernel.org, horms@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+References: <20230816123029.20339-1-liangchen.linux@gmail.com>
+ <05eec0a4-f8f8-ef68-3cf2-66b9109843b9@redhat.com>
+ <a7e72202-0fa1-633e-1564-132a1984aba1@redhat.com>
+ <a4e49ab5-fdc5-971a-47e6-30c002ad513f@huawei.com>
+In-Reply-To: <a4e49ab5-fdc5-971a-47e6-30c002ad513f@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 09, 2023 at 02:43:43PM +0200, Magnus Karlsson wrote:
-> From: Magnus Karlsson <magnus.karlsson@intel.com>
-> 
-> Add the -h option to display all available command line options
-> available for test_xsk.sh and xskxceiver.
-> 
-> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> ---
->  tools/testing/selftests/bpf/test_xsk.sh | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
-> index 94b4b86d5239..baaeb016d699 100755
-> --- a/tools/testing/selftests/bpf/test_xsk.sh
-> +++ b/tools/testing/selftests/bpf/test_xsk.sh
-> @@ -79,12 +79,15 @@
->  #
->  # Run a specific test from the test suite
->  #   sudo ./test_xsk.sh -t TEST_NAME
-> +#
-> +# Display the available command line options
-> +#   sudo ./test_xsk.sh -h
->  
->  . xsk_prereqs.sh
->  
->  ETH=""
->  
-> -while getopts "vi:dm:lt:" flag
-> +while getopts "vi:dm:lt:h" flag
->  do
->  	case "${flag}" in
->  		v) verbose=1;;
-> @@ -93,6 +96,7 @@ do
->  		m) MODE=${OPTARG};;
->  		l) list=1;;
->  		t) TEST=${OPTARG};;
-> +		h) help=1;;
->  	esac
->  done
->  
-> @@ -140,6 +144,11 @@ setup_vethPairs() {
->  	ip link set ${VETH0} up
->  }
->  
-> +if [[ $help -eq 1 ]]; then
-> +	./${XSKOBJ}
-> +        exit
-> +fi
 
-is there anything that stops from having the list of test output before
-all of the validation below (check that we are root, veth support etc) ?
 
-I would like us to have a case 'h' within parse_command_line() though.
-
-> +
->  if [ ! -z $ETH ]; then
->  	VETH0=${ETH}
->  	VETH1=${ETH}
-> -- 
-> 2.34.1
+On 22/08/2023 14.24, Yunsheng Lin wrote:
+> On 2023/8/22 5:54, Jesper Dangaard Brouer wrote:
+>> On 21/08/2023 16.21, Jesper Dangaard Brouer wrote:
+>>>
+>>> On 16/08/2023 14.30, Liang Chen wrote:
+>>>> Page pool is supported for veth, but at the moment pages are not properly
+>>>> recyled for XDP_TX and XDP_REDIRECT. That prevents veth xdp from fully
+>>>> leveraging the advantages of the page pool. So this RFC patchset is mainly
+>>>> to make recycling work for those cases. With that in place, it can be
+>>>> further optimized by utilizing the napi skb cache. Detailed figures are
+>>>> presented in each commit message, and together they demonstrate a quite
+>>>> noticeable improvement.
+>>>>
+>>>
+>>> I'm digging into this code path today.
+>>>
+>>> I'm trying to extend this and find a way to support SKBs that used
+>>> kmalloc (skb->head_frag=0), such that we can remove the
+>>> skb_head_is_locked() check in veth_convert_skb_to_xdp_buff(), which will
+>>> allow more SKBs to avoid realloc.  As long as they have enough headroom,
+>>> which we can dynamically control for netdev TX-packets by adjusting
+>>> netdev->needed_headroom, e.g. when loading an XDP prog.
+>>>
+>>> I noticed netif_receive_generic_xdp() and bpf_prog_run_generic_xdp() can
+>>> handle SKB kmalloc (skb->head_frag=0).  Going though the code, I don't
+>>> think it is a bug that generic-XDP allows this.
 > 
+> Is it possible to relaxe other checking too, and implement something like
+> pskb_expand_head() in xdp core if xdp core need to modify the data?
+> 
+
+Yes, I definitely hope (and plan) to relax other checks.
+
+The XDP_PACKET_HEADROOM (256 bytes) check have IMHO become obsolete and
+wrong, as many drivers today use headroom 192 bytes for XDP (which we
+allowed).  Thus, there is not reason for veth to insist on this
+XDP_PACKET_HEADROOM limit.  Today XDP can handle variable headroom (due
+to these drivers).
+
+
+> 
+>>>
+>>> Deep into this rabbit hole, I start to question our approach.
+>>>    - Perhaps the veth XDP approach for SKBs is wrong?
+>>>
+>>> The root-cause of this issue is that veth_xdp_rcv_skb() code path (that
+>>> handle SKBs) is calling XDP-native function "xdp_do_redirect()". I
+>>> question, why isn't it using "xdp_do_generic_redirect()"?
+>>> (I will jump into this rabbit hole now...)
+> 
+> Is there any reason why xdp_do_redirect() can not handle the slab-allocated
+> data? Can we change the xdp_do_redirect() to handle slab-allocated
+> data, so that it can benefit other case beside veth too?
+> 
+
+I started coding up this, but realized that it was a wrong approach.
+
+The xdp_do_redirect() call is for native-XDP with a proper xdp_buff.
+When dealing with SKBs we pretend is a xdp_buff, we have the API
+xdp_do_generic_redirect().  IMHO it is wrong to "steal" the packet-data
+from an SKB and in-order to use the native-XDP API xdp_do_redirect().
+In the use-cases I see, often the next layer will allocate a new SKB and
+attach the stolen packet-data , which is pure-waste as
+xdp_do_generic_redirect() keeps the SKB intact, so no new SKB allocs.
+
+--Jesper
+
+
+
 
