@@ -1,114 +1,223 @@
-Return-Path: <netdev+bounces-29803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B0B784C3F
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 23:51:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E02784CB0
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 00:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A82F41C20B1F
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 21:51:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5676628115B
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 22:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31ECC34CE0;
-	Tue, 22 Aug 2023 21:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C0434CE8;
+	Tue, 22 Aug 2023 22:07:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE15820183
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 21:51:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0893FC433C8;
-	Tue, 22 Aug 2023 21:51:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692741104;
-	bh=4sFv0MV0ptygyq2DC+30IYpXKnpI6svK4FlhdTRljCs=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA33620183
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 22:07:21 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6CEDF1B9;
+	Tue, 22 Aug 2023 15:07:19 -0700 (PDT)
+Received: from UbuntuVM-18.efytirfs5hsengjwslc1ligxab.xx.internal.cloudapp.net (unknown [20.72.208.6])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 8811A2126CD6;
+	Tue, 22 Aug 2023 15:07:18 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8811A2126CD6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1692742038;
+	bh=ccvcmxKiUzDpgLMe6MY0JLVApyZVXWCFreGvGxxSy8k=;
 	h=From:To:Cc:Subject:Date:From;
-	b=aRHtMc48gZP0p81GzU68J+T/J7Qy60EgsxqHPz3zOXoxDZR0jIM48GwhBadpzY4yB
-	 yMkBBJ5OLC6sci0CvtUyEYaeSvyWlN3sEPGlrYKQiKn7qZ0xLJ3/61H+j3HzvEsR3M
-	 h7XaBiNTWBDCbchz7HruFGa689o4BaDSD0exrhqNfWCpnogD8lhJ0lr7wMey4vfkZy
-	 QIbfJNGHge48QmDat00TTiUpFAi7RAYdl0CelFNrJcrs7Kh39MxARbEfMOaGvQTzb4
-	 pXOyIx+YAd5Ydsho5Sb/le9YhkEDQuaWy9DIbDSpj/tbYBOALJgl+gDSlsbpXVStu+
-	 uf66Hboku9uNw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
+	b=qCLXJOqaVbypJI1xgc0o9bQjz5O56c9z6O2uibHeeA+p9OA4FCJ69VapxdCFTKGm9
+	 Uh0HR62602PgPemQQz/zxRmxXxeGackiUuCJyJEShXwDyXK5Hc1lvqqAH0dtdJb7GP
+	 88V5SlfLGiar6rv/3h/3yB0JHnXi1idcxOaKIYJ8=
+From: Hardik Garg <hargar@linux.microsoft.com>
+To: stable@vger.kernel.org
+Cc: Shuah Khan <shuah@kernel.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	michael.chan@broadcom.com
-Subject: [PATCH net-next] bnxt: use the NAPI skb allocation cache
-Date: Tue, 22 Aug 2023 14:51:42 -0700
-Message-ID: <20230822215142.1012310-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bjorn@kernel.org
+Subject: [PATCH 6.1] selftests/net: mv bpf/nat6to4.c to net folder
+Date: Tue, 22 Aug 2023 22:07:10 +0000
+Message-Id: <20230822220710.3992-1-hargar@linux.microsoft.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-17.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_SBL,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-All callers of build_skb() (*) in bnxt are in NAPI context.
-The budget checking is somewhat convoluted because in the shared
-completion queue cases Rx packets are discarded by netpoll
-by forcing an error (E). But that happens before skb allocation.
-Only a call chain starting at __bnxt_poll_work() can lead to
-an skb allocation and it checks budget (b).
+From: Hangbin Liu <liuhangbin@gmail.com>
 
-* bnxt_rx_multi_page_skb
-* bnxt_rx_skb
-  ` bp->rx_skb_func
-  * bnxt_tpa_end
-    ` bnxt_rx_pkt
-      E bnxt_force_rx_discard
-      E bnxt_poll_nitroa0
-      b __bnxt_poll_work
+commit 3c107f36db06 ("selftests/net: mv bpf/nat6to4.c to net folder")
+backport this v6.4 commit to v6.1 to fix this error:
+error: unable to open output file 'linux/kselftest/net/bpf/nat6to4.o':
+'No such file or directory'
 
-Use napi_build_skb() to take advantage of the skb cache.
-In iperf tests with HW-GRO enabled it barely makes a difference
-but in cases where HW-GRO is not as effective (or disabled) it
-can give even a >10% boost (20.7Gbps -> 23.1Gbps).
+There are some issues with the bpf/nat6to4.c building.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+1. It use TEST_CUSTOM_PROGS, which will add the nat6to4.o to
+   kselftest-list file and run by common run_tests.
+2. When building the test via `make -C tools/testing/selftests/
+   TARGETS="net"`, the nat6to4.o will be build in selftests/net/bpf/
+   folder. But in test udpgro_frglist.sh it refers to ../bpf/nat6to4.o.
+   The correct path should be ./bpf/nat6to4.o.
+3. If building the test via `make -C tools/testing/selftests/ TARGETS="net"
+   install`. The nat6to4.o will be installed to kselftest_install/net/
+   folder. Then the udpgro_frglist.sh should refer to ./nat6to4.o.
+
+To fix the confusing test path, let's just move the nat6to4.c to net folder
+and build it as TEST_GEN_FILES.
+
+Fixes: edae34a3ed92 ("selftests net: add UDP GRO fraglist + bpf self-tests")
+Tested-by: Björn Töpel <bjorn@kernel.org>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Link: https://lore.kernel.org/r/20230118020927.3971864-1-liuhangbin@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Hardik Garg <hargar@linux.microsoft.com>
 ---
-CC: michael.chan@broadcom.com
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tools/testing/selftests/net/Makefile          | 50 ++++++++++++++++++-
+ tools/testing/selftests/net/bpf/Makefile      | 14 ------
+ .../testing/selftests/net/{bpf => }/nat6to4.c |  0
+ tools/testing/selftests/net/udpgro_frglist.sh |  8 +--
+ 4 files changed, 52 insertions(+), 20 deletions(-)
+ delete mode 100644 tools/testing/selftests/net/bpf/Makefile
+ rename tools/testing/selftests/net/{bpf => }/nat6to4.c (100%)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 5d6ea2782c2f..5cc0dbe12132 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -994,7 +994,7 @@ static struct sk_buff *bnxt_rx_multi_page_skb(struct bnxt *bp,
- 	dma_addr -= bp->rx_dma_offset;
- 	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, BNXT_RX_PAGE_SIZE,
- 				bp->rx_dir);
--	skb = build_skb(data_ptr - bp->rx_offset, BNXT_RX_PAGE_SIZE);
-+	skb = napi_build_skb(data_ptr - bp->rx_offset, BNXT_RX_PAGE_SIZE);
- 	if (!skb) {
- 		page_pool_recycle_direct(rxr->page_pool, page);
- 		return NULL;
-@@ -1069,7 +1069,7 @@ static struct sk_buff *bnxt_rx_skb(struct bnxt *bp,
- 		return NULL;
- 	}
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 69c58362c0ed..48d1a68be1d5 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -71,14 +71,60 @@ TEST_GEN_FILES += bind_bhash
+ TEST_GEN_PROGS += sk_bind_sendto_listen
+ TEST_GEN_PROGS += sk_connect_zero_addr
+ TEST_PROGS += test_ingress_egress_chaining.sh
++TEST_GEN_FILES += nat6to4.o
  
--	skb = build_skb(data, bp->rx_buf_size);
-+	skb = napi_build_skb(data, bp->rx_buf_size);
- 	dma_unmap_single_attrs(&bp->pdev->dev, dma_addr, bp->rx_buf_use_size,
- 			       bp->rx_dir, DMA_ATTR_WEAK_ORDERING);
- 	if (!skb) {
-@@ -1677,7 +1677,7 @@ static inline struct sk_buff *bnxt_tpa_end(struct bnxt *bp,
- 		tpa_info->data_ptr = new_data + bp->rx_offset;
- 		tpa_info->mapping = new_mapping;
+ TEST_FILES := settings
  
--		skb = build_skb(data, bp->rx_buf_size);
-+		skb = napi_build_skb(data, bp->rx_buf_size);
- 		dma_unmap_single_attrs(&bp->pdev->dev, mapping,
- 				       bp->rx_buf_use_size, bp->rx_dir,
- 				       DMA_ATTR_WEAK_ORDERING);
+ include ../lib.mk
+ 
+-include bpf/Makefile
+-
+ $(OUTPUT)/reuseport_bpf_numa: LDLIBS += -lnuma
+ $(OUTPUT)/tcp_mmap: LDLIBS += -lpthread
+ $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
+ $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
++
++# Rules to generate bpf obj nat6to4.o
++CLANG ?= clang
++SCRATCH_DIR := $(OUTPUT)/tools
++BUILD_DIR := $(SCRATCH_DIR)/build
++BPFDIR := $(abspath ../../../lib/bpf)
++APIDIR := $(abspath ../../../include/uapi)
++
++CCINCLUDE += -I../bpf
++CCINCLUDE += -I../../../../usr/include/
++CCINCLUDE += -I$(SCRATCH_DIR)/include
++
++BPFOBJ := $(BUILD_DIR)/libbpf/libbpf.a
++
++MAKE_DIRS := $(BUILD_DIR)/libbpf
++$(MAKE_DIRS):
++	mkdir -p $@
++
++# Get Clang's default includes on this system, as opposed to those seen by
++# '-target bpf'. This fixes "missing" files on some architectures/distros,
++# such as asm/byteorder.h, asm/socket.h, asm/sockios.h, sys/cdefs.h etc.
++#
++# Use '-idirafter': Don't interfere with include mechanics except where the
++# build would have failed anyways.
++define get_sys_includes
++$(shell $(1) $(2) -v -E - </dev/null 2>&1 \
++	| sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }') \
++$(shell $(1) $(2) -dM -E - </dev/null | grep '__riscv_xlen ' | awk '{printf("-D__riscv_xlen=%d -D__BITS_PER_LONG=%d", $$3, $$3)}')
++endef
++
++ifneq ($(CROSS_COMPILE),)
++CLANG_TARGET_ARCH = --target=$(notdir $(CROSS_COMPILE:%-=%))
++endif
++
++CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG),$(CLANG_TARGET_ARCH))
++
++$(OUTPUT)/nat6to4.o: nat6to4.c $(BPFOBJ) | $(MAKE_DIRS)
++	$(CLANG) -O2 -target bpf -c $< $(CCINCLUDE) $(CLANG_SYS_INCLUDES) -o $@
++
++$(BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		       \
++	   $(APIDIR)/linux/bpf.h					       \
++	   | $(BUILD_DIR)/libbpf
++	$(MAKE) $(submake_extras) -C $(BPFDIR) OUTPUT=$(BUILD_DIR)/libbpf/     \
++		    EXTRA_CFLAGS='-g -O0'				       \
++		    DESTDIR=$(SCRATCH_DIR) prefix= all install_headers
++
++EXTRA_CLEAN := $(SCRATCH_DIR)
+diff --git a/tools/testing/selftests/net/bpf/Makefile b/tools/testing/selftests/net/bpf/Makefile
+deleted file mode 100644
+index 8ccaf8732eb2..000000000000
+--- a/tools/testing/selftests/net/bpf/Makefile
++++ /dev/null
+@@ -1,14 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0
+-
+-CLANG ?= clang
+-CCINCLUDE += -I../../bpf
+-CCINCLUDE += -I../../../../lib
+-CCINCLUDE += -I../../../../../usr/include/
+-
+-TEST_CUSTOM_PROGS = $(OUTPUT)/bpf/nat6to4.o
+-all: $(TEST_CUSTOM_PROGS)
+-
+-$(OUTPUT)/%.o: %.c
+-	$(CLANG) -O2 -target bpf -c $< $(CCINCLUDE) -o $@
+-
+-EXTRA_CLEAN := $(TEST_CUSTOM_PROGS)
+diff --git a/tools/testing/selftests/net/bpf/nat6to4.c b/tools/testing/selftests/net/nat6to4.c
+similarity index 100%
+rename from tools/testing/selftests/net/bpf/nat6to4.c
+rename to tools/testing/selftests/net/nat6to4.c
+diff --git a/tools/testing/selftests/net/udpgro_frglist.sh b/tools/testing/selftests/net/udpgro_frglist.sh
+index c9c4b9d65839..0a6359bed0b9 100755
+--- a/tools/testing/selftests/net/udpgro_frglist.sh
++++ b/tools/testing/selftests/net/udpgro_frglist.sh
+@@ -40,8 +40,8 @@ run_one() {
+ 
+ 	ip -n "${PEER_NS}" link set veth1 xdp object ${BPF_FILE} section xdp
+ 	tc -n "${PEER_NS}" qdisc add dev veth1 clsact
+-	tc -n "${PEER_NS}" filter add dev veth1 ingress prio 4 protocol ipv6 bpf object-file ../bpf/nat6to4.o section schedcls/ingress6/nat_6  direct-action
+-	tc -n "${PEER_NS}" filter add dev veth1 egress prio 4 protocol ip bpf object-file ../bpf/nat6to4.o section schedcls/egress4/snat4 direct-action
++	tc -n "${PEER_NS}" filter add dev veth1 ingress prio 4 protocol ipv6 bpf object-file nat6to4.o section schedcls/ingress6/nat_6  direct-action
++	tc -n "${PEER_NS}" filter add dev veth1 egress prio 4 protocol ip bpf object-file nat6to4.o section schedcls/egress4/snat4 direct-action
+         echo ${rx_args}
+ 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx ${rx_args} -r &
+ 
+@@ -88,8 +88,8 @@ if [ ! -f ${BPF_FILE} ]; then
+ 	exit -1
+ fi
+ 
+-if [ ! -f bpf/nat6to4.o ]; then
+-	echo "Missing nat6to4 helper. Build bpfnat6to4.o selftest first"
++if [ ! -f nat6to4.o ]; then
++	echo "Missing nat6to4 helper. Build bpf nat6to4.o selftest first"
+ 	exit -1
+ fi
+ 
 -- 
-2.41.0
+2.33.8
 
 
