@@ -1,143 +1,103 @@
-Return-Path: <netdev+bounces-29488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8397783726
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 02:58:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C749E783797
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F969280F8D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 00:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDC911C20A06
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 01:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3F610E7;
-	Tue, 22 Aug 2023 00:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C15E10FA;
+	Tue, 22 Aug 2023 01:51:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE6EEA5
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 00:58:40 +0000 (UTC)
-Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D758DD7;
-	Mon, 21 Aug 2023 17:58:38 -0700 (PDT)
-Received: by mail-vk1-xa29.google.com with SMTP id 71dfb90a1353d-48d0dbd62fbso685873e0c.0;
-        Mon, 21 Aug 2023 17:58:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692665918; x=1693270718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=etbwJkjZ+47EGwO43n7nBgUqgoF0Y+SqornaZjC52hI=;
-        b=Q2MCju5n2Fs0gJAbnAMSN/TSkiK5/IJ2nWz59TWWBqyOI60mBhj2IgPSq2JMb+hgV+
-         zXo47RElxE+valBU6k7puzGdW6mMO6xi+ZOaeWuPRcPwEnyMEva0FxJDL8K6wUchnzW9
-         f+DoWDlQl+F7D2BVJ9QKnEFfyKOgMQ6WM5xuxUg7tAmu8byNXEYyrxMo0v1oWjls/qok
-         5FEg2ENmiksG86m49zNL+A3UAFn2JqegA0PIGCU5XxrgwAL4gcA/PyY3WJ9F+v/UnpJx
-         6JZsMAYk9Gr90+NW6WSJdtz9qOTVb+X52xZ5G/GsQKoD0pgy+BThzKL12y/yLhjUFmLd
-         Iujg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692665918; x=1693270718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=etbwJkjZ+47EGwO43n7nBgUqgoF0Y+SqornaZjC52hI=;
-        b=aq3evez8DfkFJZwhHAQefWJVzwQ13MdCCJQmn/8FPp2559HZmgaNZKXhu5xsATLUfr
-         hPKLmE93Q80SYxIY2LbnoNUP4vAJ/TbBthtNflsDjq5ZCbcWwelFaUVJez4cfrrLSL6G
-         WDwUcV8Y3CUEtFDbh6nuSq/L0fJ+9/s1Y+g31/qaHG9lRmQ1kO20meg8oqRIMP/W2WPB
-         sVTDInabRIIfXbg1Cz71mBvvv6Z8gzj0N6pbsiMYfSMxBa8QRCzuU7tqtHbQKt6mfBqK
-         kC/2q1w0oFuygV5+o1YNUvXiVeQkr8l3ssuLlNsl9MYm5Z+82VP0wj2tNf3mAaMjHEDh
-         XkhQ==
-X-Gm-Message-State: AOJu0YxTzYEVJA+zxE2mZE6t+fDU1Dz3J8LZJ3Ll5DsTk8hwF99Z8K+n
-	vFCt5WWprI58DCVW2yzsxTbWsv9be86gMhQuL2U=
-X-Google-Smtp-Source: AGHT+IFbiTGbud9q6eccm4P8fsg6Je3YqRd5e1SAJ+GMoopHX50V7bFswnzPZw2yl8U7370OXqMsItCFCtZl/DFPHOI=
-X-Received: by 2002:a1f:e2c1:0:b0:488:23bc:6d0f with SMTP id
- z184-20020a1fe2c1000000b0048823bc6d0fmr6383439vkg.16.1692665917754; Mon, 21
- Aug 2023 17:58:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E408010E9
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 01:51:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 932F5C433C8;
+	Tue, 22 Aug 2023 01:51:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692669081;
+	bh=hJ5Osl3ne+cxaIsn0E6XA5DP2UJT/9ZPXPOrv8ghqf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JbdmwJTsVT/dVpFxYqSNR+lZahZIs8FmjCV5F4W0P8zMVp80mfvZSWLrIb+quyqjY
+	 U3OP1BnbKvdx4K/RpQ/EAeOOMwhZmHjJ3FyBjX9snqzllGMKu9nEx5055EtXYFBBqE
+	 n6FCSA7VHEFzTMI1LyplcOeH9oAMjck0zEqWkVnKiKcmzoGg4MOm7V3OtqiQwk5eSZ
+	 3na2loTtXONs6OVHft0Y1B/mqaJWlhm1eq78ozDXmf3JczCcGJCKJQ1EpYypXfU0/O
+	 LZcPImCunVyoLJO8jghRmwmeRRw0arkX/rbsJJvZ/nKFB4frM2ePCwK9Hp8BuRgzxQ
+	 757Z5e7n0wo1Q==
+Date: Mon, 21 Aug 2023 18:51:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ sdf@google.com, Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang
+ <kaiyuanz@google.com>
+Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
+ dma-buf to netdevice
+Message-ID: <20230821185119.41ccc8a5@kernel.org>
+In-Reply-To: <CAF=yD-J5RR9w6=DzxaGT=CeKBWZEiiR3ehAkuNeJvOe3DvMH2g@mail.gmail.com>
+References: <20230810015751.3297321-1-almasrymina@google.com>
+	<20230810015751.3297321-3-almasrymina@google.com>
+	<7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
+	<20230815171638.4c057dcd@kernel.org>
+	<64dcf5834c4c8_23f1f8294fa@willemb.c.googlers.com.notmuch>
+	<c47219db-abf9-8a5c-9b26-61f65ae4dd26@kernel.org>
+	<20230817190957.571ab350@kernel.org>
+	<CAHS8izN26snAvM5DsGj+bhCUDjtAxCA7anAkO7Gm6JQf=w-CjA@mail.gmail.com>
+	<7cac1a2d-6184-7cd6-116c-e2d80c502db5@kernel.org>
+	<20230818190653.78ca6e5a@kernel.org>
+	<38a06656-b6bf-e6b7-48a1-c489d2d76db8@kernel.org>
+	<CAF=yD-KgNDzv3-MhOMOTe2bTw4T73t-M7D65MpeG6vDBqHzrtA@mail.gmail.com>
+	<20230821141659.5f0b71f7@kernel.org>
+	<CAF=yD-J5RR9w6=DzxaGT=CeKBWZEiiR3ehAkuNeJvOe3DvMH2g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-7-almasrymina@google.com> <6adafb5d-0bc5-cb9a-5232-6836ab7e77e6@redhat.com>
- <CAF=yD-L0ajGVrexnOVvvhC-A7vw6XP9tq5T3HCDTjQMS0mXdTQ@mail.gmail.com>
- <8f4d276e-470d-6ce8-85d5-a6c08fa22147@redhat.com> <4f19143d-5975-05d4-3697-0218ed2881c6@kernel.org>
- <CAF=yD-+wXynvcntVccUAM2+PAumZbRE9E6f3MS6X6qkGrG7_Ow@mail.gmail.com> <20230821143131.47de8f8f@kernel.org>
-In-Reply-To: <20230821143131.47de8f8f@kernel.org>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 21 Aug 2023 20:58:00 -0400
-Message-ID: <CAF=yD-LB1XCfihbFfGkn8seUCq9h6FLyMy94ZYQSTGsN2hVsjQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 06/11] page-pool: add device memory support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com, 
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org, 
-	sdf@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 21, 2023 at 5:31=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat, 19 Aug 2023 12:12:16 -0400 Willem de Bruijn wrote:
-> > :-) For the record, there is a prior version that added a separate type=
-.
-> >
-> > I did not like the churn it brought and asked for this.
->
-> It does end up looking cleaner that I personally expected, FWIW.
->
-> > > Use of the LSB (or bits depending on alignment expectations) is a com=
-mon
-> > > trick and already done in quite a few places in the networking stack.
-> > > This trick is essential to any realistic change here to incorporate g=
-pu
-> > > memory; way too much code will have unnecessary churn without it.
->
-> We'll end up needing the LSB trick either way, right? The only question
-> is whether the "if" is part of page pool or the caller of page pool.
+On Mon, 21 Aug 2023 20:38:09 -0400 Willem de Bruijn wrote:
+> > Are you talking about HW devices, or virt? I thought most HW made
+> > in the last 10 years should be able to take down individual queues :o  
+> 
+> That's great. This is currently mostly encapsulated device-wide behind
+> ndo_close, with code looping over all rx rings, say.
+> 
+> Taking a look at one driver, bnxt, it indeed has a per-ring
+> communication exchange with the device, in hwrm_ring_free_send_msg
+> ("/* Flush rings and disable interrupts */"), which is called before
+> the other normal steps: napi disable, dma unmap, posted mem free,
+> irq_release, napi delete and ring mem free.
+> 
+> This is what you meant? The issue I was unsure of was quiescing the
+> device immediately, i.e., that hwrm_ring_free_send_msg.
 
-Indeed. Adding layering does not remove this.
+Yes, and I recall we had similar APIs at Netronome for the NFP.
+I haven't see it in MS specs myself but I wouldn't be surprised if 
+they required it..
 
-> Having seen zctap I'm afraid if we push this out of pp every provider
-> will end up re-implementing page pool's recycling/caching functionality
-> :(
->
-> Maybe we need to "fork" the API? The device memory "ifs" are only needed
-> for data pages. Which means that we can retain a faster, "if-less" API
-> for headers and XDP. Or is that too much duplication?
+There's a bit of an unknown in how well all of this actually works,
+as the FW/HW paths were not exercised outside of RDMA and potentially
+other proprietary stuff.
 
-I don't think that would be faster. Just a different structuring of
-the code. We still need to take one of multiple paths for, say, page
-allocation (page_pool_alloc_pages).
+> I guess this means that this could all be structured on a per-queue
+> basis rather than from ndo_close. Would be a significant change to
+> many drivers, I'd imagine.
 
-If having a struct page_pool and struct mem_pool, there would still be
-a type-based branch. But now either in every caller (yech), or in some
-thin shim layer. Why not just have it behind the existing API? That is
-what your memory provider does. The only difference now is that one of
-the providers really does not deal with pages.
-
-I think this multiplexing does not have to introduce performance
-regressions with well placed static_branch. Benchmarks and
-side-by-side comparison of assembly will have to verify that.
-
-Indirect function calls need to be avoided, of course, in favor of a
-type based switch. And unless the non_default_providers static branch
-is enabled, the default path is taken unconditionally.
-
-If it no longer is a pure page pool, maybe it can be renamed. I
-personally don't care.
+Yes, it definitely is. The question is how much of it do we require
+from Mina before merging the mem provider work. I'd really like to
+avoid the "delegate all the work to the driver" approach that AF_XDP
+has taken, which is what I'm afraid we'll end up with if we push too
+hard for a full set of APIs from the start.
 
