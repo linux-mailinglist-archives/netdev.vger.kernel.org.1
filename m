@@ -1,65 +1,80 @@
-Return-Path: <netdev+bounces-29536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BF6B783AEF
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 09:31:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA06783AF2
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 09:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4191C20A60
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 07:31:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A24AE280FD3
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 07:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EC279C3;
-	Tue, 22 Aug 2023 07:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839CC79C6;
+	Tue, 22 Aug 2023 07:32:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD19748E
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:31:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D35C433C7;
-	Tue, 22 Aug 2023 07:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F057379C3
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:32:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AB71C433C8;
+	Tue, 22 Aug 2023 07:32:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692689494;
-	bh=69ppbmhyjKqNsHDR6INC1NWAMN6c620Fp921v9/rBcI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Zka6jsqtuk8eNQp7rbaUR1/g+2c1p2DVFG4Flg8jCmz65kSiCqBm9JVrsdZpoNQ5e
-	 Ln8BMNES2Mgcm9j1szeHwdOZpY6zRvmWpmxgoHQ/7zbHPVYbvLtOv5iP2EHeIqAHfP
-	 ORoTY2yPY5088gX3Vjp+uW4Ag70b41zine23eGJFt0S5JvGdzKF660lxGtMTgPnUfm
-	 qBXo8SSgsg4NgNiRG0FsADIy65ytb+hL5+m1Cvn2NZKzq+Ke9zFLqjId69xs6/Skjz
-	 V3f75ma+podibBnZqGf/SmSjIaYwbi8ILKAAq5jkYTijkR80l7CPr/B62+myMt2U0V
-	 u7QMshFHWZeAQ==
-Message-ID: <16b706ba-f755-d16d-3fea-bb0946a4c460@kernel.org>
-Date: Tue, 22 Aug 2023 10:31:30 +0300
+	s=k20201202; t=1692689524;
+	bh=KxhF+pQsKx3GhC2XIfkJW6VsrpHpZhKG0LezvhC2MSg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gKN+k3P85iOdKOpmbjKtz6KKKbBbIRdj62WqlMsMN61X2IVX+5lR3GDR6Aexl3Lc0
+	 LKPXjx0Olin1J6qP2x3TdogiAaynuXqIN05rDEjNYYMhIgvTx1dSDHVNGwCXlfaMVu
+	 K3Xs7xZI6MNmgU0LXilJbGY6QGCQ6/Gq2pHJ3fTHjF3mzny94wOr+4+7+FpDvjS58l
+	 s+bRZFRzzIhVKhCO0rWTtqWZ8bq7YtN3TZEKcxAO5G1jY4aIDV9fnNCU4SIe7i9QCt
+	 yTbgjzqicPR72chVefAaFvLmOtJpe6+KMACMa2tF5fgvEN33QvvQ3q7qzi6TF5GhML
+	 FDGxTemloTr7Q==
+Date: Tue, 22 Aug 2023 09:32:01 +0200
+From: Simon Horman <horms@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	mlxsw@nvidia.com
+Subject: Re: [PATCH net-next] vrf: Remove unnecessary RCU-bh critical section
+Message-ID: <20230822073201.GO2711035@kernel.org>
+References: <20230821142339.1889961-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next] net: ethernet: ti: Remove unused declarations
-Content-Language: en-US
-To: Yue Haibing <yuehaibing@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-References: <20230821134029.40084-1-yuehaibing@huawei.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20230821134029.40084-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230821142339.1889961-1-idosch@nvidia.com>
 
-
-
-On 21/08/2023 16:40, Yue Haibing wrote:
-> Commit e8609e69470f ("net: ethernet: ti: am65-cpsw: Convert to PHYLINK")
-> removed am65_cpsw_nuss_adjust_link() but not its declaration.
-> Commit 84640e27f230 ("net: netcp: Add Keystone NetCP core ethernet driver")
-> declared but never implemented netcp_device_find_module().
+On Mon, Aug 21, 2023 at 05:23:39PM +0300, Ido Schimmel wrote:
+> dev_queue_xmit_nit() already uses rcu_read_lock() / rcu_read_unlock()
+> and nothing suggests that softIRQs should be disabled around it.
+> Therefore, remove the rcu_read_lock_bh() / rcu_read_unlock_bh()
+> surrounding it.
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> Tested using [1] with lockdep enabled.
+> 
+> [1]
+>  #!/bin/bash
+> 
+>  ip link add name vrf1 up type vrf table 100
+>  ip link add name veth0 type veth peer name veth1
+>  ip link set dev veth1 master vrf1
+>  ip link set dev veth0 up
+>  ip link set dev veth1 up
+>  ip address add 192.0.2.1/24 dev veth0
+>  ip address add 192.0.2.2/24 dev veth1
+>  ip rule add pref 32765 table local
+>  ip rule del pref 0
+>  tcpdump -i vrf1 -c 20 -w /dev/null &
+>  sleep 10
+>  ping -i 0.1 -c 10 -q 192.0.2.2
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 
-Acked-by: Roger Quadros <rogerq@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
