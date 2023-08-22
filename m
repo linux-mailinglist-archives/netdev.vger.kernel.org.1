@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-29650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FF677843F5
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE13C7843FE
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49F2C1C20A82
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:24:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63DF1C20B34
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0EA1D313;
-	Tue, 22 Aug 2023 14:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9681DA2A;
+	Tue, 22 Aug 2023 14:23:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E44B1D310
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 14:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DFF1DA20
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 14:23:12 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2AF9CD9
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:23:07 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9554CC1
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692714186;
+	s=mimecast20190719; t=1692714188;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AIvYs6lPi1KQwhuYoAIK5dRgcUdSZ045Q6JPJVdDyXA=;
-	b=byyCTwr8SE3w2ILRq1lA6Xgaabfr7YQ54ASImxi5e2lqwifDJ8wFhN85PGox+5Gryqwn3P
-	H2nQLcurrqktOnTxREJJhkJyYN4NPvq/a0LhgRWmJjWpdZ/tEj83XK5bsJremp5acWYBqH
-	9CjJC7NPxLy8173B5d/bYARFSIedYmY=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OKCuiHdQBzYj0WQ4tg6o4MU6GBwpJn7fnEEut+9ftSM=;
+	b=H7EUOS1wEnHHOre/HwxdgfcRiEg3mCHwG/zsVa0bnnghMK8jP66DwN4xfZe5SxCDli2bA9
+	zDdjXoK6SPgh+eDdcKQohsHAcd35swN7zvA3i8P1g2rtyJBaDabLFAy3IM29lmpTsVCjF3
+	6+65P5ZS1ymuvRqJKBr2hXzlHpqnKLM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-119-rKTQHv0dMNWXoY10WK-I8A-1; Tue, 22 Aug 2023 10:23:05 -0400
-X-MC-Unique: rKTQHv0dMNWXoY10WK-I8A-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2bba9a3d63fso46027061fa.0
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:23:05 -0700 (PDT)
+ us-mta-321-2e1tlrOoPFWfUC0biBilfA-1; Tue, 22 Aug 2023 10:23:07 -0400
+X-MC-Unique: 2e1tlrOoPFWfUC0biBilfA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5218b9647a8so2880624a12.1
+        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:23:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692714184; x=1693318984;
+        d=1e100.net; s=20221208; t=1692714186; x=1693318986;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AIvYs6lPi1KQwhuYoAIK5dRgcUdSZ045Q6JPJVdDyXA=;
-        b=ey9EbyDOt7+I+vo5ffP9Mg2pzYQaaUCzJqmg/p6cvaeqcel7IsCfMdmK6oBQBRg4uY
-         RtyHO3Kn9NmoEr1cJY5Owr+/KiPXONBm/HgnwLjBN8jZiLtf9eXMzlg8tJKSX4mBN9p+
-         1j/lIEO1VMDEFnU1sqPmHOc4G82JU/JHxbDchVuvwud6Qo+8hie2EsoBAVP4/kJgbWpL
-         ua6f15UiegtdN2sIvAcY9xSff5zUenJ6U3YywymbMjDnRyiFS43WhAWnluAd9XiI+Ph1
-         rP0Y3ks51YUGfnOczIXI/qk3Rnjjhj3gzV9UdLECppAm8EnX1sUOAcbIwJPFWsHpaUT1
-         0GEg==
-X-Gm-Message-State: AOJu0YzI3iRDxjsgF9xXlA/aQOSd37XpfG+8uk3sDB8k6kADoHeg31My
-	obv8xHWrXF7Q0fAtg1XlUlvhkeZWyzTUn/n9y+QUL6zZUTj1LG9kBcS7RylV3NXOpcA+td6xEWs
-	ZWTZ76WpNcMSbPeqJ
-X-Received: by 2002:a05:6512:318b:b0:4fe:3724:fdac with SMTP id i11-20020a056512318b00b004fe3724fdacmr7988677lfe.47.1692714183888;
-        Tue, 22 Aug 2023 07:23:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEqBx5gdeGncD97WUElO6R0Utxjoumse2wrczYUW86ZE93JSTev/XmQ+qeLqocPdIaFdpDsOA==
-X-Received: by 2002:a05:6512:318b:b0:4fe:3724:fdac with SMTP id i11-20020a056512318b00b004fe3724fdacmr7988652lfe.47.1692714183436;
-        Tue, 22 Aug 2023 07:23:03 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id d17-20020a50fe91000000b0052228721f84sm7603356edt.77.2023.08.22.07.23.03
+        bh=OKCuiHdQBzYj0WQ4tg6o4MU6GBwpJn7fnEEut+9ftSM=;
+        b=GyJYHDrpX2DdvOfBfPDrvoHvV8Xoze1HE993o+/q4E8FHYutzckE3m1AC2GT68xtye
+         rpMsIPNHrNQ/Ke09NUrVSFoNHGPn4OP3xvCx6OpRM6pScGg9BMCrPE4a12rD4uSmpBXb
+         1s/uSGEPeyHcV9kQQvUDidaqAHWUjLKF7QUIAA8HnuNO1IrdNeg8Gig+4b2QjAQh04PZ
+         3mGTHO+rJ7lxW3qqFdW8RbJHM6lQZ6ROsnlQdBOoXKb7bfvVI9xyEievjQyCauh9BZYY
+         QaFTOmtXG2WZUxIDjhXrEODc+O2raGXHeyk1r34QamIm83NBB7/dxhXBaZcJ1j5TNeP2
+         IERA==
+X-Gm-Message-State: AOJu0YyANKgQddksRULXr+sFMyBvMLjMi9xXVCqouVNESzkyl8+tIw+y
+	SnR7q4HnNEvfu9HOwxy9Xeo869fE64PSriWAN9nTBJp7wKEZqr/9JQKwRq0FANQhtERhWodScVB
+	36VTkzy1ffsJlblJu
+X-Received: by 2002:aa7:d69a:0:b0:522:1956:a291 with SMTP id d26-20020aa7d69a000000b005221956a291mr7004899edr.8.1692714185952;
+        Tue, 22 Aug 2023 07:23:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHDEC40RfeTG3HAvs3Nq5GI8r8LmxEpdF3ztCO13m/XOSspkKwAqyHWCuFDjoKz5YyWJzmmkg==
+X-Received: by 2002:aa7:d69a:0:b0:522:1956:a291 with SMTP id d26-20020aa7d69a000000b005221956a291mr7004883edr.8.1692714185711;
+        Tue, 22 Aug 2023 07:23:05 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id f18-20020a50ee92000000b0051e2670d599sm7617263edr.4.2023.08.22.07.23.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 22 Aug 2023 07:23:03 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A9E78D3CCA9; Tue, 22 Aug 2023 16:23:02 +0200 (CEST)
+	id E4E99D3CCAB; Tue, 22 Aug 2023 16:23:02 +0200 (CEST)
 From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -82,9 +82,9 @@ To: Alexei Starovoitov <ast@kernel.org>,
 Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH bpf-next 5/6] samples/bpf: Remove the xdp_sample_pkts utility
-Date: Tue, 22 Aug 2023 16:22:43 +0200
-Message-ID: <20230822142255.1340991-6-toke@redhat.com>
+Subject: [PATCH bpf-next 6/6] samples/bpf: Cleanup .gitignore
+Date: Tue, 22 Aug 2023 16:22:44 +0200
+Message-ID: <20230822142255.1340991-7-toke@redhat.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230822142255.1340991-1-toke@redhat.com>
 References: <20230822142255.1340991-1-toke@redhat.com>
@@ -103,311 +103,42 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The functionality of this utility is covered by the xdpdump utility in
-xdp-tools. Remove the unmaintained version in samples.
+Remove no longer present XDP utilities from .gitignore. Apart from the
+recently removed XDP utilities this also includes the previously removed
+xdpsock and xsk utilities.
 
 Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- samples/bpf/Makefile               |   3 -
- samples/bpf/xdp_sample_pkts_kern.c |  57 ---------
- samples/bpf/xdp_sample_pkts_user.c | 196 -----------------------------
- 3 files changed, 256 deletions(-)
- delete mode 100644 samples/bpf/xdp_sample_pkts_kern.c
- delete mode 100644 samples/bpf/xdp_sample_pkts_user.c
+ samples/bpf/.gitignore | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index decd31167ee4..4ccf4236031c 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -44,7 +44,6 @@ tprogs-y += cpustat
- tprogs-y += xdp_adjust_tail
- tprogs-y += xdp_fwd
- tprogs-y += task_fd_query
--tprogs-y += xdp_sample_pkts
- tprogs-y += ibumad
- tprogs-y += hbm
- 
-@@ -95,7 +94,6 @@ cpustat-objs := cpustat_user.o
- xdp_adjust_tail-objs := xdp_adjust_tail_user.o
- xdp_fwd-objs := xdp_fwd_user.o
- task_fd_query-objs := task_fd_query_user.o $(TRACE_HELPERS)
--xdp_sample_pkts-objs := xdp_sample_pkts_user.o
- ibumad-objs := ibumad_user.o
- hbm-objs := hbm.o $(CGROUP_HELPERS)
- 
-@@ -148,7 +146,6 @@ always-y += cpustat_kern.o
- always-y += xdp_adjust_tail_kern.o
- always-y += xdp_fwd_kern.o
- always-y += task_fd_query_kern.o
--always-y += xdp_sample_pkts_kern.o
- always-y += ibumad_kern.o
- always-y += hbm_out_kern.o
- always-y += hbm_edt_kern.o
-diff --git a/samples/bpf/xdp_sample_pkts_kern.c b/samples/bpf/xdp_sample_pkts_kern.c
-deleted file mode 100644
-index 9cf76b340dd7..000000000000
---- a/samples/bpf/xdp_sample_pkts_kern.c
-+++ /dev/null
-@@ -1,57 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--#include <linux/ptrace.h>
--#include <linux/version.h>
--#include <uapi/linux/bpf.h>
--#include <bpf/bpf_helpers.h>
--
--#define SAMPLE_SIZE 64ul
--
--struct {
--	__uint(type, BPF_MAP_TYPE_PERF_EVENT_ARRAY);
--	__uint(key_size, sizeof(int));
--	__uint(value_size, sizeof(u32));
--} my_map SEC(".maps");
--
--SEC("xdp_sample")
--int xdp_sample_prog(struct xdp_md *ctx)
--{
--	void *data_end = (void *)(long)ctx->data_end;
--	void *data = (void *)(long)ctx->data;
--
--	/* Metadata will be in the perf event before the packet data. */
--	struct S {
--		u16 cookie;
--		u16 pkt_len;
--	} __packed metadata;
--
--	if (data < data_end) {
--		/* The XDP perf_event_output handler will use the upper 32 bits
--		 * of the flags argument as a number of bytes to include of the
--		 * packet payload in the event data. If the size is too big, the
--		 * call to bpf_perf_event_output will fail and return -EFAULT.
--		 *
--		 * See bpf_xdp_event_output in net/core/filter.c.
--		 *
--		 * The BPF_F_CURRENT_CPU flag means that the event output fd
--		 * will be indexed by the CPU number in the event map.
--		 */
--		u64 flags = BPF_F_CURRENT_CPU;
--		u16 sample_size;
--		int ret;
--
--		metadata.cookie = 0xdead;
--		metadata.pkt_len = (u16)(data_end - data);
--		sample_size = min(metadata.pkt_len, SAMPLE_SIZE);
--		flags |= (u64)sample_size << 32;
--
--		ret = bpf_perf_event_output(ctx, &my_map, flags,
--					    &metadata, sizeof(metadata));
--		if (ret)
--			bpf_printk("perf_event_output failed: %d\n", ret);
--	}
--
--	return XDP_PASS;
--}
--
--char _license[] SEC("license") = "GPL";
--u32 _version SEC("version") = LINUX_VERSION_CODE;
-diff --git a/samples/bpf/xdp_sample_pkts_user.c b/samples/bpf/xdp_sample_pkts_user.c
-deleted file mode 100644
-index e39d7f654f30..000000000000
---- a/samples/bpf/xdp_sample_pkts_user.c
-+++ /dev/null
-@@ -1,196 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--#include <stdio.h>
--#include <stdlib.h>
--#include <string.h>
--#include <linux/perf_event.h>
--#include <linux/bpf.h>
--#include <net/if.h>
--#include <errno.h>
--#include <assert.h>
--#include <sys/sysinfo.h>
--#include <sys/ioctl.h>
--#include <signal.h>
--#include <bpf/libbpf.h>
--#include <bpf/bpf.h>
--#include <libgen.h>
--#include <linux/if_link.h>
--
--#include "perf-sys.h"
--
--static int if_idx;
--static char *if_name;
--static __u32 xdp_flags = XDP_FLAGS_UPDATE_IF_NOEXIST;
--static __u32 prog_id;
--static struct perf_buffer *pb = NULL;
--
--static int do_attach(int idx, int fd, const char *name)
--{
--	struct bpf_prog_info info = {};
--	__u32 info_len = sizeof(info);
--	int err;
--
--	err = bpf_xdp_attach(idx, fd, xdp_flags, NULL);
--	if (err < 0) {
--		printf("ERROR: failed to attach program to %s\n", name);
--		return err;
--	}
--
--	err = bpf_prog_get_info_by_fd(fd, &info, &info_len);
--	if (err) {
--		printf("can't get prog info - %s\n", strerror(errno));
--		return err;
--	}
--	prog_id = info.id;
--
--	return err;
--}
--
--static int do_detach(int idx, const char *name)
--{
--	__u32 curr_prog_id = 0;
--	int err = 0;
--
--	err = bpf_xdp_query_id(idx, xdp_flags, &curr_prog_id);
--	if (err) {
--		printf("bpf_xdp_query_id failed\n");
--		return err;
--	}
--	if (prog_id == curr_prog_id) {
--		err = bpf_xdp_detach(idx, xdp_flags, NULL);
--		if (err < 0)
--			printf("ERROR: failed to detach prog from %s\n", name);
--	} else if (!curr_prog_id) {
--		printf("couldn't find a prog id on a %s\n", name);
--	} else {
--		printf("program on interface changed, not removing\n");
--	}
--
--	return err;
--}
--
--#define SAMPLE_SIZE 64
--
--static void print_bpf_output(void *ctx, int cpu, void *data, __u32 size)
--{
--	struct {
--		__u16 cookie;
--		__u16 pkt_len;
--		__u8  pkt_data[SAMPLE_SIZE];
--	} __packed *e = data;
--	int i;
--
--	if (e->cookie != 0xdead) {
--		printf("BUG cookie %x sized %d\n", e->cookie, size);
--		return;
--	}
--
--	printf("Pkt len: %-5d bytes. Ethernet hdr: ", e->pkt_len);
--	for (i = 0; i < 14 && i < e->pkt_len; i++)
--		printf("%02x ", e->pkt_data[i]);
--	printf("\n");
--}
--
--static void sig_handler(int signo)
--{
--	do_detach(if_idx, if_name);
--	perf_buffer__free(pb);
--	exit(0);
--}
--
--static void usage(const char *prog)
--{
--	fprintf(stderr,
--		"%s: %s [OPTS] <ifname|ifindex>\n\n"
--		"OPTS:\n"
--		"    -F    force loading prog\n"
--		"    -S    use skb-mode\n",
--		__func__, prog);
--}
--
--int main(int argc, char **argv)
--{
--	const char *optstr = "FS";
--	int prog_fd, map_fd, opt;
--	struct bpf_program *prog;
--	struct bpf_object *obj;
--	struct bpf_map *map;
--	char filename[256];
--	int ret, err;
--
--	while ((opt = getopt(argc, argv, optstr)) != -1) {
--		switch (opt) {
--		case 'F':
--			xdp_flags &= ~XDP_FLAGS_UPDATE_IF_NOEXIST;
--			break;
--		case 'S':
--			xdp_flags |= XDP_FLAGS_SKB_MODE;
--			break;
--		default:
--			usage(basename(argv[0]));
--			return 1;
--		}
--	}
--
--	if (!(xdp_flags & XDP_FLAGS_SKB_MODE))
--		xdp_flags |= XDP_FLAGS_DRV_MODE;
--
--	if (optind == argc) {
--		usage(basename(argv[0]));
--		return 1;
--	}
--
--	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
--
--	obj = bpf_object__open_file(filename, NULL);
--	if (libbpf_get_error(obj))
--		return 1;
--
--	prog = bpf_object__next_program(obj, NULL);
--	bpf_program__set_type(prog, BPF_PROG_TYPE_XDP);
--
--	err = bpf_object__load(obj);
--	if (err)
--		return 1;
--
--	prog_fd = bpf_program__fd(prog);
--
--	map = bpf_object__next_map(obj, NULL);
--	if (!map) {
--		printf("finding a map in obj file failed\n");
--		return 1;
--	}
--	map_fd = bpf_map__fd(map);
--
--	if_idx = if_nametoindex(argv[optind]);
--	if (!if_idx)
--		if_idx = strtoul(argv[optind], NULL, 0);
--
--	if (!if_idx) {
--		fprintf(stderr, "Invalid ifname\n");
--		return 1;
--	}
--	if_name = argv[optind];
--	err = do_attach(if_idx, prog_fd, if_name);
--	if (err)
--		return err;
--
--	if (signal(SIGINT, sig_handler) ||
--	    signal(SIGHUP, sig_handler) ||
--	    signal(SIGTERM, sig_handler)) {
--		perror("signal");
--		return 1;
--	}
--
--	pb = perf_buffer__new(map_fd, 8, print_bpf_output, NULL, NULL, NULL);
--	err = libbpf_get_error(pb);
--	if (err) {
--		perror("perf_buffer setup failed");
--		return 1;
--	}
--
--	while ((ret = perf_buffer__poll(pb, 1000)) >= 0) {
--	}
--
--	kill(0, SIGINT);
--	return ret;
--}
+diff --git a/samples/bpf/.gitignore b/samples/bpf/.gitignore
+index 0e7bfdbff80a..0002cd359fb1 100644
+--- a/samples/bpf/.gitignore
++++ b/samples/bpf/.gitignore
+@@ -37,22 +37,10 @@ tracex4
+ tracex5
+ tracex6
+ tracex7
+-xdp1
+-xdp2
+ xdp_adjust_tail
+ xdp_fwd
+-xdp_monitor
+-xdp_redirect
+-xdp_redirect_cpu
+-xdp_redirect_map
+-xdp_redirect_map_multi
+ xdp_router_ipv4
+-xdp_rxq_info
+-xdp_sample_pkts
+ xdp_tx_iptunnel
+-xdpsock
+-xdpsock_ctrl_proc
+-xsk_fwd
+ testfile.img
+ hbm_out.log
+ iperf.*
 -- 
 2.41.0
 
