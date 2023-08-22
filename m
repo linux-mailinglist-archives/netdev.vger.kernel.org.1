@@ -1,242 +1,155 @@
-Return-Path: <netdev+bounces-29503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51E88783857
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:13:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55CAE78385B
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66A781C209CB
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:13:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D73280FBF
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CEC6139B;
-	Tue, 22 Aug 2023 03:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BB2139B;
+	Tue, 22 Aug 2023 03:13:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18EBB7F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:12:44 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE0FC187
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:12:42 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68a1af910e0so1607701b3a.2
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:12:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692673962; x=1693278762;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OaJXlYYD+X1nizpRhqpp++D+SmFV706G2JsxeaBKDO0=;
-        b=WFUG73Ue0N9vJwAyv6RUn1tEtuFW/6R9L5D5PaKhXNlM2HHkkNZ3OlLXRvmVK1wFuX
-         jE7ghO7Hfj/qCiiPBs3s6/84f+1Qng8aZZRB+BQvRz7h9XKbutGothDsI/E/5uzKmUKD
-         v87wPDbmafEXNJv9AffcQLF4RNn93LN/TjGquYdhzonbI0UCF43JrO4hwIWlid6bWYO1
-         ElyjKC8+yC4BjFVwfG9FlWzZMi5MfIi4t+55AEhnhZqSB/v1R16nvpJQ/+X5DSWodPvR
-         J1gcn53Yd8Mh9F0HD3CT0YXx+KC1/G0mNkcSE43UC8QaEaON3UFrIkteoUguyDqG4KuT
-         6cng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692673962; x=1693278762;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OaJXlYYD+X1nizpRhqpp++D+SmFV706G2JsxeaBKDO0=;
-        b=K1ZQWlPeujOLJUceOkcjBoWGNy4SqWSftYm30q80tiqVJtXmEEudidWyrPHdmo+jxc
-         KUCWAh+mFpqvkimW8uR9+S4Au0so5wsYdUAw8Lto82Sh3GHU3WcfjkSpUVBjSnCXhLqu
-         Q9FDmnOncVzqdfXBW78hBdAJZHW0UuyJj0S6btK7BwySMZOJQGFgTlQXkGgnvyPvCLNX
-         CZ5pCH5EXa1YgJtpPN7O4eoCEOuNHnEJnmUu8bivn0aGi+2/dkzsZk6mOUJp6rCkrEvC
-         rGPSvyKiDTlcrC7fe4UiG5akvljyDK3EvRG0w7hmpwigy2L/sKijcx97gG6LiGJRmLBU
-         e2EQ==
-X-Gm-Message-State: AOJu0YzHRqDge6zAZMGBAC3HqrjVd/F6YDJZNUYoCqL32ewJ3WwYtRfW
-	s0lgTZG53FohHncV9SjYTySOJEXKj5DFeA==
-X-Google-Smtp-Source: AGHT+IGINtxOtT2scUIWkAixhZKktog/BmNfYlDI0eA3bPj2OCn7CMtFteMylAW5UsdwepyXti90xA==
-X-Received: by 2002:a05:6a20:4d8:b0:148:6398:866c with SMTP id 24-20020a056a2004d800b001486398866cmr5491863pzd.23.1692673961764;
-        Mon, 21 Aug 2023 20:12:41 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id ix21-20020a170902f81500b001bde6fa0a39sm7803601plb.167.2023.08.21.20.12.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 20:12:40 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145BD1365
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:13:38 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83379138
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:13:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692674017; x=1724210017;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gMhOPpln6PZIB0MFQoFjB/JJWAZsbI5O+vFGGPRmOJo=;
+  b=X7ezVimv67n4AUXjJf0G/48UeO/nUtpSsXZa9s/Q3gEwop7FxpcanK37
+   86GMzKXgN1rqLWR2POFgx+r1jWv24TEFZNs6NOryUpsN50cvjFXb7jrcg
+   pX9JloB1t3QS58pGBaah7bVb0MDy/ws+ec46P9GGjpJRbLI3zAE2KcukB
+   YEPAajBm1aAn7XlYCOIlqj5a218URWRe31viZrMshkytuzjK2wR4tmn0w
+   +0+ZVrTo2QQMMxZCCnsf0dcKNVxDKOLwwHL+LPYpxWWOgswSlgV2arQLr
+   RcAcAcNGN2ekJC/4CLj/yuhfJQHwMGdgSMKZklKcYJJLgD6TCuKs6xxZY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="363932363"
+X-IronPort-AV: E=Sophos;i="6.01,191,1684825200"; 
+   d="scan'208";a="363932363"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 20:13:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="806129175"
+X-IronPort-AV: E=Sophos;i="6.01,191,1684825200"; 
+   d="scan'208";a="806129175"
+Received: from lkp-server02.sh.intel.com (HELO 6809aa828f2a) ([10.239.97.151])
+  by fmsmga004.fm.intel.com with ESMTP; 21 Aug 2023 20:13:33 -0700
+Received: from kbuild by 6809aa828f2a with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qYHpk-0001Hc-1B;
+	Tue, 22 Aug 2023 03:13:32 +0000
+Date: Tue, 22 Aug 2023 11:12:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
 	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Liang Li <liali@redhat.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net 3/3] selftests: bonding: add macvlan over bond testing
-Date: Tue, 22 Aug 2023 11:12:25 +0800
-Message-ID: <20230822031225.1691679-4-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230822031225.1691679-1-liuhangbin@gmail.com>
-References: <20230822031225.1691679-1-liuhangbin@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 3/3] net: l2tp_eth: use generic dev->stats fields
+Message-ID: <202308221125.rGMwm9uv-lkp@intel.com>
+References: <20230819044059.833749-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230819044059.833749-4-edumazet@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a macvlan over bonding test with mode active-backup, balance-tlb
-and balance-alb.
+Hi Eric,
 
-]# ./bond_macvlan.sh
-TEST: active-backup: IPv4: client->server                           [ OK ]
-TEST: active-backup: IPv6: client->server                           [ OK ]
-TEST: active-backup: IPv4: client->macvlan_1                        [ OK ]
-TEST: active-backup: IPv6: client->macvlan_1                        [ OK ]
-TEST: active-backup: IPv4: client->macvlan_2                        [ OK ]
-TEST: active-backup: IPv6: client->macvlan_2                        [ OK ]
-TEST: active-backup: IPv4: macvlan_1->macvlan_2                     [ OK ]
-TEST: active-backup: IPv6: macvlan_1->macvlan_2                     [ OK ]
-TEST: active-backup: IPv4: server->client                           [ OK ]
-TEST: active-backup: IPv6: server->client                           [ OK ]
-TEST: active-backup: IPv4: macvlan_1->client                        [ OK ]
-TEST: active-backup: IPv6: macvlan_1->client                        [ OK ]
-TEST: active-backup: IPv4: macvlan_2->client                        [ OK ]
-TEST: active-backup: IPv6: macvlan_2->client                        [ OK ]
-TEST: active-backup: IPv4: macvlan_2->macvlan_2                     [ OK ]
-TEST: active-backup: IPv6: macvlan_2->macvlan_2                     [ OK ]
-[...]
-TEST: balance-alb: IPv4: client->server                             [ OK ]
-TEST: balance-alb: IPv6: client->server                             [ OK ]
-TEST: balance-alb: IPv4: client->macvlan_1                          [ OK ]
-TEST: balance-alb: IPv6: client->macvlan_1                          [ OK ]
-TEST: balance-alb: IPv4: client->macvlan_2                          [ OK ]
-TEST: balance-alb: IPv6: client->macvlan_2                          [ OK ]
-TEST: balance-alb: IPv4: macvlan_1->macvlan_2                       [ OK ]
-TEST: balance-alb: IPv6: macvlan_1->macvlan_2                       [ OK ]
-TEST: balance-alb: IPv4: server->client                             [ OK ]
-TEST: balance-alb: IPv6: server->client                             [ OK ]
-TEST: balance-alb: IPv4: macvlan_1->client                          [ OK ]
-TEST: balance-alb: IPv6: macvlan_1->client                          [ OK ]
-TEST: balance-alb: IPv4: macvlan_2->client                          [ OK ]
-TEST: balance-alb: IPv6: macvlan_2->client                          [ OK ]
-TEST: balance-alb: IPv4: macvlan_2->macvlan_2                       [ OK ]
-TEST: balance-alb: IPv6: macvlan_2->macvlan_2                       [ OK ]
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- .../drivers/net/bonding/bond_macvlan.sh       | 99 +++++++++++++++++++
- 1 file changed, 99 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+[auto build test WARNING on net-next/main]
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-new file mode 100755
-index 000000000000..b609fb6231f4
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-@@ -0,0 +1,99 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Test macvlan over balance-alb
-+
-+lib_dir=$(dirname "$0")
-+source ${lib_dir}/bond_topo_2d1c.sh
-+
-+m1_ns="m1-$(mktemp -u XXXXXX)"
-+m2_ns="m1-$(mktemp -u XXXXXX)"
-+m1_ip4="192.0.2.11"
-+m1_ip6="2001:db8::11"
-+m2_ip4="192.0.2.12"
-+m2_ip6="2001:db8::12"
-+
-+cleanup()
-+{
-+	ip -n ${m1_ns} link del macv0
-+	ip netns del ${m1_ns}
-+	ip -n ${m2_ns} link del macv0
-+	ip netns del ${m2_ns}
-+
-+	client_destroy
-+	server_destroy
-+	gateway_destroy
-+}
-+
-+check_connection()
-+{
-+	local ns=${1}
-+	local target=${2}
-+	local message=${3:-"macvlan_over_bond"}
-+	RET=0
-+
-+
-+	ip netns exec ${ns} ping ${target} -c 4 -i 0.1 &>/dev/null
-+	check_err $? "ping failed"
-+	log_test "$mode: $message"
-+}
-+
-+macvlan_over_bond()
-+{
-+	local param="$1"
-+	RET=0
-+
-+	# setup new bond mode
-+	bond_reset "${param}"
-+
-+	ip -n ${s_ns} link add link bond0 name macv0 type macvlan mode bridge
-+	ip -n ${s_ns} link set macv0 netns ${m1_ns}
-+	ip -n ${m1_ns} link set dev macv0 up
-+	ip -n ${m1_ns} addr add ${m1_ip4}/24 dev macv0
-+	ip -n ${m1_ns} addr add ${m1_ip6}/24 dev macv0
-+
-+	ip -n ${s_ns} link add link bond0 name macv0 type macvlan mode bridge
-+	ip -n ${s_ns} link set macv0 netns ${m2_ns}
-+	ip -n ${m2_ns} link set dev macv0 up
-+	ip -n ${m2_ns} addr add ${m2_ip4}/24 dev macv0
-+	ip -n ${m2_ns} addr add ${m2_ip6}/24 dev macv0
-+
-+	sleep 2
-+
-+	check_connection "${c_ns}" "${s_ip4}" "IPv4: client->server"
-+	check_connection "${c_ns}" "${s_ip6}" "IPv6: client->server"
-+	check_connection "${c_ns}" "${m1_ip4}" "IPv4: client->macvlan_1"
-+	check_connection "${c_ns}" "${m1_ip6}" "IPv6: client->macvlan_1"
-+	check_connection "${c_ns}" "${m2_ip4}" "IPv4: client->macvlan_2"
-+	check_connection "${c_ns}" "${m2_ip6}" "IPv6: client->macvlan_2"
-+	check_connection "${m1_ns}" "${m2_ip4}" "IPv4: macvlan_1->macvlan_2"
-+	check_connection "${m1_ns}" "${m2_ip6}" "IPv6: macvlan_1->macvlan_2"
-+
-+
-+	sleep 5
-+
-+	check_connection "${s_ns}" "${c_ip4}" "IPv4: server->client"
-+	check_connection "${s_ns}" "${c_ip6}" "IPv6: server->client"
-+	check_connection "${m1_ns}" "${c_ip4}" "IPv4: macvlan_1->client"
-+	check_connection "${m1_ns}" "${c_ip6}" "IPv6: macvlan_1->client"
-+	check_connection "${m2_ns}" "${c_ip4}" "IPv4: macvlan_2->client"
-+	check_connection "${m2_ns}" "${c_ip6}" "IPv6: macvlan_2->client"
-+	check_connection "${m2_ns}" "${m1_ip4}" "IPv4: macvlan_2->macvlan_2"
-+	check_connection "${m2_ns}" "${m1_ip6}" "IPv6: macvlan_2->macvlan_2"
-+
-+	ip -n ${c_ns} neigh flush dev eth0
-+}
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+ip netns add ${m1_ns}
-+ip netns add ${m2_ns}
-+
-+modes="active-backup balance-tlb balance-alb"
-+
-+for mode in $modes; do
-+	macvlan_over_bond "mode $mode"
-+done
-+
-+exit $EXIT_STATUS
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-add-DEV_STATS_READ-helper/20230821-110051
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230819044059.833749-4-edumazet%40google.com
+patch subject: [PATCH net-next 3/3] net: l2tp_eth: use generic dev->stats fields
+config: i386-randconfig-015-20230822 (https://download.01.org/0day-ci/archive/20230822/202308221125.rGMwm9uv-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20230822/202308221125.rGMwm9uv-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308221125.rGMwm9uv-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/l2tp/l2tp_eth.c:121:19: warning: variable 'priv' set but not used [-Wunused-but-set-variable]
+           struct l2tp_eth *priv;
+                            ^
+   1 warning generated.
+
+
+vim +/priv +121 net/l2tp/l2tp_eth.c
+
+d9e31d17ceba5f James Chapman    2010-04-02  116  
+d9e31d17ceba5f James Chapman    2010-04-02  117  static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb, int data_len)
+d9e31d17ceba5f James Chapman    2010-04-02  118  {
+d9e31d17ceba5f James Chapman    2010-04-02  119  	struct l2tp_eth_sess *spriv = l2tp_session_priv(session);
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  120  	struct net_device *dev;
+ee28de6bbd78c2 Guillaume Nault  2017-10-27 @121  	struct l2tp_eth *priv;
+d9e31d17ceba5f James Chapman    2010-04-02  122  
+c0cc88a7627c33 Eric Dumazet     2012-09-04  123  	if (!pskb_may_pull(skb, ETH_HLEN))
+d9e31d17ceba5f James Chapman    2010-04-02  124  		goto error;
+d9e31d17ceba5f James Chapman    2010-04-02  125  
+d9e31d17ceba5f James Chapman    2010-04-02  126  	secpath_reset(skb);
+d9e31d17ceba5f James Chapman    2010-04-02  127  
+d9e31d17ceba5f James Chapman    2010-04-02  128  	/* checksums verified by L2TP */
+d9e31d17ceba5f James Chapman    2010-04-02  129  	skb->ip_summed = CHECKSUM_NONE;
+d9e31d17ceba5f James Chapman    2010-04-02  130  
+d9e31d17ceba5f James Chapman    2010-04-02  131  	skb_dst_drop(skb);
+895b5c9f206eb7 Florian Westphal 2019-09-29  132  	nf_reset_ct(skb);
+d9e31d17ceba5f James Chapman    2010-04-02  133  
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  134  	rcu_read_lock();
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  135  	dev = rcu_dereference(spriv->dev);
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  136  	if (!dev)
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  137  		goto error_rcu;
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  138  
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  139  	priv = netdev_priv(dev);
+d9e31d17ceba5f James Chapman    2010-04-02  140  	if (dev_forward_skb(dev, skb) == NET_RX_SUCCESS) {
+b9494cd37a920d Eric Dumazet     2023-08-19  141  		DEV_STATS_INC(dev, rx_packets);
+b9494cd37a920d Eric Dumazet     2023-08-19  142  		DEV_STATS_ADD(dev, rx_bytes, data_len);
+a2842a1e663297 Eric Dumazet     2012-06-25  143  	} else {
+b9494cd37a920d Eric Dumazet     2023-08-19  144  		DEV_STATS_INC(dev, rx_errors);
+a2842a1e663297 Eric Dumazet     2012-06-25  145  	}
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  146  	rcu_read_unlock();
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  147  
+d9e31d17ceba5f James Chapman    2010-04-02  148  	return;
+d9e31d17ceba5f James Chapman    2010-04-02  149  
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  150  error_rcu:
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  151  	rcu_read_unlock();
+d9e31d17ceba5f James Chapman    2010-04-02  152  error:
+d9e31d17ceba5f James Chapman    2010-04-02  153  	kfree_skb(skb);
+d9e31d17ceba5f James Chapman    2010-04-02  154  }
+d9e31d17ceba5f James Chapman    2010-04-02  155  
+
 -- 
-2.41.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
