@@ -1,595 +1,551 @@
-Return-Path: <netdev+bounces-29516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAD1B783898
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:37:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADDE67839B9
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:06:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A55A1C20A0A
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:37:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35CD7280F75
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 06:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0246515D4;
-	Tue, 22 Aug 2023 03:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C69210A;
+	Tue, 22 Aug 2023 06:06:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40297F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:36:04 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF68187
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:36:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692675362; x=1724211362;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SigTalB6+eNew/mwaFTjWiNEioFKYvr5WHCV7a5X3zc=;
-  b=dskZBHwxGEjfF7R/YU/tEj9OGsuzkDLSFU6VwpP4bbhd5t4o+DM9A4xj
-   1njXBFs5RR9iY8bHWn4UsS/6LNEAogwHeXZqYG/7KzCUfhKSXpJB7YT0d
-   scof4qoRrC9Sd3bKoanCHJ0uswXNbUfJEfoiMmBjJZehm/qPEX2lqSE96
-   tsP6VRnYkT3l7oslNCAUprvB71dub8HpeLRVqtD5OvH3fAtWJP84aXup9
-   NO+bKbjVuv528ATFM3c/tC5rfxzQ1vvu5xK3taZgAy8q+jSG0zCYks8A9
-   QZdo79x9lv+WoJoYNJUmsMbpnDvAU1U8yTPULgfok0ECAjD5Tzmq5ltjK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="373738258"
-X-IronPort-AV: E=Sophos;i="6.01,191,1684825200"; 
-   d="scan'208";a="373738258"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 20:35:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="739149436"
-X-IronPort-AV: E=Sophos;i="6.01,191,1684825200"; 
-   d="scan'208";a="739149436"
-Received: from dpdk-wuwenjun-icelake-ii.sh.intel.com ([10.67.110.152])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Aug 2023 20:35:38 -0700
-From: Wenjun Wu <wenjun1.wu@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org
-Cc: xuejun.zhang@intel.com,
-	madhu.chittim@intel.com,
-	qi.z.zhang@intel.com,
-	anthony.l.nguyen@intel.com
-Subject: [PATCH iwl-next v4 5/5] iavf: Add VIRTCHNL Opcodes Support for Queue bw Setting
-Date: Tue, 22 Aug 2023 11:40:03 +0800
-Message-Id: <20230822034003.31628-6-wenjun1.wu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230822034003.31628-1-wenjun1.wu@intel.com>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
- <20230822034003.31628-1-wenjun1.wu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E0C17EE
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:06:09 +0000 (UTC)
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BB21186
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:06:04 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-44ac87147fdso2525708137.1
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:06:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692684363; x=1693289163;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=96PAr/ZKdMv2+Os9IV3Xbt2ZP288+QT1rrqfr7FmrOU=;
+        b=IJDiTjAeGAyJ/4v+6yRZ0Dczs1hvAAYjI0NGvmfIJer5b9MNhWRYjXm06nhHUNLB1D
+         Qfe9gPlHjEr0Eo3/G+BGb+bF61xVTLzVwNiZCDRRA7PQJ4GwPBnuCfAuRL7/l3mhS7XP
+         mPT0JKrpzt1v28Bfg/SbnIyg1YMZa7Ibd6q+hu12FsBSjrvNPUlt4lXmW4P4vENdqO4/
+         yLydp7lGe+qK3dyza2zr3g7+zKfCh2hxsqMVVESpN6obRHxfL7RPTb2UHIIZAf8ZF2Cq
+         4w9CKtnqRyIT0JPnwJiD6ZPKnouBBEUN9CAK91DbvJny16uE00Tx3YffPDcQFU40FxoE
+         VAZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692684363; x=1693289163;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=96PAr/ZKdMv2+Os9IV3Xbt2ZP288+QT1rrqfr7FmrOU=;
+        b=Gupp69ypjIBX+BvyKnt7wXTpiz51JTkLhNkw9gZNTRpOgUNEw2krVK9jAlDCfRMxXO
+         s04EMf3WAUeI4vXE94N/DZfS2EgPGGX1MxeaBjHsvg3x41+0w1iLFPjrJBm7xDHuRolp
+         BZENXBCWKjk6uRbjrQX9ocwY3Lj8NZ7bnsJzBer9ZqhhnvbBJzm/fMWE8Tl6NOsAclgy
+         kEDEtqL4uh9fqTuRdBTBEv8iIq+h3B/SV6AoGKehJ0I0S2wGWUyTd6qEyu/KEbmFZ0CN
+         2CT8RybJhPZ4/p+171QgAiuLkpn4FxF5U5tx+wG2N4vaa3E1ehcw4saiKh+1X+zi+Xhz
+         93WA==
+X-Gm-Message-State: AOJu0YxgtyQLQaRZsHd8iDaTUtv+Ol2sin/07jgucgKrw9xigOYTi8NY
+	0WGEbPDom+Y8QbIwscBorVC4WyuhDfZx8HJl38AcBA==
+X-Google-Smtp-Source: AGHT+IFPjPglggVAFjlide5m+mn7HoVFzA/jDolI+RailJQq2VaayvEQFWJzjNa7Zg17QcOhYhc1OZHohW/GCYlclM0=
+X-Received: by 2002:a05:6102:320b:b0:44b:f502:148d with SMTP id
+ r11-20020a056102320b00b0044bf502148dmr4725729vsf.6.1692684363159; Mon, 21 Aug
+ 2023 23:06:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230810015751.3297321-1-almasrymina@google.com>
+ <20230810015751.3297321-7-almasrymina@google.com> <6adafb5d-0bc5-cb9a-5232-6836ab7e77e6@redhat.com>
+In-Reply-To: <6adafb5d-0bc5-cb9a-5232-6836ab7e77e6@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 21 Aug 2023 23:05:50 -0700
+Message-ID: <CAHS8izM4w2UETAwfnV7w+ZzTMxLkz+FKO+xTgRdtYKzV8RzqXw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 06/11] page-pool: add device memory support
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: netdev@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, brouer@redhat.com, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
+	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org, 
+	sdf@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jun Zhang <xuejun.zhang@intel.com>
+On Sat, Aug 19, 2023 at 2:51=E2=80=AFAM Jesper Dangaard Brouer
+<jbrouer@redhat.com> wrote:
+>
+>
+>
+> On 10/08/2023 03.57, Mina Almasry wrote:
+> > Overload the LSB of struct page* to indicate that it's a page_pool_iov.
+> >
+> > Refactor mm calls on struct page * into helpers, and add page_pool_iov
+> > handling on those helpers. Modify callers of these mm APIs with calls t=
+o
+> > these helpers instead.
+> >
+>
+> I don't like of this approach.
+> This is adding code to the PP (page_pool) fast-path in multiple places.
+>
+> I've not had time to run my usual benchmarks, which are here:
+>
+> https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/b=
+ench_page_pool_simple.c
+>
 
-iavf rate tree with root node and queue nodes is created and registered
-with devlink rate when iavf adapter is configured.
+I ported over this benchmark to my tree and ran it, my results:
 
-User can configure the tx_max and tx_share of each queue. If any one of
-the queues have been fully updated by user, i.e. both tx_max and
-tx_share have been updated for that queue, VIRTCHNL opcodes of
-VIRTCHNL_OP_CONFIG_QUEUE_BW and VIRTCHNL_OP_CONFIG_QUANTA will be sent
-to PF to configure queues allocated to VF if PF indicates support of
-VIRTCHNL_VF_OFFLOAD_QOS through VF Resource / Capability Exchange.
+net-next @ b44693495af8
+https://pastebin.com/raw/JuU7UQXe
 
-Signed-off-by: Jun Zhang <xuejun.zhang@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf.h        |  14 ++
- .../net/ethernet/intel/iavf/iavf_devlink.c    |  29 +++
- .../net/ethernet/intel/iavf/iavf_devlink.h    |   1 +
- drivers/net/ethernet/intel/iavf/iavf_main.c   |  46 +++-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 231 +++++++++++++++++-
- 5 files changed, 317 insertions(+), 4 deletions(-)
++ Jakub's memory-provider APIs:
+https://pastebin.com/raw/StMBhetn
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index 72a68061e396..c04cd1d45be7 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -252,6 +252,9 @@ struct iavf_cloud_filter {
- #define IAVF_RESET_WAIT_DETECTED_COUNT 500
- #define IAVF_RESET_WAIT_COMPLETE_COUNT 2000
- 
-+#define IAVF_MAX_QOS_TC_NUM		8
-+#define IAVF_DEFAULT_QUANTA_SIZE	1024
-+
- /* board specific private data structure */
- struct iavf_adapter {
- 	struct workqueue_struct *wq;
-@@ -351,6 +354,9 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_DISABLE_CTAG_VLAN_INSERTION	BIT_ULL(36)
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
-+#define IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW		BIT_ULL(39)
-+#define IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE	BIT_ULL(40)
-+#define IAVF_FLAG_AQ_GET_QOS_CAPS			BIT_ULL(41)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -373,6 +379,7 @@ struct iavf_adapter {
- 
- 	struct devlink *devlink;
- 	struct devlink_port devlink_port;
-+	bool devlink_update;
- 
- 	struct iavf_hw hw; /* defined in iavf_type.h */
- 
-@@ -422,6 +429,8 @@ struct iavf_adapter {
- 			       VIRTCHNL_VF_OFFLOAD_FDIR_PF)
- #define ADV_RSS_SUPPORT(_a) ((_a)->vf_res->vf_cap_flags & \
- 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
-+#define QOS_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+			 VIRTCHNL_VF_OFFLOAD_QOS)
- 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
- 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
- 	struct virtchnl_version_info pf_version;
-@@ -430,6 +439,7 @@ struct iavf_adapter {
- 	struct virtchnl_vlan_caps vlan_v2_caps;
- 	u16 msg_enable;
- 	struct iavf_eth_stats current_stats;
-+	struct virtchnl_qos_cap_list *qos_caps;
- 	struct iavf_vsi vsi;
- 	u32 aq_wait_count;
- 	/* RSS stuff */
-@@ -576,6 +586,10 @@ void iavf_notify_client_message(struct iavf_vsi *vsi, u8 *msg, u16 len);
- void iavf_notify_client_l2_params(struct iavf_vsi *vsi);
- void iavf_notify_client_open(struct iavf_vsi *vsi);
- void iavf_notify_client_close(struct iavf_vsi *vsi, bool reset);
-+void iavf_update_queue_config(struct iavf_adapter *adapter);
-+void iavf_configure_queues_bw(struct iavf_adapter *adapter);
-+void iavf_configure_queues_quanta_size(struct iavf_adapter *adapter);
-+void iavf_get_qos_caps(struct iavf_adapter *adapter);
- void iavf_enable_channels(struct iavf_adapter *adapter);
- void iavf_disable_channels(struct iavf_adapter *adapter);
- void iavf_add_cloud_filter(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_devlink.c b/drivers/net/ethernet/intel/iavf/iavf_devlink.c
-index 732076c2126f..aefe707aafbc 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_devlink.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_devlink.c
-@@ -97,6 +97,30 @@ void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter)
- 	devl_unlock(adapter->devlink);
- }
- 
-+/**
-+ * iavf_notify_queue_config_complete - notify updating queue completion
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function sets the queue configuration update status when all
-+ * queue parameters have been sent to PF
-+ */
-+void iavf_notify_queue_config_complete(struct iavf_adapter *adapter)
-+{
-+	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+	int q_num = adapter->num_active_queues;
-+	int i;
-+
-+	/* clean up rate tree update flags*/
-+	for (i = 0; i < q_num; i++)
-+		if (dl_priv->queue_nodes[i].tx_update_flag ==
-+		    (IAVF_FLAG_TX_MAX_UPDATED | IAVF_FLAG_TX_SHARE_UPDATED)) {
-+			dl_priv->queue_nodes[i].tx_update_flag = 0;
-+			break;
-+		}
-+
-+	dl_priv->update_in_progress = false;
-+}
-+
- /**
-  * iavf_check_update_config - check if updating queue parameters needed
-  * @adapter: iavf adapter struct instance
-@@ -108,6 +132,8 @@ void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter)
- static int iavf_check_update_config(struct iavf_adapter *adapter,
- 				    struct iavf_dev_rate_node *node)
- {
-+	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+
- 	/* Update queue bw if any one of the queues have been fully updated by
- 	 * user, the other queues either use the default value or the last
- 	 * fully updated value
-@@ -123,6 +149,8 @@ static int iavf_check_update_config(struct iavf_adapter *adapter,
- 	if (adapter->state != __IAVF_RUNNING)
- 		return -EBUSY;
- 
-+	dl_priv->update_in_progress = true;
-+	iavf_update_queue_config(adapter);
- 	return 0;
- }
- 
-@@ -281,6 +309,7 @@ int iavf_devlink_register(struct iavf_adapter *adapter)
- 	if (!devlink)
- 		return -ENOMEM;
- 
-+	adapter->devlink_update = false;
- 	ref = devlink_priv(devlink);
- 	ref->devlink_ref = adapter;
- 	ref->iavf_dev_rate_initialized = false;
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_devlink.h b/drivers/net/ethernet/intel/iavf/iavf_devlink.h
-index 751e9e093ab1..4709aa1a0341 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_devlink.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_devlink.h
-@@ -33,5 +33,6 @@ int iavf_devlink_port_register(struct iavf_adapter *adapter);
- void iavf_devlink_port_unregister(struct iavf_adapter *adapter);
- void iavf_devlink_rate_init_rate_tree(struct iavf_adapter *adapter);
- void iavf_devlink_rate_deinit_rate_tree(struct iavf_adapter *adapter);
-+void iavf_notify_queue_config_complete(struct iavf_adapter *adapter);
- 
- #endif /* _IAVF_DEVLINK_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 699c6375200a..c69c8beab3b5 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2131,6 +2131,21 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return 0;
- 	}
- 
-+	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW) {
-+		iavf_configure_queues_bw(adapter);
-+		return 0;
-+	}
-+
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_QOS_CAPS) {
-+		iavf_get_qos_caps(adapter);
-+		return 0;
-+	}
-+
-+	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE) {
-+		iavf_configure_queues_quanta_size(adapter);
-+		return 0;
-+	}
-+
- 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES) {
- 		iavf_configure_queues(adapter);
- 		return 0;
-@@ -2713,7 +2728,9 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
- 
- 	if (!adapter->netdev_registered) {
- 		iavf_devlink_port_register(adapter);
--		iavf_devlink_rate_init_rate_tree(adapter);
-+
-+		if (QOS_ALLOWED(adapter))
-+			iavf_devlink_rate_init_rate_tree(adapter);
- 	}
- 
- 	netif_carrier_off(netdev);
-@@ -3136,6 +3153,19 @@ static void iavf_reset_task(struct work_struct *work)
- 		err = iavf_reinit_interrupt_scheme(adapter, running);
- 		if (err)
- 			goto reset_err;
-+
-+		if (QOS_ALLOWED(adapter)) {
-+			iavf_devlink_rate_deinit_rate_tree(adapter);
-+			iavf_devlink_rate_init_rate_tree(adapter);
-+		}
-+	}
-+
-+	if (adapter->devlink_update) {
-+		adapter->aq_required |= IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+		adapter->aq_required |= IAVF_FLAG_AQ_GET_QOS_CAPS;
-+		adapter->aq_required |=
-+				IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE;
-+		adapter->devlink_update = false;
- 	}
- 
- 	if (RSS_AQ(adapter)) {
-@@ -4901,7 +4931,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	struct net_device *netdev;
- 	struct iavf_adapter *adapter = NULL;
- 	struct iavf_hw *hw = NULL;
--	int err;
-+	int err, len;
- 
- 	err = pci_enable_device(pdev);
- 	if (err)
-@@ -4969,6 +4999,13 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	hw->bus.func = PCI_FUNC(pdev->devfn);
- 	hw->bus.bus_id = pdev->bus->number;
- 
-+	len = struct_size(adapter->qos_caps, cap, IAVF_MAX_QOS_TC_NUM);
-+	adapter->qos_caps = kzalloc(len, GFP_KERNEL);
-+	if (!adapter->qos_caps) {
-+		err = -ENOMEM;
-+		goto err_alloc_qos_cap;
-+	}
-+
- 	/* Register iavf adapter with devlink */
- 	err = iavf_devlink_register(adapter);
- 	if (err) {
-@@ -5014,8 +5051,10 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	return 0;
- 
--err_devlink_reg:
-+err_alloc_qos_cap:
- 	iounmap(hw->hw_addr);
-+err_devlink_reg:
-+	kfree(adapter->qos_caps);
- err_ioremap:
- 	destroy_workqueue(adapter->wq);
- err_alloc_wq:
-@@ -5161,6 +5200,7 @@ static void iavf_remove(struct pci_dev *pdev)
- 	iavf_devlink_rate_deinit_rate_tree(adapter);
- 	iavf_devlink_port_unregister(adapter);
- 	iavf_devlink_unregister(adapter);
-+	kfree(adapter->qos_caps);
- 
- 	mutex_lock(&adapter->crit_lock);
- 	dev_info(&adapter->pdev->dev, "Removing device\n");
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index f9727e9c3d63..2eaa93705527 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -148,7 +148,8 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_USO |
- 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
- 	       VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF |
--	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED;
-+	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED |
-+	       VIRTCHNL_VF_OFFLOAD_QOS;
- 
- 	adapter->current_op = VIRTCHNL_OP_GET_VF_RESOURCES;
- 	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_CONFIG;
-@@ -1465,6 +1466,210 @@ iavf_set_adapter_link_speed_from_vpe(struct iavf_adapter *adapter,
- 		adapter->link_speed = vpe->event_data.link_event.link_speed;
- }
- 
-+/**
-+ * iavf_get_qos_caps - get qos caps support
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF for Supported QoS Caps.
-+ */
-+void iavf_get_qos_caps(struct iavf_adapter *adapter)
-+{
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot get qos caps, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_GET_QOS_CAPS;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_QOS_CAPS;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_QOS_CAPS, NULL, 0);
-+}
-+
-+/**
-+ * iavf_set_quanta_size - set quanta size of queue chunk
-+ * @adapter: iavf adapter struct instance
-+ * @quanta_size: quanta size in bytes
-+ * @queue_index: starting index of queue chunk
-+ * @num_queues: number of queues in the queue chunk
-+ *
-+ * This function requests PF to set quanta size of queue chunk
-+ * starting at queue_index.
-+ */
-+static void
-+iavf_set_quanta_size(struct iavf_adapter *adapter, u16 quanta_size,
-+		     u16 queue_index, u16 num_queues)
-+{
-+	struct virtchnl_quanta_cfg quanta_cfg;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set queue quanta size, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUANTA;
-+	quanta_cfg.quanta_size = quanta_size;
-+	quanta_cfg.queue_select.type = VIRTCHNL_QUEUE_TYPE_TX;
-+	quanta_cfg.queue_select.start_queue_id = queue_index;
-+	quanta_cfg.queue_select.num_queues = num_queues;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_QUANTA_SIZE;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUANTA,
-+			 (u8 *)&quanta_cfg, sizeof(quanta_cfg));
-+}
-+
-+/**
-+ * iavf_set_queue_bw - set bw of allocated queues
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF to set queue bw of tc0 queues
-+ */
-+static void iavf_set_queue_bw(struct iavf_adapter *adapter)
-+{
-+	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+	struct virtchnl_queues_bw_cfg *queues_bw_cfg;
-+	struct iavf_dev_rate_node *queue_rate;
-+	size_t len;
-+	int i;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set tc queue bw, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	len = struct_size(queues_bw_cfg, cfg, adapter->num_active_queues);
-+	queues_bw_cfg = kzalloc(len, GFP_KERNEL);
-+	if (!queues_bw_cfg)
-+		return;
-+
-+	queue_rate = dl_priv->queue_nodes;
-+	queues_bw_cfg->vsi_id = adapter->vsi.id;
-+	queues_bw_cfg->num_queues = adapter->num_active_queues;
-+
-+	for (i = 0; i < queues_bw_cfg->num_queues; i++) {
-+		queues_bw_cfg->cfg[i].queue_id = i;
-+		queues_bw_cfg->cfg[i].shaper.peak = queue_rate[i].tx_max;
-+		queues_bw_cfg->cfg[i].shaper.committed =
-+						    queue_rate[i].tx_share;
-+		queues_bw_cfg->cfg[i].tc = 0;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUEUE_BW;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUEUE_BW,
-+			 (u8 *)queues_bw_cfg, len);
-+	kfree(queues_bw_cfg);
-+}
-+
-+/**
-+ * iavf_set_tc_queue_bw - set bw of allocated tc/queues
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF to set queue bw of multiple tc(s)
-+ */
-+static void iavf_set_tc_queue_bw(struct iavf_adapter *adapter)
-+{
-+	struct iavf_devlink *dl_priv = devlink_priv(adapter->devlink);
-+	struct virtchnl_queues_bw_cfg *queues_bw_cfg;
-+	struct iavf_dev_rate_node *queue_rate;
-+	u16 queue_to_tc[256];
-+	size_t len;
-+	u16 tc;
-+	int i;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set tc queue bw, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	len = struct_size(queues_bw_cfg, cfg, adapter->num_active_queues);
-+	queues_bw_cfg = kzalloc(len, GFP_KERNEL);
-+	if (!queues_bw_cfg)
-+		return;
-+
-+	queue_rate = dl_priv->queue_nodes;
-+	queues_bw_cfg->vsi_id = adapter->vsi.id;
-+	queues_bw_cfg->num_queues = adapter->ch_config.total_qps;
-+
-+	/* build tc[queue] */
-+	for (i = 0; i < adapter->num_tc; i++) {
-+		int j, q_idx;
-+
-+		for (j = 0; j < adapter->ch_config.ch_info[i].count; ++j) {
-+			q_idx = j + adapter->ch_config.ch_info[i].offset;
-+			queue_to_tc[q_idx] = i;
-+		}
-+	}
-+
-+	for (i = 0; i < queues_bw_cfg->num_queues; i++) {
-+		tc = queue_to_tc[i];
-+		queues_bw_cfg->cfg[i].queue_id = i;
-+		queues_bw_cfg->cfg[i].shaper.peak = queue_rate[i].tx_max;
-+		queues_bw_cfg->cfg[i].shaper.committed =
-+						    queue_rate[i].tx_share;
-+		queues_bw_cfg->cfg[i].tc = tc;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUEUE_BW;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUEUE_BW,
-+			 (u8 *)queues_bw_cfg, len);
-+	kfree(queues_bw_cfg);
-+}
-+
-+/**
-+ * iavf_configure_queues_bw - configure bw of allocated tc/queues
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF to configure queue bw of allocated
-+ * tc/queues
-+ */
-+void iavf_configure_queues_bw(struct iavf_adapter *adapter)
-+{
-+	/* Set Queue bw */
-+	if (adapter->ch_config.state == __IAVF_TC_INVALID)
-+		iavf_set_queue_bw(adapter);
-+	else
-+		iavf_set_tc_queue_bw(adapter);
-+}
-+
-+/**
-+ * iavf_configure_queues_quanta_size - configure quanta size of queues
-+ * @adapter: adapter structure
-+ *
-+ * Request that the PF configure quanta size of allocated queues.
-+ **/
-+void iavf_configure_queues_quanta_size(struct iavf_adapter *adapter)
-+{
-+	int quanta_size = IAVF_DEFAULT_QUANTA_SIZE;
-+
-+	/* Set Queue Quanta Size to default */
-+	iavf_set_quanta_size(adapter, quanta_size, 0,
-+			     adapter->num_active_queues);
-+}
-+
-+/**
-+ * iavf_update_queue_config - request queue configuration update
-+ * @adapter: adapter structure
-+ *
-+ * Request that the PF configure queue quanta size and queue bw
-+ * of allocated queues.
-+ **/
-+void iavf_update_queue_config(struct iavf_adapter *adapter)
-+{
-+	adapter->devlink_update = true;
-+	iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
-+}
-+
- /**
-  * iavf_enable_channels
-  * @adapter: adapter structure
-@@ -2124,6 +2329,18 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 			dev_warn(&adapter->pdev->dev, "Failed to add VLAN filter, error %s\n",
- 				 iavf_stat_str(&adapter->hw, v_retval));
- 			break;
-+		case VIRTCHNL_OP_GET_QOS_CAPS:
-+			dev_warn(&adapter->pdev->dev, "Failed to Get Qos CAPs, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
-+		case VIRTCHNL_OP_CONFIG_QUANTA:
-+			dev_warn(&adapter->pdev->dev, "Failed to Config Quanta, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
-+		case VIRTCHNL_OP_CONFIG_QUEUE_BW:
-+			dev_warn(&adapter->pdev->dev, "Failed to Config Queue BW, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
- 		default:
- 			dev_err(&adapter->pdev->dev, "PF returned error %d (%s) to our request %d\n",
- 				v_retval, iavf_stat_str(&adapter->hw, v_retval),
-@@ -2456,6 +2673,18 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		if (!v_retval)
- 			iavf_netdev_features_vlan_strip_set(netdev, false);
- 		break;
-+	case VIRTCHNL_OP_GET_QOS_CAPS: {
-+		u16 len = struct_size(adapter->qos_caps, cap,
-+				      IAVF_MAX_QOS_TC_NUM);
-+
-+		memcpy(adapter->qos_caps, msg, min(msglen, len));
-+		}
-+		break;
-+	case VIRTCHNL_OP_CONFIG_QUANTA:
-+		iavf_notify_queue_config_complete(adapter);
-+		break;
-+	case VIRTCHNL_OP_CONFIG_QUEUE_BW:
-+		break;
- 	default:
- 		if (adapter->current_op && (v_opcode != adapter->current_op))
- 			dev_warn(&adapter->pdev->dev, "Expected response %d from PF, received %d\n",
--- 
-2.34.1
++ devmem TCP changes:
+https://pastebin.com/raw/mY1L6U4r
 
++ intentional regression just to make sure the benchmark is working:
+https://pastebin.com/raw/wqWhcJdG
+
+I don't seem to be able to detect a regression with this series as-is,
+but I'm not that familiar with the test and may be doing something
+wrong or misinterpreting the results. Does this look ok to you?
+
+> But I'm sure it will affect performance.
+>
+> Regardless of performance, this approach is using ptr-LSB-bits, to hide
+> that page-pointer are not really struct-pages, feels like force feeding
+> a solution just to use the page_pool APIs.
+>
+>
+> > In areas where struct page* is dereferenced, add a check for special
+> > handling of page_pool_iov.
+> >
+> > The memory providers producing page_pool_iov can set the LSB on the
+> > struct page* returned to the page pool.
+> >
+> > Note that instead of overloading the LSB of page pointers, we can
+> > instead define a new union between struct page & struct page_pool_iov a=
+nd
+> > compact it in a new type. However, we'd need to implement the code chur=
+n
+> > to modify the page_pool & drivers to use this new type. For this POC
+> > that is not implemented (feedback welcome).
+> >
+>
+> I've said before, that I prefer multiplexing on page->pp_magic.
+> For your page_pool_iov the layout would have to match the offset of
+> pp_magic, to do this. (And if insisting on using PP infra the refcnt
+> would also need to align).
+>
+> On the allocation side, all drivers already use a driver helper
+> page_pool_dev_alloc_pages() or we could add another (better named)
+> helper to multiplex between other types of allocators, e.g. a devmem
+> allocator.
+>
+> On free/return/recycle the functions napi_pp_put_page or skb_pp_recycle
+> could multiplex on pp_magic and call another API.  The API could be an
+> extension to PP helpers, but it could also be a devmap allocator helper.
+>
+> IMHO forcing/piggy-bagging everything into page_pool is not the right
+> solution.  I really think netstack need to support different allocator
+> types. The page pool have been leading the way, yes, but perhaps it is
+> time to add an API layer that e.g. could be named netmem, that gives us
+> the multiplexing between allocators.  In that process some of page_pool
+> APIs would be lifted out as common blocks and others remain.
+>
+> --Jesper
+>
+> > I have a sample implementation of adding a new page_pool_token type
+> > in the page_pool to give a general idea here:
+> > https://github.com/torvalds/linux/commit/3a7628700eb7fd02a117db036003bc=
+a50779608d
+> >
+> > Full branch here:
+> > https://github.com/torvalds/linux/compare/master...mina:linux:tcpdevmem=
+-pp-tokens
+> >
+> > (In the branches above, page_pool_iov is called devmem_slice).
+> >
+> > Could also add static_branch to speed up the checks in page_pool_iov
+> > memory providers are being used.
+> >
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > ---
+> >   include/net/page_pool.h | 74 ++++++++++++++++++++++++++++++++++-
+> >   net/core/page_pool.c    | 85 ++++++++++++++++++++++++++++------------=
+-
+> >   2 files changed, 131 insertions(+), 28 deletions(-)
+> >
+> > diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+> > index 537eb36115ed..f08ca230d68e 100644
+> > --- a/include/net/page_pool.h
+> > +++ b/include/net/page_pool.h
+> > @@ -282,6 +282,64 @@ static inline struct page_pool_iov *page_to_page_p=
+ool_iov(struct page *page)
+> >       return NULL;
+> >   }
+> >
+> > +static inline int page_pool_page_ref_count(struct page *page)
+> > +{
+> > +     if (page_is_page_pool_iov(page))
+> > +             return page_pool_iov_refcount(page_to_page_pool_iov(page)=
+);
+> > +
+> > +     return page_ref_count(page);
+> > +}
+> > +
+> > +static inline void page_pool_page_get_many(struct page *page,
+> > +                                        unsigned int count)
+> > +{
+> > +     if (page_is_page_pool_iov(page))
+> > +             return page_pool_iov_get_many(page_to_page_pool_iov(page)=
+,
+> > +                                           count);
+> > +
+> > +     return page_ref_add(page, count);
+> > +}
+> > +
+> > +static inline void page_pool_page_put_many(struct page *page,
+> > +                                        unsigned int count)
+> > +{
+> > +     if (page_is_page_pool_iov(page))
+> > +             return page_pool_iov_put_many(page_to_page_pool_iov(page)=
+,
+> > +                                           count);
+> > +
+> > +     if (count > 1)
+> > +             page_ref_sub(page, count - 1);
+> > +
+> > +     put_page(page);
+> > +}
+> > +
+> > +static inline bool page_pool_page_is_pfmemalloc(struct page *page)
+> > +{
+> > +     if (page_is_page_pool_iov(page))
+> > +             return false;
+> > +
+> > +     return page_is_pfmemalloc(page);
+> > +}
+> > +
+> > +static inline bool page_pool_page_is_pref_nid(struct page *page, int p=
+ref_nid)
+> > +{
+> > +     /* Assume page_pool_iov are on the preferred node without actuall=
+y
+> > +      * checking...
+> > +      *
+> > +      * This check is only used to check for recycling memory in the p=
+age
+> > +      * pool's fast paths. Currently the only implementation of page_p=
+ool_iov
+> > +      * is dmabuf device memory. It's a deliberate decision by the use=
+r to
+> > +      * bind a certain dmabuf to a certain netdev, and the netdev rx q=
+ueue
+> > +      * would not be able to reallocate memory from another dmabuf tha=
+t
+> > +      * exists on the preferred node, so, this check doesn't make much=
+ sense
+> > +      * in this case. Assume all page_pool_iovs can be recycled for no=
+w.
+> > +      */
+> > +     if (page_is_page_pool_iov(page))
+> > +             return true;
+> > +
+> > +     return page_to_nid(page) =3D=3D pref_nid;
+> > +}
+> > +
+> >   struct page_pool {
+> >       struct page_pool_params p;
+> >
+> > @@ -434,6 +492,9 @@ static inline long page_pool_defrag_page(struct pag=
+e *page, long nr)
+> >   {
+> >       long ret;
+> >
+> > +     if (page_is_page_pool_iov(page))
+> > +             return -EINVAL;
+> > +
+> >       /* If nr =3D=3D pp_frag_count then we have cleared all remaining
+> >        * references to the page. No need to actually overwrite it, inst=
+ead
+> >        * we can leave this to be overwritten by the calling function.
+> > @@ -494,7 +555,12 @@ static inline void page_pool_recycle_direct(struct=
+ page_pool *pool,
+> >
+> >   static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
+> >   {
+> > -     dma_addr_t ret =3D page->dma_addr;
+> > +     dma_addr_t ret;
+> > +
+> > +     if (page_is_page_pool_iov(page))
+> > +             return page_pool_iov_dma_addr(page_to_page_pool_iov(page)=
+);
+> > +
+> > +     ret =3D page->dma_addr;
+> >
+> >       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
+> >               ret |=3D (dma_addr_t)page->dma_addr_upper << 16 << 16;
+> > @@ -504,6 +570,12 @@ static inline dma_addr_t page_pool_get_dma_addr(st=
+ruct page *page)
+> >
+> >   static inline void page_pool_set_dma_addr(struct page *page, dma_addr=
+_t addr)
+> >   {
+> > +     /* page_pool_iovs are mapped and their dma-addr can't be modified=
+. */
+> > +     if (page_is_page_pool_iov(page)) {
+> > +             DEBUG_NET_WARN_ON_ONCE(true);
+> > +             return;
+> > +     }
+> > +
+> >       page->dma_addr =3D addr;
+> >       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
+> >               page->dma_addr_upper =3D upper_32_bits(addr);
+> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > index 0a7c08d748b8..20c1f74fd844 100644
+> > --- a/net/core/page_pool.c
+> > +++ b/net/core/page_pool.c
+> > @@ -318,7 +318,7 @@ static struct page *page_pool_refill_alloc_cache(st=
+ruct page_pool *pool)
+> >               if (unlikely(!page))
+> >                       break;
+> >
+> > -             if (likely(page_to_nid(page) =3D=3D pref_nid)) {
+> > +             if (likely(page_pool_page_is_pref_nid(page, pref_nid))) {
+> >                       pool->alloc.cache[pool->alloc.count++] =3D page;
+> >               } else {
+> >                       /* NUMA mismatch;
+> > @@ -363,7 +363,15 @@ static void page_pool_dma_sync_for_device(struct p=
+age_pool *pool,
+> >                                         struct page *page,
+> >                                         unsigned int dma_sync_size)
+> >   {
+> > -     dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
+> > +     dma_addr_t dma_addr;
+> > +
+> > +     /* page_pool_iov memory provider do not support PP_FLAG_DMA_SYNC_=
+DEV */
+> > +     if (page_is_page_pool_iov(page)) {
+> > +             DEBUG_NET_WARN_ON_ONCE(true);
+> > +             return;
+> > +     }
+> > +
+> > +     dma_addr =3D page_pool_get_dma_addr(page);
+> >
+> >       dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
+> >       dma_sync_single_range_for_device(pool->p.dev, dma_addr,
+> > @@ -375,6 +383,12 @@ static bool page_pool_dma_map(struct page_pool *po=
+ol, struct page *page)
+> >   {
+> >       dma_addr_t dma;
+> >
+> > +     if (page_is_page_pool_iov(page)) {
+> > +             /* page_pool_iovs are already mapped */
+> > +             DEBUG_NET_WARN_ON_ONCE(true);
+> > +             return true;
+> > +     }
+> > +
+> >       /* Setup DMA mapping: use 'struct page' area for storing DMA-addr
+> >        * since dma_addr_t can be either 32 or 64 bits and does not alwa=
+ys fit
+> >        * into page private data (i.e 32bit cpu with 64bit DMA caps)
+> > @@ -398,14 +412,24 @@ static bool page_pool_dma_map(struct page_pool *p=
+ool, struct page *page)
+> >   static void page_pool_set_pp_info(struct page_pool *pool,
+> >                                 struct page *page)
+> >   {
+> > -     page->pp =3D pool;
+> > -     page->pp_magic |=3D PP_SIGNATURE;
+> > +     if (!page_is_page_pool_iov(page)) {
+> > +             page->pp =3D pool;
+> > +             page->pp_magic |=3D PP_SIGNATURE;
+> > +     } else {
+> > +             page_to_page_pool_iov(page)->pp =3D pool;
+> > +     }
+> > +
+> >       if (pool->p.init_callback)
+> >               pool->p.init_callback(page, pool->p.init_arg);
+> >   }
+> >
+> >   static void page_pool_clear_pp_info(struct page *page)
+> >   {
+> > +     if (page_is_page_pool_iov(page)) {
+> > +             page_to_page_pool_iov(page)->pp =3D NULL;
+> > +             return;
+> > +     }
+> > +
+> >       page->pp_magic =3D 0;
+> >       page->pp =3D NULL;
+> >   }
+> > @@ -615,7 +639,7 @@ static bool page_pool_recycle_in_cache(struct page =
+*page,
+> >               return false;
+> >       }
+> >
+> > -     /* Caller MUST have verified/know (page_ref_count(page) =3D=3D 1)=
+ */
+> > +     /* Caller MUST have verified/know (page_pool_page_ref_count(page)=
+ =3D=3D 1) */
+> >       pool->alloc.cache[pool->alloc.count++] =3D page;
+> >       recycle_stat_inc(pool, cached);
+> >       return true;
+> > @@ -638,9 +662,10 @@ __page_pool_put_page(struct page_pool *pool, struc=
+t page *page,
+> >        * refcnt =3D=3D 1 means page_pool owns page, and can recycle it.
+> >        *
+> >        * page is NOT reusable when allocated when system is under
+> > -      * some pressure. (page_is_pfmemalloc)
+> > +      * some pressure. (page_pool_page_is_pfmemalloc)
+> >        */
+> > -     if (likely(page_ref_count(page) =3D=3D 1 && !page_is_pfmemalloc(p=
+age))) {
+> > +     if (likely(page_pool_page_ref_count(page) =3D=3D 1 &&
+> > +                !page_pool_page_is_pfmemalloc(page))) {
+> >               /* Read barrier done in page_ref_count / READ_ONCE */
+> >
+> >               if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+> > @@ -741,7 +766,8 @@ static struct page *page_pool_drain_frag(struct pag=
+e_pool *pool,
+> >       if (likely(page_pool_defrag_page(page, drain_count)))
+> >               return NULL;
+> >
+> > -     if (page_ref_count(page) =3D=3D 1 && !page_is_pfmemalloc(page)) {
+> > +     if (page_pool_page_ref_count(page) =3D=3D 1 &&
+> > +         !page_pool_page_is_pfmemalloc(page)) {
+> >               if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+> >                       page_pool_dma_sync_for_device(pool, page, -1);
+> >
+> > @@ -818,9 +844,9 @@ static void page_pool_empty_ring(struct page_pool *=
+pool)
+> >       /* Empty recycle ring */
+> >       while ((page =3D ptr_ring_consume_bh(&pool->ring))) {
+> >               /* Verify the refcnt invariant of cached pages */
+> > -             if (!(page_ref_count(page) =3D=3D 1))
+> > +             if (!(page_pool_page_ref_count(page) =3D=3D 1))
+> >                       pr_crit("%s() page_pool refcnt %d violation\n",
+> > -                             __func__, page_ref_count(page));
+> > +                             __func__, page_pool_page_ref_count(page))=
+;
+> >
+> >               page_pool_return_page(pool, page);
+> >       }
+> > @@ -977,19 +1003,24 @@ bool page_pool_return_skb_page(struct page *page=
+, bool napi_safe)
+> >       struct page_pool *pp;
+> >       bool allow_direct;
+> >
+> > -     page =3D compound_head(page);
+> > +     if (!page_is_page_pool_iov(page)) {
+> > +             page =3D compound_head(page);
+> >
+> > -     /* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
+> > -      * in order to preserve any existing bits, such as bit 0 for the
+> > -      * head page of compound page and bit 1 for pfmemalloc page, so
+> > -      * mask those bits for freeing side when doing below checking,
+> > -      * and page_is_pfmemalloc() is checked in __page_pool_put_page()
+> > -      * to avoid recycling the pfmemalloc page.
+> > -      */
+> > -     if (unlikely((page->pp_magic & ~0x3UL) !=3D PP_SIGNATURE))
+> > -             return false;
+> > +             /* page->pp_magic is OR'ed with PP_SIGNATURE after the
+> > +              * allocation in order to preserve any existing bits, suc=
+h as
+> > +              * bit 0 for the head page of compound page and bit 1 for
+> > +              * pfmemalloc page, so mask those bits for freeing side w=
+hen
+> > +              * doing below checking, and page_pool_page_is_pfmemalloc=
+() is
+> > +              * checked in __page_pool_put_page() to avoid recycling t=
+he
+> > +              * pfmemalloc page.
+> > +              */
+> > +             if (unlikely((page->pp_magic & ~0x3UL) !=3D PP_SIGNATURE)=
+)
+> > +                     return false;
+> >
+> > -     pp =3D page->pp;
+> > +             pp =3D page->pp;
+> > +     } else {
+> > +             pp =3D page_to_page_pool_iov(page)->pp;
+> > +     }
+> >
+> >       /* Allow direct recycle if we have reasons to believe that we are
+> >        * in the same context as the consumer would run, so there's
+> > @@ -1273,9 +1304,9 @@ static bool mp_huge_busy(struct mp_huge *hu, unsi=
+gned int idx)
+> >
+> >       for (j =3D 0; j < (1 << MP_HUGE_ORDER); j++) {
+> >               page =3D hu->page[idx] + j;
+> > -             if (page_ref_count(page) !=3D 1) {
+> > +             if (page_pool_page_ref_count(page) !=3D 1) {
+> >                       pr_warn("Page with ref count %d at %u, %u. Can't =
+safely destory, leaking memory!\n",
+> > -                             page_ref_count(page), idx, j);
+> > +                             page_pool_page_ref_count(page), idx, j);
+> >                       return true;
+> >               }
+> >       }
+> > @@ -1330,7 +1361,7 @@ static struct page *mp_huge_alloc_pages(struct pa=
+ge_pool *pool, gfp_t gfp)
+> >                       continue;
+> >
+> >               if ((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE ||
+> > -                 page_ref_count(page) !=3D 1) {
+> > +                 page_pool_page_ref_count(page) !=3D 1) {
+> >                       atomic_inc(&mp_huge_ins_b);
+> >                       continue;
+> >               }
+> > @@ -1458,9 +1489,9 @@ static void mp_huge_1g_destroy(struct page_pool *=
+pool)
+> >       free =3D true;
+> >       for (i =3D 0; i < MP_HUGE_1G_CNT; i++) {
+> >               page =3D hu->page + i;
+> > -             if (page_ref_count(page) !=3D 1) {
+> > +             if (page_pool_page_ref_count(page) !=3D 1) {
+> >                       pr_warn("Page with ref count %d at %u. Can't safe=
+ly destory, leaking memory!\n",
+> > -                             page_ref_count(page), i);
+> > +                             page_pool_page_ref_count(page), i);
+> >                       free =3D false;
+> >                       break;
+> >               }
+> > @@ -1489,7 +1520,7 @@ static struct page *mp_huge_1g_alloc_pages(struct=
+ page_pool *pool, gfp_t gfp)
+> >               page =3D hu->page + page_i;
+> >
+> >               if ((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE ||
+> > -                 page_ref_count(page) !=3D 1) {
+> > +                 page_pool_page_ref_count(page) !=3D 1) {
+> >                       atomic_inc(&mp_huge_ins_b);
+> >                       continue;
+> >               }
+> > --
+> > 2.41.0.640.ga95def55d0-goog
+> >
+>
+
+
+--
+Thanks,
+Mina
 
