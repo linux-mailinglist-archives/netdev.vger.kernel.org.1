@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-29569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F84783D31
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:43:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB417783D34
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:43:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25A121C20A9B
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 09:43:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDFCA1C20A9F
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 09:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA459444;
-	Tue, 22 Aug 2023 09:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E8A61BF1B;
+	Tue, 22 Aug 2023 09:41:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C5A8F74
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 09:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D071C285
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 09:41:28 +0000 (UTC)
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A17931A5
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 02:41:24 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2D851A5
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 02:41:26 -0700 (PDT)
 Received: from loongson.cn (unknown [112.20.109.102])
-	by gateway (Coremail) with SMTP id _____8CxyOjCguRkQOAaAA--.19223S3;
-	Tue, 22 Aug 2023 17:41:22 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8BxIvDDguRkSuAaAA--.54135S3;
+	Tue, 22 Aug 2023 17:41:23 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.109.102])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax3c7AguRkqTVgAA--.38684S2;
-	Tue, 22 Aug 2023 17:41:21 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax3c7AguRkqTVgAA--.38684S3;
+	Tue, 22 Aug 2023 17:41:22 +0800 (CST)
 From: Feiyang Chen <chenfeiyang@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -43,9 +43,9 @@ Cc: Feiyang Chen <chenfeiyang@loongson.cn>,
 	netdev@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	chris.chenfeiyang@gmail.com
-Subject: [PATCH v4 08/11] net: stmmac: dwegmac: Fix channel numbers
-Date: Tue, 22 Aug 2023 17:41:16 +0800
-Message-Id: <65b1dc40d509676f81669bbc6b32531b1e6f3441.1692696115.git.chenfeiyang@loongson.cn>
+Subject: [PATCH v4 09/11] net: stmmac: dwmac-loongson: Disable flow control for GMAC
+Date: Tue, 22 Aug 2023 17:41:17 +0800
+Message-Id: <3a1380123ae8a95ae993641d5914c43eb0895fec.1692696115.git.chenfeiyang@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <cover.1692696115.git.chenfeiyang@loongson.cn>
 References: <cover.1692696115.git.chenfeiyang@loongson.cn>
@@ -56,11 +56,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Ax3c7AguRkqTVgAA--.38684S2
+X-CM-TRANSID:AQAAf8Ax3c7AguRkqTVgAA--.38684S3
 X-CM-SenderInfo: hfkh0wphl1t03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxWr1fZF48AFWDXw4xWr17urX_yoW5CFW8pF
-	W7Aa4j9ryjyF15Xa1kt3ykXF98Ga4FgrWxWr4jk3yfua9FyFyYqrnIyayYyF18ZF4DX3W2
-	yF18uw45WFyDXrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW7CryDXrW5GFy3ur47KF1xJFc_yoW8tF1xpa
+	nrAa48WrnrtF47Jan5Aw4kZFy5Wa47KFW7uayxCws3WFZ2k34qqr1YgFWjyF17urWDWFya
+	qrWUCr4DCFnxArbCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUmYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
@@ -72,7 +72,7 @@ X-Coremail-Antispam: 1Uk129KBj93XoWxWr1fZF48AFWDXw4xWr17urX_yoW5CFW8pF
 	IYc2Ij64vIr41lF7xvrVCFI7AF6II2Y40_Zr0_Gr1UMxkF7I0En4kS14v26r126r1DMxAI
 	w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI
 	8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
-	xVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26F1j6w1UMIIF0xvE2Ix0cI
+	xVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26w1j6s0DMIIF0xvE2Ix0cI
 	8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
 	jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
 	IFyTuYvjxUgBOJUUUUU
@@ -81,79 +81,59 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Some Loongson platforms cannot obtain the TX and RX number of channels.
-Add the dwegmac_flag for them and specify the number of channels.
+Loongson GMAC does not support Flow Control feature. Set dwmac_flag
+to disable it.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwegmac_dma.c    | 10 ++++++++--
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c |  1 +
- include/linux/stmmac.h                               |  5 +++++
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    | 6 ++++--
+ include/linux/stmmac.h                               | 1 +
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwegmac_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwegmac_dma.c
-index 9bb0564fbeff..157f0e3687be 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwegmac_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwegmac_dma.c
-@@ -479,8 +479,14 @@ static int dwegmac_get_hw_feature(struct stmmac_priv *priv,
- 	dma_cap->rx_coe_type2 = (hw_cap & DMA_HW_FEAT_RXTYP2COE) >> 18;
- 	dma_cap->rxfifo_over_2048 = (hw_cap & DMA_HW_FEAT_RXFIFOSIZE) >> 19;
- 	/* TX and RX number of channels */
--	dma_cap->number_rx_channel = (hw_cap & DMA_HW_FEAT_RXCHCNT) >> 20;
--	dma_cap->number_tx_channel = (hw_cap & DMA_HW_FEAT_TXCHCNT) >> 22;
-+	if (FIELD_GET(DWEGMAC_FIX_CHANNEL_NUM, priv->plat->dwegmac_flags) &&
-+	    ((hw_cap & (DMA_HW_FEAT_RXCHCNT | DMA_HW_FEAT_TXCHCNT)) >> 20) == 0) {
-+		dma_cap->number_rx_channel = 8;
-+		dma_cap->number_tx_channel = 8;
-+	} else {
-+		dma_cap->number_rx_channel = (hw_cap & DMA_HW_FEAT_RXCHCNT) >> 20;
-+		dma_cap->number_tx_channel = (hw_cap & DMA_HW_FEAT_TXCHCNT) >> 22;
-+	}
- 	/* Alternate (enhanced) DESC mode */
- 	dma_cap->enh_desc = (hw_cap & DMA_HW_FEAT_ENHDESSEL) >> 24;
- 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 0748bafd3aec..9fb27fc94d2a 100644
+index 9fb27fc94d2a..1f466b1e80d9 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -175,6 +175,7 @@ static int loongson_gmac_config(struct pci_dev *pdev,
- 	switch (version & 0xff) {
- 	case DWEGMAC_CORE_1_00:
- 		ret = loongson_dwmac_config_multi_msi(pdev, plat, res, np, 8);
-+		plat->dwegmac_flags |= FIELD_PREP(DWEGMAC_FIX_CHANNEL_NUM, 1);
+@@ -182,6 +182,8 @@ static int loongson_gmac_config(struct pci_dev *pdev,
  		break;
- 	default:
- 		ret = loongson_dwmac_config_single_irq(pdev, plat, res, np);
+ 	}
+ 
++	plat->dwegmac_flags |= FIELD_PREP(DWEGMAC_DISABLE_FLOW_CONTROL, 1);
++
+ 	return ret;
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 1d67e5ec5fac..a98bcd797720 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1213,8 +1213,10 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+ 		xpcs_get_interfaces(priv->hw->xpcs,
+ 				    priv->phylink_config.supported_interfaces);
+ 
+-	priv->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+-		MAC_10 | MAC_100;
++	priv->phylink_config.mac_capabilities = MAC_10 | MAC_100;
++	if (!FIELD_GET(DWEGMAC_DISABLE_FLOW_CONTROL, priv->plat->dwegmac_flags))
++		priv->phylink_config.mac_capabilities |=
++			MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
+ 
+ 	if (!max_speed || max_speed >= 1000)
+ 		priv->phylink_config.mac_capabilities |= MAC_1000;
 diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 75da4c7eb85c..e4088d2a0f39 100644
+index e4088d2a0f39..e97774efd451 100644
 --- a/include/linux/stmmac.h
 +++ b/include/linux/stmmac.h
-@@ -14,6 +14,8 @@
- 
- #include <linux/platform_device.h>
- #include <linux/phy.h>
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
- 
- #define MTL_MAX_RX_QUEUES	8
- #define MTL_MAX_TX_QUEUES	8
-@@ -205,6 +207,8 @@ struct dwmac4_addrs {
- 	u32 mtl_low_cred_offset;
+@@ -208,6 +208,7 @@ struct dwmac4_addrs {
  };
  
-+#define DWEGMAC_FIX_CHANNEL_NUM		BIT(0)
-+
+ #define DWEGMAC_FIX_CHANNEL_NUM		BIT(0)
++#define DWEGMAC_DISABLE_FLOW_CONTROL	BIT(1)
+ 
  struct plat_stmmacenet_data {
  	int bus_id;
- 	int phy_addr;
-@@ -297,5 +301,6 @@ struct plat_stmmacenet_data {
- 	bool has_integrated_pcs;
- 	int has_egmac;
- 	u32 irq_flags;
-+	unsigned int dwegmac_flags;
- };
- #endif
 -- 
 2.39.3
 
