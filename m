@@ -1,131 +1,232 @@
-Return-Path: <netdev+bounces-29759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7140578496B
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:30:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C9E78496C
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:33:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266262810ED
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:30:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673BA1C20BCC
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE4F2B56F;
-	Tue, 22 Aug 2023 18:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488701CA17;
+	Tue, 22 Aug 2023 18:33:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AC41E505
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:30:54 +0000 (UTC)
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49258CCB;
-	Tue, 22 Aug 2023 11:30:53 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-56c2e882416so1474584a12.3;
-        Tue, 22 Aug 2023 11:30:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692729053; x=1693333853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FJwN0ydvfICl3fI2kvxn1N5nH6/CDUK6G2PaZVpxA4I=;
-        b=hSDt/TD0ikAtNwtZ/R+RmB9AnmPP/Zt3LFAdNhjxdksgR3jt+3TV5tmZ49lX6A5gw1
-         iaor2/05gYCEgOVxPfkXc+Dk97g7uTswGkptiGZRZCmZWtrgdx1eAzPlr4LycxpAIMa9
-         KoWrblxUCtqmR8JVrCDnEsYMNVS30Ww6o4JCpNTEI0yx2Y2cPJ50PQjpHQ2pF7nCSvsc
-         jea+nJrrcTrq1RIaeXJ7u4X9WnnEaWdswsIlM9zaUukvCU4Gxpyyle/AGf3EhugLJn77
-         sjYhbDb4JIHM1zoERBoeEoK7WvY11sknovnpkS81AXk7e1cI3y9ARqzdXO7lmuw9yb/M
-         LnUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692729053; x=1693333853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FJwN0ydvfICl3fI2kvxn1N5nH6/CDUK6G2PaZVpxA4I=;
-        b=GPOxQ2xeKny09N8c4u6j6tUsDXQqDInfMLJ+Dwl+qZtfAkWfEERLm+Kcds0qr+A+VS
-         2QZNkHRe8L+0OI4mf5rajz0+EtNHDDbSq7zLW1B+nU3JCcGdGGc3UHUIii6HsKdrbK5D
-         1Aa1OlipGkZAZzWc2d5/7RPwqB8iKT2mqQc709ta+TjEZ/JuHGtTR3Na+j81OFVy6sY4
-         FPwvRmPUTUvyGvH/4iwV9uw/euHAlCaGb9ZkWDeZG3x/PPcy370ehe+BlZK6J/OuyJVw
-         ec7VvfQLi1ISpQ3eyTozPqadx4GYkoc0l+9L2WBIH/RZ1XfTwjTklqJ/mfhkhp+ct4ul
-         Ro4Q==
-X-Gm-Message-State: AOJu0Yx7a4GcDBL4Ty4iYbO/0DTYE4dgSAfXWD6cfBYXAEi3Jp3Kl2D1
-	UdpRoe6OrHjUuAF+tKvo/OhKwV39vw1pg3klo6s=
-X-Google-Smtp-Source: AGHT+IG70G5bzkRI9NiQyhps9POkN+ANs3KDZSZWmvxZeIyJrZIwsEnxBL/fPY4TunWbkrhDFMUxo4naz3HCEWkNr8k=
-X-Received: by 2002:a17:90b:4c81:b0:26b:219f:3399 with SMTP id
- my1-20020a17090b4c8100b0026b219f3399mr6351074pjb.35.1692729052643; Tue, 22
- Aug 2023 11:30:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4092B542
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:33:46 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B1BCD1;
+	Tue, 22 Aug 2023 11:33:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ekQ2+z1rJ3Hgh9TnPo6eVKPd6yHPuM9PqoaemUvTtM8=; b=lRa+WD04bpeFSjyHCgoPsaIbnI
+	n6EgIFXz69dJ5alQuX1Am2hpU9aOkHxFmJrqI0oZx5oCfAbTLuwlwhsg6lIlXLoxLQVid4M/7mlys
+	teTokCNPVCWRMnWXqwd8nHk87jh6sNhysQVYrELBFHj0Fk0CrfoBbNxh0Gd6043NmR/VPZ0d6FgRd
+	EhvPOatk3x2fIo9umhjUe30avKbL/CuD17F6cwlLGfgKsOIbOzixgIsLG8Fm5bLfVeLEozT6oOpcc
+	AYgEgSk7NM4ICPWlj/+69v1arJfQtqStcApGSx5DHahKdLGES+RPslkuOmwCF1YszOpJ/bRYVfl0H
+	f/HcePBQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35082)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qYWBp-0001pM-2r;
+	Tue, 22 Aug 2023 19:33:17 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qYWBk-00061G-Oa; Tue, 22 Aug 2023 19:33:12 +0100
+Date: Tue, 22 Aug 2023 19:33:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Henry Yen <Henry.Yen@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next] net: ethernet: mtk_eth_soc: add paths and
+ SerDes modes for MT7988
+Message-ID: <ZOT/aIelVomIzdZk@shell.armlinux.org.uk>
+References: <27c3f231485968874487f9a35cb7e8d74ca3dfd8.1692726676.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816100113.41034-1-linyunsheng@huawei.com>
- <20230816100113.41034-2-linyunsheng@huawei.com> <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
- <20230817091554.31bb3600@kernel.org> <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
- <20230817165744.73d61fb6@kernel.org> <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
- <20230818145145.4b357c89@kernel.org> <1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
- <20230821113543.536b7375@kernel.org> <5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
- <20230822083821.58d5d26c@kernel.org>
-In-Reply-To: <20230822083821.58d5d26c@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 22 Aug 2023 11:30:15 -0700
-Message-ID: <CAKgT0UeyRSa6LC8rmA0ottkTdYo3bv36THnCe2Yaba0xca5BHg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Mina Almasry <almasrymina@google.com>, davem@davemloft.net, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27c3f231485968874487f9a35cb7e8d74ca3dfd8.1692726676.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 22, 2023 at 8:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 22 Aug 2023 17:21:35 +0800 Yunsheng Lin wrote:
-> > > .. we should also add a:
-> > >
-> > >     WARN_ONCE(1, "misaligned DMA address, please report to netdev@");
-> >
-> > As the CONFIG_PHYS_ADDR_T_64BIT seems to used widely in x86/arm/mips/po=
-werpc,
-> > I am not sure if we can really make the above assumption.
-> >
-> > https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_AD=
-DR_T_64BIT
->
-> Huh, it's actually used a lot less than I anticipated!
->
-> None of the x86/arm/mips/powerpc systems matter IMHO - the only _real_
-> risk is something we don't know about returning non-aligned addresses.
->
-> Unless we know about specific problems I'd suggest we took the simpler
-> path rather than complicating the design for systems which may not
-> exist.
->
-> Alex, do you know of any such cases? Some crazy swiotlb setting?
-> WDYT about this in general?
+Hi,
 
-There may be scenarios where if bounce buffers are used the page may
-not be aligned. It all comes down to how
-swiotlb_tbl_map_single(https://elixir.free-electrons.com/linux/v6.5-rc7/C/i=
-dent/swiotlb_tbl_map_single)
-is called. In the IOMMU case it looks like they take the extra step of
-passing an alignment value, but it looks like for the other two cases
-they don't.
+I haven't fully reviewed this yet, but here's some initial comments.
 
-Changing that behavior wouldn't take much though. Basically we would
-just need to do something like look at the size and address and if
-they are both page aligned then we could specify a page alignment for
-the DMA mapping.
+On Tue, Aug 22, 2023 at 07:04:42PM +0100, Daniel Golle wrote:
+> MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
+> connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-KR,
+
+5Gbase-KR K normally means backplane mode.
+
+> +/* Register to read PCS AN status */
+> +#define RG_PCS_AN_STS0		0x81c
+> +#define USXGMII_LPA_SPEED_MASK	GENMASK(11, 9)
+> +#define USXGMII_LPA_SPEED_10	0
+> +#define USXGMII_LPA_SPEED_100	1
+> +#define USXGMII_LPA_SPEED_1000	2
+> +#define USXGMII_LPA_SPEED_10000	3
+> +#define USXGMII_LPA_SPEED_2500	4
+> +#define USXGMII_LPA_SPEED_5000	5
+> +#define USXGMII_LPA_DUPLEX	BIT(12)
+> +#define USXGMII_LPA_LINK	BIT(15)
+
+Aren't these the same as the MDIO_USXGMII_xxx definitions that define
+the UsxgmiiChannelInfo[15:0] bits?
+
+> +static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +				  phy_interface_t interface,
+> +				  const unsigned long *advertising,
+> +				  bool permit_pause_to_mac)
+> +{
+> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
+> +	struct mtk_eth *eth = mpcs->eth;
+> +	struct regmap *pextp = eth->regmap_pextp[mpcs->id];
+> +	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
+> +	bool mode_changed = false;
+> +
+> +	if (!pextp)
+> +		return -ENODEV;
+> +
+> +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
+> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) |
+> +			  (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
+
+Using the new neg_mode here... but you haven't set pcs.neg_mode below
+true.
+
+> +static void mtk_usxgmii_pcs_get_state(struct phylink_pcs *pcs,
+> +				      struct phylink_link_state *state)
+> +{
+> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
+> +	struct mtk_eth *eth = mpcs->eth;
+> +	struct mtk_mac *mac = eth->mac[mtk_xgmii2mac_id(eth, mpcs->id)];
+> +	u32 val = 0;
+> +
+> +	regmap_read(mpcs->regmap, RG_PCS_AN_CTRL0, &val);
+> +	if (FIELD_GET(USXGMII_AN_ENABLE, val)) {
+> +		/* Refresh LPA by inverting LPA_LATCH */
+> +		regmap_read(mpcs->regmap, RG_PCS_AN_STS0, &val);
+> +		regmap_update_bits(mpcs->regmap, RG_PCS_AN_STS0,
+> +				   USXGMII_LPA_LATCH,
+> +				   !(val & USXGMII_LPA_LATCH));
+> +
+> +		regmap_read(mpcs->regmap, RG_PCS_AN_STS0, &val);
+> +
+> +		state->interface = mpcs->interface;
+> +		state->link = FIELD_GET(USXGMII_LPA_LINK, val);
+> +		state->duplex = FIELD_GET(USXGMII_LPA_DUPLEX, val);
+> +
+> +		switch (FIELD_GET(USXGMII_LPA_SPEED_MASK, val)) {
+> +		case USXGMII_LPA_SPEED_10:
+> +			state->speed = SPEED_10;
+> +			break;
+> +		case USXGMII_LPA_SPEED_100:
+> +			state->speed = SPEED_100;
+> +			break;
+> +		case USXGMII_LPA_SPEED_1000:
+> +			state->speed = SPEED_1000;
+> +			break;
+> +		case USXGMII_LPA_SPEED_2500:
+> +			state->speed = SPEED_2500;
+> +			break;
+> +		case USXGMII_LPA_SPEED_5000:
+> +			state->speed = SPEED_5000;
+> +			break;
+> +		case USXGMII_LPA_SPEED_10000:
+> +			state->speed = SPEED_10000;
+> +			break;
+> +		}
+
+Maybe consider using phylink_decode_usxgmii_word() ?
+
+> +	} else {
+> +		val = mtk_r32(mac->hw, MTK_XGMAC_STS(mac->id));
+> +
+> +		if (mac->id == MTK_GMAC2_ID)
+> +			val >>= 16;
+> +
+> +		switch (FIELD_GET(MTK_USXGMII_PCS_MODE, val)) {
+> +		case 0:
+> +			state->speed = SPEED_10000;
+> +			break;
+> +		case 1:
+> +			state->speed = SPEED_5000;
+> +			break;
+> +		case 2:
+> +			state->speed = SPEED_2500;
+> +			break;
+> +		case 3:
+> +			state->speed = SPEED_1000;
+> +			break;
+> +		}
+> +
+> +		state->interface = mpcs->interface;
+> +		state->link = FIELD_GET(MTK_USXGMII_PCS_LINK, val);
+> +		state->duplex = DUPLEX_FULL;
+> +	}
+> +
+> +	if (state->link == 0)
+> +		mtk_usxgmii_pcs_config(pcs, MLO_AN_INBAND,
+
+Passing old-style mode rather than neg_mode here.
+
+> +				       state->interface, NULL, false);
+
+It would be good to describe why you're reconfiguring the interface
+here. You describe why in mtk_usxgmii_pcs_link_up...
+
+> +		eth->usxgmii_pcs[i] = devm_kzalloc(dev, sizeof(*eth->usxgmii_pcs), GFP_KERNEL);
+> +		if (!eth->usxgmii_pcs[i])
+> +			return -ENOMEM;
+> +
+> +		eth->usxgmii_pcs[i]->id = i;
+> +		eth->usxgmii_pcs[i]->eth = eth;
+> +		eth->usxgmii_pcs[i]->regmap = syscon_node_to_regmap(np);
+> +		if (IS_ERR(eth->usxgmii_pcs[i]->regmap))
+> +			return PTR_ERR(eth->usxgmii_pcs[i]->regmap);
+> +
+> +		eth->usxgmii_pcs[i]->pcs.ops = &mtk_usxgmii_pcs_ops;
+> +		eth->usxgmii_pcs[i]->pcs.poll = true;
+> +		eth->usxgmii_pcs[i]->interface = PHY_INTERFACE_MODE_NA;
+
+All new PCS should set pcs.neg_mode true.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
