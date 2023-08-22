@@ -1,45 +1,39 @@
-Return-Path: <netdev+bounces-29496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D64E7837D9
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 04:20:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D78637837D4
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 04:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18A97280F3D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 02:20:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F5C7280FA2
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 02:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2325E15C0;
-	Tue, 22 Aug 2023 02:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DBC110A;
+	Tue, 22 Aug 2023 02:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE82110A
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 02:20:33 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B5D113;
-	Mon, 21 Aug 2023 19:20:32 -0700 (PDT)
-Received: from dggpeml500003.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RVCf01ll9zNnCZ;
-	Tue, 22 Aug 2023 10:16:56 +0800 (CST)
-Received: from huawei.com (10.175.103.91) by dggpeml500003.china.huawei.com
- (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 22 Aug
- 2023 10:20:29 +0800
-From: Yu Liao <liaoyu15@huawei.com>
-To: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<saeedm@nvidia.com>, <leon@kernel.org>
-CC: <liaoyu15@huawei.com>, <liwei391@huawei.com>, <davem@davemloft.net>,
-	<maciej.fijalkowski@intel.com>, <michal.simek@amd.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>
-Subject: [PATCH net-next 2/2] net: dm9051: Use PTR_ERR_OR_ZERO() to simplify code
-Date: Tue, 22 Aug 2023 10:14:55 +0800
-Message-ID: <20230822021455.205101-2-liaoyu15@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230822021455.205101-1-liaoyu15@huawei.com>
-References: <20230822021455.205101-1-liaoyu15@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C5010E9
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 02:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BF374C433C9;
+	Tue, 22 Aug 2023 02:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692670824;
+	bh=WiuutlKZGSfnMqcEk2Hi4ACANiW2639zyoroXwPM8rY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qWwXRsyzXz/KvxTnNXQ9LEanWGs786Wm+OXoPuh2fuCHLLhwhBE8yyKxOB0xk3Wvj
+	 qDfNH2UoUt2j0sAFtlNTwJZwF/2DBvjBgyf+4wpsO+ex5Jc2laV4fuPavls02355Ki
+	 MTg6o6ODcPUVQm2aYtF6GXCB2zp2O9IXm2CzInxd0WO39M7KaIwsJ6TAJhh1jsgoIJ
+	 yu3HQat2zAsLmpM1pA7v1MEC9nfyT85wY1PuueulyBpaDQC5S3lAAFxKSd7hImXWak
+	 O5ShNTCb+xbbCva0BjuzdEWmYhIuyITcTiWUYgDWSVLl2SUB7KtpcuVMhosMCNMY/x
+	 S6noww69Hm7vg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0B5BE4EAFB;
+	Tue, 22 Aug 2023 02:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,41 +41,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500003.china.huawei.com (7.185.36.200)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next] net: pcs: lynxi: implement pcs_disable op
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169267082465.27540.3832216650125518638.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Aug 2023 02:20:24 +0000
+References: <f23d1a60d2c9d2fb72e32dcb0eaa5f7e867a3d68.1692327891.git.daniel@makrotopia.org>
+In-Reply-To: <f23d1a60d2c9d2fb72e32dcb0eaa5f7e867a3d68.1692327891.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: lynxis@fe80.eu, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
 
-Use the standard error pointer macro to shorten the code and simplify.
+Hello:
 
-Signed-off-by: Yu Liao <liaoyu15@huawei.com>
----
- drivers/net/ethernet/davicom/dm9051.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/davicom/dm9051.c b/drivers/net/ethernet/davicom/dm9051.c
-index 70728b2e5f18..829ec35d094b 100644
---- a/drivers/net/ethernet/davicom/dm9051.c
-+++ b/drivers/net/ethernet/davicom/dm9051.c
-@@ -1161,9 +1161,7 @@ static int dm9051_phy_connect(struct board_info *db)
- 
- 	db->phydev = phy_connect(db->ndev, phy_id, dm9051_handle_link_change,
- 				 PHY_INTERFACE_MODE_MII);
--	if (IS_ERR(db->phydev))
--		return PTR_ERR_OR_ZERO(db->phydev);
--	return 0;
-+	return PTR_ERR_OR_ZERO(db->phydev);
- }
- 
- static int dm9051_probe(struct spi_device *spi)
+On Fri, 18 Aug 2023 04:07:46 +0100 you wrote:
+> When switching from 10GBase-R/5GBase-R/USXGMII to one of the interface
+> modes provided by mtk-pcs-lynxi we need to make sure to always perform
+> a full configuration of the PHYA.
+> 
+> Implement pcs_disable op which resets the stored interface mode to
+> PHY_INTERFACE_MODE_NA to trigger a full reconfiguration once the LynxI
+> PCS driver had previously been deselected in favor of another PCS
+> driver such as the to-be-added driver for the USXGMII PCS found in
+> MT7988.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: pcs: lynxi: implement pcs_disable op
+    https://git.kernel.org/netdev/net-next/c/90308679c297
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
