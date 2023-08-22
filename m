@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-29755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48C51784944
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:11:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FBE784947
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B8A28119D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:11:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 906CC28117A
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AB31DDFE;
-	Tue, 22 Aug 2023 18:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118ED1DDF9;
+	Tue, 22 Aug 2023 18:10:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CDA1DDF9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4AE1DDFA
 	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:10:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E660BC4339A;
-	Tue, 22 Aug 2023 18:10:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0E718C433B6;
+	Tue, 22 Aug 2023 18:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1692727831;
-	bh=tlzkIhBRXghihtM5HbSPZaaP5bzYXrrOFT3p+UvMY1c=;
+	bh=n9KP9g7wX+HDOgaQuQD3XrBMsIv8EmSgREDlzRz7WzI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y1S998hnLdfp12ft8OAzLMTgzUq0XvOSeSGixVKz4/hkP8W3xVyQKiALt+1ES7OZj
-	 G1NA0p3E36NsTvwDT9bftMIiagnsvfJK6oW1+aZSsaeczl0DeYkqqNM2k/PMeJiJP0
-	 aCwOHZNozLtfwz2EM9yG5WtRIuzRv5h5sYfUncFyRfozqR8MXJo2IXhyO6b3XZg6Iu
-	 RTInGnZ1Cg4cUZamaCqrRfrIRjAFn2sja5DuAsvmpNFz2UlJPyJMpZXXKcRZkLyEcf
-	 5TTffYNUyf64T1hB3Tu/MWbC/OmsclpcUNlBpvXodtaOzlvW+6djDrd9Y0mZ6NthZX
-	 JjsNrulqVeh6w==
+	b=PTMgN+0WsB7ls76FIQ31C812K7o8OzWEbEM1eR+706nIImFsHGNh8h4IdGReTbESd
+	 BeqNVVxm9qDtT+pWlRSszwwwoj/83bfrrCOBIFH1q+NBfd/UZ3fEqwXFE4RapXOK5Y
+	 iDKWt0G2DSxSkCYAm5o5k+FNHSaPv+MYTaAH0nKmDAyUi9B2ObCsFagFGCGF7yrERy
+	 Ns3MqgT7s1y4NOEe6aLgLI2tilZ+oTikBo70NAXCbUFsJAzTbK1Szt8XK3Wyd6YCWK
+	 V4z9cM0zx6wCah8h+UWpRqjWVO+T6hax8hlMeTqrpiVWBoxXP6Vbb6LaVl6er1PeMg
+	 gPfNzeDp7GoRQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C7345C595CE;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD2A5E21EE2;
 	Tue, 22 Aug 2023 18:10:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,63 +41,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next V2 01/14] net/mlx5e: aRFS,
- Prevent repeated kernel rule migrations requests
+Subject: Re: [PATCH net-next] vrf: Remove unnecessary RCU-bh critical section
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169272783080.18530.1504106217283170391.git-patchwork-notify@kernel.org>
+ <169272783090.18530.10920057915466701144.git-patchwork-notify@kernel.org>
 Date: Tue, 22 Aug 2023 18:10:30 +0000
-References: <20230821175739.81188-2-saeed@kernel.org>
-In-Reply-To: <20230821175739.81188-2-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com, afaris@nvidia.com
+References: <20230821142339.1889961-1-idosch@nvidia.com>
+In-Reply-To: <20230821142339.1889961-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, mlxsw@nvidia.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Saeed Mahameed <saeedm@nvidia.com>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 21 Aug 2023 10:57:26 -0700 you wrote:
-> From: Adham Faris <afaris@nvidia.com>
+On Mon, 21 Aug 2023 17:23:39 +0300 you wrote:
+> dev_queue_xmit_nit() already uses rcu_read_lock() / rcu_read_unlock()
+> and nothing suggests that softIRQs should be disabled around it.
+> Therefore, remove the rcu_read_lock_bh() / rcu_read_unlock_bh()
+> surrounding it.
 > 
-> aRFS rule movement requests from one Rx ring to other Rx ring arrive
-> from the kernel to ensure that packets are steered to the right Rx ring.
-> In the time interval until satisfying such a request, several more
-> requests might follow, for the same flow.
+> Tested using [1] with lockdep enabled.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,V2,01/14] net/mlx5e: aRFS, Prevent repeated kernel rule migrations requests
-    https://git.kernel.org/netdev/net-next/c/7a73cf0bf7f9
-  - [net-next,V2,02/14] net/mlx5e: aRFS, Warn if aRFS table does not exist for aRFS rule
-    https://git.kernel.org/netdev/net-next/c/7653d8067245
-  - [net-next,V2,03/14] net/mlx5e: aRFS, Introduce ethtool stats
-    https://git.kernel.org/netdev/net-next/c/f98e51585f2c
-  - [net-next,V2,04/14] net/mlx5e: Fix spelling mistake "Faided" -> "Failed"
-    https://git.kernel.org/netdev/net-next/c/d7cea02a1fac
-  - [net-next,V2,05/14] net/mlx5: IRQ, consolidate irq and affinity mask allocation
-    https://git.kernel.org/netdev/net-next/c/9e9ff54e63b4
-  - [net-next,V2,06/14] net/mlx5: DR, Fix code indentation
-    https://git.kernel.org/netdev/net-next/c/f83e2d8aef4a
-  - [net-next,V2,07/14] net/mlx5: DR, Remove unneeded local variable
-    https://git.kernel.org/netdev/net-next/c/a15e472f8834
-  - [net-next,V2,08/14] net/mlx5: Remove health syndrome enum duplication
-    https://git.kernel.org/netdev/net-next/c/ab943e2efd5d
-  - [net-next,V2,09/14] net/mlx5: Update dead links in Kconfig documentation
-    https://git.kernel.org/netdev/net-next/c/6c8f7c434487
-  - [net-next,V2,10/14] net/mlx5: Call mlx5_esw_offloads_rep_load/unload() for uplink port directly
-    https://git.kernel.org/netdev/net-next/c/ba3d85f008f2
-  - [net-next,V2,11/14] net/mlx5: Remove VPORT_UPLINK handling from devlink_port.c
-    https://git.kernel.org/netdev/net-next/c/52020903f35c
-  - [net-next,V2,12/14] net/mlx5: Rename devlink port ops struct for PFs/VFs
-    https://git.kernel.org/netdev/net-next/c/df3822f5808d
-  - [net-next,V2,13/14] net/mlx5: DR, Supporting inline WQE when possible
-    https://git.kernel.org/netdev/net-next/c/95c337cce0e1
-  - [net-next,V2,14/14] net/mlx5: Devcom, only use devcom after NULL check in mlx5_devcom_send_event()
-    https://git.kernel.org/netdev/net-next/c/7d7c6e8c5fe4
+  - [net-next] vrf: Remove unnecessary RCU-bh critical section
+    https://git.kernel.org/netdev/net-next/c/504fc6f4f7f6
 
 You are awesome, thank you!
 -- 
