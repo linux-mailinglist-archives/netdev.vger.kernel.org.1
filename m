@@ -1,141 +1,128 @@
-Return-Path: <netdev+bounces-29577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97CEF783D75
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:00:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F001783D78
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5207128103C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:00:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5036C1C20A86
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0C49444;
-	Tue, 22 Aug 2023 10:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80699449;
+	Tue, 22 Aug 2023 10:03:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119406FA2
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 10:00:24 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3D61B0;
-	Tue, 22 Aug 2023 03:00:23 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37MA07So000739;
-	Tue, 22 Aug 2023 05:00:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1692698407;
-	bh=KFLxlOdqhAmvHU0Nwonb56jEgYiS3TxFagxKdHDOzIw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=U4NqmDijOtPXzLWCQ8bfJwRYtFuJY2MWVKijKYXqVatsmC7RXqYjelZpfiHWXpaKD
-	 ntV5/qi4KmL9GufdfNRKnN15PW/iO9mVgGnvnp1cC1ft4lP66S1Wulo8zMvEETfP0r
-	 0HqRVQFjiEE+bi0djH28nIg27GiZ+xNBRDzFxGgE=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37MA06XD082829
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 22 Aug 2023 05:00:07 -0500
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 22
- Aug 2023 05:00:05 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 22 Aug 2023 05:00:05 -0500
-Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37M9xwMt016465;
-	Tue, 22 Aug 2023 04:59:59 -0500
-Message-ID: <ef6b215b-3b60-f827-7ce8-708d00978490@ti.com>
-Date: Tue, 22 Aug 2023 15:29:57 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F358F55
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 10:03:24 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3DA1B0
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:03:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=d+PLp4qGv9vyBKfdVLM+uFC8RtyxXmEgg449xXe+ZhI=; b=00DiuSTkr9j/IHq+UsXbi3ikpd
+	M5/xGrJBCzwpTqEP+gogytb4rbMhzHARQuql9gWqxVnbnD3VnA4J0zEyYcsKZUViXgpx29XN5VU7z
+	qeI2j4crsphzOy9dmvd/vSAZ8CfYetnyLPKf3dmhHVTArWX2K44FvqdA+XKF0CaHycSLTRMNJZlEB
+	B5eq/C34+P70Ap7WO2WXGoI3ZBDSuTTdaSojF/82CfCl5sroFLyq2oNto47mIdxDh5626ZQYqnqgb
+	VZyGurX8p7wgqipjXsC9883gxdmIrQI8ia63yQnZjwTJ0+DPjqDUTjKHLZmJRfE8OPfTHDoaP4i3o
+	0M7ZEsYg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34830)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qYOE3-0001E2-1A;
+	Tue, 22 Aug 2023 11:03:03 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qYOE0-0005hB-T8; Tue, 22 Aug 2023 11:03:00 +0100
+Date: Tue, 22 Aug 2023 11:03:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Feiyang Chen <chenfeiyang@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	chenhuacai@loongson.cn, dongbiao@loongson.cn,
+	guyinggang@loongson.cn, siyanteng@loongson.cn,
+	loongson-kernel@lists.loongnix.cn, netdev@vger.kernel.org,
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v4 01/11] net: stmmac: Pass stmmac_priv and chan in some
+ callbacks
+Message-ID: <ZOSH1GxHkWbDGSLj@shell.armlinux.org.uk>
+References: <cover.1692696115.git.chenfeiyang@loongson.cn>
+ <e452ba21887e37a747f8d4f0f74ef4f2590c3eac.1692696115.git.chenfeiyang@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v5 2/5] dt-bindings: net: Add IEP property in ICSSG DT
- binding
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Roger Quadros <rogerq@kernel.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20230817114527.1585631-1-danishanwar@ti.com>
- <20230817114527.1585631-3-danishanwar@ti.com>
- <4e79fe7d5363e69ed116f440db162dcb41b54ecc.camel@redhat.com>
-From: Md Danish Anwar <a0501179@ti.com>
-Organization: Texas Instruments
-In-Reply-To: <4e79fe7d5363e69ed116f440db162dcb41b54ecc.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e452ba21887e37a747f8d4f0f74ef4f2590c3eac.1692696115.git.chenfeiyang@loongson.cn>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 22/08/23 2:36 pm, Paolo Abeni wrote:
-> On Thu, 2023-08-17 at 17:15 +0530, MD Danish Anwar wrote:
->> Add IEP node in ICSSG driver DT binding document.
->>
->> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>  Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
->> index 8ec30b3eb760..a736d1424ea4 100644
->> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
->> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
->> @@ -52,6 +52,12 @@ properties:
->>      description:
->>        phandle to MII_RT module's syscon regmap
->>  
->> +  ti,iep:
->> +    $ref: /schemas/types.yaml#/definitions/phandle-array
->> +    maxItems: 2
->> +    description:
->> +      phandle to IEP (Industrial Ethernet Peripheral) for ICSSG driver
-> 
-> It looks like the feedback given by Rob on v2:
-> 
-> https://lore.kernel.org/all/20230821160120.GA1734560-robh@kernel.org/
-> 
-> still applies here, I guess you need to address it.
+On Tue, Aug 22, 2023 at 05:40:26PM +0800, Feiyang Chen wrote:
+> @@ -636,7 +637,8 @@ static void sun8i_dwmac_set_mac(void __iomem *ioaddr, bool enable)
+>   * All slot > 0 need to be enabled with MAC_ADDR_TYPE_DST
+>   * If addr is NULL, clear the slot
+>   */
+> -static void sun8i_dwmac_set_umac_addr(struct mac_device_info *hw,
+> +static void sun8i_dwmac_set_umac_addr(struct stmmac_priv *priv,
+> +				      struct mac_device_info *hw,
+>  				      const unsigned char *addr,
+>  				      unsigned int reg_n)
+>  {
 
-Sure, Paolo. I will address the feedback and post v6 soon.
+Given that hw is always priv->hw, would it be sensible to simplify the
+callback by dropping the "hw" argument, and have the called methods do:
 
-> 
-> Cheers,
-> 
-> Paolo
-> 
-> --
-> pw-bot: cr
-> 
+	struct mac_device_info *hw = priv->hw;
+
+> @@ -657,7 +659,8 @@ static void sun8i_dwmac_set_umac_addr(struct mac_device_info *hw,
+>  	}
+>  }
+>  
+> -static void sun8i_dwmac_get_umac_addr(struct mac_device_info *hw,
+> +static void sun8i_dwmac_get_umac_addr(struct stmmac_priv *priv,
+> +				      struct mac_device_info *hw,
+>  				      unsigned char *addr,
+>  				      unsigned int reg_n)
+>  {
+
+Same here.
+
+> @@ -680,7 +683,8 @@ static int sun8i_dwmac_rx_ipc_enable(struct mac_device_info *hw)
+>  	return 1;
+>  }
+>  
+> -static void sun8i_dwmac_set_filter(struct mac_device_info *hw,
+> +static void sun8i_dwmac_set_filter(struct stmmac_priv *priv,
+> +				   struct mac_device_info *hw,
+>  				   struct net_device *dev)
+>  {
+
+Probably also worth doing for this method as well. I think the only
+thing which this function uses is hw->unicast_filter_entries, so
+one could declare:
+
+	unsigned int unicast_filter_entries = priv->hw->unicast_filter_entries;
+
+rather than carrying the pointer to both "priv" and "hw" through this
+function.
 
 -- 
-Thanks and Regards,
-Danish.
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
