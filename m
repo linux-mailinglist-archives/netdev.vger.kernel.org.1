@@ -1,96 +1,89 @@
-Return-Path: <netdev+bounces-29690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F2447845A8
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:34:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0FB57845B0
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:38:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 615B4281032
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1A371C209EE
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CFF1DA25;
-	Tue, 22 Aug 2023 15:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB9F1DA26;
+	Tue, 22 Aug 2023 15:38:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079C71D311
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:34:46 +0000 (UTC)
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE6ECE6
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 08:34:44 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-31aeedbb264so2827234f8f.0
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 08:34:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692718483; x=1693323283;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o+t39ZxccY2KvDqYDKzXBn289VzYrnhxPeif5Up0+bQ=;
-        b=IFpgOZmFVhuM9rpYc/OBH2ePylYFR2/w+C5TcBBsolPDhnorvz5HDmODZWqj9q6cSA
-         wMc18hwMArXY5jIGnjFPqLKBBSzhY/eHO1/t5p15TXJ84LH/VyS0UtimUYW//K2klMXD
-         z0teXUR66uZtcmcRcCzuJ53xy7Rj56A1JIOLXNHL8+/ioDoAGc+GHWnXoGtu/2j9SZ86
-         ziL1Vm9HPc7fk6VPFsDZ8hoZwWm3ELDtu41AZNg5Fir8k77ZJJyJRg1VfqpvwC5JizlG
-         1sJ/gDSXs1xmRs00prAfcNp2O84lORAvM79FawBgz+c6stFjYLNIv9bC0NReI/FRjV0L
-         gbIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692718483; x=1693323283;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o+t39ZxccY2KvDqYDKzXBn289VzYrnhxPeif5Up0+bQ=;
-        b=G5y8jwxOuhOJ0tdzSrs5Jz8DnuDUN/xBa3u2YSTTtnIY78N/XU74P3QlHKM6Cri8lX
-         tilyfdwNQlRPw2PyN47lO3Tk9chS6MRQEKlAxDnSrwVYZ8cI+5EA3tj2Km+Rd1E231Gp
-         Wa5jPsHdKonVC64lXDaQg9dH7VRd+4+0/LGSUfDyGJdDQQcJP7QohHkx1jue9WoRbSw3
-         wMvjkKCnbI2Pdp4ZM10SG4hRi/3p9zYTlfQEjkCBNPJ2tMxhX3vNoUVmnt2QWArGPiho
-         4fNywkV+QTv9TXEW1UDxVHFB4QaLV1k889ODwq4bGlyJ55nv8hLIQgCKsxZ4JaJwPBpo
-         K2tQ==
-X-Gm-Message-State: AOJu0YyXzMSMPPN0E98UY3cK+OLfxAsM60bQRtigbd6BT/gUKk0JlUis
-	7kSJxYBSyohNN3/fj6rHh40FTNjVkE2WTKw79pDhhe9D
-X-Google-Smtp-Source: AGHT+IHNeLRVZyqs7W0FAvg5z/ZzXvJ5Dflhj2qKRLv7dQpDk4rbcoF0uJ9SE2V8xDcsnoVzBJuRpQ==
-X-Received: by 2002:adf:e742:0:b0:318:69:ab03 with SMTP id c2-20020adfe742000000b003180069ab03mr7790238wrn.17.1692718483193;
-        Tue, 22 Aug 2023 08:34:43 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id a8-20020a5d4d48000000b0031c5b380291sm5675352wru.110.2023.08.22.08.34.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 08:34:42 -0700 (PDT)
-Date: Tue, 22 Aug 2023 17:34:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Wenjun Wu <wenjun1.wu@intel.com>, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, xuejun.zhang@intel.com,
-	madhu.chittim@intel.com, qi.z.zhang@intel.com,
-	anthony.l.nguyen@intel.com
-Subject: Re: [PATCH iwl-next v4 0/5] iavf: Add devlink and devlink rate
- support'
-Message-ID: <ZOTVkXWCLY88YfjV@nanopsycho>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
- <20230822034003.31628-1-wenjun1.wu@intel.com>
- <ZORRzEBcUDEjMniz@nanopsycho>
- <20230822081255.7a36fa4d@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91A21C28D
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:38:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5141C433C9;
+	Tue, 22 Aug 2023 15:38:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692718703;
+	bh=IYNjysX3W/sYGXBHygamD0+donpwS/LB4TT3PYl1vGU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JPA4jJRnhGOl1rVsiZYRI1GhwFAn8t24el2czrAK3ybCjc7QtqgaWq7WJFRsOPdzs
+	 55rPGiFYa18WzzZbMzTnW/y3EqErGPFC97Q5uxrJiDffRLvCynyIdlFEaZIjnXUAHm
+	 3N0RFzI8Y/9LwjgTwJFAH5bzMEBtjMpE6rgcGInu4DLwKsL05soKn8t5XnpGWLu7vH
+	 NyhhDmQGIj9blHEckYto/JQ9dXNhDgcPwGC/SNtj70E2pk3tULdIBnNYm58pgd0sVN
+	 xxjOE1+JJRNIofK+xFh7IjYuVpDiSyznEtxShoH82PdNspCtmiGB9aQgBShrsVwzw6
+	 FceF3pNEmBUXA==
+Date: Tue, 22 Aug 2023 08:38:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
+ <alexander.duyck@gmail.com>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Mina Almasry
+ <almasrymina@google.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>
+Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+Message-ID: <20230822083821.58d5d26c@kernel.org>
+In-Reply-To: <5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
+References: <20230816100113.41034-1-linyunsheng@huawei.com>
+	<20230816100113.41034-2-linyunsheng@huawei.com>
+	<CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
+	<20230817091554.31bb3600@kernel.org>
+	<CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
+	<20230817165744.73d61fb6@kernel.org>
+	<CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
+	<20230818145145.4b357c89@kernel.org>
+	<1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
+	<20230821113543.536b7375@kernel.org>
+	<5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230822081255.7a36fa4d@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Tue, Aug 22, 2023 at 05:12:55PM CEST, kuba@kernel.org wrote:
->On Tue, 22 Aug 2023 08:12:28 +0200 Jiri Pirko wrote:
->> NACK! Port function is there to configure the VF/SF from the eswitch
->> side. Yet you use it for the configureation of the actual VF, which is
->> clear misuse. Please don't
->
->Stating where they are supposed to configure the rate would be helpful.
+On Tue, 22 Aug 2023 17:21:35 +0800 Yunsheng Lin wrote:
+> > .. we should also add a:
+> > 
+> > 	WARN_ONCE(1, "misaligned DMA address, please report to netdev@");  
+> 
+> As the CONFIG_PHYS_ADDR_T_64BIT seems to used widely in x86/arm/mips/powerpc,
+> I am not sure if we can really make the above assumption.
+> 
+> https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT
 
-TC?
+Huh, it's actually used a lot less than I anticipated!
+
+None of the x86/arm/mips/powerpc systems matter IMHO - the only _real_
+risk is something we don't know about returning non-aligned addresses.
+
+Unless we know about specific problems I'd suggest we took the simpler
+path rather than complicating the design for systems which may not
+exist.
+
+Alex, do you know of any such cases? Some crazy swiotlb setting?
+WDYT about this in general?
 
