@@ -1,204 +1,300 @@
-Return-Path: <netdev+bounces-29550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA419783B90
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:16:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06EF5783B93
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B36AE1C20A6E
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:16:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2507280FED
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2598C8493;
-	Tue, 22 Aug 2023 08:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283A08493;
+	Tue, 22 Aug 2023 08:17:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11577EA8
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 08:16:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A321CC7
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 01:16:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692692213;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zckv6oFww2IAYABuKXRpSyWhyYXXDqhNviwTg2vLyFU=;
-	b=h3GUu6dWg9j4dB4AJGq6mMJGdmW/2QhGt7IoD7mOMZyB8uUMi3FF2Ku8pPLXPTKSWTehoe
-	g6lxDrSyAfQ0SKdFc0V3EeTA8PaleEg2rpPQdBiJWqM8ZYPhZrYlAkWutcj2qPa/UPaIkC
-	ZX6d9Ij9wQy7pYRRVteQfc4s6+QJmxk=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-696-ycpW5acTOE6P8KQ3fhARTA-1; Tue, 22 Aug 2023 04:16:50 -0400
-X-MC-Unique: ycpW5acTOE6P8KQ3fhARTA-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5219df4e8c4so402938a12.1
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 01:16:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692692209; x=1693297009;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zckv6oFww2IAYABuKXRpSyWhyYXXDqhNviwTg2vLyFU=;
-        b=jLjgn5r/BPDnUYCMNRB77zsIzqLHw/urrf3FsPG9xeCtwm503EJketRn44pLjYv25z
-         qjy7Nw3T6Iz+dyPggIfDIhk64Mjn5aHtuf5wY2q+nLvA9yGvtGFSm/dw8VA0T7SLsEfE
-         jeVK5EBzzvYHafG+Fv5DFqt4skY1hEZSEchqiU9ZYtbkCqr/T5OmOAM3+T3V5RcwPu+W
-         Gp2anUWupyqtlLV1BgyjzTrHRvhuwhp2W1YbNz7BO3cAMXONAJXfYjHVoa6oRMdNQOio
-         00jHaM9Z0Jx4+dzQAgrsQnKPh90b/7gwjL+kp+YpwGkXm3/yo+DekZy936ZvLX9HLPpi
-         nr2g==
-X-Gm-Message-State: AOJu0YzbhPsqKb09k5ne4fI/etf2+BJSlnWnt4+AgqvVs3ymCIV8Ik3Z
-	JlM7K/4TbQnyIl/WH5Fi3563n8w2M1Q1+8O7OtIr7aFbf1VfhI1TTcoVo99uyR+8mBnDCJROVIb
-	rv3s3REm8qdevgV5e
-X-Received: by 2002:a05:6402:268e:b0:523:2e64:122b with SMTP id w14-20020a056402268e00b005232e64122bmr6755162edd.3.1692692209656;
-        Tue, 22 Aug 2023 01:16:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHLSFMBKhUwaZNzwUhuDk7yvXSZjSgwouQMRlutTKOK/6Gw8nbnhQGL5h8TQ+NkO3C5To+oqw==
-X-Received: by 2002:a05:6402:268e:b0:523:2e64:122b with SMTP id w14-20020a056402268e00b005232e64122bmr6755152edd.3.1692692209318;
-        Tue, 22 Aug 2023 01:16:49 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
-        by smtp.gmail.com with ESMTPSA id m4-20020aa7c484000000b0052328d4268asm7109439edq.81.2023.08.22.01.16.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 01:16:48 -0700 (PDT)
-Message-ID: <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 2/4] vsock/virtio: support to send
- non-linear skb
-From: Paolo Abeni <pabeni@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel@sberdevices.ru,  oxffffaa@gmail.com
-Date: Tue, 22 Aug 2023 10:16:47 +0200
-In-Reply-To: <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
-References: <20230814212720.3679058-1-AVKrasnov@sberdevices.ru>
-	 <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1221E8BED
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 08:17:11 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40336193
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 01:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692692230; x=1724228230;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JOq9rwzzVX45Hpq+xSwwWkP3SZjNadSO/iFF4sqsnLU=;
+  b=nD6Zulk7pOKUTxYiCQKBYj5M3YBS6ol5YJsWT9OzZ+JLMdY92hRoVcZT
+   JDKMFS2dzNCtxRp4kIrGmEw5kB31LxKVpwlve2uSumMJ3wUOo3dHM0ZCL
+   zHxncIguX4RVMKHxka9m4b4dIBIjBKsfoynHB2aPkZV3k433pDGxiJnJp
+   arOkTzi0h2EQMo5lk0EKJsU1pTOLV8LLySoR45dFhNIOuH84fywL1nCWR
+   1KlnTPaGOKXHs5pp0ME6+iiDjOpoUnLGmu6t6X7QBeXK30xEk6FBwKcqn
+   y5D+zmxD8hjUlZEJ4bTZLZ6GKir9JFFoGDYU0o9LWhvP8Xm2j393Y27TR
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="460183051"
+X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
+   d="scan'208";a="460183051"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 01:17:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="859815796"
+X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
+   d="scan'208";a="859815796"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga004.jf.intel.com with ESMTP; 22 Aug 2023 01:17:08 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 22 Aug 2023 01:17:08 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 22 Aug 2023 01:17:08 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.176)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 22 Aug 2023 01:17:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D3qlPr/GxwZZY3jQUJbbGGLROG7zHESvZuw36YKAzUzPXJS7Uobf7j6vLUqF3fdGN2qYI/SQ9RLeHTZu911pEJ62FTowyUR7YqSTp9PuzHCHBWC32WzyYq3IGcZd3/bZ8ncvITSf2B9IsDwqdUbtusLA60E21T+80wJz13+Y3TZIozvRZAVPBnVlWheux7q6t04Pz2rdtjD2pOU5Rhib20t/3QaxdvRQ6NMqLGE/8Jw+zaVNs/u2Edjw2N9kuBz9k5Wg55Qcp46cEWSvFwtQl65wUwloz9RKCISNF3zTLij1FNWY0GwqqDoroBercCywKBKYm9MUi3suKcOgfL/V+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Kg8G3QQGk8HqBdVFIdvHA4kcCjbp5tKJdWc9JAdOWto=;
+ b=JbjrZSEvUJ+oyNDE1LzApPnzSITTAb8koNCVC3cnI10H1lbyfp3rJsXmhkN66MgGsCePNgCK6QRCNZeYNbSSJ0w3/Skam43DaBALUXjgwLU8UsAuriijcc4meWFVWiD6nF1aOwDsT6HCrW+dRxlNm9C2ym1B48ckwR1Y4+6KBfAiyr9nbym7nCGq+Rhmnis2xSW2DxtqtyWpvvmwFZ3wn8lQpybO/AzbGYbd9gzuXEbe1VWl9t8JUxMEuOI2qxrzn8qL8hLPfRMeWNCE6LDqas5oEtb8hMHq9eMgS5E5D1TMcr0yCg1B0WfgkrEnwWC3AGIom5bqU1Wj08mkI1PYjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by CY5PR11MB6091.namprd11.prod.outlook.com (2603:10b6:930:2d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Tue, 22 Aug
+ 2023 08:17:06 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::c45d:d61e:8d13:cb29]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::c45d:d61e:8d13:cb29%3]) with mapi id 15.20.6699.022; Tue, 22 Aug 2023
+ 08:17:06 +0000
+Message-ID: <dd439a56-81da-a7ed-84ed-c04afd50b836@intel.com>
+Date: Tue, 22 Aug 2023 10:16:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH iwl-next] ice: Disable Cage Max Power override
+Content-Language: en-US
+To: Wojciech Drewek <wojciech.drewek@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>
+References: <20230822073452.28446-1-wojciech.drewek@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20230822073452.28446-1-wojciech.drewek@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0261.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b5::15) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|CY5PR11MB6091:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9ed2203f-205a-4cf0-c970-08dba2e82c2e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VzIzsdWh9SNCdPrMIUUlLHAl4cHXYkN79qT8xn1iCtP6Fb2+tIgVro7LWOiupTDSGirMPDLyL0SjECJf9JqxSaPlKVYM2SruITxdZYcz3pSpbC3ALxM/CponXPEFTcsE6mXxtaHtR8yE93c+fODIit6xtX3uJvtULn72DNGNNquFYp9zjgo/KZrml1RQPD68Mh8SBaRLSy2ffsjmZceie12H6LXKDflh2K9gqaVYEzMgpSB02LcR8dKYzY9Ct317aOq7224+1cY48jd81uBD5USugKJBYbVYVapKESikpBV5UULN9xsjC12AyqdlvukdkmNMa95SR5067w0Rjyl0PiKT/mSbuNQsirJzRbniKO+fhJVdSu4b8DLDZ/YF6sHOS8YB6hdT6mYecWnQ+KqOTmjiaB/0ohaSHY/lYJuOTiYJyNPZJD30Q/IrzR1JIH1Ngm68kBAz4VUA6TFO6nN1Y1wYCt+Hq3jvR3dINCQ071UySWThUFuJfofUS+Af+NhUPmqXaZS/sBZQ/5+ocHCoGgP4PaBK/xCrreKgJZE35/CuDuh3DWw9bUuQb/BiGGbZhB5Kpn6gsiaok2N6132MMzFQTF6V1qtglf5POyI91mSWAs0wNjTPPrXT35VCvU3fMgclo05Ea5Bhcax3Xnk4iw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(39860400002)(136003)(396003)(451199024)(1800799009)(186009)(2906002)(53546011)(38100700002)(6486002)(6506007)(83380400001)(5660300002)(26005)(86362001)(31686004)(31696002)(8676002)(2616005)(8936002)(4326008)(316002)(6512007)(66946007)(66556008)(66476007)(82960400001)(478600001)(6666004)(36756003)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N2M0cUxWOFhMbWN4eE1HL3pyaUdzWG9pWjVjd0dobUVoVGJJVVZrVDM4cDky?=
+ =?utf-8?B?V3ZNdGdUNHFrN0VWQ04vLzcwZ2R2Z01hb09Nekh6cmxKSExkNFNQTXp6TTZo?=
+ =?utf-8?B?enkzeWR1bWFoRHRkMEJrM2pmS1NES1BwOFp5ZEJXRnk3clhPRlk4d05BWDNp?=
+ =?utf-8?B?bnNXbjA1b0txUUNnMG5QRlExSGFKYVRKOVgzdkxLVkpHVmxnNDREK3NTZldh?=
+ =?utf-8?B?eTdYSDVSL2U0c0lYWW5rQ2NRQjY4cmpqUmVXWlEvL0I3TGhDQjdKYjV5andN?=
+ =?utf-8?B?ZCtFR3NMbm1zRHhMT3lMb3dKUm1UWFlRS2lDbk9UUGVZYmVKcjRUR1pqb2Zl?=
+ =?utf-8?B?Q1lzbmFmbTJ4VWhnbVdoTnpTV3ZCclZuSjdqK3BpWEZLMXcvaVB4U1Y2U2Er?=
+ =?utf-8?B?RjJYem9lZ1d2enRHRDNhZll2aHlsOXUyQmgxQ1BRNjFSdzVHUWlZT09oUnFD?=
+ =?utf-8?B?V2p1WjhmSDFKc2hnTkd4ZXdRdEMvZUpwc2lZL3dQMUQydkFnYmZVdWtOV2NZ?=
+ =?utf-8?B?QzcyTitYSmlNSzdCVmtadHgvVmErS0FlV2NRZFE2cnBRL1ZsOVdwUGFuMXRx?=
+ =?utf-8?B?aS9QV2lvMmJocUhwM1hya0F1ZDVOTWtvaXpoQk5SdU8zbVRVWTZHcnBwbWsv?=
+ =?utf-8?B?OVZ3WXVzQ1VIMVUyQ1d5OUM3T2JFK1JLeHlKQUFHekYvSzRCN0tMOU5yY2Vk?=
+ =?utf-8?B?ZklVdXN2ZWpzWklvLzVXbERrYlNWcHA0cXp2dUtRL1lMQVdWNUVJWnRxSE5T?=
+ =?utf-8?B?blhMQTAvcUVVMlN0Zkkxb0ZmcEhoM3NXTjcxbW9wMXdrblpHa3B6L0dLa2tt?=
+ =?utf-8?B?di9Nbk9FQ09ZVnFjM0VFQitGVXNlNytPcW1EdUdySFVrNE1TY2NEQ3V2dG5Z?=
+ =?utf-8?B?d3IyTDFBUnYreHp6MVFCZTVXMUNGNTJmMU43WFRNcXQ1aVRGR0lWT3c3UkEx?=
+ =?utf-8?B?QlV5bnhZQ2dUQTZwSWtGTDJvNHpodTFnOHZhYzFRVW1ENWR0ai8rSnFCUWtB?=
+ =?utf-8?B?VGdtZXppZWJUQWREVmljWGRYS3FSUEc3d1dTeUI0V0orSmZXWGVVUEo1aUQ4?=
+ =?utf-8?B?NTdhVUd3eURDSzN5TnVjeENIelJjc3FPVFJVc1l5WmdlYUdVQkVuR1l3a0xj?=
+ =?utf-8?B?aHhzUU9vSllmRVFJbURhNU5CTzY2UFJMWXI5VFU4VzQ2MmphemFMK240RVZ5?=
+ =?utf-8?B?dW1Bc2JSK1Z5dkp5aVVhV3d0emR1aFA5NkRuSTh4dkpiNGhqY1k1eWZYVFhK?=
+ =?utf-8?B?bjQvVThld21kUUNEdm4zRjI1U3BFU25MQVhlYm1vZEJOdHF2RG1mbXdKTHVX?=
+ =?utf-8?B?cldtTzArZVJkRmlhc1NmbmVHc091QXdtUHBMN0FXNElDRmU1MlZYQTNmaUo4?=
+ =?utf-8?B?Z1h5dHVzeXBuejRaNHFpTlhHMlc1YW5UaG9NZHMrTWw5eEIxWlg3U2JwZEVQ?=
+ =?utf-8?B?bDZ2Wkh5NnlubE1qSktWeWszdnBuUG15bWhPR2dyNW95c2ZmM2MxRE4yRFVr?=
+ =?utf-8?B?MUhlSGpqbjcyTW45RlRhYlpPYUhwSE81T0tkL0NCdW1ScDRhcW5zUmRLYWw5?=
+ =?utf-8?B?ZEpBVGpDZVVnUmY1NmdKVXJSaW1LT0ZUOU5zYXVkZ3NVUHQxSk1qeVFVRWty?=
+ =?utf-8?B?TXdUcGFNaElScDZnU2xSckxod0oxL2RLTWFqZXkwVHNRT1JndmpLV2F0Ull5?=
+ =?utf-8?B?K2psMmVockxQbmpSQ2N0dVVDTHpyYm1USGF1QkF1NURYUEYrcHd2aWhUSDNn?=
+ =?utf-8?B?NWZ2c3Y0V0U4cUdHb3YvWVp3aDJCZU9iT0pab1Fad0l0ZEJ0enJYSFkrRjl5?=
+ =?utf-8?B?WXh3aWFteTljSzFjM3VrWFpuRCtOckNUR29HODZPeC9KNU5yNW5yZWZaWk9R?=
+ =?utf-8?B?NzdlKzJmV1V0eWxPcGJ5WkRibVZUVk9wWnI1aWJSaldlNlRDZUZIbHdTUVRv?=
+ =?utf-8?B?RjYxMWF6QjIzMHRpOFlxV2FRN3RjdzF4TDFNeU0zRE9veFB6ZFBvYkhSWUJo?=
+ =?utf-8?B?R2V4bVdycHlrTGhuNG9mQUMvaXROM3UrUjkzWEFoTHhGSS91bHNDaGtZdklo?=
+ =?utf-8?B?dnliNU1kYVoreHVqZU83dUM5bkdqbU43QmNjazZ5WnJVYklxOFp6d2tnczB6?=
+ =?utf-8?B?K1QyWHBicDJDL29xSGxzR1JVaVFycy9uRElkaGJlMkh3UTYrNjhSVXJOTHg3?=
+ =?utf-8?B?K1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ed2203f-205a-4cf0-c970-08dba2e82c2e
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2023 08:17:06.3398
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XlRtAfUkwWKa1x1o5WknAVO05xGnM84uxXKAMP+jeHY8FLZ8XMofIKMvzw0kQnjS8eJL3MksQ1pfWkRIcO4O9urnMciHPc0XHh1Ht+2mQ8w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6091
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-I'm sorry for the long delay here. I was OoO in the past few weeks.
-
-On Tue, 2023-08-15 at 00:27 +0300, Arseniy Krasnov wrote:
-> For non-linear skb use its pages from fragment array as buffers in
-> virtio tx queue. These pages are already pinned by 'get_user_pages()'
-> during such skb creation.
->=20
-> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+On 8/22/23 09:34, Wojciech Drewek wrote:
+> NVM module called "Cage Max Power override" allows to
+> change max power in the cage. This can be achieved
+> using external tools. The responsibility of the ice driver is to
+> go back to the default settings whenever port split is done.
+> This is achieved by clearing Override Enable bit in the
+> NVM module. Override of the max power is disabled so the
+> default value will be used.
+> 
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
 > ---
->  Changelog:
->  v2 -> v3:
->   * Comment about 'page_to_virt()' is updated. I don't remove R-b,
->     as this change is quiet small I guess.
->=20
->  net/vmw_vsock/virtio_transport.c | 41 +++++++++++++++++++++++++++-----
->  1 file changed, 35 insertions(+), 6 deletions(-)
->=20
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_tran=
-sport.c
-> index e95df847176b..7bbcc8093e51 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *wo=
-rk)
->  	vq =3D vsock->vqs[VSOCK_VQ_TX];
-> =20
->  	for (;;) {
-> -		struct scatterlist hdr, buf, *sgs[2];
-> +		/* +1 is for packet header. */
-> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
-> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
-
-Note that MAX_SKB_FRAGS depends on a config knob (CONFIG_MAX_SKB_FRAGS)
-and valid/reasonable values are up to 45. The total stack usage can be
-pretty large (~700 bytes).
-
-As this is under the vsk tx lock, have you considered moving such data
-in the virtio_vsock struct?
-
->  		int ret, in_sg =3D 0, out_sg =3D 0;
->  		struct sk_buff *skb;
->  		bool reply;
-> @@ -111,12 +113,39 @@ virtio_transport_send_pkt_work(struct work_struct *=
-work)
-> =20
->  		virtio_transport_deliver_tap_pkt(skb);
->  		reply =3D virtio_vsock_skb_reply(skb);
-> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
-> +			    sizeof(*virtio_vsock_hdr(skb)));
-> +		sgs[out_sg] =3D &bufs[out_sg];
-> +		out_sg++;
+>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  9 +++++
+>   drivers/net/ethernet/intel/ice/ice_devlink.c  | 35 +++++++++++++++++++
+>   drivers/net/ethernet/intel/ice/ice_nvm.c      |  2 +-
+>   drivers/net/ethernet/intel/ice/ice_nvm.h      |  4 +++
+>   4 files changed, 49 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index ffbe9d3a5d77..a3a49d922650 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -1569,6 +1569,15 @@ struct ice_aqc_nvm {
+>   	__le32 addr_low;
+>   };
+>   
+> +#define ICE_AQC_NVM_CMPO_MOD_ID			0x153
 > +
-> +		if (!skb_is_nonlinear(skb)) {
-> +			if (skb->len > 0) {
-> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
-> +				sgs[out_sg] =3D &bufs[out_sg];
-> +				out_sg++;
-> +			}
-> +		} else {
-> +			struct skb_shared_info *si;
-> +			int i;
+> +/* Cage Max Power override NVM module */
+> +struct ice_aqc_nvm_cmpo {
+> +	__le16 length;
+> +#define ICE_AQC_NVM_CMPO_ENABLE	BIT(8)
+> +	__le16 cages_cfg[8];
+
+[1] here
+
+> +};
 > +
-> +			si =3D skb_shinfo(skb);
+>   #define ICE_AQC_NVM_START_POINT			0
+>   
+>   /* NVM Checksum Command (direct, 0x0706) */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+> index 80dc5445b50d..e9300df9ef40 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+> @@ -591,6 +591,36 @@ static void ice_devlink_port_options_print(struct ice_pf *pf)
+>   	kfree(options);
+>   }
+>   
+> +#define ICE_NUM_OF_CAGES 8
 
-This assumes that the paged skb does not carry any actual data in the
-head buffer (only the header). Is that constraint enforced somewhere
-else? Otherwise a
-
-	WARN_ON_ONCE(skb_headlen(skb) > sizeof(*virtio_vsock_hdr(skb))
-
-could be helpful to catch early possible bugs.
-
-Thanks!
-
-Paolo
-
+perhaps move this define to ice_adminq_cmd.h to benefit from it in 
+struct definition just few lines above [1]
 > +
-> +			for (i =3D 0; i < si->nr_frags; i++) {
-> +				skb_frag_t *skb_frag =3D &si->frags[i];
-> +				void *va;
-> =20
-> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)=
-));
-> -		sgs[out_sg++] =3D &hdr;
-> -		if (skb->len > 0) {
-> -			sg_init_one(&buf, skb->data, skb->len);
-> -			sgs[out_sg++] =3D &buf;
-> +				/* We will use 'page_to_virt()' for the userspace page
-> +				 * here, because virtio or dma-mapping layers will call
-> +				 * 'virt_to_phys()' later to fill the buffer descriptor.
-> +				 * We don't touch memory at "virtual" address of this page.
-> +				 */
-> +				va =3D page_to_virt(skb_frag->bv_page);
-> +				sg_init_one(&bufs[out_sg],
-> +					    va + skb_frag->bv_offset,
-> +					    skb_frag->bv_len);
-> +				sgs[out_sg] =3D &bufs[out_sg];
-> +				out_sg++;
-> +			}
->  		}
-> =20
->  		ret =3D virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+> +/**
+> + * ice_devlink_aq_clear_cmpo - clear Cage Max Power override
+> + * @hw: pointer to the HW struct
+> + *
+> + * Read Cage Max Power override NVM module, clear override
+> + * enable bit for each of the cages. Write the settings back to
+> + * the NVM.
+
+Read+clear+write is "how" or algorithm here, but doc should just stick 
+to "what" most of the time. So I would just:
+"Clear Cage Max Power override enable bit for each of the cages".
+
+"how" part could be inside the function, just above "read" call.
+
+> + */
+> +static int
+> +ice_devlink_aq_clear_cmpo(struct ice_hw *hw)
+> +{
+> +	struct ice_aqc_nvm_cmpo data;
+> +	int ret, i;
+> +
+> +	ret = ice_aq_read_nvm(hw, ICE_AQC_NVM_CMPO_MOD_ID, 0, sizeof(data),
+> +			      &data, true, false, NULL);
+> +	if (ret)
+> +		return ret;
+> +
+> +	for (i = 0; i < ICE_NUM_OF_CAGES; i++)
+> +		data.cages_cfg[i] &= ~cpu_to_le16(ICE_AQC_NVM_CMPO_ENABLE);
+> +
+> +	/* Do not update the length word since it is not permitted */
+> +	return ice_aq_update_nvm(hw, ICE_AQC_NVM_CMPO_MOD_ID, 2,
+> +				 sizeof(data.cages_cfg), data.cages_cfg,
+> +				 false, 0, NULL);
+> +}
+> +
+>   /**
+>    * ice_devlink_aq_set_port_option - Send set port option admin queue command
+>    * @pf: the PF to print split port options
+> @@ -623,6 +653,11 @@ ice_devlink_aq_set_port_option(struct ice_pf *pf, u8 option_idx,
+>   		return -EIO;
+>   	}
+>   
+> +	status = ice_devlink_aq_clear_cmpo(&pf->hw);
+> +	if (status)
+> +		dev_dbg(dev, "Failed to clear Cage Max Power override, err %d aq_err %d\n",
+> +			status, pf->hw.adminq.sq_last_status);
+> +
+>   	status = ice_nvm_write_activate(&pf->hw, ICE_AQC_NVM_ACTIV_REQ_EMPR, NULL);
+>   	if (status) {
+>   		dev_dbg(dev, "ice_nvm_write_activate failed, err %d aq_err %d\n",
+> diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
+> index f6f52a248066..745f2459943f 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_nvm.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
+> @@ -18,7 +18,7 @@
+>    *
+>    * Read the NVM using the admin queue commands (0x0701)
+>    */
+> -static int
+> +int
+>   ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset, u16 length,
+>   		void *data, bool last_command, bool read_shadow_ram,
+>   		struct ice_sq_cd *cd)
+> diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.h b/drivers/net/ethernet/intel/ice/ice_nvm.h
+> index 774c2317967d..90f36e19e06b 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_nvm.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_nvm.h
+> @@ -15,6 +15,10 @@ struct ice_orom_civd_info {
+>   int ice_acquire_nvm(struct ice_hw *hw, enum ice_aq_res_access_type access);
+>   void ice_release_nvm(struct ice_hw *hw);
+>   int
+> +ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset, u16 length,
+> +		void *data, bool last_command, bool read_shadow_ram,
+> +		struct ice_sq_cd *cd);
+> +int
+>   ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
+>   		  bool read_shadow_ram);
+>   int
 
 
