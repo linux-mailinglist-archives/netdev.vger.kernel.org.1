@@ -1,148 +1,152 @@
-Return-Path: <netdev+bounces-29612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02BB87840D2
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:30:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B6E7840D9
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:33:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0E36281002
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41D1D280F65
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EE28F64;
-	Tue, 22 Aug 2023 12:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2219443;
+	Tue, 22 Aug 2023 12:33:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9FB1C2B6
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 12:30:34 +0000 (UTC)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC40CC6;
-	Tue, 22 Aug 2023 05:30:32 -0700 (PDT)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-591ba8bd094so28226167b3.3;
-        Tue, 22 Aug 2023 05:30:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692707431; x=1693312231;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AEdxVNTi234IeBu9/mHN8tlhC03wKCbKIUsue9+Lnac=;
-        b=ibiEjVl3q8Sus6COOoABXoT5Xb+E2o5i/m8mb+yD51DbXhf3VzrJbEA+B6ZBdJOWhb
-         1huPvhsqdulKrl2IBp+obISA+hl0qhiSFFn5roFz+JeLAU2xxroNCsSxx45GYNveUBvA
-         hTpH8uhwfoI2Bre5MzNWsLKEA5KG6PvCQX/k+WvPK6Ms5pXLxXMTE5gDCW4b5al7lB6S
-         ZBXJM2sKCyZBbM2LeZnU5yH5w9mTU7rpFs3nGNkiWchPs28zNmYGQihgOQZsQUz7+5HK
-         eFQpiMEfiHk/dduGbxkdttYj7R05YS8UOkEc6NC8r4zRqk7xtPgpqo2Kfx5mIhfwTTfD
-         Bkrw==
-X-Gm-Message-State: AOJu0YxVZRutOUUcX1aykPa/HBlXySnI7u+vppnrBs8Z8maPscu2lOrU
-	Ad5rz7Doy/agnaT6F19gyZeCdM2wKeC7pQ==
-X-Google-Smtp-Source: AGHT+IGR1mTIG39kiVb88hgmT+rATK+lNwQdkqjIs2Y/klit0w1NFXKOX5CHShvHXXkplckJOS6hbA==
-X-Received: by 2002:a81:8886:0:b0:58e:2827:4d93 with SMTP id y128-20020a818886000000b0058e28274d93mr11496109ywf.38.1692707431041;
-        Tue, 22 Aug 2023 05:30:31 -0700 (PDT)
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com. [209.85.128.179])
-        by smtp.gmail.com with ESMTPSA id m139-20020a0dca91000000b0058c55d40765sm301305ywd.106.2023.08.22.05.30.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 05:30:28 -0700 (PDT)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5922b96c5fcso17915057b3.0;
-        Tue, 22 Aug 2023 05:30:28 -0700 (PDT)
-X-Received: by 2002:a25:bcc7:0:b0:d52:f4d7:5587 with SMTP id
- l7-20020a25bcc7000000b00d52f4d75587mr9783496ybm.31.1692707427833; Tue, 22 Aug
- 2023 05:30:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33657F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 12:33:14 +0000 (UTC)
+Received: from mail.mbosch.me (mail.mbosch.me [65.21.144.185])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31C7DCC7
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 05:33:13 -0700 (PDT)
+Date: Tue, 22 Aug 2023 14:33:07 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mbosch.me; s=mail;
+	t=1692707588; bh=wv+njF2cyPiR7h3xFk9nBlxEcQfhaivXaQacL7JPmas=;
+	h=Date:From:To:Subject:References:In-Reply-To;
+	b=OepTy2nHaNoDc71i5RbaaVXG3IDGtryfL8mlN7E5LtQN6ySkhYodY/nUar+tW10y3
+	 vGAAxanhqgaqQODXhBBFMbYLSJD2BRvOMtFblA/cvR8atkaeuw5E2fbPUJ9MTbsQX7
+	 MCQMlAsnuzElM0CYAQ98T4Xj/Zbe8G5UV3lWN2Jc=
+From: Maximilian Bosch <maximilian@mbosch.me>
+To: netdev@vger.kernel.org
+Subject: [PATCH iproute2-next v2] ip-vrf: recommend using CAP_BPF rather than
+ CAP_SYS_ADMIN
+Message-ID: <43pipyx5qleyhkai5oitdfwqokuwcevak6n5laz6wshm3n4xnj@rarv5zwhdu27>
+References: <20230814134423.46036cdf@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230721221552.1973203-2-contact@jookia.org> <20230721221552.1973203-6-contact@jookia.org>
-In-Reply-To: <20230721221552.1973203-6-contact@jookia.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 22 Aug 2023 14:30:16 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdV2m54UAH0X2dG7stEg=grFihrdsz4+o7=_DpBMhjTbkw@mail.gmail.com>
-Message-ID: <CAMuHMdV2m54UAH0X2dG7stEg=grFihrdsz4+o7=_DpBMhjTbkw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] can: sun4i_can: Add support for the Allwinner D1
-To: John Watts <contact@jookia.org>
-Cc: linux-sunxi@lists.linux.dev, Wolfgang Grandegger <wg@grandegger.com>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Samuel Holland <samuel@sholland.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230814134423.46036cdf@hermes.local>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi John,
+The CAP_SYS_ADMIN capability allows far too much, to quote
+`capabilities(7)`:
 
-On Sat, Jul 22, 2023 at 12:18=E2=80=AFAM John Watts <contact@jookia.org> wr=
-ote:
-> The controllers present in the D1 are extremely similar to the R40
-> and require the same reset quirks, but An extra quirk is needed to suppor=
-t
-> receiving packets.
->
-> Signed-off-by: John Watts <contact@jookia.org>
+    Note: this capability is overloaded; see Notes to kernel developers, below.
 
-Thanks for your patch, which is now commit 8abb95250ae6af2d ("can:
-sun4i_can: Add support for the Allwinner D1") in linux-can-next/master.
+In the case of `ip-vrf(8)` this is needed to load a BPF program.
+According to the same section of the same man-page, using `CAP_BPF` is
+preferred if that's the reason for `CAP_SYS_ADMIN`;
 
-> --- a/drivers/net/can/Kconfig
-> +++ b/drivers/net/can/Kconfig
-> @@ -185,10 +185,10 @@ config CAN_SLCAN
->
->  config CAN_SUN4I
->         tristate "Allwinner A10 CAN controller"
-> -       depends on MACH_SUN4I || MACH_SUN7I || COMPILE_TEST
-> +       depends on MACH_SUN4I || MACH_SUN7I || RISCV || COMPILE_TEST
+    perform  the  same BPF operations as are governed by CAP_BPF (but the latter, weaker capability is preferred for accessing
+    that functionality).
 
-This makes this question pop up when configuring a kernel for any RISC-V
-platform, not just for Allwinner RISC-V platforms.
+Local testing revealed that `ip vrf exec` for an unprivileged user is
+sufficient if the `CAP_BPF` capability is given rather than
+`CAP_SYS_ADMIN`.
 
-In comparison, drivers/clk/sunxi-ng/Kconfig does have some
+In a previous version of the patch[1] it was mentioned that
+CAP_SYS_ADMIN was still required for Linux <5.8, however it was
+suggested to not make man-pages dependent on the kernel version. Also,
+it was suggested to improve the wording and the formatting of the entire
+paragraph mentioning capabilities which was also done.
 
-    depends on MACH_SUN<foo>I || RISCV || COMPILE_TEST
+Signed-off-by: Maximilian Bosch <maximilian@mbosch.me>
 
-but these are gated by ARCH_SUNXI at the top of the file.
+[1] https://lore.kernel.org/netdev/e6t4ucjdrcitzneh2imygsaxyb2aasxfn2q2a4zh5yqdx3vold@kutwh5kwixva/T/#m628a1900a7e5012bb87e6cb3c94af6c7281cf2bf
+---
+ ip/ip.c           |  2 +-
+ man/man8/ip-vrf.8 | 40 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 35 insertions(+), 7 deletions(-)
 
-I'm not sure what's the best way to fix this:
-  - Replace RISCV by ARCH_SUNXI?
-    This would expose it on more ARM sun<foo>i platforms, making the
-    MACH_SUN4I || MACH_SUN7I superfluous?
-  - Replace RISCV by RISCV && ARCH_SUNXI?
+diff --git a/ip/ip.c b/ip/ip.c
+index 8424736f..8c046ef1 100644
+--- a/ip/ip.c
++++ b/ip/ip.c
+@@ -175,7 +175,7 @@ int main(int argc, char **argv)
+ 	 * execv will drop them for the child command.
+ 	 * vrf exec requires:
+ 	 * - cap_dac_override to create the cgroup subdir in /sys
+-	 * - cap_sys_admin to load the BPF program
++	 * - cap_bpf to load the BPF program
+ 	 * - cap_net_admin to set the socket into the cgroup
+ 	 */
+ 	if (argc < 3 || strcmp(argv[1], "vrf") != 0 ||
+diff --git a/man/man8/ip-vrf.8 b/man/man8/ip-vrf.8
+index c1c9b958..946e8f8a 100644
+--- a/man/man8/ip-vrf.8
++++ b/man/man8/ip-vrf.8
+@@ -66,14 +66,42 @@ the current shell is associated with another VRF (e.g, Management VRF).
+ This command requires the system to be booted with cgroup v2 (e.g. with systemd,
+ add systemd.unified_cgroup_hierarchy=1 to the kernel command line).
+ 
+-This command also requires to be ran as root or with the CAP_SYS_ADMIN,
+-CAP_NET_ADMIN and CAP_DAC_OVERRIDE capabilities. If built with libcap and if
+-capabilities are added to the ip binary program via setcap, the program will
+-drop them as the first thing when invoked, unless the command is vrf exec.
++This command also requires to be run as root. Alternatively it
++can be run by an unprivileged user if the following
++.BR capabilities (7)
++are given:
++
++.RS
++.IP \fBCAP_BPF\fP
++To load the BPF program.
++.IP \fBCAP_NET_ADMIN\fP
++To set the socket into the cgroup.
++.IP \fBCAP_DAC_OVERRIDE\fP
++To create the cgroup subdir in /sys.
++.RE
++
++.IP
++If these capabilities are added and if
++.BR ip (8)
++is built with
++.BR libcap (3)
++then these capabilities will be dropped before
++.BR cmd
++is executed by
++.B ip vrf exec.
++For every other unprivileged invocation of
++.BR ip (8)
++all capabilities will be dropped.
++
+ .br
+-NOTE: capabilities will NOT be dropped if CAP_NET_ADMIN is set to INHERITABLE
++.B NOTE:
++capabilities will
++.B NOT
++be dropped if
++.B CAP_NET_ADMIN
++is set to
++.B INHERITABLE
+ to avoid breaking programs with ambient capabilities that call ip.
+-Do not set the INHERITABLE flag on the ip binary itself.
+ 
+ .TP
+ .B ip vrf identify [PID] - Report VRF association for process
+-- 
+2.40.1
 
-Thanks for your comments!
-
->         help
->           Say Y here if you want to use CAN controller found on Allwinner
-> -         A10/A20 SoCs.
-> +         A10/A20/D1 SoCs.
->
->           To compile this driver as a module, choose M here: the module w=
-ill
->           be called sun4i_can.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
