@@ -1,73 +1,80 @@
-Return-Path: <netdev+bounces-29527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8923E783A41
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 09:02:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D68B783A81
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 09:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B912280D6D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 07:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EC5D1C20A44
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 07:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1596E6D1B;
-	Tue, 22 Aug 2023 07:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A516FAC;
+	Tue, 22 Aug 2023 07:11:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F5F1FD0
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:02:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9DAEC433C8;
-	Tue, 22 Aug 2023 07:02:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692687735;
-	bh=Slg9Rrck55ui9hK/Yr9pb9KndYPiVtpXtFsYx8Md7eU=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC7F79CC
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 07:11:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2ACAC433C7;
+	Tue, 22 Aug 2023 07:11:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1692688274;
+	bh=5abBsOROkeket/n7uPinBiqxWhdIx3NpC4zEAOxIpxU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tLv3XsTe9n70+2i29n0J4WnUnPgHaK2jLFfOfAPpCLgu/vDkIfhHXe3SooXQtnOt/
-	 uNsLQT6RJCWFosyl1yAaKLFMkz5tk49b+iWlcNDP95Fv7nPMUMJUDi8gpYkoYvNSSx
-	 361QcQa6zJsJrxUfcW+nv+4ncXx0oMuu5jGKw5obziOvIzY8P3lbaXTLYofwtW1zE1
-	 PuW9BDwWRrLv+u2/C3O/LmdJUhU8nQHbkkG2jbCznrj5eJsdEPbKD1GbU6R5Z91108
-	 eiyXnWcq5IeTG7jK/u6aWjHb5oyOUUMsugfM64DwVq/12sRletmzE1a+DeMmJ3bYpG
-	 h/5qmsoh8s5WQ==
-Date: Tue, 22 Aug 2023 09:02:11 +0200
-From: Simon Horman <horms@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH v2 iwl-next 1/9] ice: use ice_pf_src_tmr_owned where
- available
-Message-ID: <20230822070211.GH2711035@kernel.org>
-References: <20230817141746.18726-1-karol.kolacinski@intel.com>
- <20230817141746.18726-2-karol.kolacinski@intel.com>
- <20230819115249.GP22185@unreal>
+	b=oxLL2jmPdNfZmpr/pZgBbY4ebnfkLiqxLltvx4pgd8VIBLhzCsqNCXCdbl5WwM7i0
+	 LmAiVPNrkDlX6AGpYnVGGykVbbevC7t4KMQoQr/LhORPt12Kegs5Je+RAkshwXxIDO
+	 Krky6Q/HZHA5nGeRXupUSLJoFmNHVU2MPngpmjgY=
+Date: Tue, 22 Aug 2023 09:10:02 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: stable@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:BROADCOM ETHERNET PHY DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH stable 4.14] net: phy: broadcom: stub c45 read/write for
+ 54810
+Message-ID: <2023082252-motor-grower-5621@gregkh>
+References: <2023082134-chain-tubular-c681@gregkh>
+ <20230821215410.3123513-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230819115249.GP22185@unreal>
+In-Reply-To: <20230821215410.3123513-1-florian.fainelli@broadcom.com>
 
-On Sat, Aug 19, 2023 at 02:52:49PM +0300, Leon Romanovsky wrote:
-> On Thu, Aug 17, 2023 at 04:17:38PM +0200, Karol Kolacinski wrote:
-> > The ice_pf_src_tmr_owned() macro exists to check the function capability
-> > bit indicating if the current function owns the PTP hardware clock.
+On Mon, Aug 21, 2023 at 02:54:10PM -0700, Florian Fainelli wrote:
+> From: Justin Chen <justin.chen@broadcom.com>
 > 
-> This is first patch in the series, but I can't find mentioned macro.
-> My net-next is based on 5b0a1414e0b0 ("Merge branch 'smc-features'")
-> ➜  kernel git:(net-next) git grep ice_pf_src_tmr_owned
-> shows nothing.
+> commit 096516d092d54604d590827d05b1022c8f326639 upstream
 > 
-> On which branch is it based?
+> The 54810 does not support c45. The mmd_phy_indirect accesses return
+> arbirtary values leading to odd behavior like saying it supports EEE
+> when it doesn't. We also see that reading/writing these non-existent
+> MMD registers leads to phy instability in some cases.
+> 
+> Fixes: b14995ac2527 ("net: phy: broadcom: Add BCM54810 PHY entry")
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Link: https://lore.kernel.org/r/1691901708-28650-1-git-send-email-justin.chen@broadcom.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> [florian: resolved conflicts in 4.14]
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-Hi Leon,
+Thanks for these, all now queued up.
 
-My assumption is that it is based on the dev-queue branch of
-https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git
+greg k-h
 
