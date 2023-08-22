@@ -1,49 +1,58 @@
-Return-Path: <netdev+bounces-29625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C5A784119
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:44:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42B12784181
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:05:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240631C20B17
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:44:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0C0828100B
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA8B1BB3D;
-	Tue, 22 Aug 2023 12:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AFC1C9E1;
+	Tue, 22 Aug 2023 13:05:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246297F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 12:43:18 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04381196;
-	Tue, 22 Aug 2023 05:43:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=PY+bsAgi3bDuH7vUp2hqTbQFPyW1J5EqPhjyCuqe+Uk=; t=1692708198; x=1693917798; 
-	b=Huk+b/+skwKWpLJlQAwBw5MA+nHSPE1CuFDMTwDXXtMSHcL39BnbUJAZTBivhBR5Xs9b6waRb9T
-	/S85GSRZPA7VHLkS/FCaQ9VwilVrCjBuLBAp16T/3FkDruBMADjdPRUabujGFymI9M70WCLxrzsch
-	79wU3tSP+mrWJeiWIhfF5yOyhzAZPQTcUxZJNNN6LDCF5C4lQL176PjMCqWglIXY732AsmLOX+CYH
-	9YPJNg0G4P3lWL7JDoBXW8epRH9G7hP4i6+g9d6LMscH6eLMK0J1jgYw/8tm+KY0XvLl+GdsS0gW0
-	O8Ait0Eyy3yrSOkXRcw4rngX+n9sZF4m5dqg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qYQj5-0058Y2-2B;
-	Tue, 22 Aug 2023 14:43:16 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: pull-request: wireless-2023-08-22
-Date: Tue, 22 Aug 2023 14:42:07 +0200
-Message-ID: <20230822124206.43926-2-johannes@sipsolutions.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99217F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 13:05:04 +0000 (UTC)
+X-Greylist: delayed 1235 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Aug 2023 06:05:02 PDT
+Received: from r3-19.sinamail.sina.com.cn (r3-19.sinamail.sina.com.cn [202.108.3.19])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90304CD6
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:05:02 -0700 (PDT)
+X-SMAIL-HELO: pek-lxu-l1.wrs.com
+Received: from unknown (HELO pek-lxu-l1.wrs.com)([111.198.228.11])
+	by sina.com (172.16.97.35) with ESMTP
+	id 64E4ADA400034095; Tue, 22 Aug 2023 20:44:21 +0800 (CST)
+X-Sender: eadavis@sina.com
+X-Auth-ID: eadavis@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=eadavis@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=eadavis@sina.com
+X-SMAIL-MID: 91623012976469
+X-SMAIL-UIID: 47881107A749403D8A56318B08C8CD75-20230822-204421
+From: eadavis@sina.com
+To: syzbot+666c97e4686410e79649@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ralf@linux-mips.org,
+	syzkaller-bugs@googlegroups.com,
+	hdanton@sina.com,
+	Edward AD <eadavis@sina.com>
+Subject: [PATCH] sock: Fix sk_sleep return invalid pointer
+Date: Tue, 22 Aug 2023 20:44:19 +0800
+Message-ID: <20230822124419.1838055-1-eadavis@sina.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <000000000000e6c05806033522d3@google.com>
+References: <000000000000e6c05806033522d3@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,55 +60,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+From: Edward AD <eadavis@sina.com>
 
-We have two more fixes - one stack and one driver - for the
-current cycle. I think the Kconfig fix would be appreciated
-more than the other, but if anyone runs with UBSAN they may
-find this problem as well.
+The parameter sk_sleep(sk) passed in when calling prepare_to_wait may 
+return an invalid pointer due to nr-release reclaiming the sock.
+Here, schedule_timeout_interruptible is used to replace the combination 
+of 'prepare_to_wait, schedule, finish_wait' to solve the problem.
 
-Please pull and let me know if there's any problem.
+Reported-and-tested-by: syzbot+666c97e4686410e79649@syzkaller.appspotmail.com
+Signed-off-by: Edward AD <eadavis@sina.com>
+---
+ net/netrom/af_netrom.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-Thanks,
-johannes
-
-
-
-The following changes since commit 06f2ab86a5b6ed55f013258de4be9319841853ea:
-
-  wifi: ath12k: Fix buffer overflow when scanning with extraie (2023-08-09 14:44:14 +0200)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2023-08-22
-
-for you to fetch changes up to b98c16107cc1647242abbd11f234c05a3a5864f6:
-
-  wifi: mac80211: limit reorder_buf_filtered to avoid UBSAN warning (2023-08-21 09:49:54 +0200)
-
-----------------------------------------------------------------
-Two fixes:
- * reorder buffer filter checks can cause bad shift/UBSAN
-   warning with newer HW, avoid the check (mac80211)
- * add Kconfig dependency for iwlwifi for PTP clock usage
-
-----------------------------------------------------------------
-Ping-Ke Shih (1):
-      wifi: mac80211: limit reorder_buf_filtered to avoid UBSAN warning
-
-Randy Dunlap (1):
-      wifi: iwlwifi: mvm: add dependency for PTP clock
-
- drivers/net/wireless/intel/iwlwifi/Kconfig |  1 +
- include/net/mac80211.h                     |  1 +
- net/mac80211/rx.c                          | 12 ++++++++++--
- 3 files changed, 12 insertions(+), 2 deletions(-)
+diff --git a/net/netrom/af_netrom.c b/net/netrom/af_netrom.c
+index eb8ccbd58d..c84a4c65b3 100644
+--- a/net/netrom/af_netrom.c
++++ b/net/netrom/af_netrom.c
+@@ -732,23 +732,18 @@ static int nr_connect(struct socket *sock, struct sockaddr *uaddr,
+ 	 * closed.
+ 	 */
+ 	if (sk->sk_state == TCP_SYN_SENT) {
+-		DEFINE_WAIT(wait);
+-
+ 		for (;;) {
+-			prepare_to_wait(sk_sleep(sk), &wait,
+-					TASK_INTERRUPTIBLE);
+ 			if (sk->sk_state != TCP_SYN_SENT)
+ 				break;
+ 			if (!signal_pending(current)) {
+ 				release_sock(sk);
+-				schedule();
++				schedule_timeout_interruptible(HZ);
+ 				lock_sock(sk);
+ 				continue;
+ 			}
+ 			err = -ERESTARTSYS;
+ 			break;
+ 		}
+-		finish_wait(sk_sleep(sk), &wait);
+ 		if (err)
+ 			goto out_release;
+ 	}
+@@ -772,7 +767,6 @@ static int nr_accept(struct socket *sock, struct socket *newsock, int flags,
+ {
+ 	struct sk_buff *skb;
+ 	struct sock *newsk;
+-	DEFINE_WAIT(wait);
+ 	struct sock *sk;
+ 	int err = 0;
+ 
+@@ -795,7 +789,6 @@ static int nr_accept(struct socket *sock, struct socket *newsock, int flags,
+ 	 *	hooked into the SABM we saved
+ 	 */
+ 	for (;;) {
+-		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
+ 		skb = skb_dequeue(&sk->sk_receive_queue);
+ 		if (skb)
+ 			break;
+@@ -806,14 +799,13 @@ static int nr_accept(struct socket *sock, struct socket *newsock, int flags,
+ 		}
+ 		if (!signal_pending(current)) {
+ 			release_sock(sk);
+-			schedule();
++			schedule_timeout_uninterruptible(HZ);
+ 			lock_sock(sk);
+ 			continue;
+ 		}
+ 		err = -ERESTARTSYS;
+ 		break;
+ 	}
+-	finish_wait(sk_sleep(sk), &wait);
+ 	if (err)
+ 		goto out_release;
+ 
+-- 
+2.25.1
 
 
