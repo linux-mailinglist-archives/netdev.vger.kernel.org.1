@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-29595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F38783F0D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:32:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CD9783F16
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E62B281062
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:32:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B6531C20A9A
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4811C29C;
-	Tue, 22 Aug 2023 11:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD551BB3C;
+	Tue, 22 Aug 2023 11:32:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0344F1BF1D
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:31:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B042BC43397;
-	Tue, 22 Aug 2023 11:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D371BF1D
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:32:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F823C433C7;
+	Tue, 22 Aug 2023 11:32:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692703907;
-	bh=lxE+/8oi77wWGFeI0TEi0QttvwUbtBUBZ31E4M75Le0=;
+	s=k20201202; t=1692703921;
+	bh=93CvJQ7GVmP36qHxWNaLcmrV8u+zkTaEJnC7LV4WR0A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GuzZPHjnN7vxCxDDYpQRAp0lhuXtk1I1gxIZJMowQel7KIUOsi5QT6fMacxQETMit
-	 oamaSmjprjfPVUv7IqWC3rrrfH9b1Wk1Pf9npQkSwssB8aQo7xeIv3wxCa5vRg+aUu
-	 Sx648bUL+Tu804JQVlNybl+6DiT48v4HtiZVYG3ZkNl1LJzzFRI+Xivj1xtlh3eXSo
-	 sD7lMomTN5jYZj+gNt2DIj/izKUQVm3htbo4hVdRmhQWbLRgW7/U0HCXxos6eOOBTj
-	 rBtg3iQXuokX+742elFGOXV+AjzCcZa8nqFqv8gAAFyP2SXohnd7zbsHIMckdfCfmq
-	 5FYHVMwLpExqA==
+	b=Fl81dK7jyqkbtwiVAD2oPwMZFZdW9vJtbvChMcCJ1bl7ZTJn49EX3TEoLX5Y6BAUS
+	 IfG0NdOM9Vm09xBpV/3XtxKj/8vJi+8uugAK7lqG3VZmkyorYZvJURMXKXWAOBUk2H
+	 DwnmYKhuPu9dC2l5+fnUeJeZklv3OHcUjaCuVmyShVGfNJPAw3TvMT8carbtv8JDNL
+	 Ie6k7AtXLyO+dU4XSC5ZIZ1SGRx/lYQORN+4t96C/bupbLvbuHe7U7iv1YRkNXwCFn
+	 NfrmKc/rp9rK6FeuR/YOk+FYX6ustF0mSwyLO7DQCyh3Szv9Zc1Dyw8MghM/ldWyNx
+	 AyO0f4LCIACwA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -42,12 +42,12 @@ Cc: Martin Kohn <m.kohn@welotec.com>,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 7/9] net: usb: qmi_wwan: add Quectel EM05GV2
-Date: Tue, 22 Aug 2023 07:31:28 -0400
-Message-Id: <20230822113130.3550050-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 3/4] net: usb: qmi_wwan: add Quectel EM05GV2
+Date: Tue, 22 Aug 2023 07:31:54 -0400
+Message-Id: <20230822113155.3550176-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230822113130.3550050-1-sashal@kernel.org>
-References: <20230822113130.3550050-1-sashal@kernel.org>
+In-Reply-To: <20230822113155.3550176-1-sashal@kernel.org>
+References: <20230822113155.3550176-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.46
+X-stable-base: Linux 5.15.127
 Content-Transfer-Encoding: 8bit
 
 From: Martin Kohn <m.kohn@welotec.com>
@@ -104,10 +104,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 68829a5a93d3e..4fb981b8732ef 100644
+index 9dde1f8358e3f..5c516bf4d3a5f 100644
 --- a/drivers/net/usb/qmi_wwan.c
 +++ b/drivers/net/usb/qmi_wwan.c
-@@ -1422,6 +1422,7 @@ static const struct usb_device_id products[] = {
+@@ -1412,6 +1412,7 @@ static const struct usb_device_id products[] = {
  	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0191, 4)},	/* Quectel EG91 */
  	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0195, 4)},	/* Quectel EG95 */
  	{QMI_FIXED_INTF(0x2c7c, 0x0296, 4)},	/* Quectel BG96 */
