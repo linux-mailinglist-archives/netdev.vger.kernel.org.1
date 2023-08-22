@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-29787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66599784AC4
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 21:46:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79C19784AC5
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 21:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96AA11C20320
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 19:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEBCE1C20B8A
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 19:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1763D3AC;
-	Tue, 22 Aug 2023 19:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8E93D38D;
+	Tue, 22 Aug 2023 19:43:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E121C34CCB
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 19:43:34 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D56AE46;
-	Tue, 22 Aug 2023 12:43:30 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fee87dd251so30167605e9.2;
-        Tue, 22 Aug 2023 12:43:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF5B34CCB
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 19:43:38 +0000 (UTC)
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84047E4E;
+	Tue, 22 Aug 2023 12:43:31 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-31ad9155414so4269070f8f.3;
+        Tue, 22 Aug 2023 12:43:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692733408; x=1693338208;
+        d=gmail.com; s=20221208; t=1692733409; x=1693338209;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Eu63iS2EexWeSk5SNuLtclZBTZl986S1+6f1xVI24c8=;
-        b=iw23BTaWuP7pKpr+644+ben5/sp3wwpMCEnpLJx4owJFOzMyc6BSPTpT7UD9NoJjfY
-         yQbbOuV35xnmyRjVCI9+UEWWP9pf/d8asYsLTp7+REeRYQ1e8+6TMexko4YdCzPlvPtj
-         b09jOMmWrr/Nvqquxe3yg9f+OkX5NpQ5SH809WltV2X9gJISiekGxY+mQFgvJY9h3aS0
-         P0OsWIVcT2e8o8sfnP4de4v9vpnzRqk5XGAgcLO3EeS897wmq/sUPP6A4+c9Vis70u0Q
-         q/5KkNj+mYIDwm5khWlXHw5QrTdrbue0CCkBIqimsePslefnj37Mj6TOEQtp5LMI2HKM
-         vpfQ==
+        bh=eLnNqJMl/isE73N1mbjQXGEF/pmHif2ExuIghaJq2uU=;
+        b=b2I2t38u38UuiatS4oQvqwT/BnU/YLZSOzMcFv1G5JY9JTURkb5V+7om6QgXiJtf1x
+         ZsStJIGXOXiSpwdj4M8BQ7yFxYbpFZa1e/wkFl6LPyblJtzn3dsjQRpgsde+g31YtLhm
+         Vv0kZtv4lI+ZStMdbFRkmd/6E79as+FpK0UMFBKMkb6v04lGrNG56PAyMYJJTN4Ls8wm
+         8TAhljxEy70IIHKHsdksDRDi1bRKVBmTPFPK2TOrup1W1E1B4TsR5uDt4yx3dJDxhcEz
+         CW8u2JYB0hdZyvfsY5wK9qyoyD5D4hElXjVjwZZ/Zo+fzX+aQw1AluEtqhj6SZnAr17Y
+         Uthg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692733408; x=1693338208;
+        d=1e100.net; s=20221208; t=1692733409; x=1693338209;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Eu63iS2EexWeSk5SNuLtclZBTZl986S1+6f1xVI24c8=;
-        b=PUBoOM9MehlCUDndrr9FQRUDrVDczycR3yYPFIiI57ap/ceyKKz9N+xpzJomnVHc6A
-         TEBeRBwXvbYwudSrlZ3EFB2vic5OCJXWaAzmVZiWKbT5u0kYG0sacXLzsVcYDiFoYD8p
-         mIZh4T4RkcbsysmPhM4bnv+fXakBfBNi5G6g2q3DJ0NTjS59HLScKXjuoVenpPpDxDVH
-         l5+ksqFC0FmgkDobz6+vpjHSuu6mcR7kS7ArPoJqwDv9m6Nk/zu+A9IwVsHSSOATyiNr
-         dUFZ2VdOuIsDczolk5DPmuWJrxPMifJtDpCOC2DdMRy99SUpd/mydQbzUY22aekyP+eU
-         07Qw==
-X-Gm-Message-State: AOJu0YyklubFswzT262D8IW9P+HZQsuqAdAoT7H7wWe1qGdN8EcqWCAR
-	KpNiP/qVupkM1octn4pFABrqDnSII0exOA==
-X-Google-Smtp-Source: AGHT+IG5k3Fcdajq92Cp3YXunNE3Xf3fvuLNW5/lIK9zNAdjHUryDLfBKdA/XNkeF0Mo5tNkm/maKQ==
-X-Received: by 2002:adf:ec48:0:b0:314:2e95:1ec9 with SMTP id w8-20020adfec48000000b003142e951ec9mr7643494wrn.10.1692733408408;
-        Tue, 22 Aug 2023 12:43:28 -0700 (PDT)
+        bh=eLnNqJMl/isE73N1mbjQXGEF/pmHif2ExuIghaJq2uU=;
+        b=CVNVKO4Ed+J9JTYAhGkuwxq2AazaGEPgFcS/h82n7h6K+6fFoksaXVAlBtGDVeQE07
+         6vphOPg/5sXXjWwUJInJCC2fkOA6CCWka436ApD8ibB9RY2pZzz33/HNPOfzQE+etrA7
+         WW0kLz/9ZNctU4uiKVhcBJ8xLnA1Wc/E8Ew4ln60qrXUipIAJeJuqO8nw8RlyMwDaVPF
+         L+wOABgTW/irTq5lc3gWpwGLJW21bxBP7Cm4tcjG55psCfVTwZRjo321WonIH4LywWfe
+         mKpm/DQlYP24eHNBMBsnFJQGijkZbNitFl6oYVgRkJuz+apWeQTXqmcjJAJZLEsG387b
+         zJTA==
+X-Gm-Message-State: AOJu0YyXxHZNtSwf8hpGd/lLXAMVXKGkGTVpdd1gz5SKueYt7FWe5vEL
+	+cs3B9xPcACbCRQVpdaVGFknqzLZ3K/Y7w==
+X-Google-Smtp-Source: AGHT+IEIJ9M3OFqaGnYgcndEF2niSEuLfuh1cWevGDH5pmZarZR31ICBPpgaKKDWoASMOyLuuA3bbw==
+X-Received: by 2002:adf:ea81:0:b0:319:67da:ed68 with SMTP id s1-20020adfea81000000b0031967daed68mr8346380wrm.7.1692733409537;
+        Tue, 22 Aug 2023 12:43:29 -0700 (PDT)
 Received: from imac.taild7a78.ts.net ([2a02:8010:60a0:0:3060:22e2:2970:3dc3])
-        by smtp.gmail.com with ESMTPSA id f8-20020adfdb48000000b0031934b035d2sm16846067wrj.52.2023.08.22.12.43.27
+        by smtp.gmail.com with ESMTPSA id f8-20020adfdb48000000b0031934b035d2sm16846067wrj.52.2023.08.22.12.43.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 12:43:27 -0700 (PDT)
+        Tue, 22 Aug 2023 12:43:29 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -68,9 +68,9 @@ To: netdev@vger.kernel.org,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v3 09/12] tools/net/ynl: Add support for create flags
-Date: Tue, 22 Aug 2023 20:43:01 +0100
-Message-ID: <20230822194304.87488-10-donald.hunter@gmail.com>
+Subject: [PATCH net-next v3 10/12] doc/netlink: Add spec for rt addr messages
+Date: Tue, 22 Aug 2023 20:43:02 +0100
+Message-ID: <20230822194304.87488-11-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230822194304.87488-1-donald.hunter@gmail.com>
 References: <20230822194304.87488-1-donald.hunter@gmail.com>
@@ -83,113 +83,205 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support for using NLM_F_REPLACE, _EXCL, _CREATE and _APPEND flags
-in requests.
+Add schema for rt addr with support for:
+     - newaddr, deladdr, getaddr (dump)
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/cli.py          | 12 ++++++++++--
- tools/net/ynl/lib/__init__.py |  4 ++--
- tools/net/ynl/lib/ynl.py      | 14 ++++++++++----
- 3 files changed, 22 insertions(+), 8 deletions(-)
+ Documentation/netlink/specs/rt_addr.yaml | 179 +++++++++++++++++++++++
+ 1 file changed, 179 insertions(+)
+ create mode 100644 Documentation/netlink/specs/rt_addr.yaml
 
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index ffaa8038aa8c..564ecf07cd2c 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -6,7 +6,7 @@ import json
- import pprint
- import time
- 
--from lib import YnlFamily
-+from lib import YnlFamily, Netlink
- 
- 
- def main():
-@@ -19,6 +19,14 @@ def main():
-     parser.add_argument('--dump', dest='dump', type=str)
-     parser.add_argument('--sleep', dest='sleep', type=int)
-     parser.add_argument('--subscribe', dest='ntf', type=str)
-+    parser.add_argument('--replace', dest='flags', action='append_const',
-+                        const=Netlink.NLM_F_REPLACE)
-+    parser.add_argument('--excl', dest='flags', action='append_const',
-+                        const=Netlink.NLM_F_EXCL)
-+    parser.add_argument('--create', dest='flags', action='append_const',
-+                        const=Netlink.NLM_F_CREATE)
-+    parser.add_argument('--append', dest='flags', action='append_const',
-+                        const=Netlink.NLM_F_APPEND)
-     args = parser.parse_args()
- 
-     if args.no_schema:
-@@ -37,7 +45,7 @@ def main():
-         time.sleep(args.sleep)
- 
-     if args.do:
--        reply = ynl.do(args.do, attrs)
-+        reply = ynl.do(args.do, attrs, args.flags)
-         pprint.PrettyPrinter().pprint(reply)
-     if args.dump:
-         reply = ynl.dump(args.dump, attrs)
-diff --git a/tools/net/ynl/lib/__init__.py b/tools/net/ynl/lib/__init__.py
-index 4b3797fe784b..f7eaa07783e7 100644
---- a/tools/net/ynl/lib/__init__.py
-+++ b/tools/net/ynl/lib/__init__.py
-@@ -2,7 +2,7 @@
- 
- from .nlspec import SpecAttr, SpecAttrSet, SpecEnumEntry, SpecEnumSet, \
-     SpecFamily, SpecOperation
--from .ynl import YnlFamily
-+from .ynl import YnlFamily, Netlink
- 
- __all__ = ["SpecAttr", "SpecAttrSet", "SpecEnumEntry", "SpecEnumSet",
--           "SpecFamily", "SpecOperation", "YnlFamily"]
-+           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink"]
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 64f50f576136..ff35fcd7fef0 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -35,6 +35,10 @@ class Netlink:
-     NLM_F_ACK = 4
-     NLM_F_ROOT = 0x100
-     NLM_F_MATCH = 0x200
+diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netlink/specs/rt_addr.yaml
+new file mode 100644
+index 000000000000..cbee1cedb177
+--- /dev/null
++++ b/Documentation/netlink/specs/rt_addr.yaml
+@@ -0,0 +1,179 @@
++# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
 +
-+    NLM_F_REPLACE = 0x100
-+    NLM_F_EXCL = 0x200
-+    NLM_F_CREATE = 0x400
-     NLM_F_APPEND = 0x800
- 
-     NLM_F_CAPPED = 0x100
-@@ -647,10 +651,12 @@ class YnlFamily(SpecFamily):
- 
-       return op['do']['request']['attributes'].copy()
- 
--    def _op(self, method, vals, dump=False):
-+    def _op(self, method, vals, flags, dump=False):
-         op = self.ops[method]
- 
-         nl_flags = Netlink.NLM_F_REQUEST | Netlink.NLM_F_ACK
-+        for flag in flags or []:
-+            nl_flags |= flag
-         if dump:
-             nl_flags |= Netlink.NLM_F_DUMP
- 
-@@ -709,8 +715,8 @@ class YnlFamily(SpecFamily):
-             return rsp[0]
-         return rsp
- 
--    def do(self, method, vals):
--        return self._op(method, vals)
-+    def do(self, method, vals, flags):
-+        return self._op(method, vals, flags)
- 
-     def dump(self, method, vals):
--        return self._op(method, vals, dump=True)
-+        return self._op(method, vals, [], dump=True)
++name: rt-addr
++protocol: netlink-raw
++protonum: 0
++
++doc:
++  Address configuration over rtnetlink.
++
++definitions:
++  -
++    name: ifaddrmsg
++    type: struct
++    members:
++      -
++        name: ifa-family
++        type: u8
++      -
++        name: ifa-prefixlen
++        type: u8
++      -
++        name: ifa-flags
++        type: u8
++        enum: ifa-flags
++        enum-as-flags: true
++      -
++        name: ifa-scope
++        type: u8
++      -
++        name: ifa-index
++        type: u32
++  -
++    name: ifa-cacheinfo
++    type: struct
++    members:
++      -
++        name: ifa-prefered
++        type: u32
++      -
++        name: ifa-valid
++        type: u32
++      -
++        name: cstamp
++        type: u32
++      -
++        name: tstamp
++        type: u32
++
++  -
++    name: ifa-flags
++    type: flags
++    entries:
++      -
++        name: secondary
++      -
++        name: nodad
++      -
++        name: optimistic
++      -
++        name: dadfailed
++      -
++        name: homeaddress
++      -
++        name: deprecated
++      -
++        name: tentative
++      -
++        name: permanent
++      -
++        name: managetempaddr
++      -
++        name: noprefixroute
++      -
++        name: mcautojoin
++      -
++        name: stable-privacy
++
++attribute-sets:
++  -
++    name: addr-attrs
++    attributes:
++      -
++        name: ifa-address
++        type: binary
++        display-hint: ipv4
++      -
++        name: ifa-local
++        type: binary
++        display-hint: ipv4
++      -
++        name: ifa-label
++        type: string
++      -
++        name: ifa-broadcast
++        type: binary
++        display-hint: ipv4
++      -
++        name: ifa-anycast
++        type: binary
++      -
++        name: ifa-cacheinfo
++        type: binary
++        struct: ifa-cacheinfo
++      -
++        name: ifa-multicast
++        type: binary
++      -
++        name: ifa-flags
++        type: u32
++        enum: ifa-flags
++        enum-as-flags: true
++      -
++        name: ifa-rt-priority
++        type: u32
++      -
++        name: ifa-target-netnsid
++        type: binary
++      -
++        name: ifa-proto
++        type: u8
++
++
++operations:
++  fixed-header: ifaddrmsg
++  enum-model: directional
++  list:
++    -
++      name: newaddr
++      doc: Add new address
++      attribute-set: addr-attrs
++      do:
++        request:
++          value: 20
++          attributes: &ifaddr-all
++            - ifa-family
++            - ifa-flags
++            - ifa-prefixlen
++            - ifa-scope
++            - ifa-index
++            - ifa-address
++            - ifa-label
++            - ifa-local
++            - ifa-cacheinfo
++    -
++      name: deladdr
++      doc: Remove address
++      attribute-set: addr-attrs
++      do:
++        request:
++          value: 21
++          attributes:
++            - ifa-family
++            - ifa-flags
++            - ifa-prefixlen
++            - ifa-scope
++            - ifa-index
++            - ifa-address
++            - ifa-local
++    -
++      name: getaddr
++      doc: Dump address information.
++      attribute-set: addr-attrs
++      dump:
++        request:
++          value: 22
++          attributes:
++            - ifa-index
++        reply:
++          value: 20
++          attributes: *ifaddr-all
++
++mcast-groups:
++  list:
++    -
++      name: rtnlgrp-ipv4-ifaddr
++      value: 5
++    -
++      name: rtnlgrp-ipv6-ifaddr
++      value: 9
 -- 
 2.41.0
 
