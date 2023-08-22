@@ -1,46 +1,66 @@
-Return-Path: <netdev+bounces-29642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332DD784385
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:10:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59B5784390
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E127228101D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:10:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58A9C281106
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21AC1CA1A;
-	Tue, 22 Aug 2023 14:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613AC1CA1A;
+	Tue, 22 Aug 2023 14:12:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D791C9FF
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 14:10:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C85C433BA;
-	Tue, 22 Aug 2023 14:10:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692713433;
-	bh=Bk8bmL2ziMya4zvM3/ZvT3gOkTt4BhDmW52iW0JD4I4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lL1DOwoHUf2wkGK3EC/oK2RnaqiVX38OE+092tYWyo9hRXlB69Te3sM1rScTWEtGY
-	 bOfwlr4bIxne46VFBlQJXH6FUxOcE5hJTCcIwWVyEZnaPAzD7MCc4264pdhRIv8teH
-	 3k7rR244O/m0YIwyRAPCfpkRQrw0YitU5Q4cNjBLTfK48sQrWs4t7VpXryprv6OnNH
-	 3sE0c8Y6vIbfZ+qXrWtXkJ1mFp5Fb1qoVC88M4q6a+zb825U7dy/qLgNJOhVtc0oiC
-	 dU1VRK43tzCwkVfIN72sD+U8To7+osFs2p4NgLoWOjpUHs1bDXnRIozRHwhzfQ7y5G
-	 /pWSXw3XcWi9g==
-Date: Tue, 22 Aug 2023 17:10:29 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Yu Liao <liaoyu15@huawei.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	saeedm@nvidia.com, liwei391@huawei.com, davem@davemloft.net,
-	maciej.fijalkowski@intel.com, michal.simek@amd.com,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net/mlx5e: Use PTR_ERR_OR_ZERO() to
- simplify code
-Message-ID: <20230822141029.GG6029@unreal>
-References: <20230822021455.205101-1-liaoyu15@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C23E7F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 14:12:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9638CF8;
+	Tue, 22 Aug 2023 07:12:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8pPiwscj/TJoZoXC5yZYpBYbUpkqoKV7y3ecZaEAFTo=; b=zo83phOskLZKRWDL0QANpRQ3DI
+	N7MlB6Tzp80l7F8Rt7l9UMDcHCBOuy/xia6ED+QIXhqitOR6YLZuSQ/NizMWhBcqMs5GVFGjm4sKK
+	j4smWST3zPvTy42XX++VS6daBxyF7h4F221yJciGGYDMrEK63/C5s3NElnrr9ll35ccI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qYS5l-004mmA-TH; Tue, 22 Aug 2023 16:10:45 +0200
+Date: Tue, 22 Aug 2023 16:10:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Rob Herring <robh@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH net-next 8/8] dt-bindings: net: fsl,backplane-anlt:
+ new binding document
+Message-ID: <36bb7d51-2fca-4d06-b78d-e411f67ecf56@lunn.ch>
+References: <20230817150644.3605105-1-vladimir.oltean@nxp.com>
+ <20230817150644.3605105-9-vladimir.oltean@nxp.com>
+ <20230821195840.GA2181626-robh@kernel.org>
+ <20230821201146.hudnk5v2zugz726p@skbuf>
+ <e3afb3d5-6efe-46de-81ca-7f0163c4b04d@lunn.ch>
+ <20230821203433.ysulh2bixfypbhsk@skbuf>
+ <842f7ff0-d376-4f55-b72d-2db7ea827792@lunn.ch>
+ <20230821215500.oap7ze73pu237pof@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,17 +69,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230822021455.205101-1-liaoyu15@huawei.com>
+In-Reply-To: <20230821215500.oap7ze73pu237pof@skbuf>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Aug 22, 2023 at 10:14:54AM +0800, Yu Liao wrote:
-> Use the standard error pointer macro to shorten the code and simplify.
+> > O.K, not ideal. For C22, you could just put the ID values in the
+> > compatible, which is enough to get a driver loaded which supports that
+> > ID. But somebody recently commented that that does not work for C45. I
+> > assume NXP has an OUI, and could allocate an ID to this device in
+> > retrospect. So maybe it makes sense to make C45 work with an ID in the
+> > compatible? And get the driver loaded that way?
+> > 
+> > 	Andrew
 > 
-> Signed-off-by: Yu Liao <liaoyu15@huawei.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_fs.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+> There are 2 clarification questions that I can think of right now.
+> Maybe more later.
 > 
+> First: Compatible strings per C45 MMD? Drivers per C45 MMD? Is there
+> supposed to be an interest in that? I might end up needing it (see the
+> problem description in the cover letter, with PCS and AN/LT block merged
+> into the same MDIO address, but responding to separate MMDs)
+> 
+> Second: Suppose I add something like "ethernet-phy-ieee802.3-c45-idXXXX.XXXX".
+> Do I replace just this with that:
+> 
+> compatible = "fsl,lx2160a-backplane-anlt", "ethernet-phy-ieee802.3-c45";
+> 
+> or also this?
+> 
+> compatible = "fsl,lx2160a-secondary-anlt";
+> 
+> 
+> I suppose it would be just the first one, but going that route would IMO
+> just increase the dissonance between the description of primary and
+> secondary AN/LT blocks. They're the same IP blocks, don't they also have
+> the same fake PHY ID?
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+For C22 PHYs, the ID registers are only used to ask user space to load
+a driver which supports that ID, and then used to match a device to a
+driver. We often say that if the ID registers don't actually contain
+an ID, or the wrong ID, use ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$
+to let the subsystem know the correct ID.
+
+The device you are trying to support has the same problem, invalid
+IDs, but its C45.
+
+C45 IDs however work slightly differently. An C45 package can have
+multiple devices in it, up to 32. Each device has its own ID
+registers. So there can be up to 32 different IDs for one package. The
+core will try to determine which of the 32 devices are actually in the
+package, and if they are, what the ID is. It then asks user space to
+load a driver for all the IDs it finds. And when matching devices to
+drivers, it sees if any of the ID of the package matches the IDs the
+driver says it supports. If a match is found, that one driver is
+expected to drive all the devices in that one package.
+
+I don't see a need for ethernet-phy-ieee802.3-c45-idXXXX.XXXX,
+ethernet-phy-ieee802.3-idXXXX.XXXX should be sufficient, since all you
+are doing it matching the ID against the driver. That matching does
+not differ between C22 and C45. 
+
+Saying "ethernet-phy-ieee802.3-c45" might be useful, because at the
+moment we have a mixup between C45 register space and C45 bus
+transactions. The drive is free to access C22 and/or C45 registers,
+since it should know what the device actually has. But some of the
+core might get the wrong idea without "ethernet-phy-ieee802.3-c45".
+
+O.K, that the background now:
+
+> First: Compatible strings per C45 MMD? Drivers per C45 MMD
+
+So far, nobody has needed that. All current drivers are package
+drivers, they drive all the devices in the package. At least for a
+PHY, there is close integration between devices in a package. Russell
+has commented that the Marvell 10G PHY does appear to contain a number
+of licensed devices, but so far, we have not noticed the same licensed
+device used by multiple vendors. So there has not been any need to
+reuse code.
+
+However, it sounds like the package you are trying to support does
+contain multiple independent devices. So from an architecture
+perspective, having multiple drivers would make sense, even if there
+is no reuse. But are the devices PHY? Everything i've said so far
+applies to PHYs. It does not apply to a PCS, etc.
+
+	Andrew
 
