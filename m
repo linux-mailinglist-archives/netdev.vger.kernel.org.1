@@ -1,103 +1,88 @@
-Return-Path: <netdev+bounces-29507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCFF78386D
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF84783872
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD744280F9F
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:19:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07418280FC4
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A9315D2;
-	Tue, 22 Aug 2023 03:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94115111F;
+	Tue, 22 Aug 2023 03:19:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844FE7F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:18:45 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5CA2E185;
-	Mon, 21 Aug 2023 20:18:44 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37M3HsJeA005069, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37M3HsJeA005069
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 22 Aug 2023 11:17:54 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Tue, 22 Aug 2023 11:18:16 +0800
-Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Tue, 22 Aug
- 2023 11:18:16 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <jiri@resnulli.us>, <andrew@lunn.ch>,
-        Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH net-next v6 2/2] MAINTAINERS: Add the rtase ethernet driver entry
-Date: Tue, 22 Aug 2023 11:18:05 +0800
-Message-ID: <20230822031805.4752-3-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230822031805.4752-1-justinlai0215@realtek.com>
-References: <20230822031805.4752-1-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFCF7F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:19:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30967C433C8;
+	Tue, 22 Aug 2023 03:19:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692674388;
+	bh=2r3suyvcvQkyDG+OrfD6flChPa5pj7JbcjYn/2h6/mE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t12waQRPevfJ3cmcPUVa36tvPvveRAnrbdKul0v82lSPOxSx/KYzf5mIZrvsWVd8f
+	 cvpnC3QFLaAUeHRl0nDgBd5ittRHpDVLOzIGdDv+BfuvqshnMI1L/T4L0FhnWXVrrf
+	 4XR/Bu0+hTaUBzdFF7HXPFLai7GBgL4Iyf8tHFMe6IJ3C2OPTEpx7zoqg0TjO3Zs8C
+	 LtLNDRB8FxsQv216gdPusDRPmzTnNadw208HUYtnAg6Z8/MKqbv+3cLU4ea7haPEoy
+	 D9yvyaPpS7j95PMEIbYBLvw1P2eXuzxk9dGydlruMiTaPYG2nO42ihQlBRsRZ0gbEp
+	 GZoXMIbjR6paw==
+Message-ID: <462ccad0-867e-3ef3-ca78-59d8a6e451b3@kernel.org>
+Date: Mon, 21 Aug 2023 20:19:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.21.210.160]
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
+ dma-buf to netdevice
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>, sdf@google.com,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20230810015751.3297321-1-almasrymina@google.com>
+ <20230810015751.3297321-3-almasrymina@google.com>
+ <7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
+ <20230815171638.4c057dcd@kernel.org>
+ <64dcf5834c4c8_23f1f8294fa@willemb.c.googlers.com.notmuch>
+ <c47219db-abf9-8a5c-9b26-61f65ae4dd26@kernel.org>
+ <20230817190957.571ab350@kernel.org>
+ <CAHS8izN26snAvM5DsGj+bhCUDjtAxCA7anAkO7Gm6JQf=w-CjA@mail.gmail.com>
+ <7cac1a2d-6184-7cd6-116c-e2d80c502db5@kernel.org>
+ <20230818190653.78ca6e5a@kernel.org>
+ <38a06656-b6bf-e6b7-48a1-c489d2d76db8@kernel.org>
+ <CAF=yD-KgNDzv3-MhOMOTe2bTw4T73t-M7D65MpeG6vDBqHzrtA@mail.gmail.com>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAF=yD-KgNDzv3-MhOMOTe2bTw4T73t-M7D65MpeG6vDBqHzrtA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add myself and Larry Chiu as the maintainer for the rtase ethernet driver.
+On 8/19/23 8:18 AM, Willem de Bruijn wrote:
+> That may be an incentive for vendors to support per-queue
+> start/stop/alloc/free. Maybe the ones that support RDMA already do?
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+I looked at most of the H/W RDMA in-tree kernel drivers today, and all
+of them hand-off create_qp to firmware. I am really surprised by that
+given that many of those drivers work with netdev. I am fairly certain
+mlx5 and ConnectX 5-6, for example, can be used to achieve the
+architecture we proposed at netdev [1], so I was expecting a general
+queue management interface.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 53b7ca804465..239aae94dc0f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18476,6 +18476,13 @@ L:	linux-remoteproc@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/rpmsg_tty.c
- 
-+RTASE ETHERNET DRIVER
-+M:	Justin Lai <justinlai0215@realtek.com>
-+M:	Larry Chiu <larry.chiu@realtek.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/realtek/rtase/
-+
- RTL2830 MEDIA DRIVER
- M:	Antti Palosaari <crope@iki.fi>
- L:	linux-media@vger.kernel.org
--- 
-2.34.1
+Between that and a skim of the providers (userspace side of it), the IB
+interface may be a dead-end from the perspective of the goals here.
 
+[1]
+https://netdevconf.info/0x16/slides/34/netdev-0x16-Merging-the-Networking-Worlds-slides.pdf,
+slide 14.
 
