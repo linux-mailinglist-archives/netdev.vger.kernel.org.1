@@ -1,88 +1,122 @@
-Return-Path: <netdev+bounces-29509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF84783872
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:20:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FCFA78387A
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:28:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07418280FC4
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:20:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 710681C209E2
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94115111F;
-	Tue, 22 Aug 2023 03:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B489139B;
+	Tue, 22 Aug 2023 03:28:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFCF7F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:19:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30967C433C8;
-	Tue, 22 Aug 2023 03:19:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692674388;
-	bh=2r3suyvcvQkyDG+OrfD6flChPa5pj7JbcjYn/2h6/mE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=t12waQRPevfJ3cmcPUVa36tvPvveRAnrbdKul0v82lSPOxSx/KYzf5mIZrvsWVd8f
-	 cvpnC3QFLaAUeHRl0nDgBd5ittRHpDVLOzIGdDv+BfuvqshnMI1L/T4L0FhnWXVrrf
-	 4XR/Bu0+hTaUBzdFF7HXPFLai7GBgL4Iyf8tHFMe6IJ3C2OPTEpx7zoqg0TjO3Zs8C
-	 LtLNDRB8FxsQv216gdPusDRPmzTnNadw208HUYtnAg6Z8/MKqbv+3cLU4ea7haPEoy
-	 D9yvyaPpS7j95PMEIbYBLvw1P2eXuzxk9dGydlruMiTaPYG2nO42ihQlBRsRZ0gbEp
-	 GZoXMIbjR6paw==
-Message-ID: <462ccad0-867e-3ef3-ca78-59d8a6e451b3@kernel.org>
-Date: Mon, 21 Aug 2023 20:19:47 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4E97F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:28:00 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99BB1CCA;
+	Mon, 21 Aug 2023 20:27:47 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37M3R5TO0001870, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37M3R5TO0001870
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 22 Aug 2023 11:27:05 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Tue, 22 Aug 2023 11:26:28 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Tue, 22 Aug 2023 11:26:28 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Tue, 22 Aug 2023 11:26:28 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek automotive PCIe driver code
+Thread-Topic: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek
+ automotive PCIe driver code
+Thread-Index: AQHZz4Ya38d07ViN20S7bf3O9T4Qta/q9pcAgAMgk2D//87KAIABzfpQ///CfgCABJnu0IAALOEAgACljtD//5/vgAAlziXA
+Date: Tue, 22 Aug 2023 03:26:28 +0000
+Message-ID: <e4f258b5e3d14a04a841d9d2b2ac82ef@realtek.com>
+References: <20230815143756.106623-1-justinlai0215@realtek.com>
+ <20230815143756.106623-2-justinlai0215@realtek.com>
+ <95f079a4-19f9-4501-90d9-0bcd476ce68d@lunn.ch>
+ <4955506dbf6b4ebdb67cbb738750fbc8@realtek.com>
+ <eb245c85-0909-4a75-830d-afb96ccd5d38@lunn.ch>
+ <4951391892534eaeb2da96f052364e4c@realtek.com>
+ <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
+ <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
+ <97f3744d-afbf-4562-9168-5b9e211fac1f@lunn.ch>
+ <4db3248874d64418b63fdf5c5e8a0f79@realtek.com>
+ <3e5b2f0a-3661-4147-bc4e-784eecf41364@lunn.ch>
+In-Reply-To: <3e5b2f0a-3661-4147-bc4e-784eecf41364@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXMBS04.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
- dma-buf to netdevice
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>, sdf@google.com,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-3-almasrymina@google.com>
- <7dd4f5b0-0edf-391b-c8b4-3fa82046ab7c@kernel.org>
- <20230815171638.4c057dcd@kernel.org>
- <64dcf5834c4c8_23f1f8294fa@willemb.c.googlers.com.notmuch>
- <c47219db-abf9-8a5c-9b26-61f65ae4dd26@kernel.org>
- <20230817190957.571ab350@kernel.org>
- <CAHS8izN26snAvM5DsGj+bhCUDjtAxCA7anAkO7Gm6JQf=w-CjA@mail.gmail.com>
- <7cac1a2d-6184-7cd6-116c-e2d80c502db5@kernel.org>
- <20230818190653.78ca6e5a@kernel.org>
- <38a06656-b6bf-e6b7-48a1-c489d2d76db8@kernel.org>
- <CAF=yD-KgNDzv3-MhOMOTe2bTw4T73t-M7D65MpeG6vDBqHzrtA@mail.gmail.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CAF=yD-KgNDzv3-MhOMOTe2bTw4T73t-M7D65MpeG6vDBqHzrtA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/19/23 8:18 AM, Willem de Bruijn wrote:
-> That may be an incentive for vendors to support per-queue
-> start/stop/alloc/free. Maybe the ones that support RDMA already do?
+> > But I2C, SPI, MDIO are connected to the SoC through this chip's
+> > external pins, not on the PCIe bus.
+>=20
+> Thanks, that was the information i was trying to get at.
+>=20
+> > Actually, there is the other function in the PCIe GMAC(Multiple
+> > function) to manage the registers of Switch Core.  Should they be
+> > integrated into the MFD driver?
+>=20
+> Can you cleanly attach another PCI driver to those functions?
 
-I looked at most of the H/W RDMA in-tree kernel drivers today, and all
-of them hand-off create_qp to firmware. I am really surprised by that
-given that many of those drivers work with netdev. I am fairly certain
-mlx5 and ConnectX 5-6, for example, can be used to achieve the
-architecture we proposed at netdev [1], so I was expecting a general
-queue management interface.
+Yes, they could be attached individually
 
-Between that and a skim of the providers (userspace side of it), the IB
-interface may be a dead-end from the perspective of the goals here.
+> You need to use an MFD when there is a single top level addressable block=
+ of
+> hardware which has multiple functions. Thank of an I2C device, which has =
+a
+> single address on the bus, but multiple functions.
+> Access to that one address needs to be shared via multiple drivers. The M=
+FD
+> framework provides the glue to share access to the hardware.
+>=20
+> However, PCI identification and addressing is more flexible. So long as t=
+hey are
+> separate PCI functions, you should be able to load two drivers and not ha=
+ve
+> problems. Then you don't need an MFD.
 
-[1]
-https://netdevconf.info/0x16/slides/34/netdev-0x16-Merging-the-Networking-Worlds-slides.pdf,
-slide 14.
+Thank you very much for your comments and time for review.=20
 
