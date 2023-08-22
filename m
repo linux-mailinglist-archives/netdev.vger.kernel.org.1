@@ -1,143 +1,142 @@
-Return-Path: <netdev+bounces-29776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8813F784A5E
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 21:25:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89792784A65
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 21:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33291281189
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 19:25:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 726051C20B34
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 19:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E3934CC5;
-	Tue, 22 Aug 2023 19:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D9C34CC8;
+	Tue, 22 Aug 2023 19:27:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F0F1DDE3
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 19:25:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E31E46
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 12:25:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692732321;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KmPOg9DvMteU/NG+0kZXy4KRyPDAtWZoS7j3SG6N+yY=;
-	b=YFMb39CMWmhI5NW1UFYAuTV/T3YpXPXB40E2xGMalcrmdd0uzMB/c+9GMMJUX0YjTsQDmu
-	zoZcV9dQ9DbgHfAVKJiA0aFFh3Hrb4aBG0JknPefyhp5kCoab1I/w5KRggyqEWMqlpyR6I
-	36Y32KD5B1RUWOeDpjQNNBFaBHzeNkI=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-158-asmf7MtMOguCdJ9t7SVqmw-1; Tue, 22 Aug 2023 15:25:19 -0400
-X-MC-Unique: asmf7MtMOguCdJ9t7SVqmw-1
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6b9c82f64b7so4600001a34.3
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 12:25:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDB71DDE3;
+	Tue, 22 Aug 2023 19:27:38 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 465A9DB;
+	Tue, 22 Aug 2023 12:27:37 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2bb8a12e819so75636221fa.1;
+        Tue, 22 Aug 2023 12:27:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692732455; x=1693337255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fht3QKsJ0Em+gRERcuW1SNPpfzbxKyt4TgAwcB5JFqw=;
+        b=NOGNtkyMb09eNpbrAHsbuFUtWrnkqmG6s8qL5C5JR+15bJvedqjgin4gx1YkZFi7M0
+         6PHscjMMWBkdGIf+AqKLlBeaePRGl4EBJd4vx57rsuW7dvAxs25QiCKjqRqq069CmO+Y
+         TYA0Hbe6k6w7zQGbG55aUuo6f4zMIIIwNpvf7OgEZyXFEONR+hXFGc32jlN3E4SoqUK5
+         bFGqcBjwXk7MjOOWVpszfcLgvAl4TzVJsUQ6MO8mqGJIeQJ1X/274dFuAIjiuqPSNtkH
+         jnAlRAuW+sFESrlo/fy2MZ24+xcvr+F0glcLSowL6UV1f8G+S8XXu6T7HZzqx3S0eWKp
+         c6sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692732319; x=1693337119;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KmPOg9DvMteU/NG+0kZXy4KRyPDAtWZoS7j3SG6N+yY=;
-        b=RluwDg9Iff9NbBlHVrtzFfADEXrKCTD1Ht8m6Q4O4npzr/EKhRyzV160CLxipMhWOX
-         +bEMUdezFXc1wIdbLVEw5Egexl7S8DgGTJHxIx8evjK4YDrqBZ5AYB4OIhRyxcdHrtzq
-         qA3gtzM9cUwuCGgunZv3kvmNDqVn/foKMb9sV0lkK3M0bnEVPD0KGCcTcxlmRGdSvOPo
-         kRaJor7zcGqaWkYzBK/dmial3LJhQ8M8PiAXQcqBDFCZ3sW4mE/QlWKAlz1OGXEc9aTI
-         6wk4KrgeKyte+ej5gDdotes0fuZj1x92HEaByNfnJ6aB4TVFD6p8dzGVMp3bfgk4NAzr
-         gzJQ==
-X-Gm-Message-State: AOJu0YwxLkxLcwxBW+SK3+XkPMvBBmC6MBCRI+tbJm+aPVt25UuVRO7W
-	vB7+d/Ljnj/yKUmxgT6dGvPbnlBGSZUJM1NWd5Y4qTpI4kHDvJE/B67JJZFEdNPIK316TC5X4gY
-	lhIrBGaeklS3dmuIZ
-X-Received: by 2002:a05:6830:1dae:b0:6b8:7d12:423d with SMTP id z14-20020a0568301dae00b006b87d12423dmr9464531oti.18.1692732318894;
-        Tue, 22 Aug 2023 12:25:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHHVSVa8YWQKWZRoR2F6ZHKC2dhlJzbVFI68d2qU3IG2H4ZRkvaanWpsM1ThlZDIKYVNCAJCA==
-X-Received: by 2002:a05:6830:1dae:b0:6b8:7d12:423d with SMTP id z14-20020a0568301dae00b006b87d12423dmr9464520oti.18.1692732318664;
-        Tue, 22 Aug 2023 12:25:18 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id t12-20020a0568301e2c00b006b8bf76174fsm4895737otr.21.2023.08.22.12.25.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 12:25:17 -0700 (PDT)
-Date: Tue, 22 Aug 2023 13:25:15 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
- <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
- <kevin.tian@intel.com>, <shannon.nelson@amd.com>
-Subject: Re: [PATCH vfio] vfio/pds: Send type for SUSPEND_STATUS command
-Message-ID: <20230822132515.51cacfc0.alex.williamson@redhat.com>
-In-Reply-To: <20230821184215.34564-1-brett.creeley@amd.com>
-References: <20230821184215.34564-1-brett.creeley@amd.com>
-Organization: Red Hat
+        d=1e100.net; s=20221208; t=1692732455; x=1693337255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fht3QKsJ0Em+gRERcuW1SNPpfzbxKyt4TgAwcB5JFqw=;
+        b=ZT7dhpEsx3CgQ8ULOXT4TxW1cUp5iP+1Y5IqAIa77xWntA4QRvsihIPrV7X2kT0FA6
+         dk9Z2s876X5hjDFOwr2tZyQu+GkAKVjGsOqbvuqVRwEiv8j11bqk3O+jkuGFwinz8rHn
+         5xO/olHiHW+FzuHgOXpby71Y4KstnGQjJipI/ktFDgYVvyerhxoranHlUCrL90WV9eoY
+         Jg27PWG8lE7zoY7w918/M7kROsd2AeZ+I1xTcmtIPQVawi7fJuDjM1OxXvyjUdAa1903
+         9wLdKcyBrK55acSzRs5lhsoyJ8YpIoSCwaW02qkrsF/McxoVNlHgvb6gHcNTeMS+GeuL
+         POKw==
+X-Gm-Message-State: AOJu0Yw/q27zIBzcaOJyXyYDeGKJhG+ZgSG75FTydgxRqOW3ovL0ACrA
+	TVkIMPcXYSrN7BvF6hH5+133orRRf6pnL3IyVwc=
+X-Google-Smtp-Source: AGHT+IEm+x96sGisjUtLl777n7A0nCYqjUp4DkvVzc7IfagSJAkAQNDwSeM2PeWeKED1ANyxHFaqG6QqxeUvNdFqUug=
+X-Received: by 2002:a2e:b0e4:0:b0:2bc:d0f8:fb4f with SMTP id
+ h4-20020a2eb0e4000000b002bcd0f8fb4fmr2291557ljl.7.1692732455148; Tue, 22 Aug
+ 2023 12:27:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230822142255.1340991-1-toke@redhat.com>
+In-Reply-To: <20230822142255.1340991-1-toke@redhat.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 22 Aug 2023 12:27:24 -0700
+Message-ID: <CAADnVQKEru25sk8sP0L_GsCW67PUAfTukWNEpTc1nRafQa81GA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 0/6] samples/bpf: Remove unmaintained XDP sample utilities
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 21 Aug 2023 11:42:15 -0700
-Brett Creeley <brett.creeley@amd.com> wrote:
+On Tue, Aug 22, 2023 at 7:23=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
+oke@redhat.com> wrote:
+>
+> The samples/bpf directory in the kernel tree started out as a way of show=
+casing
+> different aspects of BPF functionality by writing small utility programs =
+for
+> each feature. However, as the BPF subsystem has matured, the preferred wa=
+y of
+> including userspace code with a feature has become the BPF selftests, whi=
+ch also
+> have the benefit of being consistently run as part of the BPF CI system.
+>
+> As a result of this shift, the utilities in samples/bpf have seen little =
+love,
+> and have slowly bitrotted. There have been sporadic cleanup patches over =
+the
+> years, but it's clear that the utilities are far from maintained.
+>
+> For XDP in particular, some of the utilities have been used as benchmarki=
+ng aids
+> when implementing new kernel features, which seems to be the main reason =
+they
+> have stuck around; any updates the utilities have seen have been targeted=
+ at
+> this use case. However, as the BPF subsystem as a whole has moved on, it =
+has
+> become increasingly difficult to incorporate new features into these util=
+ities
+> because they predate most of the modern BPF features (such as kfuncs and =
+BTF).
+>
+> Rather than try to update these utilities and keep maintaining them in th=
+e
+> kernel tree, we have ported the useful features of the utilities to the
+> xdp-tools package. In the porting process we also updated the utilities t=
+o take
+> advantage of modern BPF features, integrated them with libxdp, and polish=
+ed the
+> user interface.
+>
+> As these utilities are standalone tools, maintaining them out of tree is
+> simpler, and we plan to keep maintaining them in the xdp-tools repo. To d=
+irect
+> users of these utilities to the right place, this series removes the util=
+ities
+> from samples/bpf, leaving in place only a couple of utilities whose
+> functionality have not yet been ported to xdp-tools.
+>
+> The xdp-tools repository is located on Github at the following URL:
+>
+> https://github.com/xdp-project/xdp-tools
 
-> Commit bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
-> added live migration support for the pds-vfio-pci driver. When
-> sending the SUSPEND command to the device, the driver sets the
-> type of suspend (i.e. P2P or FULL). However, the driver isn't
-> sending the type of suspend for the SUSPEND_STATUS command, which
-> will result in failures. Fix this by also sending the suspend type
-> in the SUSPEND_STATUS command.
-> 
-> Fixes: bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
->  drivers/vfio/pci/pds/cmds.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+Could you add this link with details to samples/bpf/README.rst,
+so that folks know where to look for them?
 
-Applied to vfio next branch for v6.6.  Thanks,
-
-Alex
-
-> 
-> diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
-> index b0d88442b091..36463ccc3df9 100644
-> --- a/drivers/vfio/pci/pds/cmds.c
-> +++ b/drivers/vfio/pci/pds/cmds.c
-> @@ -86,12 +86,13 @@ void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio)
->  }
->  
->  static int
-> -pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
->  {
->  	union pds_core_adminq_cmd cmd = {
->  		.lm_suspend_status = {
->  			.opcode = PDS_LM_CMD_SUSPEND_STATUS,
->  			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +			.type = type,
->  		},
->  	};
->  	struct device *dev = pds_vfio_to_dev(pds_vfio);
-> @@ -156,7 +157,7 @@ int pds_vfio_suspend_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
->  	 * The subsequent suspend status request(s) check if the firmware has
->  	 * completed the device suspend process.
->  	 */
-> -	return pds_vfio_suspend_wait_device_cmd(pds_vfio);
-> +	return pds_vfio_suspend_wait_device_cmd(pds_vfio, type);
->  }
->  
->  int pds_vfio_resume_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
-
+Other than that the set makes sense to me.
 
