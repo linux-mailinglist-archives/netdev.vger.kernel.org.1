@@ -1,85 +1,131 @@
-Return-Path: <netdev+bounces-29758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53BE7784957
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:20:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7140578496B
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:30:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A433F2811A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:20:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266262810ED
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4A41DDE1;
-	Tue, 22 Aug 2023 18:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE4F2B56F;
+	Tue, 22 Aug 2023 18:30:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A1C1D2F9
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B66FC433C9;
-	Tue, 22 Aug 2023 18:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692728423;
-	bh=C1pqjOji5dbhWyQPts8YZ0FiD5Zi7ocA9kgmdx+ppTg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qE+VPYL3eXVMo5EOBF1p7ZIGCLXJTVLhHSuGL0SFx08VFqpyJ69TeGKs2AffePVEk
-	 Hmua0l2T+CipGrRCWpYc+1RRW+YYIFekLHx1d4/QD6YlX2Pf5wZUjgrCULUTe9iLlS
-	 /ctQwDJyPyu/EM+OhZKn0FNgHyER60Jdd21ECU7ESonjMQg4EXcJ9ILGjmWF3D8hAr
-	 CtVYJzppa7501XrBRYfz0dUUc60S8kHoM9eWBZ5lhwTCredjxjN0um5Qe+xTuyalTG
-	 bCnzf+CaMjTkL+l2wEAzQ/YoUK0r7/WjLzhVcKWsr5PrdLX7tbc/ooPR/XVyM9XWqY
-	 sulBfC4TeQerQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5BB61C595CE;
-	Tue, 22 Aug 2023 18:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AC41E505
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:30:54 +0000 (UTC)
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49258CCB;
+	Tue, 22 Aug 2023 11:30:53 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-56c2e882416so1474584a12.3;
+        Tue, 22 Aug 2023 11:30:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692729053; x=1693333853;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FJwN0ydvfICl3fI2kvxn1N5nH6/CDUK6G2PaZVpxA4I=;
+        b=hSDt/TD0ikAtNwtZ/R+RmB9AnmPP/Zt3LFAdNhjxdksgR3jt+3TV5tmZ49lX6A5gw1
+         iaor2/05gYCEgOVxPfkXc+Dk97g7uTswGkptiGZRZCmZWtrgdx1eAzPlr4LycxpAIMa9
+         KoWrblxUCtqmR8JVrCDnEsYMNVS30Ww6o4JCpNTEI0yx2Y2cPJ50PQjpHQ2pF7nCSvsc
+         jea+nJrrcTrq1RIaeXJ7u4X9WnnEaWdswsIlM9zaUukvCU4Gxpyyle/AGf3EhugLJn77
+         sjYhbDb4JIHM1zoERBoeEoK7WvY11sknovnpkS81AXk7e1cI3y9ARqzdXO7lmuw9yb/M
+         LnUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692729053; x=1693333853;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FJwN0ydvfICl3fI2kvxn1N5nH6/CDUK6G2PaZVpxA4I=;
+        b=GPOxQ2xeKny09N8c4u6j6tUsDXQqDInfMLJ+Dwl+qZtfAkWfEERLm+Kcds0qr+A+VS
+         2QZNkHRe8L+0OI4mf5rajz0+EtNHDDbSq7zLW1B+nU3JCcGdGGc3UHUIii6HsKdrbK5D
+         1Aa1OlipGkZAZzWc2d5/7RPwqB8iKT2mqQc709ta+TjEZ/JuHGtTR3Na+j81OFVy6sY4
+         FPwvRmPUTUvyGvH/4iwV9uw/euHAlCaGb9ZkWDeZG3x/PPcy370ehe+BlZK6J/OuyJVw
+         ec7VvfQLi1ISpQ3eyTozPqadx4GYkoc0l+9L2WBIH/RZ1XfTwjTklqJ/mfhkhp+ct4ul
+         Ro4Q==
+X-Gm-Message-State: AOJu0Yx7a4GcDBL4Ty4iYbO/0DTYE4dgSAfXWD6cfBYXAEi3Jp3Kl2D1
+	UdpRoe6OrHjUuAF+tKvo/OhKwV39vw1pg3klo6s=
+X-Google-Smtp-Source: AGHT+IG70G5bzkRI9NiQyhps9POkN+ANs3KDZSZWmvxZeIyJrZIwsEnxBL/fPY4TunWbkrhDFMUxo4naz3HCEWkNr8k=
+X-Received: by 2002:a17:90b:4c81:b0:26b:219f:3399 with SMTP id
+ my1-20020a17090b4c8100b0026b219f3399mr6351074pjb.35.1692729052643; Tue, 22
+ Aug 2023 11:30:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] sfc: allocate a big enough SKB for loopback selftest
- packet
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169272842337.23867.1886199095677767522.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Aug 2023 18:20:23 +0000
-References: <20230821180153.18652-1-edward.cree@amd.com>
-In-Reply-To: <20230821180153.18652-1-edward.cree@amd.com>
-To:  <edward.cree@amd.com>
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, ecree.xilinx@gmail.com,
- netdev@vger.kernel.org, habetsm.xilinx@gmail.com, andy.moreton@amd.com
+References: <20230816100113.41034-1-linyunsheng@huawei.com>
+ <20230816100113.41034-2-linyunsheng@huawei.com> <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
+ <20230817091554.31bb3600@kernel.org> <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
+ <20230817165744.73d61fb6@kernel.org> <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
+ <20230818145145.4b357c89@kernel.org> <1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
+ <20230821113543.536b7375@kernel.org> <5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
+ <20230822083821.58d5d26c@kernel.org>
+In-Reply-To: <20230822083821.58d5d26c@kernel.org>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 22 Aug 2023 11:30:15 -0700
+Message-ID: <CAKgT0UeyRSa6LC8rmA0ottkTdYo3bv36THnCe2Yaba0xca5BHg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Mina Almasry <almasrymina@google.com>, davem@davemloft.net, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Tue, Aug 22, 2023 at 8:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 22 Aug 2023 17:21:35 +0800 Yunsheng Lin wrote:
+> > > .. we should also add a:
+> > >
+> > >     WARN_ONCE(1, "misaligned DMA address, please report to netdev@");
+> >
+> > As the CONFIG_PHYS_ADDR_T_64BIT seems to used widely in x86/arm/mips/po=
+werpc,
+> > I am not sure if we can really make the above assumption.
+> >
+> > https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_AD=
+DR_T_64BIT
+>
+> Huh, it's actually used a lot less than I anticipated!
+>
+> None of the x86/arm/mips/powerpc systems matter IMHO - the only _real_
+> risk is something we don't know about returning non-aligned addresses.
+>
+> Unless we know about specific problems I'd suggest we took the simpler
+> path rather than complicating the design for systems which may not
+> exist.
+>
+> Alex, do you know of any such cases? Some crazy swiotlb setting?
+> WDYT about this in general?
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+There may be scenarios where if bounce buffers are used the page may
+not be aligned. It all comes down to how
+swiotlb_tbl_map_single(https://elixir.free-electrons.com/linux/v6.5-rc7/C/i=
+dent/swiotlb_tbl_map_single)
+is called. In the IOMMU case it looks like they take the extra step of
+passing an alignment value, but it looks like for the other two cases
+they don't.
 
-On Mon, 21 Aug 2023 19:01:53 +0100 you wrote:
-> From: Edward Cree <ecree.xilinx@gmail.com>
-> 
-> Cited commits passed a size to alloc_skb that was only big enough for
->  the actual packet contents, but the following skb_put + memcpy writes
->  the whole struct efx_loopback_payload including leading and trailing
->  padding bytes (which are then stripped off with skb_pull/skb_trim).
-> This could cause an skb_over_panic, although in practice we get saved
->  by kmalloc_size_roundup.
-> Pass the entire size we use, instead of the size of the final packet.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] sfc: allocate a big enough SKB for loopback selftest packet
-    https://git.kernel.org/netdev/net/c/6dc5774deefe
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Changing that behavior wouldn't take much though. Basically we would
+just need to do something like look at the size and address and if
+they are both page aligned then we could specify a page alignment for
+the DMA mapping.
 
