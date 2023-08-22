@@ -1,82 +1,64 @@
-Return-Path: <netdev+bounces-29745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E947A7848EA
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:01:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B87784903
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA1E81C20BA9
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:01:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD3E3281180
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6423A1DDC3;
-	Tue, 22 Aug 2023 18:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310641DA2D;
+	Tue, 22 Aug 2023 18:01:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90CD2B577
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7DC3CC433CA;
-	Tue, 22 Aug 2023 18:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1382B577
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:01:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AF09C433C8;
+	Tue, 22 Aug 2023 18:01:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692727224;
-	bh=dO7qQ9bDHnVf4s5BRyHnVITB425xgJnsP3lzdvYNyes=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GdDGTCvDWMh4mkUgTxoQ5gKdBOdMWuTLMtiiUDHj8+iDCVSGGJ5YxIamPKlWSPcTf
-	 IG8M2JJiACSBo1QLLBxGrGkNu+v5coKu1SeBq8fNvCuL75KYZmodagOU5xd9y+CBEj
-	 naXo98UEizvUvkgdsvMPGRpP722UgQeej3fV01s+kQm2T7U1Q9kiwNgH6ncIMoGJF1
-	 nI5GARPrBQcwmLd2gE9r5bilRqyOzhpHYsjLq6ZPIwvVLZ+DO3tmPF9pNtJxzEZC4H
-	 0WsbFSemDH2xA13aqaaxy2KSY/gPm48hPhrs4D7+Yd9FNkYpTvO712VbXmQ2XzVjyj
-	 8FTFrIqL/Lplg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 617ADE21EDC;
-	Tue, 22 Aug 2023 18:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692727299;
+	bh=hBTOuyz8Nt7hcba2eNXqyX4Y0J/02IjEk3pmEmSZmiU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jaswbUAThItRiQaPaN86kz78ooHgBPVR7pMuCG0iCNo6cDVi3p8C6ofUIDeGwFkMM
+	 km08vrAWMl8Suls+uELLTFoU/dQR67nRINxgGbm0wpiIW+WGdD+ZPfti3lI55S8696
+	 PPSxezV/h09e25GJoUjLicck+wfQJhc5kkT1YoGJvm6p9V6LYdzysLL1BdqPud1tp/
+	 3MHTVBcSxN/GvBumzi3vfjtDXZdreZpL5RSNdkC+X1idaPcER7PSCfbqti22VHi6C+
+	 7tpi5Hg1zx/ff9I7VT3dcef/T9KIjIrpcwhJVMvpBaAaXysKcX/r9Mf4PAiK1UwaGb
+	 rmFa5DOv2tmFA==
+Date: Tue, 22 Aug 2023 11:01:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
+ <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Sujuan Chen
+ <sujuan.chen@mediatek.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix NULL pointer on
+ hw reset
+Message-ID: <20230822110138.10252779@kernel.org>
+In-Reply-To: <5465c1609b464cc7407ae1530c40821dcdf9d3e6.1692634266.git.daniel@makrotopia.org>
+References: <5465c1609b464cc7407ae1530c40821dcdf9d3e6.1692634266.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: microchip: Remove unused declarations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169272722439.9690.5447976597631105113.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Aug 2023 18:00:24 +0000
-References: <20230821135556.43224-1-yuehaibing@huawei.com>
-In-Reply-To: <20230821135556.43224-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
- daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 21 Aug 2023 17:12:44 +0100 Daniel Golle wrote:
+> Changes since v1:
+>  * remove unneeded {} initialization for stack allocated memory
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 21 Aug 2023 21:55:56 +0800 you wrote:
-> Commit 264a9c5c9dff ("net: sparx5: Remove unused GLAG handling in PGID")
-> removed sparx5_pgid_alloc_glag() but not its declaration.
-> Commit 27d293cceee5 ("net: microchip: sparx5: Add support for rule count by cookie")
-> removed vcap_rule_iter() but not its declaration.
-> Commit 8beef08f4618 ("net: microchip: sparx5: Adding initial VCAP API support")
-> declared but never implemented vcap_api_set_client().
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: microchip: Remove unused declarations
-    https://git.kernel.org/netdev/net-next/c/dff96d7c0cda
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+s/stack/.bss/, FWIW, thanks for updating!
 
