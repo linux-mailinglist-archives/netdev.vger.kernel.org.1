@@ -1,69 +1,62 @@
-Return-Path: <netdev+bounces-29760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C9E78496C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:33:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B133784996
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673BA1C20BCC
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:33:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21296281170
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488701CA17;
-	Tue, 22 Aug 2023 18:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A839E1DA2C;
+	Tue, 22 Aug 2023 18:50:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4092B542
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988B02B55A
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:50:02 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B1BCD1;
-	Tue, 22 Aug 2023 11:33:44 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD4BCD1
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:50:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ekQ2+z1rJ3Hgh9TnPo6eVKPd6yHPuM9PqoaemUvTtM8=; b=lRa+WD04bpeFSjyHCgoPsaIbnI
-	n6EgIFXz69dJ5alQuX1Am2hpU9aOkHxFmJrqI0oZx5oCfAbTLuwlwhsg6lIlXLoxLQVid4M/7mlys
-	teTokCNPVCWRMnWXqwd8nHk87jh6sNhysQVYrELBFHj0Fk0CrfoBbNxh0Gd6043NmR/VPZ0d6FgRd
-	EhvPOatk3x2fIo9umhjUe30avKbL/CuD17F6cwlLGfgKsOIbOzixgIsLG8Fm5bLfVeLEozT6oOpcc
-	AYgEgSk7NM4ICPWlj/+69v1arJfQtqStcApGSx5DHahKdLGES+RPslkuOmwCF1YszOpJ/bRYVfl0H
-	f/HcePBQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35082)
+	bh=blH/hqqKqMi+gy0guzeEpc4bpRaUzWv6qZAMAVdyYUQ=; b=QXF9ZXHiJwEJYjjC/ZVXCMSte8
+	/O58QCUo0VyBOox5unGFleYn4FN+iT6dZJ/+LSulXbiXdkAv0bfie2m2fbzZTg5TTpG4ddbA5K842
+	xu/194PYLkv0ArzZCFZtmrKUMR+eWBgyqQUidvEK1kCF8see+xmVYyUxntG72QmEVDEdjR6S5b/d6
+	h55XUE3mvZ8lH4k+W109dM9GKmOBk5z4oPF3q0pN2bR26bCjkKcIB6tO/o5QAQRS5jQAT1t2bsJqV
+	Leh1HRiO28WHDJHnUqtppFOznOjWu96Y72N4l8wclr0eFgl2cz9RplUy7ZGh8DnaA+k1woyCDbwVZ
+	R1aUS6tg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41746)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1qYWBp-0001pM-2r;
-	Tue, 22 Aug 2023 19:33:17 +0100
+	id 1qYWRl-0001qs-2l;
+	Tue, 22 Aug 2023 19:49:45 +0100
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qYWBk-00061G-Oa; Tue, 22 Aug 2023 19:33:12 +0100
-Date: Tue, 22 Aug 2023 19:33:12 +0100
+	id 1qYWRi-00062L-Ep; Tue, 22 Aug 2023 19:49:42 +0100
+Date: Tue, 22 Aug 2023 19:49:42 +0100
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
-	Henry Yen <Henry.Yen@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Feiyang Chen <chenfeiyang@loongson.cn>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: ethernet: mtk_eth_soc: add paths and
- SerDes modes for MT7988
-Message-ID: <ZOT/aIelVomIzdZk@shell.armlinux.org.uk>
-References: <27c3f231485968874487f9a35cb7e8d74ca3dfd8.1692726676.git.daniel@makrotopia.org>
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/9] stmmac cleanups
+Message-ID: <ZOUDRkBXzY884SJ1@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,7 +65,6 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <27c3f231485968874487f9a35cb7e8d74ca3dfd8.1692726676.git.daniel@makrotopia.org>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
@@ -83,148 +75,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 Hi,
 
-I haven't fully reviewed this yet, but here's some initial comments.
+One of the comments I had on Feiyang Chen's series was concerning the
+initialisation of phylink... and so I've decided to do something about
+it, cleaning it up a bit.
 
-On Tue, Aug 22, 2023 at 07:04:42PM +0100, Daniel Golle wrote:
-> MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
-> connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-KR,
+This series:
 
-5Gbase-KR K normally means backplane mode.
+1) adds a new phylink function to limit the MAC capabilities according
+   to a maximum speed. This allows us to greatly simplify stmmac's
+   initialisation of phylink's mac capabilities.
 
-> +/* Register to read PCS AN status */
-> +#define RG_PCS_AN_STS0		0x81c
-> +#define USXGMII_LPA_SPEED_MASK	GENMASK(11, 9)
-> +#define USXGMII_LPA_SPEED_10	0
-> +#define USXGMII_LPA_SPEED_100	1
-> +#define USXGMII_LPA_SPEED_1000	2
-> +#define USXGMII_LPA_SPEED_10000	3
-> +#define USXGMII_LPA_SPEED_2500	4
-> +#define USXGMII_LPA_SPEED_5000	5
-> +#define USXGMII_LPA_DUPLEX	BIT(12)
-> +#define USXGMII_LPA_LINK	BIT(15)
+2) everywhere that uses priv->plat->phylink_node first converts this
+   to a fwnode before doing anything with it. This is silly. Let's
+   instead store it as a fwnode to eliminate these conversions in
+   multiple places.
 
-Aren't these the same as the MDIO_USXGMII_xxx definitions that define
-the UsxgmiiChannelInfo[15:0] bits?
+3) clean up passing the fwnode to phylink - it might as well happen
+   at the phylink_create() callsite, rather than being scattered
+   throughout the entire function.
 
-> +static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-> +				  phy_interface_t interface,
-> +				  const unsigned long *advertising,
-> +				  bool permit_pause_to_mac)
-> +{
-> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-> +	struct mtk_eth *eth = mpcs->eth;
-> +	struct regmap *pextp = eth->regmap_pextp[mpcs->id];
-> +	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
-> +	bool mode_changed = false;
-> +
-> +	if (!pextp)
-> +		return -ENODEV;
-> +
-> +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
-> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) |
-> +			  (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
+4) same for mdio_bus_data
 
-Using the new neg_mode here... but you haven't set pcs.neg_mode below
-true.
+5) use phylink_limit_mac_speed() to handle the priv->plat->max_speed
+   restriction.
 
-> +static void mtk_usxgmii_pcs_get_state(struct phylink_pcs *pcs,
-> +				      struct phylink_link_state *state)
-> +{
-> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-> +	struct mtk_eth *eth = mpcs->eth;
-> +	struct mtk_mac *mac = eth->mac[mtk_xgmii2mac_id(eth, mpcs->id)];
-> +	u32 val = 0;
-> +
-> +	regmap_read(mpcs->regmap, RG_PCS_AN_CTRL0, &val);
-> +	if (FIELD_GET(USXGMII_AN_ENABLE, val)) {
-> +		/* Refresh LPA by inverting LPA_LATCH */
-> +		regmap_read(mpcs->regmap, RG_PCS_AN_STS0, &val);
-> +		regmap_update_bits(mpcs->regmap, RG_PCS_AN_STS0,
-> +				   USXGMII_LPA_LATCH,
-> +				   !(val & USXGMII_LPA_LATCH));
-> +
-> +		regmap_read(mpcs->regmap, RG_PCS_AN_STS0, &val);
-> +
-> +		state->interface = mpcs->interface;
-> +		state->link = FIELD_GET(USXGMII_LPA_LINK, val);
-> +		state->duplex = FIELD_GET(USXGMII_LPA_DUPLEX, val);
-> +
-> +		switch (FIELD_GET(USXGMII_LPA_SPEED_MASK, val)) {
-> +		case USXGMII_LPA_SPEED_10:
-> +			state->speed = SPEED_10;
-> +			break;
-> +		case USXGMII_LPA_SPEED_100:
-> +			state->speed = SPEED_100;
-> +			break;
-> +		case USXGMII_LPA_SPEED_1000:
-> +			state->speed = SPEED_1000;
-> +			break;
-> +		case USXGMII_LPA_SPEED_2500:
-> +			state->speed = SPEED_2500;
-> +			break;
-> +		case USXGMII_LPA_SPEED_5000:
-> +			state->speed = SPEED_5000;
-> +			break;
-> +		case USXGMII_LPA_SPEED_10000:
-> +			state->speed = SPEED_10000;
-> +			break;
-> +		}
+6) add a method to get the MAC-specific capabilities from the code
+   dealing with the MACs, and arrange to call it at an appropriate
+   time.
 
-Maybe consider using phylink_decode_usxgmii_word() ?
+7) convert the gmac4 users to use the MAC specific method.
 
-> +	} else {
-> +		val = mtk_r32(mac->hw, MTK_XGMAC_STS(mac->id));
-> +
-> +		if (mac->id == MTK_GMAC2_ID)
-> +			val >>= 16;
-> +
-> +		switch (FIELD_GET(MTK_USXGMII_PCS_MODE, val)) {
-> +		case 0:
-> +			state->speed = SPEED_10000;
-> +			break;
-> +		case 1:
-> +			state->speed = SPEED_5000;
-> +			break;
-> +		case 2:
-> +			state->speed = SPEED_2500;
-> +			break;
-> +		case 3:
-> +			state->speed = SPEED_1000;
-> +			break;
-> +		}
-> +
-> +		state->interface = mpcs->interface;
-> +		state->link = FIELD_GET(MTK_USXGMII_PCS_LINK, val);
-> +		state->duplex = DUPLEX_FULL;
-> +	}
-> +
-> +	if (state->link == 0)
-> +		mtk_usxgmii_pcs_config(pcs, MLO_AN_INBAND,
+8) same for xgmac.
 
-Passing old-style mode rather than neg_mode here.
+9) lastly, group all the simple phylink_config initialisations together.
 
-> +				       state->interface, NULL, false);
 
-It would be good to describe why you're reconfiguring the interface
-here. You describe why in mtk_usxgmii_pcs_link_up...
+While looking into all of this, this raised eyebrows:
 
-> +		eth->usxgmii_pcs[i] = devm_kzalloc(dev, sizeof(*eth->usxgmii_pcs), GFP_KERNEL);
-> +		if (!eth->usxgmii_pcs[i])
-> +			return -ENOMEM;
-> +
-> +		eth->usxgmii_pcs[i]->id = i;
-> +		eth->usxgmii_pcs[i]->eth = eth;
-> +		eth->usxgmii_pcs[i]->regmap = syscon_node_to_regmap(np);
-> +		if (IS_ERR(eth->usxgmii_pcs[i]->regmap))
-> +			return PTR_ERR(eth->usxgmii_pcs[i]->regmap);
-> +
-> +		eth->usxgmii_pcs[i]->pcs.ops = &mtk_usxgmii_pcs_ops;
-> +		eth->usxgmii_pcs[i]->pcs.poll = true;
-> +		eth->usxgmii_pcs[i]->interface = PHY_INTERFACE_MODE_NA;
+        if (priv->plat->tx_queues_to_use > 1)
+                priv->phylink_config.mac_capabilities &=
+                        ~(MAC_10HD | MAC_100HD | MAC_1000HD);
 
-All new PCS should set pcs.neg_mode true.
+priv->plat->tx_queues_to_use is initialised by platforms to either 1,
+4 or 8, and can be controlled from userspace via the --set-channels
+ethtool op. The implementation of this op in this driver limits the
+number of channels to priv->dma_cap.number_tx_queues, which is derived
+from the DMA hwcap.
 
-Thanks.
+So, the obvious questions are:
+
+1) what guarantees that the static initialisation of tx_queues_to_use
+will always be less than or equal to number_tx_queues from the DMA hw
+cap?
+
+2) tx_queues_to_use starts off as 1, but number_tx_queues is larger,
+we will leave the half-duplex capabilities in place, but userspace can
+increase tx_queues_to_use above 1. Does that mean half-duplex is then
+not supported?
+
+3) Should we be basing the decision whether half-duplex is supported
+off the DMA capabilities?
+
+4) What about priv->dma_cap.half_duplex? Doesn't that get a say in
+whether half-duplex is supported or not? Why isn't this used? Why is
+it only reported via debugfs? If it's not being used by the driver,
+what's the point of reporting it via debugfs?
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  8 ++++
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    | 10 ++++
+ drivers/net/ethernet/stmicro/stmmac/hwif.h         |  4 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 53 ++++++++--------------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c  |  3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  2 +-
+ drivers/net/phy/phylink.c                          | 18 ++++++++
+ include/linux/phylink.h                            |  2 +
+ include/linux/stmmac.h                             |  2 +-
+ 9 files changed, 66 insertions(+), 36 deletions(-)
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
