@@ -1,85 +1,60 @@
-Return-Path: <netdev+bounces-29492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC877837C5
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 04:10:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6CD7837C6
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 04:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50E3A1C209CD
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 02:10:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1EB11C209DB
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 02:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B934C1108;
-	Tue, 22 Aug 2023 02:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F64B1108;
+	Tue, 22 Aug 2023 02:11:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790B210E9
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 02:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDC40C433C9;
-	Tue, 22 Aug 2023 02:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC3A10E9
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 02:11:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B23CC433C7;
+	Tue, 22 Aug 2023 02:11:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692670222;
-	bh=27qc0ICxgRu8hDS3twn1iy0JSpMlFKPXq44t5WlxKn0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cKnT/wLmjIeYeLf6NlUnXlr84GT0qer6XD+kFHfnJyU9z8rF8ntVi+xab7QKdyhiA
-	 i0aHX3mFrO/Fy9f5ThQTs7CK/x8ugwlGI4e5sRsfugHJ3+1qoWOgpqgMlsdEt7zSxs
-	 saqE9RrHCvw+zqpe2KKOgMKlzeN4kWOFr+r65cUc54zMtR0y1fD9PNAy3NyPnV+J+t
-	 HTww4zGGoPIk9tTvc0tiJgnirUY+/gXHUptGlkJyA7HdKPWh/5n9yM2Tawj/zGx9pu
-	 6ELWRZRpzJD6sFVqb5zNdS4PLh00hR2U37SOe4ZZPALhBoMqlLjDK5VpzDT2X9ikqO
-	 owxKjlqDs9yEA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1D56E4EAF9;
-	Tue, 22 Aug 2023 02:10:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692670274;
+	bh=qKpcYTt70Uys3syO2Gl3O3ERY9q0s2Fqepl6Jss6024=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MPFRXzUJtd18u97W/wLhEND0SCQ855lN4Ii7He8HwHGCkYWzXhmO+7rOEG6RGW1HX
+	 AQVo+SpDphN9gQD5smpo7JZRBzFhSy+4tFVACTv/1iZbhaA5KYsJYpTcoy0bVmSED4
+	 2oAGOMYuVZNdKfunHx+GEmZfqmcaHtVy9mhSGXKgg9MivZYjam/HIlpOG20UJ1O98K
+	 3jlBHC/lRVCrVCysEjAke288sKUUF31k9KFcbUiNJHYsImI4FxTs9HtW5P3uMb07H0
+	 irhpv7FubvAF4Ez3rGgeeaM71sHYftYrUCMh8C77zohCV3XMfgvjp2Y2bv7gOiWaQk
+	 2+GPzlv/U8wEg==
+Date: Mon, 21 Aug 2023 19:11:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v1 net] net: Allow larger buffer than peer address for
+ SO_PEERNAME.
+Message-ID: <20230821191113.72311580@kernel.org>
+In-Reply-To: <20230819005552.39751-1-kuniyu@amazon.com>
+References: <20230819005552.39751-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: bonding: do not set port down before adding to
- bond
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169267022185.23069.3596480048996475238.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Aug 2023 02:10:21 +0000
-References: <20230817082459.1685972-1-liuhangbin@gmail.com>
-In-Reply-To: <20230817082459.1685972-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, j.vosburgh@gmail.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, liali@redhat.com,
- jiri@nvidia.com, razor@blackwall.org, phil@nwl.cc, shaozhengchao@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 18 Aug 2023 17:55:52 -0700 Kuniyuki Iwashima wrote:
+> For example, we usually do not know the peer name if we get an AF_UNIX
+> socket by accept(), FD passing, or pidfd_getfd().  Then we get -EINVAL
+> if we pass sizeof(struct sockaddr_un) to getsockopt(SO_PEERNAME).  So,
+> we need to do binary search to get the exact peer name.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 17 Aug 2023 16:24:59 +0800 you wrote:
-> Before adding a port to bond, it need to be set down first. In the
-> lacpdu test the author set the port down specifically. But commit
-> a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
-> changed the operation order, the kernel will set the port down _after_
-> adding to bond. So all the ports will be down at last and the test failed.
-> 
-> In fact, the veth interfaces are already inactive when added. This
-> means there's no need to set them down again before adding to the bond.
-> Let's just remove the link down operation.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] selftests: bonding: do not set port down before adding to bond
-    https://git.kernel.org/netdev/net/c/be809424659c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sounds annoying indeed, but is it really a fix?
 
