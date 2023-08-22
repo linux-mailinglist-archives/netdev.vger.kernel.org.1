@@ -1,124 +1,200 @@
-Return-Path: <netdev+bounces-29524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1CB7783A2C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:52:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B81F5783A3D
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:59:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD973280FE2
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 06:52:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED2E9280FE6
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 06:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF416ABD;
-	Tue, 22 Aug 2023 06:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3816FA2;
+	Tue, 22 Aug 2023 06:59:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F8B63BF
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:52:27 +0000 (UTC)
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901C719A;
-	Mon, 21 Aug 2023 23:52:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1692687134;
-	bh=tQ1co5z99/X+ABfdWW4NyqVShxtMELNEwRz5sOubfpE=;
-	h=From:Date:Subject:To:Cc:From;
-	b=KlBG6EdUBmsV/rWVVIeJjOIz9NOO973JsdBNQefk05l4BzHNBLfxCr8ood2D2iK5Y
-	 Pat+o6CTq+1i+TT8SgeOHpF7lWuPgarmXyVzKnlTQVzFdI7ccB3Zf/IIAsyStooVhH
-	 Kxvbnf1/zLgk46MugFfRsUFo/zJvXU/CwuFA7ilA=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Tue, 22 Aug 2023 08:51:57 +0200
-Subject: [PATCH net-next] net: generalize calculation of skb extensions
- length
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85241EA8;
+	Tue, 22 Aug 2023 06:59:40 +0000 (UTC)
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2050.outbound.protection.outlook.com [40.107.241.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2EE4FB;
+	Mon, 21 Aug 2023 23:59:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l4H7RjfyKaux4OwL4ihI5JnxCNZ0A/yePEuCELTFFymw1S+PtsA5/LEqTPinJIe1R9kJ5JNNt96eg2T66sydOdMJfymjpjDIaifKU5FPVLmf9RyXXMOw9ZP7pZELXc3fkTY20CrGEET7WS8Ro5dtNUyx8D2E4uF+YLuqBafC9QH1ySA3ZcUahseoPCLH6od7aSIADyfiKAXqxb4s/picHiwR+bKN/MYks8hu1fRQ0PKejUK0XVh0QivNiQrj76Am11pJhW6jo8/xhcyQ8gebKDEouSmy4S5ea8GwC0P2FvW7ROpU4f80b12jWch7bsepzQ2eb1KIU8m9dGuAMZoyzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SRuG5l/zhL4RCt1bbDKhOij7D8TxoAagdBhXfGStpG4=;
+ b=MBnU9YX+gdR1Fb+KdYLqoOzZhlafYLzVfMPwmkokFuGS6XE6StjEv4bM3U719tnKNgS3n6GFfwrZyUOob2DZnXhR510Kd1W1nYUmOEOItctlsUhzRNKhHRq94znsryUFS8nXHpCzX1r6LH7OiLBXA6gh+Y3hCtHqdHHBy6ZIi+HUYn+mxWgSGdXT/bfeD6g1Y5N9dkY5j5nQYKJo9NoN/i+j/c1Q3/ggpJC5llJB51KfO9OGGQsZMeJQ09wY0Xz8Fen/vp+DuVZz78VSv516mJ8oO1M7Gd75fzZblkgvKYCVbQlrenjirry6LW+rcJXTJrwxJ+8VTBBS9psd88imYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SRuG5l/zhL4RCt1bbDKhOij7D8TxoAagdBhXfGStpG4=;
+ b=B0SFC88drPwkpg06553iuy6jPQoteFhFLw6RidpoodFCmI2yHS134noB3OX87byCcjkxZCtV01THUKB2J/o+9vOszgKkPGQD8Fg+aFevKmM5BR2zBoNvePKJft3tgapkpDmcZC5fqaH/U+fqz99tg18Qa6XFO3+0KDfBFVAoB30=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
+ by PA4PR04MB8046.eurprd04.prod.outlook.com (2603:10a6:102:ba::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Tue, 22 Aug
+ 2023 06:59:36 +0000
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::2468:a15e:aa9b:7f8e]) by AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::2468:a15e:aa9b:7f8e%4]) with mapi id 15.20.6699.022; Tue, 22 Aug 2023
+ 06:59:35 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	shenwei.wang@nxp.com,
+	xiaoning.wang@nxp.com,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-imx@nxp.com
+Subject: [PATCH net-next] net: fec: add exception tracing for XDP
+Date: Tue, 22 Aug 2023 14:52:55 +0800
+Message-Id: <20230822065255.606739-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2P153CA0003.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::20) To AM5PR04MB3139.eurprd04.prod.outlook.com
+ (2603:10a6:206:8::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230822-skb_ext-simplify-v1-1-9dd047340ab5@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAAxb5GQC/x2M0QqDMAwAf0XybMClOKy/MmSsNdWg66SR4ZD+u
- 2WPB3d3gnISVuirExJ/ReUTC9zqCvz8ihOjjIWBGjJNR4S6uCcfO6q8t1XCD81ojWdn23AnKNm
- WOMjxXz4g8o6x6DDkfAHh7YlnbAAAAA==
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Robert Marko <robimarko@gmail.com>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1692687132; l=1521;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=tQ1co5z99/X+ABfdWW4NyqVShxtMELNEwRz5sOubfpE=;
- b=nB1JA227gd9D7EIQ1Y4lAJ8e2tHkBI33b9Aqdnm3VtiTRNmmo0Qas2OWUuzXM8hPBYtIamIWa
- V750Wfu0R+sBsZYNOaGf2ry/6DkUIRlF1OqNiKUUDFPD7esPizdVYcc
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM5PR04MB3139:EE_|PA4PR04MB8046:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66454c26-b517-4dda-d18c-08dba2dd5831
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	MSOAvzeHwIYOyvwfwKcfQuQ5h4TSSED8UZbDEUvLndu34y4alPPVdZyZbsKh8p4ngMlvzyMkpkY/ksBryId/RlCDkr7JKfy86Tqg0FzrfLehDuTbmp3EpakARZHrFPJ/tszwknOSkb+BAcy2uuS1+V8O7xLv05soaKJFbEuTv34IlXmytzu643KJe8Akl7TJMO0Ytv6t0wE7dSWpxUV++5sP1AmOaV/raGrnKxUMUco4UDJ7MgloIDeu7y5O/8FqS1GbUepKdHBYWkU451eA074SdNldIgZ9VLFptsrvi+vOyXttZTXMGx4Q0I5SFJhM2Tz+re5ckfJTb1DaN3ZbTWZl/KQ38Eoro8uWk9wDYekDr1/MbwqLRWeMj5EjdyG/AI/IfvDtfufL3rZF3y2N1bsXWw666w1wthqTDR+dNdWI2Z2fZYSNr6wdQBn93Xbg7CuVML7eVqKqhncWpUxWeIgYx8/yG22zFZrKgBD/ExNUnYmxiCJ1/qfgfAdpOutXFlABKvzIifQJIc6zcnSJEwf5AcC8PuV3mavbMsGMChoFd4Vnmy1cy72ym6ApH9GgbAgJsa4W5sFg3+1hX8xqq7wLn4+K43MHITp6pobOdqjaaNVwhogHW0Q3TMeugKq1YsdSPYZu5TCCBeCBvgejQA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(396003)(136003)(366004)(346002)(186009)(1800799009)(451199024)(1076003)(2616005)(26005)(6512007)(38350700002)(921005)(86362001)(38100700002)(36756003)(83380400001)(41300700001)(316002)(8936002)(8676002)(66946007)(66476007)(66556008)(2906002)(5660300002)(4326008)(44832011)(7416002)(6666004)(6486002)(6506007)(52116002)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9zDI7ADpp4Fa3XY2jUy0jD9GtXPneZ8EEZpj9MTTqTCco83PAmYBU0vgvEjo?=
+ =?us-ascii?Q?NKrNWeR3SVjzLCra/C/GABWGAK4DSGDmCJyR4oSxzPk2KKtzlsQy4nlWJCxT?=
+ =?us-ascii?Q?ce2zC+GmkoSwOA06Vvf1NGfYPlRt5d89j3GED7hDQWwjn4jd256WJQJ9uEx6?=
+ =?us-ascii?Q?uvp6OiecBO/5WoP+CiGB7MP5pWJnsF4Ax2vtHDKKWseSYWo6sTOMgmPNAFU5?=
+ =?us-ascii?Q?eNcALB9awa7ZIz6wysaB6SXwtJ7pRYDRa354dhmuAQP+G8HlHmdjKP2CopiH?=
+ =?us-ascii?Q?gH+7pCjfnKJAmMztU0cpPVttASeDXTRwiR3x+hTiK8obMtyFz1XcsMzHQMxe?=
+ =?us-ascii?Q?MCuXUKjigYhTqhrFCxpObJL3v4u+FBdgPYfvGeCf0hR/ALQNo1nkK/bDCIVk?=
+ =?us-ascii?Q?7csogfmIaOckMaW+8I9CIZFLgdUvXJ+EXm0VuqGTTIcNOnHTR76RfubD0UV1?=
+ =?us-ascii?Q?aRHcWKq6gE3W5wqEgsEqwSD1T7tdw5BAzLSVt5ZtO73uGPN1nKlz3DpOoGWY?=
+ =?us-ascii?Q?1RoRwPuLDk1rMAG8tPnOxVZrqSrpc8LaL00+YCcFTfNvkWJ3fHzeivR4v1Yj?=
+ =?us-ascii?Q?0RdFksSRhcbVK2X6D7ouhfXOzaMMFCMtvF9E1zyF9edROPx7CKhYfKxgQwvM?=
+ =?us-ascii?Q?lh85N9e33LE8oOxiCgiXRWvfFIBQywfy0uwOdYMjim65E8a+ygP50AvCJsOl?=
+ =?us-ascii?Q?D+3GhnmyJyfqhPE6y2NJnD8b2bRqcx1FePiy7GLkmpzQydftPKcanDYu588l?=
+ =?us-ascii?Q?gDk6Sq6evjOrWeMFmUZu9NZYfIzwTaQQ3tjd6G6IgX+E2hrHwafVWdnVakOc?=
+ =?us-ascii?Q?WznfbslZoVbmzgXJLDudjriVXjYnv668mBfzlxU0GDV1GE4j8YnfZNNfrY1H?=
+ =?us-ascii?Q?jqfsaWLHfS9JgYUUv7IZePlhORC8BytgnMK9Wprdf0WiIueospHE6CN2/LrX?=
+ =?us-ascii?Q?lJRBsMh+nR8FJTtviEyh97IK2zwS7sR784gJRXWbI5zDcmEfoFLxs59AlwkI?=
+ =?us-ascii?Q?TxuBgXS8HLU6gM0DbhcXOoE4OwiwLRMIifjdn+OTw4s3bU41k4/m+cX8zJA/?=
+ =?us-ascii?Q?HmDO/A1C4AAuN7MmPVMW8N0BB1OMvNhjHFF1tBZ1NVs9C/rCO1EeJHH8HKeG?=
+ =?us-ascii?Q?8KgzMW7cqIirAMWYf9qOnx+VqVSJOp+kB86O9p7sNsYL9kw2g26kZ+xLcp+1?=
+ =?us-ascii?Q?ll9fT6M9C6qt6dyW+wTp54GaSP3jfzvdPVq1CK7SoqQI5lJm5HmdkkbQ6cQF?=
+ =?us-ascii?Q?UYC9cPMHibTJmdZuDm2EKGsfKS9ZeFXOmpTidU1nQ/WFh3rB0QbyEc3iVcrX?=
+ =?us-ascii?Q?5TWnC2NJ33OixVTIqZ/YbOZjKUIra9OFz9NRD1cytGP5nrvV15lTVpPNUSkI?=
+ =?us-ascii?Q?VrYjGX0Njf8n3BeNlKPTimpXtI9svGuXbkvdOdSNugLE2FaUYLkk4JxMDUed?=
+ =?us-ascii?Q?Nsw/B4QvgYkR2EI4rFjr2dY38o65WDqR1WgoujzJpD1jGMj7Htyq53mH+8XY?=
+ =?us-ascii?Q?CM4P7zp+GgSZmi6RZ0t6dPudXUjifKdhhSnUFsTP/t2ZRcgBT77E6o/oJsu6?=
+ =?us-ascii?Q?hKXZTPNIWIWC/Rf/tQGmjBhhp9ZsTUUpvloEYZOR?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66454c26-b517-4dda-d18c-08dba2dd5831
+X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2023 06:59:35.6389
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8UYaZODOijlp7RFESgh9CEcRnT4qS9r9W9fF07PsTngUd1e4Yoe/UYmnEhqUxGrkJ3FKC9X0ZfFc2HQ1DJTkIg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB8046
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_PASS,
-	T_SPF_HELO_TEMPERROR,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Remove the necessity to modify skb_ext_total_length() when new extension
-types are added.
-Also reduces the line count a bit.
+As we already added the exception tracing for XDP_TX, I think it is
+necessary to add the exception tracing for other XDP actions, such
+as XDP_REDIRECT, XDP_ABORTED and unknown error actions.
 
-With optimizations enabled the function is folded down to a constant
-value as before.
-
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/skbuff.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+ drivers/net/ethernet/freescale/fec_main.c | 26 ++++++++++-------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index faa6c86da2a5..45707059082f 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4785,23 +4785,13 @@ static const u8 skb_ext_type_len[] = {
- 
- static __always_inline unsigned int skb_ext_total_length(void)
- {
--	return SKB_EXT_CHUNKSIZEOF(struct skb_ext) +
--#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
--		skb_ext_type_len[SKB_EXT_BRIDGE_NF] +
--#endif
--#ifdef CONFIG_XFRM
--		skb_ext_type_len[SKB_EXT_SEC_PATH] +
--#endif
--#if IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
--		skb_ext_type_len[TC_SKB_EXT] +
--#endif
--#if IS_ENABLED(CONFIG_MPTCP)
--		skb_ext_type_len[SKB_EXT_MPTCP] +
--#endif
--#if IS_ENABLED(CONFIG_MCTP_FLOWS)
--		skb_ext_type_len[SKB_EXT_MCTP] +
--#endif
--		0;
-+	unsigned int l = SKB_EXT_CHUNKSIZEOF(struct skb_ext);
-+	int i;
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index e23a55977183..8909899e9a31 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -1583,25 +1583,18 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
+ 	case XDP_REDIRECT:
+ 		rxq->stats[RX_XDP_REDIRECT]++;
+ 		err = xdp_do_redirect(fep->netdev, xdp, prog);
+-		if (!err) {
+-			ret = FEC_ENET_XDP_REDIR;
+-		} else {
+-			ret = FEC_ENET_XDP_CONSUMED;
+-			page = virt_to_head_page(xdp->data);
+-			page_pool_put_page(rxq->page_pool, page, sync, true);
+-		}
++		if (unlikely(err))
++			goto xdp_err;
 +
-+	for (i = 0; i < ARRAY_SIZE(skb_ext_type_len); i++)
-+		l += skb_ext_type_len[i];
-+
-+	return l;
- }
++		ret = FEC_ENET_XDP_REDIR;
+ 		break;
  
- static void skb_extensions_init(void)
-
----
-base-commit: 90308679c297ffcbb317c715ef434e9fb3c881dc
-change-id: 20230822-skb_ext-simplify-3d93ceb95f62
-
-Best regards,
+ 	case XDP_TX:
+ 		err = fec_enet_xdp_tx_xmit(fep, cpu, xdp, sync);
+-		if (unlikely(err)) {
+-			ret = FEC_ENET_XDP_CONSUMED;
+-			page = virt_to_head_page(xdp->data);
+-			page_pool_put_page(rxq->page_pool, page, sync, true);
+-			trace_xdp_exception(fep->netdev, prog, act);
+-		} else {
+-			ret = FEC_ENET_XDP_TX;
+-		}
++		if (unlikely(err))
++			goto xdp_err;
++
++		ret = FEC_ENET_XDP_TX;
+ 		break;
+ 
+ 	default:
+@@ -1613,9 +1606,12 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
+ 
+ 	case XDP_DROP:
+ 		rxq->stats[RX_XDP_DROP]++;
++xdp_err:
+ 		ret = FEC_ENET_XDP_CONSUMED;
+ 		page = virt_to_head_page(xdp->data);
+ 		page_pool_put_page(rxq->page_pool, page, sync, true);
++		if (act != XDP_DROP)
++			trace_xdp_exception(fep->netdev, prog, act);
+ 		break;
+ 	}
+ 
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
+2.25.1
 
 
