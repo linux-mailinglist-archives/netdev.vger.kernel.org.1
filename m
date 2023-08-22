@@ -1,119 +1,107 @@
-Return-Path: <netdev+bounces-29710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC2C78462A
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:49:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E1E784632
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C32B1C20B45
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:49:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C372B1C20AE1
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9573F1DA37;
-	Tue, 22 Aug 2023 15:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6381DA48;
+	Tue, 22 Aug 2023 15:50:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E873B1D311
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:48:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5DBDC433C7;
-	Tue, 22 Aug 2023 15:48:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692719295;
-	bh=NDGFu/pTIVIyyOPIqvM18RTysR3Zdf/N4m4xwaHNrcE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gLeBG9DXntKZLOvO19QvIy+1SRFhAT2sP7naVNH7joTxG6R8hV1xQQMamH9EkW/H2
-	 8wAL8mYz7QNELpHfBRxZ29NhhwB/rjUo2nl1/EFYOSa+AClsRh6qnhA9K7WP6l5rcq
-	 Mkx42oIY39moynpRjwsVaO6KAZ15Zhf4KKZASHwdid0TdDL/rapY3sGYpt4SQCgqEn
-	 EPmDfurWUSt7rXcdfj6zzgmf34epT48g4qQHP6B8x2t7EIFDcZvNTACahQOwaImQpn
-	 MK0uL+q1ALtoywraGn1emwGLH99/VYk3JjZ/P6/8PJZJe9xFqYpjkDySYndd3ablpe
-	 XnRwGQ+mnPqug==
-Date: Tue, 22 Aug 2023 18:48:10 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	jesse.brandeburg@intel.com,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org
-Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-next 1/9] ice: use
- ice_pf_src_tmr_owned where available
-Message-ID: <20230822154810.GM6029@unreal>
-References: <20230817141746.18726-1-karol.kolacinski@intel.com>
- <20230817141746.18726-2-karol.kolacinski@intel.com>
- <20230819115249.GP22185@unreal>
- <20230822070211.GH2711035@kernel.org>
- <20230822141348.GH6029@unreal>
- <f497dc97-76bb-7526-7d19-d6886a3f3a65@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FACB1D303
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:50:05 +0000 (UTC)
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CDF11F;
+	Tue, 22 Aug 2023 08:49:50 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-76ca7b4782cso316614185a.0;
+        Tue, 22 Aug 2023 08:49:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692719389; x=1693324189;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UjZNfGDdDwl9AE3NP8wz+0UtBemnz6Iej/5/4IAARWU=;
+        b=RXuYMIx2+TD383Kirc2HP3IAmDNpVNhAurlDTOVvGIxSZo+SjmEdd3BT3+SfrVwr9m
+         MPVYjN73/ySMSnehNZBRdy0yhMycPtCViDGnf4zdioN4I6efgTvmKme88MVwz7c7NZBe
+         82RfMBPF3/VrdcKLQtZB73mXbtIw+Yd4Rql77ZqeaeIUfzrj6cYxegDRz2XCeR1wxVEJ
+         tfu9jH2co2WiaO8hNldJHw7xnhZ1Belk1FXGNffv2yiPnUh0oSJLkacguquFTCNiTAhg
+         gRfm6x5oAWC+TOoerEyyqlpLbrkNErnvrUpKdO556JpscXyxNVqUEhbsCEGu0lHXpkpK
+         2Pzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692719389; x=1693324189;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UjZNfGDdDwl9AE3NP8wz+0UtBemnz6Iej/5/4IAARWU=;
+        b=bVsTMgtsB1sWjzMVT9qD44isWhwXgtxSeEy52H3pYHro+QXYf2BWU9q3ssRaTyJbdc
+         hBIGK0nYodX/GEvltasXxYR6GmO8mn4Nm5V4DkSw3R4I7OTq/3H43jJqMkCDayuZshMX
+         B5Frz6ynfEem/3CKQLFpH1nghfRH5XXTVDmRGvDbdADl3l0srmtDsQFFOJBh29M/3xSc
+         TcJ6FGcI6nC/VzHLYHrc8FrR++y7sXL7JRjDu6VbYBd1IaGt+5GP4qSMdV0lfeJs+lja
+         xH+EtJ0IQG3Qqfr/x+3ewQ06XL+YKhQmqbU9XIzBhdR8zzutA0XpTA34pVyV2EZImgRh
+         hp0Q==
+X-Gm-Message-State: AOJu0YxDs8ekrQtV8oq1flcl8VT0AaA5LWUsOeYPdi1+A2MhP8DvtDh2
+	YuPHzKgCbLbKlerjkFPbyQ13iCqCKEs=
+X-Google-Smtp-Source: AGHT+IGgkJ/1ozzuZy7ZMVEEt+ZRGDiPwfJPh584MojQmyHKJHDKjTteup64RPAIIPswxXASzqALRQ==
+X-Received: by 2002:a05:620a:31a6:b0:76c:9cc0:64e2 with SMTP id bi38-20020a05620a31a600b0076c9cc064e2mr12577541qkb.28.1692719389442;
+        Tue, 22 Aug 2023 08:49:49 -0700 (PDT)
+Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
+        by smtp.gmail.com with ESMTPSA id z11-20020ae9c10b000000b0076745f352adsm3265941qki.59.2023.08.22.08.49.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 08:49:48 -0700 (PDT)
+Message-ID: <5ce3a56a-7299-4ae2-ad6a-14342417fb19@gmail.com>
+Date: Tue, 22 Aug 2023 08:49:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net-next] net: dsa: rzn1-a5psw: remove redundant logs
+Content-Language: en-US
+To: =?UTF-8?Q?Alexis_Lothor=c3=a9?= <alexis.lothore@bootlin.com>,
+ =?UTF-8?Q?Cl=c3=a9ment_Leger?= <clement@clement-leger.fr>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Milan Stevanovic <milan.stevanovic@se.com>,
+ Jimmy Lalande <jimmy.lalande@se.com>,
+ Pascal Eberhard <pascal.eberhard@se.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20230822084112.54803-1-alexis.lothore@bootlin.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230822084112.54803-1-alexis.lothore@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f497dc97-76bb-7526-7d19-d6886a3f3a65@intel.com>
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Aug 22, 2023 at 04:44:29PM +0200, Przemek Kitszel wrote:
-> On 8/22/23 16:13, Leon Romanovsky wrote:
-> > On Tue, Aug 22, 2023 at 09:02:11AM +0200, Simon Horman wrote:
-> > > On Sat, Aug 19, 2023 at 02:52:49PM +0300, Leon Romanovsky wrote:
-> > > > On Thu, Aug 17, 2023 at 04:17:38PM +0200, Karol Kolacinski wrote:
-> > > > > The ice_pf_src_tmr_owned() macro exists to check the function capability
-> > > > > bit indicating if the current function owns the PTP hardware clock.
-> > > > 
-> > > > This is first patch in the series, but I can't find mentioned macro.
-> > > > My net-next is based on 5b0a1414e0b0 ("Merge branch 'smc-features'")
-> > > > ➜  kernel git:(net-next) git grep ice_pf_src_tmr_owned
-> > > > shows nothing.
-> > > > 
-> > > > On which branch is it based?
-> > > 
-> > > Hi Leon,
-> > > 
-> > > My assumption is that it is based on the dev-queue branch of
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git
-> > 
-> > So should netdev readers review it or wait till Intel folks perform
-> > first pass on it?
-> 
-> Most of the time Intel folks would be first to review, if only because of
-> our pre-IWL processes or pure familiarity/interest in given piece.
-> 
-> For this particular series, it is about right "codewise" since v1, so you
-> are welcome for an insightful look at v3
-> (I didn't provided my RBs so far because of "metadata" issues :),
-> will take a fresh look, but you don't need to wait).
-> 
-> 
-> General idea for CC'ing netdev for IWL-targeted patches is to have open
-> develompent process.
-> Quality should be already as for netdev posting.
-> Our VAL picks up patches for testing from here when Tony marks them so.
-> 
-> That's what I could say for review process.
-> 
-> "Maintainers stuff", I *guess*, is:
-> after review&test Tony Requests netdev Maintainers to Pull
-> (and throttles outgoing stuff by doing so to pace agreed upon).
-> At that stage is a last moment for (late?) review, welcomed as always.
 
-It means that we (netdev@... ) will see "same" patches twice, am I right?
 
-Thanks
+On 8/22/2023 1:41 AM, Alexis Lothoré wrote:
+> From: Alexis Lothoré <alexis.lothore@bootlin.com>
+> 
+> Remove debug logs in port vlan management, since there are already multiple
+> tracepoints defined for those operations in DSA
+> 
+> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
 
-> 
-> 
-> 
-> > 
-> > Thanks
-> > _______________________________________________
-> > Intel-wired-lan mailing list
-> > Intel-wired-lan@osuosl.org
-> > https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
-> 
-> 
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
