@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-29602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C13A783F4E
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:36:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB31783F5E
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FBF61C20A8C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:36:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B37281059
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B684C1ADF9;
-	Tue, 22 Aug 2023 11:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B641ADF9;
+	Tue, 22 Aug 2023 11:37:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424661ADC3
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:36:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA154C433CB;
-	Tue, 22 Aug 2023 11:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980361BEF9
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:37:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89261C433C9;
+	Tue, 22 Aug 2023 11:37:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692704203;
-	bh=Shy4uzllZTzfAoXNe/R74GUm2HRgtZWCevC91qt59wI=;
+	s=k20201202; t=1692704232;
+	bh=JmcbwRQZ9UiWWPOsK4nazekJw0Rv60gjSaxiY/EUxAI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TUiJ0pscjxwt/7RMFSTVZWEoioTcDzWO+Y8tVUGYPAGNK0X+C+fM7c2fohQL+WwQV
-	 bURXcwmxCesDJfT/oIaQORsPlEsWxeJ5faKdZNpqhpBwpyJLXnnlEsED9LH/nCmX3y
-	 ED8J5CXIMG+MVmJV7w1I1J4kaggYOhNUkanAiK22HYRu9G95Q/rRltqfrsPOBi1KT/
-	 LcBufl4xOWGWs0hYISY17ENSA7LkqGztJGjYMTM8dZ46p4laTsGKqooEbjMURlYDK3
-	 TH7D2iDTQPAQml9ghPpF7QOybJkCIHMVbeLcEQR6/MuF01aMAaU6Iv2wtwga72CLBM
-	 R0PJAohOtUYqQ==
+	b=aa4fk1zxiEF8Csp8yWDjirc0d507KE2UaqhyKQFjo7LvuKYPVSRuu0OLE0+Z1tuDT
+	 78cJd7U5pR/ZQsRZNK/RlPU6upd2PQ9cUfSB/IEIzhFIxZRz4OguC538dMQ1CZMtVR
+	 C5gO2zpCcer8O3EpUq00zOgKcP5BdbU3Agu49KC8gFs4sZCjYTnEO4FYonEcxSElke
+	 X3u9bG8tlL4mBV55BkiljxYuketfc/WKPsAY7BZu4ATHhEJDUeN0gHVYCDZkLZGnSj
+	 iSOPmecIbroZ/hCf2TCizD7NKSDdvleMQFxHi6PpuKmJ3RvbW+M6Mc0xkyLiIokBhl
+	 89LqvUM8+Gjkw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -48,13 +48,14 @@ Cc: Jian Shen <shenjian15@huawei.com>,
 	lanhao@huawei.com,
 	wangjie125@huawei.com,
 	chenhao418@huawei.com,
+	leon@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 05/10] net: hns3: restore user pause configure when disable autoneg
-Date: Tue, 22 Aug 2023 07:36:23 -0400
-Message-Id: <20230822113628.3551393-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 4/6] net: hns3: restore user pause configure when disable autoneg
+Date: Tue, 22 Aug 2023 07:36:56 -0400
+Message-Id: <20230822113658.3551550-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230822113628.3551393-1-sashal@kernel.org>
-References: <20230822113628.3551393-1-sashal@kernel.org>
+In-Reply-To: <20230822113658.3551550-1-sashal@kernel.org>
+References: <20230822113658.3551550-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.46
+X-stable-base: Linux 5.15.127
 Content-Transfer-Encoding: 8bit
 
 From: Jian Shen <shenjian15@huawei.com>
@@ -86,10 +87,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 6af2273f227c2..84ecd8b9be48c 100644
+index 847ebb31d4701..1d424b1ee6cd3 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -10936,9 +10936,12 @@ int hclge_cfg_flowctrl(struct hclge_dev *hdev)
+@@ -10993,9 +10993,12 @@ int hclge_cfg_flowctrl(struct hclge_dev *hdev)
  	u32 rx_pause, tx_pause;
  	u8 flowctl;
  
@@ -104,10 +105,10 @@ index 6af2273f227c2..84ecd8b9be48c 100644
  
  	if (phydev->pause)
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
-index 150f146fa24fb..8b40c6b4ee53e 100644
+index e7cb6a81e5b67..f5fe5e437bcd1 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
-@@ -1549,7 +1549,7 @@ static int hclge_bp_setup_hw(struct hclge_dev *hdev, u8 tc)
+@@ -1429,7 +1429,7 @@ static int hclge_bp_setup_hw(struct hclge_dev *hdev, u8 tc)
  	return 0;
  }
  
@@ -117,10 +118,10 @@ index 150f146fa24fb..8b40c6b4ee53e 100644
  	bool tx_en, rx_en;
  
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
-index dd6f1fd486cf2..251e808456208 100644
+index 2c5256d7f9962..e1f2feaba5454 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
-@@ -242,6 +242,7 @@ int hclge_pfc_pause_en_cfg(struct hclge_dev *hdev, u8 tx_rx_bitmap,
+@@ -233,6 +233,7 @@ int hclge_pfc_pause_en_cfg(struct hclge_dev *hdev, u8 tx_rx_bitmap,
  			   u8 pfc_bitmap);
  int hclge_mac_pause_en_cfg(struct hclge_dev *hdev, bool tx, bool rx);
  int hclge_pause_addr_cfg(struct hclge_dev *hdev, const u8 *mac_addr);
