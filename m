@@ -1,134 +1,254 @@
-Return-Path: <netdev+bounces-29601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7685783F3C
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:36:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9AD784027
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8278D28101F
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:36:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B4E3281050
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500851ADF8;
-	Tue, 22 Aug 2023 11:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B3C1BF12;
+	Tue, 22 Aug 2023 11:54:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F4011C90
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:36:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D89CC433C7;
-	Tue, 22 Aug 2023 11:36:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692704171;
-	bh=ZkOI0vHAbL8yg8J/lSkhogxr/YsGHIdzDmCBNEPtcnM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vy1vDjE45VHXuXThIHIuW3N3Wu275zYIFjRNd0vebDOjjcTfdBKlOC8dYC8gw4/rJ
-	 0yrNs6HYFmmWyqcIdM6IApyHO7HPV+tZF/AvnlA2PgQhfsJaBpvCttY9XCp9G5z+bg
-	 d+oUWpwsAu33TeuAoqsqpMLAijpNYGfWjda46363FaL+JGSYG3miCF/vCPe6MELeZU
-	 Rpr4yjRm8mvVTvdNnsocMkKRHnh4n0fB/4Pc+LPn3Iv1Xhjk90fn4Nd3C3oBHWzSf5
-	 8whEZPvX191zMb3q0DWnY31kyTVQ0QU2FixUzJKCJXRNopeYvmQlawf1CI0oCanZy5
-	 Fke6CV/v7K0CA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Jian Shen <shenjian15@huawei.com>,
-	Peiyang Wang <wangpeiyang1@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	yisen.zhuang@huawei.com,
-	salil.mehta@huawei.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	huangguangbin2@huawei.com,
-	lanhao@huawei.com,
-	wangjie125@huawei.com,
-	chenhao418@huawei.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 05/11] net: hns3: restore user pause configure when disable autoneg
-Date: Tue, 22 Aug 2023 07:35:47 -0400
-Message-Id: <20230822113553.3551206-5-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230822113553.3551206-1-sashal@kernel.org>
-References: <20230822113553.3551206-1-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383858F78
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:54:17 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC52CE9;
+	Tue, 22 Aug 2023 04:53:59 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qYPg5-0006wL-27;
+	Tue, 22 Aug 2023 11:36:06 +0000
+Date: Tue, 22 Aug 2023 12:35:47 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 1/2] dt-bindings: mt76: support setting
+ per-band MAC address
+Message-ID: <ZOSdk6LyTlCayG4i@makrotopia.org>
+References: <d3130584b64309da28a04826100643ff6239f9ca.1690841657.git.daniel@makrotopia.org>
+ <20230811190944.GA3730441-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.11
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811190944.GA3730441-robh@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Jian Shen <shenjian15@huawei.com>
+On Fri, Aug 11, 2023 at 01:09:44PM -0600, Rob Herring wrote:
+> On Mon, Jul 31, 2023 at 11:23:16PM +0100, Daniel Golle wrote:
+> > Introduce support for setting individual per-band MAC addresses using
+> > NVMEM cells by adding a 'bands' object with enumerated child nodes
+> > representing the 2.4 GHz, 5 GHz and 6 GHz bands.
+> > 
+> > In case it is defined, call of_get_mac_address for the per-band child
+> > node, otherwise try with of_get_mac_address on the main device node and
+> > fall back to a random address like it used to be.
+> > 
+> > While at it, add MAC address related properties also for the main node.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> > Changes since v2:
+> >  * drop items list with only a single item
+> > 
+> > Changes since v1:
+> >  * add dt-bindings
+> > 
+> >  .../bindings/net/wireless/mediatek,mt76.yaml  | 58 ++++++++++++++++++-
+> >  1 file changed, 57 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+> > index 252207adbc54c..7eafed53da1de 100644
+> > --- a/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+> > +++ b/Documentation/devicetree/bindings/net/wireless/mediatek,mt76.yaml
+> > @@ -37,6 +37,12 @@ properties:
+> >      description:
+> >        MT7986 should contain 3 regions consys, dcm, and sku, in this order.
+> >  
+> > +  '#address-cells':
+> > +    const: 1
+> > +
+> > +  '#size-cells':
+> > +    const: 0
+> > +
+> >    interrupts:
+> >      maxItems: 1
+> >  
+> > @@ -72,13 +78,23 @@ properties:
+> >  
+> >    ieee80211-freq-limit: true
+> >  
+> > +  address: true
+> 
+> What's this? Not a documented property.
 
-[ Upstream commit 15159ec0c831b565820c2de05114ea1b4cf07681 ]
+Maybe it should be documented then...?
+See
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/core/of_net.c#n140
 
-Restore the mac pause state to user configuration when autoneg is disabled
+```
+int of_get_mac_address(struct device_node *np, u8 *addr)
+{
+	int ret;
 
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Link: https://lore.kernel.org/r/20230807113452.474224-2-shaojijie@huawei.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 5 ++++-
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c   | 2 +-
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h   | 1 +
- 3 files changed, 6 insertions(+), 2 deletions(-)
+	if (!np)
+		return -ENODEV;
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index c3e94598f3983..0876890798ba4 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -10936,9 +10936,12 @@ int hclge_cfg_flowctrl(struct hclge_dev *hdev)
- 	u32 rx_pause, tx_pause;
- 	u8 flowctl;
- 
--	if (!phydev->link || !phydev->autoneg)
-+	if (!phydev->link)
- 		return 0;
- 
-+	if (!phydev->autoneg)
-+		return hclge_mac_pause_setup_hw(hdev);
-+
- 	local_advertising = linkmode_adv_to_lcl_adv_t(phydev->advertising);
- 
- 	if (phydev->pause)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
-index 150f146fa24fb..8b40c6b4ee53e 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.c
-@@ -1549,7 +1549,7 @@ static int hclge_bp_setup_hw(struct hclge_dev *hdev, u8 tc)
- 	return 0;
- }
- 
--static int hclge_mac_pause_setup_hw(struct hclge_dev *hdev)
-+int hclge_mac_pause_setup_hw(struct hclge_dev *hdev)
- {
- 	bool tx_en, rx_en;
- 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
-index dd6f1fd486cf2..251e808456208 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.h
-@@ -242,6 +242,7 @@ int hclge_pfc_pause_en_cfg(struct hclge_dev *hdev, u8 tx_rx_bitmap,
- 			   u8 pfc_bitmap);
- int hclge_mac_pause_en_cfg(struct hclge_dev *hdev, bool tx, bool rx);
- int hclge_pause_addr_cfg(struct hclge_dev *hdev, const u8 *mac_addr);
-+int hclge_mac_pause_setup_hw(struct hclge_dev *hdev);
- void hclge_pfc_rx_stats_get(struct hclge_dev *hdev, u64 *stats);
- void hclge_pfc_tx_stats_get(struct hclge_dev *hdev, u64 *stats);
- int hclge_tm_qs_shaper_cfg(struct hclge_vport *vport, int max_tx_rate);
--- 
-2.40.1
+	ret = of_get_mac_addr(np, "mac-address", addr);
+	if (!ret)
+		return 0;
 
+	ret = of_get_mac_addr(np, "local-mac-address", addr);
+	if (!ret)
+		return 0;
+
+	ret = of_get_mac_addr(np, "address", addr);
+	if (!ret)
+		return 0;
+
+	return of_get_mac_address_nvmem(np, addr);
+}
+EXPORT_SYMBOL(of_get_mac_address);
+```
+
+> 
+> 
+> > +
+> > +  local-mac-address: true
+> > +
+> > +  mac-address: true
+> 
+> You really need a ref to the schema defining these. But first we need to 
+> split them out from ethernet-controller.yaml. Which I think there were 
+> patches for, but it stalled out.
+> 
+
+I understand, so have a schema to include whenever of_net.c is used to
+assign a MAC address, and then use that for ethernet-controller.yaml and
+in places such as here.
+
+If you point me to the existing patches I can pick them up and address
+whatever needs to be addressed to get them merged.
+
+> Anyways, it's fine for now if you're not up for that.
+
+So just remove the (supposedly deprecated) "address: true" for now and
+then create an of_net MAC-address related schema and move things there
+after that?
+
+> 
+> > +
+> >    nvmem-cells:
+> > +    minItems: 1
+> >      items:
+> >        - description: NVMEM cell with EEPROM
+> > +      - description: NVMEM cell with the MAC address
+> >  
+> >    nvmem-cell-names:
+> > +    minItems: 1
+> >      items:
+> >        - const: eeprom
+> > +      - const: mac-address
+> >  
+> >    mediatek,eeprom-data:
+> >      $ref: /schemas/types.yaml#/definitions/uint32-array
+> > @@ -213,6 +229,29 @@ properties:
+> >                      description:
+> >                        Half-dBm power delta for different numbers of antennas
+> >  
+> > +patternProperties:
+> > +  '^band@[0-2]+$':
+> > +    type: object
+> > +    additionalProperties: false
+> > +    properties:
+> > +      reg:
+> > +        maxItems: 1
+> > +
+> > +      address: true
+> > +      local-mac-address: true
+> > +      mac-address: true
+> > +
+> > +      nvmem-cells:
+> > +        description: NVMEM cell with the MAC address
+> > +
+> > +      nvmem-cell-names:
+> > +        const: mac-address
+> > +
+> > +    required:
+> > +      - reg
+> > +
+> > +    unevaluatedProperties: false
+> > +
+> >  required:
+> >    - compatible
+> >    - reg
+> > @@ -225,10 +264,13 @@ examples:
+> >        #address-cells = <3>;
+> >        #size-cells = <2>;
+> >        wifi@0,0 {
+> > +        #address-cells = <1>;
+> > +        #size-cells = <0>;
+> >          compatible = "mediatek,mt76";
+> >          reg = <0x0000 0 0 0 0>;
+> >          ieee80211-freq-limit = <5000000 6000000>;
+> > -        mediatek,mtd-eeprom = <&factory 0x8000>;
+> > +        nvmem-cells = <&factory_eeprom>;
+> > +        nvmem-cell-names = "eeprom";
+> >          big-endian;
+> >  
+> >          led {
+> > @@ -257,6 +299,20 @@ examples:
+> >               };
+> >            };
+> >          };
+> > +
+> > +        band@0 {
+> > +          /* 2.4 GHz */
+> > +          reg = <0>;
+> > +          nvmem-cells = <&macaddr 0x4>;
+> > +          nvmem-cell-names = "mac-address";
+> > +        };
+> > +
+> > +        band@1 {
+> > +          /* 5 GHz */
+> > +          reg = <1>;
+> > +          nvmem-cells = <&macaddr 0xa>;
+> > +          nvmem-cell-names = "mac-address";
+> > +        };
+> >        };
+> >      };
+> >  
+> > -- 
+> > 2.41.0
 
