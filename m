@@ -1,551 +1,230 @@
-Return-Path: <netdev+bounces-29518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDE67839B9
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:06:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5BB7839C2
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 08:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35CD7280F75
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 06:06:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D4401C209DA
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 06:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C69210A;
-	Tue, 22 Aug 2023 06:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A12B210A;
+	Tue, 22 Aug 2023 06:12:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E0C17EE
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:06:09 +0000 (UTC)
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BB21186
-	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:06:04 -0700 (PDT)
-Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-44ac87147fdso2525708137.1
-        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:06:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AC217EE
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 06:12:34 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A39DF186
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:12:31 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-99c136ee106so536885866b.1
+        for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 23:12:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692684363; x=1693289163;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96PAr/ZKdMv2+Os9IV3Xbt2ZP288+QT1rrqfr7FmrOU=;
-        b=IJDiTjAeGAyJ/4v+6yRZ0Dczs1hvAAYjI0NGvmfIJer5b9MNhWRYjXm06nhHUNLB1D
-         Qfe9gPlHjEr0Eo3/G+BGb+bF61xVTLzVwNiZCDRRA7PQJ4GwPBnuCfAuRL7/l3mhS7XP
-         mPT0JKrpzt1v28Bfg/SbnIyg1YMZa7Ibd6q+hu12FsBSjrvNPUlt4lXmW4P4vENdqO4/
-         yLydp7lGe+qK3dyza2zr3g7+zKfCh2hxsqMVVESpN6obRHxfL7RPTb2UHIIZAf8ZF2Cq
-         4w9CKtnqRyIT0JPnwJiD6ZPKnouBBEUN9CAK91DbvJny16uE00Tx3YffPDcQFU40FxoE
-         VAZQ==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692684750; x=1693289550;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nnGKiqPMsuE0dn3dn8HBSEXMJR14dLg/QIYHbhb1hzA=;
+        b=EzjR0bYoG5RjWPSEgHJQEmM3Q8tIbOQqqhcDeyMVcpLLDVGYwYLI4dkxqDqtaAbNvw
+         5523iqpMhbJqQ1w+36Y6i/d8cq1Ghf/GT2pC48tC54pdD4gw/CI9wECEdijZPLVnddlP
+         VnNCYcjcStFMpSWZzybijoaB1GdBPBBMQuLZCjMC9qQbvuaK+mxzxHILqr1ykIH533JJ
+         FOlQ8i9/V3Y3WxGjXgH4ZecVejccxi0jraqNhDoDmWac/aFq3zJS64pvGiCtds4/T4av
+         im0f/7Sg5tbons4YY2qhFVBdmi9+REQLv2JOz3JD8q+Iomna6uoBMEFKH5Rhc1oLT1LR
+         0TPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692684363; x=1693289163;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=96PAr/ZKdMv2+Os9IV3Xbt2ZP288+QT1rrqfr7FmrOU=;
-        b=Gupp69ypjIBX+BvyKnt7wXTpiz51JTkLhNkw9gZNTRpOgUNEw2krVK9jAlDCfRMxXO
-         s04EMf3WAUeI4vXE94N/DZfS2EgPGGX1MxeaBjHsvg3x41+0w1iLFPjrJBm7xDHuRolp
-         BZENXBCWKjk6uRbjrQX9ocwY3Lj8NZ7bnsJzBer9ZqhhnvbBJzm/fMWE8Tl6NOsAclgy
-         kEDEtqL4uh9fqTuRdBTBEv8iIq+h3B/SV6AoGKehJ0I0S2wGWUyTd6qEyu/KEbmFZ0CN
-         2CT8RybJhPZ4/p+171QgAiuLkpn4FxF5U5tx+wG2N4vaa3E1ehcw4saiKh+1X+zi+Xhz
-         93WA==
-X-Gm-Message-State: AOJu0YxgtyQLQaRZsHd8iDaTUtv+Ol2sin/07jgucgKrw9xigOYTi8NY
-	0WGEbPDom+Y8QbIwscBorVC4WyuhDfZx8HJl38AcBA==
-X-Google-Smtp-Source: AGHT+IFPjPglggVAFjlide5m+mn7HoVFzA/jDolI+RailJQq2VaayvEQFWJzjNa7Zg17QcOhYhc1OZHohW/GCYlclM0=
-X-Received: by 2002:a05:6102:320b:b0:44b:f502:148d with SMTP id
- r11-20020a056102320b00b0044bf502148dmr4725729vsf.6.1692684363159; Mon, 21 Aug
- 2023 23:06:03 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692684750; x=1693289550;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nnGKiqPMsuE0dn3dn8HBSEXMJR14dLg/QIYHbhb1hzA=;
+        b=jXzavvwlMGjf7ynm1IS0lgMSRGIsKWVPCfYqtw7StJIsy/kX4Txq0S/fpAlMw1GhjW
+         Kh64Fxwtp6S7re2HxdslCuabEIAAY77tRZ8hxDgZ2wM4y+jPOiNTwRz4aBjRzaBrMjk9
+         Kqd6149VSGniaFjd+pGWFz0YYCZQ7l/yLMDrma08JV0ic8SqzuwMQhZY6o4an2gbIPYr
+         RmFBuIFXeAWZpSHzCh8sGu3RFVM1lfd129jXqCtY4e4GhlrWYCObXbzgr8J+EC5/cdrS
+         zlgjO+rtfkgmHuzB1rd4+y1ntjeGcUoBXfnOdVxsSU0qM/yRVMijI9X8g8hwxpqTjsSg
+         gYrQ==
+X-Gm-Message-State: AOJu0YzoxBkVciy6mxAv6qn+VeSACOD294fFV4F/lduUheb8WhjAiihx
+	aTT35YdhnrTBsDkF6o1q9fhxwGtP13ElQWhCGiBxoQ==
+X-Google-Smtp-Source: AGHT+IHu/WbmGP7KWcvNbRneGmYLiQT6BxNC5f9tAOz1w7bfmERdCTS0JAlpKHE9ZQH+2KoDdYlGKA==
+X-Received: by 2002:a17:907:a05c:b0:9a1:bd53:b23 with SMTP id gz28-20020a170907a05c00b009a1bd530b23mr357603ejc.14.1692684750049;
+        Mon, 21 Aug 2023 23:12:30 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id k17-20020a1709062a5100b0099bc2d1429csm7722632eje.72.2023.08.21.23.12.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 23:12:29 -0700 (PDT)
+Date: Tue, 22 Aug 2023 08:12:28 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Wenjun Wu <wenjun1.wu@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	xuejun.zhang@intel.com, madhu.chittim@intel.com,
+	qi.z.zhang@intel.com, anthony.l.nguyen@intel.com
+Subject: Re: [PATCH iwl-next v4 0/5] iavf: Add devlink and devlink rate
+ support
+Message-ID: <ZORRzEBcUDEjMniz@nanopsycho>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+ <20230822034003.31628-1-wenjun1.wu@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-7-almasrymina@google.com> <6adafb5d-0bc5-cb9a-5232-6836ab7e77e6@redhat.com>
-In-Reply-To: <6adafb5d-0bc5-cb9a-5232-6836ab7e77e6@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 21 Aug 2023 23:05:50 -0700
-Message-ID: <CAHS8izM4w2UETAwfnV7w+ZzTMxLkz+FKO+xTgRdtYKzV8RzqXw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 06/11] page-pool: add device memory support
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>
-Cc: netdev@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, brouer@redhat.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>, stephen@networkplumber.org, 
-	sdf@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,ENV_AND_HDR_SPF_MATCH,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230822034003.31628-1-wenjun1.wu@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 19, 2023 at 2:51=E2=80=AFAM Jesper Dangaard Brouer
-<jbrouer@redhat.com> wrote:
+Tue, Aug 22, 2023 at 05:39:58AM CEST, wenjun1.wu@intel.com wrote:
+>To allow user to configure queue bandwidth, devlink port support
+>is added to support devlink port rate API. [1]
 >
+>Add devlink framework registration/unregistration on iavf driver
+>initialization and remove, and devlink port of DEVLINK_PORT_FLAVOUR_VIRTUAL
+>is created to be associated iavf netdevice.
 >
->
-> On 10/08/2023 03.57, Mina Almasry wrote:
-> > Overload the LSB of struct page* to indicate that it's a page_pool_iov.
-> >
-> > Refactor mm calls on struct page * into helpers, and add page_pool_iov
-> > handling on those helpers. Modify callers of these mm APIs with calls t=
-o
-> > these helpers instead.
-> >
->
-> I don't like of this approach.
-> This is adding code to the PP (page_pool) fast-path in multiple places.
->
-> I've not had time to run my usual benchmarks, which are here:
->
-> https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/b=
-ench_page_pool_simple.c
->
+>iavf rate tree with root node, queue nodes, and leaf node is created
+>and registered with devlink rate when iavf adapter is configured, and
+>if PF indicates support of VIRTCHNL_VF_OFFLOAD_QOS through VF Resource /
+>Capability Exchange.
 
-I ported over this benchmark to my tree and ran it, my results:
-
-net-next @ b44693495af8
-https://pastebin.com/raw/JuU7UQXe
-
-+ Jakub's memory-provider APIs:
-https://pastebin.com/raw/StMBhetn
-
-+ devmem TCP changes:
-https://pastebin.com/raw/mY1L6U4r
-
-+ intentional regression just to make sure the benchmark is working:
-https://pastebin.com/raw/wqWhcJdG
-
-I don't seem to be able to detect a regression with this series as-is,
-but I'm not that familiar with the test and may be doing something
-wrong or misinterpreting the results. Does this look ok to you?
-
-> But I'm sure it will affect performance.
->
-> Regardless of performance, this approach is using ptr-LSB-bits, to hide
-> that page-pointer are not really struct-pages, feels like force feeding
-> a solution just to use the page_pool APIs.
->
->
-> > In areas where struct page* is dereferenced, add a check for special
-> > handling of page_pool_iov.
-> >
-> > The memory providers producing page_pool_iov can set the LSB on the
-> > struct page* returned to the page pool.
-> >
-> > Note that instead of overloading the LSB of page pointers, we can
-> > instead define a new union between struct page & struct page_pool_iov a=
-nd
-> > compact it in a new type. However, we'd need to implement the code chur=
-n
-> > to modify the page_pool & drivers to use this new type. For this POC
-> > that is not implemented (feedback welcome).
-> >
->
-> I've said before, that I prefer multiplexing on page->pp_magic.
-> For your page_pool_iov the layout would have to match the offset of
-> pp_magic, to do this. (And if insisting on using PP infra the refcnt
-> would also need to align).
->
-> On the allocation side, all drivers already use a driver helper
-> page_pool_dev_alloc_pages() or we could add another (better named)
-> helper to multiplex between other types of allocators, e.g. a devmem
-> allocator.
->
-> On free/return/recycle the functions napi_pp_put_page or skb_pp_recycle
-> could multiplex on pp_magic and call another API.  The API could be an
-> extension to PP helpers, but it could also be a devmap allocator helper.
->
-> IMHO forcing/piggy-bagging everything into page_pool is not the right
-> solution.  I really think netstack need to support different allocator
-> types. The page pool have been leading the way, yes, but perhaps it is
-> time to add an API layer that e.g. could be named netmem, that gives us
-> the multiplexing between allocators.  In that process some of page_pool
-> APIs would be lifted out as common blocks and others remain.
->
-> --Jesper
->
-> > I have a sample implementation of adding a new page_pool_token type
-> > in the page_pool to give a general idea here:
-> > https://github.com/torvalds/linux/commit/3a7628700eb7fd02a117db036003bc=
-a50779608d
-> >
-> > Full branch here:
-> > https://github.com/torvalds/linux/compare/master...mina:linux:tcpdevmem=
--pp-tokens
-> >
-> > (In the branches above, page_pool_iov is called devmem_slice).
-> >
-> > Could also add static_branch to speed up the checks in page_pool_iov
-> > memory providers are being used.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > ---
-> >   include/net/page_pool.h | 74 ++++++++++++++++++++++++++++++++++-
-> >   net/core/page_pool.c    | 85 ++++++++++++++++++++++++++++------------=
--
-> >   2 files changed, 131 insertions(+), 28 deletions(-)
-> >
-> > diff --git a/include/net/page_pool.h b/include/net/page_pool.h
-> > index 537eb36115ed..f08ca230d68e 100644
-> > --- a/include/net/page_pool.h
-> > +++ b/include/net/page_pool.h
-> > @@ -282,6 +282,64 @@ static inline struct page_pool_iov *page_to_page_p=
-ool_iov(struct page *page)
-> >       return NULL;
-> >   }
-> >
-> > +static inline int page_pool_page_ref_count(struct page *page)
-> > +{
-> > +     if (page_is_page_pool_iov(page))
-> > +             return page_pool_iov_refcount(page_to_page_pool_iov(page)=
-);
-> > +
-> > +     return page_ref_count(page);
-> > +}
-> > +
-> > +static inline void page_pool_page_get_many(struct page *page,
-> > +                                        unsigned int count)
-> > +{
-> > +     if (page_is_page_pool_iov(page))
-> > +             return page_pool_iov_get_many(page_to_page_pool_iov(page)=
-,
-> > +                                           count);
-> > +
-> > +     return page_ref_add(page, count);
-> > +}
-> > +
-> > +static inline void page_pool_page_put_many(struct page *page,
-> > +                                        unsigned int count)
-> > +{
-> > +     if (page_is_page_pool_iov(page))
-> > +             return page_pool_iov_put_many(page_to_page_pool_iov(page)=
-,
-> > +                                           count);
-> > +
-> > +     if (count > 1)
-> > +             page_ref_sub(page, count - 1);
-> > +
-> > +     put_page(page);
-> > +}
-> > +
-> > +static inline bool page_pool_page_is_pfmemalloc(struct page *page)
-> > +{
-> > +     if (page_is_page_pool_iov(page))
-> > +             return false;
-> > +
-> > +     return page_is_pfmemalloc(page);
-> > +}
-> > +
-> > +static inline bool page_pool_page_is_pref_nid(struct page *page, int p=
-ref_nid)
-> > +{
-> > +     /* Assume page_pool_iov are on the preferred node without actuall=
-y
-> > +      * checking...
-> > +      *
-> > +      * This check is only used to check for recycling memory in the p=
-age
-> > +      * pool's fast paths. Currently the only implementation of page_p=
-ool_iov
-> > +      * is dmabuf device memory. It's a deliberate decision by the use=
-r to
-> > +      * bind a certain dmabuf to a certain netdev, and the netdev rx q=
-ueue
-> > +      * would not be able to reallocate memory from another dmabuf tha=
-t
-> > +      * exists on the preferred node, so, this check doesn't make much=
- sense
-> > +      * in this case. Assume all page_pool_iovs can be recycled for no=
-w.
-> > +      */
-> > +     if (page_is_page_pool_iov(page))
-> > +             return true;
-> > +
-> > +     return page_to_nid(page) =3D=3D pref_nid;
-> > +}
-> > +
-> >   struct page_pool {
-> >       struct page_pool_params p;
-> >
-> > @@ -434,6 +492,9 @@ static inline long page_pool_defrag_page(struct pag=
-e *page, long nr)
-> >   {
-> >       long ret;
-> >
-> > +     if (page_is_page_pool_iov(page))
-> > +             return -EINVAL;
-> > +
-> >       /* If nr =3D=3D pp_frag_count then we have cleared all remaining
-> >        * references to the page. No need to actually overwrite it, inst=
-ead
-> >        * we can leave this to be overwritten by the calling function.
-> > @@ -494,7 +555,12 @@ static inline void page_pool_recycle_direct(struct=
- page_pool *pool,
-> >
-> >   static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
-> >   {
-> > -     dma_addr_t ret =3D page->dma_addr;
-> > +     dma_addr_t ret;
-> > +
-> > +     if (page_is_page_pool_iov(page))
-> > +             return page_pool_iov_dma_addr(page_to_page_pool_iov(page)=
-);
-> > +
-> > +     ret =3D page->dma_addr;
-> >
-> >       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> >               ret |=3D (dma_addr_t)page->dma_addr_upper << 16 << 16;
-> > @@ -504,6 +570,12 @@ static inline dma_addr_t page_pool_get_dma_addr(st=
-ruct page *page)
-> >
-> >   static inline void page_pool_set_dma_addr(struct page *page, dma_addr=
-_t addr)
-> >   {
-> > +     /* page_pool_iovs are mapped and their dma-addr can't be modified=
-. */
-> > +     if (page_is_page_pool_iov(page)) {
-> > +             DEBUG_NET_WARN_ON_ONCE(true);
-> > +             return;
-> > +     }
-> > +
-> >       page->dma_addr =3D addr;
-> >       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> >               page->dma_addr_upper =3D upper_32_bits(addr);
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index 0a7c08d748b8..20c1f74fd844 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -318,7 +318,7 @@ static struct page *page_pool_refill_alloc_cache(st=
-ruct page_pool *pool)
-> >               if (unlikely(!page))
-> >                       break;
-> >
-> > -             if (likely(page_to_nid(page) =3D=3D pref_nid)) {
-> > +             if (likely(page_pool_page_is_pref_nid(page, pref_nid))) {
-> >                       pool->alloc.cache[pool->alloc.count++] =3D page;
-> >               } else {
-> >                       /* NUMA mismatch;
-> > @@ -363,7 +363,15 @@ static void page_pool_dma_sync_for_device(struct p=
-age_pool *pool,
-> >                                         struct page *page,
-> >                                         unsigned int dma_sync_size)
-> >   {
-> > -     dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
-> > +     dma_addr_t dma_addr;
-> > +
-> > +     /* page_pool_iov memory provider do not support PP_FLAG_DMA_SYNC_=
-DEV */
-> > +     if (page_is_page_pool_iov(page)) {
-> > +             DEBUG_NET_WARN_ON_ONCE(true);
-> > +             return;
-> > +     }
-> > +
-> > +     dma_addr =3D page_pool_get_dma_addr(page);
-> >
-> >       dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
-> >       dma_sync_single_range_for_device(pool->p.dev, dma_addr,
-> > @@ -375,6 +383,12 @@ static bool page_pool_dma_map(struct page_pool *po=
-ol, struct page *page)
-> >   {
-> >       dma_addr_t dma;
-> >
-> > +     if (page_is_page_pool_iov(page)) {
-> > +             /* page_pool_iovs are already mapped */
-> > +             DEBUG_NET_WARN_ON_ONCE(true);
-> > +             return true;
-> > +     }
-> > +
-> >       /* Setup DMA mapping: use 'struct page' area for storing DMA-addr
-> >        * since dma_addr_t can be either 32 or 64 bits and does not alwa=
-ys fit
-> >        * into page private data (i.e 32bit cpu with 64bit DMA caps)
-> > @@ -398,14 +412,24 @@ static bool page_pool_dma_map(struct page_pool *p=
-ool, struct page *page)
-> >   static void page_pool_set_pp_info(struct page_pool *pool,
-> >                                 struct page *page)
-> >   {
-> > -     page->pp =3D pool;
-> > -     page->pp_magic |=3D PP_SIGNATURE;
-> > +     if (!page_is_page_pool_iov(page)) {
-> > +             page->pp =3D pool;
-> > +             page->pp_magic |=3D PP_SIGNATURE;
-> > +     } else {
-> > +             page_to_page_pool_iov(page)->pp =3D pool;
-> > +     }
-> > +
-> >       if (pool->p.init_callback)
-> >               pool->p.init_callback(page, pool->p.init_arg);
-> >   }
-> >
-> >   static void page_pool_clear_pp_info(struct page *page)
-> >   {
-> > +     if (page_is_page_pool_iov(page)) {
-> > +             page_to_page_pool_iov(page)->pp =3D NULL;
-> > +             return;
-> > +     }
-> > +
-> >       page->pp_magic =3D 0;
-> >       page->pp =3D NULL;
-> >   }
-> > @@ -615,7 +639,7 @@ static bool page_pool_recycle_in_cache(struct page =
-*page,
-> >               return false;
-> >       }
-> >
-> > -     /* Caller MUST have verified/know (page_ref_count(page) =3D=3D 1)=
- */
-> > +     /* Caller MUST have verified/know (page_pool_page_ref_count(page)=
- =3D=3D 1) */
-> >       pool->alloc.cache[pool->alloc.count++] =3D page;
-> >       recycle_stat_inc(pool, cached);
-> >       return true;
-> > @@ -638,9 +662,10 @@ __page_pool_put_page(struct page_pool *pool, struc=
-t page *page,
-> >        * refcnt =3D=3D 1 means page_pool owns page, and can recycle it.
-> >        *
-> >        * page is NOT reusable when allocated when system is under
-> > -      * some pressure. (page_is_pfmemalloc)
-> > +      * some pressure. (page_pool_page_is_pfmemalloc)
-> >        */
-> > -     if (likely(page_ref_count(page) =3D=3D 1 && !page_is_pfmemalloc(p=
-age))) {
-> > +     if (likely(page_pool_page_ref_count(page) =3D=3D 1 &&
-> > +                !page_pool_page_is_pfmemalloc(page))) {
-> >               /* Read barrier done in page_ref_count / READ_ONCE */
-> >
-> >               if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
-> > @@ -741,7 +766,8 @@ static struct page *page_pool_drain_frag(struct pag=
-e_pool *pool,
-> >       if (likely(page_pool_defrag_page(page, drain_count)))
-> >               return NULL;
-> >
-> > -     if (page_ref_count(page) =3D=3D 1 && !page_is_pfmemalloc(page)) {
-> > +     if (page_pool_page_ref_count(page) =3D=3D 1 &&
-> > +         !page_pool_page_is_pfmemalloc(page)) {
-> >               if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
-> >                       page_pool_dma_sync_for_device(pool, page, -1);
-> >
-> > @@ -818,9 +844,9 @@ static void page_pool_empty_ring(struct page_pool *=
-pool)
-> >       /* Empty recycle ring */
-> >       while ((page =3D ptr_ring_consume_bh(&pool->ring))) {
-> >               /* Verify the refcnt invariant of cached pages */
-> > -             if (!(page_ref_count(page) =3D=3D 1))
-> > +             if (!(page_pool_page_ref_count(page) =3D=3D 1))
-> >                       pr_crit("%s() page_pool refcnt %d violation\n",
-> > -                             __func__, page_ref_count(page));
-> > +                             __func__, page_pool_page_ref_count(page))=
-;
-> >
-> >               page_pool_return_page(pool, page);
-> >       }
-> > @@ -977,19 +1003,24 @@ bool page_pool_return_skb_page(struct page *page=
-, bool napi_safe)
-> >       struct page_pool *pp;
-> >       bool allow_direct;
-> >
-> > -     page =3D compound_head(page);
-> > +     if (!page_is_page_pool_iov(page)) {
-> > +             page =3D compound_head(page);
-> >
-> > -     /* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
-> > -      * in order to preserve any existing bits, such as bit 0 for the
-> > -      * head page of compound page and bit 1 for pfmemalloc page, so
-> > -      * mask those bits for freeing side when doing below checking,
-> > -      * and page_is_pfmemalloc() is checked in __page_pool_put_page()
-> > -      * to avoid recycling the pfmemalloc page.
-> > -      */
-> > -     if (unlikely((page->pp_magic & ~0x3UL) !=3D PP_SIGNATURE))
-> > -             return false;
-> > +             /* page->pp_magic is OR'ed with PP_SIGNATURE after the
-> > +              * allocation in order to preserve any existing bits, suc=
-h as
-> > +              * bit 0 for the head page of compound page and bit 1 for
-> > +              * pfmemalloc page, so mask those bits for freeing side w=
-hen
-> > +              * doing below checking, and page_pool_page_is_pfmemalloc=
-() is
-> > +              * checked in __page_pool_put_page() to avoid recycling t=
-he
-> > +              * pfmemalloc page.
-> > +              */
-> > +             if (unlikely((page->pp_magic & ~0x3UL) !=3D PP_SIGNATURE)=
-)
-> > +                     return false;
-> >
-> > -     pp =3D page->pp;
-> > +             pp =3D page->pp;
-> > +     } else {
-> > +             pp =3D page_to_page_pool_iov(page)->pp;
-> > +     }
-> >
-> >       /* Allow direct recycle if we have reasons to believe that we are
-> >        * in the same context as the consumer would run, so there's
-> > @@ -1273,9 +1304,9 @@ static bool mp_huge_busy(struct mp_huge *hu, unsi=
-gned int idx)
-> >
-> >       for (j =3D 0; j < (1 << MP_HUGE_ORDER); j++) {
-> >               page =3D hu->page[idx] + j;
-> > -             if (page_ref_count(page) !=3D 1) {
-> > +             if (page_pool_page_ref_count(page) !=3D 1) {
-> >                       pr_warn("Page with ref count %d at %u, %u. Can't =
-safely destory, leaking memory!\n",
-> > -                             page_ref_count(page), idx, j);
-> > +                             page_pool_page_ref_count(page), idx, j);
-> >                       return true;
-> >               }
-> >       }
-> > @@ -1330,7 +1361,7 @@ static struct page *mp_huge_alloc_pages(struct pa=
-ge_pool *pool, gfp_t gfp)
-> >                       continue;
-> >
-> >               if ((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE ||
-> > -                 page_ref_count(page) !=3D 1) {
-> > +                 page_pool_page_ref_count(page) !=3D 1) {
-> >                       atomic_inc(&mp_huge_ins_b);
-> >                       continue;
-> >               }
-> > @@ -1458,9 +1489,9 @@ static void mp_huge_1g_destroy(struct page_pool *=
-pool)
-> >       free =3D true;
-> >       for (i =3D 0; i < MP_HUGE_1G_CNT; i++) {
-> >               page =3D hu->page + i;
-> > -             if (page_ref_count(page) !=3D 1) {
-> > +             if (page_pool_page_ref_count(page) !=3D 1) {
-> >                       pr_warn("Page with ref count %d at %u. Can't safe=
-ly destory, leaking memory!\n",
-> > -                             page_ref_count(page), i);
-> > +                             page_pool_page_ref_count(page), i);
-> >                       free =3D false;
-> >                       break;
-> >               }
-> > @@ -1489,7 +1520,7 @@ static struct page *mp_huge_1g_alloc_pages(struct=
- page_pool *pool, gfp_t gfp)
-> >               page =3D hu->page + page_i;
-> >
-> >               if ((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE ||
-> > -                 page_ref_count(page) !=3D 1) {
-> > +                 page_pool_page_ref_count(page) !=3D 1) {
-> >                       atomic_inc(&mp_huge_ins_b);
-> >                       continue;
-> >               }
-> > --
-> > 2.41.0.640.ga95def55d0-goog
-> >
->
+NACK! Port function is there to configure the VF/SF from the eswitch
+side. Yet you use it for the configureation of the actual VF, which is
+clear misuse. Please don't
 
 
---
-Thanks,
-Mina
+>
+>[root@localhost ~]# devlink port function rate show
+>pci/0000:af:01.0/txq_15: type node parent iavf_root
+>pci/0000:af:01.0/txq_14: type node parent iavf_root
+>pci/0000:af:01.0/txq_13: type node parent iavf_root
+>pci/0000:af:01.0/txq_12: type node parent iavf_root
+>pci/0000:af:01.0/txq_11: type node parent iavf_root
+>pci/0000:af:01.0/txq_10: type node parent iavf_root
+>pci/0000:af:01.0/txq_9: type node parent iavf_root
+>pci/0000:af:01.0/txq_8: type node parent iavf_root
+>pci/0000:af:01.0/txq_7: type node parent iavf_root
+>pci/0000:af:01.0/txq_6: type node parent iavf_root
+>pci/0000:af:01.0/txq_5: type node parent iavf_root
+>pci/0000:af:01.0/txq_4: type node parent iavf_root
+>pci/0000:af:01.0/txq_3: type node parent iavf_root
+>pci/0000:af:01.0/txq_2: type node parent iavf_root
+>pci/0000:af:01.0/txq_1: type node parent iavf_root
+>pci/0000:af:01.0/txq_0: type node parent iavf_root
+>pci/0000:af:01.0/iavf_root: type node
+>
+>
+>                         +---------+
+>                         |   root  |
+>                         +----+----+
+>                              |
+>            |-----------------|-----------------|
+>       +----v----+       +----v----+       +----v----+
+>       |  txq_0  |       |  txq_1  |       |  txq_x  |
+>       +----+----+       +----+----+       +----+----+
+>
+>User can configure the tx_max and tx_share of each queue. Once any one of the
+>queues are fully configured, VIRTCHNL opcodes of VIRTCHNL_OP_CONFIG_QUEUE_BW
+>and VIRTCHNL_OP_CONFIG_QUANTA will be sent to PF to configure queues allocated
+>to VF
+>
+>Example:
+>
+>1.To Set the queue tx_share:
+>devlink port function rate set pci/0000:af:01.0 txq_0 tx_share 100 MBps
+>
+>2.To Set the queue tx_max:
+>devlink port function rate set pci/0000:af:01.0 txq_0 tx_max 200 MBps
+>
+>3.To Show Current devlink port rate info:
+>devlink port function rate function show
+>[root@localhost ~]# devlink port function rate show
+>pci/0000:af:01.0/txq_15: type node parent iavf_root
+>pci/0000:af:01.0/txq_14: type node parent iavf_root
+>pci/0000:af:01.0/txq_13: type node parent iavf_root
+>pci/0000:af:01.0/txq_12: type node parent iavf_root
+>pci/0000:af:01.0/txq_11: type node parent iavf_root
+>pci/0000:af:01.0/txq_10: type node parent iavf_root
+>pci/0000:af:01.0/txq_9: type node parent iavf_root
+>pci/0000:af:01.0/txq_8: type node parent iavf_root
+>pci/0000:af:01.0/txq_7: type node parent iavf_root
+>pci/0000:af:01.0/txq_6: type node parent iavf_root
+>pci/0000:af:01.0/txq_5: type node parent iavf_root
+>pci/0000:af:01.0/txq_4: type node parent iavf_root
+>pci/0000:af:01.0/txq_3: type node parent iavf_root
+>pci/0000:af:01.0/txq_2: type node parent iavf_root
+>pci/0000:af:01.0/txq_1: type node parent iavf_root
+>pci/0000:af:01.0/txq_0: type node tx_share 800Mbit tx_max 1600Mbit parent iavf_root
+>pci/0000:af:01.0/iavf_root: type node
+>
+>
+>[1]https://lore.kernel.org/netdev/20221115104825.172668-1-michal.wilczynski@intel.com/
+>
+>Change log:
+>
+>v4:
+>- Rearrange the ice_vf_qs_bw structure, put the largest number first
+>- Minimize the scope of values
+>- Remove the unnecessary brackets
+>- Remove the unnecessary memory allocation.
+>- Added Error Code and moved devlink registration before aq lock initialization
+>- Changed devlink registration for error handling in case of allocation failure
+>- Used kcalloc for object array memory allocation and initialization
+>- Changed functions & comments for readability
+>
+>v3:
+>- Rebase the code
+>- Changed rate node max/share set function description
+>- Put variable in local scope
+>
+>v2:
+>- Change static array to flex array
+>- Use struct_size helper
+>- Align all the error code types in the function
+>- Move the register field definitions to the right place in the file
+>- Fix coding style
+>- Adapted to queue bw cfg and qos cap list virtchnl message with flex array fields
+>---
+>
+>Jun Zhang (3):
+>  iavf: Add devlink and devlink port support
+>  iavf: Add devlink port function rate API support
+>  iavf: Add VIRTCHNL Opcodes Support for Queue bw Setting
+>
+>Wenjun Wu (2):
+>  virtchnl: support queue rate limit and quanta size configuration
+>  ice: Support VF queue rate limit and quanta size configuration
+>
+> drivers/net/ethernet/intel/Kconfig            |   1 +
+> drivers/net/ethernet/intel/iavf/Makefile      |   2 +-
+> drivers/net/ethernet/intel/iavf/iavf.h        |  19 +
+> .../net/ethernet/intel/iavf/iavf_devlink.c    | 377 ++++++++++++++++++
+> .../net/ethernet/intel/iavf/iavf_devlink.h    |  38 ++
+> drivers/net/ethernet/intel/iavf/iavf_main.c   |  64 ++-
+> .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 231 ++++++++++-
+> drivers/net/ethernet/intel/ice/ice.h          |   2 +
+> drivers/net/ethernet/intel/ice/ice_base.c     |   2 +
+> drivers/net/ethernet/intel/ice/ice_common.c   |  19 +
+> .../net/ethernet/intel/ice/ice_hw_autogen.h   |   8 +
+> drivers/net/ethernet/intel/ice/ice_txrx.h     |   2 +
+> drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+> drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   9 +
+> drivers/net/ethernet/intel/ice/ice_virtchnl.c | 310 ++++++++++++++
+> drivers/net/ethernet/intel/ice/ice_virtchnl.h |  11 +
+> .../intel/ice/ice_virtchnl_allowlist.c        |   6 +
+> include/linux/avf/virtchnl.h                  | 119 ++++++
+> 18 files changed, 1218 insertions(+), 3 deletions(-)
+> create mode 100644 drivers/net/ethernet/intel/iavf/iavf_devlink.c
+> create mode 100644 drivers/net/ethernet/intel/iavf/iavf_devlink.h
+>
+>-- 
+>2.34.1
+>
+>
 
