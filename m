@@ -1,84 +1,94 @@
-Return-Path: <netdev+bounces-29740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 743FA7848E2
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 19:59:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38F5F7848E3
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 19:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FE83281152
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:59:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 707F7280DA2
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5E11DA5A;
-	Tue, 22 Aug 2023 17:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606E61DDD9;
+	Tue, 22 Aug 2023 17:59:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FBA1DA54
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 17:59:10 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBB2196;
-	Tue, 22 Aug 2023 10:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LK06T23V52CL3+Hym+ZPbCcNQEC7s+0AXFEJE2GMEVo=; b=FV+7qPfKHMpy6L4pNss6BxnA61
-	ULmfP++J2dE74zcTCp73I2SXD1GZ67uRJ0vN2ijhkuT3ZAdwpW0qcuf5BTLLfhwkQsJH1NmR8D+bF
-	1e6fK1mc5WSWQQbbIIvLTWlGsfyFG7ZtLf8NLgJpkVUADkdrBc5HNKilqACScz7CESSg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qYVee-004o5H-3S; Tue, 22 Aug 2023 19:59:00 +0200
-Date: Tue, 22 Aug 2023 19:59:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, jiri@resnulli.us
-Subject: Re: [PATCH net-next v6 1/2] net/ethernet/realtek: Add Realtek
- automotive PCIe driver code
-Message-ID: <aa7e5c75-e337-4150-bba5-a139ab4fc02f@lunn.ch>
-References: <20230822031805.4752-1-justinlai0215@realtek.com>
- <20230822031805.4752-2-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DE51DA54
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 17:59:12 +0000 (UTC)
+Received: from [192.168.42.3] (194-45-78-10.static.kviknet.net [194.45.78.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPSA id 785C7C433CA;
+	Tue, 22 Aug 2023 17:59:09 +0000 (UTC)
+Subject: [PATCH net-next RFC v1 1/4] veth: use same bpf_xdp_adjust_head check
+ as generic-XDP
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, edumazet@google.com
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, lorenzo@kernel.org,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, mtahhan@redhat.com,
+ huangjie.albert@bytedance.com, Yunsheng Lin <linyunsheng@huawei.com>,
+ Liang Chen <liangchen.linux@gmail.com>
+Date: Tue, 22 Aug 2023 19:59:07 +0200
+Message-ID: <169272714720.1975370.12172959079424954030.stgit@firesoul>
+In-Reply-To: <169272709850.1975370.16698220879817216294.stgit@firesoul>
+References: <169272709850.1975370.16698220879817216294.stgit@firesoul>
+User-Agent: StGit/1.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230822031805.4752-2-justinlai0215@realtek.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-> +	do {
-> +		status = RTL_R32(tp, ivec->isr_addr);
-> +
-> +		handled = 1;
-> +		RTL_W32(tp, ivec->imr_addr, 0x0);
-> +		RTL_W32(tp, ivec->isr_addr, (status & ~FOVW));
-> +
-> +		if ((status & ivec->imr)) {
-> +			if (likely(napi_schedule_prep(&ivec->napi)))
-> +				__napi_schedule(&ivec->napi);
-> +		}
-> +	} while (false);
+This is a consistency patch, no functional change.
 
-Remember i said that if you do something which no other network driver
-does, it is probably wrong. How many drivers have a do {} while (false);
-loop?
+Both veth_xdp_rcv_skb() and bpf_prog_run_generic_xdp() checks if XDP bpf_prog
+adjusted packet head via BPF-helper bpf_xdp_adjust_head(). The order of
+subtracting orig_data and xdp->data are opposite between the two functions. This
+is confusing when reviewing and reading the code.
 
-Please spend a few days just reading other drivers, and compare your
-code with those drivers. Try to find all the things your driver does
-which no other driver has. That code is probably wrong and you should
-fix it.
+This patch choose to follow generic-XDP and adjust veth_xdp_rcv_skb().
 
-	Andrew
+In veth_xdp_rcv_skb() the skb_mac_header length have been __skb_push()'ed.
+Thus, we skip the skb->mac_header adjustments like bpf_prog_run_generic_xdp()
+and instead do a skb_reset_mac_header() as skb->data point to Eth header.
+
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+ drivers/net/veth.c |   13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 953f6d8f8db0..be7b62f57087 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -897,12 +897,13 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
+ 	rcu_read_unlock();
+ 
+ 	/* check if bpf_xdp_adjust_head was used */
+-	off = orig_data - xdp->data;
+-	if (off > 0)
+-		__skb_push(skb, off);
+-	else if (off < 0)
+-		__skb_pull(skb, -off);
+-
++	off = xdp->data - orig_data;
++	if (off) {
++		if (off > 0)
++			__skb_pull(skb, off);
++		else if (off < 0)
++			__skb_push(skb, -off);
++	}
+ 	skb_reset_mac_header(skb);
+ 
+ 	/* check if bpf_xdp_adjust_tail was used */
+
+
 
