@@ -1,258 +1,222 @@
-Return-Path: <netdev+bounces-29627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA1EC784159
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 14:57:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEDC178417C
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:03:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4EE281008
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:57:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDEE21C20AE7
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4873F1C2B3;
-	Tue, 22 Aug 2023 12:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5BD1C9E0;
+	Tue, 22 Aug 2023 13:03:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9257F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 12:57:22 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93181CD2;
-	Tue, 22 Aug 2023 05:57:16 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 2D6A0100004;
-	Tue, 22 Aug 2023 15:57:15 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 2D6A0100004
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1692709035;
-	bh=FiQb2EVn5ypleg6BQsERBl+GZe543bd0nkARjCdth2g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=a4x2BOd0BS1zaK5ukbZ8qhyp4LXJ8zN9nk63I79E/rgP2f92h15c9dBoolbb71Q9d
-	 0NN95Bn9Myl/FKY4N3yKZ3HsRW27fFj/mRAt8YRmgFJoEYmbKCFOKr8fwE/Phinegi
-	 4Fx6FKWlbCC25ihofhkc3Qiao/eJ2EZbVWgx9hg/D7GZt441Gl/cVlCzXMx02MDZwx
-	 MO5y2TYaBxzoWk+TnB+lU15BNAJCyNP4k42NMHK4UfMbYdKCu23+oLqoUn6pVoc0S0
-	 myKWkP658V7XrKnSHUbwfOQamcbMSeUndl730ZTyc9tTUfzsjLdxFbg58HcmWh2Z9C
-	 QgNZ/sBkT3vmg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 22 Aug 2023 15:57:14 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED4B7F;
+	Tue, 22 Aug 2023 13:03:08 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C5FCC6;
+	Tue, 22 Aug 2023 06:03:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692709387; x=1724245387;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=bfVisHuGty7CrsDVwRFiLIBfH1x+UYA4SHJJdhO+dqA=;
+  b=fiIeLLG6bvceBjL5/SOoRa5W1iRCS8h3UEHfPAUPB3/oxd1JGucu3h7d
+   5tOyYh6Hun89AZK2JEhBa4krpusxjJAP18Gv6dQ8V2auBhEZ5mgEOufvc
+   dPQSUIUAS68Pt/n/TleMuFc81d352M/q2zKXmuBkJrBnRks1gmZzjpi2M
+   6//uqqh9FWkkhbtXuPLlR2F9pTzk/38BhCURry0cKmx8a2xK++Von5Eyz
+   z9opbXowf+KK/umisf4H1Ve8cLTtKqQy7JS9tnCnzgimApIUszvLfV7I5
+   DIp6lOcQKh6kQYSfIgp/Gdk50CjlldijHDCFof1/zIx5XJxKfwQuhs0Sv
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="364039429"
+X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
+   d="scan'208";a="364039429"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 06:02:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="982862392"
+X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
+   d="scan'208";a="982862392"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga006.fm.intel.com with ESMTP; 22 Aug 2023 06:02:54 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 22 Aug 2023 06:02:54 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 22 Aug 2023 06:02:54 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 22 Aug 2023 15:57:13 +0300
-Message-ID: <7a368021-95f3-8a9d-7fe5-c0fc352b888b@sberdevices.ru>
-Date: Tue, 22 Aug 2023 15:51:11 +0300
+ 15.1.2507.27; Tue, 22 Aug 2023 06:02:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Is28yHQaV9LV/w4pod5NA4oX+JHxG/BFaj09HiRSRT8H1Y4yGAaxOdqMC1S5/63PmV7hxHXpJLNgEdD0C9ddn8om/q+MQGY8P1yjtdaST9b9WjTe0GpNk2BbQCLvtXIbncdCu3AmDF39F5P6omqrON3UHouP44vmH0GgbtYa4ZD4TA0+8b6G9n1q5BZWceyI8EqCnohOsHfLeEQ5/h+VPBMD0e622HIRz52XWyo8QhxnKJyPdRd2GTxWwKS0rDBlB2YpTkGFjHdkytlmYwVav0aS5Xk2jDH28KYUmYJfVSqoPCKgnfbr8eBpDyyA9t+jPbmIOcTJ27olilY8ocY3fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LXnZLvv9uS0skWk5bH7BrUjncyfD44GEZIWK8ZK3+O4=;
+ b=NO53hRn8EIGgdPifsysAftfcZWWCvPf+SBTr/BBan50Yhn95Ce2AwuE2HJ6eb+lut/hLGZccrrCYBpfDtY3Z6KLevYl91qyBjbFKCcwtiXUIYiEffcPwn2NbUYN+5pLNcgrtr/6AZXox90bGUZ8xF9NixkansRkvb5mx8XjuvugbeJd18y8JPd1fp1UN5JIj1FuK0seqCc3TqedySRQkH1aSqQk6pLhi3fzmrc/60WcetF8XYV2aoXMEJF3fhXbNgyNXfi8iyQemFVUwDOw+SIQqDVbaILUUg1qGfftcZo0wsY1tP7vgJgSG15l/pZ2rWYgi47u+BVPWqqLbFQJbNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ SJ1PR11MB6153.namprd11.prod.outlook.com (2603:10b6:a03:488::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Tue, 22 Aug
+ 2023 13:02:51 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::c1f9:b4eb:f57e:5c3d]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::c1f9:b4eb:f57e:5c3d%3]) with mapi id 15.20.6699.022; Tue, 22 Aug 2023
+ 13:02:51 +0000
+Date: Tue, 22 Aug 2023 15:02:38 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+CC: <magnus.karlsson@intel.com>, <bjorn@kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<yhs@fb.com>, <andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>
+Subject: Re: [PATCH bpf-next 10/10] selftests/xsk: display command line
+ options with -h
+Message-ID: <ZOSx7rZ4NcRBX/MR@boxer>
+References: <20230809124343.12957-1-magnus.karlsson@gmail.com>
+ <20230809124343.12957-11-magnus.karlsson@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230809124343.12957-11-magnus.karlsson@gmail.com>
+X-ClientProxiedBy: FR3P281CA0182.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a4::17) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
- socket
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Arseniy Krasnov <oxffffaa@gmail.com>, Stefan Hajnoczi
-	<stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>
-References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
- <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
- <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
- <44fef482-579a-fed6-6e8c-d400546285fc@gmail.com>
- <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
- <49cdd121-3389-2f08-c0cc-89c9ac32cd1e@sberdevices.ru>
- <2ce6e3eihhtjigwectlgrbiv7ygnpki6vfdkav4effpti5gtj4@lldtdljxkyrb>
-From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <2ce6e3eihhtjigwectlgrbiv7ygnpki6vfdkav4effpti5gtj4@lldtdljxkyrb>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179376 [Aug 22 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 527 527 5bb611be2ca2baa31d984ccbf4ef4415504fc308, {Tracking_smtp_not_equal_from}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;pubs.opengroup.org:7.1.1;100.64.160.123:7.1.2;sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: n, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/08/22 12:20:00
-X-KSMG-LinksScanning: Clean, bases: 2023/08/22 12:20:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/22 09:22:00 #21674243
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SJ1PR11MB6153:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7126fea0-babf-487e-2894-08dba310175d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UPTmfviT+LiQsoQSySdPa9b4OP/gt9yKgyVlOw3M5FdvmNst0iJjGMWgIA5HY4ghS5ityuJ8zEb1l1WNmqO2so8+b/QPxk3wW+XpXCYMMhwIps7NYD2ysvcXL16X1BtM1DV+drNgQ3HXdT8j7pjl8+1WyQ+GqnyJ9eZ1rHS0u15XWjPZkwosLzK6jUzS3uwWnPDvXpaIxzk52icKEAfRw+PLkzzE0KHezIR54+YJtBbNzuxxj1sdIvjBcV/His2WJwAd8rp7eJOdejPFwg1g5JK6P+6YAPC6nYgaBHDk9dHSEpop8jWRdjYOnXRAQSN4F8KqMa3JIWdfM+LrUnpEqES+eAVb/KYU0J8BLCifLrZwvLS5MQOUtdNqtFhAZ++yl1j47UwiOEnwNdTBWzyzJCMi5FR/F8ETbrNIjcZYFAuZTTWbI+Uy5+lsK/YwpljLaDDTVbn+kTAuU70LAyBdVckpzr6Wy+P+/sOWrgiajiFyeULolhSGZedN8Z0w5zT18vZz3eg02aC22aWIH6c0Bz2CxDJ3ipGXGqWElIIykhYKqIDIo6Mo5T61SrttJCtv
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(376002)(396003)(366004)(39860400002)(346002)(1800799009)(186009)(451199024)(6916009)(66476007)(66556008)(316002)(9686003)(66946007)(6512007)(82960400001)(8676002)(8936002)(4326008)(33716001)(41300700001)(478600001)(6666004)(38100700002)(6486002)(6506007)(83380400001)(2906002)(7416002)(86362001)(44832011)(5660300002)(26005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZMQRdmra4V8o4/4hTlbjCBVd5oICgHHDoeoNg51OxCvHYEtn8bhVdDFY+8uD?=
+ =?us-ascii?Q?861f0Dga9hoCJs1yS6cbo+F3kLhuS2HHICRxVRNA/1Xc+stw9mnSAIFyBiGN?=
+ =?us-ascii?Q?wTav8EbO0o9bVJAdqyZyxPzIDx/oWulkPM0k0lJSW/DFWEproo3v56/sOA90?=
+ =?us-ascii?Q?kJjS0H4HouHSW25j7XH1MVKlnlJ+d1IqUU3DivWaVBFq5qgxphFK12yOhvgi?=
+ =?us-ascii?Q?MegE8BRJOdcI5/st2VW7ml5AQaObkieC/M4idDHznk5P5MxKhtLLTPH3XoVc?=
+ =?us-ascii?Q?ZzLt0kBZn7T44ahNwb5WdfbG/QIrs1YtiB7YMvvxKezmIzQh2uBduxy+HC78?=
+ =?us-ascii?Q?QYRrGRfSHOs+r5us4jatONxQ2BjLkUi0FAoB/Rs2I0XhcFdvE2i6+IWGvz8+?=
+ =?us-ascii?Q?aenAV9Z8UJ/Rceq1jyBkgz1kGtbiB1JzkwDjK9xteZ/+vV8MsuNk1rvC5HV3?=
+ =?us-ascii?Q?SBPb2OiagpWe+3Q5DC6MdfUiPCs/ub9T3yxFX82SexMSuaYtWTXLbr7LzSaR?=
+ =?us-ascii?Q?U+4iiSu4je0VJuRcP2/QaSoHLSh455gWH0IzVDCqiTmVH5/Ox8Zo6KPXEoL/?=
+ =?us-ascii?Q?Frf3RgLAeJ1DwS4hEMuZ5KB6VHmUiWiuSIuB1Eo/feb0TyNbfE/MAzXwOAvW?=
+ =?us-ascii?Q?jHB7cHo7XHnJ8TK++2SmggUZNzTrhqQmtaGqvErL5uaxGNswWm0aSx74eiB2?=
+ =?us-ascii?Q?Xw7ZOkmyfwDliCF8xTsbYIWvHuLhWGo+NAh85ExtVstBHPTjddt5sAM02Rf5?=
+ =?us-ascii?Q?MFJG6Hi+LEyrnWSyp3npwQ23IDcKoEV8qAufR5EZ0UsmebZ/3m7OZAXJQieK?=
+ =?us-ascii?Q?EVVn/xfkNzPKpaX97fbkyTxxfMstrOOnzK/lANhM8jYQwuuB1lI8cDfUuiIq?=
+ =?us-ascii?Q?mbjsJFmpIcKjWMrsvKu5jAosm/sDjrs6Ihoeh/RVC0QYT0Fqe7RLQk5InJSc?=
+ =?us-ascii?Q?rFo/DPxO32NZMtOqJrhZK+R7dI8kgmZJqG5tQseXg4TwUG8BOv95vJMOf14t?=
+ =?us-ascii?Q?PRaE0zNqAVie8RvPnZTWJ0ZE2WKetJXlzqbkba4pXnjcdBhDo+ty/Ukfgb+W?=
+ =?us-ascii?Q?FEL1RcvZ0jEm4WlI6PUAMRz9T9cmeDIH1MlPQZK1Y3xU3mehMGt0W2QKfNXu?=
+ =?us-ascii?Q?cPJR59OIqi5JJNGECSPqrZNvjmKcNKIb2AaeTlyxjiNeEUVTDQAaQQjjwinQ?=
+ =?us-ascii?Q?RdMSwL/8UFwQHiX+DX7zsUlW+anuO9hlmtVoUD4caLSyMCAClhjwZs906ww3?=
+ =?us-ascii?Q?K3BIQHqt/qM1dH9EQ8IPb51poUabzoOrJiYPIcmC+DWcuyKWnF9OdCMnKtJ4?=
+ =?us-ascii?Q?y2qhgA5r5EcozOkWx2yfD1D7I0AyPrTqVMj9vwBjmOxRaL/Hp+EhKVm7pK38?=
+ =?us-ascii?Q?EAIDtWp2AOkSU5lOepHusFv2pIwQSV6pQwdQ2WhsASys5+iZZrCrf223lxvp?=
+ =?us-ascii?Q?Ps38cb6M+/Z6PsZ6yGDhd+0VFfloSSmIKNlMaOOTmyTCSe+uhGpbwJKN/Uql?=
+ =?us-ascii?Q?vKISaqNKwAF7belCSHOjQP6lLRC2kcFcwm672BLEiNro3Y6iuytvClanUYck?=
+ =?us-ascii?Q?8As/Yk4r+IhObNAnJojpCNysV0FXYG1kM9mVoPMbmU4QBRk5Z347dqHRj2CI?=
+ =?us-ascii?Q?Cg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7126fea0-babf-487e-2894-08dba310175d
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2023 13:02:51.1923
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: J6M1z5Q38KBs0ZiUEkErVHvdP656Lq/JdmX4gcxCxHp1QnoPq8AEgVj2GBgbI/7EQjVTHoFZ9sNpGF/M4OpCZkaMoVpGca3Ss/yR2rKj4U8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6153
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 22.08.2023 12:39, Stefano Garzarella wrote:
-> On Mon, Aug 14, 2023 at 10:46:05PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 04.08.2023 17:28, Stefano Garzarella wrote:
->>> On Fri, Aug 04, 2023 at 03:46:47PM +0300, Arseniy Krasnov wrote:
->>>> Hi Stefano,
->>>>
->>>> On 02.08.2023 10:46, Stefano Garzarella wrote:
->>>>> On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
->>>>>> POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
->>>>>> shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
->>>>>> flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
->>>>>>
->>>>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>>>>> ---
->>>>>> net/vmw_vsock/af_vsock.c | 3 +++
->>>>>> 1 file changed, 3 insertions(+)
->>>>>>
->>>>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>>>> index 020cf17ab7e4..013b65241b65 100644
->>>>>> --- a/net/vmw_vsock/af_vsock.c
->>>>>> +++ b/net/vmw_vsock/af_vsock.c
->>>>>> @@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
->>>>>>             err = total_written;
->>>>>>     }
->>>>>> out:
->>>>>> +    if (sk->sk_type == SOCK_STREAM)
->>>>>> +        err = sk_stream_error(sk, msg->msg_flags, err);
->>>>>
->>>>> Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
->>>>
->>>> Yes, here is my explanation:
->>>>
->>>> This function checks that input error is SIGPIPE, and if so it sends SIGPIPE to the 'current' thread
->>>> (except case when MSG_NOSIGNAL flag is set). This behaviour is described in POSIX:
->>>>
->>>> Page 367 (description of defines from sys/socket.h):
->>>> MSG_NOSIGNAL: No SIGPIPE generated when an attempt to send is made on a stream-
->>>> oriented socket that is no longer connected.
->>>>
->>>> Page 497 (description of SOCK_STREAM):
->>>> A SIGPIPE signal is raised if a thread sends on a broken stream (one that is
->>>> no longer connected).
->>>
->>> Okay, but I think we should do also for SEQPACKET:
->>>
->>> https://pubs.opengroup.org/onlinepubs/009696699/functions/xsh_chap02_10.html
->>>
->>> In 2.10.6 Socket Types:
->>>
->>> "The SOCK_SEQPACKET socket type is similar to the SOCK_STREAM type, and
->>> is also connection-oriented. The only difference between these types is
->>> that record boundaries ..."
->>>
->>> Then in  2.10.14 Signals:
->>>
->>> "The SIGPIPE signal shall be sent to a thread that attempts to send data
->>> on a socket that is no longer able to send. In addition, the send
->>> operation fails with the error [EPIPE]."
->>>
->>> It's honestly not super clear, but I assume the problem is similar with
->>> seqpacket since it's connection-oriented, or did I miss something?
->>>
->>> For example in sctp_sendmsg() IIUC we raise a SIGPIPE regardless of
->>> whether the socket is STREAM or SEQPACKET.
->>
->> Update about sending SIGPIPE for SOCK_SEQPACKET, I checked POSIX doc and kernel sources more deeply:
->>
->>
->> 1)
->>
->> I checked four types of sockets, which sends SIGPIPE for SOCK_SEQPACKET or not ('YES' if
->> this socket sends SIGPIPE in SOCK_SEQPACKET case):
->>
->> net/kcm/: YES
->> net/unix/: NO
->> net/sctp/: YES
->> net/caif/: NO
->>
->> Looking for this, I think it is impossible to get the right answer, as there is some
->> mess - everyone implements it as wish.
+On Wed, Aug 09, 2023 at 02:43:43PM +0200, Magnus Karlsson wrote:
+> From: Magnus Karlsson <magnus.karlsson@intel.com>
 > 
-> Eheh, I had the same impression!
+> Add the -h option to display all available command line options
+> available for test_xsk.sh and xskxceiver.
 > 
->>
->> 2)
->>
->> I opened POSIX spec again, and here are details about returning EPIPE from pages
->> for 'send()', 'sendto()', 'sendmsg()':
->>
->> [EPIPE] The socket is shut down for writing, or the socket is connection-mode and is
->> no longer connected. In the latter case, and if the socket is of type
->> SOCK_STREAM, the SIGPIPE signal is generated to the calling thread
->>
->> So my opinion is that we need to send SIGPIPE only for SOCK_STREAM. Another question
->> is how to interpret this from above (but again - SIGPIPE is related for SOCK_STREAM
->> only):
->>
->> **" and is no longer connected"**
->>
->> IIUC, if we follow POSIX strictly, this check must be like:
->>
->> /* socket is shut down for writing or no longer connected. */
->> if (sk->sk_shutdown & SEND_SHUTDOWN ||
->>    vsk->peer_shutdown & RCV_SHUTDOWN ||
->>    sock_flag(SOCK_DONE)) {
->>     err = -EPIPE;
->>     goto out;
->> }
->>
->> ...
->>
->> out:
->>     /* Handle -EPIPE for stream socket which is no longer connected. */
->>     if (sk->sk_type == SOCK_STREAM &&
->>         sock_flag(SOCK_DONE))
->>         err = sk_stream_error();
->>
->>
->>
->> From the other side, we can just follow TCP/AF_UNIX implementations as both are
->> popular types of socket. In this case I suggest to implement this check like
->> (e.g. without sock_flag(SOCK_DONE)):
->>
->>
->> if (sk->sk_shutdown & SEND_SHUTDOWN ||
->>    vsk->peer_shutdown & RCV_SHUTDOWN) {
->>     err = -EPIPE;
->>     goto out;
->> }
->>
->> ...
->>
->> out:
->>     if (sk->sk_type == SOCK_STREAM)
->>         err = sk_stream_error();
->>
->> What do you think?
+> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> ---
+>  tools/testing/selftests/bpf/test_xsk.sh | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
-> I'd follow TCP/AF_UNIX implementations, but it is up to you ;-)
+> diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
+> index 94b4b86d5239..baaeb016d699 100755
+> --- a/tools/testing/selftests/bpf/test_xsk.sh
+> +++ b/tools/testing/selftests/bpf/test_xsk.sh
+> @@ -79,12 +79,15 @@
+>  #
+>  # Run a specific test from the test suite
+>  #   sudo ./test_xsk.sh -t TEST_NAME
+> +#
+> +# Display the available command line options
+> +#   sudo ./test_xsk.sh -h
+>  
+>  . xsk_prereqs.sh
+>  
+>  ETH=""
+>  
+> -while getopts "vi:dm:lt:" flag
+> +while getopts "vi:dm:lt:h" flag
+>  do
+>  	case "${flag}" in
+>  		v) verbose=1;;
+> @@ -93,6 +96,7 @@ do
+>  		m) MODE=${OPTARG};;
+>  		l) list=1;;
+>  		t) TEST=${OPTARG};;
+> +		h) help=1;;
+>  	esac
+>  done
+>  
+> @@ -140,6 +144,11 @@ setup_vethPairs() {
+>  	ip link set ${VETH0} up
+>  }
+>  
+> +if [[ $help -eq 1 ]]; then
+> +	./${XSKOBJ}
+> +        exit
+> +fi
 
-Got it, I'll use this approach
+is there anything that stops from having the list of test output before
+all of the validation below (check that we are root, veth support etc) ?
 
-Thanks, Arseniy
+I would like us to have a case 'h' within parse_command_line() though.
 
-> 
-> Thanks,
-> Stefano
+> +
+>  if [ ! -z $ETH ]; then
+>  	VETH0=${ETH}
+>  	VETH1=${ETH}
+> -- 
+> 2.34.1
 > 
 
