@@ -1,81 +1,145 @@
-Return-Path: <netdev+bounces-29715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 980FF78466E
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:59:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C1678468C
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 18:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D203D2810F8
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:59:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC56F2810D4
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 16:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83591DA56;
-	Tue, 22 Aug 2023 15:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3E01DA5F;
+	Tue, 22 Aug 2023 16:06:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DCE79CF
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:59:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C63C2C433C8;
-	Tue, 22 Aug 2023 15:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DD51CA1F
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 16:06:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6261FC433C8;
+	Tue, 22 Aug 2023 16:06:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692719992;
-	bh=U5/rni7ScMnO0oxxGq/4AvPlu3yOQhVRQnsrpy6LqXk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lGTdEXBEwFJ4kOaYWUt/D15uCtzCvKv1svUaa5EflX4HJOSu+qQQqpM5VKRZkIb9c
-	 0Vfqpk0qaYDO6rh2gA/WIn+aMo3wbuMVBhIAefxIPY86KOHJ5mE6spMRy0OQKwirbC
-	 F05Jmfr0DFkb8I0O8e9jccCJjo5BmIyH5Y2b856E1lW2B9c+IOd3QCfB5cXoV16Zyh
-	 p4Wk7cr8eqjIysxR0Ns3fsi/P+64wn/lN4/4mysSKH2DyqZ98KC0aBQKwmh8GoLNnn
-	 OsUkHlsS4Chg2NYbUX72Vvd3dfu3R9me3WNvI2K+Gyo/77WK58vO2pM4j5C9+hRTgB
-	 OMiYeTgk5RzQQ==
-Date: Tue, 22 Aug 2023 08:59:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, Scott Dial <scott@scottdial.com>
-Subject: Re: [PATCH net-next] macsec: introduce default_async_crypto sysctl
-Message-ID: <20230822085950.02d2d2b0@kernel.org>
-In-Reply-To: <ZOTWzJ4aEa5geNva@hog>
-References: <9328d206c5d9f9239cae27e62e74de40b258471d.1692279161.git.sd@queasysnail.net>
-	<20230818184648.127b2ccf@kernel.org>
-	<ZOTWzJ4aEa5geNva@hog>
+	s=k20201202; t=1692720415;
+	bh=1V7w5fj4v1tLII5zZTBA1w3oKQjMiTF1veCGb3+VCYo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Hb9YUpXluU/qkdIVPn5jGONVx8yj//QL2hQAmzhL/mrITbjMYzNGxpMfnPNJT0cx2
+	 CGGf8gpIM+m/XMN5QRgwTvQ+cBl5sx9lT19gBg0HDh2AhoVx8IwXGT3oHrCAzfmMba
+	 3aEG1rDsvICZlWzzM7qhTdCh1ZC4Do0NFjSlOTfN8EgawbHqBP7Fxh6qi2RODTDHTe
+	 afhS/CQNyTmtStFor5ABkoW2aED9KRNHUCeqk88n/wgaNesHNN1JWTv0iQSKUyJzLU
+	 vzRN3Cu9T55sz6Cv5vwnTJUvFqs8yF+2fKwE84mBrkGQUyzTe4pkLx2m8j7KXQjND5
+	 BCPGhuw1K1hnA==
+Date: Tue, 22 Aug 2023 19:06:51 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	anthony.l.nguyen@intel.com, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	jesse.brandeburg@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-next 1/9] ice: use
+ ice_pf_src_tmr_owned where available
+Message-ID: <20230822160651.GN6029@unreal>
+References: <20230817141746.18726-1-karol.kolacinski@intel.com>
+ <20230817141746.18726-2-karol.kolacinski@intel.com>
+ <20230819115249.GP22185@unreal>
+ <20230822070211.GH2711035@kernel.org>
+ <20230822141348.GH6029@unreal>
+ <f497dc97-76bb-7526-7d19-d6886a3f3a65@intel.com>
+ <20230822154810.GM6029@unreal>
+ <8a0e05ed-ae10-ba2f-5859-003cd02fba9c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8a0e05ed-ae10-ba2f-5859-003cd02fba9c@intel.com>
 
-On Tue, 22 Aug 2023 17:39:56 +0200 Sabrina Dubroca wrote:
-> 2023-08-18, 18:46:48 -0700, Jakub Kicinski wrote:
-> > Can we not fix the ordering problem?
-> > Queue the packets locally if they get out of order?  
+On Tue, Aug 22, 2023 at 05:56:25PM +0200, Przemek Kitszel wrote:
+> On 8/22/23 17:48, Leon Romanovsky wrote:
+> > On Tue, Aug 22, 2023 at 04:44:29PM +0200, Przemek Kitszel wrote:
+> > > On 8/22/23 16:13, Leon Romanovsky wrote:
+> > > > On Tue, Aug 22, 2023 at 09:02:11AM +0200, Simon Horman wrote:
+> > > > > On Sat, Aug 19, 2023 at 02:52:49PM +0300, Leon Romanovsky wrote:
+> > > > > > On Thu, Aug 17, 2023 at 04:17:38PM +0200, Karol Kolacinski wrote:
+> > > > > > > The ice_pf_src_tmr_owned() macro exists to check the function capability
+> > > > > > > bit indicating if the current function owns the PTP hardware clock.
+> > > > > > 
+> > > > > > This is first patch in the series, but I can't find mentioned macro.
+> > > > > > My net-next is based on 5b0a1414e0b0 ("Merge branch 'smc-features'")
+> > > > > > ➜  kernel git:(net-next) git grep ice_pf_src_tmr_owned
+> > > > > > shows nothing.
+> > > > > > 
+> > > > > > On which branch is it based?
+> > > > > 
+> > > > > Hi Leon,
+> > > > > 
+> > > > > My assumption is that it is based on the dev-queue branch of
+> > > > > https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git
+> > > > 
+> > > > So should netdev readers review it or wait till Intel folks perform
+> > > > first pass on it?
+> > > 
+> > > Most of the time Intel folks would be first to review, if only because of
+> > > our pre-IWL processes or pure familiarity/interest in given piece.
+> > > 
+> > > For this particular series, it is about right "codewise" since v1, so you
+> > > are welcome for an insightful look at v3
+> > > (I didn't provided my RBs so far because of "metadata" issues :),
+> > > will take a fresh look, but you don't need to wait).
+> > > 
+> > > 
+> > > General idea for CC'ing netdev for IWL-targeted patches is to have open
+> > > develompent process.
+> > > Quality should be already as for netdev posting.
+> > > Our VAL picks up patches for testing from here when Tony marks them so.
+> > > 
+> > > That's what I could say for review process.
+> > > 
+> > > "Maintainers stuff", I *guess*, is:
+> > > after review&test Tony Requests netdev Maintainers to Pull
+> > > (and throttles outgoing stuff by doing so to pace agreed upon).
+> > > At that stage is a last moment for (late?) review, welcomed as always.
+> > 
+> > It means that we (netdev@... ) will see "same" patches twice, am I right?
 > 
-> Actually, looking into the crypto API side, I don't see how they can
-> get out of order since commit 81760ea6a95a ("crypto: cryptd - Add
-> helpers to check whether a tfm is queued"):
-> 
->     [...] ensure that no reordering is introduced because of requests
->     queued in cryptd with respect to requests being processed in
->     softirq context.
-> 
-> And cryptd_aead_queued() is used by AESNI (via simd_aead_decrypt()) to
-> decide whether to process the request synchronously or not.
-> 
-> So I really don't get what commit ab046a5d4be4 was trying to fix. I've
-> never been able to reproduce that issue, I guess commit 81760ea6a95a
-> explains why.
-> 
-> I'd suggest to revert commit ab046a5d4be4, but it feels wrong to
-> revert it without really understanding what problem Scott hit and why
-> 81760ea6a95a didn't solve it.
-> 
-> What do you think?
+> That's true.
 
-Unless Scott can tell us what he was seeing I think we should revert.
-The code looks fine to me as well...
+Can I suggest change in the process?
+1. Perform validation before posting
+2. Intel will post their patches to the netdev@ ML.
+3. Tony will collect reviewed patches from netdev@
+4. Tony will send clean PRs (without patches) from time to time to
+netdev maintainers for acceptance.
+
+It will allow to all of us (Intel, Nvidia e.t.c) to have same submission
+flow without sacrificing open netdev@ review which will be done only once.
+
+Jakub/Dave, is it possible?
+
+Thanks
+
+> 
+> > 
+> > Thanks
+> > 
+> > > 
+> > > 
+> > > 
+> > > > 
+> > > > Thanks
+> > > > _______________________________________________
+> > > > Intel-wired-lan mailing list
+> > > > Intel-wired-lan@osuosl.org
+> > > > https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+> > > 
+> > > 
+> 
 
