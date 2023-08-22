@@ -1,107 +1,100 @@
-Return-Path: <netdev+bounces-29711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E1E784632
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:50:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA2F78463B
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 17:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C372B1C20AE1
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:50:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A0ED1C20B67
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 15:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6381DA48;
-	Tue, 22 Aug 2023 15:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128B71DA4A;
+	Tue, 22 Aug 2023 15:51:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FACB1D303
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 15:50:05 +0000 (UTC)
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CDF11F;
-	Tue, 22 Aug 2023 08:49:50 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-76ca7b4782cso316614185a.0;
-        Tue, 22 Aug 2023 08:49:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692719389; x=1693324189;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UjZNfGDdDwl9AE3NP8wz+0UtBemnz6Iej/5/4IAARWU=;
-        b=RXuYMIx2+TD383Kirc2HP3IAmDNpVNhAurlDTOVvGIxSZo+SjmEdd3BT3+SfrVwr9m
-         MPVYjN73/ySMSnehNZBRdy0yhMycPtCViDGnf4zdioN4I6efgTvmKme88MVwz7c7NZBe
-         82RfMBPF3/VrdcKLQtZB73mXbtIw+Yd4Rql77ZqeaeIUfzrj6cYxegDRz2XCeR1wxVEJ
-         tfu9jH2co2WiaO8hNldJHw7xnhZ1Belk1FXGNffv2yiPnUh0oSJLkacguquFTCNiTAhg
-         gRfm6x5oAWC+TOoerEyyqlpLbrkNErnvrUpKdO556JpscXyxNVqUEhbsCEGu0lHXpkpK
-         2Pzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692719389; x=1693324189;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UjZNfGDdDwl9AE3NP8wz+0UtBemnz6Iej/5/4IAARWU=;
-        b=bVsTMgtsB1sWjzMVT9qD44isWhwXgtxSeEy52H3pYHro+QXYf2BWU9q3ssRaTyJbdc
-         hBIGK0nYodX/GEvltasXxYR6GmO8mn4Nm5V4DkSw3R4I7OTq/3H43jJqMkCDayuZshMX
-         B5Frz6ynfEem/3CKQLFpH1nghfRH5XXTVDmRGvDbdADl3l0srmtDsQFFOJBh29M/3xSc
-         TcJ6FGcI6nC/VzHLYHrc8FrR++y7sXL7JRjDu6VbYBd1IaGt+5GP4qSMdV0lfeJs+lja
-         xH+EtJ0IQG3Qqfr/x+3ewQ06XL+YKhQmqbU9XIzBhdR8zzutA0XpTA34pVyV2EZImgRh
-         hp0Q==
-X-Gm-Message-State: AOJu0YxDs8ekrQtV8oq1flcl8VT0AaA5LWUsOeYPdi1+A2MhP8DvtDh2
-	YuPHzKgCbLbKlerjkFPbyQ13iCqCKEs=
-X-Google-Smtp-Source: AGHT+IGgkJ/1ozzuZy7ZMVEEt+ZRGDiPwfJPh584MojQmyHKJHDKjTteup64RPAIIPswxXASzqALRQ==
-X-Received: by 2002:a05:620a:31a6:b0:76c:9cc0:64e2 with SMTP id bi38-20020a05620a31a600b0076c9cc064e2mr12577541qkb.28.1692719389442;
-        Tue, 22 Aug 2023 08:49:49 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id z11-20020ae9c10b000000b0076745f352adsm3265941qki.59.2023.08.22.08.49.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 08:49:48 -0700 (PDT)
-Message-ID: <5ce3a56a-7299-4ae2-ad6a-14342417fb19@gmail.com>
-Date: Tue, 22 Aug 2023 08:49:45 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982361D303;
+	Tue, 22 Aug 2023 15:51:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 427D6C433C8;
+	Tue, 22 Aug 2023 15:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692719472;
+	bh=HytErZ3SwNQutXsq7fKy9d1+X8hsvPNkS1TDLwjTPfw=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=YtQo28CMzQF5g9hOIUKPCp1yN9pIIwqYOv7IULsSYEBoND0HQdZur4sTv1S7KPrGe
+	 smiiT23SEckNPhx01XcKFhv3hNspXg4UgIKZne3Boa8ILSb3YR6gdaOwlbuhJDLE4L
+	 evUNStoR1EaJJKH6xlWLEGpSeLwX0MplGlkyDEepeU0zFzXmTdxvjM3EDmgzA5FUCB
+	 7n06yyKxO9ihY429gQO8xe/k/qnv0WE3tBokuzE56LhTGKQSuij0JoglWIti2wYqKH
+	 F8FUw/H7S2LDqJA8gbONeXJSnI4nX9zpYqe3xPVmuGLe4S4Gcr6yt8/XhuHf0fTgcj
+	 kYUYQ7MfpmIzQ==
+Message-ID: <721e5240-ab19-507a-c80e-ce5d133c0a9f@kernel.org>
+Date: Tue, 22 Aug 2023 17:51:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH net-next] net: dsa: rzn1-a5psw: remove redundant logs
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Samuel Dobron <sdobron@redhat.com>, Ondrej Lichtner <olichtne@redhat.com>,
+ Rick Alongi <ralongi@redhat.com>
+Subject: Re: [PATCH bpf-next 4/6] samples/bpf: Remove the xdp1 and xdp2
+ utilities
 Content-Language: en-US
-To: =?UTF-8?Q?Alexis_Lothor=c3=a9?= <alexis.lothore@bootlin.com>,
- =?UTF-8?Q?Cl=c3=a9ment_Leger?= <clement@clement-leger.fr>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>,
- Milan Stevanovic <milan.stevanovic@se.com>,
- Jimmy Lalande <jimmy.lalande@se.com>,
- Pascal Eberhard <pascal.eberhard@se.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230822084112.54803-1-alexis.lothore@bootlin.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230822084112.54803-1-alexis.lothore@bootlin.com>
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+References: <20230822142255.1340991-1-toke@redhat.com>
+ <20230822142255.1340991-5-toke@redhat.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20230822142255.1340991-5-toke@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
 
-
-On 8/22/2023 1:41 AM, Alexis Lothoré wrote:
-> From: Alexis Lothoré <alexis.lothore@bootlin.com>
+On 22/08/2023 16.22, Toke Høiland-Jørgensen wrote:
+> The functionality of these utilities have been incorporated into the
+> xdp-bench utility in xdp-tools. Remove the unmaintained versions in
+> samples.
 > 
-> Remove debug logs in port vlan management, since there are already multiple
-> tracepoints defined for those operations in DSA
-> 
-> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+I think it will be worth our time if we give some examples of how the
+removed utility translates to some given xdp-bench commands.  There is
+not a 1-1 mapping.
+
+XDP driver changes need to be verified on physical NIC hardware, so
+these utilities are still being run by QA.  I know Red Hat, Intel and
+Linaro QA people are using these utilities.  It will save us time if we
+can reference a commit message instead of repeatable describing this.
+E.g. for Intel is it often contingent workers that adds a tested-by
+(that all need to update their knowledge).
+
+Red Hat is in the process of moving our QA to use xdp-bench / xdp-tools.
+
+Want to mention LNST team are also adding xdp-bench (+pktgen) support:
+  - https://github.com/LNST-project/lnst/pull/310
+
+--Jesper
+
+> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> ---
+>   samples/bpf/Makefile    |   7 --
+>   samples/bpf/xdp1_kern.c | 100 ------------------------
+>   samples/bpf/xdp1_user.c | 166 ----------------------------------------
+>   samples/bpf/xdp2_kern.c | 125 ------------------------------
+>   4 files changed, 398 deletions(-)
+>   delete mode 100644 samples/bpf/xdp1_kern.c
+>   delete mode 100644 samples/bpf/xdp1_user.c
+>   delete mode 100644 samples/bpf/xdp2_kern.c
 
