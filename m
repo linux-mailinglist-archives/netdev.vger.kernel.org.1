@@ -1,218 +1,114 @@
-Return-Path: <netdev+bounces-29579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F06783DB3
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:13:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BCC783DB4
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 12:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7FEB1C20A66
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE153281007
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 10:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785349455;
-	Tue, 22 Aug 2023 10:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578B0946C;
+	Tue, 22 Aug 2023 10:13:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667D5944B
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 10:13:03 +0000 (UTC)
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B0FCEE
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:12:46 -0700 (PDT)
-Received: by mail-vs1-xe2f.google.com with SMTP id ada2fe7eead31-44d4c3fa5beso831941137.3
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:12:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEF8944B
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 10:13:06 +0000 (UTC)
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2333318B
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:12:53 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9cdba1228so67857001fa.2
+        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:12:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692699165; x=1693303965;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VdZpkYqMZd8jYgQ8zt+isMWg0vXbOV3HajplaszoCmg=;
-        b=RzYmvDvGKPT0jr2gAtZoNfiwKJFimQorxyD/r/qaSEBwCVXwXhebHPJDb36M72j4dg
-         3DCQix8gzOrPlqTghYZMD3S/jk/PjrP/82r9kDhECyi8moIfmvlW4dXk6uPXL0ULwhLi
-         NTf0eyW0BcUrvBTYgikeyqyvNhaZ09qKZaZYp4E5iIqCQthV36EFwagupRDVpBvysuCd
-         qKxmOdR+outGtv3/OCnKPmzbufHE0IwFX/QGR2xi6eIwvi19M0Q9eyv/uXEBdCsNugPH
-         Y39EEHF+Rj6xCBO+WqNiwvBBFKFBevmX3u/MzJqV8I7CxFHj0SO8TeglnO1s2eK/6ONZ
-         BAew==
+        d=blackwall-org.20221208.gappssmtp.com; s=20221208; t=1692699171; x=1693303971;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I8RcyAztl1AZBIG+BfwDP189kjI6Bbf9VazeGGkkEEk=;
+        b=sZuWGFUmvpzhtxnwq/9qV0P/uSzEl5vYX/LnMXvvr8iGr01vs76b1sU3WC92MsM7td
+         Vo9xe7UG9pk2CoHVRS8YvZ1tanCy71zk8JNaRYHwYAUSa7EJKobgIHwxNPnLmfWU0ll0
+         vCHI/IO1yNTOfKHJTqnzQZjBTTXJAJMOarJIHhOKPjfYE/g+xEccWAn5Wmv+Qj8KbUO7
+         1DYpjScYCH08YH5xwAa2nWzkZ1SQ8Mg5wIMWXFkbrR/irtibSo9eJ/9ongDtGTAegOg4
+         jOGrJN7D+dk7h3Ewqq0cHJspIU2rjRMtUN6ynJevp8zQQldss/fiVU4l1lRc8snbmPRe
+         UTnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692699165; x=1693303965;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VdZpkYqMZd8jYgQ8zt+isMWg0vXbOV3HajplaszoCmg=;
-        b=DDTWiTrSfn+QqyZ2nac5adO26tiSU+XUv8WVv7qh1nDJL1C1O4xZFO0o0np25zACEf
-         +NdXxt03bu9sOqN9FcuhIUP1xn+MZlwEgGCZ3eBKRAOODbZ6OtGtVGL/XeUt5S1Qx9uS
-         FFPJsmSLMem/kvH2Mhrzjf0UhPvfkbGRvVUzkfYBarpYBr0jH+dqFjONcWccHi9t7KMw
-         y9FV2lNkEAGUA/4W4jUQGLjmXwMK/qdAdHQw+u3bWRbFGyKBHZsvxDg+0mb0zl0HGbdz
-         fHc0Jr0O1mSdlyGUerGRh59BUrA9LyCipLODRNveK2aWy1Zy8rqWQVuTT1i0xSIaOnMq
-         hmTw==
-X-Gm-Message-State: AOJu0YyG/aQSLPwp7ou5i3cyHaQn7EAZtgdc/a+MFF6mqrMPWx/jbbCF
-	+fr2Iw9lCUt4i18EBfiY3cOD2xDRILsFER6flmE=
-X-Google-Smtp-Source: AGHT+IFL4KGEbDTuSflTu82ubRx/NN7LM0n9QHtg5wJftK+dznd4x4/UNEZ1TPlulMd1eRJ+ymJcQw==
-X-Received: by 2002:a67:fbcb:0:b0:44d:547d:4607 with SMTP id o11-20020a67fbcb000000b0044d547d4607mr2903528vsr.35.1692699164898;
-        Tue, 22 Aug 2023 03:12:44 -0700 (PDT)
-Received: from majuu.waya ([174.93.66.252])
-        by smtp.gmail.com with ESMTPSA id u16-20020a0cb410000000b0063d588c4111sm3705734qve.82.2023.08.22.03.12.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 03:12:44 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	syzkaller-bugs@googlegroups.com,
-	linux-kernel@vger.kernel.org,
-	shaozhengchao@huawei.com,
-	syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net v2 1/1] net/sched: fix a qdisc modification with ambiguous command request
-Date: Tue, 22 Aug 2023 06:12:31 -0400
-Message-Id: <20230822101231.74388-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20221208; t=1692699171; x=1693303971;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I8RcyAztl1AZBIG+BfwDP189kjI6Bbf9VazeGGkkEEk=;
+        b=JN6MN6FKwa0SNo3s4lDDCMWDshdFnbgay3zL00ef2l6UyXziz6KSK6cx0/EJ6PmHg+
+         p8DC2DWafqkJ7gKmPw2yB7pXulE/IDag8OxPzV0kgSKWy/O5UZYNn8EBb+I3yRVUeJ6G
+         r65VF/2BBMbp1625VfoZBnTOFwhQXIe/Q0wL6OTp/SPIMgjnvsZppAZQvsKeKA5fOaMB
+         LXINDXCwtW/ma1NygfzpJby89AvPY1BttyANNgLBucJhnwnjA0dpzUuISfohpLSvGp4t
+         TqdcFJupH0ijYA3xUY6jDKhsew/0zG/Bpe9vucvNor+DwKS1l9JMkb4TYyTL4v3MK+PA
+         91bw==
+X-Gm-Message-State: AOJu0YxB+ILZVMCgJ7KnuRCzoHjadK0MM86XzqxWa4SyR0gexVcAJZWK
+	Tt5ovp8BECAMdP5OhvFpHZ2aMWLxSfkYK50js93Wbw==
+X-Google-Smtp-Source: AGHT+IFvk73NXhW8VjYOzTLadCCa6mXwtqKfejqTz5eBFRnBvvnZn4jgYCoqVXUCd3HaAbA5KmySwQ==
+X-Received: by 2002:a2e:944a:0:b0:2b9:f0b4:eaa1 with SMTP id o10-20020a2e944a000000b002b9f0b4eaa1mr5540238ljh.16.1692699171204;
+        Tue, 22 Aug 2023 03:12:51 -0700 (PDT)
+Received: from [192.168.1.2] (handbookness.lineup.volia.net. [93.73.104.44])
+        by smtp.gmail.com with ESMTPSA id b7-20020a170906d10700b00992d122af63sm7946656ejz.89.2023.08.22.03.12.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 03:12:51 -0700 (PDT)
+Message-ID: <6cf46180-689d-d6bd-ff39-4c20ff2bf9e4@blackwall.org>
+Date: Tue, 22 Aug 2023 13:12:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH net-next] vxlan: vnifilter: Use GFP_KERNEL instead of
+ GFP_ATOMIC
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, mlxsw@nvidia.com
+References: <20230821141923.1889776-1-idosch@nvidia.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230821141923.1889776-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When replacing an existing root qdisc, with one that is of the same kind, the
-request boils down to essentially a parameterization change  i.e not one that
-requires allocation and grafting of a new qdisc. syzbot was able to create a
-scenario which resulted in a taprio qdisc replacing an existing taprio qdisc
-with a combination of NLM_F_CREATE, NLM_F_REPLACE and NLM_F_EXCL leading to
-create and graft scenario.
-The fix ensures that only when the qdisc kinds are different that we should
-allow a create and graft, otherwise it goes into the "change" codepath.
+On 8/21/23 17:19, Ido Schimmel wrote:
+> The function is not called from an atomic context so use GFP_KERNEL
+> instead of GFP_ATOMIC. The allocation of the per-CPU stats is already
+> performed with GFP_KERNEL.
+> 
+> Tested using test_vxlan_vnifiltering.sh with CONFIG_DEBUG_ATOMIC_SLEEP.
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   drivers/net/vxlan/vxlan_vnifilter.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
+> index c3ff30ab782e..9c59d0bf8c3d 100644
+> --- a/drivers/net/vxlan/vxlan_vnifilter.c
+> +++ b/drivers/net/vxlan/vxlan_vnifilter.c
+> @@ -696,7 +696,7 @@ static struct vxlan_vni_node *vxlan_vni_alloc(struct vxlan_dev *vxlan,
+>   {
+>   	struct vxlan_vni_node *vninode;
+>   
+> -	vninode = kzalloc(sizeof(*vninode), GFP_ATOMIC);
+> +	vninode = kzalloc(sizeof(*vninode), GFP_KERNEL);
+>   	if (!vninode)
+>   		return NULL;
+>   	vninode->stats = netdev_alloc_pcpu_stats(struct vxlan_vni_stats_pcpu);
 
-While at it, fix the code and comments to improve readability.
-
-While syzbot was able to create the issue, it did not zone on the root cause.
-Analysis from Vladimir Oltean <vladimir.oltean@nxp.com> helped narrow it down.
-
-v1->V2 changes:
-- remove "inline" function definition (Vladmir)
-- remove extrenous braces in branches (Vladmir)
-- change inline function names (Pedro)
-- Run tdc tests (Victor)
-v2->v3 changes:
-- dont break else/if (Simon)
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+a3618a167af2021433cd@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/20230816225759.g25x76kmgzya2gei@skbuf/T/
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Victor Nogueira <victor@mojatatu.com>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-Reviewed-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/sch_api.c | 53 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 40 insertions(+), 13 deletions(-)
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index aa6b1fe65151..e9eaf637220e 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1547,10 +1547,28 @@ static int tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 	return 0;
- }
- 
-+static bool req_create_or_replace(struct nlmsghdr *n)
-+{
-+	return (n->nlmsg_flags & NLM_F_CREATE &&
-+		n->nlmsg_flags & NLM_F_REPLACE);
-+}
-+
-+static bool req_create_exclusive(struct nlmsghdr *n)
-+{
-+	return (n->nlmsg_flags & NLM_F_CREATE &&
-+		n->nlmsg_flags & NLM_F_EXCL);
-+}
-+
-+static bool req_change(struct nlmsghdr *n)
-+{
-+	return (!(n->nlmsg_flags & NLM_F_CREATE) &&
-+		!(n->nlmsg_flags & NLM_F_REPLACE) &&
-+		!(n->nlmsg_flags & NLM_F_EXCL));
-+}
-+
- /*
-  * Create/change qdisc.
-  */
--
- static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 			   struct netlink_ext_ack *extack)
- {
-@@ -1644,27 +1662,35 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 				 *
- 				 *   We know, that some child q is already
- 				 *   attached to this parent and have choice:
--				 *   either to change it or to create/graft new one.
-+				 *   1) change it or 2) create/graft new one.
-+				 *   If the requested qdisc kind is different
-+				 *   than the existing one, then we choose graft.
-+				 *   If they are the same then this is "change"
-+				 *   operation - just let it fallthrough..
- 				 *
- 				 *   1. We are allowed to create/graft only
--				 *   if CREATE and REPLACE flags are set.
-+				 *   if the request is explicitly stating
-+				 *   "please create if it doesn't exist".
- 				 *
--				 *   2. If EXCL is set, requestor wanted to say,
--				 *   that qdisc tcm_handle is not expected
-+				 *   2. If the request is to exclusive create
-+				 *   then the qdisc tcm_handle is not expected
- 				 *   to exist, so that we choose create/graft too.
- 				 *
- 				 *   3. The last case is when no flags are set.
-+				 *   This will happen when for example tc
-+				 *   utility issues a "change" command.
- 				 *   Alas, it is sort of hole in API, we
- 				 *   cannot decide what to do unambiguously.
--				 *   For now we select create/graft, if
--				 *   user gave KIND, which does not match existing.
-+				 *   For now we select create/graft.
- 				 */
--				if ((n->nlmsg_flags & NLM_F_CREATE) &&
--				    (n->nlmsg_flags & NLM_F_REPLACE) &&
--				    ((n->nlmsg_flags & NLM_F_EXCL) ||
--				     (tca[TCA_KIND] &&
--				      nla_strcmp(tca[TCA_KIND], q->ops->id))))
--					goto create_n_graft;
-+				if (tca[TCA_KIND] &&
-+				    nla_strcmp(tca[TCA_KIND], q->ops->id)) {
-+					if (req_create_or_replace(n) ||
-+					    req_create_exclusive(n))
-+						goto create_n_graft;
-+					else if (req_change(n))
-+						goto create_n_graft2;
-+				}
- 			}
- 		}
- 	} else {
-@@ -1698,6 +1724,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 		NL_SET_ERR_MSG(extack, "Qdisc not found. To create specify NLM_F_CREATE flag");
- 		return -ENOENT;
- 	}
-+create_n_graft2:
- 	if (clid == TC_H_INGRESS) {
- 		if (dev_ingress_queue(dev)) {
- 			q = qdisc_create(dev, dev_ingress_queue(dev),
--- 
-2.34.1
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
