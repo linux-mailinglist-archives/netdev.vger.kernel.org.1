@@ -1,105 +1,177 @@
-Return-Path: <netdev+bounces-29589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0777C783EB3
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:28:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E7F8783ED1
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 13:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBF411C20ACB
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:28:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 930A21C20ACA
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 11:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E32011C90;
-	Tue, 22 Aug 2023 11:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51751125B7;
+	Tue, 22 Aug 2023 11:31:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9999472
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:28:14 +0000 (UTC)
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA198CD1;
-	Tue, 22 Aug 2023 04:28:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1692703693; x=1724239693;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Zy+oNUnTax/2/pEu8NMMXhkiT6EE1L1FvMZzPOAdESU=;
-  b=BSlOARM642jhazFoceCL9TjAzy6VAmYpTvDYumrJ2Q4yYvIi4yVoA9vH
-   70OYgMuKaXEzJsSxoZ+Gnm79S9XT5yfG1oi8hUyb/PSuEErPJSy0Bx0xs
-   JYTJ8vYsA3B6FOfRQUFnq7hfsLm6xVnxix7yp6ztZPlcy5PlklhYbSxue
-   2K9yvuSTDtA1MGJEc2oHn492LnCHukCsRuEd1iLfwrYCRLJi5FxnOClTF
-   x2v5jKOzbhF6/hRm2k45wpuopm63vodR8pmVUSE4NPzvB7fOcCrxvQHxS
-   Y9ErmVV7j/0gShupMIYNiL7i9w2j0S4zsQI0ZMKnR37bQoH/PdasdocHD
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.01,192,1684792800"; 
-   d="scan'208";a="32561792"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 22 Aug 2023 13:28:10 +0200
-Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 6D857280075;
-	Tue, 22 Aug 2023 13:28:10 +0200 (CEST)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, NXP Linux Team <linux-imx@nxp.com>, Fabio Estevam <festevam@gmail.com>, linux-pm@vger.kernel.org, David Airlie <airlied@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Amit Kucheria <amitk@kernel.org>, Zhang Rui <rui.zhang@intel.com>, "Rafael J . Wysocki" <rafael@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, devicetree@vger.kernel.org, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org, Sascha Hauer <s.hauer@pengutronix.de>, Thomas Gleixner <tglx@linutronix.de>, Daniel Vetter <daniel@ffwll.ch>, Rob Herring <robh+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org, Daniel Lezcano <daniel.lezcano@linaro.org>
-Subject: Re: [PATCH 4/6] dt-bindings: net: microchip: Allow nvmem-cell usage
-Date: Tue, 22 Aug 2023 13:28:10 +0200
-Message-ID: <4855037.31r3eYUQgx@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <169263807888.1978386.16316859459152478945.robh@kernel.org>
-References: <20230810144451.1459985-1-alexander.stein@ew.tq-group.com> <20230810144451.1459985-5-alexander.stein@ew.tq-group.com> <169263807888.1978386.16316859459152478945.robh@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F618479
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 11:31:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19D8C433CD;
+	Tue, 22 Aug 2023 11:31:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692703874;
+	bh=O7EU2ygF8bB2iSmUGLVvkbjQuavFC5FaeEnw1j4f5xo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Xfpvc3AbmHYJNHQrVEd4oV4x3qOXgYqHwLN1gVidMdPEa44CBZ721cCR9/z0/wkrO
+	 bP4GvN5kSmnk5knnWyQTrKP6wxxMYnvRtkXL6eA6cYP60E0ddJygrSorIqpTwn2ICu
+	 fMRkc2tVFw46IuKV/pNylxf0vb9VIV6ezwM35pFFXdIjY1H4eb2RpwFcZSgF6D32I9
+	 nX2QCUzMiwzIy0c2tRueGqru5CRJf26iE32yRCN7tqxoJCMjiVoU4jZbDNZaabNqRB
+	 OIqDRXNx7eHWq/NafVrphqRocpQ5isUnMN4o44Xc7UXYhwoY28BUWcoM4howX/n7nu
+	 rJ5Rzk2IrsPzA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Lukasz Majewski <lukma@denx.de>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 05/10] net: dsa: microchip: KSZ9477 register regmap alignment to 32 bit boundaries
+Date: Tue, 22 Aug 2023 07:30:55 -0400
+Message-Id: <20230822113101.3549915-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230822113101.3549915-1-sashal@kernel.org>
+References: <20230822113101.3549915-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.11
+Content-Transfer-Encoding: 8bit
 
-Am Montag, 21. August 2023, 19:14:39 CEST schrieb Rob Herring:
-> On Thu, 10 Aug 2023 16:44:49 +0200, Alexander Stein wrote:
-> > MAC address can be provided by a nvmem-cell, thus allow referencing a
-> > source for the address. Fixes the warning:
-> > arch/arm/boot/dts/nxp/imx/imx6q-mba6a.dtb: ethernet@1: 'nvmem-cell-name=
-s',
-> >=20
-> >  'nvmem-cells' do not match any of the regexes: 'pinctrl-[0-9]+'
-> >  From schema: Documentation/devicetree/bindings/net/microchip,lan95xx.y=
-aml
-> >=20
-> > Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-> > ---
-> >=20
-> >  Documentation/devicetree/bindings/net/microchip,lan95xx.yaml | 2 ++
-> >  1 file changed, 2 insertions(+)
->=20
-> Reviewed-by: Rob Herring <robh@kernel.org>
+From: Lukasz Majewski <lukma@denx.de>
 
-Thanks. But while reading your comment on patch 3, I'm wondering if=20
-additionalProperties should be changed to unevaluatedProperties here as wel=
-l.
-This way local-mac-address and mac-address canbe removed as well, they are=
-=20
-defined in ethernet-controller.yaml already.
+[ Upstream commit 8d7ae22ae9f8c8a4407f8e993df64440bdbd0cee ]
 
-Best regards,
-Alexander
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
+The commit (SHA1: 5c844d57aa7894154e49cf2fc648bfe2f1aefc1c) provided code
+to apply "Module 6: Certain PHY registers must be written as pairs instead
+of singly" errata for KSZ9477 as this chip for certain PHY registers
+(0xN120 to 0xN13F, N=1,2,3,4,5) must be accesses as 32 bit words instead
+of 16 or 8 bit access.
+Otherwise, adjacent registers (no matter if reserved or not) are
+overwritten with 0x0.
 
+Without this patch some registers (e.g. 0x113c or 0x1134) required for 32
+bit access are out of valid regmap ranges.
+
+As a result, following error is observed and KSZ9477 is not properly
+configured:
+
+ksz-switch spi1.0: can't rmw 32bit reg 0x113c: -EIO
+ksz-switch spi1.0: can't rmw 32bit reg 0x1134: -EIO
+ksz-switch spi1.0 lan1 (uninitialized): failed to connect to PHY: -EIO
+ksz-switch spi1.0 lan1 (uninitialized): error -5 setting up PHY for tree 0, switch 0, port 0
+
+The solution is to modify regmap_reg_range to allow accesses with 4 bytes
+boundaries.
+
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 35 +++++++++++---------------
+ 1 file changed, 15 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index a0ba2605bb620..f87ed14fa2ab2 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -635,10 +635,9 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x1030, 0x1030),
+ 	regmap_reg_range(0x1100, 0x1115),
+ 	regmap_reg_range(0x111a, 0x111f),
+-	regmap_reg_range(0x1122, 0x1127),
+-	regmap_reg_range(0x112a, 0x112b),
+-	regmap_reg_range(0x1136, 0x1139),
+-	regmap_reg_range(0x113e, 0x113f),
++	regmap_reg_range(0x1120, 0x112b),
++	regmap_reg_range(0x1134, 0x113b),
++	regmap_reg_range(0x113c, 0x113f),
+ 	regmap_reg_range(0x1400, 0x1401),
+ 	regmap_reg_range(0x1403, 0x1403),
+ 	regmap_reg_range(0x1410, 0x1417),
+@@ -669,10 +668,9 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x2030, 0x2030),
+ 	regmap_reg_range(0x2100, 0x2115),
+ 	regmap_reg_range(0x211a, 0x211f),
+-	regmap_reg_range(0x2122, 0x2127),
+-	regmap_reg_range(0x212a, 0x212b),
+-	regmap_reg_range(0x2136, 0x2139),
+-	regmap_reg_range(0x213e, 0x213f),
++	regmap_reg_range(0x2120, 0x212b),
++	regmap_reg_range(0x2134, 0x213b),
++	regmap_reg_range(0x213c, 0x213f),
+ 	regmap_reg_range(0x2400, 0x2401),
+ 	regmap_reg_range(0x2403, 0x2403),
+ 	regmap_reg_range(0x2410, 0x2417),
+@@ -703,10 +701,9 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x3030, 0x3030),
+ 	regmap_reg_range(0x3100, 0x3115),
+ 	regmap_reg_range(0x311a, 0x311f),
+-	regmap_reg_range(0x3122, 0x3127),
+-	regmap_reg_range(0x312a, 0x312b),
+-	regmap_reg_range(0x3136, 0x3139),
+-	regmap_reg_range(0x313e, 0x313f),
++	regmap_reg_range(0x3120, 0x312b),
++	regmap_reg_range(0x3134, 0x313b),
++	regmap_reg_range(0x313c, 0x313f),
+ 	regmap_reg_range(0x3400, 0x3401),
+ 	regmap_reg_range(0x3403, 0x3403),
+ 	regmap_reg_range(0x3410, 0x3417),
+@@ -737,10 +734,9 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x4030, 0x4030),
+ 	regmap_reg_range(0x4100, 0x4115),
+ 	regmap_reg_range(0x411a, 0x411f),
+-	regmap_reg_range(0x4122, 0x4127),
+-	regmap_reg_range(0x412a, 0x412b),
+-	regmap_reg_range(0x4136, 0x4139),
+-	regmap_reg_range(0x413e, 0x413f),
++	regmap_reg_range(0x4120, 0x412b),
++	regmap_reg_range(0x4134, 0x413b),
++	regmap_reg_range(0x413c, 0x413f),
+ 	regmap_reg_range(0x4400, 0x4401),
+ 	regmap_reg_range(0x4403, 0x4403),
+ 	regmap_reg_range(0x4410, 0x4417),
+@@ -771,10 +767,9 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x5030, 0x5030),
+ 	regmap_reg_range(0x5100, 0x5115),
+ 	regmap_reg_range(0x511a, 0x511f),
+-	regmap_reg_range(0x5122, 0x5127),
+-	regmap_reg_range(0x512a, 0x512b),
+-	regmap_reg_range(0x5136, 0x5139),
+-	regmap_reg_range(0x513e, 0x513f),
++	regmap_reg_range(0x5120, 0x512b),
++	regmap_reg_range(0x5134, 0x513b),
++	regmap_reg_range(0x513c, 0x513f),
+ 	regmap_reg_range(0x5400, 0x5401),
+ 	regmap_reg_range(0x5403, 0x5403),
+ 	regmap_reg_range(0x5410, 0x5417),
+-- 
+2.40.1
 
 
