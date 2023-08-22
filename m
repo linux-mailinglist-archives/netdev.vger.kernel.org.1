@@ -1,61 +1,49 @@
-Return-Path: <netdev+bounces-29792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8045784AF0
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 22:01:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90275784AF7
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 22:05:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 263DD281055
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:01:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 779A11C20AF8
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 20:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C43B20193;
-	Tue, 22 Aug 2023 20:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D360F20198;
+	Tue, 22 Aug 2023 20:05:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE2D20180
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 20:01:11 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2FB1AD;
-	Tue, 22 Aug 2023 13:01:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LXHug3TLN9P2+6rbiOjOGu7mrHI3vo5m1kq9IAwgsjM=; b=mipLXy/CGBIquuykD+YLEvlNHU
-	ab3aPgI7yTiDB6Q34WJY9XJ2g3Vn85W15Br9SUduydtZ8eGaEzMoXZlfepBd9RtS20YHCYU3M6LDF
-	w56212iOrtzLuHiIfEwYz3xRuI5+yHYHT2SSpkaQaX4msuJ4m+55nCFgtUehWdLoGyfM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qYXYa-004oiQ-AT; Tue, 22 Aug 2023 22:00:52 +0200
-Date: Tue, 22 Aug 2023 22:00:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Hawkins, Nick" <nick.hawkins@hpe.com>
-Cc: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-	"simon.horman@corigine.com" <simon.horman@corigine.com>,
-	"Verdun, Jean-Marie" <verdun@hpe.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
-Message-ID: <befbee5a-7b11-4948-a837-6311dd4d7276@lunn.ch>
-References: <20230816215220.114118-1-nick.hawkins@hpe.com>
- <20230816215220.114118-5-nick.hawkins@hpe.com>
- <01e96219-4f0c-4259-9398-bc2e6bc1794f@lunn.ch>
- <88B3833C-19FB-4E4C-A398-E7EF3143ED02@hpe.com>
- <1b8058e1-6e7f-4a4a-a191-09a9b8010e0a@lunn.ch>
- <CF9BD927-B788-4554-B246-D5CC6D06258F@hpe.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8622420182
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 20:05:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74655C433C7;
+	Tue, 22 Aug 2023 20:05:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692734747;
+	bh=CD1KmySIxZZR1tfayqqTmXWyATHSKxdxwQsQPpiG098=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Co7fYn/R4HTkNJwo6bVOpUMwcT4d/cBtRjGgqJuMG0jH0rwPlhzWGHz0+BKz/BujJ
+	 s91p6FAp/BrB/nzhjWyPUwtXkBSuwhRHALZGOlaDyRGetRSh+mISrqD97GJH2Le04K
+	 qsVbuFdsBBjqRhlwYg5PLalr/SUm32C0/4r4+uDvZt4TiMAWBSNTGQsjKwDtRSqScx
+	 LAD69Iyc6Iar8B32sfHyo5TRQ149QRGwneEL8oSPLdDrptvH4tg/6E9SIy+WlRypfP
+	 LxP9aSb2OQ94ViM8kuSeyYILp3QTX22o8rmL69mmXN7M9ZvO+iX8tR3CVY6Gf90Xbi
+	 PuUqUbKipGWPA==
+Date: Tue, 22 Aug 2023 22:05:42 +0200
+From: Simon Horman <horms@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Suman Ghosh <sumang@marvell.com>, sgoutham@marvell.com,
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+	lcherian@marvell.com, jerinj@marvell.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net PATCH V3 1/3] octeontx2-pf: Fix PFC TX scheduler free
+Message-ID: <20230822200542.GA3523530@kernel.org>
+References: <20230821052516.398572-1-sumang@marvell.com>
+ <20230821052516.398572-2-sumang@marvell.com>
+ <20230822071101.GI2711035@kernel.org>
+ <d3073c7b5d54e1ad4790b16c419e862fee952350.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,52 +52,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CF9BD927-B788-4554-B246-D5CC6D06258F@hpe.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <d3073c7b5d54e1ad4790b16c419e862fee952350.camel@redhat.com>
 
-On Tue, Aug 22, 2023 at 07:00:49PM +0000, Hawkins, Nick wrote:
+On Tue, Aug 22, 2023 at 12:58:04PM +0200, Paolo Abeni wrote:
+> On Tue, 2023-08-22 at 09:11 +0200, Simon Horman wrote:
+> > On Mon, Aug 21, 2023 at 10:55:14AM +0530, Suman Ghosh wrote:
+> > > During PFC TX schedulers free, flag TXSCHQ_FREE_ALL was being set
+> > > which caused free up all schedulers other than the PFC schedulers.
+> > > This patch fixes that to free only the PFC Tx schedulers.
+> > > 
+> > > Fixes: 99c969a83d82 ("octeontx2-pf: Add egress PFC support")
+> > > Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> > > ---
+> > >  .../ethernet/marvell/octeontx2/nic/otx2_common.c  |  1 +
+> > >  .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c   | 15 ++++-----------
+> > >  2 files changed, 5 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> > > index 77c8f650f7ac..289371b8ce4f 100644
+> > > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> > > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> > > @@ -804,6 +804,7 @@ void otx2_txschq_free_one(struct otx2_nic *pfvf, u16 lvl, u16 schq)
+> > >  
+> > >  	mutex_unlock(&pfvf->mbox.lock);
+> > >  }
+> > > +EXPORT_SYMBOL(otx2_txschq_free_one);
+> > 
+> > Hi Suman,
+> > 
+> > Given that the licence of both this file and otx2_dcbnl.c is GPLv2,
+> > I wonder if EXPORT_SYMBOL_GPL would be more appropriate here.
 > 
-> > <include/net/page_pool/helpers.h>
+> AFAICS all the symbols exported by otx2_common use plain
+> EXPORT_SYMBOL(). I think we can keep that for consistency in a -net
+> patch.
+
+Sure, no objection.
+
+> In the long run it would be nice to move all of them to
+> EXPORT_SYMBOL_GPL :)
 > 
-> Hi Andrew,
+> Cheers,
 > 
-> I can't seem to find this file in linux master. Where is it?
-
-~/linux$ ls include/net/page_pool/helpers.h
-include/net/page_pool/helpers.h
-
-When you say master, do you mean net-next/main? This is a network
-driver, so you should be based on top of that tree.
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
-
-> > Take a look at driver/net/ethernet/freescale/fec_main.c That
-> > driver/device is of similar complexity to yours. It had a recent
-> > change from its own buffer management to page pool. It
-> > started with
+> Paolo
 > 
-> I have looked over this driver and have a couple questions
-> about the pages in general.
-> 
-> How do I determine what the correct pool size should be for the
-> RX and TX?
-
-There has been some recent discussion about that. Search the netdev
-list over the last couple of week. 
-
-> I must admit I am not familiar with XDP.
-> Is it required for the page pool library?
-
-Nope, not required at all. The FEC driver was first converted to page
-pool, and then XDP support added. The conversion to page pool made the
-driver faster, it could handle more packets per second. That is why i
-suggested using it, plus it means less driver code, which means less
-bugs.
-
-	Andrew
 
