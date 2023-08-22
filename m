@@ -1,122 +1,153 @@
-Return-Path: <netdev+bounces-29510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FCFA78387A
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:28:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0B8783899
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 05:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 710681C209E2
-	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:28:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32D33280F9E
+	for <lists+netdev@lfdr.de>; Tue, 22 Aug 2023 03:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B489139B;
-	Tue, 22 Aug 2023 03:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C08E53BD;
+	Tue, 22 Aug 2023 03:36:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4E97F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:28:00 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99BB1CCA;
-	Mon, 21 Aug 2023 20:27:47 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37M3R5TO0001870, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37M3R5TO0001870
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 22 Aug 2023 11:27:05 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Tue, 22 Aug 2023 11:26:28 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 22 Aug 2023 11:26:28 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
- RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
- 15.01.2375.007; Tue, 22 Aug 2023 11:26:28 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek automotive PCIe driver code
-Thread-Topic: [PATCH net-next v3 1/2] net/ethernet/realtek: Add Realtek
- automotive PCIe driver code
-Thread-Index: AQHZz4Ya38d07ViN20S7bf3O9T4Qta/q9pcAgAMgk2D//87KAIABzfpQ///CfgCABJnu0IAALOEAgACljtD//5/vgAAlziXA
-Date: Tue, 22 Aug 2023 03:26:28 +0000
-Message-ID: <e4f258b5e3d14a04a841d9d2b2ac82ef@realtek.com>
-References: <20230815143756.106623-1-justinlai0215@realtek.com>
- <20230815143756.106623-2-justinlai0215@realtek.com>
- <95f079a4-19f9-4501-90d9-0bcd476ce68d@lunn.ch>
- <4955506dbf6b4ebdb67cbb738750fbc8@realtek.com>
- <eb245c85-0909-4a75-830d-afb96ccd5d38@lunn.ch>
- <4951391892534eaeb2da96f052364e4c@realtek.com>
- <4b630aeb-3098-4108-b8dc-7da6e55a7cf1@lunn.ch>
- <6d35d56f78b7452b9330c3257748fa3c@realtek.com>
- <97f3744d-afbf-4562-9168-5b9e211fac1f@lunn.ch>
- <4db3248874d64418b63fdf5c5e8a0f79@realtek.com>
- <3e5b2f0a-3661-4147-bc4e-784eecf41364@lunn.ch>
-In-Reply-To: <3e5b2f0a-3661-4147-bc4e-784eecf41364@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.21.210.185]
-x-kse-serverinfo: RTEXMBS04.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBE81FA7
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 03:36:08 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407B4187
+	for <netdev@vger.kernel.org>; Mon, 21 Aug 2023 20:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692675367; x=1724211367;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vDOfv2h0LTJaP31se8wIJ4d6GV6zSZegpnQjsZ0ON28=;
+  b=m+CH5v6NFfxM4vwe+9+ERfL3rbe3GQhIL6Xvlx4B8wOEut274La4wvvR
+   BvKYKZXVzn1T5ochKFiXPSSyqHQc5o5XXZgkMeytdWA3HhTfKpnB2DP/X
+   WJ5B0CztSG1UNYzbIzAu24HE5Qiq6PE/DH/9NVMgJ8Zsk1nT5EWtmvFD0
+   g/zCeNdgpsmbwkq11/DujajONwQ9wO+ooBy0Sdsjjt6V+mCH+rUvqF9JJ
+   E2rUH+/ODcoB9D2zmTjKwgVR4jKX8VNc8MSCxmcXIIIMe5Q7sw9rS6kGh
+   CIq8xR5hxtQmHKgleFFutACSvDYw5EYC94JfrEha4fsV64lYvNP+NKlN8
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="437681751"
+X-IronPort-AV: E=Sophos;i="6.01,191,1684825200"; 
+   d="scan'208";a="437681751"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 20:36:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="850436375"
+X-IronPort-AV: E=Sophos;i="6.01,191,1684825200"; 
+   d="scan'208";a="850436375"
+Received: from lkp-server02.sh.intel.com (HELO 6809aa828f2a) ([10.239.97.151])
+  by fmsmga002.fm.intel.com with ESMTP; 21 Aug 2023 20:35:59 -0700
+Received: from kbuild by 6809aa828f2a with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qYIBS-0001Iw-0e;
+	Tue, 22 Aug 2023 03:35:58 +0000
+Date: Tue, 22 Aug 2023 11:35:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 3/3] net: l2tp_eth: use generic dev->stats fields
+Message-ID: <202308221115.YXoSl0BK-lkp@intel.com>
+References: <20230819044059.833749-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230819044059.833749-4-edumazet@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > But I2C, SPI, MDIO are connected to the SoC through this chip's
-> > external pins, not on the PCIe bus.
->=20
-> Thanks, that was the information i was trying to get at.
->=20
-> > Actually, there is the other function in the PCIe GMAC(Multiple
-> > function) to manage the registers of Switch Core.  Should they be
-> > integrated into the MFD driver?
->=20
-> Can you cleanly attach another PCI driver to those functions?
+Hi Eric,
 
-Yes, they could be attached individually
+kernel test robot noticed the following build warnings:
 
-> You need to use an MFD when there is a single top level addressable block=
- of
-> hardware which has multiple functions. Thank of an I2C device, which has =
-a
-> single address on the bus, but multiple functions.
-> Access to that one address needs to be shared via multiple drivers. The M=
-FD
-> framework provides the glue to share access to the hardware.
->=20
-> However, PCI identification and addressing is more flexible. So long as t=
-hey are
-> separate PCI functions, you should be able to load two drivers and not ha=
-ve
-> problems. Then you don't need an MFD.
+[auto build test WARNING on net-next/main]
 
-Thank you very much for your comments and time for review.=20
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-add-DEV_STATS_READ-helper/20230821-110051
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230819044059.833749-4-edumazet%40google.com
+patch subject: [PATCH net-next 3/3] net: l2tp_eth: use generic dev->stats fields
+config: sparc64-allmodconfig (https://download.01.org/0day-ci/archive/20230822/202308221115.YXoSl0BK-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230822/202308221115.YXoSl0BK-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308221115.YXoSl0BK-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/l2tp/l2tp_eth.c: In function 'l2tp_eth_dev_recv':
+>> net/l2tp/l2tp_eth.c:121:26: warning: variable 'priv' set but not used [-Wunused-but-set-variable]
+     121 |         struct l2tp_eth *priv;
+         |                          ^~~~
+
+
+vim +/priv +121 net/l2tp/l2tp_eth.c
+
+d9e31d17ceba5f James Chapman    2010-04-02  116  
+d9e31d17ceba5f James Chapman    2010-04-02  117  static void l2tp_eth_dev_recv(struct l2tp_session *session, struct sk_buff *skb, int data_len)
+d9e31d17ceba5f James Chapman    2010-04-02  118  {
+d9e31d17ceba5f James Chapman    2010-04-02  119  	struct l2tp_eth_sess *spriv = l2tp_session_priv(session);
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  120  	struct net_device *dev;
+ee28de6bbd78c2 Guillaume Nault  2017-10-27 @121  	struct l2tp_eth *priv;
+d9e31d17ceba5f James Chapman    2010-04-02  122  
+c0cc88a7627c33 Eric Dumazet     2012-09-04  123  	if (!pskb_may_pull(skb, ETH_HLEN))
+d9e31d17ceba5f James Chapman    2010-04-02  124  		goto error;
+d9e31d17ceba5f James Chapman    2010-04-02  125  
+d9e31d17ceba5f James Chapman    2010-04-02  126  	secpath_reset(skb);
+d9e31d17ceba5f James Chapman    2010-04-02  127  
+d9e31d17ceba5f James Chapman    2010-04-02  128  	/* checksums verified by L2TP */
+d9e31d17ceba5f James Chapman    2010-04-02  129  	skb->ip_summed = CHECKSUM_NONE;
+d9e31d17ceba5f James Chapman    2010-04-02  130  
+d9e31d17ceba5f James Chapman    2010-04-02  131  	skb_dst_drop(skb);
+895b5c9f206eb7 Florian Westphal 2019-09-29  132  	nf_reset_ct(skb);
+d9e31d17ceba5f James Chapman    2010-04-02  133  
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  134  	rcu_read_lock();
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  135  	dev = rcu_dereference(spriv->dev);
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  136  	if (!dev)
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  137  		goto error_rcu;
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  138  
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  139  	priv = netdev_priv(dev);
+d9e31d17ceba5f James Chapman    2010-04-02  140  	if (dev_forward_skb(dev, skb) == NET_RX_SUCCESS) {
+b9494cd37a920d Eric Dumazet     2023-08-19  141  		DEV_STATS_INC(dev, rx_packets);
+b9494cd37a920d Eric Dumazet     2023-08-19  142  		DEV_STATS_ADD(dev, rx_bytes, data_len);
+a2842a1e663297 Eric Dumazet     2012-06-25  143  	} else {
+b9494cd37a920d Eric Dumazet     2023-08-19  144  		DEV_STATS_INC(dev, rx_errors);
+a2842a1e663297 Eric Dumazet     2012-06-25  145  	}
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  146  	rcu_read_unlock();
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  147  
+d9e31d17ceba5f James Chapman    2010-04-02  148  	return;
+d9e31d17ceba5f James Chapman    2010-04-02  149  
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  150  error_rcu:
+ee28de6bbd78c2 Guillaume Nault  2017-10-27  151  	rcu_read_unlock();
+d9e31d17ceba5f James Chapman    2010-04-02  152  error:
+d9e31d17ceba5f James Chapman    2010-04-02  153  	kfree_skb(skb);
+d9e31d17ceba5f James Chapman    2010-04-02  154  }
+d9e31d17ceba5f James Chapman    2010-04-02  155  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
