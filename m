@@ -1,77 +1,81 @@
-Return-Path: <netdev+bounces-29977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03687856A9
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:19:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 434597856A7
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:18:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97C002812B9
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:19:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8AB8281276
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8BBBE6E;
-	Wed, 23 Aug 2023 11:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04207BA42;
+	Wed, 23 Aug 2023 11:17:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FD6BE52
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 11:17:49 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2064.outbound.protection.outlook.com [40.107.93.64])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02A72E5A
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 04:17:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADE6BE53
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 11:17:46 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36542E5C
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 04:17:45 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eujDqtkkISQ9hmt9Ckcegp9V+RFbl15gPKWw6S8sF9Ms66VBcCiM/8AXhPWHBu9XQ/0WberSBOJlKBgkJl5iGfdBhJeyXQWEOJzeltgZvbs596LlUgjQXx1tl4kz3OAbgAj47Aump7fv7Gn2CVJ9UbnWJrEVP9mR1DOy7lZHub3dxVzHNcr5xJXNt1Wal8Q6hucoTQnWPyCxqD+4ystic1ui7h9BfxHud9um9ib7hRUBjSQmuCmmUuJ97SG+1rl15LA/JAxufHRTAtYfFN1/C1XPxKu9sHohiphPn/WcGZXP9hedhgKpPcpMVHy7rAAPQRTIqX3airQiUuqtGOgmeg==
+ b=YqaoCQwrtNpkEmRNxf/4xXQnCPt37sDIlcj2u9bIh3iNE+KebCrSUUxKPRVMx1aPOEoP2jKNkMuFmjqh1EIGu4J2ugwGiaQWi8BmO7OfUGwQr0CJZGUOUZPh9XXc1PDMOy7ckpN6y91JCJtnyNhVpcsyY9lCr5XvMAr1yNVK9bYvvGDHiAX5m5yVPh/ZLpoXWEdFG8nyvituHMdLvc10DInI5nOQyfLTtg8W+VhqGtg0oWNxwLoW57ZqOUIn4KdBrSVwGj6CjCiUIuAOoWcAldJip7SPcUczxrNlEpIn2XZuqzbtf6YDRouUfVwGsOV3LNKK7zlGql3AYKhdWoF+wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mbcb8ne1lehuOe7PHe1S3y3pA+b+VNsfwuldFl2zv14=;
- b=V/LmCneGiV3eOtxcV8S0cq6PwHtRu7FEcd8ndWGo4uIym7HEPV7nojCpyuF0ae+Eq51ZOksGcEw+2oZ+W4Wp77gaZ8+leSxCFh2udyLsjssy6KYhQ0mP7Qt1fkSQC5qfCYJi8EW4lZcX2riduwNbMcE8HYmdC1yTBAkdhphT/7ygYgffgqGw/tDFXUzF0HmifIcr+KcR7OB99xEBYBn85vkrFcrFmwACBKLRtXYOuOp7yvenzHwa5objz4r3GrfOp+x2LVRplM2i0THQr57SYRbqJ3gMwo9bfQSw70htIDJKL5n23D5CoYhpxOc+95Ip63bvBBrlxDdYl4K769dn1Q==
+ bh=RoUSp2Oft46bGNxy0vWC9gOqJsxtFmioy3A8+jRONCY=;
+ b=kC4MxaQTTykNgTjEaQd7aJMi9Kf5hIGX1kpI8oXAGusKM+0dMnRsTol6uJHI74WPTBW19vhnWNbK07/iuEJxiaMZZk7rujrdwXIxAzfZ6Ez/2mQO5AuEJ5agPE9D2NAPdEHG45R0J+eP5hlhel/CCSXB/dWAEKjxPG0OPkvVKHs35LpDF08g6xZ0P7AVTLfQ+YZJD8wHB8zV8uH3UYwXmPwa0QbAJyPZSsHf5BsBiJTC8YwXgCkp4fLeD6lxdzmQkbNC0KV2hJjCM90UwEdpIZxmmazzGtZTdl10eM7slBLYiQSLP88GRz882Ikh2IlWnJ5I4DpnJLy/lTGIVQidRw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mbcb8ne1lehuOe7PHe1S3y3pA+b+VNsfwuldFl2zv14=;
- b=EQRWVoKmq0D+6+RaO1H5VHfGAEVNeA3e8rDr6ft/eTF6shaE7AhBE7QkzG9tFqHesilboDl2D+GW4mHSKpkmAfZDRHCIXxEiVdK7xE8vqcquJfANXoKDxt/FGR8alcBmM6NdtsgPzaqRP4wjxyqo/AS+D2J0yOI9eNP94dQA3GA=
-Received: from MW4PR03CA0242.namprd03.prod.outlook.com (2603:10b6:303:b4::7)
- by CH0PR12MB5185.namprd12.prod.outlook.com (2603:10b6:610:b8::16) with
+ bh=RoUSp2Oft46bGNxy0vWC9gOqJsxtFmioy3A8+jRONCY=;
+ b=VeFdSUmyZFXN8WPctjgYX9mVvy/N8pjoRiCHvAT/gTKAUDXgQ7ShrQZg/wnfm4XYZ5LYkoYu78UfS6NYUkYO0wj19yR4MOY9EGJUL4uByuY8JARhy7chF+TEyh3YUK1gGq2xzZw1sSE6Q7dJ9buHR2je0DAfUKGpzR25BBiYtKw=
+Received: from SN7PR04CA0081.namprd04.prod.outlook.com (2603:10b6:806:121::26)
+ by MN2PR12MB4096.namprd12.prod.outlook.com (2603:10b6:208:1dc::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
- 2023 11:17:43 +0000
-Received: from MWH0EPF000971E8.namprd02.prod.outlook.com
- (2603:10b6:303:b4:cafe::af) by MW4PR03CA0242.outlook.office365.com
- (2603:10b6:303:b4::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
- Transport; Wed, 23 Aug 2023 11:17:43 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Wed, 23 Aug
+ 2023 11:17:42 +0000
+Received: from SA2PEPF00001507.namprd04.prod.outlook.com
+ (2603:10b6:806:121:cafe::d8) by SN7PR04CA0081.outlook.office365.com
+ (2603:10b6:806:121::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26 via Frontend
+ Transport; Wed, 23 Aug 2023 11:17:41 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- MWH0EPF000971E8.mail.protection.outlook.com (10.167.243.68) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6699.15 via Frontend Transport; Wed, 23 Aug 2023 11:17:43 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6699.14 via Frontend Transport; Wed, 23 Aug 2023 11:17:41 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 23 Aug
- 2023 06:17:39 -0500
+ 2023 06:17:41 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 23 Aug
+ 2023 06:17:40 -0500
 Received: from xcbpieterj41x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Wed, 23 Aug 2023 06:17:38 -0500
+ Transport; Wed, 23 Aug 2023 06:17:39 -0500
 From: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
 To: <netdev@vger.kernel.org>, <linux-net-drivers@amd.com>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <ecree.xilinx@gmail.com>, <habetsm.xilinx@gmail.com>,
 	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-Subject: [PATCH net-next 4/6] sfc: add decrement ipv6 hop limit by offloading set hop limit actions
-Date: Wed, 23 Aug 2023 12:17:23 +0100
-Message-ID: <20230823111725.28090-5-pieter.jansen-van-vuuren@amd.com>
+Subject: [PATCH net-next 5/6] sfc: introduce pedit add actions on the ipv4 ttl field
+Date: Wed, 23 Aug 2023 12:17:24 +0100
+Message-ID: <20230823111725.28090-6-pieter.jansen-van-vuuren@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230823111725.28090-1-pieter.jansen-van-vuuren@amd.com>
 References: <20230823111725.28090-1-pieter.jansen-van-vuuren@amd.com>
@@ -84,26 +88,26 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E8:EE_|CH0PR12MB5185:EE_
-X-MS-Office365-Filtering-Correlation-Id: de453fde-4476-454d-709a-08dba3ca925c
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|MN2PR12MB4096:EE_
+X-MS-Office365-Filtering-Correlation-Id: cbc68b52-ca9d-49f4-e012-08dba3ca912a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	2mvl8i4BdvREaczjmSabkTNsCSKpSvBH1b0ruxyqZfCFQbV5qI8J8XyMG3K0nDZh73NgypC44clgPnLZBnlWBUofFkYxTmgIhJxk+GiKI0HMSlxA7BSpou2t+qXSwpSGMxGC1bM5+83EbN6ME9ruKfk0vg7jAxBel4ldJWLHsCmZd3Wqne2qBkwF0PsYJX3Xn4YzCKyZUhZB4HSX+8/TUfLCNtt0WpZUnl0PkEGDNLxDRQVUsfa2IKDzcHOm0LJcTQOnE3kOPXhJ4GFa11xvaDAT6NcQ/81E/3JQg1RvpGsotgG25SksvjA3i22oFpxk5iGyCCmiwdo1vP/qiSNrs1cl3cjnsWU4OY89iZ/Zpbm5JZ7RVmC2kyJ+ERxae2y4Wv1lBhtl04a8PTlEETwYb+a/WQJsd0BQJU3polOiD544GBk8FHF1Y5R8u2G6L6UIlIJP7Q6LNXcwdN/pGtAUkb3dmMwGJ/ORxZOCmn+ET6g8bvhTMbBN5rE9TK8BZR41pbj6BNiF6qd+S+6CjZDqk0dFIyFOpteNdTH9q8skR7dJ0qyi8CSw+ikYiSneE5d+sXem5oFmJ1ho7quSsZbr6fc1Vq3TblvvbAP6jxCtPa7GbZHQweEj7vbV5bY5U47maiJ3ey7XtKru2Jys3DbvHouP7qlgmMuhlc98t/ED8UXTDxJUVKfCAoF+StEKSJmIcjkhE8jCeNb4YYqwrt1hwcHsURfd2bWOcjBRvEGRet3KvMjD6EzZubiq4BiJu+BstHgfuEVk4W35Y3mVZrq7bg==
+	Ra1IyfF1VXEaBpw/1ZaWFfE5PqGqCHo3rpTqJAf80j0tabz7UqWuA7nZQGTDjZHS+eH3642Tij6dFn9waod8g4tEEa9JUlbKnkpZBixPIesRL46T92pZ/hzfkA7mmsjchhZoV4e9gZBtxwA5sToelr/hDtvr8ZGh9up4PXuCj5x4hm4iqGCMxdn+76DB37I4CsOo1mwhKbGwUWHmqgrqjKlpWyQOuBVwiHDHJsKeuaHWiuhl4qIQ61WCiilKBQvLejGFN4CDdQ2b7fhb71hS/oI+yk/R6es0aewjfFRYT/qMUISdlF4ZJ2PI/OjdUW5x0IJOt8l9E5loY0bcTL96gXeTrN1+Hq2DdD/BFSZkTUl1QNDaS72AetMPhLWHdhM1rbukXl9nOLgNC+Y2wzDG2RMxrm4XThCozninEO/sVyjFqfV/5LlKBAEhbFRMHgxuNYn1WiTJSBCfBqSJ9mt0d2t+bkwOdC3/AvJKC/lsHAuciVdjggwB9e/h53OdXUmcgpwcgrc0Cavksl1xuIbp24RS4b26/pch2xcFXy3Fx7k/Bl3H+5OJXy6Ne/+Yam4IUNfi0TXlzVZnnWhVEOeTLyLzwy0KKzewblTByNmeCcx1IQT2HxEkF+N7HOuL7/Q/zbkkhEV6POc6PHx9ee2H9uQ8qdN0QI37WFHEbViyS1oPAmzSKWlQ30WyLLITfodLS1ML/r+DrBMKzHWi87GtDmb2i8mtk+Z6KjzTCby4UTntC+S+Ajb61nUjSSi7Fude10f2LQJX/7wmzED7Ee17jQ==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(376002)(136003)(396003)(186009)(451199024)(1800799009)(82310400011)(40470700004)(46966006)(36840700001)(2616005)(6636002)(316002)(4326008)(8936002)(8676002)(70586007)(54906003)(70206006)(110136005)(40480700001)(41300700001)(336012)(426003)(26005)(1076003)(5660300002)(6666004)(478600001)(83380400001)(40460700003)(47076005)(36860700001)(86362001)(36756003)(2906002)(82740400003)(81166007)(356005)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(136003)(396003)(39860400002)(82310400011)(451199024)(1800799009)(186009)(36840700001)(40470700004)(46966006)(2906002)(83380400001)(40480700001)(5660300002)(426003)(336012)(26005)(86362001)(47076005)(36860700001)(8676002)(2616005)(4326008)(8936002)(70586007)(70206006)(316002)(54906003)(110136005)(478600001)(81166007)(356005)(82740400003)(6666004)(40460700003)(41300700001)(36756003)(1076003)(6636002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 11:17:43.5747
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 11:17:41.6815
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de453fde-4476-454d-709a-08dba3ca925c
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbc68b52-ca9d-49f4-e012-08dba3ca912a
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E8.namprd02.prod.outlook.com
+	SA2PEPF00001507.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5185
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4096
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -111,93 +115,79 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Offload pedit set ipv6 hop limit, where the hop limit has already been
-matched and the new value is one less, by translating it to a decrement.
+Introduce pedit add actions and use it to achieve decrement ttl offload.
+Decrement ttl can be achieved by adding 0xff to the ttl field.
 
 Co-developed-by: Edward Cree <ecree.xilinx@gmail.com>
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 Signed-off-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
 ---
- drivers/net/ethernet/sfc/tc.c | 59 +++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ drivers/net/ethernet/sfc/tc.c | 45 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
 diff --git a/drivers/net/ethernet/sfc/tc.c b/drivers/net/ethernet/sfc/tc.c
-index 03205789dd6a..dc6275dee94a 100644
+index dc6275dee94a..8ba5816b51f2 100644
 --- a/drivers/net/ethernet/sfc/tc.c
 +++ b/drivers/net/ethernet/sfc/tc.c
-@@ -32,6 +32,8 @@ enum efx_encap_type efx_tc_indr_netdev_type(struct net_device *net_dev)
- }
- 
- #define EFX_TC_HDR_TYPE_TTL_MASK ((u32)0xff)
-+/* Hoplimit is stored in the most significant byte in the pedit ipv6 header action */
-+#define EFX_TC_HDR_TYPE_HLIMIT_MASK ~((u32)0xff000000)
- #define EFX_EFV_PF	NULL
- /* Look up the representor information (efv) for a device.
-  * May return NULL for the PF (us), or an error pointer for a device that
-@@ -1189,6 +1191,63 @@ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
- 			return -EOPNOTSUPP;
- 		}
- 		break;
-+	case FLOW_ACT_MANGLE_HDR_TYPE_IP6:
+@@ -1067,6 +1067,46 @@ static int efx_tc_complete_mac_mangle(struct efx_nic *efx,
+  * earlier partial mangle, consume and apply to @act by calling
+  * efx_tc_complete_mac_mangle().
+  */
++static int efx_tc_pedit_add(struct efx_nic *efx, struct efx_tc_action_set *act,
++			    const struct flow_action_entry *fa,
++			    struct netlink_ext_ack *extack)
++{
++	switch (fa->mangle.htype) {
++	case FLOW_ACT_MANGLE_HDR_TYPE_IP4:
 +		switch (fa->mangle.offset) {
-+		case round_down(offsetof(struct ipv6hdr, hop_limit), 4):
-+			/* we currently only support pedit IP6 when it applies
-+			 * to the hoplimit and then only when it can be achieved
-+			 * with a decrement hoplimit action
-+			 */
-+
++		case offsetof(struct iphdr, ttl):
 +			/* check that pedit applies to ttl only */
-+			if (fa->mangle.mask != EFX_TC_HDR_TYPE_HLIMIT_MASK) {
-+				NL_SET_ERR_MSG_FMT_MOD(extack,
-+						       "Unsupported: mask (%#x) out of range, only support mangle action on ipv6.hop_limit",
-+						       fa->mangle.mask);
++			if (fa->mangle.mask != ~EFX_TC_HDR_TYPE_TTL_MASK)
++				break;
 +
-+				return -EOPNOTSUPP;
-+			}
-+
-+			/* we can only convert to a dec ttl when we have an
-+			 * exact match on the ttl field
++			/* Adding 0xff is equivalent to decrementing the ttl.
++			 * Other added values are not supported.
 +			 */
-+			if (match->mask.ip_ttl != U8_MAX) {
-+				NL_SET_ERR_MSG_FMT_MOD(extack,
-+						       "Unsupported: only support mangle ipv6.hop_limit when we have an exact match on ttl, mask used for match (%#x)",
-+						       match->mask.ip_ttl);
-+				return -EOPNOTSUPP;
-+			}
++			if ((fa->mangle.val & EFX_TC_HDR_TYPE_TTL_MASK) != U8_MAX)
++				break;
 +
-+			/* check that we don't try to decrement 0, which equates
-+			 * to setting the ttl to 0xff
-+			 */
-+			if (match->value.ip_ttl == 0) {
-+				NL_SET_ERR_MSG_MOD(extack,
-+						   "Unsupported: we cannot decrement hop_limit past 0");
-+				return -EOPNOTSUPP;
-+			}
-+
-+			/* check that we do not decrement hoplimit twice */
++			/* check that we do not decrement ttl twice */
 +			if (!efx_tc_flower_action_order_ok(act,
 +							   EFX_TC_AO_DEC_TTL)) {
-+				NL_SET_ERR_MSG_MOD(extack,
-+						   "Unsupported: multiple dec ttl");
++				NL_SET_ERR_MSG_MOD(extack, "Unsupported: multiple dec ttl");
 +				return -EOPNOTSUPP;
 +			}
-+
-+			/* check pedit can be achieved with decrement action */
-+			tr_ttl = match->value.ip_ttl - 1;
-+			if ((fa->mangle.val >> 24) == tr_ttl) {
-+				act->do_ttl_dec = 1;
-+				return 0;
-+			}
-+
-+			fallthrough;
++			act->do_ttl_dec = 1;
++			return 0;
 +		default:
-+			NL_SET_ERR_MSG_FMT_MOD(extack,
-+					       "Unsupported: only support mangle on the hop_limit field");
-+			return -EOPNOTSUPP;
++			break;
 +		}
- 	default:
- 		NL_SET_ERR_MSG_FMT_MOD(extack, "Unhandled mangle htype %u for action rule",
- 				       fa->mangle.htype);
++		break;
++	default:
++		break;
++	}
++
++	NL_SET_ERR_MSG_FMT_MOD(extack,
++			       "Unsupported: ttl add action type %x %x %x/%x",
++			       fa->mangle.htype, fa->mangle.offset,
++			       fa->mangle.val, fa->mangle.mask);
++	return -EOPNOTSUPP;
++}
+ 
+ static int efx_tc_mangle(struct efx_nic *efx, struct efx_tc_action_set *act,
+ 			 const struct flow_action_entry *fa,
+@@ -2013,6 +2053,11 @@ static int efx_tc_flower_replace(struct efx_nic *efx,
+ 			act->vlan_proto[act->vlan_push] = fa->vlan.proto;
+ 			act->vlan_push++;
+ 			break;
++		case FLOW_ACTION_ADD:
++			rc = efx_tc_pedit_add(efx, act, fa, extack);
++			if (rc < 0)
++				goto release;
++			break;
+ 		case FLOW_ACTION_MANGLE:
+ 			rc = efx_tc_mangle(efx, act, fa, &mung, extack, &match);
+ 			if (rc < 0)
 -- 
 2.17.1
 
