@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-29993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0C57856F3
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:44:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891817856F5
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE5A01C20C0E
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:44:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40FBA281065
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616C5C150;
-	Wed, 23 Aug 2023 11:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01160C120;
+	Wed, 23 Aug 2023 11:42:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5631AC14D
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 11:42:26 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F74CD0;
-	Wed, 23 Aug 2023 04:42:25 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40061928e5aso2500645e9.3;
-        Wed, 23 Aug 2023 04:42:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CD6C2CA
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 11:42:27 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFB8E61;
+	Wed, 23 Aug 2023 04:42:26 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3fbd33a57b6so51400965e9.2;
+        Wed, 23 Aug 2023 04:42:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692790943; x=1693395743;
+        d=gmail.com; s=20221208; t=1692790944; x=1693395744;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OGTcE4hW1wmK3YLI+VZd9ibjhnWGHcOir/OGBUb1v5g=;
-        b=i11LrcsAickTUTniS8kLlbyF1zbAj6BJScxYqyh63uBZxJHtJQ9s5OsULLNPXnJTqw
-         FdSEOQH/A5XzRavauj/bjA9JtxTOUaWe131qlXIJV7jQM1H5WpRD86oZ+l16FBDG+Mot
-         asMYJ1v/nIlTj//0uS1JA694vEeOXRYv5OHacmjkHE1x7lC+RjBAF5oinaVWXmmJqBBW
-         36J6t99lllKJCiyP+Tkn8ZmPhako4Uc4rgk2kmrUrFapxekiH56LaEgYdp2OLvEIlEZB
-         nuRkx1dtFeBclLQX0/6mKSx/CLcfJ6xf0/AezdMH/1TymBF40uDgfKkIJqUeNUDd3dFr
-         ho9Q==
+        bh=ZpxozlulOHy7e2NcGQ2N1A8WX8wlrZhzOJhaC8DQaBU=;
+        b=O+biuidF6ljTTgJjvFLL8V1/KewlqF7/3jCi2s+XYEJdu2wDMyPVq+/bL0ICrbI1iE
+         emWZhQZ3bYWztIJJ/7T8ZHQtMlo+RdSCblasU3Q994U0VL+ieJO0r/+TNleeaeyo67wX
+         DQJPaWAv+zkdNQ2KnY9SiLsJP2++nlQu+jQid8gcaJyO/SIF43NPv/NqbwqoFu2iBp6h
+         b3ic0JFjBzHo4LT/PxStyFTT+YDLI2rxrcXDHhmcGdZ1sVQK9kawIdB7LS2ohcKyW+ld
+         S67g5sShIPOUN/02rJm166FGoxC14rFfOx0J7Q2wpE2Wte8mJOKXDiCaCrxARtPoj/o9
+         vLZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692790943; x=1693395743;
+        d=1e100.net; s=20221208; t=1692790944; x=1693395744;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OGTcE4hW1wmK3YLI+VZd9ibjhnWGHcOir/OGBUb1v5g=;
-        b=F5pR2EMrwPrRwwqmd/Ht2Rv95Ahua1XvgKDOGLHShpYYnY7ah/8r7AZO/+SItCPlnz
-         VbrTNBYRPLVUMWcEwDB/OrZ1HjFuvcvhkUMjYbWM8OceMLXGuaqVPmUblYNAaKpwJhXR
-         TqQ9Zk+1tohTHuM6KkHoBs1rdbpDV9K5Gcqc5edkmbSAEUEmWuh0KHzwU9kVVMlDa/w8
-         +dkciAjeCf3uDIo4crfanJs8EmHXIw+AQ9F9gqff0ulVVh0Ukh+t0Sd6a+uL+y5xHoZY
-         c/5OcYQX15KXSDYCFeYDm4BY2YKo8fwXHnTMfXzarhP6b1gLvg3rR8+Pl7gvb35+6+Na
-         a3Kw==
-X-Gm-Message-State: AOJu0YxwWp0PQLr/qaCzoIdUkOzi8ZG1hLILP/ji08MS4M5o3rDO6T+a
-	1GT/ADskiNUvEgAqXwZEpq8ccVamJLzH7w==
-X-Google-Smtp-Source: AGHT+IGUHgRYBxh6OYBjOB62Jw6JtZoOJeKzQWRwplVotrOKs8QfZXTptlvxj23PM869tbMOVHOp6w==
-X-Received: by 2002:a05:600c:b42:b0:3fb:b34f:6cd6 with SMTP id k2-20020a05600c0b4200b003fbb34f6cd6mr9904631wmr.41.1692790943346;
-        Wed, 23 Aug 2023 04:42:23 -0700 (PDT)
+        bh=ZpxozlulOHy7e2NcGQ2N1A8WX8wlrZhzOJhaC8DQaBU=;
+        b=bGyVzPVGYib34MIIZgwsekM3n95wwLs7AmXuv59P3xyg0rhGG6gx7zt25FsQ2g2wxF
+         E1zWhsEQKnlfrBCh2Gq3WAulymnJ23FhqoeAelxg2VCkp4k8WdtHyK+pZv8A6A84GhYf
+         gFKDmjbqmFBcCrIElpL+dUaf+QMk5v7Ip6uTq4bF60nkOX9NeqdBhEBgeZ0LHn3KT4gE
+         uW3JxQFlNRy3UH4laOLoPRGUWpGE9WUYuJZwGd6FFX53B88vTIJ1BS15eIvEY+CSA+3p
+         AND3F9CHrDH4qLcuMXuEHBEfO/37Vqfyr5ZUWqFCildJ2I1AHRsveiRse2UXoimd9ua4
+         o3ow==
+X-Gm-Message-State: AOJu0YwU7dlptCtA/T66w1x2PM2Tm3b0CKdnHTenCD2dfAn+KuVq3Qs8
+	QBdsuXgyzD5DdlnuvZV0rugJ/GPG1v03qA==
+X-Google-Smtp-Source: AGHT+IE+3XmyoSdRt7aPMz05YNbjeRaqibRit8p4+LkaOZxH5Naq6tO3g5U3P0m6VQaldbzrQRKDNQ==
+X-Received: by 2002:a7b:cbc8:0:b0:3fb:e254:b81e with SMTP id n8-20020a7bcbc8000000b003fbe254b81emr9608435wmi.12.1692790944485;
+        Wed, 23 Aug 2023 04:42:24 -0700 (PDT)
 Received: from imac.taild7a78.ts.net ([2a02:8010:60a0:0:e4cf:1132:7b40:4262])
-        by smtp.gmail.com with ESMTPSA id k21-20020a05600c1c9500b003fed9b1a1f4sm559508wms.1.2023.08.23.04.42.22
+        by smtp.gmail.com with ESMTPSA id k21-20020a05600c1c9500b003fed9b1a1f4sm559508wms.1.2023.08.23.04.42.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 04:42:22 -0700 (PDT)
+        Wed, 23 Aug 2023 04:42:24 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -68,9 +68,9 @@ To: netdev@vger.kernel.org,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v4 08/12] tools/net/ynl: Implement nlattr array-nest decoding in ynl
-Date: Wed, 23 Aug 2023 12:41:57 +0100
-Message-ID: <20230823114202.5862-9-donald.hunter@gmail.com>
+Subject: [PATCH net-next v4 09/12] tools/net/ynl: Add support for create flags
+Date: Wed, 23 Aug 2023 12:41:58 +0100
+Message-ID: <20230823114202.5862-10-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230823114202.5862-1-donald.hunter@gmail.com>
 References: <20230823114202.5862-1-donald.hunter@gmail.com>
@@ -83,51 +83,113 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support for the 'array-nest' attribute type that is used by several
-netlink-raw families.
+Add support for using NLM_F_REPLACE, _EXCL, _CREATE and _APPEND flags
+in requests.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/lib/ynl.py | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tools/net/ynl/cli.py          | 12 ++++++++++--
+ tools/net/ynl/lib/__init__.py |  4 ++--
+ tools/net/ynl/lib/ynl.py      | 14 ++++++++++----
+ 3 files changed, 22 insertions(+), 8 deletions(-)
 
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index ffaa8038aa8c..564ecf07cd2c 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -6,7 +6,7 @@ import json
+ import pprint
+ import time
+ 
+-from lib import YnlFamily
++from lib import YnlFamily, Netlink
+ 
+ 
+ def main():
+@@ -19,6 +19,14 @@ def main():
+     parser.add_argument('--dump', dest='dump', type=str)
+     parser.add_argument('--sleep', dest='sleep', type=int)
+     parser.add_argument('--subscribe', dest='ntf', type=str)
++    parser.add_argument('--replace', dest='flags', action='append_const',
++                        const=Netlink.NLM_F_REPLACE)
++    parser.add_argument('--excl', dest='flags', action='append_const',
++                        const=Netlink.NLM_F_EXCL)
++    parser.add_argument('--create', dest='flags', action='append_const',
++                        const=Netlink.NLM_F_CREATE)
++    parser.add_argument('--append', dest='flags', action='append_const',
++                        const=Netlink.NLM_F_APPEND)
+     args = parser.parse_args()
+ 
+     if args.no_schema:
+@@ -37,7 +45,7 @@ def main():
+         time.sleep(args.sleep)
+ 
+     if args.do:
+-        reply = ynl.do(args.do, attrs)
++        reply = ynl.do(args.do, attrs, args.flags)
+         pprint.PrettyPrinter().pprint(reply)
+     if args.dump:
+         reply = ynl.dump(args.dump, attrs)
+diff --git a/tools/net/ynl/lib/__init__.py b/tools/net/ynl/lib/__init__.py
+index 4b3797fe784b..f7eaa07783e7 100644
+--- a/tools/net/ynl/lib/__init__.py
++++ b/tools/net/ynl/lib/__init__.py
+@@ -2,7 +2,7 @@
+ 
+ from .nlspec import SpecAttr, SpecAttrSet, SpecEnumEntry, SpecEnumSet, \
+     SpecFamily, SpecOperation
+-from .ynl import YnlFamily
++from .ynl import YnlFamily, Netlink
+ 
+ __all__ = ["SpecAttr", "SpecAttrSet", "SpecEnumEntry", "SpecEnumSet",
+-           "SpecFamily", "SpecOperation", "YnlFamily"]
++           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink"]
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 4fa4416edd58..b44174f1fa33 100644
+index b44174f1fa33..14a45e71963b 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -490,6 +490,17 @@ class YnlFamily(SpecFamily):
-                 decoded = NlAttr.formatted_string(decoded, attr_spec.display_hint)
-         return decoded
- 
-+    def _decode_array_nest(self, attr, attr_spec):
-+        decoded = []
-+        offset = 0
-+        while offset < len(attr.raw):
-+            item = NlAttr(attr.raw, offset)
-+            offset += item.full_len
+@@ -35,6 +35,10 @@ class Netlink:
+     NLM_F_ACK = 4
+     NLM_F_ROOT = 0x100
+     NLM_F_MATCH = 0x200
 +
-+            subattrs = self._decode(NlAttrs(item.raw), attr_spec['nested-attributes'])
-+            decoded.append({ item.type: subattrs })
-+        return decoded
-+
-     def _decode(self, attrs, space):
-         attr_space = self.attr_sets[space]
-         rsp = dict()
-@@ -509,6 +520,8 @@ class YnlFamily(SpecFamily):
-                 decoded = True
-             elif attr_spec["type"] in NlAttr.type_formats:
-                 decoded = attr.as_scalar(attr_spec['type'], attr_spec.byte_order)
-+            elif attr_spec["type"] == 'array-nest':
-+                decoded = self._decode_array_nest(attr, attr_spec)
-             else:
-                 raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
++    NLM_F_REPLACE = 0x100
++    NLM_F_EXCL = 0x200
++    NLM_F_CREATE = 0x400
+     NLM_F_APPEND = 0x800
  
+     NLM_F_CAPPED = 0x100
+@@ -647,10 +651,12 @@ class YnlFamily(SpecFamily):
+ 
+       return op['do']['request']['attributes'].copy()
+ 
+-    def _op(self, method, vals, dump=False):
++    def _op(self, method, vals, flags, dump=False):
+         op = self.ops[method]
+ 
+         nl_flags = Netlink.NLM_F_REQUEST | Netlink.NLM_F_ACK
++        for flag in flags or []:
++            nl_flags |= flag
+         if dump:
+             nl_flags |= Netlink.NLM_F_DUMP
+ 
+@@ -709,8 +715,8 @@ class YnlFamily(SpecFamily):
+             return rsp[0]
+         return rsp
+ 
+-    def do(self, method, vals):
+-        return self._op(method, vals)
++    def do(self, method, vals, flags):
++        return self._op(method, vals, flags)
+ 
+     def dump(self, method, vals):
+-        return self._op(method, vals, dump=True)
++        return self._op(method, vals, [], dump=True)
 -- 
 2.41.0
 
