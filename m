@@ -1,221 +1,124 @@
-Return-Path: <netdev+bounces-29861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81058784FCB
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55620784FD5
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C0D4281279
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 05:06:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57F6C281271
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 05:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2BD17C6;
-	Wed, 23 Aug 2023 05:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EE96AA8;
+	Wed, 23 Aug 2023 05:10:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1CA20F1E
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:05:57 +0000 (UTC)
-Received: from mail-pg1-f206.google.com (mail-pg1-f206.google.com [209.85.215.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7C1E4A
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 22:05:55 -0700 (PDT)
-Received: by mail-pg1-f206.google.com with SMTP id 41be03b00d2f7-564fa3b49e1so5620275a12.0
-        for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 22:05:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692767155; x=1693371955;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8EYOZVLvlRuZv7TQU5HwS8/TUk4n+oYtzH2VL9bdkB4=;
-        b=QF7kL5hzzwOM1HXzUauggt7ILVsGEBaDNGyBdM185AfUA+nxriBOBzMXrtX4t0NRbU
-         9Bou7qWRHD4YfhC9cfJD+rN2EQdORlFDCOhxYrcYP0gCAsqusRsz+MWh+AyATaJqFwl2
-         LX4V9ZRFV/g3gXRVhI3tEftiF1twjJj1BWLnlVYEiqvXg9Zfs/y4qUPKZdcaMbsaqGkq
-         i6SsyaPYiRyXQXdvUfIuRsXzhwyzS3YrFXhWFmhJletPbMGQ0z3X4A5cH8CGi61RCow2
-         c8j0eNwEvI9ADE0wgxWzpgwLwTrL7W/pefSCSpfp3Pn+l1xhUIdE277TZjkO44jbRBCi
-         IE1Q==
-X-Gm-Message-State: AOJu0YzR2tIsX4YTVxbYLbuxVC64Q4ZP3xJB5P2cNJGunbAVbPkLzuWa
-	slxTuc1Q46wUzDB4W8WlE++PNBSQUuGDBvGxY56P/vwGJT2X
-X-Google-Smtp-Source: AGHT+IFhBrPHex9t/FWzMU+x63TBDxBs6D3YviHcnPcc/aqWrC9ItklUH766Q1lFWE2fj4XiqCwSeNeWUZK5ttKiSFva7/Ab23i8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEAEE1851
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0802EC433C7;
+	Wed, 23 Aug 2023 05:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692767424;
+	bh=3eJzft9lzIjN98BSZsttZgGpPh0THqN0c9UbCpX+KvY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nVjTBRgKmvst85J9HVmSiwU42pFNfLehAVVtSvUadS9sOlL4VYOjjJNetZ+iHJFlS
+	 zRMkPzQ59bmaenPE/g7jUQFgvTlBiKXuijNq+Wc2N78c7ntBdHiUf8IbUSoQT2stTN
+	 em1HYb5RWhSvAvnvqgFPAVN5J6wsCpK6X4J+9ppr3vqN4lJCoWo+QX02h9aI9P6kkj
+	 M9FihIWInRLis/Bu2k3ngY0SiWXu3OIFLBhXfLPMvMrPwjq79wR9lXOsMg23wHkxXU
+	 zCFTYMg/ilEMdjgjKyuTMILAo791BCPTk06koMG03jT8scOZqRONnGpPSyFcwXePGi
+	 7esza8id9b38w==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net-next 00/15] mlx5 updates 2023-08-22
+Date: Tue, 22 Aug 2023 22:09:57 -0700
+Message-ID: <20230823051012.162483-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a65:66c9:0:b0:564:4a9e:1b80 with SMTP id
- c9-20020a6566c9000000b005644a9e1b80mr2336511pgw.6.1692767155278; Tue, 22 Aug
- 2023 22:05:55 -0700 (PDT)
-Date: Tue, 22 Aug 2023 22:05:55 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fa5b8c060390104f@google.com>
-Subject: [syzbot] [net?] WARNING: suspicious RCU usage in inetdev_event
-From: syzbot <syzbot+c670c371a962d1334881@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-syzbot found the following issue on:
+This series provides misc updates and cleanups to mlx5.
+For more information please see tag log below.
 
-HEAD commit:    144e22e7569a selftests/net: Add log.txt and tools to .giti..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1706640fa80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aa796b6080b04102
-dashboard link: https://syzkaller.appspot.com/bug?extid=c670c371a962d1334881
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Please pull and let me know if there is any problem.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c2b82060a69a/disk-144e22e7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5b660bbc0308/vmlinux-144e22e7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/243ca7530ae8/bzImage-144e22e7.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c670c371a962d1334881@syzkaller.appspotmail.com
-
-=============================
-WARNING: suspicious RCU usage
-6.5.0-rc6-syzkaller-00144-g144e22e7569a #0 Not tainted
------------------------------
-include/linux/inetdevice.h:250 suspicious rcu_dereference_protected() usage!
-
-other info that might help us debug this:
+Thanks,
+Saeed.
 
 
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz-executor.4/21034:
- #0: ffffffff8e47afb0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1077
- #1: ffffffff8e47b068 (genl_mutex){+.+.}-{3:3}, at: genl_lock net/netlink/genetlink.c:33 [inline]
- #1: ffffffff8e47b068 (genl_mutex){+.+.}-{3:3}, at: genl_rcv_msg+0x573/0x800 net/netlink/genetlink.c:1065
+The following changes since commit 6176b8c4a19e150c4176b1ed93174e2f5965c4b5:
 
-stack backtrace:
-CPU: 0 PID: 21034 Comm: syz-executor.4 Not tainted 6.5.0-rc6-syzkaller-00144-g144e22e7569a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
- lockdep_rcu_suspicious+0x20c/0x3b0 kernel/locking/lockdep.c:6719
- __in_dev_get_rtnl include/linux/inetdevice.h:250 [inline]
- inetdev_event+0x444/0x1900 net/ipv4/devinet.c:1532
- notifier_call_chain+0xb6/0x3b0 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xb9/0x130 net/core/dev.c:1962
- call_netdevice_notifiers_extack net/core/dev.c:2000 [inline]
- call_netdevice_notifiers net/core/dev.c:2014 [inline]
- dev_set_mtu_ext+0x1e8/0x5d0 net/core/dev.c:8664
- dev_set_mtu+0xb1/0x160 net/core/dev.c:8694
- batadv_update_min_mtu+0x6e/0x90 net/batman-adv/hard-interface.c:645
- batadv_netlink_set_mesh+0x7d8/0x14e0 net/batman-adv/netlink.c:498
- genl_family_rcv_msg_doit.isra.0+0x1ef/0x2d0 net/netlink/genetlink.c:970
- genl_family_rcv_msg net/netlink/genetlink.c:1050 [inline]
- genl_rcv_msg+0x559/0x800 net/netlink/genetlink.c:1067
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2549
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1078
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x539/0x800 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x93c/0xe30 net/netlink/af_netlink.c:1914
- sock_sendmsg_nosec net/socket.c:725 [inline]
- sock_sendmsg+0xd9/0x180 net/socket.c:748
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2494
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2548
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2577
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f0093a7cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f00948330c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f0093b9bf80 RCX: 00007f0093a7cae9
-RDX: 0000000000000000 RSI: 00000000200005c0 RDI: 0000000000000003
-RBP: 00007f0093ac847a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0093b9bf80 R15: 00007ffdab8adf58
- </TASK>
-------------[ cut here ]------------
-RTNL: assertion failed at net/ipv4/devinet.c (1534)
-WARNING: CPU: 1 PID: 21034 at net/ipv4/devinet.c:1534 inetdev_event+0x1142/0x1900 net/ipv4/devinet.c:1534
-Modules linked in:
-CPU: 1 PID: 21034 Comm: syz-executor.4 Not tainted 6.5.0-rc6-syzkaller-00144-g144e22e7569a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:inetdev_event+0x1142/0x1900 net/ipv4/devinet.c:1534
-Code: 0f 85 d1 ef ff ff e8 2d 8c c7 f8 ba fe 05 00 00 48 c7 c6 60 62 8d 8b 48 c7 c7 a0 62 8d 8b c6 05 03 5a d7 05 01 e8 4e 4e 8e f8 <0f> 0b e9 a6 ef ff ff e8 02 8c c7 f8 4c 89 ef e8 da cb ff ff 48 c7
-RSP: 0018:ffffc900068b7190 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000018 RCX: ffffc90014f77000
-RDX: 0000000000040000 RSI: ffffffff814ccc86 RDI: 0000000000000001
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff88802d8fc340
-R13: ffff88802d8fc000 R14: ffffffff8e550860 R15: 0000000000000000
-FS:  00007f00948336c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2f964000 CR3: 0000000029d00000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- notifier_call_chain+0xb6/0x3b0 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xb9/0x130 net/core/dev.c:1962
- call_netdevice_notifiers_extack net/core/dev.c:2000 [inline]
- call_netdevice_notifiers net/core/dev.c:2014 [inline]
- dev_set_mtu_ext+0x1e8/0x5d0 net/core/dev.c:8664
- dev_set_mtu+0xb1/0x160 net/core/dev.c:8694
- batadv_update_min_mtu+0x6e/0x90 net/batman-adv/hard-interface.c:645
- batadv_netlink_set_mesh+0x7d8/0x14e0 net/batman-adv/netlink.c:498
- genl_family_rcv_msg_doit.isra.0+0x1ef/0x2d0 net/netlink/genetlink.c:970
- genl_family_rcv_msg net/netlink/genetlink.c:1050 [inline]
- genl_rcv_msg+0x559/0x800 net/netlink/genetlink.c:1067
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2549
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1078
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x539/0x800 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x93c/0xe30 net/netlink/af_netlink.c:1914
- sock_sendmsg_nosec net/socket.c:725 [inline]
- sock_sendmsg+0xd9/0x180 net/socket.c:748
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2494
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2548
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2577
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f0093a7cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f00948330c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f0093b9bf80 RCX: 00007f0093a7cae9
-RDX: 0000000000000000 RSI: 00000000200005c0 RDI: 0000000000000003
-RBP: 00007f0093ac847a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0093b9bf80 R15: 00007ffdab8adf58
- </TASK>
+  Merge tag 'nf-next-23-08-22' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next (2023-08-22 18:47:35 -0700)
 
+are available in the Git repository at:
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-08-22
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+for you to fetch changes up to b8c697e177bba0f802232c3f06b7769b1e1fc516:
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+  net/mlx5e: Support IPsec upper TCP protocol selector (2023-08-22 21:34:18 -0700)
 
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+----------------------------------------------------------------
+mlx5-updates-2023-08-22
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
+1) Patches #1..#13 From Jiri:
 
-If you want to undo deduplication, reply with:
-#syz undup
+The goal of this patchset is to make the SF code cleaner.
+
+Benefit from previously introduced devlink_port struct containerization
+to avoid unnecessary lookups in devlink port ops.
+
+Also, benefit from the devlink locking changes and avoid unnecessary
+reference counting.
+
+2) Patches #14,#15:
+
+Add ability to configure proto both UDP and TCP selectors in RX and TX
+directions.
+
+----------------------------------------------------------------
+Emeel Hakim (1):
+      net/mlx5e: Support IPsec upper protocol selector field offload for RX
+
+Jiri Pirko (13):
+      net/mlx5: Rework devlink port alloc/free into init/cleanup
+      net/mlx5: Push out SF devlink port init and cleanup code to separate helpers
+      net/mlx5: Push devlink port PF/VF init/cleanup calls out of devlink_port_register/unregister()
+      net/mlx5: Allow mlx5_esw_offloads_devlink_port_register() to register SFs
+      net/mlx5: Introduce mlx5_eswitch_load/unload_sf_vport() and use it from SF code
+      net/mlx5: Remove no longer used mlx5_esw_offloads_sf_vport_enable/disable()
+      net/mlx5: Don't register ops for non-PF/VF/SF port and avoid checks in ops
+      net/mlx5: Embed struct devlink_port into driver structure
+      net/mlx5: Reduce number of vport lookups passing vport pointer instead of index
+      net/mlx5: Return -EOPNOTSUPP in mlx5_devlink_port_fn_migratable_set() directly
+      net/mlx5: Relax mlx5_devlink_eswitch_get() return value checking
+      net/mlx5: Check vhca_resource_manager capability in each op and add extack msg
+      net/mlx5: Store vport in struct mlx5_devlink_port and use it in port ops
+
+Leon Romanovsky (1):
+      net/mlx5e: Support IPsec upper TCP protocol selector
+
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |  13 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c         |  45 +++--
+ .../ethernet/mellanox/mlx5/core/esw/devlink_port.c | 169 ++++++++---------
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  | 158 ++++++++++++----
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.h  |  74 ++++++--
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c | 203 +++++++--------------
+ .../net/ethernet/mellanox/mlx5/core/sf/devlink.c   |  12 +-
+ 7 files changed, 371 insertions(+), 303 deletions(-)
 
