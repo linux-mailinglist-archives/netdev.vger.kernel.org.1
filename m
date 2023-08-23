@@ -1,106 +1,72 @@
-Return-Path: <netdev+bounces-30140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE12D7862B3
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 23:43:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C70647862B9
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 23:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CF701C20D1F
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:43:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 039E01C20D40
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F52200A9;
-	Wed, 23 Aug 2023 21:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A79200AA;
+	Wed, 23 Aug 2023 21:46:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6731F188
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 21:43:21 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B42D3;
-	Wed, 23 Aug 2023 14:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692826999; x=1724362999;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cFuFwNhw4HtAIA4dHvS4o9c209u78vsiDV5ocZ0MN8M=;
-  b=N0iC6RWT17VEnRNaumXnZ/ETNXBE5XwthmvPjaw9R2l5w92lzp84aLbq
-   Dt44tirtNbxygzL7L00giReASq6omGDQy/wQ96u6BFVK9VvEcrdkG0BMl
-   5v+Tx3pH1iiuT39goi+NwzbAA0JY2FZv7CLFoWrZ+SbZAHtcVE2zb1WqA
-   bKrN8DRU5FsVFGLlImaYxo7/tNTCk8NTrO3r0+Wp88b3hlFERgXgxkR+Z
-   t09SdB8wL9fb0Z4VCELuzy8Sbj7NHdiRRwN9NipBx6FPxOlQ1SdGeSEtu
-   YpRZRFNOLY5Dw0WD4gZad2XBR5aR4PVPgO0ElU/sK53nUCeiRkpTcb8td
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="460639092"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="460639092"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 14:43:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="910671988"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="910671988"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga005.jf.intel.com with ESMTP; 23 Aug 2023 14:43:18 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 14:43:17 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 14:43:17 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.102)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 23 Aug 2023 14:43:17 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971921FB35
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 21:46:40 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 064EDD3
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:46:38 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F7fCJxOnWCHE+dXyRLlMRLyMqby8NTgQYVREW0dZbMXM+Wmijwf4zz9/V5Q34Wc/ktkmPdbeJwPY1/w3fT0+/FLdVOIoyPtIbnAoAqlgwEL3jWD65hoimQzRCB0TeoakPSGmWPwPxtXWzOPU6nDUONXbSZBtA5FZMoHYnuvBEFV/+D79Lkn7cnryAopPOna8Lnbuzv9ggD+1I7AGLv1awaggsQIppKbpQe8ngagQRRUr5nNB9xhAk8x4Fn9i8LSHFjn6//eNKg4FD4A3H3llQ31Eaqoi/zghJt9rDFwssGfIFnXsi9Y1B767vw4HVPYNJHoxH5Jjnaj55VxY549KEA==
+ b=na8xjUoi0/G/JD+l9fJAaXfvpE/EuFqIhr1n9m2GFak469YvtvUvl+qv5V6p2k5BUhqav7RVNl2huAPphaJp+n37neBlu2dQx0uDPJllv/HSTzcHldEeD9Dfrm2gcvKuHcMCGbDataTkTO/7IcxjY44wRQGKKuKONKI5UKq6IvwA2TNlh5103JBzGqitRoLyd3ErPumAg9xDHgxIuumaUobzLVdGCkeE+/N0rS0LbV0REIyLPU4DFQLr2r2k7QVjUEntMxchLycneR1lmAQKi+RSNgavag2Mqm1x7IvslS8dQKIZeZYT3mixfiYkc2QC5fbWEwR6Zn8Lgf5GNxqsDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zEEf0TJuAdJ+QR+vb9E8H4IZSbObNDXkOfZoK0oIlW0=;
- b=Gip08QIL15kZ/5Ic0Esqlc/F1MQExNH/ClbBJLMNKs1KgsYoud7YzlEJsIWQhm53xIZKuD4noUxFKJpiBli61Dy4u/DkN0YfIiaulu1euO3Wxm2YQwPUZdNZny1nWPFXcyqfjVoYmNi4ncgHw4DV0bq7iWUuMjeNVxMLGCfbCp4KviNjB0AOLzgYGgxxhyArhsN9mpoFAkaJYcDR/4Wcqy/x3OtmFX+l59iF6FUVCODukShI6HMQluCRaIWlX2Wydv/2hFLHyT0Zg5Xok7ApR7vqZ97XZp0TouvDPz5I3iL5UG3J4+Fkes5C+yCcpFnrBhy0Z9AAkEs7vLL0O3+B0w==
+ bh=mb1llyXgSZeJ1Hs/9wV8kZ2FGuHXHhFfhWnbOTK6+EY=;
+ b=DvmZ8PNbvGTiis4h/ZH/+JZeyFEU+nnF1z49CTl9lsUnZhXj5SN/lDaudSKhv9qdpfiQvIFh9Br0jZfWaAhsSl4dZeZQuOH0hwbY7eCnbT/OLUjQ8WETmuk9QUlkl+HJ+LaTedrcvGzknKUUIBWVDl6IbnnQvSqctEkWRRZcxsSG5MTKwxjazL3LiKRYPssQJjDtCjeEKtGhUlTOxDqjDdpt36mT1TBHExEkqGVd5zgX/IHgTHcFafPGCO7G6/+t048YIsfZFF8afKCJ6cw7Jvpi2qvqbYMdmiQb1lO1QpAaec24HfkXh5OuhSOA6qORlIie72nj9vU9SVfdSYFKUA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mb1llyXgSZeJ1Hs/9wV8kZ2FGuHXHhFfhWnbOTK6+EY=;
+ b=n99aXjreVQeIvFjy0Br0e88UzQCa7aSHObhWvSfZp85NJ91r5wBk6BCCU8gZr08ibUqj3shdwaqBzHoxQ4iNdO3mx78sDadm7NPUIf0nULYv9GcNYpNKmr+4NghzzCImB3ET3MeljDDKn/uPLQpCO1rkF0wo0TGVK4n93ZJy6pifurgyja3UAXM9ZLpA0eTw8HkSjAxnugg8v+Z1ADloAAwjZNZ2kVeL1l1YhjZslY0U+ySjtBt/lp7hm0Ja5HyfGyOw3dJaB+8oCFHrZ8UzLEf4CvDREoafOPVzxTE2+aqvFC9VBDGEFKK7wTBqyUmd9SzMMNpE2j18IpJrcP/GhA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by MW5PR11MB5785.namprd11.prod.outlook.com (2603:10b6:303:197::11) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by MN2PR12MB4551.namprd12.prod.outlook.com (2603:10b6:208:263::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Wed, 23 Aug
- 2023 21:43:15 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::6a23:786d:65f7:ef0b]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::6a23:786d:65f7:ef0b%6]) with mapi id 15.20.6699.022; Wed, 23 Aug 2023
- 21:43:15 +0000
-Message-ID: <57ed25b1-e00f-2601-fc76-1f9d19182915@intel.com>
-Date: Wed, 23 Aug 2023 14:43:13 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v4 02/12] doc/netlink: Add a schema for
- netlink-raw families
-Content-Language: en-US
-To: Donald Hunter <donald.hunter@gmail.com>
-CC: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	<linux-doc@vger.kernel.org>, Stanislav Fomichev <sdf@google.com>, "Arkadiusz
- Kubalewski" <arkadiusz.kubalewski@intel.com>, <donald.hunter@redhat.com>
-References: <20230823114202.5862-1-donald.hunter@gmail.com>
- <20230823114202.5862-3-donald.hunter@gmail.com>
- <005940db-b7b6-c935-b16f-8106d3970b11@intel.com> <m2edjth2x2.fsf@gmail.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <m2edjth2x2.fsf@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0263.namprd04.prod.outlook.com
- (2603:10b6:303:88::28) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
+ 2023 21:46:35 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::900c:af3b:6dbd:505f]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::900c:af3b:6dbd:505f%5]) with mapi id 15.20.6699.026; Wed, 23 Aug 2023
+ 21:46:35 +0000
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: <netdev@vger.kernel.org>,  Saeed Mahameed <saeed@kernel.org>,  Jakub
+ Kicinski <kuba@kernel.org>,  Richard Cochran <richardcochran@gmail.com>,
+  "David S. Miller" <davem@davemloft.net>,  Paolo Abeni
+ <pabeni@redhat.com>,  Vadim Fedorenko <vadfed@meta.com>,  Kenneth Klette
+ Jonassen <kenneth.jonassen@bridgetech.tv>
+Subject: Re: [PATCH net] net/mlx5: Dynamic cyclecounter shift calculation
+ for PTP free running clock
+References: <20230821230554.236210-1-rrameshbabu@nvidia.com>
+	<82ddc62b-4d2c-cf6f-f5c8-812ce795a494@intel.com>
+Date: Wed, 23 Aug 2023 14:46:20 -0700
+In-Reply-To: <82ddc62b-4d2c-cf6f-f5c8-812ce795a494@intel.com> (Jacob Keller's
+	message of "Wed, 23 Aug 2023 12:54:21 -0700")
+Message-ID: <87wmxl5t5f.fsf@nvidia.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR06CA0004.namprd06.prod.outlook.com
+ (2603:10b6:a03:d4::17) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,149 +74,187 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW5PR11MB5785:EE_
-X-MS-Office365-Filtering-Correlation-Id: d041c994-0f1a-462b-2897-08dba421f4f0
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|MN2PR12MB4551:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19b45297-a72f-45e5-37fa-08dba4226c0a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fu4GJzCibP8cogKfE3PYQ4AKPNkhEYBxtwYfm+I6F4wZWe+caLUWmAAXCj2WCW7t65zPILO5gvTxy74Q/mhFBW2+jkym73F+B3VCpf+GZkkaIEGp31HPi5FjRMibE8pw3ivk9uKZjSdON7/idjcrtjdq0/vp+p675vWYmaiQI1p+6GF74u1X1jkg+YW2rgL5eSMxMckqxplsmi7sMlB6JPoB+ElHi1PS3Yd3KyR4OFj37gYVYqNxAPciKdauNKDdS3uYf99x9RqAVgJY+R+yz4nHNDPCvRKwtiQiuh1Ckun0NlugZhK3cWDd0J9Vn9cBOigninYT6DHrKzAnusI1cjoEq+R3xmJA+ozeB56cDo0f1X6pP/kaMtL9pHTUxIoF9xCV3yMKUmkpjPoJdEuSxqCFpCL12ta7OMxBUSxOlq1pkgtWlvQ/vhqUi07ZkmUClI+i4G5xh4F2FQIrJ6mDz3q+n6eLcbOupAIldu1AbN3NNwWk+eXTCTAVMfoSB4k+/SpKeWx/znO48dPQj9CZsuYVWj+O1TZlySdkCfju7oDcVQfIQ+Hs4T/JcX5oLEmQY8Vc5Bsta6lo+fAIkxZo1cHSulptEg4Uz+O/z+M5PEnccPoOZ9PIwRxjW4Rg06ituHrz+WMgJMoTs1PtejCAiw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39860400002)(376002)(366004)(346002)(186009)(1800799009)(451199024)(54906003)(66476007)(6916009)(66946007)(6512007)(316002)(66556008)(66899024)(82960400001)(8676002)(8936002)(2616005)(966005)(4326008)(36756003)(41300700001)(478600001)(38100700002)(6506007)(53546011)(6486002)(83380400001)(7416002)(2906002)(31686004)(31696002)(86362001)(5660300002)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	WheGhGlniIGgU/a5q3I6yR/m2hecF9PRCOjAMRrmWzJs+ShXTSiQ9ePgTNbeO1C9bpBUNtpm3LVQo1+h6r0wnoWqdhcIr3xaQCL+OyB5ej3sHQ1bwYrvkQ8Cf78YGYIJnrT33Or/k7dZjgTYeo2ObS7/tr4ymQRLadszhoMMOmdhhMUSzExw90sUX0pN50r7j+qTXpF4yws8rqKiaE9LS8rlJclT5BwEFE4CQCi4npwRSWUpXxFyzVw4wTum2EUTclmB9jN8PLiLSgtnruNSNhClPaacGAO8k76jj3NcR9r1xK6954oi3FbXv8AMKwKf95mVLjAz661kQgvhc2v60s9E46rALXvG3UD6AcM2gr+dzavK9zdc0cpKsE3AYn7fmyTzgjpxALljI+NLxIvYqbbVT0MzQ1R0eCXqiIdkVdlb75P1rUlpHb1fp01/v+wMUVQ9Kz/Rc19IUKJxFF2CaWrobqH7CI1J3J9L9jQd8Kd8/VzvDQtqGdiPFbXiKo5Fh3K3kS2WsnGP34+lXoRXDF0x4cJLU0RZRKDlUIrCJjTYskez7+RkQTHyDnktaZWiW3wyKOjJqVoW/FyDiFZN5a1RNpLooHZtPMcZkKPmnI4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(136003)(39860400002)(376002)(396003)(451199024)(186009)(1800799009)(478600001)(966005)(86362001)(36756003)(6486002)(6506007)(66476007)(54906003)(66556008)(316002)(6916009)(66946007)(53546011)(6666004)(41300700001)(6512007)(38100700002)(8676002)(4326008)(8936002)(5660300002)(26005)(2616005)(83380400001)(2906002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?LytQMGhrQnBYdXBScjVHOEVVMk9aRTBEa2lUOFRkNVJlTnM4TmluRGR5Mk9x?=
- =?utf-8?B?Zm4vbTNobkFWeTQ5aWZHeWNvazBnRDlFTGpWZ1ZJajY5SGxjK2Y3dmJFVUNT?=
- =?utf-8?B?RFh4RFlZRE1oV0UycTB5aEZYY0l5NG5GdUVVeDZ1ckdmUkRiWTRSam45OXpy?=
- =?utf-8?B?RzJGQVJpajVBSDFMQXBBRG1vS2IyTTFyc3NKVng3QXBsRW5BUVFOTm1YUGF4?=
- =?utf-8?B?ZGxhS2tjZ1RJWmhCQ1lSV2hrTXhyZ1NBRXRzbDFKaXFJcThUZHpHUENhK1lI?=
- =?utf-8?B?WUxITm5pWGlHTU5EcVVkTmZ6WFNkUEVPNFVTMGFHRm5jNlo5L2NOOWpWQjZl?=
- =?utf-8?B?eUFXMFZmU0FMYUl0OW1pUS9LOG1JSFRWWG1rdzM5OFh3ZjVBREYxM2UyV3lN?=
- =?utf-8?B?WFdKVlFRNDRqNm56a0p3RDVzT3FncldDZFFMQzVacVlaZWN0S292bEpLVXBK?=
- =?utf-8?B?OEtGWU54ZExacXMrTjlFcUhxUzZXaWVHbVZGaTN6WURsRW5oWDZ3THhEY3Bu?=
- =?utf-8?B?WnpVbmNFbW44OEhIV3d6aDdycE11eFJJengzd0E3ZVRYdVdYaHlXaFlNTXdF?=
- =?utf-8?B?dWxlNHhodFRhK1ZPMXpteFpHQ1k5OHlEK2c3Mzh5eGtmNUpoQnZMdHVLUUFo?=
- =?utf-8?B?UHNZT0JFWE5RWURhTFB0TG4xaHJkb1MvODJhWmJ0SHB0K2FvbFJYdStLdE9B?=
- =?utf-8?B?R3hGNVkySk5XZ2JURmpQd2h2cnI3NU9vREx6V3dwbmkwM0w4RzdMdm5ldEt3?=
- =?utf-8?B?aVB3T2RXa1RWU3phZXZaeGpzbkJEUEtUc2FFeEZ2OUpWQTdoT2crK3F2VWxv?=
- =?utf-8?B?a2pKTVdMYndSdHkxREt5dTNsZnpFNVlLalFVNElCYThtNEZCU3R3MVFOdEc5?=
- =?utf-8?B?cWNNR2tvcTgvZ21wQVU2emNqWlY5T1lpV3ZBVDZsUjB5TXNYbEV0UEowNGMv?=
- =?utf-8?B?VEpUcnBoTGZLcXZ4S1BwRWdsM01zTzU4dFRPaStaWldCYWpLSFkrRUwwVFFy?=
- =?utf-8?B?bm4vR0MzeEdRdG1zRlRTcVpLTDgxZWhKZ24xR2tadmhHbldGb1BtRVB6cFpn?=
- =?utf-8?B?TllaMGczejJSWk9uL1NPdVBpUXkyeHZqK1cvUy96Y1BJMjg2VVNEYkwvVGsz?=
- =?utf-8?B?OHQ1MStSQmFBa2ZlM05VQm9hTWYzbUFOT0JkZTh5bGJyU2VlT04xRkRLVFJM?=
- =?utf-8?B?K1orMklqZE5NVVgrdmhYaHlPYnhPeDlIZWdwMkc4eUdSVmFjYnFpbEV0Z1Na?=
- =?utf-8?B?a3BwN0trZFJBdkFpR2NiSlRPSWpLTHJDbHdpblNpdHNDWFl5cng0a2hodkFX?=
- =?utf-8?B?TXVhTHpYdU5kb2phb0VzM09TZGlLMnhtY1dCZzduTmtlUmNnZUt4ZmQ1K0c3?=
- =?utf-8?B?dDBsM0FXanJzZC9USGVKcm8zV25XemFYUUtvTTZROUp6aG1heGlpQlJhVlBs?=
- =?utf-8?B?dDFuUGJsclRWV1BjeW9GckNDSmg5TmtQY3lSWittRkRIVWZKcHIzcmhhLzlq?=
- =?utf-8?B?Vk03UmNWTTduNWY4MDViTkJJd2pGWjN3Vml0dm80aUVzaDFOUlhHWE1UMVlC?=
- =?utf-8?B?S1pjMmY2TWw1d1FwNjhKc3pEWG84ZFRxbG1UVGVhS1dGblI3cUJXb0hOVVRT?=
- =?utf-8?B?aVBOYWJQejRjdHZCc3ZxbmtxbGJ2aUxvT1Fjc3Q4blYwUVVWQktCclpoU0ty?=
- =?utf-8?B?N0N2N2VOazZNdFlOelJQZjlibkxyUmpvdlNXcUZSSGVPMVFwRFUxeFp2elYz?=
- =?utf-8?B?Z1A4UXJSdUVIQUllSkt2bWhuK1VXTmhhYzdTV01kUHpFek16SXVzUmpEQmZ5?=
- =?utf-8?B?T0VTckhFQkhTb0k4eW9zWFJCSVhnTE1xdDUrcnBqdDBVQWU0YVpEMGhXZ094?=
- =?utf-8?B?aTJpS2U5N2l3c2dMTG1xanJ1aXpSdys0S2lLM1ZvNUtEZDk5TjlQcGF4TFdC?=
- =?utf-8?B?b1NGY0hqUUM4d0hvTUNRZlp4dnVRVWhvRzkwZWwyQ3E1NVVTVmFXWFozYXI1?=
- =?utf-8?B?ZWdsTkdCaHRQcENFVHVWZE9rZ3FlSnhpQThjU2gvV2FSY3RxdTQ0cUxQKytJ?=
- =?utf-8?B?Z245czdZY3pBMHc1TytlNHliaEZ1Zk5kZVkrckhSdzUyQ2hHa1ljdWRCVGlM?=
- =?utf-8?B?WnJNelJTMVBGTk0wOVJUcHA0eHdyeE92UEpWNDk3K1NjZXAzK0tzUG5zUm5I?=
- =?utf-8?B?akE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d041c994-0f1a-462b-2897-08dba421f4f0
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?x60BnbeD3Eoi7OooBK30nXUmI4cB1X6VC9suPEqnf0+7VbKNNPvF4WOkuruZ?=
+ =?us-ascii?Q?AT3MHY9+W5t75WKuffzrwG5rt3ItvgT/b06EOb6jfRqudebp4rjYMtvAIa2o?=
+ =?us-ascii?Q?Px+XCVQyYgmfv3uH/1oIL3J5/jkS4mB5+jnAlr3jbctlMTeQIziL2z/NHvNl?=
+ =?us-ascii?Q?grlJBZlYURx24yQDDgJxJ0Ingjiu+81SUMlRNOvLHCQtAyfkzFFeITa9lUm8?=
+ =?us-ascii?Q?yMBSYZTx7l5nUTe6jpa2MdCUG732KEPqkmL26on7k8DpHYHdIwGel6lJF460?=
+ =?us-ascii?Q?m3MiZMXEww22L7gOqLyuAcksoJLfucyvw9gEs5gXaSItBtAGzimWdJf/VhDN?=
+ =?us-ascii?Q?rCg0iN05w8dlrkGlv3cntP7xHaq3CzQE3CvHW4fxV/KXAhnl5ScdBKskchO9?=
+ =?us-ascii?Q?oVDRHn74BWPJ24T8Yqr6vBE4TPI0lIPs0hIzJbopKkbePqLmTljSp7+7hMbq?=
+ =?us-ascii?Q?zQse7+Bt6WOkb53W/S9eruqH4UP0qzgBlvSsKqZeblGPs7J8K7W9/T6VvXLh?=
+ =?us-ascii?Q?PcrHRABRojKYEDCxqnQOGIk7uSBz5fXVY6UkYVqxvjBkds72IrDbPQrOx0U/?=
+ =?us-ascii?Q?svMkcSW3ld7dpRh7BFivHfZZzwZf6r7RE0eoASv52qW0VL08XlUTi4kIzaFy?=
+ =?us-ascii?Q?fbk9QMID6MczYzZY0sRKj86a98Fqp2apYO4nLGaENtSU1ffs/LX+V+a7WUt5?=
+ =?us-ascii?Q?xptw1NGA4vC786rqbcgaVqo98mIqrYBvmEM4PCL/Z4RuE5joCE/1++P/anp6?=
+ =?us-ascii?Q?pLnjsHiKP+nsKS9olksT4fdruuYmAuDFOmA180Mjz1WTKCh33nrAHsm4RYnm?=
+ =?us-ascii?Q?DrfhJCyAjga9kTXfLhTH/ykNKsKW29UVrs60uZQr5RAwsN1mJQMEgl4qhbcX?=
+ =?us-ascii?Q?hlQDc4JwXFbn4150EJn00HFt2S+W/l/SbuozchcjCpGjW1jsJeouuCS5f4BX?=
+ =?us-ascii?Q?xc81uUMkVxCe99c1wBzKMOznwwdoA1K4T/mNmqMWzsPoq3ybmNth4uIhUT9I?=
+ =?us-ascii?Q?t8vB5B7+CuTYhTNXKBUY+f+sMLdKi9s75VdijKPlM7N+hQ+2m+OdwCHwSl3P?=
+ =?us-ascii?Q?NHyQaVs0NwmlxxUsYI7vpsoQky0wuKh7geBQBS6JBB1mfObQcVSm3tqzvPxF?=
+ =?us-ascii?Q?/Fm74rBaZ5oCeeGd7BwfYtDCsLDY24MoJlIN9PqTpmy6SlC4PATNxocpSMu6?=
+ =?us-ascii?Q?2k1xXBb3pIWPlEafRQa4I52vBzXvWvYqr+TVsdMu+mRXg4PPO1XkVVUJkSoA?=
+ =?us-ascii?Q?a6fPNwiPBnhTwIDLj2MMi6rr4H3MVdzkqkwPNzY7W3Qdqfgo30QfESZdDhde?=
+ =?us-ascii?Q?VnQVvZbo/TFRY9lFwgQnyQE30KzMKovJMmp5XMOSWNRdIwqCLjRZnvIJa7Lm?=
+ =?us-ascii?Q?j0XCfl86JDwNNeGUR0jagbvdZ8lghtkgjyLrrw2GmU8seEkHROVWH8CmsrpP?=
+ =?us-ascii?Q?CQ+f6RzqOBEsfTITfsOXo/rruE+rYSFIkxt7/aHA48SOUe5FZyWr/Jg8RUXo?=
+ =?us-ascii?Q?MMx7pABqa1oU1cWDoTyFq1NANF8DPS996d8d1e5EpsmkVimhwChAYqW5bJEZ?=
+ =?us-ascii?Q?Z2qERue8RB5FEGZITOUo7sJrn6WNfqNX+Q3FrJldfyX4Qa6WUB6XLR4JVKUR?=
+ =?us-ascii?Q?ig=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19b45297-a72f-45e5-37fa-08dba4226c0a
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 21:43:15.4737
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 21:46:35.5433
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BLinT0XDbQ4WoYlIoP1tpE6LttAABFKRn4WVajBt6zKrLkjG/QRuX7oWFxTjIuJB6XTKyXrELpikXtxeElpxUq/aD+U4cXXpbc/5kJ0BGhY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5785
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7H6SuKSa/OErT07ptQBBAVahpDDCxRQ9Hib/5GXcvXiZKBkG3++dWH34Q1FuXKnWZusE5fHFPQCVTvRQLgpV1A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4551
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Wed, 23 Aug, 2023 12:54:21 -0700 Jacob Keller <jacob.e.keller@intel.com> wrote:
+> On 8/21/2023 4:05 PM, Rahul Rameshbabu wrote:
+>> Use a dynamic calculation to determine the shift value for the internal
+>> timer cyclecounter that will lead to the highest precision frequency
+>> adjustments. Previously used a constant for the shift value assuming all
+>> devices supported by the driver had a nominal frequency of 1GHz. However,
+>> there are devices that operate at different frequencies. The previous shift
+>> value constant would break the PHC functionality for those devices.
+>> 
+>> Reported-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> Closes: https://lore.kernel.org/netdev/20230815151507.3028503-1-vadfed@meta.com/
+>> Fixes: 6a4010927562 ("net/mlx5: Update cyclecounter shift value to improve ptp free running mode precision")
+>> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+>> Tested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> ---
+>> 
+>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+>
+>> Notes:
+>>     Devices tested on:
+>>     
+>>       * ConnectX 4
+>>       * ConnectX 4-Lx
+>>       * ConnectX 5
+>>       * ConnectX 6
+>>       * ConnectX 6-Dx
+>>       * ConnectX 7
+>> 
+>>  .../ethernet/mellanox/mlx5/core/lib/clock.c   | 32 ++++++++++++++++---
+>>  1 file changed, 27 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> index 377372f0578a..aa29f09e8356 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> @@ -32,16 +32,13 @@
+>>  
+>>  #include <linux/clocksource.h>
+>>  #include <linux/highmem.h>
+>> +#include <linux/log2.h>
+>>  #include <linux/ptp_clock_kernel.h>
+>>  #include <rdma/mlx5-abi.h>
+>>  #include "lib/eq.h"
+>>  #include "en.h"
+>>  #include "clock.h"
+>>  
+>> -enum {
+>> -	MLX5_CYCLES_SHIFT	= 31
+>> -};
+>> -
+>>  enum {
+>>  	MLX5_PIN_MODE_IN		= 0x0,
+>>  	MLX5_PIN_MODE_OUT		= 0x1,
+>> @@ -93,6 +90,31 @@ static bool mlx5_modify_mtutc_allowed(struct mlx5_core_dev *mdev)
+>>  	return MLX5_CAP_MCAM_FEATURE(mdev, ptpcyc2realtime_modify);
+>>  }
+>>  
+>> +static u32 mlx5_ptp_shift_constant(u32 dev_freq_khz)
+>> +{
+>> +	/* Optimal shift constant leads to corrections above just 1 scaled ppm.
+>> +	 *
+>> +	 * Two sets of equations are needed to derive the optimal shift
+>> +	 * constant for the cyclecounter.
+>> +	 *
+>> +	 *    dev_freq_khz * 1000 / 2^shift_constant = 1 scaled_ppm
+>> +	 *    ppb = scaled_ppm * 1000 / 2^16
+>> +	 *
+>> +	 * Using the two equations together
+>> +	 *
+>> +	 *    dev_freq_khz * 1000 / 1 scaled_ppm = 2^shift_constant
+>> +	 *    dev_freq_khz * 2^16 / 1 ppb = 2^shift_constant
+>> +	 *    dev_freq_khz = 2^(shift_constant - 16)
+>> +	 *
+>> +	 * then yields
+>> +	 *
+>> +	 *    shift_constant = ilog2(dev_freq_khz) + 16
+>> +	 */
+>> +
+>
+> I appreciate the derivation here. It helps understand the calculation
+> here, and makes it clear why this is the best constant. Deriving it in
+> terms of the frequency is useful since it makes supporting other
+> frequencies much simpler in the future if thats ever necessary for the
+> device family, rather than just adding a table of known frequencies. Nice!
+>
+>> +	return min(ilog2(dev_freq_khz) + 16,
+>> +		   ilog2((U32_MAX / NSEC_PER_MSEC) * dev_freq_khz));
+>> +}
+>> +
+>>  static s32 mlx5_ptp_getmaxphase(struct ptp_clock_info *ptp)
+>>  {
+>>  	struct mlx5_clock *clock = container_of(ptp, struct mlx5_clock, ptp_info);
+>> @@ -909,7 +931,7 @@ static void mlx5_timecounter_init(struct mlx5_core_dev *mdev)
+>>  
+>>  	dev_freq = MLX5_CAP_GEN(mdev, device_frequency_khz);
+>>  	timer->cycles.read = read_internal_timer;
+>> -	timer->cycles.shift = MLX5_CYCLES_SHIFT;
+>> +	timer->cycles.shift = mlx5_ptp_shift_constant(dev_freq);
+>>  	timer->cycles.mult = clocksource_khz2mult(dev_freq,
+>>  						  timer->cycles.shift);
+>
+> And you already derive the multiplier in terms of the frequency and
+> shift, so the change in shift won't break the multiplier. Good.
+>
+>>  	timer->nominal_c_mult = timer->cycles.mult;
+>
+>
+> Not really an issue of this patch, but a few drivers use a nominal
+> multiplier in calculations with timecounter and cycle counter, I wonder
+> if this could be baked into the cyclecounter code in the future...
 
-
-On 8/23/2023 2:19 PM, Donald Hunter wrote:
-> Jacob Keller <jacob.e.keller@intel.com> writes:
->> On 8/23/2023 4:41 AM, Donald Hunter wrote:
->>> +---
->>> +$id: http://kernel.org/schemas/netlink/genetlink-legacy.yaml#
->>> +$schema: https://json-schema.org/draft-07/schema
->>> +
->>> +# Common defines
->>> +$defs:
->>> +  uint:
->>> +    type: integer
->>> +    minimum: 0
->>> +  len-or-define:
->>> +    type: [ string, integer ]
->>> +    pattern: ^[0-9A-Za-z_]+( - 1)?$
->>> +    minimum: 0
->>> +
->>> +# Schema for specs
->>> +title: Protocol
->>> +description: Specification of a genetlink protocol
->>
->> If this is for netlink-raw, shouldn't this not say genetlink? Same
->> elsewhere? or am I misunderstanding something?
-> 
-> It's a good question. The schema definitions are currently strict
-> supersets of genetlink:
-> 
-> genetlink <= genetlink-c <= genetlink-legacy <= netlink-raw
-> 
-> As you noted below, there's only 2 additions needed for the netlink raw
-> families, protonum and mcast-group value.
-> 
-> I would be happy to change the description and other references to
-> genetlink in this spec, but I'd like to hear Jakub's thoughts about
-> minimal modification vs a more thorough rewording. Perhaps a middle
-> ground would be to extend the top-level description to say "genetlink or
-> raw netlink" and qualify that all mention of genetlink also applies to
-> raw netlink.
-> 
-> Either way, I just noticed that the schema $id does need to be updated.
-> 
-
-Ok, ya lets wait for Jakub's opinion. I think the clarification would be
-good since at least conceptually genetlink is distinct to me from
-netlink raw, so it feels a bit weird.
-
-Either way, they share far more in common than I had originally
-realized, so its not a huge deal.
-
-Thanks for the clarification!
-
->>> +type: object
->>> +required: [ name, doc, attribute-sets, operations ]
->>> +additionalProperties: False
->>> +properties:
->>> +  name:
->>> +    description: Name of the genetlink family.
->>> +    type: string
->>> +  doc:
->>> +    type: string
->>> +  version:
->>> +    description: Generic Netlink family version. Default is 1.
->>> +    type: integer
->>> +    minimum: 1
->>> +  protocol:
->>> +    description: Schema compatibility level. Default is "genetlink".
->>> +    enum: [ genetlink, genetlink-c, genetlink-legacy, netlink-raw ] # Trim
->>> +  # Start netlink-raw
->>
->> I guess the netlink raw part is only below this? Or does netlink raw
->> share more of the generic netlink code than I thought?
-> 
-> Raw netlink is, so far, the same as genetlink-legacy with the addition
-> of hard-coded protocol ids.
-> 
-
-Right that makes sense why this shares so much.
+This ran through my mind as I was making this patch. As you mentioned,
+the logic used here is not specific to mlx5. Rather, it's a general
+calculator for the shift value given a frequency. I wanted to look at
+all the use cases of cyclecounter before providing a general API for
+this. I will likely follow up with you if I have concerns with regards
+to the generalization for the cyclecounter API and hopefully can share
+an RFC.
 
 Thanks,
-Jake
+
+Rahul Rameshbabu
+
+>
+> At any rate, this fix looks good to me.
 
