@@ -1,82 +1,232 @@
-Return-Path: <netdev+bounces-29963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0ED9785612
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:50:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6696078564A
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F20FD1C20A12
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:50:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB378281220
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D6DA944;
-	Wed, 23 Aug 2023 10:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34BBAD4B;
+	Wed, 23 Aug 2023 10:54:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092BB4C75
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E29AC433C9;
-	Wed, 23 Aug 2023 10:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692787822;
-	bh=5Mes//D/y7x5YeJ2YfzmT66TD1rKTdHk6q4GAG7RlFA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dRuO2SXQDqJux1C3Xr/JcevXe/6R8pOGpy3mre0WFXDKTA1Qgr1t+yrsTDP7CjT4v
-	 r/HgJ3pHOfw2J4NIUgC67GN61bdeQ4LgSFr8rIKrClafPtY7+vj4RuTGZ+KwZ/qeKF
-	 5p+16gp6eCkifRackvxQ0TahT8T7ByDVQWHYP+/kNGkhnrDnVCbd0AUG6UU3919MYR
-	 r/KNsZHq3L1fWHCJ+hsGOnYmr4Z7Sq6UD9aTl77yHKaWKVNgYGTvodgQJpAADMp8VJ
-	 cJUyM9MjNLHx4WoaAiUmjFyIVKrTYH7IFCqwGF6wYofJYaaIdax2OjmXpGSNOkdbhu
-	 JbW6njCCS/pJA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 62C40C395C5;
-	Wed, 23 Aug 2023 10:50:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54064C75
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:54:18 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162D719A;
+	Wed, 23 Aug 2023 03:54:17 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NAnB9r030951;
+	Wed, 23 Aug 2023 10:53:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=3eNJ1F1ZIh5qb5ABj3u6R40fpkitePvKxhd0FlU+G8s=;
+ b=VKt8IydGFnohWH59XRysxy6TXiX7WNJup4ggmXgZsJgtwJ0A17CkWAmXdihvozm7b8b7
+ RpfJB/mi8aDIlezw6SNvhk9occtvjPu8efnV7vSE/pWXbGTLRKpVvrsHx6qd7CneFaoy
+ i7RUQlIHzHGCSFEhkbo99IHpGeRRV4LHo7w0KNQyKD8D6uvtr5WBHoitFTotQ69fhAdn
+ wUu2uKRyEo30lmgj58dFk9lTzaGFc1sPjA+XFMEhviWb6/bloLfVQUKmIC2d+t2OLwQ3
+ SkuttcS/e3Or3U9TfQrcjQfiqMZW2oy37iHOUaLQULIq0b1UMVu2gN3yFnI+GqrIEqER hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sngpfr1qa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 10:53:11 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37NAnGSX031081;
+	Wed, 23 Aug 2023 10:53:10 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sngpfr1pt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 10:53:10 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37N9Ujs5020144;
+	Wed, 23 Aug 2023 10:53:09 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn22adnqx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 10:53:08 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37NAr6TJ45089220
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Aug 2023 10:53:06 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1494B2004D;
+	Wed, 23 Aug 2023 10:53:06 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B274420040;
+	Wed, 23 Aug 2023 10:53:03 +0000 (GMT)
+Received: from [9.171.92.225] (unknown [9.171.92.225])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 23 Aug 2023 10:53:03 +0000 (GMT)
+Message-ID: <67ec0e36908b7e6d7a6eba642ec76ef87d0d4945.camel@linux.ibm.com>
+Subject: Re: [PATCH v11 4/6] iommu/s390: Force ISM devices to use
+ IOMMU_DOMAIN_DMA
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Gerd Bayer <gbayer@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        Suravee Suthikulpanit
+ <suravee.suthikulpanit@amd.com>,
+        Hector Martin <marcan@marcan.st>, Sven
+ Peter <sven@svenpeter.dev>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        David
+ Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>, Andy
+ Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad
+ Dybcio <konrad.dybcio@linaro.org>,
+        Yong Wu <yong.wu@mediatek.com>,
+        Matthias
+ Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>,
+        Gerald Schaefer
+ <gerald.schaefer@linux.ibm.com>,
+        Orson Zhai <orsonzhai@gmail.com>,
+        Baolin
+ Wang <baolin.wang@linux.alibaba.com>,
+        Chunyan Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Thierry Reding
+ <thierry.reding@gmail.com>,
+        Krishna Reddy <vdumpa@nvidia.com>,
+        Jonathan
+ Hunter <jonathanh@nvidia.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux.dev, asahi@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
+Date: Wed, 23 Aug 2023 12:53:03 +0200
+In-Reply-To: <ba1e0b29-52e0-2fc0-2eb9-475735febacf@arm.com>
+References: <20230717-dma_iommu-v11-0-a7a0b83c355c@linux.ibm.com>
+	 <20230717-dma_iommu-v11-4-a7a0b83c355c@linux.ibm.com>
+	 <ba1e0b29-52e0-2fc0-2eb9-475735febacf@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] i40e: fix potential NULL pointer dereferencing of pf->vf
- i40e_sync_vsi_filters()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169278782239.755.1103948738320997717.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Aug 2023 10:50:22 +0000
-References: <20230822221653.2988800-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230822221653.2988800-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, andrii.staikov@intel.com,
- aleksandr.loktionov@intel.com, rafal.romanowski@intel.com
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Dn5I7UigftX5RBKQwAj9CDPxUIpK94FJ
+X-Proofpoint-GUID: X6PgzynOD1cJFA8yBLSkFvc2jrgZNG5R
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-23_06,2023-08-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 lowpriorityscore=0 mlxscore=0 malwarescore=0
+ spamscore=0 phishscore=0 adultscore=0 impostorscore=0 bulkscore=0
+ suspectscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2308100000 definitions=main-2308230096
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Fri, 2023-08-18 at 20:10 +0100, Robin Murphy wrote:
+> On 2023-07-17 12:00, Niklas Schnelle wrote:
+> > ISM devices are virtual PCI devices used for cross-LPAR communication.
+> > Unlike real PCI devices ISM devices do not use the hardware IOMMU but
+> > inspects IOMMU translation tables directly on IOTLB flush (s390 RPCIT
+> > instruction).
+> >=20
+> > While ISM devices keep their DMA allocations static and only very rarel=
+y
+> > DMA unmap at all, For each IOTLB flush that occurs after unmap the ISM
+> > devices will inspect the area of the IOVA space indicated by the flush.
+> > This means that for the global IOTLB flushes used by the flush queue
+> > mechanism the entire IOVA space would be inspected. In principle this
+> > would be fine, albeit potentially unnecessarily slow, it turns out
+> > however that ISM devices are sensitive to seeing IOVA addresses that ar=
+e
+> > currently in use in the IOVA range being flushed. Seeing such in-use
+> > IOVA addresses will cause the ISM device to enter an error state and
+> > become unusable.
+> >=20
+> > Fix this by forcing IOMMU_DOMAIN_DMA to be used for ISM devices. This
+> > makes sure IOTLB flushes only cover IOVAs that have been unmapped and
+> > also restricts the range of the IOTLB flush potentially reducing latenc=
+y
+> > spikes.
+>=20
+> Would it not be simpler to return false for IOMMU_CAP_DEFERRED_FLUSH for=
+=20
+> these devices?
+>=20
+> Cheers,
+> Robin.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Nice idea thank you. This is indeed less code, basically just return
+zdev->pft !=3D PCI_FUNC_TYPE_ISM for the IOMMU_CAP_DEFERRED_FLUSH check.
+I think it's also semantically more clear in that we don't really care
+about the domain type but about not getting deferred flushes.
 
-On Tue, 22 Aug 2023 15:16:53 -0700 you wrote:
-> From: Andrii Staikov <andrii.staikov@intel.com>
-> 
-> Add check for pf->vf not being NULL before dereferencing
-> pf->vf[vsi->vf_id] in updating VSI filter sync.
-> Add a similar check before dereferencing !pf->vf[vsi->vf_id].trusted
-> in the condition for clearing promisc mode bit.
-> 
-> [...]
+Thanks,
+Niklas
 
-Here is the summary with links:
-  - [net] i40e: fix potential NULL pointer dereferencing of pf->vf i40e_sync_vsi_filters()
-    https://git.kernel.org/netdev/net/c/9525a3c38acc
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+>=20
+> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > ---
+> >   drivers/iommu/s390-iommu.c | 10 ++++++++++
+> >   1 file changed, 10 insertions(+)
+> >=20
+> > diff --git a/drivers/iommu/s390-iommu.c b/drivers/iommu/s390-iommu.c
+> > index f6d6c60e5634..020cc538e4c4 100644
+> > --- a/drivers/iommu/s390-iommu.c
+> > +++ b/drivers/iommu/s390-iommu.c
+> > @@ -710,6 +710,15 @@ struct zpci_iommu_ctrs *zpci_get_iommu_ctrs(struct=
+ zpci_dev *zdev)
+> >   	return &zdev->s390_domain->ctrs;
+> >   }
+> >  =20
+> > +static int s390_iommu_def_domain_type(struct device *dev)
+> > +{
+> > +	struct zpci_dev *zdev =3D to_zpci_dev(dev);
+> > +
+> > +	if (zdev->pft =3D=3D PCI_FUNC_TYPE_ISM)
+> > +		return IOMMU_DOMAIN_DMA;
+> > +	return 0;
+> > +}
+> > +
+> >   int zpci_init_iommu(struct zpci_dev *zdev)
+> >   {
+> >   	u64 aperture_size;
+> > @@ -789,6 +798,7 @@ static const struct iommu_ops s390_iommu_ops =3D {
+> >   	.probe_device =3D s390_iommu_probe_device,
+> >   	.probe_finalize =3D s390_iommu_probe_finalize,
+> >   	.release_device =3D s390_iommu_release_device,
+> > +	.def_domain_type =3D s390_iommu_def_domain_type,
+> >   	.device_group =3D generic_device_group,
+> >   	.pgsize_bitmap =3D SZ_4K,
+> >   	.get_resv_regions =3D s390_iommu_get_resv_regions,
+> >=20
+>=20
 
 
