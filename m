@@ -1,260 +1,126 @@
-Return-Path: <netdev+bounces-29896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18B678515D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:20:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D44178516B
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:24:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F5621C20BF9
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:20:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B457281264
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A3BA921;
-	Wed, 23 Aug 2023 07:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8D58BF6;
+	Wed, 23 Aug 2023 07:24:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB746A920
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:19:24 +0000 (UTC)
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A781EDB
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:23 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bf55a81eeaso23747255ad.0
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBECC8BE8
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:24:26 +0000 (UTC)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D088A128
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:24:24 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-31c3726cc45so2902227f8f.0
+        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:24:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692775163; x=1693379963;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=imfuNwQrvt8oRbEV7g7IR3XWoYzARFPysi3PTWISqfA=;
-        b=E6FpOfR97jXVOJRQJwUqWUmiXjZyt2jciIKu+d5SGMWdS3mqB44h3QYQ4hZFN74+cR
-         Yj8Iv7W88i363uQIod5Ulru2iIHtSTNc/e9JIQRxFfk9yYTz1R0LWyUG7UQeQNJdOARo
-         F0M+WHy5tnPE2/d0g5WV6C8USX/TFoG8Ei8ZBTEcMGEy58PQI8YcK7VK+a4JC27HlTHv
-         3RpJZkLBfCCdSgZ9M1rQm+0ouTX1wR8J9le3G5Ki7kJHBh1tQe58TtmvNxK6DRQ3P6K8
-         gAlkO11UhGFXrHgjU2UfqHdSolOxJOSdLVPgeKSSNtSP9YZ8XOekifYQlcSgZy1IT5Vg
-         6KFA==
+        d=tessares.net; s=google; t=1692775463; x=1693380263;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/WTqaO6kZcRzLug6Tf19WjfywSVMkwELLnlSRyjAmT8=;
+        b=kLBup4D3ZGwdtO+9O58+zIouEf1aTOn1JXoT2Rja+rJXtjjk2EQwp3EncfMsyO8Wv7
+         mrr4Umkc3xkIDBqlXUrsHXUzPFg4BLGR6s3c/3JIaNdesqKl3nNt20h+25q7lJNnBn1s
+         Kfh/qVojNW9UV4hBZjWM7iTjJdrg+ssZw/CNR0jeztf/k9EH0wHdZvhSmsa6qF19+TR1
+         FDW+57/Nw7+1iWvRI7pjlAmmaRnMi8y48eaUSYDL7aEB8zjp/m2oinwXbR7CCP7fUW5D
+         2WKZZCWvCz9z/lmhLqri6qyDsThPubbvKlowLSGsb0mTO1Rs5JIbarJjsBV5xzG9ue8G
+         LGCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692775163; x=1693379963;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=imfuNwQrvt8oRbEV7g7IR3XWoYzARFPysi3PTWISqfA=;
-        b=FGi2NLtPplxhA3iXolzRrKjcM2menFQUeOTsHwuHLtFF+TkmafUBYDsr0g4d3ZQmO6
-         RGHx7xb0SRrVeQXxlfj7TS4x2wBgbfTh87DRzEW2wAOrXoYUF/zfuIYPdmvyvMkiN8lv
-         8xMhVtYeJbu3b8bUzlc5Sy3471MOfxnh74AJDcOddQiCGgUj5z7UNVZvfbEXpAfPr12x
-         IWCVcC+iIdvjrweid15rkebqEoET+yLv8XXfk/baiLkm8g4ksMAMolmI3D3+eFA7M8YV
-         5ekNR+LXaKUABkugilMTcSZGAvqDvqCvkOYXgg9UjYHkeACI8zzOQPcZuegTFzBzUbU+
-         tuOQ==
-X-Gm-Message-State: AOJu0YzByM0nLnbISYHalsgVKwkp5w87/xs0QmC9XamxLJBDclZ6DRfJ
-	dAUuSu3MumnIjWqj5OKwJ5dEUG3dtHTbaw==
-X-Google-Smtp-Source: AGHT+IG2BTbCsjPWVFwH5vakcxwrMToto7yHwvVyP99SJjM3HlCHLDwaTs5zcKFgnfDo3SO0qm7A9Q==
-X-Received: by 2002:a17:902:da82:b0:1b0:3a74:7fc4 with SMTP id j2-20020a170902da8200b001b03a747fc4mr10269754plx.24.1692775162666;
-        Wed, 23 Aug 2023 00:19:22 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id iw14-20020a170903044e00b001bdea189261sm10221212plb.229.2023.08.23.00.19.19
+        d=1e100.net; s=20221208; t=1692775463; x=1693380263;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/WTqaO6kZcRzLug6Tf19WjfywSVMkwELLnlSRyjAmT8=;
+        b=hW2GWpPdI+HkZ/vXhssStEzA8VnoDi0VN4rs/1xD+t3PhmOeDKE4g50E9UQnhXVTk7
+         VuEKKfDkSMv1An55Dal3p83fGjJwk/isUSkM/+pgfCqgsAb4IrtrN3KUr5VNeQ6mceqL
+         c9/RJuXuDfzYcjkd5RYuG1vBQz3qYXQRDJPHT8GDCN+GFHnVXww5k0IzWtPBAWVZGdWh
+         IK2p53EZV9zkp9VrNfGJ0sXo9JO8xMX8QJSz7cEftB0Hm2VGtwHjpJY4Fi+6Jf2TthZq
+         JQgzEalmq/MKoeIPZudOi4PxvH8iJr2YG9MFR5euf5dfpbMdBwl1Hzngaip3OQvWTh2R
+         2yZQ==
+X-Gm-Message-State: AOJu0YySM6KdXkkJmWTIRHuBcPWcyob+BPdeg6U/dVaJdT2dM8lfKEZ5
+	Y5VQOyqygFNbkMCXD3TuoK0k7w==
+X-Google-Smtp-Source: AGHT+IFWeSaGrv/qmVkcSWGdZnTMT+BHPHfZbyQxPWBUe3oCDzzm7oj9NsHDZjTcmd3kqLdWnrxneg==
+X-Received: by 2002:a5d:6087:0:b0:317:6816:578c with SMTP id w7-20020a5d6087000000b003176816578cmr8690475wrt.5.1692775463263;
+        Wed, 23 Aug 2023 00:24:23 -0700 (PDT)
+Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
+        by smtp.gmail.com with ESMTPSA id e10-20020a5d594a000000b003140f47224csm17975418wri.15.2023.08.23.00.24.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 00:19:22 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Liang Li <liali@redhat.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net 3/3] selftests: bonding: add macvlan over bond testing
-Date: Wed, 23 Aug 2023 15:19:06 +0800
-Message-ID: <20230823071907.3027782-4-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230823071907.3027782-1-liuhangbin@gmail.com>
-References: <20230823071907.3027782-1-liuhangbin@gmail.com>
+        Wed, 23 Aug 2023 00:24:22 -0700 (PDT)
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+Subject: [PATCH iproute2 0/3] ss: mptcp: print new info counters
+Date: Wed, 23 Aug 2023 09:24:05 +0200
+Message-Id: <20230823-mptcp-issue-415-ss-mptcp-info-6-5-v1-0-fcaf00a03511@tessares.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABW05WQC/42NQQ6CMBBFr0Jm7ZhOtSiuvIdhUWGQWViaTiEaw
+ t0lGPcu33/JfzMoJ2GFSzFD4klUhrAC7Qpoeh8ejNKuDNbYgznTCZ8xNxFFdWQ8kkPV3xS6AUt
+ 0WLVl5x1Z6u4G1p+YuJPX1riBxDSMmS3Uq+lF85DeW3yizX87lv7oTIQG2bUV+daVZeOvmVV9Y
+ t0HzlAvy/IBUEqbuN8AAAA=
+To: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
+Cc: mptcp@lists.linux.dev, Matthieu Baerts <matthieu.baerts@tessares.net>, 
+ Paolo Abeni <pabeni@redhat.com>, Andrea Claudi <aclaudi@redhat.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=843;
+ i=matthieu.baerts@tessares.net; h=from:subject:message-id;
+ bh=mrTQOYKjFM5k46RLNtxLCH35W5EqtHG3by5H9fu5f2M=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBk5bQkDiC0BczwhiPo9lr824TStCTVgvQTr5DvV
+ qkKQNwGESaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZOW0JAAKCRD2t4JPQmmg
+ c/v5EADAIkSvJfi/eRi4LlZhDT2YaMiTwiV5GL7eZ2Rdq8L5vCxNuzsH+jyG3r8eaADVIl7K3CW
+ GPOdcce7KTDKHEZvhDXD01GxRA2X4WCt0S7ty3Eb97wE+wvbBunbLePFYxHDmVNkWDtnA1ky7cU
+ zmVlv2keVFzsBV48QaNLdEeLnW5cZrA0yjUB0fLHa263c9pJMPdTUEUDeSXWH1RZQEPNSosqDWE
+ IWC96NJzgx/2/bRObg7PnKw9RhqPBaeSWrct98gQYjegsUMZamYP9HVWuAEL3i3bWnP2eaz3QWO
+ GjYlfPkLL6WHFIEtwsuc+pCEXtxZSD98DOPPNU5ZbKlii+zCrnejqIVjobP5+FKDSHFxCO2tEnR
+ EK+rrPzX8gxVe9zTPwnSQeSOQYrq0OMOhmr2y9ErnTvUUiqlMXY/RgHjuagNvvqfiJi+hAx+wSz
+ AE1HnwopsubRfPQTjuCx2tFKcbJttdE8XXs8mwqASRjFjbTMwZzRzg6HzZW0tTqRJEBmoOpuLwa
+ D3Qyg6gBGEexlkLP1zxmXF8EhyGyPBoVQpcDfH+9HVnq2CrhF9JlDLyb8Wt258H9SHLAEf/pIgi
+ Hpwpx6M3jo/7uChvP93iDv3TcmqV34FZ8PeRm0UgexL7E3G/4s4ZSy8jFBv4Ld13n8EE2ZEMM0Z
+ huj0YYGs2xKDnlg==
+X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a macvlan over bonding test with mode active-backup, balance-tlb
-and balance-alb.
+Some MPTCP counters from mptcp_info structure have been added in the
+kernel but not in ss.
 
-]# ./bond_macvlan.sh
-TEST: active-backup: IPv4: client->server                           [ OK ]
-TEST: active-backup: IPv6: client->server                           [ OK ]
-TEST: active-backup: IPv4: client->macvlan_1                        [ OK ]
-TEST: active-backup: IPv6: client->macvlan_1                        [ OK ]
-TEST: active-backup: IPv4: client->macvlan_2                        [ OK ]
-TEST: active-backup: IPv6: client->macvlan_2                        [ OK ]
-TEST: active-backup: IPv4: macvlan_1->macvlan_2                     [ OK ]
-TEST: active-backup: IPv6: macvlan_1->macvlan_2                     [ OK ]
-TEST: active-backup: IPv4: server->client                           [ OK ]
-TEST: active-backup: IPv6: server->client                           [ OK ]
-TEST: active-backup: IPv4: macvlan_1->client                        [ OK ]
-TEST: active-backup: IPv6: macvlan_1->client                        [ OK ]
-TEST: active-backup: IPv4: macvlan_2->client                        [ OK ]
-TEST: active-backup: IPv6: macvlan_2->client                        [ OK ]
-TEST: active-backup: IPv4: macvlan_2->macvlan_2                     [ OK ]
-TEST: active-backup: IPv6: macvlan_2->macvlan_2                     [ OK ]
-[...]
-TEST: balance-alb: IPv4: client->server                             [ OK ]
-TEST: balance-alb: IPv6: client->server                             [ OK ]
-TEST: balance-alb: IPv4: client->macvlan_1                          [ OK ]
-TEST: balance-alb: IPv6: client->macvlan_1                          [ OK ]
-TEST: balance-alb: IPv4: client->macvlan_2                          [ OK ]
-TEST: balance-alb: IPv6: client->macvlan_2                          [ OK ]
-TEST: balance-alb: IPv4: macvlan_1->macvlan_2                       [ OK ]
-TEST: balance-alb: IPv6: macvlan_1->macvlan_2                       [ OK ]
-TEST: balance-alb: IPv4: server->client                             [ OK ]
-TEST: balance-alb: IPv6: server->client                             [ OK ]
-TEST: balance-alb: IPv4: macvlan_1->client                          [ OK ]
-TEST: balance-alb: IPv6: macvlan_1->client                          [ OK ]
-TEST: balance-alb: IPv4: macvlan_2->client                          [ OK ]
-TEST: balance-alb: IPv6: macvlan_2->client                          [ OK ]
-TEST: balance-alb: IPv4: macvlan_2->macvlan_2                       [ OK ]
-TEST: balance-alb: IPv6: macvlan_2->macvlan_2                       [ OK ]
+Before adding the new counters in patch 3/3, patch 1/3 makes sure all
+unsigned counters are displayed as unsigned. Patch 2/3 displays all seq
+related counters as decimal instead of hexadecimal.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
-v3: add the script to Makefile
-v2: no update
----
- .../selftests/drivers/net/bonding/Makefile    |  3 +-
- .../drivers/net/bonding/bond_macvlan.sh       | 99 +++++++++++++++++++
- 2 files changed, 101 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+Matthieu Baerts (3):
+      ss: mptcp: display info counters as unsigned
+      ss: mptcp: display seq related counters as decimal
+      ss: mptcp: print missing info counters
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
-index 0a3eb0a10772..8a72bb7de70f 100644
---- a/tools/testing/selftests/drivers/net/bonding/Makefile
-+++ b/tools/testing/selftests/drivers/net/bonding/Makefile
-@@ -9,7 +9,8 @@ TEST_PROGS := \
- 	mode-1-recovery-updelay.sh \
- 	mode-2-recovery-updelay.sh \
- 	bond_options.sh \
--	bond-eth-type-change.sh
-+	bond-eth-type-change.sh \
-+	bond_macvlan.sh
- 
- TEST_FILES := \
- 	lag_lib.sh \
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-new file mode 100755
-index 000000000000..b609fb6231f4
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-@@ -0,0 +1,99 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Test macvlan over balance-alb
-+
-+lib_dir=$(dirname "$0")
-+source ${lib_dir}/bond_topo_2d1c.sh
-+
-+m1_ns="m1-$(mktemp -u XXXXXX)"
-+m2_ns="m1-$(mktemp -u XXXXXX)"
-+m1_ip4="192.0.2.11"
-+m1_ip6="2001:db8::11"
-+m2_ip4="192.0.2.12"
-+m2_ip6="2001:db8::12"
-+
-+cleanup()
-+{
-+	ip -n ${m1_ns} link del macv0
-+	ip netns del ${m1_ns}
-+	ip -n ${m2_ns} link del macv0
-+	ip netns del ${m2_ns}
-+
-+	client_destroy
-+	server_destroy
-+	gateway_destroy
-+}
-+
-+check_connection()
-+{
-+	local ns=${1}
-+	local target=${2}
-+	local message=${3:-"macvlan_over_bond"}
-+	RET=0
-+
-+
-+	ip netns exec ${ns} ping ${target} -c 4 -i 0.1 &>/dev/null
-+	check_err $? "ping failed"
-+	log_test "$mode: $message"
-+}
-+
-+macvlan_over_bond()
-+{
-+	local param="$1"
-+	RET=0
-+
-+	# setup new bond mode
-+	bond_reset "${param}"
-+
-+	ip -n ${s_ns} link add link bond0 name macv0 type macvlan mode bridge
-+	ip -n ${s_ns} link set macv0 netns ${m1_ns}
-+	ip -n ${m1_ns} link set dev macv0 up
-+	ip -n ${m1_ns} addr add ${m1_ip4}/24 dev macv0
-+	ip -n ${m1_ns} addr add ${m1_ip6}/24 dev macv0
-+
-+	ip -n ${s_ns} link add link bond0 name macv0 type macvlan mode bridge
-+	ip -n ${s_ns} link set macv0 netns ${m2_ns}
-+	ip -n ${m2_ns} link set dev macv0 up
-+	ip -n ${m2_ns} addr add ${m2_ip4}/24 dev macv0
-+	ip -n ${m2_ns} addr add ${m2_ip6}/24 dev macv0
-+
-+	sleep 2
-+
-+	check_connection "${c_ns}" "${s_ip4}" "IPv4: client->server"
-+	check_connection "${c_ns}" "${s_ip6}" "IPv6: client->server"
-+	check_connection "${c_ns}" "${m1_ip4}" "IPv4: client->macvlan_1"
-+	check_connection "${c_ns}" "${m1_ip6}" "IPv6: client->macvlan_1"
-+	check_connection "${c_ns}" "${m2_ip4}" "IPv4: client->macvlan_2"
-+	check_connection "${c_ns}" "${m2_ip6}" "IPv6: client->macvlan_2"
-+	check_connection "${m1_ns}" "${m2_ip4}" "IPv4: macvlan_1->macvlan_2"
-+	check_connection "${m1_ns}" "${m2_ip6}" "IPv6: macvlan_1->macvlan_2"
-+
-+
-+	sleep 5
-+
-+	check_connection "${s_ns}" "${c_ip4}" "IPv4: server->client"
-+	check_connection "${s_ns}" "${c_ip6}" "IPv6: server->client"
-+	check_connection "${m1_ns}" "${c_ip4}" "IPv4: macvlan_1->client"
-+	check_connection "${m1_ns}" "${c_ip6}" "IPv6: macvlan_1->client"
-+	check_connection "${m2_ns}" "${c_ip4}" "IPv4: macvlan_2->client"
-+	check_connection "${m2_ns}" "${c_ip6}" "IPv6: macvlan_2->client"
-+	check_connection "${m2_ns}" "${m1_ip4}" "IPv4: macvlan_2->macvlan_2"
-+	check_connection "${m2_ns}" "${m1_ip6}" "IPv6: macvlan_2->macvlan_2"
-+
-+	ip -n ${c_ns} neigh flush dev eth0
-+}
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+ip netns add ${m1_ns}
-+ip netns add ${m2_ns}
-+
-+modes="active-backup balance-tlb balance-alb"
-+
-+for mode in $modes; do
-+	macvlan_over_bond "mode $mode"
-+done
-+
-+exit $EXIT_STATUS
+ misc/ss.c | 34 +++++++++++++++++++++++++---------
+ 1 file changed, 25 insertions(+), 9 deletions(-)
+---
+base-commit: 872148f54e35cb13aa6c9e48e52306cd469aaa53
+change-id: 20230817-mptcp-issue-415-ss-mptcp-info-6-5-9d6fa5121fb0
+
+Best regards,
 -- 
-2.41.0
+Matthieu Baerts <matthieu.baerts@tessares.net>
 
 
