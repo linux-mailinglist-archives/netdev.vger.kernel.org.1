@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-30036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6BC1785B2F
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 16:55:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DA40785B37
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 16:56:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AE7528130D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:55:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1D11C20CFF
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2608C8E0;
-	Wed, 23 Aug 2023 14:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB857CA51;
+	Wed, 23 Aug 2023 14:54:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7E5C8D6
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:54:05 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E95E75
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:54:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEF5CA4F
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:54:06 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462B0E79
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:54:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692802441;
+	s=mimecast20190719; t=1692802443;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bxsloiasmUxt/XWsjt2rlBkIIwWpFDrt+ciSY0YZA4I=;
-	b=Vkv25lK34LEDrAun+0kGtx3e6nu+TIoWyvwEGLJ81fFDmagHmcUgquvgGS4CDeEnQbNGD9
-	UJx8fb3uKUKEXZa1Itu6jVG3tmU0rHnPVTFkIcu5KaDmTngd7Sksx270Q4eRBco9xnbEZt
-	TWttXBOW9MEAlByyj0mKHG2X++XFMls=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=NRpVAIJLJf1MrgLmXYu+Ow7eTOUvzpBkljB5pD0iIkQ=;
+	b=FnWXFlVWUkZ5LIAUv4OOhxRxu76JKpRa20USOUcIXiDDA3ZaIVOm0ABxsAc8g8QnCfGpeo
+	RXjTks9+oOcpHUldCbO3HmcHEKHYSJjmFHzHF3GaIT9vwV6iVMkFqJ56siq2rTLEsDkyI/
+	fmShgdyIw0mZPLmkMxDDyl5SBSwVJSg=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-27-PqGHNulMPQK3Z7crEdQkIQ-1; Wed, 23 Aug 2023 10:53:59 -0400
-X-MC-Unique: PqGHNulMPQK3Z7crEdQkIQ-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b6ff15946fso64519691fa.2
+ us-mta-284-_4-MjhvsOTOEuK_HjxiBIA-1; Wed, 23 Aug 2023 10:54:01 -0400
+X-MC-Unique: _4-MjhvsOTOEuK_HjxiBIA-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2bcdd6ba578so8047471fa.3
         for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:53:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1692802438; x=1693407238;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bxsloiasmUxt/XWsjt2rlBkIIwWpFDrt+ciSY0YZA4I=;
-        b=KcYPJI/y0xcomL19LiKVOEt4iUudH6w6QSVhchILF44gJDDiFj1P/Tm1O3Wbw6i1Ye
-         n/yRe0H1gzSMf+ljmYzLKI2Y1/wytBa7M2M0uVllbyKxU1RX/GX3C22dfjt1JK9oTSg5
-         aPIRkR4svdVjY91eKSpXhnUQumBsHw63Xi2GbH3nsoChoW5PBmgDZNmPU7XjfSTmWMkw
-         J5psvW3h6mIuCjDPZ1U3l8YxhWGsY11KicFOU5KGfJx2E5hTgsngXVJFDY79rHBcAGQx
-         GjpMeGplvTpq02OZrkSf6OvdRDSxHF03RzgpO10aqL01etMME8J8wo+BltATN0Jo47xM
-         kqbQ==
-X-Gm-Message-State: AOJu0Yz2LXdcoXG2CQXgdCbHlnpyNk/o28bNRCKCjGHVqqSxNPfzvZcf
-	/umln5qpeMgEX9lvceeifg8kuSldArPD8jBK2G0w86LypIqnSwOlx+0qpLXktd8GbYJsSxz4HAU
-	FnBHWIq6eVOiq1L4U
-X-Received: by 2002:a2e:9842:0:b0:2bc:c750:d9be with SMTP id e2-20020a2e9842000000b002bcc750d9bemr4455706ljj.29.1692802438266;
+        bh=NRpVAIJLJf1MrgLmXYu+Ow7eTOUvzpBkljB5pD0iIkQ=;
+        b=STkJpiI9XG3V09V5bsEVu3lN0Dzl5teGbc3VUpYU28HkUsYrla1dhM+uIZ+WIFA50g
+         PJrk5toSpFApXPtg61nIpz4vp2zZdfHoO3y0gimgKpfDl0wQI3BHnMn5ZJ1zVNN6KSSC
+         X+7ySmxXC/Z3LNPPuQxy9HJhWCLhfytK4uHKro1yJ+vOCJMadxG4zjgA13a4DOCsKofG
+         x/e+dsJlL0lkpdm0Z0oZ1zEUYkIa2A7HAgzg9+N7pxWHj7wCoKkGGXE0NBa36W8Z4a+R
+         Ooe6wRxUZXH2r+csGcUx7USy6gBvGtD1Q2QpHorG+0yS0k3NAKQR350UUMJHWHPoF5AK
+         FIBQ==
+X-Gm-Message-State: AOJu0Yy4CQNbjEuiL5bSRm6IRRILc84eDdY1wCv6EEXlwANRJ+TzAcba
+	cN1TomA0iq2oPeTrOrIUJU+dM8jFFKnkNh6YaYfUcxotjPQUm+kfO2ZapgzF4JZHEh9Jwm/gKFv
+	iIEdd27r4YFESdemG
+X-Received: by 2002:a05:651c:21a:b0:2b9:af56:f4b8 with SMTP id y26-20020a05651c021a00b002b9af56f4b8mr8758922ljn.10.1692802438500;
         Wed, 23 Aug 2023 07:53:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZiuLTz0gr1Y5sXUlIm8NLiTk+l0yeGN50ZItPwaQyYJox9cjOMhT8cRT3lTEt7sHa7bUczQ==
-X-Received: by 2002:a2e:9842:0:b0:2bc:c750:d9be with SMTP id e2-20020a2e9842000000b002bcc750d9bemr4455687ljj.29.1692802437763;
-        Wed, 23 Aug 2023 07:53:57 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id fy3-20020a170906b7c300b009894b476310sm9711573ejb.163.2023.08.23.07.53.56
+X-Google-Smtp-Source: AGHT+IHue0h3Wi3HOEuDL6S92aoCXk1ZX144dP58ZdA7d7//gHFGRCoJha/IPNUgKVus16+cg1Qv+g==
+X-Received: by 2002:a05:651c:21a:b0:2b9:af56:f4b8 with SMTP id y26-20020a05651c021a00b002b9af56f4b8mr8758895ljn.10.1692802438076;
+        Wed, 23 Aug 2023 07:53:58 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id s15-20020a1709062ecf00b0099cd008c1a4sm9824718eji.136.2023.08.23.07.53.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 23 Aug 2023 07:53:57 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 91493D3CECE; Wed, 23 Aug 2023 16:53:56 +0200 (CEST)
+	id 2719AD3CED0; Wed, 23 Aug 2023 16:53:57 +0200 (CEST)
 From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -82,9 +82,9 @@ To: Alexei Starovoitov <ast@kernel.org>,
 Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH bpf-next v2 4/6] samples/bpf: Remove the xdp1 and xdp2 utilities
-Date: Wed, 23 Aug 2023 16:53:40 +0200
-Message-ID: <20230823145346.1462819-5-toke@redhat.com>
+Subject: [PATCH bpf-next v2 5/6] samples/bpf: Remove the xdp_sample_pkts utility
+Date: Wed, 23 Aug 2023 16:53:41 +0200
+Message-ID: <20230823145346.1462819-6-toke@redhat.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230823145346.1462819-1-toke@redhat.com>
 References: <20230823145346.1462819-1-toke@redhat.com>
@@ -99,285 +99,257 @@ Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The functionality of these utilities have been incorporated into the
-xdp-bench utility in xdp-tools.
+The functionality of this utility is covered by the xdpdump utility in
+xdp-tools.
 
-Equivalent functionality is:
+There's a slight difference in usage as the xdpdump utility's main focus is
+to dump packets before or after they are processed by an existing XDP
+program. However, xdpdump also has the --load-xdp-program switch, which
+will make it attach its own program if no existing program is loaded. With
+this, xdp_sample_pkts usage can be converted as:
 
-xdp1 eth0
-  --> xdp-bench drop -p parse-ip -l load-bytes eth0
+xdp_sample_pkts eth0
+  --> xdpdump --load-xdp-program eth0
 
-xdp2 eth0
-  --> xdp-bench drop -p swap-macs eth0
-
-Note that there's a slight difference in behaviour of those examples: the
-swap-macs operation of xdp-bench doesn't use the bpf_xdp_load_bytes()
-helper to load the packet data, whereas the xdp2 utility did so
-unconditionally. For the parse-ip action the use of bpf_xdp_load_bytes()
-can be selected by the '-l load-bytes' switch, with the difference that the
-xdp-bench utility will perform two separate calls to the helper, one to
-load the ethernet header and another to load the IP header; where the xdp1
-utility only performed one call always loading 60 bytes of data.
+To get roughly equivalent behaviour.
 
 Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- samples/bpf/Makefile    |   7 --
- samples/bpf/xdp1_kern.c | 100 ------------------------
- samples/bpf/xdp1_user.c | 166 ----------------------------------------
- samples/bpf/xdp2_kern.c | 125 ------------------------------
- 4 files changed, 398 deletions(-)
- delete mode 100644 samples/bpf/xdp1_kern.c
- delete mode 100644 samples/bpf/xdp1_user.c
- delete mode 100644 samples/bpf/xdp2_kern.c
+ samples/bpf/Makefile               |   3 -
+ samples/bpf/xdp_sample_pkts_kern.c |  57 ---------
+ samples/bpf/xdp_sample_pkts_user.c | 196 -----------------------------
+ 3 files changed, 256 deletions(-)
+ delete mode 100644 samples/bpf/xdp_sample_pkts_kern.c
+ delete mode 100644 samples/bpf/xdp_sample_pkts_user.c
 
 diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index fb1dc9d96b2a..decd31167ee4 100644
+index decd31167ee4..4ccf4236031c 100644
 --- a/samples/bpf/Makefile
 +++ b/samples/bpf/Makefile
-@@ -30,8 +30,6 @@ tprogs-y += test_cgrp2_array_pin
- tprogs-y += test_cgrp2_attach
- tprogs-y += test_cgrp2_sock
- tprogs-y += test_cgrp2_sock2
--tprogs-y += xdp1
--tprogs-y += xdp2
- tprogs-y += xdp_router_ipv4
- tprogs-y += test_current_task_under_cgroup
- tprogs-y += trace_event
-@@ -83,9 +81,6 @@ test_cgrp2_array_pin-objs := test_cgrp2_array_pin.o
- test_cgrp2_attach-objs := test_cgrp2_attach.o
- test_cgrp2_sock-objs := test_cgrp2_sock.o
- test_cgrp2_sock2-objs := test_cgrp2_sock2.o
--xdp1-objs := xdp1_user.o
--# reuse xdp1 source intentionally
--xdp2-objs := xdp1_user.o
- test_current_task_under_cgroup-objs := $(CGROUP_HELPERS) \
- 				       test_current_task_under_cgroup_user.o
- trace_event-objs := trace_event_user.o $(TRACE_HELPERS)
-@@ -132,8 +127,6 @@ always-y += test_overhead_raw_tp.bpf.o
- always-y += test_overhead_kprobe.bpf.o
- always-y += parse_varlen.o parse_simple.o parse_ldabs.o
- always-y += test_cgrp2_tc.bpf.o
--always-y += xdp1_kern.o
--always-y += xdp2_kern.o
- always-y += test_current_task_under_cgroup.bpf.o
- always-y += trace_event_kern.o
- always-y += sampleip_kern.o
-diff --git a/samples/bpf/xdp1_kern.c b/samples/bpf/xdp1_kern.c
+@@ -44,7 +44,6 @@ tprogs-y += cpustat
+ tprogs-y += xdp_adjust_tail
+ tprogs-y += xdp_fwd
+ tprogs-y += task_fd_query
+-tprogs-y += xdp_sample_pkts
+ tprogs-y += ibumad
+ tprogs-y += hbm
+ 
+@@ -95,7 +94,6 @@ cpustat-objs := cpustat_user.o
+ xdp_adjust_tail-objs := xdp_adjust_tail_user.o
+ xdp_fwd-objs := xdp_fwd_user.o
+ task_fd_query-objs := task_fd_query_user.o $(TRACE_HELPERS)
+-xdp_sample_pkts-objs := xdp_sample_pkts_user.o
+ ibumad-objs := ibumad_user.o
+ hbm-objs := hbm.o $(CGROUP_HELPERS)
+ 
+@@ -148,7 +146,6 @@ always-y += cpustat_kern.o
+ always-y += xdp_adjust_tail_kern.o
+ always-y += xdp_fwd_kern.o
+ always-y += task_fd_query_kern.o
+-always-y += xdp_sample_pkts_kern.o
+ always-y += ibumad_kern.o
+ always-y += hbm_out_kern.o
+ always-y += hbm_edt_kern.o
+diff --git a/samples/bpf/xdp_sample_pkts_kern.c b/samples/bpf/xdp_sample_pkts_kern.c
 deleted file mode 100644
-index d91f27cbcfa9..000000000000
---- a/samples/bpf/xdp1_kern.c
+index 9cf76b340dd7..000000000000
+--- a/samples/bpf/xdp_sample_pkts_kern.c
 +++ /dev/null
-@@ -1,100 +0,0 @@
--/* Copyright (c) 2016 PLUMgrid
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of version 2 of the GNU General Public
-- * License as published by the Free Software Foundation.
-- */
--#define KBUILD_MODNAME "foo"
+@@ -1,57 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-#include <linux/ptrace.h>
+-#include <linux/version.h>
 -#include <uapi/linux/bpf.h>
--#include <linux/in.h>
--#include <linux/if_ether.h>
--#include <linux/if_packet.h>
--#include <linux/if_vlan.h>
--#include <linux/ip.h>
--#include <linux/ipv6.h>
 -#include <bpf/bpf_helpers.h>
 -
+-#define SAMPLE_SIZE 64ul
+-
 -struct {
--	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
--	__type(key, u32);
--	__type(value, long);
--	__uint(max_entries, 256);
--} rxcnt SEC(".maps");
+-	__uint(type, BPF_MAP_TYPE_PERF_EVENT_ARRAY);
+-	__uint(key_size, sizeof(int));
+-	__uint(value_size, sizeof(u32));
+-} my_map SEC(".maps");
 -
--static int parse_ipv4(void *data, u64 nh_off, void *data_end)
+-SEC("xdp_sample")
+-int xdp_sample_prog(struct xdp_md *ctx)
 -{
--	struct iphdr *iph = data + nh_off;
+-	void *data_end = (void *)(long)ctx->data_end;
+-	void *data = (void *)(long)ctx->data;
 -
--	if (iph + 1 > data_end)
--		return 0;
--	return iph->protocol;
--}
+-	/* Metadata will be in the perf event before the packet data. */
+-	struct S {
+-		u16 cookie;
+-		u16 pkt_len;
+-	} __packed metadata;
 -
--static int parse_ipv6(void *data, u64 nh_off, void *data_end)
--{
--	struct ipv6hdr *ip6h = data + nh_off;
+-	if (data < data_end) {
+-		/* The XDP perf_event_output handler will use the upper 32 bits
+-		 * of the flags argument as a number of bytes to include of the
+-		 * packet payload in the event data. If the size is too big, the
+-		 * call to bpf_perf_event_output will fail and return -EFAULT.
+-		 *
+-		 * See bpf_xdp_event_output in net/core/filter.c.
+-		 *
+-		 * The BPF_F_CURRENT_CPU flag means that the event output fd
+-		 * will be indexed by the CPU number in the event map.
+-		 */
+-		u64 flags = BPF_F_CURRENT_CPU;
+-		u16 sample_size;
+-		int ret;
 -
--	if (ip6h + 1 > data_end)
--		return 0;
--	return ip6h->nexthdr;
--}
+-		metadata.cookie = 0xdead;
+-		metadata.pkt_len = (u16)(data_end - data);
+-		sample_size = min(metadata.pkt_len, SAMPLE_SIZE);
+-		flags |= (u64)sample_size << 32;
 -
--#define XDPBUFSIZE	60
--SEC("xdp.frags")
--int xdp_prog1(struct xdp_md *ctx)
--{
--	__u8 pkt[XDPBUFSIZE] = {};
--	void *data_end = &pkt[XDPBUFSIZE-1];
--	void *data = pkt;
--	struct ethhdr *eth = data;
--	int rc = XDP_DROP;
--	long *value;
--	u16 h_proto;
--	u64 nh_off;
--	u32 ipproto;
--
--	if (bpf_xdp_load_bytes(ctx, 0, pkt, sizeof(pkt)))
--		return rc;
--
--	nh_off = sizeof(*eth);
--	if (data + nh_off > data_end)
--		return rc;
--
--	h_proto = eth->h_proto;
--
--	/* Handle VLAN tagged packet */
--	if (h_proto == htons(ETH_P_8021Q) || h_proto == htons(ETH_P_8021AD)) {
--		struct vlan_hdr *vhdr;
--
--		vhdr = data + nh_off;
--		nh_off += sizeof(struct vlan_hdr);
--		if (data + nh_off > data_end)
--			return rc;
--		h_proto = vhdr->h_vlan_encapsulated_proto;
--	}
--	/* Handle double VLAN tagged packet */
--	if (h_proto == htons(ETH_P_8021Q) || h_proto == htons(ETH_P_8021AD)) {
--		struct vlan_hdr *vhdr;
--
--		vhdr = data + nh_off;
--		nh_off += sizeof(struct vlan_hdr);
--		if (data + nh_off > data_end)
--			return rc;
--		h_proto = vhdr->h_vlan_encapsulated_proto;
+-		ret = bpf_perf_event_output(ctx, &my_map, flags,
+-					    &metadata, sizeof(metadata));
+-		if (ret)
+-			bpf_printk("perf_event_output failed: %d\n", ret);
 -	}
 -
--	if (h_proto == htons(ETH_P_IP))
--		ipproto = parse_ipv4(data, nh_off, data_end);
--	else if (h_proto == htons(ETH_P_IPV6))
--		ipproto = parse_ipv6(data, nh_off, data_end);
--	else
--		ipproto = 0;
--
--	value = bpf_map_lookup_elem(&rxcnt, &ipproto);
--	if (value)
--		*value += 1;
--
--	return rc;
+-	return XDP_PASS;
 -}
 -
 -char _license[] SEC("license") = "GPL";
-diff --git a/samples/bpf/xdp1_user.c b/samples/bpf/xdp1_user.c
+-u32 _version SEC("version") = LINUX_VERSION_CODE;
+diff --git a/samples/bpf/xdp_sample_pkts_user.c b/samples/bpf/xdp_sample_pkts_user.c
 deleted file mode 100644
-index f05e797013e9..000000000000
---- a/samples/bpf/xdp1_user.c
+index e39d7f654f30..000000000000
+--- a/samples/bpf/xdp_sample_pkts_user.c
 +++ /dev/null
-@@ -1,166 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/* Copyright (c) 2016 PLUMgrid
-- */
--#include <linux/bpf.h>
--#include <linux/if_link.h>
--#include <assert.h>
--#include <errno.h>
--#include <signal.h>
+@@ -1,196 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
 -#include <stdio.h>
 -#include <stdlib.h>
 -#include <string.h>
--#include <unistd.h>
--#include <libgen.h>
+-#include <linux/perf_event.h>
+-#include <linux/bpf.h>
 -#include <net/if.h>
--
--#include "bpf_util.h"
--#include <bpf/bpf.h>
+-#include <errno.h>
+-#include <assert.h>
+-#include <sys/sysinfo.h>
+-#include <sys/ioctl.h>
+-#include <signal.h>
 -#include <bpf/libbpf.h>
+-#include <bpf/bpf.h>
+-#include <libgen.h>
+-#include <linux/if_link.h>
 -
--static int ifindex;
+-#include "perf-sys.h"
+-
+-static int if_idx;
+-static char *if_name;
 -static __u32 xdp_flags = XDP_FLAGS_UPDATE_IF_NOEXIST;
 -static __u32 prog_id;
+-static struct perf_buffer *pb = NULL;
 -
--static void int_exit(int sig)
+-static int do_attach(int idx, int fd, const char *name)
 -{
--	__u32 curr_prog_id = 0;
+-	struct bpf_prog_info info = {};
+-	__u32 info_len = sizeof(info);
+-	int err;
 -
--	if (bpf_xdp_query_id(ifindex, xdp_flags, &curr_prog_id)) {
--		printf("bpf_xdp_query_id failed\n");
--		exit(1);
+-	err = bpf_xdp_attach(idx, fd, xdp_flags, NULL);
+-	if (err < 0) {
+-		printf("ERROR: failed to attach program to %s\n", name);
+-		return err;
 -	}
--	if (prog_id == curr_prog_id)
--		bpf_xdp_detach(ifindex, xdp_flags, NULL);
--	else if (!curr_prog_id)
--		printf("couldn't find a prog id on a given interface\n");
--	else
--		printf("program on interface changed, not removing\n");
--	exit(0);
+-
+-	err = bpf_prog_get_info_by_fd(fd, &info, &info_len);
+-	if (err) {
+-		printf("can't get prog info - %s\n", strerror(errno));
+-		return err;
+-	}
+-	prog_id = info.id;
+-
+-	return err;
 -}
 -
--/* simple per-protocol drop counter
-- */
--static void poll_stats(int map_fd, int interval)
+-static int do_detach(int idx, const char *name)
 -{
--	unsigned int nr_cpus = bpf_num_possible_cpus();
--	__u64 values[nr_cpus], prev[UINT8_MAX] = { 0 };
+-	__u32 curr_prog_id = 0;
+-	int err = 0;
+-
+-	err = bpf_xdp_query_id(idx, xdp_flags, &curr_prog_id);
+-	if (err) {
+-		printf("bpf_xdp_query_id failed\n");
+-		return err;
+-	}
+-	if (prog_id == curr_prog_id) {
+-		err = bpf_xdp_detach(idx, xdp_flags, NULL);
+-		if (err < 0)
+-			printf("ERROR: failed to detach prog from %s\n", name);
+-	} else if (!curr_prog_id) {
+-		printf("couldn't find a prog id on a %s\n", name);
+-	} else {
+-		printf("program on interface changed, not removing\n");
+-	}
+-
+-	return err;
+-}
+-
+-#define SAMPLE_SIZE 64
+-
+-static void print_bpf_output(void *ctx, int cpu, void *data, __u32 size)
+-{
+-	struct {
+-		__u16 cookie;
+-		__u16 pkt_len;
+-		__u8  pkt_data[SAMPLE_SIZE];
+-	} __packed *e = data;
 -	int i;
 -
--	while (1) {
--		__u32 key = UINT32_MAX;
--
--		sleep(interval);
--
--		while (bpf_map_get_next_key(map_fd, &key, &key) == 0) {
--			__u64 sum = 0;
--
--			assert(bpf_map_lookup_elem(map_fd, &key, values) == 0);
--			for (i = 0; i < nr_cpus; i++)
--				sum += values[i];
--			if (sum > prev[key])
--				printf("proto %u: %10llu pkt/s\n",
--				       key, (sum - prev[key]) / interval);
--			prev[key] = sum;
--		}
+-	if (e->cookie != 0xdead) {
+-		printf("BUG cookie %x sized %d\n", e->cookie, size);
+-		return;
 -	}
+-
+-	printf("Pkt len: %-5d bytes. Ethernet hdr: ", e->pkt_len);
+-	for (i = 0; i < 14 && i < e->pkt_len; i++)
+-		printf("%02x ", e->pkt_data[i]);
+-	printf("\n");
+-}
+-
+-static void sig_handler(int signo)
+-{
+-	do_detach(if_idx, if_name);
+-	perf_buffer__free(pb);
+-	exit(0);
 -}
 -
 -static void usage(const char *prog)
 -{
 -	fprintf(stderr,
--		"usage: %s [OPTS] IFACE\n\n"
+-		"%s: %s [OPTS] <ifname|ifindex>\n\n"
 -		"OPTS:\n"
--		"    -S    use skb-mode\n"
--		"    -N    enforce native mode\n"
--		"    -F    force loading prog\n",
--		prog);
+-		"    -F    force loading prog\n"
+-		"    -S    use skb-mode\n",
+-		__func__, prog);
 -}
 -
 -int main(int argc, char **argv)
 -{
--	struct bpf_prog_info info = {};
--	__u32 info_len = sizeof(info);
--	const char *optstr = "FSN";
+-	const char *optstr = "FS";
 -	int prog_fd, map_fd, opt;
 -	struct bpf_program *prog;
 -	struct bpf_object *obj;
 -	struct bpf_map *map;
 -	char filename[256];
--	int err;
+-	int ret, err;
 -
 -	while ((opt = getopt(argc, argv, optstr)) != -1) {
 -		switch (opt) {
--		case 'S':
--			xdp_flags |= XDP_FLAGS_SKB_MODE;
--			break;
--		case 'N':
--			/* default, set below */
--			break;
 -		case 'F':
 -			xdp_flags &= ~XDP_FLAGS_UPDATE_IF_NOEXIST;
+-			break;
+-		case 'S':
+-			xdp_flags |= XDP_FLAGS_SKB_MODE;
 -			break;
 -		default:
 -			usage(basename(argv[0]));
@@ -393,13 +365,8 @@ index f05e797013e9..000000000000
 -		return 1;
 -	}
 -
--	ifindex = if_nametoindex(argv[optind]);
--	if (!ifindex) {
--		perror("if_nametoindex");
--		return 1;
--	}
--
 -	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
+-
 -	obj = bpf_object__open_file(filename, NULL);
 -	if (libbpf_get_error(obj))
 -		return 1;
@@ -420,161 +387,39 @@ index f05e797013e9..000000000000
 -	}
 -	map_fd = bpf_map__fd(map);
 -
--	if (!prog_fd) {
--		printf("bpf_prog_load_xattr: %s\n", strerror(errno));
+-	if_idx = if_nametoindex(argv[optind]);
+-	if (!if_idx)
+-		if_idx = strtoul(argv[optind], NULL, 0);
+-
+-	if (!if_idx) {
+-		fprintf(stderr, "Invalid ifname\n");
 -		return 1;
 -	}
--
--	signal(SIGINT, int_exit);
--	signal(SIGTERM, int_exit);
--
--	if (bpf_xdp_attach(ifindex, prog_fd, xdp_flags, NULL) < 0) {
--		printf("link set xdp fd failed\n");
--		return 1;
--	}
--
--	err = bpf_prog_get_info_by_fd(prog_fd, &info, &info_len);
--	if (err) {
--		printf("can't get prog info - %s\n", strerror(errno));
+-	if_name = argv[optind];
+-	err = do_attach(if_idx, prog_fd, if_name);
+-	if (err)
 -		return err;
--	}
--	prog_id = info.id;
 -
--	poll_stats(map_fd, 1);
--
--	return 0;
--}
-diff --git a/samples/bpf/xdp2_kern.c b/samples/bpf/xdp2_kern.c
-deleted file mode 100644
-index 8bca674451ed..000000000000
---- a/samples/bpf/xdp2_kern.c
-+++ /dev/null
-@@ -1,125 +0,0 @@
--/* Copyright (c) 2016 PLUMgrid
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of version 2 of the GNU General Public
-- * License as published by the Free Software Foundation.
-- */
--#define KBUILD_MODNAME "foo"
--#include <uapi/linux/bpf.h>
--#include <linux/in.h>
--#include <linux/if_ether.h>
--#include <linux/if_packet.h>
--#include <linux/if_vlan.h>
--#include <linux/ip.h>
--#include <linux/ipv6.h>
--#include <bpf/bpf_helpers.h>
--
--struct {
--	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
--	__type(key, u32);
--	__type(value, long);
--	__uint(max_entries, 256);
--} rxcnt SEC(".maps");
--
--static void swap_src_dst_mac(void *data)
--{
--	unsigned short *p = data;
--	unsigned short dst[3];
--
--	dst[0] = p[0];
--	dst[1] = p[1];
--	dst[2] = p[2];
--	p[0] = p[3];
--	p[1] = p[4];
--	p[2] = p[5];
--	p[3] = dst[0];
--	p[4] = dst[1];
--	p[5] = dst[2];
--}
--
--static int parse_ipv4(void *data, u64 nh_off, void *data_end)
--{
--	struct iphdr *iph = data + nh_off;
--
--	if (iph + 1 > data_end)
--		return 0;
--	return iph->protocol;
--}
--
--static int parse_ipv6(void *data, u64 nh_off, void *data_end)
--{
--	struct ipv6hdr *ip6h = data + nh_off;
--
--	if (ip6h + 1 > data_end)
--		return 0;
--	return ip6h->nexthdr;
--}
--
--#define XDPBUFSIZE	60
--SEC("xdp.frags")
--int xdp_prog1(struct xdp_md *ctx)
--{
--	__u8 pkt[XDPBUFSIZE] = {};
--	void *data_end = &pkt[XDPBUFSIZE-1];
--	void *data = pkt;
--	struct ethhdr *eth = data;
--	int rc = XDP_DROP;
--	long *value;
--	u16 h_proto;
--	u64 nh_off;
--	u32 ipproto;
--
--	if (bpf_xdp_load_bytes(ctx, 0, pkt, sizeof(pkt)))
--		return rc;
--
--	nh_off = sizeof(*eth);
--	if (data + nh_off > data_end)
--		return rc;
--
--	h_proto = eth->h_proto;
--
--	/* Handle VLAN tagged packet */
--	if (h_proto == htons(ETH_P_8021Q) || h_proto == htons(ETH_P_8021AD)) {
--		struct vlan_hdr *vhdr;
--
--		vhdr = data + nh_off;
--		nh_off += sizeof(struct vlan_hdr);
--		if (data + nh_off > data_end)
--			return rc;
--		h_proto = vhdr->h_vlan_encapsulated_proto;
--	}
--	/* Handle double VLAN tagged packet */
--	if (h_proto == htons(ETH_P_8021Q) || h_proto == htons(ETH_P_8021AD)) {
--		struct vlan_hdr *vhdr;
--
--		vhdr = data + nh_off;
--		nh_off += sizeof(struct vlan_hdr);
--		if (data + nh_off > data_end)
--			return rc;
--		h_proto = vhdr->h_vlan_encapsulated_proto;
+-	if (signal(SIGINT, sig_handler) ||
+-	    signal(SIGHUP, sig_handler) ||
+-	    signal(SIGTERM, sig_handler)) {
+-		perror("signal");
+-		return 1;
 -	}
 -
--	if (h_proto == htons(ETH_P_IP))
--		ipproto = parse_ipv4(data, nh_off, data_end);
--	else if (h_proto == htons(ETH_P_IPV6))
--		ipproto = parse_ipv6(data, nh_off, data_end);
--	else
--		ipproto = 0;
--
--	value = bpf_map_lookup_elem(&rxcnt, &ipproto);
--	if (value)
--		*value += 1;
--
--	if (ipproto == IPPROTO_UDP) {
--		swap_src_dst_mac(data);
--
--		if (bpf_xdp_store_bytes(ctx, 0, pkt, sizeof(pkt)))
--			return rc;
--
--		rc = XDP_TX;
+-	pb = perf_buffer__new(map_fd, 8, print_bpf_output, NULL, NULL, NULL);
+-	err = libbpf_get_error(pb);
+-	if (err) {
+-		perror("perf_buffer setup failed");
+-		return 1;
 -	}
 -
--	return rc;
--}
+-	while ((ret = perf_buffer__poll(pb, 1000)) >= 0) {
+-	}
 -
--char _license[] SEC("license") = "GPL";
+-	kill(0, SIGINT);
+-	return ret;
+-}
 -- 
 2.41.0
 
