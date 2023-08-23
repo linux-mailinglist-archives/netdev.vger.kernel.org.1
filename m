@@ -1,108 +1,100 @@
-Return-Path: <netdev+bounces-30078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE6D785EAE
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:34:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0650F785ECC
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0943E1C20C2D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37EF91C20312
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78991F186;
-	Wed, 23 Aug 2023 17:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC941F186;
+	Wed, 23 Aug 2023 17:40:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A00C1F16D
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 17:34:40 +0000 (UTC)
-Received: from out-39.mta0.migadu.com (out-39.mta0.migadu.com [IPv6:2001:41d0:1004:224b::27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0ADCC
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:34:38 -0700 (PDT)
-Message-ID: <d2687e08-8c67-8eb9-9764-8fcc014d8de4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692812076; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W6y2PSpf0KklCK/x1vlL2IxP2CNYUVfAedkT44SDp2U=;
-	b=OI7gMP12Vgp+jaCERsVFW05Bk8n4xKzIocqn+mVIZV43JGFqZ1uZjEZ6auM1z1sEz8jbgs
-	uE08blO7QM4iRX6l9ye2D9APeH0hLjBtqd08DQLabTrBwse8Ory3qgCm+aqDOCue+YjNKn
-	POW9OcUCmO+eHOtBNYey9ogRU+R758g=
-Date: Wed, 23 Aug 2023 10:34:28 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D22C139
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 17:40:07 +0000 (UTC)
+X-Greylist: delayed 67 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Aug 2023 10:40:03 PDT
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 406E210D0
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:40:03 -0700 (PDT)
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 23 Aug
+ 2023 20:38:53 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 23 Aug
+ 2023 20:38:52 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<wireguard@lists.zx2c4.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, syzbot <syzkaller@googlegroups.com>,
+	<lvc-project@linuxtesting.org>,
+	<syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com>
+Subject: [PATCH net] wireguard: receive: fix data-race around receiving_counter.counter
+Date: Wed, 23 Aug 2023 10:38:39 -0700
+Message-ID: <20230823173839.43938-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Reply-To: yonghong.song@linux.dev
-Subject: Re: [PATCH bpf-next 7/7] selftests/bpf: Enable cpu v4 tests for RV64
-Content-Language: en-US
-To: Pu Lehui <pulehui@huaweicloud.com>, linux-riscv@lists.infradead.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Yonghong Song <yhs@fb.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Xu Kuohai <xukuohai@huawei.com>, Puranjay Mohan <puranjay12@gmail.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20230823231059.3363698-1-pulehui@huaweicloud.com>
- <20230823231059.3363698-8-pulehui@huaweicloud.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20230823231059.3363698-8-pulehui@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.0.253.138]
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Syzkaller with KCSAN identified a data-race issue when accessing
+keypair->receiving_counter.counter.
 
+This patch uses READ_ONCE() and WRITE_ONCE() annotations to fix the
+problem.
 
-On 8/23/23 4:10 PM, Pu Lehui wrote:
-> From: Pu Lehui <pulehui@huawei.com>
-> 
-> Enable cpu v4 tests for RV64, and the relevant tests have passed.
-> 
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+Fixes: a9e90d9931f3 ("wireguard: noise: separate receive counter from send counter")
+Reported-by: syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+---
+ drivers/net/wireguard/receive.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks for working on this!
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
+index 0b3f0c843550..b5232ffa8bc7 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -251,7 +251,7 @@ static bool decrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
+ 
+ 	if (unlikely(!READ_ONCE(keypair->receiving.is_valid) ||
+ 		  wg_birthdate_has_expired(keypair->receiving.birthdate, REJECT_AFTER_TIME) ||
+-		  keypair->receiving_counter.counter >= REJECT_AFTER_MESSAGES)) {
++		  READ_ONCE(keypair->receiving_counter.counter) >= REJECT_AFTER_MESSAGES)) {
+ 		WRITE_ONCE(keypair->receiving.is_valid, false);
+ 		return false;
+ 	}
+@@ -318,7 +318,7 @@ static bool counter_validate(struct noise_replay_counter *counter, u64 their_cou
+ 		for (i = 1; i <= top; ++i)
+ 			counter->backtrack[(i + index_current) &
+ 				((COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1)] = 0;
+-		counter->counter = their_counter;
++		WRITE_ONCE(counter->counter, their_counter);
+ 	}
+ 
+ 	index &= (COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1;
+-- 
+2.25.1
 
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
-
-> ---
->   tools/testing/selftests/bpf/progs/test_ldsx_insn.c | 3 ++-
->   tools/testing/selftests/bpf/progs/verifier_bswap.c | 3 ++-
->   tools/testing/selftests/bpf/progs/verifier_gotol.c | 3 ++-
->   tools/testing/selftests/bpf/progs/verifier_ldsx.c  | 3 ++-
->   tools/testing/selftests/bpf/progs/verifier_movsx.c | 3 ++-
->   tools/testing/selftests/bpf/progs/verifier_sdiv.c  | 3 ++-
->   6 files changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/progs/test_ldsx_insn.c b/tools/testing/selftests/bpf/progs/test_ldsx_insn.c
-> index 916d9435f12c..67c14ba1e87b 100644
-> --- a/tools/testing/selftests/bpf/progs/test_ldsx_insn.c
-> +++ b/tools/testing/selftests/bpf/progs/test_ldsx_insn.c
-> @@ -5,7 +5,8 @@
->   #include <bpf/bpf_helpers.h>
->   #include <bpf/bpf_tracing.h>
->   
-> -#if (defined(__TARGET_ARCH_arm64) || defined(__TARGET_ARCH_x86)) && __clang_major__ >= 18
-> +#if (defined(__TARGET_ARCH_arm64) || defined(__TARGET_ARCH_x86) || \
-> +     (defined(__TARGET_ARCH_riscv) && __riscv_xlen == 64)) && __clang_major__ >= 18
->   const volatile int skip = 0;
->   #else
->   const volatile int skip = 1;
-[...]
 
