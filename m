@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-30106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 330E078609D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:29:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3A27860A6
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 104121C20CBD
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:29:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9582C2812EE
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A141FB27;
-	Wed, 23 Aug 2023 19:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B8B1FB28;
+	Wed, 23 Aug 2023 19:33:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A4E156E6
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:29:35 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 308BCE6E;
-	Wed, 23 Aug 2023 12:29:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50269156E6
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:33:00 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 026A2E5E;
+	Wed, 23 Aug 2023 12:32:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692818974; x=1724354974;
+  t=1692819177; x=1724355177;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=6LF0tAFrB/YveAnxWIlu7f4GfHYvM1EWDUNZG1MNHAs=;
-  b=PCKAgPMV6tYmXNWSzDEZiROJJQTez51Kv8tr/uCdltq2ZNCsLoLTBn2I
-   s/XKa+5eNjgkv2OA65LMY75YnZ7BoSWb+QFuwZy7WswdGkGlZKZHEM+Zp
-   Wk3RhF+1kB2i7J7ise8VwVbmOr7kyuR1niKU4oIgMrpzVvA5A3sbdH42u
-   Ezucf7AxMPILVpFKoGn3HnyZlUWe6RyEBOTZo0azOGBRPkbMKmfn1aJtd
-   XofoBHxZBJwHy9bA5lOXz0EjGmPzpc9GP1QDi+I8oP0+NmPX2Wj1oLiuO
-   Ts/ZKqIXJVLZDuME80NFY4zV7NW3R1AfraSOuIHTreA+KDehgCL6t3AGB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="405255364"
+  bh=ZYJANV2Ozg/+q4iZI5h0HC5wtu8s7xm+fAOnC7G8hM8=;
+  b=cDJzUY66MMWAuhMq6bal6ZaNtF6nH1w/qVTQ5831n7oYECq4mcLPAqYf
+   5T132Kwcj1V57avPjNvrNbQ+1e38EPJCiSuJEANZn+9BS1r93/VsIlx0S
+   +dX1pjBXaeobGAKnLMkZ3yj/FT1gaN8QWeC1H+rJjj3n8wsKZn/Lb/955
+   Uvu/3doyySxsaha6xfdII2TqYakUjGc9qyg7oznkxWC6mWYiEH1q5q+Ho
+   siOgopM1Qo8NCMqETArSmx1aMEKLFzBNwnMYGImDjG72e5mk9ldkQlDf/
+   xZQggt1v3SK/YhDT4dT4YGW20ShxKCIizjHpthtX9x8NtwaeTmMzAGIda
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="374230401"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="405255364"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 12:29:33 -0700
+   d="scan'208";a="374230401"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 12:32:57 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="851162924"
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="730331954"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="851162924"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP; 23 Aug 2023 12:29:33 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="730331954"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga007.jf.intel.com with ESMTP; 23 Aug 2023 12:32:56 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:29:33 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2507.27; Wed, 23 Aug 2023 12:32:56 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:29:32 -0700
+ 15.1.2507.27; Wed, 23 Aug 2023 12:32:55 -0700
 Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 12:29:32 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.42) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 12:32:55 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.174)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:29:32 -0700
+ 15.1.2507.27; Wed, 23 Aug 2023 12:32:55 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nntFa2LXmNodaZGyxxs9K/Cu9lQ6tgSKS8qF+cEf0YhxXmmBD+PaNIugbohXScbs3wUcDbg7CjhIOf/O2D1U6WfgoAiPnqgwiZ79nn51tP+64tPmiDXaFb6DrPcZha6jECtnOV98WNHRhNHI2Y9l/zbcAq/baNhUYF2zUGNe9taKxwW00wCQg291M4u859iCBVnvUwK/BLHsg/NKmvmX6oGvMITs8alcAN90pxe1xAt095XnCVH1/drrC5CLBanRt0h2eKZKMJWm/pXfdIxiIfVcaw6a+OPoUmbYoI7RYLZPDEbG+QEHjKaZOxedzFqPgciiLwxe9J5oh21hqah9lg==
+ b=gRsMXrkfmGnPXZ9ZmUCbuKKc2ZPjQVHrSwFbwT/oRK5llL2xFvBUUUK+BGLxg9aNQF3VxbUNvAP24EjuQXNa1MlcVOmdH2CTDC+k+3E5DQcO+KtGc5487JbY45dH0bT4xEonMVEHj14EUJd1KxJufM1DfPtX+FAGPC4f/3W2vkL9xEg1AuLueZYyWQ4vruDKfwi9iZWlCa1bay26HI+ZQCtKvLxrcA5CJ9jILDCCrIYTJn09hZXS7bRFrMnfJzKAu74mr1YWHcQqWomtYE1Du0Fz2upw5LWtF0wK0G2tnog1X7fZ7DLQ3npiMzveMnI84VKsSE7HJUtU7Xe4BCprfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fzZZnhG2IGEGAkqqCbDTj8EyG5RTDxhApEZm/Dxjnjg=;
- b=drHCndbHZRYdRanfJJ5SFLMQURRUzc/0OZX0+lOOJgGG45jNYkkrRkdQzE/kbzVCeWOia7V+hq0gnGKrNgHgNUKTCkXzsQxat1hPKjr+ccEbzNRq2+HfMSqodat2ep98U6OSmC8nM8Crf0uQAybPKfldhdRPpFpAHDBjxbyrCA5yg6nPFunsJKoaQW9jscnuCVJu/bclDaKwlmZMOzBpMdmba7eNCMiOwNKwSfGvPyVQaYf2z4+w5yzNYLO0Fvsj+zQqIUFmT/141Ijdy/SX+fxQg2Hg02M2BwMKUXsHwJlG+PrD63GHfLwPBMrT56J/umzNYsHi+Nb1V9m4hxDnEg==
+ bh=m+MgqkMWWXH9cxzXrcC5JTjpIH7fwrmB8OJCS0iYMiI=;
+ b=W2IXq+14pkaDOrrC4JxgTYVMgHDV1eQy9goXrpT0iFTm7uWsBsAZndK/UEB/2hvXc4GEQN096lwPJINnlP55ZAKoA4p10IUJMY73dRv7sG/s/bStOP9O9abAoXB9CZItoTZoVrUPjWdT57zfhPHpOpGJoME4CxWBjNkNY9UfcLeVnhMnroHmwO/PwMJnwCBtYcPVL3VRW4yyI5Sav0CJV3UAbJ8jNBA5mcjwC06fwzF/cp5xEcre8TI5lhHX6mWLVpZwtYmnZa7+O3zpjhUwPZLCNhNZaLZmC7jqlTAFcCuPXNf+GEpDAi4XLP/hEaKUfnPa5osy/o13PhAGXr0MYQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -77,17 +77,17 @@ Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
  by SA2PR11MB4953.namprd11.prod.outlook.com (2603:10b6:806:117::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
- 2023 19:29:30 +0000
+ 2023 19:32:51 +0000
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::6a23:786d:65f7:ef0b]) by CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::6a23:786d:65f7:ef0b%6]) with mapi id 15.20.6699.022; Wed, 23 Aug 2023
- 19:29:30 +0000
-Message-ID: <4da4b150-4138-4885-58cf-d3493695bbba@intel.com>
-Date: Wed, 23 Aug 2023 12:29:27 -0700
+ 19:32:51 +0000
+Message-ID: <005940db-b7b6-c935-b16f-8106d3970b11@intel.com>
+Date: Wed, 23 Aug 2023 12:32:49 -0700
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v4 01/12] doc/netlink: Fix typo in genetlink-*
- schemas
+Subject: Re: [PATCH net-next v4 02/12] doc/netlink: Add a schema for
+ netlink-raw families
 Content-Language: en-US
 To: Donald Hunter <donald.hunter@gmail.com>, <netdev@vger.kernel.org>, "Jakub
  Kicinski" <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
@@ -96,13 +96,13 @@ To: Donald Hunter <donald.hunter@gmail.com>, <netdev@vger.kernel.org>, "Jakub
 	<sdf@google.com>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 CC: <donald.hunter@redhat.com>
 References: <20230823114202.5862-1-donald.hunter@gmail.com>
- <20230823114202.5862-2-donald.hunter@gmail.com>
+ <20230823114202.5862-3-donald.hunter@gmail.com>
 From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20230823114202.5862-2-donald.hunter@gmail.com>
+In-Reply-To: <20230823114202.5862-3-donald.hunter@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW3PR06CA0010.namprd06.prod.outlook.com
- (2603:10b6:303:2a::15) To CO1PR11MB5089.namprd11.prod.outlook.com
+X-ClientProxiedBy: MW4PR04CA0330.namprd04.prod.outlook.com
+ (2603:10b6:303:82::35) To CO1PR11MB5089.namprd11.prod.outlook.com
  (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -112,106 +112,517 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA2PR11MB4953:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6ea7c7da-b889-428d-7cd5-08dba40f455b
+X-MS-Office365-Filtering-Correlation-Id: e88fa670-849f-4600-cb70-08dba40fbd61
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WwuSMozWb92bRw7HOH6njI4TyglrjgVtFff2pWBIXHUYcbHEqq0yv1bV5ra+Y2TG4u9zVDJciaRVfa67a6r57XzUvJX+Ez9SNqUtuASmv3s45X1Oof1QkUvtCGe83NBywatpWeu1jAvXO6RRo9pGkVaKB1GONxn8EF0DLx4dneSa7hyRH9fuCNHp5tbS4SpTg1b43cFlneRE1FAunzIKpavzb03mGog/nhVkb9644XWbZspWuyqbARYhWgwSTflu1knjbZeTORJtAQUbQZtgXJlPfn4x+x6gzaTpRIoqUg01AiNU+dyi5dpU76sfJUVRH1FEghVr6PNvdnUfCFheaArJ7kokeGCf5hazXaY1Il0OKFtBoUncjBrF0zf+P8yiKum4vBfp0dLBF9yXK3dM7DjO2D1GIH6tQO0lq/aVUQMDRIjTN88KGb9m/u+ovthGzX6YwzhS2f0AZGUAMRxbYo/vTPaTNVjlPCtazLsc3Ipn34dTQc0fZFbFq/1KqmgtI2p5kvnl9n/5XwvdOg+FlhNPyAUnFvLa9jct/6Lu0t5qkswZJggZ9DjXSfjFnk1o3GqI8Ml3xo11FKTUMbNIBb3sBwuv+C/bT6mT6dKVUPeghuP3mEjoch/+15mPcw7AC6ZqFBOwwmSrFXoR1bYlBW5lYQL3IkwHDYuArGViIFQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(346002)(376002)(136003)(186009)(1800799009)(451199024)(6506007)(6486002)(6666004)(53546011)(6512007)(83380400001)(921005)(86362001)(31696002)(38100700002)(82960400001)(36756003)(26005)(2616005)(2906002)(316002)(66946007)(66556008)(6636002)(41300700001)(110136005)(66476007)(5660300002)(8676002)(7416002)(4326008)(31686004)(8936002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: gl1ipajWlbm3jD/buqa+ekeqeadhYogBnWZ2V+gJqwiP/qfGNGsmY2u36pd8JL1YUnLBRhMLvV66dSV1QNU+3PVsHSf6K327QT066hbwlJBpL7g5VdxsTT/k0NZTTyJKsTrNHxQ6Q4C+219spxjpMcBAlEXvC4OaKuIEqLJ1OzvjxpHHOyGrOIqEClvcBF5y77alYS4r/IL9VQzlDCzFQx57xc+iRgGEQVUqD2mcgT2avGtYCylCq6G56utyauGEBYJo7F0svsJAip+fnPOACIJ/GD6Iffvh84QN/n0LYWQcV/0e2NgZJ3PdZenQhc0Bsne5wRZkGKyttl6LbjjMd+y1KRGZfB5/6dpn9sD20w9RYepNw5GF13gV43ShdKJWQaavkDhKZUUfYOBWiK29PHDkULlggSQ261OshFLem+be00+dKq8evmRK+WmCaLt1UlG5An+11BxxtIiWYsk6+L42RLWNhgsi0nLdLi0ip0Axjnaogqh/tcstMm3G3Z4128iP/ZUwquorJzZNxITeONs83fwrKZIKBQPSxJNVv39Uo4ImoJ74UfwWH+GHRbKXHmusD5nFG/RBNENDqipNbUcHVjI9Gwx0eWSYYwBHNfcJgdGO73aGr6ZQk2OThodrAHs1IK9jEIVsTdjKxKgOsw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(346002)(376002)(136003)(186009)(1800799009)(451199024)(6506007)(6486002)(53546011)(6512007)(83380400001)(921005)(86362001)(31696002)(38100700002)(82960400001)(36756003)(26005)(2616005)(2906002)(316002)(66946007)(66556008)(6636002)(30864003)(41300700001)(110136005)(66476007)(5660300002)(8676002)(7416002)(4326008)(31686004)(8936002)(478600001)(966005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dXFwSXloWkY1NDM0QWZKNkRXUXA2ZnVXNUQ5R2ZFcE83eTA4M3Zkak95NTBa?=
- =?utf-8?B?UFpUZ3N4REZLeFQzTlZnVXF5dm8rK3hTQ0gwMmlzM1RrVFpYa2I2RWFtSlYz?=
- =?utf-8?B?OEVhMm1ubURFbWx0cm1iOURWTUJRSzhoeXNuUDhyQnpEYzBQOGtKVlA0T1hy?=
- =?utf-8?B?bG1pN3RScTNHN29odTYyYnplMWtIUXo4WHlKVW5aUm94a1MrK29hbC8wdVJ3?=
- =?utf-8?B?QlBHRS9jWVNmZ1djd3hZR2QrRGUva2gxZ01XemVEQitOT29pSEZHWDlvQlBD?=
- =?utf-8?B?WnQyR3JKZmxNVmFKelFDQWVaM0ZtL0I0dVNTK0pHdCtmVWZDSk9BKzMvUmVh?=
- =?utf-8?B?L2IxeEdOWlhRd2w0YU4wT0FHZHJKR3Bjak1aQUxGWEUzcHMvVHhWL0NDaEpW?=
- =?utf-8?B?TlM5V24ya083UHYyME1PcUpRaHZ1c3U0NmVOTWVic053ejJjZWpyNUMyaUlt?=
- =?utf-8?B?RjNFYllzeERMbncvK3JSbW82aXR2dkFpdS9jS3llazA2T2hZM0pyRWErL29t?=
- =?utf-8?B?M3JSelFhWXVFc0J1bFc1ZHpKRVlNbWQyUDRyNFE0UjQrcjFwT2RaQzhlUC94?=
- =?utf-8?B?SStoS0RzLzFLQUZHeWRMRzNwMythc3dTelBvVFlSTnhtYjZVMWdSYzJSMkh6?=
- =?utf-8?B?QVhCTEdCTlpTenlEVG4vREoyNzF0ZllFZldDdHI5YVV3bFduTE11bGdneHc0?=
- =?utf-8?B?NXdrUUxTTmtPalNLYU9LK3JiQzhuNjVYL0ZXV3UyUXBtQ3NTNlJFcFFibWU4?=
- =?utf-8?B?SjhOcGpQN1lDd1FWVVltWUdjNklSZUkwdkRhSmI5MXBBenNoV1dBRmZuUmw3?=
- =?utf-8?B?Z21LU1UvV29XVVVWUW8wd0tNSkR1L09sb1BZVjlXL2hsL2VTOW1HSW9EYVhU?=
- =?utf-8?B?ZldSMWJzR0FieThpbUsyREc0enlyUWJMcUFnTzZ1V2FZSTNmUGFWTGR4eVpL?=
- =?utf-8?B?WDhYd1d2eW1TQ2FIU2lzNlZIaG5INUl2TE02cnlrbFV5UWh6Y1hwVFZGcGZM?=
- =?utf-8?B?N0Y0eTI5azRLdkczN0lzUWt1NFIzWERTMXBaRTYvTEVteWoyL2NQNTlNdGpz?=
- =?utf-8?B?Y1NRU2YxT0ZXM3c3T2JXaDVBd3RBOGd0RGhReUlDeEJ1NnhQYnRTQUtrMjZa?=
- =?utf-8?B?VUVuUEs0ODFjdUVWQzkrdndhT3lxZVVpMWZON1N6YUtMNVNuTEFzbzBJcGpn?=
- =?utf-8?B?RHZzd2ZQZlQ3RlVxNC9tc2FrMmltTjE5Q2YwaFdyZTFNRDFiOFRsd3JoZlQ2?=
- =?utf-8?B?Q2JzTERFMFJvWU14SHdvT3VTODRPNEx5UERmNjJLQmZFWXNkd0lhTm84dmlS?=
- =?utf-8?B?V1grVjNSaGZVTzhDOUJXNzVBY2MvZDlHWEplMW9yeEJ5Rm9EeCtLK0pIdUJn?=
- =?utf-8?B?L1ZWQnd6bVRRRm52SXpjZUFYT21EbTYzak5tY0pJTDkwSUFrcDkvVkFxZi9W?=
- =?utf-8?B?OUplRmhOSmVmUjFIZ3FJQXErN052UG1nazNxSlN4dGIxMis3TlZtdERMVldU?=
- =?utf-8?B?Und3L2pCUzZVNTdkQ3ZhVExjK2dpS3psNlM3WHRObzcvdUtDOGVTM1pETjBw?=
- =?utf-8?B?TkF1Tk82RmNUaTFGajFPcXV4QWY0YjRHdGVQRjZlMnY3TG54dmNkVHpkQ1Zv?=
- =?utf-8?B?Z0w3N3Job0o2WEd5MmxFY0VxUU1iMGZxdWh0MnY5NVFjY0xBeVh6cWU0aTJB?=
- =?utf-8?B?L0RCY3gzRTV0cDFGK3RpSnNMQ1FpTWRPVWJrQVNVNnNLVzUxQ1VGNnIvZXhN?=
- =?utf-8?B?K1dxUXZhT0VOZUR0WjVuRkxKMnNuU3dlM2NPNnAwQnExWGdBSXI2OXVpNFZP?=
- =?utf-8?B?MGV6Si9ETWlNSzFxQzZ2OXVTZG9HZmJSbkZsL001RXlMYkhTNHlVOEwvSmJL?=
- =?utf-8?B?bGNkWEFuMWxLTnh3VzJ6TjY1cmZjdmFPZStJUC9HZW1xYy90cGxqNFFDWHd5?=
- =?utf-8?B?R2syUGJGVlg3dEtTWGJxL2p2M2ZQaWEwMmc3OUpVYW5TckxWVi84c0lSNnp5?=
- =?utf-8?B?TUxTVk1vOFd5djdta1V5KzFwV1pZQ3VRRVpCRkRXeHI3WXN3dllSbnE3bGFt?=
- =?utf-8?B?MzAzQ2luOW9OU0kwSCtoR0M3RlRSZWpBcms5YXhpek44Z0tySk90eGJUZW5V?=
- =?utf-8?B?blIxT21TRkJYWHFGVDJMOFU1NmNDc3ZzazhTYUxnbjlHK1pTaFNSOXhkSDZY?=
- =?utf-8?B?dnc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ea7c7da-b889-428d-7cd5-08dba40f455b
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bzIybWg3ZEFkUUFTNHVPd0FzY0JzcnJTMDhXRWhrNWhRd2N0alZjQnc1L1RL?=
+ =?utf-8?B?OWtXUEN0ajdSYjVFejRhS1VxZ3crem50eGZCUjduSEhadHdkVzQyM0FSYjZI?=
+ =?utf-8?B?S0FFeFhTUzRhL3VpSXZqdWQ1b05HOHFZbysvOUFGSDAvdjEvYmJnVnkzQzFt?=
+ =?utf-8?B?MDhLdjNhMkNSRmV0aWM5UmVSYXdqYTZTYmVoT3NIU1o0eVFzNGN5eFFDQ28z?=
+ =?utf-8?B?Z1FEWGFSbFpLQkx1TjN3Rm5IWWpxV2lWTVZDTmdsY1RjY3ltNG1ISDJXU2hH?=
+ =?utf-8?B?eEZZcEFtK2p1eTVXSjJLVVlOR1NpZm54bkFJK2VkdEVCclRIRzhEVTA2bW9B?=
+ =?utf-8?B?a0tYV3pyb1JkblM3d01qZUNYN1hEaXFiKy9Gc1BVWGVpR2VwSzNXZ1o0NC94?=
+ =?utf-8?B?NnFFVy9IeEttSGtmOGpVanN6RHJrQ1hwUHRURjZhUEdWVHlNWnFtK1JrQWtv?=
+ =?utf-8?B?aXVRaWwrYll1M2pWTlRsKytIanNZSXhPNkJWVThrVTAwSHk3RXEyb2ViYXFI?=
+ =?utf-8?B?M0pHbmYxRjFCMURtMThxNGhOU0JyTGNDdmFNczZlZTFHK3ZyelJZYWs2bGZF?=
+ =?utf-8?B?MGpDQ3hFMnR6a2tCeHFkanZzV1ZheTIrK0JGbHcwZ2xPN1daL29SeFZURUlJ?=
+ =?utf-8?B?UXB4eXpVRzlsblU2N3RvaXVXTnFwa1dwU3MyWmVob1daNFpRR1E2ektuYlhS?=
+ =?utf-8?B?Uk5VeFRZTHQ2aTB4aUVaSVJUbVk5UFllZEVwTXdiSGk5Y2VGQ29ZTWtJNEF3?=
+ =?utf-8?B?MEFlUlYvM1U0SDJtcEVQRzlzb2NEWG9ycm9ITHYreFJaOTVMdDlrLzdoTUpm?=
+ =?utf-8?B?M3ZIZ0JpeXpURzV4Y3A4N1gxRUhSbEVmVXI0K0RTbVNoekQrcUVENkNyU1dw?=
+ =?utf-8?B?SGUzN1QrelJONnRuN01paUs3YmpDek9EY0poSmtQajZlYlBqU2p5QmV6QjR0?=
+ =?utf-8?B?QkdhcWZpZ2g4bEEvT3gwdjdYWEt4L0dCLzZiYTEyencrM0hnU3hkZDV4Yjhp?=
+ =?utf-8?B?bElPOWpFVHVxelUzVm1TSGFHUEw3b015Q002cEhuZ3dlbCttcXNoOXQ1eGk5?=
+ =?utf-8?B?dkRYMGxuR21BT2NrWHQxdzZ6bkhoNy94Vnh4WEZYTHNWeHFVZnNmbTJVN1d3?=
+ =?utf-8?B?SEt1aFh5ZEZva3lTSWpGZmgvNzhpYzNjaGpseE1XclBNVFQzNUdBRllHYSts?=
+ =?utf-8?B?dUM3c25KbTdKY1hwSXJOVkFFVEJsWmxCTDh3TzFObElBSXpHcjQ2dnNadmI4?=
+ =?utf-8?B?eDdCN3BCS1FUQzVoVUZURUtQdDd4SytCWTZqZGZTQ3F5dlpoSER0T21wM1RG?=
+ =?utf-8?B?NzhldGJBV2pscExpNHJvUE9ReVhtL1ZTYXFqWnR6bFlJdTlPV1plWGVCcVJV?=
+ =?utf-8?B?RHhNQXdjMHVnOW9EL3RvUFF3TFBIY0ZWQ3MwQnZSamZDRUdER3VNUm8rcmJu?=
+ =?utf-8?B?dGZ3Mm5jQStzSk1MajJpYnUrUzhUYllqUEhDbG5wT3pCVG4yZUgxZUhXMzRh?=
+ =?utf-8?B?UHM4dUFjUzJOSGtDMnA0OGtaY1R2STVmVlNEMXljdEJuWTJVb2RGRGdCTGlt?=
+ =?utf-8?B?OEpXdlFZTFZlck84U0Q3RHV1b2NuL21UNmVub1JUbmEvbUx1cm0rMjNHUlRt?=
+ =?utf-8?B?MmNvbzY0TmNqaHRSRWNrdU9zT0FPV2tBMHpxWnJCMDVTeGFlaXRzVHBkT21D?=
+ =?utf-8?B?Sm9xbGhTR1pRU0JGdTBPL2RETzVZMENyNnkwVjdzcVJnRGc0eGFJU2Z1S3pP?=
+ =?utf-8?B?RmJVeXBqNkI3Uy9RcXFKd3ZQUTZHcFNYeUc1RE96ODJKblRQU1ZOS3FPUHQ3?=
+ =?utf-8?B?OFVuR2N0dHJQcjdLYk5Ockl6eWVjUFg1TG03SUN4TlVaWnNjQkxaZkpTbGtK?=
+ =?utf-8?B?aTZ3RVpGUXFRa3lTUVV1SG1EWU1tc1MwM2VMcFhJWmpTTHFkQXpFNzNwcGpM?=
+ =?utf-8?B?ckhtekhPcWI0OEt4SWJMY3loOEk0QU9YMVFwMVRiRUN0YjZlY3lQdlBrdFcz?=
+ =?utf-8?B?b29DQkc0aUkwS1JkS1NxNkJ4Tk9lVUtueVdSN3RITFd4QTBJSjVRcDluRmN5?=
+ =?utf-8?B?MnNOdWdwT0kzaUNhUGRUeTNJeGI2U3grbU1wZVNOR1orL0ZhRDZPVjFqMWJG?=
+ =?utf-8?B?Q3J2TENnWDZVd2xDS1JEdFdEa1NYSCtqQ1RoNTloY3lBMktLOGluWlNOMk1i?=
+ =?utf-8?B?QlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e88fa670-849f-4600-cb70-08dba40fbd61
 X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 19:29:30.0821
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 19:32:51.3541
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: osWsRRzUstAdAZQ9LfCYgBPWWKMtxP0vc+dPrejcO6KbLRh6We4uIZvzWB4pWen/okYHEWUWndVP3th1lMLVsnJWn581N/IuLqmT7QPaTj4=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1X7GTpS94docT+Vt9wQ6y4Cqcptq7rkYg5QmdJxxRJjFQSFavusIwWayaNtU/QOSzc+ShLtPbeOOzsSkJPnPNmqw0qE0zh92l2n2HOAV8S0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4953
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
 On 8/23/2023 4:41 AM, Donald Hunter wrote:
-> Fix typo verion -> version in genetlink-c and genetlink-legacy.
+> This schema is largely a copy of the genetlink-legacy schema with the
+> following additions:
 > 
+>  - a top-level protonum property, e.g. 0 (for NETLINK_ROUTE)
+>  - add netlink-raw to the list of protocols supported by the schema
+>  - add a value property to mcast-group definitions
+> 
+> This schema is very similar to genetlink-legacy and I considered
+> making the changes there and symlinking to it. On balance I felt that
+> might be problematic for accurate schema validation.
+> 
+
+Ya, I think they have to be distinct to properly validate.
+
 > Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 > ---
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
->  Documentation/netlink/genetlink-c.yaml      | 2 +-
->  Documentation/netlink/genetlink-legacy.yaml | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  Documentation/netlink/netlink-raw.yaml | 414 +++++++++++++++++++++++++
+>  1 file changed, 414 insertions(+)
+>  create mode 100644 Documentation/netlink/netlink-raw.yaml
 > 
-> diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-> index 4c1f8c22627b..9806c44f604c 100644
-> --- a/Documentation/netlink/genetlink-c.yaml
-> +++ b/Documentation/netlink/genetlink-c.yaml
-> @@ -41,7 +41,7 @@ properties:
->      description: Name of the define for the family name.
->      type: string
->    c-version-name:
-> -    description: Name of the define for the verion of the family.
+> diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+> new file mode 100644
+> index 000000000000..ef7bd07eab62
+> --- /dev/null
+> +++ b/Documentation/netlink/netlink-raw.yaml
+> @@ -0,0 +1,414 @@
+> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://kernel.org/schemas/netlink/genetlink-legacy.yaml#
+> +$schema: https://json-schema.org/draft-07/schema
+> +
+> +# Common defines
+> +$defs:
+> +  uint:
+> +    type: integer
+> +    minimum: 0
+> +  len-or-define:
+> +    type: [ string, integer ]
+> +    pattern: ^[0-9A-Za-z_]+( - 1)?$
+> +    minimum: 0
+> +
+> +# Schema for specs
+> +title: Protocol
+> +description: Specification of a genetlink protocol
+
+If this is for netlink-raw, shouldn't this not say genetlink? Same
+elsewhere? or am I misunderstanding something?
+
+> +type: object
+> +required: [ name, doc, attribute-sets, operations ]
+> +additionalProperties: False
+> +properties:
+> +  name:
+> +    description: Name of the genetlink family.
+> +    type: string
+> +  doc:
+> +    type: string
+> +  version:
+> +    description: Generic Netlink family version. Default is 1.
+> +    type: integer
+> +    minimum: 1
+> +  protocol:
+> +    description: Schema compatibility level. Default is "genetlink".
+> +    enum: [ genetlink, genetlink-c, genetlink-legacy, netlink-raw ] # Trim
+> +  # Start netlink-raw
+
+I guess the netlink raw part is only below this? Or does netlink raw
+share more of the generic netlink code than I thought?
+
+> +  protonum:
+> +    description: Protocol number to use for netlink-raw
+> +    type: integer
+> +  # End netlink-raw
+> +  uapi-header:
+> +    description: Path to the uAPI header, default is linux/${family-name}.h
+> +    type: string
+> +  # Start genetlink-c
+> +  c-family-name:
+> +    description: Name of the define for the family name.
+> +    type: string
+> +  c-version-name:
 > +    description: Name of the define for the version of the family.
->      type: string
->    max-by-define:
->      description: Makes the number of attributes and commands be specified by a define, not an enum value.
-> diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-> index 196076dfa309..12a0a045605d 100644
-> --- a/Documentation/netlink/genetlink-legacy.yaml
-> +++ b/Documentation/netlink/genetlink-legacy.yaml
-> @@ -41,7 +41,7 @@ properties:
->      description: Name of the define for the family name.
->      type: string
->    c-version-name:
-> -    description: Name of the define for the verion of the family.
-> +    description: Name of the define for the version of the family.
->      type: string
->    max-by-define:
->      description: Makes the number of attributes and commands be specified by a define, not an enum value.
+> +    type: string
+> +  max-by-define:
+> +    description: Makes the number of attributes and commands be specified by a define, not an enum value.
+> +    type: boolean
+> +  # End genetlink-c
+> +  # Start genetlink-legacy
+> +  kernel-policy:
+> +    description: |
+> +      Defines if the input policy in the kernel is global, per-operation, or split per operation type.
+> +      Default is split.
+> +    enum: [ split, per-op, global ]
+> +  # End genetlink-legacy
+> +
+> +  definitions:
+> +    description: List of type and constant definitions (enums, flags, defines).
+> +    type: array
+> +    items:
+> +      type: object
+> +      required: [ type, name ]
+> +      additionalProperties: False
+> +      properties:
+> +        name:
+> +          type: string
+> +        header:
+> +          description: For C-compatible languages, header which already defines this value.
+> +          type: string
+> +        type:
+> +          enum: [ const, enum, flags, struct ] # Trim
+> +        doc:
+> +          type: string
+> +        # For const
+> +        value:
+> +          description: For const - the value.
+> +          type: [ string, integer ]
+> +        # For enum and flags
+> +        value-start:
+> +          description: For enum or flags the literal initializer for the first value.
+> +          type: [ string, integer ]
+> +        entries:
+> +          description: For enum or flags array of values.
+> +          type: array
+> +          items:
+> +            oneOf:
+> +              - type: string
+> +              - type: object
+> +                required: [ name ]
+> +                additionalProperties: False
+> +                properties:
+> +                  name:
+> +                    type: string
+> +                  value:
+> +                    type: integer
+> +                  doc:
+> +                    type: string
+> +        render-max:
+> +          description: Render the max members for this enum.
+> +          type: boolean
+> +        # Start genetlink-c
+> +        enum-name:
+> +          description: Name for enum, if empty no name will be used.
+> +          type: [ string, "null" ]
+> +        name-prefix:
+> +          description: For enum the prefix of the values, optional.
+> +          type: string
+> +        # End genetlink-c
+> +        # Start genetlink-legacy
+> +        members:
+> +          description: List of struct members. Only scalars and strings members allowed.
+> +          type: array
+> +          items:
+> +            type: object
+> +            required: [ name, type ]
+> +            additionalProperties: False
+> +            properties:
+> +              name:
+> +                type: string
+> +              type:
+> +                description: The netlink attribute type
+> +                enum: [ u8, u16, u32, u64, s8, s16, s32, s64, string, binary ]
+> +              len:
+> +                $ref: '#/$defs/len-or-define'
+> +              byte-order:
+> +                enum: [ little-endian, big-endian ]
+> +              doc:
+> +                description: Documentation for the struct member attribute.
+> +                type: string
+> +              enum:
+> +                description: Name of the enum type used for the attribute.
+> +                type: string
+> +              enum-as-flags:
+> +                description: |
+> +                  Treat the enum as flags. In most cases enum is either used as flags or as values.
+> +                  Sometimes, however, both forms are necessary, in which case header contains the enum
+> +                  form while specific attributes may request to convert the values into a bitfield.
+> +                type: boolean
+> +              display-hint: &display-hint
+> +                description: |
+> +                  Optional format indicator that is intended only for choosing
+> +                  the right formatting mechanism when displaying values of this
+> +                  type.
+> +                enum: [ hex, mac, fddi, ipv4, ipv6, uuid ]
+> +        # End genetlink-legacy
+> +
+> +  attribute-sets:
+> +    description: Definition of attribute spaces for this family.
+> +    type: array
+> +    items:
+> +      description: Definition of a single attribute space.
+> +      type: object
+> +      required: [ name, attributes ]
+> +      additionalProperties: False
+> +      properties:
+> +        name:
+> +          description: |
+> +            Name used when referring to this space in other definitions, not used outside of the spec.
+> +          type: string
+> +        name-prefix:
+> +          description: |
+> +            Prefix for the C enum name of the attributes. Default family[name]-set[name]-a-
+> +          type: string
+> +        enum-name:
+> +          description: Name for the enum type of the attribute.
+> +          type: string
+> +        doc:
+> +          description: Documentation of the space.
+> +          type: string
+> +        subset-of:
+> +          description: |
+> +            Name of another space which this is a logical part of. Sub-spaces can be used to define
+> +            a limited group of attributes which are used in a nest.
+> +          type: string
+> +        # Start genetlink-c
+> +        attr-cnt-name:
+> +          description: The explicit name for constant holding the count of attributes (last attr + 1).
+> +          type: string
+> +        attr-max-name:
+> +          description: The explicit name for last member of attribute enum.
+> +          type: string
+> +        # End genetlink-c
+> +        attributes:
+> +          description: List of attributes in the space.
+> +          type: array
+> +          items:
+> +            type: object
+> +            required: [ name, type ]
+> +            additionalProperties: False
+> +            properties:
+> +              name:
+> +                type: string
+> +              type: &attr-type
+> +                description: The netlink attribute type
+> +                enum: [ unused, pad, flag, binary, u8, u16, u32, u64, s32, s64,
+> +                        string, nest, array-nest, nest-type-value ]
+> +              doc:
+> +                description: Documentation of the attribute.
+> +                type: string
+> +              value:
+> +                description: Value for the enum item representing this attribute in the uAPI.
+> +                $ref: '#/$defs/uint'
+> +              type-value:
+> +                description: Name of the value extracted from the type of a nest-type-value attribute.
+> +                type: array
+> +                items:
+> +                  type: string
+> +              byte-order:
+> +                enum: [ little-endian, big-endian ]
+> +              multi-attr:
+> +                type: boolean
+> +              nested-attributes:
+> +                description: Name of the space (sub-space) used inside the attribute.
+> +                type: string
+> +              enum:
+> +                description: Name of the enum type used for the attribute.
+> +                type: string
+> +              enum-as-flags:
+> +                description: |
+> +                  Treat the enum as flags. In most cases enum is either used as flags or as values.
+> +                  Sometimes, however, both forms are necessary, in which case header contains the enum
+> +                  form while specific attributes may request to convert the values into a bitfield.
+> +                type: boolean
+> +              checks:
+> +                description: Kernel input validation.
+> +                type: object
+> +                additionalProperties: False
+> +                properties:
+> +                  flags-mask:
+> +                    description: Name of the flags constant on which to base mask (unsigned scalar types only).
+> +                    type: string
+> +                  min:
+> +                    description: Min value for an integer attribute.
+> +                    type: integer
+> +                  min-len:
+> +                    description: Min length for a binary attribute.
+> +                    $ref: '#/$defs/len-or-define'
+> +                  max-len:
+> +                    description: Max length for a string or a binary attribute.
+> +                    $ref: '#/$defs/len-or-define'
+> +              sub-type: *attr-type
+> +              display-hint: *display-hint
+> +              # Start genetlink-c
+> +              name-prefix:
+> +                type: string
+> +              # End genetlink-c
+> +              # Start genetlink-legacy
+> +              struct:
+> +                description: Name of the struct type used for the attribute.
+> +                type: string
+> +              # End genetlink-legacy
+> +
+> +      # Make sure name-prefix does not appear in subsets (subsets inherit naming)
+> +      dependencies:
+> +        name-prefix:
+> +          not:
+> +            required: [ subset-of ]
+> +        subset-of:
+> +          not:
+> +            required: [ name-prefix ]
+> +
+> +  operations:
+> +    description: Operations supported by the protocol.
+> +    type: object
+> +    required: [ list ]
+> +    additionalProperties: False
+> +    properties:
+> +      enum-model:
+> +        description: |
+> +          The model of assigning values to the operations.
+> +          "unified" is the recommended model where all message types belong
+> +          to a single enum.
+> +          "directional" has the messages sent to the kernel and from the kernel
+> +          enumerated separately.
+> +        enum: [ unified, directional ] # Trim
+> +      name-prefix:
+> +        description: |
+> +          Prefix for the C enum name of the command. The name is formed by concatenating
+> +          the prefix with the upper case name of the command, with dashes replaced by underscores.
+> +        type: string
+> +      enum-name:
+> +        description: Name for the enum type with commands.
+> +        type: string
+> +      async-prefix:
+> +        description: Same as name-prefix but used to render notifications and events to separate enum.
+> +        type: string
+> +      async-enum:
+> +        description: Name for the enum type with notifications/events.
+> +        type: string
+> +      # Start genetlink-legacy
+> +      fixed-header: &fixed-header
+> +        description: |
+> +          Name of the structure defining the optional fixed-length protocol
+> +          header. This header is placed in a message after the netlink and
+> +          genetlink headers and before any attributes.
+> +        type: string
+> +      # End genetlink-legacy
+> +      list:
+> +        description: List of commands
+> +        type: array
+> +        items:
+> +          type: object
+> +          additionalProperties: False
+> +          required: [ name, doc ]
+> +          properties:
+> +            name:
+> +              description: Name of the operation, also defining its C enum value in uAPI.
+> +              type: string
+> +            doc:
+> +              description: Documentation for the command.
+> +              type: string
+> +            value:
+> +              description: Value for the enum in the uAPI.
+> +              $ref: '#/$defs/uint'
+> +            attribute-set:
+> +              description: |
+> +                Attribute space from which attributes directly in the requests and replies
+> +                to this command are defined.
+> +              type: string
+> +            flags: &cmd_flags
+> +              description: Command flags.
+> +              type: array
+> +              items:
+> +                enum: [ admin-perm ]
+> +            dont-validate:
+> +              description: Kernel attribute validation flags.
+> +              type: array
+> +              items:
+> +                enum: [ strict, dump ]
+> +            # Start genetlink-legacy
+> +            fixed-header: *fixed-header
+> +            # End genetlink-legacy
+> +            do: &subop-type
+> +              description: Main command handler.
+> +              type: object
+> +              additionalProperties: False
+> +              properties:
+> +                request: &subop-attr-list
+> +                  description: Definition of the request message for a given command.
+> +                  type: object
+> +                  additionalProperties: False
+> +                  properties:
+> +                    attributes:
+> +                      description: |
+> +                        Names of attributes from the attribute-set (not full attribute
+> +                        definitions, just names).
+> +                      type: array
+> +                      items:
+> +                        type: string
+> +                    # Start genetlink-legacy
+> +                    value:
+> +                      description: |
+> +                        ID of this message if value for request and response differ,
+> +                        i.e. requests and responses have different message enums.
+> +                      $ref: '#/$defs/uint'
+> +                    # End genetlink-legacy
+> +                reply: *subop-attr-list
+> +                pre:
+> +                  description: Hook for a function to run before the main callback (pre_doit or start).
+> +                  type: string
+> +                post:
+> +                  description: Hook for a function to run after the main callback (post_doit or done).
+> +                  type: string
+> +            dump: *subop-type
+> +            notify:
+> +              description: Name of the command sharing the reply type with this notification.
+> +              type: string
+> +            event:
+> +              type: object
+> +              additionalProperties: False
+> +              properties:
+> +                attributes:
+> +                  description: Explicit list of the attributes for the notification.
+> +                  type: array
+> +                  items:
+> +                    type: string
+> +            mcgrp:
+> +              description: Name of the multicast group generating given notification.
+> +              type: string
+> +  mcast-groups:
+> +    description: List of multicast groups.
+> +    type: object
+> +    required: [ list ]
+> +    additionalProperties: False
+> +    properties:
+> +      list:
+> +        description: List of groups.
+> +        type: array
+> +        items:
+> +          type: object
+> +          required: [ name ]
+> +          additionalProperties: False
+> +          properties:
+> +            name:
+> +              description: |
+> +                The name for the group, used to form the define and the value of the define.
+> +              type: string
+> +            # Start genetlink-c
+> +            c-define-name:
+> +              description: Override for the name of the define in C uAPI.
+> +              type: string
+> +            # End genetlink-c
+> +            flags: *cmd_flags
+> +            # Start netlink-raw
+> +            value:
+> +              description: Value of the netlink multicast group in the uAPI.
+> +              type: integer
+> +            # End netlink-raw
 
