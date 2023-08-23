@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-29958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C52F8785576
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:35:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A546E785577
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CAB2280D4A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:35:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6009C281314
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425ACBA58;
-	Wed, 23 Aug 2023 10:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224FCBE52;
+	Wed, 23 Aug 2023 10:33:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360A7BE52
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F32BE50
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:33:14 +0000 (UTC)
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99797E51;
-	Wed, 23 Aug 2023 03:33:10 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA94E52;
+	Wed, 23 Aug 2023 03:33:12 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qYlA7-006vHq-8B; Wed, 23 Aug 2023 18:32:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Aug 2023 18:32:32 +0800
+	id 1qYlA9-006vIz-Am; Wed, 23 Aug 2023 18:32:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Aug 2023 18:32:34 +0800
 From: "Herbert Xu" <herbert@gondor.apana.org.au>
-Date: Wed, 23 Aug 2023 18:32:32 +0800
-Subject: [PATCH 9/12] evm: Do not include crypto/algapi.h
+Date: Wed, 23 Aug 2023 18:32:34 +0800
+Subject: [PATCH 10/12] KEYS: encrypted: Do not include crypto/algapi.h
 References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>, Theodore Y.Ts'o <tytso@mit.edu>,
@@ -51,7 +51,7 @@ To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	linux-inte@web.codeaurora.org, grity@vger.kernel.org,
 	Jason A.Donenfeld <Jason@zx2c4.com>,
 	Ayush Sawal <ayush.sawal@chelsio.com>
-Message-Id: <E1qYlA7-006vHq-8B@formenos.hmeau.com>
+Message-Id: <E1qYlA9-006vIz-Am@formenos.hmeau.com>
 X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
 	PDS_RDNS_DYNAMIC_FP,RCVD_IN_DNSWL_BLOCKED,RDNS_DYNAMIC,SPF_HELO_NONE,
 	SPF_PASS,TVD_RCVD_IP autolearn=no autolearn_force=no version=3.4.6
@@ -70,28 +70,23 @@ header file crypto/utils.h instead.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- security/integrity/evm/evm_main.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ security/keys/encrypted-keys/encrypted.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
-index c9b6e2a43478..e635a8d18dae 100644
---- a/security/integrity/evm/evm_main.c
-+++ b/security/integrity/evm/evm_main.c
-@@ -14,7 +14,6 @@
- #define pr_fmt(fmt) "EVM: "fmt
- 
- #include <linux/init.h>
--#include <linux/crypto.h>
- #include <linux/audit.h>
- #include <linux/xattr.h>
- #include <linux/integrity.h>
-@@ -24,7 +23,7 @@
- 
- #include <crypto/hash.h>
- #include <crypto/hash_info.h>
+diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/encrypted-keys/encrypted.c
+index 1e313982af02..8af2136069d2 100644
+--- a/security/keys/encrypted-keys/encrypted.c
++++ b/security/keys/encrypted-keys/encrypted.c
+@@ -27,10 +27,10 @@
+ #include <linux/scatterlist.h>
+ #include <linux/ctype.h>
+ #include <crypto/aes.h>
 -#include <crypto/algapi.h>
+ #include <crypto/hash.h>
+ #include <crypto/sha2.h>
+ #include <crypto/skcipher.h>
 +#include <crypto/utils.h>
- #include "evm.h"
  
- int evm_initialized;
+ #include "encrypted.h"
+ #include "ecryptfs_format.h"
 
