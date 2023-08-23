@@ -1,154 +1,136 @@
-Return-Path: <netdev+bounces-29918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E49785339
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2759C7853EB
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:29:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D7841C20C83
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:56:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109FF1C20C91
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0528A938;
-	Wed, 23 Aug 2023 08:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D71A946;
+	Wed, 23 Aug 2023 09:29:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB50883A
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:56:42 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3EA2D43
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 01:56:36 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99c1f6f3884so696906666b.0
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 01:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692780995; x=1693385795;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AslGWfxwSGfY+Fl1ndpwxP+06+6bcSEvPOtXVEc7gDY=;
-        b=u0n54oQdFCRPlkryq7VzijjKhNcr54ieL7TViEd253esKAVYGLuWqjiU7wgRpXRIB4
-         BRhp8uAqNCMpqj5s5/+JWzfvz28GNcgHxNqwgdOsti5LuVMd7AW+rEB/fVfmlt8unDhz
-         sp2XkkBfaGUVC0af+9FGrr7bDbPV1EHh/U5qBDc8X0uWDl4upLVj6vcu3wTdHQn4xclm
-         e7MY0lYcKmMuoQNLtSwVjM3mnrnH815gqqJxCp2LDJsrq1FFj7RHmbdomzy2oM1YJuGT
-         6KX9OJAUE7hyddEFNmTgRS1m0oNwEHrbAcBQ287osSs/tkBcZTsEnT/JGq4RzOG4SfrQ
-         hx7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692780995; x=1693385795;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AslGWfxwSGfY+Fl1ndpwxP+06+6bcSEvPOtXVEc7gDY=;
-        b=hGynF9wFAyEoJ+CVYTQpMYB4VVrbV1ywapiWdDPEHQN123R0fgZr8eZo0HcKBw9LJZ
-         ws+gE6YJgpa613HtAsh2coiodQViLWdPxAn9N1bj/6BUDNedIKKHfSs8CUQXRKnA/ctF
-         ou4vcyPSQq+78/DH3MonIS4QRanlgJ3R1IpHxLmULy3NLCI012TI0Nxj+Nf9efHuP8tb
-         3t/za+C/DQFHB/4FmQ3MjDnQCUDIZ2q3Uq82qw6glGj3TJVNyfyXQVf+/YxOnYxBAnyO
-         2ts9bbfYEsynHBxivzRlwHd2rbilDwXkhDSYVJyEf4LgGCQFZTBQQ7B84sHeY94eviVG
-         f8Zw==
-X-Gm-Message-State: AOJu0YzhRZqX29dvqv9bAQ8zyrk2gcjVWcpNgG37hxcEIFrviRkYtz9a
-	qVuIfbsJktbpuBLUz+/kiI1PtA==
-X-Google-Smtp-Source: AGHT+IEHrFB+dDhCvQbbY4eTMmnC4imbCLJk4+OAcyB7Z4Z/qdStoEn0i8bid6tQ4NrAuMRxtpYB9g==
-X-Received: by 2002:a17:906:8466:b0:9a1:f026:b4f1 with SMTP id hx6-20020a170906846600b009a1f026b4f1mr192364ejc.30.1692780995169;
-        Wed, 23 Aug 2023 01:56:35 -0700 (PDT)
-Received: from krzk-bin.. ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id bs9-20020a170906d1c900b0099bcd1fa5b0sm9492255ejb.192.2023.08.23.01.56.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 01:56:34 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next] net: dsa: use capital "OR" for multiple licenses in SPDX
-Date: Wed, 23 Aug 2023 10:56:32 +0200
-Message-Id: <20230823085632.116725-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64320947B
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 09:29:12 +0000 (UTC)
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF8FB4C10;
+	Wed, 23 Aug 2023 02:28:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1692782935;
+	bh=+EpxE9f72o1TR6FpVddFLvSnxpHvOjNBp+8sV5oCN6o=;
+	h=From:Date:Subject:To:Cc:From;
+	b=NuD7fV65b9ikivJJnA4/FIwyOaJfm62E7ofQxsw4xK4iZElWFXh8ozOrcoxBqWwtx
+	 NAryLJu+dMPAdx63mPw0qBKglJM9g59+ONO7wkMqvXFIzqddq1F5vapGZcCXIkUaTo
+	 yHTdkc9lm+c7su+COK+VQIscET5M1p2P608tv7AY=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Wed, 23 Aug 2023 11:28:38 +0200
+Subject: [PATCH net-next v2] net: generalize calculation of skb extensions
+ length
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-Id: <20230823-skb_ext-simplify-v2-1-66e26cd66860@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAEXR5WQC/3WNwQ6CMBBEf4Xs2TWlBRVP/ochBuhiN0ohXUQI4
+ d9tuHucvJk3KwgFJoFrskKgiYV7H4M+JNC4yj8J2cYMWmmjLlqjvOoHzSMKd8Ob2wWNLUxDdZG
+ 3Jw1xNgRqed6Vd/A0oo91KCNxLGMflv1rSnf+XzulmGJhrcrOJlNVnd++xCLSuI87Ri2U27b9A
+ Ln0SO2/AAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Robert Marko <robimarko@gmail.com>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1692782934; l=2136;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=+EpxE9f72o1TR6FpVddFLvSnxpHvOjNBp+8sV5oCN6o=;
+ b=VUpYiDsMZc0Xwf0zpF1EGQfMWn/RD85WHBJH7J0AenY+sRUCY/XQBt5VCDgxjW/44pjXoC1Gq
+ DKgsTmM0PNRBdxFNEkJxjAMsWB3hP6IwOkK17yueGBRgqHv32BA/sl7
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Documentation/process/license-rules.rst and checkpatch expect the SPDX
-identifier syntax for multiple licenses to use capital "OR".  Correct it
-to keep consistent format and avoid copy-paste issues.
+Remove the necessity to modify skb_ext_total_length() when new extension
+types are added.
+Also reduces the line count a bit.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+With optimizations enabled the function is folded down to the same
+constant value as before during compilation.
+This has been validated on x86 with GCC 6.5.0 and 13.2.1.
+Also a similar construct has been validated on godbolt.org with GCC 5.1.
+In any case the compiler has to be able to evaluate the construct at
+compile-time for the BUILD_BUG_ON() in skb_extensions_init().
+
+Even if not evaluated at compile-time this function would only ever
+be executed once at run-time, so the overhead would be very minuscule.
+
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
- drivers/net/dsa/b53/b53_serdes.c                   | 2 +-
- drivers/net/dsa/b53/b53_serdes.h                   | 2 +-
- drivers/net/dsa/hirschmann/hellcreek.c             | 2 +-
- drivers/net/dsa/hirschmann/hellcreek.h             | 2 +-
- include/linux/platform_data/hirschmann-hellcreek.h | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+Changes in v2:
+- Add more proof for identical behavior to the commit log
+- Link to v1: https://lore.kernel.org/r/20230822-skb_ext-simplify-v1-1-9dd047340ab5@weissschuh.net
+---
+ net/core/skbuff.c | 24 +++++++-----------------
+ 1 file changed, 7 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/dsa/b53/b53_serdes.c b/drivers/net/dsa/b53/b53_serdes.c
-index b0ccebcd3ffa..3f8a491ce885 100644
---- a/drivers/net/dsa/b53/b53_serdes.c
-+++ b/drivers/net/dsa/b53/b53_serdes.c
-@@ -1,4 +1,4 @@
--// SPDX-License-Identifier: GPL-2.0 or BSD-3-Clause
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /*
-  * Northstar Plus switch SerDes/SGMII PHY main logic
-  *
-diff --git a/drivers/net/dsa/b53/b53_serdes.h b/drivers/net/dsa/b53/b53_serdes.h
-index ef81f5da5f81..3d367c4df4d9 100644
---- a/drivers/net/dsa/b53/b53_serdes.h
-+++ b/drivers/net/dsa/b53/b53_serdes.h
-@@ -1,4 +1,4 @@
--/* SPDX-License-Identifier: GPL-2.0 or BSD-3-Clause */
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
-  * Northstar Plus switch SerDes/SGMII PHY definitions
-  *
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-index 720f4e4ed0b0..11ef1d7ea229 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek.c
-@@ -1,4 +1,4 @@
--// SPDX-License-Identifier: (GPL-2.0 or MIT)
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
- /*
-  * DSA driver for:
-  * Hirschmann Hellcreek TSN switch.
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.h b/drivers/net/dsa/hirschmann/hellcreek.h
-index 4a678f7d61ae..6874cb9dc361 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.h
-+++ b/drivers/net/dsa/hirschmann/hellcreek.h
-@@ -1,4 +1,4 @@
--/* SPDX-License-Identifier: (GPL-2.0 or MIT) */
-+/* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
- /*
-  * DSA driver for:
-  * Hirschmann Hellcreek TSN switch.
-diff --git a/include/linux/platform_data/hirschmann-hellcreek.h b/include/linux/platform_data/hirschmann-hellcreek.h
-index 6a000df5541f..8748680e9e3c 100644
---- a/include/linux/platform_data/hirschmann-hellcreek.h
-+++ b/include/linux/platform_data/hirschmann-hellcreek.h
-@@ -1,4 +1,4 @@
--/* SPDX-License-Identifier: (GPL-2.0 or MIT) */
-+/* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
- /*
-  * Hirschmann Hellcreek TSN switch platform data.
-  *
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index faa6c86da2a5..45707059082f 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4785,23 +4785,13 @@ static const u8 skb_ext_type_len[] = {
+ 
+ static __always_inline unsigned int skb_ext_total_length(void)
+ {
+-	return SKB_EXT_CHUNKSIZEOF(struct skb_ext) +
+-#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+-		skb_ext_type_len[SKB_EXT_BRIDGE_NF] +
+-#endif
+-#ifdef CONFIG_XFRM
+-		skb_ext_type_len[SKB_EXT_SEC_PATH] +
+-#endif
+-#if IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
+-		skb_ext_type_len[TC_SKB_EXT] +
+-#endif
+-#if IS_ENABLED(CONFIG_MPTCP)
+-		skb_ext_type_len[SKB_EXT_MPTCP] +
+-#endif
+-#if IS_ENABLED(CONFIG_MCTP_FLOWS)
+-		skb_ext_type_len[SKB_EXT_MCTP] +
+-#endif
+-		0;
++	unsigned int l = SKB_EXT_CHUNKSIZEOF(struct skb_ext);
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(skb_ext_type_len); i++)
++		l += skb_ext_type_len[i];
++
++	return l;
+ }
+ 
+ static void skb_extensions_init(void)
+
+---
+base-commit: 90308679c297ffcbb317c715ef434e9fb3c881dc
+change-id: 20230822-skb_ext-simplify-3d93ceb95f62
+
+Best regards,
 -- 
-2.34.1
+Thomas Weißschuh <linux@weissschuh.net>
 
 
