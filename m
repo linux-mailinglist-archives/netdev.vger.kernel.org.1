@@ -1,81 +1,127 @@
-Return-Path: <netdev+bounces-29912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C407852DE
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:40:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 217707852EE
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DDE281288
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:40:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C101C20C6C
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851549461;
-	Wed, 23 Aug 2023 08:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED0E947F;
+	Wed, 23 Aug 2023 08:45:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0453679D8
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 738E0C433C8;
-	Wed, 23 Aug 2023 08:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692780023;
-	bh=71Ib7dKBnuBJNw6OcCJVQxErbOXXcRFXV7RHAmc/jJ4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hR5+jUcMPSUsH3evefI6CZdrc5ZpGRBJawUwJuYy2cn2Rhs3Nwi8HYyn8W/6GMt9Q
-	 IdXlx4yUX63la8pRKa6uxk5V7igJknyjvwnyhMUy7YJVjHmP3Hgg4jFoDenbEJ2mHE
-	 C5dldVtPhYxkDag/vhas3sjglj1/YRPJRIQQh6R/G8xc6El4vL67nRHCSyRrViVd2T
-	 UE0skGqCEVAewKZeIds1aU6VwcO3ZkaUVPEBhU8PeQUwboru/nauwdDfm3uphpPWj1
-	 Cewh0wAyCqDy46Icv8/BDx21nJ0g4FuGPxUGVdkoXx3AnOBE2WoqRCnPZqRsmb/6OA
-	 0pb7rJ5wEnO5g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4DEF9E4EAF6;
-	Wed, 23 Aug 2023 08:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07333A921;
+	Wed, 23 Aug 2023 08:45:25 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D583426B3;
+	Wed, 23 Aug 2023 01:45:21 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37N8Scd7016231;
+	Wed, 23 Aug 2023 08:44:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : reply-to : references : mime-version : content-type
+ : in-reply-to; s=pp1; bh=bFCgQ1VwQb87NWxyMzGPyCOeeMqKIRNu44QdUDKyZTk=;
+ b=QVqJQnG4yu7qDX29+N189wKIoTyYbLdJp82BvjUIgampmip/MgrA5wn1sQpK6vf68Mq2
+ dzif6HtuYw3CwsB4u6IVZuLjv5XFa3WJNI61TVh7LdYeCOE4a6NEGqbxJGCTelOv+Z1g
+ 5lzQgJTxUUS55Mu5VEybm7+z9Ly1Gjkqqz53gI4ijhqAUyUswIDdbNJKKmv0q0b+qhnB
+ RUiSZNNy6wlH/248yckDfB5y5rbAe7YDAFiw9ZSGSM9XBtLqa6djXkheM0tUUUgZiisB
+ WdWiJHEY6E60Hi+1qe7P3FhyJUhibbuLeUyeoR+NKGgJY5CPfmf8H7no+RKmzAxRdTyQ ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3snemhrfwv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 08:44:57 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37N8ShwU016407;
+	Wed, 23 Aug 2023 08:44:56 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3snemhrfwe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 08:44:56 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37N7GMlO018281;
+	Wed, 23 Aug 2023 08:44:55 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn21scwyg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 08:44:55 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37N8iqx920972158
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Aug 2023 08:44:52 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 62EBA20040;
+	Wed, 23 Aug 2023 08:44:52 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0A58A20043;
+	Wed, 23 Aug 2023 08:44:49 +0000 (GMT)
+Received: from linux.vnet.ibm.com (unknown [9.126.150.29])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 23 Aug 2023 08:44:48 +0000 (GMT)
+Date: Wed, 23 Aug 2023 14:14:48 +0530
+From: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+To: Vishal Chourasia <vishalc@linux.ibm.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+        daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com,
+        hawk@kernel.org, john.fastabend@gmail.com, jolsa@kernel.org,
+        kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+        martin.lau@linux.dev, netdev@vger.kernel.org, sachinp@linux.ibm.com,
+        sdf@google.com, song@kernel.org, yhs@fb.com
+Subject: Re: [PATCH] Fix invalid escape sequence warnings
+Message-ID: <20230823084448.GB1766638@linux.vnet.ibm.com>
+Reply-To: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+References: <20230811084739.GY3902@linux.vnet.ibm.com>
+ <20230816122133.1231599-1-vishalc@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dp83640: Use list_for_each_entry() helper
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169278002331.8188.8920718192775693100.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Aug 2023 08:40:23 +0000
-References: <20230821133528.3131786-1-ruanjinjie@huawei.com>
-In-Reply-To: <20230821133528.3131786-1-ruanjinjie@huawei.com>
-To: Ruan Jinjie <ruanjinjie@huawei.com>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20230816122133.1231599-1-vishalc@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: sO97qhLZFWISY1LXlLzevBgAPlc2lsBy
+X-Proofpoint-ORIG-GUID: 2CXY-svMiUuv1PZV5YJdNZp7XcNrumXe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-23_06,2023-08-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ impostorscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=638
+ priorityscore=1501 phishscore=0 clxscore=1015 adultscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308230077
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+* Vishal Chourasia <vishalc@linux.ibm.com> [2023-08-16 17:51:33]:
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 21 Aug 2023 21:35:28 +0800 you wrote:
-> Convert list_for_each() to list_for_each_entry() where applicable.
+> The Python script `bpf_doc.py` uses regular expressions with
+> backslashes in string literals, which results in SyntaxWarnings
+> during its execution.
 > 
-> No functional changed.
+> This patch addresses these warnings by converting relevant string
+> literals to raw strings, which interpret backslashes as literal
+> characters. This ensures that the regular expressions are parsed
+> correctly without causing any warnings.
 > 
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> ---
->  drivers/net/phy/dp83640.c | 15 ++++-----------
->  1 file changed, 4 insertions(+), 11 deletions(-)
+> Signed-off-by: Vishal Chourasia <vishalc@linux.ibm.com>
+> Reported-by: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
 
-Here is the summary with links:
-  - [net-next] dp83640: Use list_for_each_entry() helper
-    https://git.kernel.org/netdev/net-next/c/45f9cb6bd971
+Thanks, Works for me
+Tested-by: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks and Regards
+Srikar Dronamraju
 
