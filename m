@@ -1,55 +1,62 @@
-Return-Path: <netdev+bounces-29836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CDD784DF9
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 02:52:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FACE784E41
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 03:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21ECE281229
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 00:52:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B5A128121A
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 01:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F3410E3;
-	Wed, 23 Aug 2023 00:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29CC1380;
+	Wed, 23 Aug 2023 01:35:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67767E2
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:52:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E200C433C7;
-	Wed, 23 Aug 2023 00:52:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692751928;
-	bh=sPhejjQmGXXwZiarxNfyZoYdQozrlcRiKpo4M072i+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KgehLU77Wh2vDEKtbi4o8STryposvdc2lI9adccbIcKAg3SR40I2oAv866xgGGo4h
-	 SID8P/VAH3lGyIn8GEqChtGCycdpE7SBxiDHnIGDiu3kTLUCvklCsvhZtN4wM0nwc7
-	 6/E8/HI5DzUOWtOpPDTfXIGstTLfGusmK4u9TRa4mYnbKmaQfAfggBWtnnTwvfwO5/
-	 Xtu4/nlEIqE1gHexUeMEHsPYHecpBmG7CAH464IC1klszT+m16K3D239pNq6mMpTlr
-	 DyjUFlJGIlqpX3mByW1gIX9g4gIbAOxdMx8YzQJv1hWozzJkIQW3lTKQMovselvWE9
-	 o7zxlQ8jMErPg==
-Date: Tue, 22 Aug 2023 17:52:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Amritha Nambiar <amritha.nambiar@intel.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, sridhar.samudrala@intel.com
-Subject: Re: [net-next PATCH v2 7/9] net: Add NAPI IRQ support
-Message-ID: <20230822175207.17233a9e@kernel.org>
-In-Reply-To: <169266034688.10199.12117427969821291880.stgit@anambiarhost.jf.intel.com>
-References: <169266003844.10199.10450480941022607696.stgit@anambiarhost.jf.intel.com>
-	<169266034688.10199.12117427969821291880.stgit@anambiarhost.jf.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B9610E9
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 01:35:04 +0000 (UTC)
+X-Greylist: delayed 900 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Aug 2023 18:35:02 PDT
+Received: from delibird0001-40.locaweb.com.br (delibird0001-40.locaweb.com.br [201.76.49.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 96BFDE45
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 18:35:02 -0700 (PDT)
+Received: from mcbain0014.email.locaweb.com.br (189.126.112.17) by delibird0001-1.locaweb.com.br id hslgt22n8lgf for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 22:18:02 -0300 (envelope-from <site@oadbrasil.com.br>)
+Received: from proxy.email-ssl.com.br (unknown [10.31.120.101])
+	by mcbain0014.email.locaweb.com.br (Postfix) with ESMTP id EA0B4380263
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 22:19:54 -0300 (-03)
+x-locaweb-id: Ycbiv807bVrCkjoYxG4I6hWE97_lWjGauAzike8RnzK6Nq_yguMcwfVt06bA7PCxJM3f9QqZWkfcpCwynBn2_eMfpLQaEkqese6P8neuGiL8RXTqynwiOFLiEg_j58dXrvt9w5weXn4lO6cVgqkH4xTN8jCIjr5w7d5O37kJUmDyUpcZoGI40_PTh8eub1HduVpcaCrlI_n6s6IpGwmP2A== NzM2OTc0NjU0MDZmNjE2NDYyNzI2MTczNjk2YzJlNjM2ZjZkMmU2Mjcy
+X-LocaWeb-COR: locaweb_2009_x-mail
+X-AuthUser: site@oadbrasil.com.br
+Received: from oadbrasil.com.br (hm9147.locaweb.com.br [191.252.51.4])
+	(Authenticated sender: site@oadbrasil.com.br)
+	by proxy.email-ssl.com.br (Postfix) with ESMTPSA id B3BDDA01B0
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 22:19:57 -0300 (-03)
+Date: Wed, 23 Aug 2023 01:19:57 +0000
+To: netdev@vger.kernel.org
+From: "Dear:Professional international shipping services from/to China to help you develop your foreign trade!Contact:zoe@moririn-cargo.com, QQ:2265387244, MOB/WECHAT:18930557260" <site@oadbrasil.com.br>
+Reply-To: "MOB/WECHAT:18930557260" <RACE@itau.com.br>
+Subject: [Post compartilhado] Festa de Santa Rita, Ramos/Rio de Janeiro (RJ)
+Message-ID: <29ddfeb05329cd89bdad3fb9b8d30892@oadbrasil.com.br>
+X-Mailer: PHPMailer 5.2.22 (https://github.com/PHPMailer/PHPMailer)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_50,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 21 Aug 2023 16:25:46 -0700 Amritha Nambiar wrote:
-> +	if (napi->irq >= 0 && (nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq)))
+Dear:Professional international shipping services from/to China to help you develop your foreign trade!Contact:zoe@moririn-cargo.com, QQ:2265387244, MOB/WECHAT:18930557260 (RACE@itau.com.br) acha que você pode se interessar pelo seguinte post:
 
-Unnecessary brackets around nla_put
+Festa de Santa Rita, Ramos/Rio de Janeiro (RJ)
+http://oadbrasil.com.br/festa-de-santa-rita-ramosrio-de-janeiro-rj/
+
 
