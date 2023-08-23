@@ -1,76 +1,55 @@
-Return-Path: <netdev+bounces-30071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C78E785E4B
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:10:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A78F2785E90
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AAFA28126E
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6178D28124E
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE591F168;
-	Wed, 23 Aug 2023 17:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7AE41F17F;
+	Wed, 23 Aug 2023 17:30:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEB2C139
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 17:10:25 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4ED2E79;
-	Wed, 23 Aug 2023 10:10:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692810621; x=1724346621;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xrRC0v01qmst+o9CFPIeg2m8CpONvn/tnWf4Ftn+KSE=;
-  b=K61eDsNPl5P0pMhnDdUk/6lZkgHwxK6W06d6iz0Y9UhYfUUJq4UPp+RV
-   lLFKYndBnyTlrTae7DutOHEoG09dBK44dnvizUndqhJCfk00UrE+9fqwi
-   IRl339RGMc0b3s1tmThPQmZ936OEm2w6UMQtpHT7x1dpV0gVfXUmqWWA4
-   Kn99l95gFuw/zS1wpC355tUwjSbNTsixFRodP4s9SxHg+T01CpwNX0TOM
-   u9Ye7KZ177Sp/0IT8QM8+RclH2jlp1HSahipwB9aYyEjnk2T6BxcmBrXs
-   XUTvygGYogMXqD3XghGADV360lOrTsWe9W8C+FFBRs9pJ2oNeV+367791
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="376945463"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="376945463"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 10:10:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="806782503"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="806782503"
-Received: from pglc00067.png.intel.com ([10.221.207.87])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Aug 2023 10:10:15 -0700
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: fancer.lancer@gmail.com
-Cc: alexandre.torgue@foss.st.com,
-	conor+dt@kernel.org,
-	conor.dooley@microchip.com,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	edumazet@google.com,
-	joabreu@synopsys.com,
-	krzysztof.kozlowski+dt@linaro.org,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	peppe.cavallaro@st.com,
-	robh+dt@kernel.org,
-	rohan.g.thomas@intel.com
-Subject: Re: [PATCH net-next v5 1/2] dt-bindings: net: snps,dwmac: Tx queues with coe
-Date: Thu, 24 Aug 2023 01:10:04 +0800
-Message-Id: <20230823171004.6825-1-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <l7yajzhpuotn62pjkxk43qtcn3u4zltpyqcvo224737bjg3eab@bzu6pirxbvh2>
-References: <l7yajzhpuotn62pjkxk43qtcn3u4zltpyqcvo224737bjg3eab@bzu6pirxbvh2>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFDA1ED56
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 17:30:54 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3613E79
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:30:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692811852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+aElGprIV/yQ1y55QHlBORqdYhFmE9HNGN2qq4wZWTE=;
+	b=W/MFJQFbBN31T4j0GZWgovHBi82omMv1rBRgs8VoOJxls3MxWzYqs6UZAVcUU8VtDB6Ut5
+	bnJJgE9FvQpKU/eaAdLsT2KyJiPgOs7R6hzp4Bn1HdlZYAS7MRpqYCxGk6X9R+47TjxdBa
+	kNgp8qcZBYIGHjvwRjuHo4DxS7KJnRM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-144-UkpPuqXIMh-TEcY4_BXCRg-1; Wed, 23 Aug 2023 13:30:49 -0400
+X-MC-Unique: UkpPuqXIMh-TEcY4_BXCRg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C270F856F67;
+	Wed, 23 Aug 2023 17:30:48 +0000 (UTC)
+Received: from renaissance-vector.redhat.com (unknown [10.39.194.152])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BC3C2492C13;
+	Wed, 23 Aug 2023 17:30:47 +0000 (UTC)
+From: Andrea Claudi <aclaudi@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>
+Subject: [PATCH iproute2-next 0/4] make ip vrf exec SELinux-aware
+Date: Wed, 23 Aug 2023 19:29:58 +0200
+Message-ID: <cover.1692804730.git.aclaudi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,70 +57,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->On Tue, Aug 22, 2023 at 05:15:25PM -0700, Jakub Kicinski wrote:
->> On Sat, 19 Aug 2023 10:31:31 +0800 Rohan G Thomas wrote:
->> > +      snps,tx-queues-with-coe:
->> > +        $ref: /schemas/types.yaml#/definitions/uint32
->> > +        description: number of TX queues that support TX checksum offloading
->> 
->
->> Is it going to be obvious that if not present all queues support
->> checksum offload? I think we should document the default.
->
->This question is debatable:
->1. By default the DW xGMAC and DW QoS Eth IP-cores are
->synthesized with only the very first Tx queue having Tx COE enabled.
->2. If TSO is disabled then the Tx COE can be individually enabled
->for each queue available on DW QoS Eth controller and for the very
->first N queues on DW xGMAC controller.
->3. If TSO is enabled then the Tx COE will be automatically and always
->enabled for as many first queues as there are TSO-capable
->DMA-channels.
->4. At the current state the STMMAC driver assumes that all Tx Queues
->support Tx COE.
->
->The entry 4 can't be changed since we'll risk to catch regressions on
->the platforms with no property specified. On the other hand it partly
->contradicts to the rest of the entries. I don't know what would be a
->correct way to specify the default value in this case. Most likely
->just keep the entry 4 and be done with it.
->
->BTW I just noticed that but the suggested "snps,tx-queues-with-coe"
->property semantic will only cover a DW XGMAC-part of the case 2. DW
->QoS Eth can be synthesized with Tx COE individually enabled for a
->particular queue if TSO is unavailable.
+In order to execute a service with VRF, a user should start it using
+"ip vrf exec". For example, using systemd, the user can encapsulate the
+ExecStart command in ip vrf exec as shown below:
 
-Hi Serge,
+ExecStart=/usr/sbin/ip vrf exec vrf1 /usr/sbin/httpd $OPTIONS -DFOREGROUND 
 
-Didn't know about a different IP configuration supported by DW QoS Eth IP. If
-this is the case, I think we can have a flag 'coe-unsupported' for any TX
-queue subnode as below.
+Assuming SELinux is in permissive mode, starting the service with the
+current ip vrf implementation results in:
 
-+          snps,coe-unsupported:
-+            $ref: /schemas/types.yaml#/definitions/flag
-+            description:
-+              TX checksum offload is unsupported by the TX queue. If TX checksum
-+              offload is requested for a packet to be transmitted through this
-+              TX queue then have a software fallback in the driver for checksum
-+              calculation.
+# systemctl start httpd
+# ps -eafZ | grep httpd
+system_u:system_r:ifconfig_t:s0 root      597448       1  1 19:22 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+system_u:system_r:ifconfig_t:s0 apache    597452  597448  0 19:22 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+[snip]
 
-If this is okay, I can rework the patch based on this. Covers both DW QoS Eth IP
-and DW XGMAC IP cases.
+This is incorrect, as the context for httpd should be httpd_t, not
+ifconfig_t.
 
->
->-Serge(y)
->
->> -- 
->> pw-bot: cr
+This happens because ipvrf_exec invokes cmd_exec without setting the
+correct SELinux context before. Without the correct setting, the process
+is executed using ip's SELinux context.
 
-BR,
-Rohan
+This patch series makes "ip vrf exec" SELinux-aware using the
+setexecfilecon functions, which retrieves the correct context to be used
+on the next execvp() call.
+
+After this series:
+# systemctl start httpd
+# ps -eafZ | grep httpd
+system_u:system_r:httpd_t:s0    root      595805       1  0 19:01 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+system_u:system_r:httpd_t:s0    apache    595809  595805  0 19:01 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+
+
+Patch series description:
+- 1/4 and 2/4 are preliminary changes to make SELinux helper functions
+  used in ss conformant to the SELinux API definitions;
+- 3/4 makes SELinux helper functions into a library, so they can be used
+  in other iproute tools - such as ip - when iproute is compiled without
+  SELinux support; 
+- 4/4, finally, add setexecfilecon to the SELinux stubs, and uses it to
+  actually set the correct file context for the command to be executed.
+
+Andrea Claudi (4):
+  ss: make is_selinux_enabled stub work like in SELinux
+  ss: make SELinux stub functions conformant to API definitions
+  lib: add SELinux include and stub functions
+  ip vrf: make ipvrf_exec SELinux-aware
+
+ include/selinux.h | 10 ++++++++++
+ ip/ipvrf.c        |  6 ++++++
+ lib/Makefile      |  4 ++++
+ lib/selinux.c     | 37 +++++++++++++++++++++++++++++++++++++
+ misc/ss.c         | 36 ++----------------------------------
+ 5 files changed, 59 insertions(+), 34 deletions(-)
+ create mode 100644 include/selinux.h
+ create mode 100644 lib/selinux.c
+
+-- 
+2.41.0
+
 
