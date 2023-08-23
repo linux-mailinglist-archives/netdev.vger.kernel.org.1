@@ -1,106 +1,105 @@
-Return-Path: <netdev+bounces-30125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E1F78610C
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:54:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4E83786117
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B15341C20D0A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:54:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BAF1C20D37
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23641FB4E;
-	Wed, 23 Aug 2023 19:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14AD1FB4F;
+	Wed, 23 Aug 2023 19:56:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3B01F93E
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7EF1F93E
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:56:04 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE17910C2
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 12:54:38 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 357071700
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 12:55:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692820478; x=1724356478;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=g4tVhfNPEjKJ5bgheMdyGSCJFJ+FoaT+Ux+CL7EYKyY=;
-  b=W5clLrcnr0U4vM9RxhXvRr6fDURaurDTMSuJOrC85bFs/yV9/nAZubmY
-   KUSajv+XID5mEr1+0qMGWYrWkfUEC01o2fsOGjgj/qsneWA7EYuwd4Ffd
-   uTAvDCrBmn8NWDQgnF6wk7nky9Ldg83rtYDXM53/9hYkhBKm4nAy2TeGa
-   BKRz0C7WwaWF/32uUSTW+/XmmtCg2j96IBzkr5bLmCv2EexRuSz/FsCnM
-   BU2PsK81Fw/HKQZRIEZ2DTk5HQGy4LNa5Ot2ZI2dx3VVs0eV/cvFM66LL
-   kgMEsS470HMMDLClAa8jbJDULBu/keHkObPhdyr+krmzOWCJBC+7gMi1I
+  t=1692820544; x=1724356544;
+  h=message-id:date:subject:to:references:from:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=8WItWY2KYnoxNa2atXubzIjLXAXfZgZmnAj0qPGf6ww=;
+  b=O1dV24xqOG+5L2seBlyDz6tb67+eLgKgu9HijMdJQWIRqPJ/2NJ5Sxpa
+   reS8z4+NM2jYHOWm1pzWxXHGTSC6cpjhA3I0bQTfWe5pl6XEsRWxWw9Yq
+   K9ZevkBdjk4EB4UDtU0ubDZy8W64Gh+WtCdLuiZLgbwIaClHEYlCO4rEq
+   kg5pZbEyvSfNoPl2pjglyN8LlL3FdQwM5KKkWU6FvnxmJS6MmHuobcPxX
+   vXhYtyVfB04BD4NH9m1b1fnqfSfXyhCA2l0RyzFRu4OmofXnYakw5pWco
+   flVE9HwGrOzdJqUXcUT8fj1VeprLcYTBxG5aeg9VcmFB1SOtGRp8ahXhE
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="364433854"
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="364434189"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="364433854"
+   d="scan'208";a="364434189"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 12:54:26 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 12:55:43 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="686579744"
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="686580192"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="686579744"
+   d="scan'208";a="686580192"
 Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga003.jf.intel.com with ESMTP; 23 Aug 2023 12:54:26 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+  by orsmga003.jf.intel.com with ESMTP; 23 Aug 2023 12:55:43 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
  ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:54:26 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ 15.1.2507.27; Wed, 23 Aug 2023 12:55:42 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:54:25 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ 15.1.2507.27; Wed, 23 Aug 2023 12:55:41 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 12:54:25 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 12:55:41 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.106)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:54:25 -0700
+ 15.1.2507.27; Wed, 23 Aug 2023 12:55:41 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FnNgbWnRgdoWsOSnLSxpLHhihibjIB5zU8+iCNwjKveb0FRulSpmKWF27VsKoEW3fFFOA9Li5Hr0ZHW0+CyKoLI8SV08oGn4u7Yaisi4Taa8U9FotsiGH119Vh74XbxphgvY8sbn1GOO9n/X89FNik+8yzOYp6dl1aVUIBMR8hNV/GKvkyNziCcqu6vCMI4bEDsLR+3BUgRhCr7Kuzn7PrrVn72JuHSOdfHt4YV1Yoz2pjk5t9gAPMgW6Tjhc9WQ1ot6NFWtobI1LRROusYFoACcq0uPUqKlQqgOm+PIDEjE+in9Nux+f4aBGpjW2Fblr+DKR1RT2r4qKjgv/1N0dA==
+ b=SNr6swkFJM6hJyFHJ7Y7Oiwmoj76iWzo9Y2Aq59jduXayZXh232iKTDAPgyLXNCOELhoGB60jQkZNjmw5FZ/ovGN3FLNmsS/6RrSDbQmhn/i3tUuwliOXuXjN1P+/o5pLunwCqjUpifeUg0A9ghpWX3abb+/WO08asgDBXGxz7WS4pP3/tr1w9hui/gtruFUKEMt+KHBahAgOi600WUDwi/GnET9L5STmfNe+eDiRUXKXFlqh7pLselcwTpHkoSLdy4vnHTgadULY7SjAJCkJB8S6zzVENF4tcdyr/4GGv7miFFgnOBrYlV1qQo7rqrCJ2AOLjqDTDJefpALbi05ow==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WL9g0m8VnDFCIMaVrRje9qW8LU1L2ttdmNzVxgQt+TY=;
- b=EcoQjT8xy3E9pl58+4ZA4qUy7Axt12N0rgAUf/DnFw9gCKLDxYGIOoFHFvL/nXi+dM/rLRqrIT4rGlRQNG/sHl5vf/oXoqBoLSIZgZoMG4DJX9fs+RbGuYB98pfLIxBr2zkPp0qvuiqQrtgde0bW2X96CBvxa79tLkZTLHke+86bC2JgApTaoEXjoerCD7AKdK5KMiXc5glHnwxLq/zZbSEcYr7osrdI8Fq2jqpFMZYvr/2ZUI55MHu8+sk/sA90ycSkeVa1X0HmxqfOs3CXcPAEOe/LxUx6PSb2np9v2lPUEhT+1aInOCf2jq5c+PghoLthTbFNfZ4U2vH9zD2WXw==
+ bh=Z5XKqEguzAmhRB+/eN1UzyJ1dqByTFpmk43EWYpxKig=;
+ b=aGyvN165XBfwA+2pbc655LSnk0zVKieeXGjRRoD4fOQ6MxzKoNOKQl7NbLOUnHpr+OWUNgJ5TRd9YYt+QmkEZj8gGaQBma5bwcB+P4IDeWE7RvP3EFmUV9Yp8KdE/gkHCKzgyCWX+63smfDsz1XK0t2AnVmDpi6aGmVwgZ8oDWwI3tsbIZOei0M4ciuq9IX9lQoTQJGwgIFjEygYd7e5mcp6yJ/ERz7x5O0U85fOBx3DaA/Jv+QSntf3SPbqB2lQXYy+PVWE2KJ+RUPWWsjRtj2dUhhR/XUlqwi8thTWey2T6TCYfWN4IjuVwkCcw/KrGXnmfoKgn3AYjLk97skTfw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CH3PR11MB7724.namprd11.prod.outlook.com (2603:10b6:610:123::10) with
+ by LV8PR11MB8606.namprd11.prod.outlook.com (2603:10b6:408:1f7::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
- 2023 19:54:23 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Wed, 23 Aug
+ 2023 19:55:39 +0000
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::6a23:786d:65f7:ef0b]) by CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::6a23:786d:65f7:ef0b%6]) with mapi id 15.20.6699.022; Wed, 23 Aug 2023
- 19:54:23 +0000
-Message-ID: <82ddc62b-4d2c-cf6f-f5c8-812ce795a494@intel.com>
-Date: Wed, 23 Aug 2023 12:54:21 -0700
+ 19:55:38 +0000
+Message-ID: <bbe87002-aa64-cd42-7920-0bfae61cda5a@intel.com>
+Date: Wed, 23 Aug 2023 12:55:36 -0700
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH net] net/mlx5: Dynamic cyclecounter shift calculation for
- PTP free running clock
+Subject: Re: [PATCH net-next] ethernet/intel: Use list_for_each_entry() helper
 Content-Language: en-US
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>, <netdev@vger.kernel.org>
-CC: Saeed Mahameed <saeed@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Vadim Fedorenko
-	<vadfed@meta.com>, Kenneth Klette Jonassen <kenneth.jonassen@bridgetech.tv>
-References: <20230821230554.236210-1-rrameshbabu@nvidia.com>
+To: Jinjie Ruan <ruanjinjie@huawei.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+References: <20230821134229.3132692-1-ruanjinjie@huawei.com>
 From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20230821230554.236210-1-rrameshbabu@nvidia.com>
+In-Reply-To: <20230821134229.3132692-1-ruanjinjie@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P221CA0016.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::21) To CO1PR11MB5089.namprd11.prod.outlook.com
+X-ClientProxiedBy: MW4PR03CA0122.namprd03.prod.outlook.com
+ (2603:10b6:303:8c::7) To CO1PR11MB5089.namprd11.prod.outlook.com
  (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -109,61 +108,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH3PR11MB7724:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41436f0b-89f8-4cb2-26f7-08dba412bfbf
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|LV8PR11MB8606:EE_
+X-MS-Office365-Filtering-Correlation-Id: 55d35ca7-8c74-450a-1075-08dba412ec71
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1rVNMp2mNaS0POpOzYsuXx9tYQ8FS6aL+ldTAJ5T7wuKw40M8okYeKcDGq/qu7MNLrbQqce5B5EjevluLIMAZhMcM4UEhdUAMPl6RUppjJs4q7nv+MwRZdzfS+Ue27CVF8c37OG5wnNqo0Kk52jxm16bRMgrNLhF6vjmnNh/MmLf+E1Iq414L/3xkMbV7rJvpIjto9lCcgZeOcqjbymo6OY0rg6g9bIQQ+wk3+ZMPr/gk/KdxZYTtE0J6bInc/AkeKYdwq59pTvQG/SKn7HXFxMDf/3Pq9sd9AFxRHk60oc9CeGS+yFd2C4mhUeVLjAXoO55BUc3GrQpHtTmB4CPbmEslV3i04npiWzbFpKlvTok0K0v3It5pb7s25WfMFY34RDF2BuTW29aO0O7Z7JDxlyvo3+fu9GtlqlgxeUSkAqFA3ZG4vgfDlo7cmcZtx4Wv7xFye1qN9rR7Sm6lciZAFtQg4OmThzw35ScTqFrTIYOEI2IvecbGUyoROywVUopTIGVxJM1mCY8ly7IDq0pZ93wgEWvR1yj9Li+34fjdrbCUJWLulPEI7fHOZuPlAheFIoO3e1m6RZdTRSaPm40TdhXMzcObIp8u8wao35LbpaElK8ueYDGwEm7o94eOHRcyLGTX1PjGfIL8/udrbMWZQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(39860400002)(136003)(346002)(186009)(451199024)(1800799009)(2616005)(6506007)(6486002)(316002)(53546011)(8676002)(8936002)(4326008)(54906003)(66556008)(66946007)(66476007)(6512007)(41300700001)(966005)(26005)(5660300002)(478600001)(31686004)(83380400001)(36756003)(31696002)(86362001)(82960400001)(2906002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: KmH/Ie21KP4SegOJDV31OqihlZ4tBt/K+3JdOdHL6XnDUOXEAtopDXN8EpU+iU2jyrNRRp4qW2JbFnlHVkpHtDgSzZk/fkJSSLhh/sA205MHH1SKxd/02J1Zt1+M7WlutD7aaoX35zahJ1uYSqiNmYWK8/skpF24/Jl4lXb0AZZQ6b/m0HV5/eeDWG6xKWcHIwAmpAy7ZRmj3LmbwTQ4LBiwwc7qtW6LOA8WzD47FYrkZgNVWyw5YJpI0inouib1nAyNDNpHwp2MJ5cDngi4pRwJzSr6AD5qOqluLuS35SXk8u/9Im/lWZnT4jL+40hZGjZEbQaO3eK1inCqvRIxvnN7wkoiTFNeJnJa7epDuWH7X10FYVqDJZ0LXM4V/7DMEYxKW4AmB2RqvjIY5HQuQksANZpR/c09XCAiVL2R5LTu/d05roLJwHdcHnoWUIV7douwKCy0dmStUYtVZqCt8wPZVlJt6f2L8uwasOQmWYodX9vhv7jFw73P4JQPGoHtuEzxePKkqMzrrZAGrp16MNuwln4Pe3zSoyy1ahP/2MHhkvHIlORm8esFvLqs0ZHtqy9uSig1GnYuhPAQrTtNkQErsi0+vbff/zPjCNkNtlba34S3AvfQdXzqjM5yrgTbpYwEKb11AsEjQiTrEIbvKw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39860400002)(376002)(366004)(346002)(186009)(1800799009)(451199024)(66476007)(66946007)(6512007)(316002)(66556008)(82960400001)(110136005)(8676002)(8936002)(2616005)(36756003)(41300700001)(478600001)(38100700002)(6506007)(53546011)(6486002)(83380400001)(2906002)(31686004)(31696002)(86362001)(5660300002)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MnlHUDR2NndKNzRtbEd3dVp5dDh6cWVVN0lwalJaek1QamcrS0t4TXFONFV3?=
- =?utf-8?B?OXB6bStTQ3MvTHVrVUN2cmd5NVJXcVlOTmMwbmxzTDA0UmFNMkttRzhVZGM1?=
- =?utf-8?B?TUExb1EzSTRveHZJMnVCUWxYdWxmZlVKa2dTa2ZCamVQZE5DbUVJcEJZQVRk?=
- =?utf-8?B?TlptOXExbVZDcWpiRnZWUlVUM2dJYXhRdEpCSWVwcmJNUnlhK2NiQm5RaVU0?=
- =?utf-8?B?K0VYM0FhYVZQYy9lcmxiaHlUaFhCWXI1emVXUmlDeU5uaTdSY1pvNnRhaXB4?=
- =?utf-8?B?aStaZGp3eFVNRktsOS94U0NxNTVtTlQwWXFxNjRkQTc5ZzJqSUM4cExwTm5v?=
- =?utf-8?B?VUdoa1BSdEhCL3Y1SjFOdk8yMTRaVVhOWG8xOGhZeGlDWWtEeHdZczR6THZI?=
- =?utf-8?B?TW9CU0VWY2w0OElFNHhsL3pCMFJWNVBLUFVuVUlCRll0QWR4ZHVPZWJ3US9h?=
- =?utf-8?B?QmFzY2Fzd1F6Q3k0b0o5akk5RGFaOE4xY0pMdTNwNGNTMWQxMks4dGhDTjJw?=
- =?utf-8?B?bFVqWHBZWTN2Y3dmWUJQYmxKS1pyRXRKTm90dkRUYWVmSnU4YUd6NElWVzZE?=
- =?utf-8?B?aTdRYTZMQzFQSTFBUTV4cjA4TTVacnVsVVpzVGZYY2R0dWkzVnN3WDFxZ0Nj?=
- =?utf-8?B?SmFxaTFhdlAxa3gxZ21NbmFkUnB6Z2lzSDRlUlZmdmlMait1Ujd3QzhLNTJK?=
- =?utf-8?B?T2FQWkZCeGRjdjhKSG1MMGk2dlY5TFhKcVhmaHhiN01iQi9ZOEIyZGRhcktG?=
- =?utf-8?B?WU9vVkNWdytmWWtxWkRoTkc5N01sTTVSVnVvOTRkMG9xWDI3ZTdEcVZCL2FC?=
- =?utf-8?B?SnRKUGxLeWRwV0lTZHFoeFpoOTUzUm54SkY3a3hXRHdmU290bjhmcTY5TGQ0?=
- =?utf-8?B?SVQ5SjREa1VmdWd6YkhPYThyUDJNWG0zdDNYMGNzV3liNEg0VHJCK245VEp3?=
- =?utf-8?B?VlJaMmFVR1JFdjg1NWFjM0x5YzhoRC9MY3l5UWVXeTFFdXcyRFpsdXgvVWta?=
- =?utf-8?B?Q3ZmZjJObHpCQjFuS0ZYSWk1Z0trNzI5TU5VZFRQYWMvWEVYR2d0cFJCVEY2?=
- =?utf-8?B?bnNzaGtxdnFZeGxrMjg3alF6SU1mN0IyTWhhM0pIeGZXT2FXSTIzdjg1azZk?=
- =?utf-8?B?WTh6bldyUTJpeWNBRStKRlYvd1BXbUNBbW5GdnM2TStIelBBT05xZ3lPaEkv?=
- =?utf-8?B?ZUV5RUN1U2xqZ2Q1bmFKTWt6N0xtUnJQS3BZZTN4S09XVDlqOE8ybG1wRTZp?=
- =?utf-8?B?Z2JGbjZPT3ZzN2YxMU41Rmc3QlpkY1NBcUhiNlQrVnJuVXBidWdHOUJTMzF4?=
- =?utf-8?B?elIrZVpDQ0dCSllFVnAvK2ZxbS96NDJ2WE9NbjFEcDYxbk9oVFhGSFRBVVo1?=
- =?utf-8?B?akMzWE94Q3JJUStkNExHaFNWaHhzRmhWNEt2YWtWa05lTFdzVnB0c0NnVE1z?=
- =?utf-8?B?VFFLQlR5L3h3RFhLcWltSng3ODcxOUFVNW9nbUM3ZUg3cnFZZjZsd2kxbFFx?=
- =?utf-8?B?cTd2ei9ubG5ZSzNzNG1aeFhibXZCclBnRjAxZ0xUOE5DTnhnRjcrQXJJbloz?=
- =?utf-8?B?TFAzc3FYdEVQUXppUXhFZmQ2dndBUG0rR2JPYmR5T1MxL1dRVCtZTjVkaXVq?=
- =?utf-8?B?eU9UbTRTNm82ZUI0NGU3bm4xZ2t3QlFFZmgyTG5LQ2p6RGgrcHNKeDdCZlRa?=
- =?utf-8?B?aGd3MTdNbmRjZSsxQzFTbGhraWNFR1dubXVJeE01NC8veGFxU0lJOVdIejdD?=
- =?utf-8?B?T1RhTVFEaDBIM1ZUOWZuTlhyOXVlUmJQUEFNbUVBTnpTbytabnJUUW9ROVRC?=
- =?utf-8?B?Q1VjcXlERTliV3I3eExVM2tKZTlxaUhCV2p1eG51N3M5VWtPYU1xeEU1Y1RX?=
- =?utf-8?B?NE8wcEpHWDdmeVBKSVkrWkdXSGFReDRCSTFSRFdQWjZTMWxYMXdvcmx5QVY3?=
- =?utf-8?B?QmFwYVFpUHB1cjRXZjA0UkdIZmExK3l3L245c1RueUZyT2pwMXRFcEtVN0NG?=
- =?utf-8?B?QytqNHFqV1kyYTgyUDJHc2ptZkJGZ2NJcjFjbW9LT2tTOFVUWWZjbHMwQ0JP?=
- =?utf-8?B?SWNBQnJoYmF3QWZnbys4Sm84R3YrTktpMTRCWmV0NnlaMWpoWlFlQU5RK1pq?=
- =?utf-8?B?OThJNTlsVEwxZkx1UGJyejlRRXlQVHFZMFJ6dmx4Mkp0ZFhxVi8vMVphcVR6?=
- =?utf-8?B?dUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41436f0b-89f8-4cb2-26f7-08dba412bfbf
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZkpsR1VkWHQ5MjNMSUROa28xaXdxRUNSYjVTUjdlRkZha2ZuVTIwZUFpZE1h?=
+ =?utf-8?B?Skg1UVBtWk9WK2s1di85RVdBNTdYVVFOeXJPMjBLQm1BUHJodUMvSm9QcVgv?=
+ =?utf-8?B?QWl4OGlXNGl4YnRHQitFeXdkMEllRWc2cmxVVkZOODlOTGNMSUR1dXNxcVZC?=
+ =?utf-8?B?SldieldOc21naHdIeUdIMEE0bHpwdFdDc2s1SGdOSitGRHVJcGVldU5FcldK?=
+ =?utf-8?B?d0JLWGR5WHh4cW05U2hndU50dU9CbTlYYlpIais3NnMvcldhSFZKcHlRZUtN?=
+ =?utf-8?B?d2J1RWpJWlExRmZDUUZUSU5ZQXF4OVorbUJvNEhvQVlMbG9Nay9rOGFFZ3Q2?=
+ =?utf-8?B?bFkrSjlBMi9SK2M4M0dLRGZIQmZTQXJiWm9MbHZBY04zcDB4U2xKSDFOcWF0?=
+ =?utf-8?B?UExkVG9XdGZrR1pQTUp3NWJpYk81VldOc0pzZGVKb0p6cktwRTViL3htTHJu?=
+ =?utf-8?B?dzgrdjdIWEROVzhBS3pRQ0xEUzgvRnZHejRHNE10NkF2V0Qvd0E2QXo3TDEy?=
+ =?utf-8?B?V1I4N0JoR1NreXAwdUJKSlZHMTJ1cTNQemFuNlRzc3pvdGUrR1FHRzZVaTZW?=
+ =?utf-8?B?RE1lbW95V1RzSW5FdHE1YkxJbzE4WHhidFlsRjRJWXFNa2g5L2lodGNzQjdv?=
+ =?utf-8?B?VGRmSHFPMWVzZnQ3cnhqVzZDazhPalFJT21iREVvYUxiSU9MSTlRSjg0Q0RE?=
+ =?utf-8?B?Z001L0FXU2FKbzZpNWs0eXM4alBJNnRmTVhkWTZYRi9KZFJKS3V0bDRqVFhZ?=
+ =?utf-8?B?SFpBMCszM2kwSVFoQTBxc293MmVqejJqT3VpNU92aWh1M1oyV24yVmhwRk1h?=
+ =?utf-8?B?amw4Sk9abEpTQnRJVFJrdXlCNjRPUEUxV3pGbFdQMVVtK3hrSi9nekxoeHV4?=
+ =?utf-8?B?OUhnWCtOeEs2b0ZqV1N1M3hpRGJiQ24wanIvV2hvM0RuTzAzS1ZHczhiZmtB?=
+ =?utf-8?B?MWZlRU5WSzY1WldwT2FPcHFDN0hna05OejVkb3YrMlJKVkFGSS95UFR5bXhn?=
+ =?utf-8?B?ZFBaUXoxMnYzSlpDVUZIMXRjVUp2NFR1MHc4V1ZFZ1RJeXFMQ2NBRG1CVnh5?=
+ =?utf-8?B?NVNBd2xEYjZZOTZNV0plTU5ZbEFOcEd2dmlpRnl1SU1ieStVSWtVbmRRbUNq?=
+ =?utf-8?B?MFYxVTk1NmE3V2pISGtOYVd0aEQvR0E2bWdIRDdwMGRWWGVGWTA0QU8yVzZi?=
+ =?utf-8?B?dUY0TUFhUUNlUzVROHlpcWU4eFNNcWdnQnlwaDRFMWd3TjdhV0o3UkpXVnpk?=
+ =?utf-8?B?VlVQYk9sN3ZhV2JJNjhrcCtUSlJ3S0FPZGFvREpGeVBvb2MrTmROZW9KZ0pS?=
+ =?utf-8?B?WElQZG50cEt3WForWnE0SC9LQlBzcnZmeGRMUWVJK0hrREcyZlM1M2RBSW9H?=
+ =?utf-8?B?cVE0d1kxN2hTMHI0UTlTazAyQTZKaEs3cVNwVGMyRStMUmxZU29MUnl2a0R5?=
+ =?utf-8?B?K3V4M1krblhoK0Ura2dQajlQaU05Qjk3cUFtdlpHV1hsaVFUMDVxdHRPc0Zq?=
+ =?utf-8?B?QmJyRG5IMkxxU0c4SnA1a0pqU3dlTzR2Ync3TlpZanhLcjNMTEp2OTNwZmdN?=
+ =?utf-8?B?MkVLV3NCMTRmbGpQR3BvcTdLRUhqOTc4Rld2Tm8rMmxHVjFyMlErdzlFWEpX?=
+ =?utf-8?B?SGJERjdBQjc4bDhpLzhUTTdJblZ0RjlSRDIveFo5SmE2UWsrSHY3S2lYUzJw?=
+ =?utf-8?B?WnczMENCR1Y2MmwzNjRnRHFjOFVmQW1tbE5mM1NzWnB0RC95bXY5S1pYUjZO?=
+ =?utf-8?B?VHc2eVlncHFMUzdISWk2R0t0ZXM4WTNMaW1VZHpVMlhOVjN4c1N4ZGN0ZDBZ?=
+ =?utf-8?B?NURqUGRjV1F2UEU3azc4ZTh5eUxUdFJicGtWQWlYcGl1dU4rRk9DWEN6YWUv?=
+ =?utf-8?B?eGNabUwrcWhEb3ArUzE3WjJjRFl5WmpMTjlyUlVvYlN3aElEK2E3dnRCT3Yr?=
+ =?utf-8?B?R1ZlVjdRbll4RVIzUjQ0eEMwd3JOZ2ljdnhLM2pVaS9DK09iR1FQWlJ3SFRX?=
+ =?utf-8?B?SUZkNTVXTCtlZnJWR0RENEF1OWltU0Z4ZUNZWmNISWVETnJGVTZmRXNUOGZ2?=
+ =?utf-8?B?elZmRGtzWiszWXpLN1IrVkEwN3V5VEVsT1FHOFZPc3o2dURESkd5UHIvYUVN?=
+ =?utf-8?B?TllwMDFBcTlkUmdrS3pLMzlkWk9tckJvVTRsRDc4dHJtdzBrME9HZG0zck1q?=
+ =?utf-8?B?OVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55d35ca7-8c74-450a-1075-08dba412ec71
 X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 19:54:23.7580
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 19:55:38.7501
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0ywkxux9BG8Kt89oURTxVbZ8oLXKc2CiAecCiH/7vzozvVqxaulYGKqan9nHJZXp60JGmO19R9nliOJpaD2ygjnIdMle0Xov8Ld7k64HgKw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7724
+X-MS-Exchange-CrossTenant-UserPrincipalName: gtEcbNgQLHqCS+m4dLhWIiRSTHFHD6Tee+W+6xRIRUyQTsqJt8hoQt/thoomAYGY6ilNPh1u5jDltMTJ7hbbmtknbcuzJTlxU8Oicas9/48=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8606
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
@@ -175,116 +174,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 
-On 8/21/2023 4:05 PM, Rahul Rameshbabu wrote:
-> Use a dynamic calculation to determine the shift value for the internal
-> timer cyclecounter that will lead to the highest precision frequency
-> adjustments. Previously used a constant for the shift value assuming all
-> devices supported by the driver had a nominal frequency of 1GHz. However,
-> there are devices that operate at different frequencies. The previous shift
-> value constant would break the PHC functionality for those devices.
+On 8/21/2023 6:42 AM, Jinjie Ruan wrote:
+> Convert list_for_each() to list_for_each_entry() where applicable.
 > 
-> Reported-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Closes: https://lore.kernel.org/netdev/20230815151507.3028503-1-vadfed@meta.com/
-> Fixes: 6a4010927562 ("net/mlx5: Update cyclecounter shift value to improve ptp free running mode precision")
-> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Tested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> ---
+> No functional changed.
 > 
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+
+Thanks for cleaning these up!
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-> Notes:
->     Devices tested on:
->     
->       * ConnectX 4
->       * ConnectX 4-Lx
->       * ConnectX 5
->       * ConnectX 6
->       * ConnectX 6-Dx
->       * ConnectX 7
+> ---
+>  drivers/net/ethernet/intel/igb/igb_main.c      | 7 ++-----
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c | 7 ++-----
+>  2 files changed, 4 insertions(+), 10 deletions(-)
 > 
->  .../ethernet/mellanox/mlx5/core/lib/clock.c   | 32 ++++++++++++++++---
->  1 file changed, 27 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-> index 377372f0578a..aa29f09e8356 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-> @@ -32,16 +32,13 @@
->  
->  #include <linux/clocksource.h>
->  #include <linux/highmem.h>
-> +#include <linux/log2.h>
->  #include <linux/ptp_clock_kernel.h>
->  #include <rdma/mlx5-abi.h>
->  #include "lib/eq.h"
->  #include "en.h"
->  #include "clock.h"
->  
-> -enum {
-> -	MLX5_CYCLES_SHIFT	= 31
-> -};
-> -
->  enum {
->  	MLX5_PIN_MODE_IN		= 0x0,
->  	MLX5_PIN_MODE_OUT		= 0x1,
-> @@ -93,6 +90,31 @@ static bool mlx5_modify_mtutc_allowed(struct mlx5_core_dev *mdev)
->  	return MLX5_CAP_MCAM_FEATURE(mdev, ptpcyc2realtime_modify);
->  }
->  
-> +static u32 mlx5_ptp_shift_constant(u32 dev_freq_khz)
-> +{
-> +	/* Optimal shift constant leads to corrections above just 1 scaled ppm.
-> +	 *
-> +	 * Two sets of equations are needed to derive the optimal shift
-> +	 * constant for the cyclecounter.
-> +	 *
-> +	 *    dev_freq_khz * 1000 / 2^shift_constant = 1 scaled_ppm
-> +	 *    ppb = scaled_ppm * 1000 / 2^16
-> +	 *
-> +	 * Using the two equations together
-> +	 *
-> +	 *    dev_freq_khz * 1000 / 1 scaled_ppm = 2^shift_constant
-> +	 *    dev_freq_khz * 2^16 / 1 ppb = 2^shift_constant
-> +	 *    dev_freq_khz = 2^(shift_constant - 16)
-> +	 *
-> +	 * then yields
-> +	 *
-> +	 *    shift_constant = ilog2(dev_freq_khz) + 16
-> +	 */
-> +
-
-I appreciate the derivation here. It helps understand the calculation
-here, and makes it clear why this is the best constant. Deriving it in
-terms of the frequency is useful since it makes supporting other
-frequencies much simpler in the future if thats ever necessary for the
-device family, rather than just adding a table of known frequencies. Nice!
-
-> +	return min(ilog2(dev_freq_khz) + 16,
-> +		   ilog2((U32_MAX / NSEC_PER_MSEC) * dev_freq_khz));
-> +}
-> +
->  static s32 mlx5_ptp_getmaxphase(struct ptp_clock_info *ptp)
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 9f63a10c6f80..bf9c2f6a1164 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -7850,7 +7850,6 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
 >  {
->  	struct mlx5_clock *clock = container_of(ptp, struct mlx5_clock, ptp_info);
-> @@ -909,7 +931,7 @@ static void mlx5_timecounter_init(struct mlx5_core_dev *mdev)
+>  	struct pci_dev *pdev = adapter->pdev;
+>  	struct vf_data_storage *vf_data = &adapter->vf_data[vf];
+> -	struct list_head *pos;
+>  	struct vf_mac_filter *entry = NULL;
+>  	int ret = 0;
 >  
->  	dev_freq = MLX5_CAP_GEN(mdev, device_frequency_khz);
->  	timer->cycles.read = read_internal_timer;
-> -	timer->cycles.shift = MLX5_CYCLES_SHIFT;
-> +	timer->cycles.shift = mlx5_ptp_shift_constant(dev_freq);
->  	timer->cycles.mult = clocksource_khz2mult(dev_freq,
->  						  timer->cycles.shift);
-
-And you already derive the multiplier in terms of the frequency and
-shift, so the change in shift won't break the multiplier. Good.
-
->  	timer->nominal_c_mult = timer->cycles.mult;
-
-
-Not really an issue of this patch, but a few drivers use a nominal
-multiplier in calculations with timecounter and cycle counter, I wonder
-if this could be baked into the cyclecounter code in the future...
-
-At any rate, this fix looks good to me.
+> @@ -7871,8 +7870,7 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
+>  	switch (info) {
+>  	case E1000_VF_MAC_FILTER_CLR:
+>  		/* remove all unicast MAC filters related to the current VF */
+> -		list_for_each(pos, &adapter->vf_macs.l) {
+> -			entry = list_entry(pos, struct vf_mac_filter, l);
+> +		list_for_each_entry(entry, &adapter->vf_macs.l, l) {
+>  			if (entry->vf == vf) {
+>  				entry->vf = -1;
+>  				entry->free = true;
+> @@ -7882,8 +7880,7 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
+>  		break;
+>  	case E1000_VF_MAC_FILTER_ADD:
+>  		/* try to find empty slot in the list */
+> -		list_for_each(pos, &adapter->vf_macs.l) {
+> -			entry = list_entry(pos, struct vf_mac_filter, l);
+> +		list_for_each_entry(entry, &adapter->vf_macs.l, l) {
+>  			if (entry->free)
+>  				break;
+>  		}
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> index 29cc60988071..4c6e2a485d8e 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> @@ -639,12 +639,10 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
+>  				int vf, int index, unsigned char *mac_addr)
+>  {
+>  	struct vf_macvlans *entry;
+> -	struct list_head *pos;
+>  	int retval = 0;
+>  
+>  	if (index <= 1) {
+> -		list_for_each(pos, &adapter->vf_mvs.l) {
+> -			entry = list_entry(pos, struct vf_macvlans, l);
+> +		list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
+>  			if (entry->vf == vf) {
+>  				entry->vf = -1;
+>  				entry->free = true;
+> @@ -664,8 +662,7 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
+>  
+>  	entry = NULL;
+>  
+> -	list_for_each(pos, &adapter->vf_mvs.l) {
+> -		entry = list_entry(pos, struct vf_macvlans, l);
+> +	list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
+>  		if (entry->free)
+>  			break;
+>  	}
 
