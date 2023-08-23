@@ -1,116 +1,80 @@
-Return-Path: <netdev+bounces-30027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0645B785A7C
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 16:28:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C06F4785AE2
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 16:37:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D256281338
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:28:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E51328134E
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92876C2CF;
-	Wed, 23 Aug 2023 14:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4669BA27;
+	Wed, 23 Aug 2023 14:37:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E98C131
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:28:43 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 87133E5F;
-	Wed, 23 Aug 2023 07:28:42 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 37NERwIsA030051, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 37NERwIsA030051
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 23 Aug 2023 22:27:58 +0800
-Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Wed, 23 Aug 2023 22:28:21 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Wed, 23 Aug 2023 22:28:20 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
- RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
- 15.01.2375.007; Wed, 23 Aug 2023 22:28:20 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "jiri@resnulli.us" <jiri@resnulli.us>
-Subject: RE: [PATCH net-next v6 1/2] net/ethernet/realtek: Add Realtek automotive PCIe driver code
-Thread-Topic: [PATCH net-next v6 1/2] net/ethernet/realtek: Add Realtek
- automotive PCIe driver code
-Thread-Index: AQHZ1KdKxMskTPV/qUeQjEQ9njC6tK/2FT0AgAHdc4A=
-Date: Wed, 23 Aug 2023 14:28:20 +0000
-Message-ID: <5ae1444b03f64e7287fc7abb6cd56063@realtek.com>
-References: <20230822031805.4752-1-justinlai0215@realtek.com>
- <20230822031805.4752-2-justinlai0215@realtek.com>
- <aa7e5c75-e337-4150-bba5-a139ab4fc02f@lunn.ch>
-In-Reply-To: <aa7e5c75-e337-4150-bba5-a139ab4fc02f@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.21.210.185]
-x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AFCA4E
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:37:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 416A2C433C8;
+	Wed, 23 Aug 2023 14:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692801464;
+	bh=nFJQaMzN4+WOLIo2ulDo6fG5gqWoQo4wo3RYzpQckXc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gxOf27+jWp737fuS7z8Smvhvl7GaSIrp09nUEqpoI18ihVEJs7YH2wukNxniJICIX
+	 IKtHxdngK5gi8uVYA1JFKq3/Diis4fChN2cizYXXSSKNjag9UWSbNXpuJmGPwYxNNa
+	 8SMuXEcs7gp39l4ed5PoNzETHL8UNlmY7mYb6vWu/g57L9TYmTuYtQqtTSh4Ve3a1d
+	 RTb+9ttsUAWlYqf2zj6EEfY56xh44BJB0GziyURSx879VjFqR5MbECpCtd6eNa5tFy
+	 ndVk5MYvnvJMHPD2jMAm4U6WkFQys1qQPhWo3Q+c7Kh/8whDYb9sUkcjWueixgc1Z3
+	 whpEeZarTXf+g==
+Date: Wed, 23 Aug 2023 07:37:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ruan Jinjie <ruanjinjie@huawei.com>
+Cc: <rafal@milecki.pl>, <bcm-kernel-feedback-list@broadcom.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <opendmb@gmail.com>, <florian.fainelli@broadcom.com>,
+ <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+ <netdev@vger.kernel.org>, <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v4 3/3] net: lan743x: Return PTR_ERR() for
+ fixed_phy_register()
+Message-ID: <20230823073743.61770fa4@kernel.org>
+In-Reply-To: <2763f37a-8707-7fad-5dd4-cc4247fe3e1b@huawei.com>
+References: <20230821025020.1971520-1-ruanjinjie@huawei.com>
+	<20230821025020.1971520-4-ruanjinjie@huawei.com>
+	<20230822170335.671f3bef@kernel.org>
+	<2763f37a-8707-7fad-5dd4-cc4247fe3e1b@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
->=20
-> > +     do {
-> > +             status =3D RTL_R32(tp, ivec->isr_addr);
-> > +
-> > +             handled =3D 1;
-> > +             RTL_W32(tp, ivec->imr_addr, 0x0);
-> > +             RTL_W32(tp, ivec->isr_addr, (status & ~FOVW));
-> > +
-> > +             if ((status & ivec->imr)) {
-> > +                     if (likely(napi_schedule_prep(&ivec->napi)))
-> > +                             __napi_schedule(&ivec->napi);
-> > +             }
-> > +     } while (false);
->=20
-> Remember i said that if you do something which no other network driver do=
-es,
-> it is probably wrong. How many drivers have a do {} while (false); loop?
->=20
-> Please spend a few days just reading other drivers, and compare your code
-> with those drivers. Try to find all the things your driver does which no =
-other
-> driver has. That code is probably wrong and you should fix it.
->=20
->         Andrew
->=20
-Thank you for your suggestions, I will read other drivers and modify some p=
-roblems of this driver.
+On Wed, 23 Aug 2023 15:43:58 +0800 Ruan Jinjie wrote:
+> > EPROBE_DEFER is not a unix error code. We can't return it to user
+> > space, so propagating it from ndo_open is not correct.  
+> 
+> When the error is EPROBE_DEFER, Whether print the netdev_err is ok? And
+> what should it return?
+> 
+> How about this?
+> 
+> if (IS_ERR(phydev)) {
+>      ......
+>      if (PTR_ERR(phydev) != -EPROBE_DEFER)
+>          return PTR_ERR(phydev);
+>      else
+>          return -EIO;
+> }
+
+That's too much code to copy & paste into every driver.
+
+Someone who understands the code flow very well should tackle this.
+Please leave the cases where fixed_phy_register() is called outside 
+of probe alone.
 
