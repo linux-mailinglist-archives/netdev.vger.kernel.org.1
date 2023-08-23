@@ -1,39 +1,40 @@
-Return-Path: <netdev+bounces-30052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC2E785BE9
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:20:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB01B785C10
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D17F1C20CE0
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75E22281218
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E08AC2E4;
-	Wed, 23 Aug 2023 15:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A83C2F3;
+	Wed, 23 Aug 2023 15:27:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEA4AD42;
-	Wed, 23 Aug 2023 15:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5CC0EC433CA;
-	Wed, 23 Aug 2023 15:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692804022;
-	bh=B5eeEK5W55Em3qU8pGy5VFF9KO5gEdhoOLajNTGqkFM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R9lXXKWaNz9N+vTMv5UX/mrFglo+6HkVOTBr1BCfB2iXPuwcQaiSHU2F4BthQu4cr
-	 uepdwIE1PNnfV/K2UG7NGahvbB1/hpZOMb0B1z4KjVbT7IZLiZ7loRaLeD3AuYS1Vs
-	 jf9F/kiv1qNMXYmQJY3jKUE5mP81YuaFHaO1gfABlfpbHPsd28U1T5tOFHbMuyd+pA
-	 4zQROIli88pk4XOH7UOsIjsiiXlwwLzCrqOUt1BmP+Zk9FYKaUbKVOvaf8O6gU0Sts
-	 GIY/3WTUj7bdwQnIfQI336OGtYL/KOiIKxRrjWQC09E8ETWnzEDtuvKqDfdUvtYpvn
-	 Xyn9gbqJaTi0Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4303CC395C5;
-	Wed, 23 Aug 2023 15:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5547E9448
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 15:27:25 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E925CDF;
+	Wed, 23 Aug 2023 08:27:23 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1qYplL-0001jJ-UL; Wed, 23 Aug 2023 17:27:15 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+Subject: [PATCH net 0/6] netfilter updates for net
+Date: Wed, 23 Aug 2023 17:26:48 +0200
+Message-ID: <20230823152711.15279-1-fw@strlen.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,44 +42,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2 0/3] ss: mptcp: print new info counters
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169280402226.32621.2151909857968360089.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Aug 2023 15:20:22 +0000
-References: <20230823-mptcp-issue-415-ss-mptcp-info-6-5-v1-0-fcaf00a03511@tessares.net>
-In-Reply-To: <20230823-mptcp-issue-415-ss-mptcp-info-6-5-v1-0-fcaf00a03511@tessares.net>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- pabeni@redhat.com, aclaudi@redhat.com
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hello,
 
-This series was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+This PR contains nf_tables updates for your *net* tree.
 
-On Wed, 23 Aug 2023 09:24:05 +0200 you wrote:
-> Some MPTCP counters from mptcp_info structure have been added in the
-> kernel but not in ss.
-> 
-> Before adding the new counters in patch 3/3, patch 1/3 makes sure all
-> unsigned counters are displayed as unsigned. Patch 2/3 displays all seq
-> related counters as decimal instead of hexadecimal.
-> 
-> [...]
+First patch fixes table validation, I broke this in 6.4 when tracking
+validation state per table, reported by Pablo, fixup from myself.
 
-Here is the summary with links:
-  - [iproute2,1/3] ss: mptcp: display info counters as unsigned
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=0c3f1582d5b3
-  - [iproute2,2/3] ss: mptcp: display seq related counters as decimal
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=cfa70237d62a
-  - [iproute2,3/3] ss: mptcp: print missing info counters
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=505c65aa44c5
+Second patch makes sure objects waiting for memory release have been
+released, this was broken in 6.1, patch from Pablo Neira Ayuso.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Patch three is a fix-for-fix from previous PR: In case a transaction
+gets aborted, gc sequence counter needs to be incremented so pending
+gc requests are invalidated, from Pablo.
 
+Same for patch 4: gc list needs to use gc list lock, not destroy lock,
+also from Pablo.
 
+Patch 5 fixes a UaF in a set backend, but this should only occur when
+failslab is enabled for GFP_KERNEL allocations, broken since feature
+was added in 5.6, from myself.
+
+Patch 6 fixes a double-free bug that was also added via previous PR:
+We must not schedule gc work if the previous batch is still queued.
+
+The following changes since commit bfedba3b2c7793ce127680bc8f70711e05ec7a17:
+
+  ibmveth: Use dcbf rather than dcbfl (2023-08-23 11:51:16 +0100)
+
+are available in the Git repository at:
+
+  ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/netfilter/nf tags/nf-23-08-23
+
+for you to fetch changes up to 8e51830e29e12670b4c10df070a4ea4c9593e961:
+
+  netfilter: nf_tables: defer gc run if previous batch is still pending (2023-08-23 16:12:59 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 2023-08-23
+
+----------------------------------------------------------------
+Florian Westphal (3):
+      netfilter: nf_tables: validate all pending tables
+      netfilter: nf_tables: fix out of memory error handling
+      netfilter: nf_tables: defer gc run if previous batch is still pending
+
+Pablo Neira Ayuso (3):
+      netfilter: nf_tables: flush pending destroy work before netlink notifier
+      netfilter: nf_tables: GC transaction race with abort path
+      netfilter: nf_tables: use correct lock to protect gc_list
+
+ include/net/netfilter/nf_tables.h |  6 ++++++
+ net/netfilter/nf_tables_api.c     | 23 +++++++++++++++--------
+ net/netfilter/nft_set_hash.c      |  3 +++
+ net/netfilter/nft_set_pipapo.c    | 13 ++++++++++---
+ net/netfilter/nft_set_rbtree.c    |  3 +++
+ 5 files changed, 37 insertions(+), 11 deletions(-)
 
