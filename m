@@ -1,253 +1,117 @@
-Return-Path: <netdev+bounces-30126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E83786117
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:56:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF6578614A
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 22:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BAF1C20D37
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:56:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A40628137D
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 20:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14AD1FB4F;
-	Wed, 23 Aug 2023 19:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806D11FB59;
+	Wed, 23 Aug 2023 20:18:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7EF1F93E
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:56:04 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 357071700
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 12:55:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692820544; x=1724356544;
-  h=message-id:date:subject:to:references:from:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=8WItWY2KYnoxNa2atXubzIjLXAXfZgZmnAj0qPGf6ww=;
-  b=O1dV24xqOG+5L2seBlyDz6tb67+eLgKgu9HijMdJQWIRqPJ/2NJ5Sxpa
-   reS8z4+NM2jYHOWm1pzWxXHGTSC6cpjhA3I0bQTfWe5pl6XEsRWxWw9Yq
-   K9ZevkBdjk4EB4UDtU0ubDZy8W64Gh+WtCdLuiZLgbwIaClHEYlCO4rEq
-   kg5pZbEyvSfNoPl2pjglyN8LlL3FdQwM5KKkWU6FvnxmJS6MmHuobcPxX
-   vXhYtyVfB04BD4NH9m1b1fnqfSfXyhCA2l0RyzFRu4OmofXnYakw5pWco
-   flVE9HwGrOzdJqUXcUT8fj1VeprLcYTBxG5aeg9VcmFB1SOtGRp8ahXhE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="364434189"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="364434189"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 12:55:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="686580192"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="686580192"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga003.jf.intel.com with ESMTP; 23 Aug 2023 12:55:43 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:55:42 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:55:41 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 12:55:41 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.106)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:55:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SNr6swkFJM6hJyFHJ7Y7Oiwmoj76iWzo9Y2Aq59jduXayZXh232iKTDAPgyLXNCOELhoGB60jQkZNjmw5FZ/ovGN3FLNmsS/6RrSDbQmhn/i3tUuwliOXuXjN1P+/o5pLunwCqjUpifeUg0A9ghpWX3abb+/WO08asgDBXGxz7WS4pP3/tr1w9hui/gtruFUKEMt+KHBahAgOi600WUDwi/GnET9L5STmfNe+eDiRUXKXFlqh7pLselcwTpHkoSLdy4vnHTgadULY7SjAJCkJB8S6zzVENF4tcdyr/4GGv7miFFgnOBrYlV1qQo7rqrCJ2AOLjqDTDJefpALbi05ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z5XKqEguzAmhRB+/eN1UzyJ1dqByTFpmk43EWYpxKig=;
- b=aGyvN165XBfwA+2pbc655LSnk0zVKieeXGjRRoD4fOQ6MxzKoNOKQl7NbLOUnHpr+OWUNgJ5TRd9YYt+QmkEZj8gGaQBma5bwcB+P4IDeWE7RvP3EFmUV9Yp8KdE/gkHCKzgyCWX+63smfDsz1XK0t2AnVmDpi6aGmVwgZ8oDWwI3tsbIZOei0M4ciuq9IX9lQoTQJGwgIFjEygYd7e5mcp6yJ/ERz7x5O0U85fOBx3DaA/Jv+QSntf3SPbqB2lQXYy+PVWE2KJ+RUPWWsjRtj2dUhhR/XUlqwi8thTWey2T6TCYfWN4IjuVwkCcw/KrGXnmfoKgn3AYjLk97skTfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by LV8PR11MB8606.namprd11.prod.outlook.com (2603:10b6:408:1f7::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Wed, 23 Aug
- 2023 19:55:39 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::6a23:786d:65f7:ef0b]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::6a23:786d:65f7:ef0b%6]) with mapi id 15.20.6699.022; Wed, 23 Aug 2023
- 19:55:38 +0000
-Message-ID: <bbe87002-aa64-cd42-7920-0bfae61cda5a@intel.com>
-Date: Wed, 23 Aug 2023 12:55:36 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next] ethernet/intel: Use list_for_each_entry() helper
-Content-Language: en-US
-To: Jinjie Ruan <ruanjinjie@huawei.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony
- Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-References: <20230821134229.3132692-1-ruanjinjie@huawei.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20230821134229.3132692-1-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0122.namprd03.prod.outlook.com
- (2603:10b6:303:8c::7) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F362C2E6
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 20:18:55 +0000 (UTC)
+Received: from nbd.name (nbd.name [46.4.11.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BCE10D3
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 13:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9y1c2QB/wPmOKO8c1J8GFP8cWm6qJVYXSVOUxWf0OB4=; b=h4D6xbdM7cRGwJDKHd9L7LYH57
+	o2bmxI19u6LHrh/BwLEaTZZtv4ZRQwAyUeYLT1jhlEmGtsbhSmMpkm+7tNNgZyO6X6P3dJzD1Cnnw
+	b3rQW/lgwL5zF5p9lyb2XHPUVWmUb9ySPq23LiDEcsfhf0Gh6nVDLQow7WmswUR6g3gg=;
+Received: from p4ff13705.dip0.t-ipconnect.de ([79.241.55.5] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <nbd@nbd.name>)
+	id 1qYuJG-00CX7D-DA; Wed, 23 Aug 2023 22:18:34 +0200
+Message-ID: <732f3c01-a36f-4c9b-8273-a55aba9094d8@nbd.name>
+Date: Wed, 23 Aug 2023 22:18:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|LV8PR11MB8606:EE_
-X-MS-Office365-Filtering-Correlation-Id: 55d35ca7-8c74-450a-1075-08dba412ec71
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KmH/Ie21KP4SegOJDV31OqihlZ4tBt/K+3JdOdHL6XnDUOXEAtopDXN8EpU+iU2jyrNRRp4qW2JbFnlHVkpHtDgSzZk/fkJSSLhh/sA205MHH1SKxd/02J1Zt1+M7WlutD7aaoX35zahJ1uYSqiNmYWK8/skpF24/Jl4lXb0AZZQ6b/m0HV5/eeDWG6xKWcHIwAmpAy7ZRmj3LmbwTQ4LBiwwc7qtW6LOA8WzD47FYrkZgNVWyw5YJpI0inouib1nAyNDNpHwp2MJ5cDngi4pRwJzSr6AD5qOqluLuS35SXk8u/9Im/lWZnT4jL+40hZGjZEbQaO3eK1inCqvRIxvnN7wkoiTFNeJnJa7epDuWH7X10FYVqDJZ0LXM4V/7DMEYxKW4AmB2RqvjIY5HQuQksANZpR/c09XCAiVL2R5LTu/d05roLJwHdcHnoWUIV7douwKCy0dmStUYtVZqCt8wPZVlJt6f2L8uwasOQmWYodX9vhv7jFw73P4JQPGoHtuEzxePKkqMzrrZAGrp16MNuwln4Pe3zSoyy1ahP/2MHhkvHIlORm8esFvLqs0ZHtqy9uSig1GnYuhPAQrTtNkQErsi0+vbff/zPjCNkNtlba34S3AvfQdXzqjM5yrgTbpYwEKb11AsEjQiTrEIbvKw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39860400002)(376002)(366004)(346002)(186009)(1800799009)(451199024)(66476007)(66946007)(6512007)(316002)(66556008)(82960400001)(110136005)(8676002)(8936002)(2616005)(36756003)(41300700001)(478600001)(38100700002)(6506007)(53546011)(6486002)(83380400001)(2906002)(31686004)(31696002)(86362001)(5660300002)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZkpsR1VkWHQ5MjNMSUROa28xaXdxRUNSYjVTUjdlRkZha2ZuVTIwZUFpZE1h?=
- =?utf-8?B?Skg1UVBtWk9WK2s1di85RVdBNTdYVVFOeXJPMjBLQm1BUHJodUMvSm9QcVgv?=
- =?utf-8?B?QWl4OGlXNGl4YnRHQitFeXdkMEllRWc2cmxVVkZOODlOTGNMSUR1dXNxcVZC?=
- =?utf-8?B?SldieldOc21naHdIeUdIMEE0bHpwdFdDc2s1SGdOSitGRHVJcGVldU5FcldK?=
- =?utf-8?B?d0JLWGR5WHh4cW05U2hndU50dU9CbTlYYlpIais3NnMvcldhSFZKcHlRZUtN?=
- =?utf-8?B?d2J1RWpJWlExRmZDUUZUSU5ZQXF4OVorbUJvNEhvQVlMbG9Nay9rOGFFZ3Q2?=
- =?utf-8?B?bFkrSjlBMi9SK2M4M0dLRGZIQmZTQXJiWm9MbHZBY04zcDB4U2xKSDFOcWF0?=
- =?utf-8?B?UExkVG9XdGZrR1pQTUp3NWJpYk81VldOc0pzZGVKb0p6cktwRTViL3htTHJu?=
- =?utf-8?B?dzgrdjdIWEROVzhBS3pRQ0xEUzgvRnZHejRHNE10NkF2V0Qvd0E2QXo3TDEy?=
- =?utf-8?B?V1I4N0JoR1NreXAwdUJKSlZHMTJ1cTNQemFuNlRzc3pvdGUrR1FHRzZVaTZW?=
- =?utf-8?B?RE1lbW95V1RzSW5FdHE1YkxJbzE4WHhidFlsRjRJWXFNa2g5L2lodGNzQjdv?=
- =?utf-8?B?VGRmSHFPMWVzZnQ3cnhqVzZDazhPalFJT21iREVvYUxiSU9MSTlRSjg0Q0RE?=
- =?utf-8?B?Z001L0FXU2FKbzZpNWs0eXM4alBJNnRmTVhkWTZYRi9KZFJKS3V0bDRqVFhZ?=
- =?utf-8?B?SFpBMCszM2kwSVFoQTBxc293MmVqejJqT3VpNU92aWh1M1oyV24yVmhwRk1h?=
- =?utf-8?B?amw4Sk9abEpTQnRJVFJrdXlCNjRPUEUxV3pGbFdQMVVtK3hrSi9nekxoeHV4?=
- =?utf-8?B?OUhnWCtOeEs2b0ZqV1N1M3hpRGJiQ24wanIvV2hvM0RuTzAzS1ZHczhiZmtB?=
- =?utf-8?B?MWZlRU5WSzY1WldwT2FPcHFDN0hna05OejVkb3YrMlJKVkFGSS95UFR5bXhn?=
- =?utf-8?B?ZFBaUXoxMnYzSlpDVUZIMXRjVUp2NFR1MHc4V1ZFZ1RJeXFMQ2NBRG1CVnh5?=
- =?utf-8?B?NVNBd2xEYjZZOTZNV0plTU5ZbEFOcEd2dmlpRnl1SU1ieStVSWtVbmRRbUNq?=
- =?utf-8?B?MFYxVTk1NmE3V2pISGtOYVd0aEQvR0E2bWdIRDdwMGRWWGVGWTA0QU8yVzZi?=
- =?utf-8?B?dUY0TUFhUUNlUzVROHlpcWU4eFNNcWdnQnlwaDRFMWd3TjdhV0o3UkpXVnpk?=
- =?utf-8?B?VlVQYk9sN3ZhV2JJNjhrcCtUSlJ3S0FPZGFvREpGeVBvb2MrTmROZW9KZ0pS?=
- =?utf-8?B?WElQZG50cEt3WForWnE0SC9LQlBzcnZmeGRMUWVJK0hrREcyZlM1M2RBSW9H?=
- =?utf-8?B?cVE0d1kxN2hTMHI0UTlTazAyQTZKaEs3cVNwVGMyRStMUmxZU29MUnl2a0R5?=
- =?utf-8?B?K3V4M1krblhoK0Ura2dQajlQaU05Qjk3cUFtdlpHV1hsaVFUMDVxdHRPc0Zq?=
- =?utf-8?B?QmJyRG5IMkxxU0c4SnA1a0pqU3dlTzR2Ync3TlpZanhLcjNMTEp2OTNwZmdN?=
- =?utf-8?B?MkVLV3NCMTRmbGpQR3BvcTdLRUhqOTc4Rld2Tm8rMmxHVjFyMlErdzlFWEpX?=
- =?utf-8?B?SGJERjdBQjc4bDhpLzhUTTdJblZ0RjlSRDIveFo5SmE2UWsrSHY3S2lYUzJw?=
- =?utf-8?B?WnczMENCR1Y2MmwzNjRnRHFjOFVmQW1tbE5mM1NzWnB0RC95bXY5S1pYUjZO?=
- =?utf-8?B?VHc2eVlncHFMUzdISWk2R0t0ZXM4WTNMaW1VZHpVMlhOVjN4c1N4ZGN0ZDBZ?=
- =?utf-8?B?NURqUGRjV1F2UEU3azc4ZTh5eUxUdFJicGtWQWlYcGl1dU4rRk9DWEN6YWUv?=
- =?utf-8?B?eGNabUwrcWhEb3ArUzE3WjJjRFl5WmpMTjlyUlVvYlN3aElEK2E3dnRCT3Yr?=
- =?utf-8?B?R1ZlVjdRbll4RVIzUjQ0eEMwd3JOZ2ljdnhLM2pVaS9DK09iR1FQWlJ3SFRX?=
- =?utf-8?B?SUZkNTVXTCtlZnJWR0RENEF1OWltU0Z4ZUNZWmNISWVETnJGVTZmRXNUOGZ2?=
- =?utf-8?B?elZmRGtzWiszWXpLN1IrVkEwN3V5VEVsT1FHOFZPc3o2dURESkd5UHIvYUVN?=
- =?utf-8?B?TllwMDFBcTlkUmdrS3pLMzlkWk9tckJvVTRsRDc4dHJtdzBrME9HZG0zck1q?=
- =?utf-8?B?OVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55d35ca7-8c74-450a-1075-08dba412ec71
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 19:55:38.7501
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gtEcbNgQLHqCS+m4dLhWIiRSTHFHD6Tee+W+6xRIRUyQTsqJt8hoQt/thoomAYGY6ilNPh1u5jDltMTJ7hbbmtknbcuzJTlxU8Oicas9/48=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8606
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: Use hrtimer for TX coalescing
+Content-Language: en-US
+To: Vincent Whitchurch <vincent.whitchurch@axis.com>, peppe.cavallaro@st.com,
+ alexandre.torgue@st.com, joabreu@synopsys.com, davem@davemloft.net,
+ kuba@kernel.org
+Cc: kernel@axis.com, netdev@vger.kernel.org
+References: <20201120150208.6838-1-vincent.whitchurch@axis.com>
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <20201120150208.6838-1-vincent.whitchurch@axis.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 8/21/2023 6:42 AM, Jinjie Ruan wrote:
-> Convert list_for_each() to list_for_each_entry() where applicable.
+On 20.11.20 16:02, Vincent Whitchurch wrote:
+> This driver uses a normal timer for TX coalescing, which means that the
+> with the default tx-usecs of 1000 microseconds the cleanups actually
+> happen 10 ms or more later with HZ=100.  This leads to very low
+> througput with TCP when bridged to a slow link such as a 4G modem.  Fix
+> this by using an hrtimer instead.
 > 
-> No functional changed.
+> On my ARM platform with HZ=100 and the default TX coalescing settings
+> (tx-frames 25 tx-usecs 1000), with "tc qdisc add dev eth0 root netem
+> delay 60ms 40ms rate 50Mbit" run on the server, netperf's TCP_STREAM
+> improves from ~5.5 Mbps to ~100 Mbps.
 > 
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
 
-Thanks for cleaning these up!
+Based on tests by OpenWrt users, it seems that this one is causing a 
+significant performance regression caused by wasting lots of CPU cycles 
+re-arming the hrtimer on every single packet. More info:
+https://github.com/openwrt/openwrt/issues/11676#issuecomment-1690492666
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+My suggestion for fixing this properly would be:
+- keep a separate timestamp for last tx packet
+- do not modify the timer if it's scheduled already
+- in the timer function, check the last tx timestamp and re-arm the 
+timer if necessary.
 
-> ---
->  drivers/net/ethernet/intel/igb/igb_main.c      | 7 ++-----
->  drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c | 7 ++-----
->  2 files changed, 4 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index 9f63a10c6f80..bf9c2f6a1164 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -7850,7 +7850,6 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
->  {
->  	struct pci_dev *pdev = adapter->pdev;
->  	struct vf_data_storage *vf_data = &adapter->vf_data[vf];
-> -	struct list_head *pos;
->  	struct vf_mac_filter *entry = NULL;
->  	int ret = 0;
->  
-> @@ -7871,8 +7870,7 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
->  	switch (info) {
->  	case E1000_VF_MAC_FILTER_CLR:
->  		/* remove all unicast MAC filters related to the current VF */
-> -		list_for_each(pos, &adapter->vf_macs.l) {
-> -			entry = list_entry(pos, struct vf_mac_filter, l);
-> +		list_for_each_entry(entry, &adapter->vf_macs.l, l) {
->  			if (entry->vf == vf) {
->  				entry->vf = -1;
->  				entry->free = true;
-> @@ -7882,8 +7880,7 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
->  		break;
->  	case E1000_VF_MAC_FILTER_ADD:
->  		/* try to find empty slot in the list */
-> -		list_for_each(pos, &adapter->vf_macs.l) {
-> -			entry = list_entry(pos, struct vf_mac_filter, l);
-> +		list_for_each_entry(entry, &adapter->vf_macs.l, l) {
->  			if (entry->free)
->  				break;
->  		}
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-> index 29cc60988071..4c6e2a485d8e 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-> @@ -639,12 +639,10 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
->  				int vf, int index, unsigned char *mac_addr)
->  {
->  	struct vf_macvlans *entry;
-> -	struct list_head *pos;
->  	int retval = 0;
->  
->  	if (index <= 1) {
-> -		list_for_each(pos, &adapter->vf_mvs.l) {
-> -			entry = list_entry(pos, struct vf_macvlans, l);
-> +		list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
->  			if (entry->vf == vf) {
->  				entry->vf = -1;
->  				entry->free = true;
-> @@ -664,8 +662,7 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
->  
->  	entry = NULL;
->  
-> -	list_for_each(pos, &adapter->vf_mvs.l) {
-> -		entry = list_entry(pos, struct vf_macvlans, l);
-> +	list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
->  		if (entry->free)
->  			break;
->  	}
+This should significantly reduce the number of wasted CPU cycles, even 
+when accounting for the additional overhead of hrtimer vs regular timer.
+
+- Felix
 
