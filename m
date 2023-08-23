@@ -1,130 +1,195 @@
-Return-Path: <netdev+bounces-30010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E021785971
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5527785978
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0E9528117A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:35:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A2ED281324
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE148C128;
-	Wed, 23 Aug 2023 13:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2954FC12D;
+	Wed, 23 Aug 2023 13:38:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CF2BE7D
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 13:35:54 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECACDE7F
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692797747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e81i7+rqpkC/zX4ymrp3HPYgAeBHOldKterDX4M7y/A=;
-	b=VagbL3JwVL7Ado8wZquEPS/6bFgDOuU2HEK+kccms1E3fay/VcGDUL6apz1oOZOL6SB45k
-	5ZHq/J/XtYituyd1mUA8Bt1a3jydVifbXCv+TR8NWLTXyd8nVMkG/mB9oxDZLOHDv/RFGQ
-	Hb7YwKo06YW+Of5b4wCx6R+lgnrmbTo=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-209-Rejj5gbXM9W5u89VPO57Fw-1; Wed, 23 Aug 2023 09:35:45 -0400
-X-MC-Unique: Rejj5gbXM9W5u89VPO57Fw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fe19dc13a0so676378e87.1
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:35:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1568FC128
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 13:38:34 +0000 (UTC)
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9162198
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:38:32 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31969580797so5023373f8f.3
+        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1692797911; x=1693402711;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iKAzMNi8nNivewK5+MFvQ5p70qvs8dwxCWiyewlejjA=;
+        b=DXTiaR20zFzXkeale/xF2V1Kr2uWYbB3TvWYkEnVz7t53c3mPxLDaPjD6zJDOiaFRa
+         VbVQgeJUNWl1FnIPcjsML2Byy8HfYTJoZq3JhaGFqsf2OfL1tbIzllv8aFqBCpoNM5ht
+         s0vPNryawbnm7A+eQ4eBNoOGhGR9h/7NoWOZpdKEWvO80wsPgVhfjhJudCnSs2IrouIJ
+         0XFIi5jDWHv3Zjtl1fdipZllYNzWI/OmsBd9duIRuBnbL3zw95/9Xe2MLPjExi4lPsdq
+         Vei1a7Ce2seDlDOpX+g3xZ364w7KmjFhUG2jYLRUW8usUWkeSKI2ZE/57QyuVypKfiQ+
+         3cVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692797743; x=1693402543;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e81i7+rqpkC/zX4ymrp3HPYgAeBHOldKterDX4M7y/A=;
-        b=jmtMjNhIqpyN6UD9puW9IS3W6h5UCdurKaA7Re8zZ4fXq7HdwuHrk5N4xDbiiU49OC
-         DST6sZ1vhl6W1yci+SP5xKGEj5erzKTq4CI0a4PrAX/yIcY94+saiRVg4BQgvBc36+56
-         FlHoK/AD/ZxNPP938qb9/+vhHYo/ZAwRUPuMPA88kCvMWrqSNXuo+l9VWh+TTemO6pii
-         XcnPluA2Mc8Hq38JPEuzJRqGflw07fs+Ih+Qv9vslxUyOHEN0rbv6N4wTeCBV9MI8UT5
-         RZme0ua7CFZ3BtXaIOacEPg906/ZvAhmFQE3j+zQiGrhLnOsa9PkneOF94Bv4snDDkap
-         rHHw==
-X-Gm-Message-State: AOJu0Yyqg9Gd9kKtmEQo5c6+obNUxCCKYyIuWtJIx4zPlPUkBCoHcx8I
-	Gr0VuIzmAks6OxMNpj0B2DccoCvdrB9ZfPHkw38LIVeU/XaI6tnzvnkSuAsqGYnjmoBLjXrUm3W
-	d1p4q+sX4zXqMB+yh
-X-Received: by 2002:a19:7601:0:b0:500:8b4d:4cb5 with SMTP id c1-20020a197601000000b005008b4d4cb5mr3980803lff.3.1692797743674;
-        Wed, 23 Aug 2023 06:35:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHuhAiNrehaQQO98CGyKE6j/MfqLyPXBjiPxs+5vglJdyw+4A/bbnYK6/ewAxZMijt61Ww0AQ==
-X-Received: by 2002:a19:7601:0:b0:500:8b4d:4cb5 with SMTP id c1-20020a197601000000b005008b4d4cb5mr3980794lff.3.1692797743358;
-        Wed, 23 Aug 2023 06:35:43 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
-        by smtp.gmail.com with ESMTPSA id mh9-20020a170906eb8900b009934855d8f1sm9789905ejb.34.2023.08.23.06.35.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 06:35:42 -0700 (PDT)
-Message-ID: <0a842574fd0acc113ef925c48d2ad9e67aa0e101.camel@redhat.com>
-Subject: Re: [RFC PATCH net-next 1/2] net: Use SMP threads for backlog NAPI.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Wander
- Lairson Costa <wander@redhat.com>
-Date: Wed, 23 Aug 2023 15:35:41 +0200
-In-Reply-To: <20230814093528.117342-2-bigeasy@linutronix.de>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
-	 <20230814093528.117342-2-bigeasy@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20221208; t=1692797911; x=1693402711;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iKAzMNi8nNivewK5+MFvQ5p70qvs8dwxCWiyewlejjA=;
+        b=D7qwHLMD1cFzbW889wtSGMzLTMCXAXcGEpyNkgKdkUMscNZ2A9QCJNykmWKONr3s1W
+         6qjibOkMv8IMoRzKwoPfi9Imc2wqULye8fsFLaZe2xVwb/U4QgNu07wWTO61Gap/YulP
+         x9q10crGvLSGFv0JD7REUR3zRsVjIryfDSgakE9LKAKI6xrJjqyzO3E+JBqWLD4ChMU8
+         tu9f3lpw0SczARamfd+hfBWyujf1d3m98mdLMNe0q5uSdYHbrowtFa0WVD/JAo4ioS9R
+         6g60MlVC+3g/mXRDuorBJRBYWHeqldwtd9lyy+5S5pOKJt2HBLN6X4OeU1E9Y7x0sahw
+         oWVg==
+X-Gm-Message-State: AOJu0Yy8ut/KWxG7SgX0Dalhte5Wn8+yl4XLyD+TDRFzgSfiXJPg8wJI
+	p5l4tRePOtieT1FcREC+smTGZw==
+X-Google-Smtp-Source: AGHT+IGaSpNVjlokzsffDl1clDwPTvyQxkgYq4A4xPzUtZT8/B1cAud2dYVtVKIJAAjtqm9DrVoZnA==
+X-Received: by 2002:a05:6000:11c9:b0:317:6175:95fd with SMTP id i9-20020a05600011c900b00317617595fdmr9623544wrx.43.1692797911124;
+        Wed, 23 Aug 2023 06:38:31 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:e4f8:e750:a906:5580? ([2a01:e0a:b41:c160:e4f8:e750:a906:5580])
+        by smtp.gmail.com with ESMTPSA id o2-20020adfcf02000000b00317a04131c5sm19020632wrj.57.2023.08.23.06.38.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Aug 2023 06:38:30 -0700 (PDT)
+Message-ID: <856c3f29-aa38-4cf9-ae8f-a46279c3e262@6wind.com>
+Date: Wed, 23 Aug 2023 15:38:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net v2] net: handle ARPHRD_PPP in dev_is_mac_header_xmit()
+Content-Language: en-US
+To: Guillaume Nault <gnault@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Daniel Borkmann <daniel@iogearbox.net>,
+ Alexei Starovoitov <ast@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, stable@vger.kernel.org,
+ Siwar Zitouni <siwar.zitouni@6wind.com>
+References: <20230802122106.3025277-1-nicolas.dichtel@6wind.com>
+ <ZMtpSdLUQx2A6bdx@debian> <34f246ba-3ebc-1257-fe8d-5b7e0670a4a6@6wind.com>
+ <ZMuI5mxR704O9nDq@debian> <62a8762c-40b4-f03f-ca8f-13d33db84f10@6wind.com>
+ <ZMz86ADsBWV1gAal@debian>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <ZMz86ADsBWV1gAal@debian>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-08-14 at 11:35 +0200, Sebastian Andrzej Siewior wrote:
-> @@ -4781,7 +4733,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, =
-int cpu,
->  		 * We can use non atomic operation since we own the queue lock
->  		 */
->  		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state))
-> -			napi_schedule_rps(sd);
-> +			__napi_schedule_irqoff(&sd->backlog);
->  		goto enqueue;
->  	}
->  	reason =3D SKB_DROP_REASON_CPU_BACKLOG;
+Le 04/08/2023 à 15:28, Guillaume Nault a écrit :
+> On Thu, Aug 03, 2023 at 02:22:17PM +0200, Nicolas Dichtel wrote:
+>> Le 03/08/2023 à 13:00, Guillaume Nault a écrit :
+>>> On Thu, Aug 03, 2023 at 11:37:00AM +0200, Nicolas Dichtel wrote:
+>>>> Le 03/08/2023 à 10:46, Guillaume Nault a écrit :
+>>>>> On Wed, Aug 02, 2023 at 02:21:06PM +0200, Nicolas Dichtel wrote:
+>>>>>> This kind of interface doesn't have a mac header.
+>>>>>
+>>>>> Well, PPP does have a link layer header.
+>>>> It has a link layer, but not an ethernet header.
+>>>
+>>> This is generic code. The layer two protocol involved doesn't matter.
+>>> What matter is that the device requires a specific l2 header.
+>> Ok. Note, that addr_len is set to 0 for these devices:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ppp/ppp_generic.c#n1614
+> 
+> PPP has no hardware address. It doesn't need any since it's point to
+> point. But it still has an l2 header.
+> 
+>>>>> Do you instead mean that PPP automatically adds it?
+>>>>>
+>>>>>> This patch fixes bpf_redirect() to a ppp interface.
+>>>>>
+>>>>> Can you give more details? Which kind of packets are you trying to
+>>>>> redirect to PPP interfaces?
+>>>> My ebpf program redirect an IP packet (eth / ip) from a physical ethernet device
+>>>> at ingress to a ppp device at egress.
+>>>
+>>> So you're kind of bridging two incompatible layer two protocols.
+>>> I see no reason to be surprised if that doesn't work out of the box.
+>> I don't see the difference with a gre or ip tunnel. This kind of "bridging" is
+>> supported.
+> 
+> From a protocol point of view, this feature just needs to strip the l2
+> header (or add it for the other way around). Here we have to remove the
+> previous l2 header, then add a new one of a different kind.
+> 
+> But honestly, even for the l3-tunnel<->Ethernet "bridging", I don't
+> really like how the code tries to be too clever. It'd have been much
+> simpler to just require the user to drop the l2 headers explicitely.
+> Anyway, that ship has sailed.
+> 
+>>> Let me be clearer too. As I said, this patch may be the best we can do.
+>>> Making a proper l2 generic BPF-redirect/TC-mirred might require too
+>>> much work for the expected gain (how many users of non-Ethernet l2
+>>> devices are going to use this). But at least we should make it clear in
+>>> the commit message and in the code why we're finding it convenient to
+>>> treat PPP as an l3 device. Like
+>>>
+>>> +	/* PPP adds its l2 header automatically in ppp_start_xmit().
+>>> +	 * This makes it look like an l3 device to __bpf_redirect() and
+>>> +	 * tcf_mirred_init().
+>>> +	 */
+>>> +	case ARPHRD_PPP:
+>> I better understand your point with this comment, I can add it, no problem.
+>> But I fail to see why it is different from a L3 device. ip, gre, etc. tunnels
+>> also add automatically another header (ipip.c has dev->addr_len configured to 4,
+>> ip6_tunnels.c to 16, etc.).
+> 
+> These are encapsulation protocols. They glue the inner and outer
+> packets together. PPP doesn't do that, it's just an l2 protocol.
+> To encapsulate PPP into IP or UDP, you need another protocol, like
+> L2TP.
+> 
+> We can compare GRE or IPIP to L2TP (to some extend), not to PPP.
+> 
+>> A tcpdump on the physical output interface shows the same kind of packets (the
+>> outer hdr (ppp / ip / etc.) followed by the encapsulated packet and a tcpdump on
+>> the ppp or ip tunnel device shows only the inner packet.
+> 
+> Packets captured on ppp interfaces seem to be a bit misleading. They
+> don't show the l2-header, but the "Linux cooked capture" header
+> instead. I don't know the reasoning behind that, maybe to help people
+> differenciate between Rx and Tx packets. Anyway, that's different from
+> the raw IP packets captured on ipip devices for example.
+> 
+> Really, PPP isn't like any ip tunnel protocol. It's just not an
+> encapsulation protocol. PPP is like Ethernet. And just like Ethernet,
+> it can be encapsulated by tunnels, but that requires a separate
+> tunneling protocol. As an example, Ethernet has VXLAN and PPP has L2TP.
+> 
+>> Without my patch, a redirect from a ppp interface to another ppp interface would
+>> have the same problem.
+> 
+> True, but that's because the PPP code is so old and unmaintained, it
+> hasn't evolved with the rest of the networking stack. And again, I
+> agree that your patch is the easiest way to make it work. But it will
+> also expose inconsistencies in how BPF and tc-mirred handle different
+> l2 protocols. That makes the logic hard to get from a developper point
+> of view and that's why I'm asking for a better commit message and some
+> comments in the code. For the user space inconsistencies, well, I guess
+> nobody will really care :(.
 
-I *think* that the above could be quite dangerous when cpu =3D=3D
-smp_processor_id() - that is, with plain veth usage.
+Thanks for the detailed explanations.
 
-Currently, each packet runs into the rx path just after
-enqueue_to_backlog()/tx completes.
 
-With this patch there will be a burst effect, where the backlog thread
-will run after a few (several) packets will be enqueued, when the
-process scheduler will decide - note that the current CPU is already
-hosting a running process, the tx thread.
-
-The above can cause packet drops (due to limited buffering) or very
-high latency (due to long burst), even in non overload situation, quite
-hard to debug.
-
-I think the above needs to be an opt-in, but I guess that even RT
-deployments doing some packet forwarding will not be happy with this
-on.
-
-Cheers,
-
-Paolo
-
+Regards,
+Nicolas
 
