@@ -1,116 +1,72 @@
-Return-Path: <netdev+bounces-30061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DA1785C21
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:30:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204A0785C33
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D504D1C20C0D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:30:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4745F1C20C9A
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875BEC2FE;
-	Wed, 23 Aug 2023 15:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E7FC8D4;
+	Wed, 23 Aug 2023 15:35:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6E6AD42
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 15:30:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353F9CF1
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692804644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BiPg1CR7QhpEos1y8wjGxBQSx510OyL+G2I/cKhPLW8=;
-	b=iHxolWmF+UtVDlyY+iqY2RXRHaoQ+oScrFUJBRqwyHByNy2gUlUX47Y2cTpqZXFR/aRFT+
-	7cR8dWFa+ZEzfuQfNQB420RzeogspNFwF5iPUUqYpe7r8WfkxaAjIHqxKLUhxnfOjl4dJY
-	So44IvyjVPJfIZWuNSceunjo93zmpW8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-473-8NWu1HKwP7-2Q0-vJASG5Q-1; Wed, 23 Aug 2023 11:30:40 -0400
-X-MC-Unique: 8NWu1HKwP7-2Q0-vJASG5Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25F0B85D083;
-	Wed, 23 Aug 2023 15:30:38 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.39.193.143])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 15181C15BAE;
-	Wed, 23 Aug 2023 15:30:35 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	elic@nvidia.com,
-	mail@anirudhrb.com,
-	jasowang@redhat.com,
-	mst@redhat.com,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Subject: [PATCH] vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
-Date: Wed, 23 Aug 2023 17:30:32 +0200
-Message-ID: <20230823153032.239304-1-eric.auger@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FC4C2F8
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 15:35:51 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD39BE4E
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:35:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ErDNAUCocKSLt+qkkGIfIJzWEGJFTz9fQ02v0TDuewA=; b=BUM3vf4X+FMLcRF3MINmuGl0WW
+	8kdcnxfmyooNn8G7t+mD2K/cL3aV9eT9lazqN2nD0Yh6ATft/bIfOGNRijOxjC2hjOryTHdPtnGT/
+	w3q9OjzV/jbNJaCupMu1zsVxfDHzHs9D6CzLa/8njgtE5h/Y0v7ZeSz48r38XddX7F9Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qYptT-004u1X-BH; Wed, 23 Aug 2023 17:35:39 +0200
+Date: Wed, 23 Aug 2023 17:35:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, Jose.Abreu@synopsys.com,
+	rmk+kernel@armlinux.org.uk, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v3 7/8] net: txgbe: support copper NIC with
+ external PHY
+Message-ID: <7d999689-cea9-4e66-8807-a04eb9ad4cb5@lunn.ch>
+References: <20230823061935.415804-1-jiawenwu@trustnetic.com>
+ <20230823061935.415804-8-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230823061935.415804-8-jiawenwu@trustnetic.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb
-entries") Forbade vhost iotlb msg with null size to prevent entries
-with size = start = 0 and last = ULONG_MAX to end up in the iotlb.
+> +static int txgbe_phy_read(struct mii_bus *bus, int phy_addr,
+> +			  int devnum, int regnum)
 
-Then commit 95932ab2ea07 ("vhost: allow batching hint without size")
-only applied the check for VHOST_IOTLB_UPDATE and VHOST_IOTLB_INVALIDATE
-message types to fix a regression observed with batching hit.
+There is a general pattern to use the postfix _c45 for the method that
+implements C45 access. Not a must, just a nice to have.
 
-Still, the introduction of that check introduced a regression for
-some users attempting to invalidate the whole ULONG_MAX range by
-setting the size to 0. This is the case with qemu/smmuv3/vhost
-integration which does not work anymore. It Looks safe to partially
-revert the original commit and allow VHOST_IOTLB_INVALIDATE messages
-with null size. vhost_iotlb_del_range() will compute a correct end
-iova. Same for vhost_vdpa_iotlb_unmap().
+Does this bus master not support C22 at all?
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entries")
----
- drivers/vhost/vhost.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index c71d573f1c94..e0c181ad17e3 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1458,9 +1458,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
- 		goto done;
- 	}
- 
--	if ((msg.type == VHOST_IOTLB_UPDATE ||
--	     msg.type == VHOST_IOTLB_INVALIDATE) &&
--	     msg.size == 0) {
-+	if (msg.type == VHOST_IOTLB_UPDATE && msg.size == 0) {
- 		ret = -EINVAL;
- 		goto done;
- 	}
--- 
-2.41.0
-
+     Andrew
 
