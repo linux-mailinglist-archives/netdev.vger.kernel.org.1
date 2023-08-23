@@ -1,123 +1,94 @@
-Return-Path: <netdev+bounces-30122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB267860E8
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:45:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFEF786102
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:50:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 442961C20D49
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:45:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 686EA281382
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0CC1FB48;
-	Wed, 23 Aug 2023 19:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA791FB4D;
+	Wed, 23 Aug 2023 19:50:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13471FB37
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:45:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A0D7C433C7;
-	Wed, 23 Aug 2023 19:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7612A1F945;
+	Wed, 23 Aug 2023 19:50:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C2F4C433C7;
+	Wed, 23 Aug 2023 19:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692819918;
-	bh=lsGEuPRKfKWs371RBzhxtFzAYt+HhjkscGi468j6VnM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VkjEKl6DmsHHydIXLBano6M99uE9mkTtn+oc+yn5Lcp7AO9k+pPH78YmmkVeuo1J/
-	 mGXJBXv71cNXqIYmdOE8tg5ntEGKQoAkpOTcq3TWs5ugU/hOr5OSCF2kezw0wfwRqC
-	 nEFHOkbdo0r2NdIcWbPKVdNduDPvTRpzimPC8VXOIrfspQLaEfCIIdAbLYjNZe688x
-	 06i7McwrNKXQE8pdDsS7+Xz0crJ4ZN3bJzEFmSlNh8xAYZbWoVJuCTa2VUyPw0W/+o
-	 JrApSXXJcfoJmW+fbYxHR9KEPj/WB/YXK+Zjn319YJldgjG7eGEdOvjFYf4So3EesG
-	 nG0oeMxm9gMRg==
-Date: Wed, 23 Aug 2023 12:45:17 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com
-Subject: Re: [RFC PATCH net-next 1/3] net: ethtool: add symmetric Toeplitz
- RSS hash function
-Message-ID: <ZOZhzYExHgnSBej4@x130>
-References: <20230823164831.3284341-1-ahmed.zaki@intel.com>
- <20230823164831.3284341-2-ahmed.zaki@intel.com>
+	s=k20201202; t=1692820248;
+	bh=xUP8Aao2vUba1hN7Bnt0t6crXDnohGolTg985mKMKdQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ZuhIPkP4CUsDGiKsOw1+HxLQGXZ3YTAWFNprtH9vVrl5/Qw4zQzzpc7LN2Uhe5P38
+	 n4sJnMcOKXZ4Dibb3GYiZ3x4yZQ+CeXJAGdmE0Mfn6c4zlb0rDzr776/rHhnqXomT8
+	 PGx1H4DfgF/ul1OhKJMwWUU5Jbpleqxx5Gaf+hz1aK5uBsEgOtC8jXcv0wB+ML4SyI
+	 qXmVdf9SyuWd/eEn4r3IRVOdEKtPAFjtomQu/7QpHHxi2trZDJ5eBjXndUBPWy/YBD
+	 GD1MeLqAXSE5rpWrQuf6M2UjBwScWXM6ITjebQ9eG1Bjdwex2rcUUa2NgU8UNnuDeH
+	 bTE7/+NhO2eUA==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Pu Lehui <pulehui@huaweicloud.com>, linux-riscv
+ <linux-riscv@lists.infradead.org>, bpf <bpf@vger.kernel.org>, Network
+ Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Yonghong Song <yhs@fb.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri
+ Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Xu Kuohai
+ <xukuohai@huawei.com>, Puranjay Mohan <puranjay12@gmail.com>, Pu Lehui
+ <pulehui@huawei.com>
+Subject: Re: [PATCH bpf-next 7/7] selftests/bpf: Enable cpu v4 tests for RV64
+In-Reply-To: <CAADnVQLu5twbe_UpiJrD0wKq1YyHzZbfzYhsW-mte7vDmyna5g@mail.gmail.com>
+References: <20230823231059.3363698-1-pulehui@huaweicloud.com>
+ <20230823231059.3363698-8-pulehui@huaweicloud.com>
+ <87zg2hk44i.fsf@all.your.base.are.belong.to.us>
+ <CAADnVQLu5twbe_UpiJrD0wKq1YyHzZbfzYhsW-mte7vDmyna5g@mail.gmail.com>
+Date: Wed, 23 Aug 2023 21:50:44 +0200
+Message-ID: <875y55tu5n.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230823164831.3284341-2-ahmed.zaki@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 23 Aug 10:48, Ahmed Zaki wrote:
->Symmetric RSS hash functions are beneficial in applications that monitor
->both Tx and Rx packets of the same flow (IDS, software firewalls, ..etc).
->Getting all traffic of the same flow on the same RX queue results in
->higher CPU cache efficiency.
->
+Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
 
-Can you please shed more light on the use case and configuration? 
-Where do you expect the same flow/connection rx/tx to be received by the
-same rxq in a nic driver?
+> On Wed, Aug 23, 2023 at 11:25=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@ker=
+nel.org> wrote:
+>>
+>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>
+>> > From: Pu Lehui <pulehui@huawei.com>
+>> >
+>> > Enable cpu v4 tests for RV64, and the relevant tests have passed.
+>> >
+>> > Signed-off-by: Pu Lehui <pulehui@huawei.com>
+>>
+>> Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
+>
+> Bjorn,
+>
+> Thanks a lot for the quick review!
+> Could you give it a spin as well and hopefully add Tested-by ?
+>
+> We still have time to get it into bpf-next for the upcoming merge window.
 
->Allow ethtool to support symmetric Toeplitz algorithm. A user can set the
->RSS function of the netdevice via:
->    # ethtool -X eth0 hfunc symmetric_toeplitz
->
+I'll kick a run! But I'd like a change to mov 8/16b patch (#3) prior
+pulling.
 
-What is the expectation of the symmetric toeplitz hash, how do you achieve
-that? by sorting packet fields? which fields?
+> We still have time to get it into bpf-next for the upcoming merge window.
 
-Can you please provide a link to documentation/spec?
-We should make sure all vendors agree on implementation and expectation of
-the symmetric hash function.
+@Lehui Do you have time to cook a v2?
 
->Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
->---
-> include/linux/ethtool.h | 4 +++-
-> net/ethtool/common.c    | 1 +
-> 2 files changed, 4 insertions(+), 1 deletion(-)
->
->diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
->index 62b61527bcc4..9a8e1fb7170d 100644
->--- a/include/linux/ethtool.h
->+++ b/include/linux/ethtool.h
->@@ -60,10 +60,11 @@ enum {
-> 	ETH_RSS_HASH_TOP_BIT, /* Configurable RSS hash function - Toeplitz */
-> 	ETH_RSS_HASH_XOR_BIT, /* Configurable RSS hash function - Xor */
-> 	ETH_RSS_HASH_CRC32_BIT, /* Configurable RSS hash function - Crc32 */
->+	ETH_RSS_HASH_SYM_TOP_BIT, /* Configurable RSS hash function - Symmetric Toeplitz */
->
-> 	/*
-> 	 * Add your fresh new hash function bits above and remember to update
->-	 * rss_hash_func_strings[] in ethtool.c
->+	 * rss_hash_func_strings[] in ethtool/common.c
-> 	 */
-> 	ETH_RSS_HASH_FUNCS_COUNT
-> };
->@@ -108,6 +109,7 @@ enum ethtool_supported_ring_param {
-> #define __ETH_RSS_HASH(name)	__ETH_RSS_HASH_BIT(ETH_RSS_HASH_##name##_BIT)
->
-> #define ETH_RSS_HASH_TOP	__ETH_RSS_HASH(TOP)
->+#define ETH_RSS_HASH_SYM_TOP	__ETH_RSS_HASH(SYM_TOP)
-> #define ETH_RSS_HASH_XOR	__ETH_RSS_HASH(XOR)
-> #define ETH_RSS_HASH_CRC32	__ETH_RSS_HASH(CRC32)
->
->diff --git a/net/ethtool/common.c b/net/ethtool/common.c
->index f5598c5f50de..a0e0c6b2980e 100644
->--- a/net/ethtool/common.c
->+++ b/net/ethtool/common.c
->@@ -81,6 +81,7 @@ rss_hash_func_strings[ETH_RSS_HASH_FUNCS_COUNT][ETH_GSTRING_LEN] = {
-> 	[ETH_RSS_HASH_TOP_BIT] =	"toeplitz",
-> 	[ETH_RSS_HASH_XOR_BIT] =	"xor",
-> 	[ETH_RSS_HASH_CRC32_BIT] =	"crc32",
->+	[ETH_RSS_HASH_SYM_TOP_BIT] =	"symmetric_toeplitz",
-> };
->
-> const char
->-- 
->2.39.2
->
->
+
+Bj=C3=B6rn
 
