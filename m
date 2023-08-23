@@ -1,314 +1,280 @@
-Return-Path: <netdev+bounces-30009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C46B78596C
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:34:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A96CB785919
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:23:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EFE72811F6
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:34:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E04E1C20D02
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BA3C127;
-	Wed, 23 Aug 2023 13:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA52DBE79;
+	Wed, 23 Aug 2023 13:23:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDEF0BE79
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 13:34:41 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9DCFE63;
-	Wed, 23 Aug 2023 06:34:19 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37N7GRVk027416;
-	Wed, 23 Aug 2023 06:18:11 -0700
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2175.outbound.protection.outlook.com [104.47.56.175])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3sn20b2xrd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Aug 2023 06:18:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cQeN2atFUp3uDpITRLMK8HaHTTSGhPNE7Nu+noNpOZBoazL+njtmAXg65n6h+eHrXbHhwLPhBEt2KGp28XKL27r37NqtZpFTwhQsB+TT23bZQPElPxWbzexooLq1vD0dCZyYBjV6al/LRmvS6OTlc2dP3vf6VJxpuMbHxUjMj6cwkJxU2sN03zCEtyHGlqMqF0FgLVrLolhX/bxVgpKtiiSFATKOrMVq5bbQGwcjc1jQfXyP7OIDMbT0Zm7Z2TaJ9tN5umXDv23mao3mnDL9EdF+ilwibuEVEskEsYrSylGlf0yrOV0wupS16lWVVJs0dqfRLibGNcDwNs4hb0EDfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=knAPEC8OZGcgPi3VgdKOIapr9xZgh07YTzNWQUwRfNE=;
- b=kxNWqMf08iL9G+3eeqBQUOuJM9q2OH+O2Nh3g9zlxGo5s6MwLGSLcZnO2TVKmzyqQr4gWS0DrjU8jQsLpOjHIWqj5wxeCnSDrwnrVhGIbdoEKpRUQvCTnHnwd7lk8YaIkG+rZgXwc/2HdQOX6FBkHNMn6Ep7ZkfgMTvy5h/j0w30Fin1AKU/uy2OB7Euhtj86LydXf8ZjQjkbFGRoKYFqMAHR+YsTY7nZKEfkSNFVmn/aLdTbtb3WCwOrcPnavdUOUEOtkzuY8xO5tJ+ZdrGjamcfwE360Xq7gg20IPhcwMM8OxxVaWI9VIpqaIDi5uB3f2GGTAv4m/lDWWlj08tfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=knAPEC8OZGcgPi3VgdKOIapr9xZgh07YTzNWQUwRfNE=;
- b=SPCcpqET5PUvWhUB5ZuRvSFp67aZYI4pA1dVUPdAgRSX1FqEa5JWRxTZX3cTShU0Dpp7W5AlESSHpBH09qLI7KP3rrm7gIrrNchAJiQo26zAUoNMNsifQSz35XATOeIY561IkjPmpWvB5C2kYrLV3/0XiKcPmw8DbBJ2lnOVybQ=
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com (2603:10b6:a03:430::6)
- by MN2PR18MB3624.namprd18.prod.outlook.com (2603:10b6:208:261::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
- 2023 13:18:06 +0000
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::8d00:13b4:289:daff]) by SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::8d00:13b4:289:daff%5]) with mapi id 15.20.6699.020; Wed, 23 Aug 2023
- 13:18:06 +0000
-From: Suman Ghosh <sumang@marvell.com>
-To: Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula
-	<gakula@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Hariprasad Kelam <hkelam@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Jerin Jacob Kollanukkaran <jerinj@marvell.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [EXT] Re: [net PATCH V3 1/3] octeontx2-pf: Fix PFC TX scheduler
- free
-Thread-Topic: [EXT] Re: [net PATCH V3 1/3] octeontx2-pf: Fix PFC TX scheduler
- free
-Thread-Index: AQHZ0+/o1JeGmOdGN0+h1vGhw62MTq/157yAgAA/cACAAJkCAIABIDtw
-Date: Wed, 23 Aug 2023 13:18:06 +0000
-Message-ID: 
- <SJ0PR18MB5216756E9D24E7BE75F8AD81DB1CA@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20230821052516.398572-1-sumang@marvell.com>
- <20230821052516.398572-2-sumang@marvell.com>
- <20230822071101.GI2711035@kernel.org>
- <d3073c7b5d54e1ad4790b16c419e862fee952350.camel@redhat.com>
- <20230822200542.GA3523530@kernel.org>
-In-Reply-To: <20230822200542.GA3523530@kernel.org>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: 
- =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcc3VtYW5nXGFw?=
- =?us-ascii?Q?cGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0YmEy?=
- =?us-ascii?Q?OWUzNWJcbXNnc1xtc2ctN2Q4YmQzMjAtNDFiNy0xMWVlLWI2ZTktODQxNDRk?=
- =?us-ascii?Q?ZWVhNTRjXGFtZS10ZXN0XDdkOGJkMzIyLTQxYjctMTFlZS1iNmU5LTg0MTQ0?=
- =?us-ascii?Q?ZGVlYTU0Y2JvZHkudHh0IiBzej0iNjI4IiB0PSIxMzMzNzI3MDI4NDYyNDE1?=
- =?us-ascii?Q?ODgiIGg9IlVKbjZTZXdlVENidmNoZDdJT3RNOS9RMG9JVT0iIGlkPSIiIGJs?=
- =?us-ascii?Q?PSIwIiBibz0iMSIgY2k9ImNBQUFBRVJIVTFSU1JVRk5DZ1VBQU40UEFBQTBT?=
- =?us-ascii?Q?K0kveE5YWkFlMmR1K3dETDZhcjdaMjc3QU12cHFzWkFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFIQUFBQUJ1RHdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFF?=
- =?us-ascii?Q?QUFRRUJBQUFBOVJlbkx3Q0FBUUFBQUFBQUFBQUFBSjRBQUFCaEFHUUFaQUJ5?=
- =?us-ascii?Q?QUdVQWN3QnpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFBQUFBQUVB?=
- =?us-ascii?Q?QUFBQUFBQUFBZ0FBQUFBQW5nQUFBR01BZFFCekFIUUFid0J0QUY4QWNBQmxB?=
- =?us-ascii?Q?SElBY3dCdkFHNEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFB?=
- =?us-ascii?Q?QUNlQUFBQVl3QjFBSE1BZEFCdkFHMEFYd0J3QUdnQWJ3QnVBR1VBYmdCMUFH?=
- =?us-ascii?Q?MEFZZ0JsQUhJQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJqQUhVQWN3?=
- =?us-ascii?Q?QjBBRzhBYlFCZkFITUFjd0J1QUY4QVpBQmhBSE1BYUFCZkFIWUFNQUF5QUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-refone: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFHTUFk?=
- =?us-ascii?Q?UUJ6QUhRQWJ3QnRBRjhBY3dCekFHNEFYd0JyQUdVQWVRQjNBRzhBY2dCa0FI?=
- =?us-ascii?Q?TUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBWXdCMUFITUFkQUJ2QUcwQVh3?=
- =?us-ascii?Q?QnpBSE1BYmdCZkFHNEFid0JrQUdVQWJBQnBBRzBBYVFCMEFHVUFjZ0JmQUhZ?=
- =?us-ascii?Q?QU1BQXlBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFB?=
- =?us-ascii?Q?SUFBQUFBQUo0QUFBQmpBSFVBY3dCMEFHOEFiUUJmQUhNQWN3QnVBRjhBY3dC?=
- =?us-ascii?Q?d0FHRUFZd0JsQUY4QWRnQXdBRElBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdR?=
- =?us-ascii?Q?QWJBQndBRjhBY3dCckFIa0FjQUJsQUY4QVl3Qm9BR0VBZEFCZkFHMEFaUUJ6?=
- =?us-ascii?Q?QUhNQVlRQm5BR1VBWHdCMkFEQUFNZ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFDZUFBQUFaQUJzQUhBQVh3QnpBR3dB?=
- =?us-ascii?Q?WVFCakFHc0FYd0JqQUdnQVlRQjBBRjhBYlFCbEFITUFjd0JoQUdjQVpRQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reftwo: 
- =?us-ascii?Q?QUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCa0FHd0FjQUJmQUhR?=
- =?us-ascii?Q?QVpRQmhBRzBBY3dCZkFHOEFiZ0JsQUdRQWNnQnBBSFlBWlFCZkFHWUFhUUJz?=
- =?us-ascii?Q?QUdVQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFB?=
- =?us-ascii?Q?QUFBQUFBZ0FBQUFBQW5nQUFBR1VBYlFCaEFHa0FiQUJmQUdFQVpBQmtBSElB?=
- =?us-ascii?Q?WlFCekFITUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNl?=
- =?us-ascii?Q?QUFBQWJRQmhBSElBZGdCbEFHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFi?=
- =?us-ascii?Q?Z0JoQUcwQVpRQnpBRjhBWXdCdkFHNEFaZ0JwQUdRQVpRQnVBSFFBYVFCaEFH?=
- =?us-ascii?Q?d0FYd0JoQUd3QWJ3QnVBR1VBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJB?=
- =?us-ascii?Q?R1VBYkFCZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdCdUFHRUFiUUJsQUhNQVh3?=
- =?us-ascii?Q?QnlBR1VBY3dCMEFISUFhUUJqQUhRQVpRQmtBRjhBWVFCc0FHOEFiZ0JsQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFB?=
- =?us-ascii?Q?QUFBQUFBQUFnQUFBQUFBbmdBQUFHMEFZUUJ5QUhZQVpRQnNBRjhBY0FCeUFH?=
- =?us-ascii?Q?OEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFjd0JmQUhJQVpRQnpBSFFBY2dC?=
- =?us-ascii?Q?cEFHTUFkQUJsQUdRQVh3Qm9BR1VBZUFCakFHOEFaQUJsQUhNQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFB?=
- =?us-ascii?Q?Q2VBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBR0VBY2dCdEFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-rorf: true
-x-dg-refthree: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFB?=
- =?us-ascii?Q?QUFBQUo0QUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QVp3QnZBRzhBWndCc0FH?=
- =?us-ascii?Q?VUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUcwQVlR?=
- =?us-ascii?Q?QnlBSFlBWlFCc0FHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFZd0J2QUdR?=
- =?us-ascii?Q?QVpRQnpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBUUFBQUFBQUFBQUNBQUFBQUFDZUFBQUFiUUJoQUhJQWRnQmxBR3dBYkFC?=
- =?us-ascii?Q?ZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdCakFHOEFaQUJsQUhNQVh3QmtBR2tB?=
- =?us-ascii?Q?WXdCMEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJ?=
- =?us-ascii?Q?QUFBQUFBSjRBQUFCdEFHRUFjZ0IyQUdVQWJBQnNBRjhBY0FCeUFHOEFhZ0Js?=
- =?us-ascii?Q?QUdNQWRBQmZBRzRBWVFCdEFHVUFjd0JmQUdNQWJ3QnVBR1lBYVFCa0FHVUFi?=
- =?us-ascii?Q?Z0IwQUdrQVlRQnNBRjhBYlFCaEFISUFkZ0JsQUd3QWJBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFBRzBB?=
- =?us-ascii?Q?WVFCeUFIWUFaUUJzQUd3QVh3QndBSElBYndCcUFHVUFZd0IwQUY4QWJnQmhB?=
- =?us-ascii?Q?RzBBWlFCekFGOEFZd0J2QUc0QVpnQnBBR1FBWlFCdUFIUUFhUUJoQUd3QVh3?=
- =?us-ascii?Q?QnRBR0VBY2dCMkFHVUFiQUJzQUY4QWJ3QnlBRjhBWVFCeUFHMEFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reffour: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNlQUFB?=
- =?us-ascii?Q?QWJRQmhBSElBZGdCbEFHd0FiQUJmQUhBQWNnQnZBR29BWlFCakFIUUFYd0J1?=
- =?us-ascii?Q?QUdFQWJRQmxBSE1BWHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRBZEFCcEFHRUFi?=
- =?us-ascii?Q?QUJmQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J2QUhJQVh3Qm5BRzhBYndCbkFH?=
- =?us-ascii?Q?d0FaUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJBR1VB?=
- =?us-ascii?Q?YkFCc0FGOEFjQUJ5QUc4QWFnQmxBR01BZEFCZkFHNEFZUUJ0QUdVQWN3QmZB?=
- =?us-ascii?Q?SElBWlFCekFIUUFjZ0JwQUdNQWRBQmxBR1FBWHdCdEFHRUFjZ0IyQUdVQWJB?=
- =?us-ascii?Q?QnNBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFB?=
- =?us-ascii?Q?QUFBQUFnQUFBQUFBbmdBQUFHMEFZUUJ5QUhZQVpRQnNBR3dBWHdCd0FISUFi?=
- =?us-ascii?Q?d0JxQUdVQVl3QjBBRjhBYmdCaEFHMEFaUUJ6QUY4QWNnQmxBSE1BZEFCeUFH?=
- =?us-ascii?Q?a0FZd0IwQUdVQVpBQmZBRzBBWVFCeUFIWUFaUUJzQUd3QVh3QnZBSElBWHdC?=
- =?us-ascii?Q?aEFISUFiUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VB?=
- =?us-ascii?Q?QUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBSFFBWlFCeUFHMEFhUUJ1QUhVQWN3?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFBQUFBQUo0QUFBQnRBR0VBY2dCMkFH?=
- =?us-ascii?Q?VUFiQUJzQUY4QWR3QnZBSElBWkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFB?=
- =?us-ascii?Q?QUFBQUFBQWdBQUFBQUEiLz48L21ldGE+?=
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR18MB5216:EE_|MN2PR18MB3624:EE_
-x-ms-office365-filtering-correlation-id: ea2cd22c-f7ec-4b24-f2cd-08dba3db636a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- pos1Z/xV9YT6P3islH94s0/Qhw2KkWqytNRtwZSQrQI0tEJLV1VpPSJyCcT2RWeuPM5SA45Mx04jjls5b2cLq7LFl8FlzN8jK3n5pXZP/02Hvmjd5Ra2DfTbuNbMuev+ANyv8pZFG/cO5YYOIoFW5bJSFBF9aepOvmBbdEAaWhToDlRBnLxaRKWYvHHKIqAvCxfcA1hN0EoroXncoUY6yVnITtY4mn73ovvtCh9HHlbIIGN79jPvQFt3eMWI2Vv5DlXhqzZIbH+c6ndZOWE4zf8z9GtQ0pdqH+M33ikHqwAu8xz4g/kk42lC99jYCG+ubDglPeGzOemH103sfH1l4gK6ub2Pjy0YoDqyIs/te/972xEPWGDspEhodCCjIV9rLxtEmUUWZNRqdumaN5YW8o518Ymbq8pnpU03HiRLBsiALvICor/iFqUjwOm2AtbGIShzrpMuuLjs1a4RNTXXw1TMIBzxaSdOXf9HeBy8d7Oe2zb++7uKmTUJkjo+MvdTsfIk+ixA4pu1mQf7GMK1UiY1WDR/G60g7L4ookj56ZnBG9OICRMcIq2/Hv+n5GvYiWNlYzikNJozZyQREvzdhdsif4Dyn1g6slBTESYBppVxVOpPIpMEj6rmQVNW6HwU
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR18MB5216.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(366004)(346002)(39860400002)(1800799009)(186009)(451199024)(4744005)(2906002)(38070700005)(38100700002)(122000001)(33656002)(86362001)(55016003)(9686003)(41300700001)(110136005)(66446008)(66556008)(66476007)(54906003)(66946007)(64756008)(76116006)(6506007)(7696005)(316002)(52536014)(4326008)(8936002)(8676002)(478600001)(71200400001)(26005)(5660300002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?RCZA71xDF8RQOxjV11VRc5X59H/yR56rUcwWDzFDa4lWXE7ikYp7AKZ7j8wp?=
- =?us-ascii?Q?Vp/LZ6VANJavR2EdI6ehawObp0/5qK8RCen6kHrGc4OVl5Ib+3Kwi5HV5sQU?=
- =?us-ascii?Q?He5v7HZNMIUoU9aJ8u9MpeFALslf8aejG8DIDwRAIa3I+JpNPt2sl5Z/VJdV?=
- =?us-ascii?Q?9NJrNNY0L/P3xzX2vps+oMcbKrQTVA780BnSIiN0pgkVs/pxNyryFWTclqo+?=
- =?us-ascii?Q?/B9F4i2YPHvhRZXQRxBwIK4+wI52KoueK0vT0vlkEHrGKdPKL3aw6KHLdX9w?=
- =?us-ascii?Q?yHFVgK2zKNqLUbUUZDAWd+yMy/fGMT6bG3fBcIP9XULG185SS47Xkj+WP2pJ?=
- =?us-ascii?Q?n1j3MiOuG/ifLQy6GwvSenZt93CZqeeARvii7LmgQYtUFW0pwvB/6uldDT/m?=
- =?us-ascii?Q?OFuuskAVbrVPPlrr6S8m8/AutJZJnxr7Ut/IlPLCMKCQulyhwvr1uROFYiQe?=
- =?us-ascii?Q?qL0SUzwCMigqT1vKTEb1ig/1CgfoAhH0VpAGfkZRSdsHWpLS+aa9oEksHEzO?=
- =?us-ascii?Q?FpRG3D50JmnqKoCpP+EGnFpBaaPvlhdvnYUNxsrTtpVc7kwuM7jbVlfHoqsd?=
- =?us-ascii?Q?+KoU59JbHo03g44EoMW+vE/3TDsYcBBr/LK5Sdgu+9ghsNvHHEg+vR7ugem+?=
- =?us-ascii?Q?SJPZcZWBWTIw8uRGMnKcixLQVcIHW4JWu1VO6CN5Ag2IeIwFqWlnS3/DnFGQ?=
- =?us-ascii?Q?ITpyXSYUOo4OfHLEr2h9T+9Vl45PPu8fwNYsOAFvfLbXbP0Q3/NLhflBUzHc?=
- =?us-ascii?Q?niQ6tULcJAaebzBGg21q1EDJBjisAhVS7pfx3wO9Z2tDSBchYgXHrhENuGWh?=
- =?us-ascii?Q?0R+kTCzHDeATrbfWwDM0N3/rq7NarMGHiDCnEx3Lwafa5PbWHzEY2X9kPLsR?=
- =?us-ascii?Q?k1a/udAEPE7WOciGNjTdKdOMrD6Vm9RhNNgpDSvaxmW9PF/cZCbyrlwl7yBY?=
- =?us-ascii?Q?9gStJzrOzTLreYFziIp7phzj/bgGIjnQ/1so2MG/mlmGDS6VuE2rjsRWUVyL?=
- =?us-ascii?Q?dOYy0uWc224/oLr45sJQsKVdnLZCq+gnyL82CU9if9HYCJA/Z9bgR2bkEcXZ?=
- =?us-ascii?Q?5m6BSLr81og9AVorEzJmd3GX1vb+HFhAW8FgvDa07OCz0SHpp5buy18C3P86?=
- =?us-ascii?Q?GzFB0QUQqqaKNM7mnIb/obdpZL2xBlGZ5d9mV/MZWQuMeV31jNVXxlRXTcYS?=
- =?us-ascii?Q?hZFcnAEWsz47ZP3x+MDY8Zs5xvKnUCeMtGQAlqmeAut7cYMVh6csrfQ4PAwI?=
- =?us-ascii?Q?99Fhp2vuwsHw1/HXtHWrImLPx+V/M7diu06QGjSk66q/NcZYnNqtaxWKq5fz?=
- =?us-ascii?Q?/tNahkyqKW1gN91YDxSAfViAD27OTZVmuYy99ARRf9oazEoBkYOOzxLTbyeq?=
- =?us-ascii?Q?x7YybpiQdU7mYpU7WFZmX+wr9k9a2/rCf9W4WLCa3oQTtaJcuO6ukITkU/cd?=
- =?us-ascii?Q?v+iYwlRHpdcRfxBZMgrO7eLcTJyB3zrTwR6fdcQFNxcuvV9pA2429hwwyGnI?=
- =?us-ascii?Q?jprJLJRsFfb+OuHj+mASUA1Hy536G7TlbgKFI+G2S7uTLDj4XPTOWNw0c/Gn?=
- =?us-ascii?Q?yp0TtulTU6F8YOdx9DY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C772917
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 13:23:33 +0000 (UTC)
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B35910D7;
+	Wed, 23 Aug 2023 06:23:01 -0700 (PDT)
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4RW6Lp1v7Lz9w91;
+	Wed, 23 Aug 2023 15:21:54 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id e1c17_9wbE0m; Wed, 23 Aug 2023 15:21:54 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4RW6Lp0z4nz9w90;
+	Wed, 23 Aug 2023 15:21:54 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 1D1F28B77C;
+	Wed, 23 Aug 2023 15:21:54 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id EIDC-UGBUuDB; Wed, 23 Aug 2023 15:21:54 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (unknown [172.25.230.108])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id EF48A8B766;
+	Wed, 23 Aug 2023 15:21:53 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (localhost [127.0.0.1])
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.16.1) with ESMTPS id 37NDLqhA1216463
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 23 Aug 2023 15:21:52 +0200
+Received: (from chleroy@localhost)
+	by PO20335.IDSI0.si.c-s.fr (8.17.1/8.17.1/Submit) id 37NDLptD1216455;
+	Wed, 23 Aug 2023 15:21:51 +0200
+X-Authentication-Warning: PO20335.IDSI0.si.c-s.fr: chleroy set sender to christophe.leroy@csgroup.eu using -f
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Noah Goldstein <goldstein.w.n@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH net-next] kunit: Fix checksum tests on big endian CPUs
+Date: Wed, 23 Aug 2023 15:21:43 +0200
+Message-ID: <fe8a302c25bd0380ca030735a1383288a89adb11.1692796810.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR18MB5216.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea2cd22c-f7ec-4b24-f2cd-08dba3db636a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2023 13:18:06.3664
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xMgOTBOFvdqGi0zn7f7G3jNxb1esHoC8eOE7RwOvQ0c3M+aFDr18p2ImzOHAnXuJY6WAO6HDbvt9Bt+F8KIuvw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3624
-X-Proofpoint-ORIG-GUID: DmddseJ5ZR_JIiUDP0v9BeWqeXJLojEK
-X-Proofpoint-GUID: DmddseJ5ZR_JIiUDP0v9BeWqeXJLojEK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-23_07,2023-08-22_01,2023-05-22_02
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1692796902; l=7718; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=uXazXcdhB09nhwzipSWjqcji5o3m5f3NYxL6yjh+gQY=; b=Tu8L74wzQhY2cDa93pD8pHbiXEZ5l1RNQBKgIUTXdk5WX58RqAzba/j8KJ8HsAewS8CL+vXBK PnFrr+SFz+yCWmvrEcAaN1PKFUM9VZ2Oqk0JcY4ncaOa3FlQI2kXG7Q
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->> >
->> > Hi Suman,
->> >
->> > Given that the licence of both this file and otx2_dcbnl.c is GPLv2,
->> > I wonder if EXPORT_SYMBOL_GPL would be more appropriate here.
->>
->> AFAICS all the symbols exported by otx2_common use plain
->> EXPORT_SYMBOL(). I think we can keep that for consistency in a -net
->> patch.
->
->Sure, no objection.
->
->> In the long run it would be nice to move all of them to
->> EXPORT_SYMBOL_GPL :)
->>
->> Cheers,
->>
->> Paolo
-[Suman] Sure Paolo, we can push a separate patch in future.
->>
+On powerpc64le checksum kunit tests work:
+
+[    2.011457][    T1]     KTAP version 1
+[    2.011662][    T1]     # Subtest: checksum
+[    2.011848][    T1]     1..3
+[    2.034710][    T1]     ok 1 test_csum_fixed_random_inputs
+[    2.079325][    T1]     ok 2 test_csum_all_carry_inputs
+[    2.127102][    T1]     ok 3 test_csum_no_carry_inputs
+[    2.127202][    T1] # checksum: pass:3 fail:0 skip:0 total:3
+[    2.127533][    T1] # Totals: pass:3 fail:0 skip:0 total:3
+[    2.127956][    T1] ok 1 checksum
+
+But on powerpc64 and powerpc32 they fail:
+
+[    1.859890][    T1]     KTAP version 1
+[    1.860041][    T1]     # Subtest: checksum
+[    1.860201][    T1]     1..3
+[    1.861927][   T58]     # test_csum_fixed_random_inputs: ASSERTION FAILED at lib/checksum_kunit.c:243
+[    1.861927][   T58]     Expected result == expec, but
+[    1.861927][   T58]         result == 54991 (0xd6cf)
+[    1.861927][   T58]         expec == 33316 (0x8224)
+[    1.863742][    T1]     not ok 1 test_csum_fixed_random_inputs
+[    1.864520][   T60]     # test_csum_all_carry_inputs: ASSERTION FAILED at lib/checksum_kunit.c:267
+[    1.864520][   T60]     Expected result == expec, but
+[    1.864520][   T60]         result == 255 (0xff)
+[    1.864520][   T60]         expec == 65280 (0xff00)
+[    1.868820][    T1]     not ok 2 test_csum_all_carry_inputs
+[    1.869977][   T62]     # test_csum_no_carry_inputs: ASSERTION FAILED at lib/checksum_kunit.c:306
+[    1.869977][   T62]     Expected result == expec, but
+[    1.869977][   T62]         result == 64515 (0xfc03)
+[    1.869977][   T62]         expec == 0 (0x0)
+[    1.872060][    T1]     not ok 3 test_csum_no_carry_inputs
+[    1.872102][    T1] # checksum: pass:0 fail:3 skip:0 total:3
+[    1.872458][    T1] # Totals: pass:0 fail:3 skip:0 total:3
+[    1.872791][    T1] not ok 3 checksum
+
+This is because all expected values were calculated for X86 which
+is little endian. On big endian systems all precalculated 16 bits
+halves must be byte swapped.
+
+And this is confirmed by a huge amount of sparse errors when building
+with C=2
+
+So fix all sparse errors and it will naturally work on all endianness.
+
+Fixes: 688eb8191b47 ("x86/csum: Improve performance of `csum_partial`")
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+ lib/checksum_kunit.c | 54 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 38 insertions(+), 16 deletions(-)
+
+diff --git a/lib/checksum_kunit.c b/lib/checksum_kunit.c
+index ace3c4799fe1..0eed92b77ba3 100644
+--- a/lib/checksum_kunit.c
++++ b/lib/checksum_kunit.c
+@@ -10,7 +10,8 @@
+ #define MAX_ALIGN 64
+ #define TEST_BUFLEN (MAX_LEN + MAX_ALIGN)
+ 
+-static const __wsum random_init_sum = 0x2847aab;
++/* Values for a little endian CPU. Byte swap each half on big endian CPU. */
++static const u32 random_init_sum = 0x2847aab;
+ static const u8 random_buf[] = {
+ 	0xac, 0xd7, 0x76, 0x69, 0x6e, 0xf2, 0x93, 0x2c, 0x1f, 0xe0, 0xde, 0x86,
+ 	0x8f, 0x54, 0x33, 0x90, 0x95, 0xbf, 0xff, 0xb9, 0xea, 0x62, 0x6e, 0xb5,
+@@ -56,7 +57,9 @@ static const u8 random_buf[] = {
+ 	0xe1, 0xdf, 0x4b, 0xe1, 0x81, 0xe2, 0x17, 0x02, 0x7b, 0x58, 0x8b, 0x92,
+ 	0x1a, 0xac, 0x46, 0xdd, 0x2e, 0xce, 0x40, 0x09
+ };
+-static const __sum16 expected_results[] = {
++
++/* Values for a little endian CPU. Byte swap on big endian CPU. */
++static const u16 expected_results[] = {
+ 	0x82d0, 0x8224, 0xab23, 0xaaad, 0x41ad, 0x413f, 0x4f3e, 0x4eab, 0x22ab,
+ 	0x228c, 0x428b, 0x41ad, 0xbbac, 0xbb1d, 0x671d, 0x66ea, 0xd6e9, 0xd654,
+ 	0x1754, 0x1655, 0x5d54, 0x5c6a, 0xfa69, 0xf9fb, 0x44fb, 0x4428, 0xf527,
+@@ -115,7 +118,9 @@ static const __sum16 expected_results[] = {
+ 	0x1d47, 0x3c46, 0x3bc5, 0x59c4, 0x59ad, 0x57ad, 0x5732, 0xff31, 0xfea6,
+ 	0x6ca6, 0x6c8c, 0xc08b, 0xc045, 0xe344, 0xe316, 0x1516, 0x14d6,
+ };
+-static const __wsum init_sums_no_overflow[] = {
++
++/* Values for a little endian CPU. Byte swap each half on big endian CPU. */
++static const u32 init_sums_no_overflow[] = {
+ 	0xffffffff, 0xfffffffb, 0xfffffbfb, 0xfffffbf7, 0xfffff7f7, 0xfffff7f3,
+ 	0xfffff3f3, 0xfffff3ef, 0xffffefef, 0xffffefeb, 0xffffebeb, 0xffffebe7,
+ 	0xffffe7e7, 0xffffe7e3, 0xffffe3e3, 0xffffe3df, 0xffffdfdf, 0xffffdfdb,
+@@ -208,7 +213,21 @@ static u8 tmp_buf[TEST_BUFLEN];
+ 
+ #define full_csum(buff, len, sum) csum_fold(csum_partial(buff, len, sum))
+ 
+-#define CHECK_EQ(lhs, rhs) KUNIT_ASSERT_EQ(test, lhs, rhs)
++#define CHECK_EQ(lhs, rhs) KUNIT_ASSERT_EQ(test, (__force u64)lhs, (__force u64)rhs)
++
++static __sum16 to_sum16(u16 x)
++{
++	return (__force __sum16)le16_to_cpu((__force __le16)x);
++}
++
++/* This function swaps the bytes inside each half of a __wsum */
++static __wsum to_wsum(u32 x)
++{
++	u16 hi = le16_to_cpu((__force __le16)(x >> 16));
++	u16 lo = le16_to_cpu((__force __le16)x);
++
++	return (__force __wsum)((hi << 16) | lo);
++}
+ 
+ static void assert_setup_correct(struct kunit *test)
+ {
+@@ -226,7 +245,8 @@ static void assert_setup_correct(struct kunit *test)
+ static void test_csum_fixed_random_inputs(struct kunit *test)
+ {
+ 	int len, align;
+-	__wsum result, expec, sum;
++	__wsum sum;
++	__sum16 result, expec;
+ 
+ 	assert_setup_correct(test);
+ 	for (align = 0; align < TEST_BUFLEN; ++align) {
+@@ -237,9 +257,9 @@ static void test_csum_fixed_random_inputs(struct kunit *test)
+ 			/*
+ 			 * Test the precomputed random input.
+ 			 */
+-			sum = random_init_sum;
++			sum = to_wsum(random_init_sum);
+ 			result = full_csum(&tmp_buf[align], len, sum);
+-			expec = expected_results[len];
++			expec = to_sum16(expected_results[len]);
+ 			CHECK_EQ(result, expec);
+ 		}
+ 	}
+@@ -251,7 +271,8 @@ static void test_csum_fixed_random_inputs(struct kunit *test)
+ static void test_csum_all_carry_inputs(struct kunit *test)
+ {
+ 	int len, align;
+-	__wsum result, expec, sum;
++	__wsum sum;
++	__sum16 result, expec;
+ 
+ 	assert_setup_correct(test);
+ 	memset(tmp_buf, 0xff, TEST_BUFLEN);
+@@ -261,9 +282,9 @@ static void test_csum_all_carry_inputs(struct kunit *test)
+ 			/*
+ 			 * All carries from input and initial sum.
+ 			 */
+-			sum = 0xffffffff;
++			sum = to_wsum(0xffffffff);
+ 			result = full_csum(&tmp_buf[align], len, sum);
+-			expec = (len & 1) ? 0xff00 : 0;
++			expec = to_sum16((len & 1) ? 0xff00 : 0);
+ 			CHECK_EQ(result, expec);
+ 
+ 			/*
+@@ -272,11 +293,11 @@ static void test_csum_all_carry_inputs(struct kunit *test)
+ 			sum = 0;
+ 			result = full_csum(&tmp_buf[align], len, sum);
+ 			if (len & 1)
+-				expec = 0xff00;
++				expec = to_sum16(0xff00);
+ 			else if (len)
+ 				expec = 0;
+ 			else
+-				expec = 0xffff;
++				expec = to_sum16(0xffff);
+ 			CHECK_EQ(result, expec);
+ 		}
+ 	}
+@@ -290,7 +311,8 @@ static void test_csum_all_carry_inputs(struct kunit *test)
+ static void test_csum_no_carry_inputs(struct kunit *test)
+ {
+ 	int len, align;
+-	__wsum result, expec, sum;
++	__wsum sum;
++	__sum16 result, expec;
+ 
+ 	assert_setup_correct(test);
+ 	memset(tmp_buf, 0x4, TEST_BUFLEN);
+@@ -300,7 +322,7 @@ static void test_csum_no_carry_inputs(struct kunit *test)
+ 			/*
+ 			 * Expect no carries.
+ 			 */
+-			sum = init_sums_no_overflow[len];
++			sum = to_wsum(init_sums_no_overflow[len]);
+ 			result = full_csum(&tmp_buf[align], len, sum);
+ 			expec = 0;
+ 			CHECK_EQ(result, expec);
+@@ -308,9 +330,9 @@ static void test_csum_no_carry_inputs(struct kunit *test)
+ 			/*
+ 			 * Expect one carry.
+ 			 */
+-			sum = init_sums_no_overflow[len] + 1;
++			sum = to_wsum(init_sums_no_overflow[len] + 1);
+ 			result = full_csum(&tmp_buf[align], len, sum);
+-			expec = len ? 0xfffe : 0xffff;
++			expec = to_sum16(len ? 0xfffe : 0xffff);
+ 			CHECK_EQ(result, expec);
+ 		}
+ 	}
+-- 
+2.41.0
+
 
