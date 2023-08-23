@@ -1,124 +1,136 @@
-Return-Path: <netdev+bounces-29847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B751784EE1
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 04:48:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F405784EE7
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 04:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39DD9281269
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 02:48:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F3AD1C20C16
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 02:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A3515BC;
-	Wed, 23 Aug 2023 02:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A1D15BC;
+	Wed, 23 Aug 2023 02:54:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26CD15B5
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 02:48:32 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ADC11A5;
-	Tue, 22 Aug 2023 19:48:31 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-5230a22cfd1so6470973a12.1;
-        Tue, 22 Aug 2023 19:48:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692758909; x=1693363709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TVBRCz0FtwctX/FsxJ5r2bQ6j0LCaWp9EglVQZcAENc=;
-        b=MOP4XuYh0256gpCDmE1yT6Cr1aYKpaF7KxQMOCK/P+pbJ5loYJpYHL2u32eNKm1zmt
-         mljtx7b3m8Ziz43TGydP9W0Lmmgn/lTQx7tFXIWufkE7kK4q4OL7kX+qM5MCqNQXVIVp
-         WZf7QLKquIjIMs8vXjJ5PDxCNeg5J3keWoHcR24N2CvgLa63H+X9LJQ1XUvYgpKO89e9
-         +UsRr1U2xe6eXP0khCzRFdyEyNrSSQ8zotdgR6cU4D0h8HaAjPGctTnfEDAbM0y2oZqP
-         Ler+yfCjSr2BtwMhJW1zCMssvEnhmHke1PqwwR4WzHc9BL4Xmc9UOO1WIvb/lpK0dD00
-         Q0Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692758909; x=1693363709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TVBRCz0FtwctX/FsxJ5r2bQ6j0LCaWp9EglVQZcAENc=;
-        b=BnF5EwxlmQJyJclJRoIQjLNp4Jk0C9bYwmT2OAoDleL/N1t/zX508BnwcQREhZDy9R
-         N7IdhGVUXAFLZUqQk7vaDTfJl/vDy03SRWcBKYIxoPXrJjYN9lX118sdqdRr9wyudgpa
-         jLxOrkf2MTsVQmg/HfqVu7sSiZz1WgRBHVNPMNU9yUzsiRrotUUm5V7GvVi1/SDBBHrL
-         2BSHB9mcLqrg/AsAhkwPg5Zgsf3JPXLh6+6bk+hMFcyOp3fWcwWBljKF8jjh4aOzX26b
-         KNaaapdAWWjr54OHZnEwzt2qOG3PyNT8LJmIhYuevwprlX12SmXS9Q4Knz95EsQLQoSH
-         yBhg==
-X-Gm-Message-State: AOJu0Yy4YkbSgpkJweJDEHjTNqmHDJRaEEQUdG+sVctnn96/vD0ZtgnZ
-	53J25aIZj0EmHz1uFFhL8MHajAs6E1L7LCzDmso=
-X-Google-Smtp-Source: AGHT+IEEmtoammYVQnitMdyPCplu8QA/DHBw30yzP7StIYtxQsK1M9uKl3jkTahi6c4fsTk+WfnsLILksJ0xiFyrA4s=
-X-Received: by 2002:a05:6402:14c3:b0:523:1e18:3a78 with SMTP id
- f3-20020a05640214c300b005231e183a78mr8831836edx.12.1692758909416; Tue, 22 Aug
- 2023 19:48:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E660015B5
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 02:54:06 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1201A5;
+	Tue, 22 Aug 2023 19:54:05 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37MI5m7M027509;
+	Tue, 22 Aug 2023 19:53:35 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=SYit5M8LMLasjmEi/Xn9GaH/ScQROSPBnBHY1wbIy4E=;
+ b=SYAfWTDL0LOosPUnfMq4g2CWa65VccV/VflxG28AndaVh0UMLnopYz25pEARZeK9QROi
+ HHSHzHTVlLJcv2jImTadItfVHPfV9E6MMHPAGDIEkzxQajRSx5/86m1cTQserxCVPI7c
+ ftsMDwhsNXaiz0NJeSd77iaqME02lEIhhz/3jVFNaQmqT/ZLfU2awiwXDTcW5p2RMfc/
+ PLtmqp6lS/OuIoHsn9ZDa6W+1Xusa1ixc1afSQCxRLCl/kVq9JmTYqoTOwUgZVtVbkzS
+ rG5xrOcZvDm/Rx4jyVbw6XwA3goChRIE3Qz04tcG58kXLlmoVWHWi9F3ZEJ+omad3bw4 wA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3sn20b1ccr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 22 Aug 2023 19:53:35 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 22 Aug
+ 2023 19:53:33 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 22 Aug 2023 19:53:33 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 70A183F7087;
+	Tue, 22 Aug 2023 19:53:28 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
+        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
+        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
+        Alexander Lobakin
+	<aleksander.lobakin@intel.com>
+Subject: [PATCH v2 net] octeontx2-pf: fix page_pool creation fail for rings > 32k
+Date: Wed, 23 Aug 2023 08:23:25 +0530
+Message-ID: <20230823025325.2499289-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230816111310.1656224-1-keguang.zhang@gmail.com>
- <20230816111310.1656224-4-keguang.zhang@gmail.com> <c3454ad9-1874-4301-b1b1-4f76886802fb@lunn.ch>
- <CAJhJPsWVRJg7zNeXPDovkBM4pm7hD+RP21DRxt0726VXtzvCHw@mail.gmail.com> <150ae6c1-8a2f-4fd7-b012-a53a909919d4@lunn.ch>
-In-Reply-To: <150ae6c1-8a2f-4fd7-b012-a53a909919d4@lunn.ch>
-From: Keguang Zhang <keguang.zhang@gmail.com>
-Date: Wed, 23 Aug 2023 10:47:53 +0800
-Message-ID: <CAJhJPsUatqsa_D_RZ8ej33cGPRixhi7A2=2VBOSJVK6xNAA0jA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] net: stmmac: Add glue layer for Loongson-1 SoC
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: jpdeneK5LLVMBytHKUFOulOm0RDZfxu6
+X-Proofpoint-GUID: jpdeneK5LLVMBytHKUFOulOm0RDZfxu6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-22_22,2023-08-22_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 22, 2023 at 11:20=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> > > What about the other three RGMII modes? Plain rgmii is pretty unusual=
-,
-> > > rgmii-id is the most used.
-> > >
-> > According to the LS1B datasheet, only RGMII and MII are supported.
-> > And I can confirm that MII mode does work for LS1B.
->
-> What does your device tree look like? What are you setting phy-mode to
-> in the rgmii case? As i said, "rgmii" is pretty unusual, you normally
-> need "rgmii-id".
->
-> Something in the system needs to add 2ns delays to the RGMII clock
-> lines. Generally in device tree you pass phy-mode =3D "rgmii-id"; The
-> MAC configures itself for RGMII, and passes
-> PHY_INTERFACE_MODE_RGMII_ID to the PHY when it is attached. The PHY
-> then inserts the delays.
->
-> What is inserting the delays in your system?
->
-I understand the delay issue of RGMII.
-Just tried phy-mode =3D "rgmii-id", it still works.
-I will use PHY_INTERFACE_MODE_RGMII_ID instead.
-Thanks!
+octeontx2 driver calls page_pool_create() during driver probe()
+and fails if queue size > 32k. Page pool infra uses these buffers
+as shock absorbers for burst traffic. These pages are pinned down
+over time as working sets varies, due to the recycling nature
+of page pool, given page pool (currently) don't have a shrinker
+mechanism, the pages remain pinned down in ptr_ring.
+Instead of clamping page_pool size to 32k at
+most, limit it even more to 2k to avoid wasting memory.
 
->      Andrew
->
+This have been tested on octeontx2 CN10KA hardware.
+TCP and UDP tests using iperf shows no performance regressions.
 
+Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
 
---=20
-Best regards,
+ChangeLogs:
 
-Keguang Zhang
+v1->v2: Commit message changes and typo fixes
+v0->v1: Commit message changes.
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 77c8f650f7ac..3e1c70c74622 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+ 	}
+ 
+ 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+-	pp_params.pool_size = numptrs;
++	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
+ 	pp_params.nid = NUMA_NO_NODE;
+ 	pp_params.dev = pfvf->dev;
+ 	pp_params.dma_dir = DMA_FROM_DEVICE;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index ba8091131ec0..f6fea43617ff 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -30,6 +30,8 @@
+ #include <rvu_trace.h>
+ #include "qos.h"
+ 
++#define OTX2_PAGE_POOL_SZ 2048
++
+ /* IPv4 flag more fragment bit */
+ #define IPV4_FLAG_MORE				0x20
+ 
+-- 
+2.25.1
+
 
