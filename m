@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-29895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BF578515B
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:19:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18B678515D
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:20:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80051C20C0C
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:19:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F5621C20BF9
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC1B8834;
-	Wed, 23 Aug 2023 07:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A3BA921;
+	Wed, 23 Aug 2023 07:19:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83C529475
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:19:22 +0000 (UTC)
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5350DB
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:20 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bc3d94d40fso41601655ad.3
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB746A920
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:19:24 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A781EDB
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:23 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bf55a81eeaso23747255ad.0
+        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692775159; x=1693379959;
+        d=gmail.com; s=20221208; t=1692775163; x=1693379963;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5X9YFQ0dzaw6XiMElCZVo8zrsu+ifozkisiouXeObVc=;
-        b=Y70myY78nTVSWmy52IpSrPh4hwjd++6yG6EvFX0Fhn++UNCCPSf98EyXMmoMKOMgzv
-         fr2CnVaM1NKex+5+b47B9kADJnBWb8tHiYO5emb3YeACzuk9RT8yH0F558y/uTGTl10y
-         F4cFj5h6/5nieuyftoVqM6o0IS0m1O351Rj0FkQ3eITUtSs7haA7BHVq77APeSE++/8H
-         4TEO96jwV5DJww5lW9V+oy/15ORUwp/rjIRiJWnXNS2xbC40zZFAq7GbgoFRyT2jl8BQ
-         b3UzXvnr5SqoemWcrPIbHdW2QiKIixqqg568RLKXQRh4R9eh8kUi9NHju1NlRicw0hwy
-         jXpQ==
+        bh=imfuNwQrvt8oRbEV7g7IR3XWoYzARFPysi3PTWISqfA=;
+        b=E6FpOfR97jXVOJRQJwUqWUmiXjZyt2jciIKu+d5SGMWdS3mqB44h3QYQ4hZFN74+cR
+         Yj8Iv7W88i363uQIod5Ulru2iIHtSTNc/e9JIQRxFfk9yYTz1R0LWyUG7UQeQNJdOARo
+         F0M+WHy5tnPE2/d0g5WV6C8USX/TFoG8Ei8ZBTEcMGEy58PQI8YcK7VK+a4JC27HlTHv
+         3RpJZkLBfCCdSgZ9M1rQm+0ouTX1wR8J9le3G5Ki7kJHBh1tQe58TtmvNxK6DRQ3P6K8
+         gAlkO11UhGFXrHgjU2UfqHdSolOxJOSdLVPgeKSSNtSP9YZ8XOekifYQlcSgZy1IT5Vg
+         6KFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692775159; x=1693379959;
+        d=1e100.net; s=20221208; t=1692775163; x=1693379963;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5X9YFQ0dzaw6XiMElCZVo8zrsu+ifozkisiouXeObVc=;
-        b=covLIbWha9kmohC5DFotmEDE0Tf1lAhJ5D6sSLw8Lc1+OXiYehz0jjXFc0VDc8yYcq
-         j3UaZaC7Zi1p3rkLY+3PhvbA83doMCGhAWdMc1ud0rTUFLkKweTPq8c3pxdQblqEJe7w
-         DnrlNVxlwn62GNSlsPCi8xkITDUn47033vLJkhez7fyifCbIeTK3IVKWBXqWk+F8s4Dc
-         iJdtJkAr+1MfZ5OAT4t/8axBkTuXnadQntfKXHsQ11VazhA1j7TX7JPrCZh9DPGiEtKG
-         /U8pBDVNEbMJ3BhP2plOPbri/S4vLJjtmVUZ8W5KQpckFzzUqj2pas/yMLW+J4ltpQNg
-         zUqA==
-X-Gm-Message-State: AOJu0YwR5KkUMyEqvNE0zuIWKuROga6HUUUFwvNr/YqsukDkHHcaSTna
-	gArhzDXQBj6hTTWTWIP0BoKZdau7VqjJHw==
-X-Google-Smtp-Source: AGHT+IE/s8i4S9idWjCqh/IkspZWPpFQd+tFnSAxLQTj02WwdpIJD6HfrpMVjNv9RPFpbYmyIEYrvA==
-X-Received: by 2002:a17:902:a409:b0:1bd:c783:dac3 with SMTP id p9-20020a170902a40900b001bdc783dac3mr10244542plq.63.1692775159487;
-        Wed, 23 Aug 2023 00:19:19 -0700 (PDT)
+        bh=imfuNwQrvt8oRbEV7g7IR3XWoYzARFPysi3PTWISqfA=;
+        b=FGi2NLtPplxhA3iXolzRrKjcM2menFQUeOTsHwuHLtFF+TkmafUBYDsr0g4d3ZQmO6
+         RGHx7xb0SRrVeQXxlfj7TS4x2wBgbfTh87DRzEW2wAOrXoYUF/zfuIYPdmvyvMkiN8lv
+         8xMhVtYeJbu3b8bUzlc5Sy3471MOfxnh74AJDcOddQiCGgUj5z7UNVZvfbEXpAfPr12x
+         IWCVcC+iIdvjrweid15rkebqEoET+yLv8XXfk/baiLkm8g4ksMAMolmI3D3+eFA7M8YV
+         5ekNR+LXaKUABkugilMTcSZGAvqDvqCvkOYXgg9UjYHkeACI8zzOQPcZuegTFzBzUbU+
+         tuOQ==
+X-Gm-Message-State: AOJu0YzByM0nLnbISYHalsgVKwkp5w87/xs0QmC9XamxLJBDclZ6DRfJ
+	dAUuSu3MumnIjWqj5OKwJ5dEUG3dtHTbaw==
+X-Google-Smtp-Source: AGHT+IG2BTbCsjPWVFwH5vakcxwrMToto7yHwvVyP99SJjM3HlCHLDwaTs5zcKFgnfDo3SO0qm7A9Q==
+X-Received: by 2002:a17:902:da82:b0:1b0:3a74:7fc4 with SMTP id j2-20020a170902da8200b001b03a747fc4mr10269754plx.24.1692775162666;
+        Wed, 23 Aug 2023 00:19:22 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id iw14-20020a170903044e00b001bdea189261sm10221212plb.229.2023.08.23.00.19.16
+        by smtp.gmail.com with ESMTPSA id iw14-20020a170903044e00b001bdea189261sm10221212plb.229.2023.08.23.00.19.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 00:19:18 -0700 (PDT)
+        Wed, 23 Aug 2023 00:19:22 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
@@ -67,9 +67,9 @@ Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net 2/3] selftest: bond: add new topo bond_topo_2d1c.sh
-Date: Wed, 23 Aug 2023 15:19:05 +0800
-Message-ID: <20230823071907.3027782-3-liuhangbin@gmail.com>
+Subject: [PATCHv3 net 3/3] selftests: bonding: add macvlan over bond testing
+Date: Wed, 23 Aug 2023 15:19:06 +0800
+Message-ID: <20230823071907.3027782-4-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230823071907.3027782-1-liuhangbin@gmail.com>
 References: <20230823071907.3027782-1-liuhangbin@gmail.com>
@@ -82,352 +82,178 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a new testing topo bond_topo_2d1c.sh which is used more commonly.
-Make bond_topo_3d1c.sh just source bond_topo_2d1c.sh and add the
-extra link.
+Add a macvlan over bonding test with mode active-backup, balance-tlb
+and balance-alb.
+
+]# ./bond_macvlan.sh
+TEST: active-backup: IPv4: client->server                           [ OK ]
+TEST: active-backup: IPv6: client->server                           [ OK ]
+TEST: active-backup: IPv4: client->macvlan_1                        [ OK ]
+TEST: active-backup: IPv6: client->macvlan_1                        [ OK ]
+TEST: active-backup: IPv4: client->macvlan_2                        [ OK ]
+TEST: active-backup: IPv6: client->macvlan_2                        [ OK ]
+TEST: active-backup: IPv4: macvlan_1->macvlan_2                     [ OK ]
+TEST: active-backup: IPv6: macvlan_1->macvlan_2                     [ OK ]
+TEST: active-backup: IPv4: server->client                           [ OK ]
+TEST: active-backup: IPv6: server->client                           [ OK ]
+TEST: active-backup: IPv4: macvlan_1->client                        [ OK ]
+TEST: active-backup: IPv6: macvlan_1->client                        [ OK ]
+TEST: active-backup: IPv4: macvlan_2->client                        [ OK ]
+TEST: active-backup: IPv6: macvlan_2->client                        [ OK ]
+TEST: active-backup: IPv4: macvlan_2->macvlan_2                     [ OK ]
+TEST: active-backup: IPv6: macvlan_2->macvlan_2                     [ OK ]
+[...]
+TEST: balance-alb: IPv4: client->server                             [ OK ]
+TEST: balance-alb: IPv6: client->server                             [ OK ]
+TEST: balance-alb: IPv4: client->macvlan_1                          [ OK ]
+TEST: balance-alb: IPv6: client->macvlan_1                          [ OK ]
+TEST: balance-alb: IPv4: client->macvlan_2                          [ OK ]
+TEST: balance-alb: IPv6: client->macvlan_2                          [ OK ]
+TEST: balance-alb: IPv4: macvlan_1->macvlan_2                       [ OK ]
+TEST: balance-alb: IPv6: macvlan_1->macvlan_2                       [ OK ]
+TEST: balance-alb: IPv4: server->client                             [ OK ]
+TEST: balance-alb: IPv6: server->client                             [ OK ]
+TEST: balance-alb: IPv4: macvlan_1->client                          [ OK ]
+TEST: balance-alb: IPv6: macvlan_1->client                          [ OK ]
+TEST: balance-alb: IPv4: macvlan_2->client                          [ OK ]
+TEST: balance-alb: IPv6: macvlan_2->client                          [ OK ]
+TEST: balance-alb: IPv4: macvlan_2->macvlan_2                       [ OK ]
+TEST: balance-alb: IPv6: macvlan_2->macvlan_2                       [ OK ]
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-v3: add bond_topo_2d1c.sh to Makefile
+v3: add the script to Makefile
 v2: no update
 ---
- .../selftests/drivers/net/bonding/Makefile    |   1 +
- .../drivers/net/bonding/bond_options.sh       |   3 -
- .../drivers/net/bonding/bond_topo_2d1c.sh     | 158 ++++++++++++++++++
- .../drivers/net/bonding/bond_topo_3d1c.sh     | 118 +------------
- 4 files changed, 167 insertions(+), 113 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
+ .../selftests/drivers/net/bonding/Makefile    |  3 +-
+ .../drivers/net/bonding/bond_macvlan.sh       | 99 +++++++++++++++++++
+ 2 files changed, 101 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
 
 diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
-index 03f92d7aeb19..0a3eb0a10772 100644
+index 0a3eb0a10772..8a72bb7de70f 100644
 --- a/tools/testing/selftests/drivers/net/bonding/Makefile
 +++ b/tools/testing/selftests/drivers/net/bonding/Makefile
-@@ -13,6 +13,7 @@ TEST_PROGS := \
+@@ -9,7 +9,8 @@ TEST_PROGS := \
+ 	mode-1-recovery-updelay.sh \
+ 	mode-2-recovery-updelay.sh \
+ 	bond_options.sh \
+-	bond-eth-type-change.sh
++	bond-eth-type-change.sh \
++	bond_macvlan.sh
  
  TEST_FILES := \
  	lag_lib.sh \
-+	bond_topo_2d1c.sh \
- 	bond_topo_3d1c.sh \
- 	net_forwarding_lib.sh
- 
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-index 607ba5c38977..c54d1697f439 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-@@ -9,10 +9,7 @@ ALL_TESTS="
- 	num_grat_arp
- "
- 
--REQUIRE_MZ=no
--NUM_NETIFS=0
- lib_dir=$(dirname "$0")
--source ${lib_dir}/net_forwarding_lib.sh
- source ${lib_dir}/bond_topo_3d1c.sh
- 
- skip_prio()
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh b/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
-new file mode 100644
-index 000000000000..a509ef949dcf
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+new file mode 100755
+index 000000000000..b609fb6231f4
 --- /dev/null
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
-@@ -0,0 +1,158 @@
++++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+@@ -0,0 +1,99 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0
 +#
-+# Topology for Bond mode 1,5,6 testing
-+#
-+#  +-------------------------+
-+#  |          bond0          |  Server
-+#  |            +            |  192.0.2.1/24
-+#  |      eth0  |  eth1      |  2001:db8::1/24
-+#  |        +---+---+        |
-+#  |        |       |        |
-+#  +-------------------------+
-+#           |       |
-+#  +-------------------------+
-+#  |        |       |        |
-+#  |    +---+-------+---+    |  Gateway
-+#  |    |      br0      |    |  192.0.2.254/24
-+#  |    +-------+-------+    |  2001:db8::254/24
-+#  |            |            |
-+#  +-------------------------+
-+#               |
-+#  +-------------------------+
-+#  |            |            |  Client
-+#  |            +            |  192.0.2.10/24
-+#  |          eth0           |  2001:db8::10/24
-+#  +-------------------------+
++# Test macvlan over balance-alb
 +
-+REQUIRE_MZ=no
-+NUM_NETIFS=0
 +lib_dir=$(dirname "$0")
-+source ${lib_dir}/net_forwarding_lib.sh
++source ${lib_dir}/bond_topo_2d1c.sh
 +
-+s_ns="s-$(mktemp -u XXXXXX)"
-+c_ns="c-$(mktemp -u XXXXXX)"
-+g_ns="g-$(mktemp -u XXXXXX)"
-+s_ip4="192.0.2.1"
-+c_ip4="192.0.2.10"
-+g_ip4="192.0.2.254"
-+s_ip6="2001:db8::1"
-+c_ip6="2001:db8::10"
-+g_ip6="2001:db8::254"
-+
-+gateway_create()
-+{
-+	ip netns add ${g_ns}
-+	ip -n ${g_ns} link add br0 type bridge
-+	ip -n ${g_ns} link set br0 up
-+	ip -n ${g_ns} addr add ${g_ip4}/24 dev br0
-+	ip -n ${g_ns} addr add ${g_ip6}/24 dev br0
-+}
-+
-+gateway_destroy()
-+{
-+	ip -n ${g_ns} link del br0
-+	ip netns del ${g_ns}
-+}
-+
-+server_create()
-+{
-+	ip netns add ${s_ns}
-+	ip -n ${s_ns} link add bond0 type bond mode active-backup miimon 100
-+
-+	for i in $(seq 0 1); do
-+		ip -n ${s_ns} link add eth${i} type veth peer name s${i} netns ${g_ns}
-+
-+		ip -n ${g_ns} link set s${i} up
-+		ip -n ${g_ns} link set s${i} master br0
-+		ip -n ${s_ns} link set eth${i} master bond0
-+
-+		tc -n ${g_ns} qdisc add dev s${i} clsact
-+	done
-+
-+	ip -n ${s_ns} link set bond0 up
-+	ip -n ${s_ns} addr add ${s_ip4}/24 dev bond0
-+	ip -n ${s_ns} addr add ${s_ip6}/24 dev bond0
-+	sleep 2
-+}
-+
-+# Reset bond with new mode and options
-+bond_reset()
-+{
-+	# Count the eth link number in real-time as this function
-+	# maybe called from other topologies.
-+	local link_num=$(ip -n ${s_ns} -br link show | grep -c "^eth")
-+	local param="$1"
-+	link_num=$((link_num -1))
-+
-+	ip -n ${s_ns} link set bond0 down
-+	ip -n ${s_ns} link del bond0
-+
-+	ip -n ${s_ns} link add bond0 type bond $param
-+	for i in $(seq 0 ${link_num}); do
-+		ip -n ${s_ns} link set eth$i master bond0
-+	done
-+
-+	ip -n ${s_ns} link set bond0 up
-+	ip -n ${s_ns} addr add ${s_ip4}/24 dev bond0
-+	ip -n ${s_ns} addr add ${s_ip6}/24 dev bond0
-+	sleep 2
-+}
-+
-+server_destroy()
-+{
-+	# Count the eth link number in real-time as this function
-+	# maybe called from other topologies.
-+	local link_num=$(ip -n ${s_ns} -br link show | grep -c "^eth")
-+	link_num=$((link_num -1))
-+	for i in $(seq 0 ${link_num}); do
-+		ip -n ${s_ns} link del eth${i}
-+	done
-+	ip netns del ${s_ns}
-+}
-+
-+client_create()
-+{
-+	ip netns add ${c_ns}
-+	ip -n ${c_ns} link add eth0 type veth peer name c0 netns ${g_ns}
-+
-+	ip -n ${g_ns} link set c0 up
-+	ip -n ${g_ns} link set c0 master br0
-+
-+	ip -n ${c_ns} link set eth0 up
-+	ip -n ${c_ns} addr add ${c_ip4}/24 dev eth0
-+	ip -n ${c_ns} addr add ${c_ip6}/24 dev eth0
-+}
-+
-+client_destroy()
-+{
-+	ip -n ${c_ns} link del eth0
-+	ip netns del ${c_ns}
-+}
-+
-+setup_prepare()
-+{
-+	gateway_create
-+	server_create
-+	client_create
-+}
++m1_ns="m1-$(mktemp -u XXXXXX)"
++m2_ns="m1-$(mktemp -u XXXXXX)"
++m1_ip4="192.0.2.11"
++m1_ip6="2001:db8::11"
++m2_ip4="192.0.2.12"
++m2_ip6="2001:db8::12"
 +
 +cleanup()
 +{
-+	pre_cleanup
++	ip -n ${m1_ns} link del macv0
++	ip netns del ${m1_ns}
++	ip -n ${m2_ns} link del macv0
++	ip netns del ${m2_ns}
 +
 +	client_destroy
 +	server_destroy
 +	gateway_destroy
 +}
 +
-+bond_check_connection()
++check_connection()
 +{
-+	local msg=${1:-"check connection"}
++	local ns=${1}
++	local target=${2}
++	local message=${3:-"macvlan_over_bond"}
++	RET=0
++
++
++	ip netns exec ${ns} ping ${target} -c 4 -i 0.1 &>/dev/null
++	check_err $? "ping failed"
++	log_test "$mode: $message"
++}
++
++macvlan_over_bond()
++{
++	local param="$1"
++	RET=0
++
++	# setup new bond mode
++	bond_reset "${param}"
++
++	ip -n ${s_ns} link add link bond0 name macv0 type macvlan mode bridge
++	ip -n ${s_ns} link set macv0 netns ${m1_ns}
++	ip -n ${m1_ns} link set dev macv0 up
++	ip -n ${m1_ns} addr add ${m1_ip4}/24 dev macv0
++	ip -n ${m1_ns} addr add ${m1_ip6}/24 dev macv0
++
++	ip -n ${s_ns} link add link bond0 name macv0 type macvlan mode bridge
++	ip -n ${s_ns} link set macv0 netns ${m2_ns}
++	ip -n ${m2_ns} link set dev macv0 up
++	ip -n ${m2_ns} addr add ${m2_ip4}/24 dev macv0
++	ip -n ${m2_ns} addr add ${m2_ip6}/24 dev macv0
 +
 +	sleep 2
-+	ip netns exec ${s_ns} ping ${c_ip4} -c5 -i 0.1 &>/dev/null
-+	check_err $? "${msg}: ping failed"
-+	ip netns exec ${s_ns} ping6 ${c_ip6} -c5 -i 0.1 &>/dev/null
-+	check_err $? "${msg}: ping6 failed"
++
++	check_connection "${c_ns}" "${s_ip4}" "IPv4: client->server"
++	check_connection "${c_ns}" "${s_ip6}" "IPv6: client->server"
++	check_connection "${c_ns}" "${m1_ip4}" "IPv4: client->macvlan_1"
++	check_connection "${c_ns}" "${m1_ip6}" "IPv6: client->macvlan_1"
++	check_connection "${c_ns}" "${m2_ip4}" "IPv4: client->macvlan_2"
++	check_connection "${c_ns}" "${m2_ip6}" "IPv6: client->macvlan_2"
++	check_connection "${m1_ns}" "${m2_ip4}" "IPv4: macvlan_1->macvlan_2"
++	check_connection "${m1_ns}" "${m2_ip6}" "IPv6: macvlan_1->macvlan_2"
++
++
++	sleep 5
++
++	check_connection "${s_ns}" "${c_ip4}" "IPv4: server->client"
++	check_connection "${s_ns}" "${c_ip6}" "IPv6: server->client"
++	check_connection "${m1_ns}" "${c_ip4}" "IPv4: macvlan_1->client"
++	check_connection "${m1_ns}" "${c_ip6}" "IPv6: macvlan_1->client"
++	check_connection "${m2_ns}" "${c_ip4}" "IPv4: macvlan_2->client"
++	check_connection "${m2_ns}" "${c_ip6}" "IPv6: macvlan_2->client"
++	check_connection "${m2_ns}" "${m1_ip4}" "IPv4: macvlan_2->macvlan_2"
++	check_connection "${m2_ns}" "${m1_ip6}" "IPv6: macvlan_2->macvlan_2"
++
++	ip -n ${c_ns} neigh flush dev eth0
 +}
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_topo_3d1c.sh b/tools/testing/selftests/drivers/net/bonding/bond_topo_3d1c.sh
-index 69ab99a56043..3a1333d9a85b 100644
---- a/tools/testing/selftests/drivers/net/bonding/bond_topo_3d1c.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_topo_3d1c.sh
-@@ -25,121 +25,19 @@
- #  |                eth0                 |  2001:db8::10/24
- #  +-------------------------------------+
- 
--s_ns="s-$(mktemp -u XXXXXX)"
--c_ns="c-$(mktemp -u XXXXXX)"
--g_ns="g-$(mktemp -u XXXXXX)"
--s_ip4="192.0.2.1"
--c_ip4="192.0.2.10"
--g_ip4="192.0.2.254"
--s_ip6="2001:db8::1"
--c_ip6="2001:db8::10"
--g_ip6="2001:db8::254"
--
--gateway_create()
--{
--	ip netns add ${g_ns}
--	ip -n ${g_ns} link add br0 type bridge
--	ip -n ${g_ns} link set br0 up
--	ip -n ${g_ns} addr add ${g_ip4}/24 dev br0
--	ip -n ${g_ns} addr add ${g_ip6}/24 dev br0
--}
--
--gateway_destroy()
--{
--	ip -n ${g_ns} link del br0
--	ip netns del ${g_ns}
--}
--
--server_create()
--{
--	ip netns add ${s_ns}
--	ip -n ${s_ns} link add bond0 type bond mode active-backup miimon 100
--
--	for i in $(seq 0 2); do
--		ip -n ${s_ns} link add eth${i} type veth peer name s${i} netns ${g_ns}
--
--		ip -n ${g_ns} link set s${i} up
--		ip -n ${g_ns} link set s${i} master br0
--		ip -n ${s_ns} link set eth${i} master bond0
--
--		tc -n ${g_ns} qdisc add dev s${i} clsact
--	done
--
--	ip -n ${s_ns} link set bond0 up
--	ip -n ${s_ns} addr add ${s_ip4}/24 dev bond0
--	ip -n ${s_ns} addr add ${s_ip6}/24 dev bond0
--	sleep 2
--}
--
--# Reset bond with new mode and options
--bond_reset()
--{
--	local param="$1"
--
--	ip -n ${s_ns} link set bond0 down
--	ip -n ${s_ns} link del bond0
--
--	ip -n ${s_ns} link add bond0 type bond $param
--	for i in $(seq 0 2); do
--		ip -n ${s_ns} link set eth$i master bond0
--	done
--
--	ip -n ${s_ns} link set bond0 up
--	ip -n ${s_ns} addr add ${s_ip4}/24 dev bond0
--	ip -n ${s_ns} addr add ${s_ip6}/24 dev bond0
--	sleep 2
--}
--
--server_destroy()
--{
--	for i in $(seq 0 2); do
--		ip -n ${s_ns} link del eth${i}
--	done
--	ip netns del ${s_ns}
--}
--
--client_create()
--{
--	ip netns add ${c_ns}
--	ip -n ${c_ns} link add eth0 type veth peer name c0 netns ${g_ns}
--
--	ip -n ${g_ns} link set c0 up
--	ip -n ${g_ns} link set c0 master br0
--
--	ip -n ${c_ns} link set eth0 up
--	ip -n ${c_ns} addr add ${c_ip4}/24 dev eth0
--	ip -n ${c_ns} addr add ${c_ip6}/24 dev eth0
--}
--
--client_destroy()
--{
--	ip -n ${c_ns} link del eth0
--	ip netns del ${c_ns}
--}
-+source bond_topo_2d1c.sh
- 
- setup_prepare()
- {
- 	gateway_create
- 	server_create
- 	client_create
--}
--
--cleanup()
--{
--	pre_cleanup
--
--	client_destroy
--	server_destroy
--	gateway_destroy
--}
--
--bond_check_connection()
--{
--	local msg=${1:-"check connection"}
- 
--	sleep 2
--	ip netns exec ${s_ns} ping ${c_ip4} -c5 -i 0.1 &>/dev/null
--	check_err $? "${msg}: ping failed"
--	ip netns exec ${s_ns} ping6 ${c_ip6} -c5 -i 0.1 &>/dev/null
--	check_err $? "${msg}: ping6 failed"
-+	# Add the extra device as we use 3 down links for bond0
-+	local i=2
-+	ip -n ${s_ns} link add eth${i} type veth peer name s${i} netns ${g_ns}
-+	ip -n ${g_ns} link set s${i} up
-+	ip -n ${g_ns} link set s${i} master br0
-+	ip -n ${s_ns} link set eth${i} master bond0
-+	tc -n ${g_ns} qdisc add dev s${i} clsact
- }
++
++trap cleanup EXIT
++
++setup_prepare
++ip netns add ${m1_ns}
++ip netns add ${m2_ns}
++
++modes="active-backup balance-tlb balance-alb"
++
++for mode in $modes; do
++	macvlan_over_bond "mode $mode"
++done
++
++exit $EXIT_STATUS
 -- 
 2.41.0
 
