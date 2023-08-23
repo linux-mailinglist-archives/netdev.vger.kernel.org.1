@@ -1,167 +1,216 @@
-Return-Path: <netdev+bounces-29889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155A57850D5
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:52:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F72E785109
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361831C20C0D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 06:51:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51E10281264
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A9B6FBF;
-	Wed, 23 Aug 2023 06:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1598467;
+	Wed, 23 Aug 2023 07:00:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8626D20F1
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:51:55 +0000 (UTC)
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C241CD9;
-	Tue, 22 Aug 2023 23:51:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=MIME-Version:Content-Transfer-Encoding:Content-Type:
-	References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=Rso0/YrRm8azXXC9bkct7gjLBjuUhaYe+rBIcO0EVH0=; b=gKlwgIZHFpqud+27+9dwsIX86/
-	9e6wRUDUVWH1cKt00PNRu+0i/hbBud7Cl3iSvhKFhJAbAKeLYQ2CApMiQcbMl+iUwmRNG80+oZwCB
-	2XBOo8effYl7wkXXRdSh8/Eqk66jceqS0b+MMVEL2ROzDsPmdwoqLLoYwafU1gftFZ2bdU4o3/GNZ
-	g46A5BnSLus09TuZBPkughUhbTkk8MgxbAViftiFUZlflf1MgB5Q1KGzGlHZxQluAHCEKnrL5o/eu
-	+Ur4oWJ5KFXDhVDMUmx9bStJ7TpRf1Fd0GJUEb6nMVFCQiZyf5c0V9vvLqmHp57KUVeP6O687ATMh
-	bda3W3Zg==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <martin@geanix.com>)
-	id 1qYhiY-000Fgq-1w; Wed, 23 Aug 2023 08:51:49 +0200
-Received: from [85.184.138.13] (helo=[192.168.8.20])
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <martin@geanix.com>)
-	id 1qYhiX-00066l-2U; Wed, 23 Aug 2023 08:51:49 +0200
-Message-ID: <108a41e492dcfa4a7c59e44aac7dfb502e595962.camel@geanix.com>
-Subject: Re: [PATCH v5 00/12] can: m_can: Optimizations for m_can/tcan part 2
-From: Martin =?ISO-8859-1?Q?Hundeb=F8ll?= <martin@geanix.com>
-To: Markus Schneider-Pargmann <msp@baylibre.com>, Marc Kleine-Budde
-	 <mkl@pengutronix.de>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Wolfgang Grandegger
-	 <wg@grandegger.com>
-Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>, Simon Horman
- <simon.horman@corigine.com>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,  linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,  Julien Panis
- <jpanis@baylibre.com>
-Date: Wed, 23 Aug 2023 08:51:48 +0200
-In-Reply-To: <20230718075708.958094-1-msp@baylibre.com>
-References: <20230718075708.958094-1-msp@baylibre.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD943D72
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:00:38 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F446E7;
+	Wed, 23 Aug 2023 00:00:35 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id A5AE710000E;
+	Wed, 23 Aug 2023 10:00:32 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A5AE710000E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1692774032;
+	bh=SRJZujbowiyE4xrK91RwKf1qOYluLzScsl3Xa81A+dk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=BffrOigH5z4JgZW9GxRwHqrTqdiFOY9UMOPXHdXeZoQmrBL7PCdgk9cLxNDTj/M3/
+	 9vvv6yyNgRR+GtStPHapPTzmCo5vT8Ot4J2RZakcVicaNAHkD7XwwtgIbQyd2wSypI
+	 fyVUAq7wiFOgC3ljf/pT9JLAOeTjVMa5xPDGbVXJC7JcxbIjwKm0NUKY+b2ZjFR9eb
+	 NfHzXvGkHUSq3lkp4+a4Rv80VZJGGKgTCfbRNjNIQ0XwPyq6Cec+phHaGUtfnv+POb
+	 09SBHOSIeX4S+VBBW3eD84W+DkCkBTz9ZbhAe1tZ+OC+ARY0esgXG0nL8iW9ByVYnI
+	 eP4xtaFdr/3pQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 23 Aug 2023 10:00:30 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 23 Aug 2023 10:00:25 +0300
+Message-ID: <0e23cec7-0e9a-ac8d-e8b6-536a5c3d4b2e@sberdevices.ru>
+Date: Wed, 23 Aug 2023 09:54:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Authenticated-Sender: martin@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27008/Tue Aug 22 09:39:05 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v6 2/4] vsock/virtio: support to send non-linear
+ skb
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230814212720.3679058-1-AVKrasnov@sberdevices.ru>
+ <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
+ <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
+From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179391 [Aug 23 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 527 527 5bb611be2ca2baa31d984ccbf4ef4415504fc308, {Tracking_smtp_not_equal_from}, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: n, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/23 04:58:00 #21681850
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-07-18 at 09:56 +0200, Markus Schneider-Pargmann wrote:
-> Hi Marc, Simon and everyone,
->=20
-> v5 got a rebase on v6.5 with some small style fixes as pointed out in
-> v4.
->=20
-> It is tested on tcan455x but I don't have hardware with mcan on the
-> SoC
-> myself so any testing is appreciated.
->=20
-> The series implements many small and bigger throughput improvements
-> and
-> adds rx/tx coalescing at the end.
->=20
-> Based on v6.5-rc1. Also available at
-> https://gitlab.baylibre.com/msp8/linux/-/tree/topic/mcan-optimization/v6.=
-5?ref_type=3Dheads
 
-For the whole series:
-Tested-by: Martin Hundeb=C3=B8ll <martin@geanix.com>
 
-Thanks,
-Martin
+On 22.08.2023 11:16, Paolo Abeni wrote:
+> Hi,
+> 
+> I'm sorry for the long delay here. I was OoO in the past few weeks.
+> 
+> On Tue, 2023-08-15 at 00:27 +0300, Arseniy Krasnov wrote:
+>> For non-linear skb use its pages from fragment array as buffers in
+>> virtio tx queue. These pages are already pinned by 'get_user_pages()'
+>> during such skb creation.
+>>
+>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  Changelog:
+>>  v2 -> v3:
+>>   * Comment about 'page_to_virt()' is updated. I don't remove R-b,
+>>     as this change is quiet small I guess.
+>>
+>>  net/vmw_vsock/virtio_transport.c | 41 +++++++++++++++++++++++++++-----
+>>  1 file changed, 35 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index e95df847176b..7bbcc8093e51 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>>  	vq = vsock->vqs[VSOCK_VQ_TX];
+>>  
+>>  	for (;;) {
+>> -		struct scatterlist hdr, buf, *sgs[2];
+>> +		/* +1 is for packet header. */
+>> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
+>> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
+> 
+> Note that MAX_SKB_FRAGS depends on a config knob (CONFIG_MAX_SKB_FRAGS)
+> and valid/reasonable values are up to 45. The total stack usage can be
+> pretty large (~700 bytes).
+> 
+> As this is under the vsk tx lock, have you considered moving such data
+> in the virtio_vsock struct?
 
-> Changes in v5:
-> - Add back parenthesis in m_can_set_coalesce(). This will make
-> =C2=A0 checkpatch unhappy but gcc happy.
-> - Remove unused fifo_header variable in m_can_tx_handler().
-> - Rebased to v6.5-rc1
->=20
-> Changes in v4:
-> - Create and use struct m_can_fifo_element in m_can_tx_handler
-> - Fix memcpy_and_pad to copy the full buffer
-> - Fixed a few checkpatch warnings
-> - Change putidx to be unsigned
-> - Print hard_xmit error only once when TX FIFO is full
->=20
-> Changes in v3:
-> - Remove parenthesis in error messages
-> - Use memcpy_and_pad for buffer copy in 'can: m_can: Write transmit
-> =C2=A0 header and data in one transaction'.
-> - Replace spin_lock with spin_lock_irqsave. I got a report of a
-> =C2=A0 interrupt that was calling start_xmit just after the netqueue was
-> =C2=A0 woken up before the locked region was exited. spin_lock_irqsave
-> should
-> =C2=A0 fix this. I attached the full stack at the end of the mail if
-> someone
-> =C2=A0 wants to know.
-> - Rebased to v6.3-rc1.
-> - Removed tcan4x5x patches from this series.
->=20
-> Changes in v2:
-> - Rebased on v6.2-rc5
-> - Fixed missing/broken accounting for non peripheral m_can devices.
->=20
-> previous versions:
-> v1 -
-> https://lore.kernel.org/lkml/20221221152537.751564-1-msp@baylibre.com
-> v2 -
-> https://lore.kernel.org/lkml/20230125195059.630377-1-msp@baylibre.com
-> v3 -
-> https://lore.kernel.org/lkml/20230315110546.2518305-1-msp@baylibre.com/
-> v4 -
-> https://lore.kernel.org/lkml/20230621092350.3130866-1-msp@baylibre.com/
->=20
-> Markus Schneider-Pargmann (12):
-> =C2=A0 can: m_can: Write transmit header and data in one transaction
-> =C2=A0 can: m_can: Implement receive coalescing
-> =C2=A0 can: m_can: Implement transmit coalescing
-> =C2=A0 can: m_can: Add rx coalescing ethtool support
-> =C2=A0 can: m_can: Add tx coalescing ethtool support
-> =C2=A0 can: m_can: Use u32 for putidx
-> =C2=A0 can: m_can: Cache tx putidx
-> =C2=A0 can: m_can: Use the workqueue as queue
-> =C2=A0 can: m_can: Introduce a tx_fifo_in_flight counter
-> =C2=A0 can: m_can: Use tx_fifo_in_flight for netif_queue control
-> =C2=A0 can: m_can: Implement BQL
-> =C2=A0 can: m_can: Implement transmit submission coalescing
->=20
-> =C2=A0drivers/net/can/m_can/m_can.c | 517 +++++++++++++++++++++++++------=
--
-> --
-> =C2=A0drivers/net/can/m_can/m_can.h |=C2=A0 35 ++-
-> =C2=A02 files changed, 418 insertions(+), 134 deletions(-)
->=20
->=20
-> base-commit: 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5
+I think yes, there will be no problem if these temporary variables will be moved
+into this global struct. I'll add comment about this reason.
 
+> 
+>>  		int ret, in_sg = 0, out_sg = 0;
+>>  		struct sk_buff *skb;
+>>  		bool reply;
+>> @@ -111,12 +113,39 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>>  
+>>  		virtio_transport_deliver_tap_pkt(skb);
+>>  		reply = virtio_vsock_skb_reply(skb);
+>> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
+>> +			    sizeof(*virtio_vsock_hdr(skb)));
+>> +		sgs[out_sg] = &bufs[out_sg];
+>> +		out_sg++;
+>> +
+>> +		if (!skb_is_nonlinear(skb)) {
+>> +			if (skb->len > 0) {
+>> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
+>> +				sgs[out_sg] = &bufs[out_sg];
+>> +				out_sg++;
+>> +			}
+>> +		} else {
+>> +			struct skb_shared_info *si;
+>> +			int i;
+>> +
+>> +			si = skb_shinfo(skb);
+> 
+> This assumes that the paged skb does not carry any actual data in the
+> head buffer (only the header). Is that constraint enforced somewhere
+> else? Otherwise a
+> 
+> 	WARN_ON_ONCE(skb_headlen(skb) > sizeof(*virtio_vsock_hdr(skb))
+> 
+> could be helpful to catch early possible bugs.
+
+Yes, such skbs have data only in paged part, while linear buffer contains only
+header. Ok, let's add this warning here to prevent future bugs.
+
+Thanks, Arseniy
+
+> 
+> Thanks!
+> 
+> Paolo
+> 
+>> +
+>> +			for (i = 0; i < si->nr_frags; i++) {
+>> +				skb_frag_t *skb_frag = &si->frags[i];
+>> +				void *va;
+>>  
+>> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
+>> -		sgs[out_sg++] = &hdr;
+>> -		if (skb->len > 0) {
+>> -			sg_init_one(&buf, skb->data, skb->len);
+>> -			sgs[out_sg++] = &buf;
+>> +				/* We will use 'page_to_virt()' for the userspace page
+>> +				 * here, because virtio or dma-mapping layers will call
+>> +				 * 'virt_to_phys()' later to fill the buffer descriptor.
+>> +				 * We don't touch memory at "virtual" address of this page.
+>> +				 */
+>> +				va = page_to_virt(skb_frag->bv_page);
+>> +				sg_init_one(&bufs[out_sg],
+>> +					    va + skb_frag->bv_offset,
+>> +					    skb_frag->bv_len);
+>> +				sgs[out_sg] = &bufs[out_sg];
+>> +				out_sg++;
+>> +			}
+>>  		}
+>>  
+>>  		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+> 
 
