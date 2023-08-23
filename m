@@ -1,70 +1,90 @@
-Return-Path: <netdev+bounces-29825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC136784DBA
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 02:15:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABEB784DBD
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 02:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DE581C20B73
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 00:15:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 740742811EE
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 00:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEC9180;
-	Wed, 23 Aug 2023 00:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B99180;
+	Wed, 23 Aug 2023 00:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDAB7E
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:15:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5563EC433C7;
-	Wed, 23 Aug 2023 00:15:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692749726;
-	bh=m3QxC+UW70yVwLmza6iDNCXkPCmq/liyu1hcsOb0IsE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hwz9Nl+1z+jtRA2DpiRq32cQoFsmVxS4DEL/2vTmJgHTaQ7TgL/1LcgbHEPoBzUz6
-	 YElDzl8+4g3C2NGEhHkRnIUTbvEq9ih4wJ5mbBnntSKiLoS4ab14VsZhHA8WIVKpnS
-	 cGY0mQUFGIpf4U1b7azz363yW3q5Y+Tw5Kal+A4Ez7orTCicEBTnx1fFEpSFHN+K/X
-	 8hvQwpLwoRSJcOilFv1tTQg4H1Yr7O2O8O/k5cNNEMdv55EJpgre0FYex2oL21JOY+
-	 IdGRw+TLiqt/YWiCPwmS9bXG+RMRAENYE302bXWOlgU2DWv302qTcNdqbvZs5/9X8v
-	 cjc2gqirf/nuQ==
-Date: Tue, 22 Aug 2023 17:15:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Rohan G Thomas <rohan.g.thomas@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Serge
- Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>
-Subject: Re: [PATCH net-next v5 1/2] dt-bindings: net: snps,dwmac: Tx queues
- with coe
-Message-ID: <20230822171525.692bd2df@kernel.org>
-In-Reply-To: <20230819023132.23082-2-rohan.g.thomas@intel.com>
-References: <20230819023132.23082-1-rohan.g.thomas@intel.com>
-	<20230819023132.23082-2-rohan.g.thomas@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDF77E
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 00:19:18 +0000 (UTC)
+Received: from mail3-162.sinamail.sina.com.cn (mail3-162.sinamail.sina.com.cn [202.108.3.162])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A79CE6
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 17:19:15 -0700 (PDT)
+X-SMAIL-HELO: pek-lxu-l1.wrs.com
+Received: from unknown (HELO pek-lxu-l1.wrs.com)([111.198.228.11])
+	by sina.com (172.16.97.27) with ESMTP
+	id 64E5507F000095B2; Wed, 23 Aug 2023 08:19:12 +0800 (CST)
+X-Sender: eadavis@sina.com
+X-Auth-ID: eadavis@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=eadavis@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=eadavis@sina.com
+X-SMAIL-MID: 827283786788
+X-SMAIL-UIID: B07121F6B49146D88AA5B3F8E03572F4-20230823-081912
+From: eadavis@sina.com
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	hdanton@sina.com,
+	kuba@kernel.org,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	ralf@linux-mips.org,
+	syzbot+666c97e4686410e79649@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	Edward AD <eadavis@sina.com>
+Subject: Re: [PATCH] sock: Fix sk_sleep return invalid pointer
+Date: Wed, 23 Aug 2023 08:19:10 +0800
+Message-ID: <20230823001910.1943703-1-eadavis@sina.com>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <f80fcd476a230c354bf9758762250c43a1f3d5cc.camel@redhat.com>
+References: <f80fcd476a230c354bf9758762250c43a1f3d5cc.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, 19 Aug 2023 10:31:31 +0800 Rohan G Thomas wrote:
-> +      snps,tx-queues-with-coe:
-> +        $ref: /schemas/types.yaml#/definitions/uint32
-> +        description: number of TX queues that support TX checksum offloading
+From: Edward AD <eadavis@sina.com>
 
-Is it going to be obvious that if not present all queues support
-checksum offload? I think we should document the default.
--- 
-pw-bot: cr
+On Tue, 22 Aug 2023 17:31:00 +0200, pabeni@redhat.com wrote:
+> > From: Edward AD <eadavis@sina.com>
+> > 
+> > The parameter sk_sleep(sk) passed in when calling prepare_to_wait may 
+> > return an invalid pointer due to nr-release reclaiming the sock.
+> > Here, schedule_timeout_interruptible is used to replace the combination 
+> > of 'prepare_to_wait, schedule, finish_wait' to solve the problem.
+> > 
+> > Reported-and-tested-by: syzbot+666c97e4686410e79649@syzkaller.appspotmail.com
+> > Signed-off-by: Edward AD <eadavis@sina.com>
+> 
+> This looks wrong. No syscall should race with sock_release(). It looks
+> like you are papering over the real issue.
+> 
+> As the reproducer shows a disconnect on an connected socket, I'm wild
+> guessing something alike 4faeee0cf8a5d88d63cdbc3bab124fb0e6aed08c
+> should be more appropriate.
+There is insufficient evidence to prove where the current report provided by 
+syz caused 'sk_sleep()' to return an invalid pointer.
+So, the above statement is my guess.
 
