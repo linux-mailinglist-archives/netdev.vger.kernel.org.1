@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-29883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C60A785064
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:11:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E71BE785061
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF81F1C20C72
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 06:11:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B5CC280E10
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 06:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1268834;
-	Wed, 23 Aug 2023 06:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E308489;
+	Wed, 23 Aug 2023 06:09:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C989475
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:09:43 +0000 (UTC)
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15B5E60
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 23:09:24 -0700 (PDT)
-X-QQ-mid: bizesmtp73t1692770838ty18n5id
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908348482
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:09:42 +0000 (UTC)
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D514E5C
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 23:09:20 -0700 (PDT)
+X-QQ-mid: bizesmtp73t1692770841tohskbu3
 Received: from wxdbg.localdomain.com ( [60.177.96.113])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 23 Aug 2023 14:07:17 +0800 (CST)
+	id ; Wed, 23 Aug 2023 14:07:20 +0800 (CST)
 X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: Xz3VOcA7Mr0+9g2C+AmSdd5WnNW21BLBjcEuiCYtF7uKTxbuduCiUnltolYbl
-	Tc+5urITUX7Lk0C+AeYsl1ojU4NUGMCbmvDyhBo24HtZUhFV7dvAw0u79tJrPqBYiwGaA7/
-	3j8eFv8le8UJdQ6P/atSEUUqhE4T+6WTvTZZ+AMQ9ZBWnceAG/8iBdvKkQTzaoDVrGCfIIh
-	cRgfiinHsLPADNUSJpNXomCYstPmg+F1yFD7gkKVNmIn9tiNWa7q4Hw0UwNpsMxsPKaQOj2
-	W5aKcUjKwGUsBtsPIhuVDQ1fZP1g+kSK/kEwhc6kE94olUrhpRKjugSjEKYUbs/g/kyBYDW
-	Ml/RFmKzU4sztSO/j1gNG5J+et+QVqtUc2xl1vWJASKEfdz6TCIv/VPb2D/q6LSI8QrNQWI
-	Y5b0MSdkrFE=
+X-QQ-FEAT: zT6n3Y95oi0uvOYqH0FtgYG8HLeuUtqR/RT/MRp9TM4CQLYOcrEUG+g9TLfdw
+	/5uawE0ot51GZQX7ZIbMPeAs2vW9oww8WdvHOD68oRovhBiQcYSQV2QbOKh0zi0nHdJUYot
+	cmNJKiaEEdRP9kCUj2PH9EkfrMsa+wSxV64nyS5NzGuWY2LKQ7EDBFURfhy/fIVU0h9gNRM
+	r3UQphsk9U8LuPcqXTuya3yfE3GCUn58JEVpSGF0CvITh4jltKHko3unX9E9EX4lK9WrDeb
+	LGnIojhlMmljzP1cmLqkyVLANd+60oTTj0x5cA1RQu4zi97xZsSfcqvKD9lPrs9jjtlhtC1
+	B0ejUjlWDglEMXzf0SvUNqXy+jAuoqVQidPjuJb/uslmzgHC54fXXscJ7V6wmuI450UWRd8
+	loHzQh8gciGPqhOLYRyxzw==
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 9341741896140565135
+X-BIZMAIL-ID: 11161276160896124414
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
 	davem@davemloft.net,
@@ -48,9 +48,9 @@ To: netdev@vger.kernel.org,
 	rmk+kernel@armlinux.org.uk
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 1/8] net: pcs: xpcs: add specific vendor supoprt for Wangxun 10Gb NICs
-Date: Wed, 23 Aug 2023 14:19:28 +0800
-Message-Id: <20230823061935.415804-2-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v3 2/8] net: pcs: xpcs: support to switch mode for Wangxun NICs
+Date: Wed, 23 Aug 2023 14:19:29 +0800
+Message-Id: <20230823061935.415804-3-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230823061935.415804-1-jiawenwu@trustnetic.com>
 References: <20230823061935.415804-1-jiawenwu@trustnetic.com>
@@ -65,107 +65,361 @@ X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since Wangxun 10Gb NICs require some special configuration on the IP of
-Synopsys Designware XPCS, introduce dev_flag for different vendors. Read
-OUI from device identifier registers, to detect Wangxun devices.
+According to chapter 6 of DesignWare Cores Ethernet PCS (version 3.20a)
+and custom design manual, add a configuration flow for switching interface
+mode.
 
-And xpcs_soft_reset() is skipped to avoid the reset of device identifier
-registers.
+If the interface changes, the following setting is required:
+1. wait VR_XS_PCS_DIG_STS bit(4, 2) [PSEQ_STATE] = 100b (Power-Good)
+2. write SR_XS_PCS_CTRL2 to select various PCS type
+3. write SR_PMA_CTRL1 and/or SR_XS_PCS_CTRL1 for link speed
+4. program PMA registers
+5. write VR_XS_PCS_DIG_CTRL1 bit(15) [VR_RST] = 1b (Vendor-Specific
+   Soft Reset)
+6. wait for VR_XS_PCS_DIG_CTRL1 bit(15) [VR_RST] to get cleared
+
+Only 10GBASE-R/SGMII/1000BASE-X modes are planned for the current Wangxun
+devices. And there is a quirk for Wangxun devices to switch mode although
+the interface in phylink state has not changed, since PCS will change to
+default 10GBASE-R when the ethernet driver(txgbe) do LAN reset.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/pcs/pcs-xpcs.c   | 35 ++++++++++++++++++++++++++++++++---
- include/linux/pcs/pcs-xpcs.h |  7 +++++++
- 2 files changed, 39 insertions(+), 3 deletions(-)
+ MAINTAINERS                   |   1 +
+ drivers/net/pcs/Makefile      |   2 +-
+ drivers/net/pcs/pcs-xpcs-wx.c | 208 ++++++++++++++++++++++++++++++++++
+ drivers/net/pcs/pcs-xpcs.c    |  13 ++-
+ drivers/net/pcs/pcs-xpcs.h    |   8 ++
+ include/linux/pcs/pcs-xpcs.h  |   1 +
+ 6 files changed, 227 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/net/pcs/pcs-xpcs-wx.c
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 44b037646865..8b56b2f9f24d 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -238,6 +238,29 @@ static int xpcs_write_vpcs(struct dw_xpcs *xpcs, int reg, u16 val)
- 	return xpcs_write_vendor(xpcs, MDIO_MMD_PCS, reg, val);
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f150561a396e..c24168d582da 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22915,6 +22915,7 @@ S:	Maintained
+ W:	https://www.net-swift.com
+ F:	Documentation/networking/device_drivers/ethernet/wangxun/*
+ F:	drivers/net/ethernet/wangxun/
++F:	drivers/net/pcs/pcs-xpcs-wx.c
  
-+static int xpcs_dev_flag(struct dw_xpcs *xpcs)
+ WATCHDOG DEVICE DRIVERS
+ M:	Wim Van Sebroeck <wim@linux-watchdog.org>
+diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
+index ea662a7989b2..fb1694192ae6 100644
+--- a/drivers/net/pcs/Makefile
++++ b/drivers/net/pcs/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # Makefile for Linux PCS drivers
+ 
+-pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-nxp.o
++pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-nxp.o pcs-xpcs-wx.o
+ 
+ obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
+ obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
+diff --git a/drivers/net/pcs/pcs-xpcs-wx.c b/drivers/net/pcs/pcs-xpcs-wx.c
+new file mode 100644
+index 000000000000..1f228d5a1398
+--- /dev/null
++++ b/drivers/net/pcs/pcs-xpcs-wx.c
+@@ -0,0 +1,208 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2015 - 2023 Beijing WangXun Technology Co., Ltd. */
++
++#include <linux/pcs/pcs-xpcs.h>
++#include <linux/mdio.h>
++#include "pcs-xpcs.h"
++
++/* VR_XS_PMA_MMD */
++#define TXGBE_PMA_MMD			0x8020
++#define TXGBE_TX_GENCTL1		0x11
++#define TXGBE_TX_GENCTL1_VBOOST_LVL	GENMASK(10, 8)
++#define TXGBE_TX_GENCTL1_VBOOST_EN0	BIT(4)
++#define TXGBE_TX_GEN_CTL2		0x12
++#define TXGBE_TX_GEN_CTL2_TX0_WIDTH(v)	FIELD_PREP(GENMASK(9, 8), v)
++#define TXGBE_TX_RATE_CTL		0x14
++#define TXGBE_TX_RATE_CTL_TX0_RATE(v)	FIELD_PREP(GENMASK(2, 0), v)
++#define TXGBE_RX_GEN_CTL2		0x32
++#define TXGBE_RX_GEN_CTL2_RX0_WIDTH(v)	FIELD_PREP(GENMASK(9, 8), v)
++#define TXGBE_RX_GEN_CTL3		0x33
++#define TXGBE_RX_GEN_CTL3_LOS_TRSHLD0	GENMASK(2, 0)
++#define TXGBE_RX_RATE_CTL		0x34
++#define TXGBE_RX_RATE_CTL_RX0_RATE(v)	FIELD_PREP(GENMASK(1, 0), v)
++#define TXGBE_RX_EQ_ATTN_CTL		0x37
++#define TXGBE_RX_EQ_ATTN_LVL0		GENMASK(2, 0)
++#define TXGBE_RX_EQ_CTL0		0x38
++#define TXGBE_RX_EQ_CTL0_VGA1_GAIN(v)	FIELD_PREP(GENMASK(15, 12), v)
++#define TXGBE_RX_EQ_CTL0_VGA2_GAIN(v)	FIELD_PREP(GENMASK(11, 8), v)
++#define TXGBE_RX_EQ_CTL0_CTLE_POLE(v)	FIELD_PREP(GENMASK(7, 5), v)
++#define TXGBE_RX_EQ_CTL0_CTLE_BOOST(v)	FIELD_PREP(GENMASK(4, 0), v)
++#define TXGBE_RX_EQ_CTL4		0x3C
++#define TXGBE_RX_EQ_CTL4_CONT_OFF_CAN0	BIT(4)
++#define TXGBE_RX_EQ_CTL4_CONT_ADAPT0	BIT(0)
++#define TXGBE_AFE_DFE_ENABLE		0x3D
++#define TXGBE_DFE_EN_0			BIT(4)
++#define TXGBE_AFE_EN_0			BIT(0)
++#define TXGBE_DFE_TAP_CTL0		0x3E
++#define TXGBE_MPLLA_CTL0		0x51
++#define TXGBE_MPLLA_CTL2		0x53
++#define TXGBE_MPLLA_CTL2_DIV16P5_CLK_EN	BIT(10)
++#define TXGBE_MPLLA_CTL2_DIV10_CLK_EN	BIT(9)
++#define TXGBE_MPLLA_CTL3		0x57
++#define TXGBE_MISC_CTL0			0x70
++#define TXGBE_MISC_CTL0_PLL		BIT(15)
++#define TXGBE_MISC_CTL0_CR_PARA_SEL	BIT(14)
++#define TXGBE_MISC_CTL0_RX_VREF(v)	FIELD_PREP(GENMASK(12, 8), v)
++#define TXGBE_VCO_CAL_LD0		0x72
++#define TXGBE_VCO_CAL_REF0		0x76
++
++static int txgbe_read_pma(struct dw_xpcs *xpcs, int reg)
 +{
-+	int ret, oui;
-+
-+	ret = xpcs_read(xpcs, MDIO_MMD_PMAPMD, MDIO_DEVID1);
-+	if (ret < 0)
-+		return ret;
-+
-+	oui = ret;
-+
-+	ret = xpcs_read(xpcs, MDIO_MMD_PMAPMD, MDIO_DEVID2);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = (ret >> 10) & 0x3F;
-+	oui |= ret << 16;
-+
-+	if (oui == DW_OUI_WX)
-+		xpcs->dev_flag = DW_DEV_TXGBE;
-+
-+	return 0;
++	return xpcs_read(xpcs, MDIO_MMD_PMAPMD, TXGBE_PMA_MMD + reg);
 +}
 +
- static int xpcs_poll_reset(struct dw_xpcs *xpcs, int dev)
- {
- 	/* Poll until the reset bit clears (50ms per retry == 0.6 sec) */
-@@ -1284,6 +1307,10 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
- 			goto out;
- 		}
- 
-+		ret = xpcs_dev_flag(xpcs);
-+		if (ret)
-+			goto out;
++static int txgbe_write_pma(struct dw_xpcs *xpcs, int reg, u16 val)
++{
++	return xpcs_write(xpcs, MDIO_MMD_PMAPMD, TXGBE_PMA_MMD + reg, val);
++}
 +
++static void txgbe_pma_config_10gbaser(struct dw_xpcs *xpcs)
++{
++	int val;
++
++	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL0, 0x21);
++	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL3, 0);
++	val = txgbe_read_pma(xpcs, TXGBE_TX_GENCTL1);
++	val = u16_replace_bits(val, 0x5, TXGBE_TX_GENCTL1_VBOOST_LVL);
++	txgbe_write_pma(xpcs, TXGBE_TX_GENCTL1, val);
++	txgbe_write_pma(xpcs, TXGBE_MISC_CTL0, TXGBE_MISC_CTL0_PLL |
++			TXGBE_MISC_CTL0_CR_PARA_SEL | TXGBE_MISC_CTL0_RX_VREF(0xF));
++	txgbe_write_pma(xpcs, TXGBE_VCO_CAL_LD0, 0x549);
++	txgbe_write_pma(xpcs, TXGBE_VCO_CAL_REF0, 0x29);
++	txgbe_write_pma(xpcs, TXGBE_TX_RATE_CTL, 0);
++	txgbe_write_pma(xpcs, TXGBE_RX_RATE_CTL, 0);
++	txgbe_write_pma(xpcs, TXGBE_TX_GEN_CTL2, TXGBE_TX_GEN_CTL2_TX0_WIDTH(3));
++	txgbe_write_pma(xpcs, TXGBE_RX_GEN_CTL2, TXGBE_RX_GEN_CTL2_RX0_WIDTH(3));
++	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL2, TXGBE_MPLLA_CTL2_DIV16P5_CLK_EN |
++			TXGBE_MPLLA_CTL2_DIV10_CLK_EN);
++
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_CTL0, TXGBE_RX_EQ_CTL0_CTLE_POLE(2) |
++			TXGBE_RX_EQ_CTL0_CTLE_BOOST(5));
++	val = txgbe_read_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL);
++	val &= ~TXGBE_RX_EQ_ATTN_LVL0;
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL, val);
++	txgbe_write_pma(xpcs, TXGBE_DFE_TAP_CTL0, 0xBE);
++	val = txgbe_read_pma(xpcs, TXGBE_AFE_DFE_ENABLE);
++	val &= ~(TXGBE_DFE_EN_0 | TXGBE_AFE_EN_0);
++	txgbe_write_pma(xpcs, TXGBE_AFE_DFE_ENABLE, val);
++	val = txgbe_read_pma(xpcs, TXGBE_RX_EQ_CTL4);
++	val &= ~TXGBE_RX_EQ_CTL4_CONT_ADAPT0;
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_CTL4, val);
++}
++
++static void txgbe_pma_config_1g(struct dw_xpcs *xpcs)
++{
++	int val;
++
++	val = txgbe_read_pma(xpcs, TXGBE_TX_GENCTL1);
++	val = u16_replace_bits(val, 0x5, TXGBE_TX_GENCTL1_VBOOST_LVL);
++	val &= ~TXGBE_TX_GENCTL1_VBOOST_EN0;
++	txgbe_write_pma(xpcs, TXGBE_TX_GENCTL1, val);
++	txgbe_write_pma(xpcs, TXGBE_MISC_CTL0, TXGBE_MISC_CTL0_PLL |
++			TXGBE_MISC_CTL0_CR_PARA_SEL | TXGBE_MISC_CTL0_RX_VREF(0xF));
++
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_CTL0, TXGBE_RX_EQ_CTL0_VGA1_GAIN(7) |
++			TXGBE_RX_EQ_CTL0_VGA2_GAIN(7) | TXGBE_RX_EQ_CTL0_CTLE_BOOST(6));
++	val = txgbe_read_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL);
++	val &= ~TXGBE_RX_EQ_ATTN_LVL0;
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL, val);
++	txgbe_write_pma(xpcs, TXGBE_DFE_TAP_CTL0, 0);
++	val = txgbe_read_pma(xpcs, TXGBE_RX_GEN_CTL3);
++	val = u16_replace_bits(val, 0x4, TXGBE_RX_GEN_CTL3_LOS_TRSHLD0);
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL, val);
++
++	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL0, 0x20);
++	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL3, 0x46);
++	txgbe_write_pma(xpcs, TXGBE_VCO_CAL_LD0, 0x540);
++	txgbe_write_pma(xpcs, TXGBE_VCO_CAL_REF0, 0x2A);
++	txgbe_write_pma(xpcs, TXGBE_AFE_DFE_ENABLE, 0);
++	txgbe_write_pma(xpcs, TXGBE_RX_EQ_CTL4, TXGBE_RX_EQ_CTL4_CONT_OFF_CAN0);
++	txgbe_write_pma(xpcs, TXGBE_TX_RATE_CTL, TXGBE_TX_RATE_CTL_TX0_RATE(3));
++	txgbe_write_pma(xpcs, TXGBE_RX_RATE_CTL, TXGBE_RX_RATE_CTL_RX0_RATE(3));
++	txgbe_write_pma(xpcs, TXGBE_TX_GEN_CTL2, TXGBE_TX_GEN_CTL2_TX0_WIDTH(1));
++	txgbe_write_pma(xpcs, TXGBE_RX_GEN_CTL2, TXGBE_RX_GEN_CTL2_RX0_WIDTH(1));
++	txgbe_write_pma(xpcs, TXGBE_MPLLA_CTL2, TXGBE_MPLLA_CTL2_DIV10_CLK_EN);
++}
++
++static int txgbe_pcs_poll_power_up(struct dw_xpcs *xpcs)
++{
++	int val, ret;
++
++	/* Wait xpcs power-up good */
++	ret = read_poll_timeout(xpcs_read_vpcs, val,
++				(val & DW_PSEQ_ST) == DW_PSEQ_ST_GOOD,
++				10000, 1000000, false,
++				xpcs, DW_VR_XS_PCS_DIG_STS);
++	if (ret < 0)
++		dev_err(&xpcs->mdiodev->dev, "xpcs power-up timeout\n");
++
++	return ret;
++}
++
++static int txgbe_pma_init_done(struct dw_xpcs *xpcs)
++{
++	int val, ret;
++
++	xpcs_write_vpcs(xpcs, DW_VR_XS_PCS_DIG_CTRL1, DW_VR_RST | DW_EN_VSMMD1);
++
++	/* wait pma initialization done */
++	ret = read_poll_timeout(xpcs_read_vpcs, val, !(val & DW_VR_RST),
++				100000, 10000000, false,
++				xpcs, DW_VR_XS_PCS_DIG_CTRL1);
++	if (ret < 0)
++		dev_err(&xpcs->mdiodev->dev, "xpcs pma initialization timeout\n");
++
++	return ret;
++}
++
++static bool txgbe_xpcs_mode_quirk(struct dw_xpcs *xpcs)
++{
++	int ret;
++
++	/* When txgbe do LAN reset, PCS will change to default 10GBASE-R mode */
++	ret = xpcs_read(xpcs, MDIO_MMD_PCS, MDIO_CTRL2);
++	ret &= MDIO_PCS_CTRL2_TYPE;
++	if (ret == MDIO_PCS_CTRL2_10GBR &&
++	    xpcs->interface != PHY_INTERFACE_MODE_10GBASER)
++		return true;
++
++	return false;
++}
++
++int txgbe_xpcs_switch_mode(struct dw_xpcs *xpcs, phy_interface_t interface)
++{
++	int val, ret;
++
++	switch (interface) {
++	case PHY_INTERFACE_MODE_10GBASER:
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_1000BASEX:
++		break;
++	default:
++		return 0;
++	}
++
++	if (xpcs->interface == interface && !txgbe_xpcs_mode_quirk(xpcs))
++		return 0;
++
++	xpcs->interface = interface;
++
++	ret = txgbe_pcs_poll_power_up(xpcs);
++	if (ret < 0)
++		return ret;
++
++	if (interface == PHY_INTERFACE_MODE_10GBASER) {
++		xpcs_write(xpcs, MDIO_MMD_PCS, MDIO_CTRL2, MDIO_PCS_CTRL2_10GBR);
++		val = xpcs_read(xpcs, MDIO_MMD_PMAPMD, MDIO_CTRL1);
++		val |= MDIO_CTRL1_SPEED10G;
++		xpcs_write(xpcs, MDIO_MMD_PMAPMD, MDIO_CTRL1, val);
++		txgbe_pma_config_10gbaser(xpcs);
++	} else {
++		xpcs_write(xpcs, MDIO_MMD_PCS, MDIO_CTRL2, MDIO_PCS_CTRL2_10GBX);
++		xpcs_write(xpcs, MDIO_MMD_PMAPMD, MDIO_CTRL1, 0);
++		xpcs_write(xpcs, MDIO_MMD_PCS, MDIO_CTRL1, 0);
++		txgbe_pma_config_1g(xpcs);
++	}
++
++	return txgbe_pma_init_done(xpcs);
++}
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 8b56b2f9f24d..4cd011405376 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -228,12 +228,12 @@ static int xpcs_write_vendor(struct dw_xpcs *xpcs, int dev, int reg,
+ 	return xpcs_write(xpcs, dev, DW_VENDOR | reg, val);
+ }
+ 
+-static int xpcs_read_vpcs(struct dw_xpcs *xpcs, int reg)
++int xpcs_read_vpcs(struct dw_xpcs *xpcs, int reg)
+ {
+ 	return xpcs_read_vendor(xpcs, MDIO_MMD_PCS, reg);
+ }
+ 
+-static int xpcs_write_vpcs(struct dw_xpcs *xpcs, int reg, u16 val)
++int xpcs_write_vpcs(struct dw_xpcs *xpcs, int reg, u16 val)
+ {
+ 	return xpcs_write_vendor(xpcs, MDIO_MMD_PCS, reg, val);
+ }
+@@ -841,6 +841,12 @@ int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
+ 	if (!compat)
+ 		return -ENODEV;
+ 
++	if (xpcs->dev_flag == DW_DEV_TXGBE) {
++		ret = txgbe_xpcs_switch_mode(xpcs, interface);
++		if (ret)
++			return ret;
++	}
++
+ 	switch (compat->an_mode) {
+ 	case DW_10GBASER:
+ 		break;
+@@ -1313,9 +1319,6 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+ 
  		xpcs->pcs.ops = &xpcs_phylink_ops;
  		xpcs->pcs.neg_mode = true;
- 		if (compat->an_mode == DW_10GBASER)
-@@ -1291,9 +1318,11 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
- 
+-		if (compat->an_mode == DW_10GBASER)
+-			return xpcs;
+-
  		xpcs->pcs.poll = true;
  
--		ret = xpcs_soft_reset(xpcs, compat);
--		if (ret)
--			goto out;
-+		if (xpcs->dev_flag != DW_DEV_TXGBE) {
-+			ret = xpcs_soft_reset(xpcs, compat);
-+			if (ret)
-+				goto out;
-+		}
+ 		if (xpcs->dev_flag != DW_DEV_TXGBE) {
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index 68c6b5a62088..da61ad36946c 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -15,8 +15,13 @@
+ /* VR_XS_PCS */
+ #define DW_USXGMII_RST			BIT(10)
+ #define DW_USXGMII_EN			BIT(9)
++#define DW_VR_XS_PCS_DIG_CTRL1		0x0000
++#define DW_VR_RST			BIT(15)
++#define DW_EN_VSMMD1			BIT(13)
+ #define DW_VR_XS_PCS_DIG_STS		0x0010
+ #define DW_RXFIFO_ERR			GENMASK(6, 5)
++#define DW_PSEQ_ST			GENMASK(4, 2)
++#define DW_PSEQ_ST_GOOD			FIELD_PREP(GENMASK(4, 2), 0x4)
  
- 		return xpcs;
- 	}
+ /* SR_MII */
+ #define DW_USXGMII_FULL			BIT(8)
+@@ -106,6 +111,9 @@
+ 
+ int xpcs_read(struct dw_xpcs *xpcs, int dev, u32 reg);
+ int xpcs_write(struct dw_xpcs *xpcs, int dev, u32 reg, u16 val);
++int xpcs_read_vpcs(struct dw_xpcs *xpcs, int reg);
++int xpcs_write_vpcs(struct dw_xpcs *xpcs, int reg, u16 val);
+ int nxp_sja1105_sgmii_pma_config(struct dw_xpcs *xpcs);
+ int nxp_sja1110_sgmii_pma_config(struct dw_xpcs *xpcs);
+ int nxp_sja1110_2500basex_pma_config(struct dw_xpcs *xpcs);
++int txgbe_xpcs_switch_mode(struct dw_xpcs *xpcs, phy_interface_t interface);
 diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index ff99cf7a5d0d..f37e8acfd351 100644
+index f37e8acfd351..da3a6c30f6d2 100644
 --- a/include/linux/pcs/pcs-xpcs.h
 +++ b/include/linux/pcs/pcs-xpcs.h
-@@ -20,12 +20,19 @@
- #define DW_AN_C37_1000BASEX		4
- #define DW_10GBASER			5
- 
-+/* device vendor OUI */
-+#define DW_OUI_WX			0x0018fc80
-+
-+/* dev_flag */
-+#define DW_DEV_TXGBE			BIT(0)
-+
- struct xpcs_id;
- 
- struct dw_xpcs {
+@@ -32,6 +32,7 @@ struct dw_xpcs {
  	struct mdio_device *mdiodev;
  	const struct xpcs_id *id;
  	struct phylink_pcs pcs;
-+	int dev_flag;
++	phy_interface_t interface;
+ 	int dev_flag;
  };
  
- int xpcs_get_an_mode(struct dw_xpcs *xpcs, phy_interface_t interface);
 -- 
 2.27.0
 
