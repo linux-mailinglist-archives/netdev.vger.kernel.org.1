@@ -1,119 +1,141 @@
-Return-Path: <netdev+bounces-29938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0045785482
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:47:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE8B4785483
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B97D2812C0
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A3041C20BB6
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 09:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4128A954;
-	Wed, 23 Aug 2023 09:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB1CA955;
+	Wed, 23 Aug 2023 09:48:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D745DA946
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 09:47:24 +0000 (UTC)
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0514210CE
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 02:47:23 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50091b91a83so1739543e87.3
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 02:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692784041; x=1693388841;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pJYxY9EKyE3nWLrlKwhz/hBGJk5NPLW4fkCZ4lrsGEw=;
-        b=bw5w4gl/4vvhu25m5/SOpPCnGec9H3hlKTxmBMwAlXDijKxzcKALGzp/upD4QCDV2E
-         YcgEph4FhLWEOwsgMOtu1c0+NuwvyLsPlz5FhF2i63t7TYZYDKVt4PhSxrci4zeN0jKL
-         gVuIKzEWDBqOkZa6pw0jwXd5x6CnAqGrIS3IQhxS7UmTlg+qECFn8+gXt1CzixRyrbI/
-         Wj7RnpKNXU9tPd2wI+HeqamGI/5+pBAhkLmzfGMOZWisH97vY50a65l7i8D9JMdsltZf
-         Hlihoe4ka/yTWi+diQbqKGJ65AU06iFHtSIXYUVQipIvK/9bJ1789qiiIUXiRmZwaGef
-         mjuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692784041; x=1693388841;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJYxY9EKyE3nWLrlKwhz/hBGJk5NPLW4fkCZ4lrsGEw=;
-        b=CIYSwEGv4Nai/XqxCmMG7v45Ej6/kGlr9wn3DttRO0/W2nvN1NSCAY6BHO71MaQi2s
-         qAkfIc7kCWk3CyYaA0wbiu7cXJUl9gQ6ztKL3X/gK9FUqGXaOAeWSz81sequ+lLWWwdC
-         QtYZ+4dwOEzPNNb//DYCbDt8I0agMXZs7d1Dy1nmxVO1gTQV1ZnWyPJT0D1p5AFeuOEU
-         eEA5KerDzTrZS6jZoewEecuHqHqzlccESBeO6ecocpVEDYW3C0uIxHDU/y6iZpdd9yst
-         Qh/dhrS7whnqRVk98mE9dJiXb1FoB9L/YdQDNJPVWhyzQPllLHXfE2/Wky3AYYDztnak
-         x0Ww==
-X-Gm-Message-State: AOJu0Yzcz5C4BHqTjj+WgtHGaxS2+aOBQ//1Wwv59p9ERlepfXwQji2I
-	KvHwWDUBxgT9wu1kboG2N/2umg==
-X-Google-Smtp-Source: AGHT+IE7cysoJxUCYOrYxdZSwvOf4+Tr5mGAWORNPlXqqK8SIWiZ5/c3SimYFa8oVbbcvbfQe/rYeA==
-X-Received: by 2002:a05:6512:3b9e:b0:500:9a67:d40e with SMTP id g30-20020a0565123b9e00b005009a67d40emr192736lfv.60.1692784041188;
-        Wed, 23 Aug 2023 02:47:21 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id c4-20020aa7df04000000b00523b1335618sm9078804edy.97.2023.08.23.02.47.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 02:47:20 -0700 (PDT)
-Message-ID: <601f8735-39ea-7579-0047-3d3358851339@linaro.org>
-Date: Wed, 23 Aug 2023 11:47:19 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2C4A92F
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 09:48:03 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251F9128
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 02:48:02 -0700 (PDT)
+Date: Wed, 23 Aug 2023 11:47:57 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1692784080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=J/qrEyStB/EbDwp39Zj5wIHFsVReCcFwb8tljX55cMk=;
+	b=i7WK3LV/JKVHj4cCCJ7ZhL4+uzYJsHirI5UpsmaPRBr6uxc08BP0YDKx9MSejlLDhvugYs
+	+OeuFZcOYEfXzXGLg3syZFpXp/vljVuXBxIGmnlFQOFY4u7w5HyYh+SmYTfcnCgbCkMZ2F
+	87ErwcGeIYaRk+kmlNBZDsR7+PJmfHO0+gwd3MeFg6EAQ8QrzcYNfQETn4ER+a/AcW9nfD
+	++qrt0eedxsQtWuWl0R7DIFlAJlYFebgwd7tpwcQW40GT6evnPGd3N+q/AfoKvo3QwClyg
+	dBGgmvTGuRxcJmJlCXW7kyKF0wZceqCOKjZnBYmZMkuM0ti20UIleX2lPa79tg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1692784080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=J/qrEyStB/EbDwp39Zj5wIHFsVReCcFwb8tljX55cMk=;
+	b=ubEcJaCUW2qxIZJianrG4WgaTBJoNu6lh5RUdCeQPkKWqbpQklBXgMq9lozUhwPnDuhkrx
+	KeL75Rdm+GpugABQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: netdev@vger.kernel.org, Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	hariprasad <hkelam@marvell.com>
+Subject: [BUG] Possible unsafe page_pool usage in octeontx2
+Message-ID: <20230823094757.gxvCEOBi@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next] net: dsa: use capital "OR" for multiple licenses
- in SPDX
-Content-Language: en-US
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>
-References: <20230823085632.116725-1-krzysztof.kozlowski@linaro.org>
- <87h6oq9k9d.fsf@kurt>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <87h6oq9k9d.fsf@kurt>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 23/08/2023 11:32, Kurt Kanzenbach wrote:
-> On Wed Aug 23 2023, Krzysztof Kozlowski wrote:
->> Documentation/process/license-rules.rst and checkpatch expect the SPDX
->> identifier syntax for multiple licenses to use capital "OR".  Correct it
->> to keep consistent format and avoid copy-paste issues.
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> 
-> Side note: The SPDX spec in section D.2 says: "License expression
-> operators (AND, OR and WITH) should be matched in a case-sensitive
-> manner.". Should is not must. So I assume checkpatch and spdxcheck
-> should handle both cases. Especially because:
-> 
-> |linux (git)-[master] % git grep 'SPDX' | grep ' or ' | wc -l
-> |370
-> 
+Hi,
 
-But "should" denotes preferred rule:
+I've been looking at the page_pool locking.
 
-git grep "SPDX-Li" | grep " OR " | wc -l	
-7661
+page_pool_alloc_frag() -> page_pool_alloc_pages() ->
+__page_pool_get_cached():
 
-Best regards,
-Krzysztof
+There core of the allocation is:
+|         /* Caller MUST guarantee safe non-concurrent access, e.g. softirq */
+|         if (likely(pool->alloc.count)) {
+|                 /* Fast-path */
+|                 page = pool->alloc.cache[--pool->alloc.count];
 
+The access to the `cache' array and the `count' variable is not locked.
+This is fine as long as there only one consumer per pool. In my
+understanding the intention is to have one page_pool per NAPI callback
+to ensure this.
+
+The pool can be filled in the same context (within allocation if the
+pool is empty). There is also page_pool_recycle_in_cache() which fills
+the pool from within skb free, for instance:
+ napi_consume_skb() -> skb_release_all() -> skb_release_data() ->
+ napi_frag_unref() -> page_pool_return_skb_page().
+
+The last one has the following check here:
+|         napi = READ_ONCE(pp->p.napi);
+|         allow_direct = napi_safe && napi &&
+|                 READ_ONCE(napi->list_owner) == smp_processor_id();
+
+This eventually ends in page_pool_recycle_in_cache() where it adds the
+page to the cache buffer if the check above is true (and BH is disabled). 
+
+napi->list_owner is set once NAPI is scheduled until the poll callback
+completed. It is safe to add items to list because only one of the two
+can run on a single CPU and the completion of them ensured by having BH
+disabled the whole time.
+
+This breaks in octeontx2 where a worker is used to fill the buffer:
+  otx2_pool_refill_task() -> otx2_alloc_rbuf() -> __otx2_alloc_rbuf() ->
+  otx2_alloc_pool_buf() -> page_pool_alloc_frag().
+
+BH is disabled but the add of a page can still happen while NAPI
+callback runs on a remote CPU and so corrupting the index/ array.
+
+API wise I would suggest to
+
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 7ff80b80a6f9f..b50e219470a36 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -612,7 +612,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
+ 			page_pool_dma_sync_for_device(pool, page,
+ 						      dma_sync_size);
+ 
+-		if (allow_direct && in_softirq() &&
++		if (allow_direct && in_serving_softirq() &&
+ 		    page_pool_recycle_in_cache(page, pool))
+ 			return NULL;
+ 
+because the intention (as I understand it) is to be invoked from within
+the NAPI callback (while softirq is served) and not if BH is just
+disabled due to a lock or so.
+
+It would also make sense to a add WARN_ON_ONCE(!in_serving_softirq()) to
+page_pool_alloc_pages() to spot usage outside of softirq. But this will
+trigger in every driver since the same function is used in the open
+callback to initially setup the HW.
+
+Sebastian
 
