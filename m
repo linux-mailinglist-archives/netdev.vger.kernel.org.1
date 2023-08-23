@@ -1,104 +1,87 @@
-Return-Path: <netdev+bounces-30063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 129BC785C4F
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:43:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8754F785C7D
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:49:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC881C20CE7
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:43:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F27372812F8
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:49:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38940C8EB;
-	Wed, 23 Aug 2023 15:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AE7C8EC;
+	Wed, 23 Aug 2023 15:49:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD022905;
-	Wed, 23 Aug 2023 15:43:47 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A893BE70;
-	Wed, 23 Aug 2023 08:43:46 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bbad32bc79so96600311fa.0;
-        Wed, 23 Aug 2023 08:43:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692805425; x=1693410225;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xE3wqcNpOoc+MtIIQwAoQiiefvXPr9F892w05vM/6pQ=;
-        b=AjCtHzz+Ta8GojfWKrW1Ohnoc3kyEMJk+YoAbn3pNEBupc+aqqUotQKv/8VdVYkcSF
-         +9PNwqPdWhXLbdG6iLi+xSUR3dpOfWaIOTXK7nUmtfxcyiDMEcoIwy4ct4VUP826vqkz
-         SKyMIERNFzlniiMf3Dx1KSdShGNrVRS8WrsctHR/nkCH2kyvyOAWoYop56FfSL7Do84m
-         OuSlSSc2XRNeG/L5RPUgRx2yPRZcuZ5LxR1iADhR2ZzeMBO+NuY93zQKbGkZQa49JGgc
-         vwow9yAy44WBUiK9O1rQ020or9gq0QFj9knbwn8J0KVWi41NDV0wfLu5Bo0XQyCZUSdO
-         DqLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692805425; x=1693410225;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xE3wqcNpOoc+MtIIQwAoQiiefvXPr9F892w05vM/6pQ=;
-        b=QXTbxyezpzuyVnls5GoddjIMINHOvSrGi7hsXVyADVA275PvMpw0IhF7st56MYcZsM
-         KTVm5rFvkdV7Jx5o8uSsdbkftWmKWxKG9Fda8JYXHYITaETXAcwrIBiz+RPTMaaJnNZt
-         fsAqimiPPv64Penc8uGopY3gXgLrYTBKloqXZEmvdGuFzrBgj98pSUMpa67wLUzW/HyS
-         KEMiaA5W5M2E44BAJraRTrVPggAnMS9BP5LNGBLG3ClnEcyXCHII04k/NDWLFxlAFroL
-         Wa/WKXyAP8lCNvsTQqYIT88s+oOThPT1iWxoFNhYTIa23k9zGr8/XUIHrmhrLBkDyTq6
-         aPhg==
-X-Gm-Message-State: AOJu0YwPSOfgnYsHKXVbRIZPvJZt8m6TI3Jgsj1tHSeBh+aGKGvb5jUe
-	ghvcXE8aOc4DEKnTr4TFh4xxvZ5ozw/MlqHR/1u5iAUSZmk=
-X-Google-Smtp-Source: AGHT+IFEYRGc3cfoxgyvkJZPI8pZjaALi3OmFHtpEZ4fhakp/Ch1aLuu7pp08XCD1RccnEUr2Zp3vcWDJW8qNhy9c6c=
-X-Received: by 2002:a2e:9bc7:0:b0:2bb:99fa:1772 with SMTP id
- w7-20020a2e9bc7000000b002bb99fa1772mr9732655ljj.49.1692805424716; Wed, 23 Aug
- 2023 08:43:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4B52905
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 15:49:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD410C433C9;
+	Wed, 23 Aug 2023 15:49:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692805765;
+	bh=NE42OlPzmRHlwFXCXXgi1f+Eb2OiCz1sD7zYgQ/OL2s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oVM6RklICxDkz/4elBAXRcH/fsjP8rqzNRWH2m7KbSNa+nVld7NxUXQVIm4Htxk8t
+	 qHvEWzLP7w7ptYMVlF8VGmJHACNspzxbUC+Vci07cna1WO7vlqqHMJaECc2lzUE0VY
+	 /UuHbHHlnNSeURoMuyDQRhg6LnidQ4EKv1PQ+2pQl3oZgi2NcpcDjkiygQ5/20sdL0
+	 4cO4VDhxNYoFSLiYzNEfGop35aQ27D+4NnPSo3nRaTHRQ9Kp6xWN/DRbdYO3ur/fp0
+	 Qz2pzlj+edBLD2aPxnyrhwLcjS5hiMTcHvxvcDdWe5jyzK3GWuErkSsMByU6920t8W
+	 dE9otp7fGttIA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] docs: netdev: recommend against --in-reply-to
+Date: Wed, 23 Aug 2023 08:49:22 -0700
+Message-ID: <20230823154922.1162644-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230823145346.1462819-1-toke@redhat.com>
-In-Reply-To: <20230823145346.1462819-1-toke@redhat.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 23 Aug 2023 08:43:33 -0700
-Message-ID: <CAADnVQ+rD5S_k81fM82yaK9EEG3yWtEenpA15y9ujvJZVk2n6A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 0/6] samples/bpf: Remove unmaintained XDP
- sample utilities
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 23, 2023 at 7:54=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
->
-> The samples/bpf directory in the kernel tree started out as a way of show=
-casing
-> different aspects of BPF functionality by writing small utility programs =
-for
-> each feature. However, as the BPF subsystem has matured, the preferred wa=
-y of
-> including userspace code with a feature has become the BPF selftests, whi=
-ch also
-> have the benefit of being consistently run as part of the BPF CI system.
+It's somewhat unfortunate but with (my?) the current tooling
+if people post new versions of a set in reply to an old version
+managing the review queue gets difficult. So recommend against it.
 
-Did you miss my previous email?
-
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Could you add this link with details to samples/bpf/README.rst,
-so that folks know where to look for them?
+ Documentation/process/maintainer-netdev.rst | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Other than that the set makes sense to me.
----
+diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+index 2ab843cde830..c1c732e9748b 100644
+--- a/Documentation/process/maintainer-netdev.rst
++++ b/Documentation/process/maintainer-netdev.rst
+@@ -167,6 +167,8 @@ Asking the maintainer for status updates on your
+ patch is a good way to ensure your patch is ignored or pushed to the
+ bottom of the priority list.
+ 
++.. _Changes requested:
++
+ Changes requested
+ ~~~~~~~~~~~~~~~~~
+ 
+@@ -359,6 +361,10 @@ Make sure you address all the feedback in your new posting. Do not post a new
+ version of the code if the discussion about the previous version is still
+ ongoing, unless directly instructed by a reviewer.
+ 
++The new version of patches should be posted as a separate thread,
++not as a reply to the previous posting. Change log should include a link
++to the previous posting (see :ref:`Changes requested`).
++
+ Testing
+ -------
+ 
+-- 
+2.41.0
+
 
