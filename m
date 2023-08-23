@@ -1,132 +1,89 @@
-Return-Path: <netdev+bounces-29947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04645785539
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:17:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E16D78554C
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 317B71C20C5A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:17:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2575281249
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88853AD4F;
-	Wed, 23 Aug 2023 10:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81545AD58;
+	Wed, 23 Aug 2023 10:24:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73430AD3D
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:17:30 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330F1CDF
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 03:17:01 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52a1132b685so3542200a12.1
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 03:17:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692785793; x=1693390593;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PkhmhhTWHkeRQp2PPUUxTCXWp1T0OTe7aVdp4fg5upo=;
-        b=LO6EWlz79jJJ9v/UQCg4OZKmPJO9+j6QHM1tngs1xZjP73VY2yTNyozqbCEjmHkgOJ
-         /I25kU9siRPAlFrz9dpUhrfTb7C4hK1nJcapsvmczx4ZFMRu+Id4skeNROqiKQ5j7fC1
-         ZyyN0rEkpFnovXZ/Y9YFpI+20NzFPUlKW8oib55lhQS8AfgOyDR1cSStWeGIk4mOE/f8
-         e8jk+ITZo8/vSFO72g6rBQt9NS7/HQQrfF/hlcYS6bEX+Ay7j17UK9K0sHHCYLh/aFQD
-         moxfheS5gy+jsjw+9CZRAFxsIYJOD76OVSKpIkrcpc8QGv+VCkZ89LVZ+6AtV/ge1cjC
-         e99w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692785793; x=1693390593;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PkhmhhTWHkeRQp2PPUUxTCXWp1T0OTe7aVdp4fg5upo=;
-        b=M32CV9jaJcaAJWc0ztX5p9B7mT7QxTs1FbhQ3H5w2ln/mYY88K0C4a3kW5g1AeQ195
-         cY1Utvtl/jrj3vGZVgX7/qVCEm1U+KB9+eYkE6g69O/uhC7Zlwo11rU61lkYoKYCgaea
-         wBswBUe1oRv6o9pjDxn4Lpc1CubBpfWL1lM+xGXdlukYF+aCYq9z6HZC1PoGiKSTTUUJ
-         rbedFA9Mnpq+aeDajxGKIHTXaVWjE4zvE9hammCWrMC+omoaLw+5peSjQ0AMdF8SKRxi
-         L2oNrrZDP/kevgD2xPo+WrmvepusciApv/VnMU15F1+6OTvU8H92ZOtpSb0BkAVXrtkj
-         X4Zg==
-X-Gm-Message-State: AOJu0YynVT2rKcJhoExWdWJCzOoDrRvbp6hmslu+SFtYTdDaj91JtvQU
-	7NhhLOhrTnt8lK1Xr2jto3oOIQ==
-X-Google-Smtp-Source: AGHT+IG4cl/3Fz/QSS2cl3WXZt2VKfaSb/kNTKY6FTxfUyaMgKaOK/vEjbIWyu1Ae6CwwBgVchcQyg==
-X-Received: by 2002:a05:6402:1614:b0:522:1e2f:fa36 with SMTP id f20-20020a056402161400b005221e2ffa36mr8763754edv.28.1692785793520;
-        Wed, 23 Aug 2023 03:16:33 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id i15-20020a50fc0f000000b0051e1660a34esm9063699edr.51.2023.08.23.03.16.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 03:16:32 -0700 (PDT)
-Message-ID: <61b9e036-7864-65c6-d43b-463fff896ddc@linaro.org>
-Date: Wed, 23 Aug 2023 12:16:28 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F22A92F
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:24:22 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DA8F11F
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 03:24:20 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-133-Azzw1r6MPOGjmCYghTvM_Q-1; Wed, 23 Aug 2023 11:24:17 +0100
+X-MC-Unique: Azzw1r6MPOGjmCYghTvM_Q-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 23 Aug
+ 2023 11:24:16 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 23 Aug 2023 11:24:16 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Amritha Nambiar' <amritha.nambiar@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+CC: "sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>
+Subject: RE: [net-next PATCH v2 0/9] Introduce NAPI queues support
+Thread-Topic: [net-next PATCH v2 0/9] Introduce NAPI queues support
+Thread-Index: AQHZ1ISk2j15TaiRb0C/b58hOjJm6K/3rqpw
+Date: Wed, 23 Aug 2023 10:24:16 +0000
+Message-ID: <22603595289e4e86b6d61f0146b2e25d@AcuMS.aculab.com>
+References: <169266003844.10199.10450480941022607696.stgit@anambiarhost.jf.intel.com>
+In-Reply-To: <169266003844.10199.10450480941022607696.stgit@anambiarhost.jf.intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v3 29/42] dt-bindings: rtc: Add ST M48T86
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To: nikita.shubin@maquefel.me, Hartley Sweeten
- <hsweeten@visionengravers.com>, Lennert Buytenhek <kernel@wantstofly.org>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
- Thomas Gleixner <tglx@linutronix.de>, Alessandro Zummo
- <a.zummo@towertech.it>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck
- <linux@roeck-us.net>, Sebastian Reichel <sre@kernel.org>,
- Thierry Reding <thierry.reding@gmail.com>,
- =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
- Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Olof Johansson <olof@lixom.net>, soc@kernel.org,
- Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Andy Shevchenko <andy@kernel.org>,
- Michael Peters <mpeters@embeddedTS.com>, Kris Bahnsen <kris@embeddedTS.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-watchdog@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
- netdev@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
- linux-input@vger.kernel.org, alsa-devel@alsa-project.org
-References: <20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me>
- <20230605-ep93xx-v3-29-3d63a5f1103e@maquefel.me>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230605-ep93xx-v3-29-3d63a5f1103e@maquefel.me>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 20/07/2023 13:29, Nikita Shubin via B4 Relay wrote:
-> From: Nikita Shubin <nikita.shubin@maquefel.me>
-> 
-> Add YAML bindings for ST M48T86 / Dallas DS12887 RTC.
-> 
-> Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
-
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
+RnJvbTogQW1yaXRoYSBOYW1iaWFyDQo+IFNlbnQ6IFR1ZXNkYXksIEF1Z3VzdCAyMiwgMjAyMyAx
+MjoyNSBBTQ0KPiANCj4gSW50cm9kdWNlIHN1cHBvcnQgZm9yIGFzc29jaWF0aW5nIE5BUEkgaW5z
+dGFuY2VzIHdpdGgNCj4gY29ycmVzcG9uZGluZyBSWCBhbmQgVFggcXVldWUgc2V0LiBBZGQgdGhl
+IGNhcGFiaWxpdHkNCj4gdG8gZXhwb3J0IE5BUEkgaW5mb3JtYXRpb24gc3VwcG9ydGVkIGJ5IHRo
+ZSBkZXZpY2UuDQo+IEV4dGVuZCB0aGUgbmV0ZGV2X2dlbmwgZ2VuZXJpYyBuZXRsaW5rIGZhbWls
+eSBmb3IgbmV0ZGV2DQo+IHdpdGggTkFQSSBkYXRhLiBUaGUgTkFQSSBmaWVsZHMgZXhwb3NlZCBh
+cmU6DQo+IC0gTkFQSSBpZA0KPiAtIE5BUEkgZGV2aWNlIGlmaW5kZXgNCj4gLSBxdWV1ZS9xdWV1
+ZS1zZXQgKGJvdGggUlggYW5kIFRYKSBhc3NvY2lhdGVkIHdpdGggZWFjaA0KPiAgIE5BUEkgaW5z
+dGFuY2UNCj4gLSBJbnRlcnJ1cHQgbnVtYmVyIGFzc29jaWF0ZWQgd2l0aCB0aGUgTkFQSSBpbnN0
+YW5jZQ0KPiAtIFBJRCBmb3IgdGhlIE5BUEkgdGhyZWFkDQo+IA0KPiBUaGlzIHNlcmllcyBvbmx5
+IHN1cHBvcnRzICdnZXQnIGFiaWxpdHkgZm9yIHJldHJpZXZpbmcNCj4gY2VydGFpbiBOQVBJIGF0
+dHJpYnV0ZXMuIFRoZSAnc2V0JyBhYmlsaXR5IGZvciBzZXR0aW5nDQo+IHF1ZXVlW3NdIGFzc29j
+aWF0ZWQgd2l0aCBhIE5BUEkgaW5zdGFuY2UgdmlhIG5ldGRldi1nZW5sDQo+IHdpbGwgYmUgc3Vi
+bWl0dGVkIGFzIGEgc2VwYXJhdGUgcGF0Y2ggc2VyaWVzLg0KPiANCj4gUHJldmlvdXMgZGlzY3Vz
+c2lvbiBhdDoNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2L2M4NDc2NTMwNjM4YTVm
+NDM4MWQ2NGRiMGUwMjRlZDQ5YzJkYjNiMDIuY2FtZWxAZ21haWwuY29tL1QvI20wMDk5OTY1MmE4
+DQo+IGI0NzMxZmJkYjdiZjY5OGQyZTM2NjZjNjVhNjBlNw0KDQpOb3Qgb2YgdGhpcyBhbnN3ZXJz
+OiB3aGF0IGlzIGl0IGZvcj8NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtl
+c2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBV
+Sw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
 
