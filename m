@@ -1,165 +1,99 @@
-Return-Path: <netdev+bounces-30024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24E3785A69
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 16:25:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7310785A6C
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 16:26:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E879C1C20C7A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:25:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD0E61C2036F
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25C6C2CC;
-	Wed, 23 Aug 2023 14:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10C9C2CD;
+	Wed, 23 Aug 2023 14:25:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F6DC152
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:25:45 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F27CE68
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 07:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692800737; x=1724336737;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S8M71VJrSbLzKBZg9sAwgwdKtrVieXpAwftdg1mgIcQ=;
-  b=DvtyJBOiQZLWt6ewTbGbFHD/9p8vb/egdlOOOK6ucsCyBDg7jMaDnFS8
-   NaH9i27rXFrS57JT3Imv7HsbxTKLwxvAAMwyoSxF7IDAC0agLqBGGOoYM
-   W3ptvveiLazZwOz5OKcfDWhaLriHqkqODuC2zch0N28S3L2LZabGrihDk
-   6EUmEQOdVlPAfKBbWfjFZR6hmDF0RJ7VxqntAYcjxtBGI/JrOtyWs/f/1
-   lqfPVBM2O2QNQb2O8uXlxld94kenlVvP7LVfuoSLb5wVBFxZb+D+YkRr5
-   f6/kpUQMe1ykjBeLXeWkUp9/HVxm51cu3WKovQvOQtTwFHJPKejCjvxnI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="377931642"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="377931642"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 07:25:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="730227755"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="730227755"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 23 Aug 2023 07:25:34 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qYond-0001H0-1q;
-	Wed, 23 Aug 2023 14:25:33 +0000
-Date: Wed, 23 Aug 2023 22:25:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	netdev@vger.kernel.org, linux-net-drivers@amd.com
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, ecree.xilinx@gmail.com,
-	habetsm.xilinx@gmail.com,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-Subject: Re: [PATCH net-next 5/6] sfc: introduce pedit add actions on the
- ipv4 ttl field
-Message-ID: <202308232244.jYYwKnlV-lkp@intel.com>
-References: <20230823111725.28090-6-pieter.jansen-van-vuuren@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB59C2CC
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 14:25:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0599EC433C9;
+	Wed, 23 Aug 2023 14:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692800753;
+	bh=YxgrXikt9Lvvqkt6X1fJSal7MTHblE3Cq8OOJIBxl6M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hHphIuUnFB5bZjd3v1ZkPUtFfDrS0R4UvfnnOHZEkvNrRZHMqCNzwQMrXnDoQ9myM
+	 DmOPMilKIV38h3aJ54GOiXu0Nl4/yHb4ZgFkxMUuLPUGUmdBhB3fe+U94tMFrPJPd1
+	 /NIG9V9tf3p6GDF9iY0gzQdGuQdyhP4ScpANHmbmtDhPvHP/fvHhkJkY+Vl4CMUBc5
+	 IOVOp/2xlkOBVasDvIAsxcxiWr6uxEU83MqJjTHZZ9laMXSh7rGeHhe4JsDSMeHA1T
+	 0MaL7GFlv1arHSlGAYj3JEiKVKuvn2UzRPJj8eejhqVn0WNcEevQXp3+gMcYQsDe5a
+	 D/+q6z/qQTYhA==
+Date: Wed, 23 Aug 2023 07:25:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Mina Almasry <almasrymina@google.com>,
+ <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Liang Chen <liangchen.linux@gmail.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>
+Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+Message-ID: <20230823072552.044d13b3@kernel.org>
+In-Reply-To: <79a49ccd-b0c0-0b99-4b4d-c4a416d7e327@huawei.com>
+References: <20230816100113.41034-1-linyunsheng@huawei.com>
+	<20230816100113.41034-2-linyunsheng@huawei.com>
+	<CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
+	<20230817091554.31bb3600@kernel.org>
+	<CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
+	<20230817165744.73d61fb6@kernel.org>
+	<CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
+	<20230818145145.4b357c89@kernel.org>
+	<1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
+	<20230821113543.536b7375@kernel.org>
+	<5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
+	<20230822083821.58d5d26c@kernel.org>
+	<79a49ccd-b0c0-0b99-4b4d-c4a416d7e327@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230823111725.28090-6-pieter.jansen-van-vuuren@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Pieter,
+On Wed, 23 Aug 2023 11:03:31 +0800 Yunsheng Lin wrote:
+> On 2023/8/22 23:38, Jakub Kicinski wrote:
+> > On Tue, 22 Aug 2023 17:21:35 +0800 Yunsheng Lin wrote:  
+> >> As the CONFIG_PHYS_ADDR_T_64BIT seems to used widely in x86/arm/mips/powerpc,
+> >> I am not sure if we can really make the above assumption.
+> >>
+> >> https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT  
+> > 
+> > Huh, it's actually used a lot less than I anticipated!
+> > 
+> > None of the x86/arm/mips/powerpc systems matter IMHO - the only _real_  
+> 
+> Is there any particular reason that you think that the above systems does
+> not really matter?
 
-kernel test robot noticed the following build warnings:
+Not the systems themselves but the combination of a 32b arch with 
+an address space >16TB. All those arches have 64b equivalent, seems
+logical to use the 64b version for a system with a large address space.
+If we're talking about a system which ends up running Linux.
 
-[auto build test WARNING on net-next/main]
+> As we have made a similar wrong assumption about those arches before, I am
+> really trying to be more cautious about it.
+> 
+> I searched through the web, some seems to be claiming that "32-bits is DEAD",
+> I am not sure if there is some common agreement among the kernel community,
+> is there any previous discussion about that?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pieter-Jansen-van-Vuuren/sfc-introduce-ethernet-pedit-set-action-infrastructure/20230823-192051
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230823111725.28090-6-pieter.jansen-van-vuuren%40amd.com
-patch subject: [PATCH net-next 5/6] sfc: introduce pedit add actions on the ipv4 ttl field
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230823/202308232244.jYYwKnlV-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230823/202308232244.jYYwKnlV-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308232244.jYYwKnlV-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/sfc/tc.c:1073: warning: expecting prototype for efx_tc_mangle(). Prototype was for efx_tc_pedit_add() instead
-
-
-vim +1073 drivers/net/ethernet/sfc/tc.c
-
-  1056	
-  1057	/**
-  1058	 * efx_tc_mangle() - handle a single 32-bit (or less) pedit
-  1059	 * @efx: NIC we're installing a flow rule on
-  1060	 * @act: action set (cursor) to update
-  1061	 * @fa:          FLOW_ACTION_MANGLE action metadata
-  1062	 * @mung:        accumulator for partial mangles
-  1063	 * @extack:      netlink extended ack for reporting errors
-  1064	 *
-  1065	 * Identify the fields written by a FLOW_ACTION_MANGLE, and record
-  1066	 * the partial mangle state in @mung.  If this mangle completes an
-  1067	 * earlier partial mangle, consume and apply to @act by calling
-  1068	 * efx_tc_complete_mac_mangle().
-  1069	 */
-  1070	static int efx_tc_pedit_add(struct efx_nic *efx, struct efx_tc_action_set *act,
-  1071				    const struct flow_action_entry *fa,
-  1072				    struct netlink_ext_ack *extack)
-> 1073	{
-  1074		switch (fa->mangle.htype) {
-  1075		case FLOW_ACT_MANGLE_HDR_TYPE_IP4:
-  1076			switch (fa->mangle.offset) {
-  1077			case offsetof(struct iphdr, ttl):
-  1078				/* check that pedit applies to ttl only */
-  1079				if (fa->mangle.mask != ~EFX_TC_HDR_TYPE_TTL_MASK)
-  1080					break;
-  1081	
-  1082				/* Adding 0xff is equivalent to decrementing the ttl.
-  1083				 * Other added values are not supported.
-  1084				 */
-  1085				if ((fa->mangle.val & EFX_TC_HDR_TYPE_TTL_MASK) != U8_MAX)
-  1086					break;
-  1087	
-  1088				/* check that we do not decrement ttl twice */
-  1089				if (!efx_tc_flower_action_order_ok(act,
-  1090								   EFX_TC_AO_DEC_TTL)) {
-  1091					NL_SET_ERR_MSG_MOD(extack, "Unsupported: multiple dec ttl");
-  1092					return -EOPNOTSUPP;
-  1093				}
-  1094				act->do_ttl_dec = 1;
-  1095				return 0;
-  1096			default:
-  1097				break;
-  1098			}
-  1099			break;
-  1100		default:
-  1101			break;
-  1102		}
-  1103	
-  1104		NL_SET_ERR_MSG_FMT_MOD(extack,
-  1105				       "Unsupported: ttl add action type %x %x %x/%x",
-  1106				       fa->mangle.htype, fa->mangle.offset,
-  1107				       fa->mangle.val, fa->mangle.mask);
-  1108		return -EOPNOTSUPP;
-  1109	}
-  1110	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+My suspicion/claim is that 32 + PAGE_SHIFT should be enough bits for
+any 32b platform.
 
