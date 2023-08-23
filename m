@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-30074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D967785E92
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:31:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15C3A785E91
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B5D2811FC
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:31:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43D3A1C20CA6
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75841F192;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816F61F18B;
 	Wed, 23 Aug 2023 17:30:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946351F18D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F201ED56
 	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 17:30:58 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC67E7D
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B90ECE7C
 	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1692811855;
@@ -27,30 +27,30 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3MvbKMYwnqe69v0yc2E4ycPNeJxScqvzFFwMZHNI0yI=;
-	b=LKNDGMyG7mEceOzRrmNy2g5EIDafYzYZxiS2Q46MBPdSwhmvjLKSZuXxQZD9LpLM6VMV8c
-	xrc8CWrfvFFxzW44arMBwgL0ixlSdjXCFMx1hWlTh2QHzxxvUwfmjgxrj1kyvA7V0booTZ
-	lYAymbpWoRygxzbgS2dtw1k966ZxkWY=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-652-8eq7y_nROCKTWYN4HIXclw-1; Wed, 23 Aug 2023 13:30:50 -0400
-X-MC-Unique: 8eq7y_nROCKTWYN4HIXclw-1
+	bh=NKOW2pfhGio1igZ7vupeGut7GiiDl2J/8wcRw6SuG+M=;
+	b=UFFrb9QmnH+qiDF6No9XcCMcnufaNb8XOCnfeTjc/5WNuY6BqIWMGVuJFdQ7fAI3mSNvIU
+	ZDsxZQ5BmRgFOZfq8YW5+O3n5dSOjouJTxLuJyYLQqF081HvE/kuXNPcaULL/NO0cY01Pn
+	GYMRjHX7tzRKyKO5SpyKYtn3OfL9jKE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-678-Acpr2D7RMDq9ANz6itwKPQ-1; Wed, 23 Aug 2023 13:30:51 -0400
+X-MC-Unique: Acpr2D7RMDq9ANz6itwKPQ-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D52C1C0896E;
-	Wed, 23 Aug 2023 17:30:50 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 90053185A792;
+	Wed, 23 Aug 2023 17:30:51 +0000 (UTC)
 Received: from renaissance-vector.redhat.com (unknown [10.39.194.152])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 24332492C13;
-	Wed, 23 Aug 2023 17:30:48 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6538A492C13;
+	Wed, 23 Aug 2023 17:30:50 +0000 (UTC)
 From: Andrea Claudi <aclaudi@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>,
 	David Ahern <dsahern@gmail.com>
-Subject: [PATCH iproute2-next 1/4] ss: make is_selinux_enabled stub work like in SELinux
-Date: Wed, 23 Aug 2023 19:29:59 +0200
-Message-ID: <33564ea9f7c5c8d6f536a2c8db526ca1e14737a0.1692804730.git.aclaudi@redhat.com>
+Subject: [PATCH iproute2-next 2/4] ss: make SELinux stub functions conformant to API definitions
+Date: Wed, 23 Aug 2023 19:30:00 +0200
+Message-ID: <139f6e818c49b9a2dfd6eb1074afebd8dac5ccec.1692804730.git.aclaudi@redhat.com>
 In-Reply-To: <cover.1692804730.git.aclaudi@redhat.com>
 References: <cover.1692804730.git.aclaudi@redhat.com>
 Precedence: bulk
@@ -68,12 +68,11 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From the is_selinux_enabled() manpage:
+getfilecon() and security_get_initial_context() use the const qualifier
+for their first paramater in SELinux APIs.
 
-is_selinux_enabled() returns 1 if SELinux is running or 0 if it is not.
-
-This makes the is_selinux_enabled() stub functions works exactly like
-the SELinux function it is supposed to replace.
+This commit adds the const qualifier to these functions, making them
+conformant to API definitions.
 
 Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
 ---
@@ -81,27 +80,25 @@ Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/misc/ss.c b/misc/ss.c
-index 6d34ad0e..007cb349 100644
+index 007cb349..b3183630 100644
 --- a/misc/ss.c
 +++ b/misc/ss.c
-@@ -77,7 +77,7 @@
- /* Stubs for SELinux functions */
- static int is_selinux_enabled(void)
- {
--	return -1;
-+	return 0;
+@@ -86,13 +86,13 @@ static int getpidcon(pid_t pid, char **context)
+ 	return -1;
  }
  
- static int getpidcon(pid_t pid, char **context)
-@@ -5682,7 +5682,7 @@ int main(int argc, char *argv[])
- 			show_sock_ctx++;
- 			/* fall through */
- 		case 'Z':
--			if (is_selinux_enabled() <= 0) {
-+			if (!is_selinux_enabled()) {
- 				fprintf(stderr, "ss: SELinux is not enabled.\n");
- 				exit(1);
- 			}
+-static int getfilecon(char *path, char **context)
++static int getfilecon(const char *path, char **context)
+ {
+ 	*context = NULL;
+ 	return -1;
+ }
+ 
+-static int security_get_initial_context(char *name,  char **context)
++static int security_get_initial_context(const char *name,  char **context)
+ {
+ 	*context = NULL;
+ 	return -1;
 -- 
 2.41.0
 
