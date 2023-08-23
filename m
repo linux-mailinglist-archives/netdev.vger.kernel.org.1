@@ -1,117 +1,157 @@
-Return-Path: <netdev+bounces-30127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DF6578614A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 22:18:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA9F786181
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 22:28:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A40628137D
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 20:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B2A21C20D35
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 20:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806D11FB59;
-	Wed, 23 Aug 2023 20:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C451FB5D;
+	Wed, 23 Aug 2023 20:28:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F362C2E6
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 20:18:55 +0000 (UTC)
-Received: from nbd.name (nbd.name [46.4.11.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BCE10D3
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 13:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9y1c2QB/wPmOKO8c1J8GFP8cWm6qJVYXSVOUxWf0OB4=; b=h4D6xbdM7cRGwJDKHd9L7LYH57
-	o2bmxI19u6LHrh/BwLEaTZZtv4ZRQwAyUeYLT1jhlEmGtsbhSmMpkm+7tNNgZyO6X6P3dJzD1Cnnw
-	b3rQW/lgwL5zF5p9lyb2XHPUVWmUb9ySPq23LiDEcsfhf0Gh6nVDLQow7WmswUR6g3gg=;
-Received: from p4ff13705.dip0.t-ipconnect.de ([79.241.55.5] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <nbd@nbd.name>)
-	id 1qYuJG-00CX7D-DA; Wed, 23 Aug 2023 22:18:34 +0200
-Message-ID: <732f3c01-a36f-4c9b-8273-a55aba9094d8@nbd.name>
-Date: Wed, 23 Aug 2023 22:18:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B41C2E6
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 20:28:00 +0000 (UTC)
+X-Greylist: delayed 324 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Aug 2023 13:27:59 PDT
+Received: from mail.scottdial.com (bert.scottdial.com [104.237.142.221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A9210C7;
+	Wed, 23 Aug 2023 13:27:58 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.scottdial.com (Postfix) with ESMTP id A119E111B49E;
+	Wed, 23 Aug 2023 16:22:33 -0400 (EDT)
+Received: from mail.scottdial.com ([127.0.0.1])
+	by localhost (mail.scottdial.com [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id UQH3nC_IfCdB; Wed, 23 Aug 2023 16:22:32 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.scottdial.com (Postfix) with ESMTP id 0AC44111B0C2;
+	Wed, 23 Aug 2023 16:22:32 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.scottdial.com 0AC44111B0C2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=scottdial.com;
+	s=24B7B964-7506-11E8-A7D6-CF6FBF8C6FCF; t=1692822152;
+	bh=4ro6skDZPhNFiMNcHq20oe+J8XwK1HUQS3NB15eFkJY=;
+	h=Message-ID:Date:MIME-Version:To:From;
+	b=yEqAvoZFxTwcGOciJVr6R0XxP7RxINnUUet34rKL5zHpOpL7YpkHO8QkeWYAjSGkz
+	 iFOnZATQ2tpnfD3OnCiwScFdVRMacHed37epCFpzAMDplQqU0/zMZIcbJD116ntFmD
+	 FWU5+f6ikFCWaMgCq2r3/9nbt7E35rGr5dl9cxU0HrOmJXru9JuGJYhi+pyAoq+jr9
+	 6xeMSt778MK0ljTxK/CbLq7XBNiUaX68n3w1NM2MsQw7fbVMXqHdcHn3pTginLWE/X
+	 j6w+aLOxbOGQ2aWvR8D+OOXR0DxDVP5TDehHgg1ni89A7l+xuwdbJ9PzNIw7wKokaS
+	 G9BXRwnzTO8HA==
+X-Virus-Scanned: amavisd-new at scottdial.com
+Received: from mail.scottdial.com ([127.0.0.1])
+	by localhost (mail.scottdial.com [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 4nDsxhdqy-ZN; Wed, 23 Aug 2023 16:22:31 -0400 (EDT)
+Received: from [172.17.2.2] (unknown [172.17.2.2])
+	by mail.scottdial.com (Postfix) with ESMTPSA id D4BBC111B49E;
+	Wed, 23 Aug 2023 16:22:31 -0400 (EDT)
+Message-ID: <a9af0c0a-ec7c-fa01-05ac-147fccb94fbf@scottdial.com>
+Date: Wed, 23 Aug 2023 16:22:31 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: stmmac: Use hrtimer for TX coalescing
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net-next] macsec: introduce default_async_crypto sysctl
 Content-Language: en-US
-To: Vincent Whitchurch <vincent.whitchurch@axis.com>, peppe.cavallaro@st.com,
- alexandre.torgue@st.com, joabreu@synopsys.com, davem@davemloft.net,
- kuba@kernel.org
-Cc: kernel@axis.com, netdev@vger.kernel.org
-References: <20201120150208.6838-1-vincent.whitchurch@axis.com>
-From: Felix Fietkau <nbd@nbd.name>
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <20201120150208.6838-1-vincent.whitchurch@axis.com>
+To: Sabrina Dubroca <sd@queasysnail.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org
+References: <9328d206c5d9f9239cae27e62e74de40b258471d.1692279161.git.sd@queasysnail.net>
+ <20230818184648.127b2ccf@kernel.org> <ZOTWzJ4aEa5geNva@hog>
+From: Scott Dial <scott@scottdial.com>
+In-Reply-To: <ZOTWzJ4aEa5geNva@hog>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 20.11.20 16:02, Vincent Whitchurch wrote:
-> This driver uses a normal timer for TX coalescing, which means that the
-> with the default tx-usecs of 1000 microseconds the cleanups actually
-> happen 10 ms or more later with HZ=100.  This leads to very low
-> througput with TCP when bridged to a slow link such as a 4G modem.  Fix
-> this by using an hrtimer instead.
+> 2023-08-18, 18:46:48 -0700, Jakub Kicinski wrote:
+>> Can we not fix the ordering problem?
+>> Queue the packets locally if they get out of order?
+
+AES-NI's implementation of gcm(aes) requires the FPU, so if it's busy 
+the decrypt gets stuck on the cryptd queue, but that queue is not 
+order-preserving. If the macsec driver maintained a queue for the netdev 
+that was order-preserving, then you could resolve the issue, but it adds 
+more complexity to the macsec driver, so I assume that's why the 
+maintainers have always desired to revert my patch instead of ensuring 
+packet order.
+
+With respect to AES-NI's implementation of gcm(aes), it's unfortunate 
+that there is not a synchronous version that uses the FPU when available 
+and fallsback to gcm_base(ctr(aes-aesni),ghash-generic) when it's not. 
+In that case, you would get the benefit of the FPU for the majority of 
+time when it's available. When I suggested this to linux-crypto, I was 
+told that relying on synchronous crypto in the macsec driver was wrong:
+
+On 12 Aug 2020 10:45:00 +0000, Pascal Van Leeuwen wrote:
+> Forcing the use of sync algorithms only would be detrimental to platforms
+> that do not have CPU accelerated crypto, but do have HW acceleration
+> for crypto external to the CPU. I understand it's much easier to implement,
+> but that is just being lazy IMHO. For bulk crypto of relatively independent
+> blocks (networking packets, disk sectors), ASYNC should always be preferred.
+
+So, I abandoned my suggestion to add a fallback. The complexity of the 
+queueing the macsec driver was beyond the time I had available, and the 
+regression in performance was not significant for my use case, but I 
+understand that others may have different requirements. I would 
+emphasize that benchmarking of network performance should be done by 
+looking at more than just the interface frame rate. For instance, 
+out-of-order deliver of packets can trigger TCP backoff. I was never 
+interested in how many packets the macsec driver could stuff onto the 
+wire, because the impact was my TCP socket stalling and my UDP streams 
+being garbled.
+
+On 8/22/2023 11:39 AM, Sabrina Dubroca wrote:
+> Actually, looking into the crypto API side, I don't see how they can
+> get out of order since commit 81760ea6a95a ("crypto: cryptd - Add
+> helpers to check whether a tfm is queued"):
 > 
-> On my ARM platform with HZ=100 and the default TX coalescing settings
-> (tx-frames 25 tx-usecs 1000), with "tc qdisc add dev eth0 root netem
-> delay 60ms 40ms rate 50Mbit" run on the server, netperf's TCP_STREAM
-> improves from ~5.5 Mbps to ~100 Mbps.
+>      [...] ensure that no reordering is introduced because of requests
+>      queued in cryptd with respect to requests being processed in
+>      softirq context.
 > 
-> Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+> And cryptd_aead_queued() is used by AESNI (via simd_aead_decrypt()) to
+> decide whether to process the request synchronously or not.
 
-Based on tests by OpenWrt users, it seems that this one is causing a 
-significant performance regression caused by wasting lots of CPU cycles 
-re-arming the hrtimer on every single packet. More info:
-https://github.com/openwrt/openwrt/issues/11676#issuecomment-1690492666
+I have not been following linux-crypto changes, but I would be surprised 
+if request is not flagged with CRYPTO_TFM_REQ_MAY_BACKLOG, so it would 
+be queue. If that's not the case, then the attempt to decrypt would 
+return -EBUSY, which would translate to a packet error, since 
+macsec_decrypt MUST handle the skb during the softirq.
 
-My suggestion for fixing this properly would be:
-- keep a separate timestamp for last tx packet
-- do not modify the timer if it's scheduled already
-- in the timer function, check the last tx timestamp and re-arm the 
-timer if necessary.
+> So I really don't get what commit ab046a5d4be4 was trying to fix. I've
+> never been able to reproduce that issue, I guess commit 81760ea6a95a
+> explains why.
+ >
+ > I'd suggest to revert commit ab046a5d4be4, but it feels wrong to
+ > revert it without really understanding what problem Scott hit and why
+ > 81760ea6a95a didn't solve it.
 
-This should significantly reduce the number of wasted CPU cycles, even 
-when accounting for the additional overhead of hrtimer vs regular timer.
+I don't think that commit has any relevance to the issue. For instance 
+with AES-NI, you need to have competing load on the FPU such that 
+crypto_simd_usable() fails to be true. In the past, I replicated this 
+failure mode using two SuperMicro 5018D-FN4T servers directly connected 
+to each other, which is a Xeon-D 1541 w/ Intel 10GbE NIC (ixgbe driver). 
+ From there, I would send /dev/urandom as UDP to the other host. I would 
+get about 1 out of 10k packets queued on cryptd with that setup. My real 
+world case was transporting MPEG TS video streams, each about 1k pps, so 
+that is an decode error in the video stream every 10 seconds.
 
-- Felix
+-- 
+Scott Dial
+scott@scottdial.com
+
 
