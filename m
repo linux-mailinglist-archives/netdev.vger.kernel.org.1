@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-29885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C5C785066
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:11:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F70B785065
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:11:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 757212812E2
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 06:11:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8C83280D8C
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 06:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2323D65;
-	Wed, 23 Aug 2023 06:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909AB79FA;
+	Wed, 23 Aug 2023 06:09:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88842A922
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:09:52 +0000 (UTC)
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A2BE5F
-	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 23:09:49 -0700 (PDT)
-X-QQ-mid: bizesmtp73t1692770860tjfjy34r
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803A6A922
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 06:09:47 +0000 (UTC)
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E52FE6A
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 23:09:37 -0700 (PDT)
+X-QQ-mid: bizesmtp73t1692770864tn3biux7
 Received: from wxdbg.localdomain.com ( [60.177.96.113])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 23 Aug 2023 14:07:39 +0800 (CST)
+	id ; Wed, 23 Aug 2023 14:07:43 +0800 (CST)
 X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: XBN7tc9DADKifSlIMV48XXe6Pev8diU3Q/ijT+IMZ+DBgBaa4Zob8HaXCajON
-	2DngX/Sp6J+9tKy6bkcS0ka/3mmVc1RJ062vB2lkiPDenxwzq0pMalSB+4QL0DKJbjNYjzy
-	Y9bEIDnujRbirYaTmhKXIHFgKy4tBItXDXOk1VXxEjj/fbvvzWj+wXhJBe15K9Kl+Il2Vhx
-	xYKkVoRQTJJyC1Rgxo0LW/GTzRKCGlfCnVX/DXBVdb+CpyDKq8ipZjFz9W+lBngx12JsNLI
-	cjkUfdKjREq+pb6k34vYgXm1HYC8vG0DYLKN4vfvPa0NSvF57YxjVfXKzViIn4zIc7WSCJM
-	PHEOSjmNrzDc0RZBkRgayqMcsWDx+nYPG2LVMhaTIjHrwFNEm+lazBmpsmQsdq4NXbv0UN3
-	clPrDBxEby1G11pQ2ApTjw==
+X-QQ-FEAT: k0mQ4ihyJQNzHAVC+pdaes6mQKpg8q40I8j5oZqjX3qy4q3hJWW8mnLaysj+h
+	1xuZCNvekscY4YW0V2eMB3wJBbWTK9MOUTBXTxbaun38/s+5sAftV9LrDo8Zz3hyji2U6GP
+	WiPUxXBvp2FEDOFfhr4XWmLxwKgtoO7x0su66j1VJCNuKTNFkQKMERXwg4YF4uZtn7UYFpv
+	GExoztf7K6ZETtspXEEZkEZ3hzN1eW6fXGR2OqoakTIwuZOzpADxOt+9BtQ10HZHaF73SjU
+	J4sMRrehRjTP9LKsKVtP43F2//dNgeWfbRRnlS1s+qLaywuWLQS1y+zEjW32+miRO36v1nw
+	wiOTz63SG39EZEFQG0XBfJ4YUAUDvWboi7Eul83ye9oC6NgnAwSJBlWFpf4FfvqHLbk9UN1
+	YAaaf48rvbg=
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 16917572862029340319
+X-BIZMAIL-ID: 1307842272495529687
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
 	davem@davemloft.net,
@@ -48,9 +48,9 @@ To: netdev@vger.kernel.org,
 	rmk+kernel@armlinux.org.uk
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 7/8] net: txgbe: support copper NIC with external PHY
-Date: Wed, 23 Aug 2023 14:19:34 +0800
-Message-Id: <20230823061935.415804-8-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v3 8/8] net: ngbe: move mdio access registers to libwx
+Date: Wed, 23 Aug 2023 14:19:35 +0800
+Message-Id: <20230823061935.415804-9-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230823061935.415804-1-jiawenwu@trustnetic.com>
 References: <20230823061935.415804-1-jiawenwu@trustnetic.com>
@@ -65,387 +65,185 @@ X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wangxun SP chip supports to connect with external PHY (marvell 88x3310),
-which links to 10GBASE-T/1000BASE-T/100BASE-T. Add the identification of
-media types from subsystem device IDs. For sp_media_copper, register mdio
-bus for the external PHY.
+Registers of mdio accessing are common defined in libwx, remove the
+redundant macro definitions in ngbe driver.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/ethernet/wangxun/Kconfig          |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  26 +++
- drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |  13 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  53 +++++--
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 150 +++++++++++++++++-
- 5 files changed, 221 insertions(+), 22 deletions(-)
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 84 +++++++++----------
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h | 19 -----
+ 2 files changed, 42 insertions(+), 61 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
-index 39596cd13539..23cd610bd376 100644
---- a/drivers/net/ethernet/wangxun/Kconfig
-+++ b/drivers/net/ethernet/wangxun/Kconfig
-@@ -41,6 +41,7 @@ config TXGBE
- 	tristate "Wangxun(R) 10GbE PCI Express adapters support"
- 	depends on PCI
- 	depends on COMMON_CLK
-+	select MARVELL_10G_PHY
- 	select REGMAP
- 	select I2C
- 	select I2C_DESIGNWARE_PLATFORM
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 50b92cfb46a0..c5cbd177ef62 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -233,6 +233,24 @@
- #define WX_MAC_WDG_TIMEOUT           0x1100C
- #define WX_MAC_RX_FLOW_CTRL          0x11090
- #define WX_MAC_RX_FLOW_CTRL_RFE      BIT(0) /* receive fc enable */
-+/* MDIO Registers */
-+#define WX_MSCA                      0x11200
-+#define WX_MSCA_RA(v)                FIELD_PREP(U16_MAX, v)
-+#define WX_MSCA_PA(v)                FIELD_PREP(GENMASK(20, 16), v)
-+#define WX_MSCA_DA(v)                FIELD_PREP(GENMASK(25, 21), v)
-+#define WX_MSCC                      0x11204
-+#define WX_MSCC_CMD(v)               FIELD_PREP(GENMASK(17, 16), v)
-+
-+enum WX_MSCA_CMD_value {
-+	WX_MSCA_CMD_RSV = 0,
-+	WX_MSCA_CMD_WRITE,
-+	WX_MSCA_CMD_POST_READ,
-+	WX_MSCA_CMD_READ,
-+};
-+
-+#define WX_MSCC_SADDR                BIT(18)
-+#define WX_MSCC_BUSY                 BIT(22)
-+#define WX_MDIO_CLK(v)               FIELD_PREP(GENMASK(21, 19), v)
- #define WX_MMC_CONTROL               0x11800
- #define WX_MMC_CONTROL_RSTONRD       BIT(2) /* reset on read */
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+index fe20f02ecb3a..591f5b7b6da6 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+@@ -37,24 +37,24 @@ static int ngbe_phy_read_reg_mdi_c22(struct mii_bus *bus, int phy_addr, int regn
  
-@@ -582,6 +600,13 @@ enum wx_mac_type {
- 	wx_mac_em
- };
+ 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0xF);
+ 	/* setup and write the address cycle command */
+-	command = NGBE_MSCA_RA(regnum) |
+-		  NGBE_MSCA_PA(phy_addr) |
+-		  NGBE_MSCA_DA(device_type);
+-	wr32(wx, NGBE_MSCA, command);
+-	command = NGBE_MSCC_CMD(NGBE_MSCA_CMD_READ) |
+-		  NGBE_MSCC_BUSY |
+-		  NGBE_MDIO_CLK(6);
+-	wr32(wx, NGBE_MSCC, command);
++	command = WX_MSCA_RA(regnum) |
++		  WX_MSCA_PA(phy_addr) |
++		  WX_MSCA_DA(device_type);
++	wr32(wx, WX_MSCA, command);
++	command = WX_MSCC_CMD(WX_MSCA_CMD_READ) |
++		  WX_MSCC_BUSY |
++		  WX_MDIO_CLK(6);
++	wr32(wx, WX_MSCC, command);
  
-+enum sp_media_type {
-+	sp_media_unknown = 0,
-+	sp_media_fiber,
-+	sp_media_copper,
-+	sp_media_backplane
-+};
-+
- enum em_mac_type {
- 	em_mac_type_unknown = 0,
- 	em_mac_type_mdi,
-@@ -829,6 +854,7 @@ struct wx {
- 	struct wx_bus_info bus;
- 	struct wx_mac_info mac;
- 	enum em_mac_type mac_type;
-+	enum sp_media_type media_type;
- 	struct wx_eeprom_info eeprom;
- 	struct wx_addr_filter_info addr_ctrl;
- 	struct wx_mac_addr *mac_table;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-index 90168aab11ae..372745250270 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-@@ -285,17 +285,20 @@ static void txgbe_reset_misc(struct wx *wx)
- int txgbe_reset_hw(struct wx *wx)
- {
- 	int status;
--	u32 val;
- 
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = wx_stop_adapter(wx);
- 	if (status != 0)
- 		return status;
- 
--	val = WX_MIS_RST_LAN_RST(wx->bus.func);
--	wr32(wx, WX_MIS_RST, val | rd32(wx, WX_MIS_RST));
--	WX_WRITE_FLUSH(wx);
--	usleep_range(10, 100);
-+	if (wx->media_type != sp_media_copper) {
-+		u32 val;
-+
-+		val = WX_MIS_RST_LAN_RST(wx->bus.func);
-+		wr32(wx, WX_MIS_RST, val | rd32(wx, WX_MIS_RST));
-+		WX_WRITE_FLUSH(wx);
-+		usleep_range(10, 100);
-+	}
- 
- 	status = wx_check_flash_load(wx, TXGBE_SPI_ILDR_STATUS_LAN_SW_RST(wx->bus.func));
- 	if (status != 0)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 641b8188da4e..5c3aed516ac2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -300,6 +300,49 @@ static void txgbe_down(struct wx *wx)
- 	wx_clean_all_rx_rings(wx);
- }
- 
-+/**
-+ *  txgbe_init_type_code - Initialize the shared code
-+ *  @wx: pointer to hardware structure
-+ **/
-+static void txgbe_init_type_code(struct wx *wx)
-+{
-+	u8 device_type = wx->subsystem_device_id & 0xF0;
-+
-+	switch (wx->device_id) {
-+	case TXGBE_DEV_ID_SP1000:
-+	case TXGBE_DEV_ID_WX1820:
-+		wx->mac.type = wx_mac_sp;
-+		break;
-+	default:
-+		wx->mac.type = wx_mac_unknown;
-+		break;
-+	}
-+
-+	switch (device_type) {
-+	case TXGBE_ID_SFP:
-+		wx->media_type = sp_media_fiber;
-+		break;
-+	case TXGBE_ID_XAUI:
-+	case TXGBE_ID_SGMII:
-+		wx->media_type = sp_media_copper;
-+		break;
-+	case TXGBE_ID_KR_KX_KX4:
-+	case TXGBE_ID_MAC_XAUI:
-+	case TXGBE_ID_MAC_SGMII:
-+		wx->media_type = sp_media_backplane;
-+		break;
-+	case TXGBE_ID_SFI_XAUI:
-+		if (wx->bus.func == 0)
-+			wx->media_type = sp_media_fiber;
-+		else
-+			wx->media_type = sp_media_copper;
-+		break;
-+	default:
-+		wx->media_type = sp_media_unknown;
-+		break;
-+	}
-+}
-+
- /**
-  * txgbe_sw_init - Initialize general software structures (struct wx)
-  * @wx: board private structure to initialize
-@@ -324,15 +367,7 @@ static int txgbe_sw_init(struct wx *wx)
- 		return err;
+ 	/* wait to complete */
+-	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
+-				100000, false, wx, NGBE_MSCC);
++	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
++				100000, false, wx, WX_MSCC);
+ 	if (ret) {
+ 		wx_err(wx, "Mdio read c22 command did not complete.\n");
+ 		return ret;
  	}
  
--	switch (wx->device_id) {
--	case TXGBE_DEV_ID_SP1000:
--	case TXGBE_DEV_ID_WX1820:
--		wx->mac.type = wx_mac_sp;
--		break;
--	default:
--		wx->mac.type = wx_mac_unknown;
--		break;
--	}
-+	txgbe_init_type_code(wx);
- 
- 	/* Set common capability flags and settings */
- 	wx->max_q_vectors = TXGBE_MAX_MSIX_VECTORS;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index d2124547394d..4159c84035fd 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -161,7 +161,10 @@ static struct phylink_pcs *txgbe_phylink_mac_select(struct phylink_config *confi
- {
- 	struct txgbe *txgbe = netdev_to_txgbe(to_net_dev(config->dev));
- 
--	return &txgbe->xpcs->pcs;
-+	if (interface == PHY_INTERFACE_MODE_10GBASER)
-+		return &txgbe->xpcs->pcs;
-+
-+	return NULL;
- }
- 
- static void txgbe_mac_config(struct phylink_config *config, unsigned int mode,
-@@ -244,8 +247,8 @@ static const struct phylink_mac_ops txgbe_mac_ops = {
- 
- static int txgbe_phylink_init(struct txgbe *txgbe)
- {
-+	struct fwnode_handle *fwnode = NULL;
- 	struct phylink_config *config;
--	struct fwnode_handle *fwnode;
- 	struct wx *wx = txgbe->wx;
- 	phy_interface_t phy_mode;
- 	struct phylink *phylink;
-@@ -256,16 +259,34 @@ static int txgbe_phylink_init(struct txgbe *txgbe)
- 
- 	config->dev = &wx->netdev->dev;
- 	config->type = PHYLINK_NETDEV;
--	config->mac_capabilities = MAC_10000FD | MAC_1000FD | MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
--	phy_mode = PHY_INTERFACE_MODE_10GBASER;
--	__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
--	__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
--	__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
--	fwnode = software_node_fwnode(txgbe->nodes.group[SWNODE_PHYLINK]);
-+	config->mac_capabilities = MAC_10000FD | MAC_1000FD | MAC_100FD |
-+				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
-+
-+	if (wx->media_type == sp_media_copper) {
-+		phy_mode = PHY_INTERFACE_MODE_XAUI;
-+		__set_bit(PHY_INTERFACE_MODE_XAUI, config->supported_interfaces);
-+	} else {
-+		phy_mode = PHY_INTERFACE_MODE_10GBASER;
-+		fwnode = software_node_fwnode(txgbe->nodes.group[SWNODE_PHYLINK]);
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
-+	}
-+
- 	phylink = phylink_create(config, fwnode, phy_mode, &txgbe_mac_ops);
- 	if (IS_ERR(phylink))
- 		return PTR_ERR(phylink);
- 
-+	if (wx->phydev) {
-+		int ret;
-+
-+		ret = phylink_connect_phy(phylink, wx->phydev);
-+		if (ret) {
-+			phylink_destroy(phylink);
-+			return ret;
-+		}
-+	}
-+
- 	txgbe->phylink = phylink;
- 
- 	return 0;
-@@ -626,10 +647,117 @@ static int txgbe_sfp_register(struct txgbe *txgbe)
- 	return 0;
- }
- 
-+static int txgbe_phy_read(struct mii_bus *bus, int phy_addr,
-+			  int devnum, int regnum)
-+{
-+	struct wx *wx = bus->priv;
-+	u32 val, command;
-+	int ret;
-+
-+	/* setup and write the address cycle command */
-+	command = WX_MSCA_RA(regnum) |
-+		  WX_MSCA_PA(phy_addr) |
-+		  WX_MSCA_DA(devnum);
-+	wr32(wx, WX_MSCA, command);
-+
-+	command = WX_MSCC_CMD(WX_MSCA_CMD_READ) | WX_MSCC_BUSY;
-+	wr32(wx, WX_MSCC, command);
-+
-+	/* wait to complete */
-+	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
-+				100000, false, wx, WX_MSCC);
-+	if (ret) {
-+		wx_err(wx, "Mdio read c45 command did not complete.\n");
-+		return ret;
-+	}
-+
+-	return (u16)rd32(wx, NGBE_MSCC);
 +	return (u16)rd32(wx, WX_MSCC);
-+}
-+
-+static int txgbe_phy_write(struct mii_bus *bus, int phy_addr,
-+			   int devnum, int regnum, u16 value)
-+{
-+	struct wx *wx = bus->priv;
-+	int ret, command;
-+	u16 val;
-+
-+	/* setup and write the address cycle command */
+ }
+ 
+ static int ngbe_phy_write_reg_mdi_c22(struct mii_bus *bus, int phy_addr, int regnum, u16 value)
+@@ -65,19 +65,19 @@ static int ngbe_phy_write_reg_mdi_c22(struct mii_bus *bus, int phy_addr, int reg
+ 
+ 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0xF);
+ 	/* setup and write the address cycle command */
+-	command = NGBE_MSCA_RA(regnum) |
+-		  NGBE_MSCA_PA(phy_addr) |
+-		  NGBE_MSCA_DA(device_type);
+-	wr32(wx, NGBE_MSCA, command);
++	command = WX_MSCA_RA(regnum) |
++		  WX_MSCA_PA(phy_addr) |
++		  WX_MSCA_DA(device_type);
++	wr32(wx, WX_MSCA, command);
+ 	command = value |
+-		  NGBE_MSCC_CMD(NGBE_MSCA_CMD_WRITE) |
+-		  NGBE_MSCC_BUSY |
+-		  NGBE_MDIO_CLK(6);
+-	wr32(wx, NGBE_MSCC, command);
++		  WX_MSCC_CMD(WX_MSCA_CMD_WRITE) |
++		  WX_MSCC_BUSY |
++		  WX_MDIO_CLK(6);
++	wr32(wx, WX_MSCC, command);
+ 
+ 	/* wait to complete */
+-	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
+-				100000, false, wx, NGBE_MSCC);
++	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
++				100000, false, wx, WX_MSCC);
+ 	if (ret)
+ 		wx_err(wx, "Mdio write c22 command did not complete.\n");
+ 
+@@ -92,24 +92,24 @@ static int ngbe_phy_read_reg_mdi_c45(struct mii_bus *bus, int phy_addr, int devn
+ 
+ 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0x0);
+ 	/* setup and write the address cycle command */
+-	command = NGBE_MSCA_RA(regnum) |
+-		  NGBE_MSCA_PA(phy_addr) |
+-		  NGBE_MSCA_DA(devnum);
+-	wr32(wx, NGBE_MSCA, command);
+-	command = NGBE_MSCC_CMD(NGBE_MSCA_CMD_READ) |
+-		  NGBE_MSCC_BUSY |
+-		  NGBE_MDIO_CLK(6);
+-	wr32(wx, NGBE_MSCC, command);
 +	command = WX_MSCA_RA(regnum) |
 +		  WX_MSCA_PA(phy_addr) |
 +		  WX_MSCA_DA(devnum);
 +	wr32(wx, WX_MSCA, command);
-+
-+	command = value | WX_MSCC_CMD(WX_MSCA_CMD_WRITE) | WX_MSCC_BUSY;
++	command = WX_MSCC_CMD(WX_MSCA_CMD_READ) |
++		  WX_MSCC_BUSY |
++		  WX_MDIO_CLK(6);
 +	wr32(wx, WX_MSCC, command);
-+
-+	/* wait to complete */
+ 
+ 	/* wait to complete */
+-	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
+-				100000, false, wx, NGBE_MSCC);
 +	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
 +				100000, false, wx, WX_MSCC);
-+	if (ret)
-+		wx_err(wx, "Mdio write c45 command did not complete.\n");
-+
-+	return ret;
-+}
-+
-+static int txgbe_ext_phy_init(struct txgbe *txgbe)
-+{
-+	struct phy_device *phydev;
-+	struct mii_bus *mii_bus;
-+	struct pci_dev *pdev;
-+	struct wx *wx;
-+	int ret = 0;
-+
-+	wx = txgbe->wx;
-+	pdev = wx->pdev;
-+
-+	mii_bus = devm_mdiobus_alloc(&pdev->dev);
-+	if (!mii_bus)
-+		return -ENOMEM;
-+
-+	mii_bus->name = "txgbe_mii_bus";
-+	mii_bus->read_c45 = &txgbe_phy_read;
-+	mii_bus->write_c45 = &txgbe_phy_write;
-+	mii_bus->parent = &pdev->dev;
-+	mii_bus->phy_mask = GENMASK(31, 1);
-+	mii_bus->priv = wx;
-+	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "txgbe-%x",
-+		 (pdev->bus->number << 8) | pdev->devfn);
-+
-+	ret = devm_mdiobus_register(&pdev->dev, mii_bus);
-+	if (ret) {
-+		wx_err(wx, "failed to register MDIO bus: %d\n", ret);
-+		return ret;
-+	}
-+
-+	phydev = phy_find_first(mii_bus);
-+	if (!phydev) {
-+		wx_err(wx, "no PHY found\n");
-+		return -ENODEV;
-+	}
-+
-+	phy_attached_info(phydev);
-+
-+	wx->link = 0;
-+	wx->speed = 0;
-+	wx->duplex = 0;
-+	wx->phydev = phydev;
-+
-+	ret = txgbe_phylink_init(txgbe);
-+	if (ret) {
-+		wx_err(wx, "failed to init phylink: %d\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- int txgbe_init_phy(struct txgbe *txgbe)
- {
- 	int ret;
- 
-+	if (txgbe->wx->media_type == sp_media_copper)
-+		return txgbe_ext_phy_init(txgbe);
-+
- 	ret = txgbe_swnodes_register(txgbe);
  	if (ret) {
- 		wx_err(txgbe->wx, "failed to register software nodes\n");
-@@ -691,6 +819,12 @@ int txgbe_init_phy(struct txgbe *txgbe)
+ 		wx_err(wx, "Mdio read c45 command did not complete.\n");
+ 		return ret;
+ 	}
  
- void txgbe_remove_phy(struct txgbe *txgbe)
- {
-+	if (txgbe->wx->media_type == sp_media_copper) {
-+		phylink_disconnect_phy(txgbe->phylink);
-+		phylink_destroy(txgbe->phylink);
-+		return;
-+	}
-+
- 	platform_device_unregister(txgbe->sfp_dev);
- 	platform_device_unregister(txgbe->i2c_dev);
- 	clkdev_drop(txgbe->clock);
+-	return (u16)rd32(wx, NGBE_MSCC);
++	return (u16)rd32(wx, WX_MSCC);
+ }
+ 
+ static int ngbe_phy_write_reg_mdi_c45(struct mii_bus *bus, int phy_addr,
+@@ -121,19 +121,19 @@ static int ngbe_phy_write_reg_mdi_c45(struct mii_bus *bus, int phy_addr,
+ 
+ 	wr32(wx, NGBE_MDIO_CLAUSE_SELECT, 0x0);
+ 	/* setup and write the address cycle command */
+-	command = NGBE_MSCA_RA(regnum) |
+-		  NGBE_MSCA_PA(phy_addr) |
+-		  NGBE_MSCA_DA(devnum);
+-	wr32(wx, NGBE_MSCA, command);
++	command = WX_MSCA_RA(regnum) |
++		  WX_MSCA_PA(phy_addr) |
++		  WX_MSCA_DA(devnum);
++	wr32(wx, WX_MSCA, command);
+ 	command = value |
+-		  NGBE_MSCC_CMD(NGBE_MSCA_CMD_WRITE) |
+-		  NGBE_MSCC_BUSY |
+-		  NGBE_MDIO_CLK(6);
+-	wr32(wx, NGBE_MSCC, command);
++		  WX_MSCC_CMD(WX_MSCA_CMD_WRITE) |
++		  WX_MSCC_BUSY |
++		  WX_MDIO_CLK(6);
++	wr32(wx, WX_MSCC, command);
+ 
+ 	/* wait to complete */
+-	ret = read_poll_timeout(rd32, val, !(val & NGBE_MSCC_BUSY), 1000,
+-				100000, false, wx, NGBE_MSCC);
++	ret = read_poll_timeout(rd32, val, !(val & WX_MSCC_BUSY), 1000,
++				100000, false, wx, WX_MSCC);
+ 	if (ret)
+ 		wx_err(wx, "Mdio write c45 command did not complete.\n");
+ 
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+index b70eca397b67..72c8cd2d5575 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+@@ -59,25 +59,6 @@
+ #define NGBE_EEPROM_VERSION_L			0x1D
+ #define NGBE_EEPROM_VERSION_H			0x1E
+ 
+-/* mdio access */
+-#define NGBE_MSCA				0x11200
+-#define NGBE_MSCA_RA(v)				FIELD_PREP(U16_MAX, v)
+-#define NGBE_MSCA_PA(v)				FIELD_PREP(GENMASK(20, 16), v)
+-#define NGBE_MSCA_DA(v)				FIELD_PREP(GENMASK(25, 21), v)
+-#define NGBE_MSCC				0x11204
+-#define NGBE_MSCC_CMD(v)			FIELD_PREP(GENMASK(17, 16), v)
+-
+-enum NGBE_MSCA_CMD_value {
+-	NGBE_MSCA_CMD_RSV = 0,
+-	NGBE_MSCA_CMD_WRITE,
+-	NGBE_MSCA_CMD_POST_READ,
+-	NGBE_MSCA_CMD_READ,
+-};
+-
+-#define NGBE_MSCC_SADDR				BIT(18)
+-#define NGBE_MSCC_BUSY				BIT(22)
+-#define NGBE_MDIO_CLK(v)			FIELD_PREP(GENMASK(21, 19), v)
+-
+ /* Media-dependent registers. */
+ #define NGBE_MDIO_CLAUSE_SELECT			0x11220
+ 
 -- 
 2.27.0
 
