@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-29875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A329C784FE3
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:14:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DFF7784FE5
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 07:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBBEF1C20C70
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 05:14:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20490281307
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 05:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5DDA959;
-	Wed, 23 Aug 2023 05:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FE4AD4B;
+	Wed, 23 Aug 2023 05:10:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E83AD29
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:10:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24F47C433B7;
-	Wed, 23 Aug 2023 05:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76BBAD3F
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:10:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D87C433AD;
+	Wed, 23 Aug 2023 05:10:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692767440;
-	bh=y/2E8i+xwjBbtrafhAcdvqxlKxuciknFKTCEpBiggS8=;
+	s=k20201202; t=1692767441;
+	bh=rFoUTDamZTt0uwWk163o3LduLFe1gq6XDQCSnKBQewY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iHK/WJR5WDLVqqNXowvnXwMEOhSMbAmIWFj15s4ldjpyXoZ3X4gAtB+UwjbycLmHT
-	 SRmC6Q6+IIDzENFuDeWgbsHkR6Uevy2ID1wQETTkJPs6QF0mMJ438y5aPBtZDATovP
-	 gmxYGt1BieMuNvgaqM0K1FpSiBAWF1aJioMFAOn5ETL+amOZGY0vANZM4eaQQxqpGL
-	 dX4Bn9NMhvFhCcYO/rKMrKUOI7xQppdV/RujXLb++VOX2Z/V55zSkSQfGRDZDSTR+I
-	 bIvWsBrHmepR3y7oYv2q2ePp+OInscwiSdWmibyMUdLQRYQsX1mY/kRjkwFx07LCwb
-	 amQ4LryJaJ05g==
+	b=Ufvn3vbPTN7YHC62DtkbCFmDSH9wQ2uVT/OYoTIZjq594diWHLzT9vrG+Av/ycVTB
+	 Nscg4OzIYwbhsbFY8t2bYMT+alq1ru/2ihdkBrDgzlZZtkQ0jge92jbdfi+yqgK8BJ
+	 mscwjT6oNnUgqBhAfbHopyoqawT8aoBC23TYs0TWDwQbnDtpoDJZDDvCWlG3haBPIH
+	 qF98No4QSz0KnaiWIn9ROGaFF00/mc4mOa6P5pDjvBcAuqvrZCpQfn+hqHutgd3gx3
+	 R5XBlwEXb0bP9M5WWuqxLG8fwfZki3+vFV31wy3jp5/L1lB1tSo9FX/yvmezqFmCP7
+	 WyQJbXw0k3O8Q==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,11 +38,13 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>
-Subject: [net-next 13/15] net/mlx5: Store vport in struct mlx5_devlink_port and use it in port ops
-Date: Tue, 22 Aug 2023 22:10:10 -0700
-Message-ID: <20230823051012.162483-14-saeed@kernel.org>
+	Emeel Hakim <ehakim@nvidia.com>,
+	Raed Salem <raeds@nvidia.com>,
+	Simon Horman <horms@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [net-next 14/15] net/mlx5e: Support IPsec upper protocol selector field offload for RX
+Date: Tue, 22 Aug 2023 22:10:11 -0700
+Message-ID: <20230823051012.162483-15-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230823051012.162483-1-saeed@kernel.org>
 References: <20230823051012.162483-1-saeed@kernel.org>
@@ -54,213 +56,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: Emeel Hakim <ehakim@nvidia.com>
 
-Instead of using internal devlink_port->index to perform vport lookup in
-every devlink port op, store the vport pointer to the container struct
-mlx5_devlink_port and use it directly in port ops.
+Support RX policy/state upper protocol selector field offload,
+to enable selecting RX traffic for IPsec operation based on l4
+protocol UDP with specific source/destination port.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Emeel Hakim <ehakim@nvidia.com>
+Reviewed-by: Raed Salem <raeds@nvidia.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/esw/devlink_port.c     |  2 +
- .../net/ethernet/mellanox/mlx5/core/eswitch.h | 19 ++++++
- .../mellanox/mlx5/core/eswitch_offloads.c     | 61 +++----------------
- 3 files changed, 29 insertions(+), 53 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c   | 10 ++++------
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c    |  2 ++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-index 2dc7b0bf38c7..3c254a710006 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/devlink_port.c
-@@ -71,6 +71,7 @@ int mlx5_esw_offloads_pf_vf_devlink_port_init(struct mlx5_eswitch *esw,
- 						       &dl_port->dl_port);
- 
- 	vport->dl_port = dl_port;
-+	mlx5_devlink_port_init(dl_port, vport);
- 	return 0;
- }
- 
-@@ -115,6 +116,7 @@ int mlx5_esw_offloads_sf_devlink_port_init(struct mlx5_eswitch *esw, struct mlx5
- 	mlx5_esw_offloads_sf_devlink_port_attrs_set(esw, &dl_port->dl_port, controller, sfnum);
- 
- 	vport->dl_port = dl_port;
-+	mlx5_devlink_port_init(dl_port, vport);
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-index 9f94c3d6d6e5..6fcece69d3be 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-@@ -172,10 +172,29 @@ enum mlx5_eswitch_vport_event {
- 	MLX5_VPORT_PROMISC_CHANGE = BIT(3),
- };
- 
-+struct mlx5_vport;
-+
- struct mlx5_devlink_port {
- 	struct devlink_port dl_port;
-+	struct mlx5_vport *vport;
- };
- 
-+static inline void mlx5_devlink_port_init(struct mlx5_devlink_port *dl_port,
-+					  struct mlx5_vport *vport)
-+{
-+	dl_port->vport = vport;
-+}
-+
-+static inline struct mlx5_devlink_port *mlx5_devlink_port_get(struct devlink_port *dl_port)
-+{
-+	return container_of(dl_port, struct mlx5_devlink_port, dl_port);
-+}
-+
-+static inline struct mlx5_vport *mlx5_devlink_port_vport_get(struct devlink_port *dl_port)
-+{
-+	return mlx5_devlink_port_get(dl_port)->vport;
-+}
-+
- struct mlx5_vport {
- 	struct mlx5_core_dev    *dev;
- 	struct hlist_head       uc_list[MLX5_L2_ADDR_HASH_SIZE];
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index e4d1744516f7..67eab99f95b1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -4223,17 +4223,7 @@ int mlx5_devlink_port_fn_hw_addr_get(struct devlink_port *port,
- 				     struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = mlx5_devlink_eswitch_nocheck_get(port->devlink);
--	struct mlx5_vport *vport;
--	u16 vport_num;
--
--
--	vport_num = mlx5_esw_devlink_port_index_to_vport_num(port->index);
--
--	vport = mlx5_eswitch_get_vport(esw, vport_num);
--	if (IS_ERR(vport)) {
--		NL_SET_ERR_MSG_MOD(extack, "Invalid port");
--		return PTR_ERR(vport);
--	}
-+	struct mlx5_vport *vport = mlx5_devlink_port_vport_get(port);
- 
- 	mutex_lock(&esw->state_lock);
- 	ether_addr_copy(hw_addr, vport->info.mac);
-@@ -4247,26 +4237,16 @@ int mlx5_devlink_port_fn_hw_addr_set(struct devlink_port *port,
- 				     struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = mlx5_devlink_eswitch_nocheck_get(port->devlink);
--	u16 vport_num;
-+	struct mlx5_vport *vport = mlx5_devlink_port_vport_get(port);
- 
--	vport_num = mlx5_esw_devlink_port_index_to_vport_num(port->index);
--	return mlx5_eswitch_set_vport_mac(esw, vport_num, hw_addr);
--}
--
--static struct mlx5_vport *
--mlx5_devlink_port_fn_get_vport(struct devlink_port *port, struct mlx5_eswitch *esw)
--{
--	u16 vport_num;
--
--	vport_num = mlx5_esw_devlink_port_index_to_vport_num(port->index);
--	return mlx5_eswitch_get_vport(esw, vport_num);
-+	return mlx5_eswitch_set_vport_mac(esw, vport->vport, hw_addr);
- }
- 
- int mlx5_devlink_port_fn_migratable_get(struct devlink_port *port, bool *is_enabled,
- 					struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = mlx5_devlink_eswitch_nocheck_get(port->devlink);
--	struct mlx5_vport *vport;
-+	struct mlx5_vport *vport = mlx5_devlink_port_vport_get(port);
- 
- 	if (!MLX5_CAP_GEN(esw->dev, migration)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Device doesn't support migration");
-@@ -4278,12 +4258,6 @@ int mlx5_devlink_port_fn_migratable_get(struct devlink_port *port, bool *is_enab
- 		return -EOPNOTSUPP;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index a577f0edabe8..2bbe232c2ffa 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -440,9 +440,8 @@ static int mlx5e_xfrm_validate_state(struct mlx5_core_dev *mdev,
+ 		return -EINVAL;
  	}
  
--	vport = mlx5_devlink_port_fn_get_vport(port, esw);
--	if (IS_ERR(vport)) {
--		NL_SET_ERR_MSG_MOD(extack, "Invalid port");
--		return PTR_ERR(vport);
--	}
--
- 	mutex_lock(&esw->state_lock);
- 	*is_enabled = vport->info.mig_enabled;
- 	mutex_unlock(&esw->state_lock);
-@@ -4294,8 +4268,8 @@ int mlx5_devlink_port_fn_migratable_set(struct devlink_port *port, bool enable,
- 					struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = mlx5_devlink_eswitch_nocheck_get(port->devlink);
-+	struct mlx5_vport *vport = mlx5_devlink_port_vport_get(port);
- 	int query_out_sz = MLX5_ST_SZ_BYTES(query_hca_cap_out);
--	struct mlx5_vport *vport;
- 	void *query_ctx;
- 	void *hca_caps;
- 	int err;
-@@ -4310,12 +4284,6 @@ int mlx5_devlink_port_fn_migratable_set(struct devlink_port *port, bool enable,
- 		return -EOPNOTSUPP;
+-	if (x->sel.proto != IPPROTO_IP &&
+-	    (x->sel.proto != IPPROTO_UDP || x->xso.dir != XFRM_DEV_OFFLOAD_OUT)) {
+-		NL_SET_ERR_MSG_MOD(extack, "Device does not support upper protocol other than UDP, and only Tx direction");
++	if (x->sel.proto != IPPROTO_IP && x->sel.proto != IPPROTO_UDP) {
++		NL_SET_ERR_MSG_MOD(extack, "Device does not support upper protocol other than UDP");
+ 		return -EINVAL;
  	}
  
--	vport = mlx5_devlink_port_fn_get_vport(port, esw);
--	if (IS_ERR(vport)) {
--		NL_SET_ERR_MSG_MOD(extack, "Invalid port");
--		return PTR_ERR(vport);
--	}
--
- 	mutex_lock(&esw->state_lock);
- 
- 	if (vport->info.mig_enabled == enable) {
-@@ -4359,19 +4327,13 @@ int mlx5_devlink_port_fn_roce_get(struct devlink_port *port, bool *is_enabled,
- 				  struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = mlx5_devlink_eswitch_nocheck_get(port->devlink);
--	struct mlx5_vport *vport;
-+	struct mlx5_vport *vport = mlx5_devlink_port_vport_get(port);
- 
- 	if (!MLX5_CAP_GEN(esw->dev, vhca_resource_manager)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Device doesn't support VHCA management");
- 		return -EOPNOTSUPP;
+@@ -983,9 +982,8 @@ static int mlx5e_xfrm_validate_policy(struct mlx5_core_dev *mdev,
+ 		return -EINVAL;
  	}
  
--	vport = mlx5_devlink_port_fn_get_vport(port, esw);
--	if (IS_ERR(vport)) {
--		NL_SET_ERR_MSG_MOD(extack, "Invalid port");
--		return PTR_ERR(vport);
--	}
--
- 	mutex_lock(&esw->state_lock);
- 	*is_enabled = vport->info.roce_enabled;
- 	mutex_unlock(&esw->state_lock);
-@@ -4382,11 +4344,11 @@ int mlx5_devlink_port_fn_roce_set(struct devlink_port *port, bool enable,
- 				  struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = mlx5_devlink_eswitch_nocheck_get(port->devlink);
-+	struct mlx5_vport *vport = mlx5_devlink_port_vport_get(port);
- 	int query_out_sz = MLX5_ST_SZ_BYTES(query_hca_cap_out);
--	struct mlx5_vport *vport;
-+	u16 vport_num = vport->vport;
- 	void *query_ctx;
- 	void *hca_caps;
--	u16 vport_num;
- 	int err;
- 
- 	if (!MLX5_CAP_GEN(esw->dev, vhca_resource_manager)) {
-@@ -4394,13 +4356,6 @@ int mlx5_devlink_port_fn_roce_set(struct devlink_port *port, bool enable,
- 		return -EOPNOTSUPP;
+-	if (sel->proto != IPPROTO_IP &&
+-	    (sel->proto != IPPROTO_UDP || x->xdo.dir != XFRM_DEV_OFFLOAD_OUT)) {
+-		NL_SET_ERR_MSG_MOD(extack, "Device does not support upper protocol other than UDP, and only Tx direction");
++	if (x->selector.proto != IPPROTO_IP && x->selector.proto != IPPROTO_UDP) {
++		NL_SET_ERR_MSG_MOD(extack, "Device does not support upper protocol other than UDP");
+ 		return -EINVAL;
  	}
  
--	vport = mlx5_devlink_port_fn_get_vport(port, esw);
--	if (IS_ERR(vport)) {
--		NL_SET_ERR_MSG_MOD(extack, "Invalid port");
--		return PTR_ERR(vport);
--	}
--	vport_num = vport->vport;
--
- 	mutex_lock(&esw->state_lock);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+index 3781c72d97f1..f5e29b7f5ba0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+@@ -1243,6 +1243,7 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	setup_fte_spi(spec, attrs->spi);
+ 	setup_fte_esp(spec);
+ 	setup_fte_no_frags(spec);
++	setup_fte_upper_proto_match(spec, &attrs->upspec);
  
- 	if (vport->info.roce_enabled == enable) {
+ 	if (rx != ipsec->rx_esw)
+ 		err = setup_modify_header(ipsec, attrs->type,
+@@ -1519,6 +1520,7 @@ static int rx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ 		setup_fte_addr6(spec, attrs->saddr.a6, attrs->daddr.a6);
+ 
+ 	setup_fte_no_frags(spec);
++	setup_fte_upper_proto_match(spec, &attrs->upspec);
+ 
+ 	switch (attrs->action) {
+ 	case XFRM_POLICY_ALLOW:
 -- 
 2.41.0
 
