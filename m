@@ -1,87 +1,82 @@
-Return-Path: <netdev+bounces-29908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F347278527C
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:15:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110AB785281
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3872C1C20B40
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:15:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6C1C2811FA
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 08:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CA1A92E;
-	Wed, 23 Aug 2023 08:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE983A930;
+	Wed, 23 Aug 2023 08:15:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC195883A
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:15:21 +0000 (UTC)
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C696935BF;
-	Wed, 23 Aug 2023 01:15:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1692778507;
-	bh=UdKH51HqsKN9rWM3wGkZ2xvYLTpyww+HuWDOQXzqjbQ=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=cAnSn0CNF3nmMQf+gdUSihMSHVYsrwwjHFYmTOuENkMgMMYgHA6U+xPEe/XGJ0GYS
-	 qL77JrqloZH/Anql86ZX7Hiu0QKSLg6CU0fkMsli0ka6NJlX8sO6/4Eyhy/11qzmHk
-	 3QIhWKAoHDFL5z1FCMAGo9YQm3wiSn6MiPSiuWIw=
-Date: Wed, 23 Aug 2023 10:14:48 +0200 (GMT+02:00)
-From: linux@weissschuh.net
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Robert Marko <robimarko@gmail.com>
-Message-ID: <1e1dde74-edc6-4306-9b1b-0a1b5a658b67@weissschuh.net>
-In-Reply-To: <20230822184644.18966d0f@kernel.org>
-References: <20230822-skb_ext-simplify-v1-1-9dd047340ab5@weissschuh.net> <20230822184644.18966d0f@kernel.org>
-Subject: Re: [PATCH net-next] net: generalize calculation of skb extensions
- length
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922FE8BF6
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:15:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86C03C433C8;
+	Wed, 23 Aug 2023 08:15:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1692778548;
+	bh=f7/tnL/CYJkwKNLcLrlquf8W0oqouUPAZbxzQF2xWrg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K29YbCvSIvPIqrCKyzF6IAffEdlYbhbCNNjtIERAkM39WOwz/obWYbhEcPuC8WYTw
+	 IRvra7Xt1BozBNGXoyiLEp4yBZFEMiH4plosQCODwPjZApgakAChJ4c9p2Hu+sI5VE
+	 JP8V0gaTauWxvLnx2Ti8GdmxbTFgmQMdp8kAW7RQ=
+Date: Wed, 23 Aug 2023 10:15:45 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: "Limonciello, Mario" <mario.limonciello@amd.com>,
+	Evan Quan <evan.quan@amd.com>, Andrew Lunn <andrew@lunn.ch>,
+	rafael@kernel.org, lenb@kernel.org, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alexander.deucher@amd.com, rdunlap@infradead.org,
+	quic_jjohnson@quicinc.com, horms@kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [V9 1/9] drivers core: Add support for Wifi band RF mitigations
+Message-ID: <2023082333-unruly-explode-9ee8@gregkh>
+References: <20230818032619.3341234-1-evan.quan@amd.com>
+ <20230818032619.3341234-2-evan.quan@amd.com>
+ <2023081806-rounding-distract-b695@gregkh>
+ <2328cf53-849d-46a1-87e6-436e3a1f5fd8@amd.com>
+ <2023081919-mockup-bootleg-bdb9@gregkh>
+ <e5d153ed-df8a-4d6f-8222-18dfd97f6371@amd.com>
+ <2023082247-synthesis-revenge-470d@gregkh>
+ <87a5uiw5x4.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Correlation-ID: <1e1dde74-edc6-4306-9b1b-0a1b5a658b67@weissschuh.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a5uiw5x4.fsf@kernel.org>
 
-Hi Jakub,
+On Wed, Aug 23, 2023 at 10:53:43AM +0300, Kalle Valo wrote:
+> Greg KH <gregkh@linuxfoundation.org> writes:
+> 
+> > On Mon, Aug 21, 2023 at 10:13:45PM -0500, Limonciello, Mario wrote:
+> >> So I wonder if the right answer is to put it in drivers/net/wireless
+> >> initially and if we come up with a need later for non wifi producers we can
+> >> discuss moving it at that time.
+> >
+> > Please do so.
+> 
+> Sorry, I haven't been able to follow the discussion in detail but just a
+> quick comment: if there's supposed to be code which is shared with
+> different wifi drivers then drivers/net/wireless sounds wrong,
+> net/wireless or net/mac80211 would be more approriate location.
 
+That's fine with me as well, just not drivers/core/ please :)
 
-Aug 23, 2023 03:46:48 Jakub Kicinski <kuba@kernel.org>:
+thanks,
 
-> On Tue, 22 Aug 2023 08:51:57 +0200 Thomas Wei=C3=9Fschuh wrote:
->> Remove the necessity to modify skb_ext_total_length() when new extension
->> types are added.
->> Also reduces the line count a bit.
->>
->> With optimizations enabled the function is folded down to a constant
->> value as before.
->
-> Could you include more info about the compiler versions you tried
-> and maybe some objdump? We'll have to take your word for it getting
-> optimized out, would be great if we had more proof in the commit msg.
-> --
-> pw-bot: cr
-
-Thanks for the feedback.
-I'll send a v2 with more background soon.
-
-On the other hand this function is only ever
-executed once, so even if it is slightly inefficient
-it shouldn't matter.
-
-Thomas
+greg k-h
 
