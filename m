@@ -1,138 +1,73 @@
-Return-Path: <netdev+bounces-30001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADE88785828
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:54:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B59D78582D
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 14:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 977481C20C71
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:54:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AE581C20C79
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4886CBE47;
-	Wed, 23 Aug 2023 12:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18C1BE7C;
+	Wed, 23 Aug 2023 12:54:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CA58F77
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 12:54:54 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77D7ACD2
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:54:49 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-31aeef88a55so3366000f8f.2
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:54:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1692795288; x=1693400088;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kz3nv5YqHQjqTTShi+P/CzY2fv/kkQKSSZsOTw+wpGs=;
-        b=S2KO5V11etuXn3HjsyIp2y0q8iehMpZfFWzj43jBCKU0GRlT1Jel7jYYKyWW+MMcyS
-         3gO4D3Fbn/rJWULMXNyJRmzc68C1v13z0fT20MJ5qYQLBDDVsqEDYIfgbZEXfozjoZWj
-         +s1KPUCOMcyEILjbeW+kPzeYZsDkxUSQ4uHbyP30pbTCZTDdz/LMA6JevVYEUwgmnILh
-         RgBCaFsdv7Zz/3iwo8jV7EojrOx5MmTri1GxJDOkpA+NFWGxHu0XHeQ6UOzyH7up8Bbw
-         DlRHe4E2vniUvAiejIk0q6NU2gh0yHhRRp9HxZT2KHEQlTarpdD26SiBS7CKiATWVnJO
-         DwVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692795288; x=1693400088;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kz3nv5YqHQjqTTShi+P/CzY2fv/kkQKSSZsOTw+wpGs=;
-        b=QMv3aJkGA1syFMOITJBc0fEu/aKHHPIjmMw3aYxsqrYBOVEDil37hI+3+30RfYqatR
-         QSkHyZ2ME0Luu1qS+NchZtjtto8W/NWvQEy1+JTY5KAZ7Qen/qBIWw5pEyRhd2r+nB4O
-         TxajRzbnzndv5QpzZtH6Qg+dMk1iZSq8ABurzNZIdaHU/UEsShwvvekuGx8h3DP2QY1P
-         3v1OphvdzeIXRAw+jyPqZmac/n+saWuQTVEdzUUJMvyB4RrbWa0TQrVfxq0Z/AltwP4T
-         rNwRKMXV93/iIWPU0bNYpEkt6QNw2SsseSpabHmOlDNTbNzOYcmqpRfFNVJDuTzRUK3s
-         qyAg==
-X-Gm-Message-State: AOJu0Yx6ZkP2LuIhk5636l+rUtD8qVCWxIg3Jxx7gCUrH3QcAPwSq6Nd
-	GGyFOw5KoqCi0iAKAMB7WBxAEg==
-X-Google-Smtp-Source: AGHT+IHQKaFYegnuMIRWnuoQvRvExhXrBSR1pihsYbjd0/1pzNKi0f5Kv08dlWImgQCO3gNfePncHQ==
-X-Received: by 2002:adf:f64d:0:b0:319:7722:30c with SMTP id x13-20020adff64d000000b003197722030cmr10892417wrp.22.1692795287957;
-        Wed, 23 Aug 2023 05:54:47 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:5b4:abda:ac34:eca0? ([2a02:578:8593:1200:5b4:abda:ac34:eca0])
-        by smtp.gmail.com with ESMTPSA id m14-20020adffe4e000000b00317b0155502sm19387258wrs.8.2023.08.23.05.54.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 05:54:45 -0700 (PDT)
-Message-ID: <4ddaaf1e-753d-42c3-afb6-6836fff6a428@tessares.net>
-Date: Wed, 23 Aug 2023 14:53:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39BDBE7B
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 12:54:55 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B205EE5C
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 05:54:52 -0700 (PDT)
+Date: Wed, 23 Aug 2023 14:54:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1692795290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zBRWiMnYP/bWCOqgyAMEagaSdQUvqpL4iQXSl2tEboU=;
+	b=hB3VH8XOSfalQPLY1p7a054BXteOwPt9NKSgkTs/9EyyRWz+1DkiJ8LrXyLsKDQTdzjiDA
+	s/OK7MwNkDlfoy6jB+k4purMTAPqHugBstTx35EbYv4GU/Kqw7PuvlT2jmD6JRbfZYYQLS
+	+1D21FfbBIDWxrrjEBrmj4kiWX/qWthwagtgv62M2AbAWk4voN+ZAvbS7XyPGi9NGhuNXu
+	2vgE4lECbk2z7oSgpu/Qylgxkr9x5+LnqFLcovvga944wZEFsJl2kudypN/UwqKgHVlBJ0
+	KRNF4WAuUfQMAU2qBEq+iD1m7071t9ithltxbt95WLGU4E0rZNURROq1jme28Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1692795290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zBRWiMnYP/bWCOqgyAMEagaSdQUvqpL4iQXSl2tEboU=;
+	b=oAstP5cYpLZDT3Wf4/65/Nd5PYvoWXINs9govrFBlWhIXtpAtJJcNFciAqEXjFXB2ietmr
+	gdSZms4NXIIe4BAw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: RE: [EXT] [BUG] Possible unsafe page_pool usage in octeontx2
+Message-ID: <20230823125448.Q89O9wFB@linutronix.de>
+References: <20230823094757.gxvCEOBi@linutronix.de>
+ <MWHPR1801MB1918F1D7686BDBC8817E473FD31CA@MWHPR1801MB1918.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/12] mptcp: Do not include crypto/algapi.h
-Content-Language: en-GB
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org,
- Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
- Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
- ceph-devel@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
- "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org,
- Mat Martineau <martineau@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
- Mimi Zohar <zohar@linux.ibm.com>, linux-integrity@vger.kernel.org,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Ayush Sawal <ayush.sawal@chelsio.com>
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
- <E1qYlA3-006vGH-1L@formenos.hmeau.com>
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Autocrypt: addr=matthieu.baerts@tessares.net; keydata=
- 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
-In-Reply-To: <E1qYlA3-006vGH-1L@formenos.hmeau.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <MWHPR1801MB1918F1D7686BDBC8817E473FD31CA@MWHPR1801MB1918.namprd18.prod.outlook.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
@@ -140,39 +75,59 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On 2023-08-23 12:28:58 [+0000], Ratheesh Kannoth wrote:
+> > From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Sent: Wednesday, August 23, 2023 3:18 PM
+> > Subject: [EXT] [BUG] Possible unsafe page_pool usage in octeontx2
+> > 
+> > This breaks in octeontx2 where a worker is used to fill the buffer:
+> >   otx2_pool_refill_task() -> otx2_alloc_rbuf() -> __otx2_alloc_rbuf() ->
+> >   otx2_alloc_pool_buf() -> page_pool_alloc_frag().
+> >
+> As I understand, the problem is due to workqueue may get scheduled on
+> other CPU. If we use BOUND workqueue, do you think this problem can be
+> solved ?
 
-On 23/08/2023 12:32, Herbert Xu wrote:
-> The header file crypto/algapi.h is for internal use only.  Use the
-> header file crypto/utils.h instead.
+It would but is still open to less obvious races for instance if the
+IRQ/ NAPI is assigned to another CPU while the workqueue is scheduled.
+You would have to additional synchronisation to ensure that bad can
+happen. This does not make it any simpler nor prettier or serves as a
+good example.
 
-Thank you for the patch! It looks good to me:
+I would suggest to stay away from the lock-less buffer if not in NAPI
+and feed the pool->ring instead.
 
-Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+> > BH is disabled but the add of a page can still happen while NAPI callback runs
+> > on a remote CPU and so corrupting the index/ array.
+> > 
+> > API wise I would suggest to
+> > 
+> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c index
+> > 7ff80b80a6f9f..b50e219470a36 100644
+> > --- a/net/core/page_pool.c
+> > +++ b/net/core/page_pool.c
+> > @@ -612,7 +612,7 @@ __page_pool_put_page(struct page_pool *pool,
+> > struct page *page,
+> >  			page_pool_dma_sync_for_device(pool, page,
+> >  						      dma_sync_size);
+> > 
+> > -		if (allow_direct && in_softirq() &&
+> > +		if (allow_direct && in_serving_softirq() &&
+> >  		    page_pool_recycle_in_cache(page, pool))
+> >  			return NULL;
+> > 
+> > because the intention (as I understand it) is to be invoked from within the
+> > NAPI callback (while softirq is served) and not if BH is just disabled due to a
+> > lock or so.
+> Could you help me understand where in_softirq() check will break ?  If
+> we TX a packet (dev_queue_xmit()) in 
+> Process context on same core,  in_serving_softirq() check will prevent
+> it from recycling ?
 
-I understood that other patches will come later to make it clear
-crypto/algapi.h is for internal use only so that's good!
+If a check is added to page_pool_alloc_pages() then it will trigger if
+you fill the buffer from your ->ndo_open() callback.
+Also, if you invoke dev_queue_xmit() from process context. But It will
+be added to &pool->ring instead.
 
-> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-> index 9ee3b7abbaf6..64bb200099dc 100644
-> --- a/net/mptcp/subflow.c
-> +++ b/net/mptcp/subflow.c
-> @@ -9,8 +9,8 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/netdevice.h>
-> -#include <crypto/algapi.h>
->  #include <crypto/sha2.h>
-> +#include <crypto/utils.h>
-
-It is fine for me if you carry this patch in your tree: this part here
-has not changed for a while and there is no ongoing work going to modify
-it. So there should not be any conflicts when merging the different
-trees later.
-
-Cheers,
-Matt
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+Sebastian
 
