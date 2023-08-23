@@ -1,442 +1,156 @@
-Return-Path: <netdev+bounces-29997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A0F4785705
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:45:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B366478572E
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 13:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 405AB281325
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:45:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E449A1C20C8F
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 11:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C51C135;
-	Wed, 23 Aug 2023 11:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87143BE48;
+	Wed, 23 Aug 2023 11:51:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A111C2CA
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 11:42:32 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB18FE5D;
-	Wed, 23 Aug 2023 04:42:30 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2bbbda48904so66994351fa.2;
-        Wed, 23 Aug 2023 04:42:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692790948; x=1693395748;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mQWgeaWQ/4hBL4NibSaXA04uIF2WfKhdxv+btB+gu2w=;
-        b=PyBH8jbjfaOAug3YonQoZNE0BUphmuiH7N9Cia6ESwm7RcbZiEk2TXaF+VIrORnlXS
-         8m0yfTFTqTgapTDMdSd/+ngtj9+ESbLw3muk+EbwSNpg2EnB0H5uqaJ1Jiv6BhmKXf5j
-         wXNbFs/kpE7u2XmuCRTYEN2DGbIBx19zm07oGqwcF7GouoP68IOgrImoZo7qnWSYMG5K
-         3mbjeTO2fhdDllJeRSoNzqxlqk2O+j0GPOhmFaEf1g+LLG32iQNg9159e6BLcMtUHiD2
-         0V7N4bwcoJeepd5bYFOBr6X+UGxEOVqd9zLvQSkUyFkyGcPO8UwLkPfSUxukZ2vXapXp
-         c0jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692790948; x=1693395748;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mQWgeaWQ/4hBL4NibSaXA04uIF2WfKhdxv+btB+gu2w=;
-        b=GJh3oixe46KvCa25g4T2HQ2UT/6T9buTcxEsgPwrGstACRus2jx1X4EP7WCG+zjR6x
-         zsrRnWZFBEPwoBcIJeDUkgg9GC1oBw83lMUFllpeyupFrZ2uZilqQbN920YqrkEZX0eb
-         1oKoWxhCy4dKzJXQjK9hJ+veX8AFnlETarXtp1rDrfPbKZtmBYYBQWtSEPJdqosCLT6o
-         lioEkl3XyVG6cE8mouxENzJUA5dZjk2QqDxQMEV56fquS3FOaANLQGhj/wJWgkoZFdwJ
-         9boyZ4hUEtyu97KCoCnCEt0tZio74uo1YD5MP0wHDk8GgxzcjPTdRi9CjXLCOzBlUVnF
-         n6MA==
-X-Gm-Message-State: AOJu0YyUB8K7fMfIA0FYw6+mIbpG6md/zzOHnJSpE4bYQBTgCMsJ9M1E
-	HkJYdESDR9Obc0ax/NMAqvgWCHrC0k7Qnw==
-X-Google-Smtp-Source: AGHT+IE8mupUI5CMOwDLKM6cAKywIfCmVVn0PnGa9Ss+78W5KUB0sHbyIEclbSM3yaSdrSpd+x2YMQ==
-X-Received: by 2002:a2e:99ce:0:b0:2bc:b27f:4019 with SMTP id l14-20020a2e99ce000000b002bcb27f4019mr7454863ljj.6.1692790948460;
-        Wed, 23 Aug 2023 04:42:28 -0700 (PDT)
-Received: from imac.taild7a78.ts.net ([2a02:8010:60a0:0:e4cf:1132:7b40:4262])
-        by smtp.gmail.com with ESMTPSA id k21-20020a05600c1c9500b003fed9b1a1f4sm559508wms.1.2023.08.23.04.42.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 04:42:27 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Stanislav Fomichev <sdf@google.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v4 12/12] doc/netlink: Add spec for rt route messages
-Date: Wed, 23 Aug 2023 12:42:01 +0100
-Message-ID: <20230823114202.5862-13-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230823114202.5862-1-donald.hunter@gmail.com>
-References: <20230823114202.5862-1-donald.hunter@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE328F77
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 11:51:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D6BBC433D9;
+	Wed, 23 Aug 2023 11:51:50 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HvlznVnN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1692791504;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i9S50yEi/p2rCDiQFKotCIoS/umPPt7Pl2fEpLB+hPU=;
+	b=HvlznVnN4+nTE+9P5lkr2rPCYQplDgdO5TEv4CB+fveG2FN0HLeY+NAKhcNFA6GMXSUYPq
+	R8vqfNV1vDE9kWFG8KCRj+3M8C/lrcTsz5tgdrIKsIZ/EgSSCfZRt8uPFm8LgCHWdCfxEV
+	UQuclphoiHFSePfXFFvOomDkbQr3/xM=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c56767ad (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 23 Aug 2023 11:51:44 +0000 (UTC)
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-44d5ac10c41so854545137.0;
+        Wed, 23 Aug 2023 04:51:44 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxusXUY5obDP6tjt4IEgrt6n41c6CPK6h+LdHr5QGxUrieLlpmG
+	5z9b6I8BK1hxlOFHEoIbSfloTkZB5DLdQUZYUqQ=
+X-Google-Smtp-Source: AGHT+IFt7G1/ZeusTY56LT7aeMj6tJiORTuiaRW4q76XBgQu2EncKhol2bejM2ffQ7Afv6eCg3gMogdKzIe6mnDS5dk=
+X-Received: by 2002:a67:ba0c:0:b0:44d:40b1:9273 with SMTP id
+ l12-20020a67ba0c000000b0044d40b19273mr8437282vsn.4.1692791501269; Wed, 23 Aug
+ 2023 04:51:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au> <E1qYlAB-006vJI-Cv@formenos.hmeau.com>
+In-Reply-To: <E1qYlAB-006vJI-Cv@formenos.hmeau.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Wed, 23 Aug 2023 13:48:47 +0200
+X-Gmail-Original-Message-ID: <CAHmME9qwYhM55he7WyWQZXwSg9Ri6-9K31tHHqaKcMYFEJYxTw@mail.gmail.com>
+Message-ID: <CAHmME9qwYhM55he7WyWQZXwSg9Ri6-9K31tHHqaKcMYFEJYxTw@mail.gmail.com>
+Subject: Re: [PATCH 11/12] wireguard: Do not include crypto/algapi.h
+To: herbert@gondor.apana.org.au
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org, 
+	Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, 
+	Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>, 
+	ceph-devel@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>, 
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org, 
+	Matthieu Baerts <matthieu.baerts@tessares.net>, Mat Martineau <martineau@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org, 
+	Mimi Zohar <zohar@linux.ibm.com>, linux-integrity@vger.kernel.org, 
+	Ayush Sawal <ayush.sawal@chelsio.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add schema for rt route with support for getroute, newroute and
-delroute.
+On Wed, Aug 23, 2023 at 12:33=E2=80=AFPM Herbert Xu <herbert@gondor.apana.o=
+rg.au> wrote:
+>
+> The header file crypto/algapi.h is for internal use only.  Use the
+> header file crypto/utils.h instead.
+>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>
+>  drivers/net/wireguard/cookie.c  |    2 +-
+>  drivers/net/wireguard/netlink.c |    2 +-
+>  drivers/net/wireguard/noise.c   |    2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/wireguard/cookie.c b/drivers/net/wireguard/cooki=
+e.c
+> index 4956f0499c19..f89581b5e8cb 100644
+> --- a/drivers/net/wireguard/cookie.c
+> +++ b/drivers/net/wireguard/cookie.c
+> @@ -12,9 +12,9 @@
+>
+>  #include <crypto/blake2s.h>
+>  #include <crypto/chacha20poly1305.h>
+> +#include <crypto/utils.h>
+>
+>  #include <net/ipv6.h>
+> -#include <crypto/algapi.h>
+>
+>  void wg_cookie_checker_init(struct cookie_checker *checker,
+>                             struct wg_device *wg)
+> diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netl=
+ink.c
+> index 6d1bd9f52d02..0a1502100e8b 100644
+> --- a/drivers/net/wireguard/netlink.c
+> +++ b/drivers/net/wireguard/netlink.c
+> @@ -12,10 +12,10 @@
+>
+>  #include <uapi/linux/wireguard.h>
+>
+> +#include <crypto/utils.h>
+>  #include <linux/if.h>
+>  #include <net/genetlink.h>
+>  #include <net/sock.h>
+> -#include <crypto/algapi.h>
+>
+>  static struct genl_family genl_family;
+>
+> diff --git a/drivers/net/wireguard/noise.c b/drivers/net/wireguard/noise.=
+c
+> index 720952b92e78..e7ad81ca4a36 100644
+> --- a/drivers/net/wireguard/noise.c
+> +++ b/drivers/net/wireguard/noise.c
+> @@ -10,12 +10,12 @@
+>  #include "queueing.h"
+>  #include "peerlookup.h"
+>
+> +#include <crypto/utils.h>
+>  #include <linux/rcupdate.h>
+>  #include <linux/slab.h>
+>  #include <linux/bitmap.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/highmem.h>
+> -#include <crypto/algapi.h>
+>
+>  /* This implements Noise_IKpsk2:
+>   *
 
-Routes can be dumped with filter attributes like this:
+Small nit - with the exception of the cookie.c reordering, could you
+maintain the existing #include ordering of the other files? No need to
+send a v2 for that if you don't want. And please make the entire
+commit subject lowercase. With those done,
 
-./tools/net/ynl/cli.py \
-    --spec Documentation/netlink/specs/rt_route.yaml \
-    --dump getroute --json '{"rtm-family": 2, "rtm-table": 254}'
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/specs/rt_route.yaml | 327 ++++++++++++++++++++++
- 1 file changed, 327 insertions(+)
- create mode 100644 Documentation/netlink/specs/rt_route.yaml
+As a side note, you may want to eventually do something to make sure
+people don't add back algapi.h, like move it to internal/ or out of
+include/ all together. I figure you've already thought about this, and
+this series is just the first step.
 
-diff --git a/Documentation/netlink/specs/rt_route.yaml b/Documentation/netlink/specs/rt_route.yaml
-new file mode 100644
-index 000000000000..f4368be0caed
---- /dev/null
-+++ b/Documentation/netlink/specs/rt_route.yaml
-@@ -0,0 +1,327 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: rt-route
-+protocol: netlink-raw
-+protonum: 0
-+
-+doc:
-+  Route configuration over rtnetlink.
-+
-+definitions:
-+  -
-+    name: rtm-type
-+    name-prefix: rtn-
-+    type: enum
-+    entries:
-+      - unspec
-+      - unicast
-+      - local
-+      - broadcast
-+      - anycast
-+      - multicast
-+      - blackhole
-+      - unreachable
-+      - prohibit
-+      - throw
-+      - nat
-+      - xresolve
-+  -
-+    name: rtmsg
-+    type: struct
-+    members:
-+      -
-+        name: rtm-family
-+        type: u8
-+      -
-+        name: rtm-dst-len
-+        type: u8
-+      -
-+        name: rtm-src-len
-+        type: u8
-+      -
-+        name: rtm-tos
-+        type: u8
-+      -
-+        name: rtm-table
-+        type: u8
-+      -
-+        name: rtm-protocol
-+        type: u8
-+      -
-+        name: rtm-scope
-+        type: u8
-+      -
-+        name: rtm-type
-+        type: u8
-+        enum: rtm-type
-+      -
-+        name: rtm-flags
-+        type: u32
-+  -
-+    name: rta-cacheinfo
-+    type: struct
-+    members:
-+      -
-+        name: rta-clntref
-+        type: u32
-+      -
-+        name: rta-lastuse
-+        type: u32
-+      -
-+        name: rta-expires
-+        type: u32
-+      -
-+        name: rta-error
-+        type: u32
-+      -
-+        name: rta-used
-+        type: u32
-+
-+attribute-sets:
-+  -
-+    name: route-attrs
-+    attributes:
-+      -
-+        name: rta-dst
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-src
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-iif
-+        type: u32
-+      -
-+        name: rta-oif
-+        type: u32
-+      -
-+        name: rta-gateway
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-priority
-+        type: u32
-+      -
-+        name: rta-prefsrc
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: rta-metrics
-+        type: nest
-+        nested-attributes: rta-metrics
-+      -
-+        name: rta-multipath
-+        type: binary
-+      -
-+        name: rta-protoinfo # not used
-+        type: binary
-+      -
-+        name: rta-flow
-+        type: u32
-+      -
-+        name: rta-cacheinfo
-+        type: binary
-+        struct: rta-cacheinfo
-+      -
-+        name: rta-session # not used
-+        type: binary
-+      -
-+        name: rta-mp-algo # not used
-+        type: binary
-+      -
-+        name: rta-table
-+        type: u32
-+      -
-+        name: rta-mark
-+        type: u32
-+      -
-+        name: rta-mfc-stats
-+        type: binary
-+      -
-+        name: rta-via
-+        type: binary
-+      -
-+        name: rta-newdst
-+        type: binary
-+      -
-+        name: rta-pref
-+        type: u8
-+      -
-+        name: rta-encap-type
-+        type: u16
-+      -
-+        name: rta-encap
-+        type: binary # tunnel specific nest
-+      -
-+        name: rta-expires
-+        type: u32
-+      -
-+        name: rta-pad
-+        type: binary
-+      -
-+        name: rta-uid
-+        type: u32
-+      -
-+        name: rta-ttl-propagate
-+        type: u8
-+      -
-+        name: rta-ip-proto
-+        type: u8
-+      -
-+        name: rta-sport
-+        type: u16
-+      -
-+        name: rta-dport
-+        type: u16
-+      -
-+        name: rta-nh-id
-+        type: u32
-+  -
-+    name: rta-metrics
-+    attributes:
-+      -
-+        name: rtax-unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: rtax-lock
-+        type: u32
-+      -
-+        name: rtax-mtu
-+        type: u32
-+      -
-+        name: rtax-window
-+        type: u32
-+      -
-+        name: rtax-rtt
-+        type: u32
-+      -
-+        name: rtax-rttvar
-+        type: u32
-+      -
-+        name: rtax-ssthresh
-+        type: u32
-+      -
-+        name: rtax-cwnd
-+        type: u32
-+      -
-+        name: rtax-advmss
-+        type: u32
-+      -
-+        name: rtax-reordering
-+        type: u32
-+      -
-+        name: rtax-hoplimit
-+        type: u32
-+      -
-+        name: rtax-initcwnd
-+        type: u32
-+      -
-+        name: rtax-features
-+        type: u32
-+      -
-+        name: rtax-rto-min
-+        type: u32
-+      -
-+        name: rtax-initrwnd
-+        type: u32
-+      -
-+        name: rtax-quickack
-+        type: u32
-+      -
-+        name: rtax-cc-algo
-+        type: string
-+      -
-+        name: rtax-fastopen-no-cookie
-+        type: u32
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: getroute
-+      doc: Dump route information.
-+      attribute-set: route-attrs
-+      fixed-header: rtmsg
-+      do:
-+        request:
-+          value: 26
-+          attributes:
-+            - rtm-family
-+            - rta-src
-+            - rtm-src-len
-+            - rta-dst
-+            - rtm-dst-len
-+            - rta-iif
-+            - rta-oif
-+            - rta-ip-proto
-+            - rta-sport
-+            - rta-dport
-+            - rta-mark
-+            - rta-uid
-+        reply:
-+          value: 24
-+          attributes: &all-route-attrs
-+            - rtm-family
-+            - rtm-dst-len
-+            - rtm-src-len
-+            - rtm-tos
-+            - rtm-table
-+            - rtm-protocol
-+            - rtm-scope
-+            - rtm-type
-+            - rtm-flags
-+            - rta-dst
-+            - rta-src
-+            - rta-iif
-+            - rta-oif
-+            - rta-gateway
-+            - rta-priority
-+            - rta-prefsrc
-+            - rta-metrics
-+            - rta-multipath
-+            - rta-flow
-+            - rta-cacheinfo
-+            - rta-table
-+            - rta-mark
-+            - rta-mfc-stats
-+            - rta-via
-+            - rta-newdst
-+            - rta-pref
-+            - rta-encap-type
-+            - rta-encap
-+            - rta-expires
-+            - rta-pad
-+            - rta-uid
-+            - rta-ttl-propagate
-+            - rta-ip-proto
-+            - rta-sport
-+            - rta-dport
-+            - rta-nh-id
-+      dump:
-+        request:
-+          value: 26
-+          attributes:
-+            - rtm-family
-+        reply:
-+          value: 24
-+          attributes: *all-route-attrs
-+    -
-+      name: newroute
-+      doc: Create a new route
-+      attribute-set: route-attrs
-+      fixed-header: rtmsg
-+      do:
-+        request:
-+          value: 24
-+          attributes: *all-route-attrs
-+    -
-+      name: delroute
-+      doc: Delete an existing route
-+      attribute-set: route-attrs
-+      fixed-header: rtmsg
-+      do:
-+        request:
-+          value: 25
-+          attributes: *all-route-attrs
--- 
-2.41.0
-
+Jason
 
