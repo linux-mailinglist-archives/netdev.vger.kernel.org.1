@@ -1,72 +1,104 @@
-Return-Path: <netdev+bounces-30062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 204A0785C33
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:35:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 129BC785C4F
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 17:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4745F1C20C9A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:35:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC881C20CE7
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 15:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E7FC8D4;
-	Wed, 23 Aug 2023 15:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38940C8EB;
+	Wed, 23 Aug 2023 15:43:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FC4C2F8
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 15:35:51 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD39BE4E
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 08:35:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ErDNAUCocKSLt+qkkGIfIJzWEGJFTz9fQ02v0TDuewA=; b=BUM3vf4X+FMLcRF3MINmuGl0WW
-	8kdcnxfmyooNn8G7t+mD2K/cL3aV9eT9lazqN2nD0Yh6ATft/bIfOGNRijOxjC2hjOryTHdPtnGT/
-	w3q9OjzV/jbNJaCupMu1zsVxfDHzHs9D6CzLa/8njgtE5h/Y0v7ZeSz48r38XddX7F9Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qYptT-004u1X-BH; Wed, 23 Aug 2023 17:35:39 +0200
-Date: Wed, 23 Aug 2023 17:35:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, Jose.Abreu@synopsys.com,
-	rmk+kernel@armlinux.org.uk, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 7/8] net: txgbe: support copper NIC with
- external PHY
-Message-ID: <7d999689-cea9-4e66-8807-a04eb9ad4cb5@lunn.ch>
-References: <20230823061935.415804-1-jiawenwu@trustnetic.com>
- <20230823061935.415804-8-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD022905;
+	Wed, 23 Aug 2023 15:43:47 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A893BE70;
+	Wed, 23 Aug 2023 08:43:46 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bbad32bc79so96600311fa.0;
+        Wed, 23 Aug 2023 08:43:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692805425; x=1693410225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xE3wqcNpOoc+MtIIQwAoQiiefvXPr9F892w05vM/6pQ=;
+        b=AjCtHzz+Ta8GojfWKrW1Ohnoc3kyEMJk+YoAbn3pNEBupc+aqqUotQKv/8VdVYkcSF
+         +9PNwqPdWhXLbdG6iLi+xSUR3dpOfWaIOTXK7nUmtfxcyiDMEcoIwy4ct4VUP826vqkz
+         SKyMIERNFzlniiMf3Dx1KSdShGNrVRS8WrsctHR/nkCH2kyvyOAWoYop56FfSL7Do84m
+         OuSlSSc2XRNeG/L5RPUgRx2yPRZcuZ5LxR1iADhR2ZzeMBO+NuY93zQKbGkZQa49JGgc
+         vwow9yAy44WBUiK9O1rQ020or9gq0QFj9knbwn8J0KVWi41NDV0wfLu5Bo0XQyCZUSdO
+         DqLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692805425; x=1693410225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xE3wqcNpOoc+MtIIQwAoQiiefvXPr9F892w05vM/6pQ=;
+        b=QXTbxyezpzuyVnls5GoddjIMINHOvSrGi7hsXVyADVA275PvMpw0IhF7st56MYcZsM
+         KTVm5rFvkdV7Jx5o8uSsdbkftWmKWxKG9Fda8JYXHYITaETXAcwrIBiz+RPTMaaJnNZt
+         fsAqimiPPv64Penc8uGopY3gXgLrYTBKloqXZEmvdGuFzrBgj98pSUMpa67wLUzW/HyS
+         KEMiaA5W5M2E44BAJraRTrVPggAnMS9BP5LNGBLG3ClnEcyXCHII04k/NDWLFxlAFroL
+         Wa/WKXyAP8lCNvsTQqYIT88s+oOThPT1iWxoFNhYTIa23k9zGr8/XUIHrmhrLBkDyTq6
+         aPhg==
+X-Gm-Message-State: AOJu0YwPSOfgnYsHKXVbRIZPvJZt8m6TI3Jgsj1tHSeBh+aGKGvb5jUe
+	ghvcXE8aOc4DEKnTr4TFh4xxvZ5ozw/MlqHR/1u5iAUSZmk=
+X-Google-Smtp-Source: AGHT+IFEYRGc3cfoxgyvkJZPI8pZjaALi3OmFHtpEZ4fhakp/Ch1aLuu7pp08XCD1RccnEUr2Zp3vcWDJW8qNhy9c6c=
+X-Received: by 2002:a2e:9bc7:0:b0:2bb:99fa:1772 with SMTP id
+ w7-20020a2e9bc7000000b002bb99fa1772mr9732655ljj.49.1692805424716; Wed, 23 Aug
+ 2023 08:43:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230823061935.415804-8-jiawenwu@trustnetic.com>
+References: <20230823145346.1462819-1-toke@redhat.com>
+In-Reply-To: <20230823145346.1462819-1-toke@redhat.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 23 Aug 2023 08:43:33 -0700
+Message-ID: <CAADnVQ+rD5S_k81fM82yaK9EEG3yWtEenpA15y9ujvJZVk2n6A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 0/6] samples/bpf: Remove unmaintained XDP
+ sample utilities
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +static int txgbe_phy_read(struct mii_bus *bus, int phy_addr,
-> +			  int devnum, int regnum)
+On Wed, Aug 23, 2023 at 7:54=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
+oke@redhat.com> wrote:
+>
+> The samples/bpf directory in the kernel tree started out as a way of show=
+casing
+> different aspects of BPF functionality by writing small utility programs =
+for
+> each feature. However, as the BPF subsystem has matured, the preferred wa=
+y of
+> including userspace code with a feature has become the BPF selftests, whi=
+ch also
+> have the benefit of being consistently run as part of the BPF CI system.
 
-There is a general pattern to use the postfix _c45 for the method that
-implements C45 access. Not a must, just a nice to have.
+Did you miss my previous email?
 
-Does this bus master not support C22 at all?
+---
+Could you add this link with details to samples/bpf/README.rst,
+so that folks know where to look for them?
 
-     Andrew
+Other than that the set makes sense to me.
+---
 
