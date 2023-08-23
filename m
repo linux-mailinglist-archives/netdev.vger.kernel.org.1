@@ -1,232 +1,154 @@
-Return-Path: <netdev+bounces-29965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6696078564A
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:54:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5493D78564C
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 12:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB378281220
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 841A21C20BF8
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 10:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34BBAD4B;
-	Wed, 23 Aug 2023 10:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09166AD58;
+	Wed, 23 Aug 2023 10:54:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54064C75
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:54:18 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162D719A;
-	Wed, 23 Aug 2023 03:54:17 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NAnB9r030951;
-	Wed, 23 Aug 2023 10:53:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=3eNJ1F1ZIh5qb5ABj3u6R40fpkitePvKxhd0FlU+G8s=;
- b=VKt8IydGFnohWH59XRysxy6TXiX7WNJup4ggmXgZsJgtwJ0A17CkWAmXdihvozm7b8b7
- RpfJB/mi8aDIlezw6SNvhk9occtvjPu8efnV7vSE/pWXbGTLRKpVvrsHx6qd7CneFaoy
- i7RUQlIHzHGCSFEhkbo99IHpGeRRV4LHo7w0KNQyKD8D6uvtr5WBHoitFTotQ69fhAdn
- wUu2uKRyEo30lmgj58dFk9lTzaGFc1sPjA+XFMEhviWb6/bloLfVQUKmIC2d+t2OLwQ3
- SkuttcS/e3Or3U9TfQrcjQfiqMZW2oy37iHOUaLQULIq0b1UMVu2gN3yFnI+GqrIEqER hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sngpfr1qa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Aug 2023 10:53:11 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37NAnGSX031081;
-	Wed, 23 Aug 2023 10:53:10 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sngpfr1pt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Aug 2023 10:53:10 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37N9Ujs5020144;
-	Wed, 23 Aug 2023 10:53:09 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn22adnqx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Aug 2023 10:53:08 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37NAr6TJ45089220
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 23 Aug 2023 10:53:06 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1494B2004D;
-	Wed, 23 Aug 2023 10:53:06 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B274420040;
-	Wed, 23 Aug 2023 10:53:03 +0000 (GMT)
-Received: from [9.171.92.225] (unknown [9.171.92.225])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 23 Aug 2023 10:53:03 +0000 (GMT)
-Message-ID: <67ec0e36908b7e6d7a6eba642ec76ef87d0d4945.camel@linux.ibm.com>
-Subject: Re: [PATCH v11 4/6] iommu/s390: Force ISM devices to use
- IOMMU_DOMAIN_DMA
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Gerd Bayer <gbayer@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>,
-        Suravee Suthikulpanit
- <suravee.suthikulpanit@amd.com>,
-        Hector Martin <marcan@marcan.st>, Sven
- Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        David
- Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>, Andy
- Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad
- Dybcio <konrad.dybcio@linaro.org>,
-        Yong Wu <yong.wu@mediatek.com>,
-        Matthias
- Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>,
-        Gerald Schaefer
- <gerald.schaefer@linux.ibm.com>,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Baolin
- Wang <baolin.wang@linux.alibaba.com>,
-        Chunyan Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Thierry Reding
- <thierry.reding@gmail.com>,
-        Krishna Reddy <vdumpa@nvidia.com>,
-        Jonathan
- Hunter <jonathanh@nvidia.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux.dev, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
-Date: Wed, 23 Aug 2023 12:53:03 +0200
-In-Reply-To: <ba1e0b29-52e0-2fc0-2eb9-475735febacf@arm.com>
-References: <20230717-dma_iommu-v11-0-a7a0b83c355c@linux.ibm.com>
-	 <20230717-dma_iommu-v11-4-a7a0b83c355c@linux.ibm.com>
-	 <ba1e0b29-52e0-2fc0-2eb9-475735febacf@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F223A79D8
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 10:54:42 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0AFCD6;
+	Wed, 23 Aug 2023 03:54:41 -0700 (PDT)
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1692788079;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wmHgbHhEItbnaHrWyL/jeRkBYJl8ncNrJqVyvLd/saQ=;
+	b=anN/lNv5unmqi1nUqtab4bLJR5gSJp6iiya4k1viCB8W5eN5rKibFN+D/O4tjHTG7noX10
+	QfNlhQkp+FVRZTDNjIlSgUH17JOgj3RnkrXDqJVGAxNiB5i3f4XRk4ZUpFRlMIYfcjcGBV
+	CglhcxA4VGfS74j9Q2dOFPxs8jASarE1W1eqlY7XTj2WPcC5EHe4ZymV/sPNaVyIvVxmrc
+	DnlCKjt6CrPQXJLSFiMcGyXxt50Lfbg/wyoK8iHMatQ6EFOfNIbXKB3BDAIHPyihbUrnrD
+	zZJ3IPzSbLDlnP5m7IsBYeS2RqL/mGsQEz0/v/BCabrDitFuBTMe5PGuhzMk2Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1692788079;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wmHgbHhEItbnaHrWyL/jeRkBYJl8ncNrJqVyvLd/saQ=;
+	b=b6PFK7JQ1o0blushrjGnYwuctmmS3/8m0hKdIy2gBeF9gWizfyyBUPqxgB14N1B+W4iihu
+	PL9HJiiwCyKxLPBg==
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net-next] net: dsa: use capital "OR" for multiple
+ licenses in SPDX
+In-Reply-To: <601f8735-39ea-7579-0047-3d3358851339@linaro.org>
+References: <20230823085632.116725-1-krzysztof.kozlowski@linaro.org>
+ <87h6oq9k9d.fsf@kurt> <601f8735-39ea-7579-0047-3d3358851339@linaro.org>
+Date: Wed, 23 Aug 2023 12:54:37 +0200
+Message-ID: <87edju9ggi.fsf@kurt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Dn5I7UigftX5RBKQwAj9CDPxUIpK94FJ
-X-Proofpoint-GUID: X6PgzynOD1cJFA8yBLSkFvc2jrgZNG5R
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-23_06,2023-08-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 malwarescore=0
- spamscore=0 phishscore=0 adultscore=0 impostorscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2308100000 definitions=main-2308230096
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-08-18 at 20:10 +0100, Robin Murphy wrote:
-> On 2023-07-17 12:00, Niklas Schnelle wrote:
-> > ISM devices are virtual PCI devices used for cross-LPAR communication.
-> > Unlike real PCI devices ISM devices do not use the hardware IOMMU but
-> > inspects IOMMU translation tables directly on IOTLB flush (s390 RPCIT
-> > instruction).
-> >=20
-> > While ISM devices keep their DMA allocations static and only very rarel=
-y
-> > DMA unmap at all, For each IOTLB flush that occurs after unmap the ISM
-> > devices will inspect the area of the IOVA space indicated by the flush.
-> > This means that for the global IOTLB flushes used by the flush queue
-> > mechanism the entire IOVA space would be inspected. In principle this
-> > would be fine, albeit potentially unnecessarily slow, it turns out
-> > however that ISM devices are sensitive to seeing IOVA addresses that ar=
-e
-> > currently in use in the IOVA range being flushed. Seeing such in-use
-> > IOVA addresses will cause the ISM device to enter an error state and
-> > become unusable.
-> >=20
-> > Fix this by forcing IOMMU_DOMAIN_DMA to be used for ISM devices. This
-> > makes sure IOTLB flushes only cover IOVAs that have been unmapped and
-> > also restricts the range of the IOTLB flush potentially reducing latenc=
-y
-> > spikes.
->=20
-> Would it not be simpler to return false for IOMMU_CAP_DEFERRED_FLUSH for=
-=20
-> these devices?
->=20
-> Cheers,
-> Robin.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Nice idea thank you. This is indeed less code, basically just return
-zdev->pft !=3D PCI_FUNC_TYPE_ISM for the IOMMU_CAP_DEFERRED_FLUSH check.
-I think it's also semantically more clear in that we don't really care
-about the domain type but about not getting deferred flushes.
+On Wed Aug 23 2023, Krzysztof Kozlowski wrote:
+> On 23/08/2023 11:32, Kurt Kanzenbach wrote:
+>> On Wed Aug 23 2023, Krzysztof Kozlowski wrote:
+>>> Documentation/process/license-rules.rst and checkpatch expect the SPDX
+>>> identifier syntax for multiple licenses to use capital "OR".  Correct it
+>>> to keep consistent format and avoid copy-paste issues.
+>>>
+>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>>=20
+>> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+>>=20
+>> Side note: The SPDX spec in section D.2 says: "License expression
+>> operators (AND, OR and WITH) should be matched in a case-sensitive
+>> manner.". Should is not must. So I assume checkpatch and spdxcheck
+>> should handle both cases. Especially because:
+>>=20
+>> |linux (git)-[master] % git grep 'SPDX' | grep ' or ' | wc -l
+>> |370
+>>=20
+>
+> But "should" denotes preferred rule:
+
+Yes, of course :).
+
+You mentioned checkpatch. But checkpatch doesn't warn about it. Or does
+it?=20
+
+|linux (git)-[master] % ./scripts/checkpatch.pl -- drivers/net/dsa/hirschma=
+nn/hellcreek.h
+|total: 0 errors, 0 warnings, 0 checks, 321 lines checked
+|
+|drivers/net/dsa/hirschmann/hellcreek.h has no obvious style problems and
+|is ready for submission.
+
+What about something like this?
+
+|linux (git)-[master*] % ./scripts/checkpatch.pl -- drivers/net/dsa/hirschm=
+ann/hellcreek.h
+|WARNING: License expression operators (AND, OR, WITH) should be upper case
+|#1: FILE: drivers/net/dsa/hirschmann/hellcreek.h:1:
+|+/* SPDX-License-Identifier: (GPL-2.0 or MIT) */
+|
+|total: 0 errors, 1 warnings, 0 checks, 321 lines checked
+|
+|NOTE: For some of the reported defects, checkpatch may be able to
+|      mechanically convert to the typical style using --fix or --fix-inpla=
+ce.
+|
+|drivers/net/dsa/hirschmann/hellcreek.h has style problems, please review.
+|
+|NOTE: If any of the errors are false positives, please report
+|      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 Thanks,
-Niklas
+Kurt
 
->=20
-> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> > ---
-> >   drivers/iommu/s390-iommu.c | 10 ++++++++++
-> >   1 file changed, 10 insertions(+)
-> >=20
-> > diff --git a/drivers/iommu/s390-iommu.c b/drivers/iommu/s390-iommu.c
-> > index f6d6c60e5634..020cc538e4c4 100644
-> > --- a/drivers/iommu/s390-iommu.c
-> > +++ b/drivers/iommu/s390-iommu.c
-> > @@ -710,6 +710,15 @@ struct zpci_iommu_ctrs *zpci_get_iommu_ctrs(struct=
- zpci_dev *zdev)
-> >   	return &zdev->s390_domain->ctrs;
-> >   }
-> >  =20
-> > +static int s390_iommu_def_domain_type(struct device *dev)
-> > +{
-> > +	struct zpci_dev *zdev =3D to_zpci_dev(dev);
-> > +
-> > +	if (zdev->pft =3D=3D PCI_FUNC_TYPE_ISM)
-> > +		return IOMMU_DOMAIN_DMA;
-> > +	return 0;
-> > +}
-> > +
-> >   int zpci_init_iommu(struct zpci_dev *zdev)
-> >   {
-> >   	u64 aperture_size;
-> > @@ -789,6 +798,7 @@ static const struct iommu_ops s390_iommu_ops =3D {
-> >   	.probe_device =3D s390_iommu_probe_device,
-> >   	.probe_finalize =3D s390_iommu_probe_finalize,
-> >   	.release_device =3D s390_iommu_release_device,
-> > +	.def_domain_type =3D s390_iommu_def_domain_type,
-> >   	.device_group =3D generic_device_group,
-> >   	.pgsize_bitmap =3D SZ_4K,
-> >   	.get_resv_regions =3D s390_iommu_get_resv_regions,
-> >=20
->=20
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmTl5W4THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgkKfD/9p7DMXuJxhJWoePn8AcmZQDBL7HlAk
+4NgAljOSk5P5TAmVWUPRf8EVP2y/4aVDnmq6G0Qg84F5xTMuwLN1Mfkp+lV8HARN
+ocAVhiCOR1f/EU2U/MuHiqPMoQwq1eh+9AZiTjXqQCtEZPT4sPKdBKyIxl80eBmo
+/onDChcy8CVsGqxXfr9IsllGwBjSppdXTmxUPK4sHW1abnEvmvJ591orfwzCdoX0
+htUrY2o2aH2OVFgJmINlHgAE2JU3hnBJeUGT0L69HtACdyUeYjjXsAFMA3f2NeJ3
+Ff8muRbSK6TCka7vh0GAmXXjsq/Bw7i02wwfe8JJNNnTUxXIKp+/APAm0Np9g0vC
+jSIIwCimO0C6TjPRR/SDggf/lXltCzuMaYzRqkQOHFYfusQF/hSGV6ue6Xw7o+y+
+fl58F6qZ81Ga8iv8FjxqWr/ujCU3xuyZocxstZ9uap5D3dJMlptGdhuCOy83Nb+c
+AZJVjmbpjeRl5NmBV/mFs8aMBuEvDDEtSTI52VP/Y+iQRDxe34iofJ3iXitcu28V
+ehbQiTiS5VqfPUQqe/+50+GCYgzS5rcIvJG4+7nLWR9NTFxdcBLXzevIaN0WS7NS
+IL1YTlxvsrQ2Ho4dvxD7ngfTPerrywk29RO8hF5G2Dxowc77tEgmwWJhvqg+FWtO
+mc15jJSm9KbbHg==
+=gNOL
+-----END PGP SIGNATURE-----
+--=-=-=--
 
