@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-30144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1A7C786356
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 00:23:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0D2786357
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 00:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D15231C20D48
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 22:23:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D6C02813A3
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 22:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BABB200B8;
-	Wed, 23 Aug 2023 22:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E346F200BA;
+	Wed, 23 Aug 2023 22:25:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F69FBE7
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 22:23:53 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE0310E4
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 15:23:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE94DFBE7
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 22:25:11 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE62810C4;
+	Wed, 23 Aug 2023 15:25:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692829425; x=1724365425;
+  t=1692829509; x=1724365509;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=8J6NIgA/Hz2Aq6C39Rs8quFhuCC8BI14bvBU+ITueEc=;
-  b=UDLudshsg18uWP2QkRtFcWBI+vCjMc8jVazVggvqlQbqYN+WLfg1i0w9
-   daGCQ3WQKd/jEkH7pdkkJ3K4Ofuskjwmx1Zk8CRt2XKH8Br+9Pq+Bsgcz
-   J9ABwUeKKkBWP8j6zRLKJcISZkclT0ttkcmlV0YfUtMQRg/3OY8FuL5HS
-   kLJoR/BjQZLW7sb5cuVoDnWL5HyVOwJzG/hYXt7tEKYRIqX3Z6r9yI12/
-   ByDvDgNZKGYoMerxlISJRs1fMKIM8FOWH/AS7exb6PSiRY6VK3wVbwFLt
-   JaD4DVcHONVVUk0yDNLfKh7ZJJXPut/meuhjgzCk+Jl0AS1ZzVlWRcS7n
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="378039197"
+  bh=rBHmLm+VrHCX6fl7IOnxTfCOB5RIZ1f6KnBvcLh4m5Y=;
+  b=Ygle0JLXdQdSGX6DBDUIOKL7wQKSDZdDCK+BnTsa4HBPlYv4UyFZgArp
+   0au//edbOLEkDuf/ewihdn9XX8CAFKwCkW0SiASnL98IbSh2n+zoitrm/
+   9v6I7+afnPKQDk7UbAo83vwhLvyc04Ik3HSYSbuChndujCrWjF1ylb2bG
+   5FkIfSp6KyPSfS3D42tOP3nLMypE0ap6UowYGZlZ3DUHy5lugtuCV/aft
+   X2Nm/VeRKqXeST6UuX9S0M8zJpUyTS5+ss0VtU3geH0KHXF04TL5dmRpg
+   /czajqOdlnEqyYuYl9AAsWaunAleLlDj4vMhrlhVZGPD8hick1Ct6C51S
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="371697540"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="378039197"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 15:23:45 -0700
+   d="scan'208";a="371697540"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 15:25:09 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="686629423"
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="826894319"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="686629423"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga003.jf.intel.com with ESMTP; 23 Aug 2023 15:23:45 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="scan'208";a="826894319"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by FMSMGA003.fm.intel.com with ESMTP; 23 Aug 2023 15:25:08 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 15:23:44 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ 15.1.2507.27; Wed, 23 Aug 2023 15:25:08 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 15:23:44 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2507.27; Wed, 23 Aug 2023 15:25:07 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 15:23:44 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 15:25:07 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 23 Aug 2023 15:23:43 -0700
+ 15.1.2507.27; Wed, 23 Aug 2023 15:25:07 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PGsn7AOXbpPzUna8kk8x5o0pajbquZ8dAxjKbO91s/1Q5agLQR6RN/Ka1HfzWXoQHFHDoFc2nywVEYrPckJgP0V7E4LUljaOvsLj3D25xESHiWNYwkRp8MTzt9RPnAHrcwpJTu3sWki5CvjlqXFnjPKGpbE63UpxNSpdDPZ1oXQhfsLoI2OCnw26qzjtJXBFwtqPYoHE5NeqfG0yzluoM3UK3lMRzsWrvIHQbPnUhSuptRm2iAI8NhhtklDtmAa4xPRsNPVqbBBbL9lNraIumN9ebXEVdaowhDuvi0GVdl5o+a8gamp/sFRB62tTj8s2wEbU9pZ+VJp/CBtT9l9sKA==
+ b=AArgsN6nhz9Gm8jZxq4dL+bgXElUlM8L0Be0th08la3sV2He4Ch6+5LIQLTT0snHgXblac9lRJPk30XIbYpV7CoKKAYpYfZUINMjMM//RIyZKQKqZSuTjY3+7v/VfL3+feBLVlpODKki9DTv4lUqsQJeGT9bwHZ5bCdW8QwlZAGXonhQf7WrnSFWW1fX1Zm7F2yY7Q31TIdkQijz5ww5iaBY6Gdv4/kLSUpi5fECjGdyRt8gK+RDIgnjYq1vP72FOGO3BRvfgHISX8G+mcpyiBx66hyqpG62gvT/ZiDBV/XtGn5LBgeF6qlN8WXNB5LKbYfSlhByxs1D46aWf0wG9A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gRPCvve/nIpDsJ62L0J8g3NJgnctNtIchOZBQvNJ/NY=;
- b=T6HQFhZlKV4h2ePaVVWmWUPDAYm3j2RKehikaIdz1Zp+RML1hWH/m7V3U6E+4ZiCPGF2A6qmshX1w1uHWlcDAfGen0w9BdRmbnkP0LsrpTcnJRO4NqEQPa36BqoFi2I6HBGqnfYUAr+VjyuDFrJhzVUUSOs7QorUDBgniTWioLGIIHauoZk/qYUoz/KmGcV6Oo6odvTglxnyoL62GhBUde6wmF1Sp5y+TxOS7zhjz2QuuOqp7n7WDKHP3+wbFzyrNZpd6WzHgXPer7HvxRhWxVmsBvIJO/fLRAOpElwzln58+pLZY5OdBLxsJHewvO121q7SYmAPEEZ0Fa+X1RVgrw==
+ bh=w6x/gtk8Ze616cqSGK90Oi4nHCGGyO+BIdguw03+Fl4=;
+ b=HXxuLU7858OnIN8eCYhn+im2uN7RgqiN0SQGIjXa8IJFflorHwpeqI3NfHuryh/RGE94c3BOz4GuZQsj5SfjMO5CdGSfBrxkXi3YbUWMybSjkboYTyetL9VxQ8Q1eJzMc3fCLuM12ucwmvp+Vk12NE8Lr7/qgL5asZHyVkbFmiefj9orGKIMlFfg6a9KfCKkgEvo7bnyo9vGFDWUfRypyZeH1rSNUHDHFJQWyVBP/hL4NE8Hd6fbVwCryP8BRWgJigmVkGPEW2/Ke0bYl4y6OibcESxjCySOU+cErjZrNvQDgP7pAkft45j1N1hXBVX1d3rQG/WrUOJ9iiYgGj232Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -77,32 +77,31 @@ Received: from CO6PR11MB5636.namprd11.prod.outlook.com (2603:10b6:5:357::21)
  by SA1PR11MB6990.namprd11.prod.outlook.com (2603:10b6:806:2b9::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.25; Wed, 23 Aug
- 2023 22:23:41 +0000
+ 2023 22:25:05 +0000
 Received: from CO6PR11MB5636.namprd11.prod.outlook.com
  ([fe80::a184:2cd6:51a5:448f]) by CO6PR11MB5636.namprd11.prod.outlook.com
  ([fe80::a184:2cd6:51a5:448f%7]) with mapi id 15.20.6699.025; Wed, 23 Aug 2023
- 22:23:41 +0000
-Message-ID: <c1707845-af5b-7967-514a-102818afc6da@intel.com>
-Date: Wed, 23 Aug 2023 15:23:38 -0700
+ 22:25:05 +0000
+Message-ID: <1e3bf80b-7b8f-418d-3d2d-26dfe2556c75@intel.com>
+Date: Wed, 23 Aug 2023 15:25:02 -0700
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v3 2/5] ice: configure FW logging
-To: Leon Romanovsky <leon@kernel.org>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <netdev@vger.kernel.org>, <jacob.e.keller@intel.com>,
-	<horms@kernel.org>, Pucha Himasekhar Reddy
-	<himasekharx.reddy.pucha@intel.com>
-References: <20230815165750.2789609-1-anthony.l.nguyen@intel.com>
- <20230815165750.2789609-3-anthony.l.nguyen@intel.com>
- <20230815183854.GU22185@unreal>
+Subject: Re: [PATCH net-next v3 5/5] ice: add documentation for FW logging
 Content-Language: en-US
+To: Randy Dunlap <rdunlap@infradead.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>
+CC: <jacob.e.keller@intel.com>, <horms@kernel.org>, <corbet@lwn.net>,
+	<linux-doc@vger.kernel.org>
+References: <20230815165750.2789609-1-anthony.l.nguyen@intel.com>
+ <20230815165750.2789609-6-anthony.l.nguyen@intel.com>
+ <ae2b7002-1230-95a1-33e8-91b1898a33ad@infradead.org>
 From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
-In-Reply-To: <20230815183854.GU22185@unreal>
+In-Reply-To: <ae2b7002-1230-95a1-33e8-91b1898a33ad@infradead.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR07CA0031.namprd07.prod.outlook.com
- (2603:10b6:a02:bc::44) To CO6PR11MB5636.namprd11.prod.outlook.com
+X-ClientProxiedBy: SJ0PR13CA0149.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::34) To CO6PR11MB5636.namprd11.prod.outlook.com
  (2603:10b6:5:357::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -112,246 +111,243 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CO6PR11MB5636:EE_|SA1PR11MB6990:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3293a065-e0f2-46da-dbe5-08dba4279ada
+X-MS-Office365-Filtering-Correlation-Id: 9c23849b-7f05-4765-e677-08dba427ccca
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mw7om+8PPZBKr4xWFCQ8Q/fDp/6v2ReFmKE1lCAinrD+SZVHYbfzzA9x8SIU3ow4IcfAsoW679IuX5pxIaFGbkiHebz2LQGEaFSu2/PbRY/Xjbz2/NF7srbKaVQtwUYDTZtoMowKIN9blWjYUv3x1o2WBvpAzxIM2yNQUDZ1gOgsMKB+juV3HSn90UimZ/5HtkADXk6nGjxYuKQqTAvAw0DdoeDLeof1RfwzdamzFdqBQ+5yu6ZRnN1eCalDLk3uaiS1DKMUtYpHQc62kkVfSHAfbw5CoYMegnMSaU75wFGHFJ2mU0xSHp0yxxpu8ND/0EtygV4xjrwZG8R4mEF0MoeY6INuZblEicPKsGmOwadJaEcuH58uzDcNjJxLGG4dCNNheTKdxKNEDf9/TPm+zk5DuKI2sx1/9yH1VIiNACJuu1hziGWDNZiXA+S2SCCkEBsu9uvMkd9COOhc0thrKdQysxRCY/ox2WuEsjFYh+3m3xyhu6NFQ7O8eBY+aWBQiU59+PCeYXYXENjpWER3nK8LqLBxJXPaEvEw9LtAnmzVPc6ky7ZhbGyy0A5nFpqFA7ka2pKM3VwYgpe+f70yd5lM/vYfV5GuHU18M6dqiQ2oPouEIrwB/3HV1rsabWMc7PvqOiuuLKI89i6OIzItFQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR11MB5636.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(136003)(396003)(346002)(1800799009)(186009)(451199024)(6666004)(53546011)(2616005)(6486002)(6506007)(107886003)(6512007)(86362001)(66556008)(31696002)(5660300002)(4326008)(2906002)(110136005)(38100700002)(82960400001)(6636002)(8676002)(66946007)(8936002)(66476007)(36756003)(41300700001)(316002)(478600001)(83380400001)(31686004)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: e6SLqkkZ98gV5O2Og90wEU1nFN3TUDTe4CnqzU+jJMsp0loBQOdrdgPa1f825R/HZSHG60j0i/5rfR+Q4rdY3ujUEMH0rhStqrtcx/BcDHPW8+grYxrApAS+jgjgUJ/3Rx++IJ5gUgGRbF388aGibp4wQQm3Mgk+12DEZXG1lmMXaX9N5pnNHfuhFL05k+TtIBHFs+MHBZE6u95JUxxpxo35ECAMdusYqShOd9Zjp4A75BR0zDxAKdm8NbhVgpjp9kQjllXbJqwroolOKhsoKWAplbIvpgXrDVl5PACWwnwyOooFRjIfmZAMvEK8aO9q0oWzodjMm3DLaSR1B1hqzHRKWN8Zj3D7NY8ridmHiES6ygZutGhwt6dZIdsfmjoVY3fwlw3ekcN8zMb0A+XHrr1RK6Ftzqg1pf1FR4GThVC572OoeKH75Q7uQFLzGD41+5i8nlC5zFJ140RJ5w2wLfLpfC+rDrAG4RkyVjP+gDXFl4i9D9/SvtLDUrzdv9RkmWJhUMeBbC4DeACtgOAg2zZzqJsmyWs7mzf5kdUv027tqXDRzAEtS7Ixamwt4A+gE5b0ShhAiPbgflgvZUnnQbM/uv6QULdwxz0DhfRCApJO8KDZv++SBcNNH4JfbwMa9p7/ihuFqr4tZ9dGa6evZQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR11MB5636.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(136003)(396003)(346002)(1800799009)(186009)(451199024)(6666004)(53546011)(2616005)(6486002)(6506007)(6512007)(86362001)(66556008)(31696002)(5660300002)(4326008)(2906002)(110136005)(38100700002)(82960400001)(8676002)(66946007)(8936002)(66476007)(36756003)(41300700001)(316002)(478600001)(83380400001)(31686004)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ekEyY051a09oSkhSb2NIQ2lwdzRMZXI1NXFjUi90aWtqQWMvSVhBbzcyR1ZT?=
- =?utf-8?B?K3dBWFVFd3hGQlF5VzJzVUEzeFF0MUQwelJjamxvMTRiSXhsOW8wUjU1TCsx?=
- =?utf-8?B?TGxFR1hKaXhWaWJyMzZabThTckltUjErODFyK1NrZmdkTzlyVFpCNCs0bkIv?=
- =?utf-8?B?VlY4RDNlclhUT1VPOWtQMXF6djJkV3NWS3lvZEMxN3B1WnYra0tkdkJYb2Fv?=
- =?utf-8?B?djQreGVZdTVhQ0x1L1ZRRmxnQUNseTdYK3kzdWIwV0dkVnJLZUh3ZW9rOEpa?=
- =?utf-8?B?cGU2T243ZDRheDJiODdFbE0zTyt3ZFp0S21NWWlidWNSaCtYcHNQaFIxdjk1?=
- =?utf-8?B?blFzVGRGSEpZMno3SldHRUNleXJZb0JCM1dQNVFQanFBdVdKQUtDenpXMDBR?=
- =?utf-8?B?VWR5OXNkNE5hWG5kN011Q3hWQjMxQVFCZE9GYW9leXAxY0NIb2ZmZDFRLzJy?=
- =?utf-8?B?MzltbzB4SG5VSHplVE9MS1k4d2FPNVlRS3RFUjNQY1pvZVZZQ3FpV0ZpYnRi?=
- =?utf-8?B?KzF4dkszcEZKVG5pcFJLOHEyTjJzTklTQ0pHWUxLNEtCZ21QajlKelNyTCt5?=
- =?utf-8?B?MGZSeXYxV20xdGZwOXc2Y0dDbHlmUGVvZVJCYTZwMGE3aCtQNVp1YVF1bUI5?=
- =?utf-8?B?c2I2WEhkOTViekk5YlRhQzhxcUZKSi9JTkhNUHVBenpra0JhdGxBSDRkM2pv?=
- =?utf-8?B?WWNFU0dDRWo3cmRDTkpCNjEyOVhONmp2Y0x0OEUvM3huclM1aStYTTFaak82?=
- =?utf-8?B?UmI1TXdkNjFORkdjcjRSMkRiMGlGNzc0K1ZKcVJGeWIzZ1NrWWIybktlMEU4?=
- =?utf-8?B?dDdQZzZKbE0zaUpGd05meU9WN29md2g5aXFibnpHelVZQVpvVTJrVTF1aUlx?=
- =?utf-8?B?Q2VmOTd5eTNkQnhwRFhramdWaWFUSTR3UG91Z1ZtWlZVVDVMQUdUamhINUdi?=
- =?utf-8?B?WWlZd1h6UGllTzc2MEpyNGJHSFdvWDRHcDYyM2RVMjhXUTdJU1creE1LbTFj?=
- =?utf-8?B?eDI5d1NKM3gwUHhrQlZWaXlMVXdEY21SZzFVSGpmemlQRW5DOTB3SUtnQlBj?=
- =?utf-8?B?Zm5CNkh2L0FXMmN4Q0E4S2RuRVltQXVBeUhJclJKQkF0QjM2NXBPa2UyVnFX?=
- =?utf-8?B?Ukl5Q05CZDI5aUpETzNPejcvbURNM1hHRGw4NGdRNUJla04xTUlyVUJoeFY1?=
- =?utf-8?B?OFcwbFk3SG51ekdXTExkdlhGYy9Kd01ldXE2ODV6K2ZiNEk5bnk1aXlYTVBW?=
- =?utf-8?B?dG96c2tta2QyUHN1K3NLUDQxWTVsYnROSEZBVjBHMHFUbGNrQnAzNjB4OGIz?=
- =?utf-8?B?L3JIa1o1ZExYRlBIbzZtbDI0bStKUnc0UWRnYlN0aEwyQmdzYTg5T1lBWDRr?=
- =?utf-8?B?Q3orcm92bml6Vzh2ODhhWjhvaXBWRXhNTlBESzBPYlhDMHNRekRlM0dRK3Iy?=
- =?utf-8?B?VkdDU3ZYZU9TdWRZRUt6SUhCeHkrTXBDNmNaVmt0RElXMVlGa0dld2hRSWRU?=
- =?utf-8?B?Sk54b0RkUkhlN2RHbEtUdlZBY2VsTUlRVnhET0VzSHZPMnMzSFJ1T1Nzck9G?=
- =?utf-8?B?UTltcVludk12SzAxNjIvaFdRS242OElMT1FtVVpyNjhIdlNFcGZWWE1QbEpt?=
- =?utf-8?B?dTROVzZzdzJMOTRBWE5BSXhTRkJNb3IyRytYRUxEeG11Z3ZJU2hVem9QTVJX?=
- =?utf-8?B?Qy9hbmlIY0V3Q2NIWjNvTkRsTm1BdG81b1pqenRGaTRyRmM5UGNETzVtb0N4?=
- =?utf-8?B?SEUzajI4MDRyeHEzdzlPdFg1ems5M24ySXVDSS8zV1ZIQ1BxcDdsUHpwaWE4?=
- =?utf-8?B?RC84Tzl3MEVZbk1lNStKVnh1elAwZ2FmV3pQRlRwOGhTZXZnUU0xRkljekNG?=
- =?utf-8?B?Q3lIZDdUTG9GbnEyT3QrQkZ3V09zNUVpcUczTEZaZEFsbEtwQ3B2QnpQRUpK?=
- =?utf-8?B?ZEllUVVtMEpCM0RBcDlDTThSa3dxaHIrNGdWbjVUZ2dLQWF2NENjSm1ERThD?=
- =?utf-8?B?eUl5YjZ4QUlxbFB1Y3F6bk12d0tRNlF6SG5COGxNZ1FYYjZ5TDcrMFNJSUVx?=
- =?utf-8?B?UTd0T2dHTmJYUmZOTHhJUmp5cHFLcmM5RHZqa0FJTFlTR0Zzd1R3cElqdHZF?=
- =?utf-8?B?N2FWUTdUNkd4TmkxRXRHRHBYSnU0L2x1S3FxT2RxT3AzVlJ6VEpiTXhUVHpn?=
- =?utf-8?B?OFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3293a065-e0f2-46da-dbe5-08dba4279ada
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SjZoanBwNjJ3YVJkdTRYeDRaRnBBbitzdHdmK3JNallLeWJpYUVDU0djcWJy?=
+ =?utf-8?B?LzVvNFVROVp5L05CM2tSalZjV0lsdDhjcUNHOElvcnFoODA4Zm1RbHh0UGNn?=
+ =?utf-8?B?TmJMRWM5R3pUdlhPUUVOYjQwSnlCcjUwbW9uY0V5TmFETjJLY3lobnNlVTlY?=
+ =?utf-8?B?ZkNCcmk4L2REZmY0Z2ovc2NBa1pEVFllZnFGWXBMK0RtaVNZSDU1WkFSaU1m?=
+ =?utf-8?B?REdVcmRFZDNERUZLYS8yMGZDd0hjV2VkYmhwbXJiM3Q2Yk9Ob3UrZ3BLTS9j?=
+ =?utf-8?B?SHdSL3RRb05FKzl6bGQ5UmxxOWowQXJHT2pCbHpqcUppQmVLazlndXdZNnRp?=
+ =?utf-8?B?ZUZpVElFMUtqaWZReGZFUWptWlY0QkJ2QU1sZ0h2elRSOGVTQkFWaXV4cVZC?=
+ =?utf-8?B?ZHNUV3JVaEltRmdKZDkrYndsV1EwWFhtWTlVUkhMNW82aHlOblpybGNENlRX?=
+ =?utf-8?B?TFZKbi92UndqbXNTQm5vNEpvYlJ3RjYwNUYxbTZCaklRMHVrWVlWMnRlWUpI?=
+ =?utf-8?B?OTNRVkQzWjc3ZHExVlM1NWJDUkhGaGZUNmpZb25STU12QnoveENneHpiTy9i?=
+ =?utf-8?B?ZlVHVDg1blRiaVpmU21sL0RtYUNmdkx0cHorK2NnTEp0SEJzU3hRakhtdFRN?=
+ =?utf-8?B?bFdtMWsxSW1FdnVSQWordExrd0JBWjVqcVJiWW9OVTREd2NYV0J6S0FsZEEz?=
+ =?utf-8?B?WklianZXV0srSWNZRTgwN1BENTBiWDkzL2JLTDl3VWFnYXBuOG12WXpJMkkr?=
+ =?utf-8?B?RHcweVllMlo2YWdkb0dJZ1NjMUV0SlJLMUJKNzV6ZTIzVjZKVUUxczR3UnNI?=
+ =?utf-8?B?Z2Q4eWIxYUo2L2FoL09NVzZ3V2Y3VGtYaHJMK0RDVy9LN1I1YnFsM2tNVUlW?=
+ =?utf-8?B?SXUxL2JNdGFPRnZ4ZHZ6UkVNOGtHeXI1c3ZmbVY2K0ZBTFRZN1FTUTc5VnVO?=
+ =?utf-8?B?Mk50ZERpeERlRy9MSzBCOXM0TVVYTVoybHRkNkZaME0vbS9rblI4REhyWURq?=
+ =?utf-8?B?Nkhyb3VWaTJnbURuc0lWNzEyT0xzNlFRekk2QjE4dzRoUVFQaWUyK2xLZUNT?=
+ =?utf-8?B?MGFhL3FVUjRDNVEvTlB1RHBqcURkdGNqTjFjOEg2MDJvaExiVTJEenJ2Umps?=
+ =?utf-8?B?dDlGckVUY2pjVHh2NEpkM0hzdHViU2lUUC9xN0NibEVEbURuUFo0Q2xDWTYy?=
+ =?utf-8?B?YkZHbkdNNE9DdFVNUlVINXNHMGlKa0JuNG1TTVNzZFpvRUUwS3lHS0VFaXpq?=
+ =?utf-8?B?Y3RUYTJHbEg3SDdIWUVXVi9pREo5ZlFubDROSDZ4Mms2UE8xSDFiZCsxWUhR?=
+ =?utf-8?B?OFp2bjBobU9hTWpXdzhJSEp4YVhPUXlvUVFuU2hJaXZ0YmNiTVZ5L1R6L3J3?=
+ =?utf-8?B?cDJrcERzVHVCUHNrc2FNbjRzQlRRemU0cmxSUnUrNDM2aVZLVElYMFFYeVgr?=
+ =?utf-8?B?ZUNBbGZSa1UybFZIb0V0Y29odHBoMDh0YURXUWE0cmpDVGR2OHZaZm83QURL?=
+ =?utf-8?B?Yk1RWUIrM2hTbElJTkdkWFR1Szd5TFozNkNqUzYwcXV3Z1NsOHNBYTJma0J5?=
+ =?utf-8?B?VWdKdnViUWNZZ2lGa3pqaUM5M0twb053V2JvaVpSbndFRElIczdEVUVzeUQ3?=
+ =?utf-8?B?aEhYN0tyaWxicW51S2s0dGZITTVPdzJGelZKTDlqMFdhaDhoWE56RGVjS3l2?=
+ =?utf-8?B?Q3JVY3BxRDI1a0ZWMFRNWG9KYWRJK01yR1k1c0czWnVtZG9ua0Q2TUlOQmt1?=
+ =?utf-8?B?blUwTUpQTS9oSm02OUl6cXJDT0J0YlhWczgvemlMMStBVFVYTE1ZcjNBTzdT?=
+ =?utf-8?B?ZkNPMzRXNWsybmhrUmhmZjVKOVNITFZ6RXhoM3Q3U2xpR2NNMW9GQW5xMVJE?=
+ =?utf-8?B?eDFYSU5UMjI4eitTazl6aGV1ei9OWFJxOVNRYTIvYVQ4cGxGTnV2cWtLcnNk?=
+ =?utf-8?B?b1l4aGhxT09iN3Y4TzhaUzhERENkamhWZEJzQjFETFJTRk5xUWViYmQ1L1dV?=
+ =?utf-8?B?eU5lQ3phZ1hYTW9WUHdkN2RYQzdQQWNhaktoenlMQmF0RG9Ub0FlZ2xCcVZP?=
+ =?utf-8?B?M05mSjVsakduNy9aU3hNRCtvVldnNTlTTkhWdS9hYmdlRHJORTA1RExWRXFm?=
+ =?utf-8?B?UUZ1U21pbklrU2FoKzc0eTh6MGNvS1JPcXdvcjJaUHpHdUM3aXBSaWV5aUNl?=
+ =?utf-8?B?bFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c23849b-7f05-4765-e677-08dba427ccca
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR11MB5636.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 22:23:41.3685
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 22:25:05.1023
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iPQA/ztSXjNsHbALcC8Hlh5cU6GMzFaFylUkRMP+8IZADyQjAXnxruM0XKNNhT31ICVjJSE9CzguGX1Vxf10GwOBekl4irPQ9R6eTTbx00A=
+X-MS-Exchange-CrossTenant-UserPrincipalName: G6incwSDO4S6TOfHKAhS9dLYIcV8WwjtBkeb4RxlluRmGlqOkkSO9mwfDMzNq4KLI/M+IxZcfKHFdx9yEYSXOD2eH1BnXEY9zIViGPfQ2GY=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6990
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/15/2023 11:38 AM, Leon Romanovsky wrote:
-> On Tue, Aug 15, 2023 at 09:57:47AM -0700, Tony Nguyen wrote:
+On 8/16/2023 3:43 PM, Randy Dunlap wrote:
+> 
+> 
+> On 8/15/23 09:57, Tony Nguyen wrote:
 >> From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
 >>
->> Users want the ability to debug FW issues by retrieving the
->> FW logs from the E8xx devices. Use debugfs to allow the user to
->> read/write the FW log configuration by adding a 'fwlog/modules' file.
->> Reading the file will show either the currently running configuration or
->> the next configuration (if the user has changed the configuration).
->> Writing to the file will update the configuration, but NOT enable the
->> configuration (that is a separate command).
->>
->> To see the status of FW logging then read the 'fwlog/modules' file like
->> this:
->>
->> cat /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules
->>
->> To change the configuration of FW logging then write to the 'fwlog/modules'
->> file like this:
->>
->> echo DCB NORMAL > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules
->>
->> The format to change the configuration is
->>
->> echo <fwlog_module> <fwlog_level> > /sys/kernel/debug/ice/<pci device
-> 
-> This line is truncated, it is not clear where you are writing.
-
-Fixed
-
-> And more general question, a long time ago, netdev had a policy of
-> not-allowing writing to debugfs, was it changed?
-> 
->>
->> where
->>
->> * fwlog_level is a name as described below. Each level includes the
->>    messages from the previous/lower level
->>
->>        * NONE
->>        *	ERROR
->>        *	WARNING
->>        *	NORMAL
->>        *	VERBOSE
->>
->> * fwlog_event is a name that represents the module to receive events for.
->>    The module names are
->>
->>        *	GENERAL
->>        *	CTRL
->>        *	LINK
->>        *	LINK_TOPO
->>        *	DNL
->>        *	I2C
->>        *	SDP
->>        *	MDIO
->>        *	ADMINQ
->>        *	HDMA
->>        *	LLDP
->>        *	DCBX
->>        *	DCB
->>        *	XLR
->>        *	NVM
->>        *	AUTH
->>        *	VPD
->>        *	IOSF
->>        *	PARSER
->>        *	SW
->>        *	SCHEDULER
->>        *	TXQ
->>        *	RSVD
->>        *	POST
->>        *	WATCHDOG
->>        *	TASK_DISPATCH
->>        *	MNG
->>        *	SYNCE
->>        *	HEALTH
->>        *	TSDRV
->>        *	PFREG
->>        *	MDLVER
->>        *	ALL
->>
->> The name ALL is special and specifies setting all of the modules to the
->> specified fwlog_level.
->>
->> If the NVM supports FW logging then the file 'fwlog' will be created
->> under the PCI device ID for the ice driver. If the file does not exist
->> then either the NVM doesn't support FW logging or debugfs is not enabled
->> on the system.
->>
->> In addition to configuring the modules, the user can also configure the
->> number of log messages (resolution) to include in a single Admin Receive
->> Queue (ARQ) event.The range is 1-128 (1 means push every log message, 128
->> means push only when the max AQ command buffer is full). The suggested
->> value is 10.
->>
->> To see/change the resolution the user can read/write the
->> 'fwlog/resolution' file. An example changing the value to 50 is
->>
->> echo 50 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/resolution
+>> Add documentation for FW logging in
+>> Documentation/networking/device-drivers/ethernet/intel/ice.rst
 >>
 >> Signed-off-by: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
->> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 >> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 >> ---
->>   drivers/net/ethernet/intel/ice/Makefile       |   4 +-
->>   drivers/net/ethernet/intel/ice/ice.h          |  18 +
->>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  80 ++++
->>   drivers/net/ethernet/intel/ice/ice_common.c   |   5 +
->>   drivers/net/ethernet/intel/ice/ice_debugfs.c  | 450 ++++++++++++++++++
->>   drivers/net/ethernet/intel/ice/ice_fwlog.c    | 231 +++++++++
->>   drivers/net/ethernet/intel/ice/ice_fwlog.h    |  55 +++
->>   drivers/net/ethernet/intel/ice/ice_main.c     |  21 +
->>   drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
->>   9 files changed, 867 insertions(+), 1 deletion(-)
->>   create mode 100644 drivers/net/ethernet/intel/ice/ice_debugfs.c
->>   create mode 100644 drivers/net/ethernet/intel/ice/ice_fwlog.c
->>   create mode 100644 drivers/net/ethernet/intel/ice/ice_fwlog.h
+>>   .../device_drivers/ethernet/intel/ice.rst     | 117 ++++++++++++++++++
+>>   1 file changed, 117 insertions(+)
 >>
->> diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
->> index 960277d78e09..d43a59e5f8ee 100644
->> --- a/drivers/net/ethernet/intel/ice/Makefile
->> +++ b/drivers/net/ethernet/intel/ice/Makefile
->> @@ -34,7 +34,8 @@ ice-y := ice_main.o	\
->>   	 ice_lag.o	\
->>   	 ice_ethtool.o  \
->>   	 ice_repr.o	\
->> -	 ice_tc_lib.o
->> +	 ice_tc_lib.o	\
->> +	 ice_fwlog.o
->>   ice-$(CONFIG_PCI_IOV) +=	\
->>   	ice_sriov.o		\
->>   	ice_virtchnl.o		\
->> @@ -49,3 +50,4 @@ ice-$(CONFIG_RFS_ACCEL) += ice_arfs.o
->>   ice-$(CONFIG_XDP_SOCKETS) += ice_xsk.o
->>   ice-$(CONFIG_ICE_SWITCHDEV) += ice_eswitch.o ice_eswitch_br.o
->>   ice-$(CONFIG_GNSS) += ice_gnss.o
->> +ice-$(CONFIG_DEBUG_FS) += ice_debugfs.o
->> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
->> index 5ac0ad12f9f1..e6dd9f6f9eee 100644
->> --- a/drivers/net/ethernet/intel/ice/ice.h
->> +++ b/drivers/net/ethernet/intel/ice/ice.h
->> @@ -556,6 +556,8 @@ struct ice_pf {
->>   	struct ice_vsi_stats **vsi_stats;
->>   	struct ice_sw *first_sw;	/* first switch created by firmware */
->>   	u16 eswitch_mode;		/* current mode of eswitch */
->> +	struct dentry *ice_debugfs_pf;
->> +	struct dentry *ice_debugfs_pf_fwlog;
->>   	struct ice_vfs vfs;
->>   	DECLARE_BITMAP(features, ICE_F_MAX);
->>   	DECLARE_BITMAP(state, ICE_STATE_NBITS);
->> @@ -861,6 +863,22 @@ static inline bool ice_is_adq_active(struct ice_pf *pf)
->>   	return false;
->>   }
+>> diff --git a/Documentation/networking/device_drivers/ethernet/intel/ice.rst b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
+>> index e4d065c55ea8..3ddef911faaa 100644
+>> --- a/Documentation/networking/device_drivers/ethernet/intel/ice.rst
+>> +++ b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
+>> @@ -895,6 +895,123 @@ driver writes raw bytes by the GNSS object to the receiver through i2c. Please
+>>   refer to the hardware GNSS module documentation for configuration details.
 >>   
->> +#ifdef CONFIG_DEBUG_FS
+>>   
+>> +Firmware (FW) logging
+>> +---------------------
+>> +The driver supports FW logging via the debugfs interface on PF 0 only. In order
+>> +for FW logging to work, the NVM must support it. The 'fwlog' file will only get
+>> +created in the ice debugfs directory if the NVM supports FW logging.
+>> +
+>> +Module configuration
+>> +~~~~~~~~~~~~~~~~~~~~
+>> +To see the status of FW logging then read the 'fwlog/modules' file like this::
 > 
-> There is no need in this CONFIG_DEBUG_FS and code should be written
-> without debugfs stubs.
+>                       of FW logging, read
 > 
 
 Fixed
 
->> +void ice_debugfs_fwlog_init(struct ice_pf *pf);
->> +void ice_debugfs_init(void);
->> +void ice_debugfs_exit(void);
->> +void ice_pf_fwlog_update_module(struct ice_pf *pf, int log_level, int module);
->> +#else
->> +static inline void ice_debugfs_fwlog_init(struct ice_pf *pf) { }
->> +static inline void ice_debugfs_init(void) { }
->> +static inline void ice_debugfs_exit(void) { }
->> +static void
->> +ice_pf_fwlog_update_module(struct ice_pf *pf, int log_level, int module)
->> +{
->> +	return -EOPNOTSUPP;
->> +}
->> +#endif /* CONFIG_DEBUG_FS */
+>> +
+>> +  # cat /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules
+>> +
+>> +To configure FW logging then write to the 'fwlog/modules' file like this::
 > 
-> Thanks
+>                  FW logging, write to
+> 
+
+Fixed
+
+>> +
+>> +  # echo <fwlog_event> <fwlog_level> > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules
+>> +
+>> +where
+>> +
+>> +* fwlog_level is a name as described below. Each level includes the
+>> +  messages from the previous/lower level
+>> +
+>> +      * NONE
+> 
+> Should NONE be aligned with the entries below?
+> Ah, they are aligned in the source file, but NONE uses a space after the '*'
+> while the others use a TAB after the '*'.
+> 
+
+Good catch, fixed
+
+>> +      *	ERROR
+>> +      *	WARNING
+>> +      *	NORMAL
+>> +      *	VERBOSE
+>> +
+>> +* fwlog_event is a name that represents the module to receive events for. The
+>> +  module names are
+>> +
+>> +      *	GENERAL
+>> +      *	CTRL
+>> +      *	LINK
+>> +      *	LINK_TOPO
+>> +      *	DNL
+>> +      *	I2C
+>> +      *	SDP
+>> +      *	MDIO
+>> +      *	ADMINQ
+>> +      *	HDMA
+>> +      *	LLDP
+>> +      *	DCBX
+>> +      *	DCB
+>> +      *	XLR
+>> +      *	NVM
+>> +      *	AUTH
+>> +      *	VPD
+>> +      *	IOSF
+>> +      *	PARSER
+>> +      *	SW
+>> +      *	SCHEDULER
+>> +      *	TXQ
+>> +      *	RSVD
+>> +      *	POST
+>> +      *	WATCHDOG
+>> +      *	TASK_DISPATCH
+>> +      *	MNG
+>> +      *	SYNCE
+>> +      *	HEALTH
+>> +      *	TSDRV
+>> +      *	PFREG
+>> +      *	MDLVER
+>> +      *	ALL
+>> +
+>> +The name ALL is special and specifies setting all of the modules to the
+>> +specified fwlog_level.
+>> +
+>> +Example usage to configure the modules::
+>> +
+>> +  # echo LINK VERBOSE > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/modules
+>> +
+>> +Enabling FW log
+>> +~~~~~~~~~~~~~~~
+>> +Once the desired modules are configured the user will enable the logging. To do
+> 
+>                                             the user enables logging. To do
+> 
+
+Fixed
+
+>> +this the user can write a 1 (enable) or 0 (disable) to 'fwlog/enable'. An
+>> +example is::
+>> +
+>> +  # echo 1 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/enable
+>> +
+>> +Retrieving FW log data
+>> +~~~~~~~~~~~~~~~~~~~~~~
+>> +The FW log data can be retrieved by reading from 'fwlog/data'. The user can
+>> +write to 'fwlog/data' to clear the data. The data can only be cleared when FW
+>> +logging is disabled. The FW log data is a binary file that is sent to Intel and
+>> +used to help debug user issues.
+>> +
+>> +An example to read the data is::
+>> +
+>> +  # cat /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/data > fwlog.bin
+>> +
+>> +An example to clear the data is::
+>> +
+>> +  # echo 0 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/data
+>> +
+>> +Changing how often the log events are sent to the driver
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> +The driver receives FW log data from the Admin Receive Queue (ARQ). The
+>> +frequency that the FW sends the ARQ events can be configured by writing to
+>> +'fwlog/resolution'. The range is 1-128 (1 means push every log message, 128
+>> +means push only when the max AQ command buffer is full). The suggested value is
+>> +10. The user can see what the value is configured to by reading
+>> +'fwlog/resolution'. An example to set the value is::
+>> +
+>> +  # echo 50 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/resolution
+>> +
+>> +Configuring the number of buffers used to store FW log data
+>> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> +The driver stores FW log data in a ring within the driver. The default size of
+>> +the ring is 256 4K buffers. Some use cases may require more or less data so
+>> +the user can change the number of buffers that are allocated for FW log data.
+>> +To change the number of buffers write to 'fwlog/nr_buffs'. The value must be a
+>> +power of two and between the values 64-512. FW logging must be disabled to
+> 
+> or
+> The value must be one of: 64, 128, 256, or 512.
+> 
+
+Changed
+
+>> +change the value. An example of changing the value is::
+>> +
+>> +  # echo 128 > /sys/kernel/debug/ice/0000\:18\:00.0/fwlog/nr_buffs
+>> +
+>> +
+>>   Performance Optimization
+>>   ========================
+>>   Driver defaults are meant to fit a wide variety of workloads, but if further
 
 
