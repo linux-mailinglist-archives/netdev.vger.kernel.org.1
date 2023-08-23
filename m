@@ -1,102 +1,117 @@
-Return-Path: <netdev+bounces-29851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-29852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988CB784F25
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 05:15:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3C0784F2B
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 05:17:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E8A61C20C05
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 03:15:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB0CB1C20C30
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 03:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094B520F09;
-	Wed, 23 Aug 2023 03:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C0C20F0C;
+	Wed, 23 Aug 2023 03:17:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F239B15BC
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 03:15:45 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C5AACE8;
-	Tue, 22 Aug 2023 20:15:44 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RVrq15kHGztS8T;
-	Wed, 23 Aug 2023 11:11:57 +0800 (CST)
-Received: from [10.69.136.139] (10.69.136.139) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 23 Aug 2023 11:15:41 +0800
-Message-ID: <1b87e5c8-ceed-9b7a-4137-89d085e6c959@huawei.com>
-Date: Wed, 23 Aug 2023 11:15:40 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B6117C6
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 03:17:24 +0000 (UTC)
+Received: from out-24.mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B14CE9
+	for <netdev@vger.kernel.org>; Tue, 22 Aug 2023 20:17:22 -0700 (PDT)
+Date: Wed, 23 Aug 2023 13:16:57 +1000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jookia.org; s=key1;
+	t=1692760640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zahP6Lk7k9gO6ZWwdWZ4JSMtgXLMnFQ0XU2AxSSHQqk=;
+	b=g10hba/RCjfZrCJZ6kvJA5qG83PfMboSMVC5DMuz1BkYsaHcEDYRQapCyCo3w7aQ428a2B
+	TQaxZ2edx7VaWhoF9KHaKWzAfcAPwe0tjp9RQLB78Ta5Z4uc4fgzYEcoIzSLmZF6GgBew1
+	+WnlAOaB9pEiwPCuDLbs8nHzTpj2y7kFxZX9DJFLwX1N77WqMqKPKME2H7ULtZrQHDqlaR
+	1R15js3rAHYtZUgrB8CeaiNfV6QKyKZz8KVLwRFzJwLXoopsHTDIZXqY7o6lgeyb9DIi2t
+	ekTP/JoNwBT8UamdiFVRN+drkQLekCyjlUoc+d92oR6WlLPKEfIcr9EROYyhvQ==
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: John Watts <contact@jookia.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-sunxi@lists.linux.dev, Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 4/4] can: sun4i_can: Add support for the Allwinner D1
+Message-ID: <ZOV6KclYNYVmbr6Y@titan>
+References: <20230721221552.1973203-2-contact@jookia.org>
+ <20230721221552.1973203-6-contact@jookia.org>
+ <CAMuHMdV2m54UAH0X2dG7stEg=grFihrdsz4+o7=_DpBMhjTbkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH ethtool] hns3: add support dump registers for hns3 driver
-To: <mkubecek@suse.cz>
-References: <20230818085611.2483909-1-shaojijie@huawei.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20230818085611.2483909-1-shaojijie@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.136.139]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdV2m54UAH0X2dG7stEg=grFihrdsz4+o7=_DpBMhjTbkw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, Aug 22, 2023 at 02:30:16PM +0200, Geert Uytterhoeven wrote:
+> Hi John,
+> 
+> This makes this question pop up when configuring a kernel for any RISC-V
+> platform, not just for Allwinner RISC-V platforms.
 
-on 2023/8/18 16:56, Jijie Shao wrote:
-> Add support pretty printer for the registers of hns3 driver.
-> This printer supports PF and VF, and is compatible with hns3
-> drivers of earlier versions.
->
-> Sample output:
->
-> $ ethtool -d eth1
-> [cmdq_regs]
->    comm_nic_csq_baseaddr_l : 0x48168000
->    comm_nic_csq_baseaddr_h : 0x00000000
->    comm_nic_csq_depth      : 0x00000080
->    comm_nic_csq_tail       : 0x00000050
->    comm_nic_csq_head       : 0x00000050
->    comm_nic_crq_baseaddr_l : 0x48170000
->    comm_nic_crq_baseaddr_h : 0x00000000
->    comm_nic_crq_depth      : 0x00000080
->    comm_nic_crq_tail       : 0x00000000
->    comm_nic_crq_head       : 0x00000000
->    comm_vector0_cmdq_src   : 0x00000000
->    comm_cmdq_intr_sts      : 0x00000000
->    comm_cmdq_intr_en       : 0x00000002
->    comm_cmdq_intr_gen      : 0x00000000
-> [common_regs]
->    misc_vector_base    : 0x00000001
->    pf_other_int        : 0x00000040
->    misc_reset_sts      : 0x00000000
->    misc_vector_int_sts : 0x00000000
->    global_reset        : 0x00000000
->    fun_rst_ing         : 0x00000000
->    gro_en              : 0x00000001
-> ...
+Oh dear.
 
-Hi，
+> In comparison, drivers/clk/sunxi-ng/Kconfig does have some
+> 
+>     depends on MACH_SUN<foo>I || RISCV || COMPILE_TEST
+> 
+> but these are gated by ARCH_SUNXI at the top of the file.
 
-We noticed that this patch had been stuck for several days.
+Ah, that is what I copied.
 
-Is there any problem with this patch?
+> I'm not sure what's the best way to fix this:
+>   - Replace RISCV by ARCH_SUNXI?
+>     This would expose it on more ARM sun<foo>i platforms, making the
+>     MACH_SUN4I || MACH_SUN7I superfluous?
+>   - Replace RISCV by RISCV && ARCH_SUNXI?
 
-Jijie Shao
+I'm not sure what the best approach here is. Just having it require ARCH_SUNXI
+would make sense to me but I'm not too sure why where's so many different MACH
+here in the first place.
 
+> Thanks for your comments!
+> 
+> >         help
+> >           Say Y here if you want to use CAN controller found on Allwinner
+> > -         A10/A20 SoCs.
+> > +         A10/A20/D1 SoCs.
+> >
+> >           To compile this driver as a module, choose M here: the module will
+> >           be called sun4i_can.
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+
+John.
 
