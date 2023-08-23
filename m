@@ -1,247 +1,185 @@
-Return-Path: <netdev+bounces-30120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ECA87860E0
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:44:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874097860E5
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 21:45:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D1A281354
-	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:44:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F5252813E2
+	for <lists+netdev@lfdr.de>; Wed, 23 Aug 2023 19:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03871FB46;
-	Wed, 23 Aug 2023 19:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A861FB46;
+	Wed, 23 Aug 2023 19:45:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE4D156E6;
-	Wed, 23 Aug 2023 19:44:43 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D96E57;
-	Wed, 23 Aug 2023 12:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692819882; x=1724355882;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=pzhmvrP1iIv1GGZkP4MzlikNF6uGeM0RKGukrmeSwyU=;
-  b=YDIsw+0fCWgV7VKuvEIrcJz4wBvFBxn6Nua4i1/r08oMOppk59ORBpAW
-   M8SjER0nPaQIXxUVKn+ykop5P4FGxiMX+/D/ig8CxITjClBZOQ/8LK8oX
-   9k9jx85VLB3xq9e0Wc86Th9Lpy1EopXbSOl9XA0490yXGPh9DKPhLVVYl
-   ZXB3Ukg0X5ofwGf/5J8NYkgGLFo6THmmgptBeU2XegPJgynQ/Iq2+q0jb
-   XlO2IfsIiN+Earkwz7sZz9qF7cI4ZY/N1u/C93ZaI/O4L06kY/Rl1Wjiq
-   RT3OR9CzSWTWWuAYIp4zohp5fhNdZlwIgsSaiuxTq3PZwziy2GWCySOPG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="373141851"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="373141851"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 12:44:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="713704467"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="713704467"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga006.jf.intel.com with ESMTP; 23 Aug 2023 12:44:41 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:44:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:44:40 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 12:44:40 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.42) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 23 Aug 2023 12:44:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hf5j6LbgW9Nj52yyEzilbk9q7mACWO3mjTRqFZ4uEsUVj5gyf00erb0JoFKRpG5dN4O1xBHakJ+F4nSCR7HjuSfnBfGUxjak0I817y+xG1lpfoJAWMB2Aw5nJ6pVwR8u+4xaIt8uFUP5JHVzSXPqDz4HJdT2Ee9IhJ23mMF55XNwWqJ4w/MY4PTrqLMS7shIk1bW7Rug1N8j53L85a7sG4qt6qtdc4Cy5AMmQ6K9YiPkUvhqRRlB/VFuOpcNt8LITxZhEn45xJ8wYmxpZQ9DYhBD1pWOVDQW0MzqH2u896eqzRFb0LFOsBTaUvJ3MZDu5SJLZnFiSZYGrQWlvyl0kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vPCTOX36epMCUJU6AIglQlUi5WySyLLS1//zzJWFvYo=;
- b=PuDT3JkMfbuaOf+4We2rZBosDUqKeNpX2juJ/ArWrp5XdS0db1jedRh98IJgNcPheULUCAU7NuSSacPiZm7Ld4uN7KHq0219PN0s7Ibi3zl14FDlEg3HybWOErh/306W9L69FCdcUSzTH2ewO1FHbC/+4h+oQaMFa2Wht9X03aN5D0/4MfFKOSjHuyVXmmsJFdmp+cQQsH0nRyNcGeDf1WXfOk7BLSxw5JJ6lzUo+5yPf/YWdSavBiaWXYvsitwRO4Dg1zCqLRRPzDc6kSWg+3iAe7EPpQggTUeHX3ucBQNIaEfwvR9IpVeia3Yr51xFjVtHXAX0Ft5ScrmFQEA0HA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SJ2PR11MB7454.namprd11.prod.outlook.com (2603:10b6:a03:4cc::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.25; Wed, 23 Aug
- 2023 19:44:38 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::6a23:786d:65f7:ef0b]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::6a23:786d:65f7:ef0b%6]) with mapi id 15.20.6699.022; Wed, 23 Aug 2023
- 19:44:30 +0000
-Message-ID: <f6a026c5-d86d-6016-c0f2-b14e801016ac@intel.com>
-Date: Wed, 23 Aug 2023 12:44:28 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next] net: fec: add exception tracing for XDP
-Content-Language: en-US
-To: Wei Fang <wei.fang@nxp.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<shenwei.wang@nxp.com>, <xiaoning.wang@nxp.com>, <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, <linux-imx@nxp.com>
-References: <20230822065255.606739-1-wei.fang@nxp.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20230822065255.606739-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P222CA0001.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:303:114::6) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9201FB45
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 19:45:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 798CBC433C9;
+	Wed, 23 Aug 2023 19:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692819911;
+	bh=mVfYjfAer7LGb5obJ89lMIm5KMc02IYUnhx8PdVsGNE=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=et+Bzz/F9mxExjLRmSYRl/hkjiavTSsD7i8rcfzHNWpdfAIIgJ4HLOIEflfLtYSVO
+	 11MhtzxJavZfFfTlr+b6G9WePIrSaagwRvyQFvu2oTKtXiIK9VJgMslS0p99pw49K/
+	 KnegU50coXMGCDd5bKFlPZqTEf8Ft9ACd5fbrpzTRpMaEI9OMhafGdrffulxgWaYGV
+	 BxmLTYRlo3q5kwJgYN7jIjqzoHIsvEI7phX5EwY5Kkdxi26JO9U+3DretSiB+CIrjb
+	 97ZgDI5ksilFI37S3V4v85IaJ55Dyy6LvwgHxXXIQ0xQHKGYq558q+sx7sk7yySEdU
+	 DZYdzxtK0V7aA==
+Message-ID: <d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
+Date: Wed, 23 Aug 2023 21:45:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ2PR11MB7454:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9422069-006f-46b4-f9b4-08dba4115e56
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OBfNFjMyozQhUNk7sYZbuFNMLiKG8df/7tatMnsBAaPEZ3+f5c4ErwSSQjcNmqLnYQO4euhLSHBqicqU10VG1iaPIoQrNymBIirY90tGJmcgkdQWvYxYArVCBYzwdxER9mQEjw3HUWsqnreTpu7wwO7EJSRldhSjyZeTw2TLuobHjg7tpC/3VZLeo4LEB4EiKnBpcnK4dWe+9tc4y9Drwz4BYYr8VA68gtI9Pg6HSVbQ7Zuwz62ZEGE0XWCXn5D1rSunUtAGUA41vkOlmVGyvgjrnSkqVh8mbgZxCxCXnufIzPSXOFb68Fzxkc+kLtExQ19SrZ3SNMqf5hgXjvPQjjv0KWLvhcmkPKFtpSQex3snzeB7oFSLYDDZ0Jm4GL8iwL5aij9qof+VUjH5Su7k3ElXkkzQD0EiaoeW9rfm9mnmjQXqFGf/r2cP9Z7SbPHN5b3aQQUTdL+EPYh9wlOuCM40H0VlysB4jAAjQodq7lT7OusEoj6NZgrhpy9Jgk+LrKenurExp1Tb0Qemg+js9iC1tDYKQlevRWT1vSXsDUMVNLzbdT+LlEfv5C7hUVcDDH8HKQInkEWgKiv50G4Lj44zhMgyrae4LxrKIvgXAylKUiiknpDk50jDYykmwB/7Mzf1+vxCv9mJRED482DxEQ2z+iVX4i90pPd4mI27SnA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(376002)(136003)(346002)(396003)(1800799009)(186009)(451199024)(82960400001)(478600001)(6486002)(6506007)(6512007)(2616005)(2906002)(41300700001)(7416002)(8936002)(26005)(4326008)(86362001)(316002)(5660300002)(53546011)(8676002)(66946007)(36756003)(31696002)(66476007)(66556008)(38100700002)(83380400001)(921005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjRxU0hqNWt4OWVPelpiWEJ5R0dsUWR6Nnh6MnBFUTlEQmpjN2NlSlExTnVK?=
- =?utf-8?B?c2NlSnc4VlBrdWtQRy9IV0NMc1hxbTlJbE5ZZ3JnU3NIdU1Xc3VQOElUWHRx?=
- =?utf-8?B?VlJ0V2hzK3A4U1JxaVNTRGpNWk9FYm8xeUIyUzVyeEIrd0NpMm5HcWdOQzBL?=
- =?utf-8?B?SitscS96REF3RVVKNThxeHVHbWdKS3ZUZ092OHplT0pFWk9rcitYUE95bGlQ?=
- =?utf-8?B?Z3l6N0xvaVdKcElCRUxmZGJwS1VLYkszcGFVSkxlRVltbUpYYXhRR1Era1JD?=
- =?utf-8?B?TTZnR3pJTERCWmhsQ2l0VkovSEVGY01Sb2llQWRhdTJZUTZRTnhlWnU2dlZP?=
- =?utf-8?B?T1FhNzJoVFVLNEZSSXVYcS9BNjVCdGRRSmRJcGIzQ2hzSlR1MUxvb2FzRFdk?=
- =?utf-8?B?eERuWmRCemtPZ096OGVKSWIvVjhENzlsWnVZWkIydk9UVk9XeGljOG1WZnJx?=
- =?utf-8?B?c0xTTzNPMVpJUitDNEdKQXlYQTFHWVBISm90aytjWEh1dDJoRjF6czcyMXB4?=
- =?utf-8?B?WUJIT0JBbTJ1NmRzRHcza1RMYXdyWUEvaFlXb0plYXc5OE9VNEJZK3RXbURO?=
- =?utf-8?B?aVBFUHdiNHp5ZkFWMVRZaTdKYVRqdmxQYmZCNzRiNEZoUmZZLzhrNnZtdzVU?=
- =?utf-8?B?TEVkVWxZNXhZS25ZR2pncko3dlZYMDNDMXVMRjBNWVdvODVWSmNrSkNHKzNz?=
- =?utf-8?B?Q3djc09YQ3dEdDg4azNiWDdtK0toSmE2WTlUVDhBb1J6LzVWWUdUZTI5eEcr?=
- =?utf-8?B?UWdtbXl2YW1DYkVCMkJKdVJaYnJ2L0ZpbHo2SWlQUjlTcGxiYXZXUEFUSVJE?=
- =?utf-8?B?Ykp1cEwxaWMzM3J0NEFScDVMSVFaMU42NzBLLzJPTk4ycjhRYXV3TnN5YTlz?=
- =?utf-8?B?SFRQRzI2TWlJakFLUUFDS1VXT3ZVT1gwOEdZUzFuejA3WnczOG1XMVNYdGVj?=
- =?utf-8?B?ODFEYm9NUEhBbDVqeTAxaEhtZmU1b2JFVDh3cHhITmF1Q1FlVXJlMThFZ0tE?=
- =?utf-8?B?L2V4dDRFVWZuR2Q5YTN0ak1ld1IxZ295RjJhRlZxbVhFWWVxc0tKeThJcFNw?=
- =?utf-8?B?MjNOaERVQnE3amVSYmZweGNpZGp5WnZHaU9NQWFFbHVyZDBtVlAyREFqQ1J3?=
- =?utf-8?B?ZEgybmtLQ2FQemNqdzI5WGRlQ3hhd0xsUzkwbkp0K3lWa2poTTFZajNpTHFX?=
- =?utf-8?B?bnRqdmYxN2hKNG13eWgzd3RhWE5Cc0FSK3hTK0JrZUxxMENrWFpORGxtTVhY?=
- =?utf-8?B?ZFJhU1VkZFJQUTNvUGE5V01lbmlSZEVGUUFSNEYrUFdoSUpwNVhMYkJtbHdD?=
- =?utf-8?B?UzdaRWdUUzI0WUJhcmZYZ1AxUnQwM1l4Tm9lUG5ySXhzWnZZd2ZqZTNlZGdj?=
- =?utf-8?B?Z1FNZ0h0My9rdjhWZ1E1Ti9PelFxQ1BjNkxiRnYxcG1pWlc4U3NGSXBhRmg5?=
- =?utf-8?B?WUNEMXVyN2RWa0x0a0EzNC9QODdHZHRIYU5XRGN4OHFjTjNRVDhLaGtBY01Q?=
- =?utf-8?B?Z2s2ZnJwdDN0T3BGM05TMjFJNnpYYWNQdmZOejlLV0RQdk81aWJHWXVnVWND?=
- =?utf-8?B?anMwY01aa3lPeEQ1QWtLMTZCMmx2eStrY05sOGhZdldXWW9JMXE4RmhKVUEw?=
- =?utf-8?B?bGRpcm9ZQjQ2WjdnT2tsZ0VUQjl3QVh0Z3RkQ1d6RDE0YmZ6dEJuamlYaHdt?=
- =?utf-8?B?WFM1TFE0amp2YXNJZ2U4RU9BOGlicmlrRHo2djFobWdiNE9FR2l3TkxwL0RR?=
- =?utf-8?B?WHlhUDFSN0ErVWF0YUJ4OHVvMGk3Qm1ObXNRMG8yL3FrcEthMG00TTRZZW1y?=
- =?utf-8?B?bmNZMnMwcktCNDhnQUdUR2xudDF5amJZdWJ5UGpYYlpXcTFVa3BEbU1TbDFh?=
- =?utf-8?B?TjRubXQvbjUyNnJ3TjBmY2ZxelZudVY4NmZPRVV2M29mL2xnQ0VCT2xOaXJq?=
- =?utf-8?B?cGJCZTBHaGRHTFhDS2pFb0tsclJ6ZmxPRzdRWm8rTU10QnNOSWdtaUtjckZm?=
- =?utf-8?B?VVJjalFTcTRYM2tRNHFzWnZXSEs2UHF1QzZkZThNUkRmVlFqZU81aURLdnNu?=
- =?utf-8?B?R0tCVzM3eDd0Zld3bUhmRVVrSVdhWGMyOUNiQklXb0VrSjBjMjhSTFV5NTBs?=
- =?utf-8?B?Zk1xZS9zU1dnMlY3cm44Umd5V2NhOVdSVzVyUm16UXYvcVNxWkNxMEFOQmh4?=
- =?utf-8?B?UVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9422069-006f-46b4-f9b4-08dba4115e56
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 19:44:30.8160
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Co0v+Egars3iX6iJE8a5RRD9wNknVrNnZX0KYrPqmzvxO/n2T1rUEXs09jnlY8LCFjR5TIUes8pELkvUfSsO77aO3URAd1UkoAsra4T70Qg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7454
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Geetha sowjanya <gakula@marvell.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ hariprasad <hkelam@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Qingfang DENG <qingfang.deng@siflower.com.cn>
+Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
+Content-Language: en-US
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ netdev@vger.kernel.org, Ratheesh Kannoth <rkannoth@marvell.com>
+References: <20230823094757.gxvCEOBi@linutronix.de>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20230823094757.gxvCEOBi@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+(Cc Olek as he have changes in this code path)
 
-
-On 8/21/2023 11:52 PM, Wei Fang wrote:
-> As we already added the exception tracing for XDP_TX, I think it is
-> necessary to add the exception tracing for other XDP actions, such
-> as XDP_REDIRECT, XDP_ABORTED and unknown error actions.
+On 23/08/2023 11.47, Sebastian Andrzej Siewior wrote:
+> Hi,
 > 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-
-Makes sense to me, and it ends up being a bit less code.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
->  drivers/net/ethernet/freescale/fec_main.c | 26 ++++++++++-------------
->  1 file changed, 11 insertions(+), 15 deletions(-)
+> I've been looking at the page_pool locking.
 > 
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> index e23a55977183..8909899e9a31 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -1583,25 +1583,18 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
->  	case XDP_REDIRECT:
->  		rxq->stats[RX_XDP_REDIRECT]++;
->  		err = xdp_do_redirect(fep->netdev, xdp, prog);
-> -		if (!err) {
-> -			ret = FEC_ENET_XDP_REDIR;
-> -		} else {
-> -			ret = FEC_ENET_XDP_CONSUMED;
-> -			page = virt_to_head_page(xdp->data);
-> -			page_pool_put_page(rxq->page_pool, page, sync, true);
-> -		}
-> +		if (unlikely(err))
-> +			goto xdp_err;
-> +
-> +		ret = FEC_ENET_XDP_REDIR;
->  		break;
->  
->  	case XDP_TX:
->  		err = fec_enet_xdp_tx_xmit(fep, cpu, xdp, sync);
-> -		if (unlikely(err)) {
-> -			ret = FEC_ENET_XDP_CONSUMED;
-> -			page = virt_to_head_page(xdp->data);
-> -			page_pool_put_page(rxq->page_pool, page, sync, true);
-> -			trace_xdp_exception(fep->netdev, prog, act);
-> -		} else {
-> -			ret = FEC_ENET_XDP_TX;
-> -		}
-> +		if (unlikely(err))
-> +			goto xdp_err;
-> +
-> +		ret = FEC_ENET_XDP_TX;
->  		break;
->  
->  	default:
-> @@ -1613,9 +1606,12 @@ fec_enet_run_xdp(struct fec_enet_private *fep, struct bpf_prog *prog,
->  
->  	case XDP_DROP:
->  		rxq->stats[RX_XDP_DROP]++;
-> +xdp_err:
->  		ret = FEC_ENET_XDP_CONSUMED;
->  		page = virt_to_head_page(xdp->data);
->  		page_pool_put_page(rxq->page_pool, page, sync, true);
+> page_pool_alloc_frag() -> page_pool_alloc_pages() ->
+> __page_pool_get_cached():
+> 
+> There core of the allocation is:
+> |         /* Caller MUST guarantee safe non-concurrent access, e.g. softirq */
+> |         if (likely(pool->alloc.count)) {
+> |                 /* Fast-path */
+> |                 page = pool->alloc.cache[--pool->alloc.count];
+> 
+> The access to the `cache' array and the `count' variable is not locked.
+> This is fine as long as there only one consumer per pool. In my
+> understanding the intention is to have one page_pool per NAPI callback
+> to ensure this.
+> 
 
-Ok, so we handle the cleaning up of the page and such here, which is
-shared for both paths now. Nice!
+Yes, the intention is a single PP instance is "bound" to one RX-NAPI.
 
-> +		if (act != XDP_DROP)
-> +			trace_xdp_exception(fep->netdev, prog, act);
->  		break;
->  	}
->  
+
+> The pool can be filled in the same context (within allocation if the
+> pool is empty). There is also page_pool_recycle_in_cache() which fills
+> the pool from within skb free, for instance:
+>   napi_consume_skb() -> skb_release_all() -> skb_release_data() ->
+>   napi_frag_unref() -> page_pool_return_skb_page().
+> 
+> The last one has the following check here:
+> |         napi = READ_ONCE(pp->p.napi);
+> |         allow_direct = napi_safe && napi &&
+> |                 READ_ONCE(napi->list_owner) == smp_processor_id();
+> 
+> This eventually ends in page_pool_recycle_in_cache() where it adds the
+> page to the cache buffer if the check above is true (and BH is disabled).
+> 
+> napi->list_owner is set once NAPI is scheduled until the poll callback
+> completed. It is safe to add items to list because only one of the two
+> can run on a single CPU and the completion of them ensured by having BH
+> disabled the whole time.
+> 
+> This breaks in octeontx2 where a worker is used to fill the buffer:
+>    otx2_pool_refill_task() -> otx2_alloc_rbuf() -> __otx2_alloc_rbuf() ->
+>    otx2_alloc_pool_buf() -> page_pool_alloc_frag().
+> 
+
+This seems problematic! - this is NOT allowed.
+
+But otx2_pool_refill_task() is a work-queue, and I though it runs in
+process-context.  This WQ process is not allowed to use the lockless PP
+cache.  This seems to be a bug!
+
+The problematic part is otx2_alloc_rbuf() that disables BH:
+
+  int otx2_alloc_rbuf(struct otx2_nic *pfvf, struct otx2_pool *pool,
+		    dma_addr_t *dma)
+  {
+	int ret;
+
+	local_bh_disable();
+	ret = __otx2_alloc_rbuf(pfvf, pool, dma);
+	local_bh_enable();
+	return ret;
+  }
+
+The fix, can be to not do this local_bh_disable() in this driver?
+
+> BH is disabled but the add of a page can still happen while NAPI
+> callback runs on a remote CPU and so corrupting the index/ array.
+> 
+> API wise I would suggest to
+> 
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 7ff80b80a6f9f..b50e219470a36 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -612,7 +612,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
+>   			page_pool_dma_sync_for_device(pool, page,
+>   						      dma_sync_size);
+>   
+> -		if (allow_direct && in_softirq() &&
+> +		if (allow_direct && in_serving_softirq() &&
+
+This is the "return/free/put" code path, where we have "allow_direct" as
+a protection in the API.  API users are suppose to use
+page_pool_recycle_direct() to indicate this, but as some point we
+allowed APIs to expose 'allow_direct'.
+
+The PP-alloc side is more fragile, and maybe the in_serving_softirq()
+belongs there.
+
+>   		    page_pool_recycle_in_cache(page, pool))
+>   			return NULL;
+>   
+> because the intention (as I understand it) is to be invoked from within
+> the NAPI callback (while softirq is served) and not if BH is just
+> disabled due to a lock or so.
+>
+
+True, and it used-to-be like this (in_serving_softirq), but as Ilias
+wrote it was changed recently.  This was to support threaded-NAPI (in
+542bcea4be866b ("net: page_pool: use in_softirq() instead")), which
+I understood was one of your (Sebastian's) use-cases.
+
+
+> It would also make sense to a add WARN_ON_ONCE(!in_serving_softirq()) to
+> page_pool_alloc_pages() to spot usage outside of softirq. But this will
+> trigger in every driver since the same function is used in the open
+> callback to initially setup the HW.
+> 
+
+I'm very open to ideas of detecting this.  Since mentioned commit PP is
+open to these kind of miss-uses of the API.
+
+One idea would be to leverage that NAPI napi->list_owner will have been
+set to something else than -1, when this is NAPI context.  Getting hold
+of napi object, could be done via pp->p.napi (but as Jakub wrote this is
+opt-in ATM).
+
+--Jesper
 
