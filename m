@@ -1,138 +1,145 @@
-Return-Path: <netdev+bounces-30202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0BAB7865AC
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 05:03:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 357CD7865CE
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 05:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 441F52813F4
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 03:03:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F101C20D61
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 03:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288C124521;
-	Thu, 24 Aug 2023 03:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930E224521;
+	Thu, 24 Aug 2023 03:24:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E5524520
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:03:40 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9CE110DE;
-	Wed, 23 Aug 2023 20:03:39 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NJotTH006552;
-	Wed, 23 Aug 2023 20:03:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=rdI7+32VFalWfBCSBWgYPHJV3iAwoybCfqDIXqxMYl8=;
- b=PHnFrFs0dULr1/CK5X4FLcp7Qz4qBigaD8PWR7O9uB77Dcl5Ibi8ED8pABVjilZ9I0eN
- uPl2+fhkETPB6FfcZJflGJcNCEDUKVPwWQIgX2wL7M9aDj0LiejcU+/PxnNbnIcKcVpv
- mRpfhbrBE5BRD7gstww0nY2jvL/AyMzHS3I6XlrJccsf20Ga2KLGV1SM1r/nq7azRfJV
- 3wj3fcM+9d7PVgWjyBMuMZnVMca6ipiQSpcgD5BK8JdYVbzkgWTr59OidYWppNR73poY
- IkmF8I23q1A1RyVk7Q0Gqzf/SX9Y+Mm+W7+ypInYDvxOfd0Ucp6gpGLnwD5Ab2CZFvyW Yw== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3snrmcs3b9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 23 Aug 2023 20:03:09 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 23 Aug
- 2023 20:03:08 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 23 Aug 2023 20:03:08 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 535D33F70A7;
-	Wed, 23 Aug 2023 20:03:03 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
-        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
-        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
-        Alexander Lobakin
-	<aleksander.lobakin@intel.com>
-Subject: [PATCH v3 net] octeontx2-pf: fix page_pool creation fail for rings > 32k
-Date: Thu, 24 Aug 2023 08:33:01 +0530
-Message-ID: <20230824030301.2525375-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8476617F6
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:24:08 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294DC10EC
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 20:24:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692847446;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yPglN9jWCOWkDHiaVESzd3fbifjjVGG3Y2tLlmCAqyw=;
+	b=VxK3WDYbTykeW3YuyAts0vGA7HmODQhnNmzV8yauMtAgjaTW30n5bfxkrhidypQXvMW2/B
+	+NAIEBWyK4/WCBz5seGelMR1IF2BNPdzaynd2qK3mTwzv7Gn1/NbM+nSKtpBdcWY6lykqo
+	JpM85qjPreGIEUzG2erR0i49dZ8Duik=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-1wuLYiIwPM-om1Z1Sw35Mg-1; Wed, 23 Aug 2023 23:24:04 -0400
+X-MC-Unique: 1wuLYiIwPM-om1Z1Sw35Mg-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2bbc1d8011dso54068721fa.1
+        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 20:24:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692847443; x=1693452243;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yPglN9jWCOWkDHiaVESzd3fbifjjVGG3Y2tLlmCAqyw=;
+        b=Do4XietITfhh3Ji+REc2s9b9nj7VJsynSuA0MUmMROw/ayqr0x1rNVr4T/yWZyy8Og
+         ECro63Vg8VNcK/fst7yE9z2esRlm7Ygf2Nfo8+WJ+YVNjybEfS6SsccOSUsvlAK+jjD2
+         Z6eiMTlH39ILa0I8jXL6jk01yCIyz5vez4xY6PVc4puzW2ECo6nZy4+5S4rWmIKnjFn2
+         daRWSkMqqlrxPqQtRPZiMQ/4+kP9IvsM+eB83PD2s9sX7qjc9Wq52IF15mObr5hjj7RH
+         b/wDTA2apDL5uBB9vxY2u0A2wx5ttnA8e9pjis8f0hJvCw+ItCHVxTc75+pucAq/Qp9j
+         ps2Q==
+X-Gm-Message-State: AOJu0Yyh3I13jY8/8qw5VjLrMLZfqZtUMevKOk3jAJ2YzB0ju4sCjpeU
+	Ui3bGa62XB7dATyMK7lfaX8hMlm+B9zwQcVYmcgD3NRMqVd0ZR5Bh7ogQFBK/zcCRV6JIETSnCu
+	GhWcv/8OldzRj66+pw7KcG0ka4R6r0K+w
+X-Received: by 2002:a2e:b710:0:b0:2b5:80e0:f18e with SMTP id j16-20020a2eb710000000b002b580e0f18emr11256984ljo.3.1692847443057;
+        Wed, 23 Aug 2023 20:24:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjkeGqdviCPH5wTUExjQLr+CqEbEiWt/ba0nY6S4lLgHFwDlCy0ER84ojf2Z39Sci9dtg33fDr0zJFePv+spQ=
+X-Received: by 2002:a2e:b710:0:b0:2b5:80e0:f18e with SMTP id
+ j16-20020a2eb710000000b002b580e0f18emr11256978ljo.3.1692847442724; Wed, 23
+ Aug 2023 20:24:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: IxbCkk7PbFkuzhcY9aYmeoZZxzELmrg5
-X-Proofpoint-ORIG-GUID: IxbCkk7PbFkuzhcY9aYmeoZZxzELmrg5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-23_17,2023-08-22_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230823153032.239304-1-eric.auger@redhat.com>
+In-Reply-To: <20230823153032.239304-1-eric.auger@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 24 Aug 2023 11:23:51 +0800
+Message-ID: <CACGkMEseBgbQx1ESA+QV_Y+BDdmwYPVg1UjUu2G0S2B6ksDeyQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, elic@nvidia.com, mail@anirudhrb.com, 
+	mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.cs.columbia.edu, netdev@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-octeontx2 driver calls page_pool_create() during driver probe()
-and fails if queue size > 32k. Page pool infra uses these buffers
-as shock absorbers for burst traffic. These pages are pinned down
-over time as working sets varies, due to the recycling nature
-of page pool, given page pool (currently) don't have a shrinker
-mechanism, the pages remain pinned down in ptr_ring.
-Instead of clamping page_pool size to 32k at
-most, limit it even more to 2k to avoid wasting memory.
+On Wed, Aug 23, 2023 at 11:30=E2=80=AFPM Eric Auger <eric.auger@redhat.com>=
+ wrote:
+>
+> Commit e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb
+> entries") Forbade vhost iotlb msg with null size to prevent entries
+> with size =3D start =3D 0 and last =3D ULONG_MAX to end up in the iotlb.
+>
+> Then commit 95932ab2ea07 ("vhost: allow batching hint without size")
+> only applied the check for VHOST_IOTLB_UPDATE and VHOST_IOTLB_INVALIDATE
+> message types to fix a regression observed with batching hit.
+>
+> Still, the introduction of that check introduced a regression for
+> some users attempting to invalidate the whole ULONG_MAX range by
+> setting the size to 0. This is the case with qemu/smmuv3/vhost
+> integration which does not work anymore. It Looks safe to partially
+> revert the original commit and allow VHOST_IOTLB_INVALIDATE messages
+> with null size. vhost_iotlb_del_range() will compute a correct end
+> iova. Same for vhost_vdpa_iotlb_unmap().
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-This have been tested on octeontx2 CN10KA hardware.
-TCP and UDP tests using iperf shows no performance regressions.
+Cc: stable@vger.kernel.org
 
-Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
+I think we need to document the usage of 0 as msg.size for
+IOTLB_INVALIDATE in uapi.
 
-ChangeLogs:
+Other than this:
 
-v2->v3: Fix macro aligment and header file changes suggested by
-	Alexander Lobakin
-v1->v2: Commit message changes and typo fixes
-v0->v1: Commit message changes.
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h   | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 77c8f650f7ac..3e1c70c74622 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 	}
- 
- 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
--	pp_params.pool_size = numptrs;
-+	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
- 	pp_params.nid = NUMA_NO_NODE;
- 	pp_params.dev = pfvf->dev;
- 	pp_params.dma_dir = DMA_FROM_DEVICE;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-index b5d689eeff80..9e3bfbe5c480 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-@@ -23,6 +23,8 @@
- #define	OTX2_ETH_HLEN		(VLAN_ETH_HLEN + VLAN_HLEN)
- #define	OTX2_MIN_MTU		60
- 
-+#define OTX2_PAGE_POOL_SZ	2048
-+
- #define OTX2_MAX_GSO_SEGS	255
- #define OTX2_MAX_FRAGS_IN_SQE	9
- 
--- 
-2.25.1
+Thanks
+
+> Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entri=
+es")
+> ---
+>  drivers/vhost/vhost.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index c71d573f1c94..e0c181ad17e3 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1458,9 +1458,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>                 goto done;
+>         }
+>
+> -       if ((msg.type =3D=3D VHOST_IOTLB_UPDATE ||
+> -            msg.type =3D=3D VHOST_IOTLB_INVALIDATE) &&
+> -            msg.size =3D=3D 0) {
+> +       if (msg.type =3D=3D VHOST_IOTLB_UPDATE && msg.size =3D=3D 0) {
+>                 ret =3D -EINVAL;
+>                 goto done;
+>         }
+> --
+> 2.41.0
+>
 
 
