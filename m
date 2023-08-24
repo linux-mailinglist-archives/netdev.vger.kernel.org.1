@@ -1,120 +1,88 @@
-Return-Path: <netdev+bounces-30472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44784787812
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 20:36:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90EA0787837
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 20:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2939280157
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 18:36:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713D51C20EB1
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 18:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9301134A1;
-	Thu, 24 Aug 2023 18:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E5714F8B;
+	Thu, 24 Aug 2023 18:49:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDA4CA76
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 18:36:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66D45C433C8;
-	Thu, 24 Aug 2023 18:36:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692902198;
-	bh=54RR5HEt4NRZ+LMzvy1AprSDd8pbmrH+Y+aTS6x2Tkk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QGnJuwHbKlzYpqRUV+slZhpwelCK/Bov03qUkxk4mrjmjR8oIAzhVn4glAc1dF8xi
-	 sQBnEXd204anhiLm8VsNj/uAipAykx9SJsqCrwKfF52/iIVrDq4yWHhikPXvOrKgSZ
-	 WQVM591+OTQXLn0m3u7WraUS0ieAHMXxo7pxutIkQ8S3Qw7NAt+gHSuGlpWntZ8Qki
-	 QjKgThKu1rMdw5PlgPhT42C0w9EN/ijMcp4Hp93iqevn5QzU9ECkL6PJuwZWcixTRW
-	 JOIW3s4Epfh2h0E1KWoXpag5kILwnXo/JsqzYiCcVg2XAaPyHpiqzYNP298Flwy9IP
-	 wQazn+/4HQ80Q==
-Date: Thu, 24 Aug 2023 11:36:37 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com
-Subject: Re: [RFC PATCH net-next 1/3] net: ethtool: add symmetric Toeplitz
- RSS hash function
-Message-ID: <ZOejNYJgR74JGRse@x130>
-References: <20230823164831.3284341-1-ahmed.zaki@intel.com>
- <20230823164831.3284341-2-ahmed.zaki@intel.com>
- <ZOZhzYExHgnSBej4@x130>
- <94d9c857-2c2b-77f0-9b17-8088068eee6d@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF52CA76
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 18:49:27 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36AA1BD1;
+	Thu, 24 Aug 2023 11:49:22 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5007616b756so165060e87.3;
+        Thu, 24 Aug 2023 11:49:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692902961; x=1693507761;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LHRS4UEXxu8F0WleFwTDxLVpmIkpw8qRBxsTWoqyCew=;
+        b=EzE2YpmXh9abD9+0dqFc9MXO0MNUNQieniyt6V4qvN5TbOLydMBrfnhUzSEiMPK2TG
+         HnK8yubCC0Vy5L/1zZm4zNSx/jIloKmOIH9XDItHJ3c8NcFSE/UxNpOyVnG3zeTQO6+9
+         /3NzsVVWEcLTRaVv47zkjW25i2/ak6L/uDcjF2hi0o9dMXXuQtTd4Ak3sJuiB819cd9t
+         ln7p4IAUV4h4YyIBPdd4rPwNqeDo9XfRAa6klh4o+da6x+z4JKJ/RvkOOPHTMydY4+1Q
+         ULpNX1KoZiDUofBobwzMgOFoYucjZsyDzZslglJE98EW7rCRyGVCxN3/8YnEGNW/mjcT
+         PGiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692902961; x=1693507761;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LHRS4UEXxu8F0WleFwTDxLVpmIkpw8qRBxsTWoqyCew=;
+        b=I72GuY87bQ67ZhoIZHHuz+aNhF8JbDJi86wvc8uZFeYD9XnvoVUADBcS5KAwnhr2mV
+         HmKGjjvDApdZlNJiP4JZpJGf3AoF4dRTwQ/RG069YjAVKVzZq8dArJjAxxfpUkh3zKCn
+         IU9EPsl0E+1I+94wsXGHdaGXwFCwc/q29OZ3AUMW4GaWDPxx8Hazro49vWbXE/uhorCO
+         2rlZpEn7I4zjlPcWWE05kY9dv+JaflVF2EWkcc9gvltVUVxHstVbFVwyeGVd4ypd4yDF
+         lM+ACwZ+mRHFhXkZRqvwAzM/Y6kK6by5ao5DA8ARVCI8a7/JL9eaOAjCGsEz/kL6zAz7
+         +zuQ==
+X-Gm-Message-State: AOJu0YzeEbNHuWY+s8IaAw/KSvj25A+VBIA9zdn+mGqSiZX0DHqX9yVP
+	CpmSxD7HnjNk6JEAi0oaZh8=
+X-Google-Smtp-Source: AGHT+IH4UH6SkmpNTWiDNASumNMT3avgYEaJSuF1a/GllfuoDAQfjLNGRgsgsTLHW4a+HgVEswOKCA==
+X-Received: by 2002:a05:6512:36c9:b0:4fe:17d6:af2b with SMTP id e9-20020a05651236c900b004fe17d6af2bmr10240267lfs.42.1692902960837;
+        Thu, 24 Aug 2023 11:49:20 -0700 (PDT)
+Received: from [192.168.100.57] ([77.105.14.121])
+        by smtp.gmail.com with ESMTPSA id i9-20020aa7c709000000b0052a198d8a4dsm59792edq.52.2023.08.24.11.49.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 11:49:20 -0700 (PDT)
+Message-ID: <add84df503df6b0bd3f572cd396dbde9da558eab.camel@gmail.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: dsa: marvell: add
+ MV88E6361 switch to compatibility list
+From: airat.gl@gmail.com
+To: alexis.lothore@bootlin.com
+Cc: andrew@lunn.ch, davem@davemloft.net, devicetree@vger.kernel.org, 
+	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, olteanv@gmail.com, 
+	pabeni@redhat.com, paul.arola@telus.com, richardcochran@gmail.com, 
+	scott.roberts@telus.com, thomas.petazzoni@bootlin.com
+Date: Thu, 24 Aug 2023 20:49:17 +0200
+In-Reply-To: <20230517203430.448705-2-alexis.lothore@bootlin.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+User-Agent: Evolution 3.48.4 (by Flathub.org) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <94d9c857-2c2b-77f0-9b17-8088068eee6d@intel.com>
+X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 24 Aug 07:14, Ahmed Zaki wrote:
->
->On 2023-08-23 13:45, Saeed Mahameed wrote:
->>On 23 Aug 10:48, Ahmed Zaki wrote:
->>>Symmetric RSS hash functions are beneficial in applications that monitor
->>>both Tx and Rx packets of the same flow (IDS, software firewalls, 
->>>..etc).
->>>Getting all traffic of the same flow on the same RX queue results in
->>>higher CPU cache efficiency.
->>>
-
-...
-
->>
->>What is the expectation of the symmetric toeplitz hash, how do you 
->>achieve
->>that? by sorting packet fields? which fields?
->>
->>Can you please provide a link to documentation/spec?
->>We should make sure all vendors agree on implementation and 
->>expectation of
->>the symmetric hash function.
->
->The way the Intel NICs are achieving this hash symmetry is by XORing 
->the source and destination values of the IP and L4 ports and then 
->feeding these values to the regular Toeplitz (in-tree) hash algorithm.
->
->For example, for UDP/IPv4, the input fields for the Toeplitz hash would be:
->
->(SRC_IP, DST_IP, SRC_PORT,  DST_PORT)
->
-
-So you mangle the input. This is different than the paper you
-referenced below which doesn't change the input but it modifies the RSS
-algorithm and uses a special hash key.
-
->If symmetric Toeplitz is set, the NIC XOR the src and dst fields:
->
->(SRC_IP^DST_IP ,  SRC_IP^DST_IP, SRC_PORT^DST_PORT, SRC_PORT^DST_PORT)
->
->This way, the output hash would be the same for both flow directions. 
->Same is applicable for IPv6, TCP and SCTP.
->
-
-I understand the motivation, I just want to make sure the interpretation is
-clear, I agree with Jakub, we should use a clear name for the ethtool
-parameter or allow users to select "xor-ed"/"sorted" fields as Jakub
-suggested.
-
->Regarding the documentation, the above is available in our public 
->datasheets [2]. In the final version, I can add similar explanation in 
->the headers (kdoc) and under "Documentation/networking/" so that there 
->is a clear understanding of the algorithm.
->
->
->[1] https://www.ndsl.kaist.edu/~kyoungsoo/papers/TR-symRSS.pdf
->
->[2] E810 datasheet: 7.10.10.2 : Symmetric Hash
->
->https://www.intel.com/content/www/us/en/content-details/613875/intel-ethernet-controller-e810-datasheet.html
->
-
-This document doesn't mention anything about implementation.
-
+Is there an error? The new string include 6163 instead of 6361
 
