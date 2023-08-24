@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-30309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB82786DB6
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:22:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B50786DB7
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28F8A1C20CF5
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:22:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 180891C20DED
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13766100C1;
-	Thu, 24 Aug 2023 11:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A334C10966;
+	Thu, 24 Aug 2023 11:20:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06B310966
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:20:25 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A38C419B3;
-	Thu, 24 Aug 2023 04:20:23 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fee769fd53so46231275e9.1;
-        Thu, 24 Aug 2023 04:20:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903F21119D
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:20:27 +0000 (UTC)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C031119B7;
+	Thu, 24 Aug 2023 04:20:24 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-31c71898109so862230f8f.2;
+        Thu, 24 Aug 2023 04:20:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692876021; x=1693480821;
+        d=gmail.com; s=20221208; t=1692876023; x=1693480823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xeOioWQbqu83Tsvvw7lSdRkXGk4CEXA20oNSkobpGlo=;
-        b=gQiAqhcEyDPLomsMQQriZQ1l0Coxk2CvtQvZg5590+VoWiyK5ollT714vKPx4+e8id
-         rn4OXWQUBY0mEjjsZBpQipIcueevB6c1roYyNmgCXxkXY1tkl1K2+U0nreze0678Kxm6
-         fMlgmQW20xhsB/ClKH6wQoxOcsjT6JXmtqbLYmgg5GzzRuPhEduwQ9LtuNTUNLwO9u/j
-         25N+AbhdFV4NNIG8J+ezLbZTFiwfSo4DepXzAgdj2jtTZj+Q66IZzUtSRph45hA5uskN
-         GVrOGdRsv7MEa3JEJiz2DNmZgoVaGLdhYxfKXew2tjNhd7XGsj2Mb1uby4TpOyzXg4lq
-         7s4Q==
+        bh=6xYApsDeilR/lh/FduE88Yq5t+89QhdT6EgnUVD7mho=;
+        b=CGZK0n4tTp/q5XNWidUDWXMGNBfMaaLV86EKEJQW1HP2ugu3okeP8THIJQxkb4ptUz
+         1KHJ1uEARhmuFlvwBlJ+y9CTj21KQX9bKpYCOCm5JLfwQhF1OISQk0qEGprzvfsxKj9Y
+         0v0KRx3RnZIpyA3neEkM2GRgNJcxiCjGFLFOi0Q2iSH5yFu2Xe7wqvxnnZ1Y5CjB32F1
+         ikj+cYcwBWu3f59/LxoG31W/9Pc/bPW5heVKtrKzDK/OwdNNKK22tB5Q08YXtTFzshUk
+         pM6ryIzMnNWPjhY55LoJQ2Qyb167Q+ZGCsN1AiR6oc1qXNwFaXWZVI22HSBljm3feu45
+         UiYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692876021; x=1693480821;
+        d=1e100.net; s=20221208; t=1692876023; x=1693480823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xeOioWQbqu83Tsvvw7lSdRkXGk4CEXA20oNSkobpGlo=;
-        b=a0qVrlKEC4RHORqjf4+a6KAc4AraX1ryMuR/wAGDFGmKY40PUbzgqteWIHLHmoAUPk
-         W1bT+maDD0LG9furgtXU9y7pE5j2HR6g/Yn9gD0OhdJFvWYwbA6gyp00awtO9iDqLU9C
-         ISEPBTch2/w1WSU2OgnPjXyeDQcjlgl8UXVlGux5HkB4RA96hQ9ShxjDgprhmJVYUKQf
-         NMOX81oxSFVou7v6fQ7E0TyEk9rZDaPyxZKtLqDuM3lZ+9n990okERt9/nNK4s5lDXb6
-         JQLDDWUTFct0qnHHqwSNQ4cuktXs75r+CpNEfUa1u+23gRj2uqzDiKwys3biEdPtaGws
-         Ndzg==
-X-Gm-Message-State: AOJu0YzTgOmZ6JfJyfOxqt0AMxDyT5M1FtZoqdb0W5vt2c/P5jNFZTzi
-	1YXsS2FhckFzmNMjgvrUN5rYvQh1jZ9k1g==
-X-Google-Smtp-Source: AGHT+IFT9viTQGZfSCa2lc1BmKh/+O6Tw3CHex9hWU4YutSgY9OO8Yvva5+/DCQijJ6QVWKzl52nbQ==
-X-Received: by 2002:a5d:595f:0:b0:317:5b32:b2c3 with SMTP id e31-20020a5d595f000000b003175b32b2c3mr11926390wri.6.1692876021562;
-        Thu, 24 Aug 2023 04:20:21 -0700 (PDT)
+        bh=6xYApsDeilR/lh/FduE88Yq5t+89QhdT6EgnUVD7mho=;
+        b=GRObB0nr1/AvTYzW3QQ9nydV6hVdvi8AshwztV+NCkYNnzo9wAJjFXdSgkjqMnEwBB
+         0aBNN57VOdW/UUPhcFdgNz32dFndCVdeDe9FHkdYCmO9mAKgyvigelDLM71fATTBih9A
+         zL8nXtwJe7k7kmjkeXUsWMT3KMRI6YejpUjY1yfGGvzLyXKs44OpnqSBm9gyHtCq6zOy
+         QXEiYRVVeLiIzobKmGb4tTCEldC1Dsc/IVxUb7wx7CkRvCMjMjn39JTI5/bvHdWYlL6h
+         ybEPYiqbCzdedqPjZ/jhJ8r6Hg7hx4NZiKQ/vrUxLbN8i/3yTFZYw/kXcPTY98Gx2qet
+         jSRQ==
+X-Gm-Message-State: AOJu0Yy13plJONvX/jiPdUonUbvxO1VqTWkeP6hx+R1ajGUDj1dU+QQi
+	f3ryXnLbnpB6Z7Qd61HUJSmQklEt8Onc0g==
+X-Google-Smtp-Source: AGHT+IHXvVtFv2KHiZuXteTdT1D+ep7x1kdon/zlQoA11jMGffRK4x8Bg6gdkd2HxXYrrWTssUY3AQ==
+X-Received: by 2002:adf:fa88:0:b0:319:7abf:d8e2 with SMTP id h8-20020adffa88000000b003197abfd8e2mr11196464wrr.24.1692876022754;
+        Thu, 24 Aug 2023 04:20:22 -0700 (PDT)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:1a5:1436:c34c:226])
-        by smtp.gmail.com with ESMTPSA id i14-20020a5d630e000000b0031980783d78sm21875295wru.54.2023.08.24.04.20.20
+        by smtp.gmail.com with ESMTPSA id i14-20020a5d630e000000b0031980783d78sm21875295wru.54.2023.08.24.04.20.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 04:20:21 -0700 (PDT)
+        Thu, 24 Aug 2023 04:20:22 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -67,11 +67,10 @@ To: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@google.com>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next v5 06/12] tools/net/ynl: Fix extack parsing with fixed header genlmsg
-Date: Thu, 24 Aug 2023 12:19:57 +0100
-Message-ID: <20230824112003.52939-7-donald.hunter@gmail.com>
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v5 07/12] tools/net/ynl: Add support for netlink-raw families
+Date: Thu, 24 Aug 2023 12:19:58 +0100
+Message-ID: <20230824112003.52939-8-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230824112003.52939-1-donald.hunter@gmail.com>
 References: <20230824112003.52939-1-donald.hunter@gmail.com>
@@ -89,131 +88,241 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Move decode_fixed_header into YnlFamily and add a _fixed_header_size
-method to allow extack decoding to skip the fixed header.
+Refactor the ynl code to encapsulate protocol specifics into
+NetlinkProtocol and GenlProtocol.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- tools/net/ynl/lib/ynl.py | 65 ++++++++++++++++++++++++----------------
- 1 file changed, 40 insertions(+), 25 deletions(-)
+ tools/net/ynl/lib/ynl.py | 124 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 91 insertions(+), 33 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 6951bcc7efdc..1d1bc712456e 100644
+index 1d1bc712456e..e5001356ad0c 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -293,7 +293,7 @@ def _genl_load_families():
+@@ -25,6 +25,7 @@ class Netlink:
+     NETLINK_ADD_MEMBERSHIP = 1
+     NETLINK_CAP_ACK = 10
+     NETLINK_EXT_ACK = 11
++    NETLINK_GET_STRICT_CHK = 12
  
-                 gm = GenlMsg(nl_msg)
-                 fam = dict()
--                for attr in gm.raw_attrs:
-+                for attr in NlAttrs(gm.raw):
-                     if attr.type == Netlink.CTRL_ATTR_FAMILY_ID:
-                         fam['id'] = attr.as_scalar('u16')
-                     elif attr.type == Netlink.CTRL_ATTR_FAMILY_NAME:
-@@ -317,23 +317,10 @@ def _genl_load_families():
+     # Netlink message
+     NLMSG_ERROR = 2
+@@ -228,6 +229,9 @@ class NlMsg:
+                             desc += f" ({spec['doc']})"
+                         self.extack['miss-type'] = desc
  
++    def cmd(self):
++        return self.nl_type
++
+     def __repr__(self):
+         msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}\n"
+         if self.error:
+@@ -322,6 +326,9 @@ class GenlMsg:
+         self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
+         self.raw = nl_msg.raw[4:]
  
- class GenlMsg:
--    def __init__(self, nl_msg, fixed_header_members=[]):
-+    def __init__(self, nl_msg):
-         self.nl = nl_msg
--
--        self.hdr = nl_msg.raw[0:4]
--        offset = 4
--
--        self.genl_cmd, self.genl_version, _ = struct.unpack("BBH", self.hdr)
--
--        self.fixed_header_attrs = dict()
--        for m in fixed_header_members:
--            format = NlAttr.get_format(m.type, m.byte_order)
--            decoded = format.unpack_from(nl_msg.raw, offset)
--            offset += format.size
--            self.fixed_header_attrs[m.name] = decoded[0]
--
--        self.raw = nl_msg.raw[offset:]
--        self.raw_attrs = NlAttrs(self.raw)
-+        self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
-+        self.raw = nl_msg.raw[4:]
- 
++    def cmd(self):
++        return self.genl_cmd
++
      def __repr__(self):
          msg = repr(self.nl)
-@@ -509,17 +496,44 @@ class YnlFamily(SpecFamily):
+         msg += f"\tgenl_cmd = {self.genl_cmd} genl_ver = {self.genl_version}\n"
+@@ -330,9 +337,41 @@ class GenlMsg:
+         return msg
  
-         return None
  
--    def _decode_extack(self, request, attr_space, extack):
-+    def _decode_extack(self, request, op, extack):
+-class GenlFamily:
+-    def __init__(self, family_name):
++class NetlinkProtocol:
++    def __init__(self, family_name, proto_num):
+         self.family_name = family_name
++        self.proto_num = proto_num
++
++    def _message(self, nl_type, nl_flags, seq=None):
++        if seq is None:
++            seq = random.randint(1, 1024)
++        nlmsg = struct.pack("HHII", nl_type, nl_flags, seq, 0)
++        return nlmsg
++
++    def message(self, flags, command, version, seq=None):
++        return self._message(command, flags, seq)
++
++    def _decode(self, nl_msg):
++        return nl_msg
++
++    def decode(self, ynl, nl_msg):
++        msg = self._decode(nl_msg)
++        fixed_header_size = 0
++        if ynl:
++            op = ynl.rsp_by_value[msg.cmd()]
++            fixed_header_size = ynl._fixed_header_size(op)
++        msg.raw_attrs = NlAttrs(msg.raw[fixed_header_size:])
++        return msg
++
++    def get_mcast_id(self, mcast_name, mcast_groups):
++        if mcast_name not in mcast_groups:
++            raise Exception(f'Multicast group "{mcast_name}" not present in the spec')
++        return mcast_groups[mcast_name].value
++
++
++class GenlProtocol(NetlinkProtocol):
++    def __init__(self, family_name):
++        super().__init__(family_name, Netlink.NETLINK_GENERIC)
+ 
+         global genl_family_name_to_id
+         if genl_family_name_to_id is None:
+@@ -341,6 +380,19 @@ class GenlFamily:
+         self.genl_family = genl_family_name_to_id[family_name]
+         self.family_id = genl_family_name_to_id[family_name]['id']
+ 
++    def message(self, flags, command, version, seq=None):
++        nlmsg = self._message(self.family_id, flags, seq)
++        genlmsg = struct.pack("BBH", command, version, 0)
++        return nlmsg + genlmsg
++
++    def _decode(self, nl_msg):
++        return GenlMsg(nl_msg)
++
++    def get_mcast_id(self, mcast_name, mcast_groups):
++        if mcast_name not in self.genl_family['mcast']:
++            raise Exception(f'Multicast group "{mcast_name}" not present in the family')
++        return self.genl_family['mcast'][mcast_name]
++
+ 
+ #
+ # YNL implementation details.
+@@ -353,9 +405,19 @@ class YnlFamily(SpecFamily):
+ 
+         self.include_raw = False
+ 
+-        self.sock = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, Netlink.NETLINK_GENERIC)
++        try:
++            if self.proto == "netlink-raw":
++                self.nlproto = NetlinkProtocol(self.yaml['name'],
++                                               self.yaml['protonum'])
++            else:
++                self.nlproto = GenlProtocol(self.yaml['name'])
++        except KeyError:
++            raise Exception(f"Family '{self.yaml['name']}' not supported by the kernel")
++
++        self.sock = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, self.nlproto.proto_num)
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_CAP_ACK, 1)
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_EXT_ACK, 1)
++        self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_GET_STRICT_CHK, 1)
+ 
+         self.async_msg_ids = set()
+         self.async_msg_queue = []
+@@ -368,18 +430,12 @@ class YnlFamily(SpecFamily):
+             bound_f = functools.partial(self._op, op_name)
+             setattr(self, op.ident_name, bound_f)
+ 
+-        try:
+-            self.family = GenlFamily(self.yaml['name'])
+-        except KeyError:
+-            raise Exception(f"Family '{self.yaml['name']}' not supported by the kernel")
+ 
+     def ntf_subscribe(self, mcast_name):
+-        if mcast_name not in self.family.genl_family['mcast']:
+-            raise Exception(f'Multicast group "{mcast_name}" not present in the family')
+-
++        mcast_id = self.nlproto.get_mcast_id(mcast_name, self.mcast_groups)
+         self.sock.bind((0, 0))
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
+-                             self.family.genl_family['mcast'][mcast_name])
++                             mcast_id)
+ 
+     def _add_attr(self, space, name, value):
+         try:
+@@ -500,11 +556,9 @@ class YnlFamily(SpecFamily):
          if 'bad-attr-offs' not in extack:
              return
  
--        genl_req = GenlMsg(NlMsg(request, 0, attr_space=attr_space))
--        path = self._decode_extack_path(genl_req.raw_attrs, attr_space,
--                                        20, extack['bad-attr-offs'])
-+        genl_req = GenlMsg(NlMsg(request, 0, op.attr_set))
-+        fixed_header_size = self._fixed_header_size(op)
-+        offset = 20 + fixed_header_size
-+        path = self._decode_extack_path(NlAttrs(genl_req.raw[fixed_header_size:]),
-+                                        op.attr_set, offset,
-+                                        extack['bad-attr-offs'])
+-        genl_req = GenlMsg(NlMsg(request, 0, op.attr_set))
+-        fixed_header_size = self._fixed_header_size(op)
+-        offset = 20 + fixed_header_size
+-        path = self._decode_extack_path(NlAttrs(genl_req.raw[fixed_header_size:]),
+-                                        op.attr_set, offset,
++        msg = self.nlproto.decode(self, NlMsg(request, 0, op.attr_set))
++        offset = 20 + self._fixed_header_size(op)
++        path = self._decode_extack_path(msg.raw_attrs, op.attr_set, offset,
+                                         extack['bad-attr-offs'])
          if path:
              del extack['bad-attr-offs']
-             extack['bad-attr'] = path
+@@ -534,14 +588,17 @@ class YnlFamily(SpecFamily):
+             fixed_header_attrs[m.name] = value
+         return fixed_header_attrs
  
-+    def _fixed_header_size(self, op):
-+        if op.fixed_header:
-+            fixed_header_members = self.consts[op.fixed_header].members
-+            size = 0
-+            for m in fixed_header_members:
-+                format = NlAttr.get_format(m.type, m.byte_order)
-+                size += format.size
-+            return size
-+        else:
-+            return 0
-+
-+    def _decode_fixed_header(self, msg, name):
-+        fixed_header_members = self.consts[name].members
-+        fixed_header_attrs = dict()
-+        offset = 0
-+        for m in fixed_header_members:
-+            format = NlAttr.get_format(m.type, m.byte_order)
-+            [ value ] = format.unpack_from(msg.raw, offset)
-+            offset += format.size
-+            if m.enum:
-+                value = self._decode_enum(value, m)
-+            fixed_header_attrs[m.name] = value
-+        return fixed_header_attrs
-+
-     def handle_ntf(self, nl_msg, genl_msg):
+-    def handle_ntf(self, nl_msg, genl_msg):
++    def handle_ntf(self, decoded):
          msg = dict()
          if self.include_raw:
-@@ -594,7 +608,7 @@ class YnlFamily(SpecFamily):
-             nms = NlMsgs(reply, attr_space=op.attr_set)
-             for nl_msg in nms:
-                 if nl_msg.extack:
--                    self._decode_extack(msg, op.attr_set, nl_msg.extack)
-+                    self._decode_extack(msg, op, nl_msg.extack)
+-            msg['nlmsg'] = nl_msg
+-            msg['genlmsg'] = genl_msg
+-        op = self.rsp_by_value[genl_msg.genl_cmd]
++            msg['raw'] = decoded
++        op = self.rsp_by_value[decoded.cmd()]
++        attrs = self._decode(decoded.raw_attrs, op.attr_set.name)
++        if op.fixed_header:
++            attrs.update(self._decode_fixed_header(decoded, op.fixed_header))
++
+         msg['name'] = op['name']
+-        msg['msg'] = self._decode(genl_msg.raw_attrs, op.attr_set.name)
++        msg['msg'] = attrs
+         self.async_msg_queue.append(msg)
  
-                 if nl_msg.error:
-                     raise NlError(nl_msg)
-@@ -605,7 +619,7 @@ class YnlFamily(SpecFamily):
+     def check_ntf(self):
+@@ -561,12 +618,12 @@ class YnlFamily(SpecFamily):
+                     print("Netlink done while checking for ntf!?")
+                     continue
+ 
+-                gm = GenlMsg(nl_msg)
+-                if gm.genl_cmd not in self.async_msg_ids:
+-                    print("Unexpected msg id done while checking for ntf", gm)
++                decoded = self.nlproto.decode(self, nl_msg)
++                if decoded.cmd() not in self.async_msg_ids:
++                    print("Unexpected msg id done while checking for ntf", decoded)
+                     continue
+ 
+-                self.handle_ntf(nl_msg, gm)
++                self.handle_ntf(decoded)
+ 
+     def operation_do_attributes(self, name):
+       """
+@@ -587,7 +644,7 @@ class YnlFamily(SpecFamily):
+             nl_flags |= Netlink.NLM_F_DUMP
+ 
+         req_seq = random.randint(1024, 65535)
+-        msg = _genl_msg(self.family.family_id, nl_flags, op.req_value, 1, req_seq)
++        msg = self.nlproto.message(nl_flags, op.req_value, 1, req_seq)
+         fixed_header_members = []
+         if op.fixed_header:
+             fixed_header_members = self.consts[op.fixed_header].members
+@@ -619,19 +676,20 @@ class YnlFamily(SpecFamily):
                      done = True
                      break
  
--                gm = GenlMsg(nl_msg, fixed_header_members)
-+                gm = GenlMsg(nl_msg)
+-                gm = GenlMsg(nl_msg)
++                decoded = self.nlproto.decode(self, nl_msg)
++
                  # Check if this is a reply to our request
-                 if nl_msg.nl_seq != req_seq or gm.genl_cmd != op.rsp_value:
-                     if gm.genl_cmd in self.async_msg_ids:
-@@ -615,8 +629,9 @@ class YnlFamily(SpecFamily):
-                         print('Unexpected message: ' + repr(gm))
+-                if nl_msg.nl_seq != req_seq or gm.genl_cmd != op.rsp_value:
+-                    if gm.genl_cmd in self.async_msg_ids:
+-                        self.handle_ntf(nl_msg, gm)
++                if nl_msg.nl_seq != req_seq or decoded.cmd() != op.rsp_value:
++                    if decoded.cmd() in self.async_msg_ids:
++                        self.handle_ntf(decoded)
+                         continue
+                     else:
+-                        print('Unexpected message: ' + repr(gm))
++                        print('Unexpected message: ' + repr(decoded))
                          continue
  
--                rsp_msg = self._decode(gm.raw_attrs, op.attr_set.name)
--                rsp_msg.update(gm.fixed_header_attrs)
-+                rsp_msg = self._decode(NlAttrs(gm.raw), op.attr_set.name)
-+                if op.fixed_header:
-+                    rsp_msg.update(self._decode_fixed_header(gm, op.fixed_header))
+-                rsp_msg = self._decode(NlAttrs(gm.raw), op.attr_set.name)
++                rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
+                 if op.fixed_header:
+-                    rsp_msg.update(self._decode_fixed_header(gm, op.fixed_header))
++                    rsp_msg.update(self._decode_fixed_header(decoded, op.fixed_header))
                  rsp.append(rsp_msg)
  
          if not rsp:
