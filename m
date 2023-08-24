@@ -1,358 +1,162 @@
-Return-Path: <netdev+bounces-30300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F870786D50
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:02:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B610C786D51
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30251C20D78
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:02:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBEE31C20DA4
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213E8CA6F;
-	Thu, 24 Aug 2023 11:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D46CA7E;
+	Thu, 24 Aug 2023 11:02:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FF32454A
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B94A933
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:02:15 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD4C1BE2
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:01:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F413519A2
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:01:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692874847;
+	s=mimecast20190719; t=1692874905;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=QAfwdEDndECSlDGorQjnh/S+F3+SKEyMi4kul5pbia0=;
-	b=Bxuz1GB5xte5DPtS6q3rcNRNtyg9u9DBxOkUKY+4wllyww2pAvauMTITlL1PV6ww5V/LUw
-	XQ82M2nmAzMLyddq7aWikqhK5NHh7dUKeu0hoeA5v+HhVL+ALnVipnN6iau9aUYZKy1wdg
-	TSzHIibxffvhfEeJgmqHURshRp5i70g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-594-BlUxG03TPHOaVS6aUlFt0A-1; Thu, 24 Aug 2023 07:00:44 -0400
-X-MC-Unique: BlUxG03TPHOaVS6aUlFt0A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C9503185A7B8;
-	Thu, 24 Aug 2023 11:00:43 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 878B01121314;
-	Thu, 24 Aug 2023 11:00:42 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for 6.5-rc8
-Date: Thu, 24 Aug 2023 13:00:37 +0200
-Message-ID: <20230824110037.31215-1-pabeni@redhat.com>
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5WrWsrLG6AaEOOJ9A9ov3qY439ojh9QoBEVAKqojw0Y=;
+	b=hjeIRNIHvE0HLk+blrQwnWbMT4kAI6cT5fyBtn0/EHbgoG/tGgEVqm2Oxwi3iOw5T/cpft
+	XYFCqHGMSdQAatX/tlPME3iEbWHjPkkwyqaRjSLuaz+EyeqES9Ek63Qs44z6BNCqljspxj
+	vs4+Xc9Czsjn8x/cSRmfuHES9Q+Wn90=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-352-tdD5M1VaM_ua2k_-12EgOA-1; Thu, 24 Aug 2023 07:01:44 -0400
+X-MC-Unique: tdD5M1VaM_ua2k_-12EgOA-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fe52cd62aaso7778594e87.0
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:01:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692874902; x=1693479702;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5WrWsrLG6AaEOOJ9A9ov3qY439ojh9QoBEVAKqojw0Y=;
+        b=N5dSYmn16z1BqSERTY5HgYPH1k/KeMMM41evgQuJK68GGCOa1sb2254ZT29n3A4jI8
+         /HEP9cXyBOhZLU8xjCM+Ugy/wstuqTTZDEITvi3MeGrLZbWvLOG7iYwOGLjLYCeROPaj
+         U3jhtxLnJaZ9ZW97+91gkk1Wf7a4VZgHs9MdPV9rVsnE8pfungg+LVgBML/wO79KBNwO
+         TKK57xzG/vhp2tlhm4aYCZPhhbgwm1fS7VmnQRxfCQxSX2+pq7Rds7H23B5xqyX5b6ZO
+         MOi0SxKX1TDwtKwRf+/yPIfZQzcoj9APfEeSbEsN6n/ZYt4gPAg2HRgT161lTXvhmSko
+         WVZQ==
+X-Gm-Message-State: AOJu0Yyfz0Dddp0lrNGrrx8+4zlCQR5fwzHKx9Gj2OLlWnw2hEB/b7cW
+	9R+cy2fcSkNVZV4ioZiSWmus8jBymA86UXsQtl2cph4z1DPdRM3y4usstygEyUPqMLsGlGHyVFC
+	BJ/glivxw5euLNCTS
+X-Received: by 2002:a05:6512:689:b0:4fd:d64f:c0a6 with SMTP id t9-20020a056512068900b004fdd64fc0a6mr13373790lfe.48.1692874902596;
+        Thu, 24 Aug 2023 04:01:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/8JSIpvwRmqUiTu7BKn1NEXo81ltu5VANojRzPX7O9gRwpDR1OYO6jocVlLCUqX3t2VYMrg==
+X-Received: by 2002:a05:6512:689:b0:4fd:d64f:c0a6 with SMTP id t9-20020a056512068900b004fdd64fc0a6mr13373761lfe.48.1692874902091;
+        Thu, 24 Aug 2023 04:01:42 -0700 (PDT)
+Received: from [192.168.41.200] (83-90-141-187-cable.dk.customer.tdc.net. [83.90.141.187])
+        by smtp.gmail.com with ESMTPSA id d6-20020a05640208c600b0052a3ad836basm1995473edz.41.2023.08.24.04.01.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Aug 2023 04:01:41 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <131877ae-cb72-1bc2-350d-8a21c3b4e27a@redhat.com>
+Date: Thu, 24 Aug 2023 13:01:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: brouer@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
+ alexander.duyck@gmail.com, ilias.apalodimas@linaro.org,
+ linyunsheng@huawei.com, Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: Re: [PATCH v3 net] octeontx2-pf: fix page_pool creation fail for
+ rings > 32k
+Content-Language: en-US
+To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230824030301.2525375-1-rkannoth@marvell.com>
+In-Reply-To: <20230824030301.2525375-1-rkannoth@marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Linus!
 
-I preserved the new section introduced by Jakub in the previous -net
-PR, I hope it makes things clearer.
 
-No known outstanding regressions.
-
-The following changes since commit 0e8860d2125f51ba9bca67a520d826cb8f66cf42:
-
-  Merge tag 'net-6.5-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-08-18 06:52:23 +0200)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc8
-
-for you to fetch changes up to 8938fc0c7e16e0868a1083deadc91b95b72ca0da:
-
-  Merge tag 'nf-23-08-23' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2023-08-24 10:33:22 +0200)
-
-----------------------------------------------------------------
-Networking fixes for 6.5-rc8, including fixes from wifi, can
-and netfilter
-
-Fixes to fixes:
-
-  - nf_tables:
-    - GC transaction race with abort path
-    - defer gc run if previous batch is still pending
-
-Previous releases - regressions:
-
-  - ipv4: fix data-races around inet->inet_id
-
-  - phy: fix deadlocking in phy_error() invocation
-
-  - mdio: fix C45 read/write protocol
-
-  - ipvlan: fix a reference count leak warning in ipvlan_ns_exit()
-
-  - ice: fix NULL pointer deref during VF reset
-
-  - i40e: fix potential NULL pointer dereferencing of pf->vf i40e_sync_vsi_filters()
-
-  - tg3: use slab_build_skb() when needed
-
-  - mtk_eth_soc: fix NULL pointer on hw reset
-
-Previous releases - always broken:
-
-  - core: validate veth and vxcan peer ifindexes
-
-  - sched: fix a qdisc modification with ambiguous command request
-
-  - devlink: add missing unregister linecard notification
-
-  - wifi: mac80211: limit reorder_buf_filtered to avoid UBSAN warning
-
-  - batman:
-    - do not get eth header before batadv_check_management_packet
-    - fix batadv_v_ogm_aggr_send memory leak
-
-  - bonding: fix macvlan over alb bond support
-
-  - mlxsw: set time stamp fields also when its type is MIRROR_UTC
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alessio Igor Bogani (1):
-      igb: Avoid starting unnecessary workqueues
-
-Amit Cohen (1):
-      mlxsw: Fix the size of 'VIRT_ROUTER_MSB'
-
-Andrii Staikov (1):
-      i40e: fix potential NULL pointer dereferencing of pf->vf i40e_sync_vsi_filters()
-
-Anh Tuan Phan (1):
-      selftests/net: Add log.txt and tools to .gitignore
-
-Arınç ÜNAL (1):
-      net: dsa: mt7530: fix handling of 802.1X PAE frames
-
-Daniel Golle (1):
-      net: ethernet: mtk_eth_soc: fix NULL pointer on hw reset
-
-Danielle Ratson (1):
-      mlxsw: pci: Set time stamp fields also when its type is MIRROR_UTC
-
-David S. Miller (1):
-      Merge branch 'fixed_phy_register-return-value'
-
-Edward Cree (1):
-      sfc: allocate a big enough SKB for loopback selftest packet
-
-Eric Dumazet (3):
-      sock: annotate data-races around prot->memory_pressure
-      dccp: annotate data-races in dccp_poll()
-      ipv4: fix data-races around inet->inet_id
-
-Florian Westphal (3):
-      netfilter: nf_tables: validate all pending tables
-      netfilter: nf_tables: fix out of memory error handling
-      netfilter: nf_tables: defer gc run if previous batch is still pending
-
-Hangbin Liu (4):
-      selftests: bonding: do not set port down before adding to bond
-      bonding: fix macvlan over alb bond support
-      selftest: bond: add new topo bond_topo_2d1c.sh
-      selftests: bonding: add macvlan over bond testing
-
-Hariprasad Kelam (1):
-      octeontx2-af: SDP: fix receive link config
-
-Ido Schimmel (3):
-      mlxsw: reg: Fix SSPR register layout
-      selftests: mlxsw: Fix test failure on Spectrum-4
-      rtnetlink: Reject negative ifindexes in RTM_NEWLINK
-
-Jakub Kicinski (6):
-      Merge tag 'batadv-net-pullrequest-20230816' of git://git.open-mesh.org/linux-merge
-      Merge branch 'mlxsw-fixes-for-spectrum-4'
-      net: validate veth and vxcan peer ifindexes
-      Merge tag 'wireless-2023-08-22' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      Merge branch 'can-fixes-for-6-5-rc7'
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-
-Jamal Hadi Salim (1):
-      net/sched: fix a qdisc modification with ambiguous command request
-
-Jesse Brandeburg (1):
-      ice: fix receive buffer size miscalculation
-
-Jiri Pirko (1):
-      devlink: add missing unregister linecard notification
-
-Josua Mayer (1):
-      net: sfp: handle 100G/25G active optical cables in sfp_parse_support
-
-Kees Cook (1):
-      tg3: Use slab_build_skb() when needed
-
-Lu Wei (1):
-      ipvlan: Fix a reference count leak warning in ipvlan_ns_exit()
-
-Marek Behún (1):
-      leds: trigger: netdev: rename 'hw_control' sysfs entry to 'offloaded'
-
-Michael Ellerman (1):
-      ibmveth: Use dcbf rather than dcbfl
-
-Oliver Hartkopp (2):
-      can: isotp: fix support for transmission of SF without flow control
-      can: raw: add missing refcount for memory leak fix
-
-Pablo Neira Ayuso (3):
-      netfilter: nf_tables: flush pending destroy work before netlink notifier
-      netfilter: nf_tables: GC transaction race with abort path
-      netfilter: nf_tables: use correct lock to protect gc_list
-
-Paolo Abeni (2):
-      Merge branch 'fix-macvlan-over-alb-bond-support'
-      Merge tag 'nf-23-08-23' of ssh://gitolite.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Petr Oros (2):
-      Revert "ice: Fix ice VF reset during iavf initialization"
-      ice: Fix NULL pointer deref during VF reset
-
-Ping-Ke Shih (1):
-      wifi: mac80211: limit reorder_buf_filtered to avoid UBSAN warning
-
-Randy Dunlap (1):
-      wifi: iwlwifi: mvm: add dependency for PTP clock
-
-Remi Pommarel (3):
-      batman-adv: Do not get eth header before batadv_check_management_packet
-      batman-adv: Fix TT global entry leak when client roamed back
-      batman-adv: Fix batadv_v_ogm_aggr_send memory leak
-
-Ruan Jinjie (2):
-      net: bgmac: Fix return value check for fixed_phy_register()
-      net: bcmgenet: Fix return value check for fixed_phy_register()
-
-Sabrina Dubroca (1):
-      MAINTAINERS: add entry for macsec
-
-Sasha Neftin (1):
-      igc: Fix the typo in the PTM Control macro
-
-Serge Semin (2):
-      net: mdio: mdio-bitbang: Fix C45 read/write protocol
-      net: phy: Fix deadlocking in phy_error() invocation
-
-Sven Eckelmann (3):
-      batman-adv: Trigger events for auto adjusted MTU
-      batman-adv: Don't increase MTU when set by user
-      batman-adv: Hold rtnl lock during MTU update via netlink
-
-Thinh Tran (1):
-      bnx2x: new flag for track HW resource allocation
-
-Vladimir Oltean (1):
-      net: dsa: felix: fix oversize frame dropping for always closed tc-taprio gates
-
- .../ABI/testing/sysfs-class-led-trigger-netdev     |  20 +--
- MAINTAINERS                                        |  10 ++
- drivers/leds/trigger/ledtrig-netdev.c              |   8 +-
- drivers/net/bonding/bond_alb.c                     |   6 +-
- drivers/net/can/vxcan.c                            |   7 +-
- drivers/net/dsa/mt7530.c                           |   4 +
- drivers/net/dsa/mt7530.h                           |   2 +
- drivers/net/dsa/ocelot/felix_vsc9959.c             |   3 +
- drivers/net/ethernet/broadcom/bgmac.c              |   2 +-
- drivers/net/ethernet/broadcom/bnx2x/bnx2x.h        |   2 +
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c    |  21 +--
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c   |  32 +++--
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c   |  17 ++-
- drivers/net/ethernet/broadcom/genet/bcmmii.c       |   2 +-
- drivers/net/ethernet/broadcom/tg3.c                |   5 +-
- .../chelsio/inline_crypto/chtls/chtls_cm.c         |   2 +-
- drivers/net/ethernet/ibm/ibmveth.c                 |   2 +-
- drivers/net/ethernet/intel/i40e/i40e_main.c        |   5 +-
- drivers/net/ethernet/intel/ice/ice_base.c          |   3 +-
- drivers/net/ethernet/intel/ice/ice_sriov.c         |   8 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c        |  34 ++---
- drivers/net/ethernet/intel/ice/ice_vf_lib.h        |   1 -
- drivers/net/ethernet/intel/ice/ice_virtchnl.c      |   1 -
- drivers/net/ethernet/intel/igb/igb_ptp.c           |  24 ++--
- drivers/net/ethernet/intel/igc/igc_defines.h       |   2 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |   3 +-
- drivers/net/ethernet/mediatek/mtk_wed.c            |  12 +-
- .../ethernet/mellanox/mlxsw/core_acl_flex_keys.c   |   4 +-
- drivers/net/ethernet/mellanox/mlxsw/pci.c          |   8 +-
- drivers/net/ethernet/mellanox/mlxsw/reg.h          |   9 --
- .../ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c    |   2 +-
- .../mellanox/mlxsw/spectrum_acl_flex_keys.c        |   4 +-
- drivers/net/ethernet/sfc/falcon/selftest.c         |   2 +-
- drivers/net/ethernet/sfc/selftest.c                |   2 +-
- drivers/net/ethernet/sfc/siena/selftest.c          |   2 +-
- drivers/net/ipvlan/ipvlan_main.c                   |   3 +-
- drivers/net/mdio/mdio-bitbang.c                    |   4 +-
- drivers/net/phy/phy.c                              |  11 +-
- drivers/net/phy/sfp-bus.c                          |  10 ++
- drivers/net/veth.c                                 |   5 +-
- drivers/net/wireless/intel/iwlwifi/Kconfig         |   1 +
- include/net/bonding.h                              |  11 +-
- include/net/inet_sock.h                            |   2 +-
- include/net/ip.h                                   |  15 +-
- include/net/mac80211.h                             |   1 +
- include/net/netfilter/nf_tables.h                  |   6 +
- include/net/rtnetlink.h                            |   4 +-
- include/net/sock.h                                 |   7 +-
- net/batman-adv/bat_v_elp.c                         |   3 +-
- net/batman-adv/bat_v_ogm.c                         |   7 +-
- net/batman-adv/hard-interface.c                    |  14 +-
- net/batman-adv/netlink.c                           |   3 +
- net/batman-adv/soft-interface.c                    |   3 +
- net/batman-adv/translation-table.c                 |   1 -
- net/batman-adv/types.h                             |   6 +
- net/can/isotp.c                                    |  22 +--
- net/can/raw.c                                      |  35 +++--
- net/core/rtnetlink.c                               |  25 +++-
- net/dccp/ipv4.c                                    |   4 +-
- net/dccp/proto.c                                   |  20 +--
- net/devlink/leftover.c                             |   3 +
- net/ipv4/af_inet.c                                 |   2 +-
- net/ipv4/datagram.c                                |   2 +-
- net/ipv4/tcp_ipv4.c                                |   4 +-
- net/mac80211/rx.c                                  |  12 +-
- net/netfilter/nf_tables_api.c                      |  23 +--
- net/netfilter/nft_set_hash.c                       |   3 +
- net/netfilter/nft_set_pipapo.c                     |  13 +-
- net/netfilter/nft_set_rbtree.c                     |   3 +
- net/sched/sch_api.c                                |  53 +++++--
- net/sctp/socket.c                                  |   4 +-
- .../testing/selftests/drivers/net/bonding/Makefile |   4 +-
- .../drivers/net/bonding/bond-break-lacpdu-tx.sh    |   4 +-
- .../selftests/drivers/net/bonding/bond_macvlan.sh  |  99 +++++++++++++
- .../selftests/drivers/net/bonding/bond_options.sh  |   3 -
- .../drivers/net/bonding/bond_topo_2d1c.sh          | 158 +++++++++++++++++++++
- .../drivers/net/bonding/bond_topo_3d1c.sh          | 118 ++-------------
- .../selftests/drivers/net/mlxsw/sharedbuffer.sh    |  16 +--
- tools/testing/selftests/net/.gitignore             |   2 +
- 79 files changed, 664 insertions(+), 356 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
- create mode 100644 tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
+On 24/08/2023 05.03, Ratheesh Kannoth wrote:
+> octeontx2 driver calls page_pool_create() during driver probe()
+> and fails if queue size > 32k. Page pool infra uses these buffers
+> as shock absorbers for burst traffic. These pages are pinned down
+> over time as working sets varies, due to the recycling nature
+> of page pool, given page pool (currently) don't have a shrinker
+> mechanism, the pages remain pinned down in ptr_ring.
+> Instead of clamping page_pool size to 32k at
+> most, limit it even more to 2k to avoid wasting memory.
+> 
+> This have been tested on octeontx2 CN10KA hardware.
+> TCP and UDP tests using iperf shows no performance regressions.
+> 
+> Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> ---
+
+Again
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+
+> ChangeLogs:
+> 
+> v2->v3: Fix macro aligment and header file changes suggested by
+> 	Alexander Lobakin
+> v1->v2: Commit message changes and typo fixes
+> v0->v1: Commit message changes.
+> ---
+>   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
+>   drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h   | 2 ++
+>   2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> index 77c8f650f7ac..3e1c70c74622 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> @@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+>   	}
+>   
+>   	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+> -	pp_params.pool_size = numptrs;
+> +	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
+>   	pp_params.nid = NUMA_NO_NODE;
+>   	pp_params.dev = pfvf->dev;
+>   	pp_params.dma_dir = DMA_FROM_DEVICE;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+> index b5d689eeff80..9e3bfbe5c480 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+> @@ -23,6 +23,8 @@
+>   #define	OTX2_ETH_HLEN		(VLAN_ETH_HLEN + VLAN_HLEN)
+>   #define	OTX2_MIN_MTU		60
+>   
+> +#define OTX2_PAGE_POOL_SZ	2048
+> +
+>   #define OTX2_MAX_GSO_SEGS	255
+>   #define OTX2_MAX_FRAGS_IN_SQE	9
+>   
 
 
