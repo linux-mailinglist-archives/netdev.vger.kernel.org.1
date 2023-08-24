@@ -1,162 +1,184 @@
-Return-Path: <netdev+bounces-30301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B610C786D51
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:02:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1EFC786D57
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:02:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBEE31C20DA4
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:02:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655742814E5
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D46CA7E;
-	Thu, 24 Aug 2023 11:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913E5CA7E;
+	Thu, 24 Aug 2023 11:02:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B94A933
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:02:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F413519A2
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:01:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692874905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5WrWsrLG6AaEOOJ9A9ov3qY439ojh9QoBEVAKqojw0Y=;
-	b=hjeIRNIHvE0HLk+blrQwnWbMT4kAI6cT5fyBtn0/EHbgoG/tGgEVqm2Oxwi3iOw5T/cpft
-	XYFCqHGMSdQAatX/tlPME3iEbWHjPkkwyqaRjSLuaz+EyeqES9Ek63Qs44z6BNCqljspxj
-	vs4+Xc9Czsjn8x/cSRmfuHES9Q+Wn90=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-352-tdD5M1VaM_ua2k_-12EgOA-1; Thu, 24 Aug 2023 07:01:44 -0400
-X-MC-Unique: tdD5M1VaM_ua2k_-12EgOA-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fe52cd62aaso7778594e87.0
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:01:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8512324543
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:02:32 +0000 (UTC)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54622E58
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:02:31 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-68a520dba33so3287273b3a.0
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:02:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1692874951; x=1693479751;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oELav9k2SIZBN+RuqQkpAGBpv33M47omX44ww0HA6QI=;
+        b=m2reI3I62fTBYK0BD8KsPr7WKMrE5LYqNr1YDU7thGtnZ3E/gCl5XYEW9huLjHSuT9
+         MdbszaVPx6v8UUQ3UYlUGQTUhzTh/2v4bMt2a4nVpl5GuY5p5KgMroUZrJeA4krA9Vm7
+         4M6o6v682yVwEVsDkhGMl1gpcuKJ/FQB66xUgFBbyFbb/1eLLGxgYGwlipHVKuzUAiUU
+         0CZXucs+Kd0N1a9kRvisYCyaHn1zOiKQ7O65IO61adjvMWgEz99z928eBOKzzU94kpef
+         MKe/+nPdPbVZwdmNLPnIVTYZVflxUHtzBT6eGQz5Apb63fkJXe0TlvxJdClWPT0taVOx
+         RK9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692874902; x=1693479702;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5WrWsrLG6AaEOOJ9A9ov3qY439ojh9QoBEVAKqojw0Y=;
-        b=N5dSYmn16z1BqSERTY5HgYPH1k/KeMMM41evgQuJK68GGCOa1sb2254ZT29n3A4jI8
-         /HEP9cXyBOhZLU8xjCM+Ugy/wstuqTTZDEITvi3MeGrLZbWvLOG7iYwOGLjLYCeROPaj
-         U3jhtxLnJaZ9ZW97+91gkk1Wf7a4VZgHs9MdPV9rVsnE8pfungg+LVgBML/wO79KBNwO
-         TKK57xzG/vhp2tlhm4aYCZPhhbgwm1fS7VmnQRxfCQxSX2+pq7Rds7H23B5xqyX5b6ZO
-         MOi0SxKX1TDwtKwRf+/yPIfZQzcoj9APfEeSbEsN6n/ZYt4gPAg2HRgT161lTXvhmSko
-         WVZQ==
-X-Gm-Message-State: AOJu0Yyfz0Dddp0lrNGrrx8+4zlCQR5fwzHKx9Gj2OLlWnw2hEB/b7cW
-	9R+cy2fcSkNVZV4ioZiSWmus8jBymA86UXsQtl2cph4z1DPdRM3y4usstygEyUPqMLsGlGHyVFC
-	BJ/glivxw5euLNCTS
-X-Received: by 2002:a05:6512:689:b0:4fd:d64f:c0a6 with SMTP id t9-20020a056512068900b004fdd64fc0a6mr13373790lfe.48.1692874902596;
-        Thu, 24 Aug 2023 04:01:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/8JSIpvwRmqUiTu7BKn1NEXo81ltu5VANojRzPX7O9gRwpDR1OYO6jocVlLCUqX3t2VYMrg==
-X-Received: by 2002:a05:6512:689:b0:4fd:d64f:c0a6 with SMTP id t9-20020a056512068900b004fdd64fc0a6mr13373761lfe.48.1692874902091;
-        Thu, 24 Aug 2023 04:01:42 -0700 (PDT)
-Received: from [192.168.41.200] (83-90-141-187-cable.dk.customer.tdc.net. [83.90.141.187])
-        by smtp.gmail.com with ESMTPSA id d6-20020a05640208c600b0052a3ad836basm1995473edz.41.2023.08.24.04.01.40
+        d=1e100.net; s=20221208; t=1692874951; x=1693479751;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oELav9k2SIZBN+RuqQkpAGBpv33M47omX44ww0HA6QI=;
+        b=USgmKuMPQshLRexE48Qa+I34a6cB1DBoR05I4U5tzeRpYxabKy6xzb1GsLvZoBkXPf
+         swJp5ItUvV/Yl3o5hgpeL6E8ppa9snqrfeBIJeyg7B81GgcR/ynyN6FoAVGQtM9LMS5E
+         Vwu1p0Ou+KhrF0Om171igN0y0cwUKRZMka9UFbxjanp2sA7JEd7WgoWLdY9yy8mUSQuu
+         09TvURAzgpIgOHn4y3edJqXXxLnLK4IXcCvqrhBwSj9APxzzLdQ+I6bVGtFBs7A/bgXX
+         9msZ6MKrbCK3j0SbQMxkkwWu4YDPqN2vD1f6CKFegsWzpVHnCmEDAy2WZvtZeBBS+mkW
+         jE2w==
+X-Gm-Message-State: AOJu0YyUqjCCPaNDipg8YY0oX5FeuD9oxK7yxwu/VlGKWY5yvef3THev
+	9IRk2wxzVGw+QZ9cSseY1awXgQ==
+X-Google-Smtp-Source: AGHT+IF2R1qXxHpm+yMWIrVu0MlXnuC57ojGuF9ppq+MmulUi5V2RsjjDt59eMIHrK5WNaadTG+GOA==
+X-Received: by 2002:a05:6a20:938d:b0:129:d944:2e65 with SMTP id x13-20020a056a20938d00b00129d9442e65mr20501635pzh.13.1692874950709;
+        Thu, 24 Aug 2023 04:02:30 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
+        by smtp.gmail.com with ESMTPSA id r5-20020a638f45000000b00528db73ed70sm11223776pgn.3.2023.08.24.04.02.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 04:01:41 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <131877ae-cb72-1bc2-350d-8a21c3b4e27a@redhat.com>
-Date: Thu, 24 Aug 2023 13:01:39 +0200
+        Thu, 24 Aug 2023 04:02:30 -0700 (PDT)
+Message-ID: <add68d1c-763d-4f08-96ba-73b8d9604391@daynix.com>
+Date: Thu, 24 Aug 2023 20:02:27 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: brouer@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- alexander.duyck@gmail.com, ilias.apalodimas@linaro.org,
- linyunsheng@huawei.com, Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v3 net] octeontx2-pf: fix page_pool creation fail for
- rings > 32k
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] igb: clean up in all error paths when enabling SR-IOV
+To: Corinna Vinschen <vinschen@redhat.com>, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, davem@davemloft.net, kuba@kernel.org,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20230824091603.3188249-1-vinschen@redhat.com>
 Content-Language: en-US
-To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230824030301.2525375-1-rkannoth@marvell.com>
-In-Reply-To: <20230824030301.2525375-1-rkannoth@marvell.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20230824091603.3188249-1-vinschen@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 24/08/2023 05.03, Ratheesh Kannoth wrote:
-> octeontx2 driver calls page_pool_create() during driver probe()
-> and fails if queue size > 32k. Page pool infra uses these buffers
-> as shock absorbers for burst traffic. These pages are pinned down
-> over time as working sets varies, due to the recycling nature
-> of page pool, given page pool (currently) don't have a shrinker
-> mechanism, the pages remain pinned down in ptr_ring.
-> Instead of clamping page_pool size to 32k at
-> most, limit it even more to 2k to avoid wasting memory.
+On 2023/08/24 18:16, Corinna Vinschen wrote:
+> After commit 50f303496d92 ("igb: Enable SR-IOV after reinit"), removing
+> the igb module could hang or crash (depending on the machine) when the
+> module has been loaded with the max_vfs parameter set to some value != 0.
 > 
-> This have been tested on octeontx2 CN10KA hardware.
-> TCP and UDP tests using iperf shows no performance regressions.
+> In case of one test machine with a dual port 82580, this hang occured:
 > 
-> Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> [  232.480687] igb 0000:41:00.1: removed PHC on enp65s0f1
+> [  233.093257] igb 0000:41:00.1: IOV Disabled
+> [  233.329969] pcieport 0000:40:01.0: AER: Multiple Uncorrected (Non-Fatal) err0
+> [  233.340302] igb 0000:41:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fata)
+> [  233.352248] igb 0000:41:00.0:   device [8086:1516] error status/mask=00100000
+> [  233.361088] igb 0000:41:00.0:    [20] UnsupReq               (First)
+> [  233.368183] igb 0000:41:00.0: AER:   TLP Header: 40000001 0000040f cdbfc00c c
+> [  233.376846] igb 0000:41:00.1: PCIe Bus Error: severity=Uncorrected (Non-Fata)
+> [  233.388779] igb 0000:41:00.1:   device [8086:1516] error status/mask=00100000
+> [  233.397629] igb 0000:41:00.1:    [20] UnsupReq               (First)
+> [  233.404736] igb 0000:41:00.1: AER:   TLP Header: 40000001 0000040f cdbfc00c c
+> [  233.538214] pci 0000:41:00.1: AER: can't recover (no error_detected callback)
+> [  233.538401] igb 0000:41:00.0: removed PHC on enp65s0f0
+> [  233.546197] pcieport 0000:40:01.0: AER: device recovery failed
+> [  234.157244] igb 0000:41:00.0: IOV Disabled
+> [  371.619705] INFO: task irq/35-aerdrv:257 blocked for more than 122 seconds.
+> [  371.627489]       Not tainted 6.4.0-dirty #2
+> [  371.632257] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this.
+> [  371.641000] task:irq/35-aerdrv   state:D stack:0     pid:257   ppid:2      f0
+> [  371.650330] Call Trace:
+> [  371.653061]  <TASK>
+> [  371.655407]  __schedule+0x20e/0x660
+> [  371.659313]  schedule+0x5a/0xd0
+> [  371.662824]  schedule_preempt_disabled+0x11/0x20
+> [  371.667983]  __mutex_lock.constprop.0+0x372/0x6c0
+> [  371.673237]  ? __pfx_aer_root_reset+0x10/0x10
+> [  371.678105]  report_error_detected+0x25/0x1c0
+> [  371.682974]  ? __pfx_report_normal_detected+0x10/0x10
+> [  371.688618]  pci_walk_bus+0x72/0x90
+> [  371.692519]  pcie_do_recovery+0xb2/0x330
+> [  371.696899]  aer_process_err_devices+0x117/0x170
+> [  371.702055]  aer_isr+0x1c0/0x1e0
+> [  371.705661]  ? __set_cpus_allowed_ptr+0x54/0xa0
+> [  371.710723]  ? __pfx_irq_thread_fn+0x10/0x10
+> [  371.715496]  irq_thread_fn+0x20/0x60
+> [  371.719491]  irq_thread+0xe6/0x1b0
+> [  371.723291]  ? __pfx_irq_thread_dtor+0x10/0x10
+> [  371.728255]  ? __pfx_irq_thread+0x10/0x10
+> [  371.732731]  kthread+0xe2/0x110
+> [  371.736243]  ? __pfx_kthread+0x10/0x10
+> [  371.740430]  ret_from_fork+0x2c/0x50
+> [  371.744428]  </TASK>
+> 
+> The reproducer was a simple script:
+> 
+>    #!/bin/sh
+>    for i in `seq 1 5`; do
+>      modprobe -rv igb
+>      modprobe -v igb max_vfs=1
+>      sleep 1
+>      modprobe -rv igb
+>    done
+> 
+> It turned out that this could only be reproduce on 82580 (quad and
+> dual-port), but not on 82576, i350 and i210.  Further debugging showed
+> that igb_enable_sriov()'s call to pci_enable_sriov() is failing, because
+> dev->is_physfn is 0 on 82580.
+> 
+> Prior to commit 50f303496d92 ("igb: Enable SR-IOV after reinit"),
+> igb_enable_sriov() jumped into the "err_out" cleanup branch.  After this
+> commit it only returned the error code.
+> 
+> So the cleanup didn't take place, and the incorrect VF setup in the
+> igb_adapter structure fooled the igb driver into assuming that VFs have
+> been set up where no VF actually existed.
+> 
+> Fix this problem by cleaning up again if pci_enable_sriov() fails.
+> 
+> Fixes: 50f303496d92 ("igb: Enable SR-IOV after reinit")
+> Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
 > ---
-
-Again
-
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-
-> ChangeLogs:
+>   drivers/net/ethernet/intel/igb/igb_main.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> v2->v3: Fix macro aligment and header file changes suggested by
-> 	Alexander Lobakin
-> v1->v2: Commit message changes and typo fixes
-> v0->v1: Commit message changes.
-> ---
->   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 2 +-
->   drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h   | 2 ++
->   2 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> index 77c8f650f7ac..3e1c70c74622 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> @@ -1432,7 +1432,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 9a2561409b06..42ab9ca7f97e 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -3827,8 +3827,11 @@ static int igb_enable_sriov(struct pci_dev *pdev, int num_vfs, bool reinit)
 >   	}
 >   
->   	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
-> -	pp_params.pool_size = numptrs;
-> +	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
->   	pp_params.nid = NUMA_NO_NODE;
->   	pp_params.dev = pfvf->dev;
->   	pp_params.dma_dir = DMA_FROM_DEVICE;
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-> index b5d689eeff80..9e3bfbe5c480 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-> @@ -23,6 +23,8 @@
->   #define	OTX2_ETH_HLEN		(VLAN_ETH_HLEN + VLAN_HLEN)
->   #define	OTX2_MIN_MTU		60
+>   	/* only call pci_enable_sriov() if no VFs are allocated already */
+> -	if (!old_vfs)
+> +	if (!old_vfs) {
+>   		err = pci_enable_sriov(pdev, adapter->vfs_allocated_count);
+> +		if (err)
+> +			goto err_out;
+> +	}
 >   
-> +#define OTX2_PAGE_POOL_SZ	2048
-> +
->   #define OTX2_MAX_GSO_SEGS	255
->   #define OTX2_MAX_FRAGS_IN_SQE	9
+>   	goto out;
 >   
 
+Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
