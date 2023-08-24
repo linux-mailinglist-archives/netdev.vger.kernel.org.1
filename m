@@ -1,260 +1,125 @@
-Return-Path: <netdev+bounces-30418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA39C78727B
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:54:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0DA17872C8
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39D8928140D
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:54:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65FAE2815F9
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2DF011731;
-	Thu, 24 Aug 2023 14:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FA311197;
+	Thu, 24 Aug 2023 14:57:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A3AFC07
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:54:46 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5824A19A9
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:54:45 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-435-q68lpTtWO1akSMByFYQSCA-1; Thu, 24 Aug 2023 10:54:26 -0400
-X-MC-Unique: q68lpTtWO1akSMByFYQSCA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D7791C08986;
-	Thu, 24 Aug 2023 14:54:25 +0000 (UTC)
-Received: from hog (unknown [10.39.192.31])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EFA1492C18;
-	Thu, 24 Aug 2023 14:54:23 +0000 (UTC)
-Date: Thu, 24 Aug 2023 16:54:22 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com,
-	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v2 2/5] net: macsec: introduce mdo_insert_tx_tag
-Message-ID: <ZOduuY6cfXbgv_L3@hog>
-References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
- <20230824091615.191379-3-radu-nicolae.pirea@oss.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5855F11CAE
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:57:34 +0000 (UTC)
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D8619B2
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:57:31 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-58d70c441d5so73511027b3.2
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:57:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692889051; x=1693493851;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AFHmAqEtcB5SKJFZKlXSyxDA5+Wgl4kTCcp+DD4uPDY=;
+        b=xSdOEaHVgj5+vr0C1SnqQ31p+4cmWOK/vd17KCabm3eszYOSF6cv14HjHKfYKcAxtU
+         wTpEgMGZXhnEtmtYlcrw/IOk/d6deaa5fy+BRrLOVPs65bAP87sCwlXeWWwLGOjTLJYr
+         UZLkV5vb7ZDll5nP+DNa0liYIUVWYMow38dbBguJ/vkF4XWKUsasCJqznWWXbXZPExmf
+         6HKesoAquxT91f3QZFgw7FThxMIqo1FzxINfSMTO/7GqiLMoiy0lRoy4lW6UDS1F3Dsn
+         BZee5HbPQi2FwqeEq+jw1N3X3pdolmSmj/obnaSFleZIBMe7K+ewT2xtFf7o1EPbxk37
+         l+OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692889051; x=1693493851;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AFHmAqEtcB5SKJFZKlXSyxDA5+Wgl4kTCcp+DD4uPDY=;
+        b=fl+5nRBo9POvNir0YKl2a7kcYn4inZnJKonsifBvefBIOUy0JTF5nb9NnJc4fDWGrd
+         lyG2HlSRpFQNWntNyzm1OUmp26wjtds6hT/x0y4DNT7RHn7nfQ+B4wj40jHuyRJG6uT0
+         sZ0ZmG9TgaJVmrQv03NH14w+OqNPKllPtKQP6zgnWG/XTORPoLsFJnwG6/Mn9E2Q1jUJ
+         N4c9prws/b5g+xzmmw+ppzrj0r3JdGmcCgIXeT7bnhQjzQUDL7iRkq17bE1nbmcajFv/
+         t9fhy6/LkHcTIlxY8ykYg6KrY+FfWXJBbtdjBt+Q5WBpa/VBvgElWdzu1k7Xg/PwnIED
+         IuhQ==
+X-Gm-Message-State: AOJu0Yw3HaIjyN8rHhxaCuX/5uoWyM8AX6aDggW+2MA9dD7uvTG7+oMj
+	GYxPsF+TeJ/y375KIrMkkfiGKddNjH6hCoumMtpMHQ==
+X-Google-Smtp-Source: AGHT+IEAWyvj3lNN5ewLBwwOaVYqKevHoJl4afs4RvLOaLwWKEt6oQNescVw+KzwTJO4az8fgF5d9bOHkFzfuwp+BMw=
+X-Received: by 2002:a0d:f446:0:b0:56d:9e2:7d9e with SMTP id
+ d67-20020a0df446000000b0056d09e27d9emr17587282ywf.21.1692889050931; Thu, 24
+ Aug 2023 07:57:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230824091615.191379-3-radu-nicolae.pirea@oss.nxp.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+References: <20230819163515.2266246-1-victor@mojatatu.com> <20230819163515.2266246-4-victor@mojatatu.com>
+ <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com> <4cbd35c1bb2dd8b0a8bea85d32e3d296fac5f715.camel@redhat.com>
+In-Reply-To: <4cbd35c1bb2dd8b0a8bea85d32e3d296fac5f715.camel@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 24 Aug 2023 10:57:19 -0400
+Message-ID: <CAM0EoMnO6m06r9vngnkCdOsMc8HYKh6i5xsWTfeHs+O=zBPFiQ@mail.gmail.com>
+Subject: Re: Weird sparse error WAS( [PATCH net-next v2 3/3] net/sched:
+ act_blockcast: Introduce blockcast tc action
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <horms@kernel.org>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-08-24, 12:16:12 +0300, Radu Pirea (NXP OSS) wrote:
-> Offloading MACsec in PHYs requires inserting the SecTAG and the ICV in
-> the ethernet frame. This operation will increase the frame size with up
-> to 32 bytes. If the frames are sent at line rate, the PHY will not have
-> enough room to insert the SecTAG and the ICV.
-> 
-> Some PHYs use a hardware buffer to store a number of ethernet frames and,
-> if it fills up, a pause frame is sent to the MAC to control the flow.
-> This HW implementation does not need any modification in the stack.
-> 
-> Other PHYs might offer to use a specific ethertype with some padding
-> bytes present in the ethernet frame. This ethertype and its associated
-> bytes will be replaced by the SecTAG and ICV.
-> 
-> mdo_insert_tx_tag allows the PHY drivers to add any specific tag in the
-> skb.
+On Thu, Aug 24, 2023 at 10:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On Thu, 2023-08-24 at 10:30 -0400, Jamal Hadi Salim wrote:
+> > Dan/Simon,
+> > Can someone help explain this error on the code below:
+> >
+> > ../net/sched/act_blockcast.c:213:9: warning: context imbalance in
+> > 'tcf_blockcast_init' - different lock contexts for basic block
+>
+> IIRC sparse is fooled by lock under conditionals, in this case:
+>
+>        if (exists)
+>                spin_lock_bh(&p->tcf_lock);
+>
+> a possible solution would be:
+>
+>         if (exists) {
+>                 spin_lock_bh(&p->tcf_lock);
+>                 goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto=
+_ch);
+>                 spin_unlock_bh(&p->tcf_lock);
+>         } else {
+>                 goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto=
+_ch);
+>         }
+>
 
-Please add a per-patch changelog between versions. For example:
+aha;->
+Thanks - this should fix it. We will fix it to follow this pattern.
 
-v2:
- - add doc for the new fields in macsec_ops
- - add insert_tx_tag to macsec_dev
- - use unsigned int for macsec_ops.needed_{head,tail}room
-[etc]
+> Using some additional helpers the code could be less ugly...
 
-> Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-> ---
->  drivers/net/macsec.c | 96 +++++++++++++++++++++++++++++++++++++++++++-
->  include/net/macsec.h | 10 +++++
->  2 files changed, 105 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-> index ae60817ec5c2..5541aaced61f 100644
-> --- a/drivers/net/macsec.c
-> +++ b/drivers/net/macsec.c
-> @@ -93,6 +93,7 @@ struct pcpu_secy_stats {
->   * @secys: linked list of SecY's on the underlying device
->   * @gro_cells: pointer to the Generic Receive Offload cell
->   * @offload: status of offloading on the MACsec device
-> + * @insert_tx_tag: insert tx tag if true
+I think only one other action(ife) has this pattern - we should be
+able to fix that one instead.
 
-(probably a bit nitpicky)
-Maybe briefly mention something about offloading and why devices might
-needed that tag? Otherwise this doc feels a bit like it's there just
-to make a checker happy, it doesn't say anything that "bool
-insert_tx_tag" doesn't already tell us.
+cheers,
+jamal
 
-Maybe something like:
-"when offloading, device requires to insert an additional tag"
 
->   */
->  struct macsec_dev {
->  	struct macsec_secy secy;
-> @@ -102,6 +103,7 @@ struct macsec_dev {
->  	struct list_head secys;
->  	struct gro_cells gro_cells;
->  	enum macsec_offload offload;
-> +	bool insert_tx_tag;
->  };
->  
->  /**
-> @@ -2582,6 +2584,33 @@ static bool macsec_is_configured(struct macsec_dev *macsec)
->  	return false;
->  }
->  
-> +static bool macsec_can_insert_tx_tag(struct macsec_dev *macsec,
-
-It feels more like a "needs" than a "can" situation to me. The device
-needs this tag inserted in order to fully work.
-
-> +				     const struct macsec_ops *ops)
-> +{
-> +	return macsec->offload == MACSEC_OFFLOAD_PHY &&
-> +		ops->mdo_insert_tx_tag;
-> +}
-> +
-> +static void macsec_adjust_room(struct net_device *dev,
-> +			       const struct macsec_ops *ops)
-> +{
-> +	struct macsec_dev *macsec = macsec = macsec_priv(dev);
-
-duplicate "macsec = macsec = ..."
-
-> +
-> +	if (macsec_is_offloaded(macsec)) {
-
-Shouldn't that whole adjustment (in both directions) depend on
-->insert_tx_tag?
-
-> +		dev->needed_headroom -= MACSEC_NEEDED_HEADROOM;
-> +		dev->needed_headroom += ops->needed_headroom;
-
-I would compute "diff = ops->needed_headroom - MACSEC_NEEDED_HEADROOM"
-at the start and then we can simply do "+= diff" or "-= diff" (and
-same for tailroom).
-
-> +		dev->needed_tailroom -= MACSEC_NEEDED_TAILROOM;
-> +		dev->needed_tailroom += ops->needed_tailroom;
-> +
-> +		return;
-> +	}
-
-nit: else instead of the early return would make things more
-symmetrical.
-
-> +
-> +	dev->needed_headroom -= ops->needed_headroom;
-> +	dev->needed_headroom += MACSEC_NEEDED_HEADROOM;
-> +	dev->needed_tailroom -= ops->needed_tailroom;
-> +	dev->needed_tailroom += MACSEC_NEEDED_TAILROOM;
-> +}
-> +
->  static int macsec_update_offload(struct net_device *dev, enum macsec_offload offload)
->  {
->  	enum macsec_offload prev_offload;
-> @@ -2619,9 +2648,15 @@ static int macsec_update_offload(struct net_device *dev, enum macsec_offload off
->  	ctx.secy = &macsec->secy;
->  	ret = offload == MACSEC_OFFLOAD_OFF ? macsec_offload(ops->mdo_del_secy, &ctx)
->  					    : macsec_offload(ops->mdo_add_secy, &ctx);
-> -	if (ret)
-> +	if (ret) {
->  		macsec->offload = prev_offload;
-> +		goto out;
-
-I would prefer a direct return right here instead of this goto.
-
-> +	}
-> +
-> +	macsec_adjust_room(dev, ops);
-> +	macsec->insert_tx_tag = macsec_can_insert_tx_tag(macsec, ops);
->  
-> +out:
->  	return ret;
->  }
->  
-> @@ -3378,6 +3413,55 @@ static struct genl_family macsec_fam __ro_after_init = {
->  	.resv_start_op	= MACSEC_CMD_UPD_OFFLOAD + 1,
->  };
->  
-> +static struct sk_buff *insert_tx_tag(struct sk_buff *skb,
-> +				     struct net_device *dev)
-> +{
-> +	struct macsec_dev *macsec = macsec_priv(dev);
-> +	const struct macsec_ops *ops;
-> +	struct phy_device *phydev;
-> +	struct macsec_context ctx;
-> +	int err;
-> +
-> +	if (!macsec->insert_tx_tag)
-> +		return skb;
-
-I think it would look a bit nicer if this test was moved out, before
-calling insert_tx_tag(). Then if we call insert_tx_tag(), we know we
-have to insert it.
-
-> +	ops = macsec_get_ops(macsec, &ctx);
-> +	phydev = macsec->real_dev->phydev;
-> +
-
-[...]
-> @@ -4125,6 +4216,9 @@ static int macsec_newlink(struct net *net, struct net_device *dev,
->  			err = macsec_offload(ops->mdo_add_secy, &ctx);
->  			if (err)
->  				goto del_dev;
-> +
-> +			macsec_adjust_room(dev, ops);
-> +			macsec->insert_tx_tag = macsec_can_insert_tx_tag(macsec, ops);
->  		}
->  	}
->  
-> diff --git a/include/net/macsec.h b/include/net/macsec.h
-> index 76f024727bb4..9577921897f9 100644
-> --- a/include/net/macsec.h
-> +++ b/include/net/macsec.h
-> @@ -312,6 +312,11 @@ struct macsec_context {
->   * @mdo_get_tx_sa_stats: called when TX SA stats are read
->   * @mdo_get_rx_sc_stats: called when RX SC stats are read
->   * @mdo_get_rx_sa_stats: called when RX SA stats are read
-> + * @mdo_insert_tx_tag: called to insert the TX offload tag
-> + * @needed_headroom: number of bytes reserved at the beginning of the sk_buff
-> + *	for the TX Tag
-> + * @needed_tailroom: number of bytes reserved at the end of the sk_buff for the
-> + *	TX Tag
-
-It would be nice to use a consistent name (either "TX offload tag" or
-"TX tag") and case in those 3 descriptions (slight preference for
-"tag" over "Tag" on my side).
-
-I'd also add ", to be filled by mdo_insert_tx_tag" (not sure whether
-that needs to be @mdo_insert_tx_tag or just mdo_insert_tx_tag) to the
-needed_headroom/needed_tailroom descriptions, just to be really clear.
-
--- 
-Sabrina
-
+> Cheers,
+>
+> Paolo
+>
 
