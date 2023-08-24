@@ -1,125 +1,172 @@
-Return-Path: <netdev+bounces-30331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53A0D786EBC
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:09:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A36786F05
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 667B328154C
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:09:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72B0F28150B
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31070FC14;
-	Thu, 24 Aug 2023 12:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8757D100BB;
+	Thu, 24 Aug 2023 12:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252ED24550
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 12:09:52 +0000 (UTC)
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5D181BDD
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:09:39 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-44ac60aa8f7so2799898137.2
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:09:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C702454A;
+	Thu, 24 Aug 2023 12:29:35 +0000 (UTC)
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4C3171A;
+	Thu, 24 Aug 2023 05:29:33 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2bcd48725dbso8445501fa.1;
+        Thu, 24 Aug 2023 05:29:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692878979; x=1693483779;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FNnESqHY3zdmajCScO++ruRgHXEsu4da9yUlq5oo6Wk=;
-        b=YIoSUsi2BIXyOTTUW1P/TGyViuALhj6lz641M7Ac2A7QEgtloG0AmNpGaaY8LDbsKI
-         j372LjOlEkV2JWJxo4VpBtcB2L8WyAaHatnf/rEtM3MhOiO/D5jmcbkgD1urAe/bccjA
-         k0Mhs9i6pu84gjIvP2QpGNJ1KS3Uv6xmde6VpUh7IXPo913dytN1lM9hd2NWUn5Aoms8
-         ol6LrBXzi5wB4VqeM73+xFXkh1erl7ihJJ6AhzlsExKGBgnIMnYdzBqHc6R4Z3m3yOwS
-         uCtLu0KIqH8ieDnua7yw+aoMTwlk7W3STZfzqHkVRSPEo/gzwsm+AqUNChpQXGwOPWSO
-         JQSg==
+        d=gmail.com; s=20221208; t=1692880172; x=1693484972;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2mgCQ/4l+k/Mag95Sx358RqULbNRiRP9ljR5yjStBE=;
+        b=fTk+U4prYgdxxC8dBxPpV4RHuyO5HXHf0kIcwnod9WJ8XTaPpJfBgDBZ/Ygl+QvT1N
+         pUJts8aLHKWcSOL8bJAzjn+H/t2MCLFoztOrxGl4v+1rZCvFflOidJtDdoosauoXD866
+         i17bjppGFnXrDkSHi6T5qRVlb+VTcYr3ptpQK8AsPRQwcOcp62xxLx6WuuCPZDA7e9mU
+         yB9u33RTVZxIwlpLoEm9+NIVvvvxg8+aJg08MpznKZaywEv/HnUCbKPZ8i7ZMV5ryU6D
+         MH/5rTwSRY5km8IJKe5jA124A3ApUrkt+CSuMF+v2Gc3HcicrnQnzU+3ZGnybAEz63WE
+         F6eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692878979; x=1693483779;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1692880172; x=1693484972;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FNnESqHY3zdmajCScO++ruRgHXEsu4da9yUlq5oo6Wk=;
-        b=YyGNhVKk5OhwvWiJvgPxFlBC2xBCdGl+6y6+TvlgyFA5Dr2oRBt0e8Cr+3rj7NgjaC
-         /sOqIp1Y1oHS/wLl8VstPit2ptYEbrQV/gEXlvn9yrtxwPj0IBNI/KxPYbkokaVfZBuS
-         yu3OZNwWXzntrdW5mGX6loYC7kXcACeu8K8brRj0yObxaYtG5CJ7hQBILui2QfHuWgiW
-         J9XF/ojq6rbhbr4ujJRgBzxcW1BlUUpGeRRXerovwbYFeuFrSY9KFWfp21Mqw/wVS877
-         KW9shZv6z07NprlqiRqOLnw0/NFj3KZOv/+5UA8sSMVyF00qbI0mArZbQzsbsH/HiIex
-         LuXw==
-X-Gm-Message-State: AOJu0YwxkpV1lZSdpsIxo8MpXzPhmYRhdiRCKvUJSQ4ipIvYYCOvv+AY
-	u1hAX1eu86JJc1HulWh1eMdEx9hc9wYzw8wPTf+eWmeBD0encQ==
-X-Google-Smtp-Source: AGHT+IF4hm4Mt4e40UFh0QZdoQf31Oebupsts1nQ7Q2XwV813l/GLKDWx+E0SWuw1Wl//qqXzx7PSjzCO9V35oS2kcA=
-X-Received: by 2002:a67:de12:0:b0:44d:55a4:2279 with SMTP id
- q18-20020a67de12000000b0044d55a42279mr9569305vsk.6.1692878978710; Thu, 24 Aug
- 2023 05:09:38 -0700 (PDT)
+        bh=y2mgCQ/4l+k/Mag95Sx358RqULbNRiRP9ljR5yjStBE=;
+        b=KGfZ3w4s6x12hV6n3QhELkhI1WrZMD/80ReB/ZMJJohS5YEr8xSN1GiA/WD1tQQrJm
+         0f0F9+SWIFp8F9voEM2Yl1idB1ZRtc2uFr6kWJcLbUYeH+pE6PI96oYRfZr6Lsz6Wtmw
+         OG0HZbCRDxSmKrgRHcHgsSszbpPia5Q5LqHpPyb+mR3tclK7a7DK2pKoa6CbNZ5wHh4k
+         HNkEfSqghoIZq9pkw9C72dUgSalwPX0MxW0/KQjT9jQaz4LX4YX1kliYm/CJdj+1xnMY
+         M2Npdcure1s7u0a8Y/eYtyuXlIabntQYebAAmohFEwcGzcFS2vw0I0WZDk3YPkrOtTfm
+         +D/g==
+X-Gm-Message-State: AOJu0YwTSzguGQdxMea7KXblrlVxwyEn3ZfGCzq8tZM+/GmVDQKMH9xL
+	ki0ADzTBo97fVUg/vmOp/hM=
+X-Google-Smtp-Source: AGHT+IEDzwcaHZ1bipIA5p/ef6LPOB9RXACD1TKIBgsJGIUKHiJNJAy2pQfiJmau059npsz/UEGE/g==
+X-Received: by 2002:a2e:b5aa:0:b0:2bc:e36a:9e32 with SMTP id f10-20020a2eb5aa000000b002bce36a9e32mr1335530ljn.5.1692880171701;
+        Thu, 24 Aug 2023 05:29:31 -0700 (PDT)
+Received: from localhost.localdomain ([94.234.116.52])
+        by smtp.gmail.com with ESMTPSA id hn1-20020a05600ca38100b003fbe4cecc3bsm2523776wmb.16.2023.08.24.05.29.29
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 24 Aug 2023 05:29:31 -0700 (PDT)
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+To: magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com,
+	bpf@vger.kernel.org,
+	yhs@fb.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	przemyslaw.kitszel@intel.com
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>
+Subject: [PATCH bpf-next v2 00/11] seltests/xsk: various improvements to xskxceiver
+Date: Thu, 24 Aug 2023 14:28:42 +0200
+Message-Id: <20230824122853.3494-1-magnus.karlsson@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABq1_viq9yMo9wZ2XkLg_45FaOcwL93qVhqFUZ9wTygKagnszg@mail.gmail.com>
- <366b2e82-8723-7757-1864-c9fef32dc8f8@gmail.com>
-In-Reply-To: <366b2e82-8723-7757-1864-c9fef32dc8f8@gmail.com>
-From: Klara Modin <klarasmodin@gmail.com>
-Date: Thu, 24 Aug 2023 14:09:27 +0200
-Message-ID: <CABq1_vgE_nzcGPUf0r76xrNchcKUXSHfHCZs4EsXedXCTu-nNg@mail.gmail.com>
-Subject: Re: IPv6 TCP seems broken on 32bit x86 (bisected)
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
-	simon.horman@corigine.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Den tors 24 aug. 2023 kl 13:28 skrev Pavel Begunkov <asml.silence@gmail.com>:
->
-> On 8/24/23 01:00, Klara Modin wrote:
-> > Hi,
-> >
-> > I recently noticed that IPv6 stopped working properly on my 32 bit x86
-> > machines with recent kernels. Bisecting leads to
-> > "fe79bd65c819cc520aa66de65caae8e4cea29c5a net/tcp: refactor
-> > tcp_inet6_sk()". Reverting this commit on top of
-> > a5e505a99ca748583dbe558b691be1b26f05d678 fixes the issue.
-> > 64 bit x86 seems unaffected.
->
-> It should be same to what was discussed here
->
-> https://lore.kernel.org/netdev/CANn89iLTn6vv9=PvAUccpRNNw6CKcXktixusDpqxqvo+UeLviQ@mail.gmail.com/T/#eb8dca9fc9491cc78fca691e64e601301ec036ce7
->
-> Thanks to Eric it should be fixed upstream. Let me check if
-> it's queued for stable kernels.
+This patch set implements several improvements to the xsk selftests
+test suite that I thought were useful while debugging the xsk
+multi-buffer code and tests. The largest new feature is the ability to
+be able to execute a single test instead of the whole test suite. This
+required some surgery on the current code, details below.
 
-That does solve the issue, thanks!
+Anatomy of the path set:
 
->
->
-> > One of the symptoms seems to be that the hop limit is sometimes set to
-> > zero. Attached is tcpdump output from trying to ssh into the machine
-> > from a different subnet.
-> >
-> > I also tried http which seems even weirder, the source address is cut
-> > off or offsetted by 32 bits (results in
-> > "a5c:1204:84c4:847e:950e:2b3d::", should be
-> > "2001:678:a5c:1204:84c4:847e:950e:2b3d"). Trying to connect using
-> > netcat sees the same result as with http.
-> >
-> > Tested on two machines running Gentoo, one with a locally compiled
-> > kernel and the other compiled from a x86_64 host, both using gcc 13.2.
-> > If I remember correctly I was using gcc 12.3.1 on the first machine
-> > when I initially noticed the issue but didn't troubleshoot further at
-> > the time.
-> >
-> > Please tell me if there's any other information you need.
-> >
-> > Regards,
-> > Klara Modin
->
-> --
-> Pavel Begunkov
+1: Print useful info on a per packet basis with the option -v
+
+2: Add a timeout in the transmission loop too. We only used to have
+   one for the Rx thread, but Tx can lock up too waiting for
+   completions.
+
+3: Add an option (-m) to only run the tests (or a single test with a
+   later patch) in a single mode: skb, drv, or zc (zero-copy).
+
+4-5: Preparatory patches to be able to specify a test to run. Need to
+     define the test names in a single structure and their entry
+     points, so we can use this when wanting to run a specific test.
+
+6: Adds a command line option (-l) that lists all the tests.
+
+7: Adds a command line option (-t) that runs a specific test instead
+   of the whole test suite. Can be combined with -m to specify a
+   single mode too.
+
+8: Use ksft_print_msg() uniformly throughout the tests. It was a mix
+   of printf() and ksft_print_msg() before.
+
+9: In some places, we failed the whole test suite instead of a single
+   test in certain circumstances. Fix this so only the test in
+   question is failed and the rest of the test suite continues.
+
+10: Display the available command line options with -h
+
+11: Introduce the environment variable XSKTEST_ETH to be able to set
+    the network interface to be used.
+
+v1 -> v2:
+
+* Introduce XSKTEST_MODE env variable to be able to set the mode to
+  use [Przemyslaw]
+* Introduce XSKTEST_ETH env variable to be able to set the ethernet
+  interface to use by introducing a new patch (#11) [Magnus]
+* Fixed spelling error in patch #5 [Przemyslaw, Maciej]
+* Fixed confusing documentation in patch #10  [Przemyslaw]
+* The -l option can now be used without being root [Magnus, Maciej]
+* Fixed documentation error in patch #7 [Maciej]
+* Added error handling to the -t option [Maciej]
+* -h now displayed as an option [Maciej]
+
+Thanks: Magnus
+
+Magnus Karlsson (11):
+  selftests/xsk: print per packet info in verbose mode
+  selftests/xsk: add timeout for Tx thread
+  selftests/xsk: add option to only run tests in a single mode
+  selftests/xsk: move all tests to separate functions
+  selftests/xsk: declare test names in struct
+  selftests/xsk: add option that lists all tests
+  selftests/xsk: add option to run single test
+  selftests/xsk: use ksft_print_msg uniformly
+  selftests/xsk: fail single test instead of all tests
+  selftests/xsk: display command line options with -h
+  selftests/xsk: introduce XSKTEST_ETH environment variable
+
+ tools/testing/selftests/bpf/test_xsk.sh    |  60 ++-
+ tools/testing/selftests/bpf/xsk_prereqs.sh |  10 +-
+ tools/testing/selftests/bpf/xskxceiver.c   | 536 ++++++++++++---------
+ tools/testing/selftests/bpf/xskxceiver.h   |  44 +-
+ 4 files changed, 377 insertions(+), 273 deletions(-)
+
+
+base-commit: f3bdb54f09ab4cdbca48bf7befa8997cadd8d6a1
+--
+2.34.1
 
