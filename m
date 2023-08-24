@@ -1,84 +1,80 @@
-Return-Path: <netdev+bounces-30323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BA9786DDD
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:30:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9215D786E35
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AF031C2030D
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:30:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B44F41C20DA4
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE87111A0;
-	Thu, 24 Aug 2023 11:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228C8DF65;
+	Thu, 24 Aug 2023 11:45:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA021119D
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:29:09 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eae::601])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD51610FE
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:29:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F1C24550
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:45:32 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2049.outbound.protection.outlook.com [40.107.244.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102711987;
+	Thu, 24 Aug 2023 04:45:28 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ocw1rYdFSSqxIahGLUhSaJViLmAFcHpVD972gRCGn/1DTOOnxF3B2bQHUi0BGMY/uNrZLWqwJH9JHjzXjiJLcBAw5oxIwLQxbYyLNEiUnYAS8spIiJaWXKIJmYOZQkX8eL4Jqn1HAHzOu7wQlqlVifaYWsW77yeCym461livRvYtdXCtKLAMaJvuenHjryNVsPM7PLQnshnhrrfiioTljF5LAjIyO/oQh/uWXS9vGdrYZo7zAvuV6qj+GYveG613spUPAgYM3gY0Z7/LR+Uqn82SVaiXBVLPlsKLSzAl3Va96+6vgXwFmfbp4Xa1iA2gT6GeN/KO+KV4Qxqg4gUK6w==
+ b=RY1Xk2OgkgaOl91R80xbEQgMjlh6zAtcrgQ30EM3tgB7Szm422XobysRCvXnANiALTiUBEMS+UMw3RVEtrvngM3mqR+BziGP04cJVKHl02L6FINhMcOBM4dxpnyVWb6Wg5PB0e7316WmftS5DauwaZxizI1BSEI1bYj0BT3sIHGL+KDxfFUGS4R1bYvGM92B3f+yGqR9WXXKeiEY509IbGiIUirJp0JW1A+H2XXZQB/Qg9xHqiVz12O6bJdYtVzdk4zIsrKdXEpR4w4Fo8uu6kjwvyagmpAFIPzIWN0YQID5xaBLxxCH2Y3P6PHB/oCR1nj+3dUry+WGaSCp7CuQvw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TpPH5tPj0XGDgw1IR9nuqyAy/kzXVhlU8q/Bx+WiJz8=;
- b=ANRgn0VPypPNqvTZpTJzL3a+/lZy8ClV+yLC85jtz6R+at3tQLdllKsZlTYi5D7+9xkGDJUzn+M0P1SqED4uPR76Gtv8lPkm5FWUuyrjZYoHS+8PPtYvqSNWZZ7Tby9WPWGY68f2mfs28lyS1danaq/m0C0e4v3wjhM3V0xPLr/Zo4YcmLpKou7E7y4rwc5CWmVnRXHlfTuaKE+1/ksl77t9W1pA9Znv9QoooNOa3LG6/bkS/SpmIFA7NT5oDgYNskQ3ClXveVDhl7mp0vI8OkVfNJn2RfjnpNUJTIFwRSj1hcKXtXWTVGIrEBPpS6RQWJyWXHAA5ByvxW0UfLrv6g==
+ bh=KHur3tpdKg78gEuipzi5g0/0jtiaS2TqKgEqhCKKJ98=;
+ b=NeRV1zgOC4GFn8xdIGp8pU4LKIXVgqbmZuZ2aOzFOL1K+Der6uxNSeft4LqeQuheWjo7dc5ATM6zZTG0tyInT3WDE/URbLYAxOOd257S3XPTKvHTuSmoAeIZaU0kyDQC2h7W4XnB2fFGIqxtMqRX5n2Nq2oERfXID7+4n8w3Cr++RewMYv2bUwWe9ZYZ7gUEgwRCRR8jnM1FCw5eJ9cxlsqqxlDZpAMYsMLeyt5TozcYRj8R+XCI3uwsyvNvPKjGKIZIzeT/sXQAOz/jKaCmeBtUMPR4q1epjzFcQmgrrlUpDOhwHxTOqaB5Yrm4lz522QZ24I7FUC+QgafxyuLT3g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TpPH5tPj0XGDgw1IR9nuqyAy/kzXVhlU8q/Bx+WiJz8=;
- b=L4/3lZinCNZfxUZCA9+frjRORgLcKMAeLp366MMXnTO8vi/sfHbUgvbu+OMdUqkPRDDgZljR+c0YnG5VTEbWmXBkjH+QnMM3kO9YtfB7tN7gyn7GZ5KjU6+nG6YVYlHi8mhbKQBAnIqoaUnRhVsHMS/vEnWLefdVjCggjGXn1FQ=
-Received: from CY5PR13CA0059.namprd13.prod.outlook.com (2603:10b6:930:11::20)
- by PH7PR12MB7916.namprd12.prod.outlook.com (2603:10b6:510:26a::18) with
+ bh=KHur3tpdKg78gEuipzi5g0/0jtiaS2TqKgEqhCKKJ98=;
+ b=roLV6W6bSnXm02KTmpa28zEj90JWN55uInn3EmNauPts0Sgia1W6Mj2pq2dyowZRNe1Qnzz0yUvg2Va0IvT7xV80+0lxiNxseuPIEiMruDnykZOdwM4nbPt4ycaHiCJKRLunAyZKlPOWaT+ZlgrfXWeUuICgLWzfW7gwgM6HHYk=
+Received: from MW4PR04CA0293.namprd04.prod.outlook.com (2603:10b6:303:89::28)
+ by DM6PR12MB4369.namprd12.prod.outlook.com (2603:10b6:5:2a1::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Thu, 24 Aug
- 2023 11:29:04 +0000
-Received: from CY4PEPF0000EE3A.namprd03.prod.outlook.com
- (2603:10b6:930:11:cafe::72) by CY5PR13CA0059.outlook.office365.com
- (2603:10b6:930:11::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.14 via Frontend
- Transport; Thu, 24 Aug 2023 11:29:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
+ 2023 11:45:25 +0000
+Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
+ (2603:10b6:303:89:cafe::9) by MW4PR04CA0293.outlook.office365.com
+ (2603:10b6:303:89::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
+ Transport; Thu, 24 Aug 2023 11:45:25 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EE3A.mail.protection.outlook.com (10.167.242.14) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6699.15 via Frontend Transport; Thu, 24 Aug 2023 11:29:04 +0000
-Received: from SATLEXMB07.amd.com (10.181.41.45) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 24 Aug
- 2023 06:29:02 -0500
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB07.amd.com
- (10.181.41.45) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 24 Aug
- 2023 04:29:01 -0700
-Received: from xcbpieterj41x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ 15.20.6745.2 via Frontend Transport; Thu, 24 Aug 2023 11:45:24 +0000
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Thu, 24 Aug 2023 06:28:59 -0500
-From: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-To: <netdev@vger.kernel.org>, <linux-net-drivers@amd.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <ecree.xilinx@gmail.com>, <habetsm.xilinx@gmail.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-Subject: [PATCH net-next v2 6/6] sfc: extend pedit add action to handle decrement ipv6 hop limit
-Date: Thu, 24 Aug 2023 12:28:42 +0100
-Message-ID: <20230824112842.47883-7-pieter.jansen-van-vuuren@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 24 Aug
+ 2023 06:45:05 -0500
+Received: from xhdharinik40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
+ Transport; Thu, 24 Aug 2023 06:45:01 -0500
+From: Harini Katakam <harini.katakam@amd.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<harinikatakamlinux@gmail.com>, <michal.simek@amd.com>,
+	<harini.katakam@amd.com>, <radhey.shyam.pandey@amd.com>
+Subject: [PATCH net-next v3] dt-bindings: net: xilinx_gmii2rgmii: Convert to json schema
+Date: Thu, 24 Aug 2023 17:14:56 +0530
+Message-ID: <20230824114456.12243-1-harini.katakam@amd.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230824112842.47883-1-pieter.jansen-van-vuuren@amd.com>
-References: <20230824112842.47883-1-pieter.jansen-van-vuuren@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,80 +84,156 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3A:EE_|PH7PR12MB7916:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee8cafff-3740-4459-b62d-08dba4955250
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|DM6PR12MB4369:EE_
+X-MS-Office365-Filtering-Correlation-Id: bdb370d7-4104-4752-3c9b-08dba4979aef
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	MFqfy63JnDqAi79Io4hXjCZLcqW5e8T8Y3mLtDCwapWAGyizu/z2TdT6JFhxYoJIynS/bleTaE3DF6zVhWZ9RcYrk76dlFpDPM9TSJ+d6hY3Ay/IJLNoNFP4LGXvZSEKzfv/fw4LJebWEGiby+8rYLsWQkXhKWjIostTFD79qgZRyEuRQ8F3C0HP5z8k++wKVFyj04B4kADINRMiHEoZoquLYRUcniKzIuQ2FXmhCRbA7WMJqU5T74pUe4Oqto42QUmZuY6TvBbaleixr0fI2yaBf+i/mVS+5ngcNAlp77379kj9VMMv1JO1e/XIc2W6oxjM4gEaUl5NU2gIDZLzD5IEo7evJ+tcgnWhSmpqm5ep4GGRJ5rKoxvh9NJJHMS0pgM9JpB6kV3B9NWm2eTLCTf8aGH8rphd3uA43m7OzIuqoW7y8aQ4yVPv5LqxBLHx4cm4vPZnq3OHejugBxpI9NWoJaHUjmqNYo7NyINLYShCQ5dMryXRg1NqcLAD294SJvyliS+t1sG1jVxf96DWsfl4hFc549aJtmyqI1rcEkNH6eWJCAut7I8gdahJYFSCIXdt/O1nKiPeRAzC3dlv6UZLSs7TEqt8v63B0PtUgK65Nx9PkZjRS+xxqFDxcuJTESuVbrcAVl2QM8pRonzROZTQS6+seS0rrdqP2UlVKkUYP0m9slN6aRGEKA9R7ps1T/NpjK60bivBcXLfrMA+ZV8LJ6izHiuDyTPlb5+fkpWDzXRNG+rkhjmzwQz2lNpEOKZ+/Sx2sas26E3hcA21Fg==
+	aRTpJt9R/NPimveCgmiHXSPfQcDwR6JBeO2nwTBhyo8xCas64ZJtIsv2yuLrVOELzmYi7yiQMcAkCIQ213b3e1cYW/kGY+HVfbA83ATDA0jS+cRnqQIBynSveu9dKS6dX08e4FM4jH67uVwBkTSkgoaM7YHd4twnTBSAUWGj3iv/WFQq6y++Rf8aUoHDEcQanQNeU28BuZhVpcvE8tP5bgnmD1rxJwSwObe+gKPt6LcV1y/wbwpgnx9SbA+n4pOBVpC1ej4cD4hOP3My95qIZ4CjvYsDEaGVFxlzo7ytgoNN2LU0cGbLPyUB4CnY+/qjeExU1m/GYki3+g5FQtH8MyLEl3L0YA8xumH9zR8FRIqIH+g9TEDRHJ90tFEybZMbFTBZKlPT40lQZLs444xPlVUvQOkfLi8b5JW2yVj6XmcC33u8G56oWWTNGUadCEWiXkva0Kds1BzdUoE+8DXQjvA4Rx/08StRU5aCVkAMQfLbx2JvjEHeTQfAMPeG5eChSa+DWmXJ0mXSboP12oM8rIftQmEcFHWmwNlNbHdAmXjUYQy5DIVaeJ7fs6dUU8FH20wJj7Jhw7zwjU0BVBRa4lswvrNB7QtWpDmI8eyYSLjDOkv8An39XGKt6LhyKxvEhgiSdFJ2oe668Gt3E+IjQamIwMGFUdozK291AA3SLSwZpG3YXTbl7BZ03ggd7fAPPbRx9HsWAWwHZeSh+n7RXPl3NsZKADKkyEdYGk/+4OZp5pkS6trwandG6KnwC7B4PIil5bSrMsw+gKj/Y44JK9gAIB8IH4YW/JWEWbv4laI=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(39860400002)(136003)(376002)(396003)(451199024)(82310400011)(1800799009)(186009)(46966006)(36840700001)(40470700004)(2906002)(5660300002)(40480700001)(83380400001)(336012)(426003)(26005)(36860700001)(86362001)(47076005)(8676002)(8936002)(2616005)(4326008)(70586007)(316002)(54906003)(110136005)(6636002)(70206006)(478600001)(82740400003)(356005)(81166007)(6666004)(41300700001)(36756003)(40460700003)(1076003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(39860400002)(376002)(346002)(451199024)(186009)(82310400011)(1800799009)(40470700004)(36840700001)(46966006)(54906003)(70206006)(70586007)(316002)(81166007)(478600001)(110136005)(26005)(44832011)(36860700001)(356005)(6666004)(82740400003)(40480700001)(41300700001)(86362001)(2906002)(966005)(4326008)(8676002)(8936002)(1076003)(40460700003)(2616005)(5660300002)(7416002)(83380400001)(36756003)(336012)(47076005)(426003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 11:29:04.0067
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 11:45:24.8037
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee8cafff-3740-4459-b62d-08dba4955250
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdb370d7-4104-4752-3c9b-08dba4979aef
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3A.namprd03.prod.outlook.com
+	CO1PEPF000044F8.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7916
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4369
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Extend the pedit add actions to handle this case for ipv6. Similar to ipv4
-dec ttl, decrementing ipv6 hop limit can be achieved by adding 0xff to the
-hop limit field.
+From: Pranavi Somisetty <pranavi.somisetty@amd.com>
 
-Co-developed-by: Edward Cree <ecree.xilinx@gmail.com>
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
-Signed-off-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
+Convert the Xilinx GMII to RGMII Converter device tree binding
+documentation to json schema.
+This converter is usually used as gem <---> gmii2rgmii <---> external phy
+and, it's phy-handle should point to the phandle of the external phy.
+
+Signed-off-by: Pranavi Somisetty <pranavi.somisetty@amd.com>
+Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/ethernet/sfc/tc.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+v3 changes:
+- Add new line before child nodes in example.
+- Add Conor's review tag
 
-diff --git a/drivers/net/ethernet/sfc/tc.c b/drivers/net/ethernet/sfc/tc.c
-index dfe3a8bf74f0..047322b04d4f 100644
---- a/drivers/net/ethernet/sfc/tc.c
-+++ b/drivers/net/ethernet/sfc/tc.c
-@@ -1084,6 +1084,31 @@ static int efx_tc_pedit_add(struct efx_nic *efx, struct efx_tc_action_set *act,
- 			break;
- 		}
- 		break;
-+	case FLOW_ACT_MANGLE_HDR_TYPE_IP6:
-+		switch (fa->mangle.offset) {
-+		case round_down(offsetof(struct ipv6hdr, hop_limit), 4):
-+			/* check that pedit applies to hoplimit only */
-+			if (fa->mangle.mask != EFX_TC_HDR_TYPE_HLIMIT_MASK)
-+				break;
+ .../bindings/net/xilinx_gmii2rgmii.txt        | 35 ------------
+ .../bindings/net/xlnx,gmii-to-rgmii.yaml      | 55 +++++++++++++++++++
+ 2 files changed, 55 insertions(+), 35 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+ create mode 100644 Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+
+diff --git a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt b/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
+deleted file mode 100644
+index 038dda48b8e6..000000000000
+--- a/Documentation/devicetree/bindings/net/xilinx_gmii2rgmii.txt
++++ /dev/null
+@@ -1,35 +0,0 @@
+-XILINX GMIITORGMII Converter Driver Device Tree Bindings
+---------------------------------------------------------
+-
+-The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
+-Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
+-Ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
+-This core can be used in all three modes of operation(10/100/1000 Mb/s).
+-The Management Data Input/Output (MDIO) interface is used to configure the
+-Speed of operation. This core can switch dynamically between the three
+-Different speed modes by configuring the conveter register through mdio write.
+-
+-This converter sits between the ethernet MAC and the external phy.
+-MAC <==> GMII2RGMII <==> RGMII_PHY
+-
+-For more details about mdio please refer phy.txt file in the same directory.
+-
+-Required properties:
+-- compatible	: Should be "xlnx,gmii-to-rgmii-1.0"
+-- reg		: The ID number for the phy, usually a small integer
+-- phy-handle	: Should point to the external phy device.
+-		  See ethernet.txt file in the same directory.
+-
+-Example:
+-	mdio {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-		phy: ethernet-phy@0 {
+-			......
+-		};
+-		gmiitorgmii: gmiitorgmii@8 {
+-			compatible = "xlnx,gmii-to-rgmii-1.0";
+-			reg = <8>;
+-			phy-handle = <&phy>;
+-		};
+-	};
+diff --git a/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+new file mode 100644
+index 000000000000..0f781dac6717
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/xlnx,gmii-to-rgmii.yaml
+@@ -0,0 +1,55 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/xlnx,gmii-to-rgmii.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+			/* Adding 0xff is equivalent to decrementing the hoplimit.
-+			 * Other added values are not supported.
-+			 */
-+			if ((fa->mangle.val >> 24) != U8_MAX)
-+				break;
++title: Xilinx GMII to RGMII Converter
 +
-+			/* check that we do not decrement hoplimit twice */
-+			if (!efx_tc_flower_action_order_ok(act,
-+							   EFX_TC_AO_DEC_TTL)) {
-+				NL_SET_ERR_MSG_MOD(extack, "Unsupported: multiple dec ttl");
-+				return -EOPNOTSUPP;
-+			}
-+			act->do_ttl_dec = 1;
-+			return 0;
-+		default:
-+			break;
-+		}
-+		break;
- 	default:
- 		break;
- 	}
++maintainers:
++  - Harini Katakam <harini.katakam@amd.com>
++
++description:
++  The Gigabit Media Independent Interface (GMII) to Reduced Gigabit Media
++  Independent Interface (RGMII) core provides the RGMII between RGMII-compliant
++  ethernet physical media devices (PHY) and the Gigabit Ethernet controller.
++  This core can be used in all three modes of operation(10/100/1000 Mb/s).
++  The Management Data Input/Output (MDIO) interface is used to configure the
++  speed of operation. This core can switch dynamically between the three
++  different speed modes by configuring the converter register through mdio write.
++  The core cannot function without an external phy connected to it.
++
++properties:
++  compatible:
++    const: xlnx,gmii-to-rgmii-1.0
++
++  reg:
++    minimum: 0
++    maximum: 31
++    description: The ID number for the phy.
++
++  phy-handle:
++    $ref: ethernet-controller.yaml#/properties/phy-handle
++
++required:
++  - compatible
++  - reg
++  - phy-handle
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        phy: ethernet-phy@0 {
++            reg = <0>;
++        };
++        gmiitorgmii@8 {
++            compatible = "xlnx,gmii-to-rgmii-1.0";
++            reg = <8>;
++            phy-handle = <&phy>;
++        };
++    };
 -- 
 2.17.1
 
