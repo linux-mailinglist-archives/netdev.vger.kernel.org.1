@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-30167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4C678643F
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 02:31:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA8A786440
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 02:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8886E281405
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 00:31:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC7722813A3
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 00:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FBF17F9;
-	Thu, 24 Aug 2023 00:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664B619A;
+	Thu, 24 Aug 2023 00:31:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CD217F2
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 00:31:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A071C433C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45FB17D5
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 00:31:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBD05C433CA;
 	Thu, 24 Aug 2023 00:31:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692837063;
-	bh=VMmlax7Excwowq1QUS30g79arpxXQalQDoiV4/IqYQY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gTYPSoFTeRMTop9Skl5uOtCkERNpz4cnySKVCIx3nM3nwDhYKOADblZJapUAopgDv
-	 H/yTCcn80FXZpyCKGRol/STiqPcyKwwNcM4mV8/CYcQHwLjhTYvX+onTLSHN6OJj+O
-	 aT+ixipB9OXcr/j0rst19ZaGjH1fzHwA1dumVaf2FwsfqMgji4EayTEEaqMsdeXYV6
-	 Siaqf+mTR21OQgRHtVP7psgrHhZQf5+53i2fp2KtzhGYnMSErhiK8kS/nGrs1s5UnC
-	 wlDoaPNxW2/2JeI/jxwtmp6DkOdJnPoq9x0aFuCdei9XkmVIzsa6LIdwSIwCRhAhjn
-	 PILqsOYiyNZ1Q==
+	s=k20201202; t=1692837064;
+	bh=2tGGV7MvvdpEd7TlX1kvwAgLP2tN3pYgoYGJJg1JrE4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sns/2tc1qixXUB1CKpjqCwsjaKbftnWZ9lfzlwtRySEXwurhjgQkcbJNMSs1Jc3Fj
+	 sFGctsOAclKUX5y+qZZ8uP01qf7CNs9bgbDbEtY0gFxJKhxRHHcFqa9xGonxlSVkDy
+	 nMhloO3ktczca0DMcYoG3K/8/sLscUAqTO1+bkoReGjjHNZGoa7VzuBoktyntQtRg2
+	 +RDdxZghfL17QKzc84Wnacr1ZL1ksFqGVl4tl/+sPbS3TcwH3Y/3OEBeE0je5Nd6DN
+	 RX+JYNB0GIHMxBrgSffCXvkA0n793P8AC3znlnq1QBmyfkMC2YBO12LFpMoYQEhyOI
+	 ourexY5RAIjaA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -37,10 +37,12 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/5] tools: ynl: handful of forward looking updates
-Date: Wed, 23 Aug 2023 17:30:51 -0700
-Message-ID: <20230824003056.1436637-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/5] tools: ynl: allow passing binary data
+Date: Wed, 23 Aug 2023 17:30:52 -0700
+Message-ID: <20230824003056.1436637-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230824003056.1436637-1-kuba@kernel.org>
+References: <20230824003056.1436637-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,22 +51,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Small YNL improvements, mostly for work-in-progress families.
+Recent changes made us assume that input for binary data is in hex.
+When using YNL as a Python library it's possible to pass in raw bytes.
+Bring the ability to do that back.
 
-Jakub Kicinski (5):
-  tools: ynl: allow passing binary data
-  tools: ynl-gen: set length of binary fields
-  tools: ynl-gen: fix collecting global policy attrs
-  tools: ynl-gen: support empty attribute lists
-  netlink: specs: fix indent in fou
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/net/ynl/lib/ynl.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- Documentation/netlink/specs/fou.yaml   | 18 +++++++++---------
- tools/net/ynl/generated/ethtool-user.h |  4 ++++
- tools/net/ynl/generated/fou-user.h     |  6 ++++++
- tools/net/ynl/lib/ynl.py               |  7 ++++++-
- tools/net/ynl/ynl-gen-c.py             | 16 +++++++++++++---
- 5 files changed, 38 insertions(+), 13 deletions(-)
-
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 6951bcc7efdc..fa4f1c28efc5 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -410,7 +410,12 @@ genl_family_name_to_id = None
+         elif attr["type"] == 'string':
+             attr_payload = str(value).encode('ascii') + b'\x00'
+         elif attr["type"] == 'binary':
+-            attr_payload = bytes.fromhex(value)
++            if isinstance(value, bytes):
++                attr_payload = value
++            elif isinstance(value, str):
++                attr_payload = bytes.fromhex(value)
++            else:
++                raise Exception(f'Unknown type for binary attribute, value: {value}')
+         elif attr['type'] in NlAttr.type_formats:
+             format = NlAttr.get_format(attr['type'], attr.byte_order)
+             attr_payload = format.pack(int(value))
 -- 
 2.41.0
 
