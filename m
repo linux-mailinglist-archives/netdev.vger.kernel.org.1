@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-30532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD6FC787BAE
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 00:55:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F47787BC0
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 00:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42ABA2816F8
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 22:55:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E15B51C20F01
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 22:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA9CBE4C;
-	Thu, 24 Aug 2023 22:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60797BE51;
+	Thu, 24 Aug 2023 22:56:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF337E
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 22:55:51 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5098019A0
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 15:55:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4E77E
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 22:56:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7D01BF7
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 15:56:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692917750; x=1724453750;
+  t=1692917801; x=1724453801;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=dIbnaw9KWcsTmg3o9YoRfr2aE5BBwRXMYD6R5GZ1ZAg=;
-  b=YRVY/mSKLtgEdVLXrXGIY6sES1QNXAtz+bhd9KAG9Y6DBLGghHQb/7bK
-   WDijSGqDfjJ55/JXu/0hZRJmRpekgHj24FjDV8fZIEaHjNk8ikwg/jOc+
-   2d/R9hXv/WoQQ9prvPZGsISOCSQw+tDcq1IG5duc08odu2lPkiHxqdq4G
-   zZXqkctNWoSQNxifL9z4MiQXObE7/XsmhOlYpCT9jO7OFCpI4kV0ciXSm
-   9dWT0FNhRZAaZQuV1G7NjWUvKswg/DBiXdZNDTFH3UYBtaA2BAIxsi+YX
-   cZHZMEL23Tmp9D1Qiv7T7WZx0DERAX7aEBJ6HBTjPeZ3VvO4LGjRgKC2v
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="378365707"
+  bh=PGtYGYRcz+D9b/WA+XtsQENcS4ImWYDy+XJ2TwcGpas=;
+  b=O/+Yr2s+suSA9YL5aU0zaF7fpskXnLFusMZnCE9uy+8yVOcr0MTc6ct9
+   gr8MJw2+bb6F6tRLPwBORXtFMU+3i73gYYjtQRfQi9B1RM5vYhUWhjMLN
+   VvWgjUNWHP0gbr/C1lTWvY+IMmPunD25Jc1d3J9ragDlZ0uPRPA1JYCX3
+   1Ub2fWnTFfU7oZRQr2PwcCOc2nXM9dolmKIQG+IrRGgRFAvwPBZPmbfpE
+   UkTzDxoPYSZ9oJmDyQDwfzeck5T+n0ZjWP7bPAGRpZAeJF5VBjOcm67Mz
+   /gfls2vwJJZlMxRemfTRKmC2R4vg/BpKBuSEut+otgvREF/m+cAymcN+V
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="364769140"
 X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="378365707"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2023 15:55:49 -0700
+   d="scan'208";a="364769140"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2023 15:56:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="740380017"
+X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="714137545"
 X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="740380017"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga007.fm.intel.com with ESMTP; 24 Aug 2023 15:55:49 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+   d="scan'208";a="714137545"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga006.jf.intel.com with ESMTP; 24 Aug 2023 15:56:41 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 24 Aug 2023 15:55:48 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.27; Thu, 24 Aug 2023 15:56:40 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 24 Aug 2023 15:55:48 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.27; Thu, 24 Aug 2023 15:56:40 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 24 Aug 2023 15:55:48 -0700
+ 15.1.2507.27 via Frontend Transport; Thu, 24 Aug 2023 15:56:40 -0700
 Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 24 Aug 2023 15:55:47 -0700
+ 15.1.2507.27; Thu, 24 Aug 2023 15:56:39 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qdl8PmD+z2iq/RIj3GVp7VwqxQ55yjUbjO8P2E4OM16BQvz5y/nEKWvMeYA+cCwISrADuldRh/GS7nftdvooYx85W6lgBc4hrDlitcyxRDmPmiAXSsINktWiG7wRRCfNQXRObPndH0Oez00i4NG01o5JbrnE10uvcGIo54upV2wbhAnZiHMEbZFh8ZA+7DSWXNFZY8OMOEzhgBo52MSSDAbGWUpgLGp2VpyKFQPeHJW34aq/fhvuHzvh8EH1fG3m2CxDow2T0L9pmclDnkFw6hc9oHeA27nzMHHb0EMtkurWMWOFl/TaIB6f0DmmIEumuIsem77pQMd06JXLq1qQ+g==
+ b=ilBCpS32ax5Plycb8No9xqqbR19lOtdS1RQ5tAmWLcdo9o1R7xJRajq0pQKM8A0ZXOMsjmBTBFYKcqO0wq87axQTLtDuQ5okTLwaLaEp/33zgCnqZlii2KcHAjEox9N3miut6XuqJCHkLLZL+T6Jx8Y5AO7Pj5dckyOmjzjT9EIotrumj8RbEmXiEK085MYbjBEKnyEVFIWrMMG6ItnSbdRVnH0bxl+aR1rfSK6Co2lJDw2kdTbC95M4tcYkxVi4/UEbxvk9H356M6BcZw0lx7DB9ENBTrOo7S99nbMPmUn5vD5opa3es50sTeI3y+CEh26WDGKZRaxKZjFWsqnP6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FzWdp6ECalEloimKORa0f1C1jL0OS8gbY68TPASO/MY=;
- b=GspLl3KCg9Q43bzzydoPD/V1osq+nrQZ11avsHIMrFzKkkMA0e+UTLLZ6B38b6pvWu0tPnXyUUgtDrVq29tS840NUKyDitry7ORHs7L3FO+8/qMB8K2oYz36cqDV0oy28BwpSSYynzKMYc+Hi8qULggaRcWtBSPPEJAZSbBElul+HreLn0zXHQdG6GfWhKYR5jnfRVIMyWJ2m0tOcdE0IProFwJejXC3z6fQPpG+crhF9/cIe8vEGAKjqMW3OWWe1xi728LV1swaQWPW0dY2GDe/aMwRa6x+rzGbpbFZxa5cnSz12umwjWau+1MKXYt0Bf862+XGBFwOgjp/DNncfA==
+ bh=vrcYizFkka/nHubQrQc7ylKlIvNagoMYv3DU62/thqo=;
+ b=K31DXuLVicIavwc6raElpLRklqHjw+rGJQQDWfy5aY8Mpcv1MRdEVrUxDAA1S/hiF5Tm5wU9dMM+Q05J01VjpoPr3R118iSnkbXWuQI/ZVhGHYol+JnuJ5mZ883TMz8BFouUkKM/hsLzc8u5aks4V+qc7QUczUm3ZaX5MYNN4UeYCvrxRziTlgf6950J0IHHrLXwIB93GOvqbWKeD56z17akJd9rSAOMy8EpGOdPPJ+RvuaCsUY4LZ1vd7zLDWer03+QaCMAeh8odc4Fx56YJkJSM9PX4e+cnAKRATtM1zlXbfYWTyE/owTHCz6SPR5++SNOwm749wZE19PC30ntpA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -77,31 +77,30 @@ Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
  by SJ0PR11MB5893.namprd11.prod.outlook.com (2603:10b6:a03:429::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
- 2023 22:55:46 +0000
+ 2023 22:56:38 +0000
 Received: from SN7PR11MB7420.namprd11.prod.outlook.com
  ([fe80::3e89:54d7:2c3b:d1b0]) by SN7PR11MB7420.namprd11.prod.outlook.com
  ([fe80::3e89:54d7:2c3b:d1b0%6]) with mapi id 15.20.6699.027; Thu, 24 Aug 2023
- 22:55:46 +0000
-Message-ID: <849341ef-b0f4-d93f-1420-19c75ebf82b2@intel.com>
-Date: Thu, 24 Aug 2023 16:55:40 -0600
+ 22:56:38 +0000
+Message-ID: <4f0393fb-7f5a-5e91-ce43-4b2d842dd9b3@intel.com>
+Date: Thu, 24 Aug 2023 16:56:33 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
 Subject: Re: [RFC PATCH net-next 1/3] net: ethtool: add symmetric Toeplitz RSS
  hash function
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
 CC: <netdev@vger.kernel.org>, <jesse.brandeburg@intel.com>,
-	<anthony.l.nguyen@intel.com>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>
+	<anthony.l.nguyen@intel.com>
 References: <20230823164831.3284341-1-ahmed.zaki@intel.com>
- <20230823164831.3284341-2-ahmed.zaki@intel.com>
- <20230824111455.686e98b4@kernel.org>
+ <20230823164831.3284341-2-ahmed.zaki@intel.com> <ZOZhzYExHgnSBej4@x130>
+ <94d9c857-2c2b-77f0-9b17-8088068eee6d@intel.com> <ZOejNYJgR74JGRse@x130>
 From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <20230824111455.686e98b4@kernel.org>
+In-Reply-To: <ZOejNYJgR74JGRse@x130>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0083.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1f::21) To SN7PR11MB7420.namprd11.prod.outlook.com
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0074.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1f::12) To SN7PR11MB7420.namprd11.prod.outlook.com
  (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -111,161 +110,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|SJ0PR11MB5893:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6717db14-b404-48b8-c704-08dba4f5405b
+X-MS-Office365-Filtering-Correlation-Id: 3abd0e64-7bf9-4e15-9ddc-08dba4f55f88
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UPbIQtffVGnmiNCQ658Pr1+zZt4Ysc5U+7xnpwLOp6vTBnFXXSGDME6dfyFoBdmBVF/Un3YHbRilleGcRpmcFSnm1pNNWGxrX+oQ13ZB9SBDuxCqqlo5nhFIFcPfamze9LEMZnKIDCKboyTfpxLxSTdTaJTG5CVlYXVHid70vGJenox7Zid1/P4Gm9xUxKN0+bLxVUlj97nyUHSPvM6FIJTHH3VMW7dEmCmXEzL/bu27WJxDX+8TpTu2dAK9cxIpLUlfmOUoK9zJqvTOEhnunRKEi3G7nn2b19i8Jv4Q+8zbzolbw+93PfeVuVEWtno8gwjb0P0JV+Cn7sc2gT7ZLarfloZJyVgRbRRvwkJtenrFpbcg5j2gaMNUEGV0Ls1HnbuKZ/cscCXbCnY4SyKs6XLCrLGSn9HMV3kpD5DlIXxL9ENE3i9pSGvsJYSh2o3Y1cHVZ/cZUMijK8u0XtHLAX1jOpegFistLC7CkdDv1SotYW0uZlGtJlBnjhG6LRnN25YbIczar2GfxS07GUQCa9vOVYlfXrps05uU34xkRXyIyRgZsedEjHv/FeVcVrLy8PgFDp4HpH52BpqdgrwquNM0dkVXR1WUuLm9v8CbqIcTzNWKDmOPGAGyTgMuzwv7ydZTWjiUtZkgd5GMM4TqVQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(366004)(376002)(396003)(186009)(1800799009)(451199024)(86362001)(31696002)(2906002)(36756003)(83380400001)(6666004)(53546011)(4326008)(82960400001)(8676002)(8936002)(26005)(6506007)(478600001)(2616005)(5660300002)(31686004)(6512007)(41300700001)(38100700002)(44832011)(6916009)(66946007)(66476007)(66556008)(6486002)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: aLEsEfL/7LPXrz04s+vVdlv644b8qIbCd5gypoKijaNTf4YvBzZlrS4rlAKQAtSGDE9VyQAIKqRc4XFXbH7FLsl4cYnUOnf5R+etJqU1sSqeBmwNvlBNnyXOcuf/A8KmrGUjAR5pLl5hJ3vWSsBZFsQjA/Q5PVGz2Mwa2aybqkfYa+54gjqs9WvaO+Ya4Hr3Poj1NTMnkvYo9pGfQ724rx0jNHY+8NKYSIG91RAa/k83PKIKYmh07rko1NN4tsLSp6pSMM6l+g0HB84jkQHlX4IaeRK180zPX4zRbKlvjU+tCYe5xhY/7luCkEc0mjoN36N4iRA4lktLq1Y0VZMaGvL9gnPWpr6Cn5aWhsZ0Ki09uBL2NLzJ0ZbFso10MZMaNqr+Bfttquhyg1/M5KeLLon+Ja16NOj/ebbscH2DKUdKNs/tydYgoEVT847TykVoAQrkpDD/IjvyhvyeCppf9uMjxnUhV6RXYp5Yhy2uL3mU3guDyTbZ6M618zTIVRgybuOSHdZw+DZa935itmcN7Y2+UWiailExy/7inxK8z8DxVcO5/xjBMGSJAhY6sAgLU0pr2H76lqUjP/UL3delq4apJ2Y9n+Nm2DVB4nExTt7/bpdetTWKwuzIgWBXFNIuOt6ftopjlVAstR6hWKrgXdbAHs1txlr1u2wZraWJlCQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(366004)(376002)(396003)(186009)(1800799009)(451199024)(86362001)(31696002)(2906002)(36756003)(6666004)(53546011)(4326008)(82960400001)(8676002)(8936002)(26005)(6506007)(478600001)(107886003)(2616005)(5660300002)(31686004)(6512007)(41300700001)(38100700002)(966005)(44832011)(6916009)(66946007)(66476007)(66556008)(6486002)(316002)(369524004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a09oTlUxamxuM3FHbHBsN0pFUTFlSG55VXh5bHE2VFRreG1VaTRIOGkzaVV6?=
- =?utf-8?B?ZkU0elVvRTcrTGlUeDhIeHk4S1dLN1hyMkcrS2xNLzJnU2FtTGd0dlgrR0N4?=
- =?utf-8?B?cHpzOXlvOHZxbUMwWHBWNmdrdHIxOWhoZTdFV2N1SXVINWlMbWsvZ0JZZi9u?=
- =?utf-8?B?SExtNnBHaTNSSDJCZ3ZwMFJrTTNBWXV0eEY5MmxlVmdtUExZY0JNTlJ0Wmc5?=
- =?utf-8?B?aDYwcmxpRkRJRElrWDVRVGR0djBhckxNbC8ydmVLYVJNK3huMHdUbzB1L0V3?=
- =?utf-8?B?dG14QXRXcFNHYkhQRldDbnE0NW44R1paS1MrQm1SaGxZRFJRWXNzQjhETGYy?=
- =?utf-8?B?UVhCc1ZDckxRL3ZKSU9jdVNZUWJpRURhU1RtOXMzQk4zUGRYREg3RHlGVVZL?=
- =?utf-8?B?bzlOeFZQekJuOWlhTDdMZlVCV09pb2FyY2FmNytXM3Rya0JKS2VGWFVRTlgr?=
- =?utf-8?B?V1hNMzZxZ04rRWdtcTdodkRkdlF3YkJGOGlmaFpVZ2V2bzkzeVVKM3JtSSs5?=
- =?utf-8?B?cytXbUhJQXgyMHN1eGoxZCtYVVNYaktVaXlySFpxVjgwMVVwamVhOE5YZzZ2?=
- =?utf-8?B?QlNnOXhCU1JYZXJkQm5QYm1lTU9POHdtcEN4eHF4U1hoNUlON1NJdTBPZHkw?=
- =?utf-8?B?dVJaczhVb1BibzJUMTUrMExKa3hWVyszSmRqdXE0TGJ3Qkh3M09lcEN3Z3pX?=
- =?utf-8?B?VFo5M1B1U0p3MzVSNTJMU0pyU3kvY0pBeG5oaEx1UVFjSGlwOVRIQlY4Unov?=
- =?utf-8?B?WDIvQzdDLytRN2g2QWZkOGRzaFlEWHQ3SUxPK21DL0pCN3RxMDRwaGZJV0wv?=
- =?utf-8?B?QXRSM2VaaHl0MDExZlJPTXJCWk9pRU8rNWYzeG1Uelo2UnF1TjBIYjF4L1o1?=
- =?utf-8?B?ektrOC94Y3RUYWR0NmpLVVp6TE1VL3hpREdNLzNqWXV6T0RzYTNwc0FUTERE?=
- =?utf-8?B?aGNtUWpBcHFNZ0ZnSUxFODEyaUVONTNVZXkwRjcxSDU5NVJsODFiNG5LcGhJ?=
- =?utf-8?B?d0R2SnhVSzFKKzBub0hpcUUvRHlLd2k4TkhwOUVwdm9jbTYrK1A3S2VDWUNH?=
- =?utf-8?B?cFZpZGhROFJzSGsyN0NDeEVWWGRrMHQ3WkJqYXB3OFYxZzZzMEZ1NzUyNGk3?=
- =?utf-8?B?dXYvS1g3QXhYdmYrZnRZWTRoalo2V0RxZ0h2Um9GTnR6THJmS2g2dmhoUnJy?=
- =?utf-8?B?cU5pM1p1T0E3SGFyVUtUeCtYaGJSK0VIQy83aFQwcnoyS3BZY0pKRmwxRkVF?=
- =?utf-8?B?THVlclFUZmkzWXZ3WklvT3JobVdGbU94cFQ5SkQwTkxCRjJkWWJ2RitOSWtP?=
- =?utf-8?B?TkVDL1ZkeVVPK0MzUU9NUjZHREM1ZzNNeU1HWXBObDdMR3dpNEhiTTJ6L2Jp?=
- =?utf-8?B?QVNMQVBucm9Qakhza1FtUC9ZdS9hTFU0Ujd1TEVqTE9rOVZ1cmM2ZVZacjJY?=
- =?utf-8?B?ei9SQjhmMmtnMTkwaDAzVE1CVzNOT3BUVEx1b2Fyc0dDV3ZvMG5Rd1NDeVFn?=
- =?utf-8?B?ejdBSGpWZ0NxWDFwekVNMGQxQ1RRM3pXUWp4RmhyOHRDazhWVS9HN21Fd01U?=
- =?utf-8?B?S3NORmhaRTd4ZDdnV0dFM1ozenNtL2l2WFAyNkNxNDAxZXRnUGk0b2YyQnEv?=
- =?utf-8?B?Y2NHY0pIU1ZZcUxIZXFqTitQT0pDWkhRVFdQVjk1ZVE2c3orc0pnVzZ2dndr?=
- =?utf-8?B?RzBOSXdEaE5tdGZPa2t6RHorU3hlaU1odjMxLzZadlZQZm4xRUxZUk54YlFn?=
- =?utf-8?B?NmZHQ084bUR2Wm9jdTBwVmVjMG5LVzd3U3NWYkdqWGtVODV1aUh3UHp2c1lC?=
- =?utf-8?B?TGRIYzBqN3E2L0hoTDUyTVY5RVdpWEZkQVowNk9PbkdOVHZDdWxLblVvZ2lN?=
- =?utf-8?B?a25aZ0E5c29HdUpYUk9tZzRVcHNHT0pVRzY5U2VNL2tzbW9KSnVUMElMYk8x?=
- =?utf-8?B?SjBkNzJTVmJ5UmVrNXcwQnBNdjRBUjNFZlJSck9jTmE5c0txK2hNNlFRWkpI?=
- =?utf-8?B?eFJ1aVBDWHdPREZQK0VBNEp4OFVPdkxGdGk5K053ejQ1clhIRWdpR1djOTZ2?=
- =?utf-8?B?dUNxSEUzR2todGZrUE9xUEgxMFpESnNPa1EvdVk4bGJ1VG5QYVRUT2NXUjNN?=
- =?utf-8?B?clJCV2dWMFZqczI5NFRhenZVTE96UkFwRFRET1NrNTdaWCtLMGVUUHN5c2Vp?=
- =?utf-8?B?dGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6717db14-b404-48b8-c704-08dba4f5405b
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SFVDSzNBRXo3Mjl5L1VvQzVISXoydjhjM3VOQyszNWxLbk1BbzJER1dhZXZV?=
+ =?utf-8?B?eXF5bTZGS2lkb0dHdDMrUmFZa0NwbDRxS2hyMzZGWWNJNDFLZHJOa2JzeVo3?=
+ =?utf-8?B?K3BHWUhwdlFZWXhmenZvSDZNcHRFWGh1djNERzQ0UlFuS1RUekgwZWI3WlJa?=
+ =?utf-8?B?YjFQSUxBYzBWK1V6N3N1Y0hlSFNVU29ONzVMSUZVZW9lNXp1V003V04wRGxS?=
+ =?utf-8?B?cjNGdEFjbkVnZTFUMmkxQUpzS0o1OTlVdUpwZm52WlB0d3JmSGI5SjJEWTBy?=
+ =?utf-8?B?S0djKzU1OXBNN2k4WUdsbTJRNW4vRHpEYThjRTJKTXMyOTlWRDdvWHppd1pY?=
+ =?utf-8?B?TW43OFdoMGpBRFdyL1pZZ0VBdFM5cXdDZFQ2TGZjWStxZzZmMUpaMGlKeWRQ?=
+ =?utf-8?B?ZkhQejFFTit1QXVTVFc4Nk5qMC9nRHR3a3hQNTVQUUt0VEJyeUtaT3pOaG9K?=
+ =?utf-8?B?WmVVVUZDQUNpQ3RsVDVjOEQ1QkJvV085WTNhNGlsUlB2SGU4azdtM1BURGkx?=
+ =?utf-8?B?WFd0Y2oyaU1PMjR4N1lzL2pTZHU4cmlXSGFIUDV5S3R4TzM0OFpWMVk2YVJI?=
+ =?utf-8?B?L2RXNU5lQzlkbDNYRzVKRmJTUHBHUXhqMFdnVS9ReXhERDMwdzkwMlVRdHcz?=
+ =?utf-8?B?d1cwN1ZLZnBnTUZyREVuZVJ5d1lwNkd1QzFZRkxzUlBlaHcxam9wM3hOQ3Yy?=
+ =?utf-8?B?SjFza3ZHSnE4d045akQvZjhEWjFmOG9FVGEvby9nNDVLSzNFcS9EQThCa1I2?=
+ =?utf-8?B?REpNU1RTY0xrUC95Q1VpWFIyNEZZVVoxd2dCUmlnQno5c1Bwc00rZllVM3FM?=
+ =?utf-8?B?QmVSYWtQNS9jUUo1bFZqSXZ6YS9JYzl3TXVWc0RkYzhVbWlrSVJCTFFmUHhk?=
+ =?utf-8?B?cEVEN0pjWGl6Z012dFFzYlNhYWZuSGlyYUNwMk9kTlIrSmgrblZIUzd1VDRD?=
+ =?utf-8?B?M3dlTm9QL1E2b0JMTlB6TFlocEkxUlI1UndUYmQxU1ZEaElIY1VNTzhIamds?=
+ =?utf-8?B?MEJEUE5PbjV0NjZHWWF3YmdCUlFJT1M4MzNtV3lrck9WbG9TU2Z4WDFUOHQ3?=
+ =?utf-8?B?c003aFJNbW5JdmdKT28wUFhSbUliL3lrZ05taFpoSEZkVkQySURDSDlCNlE3?=
+ =?utf-8?B?RG1Gb3d6Q0NXbVJmOXFVSUc3VXBOOVlLTlEzZXA5WVN2c3JFM3UxRnk1YklH?=
+ =?utf-8?B?SVZ3c1ppa2hmaWU3VUJOL0QzUlNwMTlWa3hLNlZYTys3ZXkvNWtsMUxSbTUx?=
+ =?utf-8?B?WEJJTTdnWjNqSzlIWmFETFN5VmRmajB3Y1RianlzaTBVV2hHY3hZVkdCUHJE?=
+ =?utf-8?B?N2Uzc0FpeDR3QWd5TEx5S2xNVTh4SlRCUFg0UDh3UG5wNThuSGlLZ3V0dDF4?=
+ =?utf-8?B?WjF0RDQzTzVBdm94aGRxdldlNzlmNE0vQVVLU3pyR1R3MTBIaXlZeThiUFpy?=
+ =?utf-8?B?VU91bnhldzZ2bnVRY3JvNlk5amR4bERUSzJGVFZpeXNlVjhiaUtWQklVcHl3?=
+ =?utf-8?B?TDZyQUhrOVBhbVpFTjFncTVTaDFDQkZYSFlOMUlIMXpmOHI5eEJrQ1V4Mkxi?=
+ =?utf-8?B?dW12akxMVHo5RUk2eHpaeVYwdGwxTkIzL0EwMDlJN2ozTHFUQjZ5RW9hcGpC?=
+ =?utf-8?B?cmltUWZOcitQb1hJc1EwZGQwNkE2cVJLWDlRbStVZG14ZVVnMVRJUmpJM0xB?=
+ =?utf-8?B?Ui85bDJVVk9MKzdVdDRkVldNTVFHVklvWDJUa2YyMUloUXN4UnZRODFTRWhl?=
+ =?utf-8?B?Qlg4eEtXdE5xVnczRWx3WUFwYWpLditUK0N0TlZTWVQwZXYzaFZrUDlKWTVj?=
+ =?utf-8?B?YVJ4ZXh2WU9sajdMemxSUzB6WmVtdWh2V3R5cEMycU1pRTNRUFBERHhMM3pJ?=
+ =?utf-8?B?T3g5blNxUWh3dU9VWGhCb3EwalhsWEY0ZCtwK1JRSm1iaWY1dlRnRUhOZmRN?=
+ =?utf-8?B?MVcxcjVKaEIzWmI0QUloS3Rqc0Nxb2xGRWhrS3dFQ1pKb3JIWkloWlkwQSto?=
+ =?utf-8?B?WEw0UlhISk1VSGoxQzY2bTNCVk5HVUNJSitmMHRvRUZYT01kZjBVNVI1aTNC?=
+ =?utf-8?B?d0hGQjd1TkgvbTZoRVpKbTFxQ0Y0Wnpzdy9EZ2pUcGc5WTE3Y0c4eFFGV0RC?=
+ =?utf-8?B?bkFOUjhLM2xhSG5oWUhWRU9kcG5ZUGdySGU5VlNZeEVLQnoxSklJN0JFcVAx?=
+ =?utf-8?B?V2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3abd0e64-7bf9-4e15-9ddc-08dba4f55f88
 X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 22:55:45.9690
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 22:56:38.1766
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cz0merVUBjdgXy6LcGxVXLn2UMsJyQ07jxoiI4d9iOlG9USG7Nei/UNysWfCMc2Bk6e6UyGt5MdWpKh1P9hR8A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4a4z3oPNdloIgEry+TbSAo2/bMttemoCYyE3P+sjMWzmUy+wECqwUHtjgUuY9ubtZyMLp7XIAAXpTyWc9fMyPQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5893
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URI_DOTEDU autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-On 2023-08-24 12:14, Jakub Kicinski wrote:
-> CC Willem
->
-> On Wed, 23 Aug 2023 10:48:29 -0600 Ahmed Zaki wrote:
->> Symmetric RSS hash functions are beneficial in applications that monitor
->> both Tx and Rx packets of the same flow (IDS, software firewalls, ..etc).
->> Getting all traffic of the same flow on the same RX queue results in
->> higher CPU cache efficiency.
+On 2023-08-24 12:36, Saeed Mahameed wrote:
+> On 24 Aug 07:14, Ahmed Zaki wrote:
 >>
->> Allow ethtool to support symmetric Toeplitz algorithm. A user can set the
->> RSS function of the netdevice via:
->>      # ethtool -X eth0 hfunc symmetric_toeplitz
-> Looks fairly reasonable, but there are two questions we need to answer:
->   - what do we do if RXH config includes fields which are by definition
->     not symmetric (l2 DA or in the future flow label)?
->   - my initial thought was the same as Saeed's - that the fields are
->     sorted, so how do we inform user about the exact implementation?
+>> On 2023-08-23 13:45, Saeed Mahameed wrote:
+>>> On 23 Aug 10:48, Ahmed Zaki wrote:
+>>>> Symmetric RSS hash functions are beneficial in applications that 
+>>>> monitor
+>>>> both Tx and Rx packets of the same flow (IDS, software firewalls, 
+>>>> ..etc).
+>>>> Getting all traffic of the same flow on the same RX queue results in
+>>>> higher CPU cache efficiency.
+>>>>
 >
-> One way to fix both problems would be to, instead of changing the hash
-> function, change the RXH config. Add new "xor-ed" fields there.
+> ...
 >
-> Another would be to name the function "XORSYM_TOP" and make the core
-> check that it cannot be combined with uni-dir fields?
+>>>
+>>> What is the expectation of the symmetric toeplitz hash, how do you 
+>>> achieve
+>>> that? by sorting packet fields? which fields?
+>>>
+>>> Can you please provide a link to documentation/spec?
+>>> We should make sure all vendors agree on implementation and 
+>>> expectation of
+>>> the symmetric hash function.
+>>
+>> The way the Intel NICs are achieving this hash symmetry is by XORing 
+>> the source and destination values of the IP and L4 ports and then 
+>> feeding these values to the regular Toeplitz (in-tree) hash algorithm.
+>>
+>> For example, for UDP/IPv4, the input fields for the Toeplitz hash 
+>> would be:
+>>
+>> (SRC_IP, DST_IP, SRC_PORT,  DST_PORT)
+>>
 >
-> I like the first option more.
+> So you mangle the input. This is different than the paper you
+> referenced below which doesn't change the input but it modifies the RSS
+> algorithm and uses a special hash key.
 >
-> Either way, please make sure to add docs, and extend the toeplitz test
-> for this.
-
-When "Symmetric Toeplitz" is set in the NIC, the H/W will yield the same 
-hash as the regular Toeplitz for protocol types that do not have such 
-symmetric fields in both directions (i.e. there will be no RSS hash 
-symmetry and the TX/RX traffic will land on different Rx queues).
-
-The goal of this series is to enable the "default" behavior of the whole 
-device ("-X hfunc") to be the symmetric hash (again, only for protocols 
-that have symmetric src/dst counterparts). If I understand the first 
-option correctly, the user would need to manually configure all RXH 
-fields for all flow types (tcp4, udp4, sctp4, tcp6, ..etc), to get 
-symmetric RSS on them, instead of the proposed single "-X" command? The 
-second option is closer to what I had in mind. We can re-name and 
-provide any details.
-
-I agree that we will need to take care of some cases like if the user 
-removes only "source IP" or "destination port" from the hash fields, 
-without that field's counterpart (we can prevent this, or show a 
-warning, ..etc). I was planning to address that in a follow-up series; 
-ie. handling the "ethtool -U rx-flow-hash". Do you want that to be 
-included in the same series as well?
-
-
+>> If symmetric Toeplitz is set, the NIC XOR the src and dst fields:
+>>
+>> (SRC_IP^DST_IP ,  SRC_IP^DST_IP, SRC_PORT^DST_PORT, SRC_PORT^DST_PORT)
+>>
+>> This way, the output hash would be the same for both flow directions. 
+>> Same is applicable for IPv6, TCP and SCTP.
+>>
 >
->> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
->> index 62b61527bcc4..9a8e1fb7170d 100644
->> --- a/include/linux/ethtool.h
->> +++ b/include/linux/ethtool.h
->> @@ -60,10 +60,11 @@ enum {
->>   	ETH_RSS_HASH_TOP_BIT, /* Configurable RSS hash function - Toeplitz */
->>   	ETH_RSS_HASH_XOR_BIT, /* Configurable RSS hash function - Xor */
->>   	ETH_RSS_HASH_CRC32_BIT, /* Configurable RSS hash function - Crc32 */
->> +	ETH_RSS_HASH_SYM_TOP_BIT, /* Configurable RSS hash function - Symmetric Toeplitz */
->>   
->>   	/*
->>   	 * Add your fresh new hash function bits above and remember to update
->> -	 * rss_hash_func_strings[] in ethtool.c
->> +	 * rss_hash_func_strings[] in ethtool/common.c
->>   	 */
->>   	ETH_RSS_HASH_FUNCS_COUNT
->>   };
->> @@ -108,6 +109,7 @@ enum ethtool_supported_ring_param {
->>   #define __ETH_RSS_HASH(name)	__ETH_RSS_HASH_BIT(ETH_RSS_HASH_##name##_BIT)
->>   
->>   #define ETH_RSS_HASH_TOP	__ETH_RSS_HASH(TOP)
->> +#define ETH_RSS_HASH_SYM_TOP	__ETH_RSS_HASH(SYM_TOP)
->>   #define ETH_RSS_HASH_XOR	__ETH_RSS_HASH(XOR)
->>   #define ETH_RSS_HASH_CRC32	__ETH_RSS_HASH(CRC32)
->>   
->> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
->> index f5598c5f50de..a0e0c6b2980e 100644
->> --- a/net/ethtool/common.c
->> +++ b/net/ethtool/common.c
->> @@ -81,6 +81,7 @@ rss_hash_func_strings[ETH_RSS_HASH_FUNCS_COUNT][ETH_GSTRING_LEN] = {
->>   	[ETH_RSS_HASH_TOP_BIT] =	"toeplitz",
->>   	[ETH_RSS_HASH_XOR_BIT] =	"xor",
->>   	[ETH_RSS_HASH_CRC32_BIT] =	"crc32",
->> +	[ETH_RSS_HASH_SYM_TOP_BIT] =	"symmetric_toeplitz",
->>   };
->>   
->>   const char
+> I understand the motivation, I just want to make sure the 
+> interpretation is
+> clear, I agree with Jakub, we should use a clear name for the ethtool
+> parameter or allow users to select "xor-ed"/"sorted" fields as Jakub
+> suggested.
+>> Regarding the documentation, the above is available in our public 
+>> datasheets [2]. In the final version, I can add similar explanation 
+>> in the headers (kdoc) and under "Documentation/networking/" so that 
+>> there is a clear understanding of the algorithm.
+>>
+>>
+>> [1] https://www.ndsl.kaist.edu/~kyoungsoo/papers/TR-symRSS.pdf
+>>
+>> [2] E810 datasheet: 7.10.10.2 : Symmetric Hash
+>>
+>> https://www.intel.com/content/www/us/en/content-details/613875/intel-ethernet-controller-e810-datasheet.html 
+>>
+>>
+>
+> This document doesn't mention anything about implementation.
 
-Thanks,
 
-Ahmed
+It has all the info regarding which fields are XOR'd using which 
+registers and so on. The hash algorithm itself is the standard Toeplitz, 
+also on section 7.10.10.2.
 
 
