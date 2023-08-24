@@ -1,129 +1,199 @@
-Return-Path: <netdev+bounces-30259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555FE7869E1
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:21:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC6D786A13
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 867111C20E00
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:21:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF91F1C20DFD
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18081AD4C;
-	Thu, 24 Aug 2023 08:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E317F;
+	Thu, 24 Aug 2023 08:31:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C97A5699
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:21:20 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C462E10FE
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 01:21:19 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99c1f6f3884so842516466b.0
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 01:21:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692865278; x=1693470078;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rNET76Ud4BrnHISLCcfZfW0L376WLs2AdNAt4B/d3mM=;
-        b=RcF3GhYjzqbRgy6dbRkfBeQPETRLI/Ea0BTfqkorM/kW3bmr5PercSjFXs9pM8K6LG
-         sjj2ouXiKhtOMlvrEDLPASJ367BqYqyF76a+IlCYA+920bLLBBAzacIutz5g84Lt4jsL
-         iSI9oePLUDe5WqpkUAZF2oiwwsMauofDVF6Yb0yvX6A8fnwwEbeZCmUSpGcKWmIYvg4V
-         KUO/QeGWBYfIqqF6ZhBVKfGUA+11Wxt+SsC0BCfI4oqQf67VlfTUIskhI7gskUpRKhsB
-         +mSIINZz6qL83GoSnZXkpqIplVietYdq7YQ4qCYXNZaHs6nPjQh/2SCnZI4V2FQBuq4c
-         q3Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692865278; x=1693470078;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rNET76Ud4BrnHISLCcfZfW0L376WLs2AdNAt4B/d3mM=;
-        b=M79qIy3oeaIzZroprcGkLN6lRvosjLvzjwdYZGCmGemjbteobcrcSXiX+jlAgE1pHt
-         oNrc7sy47dy4H7z4IPM+6whqv2awtDBcM5Pi1lGqxnA9HaHBHSyVBtYCuqIZgIutX+bF
-         jbanU1dkmHASn3kCGT7mBYzpRh82C1Fa2lJWd33LOBl2Nt94UID+Kgm464OTdOkagOwD
-         JbuP4T+u2ORXl2XELl0W/B+2TOxxQeBl7Ly4YfFbtq6uudPcT7P3JYjNoozWuOC/MoK7
-         fPpmhIJO7+CEj/t0RdF0bR5qXRr/JQMEwUsRsxQSqOKF9y89HjBpknUHBBvXrCC06aQ9
-         Z62A==
-X-Gm-Message-State: AOJu0Yz0Rr7atm2prcyAm1oKmU4J9nj/gnb0pyaDpkzbNETRPRSCxoo1
-	FOQ1P3kUKKjWK+a4au53APc=
-X-Google-Smtp-Source: AGHT+IHKswW46T/wrp1CyGPQAJMPOpKtNmxL3yj8IYCC29RQeJH3X7KqOreV44bet93T4iBxPj3RyA==
-X-Received: by 2002:a17:906:5392:b0:9a1:debe:6b9b with SMTP id g18-20020a170906539200b009a1debe6b9bmr3198856ejo.35.1692865277964;
-        Thu, 24 Aug 2023 01:21:17 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:95e4:6600:5091:3e0c:bdec:d10a? (dynamic-2a02-3100-95e4-6600-5091-3e0c-bdec-d10a.310.pool.telefonica.de. [2a02:3100:95e4:6600:5091:3e0c:bdec:d10a])
-        by smtp.googlemail.com with ESMTPSA id p20-20020a170906499400b0099bcdfff7cbsm10595825eju.160.2023.08.24.01.21.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 01:21:17 -0700 (PDT)
-Message-ID: <22ef754e-1d6c-652e-c626-edc571530a3b@gmail.com>
-Date: Thu, 24 Aug 2023 10:21:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE5F111A5
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:31:27 +0000 (UTC)
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A88B9172D;
+	Thu, 24 Aug 2023 01:31:24 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37O8V4Jh075375;
+	Thu, 24 Aug 2023 03:31:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1692865864;
+	bh=vOkj4zAoo62uwYWmtr0A2SD6qiUs4QCmudTT6wYuduo=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=Ea/mkAOXqoJ25E1s+ejDOtb0Ot1GwNS1wqH4hslzh8ebJ1metrQr/KqV7N4gEnfN6
+	 RSELm3jYE0L15pYTvQWzFWi7FBRN6YTsBvpDOzfa73No1gGhzijLG44KdKep4/tp7X
+	 SkTmlq+PO2Op/p7XPUVVERm9SlI1JuPai1S4DlzE=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37O8V4ba037931
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 24 Aug 2023 03:31:04 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 24
+ Aug 2023 03:31:04 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 24 Aug 2023 03:31:04 -0500
+Received: from [172.24.227.35] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37O8Uv93055459;
+	Thu, 24 Aug 2023 03:30:58 -0500
+Message-ID: <6d1b6571-20d4-a4a9-5c46-adb2c9938abb@ti.com>
+Date: Thu, 24 Aug 2023 14:00:56 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: r8169 link up but no traffic, and watchdog error
-To: =?UTF-8?Q?Martin_Kj=c3=a6r_J=c3=b8rgensen?= <me@lagy.org>
-Cc: nic_swsd@realtek.com, Jakub Kicinski <kuba@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <87zg30a0h9.fsf@lagy.org> <20230809125805.2e3f86ac@kernel.org>
- <87fs489agk.fsf@lagy.org> <ad71f412-e317-d8d0-5e9d-274fe0e01374@gmail.com>
- <87bkew98ai.fsf@lagy.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [EXTERNAL] Re: [PATCH v6 1/5] dt-bindings: net: Add ICSS IEP
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <87bkew98ai.fsf@lagy.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        MD Danish Anwar
+	<danishanwar@ti.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Roger Quadros
+	<rogerq@kernel.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>
+CC: <nm@ti.com>, <srk@ti.com>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20230823113254.292603-1-danishanwar@ti.com>
+ <20230823113254.292603-2-danishanwar@ti.com>
+ <d5a343c8-c384-6eea-94bf-e0c4f96e5fb0@linaro.org>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <d5a343c8-c384-6eea-94bf-e0c4f96e5fb0@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 24.08.2023 10:01, Martin Kjær Jørgensen wrote:
-> 
-> On Thu, Aug 24 2023, Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> 
->> On 18.08.2023 13:49, Martin Kjær Jørgensen wrote:
->>>
->>> On Wed, Aug 09 2023, Jakub Kicinski <kuba@kernel.org> wrote:
->>>
->>>>
->>>> There were some fix in r8169 for power management changes recently.
->>>> Could you try the latest stable kernel? 6.4.9 ?
->>>>
->>>
->>> I have just upgraded to latest Debian testing kernel (6.4.0-3-amd64 #1 SMP
->>> PREEMPT_DYNAMIC Debian 6.4.11-1) but it doesn't seem to make much
->>> difference. I can trigger the same issue again, and get similar kernel error
->>> as before:
->>>
-> 
-> 
->> From the line above it's not clear which kernel version is used. Best test with a
->> self-compiled mainline kernel.
+On 24/08/23 12:13 pm, Krzysztof Kozlowski wrote:
+> On 23/08/2023 13:32, MD Danish Anwar wrote:
+>> Add a DT binding document for the ICSS Industrial Ethernet Peripheral(IEP)
+>> hardware. IEP supports packet timestamping, PTP and PPS.
 >>
+>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 > 
-> It should be based on 6.4.11 , but I can try with a self-compiled version too.
+> Really? Where?
 > 
+>> Reviewed-by: Roger Quadros <rogerq@kernel.org>
+> 
+> Now you are making things up. Please stop faking tags.
+> 
+>> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> Where?
+> 
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+>>  .../devicetree/bindings/net/ti,icss-iep.yaml  | 61 +++++++++++++++++++
+>>  1 file changed, 61 insertions(+)
+>>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
 >>
->> Please test also with the different ASPM L1 states disabled, you can use the sysfs
->> attributes under /sys/class/net/enp3s0/device/link/ for this.
->>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>> new file mode 100644
+>> index 000000000000..75668bea8614
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+>> @@ -0,0 +1,61 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
+>> +
+>> +maintainers:
+>> +  - Md Danish Anwar <danishanwar@ti.com>
+>> +
+>> +properties:
+>> +  compatible:
+>> +    oneOf:
+>> +      - items:
+>> +          - enum:
+>> +              - ti,am642-icss-iep
+>> +              - ti,j721e-icss-iep
+>> +          - const: ti,am654-icss-iep
+>> +
+>> +      - const: ti,am654-icss-iep
+>> +
+>> +
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  clocks:
+>> +    maxItems: 1
+>> +    description: phandle to the IEP source clock
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - clocks
+>> +
+>> +additionalProperties: false
+>> +
+>> +examples:
+>> +  - |
+>> +
 > 
-> I will try that.
+> Drop stray blank line
 > 
-> 
->> Best bisect between last known good kernel and latest 6.4 version.
->>
-> 
-> I do not know of any working version. My machine/system have had this behavior
-> ever since I've got it. At least for 9 months ...
 
-You could compile and test the LTS versions 6.1 and 5.15.
+I will drop this blank line.
+
+>> +    /* AM65x */
+>> +    icssg0_iep0: iep@2e000 {
+>> +        compatible = "ti,am654-icss-iep";
+>> +        reg = <0x2e000 0x1000>;
+>> +        clocks = <&icssg0_iepclk_mux>;
+>> +    };
+> 
+> Choose one example.
+> 
+
+I will only keep one example (AM65x) and drop other examples.
+
+> 
+> Best regards,
+> Krzysztof
+> 
+
+I will make above changes and remove Roger's RB from patch 3 and 4 as he is the
+author of those patches. With these changes I will send next revision today. If
+there is anything else, please let me know.
+
+-- 
+Thanks and Regards,
+Danish.
 
