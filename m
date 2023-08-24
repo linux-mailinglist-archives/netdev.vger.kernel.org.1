@@ -1,184 +1,177 @@
-Return-Path: <netdev+bounces-30302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1EFC786D57
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:02:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA8F786D9A
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655742814E5
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:02:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECF0D1C20DEA
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913E5CA7E;
-	Thu, 24 Aug 2023 11:02:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC4BDDCB;
+	Thu, 24 Aug 2023 11:20:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8512324543
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:02:32 +0000 (UTC)
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54622E58
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:02:31 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-68a520dba33so3287273b3a.0
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 04:02:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AA424543
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:20:17 +0000 (UTC)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E2110F3;
+	Thu, 24 Aug 2023 04:20:16 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-31977ace1c8so5854172f8f.1;
+        Thu, 24 Aug 2023 04:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1692874951; x=1693479751;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oELav9k2SIZBN+RuqQkpAGBpv33M47omX44ww0HA6QI=;
-        b=m2reI3I62fTBYK0BD8KsPr7WKMrE5LYqNr1YDU7thGtnZ3E/gCl5XYEW9huLjHSuT9
-         MdbszaVPx6v8UUQ3UYlUGQTUhzTh/2v4bMt2a4nVpl5GuY5p5KgMroUZrJeA4krA9Vm7
-         4M6o6v682yVwEVsDkhGMl1gpcuKJ/FQB66xUgFBbyFbb/1eLLGxgYGwlipHVKuzUAiUU
-         0CZXucs+Kd0N1a9kRvisYCyaHn1zOiKQ7O65IO61adjvMWgEz99z928eBOKzzU94kpef
-         MKe/+nPdPbVZwdmNLPnIVTYZVflxUHtzBT6eGQz5Apb63fkJXe0TlvxJdClWPT0taVOx
-         RK9g==
+        d=gmail.com; s=20221208; t=1692876014; x=1693480814;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DuJW0LKbZt9E5H/o5pYsw4kheQDvEfUDjmQ5oCP0+3M=;
+        b=YvLp6BAuvU4sfSKxfGyAjuBL0mvrUWXpxRKtfBAmHpi6P6hbYU597w84cH8E3+Ymkx
+         OxQHGXMoYz/Mu1gdhYpkJj9N8R/azLfAS8hHVOv9rg90DxdWZw1JvuV5vpe88O3ZWwTL
+         DB4xasT1loNSnd50celbazHVoX+ZxHug1JCM1po/NDAPnMDKKeu77KrCqm5BMXSPlfFZ
+         3owpCQQTSOu4LVQFiuE45s5HNwS2heWZ1/cfWCyNHesOyH4pahSG+55mJrxOcIfjuwpN
+         ONjQE8k/cyI4sCK/QkJMKYj3TF/FDtq5CknRdjgpgC5tmWhMmquiEJbOhiKMS1v6LNRk
+         ZtSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692874951; x=1693479751;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oELav9k2SIZBN+RuqQkpAGBpv33M47omX44ww0HA6QI=;
-        b=USgmKuMPQshLRexE48Qa+I34a6cB1DBoR05I4U5tzeRpYxabKy6xzb1GsLvZoBkXPf
-         swJp5ItUvV/Yl3o5hgpeL6E8ppa9snqrfeBIJeyg7B81GgcR/ynyN6FoAVGQtM9LMS5E
-         Vwu1p0Ou+KhrF0Om171igN0y0cwUKRZMka9UFbxjanp2sA7JEd7WgoWLdY9yy8mUSQuu
-         09TvURAzgpIgOHn4y3edJqXXxLnLK4IXcCvqrhBwSj9APxzzLdQ+I6bVGtFBs7A/bgXX
-         9msZ6MKrbCK3j0SbQMxkkwWu4YDPqN2vD1f6CKFegsWzpVHnCmEDAy2WZvtZeBBS+mkW
-         jE2w==
-X-Gm-Message-State: AOJu0YyUqjCCPaNDipg8YY0oX5FeuD9oxK7yxwu/VlGKWY5yvef3THev
-	9IRk2wxzVGw+QZ9cSseY1awXgQ==
-X-Google-Smtp-Source: AGHT+IF2R1qXxHpm+yMWIrVu0MlXnuC57ojGuF9ppq+MmulUi5V2RsjjDt59eMIHrK5WNaadTG+GOA==
-X-Received: by 2002:a05:6a20:938d:b0:129:d944:2e65 with SMTP id x13-20020a056a20938d00b00129d9442e65mr20501635pzh.13.1692874950709;
-        Thu, 24 Aug 2023 04:02:30 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id r5-20020a638f45000000b00528db73ed70sm11223776pgn.3.2023.08.24.04.02.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 04:02:30 -0700 (PDT)
-Message-ID: <add68d1c-763d-4f08-96ba-73b8d9604391@daynix.com>
-Date: Thu, 24 Aug 2023 20:02:27 +0900
+        d=1e100.net; s=20221208; t=1692876014; x=1693480814;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DuJW0LKbZt9E5H/o5pYsw4kheQDvEfUDjmQ5oCP0+3M=;
+        b=QaOn1OMO4bPbbmkq/3VkrBPILjTnfvd0bFHfMBpCYXM5Ft5jvGwehMVpWgeUCWhdky
+         PBiuNV6OYVviAHcqdxWBLAOnPeCLQ7QUWgswni1QdhoJf5uzKamKeFMsF+73NxZKgf2j
+         dRH4GR2EGVXRWN4Sxif65Sa03hQJAxQuHydd2VaRuVDUzBd4f9WS75pV4KjQaYknTJSz
+         RtNhYyPJjwShen2cdSO12ysVy3uIM1jpnCLJZMLgX6GwEQSGb8p0FVoe9M/I7GHNyzJY
+         QQ6NDag2+cARzvokl1glFN5FqgdPlxudIluYl5emO5db9BL3g+vuD+PoJ3UMV1p37gDz
+         oScg==
+X-Gm-Message-State: AOJu0YxtJc3X5zNdL0X8JMU+veP1hi46zaCrwVdqgBo/tQPz6SypvlrY
+	W/7wFdkdndBs7W/90T0KoPa0DMEHpqZdHA==
+X-Google-Smtp-Source: AGHT+IHfDVsyxgqXUWNMvNmXlEKaURz16EI2XRHzZJ8Yul5DE3GlLI6ZaUj+kt/4/JNw9iFfakUSqg==
+X-Received: by 2002:adf:f84e:0:b0:315:9362:3c70 with SMTP id d14-20020adff84e000000b0031593623c70mr10974590wrq.60.1692876013697;
+        Thu, 24 Aug 2023 04:20:13 -0700 (PDT)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:1a5:1436:c34c:226])
+        by smtp.gmail.com with ESMTPSA id i14-20020a5d630e000000b0031980783d78sm21875295wru.54.2023.08.24.04.20.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 04:20:13 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Stanislav Fomichev <sdf@google.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v5 00/12] tools/net/ynl: Add support for netlink-raw families
+Date: Thu, 24 Aug 2023 12:19:51 +0100
+Message-ID: <20230824112003.52939-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] igb: clean up in all error paths when enabling SR-IOV
-To: Corinna Vinschen <vinschen@redhat.com>, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, kuba@kernel.org,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <20230824091603.3188249-1-vinschen@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20230824091603.3188249-1-vinschen@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/08/24 18:16, Corinna Vinschen wrote:
-> After commit 50f303496d92 ("igb: Enable SR-IOV after reinit"), removing
-> the igb module could hang or crash (depending on the machine) when the
-> module has been loaded with the max_vfs parameter set to some value != 0.
-> 
-> In case of one test machine with a dual port 82580, this hang occured:
-> 
-> [  232.480687] igb 0000:41:00.1: removed PHC on enp65s0f1
-> [  233.093257] igb 0000:41:00.1: IOV Disabled
-> [  233.329969] pcieport 0000:40:01.0: AER: Multiple Uncorrected (Non-Fatal) err0
-> [  233.340302] igb 0000:41:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fata)
-> [  233.352248] igb 0000:41:00.0:   device [8086:1516] error status/mask=00100000
-> [  233.361088] igb 0000:41:00.0:    [20] UnsupReq               (First)
-> [  233.368183] igb 0000:41:00.0: AER:   TLP Header: 40000001 0000040f cdbfc00c c
-> [  233.376846] igb 0000:41:00.1: PCIe Bus Error: severity=Uncorrected (Non-Fata)
-> [  233.388779] igb 0000:41:00.1:   device [8086:1516] error status/mask=00100000
-> [  233.397629] igb 0000:41:00.1:    [20] UnsupReq               (First)
-> [  233.404736] igb 0000:41:00.1: AER:   TLP Header: 40000001 0000040f cdbfc00c c
-> [  233.538214] pci 0000:41:00.1: AER: can't recover (no error_detected callback)
-> [  233.538401] igb 0000:41:00.0: removed PHC on enp65s0f0
-> [  233.546197] pcieport 0000:40:01.0: AER: device recovery failed
-> [  234.157244] igb 0000:41:00.0: IOV Disabled
-> [  371.619705] INFO: task irq/35-aerdrv:257 blocked for more than 122 seconds.
-> [  371.627489]       Not tainted 6.4.0-dirty #2
-> [  371.632257] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this.
-> [  371.641000] task:irq/35-aerdrv   state:D stack:0     pid:257   ppid:2      f0
-> [  371.650330] Call Trace:
-> [  371.653061]  <TASK>
-> [  371.655407]  __schedule+0x20e/0x660
-> [  371.659313]  schedule+0x5a/0xd0
-> [  371.662824]  schedule_preempt_disabled+0x11/0x20
-> [  371.667983]  __mutex_lock.constprop.0+0x372/0x6c0
-> [  371.673237]  ? __pfx_aer_root_reset+0x10/0x10
-> [  371.678105]  report_error_detected+0x25/0x1c0
-> [  371.682974]  ? __pfx_report_normal_detected+0x10/0x10
-> [  371.688618]  pci_walk_bus+0x72/0x90
-> [  371.692519]  pcie_do_recovery+0xb2/0x330
-> [  371.696899]  aer_process_err_devices+0x117/0x170
-> [  371.702055]  aer_isr+0x1c0/0x1e0
-> [  371.705661]  ? __set_cpus_allowed_ptr+0x54/0xa0
-> [  371.710723]  ? __pfx_irq_thread_fn+0x10/0x10
-> [  371.715496]  irq_thread_fn+0x20/0x60
-> [  371.719491]  irq_thread+0xe6/0x1b0
-> [  371.723291]  ? __pfx_irq_thread_dtor+0x10/0x10
-> [  371.728255]  ? __pfx_irq_thread+0x10/0x10
-> [  371.732731]  kthread+0xe2/0x110
-> [  371.736243]  ? __pfx_kthread+0x10/0x10
-> [  371.740430]  ret_from_fork+0x2c/0x50
-> [  371.744428]  </TASK>
-> 
-> The reproducer was a simple script:
-> 
->    #!/bin/sh
->    for i in `seq 1 5`; do
->      modprobe -rv igb
->      modprobe -v igb max_vfs=1
->      sleep 1
->      modprobe -rv igb
->    done
-> 
-> It turned out that this could only be reproduce on 82580 (quad and
-> dual-port), but not on 82576, i350 and i210.  Further debugging showed
-> that igb_enable_sriov()'s call to pci_enable_sriov() is failing, because
-> dev->is_physfn is 0 on 82580.
-> 
-> Prior to commit 50f303496d92 ("igb: Enable SR-IOV after reinit"),
-> igb_enable_sriov() jumped into the "err_out" cleanup branch.  After this
-> commit it only returned the error code.
-> 
-> So the cleanup didn't take place, and the incorrect VF setup in the
-> igb_adapter structure fooled the igb driver into assuming that VFs have
-> been set up where no VF actually existed.
-> 
-> Fix this problem by cleaning up again if pci_enable_sriov() fails.
-> 
-> Fixes: 50f303496d92 ("igb: Enable SR-IOV after reinit")
-> Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
-> ---
->   drivers/net/ethernet/intel/igb/igb_main.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index 9a2561409b06..42ab9ca7f97e 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -3827,8 +3827,11 @@ static int igb_enable_sriov(struct pci_dev *pdev, int num_vfs, bool reinit)
->   	}
->   
->   	/* only call pci_enable_sriov() if no VFs are allocated already */
-> -	if (!old_vfs)
-> +	if (!old_vfs) {
->   		err = pci_enable_sriov(pdev, adapter->vfs_allocated_count);
-> +		if (err)
-> +			goto err_out;
-> +	}
->   
->   	goto out;
->   
+This patchset adds support for netlink-raw families such as rtnetlink.
 
-Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Patch 1 fixes a typo in existing schemas
+Patch 2 contains the schema definition
+Patches 3 & 4 update the schema documentation
+Patches 5 - 9 extends ynl
+Patches 10 - 12 add several netlink-raw specs
+
+The netlink-raw schema is very similar to genetlink-legacy and I thought
+about making the changes there and symlinking to it. On balance I
+thought that might be problematic for accurate schema validation.
+
+rtnetlink doesn't seem to fit into unified or directional message
+enumeration models. It seems like an 'explicit' model would be useful,
+to force the schema author to specify the message ids directly.
+
+There is not yet support for notifications because ynl currently doesn't
+support defining 'event' properties on a 'do' operation. The message ids
+are shared so ops need to be both sync and async. I plan to look at this
+in a future patch.
+
+The link and route messages contain different nested attributes
+dependent on the type of link or route. Decoding these will need some
+kind of attr-space selection that uses the value of another attribute as
+the selector key. These nested attributes have been left with type
+'binary' for now.
+
+v4 -> v5:
+  - Fix schema id in netlink-raw schema
+  - Remove doc references to genetlink from netlink-raw schema
+  - Add missing whitespace between classes in ynl.py
+
+v3 -> v4:
+  - Fix incorrect var name in handle_ntf
+  - Update rt_link spec to include operation attributes
+  - Update rt_route spec to refine operation attributes
+
+v2 -> v3:
+  - Fix typo in existing schemas
+  - Rework fixed_header code to fix extack parsing
+  - Add support for CREATE, EXCL, REPLACE and APPEND, needed by rt_route
+
+v1 -> v2:
+  - Put mcast-group changes in separate patch
+  - Put decode_fixed_header refactoring in separate patch
+  - Avoid refactoring decode_enum
+  - Rename NetlinkProtocolFamily -> NetlinkProtocol and
+    GenlProtocolFamily -> GenlProtocol and store in self.nlproto
+  - Add spec for rt link.
+
+Donald Hunter (12):
+  doc/netlink: Fix typo in genetlink-* schemas
+  doc/netlink: Add a schema for netlink-raw families
+  doc/netlink: Update genetlink-legacy documentation
+  doc/netlink: Document the netlink-raw schema extensions
+  tools/ynl: Add mcast-group schema parsing to ynl
+  tools/net/ynl: Fix extack parsing with fixed header genlmsg
+  tools/net/ynl: Add support for netlink-raw families
+  tools/net/ynl: Implement nlattr array-nest decoding in ynl
+  tools/net/ynl: Add support for create flags
+  doc/netlink: Add spec for rt addr messages
+  doc/netlink: Add spec for rt link messages
+  doc/netlink: Add spec for rt route messages
+
+ Documentation/core-api/netlink.rst            |    9 +-
+ Documentation/netlink/genetlink-c.yaml        |    2 +-
+ Documentation/netlink/genetlink-legacy.yaml   |    2 +-
+ Documentation/netlink/netlink-raw.yaml        |  410 +++++
+ Documentation/netlink/specs/rt_addr.yaml      |  179 ++
+ Documentation/netlink/specs/rt_link.yaml      | 1499 +++++++++++++++++
+ Documentation/netlink/specs/rt_route.yaml     |  327 ++++
+ .../netlink/genetlink-legacy.rst              |   26 +-
+ Documentation/userspace-api/netlink/index.rst |    1 +
+ .../userspace-api/netlink/netlink-raw.rst     |   58 +
+ Documentation/userspace-api/netlink/specs.rst |   13 +
+ tools/net/ynl/cli.py                          |   12 +-
+ tools/net/ynl/lib/__init__.py                 |    4 +-
+ tools/net/ynl/lib/nlspec.py                   |   31 +
+ tools/net/ynl/lib/ynl.py                      |  198 ++-
+ 15 files changed, 2699 insertions(+), 72 deletions(-)
+ create mode 100644 Documentation/netlink/netlink-raw.yaml
+ create mode 100644 Documentation/netlink/specs/rt_addr.yaml
+ create mode 100644 Documentation/netlink/specs/rt_link.yaml
+ create mode 100644 Documentation/netlink/specs/rt_route.yaml
+ create mode 100644 Documentation/userspace-api/netlink/netlink-raw.rst
+
+-- 
+2.39.2 (Apple Git-143)
+
 
