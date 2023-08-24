@@ -1,84 +1,93 @@
-Return-Path: <netdev+bounces-30351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15089786FD4
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:02:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9521A786FD9
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462C21C20DDF
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:02:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50E232815FE
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4DB288F9;
-	Thu, 24 Aug 2023 13:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0093288F1;
+	Thu, 24 Aug 2023 13:02:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600BED519
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:02:24 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3006E79
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:02:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6a1yeikx9jaXhKILo9Z+ouxJkqTXegk/Dw2TudK6aZ0=; b=W2rUV2PDAw2XUEUVjHK6KObESO
-	jMgQPHQOXDPVslhCic3F5a3p2SqGXnNYvLiOwMW6FiXD0ALWVn9t5oWF6d2ZXlIPs6xubFg4o9tj0
-	2r/TnSIHFF2xn+LJMKNGHPKiD/Q5hycXmX/dojIYd80neZh3+DxDpnx9meBS6WkNYPnw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qZ9ya-004zIc-SV; Thu, 24 Aug 2023 15:02:16 +0200
-Date: Thu, 24 Aug 2023 15:02:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, Jose.Abreu@synopsys.com,
-	rmk+kernel@armlinux.org.uk, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 7/8] net: txgbe: support copper NIC with
- external PHY
-Message-ID: <8b142b43-65fa-465b-aa41-bd2200e71c63@lunn.ch>
-References: <20230823061935.415804-1-jiawenwu@trustnetic.com>
- <20230823061935.415804-8-jiawenwu@trustnetic.com>
- <7d999689-cea9-4e66-8807-a04eb9ad4cb5@lunn.ch>
- <039101d9d62e$c97b21f0$5c7165d0$@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1274FC14
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:02:35 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F134FE79
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:02:34 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-74-lZCG3vAwOQyzvKQ69jrznQ-1; Thu, 24 Aug 2023 09:02:30 -0400
+X-MC-Unique: lZCG3vAwOQyzvKQ69jrznQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 897078D40A2;
+	Thu, 24 Aug 2023 13:02:29 +0000 (UTC)
+Received: from hog (unknown [10.39.192.31])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C42F140E962;
+	Thu, 24 Aug 2023 13:02:28 +0000 (UTC)
+Date: Thu, 24 Aug 2023 15:02:27 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux@weissschuh.net, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Robert Marko <robimarko@gmail.com>
+Subject: Re: [PATCH net-next] net: generalize calculation of skb extensions
+ length
+Message-ID: <ZOdU432SDOykeDso@hog>
+References: <20230822-skb_ext-simplify-v1-1-9dd047340ab5@weissschuh.net>
+ <20230822184644.18966d0f@kernel.org>
+ <1e1dde74-edc6-4306-9b1b-0a1b5a658b67@weissschuh.net>
+ <20230823075318.4860cebc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <039101d9d62e$c97b21f0$5c7165d0$@trustnetic.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230823075318.4860cebc@kernel.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 24, 2023 at 10:00:41AM +0800, Jiawen Wu wrote:
-> On Wednesday, August 23, 2023 11:36 PM, Andrew Lunn wrote:
-> > > +static int txgbe_phy_read(struct mii_bus *bus, int phy_addr,
-> > > +			  int devnum, int regnum)
+2023-08-23, 07:53:18 -0700, Jakub Kicinski wrote:
+> On Wed, 23 Aug 2023 10:14:48 +0200 (GMT+02:00) linux@weissschuh.net
+> wrote:
+> > > Could you include more info about the compiler versions you tried
+> > > and maybe some objdump? We'll have to take your word for it getting
+> > > optimized out, would be great if we had more proof in the commit msg.
+> > > --
+> > > pw-bot: cr  
 > > 
-> > There is a general pattern to use the postfix _c45 for the method that
-> > implements C45 access. Not a must, just a nice to have.
+> > Thanks for the feedback.
+> > I'll send a v2 with more background soon.
 > > 
-> > Does this bus master not support C22 at all?
+> > On the other hand this function is only ever
+> > executed once, so even if it is slightly inefficient
+> > it shouldn't matter.
 > 
-> It supports C22.
+> Oh you're right, somehow I thought it was for every alloc.
+> You can mention it's only run at init in the commit msg if 
+> that's easier.
 
-I was looking at how the two MDIO bus master implementations
-differ. Once difference is a register write to set C22/C45, which this
-code does not have. The second change appears to be a clock setting.
+We could also add __init annotations to skb_ext_total_length and
+skb_extensions_init to make that clearer.
 
-If you added C22, do the two become more similar? Should this actually
-be one implementation in the library?
+-- 
+Sabrina
 
-	Andrew
 
