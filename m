@@ -1,126 +1,119 @@
-Return-Path: <netdev+bounces-30253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EEDA78699D
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:10:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9A7786A01
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:28:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704491C20DDD
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:10:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73FDB2814AF
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEFAF5696;
-	Thu, 24 Aug 2023 08:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E8BAD4F;
+	Thu, 24 Aug 2023 08:28:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07252455E
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:10:11 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748E41BD5
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 01:09:43 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40078c4855fso10897935e9.3
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 01:09:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692864544; x=1693469344;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rOoRVdRM/Q9tMhCNdS4M5xTmqEs260amH9lg6cGcCJw=;
-        b=YHHk0yFRDlslFRuTQiwcxVePLDYBzWXiTxVlB3Fekxk/AWPyTAPSPd9WdXx03QNcVn
-         CKDTCDMJZWXyfoCyJ8S20OhiDDNMTU0PejkYgW3KtfEqJnDwiHnlF1n67yEYiWUs3HKP
-         SK0UStzxMFSipk7haD2YtqKvFdbsg/Nonli+WiL2ivpkxCZTy4xZpp+UPbzQJ141D5VK
-         Q6dlnmEW7unTLHiVhvwMuchouq6OhkusdvMZGvJ5KJmR/8FtQB6F4hNWVu4cm8k0LEaO
-         t3/3twD1zhOUDu5JS2MKnMGa33jttATaDhdS/y6aHLtt1yZsewBKVjWqNGIN4Sz77iJg
-         sSYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692864544; x=1693469344;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rOoRVdRM/Q9tMhCNdS4M5xTmqEs260amH9lg6cGcCJw=;
-        b=X2J3qgx8tpXaN4oKlpmTMXZyg0GR4RfG3h7NRc2C6vlbcaBVCJ4MY4bA/evKrlnjVZ
-         9rZxTW7UGnghS85b/SUTXYp0dXWXS0RoPrDXHn0yVAE67oYUzGTsCWQq624pL8vP+JAT
-         lePIamsOn14AuNG4x6HHsAu00In0XO+BtMUYgObAczRcLtB+HEa/GzXppBDzX6gsxTEn
-         4Wz+JLKpB4TRAmwbsKbFlUgmDQGnQ+XvVtHqtsFjz6w66Pyewh5Xf/tk2ANAje3ZEgPX
-         og5/IK457IrOVP+CcifGPrnCLgOGzzJDKDZbPQ+p6to/7zhU1RFqTwlONX2q6cXkcXYV
-         AZEg==
-X-Gm-Message-State: AOJu0Ywhd+hqfr9KoBVErxJ6fDYFpFp1E5RTRKG+vri9u/IXthBc47l9
-	5jNSWNeRnjnWOxeCJM97843/G9aTsM2afaKVcqc1gw==
-X-Google-Smtp-Source: AGHT+IE70PjcuIVVnONA1P+T+aLarLCse3QG37svKtGHOJRuzkIbb6QHO0QZg/VEq2xpfo9CrWElAg==
-X-Received: by 2002:a7b:cbcb:0:b0:3fe:34c2:654b with SMTP id n11-20020a7bcbcb000000b003fe34c2654bmr11548157wmi.14.1692864543695;
-        Thu, 24 Aug 2023 01:09:03 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id y26-20020a7bcd9a000000b003fed7fa6c00sm1890003wmj.7.2023.08.24.01.09.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 01:09:02 -0700 (PDT)
-Date: Thu, 24 Aug 2023 10:09:01 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, idosch@nvidia.com, petrm@nvidia.com
-Subject: Re: [patch net-next] devlink: add missing unregister linecard
- notification
-Message-ID: <ZOcQHYAcUwd+VguS@nanopsycho>
-References: <20230817125240.2144794-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304EBAD33
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:28:22 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E196A1709;
+	Thu, 24 Aug 2023 01:28:21 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NJp2KM006892;
+	Thu, 24 Aug 2023 01:10:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=kaRq8uKZd7yfUZZ9uSEnc5pa8mwuX9nh/NFBHsK6hLI=;
+ b=TRtT5AgUAYNoiybTLOxnUYdtkHdC7C/rvYfC4KiOXJQm2KECZqofzndys80+fiPl8YgV
+ jq/i2AH0fkLdNvV9bP/28bw/0VkWx6+YTZ0HUinO9i1aoTkd8YMEw06zz35AesJz+ROi
+ 9lgqtGXeJNNLHKmEbLZt6b7oiPqyl/Pe/7BFqrYOmHXxBpF+dfzP+mYD0Mow5QAdx+TK
+ Dsb8EZy0rONJvFoJqusuR+cbItUiP5TZFOoN8wdbi1//2Az8GrRUm/m9sxvWNpbfzkK2
+ qHKM27moPpUcjz4aWu21W5hWysAnzDLK6ZglKv2lfSFC/8g40wV0E4/gVhyeSEPzYN3K TA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3snrmcsv87-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 24 Aug 2023 01:10:41 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 24 Aug
+ 2023 01:10:39 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 24 Aug 2023 01:10:39 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 0AB223F70A1;
+	Thu, 24 Aug 2023 01:10:34 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH V4 0/3] Fix PFC related issues
+Date: Thu, 24 Aug 2023 13:40:29 +0530
+Message-ID: <20230824081032.436432-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817125240.2144794-1-jiri@resnulli.us>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: VIQMUYkBWa0_oQ_0664BcH9FYO9oaIYU
+X-Proofpoint-ORIG-GUID: VIQMUYkBWa0_oQ_0664BcH9FYO9oaIYU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-24_05,2023-08-22_01,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Kuba, do you plan to merge net into net-next any time soon? I have
-another patchset depending on this.
+This patchset fixes multiple PFC related issues related to Octeon.
 
-Btw, I aimed this to net-next on purpose, in net it does not make much
-sense imho.
+Patch #1: octeontx2-pf: Fix PFC TX scheduler free
 
-Thanks!
+Patch #2: octeontx2-af: CN10KB: fix PFC configuration
 
-Thu, Aug 17, 2023 at 02:52:40PM CEST, jiri@resnulli.us wrote:
->From: Jiri Pirko <jiri@nvidia.com>
->
->Cited fixes commit introduced linecard notifications for register,
->however it didn't add them for unregister. Fix that by adding them.
->
->Fixes: c246f9b5fd61 ("devlink: add support to create line card and expose to user")
->Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->---
-> net/devlink/leftover.c | 3 +++
-> 1 file changed, 3 insertions(+)
->
->diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
->index c26c63275b0b..e7f76cc58533 100644
->--- a/net/devlink/leftover.c
->+++ b/net/devlink/leftover.c
->@@ -6630,6 +6630,7 @@ void devlink_notify_unregister(struct devlink *devlink)
-> 	struct devlink_param_item *param_item;
-> 	struct devlink_trap_item *trap_item;
-> 	struct devlink_port *devlink_port;
->+	struct devlink_linecard *linecard;
-> 	struct devlink_rate *rate_node;
-> 	struct devlink_region *region;
-> 	unsigned long port_index;
->@@ -6658,6 +6659,8 @@ void devlink_notify_unregister(struct devlink *devlink)
-> 
-> 	xa_for_each(&devlink->ports, port_index, devlink_port)
-> 		devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
->+	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
->+		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
-> 	devlink_notify(devlink, DEVLINK_CMD_DEL);
-> }
-> 
->-- 
->2.41.0
->
+Patch #3: octeonxt2-pf: Fix backpressure config for multiple PFC
+priorities to work simultaneously
+
+Hariprasad Kelam (1):
+  octeontx2-af: CN10KB: fix PFC configuration
+
+Suman Ghosh (2):
+  octeontx2-pf: Fix PFC TX scheduler free
+  cteonxt2-pf: Fix backpressure config for multiple PFC priorities to
+    work simultaneously
+
+---
+v4 changes:
+	Added detailed commit description for patch #2
+
+v3 changes:
+	Removed patch #1 from v2 patchset due to review comment from Jakub.
+	I will find a more accurate fix for that and will push a separate
+	patch.
+
+v2 changes:
+	1. Fixed compilation error in patch #2
+	ERROR: modpost: "otx2_txschq_free_one"
+	[drivers/net/ethernet/marvell/octeontx2/nic/rvu_nicvf.ko] undefined!
+	2. Added new patch #4 to the patch set. This patch fixes another PFC
+	related issue.
+
+ .../net/ethernet/marvell/octeontx2/af/rpm.c   | 17 +++++++++--------
+ .../marvell/octeontx2/nic/otx2_common.c       |  1 +
+ .../marvell/octeontx2/nic/otx2_dcbnl.c        | 19 ++++++-------------
+ 3 files changed, 16 insertions(+), 21 deletions(-)
+
+-- 
+2.25.1
+
 
