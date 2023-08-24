@@ -1,170 +1,201 @@
-Return-Path: <netdev+bounces-30376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA637870B1
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:45:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EA707870CF
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:47:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01E1C2815D8
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:45:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073332815FA
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBB7CA6E;
-	Thu, 24 Aug 2023 13:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4879100BC;
+	Thu, 24 Aug 2023 13:47:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB98128906
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:45:16 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061b.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5b::61b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891091BE3
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:44:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M6FZ9F20haPvV9b6EPYtM0pA7IIugdJ82c7MJAJ45k7xDHojxHfHhETfgumRUDWslrNn9p7A6+NZ9Y4HcdZqJ0w1wdTMF7Qs9cGrpqrIVthERQYDy84Xrkj+9u6/Z5dmDQoD1P0+OQCdgs5l7suv6epBODefDys5mJqBOy8w3Vhi+Clp2v+4RTwg982+zNugMoL2Fpe3xkxuN0YYAoVZj1/6FYL85DA3eTBtzocA18UtS7+BcV4Bk3dhdybTmMg5Z6EFkq6FjAycZHWD+tTlnwRQUQA9U3UMW5WJ43lAH8OAMYFVrTDgf5ofpOZ5B92fXexNl5jj71jz00I/9Efvdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1hCHhwmeadIafNIh+CSRRndX8DHSSZ5oMspAXh7i5OU=;
- b=l0CJAVNttDBkiErnUA7WDqjDaAoUzY1j+vmifi7Aag3l15f/0OCsh8FvmhWlmEKTr4f++TdKyRYnFGwm9l80fGcMu1OvxyvKRqyN9+PUEvtIk2GLvN1KrEjrDa7cYMtBrKyeellN1KobskUUokgWFz9N2gvIS00WgswGXtz9fNcMbQGjhx4Q+ranrwEDUbI8ssJI9edFzIFyOz3yJGqSxfg6nPg8F9+TderqdZG1gAuKI4oda4d1VvHAUUlIffpjO6MQot8zVUR8JM28qSPoZncddi8gsmXycS31/zyyV/g0GLR51tl4MKjpQeHZqb2zDmn15d84jfMVlzF3M70jGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1hCHhwmeadIafNIh+CSRRndX8DHSSZ5oMspAXh7i5OU=;
- b=WrsEq8Fe+aTTU/lIkR+5Jf+BXEEx0bl8K7Os6qhAU2sp4iyGzvMTA5B24gINdsrAWIhYX5wlzhPV+Z7RTzeHfdwKiQMl6V/pRTKgf1jnyxC2y3Qcr4AwCyXkRu59jEoRkfPjemfRPRV3wBrQ98OZKrwFrRdVMfSeJ7nv70UffjcdsBL/s/RhwcAlukFnVvzuPIobzdZcueiwNbJaFeBTOxNaqxcoGAgTZrhVe558SRDVHigP42OkSOWRZcSiGmnQIp8Pz+umngzWQnYoWXNGaxKPkCdShckf75aqR8gI+ZrHkazc1WeEqgD6+9LhFbjsKlhtTL8LFpjJbKQpCF57yA==
-Received: from CY5PR15CA0059.namprd15.prod.outlook.com (2603:10b6:930:1b::28)
- by MW6PR12MB9000.namprd12.prod.outlook.com (2603:10b6:303:24b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
- 2023 13:44:10 +0000
-Received: from CY4PEPF0000E9CD.namprd03.prod.outlook.com
- (2603:10b6:930:1b:cafe::f4) by CY5PR15CA0059.outlook.office365.com
- (2603:10b6:930:1b::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27 via Frontend
- Transport; Thu, 24 Aug 2023 13:44:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000E9CD.mail.protection.outlook.com (10.167.241.140) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6699.15 via Frontend Transport; Thu, 24 Aug 2023 13:44:09 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 24 Aug 2023
- 06:43:57 -0700
-Received: from yaviefel.vdiclient.nvidia.com (10.126.231.37) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Thu, 24 Aug 2023 06:43:53 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Jiri
- Pirko" <jiri@resnulli.us>, Vadim Pasternak <vadimp@nvidia.com>,
-	<mlxsw@nvidia.com>
-Subject: [PATCH net 3/3] mlxsw: core_hwmon: Adjust module label names based on MTCAP sensor counter
-Date: Thu, 24 Aug 2023 15:43:10 +0200
-Message-ID: <dbbe1713c4a23a06a297b8790eccf757f68d5d62.1692882703.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1692882702.git.petrm@nvidia.com>
-References: <cover.1692882702.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BD42891B
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:47:36 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3FF9A8
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:47:34 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-58dfe2d5b9aso12980567b3.1
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:47:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692884854; x=1693489654;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3w2OhhcQJjuqQ4ahLURtI+WyuwCALYntZIUGJyH2H/c=;
+        b=IOLbb3RHErgwQaeIl+eG8kaZPTR58zn+Crjd/Rr7LAZntNiWQNwi+1FL1yN8zUjMrZ
+         ZvTUJKnJ3jDRTCH306yunZningJZxyT5XBOXZL6LhcGTW1KNbU5AnqPE6zoAi44AZHar
+         LeV5u512VD75Y2Z5LRJQ1a1jN+26uOE+LJrM79oNri3zqIymGdSDdzbxuTYC+KyYd4wC
+         U1qMoQrTVoBtWp0NgVqX0pQuwYyXXpn8XvRZwvRiGBsFXXV1nKafKhX79OQDVqqOOJC6
+         TTHU24RqbIjF820nxuHO9RZZN0Q3jVH55Tx+38/kacpm50+vtrmQ2Ye1TsvIjFJMHPtp
+         tCdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692884854; x=1693489654;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3w2OhhcQJjuqQ4ahLURtI+WyuwCALYntZIUGJyH2H/c=;
+        b=O6YK7cyGAbvQqF6M0yUc2oMOz4Tex1WcyjzBx7D2w9gfdU6BKHIoRy9oiksnsqK1Et
+         gOoaegTCgTfOkpY4xA/vZCllOhK2IbpL2uYVNo83gCw/TKwNYxxffX8RYt4sd6EnHCXG
+         3eisQ+oYHveB9unXfy0qwaHapcdXwQObVluLeA9ON26xbEp2Giok3irtx3ifMNgzAxF4
+         wvR07YyBsVoahKGnAsKGQfG6IkUp1E/XdydJIab7IBqJqFqZ8wimFz06/8+gdLpyEq1v
+         ReHX5SI7dcYHbMPYxaXeestLao2vcZ2ix3Z/CTJsUu/m9DGrmPKjYbcs4BJMse/2eWm1
+         jRAA==
+X-Gm-Message-State: AOJu0YwyTDFR6a1dySmqXVWNgF/79rqQFlZzgAbLg38uAZNzVR0lTuwE
+	hTW/UmZufHVmXmiqKPWVtiz4arTY6pcrHwBujfBa/nL5Nrige2zH
+X-Google-Smtp-Source: AGHT+IFBqLY4xL/WAPWJysdexoFxTO8J7/oC39jT/pBG0zbgNPECsiqQzIAGxuIOexHYvod+UgMfj40/ywiZ9WFkkqU=
+X-Received: by 2002:a0d:cbcd:0:b0:592:4c2:1514 with SMTP id
+ n196-20020a0dcbcd000000b0059204c21514mr12606667ywd.25.1692884853840; Thu, 24
+ Aug 2023 06:47:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20230819163515.2266246-1-victor@mojatatu.com> <875y586whs.fsf@nvidia.com>
+In-Reply-To: <875y586whs.fsf@nvidia.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 24 Aug 2023 09:47:22 -0400
+Message-ID: <CAM0EoMkae4AnM=j3v7dMTwaxZQjmQR9LDmp8fPL8k7KX9kCqgQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/3] net/sched: Introduce tc block ports
+ tracking and use
+To: Vlad Buslov <vladbu@nvidia.com>
+Cc: Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, mleitner@redhat.com, horms@kernel.org, 
+	pctammela@mojatatu.com, kernel@mojatatu.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9CD:EE_|MW6PR12MB9000:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a69f8ad-2582-42fa-1a06-08dba4a831b0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	9C11GX0HdUCy/VAXIiREWU0F69Ku1kwCsbpxI+FNY8wXIWS8Zo+zANmVeh9KPy6ZutAbJdg3EH7RQ49gPgIbn+QOT7woo+VBVFA37rj9unwu8vtKa7SSFmo3H49G2lX2g2Wd//4F7aDyqr7PzpNXOKtAK1fpHjQ5sNh0oq8ndWz4Y/vICoX6zPNNnKqAgIh0Z6KZn4WmLMHogLVY0iJvMSlS6RJ36z+5N722HEf67CTGYe0vkYhztGLm2ttNUSo2j4Zvcl2UOTKQIEPFtJJyN4RZu+1Dvbye/Qe6NvNUQQCx2Ce6Qj7tdNsWoXjShA6f6J4NW4AlVG5SRWLJSMAD1hxS2bPFkeQuMlmm2Mc56dcSquJ1PtiSk9EYzknT0hemHcKEfJaIJnIvMuPyhTIoPEX0sRoStmhrQqu2cbhUgJF7DTGadf6CrYvFy94g0+StAn2G55aP2JMqrNfMsoOyc7a8mLVnb5eNH0DUl2HEuKECwIezYw11J6EulWq2QCtcxART1MKbVb/4MkLKLcyqR1tfmgx5KkSrhxoWR5UaHv40IWXWuPl/6bBQhbx/pMIu+0AaOTZ/Jl0PJ5W8KrxUPE1ZxPJDdsicVrCv3GmR5QCIOlErRcsO4QgcmuaUpjml/TrM3RA0Rl3H98VzgWhFoRNosQnKLLbWLsIHo5GW8z5CKEo6Emkw5lBT+WTMvfqX/hFcG8EnnVC2IVceVCW8dzhTllISJTE4bRa79yNdmY7FFNbwdWbl1u572grJkRA+
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(346002)(136003)(376002)(1800799009)(451199024)(82310400011)(186009)(36840700001)(40470700004)(46966006)(86362001)(356005)(82740400003)(7636003)(36756003)(40460700003)(7696005)(6666004)(478600001)(5660300002)(316002)(70586007)(54906003)(2906002)(70206006)(8676002)(110136005)(4326008)(8936002)(40480700001)(26005)(16526019)(426003)(336012)(83380400001)(36860700001)(47076005)(41300700001)(2616005)(107886003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 13:44:09.6580
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a69f8ad-2582-42fa-1a06-08dba4a831b0
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9CD.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB9000
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=no
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Vadim Pasternak <vadimp@nvidia.com>
+On Mon, Aug 21, 2023 at 3:12=E2=80=AFPM Vlad Buslov <vladbu@nvidia.com> wro=
+te:
+>
+> On Sat 19 Aug 2023 at 13:35, Victor Nogueira <victor@mojatatu.com> wrote:
+> > __context__
+> > The "tc block" is a collection of netdevs/ports which allow qdiscs to s=
+hare
+> > match-action block instances (as opposed to the traditional tc filter p=
+er
+> > netdev/port)[1].
+> >
+> > Example setup:
+> > $ tc qdisc add dev ens7 ingress block 22
+> > $ tc qdisc add dev ens8 ingress block 22
+> >
+> > Once the block is created we can add a filter using the block index:
+> > $ tc filter add block 22 protocol ip pref 25 \
+> >   flower dst_ip 192.168.0.0/16 action drop
+> >
+> > A packet with dst IP matching 192.168.0.0/16 arriving on the ingress of
+> > either ens7 or ens8 is dropped.
+> >
+> > __this patchset__
+> > Up to this point in the implementation, the block is unaware of its por=
+ts.
+> > This patch fixes that and makes the tc block ports available to the
+> > datapath as well as the offload control path (by virtue of the ports be=
+ing
+> > in the tc block structure).
+>
+> Could you elaborate on offload control path? I guess I'm missing
+> something here because struct flow_cls_offload doesn't seem to include
+> pointer to the parent tcf_block instance.
+>
 
-Transceiver module temperature sensors are indexed after ASIC and
-platform sensors. The current label printing method does not take this
-into account and simply prints the index of the transceiver module
-sensor.
+Sorry - that statement was subconsciously over-reaching as far as this
+patch is concerned, but talking from P4TC pov, (even though the
+current submission for P4TC is s/w only):
+A single PCI device is mapped to at least one PF and possibly many VFs
+- this gets mapped to a tc block...
+Then the tc filter adds the P4 program to a block. The goal then is to
+send a table entry towards the driver, once instead of replicating it
+many times.
+This can be achieved either at a) the tc layer by keeping the entries
+per block and only invoke the driver once or b) let the driver
+maintain the state (with or without the tc block).
+For P4TC either is achievable because the tables are "global". The
+challenge is how to get the driver to be aware of the tc block.
+To answer your question, the idea is to be able to pass this list of
+ports per block to the driver (which as you point out doesnt exist
+today, but should be easy to add).
 
-On new systems that have platform sensors this results in incorrect
-(shifted) transceiver module labels being printed:
+Thoughts?
 
-$ sensors
-[...]
-front panel 002:  +37.0°C  (crit = +70.0°C, emerg = +75.0°C)
-front panel 003:  +47.0°C  (crit = +70.0°C, emerg = +75.0°C)
-[...]
+cheers,
+jamal
 
-Fix by taking the sensor count into account. After the fix:
 
-$ sensors
-[...]
-front panel 001:  +37.0°C  (crit = +70.0°C, emerg = +75.0°C)
-front panel 002:  +47.0°C  (crit = +70.0°C, emerg = +75.0°C)
-[...]
-
-Fixes: a53779de6a0e ("mlxsw: core: Add QSFP module temperature label attribute to hwmon")
-Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c b/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c
-index 70735068cf29..0fd290d776ff 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c
-@@ -405,7 +405,8 @@ mlxsw_hwmon_module_temp_label_show(struct device *dev,
- 			container_of(attr, struct mlxsw_hwmon_attr, dev_attr);
- 
- 	return sprintf(buf, "front panel %03u\n",
--		       mlxsw_hwmon_attr->type_index);
-+		       mlxsw_hwmon_attr->type_index + 1 -
-+		       mlxsw_hwmon_attr->mlxsw_hwmon_dev->sensor_count);
- }
- 
- static ssize_t
--- 
-2.41.0
-
+> >
+> > For the datapath we provide a use case of the tc block in an action
+> > we call "blockcast" in patch 3. This action can be used in an example a=
+s
+> > such:
+> >
+> > $ tc qdisc add dev ens7 ingress block 22
+> > $ tc qdisc add dev ens8 ingress block 22
+> > $ tc qdisc add dev ens9 ingress block 22
+> > $ tc filter add block 22 protocol ip pref 25 \
+> >   flower dst_ip 192.168.0.0/16 action blockcast
+> >
+> > When a packet(matching dst IP 192.168.0.0/16) arrives on the ingress of=
+ any
+> > of ens7, ens8 or ens9 it will be copied to all ports other than itself.
+> > For example, if it arrives on ens8 then a copy of the packet will be
+> > "blockcasted";-> to both ens7 and ens9 (unmodified), but not to ens7.
+> >
+> > For an offload path, one use case is to "group" all ports belonging to =
+a
+> > PCI device into the same tc block.
+> >
+> > Patch 1 introduces the required infra. Patch 2 exposes the tc block to =
+the
+> > tc datapath and patch 3 implements datapath usage via a new tc action
+> > "blockcast".
+> >
+> > __Acknowledgements__
+> > Suggestions from Vlad Buslov and Marcelo Ricardo Leitner made this patc=
+hset
+> > better. The idea of integrating the ports into the tc block was suggest=
+ed
+> > by Jiri Pirko.
+> >
+> > [1] See commit ca46abd6f89f ("Merge branch 'net-sched-allow-qdiscs-to-s=
+hare-filter-block-instances'")
+> >
+> > Changes in v2:
+> >   - Remove RFC tag
+> >   - Add more details in patch 0(Jiri)
+> >   - When CONFIG_NET_TC_SKB_EXT is selected we have unused qdisc_cb
+> >     Reported-by: kernel test robot <lkp@intel.com> (and horms@kernel.or=
+g)
+> >   - Fix bad dev dereference in printk of blockcast action (Simon)
+> >
+> > Victor Nogueira (3):
+> >   net/sched: Introduce tc block netdev tracking infra
+> >   net/sched: cls_api: Expose tc block ports to the datapath
+> >   Introduce blockcast tc action
+> >
+> >  include/net/sch_generic.h |   8 +
+> >  include/net/tc_wrapper.h  |   5 +
+> >  net/sched/Kconfig         |  13 ++
+> >  net/sched/Makefile        |   1 +
+> >  net/sched/act_blockcast.c | 299 ++++++++++++++++++++++++++++++++++++++
+> >  net/sched/cls_api.c       |  11 +-
+> >  net/sched/sch_api.c       |  79 +++++++++-
+> >  net/sched/sch_generic.c   |  40 ++++-
+> >  8 files changed, 449 insertions(+), 7 deletions(-)
+> >  create mode 100644 net/sched/act_blockcast.c
+>
 
