@@ -1,107 +1,97 @@
-Return-Path: <netdev+bounces-30381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837147870D9
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:51:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26AE77870DE
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D14172815D0
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:51:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571791C20E34
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A92100C5;
-	Thu, 24 Aug 2023 13:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317D9100C5;
+	Thu, 24 Aug 2023 13:53:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D657428904
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:51:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D787C433C7;
-	Thu, 24 Aug 2023 13:51:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692885110;
-	bh=IGrWYq/ZXmDjQ6zqpDz+u4Qc6Ytf4FoiHtj5an9v9hc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ke9N6X77gHD0roWs3QMIT4U7Ywbm9BSbYE6C9DsAZzYk+DBrZSUVhivAZ8rHL/AFq
-	 /ou1Vr58UJmDyAcXNflwznxXQdcQyLeYylTpcP4Ha5yDGqajJHLBL1QcHcrTRL0o7i
-	 DKWWJLbo1acxBvfPYEHsY2ICxvKz0t66nIrxfj9Jkn3rNVzuI4aDHMz+ISK05atZHn
-	 yRxDD5N4kg8+uvE9mGEEFMfQqxP1fTeoffo5ZpAZbK5P98MJAOkUcu5lWLh9I/Wkaz
-	 THWqNpasZ5foE4j+0ijTEgfRfA8TlPOgfF0bv2wVZpE+Nm+VtwKaxCGuiGzdqFNNHi
-	 ieAfdBe4onQJw==
-Date: Thu, 24 Aug 2023 15:51:39 +0200
-From: Simon Horman <horms@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>, richardcochran@gmail.com,
-	Siddaraju DH <siddaraju.dh@intel.com>,
-	Sunitha Mekala <sunithax.d.mekala@intel.com>
-Subject: Re: [PATCH net] ice: avoid executing commands on other ports when
- driving sync
-Message-ID: <20230824135139.GH3523530@kernel.org>
-References: <20230823151814.3492480-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256BF1118D
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:53:23 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A83DF19B5;
+	Thu, 24 Aug 2023 06:53:21 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RWkyq0LtwzrSM7;
+	Thu, 24 Aug 2023 21:51:47 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 24 Aug
+ 2023 21:53:18 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<shuah@kernel.org>
+CC: <j.vosburgh@gmail.com>, <andy@greyhouse.net>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
+Subject: [PATCH net-next,v2] selftests: bonding: create directly devices in the target namespaces
+Date: Thu, 24 Aug 2023 21:57:15 +0800
+Message-ID: <20230824135715.1131084-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230823151814.3492480-1-anthony.l.nguyen@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Aug 23, 2023 at 08:18:14AM -0700, Tony Nguyen wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> The ice hardware has a synchronization mechanism used to drive the
-> simultaneous application of commands on both PHY ports and the source timer
-> in the MAC.
-> 
-> When issuing a sync via ice_ptp_exec_tmr_cmd(), the hardware will
-> simultaneously apply the commands programmed for the main timer and each
-> PHY port. Neither the main timer command register, nor the PHY port command
-> registers auto clear on command execution.
-> 
-> During the execution of a timer command intended for a single port on E822
-> devices, such as those used to configure a PHY during link up, the driver
-> is not correctly clearing the previous commands.
-> 
-> This results in unintentionally executing the last programmed command on
-> the main timer and other PHY ports whenever performing reconfiguration on
-> E822 ports after link up. This results in unintended side effects on other
-> timers, depending on what command was previously programmed.
-> 
-> To fix this, the driver must ensure that the main timer and all other PHY
-> ports are properly initialized to perform no action.
-> 
-> The enumeration for timer commands does not include an enumeration value
-> for doing nothing. Introduce ICE_PTP_NOP for this purpose. When writing a
-> timer command to hardware, leave the command bits set to zero which
-> indicates that no operation should be performed on that port.
-> 
-> Modify ice_ptp_one_port_cmd() to always initialize all ports. For all ports
-> other than the one being configured, write their timer command register to
-> ICE_PTP_NOP. This ensures that no side effect happens on the timer command.
-> 
-> To fix this for the PHY ports, modify ice_ptp_one_port_cmd() to always
-> initialize all other ports to ICE_PTP_NOP. This ensures that no side
-> effects happen on the other ports.
-> 
-> Call ice_ptp_src_cmd() with a command value if ICE_PTP_NOP in
-> ice_sync_phy_timer_e822() and ice_start_phy_timer_e822().
-> 
-> With both of these changes, the driver should no longer execute a stale
-> command on the main timer or another PHY port when reconfiguring one of the
-> PHY ports after link up.
-> 
-> Fixes: 3a7496234d17 ("ice: implement basic E822 PTP support")
-> Signed-off-by: Siddaraju DH <siddaraju.dh@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+If failed to set link1_1 to netns client, we should delete link1_1 in the
+cleanup path. But if set link1_1 to netns client successfully, delete
+link1_1 will report warning. So it will be safer creating directly the
+devices in the target namespaces.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reported-by: Hangbin Liu <liuhangbin@gmail.com>
+Closes: https://lore.kernel.org/all/ZNyJx1HtXaUzOkNA@Laptop-X1/
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+---
+v2: create directly devices in the target namespaces
+---
+ .../drivers/net/bonding/bond-arp-interval-causes-panic.sh | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
+index 7b2d421f09cf..fe7c34f89fc7 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
+@@ -22,14 +22,12 @@ server_ip4=192.168.1.254
+ echo 180 >/proc/sys/kernel/panic
+ 
+ # build namespaces
+-ip link add dev link1_1 type veth peer name link1_2
+-
+ ip netns add "server"
+-ip link set dev link1_2 netns server up name eth0
++ip netns add "client"
++ip link add dev eth0 netns client type veth peer name eth0 netns server
++ip netns exec server ip link set dev eth0 up
+ ip netns exec server ip addr add ${server_ip4}/24 dev eth0
+ 
+-ip netns add "client"
+-ip link set dev link1_1 netns client down name eth0
+ ip netns exec client ip link add dev bond0 down type bond mode 1 \
+ 	miimon 100 all_slaves_active 1
+ ip netns exec client ip link set dev eth0 down master bond0
+-- 
+2.34.1
 
 
