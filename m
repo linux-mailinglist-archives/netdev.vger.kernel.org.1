@@ -1,120 +1,121 @@
-Return-Path: <netdev+bounces-30386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 116D478715B
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:22:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA2B878715C
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF2728156E
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A362B1C20E6B
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B489B111AE;
-	Thu, 24 Aug 2023 14:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264EC111B0;
+	Thu, 24 Aug 2023 14:22:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83191119E
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:21:56 +0000 (UTC)
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39CD91BC7
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:21:55 -0700 (PDT)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-58d40c2debeso73126037b3.2
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:21:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C28FCA7D
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:22:39 +0000 (UTC)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A1311F
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:22:34 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31c71898109so1040300f8f.2
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:22:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692886914; x=1693491714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4CDAvf6CRXvymIu0Aj3fcuUeAuEDIC/nMPHrUJUD9mQ=;
-        b=eVtpcXLAilzyx4k9OGUJ1KcxsWo3CIFM7xWlF5uK9dcikzxpYG0beuN2V3YGp67smE
-         qz5I7oq8+c+DC2kgpoItxYlIfP6kKolzHD/Wv7HV6qZMLRlDN2wsNidOwfiu0oykHHrr
-         +k+85MqeBOxUu2H7iypPxbrALQN6A3hPvMXhRVrILXcE8wv3gzQVp5q9yEdytPcN1FZF
-         Sd7lJSKVQq68n03PQxQGY5uQUI3rlPjzYvjaTEGNs+Wn8KVS6bEiVv9pu0bdVSBajjPY
-         BWhpXOSqb7AxrYNSvuDpRo5zJEpOlAPeYWsb8hU3QgXV0QrG3KfhxmLZwgCRaxZYiclP
-         XHPQ==
+        d=gmail.com; s=20221208; t=1692886952; x=1693491752;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rX/+9gEu3kp9om7xLyNFnYy68Hxacg3OtkhTfAAHF5k=;
+        b=VTdzIqnmD/RXSp/QkAG0WJL4DB+PoxGdkInTYEij3h6CliqlDi/z3FE5mJPKTVQppc
+         lhwRZK1+vcE2FZXMcpvspHLKieEHwcZ6pVFolw1MEIQj6WuT3RTqhRTTfeA3Rd96WE5/
+         il4AzoeqDp965uXZQOzAKEOZdoyUbtQpjeYSMfvl8+3N/G2TtrvSpTFdlFTY9WZG0E7A
+         0Omf6QMTiJgN3ADVOPslRbvf1lDbKVqXQBSgfJOR4/vAqNaQ4hmyC+E95GOXDLsJWPf2
+         slTUOOrFhXphzUNXb9nbq850/Ma2KS46W5esueu0bjXvk4TLSGTw7wrMC/t5HLZsN7k0
+         Ivrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692886914; x=1693491714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4CDAvf6CRXvymIu0Aj3fcuUeAuEDIC/nMPHrUJUD9mQ=;
-        b=dy38ATKstxn0fedvCluvyAYPEseWefktQBbekvvfEDPbRpzBJCYJKsnl16HjVVg/iT
-         WXK2pShRKcj9JmnC5GC3PMWcu+OovftTdU5K6ejOBmTVLSgXo8CjOw/7Gkpp+ObDXJhM
-         aB0PMFBkOqgRm5FkEPwH3ZwTnpGguj/wKhYX3EluY0q1ni63TZbXnEpXf9Th0eGv6TCJ
-         5nHSXpdI/XPuj9VLqzx+gZRikchECtLstGlp506w/dpZTTXmE+B5TkKNrsYNOxMu7hBt
-         3TFxay5tzpXwcGsYVzGa5aHEM0ECCgTv5o7oVmvGU8B4H6/oVvghIQ7+dJAy5zKvMF7o
-         cffg==
-X-Gm-Message-State: AOJu0YyAMvnsHOxKgOHsIbqfg9Q9jAYka7JiTn7qT4s59ZlSacqsKbj8
-	6eaEIW73yfJn2MrESVyE1ZTm6D9pjCsjkVhoEwr1tEII+cR/wNs8
-X-Google-Smtp-Source: AGHT+IF0h3g76dRixo6zReQGlPY4AAeFTSKRnvAinHT9zHvVFVF9nIdiQStuB2cNC8FVx+uweV2y4Vn7icJAuzzTJbw=
-X-Received: by 2002:a81:5b87:0:b0:58c:4e9f:4ed4 with SMTP id
- p129-20020a815b87000000b0058c4e9f4ed4mr17024027ywb.42.1692886914456; Thu, 24
- Aug 2023 07:21:54 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692886952; x=1693491752;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rX/+9gEu3kp9om7xLyNFnYy68Hxacg3OtkhTfAAHF5k=;
+        b=LS5oo0RvwGKfpgCKg92Dh4CnksfbID0BXhRmJl0MxpU2/fW85LO6++r2IpdUc8Er7M
+         LK6inorHOzs+IZif5LxZFuWM2TfWaLoZNW1DLodK0czzPCoH2dYca7qUcdZtwFN77+EX
+         sPJLBVH/yz9E/Aq+terjZmmehWC0r/XnyNTW/S10V5FV3b6dXilpFdz2RjgcyInWbtof
+         jFFYsWZkVXQ04p79K6DFGAJRLz/V/60mYFlRKtw/WEeWX5wkYSppzUqLyKdru+ab6D+g
+         UIlw+XZhX3MTIi5xflxAPRVhnlqJzZyEtBoCKZaOdV+txuE3SwUwKQw2O3OEQTBAdw3i
+         Jyiw==
+X-Gm-Message-State: AOJu0YzeUcOsOop4zzUp1uOxHg++FyUDfE99n6bXpKJRtfTYFLNNNGvo
+	cfRJqLyipz2on8XAZuI6G16ZN6zGj0pRSQ==
+X-Google-Smtp-Source: AGHT+IFg38zMT9lYi/La1AZhan67eRUPXqXV4sI4N1s3IM4jkT2RyM3lJnnHqYqIIGEt0DBLVWO+aA==
+X-Received: by 2002:a5d:4950:0:b0:319:7b96:a1c0 with SMTP id r16-20020a5d4950000000b003197b96a1c0mr12532174wrs.21.1692886951860;
+        Thu, 24 Aug 2023 07:22:31 -0700 (PDT)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:1a5:1436:c34c:226])
+        by smtp.gmail.com with ESMTPSA id i4-20020a5d6304000000b0031431fb40fasm22366617wru.89.2023.08.24.07.22.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 07:22:31 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1] doc/netlink: Add delete operation to ovs_vport spec
+Date: Thu, 24 Aug 2023 15:22:21 +0100
+Message-ID: <20230824142221.71339-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230824084905.422-1-markovicbudimir@gmail.com>
-In-Reply-To: <20230824084905.422-1-markovicbudimir@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 24 Aug 2023 10:21:43 -0400
-Message-ID: <CAM0EoM=7Z2bwHZuX+f5fJB1+UW9HdUCXGDa6hxGGccJEf2zH2Q@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: sch_hfsc: Ensure inner classes have fsc curve
-To: Budimir Markovic <markovicbudimir@gmail.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 24, 2023 at 4:50=E2=80=AFAM Budimir Markovic
-<markovicbudimir@gmail.com> wrote:
->
-> HFSC assumes that inner classes have an fsc curve, but it is currently
-> possible for classes without an fsc curve to become parents. This leads
-> to bugs including a use-after-free.
->
-> Don't allow non-root classes without HFSC_FSC to become parents.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
-> Signed-off-by: Budimir Markovic <markovicbudimir@gmail.com>
+Add del operation to the spec to help with testing.
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ Documentation/netlink/specs/ovs_vport.yaml | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-cheers,
-jamal
+diff --git a/Documentation/netlink/specs/ovs_vport.yaml b/Documentation/netlink/specs/ovs_vport.yaml
+index ef298b001445..f65ce62cd60d 100644
+--- a/Documentation/netlink/specs/ovs_vport.yaml
++++ b/Documentation/netlink/specs/ovs_vport.yaml
+@@ -138,10 +138,21 @@ operations:
+             - dp-ifindex
+             - ifindex
+             - options
++    -
++      name: del
++      doc: Delete existing OVS vport from a data path
++      attribute-set: vport
++      fixed-header: ovs-header
++      do:
++        request:
++          attributes:
++            - dp-ifindex
++            - port-no
++            - type
++            - name
+     -
+       name: get
+       doc: Get / dump OVS vport configuration and state
+-      value: 3
+       attribute-set: vport
+       fixed-header: ovs-header
+       do: &vport-get-op
+-- 
+2.41.0
 
-> ---
->  net/sched/sch_hfsc.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-> index 70b0c5873..d14cff8d4 100644
-> --- a/net/sched/sch_hfsc.c
-> +++ b/net/sched/sch_hfsc.c
-> @@ -1012,6 +1012,10 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, =
-u32 parentid,
->                 if (parent =3D=3D NULL)
->                         return -ENOENT;
->         }
-> +       if (!(parent->cl_flags & HFSC_FSC) && parent !=3D &q->root) {
-> +               NL_SET_ERR_MSG(extack, "Invalid parent - parent class mus=
-t have FSC");
-> +               return -EINVAL;
-> +       }
->
->         if (classid =3D=3D 0 || TC_H_MAJ(classid ^ sch->handle) !=3D 0)
->                 return -EINVAL;
-> --
-> 2.41.0
->
 
