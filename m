@@ -1,48 +1,52 @@
-Return-Path: <netdev+bounces-30432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D12E78746D
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 17:39:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CAA5787485
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 17:47:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66F141C20B23
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:39:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29302281588
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AC1134DE;
-	Thu, 24 Aug 2023 15:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCBBE13AD0;
+	Thu, 24 Aug 2023 15:47:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74546100DC
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 15:39:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8586BC433C7;
-	Thu, 24 Aug 2023 15:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757A6100DC
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 15:47:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A07B4C433C8;
+	Thu, 24 Aug 2023 15:47:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692891547;
-	bh=ccJZ7jMCkPXEoZObdfh/lq2IGmiKK2gTVM+NPOtVGVs=;
+	s=k20201202; t=1692892033;
+	bh=bo80xRhwCxiBHOSnaUm4RwomNMAJj1C5Ft16yClya1A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OaKZ5s4erFUXppdehkjcTT1TeUUblS5NX0TxjzRN81PErzSB/N0HcMjIC2lLOWrMB
-	 175wLpEMROv2sMoSkMkkP5ANyuQrblZ55zv31eRu3FfxBX+BuDTWIMS46ULL/7sgvN
-	 IE9G2MMY0vYHlVEaGXgtJFy3lJbIdbdmHevlkCtK+6JB7aoOZkI2E5Uxdas7APoP+c
-	 79md4SKZ/+TuoosX7ihss85S720C+k7k6HhJeovTshOp+CTXbXs7Tatag+dS4ebZOZ
-	 96gDbNeuUuqWF1EBTzpFD5VzaHBSA4kteTuw1tETRd2SNxBpE0QHYGwEov5Z1+kSm/
-	 ipR5rgR3xLb0A==
-Date: Thu, 24 Aug 2023 17:39:01 +0200
+	b=XgJTwW8b1JHCW2ZVKlUx7zvpcTSlrUs3PMdSQ6fut+sJreSg7OZl09T2NP++fNIr9
+	 PEzpAGuoIWVisKZOvCrOjiEWDgxaMMiMTCxYt7hsGt7wNPkqK4S941iBqMUVuaAgO8
+	 i7zputd0mm5JLJFdaBm4DCcv1ZNmmS3eOPgOe3OmNhLn87SSHd6wUliZLD8faKSrzc
+	 h1l5CjQGYPpk6HTcdPA+DnkyXQuoN0SMKKkEam5AtfJ6hqAK6oSyiLpDfrDW9hzlo4
+	 Dnkfd0+TXPBxAchqI2Gp5TQ9SYyn5zBUWsLJOW64P7E8IiwhVaAbXvG0hpqpVEYxDO
+	 sBO7OZMIDZmTA==
+Date: Thu, 24 Aug 2023 17:47:05 +0200
 From: Simon Horman <horms@kernel.org>
-To: Junfeng Guo <junfeng.guo@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
-	qi.z.zhang@intel.com, ivecera@redhat.com,
-	sridhar.samudrala@intel.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [PATCH iwl-next v8 12/15] ice: add parser execution main loop
-Message-ID: <20230824153901.GJ3523530@kernel.org>
-References: <20230823093158.782802-1-junfeng.guo@intel.com>
- <20230824075500.1735790-1-junfeng.guo@intel.com>
- <20230824075500.1735790-13-junfeng.guo@intel.com>
+To: Jinjian Song <songjinjian@hotmail.com>
+Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com, danielwinkler@google.com,
+	davem@davemloft.net, edumazet@google.com, haijun.liu@mediatek.com,
+	ilpo.jarvinen@linux.intel.com, jesse.brandeburg@intel.com,
+	jinjian.song@fibocom.com, johannes@sipsolutions.net,
+	kuba@kernel.org, linuxwwan@intel.com, linuxwwan_5g@intel.com,
+	loic.poulain@linaro.org, m.chetan.kumar@linux.intel.com,
+	pabeni@redhat.com, ricardo.martinez@linux.intel.com,
+	ryazanov.s.a@gmail.com, soumya.prakash.mishra@intel.com,
+	nmarupaka@google.com, vsankar@lenovo.com
+Subject: Re: [net-next v2 5/5] net: wwan: t7xx: Devlink documentation
+Message-ID: <20230824154705.GK3523530@kernel.org>
+References: <20230823142129.20566-1-songjinjian@hotmail.com>
+ <MEYP282MB26978F449A3C639B1DB89984BB1CA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,62 +55,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230824075500.1735790-13-junfeng.guo@intel.com>
+In-Reply-To: <MEYP282MB26978F449A3C639B1DB89984BB1CA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 
-On Thu, Aug 24, 2023 at 03:54:57PM +0800, Junfeng Guo wrote:
-> Implement function ice_parser_rt_execute which perform the main
-> loop of the parser.
+On Wed, Aug 23, 2023 at 10:21:29PM +0800, Jinjian Song wrote:
+> From: Jinjian Song <jinjian.song@fibocom.com>
 > 
-> Also include the Parser Library files into ice Makefile.
+> Document the t7xx devlink commands usage for firmware flashing &
+> coredump collection.
 > 
-> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> Base on the v5 patch version of follow series:
+> 'net: wwan: t7xx: fw flashing & coredump support'
+> (https://patchwork.kernel.org/project/netdevbpf/patch/f902d4a0cb807a205687f7e693079fba72ca7341.1674307425.git.m.chetan.kumar@linux.intel.com/)
+> 
+> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
+
+Hi Jinjian Song,
+
+some minor feedback from my side.
 
 ...
 
-> @@ -80,6 +107,632 @@ void ice_parser_rt_pktbuf_set(struct ice_parser_rt *rt, const u8 *pkt_buf,
->  	memcpy(&rt->gpr[ICE_GPR_HV_IDX], &rt->pkt_buf[ho], ICE_GPR_HV_SIZE);
->  }
->  
-> +static void _ice_bst_key_init(struct ice_parser_rt *rt,
-> +			      struct ice_imem_item *imem)
-> +{
-> +	u8 tsr = (u8)rt->gpr[ICE_GPR_TSR_IDX];
-> +	u16 ho = rt->gpr[ICE_GPR_HO_IDX];
-> +	u8 *key = rt->bst_key;
-> +	int idd, i;
 > +
-> +	idd = ICE_BST_TCAM_KEY_SIZE - 1;
-> +	if (imem->b_kb.tsr_ctrl)
-> +		key[idd] = (u8)tsr;
-> +	else
-> +		key[idd] = imem->b_kb.prio;
-> +
-> +	idd = ICE_BST_KEY_TCAM_SIZE - 1;
-> +	for (i = idd; i >= 0; i--) {
-> +		int j;
-> +
-> +		j = ho + idd - i;
-> +		if (j < ICE_PARSER_MAX_PKT_LEN)
-> +			key[i] = rt->pkt_buf[ho + idd - i];
-> +		else
-> +			key[i] = 0;
-> +	}
-> +
-> +	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "Generated Boost TCAM Key:\n");
-> +	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
-> +		  key[0], key[1], key[2], key[3], key[4],
-> +		  key[5], key[6], key[7], key[8], key[9],
-> +		  key[10], key[11], key[12], key[13], key[14],
-> +		  key[15], key[16], key[17], key[18], key[19]);
+> +Coredump Collection
+> +~~~~~~~~~~~~~~~~~~
 
-Hi Junfeng Guo,
+nit: the line above seems to need one more '~'
 
-key points to rt->bst_key which has ICE_BST_KEY_SIZE (10) elements.
-But here 20 elements are accessed. This seems to be an overrun.
-
-Flagged by Smatch.
-
-> +	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "\n");
-> +}
 > +
+> +::
+> +
+> +  $ devlink region new mr_dump
+> +
+> +::
+> +
+> +  $ devlink region read mr_dump snapshot 0 address 0 length $len
+> +
+> +::
+> +
+> +  $ devlink region del mr_dump snapshot 0
+> +
+> +Note: $len is actual len to be dumped.
+> +
+> +The userspace application uses these commands for obtaining the modem component
+> +logs when device encounters an exception.
+> +
+> +Second Stage Bootloader dump
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ditto.
+
+> +
+> +::
+> +
+> +  $ devlink region new lk_dump
+> +
+> +::
+> +
+> +  $ devlink region read lk_dump snapshot 0 address 0 length $len
+> +
+> +::
+> +
+> +  $ devlink region del lk_dump snapshot 0
+> +
+> +Note: $len is actual len to be dumped.
+> +
+> +In fastboot mode the userspace application uses these commands for obtaining the
+> +current snapshot of second stage bootloader.
+> +
+> -- 
+> 2.34.1
+> 
+> 
 
