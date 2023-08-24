@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-30212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD41786719
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 07:25:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF10C786724
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 07:26:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77210281421
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 05:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14CCA1C20D90
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 05:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742BA24535;
-	Thu, 24 Aug 2023 05:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6A524535;
+	Thu, 24 Aug 2023 05:26:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6862024525
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13BC24525
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:26:32 +0000 (UTC)
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 356AA198;
-	Wed, 23 Aug 2023 22:25:09 -0700 (PDT)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37O52iuX009529;
-	Thu, 24 Aug 2023 05:24:52 GMT
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D584CD0;
+	Wed, 23 Aug 2023 22:26:31 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37O2dY7A027342;
+	Thu, 24 Aug 2023 05:26:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=qcppdkim1;
- bh=kmKwr01EpasB+ADLvTx3XipsclwcdrknzBWShzrD9Zk=;
- b=jdE0/k++x3t83vuoFzNfhCms8tzDxHxR77PSRhsc0hm7ih83U4Xuq0f7p24ag3gVB6x1
- W1sYvH/K/Ms2cZluI+8qjYBSBhAfciXdSE+6O6WrUnqld+z0eeFs/1aATtK98NJ2PGPq
- gOhvfVpkuRjTk+xchb4DA3AeQDc3IGbrgp7FCTetsy5HqpWQvi3IsOMMYoHmgtQOwstG
- 7BjoU9zdDvV8yjvuAONZ+7P2xQGbhV1X16eaxFJfxz0MlKPtc9T7R4nawTePLT3RyaR3
- wqyjdkRb+8Ez568EnIBDpsWd4BQsuieIfKaneDGuSGeZxORObK0STZfYl5oj72b7NH/B rQ== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3snkumsj0d-1
+ bh=cR9r0HbqbixacVcNUJfujbEbOF2OUeDJHRF2a00IxU0=;
+ b=I/292nJWrI7vtpLcA7HibzN5WXozIMOWCBhZzioZAXMHu7M4olI/DIi9XKtfsqlBZaf/
+ IiobuYb85xVbYXc1wYxSag1uaurD0qCbNMN70zBVUHRo/1q1rIjmp5o3KVo+oxcwImfK
+ b/uT/zxpPddUGF5HyRRGDrOmi+hyIpgtexd8ap3QNc+9QcziCdszGv2H7XU1Vuv4Rc/p
+ SA7nYEDD80jK0A0rj8ZUy2t9l3cY7Hwpu98kSWb7JRTTz5/Cjn6csyDhRHkZF/fetcZ0
+ 4ihxtkPfBD8TxtZyUqzpL3tqAz0Yh31JGjipdeBNiZIKD4QASan+J61J4f9Hy6erLTVj rQ== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sn2exukxw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Aug 2023 05:24:52 +0000
+	Thu, 24 Aug 2023 05:26:07 +0000
 Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37O5OnVw025425
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37O5PWY4032278
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Aug 2023 05:24:49 GMT
+	Thu, 24 Aug 2023 05:25:32 GMT
 Received: from [10.216.48.216] (10.80.80.8) by nalasex01a.na.qualcomm.com
  (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Wed, 23 Aug
- 2023 22:24:28 -0700
-Message-ID: <b6d0664c-02b8-5641-c9af-218cd7bd0898@quicinc.com>
-Date: Thu, 24 Aug 2023 10:54:25 +0530
+ 2023 22:25:24 -0700
+Message-ID: <17a4b36b-4c46-86f6-5b93-b30171c324f2@quicinc.com>
+Date: Thu, 24 Aug 2023 10:55:21 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,10 +55,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH 2/6] clk: qcom: gcc-ipq9574: Mark nssnoc clocks as
- critical
+Subject: Re: [PATCH 5/6] arm64: dts: qcom: ipq9574: Add support for nsscc node
 Content-Language: en-US
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, <agross@kernel.org>,
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
         <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
         <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
         <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
@@ -71,27 +70,27 @@ To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, <agross@kernel.org>,
         <netdev@vger.kernel.org>
 CC: <quic_saahtoma@quicinc.com>
 References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
- <20230711093529.18355-3-quic_devipriy@quicinc.com>
- <8433cbfa-52c5-90c5-1e4c-0b13236d2153@linaro.org>
+ <20230711093529.18355-6-quic_devipriy@quicinc.com>
+ <05554015-6b08-c194-9d27-af5539e3ce46@linaro.org>
 From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <8433cbfa-52c5-90c5-1e4c-0b13236d2153@linaro.org>
+In-Reply-To: <05554015-6b08-c194-9d27-af5539e3ce46@linaro.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nalasex01a.na.qualcomm.com (10.47.209.196)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: jiROBs6DdN3kCx_eanj1-sVr18Hdaf0n
-X-Proofpoint-ORIG-GUID: jiROBs6DdN3kCx_eanj1-sVr18Hdaf0n
+X-Proofpoint-GUID: k80k8rolSFTOWiLC5rDJLv-HBqSOxo8_
+X-Proofpoint-ORIG-GUID: k80k8rolSFTOWiLC5rDJLv-HBqSOxo8_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
  definitions=2023-08-24_02,2023-08-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=972
- spamscore=0 suspectscore=0 adultscore=0 clxscore=1015 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2308240042
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ mlxscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ malwarescore=0 suspectscore=0 adultscore=0 phishscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308240043
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -101,59 +100,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 
-On 7/11/2023 3:55 PM, Dmitry Baryshkov wrote:
-> On 11/07/2023 12:35, Devi Priya wrote:
->> Mark nssnoc clocks as critical as they are to be turned on to access
->> nss port tx/rx clocks.
+On 7/11/2023 3:27 PM, Krzysztof Kozlowski wrote:
+> On 11/07/2023 11:35, Devi Priya wrote:
+>> Add a node for the nss clock controller found on ipq9574 based devices.
+>>
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>> ---
+>>   arch/arm64/boot/dts/qcom/ipq9574.dtsi | 44 +++++++++++++++++++++++++++
+>>   1 file changed, 44 insertions(+)
+>>
+>> diff --git a/arch/arm64/boot/dts/qcom/ipq9574.dtsi b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+>> index f120c7c52351..257ce4a5bfd5 100644
+>> --- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+>> @@ -10,6 +10,8 @@
+>>   #include <dt-bindings/clock/qcom,ipq9574-gcc.h>
+>>   #include <dt-bindings/interrupt-controller/arm-gic.h>
+>>   #include <dt-bindings/reset/qcom,ipq9574-gcc.h>
+>> +#include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
+>> +#include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
+>>   
+>>   / {
+>>   	interrupt-parent = <&intc>;
+>> @@ -17,6 +19,30 @@
+>>   	#size-cells = <2>;
+>>   
+>>   	clocks {
+>> +		bias_pll_cc_clk: bias-pll-cc-clk {
+>> +			compatible = "fixed-clock";
+>> +			clock-frequency = <1200000000>;
+>> +			#clock-cells = <0>;
+>> +		};
+>> +
+>> +		bias_pll_nss_noc_clk: bias-pll-nss-noc-clk {
+>> +			compatible = "fixed-clock";
+>> +			clock-frequency = <461500000>;
+>> +			#clock-cells = <0>;
+>> +		};
+>> +
+>> +		bias_pll_ubi_nc_clk: bias-pll-ubi-nc-clk {
+>> +			compatible = "fixed-clock";
+>> +			clock-frequency = <353000000>;
+>> +			#clock-cells = <0>;
+>> +		};
+>> +
+>> +		gcc_gpll0_out_aux: gcc-gpll0-out-aux {
+>> +			compatible = "fixed-clock";
+>> +			clock-frequency = <800000000>;
+>> +			#clock-cells = <0>;
+>> +		};
 > 
-> Can you please clarify, if these are turned off, one can not access 
-> nsscc clocks? Then the nsscc should be the consumer of these clocks 
-> (instead of declaring them as critical). May be using pm_clk for nsscc 
-> will work. If not, you'll have to do that manually from 
-> runtime_suspend/runtime_resume callbacks.
-
-Sure, will use pm_clk for nsscc in V2
+> Isn't this GCC clock?
+Yes, will register this in the gcc driver.
 
 Thanks,
 Devi Priya
 > 
->>
->> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->> ---
->>   drivers/clk/qcom/gcc-ipq9574.c | 6 +++---
->>   1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/clk/qcom/gcc-ipq9574.c 
->> b/drivers/clk/qcom/gcc-ipq9574.c
->> index 6914f962c893..b68addc6f687 100644
->> --- a/drivers/clk/qcom/gcc-ipq9574.c
->> +++ b/drivers/clk/qcom/gcc-ipq9574.c
->> @@ -2166,7 +2166,7 @@ static struct clk_branch gcc_nssnoc_nsscc_clk = {
->>                   &pcnoc_bfdcd_clk_src.clkr.hw
->>               },
->>               .num_parents = 1,
->> -            .flags = CLK_SET_RATE_PARENT,
->> +            .flags = CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
->>               .ops = &clk_branch2_ops,
->>           },
->>       },
->> @@ -2565,7 +2565,7 @@ static struct clk_branch gcc_nssnoc_snoc_clk = {
->>                   &system_noc_bfdcd_clk_src.clkr.hw
->>               },
->>               .num_parents = 1,
->> -            .flags = CLK_SET_RATE_PARENT,
->> +            .flags = CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
->>               .ops = &clk_branch2_ops,
->>           },
->>       },
->> @@ -2582,7 +2582,7 @@ static struct clk_branch gcc_nssnoc_snoc_1_clk = {
->>                   &system_noc_bfdcd_clk_src.clkr.hw
->>               },
->>               .num_parents = 1,
->> -            .flags = CLK_SET_RATE_PARENT,
->> +            .flags = CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
->>               .ops = &clk_branch2_ops,
->>           },
->>       },
+>> +
+>>   		sleep_clk: sleep-clk {
+>>   			compatible = "fixed-clock";
+>>   			#clock-cells = <0>;
+>> @@ -620,6 +646,24 @@
+>>   				status = "disabled";
+>>   			};
+>>   		};
+>> +
+>> +		nsscc: nsscc@39b00000 {
+> 
+> Node names should be generic. See also an explanation and list of
+> examples (not exhaustive) in DT specification:
+> https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
+> 
+> 
+> Best regards,
+> Krzysztof
 > 
 
