@@ -1,122 +1,101 @@
-Return-Path: <netdev+bounces-30416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFC678721F
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:46:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA9578722D
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:49:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57880281616
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:46:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D8D42815B5
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8864810979;
-	Thu, 24 Aug 2023 14:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E82B1119B;
+	Thu, 24 Aug 2023 14:49:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C74028911
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:41:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26AA81BC6
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692888113;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O77VDoQsJ5CTSmvV+GLqqEGiI0r/X9wLaybA0ZqkGBY=;
-	b=VMMY4jKagcnL71PPk8Jg+ZqMNVlV4Xk2WLprPYfKxIwXPihZ3nIy0T8u6CYdXCpCN+6iGE
-	voq7pqSDMyu4ZU3te92ZsKVG3f1ht/kLHujTs3U46d8bStvLPQnJLHRI64cw+ByvsmcWao
-	Q0ulVbTPVqUQIjybZXavVJquUDXWWsY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-217-dYiorHW5Pai5XODYVA_jcw-1; Thu, 24 Aug 2023 10:41:49 -0400
-X-MC-Unique: dYiorHW5Pai5XODYVA_jcw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5222c47ab80so1188508a12.0
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:41:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692888109; x=1693492909;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O77VDoQsJ5CTSmvV+GLqqEGiI0r/X9wLaybA0ZqkGBY=;
-        b=gmFaRihjsiMUf0gHpxSLO5S29iEzIGP5+eQ0Jxy9fjfso1i5zUYcAyp+SgGH9eVKgz
-         FctYJgc8xpk2QubZh7O3zpS8qZAIkZmbMhLaAvUtRzcUd1OGgIioFSQ4MJJv6RqwCU2i
-         eabqKVvcx8o26TO1ybMbGk0oyM3F2kECWwxJrwCogsfiNabanKbHN/5zXmzVujJnicEo
-         ToQjywymX1Uyy/hcOgEUd8Fq5pD2lhGNlplKHVuHEW+tAltuqGRVVrXTMCeuQ1oI5qKd
-         5o5eAkUW+YDmpczxyEaysB1NLBil7phezLSHPCrb8yrHHWcDa2fviaZgx2PdL27PGFjJ
-         UG1g==
-X-Gm-Message-State: AOJu0YyM8AYANLYBFMNwqLUcW0QUdUaD7kMxCKjq6w71mp7HIWS7FHKe
-	GrIHIlqzi1uVHy0xBhlfehSlpEzPX2V2i10thTalwfheOl6i7+uxzCBZYuS8F8i+mX+WqRdEe1Q
-	Xt7+DomUP9N/Cr51e
-X-Received: by 2002:a17:906:1017:b0:9a1:f96c:4bb9 with SMTP id 23-20020a170906101700b009a1f96c4bb9mr2576460ejm.6.1692888108934;
-        Thu, 24 Aug 2023 07:41:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEgSovT9W/LBF474xUHvDh6FL2/3TbJZ9zlACRQ8AHV+LJZiHtTA8p94JnFu6c7K4czguS6Nw==
-X-Received: by 2002:a17:906:1017:b0:9a1:f96c:4bb9 with SMTP id 23-20020a170906101700b009a1f96c4bb9mr2576451ejm.6.1692888108639;
-        Thu, 24 Aug 2023 07:41:48 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
-        by smtp.gmail.com with ESMTPSA id y12-20020a1709064b0c00b009a1bf608ff3sm3546170eju.132.2023.08.24.07.41.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 07:41:48 -0700 (PDT)
-Message-ID: <4cbd35c1bb2dd8b0a8bea85d32e3d296fac5f715.camel@redhat.com>
-Subject: Re: Weird sparse error WAS( [PATCH net-next v2 3/3] net/sched:
- act_blockcast: Introduce blockcast tc action
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Dan Carpenter
-	 <dan.carpenter@linaro.org>
-Cc: Simon Horman <horms@kernel.org>, Linux Kernel Network Developers
-	 <netdev@vger.kernel.org>
-Date: Thu, 24 Aug 2023 16:41:45 +0200
-In-Reply-To: <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com>
-References: <20230819163515.2266246-1-victor@mojatatu.com>
-	 <20230819163515.2266246-4-victor@mojatatu.com>
-	 <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE011288EC
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:49:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34FF9C433C8;
+	Thu, 24 Aug 2023 14:49:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692888562;
+	bh=JHO5XVOq1X6JltauUfgGpAsDE8mIiAO0JKHrq9w2P0Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rZEKa14a2pU3qdt6cIfXE0T6L6Jt2XAUlYGZg/NGIgjLhxfzULY+xbVl+xj+BVd8t
+	 3mKXVe+t82h4PkBYF6uZGU4jNNdFMCSUSZF+YbPiSITfQrLPIVbVlG1JscGSzLSQln
+	 kCOtDmgpuQ+0A4V2n97TTe7ZTMbIPSCwg3R0ggKW/vtvHaW2U9xJg8nnN+ZFMAi7q1
+	 IH62qNNeL831aguE44N9VkyLM9JuO0Bn44a0BcJH/tsOzBW3h5UGNWLZ54o8JuW7Hd
+	 szDC4nkcSW7nphXx8HELPuQXUnH7S+cxrmtc8OGNshDgSwS9itTyBS6VsTMjkcaHBs
+	 87xhZyOqjn1xA==
+Date: Thu, 24 Aug 2023 16:49:07 +0200
+From: Simon Horman <horms@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Mark Rustad <mark.d.rustad@intel.com>,
+	Darin Miller <darin.j.miller@intel.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net] ixgbe: fix timestamp configuration code
+Message-ID: <20230824144907.GI3523530@kernel.org>
+References: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
 
-On Thu, 2023-08-24 at 10:30 -0400, Jamal Hadi Salim wrote:
-> Dan/Simon,
-> Can someone help explain this error on the code below:
->=20
-> ../net/sched/act_blockcast.c:213:9: warning: context imbalance in
-> 'tcf_blockcast_init' - different lock contexts for basic block
+On Wed, Aug 23, 2023 at 11:15:37PM +0100, Vadim Fedorenko wrote:
+> The commit in fixes introduced flags to control the status of hardware
+> configuration while processing packets. At the same time another structure
+> is used to provide configuration of timestamper to user-space applications.
+> The way it was coded makes this structures go out of sync easily. The
+> repro is easy for 82599 chips:
+> 
+> [root@hostname ~]# hwstamp_ctl -i eth0 -r 12 -t 1
+> current settings:
+> tx_type 0
+> rx_filter 0
+> new settings:
+> tx_type 1
+> rx_filter 12
+> 
+> The eth0 device is properly configured to timestamp any PTPv2 events.
+> 
+> [root@hostname ~]# hwstamp_ctl -i eth0 -r 1 -t 1
+> current settings:
+> tx_type 1
+> rx_filter 12
+> SIOCSHWTSTAMP failed: Numerical result out of range
+> The requested time stamping mode is not supported by the hardware.
+> 
+> The error is properly returned because HW doesn't support all packets
+> timestamping. But the adapter->flags is cleared of timestamp flags
+> even though no HW configuration was done. From that point no RX timestamps
+> are received by user-space application. But configuration shows good
+> values:
+> 
+> [root@hostname ~]# hwstamp_ctl -i eth0
+> current settings:
+> tx_type 1
+> rx_filter 12
+> 
+> Fix the issue by applying new flags only when the HW was actually
+> configured.
+> 
+> Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-IIRC sparse is fooled by lock under conditionals, in this case:
-
-       if (exists)
-               spin_lock_bh(&p->tcf_lock);
-
-a possible solution would be:
-
-	if (exists) {
-		spin_lock_bh(&p->tcf_lock);
-		goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto_ch);
-		spin_unlock_bh(&p->tcf_lock);
-	} else {
-		goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto_ch);
-	}
-=09
-Using some additional helpers the code could be less ugly...
-
-Cheers,
-
-Paolo
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
