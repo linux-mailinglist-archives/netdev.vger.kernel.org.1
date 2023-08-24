@@ -1,93 +1,163 @@
-Return-Path: <netdev+bounces-30209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0338C7866FF
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 07:11:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43D7578670F
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 07:19:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13FAC1C20DB7
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 05:11:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 327191C20C06
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 05:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8BF17E1;
-	Thu, 24 Aug 2023 05:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8465824525;
+	Thu, 24 Aug 2023 05:19:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7028624525
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:11:09 +0000 (UTC)
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBC810F9;
-	Wed, 23 Aug 2023 22:11:06 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qZ2bd-007EU6-EA; Thu, 24 Aug 2023 13:10:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Aug 2023 13:10:06 +0800
-Date: Thu, 24 Aug 2023 13:10:06 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y.Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-	linux-mtd@lists.infradead.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-	Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-	ceph-devel@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
-	linux-nfs@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-	linux-integrity@vger.kernel.org,
-	"Jason A.Donenfeld" <Jason@zx2c4.com>,
-	Ayush Sawal <ayush.sawal@chelsio.com>
-Subject: Re: [PATCH 6/12] wifi: mac80211: Do not include crypto/algapi.h
-Message-ID: <ZObmLqztZ4vMFKnI@gondor.apana.org.au>
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
- <E1qYlA0-006vFr-Ts@formenos.hmeau.com>
- <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760D017E1
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:19:32 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BADD198;
+	Wed, 23 Aug 2023 22:19:30 -0700 (PDT)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37O4xdKo015458;
+	Thu, 24 Aug 2023 05:18:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=zEoA+vnWTFcGKYryXxDX7QIHNupVhel1DxlfRKQiiaI=;
+ b=kR7x3rDMW+Et/Z+/0mEVuX/85Jau3hquncMSSukSOXClm2nsfqbYfGLFIIB5F3UFfA5J
+ DPl7I/F7m3YoS+I6aK72tVpoQgUPVfKWDSj3KkGSuoX3K+gyh2K3wucPjwtnGbqoXxEs
+ zMyuosHXDaTl/0h9n9ASRFv70kuHsc+NtToRrhU8WWfXJV2d8NuET/XIJ7I67OrmX7YW
+ 4KDpJyb6vjZfOcyCRmOZj1/0Mu1KUzuwYJCEn1V/iydiV3wK15nEi8Occnl987Q8M/RG
+ Y7jFDVILorNYqZXfBri/wOsO+bukf8k5Pl4jUf4w4pb3kljGDRc9KpaCGqLu6arhAPKK bw== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sn2t43rp4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Aug 2023 05:18:43 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37O5Iehm007462
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Aug 2023 05:18:41 GMT
+Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Wed, 23 Aug
+ 2023 22:18:33 -0700
+Message-ID: <ea229d40-0bce-87e8-edef-72a7f251c051@quicinc.com>
+Date: Thu, 24 Aug 2023 10:48:30 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
-X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
-	PDS_RDNS_DYNAMIC_FP,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,TVD_RCVD_IP
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: **
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.0
+Subject: Re: [PATCH 3/6] dt-bindings: clock: Add ipq9574 NSSCC clock and reset
+ definitions
+To: Devi Priya <quic_devipriy@quicinc.com>, <agross@kernel.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
+        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
+        <rafal@milecki.pl>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <netdev@vger.kernel.org>
+CC: <quic_saahtoma@quicinc.com>
+References: <20230711093529.18355-1-quic_devipriy@quicinc.com>
+ <20230711093529.18355-4-quic_devipriy@quicinc.com>
+Content-Language: en-US
+From: Kathiravan T <quic_kathirav@quicinc.com>
+In-Reply-To: <20230711093529.18355-4-quic_devipriy@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: coVgQE1THNUmsp74cCKzFpVn4McNc0et
+X-Proofpoint-ORIG-GUID: coVgQE1THNUmsp74cCKzFpVn4McNc0et
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-24_02,2023-08-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ clxscore=1011 phishscore=0 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ mlxscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308240041
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 23, 2023 at 12:34:35PM +0200, Johannes Berg wrote:
-> 
-> No objection, of course, but I don't think it's necessarily clear that
-> it "is for internal use only", it literally says:
-> 
->  * Cryptographic API for algorithms (i.e., low-level API).
-> 
-> which really isn't the same as "don't use this file".
-> 
-> Might want to clarify that, or even move it into crypto/ from
-> include/crypto/ or something?
 
-Yes it should be in include/crypto/internal.  Once the churn gets
-small enough I'll move it there.
+On 7/11/2023 3:05 PM, Devi Priya wrote:
+> Add NSSCC clock and reset definitions for ipq9574.
+>
+> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> ---
+>   .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  76 +++++++++
+>   .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
+>   .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
+>   3 files changed, 362 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>   create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+>   create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+>
+> diff --git a/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+> new file mode 100644
+> index 000000000000..1e8754760785
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+> @@ -0,0 +1,76 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/clock/qcom,ipq9574-nsscc.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Qualcomm Networking Sub System Clock & Reset Controller on IPQ9574
+> +
+> +maintainers:
+> +  - Bjorn Andersson <andersson@kernel.org>
+> +  - Anusha Rao <quic_anusha@quicinc.com>
+> +
+> +description: |
+> +  Qualcomm networking sub system clock control module provides the clocks,
+> +  resets and power domains on IPQ9574
+> +
+> +  See also::
+> +    include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+> +    include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+> +
+> +properties:
+> +  compatible:
+> +    const: qcom,ipq9574-nsscc
+> +
+> +  clocks:
+> +    items:
+> +      - description: Bias PLL cc clock source
+> +      - description: Bias PLL nss noc clock source
+> +      - description: Bias PLL ubi nc clock source
+> +      - description: GCC GPLL0 out aux clock source
+> +      - description: Uniphy0 GCC Rx clock source
+> +      - description: Uniphy0 GCC Tx clock source
+> +      - description: Uniphy1 GCC Rx clock source
+> +      - description: Uniphy1 GCC Tx clock source
+> +      - description: Uniphy2 GCC Rx clock source
+> +      - description: Uniphy2 GCC Tx clock source
+
+
+These are UniphyX *NSS* TX/RX clock source?
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
 
