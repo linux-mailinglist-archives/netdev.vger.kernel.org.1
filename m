@@ -1,88 +1,157 @@
-Return-Path: <netdev+bounces-30473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EA0787837
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 20:49:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28E06787840
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 20:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713D51C20EB1
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 18:49:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 591831C20EAD
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 18:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E5714F8B;
-	Thu, 24 Aug 2023 18:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA621548F;
+	Thu, 24 Aug 2023 18:52:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF52CA76
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 18:49:27 +0000 (UTC)
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36AA1BD1;
-	Thu, 24 Aug 2023 11:49:22 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5007616b756so165060e87.3;
-        Thu, 24 Aug 2023 11:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692902961; x=1693507761;
-        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
-         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LHRS4UEXxu8F0WleFwTDxLVpmIkpw8qRBxsTWoqyCew=;
-        b=EzE2YpmXh9abD9+0dqFc9MXO0MNUNQieniyt6V4qvN5TbOLydMBrfnhUzSEiMPK2TG
-         HnK8yubCC0Vy5L/1zZm4zNSx/jIloKmOIH9XDItHJ3c8NcFSE/UxNpOyVnG3zeTQO6+9
-         /3NzsVVWEcLTRaVv47zkjW25i2/ak6L/uDcjF2hi0o9dMXXuQtTd4Ak3sJuiB819cd9t
-         ln7p4IAUV4h4YyIBPdd4rPwNqeDo9XfRAa6klh4o+da6x+z4JKJ/RvkOOPHTMydY4+1Q
-         ULpNX1KoZiDUofBobwzMgOFoYucjZsyDzZslglJE98EW7rCRyGVCxN3/8YnEGNW/mjcT
-         PGiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692902961; x=1693507761;
-        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
-         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LHRS4UEXxu8F0WleFwTDxLVpmIkpw8qRBxsTWoqyCew=;
-        b=I72GuY87bQ67ZhoIZHHuz+aNhF8JbDJi86wvc8uZFeYD9XnvoVUADBcS5KAwnhr2mV
-         HmKGjjvDApdZlNJiP4JZpJGf3AoF4dRTwQ/RG069YjAVKVzZq8dArJjAxxfpUkh3zKCn
-         IU9EPsl0E+1I+94wsXGHdaGXwFCwc/q29OZ3AUMW4GaWDPxx8Hazro49vWbXE/uhorCO
-         2rlZpEn7I4zjlPcWWE05kY9dv+JaflVF2EWkcc9gvltVUVxHstVbFVwyeGVd4ypd4yDF
-         lM+ACwZ+mRHFhXkZRqvwAzM/Y6kK6by5ao5DA8ARVCI8a7/JL9eaOAjCGsEz/kL6zAz7
-         +zuQ==
-X-Gm-Message-State: AOJu0YzeEbNHuWY+s8IaAw/KSvj25A+VBIA9zdn+mGqSiZX0DHqX9yVP
-	CpmSxD7HnjNk6JEAi0oaZh8=
-X-Google-Smtp-Source: AGHT+IH4UH6SkmpNTWiDNASumNMT3avgYEaJSuF1a/GllfuoDAQfjLNGRgsgsTLHW4a+HgVEswOKCA==
-X-Received: by 2002:a05:6512:36c9:b0:4fe:17d6:af2b with SMTP id e9-20020a05651236c900b004fe17d6af2bmr10240267lfs.42.1692902960837;
-        Thu, 24 Aug 2023 11:49:20 -0700 (PDT)
-Received: from [192.168.100.57] ([77.105.14.121])
-        by smtp.gmail.com with ESMTPSA id i9-20020aa7c709000000b0052a198d8a4dsm59792edq.52.2023.08.24.11.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 11:49:20 -0700 (PDT)
-Message-ID: <add84df503df6b0bd3f572cd396dbde9da558eab.camel@gmail.com>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: dsa: marvell: add
- MV88E6361 switch to compatibility list
-From: airat.gl@gmail.com
-To: alexis.lothore@bootlin.com
-Cc: andrew@lunn.ch, davem@davemloft.net, devicetree@vger.kernel.org, 
-	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, olteanv@gmail.com, 
-	pabeni@redhat.com, paul.arola@telus.com, richardcochran@gmail.com, 
-	scott.roberts@telus.com, thomas.petazzoni@bootlin.com
-Date: Thu, 24 Aug 2023 20:49:17 +0200
-In-Reply-To: <20230517203430.448705-2-alexis.lothore@bootlin.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-User-Agent: Evolution 3.48.4 (by Flathub.org) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566ED11CAF
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 18:52:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF58EC433C8;
+	Thu, 24 Aug 2023 18:52:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692903120;
+	bh=F9KFzp3RIyYz1hSGj9sFsAsINDZWmj2HmYc1rwDFU4E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hhf7ihMJj2jCYtSAQXqyoolpxtXAy2heKNfDoFZ7KjrJBXoX7XOCd8sHXM1E0Zf3r
+	 0AXt9LJ1tugA4inWVs/Osc2lOuI//uHv6VyMD7fwIaFcTPOkR0g2CsrItdSrQ72bGT
+	 0dnbvQe+Z8ApCaDcvozkOo5jAvzKrq/gF3JxtloXbrtQY+WBlPPhRMQI+V4Lr2FWW4
+	 KfSXcfz/8wmt96q/MRtYE7+jXqvisnQ2htsRNdCSBXnRBRzOWOJU83GH+vWCiM49A8
+	 ok2rX1mjCFytqaOIYgS9GE5CCSmCUDnLP+htNbNEndNA1wyjiolIy3PuES8q3Db1MZ
+	 YHAYOZOowhedg==
+Date: Thu, 24 Aug 2023 11:51:59 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: "Nabil S. Alramli" <dev@nalramli.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	saeedm@nvidia.com, tariqt@nvidia.com, linux-kernel@vger.kernel.org,
+	leon@kernel.org, jdamato@fastly.com, nalramli@fastly.com
+Subject: Re: [net-next RFC 0/1] mlx5: support per queue coalesce settings
+Message-ID: <ZOemz1HLp95aGXXQ@x130>
+References: <20230823223121.58676-1-dev@nalramli.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230823223121.58676-1-dev@nalramli.com>
 
-Is there an error? The new string include 6163 instead of 6361
+On 23 Aug 18:31, Nabil S. Alramli wrote:
+>Hello,
+>
+>I am Submitting this as an RFC to get feedback and to find out if the folks
+>at Mellanox would accept this change.
+>
+>Currently, only gobal coalescing configuration queries or changes are
+>supported in the `mlx5` driver. However, per-queue operations are not, and
+>result in `EOPNOTSUPP` errors when attempted with `ethtool`. This patch
+>adds support for per-queue coalesce operations, with a caveat described
+>below.
+>
+>Here's an example use case:
+>
+>- An mlx5 NIC is configured with 8 queues, each queue has its IRQ pinned
+>  to a unique CPU.
+>- Two custom RSS contexts are created: context 1 and context 2. Each
+>  context has a different set of queues where flows are distributed. For
+>  example, context 1 may distribute flows to queues 0-3, and context 2 may
+>  distribute flows to queues 4-7.
+>- A series of ntuple filters are installed which direct matching flows to
+>  RSS contexts. For example, perhaps port 80 is directed to context 1 and
+>  port 443 to context 2.
+>- Applications which receive network data associated with either context
+>  are pinned to the CPUs where the queues in the matching context have
+>  their IRQs pinned to maximize locality.
+>
+>The apps themselves, however, may have different requirements on latency vs
+>CPU usage and so setting the per queue IRQ coalesce values would be very
+>helpful.
+>
+>This patch would support this, with the caveat that DIM mode changes per
+>queue are not supported. DIM mode can only be changed NIC-wide. This is
+>because in the mlx5 driver, global operations that change the state of
+>adaptive-ex or adaptive-tx require a reset. So in the case of per-queue, we
+>reject such requests. This was done in the interest of simplicity for this
+>RFC as setting the DIM mode per queue appears to require significant
+>changes to mlx5 to be able to preserve the state of the indvidual channels
+>through a reset.
+>
+>IMO, if a user is going to set per-queue coalesce settings it might be
+>reasonable to assume that they will disable adaptive rx/tx NIC wide first
+>and then go through and apply their desired per-queue settings.
+>
+
+DIM is already per channel, so I don't think it's that difficult to have
+mix support of DIM and static config per channel. Yes the code will need
+some refactoring, but with a quick glance at the code provided here, such
+refactoring is already required IMO.
+
+>Here's an example:
+>
+>$ ethtool --per-queue eth0 queue_mask 0x4 --show-coalesce
+>Queue: 2
+>Adaptive RX: on  TX: on
+>stats-block-usecs: 0
+>sample-interval: 0
+>pkt-rate-low: 0
+>pkt-rate-high: 0
+>
+>rx-usecs: 8
+>rx-frames: 128
+>...
+>
+>Now, let's try to set adaptive-rx off rx-usecs 16 for queue 2:
+>
+>$ sudo ethtool --per-queue eth0 queue_mask 0x4 --coalesce adaptive-rx off \
+>  rx-usecs 16
+>Cannot set device per queue parameters: Operation not supported
+>
+>This is not supported; adaptive-rx must be disabled NIC wide first:
+>
+>$ sudo ethtool -C eth0 adaptive-rx off
+>
+>And now, queue_mask 0x4 can be applied to set rx-usecs:
+>
+>$ sudo ethtool --per-queue eth0 queue_mask 0x4 --coalesce rx-usecs 16
+>$ ethtool --per-queue eth0 queue_mask 0x4 --show-coalesce
+>Queue: 2
+>Adaptive RX: off  TX: on
+>stats-block-usecs: 0
+>sample-interval: 0
+>pkt-rate-low: 0
+>pkt-rate-high: 0
+>
+>rx-usecs: 16
+>rx-frames: 32
+>...
+>
+>Previously a global `struct mlx5e_params` stored the options in
+>`struct mlx5e_priv.channels.params`. That was preserved, but a channel-
+>specific instance was added as well, in `struct mlx5e_channel.params`.
+>
+>Note that setting global coalescing options will set the individual
+>channel settings to the same values as well.
+>
+>Is Mellanox open to this change? What would be needed to get something like
+>this accepted?
+>
+
+Sure, we just need to pass review and few testing cycles.
+
+Thanks,
+Saeed.
+
 
