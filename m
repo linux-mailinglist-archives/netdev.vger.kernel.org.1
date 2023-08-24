@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-30197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC5B78655F
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 04:30:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64213786561
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 04:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 613261C20D8A
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 02:30:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F8311C20DDA
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 02:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB06417F6;
-	Thu, 24 Aug 2023 02:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5542B1FD8;
+	Thu, 24 Aug 2023 02:30:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22DBA927
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 02:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 08A02C433C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52B9A941;
+	Thu, 24 Aug 2023 02:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 234E8C433C9;
 	Thu, 24 Aug 2023 02:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1692844224;
-	bh=Mf+4HSNHW/8gsTF1eN2rjY4M1HRlYwTnQWlDdie2JGY=;
+	bh=j9Kq4dl/5gc0BMf02DLNfYW3rJC8KZrnvYrZOv6vb8M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V/62bohpS8lwCRaM3fFoUrGfq15QHvYc7sn0l2AYKaRub1hZ9hbOTA+TwRaG4cZ63
-	 JzXVFvRjObYLkDweIWe61EE2kNAKafRI1jkZ2VHH3z/QpKF6QbV6n6KTNo1ySLCCY9
-	 ESrDZOBgawp03E+IZwClUhlHNCljeXFeuIdOUsAbh/uYFDRY5sln6FbyDcNDBnuaTa
-	 e1WLyjedHeZqAIvqOP7Ah+iZF207keYQtveYogppJTSHiWmeq00TJ7C7MYAZCQ65uN
-	 lPPAiXSn/ittrdnNjgXpD46Ea9Ybsz9I3kpYOBanEtmi4Lp9sF5E2Y/Un9dzIjrYBn
-	 ezJrlcS1fpOsg==
+	b=NfbCXITbNg19Kl/LbJM+qPkLVoZHd6EC12JJWuh7UUBkWGJA1Jtt9ErjNLjb0KnaS
+	 zd+IP2O6+tfpbfe1oAjZ8G81YC3crF+Qu1921jTb5W71xzlEgfB+YF5UkyGRrU/aP1
+	 bdVNimPoOcs+m+RXe6osstFoR7v6RQ25k7dGkBwRDvNxGTxvzNpI7Uaml4aSFJl4aQ
+	 LQOkFQWs8nNr/hynpK9pBQCg7RRTH4vy5d0zpgLilGV26jC5+0Tqx9hwHg3Gmuk2rb
+	 fDxcOPdI0v9XI3h1gB9kP1d3idqytVnNi8p6VDVhc8Hs6/PYtwQNNf3FxLb42QPBRd
+	 kUSRuK1oXlqdA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E1F15C395C5;
-	Thu, 24 Aug 2023 02:30:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05F92E330A0;
+	Thu, 24 Aug 2023 02:30:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,38 +41,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] net/mlx5e: Use PTR_ERR_OR_ZERO() to simplify
- code
+Subject: Re: [PATCH net-next] net: fec: add exception tracing for XDP
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169284422392.2546.14098414271711051915.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Aug 2023 02:30:23 +0000
-References: <20230822021455.205101-1-liaoyu15@huawei.com>
-In-Reply-To: <20230822021455.205101-1-liaoyu15@huawei.com>
-To: Yu Liao <liaoyu15@huawei.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, liwei391@huawei.com, davem@davemloft.net,
- maciej.fijalkowski@intel.com, michal.simek@amd.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org
+ <169284422401.2546.2123988345748875298.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Aug 2023 02:30:24 +0000
+References: <20230822065255.606739-1-wei.fang@nxp.com>
+In-Reply-To: <20230822065255.606739-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-imx@nxp.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 22 Aug 2023 10:14:54 +0800 you wrote:
-> Use the standard error pointer macro to shorten the code and simplify.
+On Tue, 22 Aug 2023 14:52:55 +0800 you wrote:
+> As we already added the exception tracing for XDP_TX, I think it is
+> necessary to add the exception tracing for other XDP actions, such
+> as XDP_REDIRECT, XDP_ABORTED and unknown error actions.
 > 
-> Signed-off-by: Yu Liao <liaoyu15@huawei.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_fs.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net/mlx5e: Use PTR_ERR_OR_ZERO() to simplify code
-    (no matching commit)
-  - [net-next,2/2] net: dm9051: Use PTR_ERR_OR_ZERO() to simplify code
-    https://git.kernel.org/netdev/net-next/c/664c84c26d7a
+  - [net-next] net: fec: add exception tracing for XDP
+    https://git.kernel.org/netdev/net-next/c/e83fabb797b9
 
 You are awesome, thank you!
 -- 
