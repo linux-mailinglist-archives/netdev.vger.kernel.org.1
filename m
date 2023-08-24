@@ -1,85 +1,181 @@
-Return-Path: <netdev+bounces-30220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A037867A7
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:44:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77AAB7867A6
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C04B328141B
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 06:44:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 617561C20D90
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 06:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A0624540;
-	Thu, 24 Aug 2023 06:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B229A24522;
+	Thu, 24 Aug 2023 06:44:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0FF2453C
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:44:10 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2AEDCC
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:43:58 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RWYP13Pt2zNn2v;
-	Thu, 24 Aug 2023 14:40:21 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
- (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 24 Aug
- 2023 14:43:55 +0800
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-To: <netdev@vger.kernel.org>, Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH] net: arcnet: Do not call kfree_skb() under local_irq_disable()
-Date: Thu, 24 Aug 2023 14:43:36 +0800
-Message-ID: <20230824064336.1889106-1-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7331C26
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:44:08 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B024170B
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:43:56 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-52a1ce529fdso3271688a12.1
+        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:43:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692859434; x=1693464234;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ti0tJCov0gsw8bly+e2gyZeZthleb2G4QELgyb6xbJk=;
+        b=I1zZJTfjm821j0x0yIfW4QMqklnH56r4qmM4t/5dYbVuZvxkzL6f3cpaltMFY/XXb5
+         EbBmse/2gH7Az1sjHnvD9d+bFlnXxuvT+dLR4XipRXRu1xwKka+Q9LO1v+FFzL+GIaWz
+         0cVmlYk9dfAS+JngsrZjYRBPG+0nml6up0U9AIoleTYqjuor4sjx9/J71jj6x5FSSxDb
+         vslV6rKx06UALgB1NX3JGRM1uHitgAyN5A8+zq5pvCynRMWjsL7Gqq5Xpmeu+eaSQE1v
+         B/ivDRgW24kbp+udc2TWTWgk1ia0hjrO4iUBWDsezAR6QDlNXXxd9oR59pEWV/KdP+G5
+         TkYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692859434; x=1693464234;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ti0tJCov0gsw8bly+e2gyZeZthleb2G4QELgyb6xbJk=;
+        b=Nc23UHVbaqsyx6xHEpZrx8oEtEfUFPfPRLdkNdBfvRve9MC6SnXzWQK1KZSY20UOa4
+         t4VZx0qlQx+EqSS3coMRbkqvfUMj/pbgiXNg5pnHxvl2HBPCxYsiGDqzbVQNJekPla/8
+         uZdPmRZ8X7p22WP4dEJ3PfPhC7ekkAwcexNoaGwEgGWh4XuS/tOKj3HVmLGm2cAnQ03X
+         vL2rGXAFQ0XmqmJpFMUQR+xI6ulpc50yUcEVsp1bAHY6R47G2ue+4jkuS+V4i1frRSvC
+         1cT7LDo0MWBcZfusmzXW7Xvdy7mVleXiVnHaYoVIupZCc52lIrbsrtMI5A/Ow8dIKENm
+         QtqA==
+X-Gm-Message-State: AOJu0YxYsyL8RFWOAVV7HS/gs3/q8+p3VMSzfEIUK6C3j9BYyG/N/ZJI
+	mBJcvYnPR6z3ZxxpE03dWJttmQ==
+X-Google-Smtp-Source: AGHT+IEQvZYgarQloyMnR+HnLjWh6aBRXyE5c7u2/JigeeURkpGl76ThL5cokigKZvqW5eh82CHhgg==
+X-Received: by 2002:aa7:d34f:0:b0:523:b1b0:f69f with SMTP id m15-20020aa7d34f000000b00523b1b0f69fmr10351857edr.32.1692859434571;
+        Wed, 23 Aug 2023 23:43:54 -0700 (PDT)
+Received: from [192.168.0.22] ([77.252.47.198])
+        by smtp.gmail.com with ESMTPSA id x21-20020aa7dad5000000b0052284228e3bsm10068665eds.8.2023.08.23.23.43.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Aug 2023 23:43:54 -0700 (PDT)
+Message-ID: <d5a343c8-c384-6eea-94bf-e0c4f96e5fb0@linaro.org>
+Date: Thu, 24 Aug 2023 08:43:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v6 1/5] dt-bindings: net: Add ICSS IEP
+Content-Language: en-US
+To: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
+ Simon Horman <simon.horman@corigine.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20230823113254.292603-1-danishanwar@ti.com>
+ <20230823113254.292603-2-danishanwar@ti.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230823113254.292603-2-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-It is not allowed to call kfree_skb() from hardware interrupt
-context or with hardware interrupts being disabled.
-So replace kfree_skb() with dev_kfree_skb_irq() under
-local_irq_disable(). Compile tested only.
+On 23/08/2023 13:32, MD Danish Anwar wrote:
+> Add a DT binding document for the ICSS Industrial Ethernet Peripheral(IEP)
+> hardware. IEP supports packet timestamping, PTP and PPS.
+> 
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-Fixes: 05fcd31cc472 ("arcnet: add err_skb package for package status feedback")
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
----
- drivers/net/arcnet/arcnet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Really? Where?
 
-diff --git a/drivers/net/arcnet/arcnet.c b/drivers/net/arcnet/arcnet.c
-index 99265667538c..d9e052c49ba1 100644
---- a/drivers/net/arcnet/arcnet.c
-+++ b/drivers/net/arcnet/arcnet.c
-@@ -464,7 +464,7 @@ static void arcnet_reply_tasklet(struct tasklet_struct *t)
- 
- 	ret = sock_queue_err_skb(sk, ackskb);
- 	if (ret)
--		kfree_skb(ackskb);
-+		dev_kfree_skb_irq(ackskb);
- 
- 	local_irq_enable();
- };
--- 
-2.34.1
+> Reviewed-by: Roger Quadros <rogerq@kernel.org>
+
+Now you are making things up. Please stop faking tags.
+
+> Reviewed-by: Simon Horman <horms@kernel.org>
+
+Where?
+
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>  .../devicetree/bindings/net/ti,icss-iep.yaml  | 61 +++++++++++++++++++
+>  1 file changed, 61 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+> new file mode 100644
+> index 000000000000..75668bea8614
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
+> @@ -0,0 +1,61 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
+> +
+> +maintainers:
+> +  - Md Danish Anwar <danishanwar@ti.com>
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - ti,am642-icss-iep
+> +              - ti,j721e-icss-iep
+> +          - const: ti,am654-icss-iep
+> +
+> +      - const: ti,am654-icss-iep
+> +
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +    description: phandle to the IEP source clock
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +
+
+Drop stray blank line
+
+> +    /* AM65x */
+> +    icssg0_iep0: iep@2e000 {
+> +        compatible = "ti,am654-icss-iep";
+> +        reg = <0x2e000 0x1000>;
+> +        clocks = <&icssg0_iepclk_mux>;
+> +    };
+
+Choose one example.
+
+
+Best regards,
+Krzysztof
 
 
