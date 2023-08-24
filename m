@@ -1,64 +1,39 @@
-Return-Path: <netdev+bounces-30256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA95C7869C8
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:12:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CA07869DF
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 957D4281519
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:12:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0BA31C20DE0
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE5F5CBB;
-	Thu, 24 Aug 2023 08:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556ECAD4A;
+	Thu, 24 Aug 2023 08:20:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B3EBA26
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:12:17 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06CDD2703;
-	Thu, 24 Aug 2023 01:11:53 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NJp2KP006892;
-	Thu, 24 Aug 2023 01:10:59 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=bzBEdiFZRb0jxcT/TEECbiAx7DDEP3WAKgANQVDaT9g=;
- b=VzXABoksa23kwDXJK8gC57e/OGwnBuPCwLM6HrHTcH7rH9e8Bt4O+G0FfPxHfjgMGXwf
- F5ixC88OC1NKtCUflCJPr6mlnvmd1nYOkBEUWJDpqHFPXhLJ1TUgzgr3lmrPifZNmCED
- ipC93IOdZD7DT+0quwbyU7a699rLRgxjPBVqe/wmOxXwEp3cJxBhpPeU8kOvk0iRuepr
- 0LhPfU5hChKldc0+e+rN0V9a+Q5Opt7UBOf5sUiOs0U2AtMa5phE+Z5icaH7eq1QVSxq
- fqgzoXjtyroLn0pedhIdYUfYkphZMmQjm1bQ5SD5WvxsRq6XAL4TMJGEvdD7+oi+9PLb cA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3snrmcsv95-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 24 Aug 2023 01:10:59 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 24 Aug
- 2023 01:10:57 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 24 Aug 2023 01:10:57 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 3DA203F705F;
-	Thu, 24 Aug 2023 01:10:52 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH V4 3/3] cteonxt2-pf: Fix backpressure config for multiple PFC priorities to work simultaneously
-Date: Thu, 24 Aug 2023 13:40:32 +0530
-Message-ID: <20230824081032.436432-4-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230824081032.436432-1-sumang@marvell.com>
-References: <20230824081032.436432-1-sumang@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4B15696
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 787C2C433C9;
+	Thu, 24 Aug 2023 08:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692865223;
+	bh=SgeGitZAeoqW1XWPw4cFq2CrnQFcxKuYCYLOXfLHGgw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EG41xguoLvvEJPsy+z5tphWua+oVUh7oQM4ebmHhViw2N0ei5fNhYeUf8xt50ufZ+
+	 o1w//L7lzjftKvzSNs1JZsQjMfE14b6ZAGcxSooL8axvsz8JpGSgouFWVXZMuNENpV
+	 UEAK3XSO2kDZGQeOLvE3OaQ/QxF7ZObFUVzDPue/HVV56F/OeUJpFhbDSme+KSvUu6
+	 N5v/4BnUn9v4XsiL4s+hd8EqZzThzl3o/sTi0TXWVZIcbGWd2j59E2q+j2XupaFROf
+	 9XIwJ56+G2CdopyezqYXYC8WzRfsYySTCmojNtIcg+Czsla9QPwAhABX+fYCZV9DYv
+	 7+O7Vy/rOhmHQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 59C57E33094;
+	Thu, 24 Aug 2023 08:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,67 +41,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: MYFO0hS9uk6D5315y_lQ52pVFhQEx4CS
-X-Proofpoint-ORIG-GUID: MYFO0hS9uk6D5315y_lQ52pVFhQEx4CS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-24_05,2023-08-22_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCHv3 net 0/3] fix macvlan over alb bond support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169286522336.14292.14364639578541758706.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Aug 2023 08:20:23 +0000
+References: <20230823071907.3027782-1-liuhangbin@gmail.com>
+In-Reply-To: <20230823071907.3027782-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, j.vosburgh@gmail.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, liali@redhat.com,
+ jiri@nvidia.com, razor@blackwall.org
 
-MAC (CGX or RPM) asserts backpressure at TL3 or TL2 node of the egress
-hierarchical scheduler tree depending on link level config done. If
-there are multiple PFC priorities enabled at a time and for all such
-flows to backoff, each priority will have to assert backpressure at
-different TL3/TL2 scheduler nodes and these flows will need to submit
-egress pkts to these nodes.
+Hello:
 
-Current PFC configuration has an issue where in only one backpressure
-scheduler node is being allocated which is resulting in only one PFC
-priority to work. This patch fixes this issue.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 99c969a83d82 ("octeontx2-pf: Add egress PFC support")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On Wed, 23 Aug 2023 15:19:03 +0800 you wrote:
+> Currently, the macvlan over alb bond is broken after commit
+> 14af9963ba1e ("bonding: Support macvlans on top of tlb/rlb mode bonds").
+> Fix this and add relate tests.
+> 
+> Hangbin Liu (3):
+>   bonding: fix macvlan over alb bond support
+>   selftest: bond: add new topo bond_topo_2d1c.sh
+>   selftests: bonding: add macvlan over bond testing
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-index 6492749dd7c8..bfddbff7bcdf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-@@ -70,7 +70,7 @@ static int otx2_pfc_txschq_alloc_one(struct otx2_nic *pfvf, u8 prio)
- 	 * link config level. These rest of the scheduler can be
- 	 * same as hw.txschq_list.
- 	 */
--	for (lvl = 0; lvl < pfvf->hw.txschq_link_cfg_lvl; lvl++)
-+	for (lvl = 0; lvl <= pfvf->hw.txschq_link_cfg_lvl; lvl++)
- 		req->schq[lvl] = 1;
- 
- 	rc = otx2_sync_mbox_msg(&pfvf->mbox);
-@@ -83,7 +83,7 @@ static int otx2_pfc_txschq_alloc_one(struct otx2_nic *pfvf, u8 prio)
- 		return PTR_ERR(rsp);
- 
- 	/* Setup transmit scheduler list */
--	for (lvl = 0; lvl < pfvf->hw.txschq_link_cfg_lvl; lvl++) {
-+	for (lvl = 0; lvl <= pfvf->hw.txschq_link_cfg_lvl; lvl++) {
- 		if (!rsp->schq[lvl])
- 			return -ENOSPC;
- 
-@@ -128,7 +128,7 @@ static int otx2_pfc_txschq_stop_one(struct otx2_nic *pfvf, u8 prio)
- 	int lvl;
- 
- 	/* free PFC TLx nodes */
--	for (lvl = 0; lvl < pfvf->hw.txschq_link_cfg_lvl; lvl++)
-+	for (lvl = 0; lvl <= pfvf->hw.txschq_link_cfg_lvl; lvl++)
- 		otx2_txschq_free_one(pfvf, lvl,
- 				     pfvf->pfc_schq_list[lvl][prio]);
- 
+Here is the summary with links:
+  - [PATCHv3,net,1/3] bonding: fix macvlan over alb bond support
+    https://git.kernel.org/netdev/net/c/e74216b8def3
+  - [PATCHv3,net,2/3] selftest: bond: add new topo bond_topo_2d1c.sh
+    https://git.kernel.org/netdev/net/c/27aa43f83c83
+  - [PATCHv3,net,3/3] selftests: bonding: add macvlan over bond testing
+    https://git.kernel.org/netdev/net/c/246af950b940
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
