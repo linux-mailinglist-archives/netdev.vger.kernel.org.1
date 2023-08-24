@@ -1,85 +1,71 @@
-Return-Path: <netdev+bounces-30343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1ED3786F34
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:36:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33744786F37
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ED311C20EC9
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:36:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B282815D0
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B4B156FF;
-	Thu, 24 Aug 2023 12:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD26193B6;
+	Thu, 24 Aug 2023 12:32:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A011156FD;
-	Thu, 24 Aug 2023 12:30:00 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AD0E10D7;
-	Thu, 24 Aug 2023 05:29:59 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-400e8ab9325so2040085e9.1;
-        Thu, 24 Aug 2023 05:29:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED36193B3
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 12:32:12 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 477B31BC1
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:31:57 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c09673b006so18920405ad.1
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 05:31:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692880197; x=1693484997;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gtB1qAnmEEEdOMdr+ldusNhjfEmkbuz6v9vvmxAdLWU=;
-        b=HCmyscqBBHNTLTcBc5OA7BrAnbZC1zKZd4e4mbV9u4Cn/4bVdDnM8ZekC1YQWOsEzp
-         GYJCMO19yDOcpWxEGZQu8VaWnIXwT+3tWa4sWAuwAOgLWXlH98nY9aKc0XvFNBUWddNR
-         V2zqUEuQ2zb+v3kiGHDpI6zAb+ac2WGnazE5WJdn9K8TmC4BuqOgIsqtEh47c52//UDQ
-         VoJ7a/NQvGhNyVDdaYr4xdkwS9YEyzLpuc/UZcelkasXoI7Z280Yw3GVCqJZd4p1mS5M
-         WvYOEj1rJx8PIroV6/tM3jeQbIwkPOGy8I6/G5gSdA734AtL2Ghg9VLwSifugeHoS8J1
-         eT6Q==
+        d=gmail.com; s=20221208; t=1692880316; x=1693485116;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U5uNBFRKdGGDZRAKFO4JFxe+e5Mi3BpGgv08ttLAbB4=;
+        b=MfWOOqqbCDLkbWxtg0uR/wjfD1QNMniZeu5eEyRFyxlwvzt2bTF3KxkBIBgy9M1u7K
+         d39zSduODTKcuaBEMzYdc4XPCqQK7QT4JdEE9cNxZRZIxEtpzhpbAOprOuZOzVO50ZOh
+         7gYweWhFINLztb+AIWwt8Zej1twioBVOaKAY7gNAzIXCNX/E9SkK5GxSO4ACddgxL8nw
+         OKrXv28uY2q1D+lnxNf2jPY0eZpWOghZMQ4hydpvhtMoLzdydg3cw2Ffqs85WYQFTWop
+         u38F/U23EDn48pBpn4WcLFGItFC8X+xpoyoI7FhAibw5MisxV8pOqJu9JrEh4P6OkcqK
+         vKFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692880197; x=1693484997;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gtB1qAnmEEEdOMdr+ldusNhjfEmkbuz6v9vvmxAdLWU=;
-        b=d9iZ02qhaF0NdNQgxatjbJ9+qMRUcS0rds229Vu8aoWNm44ce8G3yNVa/lWJS/Bhlo
-         9nkHsBlJf/rdNAC5GsOtMhVTvaZXigCVwtqvdGNDB7cLThbwrbzZCZowPScl+OHE/D84
-         73ibaEBHz0c1O6RZrLs/6ndONgQyNLYnGV4OS4BI9RPT4Od9oeC5YuyCO7AD0xe9METM
-         lvVZ8hYxV4A64j4pj9CcThCds0TfjpbYnkvCtQqiawgcT7iWkCZe5d07B7b+sB10l+dj
-         jIISFVdGLalpmDVe9sfZqIxAl+4/TC1S6Lv3J5CEa+h/mgA7BClJ6xqIF9ql3foYrfOd
-         IjEg==
-X-Gm-Message-State: AOJu0YztNFcVESD2ep16Lj3EBHB34yzmm83YkVl8WyIbTRRjYcnG5MSY
-	uOgJNM5jlK8sf1W0xJPum0Y=
-X-Google-Smtp-Source: AGHT+IF4POKdyilStYzuHxnt860VFcAFmJNoX2yD14rKb1ygTGjlMEsvt4e4B9ALu3HTiM5ZKt9ajA==
-X-Received: by 2002:a05:600c:5185:b0:3fe:dd78:8fbc with SMTP id fa5-20020a05600c518500b003fedd788fbcmr12168797wmb.3.1692880197634;
-        Thu, 24 Aug 2023 05:29:57 -0700 (PDT)
-Received: from localhost.localdomain ([94.234.116.52])
-        by smtp.gmail.com with ESMTPSA id hn1-20020a05600ca38100b003fbe4cecc3bsm2523776wmb.16.2023.08.24.05.29.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Aug 2023 05:29:57 -0700 (PDT)
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-To: magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	netdev@vger.kernel.org,
-	maciej.fijalkowski@intel.com,
-	bpf@vger.kernel.org,
-	yhs@fb.com,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: [PATCH bpf-next v2 11/11] selftests/xsk: introduce XSKTEST_ETH environment variable
-Date: Thu, 24 Aug 2023 14:28:53 +0200
-Message-Id: <20230824122853.3494-12-magnus.karlsson@gmail.com>
+        d=1e100.net; s=20221208; t=1692880316; x=1693485116;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U5uNBFRKdGGDZRAKFO4JFxe+e5Mi3BpGgv08ttLAbB4=;
+        b=ElPep022dQpHkmD55A2WWKjcbOxjzV6wXVfVJkB1vaN2/FXa04ynDY9BMxN/YAQEjf
+         DZcK1s02RKf9Wi7x7Y1JmcdLO01munqv6GefDwhuFsSnhGxI2tLGlvfLlbXoCz4p/mOU
+         Ykk4i4k8UkhJVIIy2fc1TDI6oEl3tHwGkB+kR3jsC4MdDWSVTPBBpJlLQdi1nwATunTk
+         w23BAmKYLQXiyDCtvvNgRP/xuIp1lIPIYpzmd1w9KMclIY3SdiM7jMf5uMPVV5kBeOsG
+         aAFyLbkqpIHX/AVjcUMeiN+eq13HO0rjDfEGdf3NTQYOWbrFPDkWdGGYscyjEJGGrqK2
+         SqjQ==
+X-Gm-Message-State: AOJu0YzTmcuwOEwt7P+d9tyxpp0n7xdK641DQRIuedL+UJl/jYpC0riU
+	W1OhXJG/b4YEhtKNe1IU4Qk=
+X-Google-Smtp-Source: AGHT+IFLodXAn4fo+KxTYnA1dWhTGiqBCoTsgJ4vBtKPqTmRhigm/L4PLBVAHLX7iHgel1c6D+1bSQ==
+X-Received: by 2002:a17:902:f684:b0:1bc:25ed:374 with SMTP id l4-20020a170902f68400b001bc25ed0374mr15475900plg.49.1692880316605;
+        Thu, 24 Aug 2023 05:31:56 -0700 (PDT)
+Received: from localhost.localdomain ([50.7.159.34])
+        by smtp.googlemail.com with ESMTPSA id h9-20020a170902748900b001bf11cf2e21sm12601467pll.210.2023.08.24.05.31.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 05:31:55 -0700 (PDT)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next] veth: Avoid NAPI scheduling on failed SKB forwarding
+Date: Thu, 24 Aug 2023 20:31:31 +0800
+Message-Id: <20230824123131.7673-1-liangchen.linux@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230824122853.3494-1-magnus.karlsson@gmail.com>
-References: <20230824122853.3494-1-magnus.karlsson@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,84 +80,38 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Magnus Karlsson <magnus.karlsson@intel.com>
+When an skb fails to be forwarded to the peer(e.g., skb data buffer
+length exceeds MTU), it will not be added to the peer's receive queue.
+Therefore, we should schedule the peer's NAPI poll function only when
+skb forwarding is successful to avoid unnecessary overhead.
 
-Introduce the XSKTEST_ETH environment variable to be able to set the
-network interface that should be used for testing.
-
-Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
 ---
- tools/testing/selftests/bpf/test_xsk.sh | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
+ drivers/net/veth.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
-index 9ec718043c1a..3e0a2302a185 100755
---- a/tools/testing/selftests/bpf/test_xsk.sh
-+++ b/tools/testing/selftests/bpf/test_xsk.sh
-@@ -88,14 +88,12 @@
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 614f3e3efab0..e163c6927f56 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -373,14 +373,13 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == NET_RX_SUCCESS)) {
+ 		if (!use_napi)
+ 			dev_lstats_add(dev, length);
++		else
++			__veth_xdp_flush(rq);
+ 	} else {
+ drop:
+ 		atomic64_inc(&priv->dropped);
+ 	}
  
- . xsk_prereqs.sh
- 
--ETH=""
+-	if (use_napi)
+-		__veth_xdp_flush(rq);
 -
- while getopts "vi:dm:lt:h" flag
- do
- 	case "${flag}" in
- 		v) verbose=1;;
- 		d) debug=1;;
--		i) ETH=${OPTARG};;
-+		i) XSKTEST_ETH=${OPTARG};;
- 		m) XSKTEST_MODE=${OPTARG};;
- 		l) list=1;;
- 		t) XSKTEST_TEST=${OPTARG};;
-@@ -157,9 +155,9 @@ if [[ $help -eq 1 ]]; then
-         exit
- fi
+ 	rcu_read_unlock();
  
--if [ ! -z $ETH ]; then
--	VETH0=${ETH}
--	VETH1=${ETH}
-+if [ -n "$XSKTEST_ETH" ]; then
-+	VETH0=${XSKTEST_ETH}
-+	VETH1=${XSKTEST_ETH}
- else
- 	validate_root_exec
- 	validate_veth_support ${VETH0}
-@@ -203,10 +201,10 @@ fi
- 
- exec_xskxceiver
- 
--if [ -z $ETH ]; then
-+if [ -z $XSKTEST_ETH ]; then
- 	cleanup_exit ${VETH0} ${VETH1}
- else
--	cleanup_iface ${ETH} ${MTU}
-+	cleanup_iface ${XSKTEST_ETH} ${MTU}
- fi
- 
- if [[ $list -eq 1 ]]; then
-@@ -216,17 +214,17 @@ fi
- TEST_NAME="XSK_SELFTESTS_${VETH0}_BUSY_POLL"
- busy_poll=1
- 
--if [ -z $ETH ]; then
-+if [ -z $XSKTEST_ETH ]; then
- 	setup_vethPairs
- fi
- exec_xskxceiver
- 
- ## END TESTS
- 
--if [ -z $ETH ]; then
-+if [ -z $XSKTEST_ETH ]; then
- 	cleanup_exit ${VETH0} ${VETH1}
- else
--	cleanup_iface ${ETH} ${MTU}
-+	cleanup_iface ${XSKTEST_ETH} ${MTU}
- fi
- 
- failures=0
+ 	return NETDEV_TX_OK;
 -- 
-2.34.1
+2.40.1
 
 
