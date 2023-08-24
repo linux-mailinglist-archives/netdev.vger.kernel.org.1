@@ -1,86 +1,97 @@
-Return-Path: <netdev+bounces-30436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23431787491
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 17:49:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DFE5787498
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 17:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D176E2811D9
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:49:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF4FC1C20EB7
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7123C13AE7;
-	Thu, 24 Aug 2023 15:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B5C13AFB;
+	Thu, 24 Aug 2023 15:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC0D100DC
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 15:49:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53607C433C8;
-	Thu, 24 Aug 2023 15:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E377614263;
+	Thu, 24 Aug 2023 15:50:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AE857C433C9;
+	Thu, 24 Aug 2023 15:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692892175;
-	bh=eC9VAF+7u+1jW7kBZ1cokph7iWMcoRHh6F6nR9a6IPs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OeFVez6ajm6VnzYsfFMDK7+Dd0g3b77EHss18ukapCrNQFaadu5BpgZrEx4B9rZBs
-	 OjYUjLI4pFi6D4Nvx4J1XAiJs+QHJFktjiKHEvsJVHBw8/COuZhU0StXiRii+4KIVm
-	 LyzO6nvd9lDTusMwlUplq3V18ae3ypHX2MWIMFFjjUP8Dpwctf91m7DGdjSvCVp1/F
-	 KWJKGzA1xxlKKmdjxj7sdfRIZ6C9LUfzqf7K6mt6euTJMdSk9ZFLfE8MnyUiF/ptKs
-	 LYKx6AjZmZdSacR34k7mwBASNnDQA9IM5m15OCwru4j7GNmMHhhToQVxvH9UD/smiC
-	 CR04bxr2GJliA==
-Date: Thu, 24 Aug 2023 08:49:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Michalik, Michal" <michal.michalik@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "jiri@resnulli.us"
- <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
- <arkadiusz.kubalewski@intel.com>, "jonathan.lemon@gmail.com"
- <jonathan.lemon@gmail.com>, "pabeni@redhat.com" <pabeni@redhat.com>, poros
- <poros@redhat.com>, "Olech, Milena" <milena.olech@intel.com>, mschmidt
- <mschmidt@redhat.com>, "linux-clk@vger.kernel.org"
- <linux-clk@vger.kernel.org>, "bvanassche@acm.org" <bvanassche@acm.org>
-Subject: Re: [PATCH RFC net-next v1 2/2] selftests/dpll: add DPLL system
- integration selftests
-Message-ID: <20230824084934.3b9b96ee@kernel.org>
-In-Reply-To: <CH3PR11MB84149ADA77B4A6FBD4F0C230E31DA@CH3PR11MB8414.namprd11.prod.outlook.com>
-References: <20230817152209.23868-1-michal.michalik@intel.com>
-	<20230817152209.23868-3-michal.michalik@intel.com>
-	<20230818140802.063aae1f@kernel.org>
-	<CH3PR11MB84141E0EDA588B84F7E10F71E31EA@CH3PR11MB8414.namprd11.prod.outlook.com>
-	<20230821141327.1ae35b2e@kernel.org>
-	<CH3PR11MB84149ADA77B4A6FBD4F0C230E31DA@CH3PR11MB8414.namprd11.prod.outlook.com>
+	s=k20201202; t=1692892227;
+	bh=VDf/P57UBTNUWaNujy/UboLHBn6h3liQaPxetBBlPTY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gDjEtq5SnuQXXUak3ZMINPc+egP6xJUD2yOUDHAOyKnbXOlF9rDKxXWDujoa2Elz9
+	 YCoN1K42kZTXgCtGSaYvWddHdiT0LQkOA+/M+IlpqdoZHJ38m07X90TERuXkxsVJTJ
+	 iOZaZVC/of8WRbBrWU6PxsEXNo2P9E+SJFGKTpcKdibutqZbGTcgq+Ps4NvCfnbec3
+	 gtjJ8jfY3sSJ4Rnqg37HiH+6RVXBdydHkmENrq6+yMgZIxeG0J9BSSumzG7ceVxxYy
+	 QsEtaeE9RuCOKUeD4J649nIMBXv5Key4q9Ggm05wnLA0bMKHIstUx1N74P+f+lRqhe
+	 dqsrNwcKzPuTA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B00FE33094;
+	Thu, 24 Aug 2023 15:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v3 0/7] samples/bpf: Remove unmaintained XDP sample
+ utilities
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169289222756.26245.8888733528089186580.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Aug 2023 15:50:27 +0000
+References: <20230824102255.1561885-1-toke@redhat.com>
+In-Reply-To: <20230824102255.1561885-1-toke@redhat.com>
+To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2VuIDx0b2tlQHJlZGhhdC5jb20+?=@codeaurora.org
+Cc: ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Thu, 24 Aug 2023 08:59:53 +0000 Michalik, Michal wrote:
-> >> The biggest concern for me is the requirement of selftests[2]:
-> >>   "Don't take too long;"
-> >> This approach is reloading the modules few times to check few scenarios.
-> >> Also, the DPLL subsystem is being tested against multiple requests - so
-> >> it takes some time to finish (not too long but is definitely not instant).  
-> > 
-> > I think the time constraints are more of a question of practicality.
-> > A developer should be able to run the tests as part of their workflow.
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Thu, 24 Aug 2023 12:22:43 +0200 you wrote:
+> The samples/bpf directory in the kernel tree started out as a way of showcasing
+> different aspects of BPF functionality by writing small utility programs for
+> each feature. However, as the BPF subsystem has matured, the preferred way of
+> including userspace code with a feature has become the BPF selftests, which also
+> have the benefit of being consistently run as part of the BPF CI system.
 > 
-> That makes sense - agree. So Jakub, if I understand correctly we have a few
-> different problems to solve here:
-> 1) how to deploy the module:
->  - now it's separated, we should consider e.g. netdevsim
-> 2) if we should have those tests a part of selftests
->  - I would remove it from selftests and move it to ./tools/testing
-> 3) if we should use Python at all:
->  - fast to develop and easy to maintain
->  - might be problematic to deploy (no Python, VMs, embedded, no network etc.)
->  
-> Do I understand our current outcome of the discussion correctly?
+> As a result of this shift, the utilities in samples/bpf have seen little love,
+> and have slowly bitrotted. There have been sporadic cleanup patches over the
+> years, but it's clear that the utilities are far from maintained.
+> 
+> [...]
 
-Yes, and on (3) unless someone objects let's stick to Python.
+Here is the summary with links:
+  - [bpf-next,v3,1/7] samples/bpf: Remove the xdp_monitor utility
+    https://git.kernel.org/bpf/bpf-next/c/e7c9e73d0822
+  - [bpf-next,v3,2/7] samples/bpf: Remove the xdp_redirect* utilities
+    https://git.kernel.org/bpf/bpf-next/c/91dda69b08de
+  - [bpf-next,v3,3/7] samples/bpf: Remove the xdp_rxq_info utility
+    https://git.kernel.org/bpf/bpf-next/c/0e445e115f8f
+  - [bpf-next,v3,4/7] samples/bpf: Remove the xdp1 and xdp2 utilities
+    https://git.kernel.org/bpf/bpf-next/c/eaca21d6eee9
+  - [bpf-next,v3,5/7] samples/bpf: Remove the xdp_sample_pkts utility
+    https://git.kernel.org/bpf/bpf-next/c/cced0699cbf1
+  - [bpf-next,v3,6/7] samples/bpf: Cleanup .gitignore
+    https://git.kernel.org/bpf/bpf-next/c/91b965136d53
+  - [bpf-next,v3,7/7] samples/bpf: Add note to README about the XDP utilities moved to xdp-tools
+    https://git.kernel.org/bpf/bpf-next/c/5a9fd0f778eb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
