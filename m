@@ -1,163 +1,122 @@
-Return-Path: <netdev+bounces-30396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F147871DF
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:39:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EFC678721F
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:46:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D33F281670
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:39:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57880281616
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2A215485;
-	Thu, 24 Aug 2023 14:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8864810979;
+	Thu, 24 Aug 2023 14:41:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E5D14AAA;
-	Thu, 24 Aug 2023 14:36:34 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837E01BD2;
-	Thu, 24 Aug 2023 07:36:16 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RWlwJ4S4rzrSd3;
-	Thu, 24 Aug 2023 22:34:40 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
- (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 24 Aug
- 2023 22:36:11 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <john.fastabend@gmail.com>, <jakub@cloudflare.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yonghong.song@linux.dev>, <kpsingh@kernel.org>,
-	<sdf@google.com>, <haoluo@google.com>, <jolsa@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <liujian56@huawei.com>
-Subject: [PATCH bpf-next v3 7/7] selftests/bpf: add tests for verdict skmsg to closed socket
-Date: Thu, 24 Aug 2023 22:39:59 +0800
-Message-ID: <20230824143959.1134019-8-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230824143959.1134019-1-liujian56@huawei.com>
-References: <20230824143959.1134019-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C74028911
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:41:55 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26AA81BC6
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:41:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692888113;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O77VDoQsJ5CTSmvV+GLqqEGiI0r/X9wLaybA0ZqkGBY=;
+	b=VMMY4jKagcnL71PPk8Jg+ZqMNVlV4Xk2WLprPYfKxIwXPihZ3nIy0T8u6CYdXCpCN+6iGE
+	voq7pqSDMyu4ZU3te92ZsKVG3f1ht/kLHujTs3U46d8bStvLPQnJLHRI64cw+ByvsmcWao
+	Q0ulVbTPVqUQIjybZXavVJquUDXWWsY=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-dYiorHW5Pai5XODYVA_jcw-1; Thu, 24 Aug 2023 10:41:49 -0400
+X-MC-Unique: dYiorHW5Pai5XODYVA_jcw-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5222c47ab80so1188508a12.0
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:41:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692888109; x=1693492909;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O77VDoQsJ5CTSmvV+GLqqEGiI0r/X9wLaybA0ZqkGBY=;
+        b=gmFaRihjsiMUf0gHpxSLO5S29iEzIGP5+eQ0Jxy9fjfso1i5zUYcAyp+SgGH9eVKgz
+         FctYJgc8xpk2QubZh7O3zpS8qZAIkZmbMhLaAvUtRzcUd1OGgIioFSQ4MJJv6RqwCU2i
+         eabqKVvcx8o26TO1ybMbGk0oyM3F2kECWwxJrwCogsfiNabanKbHN/5zXmzVujJnicEo
+         ToQjywymX1Uyy/hcOgEUd8Fq5pD2lhGNlplKHVuHEW+tAltuqGRVVrXTMCeuQ1oI5qKd
+         5o5eAkUW+YDmpczxyEaysB1NLBil7phezLSHPCrb8yrHHWcDa2fviaZgx2PdL27PGFjJ
+         UG1g==
+X-Gm-Message-State: AOJu0YyM8AYANLYBFMNwqLUcW0QUdUaD7kMxCKjq6w71mp7HIWS7FHKe
+	GrIHIlqzi1uVHy0xBhlfehSlpEzPX2V2i10thTalwfheOl6i7+uxzCBZYuS8F8i+mX+WqRdEe1Q
+	Xt7+DomUP9N/Cr51e
+X-Received: by 2002:a17:906:1017:b0:9a1:f96c:4bb9 with SMTP id 23-20020a170906101700b009a1f96c4bb9mr2576460ejm.6.1692888108934;
+        Thu, 24 Aug 2023 07:41:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgSovT9W/LBF474xUHvDh6FL2/3TbJZ9zlACRQ8AHV+LJZiHtTA8p94JnFu6c7K4czguS6Nw==
+X-Received: by 2002:a17:906:1017:b0:9a1:f96c:4bb9 with SMTP id 23-20020a170906101700b009a1f96c4bb9mr2576451ejm.6.1692888108639;
+        Thu, 24 Aug 2023 07:41:48 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
+        by smtp.gmail.com with ESMTPSA id y12-20020a1709064b0c00b009a1bf608ff3sm3546170eju.132.2023.08.24.07.41.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 07:41:48 -0700 (PDT)
+Message-ID: <4cbd35c1bb2dd8b0a8bea85d32e3d296fac5f715.camel@redhat.com>
+Subject: Re: Weird sparse error WAS( [PATCH net-next v2 3/3] net/sched:
+ act_blockcast: Introduce blockcast tc action
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Dan Carpenter
+	 <dan.carpenter@linaro.org>
+Cc: Simon Horman <horms@kernel.org>, Linux Kernel Network Developers
+	 <netdev@vger.kernel.org>
+Date: Thu, 24 Aug 2023 16:41:45 +0200
+In-Reply-To: <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com>
+References: <20230819163515.2266246-1-victor@mojatatu.com>
+	 <20230819163515.2266246-4-victor@mojatatu.com>
+	 <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add four tests for verdict skmsg to closed socket in sockmap_basic.c.
+On Thu, 2023-08-24 at 10:30 -0400, Jamal Hadi Salim wrote:
+> Dan/Simon,
+> Can someone help explain this error on the code below:
+>=20
+> ../net/sched/act_blockcast.c:213:9: warning: context imbalance in
+> 'tcf_blockcast_init' - different lock contexts for basic block
 
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 42 +++++++++++++++----
- 1 file changed, 34 insertions(+), 8 deletions(-)
+IIRC sparse is fooled by lock under conditionals, in this case:
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index 1fcfa30720c6..dabea0997982 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -476,9 +476,10 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 		test_sockmap_drop_prog__destroy(drop);
- }
- 
--static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is_self)
-+static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is_self,
-+				     bool target_shutdown)
- {
--	int key, sent, recvd, recv_fd;
-+	int key, sent, recvd, recv_fd, target_fd;
- 	int err, map, verdict, s, c0, c1, p0, p1;
- 	struct test_sockmap_msg_verdict *skel;
- 	char buf[256] = "0123456789";
-@@ -522,18 +523,22 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is
- 		skel->bss->skmsg_redir_flags = BPF_F_INGRESS;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = p1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 1;
-+			target_fd = c1;
- 			recv_fd = c1;
- 		}
- 	} else {
- 		skel->bss->skmsg_redir_flags = 0;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = c1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 2;
-+			target_fd = p0;
- 			recv_fd = c0;
- 		}
- 	}
-@@ -546,6 +551,19 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
- 	ASSERT_EQ(recvd, sizeof(buf), "recv_timeout(recv_fd)");
- 
-+	if (target_shutdown) {
-+		signal(SIGPIPE, SIG_IGN);
-+		close(target_fd);
-+		sent = send(p1, &buf, sizeof(buf), 0);
-+		if (is_permanent) {
-+			ASSERT_EQ(sent, -1, "xsend(p1)");
-+			ASSERT_EQ(errno, EPIPE, "xsend(p1)");
-+		} else {
-+			ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
-+		}
-+		goto out_close;
-+	}
-+
- 	sent = xsend(p1, &buf, sizeof(buf), 0);
- 	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
-@@ -600,15 +618,23 @@ void test_sockmap_basic(void)
- 	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
- 		test_sockmap_skb_verdict_fionread(false);
- 	if (test__start_subtest("sockmap msg_verdict"))
--		test_sockmap_msg_verdict(false, false, false);
-+		test_sockmap_msg_verdict(false, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress"))
--		test_sockmap_msg_verdict(true, false, false);
-+		test_sockmap_msg_verdict(true, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanent"))
--		test_sockmap_msg_verdict(false, true, false);
-+		test_sockmap_msg_verdict(false, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanent"))
--		test_sockmap_msg_verdict(true, true, false);
-+		test_sockmap_msg_verdict(true, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanent self"))
--		test_sockmap_msg_verdict(false, true, true);
-+		test_sockmap_msg_verdict(false, true, true, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanent self"))
--		test_sockmap_msg_verdict(true, true, true);
-+		test_sockmap_msg_verdict(true, true, true, false);
-+	if (test__start_subtest("sockmap msg_verdict permanent shutdown"))
-+		test_sockmap_msg_verdict(false, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress permanent shutdown"))
-+		test_sockmap_msg_verdict(true, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict shutdown"))
-+		test_sockmap_msg_verdict(false, false, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress shutdown"))
-+		test_sockmap_msg_verdict(true, false, false, true);
- }
--- 
-2.34.1
+       if (exists)
+               spin_lock_bh(&p->tcf_lock);
+
+a possible solution would be:
+
+	if (exists) {
+		spin_lock_bh(&p->tcf_lock);
+		goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto_ch);
+		spin_unlock_bh(&p->tcf_lock);
+	} else {
+		goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto_ch);
+	}
+=09
+Using some additional helpers the code could be less ugly...
+
+Cheers,
+
+Paolo
 
 
