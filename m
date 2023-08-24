@@ -1,90 +1,120 @@
-Return-Path: <netdev+bounces-30269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC05786AAA
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:50:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB80786AC2
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ADA21C20BE1
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36A1F1C20DB7
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4F7CA7A;
-	Thu, 24 Aug 2023 08:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95661CA7B;
+	Thu, 24 Aug 2023 08:53:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9AFE24544
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6ABDFC433C9;
-	Thu, 24 Aug 2023 08:50:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692867021;
-	bh=jvmeqWtT+a95MPO2TYGl+YZLchPcbm7vpnWoKkHsTr0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m7XwvjGSkwadPCyOme2Y80LtvEzWAmaGiqzGu9KuHeBfDHJdyfgOY2puZax44q/vO
-	 nLQ4INGXuMQChKuWM8U1O+MdZwInT3WTZ2b+bcx2CedOb/AtVcjiAcbK1XqxbCF52z
-	 xAFa4W5Kmqdi6Bcl19qThqdapio0h5MSS/YU/EYYO/WJDaifUbUr0s3LJGGSHxvRmc
-	 nNAM+E4DMdHW2qHBi9YsHJgb4pJDfwnrKTiQ4ehtdrScEawPPpJk5QSlmoW4cTmD+E
-	 Idn/8V+GWVx3VmYou3xnDrRha8HYUQ33X34Ksl/R7RIPmgG9ybyv53gcASkKIXzRTK
-	 snNqLSpYe1peA==
-Date: Thu, 24 Aug 2023 10:50:07 +0200
-From: Simon Horman <horms@kernel.org>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	shuah@kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net-next] selftests: bonding: delete link1_1 in the
- cleanup path
-Message-ID: <20230824085007.GE3523530@kernel.org>
-References: <20230823032640.3609934-1-shaozhengchao@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821AA24544
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 08:53:46 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F651994
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 01:53:32 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-21-1nU0YSAiNYCfvxfcnnRqsg-1; Thu, 24 Aug 2023 09:53:29 +0100
+X-MC-Unique: 1nU0YSAiNYCfvxfcnnRqsg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 24 Aug
+ 2023 09:53:25 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 24 Aug 2023 09:53:25 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Mahmoud Matook' <mahmoudmatook.mm@gmail.com>
+CC: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, "shuah@kernel.org" <shuah@kernel.org>,
+	"linux-kernel-mentees@lists.linuxfoundation.org"
+	<linux-kernel-mentees@lists.linuxfoundation.org>
+Subject: RE: [PATCH 1/2] selftests: Provide local define of min() and max()
+Thread-Topic: [PATCH 1/2] selftests: Provide local define of min() and max()
+Thread-Index: AQHZ03nFpJJs9cS/jEaiicM+CY14+6/0t4aQgAGcP4CAABL1kIAB05OAgADtwiA=
+Date: Thu, 24 Aug 2023 08:53:25 +0000
+Message-ID: <956ab0e63b8340669c31d2452830b7f3@AcuMS.aculab.com>
+References: <20230819195005.99387-1-mahmoudmatook.mm@gmail.com>
+ <20230819195005.99387-2-mahmoudmatook.mm@gmail.com>
+ <64e22df53d1e6_3580162945b@willemb.c.googlers.com.notmuch>
+ <7e8c2597c71647f38cd4672cbef53a66@AcuMS.aculab.com>
+ <CAF=yD-+6cWTiDgpsu=hUV+OvzDFRaT2ZUmtQo9qTrCB9i-+7ng@mail.gmail.com>
+ <d33fbb24119c4d09864e79ea9dfbb881@AcuMS.aculab.com>
+ <20230823193545.nrzlbsa32hm4os4k@mmaatuq-HP-Laptop-15-dy2xxx>
+In-Reply-To: <20230823193545.nrzlbsa32hm4os4k@mmaatuq-HP-Laptop-15-dy2xxx>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230823032640.3609934-1-shaozhengchao@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,PDS_BAD_THREAD_QP_64,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Aug 23, 2023 at 11:26:40AM +0800, Zhengchao Shao wrote:
-> If failed to set link1_1 to netns client, we should delete link1_1 in the
-> cleanup path. But if set link1_1 to netns client successfully, delete
-> link1_1 will report warning. So delete link1_1 in the cleanup path and
-> drop any warning message.
+From: Mahmoud Matook
+> Sent: Wednesday, August 23, 2023 8:36 PM
+...
+> I tried to use the relaxed version provided in the shared patchset link
+> besides not able to use is_constexpr(), I'm not able to use
+> __UNIQUE_ID() also. It's definded inside include/linux/compiler-gcc.h
+> and it uses another macro __PASTE() which is defined inside
+> include/linux/compiler_types.h.
+> not sure what to do next
+>
+> - bring those macros definitions to able to use the relaxed version.
+> - if the most important point for min/max defines inside selftests is to
+>   avoid multiple evaluation is the below version acceptable?
+>
+>   #define min(x, y) ({ \
+>     typeof(x) _x =3D (x); \
+>     typeof(y) _y =3D (y); \
+>     _x < _y ? _x : _y; \
+> })
+>=20
+> #define max(x, y) ({ \
+>     typeof(x) _x =3D (x); \
+>     typeof(y) _y =3D (y); \
+>     _x > _y ? _x : _y; \
+> })
 
-Hi Zhengchao Shao,
+Those are a reasonable pair.
 
-It seems unfortunate to drop all warning and error messages.
-What if the message is about something other than link1_1 not existing?
+If you want a signed-ness check the:
+=09_Static_assert(is_signed_type(typeof(a)) =3D=3D is_signed_type(typeof(b)=
+), "min/max signednesss")
+check should just drop into the above.
 
-Would it be practical to check if link1_1 exists,
-say by looking in sysfs, before trying to delete it?
+=09David
 
-> Reported-by: Hangbin Liu <liuhangbin@gmail.com>
-> Closes: https://lore.kernel.org/all/ZNyJx1HtXaUzOkNA@Laptop-X1/
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  .../drivers/net/bonding/bond-arp-interval-causes-panic.sh        | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-> index 7b2d421f09cf..2b3c678c5205 100755
-> --- a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-> +++ b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-> @@ -11,6 +11,7 @@ finish()
->  {
->  	ip netns delete server || true
->  	ip netns delete client || true
-> +	ip link del link1_1 >/dev/null 2>&1
->  }
->  
->  trap finish EXIT
-> -- 
-> 2.34.1
-> 
-> 
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
