@@ -1,108 +1,188 @@
-Return-Path: <netdev+bounces-30288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BA31786CA7
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E14786CAE
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37E701C20DC6
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:18:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91BEB1C20E1C
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9D9DDCA;
-	Thu, 24 Aug 2023 10:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68979DF62;
+	Thu, 24 Aug 2023 10:23:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8DADDB9
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 10:18:39 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D909198B
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:18:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692872318; x=1724408318;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=poAihbucEHEEeKzfGpTvQgm87KOzaDkiK8jW22mubMY=;
-  b=SE66mdw5Kf/lG36WuGoEB0k4Hc6Zl295TBaieH3PCKGLS5q4SbecW+U2
-   KQ83igixsQvOk7mT04cfsp429YNGpzN3wYoElAFQsrUb+kbEP/SC6ZkCh
-   AxpDspTc9oyMpixwn7CE5bMDP8PBCCq447NxsGkJNZHAA7Coe5hoLC8NY
-   nCb2MVcjY/Ld9sTJDyFr4dm+7NIBz+e+IMfvk7iEPjY8ETEqNnZuqXGoR
-   bvVIViypKOKCdKmomXqJOFshbX1kuBx1r7yHaMqY0dwwuAf1aQwNjjdd1
-   xnHeBcBZTAwAK/yIFlu39xNcwRSVfrGmVvQ60aYdBHoZbbpcOD4sxt71d
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="371808037"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="371808037"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2023 03:18:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="730560612"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="730560612"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 24 Aug 2023 03:18:35 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qZ7Q8-0001wK-0j;
-	Thu, 24 Aug 2023 10:18:33 +0000
-Date: Thu, 24 Aug 2023 18:18:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paul Greenwalt <paul.greenwalt@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, andrew@lunn.ch, aelior@marvell.com,
-	manishc@marvell.com, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 2/9] ethtool: Add forced
- speed to supported link modes maps
-Message-ID: <202308241737.GzJ3EfdT-lkp@intel.com>
-References: <20230819093941.15163-1-paul.greenwalt@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C155DF5B
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 10:23:07 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F60199D
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:23:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1692872581;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=T6b4rpOjVfEQK0kxx9ILs6ZtJF+x9z2oq0vowMV7tZk=;
+	b=U51GPtSoM2Y32JBiX/Cr9EbTExAh3VWjlzd2Bo6Y2G8VXCmGRkXSVo1LY4AcHPjUiZI6LT
+	3fNU5CoSc9aW2m6GKk7tMNExXwx6TbRKJ1v1Koisb+WIrFxFMSLF9Dl4RixXXVXtIP8zqq
+	/U8zuhHh3/vY/rrGwGnWCsGB+RkanKc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-408-aGrY6b5eNSmUn32jvfRl5g-1; Thu, 24 Aug 2023 06:22:59 -0400
+X-MC-Unique: aGrY6b5eNSmUn32jvfRl5g-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-99bcf6ae8e1so496770066b.0
+        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:22:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692872578; x=1693477378;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T6b4rpOjVfEQK0kxx9ILs6ZtJF+x9z2oq0vowMV7tZk=;
+        b=J+bDybNy99hXdw3I//FVFDa0DeprbNgsf68WGxro8dkv6G1+xeEirb+zjhffOHyc1v
+         HujHKN72LLn7RimrzX5gCTnxdxDJTxZXSAvHqs+CVt7yY2h/ETwm8HSnCJn6N5W7WPWu
+         tsUigIp1U2tn7FoaV/n9swEL/GOgVAop1s9CG92dycrc/S+XHSPdS3nO/dqL2RSf4hdk
+         ZHGuwcO7UmfyGxIu1N4slyb5l1srzzRrbOOVjzMFunbOAQgxS1PuHRxNuq4Mx4EEj0Rt
+         YdcpTxOUQk6hB9vB93fJcltsAmCu0a5shefEJwv0U3Ae81e1cvvQJCHDaCSUubiA90bH
+         tkGw==
+X-Gm-Message-State: AOJu0YylpscIl8sBesy0fAhUXrahHwUvbgBcgHUqrZpAS64GfsttGUCL
+	37Qt2ogdCZyRbiHkSXmOSv4N52BWNfHx8DPwnNXspS645wn2Q4DjjJmSqLhVUjCtcpJTlg0SrpF
+	WaXbt6MuFbPaZK3pVju1mnPtF
+X-Received: by 2002:a17:906:9be8:b0:99d:6ca6:7a8c with SMTP id de40-20020a1709069be800b0099d6ca67a8cmr12054306ejc.63.1692872578288;
+        Thu, 24 Aug 2023 03:22:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyYJqIJBLFGi9gN/Io1cNAHYXbpxYAK8AMKDXSFnaJIGihwtZeaJYwMgaHOnO+zJttTwZgDg==
+X-Received: by 2002:a17:906:9be8:b0:99d:6ca6:7a8c with SMTP id de40-20020a1709069be800b0099d6ca67a8cmr12054285ejc.63.1692872577855;
+        Thu, 24 Aug 2023 03:22:57 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id bv24-20020a170906b1d800b0099b8234a9fesm10688853ejb.1.2023.08.24.03.22.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 03:22:57 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id F1191D3D099; Thu, 24 Aug 2023 12:22:56 +0200 (CEST)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf-next v3 0/7] samples/bpf: Remove unmaintained XDP sample utilities
+Date: Thu, 24 Aug 2023 12:22:43 +0200
+Message-ID: <20230824102255.1561885-1-toke@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230819093941.15163-1-paul.greenwalt@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Paul,
+The samples/bpf directory in the kernel tree started out as a way of showcasing
+different aspects of BPF functionality by writing small utility programs for
+each feature. However, as the BPF subsystem has matured, the preferred way of
+including userspace code with a feature has become the BPF selftests, which also
+have the benefit of being consistently run as part of the BPF CI system.
 
-kernel test robot noticed the following build warnings:
+As a result of this shift, the utilities in samples/bpf have seen little love,
+and have slowly bitrotted. There have been sporadic cleanup patches over the
+years, but it's clear that the utilities are far from maintained.
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on next-20230824]
-[cannot apply to tnguy-next-queue/dev-queue tnguy-net-queue/dev-queue net/main linus/master horms-ipvs/master v6.5-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+For XDP in particular, some of the utilities have been used as benchmarking aids
+when implementing new kernel features, which seems to be the main reason they
+have stuck around; any updates the utilities have seen have been targeted at
+this use case. However, as the BPF subsystem as a whole has moved on, it has
+become increasingly difficult to incorporate new features into these utilities
+because they predate most of the modern BPF features (such as kfuncs and BTF).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Paul-Greenwalt/ice-Add-E830-device-IDs-MAC-type-and-registers/20230821-095200
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230819093941.15163-1-paul.greenwalt%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-next v2 2/9] ethtool: Add forced speed to supported link modes maps
-config: i386-randconfig-063-20230824 (https://download.01.org/0day-ci/archive/20230824/202308241737.GzJ3EfdT-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230824/202308241737.GzJ3EfdT-lkp@intel.com/reproduce)
+Rather than try to update these utilities and keep maintaining them in the
+kernel tree, we have ported the useful features of the utilities to the
+xdp-tools package. In the porting process we also updated the utilities to take
+advantage of modern BPF features, integrated them with libxdp, and polished the
+user interface.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308241737.GzJ3EfdT-lkp@intel.com/
+As these utilities are standalone tools, maintaining them out of tree is
+simpler, and we plan to keep maintaining them in the xdp-tools repo. To direct
+users of these utilities to the right place, this series removes the utilities
+from samples/bpf, leaving in place only a couple of utilities whose
+functionality have not yet been ported to xdp-tools.
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/ethernet/qlogic/qede/qede_ethtool.c:204:33: sparse: sparse: symbol 'qede_forced_speed_maps' was not declared. Should it be static?
+The xdp-tools repository is located on Github at the following URL:
+
+https://github.com/xdp-project/xdp-tools
+
+The commits in the series removes one utility each, explaining how the
+equivalent functionality can be obtained with xdp-tools.
+
+v2:
+- Add equivalent xdp-tools commands for each removed utility
+v3:
+- Add link to xdp-tools in the README
+
+Toke Høiland-Jørgensen (7):
+  samples/bpf: Remove the xdp_monitor utility
+  samples/bpf: Remove the xdp_redirect* utilities
+  samples/bpf: Remove the xdp_rxq_info utility
+  samples/bpf: Remove the xdp1 and xdp2 utilities
+  samples/bpf: Remove the xdp_sample_pkts utility
+  samples/bpf: Cleanup .gitignore
+  samples/bpf: Add note to README about the XDP utilities moved to
+    xdp-tools
+
+ samples/bpf/.gitignore                    |  12 -
+ samples/bpf/Makefile                      |  48 +-
+ samples/bpf/README.rst                    |   6 +
+ samples/bpf/xdp1_kern.c                   | 100 ----
+ samples/bpf/xdp1_user.c                   | 166 ------
+ samples/bpf/xdp2_kern.c                   | 125 -----
+ samples/bpf/xdp_monitor.bpf.c             |   8 -
+ samples/bpf/xdp_monitor_user.c            | 118 -----
+ samples/bpf/xdp_redirect.bpf.c            |  49 --
+ samples/bpf/xdp_redirect_cpu.bpf.c        | 539 -------------------
+ samples/bpf/xdp_redirect_cpu_user.c       | 559 --------------------
+ samples/bpf/xdp_redirect_map.bpf.c        |  97 ----
+ samples/bpf/xdp_redirect_map_multi.bpf.c  |  77 ---
+ samples/bpf/xdp_redirect_map_multi_user.c | 232 --------
+ samples/bpf/xdp_redirect_map_user.c       | 228 --------
+ samples/bpf/xdp_redirect_user.c           | 172 ------
+ samples/bpf/xdp_rxq_info_kern.c           | 140 -----
+ samples/bpf/xdp_rxq_info_user.c           | 614 ----------------------
+ samples/bpf/xdp_sample_pkts_kern.c        |  57 --
+ samples/bpf/xdp_sample_pkts_user.c        | 196 -------
+ 20 files changed, 7 insertions(+), 3536 deletions(-)
+ delete mode 100644 samples/bpf/xdp1_kern.c
+ delete mode 100644 samples/bpf/xdp1_user.c
+ delete mode 100644 samples/bpf/xdp2_kern.c
+ delete mode 100644 samples/bpf/xdp_monitor.bpf.c
+ delete mode 100644 samples/bpf/xdp_monitor_user.c
+ delete mode 100644 samples/bpf/xdp_redirect.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_cpu.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_cpu_user.c
+ delete mode 100644 samples/bpf/xdp_redirect_map.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_map_multi.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_map_multi_user.c
+ delete mode 100644 samples/bpf/xdp_redirect_map_user.c
+ delete mode 100644 samples/bpf/xdp_redirect_user.c
+ delete mode 100644 samples/bpf/xdp_rxq_info_kern.c
+ delete mode 100644 samples/bpf/xdp_rxq_info_user.c
+ delete mode 100644 samples/bpf/xdp_sample_pkts_kern.c
+ delete mode 100644 samples/bpf/xdp_sample_pkts_user.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
 
