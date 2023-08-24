@@ -1,99 +1,91 @@
-Return-Path: <netdev+bounces-30195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC0FD786538
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 04:19:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD9A5786559
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 04:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 484182813C5
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 02:19:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E0528140B
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 02:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5258917F3;
-	Thu, 24 Aug 2023 02:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2345193;
+	Thu, 24 Aug 2023 02:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9297F
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 02:19:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC903C433C7;
-	Thu, 24 Aug 2023 02:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7964A928
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 02:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 163D0C433CA;
+	Thu, 24 Aug 2023 02:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692843570;
-	bh=3EVcN2vYcbG04uVwv5dzwC83DowUUe2Rac9gz9OGIZw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WDuuOCxU1XGq4hIodAG3sSkCb8yhHWr9RZ0peSgOO8Sh4zPyEJ3zbs5Ew/y+X7g4W
-	 EWQH4yIDiNVUWTiVONeLeeUjFKMIxSy5cAqb1dsZ4SbvEbfLdU6ZigN6YmsU8lDC08
-	 ksC3/JiJ2cpE38+Z7jmVoqg6Ov82Lr9AfA6lFRxru2/ibv6hVHrZLprpz96bKNWUG7
-	 /LiaXybBwXWdBJdrbOwY+zMMJvJQ/qD01zUxk7aQpxgWlnTt9gp4qhkIN1CAwC/yuP
-	 0jTWCLOqKbJhiXiiga4hNdSKXTv09AeypcxpqQJJd77GXcIKfLyXKGx5nWfjxpb9Zx
-	 2433IZsEP6nhg==
-Date: Wed, 23 Aug 2023 19:19:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, Muhammad Husaini Zulkifli
- <muhammad.husaini.zulkifli@intel.com>, sasha.neftin@intel.com,
- horms@kernel.org, bcreeley@amd.com, Naama Meir
- <naamax.meir@linux.intel.com>
-Subject: Re: [PATCH net v3 2/2] igc: Modify the tx-usecs coalesce setting
-Message-ID: <20230823191928.1a32aed7@kernel.org>
-In-Reply-To: <20230822221620.2988753-3-anthony.l.nguyen@intel.com>
-References: <20230822221620.2988753-1-anthony.l.nguyen@intel.com>
-	<20230822221620.2988753-3-anthony.l.nguyen@intel.com>
+	s=k20201202; t=1692844224;
+	bh=9Xb37OSDJN57bJvKF/3cFqqWU91ZHJ/cqmbZ1guvma4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FC/V84pP4Kluj8GF5Bg5IHVBAJWd1OJdu1XutdSouErp7c4EsaiT5lBnMFBkivf5f
+	 /ewPNVv9XoGBEzn4ZwrrXYesNAB9oY00GoKL2UohT+TDrY49CtDl/sK3TkNb15zibx
+	 +qOxyyVE0kGU1MPXBZgWXX2B1cBNZXwh390fqAF1lmS6Pqc3iK+LoYCMp1xIuHeehI
+	 ynCVw2Knv7xDCTxzma72q9ydJEsqRWGvtV+aYx7av2GuTr06HmaMbo867mgP7rj1tP
+	 v1dsPn1JpgHJYEfbx5HIdgOBCDd47P9a977LLAN2ubgBygoONPWrsDQqHnohivzCJ1
+	 PHuVEjRp3MxiQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB4A7E4EAF6;
+	Thu, 24 Aug 2023 02:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/4] net: ethernet: mtk_eth_soc: improve support
+ for MT7988
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169284422395.2546.12287101492552231894.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Aug 2023 02:30:23 +0000
+References: <cover.1692721443.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1692721443.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: nbd@nbd.name, john@phrozen.org, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-On Tue, 22 Aug 2023 15:16:20 -0700 Tony Nguyen wrote:
-> root@P12DYHUSAINI:~# ethtool -C enp170s0 tx-usecs 10
-> netlink error: Invalid argument
+Hello:
 
-Why was it returning an error previously? It's not clear from just 
-this patch.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> -	/* convert to rate of irq's per second */
-> -	if (ec->rx_coalesce_usecs && ec->rx_coalesce_usecs <= 3)
-> -		adapter->rx_itr_setting = ec->rx_coalesce_usecs;
-> -	else
-> -		adapter->rx_itr_setting = ec->rx_coalesce_usecs << 2;
-> +	if (adapter->flags & IGC_FLAG_QUEUE_PAIRS) {
-> +		u32 old_tx_itr, old_rx_itr;
-> +
-> +		/* This is to get back the original value before byte shifting */
-> +		old_tx_itr = (adapter->tx_itr_setting <= 3) ?
-> +			      adapter->tx_itr_setting : adapter->tx_itr_setting >> 2;
-> +
-> +		old_rx_itr = (adapter->rx_itr_setting <= 3) ?
-> +			      adapter->rx_itr_setting : adapter->rx_itr_setting >> 2;
-> +
-> +		/* convert to rate of irq's per second */
-> +		if (old_tx_itr != ec->tx_coalesce_usecs) {
-> +			adapter->tx_itr_setting =
-> +				igc_ethtool_coalesce_to_itr_setting(ec->tx_coalesce_usecs);
-> +			adapter->rx_itr_setting = adapter->tx_itr_setting;
-> +		} else if (old_rx_itr != ec->rx_coalesce_usecs) {
-> +			adapter->rx_itr_setting =
-> +				igc_ethtool_coalesce_to_itr_setting(ec->rx_coalesce_usecs);
-> +			adapter->tx_itr_setting = adapter->rx_itr_setting;
-> +		}
+On Tue, 22 Aug 2023 17:30:56 +0100 you wrote:
+> This series fixes and completes commit 445eb6448ed3b ("net: ethernet:
+> mtk_eth_soc: add basic support for MT7988 SoC") and also adds support
+> for using the in-SoC SRAM to previous MT7986 and MT7981 SoCs.
+> 
+> Changes since v2:
+>  * fold changes to commit they were supposed to go into
+> 
+> [...]
 
-I'm not sure about this fix. Systems which try to converge
-configuration like chef will keep issuing: 
+Here is the summary with links:
+  - [net-next,v3,1/4] net: ethernet: mtk_eth_soc: fix register definitions for MT7988
+    https://git.kernel.org/netdev/net-next/c/cfb5677de5ba
+  - [net-next,v3,2/4] net: ethernet: mtk_eth_soc: add reset bits for MT7988
+    https://git.kernel.org/netdev/net-next/c/88c1e6efb7a5
+  - [net-next,v3,3/4] net: ethernet: mtk_eth_soc: add support for in-SoC SRAM
+    https://git.kernel.org/netdev/net-next/c/ebb1e4f9cf38
+  - [net-next,v3,4/4] net: ethernet: mtk_eth_soc: support 36-bit DMA addressing on MT7988
+    https://git.kernel.org/netdev/net-next/c/2d75891ebc09
 
-ethtool -C enp170s0 tx-usecs 20 rx-usecs 10
-
-and AFAICT the values will flip back and froth between 10 and 20, 
-and never stabilize. Returning an error for unsupported config
-sounds right to me. This function takes extack, you can tell 
-the user what the problem is.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
