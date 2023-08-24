@@ -1,109 +1,109 @@
-Return-Path: <netdev+bounces-30298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F272786CD6
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:31:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF84786CE5
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 12:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC1412814D3
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:31:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EADEE281549
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 10:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD546134CC;
-	Thu, 24 Aug 2023 10:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43E25689;
+	Thu, 24 Aug 2023 10:39:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5CE156FF
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 10:31:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C18199B
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:31:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692873069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gpjf/YZm7tfcPZCca7L2sv1Wv8PZiaW/olle5+rMMQE=;
-	b=XpVr2hWyoohuQc1Na3o9jd+9hf9exdi7gnvrubFyokNzLN3hYCKYmA1gUvzzFYtmmoHqoJ
-	7BwVQBTGdhPrYIpxGCtDKhhdSp7I3W3Y5s4m0mI787wpKZcMyDE0nD+XTfo/dmNQdyVihr
-	WMdTbaXi+H8URT/E9oln5G7w9fNt67c=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-_EC4lqqYMcCzdFQRoRlu9Q-1; Thu, 24 Aug 2023 06:31:08 -0400
-X-MC-Unique: _EC4lqqYMcCzdFQRoRlu9Q-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40179a353aeso908455e9.0
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:31:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692873067; x=1693477867;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gpjf/YZm7tfcPZCca7L2sv1Wv8PZiaW/olle5+rMMQE=;
-        b=DscUgAiBNd0Ro/qseP2BdRy1H/xMKk0xpOwR6YdxLqQfGFwrjc5GYUsj8s/wLcJLwP
-         eiRp2QGDiFMB8JBNgAoW9UNNMsa4u52l0s1li860lJr42GbKqu73ls1EZx3KjBwmh0Cn
-         zHzjiivezlkFP61RwfnKqIctJ0Dg/yWhhesNkGZfaueEOXbURSqcE200urxgLIvKASrS
-         h6zLPRac3AL5iEHAXNPhunehchen9KoiiSLm9AJiIWm5+Af/LpIJKnHI9p46bLRjM+r2
-         ZlQoLQxJjU9tldKP6Zkw9Nz3Ssu7HnYfE6HrIlYjX56hZOivW/3snNWPkGHHCj4ezHv2
-         e3jQ==
-X-Gm-Message-State: AOJu0YwT6OpsFz4buBWg027mV5XoNHMZeK54IUiw7friHdhqQ8WBa04Q
-	K3rESQjoFSP91ewLfnon0wuCoi80NIzOUrK/v7uOt4yiCkQyOckTvECUavoU0+3DzjKe3v5F2Rj
-	0HZJ6ra9jnWKj7y7igI9YNZPI
-X-Received: by 2002:a05:600c:5185:b0:3fe:d46a:ef4b with SMTP id fa5-20020a05600c518500b003fed46aef4bmr11818116wmb.1.1692873066833;
-        Thu, 24 Aug 2023 03:31:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFZtwK14eR28M+W3iJ2f6nXo7erBL0kYURufI72Y2JY32Cs5kl5Iq/OMSPYFBH31/x9KQNrUw==
-X-Received: by 2002:a05:600c:5185:b0:3fe:d46a:ef4b with SMTP id fa5-20020a05600c518500b003fed46aef4bmr11818104wmb.1.1692873066484;
-        Thu, 24 Aug 2023 03:31:06 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
-        by smtp.gmail.com with ESMTPSA id 14-20020a05600c020e00b003fed78b03b4sm2233452wmi.20.2023.08.24.03.31.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 03:31:06 -0700 (PDT)
-Message-ID: <c25141405ba52eb0eee96317407376ef68802198.camel@redhat.com>
-Subject: Re: [PATCH net-next] selftests: bonding: delete link1_1 in the
- cleanup path
-From: Paolo Abeni <pabeni@redhat.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, shuah@kernel.org
-Cc: j.vosburgh@gmail.com, andy@greyhouse.net, weiyongjun1@huawei.com, 
-	yuehaibing@huawei.com
-Date: Thu, 24 Aug 2023 12:31:04 +0200
-In-Reply-To: <20230823032640.3609934-1-shaozhengchao@huawei.com>
-References: <20230823032640.3609934-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B7B24550
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 10:39:23 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA1ED19BA
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 03:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bd9ObF5yMryn1R9YSIxTJTCgwM9L1it8cN+fWSWpN5M=; b=psXyNZvI5Np55L+RpucSDCB+HA
+	cgUdNAjvw/3EKhGEdZSbRqkutatnhXtVvKqGMReYnbfuQeZsx5tBtXYXA/+oEYhtG7eJWDt0Re7C7
+	IRy2aoTBqVrgB9RuXM4Xrz4fXLDZ6Ot4qLw8RxRUr0jY+D5guMY4J7a5xPC0OG/nfnCQdBxWCQ+OH
+	Ry8Jvp4GLcRb7qO0EKqbPp9Rw0JUI3VTbBOfWi0+FxI1R0tDusORiWO+nMrb4ftG8fzki9kgEhKHh
+	OCt6fcydMeUzij2zGPKiKkx+Lq0/AmgcUQrO+FGZdwKs433zeZj23hKDZV3SmXvFzl3aBA17sFjYT
+	F4n68GSA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45678)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qZ7jq-00040J-06;
+	Thu, 24 Aug 2023 11:38:54 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qZ7jl-0007mV-UL; Thu, 24 Aug 2023 11:38:49 +0100
+Date: Thu, 24 Aug 2023 11:38:49 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Feiyang Chen <chenfeiyang@loongson.cn>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 5/9] net: stmmac: use phylink_limit_mac_speed()
+Message-ID: <ZOczOWMLJnzAdwV1@shell.armlinux.org.uk>
+References: <ZOUDRkBXzY884SJ1@shell.armlinux.org.uk>
+ <E1qYWSO-005fXx-6w@rmk-PC.armlinux.org.uk>
+ <20230823193457.35052bf8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230823193457.35052bf8@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-08-23 at 11:26 +0800, Zhengchao Shao wrote:
-> If failed to set link1_1 to netns client, we should delete link1_1 in the
-> cleanup path. But if set link1_1 to netns client successfully, delete
-> link1_1 will report warning. So delete link1_1 in the cleanup path and
-> drop any warning message.
+On Wed, Aug 23, 2023 at 07:34:57PM -0700, Jakub Kicinski wrote:
+> On Tue, 22 Aug 2023 19:50:24 +0100 Russell King (Oracle) wrote:
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index b51cf92392d2..0d7354955d62 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -440,7 +440,7 @@ void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed)
+> >  
+> >  	for (i = 0; i < ARRAY_SIZE(phylink_caps_params) &&
+> >  		    phylink_caps_params[i].speed > max_speed; i++)
+> > -		config->mac_speed &= ~phylink_caps_params.mask;
+> > +		config->mac_capabilities &= ~phylink_caps_params[i].mask;
+> >  }
+> >  EXPORT_SYMBOL_GPL(phylink_limit_mac_speed);
+> 
+> This chunk belongs to patch 1?
 
-I think the same could happen also for the link1_2 device.
+Thanks for spotting that, you're absolutely right. I wonder why I didn't
+merge that fix into the correct patch...
 
-It would probably be safer creating directly the devices in the target
-namespaces, with the 'final' name
+In any case, I added a 10th patch to the patch set which converts the
+half-duplex capabilities to be positive logic. I'll resend it later
+today.
 
-ip link add dev eth0 netns client type veth peer name eth0 netns server
+I also have a raft of other stmmac cleanup patches which are steadily
+growing at the moment!
 
-Cheers,
-
-Paolo
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
