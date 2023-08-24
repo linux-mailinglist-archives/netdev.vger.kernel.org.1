@@ -1,125 +1,200 @@
-Return-Path: <netdev+bounces-30419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0DA17872C8
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 16:57:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F19187873C7
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 17:15:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65FAE2815F9
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 14:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DDFD281591
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FA311197;
-	Thu, 24 Aug 2023 14:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54501125B1;
+	Thu, 24 Aug 2023 15:15:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5855F11CAE
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 14:57:34 +0000 (UTC)
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D8619B2
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:57:31 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-58d70c441d5so73511027b3.2
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 07:57:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692889051; x=1693493851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AFHmAqEtcB5SKJFZKlXSyxDA5+Wgl4kTCcp+DD4uPDY=;
-        b=xSdOEaHVgj5+vr0C1SnqQ31p+4cmWOK/vd17KCabm3eszYOSF6cv14HjHKfYKcAxtU
-         wTpEgMGZXhnEtmtYlcrw/IOk/d6deaa5fy+BRrLOVPs65bAP87sCwlXeWWwLGOjTLJYr
-         UZLkV5vb7ZDll5nP+DNa0liYIUVWYMow38dbBguJ/vkF4XWKUsasCJqznWWXbXZPExmf
-         6HKesoAquxT91f3QZFgw7FThxMIqo1FzxINfSMTO/7GqiLMoiy0lRoy4lW6UDS1F3Dsn
-         BZee5HbPQi2FwqeEq+jw1N3X3pdolmSmj/obnaSFleZIBMe7K+ewT2xtFf7o1EPbxk37
-         l+OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692889051; x=1693493851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AFHmAqEtcB5SKJFZKlXSyxDA5+Wgl4kTCcp+DD4uPDY=;
-        b=fl+5nRBo9POvNir0YKl2a7kcYn4inZnJKonsifBvefBIOUy0JTF5nb9NnJc4fDWGrd
-         lyG2HlSRpFQNWntNyzm1OUmp26wjtds6hT/x0y4DNT7RHn7nfQ+B4wj40jHuyRJG6uT0
-         sZ0ZmG9TgaJVmrQv03NH14w+OqNPKllPtKQP6zgnWG/XTORPoLsFJnwG6/Mn9E2Q1jUJ
-         N4c9prws/b5g+xzmmw+ppzrj0r3JdGmcCgIXeT7bnhQjzQUDL7iRkq17bE1nbmcajFv/
-         t9fhy6/LkHcTIlxY8ykYg6KrY+FfWXJBbtdjBt+Q5WBpa/VBvgElWdzu1k7Xg/PwnIED
-         IuhQ==
-X-Gm-Message-State: AOJu0Yw3HaIjyN8rHhxaCuX/5uoWyM8AX6aDggW+2MA9dD7uvTG7+oMj
-	GYxPsF+TeJ/y375KIrMkkfiGKddNjH6hCoumMtpMHQ==
-X-Google-Smtp-Source: AGHT+IEAWyvj3lNN5ewLBwwOaVYqKevHoJl4afs4RvLOaLwWKEt6oQNescVw+KzwTJO4az8fgF5d9bOHkFzfuwp+BMw=
-X-Received: by 2002:a0d:f446:0:b0:56d:9e2:7d9e with SMTP id
- d67-20020a0df446000000b0056d09e27d9emr17587282ywf.21.1692889050931; Thu, 24
- Aug 2023 07:57:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400F411CAE
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 15:15:06 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7052199D;
+	Thu, 24 Aug 2023 08:15:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692890104; x=1724426104;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=j3s15fzbY21jU7a4dXxI63BSMfPORjJ31zoaNT3reHQ=;
+  b=kTo9V4K29VBikhgon2i3l+sW6YS176ojdecd0rK0vcvwPtRXHvZfzE1x
+   WHPXzPsGKowwGKi7xRRZ3l3ghOR3a5MUeLaDHrvnvaIsRKI5Md2dMGwu8
+   xYQ9MErdqr0fkZHDbSDZp6BIEVJxCrjQNPQ5lckx4liiqMZB1l9HSW3Qr
+   DhugodGlclgWUkhlLg4YpLP7k7KUJzDX/QFKUo+PVQZXZxe3oW4Iuc6Cr
+   oYI6QXL3tWyucJYk8/m2WTLK1zKSNSrI10CCY34IjJh1CVtC6sDbz0adZ
+   vhgirUpZQVz/xT5orEHoi7WllG5V7YubCBA+CmJVP0OTDPg70mEmfYBkE
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="374433212"
+X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
+   d="scan'208";a="374433212"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2023 08:07:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="880838364"
+Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 24 Aug 2023 08:06:58 -0700
+Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qZBv5-0002me-0p;
+	Thu, 24 Aug 2023 15:06:49 +0000
+Date: Thu, 24 Aug 2023 23:06:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jisheng Zhang <jszhang@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next 3/3] net: stmmac: add glue layer for T-HEAD
+ TH1520 SoC
+Message-ID: <202308242250.G39QxvdR-lkp@intel.com>
+References: <20230820120213.2054-4-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230819163515.2266246-1-victor@mojatatu.com> <20230819163515.2266246-4-victor@mojatatu.com>
- <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com> <4cbd35c1bb2dd8b0a8bea85d32e3d296fac5f715.camel@redhat.com>
-In-Reply-To: <4cbd35c1bb2dd8b0a8bea85d32e3d296fac5f715.camel@redhat.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 24 Aug 2023 10:57:19 -0400
-Message-ID: <CAM0EoMnO6m06r9vngnkCdOsMc8HYKh6i5xsWTfeHs+O=zBPFiQ@mail.gmail.com>
-Subject: Re: Weird sparse error WAS( [PATCH net-next v2 3/3] net/sched:
- act_blockcast: Introduce blockcast tc action
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <horms@kernel.org>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230820120213.2054-4-jszhang@kernel.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 24, 2023 at 10:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Thu, 2023-08-24 at 10:30 -0400, Jamal Hadi Salim wrote:
-> > Dan/Simon,
-> > Can someone help explain this error on the code below:
-> >
-> > ../net/sched/act_blockcast.c:213:9: warning: context imbalance in
-> > 'tcf_blockcast_init' - different lock contexts for basic block
->
-> IIRC sparse is fooled by lock under conditionals, in this case:
->
->        if (exists)
->                spin_lock_bh(&p->tcf_lock);
->
-> a possible solution would be:
->
->         if (exists) {
->                 spin_lock_bh(&p->tcf_lock);
->                 goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto=
-_ch);
->                 spin_unlock_bh(&p->tcf_lock);
->         } else {
->                 goto_ch =3D tcf_action_set_ctrlact(*a, parm->action, goto=
-_ch);
->         }
->
+Hi Jisheng,
 
-aha;->
-Thanks - this should fix it. We will fix it to follow this pattern.
+kernel test robot noticed the following build warnings:
 
-> Using some additional helpers the code could be less ugly...
+[auto build test WARNING on net-next/main]
 
-I think only one other action(ife) has this pattern - we should be
-able to fix that one instead.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jisheng-Zhang/dt-bindings-net-snps-dwmac-allow-dwmac-3-70a-to-set-pbl-properties/20230821-114902
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230820120213.2054-4-jszhang%40kernel.org
+patch subject: [PATCH net-next 3/3] net: stmmac: add glue layer for T-HEAD TH1520 SoC
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20230824/202308242250.G39QxvdR-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230824/202308242250.G39QxvdR-lkp@intel.com/reproduce)
 
-cheers,
-jamal
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308242250.G39QxvdR-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:151:3: warning: variable 'div' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
+     151 |                 default:
+         |                 ^~~~~~~
+   drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:156:50: note: uninitialized use occurs here
+     156 |                                    GMAC_PLLCLK_DIV_MASK, GMAC_PLLCLK_DIV_NUM(div));
+         |                                                                              ^~~
+   drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:40:68: note: expanded from macro 'GMAC_PLLCLK_DIV_NUM'
+      40 | #define  GMAC_PLLCLK_DIV_NUM(x)         FIELD_PREP(GMAC_PLLCLK_DIV_MASK, (x))
+         |                                                                           ^
+   include/linux/bitfield.h:114:33: note: expanded from macro 'FIELD_PREP'
+     114 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
+         |                                               ^~~~
+   include/linux/bitfield.h:68:41: note: expanded from macro '__BF_FIELD_CHECK'
+      68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
+         |                                                       ^~~~
+   note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:397:22: note: expanded from macro 'compiletime_assert'
+     397 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:385:23: note: expanded from macro '_compiletime_assert'
+     385 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:377:9: note: expanded from macro '__compiletime_assert'
+     377 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:121:9: note: initialize the variable 'div' to silence this warning
+     121 |         u32 div;
+         |                ^
+         |                 = 0
+   1 warning generated.
 
 
-> Cheers,
->
-> Paolo
->
+vim +/div +151 drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+
+   115	
+   116	static void thead_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mode)
+   117	{
+   118		struct thead_dwmac *dwmac = priv;
+   119		struct plat_stmmacenet_data *plat = dwmac->plat;
+   120		unsigned long rate;
+   121		u32 div;
+   122	
+   123		switch (plat->interface) {
+   124		/* For MII, rxc/txc is provided by phy */
+   125		case PHY_INTERFACE_MODE_MII:
+   126			return;
+   127	
+   128		case PHY_INTERFACE_MODE_RGMII:
+   129		case PHY_INTERFACE_MODE_RGMII_ID:
+   130		case PHY_INTERFACE_MODE_RGMII_RXID:
+   131		case PHY_INTERFACE_MODE_RGMII_TXID:
+   132			rate = clk_get_rate(plat->stmmac_clk);
+   133			if (!rate || rate % GMAC_GMII_RGMII_RATE != 0 ||
+   134			    rate % GMAC_MII_RATE != 0) {
+   135				dev_err(dwmac->dev, "invalid gmac rate %ld\n", rate);
+   136				return;
+   137			}
+   138	
+   139			regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV, GMAC_PLLCLK_DIV_EN, 0);
+   140	
+   141			switch (speed) {
+   142			case SPEED_1000:
+   143				div = rate / GMAC_GMII_RGMII_RATE;
+   144				break;
+   145			case SPEED_100:
+   146				div = rate / GMAC_MII_RATE;
+   147				break;
+   148			case SPEED_10:
+   149				div = rate * 10 / GMAC_MII_RATE;
+   150				break;
+ > 151			default:
+   152				dev_err(dwmac->dev, "invalid speed %u\n", speed);
+   153				break;
+   154			}
+   155			regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV,
+   156					   GMAC_PLLCLK_DIV_MASK, GMAC_PLLCLK_DIV_NUM(div));
+   157	
+   158			regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV,
+   159					   GMAC_PLLCLK_DIV_EN, GMAC_PLLCLK_DIV_EN);
+   160			break;
+   161		default:
+   162			dev_err(dwmac->dev, "unsupported phy interface %d\n",
+   163				plat->interface);
+   164			return;
+   165		}
+   166	}
+   167	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
