@@ -1,159 +1,120 @@
-Return-Path: <netdev+bounces-30471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3524F787807
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 20:35:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44784787812
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 20:36:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 665BC1C20E5D
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 18:35:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2939280157
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 18:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF18C18045;
-	Thu, 24 Aug 2023 18:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9301134A1;
+	Thu, 24 Aug 2023 18:36:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EEA18032
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 18:33:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B348E1BF5
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:33:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692901988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qzwAY3qfQtSXBG/JoTJUgqmvExN/Fjeet/g8tdk5k1I=;
-	b=TL9fvLw+yqz3s/7odtWIpAK6orDDc5L4WsTsgNyPMRhkB8P+WF01UC5wKRMeyqXG55V0r8
-	p1y8Em/jvelAmvKMOMD1fxDswIj8jfFcqeRUbsOZeqsG/skBuaLFUZoEaqB8zFn+zurMVZ
-	vr0AsIYmcKuwi0lc58z4llPjbAB0YqM=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-88no-JMuOY-Z9lmRyFZ33g-1; Thu, 24 Aug 2023 14:33:07 -0400
-X-MC-Unique: 88no-JMuOY-Z9lmRyFZ33g-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-64b7c2a0d5dso1330006d6.3
-        for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 11:33:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692901987; x=1693506787;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qzwAY3qfQtSXBG/JoTJUgqmvExN/Fjeet/g8tdk5k1I=;
-        b=MerHMC2zoce7B19sfsrMqp/Lf2HaaNlnpVHMvnzp+wnPzDwS9w9CUL/CSUcrpuRCKx
-         VtKHEH//5OyTTE3Yr7MwKze0ZwwaeVpSeEdnkB8WKAkkYsSKx15SVpQKYyzW8Dv/pDYQ
-         RKKNiyCw5mb5DB7GmcfQA6JZVtgOsGjOM0Fif5x6/pi2NHasO23F+AlmQ6DG/d8QzQox
-         /YFxF6fzJ/+owroTjk6QrVG6aLYBwKrocUbk+vC4hkAk4vgkEu552xEuB0ODclAqhw7F
-         r7aAEDb7L+tQF7gQVkH8dWy8mtbHkLBkD+tjHzTA5dSOcK2qytEqp0WwVREd5C2jppnV
-         bosA==
-X-Gm-Message-State: AOJu0Yz+NU3FPA4vJ9Z/Es3YtkfEEjE++C9ad1KjewxSLV/sQRxnPmlE
-	bYOnHzS3Vlt8fn+7aQxezGgNi+6Q6wkQgzMph3mQgt3inji6xRsx/IcTQSqaBhraYp5FuQnvs2f
-	/IX+E00GRRxduhWFACiMvPqeq
-X-Received: by 2002:a0c:cb8a:0:b0:64b:997f:5a73 with SMTP id p10-20020a0ccb8a000000b0064b997f5a73mr17312062qvk.0.1692901986874;
-        Thu, 24 Aug 2023 11:33:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH0V6Mej9o119R+pmyxj+YFe+lm4pgu3DlavB9TMY9jyVspWXod0xr56aTpa4++K5uMfm7xpg==
-X-Received: by 2002:a0c:cb8a:0:b0:64b:997f:5a73 with SMTP id p10-20020a0ccb8a000000b0064b997f5a73mr17312048qvk.0.1692901986627;
-        Thu, 24 Aug 2023 11:33:06 -0700 (PDT)
-Received: from [192.168.1.165] ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id j17-20020a0ceb11000000b0064f77d37798sm4209qvp.5.2023.08.24.11.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 11:33:06 -0700 (PDT)
-From: Andrew Halaney <ahalaney@redhat.com>
-Date: Thu, 24 Aug 2023 13:32:58 -0500
-Subject: [PATCH net-next 7/7] net: stmmac: Make PTP reference clock
- references more clear
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDA4CA76
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 18:36:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66D45C433C8;
+	Thu, 24 Aug 2023 18:36:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692902198;
+	bh=54RR5HEt4NRZ+LMzvy1AprSDd8pbmrH+Y+aTS6x2Tkk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QGnJuwHbKlzYpqRUV+slZhpwelCK/Bov03qUkxk4mrjmjR8oIAzhVn4glAc1dF8xi
+	 sQBnEXd204anhiLm8VsNj/uAipAykx9SJsqCrwKfF52/iIVrDq4yWHhikPXvOrKgSZ
+	 WQVM591+OTQXLn0m3u7WraUS0ieAHMXxo7pxutIkQ8S3Qw7NAt+gHSuGlpWntZ8Qki
+	 QjKgThKu1rMdw5PlgPhT42C0w9EN/ijMcp4Hp93iqevn5QzU9ECkL6PJuwZWcixTRW
+	 JOIW3s4Epfh2h0E1KWoXpag5kILwnXo/JsqzYiCcVg2XAaPyHpiqzYNP298Flwy9IP
+	 wQazn+/4HQ80Q==
+Date: Thu, 24 Aug 2023 11:36:37 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com
+Subject: Re: [RFC PATCH net-next 1/3] net: ethtool: add symmetric Toeplitz
+ RSS hash function
+Message-ID: <ZOejNYJgR74JGRse@x130>
+References: <20230823164831.3284341-1-ahmed.zaki@intel.com>
+ <20230823164831.3284341-2-ahmed.zaki@intel.com>
+ <ZOZhzYExHgnSBej4@x130>
+ <94d9c857-2c2b-77f0-9b17-8088068eee6d@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230824-stmmac-subsecond-inc-cleanup-v1-7-e0b9f7c18b37@redhat.com>
-References: <20230824-stmmac-subsecond-inc-cleanup-v1-0-e0b9f7c18b37@redhat.com>
-In-Reply-To: <20230824-stmmac-subsecond-inc-cleanup-v1-0-e0b9f7c18b37@redhat.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>
-X-Mailer: b4 0.12.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <94d9c857-2c2b-77f0-9b17-8088068eee6d@intel.com>
 
-ptp_clock is an overloaded term, and in some instances it is used to
-represent the clk_ptp_rate variable. Just use that name as it is
-clear that it represents the rate of the PTP reference clock.
+On 24 Aug 07:14, Ahmed Zaki wrote:
+>
+>On 2023-08-23 13:45, Saeed Mahameed wrote:
+>>On 23 Aug 10:48, Ahmed Zaki wrote:
+>>>Symmetric RSS hash functions are beneficial in applications that monitor
+>>>both Tx and Rx packets of the same flow (IDS, software firewalls, 
+>>>..etc).
+>>>Getting all traffic of the same flow on the same RX queue results in
+>>>higher CPU cache efficiency.
+>>>
 
-Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
----
- drivers/net/ethernet/stmicro/stmmac/hwif.h            |  5 +++--
- drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c | 10 +++++-----
- 2 files changed, 8 insertions(+), 7 deletions(-)
+...
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index bd607da65037..ba92b10cff0e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -523,8 +523,9 @@ struct stmmac_ops {
- /* PTP and HW Timer helpers */
- struct stmmac_hwtimestamp {
- 	void (*config_hw_tstamping) (void __iomem *ioaddr, u32 data);
--	void (*config_sub_second_increment)(void __iomem *ioaddr, u32 ptp_clock,
--					   int gmac4, u32 *sub_second_inc);
-+	void (*config_sub_second_increment)(void __iomem *ioaddr,
-+					    u32 clk_ptp_rate,
-+					    int gmac4, u32 *sub_second_inc);
- 	int (*init_systime) (void __iomem *ioaddr, u32 sec, u32 nsec);
- 	int (*config_addend) (void __iomem *ioaddr, u32 addend);
- 	int (*adjust_systime) (void __iomem *ioaddr, u32 sec, u32 nsec,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-index 29fd51bb853d..cc0386ee6dee 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-@@ -24,7 +24,7 @@ static void config_hw_tstamping(void __iomem *ioaddr, u32 data)
- }
- 
- static void config_sub_second_increment(void __iomem *ioaddr,
--		u32 ptp_clock, int gmac4, u32 *sub_second_inc)
-+		u32 clk_ptp_rate, int gmac4, u32 *sub_second_inc)
- {
- 	u32 value = readl(ioaddr + PTP_TCR);
- 	unsigned long data;
-@@ -34,14 +34,14 @@ static void config_sub_second_increment(void __iomem *ioaddr,
- 	 * increment to twice the number of nanoseconds of a clock cycle.
- 	 * The calculation of the default_addend value by the caller will set it
- 	 * to mid-range = 2^31 when the remainder of this division is zero,
--	 * which will make the accumulator overflow once every 2 ptp_clock
-+	 * which will make the accumulator overflow once every 2 clk_ptp_rate
- 	 * cycles, adding twice the number of nanoseconds of a clock cycle :
--	 * 2 * NSEC_PER_SEC / ptp_clock.
-+	 * 2 * NSEC_PER_SEC / clk_ptp_rate.
- 	 */
- 	if (value & PTP_TCR_TSCFUPDT)
--		data = (2 * NSEC_PER_SEC / ptp_clock);
-+		data = (2 * NSEC_PER_SEC / clk_ptp_rate);
- 	else
--		data = (NSEC_PER_SEC / ptp_clock);
-+		data = (NSEC_PER_SEC / clk_ptp_rate);
- 
- 	/* 0.465ns accuracy */
- 	if (!(value & PTP_TCR_TSCTRLSSR))
+>>
+>>What is the expectation of the symmetric toeplitz hash, how do you 
+>>achieve
+>>that? by sorting packet fields? which fields?
+>>
+>>Can you please provide a link to documentation/spec?
+>>We should make sure all vendors agree on implementation and 
+>>expectation of
+>>the symmetric hash function.
+>
+>The way the Intel NICs are achieving this hash symmetry is by XORing 
+>the source and destination values of the IP and L4 ports and then 
+>feeding these values to the regular Toeplitz (in-tree) hash algorithm.
+>
+>For example, for UDP/IPv4, the input fields for the Toeplitz hash would be:
+>
+>(SRC_IP, DST_IP, SRC_PORT,  DST_PORT)
+>
 
--- 
-2.41.0
+So you mangle the input. This is different than the paper you
+referenced below which doesn't change the input but it modifies the RSS
+algorithm and uses a special hash key.
+
+>If symmetric Toeplitz is set, the NIC XOR the src and dst fields:
+>
+>(SRC_IP^DST_IP ,  SRC_IP^DST_IP, SRC_PORT^DST_PORT, SRC_PORT^DST_PORT)
+>
+>This way, the output hash would be the same for both flow directions. 
+>Same is applicable for IPv6, TCP and SCTP.
+>
+
+I understand the motivation, I just want to make sure the interpretation is
+clear, I agree with Jakub, we should use a clear name for the ethtool
+parameter or allow users to select "xor-ed"/"sorted" fields as Jakub
+suggested.
+
+>Regarding the documentation, the above is available in our public 
+>datasheets [2]. In the final version, I can add similar explanation in 
+>the headers (kdoc) and under "Documentation/networking/" so that there 
+>is a clear understanding of the algorithm.
+>
+>
+>[1] https://www.ndsl.kaist.edu/~kyoungsoo/papers/TR-symRSS.pdf
+>
+>[2] E810 datasheet: 7.10.10.2 : Symmetric Hash
+>
+>https://www.intel.com/content/www/us/en/content-details/613875/intel-ethernet-controller-e810-datasheet.html
+>
+
+This document doesn't mention anything about implementation.
 
 
