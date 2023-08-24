@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-30219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AAB7867A6
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:44:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5AEA7867AB
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 08:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 617561C20D90
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 06:44:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85252281445
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 06:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B229A24522;
-	Thu, 24 Aug 2023 06:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4536124541;
+	Thu, 24 Aug 2023 06:45:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7331C26
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:44:08 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B024170B
-	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:43:56 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-52a1ce529fdso3271688a12.1
-        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:43:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A312453C
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:45:29 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E822A10F7
+	for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:45:25 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99c4923195dso830003366b.2
+        for <netdev@vger.kernel.org>; Wed, 23 Aug 2023 23:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692859434; x=1693464234;
+        d=linaro.org; s=google; t=1692859524; x=1693464324;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ti0tJCov0gsw8bly+e2gyZeZthleb2G4QELgyb6xbJk=;
-        b=I1zZJTfjm821j0x0yIfW4QMqklnH56r4qmM4t/5dYbVuZvxkzL6f3cpaltMFY/XXb5
-         EbBmse/2gH7Az1sjHnvD9d+bFlnXxuvT+dLR4XipRXRu1xwKka+Q9LO1v+FFzL+GIaWz
-         0cVmlYk9dfAS+JngsrZjYRBPG+0nml6up0U9AIoleTYqjuor4sjx9/J71jj6x5FSSxDb
-         vslV6rKx06UALgB1NX3JGRM1uHitgAyN5A8+zq5pvCynRMWjsL7Gqq5Xpmeu+eaSQE1v
-         B/ivDRgW24kbp+udc2TWTWgk1ia0hjrO4iUBWDsezAR6QDlNXXxd9oR59pEWV/KdP+G5
-         TkYA==
+        bh=rnNGmf2WWBgfkQAyVC3feikVFhEUoK2YZ6y9s10fp+g=;
+        b=ZoaOILWVeHmGVSqeM8U7E3ZXekN3WMc75pFN7wcLlHYTcopJoS9k+ERfYsEddO37UB
+         lNwbBVOiwhYBlZZvGk62x2SiK5hoGOOoeze07ubjx+kvO64UaP3LFy2ss+tZax/2Ej5O
+         Oqq2PQdY8LWmJVZUYc+mv7ezbTJwUHQkwPQg99g0CX+sixtpDTYDzENZUjSGBLqXN/2N
+         bjr0DnPTi8kGxZCKDc1O7UgFkUrPPH8ArytEFZeeUVn4M7y2ehTZQTfSicgotjrWaNuR
+         /F4ww+S+CPEElNzVsrbZuhdaxIsDPbXU3zZxRxo2hbXmXdJJzlzoes34XKmgGE/m6C6c
+         uiBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692859434; x=1693464234;
+        d=1e100.net; s=20221208; t=1692859524; x=1693464324;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ti0tJCov0gsw8bly+e2gyZeZthleb2G4QELgyb6xbJk=;
-        b=Nc23UHVbaqsyx6xHEpZrx8oEtEfUFPfPRLdkNdBfvRve9MC6SnXzWQK1KZSY20UOa4
-         t4VZx0qlQx+EqSS3coMRbkqvfUMj/pbgiXNg5pnHxvl2HBPCxYsiGDqzbVQNJekPla/8
-         uZdPmRZ8X7p22WP4dEJ3PfPhC7ekkAwcexNoaGwEgGWh4XuS/tOKj3HVmLGm2cAnQ03X
-         vL2rGXAFQ0XmqmJpFMUQR+xI6ulpc50yUcEVsp1bAHY6R47G2ue+4jkuS+V4i1frRSvC
-         1cT7LDo0MWBcZfusmzXW7Xvdy7mVleXiVnHaYoVIupZCc52lIrbsrtMI5A/Ow8dIKENm
-         QtqA==
-X-Gm-Message-State: AOJu0YxYsyL8RFWOAVV7HS/gs3/q8+p3VMSzfEIUK6C3j9BYyG/N/ZJI
-	mBJcvYnPR6z3ZxxpE03dWJttmQ==
-X-Google-Smtp-Source: AGHT+IEQvZYgarQloyMnR+HnLjWh6aBRXyE5c7u2/JigeeURkpGl76ThL5cokigKZvqW5eh82CHhgg==
-X-Received: by 2002:aa7:d34f:0:b0:523:b1b0:f69f with SMTP id m15-20020aa7d34f000000b00523b1b0f69fmr10351857edr.32.1692859434571;
-        Wed, 23 Aug 2023 23:43:54 -0700 (PDT)
+        bh=rnNGmf2WWBgfkQAyVC3feikVFhEUoK2YZ6y9s10fp+g=;
+        b=XBW+tJQ3uMIGwBmy0gzoyP3pN1ot8Oe+cCs18xhDk5Nf58F7zScoSrT6qs3Qvi/zVd
+         ZZPog5IshRkv4lrNX7Blojd2TFwEoW8MljHOuGtQsl+lfTs4+ahHkXSGNz3fTWreCzu8
+         9vcq2CoEoqhvq2JPFkUYL7rwU8mkR7bJWAl1Q0UzKDHBFCO/JxzFKwj9mwcWlxDriP25
+         h1fdxJp6UlBNI52j/ViQXEHimSeB9qmEIgFOO961368vipNmNet+eAlo8qtbcMoxnvtI
+         UqUudSJap0q2o6CmC+VoZmjVP/nbUerqYyDzPRM5di8aodn4FJ9lRBNBW/6qdnwtkdtS
+         QuFA==
+X-Gm-Message-State: AOJu0YzuWisYSXeYXbRdGgqI5M4DvsmUZvGZ13s5ICwGtlwhNjPhBx9W
+	jZ6CwPGI7hdnjEwW4zldntRRfg==
+X-Google-Smtp-Source: AGHT+IGy78witumN00EVCy5UGo3smU/gaSGULiiCcVwhomJv/wCO+KpTMU2P5OmjNabYfnDdCjVcfw==
+X-Received: by 2002:a17:906:249:b0:9a1:cbe4:d033 with SMTP id 9-20020a170906024900b009a1cbe4d033mr3788327ejl.53.1692859524373;
+        Wed, 23 Aug 2023 23:45:24 -0700 (PDT)
 Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id x21-20020aa7dad5000000b0052284228e3bsm10068665eds.8.2023.08.23.23.43.53
+        by smtp.gmail.com with ESMTPSA id t7-20020a1709060c4700b00988c0c175c6sm10571133ejf.189.2023.08.23.23.45.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 23:43:54 -0700 (PDT)
-Message-ID: <d5a343c8-c384-6eea-94bf-e0c4f96e5fb0@linaro.org>
-Date: Thu, 24 Aug 2023 08:43:52 +0200
+        Wed, 23 Aug 2023 23:45:24 -0700 (PDT)
+Message-ID: <1326776f-2592-f231-2056-a231729da50a@linaro.org>
+Date: Thu, 24 Aug 2023 08:45:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,7 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH v6 1/5] dt-bindings: net: Add ICSS IEP
+Subject: Re: [PATCH v6 2/5] dt-bindings: net: Add IEP property in ICSSG
 Content-Language: en-US
 To: MD Danish Anwar <danishanwar@ti.com>, Randy Dunlap
  <rdunlap@infradead.org>, Roger Quadros <rogerq@kernel.org>,
@@ -82,97 +82,40 @@ Cc: nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org, netdev@vger.kernel.org,
  linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 References: <20230823113254.292603-1-danishanwar@ti.com>
- <20230823113254.292603-2-danishanwar@ti.com>
+ <20230823113254.292603-3-danishanwar@ti.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230823113254.292603-2-danishanwar@ti.com>
+In-Reply-To: <20230823113254.292603-3-danishanwar@ti.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 23/08/2023 13:32, MD Danish Anwar wrote:
-> Add a DT binding document for the ICSS Industrial Ethernet Peripheral(IEP)
-> hardware. IEP supports packet timestamping, PTP and PPS.
+> Add IEP property in ICSSG hardware DT binding document.
+> ICSSG uses IEP (Industrial Ethernet Peripheral) to support timestamping
+> of ethernet packets, PTP and PPS.
 > 
 > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-Really? Where?
+Where? Please provide link.
 
 > Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
-Now you are making things up. Please stop faking tags.
+Where? Please provide link.
 
 > Reviewed-by: Simon Horman <horms@kernel.org>
 
-Where?
+Where? Please provide link.
+
+Otherwise all of them look like fake ways to sneak patches into the
+kernel. Our work here depends a lot on the trust. Trust once lost, is
+tricky to get back.
 
 > Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 > ---
->  .../devicetree/bindings/net/ti,icss-iep.yaml  | 61 +++++++++++++++++++
->  1 file changed, 61 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/ti,icss-iep.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,icss-iep.yaml b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
-> new file mode 100644
-> index 000000000000..75668bea8614
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/ti,icss-iep.yaml
-> @@ -0,0 +1,61 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/ti,icss-iep.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Texas Instruments ICSS Industrial Ethernet Peripheral (IEP) module
-> +
-> +maintainers:
-> +  - Md Danish Anwar <danishanwar@ti.com>
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - ti,am642-icss-iep
-> +              - ti,j721e-icss-iep
-> +          - const: ti,am654-icss-iep
-> +
-> +      - const: ti,am654-icss-iep
-> +
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +    description: phandle to the IEP source clock
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +
-
-Drop stray blank line
-
-> +    /* AM65x */
-> +    icssg0_iep0: iep@2e000 {
-> +        compatible = "ti,am654-icss-iep";
-> +        reg = <0x2e000 0x1000>;
-> +        clocks = <&icssg0_iepclk_mux>;
-> +    };
-
-Choose one example.
 
 
 Best regards,
