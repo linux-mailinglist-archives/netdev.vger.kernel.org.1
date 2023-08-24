@@ -1,174 +1,189 @@
-Return-Path: <netdev+bounces-30277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A826786B49
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:16:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2791786B4D
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 11:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3860A1C20DDD
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 09:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEE371C20DB9
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 09:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E46CD507;
-	Thu, 24 Aug 2023 09:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974A4D510;
+	Thu, 24 Aug 2023 09:16:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8986DCA78
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 09:16:13 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38B61E67
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 02:16:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1692868571;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Vy7OQcpWSMp4ed/7wu+8P+W33XodHQjr5c/D1WD0xz4=;
-	b=XidoXuSUHLEkt9golgReTbDLkicO1DSWm1W9g+Aj6mW8CmIjQPLNVmcNNzu5rGUXUIevIF
-	YeQ3BCo2FPC3Hi8JPrg6pyUA3r8USJbRo9Y45WZjxi+ect87J6ch/5mm5uSkmuzwUiJN/4
-	4EBelw44ffeLOd0JKUxfMPXpFP0TXBY=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-682-Rj-9r2BxNGCl9dn-C9zWfA-1; Thu, 24 Aug 2023 05:16:04 -0400
-X-MC-Unique: Rj-9r2BxNGCl9dn-C9zWfA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 75DB129AA2CB;
-	Thu, 24 Aug 2023 09:16:04 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.193.96])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 32DD6492C13;
-	Thu, 24 Aug 2023 09:16:04 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 0B443A80D55; Thu, 24 Aug 2023 11:16:03 +0200 (CEST)
-From: Corinna Vinschen <vinschen@redhat.com>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B776CA73
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 09:16:50 +0000 (UTC)
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2079.outbound.protection.outlook.com [40.107.105.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEA3E67;
+	Thu, 24 Aug 2023 02:16:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Za3NVA21QcbQPvsvKsCAUtf+zBwlak5p9aNSAgIEN6OcKhix691OtITzU9vNPXSUaW1YBRKQ+o6Qc9YrptDehkSRO6BsSElmiLl87YW0Lk9TylmVFxLoCyFUnI4eMhGY5byYZz7lUuRW5VSTsDFa+nGxH6cbxr/Obq7ONPzknFLG4r8As0VoKnN8saZCC/oTPg4YJp2QwKbybIhvRVOeakE5ZY/oDc5mus5ZwbGjwXJLm76rmk1QFjFmXigW8r0939BEe5tuXzmOMHgfAqCmaJNJk7tph3p4nOYI38UOKazwqCambeUJJlN3RRVUx9VTzeE6l+MXBCABZ2YOa2FrSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Bz4d5QgfJsM1JACZXhgGYWq7XAvNt0arNLip1fO9B/k=;
+ b=JIP4dSF/5GF0Ll+AZpPjzvAL5VSBeAuwhZFLewRu/0W8LoLLcHX6fPAn+nS4eB1Rvq7LjR9vDmn5Ti5cOZua1Nps8YesDah0XifrCtaC2TyiMCYBhQw+2kdcfRPUVBXvn/rdxU5eN3KXcggzRJHqhoA8hnSJAmTelp6rcul43C1k489JgWhHrsyP35ibGpl9pInRteRbtUPbnasJvQdiqxad203Prub41s79Qm0g3FDGi4GzholOYp8UNcOFVmWADr486qUmxzjaLQk1bYXJjsme0Yt8zqKf4O8YRJUKNTCvFtJe1ckQ7w+JFG2hTQKwGrRoq+7AUNraffSo5eP2cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Bz4d5QgfJsM1JACZXhgGYWq7XAvNt0arNLip1fO9B/k=;
+ b=OhDLFpIiPgFJiVMbkpsyechWuw41w1KLKE+cBtImS3RGi8ndDl1Ut3yOyNK/VBDuyP6g8Ucuddh8o7IEvWMITIFHFFvkvcTs+C3Qyizgp8n7KrrmmikZtOYlg4i9e7wKBEJCTFpnlAMgnCRUJnFc6yoH9CAILWo77dwmCEgbP1w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by AM9PR04MB8260.eurprd04.prod.outlook.com (2603:10a6:20b:3e6::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
+ 2023 09:16:46 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50%5]) with mapi id 15.20.6678.031; Thu, 24 Aug 2023
+ 09:16:46 +0000
+From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
 	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net] igb: clean up in all error paths when enabling SR-IOV
-Date: Thu, 24 Aug 2023 11:16:02 +0200
-Message-ID: <20230824091603.3188249-1-vinschen@redhat.com>
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	sd@queasysnail.net,
+	sebastian.tobuschat@nxp.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Subject: [RFC net-next v2 0/5] Add MACsec support for TJA11XX C45 PHYs
+Date: Thu, 24 Aug 2023 12:16:10 +0300
+Message-Id: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR10CA0116.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::33) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|AM9PR04MB8260:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6e1db38-0f23-4168-4fec-08dba482d685
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	fiH/W5TLfhZkGHINdTbwo7nCDsdUaG+RO0et7B4DANTsfzaNmPrfX3xrKg3u7dY7Kb5G+0IkOn70Dx8MTiwF1vvDADYWYMvlcMPQNZDUKTBrPEn+IXSz4/2WvaCIGW4OwccJ1TporEWTj57xHNWc64IRJNIhnZEMMDNNItlj0TryiAgCAdkX68EkjrukwDBnq7LyniDwFMvbuMCENSboyxD7fZSvJNDnHHvqugsRR3r92t4jVudUrCEt1tYUXRxDjd0N/vqK2lNYhyY13vUHJ4u/KAU3Kp+px113l7YLaBo1mZIAP7BMJykXCCdWdE2mJNsEmmQXMbE5qwQcb80TYTQsJDZIcCddudhDDxWctcv1Rb7q8iFvn59AYV/G63ubT4TGT7LPCzZ4RoytHIOKH2gCNX4QDCTNPO+cuKSaPcIRCWFhqwG7BhOzpbMrHeu2Ogh2/HvIRdq/vPY858IeSzuZoDXExVkA290FyOijfMVkQRl83T2zJCtI/EAZRprWn/riP0sHJc6xG9pvbkmFRzo0QUHExYL9r2d5bthGVjE0YUWsJ/zBL1EElGbV2Cw0ArIKK66WeZF83hcZ1t2nmcYZoSOjx9cHVcPwnUeh5nNDVUPSF0J4iT65vei7Pc9xSC6ElBryD6V3nIgklYu6HA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(39860400002)(376002)(366004)(451199024)(186009)(1800799009)(66556008)(66946007)(66476007)(316002)(478600001)(26005)(38350700002)(6666004)(921005)(38100700002)(41300700001)(52116002)(86362001)(6512007)(6486002)(2906002)(6506007)(4326008)(8676002)(8936002)(1076003)(2616005)(5660300002)(7416002)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9B2AZx/F5XiPHm4KDUNIv9lAxpFEO2sfJTbw0qC0jZKLKFCVspgxgIi6ID4Z?=
+ =?us-ascii?Q?NDclhgVBNtcTl0hjzG/xcly/X+Zn8OXjuD71m2wuAORaPQN2xb3wfIwX/iKz?=
+ =?us-ascii?Q?75f2Irf6ZnJ4onh7yNv/4y2qHlygdw6U4Y25rE6KU8BSDv/T6jBaDWdTFzcd?=
+ =?us-ascii?Q?PwF3mSNMPvLYMRDvgSh7G+DVIvsV9ZzZASCdXDHeiiUGJvVt1NhxrLZWLtIs?=
+ =?us-ascii?Q?zxoCXFE9R0jn5LqDpIJihaaXZA4x1WQN3mh5YnZSz0osFPfpkfirb+U7a5jE?=
+ =?us-ascii?Q?t/zLroYB7yYGmBrN3tYJ82Qr7+hlyrDTSFCwXuVPexXEpJn9U5jzMWnVhLzM?=
+ =?us-ascii?Q?ZXL01LAG2s+6gkyeT6PU34monBWHOuBDS3rca1V3GoT/vqaTE6OxY82028kq?=
+ =?us-ascii?Q?8lxDN90F0SP+2vt9IKJ6fU8n/oTDDuN7FpP6XN9eML0dt55cZrV8LMjd6Hs/?=
+ =?us-ascii?Q?0hDzL0vCgLii6B4qxE9MXx/PL0HTLDzh2p0pYcgrAz5h8hJLoyrVDjmT80Eq?=
+ =?us-ascii?Q?Hduy0b9Oj3qDsprI5hD/DYmqDNU3/YzVvBoJ3okQnPb9pRRFqkDHhtSAwHEL?=
+ =?us-ascii?Q?wryYN0V5YXUgutoi0/ce4sDiTVSnplsduaREBCmYoO95okBdrAeR5iSHC6ds?=
+ =?us-ascii?Q?mTK1cSirE2SuYxTvSkA+PHPJdQDbMRYpPYqM28RvV29gtKwOz9bScs//p1XS?=
+ =?us-ascii?Q?0/fooFX9+6VvKFP9q06yToIcA8OBsB01DdL6dzM6qfQlbZ1p/xEEh6hJfV3T?=
+ =?us-ascii?Q?lnkDZGXkU93sXxlAL4IuzPWtb0lMZVnHUAHdWVqvP/kkx2+cNwZwSXtxa0TP?=
+ =?us-ascii?Q?BUb7WfLNp7kjA2AFZyHZjoCnAVXezKEXrAUVxfpjCtnwdItoftVltUBkwVfE?=
+ =?us-ascii?Q?oKkrBYXZ5QOSGaGcOElQLe17y5RAojIRSgauIBkq1oWX/+QhUBykg8JQALrt?=
+ =?us-ascii?Q?J4MMLvDDEaJVDrYBCsYe+MHMEZR/Mk3QqXLhb+EmQKGXcu/mwsUTi6ZsTN+V?=
+ =?us-ascii?Q?G3tKtKwyAENDUlLVLrYasjypcsEceNkzRn2Z0VrqNNo//nOd72ctUXKB13jM?=
+ =?us-ascii?Q?Ma5WCVQFxb4+uuglI2a2ey3YutOn9H+/5WIiJvHy3QF1asjTgDRbmsJ96zOx?=
+ =?us-ascii?Q?XRUev+A3lR45udqik6oYMKOo00q64LkC8O84LposRe+ais+ZLV6ZmQKdgiAX?=
+ =?us-ascii?Q?PcpydyNFR+anXbwYKSe9sDId5r/akdaXp3YuMZ+rURZV0bMovwjir8U1J1Gm?=
+ =?us-ascii?Q?Sqrcsx7c/W7Z2cYG5Sr+HJh05zDcpQvFdjcV6wgP8Awe4f+LgbQYnnanP3vj?=
+ =?us-ascii?Q?ElMwMRmMhbHdRT/Oe4uWF1QESZtR/TmlFi2xfCmdyRXjbbCHMEr1+tWrQqRH?=
+ =?us-ascii?Q?ZarxuwlG/GoxheRX5P+BwDw0NeJy2nVur+DMsiOlELV6QrsOJc9O0MdjJSrg?=
+ =?us-ascii?Q?EoW0eqMXbcdLkDuqvrjUVRlNj4dn0VfE7Sugehe6C9XnaeRucDyfAT7kkFm4?=
+ =?us-ascii?Q?V22SdO10z6iDnqw2amg/8bC27oXcrCgRidk1j+74gVevfrx18xxraNbdBSQe?=
+ =?us-ascii?Q?xdiW846VpoU3oTyPN1EM/ANQRXe1skIy2CcBGUcm8W6KWxCHo2y8II+DLyQB?=
+ =?us-ascii?Q?WQ=3D=3D?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6e1db38-0f23-4168-4fec-08dba482d685
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 09:16:46.1383
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vvvX5Dmo2toDx4oRlLsKotDuaQsOqTunQLO6KnmQVHSyr30iXgEZS1zobV/qBcxXGNlQDfC0664MC6geuJZJv8FCRfxp/aNRNbFqavQ+5Zg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8260
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-After commit 50f303496d92 ("igb: Enable SR-IOV after reinit"), removing
-the igb module could hang or crash (depending on the machine) when the
-module has been loaded with the max_vfs parameter set to some value != 0.
+This is the MACsec support for TJA11XX PHYs. The MACsec block encrypts
+the ethernet frames on the fly and has no buffering. This operation will
+grow the frames by 32 bytes. If the frames are sent back to back, the
+MACsec block will not have enough room to insert the SecTAG and the ICV
+and the frames will be dropped. 
 
-In case of one test machine with a dual port 82580, this hang occured:
+To mitigate this, the PHY can parse a specific ethertype with some
+padding bytes and replace them with the SecTAG and ICV. These padding
+bytes might be dummy or might contain information about TX SC that must
+be used to encrypt the frame.
 
-[  232.480687] igb 0000:41:00.1: removed PHC on enp65s0f1
-[  233.093257] igb 0000:41:00.1: IOV Disabled
-[  233.329969] pcieport 0000:40:01.0: AER: Multiple Uncorrected (Non-Fatal) err0
-[  233.340302] igb 0000:41:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fata)
-[  233.352248] igb 0000:41:00.0:   device [8086:1516] error status/mask=00100000
-[  233.361088] igb 0000:41:00.0:    [20] UnsupReq               (First)
-[  233.368183] igb 0000:41:00.0: AER:   TLP Header: 40000001 0000040f cdbfc00c c
-[  233.376846] igb 0000:41:00.1: PCIe Bus Error: severity=Uncorrected (Non-Fata)
-[  233.388779] igb 0000:41:00.1:   device [8086:1516] error status/mask=00100000
-[  233.397629] igb 0000:41:00.1:    [20] UnsupReq               (First)
-[  233.404736] igb 0000:41:00.1: AER:   TLP Header: 40000001 0000040f cdbfc00c c
-[  233.538214] pci 0000:41:00.1: AER: can't recover (no error_detected callback)
-[  233.538401] igb 0000:41:00.0: removed PHC on enp65s0f0
-[  233.546197] pcieport 0000:40:01.0: AER: device recovery failed
-[  234.157244] igb 0000:41:00.0: IOV Disabled
-[  371.619705] INFO: task irq/35-aerdrv:257 blocked for more than 122 seconds.
-[  371.627489]       Not tainted 6.4.0-dirty #2
-[  371.632257] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this.
-[  371.641000] task:irq/35-aerdrv   state:D stack:0     pid:257   ppid:2      f0
-[  371.650330] Call Trace:
-[  371.653061]  <TASK>
-[  371.655407]  __schedule+0x20e/0x660
-[  371.659313]  schedule+0x5a/0xd0
-[  371.662824]  schedule_preempt_disabled+0x11/0x20
-[  371.667983]  __mutex_lock.constprop.0+0x372/0x6c0
-[  371.673237]  ? __pfx_aer_root_reset+0x10/0x10
-[  371.678105]  report_error_detected+0x25/0x1c0
-[  371.682974]  ? __pfx_report_normal_detected+0x10/0x10
-[  371.688618]  pci_walk_bus+0x72/0x90
-[  371.692519]  pcie_do_recovery+0xb2/0x330
-[  371.696899]  aer_process_err_devices+0x117/0x170
-[  371.702055]  aer_isr+0x1c0/0x1e0
-[  371.705661]  ? __set_cpus_allowed_ptr+0x54/0xa0
-[  371.710723]  ? __pfx_irq_thread_fn+0x10/0x10
-[  371.715496]  irq_thread_fn+0x20/0x60
-[  371.719491]  irq_thread+0xe6/0x1b0
-[  371.723291]  ? __pfx_irq_thread_dtor+0x10/0x10
-[  371.728255]  ? __pfx_irq_thread+0x10/0x10
-[  371.732731]  kthread+0xe2/0x110
-[  371.736243]  ? __pfx_kthread+0x10/0x10
-[  371.740430]  ret_from_fork+0x2c/0x50
-[  371.744428]  </TASK>
+On the RX path, the PHY can insert a similar tag that contains
+information about the RX SC which received the frame. However, the RX tag
+is not enabled in this patch series, but I consider this important for the
+review.
 
-The reproducer was a simple script:
+Radu P.
 
-  #!/bin/sh
-  for i in `seq 1 5`; do
-    modprobe -rv igb
-    modprobe -v igb max_vfs=1
-    sleep 1
-    modprobe -rv igb
-  done
+Changes in v2:
+- added documentation
+- reordered and split patches
+- WARN_ON_ONCE if reg address is not properly aligned
+- removed unnecesary checks in insert_tx_tag
+- adjusted mdo_insert_tx_tag parameters. macsec_context replaced with 
+ phy_device and sk_buff
+- added extscs parameter to allow the user to choose the TX SC selection
+ mechanism
+- improved patches description
 
-It turned out that this could only be reproduce on 82580 (quad and
-dual-port), but not on 82576, i350 and i210.  Further debugging showed
-that igb_enable_sriov()'s call to pci_enable_sriov() is failing, because
-dev->is_physfn is 0 on 82580.
+Radu Pirea (NXP OSS) (5):
+  net: macsec: documentation for macsec_context and macsec_ops
+  net: macsec: introduce mdo_insert_tx_tag
+  net: phy: nxp-c45-tja11xx add MACsec support
+  net: phy: nxp-c45-tja11xx: add MACsec statistics
+  net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
 
-Prior to commit 50f303496d92 ("igb: Enable SR-IOV after reinit"),
-igb_enable_sriov() jumped into the "err_out" cleanup branch.  After this
-commit it only returned the error code.
+ MAINTAINERS                              |    2 +-
+ drivers/net/macsec.c                     |   96 +-
+ drivers/net/phy/Kconfig                  |    2 +-
+ drivers/net/phy/Makefile                 |    4 +
+ drivers/net/phy/nxp-c45-tja11xx-macsec.c | 1877 ++++++++++++++++++++++
+ drivers/net/phy/nxp-c45-tja11xx.c        |   72 +-
+ drivers/net/phy/nxp-c45-tja11xx.h        |   55 +
+ include/net/macsec.h                     |   46 +
+ 8 files changed, 2122 insertions(+), 32 deletions(-)
+ create mode 100644 drivers/net/phy/nxp-c45-tja11xx-macsec.c
+ create mode 100644 drivers/net/phy/nxp-c45-tja11xx.h
 
-So the cleanup didn't take place, and the incorrect VF setup in the
-igb_adapter structure fooled the igb driver into assuming that VFs have
-been set up where no VF actually existed.
-
-Fix this problem by cleaning up again if pci_enable_sriov() fails.
-
-Fixes: 50f303496d92 ("igb: Enable SR-IOV after reinit")
-Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
----
- drivers/net/ethernet/intel/igb/igb_main.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 9a2561409b06..42ab9ca7f97e 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3827,8 +3827,11 @@ static int igb_enable_sriov(struct pci_dev *pdev, int num_vfs, bool reinit)
- 	}
- 
- 	/* only call pci_enable_sriov() if no VFs are allocated already */
--	if (!old_vfs)
-+	if (!old_vfs) {
- 		err = pci_enable_sriov(pdev, adapter->vfs_allocated_count);
-+		if (err)
-+			goto err_out;
-+	}
- 
- 	goto out;
- 
 -- 
-2.41.0
+2.34.1
 
 
