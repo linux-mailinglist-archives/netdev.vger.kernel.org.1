@@ -1,121 +1,111 @@
-Return-Path: <netdev+bounces-30372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F33678707F
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:41:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0446787087
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 15:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1BDA1C20E7E
-	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:41:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D10001C20DB6
+	for <lists+netdev@lfdr.de>; Thu, 24 Aug 2023 13:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94DC2891D;
-	Thu, 24 Aug 2023 13:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8940A2891F;
+	Thu, 24 Aug 2023 13:40:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3F5288E8
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:38:50 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF361FD
-	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 06:38:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=J3e+4Vo84h0ny8OR5GBo+JRGtZ3c958TOz/VATLJd6Y=; b=lmgTDgz83a5mOXKNh+PJ985QvN
-	KEjVZ3UQLkQ9nWZbTeOOx21/M/wHkLTVITHnMD+aL8qtKlBzwOvpfp/fjeBycqmRpzuNHfYzf7YRw
-	iXccBVFYh0CcV/vO7xNy1DoWwSDHL8kd629FQdCZ9dIqAY0mRoQvkWfcUgAe8yi95pvur7jOC7TJO
-	oWzrxRyaIlKvYaAvQlcv16+CUzxZbV6cQm7z3dwSg3dCDeXjWT8WHqFmPzUrk183FHvWbF9mp2jKD
-	70x62aqTMGKGBgL2uBxSz2ciD2vyVIfxOwn0I8Fd7Po7LDYvU+i/iiA/63d35ZCL/BdG/d32G+dS6
-	3cBvd7iA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:60606 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qZAXn-0004Ej-1g;
-	Thu, 24 Aug 2023 14:38:39 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qZAXn-005pUb-SP; Thu, 24 Aug 2023 14:38:39 +0100
-In-Reply-To: <ZOddFH22PWmOmbT5@shell.armlinux.org.uk>
-References: <ZOddFH22PWmOmbT5@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	 Jose Abreu <joabreu@synopsys.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Feiyang Chen <chenfeiyang@loongson.cn>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 10/10] net: stmmac: convert half-duplex support to
- positive logic
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254CA288E8
+	for <netdev@vger.kernel.org>; Thu, 24 Aug 2023 13:40:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83416C433CA;
+	Thu, 24 Aug 2023 13:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692884426;
+	bh=bqvGJZmFfdK8pXTbE4S3pBY1d/oCTP7QNa5jsagT9/k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tnAXvGs+o8VxEKH7kFL6BNJF4ng17QfV6WaVkLyYaxUeJYbd0frmiYsBZ7le+sr1G
+	 rOSsAuxVeFUfzcKUCWeAvoFA5sLcOEgu636qHbJPMGfXTl0gKEwpb0qd7NOdoKzpr7
+	 SyCYLlYeGb6xmEFuSaz6f+rXgrT2ysdVqGsggNgzaA7YxSqvnGPws4g+gBXWXwnObG
+	 yRL7ltAdpFPrmSXmqaV7uhqJN3H2n+MRlAxcRXglyS+z/zhgqzykKJXIwqY0q2NAaa
+	 CO16MOo4KXNTNPRSl064h+SZHpX8FKNA5OJ/7BXpKYDzGKlkRaPoX1CVdoZNJUDjRL
+	 A5HkvEt4gZs+w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 671E0E33095;
+	Thu, 24 Aug 2023 13:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qZAXn-005pUb-SP@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 24 Aug 2023 14:38:39 +0100
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [net-next 01/15] net/mlx5: Rework devlink port alloc/free into
+ init/cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169288442641.14572.15853901676178071093.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Aug 2023 13:40:26 +0000
+References: <20230823051012.162483-2-saeed@kernel.org>
+In-Reply-To: <20230823051012.162483-2-saeed@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
+ tariqt@nvidia.com, jiri@nvidia.com, shayd@nvidia.com
 
-Rather than detecting when half-duplex is not supported, and clearing
-the MAC capabilities, reverse the if() condition and use it to set the
-capabilities instead.
+Hello:
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+This series was applied to netdev/net-next.git (main)
+by Saeed Mahameed <saeedm@nvidia.com>:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 7cfc2918c913..33ca5c50bdcd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1223,16 +1223,17 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 				    priv->phylink_config.supported_interfaces);
- 
- 	priv->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
--		MAC_10 | MAC_100 | MAC_1000;
-+						MAC_10FD | MAC_100FD |
-+						MAC_1000FD;
-+
-+	/* Half-Duplex can only work with single queue */
-+	if (priv->plat->tx_queues_to_use <= 1)
-+		priv->phylink_config.mac_capabilities |= MAC_10HD | MAC_100HD |
-+							 MAC_1000HD;
- 
- 	/* Get the MAC specific capabilities */
- 	stmmac_mac_phylink_get_caps(priv);
- 
--	/* Half-Duplex can only work with single queue */
--	if (priv->plat->tx_queues_to_use > 1)
--		priv->phylink_config.mac_capabilities &=
--			~(MAC_10HD | MAC_100HD | MAC_1000HD);
--
- 	max_speed = priv->plat->max_speed;
- 	if (max_speed)
- 		phylink_limit_mac_speed(&priv->phylink_config, max_speed);
+On Tue, 22 Aug 2023 22:09:58 -0700 you wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> In order to prepare the devlink port registration function to be common
+> for PFs/VFs and SFs, change the existing devlink port allocation and
+> free functions into PF/VF init and cleanup, so similar helpers could be
+> later on introduced for SFs. Make the init/cleanup helpers responsible
+> for setting/clearing the vport->dl_port pointer.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/15] net/mlx5: Rework devlink port alloc/free into init/cleanup
+    https://git.kernel.org/netdev/net-next/c/4c0dac1ef8ab
+  - [net-next,02/15] net/mlx5: Push out SF devlink port init and cleanup code to separate helpers
+    https://git.kernel.org/netdev/net-next/c/638002252544
+  - [net-next,03/15] net/mlx5: Push devlink port PF/VF init/cleanup calls out of devlink_port_register/unregister()
+    https://git.kernel.org/netdev/net-next/c/d9833bcfe840
+  - [net-next,04/15] net/mlx5: Allow mlx5_esw_offloads_devlink_port_register() to register SFs
+    https://git.kernel.org/netdev/net-next/c/382fe5747b8a
+  - [net-next,05/15] net/mlx5: Introduce mlx5_eswitch_load/unload_sf_vport() and use it from SF code
+    https://git.kernel.org/netdev/net-next/c/e855afd71565
+  - [net-next,06/15] net/mlx5: Remove no longer used mlx5_esw_offloads_sf_vport_enable/disable()
+    https://git.kernel.org/netdev/net-next/c/b940ec4b25be
+  - [net-next,07/15] net/mlx5: Don't register ops for non-PF/VF/SF port and avoid checks in ops
+    https://git.kernel.org/netdev/net-next/c/13f878a22c20
+  - [net-next,08/15] net/mlx5: Embed struct devlink_port into driver structure
+    https://git.kernel.org/netdev/net-next/c/2c5f33f6b940
+  - [net-next,09/15] net/mlx5: Reduce number of vport lookups passing vport pointer instead of index
+    https://git.kernel.org/netdev/net-next/c/2caa2a39116f
+  - [net-next,10/15] net/mlx5: Return -EOPNOTSUPP in mlx5_devlink_port_fn_migratable_set() directly
+    https://git.kernel.org/netdev/net-next/c/c0ae00929272
+  - [net-next,11/15] net/mlx5: Relax mlx5_devlink_eswitch_get() return value checking
+    https://git.kernel.org/netdev/net-next/c/5c632cc352e1
+  - [net-next,12/15] net/mlx5: Check vhca_resource_manager capability in each op and add extack msg
+    https://git.kernel.org/netdev/net-next/c/eb555e34f084
+  - [net-next,13/15] net/mlx5: Store vport in struct mlx5_devlink_port and use it in port ops
+    https://git.kernel.org/netdev/net-next/c/7d8335200c94
+  - [net-next,14/15] net/mlx5e: Support IPsec upper protocol selector field offload for RX
+    https://git.kernel.org/netdev/net-next/c/c338325f7a18
+  - [net-next,15/15] net/mlx5e: Support IPsec upper TCP protocol selector
+    https://git.kernel.org/netdev/net-next/c/b8c697e177bb
+
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
