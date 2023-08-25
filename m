@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-30540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF07A787C97
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 02:40:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1305D787CA0
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 02:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58DEF28170A
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 00:40:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC2B6281717
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 00:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4676C361;
-	Fri, 25 Aug 2023 00:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A820361;
+	Fri, 25 Aug 2023 00:43:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55263179
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 00:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BE8AAC433C9;
-	Fri, 25 Aug 2023 00:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FE0179
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 00:43:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EDE6C433C8;
+	Fri, 25 Aug 2023 00:43:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692924023;
-	bh=AlchTnBHk38EDaleTTR+EWrFZBPTxfju11Gub8nZ/Mc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n1x+LfGPJriUM1J5amgw1W96qVCMqkRJuD8RJNMVYBqr6dDTbtq5NY/gnLkIvRStO
-	 E9vMQgN/saFeUpRdiIb2ShkHs+D2ast50msh4AuKDrdwv+RLUUupE8RHbCdravshSh
-	 ibdXMTHooDpQo1VfkWfcB8EJ94EgqHQZkr/yUwaZ8j8aA5eEu6cXO9MWSmWYFxGR64
-	 Gugl+6LY3FdzjnqMoL555EbEDCzlkAewjBfPOBnc48koaUJJhIKh1h8jtQ5RC13TEz
-	 iAA6tJ1gR+YxMrbZkaCd7fas0MVi1tQM9Z3TR8Kf12uhnzS1RpQ692m5sT/AT05hm1
-	 icnn/C3Az2g4A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A3C73E33094;
-	Fri, 25 Aug 2023 00:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1692924217;
+	bh=3FvToJ9W9Cx3znvSK8L/1cCAS7onIM8VwFyVO0om7vg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q9HHb7VVQNnYn7uUVcgDjYRGsKBenG/gndlH87e9I2o4DhzP16TIBmKmYCaS0UXIq
+	 yVV4k7s18j8gshoQxYaW367zdOgh7feUNYGNklcLzho0hP9kXhnpSvGC0f0BKrxFsN
+	 PRqR6CFRs4M+r2AG5C2FYF1oKTEay3kzJbnYS4D7HQec5X14S82CH+4lG3tRU3FOYq
+	 al3FvDRGkHab8I71GaKD915rAxAprO1GE1XYEuvjNWVlWyH7y1OvDttKr/LWgPFqBY
+	 FeBELzVHsa/PjxGta0D1X3+/u7Ppw39PDKzOVBgQQCldb7zt6jh0Y878bnLGr0KVYG
+	 0w9lEnIGN3Axw==
+Date: Thu, 24 Aug 2023 17:43:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: <netdev@vger.kernel.org>, <jesse.brandeburg@intel.com>,
+ <anthony.l.nguyen@intel.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>
+Subject: Re: [RFC PATCH net-next 1/3] net: ethtool: add symmetric Toeplitz
+ RSS hash function
+Message-ID: <20230824174336.6fb801d5@kernel.org>
+In-Reply-To: <849341ef-b0f4-d93f-1420-19c75ebf82b2@intel.com>
+References: <20230823164831.3284341-1-ahmed.zaki@intel.com>
+	<20230823164831.3284341-2-ahmed.zaki@intel.com>
+	<20230824111455.686e98b4@kernel.org>
+	<849341ef-b0f4-d93f-1420-19c75ebf82b2@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next 0/4] make ip vrf exec SELinux-aware
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169292402366.28235.12908198050916037207.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Aug 2023 00:40:23 +0000
-References: <cover.1692804730.git.aclaudi@redhat.com>
-In-Reply-To: <cover.1692804730.git.aclaudi@redhat.com>
-To: Andrea Claudi <aclaudi@redhat.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 24 Aug 2023 16:55:40 -0600 Ahmed Zaki wrote:
+> When "Symmetric Toeplitz" is set in the NIC, the H/W will yield the same 
+> hash as the regular Toeplitz for protocol types that do not have such 
+> symmetric fields in both directions (i.e. there will be no RSS hash 
+> symmetry and the TX/RX traffic will land on different Rx queues).
+>
+> The goal of this series is to enable the "default" behavior of the whole 
+> device ("-X hfunc") to be the symmetric hash (again, only for protocols 
+> that have symmetric src/dst counterparts). If I understand the first 
+> option correctly, the user would need to manually configure all RXH 
+> fields for all flow types (tcp4, udp4, sctp4, tcp6, ..etc), to get 
+> symmetric RSS on them, instead of the proposed single "-X" command? 
+> The second option is closer to what I had in mind. We can re-name and 
+> provide any details.
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+I'm just trying to help, if you want a single knob you'd need to add
+new fields to the API and the RXFH API is not netlink-ified.
 
-On Wed, 23 Aug 2023 19:29:58 +0200 you wrote:
-> In order to execute a service with VRF, a user should start it using
-> "ip vrf exec". For example, using systemd, the user can encapsulate the
-> ExecStart command in ip vrf exec as shown below:
-> 
-> ExecStart=/usr/sbin/ip vrf exec vrf1 /usr/sbin/httpd $OPTIONS -DFOREGROUND
-> 
-> Assuming SELinux is in permissive mode, starting the service with the
-> current ip vrf implementation results in:
-> 
-> [...]
+Using hashing algo for configuring fields feels like a dirty hack.
 
-Here is the summary with links:
-  - [iproute2-next,1/4] ss: make is_selinux_enabled stub work like in SELinux
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=c8970828b650
-  - [iproute2-next,2/4] ss: make SELinux stub functions conformant to API definitions
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=61c6882ce21c
-  - [iproute2-next,3/4] lib: add SELinux include and stub functions
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e246ebc3b7f1
-  - [iproute2-next,4/4] ip vrf: make ipvrf_exec SELinux-aware
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=0d0eeaa6cb92
+> I agree that we will need to take care of some cases like if the user 
+> removes only "source IP" or "destination port" from the hash fields, 
+> without that field's counterpart (we can prevent this, or show a 
+> warning, ..etc). I was planning to address that in a follow-up
+> series; ie. handling the "ethtool -U rx-flow-hash". Do you want that
+> to be included in the same series as well?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yes, the validation needs to be part of the same series. But the
+semantics of selecting only src or dst need to be established, too.
+You said you feed dst ^ src into the hashing twice - why?
 
