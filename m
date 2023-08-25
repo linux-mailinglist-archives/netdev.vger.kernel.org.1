@@ -1,115 +1,409 @@
-Return-Path: <netdev+bounces-30671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8AE7887CC
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 14:51:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006A87887D0
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 14:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58B11281779
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 12:51:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 227271C20FBB
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 12:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540FACA5B;
-	Fri, 25 Aug 2023 12:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A50D2EB;
+	Fri, 25 Aug 2023 12:53:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4710EC8E4
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 12:51:07 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6F91FD3;
-	Fri, 25 Aug 2023 05:51:05 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-52a3ec08d93so1315967a12.2;
-        Fri, 25 Aug 2023 05:51:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692967864; x=1693572664;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3veK2GLQgAEyb3AnmI5hfEQQ/nHn4wGQ/Gz5qedNjzc=;
-        b=KSo8N+C+lT7gjxgt0QTTjqKba1nHMTCn1/CGila3+nU74bsq8Mv6iojbozL1LzafRO
-         HbNxYDtICoE/zeuDbr3nMaxFW+kuVan4FsyeYpnq7csAxY+ehTqGlOT1r2S+RxnSJuvW
-         1h01y2SOlnmEIve/pzqc/ryEofvuHkItUkJtK2Nejr7X6tgg6V4U6tsgkUsNxh3Vi/+9
-         5KRsQEgtWX7ET07xI6y3yidv18lx4tSB+VXp6yBbjp/hL3U4Vk0TL4ag489Wv0ilPvcF
-         O4UpoOIaQzEF91IGN7YOUGH4lnvh6A+3OcN0KF57mGNTZJq4nOxfiy/Eh5FxaGo0YGQV
-         lv6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692967864; x=1693572664;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3veK2GLQgAEyb3AnmI5hfEQQ/nHn4wGQ/Gz5qedNjzc=;
-        b=H2muq5KYl5miHpIMoqf0tQY+12fHnNSj2IYQP+0GJkCpueL7T4L/4y2heNGuaVDl+w
-         iRR9SoeO41vPagVkcYi9n4+OeXnuNt8RXpELy7/QpdVt0724jkJV84ZGRV14IKUR1Xf+
-         U2gtp3cGhLUbk7S66h0fS+ycSctgAT3vwFi6/NH2plitQ1ovvltNN9v8M8YRU8nkdIer
-         msM9CSXjY5i6Rn4+uWuUV3TCaOWfE5rtcYhFdBirHiHBNpbKIJxyLKAH6r+e9AuNY9wu
-         WgBkOoowaxwjL+RHD6hsAAkyY7svJDHR3tuKDuc5tusG2wXOtOiEmDn/3s5fiS5jU9gM
-         i8iw==
-X-Gm-Message-State: AOJu0YyPl1LQIJOFhRnncsfLF2LhqVqOdw+HZmZloAJ+72R7v8dvf8cS
-	E1tYomqxWGv5/4E7IhI6P5v0Vto2nrU=
-X-Google-Smtp-Source: AGHT+IFI3Q0yMaKg4B5UwItri9FXog9d/RAogfgWy6j5YJ81cfmiJjeVJZgZiaF2B4L1kKoLDFNrjg==
-X-Received: by 2002:a17:906:7395:b0:9a1:b5fc:8c5f with SMTP id f21-20020a170906739500b009a1b5fc8c5fmr9538341ejl.49.1692967864276;
-        Fri, 25 Aug 2023 05:51:04 -0700 (PDT)
-Received: from felia.fritz.box ([2a02:810d:7e40:14b0:98c5:e120:ff1e:7709])
-        by smtp.gmail.com with ESMTPSA id ck16-20020a170906c45000b00992b8d56f3asm922571ejb.105.2023.08.25.05.51.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 05:51:03 -0700 (PDT)
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Gal Pressman <gal@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] net/mlx5: fix config name in Kconfig parameter documentation
-Date: Fri, 25 Aug 2023 14:51:00 +0200
-Message-Id: <20230825125100.26453-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C83AAD5C
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 12:53:22 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9825B1BE2
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 05:53:20 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-133-Y7NVsyhmP-6lIszpvB8fGQ-1; Fri, 25 Aug 2023 08:53:01 -0400
+X-MC-Unique: Y7NVsyhmP-6lIszpvB8fGQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0A971C0693A;
+	Fri, 25 Aug 2023 12:53:00 +0000 (UTC)
+Received: from hog (unknown [10.39.192.31])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E46840C6F4C;
+	Fri, 25 Aug 2023 12:52:58 +0000 (UTC)
+Date: Fri, 25 Aug 2023 14:52:57 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next v2 3/5] net: phy: nxp-c45-tja11xx add MACsec
+ support
+Message-ID: <ZOikKUjRvces_vVj@hog>
+References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230824091615.191379-4-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230824091615.191379-4-radu-nicolae.pirea@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Commit a12ba19269d7 ("net/mlx5: Update Kconfig parameter documentation")
-adds documentation on Kconfig options for the mlx5 driver. It refers to the
-config MLX5_EN_MACSEC for MACSec offloading, but the config is actually
-called MLX5_MACSEC.
+[Some of the questions I'm asking are probably dumb since I don't know
+anything about phy drivers. Sorry if that's the case.]
 
-Fix the reference to the right config name in the documentation.
+General code organization nit: I think it would be easier to review
+the code if helpers functions were grouped by the type of object they
+work on. All the RXSA-related functions together, all the TXSA
+functions together, same for RXSC and then TXSC/SecY. Right now I see
+some RXSA functions in a group of TXSA functions, another in the
+middle of a group of RXSC functions. It makes navigating through the
+code a bit less convenient.
 
-Fixes: a12ba19269d7 ("net/mlx5: Update Kconfig parameter documentation")
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
-Saeed, please pick this quick fix to the documentation.
+Another nit: for consistency, it would be nice to stick to either
+"tx_sa" or "txsa" (same for rxsa and rxsc) in function names.
 
- .../device_drivers/ethernet/mellanox/mlx5/kconfig.rst           | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+2023-08-24, 12:16:13 +0300, Radu Pirea (NXP OSS) wrote:
+> +static int nxp_c45_macsec_write(struct phy_device *phydev, u16 reg, u32 val)
+> +{
+> +	WARN_ON_ONCE(reg % 4);
+> +
+> +	reg = reg / 2;
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND2,
+> +		      VEND1_MACSEC_BASE + reg, val);
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND2,
+> +		      VEND1_MACSEC_BASE + reg + 1, val >> 16);
 
-diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-index 0a42c3395ffa..20d3b7e87049 100644
---- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-+++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-@@ -67,7 +67,7 @@ Enabling the driver and kconfig options
- |    Enables :ref:`IPSec XFRM cryptography-offload acceleration <xfrm_device>`.
- 
- 
--**CONFIG_MLX5_EN_MACSEC=(y/n)**
-+**CONFIG_MLX5_MACSEC=(y/n)**
- 
- |    Build support for MACsec cryptography-offload acceleration in the NIC.
- 
+Can these calls fail? ie, do you need to handle errors like in
+nxp_c45_macsec_read (and then in callers of nxp_c45_macsec_write)?
+
+I see that no caller of nxp_c45_macsec_read actually checks the return
+value, so maybe those errors don't matter.
+
+
+[...]
+> +void nxp_c45_macsec_config_init(struct phy_device *phydev)
+> +{
+> +	if (!phydev->macsec_ops)
+> +		return;
+> +
+> +	phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PORT_FUNC_ENABLES,
+> +			 MACSEC_EN | ADAPTER_EN);
+
+The calls to phy_set_bits_mmd() in nxp_c45_config_intr() have error
+handling. Does this need error handling as well?
+
+[...]
+> +static bool nxp_c45_port_valid(struct nxp_c45_secy *phy_secy, u16 port)
+> +{
+> +	if (phy_secy->secy->tx_sc.end_station &&
+> +	    __be16_to_cpu((__force __be16)port) != 1)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +static bool nxp_c45_rx_sc_valid(struct nxp_c45_secy *phy_secy,
+> +				struct macsec_rx_sc *rx_sc)
+> +{
+> +	u16 port =  (__force u64)rx_sc->sci >> (ETH_ALEN * 8);
+
+u64 sci = be64_to_cpu((__force __be64)rx_sc->sci);
+u16 port = (u16)sci;
+
+And then drop the __be16_to_cpu conversion from nxp_c45_port_valid
+
+> +
+> +	if (phy_secy->point_to_point && phy_secy->secy_id != 0)
+> +		return false;
+> +
+> +	return nxp_c45_port_valid(phy_secy, port);
+> +}
+> +
+> +static bool nxp_c45_secy_cfg_valid(struct nxp_c45_secy *phy_secy, bool can_ptp)
+> +{
+> +	u16 port =  (__force u64)phy_secy->secy->sci >> (ETH_ALEN * 8);
+
+u64 sci = be64_to_cpu((__force __be64)rx_sc->sci);
+u16 port = (u16)sci;
+
+> +	if (phy_secy->secy->tx_sc.scb)
+> +		return false;
+
+[...]
+> +static int nxp_c45_update_tx_sc_secy_cfg(struct phy_device *phydev,
+> +					 struct nxp_c45_secy *phy_secy)
+> +{
+[...]
+> +	phydev_dbg(phydev, "scb %s\n",
+> +		   phy_secy->secy->tx_sc.scb ? "on" : "off");
+> +	if (phy_secy->secy->tx_sc.scb)
+> +		cfg |= MACSEC_TXSC_CFG_SCI;
+> +	else
+> +		cfg &= ~MACSEC_TXSC_CFG_SCI;
+
+Should that be called MACSEC_TXSC_CFG_SCB? I had to check that it
+wasn't using the wrong constant, using "SCI" for "SCB" (when SCI is
+already a well-defined thing in macsec) confused me.
+
+> +
+> +	nxp_c45_macsec_write(phydev, MACSEC_TXSC_CFG, cfg);
+> +
+> +	return 0;
+> +}
+> +
+[...]
+> +static int nxp_c45_set_rxsa_key(struct macsec_context *ctx, bool key_a)
+> +{
+> +	u32 *salt = (u32 *)ctx->sa.rx_sa->key.salt.bytes;
+> +	const struct nxp_c45_macsec_sa_regs *sa_regs;
+> +	u32 ssci = (__force u32)ctx->sa.rx_sa->ssci;
+> +	u32 key_size = ctx->secy->key_len / 4;
+> +	u32 salt_size = MACSEC_SALT_LEN / 4;
+> +	u32 *key = (u32 *)ctx->sa.key;
+> +	u32 reg;
+> +	int i;
+> +
+> +	sa_regs = nxp_c45_get_macsec_sa_regs(key_a);
+> +
+> +	for (i = 0; i < key_size; i++) {
+> +		reg = sa_regs->rxsa_ka + i * 4;
+> +		nxp_c45_macsec_write(ctx->phydev, reg,
+> +				     (__force u32)cpu_to_be32(key[i]));
+> +	}
+> +
+> +	if (ctx->secy->xpn) {
+> +		for (i = 0; i < salt_size; i++) {
+> +			reg = sa_regs->rxsa_salt + (2 - i) * 4;
+> +			nxp_c45_macsec_write(ctx->phydev, reg,
+> +					     (__force u32)cpu_to_be32(salt[i]));
+> +		}
+> +		nxp_c45_macsec_write(ctx->phydev, sa_regs->rxsa_ssci,
+> +				     (__force u32)cpu_to_be32(ssci));
+> +	}
+
+This looks basically identical to nxp_c45_txsa_set_key except for the
+registers it writes to. It could be turned into 2 or 3 small helpers
+(one for the key, then salt and ssci).
+
+> +
+> +	nxp_c45_set_rxsa_key_cfg(ctx, key_a, false);
+> +
+> +	return 0;
+> +}
+
+[...]
+> +static int nxp_c45_mdo_add_secy(struct macsec_context *ctx)
+> +{
+> +	struct phy_device *phydev = ctx->phydev;
+> +	struct nxp_c45_phy *priv = phydev->priv;
+> +	u64 sci = (__force u64)ctx->secy->sci;
+> +	struct nxp_c45_secy *phy_secy;
+> +	bool can_ptp;
+> +	int idx;
+> +	u32 reg;
+> +
+> +	phydev_dbg(ctx->phydev, "add secy SCI %llu\n", ctx->secy->sci);
+
+nit: %016llx feels more natural for SCIs since they can be broken down
+into address+port.
+
+And since it's stored in network byte order, you'll want to convert it
+via be64_to_cpu before you print it out.
+
+I'd suggest doing that directly into the sci variable:
+
+    u64 sci = be64_to_cpu((__force __be64)ctx->secy->sci);
+
+and then adapt the uses of sci further down.
+
+Feel free to move the sci_to_cpu function from
+drivers/net/netdevsim/macsec.c to include/net/macsec.h and reuse it.
+
+
+[...]
+> +static int nxp_c45_mdo_upd_secy(struct macsec_context *ctx)
+> +{
+[...]
+> +	if (phy_secy->enabled_an != ctx->secy->tx_sc.encoding_sa) {
+> +		old_tx_sa = phy_secy->tx_sa[phy_secy->enabled_an];
+> +		phy_secy->enabled_an = ctx->secy->tx_sc.encoding_sa;
+> +		new_tx_sa = phy_secy->tx_sa[phy_secy->enabled_an];
+> +		if (!new_tx_sa) {
+> +			nxp_c45_tx_sa_disable(phydev, phy_secy);
+> +			goto disable_old_tx_sa;
+> +		}
+> +
+> +		if (!new_tx_sa->tx_sa->active) {
+> +			nxp_c45_tx_sa_disable(phydev, phy_secy);
+> +			goto disable_old_tx_sa;
+> +		}
+
+You can combine those two conditions into
+
+		if (!new_tx_sa || !new_tx_sa->tx_sa->active) {
+			nxp_c45_tx_sa_disable(phydev, phy_secy);
+			goto disable_old_tx_sa;
+		}
+
+> +
+> +		new_tx_sa->is_key_a = phy_secy->tx_sa_key_a;
+> +		phy_secy->tx_sa_key_a = phy_secy->tx_sa_key_a;
+
+Is this missing a ! on the right side?
+
+Maybe worth creating a "next_sa_key_id" helper (or something like
+that) that returns the current value and updates tx_sa_key_a, since
+you use this pattern a few times.
+
+
+[...]
+> +static int nxp_c45_mdo_add_rxsc(struct macsec_context *ctx)
+> +{
+> +	struct phy_device *phydev = ctx->phydev;
+> +	struct nxp_c45_phy *priv = phydev->priv;
+> +	struct nxp_c45_secy *phy_secy;
+> +	struct nxp_c45_rx_sc *rx_sc;
+> +
+> +	phydev_dbg(phydev, "add RX SC %s\n",
+> +		   ctx->rx_sc->active ? "enabled" : "disabled");
+
+If the HW/driver supports multiple TXSC/RXSC on the same device, it
+would probably be helpful to add their SCIs to this debug message (and
+the update/delete ones, also for the mdo_*_rxsa and mdo_*_txsa
+functions).
+
+[...]
+> +static int nxp_c45_mdo_add_rxsa(struct macsec_context *ctx)
+> +{
+[...]
+> +	if (!rx_sc->rx_sa_b) {
+> +		phydev_dbg(phydev, "add RX SA B %u %s\n",
+> +			   an, rx_sa->active ? "enabled" : "disabled");
+> +		nxp_c45_set_rxsa_key(ctx, false);
+> +		rx_sc->rx_sa_b = rx_sa;
+> +		return 0;
+> +	}
+> +
+> +	return -ENOMEM;
+
+maybe -ENOSPC would fit better?
+
+> +}
+> +
+
+[...]
+> +static int nxp_c45_mdo_add_txsa(struct macsec_context *ctx)
+> +{
+[...]
+> +	if (phy_secy->tx_sa[sa])
+> +		return -EBUSY;
+> +
+> +	tx_sa = kzalloc(sizeof(*tx_sa), GFP_KERNEL);
+
+missing NULL check
+
+[...]
+> +static int nxp_c45_mdo_del_txsa(struct macsec_context *ctx)
+> +{
+[...]
+> +
+> +	phy_secy->tx_sa[sa] = NULL;
+> +	kfree(tx_sa);
+
+tx_sa contains the key, so this needs to be kfree_sensitive, or add a
+memzero_explicit(tx_sa->key) before freeing. Or if possible, don't
+copy the key at all into tx_sa.
+
+similar changes in the mscc driver:
+1b16b3fdf675 ("net: phy: mscc: macsec: clear encryption keys when freeing a flow")
+0dc33c65835d ("net: phy: mscc: macsec: do not copy encryption keys")
+
+
+[...]
+> diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+> index 7ab080ff02df..5bf7caa4e63d 100644
+> --- a/drivers/net/phy/nxp-c45-tja11xx.c
+> +++ b/drivers/net/phy/nxp-c45-tja11xx.c
+[...]
+> @@ -1218,12 +1201,25 @@ static int nxp_c45_start_op(struct phy_device *phydev)
+>  
+>  static int nxp_c45_config_intr(struct phy_device *phydev)
+>  {
+> -	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
+> +	int ret;
+> +
+> +	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+> +		ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
+> +				       VEND1_PORT_FUNC_IRQ_EN, MACSEC_IRQS);
+> +		if (ret)
+> +			return ret;
+> +
+>  		return phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
+>  					VEND1_PHY_IRQ_EN, PHY_IRQ_LINK_EVENT);
+
+Maybe a dumb question: should we be clearing the MACSEC_IRQS bits when
+this 2nd call to phy_set_bits_mmd fails? (and same below, reset when
+the 2nd clear fails)
+
+
+> -	else
+> -		return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
+> -					  VEND1_PHY_IRQ_EN, PHY_IRQ_LINK_EVENT);
+> +	}
+> +
+> +	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
+> +				 VEND1_PORT_FUNC_IRQ_EN, MACSEC_IRQS);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
+> +				  VEND1_PHY_IRQ_EN, PHY_IRQ_LINK_EVENT);
+>  }
+
+[...]
+> @@ -1666,6 +1666,20 @@ static int nxp_c45_probe(struct phy_device *phydev)
+>  	}
+>  
+>  no_ptp_support:
+> +	macsec_ability = !!(phy_abilities & MACSEC_ABILITY);
+> +	if (!macsec_ability) {
+> +		phydev_info(phydev, "the phy does not support MACsec\n");
+> +		goto no_macsec_support;
+> +	}
+> +
+> +	if (IS_ENABLED(CONFIG_MACSEC)) {
+> +		ret = nxp_c45_macsec_probe(phydev);
+
+I don't know how this probing is handled so maybe another dumb
+question: if that fails, are we going to leak resources allocated
+earlier?  (devm_kzalloc for example)
+
+> +		phydev_dbg(phydev, "MACsec support enabled.");
+> +	} else {
+> +		phydev_dbg(phydev, "MACsec support not enabled even if the phy supports it");
+> +	}
+> +
+> +no_macsec_support:
+>  
+>  	return ret;
+>  }
+
 -- 
-2.17.1
+Sabrina
 
 
