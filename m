@@ -1,156 +1,151 @@
-Return-Path: <netdev+bounces-30795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E8ED789203
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:53:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1791B789212
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F05C1C2104E
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 22:53:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3EEB2816CE
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 22:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA07198A5;
-	Fri, 25 Aug 2023 22:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D34D198AA;
+	Fri, 25 Aug 2023 22:56:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ABF1C02
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 22:53:45 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5CA272B
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68c0d4cc3a4so714039b3a.1
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693004012; x=1693608812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pUz0mvDJOC9uQjgg5Uba361PK/6ticcfnjAOo3qTtYA=;
-        b=F6apRE+SrZTqCeuN1zLMRosK5ge3rhNKZnpOWKEqEdWDSsGDK7EQGyDQsb6/5NjMZA
-         3YMPbcTJ/D3BMiY5oD/xtnLm9pzhShZ6+Y7oDMWnO0DfFEZbieWLXokCpFNjeT5nfH1C
-         s22NB1Wf7ErFiXowqbOOitIpN8YQ6wn+7f9hHAh/AXrGUdDwlOs/O2qrqcuv4RSpXcnU
-         GbrxFepvZAk5VQgoyCmH+APqoM+wo3KvR0eb+zB1BsLvnPOQaJNrJEZsuvoY9FN/6wnP
-         PBrjyNBdKOdo0Hj7mZUOQ9904vJZldE2dQql827LKN+udL2AKxU33q1Q1ADVqqMaFs/v
-         qugw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693004012; x=1693608812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pUz0mvDJOC9uQjgg5Uba361PK/6ticcfnjAOo3qTtYA=;
-        b=gRNETiZArBu9AVbm0IG6jQ0I2pH9a1Dc0ry5v0jxkoqxdx7YV3jeSKjK88dpeBj0iG
-         igvBNggmVE1mOn3NG72O3vBlCcaQmP9YlMYUnzS0jHOEgbOJ9TDX01cp2CQGaSnHA5cx
-         J2aU3kqPoPLij7kNy+HRooG3wwYagHAiALwRM8UOcL/PYqSFdSrniEjuQpcmEU+MTNks
-         hCYHPrtmEFRSmfs4MI6up/rqwyjqZfFtioiTjKbvJvGYv2vjWWIaMELJ4j7CfRsBe094
-         Z04jeUxOczsa/42Nb0gIEtch34H/l6dHbgrarMzmNiPTkucxIgce7Zn8he6YawGRYnil
-         oY8g==
-X-Gm-Message-State: AOJu0YxCZ7ifVmf3y6SFhITo44lLoldJs9b2EB/fN4fL22TvW3jKTCq2
-	Xf/1lqOKzjEhFS2dCBWwW2HeAQ==
-X-Google-Smtp-Source: AGHT+IF7qLruqklxY40yAH4SKvsJCnFBTQ8pg1x9p8DXB9ryPTSvbA4aGhPPBTQdBXYgxxyeFGZdhA==
-X-Received: by 2002:a05:6a20:7354:b0:13d:5b8e:db83 with SMTP id v20-20020a056a20735400b0013d5b8edb83mr20399311pzc.9.1693004012072;
-        Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id u15-20020a62ed0f000000b006887be16675sm2060364pfh.205.2023.08.25.15.53.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 15:53:31 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1qZfgG-006WDY-1c;
-	Sat, 26 Aug 2023 08:53:28 +1000
-Date: Sat, 26 Aug 2023 08:53:28 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Hao Xu <hao.xu@linux.dev>
-Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH RFC v5 00/29] io_uring getdents
-Message-ID: <ZOkw6KkdP1UWPNBW@dread.disaster.area>
-References: <20230825135431.1317785-1-hao.xu@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911FF174E6
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 22:56:06 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68946199F
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:56:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693004165; x=1724540165;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=AM7Wr8GMP/Lwm+AcnMkKhXcNzAIBo/oiIO65fhZLqXo=;
+  b=FOhnrJNTeFhfjb1lZvvAPD93LdRgVZyWdZZO5a3IJ1kfxbnSMjXwLFsR
+   eqPUOQyacG/dbi6ansOoSqkjSL77rPpOdLm8STFpECkAjnoafcGXsliWs
+   Fklbx2HKzqwM1X1aJJ3k73kHVf7Tk7u1fEIVXg/P/n11CGm751yPAQz5j
+   1ttNKiPnhBPGbfMLN/iR6PsRgdAL+OxR08gGpcq3nUl+mlEQVNXXyp2oo
+   jRnB7wNAAQLLRwKMc3Gvo7hkA5vxeu9qAwLXzYmMoztg1bV0eetHIjeCR
+   rOzr6wV+Oyk9CxHsOQJVhQYCbdNbukwPtoAx8NdIpUCqzu/APdmWJzvnJ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="441165852"
+X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
+   d="scan'208";a="441165852"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 15:56:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="803109867"
+X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
+   d="scan'208";a="803109867"
+Received: from rtallon-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.212.111.120])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 15:56:03 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Ferenc Fejes <ferenc.fejes@ericsson.com>, "jesse.brandeburg@intel.com"
+ <jesse.brandeburg@intel.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "sasha.neftin@intel.com"
+ <sasha.neftin@intel.com>, "intel-wired-lan@lists.osuosl.org"
+ <intel-wired-lan@lists.osuosl.org>, "anthony.l.nguyen@intel.com"
+ <anthony.l.nguyen@intel.com>
+Cc: "hawk@kernel.org" <hawk@kernel.org>
+Subject: Re: BUG(?): igc link up and XDP program init fails
+In-Reply-To: <0caf33cf6adb3a5bf137eeaa20e89b167c9986d5.camel@ericsson.com>
+References: <0caf33cf6adb3a5bf137eeaa20e89b167c9986d5.camel@ericsson.com>
+Date: Fri, 25 Aug 2023 15:56:01 -0700
+Message-ID: <87ttsmohoe.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825135431.1317785-1-hao.xu@linux.dev>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 09:54:02PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> This series introduce getdents64 to io_uring, the code logic is similar
-> with the snychronized version's. It first try nowait issue, and offload
-> it to io-wq threads if the first try fails.
-> 
-> Patch1 and Patch2 are some preparation
-> Patch3 supports nowait for xfs getdents code
-> Patch4-11 are vfs change, include adding helpers and trylock for locks
-> Patch12-29 supports nowait for involved xfs journal stuff
-> note, Patch24 and 27 are actually two questions, might be removed later.
-> an xfs test may come later.
+Hi Ferenc,
 
-You need to drop all the XFS journal stuff. It's fundamentally
-broken as it stands, and we cannot support non-blocking
-transactional changes without first putting a massive investment in
-transaction and intent chain rollback to allow correctly undoing
-partially complete modifications.
+Ferenc Fejes <ferenc.fejes@ericsson.com> writes:
 
-Regardless, non-blocking transactions are completely unnecessary for
-a non-blocking readdir implementation. readdir should only be
-touching atime, and with relatime it should only occur once every 24
-hours per inode. If that's a problem, then we have noatime mount
-options. Hence I just don't see any point in worrying about having a
-timestamp update block occasionally...
+> Dear igc Maintainers!
+>
+> I noticed that ip link set dev up fails with igc (Intel i225) driver
+> when XDP program is attached to it. More precisely, only when we have
+> incoming traffic and the incoming packet rate is too fast (like 100
+> packets per-sec).
+>
+> I don't have a very smart reproducer, so 4 i225 cards are needed to
+> trigger it. My setup (enp3s0 and enp4s0 directly connected with a
+> cable, similarly enp6s0 and enp7s0).
+>
+> veth0 ----> veth1 --redir---> enp3s0 ~~~~~~~ enp4s0
+> 			=C2=A0 |
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 +-> enp6s0 ~~~~~~~ enp7s0
+>
+> ip link add dev type veth
+> ip nei change 1.2.3.4 lladdr aa:aa:aa:aa:aa:aa dev veth0
+> xdp-bench redirect-multi veth1 enp3s0 enp6s0	#in terminal 1
+> xdpdump -i enp4s0				#in terminal 2
+> ping -I veth0 1.2.3.4 -i 0.5 #slow packet rate=C2=A0 #in terminal 3
+>
 
-I also don't really don't see why you need to fiddle with xfs buffer
-cache semantics - it already has the functionality "nowait" buffer
-reads require (i.e.  XBF_INCORE|XBF_TRYLOCK).
+I was just able to reproduce this issue, with a different setup:=20
 
-However, the readahead IO that the xfs readdir code issues cannot
-use your defined NOWAIT semantics - it must be able to allocate
-memory and issue IO. Readahead already avoids blocking on memory
-allocation and blocking on IO via the XBF_READ_AHEAD flag. This sets
-__GFP_NORETRY for buffer allocation and REQ_RAHEAD for IO. Hence
-readahead only needs the existing XBF_TRYLOCK flag to be set to be
-compatible with the required NOWAIT semantics....
+|             System A                 |   System B   |=20
+veth0 ----> veth1 --redir---> "enp3s0" ~~~~~~~ "enp4s0"
 
-As for the NOIO memory allocation restrictions io_uring requires,
-that should be enforced at the io_uring layer before calling into
-the VFS using memalloc_noio_save/restore.  At that point no memory
-allocation will trigger IO and none of the code running under NOWAIT
-conditions even needs to be aware that io_uring has a GFP_NOIO
-restriction on memory allocation....
+And running xdp-bench like this:
 
-Please go back to the simple "do non-blocking buffer IO"
-implementation we started with and don't try to solve every little
-blocking problem that might exist in the VFS and filesystems...
+$ xdp-bench redirect-multi veth1 enp3s0
 
--Dave
--- 
-Dave Chinner
-david@fromorbit.com
+Also I am running a different traffic generator.
+
+> Now in a separate terminal do a "ip link set dev enp4s0 down" and "ip
+> link set dev enp4s0 up". After a while, xdpdump will see the incoming
+> packets.
+>
+
+It seems that anything that triggers a reset of the adapter would
+trigger the bug: I am able to trigger the bug when I run 'xdp-bench'
+last (after "ping"/traffic generator), no need for 'link down/link up'.
+
+> Now in terminal 3, change the ping to a faster rate:
+> ping -I veth0 1.2.3.4 -i 0.01
+>
+> And do the ip link down/up again. In my setup, I no longer see incoming
+> packets. With bpftrace I see the driver keep trying to initialize
+> itself in an endless loop.
+>
+> Now stop the ping, wait about 4-5 seconds, and start the ping again.
+> This is enough time for the driver to initialize properly, and packets
+> are visible in xdpdump again.
+>
+> If anyone has an idea what is wrong with my setup I would be happy to
+> hear it, and I can help with testing fixes if this is indeed a bug.
+> I have replicated the setup with veths and it looks fine.
+>
+
+I don't think there's anything wrong with your setup.
+
+I am considering this a bug, I don't have any patches from the top of my
+head for you to try, but taking a look.
+
+Anyway, thanks for the report.
+
+
+Cheers,
+--=20
+Vinicius
 
