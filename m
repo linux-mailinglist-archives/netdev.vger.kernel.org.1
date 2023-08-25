@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-30589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F1D7882AE
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:54:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80EE77882B0
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AB511C20F76
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 309222817EE
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D8DA925;
-	Fri, 25 Aug 2023 08:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABDCC2EF;
+	Fri, 25 Aug 2023 08:53:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC54C2D1
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:34 +0000 (UTC)
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86CC61BCD
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:29 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id 38308e7fff4ca-2b9b50be31aso9167641fa.3
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43732C2D1
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:36 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392941BF2
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:31 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b974031aeaso10239361fa.0
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953608; x=1693558408;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953609; x=1693558409;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vVMeTZpvfiLqWf5TD37ygol4TbERvhIWDpxSNCRTor0=;
-        b=oQcHU4SNU7oeNBThHjZNHHzx0scLd1LPAzFQOJZADinFSH10Ic6SmaljjR/ZQPSLXb
-         kWFo/MWrS5B6AyHlfjkhVqgxZxBdizsx7vyyu0M+GCNYvGQj1UOyzguUJic/bM6OmI2a
-         H5t4tNIjKIGVfuakVVMyxxE9HXWT760vwOBU9c3ZXKTHQs8dOG2eNqddU09tbOXDPBSl
-         Gmu6jBBykxEi6jnjUyQ6UcV4iUD9FrzRd4JM5iJ3qSVpD6HQV/WQM/nmWinZL3CdJIa6
-         dqn3TCtWcWhtFt1B7/p5f98mj9OKeHp3b9WMYjBcZunhFz/yd0z6mavVPZaN0ge88vXw
-         yhZQ==
+        bh=BB1vqLAWPmHeO/chCKqFWKRCaXNk0Wss7ueKL+HFxmQ=;
+        b=sOZz2Fv9v32nUQ/gy5b3Yn4pvjhpq/pCpmwKZt+15SKt1vr747gnyjPVHCXkcZz7/h
+         x+jUjx+LgVOvj0y3Xl7nYgZxw9AI1tdU/uSeRqkwZJkJL895wMI73m6vbl8EzYXHXYAG
+         LurZTy7zn2XFCrBe7eA84wnGmr7+C5L1PM9KC+ExmFddcQB7F+WcBwFPGFIJEZLdjCne
+         e7GA3nhGZ1EH5I3Oyntx9TUNkjmq/6S1KYop7Z0Oed1EP/uGFPxVu35ldbhwhBLTNcTn
+         I7z5t5JcKaQWYnp0j/AiwM44LT7pEkwpyM6xF3TVFtKPLlwrCV8TmQA4AceQaHzgBQir
+         zt2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692953608; x=1693558408;
+        d=1e100.net; s=20221208; t=1692953609; x=1693558409;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vVMeTZpvfiLqWf5TD37ygol4TbERvhIWDpxSNCRTor0=;
-        b=hfrjpbtSielr8voZESnbVroIQ+pHfyBh/aFOtXIJml5aHxwxrSfpe8Ja2MJhJb7vnK
-         QZemrBCTYRtUiAdVtB8vaXJPzDLSzROBXDx3k4zJc0meafSjAhlqH2hoZcrF+atvtgIH
-         wNUMQgzJCLQkTjdhv7MXn9L2fj6DKCYCWL4eMZ7kJAiqdaxYg3C0BoxarWON5UI72ITr
-         PdetKWH+z4rqzV9PP/igeqsQSsqjrVfQq9URA7rk/+zBrH+A8OgWEzmbExmN8+uZKx6x
-         xvpCg3MnXh8FyYTpcDVkLKR/ERjdf4O/qcKu3XLctW35qA4C3ZERsawM/cf8svPlSN+i
-         RZAw==
-X-Gm-Message-State: AOJu0YyWU3CObsgKp0ht5td3edtXptfleP4tHBqpseLKz76wUjyhaTPS
-	yTW/Urx7bajYyaiiJbPbn4OZGmxrNqHxB/GGCMqBsMHCwQ8=
-X-Google-Smtp-Source: AGHT+IEVo8ObLwitwXk9a4FZxNQBmNPZtVkwYZq3nHTR4z0ZAZWBCjkYmkqV1cHjR5nlxHLD0HvrQw==
-X-Received: by 2002:a2e:9e08:0:b0:2b9:dfd0:c3d5 with SMTP id e8-20020a2e9e08000000b002b9dfd0c3d5mr11317551ljk.46.1692953607292;
-        Fri, 25 Aug 2023 01:53:27 -0700 (PDT)
+        bh=BB1vqLAWPmHeO/chCKqFWKRCaXNk0Wss7ueKL+HFxmQ=;
+        b=dnJIKAU6Y/lLjM4DjnQ0YdqJV3JqNnSUdHngkWEUxbA+fLCdMliwtM3TygOtdd2jyp
+         5OpDTbItvZhj4iCX/1k0THo7DizoULsSblsrqfhrp2h3dMqtK+11go1GNFqFOf1dSrjm
+         I3PmCYpPgo5ew0az+3ZtMjmxkUYdKvgIZV0KrOPft8lRhGFM/wfYMBjKOJqKLpz9CoFj
+         U3kelhPzVXFi/H6YmgeaYmjNhuJpywp6ox5uD7rSEdVflU7ZmJDSzh24fPJTu++pj3h9
+         M5zGM7sB24ozclDgLWodvreawRL5apGdr8YHt5r5LWzsrBaNXrlb5liOA+U0lP9n+7y5
+         tbRw==
+X-Gm-Message-State: AOJu0YxNnusHWSCChYY21s5JrJ8JqCJ9tgdfM9rOhbicC2+89uiXQsDW
+	fakhDn0ctSDlKWkXvF6Lnfq+D330VDpJAHqt1I1i42IP
+X-Google-Smtp-Source: AGHT+IHmYCdlDti++fPE54p6iDWZH7a8rxhawfss+JwEHce9gf4zMOZsQ2jKIQgJAdz0YdRdcFV6Qg==
+X-Received: by 2002:a2e:a309:0:b0:2b5:68ad:291f with SMTP id l9-20020a2ea309000000b002b568ad291fmr14018820lje.19.1692953609139;
+        Fri, 25 Aug 2023 01:53:29 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id 21-20020a05600c231500b003fc0505be19sm1574425wmo.37.2023.08.25.01.53.26
+        by smtp.gmail.com with ESMTPSA id s11-20020a1cf20b000000b003fe1a092925sm1586219wmc.19.2023.08.25.01.53.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 01:53:26 -0700 (PDT)
+        Fri, 25 Aug 2023 01:53:28 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -63,9 +63,9 @@ Cc: kuba@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	moshe@nvidia.com
-Subject: [patch net-next 02/15] devlink: push port related code into separate file
-Date: Fri, 25 Aug 2023 10:53:08 +0200
-Message-ID: <20230825085321.178134-3-jiri@resnulli.us>
+Subject: [patch net-next 03/15] devlink: push shared buffer related code into separate file
+Date: Fri, 25 Aug 2023 10:53:09 +0200
+Message-ID: <20230825085321.178134-4-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230825085321.178134-1-jiri@resnulli.us>
 References: <20230825085321.178134-1-jiri@resnulli.us>
@@ -77,516 +77,758 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_FILL_THIS_FORM_SHORT autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Cut out another chunk from leftover.c and put port related code
+Cut out another chunk from leftover.c and put sb related code
 into a separate file.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
  net/devlink/Makefile        |    2 +-
- net/devlink/devl_internal.h |   32 +-
- net/devlink/leftover.c      | 1446 +----------------------------------
- net/devlink/port.c          | 1411 ++++++++++++++++++++++++++++++++++
- 4 files changed, 1454 insertions(+), 1437 deletions(-)
- create mode 100644 net/devlink/port.c
+ net/devlink/devl_internal.h |    9 +
+ net/devlink/leftover.c      | 1338 +++++------------------------------
+ net/devlink/sb.c            |  996 ++++++++++++++++++++++++++
+ 4 files changed, 1180 insertions(+), 1165 deletions(-)
+ create mode 100644 net/devlink/sb.c
 
 diff --git a/net/devlink/Makefile b/net/devlink/Makefile
-index a087af581847..456bfb336540 100644
+index 456bfb336540..dcc508af48a9 100644
 --- a/net/devlink/Makefile
 +++ b/net/devlink/Makefile
 @@ -1,3 +1,3 @@
  # SPDX-License-Identifier: GPL-2.0
  
--obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o health.o
-+obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o health.o
+-obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o health.o
++obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o sb.o health.o \
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index eb1d5066c73f..7d01e2060702 100644
+index 7d01e2060702..e1a6b7a763b8 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -3,6 +3,7 @@
-  * Copyright (c) 2016 Jiri Pirko <jiri@mellanox.com>
-  */
- 
-+#include <linux/etherdevice.h>
- #include <linux/mutex.h>
- #include <linux/netdevice.h>
- #include <linux/notifier.h>
-@@ -11,6 +12,8 @@
- #include <linux/xarray.h>
- #include <net/devlink.h>
- #include <net/net_namespace.h>
-+#include <net/rtnetlink.h>
-+#include <rdma/ib_verbs.h>
- 
- #include "netlink_gen.h"
- 
-@@ -149,16 +152,37 @@ devlink_nl_put_handle(struct sk_buff *msg, struct devlink *devlink)
- 
- /* Notify */
- void devlink_notify(struct devlink *devlink, enum devlink_command cmd);
-+void devlink_ports_notify_register(struct devlink *devlink);
-+void devlink_ports_notify_unregister(struct devlink *devlink);
- 
- /* Ports */
-+#define ASSERT_DEVLINK_PORT_INITIALIZED(devlink_port)				\
-+	WARN_ON_ONCE(!(devlink_port)->initialized)
-+
-+struct devlink_port *devlink_port_get_by_index(struct devlink *devlink,
-+					       unsigned int port_index);
- int devlink_port_netdevice_event(struct notifier_block *nb,
- 				 unsigned long event, void *ptr);
--
- struct devlink_port *
- devlink_port_get_from_info(struct devlink *devlink, struct genl_info *info);
- struct devlink_port *devlink_port_get_from_attrs(struct devlink *devlink,
- 						 struct nlattr **attrs);
- 
-+/* Linecards */
-+struct devlink_linecard {
-+	struct list_head list;
-+	struct devlink *devlink;
-+	unsigned int index;
-+	const struct devlink_linecard_ops *ops;
-+	void *priv;
-+	enum devlink_linecard_state state;
-+	struct mutex state_lock; /* Protects state */
-+	const char *type;
-+	struct devlink_linecard_type *types;
-+	unsigned int types_count;
-+	struct devlink *nested_devlink;
-+};
-+
- /* Reload */
- bool devlink_reload_actions_valid(const struct devlink_ops *ops);
- int devlink_reload(struct devlink *devlink, struct net *dest_net,
-@@ -190,6 +214,12 @@ int devlink_nl_cmd_eswitch_get_doit(struct sk_buff *skb, struct genl_info *info)
- int devlink_nl_cmd_eswitch_set_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_cmd_flash_update(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_cmd_selftests_run(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_port_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_port_split_doit(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_port_unsplit_doit(struct sk_buff *skb,
-+				     struct genl_info *info);
-+int devlink_nl_cmd_port_new_doit(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_port_del_doit(struct sk_buff *skb, struct genl_info *info);
+@@ -220,6 +220,15 @@ int devlink_nl_cmd_port_unsplit_doit(struct sk_buff *skb,
+ 				     struct genl_info *info);
+ int devlink_nl_cmd_port_new_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_port_del_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_cmd_sb_pool_set_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_cmd_sb_port_pool_set_doit(struct sk_buff *skb,
++					 struct genl_info *info);
++int devlink_nl_cmd_sb_tc_pool_bind_set_doit(struct sk_buff *skb,
++					    struct genl_info *info);
++int devlink_nl_cmd_sb_occ_snapshot_doit(struct sk_buff *skb,
++					struct genl_info *info);
++int devlink_nl_cmd_sb_occ_max_clear_doit(struct sk_buff *skb,
++					 struct genl_info *info);
  int devlink_nl_cmd_health_reporter_set_doit(struct sk_buff *skb,
  					    struct genl_info *info);
  int devlink_nl_cmd_health_reporter_recover_doit(struct sk_buff *skb,
 diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index a134dddf2632..d14b40fb8fdf 100644
+index d14b40fb8fdf..795bfdd41103 100644
 --- a/net/devlink/leftover.c
 +++ b/net/devlink/leftover.c
-@@ -33,20 +33,6 @@
+@@ -231,164 +231,6 @@ devlink_linecard_get_from_info(struct devlink *devlink, struct genl_info *info)
+ 	return devlink_linecard_get_from_attrs(devlink, info->attrs);
+ }
  
- #include "devl_internal.h"
- 
--struct devlink_linecard {
+-struct devlink_sb {
 -	struct list_head list;
--	struct devlink *devlink;
 -	unsigned int index;
--	const struct devlink_linecard_ops *ops;
--	void *priv;
--	enum devlink_linecard_state state;
--	struct mutex state_lock; /* Protects state */
--	const char *type;
--	struct devlink_linecard_type *types;
--	unsigned int types_count;
--	struct devlink *nested_devlink;
+-	u32 size;
+-	u16 ingress_pools_count;
+-	u16 egress_pools_count;
+-	u16 ingress_tc_count;
+-	u16 egress_tc_count;
 -};
 -
- /**
-  * struct devlink_resource - devlink resource
-  * @name: name of the resource
-@@ -131,52 +117,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwmsg);
- EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwerr);
- EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_trap_report);
- 
--#define DEVLINK_PORT_FN_CAPS_VALID_MASK \
--	(_BITUL(__DEVLINK_PORT_FN_ATTR_CAPS_MAX) - 1)
--
--static const struct nla_policy devlink_function_nl_policy[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1] = {
--	[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] = { .type = NLA_BINARY },
--	[DEVLINK_PORT_FN_ATTR_STATE] =
--		NLA_POLICY_RANGE(NLA_U8, DEVLINK_PORT_FN_STATE_INACTIVE,
--				 DEVLINK_PORT_FN_STATE_ACTIVE),
--	[DEVLINK_PORT_FN_ATTR_CAPS] =
--		NLA_POLICY_BITFIELD32(DEVLINK_PORT_FN_CAPS_VALID_MASK),
--};
--
--#define ASSERT_DEVLINK_PORT_REGISTERED(devlink_port)				\
--	WARN_ON_ONCE(!(devlink_port)->registered)
--#define ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port)			\
--	WARN_ON_ONCE((devlink_port)->registered)
--#define ASSERT_DEVLINK_PORT_INITIALIZED(devlink_port)				\
--	WARN_ON_ONCE(!(devlink_port)->initialized)
--
--static struct devlink_port *devlink_port_get_by_index(struct devlink *devlink,
--						      unsigned int port_index)
+-static u16 devlink_sb_pool_count(struct devlink_sb *devlink_sb)
 -{
--	return xa_load(&devlink->ports, port_index);
+-	return devlink_sb->ingress_pools_count + devlink_sb->egress_pools_count;
 -}
 -
--struct devlink_port *devlink_port_get_from_attrs(struct devlink *devlink,
--						 struct nlattr **attrs)
+-static struct devlink_sb *devlink_sb_get_by_index(struct devlink *devlink,
+-						  unsigned int sb_index)
 -{
--	if (attrs[DEVLINK_ATTR_PORT_INDEX]) {
--		u32 port_index = nla_get_u32(attrs[DEVLINK_ATTR_PORT_INDEX]);
--		struct devlink_port *devlink_port;
+-	struct devlink_sb *devlink_sb;
 -
--		devlink_port = devlink_port_get_by_index(devlink, port_index);
--		if (!devlink_port)
+-	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
+-		if (devlink_sb->index == sb_index)
+-			return devlink_sb;
+-	}
+-	return NULL;
+-}
+-
+-static bool devlink_sb_index_exists(struct devlink *devlink,
+-				    unsigned int sb_index)
+-{
+-	return devlink_sb_get_by_index(devlink, sb_index);
+-}
+-
+-static struct devlink_sb *devlink_sb_get_from_attrs(struct devlink *devlink,
+-						    struct nlattr **attrs)
+-{
+-	if (attrs[DEVLINK_ATTR_SB_INDEX]) {
+-		u32 sb_index = nla_get_u32(attrs[DEVLINK_ATTR_SB_INDEX]);
+-		struct devlink_sb *devlink_sb;
+-
+-		devlink_sb = devlink_sb_get_by_index(devlink, sb_index);
+-		if (!devlink_sb)
 -			return ERR_PTR(-ENODEV);
--		return devlink_port;
+-		return devlink_sb;
 -	}
 -	return ERR_PTR(-EINVAL);
 -}
 -
--struct devlink_port *devlink_port_get_from_info(struct devlink *devlink,
--						struct genl_info *info)
+-static struct devlink_sb *devlink_sb_get_from_info(struct devlink *devlink,
+-						   struct genl_info *info)
 -{
--	return devlink_port_get_from_attrs(devlink, info->attrs);
+-	return devlink_sb_get_from_attrs(devlink, info->attrs);
 -}
 -
- static inline bool
- devlink_rate_is_leaf(struct devlink_rate *devlink_rate)
+-static int devlink_sb_pool_index_get_from_attrs(struct devlink_sb *devlink_sb,
+-						struct nlattr **attrs,
+-						u16 *p_pool_index)
+-{
+-	u16 val;
+-
+-	if (!attrs[DEVLINK_ATTR_SB_POOL_INDEX])
+-		return -EINVAL;
+-
+-	val = nla_get_u16(attrs[DEVLINK_ATTR_SB_POOL_INDEX]);
+-	if (val >= devlink_sb_pool_count(devlink_sb))
+-		return -EINVAL;
+-	*p_pool_index = val;
+-	return 0;
+-}
+-
+-static int devlink_sb_pool_index_get_from_info(struct devlink_sb *devlink_sb,
+-					       struct genl_info *info,
+-					       u16 *p_pool_index)
+-{
+-	return devlink_sb_pool_index_get_from_attrs(devlink_sb, info->attrs,
+-						    p_pool_index);
+-}
+-
+-static int
+-devlink_sb_pool_type_get_from_attrs(struct nlattr **attrs,
+-				    enum devlink_sb_pool_type *p_pool_type)
+-{
+-	u8 val;
+-
+-	if (!attrs[DEVLINK_ATTR_SB_POOL_TYPE])
+-		return -EINVAL;
+-
+-	val = nla_get_u8(attrs[DEVLINK_ATTR_SB_POOL_TYPE]);
+-	if (val != DEVLINK_SB_POOL_TYPE_INGRESS &&
+-	    val != DEVLINK_SB_POOL_TYPE_EGRESS)
+-		return -EINVAL;
+-	*p_pool_type = val;
+-	return 0;
+-}
+-
+-static int
+-devlink_sb_pool_type_get_from_info(struct genl_info *info,
+-				   enum devlink_sb_pool_type *p_pool_type)
+-{
+-	return devlink_sb_pool_type_get_from_attrs(info->attrs, p_pool_type);
+-}
+-
+-static int
+-devlink_sb_th_type_get_from_attrs(struct nlattr **attrs,
+-				  enum devlink_sb_threshold_type *p_th_type)
+-{
+-	u8 val;
+-
+-	if (!attrs[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE])
+-		return -EINVAL;
+-
+-	val = nla_get_u8(attrs[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE]);
+-	if (val != DEVLINK_SB_THRESHOLD_TYPE_STATIC &&
+-	    val != DEVLINK_SB_THRESHOLD_TYPE_DYNAMIC)
+-		return -EINVAL;
+-	*p_th_type = val;
+-	return 0;
+-}
+-
+-static int
+-devlink_sb_th_type_get_from_info(struct genl_info *info,
+-				 enum devlink_sb_threshold_type *p_th_type)
+-{
+-	return devlink_sb_th_type_get_from_attrs(info->attrs, p_th_type);
+-}
+-
+-static int
+-devlink_sb_tc_index_get_from_attrs(struct devlink_sb *devlink_sb,
+-				   struct nlattr **attrs,
+-				   enum devlink_sb_pool_type pool_type,
+-				   u16 *p_tc_index)
+-{
+-	u16 val;
+-
+-	if (!attrs[DEVLINK_ATTR_SB_TC_INDEX])
+-		return -EINVAL;
+-
+-	val = nla_get_u16(attrs[DEVLINK_ATTR_SB_TC_INDEX]);
+-	if (pool_type == DEVLINK_SB_POOL_TYPE_INGRESS &&
+-	    val >= devlink_sb->ingress_tc_count)
+-		return -EINVAL;
+-	if (pool_type == DEVLINK_SB_POOL_TYPE_EGRESS &&
+-	    val >= devlink_sb->egress_tc_count)
+-		return -EINVAL;
+-	*p_tc_index = val;
+-	return 0;
+-}
+-
+-static int
+-devlink_sb_tc_index_get_from_info(struct devlink_sb *devlink_sb,
+-				  struct genl_info *info,
+-				  enum devlink_sb_pool_type pool_type,
+-				  u16 *p_tc_index)
+-{
+-	return devlink_sb_tc_index_get_from_attrs(devlink_sb, info->attrs,
+-						  pool_type, p_tc_index);
+-}
+-
+ struct devlink_region {
+ 	struct devlink *devlink;
+ 	struct devlink_port *port;
+@@ -1053,825 +895,31 @@ static void devlink_linecards_notify_unregister(struct devlink *devlink)
  {
-@@ -439,86 +379,6 @@ devlink_sb_tc_index_get_from_attrs(struct devlink_sb *devlink_sb,
- 	return 0;
- }
+ 	struct devlink_linecard *linecard;
  
--static void devlink_port_fn_cap_fill(struct nla_bitfield32 *caps,
--				     u32 cap, bool is_enable)
--{
--	caps->selector |= cap;
--	if (is_enable)
--		caps->value |= cap;
+-	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
 -}
 -
--static int devlink_port_fn_roce_fill(struct devlink_port *devlink_port,
--				     struct nla_bitfield32 *caps,
--				     struct netlink_ext_ack *extack)
+-int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info)
 -{
--	bool is_enable;
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_linecard *linecard;
+-	struct sk_buff *msg;
 -	int err;
 -
--	if (!devlink_port->ops->port_fn_roce_get)
--		return 0;
+-	linecard = devlink_linecard_get_from_info(devlink, info);
+-	if (IS_ERR(linecard))
+-		return PTR_ERR(linecard);
 -
--	err = devlink_port->ops->port_fn_roce_get(devlink_port, &is_enable,
--						  extack);
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+-	if (!msg)
+-		return -ENOMEM;
+-
+-	mutex_lock(&linecard->state_lock);
+-	err = devlink_nl_linecard_fill(msg, devlink, linecard,
+-				       DEVLINK_CMD_LINECARD_NEW,
+-				       info->snd_portid, info->snd_seq, 0,
+-				       info->extack);
+-	mutex_unlock(&linecard->state_lock);
 -	if (err) {
--		if (err == -EOPNOTSUPP)
--			return 0;
+-		nlmsg_free(msg);
 -		return err;
 -	}
 -
--	devlink_port_fn_cap_fill(caps, DEVLINK_PORT_FN_CAP_ROCE, is_enable);
--	return 0;
+-	return genlmsg_reply(msg, info);
 -}
 -
--static int devlink_port_fn_migratable_fill(struct devlink_port *devlink_port,
--					   struct nla_bitfield32 *caps,
--					   struct netlink_ext_ack *extack)
+-static int devlink_nl_linecard_get_dump_one(struct sk_buff *msg,
+-					    struct devlink *devlink,
+-					    struct netlink_callback *cb,
+-					    int flags)
 -{
--	bool is_enable;
--	int err;
+-	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+-	struct devlink_linecard *linecard;
+-	int idx = 0;
+-	int err = 0;
 -
--	if (!devlink_port->ops->port_fn_migratable_get ||
--	    devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_VF)
--		return 0;
--
--	err = devlink_port->ops->port_fn_migratable_get(devlink_port,
--							&is_enable, extack);
--	if (err) {
--		if (err == -EOPNOTSUPP)
--			return 0;
--		return err;
+-	list_for_each_entry(linecard, &devlink->linecard_list, list) {
+-		if (idx < state->idx) {
+-			idx++;
+-			continue;
+-		}
+-		mutex_lock(&linecard->state_lock);
+-		err = devlink_nl_linecard_fill(msg, devlink, linecard,
+-					       DEVLINK_CMD_LINECARD_NEW,
+-					       NETLINK_CB(cb->skb).portid,
+-					       cb->nlh->nlmsg_seq, flags,
+-					       cb->extack);
+-		mutex_unlock(&linecard->state_lock);
+-		if (err) {
+-			state->idx = idx;
+-			break;
+-		}
+-		idx++;
 -	}
 -
--	devlink_port_fn_cap_fill(caps, DEVLINK_PORT_FN_CAP_MIGRATABLE, is_enable);
--	return 0;
--}
--
--static int devlink_port_fn_caps_fill(struct devlink_port *devlink_port,
--				     struct sk_buff *msg,
--				     struct netlink_ext_ack *extack,
--				     bool *msg_updated)
--{
--	struct nla_bitfield32 caps = {};
--	int err;
--
--	err = devlink_port_fn_roce_fill(devlink_port, &caps, extack);
--	if (err)
--		return err;
--
--	err = devlink_port_fn_migratable_fill(devlink_port, &caps, extack);
--	if (err)
--		return err;
--
--	if (!caps.selector)
--		return 0;
--	err = nla_put_bitfield32(msg, DEVLINK_PORT_FN_ATTR_CAPS, caps.value,
--				 caps.selector);
--	if (err)
--		return err;
--
--	*msg_updated = true;
--	return 0;
--}
--
- static int
- devlink_sb_tc_index_get_from_info(struct devlink_sb *devlink_sb,
- 				  struct genl_info *info,
-@@ -609,113 +469,6 @@ static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct devlink *dev
- 	return -EMSGSIZE;
- }
- 
--int devlink_nl_port_handle_fill(struct sk_buff *msg, struct devlink_port *devlink_port)
--{
--	if (devlink_nl_put_handle(msg, devlink_port->devlink))
--		return -EMSGSIZE;
--	if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, devlink_port->index))
--		return -EMSGSIZE;
--	return 0;
--}
--
--size_t devlink_nl_port_handle_size(struct devlink_port *devlink_port)
--{
--	struct devlink *devlink = devlink_port->devlink;
--
--	return nla_total_size(strlen(devlink->dev->bus->name) + 1) /* DEVLINK_ATTR_BUS_NAME */
--	     + nla_total_size(strlen(dev_name(devlink->dev)) + 1) /* DEVLINK_ATTR_DEV_NAME */
--	     + nla_total_size(4); /* DEVLINK_ATTR_PORT_INDEX */
--}
--
--static int devlink_nl_port_attrs_put(struct sk_buff *msg,
--				     struct devlink_port *devlink_port)
--{
--	struct devlink_port_attrs *attrs = &devlink_port->attrs;
--
--	if (!devlink_port->attrs_set)
--		return 0;
--	if (attrs->lanes) {
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_LANES, attrs->lanes))
--			return -EMSGSIZE;
--	}
--	if (nla_put_u8(msg, DEVLINK_ATTR_PORT_SPLITTABLE, attrs->splittable))
--		return -EMSGSIZE;
--	if (nla_put_u16(msg, DEVLINK_ATTR_PORT_FLAVOUR, attrs->flavour))
--		return -EMSGSIZE;
--	switch (devlink_port->attrs.flavour) {
--	case DEVLINK_PORT_FLAVOUR_PCI_PF:
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_CONTROLLER_NUMBER,
--				attrs->pci_pf.controller) ||
--		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_PF_NUMBER, attrs->pci_pf.pf))
--			return -EMSGSIZE;
--		if (nla_put_u8(msg, DEVLINK_ATTR_PORT_EXTERNAL, attrs->pci_pf.external))
--			return -EMSGSIZE;
--		break;
--	case DEVLINK_PORT_FLAVOUR_PCI_VF:
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_CONTROLLER_NUMBER,
--				attrs->pci_vf.controller) ||
--		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_PF_NUMBER, attrs->pci_vf.pf) ||
--		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_VF_NUMBER, attrs->pci_vf.vf))
--			return -EMSGSIZE;
--		if (nla_put_u8(msg, DEVLINK_ATTR_PORT_EXTERNAL, attrs->pci_vf.external))
--			return -EMSGSIZE;
--		break;
--	case DEVLINK_PORT_FLAVOUR_PCI_SF:
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_CONTROLLER_NUMBER,
--				attrs->pci_sf.controller) ||
--		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_PF_NUMBER,
--				attrs->pci_sf.pf) ||
--		    nla_put_u32(msg, DEVLINK_ATTR_PORT_PCI_SF_NUMBER,
--				attrs->pci_sf.sf))
--			return -EMSGSIZE;
--		break;
--	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
--	case DEVLINK_PORT_FLAVOUR_CPU:
--	case DEVLINK_PORT_FLAVOUR_DSA:
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_NUMBER,
--				attrs->phys.port_number))
--			return -EMSGSIZE;
--		if (!attrs->split)
--			return 0;
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_SPLIT_GROUP,
--				attrs->phys.port_number))
--			return -EMSGSIZE;
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_SPLIT_SUBPORT_NUMBER,
--				attrs->phys.split_subport_number))
--			return -EMSGSIZE;
--		break;
--	default:
--		break;
--	}
--	return 0;
--}
--
--static int devlink_port_fn_hw_addr_fill(struct devlink_port *port,
--					struct sk_buff *msg,
--					struct netlink_ext_ack *extack,
--					bool *msg_updated)
--{
--	u8 hw_addr[MAX_ADDR_LEN];
--	int hw_addr_len;
--	int err;
--
--	if (!port->ops->port_fn_hw_addr_get)
--		return 0;
--
--	err = port->ops->port_fn_hw_addr_get(port, hw_addr, &hw_addr_len,
--					     extack);
--	if (err) {
--		if (err == -EOPNOTSUPP)
--			return 0;
--		return err;
--	}
--	err = nla_put(msg, DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR, hw_addr_len, hw_addr);
--	if (err)
--		return err;
--	*msg_updated = true;
--	return 0;
--}
--
- static int devlink_nl_rate_fill(struct sk_buff *msg,
- 				struct devlink_rate *devlink_rate,
- 				enum devlink_command cmd, u32 portid, u32 seq,
-@@ -773,231 +526,6 @@ static int devlink_nl_rate_fill(struct sk_buff *msg,
- 	return -EMSGSIZE;
- }
- 
--static bool
--devlink_port_fn_state_valid(enum devlink_port_fn_state state)
--{
--	return state == DEVLINK_PORT_FN_STATE_INACTIVE ||
--	       state == DEVLINK_PORT_FN_STATE_ACTIVE;
--}
--
--static bool
--devlink_port_fn_opstate_valid(enum devlink_port_fn_opstate opstate)
--{
--	return opstate == DEVLINK_PORT_FN_OPSTATE_DETACHED ||
--	       opstate == DEVLINK_PORT_FN_OPSTATE_ATTACHED;
--}
--
--static int devlink_port_fn_state_fill(struct devlink_port *port,
--				      struct sk_buff *msg,
--				      struct netlink_ext_ack *extack,
--				      bool *msg_updated)
--{
--	enum devlink_port_fn_opstate opstate;
--	enum devlink_port_fn_state state;
--	int err;
--
--	if (!port->ops->port_fn_state_get)
--		return 0;
--
--	err = port->ops->port_fn_state_get(port, &state, &opstate, extack);
--	if (err) {
--		if (err == -EOPNOTSUPP)
--			return 0;
--		return err;
--	}
--	if (!devlink_port_fn_state_valid(state)) {
--		WARN_ON_ONCE(1);
--		NL_SET_ERR_MSG(extack, "Invalid state read from driver");
--		return -EINVAL;
--	}
--	if (!devlink_port_fn_opstate_valid(opstate)) {
--		WARN_ON_ONCE(1);
--		NL_SET_ERR_MSG(extack, "Invalid operational state read from driver");
--		return -EINVAL;
--	}
--	if (nla_put_u8(msg, DEVLINK_PORT_FN_ATTR_STATE, state) ||
--	    nla_put_u8(msg, DEVLINK_PORT_FN_ATTR_OPSTATE, opstate))
--		return -EMSGSIZE;
--	*msg_updated = true;
--	return 0;
--}
--
--static int
--devlink_port_fn_mig_set(struct devlink_port *devlink_port, bool enable,
--			struct netlink_ext_ack *extack)
--{
--	return devlink_port->ops->port_fn_migratable_set(devlink_port, enable,
--							 extack);
--}
--
--static int
--devlink_port_fn_roce_set(struct devlink_port *devlink_port, bool enable,
--			 struct netlink_ext_ack *extack)
--{
--	return devlink_port->ops->port_fn_roce_set(devlink_port, enable,
--						   extack);
--}
--
--static int devlink_port_fn_caps_set(struct devlink_port *devlink_port,
--				    const struct nlattr *attr,
--				    struct netlink_ext_ack *extack)
--{
--	struct nla_bitfield32 caps;
--	u32 caps_value;
--	int err;
--
--	caps = nla_get_bitfield32(attr);
--	caps_value = caps.value & caps.selector;
--	if (caps.selector & DEVLINK_PORT_FN_CAP_ROCE) {
--		err = devlink_port_fn_roce_set(devlink_port,
--					       caps_value & DEVLINK_PORT_FN_CAP_ROCE,
--					       extack);
--		if (err)
--			return err;
--	}
--	if (caps.selector & DEVLINK_PORT_FN_CAP_MIGRATABLE) {
--		err = devlink_port_fn_mig_set(devlink_port, caps_value &
--					      DEVLINK_PORT_FN_CAP_MIGRATABLE,
--					      extack);
--		if (err)
--			return err;
--	}
--	return 0;
--}
--
--static int
--devlink_nl_port_function_attrs_put(struct sk_buff *msg, struct devlink_port *port,
--				   struct netlink_ext_ack *extack)
--{
--	struct nlattr *function_attr;
--	bool msg_updated = false;
--	int err;
--
--	function_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PORT_FUNCTION);
--	if (!function_attr)
--		return -EMSGSIZE;
--
--	err = devlink_port_fn_hw_addr_fill(port, msg, extack, &msg_updated);
--	if (err)
--		goto out;
--	err = devlink_port_fn_caps_fill(port, msg, extack, &msg_updated);
--	if (err)
--		goto out;
--	err = devlink_port_fn_state_fill(port, msg, extack, &msg_updated);
--out:
--	if (err || !msg_updated)
--		nla_nest_cancel(msg, function_attr);
--	else
--		nla_nest_end(msg, function_attr);
 -	return err;
 -}
 -
--static int devlink_nl_port_fill(struct sk_buff *msg,
--				struct devlink_port *devlink_port,
--				enum devlink_command cmd, u32 portid, u32 seq,
--				int flags, struct netlink_ext_ack *extack)
+-int devlink_nl_linecard_get_dumpit(struct sk_buff *skb,
+-				   struct netlink_callback *cb)
 -{
--	struct devlink *devlink = devlink_port->devlink;
+-	return devlink_nl_dumpit(skb, cb, devlink_nl_linecard_get_dump_one);
+-}
+-
+-static struct devlink_linecard_type *
+-devlink_linecard_type_lookup(struct devlink_linecard *linecard,
+-			     const char *type)
+-{
+-	struct devlink_linecard_type *linecard_type;
+-	int i;
+-
+-	for (i = 0; i < linecard->types_count; i++) {
+-		linecard_type = &linecard->types[i];
+-		if (!strcmp(type, linecard_type->type))
+-			return linecard_type;
+-	}
+-	return NULL;
+-}
+-
+-static int devlink_linecard_type_set(struct devlink_linecard *linecard,
+-				     const char *type,
+-				     struct netlink_ext_ack *extack)
+-{
+-	const struct devlink_linecard_ops *ops = linecard->ops;
+-	struct devlink_linecard_type *linecard_type;
+-	int err;
+-
+-	mutex_lock(&linecard->state_lock);
+-	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-
+-	linecard_type = devlink_linecard_type_lookup(linecard, type);
+-	if (!linecard_type) {
+-		NL_SET_ERR_MSG(extack, "Unsupported line card type provided");
+-		err = -EINVAL;
+-		goto out;
+-	}
+-
+-	if (linecard->state != DEVLINK_LINECARD_STATE_UNPROVISIONED &&
+-	    linecard->state != DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
+-		NL_SET_ERR_MSG(extack, "Line card already provisioned");
+-		err = -EBUSY;
+-		/* Check if the line card is provisioned in the same
+-		 * way the user asks. In case it is, make the operation
+-		 * to return success.
+-		 */
+-		if (ops->same_provision &&
+-		    ops->same_provision(linecard, linecard->priv,
+-					linecard_type->type,
+-					linecard_type->priv))
+-			err = 0;
+-		goto out;
+-	}
+-
+-	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONING;
+-	linecard->type = linecard_type->type;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-	err = ops->provision(linecard, linecard->priv, linecard_type->type,
+-			     linecard_type->priv, extack);
+-	if (err) {
+-		/* Provisioning failed. Assume the linecard is unprovisioned
+-		 * for future operations.
+-		 */
+-		mutex_lock(&linecard->state_lock);
+-		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-		linecard->type = NULL;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		mutex_unlock(&linecard->state_lock);
+-	}
+-	return err;
+-
+-out:
+-	mutex_unlock(&linecard->state_lock);
+-	return err;
+-}
+-
+-static int devlink_linecard_type_unset(struct devlink_linecard *linecard,
+-				       struct netlink_ext_ack *extack)
+-{
+-	int err;
+-
+-	mutex_lock(&linecard->state_lock);
+-	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
+-		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-		linecard->type = NULL;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		err = 0;
+-		goto out;
+-	}
+-
+-	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONED) {
+-		NL_SET_ERR_MSG(extack, "Line card is not provisioned");
+-		err = 0;
+-		goto out;
+-	}
+-	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONING;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-	err = linecard->ops->unprovision(linecard, linecard->priv,
+-					 extack);
+-	if (err) {
+-		/* Unprovisioning failed. Assume the linecard is unprovisioned
+-		 * for future operations.
+-		 */
+-		mutex_lock(&linecard->state_lock);
+-		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-		linecard->type = NULL;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		mutex_unlock(&linecard->state_lock);
+-	}
+-	return err;
+-
+-out:
+-	mutex_unlock(&linecard->state_lock);
+-	return err;
+-}
+-
+-static int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
+-					    struct genl_info *info)
+-{
+-	struct netlink_ext_ack *extack = info->extack;
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_linecard *linecard;
+-	int err;
+-
+-	linecard = devlink_linecard_get_from_info(devlink, info);
+-	if (IS_ERR(linecard))
+-		return PTR_ERR(linecard);
+-
+-	if (info->attrs[DEVLINK_ATTR_LINECARD_TYPE]) {
+-		const char *type;
+-
+-		type = nla_data(info->attrs[DEVLINK_ATTR_LINECARD_TYPE]);
+-		if (strcmp(type, "")) {
+-			err = devlink_linecard_type_set(linecard, type, extack);
+-			if (err)
+-				return err;
+-		} else {
+-			err = devlink_linecard_type_unset(linecard, extack);
+-			if (err)
+-				return err;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+-static int devlink_nl_sb_fill(struct sk_buff *msg, struct devlink *devlink,
+-			      struct devlink_sb *devlink_sb,
+-			      enum devlink_command cmd, u32 portid,
+-			      u32 seq, int flags)
+-{
 -	void *hdr;
+-
+-	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+-	if (!hdr)
+-		return -EMSGSIZE;
+-
+-	if (devlink_nl_put_handle(msg, devlink))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_SIZE, devlink_sb->size))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_INGRESS_POOL_COUNT,
+-			devlink_sb->ingress_pools_count))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_EGRESS_POOL_COUNT,
+-			devlink_sb->egress_pools_count))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_INGRESS_TC_COUNT,
+-			devlink_sb->ingress_tc_count))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_EGRESS_TC_COUNT,
+-			devlink_sb->egress_tc_count))
+-		goto nla_put_failure;
+-
+-	genlmsg_end(msg, hdr);
+-	return 0;
+-
+-nla_put_failure:
+-	genlmsg_cancel(msg, hdr);
+-	return -EMSGSIZE;
+-}
+-
+-int devlink_nl_sb_get_doit(struct sk_buff *skb, struct genl_info *info)
+-{
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_sb *devlink_sb;
+-	struct sk_buff *msg;
+-	int err;
+-
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
+-
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+-	if (!msg)
+-		return -ENOMEM;
+-
+-	err = devlink_nl_sb_fill(msg, devlink, devlink_sb,
+-				 DEVLINK_CMD_SB_NEW,
+-				 info->snd_portid, info->snd_seq, 0);
+-	if (err) {
+-		nlmsg_free(msg);
+-		return err;
+-	}
+-
+-	return genlmsg_reply(msg, info);
+-}
+-
+-static int
+-devlink_nl_sb_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
+-			   struct netlink_callback *cb, int flags)
+-{
+-	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+-	struct devlink_sb *devlink_sb;
+-	int idx = 0;
+-	int err = 0;
+-
+-	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
+-		if (idx < state->idx) {
+-			idx++;
+-			continue;
+-		}
+-		err = devlink_nl_sb_fill(msg, devlink, devlink_sb,
+-					 DEVLINK_CMD_SB_NEW,
+-					 NETLINK_CB(cb->skb).portid,
+-					 cb->nlh->nlmsg_seq, flags);
+-		if (err) {
+-			state->idx = idx;
+-			break;
+-		}
+-		idx++;
+-	}
+-
+-	return err;
+-}
+-
+-int devlink_nl_sb_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+-{
+-	return devlink_nl_dumpit(skb, cb, devlink_nl_sb_get_dump_one);
+-}
+-
+-static int devlink_nl_sb_pool_fill(struct sk_buff *msg, struct devlink *devlink,
+-				   struct devlink_sb *devlink_sb,
+-				   u16 pool_index, enum devlink_command cmd,
+-				   u32 portid, u32 seq, int flags)
+-{
+-	struct devlink_sb_pool_info pool_info;
+-	void *hdr;
+-	int err;
+-
+-	err = devlink->ops->sb_pool_get(devlink, devlink_sb->index,
+-					pool_index, &pool_info);
+-	if (err)
+-		return err;
+-
+-	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+-	if (!hdr)
+-		return -EMSGSIZE;
+-
+-	if (devlink_nl_put_handle(msg, devlink))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_POOL_INDEX, pool_index))
+-		goto nla_put_failure;
+-	if (nla_put_u8(msg, DEVLINK_ATTR_SB_POOL_TYPE, pool_info.pool_type))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_POOL_SIZE, pool_info.size))
+-		goto nla_put_failure;
+-	if (nla_put_u8(msg, DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE,
+-		       pool_info.threshold_type))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_POOL_CELL_SIZE,
+-			pool_info.cell_size))
+-		goto nla_put_failure;
+-
+-	genlmsg_end(msg, hdr);
+-	return 0;
+-
+-nla_put_failure:
+-	genlmsg_cancel(msg, hdr);
+-	return -EMSGSIZE;
+-}
+-
+-int devlink_nl_sb_pool_get_doit(struct sk_buff *skb, struct genl_info *info)
+-{
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_sb *devlink_sb;
+-	struct sk_buff *msg;
+-	u16 pool_index;
+-	int err;
+-
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
+-
+-	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
+-						  &pool_index);
+-	if (err)
+-		return err;
+-
+-	if (!devlink->ops->sb_pool_get)
+-		return -EOPNOTSUPP;
+-
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+-	if (!msg)
+-		return -ENOMEM;
+-
+-	err = devlink_nl_sb_pool_fill(msg, devlink, devlink_sb, pool_index,
+-				      DEVLINK_CMD_SB_POOL_NEW,
+-				      info->snd_portid, info->snd_seq, 0);
+-	if (err) {
+-		nlmsg_free(msg);
+-		return err;
+-	}
+-
+-	return genlmsg_reply(msg, info);
+-}
+-
+-static int __sb_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
+-				struct devlink *devlink,
+-				struct devlink_sb *devlink_sb,
+-				u32 portid, u32 seq, int flags)
+-{
+-	u16 pool_count = devlink_sb_pool_count(devlink_sb);
+-	u16 pool_index;
+-	int err;
+-
+-	for (pool_index = 0; pool_index < pool_count; pool_index++) {
+-		if (*p_idx < start) {
+-			(*p_idx)++;
+-			continue;
+-		}
+-		err = devlink_nl_sb_pool_fill(msg, devlink,
+-					      devlink_sb,
+-					      pool_index,
+-					      DEVLINK_CMD_SB_POOL_NEW,
+-					      portid, seq, flags);
+-		if (err)
+-			return err;
+-		(*p_idx)++;
+-	}
+-	return 0;
+-}
+-
+-static int
+-devlink_nl_sb_pool_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
+-				struct netlink_callback *cb, int flags)
+-{
+-	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+-	struct devlink_sb *devlink_sb;
+-	int err = 0;
+-	int idx = 0;
+-
+-	if (!devlink->ops->sb_pool_get)
+-		return 0;
+-
+-	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
+-		err = __sb_pool_get_dumpit(msg, state->idx, &idx,
+-					   devlink, devlink_sb,
+-					   NETLINK_CB(cb->skb).portid,
+-					   cb->nlh->nlmsg_seq, flags);
+-		if (err == -EOPNOTSUPP) {
+-			err = 0;
+-		} else if (err) {
+-			state->idx = idx;
+-			break;
+-		}
+-	}
+-
+-	return err;
+-}
+-
+-int devlink_nl_sb_pool_get_dumpit(struct sk_buff *skb,
+-				  struct netlink_callback *cb)
+-{
+-	return devlink_nl_dumpit(skb, cb, devlink_nl_sb_pool_get_dump_one);
+-}
+-
+-static int devlink_sb_pool_set(struct devlink *devlink, unsigned int sb_index,
+-			       u16 pool_index, u32 size,
+-			       enum devlink_sb_threshold_type threshold_type,
+-			       struct netlink_ext_ack *extack)
+-
+-{
+-	const struct devlink_ops *ops = devlink->ops;
+-
+-	if (ops->sb_pool_set)
+-		return ops->sb_pool_set(devlink, sb_index, pool_index,
+-					size, threshold_type, extack);
+-	return -EOPNOTSUPP;
+-}
+-
+-static int devlink_nl_cmd_sb_pool_set_doit(struct sk_buff *skb,
+-					   struct genl_info *info)
+-{
+-	struct devlink *devlink = info->user_ptr[0];
+-	enum devlink_sb_threshold_type threshold_type;
+-	struct devlink_sb *devlink_sb;
+-	u16 pool_index;
+-	u32 size;
+-	int err;
+-
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
+-
+-	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
+-						  &pool_index);
+-	if (err)
+-		return err;
+-
+-	err = devlink_sb_th_type_get_from_info(info, &threshold_type);
+-	if (err)
+-		return err;
+-
+-	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_SB_POOL_SIZE))
+-		return -EINVAL;
+-
+-	size = nla_get_u32(info->attrs[DEVLINK_ATTR_SB_POOL_SIZE]);
+-	return devlink_sb_pool_set(devlink, devlink_sb->index,
+-				   pool_index, size, threshold_type,
+-				   info->extack);
+-}
+-
+-static int devlink_nl_sb_port_pool_fill(struct sk_buff *msg,
+-					struct devlink *devlink,
+-					struct devlink_port *devlink_port,
+-					struct devlink_sb *devlink_sb,
+-					u16 pool_index,
+-					enum devlink_command cmd,
+-					u32 portid, u32 seq, int flags)
+-{
+-	const struct devlink_ops *ops = devlink->ops;
+-	u32 threshold;
+-	void *hdr;
+-	int err;
+-
+-	err = ops->sb_port_pool_get(devlink_port, devlink_sb->index,
+-				    pool_index, &threshold);
+-	if (err)
+-		return err;
 -
 -	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
 -	if (!hdr)
@@ -596,132 +838,69 @@ index a134dddf2632..d14b40fb8fdf 100644
 -		goto nla_put_failure;
 -	if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, devlink_port->index))
 -		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_POOL_INDEX, pool_index))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_THRESHOLD, threshold))
+-		goto nla_put_failure;
 -
--	spin_lock_bh(&devlink_port->type_lock);
--	if (nla_put_u16(msg, DEVLINK_ATTR_PORT_TYPE, devlink_port->type))
--		goto nla_put_failure_type_locked;
--	if (devlink_port->desired_type != DEVLINK_PORT_TYPE_NOTSET &&
--	    nla_put_u16(msg, DEVLINK_ATTR_PORT_DESIRED_TYPE,
--			devlink_port->desired_type))
--		goto nla_put_failure_type_locked;
--	if (devlink_port->type == DEVLINK_PORT_TYPE_ETH) {
--		if (devlink_port->type_eth.netdev &&
--		    (nla_put_u32(msg, DEVLINK_ATTR_PORT_NETDEV_IFINDEX,
--				 devlink_port->type_eth.ifindex) ||
--		     nla_put_string(msg, DEVLINK_ATTR_PORT_NETDEV_NAME,
--				    devlink_port->type_eth.ifname)))
--			goto nla_put_failure_type_locked;
--	}
--	if (devlink_port->type == DEVLINK_PORT_TYPE_IB) {
--		struct ib_device *ibdev = devlink_port->type_ib.ibdev;
+-	if (ops->sb_occ_port_pool_get) {
+-		u32 cur;
+-		u32 max;
 -
--		if (ibdev &&
--		    nla_put_string(msg, DEVLINK_ATTR_PORT_IBDEV_NAME,
--				   ibdev->name))
--			goto nla_put_failure_type_locked;
+-		err = ops->sb_occ_port_pool_get(devlink_port, devlink_sb->index,
+-						pool_index, &cur, &max);
+-		if (err && err != -EOPNOTSUPP)
+-			goto sb_occ_get_failure;
+-		if (!err) {
+-			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_CUR, cur))
+-				goto nla_put_failure;
+-			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_MAX, max))
+-				goto nla_put_failure;
+-		}
 -	}
--	spin_unlock_bh(&devlink_port->type_lock);
--	if (devlink_nl_port_attrs_put(msg, devlink_port))
--		goto nla_put_failure;
--	if (devlink_nl_port_function_attrs_put(msg, devlink_port, extack))
--		goto nla_put_failure;
--	if (devlink_port->linecard &&
--	    nla_put_u32(msg, DEVLINK_ATTR_LINECARD_INDEX,
--			devlink_port->linecard->index))
--		goto nla_put_failure;
 -
 -	genlmsg_end(msg, hdr);
 -	return 0;
 -
--nla_put_failure_type_locked:
--	spin_unlock_bh(&devlink_port->type_lock);
 -nla_put_failure:
+-	err = -EMSGSIZE;
+-sb_occ_get_failure:
 -	genlmsg_cancel(msg, hdr);
--	return -EMSGSIZE;
+-	return err;
 -}
 -
--static void devlink_port_notify(struct devlink_port *devlink_port,
--				enum devlink_command cmd)
--{
--	struct devlink *devlink = devlink_port->devlink;
--	struct sk_buff *msg;
--	int err;
--
--	WARN_ON(cmd != DEVLINK_CMD_PORT_NEW && cmd != DEVLINK_CMD_PORT_DEL);
--
--	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
--		return;
--
--	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
--	if (!msg)
--		return;
--
--	err = devlink_nl_port_fill(msg, devlink_port, cmd, 0, 0, 0, NULL);
--	if (err) {
--		nlmsg_free(msg);
--		return;
--	}
--
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
--				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
--}
--
--static void devlink_ports_notify(struct devlink *devlink,
--				 enum devlink_command cmd)
--{
--	struct devlink_port *devlink_port;
--	unsigned long port_index;
--
--	xa_for_each(&devlink->ports, port_index, devlink_port)
--		devlink_port_notify(devlink_port, cmd);
--}
--
--static void devlink_ports_notify_register(struct devlink *devlink)
--{
--	devlink_ports_notify(devlink, DEVLINK_CMD_PORT_NEW);
--}
--
--static void devlink_ports_notify_unregister(struct devlink *devlink)
--{
--	devlink_ports_notify(devlink, DEVLINK_CMD_PORT_DEL);
--}
--
- static void devlink_rate_notify(struct devlink_rate *devlink_rate,
- 				enum devlink_command cmd)
- {
-@@ -1096,367 +624,20 @@ int devlink_nl_rate_get_doit(struct sk_buff *skb, struct genl_info *info)
- 		nlmsg_free(msg);
- 		return err;
- 	}
--
--	return genlmsg_reply(msg, info);
--}
--
--static bool
--devlink_rate_is_parent_node(struct devlink_rate *devlink_rate,
--			    struct devlink_rate *parent)
--{
--	while (parent) {
--		if (parent == devlink_rate)
--			return true;
--		parent = parent->parent;
--	}
--	return false;
--}
--
--int devlink_nl_port_get_doit(struct sk_buff *skb, struct genl_info *info)
+-int devlink_nl_sb_port_pool_get_doit(struct sk_buff *skb,
+-				     struct genl_info *info)
 -{
 -	struct devlink_port *devlink_port = info->user_ptr[1];
+-	struct devlink *devlink = devlink_port->devlink;
+-	struct devlink_sb *devlink_sb;
 -	struct sk_buff *msg;
+-	u16 pool_index;
 -	int err;
+-
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
+-
+-	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
+-						  &pool_index);
+-	if (err)
+-		return err;
+-
+-	if (!devlink->ops->sb_port_pool_get)
+-		return -EOPNOTSUPP;
 -
 -	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
 -	if (!msg)
 -		return -ENOMEM;
 -
--	err = devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_PORT_NEW,
--				   info->snd_portid, info->snd_seq, 0,
--				   info->extack);
+-	err = devlink_nl_sb_port_pool_fill(msg, devlink, devlink_port,
+-					   devlink_sb, pool_index,
+-					   DEVLINK_CMD_SB_PORT_POOL_NEW,
+-					   info->snd_portid, info->snd_seq, 0);
 -	if (err) {
 -		nlmsg_free(msg);
 -		return err;
@@ -730,23 +909,59 @@ index a134dddf2632..d14b40fb8fdf 100644
 -	return genlmsg_reply(msg, info);
 -}
 -
+-static int __sb_port_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
+-				     struct devlink *devlink,
+-				     struct devlink_sb *devlink_sb,
+-				     u32 portid, u32 seq, int flags)
+-{
+-	struct devlink_port *devlink_port;
+-	u16 pool_count = devlink_sb_pool_count(devlink_sb);
+-	unsigned long port_index;
+-	u16 pool_index;
+-	int err;
+-
+-	xa_for_each(&devlink->ports, port_index, devlink_port) {
+-		for (pool_index = 0; pool_index < pool_count; pool_index++) {
+-			if (*p_idx < start) {
+-				(*p_idx)++;
+-				continue;
+-			}
+-			err = devlink_nl_sb_port_pool_fill(msg, devlink,
+-							   devlink_port,
+-							   devlink_sb,
+-							   pool_index,
+-							   DEVLINK_CMD_SB_PORT_POOL_NEW,
+-							   portid, seq, flags);
+-			if (err)
+-				return err;
+-			(*p_idx)++;
+-		}
+-	}
+-	return 0;
+-}
+-
 -static int
--devlink_nl_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			     struct netlink_callback *cb, int flags)
+-devlink_nl_sb_port_pool_get_dump_one(struct sk_buff *msg,
+-				     struct devlink *devlink,
+-				     struct netlink_callback *cb, int flags)
 -{
 -	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
--	struct devlink_port *devlink_port;
--	unsigned long port_index;
+-	struct devlink_sb *devlink_sb;
+-	int idx = 0;
 -	int err = 0;
 -
--	xa_for_each_start(&devlink->ports, port_index, devlink_port, state->idx) {
--		err = devlink_nl_port_fill(msg, devlink_port,
--					   DEVLINK_CMD_NEW,
--					   NETLINK_CB(cb->skb).portid,
--					   cb->nlh->nlmsg_seq, flags,
--					   cb->extack);
--		if (err) {
--			state->idx = port_index;
+-	if (!devlink->ops->sb_port_pool_get)
+-		return 0;
+-
+-	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
+-		err = __sb_port_pool_get_dumpit(msg, state->idx, &idx,
+-						devlink, devlink_sb,
+-						NETLINK_CB(cb->skb).portid,
+-						cb->nlh->nlmsg_seq, flags);
+-		if (err == -EOPNOTSUPP) {
+-			err = 0;
+-		} else if (err) {
+-			state->idx = idx;
 -			break;
 -		}
 -	}
@@ -754,949 +969,587 @@ index a134dddf2632..d14b40fb8fdf 100644
 -	return err;
 -}
 -
--int devlink_nl_port_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+-int devlink_nl_sb_port_pool_get_dumpit(struct sk_buff *skb,
+-				       struct netlink_callback *cb)
 -{
--	return devlink_nl_dumpit(skb, cb, devlink_nl_port_get_dump_one);
+-	return devlink_nl_dumpit(skb, cb, devlink_nl_sb_port_pool_get_dump_one);
 -}
 -
--static int devlink_port_type_set(struct devlink_port *devlink_port,
--				 enum devlink_port_type port_type)
+-static int devlink_sb_port_pool_set(struct devlink_port *devlink_port,
+-				    unsigned int sb_index, u16 pool_index,
+-				    u32 threshold,
+-				    struct netlink_ext_ack *extack)
 -
 -{
+-	const struct devlink_ops *ops = devlink_port->devlink->ops;
+-
+-	if (ops->sb_port_pool_set)
+-		return ops->sb_port_pool_set(devlink_port, sb_index,
+-					     pool_index, threshold, extack);
+-	return -EOPNOTSUPP;
+-}
+-
+-static int devlink_nl_cmd_sb_port_pool_set_doit(struct sk_buff *skb,
+-						struct genl_info *info)
+-{
+-	struct devlink_port *devlink_port = info->user_ptr[1];
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_sb *devlink_sb;
+-	u16 pool_index;
+-	u32 threshold;
 -	int err;
 -
--	if (!devlink_port->ops->port_type_set)
--		return -EOPNOTSUPP;
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
 -
--	if (port_type == devlink_port->type)
+-	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
+-						  &pool_index);
+-	if (err)
+-		return err;
+-
+-	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_SB_THRESHOLD))
+-		return -EINVAL;
+-
+-	threshold = nla_get_u32(info->attrs[DEVLINK_ATTR_SB_THRESHOLD]);
+-	return devlink_sb_port_pool_set(devlink_port, devlink_sb->index,
+-					pool_index, threshold, info->extack);
+-}
+-
+-static int
+-devlink_nl_sb_tc_pool_bind_fill(struct sk_buff *msg, struct devlink *devlink,
+-				struct devlink_port *devlink_port,
+-				struct devlink_sb *devlink_sb, u16 tc_index,
+-				enum devlink_sb_pool_type pool_type,
+-				enum devlink_command cmd,
+-				u32 portid, u32 seq, int flags)
+-{
+-	const struct devlink_ops *ops = devlink->ops;
+-	u16 pool_index;
+-	u32 threshold;
+-	void *hdr;
+-	int err;
+-
+-	err = ops->sb_tc_pool_bind_get(devlink_port, devlink_sb->index,
+-				       tc_index, pool_type,
+-				       &pool_index, &threshold);
+-	if (err)
+-		return err;
+-
+-	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+-	if (!hdr)
+-		return -EMSGSIZE;
+-
+-	if (devlink_nl_put_handle(msg, devlink))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, devlink_port->index))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_TC_INDEX, tc_index))
+-		goto nla_put_failure;
+-	if (nla_put_u8(msg, DEVLINK_ATTR_SB_POOL_TYPE, pool_type))
+-		goto nla_put_failure;
+-	if (nla_put_u16(msg, DEVLINK_ATTR_SB_POOL_INDEX, pool_index))
+-		goto nla_put_failure;
+-	if (nla_put_u32(msg, DEVLINK_ATTR_SB_THRESHOLD, threshold))
+-		goto nla_put_failure;
+-
+-	if (ops->sb_occ_tc_port_bind_get) {
+-		u32 cur;
+-		u32 max;
+-
+-		err = ops->sb_occ_tc_port_bind_get(devlink_port,
+-						   devlink_sb->index,
+-						   tc_index, pool_type,
+-						   &cur, &max);
+-		if (err && err != -EOPNOTSUPP)
+-			return err;
+-		if (!err) {
+-			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_CUR, cur))
+-				goto nla_put_failure;
+-			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_MAX, max))
+-				goto nla_put_failure;
+-		}
+-	}
+-
+-	genlmsg_end(msg, hdr);
+-	return 0;
+-
+-nla_put_failure:
+-	genlmsg_cancel(msg, hdr);
+-	return -EMSGSIZE;
++	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
+ }
+ 
+-int devlink_nl_sb_tc_pool_bind_get_doit(struct sk_buff *skb,
+-					struct genl_info *info)
++int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+-	struct devlink_port *devlink_port = info->user_ptr[1];
+-	struct devlink *devlink = devlink_port->devlink;
+-	struct devlink_sb *devlink_sb;
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_linecard *linecard;
+ 	struct sk_buff *msg;
+-	enum devlink_sb_pool_type pool_type;
+-	u16 tc_index;
+ 	int err;
+ 
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
+-
+-	err = devlink_sb_pool_type_get_from_info(info, &pool_type);
+-	if (err)
+-		return err;
+-
+-	err = devlink_sb_tc_index_get_from_info(devlink_sb, info,
+-						pool_type, &tc_index);
+-	if (err)
+-		return err;
+-
+-	if (!devlink->ops->sb_tc_pool_bind_get)
+-		return -EOPNOTSUPP;
++	linecard = devlink_linecard_get_from_info(devlink, info);
++	if (IS_ERR(linecard))
++		return PTR_ERR(linecard);
+ 
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!msg)
+ 		return -ENOMEM;
+ 
+-	err = devlink_nl_sb_tc_pool_bind_fill(msg, devlink, devlink_port,
+-					      devlink_sb, tc_index, pool_type,
+-					      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
+-					      info->snd_portid,
+-					      info->snd_seq, 0);
++	mutex_lock(&linecard->state_lock);
++	err = devlink_nl_linecard_fill(msg, devlink, linecard,
++				       DEVLINK_CMD_LINECARD_NEW,
++				       info->snd_portid, info->snd_seq, 0,
++				       info->extack);
++	mutex_unlock(&linecard->state_lock);
+ 	if (err) {
+ 		nlmsg_free(msg);
+ 		return err;
+@@ -1880,179 +928,204 @@ int devlink_nl_sb_tc_pool_bind_get_doit(struct sk_buff *skb,
+ 	return genlmsg_reply(msg, info);
+ }
+ 
+-static int __sb_tc_pool_bind_get_dumpit(struct sk_buff *msg,
+-					int start, int *p_idx,
+-					struct devlink *devlink,
+-					struct devlink_sb *devlink_sb,
+-					u32 portid, u32 seq, int flags)
+-{
+-	struct devlink_port *devlink_port;
+-	unsigned long port_index;
+-	u16 tc_index;
+-	int err;
+-
+-	xa_for_each(&devlink->ports, port_index, devlink_port) {
+-		for (tc_index = 0;
+-		     tc_index < devlink_sb->ingress_tc_count; tc_index++) {
+-			if (*p_idx < start) {
+-				(*p_idx)++;
+-				continue;
+-			}
+-			err = devlink_nl_sb_tc_pool_bind_fill(msg, devlink,
+-							      devlink_port,
+-							      devlink_sb,
+-							      tc_index,
+-							      DEVLINK_SB_POOL_TYPE_INGRESS,
+-							      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
+-							      portid, seq,
+-							      flags);
+-			if (err)
+-				return err;
+-			(*p_idx)++;
+-		}
+-		for (tc_index = 0;
+-		     tc_index < devlink_sb->egress_tc_count; tc_index++) {
+-			if (*p_idx < start) {
+-				(*p_idx)++;
+-				continue;
+-			}
+-			err = devlink_nl_sb_tc_pool_bind_fill(msg, devlink,
+-							      devlink_port,
+-							      devlink_sb,
+-							      tc_index,
+-							      DEVLINK_SB_POOL_TYPE_EGRESS,
+-							      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
+-							      portid, seq,
+-							      flags);
+-			if (err)
+-				return err;
+-			(*p_idx)++;
+-		}
+-	}
+-	return 0;
+-}
+-
+-static int devlink_nl_sb_tc_pool_bind_get_dump_one(struct sk_buff *msg,
+-						   struct devlink *devlink,
+-						   struct netlink_callback *cb,
+-						   int flags)
++static int devlink_nl_linecard_get_dump_one(struct sk_buff *msg,
++					    struct devlink *devlink,
++					    struct netlink_callback *cb,
++					    int flags)
+ {
+ 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+-	struct devlink_sb *devlink_sb;
++	struct devlink_linecard *linecard;
+ 	int idx = 0;
+ 	int err = 0;
+ 
+-	if (!devlink->ops->sb_tc_pool_bind_get)
 -		return 0;
 -
--	err = devlink_port->ops->port_type_set(devlink_port, port_type);
--	if (err)
--		return err;
--
--	devlink_port->desired_type = port_type;
--	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
--	return 0;
--}
--
--static int devlink_port_function_hw_addr_set(struct devlink_port *port,
--					     const struct nlattr *attr,
--					     struct netlink_ext_ack *extack)
--{
--	const u8 *hw_addr;
--	int hw_addr_len;
--
--	hw_addr = nla_data(attr);
--	hw_addr_len = nla_len(attr);
--	if (hw_addr_len > MAX_ADDR_LEN) {
--		NL_SET_ERR_MSG(extack, "Port function hardware address too long");
--		return -EINVAL;
--	}
--	if (port->type == DEVLINK_PORT_TYPE_ETH) {
--		if (hw_addr_len != ETH_ALEN) {
--			NL_SET_ERR_MSG(extack, "Address must be 6 bytes for Ethernet device");
--			return -EINVAL;
--		}
--		if (!is_unicast_ether_addr(hw_addr)) {
--			NL_SET_ERR_MSG(extack, "Non-unicast hardware address unsupported");
--			return -EINVAL;
--		}
--	}
--
--	return port->ops->port_fn_hw_addr_set(port, hw_addr, hw_addr_len,
--					      extack);
--}
--
--static int devlink_port_fn_state_set(struct devlink_port *port,
--				     const struct nlattr *attr,
--				     struct netlink_ext_ack *extack)
--{
--	enum devlink_port_fn_state state;
--
--	state = nla_get_u8(attr);
--	return port->ops->port_fn_state_set(port, state, extack);
--}
--
--static int devlink_port_function_validate(struct devlink_port *devlink_port,
--					  struct nlattr **tb,
--					  struct netlink_ext_ack *extack)
--{
--	const struct devlink_port_ops *ops = devlink_port->ops;
--	struct nlattr *attr;
--
--	if (tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] &&
--	    !ops->port_fn_hw_addr_set) {
--		NL_SET_ERR_MSG_ATTR(extack, tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR],
--				    "Port doesn't support function attributes");
--		return -EOPNOTSUPP;
--	}
--	if (tb[DEVLINK_PORT_FN_ATTR_STATE] && !ops->port_fn_state_set) {
--		NL_SET_ERR_MSG_ATTR(extack, tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR],
--				    "Function does not support state setting");
--		return -EOPNOTSUPP;
--	}
--	attr = tb[DEVLINK_PORT_FN_ATTR_CAPS];
--	if (attr) {
--		struct nla_bitfield32 caps;
--
--		caps = nla_get_bitfield32(attr);
--		if (caps.selector & DEVLINK_PORT_FN_CAP_ROCE &&
--		    !ops->port_fn_roce_set) {
--			NL_SET_ERR_MSG_ATTR(extack, attr,
--					    "Port doesn't support RoCE function attribute");
--			return -EOPNOTSUPP;
--		}
--		if (caps.selector & DEVLINK_PORT_FN_CAP_MIGRATABLE) {
--			if (!ops->port_fn_migratable_set) {
--				NL_SET_ERR_MSG_ATTR(extack, attr,
--						    "Port doesn't support migratable function attribute");
--				return -EOPNOTSUPP;
--			}
--			if (devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_VF) {
--				NL_SET_ERR_MSG_ATTR(extack, attr,
--						    "migratable function attribute supported for VFs only");
--				return -EOPNOTSUPP;
--			}
--		}
--	}
--	return 0;
--}
--
--static int devlink_port_function_set(struct devlink_port *port,
--				     const struct nlattr *attr,
--				     struct netlink_ext_ack *extack)
--{
--	struct nlattr *tb[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1];
--	int err;
--
--	err = nla_parse_nested(tb, DEVLINK_PORT_FUNCTION_ATTR_MAX, attr,
--			       devlink_function_nl_policy, extack);
--	if (err < 0) {
--		NL_SET_ERR_MSG(extack, "Fail to parse port function attributes");
--		return err;
--	}
--
--	err = devlink_port_function_validate(port, tb, extack);
--	if (err)
--		return err;
--
--	attr = tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR];
--	if (attr) {
--		err = devlink_port_function_hw_addr_set(port, attr, extack);
--		if (err)
--			return err;
--	}
--
--	attr = tb[DEVLINK_PORT_FN_ATTR_CAPS];
--	if (attr) {
--		err = devlink_port_fn_caps_set(port, attr, extack);
--		if (err)
--			return err;
--	}
--
--	/* Keep this as the last function attribute set, so that when
--	 * multiple port function attributes are set along with state,
--	 * Those can be applied first before activating the state.
--	 */
--	attr = tb[DEVLINK_PORT_FN_ATTR_STATE];
--	if (attr)
--		err = devlink_port_fn_state_set(port, attr, extack);
--
--	if (!err)
--		devlink_port_notify(port, DEVLINK_CMD_PORT_NEW);
--	return err;
--}
--
--static int devlink_nl_cmd_port_set_doit(struct sk_buff *skb,
--					struct genl_info *info)
--{
--	struct devlink_port *devlink_port = info->user_ptr[1];
--	int err;
--
--	if (info->attrs[DEVLINK_ATTR_PORT_TYPE]) {
--		enum devlink_port_type port_type;
--
--		port_type = nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_TYPE]);
--		err = devlink_port_type_set(devlink_port, port_type);
--		if (err)
--			return err;
--	}
--
--	if (info->attrs[DEVLINK_ATTR_PORT_FUNCTION]) {
--		struct nlattr *attr = info->attrs[DEVLINK_ATTR_PORT_FUNCTION];
--		struct netlink_ext_ack *extack = info->extack;
--
--		err = devlink_port_function_set(devlink_port, attr, extack);
--		if (err)
--			return err;
--	}
--
--	return 0;
--}
--
--static int devlink_nl_cmd_port_split_doit(struct sk_buff *skb,
--					  struct genl_info *info)
--{
--	struct devlink_port *devlink_port = info->user_ptr[1];
--	struct devlink *devlink = info->user_ptr[0];
--	u32 count;
--
--	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PORT_SPLIT_COUNT))
--		return -EINVAL;
--	if (!devlink_port->ops->port_split)
--		return -EOPNOTSUPP;
--
--	count = nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_SPLIT_COUNT]);
--
--	if (!devlink_port->attrs.splittable) {
--		/* Split ports cannot be split. */
--		if (devlink_port->attrs.split)
--			NL_SET_ERR_MSG(info->extack, "Port cannot be split further");
--		else
--			NL_SET_ERR_MSG(info->extack, "Port cannot be split");
--		return -EINVAL;
--	}
--
--	if (count < 2 || !is_power_of_2(count) || count > devlink_port->attrs.lanes) {
--		NL_SET_ERR_MSG(info->extack, "Invalid split count");
--		return -EINVAL;
--	}
--
--	return devlink_port->ops->port_split(devlink, devlink_port, count,
--					     info->extack);
--}
--
--static int devlink_nl_cmd_port_unsplit_doit(struct sk_buff *skb,
--					    struct genl_info *info)
--{
--	struct devlink_port *devlink_port = info->user_ptr[1];
--	struct devlink *devlink = info->user_ptr[0];
--
--	if (!devlink_port->ops->port_unsplit)
--		return -EOPNOTSUPP;
--	return devlink_port->ops->port_unsplit(devlink, devlink_port, info->extack);
--}
--
--static int devlink_nl_cmd_port_new_doit(struct sk_buff *skb,
--					struct genl_info *info)
--{
--	struct netlink_ext_ack *extack = info->extack;
--	struct devlink_port_new_attrs new_attrs = {};
--	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_port *devlink_port;
--	struct sk_buff *msg;
--	int err;
--
--	if (!devlink->ops->port_new)
--		return -EOPNOTSUPP;
--
--	if (!info->attrs[DEVLINK_ATTR_PORT_FLAVOUR] ||
--	    !info->attrs[DEVLINK_ATTR_PORT_PCI_PF_NUMBER]) {
--		NL_SET_ERR_MSG(extack, "Port flavour or PCI PF are not specified");
--		return -EINVAL;
--	}
--	new_attrs.flavour = nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_FLAVOUR]);
--	new_attrs.pfnum =
--		nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_PCI_PF_NUMBER]);
--
--	if (info->attrs[DEVLINK_ATTR_PORT_INDEX]) {
--		/* Port index of the new port being created by driver. */
--		new_attrs.port_index =
--			nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_INDEX]);
--		new_attrs.port_index_valid = true;
--	}
--	if (info->attrs[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER]) {
--		new_attrs.controller =
--			nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER]);
--		new_attrs.controller_valid = true;
--	}
--	if (new_attrs.flavour == DEVLINK_PORT_FLAVOUR_PCI_SF &&
--	    info->attrs[DEVLINK_ATTR_PORT_PCI_SF_NUMBER]) {
--		new_attrs.sfnum = nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_PCI_SF_NUMBER]);
--		new_attrs.sfnum_valid = true;
--	}
--
--	err = devlink->ops->port_new(devlink, &new_attrs,
--				     extack, &devlink_port);
--	if (err)
--		return err;
--
--	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
--	if (!msg) {
--		err = -ENOMEM;
--		goto err_out_port_del;
--	}
--	err = devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_NEW,
--				   info->snd_portid, info->snd_seq, 0, NULL);
--	if (WARN_ON_ONCE(err))
--		goto err_out_msg_free;
--	err = genlmsg_reply(msg, info);
--	if (err)
--		goto err_out_port_del;
--	return 0;
--
--err_out_msg_free:
--	nlmsg_free(msg);
--err_out_port_del:
--	devlink_port->ops->port_del(devlink, devlink_port, NULL);
--	return err;
-+
-+	return genlmsg_reply(msg, info);
+-	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
+-		err = __sb_tc_pool_bind_get_dumpit(msg, state->idx, &idx,
+-						   devlink, devlink_sb,
+-						   NETLINK_CB(cb->skb).portid,
+-						   cb->nlh->nlmsg_seq, flags);
+-		if (err == -EOPNOTSUPP) {
+-			err = 0;
+-		} else if (err) {
++	list_for_each_entry(linecard, &devlink->linecard_list, list) {
++		if (idx < state->idx) {
++			idx++;
++			continue;
++		}
++		mutex_lock(&linecard->state_lock);
++		err = devlink_nl_linecard_fill(msg, devlink, linecard,
++					       DEVLINK_CMD_LINECARD_NEW,
++					       NETLINK_CB(cb->skb).portid,
++					       cb->nlh->nlmsg_seq, flags,
++					       cb->extack);
++		mutex_unlock(&linecard->state_lock);
++		if (err) {
+ 			state->idx = idx;
+ 			break;
+ 		}
++		idx++;
+ 	}
+ 
+ 	return err;
  }
  
--static int devlink_nl_cmd_port_del_doit(struct sk_buff *skb,
--					struct genl_info *info)
-+static bool
-+devlink_rate_is_parent_node(struct devlink_rate *devlink_rate,
-+			    struct devlink_rate *parent)
+-int devlink_nl_sb_tc_pool_bind_get_dumpit(struct sk_buff *skb,
+-					  struct netlink_callback *cb)
++int devlink_nl_linecard_get_dumpit(struct sk_buff *skb,
++				   struct netlink_callback *cb)
+ {
+-	return devlink_nl_dumpit(skb, cb,
+-				 devlink_nl_sb_tc_pool_bind_get_dump_one);
++	return devlink_nl_dumpit(skb, cb, devlink_nl_linecard_get_dump_one);
+ }
+ 
+-static int devlink_sb_tc_pool_bind_set(struct devlink_port *devlink_port,
+-				       unsigned int sb_index, u16 tc_index,
+-				       enum devlink_sb_pool_type pool_type,
+-				       u16 pool_index, u32 threshold,
+-				       struct netlink_ext_ack *extack)
+-
++static struct devlink_linecard_type *
++devlink_linecard_type_lookup(struct devlink_linecard *linecard,
++			     const char *type)
+ {
+-	const struct devlink_ops *ops = devlink_port->devlink->ops;
++	struct devlink_linecard_type *linecard_type;
++	int i;
+ 
+-	if (ops->sb_tc_pool_bind_set)
+-		return ops->sb_tc_pool_bind_set(devlink_port, sb_index,
+-						tc_index, pool_type,
+-						pool_index, threshold, extack);
+-	return -EOPNOTSUPP;
++	for (i = 0; i < linecard->types_count; i++) {
++		linecard_type = &linecard->types[i];
++		if (!strcmp(type, linecard_type->type))
++			return linecard_type;
++	}
++	return NULL;
+ }
+ 
+-static int devlink_nl_cmd_sb_tc_pool_bind_set_doit(struct sk_buff *skb,
+-						   struct genl_info *info)
++static int devlink_linecard_type_set(struct devlink_linecard *linecard,
++				     const char *type,
++				     struct netlink_ext_ack *extack)
  {
 -	struct devlink_port *devlink_port = info->user_ptr[1];
--	struct netlink_ext_ack *extack = info->extack;
 -	struct devlink *devlink = info->user_ptr[0];
--
--	if (!devlink_port->ops->port_del)
--		return -EOPNOTSUPP;
--
--	return devlink_port->ops->port_del(devlink, devlink_port, extack);
-+	while (parent) {
-+		if (parent == devlink_rate)
-+			return true;
-+		parent = parent->parent;
-+	}
-+	return false;
- }
+-	enum devlink_sb_pool_type pool_type;
+-	struct devlink_sb *devlink_sb;
+-	u16 tc_index;
+-	u16 pool_index;
+-	u32 threshold;
++	const struct devlink_linecard_ops *ops = linecard->ops;
++	struct devlink_linecard_type *linecard_type;
+ 	int err;
  
- static int
-@@ -6679,489 +5860,6 @@ void devlink_notify_unregister(struct devlink *devlink)
- 	devlink_notify(devlink, DEVLINK_CMD_DEL);
- }
- 
--static void devlink_port_type_warn(struct work_struct *work)
--{
--	struct devlink_port *port = container_of(to_delayed_work(work),
--						 struct devlink_port,
--						 type_warn_dw);
--	dev_warn(port->devlink->dev, "Type was not set for devlink port.");
--}
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
 -
--static bool devlink_port_type_should_warn(struct devlink_port *devlink_port)
--{
--	/* Ignore CPU and DSA flavours. */
--	return devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_CPU &&
--	       devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_DSA &&
--	       devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_UNUSED;
--}
--
--#define DEVLINK_PORT_TYPE_WARN_TIMEOUT (HZ * 3600)
--
--static void devlink_port_type_warn_schedule(struct devlink_port *devlink_port)
--{
--	if (!devlink_port_type_should_warn(devlink_port))
--		return;
--	/* Schedule a work to WARN in case driver does not set port
--	 * type within timeout.
--	 */
--	schedule_delayed_work(&devlink_port->type_warn_dw,
--			      DEVLINK_PORT_TYPE_WARN_TIMEOUT);
--}
--
--static void devlink_port_type_warn_cancel(struct devlink_port *devlink_port)
--{
--	if (!devlink_port_type_should_warn(devlink_port))
--		return;
--	cancel_delayed_work_sync(&devlink_port->type_warn_dw);
--}
--
--/**
-- * devlink_port_init() - Init devlink port
-- *
-- * @devlink: devlink
-- * @devlink_port: devlink port
-- *
-- * Initialize essential stuff that is needed for functions
-- * that may be called before devlink port registration.
-- * Call to this function is optional and not needed
-- * in case the driver does not use such functions.
-- */
--void devlink_port_init(struct devlink *devlink,
--		       struct devlink_port *devlink_port)
--{
--	if (devlink_port->initialized)
--		return;
--	devlink_port->devlink = devlink;
--	INIT_LIST_HEAD(&devlink_port->region_list);
--	devlink_port->initialized = true;
--}
--EXPORT_SYMBOL_GPL(devlink_port_init);
--
--/**
-- * devlink_port_fini() - Deinitialize devlink port
-- *
-- * @devlink_port: devlink port
-- *
-- * Deinitialize essential stuff that is in use for functions
-- * that may be called after devlink port unregistration.
-- * Call to this function is optional and not needed
-- * in case the driver does not use such functions.
-- */
--void devlink_port_fini(struct devlink_port *devlink_port)
--{
--	WARN_ON(!list_empty(&devlink_port->region_list));
--}
--EXPORT_SYMBOL_GPL(devlink_port_fini);
--
--static const struct devlink_port_ops devlink_port_dummy_ops = {};
--
--/**
-- * devl_port_register_with_ops() - Register devlink port
-- *
-- * @devlink: devlink
-- * @devlink_port: devlink port
-- * @port_index: driver-specific numerical identifier of the port
-- * @ops: port ops
-- *
-- * Register devlink port with provided port index. User can use
-- * any indexing, even hw-related one. devlink_port structure
-- * is convenient to be embedded inside user driver private structure.
-- * Note that the caller should take care of zeroing the devlink_port
-- * structure.
-- */
--int devl_port_register_with_ops(struct devlink *devlink,
--				struct devlink_port *devlink_port,
--				unsigned int port_index,
--				const struct devlink_port_ops *ops)
--{
--	int err;
--
--	devl_assert_locked(devlink);
--
--	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
--
--	devlink_port_init(devlink, devlink_port);
--	devlink_port->registered = true;
--	devlink_port->index = port_index;
--	devlink_port->ops = ops ? ops : &devlink_port_dummy_ops;
--	spin_lock_init(&devlink_port->type_lock);
--	INIT_LIST_HEAD(&devlink_port->reporter_list);
--	err = xa_insert(&devlink->ports, port_index, devlink_port, GFP_KERNEL);
--	if (err) {
--		devlink_port->registered = false;
+-	err = devlink_sb_pool_type_get_from_info(info, &pool_type);
+-	if (err)
 -		return err;
--	}
++	mutex_lock(&linecard->state_lock);
++	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
++		err = -EBUSY;
++		goto out;
++	}
++	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
++		err = -EBUSY;
++		goto out;
++	}
+ 
+-	err = devlink_sb_tc_index_get_from_info(devlink_sb, info,
+-						pool_type, &tc_index);
+-	if (err)
+-		return err;
++	linecard_type = devlink_linecard_type_lookup(linecard, type);
++	if (!linecard_type) {
++		NL_SET_ERR_MSG(extack, "Unsupported line card type provided");
++		err = -EINVAL;
++		goto out;
++	}
+ 
+-	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
+-						  &pool_index);
+-	if (err)
+-		return err;
++	if (linecard->state != DEVLINK_LINECARD_STATE_UNPROVISIONED &&
++	    linecard->state != DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
++		NL_SET_ERR_MSG(extack, "Line card already provisioned");
++		err = -EBUSY;
++		/* Check if the line card is provisioned in the same
++		 * way the user asks. In case it is, make the operation
++		 * to return success.
++		 */
++		if (ops->same_provision &&
++		    ops->same_provision(linecard, linecard->priv,
++					linecard_type->type,
++					linecard_type->priv))
++			err = 0;
++		goto out;
++	}
+ 
+-	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_SB_THRESHOLD))
+-		return -EINVAL;
++	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONING;
++	linecard->type = linecard_type->type;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++	err = ops->provision(linecard, linecard->priv, linecard_type->type,
++			     linecard_type->priv, extack);
++	if (err) {
++		/* Provisioning failed. Assume the linecard is unprovisioned
++		 * for future operations.
++		 */
++		mutex_lock(&linecard->state_lock);
++		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++		linecard->type = NULL;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		mutex_unlock(&linecard->state_lock);
++	}
++	return err;
+ 
+-	threshold = nla_get_u32(info->attrs[DEVLINK_ATTR_SB_THRESHOLD]);
+-	return devlink_sb_tc_pool_bind_set(devlink_port, devlink_sb->index,
+-					   tc_index, pool_type,
+-					   pool_index, threshold, info->extack);
++out:
++	mutex_unlock(&linecard->state_lock);
++	return err;
+ }
+ 
+-static int devlink_nl_cmd_sb_occ_snapshot_doit(struct sk_buff *skb,
+-					       struct genl_info *info)
++static int devlink_linecard_type_unset(struct devlink_linecard *linecard,
++				       struct netlink_ext_ack *extack)
+ {
+-	struct devlink *devlink = info->user_ptr[0];
+-	const struct devlink_ops *ops = devlink->ops;
+-	struct devlink_sb *devlink_sb;
++	int err;
++
++	mutex_lock(&linecard->state_lock);
++	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
++		err = -EBUSY;
++		goto out;
++	}
++	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
++		err = -EBUSY;
++		goto out;
++	}
++	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
++		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++		linecard->type = NULL;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		err = 0;
++		goto out;
++	}
+ 
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
++	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONED) {
++		NL_SET_ERR_MSG(extack, "Line card is not provisioned");
++		err = 0;
++		goto out;
++	}
++	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONING;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++	err = linecard->ops->unprovision(linecard, linecard->priv,
++					 extack);
++	if (err) {
++		/* Unprovisioning failed. Assume the linecard is unprovisioned
++		 * for future operations.
++		 */
++		mutex_lock(&linecard->state_lock);
++		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++		linecard->type = NULL;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		mutex_unlock(&linecard->state_lock);
++	}
++	return err;
+ 
+-	if (ops->sb_occ_snapshot)
+-		return ops->sb_occ_snapshot(devlink, devlink_sb->index);
+-	return -EOPNOTSUPP;
++out:
++	mutex_unlock(&linecard->state_lock);
++	return err;
+ }
+ 
+-static int devlink_nl_cmd_sb_occ_max_clear_doit(struct sk_buff *skb,
+-						struct genl_info *info)
++static int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
++					    struct genl_info *info)
+ {
++	struct netlink_ext_ack *extack = info->extack;
+ 	struct devlink *devlink = info->user_ptr[0];
+-	const struct devlink_ops *ops = devlink->ops;
+-	struct devlink_sb *devlink_sb;
++	struct devlink_linecard *linecard;
++	int err;
+ 
+-	devlink_sb = devlink_sb_get_from_info(devlink, info);
+-	if (IS_ERR(devlink_sb))
+-		return PTR_ERR(devlink_sb);
++	linecard = devlink_linecard_get_from_info(devlink, info);
++	if (IS_ERR(linecard))
++		return PTR_ERR(linecard);
++
++	if (info->attrs[DEVLINK_ATTR_LINECARD_TYPE]) {
++		const char *type;
++
++		type = nla_data(info->attrs[DEVLINK_ATTR_LINECARD_TYPE]);
++		if (strcmp(type, "")) {
++			err = devlink_linecard_type_set(linecard, type, extack);
++			if (err)
++				return err;
++		} else {
++			err = devlink_linecard_type_unset(linecard, extack);
++			if (err)
++				return err;
++		}
++	}
+ 
+-	if (ops->sb_occ_max_clear)
+-		return ops->sb_occ_max_clear(devlink, devlink_sb->index);
+-	return -EOPNOTSUPP;
++	return 0;
+ }
+ 
+ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
+@@ -6215,69 +5288,6 @@ void devlink_linecard_nested_dl_set(struct devlink_linecard *linecard,
+ }
+ EXPORT_SYMBOL_GPL(devlink_linecard_nested_dl_set);
+ 
+-int devl_sb_register(struct devlink *devlink, unsigned int sb_index,
+-		     u32 size, u16 ingress_pools_count,
+-		     u16 egress_pools_count, u16 ingress_tc_count,
+-		     u16 egress_tc_count)
+-{
+-	struct devlink_sb *devlink_sb;
 -
--	INIT_DELAYED_WORK(&devlink_port->type_warn_dw, &devlink_port_type_warn);
--	devlink_port_type_warn_schedule(devlink_port);
--	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
+-	lockdep_assert_held(&devlink->lock);
+-
+-	if (devlink_sb_index_exists(devlink, sb_index))
+-		return -EEXIST;
+-
+-	devlink_sb = kzalloc(sizeof(*devlink_sb), GFP_KERNEL);
+-	if (!devlink_sb)
+-		return -ENOMEM;
+-	devlink_sb->index = sb_index;
+-	devlink_sb->size = size;
+-	devlink_sb->ingress_pools_count = ingress_pools_count;
+-	devlink_sb->egress_pools_count = egress_pools_count;
+-	devlink_sb->ingress_tc_count = ingress_tc_count;
+-	devlink_sb->egress_tc_count = egress_tc_count;
+-	list_add_tail(&devlink_sb->list, &devlink->sb_list);
 -	return 0;
 -}
--EXPORT_SYMBOL_GPL(devl_port_register_with_ops);
+-EXPORT_SYMBOL_GPL(devl_sb_register);
 -
--/**
-- *	devlink_port_register_with_ops - Register devlink port
-- *
-- *	@devlink: devlink
-- *	@devlink_port: devlink port
-- *	@port_index: driver-specific numerical identifier of the port
-- *	@ops: port ops
-- *
-- *	Register devlink port with provided port index. User can use
-- *	any indexing, even hw-related one. devlink_port structure
-- *	is convenient to be embedded inside user driver private structure.
-- *	Note that the caller should take care of zeroing the devlink_port
-- *	structure.
-- *
-- *	Context: Takes and release devlink->lock <mutex>.
-- */
--int devlink_port_register_with_ops(struct devlink *devlink,
--				   struct devlink_port *devlink_port,
--				   unsigned int port_index,
--				   const struct devlink_port_ops *ops)
+-int devlink_sb_register(struct devlink *devlink, unsigned int sb_index,
+-			u32 size, u16 ingress_pools_count,
+-			u16 egress_pools_count, u16 ingress_tc_count,
+-			u16 egress_tc_count)
 -{
 -	int err;
 -
 -	devl_lock(devlink);
--	err = devl_port_register_with_ops(devlink, devlink_port,
--					  port_index, ops);
+-	err = devl_sb_register(devlink, sb_index, size, ingress_pools_count,
+-			       egress_pools_count, ingress_tc_count,
+-			       egress_tc_count);
 -	devl_unlock(devlink);
 -	return err;
 -}
--EXPORT_SYMBOL_GPL(devlink_port_register_with_ops);
+-EXPORT_SYMBOL_GPL(devlink_sb_register);
 -
--/**
-- * devl_port_unregister() - Unregister devlink port
-- *
-- * @devlink_port: devlink port
-- */
--void devl_port_unregister(struct devlink_port *devlink_port)
+-void devl_sb_unregister(struct devlink *devlink, unsigned int sb_index)
 -{
--	lockdep_assert_held(&devlink_port->devlink->lock);
--	WARN_ON(devlink_port->type != DEVLINK_PORT_TYPE_NOTSET);
+-	struct devlink_sb *devlink_sb;
 -
--	devlink_port_type_warn_cancel(devlink_port);
--	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
--	xa_erase(&devlink_port->devlink->ports, devlink_port->index);
--	WARN_ON(!list_empty(&devlink_port->reporter_list));
--	devlink_port->registered = false;
+-	lockdep_assert_held(&devlink->lock);
+-
+-	devlink_sb = devlink_sb_get_by_index(devlink, sb_index);
+-	WARN_ON(!devlink_sb);
+-	list_del(&devlink_sb->list);
+-	kfree(devlink_sb);
 -}
--EXPORT_SYMBOL_GPL(devl_port_unregister);
+-EXPORT_SYMBOL_GPL(devl_sb_unregister);
 -
--/**
-- *	devlink_port_unregister - Unregister devlink port
-- *
-- *	@devlink_port: devlink port
-- *
-- *	Context: Takes and release devlink->lock <mutex>.
-- */
--void devlink_port_unregister(struct devlink_port *devlink_port)
+-void devlink_sb_unregister(struct devlink *devlink, unsigned int sb_index)
 -{
--	struct devlink *devlink = devlink_port->devlink;
--
 -	devl_lock(devlink);
--	devl_port_unregister(devlink_port);
+-	devl_sb_unregister(devlink, sb_index);
 -	devl_unlock(devlink);
 -}
--EXPORT_SYMBOL_GPL(devlink_port_unregister);
--
--static void devlink_port_type_netdev_checks(struct devlink_port *devlink_port,
--					    struct net_device *netdev)
--{
--	const struct net_device_ops *ops = netdev->netdev_ops;
--
--	/* If driver registers devlink port, it should set devlink port
--	 * attributes accordingly so the compat functions are called
--	 * and the original ops are not used.
--	 */
--	if (ops->ndo_get_phys_port_name) {
--		/* Some drivers use the same set of ndos for netdevs
--		 * that have devlink_port registered and also for
--		 * those who don't. Make sure that ndo_get_phys_port_name
--		 * returns -EOPNOTSUPP here in case it is defined.
--		 * Warn if not.
--		 */
--		char name[IFNAMSIZ];
--		int err;
--
--		err = ops->ndo_get_phys_port_name(netdev, name, sizeof(name));
--		WARN_ON(err != -EOPNOTSUPP);
--	}
--	if (ops->ndo_get_port_parent_id) {
--		/* Some drivers use the same set of ndos for netdevs
--		 * that have devlink_port registered and also for
--		 * those who don't. Make sure that ndo_get_port_parent_id
--		 * returns -EOPNOTSUPP here in case it is defined.
--		 * Warn if not.
--		 */
--		struct netdev_phys_item_id ppid;
--		int err;
--
--		err = ops->ndo_get_port_parent_id(netdev, &ppid);
--		WARN_ON(err != -EOPNOTSUPP);
--	}
--}
--
--static void __devlink_port_type_set(struct devlink_port *devlink_port,
--				    enum devlink_port_type type,
--				    void *type_dev)
--{
--	struct net_device *netdev = type_dev;
--
--	ASSERT_DEVLINK_PORT_REGISTERED(devlink_port);
--
--	if (type == DEVLINK_PORT_TYPE_NOTSET) {
--		devlink_port_type_warn_schedule(devlink_port);
--	} else {
--		devlink_port_type_warn_cancel(devlink_port);
--		if (type == DEVLINK_PORT_TYPE_ETH && netdev)
--			devlink_port_type_netdev_checks(devlink_port, netdev);
--	}
--
--	spin_lock_bh(&devlink_port->type_lock);
--	devlink_port->type = type;
--	switch (type) {
--	case DEVLINK_PORT_TYPE_ETH:
--		devlink_port->type_eth.netdev = netdev;
--		if (netdev) {
--			ASSERT_RTNL();
--			devlink_port->type_eth.ifindex = netdev->ifindex;
--			BUILD_BUG_ON(sizeof(devlink_port->type_eth.ifname) !=
--				     sizeof(netdev->name));
--			strcpy(devlink_port->type_eth.ifname, netdev->name);
--		}
--		break;
--	case DEVLINK_PORT_TYPE_IB:
--		devlink_port->type_ib.ibdev = type_dev;
--		break;
--	default:
--		break;
--	}
--	spin_unlock_bh(&devlink_port->type_lock);
--	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
--}
--
--/**
-- *	devlink_port_type_eth_set - Set port type to Ethernet
-- *
-- *	@devlink_port: devlink port
-- *
-- *	If driver is calling this, most likely it is doing something wrong.
-- */
--void devlink_port_type_eth_set(struct devlink_port *devlink_port)
--{
--	dev_warn(devlink_port->devlink->dev,
--		 "devlink port type for port %d set to Ethernet without a software interface reference, device type not supported by the kernel?\n",
--		 devlink_port->index);
--	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_ETH, NULL);
--}
--EXPORT_SYMBOL_GPL(devlink_port_type_eth_set);
--
--/**
-- *	devlink_port_type_ib_set - Set port type to InfiniBand
-- *
-- *	@devlink_port: devlink port
-- *	@ibdev: related IB device
-- */
--void devlink_port_type_ib_set(struct devlink_port *devlink_port,
--			      struct ib_device *ibdev)
--{
--	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_IB, ibdev);
--}
--EXPORT_SYMBOL_GPL(devlink_port_type_ib_set);
--
--/**
-- *	devlink_port_type_clear - Clear port type
-- *
-- *	@devlink_port: devlink port
-- *
-- *	If driver is calling this for clearing Ethernet type, most likely
-- *	it is doing something wrong.
-- */
--void devlink_port_type_clear(struct devlink_port *devlink_port)
--{
--	if (devlink_port->type == DEVLINK_PORT_TYPE_ETH)
--		dev_warn(devlink_port->devlink->dev,
--			 "devlink port type for port %d cleared without a software interface reference, device type not supported by the kernel?\n",
--			 devlink_port->index);
--	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_NOTSET, NULL);
--}
--EXPORT_SYMBOL_GPL(devlink_port_type_clear);
--
--int devlink_port_netdevice_event(struct notifier_block *nb,
--				 unsigned long event, void *ptr)
--{
--	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
--	struct devlink_port *devlink_port = netdev->devlink_port;
--	struct devlink *devlink;
--
--	if (!devlink_port)
--		return NOTIFY_OK;
--	devlink = devlink_port->devlink;
--
--	switch (event) {
--	case NETDEV_POST_INIT:
--		/* Set the type but not netdev pointer. It is going to be set
--		 * later on by NETDEV_REGISTER event. Happens once during
--		 * netdevice register
--		 */
--		__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_ETH,
--					NULL);
--		break;
--	case NETDEV_REGISTER:
--	case NETDEV_CHANGENAME:
--		if (devlink_net(devlink) != dev_net(netdev))
--			return NOTIFY_OK;
--		/* Set the netdev on top of previously set type. Note this
--		 * event happens also during net namespace change so here
--		 * we take into account netdev pointer appearing in this
--		 * namespace.
--		 */
--		__devlink_port_type_set(devlink_port, devlink_port->type,
--					netdev);
--		break;
--	case NETDEV_UNREGISTER:
--		if (devlink_net(devlink) != dev_net(netdev))
--			return NOTIFY_OK;
--		/* Clear netdev pointer, but not the type. This event happens
--		 * also during net namespace change so we need to clear
--		 * pointer to netdev that is going to another net namespace.
--		 */
--		__devlink_port_type_set(devlink_port, devlink_port->type,
--					NULL);
--		break;
--	case NETDEV_PRE_UNINIT:
--		/* Clear the type and the netdev pointer. Happens one during
--		 * netdevice unregister.
--		 */
--		__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_NOTSET,
--					NULL);
--		break;
--	}
--
--	return NOTIFY_OK;
--}
--
--static int __devlink_port_attrs_set(struct devlink_port *devlink_port,
--				    enum devlink_port_flavour flavour)
--{
--	struct devlink_port_attrs *attrs = &devlink_port->attrs;
--
--	devlink_port->attrs_set = true;
--	attrs->flavour = flavour;
--	if (attrs->switch_id.id_len) {
--		devlink_port->switch_port = true;
--		if (WARN_ON(attrs->switch_id.id_len > MAX_PHYS_ITEM_ID_LEN))
--			attrs->switch_id.id_len = MAX_PHYS_ITEM_ID_LEN;
--	} else {
--		devlink_port->switch_port = false;
--	}
--	return 0;
--}
--
--/**
-- *	devlink_port_attrs_set - Set port attributes
-- *
-- *	@devlink_port: devlink port
-- *	@attrs: devlink port attrs
-- */
--void devlink_port_attrs_set(struct devlink_port *devlink_port,
--			    struct devlink_port_attrs *attrs)
--{
--	int ret;
--
--	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
--
--	devlink_port->attrs = *attrs;
--	ret = __devlink_port_attrs_set(devlink_port, attrs->flavour);
--	if (ret)
--		return;
--	WARN_ON(attrs->splittable && attrs->split);
--}
--EXPORT_SYMBOL_GPL(devlink_port_attrs_set);
--
--/**
-- *	devlink_port_attrs_pci_pf_set - Set PCI PF port attributes
-- *
-- *	@devlink_port: devlink port
-- *	@controller: associated controller number for the devlink port instance
-- *	@pf: associated PF for the devlink port instance
-- *	@external: indicates if the port is for an external controller
-- */
--void devlink_port_attrs_pci_pf_set(struct devlink_port *devlink_port, u32 controller,
--				   u16 pf, bool external)
--{
--	struct devlink_port_attrs *attrs = &devlink_port->attrs;
--	int ret;
--
--	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
--
--	ret = __devlink_port_attrs_set(devlink_port,
--				       DEVLINK_PORT_FLAVOUR_PCI_PF);
--	if (ret)
--		return;
--	attrs->pci_pf.controller = controller;
--	attrs->pci_pf.pf = pf;
--	attrs->pci_pf.external = external;
--}
--EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_pf_set);
--
--/**
-- *	devlink_port_attrs_pci_vf_set - Set PCI VF port attributes
-- *
-- *	@devlink_port: devlink port
-- *	@controller: associated controller number for the devlink port instance
-- *	@pf: associated PF for the devlink port instance
-- *	@vf: associated VF of a PF for the devlink port instance
-- *	@external: indicates if the port is for an external controller
-- */
--void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 controller,
--				   u16 pf, u16 vf, bool external)
--{
--	struct devlink_port_attrs *attrs = &devlink_port->attrs;
--	int ret;
--
--	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
--
--	ret = __devlink_port_attrs_set(devlink_port,
--				       DEVLINK_PORT_FLAVOUR_PCI_VF);
--	if (ret)
--		return;
--	attrs->pci_vf.controller = controller;
--	attrs->pci_vf.pf = pf;
--	attrs->pci_vf.vf = vf;
--	attrs->pci_vf.external = external;
--}
--EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_vf_set);
--
--/**
-- *	devlink_port_attrs_pci_sf_set - Set PCI SF port attributes
-- *
-- *	@devlink_port: devlink port
-- *	@controller: associated controller number for the devlink port instance
-- *	@pf: associated PF for the devlink port instance
-- *	@sf: associated SF of a PF for the devlink port instance
-- *	@external: indicates if the port is for an external controller
-- */
--void devlink_port_attrs_pci_sf_set(struct devlink_port *devlink_port, u32 controller,
--				   u16 pf, u32 sf, bool external)
--{
--	struct devlink_port_attrs *attrs = &devlink_port->attrs;
--	int ret;
--
--	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
--
--	ret = __devlink_port_attrs_set(devlink_port,
--				       DEVLINK_PORT_FLAVOUR_PCI_SF);
--	if (ret)
--		return;
--	attrs->pci_sf.controller = controller;
--	attrs->pci_sf.pf = pf;
--	attrs->pci_sf.sf = sf;
--	attrs->pci_sf.external = external;
--}
--EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_sf_set);
+-EXPORT_SYMBOL_GPL(devlink_sb_unregister);
 -
  /**
-  * devl_rate_node_create - create devlink rate node
-  * @devlink: devlink instance
-@@ -7308,92 +6006,6 @@ void devl_rate_nodes_destroy(struct devlink *devlink)
- }
- EXPORT_SYMBOL_GPL(devl_rate_nodes_destroy);
- 
--/**
-- *	devlink_port_linecard_set - Link port with a linecard
-- *
-- *	@devlink_port: devlink port
-- *	@linecard: devlink linecard
-- */
--void devlink_port_linecard_set(struct devlink_port *devlink_port,
--			       struct devlink_linecard *linecard)
--{
--	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
--
--	devlink_port->linecard = linecard;
--}
--EXPORT_SYMBOL_GPL(devlink_port_linecard_set);
--
--static int __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,
--					     char *name, size_t len)
--{
--	struct devlink_port_attrs *attrs = &devlink_port->attrs;
--	int n = 0;
--
--	if (!devlink_port->attrs_set)
--		return -EOPNOTSUPP;
--
--	switch (attrs->flavour) {
--	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
--		if (devlink_port->linecard)
--			n = snprintf(name, len, "l%u",
--				     devlink_port->linecard->index);
--		if (n < len)
--			n += snprintf(name + n, len - n, "p%u",
--				      attrs->phys.port_number);
--		if (n < len && attrs->split)
--			n += snprintf(name + n, len - n, "s%u",
--				      attrs->phys.split_subport_number);
--		break;
--	case DEVLINK_PORT_FLAVOUR_CPU:
--	case DEVLINK_PORT_FLAVOUR_DSA:
--	case DEVLINK_PORT_FLAVOUR_UNUSED:
--		/* As CPU and DSA ports do not have a netdevice associated
--		 * case should not ever happen.
--		 */
--		WARN_ON(1);
--		return -EINVAL;
--	case DEVLINK_PORT_FLAVOUR_PCI_PF:
--		if (attrs->pci_pf.external) {
--			n = snprintf(name, len, "c%u", attrs->pci_pf.controller);
--			if (n >= len)
--				return -EINVAL;
--			len -= n;
--			name += n;
--		}
--		n = snprintf(name, len, "pf%u", attrs->pci_pf.pf);
--		break;
--	case DEVLINK_PORT_FLAVOUR_PCI_VF:
--		if (attrs->pci_vf.external) {
--			n = snprintf(name, len, "c%u", attrs->pci_vf.controller);
--			if (n >= len)
--				return -EINVAL;
--			len -= n;
--			name += n;
--		}
--		n = snprintf(name, len, "pf%uvf%u",
--			     attrs->pci_vf.pf, attrs->pci_vf.vf);
--		break;
--	case DEVLINK_PORT_FLAVOUR_PCI_SF:
--		if (attrs->pci_sf.external) {
--			n = snprintf(name, len, "c%u", attrs->pci_sf.controller);
--			if (n >= len)
--				return -EINVAL;
--			len -= n;
--			name += n;
--		}
--		n = snprintf(name, len, "pf%usf%u", attrs->pci_sf.pf,
--			     attrs->pci_sf.sf);
--		break;
--	case DEVLINK_PORT_FLAVOUR_VIRTUAL:
--		return -EOPNOTSUPP;
--	}
--
--	if (n >= len)
--		return -EINVAL;
--
--	return 0;
--}
--
- static int devlink_linecard_types_init(struct devlink_linecard *linecard)
- {
- 	struct devlink_linecard_type *linecard_type;
-@@ -9468,39 +8080,3 @@ devl_trap_policers_unregister(struct devlink *devlink,
- 		devlink_trap_policer_unregister(devlink, &policers[i]);
- }
- EXPORT_SYMBOL_GPL(devl_trap_policers_unregister);
--
--int devlink_compat_phys_port_name_get(struct net_device *dev,
--				      char *name, size_t len)
--{
--	struct devlink_port *devlink_port;
--
--	/* RTNL mutex is held here which ensures that devlink_port
--	 * instance cannot disappear in the middle. No need to take
--	 * any devlink lock as only permanent values are accessed.
--	 */
--	ASSERT_RTNL();
--
--	devlink_port = dev->devlink_port;
--	if (!devlink_port)
--		return -EOPNOTSUPP;
--
--	return __devlink_port_phys_port_name_get(devlink_port, name, len);
--}
--
--int devlink_compat_switch_id_get(struct net_device *dev,
--				 struct netdev_phys_item_id *ppid)
--{
--	struct devlink_port *devlink_port;
--
--	/* Caller must hold RTNL mutex or reference to dev, which ensures that
--	 * devlink_port instance cannot disappear in the middle. No need to take
--	 * any devlink lock as only permanent values are accessed.
--	 */
--	devlink_port = dev->devlink_port;
--	if (!devlink_port || !devlink_port->switch_port)
--		return -EOPNOTSUPP;
--
--	memcpy(ppid, &devlink_port->attrs.switch_id, sizeof(*ppid));
--
--	return 0;
--}
-diff --git a/net/devlink/port.c b/net/devlink/port.c
+  * devl_dpipe_headers_register - register dpipe headers
+  *
+diff --git a/net/devlink/sb.c b/net/devlink/sb.c
 new file mode 100644
-index 000000000000..0be8453012ee
+index 000000000000..bd677fff5ec8
 --- /dev/null
-+++ b/net/devlink/port.c
-@@ -0,0 +1,1411 @@
++++ b/net/devlink/sb.c
+@@ -0,0 +1,996 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (c) 2016 Mellanox Technologies. All rights reserved.
@@ -1705,363 +1558,461 @@ index 000000000000..0be8453012ee
 +
 +#include "devl_internal.h"
 +
-+#define DEVLINK_PORT_FN_CAPS_VALID_MASK \
-+	(_BITUL(__DEVLINK_PORT_FN_ATTR_CAPS_MAX) - 1)
-+
-+static const struct nla_policy devlink_function_nl_policy[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1] = {
-+	[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] = { .type = NLA_BINARY },
-+	[DEVLINK_PORT_FN_ATTR_STATE] =
-+		NLA_POLICY_RANGE(NLA_U8, DEVLINK_PORT_FN_STATE_INACTIVE,
-+				 DEVLINK_PORT_FN_STATE_ACTIVE),
-+	[DEVLINK_PORT_FN_ATTR_CAPS] =
-+		NLA_POLICY_BITFIELD32(DEVLINK_PORT_FN_CAPS_VALID_MASK),
++struct devlink_sb {
++	struct list_head list;
++	unsigned int index;
++	u32 size;
++	u16 ingress_pools_count;
++	u16 egress_pools_count;
++	u16 ingress_tc_count;
++	u16 egress_tc_count;
 +};
 +
-+#define ASSERT_DEVLINK_PORT_REGISTERED(devlink_port)				\
-+	WARN_ON_ONCE(!(devlink_port)->registered)
-+#define ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port)			\
-+	WARN_ON_ONCE((devlink_port)->registered)
-+
-+struct devlink_port *devlink_port_get_by_index(struct devlink *devlink,
-+					       unsigned int port_index)
++static u16 devlink_sb_pool_count(struct devlink_sb *devlink_sb)
 +{
-+	return xa_load(&devlink->ports, port_index);
++	return devlink_sb->ingress_pools_count + devlink_sb->egress_pools_count;
 +}
 +
-+struct devlink_port *devlink_port_get_from_attrs(struct devlink *devlink,
-+						 struct nlattr **attrs)
++static struct devlink_sb *devlink_sb_get_by_index(struct devlink *devlink,
++						  unsigned int sb_index)
 +{
-+	if (attrs[DEVLINK_ATTR_PORT_INDEX]) {
-+		u32 port_index = nla_get_u32(attrs[DEVLINK_ATTR_PORT_INDEX]);
-+		struct devlink_port *devlink_port;
++	struct devlink_sb *devlink_sb;
 +
-+		devlink_port = devlink_port_get_by_index(devlink, port_index);
-+		if (!devlink_port)
++	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
++		if (devlink_sb->index == sb_index)
++			return devlink_sb;
++	}
++	return NULL;
++}
++
++static bool devlink_sb_index_exists(struct devlink *devlink,
++				    unsigned int sb_index)
++{
++	return devlink_sb_get_by_index(devlink, sb_index);
++}
++
++static struct devlink_sb *devlink_sb_get_from_attrs(struct devlink *devlink,
++						    struct nlattr **attrs)
++{
++	if (attrs[DEVLINK_ATTR_SB_INDEX]) {
++		u32 sb_index = nla_get_u32(attrs[DEVLINK_ATTR_SB_INDEX]);
++		struct devlink_sb *devlink_sb;
++
++		devlink_sb = devlink_sb_get_by_index(devlink, sb_index);
++		if (!devlink_sb)
 +			return ERR_PTR(-ENODEV);
-+		return devlink_port;
++		return devlink_sb;
 +	}
 +	return ERR_PTR(-EINVAL);
 +}
 +
-+struct devlink_port *devlink_port_get_from_info(struct devlink *devlink,
-+						struct genl_info *info)
++static struct devlink_sb *devlink_sb_get_from_info(struct devlink *devlink,
++						   struct genl_info *info)
 +{
-+	return devlink_port_get_from_attrs(devlink, info->attrs);
++	return devlink_sb_get_from_attrs(devlink, info->attrs);
 +}
 +
-+static void devlink_port_fn_cap_fill(struct nla_bitfield32 *caps,
-+				     u32 cap, bool is_enable)
++static int devlink_sb_pool_index_get_from_attrs(struct devlink_sb *devlink_sb,
++						struct nlattr **attrs,
++						u16 *p_pool_index)
 +{
-+	caps->selector |= cap;
-+	if (is_enable)
-+		caps->value |= cap;
-+}
++	u16 val;
 +
-+static int devlink_port_fn_roce_fill(struct devlink_port *devlink_port,
-+				     struct nla_bitfield32 *caps,
-+				     struct netlink_ext_ack *extack)
-+{
-+	bool is_enable;
-+	int err;
-+
-+	if (!devlink_port->ops->port_fn_roce_get)
-+		return 0;
-+
-+	err = devlink_port->ops->port_fn_roce_get(devlink_port, &is_enable,
-+						  extack);
-+	if (err) {
-+		if (err == -EOPNOTSUPP)
-+			return 0;
-+		return err;
-+	}
-+
-+	devlink_port_fn_cap_fill(caps, DEVLINK_PORT_FN_CAP_ROCE, is_enable);
-+	return 0;
-+}
-+
-+static int devlink_port_fn_migratable_fill(struct devlink_port *devlink_port,
-+					   struct nla_bitfield32 *caps,
-+					   struct netlink_ext_ack *extack)
-+{
-+	bool is_enable;
-+	int err;
-+
-+	if (!devlink_port->ops->port_fn_migratable_get ||
-+	    devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_VF)
-+		return 0;
-+
-+	err = devlink_port->ops->port_fn_migratable_get(devlink_port,
-+							&is_enable, extack);
-+	if (err) {
-+		if (err == -EOPNOTSUPP)
-+			return 0;
-+		return err;
-+	}
-+
-+	devlink_port_fn_cap_fill(caps, DEVLINK_PORT_FN_CAP_MIGRATABLE, is_enable);
-+	return 0;
-+}
-+
-+static int devlink_port_fn_caps_fill(struct devlink_port *devlink_port,
-+				     struct sk_buff *msg,
-+				     struct netlink_ext_ack *extack,
-+				     bool *msg_updated)
-+{
-+	struct nla_bitfield32 caps = {};
-+	int err;
-+
-+	err = devlink_port_fn_roce_fill(devlink_port, &caps, extack);
-+	if (err)
-+		return err;
-+
-+	err = devlink_port_fn_migratable_fill(devlink_port, &caps, extack);
-+	if (err)
-+		return err;
-+
-+	if (!caps.selector)
-+		return 0;
-+	err = nla_put_bitfield32(msg, DEVLINK_PORT_FN_ATTR_CAPS, caps.value,
-+				 caps.selector);
-+	if (err)
-+		return err;
-+
-+	*msg_updated = true;
-+	return 0;
-+}
-+
-+int devlink_nl_port_handle_fill(struct sk_buff *msg, struct devlink_port *devlink_port)
-+{
-+	if (devlink_nl_put_handle(msg, devlink_port->devlink))
-+		return -EMSGSIZE;
-+	if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, devlink_port->index))
-+		return -EMSGSIZE;
-+	return 0;
-+}
-+
-+size_t devlink_nl_port_handle_size(struct devlink_port *devlink_port)
-+{
-+	struct devlink *devlink = devlink_port->devlink;
-+
-+	return nla_total_size(strlen(devlink->dev->bus->name) + 1) /* DEVLINK_ATTR_BUS_NAME */
-+	     + nla_total_size(strlen(dev_name(devlink->dev)) + 1) /* DEVLINK_ATTR_DEV_NAME */
-+	     + nla_total_size(4); /* DEVLINK_ATTR_PORT_INDEX */
-+}
-+
-+static int devlink_nl_port_attrs_put(struct sk_buff *msg,
-+				     struct devlink_port *devlink_port)
-+{
-+	struct devlink_port_attrs *attrs = &devlink_port->attrs;
-+
-+	if (!devlink_port->attrs_set)
-+		return 0;
-+	if (attrs->lanes) {
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_LANES, attrs->lanes))
-+			return -EMSGSIZE;
-+	}
-+	if (nla_put_u8(msg, DEVLINK_ATTR_PORT_SPLITTABLE, attrs->splittable))
-+		return -EMSGSIZE;
-+	if (nla_put_u16(msg, DEVLINK_ATTR_PORT_FLAVOUR, attrs->flavour))
-+		return -EMSGSIZE;
-+	switch (devlink_port->attrs.flavour) {
-+	case DEVLINK_PORT_FLAVOUR_PCI_PF:
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_CONTROLLER_NUMBER,
-+				attrs->pci_pf.controller) ||
-+		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_PF_NUMBER, attrs->pci_pf.pf))
-+			return -EMSGSIZE;
-+		if (nla_put_u8(msg, DEVLINK_ATTR_PORT_EXTERNAL, attrs->pci_pf.external))
-+			return -EMSGSIZE;
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_PCI_VF:
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_CONTROLLER_NUMBER,
-+				attrs->pci_vf.controller) ||
-+		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_PF_NUMBER, attrs->pci_vf.pf) ||
-+		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_VF_NUMBER, attrs->pci_vf.vf))
-+			return -EMSGSIZE;
-+		if (nla_put_u8(msg, DEVLINK_ATTR_PORT_EXTERNAL, attrs->pci_vf.external))
-+			return -EMSGSIZE;
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_PCI_SF:
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_CONTROLLER_NUMBER,
-+				attrs->pci_sf.controller) ||
-+		    nla_put_u16(msg, DEVLINK_ATTR_PORT_PCI_PF_NUMBER,
-+				attrs->pci_sf.pf) ||
-+		    nla_put_u32(msg, DEVLINK_ATTR_PORT_PCI_SF_NUMBER,
-+				attrs->pci_sf.sf))
-+			return -EMSGSIZE;
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
-+	case DEVLINK_PORT_FLAVOUR_CPU:
-+	case DEVLINK_PORT_FLAVOUR_DSA:
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_NUMBER,
-+				attrs->phys.port_number))
-+			return -EMSGSIZE;
-+		if (!attrs->split)
-+			return 0;
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_SPLIT_GROUP,
-+				attrs->phys.port_number))
-+			return -EMSGSIZE;
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_SPLIT_SUBPORT_NUMBER,
-+				attrs->phys.split_subport_number))
-+			return -EMSGSIZE;
-+		break;
-+	default:
-+		break;
-+	}
-+	return 0;
-+}
-+
-+static int devlink_port_fn_hw_addr_fill(struct devlink_port *port,
-+					struct sk_buff *msg,
-+					struct netlink_ext_ack *extack,
-+					bool *msg_updated)
-+{
-+	u8 hw_addr[MAX_ADDR_LEN];
-+	int hw_addr_len;
-+	int err;
-+
-+	if (!port->ops->port_fn_hw_addr_get)
-+		return 0;
-+
-+	err = port->ops->port_fn_hw_addr_get(port, hw_addr, &hw_addr_len,
-+					     extack);
-+	if (err) {
-+		if (err == -EOPNOTSUPP)
-+			return 0;
-+		return err;
-+	}
-+	err = nla_put(msg, DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR, hw_addr_len, hw_addr);
-+	if (err)
-+		return err;
-+	*msg_updated = true;
-+	return 0;
-+}
-+
-+static bool
-+devlink_port_fn_state_valid(enum devlink_port_fn_state state)
-+{
-+	return state == DEVLINK_PORT_FN_STATE_INACTIVE ||
-+	       state == DEVLINK_PORT_FN_STATE_ACTIVE;
-+}
-+
-+static bool
-+devlink_port_fn_opstate_valid(enum devlink_port_fn_opstate opstate)
-+{
-+	return opstate == DEVLINK_PORT_FN_OPSTATE_DETACHED ||
-+	       opstate == DEVLINK_PORT_FN_OPSTATE_ATTACHED;
-+}
-+
-+static int devlink_port_fn_state_fill(struct devlink_port *port,
-+				      struct sk_buff *msg,
-+				      struct netlink_ext_ack *extack,
-+				      bool *msg_updated)
-+{
-+	enum devlink_port_fn_opstate opstate;
-+	enum devlink_port_fn_state state;
-+	int err;
-+
-+	if (!port->ops->port_fn_state_get)
-+		return 0;
-+
-+	err = port->ops->port_fn_state_get(port, &state, &opstate, extack);
-+	if (err) {
-+		if (err == -EOPNOTSUPP)
-+			return 0;
-+		return err;
-+	}
-+	if (!devlink_port_fn_state_valid(state)) {
-+		WARN_ON_ONCE(1);
-+		NL_SET_ERR_MSG(extack, "Invalid state read from driver");
++	if (!attrs[DEVLINK_ATTR_SB_POOL_INDEX])
 +		return -EINVAL;
-+	}
-+	if (!devlink_port_fn_opstate_valid(opstate)) {
-+		WARN_ON_ONCE(1);
-+		NL_SET_ERR_MSG(extack, "Invalid operational state read from driver");
++
++	val = nla_get_u16(attrs[DEVLINK_ATTR_SB_POOL_INDEX]);
++	if (val >= devlink_sb_pool_count(devlink_sb))
 +		return -EINVAL;
-+	}
-+	if (nla_put_u8(msg, DEVLINK_PORT_FN_ATTR_STATE, state) ||
-+	    nla_put_u8(msg, DEVLINK_PORT_FN_ATTR_OPSTATE, opstate))
-+		return -EMSGSIZE;
-+	*msg_updated = true;
++	*p_pool_index = val;
++	return 0;
++}
++
++static int devlink_sb_pool_index_get_from_info(struct devlink_sb *devlink_sb,
++					       struct genl_info *info,
++					       u16 *p_pool_index)
++{
++	return devlink_sb_pool_index_get_from_attrs(devlink_sb, info->attrs,
++						    p_pool_index);
++}
++
++static int
++devlink_sb_pool_type_get_from_attrs(struct nlattr **attrs,
++				    enum devlink_sb_pool_type *p_pool_type)
++{
++	u8 val;
++
++	if (!attrs[DEVLINK_ATTR_SB_POOL_TYPE])
++		return -EINVAL;
++
++	val = nla_get_u8(attrs[DEVLINK_ATTR_SB_POOL_TYPE]);
++	if (val != DEVLINK_SB_POOL_TYPE_INGRESS &&
++	    val != DEVLINK_SB_POOL_TYPE_EGRESS)
++		return -EINVAL;
++	*p_pool_type = val;
 +	return 0;
 +}
 +
 +static int
-+devlink_port_fn_mig_set(struct devlink_port *devlink_port, bool enable,
-+			struct netlink_ext_ack *extack)
++devlink_sb_pool_type_get_from_info(struct genl_info *info,
++				   enum devlink_sb_pool_type *p_pool_type)
 +{
-+	return devlink_port->ops->port_fn_migratable_set(devlink_port, enable,
-+							 extack);
++	return devlink_sb_pool_type_get_from_attrs(info->attrs, p_pool_type);
 +}
 +
 +static int
-+devlink_port_fn_roce_set(struct devlink_port *devlink_port, bool enable,
-+			 struct netlink_ext_ack *extack)
++devlink_sb_th_type_get_from_attrs(struct nlattr **attrs,
++				  enum devlink_sb_threshold_type *p_th_type)
 +{
-+	return devlink_port->ops->port_fn_roce_set(devlink_port, enable,
-+						   extack);
-+}
++	u8 val;
 +
-+static int devlink_port_fn_caps_set(struct devlink_port *devlink_port,
-+				    const struct nlattr *attr,
-+				    struct netlink_ext_ack *extack)
-+{
-+	struct nla_bitfield32 caps;
-+	u32 caps_value;
-+	int err;
++	if (!attrs[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE])
++		return -EINVAL;
 +
-+	caps = nla_get_bitfield32(attr);
-+	caps_value = caps.value & caps.selector;
-+	if (caps.selector & DEVLINK_PORT_FN_CAP_ROCE) {
-+		err = devlink_port_fn_roce_set(devlink_port,
-+					       caps_value & DEVLINK_PORT_FN_CAP_ROCE,
-+					       extack);
-+		if (err)
-+			return err;
-+	}
-+	if (caps.selector & DEVLINK_PORT_FN_CAP_MIGRATABLE) {
-+		err = devlink_port_fn_mig_set(devlink_port, caps_value &
-+					      DEVLINK_PORT_FN_CAP_MIGRATABLE,
-+					      extack);
-+		if (err)
-+			return err;
-+	}
++	val = nla_get_u8(attrs[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE]);
++	if (val != DEVLINK_SB_THRESHOLD_TYPE_STATIC &&
++	    val != DEVLINK_SB_THRESHOLD_TYPE_DYNAMIC)
++		return -EINVAL;
++	*p_th_type = val;
 +	return 0;
 +}
 +
 +static int
-+devlink_nl_port_function_attrs_put(struct sk_buff *msg, struct devlink_port *port,
-+				   struct netlink_ext_ack *extack)
++devlink_sb_th_type_get_from_info(struct genl_info *info,
++				 enum devlink_sb_threshold_type *p_th_type)
 +{
-+	struct nlattr *function_attr;
-+	bool msg_updated = false;
-+	int err;
++	return devlink_sb_th_type_get_from_attrs(info->attrs, p_th_type);
++}
 +
-+	function_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PORT_FUNCTION);
-+	if (!function_attr)
++static int
++devlink_sb_tc_index_get_from_attrs(struct devlink_sb *devlink_sb,
++				   struct nlattr **attrs,
++				   enum devlink_sb_pool_type pool_type,
++				   u16 *p_tc_index)
++{
++	u16 val;
++
++	if (!attrs[DEVLINK_ATTR_SB_TC_INDEX])
++		return -EINVAL;
++
++	val = nla_get_u16(attrs[DEVLINK_ATTR_SB_TC_INDEX]);
++	if (pool_type == DEVLINK_SB_POOL_TYPE_INGRESS &&
++	    val >= devlink_sb->ingress_tc_count)
++		return -EINVAL;
++	if (pool_type == DEVLINK_SB_POOL_TYPE_EGRESS &&
++	    val >= devlink_sb->egress_tc_count)
++		return -EINVAL;
++	*p_tc_index = val;
++	return 0;
++}
++
++static int
++devlink_sb_tc_index_get_from_info(struct devlink_sb *devlink_sb,
++				  struct genl_info *info,
++				  enum devlink_sb_pool_type pool_type,
++				  u16 *p_tc_index)
++{
++	return devlink_sb_tc_index_get_from_attrs(devlink_sb, info->attrs,
++						  pool_type, p_tc_index);
++}
++
++static int devlink_nl_sb_fill(struct sk_buff *msg, struct devlink *devlink,
++			      struct devlink_sb *devlink_sb,
++			      enum devlink_command cmd, u32 portid,
++			      u32 seq, int flags)
++{
++	void *hdr;
++
++	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
++	if (!hdr)
 +		return -EMSGSIZE;
 +
-+	err = devlink_port_fn_hw_addr_fill(port, msg, extack, &msg_updated);
-+	if (err)
-+		goto out;
-+	err = devlink_port_fn_caps_fill(port, msg, extack, &msg_updated);
-+	if (err)
-+		goto out;
-+	err = devlink_port_fn_state_fill(port, msg, extack, &msg_updated);
-+out:
-+	if (err || !msg_updated)
-+		nla_nest_cancel(msg, function_attr);
-+	else
-+		nla_nest_end(msg, function_attr);
++	if (devlink_nl_put_handle(msg, devlink))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_SIZE, devlink_sb->size))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_INGRESS_POOL_COUNT,
++			devlink_sb->ingress_pools_count))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_EGRESS_POOL_COUNT,
++			devlink_sb->egress_pools_count))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_INGRESS_TC_COUNT,
++			devlink_sb->ingress_tc_count))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_EGRESS_TC_COUNT,
++			devlink_sb->egress_tc_count))
++		goto nla_put_failure;
++
++	genlmsg_end(msg, hdr);
++	return 0;
++
++nla_put_failure:
++	genlmsg_cancel(msg, hdr);
++	return -EMSGSIZE;
++}
++
++int devlink_nl_sb_get_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_sb *devlink_sb;
++	struct sk_buff *msg;
++	int err;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!msg)
++		return -ENOMEM;
++
++	err = devlink_nl_sb_fill(msg, devlink, devlink_sb,
++				 DEVLINK_CMD_SB_NEW,
++				 info->snd_portid, info->snd_seq, 0);
++	if (err) {
++		nlmsg_free(msg);
++		return err;
++	}
++
++	return genlmsg_reply(msg, info);
++}
++
++static int
++devlink_nl_sb_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
++			   struct netlink_callback *cb, int flags)
++{
++	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
++	struct devlink_sb *devlink_sb;
++	int idx = 0;
++	int err = 0;
++
++	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
++		if (idx < state->idx) {
++			idx++;
++			continue;
++		}
++		err = devlink_nl_sb_fill(msg, devlink, devlink_sb,
++					 DEVLINK_CMD_SB_NEW,
++					 NETLINK_CB(cb->skb).portid,
++					 cb->nlh->nlmsg_seq, flags);
++		if (err) {
++			state->idx = idx;
++			break;
++		}
++		idx++;
++	}
++
 +	return err;
 +}
 +
-+static int devlink_nl_port_fill(struct sk_buff *msg,
-+				struct devlink_port *devlink_port,
-+				enum devlink_command cmd, u32 portid, u32 seq,
-+				int flags, struct netlink_ext_ack *extack)
++int devlink_nl_sb_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
 +{
-+	struct devlink *devlink = devlink_port->devlink;
++	return devlink_nl_dumpit(skb, cb, devlink_nl_sb_get_dump_one);
++}
++
++static int devlink_nl_sb_pool_fill(struct sk_buff *msg, struct devlink *devlink,
++				   struct devlink_sb *devlink_sb,
++				   u16 pool_index, enum devlink_command cmd,
++				   u32 portid, u32 seq, int flags)
++{
++	struct devlink_sb_pool_info pool_info;
 +	void *hdr;
++	int err;
++
++	err = devlink->ops->sb_pool_get(devlink, devlink_sb->index,
++					pool_index, &pool_info);
++	if (err)
++		return err;
++
++	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	if (devlink_nl_put_handle(msg, devlink))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_POOL_INDEX, pool_index))
++		goto nla_put_failure;
++	if (nla_put_u8(msg, DEVLINK_ATTR_SB_POOL_TYPE, pool_info.pool_type))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_POOL_SIZE, pool_info.size))
++		goto nla_put_failure;
++	if (nla_put_u8(msg, DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE,
++		       pool_info.threshold_type))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_POOL_CELL_SIZE,
++			pool_info.cell_size))
++		goto nla_put_failure;
++
++	genlmsg_end(msg, hdr);
++	return 0;
++
++nla_put_failure:
++	genlmsg_cancel(msg, hdr);
++	return -EMSGSIZE;
++}
++
++int devlink_nl_sb_pool_get_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_sb *devlink_sb;
++	struct sk_buff *msg;
++	u16 pool_index;
++	int err;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
++						  &pool_index);
++	if (err)
++		return err;
++
++	if (!devlink->ops->sb_pool_get)
++		return -EOPNOTSUPP;
++
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!msg)
++		return -ENOMEM;
++
++	err = devlink_nl_sb_pool_fill(msg, devlink, devlink_sb, pool_index,
++				      DEVLINK_CMD_SB_POOL_NEW,
++				      info->snd_portid, info->snd_seq, 0);
++	if (err) {
++		nlmsg_free(msg);
++		return err;
++	}
++
++	return genlmsg_reply(msg, info);
++}
++
++static int __sb_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
++				struct devlink *devlink,
++				struct devlink_sb *devlink_sb,
++				u32 portid, u32 seq, int flags)
++{
++	u16 pool_count = devlink_sb_pool_count(devlink_sb);
++	u16 pool_index;
++	int err;
++
++	for (pool_index = 0; pool_index < pool_count; pool_index++) {
++		if (*p_idx < start) {
++			(*p_idx)++;
++			continue;
++		}
++		err = devlink_nl_sb_pool_fill(msg, devlink,
++					      devlink_sb,
++					      pool_index,
++					      DEVLINK_CMD_SB_POOL_NEW,
++					      portid, seq, flags);
++		if (err)
++			return err;
++		(*p_idx)++;
++	}
++	return 0;
++}
++
++static int
++devlink_nl_sb_pool_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
++				struct netlink_callback *cb, int flags)
++{
++	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
++	struct devlink_sb *devlink_sb;
++	int err = 0;
++	int idx = 0;
++
++	if (!devlink->ops->sb_pool_get)
++		return 0;
++
++	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
++		err = __sb_pool_get_dumpit(msg, state->idx, &idx,
++					   devlink, devlink_sb,
++					   NETLINK_CB(cb->skb).portid,
++					   cb->nlh->nlmsg_seq, flags);
++		if (err == -EOPNOTSUPP) {
++			err = 0;
++		} else if (err) {
++			state->idx = idx;
++			break;
++		}
++	}
++
++	return err;
++}
++
++int devlink_nl_sb_pool_get_dumpit(struct sk_buff *skb,
++				  struct netlink_callback *cb)
++{
++	return devlink_nl_dumpit(skb, cb, devlink_nl_sb_pool_get_dump_one);
++}
++
++static int devlink_sb_pool_set(struct devlink *devlink, unsigned int sb_index,
++			       u16 pool_index, u32 size,
++			       enum devlink_sb_threshold_type threshold_type,
++			       struct netlink_ext_ack *extack)
++
++{
++	const struct devlink_ops *ops = devlink->ops;
++
++	if (ops->sb_pool_set)
++		return ops->sb_pool_set(devlink, sb_index, pool_index,
++					size, threshold_type, extack);
++	return -EOPNOTSUPP;
++}
++
++int devlink_nl_cmd_sb_pool_set_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	enum devlink_sb_threshold_type threshold_type;
++	struct devlink_sb *devlink_sb;
++	u16 pool_index;
++	u32 size;
++	int err;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
++						  &pool_index);
++	if (err)
++		return err;
++
++	err = devlink_sb_th_type_get_from_info(info, &threshold_type);
++	if (err)
++		return err;
++
++	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_SB_POOL_SIZE))
++		return -EINVAL;
++
++	size = nla_get_u32(info->attrs[DEVLINK_ATTR_SB_POOL_SIZE]);
++	return devlink_sb_pool_set(devlink, devlink_sb->index,
++				   pool_index, size, threshold_type,
++				   info->extack);
++}
++
++static int devlink_nl_sb_port_pool_fill(struct sk_buff *msg,
++					struct devlink *devlink,
++					struct devlink_port *devlink_port,
++					struct devlink_sb *devlink_sb,
++					u16 pool_index,
++					enum devlink_command cmd,
++					u32 portid, u32 seq, int flags)
++{
++	const struct devlink_ops *ops = devlink->ops;
++	u32 threshold;
++	void *hdr;
++	int err;
++
++	err = ops->sb_port_pool_get(devlink_port, devlink_sb->index,
++				    pool_index, &threshold);
++	if (err)
++		return err;
 +
 +	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
 +	if (!hdr)
@@ -2071,109 +2022,69 @@ index 000000000000..0be8453012ee
 +		goto nla_put_failure;
 +	if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, devlink_port->index))
 +		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_POOL_INDEX, pool_index))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_THRESHOLD, threshold))
++		goto nla_put_failure;
 +
-+	spin_lock_bh(&devlink_port->type_lock);
-+	if (nla_put_u16(msg, DEVLINK_ATTR_PORT_TYPE, devlink_port->type))
-+		goto nla_put_failure_type_locked;
-+	if (devlink_port->desired_type != DEVLINK_PORT_TYPE_NOTSET &&
-+	    nla_put_u16(msg, DEVLINK_ATTR_PORT_DESIRED_TYPE,
-+			devlink_port->desired_type))
-+		goto nla_put_failure_type_locked;
-+	if (devlink_port->type == DEVLINK_PORT_TYPE_ETH) {
-+		if (devlink_port->type_eth.netdev &&
-+		    (nla_put_u32(msg, DEVLINK_ATTR_PORT_NETDEV_IFINDEX,
-+				 devlink_port->type_eth.ifindex) ||
-+		     nla_put_string(msg, DEVLINK_ATTR_PORT_NETDEV_NAME,
-+				    devlink_port->type_eth.ifname)))
-+			goto nla_put_failure_type_locked;
-+	}
-+	if (devlink_port->type == DEVLINK_PORT_TYPE_IB) {
-+		struct ib_device *ibdev = devlink_port->type_ib.ibdev;
++	if (ops->sb_occ_port_pool_get) {
++		u32 cur;
++		u32 max;
 +
-+		if (ibdev &&
-+		    nla_put_string(msg, DEVLINK_ATTR_PORT_IBDEV_NAME,
-+				   ibdev->name))
-+			goto nla_put_failure_type_locked;
++		err = ops->sb_occ_port_pool_get(devlink_port, devlink_sb->index,
++						pool_index, &cur, &max);
++		if (err && err != -EOPNOTSUPP)
++			goto sb_occ_get_failure;
++		if (!err) {
++			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_CUR, cur))
++				goto nla_put_failure;
++			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_MAX, max))
++				goto nla_put_failure;
++		}
 +	}
-+	spin_unlock_bh(&devlink_port->type_lock);
-+	if (devlink_nl_port_attrs_put(msg, devlink_port))
-+		goto nla_put_failure;
-+	if (devlink_nl_port_function_attrs_put(msg, devlink_port, extack))
-+		goto nla_put_failure;
-+	if (devlink_port->linecard &&
-+	    nla_put_u32(msg, DEVLINK_ATTR_LINECARD_INDEX,
-+			devlink_port->linecard->index))
-+		goto nla_put_failure;
 +
 +	genlmsg_end(msg, hdr);
 +	return 0;
 +
-+nla_put_failure_type_locked:
-+	spin_unlock_bh(&devlink_port->type_lock);
 +nla_put_failure:
++	err = -EMSGSIZE;
++sb_occ_get_failure:
 +	genlmsg_cancel(msg, hdr);
-+	return -EMSGSIZE;
++	return err;
 +}
 +
-+static void devlink_port_notify(struct devlink_port *devlink_port,
-+				enum devlink_command cmd)
-+{
-+	struct devlink *devlink = devlink_port->devlink;
-+	struct sk_buff *msg;
-+	int err;
-+
-+	WARN_ON(cmd != DEVLINK_CMD_PORT_NEW && cmd != DEVLINK_CMD_PORT_DEL);
-+
-+	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
-+		return;
-+
-+	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg)
-+		return;
-+
-+	err = devlink_nl_port_fill(msg, devlink_port, cmd, 0, 0, 0, NULL);
-+	if (err) {
-+		nlmsg_free(msg);
-+		return;
-+	}
-+
-+	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
-+				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+}
-+
-+static void devlink_ports_notify(struct devlink *devlink,
-+				 enum devlink_command cmd)
-+{
-+	struct devlink_port *devlink_port;
-+	unsigned long port_index;
-+
-+	xa_for_each(&devlink->ports, port_index, devlink_port)
-+		devlink_port_notify(devlink_port, cmd);
-+}
-+
-+void devlink_ports_notify_register(struct devlink *devlink)
-+{
-+	devlink_ports_notify(devlink, DEVLINK_CMD_PORT_NEW);
-+}
-+
-+void devlink_ports_notify_unregister(struct devlink *devlink)
-+{
-+	devlink_ports_notify(devlink, DEVLINK_CMD_PORT_DEL);
-+}
-+
-+int devlink_nl_port_get_doit(struct sk_buff *skb, struct genl_info *info)
++int devlink_nl_sb_port_pool_get_doit(struct sk_buff *skb,
++				     struct genl_info *info)
 +{
 +	struct devlink_port *devlink_port = info->user_ptr[1];
++	struct devlink *devlink = devlink_port->devlink;
++	struct devlink_sb *devlink_sb;
 +	struct sk_buff *msg;
++	u16 pool_index;
 +	int err;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
++						  &pool_index);
++	if (err)
++		return err;
++
++	if (!devlink->ops->sb_port_pool_get)
++		return -EOPNOTSUPP;
 +
 +	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
 +	if (!msg)
 +		return -ENOMEM;
 +
-+	err = devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_PORT_NEW,
-+				   info->snd_portid, info->snd_seq, 0,
-+				   info->extack);
++	err = devlink_nl_sb_port_pool_fill(msg, devlink, devlink_port,
++					   devlink_sb, pool_index,
++					   DEVLINK_CMD_SB_PORT_POOL_NEW,
++					   info->snd_portid, info->snd_seq, 0);
 +	if (err) {
 +		nlmsg_free(msg);
 +		return err;
@@ -2182,23 +2093,59 @@ index 000000000000..0be8453012ee
 +	return genlmsg_reply(msg, info);
 +}
 +
++static int __sb_port_pool_get_dumpit(struct sk_buff *msg, int start, int *p_idx,
++				     struct devlink *devlink,
++				     struct devlink_sb *devlink_sb,
++				     u32 portid, u32 seq, int flags)
++{
++	struct devlink_port *devlink_port;
++	u16 pool_count = devlink_sb_pool_count(devlink_sb);
++	unsigned long port_index;
++	u16 pool_index;
++	int err;
++
++	xa_for_each(&devlink->ports, port_index, devlink_port) {
++		for (pool_index = 0; pool_index < pool_count; pool_index++) {
++			if (*p_idx < start) {
++				(*p_idx)++;
++				continue;
++			}
++			err = devlink_nl_sb_port_pool_fill(msg, devlink,
++							   devlink_port,
++							   devlink_sb,
++							   pool_index,
++							   DEVLINK_CMD_SB_PORT_POOL_NEW,
++							   portid, seq, flags);
++			if (err)
++				return err;
++			(*p_idx)++;
++		}
++	}
++	return 0;
++}
++
 +static int
-+devlink_nl_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
-+			     struct netlink_callback *cb, int flags)
++devlink_nl_sb_port_pool_get_dump_one(struct sk_buff *msg,
++				     struct devlink *devlink,
++				     struct netlink_callback *cb, int flags)
 +{
 +	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
-+	struct devlink_port *devlink_port;
-+	unsigned long port_index;
++	struct devlink_sb *devlink_sb;
++	int idx = 0;
 +	int err = 0;
 +
-+	xa_for_each_start(&devlink->ports, port_index, devlink_port, state->idx) {
-+		err = devlink_nl_port_fill(msg, devlink_port,
-+					   DEVLINK_CMD_NEW,
-+					   NETLINK_CB(cb->skb).portid,
-+					   cb->nlh->nlmsg_seq, flags,
-+					   cb->extack);
-+		if (err) {
-+			state->idx = port_index;
++	if (!devlink->ops->sb_port_pool_get)
++		return 0;
++
++	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
++		err = __sb_port_pool_get_dumpit(msg, state->idx, &idx,
++						devlink, devlink_sb,
++						NETLINK_CB(cb->skb).portid,
++						cb->nlh->nlmsg_seq, flags);
++		if (err == -EOPNOTSUPP) {
++			err = 0;
++		} else if (err) {
++			state->idx = idx;
 +			break;
 +		}
 +	}
@@ -2206,908 +2153,399 @@ index 000000000000..0be8453012ee
 +	return err;
 +}
 +
-+int devlink_nl_port_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
++int devlink_nl_sb_port_pool_get_dumpit(struct sk_buff *skb,
++				       struct netlink_callback *cb)
 +{
-+	return devlink_nl_dumpit(skb, cb, devlink_nl_port_get_dump_one);
++	return devlink_nl_dumpit(skb, cb, devlink_nl_sb_port_pool_get_dump_one);
 +}
 +
-+static int devlink_port_type_set(struct devlink_port *devlink_port,
-+				 enum devlink_port_type port_type)
++static int devlink_sb_port_pool_set(struct devlink_port *devlink_port,
++				    unsigned int sb_index, u16 pool_index,
++				    u32 threshold,
++				    struct netlink_ext_ack *extack)
 +
 +{
++	const struct devlink_ops *ops = devlink_port->devlink->ops;
++
++	if (ops->sb_port_pool_set)
++		return ops->sb_port_pool_set(devlink_port, sb_index,
++					     pool_index, threshold, extack);
++	return -EOPNOTSUPP;
++}
++
++int devlink_nl_cmd_sb_port_pool_set_doit(struct sk_buff *skb,
++					 struct genl_info *info)
++{
++	struct devlink_port *devlink_port = info->user_ptr[1];
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_sb *devlink_sb;
++	u16 pool_index;
++	u32 threshold;
 +	int err;
 +
-+	if (!devlink_port->ops->port_type_set)
-+		return -EOPNOTSUPP;
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
 +
-+	if (port_type == devlink_port->type)
-+		return 0;
-+
-+	err = devlink_port->ops->port_type_set(devlink_port, port_type);
++	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
++						  &pool_index);
 +	if (err)
 +		return err;
 +
-+	devlink_port->desired_type = port_type;
-+	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
-+	return 0;
-+}
-+
-+static int devlink_port_function_hw_addr_set(struct devlink_port *port,
-+					     const struct nlattr *attr,
-+					     struct netlink_ext_ack *extack)
-+{
-+	const u8 *hw_addr;
-+	int hw_addr_len;
-+
-+	hw_addr = nla_data(attr);
-+	hw_addr_len = nla_len(attr);
-+	if (hw_addr_len > MAX_ADDR_LEN) {
-+		NL_SET_ERR_MSG(extack, "Port function hardware address too long");
++	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_SB_THRESHOLD))
 +		return -EINVAL;
-+	}
-+	if (port->type == DEVLINK_PORT_TYPE_ETH) {
-+		if (hw_addr_len != ETH_ALEN) {
-+			NL_SET_ERR_MSG(extack, "Address must be 6 bytes for Ethernet device");
-+			return -EINVAL;
-+		}
-+		if (!is_unicast_ether_addr(hw_addr)) {
-+			NL_SET_ERR_MSG(extack, "Non-unicast hardware address unsupported");
-+			return -EINVAL;
-+		}
-+	}
 +
-+	return port->ops->port_fn_hw_addr_set(port, hw_addr, hw_addr_len,
-+					      extack);
++	threshold = nla_get_u32(info->attrs[DEVLINK_ATTR_SB_THRESHOLD]);
++	return devlink_sb_port_pool_set(devlink_port, devlink_sb->index,
++					pool_index, threshold, info->extack);
 +}
 +
-+static int devlink_port_fn_state_set(struct devlink_port *port,
-+				     const struct nlattr *attr,
-+				     struct netlink_ext_ack *extack)
++static int
++devlink_nl_sb_tc_pool_bind_fill(struct sk_buff *msg, struct devlink *devlink,
++				struct devlink_port *devlink_port,
++				struct devlink_sb *devlink_sb, u16 tc_index,
++				enum devlink_sb_pool_type pool_type,
++				enum devlink_command cmd,
++				u32 portid, u32 seq, int flags)
 +{
-+	enum devlink_port_fn_state state;
-+
-+	state = nla_get_u8(attr);
-+	return port->ops->port_fn_state_set(port, state, extack);
-+}
-+
-+static int devlink_port_function_validate(struct devlink_port *devlink_port,
-+					  struct nlattr **tb,
-+					  struct netlink_ext_ack *extack)
-+{
-+	const struct devlink_port_ops *ops = devlink_port->ops;
-+	struct nlattr *attr;
-+
-+	if (tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] &&
-+	    !ops->port_fn_hw_addr_set) {
-+		NL_SET_ERR_MSG_ATTR(extack, tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR],
-+				    "Port doesn't support function attributes");
-+		return -EOPNOTSUPP;
-+	}
-+	if (tb[DEVLINK_PORT_FN_ATTR_STATE] && !ops->port_fn_state_set) {
-+		NL_SET_ERR_MSG_ATTR(extack, tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR],
-+				    "Function does not support state setting");
-+		return -EOPNOTSUPP;
-+	}
-+	attr = tb[DEVLINK_PORT_FN_ATTR_CAPS];
-+	if (attr) {
-+		struct nla_bitfield32 caps;
-+
-+		caps = nla_get_bitfield32(attr);
-+		if (caps.selector & DEVLINK_PORT_FN_CAP_ROCE &&
-+		    !ops->port_fn_roce_set) {
-+			NL_SET_ERR_MSG_ATTR(extack, attr,
-+					    "Port doesn't support RoCE function attribute");
-+			return -EOPNOTSUPP;
-+		}
-+		if (caps.selector & DEVLINK_PORT_FN_CAP_MIGRATABLE) {
-+			if (!ops->port_fn_migratable_set) {
-+				NL_SET_ERR_MSG_ATTR(extack, attr,
-+						    "Port doesn't support migratable function attribute");
-+				return -EOPNOTSUPP;
-+			}
-+			if (devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_VF) {
-+				NL_SET_ERR_MSG_ATTR(extack, attr,
-+						    "migratable function attribute supported for VFs only");
-+				return -EOPNOTSUPP;
-+			}
-+		}
-+	}
-+	return 0;
-+}
-+
-+static int devlink_port_function_set(struct devlink_port *port,
-+				     const struct nlattr *attr,
-+				     struct netlink_ext_ack *extack)
-+{
-+	struct nlattr *tb[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1];
++	const struct devlink_ops *ops = devlink->ops;
++	u16 pool_index;
++	u32 threshold;
++	void *hdr;
 +	int err;
 +
-+	err = nla_parse_nested(tb, DEVLINK_PORT_FUNCTION_ATTR_MAX, attr,
-+			       devlink_function_nl_policy, extack);
-+	if (err < 0) {
-+		NL_SET_ERR_MSG(extack, "Fail to parse port function attributes");
-+		return err;
-+	}
-+
-+	err = devlink_port_function_validate(port, tb, extack);
++	err = ops->sb_tc_pool_bind_get(devlink_port, devlink_sb->index,
++				       tc_index, pool_type,
++				       &pool_index, &threshold);
 +	if (err)
 +		return err;
 +
-+	attr = tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR];
-+	if (attr) {
-+		err = devlink_port_function_hw_addr_set(port, attr, extack);
-+		if (err)
++	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	if (devlink_nl_put_handle(msg, devlink))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, devlink_port->index))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_INDEX, devlink_sb->index))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_TC_INDEX, tc_index))
++		goto nla_put_failure;
++	if (nla_put_u8(msg, DEVLINK_ATTR_SB_POOL_TYPE, pool_type))
++		goto nla_put_failure;
++	if (nla_put_u16(msg, DEVLINK_ATTR_SB_POOL_INDEX, pool_index))
++		goto nla_put_failure;
++	if (nla_put_u32(msg, DEVLINK_ATTR_SB_THRESHOLD, threshold))
++		goto nla_put_failure;
++
++	if (ops->sb_occ_tc_port_bind_get) {
++		u32 cur;
++		u32 max;
++
++		err = ops->sb_occ_tc_port_bind_get(devlink_port,
++						   devlink_sb->index,
++						   tc_index, pool_type,
++						   &cur, &max);
++		if (err && err != -EOPNOTSUPP)
 +			return err;
++		if (!err) {
++			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_CUR, cur))
++				goto nla_put_failure;
++			if (nla_put_u32(msg, DEVLINK_ATTR_SB_OCC_MAX, max))
++				goto nla_put_failure;
++		}
 +	}
 +
-+	attr = tb[DEVLINK_PORT_FN_ATTR_CAPS];
-+	if (attr) {
-+		err = devlink_port_fn_caps_set(port, attr, extack);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* Keep this as the last function attribute set, so that when
-+	 * multiple port function attributes are set along with state,
-+	 * Those can be applied first before activating the state.
-+	 */
-+	attr = tb[DEVLINK_PORT_FN_ATTR_STATE];
-+	if (attr)
-+		err = devlink_port_fn_state_set(port, attr, extack);
-+
-+	if (!err)
-+		devlink_port_notify(port, DEVLINK_CMD_PORT_NEW);
-+	return err;
-+}
-+
-+int devlink_nl_cmd_port_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct devlink_port *devlink_port = info->user_ptr[1];
-+	int err;
-+
-+	if (info->attrs[DEVLINK_ATTR_PORT_TYPE]) {
-+		enum devlink_port_type port_type;
-+
-+		port_type = nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_TYPE]);
-+		err = devlink_port_type_set(devlink_port, port_type);
-+		if (err)
-+			return err;
-+	}
-+
-+	if (info->attrs[DEVLINK_ATTR_PORT_FUNCTION]) {
-+		struct nlattr *attr = info->attrs[DEVLINK_ATTR_PORT_FUNCTION];
-+		struct netlink_ext_ack *extack = info->extack;
-+
-+		err = devlink_port_function_set(devlink_port, attr, extack);
-+		if (err)
-+			return err;
-+	}
-+
++	genlmsg_end(msg, hdr);
 +	return 0;
++
++nla_put_failure:
++	genlmsg_cancel(msg, hdr);
++	return -EMSGSIZE;
 +}
 +
-+int devlink_nl_cmd_port_split_doit(struct sk_buff *skb, struct genl_info *info)
++int devlink_nl_sb_tc_pool_bind_get_doit(struct sk_buff *skb,
++					struct genl_info *info)
 +{
 +	struct devlink_port *devlink_port = info->user_ptr[1];
-+	struct devlink *devlink = info->user_ptr[0];
-+	u32 count;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PORT_SPLIT_COUNT))
-+		return -EINVAL;
-+	if (!devlink_port->ops->port_split)
-+		return -EOPNOTSUPP;
-+
-+	count = nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_SPLIT_COUNT]);
-+
-+	if (!devlink_port->attrs.splittable) {
-+		/* Split ports cannot be split. */
-+		if (devlink_port->attrs.split)
-+			NL_SET_ERR_MSG(info->extack, "Port cannot be split further");
-+		else
-+			NL_SET_ERR_MSG(info->extack, "Port cannot be split");
-+		return -EINVAL;
-+	}
-+
-+	if (count < 2 || !is_power_of_2(count) || count > devlink_port->attrs.lanes) {
-+		NL_SET_ERR_MSG(info->extack, "Invalid split count");
-+		return -EINVAL;
-+	}
-+
-+	return devlink_port->ops->port_split(devlink, devlink_port, count,
-+					     info->extack);
-+}
-+
-+int devlink_nl_cmd_port_unsplit_doit(struct sk_buff *skb,
-+				     struct genl_info *info)
-+{
-+	struct devlink_port *devlink_port = info->user_ptr[1];
-+	struct devlink *devlink = info->user_ptr[0];
-+
-+	if (!devlink_port->ops->port_unsplit)
-+		return -EOPNOTSUPP;
-+	return devlink_port->ops->port_unsplit(devlink, devlink_port, info->extack);
-+}
-+
-+int devlink_nl_cmd_port_new_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct netlink_ext_ack *extack = info->extack;
-+	struct devlink_port_new_attrs new_attrs = {};
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_port *devlink_port;
++	struct devlink *devlink = devlink_port->devlink;
++	struct devlink_sb *devlink_sb;
 +	struct sk_buff *msg;
++	enum devlink_sb_pool_type pool_type;
++	u16 tc_index;
 +	int err;
 +
-+	if (!devlink->ops->port_new)
-+		return -EOPNOTSUPP;
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
 +
-+	if (!info->attrs[DEVLINK_ATTR_PORT_FLAVOUR] ||
-+	    !info->attrs[DEVLINK_ATTR_PORT_PCI_PF_NUMBER]) {
-+		NL_SET_ERR_MSG(extack, "Port flavour or PCI PF are not specified");
-+		return -EINVAL;
-+	}
-+	new_attrs.flavour = nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_FLAVOUR]);
-+	new_attrs.pfnum =
-+		nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_PCI_PF_NUMBER]);
-+
-+	if (info->attrs[DEVLINK_ATTR_PORT_INDEX]) {
-+		/* Port index of the new port being created by driver. */
-+		new_attrs.port_index =
-+			nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_INDEX]);
-+		new_attrs.port_index_valid = true;
-+	}
-+	if (info->attrs[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER]) {
-+		new_attrs.controller =
-+			nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER]);
-+		new_attrs.controller_valid = true;
-+	}
-+	if (new_attrs.flavour == DEVLINK_PORT_FLAVOUR_PCI_SF &&
-+	    info->attrs[DEVLINK_ATTR_PORT_PCI_SF_NUMBER]) {
-+		new_attrs.sfnum = nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_PCI_SF_NUMBER]);
-+		new_attrs.sfnum_valid = true;
-+	}
-+
-+	err = devlink->ops->port_new(devlink, &new_attrs,
-+				     extack, &devlink_port);
++	err = devlink_sb_pool_type_get_from_info(info, &pool_type);
 +	if (err)
 +		return err;
++
++	err = devlink_sb_tc_index_get_from_info(devlink_sb, info,
++						pool_type, &tc_index);
++	if (err)
++		return err;
++
++	if (!devlink->ops->sb_tc_pool_bind_get)
++		return -EOPNOTSUPP;
 +
 +	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg) {
-+		err = -ENOMEM;
-+		goto err_out_port_del;
-+	}
-+	err = devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_NEW,
-+				   info->snd_portid, info->snd_seq, 0, NULL);
-+	if (WARN_ON_ONCE(err))
-+		goto err_out_msg_free;
-+	err = genlmsg_reply(msg, info);
-+	if (err)
-+		goto err_out_port_del;
-+	return 0;
++	if (!msg)
++		return -ENOMEM;
 +
-+err_out_msg_free:
-+	nlmsg_free(msg);
-+err_out_port_del:
-+	devlink_port->ops->port_del(devlink, devlink_port, NULL);
-+	return err;
-+}
-+
-+int devlink_nl_cmd_port_del_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct devlink_port *devlink_port = info->user_ptr[1];
-+	struct netlink_ext_ack *extack = info->extack;
-+	struct devlink *devlink = info->user_ptr[0];
-+
-+	if (!devlink_port->ops->port_del)
-+		return -EOPNOTSUPP;
-+
-+	return devlink_port->ops->port_del(devlink, devlink_port, extack);
-+}
-+
-+static void devlink_port_type_warn(struct work_struct *work)
-+{
-+	struct devlink_port *port = container_of(to_delayed_work(work),
-+						 struct devlink_port,
-+						 type_warn_dw);
-+	dev_warn(port->devlink->dev, "Type was not set for devlink port.");
-+}
-+
-+static bool devlink_port_type_should_warn(struct devlink_port *devlink_port)
-+{
-+	/* Ignore CPU and DSA flavours. */
-+	return devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_CPU &&
-+	       devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_DSA &&
-+	       devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_UNUSED;
-+}
-+
-+#define DEVLINK_PORT_TYPE_WARN_TIMEOUT (HZ * 3600)
-+
-+static void devlink_port_type_warn_schedule(struct devlink_port *devlink_port)
-+{
-+	if (!devlink_port_type_should_warn(devlink_port))
-+		return;
-+	/* Schedule a work to WARN in case driver does not set port
-+	 * type within timeout.
-+	 */
-+	schedule_delayed_work(&devlink_port->type_warn_dw,
-+			      DEVLINK_PORT_TYPE_WARN_TIMEOUT);
-+}
-+
-+static void devlink_port_type_warn_cancel(struct devlink_port *devlink_port)
-+{
-+	if (!devlink_port_type_should_warn(devlink_port))
-+		return;
-+	cancel_delayed_work_sync(&devlink_port->type_warn_dw);
-+}
-+
-+/**
-+ * devlink_port_init() - Init devlink port
-+ *
-+ * @devlink: devlink
-+ * @devlink_port: devlink port
-+ *
-+ * Initialize essential stuff that is needed for functions
-+ * that may be called before devlink port registration.
-+ * Call to this function is optional and not needed
-+ * in case the driver does not use such functions.
-+ */
-+void devlink_port_init(struct devlink *devlink,
-+		       struct devlink_port *devlink_port)
-+{
-+	if (devlink_port->initialized)
-+		return;
-+	devlink_port->devlink = devlink;
-+	INIT_LIST_HEAD(&devlink_port->region_list);
-+	devlink_port->initialized = true;
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_init);
-+
-+/**
-+ * devlink_port_fini() - Deinitialize devlink port
-+ *
-+ * @devlink_port: devlink port
-+ *
-+ * Deinitialize essential stuff that is in use for functions
-+ * that may be called after devlink port unregistration.
-+ * Call to this function is optional and not needed
-+ * in case the driver does not use such functions.
-+ */
-+void devlink_port_fini(struct devlink_port *devlink_port)
-+{
-+	WARN_ON(!list_empty(&devlink_port->region_list));
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_fini);
-+
-+static const struct devlink_port_ops devlink_port_dummy_ops = {};
-+
-+/**
-+ * devl_port_register_with_ops() - Register devlink port
-+ *
-+ * @devlink: devlink
-+ * @devlink_port: devlink port
-+ * @port_index: driver-specific numerical identifier of the port
-+ * @ops: port ops
-+ *
-+ * Register devlink port with provided port index. User can use
-+ * any indexing, even hw-related one. devlink_port structure
-+ * is convenient to be embedded inside user driver private structure.
-+ * Note that the caller should take care of zeroing the devlink_port
-+ * structure.
-+ */
-+int devl_port_register_with_ops(struct devlink *devlink,
-+				struct devlink_port *devlink_port,
-+				unsigned int port_index,
-+				const struct devlink_port_ops *ops)
-+{
-+	int err;
-+
-+	devl_assert_locked(devlink);
-+
-+	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+
-+	devlink_port_init(devlink, devlink_port);
-+	devlink_port->registered = true;
-+	devlink_port->index = port_index;
-+	devlink_port->ops = ops ? ops : &devlink_port_dummy_ops;
-+	spin_lock_init(&devlink_port->type_lock);
-+	INIT_LIST_HEAD(&devlink_port->reporter_list);
-+	err = xa_insert(&devlink->ports, port_index, devlink_port, GFP_KERNEL);
++	err = devlink_nl_sb_tc_pool_bind_fill(msg, devlink, devlink_port,
++					      devlink_sb, tc_index, pool_type,
++					      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
++					      info->snd_portid,
++					      info->snd_seq, 0);
 +	if (err) {
-+		devlink_port->registered = false;
++		nlmsg_free(msg);
 +		return err;
 +	}
 +
-+	INIT_DELAYED_WORK(&devlink_port->type_warn_dw, &devlink_port_type_warn);
-+	devlink_port_type_warn_schedule(devlink_port);
-+	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
++	return genlmsg_reply(msg, info);
++}
++
++static int __sb_tc_pool_bind_get_dumpit(struct sk_buff *msg,
++					int start, int *p_idx,
++					struct devlink *devlink,
++					struct devlink_sb *devlink_sb,
++					u32 portid, u32 seq, int flags)
++{
++	struct devlink_port *devlink_port;
++	unsigned long port_index;
++	u16 tc_index;
++	int err;
++
++	xa_for_each(&devlink->ports, port_index, devlink_port) {
++		for (tc_index = 0;
++		     tc_index < devlink_sb->ingress_tc_count; tc_index++) {
++			if (*p_idx < start) {
++				(*p_idx)++;
++				continue;
++			}
++			err = devlink_nl_sb_tc_pool_bind_fill(msg, devlink,
++							      devlink_port,
++							      devlink_sb,
++							      tc_index,
++							      DEVLINK_SB_POOL_TYPE_INGRESS,
++							      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
++							      portid, seq,
++							      flags);
++			if (err)
++				return err;
++			(*p_idx)++;
++		}
++		for (tc_index = 0;
++		     tc_index < devlink_sb->egress_tc_count; tc_index++) {
++			if (*p_idx < start) {
++				(*p_idx)++;
++				continue;
++			}
++			err = devlink_nl_sb_tc_pool_bind_fill(msg, devlink,
++							      devlink_port,
++							      devlink_sb,
++							      tc_index,
++							      DEVLINK_SB_POOL_TYPE_EGRESS,
++							      DEVLINK_CMD_SB_TC_POOL_BIND_NEW,
++							      portid, seq,
++							      flags);
++			if (err)
++				return err;
++			(*p_idx)++;
++		}
++	}
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(devl_port_register_with_ops);
 +
-+/**
-+ *	devlink_port_register_with_ops - Register devlink port
-+ *
-+ *	@devlink: devlink
-+ *	@devlink_port: devlink port
-+ *	@port_index: driver-specific numerical identifier of the port
-+ *	@ops: port ops
-+ *
-+ *	Register devlink port with provided port index. User can use
-+ *	any indexing, even hw-related one. devlink_port structure
-+ *	is convenient to be embedded inside user driver private structure.
-+ *	Note that the caller should take care of zeroing the devlink_port
-+ *	structure.
-+ *
-+ *	Context: Takes and release devlink->lock <mutex>.
-+ */
-+int devlink_port_register_with_ops(struct devlink *devlink,
-+				   struct devlink_port *devlink_port,
-+				   unsigned int port_index,
-+				   const struct devlink_port_ops *ops)
++static int devlink_nl_sb_tc_pool_bind_get_dump_one(struct sk_buff *msg,
++						   struct devlink *devlink,
++						   struct netlink_callback *cb,
++						   int flags)
++{
++	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
++	struct devlink_sb *devlink_sb;
++	int idx = 0;
++	int err = 0;
++
++	if (!devlink->ops->sb_tc_pool_bind_get)
++		return 0;
++
++	list_for_each_entry(devlink_sb, &devlink->sb_list, list) {
++		err = __sb_tc_pool_bind_get_dumpit(msg, state->idx, &idx,
++						   devlink, devlink_sb,
++						   NETLINK_CB(cb->skb).portid,
++						   cb->nlh->nlmsg_seq, flags);
++		if (err == -EOPNOTSUPP) {
++			err = 0;
++		} else if (err) {
++			state->idx = idx;
++			break;
++		}
++	}
++
++	return err;
++}
++
++int devlink_nl_sb_tc_pool_bind_get_dumpit(struct sk_buff *skb,
++					  struct netlink_callback *cb)
++{
++	return devlink_nl_dumpit(skb, cb,
++				 devlink_nl_sb_tc_pool_bind_get_dump_one);
++}
++
++static int devlink_sb_tc_pool_bind_set(struct devlink_port *devlink_port,
++				       unsigned int sb_index, u16 tc_index,
++				       enum devlink_sb_pool_type pool_type,
++				       u16 pool_index, u32 threshold,
++				       struct netlink_ext_ack *extack)
++
++{
++	const struct devlink_ops *ops = devlink_port->devlink->ops;
++
++	if (ops->sb_tc_pool_bind_set)
++		return ops->sb_tc_pool_bind_set(devlink_port, sb_index,
++						tc_index, pool_type,
++						pool_index, threshold, extack);
++	return -EOPNOTSUPP;
++}
++
++int devlink_nl_cmd_sb_tc_pool_bind_set_doit(struct sk_buff *skb,
++					    struct genl_info *info)
++{
++	struct devlink_port *devlink_port = info->user_ptr[1];
++	struct devlink *devlink = info->user_ptr[0];
++	enum devlink_sb_pool_type pool_type;
++	struct devlink_sb *devlink_sb;
++	u16 tc_index;
++	u16 pool_index;
++	u32 threshold;
++	int err;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	err = devlink_sb_pool_type_get_from_info(info, &pool_type);
++	if (err)
++		return err;
++
++	err = devlink_sb_tc_index_get_from_info(devlink_sb, info,
++						pool_type, &tc_index);
++	if (err)
++		return err;
++
++	err = devlink_sb_pool_index_get_from_info(devlink_sb, info,
++						  &pool_index);
++	if (err)
++		return err;
++
++	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_SB_THRESHOLD))
++		return -EINVAL;
++
++	threshold = nla_get_u32(info->attrs[DEVLINK_ATTR_SB_THRESHOLD]);
++	return devlink_sb_tc_pool_bind_set(devlink_port, devlink_sb->index,
++					   tc_index, pool_type,
++					   pool_index, threshold, info->extack);
++}
++
++int devlink_nl_cmd_sb_occ_snapshot_doit(struct sk_buff *skb,
++					struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	const struct devlink_ops *ops = devlink->ops;
++	struct devlink_sb *devlink_sb;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	if (ops->sb_occ_snapshot)
++		return ops->sb_occ_snapshot(devlink, devlink_sb->index);
++	return -EOPNOTSUPP;
++}
++
++int devlink_nl_cmd_sb_occ_max_clear_doit(struct sk_buff *skb,
++					 struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	const struct devlink_ops *ops = devlink->ops;
++	struct devlink_sb *devlink_sb;
++
++	devlink_sb = devlink_sb_get_from_info(devlink, info);
++	if (IS_ERR(devlink_sb))
++		return PTR_ERR(devlink_sb);
++
++	if (ops->sb_occ_max_clear)
++		return ops->sb_occ_max_clear(devlink, devlink_sb->index);
++	return -EOPNOTSUPP;
++}
++
++int devl_sb_register(struct devlink *devlink, unsigned int sb_index,
++		     u32 size, u16 ingress_pools_count,
++		     u16 egress_pools_count, u16 ingress_tc_count,
++		     u16 egress_tc_count)
++{
++	struct devlink_sb *devlink_sb;
++
++	lockdep_assert_held(&devlink->lock);
++
++	if (devlink_sb_index_exists(devlink, sb_index))
++		return -EEXIST;
++
++	devlink_sb = kzalloc(sizeof(*devlink_sb), GFP_KERNEL);
++	if (!devlink_sb)
++		return -ENOMEM;
++	devlink_sb->index = sb_index;
++	devlink_sb->size = size;
++	devlink_sb->ingress_pools_count = ingress_pools_count;
++	devlink_sb->egress_pools_count = egress_pools_count;
++	devlink_sb->ingress_tc_count = ingress_tc_count;
++	devlink_sb->egress_tc_count = egress_tc_count;
++	list_add_tail(&devlink_sb->list, &devlink->sb_list);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(devl_sb_register);
++
++int devlink_sb_register(struct devlink *devlink, unsigned int sb_index,
++			u32 size, u16 ingress_pools_count,
++			u16 egress_pools_count, u16 ingress_tc_count,
++			u16 egress_tc_count)
 +{
 +	int err;
 +
 +	devl_lock(devlink);
-+	err = devl_port_register_with_ops(devlink, devlink_port,
-+					  port_index, ops);
++	err = devl_sb_register(devlink, sb_index, size, ingress_pools_count,
++			       egress_pools_count, ingress_tc_count,
++			       egress_tc_count);
 +	devl_unlock(devlink);
 +	return err;
 +}
-+EXPORT_SYMBOL_GPL(devlink_port_register_with_ops);
++EXPORT_SYMBOL_GPL(devlink_sb_register);
 +
-+/**
-+ * devl_port_unregister() - Unregister devlink port
-+ *
-+ * @devlink_port: devlink port
-+ */
-+void devl_port_unregister(struct devlink_port *devlink_port)
++void devl_sb_unregister(struct devlink *devlink, unsigned int sb_index)
 +{
-+	lockdep_assert_held(&devlink_port->devlink->lock);
-+	WARN_ON(devlink_port->type != DEVLINK_PORT_TYPE_NOTSET);
++	struct devlink_sb *devlink_sb;
 +
-+	devlink_port_type_warn_cancel(devlink_port);
-+	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
-+	xa_erase(&devlink_port->devlink->ports, devlink_port->index);
-+	WARN_ON(!list_empty(&devlink_port->reporter_list));
-+	devlink_port->registered = false;
++	lockdep_assert_held(&devlink->lock);
++
++	devlink_sb = devlink_sb_get_by_index(devlink, sb_index);
++	WARN_ON(!devlink_sb);
++	list_del(&devlink_sb->list);
++	kfree(devlink_sb);
 +}
-+EXPORT_SYMBOL_GPL(devl_port_unregister);
++EXPORT_SYMBOL_GPL(devl_sb_unregister);
 +
-+/**
-+ *	devlink_port_unregister - Unregister devlink port
-+ *
-+ *	@devlink_port: devlink port
-+ *
-+ *	Context: Takes and release devlink->lock <mutex>.
-+ */
-+void devlink_port_unregister(struct devlink_port *devlink_port)
++void devlink_sb_unregister(struct devlink *devlink, unsigned int sb_index)
 +{
-+	struct devlink *devlink = devlink_port->devlink;
-+
 +	devl_lock(devlink);
-+	devl_port_unregister(devlink_port);
++	devl_sb_unregister(devlink, sb_index);
 +	devl_unlock(devlink);
 +}
-+EXPORT_SYMBOL_GPL(devlink_port_unregister);
-+
-+static void devlink_port_type_netdev_checks(struct devlink_port *devlink_port,
-+					    struct net_device *netdev)
-+{
-+	const struct net_device_ops *ops = netdev->netdev_ops;
-+
-+	/* If driver registers devlink port, it should set devlink port
-+	 * attributes accordingly so the compat functions are called
-+	 * and the original ops are not used.
-+	 */
-+	if (ops->ndo_get_phys_port_name) {
-+		/* Some drivers use the same set of ndos for netdevs
-+		 * that have devlink_port registered and also for
-+		 * those who don't. Make sure that ndo_get_phys_port_name
-+		 * returns -EOPNOTSUPP here in case it is defined.
-+		 * Warn if not.
-+		 */
-+		char name[IFNAMSIZ];
-+		int err;
-+
-+		err = ops->ndo_get_phys_port_name(netdev, name, sizeof(name));
-+		WARN_ON(err != -EOPNOTSUPP);
-+	}
-+	if (ops->ndo_get_port_parent_id) {
-+		/* Some drivers use the same set of ndos for netdevs
-+		 * that have devlink_port registered and also for
-+		 * those who don't. Make sure that ndo_get_port_parent_id
-+		 * returns -EOPNOTSUPP here in case it is defined.
-+		 * Warn if not.
-+		 */
-+		struct netdev_phys_item_id ppid;
-+		int err;
-+
-+		err = ops->ndo_get_port_parent_id(netdev, &ppid);
-+		WARN_ON(err != -EOPNOTSUPP);
-+	}
-+}
-+
-+static void __devlink_port_type_set(struct devlink_port *devlink_port,
-+				    enum devlink_port_type type,
-+				    void *type_dev)
-+{
-+	struct net_device *netdev = type_dev;
-+
-+	ASSERT_DEVLINK_PORT_REGISTERED(devlink_port);
-+
-+	if (type == DEVLINK_PORT_TYPE_NOTSET) {
-+		devlink_port_type_warn_schedule(devlink_port);
-+	} else {
-+		devlink_port_type_warn_cancel(devlink_port);
-+		if (type == DEVLINK_PORT_TYPE_ETH && netdev)
-+			devlink_port_type_netdev_checks(devlink_port, netdev);
-+	}
-+
-+	spin_lock_bh(&devlink_port->type_lock);
-+	devlink_port->type = type;
-+	switch (type) {
-+	case DEVLINK_PORT_TYPE_ETH:
-+		devlink_port->type_eth.netdev = netdev;
-+		if (netdev) {
-+			ASSERT_RTNL();
-+			devlink_port->type_eth.ifindex = netdev->ifindex;
-+			BUILD_BUG_ON(sizeof(devlink_port->type_eth.ifname) !=
-+				     sizeof(netdev->name));
-+			strcpy(devlink_port->type_eth.ifname, netdev->name);
-+		}
-+		break;
-+	case DEVLINK_PORT_TYPE_IB:
-+		devlink_port->type_ib.ibdev = type_dev;
-+		break;
-+	default:
-+		break;
-+	}
-+	spin_unlock_bh(&devlink_port->type_lock);
-+	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
-+}
-+
-+/**
-+ *	devlink_port_type_eth_set - Set port type to Ethernet
-+ *
-+ *	@devlink_port: devlink port
-+ *
-+ *	If driver is calling this, most likely it is doing something wrong.
-+ */
-+void devlink_port_type_eth_set(struct devlink_port *devlink_port)
-+{
-+	dev_warn(devlink_port->devlink->dev,
-+		 "devlink port type for port %d set to Ethernet without a software interface reference, device type not supported by the kernel?\n",
-+		 devlink_port->index);
-+	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_ETH, NULL);
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_type_eth_set);
-+
-+/**
-+ *	devlink_port_type_ib_set - Set port type to InfiniBand
-+ *
-+ *	@devlink_port: devlink port
-+ *	@ibdev: related IB device
-+ */
-+void devlink_port_type_ib_set(struct devlink_port *devlink_port,
-+			      struct ib_device *ibdev)
-+{
-+	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_IB, ibdev);
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_type_ib_set);
-+
-+/**
-+ *	devlink_port_type_clear - Clear port type
-+ *
-+ *	@devlink_port: devlink port
-+ *
-+ *	If driver is calling this for clearing Ethernet type, most likely
-+ *	it is doing something wrong.
-+ */
-+void devlink_port_type_clear(struct devlink_port *devlink_port)
-+{
-+	if (devlink_port->type == DEVLINK_PORT_TYPE_ETH)
-+		dev_warn(devlink_port->devlink->dev,
-+			 "devlink port type for port %d cleared without a software interface reference, device type not supported by the kernel?\n",
-+			 devlink_port->index);
-+	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_NOTSET, NULL);
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_type_clear);
-+
-+int devlink_port_netdevice_event(struct notifier_block *nb,
-+				 unsigned long event, void *ptr)
-+{
-+	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
-+	struct devlink_port *devlink_port = netdev->devlink_port;
-+	struct devlink *devlink;
-+
-+	if (!devlink_port)
-+		return NOTIFY_OK;
-+	devlink = devlink_port->devlink;
-+
-+	switch (event) {
-+	case NETDEV_POST_INIT:
-+		/* Set the type but not netdev pointer. It is going to be set
-+		 * later on by NETDEV_REGISTER event. Happens once during
-+		 * netdevice register
-+		 */
-+		__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_ETH,
-+					NULL);
-+		break;
-+	case NETDEV_REGISTER:
-+	case NETDEV_CHANGENAME:
-+		if (devlink_net(devlink) != dev_net(netdev))
-+			return NOTIFY_OK;
-+		/* Set the netdev on top of previously set type. Note this
-+		 * event happens also during net namespace change so here
-+		 * we take into account netdev pointer appearing in this
-+		 * namespace.
-+		 */
-+		__devlink_port_type_set(devlink_port, devlink_port->type,
-+					netdev);
-+		break;
-+	case NETDEV_UNREGISTER:
-+		if (devlink_net(devlink) != dev_net(netdev))
-+			return NOTIFY_OK;
-+		/* Clear netdev pointer, but not the type. This event happens
-+		 * also during net namespace change so we need to clear
-+		 * pointer to netdev that is going to another net namespace.
-+		 */
-+		__devlink_port_type_set(devlink_port, devlink_port->type,
-+					NULL);
-+		break;
-+	case NETDEV_PRE_UNINIT:
-+		/* Clear the type and the netdev pointer. Happens one during
-+		 * netdevice unregister.
-+		 */
-+		__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_NOTSET,
-+					NULL);
-+		break;
-+	}
-+
-+	return NOTIFY_OK;
-+}
-+
-+static int __devlink_port_attrs_set(struct devlink_port *devlink_port,
-+				    enum devlink_port_flavour flavour)
-+{
-+	struct devlink_port_attrs *attrs = &devlink_port->attrs;
-+
-+	devlink_port->attrs_set = true;
-+	attrs->flavour = flavour;
-+	if (attrs->switch_id.id_len) {
-+		devlink_port->switch_port = true;
-+		if (WARN_ON(attrs->switch_id.id_len > MAX_PHYS_ITEM_ID_LEN))
-+			attrs->switch_id.id_len = MAX_PHYS_ITEM_ID_LEN;
-+	} else {
-+		devlink_port->switch_port = false;
-+	}
-+	return 0;
-+}
-+
-+/**
-+ *	devlink_port_attrs_set - Set port attributes
-+ *
-+ *	@devlink_port: devlink port
-+ *	@attrs: devlink port attrs
-+ */
-+void devlink_port_attrs_set(struct devlink_port *devlink_port,
-+			    struct devlink_port_attrs *attrs)
-+{
-+	int ret;
-+
-+	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+
-+	devlink_port->attrs = *attrs;
-+	ret = __devlink_port_attrs_set(devlink_port, attrs->flavour);
-+	if (ret)
-+		return;
-+	WARN_ON(attrs->splittable && attrs->split);
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_attrs_set);
-+
-+/**
-+ *	devlink_port_attrs_pci_pf_set - Set PCI PF port attributes
-+ *
-+ *	@devlink_port: devlink port
-+ *	@controller: associated controller number for the devlink port instance
-+ *	@pf: associated PF for the devlink port instance
-+ *	@external: indicates if the port is for an external controller
-+ */
-+void devlink_port_attrs_pci_pf_set(struct devlink_port *devlink_port, u32 controller,
-+				   u16 pf, bool external)
-+{
-+	struct devlink_port_attrs *attrs = &devlink_port->attrs;
-+	int ret;
-+
-+	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+
-+	ret = __devlink_port_attrs_set(devlink_port,
-+				       DEVLINK_PORT_FLAVOUR_PCI_PF);
-+	if (ret)
-+		return;
-+	attrs->pci_pf.controller = controller;
-+	attrs->pci_pf.pf = pf;
-+	attrs->pci_pf.external = external;
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_pf_set);
-+
-+/**
-+ *	devlink_port_attrs_pci_vf_set - Set PCI VF port attributes
-+ *
-+ *	@devlink_port: devlink port
-+ *	@controller: associated controller number for the devlink port instance
-+ *	@pf: associated PF for the devlink port instance
-+ *	@vf: associated VF of a PF for the devlink port instance
-+ *	@external: indicates if the port is for an external controller
-+ */
-+void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 controller,
-+				   u16 pf, u16 vf, bool external)
-+{
-+	struct devlink_port_attrs *attrs = &devlink_port->attrs;
-+	int ret;
-+
-+	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+
-+	ret = __devlink_port_attrs_set(devlink_port,
-+				       DEVLINK_PORT_FLAVOUR_PCI_VF);
-+	if (ret)
-+		return;
-+	attrs->pci_vf.controller = controller;
-+	attrs->pci_vf.pf = pf;
-+	attrs->pci_vf.vf = vf;
-+	attrs->pci_vf.external = external;
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_vf_set);
-+
-+/**
-+ *	devlink_port_attrs_pci_sf_set - Set PCI SF port attributes
-+ *
-+ *	@devlink_port: devlink port
-+ *	@controller: associated controller number for the devlink port instance
-+ *	@pf: associated PF for the devlink port instance
-+ *	@sf: associated SF of a PF for the devlink port instance
-+ *	@external: indicates if the port is for an external controller
-+ */
-+void devlink_port_attrs_pci_sf_set(struct devlink_port *devlink_port, u32 controller,
-+				   u16 pf, u32 sf, bool external)
-+{
-+	struct devlink_port_attrs *attrs = &devlink_port->attrs;
-+	int ret;
-+
-+	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+
-+	ret = __devlink_port_attrs_set(devlink_port,
-+				       DEVLINK_PORT_FLAVOUR_PCI_SF);
-+	if (ret)
-+		return;
-+	attrs->pci_sf.controller = controller;
-+	attrs->pci_sf.pf = pf;
-+	attrs->pci_sf.sf = sf;
-+	attrs->pci_sf.external = external;
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_sf_set);
-+
-+/**
-+ *	devlink_port_linecard_set - Link port with a linecard
-+ *
-+ *	@devlink_port: devlink port
-+ *	@linecard: devlink linecard
-+ */
-+void devlink_port_linecard_set(struct devlink_port *devlink_port,
-+			       struct devlink_linecard *linecard)
-+{
-+	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+
-+	devlink_port->linecard = linecard;
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_linecard_set);
-+
-+static int __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,
-+					     char *name, size_t len)
-+{
-+	struct devlink_port_attrs *attrs = &devlink_port->attrs;
-+	int n = 0;
-+
-+	if (!devlink_port->attrs_set)
-+		return -EOPNOTSUPP;
-+
-+	switch (attrs->flavour) {
-+	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
-+		if (devlink_port->linecard)
-+			n = snprintf(name, len, "l%u",
-+				     devlink_port->linecard->index);
-+		if (n < len)
-+			n += snprintf(name + n, len - n, "p%u",
-+				      attrs->phys.port_number);
-+		if (n < len && attrs->split)
-+			n += snprintf(name + n, len - n, "s%u",
-+				      attrs->phys.split_subport_number);
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_CPU:
-+	case DEVLINK_PORT_FLAVOUR_DSA:
-+	case DEVLINK_PORT_FLAVOUR_UNUSED:
-+		/* As CPU and DSA ports do not have a netdevice associated
-+		 * case should not ever happen.
-+		 */
-+		WARN_ON(1);
-+		return -EINVAL;
-+	case DEVLINK_PORT_FLAVOUR_PCI_PF:
-+		if (attrs->pci_pf.external) {
-+			n = snprintf(name, len, "c%u", attrs->pci_pf.controller);
-+			if (n >= len)
-+				return -EINVAL;
-+			len -= n;
-+			name += n;
-+		}
-+		n = snprintf(name, len, "pf%u", attrs->pci_pf.pf);
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_PCI_VF:
-+		if (attrs->pci_vf.external) {
-+			n = snprintf(name, len, "c%u", attrs->pci_vf.controller);
-+			if (n >= len)
-+				return -EINVAL;
-+			len -= n;
-+			name += n;
-+		}
-+		n = snprintf(name, len, "pf%uvf%u",
-+			     attrs->pci_vf.pf, attrs->pci_vf.vf);
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_PCI_SF:
-+		if (attrs->pci_sf.external) {
-+			n = snprintf(name, len, "c%u", attrs->pci_sf.controller);
-+			if (n >= len)
-+				return -EINVAL;
-+			len -= n;
-+			name += n;
-+		}
-+		n = snprintf(name, len, "pf%usf%u", attrs->pci_sf.pf,
-+			     attrs->pci_sf.sf);
-+		break;
-+	case DEVLINK_PORT_FLAVOUR_VIRTUAL:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (n >= len)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+int devlink_compat_phys_port_name_get(struct net_device *dev,
-+				      char *name, size_t len)
-+{
-+	struct devlink_port *devlink_port;
-+
-+	/* RTNL mutex is held here which ensures that devlink_port
-+	 * instance cannot disappear in the middle. No need to take
-+	 * any devlink lock as only permanent values are accessed.
-+	 */
-+	ASSERT_RTNL();
-+
-+	devlink_port = dev->devlink_port;
-+	if (!devlink_port)
-+		return -EOPNOTSUPP;
-+
-+	return __devlink_port_phys_port_name_get(devlink_port, name, len);
-+}
-+
-+int devlink_compat_switch_id_get(struct net_device *dev,
-+				 struct netdev_phys_item_id *ppid)
-+{
-+	struct devlink_port *devlink_port;
-+
-+	/* Caller must hold RTNL mutex or reference to dev, which ensures that
-+	 * devlink_port instance cannot disappear in the middle. No need to take
-+	 * any devlink lock as only permanent values are accessed.
-+	 */
-+	devlink_port = dev->devlink_port;
-+	if (!devlink_port || !devlink_port->switch_port)
-+		return -EOPNOTSUPP;
-+
-+	memcpy(ppid, &devlink_port->attrs.switch_id, sizeof(*ppid));
-+
-+	return 0;
-+}
++EXPORT_SYMBOL_GPL(devlink_sb_unregister);
 -- 
 2.41.0
 
