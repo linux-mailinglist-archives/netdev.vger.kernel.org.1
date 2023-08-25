@@ -1,83 +1,173 @@
-Return-Path: <netdev+bounces-30574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873457881F1
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:20:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C548578824A
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:39:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B85C41C20F50
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8047A281774
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D917495;
-	Fri, 25 Aug 2023 08:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1381C06;
+	Fri, 25 Aug 2023 08:39:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6476C20E7
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:20:41 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8958119AD;
-	Fri, 25 Aug 2023 01:20:37 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 290651BF214;
-	Fri, 25 Aug 2023 08:20:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1692951635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s7m/4pQD3gCo/V071m4nl/HimDm8tCat76xxXDvmJYA=;
-	b=J7moYxo990zjrNGVbGz9dyMSVVZAZHwGenTXVI2UQoCJpa3uiE73RzLpHB+htrM2DcO/eD
-	ymITedzE/IvdtnqZnCIB88gU1ktv2TVVMmLbV1NRwlbDrygCgYZmN2r4YlRAwuaFWWh83j
-	efMo1zMtXy412NGR/LTuxscqVvYCL1zD+X3COXWk1xuX3LbezfrVqg6cPByzLFIUZoU0kl
-	kDpg+T+63ySmPMsLYaDJpuEClSrZ3pnwwpNTadCTt4N+zx1v5ukVMyiivMr8H+kZ2X100w
-	zLMwlDpfYo0YoCJimbDkHLEc9VUVWbQDcJ3/G3w3uXT05EuiQsSlRiMwAC9I8w==
-Message-ID: <f8ff7611-d8e8-d229-2b72-95e6b3ca951d@bootlin.com>
-Date: Fri, 25 Aug 2023 10:21:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B3B17FA
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:39:54 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2078.outbound.protection.outlook.com [40.107.93.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 278C21FF2;
+	Fri, 25 Aug 2023 01:39:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N2IJnaqAy6f+De3Uqcgs37+GL6mvgi3PHiEm24bKYxCQXPVNqtpdybXD/DYC9X9Zc+O7edgyoQIuo1SfLM51DESybKSxKX34PiCRq6VFfCD1v7HaiabqMmzj0NVDOoyShPpmbS5odxa2DQKH0Ub2j8MKdR9IiCx+9mciSbNKxwY0moDRHBKYrP72ryFYR4doq+q2UALO2bnWVsfDxiaCqX6H0mxtQD7xn5jKR/vvMeI4DedeA5U47hacYQ6Ul2bJNXrcC4oOzoRY26KmvmHbdZ6XQgy75pTwc2itr5R2FWn4qtebQhj2EYJ6sj9E0q9lM4oZTIuBwBNZd/8BWrMrMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k2EDYCFsd6zha1jrnQQ0KcCa3cUuiIV71Xaj/r0uBws=;
+ b=Yabskpz162BE+2PBNf1p84+LSIbAR0zid70u7qfU52Wb8dFQUyX/bZDfBlUgGxjeY+KsUDh1ob0gmpfsB5M8ToZg3EM7e/7CjmqpXaM1jouNhYlHsG+K8JEXeqOPw6MLaryNslRi7O7rmwodn2otqddvELenGO2jA5XwSqHjefNw8QoJpLFzcB+/vsYxKr4F6KVpyWJTK18iI4OVB894Hnps2ILiIqdAjbSjVl5A+eu4hdIFSCtiM1ID0pJjdyYlXWwdWWcAZOD+b1O4RLXvXVXScWId5zL3ae+cAbS6tkIC9DfWToPH7W0BVSfhwLGz0zK9qybRTxmAODnwInfCKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k2EDYCFsd6zha1jrnQQ0KcCa3cUuiIV71Xaj/r0uBws=;
+ b=aM7LYB65zhxvYiP+RUGABO/CxAjRHzrQH9Q7dpT6uhnLZvO4po7By/qwE4SwCPsMjaJ+bEZae/Vr6Wf7kfUdvoqLAGyhjbBhvXZNmM4GVIjmWdTxiEaVTIHZVulfJv7zQxf6yueVbfufa/okZ/lN4LDZnDVTdJnFhaN96N655w0=
+Received: from MW2PR16CA0001.namprd16.prod.outlook.com (2603:10b6:907::14) by
+ PH0PR12MB7864.namprd12.prod.outlook.com (2603:10b6:510:26c::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.30; Fri, 25 Aug
+ 2023 08:39:50 +0000
+Received: from MWH0EPF000989EC.namprd02.prod.outlook.com
+ (2603:10b6:907:0:cafe::ff) by MW2PR16CA0001.outlook.office365.com
+ (2603:10b6:907::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.30 via Frontend
+ Transport; Fri, 25 Aug 2023 08:39:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989EC.mail.protection.outlook.com (10.167.241.139) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6699.14 via Frontend Transport; Fri, 25 Aug 2023 08:39:50 +0000
+Received: from equan-buildpc.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 25 Aug
+ 2023 03:39:45 -0500
+From: Evan Quan <evan.quan@amd.com>
+To: <lenb@kernel.org>, <johannes@sipsolutions.net>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<alexander.deucher@amd.com>, <rafael@kernel.org>, <Lijo.Lazar@amd.com>,
+	<mario.limonciello@amd.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<amd-gfx@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, Evan Quan
+	<evan.quan@amd.com>
+Subject: [V10 0/8] Enable Wifi RFI interference mitigation feature support
+Date: Fri, 25 Aug 2023 16:38:38 +0800
+Message-ID: <20230825083846.4001973-1-evan.quan@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: dsa: marvell: add
- MV88E6361 switch to compatibility list
-Content-Language: en-US
-To: airat.gl@gmail.com
-Cc: andrew@lunn.ch, davem@davemloft.net, devicetree@vger.kernel.org,
- edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, olteanv@gmail.com,
- pabeni@redhat.com, paul.arola@telus.com, richardcochran@gmail.com,
- scott.roberts@telus.com, thomas.petazzoni@bootlin.com
-References: <add84df503df6b0bd3f572cd396dbde9da558eab.camel@gmail.com>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-In-Reply-To: <add84df503df6b0bd3f572cd396dbde9da558eab.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_PASS,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989EC:EE_|PH0PR12MB7864:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d9f1936-6313-467b-a535-08dba546d887
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	cxFrvCNDsEerulxmOk6ujA193hx8RuCZhtdAlSjowilxH6CTwVI9Er5DvgVZJFFPm4DkrDmOHbrUMazuwSb3gDFDEqB/yHMjcWSfXGReQwStiFDwKlgcfd4YDU5qNFTGCyTWZlzt+aFAA29cAPSxmMxx1FaloV8l0CmDdK6njiBoyR3TeMpGldsniV2Byd57h/JGXlI1XufJbQ37ZeXm3CEPfC4yHiZTgP28TzzmV5WCnHLyI+qFvrOLKyObnBGjeHKLAcx5TD1X8yBB27sozyTUO2HeRMD8fu4314uIGfxQt5FWD4YscMpR7FYlsWzkqDJTw78h+Mdjqct+1g1U7NqA31b1LIDaLRcL9Os3DxOZpzoVvI5RSDTx+4oweKtTv0omv2QmtqRHofHjpDzx8Kx5uy7EO0eANo2Xzp4kcGxs5MtG832dyVQ6eOWd5iFalWYt/GiDhtbMXH2gB6inDNP14QBlNWu+paCH2EWN2tDnlqToLcEHHTqhjRT5JmXwKCFf6NT8ptlGMQFeWg70GAndSxPL45SoLulMUaml9zD7XDKXxsitk1UV33m3BcWuyXf6DNvjdVAM/nJCrBDBDNzGYBOsmsz4He6jEKLVeMOpi7zUJaH6lRsXeuCIEWvymEFbSl7TmNsMhem7ruGQRA6jO1pKc9mzRqjrh7qymRol6kL6z0yzpNdIFokudwPrdtnuaK+rHW5VTE03LA3ifzLMEUS6GYQvEuCU0AH4VTNGb1IW798BcqjZfqLsSwaPe51HX6Ewx5nEqMiM5X2MxOcnCld4ecGa3+N0RHpxILA=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(136003)(376002)(39860400002)(1800799009)(82310400011)(451199024)(186009)(36840700001)(46966006)(40470700004)(336012)(1076003)(36860700001)(44832011)(7416002)(83380400001)(16526019)(26005)(478600001)(47076005)(40480700001)(2616005)(5660300002)(426003)(2906002)(8936002)(4326008)(8676002)(921005)(356005)(82740400003)(81166007)(40460700003)(6636002)(110136005)(70206006)(70586007)(86362001)(41300700001)(7696005)(54906003)(36756003)(316002)(6666004)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2023 08:39:50.0556
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d9f1936-6313-467b-a535-08dba546d887
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989EC.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7864
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Due to electrical and mechanical constraints in certain platform designs there
+may be likely interference of relatively high-powered harmonics of the (G-)DDR
+memory clocks with local radio module frequency bands used by Wifi 6/6e/7. To
+mitigate possible RFI interference producers can advertise the frequencies in
+use and consumers can use this information to avoid using these frequencies for
+sensitive features.
 
-On 8/24/23 20:49, airat.gl@gmail.com wrote:
-> Is there an error? The new string include 6163 instead of 6361
+The whole patch set is based on Linux 6.5-rc5. With some brief introductions
+as below:
+    Patch1:  Core functionality setup for WBRF feature support
+Patch2 - 3:  Bring WBRF support to wifi subsystem.
+Patch4 - 8:  Bring WBRF support to AMD graphics driver.
 
-I am afraid you are right, I made a dumb typo in the binding docs while
-submitting 88E6361 support.
-I have sent the corresponding fix to net, thanks for spotting this.
+Evan Quan (8):
+  ACPI: Add support for AMD ACPI based Wifi band RFI mitigation feature
+  cfg80211: expose nl80211_chan_width_to_mhz for wide sharing
+  wifi: mac80211: Add support for WBRF features
+  drm/amd/pm: update driver_if and ppsmc headers for coming wbrf feature
+  drm/amd/pm: setup the framework to support Wifi RFI mitigation feature
+  drm/amd/pm: add flood detection for wbrf events
+  drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.0
+  drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
+
+ drivers/acpi/Kconfig                          |  17 +
+ drivers/acpi/Makefile                         |   2 +
+ drivers/acpi/amd_wbrf.c                       | 414 ++++++++++++++++++
+ drivers/gpu/drm/amd/amdgpu/amdgpu.h           |   2 +
+ drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c       |  17 +
+ drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     | 214 +++++++++
+ drivers/gpu/drm/amd/pm/swsmu/inc/amdgpu_smu.h |  33 ++
+ .../inc/pmfw_if/smu13_driver_if_v13_0_0.h     |  14 +-
+ .../inc/pmfw_if/smu13_driver_if_v13_0_7.h     |  14 +-
+ .../pm/swsmu/inc/pmfw_if/smu_v13_0_0_ppsmc.h  |   3 +-
+ .../pm/swsmu/inc/pmfw_if/smu_v13_0_7_ppsmc.h  |   3 +-
+ drivers/gpu/drm/amd/pm/swsmu/inc/smu_types.h  |   3 +-
+ drivers/gpu/drm/amd/pm/swsmu/inc/smu_v13_0.h  |   3 +
+ .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |   9 +
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |  60 +++
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |  59 +++
+ drivers/gpu/drm/amd/pm/swsmu/smu_internal.h   |   3 +
+ include/linux/acpi_amd_wbrf.h                 | 140 ++++++
+ include/linux/ieee80211.h                     |   1 +
+ include/net/cfg80211.h                        |   8 +
+ net/mac80211/Makefile                         |   2 +
+ net/mac80211/chan.c                           |   9 +
+ net/mac80211/ieee80211_i.h                    |   9 +
+ net/mac80211/main.c                           |   2 +
+ net/mac80211/wbrf.c                           | 105 +++++
+ net/wireless/chan.c                           |   3 +-
+ 26 files changed, 1143 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/acpi/amd_wbrf.c
+ create mode 100644 include/linux/acpi_amd_wbrf.h
+ create mode 100644 net/mac80211/wbrf.c
 
 -- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.34.1
 
 
