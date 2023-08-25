@@ -1,166 +1,188 @@
-Return-Path: <netdev+bounces-30757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81949788EC4
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 20:35:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 267C2788EEF
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 20:49:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5E391C20E72
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:35:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3681C20E24
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C6F174F7;
-	Fri, 25 Aug 2023 18:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C72182D1;
+	Fri, 25 Aug 2023 18:49:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3398C256A
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 18:35:39 +0000 (UTC)
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E95210A;
-	Fri, 25 Aug 2023 11:35:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810FD2915
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 18:49:21 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB781BD2;
+	Fri, 25 Aug 2023 11:49:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1692989360; x=1724525360;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=k2GUyE+Sq1heRCxaJ3psOuF9xtb1ZeYgzV8ugjK2eyk=;
+  b=gsli9vXPSHCSaUhumvTeuciddOc/UMA4tp4WV/niaYEtO57g0EjC4U5g
+   0l5b4Feq34Nuh9J4sWBRwYgs9ktfZedC8XGALQPMmEjmrJN9NhBgenjaI
+   Brv9a3afqL3e4uDPukt85gwfgkpddDqKiE8mXFx4cbqWgrPwHpc3vTU9T
+   pX4PqVjTShRp5zImcIcZ5vwaMdProFhWVOLpFysF4JelU9dEoEmHHLAD8
+   HMM8iyqFtOE8j4ZIGQ6pPT+pN4ryPiTkRJ08T594lafVNVqYLIKPnBJAT
+   XPZ6+cu1wgq2hOb9qv9V3yHVSe/WqhEIHG0fx+q2BoY4lwCNY/62vZY7b
+   w==;
+X-IronPort-AV: E=Sophos;i="6.02,201,1688454000"; 
+   d="scan'208";a="1325455"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 25 Aug 2023 11:49:20 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Fri, 25 Aug 2023 11:48:44 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Fri, 25 Aug 2023 11:48:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jmkQQzPcI8wvpeqQnF0Z0LWLGB66W6cvW2doRa8DLnH6EHenOml3xxYomv+r0PsBK2WjJLHdWfs3jv2j39mDNUjoODEMbGY81WoMaaPQm2gEe9bsJJLAz4skaFHEeu0rH6owsCJhT4mnxH5zeumFFH4WHik0Ye1V9rYDNV8tFkgBjw2Ix6G/6i/TNeGiWEoveDoZ1gVrIn5JMnNjL8jah9Vj8j8WlGbJrJHKaDAMSlpuR7UBD/HPfxMRQs7B6V5o1SxBswET/Kzt0vFonkUXQC4KDvK1+pCTcEocKPOVUctFhh3uyJpMkJU165wbC/LJZxkDV4RK1wUFkjizmmKbTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k2GUyE+Sq1heRCxaJ3psOuF9xtb1ZeYgzV8ugjK2eyk=;
+ b=np8hw7El9ijrWemCje1n4VzBV29HQvY6U2ujS9OvXnYtB2rvWTZ5JoHeYGCUJpGZ02G+Rwe1I02pJmN9Uyp1UHBRIl4gAXE8UoUlreY0x1QrqaFQqXH7vwgPNk76y9sW6v0A4ChoUbQpEKDaPhTJDa3cOyGxno+jHfn4DX7se67oaebledNtHhuQTMqSgDrdY6Gz6Nw49LrdFu2lFoLEXcvFJjAI9iZlfu5M/PN57wV0B3wvi5+s978PB0YgyMMlRsKUzGJoODkwAQwiTXcFgrrtR9g0yBRph+TFFx4PTFdsXBDygQ5WxMAFF49v4rPwo/18XQ2mizwpiJjE8iKQMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1692988538; x=1724524538;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=y4IJ9fWGWId9jFHSjrSDACenhV8KSDVmN2rshsCIasA=;
-  b=UqEmpnlAQqmJNydUb3T5sNtGQeOyHkbHREWa8N4EQbfYoMRgihyZ1U7t
-   9GJv8uR7hAIFGgpWA1u8aPLQsCCOYZHqiSDZ7lTXRapRLhcLh1nQo7qPo
-   TjH3HcbWoF9KttzDznKX6Cl6WzTPKJF7x28+IWHpRRGYY6iDF+ED6V8Jk
-   A=;
-X-IronPort-AV: E=Sophos;i="6.02,201,1688428800"; 
-   d="scan'208";a="1150822194"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 18:35:30 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com (Postfix) with ESMTPS id CD0A880926;
-	Fri, 25 Aug 2023 18:35:26 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 25 Aug 2023 18:35:25 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.37;
- Fri, 25 Aug 2023 18:35:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jannh@google.com>
-CC: <davem@davemloft.net>, <dccp@vger.kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>, "Kuniyuki
- Iwashima" <kuniyu@amazon.com>
-Subject: Re: [PATCH net] dccp: Fix out of bounds access in DCCP error handler
-Date: Fri, 25 Aug 2023 11:35:08 -0700
-Message-ID: <20230825183508.8687-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230825133241.3635236-1-jannh@google.com>
-References: <20230825133241.3635236-1-jannh@google.com>
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k2GUyE+Sq1heRCxaJ3psOuF9xtb1ZeYgzV8ugjK2eyk=;
+ b=eU2leESYA8wkgqMPQjsEWm3/sQvPrdFRo9+2ARH6JbJPHLunP2OjM+HQ5A2s3f9z3WxZTQaupppxgxCiyXw27F4AtMtRKPbQ7eoJeTqxR62rdH7gUO7WX6abAPXIfjEVZjS3nOaY5OigCrot/AkcMnVcmxF1nZ6dYJsD0okWi7Q=
+Received: from BYAPR11MB3558.namprd11.prod.outlook.com (2603:10b6:a03:b3::11)
+ by IA1PR11MB6099.namprd11.prod.outlook.com (2603:10b6:208:3d5::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Fri, 25 Aug
+ 2023 18:48:41 +0000
+Received: from BYAPR11MB3558.namprd11.prod.outlook.com
+ ([fe80::ceda:7787:e08b:7a19]) by BYAPR11MB3558.namprd11.prod.outlook.com
+ ([fe80::ceda:7787:e08b:7a19%7]) with mapi id 15.20.6699.028; Fri, 25 Aug 2023
+ 18:48:41 +0000
+From: <Tristram.Ha@microchip.com>
+To: <f.fainelli@gmail.com>
+CC: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <Woojung.Huh@microchip.com>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
+	<lukma@denx.de>
+Subject: RE: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Thread-Topic: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Thread-Index: AQHZ1qKWLyunbFo9dUGlg3dtAL+k26/6NENwgAB9tYCAAHHrgIAANckA
+Date: Fri, 25 Aug 2023 18:48:41 +0000
+Message-ID: <BYAPR11MB3558A24A05D30BA93408851EECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+References: <20230824154827.166274-1-lukma@denx.de>
+ <20230824154827.166274-2-lukma@denx.de>
+ <BYAPR11MB35583A648E4E44944A0172A0ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <20230825103911.682b3d70@wsk>
+ <862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
+In-Reply-To: <862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BYAPR11MB3558:EE_|IA1PR11MB6099:EE_
+x-ms-office365-filtering-correlation-id: 814bd1fd-4a0c-42ce-69ae-08dba59be6c3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: u0BbpOLzUebFRz9YYekWxWwSrysD9QmuFvTu8P0uvXWCTiQZyaG5KeTzhTpwQHyljX8y6BWhPHxqf8EWq1cMkn2E/DLRu5BOj/Ot5VAVC/ggtMwgZLwrrZNZ7CB8Dgee+/KP1DXeXjy9UMffD6HRMHvx/ID+ZngZ7nqC5gYKgbFUsthU0URXQpV5VEYjEsLt/MdaIkxDdhaaDIe9EmPKP+TbjQtc9WAGnIpaGJofsvXGc01eXaHGBMeE6zyYuQudgoTEtiJCKMRKEnA5rHPJVsUrU0m8N7UaXWryaM5ztszdohSiIGUjLyiPT3AnpyVcEJKo6+DKQIM7JbsWimgYDpPScCb+VDSXsFslHHsJO+xzL3hQ6PlUzlcMzhhRXvISQVS5dffUfKDtz5XeiYMyvFNRimv4d+KDfYdX69z/Om8p2dDaxwKOeC3Ze9WE8uEHaqATNtm4BCmr2FEY4gAEpIT87vxGcX5p68/Ot+2azY7xOyrpfB3u/jkfE90xYnMLsoXvh5hWkeG8VbjCCZhvsZwx/fvQjh9GQ5eOP/vfdsIOIr/A73zpDCwZiATbOHmnejVKPyNUHtF0IgLtOb4n9GpiotYcWPjHeM/A0JgAKPMyp7Uie9kZ5M+XWhlBFdW2
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3558.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(376002)(346002)(39860400002)(451199024)(186009)(1800799009)(54906003)(66446008)(6506007)(64756008)(76116006)(66946007)(66476007)(316002)(6916009)(66556008)(122000001)(478600001)(26005)(55016003)(71200400001)(38100700002)(38070700005)(41300700001)(86362001)(7696005)(9686003)(2906002)(8936002)(8676002)(4326008)(66899024)(52536014)(5660300002)(7416002)(83380400001)(33656002)(4744005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QXdQU1FITmtNTWZYRElIRkRKVEJ4ZlJRWEZRejc1OFVIV2xWNzhtYkRaT0V0?=
+ =?utf-8?B?bkdZUXFNUGYrb2VhOTRxdVFGU3Jqb2R0UmR3bEovTGhCSHREY3JvS1oxeTlP?=
+ =?utf-8?B?R215RE9PeExLYmg1NURYNzZPTHBCREtlNjA2Ym01UXMzbm9USXQzQTZWdkRU?=
+ =?utf-8?B?VUlhVThNNUp0ZTIxNW5rcVN0SzBZRlBpNXc5T1R5cVNVU0hYVHhscngvbUZQ?=
+ =?utf-8?B?WlRPR2ZWSzBnNHVpMHNHRmFHbTNPVldFSENXRFhHU2JWZENhZUdTbXpCaUJ2?=
+ =?utf-8?B?bmVFZzRZYmE2bTJEQlE2QjZNdktXRDI0SGJjK1htRUczUTVJUEc4MXNVKy9D?=
+ =?utf-8?B?dVl5c0xxNVNaTEg1Nkg5bDhCV2NJQ2ZiKzVBSlBUYWFRSUZUOXErWHdEOHYx?=
+ =?utf-8?B?UXZBN1NkcG1kYjV1Z015Ly8raGRubnBhZUtKWkJnbVBDZUsrWTJEQjF6MWx1?=
+ =?utf-8?B?akRjTytnYXFVaHRDSzhsMDlDQTU3Rk1CVWdUWnlYNmVySnc4SEhucElJem9H?=
+ =?utf-8?B?T3hXNnNvKzY2WldOdGYzMlducjM1YVJ6QkVhLzkySkNkcTVFSUVuRDErMFZX?=
+ =?utf-8?B?bzhxR0VsQlR0cjVvV0cwVWtjK05UaE9oRW5Lb0xKNXErdEJ3N1NURWRGNmd0?=
+ =?utf-8?B?QUFXRGZFMG42dzlGNXRLNU1xTDZuQmppY0RqdExPdjI4U3BQcjBRYWgyMk1q?=
+ =?utf-8?B?alFvK01IdVI0QVVFUzZzV2ZQR3QyZGJkcDlVMHE5RkhBRHp1VHp6NUdNNlhK?=
+ =?utf-8?B?aTYxRlRuYmprZ2hzQ010QTh2MTJ2MlhxZXFjOXdPajgvZ3NSbTA5Wnhpb2VU?=
+ =?utf-8?B?bWUwMFZRZDRiaWM5ZmE1dkNCbC9KUFhaa21yRVlDZUNReVRqU3YzTTdzYnBN?=
+ =?utf-8?B?VFp5cG1mczlTZkY1d28rUmllQjlVSG5mVGh2a0JiUG1SN0JOcU5BUTdrUGc3?=
+ =?utf-8?B?OXNYa0szRUUyMzF2akh3d3N5S1RGNlRTRm10R1pWZ2RvRDZOcUI3cGtFUFAy?=
+ =?utf-8?B?TWh3MTJxZmxrVloySlcyZkZlRmQvTXhSM0FzYVprbkVZbEQzVFdpRUx0SmlK?=
+ =?utf-8?B?N1VVS21TQWpXVWJkNE0vYU1vU2RSdlNFQkx1cE9NNUJYWnlNTENEQlJSWXAz?=
+ =?utf-8?B?d2pzZUNBenR6dmVJdy95SFNKeTc3bnZNWkZGY1VoTzJTZC9ERmUwdTlJL3F2?=
+ =?utf-8?B?WlRDL0Z5VEs4VVAycG9sR1h4ck5RN0hjazNqWXRna3cxNlVyNXpVOHpVN2pN?=
+ =?utf-8?B?aFZpdzNWcFZHeU5Eb3J3TzVsN2RiZDVxTDFHejBYZWJITW9yUnNZQzJJck5X?=
+ =?utf-8?B?c1dmYTlDOEJ3NlZIT2NaanE0N3U2YUUzaGxBOC9pNlR3dWN2YzFOT0NacDAy?=
+ =?utf-8?B?UFZUTEVnZW0veXpPVWNTY2FGNnRkaFdJRjZwQ01vaktYTktyY09oM2pQWkhn?=
+ =?utf-8?B?QVRGL2N6WHhtNHkrcVlBZUNjeXBZRWRJWHhZUDFWRnBQRERTcTF1cVFUc2kz?=
+ =?utf-8?B?VGZOdVlod2gxTzdMdmFqeFJSOHhaVjlCSzV0VS9SZWxFY1c2eUtoZC9Zbnp3?=
+ =?utf-8?B?YVJvVWN3OFByZDJ3R0xvdWQ4Tk5ObHY0UFI0R3dqNFIycHc0Wk4wOXlvSkRZ?=
+ =?utf-8?B?Z2lPanNBUms2aTNaN3V0MCt4MXo2MUxqUUpWakdtdUpmRVZiVDhEMUxrRU9q?=
+ =?utf-8?B?YXhJanpUVkFDL0dPTmpkZXNnVWkzQVBiRkk4SmQ4Z1R2aU5CMzVxZWZnK253?=
+ =?utf-8?B?TjBuMUlSdUdRWWhqbW9CWnVIaUVuQWJYRVlXdC80ejFla0drNXBtSmMzL0Zh?=
+ =?utf-8?B?ZkV6TUh2N0tGK2RXaXJkelNXdGdFVUw3eUk2dDJ6OWVtbEFycXlQcm1VYUJv?=
+ =?utf-8?B?SitFR2pTcnp4TTJQM3ZPMVZWQVV4bGVUUHVhY09XQlVnUUp3bjFDOFRUaUVN?=
+ =?utf-8?B?MzVjekFOc2dxN3NsRnB2dXpqTGlldjF4b3NSM04yc3NvbUs4b3oyVEVQazM5?=
+ =?utf-8?B?K0R4OWlVMzFtcElNTnNTY1VOdFg4WWN6WlhtaEZXcGdML2ZCWmlNbjM5Qm9y?=
+ =?utf-8?B?a0hNM1R3Sm9vY2VLREozb3dKZWJ4bSsvWE1OR0tqd253THg4bEdRUTFMeEVW?=
+ =?utf-8?Q?z+qYWG35KNv0VQdy0fe120dL+?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.44]
-X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3558.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 814bd1fd-4a0c-42ce-69ae-08dba59be6c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2023 18:48:41.2717
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: W49DjupnhlELvaOpGwwxOUS7DTQFFGpN9qAcnHu7/7k6SWYOduWYMtA7++rs6A1Tvskd00PBLDmBauBZJ8UyuYveGKts18VRhJ31ghqR8MA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6099
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jann Horn <jannh@google.com>
-Date: Fri, 25 Aug 2023 15:32:41 +0200
-> There was a previous attempt to fix an out-of-bounds access in the DCCP
-> error handlers, but that fix assumed that the error handlers only want
-> to access the first 8 bytes of the DCCP header. Actually, they also look
-> at the DCCP sequence number, which is stored beyond 8 bytes, so an
-> explicit pskb_may_pull() is required.
-> 
-> Fixes: 6706a97fec96 ("dccp: fix out of bound access in dccp_v4_err()")
-> Fixes: 1aa9d1a0e7ee ("ipv6: dccp: fix out of bound access in dccp_v6_err()")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jann Horn <jannh@google.com>
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-
-> ---
->  net/dccp/ipv4.c | 13 +++++++++----
->  net/dccp/ipv6.c | 15 ++++++++++-----
->  2 files changed, 19 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-> index fa8079303cb0..dcd2fb774d82 100644
-> --- a/net/dccp/ipv4.c
-> +++ b/net/dccp/ipv4.c
-> @@ -255,12 +255,17 @@ static int dccp_v4_err(struct sk_buff *skb, u32 info)
->  	int err;
->  	struct net *net = dev_net(skb->dev);
->  
-> -	/* Only need dccph_dport & dccph_sport which are the first
-> -	 * 4 bytes in dccp header.
-> +	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
-> +	 * which is in byte 7 of the dccp header.
->  	 * Our caller (icmp_socket_deliver()) already pulled 8 bytes for us.
-> +	 *
-> +	 * Later on, we want to access the sequence number fields, which are
-> +	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
->  	 */
-> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
-> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
-> +	dh = (struct dccp_hdr *)(skb->data + offset);
-> +	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
-> +		return -EINVAL;
-> +	iph = (struct iphdr *)skb->data;
->  	dh = (struct dccp_hdr *)(skb->data + offset);
->  
->  	sk = __inet_lookup_established(net, &dccp_hashinfo,
-> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-> index d29d1163203d..25816e790527 100644
-> --- a/net/dccp/ipv6.c
-> +++ b/net/dccp/ipv6.c
-> @@ -74,7 +74,7 @@ static inline __u64 dccp_v6_init_sequence(struct sk_buff *skb)
->  static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
->  			u8 type, u8 code, int offset, __be32 info)
->  {
-> -	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
-> +	const struct ipv6hdr *hdr;
->  	const struct dccp_hdr *dh;
->  	struct dccp_sock *dp;
->  	struct ipv6_pinfo *np;
-> @@ -83,12 +83,17 @@ static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
->  	__u64 seq;
->  	struct net *net = dev_net(skb->dev);
->  
-> -	/* Only need dccph_dport & dccph_sport which are the first
-> -	 * 4 bytes in dccp header.
-> +	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
-> +	 * which is in byte 7 of the dccp header.
->  	 * Our caller (icmpv6_notify()) already pulled 8 bytes for us.
-> +	 *
-> +	 * Later on, we want to access the sequence number fields, which are
-> +	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
->  	 */
-> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
-> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
-> +	dh = (struct dccp_hdr *)(skb->data + offset);
-> +	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
-> +		return -EINVAL;
-> +	hdr = (const struct ipv6hdr *)skb->data;
->  	dh = (struct dccp_hdr *)(skb->data + offset);
->  
->  	sk = __inet6_lookup_established(net, &dccp_hashinfo,
-> 
-> base-commit: 93f5de5f648d2b1ce3540a4ac71756d4a852dc23
-> -- 
-> 2.42.0.rc1.204.g551eb34607-goog
+PiA+IElNSE8gYWRkaW5nIGZ1bmN0aW9ucyB0byBNTUQgbW9kaWZpY2F0aW9uIHdvdWxkIGZhY2ls
+aXRhdGUgZnVydGhlcg0KPiA+IGRldmVsb3BtZW50IChmb3IgZXhhbXBsZSBMRUQgc2V0dXApLg0K
+PiANCj4gV2UgYWxyZWFkeSBoYXZlIHNvbWUgS1NaOTQ3NyBzcGVjaWZpYyBpbml0aWFsaXphdGlv
+biBkb25lIGluIHRoZSBNaWNyZWwNCj4gUEhZIGRyaXZlciB1bmRlciBkcml2ZXJzL25ldC9waHkv
+bWljcmVsLmMsIGNhbiB3ZSBjb252ZXJnZSBvbiB0aGUgUEhZDQo+IGRyaXZlciB3aGljaCBoYXMg
+YSByZWFzb25hYmxlIGFtb3VudCBvZiBpbmZyYXN0cnVjdHVyZSBmb3IgZGVhbGluZyB3aXRoDQo+
+IHdvcmthcm91bmRzLCBpbmRpcmVjdCBvciBkaXJlY3QgTU1EIGFjY2Vzc2VzIGV0Yy4/DQoNCkFj
+dHVhbGx5IHRoZSBpbnRlcm5hbCBQSFkgdXNlZCBpbiB0aGUgS1NaOTg5Ny9LU1o5NDc3L0tTWjk4
+OTMgc3dpdGNoZXMNCmFyZSBzcGVjaWFsIGFuZCBvbmx5IHVzZWQgaW5zaWRlIHRob3NlIHN3aXRj
+aGVzLiAgUHV0dGluZyBhbGwgdGhlIHN3aXRjaA0KcmVsYXRlZCBjb2RlIGluIE1pY3JlbCBQSFkg
+ZHJpdmVyIGRvZXMgbm90IHJlYWxseSBoZWxwLiAgV2hlbiB0aGUgc3dpdGNoDQppcyByZXNldCBh
+bGwgdGhvc2UgUEhZIHJlZ2lzdGVycyBuZWVkIHRvIGJlIHNldCBhZ2FpbiwgYnV0IHRoZSBQSFkg
+ZHJpdmVyDQpvbmx5IGV4ZWN1dGVzIHRob3NlIGNvZGUgZHVyaW5nIFBIWSBpbml0aWFsaXphdGlv
+bi4gIEkgZG8gbm90IGtub3cgaWYNCnRoZXJlIGlzIGEgZ29vZCB3YXkgdG8gdGVsbCB0aGUgUEhZ
+IHRvIHJlLWluaXRpYWxpemUgYWdhaW4uDQpUaGVyZSBpcyBhbHNvIGEgdHlwbyBpbiBvbmUgb2Yg
+dGhvc2UgcmVnaXN0ZXJzIHdoZW4gdGhlIGNvZGUgd2FzIG1vdmVkDQp0byB0aGUgTWljcmVsIFBI
+WSBkcml2ZXIuICBBIGZpeCB3aWxsIGJlIG5lZWRlZC4NCg0K
 
