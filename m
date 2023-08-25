@@ -1,110 +1,216 @@
-Return-Path: <netdev+bounces-30641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4C8788526
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 12:42:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7123C78853F
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 12:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BF121C20FA9
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:42:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 193AA2817BF
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7415DD2F6;
-	Fri, 25 Aug 2023 10:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC2ACA46;
+	Fri, 25 Aug 2023 10:54:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B1ED2EF
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 10:40:59 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5BD173F;
-	Fri, 25 Aug 2023 03:40:57 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37P3d5Ut002288;
-	Fri, 25 Aug 2023 03:40:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0220; bh=t2pvIFE8MQJaMYgyaaNRppZgy+XMWUXObDnC2oe1/8Y=;
- b=e8r4hNcZY18+iTmP2AaICWVrzXvkDqOElcIIaj1TsrAc/3j5pfSYLu2HfW13T/zj9iLZ
- MMfylXLaTaiztKpFV9lI9W0VSOi4+m5FImdp8T7NJCKMzUWvk4Mn8HffXkxC+38GKDka
- tmCNSRv1sv/831ScNi07eV+JPRB70pddOduzlq5P0ncSNw2/SaECoolWb8EBy6RFiuBe
- u/lzoL1c1cjF2FKma4ezkucLZk6MsUPY+xtzKb1cOwGQOgQI5t9V2WsrYSFVoLJ0Pwed
- N3OrYoEk7nY+ONfe0Jq8HyaLuUjUsPrq+S5D/SXhOIK0p4lH0khUeHGzMLEAOgLyHQPF qg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3spmk291vy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 25 Aug 2023 03:40:49 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 25 Aug
- 2023 03:40:47 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 25 Aug 2023 03:40:47 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 29CC63F7096;
-	Fri, 25 Aug 2023 03:40:42 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net-next PatchV2 4/4] octeontx2-af: print error message incase of invalid pf mapping
-Date: Fri, 25 Aug 2023 16:10:22 +0530
-Message-ID: <20230825104022.16288-5-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230825104022.16288-1-hkelam@marvell.com>
-References: <20230825104022.16288-1-hkelam@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD11C2EB
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 10:54:19 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8259319B0
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 03:54:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692960858; x=1724496858;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=kyfIaGCVFJ/kCcLDpzizQ4q5CcFilK+SmkcAQ1OGJfw=;
+  b=idF1LpIG6vk4z49+HYBw9KU4E+xQSBEALhZqcIpuTnqqCJOhHpWAyL3C
+   XJ8TvQcfmc+DCnv5sp8e/S+/aNCcwJ/QDSxuPDrU22tFr0l65QEK6EdAu
+   DDfVNOsTSMGWAsLJPSDbmjSm9+DRmPFUGXstFnwnLDis1pp5OGyOYVGPc
+   hOIER41+SthfeLGP9UkUhTNC+B+G1XbVcYc8Kds1rrg21NwpCtzhHgKH8
+   Z7iT7Z3RCKDUNBkmn+rbi3QpH45At8LCE8Oi8/KN1/5AKp9AIB8pwO63O
+   s6Dxw1bbs10kIL/hArtwyLkFaMD4RuQeBkL3LzeMT7dhzltO8KuYePrKe
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="355016947"
+X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
+   d="scan'208";a="355016947"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 03:54:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="772448144"
+X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
+   d="scan'208";a="772448144"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga001.jf.intel.com with ESMTP; 25 Aug 2023 03:54:17 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 25 Aug 2023 03:54:17 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 25 Aug 2023 03:54:17 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 25 Aug 2023 03:54:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RXp4TGdD43PbH8lVHt16FR2ToxB8pX2hi0Xj3IsSDBkh2bGqBTDVJkxpsSdSLNA2pq6n3Mc4C0cetczxy67G/JgFGd9nTPmfnnJ8v3dAFETZUmd/tNf1ErRHtbRJWtvgD3EG79cXRdR7bPckfuJx/nPF0gBYpZFiiRczdLouC6sK3Omn+B9yClQ1cCmURq5za2+I8+ibYMjzDymPdkSW2sxAvaQ6dbPD3Zo/SE67D+3XsrZpUxhZX89I6N8oEUKZj4cVaQN00R5o1zJgA3HDPkrVjonjnHwfDUoRTyfwiSHI474YqFt6KaR+sRnNiPBBuBm0c6AGj0j6OHiC6RgIZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=83nBSXyfAdlwymfIR8XPAZ55nqU98yTNzkXRIqsxhOE=;
+ b=O/M6PfpVECVDX264duDithfgiGGNmqM/IZJegxvAoG3dOOkCQkkxMjRA2y7jXeYVddGOMsQmjYD0jiccGFbFsOzAQByH8sA9zIXIw0egMDgk/H8HYs+JxwVa9z0aI+cdIjmXJAsDhpdPsfFWpuNRnIyrBdy7djYK4H3PNuCBHLGT70FeDYCu15rO+8AbQScLzd8/S0vW7N6r1ZLQ94ZXarlIC5NhKq9ushpcwuAZcyn7kNSsAKNrICx+wy0/8nphNLmih4QsgHLjmOHN91KScYFLPRhQ8HMtyBUY0robg6RRP/tAliyHiFuiA6ZLpTbkiH8fjfZlXqtUTmOOSzv2cQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SJ2PR11MB8323.namprd11.prod.outlook.com (2603:10b6:a03:53f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Fri, 25 Aug
+ 2023 10:54:10 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::44ff:6a5:9aa4:124a%7]) with mapi id 15.20.6678.031; Fri, 25 Aug 2023
+ 10:54:10 +0000
+Message-ID: <dbdc320e-bd4a-eb49-5c6d-8f861602046f@intel.com>
+Date: Fri, 25 Aug 2023 12:52:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH iwl-next v8 00/15] Introduce the Parser Library
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Junfeng Guo <junfeng.guo@intel.com>, <anthony.l.nguyen@intel.com>,
+	<jesse.brandeburg@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <qi.z.zhang@intel.com>, <ivecera@redhat.com>,
+	<sridhar.samudrala@intel.com>, <horms@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <pabeni@redhat.com>
+References: <20230823093158.782802-1-junfeng.guo@intel.com>
+ <20230824075500.1735790-1-junfeng.guo@intel.com>
+ <20230824082039.22901063@kernel.org>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20230824082039.22901063@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE1P281CA0395.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:80::15) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: WvhABB_kl5CMKMkUS4FACsPLJtvZkLQx
-X-Proofpoint-GUID: WvhABB_kl5CMKMkUS4FACsPLJtvZkLQx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-25_08,2023-08-25_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SJ2PR11MB8323:EE_
+X-MS-Office365-Filtering-Correlation-Id: f0baa2d1-bc74-49a8-0053-08dba5599c88
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bIpqdq7Br1ja1I0kxAShtr3RfGc5E/+r3p9QLlYZKTAhxLlRck27AXe763/9N1mNgMYzkbW/UIb1FIXCgrt1o4Gf0SNuP3cUe5jIHX925lnc2ATSNUscO1M/acu1IPFc32n0Gg/HSRzVTAxaKxoblr4LQe1RVFVxNm7z++6HvP2a391R2xJTrp3ZlTd3Qigh1Y55zl/HEIyz9uCLKHAtY8+yia+7utAm4sNfDHUOt3m9CjKa+F08V5xluExE45rgWrg41uIXaYU5jqBMuX+/4mKVFO49OAVYNyoku/FzCrE4MiJEp2jWs0nxid8GwuDVF7HtzkeKTAgLDm7JBQRTneFivng7vHcvPPX6vXncGQnE9p2tt5D3nOHcmFHpG4a0DGxqc2DalWg3URyH8uobfqiNw/pj/8tOTpJHFPvaUvLMxJG2YHqr59jpEGdZYasQ8DgEjTFfUDRnt2NTISY1tiYx8ZATwZzHb8zoXwoHh3t3d6dHLxOIyujvXdXlnf74O3qZoPRTXg78w+rc69FrIJu/8eVBCAnxy0lE5NRyofhy40WK5HHis2dNXZNrQP8d9HzsoqJX+o7hzDxQl1hsfgRK75uZF1hfyizKjfapAlyHQbgpPXe9IudZUsEXksFVTOmm6MgZ1kgD4s/oDECd5g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(39860400002)(396003)(136003)(366004)(186009)(1800799009)(451199024)(2616005)(5660300002)(4326008)(8676002)(8936002)(36756003)(83380400001)(26005)(38100700002)(6666004)(82960400001)(66556008)(66946007)(6916009)(66476007)(316002)(478600001)(31686004)(41300700001)(6512007)(6506007)(2906002)(86362001)(6486002)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dGlKNlExd0JscmhjZ0p2TGNjOGJvSUMrQ3J1dFNNVlNvMHltU3IwajNNWkl5?=
+ =?utf-8?B?N3g2ekJGcVBJVzlDbE5CcUhBV3JramtSWmVuZy9ZT2VmMHdnNzNLVHJXT0o5?=
+ =?utf-8?B?T3FQdlBIUWV2N3VEeTEzeTRtWFNTeGF0Mk5mR1pTc0l6YkJhTlBsMW1ScGlI?=
+ =?utf-8?B?OFZiZ2kxWGRyeEZWQ040Y1dXMVJkQ0pVc3RjRUtSMit3SFVwUmVSL3pEVGdM?=
+ =?utf-8?B?WHIzNHlKb3pOUlp2VzVjb21rdHBsNEc3VzMyeFlRUEEySmRGMEJwWXc1SlpF?=
+ =?utf-8?B?TnBhdHRJTkVhTUNYa21vL3RobXVjT3BiSlFkTFlPdVRDZE9OQ0txcDUySFNK?=
+ =?utf-8?B?TDNzdzRCdytvbkx6cUZlNHV0aVN3dVBuTWJiVkM0c1JiaS9xN3I2MzVZamxq?=
+ =?utf-8?B?d1FCVWJQSlViUkFjdjRYQWh4c1VTZ0k5aXc1TGt6SUhpM2pyZGs0MExZL1cw?=
+ =?utf-8?B?Q2RzY1VaWWxLWXVyRDE5MzNmdkZhdlRiNEt6UGE2NUV3aTZRVjEydmZUdzNC?=
+ =?utf-8?B?R3FvSUFEWTlXN0V5amN4elQrc0kzb25XelR4Tkt6dWplYnFMWW1GVzNXM2Ir?=
+ =?utf-8?B?aGQ2QkxYN2haOTA0d050QzlkdVR1ZWdUdXd3Q0huaGF0VEhndnhKdk85TURw?=
+ =?utf-8?B?TTJtZDBYZGo1ekM4akpRbUlKWEp5N3pJdlc0YWMrRC9zWVdEa1hldUJBMmVv?=
+ =?utf-8?B?cmFMQ25mMjV6YXlrMllSbnIxVVVLemo4Sy9VSmtsdS9wbHRWRFdISjA5V1Jn?=
+ =?utf-8?B?K3JxMXluMzVybEVjVURmR0RIMlNDUENHMW9PWE03NjFvRzdQVmJMMVkwdmZo?=
+ =?utf-8?B?TDJQVG13RzRjS21nM2hWaGxWdmtEVHIzSEV5SUE3TWMzNTNBWjdGWnpKd1J0?=
+ =?utf-8?B?TDA4SVZtdlFPSVJpUkxBSlVSU1lNcFYvNU9mcjJ0Z216V3YybjRYZGRNenJh?=
+ =?utf-8?B?ZFNKVDA2Wjd5WkVBTmdOS29MZlRWdjFvbllrN09QVXNJQVNFemI4bjJNZW1Z?=
+ =?utf-8?B?Sk52OWxKL0dxcHJrYU1HbERTRjZweUtoR3poVVBkdXJPeDZFdVBlNStOR3pr?=
+ =?utf-8?B?aldOSVdPTjRGRWtpdE1HaTdSMkxZRkpKc281b2VwRVB4VzRZSldvWVE2bnQr?=
+ =?utf-8?B?VnhuMVZZeXpWYmJVL0FVUjYxZEhZbDM5ZnQ5RDA2Wm1JdkVWOUE1KzdUb0tr?=
+ =?utf-8?B?ZlBEZlF1STEzTThQT2E0WDFJZHJNRzJxcXhWdHZKWHdzdlN6bmUzSndtQXc1?=
+ =?utf-8?B?dFA4YnVBN085VWs4bkowa1pBZ2xBSEZFMVpGUFVaUXVHRkZ4NUgwM1hTSFVN?=
+ =?utf-8?B?U2gzd2YvVEl6QURVcHQxaXVyNUdIZlFMaUlLNTFsamxvSmlFL2prVHgzSnd3?=
+ =?utf-8?B?Mkk4Q0JOMDdXbkRZZlhmQUdSV1J2bmdWb0t3Q09ZbkpOU3MzMCtXemZuS2xs?=
+ =?utf-8?B?K2s0UWN1MzMvVnZ1U3JhYmg4Yzd1cS9NNHBSK2VHajRWT2VZSHlJMUowd2tw?=
+ =?utf-8?B?NkF5ZFlWNGptSUNsMHNPd3hzOHFZL1VxZm1aSGQ4UmVRUWVpWWJPRWpPeGY3?=
+ =?utf-8?B?M2ErMzdjY05zeU13M1hSbDY2S1RWbE1hc3dXc2hMZ2hoUlBScGpMWmZZUzNx?=
+ =?utf-8?B?QkQyVmtnSC9nRjhib2Jub3dCT1lsajVIV005b2tHcVJGMVhWbjZPTEs3Zytt?=
+ =?utf-8?B?NWRwVnVlKyt6N0Z5ZnVNdXVZejlzV3ZYb2ZpNytKbzR0dnZUWnVPaDV0YStF?=
+ =?utf-8?B?ajVVeXoyTkdjV1JVbmIvVHVvdUhkTHQwWWxzWE9EbW95NmdEaGVkS1U2NDBI?=
+ =?utf-8?B?Skt5dEZRY2FMdzhGWXhDenVXNWVuUTZ4OVZjMEVxSTdxZGpHVFl3V1FneHpY?=
+ =?utf-8?B?SjlvajdDamdrWDhFSURyTFN1VmFzR2ovdVJmMEJkWG9ZZnRUejcxdHBTQi9G?=
+ =?utf-8?B?TEdGcU1qcEh2eXloVnRnSUlwVzNORHlKcXA1Y2lGNlhqWHI0VUhKdk1nQmY5?=
+ =?utf-8?B?YXM3ZUdBSTd3eVFHWnpYbCtGdzZQa2ZKandINEZValhLYWQrRnhLVFY2VjNW?=
+ =?utf-8?B?bHNJT25pc0hSWk5XUENQSFE3MjZKeTl2QUFkdkF6RS9Pa1VXZnYrS1N2emlm?=
+ =?utf-8?B?bStnVmJvbUNmOC9hM1Yyc3dXcExIdXVmNCtWU0Y1WFBDRFptZjBMSzlPcUJV?=
+ =?utf-8?B?Unc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0baa2d1-bc74-49a8-0053-08dba5599c88
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2023 10:54:10.3720
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AdptY4f33n5SRsr00DhY81RAhGGYQsXVQpkNeeuhGjIFJN13VMz03zXQu0DiM6Z6is9N3bJ1g3LsFQ1oI1PU0DXcXHMj55pkjBXkEgiMoV4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8323
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-During AF driver initialization, it creates a mapping between pf to
-cgx,lmac pair. Whenever there is a physical link change, using this
-mapping driver forwards the message to the associated netdev.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 24 Aug 2023 08:20:39 -0700
 
-This patch prints error message incase of cgx,lmac pair is not
-associated with any pf netdev.
+> On Thu, 24 Aug 2023 15:54:45 +0800 Junfeng Guo wrote:
+>> Current software architecture for flow filtering offloading limited
+>> the capability of Intel Ethernet 800 Series Dynamic Device
+>> Personalization (DDP) Package. The flow filtering offloading in the
+>> driver is enabled based on the naming parsers, each flow pattern is
+>> represented by a protocol header stack. And there are multiple layers
+>> (e.g., virtchnl) to maintain their own enum/macro/structure
+>> to represent a protocol header (IP, TCP, UDP ...), thus the extra
+>> parsers to verify if a pattern is supported by hardware or not as
+>> well as the extra converters that to translate represents between
+>> different layers. Every time a new protocol/field is requested to be
+>> supported, the corresponding logic for the parsers and the converters
+>> needs to be modified accordingly. Thus, huge & redundant efforts are
+>> required to support the increasing flow filtering offloading features,
+>> especially for the tunnel types flow filtering.
+> 
+> You keep breaking the posting guidelines :(
+> I already complained to people at Intel about you.
+> 
+> The only way to push back that I can think of is to start handing out
+> posting suspensions for all @intel.com addresses on netdev. Please
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Ah, that collective responsibility :D
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 4e3aec7bdbee..f2b1edf1bb43 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -236,6 +236,11 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
- 
- 	linfo = &event->link_uinfo;
- 	pfmap = cgxlmac_to_pfmap(rvu, event->cgx_id, event->lmac_id);
-+	if (!pfmap) {
-+		dev_err(rvu->dev, "CGX port%d:%d not mapped with PF\n",
-+			event->cgx_id, event->lmac_id);
-+		return;
-+	}
- 
- 	do {
- 		pfid = find_first_bit(&pfmap,
--- 
-2.17.1
+> don't make us stoop that low.
 
+But seriously, please don't. Intel is huge and we physically can't keep
+an eye on every developer or patch. I personally don't even know what
+team the submitter is from. Spending 8 hrs a day on tracking every
+@intel.com submission on netdev is also not something I'd like to do at
+work (I mean, I'd probably like reviewing every line coming out of my
+org, had I 120-150 hrs a day...).
+I know that sounds cheap, but that's how I see it :z
+
+> 
+> 
+
+Thanks,
+Olek
 
