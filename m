@@ -1,90 +1,64 @@
-Return-Path: <netdev+bounces-30793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1026F78918B
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:16:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D4A7891AC
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7D51C20F90
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 22:16:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E33A9281945
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 22:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EC71AA64;
-	Fri, 25 Aug 2023 22:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9363F1AA6B;
+	Fri, 25 Aug 2023 22:23:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54620193B2
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 22:16:21 +0000 (UTC)
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 717812701
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:16:19 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c09673b006so10133175ad.1
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:16:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693001779; x=1693606579;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppeQOWgbWz5gqWZs/rbytV4GhpZ82FSsmBh/giRYIfc=;
-        b=oGxnlMh0S/WiVEBqRgXg0XkOHzHqDpTBvnGnagMxXiK0WZOe1Z4r+2p1ptsCZGDnWB
-         pXEktmY/ad0PuwAxCgT0YcHOMRjDsuwyrAXCFtdwEmAj+muyxYQXIE+r39jHMvXhT5B0
-         o+SPYmvdCE0AaqEX44rBk89wjuy74zXAp3Vwzk0u1JPoPtSJh1DrCjw1RqWqiFdJpqby
-         tMNly65LV0QvaLstk47azhvzcHLQyEtc8q2u/G93EQr7wDi/F72WQh2TPKv7ILrD/tve
-         HoezaGEwtih61yu0zT7giO0Mqh1qaOyneAEL9vdEIb12mBB0wZbgWFOwNbvY6RzLwUwH
-         OW2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693001779; x=1693606579;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ppeQOWgbWz5gqWZs/rbytV4GhpZ82FSsmBh/giRYIfc=;
-        b=jkgJ5bvn7X9p1dIafm1KCmpAuvAO7fsEGoAoAH5CLhCVo8T/o+9FbFctvN/hwFxy64
-         1ZspHX8yYY7+ukQ0qMuPrun9ft6FQnVEa/TJEaIdptwcLsNiOCg/2SLOD7i9DLYIPeZ7
-         PY6cnsH0ywP75ef9XYsrpsVtKnRP9Qcr1HJtWyyI96cgNv81KHUk2PXHvI0nZMFsPS8P
-         WCiOfx18m53wzp/UsT6UjRg8nG0NeVT8FnmzaQRbtoBUIrBbMFr2Fkx5L4ik4Q/eKjyH
-         IryHxkfhzdY6FCS42TML207lRgmMZ/BFLy95aoKSMrO19/R0zaEpigkU1H/VPdKpwra0
-         7Pug==
-X-Gm-Message-State: AOJu0YwYOq/vAszI9gbFs9KmK6+csJDDfUeGjf5dnCCQovKWC7muVw4m
-	iPhsVGr0ZXilnAXj9yG6JYBqVw==
-X-Google-Smtp-Source: AGHT+IEjt82Q7/ukix1Bwi0HcqOCAUCGzooSpz1T14B8KRhD3u7v0lApveU1bnKvxuVgpN4iNhxk8w==
-X-Received: by 2002:a17:903:264e:b0:1bd:c338:ae14 with SMTP id je14-20020a170903264e00b001bdc338ae14mr16243879plb.12.1693001778913;
-        Fri, 25 Aug 2023 15:16:18 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id f8-20020a170902684800b001c0bf60ba5csm2276046pln.272.2023.08.25.15.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 15:16:18 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1qZf6F-006Va3-0j;
-	Sat, 26 Aug 2023 08:16:15 +1000
-Date: Sat, 26 Aug 2023 08:16:15 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Hao Xu <hao.xu@linux.dev>
-Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 25/29] xfs: support nowait for xfs_buf_item_init()
-Message-ID: <ZOkoL8nuXJDVZM1H@dread.disaster.area>
-References: <20230825135431.1317785-1-hao.xu@linux.dev>
- <20230825135431.1317785-26-hao.xu@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801DA19883
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 22:23:30 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71D92110
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693002208; x=1724538208;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JBnc0QG+1aFQQroftxh2ThC8FXzf6nI5IRhrwD0d8tY=;
+  b=aEOX1LhWAoHdxKZRQR5eQ51Sp/YSBLl9LFl8Vy/4p0fT09n45oEwhsOe
+   Ko+j6eofu1b4qcuPozApmnnbOOFHUmu4jmpieugPmc1XY9yaSY79sKuvI
+   P6hM6wSqLCpM6M3lOvzFoTkMsr3ySR+B0TRB3AuEFVhMMQ0cGgXoqXIVm
+   oZmhd1ArTCcZLPRWu1TkNcOl7WlRYm/NT5wNDZobBYQLWu4/k+GQytu2w
+   7J8lEOnXhzVsBJfajg28HZLpb6ML+mOdO7FcZlXDytiaF0dZMb1ufI/+N
+   lX/E2poKt7uSvO3VF1CvyQGVLz+1O0OOyIhFV8SZuKt/2Oicsz0lLVrjp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="374789365"
+X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
+   d="scan'208";a="374789365"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 15:22:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="772640758"
+X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
+   d="scan'208";a="772640758"
+Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 25 Aug 2023 15:22:09 -0700
+Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qZfBu-000445-0v;
+	Fri, 25 Aug 2023 22:22:06 +0000
+Date: Sat, 26 Aug 2023 06:21:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Pawel Chmielewski <pawel.chmielewski@intel.com>,
+	intel-wired-lan@osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	aelior@marvell.com, manishc@marvell.com, andrew@lunn.ch
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 2/8] ethtool: Add forced
+ speed to supported link modes maps
+Message-ID: <202308260616.Sf8QzI7c-lkp@intel.com>
+References: <20230823180633.2450617-3-pawel.chmielewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,156 +67,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230825135431.1317785-26-hao.xu@linux.dev>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20230823180633.2450617-3-pawel.chmielewski@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 09:54:27PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> support nowait for xfs_buf_item_init() and error out -EAGAIN to
-> _xfs_trans_bjoin() when it would block.
-> 
-> Signed-off-by: Hao Xu <howeyxu@tencent.com>
-> ---
->  fs/xfs/xfs_buf_item.c         |  9 +++++++--
->  fs/xfs/xfs_buf_item.h         |  2 +-
->  fs/xfs/xfs_buf_item_recover.c |  2 +-
->  fs/xfs/xfs_trans_buf.c        | 16 +++++++++++++---
->  4 files changed, 22 insertions(+), 7 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_buf_item.c b/fs/xfs/xfs_buf_item.c
-> index 023d4e0385dd..b1e63137d65b 100644
-> --- a/fs/xfs/xfs_buf_item.c
-> +++ b/fs/xfs/xfs_buf_item.c
-> @@ -827,7 +827,8 @@ xfs_buf_item_free_format(
->  int
->  xfs_buf_item_init(
->  	struct xfs_buf	*bp,
-> -	struct xfs_mount *mp)
-> +	struct xfs_mount *mp,
-> +	bool   nowait)
->  {
->  	struct xfs_buf_log_item	*bip = bp->b_log_item;
->  	int			chunks;
-> @@ -847,7 +848,11 @@ xfs_buf_item_init(
->  		return 0;
->  	}
->  
-> -	bip = kmem_cache_zalloc(xfs_buf_item_cache, GFP_KERNEL | __GFP_NOFAIL);
-> +	bip = kmem_cache_zalloc(xfs_buf_item_cache,
-> +				GFP_KERNEL | (nowait ? 0 : __GFP_NOFAIL));
-> +	if (!bip)
-> +		return -EAGAIN;
-> +
->  	xfs_log_item_init(mp, &bip->bli_item, XFS_LI_BUF, &xfs_buf_item_ops);
->  	bip->bli_buf = bp;
+Hi Pawel,
 
-I see filesystem shutdowns....
+kernel test robot noticed the following build errors:
 
-> diff --git a/fs/xfs/xfs_trans_buf.c b/fs/xfs/xfs_trans_buf.c
-> index 016371f58f26..a1e4f2e8629a 100644
-> --- a/fs/xfs/xfs_trans_buf.c
-> +++ b/fs/xfs/xfs_trans_buf.c
-> @@ -57,13 +57,14 @@ xfs_trans_buf_item_match(
->   * If the buffer does not yet have a buf log item associated with it,
->   * then allocate one for it.  Then add the buf item to the transaction.
->   */
-> -STATIC void
-> +STATIC int
->  _xfs_trans_bjoin(
->  	struct xfs_trans	*tp,
->  	struct xfs_buf		*bp,
->  	int			reset_recur)
->  {
->  	struct xfs_buf_log_item	*bip;
-> +	int ret;
->  
->  	ASSERT(bp->b_transp == NULL);
->  
-> @@ -72,7 +73,11 @@ _xfs_trans_bjoin(
->  	 * it doesn't have one yet, then allocate one and initialize it.
->  	 * The checks to see if one is there are in xfs_buf_item_init().
->  	 */
-> -	xfs_buf_item_init(bp, tp->t_mountp);
-> +	ret = xfs_buf_item_init(bp, tp->t_mountp,
-> +				tp->t_flags & XFS_TRANS_NOWAIT);
-> +	if (ret < 0)
-> +		return ret;
-> +
->  	bip = bp->b_log_item;
->  	ASSERT(!(bip->bli_flags & XFS_BLI_STALE));
->  	ASSERT(!(bip->__bli_format.blf_flags & XFS_BLF_CANCEL));
-> @@ -92,6 +97,7 @@ _xfs_trans_bjoin(
->  	xfs_trans_add_item(tp, &bip->bli_item);
->  	bp->b_transp = tp;
->  
-> +	return 0;
->  }
->  
->  void
-> @@ -309,7 +315,11 @@ xfs_trans_read_buf_map(
->  	}
->  
->  	if (tp) {
-> -		_xfs_trans_bjoin(tp, bp, 1);
-> +		error = _xfs_trans_bjoin(tp, bp, 1);
-> +		if (error) {
-> +			xfs_buf_relse(bp);
-> +			return error;
-> +		}
->  		trace_xfs_trans_read_buf(bp->b_log_item);
+[auto build test ERROR on tnguy-next-queue/dev-queue]
 
-So what happens at the callers when we have a dirty transaction and
-joining a buffer fails with -EAGAIN?
+url:    https://github.com/intel-lab-lkp/linux/commits/Pawel-Chmielewski/ice-Add-E830-device-IDs-MAC-type-and-registers/20230824-021235
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20230823180633.2450617-3-pawel.chmielewski%40intel.com
+patch subject: [Intel-wired-lan] [PATCH iwl-next v3 2/8] ethtool: Add forced speed to supported link modes maps
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230826/202308260616.Sf8QzI7c-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230826/202308260616.Sf8QzI7c-lkp@intel.com/reproduce)
 
-Apart from the fact this may well propagate -EAGAIN up to userspace,
-cancelling a dirty transaction at this point will result in a
-filesystem shutdown....
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308260616.Sf8QzI7c-lkp@intel.com/
 
-Indeed, this can happen in the "simple" timestamp update case that
-this "nowait" semantic is being aimed at. We log the inode in the
-timestamp update, which dirties the log item and registers a
-precommit operation to be run. We commit the
-transaction, which then runs xfs_inode_item_precommit() and that
-may need to attach the inode to the inode cluster buffer. This
-results in:
+All errors (new ones prefixed by >>):
 
-xfs_inode_item_precommit
-  xfs_imap_to_bp
-    xfs_trans_read_buf_map
-      _xfs_trans_bjoin
-        xfs_buf_item_init(XFS_TRANS_NOWAIT)
-	  kmem_cache_zalloc(GFP_NOFS)
-	  <memory allocation fails>
-      gets -EAGAIN error
-    propagates -EAGAIN
-  fails due to -EAGAIN
+   drivers/net/ethernet/qlogic/qede/qede_ethtool.c: In function 'qede_set_link_ksettings':
+>> drivers/net/ethernet/qlogic/qede/qede_ethtool.c:584:29: error: assignment to 'const struct qede_forced_speed_map *' from incompatible pointer type 'struct ethtool_forced_speed_map *' [-Werror=incompatible-pointer-types]
+     584 |                         map = qede_forced_speed_maps + i;
+         |                             ^
+>> drivers/net/ethernet/qlogic/qede/qede_ethtool.c:586:47: error: invalid use of undefined type 'const struct qede_forced_speed_map'
+     586 |                         if (base->speed != map->speed ||
+         |                                               ^~
+   drivers/net/ethernet/qlogic/qede/qede_ethtool.c:588:53: error: invalid use of undefined type 'const struct qede_forced_speed_map'
+     588 |                                                  map->caps))
+         |                                                     ^~
+   drivers/net/ethernet/qlogic/qede/qede_ethtool.c:592:70: error: invalid use of undefined type 'const struct qede_forced_speed_map'
+     592 |                                      current_link.supported_caps, map->caps);
+         |                                                                      ^~
+   cc1: some warnings being treated as errors
 
-And now xfs_trans_commit() fails with a dirty transaction and the
-filesystem shuts down.
 
-IOWs, XFS_TRANS_NOWAIT as it stands is fundamentally broken. Once we
-dirty an item in a transaction, we *cannot* back out of the
-transaction. We *must block* in every place that could fail -
-locking, memory allocation and/or IO - until the transaction
-completes because we cannot undo the changes we've already made to
-the dirty items in the transaction....
+vim +584 drivers/net/ethernet/qlogic/qede/qede_ethtool.c
 
-It's even worse than that - once we have committed intents, the
-whole chain of intent processing must be run to completionr. Hence
-we can't tolerate backing out of that defered processing chain half
-way through because we might have to block.
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  546  
+054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  547  static int qede_set_link_ksettings(struct net_device *dev,
+054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  548  				   const struct ethtool_link_ksettings *cmd)
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  549  {
+054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  550  	const struct ethtool_link_settings *base = &cmd->base;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  551  	struct qede_dev *edev = netdev_priv(dev);
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  552  	const struct qede_forced_speed_map *map;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  553  	struct qed_link_output current_link;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  554  	struct qed_link_params params;
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  555  	u32 i;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  556  
+fe7cd2bfdac4d8 Yuval Mintz                  2016-04-22  557  	if (!edev->ops || !edev->ops->common->can_link_change(edev->cdev)) {
+054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  558  		DP_INFO(edev, "Link settings are not allowed to be changed\n");
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  559  		return -EOPNOTSUPP;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  560  	}
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  561  	memset(&current_link, 0, sizeof(current_link));
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  562  	memset(&params, 0, sizeof(params));
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  563  	edev->ops->common->get_link(edev->cdev, &current_link);
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  564  
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  565  	params.override_flags |= QED_LINK_OVERRIDE_SPEED_ADV_SPEEDS;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  566  	params.override_flags |= QED_LINK_OVERRIDE_SPEED_AUTONEG;
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  567  
+054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  568  	if (base->autoneg == AUTONEG_ENABLE) {
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  569  		if (!phylink_test(current_link.supported_caps, Autoneg)) {
+161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  570  			DP_INFO(edev, "Auto negotiation is not supported\n");
+161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  571  			return -EOPNOTSUPP;
+161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  572  		}
+161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  573  
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  574  		params.autoneg = true;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  575  		params.forced_speed = 0;
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  576  
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  577  		linkmode_copy(params.adv_speeds, cmd->link_modes.advertising);
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  578  	} else {		/* forced speed */
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  579  		params.override_flags |= QED_LINK_OVERRIDE_SPEED_FORCED_SPEED;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  580  		params.autoneg = false;
+054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  581  		params.forced_speed = base->speed;
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  582  
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  583  		for (i = 0; i < ARRAY_SIZE(qede_forced_speed_maps); i++) {
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20 @584  			map = qede_forced_speed_maps + i;
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  585  
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20 @586  			if (base->speed != map->speed ||
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  587  			    !linkmode_intersects(current_link.supported_caps,
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  588  						 map->caps))
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  589  				continue;
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  590  
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  591  			linkmode_and(params.adv_speeds,
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  592  				     current_link.supported_caps, map->caps);
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  593  			goto set_link;
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  594  		}
+bdb5d8ec47611c Alexander Lobakin            2020-07-20  595  
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  596  		DP_INFO(edev, "Unsupported speed %u\n", base->speed);
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  597  		return -EINVAL;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  598  	}
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  599  
+1d4e4ecccb1144 Alexander Lobakin            2020-07-20  600  set_link:
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  601  	params.link_up = true;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  602  	edev->ops->common->set_link(edev->cdev, &params);
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  603  
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  604  	return 0;
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  605  }
+133fac0eedc355 Sudarsana Kalluru            2015-10-26  606  
 
-Until we can roll back partial dirty transactions and partially
-completed defered intent chains at any random point of completion,
-XFS_TRANS_NOWAIT will not work.
-
--Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
