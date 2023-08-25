@@ -1,230 +1,138 @@
-Return-Path: <netdev+bounces-30747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27203788D76
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:54:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D77F788D7A
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574C21C20F83
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 16:54:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66CC31C20ED7
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 16:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD4D17FE5;
-	Fri, 25 Aug 2023 16:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C5F18003;
+	Fri, 25 Aug 2023 16:56:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D2417AD5;
-	Fri, 25 Aug 2023 16:54:04 +0000 (UTC)
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47539E77;
-	Fri, 25 Aug 2023 09:54:02 -0700 (PDT)
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-9a1de3417acso461118866b.0;
-        Fri, 25 Aug 2023 09:54:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127FE101CA
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 16:56:00 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4058E67
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:55:59 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-52a1ce529fdso1736501a12.1
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:55:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692982558; x=1693587358;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CplWnnbQy7/LKKL7kZ4OrsUrPVf1W9czpfw1103nd2c=;
+        b=Vwv9gIBIHwJGnZyOh07NQLq7oLPtPoeZz2lHsicpaAbSz3BPI5rFiqXw7GBOV/+lBQ
+         Y9/rOOjzJv381yCboflqaGQEVOZgAIJ5GMNic7CI0oS4YWwLwydLZCfkC01ZCRJTsL8L
+         P/mlCIQ6//6ojE6apoxNsnNt7rzNWYjCbYZHL35UNiUkXTv6gakf4kUL5Myu2BgpQO4K
+         72s7T7QiFo+n7C8fFnI98tSrCuLY/hOG+SiRO0p9WTvOccQVefvzyH9Pvq3Xc6HBW+Ma
+         Jj04wVHuuQuryQ5bns2uLAoh5SopRYEW55cSiYnxgmz9iF+ktLG3rcG7fj565hzNdN/A
+         4BTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692982441; x=1693587241;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lP7cZ2Rz5OnDrr8sQ04GNTnuORrvKWdUu3qvHzVHGws=;
-        b=R0nO/pLGP33FZhAWAdCUIb34pLwFWWMW3oo6kXRJF4ReZR+PjGbVOB5HFnkgKfJvF9
-         BYujvycMpO4bsshZTyK9FQ97fvgBrOYCVj/gRRE3mICWHBbLGcHS97Gl9Bit6ut1kveq
-         loOmJDL4Pnupla08sfGLtgUhwHKjpOXgBG9krfmLxPKVgnloiC75X0Fb5g7etfEdQu8Y
-         wQEAsWmNVjGldghsx7TTeMQItASa/9/g6shC1YitQpsi8+gnZrZ6jk+XQwCbRolVlJdB
-         SIBni7v+vA5aD69OR+sQG2uFNe1xaBZ4NqraIv4UWQCe1qc5iacphXnYWmT2FiGeAdQx
-         H1Ew==
-X-Gm-Message-State: AOJu0YwahpJJ/hqcor9XV2MVR33B33Fy1VN23e0C3mJDZ5tqxaDIHM0S
-	gM9jDww9MhCWvVBpYAU8FhI=
-X-Google-Smtp-Source: AGHT+IEuGVqHOFGyJFWQzjtY1yWk9pBKq0Vq4sKCayTDkfjAubGXdPAXCAi5P0CQCpGGZ9/kzOdKYw==
-X-Received: by 2002:a17:906:c116:b0:993:f664:ce25 with SMTP id do22-20020a170906c11600b00993f664ce25mr19345106ejc.19.1692982440507;
-        Fri, 25 Aug 2023 09:54:00 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-003.fbsv.net. [2a03:2880:31ff:3::face:b00c])
-        by smtp.gmail.com with ESMTPSA id dk24-20020a170906f0d800b0099ddc81903asm1125265ejb.221.2023.08.25.09.53.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 09:53:59 -0700 (PDT)
-Date: Fri, 25 Aug 2023 09:53:58 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>, sdf@google.com,
-	axboe@kernel.dk, asml.silence@gmail.com,
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v3 8/9] io_uring/cmd: BPF hook for getsockopt cmd
-Message-ID: <ZOjcpmlukOuEmuZ9@gmail.com>
-References: <20230817145554.892543-1-leitao@debian.org>
- <20230817145554.892543-9-leitao@debian.org>
- <87pm3l32rk.fsf@suse.de>
- <6ae89b3a-b53d-dd2c-ecc6-1094f9b95586@linux.dev>
+        d=1e100.net; s=20221208; t=1692982558; x=1693587358;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CplWnnbQy7/LKKL7kZ4OrsUrPVf1W9czpfw1103nd2c=;
+        b=NLl3I6bVCDB1offWt/ijMm09ojZvFdh68ABRYzvXOR+lBmBGlHqGmcITbGWCqpliiY
+         CmNgvcC80lBmtPzQkSro20cHGD8MfHbt0SDYJWWkUZyOVg8Ac7T4cJx2MsI2PRW/TR9f
+         fGWw4/wd4hkKXpU0YfXS71V5VoN+B8sG8UW6txD4/2EQ4umMjRXyfF0wO7KUGqQKys4y
+         9Qg8gEYqR6hKMpnML8ARgojdREpldYEB12f49ORXou+wOnSlV6OkBph8GUtas7ADoZmX
+         ie1KUn4iOr6Eu+7sX5CngVSbQN933OBnoZTcpc0wcWSNm67HM7qIUUHDlQmNmiw85EEa
+         8BGw==
+X-Gm-Message-State: AOJu0YwUwriSRaiNvxggolT+PS294HbCfzZI0sVbqTUMGjEkGgn/CSkM
+	r4gxch5brwtd0fpG0x574FD5/AO6rQY=
+X-Google-Smtp-Source: AGHT+IGAs6O0XAPu8b+2AqmCN5bB2u3aDOOpT6H+p+CO9Q1EpbXIg53GJaUGOwCBXgc8Z1R6DTUQ4Q==
+X-Received: by 2002:a17:906:1dd:b0:9a0:9558:82a3 with SMTP id 29-20020a17090601dd00b009a0955882a3mr16561493ejj.58.1692982557709;
+        Fri, 25 Aug 2023 09:55:57 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7278:9e00:3d6c:1d4d:484c:d423? (dynamic-2a01-0c22-7278-9e00-3d6c-1d4d-484c-d423.c22.pool.telefonica.de. [2a01:c22:7278:9e00:3d6c:1d4d:484c:d423])
+        by smtp.googlemail.com with ESMTPSA id lx16-20020a170906af1000b0099bcd1fa5b0sm1131286ejb.192.2023.08.25.09.55.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Aug 2023 09:55:57 -0700 (PDT)
+Message-ID: <97ec2232-3257-316c-c3e7-a08192ce16a6@gmail.com>
+Date: Fri, 25 Aug 2023 18:55:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6ae89b3a-b53d-dd2c-ecc6-1094f9b95586@linux.dev>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: r8169 link up but no traffic, and watchdog error
+To: =?UTF-8?Q?Martin_Kj=c3=a6r_J=c3=b8rgensen?= <me@lagy.org>
+Cc: nic_swsd@realtek.com, Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <87zg30a0h9.fsf@lagy.org> <20230809125805.2e3f86ac@kernel.org>
+ <87fs489agk.fsf@lagy.org> <ad71f412-e317-d8d0-5e9d-274fe0e01374@gmail.com>
+ <87edjsx03e.fsf@lagy.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <87edjsx03e.fsf@lagy.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 21, 2023 at 01:25:25PM -0700, Martin KaFai Lau wrote:
-> On 8/17/23 12:08 PM, Gabriel Krisman Bertazi wrote:
-> > Shouldn't you call sock->ops->getsockopt for level!=SOL_SOCKET prior to
-> > running the hook?  Before this patch, it would bail out with EOPNOTSUPP,
-> > but now the bpf hook gets called even for level!=SOL_SOCKET, which
-> > doesn't fit __sys_getsockopt. Am I misreading the code?
-> I agree it should not call into bpf if the io_uring cannot support non
-> SOL_SOCKET optnames. Otherwise, the bpf prog will get different optval and
-> optlen when running in _sys_getsockopt vs io_uring getsockopt (e.g. in
-> regular _sys_getsockopt(SOL_TCP), bpf expects the optval returned from
-> tcp_getsockopt).
+On 24.08.2023 11:22, Martin Kjær Jørgensen wrote:
 > 
-> I think __sys_getsockopt can also be refactored similar to __sys_setsockopt
-> in patch 3. Yes, for non SOL_SOCKET it only supports __user *optval and
-> __user *optlen but may be a WARN_ON_ONCE/BUG_ON(sockpt_is_kernel(optval))
-> can be added before calling ops->getsockopt()? Then this details can be
-> hidden away from the io_uring.
+> On Thu, Aug 24 2023, Heiner Kallweit <hkallweit1@gmail.com> wrote:
+> 
+>> On 18.08.2023 13:49, Martin Kjær Jørgensen wrote:
+>>>
+>>> On Wed, Aug 09 2023, Jakub Kicinski <kuba@kernel.org> wrote:
+>>>
+>>>>
+>>>> There were some fix in r8169 for power management changes recently.
+>>>> Could you try the latest stable kernel? 6.4.9 ?
+>>>>
+>>>
+>>> I have just upgraded to latest Debian testing kernel (6.4.0-3-amd64 #1 SMP
+>>> PREEMPT_DYNAMIC Debian 6.4.11-1) but it doesn't seem to make much
+>>> difference. I can trigger the same issue again, and get similar kernel error
+>>> as before:
+>>>
+>> From the line above it's not clear which kernel version is used. Best test with a
+>> self-compiled mainline kernel.
+>>
+>> Please test also with the different ASPM L1 states disabled, you can use the sysfs
+>> attributes under /sys/class/net/enp3s0/device/link/ for this.
+> 
+> My BIOS doesn't seem to allow ASPM even though the BIOS option is set to
+> "Auto" insteadof "Disabled".
+> 
+Good to know, in this the NIC doesn't trigger transitions to ASPM states.
+Having said that your issue doesn't seem to be ASPM-related.
 
+> ~ $ dmesg | grep -i aspm
+> [    0.118432] ACPI FADT declares the system doesn't support PCIe ASPM, so disable it
+> [    0.199782] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI HPX-Type3]
+> [    0.201735] acpi PNP0A08:00: FADT indicates ASPM is unsupported, using BIOS configuration
+> [    0.750649] r8169 0000:03:00.0: can't disable ASPM; OS doesn't have ASPM control
+> [    0.771525] r8169 0000:04:00.0: can't disable ASPM; OS doesn't have ASPM control
+> [    0.791797] r8169 0000:08:00.0: can't disable ASPM; OS doesn't have ASPM control
+> [    0.807683] r8169 0000:09:00.0: can't disable ASPM; OS doesn't have ASPM control
+> 
+> I cannot see any ASPM files in /sys/class/net/enp*s*/device .
+> 
+> -r--r--r-- 1 root root 4096 aug 24 10:31 iflink
+> -r--r--r-- 1 root root 4096 aug 24 10:32 link_mode
+> -rw-r--r-- 1 root root 4096 aug 24 10:32 mtu
+> -r--r--r-- 1 root root 4096 aug 24 10:31 name_assign_type
+> 
+>>
+>> Best bisect between last known good kernel and latest 6.4 version.
+>>
 
-Right, I've spent some time thinking about it, and this could be done.
-This is a draft I have. Is it what you had in mind?
-
---
-
-diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
-index 5e3419eb267a..e39743f4ce5e 100644
---- a/include/linux/bpf-cgroup.h
-+++ b/include/linux/bpf-cgroup.h
-@@ -378,7 +378,7 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
- ({									       \
- 	int __ret = 0;							       \
- 	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))			       \
--		get_user(__ret, optlen);				       \
-+		copy_from_sockptr(&__ret, optlen, sizeof(int));		       \
- 	__ret;								       \
- })
- 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 2a0324275347..24ea1719fd02 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1855,6 +1855,8 @@ int sock_setsockopt(struct socket *sock, int level, int op,
- 		    sockptr_t optval, unsigned int optlen);
- int do_sock_setsockopt(struct socket *sock, bool compat, int level,
- 		       int optname, sockptr_t optval, int optlen);
-+int do_sock_getsockopt(struct socket *sock, bool compat, int level,
-+		       int optname, sockptr_t optval, sockptr_t optlen);
- 
- int sk_getsockopt(struct sock *sk, int level, int optname,
- 		  sockptr_t optval, sockptr_t optlen);
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9370fd50aa2c..2a5f30f14f5c 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1997,14 +1997,6 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 	return 0;
- }
- 
--int sock_getsockopt(struct socket *sock, int level, int optname,
--		    char __user *optval, int __user *optlen)
--{
--	return sk_getsockopt(sock->sk, level, optname,
--			     USER_SOCKPTR(optval),
--			     USER_SOCKPTR(optlen));
--}
--
- /*
-  * Initialize an sk_lock.
-  *
-diff --git a/net/socket.c b/net/socket.c
-index b5e4398a6b4d..f0d6b6b1f75e 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -2290,6 +2290,40 @@ SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
- INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
- 							 int optname));
- 
-+int do_sock_getsockopt(struct socket *sock, bool compat, int level,
-+		       int optname, sockptr_t optval, sockptr_t optlen)
-+{
-+	int max_optlen __maybe_unused;
-+	int err;
-+
-+	err = security_socket_getsockopt(sock, level, optname);
-+	if (err)
-+		return err;
-+
-+	if (level == SOL_SOCKET) {
-+		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
-+	} else if (unlikely(!sock->ops->getsockopt)) {
-+		err = -EOPNOTSUPP;
-+	} else {
-+		if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
-+			      "Invalid argument type"))
-+			return -EOPNOTSUPP;
-+
-+		err = sock->ops->getsockopt(sock, level, optname, optval.user,
-+					    optlen.user);
-+	}
-+
-+	if (!compat) {
-+		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
-+		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
-+						     optval, optlen, max_optlen,
-+						     err);
-+	}
-+
-+	return err;
-+}
-+EXPORT_SYMBOL(do_sock_getsockopt);
-+
- /*
-  *	Get a socket option. Because we don't know the option lengths we have
-  *	to pass a user mode parameter for the protocols to sort out.
-@@ -2297,35 +2331,17 @@ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
- int __sys_getsockopt(int fd, int level, int optname, char __user *optval,
- 		int __user *optlen)
- {
--	int max_optlen __maybe_unused;
- 	int err, fput_needed;
-+	bool compat = in_compat_syscall();
- 	struct socket *sock;
- 
- 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
- 	if (!sock)
- 		return err;
- 
--	err = security_socket_getsockopt(sock, level, optname);
--	if (err)
--		goto out_put;
--
--	if (!in_compat_syscall())
--		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
--
--	if (level == SOL_SOCKET)
--		err = sock_getsockopt(sock, level, optname, optval, optlen);
--	else if (unlikely(!sock->ops->getsockopt))
--		err = -EOPNOTSUPP;
--	else
--		err = sock->ops->getsockopt(sock, level, optname, optval,
--					    optlen);
-+	err = do_sock_getsockopt(sock, compat, level, optname,
-+				 USER_SOCKPTR(optval), USER_SOCKPTR(optlen));
- 
--	if (!in_compat_syscall())
--		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
--						     USER_SOCKPTR(optval),
--						     USER_SOCKPTR(optlen),
--						     max_optlen, err);
--out_put:
- 	fput_light(sock->file, fput_needed);
- 	return err;
- }
 
