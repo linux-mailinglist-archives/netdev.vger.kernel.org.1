@@ -1,177 +1,144 @@
-Return-Path: <netdev+bounces-30749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21907788DCD
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 19:25:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7035F788DDE
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 19:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 538731C20DAA
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 17:25:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A27791C20F0B
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 17:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B2418030;
-	Fri, 25 Aug 2023 17:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEE518033;
+	Fri, 25 Aug 2023 17:38:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50642107A8
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 17:25:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E6FC433C8;
-	Fri, 25 Aug 2023 17:25:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692984347;
-	bh=hQjAYMR2LVMdI/EWun0sAdi1d+BSM7TJKY29+NPc9Bo=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=goVhy8INSLR/EKnXvH3yBOjKAZBxY5JuoUhrMWoP/58tltgOkkB7wsDGHaoNdGBz5
-	 2jbSouCRoAbgpPNjl2vXSX1tHyjsYlxKoL6TjSl/7dq44LzAkXS43R3oAeteixvGgD
-	 FMjaoT/afAYGQJ6ryEkVUo9MvNJAYAASTdk2skKVgtSCTLsEgClxjjUmAZ4CpHMSGu
-	 q/ewriYx9zAFEL9P2oe08zqtOkrpql8f1heIyxJXpr5HC+DXJJ4f2YygXLlcEsw3ED
-	 b0VWZs/nLD+IWRJ7UsBTgQaw2Ao30BPtIHt+Pv/JNkfMTQjUqhjZTadcmXcqPFp+6w
-	 YLEwkBZknxd9w==
-Message-ID: <2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
-Date: Fri, 25 Aug 2023 19:25:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1AB11720
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 17:38:34 +0000 (UTC)
+Received: from nbd.name (nbd.name [46.4.11.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFE3A2127
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 10:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=SE41FhtO0HqL1h4OkVbcGXUmViDcQMDrybnQEXfR0rs=; b=dTIxGI2E8uTCtlWcsWzuTAKHrQ
+	aRmpp1YUu+ubFrNS+zSQPCaZgUvBswmY0vgNmjs8fKrZLkq3NlHf6uuIjC5YUasONpmkSg1605A0v
+	kowJGBSz7hkfsFOfjU9F8rmChXsd0qkynlbAXeniTQmNjoByxjpgtamJMW4Agvq1wp9Q=;
+Received: from p4ff13705.dip0.t-ipconnect.de ([79.241.55.5] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <nbd@nbd.name>)
+	id 1qZalH-00D4CK-3l; Fri, 25 Aug 2023 19:38:19 +0200
+Message-ID: <a4ee2e37-6b2f-4cab-aab8-b9c46a7c1334@nbd.name>
+Date: Fri, 25 Aug 2023 19:38:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: hawk@kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, Ratheesh Kannoth <rkannoth@marvell.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Geetha sowjanya <gakula@marvell.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham
- <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
- hariprasad <hkelam@marvell.com>,
- Qingfang DENG <qingfang.deng@siflower.com.cn>
-Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: Use hrtimer for TX coalescing
 Content-Language: en-US
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-References: <20230823094757.gxvCEOBi@linutronix.de>
- <d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
- <923d74d4-3d43-8cac-9732-c55103f6dafb@intel.com>
- <044c90b6-4e38-9ae9-a462-def21649183d@kernel.org>
- <ce5627eb-5cae-7b9a-fed3-dc1ee725464a@intel.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <ce5627eb-5cae-7b9a-fed3-dc1ee725464a@intel.com>
+To: Vincent Whitchurch <Vincent.Whitchurch@axis.com>,
+ "kuba@kernel.org" <kuba@kernel.org>,
+ "joabreu@synopsys.com" <joabreu@synopsys.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "peppe.cavallaro@st.com" <peppe.cavallaro@st.com>,
+ "alexandre.torgue@st.com" <alexandre.torgue@st.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ kernel <kernel@axis.com>
+References: <20201120150208.6838-1-vincent.whitchurch@axis.com>
+ <732f3c01-a36f-4c9b-8273-a55aba9094d8@nbd.name>
+ <2e1db3c654b4e76c7249e90ecf8fa9d64046cbb8.camel@axis.com>
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <2e1db3c654b4e76c7249e90ecf8fa9d64046cbb8.camel@axis.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-
-On 25/08/2023 15.38, Alexander Lobakin wrote:
-> From: Jesper Dangaard Brouer <hawk@kernel.org>
-> Date: Fri, 25 Aug 2023 15:22:05 +0200
+On 25.08.23 15:42, Vincent Whitchurch wrote:
+> On Wed, 2023-08-23 at 22:18 +0200, Felix Fietkau wrote:
+>> Based on tests by OpenWrt users, it seems that this one is causing a 
+>> significant performance regression caused by wasting lots of CPU cycles 
+>> re-arming the hrtimer on every single packet. More info:
+>> https://github.com/openwrt/openwrt/issues/11676#issuecomment-1690492666
 > 
->>
->>
->> On 24/08/2023 17.26, Alexander Lobakin wrote:
->>> From: Jesper Dangaard Brouer<hawk@kernel.org>
->>> Date: Wed, 23 Aug 2023 21:45:04 +0200
->>>
->>>> (Cc Olek as he have changes in this code path)
->>> Thanks! I was reading the thread a bit on LKML, but being in the CC list
->>> is more convenient :D
->>>
->>
->> :D
->>
->>>> On 23/08/2023 11.47, Sebastian Andrzej Siewior wrote:
->>>>> Hi,
->>>>>
->>>>> I've been looking at the page_pool locking.
->>>>>
->>>>> page_pool_alloc_frag() -> page_pool_alloc_pages() ->
->>>>> __page_pool_get_cached():
->>>>>
->>>>> There core of the allocation is:
->>>>> |         /* Caller MUST guarantee safe non-concurrent access, e.g.
->>>>> softirq */
->>>>> |         if (likely(pool->alloc.count)) {
->>>>> |                 /* Fast-path */
->>>>> |                 page = pool->alloc.cache[--pool->alloc.count];
->>>>>
->>>>> The access to the `cache' array and the `count' variable is not locked.
->>>>> This is fine as long as there only one consumer per pool. In my
->>>>> understanding the intention is to have one page_pool per NAPI callback
->>>>> to ensure this.
->>>>>
->>>> Yes, the intention is a single PP instance is "bound" to one RX-NAPI.
->>>
->>> Isn't that also a misuse of page_pool->p.napi? I thought it can be set
->>> only when page allocation and cache refill happen both inside the same
->>> NAPI polling function. Otx2 uses workqueues to refill the queues,
->>> meaning that consumer and producer can happen in different contexts or
->>> even threads and it shouldn't set p.napi.
->>>
->>
->> As Jakub wrote this otx2 driver doesn't set p.napi (so that part of the
->> problem cannot happen).
+> It looks like there was an attempt to avoid the re-arming of the timer
+> in ->xmit() a while ago (pre-dating the hrtimer usage) in commit
+> 4ae0169fd1b3c792b66be58995b7e6b629919ecf ("net: stmmac: Do not keep
+> rearming the coalesce timer in stmmac_xmit"), but that got reverted
+> later due to regressions.  The coalescing code has been reworked since
+> then but the removal of the re-arming was never attempted again.
 > 
-> Oh I'm dumb :z
+>> My suggestion for fixing this properly would be:
+>> - keep a separate timestamp for last tx packet
+>> - do not modify the timer if it's scheduled already
+>> - in the timer function, check the last tx timestamp and re-arm the 
+>> timer if necessary.
 > 
->>
->> That said using workqueues to refill the queues is not compatible with
->> using page_pool_alloc APIs.  This need to be fixed in driver!
+> Would you mind explain the reasons for maintaining a timestamp and
+> checking it in the expiry function?  Is that to obtain the same effect
+> as the driver's current behaviour of postponing the expiry of the timer
+> for each packet? 
+
+Exactly. I did something very similar in mac80211 in the past, when 
+expensive mod_timer calls were showing up in my perf measurements.
+Functionally it should be the same, it just avoids excessive re-sorting 
+in timer data structures.
+
+> Is that really desired?  According to the commit
+> message in 4ae0169fd1b3c792b66be58995b7e6b629919ecf, "Once the timer is
+> armed it should run after the time expires for the first packet sent and
+> not the last one."
 > 
-> Hmmm I'm wondering now, how should we use Page Pool if we want to run
-> consume and alloc routines separately? Do you want to say we can't use
-> Page Pool in that case at all? Quoting other your reply:
-> 
->> This WQ process is not allowed to use the page_pool_alloc() API this
->> way (from a work-queue).  The PP alloc-side API must only be used
->> under NAPI protection.
-> 
-> Who did say that? If I don't set p.napi, how is Page Pool then tied to NAPI?
+> Since the timer expiry function schedules napi, and the napi poll
+> function stmmac_tx_clean() re-arms the timer if it sees that there are
+> pending tx packets, shouldn't an implementation similar to hip04_eth.c
+> (which doesn't save/check the last tx timestamp) be sufficient?
 
-*I* say that (as the PP inventor) as that was the design and intent,
-that this is tied to a NAPI instance and rely on the NAPI protection to
-make it safe to do lockless access to this cache array.
+To be honest, I didn't look very closely at what the timer does and how 
+coalescing works. I don't know if delaying the timer processing with 
+every tx is the right choice, or if it should be armed only once. 
+However, as you pointed out, the commit that dropped the re-arming was 
+reverted because of regressions.
 
-> Moreover, when you initially do an ifup/.ndo_open, you have to fill your
-> Rx queues. It's process context and it can happen on whichever CPU.
-> Do you mean I can't allocate pages in .ndo_open? :D
+My suggestions are intended to preserve the existing behavior as much as 
+possible (in order to avoid regressions), while also achieving the 
+benefit of significantly reducing CPU cycles wasted by re-arming the timer.
 
-True, that all driver basically allocate from this *before* the RX-ring 
-/ NAPI is activated.  That is safe and "allowed" given the driver 
-RX-ring is not active yet.  This use-case unfortunately also make it 
-harder to add something to the PP API, that detect miss-usage of the API.
-
-Looking again at the driver otx2_txrx.c NAPI code path also calls PP 
-directly in otx2_napi_handler() will call refill_pool_ptrs() -> 
-otx2_refill_pool_ptrs() -> otx2_alloc_buffer() -> __otx2_alloc_rbuf() -> 
-if (pool->page_pool) otx2_alloc_pool_buf() -> page_pool_alloc_frag().
-
-The function otx2_alloc_buffer() can also choose to start a WQ, that 
-also called PP alloc API this time via otx2_alloc_rbuf() that have 
-BH-disable.  Like Sebastian, I don't think this is safe!
-
---Jesper
-
-This can be a workaround fix:
-
-$ git diff
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c 
-b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index dce3cea00032..ab7ca146fddf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -578,6 +578,10 @@ int otx2_alloc_buffer(struct otx2_nic *pfvf, struct 
-otx2_cq_queue *cq,
-                 struct refill_work *work;
-                 struct delayed_work *dwork;
-
-+               /* page_pool alloc API cannot be used from WQ */
-+               if (cq->rbpool->page_pool)
-+                       return -ENOMEM;
-+
-                 work = &pfvf->refill_wrk[cq->cq_idx];
-                 dwork = &work->pool_refill_work;
-                 /* Schedule a task if no other task is running */
+- Felix
 
