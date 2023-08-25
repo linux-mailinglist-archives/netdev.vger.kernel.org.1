@@ -1,77 +1,58 @@
-Return-Path: <netdev+bounces-30623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5387883F4
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:40:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A3EC78841E
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C11F1C20F8F
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B522816EF
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854D8C8DF;
-	Fri, 25 Aug 2023 09:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6947C8EB;
+	Fri, 25 Aug 2023 09:57:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E024C8D1
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:40:48 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A515F1FD5;
-	Fri, 25 Aug 2023 02:40:46 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RXFJ117srzVkb3;
-	Fri, 25 Aug 2023 17:38:25 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 25 Aug
- 2023 17:40:43 +0800
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Alexander Duyck <alexander.duyck@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>
-CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Mina Almasry
-	<almasrymina@google.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>
-References: <20230816100113.41034-1-linyunsheng@huawei.com>
- <20230816100113.41034-2-linyunsheng@huawei.com>
- <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
- <20230817091554.31bb3600@kernel.org>
- <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
- <20230817165744.73d61fb6@kernel.org>
- <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
- <20230818145145.4b357c89@kernel.org>
- <1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
- <20230821113543.536b7375@kernel.org>
- <5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
- <20230822083821.58d5d26c@kernel.org>
- <79a49ccd-b0c0-0b99-4b4d-c4a416d7e327@huawei.com>
- <20230823072552.044d13b3@kernel.org>
- <CAKgT0UeSOBbXohq1rZ3YsB4abB_-5ktkLtYbDKTah8dvaojruA@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <5aae00a4-42c0-df8b-30cb-d47c91cf1095@huawei.com>
-Date: Fri, 25 Aug 2023 17:40:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3A4C8C4
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:57:17 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E9A1FD3;
+	Fri, 25 Aug 2023 02:57:16 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RXFdM6g8TztSKq;
+	Fri, 25 Aug 2023 17:53:27 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 25 Aug 2023 17:57:13 +0800
+Message-ID: <ebe4eca2-9f7d-d084-7d31-114605bf1078@huawei.com>
+Date: Fri, 25 Aug 2023 17:57:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UeSOBbXohq1rZ3YsB4abB_-5ktkLtYbDKTah8dvaojruA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net-next,v2] selftests: bonding: create directly devices
+ in the target namespaces
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<shuah@kernel.org>, <j.vosburgh@gmail.com>, <andy@greyhouse.net>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20230824135715.1131084-1-shaozhengchao@huawei.com>
+ <ZOgTxefEAVNPkZ23@Laptop-X1>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ZOgTxefEAVNPkZ23@Laptop-X1>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
 	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
@@ -79,53 +60,52 @@ X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/24 2:00, Alexander Duyck wrote:
-> On Wed, Aug 23, 2023 at 7:25 AM Jakub Kicinski <kuba@kernel.org> wrote:
+
+
+On 2023/8/25 10:36, Hangbin Liu wrote:
+> On Thu, Aug 24, 2023 at 09:57:15PM +0800, Zhengchao Shao wrote:
+>> If failed to set link1_1 to netns client, we should delete link1_1 in the
+>> cleanup path. But if set link1_1 to netns client successfully, delete
+>> link1_1 will report warning. So it will be safer creating directly the
+>> devices in the target namespaces.
 >>
->> On Wed, 23 Aug 2023 11:03:31 +0800 Yunsheng Lin wrote:
->>> On 2023/8/22 23:38, Jakub Kicinski wrote:
->>>> On Tue, 22 Aug 2023 17:21:35 +0800 Yunsheng Lin wrote:
->>>>> As the CONFIG_PHYS_ADDR_T_64BIT seems to used widely in x86/arm/mips/powerpc,
->>>>> I am not sure if we can really make the above assumption.
->>>>>
->>>>> https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT
->>>>
->>>> Huh, it's actually used a lot less than I anticipated!
->>>>
->>>> None of the x86/arm/mips/powerpc systems matter IMHO - the only _real_
->>>
->>> Is there any particular reason that you think that the above systems does
->>> not really matter?
+>> Reported-by: Hangbin Liu <liuhangbin@gmail.com>
+>> Closes: https://lore.kernel.org/all/ZNyJx1HtXaUzOkNA@Laptop-X1/
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> ---
+>> v2: create directly devices in the target namespaces
+>> ---
+>>   .../drivers/net/bonding/bond-arp-interval-causes-panic.sh | 8 +++-----
+>>   1 file changed, 3 insertions(+), 5 deletions(-)
 >>
->> Not the systems themselves but the combination of a 32b arch with
->> an address space >16TB. All those arches have 64b equivalent, seems
->> logical to use the 64b version for a system with a large address space.
->> If we're talking about a system which ends up running Linux.
->>
->>> As we have made a similar wrong assumption about those arches before, I am
->>> really trying to be more cautious about it.
->>>
->>> I searched through the web, some seems to be claiming that "32-bits is DEAD",
->>> I am not sure if there is some common agreement among the kernel community,
->>> is there any previous discussion about that?
->>
->> My suspicion/claim is that 32 + PAGE_SHIFT should be enough bits for
->> any 32b platform.
+>> diff --git a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
+>> index 7b2d421f09cf..fe7c34f89fc7 100755
+>> --- a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
+>> +++ b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
+>> @@ -22,14 +22,12 @@ server_ip4=192.168.1.254
+>>   echo 180 >/proc/sys/kernel/panic
+>>   
+>>   # build namespaces
+>> -ip link add dev link1_1 type veth peer name link1_2
+>> -
+>>   ip netns add "server"
+>> -ip link set dev link1_2 netns server up name eth0
+>> +ip netns add "client"
+>> +ip link add dev eth0 netns client type veth peer name eth0 netns server
 > 
-> One additional thing we could consider would be to simply look at
-> having page_pool enforce a DMA mask for the device to address any
-> cases where we might not be able to fit the address. Then in the
-> unlikely event that somebody is running a 32b system with over 16
-> terabytes of RAM. With that the DMA subsystem would handle it for us
-> and we wouldn't have to worry so much about it.
-
-It seems there is a API to acquire the DMA mask used by the device:
-https://elixir.free-electrons.com/linux/v6.4-rc6/source/include/linux/dma-mapping.h#L434
-
-Is it possible to use that to check if DMA mask used by the device is
-within 32 + PAGE_SHIFT limit, if yes, we use jakub's proposal to reduce
-reduce the dma address bit, if no, we fail the page_pool creation?
-
-> .
+> When we already have an eth0 interface on init net, this cmd will failed
 > 
+> # ip link add dev eth0 netns client type veth peer name eth0 netns server
+> RTNETLINK answers: File exists
+> 
+> You should create the eth0 in the namespace, e.g.
+> 
+> # ip -n client link add eth0 type veth peer name eth0 netns server
+> 
+> Thanks
+> Hangbin
+Hi Hangbin:
+	Thank you for your testing. I will modify in v3
+
+Zhengchao Shao
 
