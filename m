@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-30593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD91F7882B3
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:55:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47967882B6
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61BF8280209
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:55:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D1EA28122A
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B28C8E9;
-	Fri, 25 Aug 2023 08:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F32CA47;
+	Fri, 25 Aug 2023 08:53:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4B6C8E5
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:40 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42401FD4
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:35 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fee87dd251so6099995e9.2
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D888CA46
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:43 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DF11BF6
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:37 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso9299711fa.2
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953614; x=1693558414;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953616; x=1693558416;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mnNJFNWZ8/vEsZe24suIaLj8rywmyeemTqxOS9bHcok=;
-        b=DA2F5jJqR2eCerBvkjHoEuHcPsq9L8SlMdYEdAxQa6dySeVlyvrPkQoNPO8zSRe6a+
-         gpwLzO4ZZu6oItl7h62NKR9A/ze7JL3Hivh3hT3cxYbijk3pR3bQ+zKQXg5exdVZKNOn
-         P2e/vHKlC1SMMzPPVIiawJXnF3jf7OCqHGZ6p3qLOu0H+QIv4neb6hMHqMVDNkdKEdvn
-         4QGDTKmSIR1zKz+7WD+URzKJ3JMYBF26pR3Ryg9bqPYEawtJqOJuiFG7eR72OxiGe8o6
-         +KBbREt42HPalkntEE9WjDpwmcF0d1WBs6Gbdh3OaYKcz5VfZU86PCz4f/QGkpfgHxLE
-         huuw==
+        bh=htaVSQJ2mMrnuk+sYXoJ+JsRPKyFeaeZOyc0F+ay3u0=;
+        b=PPzTHuT8AUbfcA7vY7yQfvqmI3vDrDmmZ7Hkxq7Gf+y56F8EToZzma6OFmMQ81WiOA
+         tjuZ561X9tn8o2cu6JL+SML5xhuzEKHBUZ/IXQRl5MLyq+whDkO+J8kts0NPJFnsEaWM
+         TdMW6+ICPokt39i8zaoFc3jmUvf1ryqrnP+tTT4Tw37t2uF9Cz7bwxUrMEhXMcr9LOui
+         43IodvVD7sxpfcVPam5RGhG1JD1cJUw7B7uBm4i20hhAqu5K03Mkr+nflrVuPQat27No
+         thaZixXFnnxxU75RDLEPm6Ke1tZB0aghVWdFPYQhhKFR7CbGaES7Vodl4ey9zvrX5Soh
+         nEsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692953614; x=1693558414;
+        d=1e100.net; s=20221208; t=1692953616; x=1693558416;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mnNJFNWZ8/vEsZe24suIaLj8rywmyeemTqxOS9bHcok=;
-        b=jKRV9yXcFuC2s8FftiAPmt1at2AnVHmWVN+nkzfo8AXRGKbv267twbkyPtcs4f8iVq
-         94kspWmnFj69dff/h2zHxZwwLKlWW7hLlsAptI9kimn1UQxG3Dy5OpD+5rUFRI5t4DfM
-         V6j3OCTGN8DBJYp9h6jnFJCO1Kd4SeZ6dtXv8PYI98Z1dV8JCXzd225/3LOvHtonsRen
-         2T/t2XjOeqo5JONbKttoyx6ETfIfwLKEox4KLdEVTMk+2YaJMGYWZapaprkMR4iPWjuw
-         0zjkdjVu4l6HJBEiCVZb4xVxzZF1+ZHVDUFT2QTOyGvntDnkhSu53IKFZY8AxTddMsLV
-         I1Tw==
-X-Gm-Message-State: AOJu0YyXzAotTR+Dvl9rlDL1F3Nzs3S3i/zZ3VwT4cZ/M+hIdxxHf6F4
-	jTl4rufd9IHPdhdOEP6Vi5aXtJVFNK+t5Gi33AtYyk6I
-X-Google-Smtp-Source: AGHT+IHJ5wuj9fCZwcBilEWf4K4gF4tda4+USfPQRk5fsP5P7HLlZsHN3W8ojIf9qnc1tDVAz2Eieg==
-X-Received: by 2002:a7b:c3c2:0:b0:3fe:df1:5b95 with SMTP id t2-20020a7bc3c2000000b003fe0df15b95mr14116619wmj.19.1692953614220;
-        Fri, 25 Aug 2023 01:53:34 -0700 (PDT)
+        bh=htaVSQJ2mMrnuk+sYXoJ+JsRPKyFeaeZOyc0F+ay3u0=;
+        b=fSxinTwL35EwoBVlTxoll88gcLR9nLqNrf1q8ho/mN/Y+zkzcCLDWOqpo6isH7l3bY
+         rDfIQcvGagrC2BR6I44lv+96M2PpCDVoSbdzAljy+IHccHqo17JVxi3wVHZEaQU2+roL
+         WEyFCB9BqjdzClUSDQS/qeV6ONuQSvgW/Oo/8MX587YnxLZ5/kgeJK72wkLMcqcmBNSw
+         4wjea0YqF10KjBbRg0Bf3p/DYEgxx5dcsYTd0maw+QSDGPK5RFgP3jb6NFsl7+juusEs
+         TDib6PQExS8+97Zx8anJ4FGNyp6bsxAAS7xpLYzTYq9BHBM27lNLASXZHcwgR8ItgduQ
+         bupg==
+X-Gm-Message-State: AOJu0Yyt9G33asoCjH7nNcQ1zwHS2yZ8SWGJ7KPKarLw9yqdVY5h/K0j
+	4wewvwwwidsVJ3UgJbDCtPu1fkRTHQHypvvGe5G9DfH9
+X-Google-Smtp-Source: AGHT+IF2XnWfs6dYrWwAZdHFiaN7WfQd70X7rBkbC5xD1/sS3Yz62/Z43PWVFtoLdzrH4ZcPxueF8w==
+X-Received: by 2002:a2e:934b:0:b0:2b7:117:e54 with SMTP id m11-20020a2e934b000000b002b701170e54mr13322044ljh.4.1692953615943;
+        Fri, 25 Aug 2023 01:53:35 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id u2-20020a05600c00c200b003fe17901fcdsm4764916wmm.32.2023.08.25.01.53.33
+        by smtp.gmail.com with ESMTPSA id a16-20020a5d5090000000b0031432f1528csm1592759wrt.45.2023.08.25.01.53.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 01:53:33 -0700 (PDT)
+        Fri, 25 Aug 2023 01:53:35 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -63,9 +63,9 @@ Cc: kuba@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	moshe@nvidia.com
-Subject: [patch net-next 06/15] devlink: push resource related code into separate file
-Date: Fri, 25 Aug 2023 10:53:12 +0200
-Message-ID: <20230825085321.178134-7-jiri@resnulli.us>
+Subject: [patch net-next 07/15] devlink: push param related code into separate file
+Date: Fri, 25 Aug 2023 10:53:13 +0200
+Message-ID: <20230825085321.178134-8-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230825085321.178134-1-jiri@resnulli.us>
 References: <20230825085321.178134-1-jiri@resnulli.us>
@@ -84,646 +84,938 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Cut out another chunk from leftover.c and put resource related code
+Cut out another chunk from leftover.c and put param related code
 into a separate file.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
  net/devlink/Makefile        |   2 +-
- net/devlink/devl_internal.h |   2 +
- net/devlink/leftover.c      | 574 -----------------------------------
- net/devlink/resource.c      | 579 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 582 insertions(+), 575 deletions(-)
- create mode 100644 net/devlink/resource.c
+ net/devlink/devl_internal.h |   9 +
+ net/devlink/leftover.c      | 859 -----------------------------------
+ net/devlink/param.c         | 865 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 875 insertions(+), 860 deletions(-)
+ create mode 100644 net/devlink/param.c
 
 diff --git a/net/devlink/Makefile b/net/devlink/Makefile
-index 122de1d565d2..8864cd933acb 100644
+index 8864cd933acb..c4b29f603a1f 100644
 --- a/net/devlink/Makefile
 +++ b/net/devlink/Makefile
 @@ -1,4 +1,4 @@
  # SPDX-License-Identifier: GPL-2.0
  
  obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
--	 health.o
-+	 resource.o health.o
+-	 resource.o health.o
++	 resource.o param.o health.o
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 72653e1dae80..e5c0acf7a758 100644
+index e5c0acf7a758..e0304d607978 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -238,6 +238,8 @@ int devlink_nl_cmd_dpipe_headers_get(struct sk_buff *skb,
- 				     struct genl_info *info);
- int devlink_nl_cmd_dpipe_table_counters_set(struct sk_buff *skb,
+@@ -156,6 +156,8 @@ int devlink_nl_msg_reply_and_new(struct sk_buff **msg, struct genl_info *info);
+ void devlink_notify(struct devlink *devlink, enum devlink_command cmd);
+ void devlink_ports_notify_register(struct devlink *devlink);
+ void devlink_ports_notify_unregister(struct devlink *devlink);
++void devlink_params_notify_register(struct devlink *devlink);
++void devlink_params_notify_unregister(struct devlink *devlink);
+ 
+ /* Ports */
+ #define ASSERT_DEVLINK_PORT_INITIALIZED(devlink_port)				\
+@@ -240,6 +242,13 @@ int devlink_nl_cmd_dpipe_table_counters_set(struct sk_buff *skb,
  					    struct genl_info *info);
-+int devlink_nl_cmd_resource_set(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_resource_dump(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_resource_set(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_resource_dump(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_cmd_param_set_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_cmd_port_param_get_dumpit(struct sk_buff *msg,
++					 struct netlink_callback *cb);
++int devlink_nl_cmd_port_param_get_doit(struct sk_buff *skb,
++				       struct genl_info *info);
++int devlink_nl_cmd_port_param_set_doit(struct sk_buff *skb,
++				       struct genl_info *info);
  int devlink_nl_cmd_health_reporter_set_doit(struct sk_buff *skb,
  					    struct genl_info *info);
  int devlink_nl_cmd_health_reporter_recover_doit(struct sk_buff *skb,
 diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index f71201e6b5e1..1c65449f2252 100644
+index 1c65449f2252..2f1dfd27d1c8 100644
 --- a/net/devlink/leftover.c
 +++ b/net/devlink/leftover.c
-@@ -33,35 +33,6 @@
- 
- #include "devl_internal.h"
- 
--/**
-- * struct devlink_resource - devlink resource
-- * @name: name of the resource
-- * @id: id, per devlink instance
-- * @size: size of the resource
-- * @size_new: updated size of the resource, reload is needed
-- * @size_valid: valid in case the total size of the resource is valid
-- *              including its children
-- * @parent: parent resource
-- * @size_params: size parameters
-- * @list: parent list
-- * @resource_list: list of child resources
-- * @occ_get: occupancy getter callback
-- * @occ_get_priv: occupancy getter callback priv
-- */
--struct devlink_resource {
--	const char *name;
--	u64 id;
--	u64 size;
--	u64 size_new;
--	bool size_valid;
--	struct devlink_resource *parent;
--	struct devlink_resource_size_params size_params;
--	struct list_head list;
--	struct list_head resource_list;
--	devlink_resource_occ_get_t *occ_get;
--	void *occ_get_priv;
--};
--
- EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwmsg);
- EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwerr);
- EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_trap_report);
-@@ -1090,290 +1061,6 @@ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
+@@ -1061,611 +1061,6 @@ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
  	return 0;
  }
  
--static struct devlink_resource *
--devlink_resource_find(struct devlink *devlink,
--		      struct devlink_resource *resource, u64 resource_id)
+-static const struct devlink_param devlink_param_generic[] = {
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_INT_ERR_RESET,
+-		.name = DEVLINK_PARAM_GENERIC_INT_ERR_RESET_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_INT_ERR_RESET_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_MAX_MACS,
+-		.name = DEVLINK_PARAM_GENERIC_MAX_MACS_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_MAX_MACS_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_SRIOV,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_SRIOV_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_SRIOV_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_REGION_SNAPSHOT,
+-		.name = DEVLINK_PARAM_GENERIC_REGION_SNAPSHOT_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_REGION_SNAPSHOT_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_IGNORE_ARI,
+-		.name = DEVLINK_PARAM_GENERIC_IGNORE_ARI_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_IGNORE_ARI_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+-		.name = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MAX_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MAX_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+-		.name = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MIN_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MIN_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_FW_LOAD_POLICY,
+-		.name = DEVLINK_PARAM_GENERIC_FW_LOAD_POLICY_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_FW_LOAD_POLICY_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_RESET_DEV_ON_DRV_PROBE,
+-		.name = DEVLINK_PARAM_GENERIC_RESET_DEV_ON_DRV_PROBE_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_RESET_DEV_ON_DRV_PROBE_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_ROCE,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_ROCE_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_ROCE_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_REMOTE_DEV_RESET,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_REMOTE_DEV_RESET_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_REMOTE_DEV_RESET_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_ETH,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_ETH_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_ETH_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_RDMA,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_RDMA_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_RDMA_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_VNET,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_VNET_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_VNET_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
+-		.name = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_IO_EQ_SIZE,
+-		.name = DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_TYPE,
+-	},
+-	{
+-		.id = DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
+-		.name = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME,
+-		.type = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE,
+-	},
+-};
+-
+-static int devlink_param_generic_verify(const struct devlink_param *param)
 -{
--	struct list_head *resource_list;
+-	/* verify it match generic parameter by id and name */
+-	if (param->id > DEVLINK_PARAM_GENERIC_ID_MAX)
+-		return -EINVAL;
+-	if (strcmp(param->name, devlink_param_generic[param->id].name))
+-		return -ENOENT;
 -
--	if (resource)
--		resource_list = &resource->resource_list;
--	else
--		resource_list = &devlink->resource_list;
+-	WARN_ON(param->type != devlink_param_generic[param->id].type);
 -
--	list_for_each_entry(resource, resource_list, list) {
--		struct devlink_resource *child_resource;
+-	return 0;
+-}
 -
--		if (resource->id == resource_id)
--			return resource;
+-static int devlink_param_driver_verify(const struct devlink_param *param)
+-{
+-	int i;
 -
--		child_resource = devlink_resource_find(devlink, resource,
--						       resource_id);
--		if (child_resource)
--			return child_resource;
+-	if (param->id <= DEVLINK_PARAM_GENERIC_ID_MAX)
+-		return -EINVAL;
+-	/* verify no such name in generic params */
+-	for (i = 0; i <= DEVLINK_PARAM_GENERIC_ID_MAX; i++)
+-		if (!strcmp(param->name, devlink_param_generic[i].name))
+-			return -EEXIST;
+-
+-	return 0;
+-}
+-
+-static struct devlink_param_item *
+-devlink_param_find_by_name(struct xarray *params, const char *param_name)
+-{
+-	struct devlink_param_item *param_item;
+-	unsigned long param_id;
+-
+-	xa_for_each(params, param_id, param_item) {
+-		if (!strcmp(param_item->param->name, param_name))
+-			return param_item;
 -	}
 -	return NULL;
 -}
 -
--static void
--devlink_resource_validate_children(struct devlink_resource *resource)
+-static struct devlink_param_item *
+-devlink_param_find_by_id(struct xarray *params, u32 param_id)
 -{
--	struct devlink_resource *child_resource;
--	bool size_valid = true;
--	u64 parts_size = 0;
+-	return xa_load(params, param_id);
+-}
 -
--	if (list_empty(&resource->resource_list))
--		goto out;
+-static bool
+-devlink_param_cmode_is_supported(const struct devlink_param *param,
+-				 enum devlink_param_cmode cmode)
+-{
+-	return test_bit(cmode, &param->supported_cmodes);
+-}
 -
--	list_for_each_entry(child_resource, &resource->resource_list, list)
--		parts_size += child_resource->size_new;
+-static int devlink_param_get(struct devlink *devlink,
+-			     const struct devlink_param *param,
+-			     struct devlink_param_gset_ctx *ctx)
+-{
+-	if (!param->get)
+-		return -EOPNOTSUPP;
+-	return param->get(devlink, param->id, ctx);
+-}
 -
--	if (parts_size > resource->size_new)
--		size_valid = false;
--out:
--	resource->size_valid = size_valid;
+-static int devlink_param_set(struct devlink *devlink,
+-			     const struct devlink_param *param,
+-			     struct devlink_param_gset_ctx *ctx)
+-{
+-	if (!param->set)
+-		return -EOPNOTSUPP;
+-	return param->set(devlink, param->id, ctx);
 -}
 -
 -static int
--devlink_resource_validate_size(struct devlink_resource *resource, u64 size,
--			       struct netlink_ext_ack *extack)
+-devlink_param_type_to_nla_type(enum devlink_param_type param_type)
 -{
--	u64 reminder;
--	int err = 0;
--
--	if (size > resource->size_params.size_max) {
--		NL_SET_ERR_MSG(extack, "Size larger than maximum");
--		err = -EINVAL;
--	}
--
--	if (size < resource->size_params.size_min) {
--		NL_SET_ERR_MSG(extack, "Size smaller than minimum");
--		err = -EINVAL;
--	}
--
--	div64_u64_rem(size, resource->size_params.size_granularity, &reminder);
--	if (reminder) {
--		NL_SET_ERR_MSG(extack, "Wrong granularity");
--		err = -EINVAL;
--	}
--
--	return err;
--}
--
--static int devlink_nl_cmd_resource_set(struct sk_buff *skb,
--				       struct genl_info *info)
--{
--	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_resource *resource;
--	u64 resource_id;
--	u64 size;
--	int err;
--
--	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_RESOURCE_ID) ||
--	    GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_RESOURCE_SIZE))
+-	switch (param_type) {
+-	case DEVLINK_PARAM_TYPE_U8:
+-		return NLA_U8;
+-	case DEVLINK_PARAM_TYPE_U16:
+-		return NLA_U16;
+-	case DEVLINK_PARAM_TYPE_U32:
+-		return NLA_U32;
+-	case DEVLINK_PARAM_TYPE_STRING:
+-		return NLA_STRING;
+-	case DEVLINK_PARAM_TYPE_BOOL:
+-		return NLA_FLAG;
+-	default:
 -		return -EINVAL;
--	resource_id = nla_get_u64(info->attrs[DEVLINK_ATTR_RESOURCE_ID]);
--
--	resource = devlink_resource_find(devlink, NULL, resource_id);
--	if (!resource)
--		return -EINVAL;
--
--	size = nla_get_u64(info->attrs[DEVLINK_ATTR_RESOURCE_SIZE]);
--	err = devlink_resource_validate_size(resource, size, info->extack);
--	if (err)
--		return err;
--
--	resource->size_new = size;
--	devlink_resource_validate_children(resource);
--	if (resource->parent)
--		devlink_resource_validate_children(resource->parent);
--	return 0;
+-	}
 -}
 -
 -static int
--devlink_resource_size_params_put(struct devlink_resource *resource,
--				 struct sk_buff *skb)
+-devlink_nl_param_value_fill_one(struct sk_buff *msg,
+-				enum devlink_param_type type,
+-				enum devlink_param_cmode cmode,
+-				union devlink_param_value val)
 -{
--	struct devlink_resource_size_params *size_params;
+-	struct nlattr *param_value_attr;
 -
--	size_params = &resource->size_params;
--	if (nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_GRAN,
--			      size_params->size_granularity, DEVLINK_ATTR_PAD) ||
--	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_MAX,
--			      size_params->size_max, DEVLINK_ATTR_PAD) ||
--	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_MIN,
--			      size_params->size_min, DEVLINK_ATTR_PAD) ||
--	    nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_UNIT, size_params->unit))
--		return -EMSGSIZE;
--	return 0;
--}
--
--static int devlink_resource_occ_put(struct devlink_resource *resource,
--				    struct sk_buff *skb)
--{
--	if (!resource->occ_get)
--		return 0;
--	return nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_OCC,
--				 resource->occ_get(resource->occ_get_priv),
--				 DEVLINK_ATTR_PAD);
--}
--
--static int devlink_resource_put(struct devlink *devlink, struct sk_buff *skb,
--				struct devlink_resource *resource)
--{
--	struct devlink_resource *child_resource;
--	struct nlattr *child_resource_attr;
--	struct nlattr *resource_attr;
--
--	resource_attr = nla_nest_start_noflag(skb, DEVLINK_ATTR_RESOURCE);
--	if (!resource_attr)
--		return -EMSGSIZE;
--
--	if (nla_put_string(skb, DEVLINK_ATTR_RESOURCE_NAME, resource->name) ||
--	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE, resource->size,
--			      DEVLINK_ATTR_PAD) ||
--	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_ID, resource->id,
--			      DEVLINK_ATTR_PAD))
--		goto nla_put_failure;
--	if (resource->size != resource->size_new &&
--	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_NEW,
--			      resource->size_new, DEVLINK_ATTR_PAD))
--		goto nla_put_failure;
--	if (devlink_resource_occ_put(resource, skb))
--		goto nla_put_failure;
--	if (devlink_resource_size_params_put(resource, skb))
--		goto nla_put_failure;
--	if (list_empty(&resource->resource_list))
--		goto out;
--
--	if (nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_SIZE_VALID,
--		       resource->size_valid))
+-	param_value_attr = nla_nest_start_noflag(msg,
+-						 DEVLINK_ATTR_PARAM_VALUE);
+-	if (!param_value_attr)
 -		goto nla_put_failure;
 -
--	child_resource_attr = nla_nest_start_noflag(skb,
--						    DEVLINK_ATTR_RESOURCE_LIST);
--	if (!child_resource_attr)
--		goto nla_put_failure;
+-	if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_VALUE_CMODE, cmode))
+-		goto value_nest_cancel;
 -
--	list_for_each_entry(child_resource, &resource->resource_list, list) {
--		if (devlink_resource_put(devlink, skb, child_resource))
--			goto resource_put_failure;
+-	switch (type) {
+-	case DEVLINK_PARAM_TYPE_U8:
+-		if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_VALUE_DATA, val.vu8))
+-			goto value_nest_cancel;
+-		break;
+-	case DEVLINK_PARAM_TYPE_U16:
+-		if (nla_put_u16(msg, DEVLINK_ATTR_PARAM_VALUE_DATA, val.vu16))
+-			goto value_nest_cancel;
+-		break;
+-	case DEVLINK_PARAM_TYPE_U32:
+-		if (nla_put_u32(msg, DEVLINK_ATTR_PARAM_VALUE_DATA, val.vu32))
+-			goto value_nest_cancel;
+-		break;
+-	case DEVLINK_PARAM_TYPE_STRING:
+-		if (nla_put_string(msg, DEVLINK_ATTR_PARAM_VALUE_DATA,
+-				   val.vstr))
+-			goto value_nest_cancel;
+-		break;
+-	case DEVLINK_PARAM_TYPE_BOOL:
+-		if (val.vbool &&
+-		    nla_put_flag(msg, DEVLINK_ATTR_PARAM_VALUE_DATA))
+-			goto value_nest_cancel;
+-		break;
 -	}
 -
--	nla_nest_end(skb, child_resource_attr);
--out:
--	nla_nest_end(skb, resource_attr);
+-	nla_nest_end(msg, param_value_attr);
 -	return 0;
 -
--resource_put_failure:
--	nla_nest_cancel(skb, child_resource_attr);
+-value_nest_cancel:
+-	nla_nest_cancel(msg, param_value_attr);
 -nla_put_failure:
--	nla_nest_cancel(skb, resource_attr);
 -	return -EMSGSIZE;
 -}
 -
--static int devlink_resource_fill(struct genl_info *info,
--				 enum devlink_command cmd, int flags)
+-static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+-				 unsigned int port_index,
+-				 struct devlink_param_item *param_item,
+-				 enum devlink_command cmd,
+-				 u32 portid, u32 seq, int flags)
 -{
--	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_resource *resource;
--	struct nlattr *resources_attr;
--	struct sk_buff *skb = NULL;
--	struct nlmsghdr *nlh;
--	bool incomplete;
+-	union devlink_param_value param_value[DEVLINK_PARAM_CMODE_MAX + 1];
+-	bool param_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
+-	const struct devlink_param *param = param_item->param;
+-	struct devlink_param_gset_ctx ctx;
+-	struct nlattr *param_values_list;
+-	struct nlattr *param_attr;
+-	int nla_type;
 -	void *hdr;
+-	int err;
 -	int i;
+-
+-	/* Get value from driver part to driverinit configuration mode */
+-	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
+-		if (!devlink_param_cmode_is_supported(param, i))
+-			continue;
+-		if (i == DEVLINK_PARAM_CMODE_DRIVERINIT) {
+-			if (param_item->driverinit_value_new_valid)
+-				param_value[i] = param_item->driverinit_value_new;
+-			else if (param_item->driverinit_value_valid)
+-				param_value[i] = param_item->driverinit_value;
+-			else
+-				return -EOPNOTSUPP;
+-		} else {
+-			ctx.cmode = i;
+-			err = devlink_param_get(devlink, param, &ctx);
+-			if (err)
+-				return err;
+-			param_value[i] = ctx.val;
+-		}
+-		param_value_set[i] = true;
+-	}
+-
+-	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+-	if (!hdr)
+-		return -EMSGSIZE;
+-
+-	if (devlink_nl_put_handle(msg, devlink))
+-		goto genlmsg_cancel;
+-
+-	if (cmd == DEVLINK_CMD_PORT_PARAM_GET ||
+-	    cmd == DEVLINK_CMD_PORT_PARAM_NEW ||
+-	    cmd == DEVLINK_CMD_PORT_PARAM_DEL)
+-		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, port_index))
+-			goto genlmsg_cancel;
+-
+-	param_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PARAM);
+-	if (!param_attr)
+-		goto genlmsg_cancel;
+-	if (nla_put_string(msg, DEVLINK_ATTR_PARAM_NAME, param->name))
+-		goto param_nest_cancel;
+-	if (param->generic && nla_put_flag(msg, DEVLINK_ATTR_PARAM_GENERIC))
+-		goto param_nest_cancel;
+-
+-	nla_type = devlink_param_type_to_nla_type(param->type);
+-	if (nla_type < 0)
+-		goto param_nest_cancel;
+-	if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_TYPE, nla_type))
+-		goto param_nest_cancel;
+-
+-	param_values_list = nla_nest_start_noflag(msg,
+-						  DEVLINK_ATTR_PARAM_VALUES_LIST);
+-	if (!param_values_list)
+-		goto param_nest_cancel;
+-
+-	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
+-		if (!param_value_set[i])
+-			continue;
+-		err = devlink_nl_param_value_fill_one(msg, param->type,
+-						      i, param_value[i]);
+-		if (err)
+-			goto values_list_nest_cancel;
+-	}
+-
+-	nla_nest_end(msg, param_values_list);
+-	nla_nest_end(msg, param_attr);
+-	genlmsg_end(msg, hdr);
+-	return 0;
+-
+-values_list_nest_cancel:
+-	nla_nest_end(msg, param_values_list);
+-param_nest_cancel:
+-	nla_nest_cancel(msg, param_attr);
+-genlmsg_cancel:
+-	genlmsg_cancel(msg, hdr);
+-	return -EMSGSIZE;
+-}
+-
+-static void devlink_param_notify(struct devlink *devlink,
+-				 unsigned int port_index,
+-				 struct devlink_param_item *param_item,
+-				 enum devlink_command cmd)
+-{
+-	struct sk_buff *msg;
 -	int err;
 -
--	resource = list_first_entry(&devlink->resource_list,
--				    struct devlink_resource, list);
--start_again:
--	err = devlink_nl_msg_reply_and_new(&skb, info);
--	if (err)
--		return err;
+-	WARN_ON(cmd != DEVLINK_CMD_PARAM_NEW && cmd != DEVLINK_CMD_PARAM_DEL &&
+-		cmd != DEVLINK_CMD_PORT_PARAM_NEW &&
+-		cmd != DEVLINK_CMD_PORT_PARAM_DEL);
 -
--	hdr = genlmsg_put(skb, info->snd_portid, info->snd_seq,
--			  &devlink_nl_family, NLM_F_MULTI, cmd);
--	if (!hdr) {
--		nlmsg_free(skb);
--		return -EMSGSIZE;
+-	/* devlink_notify_register() / devlink_notify_unregister()
+-	 * will replay the notifications if the params are added/removed
+-	 * outside of the lifetime of the instance.
+-	 */
+-	if (!devl_is_registered(devlink))
+-		return;
+-
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+-	if (!msg)
+-		return;
+-	err = devlink_nl_param_fill(msg, devlink, port_index, param_item, cmd,
+-				    0, 0, 0);
+-	if (err) {
+-		nlmsg_free(msg);
+-		return;
 -	}
 -
--	if (devlink_nl_put_handle(skb, devlink))
--		goto nla_put_failure;
+-	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
+-				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+-}
 -
--	resources_attr = nla_nest_start_noflag(skb,
--					       DEVLINK_ATTR_RESOURCE_LIST);
--	if (!resources_attr)
--		goto nla_put_failure;
+-static void devlink_params_notify(struct devlink *devlink,
+-				  enum devlink_command cmd)
+-{
+-	struct devlink_param_item *param_item;
+-	unsigned long param_id;
 -
--	incomplete = false;
--	i = 0;
--	list_for_each_entry_from(resource, &devlink->resource_list, list) {
--		err = devlink_resource_put(devlink, skb, resource);
--		if (err) {
--			if (!i)
--				goto err_resource_put;
--			incomplete = true;
+-	xa_for_each(&devlink->params, param_id, param_item)
+-		devlink_param_notify(devlink, 0, param_item, cmd);
+-}
+-
+-static void devlink_params_notify_register(struct devlink *devlink)
+-{
+-	devlink_params_notify(devlink, DEVLINK_CMD_PARAM_NEW);
+-}
+-
+-static void devlink_params_notify_unregister(struct devlink *devlink)
+-{
+-	devlink_params_notify(devlink, DEVLINK_CMD_PARAM_DEL);
+-}
+-
+-static int devlink_nl_param_get_dump_one(struct sk_buff *msg,
+-					 struct devlink *devlink,
+-					 struct netlink_callback *cb,
+-					 int flags)
+-{
+-	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+-	struct devlink_param_item *param_item;
+-	unsigned long param_id;
+-	int err = 0;
+-
+-	xa_for_each_start(&devlink->params, param_id, param_item, state->idx) {
+-		err = devlink_nl_param_fill(msg, devlink, 0, param_item,
+-					    DEVLINK_CMD_PARAM_GET,
+-					    NETLINK_CB(cb->skb).portid,
+-					    cb->nlh->nlmsg_seq, flags);
+-		if (err == -EOPNOTSUPP) {
+-			err = 0;
+-		} else if (err) {
+-			state->idx = param_id;
 -			break;
 -		}
--		i++;
 -	}
--	nla_nest_end(skb, resources_attr);
--	genlmsg_end(skb, hdr);
--	if (incomplete)
--		goto start_again;
--send_done:
--	nlh = nlmsg_put(skb, info->snd_portid, info->snd_seq,
--			NLMSG_DONE, 0, flags | NLM_F_MULTI);
--	if (!nlh) {
--		err = devlink_nl_msg_reply_and_new(&skb, info);
--		if (err)
--			return err;
--		goto send_done;
--	}
--	return genlmsg_reply(skb, info);
 -
--nla_put_failure:
--	err = -EMSGSIZE;
--err_resource_put:
--	nlmsg_free(skb);
 -	return err;
 -}
 -
--static int devlink_nl_cmd_resource_dump(struct sk_buff *skb,
--					struct genl_info *info)
+-int devlink_nl_param_get_dumpit(struct sk_buff *skb,
+-				struct netlink_callback *cb)
+-{
+-	return devlink_nl_dumpit(skb, cb, devlink_nl_param_get_dump_one);
+-}
+-
+-static int
+-devlink_param_type_get_from_info(struct genl_info *info,
+-				 enum devlink_param_type *param_type)
+-{
+-	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_TYPE))
+-		return -EINVAL;
+-
+-	switch (nla_get_u8(info->attrs[DEVLINK_ATTR_PARAM_TYPE])) {
+-	case NLA_U8:
+-		*param_type = DEVLINK_PARAM_TYPE_U8;
+-		break;
+-	case NLA_U16:
+-		*param_type = DEVLINK_PARAM_TYPE_U16;
+-		break;
+-	case NLA_U32:
+-		*param_type = DEVLINK_PARAM_TYPE_U32;
+-		break;
+-	case NLA_STRING:
+-		*param_type = DEVLINK_PARAM_TYPE_STRING;
+-		break;
+-	case NLA_FLAG:
+-		*param_type = DEVLINK_PARAM_TYPE_BOOL;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-
+-static int
+-devlink_param_value_get_from_info(const struct devlink_param *param,
+-				  struct genl_info *info,
+-				  union devlink_param_value *value)
+-{
+-	struct nlattr *param_data;
+-	int len;
+-
+-	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
+-
+-	if (param->type != DEVLINK_PARAM_TYPE_BOOL && !param_data)
+-		return -EINVAL;
+-
+-	switch (param->type) {
+-	case DEVLINK_PARAM_TYPE_U8:
+-		if (nla_len(param_data) != sizeof(u8))
+-			return -EINVAL;
+-		value->vu8 = nla_get_u8(param_data);
+-		break;
+-	case DEVLINK_PARAM_TYPE_U16:
+-		if (nla_len(param_data) != sizeof(u16))
+-			return -EINVAL;
+-		value->vu16 = nla_get_u16(param_data);
+-		break;
+-	case DEVLINK_PARAM_TYPE_U32:
+-		if (nla_len(param_data) != sizeof(u32))
+-			return -EINVAL;
+-		value->vu32 = nla_get_u32(param_data);
+-		break;
+-	case DEVLINK_PARAM_TYPE_STRING:
+-		len = strnlen(nla_data(param_data), nla_len(param_data));
+-		if (len == nla_len(param_data) ||
+-		    len >= __DEVLINK_PARAM_MAX_STRING_VALUE)
+-			return -EINVAL;
+-		strcpy(value->vstr, nla_data(param_data));
+-		break;
+-	case DEVLINK_PARAM_TYPE_BOOL:
+-		if (param_data && nla_len(param_data))
+-			return -EINVAL;
+-		value->vbool = nla_get_flag(param_data);
+-		break;
+-	}
+-	return 0;
+-}
+-
+-static struct devlink_param_item *
+-devlink_param_get_from_info(struct xarray *params, struct genl_info *info)
+-{
+-	char *param_name;
+-
+-	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_NAME))
+-		return NULL;
+-
+-	param_name = nla_data(info->attrs[DEVLINK_ATTR_PARAM_NAME]);
+-	return devlink_param_find_by_name(params, param_name);
+-}
+-
+-int devlink_nl_param_get_doit(struct sk_buff *skb,
+-			      struct genl_info *info)
+-{
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_param_item *param_item;
+-	struct sk_buff *msg;
+-	int err;
+-
+-	param_item = devlink_param_get_from_info(&devlink->params, info);
+-	if (!param_item)
+-		return -EINVAL;
+-
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+-	if (!msg)
+-		return -ENOMEM;
+-
+-	err = devlink_nl_param_fill(msg, devlink, 0, param_item,
+-				    DEVLINK_CMD_PARAM_GET,
+-				    info->snd_portid, info->snd_seq, 0);
+-	if (err) {
+-		nlmsg_free(msg);
+-		return err;
+-	}
+-
+-	return genlmsg_reply(msg, info);
+-}
+-
+-static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
+-					   unsigned int port_index,
+-					   struct xarray *params,
+-					   struct genl_info *info,
+-					   enum devlink_command cmd)
+-{
+-	enum devlink_param_type param_type;
+-	struct devlink_param_gset_ctx ctx;
+-	enum devlink_param_cmode cmode;
+-	struct devlink_param_item *param_item;
+-	const struct devlink_param *param;
+-	union devlink_param_value value;
+-	int err = 0;
+-
+-	param_item = devlink_param_get_from_info(params, info);
+-	if (!param_item)
+-		return -EINVAL;
+-	param = param_item->param;
+-	err = devlink_param_type_get_from_info(info, &param_type);
+-	if (err)
+-		return err;
+-	if (param_type != param->type)
+-		return -EINVAL;
+-	err = devlink_param_value_get_from_info(param, info, &value);
+-	if (err)
+-		return err;
+-	if (param->validate) {
+-		err = param->validate(devlink, param->id, value, info->extack);
+-		if (err)
+-			return err;
+-	}
+-
+-	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_VALUE_CMODE))
+-		return -EINVAL;
+-	cmode = nla_get_u8(info->attrs[DEVLINK_ATTR_PARAM_VALUE_CMODE]);
+-	if (!devlink_param_cmode_is_supported(param, cmode))
+-		return -EOPNOTSUPP;
+-
+-	if (cmode == DEVLINK_PARAM_CMODE_DRIVERINIT) {
+-		param_item->driverinit_value_new = value;
+-		param_item->driverinit_value_new_valid = true;
+-	} else {
+-		if (!param->set)
+-			return -EOPNOTSUPP;
+-		ctx.val = value;
+-		ctx.cmode = cmode;
+-		err = devlink_param_set(devlink, param, &ctx);
+-		if (err)
+-			return err;
+-	}
+-
+-	devlink_param_notify(devlink, port_index, param_item, cmd);
+-	return 0;
+-}
+-
+-static int devlink_nl_cmd_param_set_doit(struct sk_buff *skb,
+-					 struct genl_info *info)
 -{
 -	struct devlink *devlink = info->user_ptr[0];
 -
--	if (list_empty(&devlink->resource_list))
--		return -EOPNOTSUPP;
--
--	return devlink_resource_fill(info, DEVLINK_CMD_RESOURCE_DUMP, 0);
+-	return __devlink_nl_cmd_param_set_doit(devlink, 0, &devlink->params,
+-					       info, DEVLINK_CMD_PARAM_NEW);
 -}
 -
--int devlink_resources_validate(struct devlink *devlink,
--			       struct devlink_resource *resource,
--			       struct genl_info *info)
+-static int devlink_nl_cmd_port_param_get_dumpit(struct sk_buff *msg,
+-						struct netlink_callback *cb)
 -{
--	struct list_head *resource_list;
--	int err = 0;
--
--	if (resource)
--		resource_list = &resource->resource_list;
--	else
--		resource_list = &devlink->resource_list;
--
--	list_for_each_entry(resource, resource_list, list) {
--		if (!resource->size_valid)
--			return -EINVAL;
--		err = devlink_resources_validate(devlink, resource, info);
--		if (err)
--			return err;
--	}
--	return err;
+-	NL_SET_ERR_MSG(cb->extack, "Port params are not supported");
+-	return msg->len;
 -}
 -
- static const struct devlink_param devlink_param_generic[] = {
- 	{
- 		.id = DEVLINK_PARAM_GENERIC_ID_INT_ERR_RESET,
-@@ -4529,267 +4216,6 @@ void devlink_linecard_nested_dl_set(struct devlink_linecard *linecard,
+-static int devlink_nl_cmd_port_param_get_doit(struct sk_buff *skb,
+-					      struct genl_info *info)
+-{
+-	NL_SET_ERR_MSG(info->extack, "Port params are not supported");
+-	return -EINVAL;
+-}
+-
+-static int devlink_nl_cmd_port_param_set_doit(struct sk_buff *skb,
+-					      struct genl_info *info)
+-{
+-	NL_SET_ERR_MSG(info->extack, "Port params are not supported");
+-	return -EINVAL;
+-}
+-
+ static int devlink_nl_region_snapshot_id_put(struct sk_buff *msg,
+ 					     struct devlink *devlink,
+ 					     struct devlink_snapshot *snapshot)
+@@ -4216,260 +3611,6 @@ void devlink_linecard_nested_dl_set(struct devlink_linecard *linecard,
  }
  EXPORT_SYMBOL_GPL(devlink_linecard_nested_dl_set);
  
--/**
-- * devl_resource_register - devlink resource register
-- *
-- * @devlink: devlink
-- * @resource_name: resource's name
-- * @resource_size: resource's size
-- * @resource_id: resource's id
-- * @parent_resource_id: resource's parent id
-- * @size_params: size parameters
-- *
-- * Generic resources should reuse the same names across drivers.
-- * Please see the generic resources list at:
-- * Documentation/networking/devlink/devlink-resource.rst
-- */
--int devl_resource_register(struct devlink *devlink,
--			   const char *resource_name,
--			   u64 resource_size,
--			   u64 resource_id,
--			   u64 parent_resource_id,
--			   const struct devlink_resource_size_params *size_params)
+-static int devlink_param_verify(const struct devlink_param *param)
 -{
--	struct devlink_resource *resource;
--	struct list_head *resource_list;
--	bool top_hierarchy;
+-	if (!param || !param->name || !param->supported_cmodes)
+-		return -EINVAL;
+-	if (param->generic)
+-		return devlink_param_generic_verify(param);
+-	else
+-		return devlink_param_driver_verify(param);
+-}
+-
+-static int devlink_param_register(struct devlink *devlink,
+-				  const struct devlink_param *param)
+-{
+-	struct devlink_param_item *param_item;
+-	int err;
+-
+-	WARN_ON(devlink_param_verify(param));
+-	WARN_ON(devlink_param_find_by_name(&devlink->params, param->name));
+-
+-	if (param->supported_cmodes == BIT(DEVLINK_PARAM_CMODE_DRIVERINIT))
+-		WARN_ON(param->get || param->set);
+-	else
+-		WARN_ON(!param->get || !param->set);
+-
+-	param_item = kzalloc(sizeof(*param_item), GFP_KERNEL);
+-	if (!param_item)
+-		return -ENOMEM;
+-
+-	param_item->param = param;
+-
+-	err = xa_insert(&devlink->params, param->id, param_item, GFP_KERNEL);
+-	if (err)
+-		goto err_xa_insert;
+-
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
+-	return 0;
+-
+-err_xa_insert:
+-	kfree(param_item);
+-	return err;
+-}
+-
+-static void devlink_param_unregister(struct devlink *devlink,
+-				     const struct devlink_param *param)
+-{
+-	struct devlink_param_item *param_item;
+-
+-	param_item = devlink_param_find_by_id(&devlink->params, param->id);
+-	if (WARN_ON(!param_item))
+-		return;
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_DEL);
+-	xa_erase(&devlink->params, param->id);
+-	kfree(param_item);
+-}
+-
+-/**
+- *	devl_params_register - register configuration parameters
+- *
+- *	@devlink: devlink
+- *	@params: configuration parameters array
+- *	@params_count: number of parameters provided
+- *
+- *	Register the configuration parameters supported by the driver.
+- */
+-int devl_params_register(struct devlink *devlink,
+-			 const struct devlink_param *params,
+-			 size_t params_count)
+-{
+-	const struct devlink_param *param = params;
+-	int i, err;
 -
 -	lockdep_assert_held(&devlink->lock);
 -
--	top_hierarchy = parent_resource_id == DEVLINK_RESOURCE_ID_PARENT_TOP;
--
--	resource = devlink_resource_find(devlink, NULL, resource_id);
--	if (resource)
--		return -EINVAL;
--
--	resource = kzalloc(sizeof(*resource), GFP_KERNEL);
--	if (!resource)
--		return -ENOMEM;
--
--	if (top_hierarchy) {
--		resource_list = &devlink->resource_list;
--	} else {
--		struct devlink_resource *parent_resource;
--
--		parent_resource = devlink_resource_find(devlink, NULL,
--							parent_resource_id);
--		if (parent_resource) {
--			resource_list = &parent_resource->resource_list;
--			resource->parent = parent_resource;
--		} else {
--			kfree(resource);
--			return -EINVAL;
--		}
+-	for (i = 0; i < params_count; i++, param++) {
+-		err = devlink_param_register(devlink, param);
+-		if (err)
+-			goto rollback;
 -	}
--
--	resource->name = resource_name;
--	resource->size = resource_size;
--	resource->size_new = resource_size;
--	resource->id = resource_id;
--	resource->size_valid = true;
--	memcpy(&resource->size_params, size_params,
--	       sizeof(resource->size_params));
--	INIT_LIST_HEAD(&resource->resource_list);
--	list_add_tail(&resource->list, resource_list);
--
 -	return 0;
--}
--EXPORT_SYMBOL_GPL(devl_resource_register);
 -
--/**
-- *	devlink_resource_register - devlink resource register
-- *
-- *	@devlink: devlink
-- *	@resource_name: resource's name
-- *	@resource_size: resource's size
-- *	@resource_id: resource's id
-- *	@parent_resource_id: resource's parent id
-- *	@size_params: size parameters
-- *
-- *	Generic resources should reuse the same names across drivers.
-- *	Please see the generic resources list at:
-- *	Documentation/networking/devlink/devlink-resource.rst
-- *
-- *	Context: Takes and release devlink->lock <mutex>.
-- */
--int devlink_resource_register(struct devlink *devlink,
--			      const char *resource_name,
--			      u64 resource_size,
--			      u64 resource_id,
--			      u64 parent_resource_id,
--			      const struct devlink_resource_size_params *size_params)
+-rollback:
+-	if (!i)
+-		return err;
+-
+-	for (param--; i > 0; i--, param--)
+-		devlink_param_unregister(devlink, param);
+-	return err;
+-}
+-EXPORT_SYMBOL_GPL(devl_params_register);
+-
+-int devlink_params_register(struct devlink *devlink,
+-			    const struct devlink_param *params,
+-			    size_t params_count)
 -{
 -	int err;
 -
 -	devl_lock(devlink);
--	err = devl_resource_register(devlink, resource_name, resource_size,
--				     resource_id, parent_resource_id, size_params);
+-	err = devl_params_register(devlink, params, params_count);
 -	devl_unlock(devlink);
 -	return err;
 -}
--EXPORT_SYMBOL_GPL(devlink_resource_register);
--
--static void devlink_resource_unregister(struct devlink *devlink,
--					struct devlink_resource *resource)
--{
--	struct devlink_resource *tmp, *child_resource;
--
--	list_for_each_entry_safe(child_resource, tmp, &resource->resource_list,
--				 list) {
--		devlink_resource_unregister(devlink, child_resource);
--		list_del(&child_resource->list);
--		kfree(child_resource);
--	}
--}
+-EXPORT_SYMBOL_GPL(devlink_params_register);
 -
 -/**
-- * devl_resources_unregister - free all resources
-- *
-- * @devlink: devlink
+- *	devl_params_unregister - unregister configuration parameters
+- *	@devlink: devlink
+- *	@params: configuration parameters to unregister
+- *	@params_count: number of parameters provided
 - */
--void devl_resources_unregister(struct devlink *devlink)
+-void devl_params_unregister(struct devlink *devlink,
+-			    const struct devlink_param *params,
+-			    size_t params_count)
 -{
--	struct devlink_resource *tmp, *child_resource;
+-	const struct devlink_param *param = params;
+-	int i;
 -
 -	lockdep_assert_held(&devlink->lock);
 -
--	list_for_each_entry_safe(child_resource, tmp, &devlink->resource_list,
--				 list) {
--		devlink_resource_unregister(devlink, child_resource);
--		list_del(&child_resource->list);
--		kfree(child_resource);
--	}
+-	for (i = 0; i < params_count; i++, param++)
+-		devlink_param_unregister(devlink, param);
 -}
--EXPORT_SYMBOL_GPL(devl_resources_unregister);
+-EXPORT_SYMBOL_GPL(devl_params_unregister);
 -
--/**
-- *	devlink_resources_unregister - free all resources
-- *
-- *	@devlink: devlink
-- *
-- *	Context: Takes and release devlink->lock <mutex>.
-- */
--void devlink_resources_unregister(struct devlink *devlink)
+-void devlink_params_unregister(struct devlink *devlink,
+-			       const struct devlink_param *params,
+-			       size_t params_count)
 -{
 -	devl_lock(devlink);
--	devl_resources_unregister(devlink);
+-	devl_params_unregister(devlink, params, params_count);
 -	devl_unlock(devlink);
 -}
--EXPORT_SYMBOL_GPL(devlink_resources_unregister);
+-EXPORT_SYMBOL_GPL(devlink_params_unregister);
 -
 -/**
-- * devl_resource_size_get - get and update size
+- *	devl_param_driverinit_value_get - get configuration parameter
+- *					  value for driver initializing
 - *
-- * @devlink: devlink
-- * @resource_id: the requested resource id
-- * @p_resource_size: ptr to update
+- *	@devlink: devlink
+- *	@param_id: parameter ID
+- *	@val: pointer to store the value of parameter in driverinit
+- *	      configuration mode
+- *
+- *	This function should be used by the driver to get driverinit
+- *	configuration for initialization after reload command.
+- *
+- *	Note that lockless call of this function relies on the
+- *	driver to maintain following basic sane behavior:
+- *	1) Driver ensures a call to this function cannot race with
+- *	   registering/unregistering the parameter with the same parameter ID.
+- *	2) Driver ensures a call to this function cannot race with
+- *	   devl_param_driverinit_value_set() call with the same parameter ID.
+- *	3) Driver ensures a call to this function cannot race with
+- *	   reload operation.
+- *	If the driver is not able to comply, it has to take the devlink->lock
+- *	while calling this.
 - */
--int devl_resource_size_get(struct devlink *devlink,
--			   u64 resource_id,
--			   u64 *p_resource_size)
+-int devl_param_driverinit_value_get(struct devlink *devlink, u32 param_id,
+-				    union devlink_param_value *val)
 -{
--	struct devlink_resource *resource;
+-	struct devlink_param_item *param_item;
 -
--	lockdep_assert_held(&devlink->lock);
+-	if (WARN_ON(!devlink_reload_supported(devlink->ops)))
+-		return -EOPNOTSUPP;
 -
--	resource = devlink_resource_find(devlink, NULL, resource_id);
--	if (!resource)
+-	param_item = devlink_param_find_by_id(&devlink->params, param_id);
+-	if (!param_item)
 -		return -EINVAL;
--	*p_resource_size = resource->size_new;
--	resource->size = resource->size_new;
+-
+-	if (!param_item->driverinit_value_valid)
+-		return -EOPNOTSUPP;
+-
+-	if (WARN_ON(!devlink_param_cmode_is_supported(param_item->param,
+-						      DEVLINK_PARAM_CMODE_DRIVERINIT)))
+-		return -EOPNOTSUPP;
+-
+-	*val = param_item->driverinit_value;
+-
 -	return 0;
 -}
--EXPORT_SYMBOL_GPL(devl_resource_size_get);
+-EXPORT_SYMBOL_GPL(devl_param_driverinit_value_get);
 -
 -/**
-- * devl_resource_occ_get_register - register occupancy getter
-- *
-- * @devlink: devlink
-- * @resource_id: resource id
-- * @occ_get: occupancy getter callback
-- * @occ_get_priv: occupancy getter callback priv
-- */
--void devl_resource_occ_get_register(struct devlink *devlink,
--				    u64 resource_id,
--				    devlink_resource_occ_get_t *occ_get,
--				    void *occ_get_priv)
--{
--	struct devlink_resource *resource;
--
--	lockdep_assert_held(&devlink->lock);
--
--	resource = devlink_resource_find(devlink, NULL, resource_id);
--	if (WARN_ON(!resource))
--		return;
--	WARN_ON(resource->occ_get);
--
--	resource->occ_get = occ_get;
--	resource->occ_get_priv = occ_get_priv;
--}
--EXPORT_SYMBOL_GPL(devl_resource_occ_get_register);
--
--/**
-- *	devlink_resource_occ_get_register - register occupancy getter
+- *	devl_param_driverinit_value_set - set value of configuration
+- *					  parameter for driverinit
+- *					  configuration mode
 - *
 - *	@devlink: devlink
-- *	@resource_id: resource id
-- *	@occ_get: occupancy getter callback
-- *	@occ_get_priv: occupancy getter callback priv
+- *	@param_id: parameter ID
+- *	@init_val: value of parameter to set for driverinit configuration mode
 - *
-- *	Context: Takes and release devlink->lock <mutex>.
+- *	This function should be used by the driver to set driverinit
+- *	configuration mode default value.
 - */
--void devlink_resource_occ_get_register(struct devlink *devlink,
--				       u64 resource_id,
--				       devlink_resource_occ_get_t *occ_get,
--				       void *occ_get_priv)
+-void devl_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
+-				     union devlink_param_value init_val)
 -{
--	devl_lock(devlink);
--	devl_resource_occ_get_register(devlink, resource_id,
--				       occ_get, occ_get_priv);
--	devl_unlock(devlink);
--}
--EXPORT_SYMBOL_GPL(devlink_resource_occ_get_register);
+-	struct devlink_param_item *param_item;
 -
--/**
-- * devl_resource_occ_get_unregister - unregister occupancy getter
-- *
-- * @devlink: devlink
-- * @resource_id: resource id
-- */
--void devl_resource_occ_get_unregister(struct devlink *devlink,
--				      u64 resource_id)
--{
--	struct devlink_resource *resource;
+-	devl_assert_locked(devlink);
 -
--	lockdep_assert_held(&devlink->lock);
--
--	resource = devlink_resource_find(devlink, NULL, resource_id);
--	if (WARN_ON(!resource))
+-	param_item = devlink_param_find_by_id(&devlink->params, param_id);
+-	if (WARN_ON(!param_item))
 -		return;
--	WARN_ON(!resource->occ_get);
 -
--	resource->occ_get = NULL;
--	resource->occ_get_priv = NULL;
+-	if (WARN_ON(!devlink_param_cmode_is_supported(param_item->param,
+-						      DEVLINK_PARAM_CMODE_DRIVERINIT)))
+-		return;
+-
+-	param_item->driverinit_value = init_val;
+-	param_item->driverinit_value_valid = true;
+-
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
 -}
--EXPORT_SYMBOL_GPL(devl_resource_occ_get_unregister);
+-EXPORT_SYMBOL_GPL(devl_param_driverinit_value_set);
+-
+-void devlink_params_driverinit_load_new(struct devlink *devlink)
+-{
+-	struct devlink_param_item *param_item;
+-	unsigned long param_id;
+-
+-	xa_for_each(&devlink->params, param_id, param_item) {
+-		if (!devlink_param_cmode_is_supported(param_item->param,
+-						      DEVLINK_PARAM_CMODE_DRIVERINIT) ||
+-		    !param_item->driverinit_value_new_valid)
+-			continue;
+-		param_item->driverinit_value = param_item->driverinit_value_new;
+-		param_item->driverinit_value_valid = true;
+-		param_item->driverinit_value_new_valid = false;
+-	}
+-}
 -
 -/**
-- *	devlink_resource_occ_get_unregister - unregister occupancy getter
+- *	devl_param_value_changed - notify devlink on a parameter's value
+- *				   change. Should be called by the driver
+- *				   right after the change.
 - *
 - *	@devlink: devlink
-- *	@resource_id: resource id
+- *	@param_id: parameter ID
 - *
-- *	Context: Takes and release devlink->lock <mutex>.
+- *	This function should be used by the driver to notify devlink on value
+- *	change, excluding driverinit configuration mode.
+- *	For driverinit configuration mode driver should use the function
 - */
--void devlink_resource_occ_get_unregister(struct devlink *devlink,
--					 u64 resource_id)
+-void devl_param_value_changed(struct devlink *devlink, u32 param_id)
 -{
--	devl_lock(devlink);
--	devl_resource_occ_get_unregister(devlink, resource_id);
--	devl_unlock(devlink);
--}
--EXPORT_SYMBOL_GPL(devlink_resource_occ_get_unregister);
+-	struct devlink_param_item *param_item;
 -
- static int devlink_param_verify(const struct devlink_param *param)
- {
- 	if (!param || !param->name || !param->supported_cmodes)
-diff --git a/net/devlink/resource.c b/net/devlink/resource.c
+-	param_item = devlink_param_find_by_id(&devlink->params, param_id);
+-	WARN_ON(!param_item);
+-
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
+-}
+-EXPORT_SYMBOL_GPL(devl_param_value_changed);
+-
+ /**
+  * devl_region_create - create a new address region
+  *
+diff --git a/net/devlink/param.c b/net/devlink/param.c
 new file mode 100644
-index 000000000000..c8b615e4c385
+index 000000000000..31275f9d4cb7
 --- /dev/null
-+++ b/net/devlink/resource.c
-@@ -0,0 +1,579 @@
++++ b/net/devlink/param.c
+@@ -0,0 +1,865 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (c) 2016 Mellanox Technologies. All rights reserved.
@@ -732,577 +1024,863 @@ index 000000000000..c8b615e4c385
 +
 +#include "devl_internal.h"
 +
-+/**
-+ * struct devlink_resource - devlink resource
-+ * @name: name of the resource
-+ * @id: id, per devlink instance
-+ * @size: size of the resource
-+ * @size_new: updated size of the resource, reload is needed
-+ * @size_valid: valid in case the total size of the resource is valid
-+ *              including its children
-+ * @parent: parent resource
-+ * @size_params: size parameters
-+ * @list: parent list
-+ * @resource_list: list of child resources
-+ * @occ_get: occupancy getter callback
-+ * @occ_get_priv: occupancy getter callback priv
-+ */
-+struct devlink_resource {
-+	const char *name;
-+	u64 id;
-+	u64 size;
-+	u64 size_new;
-+	bool size_valid;
-+	struct devlink_resource *parent;
-+	struct devlink_resource_size_params size_params;
-+	struct list_head list;
-+	struct list_head resource_list;
-+	devlink_resource_occ_get_t *occ_get;
-+	void *occ_get_priv;
++static const struct devlink_param devlink_param_generic[] = {
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_INT_ERR_RESET,
++		.name = DEVLINK_PARAM_GENERIC_INT_ERR_RESET_NAME,
++		.type = DEVLINK_PARAM_GENERIC_INT_ERR_RESET_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_MAX_MACS,
++		.name = DEVLINK_PARAM_GENERIC_MAX_MACS_NAME,
++		.type = DEVLINK_PARAM_GENERIC_MAX_MACS_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_SRIOV,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_SRIOV_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_SRIOV_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_REGION_SNAPSHOT,
++		.name = DEVLINK_PARAM_GENERIC_REGION_SNAPSHOT_NAME,
++		.type = DEVLINK_PARAM_GENERIC_REGION_SNAPSHOT_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_IGNORE_ARI,
++		.name = DEVLINK_PARAM_GENERIC_IGNORE_ARI_NAME,
++		.type = DEVLINK_PARAM_GENERIC_IGNORE_ARI_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
++		.name = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MAX_NAME,
++		.type = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MAX_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
++		.name = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MIN_NAME,
++		.type = DEVLINK_PARAM_GENERIC_MSIX_VEC_PER_PF_MIN_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_FW_LOAD_POLICY,
++		.name = DEVLINK_PARAM_GENERIC_FW_LOAD_POLICY_NAME,
++		.type = DEVLINK_PARAM_GENERIC_FW_LOAD_POLICY_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_RESET_DEV_ON_DRV_PROBE,
++		.name = DEVLINK_PARAM_GENERIC_RESET_DEV_ON_DRV_PROBE_NAME,
++		.type = DEVLINK_PARAM_GENERIC_RESET_DEV_ON_DRV_PROBE_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_ROCE,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_ROCE_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_ROCE_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_REMOTE_DEV_RESET,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_REMOTE_DEV_RESET_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_REMOTE_DEV_RESET_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_ETH,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_ETH_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_ETH_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_RDMA,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_RDMA_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_RDMA_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_VNET,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_VNET_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_VNET_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_IO_EQ_SIZE,
++		.name = DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_NAME,
++		.type = DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_TYPE,
++	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
++		.name = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME,
++		.type = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE,
++	},
 +};
 +
-+static struct devlink_resource *
-+devlink_resource_find(struct devlink *devlink,
-+		      struct devlink_resource *resource, u64 resource_id)
++static int devlink_param_generic_verify(const struct devlink_param *param)
 +{
-+	struct list_head *resource_list;
++	/* verify it match generic parameter by id and name */
++	if (param->id > DEVLINK_PARAM_GENERIC_ID_MAX)
++		return -EINVAL;
++	if (strcmp(param->name, devlink_param_generic[param->id].name))
++		return -ENOENT;
 +
-+	if (resource)
-+		resource_list = &resource->resource_list;
-+	else
-+		resource_list = &devlink->resource_list;
++	WARN_ON(param->type != devlink_param_generic[param->id].type);
 +
-+	list_for_each_entry(resource, resource_list, list) {
-+		struct devlink_resource *child_resource;
++	return 0;
++}
 +
-+		if (resource->id == resource_id)
-+			return resource;
++static int devlink_param_driver_verify(const struct devlink_param *param)
++{
++	int i;
 +
-+		child_resource = devlink_resource_find(devlink, resource,
-+						       resource_id);
-+		if (child_resource)
-+			return child_resource;
++	if (param->id <= DEVLINK_PARAM_GENERIC_ID_MAX)
++		return -EINVAL;
++	/* verify no such name in generic params */
++	for (i = 0; i <= DEVLINK_PARAM_GENERIC_ID_MAX; i++)
++		if (!strcmp(param->name, devlink_param_generic[i].name))
++			return -EEXIST;
++
++	return 0;
++}
++
++static struct devlink_param_item *
++devlink_param_find_by_name(struct xarray *params, const char *param_name)
++{
++	struct devlink_param_item *param_item;
++	unsigned long param_id;
++
++	xa_for_each(params, param_id, param_item) {
++		if (!strcmp(param_item->param->name, param_name))
++			return param_item;
 +	}
 +	return NULL;
 +}
 +
-+static void
-+devlink_resource_validate_children(struct devlink_resource *resource)
++static struct devlink_param_item *
++devlink_param_find_by_id(struct xarray *params, u32 param_id)
 +{
-+	struct devlink_resource *child_resource;
-+	bool size_valid = true;
-+	u64 parts_size = 0;
++	return xa_load(params, param_id);
++}
 +
-+	if (list_empty(&resource->resource_list))
-+		goto out;
++static bool
++devlink_param_cmode_is_supported(const struct devlink_param *param,
++				 enum devlink_param_cmode cmode)
++{
++	return test_bit(cmode, &param->supported_cmodes);
++}
 +
-+	list_for_each_entry(child_resource, &resource->resource_list, list)
-+		parts_size += child_resource->size_new;
++static int devlink_param_get(struct devlink *devlink,
++			     const struct devlink_param *param,
++			     struct devlink_param_gset_ctx *ctx)
++{
++	if (!param->get)
++		return -EOPNOTSUPP;
++	return param->get(devlink, param->id, ctx);
++}
 +
-+	if (parts_size > resource->size_new)
-+		size_valid = false;
-+out:
-+	resource->size_valid = size_valid;
++static int devlink_param_set(struct devlink *devlink,
++			     const struct devlink_param *param,
++			     struct devlink_param_gset_ctx *ctx)
++{
++	if (!param->set)
++		return -EOPNOTSUPP;
++	return param->set(devlink, param->id, ctx);
 +}
 +
 +static int
-+devlink_resource_validate_size(struct devlink_resource *resource, u64 size,
-+			       struct netlink_ext_ack *extack)
++devlink_param_type_to_nla_type(enum devlink_param_type param_type)
 +{
-+	u64 reminder;
-+	int err = 0;
-+
-+	if (size > resource->size_params.size_max) {
-+		NL_SET_ERR_MSG(extack, "Size larger than maximum");
-+		err = -EINVAL;
-+	}
-+
-+	if (size < resource->size_params.size_min) {
-+		NL_SET_ERR_MSG(extack, "Size smaller than minimum");
-+		err = -EINVAL;
-+	}
-+
-+	div64_u64_rem(size, resource->size_params.size_granularity, &reminder);
-+	if (reminder) {
-+		NL_SET_ERR_MSG(extack, "Wrong granularity");
-+		err = -EINVAL;
-+	}
-+
-+	return err;
-+}
-+
-+int devlink_nl_cmd_resource_set(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_resource *resource;
-+	u64 resource_id;
-+	u64 size;
-+	int err;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_RESOURCE_ID) ||
-+	    GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_RESOURCE_SIZE))
++	switch (param_type) {
++	case DEVLINK_PARAM_TYPE_U8:
++		return NLA_U8;
++	case DEVLINK_PARAM_TYPE_U16:
++		return NLA_U16;
++	case DEVLINK_PARAM_TYPE_U32:
++		return NLA_U32;
++	case DEVLINK_PARAM_TYPE_STRING:
++		return NLA_STRING;
++	case DEVLINK_PARAM_TYPE_BOOL:
++		return NLA_FLAG;
++	default:
 +		return -EINVAL;
-+	resource_id = nla_get_u64(info->attrs[DEVLINK_ATTR_RESOURCE_ID]);
-+
-+	resource = devlink_resource_find(devlink, NULL, resource_id);
-+	if (!resource)
-+		return -EINVAL;
-+
-+	size = nla_get_u64(info->attrs[DEVLINK_ATTR_RESOURCE_SIZE]);
-+	err = devlink_resource_validate_size(resource, size, info->extack);
-+	if (err)
-+		return err;
-+
-+	resource->size_new = size;
-+	devlink_resource_validate_children(resource);
-+	if (resource->parent)
-+		devlink_resource_validate_children(resource->parent);
-+	return 0;
++	}
 +}
 +
 +static int
-+devlink_resource_size_params_put(struct devlink_resource *resource,
-+				 struct sk_buff *skb)
++devlink_nl_param_value_fill_one(struct sk_buff *msg,
++				enum devlink_param_type type,
++				enum devlink_param_cmode cmode,
++				union devlink_param_value val)
 +{
-+	struct devlink_resource_size_params *size_params;
++	struct nlattr *param_value_attr;
 +
-+	size_params = &resource->size_params;
-+	if (nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_GRAN,
-+			      size_params->size_granularity, DEVLINK_ATTR_PAD) ||
-+	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_MAX,
-+			      size_params->size_max, DEVLINK_ATTR_PAD) ||
-+	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_MIN,
-+			      size_params->size_min, DEVLINK_ATTR_PAD) ||
-+	    nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_UNIT, size_params->unit))
-+		return -EMSGSIZE;
-+	return 0;
-+}
-+
-+static int devlink_resource_occ_put(struct devlink_resource *resource,
-+				    struct sk_buff *skb)
-+{
-+	if (!resource->occ_get)
-+		return 0;
-+	return nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_OCC,
-+				 resource->occ_get(resource->occ_get_priv),
-+				 DEVLINK_ATTR_PAD);
-+}
-+
-+static int devlink_resource_put(struct devlink *devlink, struct sk_buff *skb,
-+				struct devlink_resource *resource)
-+{
-+	struct devlink_resource *child_resource;
-+	struct nlattr *child_resource_attr;
-+	struct nlattr *resource_attr;
-+
-+	resource_attr = nla_nest_start_noflag(skb, DEVLINK_ATTR_RESOURCE);
-+	if (!resource_attr)
-+		return -EMSGSIZE;
-+
-+	if (nla_put_string(skb, DEVLINK_ATTR_RESOURCE_NAME, resource->name) ||
-+	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE, resource->size,
-+			      DEVLINK_ATTR_PAD) ||
-+	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_ID, resource->id,
-+			      DEVLINK_ATTR_PAD))
-+		goto nla_put_failure;
-+	if (resource->size != resource->size_new &&
-+	    nla_put_u64_64bit(skb, DEVLINK_ATTR_RESOURCE_SIZE_NEW,
-+			      resource->size_new, DEVLINK_ATTR_PAD))
-+		goto nla_put_failure;
-+	if (devlink_resource_occ_put(resource, skb))
-+		goto nla_put_failure;
-+	if (devlink_resource_size_params_put(resource, skb))
-+		goto nla_put_failure;
-+	if (list_empty(&resource->resource_list))
-+		goto out;
-+
-+	if (nla_put_u8(skb, DEVLINK_ATTR_RESOURCE_SIZE_VALID,
-+		       resource->size_valid))
++	param_value_attr = nla_nest_start_noflag(msg,
++						 DEVLINK_ATTR_PARAM_VALUE);
++	if (!param_value_attr)
 +		goto nla_put_failure;
 +
-+	child_resource_attr = nla_nest_start_noflag(skb,
-+						    DEVLINK_ATTR_RESOURCE_LIST);
-+	if (!child_resource_attr)
-+		goto nla_put_failure;
++	if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_VALUE_CMODE, cmode))
++		goto value_nest_cancel;
 +
-+	list_for_each_entry(child_resource, &resource->resource_list, list) {
-+		if (devlink_resource_put(devlink, skb, child_resource))
-+			goto resource_put_failure;
++	switch (type) {
++	case DEVLINK_PARAM_TYPE_U8:
++		if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_VALUE_DATA, val.vu8))
++			goto value_nest_cancel;
++		break;
++	case DEVLINK_PARAM_TYPE_U16:
++		if (nla_put_u16(msg, DEVLINK_ATTR_PARAM_VALUE_DATA, val.vu16))
++			goto value_nest_cancel;
++		break;
++	case DEVLINK_PARAM_TYPE_U32:
++		if (nla_put_u32(msg, DEVLINK_ATTR_PARAM_VALUE_DATA, val.vu32))
++			goto value_nest_cancel;
++		break;
++	case DEVLINK_PARAM_TYPE_STRING:
++		if (nla_put_string(msg, DEVLINK_ATTR_PARAM_VALUE_DATA,
++				   val.vstr))
++			goto value_nest_cancel;
++		break;
++	case DEVLINK_PARAM_TYPE_BOOL:
++		if (val.vbool &&
++		    nla_put_flag(msg, DEVLINK_ATTR_PARAM_VALUE_DATA))
++			goto value_nest_cancel;
++		break;
 +	}
 +
-+	nla_nest_end(skb, child_resource_attr);
-+out:
-+	nla_nest_end(skb, resource_attr);
++	nla_nest_end(msg, param_value_attr);
 +	return 0;
 +
-+resource_put_failure:
-+	nla_nest_cancel(skb, child_resource_attr);
++value_nest_cancel:
++	nla_nest_cancel(msg, param_value_attr);
 +nla_put_failure:
-+	nla_nest_cancel(skb, resource_attr);
 +	return -EMSGSIZE;
 +}
 +
-+static int devlink_resource_fill(struct genl_info *info,
-+				 enum devlink_command cmd, int flags)
++static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
++				 unsigned int port_index,
++				 struct devlink_param_item *param_item,
++				 enum devlink_command cmd,
++				 u32 portid, u32 seq, int flags)
 +{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_resource *resource;
-+	struct nlattr *resources_attr;
-+	struct sk_buff *skb = NULL;
-+	struct nlmsghdr *nlh;
-+	bool incomplete;
++	union devlink_param_value param_value[DEVLINK_PARAM_CMODE_MAX + 1];
++	bool param_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
++	const struct devlink_param *param = param_item->param;
++	struct devlink_param_gset_ctx ctx;
++	struct nlattr *param_values_list;
++	struct nlattr *param_attr;
++	int nla_type;
 +	void *hdr;
++	int err;
 +	int i;
++
++	/* Get value from driver part to driverinit configuration mode */
++	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
++		if (!devlink_param_cmode_is_supported(param, i))
++			continue;
++		if (i == DEVLINK_PARAM_CMODE_DRIVERINIT) {
++			if (param_item->driverinit_value_new_valid)
++				param_value[i] = param_item->driverinit_value_new;
++			else if (param_item->driverinit_value_valid)
++				param_value[i] = param_item->driverinit_value;
++			else
++				return -EOPNOTSUPP;
++		} else {
++			ctx.cmode = i;
++			err = devlink_param_get(devlink, param, &ctx);
++			if (err)
++				return err;
++			param_value[i] = ctx.val;
++		}
++		param_value_set[i] = true;
++	}
++
++	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	if (devlink_nl_put_handle(msg, devlink))
++		goto genlmsg_cancel;
++
++	if (cmd == DEVLINK_CMD_PORT_PARAM_GET ||
++	    cmd == DEVLINK_CMD_PORT_PARAM_NEW ||
++	    cmd == DEVLINK_CMD_PORT_PARAM_DEL)
++		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, port_index))
++			goto genlmsg_cancel;
++
++	param_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PARAM);
++	if (!param_attr)
++		goto genlmsg_cancel;
++	if (nla_put_string(msg, DEVLINK_ATTR_PARAM_NAME, param->name))
++		goto param_nest_cancel;
++	if (param->generic && nla_put_flag(msg, DEVLINK_ATTR_PARAM_GENERIC))
++		goto param_nest_cancel;
++
++	nla_type = devlink_param_type_to_nla_type(param->type);
++	if (nla_type < 0)
++		goto param_nest_cancel;
++	if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_TYPE, nla_type))
++		goto param_nest_cancel;
++
++	param_values_list = nla_nest_start_noflag(msg,
++						  DEVLINK_ATTR_PARAM_VALUES_LIST);
++	if (!param_values_list)
++		goto param_nest_cancel;
++
++	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
++		if (!param_value_set[i])
++			continue;
++		err = devlink_nl_param_value_fill_one(msg, param->type,
++						      i, param_value[i]);
++		if (err)
++			goto values_list_nest_cancel;
++	}
++
++	nla_nest_end(msg, param_values_list);
++	nla_nest_end(msg, param_attr);
++	genlmsg_end(msg, hdr);
++	return 0;
++
++values_list_nest_cancel:
++	nla_nest_end(msg, param_values_list);
++param_nest_cancel:
++	nla_nest_cancel(msg, param_attr);
++genlmsg_cancel:
++	genlmsg_cancel(msg, hdr);
++	return -EMSGSIZE;
++}
++
++static void devlink_param_notify(struct devlink *devlink,
++				 unsigned int port_index,
++				 struct devlink_param_item *param_item,
++				 enum devlink_command cmd)
++{
++	struct sk_buff *msg;
 +	int err;
 +
-+	resource = list_first_entry(&devlink->resource_list,
-+				    struct devlink_resource, list);
-+start_again:
-+	err = devlink_nl_msg_reply_and_new(&skb, info);
-+	if (err)
-+		return err;
++	WARN_ON(cmd != DEVLINK_CMD_PARAM_NEW && cmd != DEVLINK_CMD_PARAM_DEL &&
++		cmd != DEVLINK_CMD_PORT_PARAM_NEW &&
++		cmd != DEVLINK_CMD_PORT_PARAM_DEL);
 +
-+	hdr = genlmsg_put(skb, info->snd_portid, info->snd_seq,
-+			  &devlink_nl_family, NLM_F_MULTI, cmd);
-+	if (!hdr) {
-+		nlmsg_free(skb);
-+		return -EMSGSIZE;
++	/* devlink_notify_register() / devlink_notify_unregister()
++	 * will replay the notifications if the params are added/removed
++	 * outside of the lifetime of the instance.
++	 */
++	if (!devl_is_registered(devlink))
++		return;
++
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!msg)
++		return;
++	err = devlink_nl_param_fill(msg, devlink, port_index, param_item, cmd,
++				    0, 0, 0);
++	if (err) {
++		nlmsg_free(msg);
++		return;
 +	}
 +
-+	if (devlink_nl_put_handle(skb, devlink))
-+		goto nla_put_failure;
-+
-+	resources_attr = nla_nest_start_noflag(skb,
-+					       DEVLINK_ATTR_RESOURCE_LIST);
-+	if (!resources_attr)
-+		goto nla_put_failure;
-+
-+	incomplete = false;
-+	i = 0;
-+	list_for_each_entry_from(resource, &devlink->resource_list, list) {
-+		err = devlink_resource_put(devlink, skb, resource);
-+		if (err) {
-+			if (!i)
-+				goto err_resource_put;
-+			incomplete = true;
-+			break;
-+		}
-+		i++;
-+	}
-+	nla_nest_end(skb, resources_attr);
-+	genlmsg_end(skb, hdr);
-+	if (incomplete)
-+		goto start_again;
-+send_done:
-+	nlh = nlmsg_put(skb, info->snd_portid, info->snd_seq,
-+			NLMSG_DONE, 0, flags | NLM_F_MULTI);
-+	if (!nlh) {
-+		err = devlink_nl_msg_reply_and_new(&skb, info);
-+		if (err)
-+			return err;
-+		goto send_done;
-+	}
-+	return genlmsg_reply(skb, info);
-+
-+nla_put_failure:
-+	err = -EMSGSIZE;
-+err_resource_put:
-+	nlmsg_free(skb);
-+	return err;
++	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
++				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
 +}
 +
-+int devlink_nl_cmd_resource_dump(struct sk_buff *skb, struct genl_info *info)
++static void devlink_params_notify(struct devlink *devlink,
++				  enum devlink_command cmd)
 +{
-+	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_param_item *param_item;
++	unsigned long param_id;
 +
-+	if (list_empty(&devlink->resource_list))
-+		return -EOPNOTSUPP;
-+
-+	return devlink_resource_fill(info, DEVLINK_CMD_RESOURCE_DUMP, 0);
++	xa_for_each(&devlink->params, param_id, param_item)
++		devlink_param_notify(devlink, 0, param_item, cmd);
 +}
 +
-+int devlink_resources_validate(struct devlink *devlink,
-+			       struct devlink_resource *resource,
-+			       struct genl_info *info)
++void devlink_params_notify_register(struct devlink *devlink)
 +{
-+	struct list_head *resource_list;
++	devlink_params_notify(devlink, DEVLINK_CMD_PARAM_NEW);
++}
++
++void devlink_params_notify_unregister(struct devlink *devlink)
++{
++	devlink_params_notify(devlink, DEVLINK_CMD_PARAM_DEL);
++}
++
++static int devlink_nl_param_get_dump_one(struct sk_buff *msg,
++					 struct devlink *devlink,
++					 struct netlink_callback *cb,
++					 int flags)
++{
++	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
++	struct devlink_param_item *param_item;
++	unsigned long param_id;
 +	int err = 0;
 +
-+	if (resource)
-+		resource_list = &resource->resource_list;
-+	else
-+		resource_list = &devlink->resource_list;
-+
-+	list_for_each_entry(resource, resource_list, list) {
-+		if (!resource->size_valid)
-+			return -EINVAL;
-+		err = devlink_resources_validate(devlink, resource, info);
-+		if (err)
-+			return err;
-+	}
-+	return err;
-+}
-+
-+/**
-+ * devl_resource_register - devlink resource register
-+ *
-+ * @devlink: devlink
-+ * @resource_name: resource's name
-+ * @resource_size: resource's size
-+ * @resource_id: resource's id
-+ * @parent_resource_id: resource's parent id
-+ * @size_params: size parameters
-+ *
-+ * Generic resources should reuse the same names across drivers.
-+ * Please see the generic resources list at:
-+ * Documentation/networking/devlink/devlink-resource.rst
-+ */
-+int devl_resource_register(struct devlink *devlink,
-+			   const char *resource_name,
-+			   u64 resource_size,
-+			   u64 resource_id,
-+			   u64 parent_resource_id,
-+			   const struct devlink_resource_size_params *size_params)
-+{
-+	struct devlink_resource *resource;
-+	struct list_head *resource_list;
-+	bool top_hierarchy;
-+
-+	lockdep_assert_held(&devlink->lock);
-+
-+	top_hierarchy = parent_resource_id == DEVLINK_RESOURCE_ID_PARENT_TOP;
-+
-+	resource = devlink_resource_find(devlink, NULL, resource_id);
-+	if (resource)
-+		return -EINVAL;
-+
-+	resource = kzalloc(sizeof(*resource), GFP_KERNEL);
-+	if (!resource)
-+		return -ENOMEM;
-+
-+	if (top_hierarchy) {
-+		resource_list = &devlink->resource_list;
-+	} else {
-+		struct devlink_resource *parent_resource;
-+
-+		parent_resource = devlink_resource_find(devlink, NULL,
-+							parent_resource_id);
-+		if (parent_resource) {
-+			resource_list = &parent_resource->resource_list;
-+			resource->parent = parent_resource;
-+		} else {
-+			kfree(resource);
-+			return -EINVAL;
++	xa_for_each_start(&devlink->params, param_id, param_item, state->idx) {
++		err = devlink_nl_param_fill(msg, devlink, 0, param_item,
++					    DEVLINK_CMD_PARAM_GET,
++					    NETLINK_CB(cb->skb).portid,
++					    cb->nlh->nlmsg_seq, flags);
++		if (err == -EOPNOTSUPP) {
++			err = 0;
++		} else if (err) {
++			state->idx = param_id;
++			break;
 +		}
 +	}
 +
-+	resource->name = resource_name;
-+	resource->size = resource_size;
-+	resource->size_new = resource_size;
-+	resource->id = resource_id;
-+	resource->size_valid = true;
-+	memcpy(&resource->size_params, size_params,
-+	       sizeof(resource->size_params));
-+	INIT_LIST_HEAD(&resource->resource_list);
-+	list_add_tail(&resource->list, resource_list);
++	return err;
++}
++
++int devlink_nl_param_get_dumpit(struct sk_buff *skb,
++				struct netlink_callback *cb)
++{
++	return devlink_nl_dumpit(skb, cb, devlink_nl_param_get_dump_one);
++}
++
++static int
++devlink_param_type_get_from_info(struct genl_info *info,
++				 enum devlink_param_type *param_type)
++{
++	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_TYPE))
++		return -EINVAL;
++
++	switch (nla_get_u8(info->attrs[DEVLINK_ATTR_PARAM_TYPE])) {
++	case NLA_U8:
++		*param_type = DEVLINK_PARAM_TYPE_U8;
++		break;
++	case NLA_U16:
++		*param_type = DEVLINK_PARAM_TYPE_U16;
++		break;
++	case NLA_U32:
++		*param_type = DEVLINK_PARAM_TYPE_U32;
++		break;
++	case NLA_STRING:
++		*param_type = DEVLINK_PARAM_TYPE_STRING;
++		break;
++	case NLA_FLAG:
++		*param_type = DEVLINK_PARAM_TYPE_BOOL;
++		break;
++	default:
++		return -EINVAL;
++	}
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(devl_resource_register);
++
++static int
++devlink_param_value_get_from_info(const struct devlink_param *param,
++				  struct genl_info *info,
++				  union devlink_param_value *value)
++{
++	struct nlattr *param_data;
++	int len;
++
++	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
++
++	if (param->type != DEVLINK_PARAM_TYPE_BOOL && !param_data)
++		return -EINVAL;
++
++	switch (param->type) {
++	case DEVLINK_PARAM_TYPE_U8:
++		if (nla_len(param_data) != sizeof(u8))
++			return -EINVAL;
++		value->vu8 = nla_get_u8(param_data);
++		break;
++	case DEVLINK_PARAM_TYPE_U16:
++		if (nla_len(param_data) != sizeof(u16))
++			return -EINVAL;
++		value->vu16 = nla_get_u16(param_data);
++		break;
++	case DEVLINK_PARAM_TYPE_U32:
++		if (nla_len(param_data) != sizeof(u32))
++			return -EINVAL;
++		value->vu32 = nla_get_u32(param_data);
++		break;
++	case DEVLINK_PARAM_TYPE_STRING:
++		len = strnlen(nla_data(param_data), nla_len(param_data));
++		if (len == nla_len(param_data) ||
++		    len >= __DEVLINK_PARAM_MAX_STRING_VALUE)
++			return -EINVAL;
++		strcpy(value->vstr, nla_data(param_data));
++		break;
++	case DEVLINK_PARAM_TYPE_BOOL:
++		if (param_data && nla_len(param_data))
++			return -EINVAL;
++		value->vbool = nla_get_flag(param_data);
++		break;
++	}
++	return 0;
++}
++
++static struct devlink_param_item *
++devlink_param_get_from_info(struct xarray *params, struct genl_info *info)
++{
++	char *param_name;
++
++	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_NAME))
++		return NULL;
++
++	param_name = nla_data(info->attrs[DEVLINK_ATTR_PARAM_NAME]);
++	return devlink_param_find_by_name(params, param_name);
++}
++
++int devlink_nl_param_get_doit(struct sk_buff *skb,
++			      struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_param_item *param_item;
++	struct sk_buff *msg;
++	int err;
++
++	param_item = devlink_param_get_from_info(&devlink->params, info);
++	if (!param_item)
++		return -EINVAL;
++
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!msg)
++		return -ENOMEM;
++
++	err = devlink_nl_param_fill(msg, devlink, 0, param_item,
++				    DEVLINK_CMD_PARAM_GET,
++				    info->snd_portid, info->snd_seq, 0);
++	if (err) {
++		nlmsg_free(msg);
++		return err;
++	}
++
++	return genlmsg_reply(msg, info);
++}
++
++static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
++					   unsigned int port_index,
++					   struct xarray *params,
++					   struct genl_info *info,
++					   enum devlink_command cmd)
++{
++	enum devlink_param_type param_type;
++	struct devlink_param_gset_ctx ctx;
++	enum devlink_param_cmode cmode;
++	struct devlink_param_item *param_item;
++	const struct devlink_param *param;
++	union devlink_param_value value;
++	int err = 0;
++
++	param_item = devlink_param_get_from_info(params, info);
++	if (!param_item)
++		return -EINVAL;
++	param = param_item->param;
++	err = devlink_param_type_get_from_info(info, &param_type);
++	if (err)
++		return err;
++	if (param_type != param->type)
++		return -EINVAL;
++	err = devlink_param_value_get_from_info(param, info, &value);
++	if (err)
++		return err;
++	if (param->validate) {
++		err = param->validate(devlink, param->id, value, info->extack);
++		if (err)
++			return err;
++	}
++
++	if (GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_VALUE_CMODE))
++		return -EINVAL;
++	cmode = nla_get_u8(info->attrs[DEVLINK_ATTR_PARAM_VALUE_CMODE]);
++	if (!devlink_param_cmode_is_supported(param, cmode))
++		return -EOPNOTSUPP;
++
++	if (cmode == DEVLINK_PARAM_CMODE_DRIVERINIT) {
++		param_item->driverinit_value_new = value;
++		param_item->driverinit_value_new_valid = true;
++	} else {
++		if (!param->set)
++			return -EOPNOTSUPP;
++		ctx.val = value;
++		ctx.cmode = cmode;
++		err = devlink_param_set(devlink, param, &ctx);
++		if (err)
++			return err;
++	}
++
++	devlink_param_notify(devlink, port_index, param_item, cmd);
++	return 0;
++}
++
++int devlink_nl_cmd_param_set_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++
++	return __devlink_nl_cmd_param_set_doit(devlink, 0, &devlink->params,
++					       info, DEVLINK_CMD_PARAM_NEW);
++}
++
++int devlink_nl_cmd_port_param_get_dumpit(struct sk_buff *msg,
++					 struct netlink_callback *cb)
++{
++	NL_SET_ERR_MSG(cb->extack, "Port params are not supported");
++	return msg->len;
++}
++
++int devlink_nl_cmd_port_param_get_doit(struct sk_buff *skb,
++				       struct genl_info *info)
++{
++	NL_SET_ERR_MSG(info->extack, "Port params are not supported");
++	return -EINVAL;
++}
++
++int devlink_nl_cmd_port_param_set_doit(struct sk_buff *skb,
++				       struct genl_info *info)
++{
++	NL_SET_ERR_MSG(info->extack, "Port params are not supported");
++	return -EINVAL;
++}
++
++static int devlink_param_verify(const struct devlink_param *param)
++{
++	if (!param || !param->name || !param->supported_cmodes)
++		return -EINVAL;
++	if (param->generic)
++		return devlink_param_generic_verify(param);
++	else
++		return devlink_param_driver_verify(param);
++}
++
++static int devlink_param_register(struct devlink *devlink,
++				  const struct devlink_param *param)
++{
++	struct devlink_param_item *param_item;
++	int err;
++
++	WARN_ON(devlink_param_verify(param));
++	WARN_ON(devlink_param_find_by_name(&devlink->params, param->name));
++
++	if (param->supported_cmodes == BIT(DEVLINK_PARAM_CMODE_DRIVERINIT))
++		WARN_ON(param->get || param->set);
++	else
++		WARN_ON(!param->get || !param->set);
++
++	param_item = kzalloc(sizeof(*param_item), GFP_KERNEL);
++	if (!param_item)
++		return -ENOMEM;
++
++	param_item->param = param;
++
++	err = xa_insert(&devlink->params, param->id, param_item, GFP_KERNEL);
++	if (err)
++		goto err_xa_insert;
++
++	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
++	return 0;
++
++err_xa_insert:
++	kfree(param_item);
++	return err;
++}
++
++static void devlink_param_unregister(struct devlink *devlink,
++				     const struct devlink_param *param)
++{
++	struct devlink_param_item *param_item;
++
++	param_item = devlink_param_find_by_id(&devlink->params, param->id);
++	if (WARN_ON(!param_item))
++		return;
++	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_DEL);
++	xa_erase(&devlink->params, param->id);
++	kfree(param_item);
++}
 +
 +/**
-+ *	devlink_resource_register - devlink resource register
++ *	devl_params_register - register configuration parameters
 + *
 + *	@devlink: devlink
-+ *	@resource_name: resource's name
-+ *	@resource_size: resource's size
-+ *	@resource_id: resource's id
-+ *	@parent_resource_id: resource's parent id
-+ *	@size_params: size parameters
++ *	@params: configuration parameters array
++ *	@params_count: number of parameters provided
 + *
-+ *	Generic resources should reuse the same names across drivers.
-+ *	Please see the generic resources list at:
-+ *	Documentation/networking/devlink/devlink-resource.rst
-+ *
-+ *	Context: Takes and release devlink->lock <mutex>.
++ *	Register the configuration parameters supported by the driver.
 + */
-+int devlink_resource_register(struct devlink *devlink,
-+			      const char *resource_name,
-+			      u64 resource_size,
-+			      u64 resource_id,
-+			      u64 parent_resource_id,
-+			      const struct devlink_resource_size_params *size_params)
++int devl_params_register(struct devlink *devlink,
++			 const struct devlink_param *params,
++			 size_t params_count)
++{
++	const struct devlink_param *param = params;
++	int i, err;
++
++	lockdep_assert_held(&devlink->lock);
++
++	for (i = 0; i < params_count; i++, param++) {
++		err = devlink_param_register(devlink, param);
++		if (err)
++			goto rollback;
++	}
++	return 0;
++
++rollback:
++	if (!i)
++		return err;
++
++	for (param--; i > 0; i--, param--)
++		devlink_param_unregister(devlink, param);
++	return err;
++}
++EXPORT_SYMBOL_GPL(devl_params_register);
++
++int devlink_params_register(struct devlink *devlink,
++			    const struct devlink_param *params,
++			    size_t params_count)
 +{
 +	int err;
 +
 +	devl_lock(devlink);
-+	err = devl_resource_register(devlink, resource_name, resource_size,
-+				     resource_id, parent_resource_id, size_params);
++	err = devl_params_register(devlink, params, params_count);
 +	devl_unlock(devlink);
 +	return err;
 +}
-+EXPORT_SYMBOL_GPL(devlink_resource_register);
-+
-+static void devlink_resource_unregister(struct devlink *devlink,
-+					struct devlink_resource *resource)
-+{
-+	struct devlink_resource *tmp, *child_resource;
-+
-+	list_for_each_entry_safe(child_resource, tmp, &resource->resource_list,
-+				 list) {
-+		devlink_resource_unregister(devlink, child_resource);
-+		list_del(&child_resource->list);
-+		kfree(child_resource);
-+	}
-+}
++EXPORT_SYMBOL_GPL(devlink_params_register);
 +
 +/**
-+ * devl_resources_unregister - free all resources
-+ *
-+ * @devlink: devlink
++ *	devl_params_unregister - unregister configuration parameters
++ *	@devlink: devlink
++ *	@params: configuration parameters to unregister
++ *	@params_count: number of parameters provided
 + */
-+void devl_resources_unregister(struct devlink *devlink)
++void devl_params_unregister(struct devlink *devlink,
++			    const struct devlink_param *params,
++			    size_t params_count)
 +{
-+	struct devlink_resource *tmp, *child_resource;
++	const struct devlink_param *param = params;
++	int i;
 +
 +	lockdep_assert_held(&devlink->lock);
 +
-+	list_for_each_entry_safe(child_resource, tmp, &devlink->resource_list,
-+				 list) {
-+		devlink_resource_unregister(devlink, child_resource);
-+		list_del(&child_resource->list);
-+		kfree(child_resource);
-+	}
++	for (i = 0; i < params_count; i++, param++)
++		devlink_param_unregister(devlink, param);
 +}
-+EXPORT_SYMBOL_GPL(devl_resources_unregister);
++EXPORT_SYMBOL_GPL(devl_params_unregister);
 +
-+/**
-+ *	devlink_resources_unregister - free all resources
-+ *
-+ *	@devlink: devlink
-+ *
-+ *	Context: Takes and release devlink->lock <mutex>.
-+ */
-+void devlink_resources_unregister(struct devlink *devlink)
++void devlink_params_unregister(struct devlink *devlink,
++			       const struct devlink_param *params,
++			       size_t params_count)
 +{
 +	devl_lock(devlink);
-+	devl_resources_unregister(devlink);
++	devl_params_unregister(devlink, params, params_count);
 +	devl_unlock(devlink);
 +}
-+EXPORT_SYMBOL_GPL(devlink_resources_unregister);
++EXPORT_SYMBOL_GPL(devlink_params_unregister);
 +
 +/**
-+ * devl_resource_size_get - get and update size
++ *	devl_param_driverinit_value_get - get configuration parameter
++ *					  value for driver initializing
 + *
-+ * @devlink: devlink
-+ * @resource_id: the requested resource id
-+ * @p_resource_size: ptr to update
++ *	@devlink: devlink
++ *	@param_id: parameter ID
++ *	@val: pointer to store the value of parameter in driverinit
++ *	      configuration mode
++ *
++ *	This function should be used by the driver to get driverinit
++ *	configuration for initialization after reload command.
++ *
++ *	Note that lockless call of this function relies on the
++ *	driver to maintain following basic sane behavior:
++ *	1) Driver ensures a call to this function cannot race with
++ *	   registering/unregistering the parameter with the same parameter ID.
++ *	2) Driver ensures a call to this function cannot race with
++ *	   devl_param_driverinit_value_set() call with the same parameter ID.
++ *	3) Driver ensures a call to this function cannot race with
++ *	   reload operation.
++ *	If the driver is not able to comply, it has to take the devlink->lock
++ *	while calling this.
 + */
-+int devl_resource_size_get(struct devlink *devlink,
-+			   u64 resource_id,
-+			   u64 *p_resource_size)
++int devl_param_driverinit_value_get(struct devlink *devlink, u32 param_id,
++				    union devlink_param_value *val)
 +{
-+	struct devlink_resource *resource;
++	struct devlink_param_item *param_item;
 +
-+	lockdep_assert_held(&devlink->lock);
++	if (WARN_ON(!devlink_reload_supported(devlink->ops)))
++		return -EOPNOTSUPP;
 +
-+	resource = devlink_resource_find(devlink, NULL, resource_id);
-+	if (!resource)
++	param_item = devlink_param_find_by_id(&devlink->params, param_id);
++	if (!param_item)
 +		return -EINVAL;
-+	*p_resource_size = resource->size_new;
-+	resource->size = resource->size_new;
++
++	if (!param_item->driverinit_value_valid)
++		return -EOPNOTSUPP;
++
++	if (WARN_ON(!devlink_param_cmode_is_supported(param_item->param,
++						      DEVLINK_PARAM_CMODE_DRIVERINIT)))
++		return -EOPNOTSUPP;
++
++	*val = param_item->driverinit_value;
++
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(devl_resource_size_get);
++EXPORT_SYMBOL_GPL(devl_param_driverinit_value_get);
 +
 +/**
-+ * devl_resource_occ_get_register - register occupancy getter
-+ *
-+ * @devlink: devlink
-+ * @resource_id: resource id
-+ * @occ_get: occupancy getter callback
-+ * @occ_get_priv: occupancy getter callback priv
-+ */
-+void devl_resource_occ_get_register(struct devlink *devlink,
-+				    u64 resource_id,
-+				    devlink_resource_occ_get_t *occ_get,
-+				    void *occ_get_priv)
-+{
-+	struct devlink_resource *resource;
-+
-+	lockdep_assert_held(&devlink->lock);
-+
-+	resource = devlink_resource_find(devlink, NULL, resource_id);
-+	if (WARN_ON(!resource))
-+		return;
-+	WARN_ON(resource->occ_get);
-+
-+	resource->occ_get = occ_get;
-+	resource->occ_get_priv = occ_get_priv;
-+}
-+EXPORT_SYMBOL_GPL(devl_resource_occ_get_register);
-+
-+/**
-+ *	devlink_resource_occ_get_register - register occupancy getter
++ *	devl_param_driverinit_value_set - set value of configuration
++ *					  parameter for driverinit
++ *					  configuration mode
 + *
 + *	@devlink: devlink
-+ *	@resource_id: resource id
-+ *	@occ_get: occupancy getter callback
-+ *	@occ_get_priv: occupancy getter callback priv
++ *	@param_id: parameter ID
++ *	@init_val: value of parameter to set for driverinit configuration mode
 + *
-+ *	Context: Takes and release devlink->lock <mutex>.
++ *	This function should be used by the driver to set driverinit
++ *	configuration mode default value.
 + */
-+void devlink_resource_occ_get_register(struct devlink *devlink,
-+				       u64 resource_id,
-+				       devlink_resource_occ_get_t *occ_get,
-+				       void *occ_get_priv)
++void devl_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
++				     union devlink_param_value init_val)
 +{
-+	devl_lock(devlink);
-+	devl_resource_occ_get_register(devlink, resource_id,
-+				       occ_get, occ_get_priv);
-+	devl_unlock(devlink);
-+}
-+EXPORT_SYMBOL_GPL(devlink_resource_occ_get_register);
++	struct devlink_param_item *param_item;
 +
-+/**
-+ * devl_resource_occ_get_unregister - unregister occupancy getter
-+ *
-+ * @devlink: devlink
-+ * @resource_id: resource id
-+ */
-+void devl_resource_occ_get_unregister(struct devlink *devlink,
-+				      u64 resource_id)
-+{
-+	struct devlink_resource *resource;
++	devl_assert_locked(devlink);
 +
-+	lockdep_assert_held(&devlink->lock);
-+
-+	resource = devlink_resource_find(devlink, NULL, resource_id);
-+	if (WARN_ON(!resource))
++	param_item = devlink_param_find_by_id(&devlink->params, param_id);
++	if (WARN_ON(!param_item))
 +		return;
-+	WARN_ON(!resource->occ_get);
 +
-+	resource->occ_get = NULL;
-+	resource->occ_get_priv = NULL;
++	if (WARN_ON(!devlink_param_cmode_is_supported(param_item->param,
++						      DEVLINK_PARAM_CMODE_DRIVERINIT)))
++		return;
++
++	param_item->driverinit_value = init_val;
++	param_item->driverinit_value_valid = true;
++
++	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
 +}
-+EXPORT_SYMBOL_GPL(devl_resource_occ_get_unregister);
++EXPORT_SYMBOL_GPL(devl_param_driverinit_value_set);
++
++void devlink_params_driverinit_load_new(struct devlink *devlink)
++{
++	struct devlink_param_item *param_item;
++	unsigned long param_id;
++
++	xa_for_each(&devlink->params, param_id, param_item) {
++		if (!devlink_param_cmode_is_supported(param_item->param,
++						      DEVLINK_PARAM_CMODE_DRIVERINIT) ||
++		    !param_item->driverinit_value_new_valid)
++			continue;
++		param_item->driverinit_value = param_item->driverinit_value_new;
++		param_item->driverinit_value_valid = true;
++		param_item->driverinit_value_new_valid = false;
++	}
++}
 +
 +/**
-+ *	devlink_resource_occ_get_unregister - unregister occupancy getter
++ *	devl_param_value_changed - notify devlink on a parameter's value
++ *				   change. Should be called by the driver
++ *				   right after the change.
 + *
 + *	@devlink: devlink
-+ *	@resource_id: resource id
++ *	@param_id: parameter ID
 + *
-+ *	Context: Takes and release devlink->lock <mutex>.
++ *	This function should be used by the driver to notify devlink on value
++ *	change, excluding driverinit configuration mode.
++ *	For driverinit configuration mode driver should use the function
 + */
-+void devlink_resource_occ_get_unregister(struct devlink *devlink,
-+					 u64 resource_id)
++void devl_param_value_changed(struct devlink *devlink, u32 param_id)
 +{
-+	devl_lock(devlink);
-+	devl_resource_occ_get_unregister(devlink, resource_id);
-+	devl_unlock(devlink);
++	struct devlink_param_item *param_item;
++
++	param_item = devlink_param_find_by_id(&devlink->params, param_id);
++	WARN_ON(!param_item);
++
++	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
 +}
-+EXPORT_SYMBOL_GPL(devlink_resource_occ_get_unregister);
++EXPORT_SYMBOL_GPL(devl_param_value_changed);
 -- 
 2.41.0
 
