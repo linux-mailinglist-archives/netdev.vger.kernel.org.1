@@ -1,190 +1,159 @@
-Return-Path: <netdev+bounces-30738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AFA8788C6F
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 17:27:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 042B7788C7C
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 17:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 632DF1C20FF7
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:27:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0E7228154F
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E60107A0;
-	Fri, 25 Aug 2023 15:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5DE107A8;
+	Fri, 25 Aug 2023 15:31:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E34101DE
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:27:21 +0000 (UTC)
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB32F2733;
-	Fri, 25 Aug 2023 08:26:58 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id e9e14a558f8ab-34bb72ffb1fso3553215ab.3;
-        Fri, 25 Aug 2023 08:26:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692977218; x=1693582018;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KcmM3G7mPvInDI7x9n1WVGdIT7j8cD6MA5FDEXRb+aE=;
-        b=s3hraC9tsUnIgyCPDaQtSu0TjbCWmspIIFEXz3RN21Lg6Q9MWewWMwhuxnx2iAu/1/
-         61FgF+8fiMvfNUrayZYSy4PwVasyF4e/HssLT3a+iuXFN/dboOREr0f48Yp8sO/MbGsa
-         Uf2leWp/jsVpAn7144DlcLNLPwcpiXlv0hHvv00INQOuCh0oxlTagWF4FzO6tymuS8or
-         KlhFZkkq7KDO3/tZEESIzW8+b46Zd96pySgqst2qcFXz8ZLCEQFTGbhnau0R8ou62wd3
-         2fLAdc1V/oACM9PTbEDG3C9683N2S+jeU2Ny3cnwn6HNj+KxEej7WPjjx5efkfURyN2U
-         BuHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692977218; x=1693582018;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KcmM3G7mPvInDI7x9n1WVGdIT7j8cD6MA5FDEXRb+aE=;
-        b=Z4oWKGJkz87JmX2lydYIgmFKEM6GXdicsDq/8BMXW1UGfFFzI43grPKQDX/OFnfo3e
-         vFv5+svn8fUf4kmfzwHoMVRMyO0COoHXh4Kcu9b9Tp38jtPxgSeFtMo29+wJZD9EluOy
-         1ymSA+n5GyPT417wElgiWhAw2U/LY+EJJasS/Mle4MOcjTo82JuGMLYCxitC/XtG9njK
-         goeOCwQWWbPtnmdfN/Q9egWQxkboz3mqKyGRLcvn6sr1vBRKFU2A4XVCkGmN8lW7LXwj
-         Vy9EUCC8V5iOoGmE+A9bl8EQSeYuH9elFjRQzjR0h8GKp68Yb1PNuL+o0LFgdfTRJ0I/
-         ganA==
-X-Gm-Message-State: AOJu0YzNtoywADeZjYgZa1XeDdKOVp5Y2XIARYj4btACcFXnOWRFXJmG
-	TDI/snNx8qEaYAiyaRUf2eg=
-X-Google-Smtp-Source: AGHT+IFz7+5LJ1/nuYFat8UgtlwpTAtGQnchg/NH5X+DRSteprVeX+TDhddZM1cNbBJOLsO+2f4zVA==
-X-Received: by 2002:a92:cd86:0:b0:349:777e:f514 with SMTP id r6-20020a92cd86000000b00349777ef514mr11240682ilb.10.1692977217952;
-        Fri, 25 Aug 2023 08:26:57 -0700 (PDT)
-Received: from ?IPV6:2600:8802:b00:4a48:944f:2db6:2b1a:8d59? ([2600:8802:b00:4a48:944f:2db6:2b1a:8d59])
-        by smtp.gmail.com with ESMTPSA id z11-20020a63b04b000000b00565ec002d14sm1694547pgo.33.2023.08.25.08.26.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Aug 2023 08:26:56 -0700 (PDT)
-Message-ID: <862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
-Date: Fri, 25 Aug 2023 08:26:55 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCE0101CA
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:31:40 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7355D2134;
+	Fri, 25 Aug 2023 08:31:38 -0700 (PDT)
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 1082786A2D;
+	Fri, 25 Aug 2023 17:31:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1692977496;
+	bh=g/VNauoDXetVsPPtplesS+rVsh45l3BezBkVgWV4Yvw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IwNzAse4SKZrxJ8kqO3hN+dzy/KzrE+jGzg62/DD6PujT7pMldqU5xJJGqh/YpDAH
+	 GQFaZpT7a2c/8ePMSWOgXwUnkd1gl5QKthYxTF4jG7FN9Wnrbn0r9oKGkjLFHgA+//
+	 qfCiO7p0E1m4q6b1FWHJpi5cdhVrM/G6RIZ6XoMF1nY6QWYjLF3cTammu1H56+efl7
+	 vBJfqZXVkPNGV1xiP0pzZ/yQYczTI9i4RKUKDbRZtnGOvilSHJSxeqbqV1cUHpd4eW
+	 +JnMDn3zmSTlU93GT9KWhi0NUx4SIMsE27L5zETNGCQU8vfMrZlxCdDZPQdA/HHs7t
+	 WNM7OCcKx16CA==
+From: Lukasz Majewski <lukma@denx.de>
+To: Tristram.Ha@microchip.com,
+	Eric Dumazet <edumazet@google.com>,
+	davem@davemloft.net
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kristian Overskeid <koverskeid@gmail.com>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames decoding
+Date: Fri, 25 Aug 2023 17:31:11 +0200
+Message-Id: <20230825153111.228768-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Content-Language: en-US
-To: Lukasz Majewski <lukma@denx.de>, Tristram.Ha@microchip.com
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, Woojung.Huh@microchip.com,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- UNGLinuxDriver@microchip.com
-References: <20230824154827.166274-1-lukma@denx.de>
- <20230824154827.166274-2-lukma@denx.de>
- <BYAPR11MB35583A648E4E44944A0172A0ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
- <20230825103911.682b3d70@wsk>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230825103911.682b3d70@wsk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Provide fix to decode correctly supervisory frames when HSRv1 version of
+the HSR protocol is used.
 
+Without this patch console is polluted with:
+ksz-switch spi1.0 lan1: hsr_addr_subst_dest: Unknown node
 
-On 8/25/2023 1:39 AM, Lukasz Majewski wrote:
-> Hi Tristram,
-> 
->>> +static int ksz9477_errata(struct dsa_switch *ds)
->>> +{
->>> +       struct ksz_device *dev = ds->priv;
->>> +       u16 val;
->>> +       int p;
->>> +
->>> +       /* KSZ9477 Errata DS80000754C
->>> +        *
->>> +        * Module 4: Energy Efficient Ethernet (EEE) feature select
->>> must be
->>> +        * manually disabled
->>> +        *   The EEE feature is enabled by default, but it is not
->>> fully
->>> +        *   operational. It must be manually disabled through
->>> register
->>> +        *   controls. If not disabled, the PHY ports can
->>> auto-negotiate
->>> +        *   to enable EEE, and this feature can cause link drops
->>> when linked
->>> +        *   to another device supporting EEE.
->>> +        *
->>> +        *   Only PHY ports (dsa user) [0-4] need to have the EEE
->>> advertisement
->>> +        *   bits cleared.
->>> +        */
->>> +
->>> +       for (p = 0; p < ds->num_ports; p++) {
->>> +               if (!dsa_is_user_port(ds, p))
->>> +                       continue;
->>> +
->>> +               ksz9477_port_mmd_read(dev, p, MMD_DEVICE_ID_EEE_ADV,
->>> +                                     MMD_EEE_ADV, &val, 1);
->>> +
->>> +               pr_err("%s: PORT: %d val: 0x%x pc: %d\n", __func__,
->>> p, val,
->>> +                      ds->num_ports);
->>> +
->>> +               val &= ~(EEE_ADV_100MBIT | EEE_ADV_1GBIT);
->>> +               ksz9477_port_mmd_write(dev, p,
->>> MMD_DEVICE_ID_EEE_ADV,
->>> +                                      MMD_EEE_ADV, &val, 1);
->>> +       }
->>> +
->>> +       return 0;
->>> +}
->>> +
->>>   int ksz9477_setup(struct dsa_switch *ds)
->>>   {
->>>          struct ksz_device *dev = ds->priv;
->>> @@ -1157,7 +1195,7 @@ int ksz9477_setup(struct dsa_switch *ds)
->>>          /* enable global MIB counter freeze function */
->>>          ksz_cfg(dev, REG_SW_MAC_CTRL_6, SW_MIB_COUNTER_FREEZE,
->>> true);
->>>
->>> -       return 0;
->>> +       return ksz9477_errata(ds);
->>>   }
->>
->> I would prefer to execute the code in ksz9477_config_cpu_port(), as at
->> the end there is already a loop to do something to each port.
-> 
-> Just some explanation of the taken approach:
-> 
-> 1. I've followed already in-mainline code for ksz8795.c
-> (ksz8_handle_global_errata(ds)) which is executed in ksz8_setup
-> function.
-> 
-> 2. I do believe, that separate "errata" function would be more
-> readable, as KSZ9477 has many more erratas to be added.
-> 
->> The
->> check to disable EEE or not should be dev->info->internal_phy[port],
->> as one of the user ports can be RGMII or SGMII, which does not have a
->> PHY that can be accessed inside the switch.
-> 
-> Yes, this would be better solution. Thanks for the suggestion.
-> 
->>
->> As the EEE register value is simply 6 it should be enough to just set
->> the register to zero.  If so we do not need to add back those
->> ksz9477_port_mmd_setup functions and just use ksz_pwrite16() to write
->> to the MMD register.
->>
-> 
-> IMHO adding functions to MMD modification would facilitate further
-> development (for example LED setup).
+as a result of destination node's A MAC address equals to:
+00:00:00:00:00:00.
 
-We already have some KSZ9477 specific initialization done in the Micrel 
-PHY driver under drivers/net/phy/micrel.c, can we converge on the PHY 
-driver which has a reasonable amount of infrastructure for dealing with 
-workarounds, indirect or direct MMD accesses etc.?
+cat /sys/kernel/debug/hsr/hsr0/node_table
+Node Table entries for (HSR) device
+MAC-Address-A,    MAC-Address-B,    time_in[A], time_in[B], Address-B
+00:00:00:00:00:00 00:10:a1:94:77:30      400bf,       399c,	        0
+
+It was caused by wrong frames decoding in the hsr_handle_sup_frame().
+
+As the supervisor frame is encapsulated in HSRv1 frame:
+
+SKB_I100000000: 01 15 4e 00 01 2d 00 10 a1 94 77 30 89 2f 00 34
+SKB_I100000010: 02 59 88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
+SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+SKB_I100000040: 00 00
+
+The code had to be adjusted accordingly and the MAC-Address-A now
+has the proper address (the MAC-Address-B now has all 0's).
+
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ net/hsr/hsr_framereg.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
+
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index 80fc71daf7ca..85abe052e0a9 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -300,9 +300,24 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
+ 
+ 	ethhdr = (struct ethhdr *)skb_mac_header(skb);
+ 
+-	/* And leave the HSR tag. */
++	 * And leave the HSR tag.
++	 *
++	 * The HSRv1 supervisory frame encapsulates the v0 frame
++	 * with EtherType of 0x88FB
++	 */
+ 	if (ethhdr->h_proto == htons(ETH_P_HSR)) {
+-		pull_size = sizeof(struct ethhdr);
++		if (hsr->prot_version == HSR_V1)
++			/* In the above step the DA, SA and EtherType
++			 * (0x892F - HSRv1) bytes has been removed.
++			 *
++			 * As the HSRv1 has the HSR header added, one need
++			 * to remove path_and_LSDU_size and sequence_nr fields.
++			 *
++			 */
++			pull_size = 4;
++		else
++			pull_size = sizeof(struct hsr_tag);
++
+ 		skb_pull(skb, pull_size);
+ 		total_pull_size += pull_size;
+ 	}
+@@ -313,6 +328,19 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
+ 	total_pull_size += pull_size;
+ 
+ 	/* get HSR sup payload */
++	if (hsr->prot_version == HSR_V1) {
++		/* In the HSRv1 supervisor frame, when
++		 * one with EtherType = 0x88FB is extracted, the Node A
++		 * MAC address is preceded with type and length elements of TLV
++		 * data field.
++		 *
++		 * It needs to be removed to get the remote peer MAC address.
++		 */
++		pull_size = sizeof(struct hsr_sup_tlv);
++		skb_pull(skb, pull_size);
++		total_pull_size += pull_size;
++	}
++
+ 	hsr_sp = (struct hsr_sup_payload *)skb->data;
+ 
+ 	/* Merge node_curr (registered on macaddress_B) into node_real */
 -- 
-Florian
+2.20.1
+
 
