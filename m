@@ -1,64 +1,89 @@
-Return-Path: <netdev+bounces-30794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D4A7891AC
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:23:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E8ED789203
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E33A9281945
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 22:23:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F05C1C2104E
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 22:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9363F1AA6B;
-	Fri, 25 Aug 2023 22:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA07198A5;
+	Fri, 25 Aug 2023 22:53:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801DA19883
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 22:23:30 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71D92110
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:23:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693002208; x=1724538208;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JBnc0QG+1aFQQroftxh2ThC8FXzf6nI5IRhrwD0d8tY=;
-  b=aEOX1LhWAoHdxKZRQR5eQ51Sp/YSBLl9LFl8Vy/4p0fT09n45oEwhsOe
-   Ko+j6eofu1b4qcuPozApmnnbOOFHUmu4jmpieugPmc1XY9yaSY79sKuvI
-   P6hM6wSqLCpM6M3lOvzFoTkMsr3ySR+B0TRB3AuEFVhMMQ0cGgXoqXIVm
-   oZmhd1ArTCcZLPRWu1TkNcOl7WlRYm/NT5wNDZobBYQLWu4/k+GQytu2w
-   7J8lEOnXhzVsBJfajg28HZLpb6ML+mOdO7FcZlXDytiaF0dZMb1ufI/+N
-   lX/E2poKt7uSvO3VF1CvyQGVLz+1O0OOyIhFV8SZuKt/2Oicsz0lLVrjp
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="374789365"
-X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
-   d="scan'208";a="374789365"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 15:22:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="772640758"
-X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
-   d="scan'208";a="772640758"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 25 Aug 2023 15:22:09 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qZfBu-000445-0v;
-	Fri, 25 Aug 2023 22:22:06 +0000
-Date: Sat, 26 Aug 2023 06:21:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	intel-wired-lan@osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	aelior@marvell.com, manishc@marvell.com, andrew@lunn.ch
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 2/8] ethtool: Add forced
- speed to supported link modes maps
-Message-ID: <202308260616.Sf8QzI7c-lkp@intel.com>
-References: <20230823180633.2450617-3-pawel.chmielewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ABF1C02
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 22:53:45 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5CA272B
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68c0d4cc3a4so714039b3a.1
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693004012; x=1693608812;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pUz0mvDJOC9uQjgg5Uba361PK/6ticcfnjAOo3qTtYA=;
+        b=F6apRE+SrZTqCeuN1zLMRosK5ge3rhNKZnpOWKEqEdWDSsGDK7EQGyDQsb6/5NjMZA
+         3YMPbcTJ/D3BMiY5oD/xtnLm9pzhShZ6+Y7oDMWnO0DfFEZbieWLXokCpFNjeT5nfH1C
+         s22NB1Wf7ErFiXowqbOOitIpN8YQ6wn+7f9hHAh/AXrGUdDwlOs/O2qrqcuv4RSpXcnU
+         GbrxFepvZAk5VQgoyCmH+APqoM+wo3KvR0eb+zB1BsLvnPOQaJNrJEZsuvoY9FN/6wnP
+         PBrjyNBdKOdo0Hj7mZUOQ9904vJZldE2dQql827LKN+udL2AKxU33q1Q1ADVqqMaFs/v
+         qugw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693004012; x=1693608812;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pUz0mvDJOC9uQjgg5Uba361PK/6ticcfnjAOo3qTtYA=;
+        b=gRNETiZArBu9AVbm0IG6jQ0I2pH9a1Dc0ry5v0jxkoqxdx7YV3jeSKjK88dpeBj0iG
+         igvBNggmVE1mOn3NG72O3vBlCcaQmP9YlMYUnzS0jHOEgbOJ9TDX01cp2CQGaSnHA5cx
+         J2aU3kqPoPLij7kNy+HRooG3wwYagHAiALwRM8UOcL/PYqSFdSrniEjuQpcmEU+MTNks
+         hCYHPrtmEFRSmfs4MI6up/rqwyjqZfFtioiTjKbvJvGYv2vjWWIaMELJ4j7CfRsBe094
+         Z04jeUxOczsa/42Nb0gIEtch34H/l6dHbgrarMzmNiPTkucxIgce7Zn8he6YawGRYnil
+         oY8g==
+X-Gm-Message-State: AOJu0YxCZ7ifVmf3y6SFhITo44lLoldJs9b2EB/fN4fL22TvW3jKTCq2
+	Xf/1lqOKzjEhFS2dCBWwW2HeAQ==
+X-Google-Smtp-Source: AGHT+IF7qLruqklxY40yAH4SKvsJCnFBTQ8pg1x9p8DXB9ryPTSvbA4aGhPPBTQdBXYgxxyeFGZdhA==
+X-Received: by 2002:a05:6a20:7354:b0:13d:5b8e:db83 with SMTP id v20-20020a056a20735400b0013d5b8edb83mr20399311pzc.9.1693004012072;
+        Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id u15-20020a62ed0f000000b006887be16675sm2060364pfh.205.2023.08.25.15.53.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Aug 2023 15:53:31 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1qZfgG-006WDY-1c;
+	Sat, 26 Aug 2023 08:53:28 +1000
+Date: Sat, 26 Aug 2023 08:53:28 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Hao Xu <hao.xu@linux.dev>
+Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+	"Darrick J . Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+	Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH RFC v5 00/29] io_uring getdents
+Message-ID: <ZOkw6KkdP1UWPNBW@dread.disaster.area>
+References: <20230825135431.1317785-1-hao.xu@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,115 +92,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230823180633.2450617-3-pawel.chmielewski@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230825135431.1317785-1-hao.xu@linux.dev>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Pawel,
+On Fri, Aug 25, 2023 at 09:54:02PM +0800, Hao Xu wrote:
+> From: Hao Xu <howeyxu@tencent.com>
+> 
+> This series introduce getdents64 to io_uring, the code logic is similar
+> with the snychronized version's. It first try nowait issue, and offload
+> it to io-wq threads if the first try fails.
+> 
+> Patch1 and Patch2 are some preparation
+> Patch3 supports nowait for xfs getdents code
+> Patch4-11 are vfs change, include adding helpers and trylock for locks
+> Patch12-29 supports nowait for involved xfs journal stuff
+> note, Patch24 and 27 are actually two questions, might be removed later.
+> an xfs test may come later.
 
-kernel test robot noticed the following build errors:
+You need to drop all the XFS journal stuff. It's fundamentally
+broken as it stands, and we cannot support non-blocking
+transactional changes without first putting a massive investment in
+transaction and intent chain rollback to allow correctly undoing
+partially complete modifications.
 
-[auto build test ERROR on tnguy-next-queue/dev-queue]
+Regardless, non-blocking transactions are completely unnecessary for
+a non-blocking readdir implementation. readdir should only be
+touching atime, and with relatime it should only occur once every 24
+hours per inode. If that's a problem, then we have noatime mount
+options. Hence I just don't see any point in worrying about having a
+timestamp update block occasionally...
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pawel-Chmielewski/ice-Add-E830-device-IDs-MAC-type-and-registers/20230824-021235
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20230823180633.2450617-3-pawel.chmielewski%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-next v3 2/8] ethtool: Add forced speed to supported link modes maps
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230826/202308260616.Sf8QzI7c-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230826/202308260616.Sf8QzI7c-lkp@intel.com/reproduce)
+I also don't really don't see why you need to fiddle with xfs buffer
+cache semantics - it already has the functionality "nowait" buffer
+reads require (i.e.  XBF_INCORE|XBF_TRYLOCK).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308260616.Sf8QzI7c-lkp@intel.com/
+However, the readahead IO that the xfs readdir code issues cannot
+use your defined NOWAIT semantics - it must be able to allocate
+memory and issue IO. Readahead already avoids blocking on memory
+allocation and blocking on IO via the XBF_READ_AHEAD flag. This sets
+__GFP_NORETRY for buffer allocation and REQ_RAHEAD for IO. Hence
+readahead only needs the existing XBF_TRYLOCK flag to be set to be
+compatible with the required NOWAIT semantics....
 
-All errors (new ones prefixed by >>):
+As for the NOIO memory allocation restrictions io_uring requires,
+that should be enforced at the io_uring layer before calling into
+the VFS using memalloc_noio_save/restore.  At that point no memory
+allocation will trigger IO and none of the code running under NOWAIT
+conditions even needs to be aware that io_uring has a GFP_NOIO
+restriction on memory allocation....
 
-   drivers/net/ethernet/qlogic/qede/qede_ethtool.c: In function 'qede_set_link_ksettings':
->> drivers/net/ethernet/qlogic/qede/qede_ethtool.c:584:29: error: assignment to 'const struct qede_forced_speed_map *' from incompatible pointer type 'struct ethtool_forced_speed_map *' [-Werror=incompatible-pointer-types]
-     584 |                         map = qede_forced_speed_maps + i;
-         |                             ^
->> drivers/net/ethernet/qlogic/qede/qede_ethtool.c:586:47: error: invalid use of undefined type 'const struct qede_forced_speed_map'
-     586 |                         if (base->speed != map->speed ||
-         |                                               ^~
-   drivers/net/ethernet/qlogic/qede/qede_ethtool.c:588:53: error: invalid use of undefined type 'const struct qede_forced_speed_map'
-     588 |                                                  map->caps))
-         |                                                     ^~
-   drivers/net/ethernet/qlogic/qede/qede_ethtool.c:592:70: error: invalid use of undefined type 'const struct qede_forced_speed_map'
-     592 |                                      current_link.supported_caps, map->caps);
-         |                                                                      ^~
-   cc1: some warnings being treated as errors
+Please go back to the simple "do non-blocking buffer IO"
+implementation we started with and don't try to solve every little
+blocking problem that might exist in the VFS and filesystems...
 
-
-vim +584 drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  546  
-054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  547  static int qede_set_link_ksettings(struct net_device *dev,
-054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  548  				   const struct ethtool_link_ksettings *cmd)
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  549  {
-054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  550  	const struct ethtool_link_settings *base = &cmd->base;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  551  	struct qede_dev *edev = netdev_priv(dev);
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  552  	const struct qede_forced_speed_map *map;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  553  	struct qed_link_output current_link;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  554  	struct qed_link_params params;
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  555  	u32 i;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  556  
-fe7cd2bfdac4d8 Yuval Mintz                  2016-04-22  557  	if (!edev->ops || !edev->ops->common->can_link_change(edev->cdev)) {
-054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  558  		DP_INFO(edev, "Link settings are not allowed to be changed\n");
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  559  		return -EOPNOTSUPP;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  560  	}
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  561  	memset(&current_link, 0, sizeof(current_link));
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  562  	memset(&params, 0, sizeof(params));
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  563  	edev->ops->common->get_link(edev->cdev, &current_link);
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  564  
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  565  	params.override_flags |= QED_LINK_OVERRIDE_SPEED_ADV_SPEEDS;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  566  	params.override_flags |= QED_LINK_OVERRIDE_SPEED_AUTONEG;
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  567  
-054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  568  	if (base->autoneg == AUTONEG_ENABLE) {
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  569  		if (!phylink_test(current_link.supported_caps, Autoneg)) {
-161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  570  			DP_INFO(edev, "Auto negotiation is not supported\n");
-161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  571  			return -EOPNOTSUPP;
-161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  572  		}
-161adb046b9119 sudarsana.kalluru@cavium.com 2017-05-04  573  
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  574  		params.autoneg = true;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  575  		params.forced_speed = 0;
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  576  
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  577  		linkmode_copy(params.adv_speeds, cmd->link_modes.advertising);
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  578  	} else {		/* forced speed */
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  579  		params.override_flags |= QED_LINK_OVERRIDE_SPEED_FORCED_SPEED;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  580  		params.autoneg = false;
-054c67d1c82afd Sudarsana Reddy Kalluru      2016-08-09  581  		params.forced_speed = base->speed;
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  582  
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  583  		for (i = 0; i < ARRAY_SIZE(qede_forced_speed_maps); i++) {
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20 @584  			map = qede_forced_speed_maps + i;
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  585  
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20 @586  			if (base->speed != map->speed ||
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  587  			    !linkmode_intersects(current_link.supported_caps,
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  588  						 map->caps))
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  589  				continue;
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  590  
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  591  			linkmode_and(params.adv_speeds,
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  592  				     current_link.supported_caps, map->caps);
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  593  			goto set_link;
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  594  		}
-bdb5d8ec47611c Alexander Lobakin            2020-07-20  595  
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  596  		DP_INFO(edev, "Unsupported speed %u\n", base->speed);
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  597  		return -EINVAL;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  598  	}
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  599  
-1d4e4ecccb1144 Alexander Lobakin            2020-07-20  600  set_link:
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  601  	params.link_up = true;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  602  	edev->ops->common->set_link(edev->cdev, &params);
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  603  
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  604  	return 0;
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  605  }
-133fac0eedc355 Sudarsana Kalluru            2015-10-26  606  
-
+-Dave
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Dave Chinner
+david@fromorbit.com
 
