@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-30587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA2F7882AB
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:53:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 557117882AC
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:53:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C0322817E8
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:53:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCFC6281811
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1C0A94A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D705BA29;
 	Fri, 25 Aug 2023 08:53:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789681C06
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:28 +0000 (UTC)
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5C91BCD
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:25 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-31c65820134so520320f8f.1
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8875DA925
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:29 +0000 (UTC)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFE21BF2
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:27 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4ff933f9ca8so1015868e87.1
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953604; x=1693558404;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eZcv41f6N+Y3whwcGh6kmDJx06nuexMNGd8bbQSwXJ0=;
-        b=01xj73Da9OIwr78McNXwqXBZfkTcV8avDJTZGTg6Rj1rRMgz0oxpT4IIJ0Fos/MDyQ
-         kU1t7u2C44lnb28slT807g/6gXGEyfF7IYQUyYadeVV1oYmpImdpREHSrP6LsiLQfuRD
-         Gj3fSqMIMxJGQw+BrdmD6L6MN37GpEWmRjwa7CtIvtcsUihvAlpVhzdyxdTx/un4xbb5
-         ZSUm2dFQZVL+G3pFhcg2dW2ZeksbFnlKLjJe11ILGwbYR02mYc70pPzQhGdJDC7Q+zsW
-         Qzl59EspuLUEe/RRfPazHSXDzHZrL1ho0eN8xXBULKFCice02D/+uElVTdnR7/g0GC+5
-         bkbA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953606; x=1693558406;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ymCUaI9Sd81RMgDR1qn0M+wpDprHHG3RZOZbigNcOKc=;
+        b=M4IwCWiPZfdY9S6/164U6uxCJiZ6M9PeBlGWwM5erx61RLCbr/f66GmtrY/Ickuw4Y
+         T8WYfydC/IbndJqO4P0vChTk2pcyqZWxF8ZJa22w0xDAW4hQn2h4/tcs734U0OzcViQX
+         hWuVLuE0LbXnDoI7dusWlaeXbOzmAplOzKrC9vRUpswvT840BXgfalz9jCwltHV79eLt
+         ZwhmD9aNG8FJujXuOj0Asa3Ucc+a3CX23ipdJRmQj7UXldVU1tOFrmAFCVej8TgepK0u
+         spFwOBSeYderkYvmK++sfKrnoWy+QK8cq9ekrU7hFyy7r/CkW+nGCLZ5eAlPC9Ia7b+9
+         tncA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692953604; x=1693558404;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eZcv41f6N+Y3whwcGh6kmDJx06nuexMNGd8bbQSwXJ0=;
-        b=k9n1mCJ7a6qGS/MDXs6Gcxv2SboqeqwhP4xH6cgPPYSXr7CxTPC+wiQUoNVEFiMj8u
-         11CZAr51vcf2yQgEWoGWx92kRg5/AtD0FiTCcpyy/ApxZnE5TV5ERZlIKsI5phKs/w+l
-         LOz5dIfDHl3GbAIr8GCPZhHeaz7ebWYzIYWvOjDYjaO0Jfkyj3LgzO1/3F5hX9TqAdxr
-         Y6+pNg7z633ftyEWbA9SFBfEJy5G7rel7NuDFVT6BBkSArLguxFSmzwTolpXtQz6E9bh
-         fGSiXmOqad4ClQffvmWd8Phb9rcV2C01XgyauUm+jGMjnUZOGWa1jrjBrUd+WYzey6qe
-         eZqw==
-X-Gm-Message-State: AOJu0YxSFjTPYjMVrfKQdzMNHe0F7h21xpELyhtuD+7k71mGXhw+9svk
-	8k5s12al0msavZlx8vl5jsWRHyR4+KdaP04h1DJvxk9D
-X-Google-Smtp-Source: AGHT+IECfo5nDZ3XLUOrotc1r/pwLLarsvrsXE7QfjrRLQkX7o2+etONQyPjKXaWoqwmbED7RMc4FQ==
-X-Received: by 2002:adf:d4c2:0:b0:316:f25c:d0c0 with SMTP id w2-20020adfd4c2000000b00316f25cd0c0mr12265782wrk.16.1692953603614;
-        Fri, 25 Aug 2023 01:53:23 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692953606; x=1693558406;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ymCUaI9Sd81RMgDR1qn0M+wpDprHHG3RZOZbigNcOKc=;
+        b=h0NLxdtPueNHRfguIQeDewRciEuhA2g1cwg6OZF6V7NfIybNieajtKOjLwmSrI6YjZ
+         tmfX0tBBKwZNIBcxAVHkT3gvBdpfsTI+BJid0iJ0OjFGHdkdn9nOs8F8tIqJVyXidVM6
+         C4heORIdSotcQbN3BzlU2ZYx6WJzH1Pbf7MEHvhys4k5CoXsKBqIdUOwayeObjMHVtUF
+         XUCIe54cNi9wSAllYvPKd5haudl68QMJB/2O2SJmMRyeQMsbrAPVbHvi6UHuymd8EooL
+         L8bj5SlLXzUQwjT67eoAOlCqXTg0eHsBfdKHpWygDU/V1Q/zQefeiQP2j5G0zTn8RJ8+
+         26mQ==
+X-Gm-Message-State: AOJu0YwFaMAFdb+BRuCL2iUPd1yfeGyfQdDnmuvY3w1wyKvrol57v6a7
+	pKzWJHF+ffXBFjd9OEGrREbK7efWlc63ttZRTQpoL0Sx
+X-Google-Smtp-Source: AGHT+IH552WjlPozGhHmWOwXEneL4k3Q1FmeDKzvo/kXeBE7fFnAbgCvbdlPmAGLzWwhXf6gr73VEA==
+X-Received: by 2002:ac2:5f85:0:b0:500:9860:f8a with SMTP id r5-20020ac25f85000000b0050098600f8amr4328601lfe.4.1692953605481;
+        Fri, 25 Aug 2023 01:53:25 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id s16-20020adfea90000000b003198a9d758dsm1586670wrm.78.2023.08.25.01.53.22
+        by smtp.gmail.com with ESMTPSA id m25-20020a7bce19000000b003fc080acf68sm4792172wmc.34.2023.08.25.01.53.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 01:53:22 -0700 (PDT)
+        Fri, 25 Aug 2023 01:53:24 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -62,10 +63,12 @@ Cc: kuba@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	moshe@nvidia.com
-Subject: [patch net-next 00/15] devlink: finish file split and get retire leftover.c
-Date: Fri, 25 Aug 2023 10:53:06 +0200
-Message-ID: <20230825085321.178134-1-jiri@resnulli.us>
+Subject: [patch net-next 01/15] devlink: push object register/unregister notifications into separate helpers
+Date: Fri, 25 Aug 2023 10:53:07 +0200
+Message-ID: <20230825085321.178134-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230825085321.178134-1-jiri@resnulli.us>
+References: <20230825085321.178134-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,61 +84,341 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-This patchset finishes a move Jakub started and Moshe continued in the
-past. I was planning to do this for a long time, so here it is, finally.
+In preparations of leftover.c split to individual files, avoid need to
+have object structures exposed in devl_internal.h and allow to have them
+maintained in object files.
 
-This patchset does not change any behaviour. It just splits leftover.c
-into per-object files and do necessary changes, like declaring functions
-used from other code, on the way.
+The register/unregister notifications need to know the structures
+to iterate lists. To avoid the need, introduce per-object
+register/unregister notification helpers and use them.
 
-The last 3 patches are pushing the rest of the code into appropriate
-existing files.
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ net/devlink/leftover.c | 247 +++++++++++++++++++++++++++--------------
+ 1 file changed, 163 insertions(+), 84 deletions(-)
 
-Jiri Pirko (15):
-  devlink: push object register/unregister notifications into separate
-    helpers
-  devlink: push port related code into separate file
-  devlink: push shared buffer related code into separate file
-  devlink: move and rename devlink_dpipe_send_and_alloc_skb() helper
-  devlink: push dpipe related code into separate file
-  devlink: push resource related code into separate file
-  devlink: push param related code into separate file
-  devlink: push region related code into separate file
-  devlink: use tracepoint_enabled() helper
-  devlink: push trap related code into separate file
-  devlink: push rate related code into separate file
-  devlink: push linecard related code into separate file
-  devlink: move tracepoint definitions into core.c
-  devlink: move small_ops definition into netlink.c
-  devlink: move devlink_notify_register/unregister() to dev.c
-
- net/devlink/Makefile        |    3 +-
- net/devlink/core.c          |    6 +
- net/devlink/dev.c           |   28 +-
- net/devlink/devl_internal.h |   95 +-
- net/devlink/dpipe.c         |  917 ++++
- net/devlink/leftover.c      | 9427 -----------------------------------
- net/devlink/linecard.c      |  606 +++
- net/devlink/netlink.c       |  266 +
- net/devlink/param.c         |  865 ++++
- net/devlink/port.c          | 1411 ++++++
- net/devlink/rate.c          |  722 +++
- net/devlink/region.c        | 1260 +++++
- net/devlink/resource.c      |  579 +++
- net/devlink/sb.c            |  996 ++++
- net/devlink/trap.c          | 1861 +++++++
- 15 files changed, 9606 insertions(+), 9436 deletions(-)
- create mode 100644 net/devlink/dpipe.c
- delete mode 100644 net/devlink/leftover.c
- create mode 100644 net/devlink/linecard.c
- create mode 100644 net/devlink/param.c
- create mode 100644 net/devlink/port.c
- create mode 100644 net/devlink/rate.c
- create mode 100644 net/devlink/region.c
- create mode 100644 net/devlink/resource.c
- create mode 100644 net/devlink/sb.c
- create mode 100644 net/devlink/trap.c
-
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index e2cd13958cc2..a134dddf2632 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -978,6 +978,26 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
+ 				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_ports_notify(struct devlink *devlink,
++				 enum devlink_command cmd)
++{
++	struct devlink_port *devlink_port;
++	unsigned long port_index;
++
++	xa_for_each(&devlink->ports, port_index, devlink_port)
++		devlink_port_notify(devlink_port, cmd);
++}
++
++static void devlink_ports_notify_register(struct devlink *devlink)
++{
++	devlink_ports_notify(devlink, DEVLINK_CMD_PORT_NEW);
++}
++
++static void devlink_ports_notify_unregister(struct devlink *devlink)
++{
++	devlink_ports_notify(devlink, DEVLINK_CMD_PORT_DEL);
++}
++
+ static void devlink_rate_notify(struct devlink_rate *devlink_rate,
+ 				enum devlink_command cmd)
+ {
+@@ -1004,6 +1024,22 @@ static void devlink_rate_notify(struct devlink_rate *devlink_rate,
+ 				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_rates_notify_register(struct devlink *devlink)
++{
++	struct devlink_rate *rate_node;
++
++	list_for_each_entry(rate_node, &devlink->rate_list, list)
++		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
++}
++
++static void devlink_rates_notify_unregister(struct devlink *devlink)
++{
++	struct devlink_rate *rate_node;
++
++	list_for_each_entry_reverse(rate_node, &devlink->rate_list, list)
++		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_DEL);
++}
++
+ static int
+ devlink_nl_rate_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
+ 			     struct netlink_callback *cb, int flags)
+@@ -1824,6 +1860,22 @@ static void devlink_linecard_notify(struct devlink_linecard *linecard,
+ 				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_linecards_notify_register(struct devlink *devlink)
++{
++	struct devlink_linecard *linecard;
++
++	list_for_each_entry(linecard, &devlink->linecard_list, list)
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++}
++
++static void devlink_linecards_notify_unregister(struct devlink *devlink)
++{
++	struct devlink_linecard *linecard;
++
++	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
++}
++
+ int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct devlink *devlink = info->user_ptr[0];
+@@ -4181,6 +4233,26 @@ static void devlink_param_notify(struct devlink *devlink,
+ 				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_params_notify(struct devlink *devlink,
++				  enum devlink_command cmd)
++{
++	struct devlink_param_item *param_item;
++	unsigned long param_id;
++
++	xa_for_each(&devlink->params, param_id, param_item)
++		devlink_param_notify(devlink, 0, param_item, cmd);
++}
++
++static void devlink_params_notify_register(struct devlink *devlink)
++{
++	devlink_params_notify(devlink, DEVLINK_CMD_PARAM_NEW);
++}
++
++static void devlink_params_notify_unregister(struct devlink *devlink)
++{
++	devlink_params_notify(devlink, DEVLINK_CMD_PARAM_DEL);
++}
++
+ static int devlink_nl_param_get_dump_one(struct sk_buff *msg,
+ 					 struct devlink *devlink,
+ 					 struct netlink_callback *cb,
+@@ -4590,6 +4662,22 @@ static void devlink_nl_region_notify(struct devlink_region *region,
+ 				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_regions_notify_register(struct devlink *devlink)
++{
++	struct devlink_region *region;
++
++	list_for_each_entry(region, &devlink->region_list, list)
++		devlink_nl_region_notify(region, NULL, DEVLINK_CMD_REGION_NEW);
++}
++
++static void devlink_regions_notify_unregister(struct devlink *devlink)
++{
++	struct devlink_region *region;
++
++	list_for_each_entry_reverse(region, &devlink->region_list, list)
++		devlink_nl_region_notify(region, NULL, DEVLINK_CMD_REGION_DEL);
++}
++
+ /**
+  * __devlink_snapshot_id_increment - Increment number of snapshots using an id
+  *	@devlink: devlink instance
+@@ -6558,98 +6646,36 @@ const struct genl_small_ops devlink_nl_small_ops[40] = {
+ 	/* -- No new ops here! Use split ops going forward! -- */
+ };
+ 
+-static void
+-devlink_trap_policer_notify(struct devlink *devlink,
+-			    const struct devlink_trap_policer_item *policer_item,
+-			    enum devlink_command cmd);
+-static void
+-devlink_trap_group_notify(struct devlink *devlink,
+-			  const struct devlink_trap_group_item *group_item,
+-			  enum devlink_command cmd);
+-static void devlink_trap_notify(struct devlink *devlink,
+-				const struct devlink_trap_item *trap_item,
+-				enum devlink_command cmd);
++static void devlink_trap_policers_notify_register(struct devlink *devlink);
++static void devlink_trap_policers_notify_unregister(struct devlink *devlink);
++static void devlink_trap_groups_notify_register(struct devlink *devlink);
++static void devlink_trap_groups_notify_unregister(struct devlink *devlink);
++static void devlink_traps_notify_register(struct devlink *devlink);
++static void devlink_traps_notify_unregister(struct devlink *devlink);
+ 
+ void devlink_notify_register(struct devlink *devlink)
+ {
+-	struct devlink_trap_policer_item *policer_item;
+-	struct devlink_trap_group_item *group_item;
+-	struct devlink_param_item *param_item;
+-	struct devlink_trap_item *trap_item;
+-	struct devlink_port *devlink_port;
+-	struct devlink_linecard *linecard;
+-	struct devlink_rate *rate_node;
+-	struct devlink_region *region;
+-	unsigned long port_index;
+-	unsigned long param_id;
+-
+ 	devlink_notify(devlink, DEVLINK_CMD_NEW);
+-	list_for_each_entry(linecard, &devlink->linecard_list, list)
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-
+-	xa_for_each(&devlink->ports, port_index, devlink_port)
+-		devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
+-
+-	list_for_each_entry(policer_item, &devlink->trap_policer_list, list)
+-		devlink_trap_policer_notify(devlink, policer_item,
+-					    DEVLINK_CMD_TRAP_POLICER_NEW);
+-
+-	list_for_each_entry(group_item, &devlink->trap_group_list, list)
+-		devlink_trap_group_notify(devlink, group_item,
+-					  DEVLINK_CMD_TRAP_GROUP_NEW);
+-
+-	list_for_each_entry(trap_item, &devlink->trap_list, list)
+-		devlink_trap_notify(devlink, trap_item, DEVLINK_CMD_TRAP_NEW);
+-
+-	list_for_each_entry(rate_node, &devlink->rate_list, list)
+-		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
+-
+-	list_for_each_entry(region, &devlink->region_list, list)
+-		devlink_nl_region_notify(region, NULL, DEVLINK_CMD_REGION_NEW);
+-
+-	xa_for_each(&devlink->params, param_id, param_item)
+-		devlink_param_notify(devlink, 0, param_item,
+-				     DEVLINK_CMD_PARAM_NEW);
++	devlink_linecards_notify_register(devlink);
++	devlink_ports_notify_register(devlink);
++	devlink_trap_policers_notify_register(devlink);
++	devlink_trap_groups_notify_register(devlink);
++	devlink_traps_notify_register(devlink);
++	devlink_rates_notify_register(devlink);
++	devlink_regions_notify_register(devlink);
++	devlink_params_notify_register(devlink);
+ }
+ 
+ void devlink_notify_unregister(struct devlink *devlink)
+ {
+-	struct devlink_trap_policer_item *policer_item;
+-	struct devlink_trap_group_item *group_item;
+-	struct devlink_param_item *param_item;
+-	struct devlink_trap_item *trap_item;
+-	struct devlink_port *devlink_port;
+-	struct devlink_linecard *linecard;
+-	struct devlink_rate *rate_node;
+-	struct devlink_region *region;
+-	unsigned long port_index;
+-	unsigned long param_id;
+-
+-	xa_for_each(&devlink->params, param_id, param_item)
+-		devlink_param_notify(devlink, 0, param_item,
+-				     DEVLINK_CMD_PARAM_DEL);
+-
+-	list_for_each_entry_reverse(region, &devlink->region_list, list)
+-		devlink_nl_region_notify(region, NULL, DEVLINK_CMD_REGION_DEL);
+-
+-	list_for_each_entry_reverse(rate_node, &devlink->rate_list, list)
+-		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_DEL);
+-
+-	list_for_each_entry_reverse(trap_item, &devlink->trap_list, list)
+-		devlink_trap_notify(devlink, trap_item, DEVLINK_CMD_TRAP_DEL);
+-
+-	list_for_each_entry_reverse(group_item, &devlink->trap_group_list, list)
+-		devlink_trap_group_notify(devlink, group_item,
+-					  DEVLINK_CMD_TRAP_GROUP_DEL);
+-	list_for_each_entry_reverse(policer_item, &devlink->trap_policer_list,
+-				    list)
+-		devlink_trap_policer_notify(devlink, policer_item,
+-					    DEVLINK_CMD_TRAP_POLICER_DEL);
+-
+-	xa_for_each(&devlink->ports, port_index, devlink_port)
+-		devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
+-	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
++	devlink_params_notify_unregister(devlink);
++	devlink_regions_notify_unregister(devlink);
++	devlink_rates_notify_unregister(devlink);
++	devlink_traps_notify_unregister(devlink);
++	devlink_trap_groups_notify_unregister(devlink);
++	devlink_trap_policers_notify_unregister(devlink);
++	devlink_ports_notify_unregister(devlink);
++	devlink_linecards_notify_unregister(devlink);
+ 	devlink_notify(devlink, DEVLINK_CMD_DEL);
+ }
+ 
+@@ -8775,6 +8801,24 @@ devlink_trap_group_notify(struct devlink *devlink,
+ 				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_trap_groups_notify_register(struct devlink *devlink)
++{
++	struct devlink_trap_group_item *group_item;
++
++	list_for_each_entry(group_item, &devlink->trap_group_list, list)
++		devlink_trap_group_notify(devlink, group_item,
++					  DEVLINK_CMD_TRAP_GROUP_NEW);
++}
++
++static void devlink_trap_groups_notify_unregister(struct devlink *devlink)
++{
++	struct devlink_trap_group_item *group_item;
++
++	list_for_each_entry_reverse(group_item, &devlink->trap_group_list, list)
++		devlink_trap_group_notify(devlink, group_item,
++					  DEVLINK_CMD_TRAP_GROUP_DEL);
++}
++
+ static int
+ devlink_trap_item_group_link(struct devlink *devlink,
+ 			     struct devlink_trap_item *trap_item)
+@@ -8817,6 +8861,22 @@ static void devlink_trap_notify(struct devlink *devlink,
+ 				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_traps_notify_register(struct devlink *devlink)
++{
++	struct devlink_trap_item *trap_item;
++
++	list_for_each_entry(trap_item, &devlink->trap_list, list)
++		devlink_trap_notify(devlink, trap_item, DEVLINK_CMD_TRAP_NEW);
++}
++
++static void devlink_traps_notify_unregister(struct devlink *devlink)
++{
++	struct devlink_trap_item *trap_item;
++
++	list_for_each_entry_reverse(trap_item, &devlink->trap_list, list)
++		devlink_trap_notify(devlink, trap_item, DEVLINK_CMD_TRAP_DEL);
++}
++
+ static int
+ devlink_trap_register(struct devlink *devlink,
+ 		      const struct devlink_trap *trap, void *priv)
+@@ -9278,6 +9338,25 @@ devlink_trap_policer_notify(struct devlink *devlink,
+ 				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ }
+ 
++static void devlink_trap_policers_notify_register(struct devlink *devlink)
++{
++	struct devlink_trap_policer_item *policer_item;
++
++	list_for_each_entry(policer_item, &devlink->trap_policer_list, list)
++		devlink_trap_policer_notify(devlink, policer_item,
++					    DEVLINK_CMD_TRAP_POLICER_NEW);
++}
++
++static void devlink_trap_policers_notify_unregister(struct devlink *devlink)
++{
++	struct devlink_trap_policer_item *policer_item;
++
++	list_for_each_entry_reverse(policer_item, &devlink->trap_policer_list,
++				    list)
++		devlink_trap_policer_notify(devlink, policer_item,
++					    DEVLINK_CMD_TRAP_POLICER_DEL);
++}
++
+ static int
+ devlink_trap_policer_register(struct devlink *devlink,
+ 			      const struct devlink_trap_policer *policer)
 -- 
 2.41.0
 
