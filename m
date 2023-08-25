@@ -1,86 +1,104 @@
-Return-Path: <netdev+bounces-30620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D44788368
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:20:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA3578838D
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E89281681
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F15281706
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A522C8CA;
-	Fri, 25 Aug 2023 09:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45EAC8CB;
+	Fri, 25 Aug 2023 09:32:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB738C2F2
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A1D2C433CD;
-	Fri, 25 Aug 2023 09:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692955222;
-	bh=RkKLK3ccBCSlvsLnPaVYJP51Ayxs+r8TXBqJBNM1MUw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bOY8C66vMnEFw/myY0Acf+rii7E+CiT439LUMG5HCLtVRGrtnMVENHIuVJ2dlO5NZ
-	 /rRElSlq33DfE3AnIgmuUqZBpN6pydkwwWaDBDQxSVHOUgptu1UzY50dkzvShCDXHM
-	 VWbDE+bfJohVXn7ac4Jqnmw7MeIomwWKdE7Vkk2+JSfdpK4Nw2CNNm5tsz0qnUJ8ye
-	 hy+l43/uU21bMyPUVC2lFo9qhP8Z3stOB7y1kZ23vgGTFgaVsbnH5kHcD4DkpvQAAf
-	 mrWr07xgkyXCUKpyvVZb9xJLIZuX0Ch9HA5H2A7dF7tv4+skdC0u/wcrflOPstlnq0
-	 FAXVTGQ444Kbg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65544C595C5;
-	Fri, 25 Aug 2023 09:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5327C2D6
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:32:09 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228241FD4
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 02:32:06 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mtapsc-2-CWXtiu9VOBa0HfxzC4PXkQ-1; Fri, 25 Aug 2023 10:32:04 +0100
+X-MC-Unique: CWXtiu9VOBa0HfxzC4PXkQ-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 25 Aug
+ 2023 10:32:02 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 25 Aug 2023 10:32:02 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Mahmoud Maatuq' <mahmoudmatook.mm@gmail.com>, "keescook@chromium.org"
+	<keescook@chromium.org>, "edumazet@google.com" <edumazet@google.com>,
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"wad@chromium.org" <wad@chromium.org>, "luto@amacapital.net"
+	<luto@amacapital.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>, "shuah@kernel.org" <shuah@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>
+CC: "linux-kernel-mentees@lists.linuxfoundation.org"
+	<linux-kernel-mentees@lists.linuxfoundation.org>
+Subject: RE: [PATCH v2 2/2] selftests/net: replace ternary operator with
+ min()/max()
+Thread-Topic: [PATCH v2 2/2] selftests/net: replace ternary operator with
+ min()/max()
+Thread-Index: AQHZ1slDuEzSfgmyIkyLho9d3Y2q6K/6vr1A
+Date: Fri, 25 Aug 2023 09:32:02 +0000
+Message-ID: <dd7b956916e044b181e7ccd1823f14ec@AcuMS.aculab.com>
+References: <20230824202415.131824-1-mahmoudmatook.mm@gmail.com>
+ <20230824202415.131824-2-mahmoudmatook.mm@gmail.com>
+In-Reply-To: <20230824202415.131824-2-mahmoudmatook.mm@gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] kunit: Fix checksum tests on big endian CPUs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169295522241.11125.1512224356582645824.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Aug 2023 09:20:22 +0000
-References: <fe8a302c25bd0380ca030735a1383288a89adb11.1692796810.git.christophe.leroy@csgroup.eu>
-In-Reply-To: <fe8a302c25bd0380ca030735a1383288a89adb11.1692796810.git.christophe.leroy@csgroup.eu>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: davem@davemloft.net, kuba@kernel.org, dave.hansen@linux.intel.com,
- goldstein.w.n@gmail.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,PDS_BAD_THREAD_QP_64,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+From: Mahmoud Maatuq
+> Sent: 24 August 2023 21:24
+....
+>  =09=09tdeliver =3D glob_tstart + ts->delay_us * 1000;
+> -=09=09tdeliver_max =3D tdeliver_max > tdeliver ?
+> -=09=09=09       tdeliver_max : tdeliver;
+> +=09=09tdeliver_max =3D max(tdeliver_max, tdeliver);
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+That was spectacularly horrid...
+What is wrong with using:
+=09if (tdeliver > tdeliver_max)
+=09=09tdeliver_max =3D tdeliver;
+That is pretty obviously calculating the upper bound.
+Even the version with max() needs extra parsing by the human reader.
 
-On Wed, 23 Aug 2023 15:21:43 +0200 you wrote:
-> On powerpc64le checksum kunit tests work:
-> 
-> [    2.011457][    T1]     KTAP version 1
-> [    2.011662][    T1]     # Subtest: checksum
-> [    2.011848][    T1]     1..3
-> [    2.034710][    T1]     ok 1 test_csum_fixed_random_inputs
-> [    2.079325][    T1]     ok 2 test_csum_all_carry_inputs
-> [    2.127102][    T1]     ok 3 test_csum_no_carry_inputs
-> [    2.127202][    T1] # checksum: pass:3 fail:0 skip:0 total:3
-> [    2.127533][    T1] # Totals: pass:3 fail:0 skip:0 total:3
-> [    2.127956][    T1] ok 1 checksum
-> 
-> [...]
+(The only issue is whether it reads better with the if condition
+reversed.)
 
-Here is the summary with links:
-  - [net-next] kunit: Fix checksum tests on big endian CPUs
-    https://git.kernel.org/netdev/net-next/c/b38460bc463c
+=09David
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
