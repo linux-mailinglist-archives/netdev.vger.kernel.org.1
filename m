@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-30550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16141787FE4
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:30:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2959E787FE5
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DDF81C20E73
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 06:29:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C65D1C20F3B
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 06:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24DC17EC;
-	Fri, 25 Aug 2023 06:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF5617E8;
+	Fri, 25 Aug 2023 06:29:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1E417E8
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 06:29:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EB57C433C8;
-	Fri, 25 Aug 2023 06:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D7C17EA
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 06:29:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72FD4C433C9;
+	Fri, 25 Aug 2023 06:29:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692944994;
-	bh=6z8yiYVpuB5guW7VkAy41RS3vc2m5q6b+46xAxIi6e0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=L5WdrroIJPTNmeZjeC6eYSrwagvwT+QUHg/JA7sbzNi8fYNAuh5hArq7KmFNXBvR+
-	 QeWfxL9VZh1je7X9zLBQX78tMkB3MRDxu79bY1pgxM00u5g84iKmeQLMwP1GbMYqT5
-	 3EEvhmSzTdkYs9H5v+6CaMdIQzJaz9acd/ITBa4/R4xmwzwH20NL0ZZzc5qxKz600f
-	 Kd2UQQeTHgoKUP7ny4gcEW/4oyPyIDw6ZQ4wbkWoociH5+HSLFNEXXDrXomSVJWHQf
-	 hSXFn6FwtC2Wz8P9GLAm7NQWAtKG4jD2RYaHs6xeOmOYFObEFL18B0CKfAUHE4/Had
-	 qyEYrnOuQDDRg==
+	s=k20201202; t=1692944995;
+	bh=51DPxVF8MRcZ375Iqg+MC+4CEgxa6WXUU+3lrhv1E68=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QXXzXR8cQKoq4x8Nd7yrmOyj+rsYruMLwIUIhl3BMHKV8Pt9/BidLuWxaWhj/xo+B
+	 VzRA1sj1urvnAgER2XXS9K0pRgSClQjDlhkFH+SErtwb8T79l8k+gVLPSJFMUzJJuf
+	 zzf9yYkGHOhiNc7/7p2odQA/iH7vUvbI8Cmd1xPNVExAawXtB/We4htXIlC0IMCs3C
+	 nkmKQIPz2StXdI5p7qqeAMw8FDZeHbpzSTo0acNO9kYiQW9ymUcC7V/2EDMJUHDLjo
+	 AqfmhbTM3SXhyTF95/NqFoPTGvuenqfq9CCf51PYNRypMjP+pZOpOjZ1EwTnDGrvWM
+	 Gq2EiB+1eO6pA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -39,11 +39,14 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH net-next V4 0/8] {devlink,mlx5}: Add port function attributes for ipsec
-Date: Thu, 24 Aug 2023 23:28:28 -0700
-Message-ID: <20230825062836.103744-1-saeed@kernel.org>
+	Leon Romanovsky <leonro@nvidia.com>,
+	Dima Chumak <dchumak@nvidia.com>
+Subject: [PATCH net-next V4 1/8] devlink: Expose port function commands to control IPsec crypto offloads
+Date: Thu, 24 Aug 2023 23:28:29 -0700
+Message-ID: <20230825062836.103744-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230825062836.103744-1-saeed@kernel.org>
+References: <20230825062836.103744-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,107 +55,229 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Dima Chumak <dchumak@nvidia.com>
 
-v4:
- - Rebased on top of latest mlx5 changes, align with new code, fix build
-   warnings
+Expose port function commands to enable / disable IPsec crypto offloads,
+this is used to control the port IPsec capabilities.
 
-v3:
- - Changed newly introduced IPsec blocking routine
-   and as an outcome of testing already existing one.
-   I'm sending them together to avoid merge conflicts.
- - Refactored patches to separate IFC part
- - Simplified 
-v2: https://lore.kernel.org/netdev/20230421104901.897946-1-dchumak@nvidia.com/
- - Improve docs of ipsec_crypto vs ipsec_packet devlink attributes
- - also see patches 2,4 for the changelog.
+When IPsec crypto is disabled for a function of the port (default),
+function cannot offload any IPsec crypto operations (Encrypt/Decrypt and
+XFRM state offloading). When enabled, IPsec crypto operations can be
+offloaded by the function of the port.
 
----------------------------------------------------------------------------------
-From Dima:
+Example of a PCI VF port which supports IPsec crypto offloads:
 
-Introduce hypervisor-level control knobs to set the functionality of PCI
-VF devices passed through to guests. The administrator of a hypervisor
-host may choose to change the settings of a port function from the
-defaults configured by the device firmware.
+$ devlink port show pci/0000:06:00.0/1
+    pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+        function:
+        hw_addr 00:00:00:00:00:00 roce enable ipsec_crypto disable
 
-The software stack has two types of IPsec offload - crypto and packet.
-Specifically, the ip xfrm command has sub-commands for "state" and
-"policy" that have an "offload" parameter. With ip xfrm state, both
-crypto and packet offload types are supported, while ip xfrm policy can
-only be offloaded in packet mode.
+$ devlink port function set pci/0000:06:00.0/1 ipsec_crypto enable
 
-The series introduces two new boolean attributes of a port function:
-ipsec_crypto and ipsec_packet. The goal is to provide a similar level of
-granularity for controlling VF IPsec offload capabilities, which would
-be aligned with the software model. This will allow users to decide if
-they want both types of offload enabled for a VF, just one of them, or
-none at all (which is the default).
+$ devlink port show pci/0000:06:00.0/1
+    pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
+        function:
+        hw_addr 00:00:00:00:00:00 roce enable ipsec_crypto enable
 
-At a high level, the difference between the two knobs is that with
-ipsec_crypto, only XFRM state can be offloaded. Specifically, only the
-crypto operation (Encrypt/Decrypt) is offloaded. With ipsec_packet, both
-XFRM state and policy can be offloaded. Furthermore, in addition to
-crypto operation offload, IPsec encapsulation is also offloaded. For
-XFRM state, choosing between crypto and packet offload types is
-possible. From the HW perspective, different resources may be required
-for each offload type.
+Signed-off-by: Dima Chumak <dchumak@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../networking/devlink/devlink-port.rst       | 27 ++++++++++
+ include/net/devlink.h                         | 15 ++++++
+ include/uapi/linux/devlink.h                  |  2 +
+ net/devlink/leftover.c                        | 52 +++++++++++++++++++
+ 4 files changed, 96 insertions(+)
 
-Examples of when a user prefers to enable IPsec packet offload for a VF
-when using switchdev mode:
-
-  $ devlink port show pci/0000:06:00.0/1
-      pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
-          function:
-          hw_addr 00:00:00:00:00:00 roce enable migratable disable ipsec_crypto disable ipsec_packet disable
-
-  $ devlink port function set pci/0000:06:00.0/1 ipsec_packet enable
-
-  $ devlink port show pci/0000:06:00.0/1
-      pci/0000:06:00.0/1: type eth netdev enp6s0pf0vf0 flavour pcivf pfnum 0 vfnum 0
-          function:
-          hw_addr 00:00:00:00:00:00 roce enable migratable disable ipsec_crypto disable ipsec_packet enable
-
-This enables the corresponding IPsec capability of the function before
-it's enumerated, so when the driver reads the capability from the device
-firmware, it is enabled. The driver is then able to configure
-corresponding features and ops of the VF net device to support IPsec
-state and policy offloading.
-
-Thanks
-
-Dima Chumak (4):
-  devlink: Expose port function commands to control IPsec crypto
-    offloads
-  devlink: Expose port function commands to control IPsec packet
-    offloads
-  net/mlx5: Implement devlink port function cmds to control ipsec_crypto
-  net/mlx5: Implement devlink port function cmds to control ipsec_packet
-
-Leon Romanovsky (4):
-  net/mlx5: Drop extra layer of locks in IPsec
-  net/mlx5e: Rewrite IPsec vs. TC block interface
-  net/mlx5: Add IFC bits to support IPsec enable/disable
-  net/mlx5: Provide an interface to block change of IPsec capabilities
-
- .../ethernet/mellanox/mlx5/switchdev.rst      |  20 +
- .../networking/devlink/devlink-port.rst       |  55 +++
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
- .../mellanox/mlx5/core/en_accel/ipsec.c       |  20 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c    |  63 ++-
- .../mellanox/mlx5/core/esw/devlink_port.c     |   6 +
- .../ethernet/mellanox/mlx5/core/esw/ipsec.c   | 369 ++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/eswitch.c |  41 ++
- .../net/ethernet/mellanox/mlx5/core/eswitch.h |  48 ++-
- .../mellanox/mlx5/core/eswitch_offloads.c     | 240 +++++++++---
- include/linux/mlx5/driver.h                   |   1 +
- include/linux/mlx5/mlx5_ifc.h                 |   3 +
- include/net/devlink.h                         |  30 ++
- include/uapi/linux/devlink.h                  |   4 +
- net/devlink/leftover.c                        | 104 +++++
- 15 files changed, 898 insertions(+), 108 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec.c
-
+diff --git a/Documentation/networking/devlink/devlink-port.rst b/Documentation/networking/devlink/devlink-port.rst
+index 3da590953ce8..6983b11559cb 100644
+--- a/Documentation/networking/devlink/devlink-port.rst
++++ b/Documentation/networking/devlink/devlink-port.rst
+@@ -128,6 +128,9 @@ Users may also set the RoCE capability of the function using
+ Users may also set the function as migratable using
+ 'devlink port function set migratable' command.
+ 
++Users may also set the IPsec crypto capability of the function using
++`devlink port function set ipsec_crypto` command.
++
+ Function attributes
+ ===================
+ 
+@@ -240,6 +243,30 @@ Attach VF to the VM.
+ Start the VM.
+ Perform live migration.
+ 
++IPsec crypto capability setup
++-----------------------------
++When user enables IPsec crypto capability for a VF, user application can offload
++XFRM state crypto operation (Encrypt/Decrypt) to this VF.
++
++When IPsec crypto capability is disabled (default) for a VF, the XFRM state is
++processed in software by the kernel.
++
++- Get IPsec crypto capability of the VF device::
++
++    $ devlink port show pci/0000:06:00.0/2
++    pci/0000:06:00.0/2: type eth netdev enp6s0pf0vf1 flavour pcivf pfnum 0 vfnum 1
++        function:
++            hw_addr 00:00:00:00:00:00 ipsec_crypto disabled
++
++- Set IPsec crypto capability of the VF device::
++
++    $ devlink port function set pci/0000:06:00.0/2 ipsec_crypto enable
++
++    $ devlink port show pci/0000:06:00.0/2
++    pci/0000:06:00.0/2: type eth netdev enp6s0pf0vf1 flavour pcivf pfnum 0 vfnum 1
++        function:
++            hw_addr 00:00:00:00:00:00 ipsec_crypto enabled
++
+ Subfunction
+ ============
+ 
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index f7fec0791acc..1cf07a820a0e 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -1583,6 +1583,15 @@ void devlink_free(struct devlink *devlink);
+  *		       Should be used by device drivers set
+  *		       the admin state of a function managed
+  *		       by the devlink port.
++ * @port_fn_ipsec_crypto_get: Callback used to get port function's ipsec_crypto
++ *			      capability. Should be used by device drivers
++ *			      to report the current state of ipsec_crypto
++ *			      capability of a function managed by the devlink
++ *			      port.
++ * @port_fn_ipsec_crypto_set: Callback used to set port function's ipsec_crypto
++ *			      capability. Should be used by device drivers to
++ *			      enable/disable ipsec_crypto capability of a
++ *			      function managed by the devlink port.
+  *
+  * Note: Driver should return -EOPNOTSUPP if it doesn't support
+  * port function (@port_fn_*) handling for a particular port.
+@@ -1620,6 +1629,12 @@ struct devlink_port_ops {
+ 	int (*port_fn_state_set)(struct devlink_port *port,
+ 				 enum devlink_port_fn_state state,
+ 				 struct netlink_ext_ack *extack);
++	int (*port_fn_ipsec_crypto_get)(struct devlink_port *devlink_port,
++					bool *is_enable,
++					struct netlink_ext_ack *extack);
++	int (*port_fn_ipsec_crypto_set)(struct devlink_port *devlink_port,
++					bool enable,
++					struct netlink_ext_ack *extack);
+ };
+ 
+ void devlink_port_init(struct devlink *devlink,
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index 3782d4219ac9..f9ae9a058ad2 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -661,6 +661,7 @@ enum devlink_resource_unit {
+ enum devlink_port_fn_attr_cap {
+ 	DEVLINK_PORT_FN_ATTR_CAP_ROCE_BIT,
+ 	DEVLINK_PORT_FN_ATTR_CAP_MIGRATABLE_BIT,
++	DEVLINK_PORT_FN_ATTR_CAP_IPSEC_CRYPTO_BIT,
+ 
+ 	/* Add new caps above */
+ 	__DEVLINK_PORT_FN_ATTR_CAPS_MAX,
+@@ -669,6 +670,7 @@ enum devlink_port_fn_attr_cap {
+ #define DEVLINK_PORT_FN_CAP_ROCE _BITUL(DEVLINK_PORT_FN_ATTR_CAP_ROCE_BIT)
+ #define DEVLINK_PORT_FN_CAP_MIGRATABLE \
+ 	_BITUL(DEVLINK_PORT_FN_ATTR_CAP_MIGRATABLE_BIT)
++#define DEVLINK_PORT_FN_CAP_IPSEC_CRYPTO _BITUL(DEVLINK_PORT_FN_ATTR_CAP_IPSEC_CRYPTO_BIT)
+ 
+ enum devlink_port_function_attr {
+ 	DEVLINK_PORT_FUNCTION_ATTR_UNSPEC,
+diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
+index e2cd13958cc2..fcc1a06cae48 100644
+--- a/net/devlink/leftover.c
++++ b/net/devlink/leftover.c
+@@ -492,6 +492,28 @@ static int devlink_port_fn_migratable_fill(struct devlink_port *devlink_port,
+ 	return 0;
+ }
+ 
++static int devlink_port_fn_ipsec_crypto_fill(struct devlink_port *devlink_port,
++					     struct nla_bitfield32 *caps,
++					     struct netlink_ext_ack *extack)
++{
++	bool is_enable;
++	int err;
++
++	if (!devlink_port->ops->port_fn_ipsec_crypto_get ||
++	    devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_VF)
++		return 0;
++
++	err = devlink_port->ops->port_fn_ipsec_crypto_get(devlink_port, &is_enable, extack);
++	if (err) {
++		if (err == -EOPNOTSUPP)
++			return 0;
++		return err;
++	}
++
++	devlink_port_fn_cap_fill(caps, DEVLINK_PORT_FN_CAP_IPSEC_CRYPTO, is_enable);
++	return 0;
++}
++
+ static int devlink_port_fn_caps_fill(struct devlink_port *devlink_port,
+ 				     struct sk_buff *msg,
+ 				     struct netlink_ext_ack *extack,
+@@ -508,6 +530,10 @@ static int devlink_port_fn_caps_fill(struct devlink_port *devlink_port,
+ 	if (err)
+ 		return err;
+ 
++	err = devlink_port_fn_ipsec_crypto_fill(devlink_port, &caps, extack);
++	if (err)
++		return err;
++
+ 	if (!caps.selector)
+ 		return 0;
+ 	err = nla_put_bitfield32(msg, DEVLINK_PORT_FN_ATTR_CAPS, caps.value,
+@@ -838,6 +864,13 @@ devlink_port_fn_roce_set(struct devlink_port *devlink_port, bool enable,
+ 						   extack);
+ }
+ 
++static int
++devlink_port_fn_ipsec_crypto_set(struct devlink_port *devlink_port, bool enable,
++				 struct netlink_ext_ack *extack)
++{
++	return devlink_port->ops->port_fn_ipsec_crypto_set(devlink_port, enable, extack);
++}
++
+ static int devlink_port_fn_caps_set(struct devlink_port *devlink_port,
+ 				    const struct nlattr *attr,
+ 				    struct netlink_ext_ack *extack)
+@@ -862,6 +895,13 @@ static int devlink_port_fn_caps_set(struct devlink_port *devlink_port,
+ 		if (err)
+ 			return err;
+ 	}
++	if (caps.selector & DEVLINK_PORT_FN_CAP_IPSEC_CRYPTO) {
++		err = devlink_port_fn_ipsec_crypto_set(devlink_port, caps_value &
++						       DEVLINK_PORT_FN_CAP_IPSEC_CRYPTO,
++						       extack);
++		if (err)
++			return err;
++	}
+ 	return 0;
+ }
+ 
+@@ -1226,6 +1266,18 @@ static int devlink_port_function_validate(struct devlink_port *devlink_port,
+ 				return -EOPNOTSUPP;
+ 			}
+ 		}
++		if (caps.selector & DEVLINK_PORT_FN_CAP_IPSEC_CRYPTO) {
++			if (!ops->port_fn_ipsec_crypto_set) {
++				NL_SET_ERR_MSG_ATTR(extack, attr,
++						    "Port doesn't support ipsec_crypto function attribute");
++				return -EOPNOTSUPP;
++			}
++			if (devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_VF) {
++				NL_SET_ERR_MSG_ATTR(extack, attr,
++						    "ipsec_crypto function attribute supported for VFs only");
++				return -EOPNOTSUPP;
++			}
++		}
+ 	}
+ 	return 0;
+ }
 -- 
 2.41.0
 
