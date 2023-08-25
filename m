@@ -1,70 +1,89 @@
-Return-Path: <netdev+bounces-30684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 268C67888A1
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:32:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2BA7888D2
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 774EF2817E2
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 13:32:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 868FA281855
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 13:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69007DDAA;
-	Fri, 25 Aug 2023 13:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487C7DDDE;
+	Fri, 25 Aug 2023 13:43:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534BBD523
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 13:32:54 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8AB1FDE
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 06:32:52 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-4009fdc224dso72415e9.1
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 06:32:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692970371; x=1693575171; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jMgENuQTUm9al0raOuSkoRbcV4eFm8ZoAXmdkzqummM=;
-        b=mpjB2aMPstSr/9aUA9o4x2Q11ub8LlCgy8zS1XNlGcK9SUh3DsEKTFcEPCgK64EY0X
-         OBNin9gTZwYkXCaLXnIxotZA8cHQnrXdOmMvrAfyrnSIb0b33P/lGDqmUNpoF9RMmCuk
-         7JeQKve7zD/wLjSCJp71ByJez1n/u5f/lv1qaw0CU3WP/gOdtRKr0sq8SiIQhyYhKs4o
-         d6SNUcmNYdCJKsQT9Hl55dzWQNvGuBNArguyjGicN+bK7UOaSNghM3VOnTWyyks+XfIS
-         NLYK4sA+5ClwwrHvzjKaUMMgYsJCc8y/U4AQh/ioIdJmK/fZ1/FOixaYmcjhlzniidvw
-         TN1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692970371; x=1693575171;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jMgENuQTUm9al0raOuSkoRbcV4eFm8ZoAXmdkzqummM=;
-        b=dTSJBFE6/0MyxTt9mS4y1SALs/6YWR9SQWNuo+9rvRUYTuO6UOxmVjMaVaD4VQrnCG
-         alPbT/G267drWZ4c+Om3kfbu7NmNdAIT0K3VLV8v8Qvnr+5rCH2fEh63Im4B/ER8RQ9d
-         sjXcFjN2sUud5oyYe9HGfrrDHK4wstn8HNgoer0DzkdA6moMpwvJMhojIG2TwlyimmXu
-         xwIqtiviKw7/UXWIEU/ZkPArRSse4hrbI24JJAoyOlZx4j2rC/wmgYH1WHzVAZIOodG9
-         wL5A9f/lBUdT6rfV1NEaFfcm3pAB2yaTOhHBZbQAU8fDYcGhwOllMnEdhDLq5R5q/KWQ
-         shkQ==
-X-Gm-Message-State: AOJu0YzCQLtpPorUi59JCcHqeRrJ+48nJt8vMKXkEi2OAPHK6RPy3Cc0
-	aIXKQ53tokPZF4fzaKS5mLw//g==
-X-Google-Smtp-Source: AGHT+IGJR6VlnUlpJi5XWv4o1WdYQ0zmm0E6porJBW6byN68WqZpCJrXbmhmp5hwFVUsPoFo4L5SMQ==
-X-Received: by 2002:a05:600c:1d98:b0:401:a494:2bbb with SMTP id p24-20020a05600c1d9800b00401a4942bbbmr161556wms.5.1692970371097;
-        Fri, 25 Aug 2023 06:32:51 -0700 (PDT)
-Received: from localhost ([2a00:79e0:9d:4:d136:2a30:906a:7af7])
-        by smtp.gmail.com with ESMTPSA id y6-20020adfd086000000b003179b3fd837sm2264180wrh.33.2023.08.25.06.32.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 06:32:49 -0700 (PDT)
-From: Jann Horn <jannh@google.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	dccp@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net] dccp: Fix out of bounds access in DCCP error handler
-Date: Fri, 25 Aug 2023 15:32:41 +0200
-Message-ID: <20230825133241.3635236-1-jannh@google.com>
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C72ADDD0;
+	Fri, 25 Aug 2023 13:43:17 +0000 (UTC)
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C658D1FDE;
+	Fri, 25 Aug 2023 06:43:14 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id B2A9032009B7;
+	Fri, 25 Aug 2023 09:43:10 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Fri, 25 Aug 2023 09:43:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjusaka.me; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm1; t=1692970990; x=1693057390; bh=cWLyjRrcaS
+	NB2Tn0G3Iyc+2TU5mhy5OdRlgEedNUqgs=; b=Wlt0EPZhRt18+4hLp+cTyABmV/
+	rcA8OjZR2phU7nOpBGDFJ0xMqSsQY1B73abOqxNz5/lp9jwn2CTf36Pt+IOTgOmD
+	9QpEcAf/bxNqTMP3uziR4d4WrjjGV1GL4FjD/c3+m/PeXjhY2nOvyyGYNS6zqTke
+	eoBsY+PPQHL27lUvJdxv8cTtaOUOfzqVLlqxbx9pdIHPYjkGj7uvukBPaKkJ3mzn
+	ed6QLpwS+Nbo8Paj4BBF+Z8VzGkIl7SnO0rMTkZc7Of0IUDWDBJMMxD/1CGY/FhA
+	u2rJzkevGbTRDz+k/otnKQrdVj2yz7z9i3V6IMkT8mXF3iz69UFMiuuG7Q6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1692970990; x=1693057390; bh=cWLyjRrcaSNB2
+	Tn0G3Iyc+2TU5mhy5OdRlgEedNUqgs=; b=19faRVhuP58P5mFZUAw6KY9kqcKLH
+	86Ni0yIxChPTrD6BHjpINDq+UD8PK4TOyocGC8qzDqa5KhRB55H7b8lQY0Dpcac1
+	LvcftJLg34QeHtI8/5iG+EdmJq/xHkaFs0LeAgHDKTgUKuADg2ssCK5kL2KNbDkh
+	lyEq6/9lgUArHL0PfuPmRl/Gm9dglykWthRbjYKPdRRNImzW6+qUzJSxDE7GuO2J
+	U2fu38jaaWsd94L2agyFkIc9VkNJJwLvE2GNe59BjHvpIXSJRxxHQUVDa88ozGcU
+	ydg6hJ/9Akcl1NnzHIMD8jOHIvhyAgybyIENuSiQr/vwLtn6JhXW7MaCg==
+X-ME-Sender: <xms:7a_oZJ6VG1pjVuorpyoCUUjoGgIDzRcI0o7CxVDOLIHUa_HnhDaSBg>
+    <xme:7a_oZG7EyF_54juxEvm9RTjrd-qGX3wfk3GXqfcPmkMf3Zi_E890Zp5KTeeDR38Sl
+    f_pF5FfJXiwKc38nak>
+X-ME-Received: <xmr:7a_oZAfPvpmC4r9QdgqOUaNjtGDn-xkgs-Z-QM39pYvfM44ApgWktz-xAEBzgyVx52GHmxpkhg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedruddvkedgieejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
+    ertddtnecuhfhrohhmpegkhhgvrghoucfnihcuoehmvgesmhgrnhhjuhhsrghkrgdrmhgv
+    qeenucggtffrrghtthgvrhhnpeffgeeluddvveekueettdeiffefffdvhfevhffgkeelte
+    egieetfeffheffudekteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgvsehmrghnjhhush
+    grkhgrrdhmvg
+X-ME-Proxy: <xmx:7a_oZCLclRUEbiVb1slwRlFGWocrjfx_NGm5r6F_oSFM84m_Ckx8lA>
+    <xmx:7a_oZNIKMXxwj_IH9fnvM6haE-fOvaMOyrlCtoBM2A6LrsHl5Vbl-g>
+    <xmx:7a_oZLzjGIclSULVr44ozt8oEcrBAeN9FIL6lqHeaX_63skPH22wIQ>
+    <xmx:7q_oZKD1FyLSLttSIGolxpoLubSTy_NMuRE8pGbnkjQMLwmm6xJgIw>
+Feedback-ID: i3ea9498d:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 25 Aug 2023 09:43:05 -0400 (EDT)
+From: Zheao Li <me@manjusaka.me>
+To: edumazet@google.com,
+	mhiramat@kernel.org,
+	rostedt@goodmis.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Zheao Li <me@manjusaka.me>
+Subject: [PATCH v4] tracepoint: add new `tcp:tcp_ca_event` trace event
+Date: Fri, 25 Aug 2023 13:32:47 +0000
+Message-Id: <20230825133246.344364-1-me@manjusaka.me>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,93 +91,174 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There was a previous attempt to fix an out-of-bounds access in the DCCP
-error handlers, but that fix assumed that the error handlers only want
-to access the first 8 bytes of the DCCP header. Actually, they also look
-at the DCCP sequence number, which is stored beyond 8 bytes, so an
-explicit pskb_may_pull() is required.
+Hello 
 
-Fixes: 6706a97fec96 ("dccp: fix out of bound access in dccp_v4_err()")
-Fixes: 1aa9d1a0e7ee ("ipv6: dccp: fix out of bound access in dccp_v6_err()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jann Horn <jannh@google.com>
+This the 4th version of the patch, the previous discusstion is here
+
+https://lore.kernel.org/linux-trace-kernel/20230807183308.9015-1-me@manjusaka.me/
+
+In this version of the code, here's some different:
+
+1. The event name has been changed from `tcp_ca_event_set` to
+`tcp_ca_event`
+
+2. Output the current protocol family in TP_printk
+
+3. Show the ca_event symbol instead of the original number
+
+But the `./scripts/checkpatch.pl` has been failed to check this patch,
+because we sill have some code error in ./scripts/checkpatch.pl(in
+another world, the test would be failed when we use the 
+scripts/checkpatch.pl to check the events/tcp.h
+
+Feel free to ask me if you have have any issues and ideas.
+
+Thanks
+
 ---
- net/dccp/ipv4.c | 13 +++++++++----
- net/dccp/ipv6.c | 15 ++++++++++-----
- 2 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index fa8079303cb0..dcd2fb774d82 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -255,12 +255,17 @@ static int dccp_v4_err(struct sk_buff *skb, u32 info)
- 	int err;
- 	struct net *net = dev_net(skb->dev);
+In normal use case, the tcp_ca_event would be changed in high frequency.
+
+The developer can monitor the network quality more easier by tracing
+TCP stack with this TP event.
+
+So I propose to add a `tcp:tcp_ca_event` trace event
+like `tcp:tcp_cong_state_set` to help the people to
+trace the TCP connection status
+
+Signed-off-by: Zheao Li <me@manjusaka.me>
+---
+ include/net/tcp.h          |  9 ++----
+ include/trace/events/tcp.h | 60 ++++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp_cong.c        | 10 +++++++
+ 3 files changed, 72 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 0ca972ebd3dd..a68c5b61889c 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1154,13 +1154,8 @@ static inline bool tcp_ca_needs_ecn(const struct sock *sk)
+ 	return icsk->icsk_ca_ops->flags & TCP_CONG_NEEDS_ECN;
+ }
  
--	/* Only need dccph_dport & dccph_sport which are the first
--	 * 4 bytes in dccp header.
-+	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
-+	 * which is in byte 7 of the dccp header.
- 	 * Our caller (icmp_socket_deliver()) already pulled 8 bytes for us.
-+	 *
-+	 * Later on, we want to access the sequence number fields, which are
-+	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
- 	 */
--	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
--	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
-+	dh = (struct dccp_hdr *)(skb->data + offset);
-+	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
-+		return -EINVAL;
-+	iph = (struct iphdr *)skb->data;
- 	dh = (struct dccp_hdr *)(skb->data + offset);
+-static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
+-{
+-	const struct inet_connection_sock *icsk = inet_csk(sk);
+-
+-	if (icsk->icsk_ca_ops->cwnd_event)
+-		icsk->icsk_ca_ops->cwnd_event(sk, event);
+-}
++/* from tcp_cong.c */
++void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event);
  
- 	sk = __inet_lookup_established(net, &dccp_hashinfo,
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index d29d1163203d..25816e790527 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -74,7 +74,7 @@ static inline __u64 dccp_v6_init_sequence(struct sk_buff *skb)
- static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 			u8 type, u8 code, int offset, __be32 info)
+ /* From tcp_cong.c */
+ void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 7b1ddffa3dfc..993eb00403ea 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -41,6 +41,18 @@
+ 	TP_STORE_V4MAPPED(__entry, saddr, daddr)
+ #endif
+ 
++/* The TCP CA event traced by tcp_ca_event*/
++#define tcp_ca_event_names    \
++		EM(CA_EVENT_TX_START)     \
++		EM(CA_EVENT_CWND_RESTART) \
++		EM(CA_EVENT_COMPLETE_CWR) \
++		EM(CA_EVENT_LOSS)         \
++		EM(CA_EVENT_ECN_NO_CE)    \
++		EMe(CA_EVENT_ECN_IS_CE)
++
++#define show_tcp_ca_event_names(val) \
++	__print_symbolic(val, tcp_ca_event_names)
++
+ /*
+  * tcp event with arguments sk and skb
+  *
+@@ -419,6 +431,54 @@ TRACE_EVENT(tcp_cong_state_set,
+ 		  __entry->cong_state)
+ );
+ 
++TRACE_EVENT(tcp_ca_event,
++
++	TP_PROTO(struct sock *sk, const u8 ca_event),
++
++	TP_ARGS(sk, ca_event),
++
++	TP_STRUCT__entry(
++		__field(const void *, skaddr)
++		__field(__u16, sport)
++		__field(__u16, dport)
++		__field(__u16, family)
++		__array(__u8, saddr, 4)
++		__array(__u8, daddr, 4)
++		__array(__u8, saddr_v6, 16)
++		__array(__u8, daddr_v6, 16)
++		__field(__u8, ca_event)
++	),
++
++	TP_fast_assign(
++		struct inet_sock *inet = inet_sk(sk);
++		__be32 *p32;
++
++		__entry->skaddr = sk;
++
++		__entry->sport = ntohs(inet->inet_sport);
++		__entry->dport = ntohs(inet->inet_dport);
++		__entry->family = sk->sk_family;
++
++		p32 = (__be32 *) __entry->saddr;
++		*p32 = inet->inet_saddr;
++
++		p32 = (__be32 *) __entry->daddr;
++		*p32 =  inet->inet_daddr;
++
++		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
++			   sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
++
++		__entry->ca_event = ca_event;
++	),
++
++	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c ca_event=%s",
++		  show_family_name(__entry->family),
++		  __entry->sport, __entry->dport,
++		  __entry->saddr, __entry->daddr,
++		  __entry->saddr_v6, __entry->daddr_v6,
++		  show_tcp_ca_event_names(__entry->ca_event))
++);
++
+ #endif /* _TRACE_TCP_H */
+ 
+ /* This part must be outside protection */
+diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
+index 1b34050a7538..fb7ec6ebbbd0 100644
+--- a/net/ipv4/tcp_cong.c
++++ b/net/ipv4/tcp_cong.c
+@@ -34,6 +34,16 @@ struct tcp_congestion_ops *tcp_ca_find(const char *name)
+ 	return NULL;
+ }
+ 
++void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
++{
++	const struct inet_connection_sock *icsk = inet_csk(sk);
++
++	trace_tcp_ca_event(sk, (u8)event);
++
++	if (icsk->icsk_ca_ops->cwnd_event)
++		icsk->icsk_ca_ops->cwnd_event(sk, event);
++}
++
+ void tcp_set_ca_state(struct sock *sk, const u8 ca_state)
  {
--	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
-+	const struct ipv6hdr *hdr;
- 	const struct dccp_hdr *dh;
- 	struct dccp_sock *dp;
- 	struct ipv6_pinfo *np;
-@@ -83,12 +83,17 @@ static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 	__u64 seq;
- 	struct net *net = dev_net(skb->dev);
- 
--	/* Only need dccph_dport & dccph_sport which are the first
--	 * 4 bytes in dccp header.
-+	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
-+	 * which is in byte 7 of the dccp header.
- 	 * Our caller (icmpv6_notify()) already pulled 8 bytes for us.
-+	 *
-+	 * Later on, we want to access the sequence number fields, which are
-+	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
- 	 */
--	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
--	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
-+	dh = (struct dccp_hdr *)(skb->data + offset);
-+	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
-+		return -EINVAL;
-+	hdr = (const struct ipv6hdr *)skb->data;
- 	dh = (struct dccp_hdr *)(skb->data + offset);
- 
- 	sk = __inet6_lookup_established(net, &dccp_hashinfo,
-
-base-commit: 93f5de5f648d2b1ce3540a4ac71756d4a852dc23
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
 -- 
-2.42.0.rc1.204.g551eb34607-goog
+2.34.1
 
 
