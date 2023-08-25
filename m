@@ -1,82 +1,135 @@
-Return-Path: <netdev+bounces-30611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA48F78831D
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:11:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B471078832B
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:13:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1791D1C2091B
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:11:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E54861C20F85
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841D0C8E1;
-	Fri, 25 Aug 2023 09:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD3CC2F2;
+	Fri, 25 Aug 2023 09:13:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32EFC2D6
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A4DDC43395;
-	Fri, 25 Aug 2023 09:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1692954622;
-	bh=ayQFeULtvaJ26zGbRRHB3ZHj4umKdAVnrBX2etc2KMg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oLZ2Zc2SF1Yl0cap4gb1Rd2G8PkxwSUBgO3IxRiSP7JNZntxLn1TWVGP+8bfU7Z/P
-	 X7OoV02RqkRfYTiQ3LoCNsoOcdTJhXScoFPKtBpSUfk2fVqbK/LRZF2LSxW5xO3FpD
-	 nJgxrfVMutC3HJid7uE+Kxk9TnQkVJnTVYCTdufYIm5GGNqLDPs8CwTEMNnNiTcB4i
-	 vitL8CsVXiRKIfBXZM1HUbISogVBae3kcV8JuN0mc+PaNgMSZHxGnGNdzXFtCst87d
-	 bV7TlfpvnL6RHM9feBNpm+tS7GQqHsYhbyhy5S8h18YuOAHq0ZL5mh5c/h3SmxuOAL
-	 zci0+cyTAbNXg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41205E33083;
-	Fri, 25 Aug 2023 09:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB58AC2D1
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:13:32 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FDE1FD5;
+	Fri, 25 Aug 2023 02:13:31 -0700 (PDT)
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37P3uhJg027744;
+	Fri, 25 Aug 2023 09:12:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=R6R18gHw2C5mdhOKBBzW91Z3FEvtD6d0pTm5U2bvFFw=;
+ b=npn6LBCePTaAFrMsIQ6ABYakoFgfkE1MJu+VqZdHn26qhFDOum8p066dn3f51jABsXDF
+ 0a1UkPP2os8S2dSB/AQ1Q0oA+QOdqqxi8Q7fHdsGtymFAnj+mswlDDgA9j2R/G9TK8zQ
+ kCKz64wI89HfpGoCCRREAb+ObmilKnqExo3EvoXa9wFGn6gBaEwO4aTTTI4rY9RBYwDo
+ 3UWsN8hwywmhmtSXlzoNaVEQ5NhXSoq8Q9znMzUMgj49sZQxR1VqSrKXOPjJYD1ryFUo
+ eAMk3WOnf/1RhfxS/kJqMpvpodAoTOuB9CUypGAEtqh8vA8xwo5Y7zvby89+soewPTm2 xQ== 
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3spmtxrhb5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Aug 2023 09:12:59 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37P9CwZG029101
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Aug 2023 09:12:58 GMT
+Received: from devipriy-linux.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.36; Fri, 25 Aug 2023 02:12:51 -0700
+From: Devi Priya <quic_devipriy@quicinc.com>
+To: <andersson@kernel.org>, <agross@kernel.org>, <konrad.dybcio@linaro.org>,
+        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
+        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <nfraprado@collabora.com>, <rafal@milecki.pl>, <peng.fan@nxp.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>
+CC: <quic_devipriy@quicinc.com>, <quic_saahtoma@quicinc.com>
+Subject: [PATCH V2 0/7] Add NSS clock controller support for IPQ9574
+Date: Fri, 25 Aug 2023 14:42:27 +0530
+Message-ID: <20230825091234.32713-1-quic_devipriy@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: fec: add statistics for XDP_TX
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169295462226.4538.9021625369477551979.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Aug 2023 09:10:22 +0000
-References: <20230824061150.638251-1-wei.fang@nxp.com>
-In-Reply-To: <20230824061150.638251-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-imx@nxp.com
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: taJa4SE5Q03McoRRGo2fYrhIPro_Xo0S
+X-Proofpoint-GUID: taJa4SE5Q03McoRRGo2fYrhIPro_Xo0S
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-25_07,2023-08-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=828
+ mlxscore=0 priorityscore=1501 suspectscore=0 bulkscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308250079
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Add bindings, driver and devicetree node for networking sub system clock 
+controller on IPQ9574. Also add support for NSS Huayra type alpha PLL and
+add support for gpll0_out_aux clock which serves as the parent for 
+some nss clocks.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+The NSS clock controller driver depends on the below patchset which adds
+support for multiple configurations for same frequency.
+https://lore.kernel.org/linux-arm-msm/20230531222654.25475-1-ansuelsmth@gmail.com/
 
-On Thu, 24 Aug 2023 14:11:50 +0800 you wrote:
-> The FEC driver supports the statistics for XDP actions except for
-> XDP_TX before, because the XDP_TX was not supported when adding
-> the statistics for XDP. Now the FEC driver has supported XDP_TX
-> since commit f601899e4321 ("net: fec: add XDP_TX feature support").
-> So it's reasonable and necessary to add statistics for XDP_TX.
-> 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> 
-> [...]
+Changes in V2:
+	- Detailed change logs are added to the respective patches.
 
-Here is the summary with links:
-  - [net-next] net: fec: add statistics for XDP_TX
-    https://git.kernel.org/netdev/net-next/c/9540329452b7
+V1 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230711093529.18355-1-quic_devipriy@quicinc.com/
 
-You are awesome, thank you!
+Devi Priya (7):
+  clk: qcom: clk-alpha-pll: Add NSS HUAYRA ALPHA PLL support for ipq9574
+  dt-bindings: clock: gcc-ipq9574: Add definition for GPLL0_OUT_AUX
+  clk: qcom: gcc-ipq9574: Add gpll0_out_aux clock
+  dt-bindings: clock: Add ipq9574 NSSCC clock and reset definitions
+  clk: qcom: Add NSS clock Controller driver for IPQ9574
+  arm64: dts: qcom: ipq9574: Add support for nsscc node
+  arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
+
+ .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  107 +
+ arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   48 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/clk/qcom/Kconfig                      |    7 +
+ drivers/clk/qcom/Makefile                     |    1 +
+ drivers/clk/qcom/clk-alpha-pll.c              |   12 +
+ drivers/clk/qcom/clk-alpha-pll.h              |    1 +
+ drivers/clk/qcom/gcc-ipq9574.c                |   16 +
+ drivers/clk/qcom/nsscc-ipq9574.c              | 3109 +++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
+ .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
+ .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
+ 12 files changed, 3589 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+ create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+ create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+ create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
