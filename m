@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-30709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5FF6788A0A
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 16:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C61788A1C
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 16:03:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E68101C21093
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 14:03:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58DFC281810
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 14:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F52FBFC;
-	Fri, 25 Aug 2023 14:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D73F101D4;
+	Fri, 25 Aug 2023 14:02:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49498101D4
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 14:02:25 +0000 (UTC)
-Received: from out-242.mta1.migadu.com (out-242.mta1.migadu.com [95.215.58.242])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB31272D;
-	Fri, 25 Aug 2023 07:02:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35C3FC09
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 14:02:44 +0000 (UTC)
+Received: from out-246.mta1.migadu.com (out-246.mta1.migadu.com [IPv6:2001:41d0:203:375::f6])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187E72D51
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 07:02:18 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1692972120;
+	t=1692972134;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=d4c4JLcaw2hXejiOrGnFBQPVU2RM5hO/J+/aXcCYNEw=;
-	b=khe71NuAofqjJQcQBQh8qaSLQW5l+ABTZSFJ8Vvkem+VJ7Uz3lPnhsRbG1QiQpVIB0WzKu
-	TWSkBSbRJUjuC3LbOfeO0WhIFxiibQKBlsbXK8GLa0a537NlmAJDnBgPGmvzDTS140+5t+
-	gKh3+G5l/F0DpREKKRmtO+kz90FC86s=
+	bh=KWqxpxLv+BWdZ1zPLCWWiPjW3gW3QR8GdaNCgbqB+rA=;
+	b=W3mJ9hHH5VKigloC5U9bTjeZXL1WzXE+if57PbkgslJR/vwxXv7urAz03rnLzn8z8erL5h
+	VCpx6iOsBDC23kpw8k8XGE0qr0cLxvBRgKj1NfrV6YtEtntJMub0qfyQ1aHr3mZsH0O0dL
+	P836PFFsTuNux9i0jwQOVu5ehTDOpZM=
 From: Hao Xu <hao.xu@linux.dev>
 To: io-uring@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>
@@ -66,9 +66,9 @@ Cc: Dominique Martinet <asmadeus@codewreck.org>,
 	samba-technical@lists.samba.org,
 	linux-mtd@lists.infradead.org,
 	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 15/29] xfs: don't wait for free space in xlog_grant_head_check() in nowait case
-Date: Fri, 25 Aug 2023 21:54:17 +0800
-Message-Id: <20230825135431.1317785-16-hao.xu@linux.dev>
+Subject: [PATCH 16/29] xfs: add nowait parameter for xfs_inode_item_init()
+Date: Fri, 25 Aug 2023 21:54:18 +0800
+Message-Id: <20230825135431.1317785-17-hao.xu@linux.dev>
 In-Reply-To: <20230825135431.1317785-1-hao.xu@linux.dev>
 References: <20230825135431.1317785-1-hao.xu@linux.dev>
 Precedence: bulk
@@ -87,65 +87,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Hao Xu <howeyxu@tencent.com>
 
-Don't sleep and wait for more space for a log ticket in
-xlog_grant_head_check() when it is in nowait case.
+Add nowait parameter for xfs_inode_item_init() to support nowait
+semantics.
 
 Signed-off-by: Hao Xu <howeyxu@tencent.com>
 ---
- fs/xfs/xfs_log.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ fs/xfs/libxfs/xfs_trans_inode.c |  3 ++-
+ fs/xfs/xfs_inode_item.c         | 12 ++++++++----
+ fs/xfs/xfs_inode_item.h         |  3 ++-
+ 3 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/fs/xfs/xfs_log.c b/fs/xfs/xfs_log.c
-index 90fbb1c0eca2..a2aabdd42a29 100644
---- a/fs/xfs/xfs_log.c
-+++ b/fs/xfs/xfs_log.c
-@@ -341,7 +341,8 @@ xlog_grant_head_check(
- 	struct xlog		*log,
- 	struct xlog_grant_head	*head,
- 	struct xlog_ticket	*tic,
--	int			*need_bytes)
-+	int			*need_bytes,
+diff --git a/fs/xfs/libxfs/xfs_trans_inode.c b/fs/xfs/libxfs/xfs_trans_inode.c
+index cb4796b6e693..e7a8f63c8975 100644
+--- a/fs/xfs/libxfs/xfs_trans_inode.c
++++ b/fs/xfs/libxfs/xfs_trans_inode.c
+@@ -33,7 +33,8 @@ xfs_trans_ijoin(
+ 
+ 	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
+ 	if (ip->i_itemp == NULL)
+-		xfs_inode_item_init(ip, ip->i_mount);
++		xfs_inode_item_init(ip, ip->i_mount,
++				    tp->t_flags & XFS_TRANS_NOWAIT);
+ 	iip = ip->i_itemp;
+ 
+ 	ASSERT(iip->ili_lock_flags == 0);
+diff --git a/fs/xfs/xfs_inode_item.c b/fs/xfs/xfs_inode_item.c
+index 91c847a84e10..1742920bb4ce 100644
+--- a/fs/xfs/xfs_inode_item.c
++++ b/fs/xfs/xfs_inode_item.c
+@@ -825,21 +825,25 @@ static const struct xfs_item_ops xfs_inode_item_ops = {
+ /*
+  * Initialize the inode log item for a newly allocated (in-core) inode.
+  */
+-void
++int
+ xfs_inode_item_init(
+ 	struct xfs_inode	*ip,
+-	struct xfs_mount	*mp)
++	struct xfs_mount	*mp,
 +	bool			nowait)
  {
- 	int			free_bytes;
- 	int			error = 0;
-@@ -360,13 +361,15 @@ xlog_grant_head_check(
- 		spin_lock(&head->lock);
- 		if (!xlog_grant_head_wake(log, head, &free_bytes) ||
- 		    free_bytes < *need_bytes) {
--			error = xlog_grant_head_wait(log, head, tic,
--						     *need_bytes);
-+			error = nowait ?
-+				-EAGAIN : xlog_grant_head_wait(log, head, tic,
-+							       *need_bytes);
- 		}
- 		spin_unlock(&head->lock);
- 	} else if (free_bytes < *need_bytes) {
- 		spin_lock(&head->lock);
--		error = xlog_grant_head_wait(log, head, tic, *need_bytes);
-+		error = nowait ? -EAGAIN : xlog_grant_head_wait(log, head, tic,
-+								*need_bytes);
- 		spin_unlock(&head->lock);
- 	}
+ 	struct xfs_inode_log_item *iip;
++	gfp_t gfp_flags = GFP_KERNEL | (nowait ? 0 : __GFP_NOFAIL);
  
-@@ -428,7 +431,7 @@ xfs_log_regrant(
- 	trace_xfs_log_regrant(log, tic);
+ 	ASSERT(ip->i_itemp == NULL);
+-	iip = ip->i_itemp = kmem_cache_zalloc(xfs_ili_cache,
+-					      GFP_KERNEL | __GFP_NOFAIL);
++	iip = ip->i_itemp = kmem_cache_zalloc(xfs_ili_cache, gfp_flags);
++	if (!iip)
++		return -EAGAIN;
  
- 	error = xlog_grant_head_check(log, &log->l_write_head, tic,
--				      &need_bytes);
-+				      &need_bytes, false);
- 	if (error)
- 		goto out_error;
+ 	iip->ili_inode = ip;
+ 	spin_lock_init(&iip->ili_lock);
+ 	xfs_log_item_init(mp, &iip->ili_item, XFS_LI_INODE,
+ 						&xfs_inode_item_ops);
++	return 0;
+ }
  
-@@ -487,7 +490,7 @@ xfs_log_reserve(
- 	trace_xfs_log_reserve(log, tic);
+ /*
+diff --git a/fs/xfs/xfs_inode_item.h b/fs/xfs/xfs_inode_item.h
+index 377e06007804..7ba6f8a6b243 100644
+--- a/fs/xfs/xfs_inode_item.h
++++ b/fs/xfs/xfs_inode_item.h
+@@ -42,7 +42,8 @@ static inline int xfs_inode_clean(struct xfs_inode *ip)
+ 	return !ip->i_itemp || !(ip->i_itemp->ili_fields & XFS_ILOG_ALL);
+ }
  
- 	error = xlog_grant_head_check(log, &log->l_reserve_head, tic,
--				      &need_bytes);
-+				      &need_bytes, nowait);
- 	if (error)
- 		goto out_error;
- 
+-extern void xfs_inode_item_init(struct xfs_inode *, struct xfs_mount *);
++extern int xfs_inode_item_init(struct xfs_inode *ip, struct xfs_mount *mp,
++			       bool nowait);
+ extern void xfs_inode_item_destroy(struct xfs_inode *);
+ extern void xfs_iflush_abort(struct xfs_inode *);
+ extern void xfs_iflush_shutdown_abort(struct xfs_inode *);
 -- 
 2.25.1
 
