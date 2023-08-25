@@ -1,162 +1,166 @@
-Return-Path: <netdev+bounces-30756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94A5788EAC
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 20:27:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81949788EC4
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 20:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C3CC28186A
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:27:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5E391C20E72
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10333182D1;
-	Fri, 25 Aug 2023 18:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C6F174F7;
+	Fri, 25 Aug 2023 18:35:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB3C125D2
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 18:27:35 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D179CD2;
-	Fri, 25 Aug 2023 11:27:34 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37PHuYWF017369;
-	Fri, 25 Aug 2023 18:27:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=QHQOxiPuUa0ebvOp4zeF41oQRZYAzTOs8FVVwIp9Ljk=;
- b=fxnjY7pa/kjrEjYsAn3f830wFpCa/pqiFmmssVqUCVajBH7x0d3Z7b+szRJJK2n7EvvZ
- m/0mxjm3m4ZSW2RFapYNT9kcRBym4ds2RoJ38RygPWd8SF/MZxnDjRmJCKmN9kzRSzEw
- 8I0uPAFHRTbugceMPcELPp3L1tcI+r0cXo3Tm5EXkPkEsPkMeoHQFPXgaMMjkN5rg3K9
- gk4W5GX/UGrgdsRsyFDViK6VOwAZzWQ1OQw0woGDuZZbm0id+qS0iYZLkDKatSGOwRIA
- YkJ0RIkIGgKDYHEqIuUrsswDvpF84AMTKNM7lLuqDHUrKUlTiMHkSsY/doHiy1nCX/Ca qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sq1528vru-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Aug 2023 18:26:59 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37PIHT0S004200;
-	Fri, 25 Aug 2023 18:26:58 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sq1528vr8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Aug 2023 18:26:58 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37PI48X6016687;
-	Fri, 25 Aug 2023 18:26:57 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sn2289ner-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Aug 2023 18:26:57 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37PIQuda1770098
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Aug 2023 18:26:56 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B91258055;
-	Fri, 25 Aug 2023 18:26:56 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7EBBD5804B;
-	Fri, 25 Aug 2023 18:26:51 +0000 (GMT)
-Received: from [9.61.160.138] (unknown [9.61.160.138])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 25 Aug 2023 18:26:51 +0000 (GMT)
-Message-ID: <240c26d3-b821-8410-3142-62e9a8656146@linux.ibm.com>
-Date: Fri, 25 Aug 2023 14:26:51 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3398C256A
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 18:35:39 +0000 (UTC)
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E95210A;
+	Fri, 25 Aug 2023 11:35:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1692988538; x=1724524538;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=y4IJ9fWGWId9jFHSjrSDACenhV8KSDVmN2rshsCIasA=;
+  b=UqEmpnlAQqmJNydUb3T5sNtGQeOyHkbHREWa8N4EQbfYoMRgihyZ1U7t
+   9GJv8uR7hAIFGgpWA1u8aPLQsCCOYZHqiSDZ7lTXRapRLhcLh1nQo7qPo
+   TjH3HcbWoF9KttzDznKX6Cl6WzTPKJF7x28+IWHpRRGYY6iDF+ED6V8Jk
+   A=;
+X-IronPort-AV: E=Sophos;i="6.02,201,1688428800"; 
+   d="scan'208";a="1150822194"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 18:35:30 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com (Postfix) with ESMTPS id CD0A880926;
+	Fri, 25 Aug 2023 18:35:26 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 25 Aug 2023 18:35:25 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.37;
+ Fri, 25 Aug 2023 18:35:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jannh@google.com>
+CC: <davem@davemloft.net>, <dccp@vger.kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>, "Kuniyuki
+ Iwashima" <kuniyu@amazon.com>
+Subject: Re: [PATCH net] dccp: Fix out of bounds access in DCCP error handler
+Date: Fri, 25 Aug 2023 11:35:08 -0700
+Message-ID: <20230825183508.8687-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230825133241.3635236-1-jannh@google.com>
+References: <20230825133241.3635236-1-jannh@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and optimized
- IOTLB flushing
-Content-Language: en-US
-To: Niklas Schnelle <schnelle@linux.ibm.com>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Gerd Bayer <gbayer@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>, Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Yong Wu <yong.wu@mediatek.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Baolin Wang
- <baolin.wang@linux.alibaba.com>,
-        Chunyan Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Krishna Reddy
- <vdumpa@nvidia.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux.dev, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gJVEk2wQaewkyrtQ9b__FpQB1m2yDbYi
-X-Proofpoint-ORIG-GUID: plJWB3elhf65jTBHYa7I2-RRr5Ln9Ish
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-25_16,2023-08-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- malwarescore=0 mlxlogscore=758 lowpriorityscore=0 clxscore=1015
- suspectscore=0 bulkscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308250162
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.44]
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/25/23 6:11 AM, Niklas Schnelle wrote:
-> Hi All,
+From: Jann Horn <jannh@google.com>
+Date: Fri, 25 Aug 2023 15:32:41 +0200
+> There was a previous attempt to fix an out-of-bounds access in the DCCP
+> error handlers, but that fix assumed that the error handlers only want
+> to access the first 8 bytes of the DCCP header. Actually, they also look
+> at the DCCP sequence number, which is stored beyond 8 bytes, so an
+> explicit pskb_may_pull() is required.
 > 
-> This patch series converts s390's PCI support from its platform specific DMA
-> API implementation in arch/s390/pci/pci_dma.c to the common DMA IOMMU layer.
-> The conversion itself is done in patches 3-4 with patch 2 providing the final
-> necessary IOMMU driver improvement to handle s390's special IOTLB flush
-> out-of-resource indication in virtualized environments. The conversion
-> itself only touches the s390 IOMMU driver and s390 arch code moving over
-> remaining functions from the s390 DMA API implementation. No changes to
-> common code are necessary.
+> Fixes: 6706a97fec96 ("dccp: fix out of bound access in dccp_v4_err()")
+> Fixes: 1aa9d1a0e7ee ("ipv6: dccp: fix out of bound access in dccp_v6_err()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jann Horn <jannh@google.com>
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+> ---
+>  net/dccp/ipv4.c | 13 +++++++++----
+>  net/dccp/ipv6.c | 15 ++++++++++-----
+>  2 files changed, 19 insertions(+), 9 deletions(-)
 > 
-
-I also picked up this latest version and ran various tests with ISM, mlx5 and some NVMe drives.  FWIW, I have been including versions of this series in my s390 dev environments for a number of months now and have also been building my s390 pci iommufd nested translation series on top of this, so it's seen quite a bit of testing from me at least.
-
-So as far as I'm concerned anyway, this series is ready for -next (after the merge window). 
-
-Thanks,
-Matt
-
+> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+> index fa8079303cb0..dcd2fb774d82 100644
+> --- a/net/dccp/ipv4.c
+> +++ b/net/dccp/ipv4.c
+> @@ -255,12 +255,17 @@ static int dccp_v4_err(struct sk_buff *skb, u32 info)
+>  	int err;
+>  	struct net *net = dev_net(skb->dev);
+>  
+> -	/* Only need dccph_dport & dccph_sport which are the first
+> -	 * 4 bytes in dccp header.
+> +	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
+> +	 * which is in byte 7 of the dccp header.
+>  	 * Our caller (icmp_socket_deliver()) already pulled 8 bytes for us.
+> +	 *
+> +	 * Later on, we want to access the sequence number fields, which are
+> +	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
+>  	 */
+> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
+> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
+> +	dh = (struct dccp_hdr *)(skb->data + offset);
+> +	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
+> +		return -EINVAL;
+> +	iph = (struct iphdr *)skb->data;
+>  	dh = (struct dccp_hdr *)(skb->data + offset);
+>  
+>  	sk = __inet_lookup_established(net, &dccp_hashinfo,
+> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+> index d29d1163203d..25816e790527 100644
+> --- a/net/dccp/ipv6.c
+> +++ b/net/dccp/ipv6.c
+> @@ -74,7 +74,7 @@ static inline __u64 dccp_v6_init_sequence(struct sk_buff *skb)
+>  static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+>  			u8 type, u8 code, int offset, __be32 info)
+>  {
+> -	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
+> +	const struct ipv6hdr *hdr;
+>  	const struct dccp_hdr *dh;
+>  	struct dccp_sock *dp;
+>  	struct ipv6_pinfo *np;
+> @@ -83,12 +83,17 @@ static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+>  	__u64 seq;
+>  	struct net *net = dev_net(skb->dev);
+>  
+> -	/* Only need dccph_dport & dccph_sport which are the first
+> -	 * 4 bytes in dccp header.
+> +	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
+> +	 * which is in byte 7 of the dccp header.
+>  	 * Our caller (icmpv6_notify()) already pulled 8 bytes for us.
+> +	 *
+> +	 * Later on, we want to access the sequence number fields, which are
+> +	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
+>  	 */
+> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
+> -	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
+> +	dh = (struct dccp_hdr *)(skb->data + offset);
+> +	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
+> +		return -EINVAL;
+> +	hdr = (const struct ipv6hdr *)skb->data;
+>  	dh = (struct dccp_hdr *)(skb->data + offset);
+>  
+>  	sk = __inet6_lookup_established(net, &dccp_hashinfo,
+> 
+> base-commit: 93f5de5f648d2b1ce3540a4ac71756d4a852dc23
+> -- 
+> 2.42.0.rc1.204.g551eb34607-goog
 
