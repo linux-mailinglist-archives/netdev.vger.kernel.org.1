@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-30598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B554D7882BB
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:57:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 332C27882C7
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 10:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABDC1C20F72
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:57:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5AA3281809
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 08:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF17CA61;
-	Fri, 25 Aug 2023 08:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7B2D2F7;
+	Fri, 25 Aug 2023 08:53:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E51CA5F
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:49 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B521BFA
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:44 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3ff006454fdso5903545e9.1
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C89D2E9
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:53:51 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F37D1FC3
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:47 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-401b0d97850so5804085e9.2
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 01:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953623; x=1693558423;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1692953625; x=1693558425;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IGwVZyjSdwMoylnGrRWpUD943PPa2R/RpuTBMlAD87g=;
-        b=a0B1Eu4T7vKO/iey5hGoC7vK29rSj9cm+oL5FVc4DUp4c2n6OH3TMeKLWScppGObgz
-         3+91rdHqA830HarD+j+6gEKTDaahQaYbllKaJg3Go5EPzF5bn95LLJ3cjj1Hxdi8urqE
-         78f7HehMKbLUq75p8UYh5dgCAnWdwntxRmFCK2jcNSWkr2D/oIxgAa+u/rbdxYqD5/qg
-         ZhkJZXfz+ZZr3kDM445lHG5Fv4/iQ75WtAg7c3rLPrd6IPDyn6PlX6+1sJtEOOVQ0m+y
-         Wo6oFGjBsE+h5SzJUaoijcusKbMoq0uznp4GR+Q4nyySha+NdsCFtYFKIoA32bL7aPhb
-         NLVw==
+        bh=yqP0UdCwJQ3E1jb+YSK4rzFkUiH19UWtpXiuFodrCFk=;
+        b=b0aXMG3yTBqV5HDFyG0uLTlbceVFPPlwibgS0nadp0ANvAq8+shJ8eNzpxShce4FWz
+         vcOMc76uFg92/ft7Y/C4U3Tmo/SOYnGMYhxmk/cmss6mm5xSSJuwVZC11Z9GjwYVMRpu
+         6ZQ1Ivg3bzbSOluBFRMmaD5F6x47WmOfaXVLAuU2flwSAPPx+4H0Yl6K4lXjTzOSwXu5
+         RoRjgaKCp2w7iha1vTd6ixmQ4drG1APLiOsen/Yn+aZVlbPUj2aG75xtOvfasputIJY9
+         hyTdvPjZWgw72VRYICb0CQS8joM8ctlPiA2XeHRkOAnVV+nNZANBNaPJTIcZqpPlBn47
+         YURQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692953623; x=1693558423;
+        d=1e100.net; s=20221208; t=1692953625; x=1693558425;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IGwVZyjSdwMoylnGrRWpUD943PPa2R/RpuTBMlAD87g=;
-        b=ecvtjjseaviI9FG49GHQ+UwBjx8N2wPG5FShIDUBapAs1za6Uhi963rcatV4nXQEQj
-         XkfOu5ioYDODwNiKtxcmJaWiiMe590geGTE9ONQdjbmXsZiC8gsudDpMKwcc5lQa4ynH
-         QGoAqrSjgExUNG1se/g4jzCUqc8Ecsj0bK4GX7Itm49ZRCYk4D/eHLnsVtTzxZHiMx9h
-         CFs4q54muMM9948WKO8v/1H6Nqo9v0WMNtJ0l/xXv3daSDGZcRvQgU5MU5E7pfLeYwYg
-         PW90pzrV3mUQvEwEk11rhhMyBwRPWfR60eZtrsf+4IuNJQUDT8qOAqM1SPWxyk30KsEu
-         WrXg==
-X-Gm-Message-State: AOJu0YxNqfv9qSBF0hYqWmjk57iPwROTBDEHeLt45A3DqzgRNtvIkwBv
-	I3POQjKJ97bCL/gjeMd17oWIO8+p1yrm4BIRzX6MdifU
-X-Google-Smtp-Source: AGHT+IFvkOfxYpXwaEPm3KmAr9G2FpeWKBIwpnJ2SUrBIlFmLBbLmyX5AyyA+zS+XwNCqK2XDk5iBA==
-X-Received: by 2002:a1c:7907:0:b0:400:ce4f:f184 with SMTP id l7-20020a1c7907000000b00400ce4ff184mr4222113wme.41.1692953623289;
-        Fri, 25 Aug 2023 01:53:43 -0700 (PDT)
+        bh=yqP0UdCwJQ3E1jb+YSK4rzFkUiH19UWtpXiuFodrCFk=;
+        b=AIvEeXeW1UOSHc7SXXgKWuu7wNUx7iYbguiF20N/xfiwjr1TRTF68Dzj+ifUQmKsnY
+         JcZs+5/7ixBbTx9dunLCKSytEwyM8a2g0Hn9ylYBli5S3sITOAR1FGwkreVWUW1Cuzdg
+         e4NeIe7FE5OY1T21VFE2/u29tFSQcrpPQnHdRDbFuMnyVZDp4VoAveOH4ilcAv3FX2o2
+         3QafRh8OFfTaBr+Hf+4ZkByjDeqrE4hGWLkIrxKszpVbQETqYGQjDS+ju+XFn+OJzHyN
+         gpGuJ5p1b6cNAkkYEbnkYatAFrd2orZBQcqM5x615AviZB3rPfJGu8KjlQ+AO3CIwAnA
+         39Ag==
+X-Gm-Message-State: AOJu0YxYybeHjsAF/AYdquK7QtNbJX04LQ4kKgyhXMNaLCsjqmQofpl3
+	yPHIpQigbFZT++CsMOsDGtdUJVaOiyP6wywuU4vqu2mH
+X-Google-Smtp-Source: AGHT+IEMuUUn6+6GdQtE7PS27W5ekjoKCiVFBEO5oMb5B95HSSYE7DlVn8chCtUfcrAQJLwGZI5L1g==
+X-Received: by 2002:a7b:cc81:0:b0:401:aa8f:7573 with SMTP id p1-20020a7bcc81000000b00401aa8f7573mr2730857wma.6.1692953625458;
+        Fri, 25 Aug 2023 01:53:45 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id f23-20020a7bcd17000000b003feef82bbefsm1565573wmj.29.2023.08.25.01.53.42
+        by smtp.gmail.com with ESMTPSA id y24-20020a1c4b18000000b003fc01189b0dsm1550530wma.42.2023.08.25.01.53.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 01:53:42 -0700 (PDT)
+        Fri, 25 Aug 2023 01:53:44 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -63,9 +63,9 @@ Cc: kuba@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	moshe@nvidia.com
-Subject: [patch net-next 11/15] devlink: push rate related code into separate file
-Date: Fri, 25 Aug 2023 10:53:17 +0200
-Message-ID: <20230825085321.178134-12-jiri@resnulli.us>
+Subject: [patch net-next 12/15] devlink: push linecard related code into separate file
+Date: Fri, 25 Aug 2023 10:53:18 +0200
+Message-ID: <20230825085321.178134-13-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230825085321.178134-1-jiri@resnulli.us>
 References: <20230825085321.178134-1-jiri@resnulli.us>
@@ -84,144 +84,173 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Cut out another chunk from leftover.c and put rate related code
+Cut out another chunk from leftover.c and put linecard related code
 into a separate file.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
  net/devlink/Makefile        |   2 +-
- net/devlink/devl_internal.h |   5 +
- net/devlink/leftover.c      | 718 -----------------------------------
- net/devlink/rate.c          | 722 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 728 insertions(+), 719 deletions(-)
- create mode 100644 net/devlink/rate.c
+ net/devlink/devl_internal.h |  34 +-
+ net/devlink/leftover.c      | 599 -----------------------------------
+ net/devlink/linecard.c      | 606 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 626 insertions(+), 615 deletions(-)
+ create mode 100644 net/devlink/linecard.c
 
 diff --git a/net/devlink/Makefile b/net/devlink/Makefile
-index 523efffe522c..f61aa97688f5 100644
+index f61aa97688f5..71f490d301d7 100644
 --- a/net/devlink/Makefile
 +++ b/net/devlink/Makefile
 @@ -1,4 +1,4 @@
  # SPDX-License-Identifier: GPL-2.0
  
  obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
--	 resource.o param.o region.o health.o trap.o
-+	 resource.o param.o region.o health.o trap.o rate.o
+-	 resource.o param.o region.o health.o trap.o rate.o
++	 resource.o param.o region.o health.o trap.o rate.o linecard.o
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 148525aa2847..8b530f15c439 100644
+index 8b530f15c439..8c81f731a4c7 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -166,6 +166,8 @@ void devlink_trap_groups_notify_register(struct devlink *devlink);
- void devlink_trap_groups_notify_unregister(struct devlink *devlink);
- void devlink_traps_notify_register(struct devlink *devlink);
+@@ -168,6 +168,8 @@ void devlink_traps_notify_register(struct devlink *devlink);
  void devlink_traps_notify_unregister(struct devlink *devlink);
-+void devlink_rates_notify_register(struct devlink *devlink);
-+void devlink_rates_notify_unregister(struct devlink *devlink);
+ void devlink_rates_notify_register(struct devlink *devlink);
+ void devlink_rates_notify_unregister(struct devlink *devlink);
++void devlink_linecards_notify_register(struct devlink *devlink);
++void devlink_linecards_notify_unregister(struct devlink *devlink);
  
  /* Ports */
  #define ASSERT_DEVLINK_PORT_INITIALIZED(devlink_port)				\
-@@ -278,3 +280,6 @@ int devlink_nl_cmd_trap_group_set_doit(struct sk_buff *skb,
- 				       struct genl_info *info);
- int devlink_nl_cmd_trap_policer_set_doit(struct sk_buff *skb,
- 					 struct genl_info *info);
-+int devlink_nl_cmd_rate_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_rate_new_doit(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_cmd_rate_del_doit(struct sk_buff *skb, struct genl_info *info);
+@@ -182,21 +184,6 @@ devlink_port_get_from_info(struct devlink *devlink, struct genl_info *info);
+ struct devlink_port *devlink_port_get_from_attrs(struct devlink *devlink,
+ 						 struct nlattr **attrs);
+ 
+-/* Linecards */
+-struct devlink_linecard {
+-	struct list_head list;
+-	struct devlink *devlink;
+-	unsigned int index;
+-	const struct devlink_linecard_ops *ops;
+-	void *priv;
+-	enum devlink_linecard_state state;
+-	struct mutex state_lock; /* Protects state */
+-	const char *type;
+-	struct devlink_linecard_type *types;
+-	unsigned int types_count;
+-	struct devlink *nested_devlink;
+-};
+-
+ /* Reload */
+ bool devlink_reload_actions_valid(const struct devlink_ops *ops);
+ int devlink_reload(struct devlink *devlink, struct net *dest_net,
+@@ -222,6 +209,21 @@ int devlink_resources_validate(struct devlink *devlink,
+ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
+ 			     struct netlink_ext_ack *extack);
+ 
++/* Linecards */
++struct devlink_linecard {
++	struct list_head list;
++	struct devlink *devlink;
++	unsigned int index;
++	const struct devlink_linecard_ops *ops;
++	void *priv;
++	enum devlink_linecard_state state;
++	struct mutex state_lock; /* Protects state */
++	const char *type;
++	struct devlink_linecard_type *types;
++	unsigned int types_count;
++	struct devlink *nested_devlink;
++};
++
+ /* Devlink nl cmds */
+ int devlink_nl_cmd_reload(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_eswitch_get_doit(struct sk_buff *skb, struct genl_info *info);
+@@ -283,3 +285,5 @@ int devlink_nl_cmd_trap_policer_set_doit(struct sk_buff *skb,
+ int devlink_nl_cmd_rate_set_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_rate_new_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_cmd_rate_del_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
++				     struct genl_info *info);
 diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index 5b153ce097ab..13958c3da59a 100644
+index 13958c3da59a..98ccb3a8393d 100644
 --- a/net/devlink/leftover.c
 +++ b/net/devlink/leftover.c
-@@ -37,80 +37,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwmsg);
+@@ -37,396 +37,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwmsg);
  EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_hwerr);
  EXPORT_TRACEPOINT_SYMBOL_GPL(devlink_trap_report);
  
--static inline bool
--devlink_rate_is_leaf(struct devlink_rate *devlink_rate)
+-static struct devlink_linecard *
+-devlink_linecard_get_by_index(struct devlink *devlink,
+-			      unsigned int linecard_index)
 -{
--	return devlink_rate->type == DEVLINK_RATE_TYPE_LEAF;
--}
+-	struct devlink_linecard *devlink_linecard;
 -
--static inline bool
--devlink_rate_is_node(struct devlink_rate *devlink_rate)
--{
--	return devlink_rate->type == DEVLINK_RATE_TYPE_NODE;
--}
--
--static struct devlink_rate *
--devlink_rate_leaf_get_from_info(struct devlink *devlink, struct genl_info *info)
--{
--	struct devlink_rate *devlink_rate;
--	struct devlink_port *devlink_port;
--
--	devlink_port = devlink_port_get_from_attrs(devlink, info->attrs);
--	if (IS_ERR(devlink_port))
--		return ERR_CAST(devlink_port);
--	devlink_rate = devlink_port->devlink_rate;
--	return devlink_rate ?: ERR_PTR(-ENODEV);
--}
--
--static struct devlink_rate *
--devlink_rate_node_get_by_name(struct devlink *devlink, const char *node_name)
--{
--	static struct devlink_rate *devlink_rate;
--
--	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
--		if (devlink_rate_is_node(devlink_rate) &&
--		    !strcmp(node_name, devlink_rate->name))
--			return devlink_rate;
+-	list_for_each_entry(devlink_linecard, &devlink->linecard_list, list) {
+-		if (devlink_linecard->index == linecard_index)
+-			return devlink_linecard;
 -	}
--	return ERR_PTR(-ENODEV);
+-	return NULL;
 -}
 -
--static struct devlink_rate *
--devlink_rate_node_get_from_attrs(struct devlink *devlink, struct nlattr **attrs)
+-static bool devlink_linecard_index_exists(struct devlink *devlink,
+-					  unsigned int linecard_index)
 -{
--	const char *rate_node_name;
--	size_t len;
--
--	if (!attrs[DEVLINK_ATTR_RATE_NODE_NAME])
--		return ERR_PTR(-EINVAL);
--	rate_node_name = nla_data(attrs[DEVLINK_ATTR_RATE_NODE_NAME]);
--	len = strlen(rate_node_name);
--	/* Name cannot be empty or decimal number */
--	if (!len || strspn(rate_node_name, "0123456789") == len)
--		return ERR_PTR(-EINVAL);
--
--	return devlink_rate_node_get_by_name(devlink, rate_node_name);
+-	return devlink_linecard_get_by_index(devlink, linecard_index);
 -}
 -
--static struct devlink_rate *
--devlink_rate_node_get_from_info(struct devlink *devlink, struct genl_info *info)
+-static struct devlink_linecard *
+-devlink_linecard_get_from_attrs(struct devlink *devlink, struct nlattr **attrs)
 -{
--	return devlink_rate_node_get_from_attrs(devlink, info->attrs);
+-	if (attrs[DEVLINK_ATTR_LINECARD_INDEX]) {
+-		u32 linecard_index = nla_get_u32(attrs[DEVLINK_ATTR_LINECARD_INDEX]);
+-		struct devlink_linecard *linecard;
+-
+-		linecard = devlink_linecard_get_by_index(devlink, linecard_index);
+-		if (!linecard)
+-			return ERR_PTR(-ENODEV);
+-		return linecard;
+-	}
+-	return ERR_PTR(-EINVAL);
 -}
 -
--static struct devlink_rate *
--devlink_rate_get_from_info(struct devlink *devlink, struct genl_info *info)
+-static struct devlink_linecard *
+-devlink_linecard_get_from_info(struct devlink *devlink, struct genl_info *info)
 -{
--	struct nlattr **attrs = info->attrs;
--
--	if (attrs[DEVLINK_ATTR_PORT_INDEX])
--		return devlink_rate_leaf_get_from_info(devlink, info);
--	else if (attrs[DEVLINK_ATTR_RATE_NODE_NAME])
--		return devlink_rate_node_get_from_info(devlink, info);
--	else
--		return ERR_PTR(-EINVAL);
+-	return devlink_linecard_get_from_attrs(devlink, info->attrs);
 -}
 -
- static struct devlink_linecard *
- devlink_linecard_get_by_index(struct devlink *devlink,
- 			      unsigned int linecard_index)
-@@ -169,491 +95,6 @@ static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct devlink *dev
- 	return -EMSGSIZE;
- }
- 
--static int devlink_nl_rate_fill(struct sk_buff *msg,
--				struct devlink_rate *devlink_rate,
--				enum devlink_command cmd, u32 portid, u32 seq,
--				int flags, struct netlink_ext_ack *extack)
+-static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct devlink *devlink)
 -{
--	struct devlink *devlink = devlink_rate->devlink;
+-	struct nlattr *nested_attr;
+-
+-	nested_attr = nla_nest_start(msg, DEVLINK_ATTR_NESTED_DEVLINK);
+-	if (!nested_attr)
+-		return -EMSGSIZE;
+-	if (devlink_nl_put_handle(msg, devlink))
+-		goto nla_put_failure;
+-
+-	nla_nest_end(msg, nested_attr);
+-	return 0;
+-
+-nla_put_failure:
+-	nla_nest_cancel(msg, nested_attr);
+-	return -EMSGSIZE;
+-}
+-
+-struct devlink_linecard_type {
+-	const char *type;
+-	const void *priv;
+-};
+-
+-static int devlink_nl_linecard_fill(struct sk_buff *msg,
+-				    struct devlink *devlink,
+-				    struct devlink_linecard *linecard,
+-				    enum devlink_command cmd, u32 portid,
+-				    u32 seq, int flags,
+-				    struct netlink_ext_ack *extack)
+-{
+-	struct devlink_linecard_type *linecard_type;
+-	struct nlattr *attr;
 -	void *hdr;
+-	int i;
 -
 -	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
 -	if (!hdr)
@@ -229,40 +258,33 @@ index 5b153ce097ab..13958c3da59a 100644
 -
 -	if (devlink_nl_put_handle(msg, devlink))
 -		goto nla_put_failure;
--
--	if (nla_put_u16(msg, DEVLINK_ATTR_RATE_TYPE, devlink_rate->type))
+-	if (nla_put_u32(msg, DEVLINK_ATTR_LINECARD_INDEX, linecard->index))
+-		goto nla_put_failure;
+-	if (nla_put_u8(msg, DEVLINK_ATTR_LINECARD_STATE, linecard->state))
+-		goto nla_put_failure;
+-	if (linecard->type &&
+-	    nla_put_string(msg, DEVLINK_ATTR_LINECARD_TYPE, linecard->type))
 -		goto nla_put_failure;
 -
--	if (devlink_rate_is_leaf(devlink_rate)) {
--		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX,
--				devlink_rate->devlink_port->index))
+-	if (linecard->types_count) {
+-		attr = nla_nest_start(msg,
+-				      DEVLINK_ATTR_LINECARD_SUPPORTED_TYPES);
+-		if (!attr)
 -			goto nla_put_failure;
--	} else if (devlink_rate_is_node(devlink_rate)) {
--		if (nla_put_string(msg, DEVLINK_ATTR_RATE_NODE_NAME,
--				   devlink_rate->name))
--			goto nla_put_failure;
+-		for (i = 0; i < linecard->types_count; i++) {
+-			linecard_type = &linecard->types[i];
+-			if (nla_put_string(msg, DEVLINK_ATTR_LINECARD_TYPE,
+-					   linecard_type->type)) {
+-				nla_nest_cancel(msg, attr);
+-				goto nla_put_failure;
+-			}
+-		}
+-		nla_nest_end(msg, attr);
 -	}
 -
--	if (nla_put_u64_64bit(msg, DEVLINK_ATTR_RATE_TX_SHARE,
--			      devlink_rate->tx_share, DEVLINK_ATTR_PAD))
+-	if (linecard->nested_devlink &&
+-	    devlink_nl_put_nested_handle(msg, linecard->nested_devlink))
 -		goto nla_put_failure;
--
--	if (nla_put_u64_64bit(msg, DEVLINK_ATTR_RATE_TX_MAX,
--			      devlink_rate->tx_max, DEVLINK_ATTR_PAD))
--		goto nla_put_failure;
--
--	if (nla_put_u32(msg, DEVLINK_ATTR_RATE_TX_PRIORITY,
--			devlink_rate->tx_priority))
--		goto nla_put_failure;
--
--	if (nla_put_u32(msg, DEVLINK_ATTR_RATE_TX_WEIGHT,
--			devlink_rate->tx_weight))
--		goto nla_put_failure;
--
--	if (devlink_rate->parent)
--		if (nla_put_string(msg, DEVLINK_ATTR_RATE_PARENT_NODE_NAME,
--				   devlink_rate->parent->name))
--			goto nla_put_failure;
 -
 -	genlmsg_end(msg, hdr);
 -	return 0;
@@ -272,14 +294,15 @@ index 5b153ce097ab..13958c3da59a 100644
 -	return -EMSGSIZE;
 -}
 -
--static void devlink_rate_notify(struct devlink_rate *devlink_rate,
--				enum devlink_command cmd)
+-static void devlink_linecard_notify(struct devlink_linecard *linecard,
+-				    enum devlink_command cmd)
 -{
--	struct devlink *devlink = devlink_rate->devlink;
+-	struct devlink *devlink = linecard->devlink;
 -	struct sk_buff *msg;
 -	int err;
 -
--	WARN_ON(cmd != DEVLINK_CMD_RATE_NEW && cmd != DEVLINK_CMD_RATE_DEL);
+-	WARN_ON(cmd != DEVLINK_CMD_LINECARD_NEW &&
+-		cmd != DEVLINK_CMD_LINECARD_DEL);
 -
 -	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
 -		return;
@@ -288,51 +311,84 @@ index 5b153ce097ab..13958c3da59a 100644
 -	if (!msg)
 -		return;
 -
--	err = devlink_nl_rate_fill(msg, devlink_rate, cmd, 0, 0, 0, NULL);
+-	err = devlink_nl_linecard_fill(msg, devlink, linecard, cmd, 0, 0, 0,
+-				       NULL);
 -	if (err) {
 -		nlmsg_free(msg);
 -		return;
 -	}
 -
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
--				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+-	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
+-				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
 -}
 -
--static void devlink_rates_notify_register(struct devlink *devlink)
+-static void devlink_linecards_notify_register(struct devlink *devlink)
 -{
--	struct devlink_rate *rate_node;
+-	struct devlink_linecard *linecard;
 -
--	list_for_each_entry(rate_node, &devlink->rate_list, list)
--		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
+-	list_for_each_entry(linecard, &devlink->linecard_list, list)
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
 -}
 -
--static void devlink_rates_notify_unregister(struct devlink *devlink)
+-static void devlink_linecards_notify_unregister(struct devlink *devlink)
 -{
--	struct devlink_rate *rate_node;
+-	struct devlink_linecard *linecard;
 -
--	list_for_each_entry_reverse(rate_node, &devlink->rate_list, list)
--		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_DEL);
+-	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
 -}
 -
--static int
--devlink_nl_rate_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
--			     struct netlink_callback *cb, int flags)
+-int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info)
+-{
+-	struct devlink *devlink = info->user_ptr[0];
+-	struct devlink_linecard *linecard;
+-	struct sk_buff *msg;
+-	int err;
+-
+-	linecard = devlink_linecard_get_from_info(devlink, info);
+-	if (IS_ERR(linecard))
+-		return PTR_ERR(linecard);
+-
+-	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+-	if (!msg)
+-		return -ENOMEM;
+-
+-	mutex_lock(&linecard->state_lock);
+-	err = devlink_nl_linecard_fill(msg, devlink, linecard,
+-				       DEVLINK_CMD_LINECARD_NEW,
+-				       info->snd_portid, info->snd_seq, 0,
+-				       info->extack);
+-	mutex_unlock(&linecard->state_lock);
+-	if (err) {
+-		nlmsg_free(msg);
+-		return err;
+-	}
+-
+-	return genlmsg_reply(msg, info);
+-}
+-
+-static int devlink_nl_linecard_get_dump_one(struct sk_buff *msg,
+-					    struct devlink *devlink,
+-					    struct netlink_callback *cb,
+-					    int flags)
 -{
 -	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
--	struct devlink_rate *devlink_rate;
+-	struct devlink_linecard *linecard;
 -	int idx = 0;
 -	int err = 0;
 -
--	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
--		enum devlink_command cmd = DEVLINK_CMD_RATE_NEW;
--		u32 id = NETLINK_CB(cb->skb).portid;
--
+-	list_for_each_entry(linecard, &devlink->linecard_list, list) {
 -		if (idx < state->idx) {
 -			idx++;
 -			continue;
 -		}
--		err = devlink_nl_rate_fill(msg, devlink_rate, cmd, id,
--					   cb->nlh->nlmsg_seq, flags, NULL);
+-		mutex_lock(&linecard->state_lock);
+-		err = devlink_nl_linecard_fill(msg, devlink, linecard,
+-					       DEVLINK_CMD_LINECARD_NEW,
+-					       NETLINK_CB(cb->skb).portid,
+-					       cb->nlh->nlmsg_seq, flags,
+-					       cb->extack);
+-		mutex_unlock(&linecard->state_lock);
 -		if (err) {
 -			state->idx = idx;
 -			break;
@@ -343,545 +399,396 @@ index 5b153ce097ab..13958c3da59a 100644
 -	return err;
 -}
 -
--int devlink_nl_rate_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+-int devlink_nl_linecard_get_dumpit(struct sk_buff *skb,
+-				   struct netlink_callback *cb)
 -{
--	return devlink_nl_dumpit(skb, cb, devlink_nl_rate_get_dump_one);
+-	return devlink_nl_dumpit(skb, cb, devlink_nl_linecard_get_dump_one);
 -}
 -
--int devlink_nl_rate_get_doit(struct sk_buff *skb, struct genl_info *info)
+-static struct devlink_linecard_type *
+-devlink_linecard_type_lookup(struct devlink_linecard *linecard,
+-			     const char *type)
 -{
--	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_rate *devlink_rate;
--	struct sk_buff *msg;
+-	struct devlink_linecard_type *linecard_type;
+-	int i;
+-
+-	for (i = 0; i < linecard->types_count; i++) {
+-		linecard_type = &linecard->types[i];
+-		if (!strcmp(type, linecard_type->type))
+-			return linecard_type;
+-	}
+-	return NULL;
+-}
+-
+-static int devlink_linecard_type_set(struct devlink_linecard *linecard,
+-				     const char *type,
+-				     struct netlink_ext_ack *extack)
+-{
+-	const struct devlink_linecard_ops *ops = linecard->ops;
+-	struct devlink_linecard_type *linecard_type;
 -	int err;
 -
--	devlink_rate = devlink_rate_get_from_info(devlink, info);
--	if (IS_ERR(devlink_rate))
--		return PTR_ERR(devlink_rate);
+-	mutex_lock(&linecard->state_lock);
+-	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
 -
--	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
--	if (!msg)
--		return -ENOMEM;
+-	linecard_type = devlink_linecard_type_lookup(linecard, type);
+-	if (!linecard_type) {
+-		NL_SET_ERR_MSG(extack, "Unsupported line card type provided");
+-		err = -EINVAL;
+-		goto out;
+-	}
 -
--	err = devlink_nl_rate_fill(msg, devlink_rate, DEVLINK_CMD_RATE_NEW,
--				   info->snd_portid, info->snd_seq, 0,
--				   info->extack);
+-	if (linecard->state != DEVLINK_LINECARD_STATE_UNPROVISIONED &&
+-	    linecard->state != DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
+-		NL_SET_ERR_MSG(extack, "Line card already provisioned");
+-		err = -EBUSY;
+-		/* Check if the line card is provisioned in the same
+-		 * way the user asks. In case it is, make the operation
+-		 * to return success.
+-		 */
+-		if (ops->same_provision &&
+-		    ops->same_provision(linecard, linecard->priv,
+-					linecard_type->type,
+-					linecard_type->priv))
+-			err = 0;
+-		goto out;
+-	}
+-
+-	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONING;
+-	linecard->type = linecard_type->type;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-	err = ops->provision(linecard, linecard->priv, linecard_type->type,
+-			     linecard_type->priv, extack);
 -	if (err) {
--		nlmsg_free(msg);
--		return err;
+-		/* Provisioning failed. Assume the linecard is unprovisioned
+-		 * for future operations.
+-		 */
+-		mutex_lock(&linecard->state_lock);
+-		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-		linecard->type = NULL;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		mutex_unlock(&linecard->state_lock);
 -	}
+-	return err;
 -
--	return genlmsg_reply(msg, info);
--}
--
--static bool
--devlink_rate_is_parent_node(struct devlink_rate *devlink_rate,
--			    struct devlink_rate *parent)
--{
--	while (parent) {
--		if (parent == devlink_rate)
--			return true;
--		parent = parent->parent;
--	}
--	return false;
--}
--
--static int
--devlink_nl_rate_parent_node_set(struct devlink_rate *devlink_rate,
--				struct genl_info *info,
--				struct nlattr *nla_parent)
--{
--	struct devlink *devlink = devlink_rate->devlink;
--	const char *parent_name = nla_data(nla_parent);
--	const struct devlink_ops *ops = devlink->ops;
--	size_t len = strlen(parent_name);
--	struct devlink_rate *parent;
--	int err = -EOPNOTSUPP;
--
--	parent = devlink_rate->parent;
--
--	if (parent && !len) {
--		if (devlink_rate_is_leaf(devlink_rate))
--			err = ops->rate_leaf_parent_set(devlink_rate, NULL,
--							devlink_rate->priv, NULL,
--							info->extack);
--		else if (devlink_rate_is_node(devlink_rate))
--			err = ops->rate_node_parent_set(devlink_rate, NULL,
--							devlink_rate->priv, NULL,
--							info->extack);
--		if (err)
--			return err;
--
--		refcount_dec(&parent->refcnt);
--		devlink_rate->parent = NULL;
--	} else if (len) {
--		parent = devlink_rate_node_get_by_name(devlink, parent_name);
--		if (IS_ERR(parent))
--			return -ENODEV;
--
--		if (parent == devlink_rate) {
--			NL_SET_ERR_MSG(info->extack, "Parent to self is not allowed");
--			return -EINVAL;
--		}
--
--		if (devlink_rate_is_node(devlink_rate) &&
--		    devlink_rate_is_parent_node(devlink_rate, parent->parent)) {
--			NL_SET_ERR_MSG(info->extack, "Node is already a parent of parent node.");
--			return -EEXIST;
--		}
--
--		if (devlink_rate_is_leaf(devlink_rate))
--			err = ops->rate_leaf_parent_set(devlink_rate, parent,
--							devlink_rate->priv, parent->priv,
--							info->extack);
--		else if (devlink_rate_is_node(devlink_rate))
--			err = ops->rate_node_parent_set(devlink_rate, parent,
--							devlink_rate->priv, parent->priv,
--							info->extack);
--		if (err)
--			return err;
--
--		if (devlink_rate->parent)
--			/* we're reassigning to other parent in this case */
--			refcount_dec(&devlink_rate->parent->refcnt);
--
--		refcount_inc(&parent->refcnt);
--		devlink_rate->parent = parent;
--	}
--
--	return 0;
--}
--
--static int devlink_nl_rate_set(struct devlink_rate *devlink_rate,
--			       const struct devlink_ops *ops,
--			       struct genl_info *info)
--{
--	struct nlattr *nla_parent, **attrs = info->attrs;
--	int err = -EOPNOTSUPP;
--	u32 priority;
--	u32 weight;
--	u64 rate;
--
--	if (attrs[DEVLINK_ATTR_RATE_TX_SHARE]) {
--		rate = nla_get_u64(attrs[DEVLINK_ATTR_RATE_TX_SHARE]);
--		if (devlink_rate_is_leaf(devlink_rate))
--			err = ops->rate_leaf_tx_share_set(devlink_rate, devlink_rate->priv,
--							  rate, info->extack);
--		else if (devlink_rate_is_node(devlink_rate))
--			err = ops->rate_node_tx_share_set(devlink_rate, devlink_rate->priv,
--							  rate, info->extack);
--		if (err)
--			return err;
--		devlink_rate->tx_share = rate;
--	}
--
--	if (attrs[DEVLINK_ATTR_RATE_TX_MAX]) {
--		rate = nla_get_u64(attrs[DEVLINK_ATTR_RATE_TX_MAX]);
--		if (devlink_rate_is_leaf(devlink_rate))
--			err = ops->rate_leaf_tx_max_set(devlink_rate, devlink_rate->priv,
--							rate, info->extack);
--		else if (devlink_rate_is_node(devlink_rate))
--			err = ops->rate_node_tx_max_set(devlink_rate, devlink_rate->priv,
--							rate, info->extack);
--		if (err)
--			return err;
--		devlink_rate->tx_max = rate;
--	}
--
--	if (attrs[DEVLINK_ATTR_RATE_TX_PRIORITY]) {
--		priority = nla_get_u32(attrs[DEVLINK_ATTR_RATE_TX_PRIORITY]);
--		if (devlink_rate_is_leaf(devlink_rate))
--			err = ops->rate_leaf_tx_priority_set(devlink_rate, devlink_rate->priv,
--							     priority, info->extack);
--		else if (devlink_rate_is_node(devlink_rate))
--			err = ops->rate_node_tx_priority_set(devlink_rate, devlink_rate->priv,
--							     priority, info->extack);
--
--		if (err)
--			return err;
--		devlink_rate->tx_priority = priority;
--	}
--
--	if (attrs[DEVLINK_ATTR_RATE_TX_WEIGHT]) {
--		weight = nla_get_u32(attrs[DEVLINK_ATTR_RATE_TX_WEIGHT]);
--		if (devlink_rate_is_leaf(devlink_rate))
--			err = ops->rate_leaf_tx_weight_set(devlink_rate, devlink_rate->priv,
--							   weight, info->extack);
--		else if (devlink_rate_is_node(devlink_rate))
--			err = ops->rate_node_tx_weight_set(devlink_rate, devlink_rate->priv,
--							   weight, info->extack);
--
--		if (err)
--			return err;
--		devlink_rate->tx_weight = weight;
--	}
--
--	nla_parent = attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME];
--	if (nla_parent) {
--		err = devlink_nl_rate_parent_node_set(devlink_rate, info,
--						      nla_parent);
--		if (err)
--			return err;
--	}
--
--	return 0;
--}
--
--static bool devlink_rate_set_ops_supported(const struct devlink_ops *ops,
--					   struct genl_info *info,
--					   enum devlink_rate_type type)
--{
--	struct nlattr **attrs = info->attrs;
--
--	if (type == DEVLINK_RATE_TYPE_LEAF) {
--		if (attrs[DEVLINK_ATTR_RATE_TX_SHARE] && !ops->rate_leaf_tx_share_set) {
--			NL_SET_ERR_MSG(info->extack, "TX share set isn't supported for the leafs");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_TX_MAX] && !ops->rate_leaf_tx_max_set) {
--			NL_SET_ERR_MSG(info->extack, "TX max set isn't supported for the leafs");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] &&
--		    !ops->rate_leaf_parent_set) {
--			NL_SET_ERR_MSG(info->extack, "Parent set isn't supported for the leafs");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_TX_PRIORITY] && !ops->rate_leaf_tx_priority_set) {
--			NL_SET_ERR_MSG_ATTR(info->extack,
--					    attrs[DEVLINK_ATTR_RATE_TX_PRIORITY],
--					    "TX priority set isn't supported for the leafs");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_TX_WEIGHT] && !ops->rate_leaf_tx_weight_set) {
--			NL_SET_ERR_MSG_ATTR(info->extack,
--					    attrs[DEVLINK_ATTR_RATE_TX_WEIGHT],
--					    "TX weight set isn't supported for the leafs");
--			return false;
--		}
--	} else if (type == DEVLINK_RATE_TYPE_NODE) {
--		if (attrs[DEVLINK_ATTR_RATE_TX_SHARE] && !ops->rate_node_tx_share_set) {
--			NL_SET_ERR_MSG(info->extack, "TX share set isn't supported for the nodes");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_TX_MAX] && !ops->rate_node_tx_max_set) {
--			NL_SET_ERR_MSG(info->extack, "TX max set isn't supported for the nodes");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] &&
--		    !ops->rate_node_parent_set) {
--			NL_SET_ERR_MSG(info->extack, "Parent set isn't supported for the nodes");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_TX_PRIORITY] && !ops->rate_node_tx_priority_set) {
--			NL_SET_ERR_MSG_ATTR(info->extack,
--					    attrs[DEVLINK_ATTR_RATE_TX_PRIORITY],
--					    "TX priority set isn't supported for the nodes");
--			return false;
--		}
--		if (attrs[DEVLINK_ATTR_RATE_TX_WEIGHT] && !ops->rate_node_tx_weight_set) {
--			NL_SET_ERR_MSG_ATTR(info->extack,
--					    attrs[DEVLINK_ATTR_RATE_TX_WEIGHT],
--					    "TX weight set isn't supported for the nodes");
--			return false;
--		}
--	} else {
--		WARN(1, "Unknown type of rate object");
--		return false;
--	}
--
--	return true;
--}
--
--static int devlink_nl_cmd_rate_set_doit(struct sk_buff *skb,
--					struct genl_info *info)
--{
--	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_rate *devlink_rate;
--	const struct devlink_ops *ops;
--	int err;
--
--	devlink_rate = devlink_rate_get_from_info(devlink, info);
--	if (IS_ERR(devlink_rate))
--		return PTR_ERR(devlink_rate);
--
--	ops = devlink->ops;
--	if (!ops || !devlink_rate_set_ops_supported(ops, info, devlink_rate->type))
--		return -EOPNOTSUPP;
--
--	err = devlink_nl_rate_set(devlink_rate, ops, info);
--
--	if (!err)
--		devlink_rate_notify(devlink_rate, DEVLINK_CMD_RATE_NEW);
+-out:
+-	mutex_unlock(&linecard->state_lock);
 -	return err;
 -}
 -
--static int devlink_nl_cmd_rate_new_doit(struct sk_buff *skb,
--					struct genl_info *info)
+-static int devlink_linecard_type_unset(struct devlink_linecard *linecard,
+-				       struct netlink_ext_ack *extack)
 -{
--	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_rate *rate_node;
--	const struct devlink_ops *ops;
 -	int err;
 -
--	ops = devlink->ops;
--	if (!ops || !ops->rate_node_new || !ops->rate_node_del) {
--		NL_SET_ERR_MSG(info->extack, "Rate nodes aren't supported");
--		return -EOPNOTSUPP;
+-	mutex_lock(&linecard->state_lock);
+-	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
+-		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
+-		err = -EBUSY;
+-		goto out;
+-	}
+-	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
+-		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-		linecard->type = NULL;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		err = 0;
+-		goto out;
 -	}
 -
--	if (!devlink_rate_set_ops_supported(ops, info, DEVLINK_RATE_TYPE_NODE))
--		return -EOPNOTSUPP;
--
--	rate_node = devlink_rate_node_get_from_attrs(devlink, info->attrs);
--	if (!IS_ERR(rate_node))
--		return -EEXIST;
--	else if (rate_node == ERR_PTR(-EINVAL))
--		return -EINVAL;
--
--	rate_node = kzalloc(sizeof(*rate_node), GFP_KERNEL);
--	if (!rate_node)
--		return -ENOMEM;
--
--	rate_node->devlink = devlink;
--	rate_node->type = DEVLINK_RATE_TYPE_NODE;
--	rate_node->name = nla_strdup(info->attrs[DEVLINK_ATTR_RATE_NODE_NAME], GFP_KERNEL);
--	if (!rate_node->name) {
--		err = -ENOMEM;
--		goto err_strdup;
+-	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONED) {
+-		NL_SET_ERR_MSG(extack, "Line card is not provisioned");
+-		err = 0;
+-		goto out;
 -	}
+-	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONING;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-	err = linecard->ops->unprovision(linecard, linecard->priv,
+-					 extack);
+-	if (err) {
+-		/* Unprovisioning failed. Assume the linecard is unprovisioned
+-		 * for future operations.
+-		 */
+-		mutex_lock(&linecard->state_lock);
+-		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-		linecard->type = NULL;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		mutex_unlock(&linecard->state_lock);
+-	}
+-	return err;
 -
--	err = ops->rate_node_new(rate_node, &rate_node->priv, info->extack);
--	if (err)
--		goto err_node_new;
--
--	err = devlink_nl_rate_set(rate_node, ops, info);
--	if (err)
--		goto err_rate_set;
--
--	refcount_set(&rate_node->refcnt, 1);
--	list_add(&rate_node->list, &devlink->rate_list);
--	devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
--	return 0;
--
--err_rate_set:
--	ops->rate_node_del(rate_node, rate_node->priv, info->extack);
--err_node_new:
--	kfree(rate_node->name);
--err_strdup:
--	kfree(rate_node);
+-out:
+-	mutex_unlock(&linecard->state_lock);
 -	return err;
 -}
 -
--static int devlink_nl_cmd_rate_del_doit(struct sk_buff *skb,
--					struct genl_info *info)
+-static int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
+-					    struct genl_info *info)
 -{
+-	struct netlink_ext_ack *extack = info->extack;
 -	struct devlink *devlink = info->user_ptr[0];
--	struct devlink_rate *rate_node;
+-	struct devlink_linecard *linecard;
 -	int err;
 -
--	rate_node = devlink_rate_node_get_from_info(devlink, info);
--	if (IS_ERR(rate_node))
--		return PTR_ERR(rate_node);
+-	linecard = devlink_linecard_get_from_info(devlink, info);
+-	if (IS_ERR(linecard))
+-		return PTR_ERR(linecard);
 -
--	if (refcount_read(&rate_node->refcnt) > 1) {
--		NL_SET_ERR_MSG(info->extack, "Node has children. Cannot delete node.");
--		return -EBUSY;
--	}
+-	if (info->attrs[DEVLINK_ATTR_LINECARD_TYPE]) {
+-		const char *type;
 -
--	devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_DEL);
--	err = devlink->ops->rate_node_del(rate_node, rate_node->priv,
--					  info->extack);
--	if (rate_node->parent)
--		refcount_dec(&rate_node->parent->refcnt);
--	list_del(&rate_node->list);
--	kfree(rate_node->name);
--	kfree(rate_node);
--	return err;
--}
--
- struct devlink_linecard_type {
- 	const char *type;
- 	const void *priv;
-@@ -986,19 +427,6 @@ static int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
- 	return 0;
- }
- 
--int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
--			     struct netlink_ext_ack *extack)
--{
--	struct devlink_rate *devlink_rate;
--
--	list_for_each_entry(devlink_rate, &devlink->rate_list, list)
--		if (devlink_rate_is_node(devlink_rate)) {
--			NL_SET_ERR_MSG(extack, "Rate node(s) exists.");
--			return -EBUSY;
+-		type = nla_data(info->attrs[DEVLINK_ATTR_LINECARD_TYPE]);
+-		if (strcmp(type, "")) {
+-			err = devlink_linecard_type_set(linecard, type, extack);
+-			if (err)
+-				return err;
+-		} else {
+-			err = devlink_linecard_type_unset(linecard, extack);
+-			if (err)
+-				return err;
 -		}
+-	}
+-
 -	return 0;
 -}
 -
  const struct genl_small_ops devlink_nl_small_ops[40] = {
  	{
  		.cmd = DEVLINK_CMD_PORT_SET,
-@@ -1276,152 +704,6 @@ void devlink_notify_unregister(struct devlink *devlink)
+@@ -703,212 +313,3 @@ void devlink_notify_unregister(struct devlink *devlink)
+ 	devlink_linecards_notify_unregister(devlink);
  	devlink_notify(devlink, DEVLINK_CMD_DEL);
  }
- 
--/**
-- * devl_rate_node_create - create devlink rate node
-- * @devlink: devlink instance
-- * @priv: driver private data
-- * @node_name: name of the resulting node
-- * @parent: parent devlink_rate struct
-- *
-- * Create devlink rate object of type node
-- */
--struct devlink_rate *
--devl_rate_node_create(struct devlink *devlink, void *priv, char *node_name,
--		      struct devlink_rate *parent)
+-
+-static int devlink_linecard_types_init(struct devlink_linecard *linecard)
 -{
--	struct devlink_rate *rate_node;
+-	struct devlink_linecard_type *linecard_type;
+-	unsigned int count;
+-	int i;
 -
--	rate_node = devlink_rate_node_get_by_name(devlink, node_name);
--	if (!IS_ERR(rate_node))
--		return ERR_PTR(-EEXIST);
--
--	rate_node = kzalloc(sizeof(*rate_node), GFP_KERNEL);
--	if (!rate_node)
--		return ERR_PTR(-ENOMEM);
--
--	if (parent) {
--		rate_node->parent = parent;
--		refcount_inc(&rate_node->parent->refcnt);
--	}
--
--	rate_node->type = DEVLINK_RATE_TYPE_NODE;
--	rate_node->devlink = devlink;
--	rate_node->priv = priv;
--
--	rate_node->name = kstrdup(node_name, GFP_KERNEL);
--	if (!rate_node->name) {
--		kfree(rate_node);
--		return ERR_PTR(-ENOMEM);
--	}
--
--	refcount_set(&rate_node->refcnt, 1);
--	list_add(&rate_node->list, &devlink->rate_list);
--	devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
--	return rate_node;
--}
--EXPORT_SYMBOL_GPL(devl_rate_node_create);
--
--/**
-- * devl_rate_leaf_create - create devlink rate leaf
-- * @devlink_port: devlink port object to create rate object on
-- * @priv: driver private data
-- * @parent: parent devlink_rate struct
-- *
-- * Create devlink rate object of type leaf on provided @devlink_port.
-- */
--int devl_rate_leaf_create(struct devlink_port *devlink_port, void *priv,
--			  struct devlink_rate *parent)
--{
--	struct devlink *devlink = devlink_port->devlink;
--	struct devlink_rate *devlink_rate;
--
--	devl_assert_locked(devlink_port->devlink);
--
--	if (WARN_ON(devlink_port->devlink_rate))
--		return -EBUSY;
--
--	devlink_rate = kzalloc(sizeof(*devlink_rate), GFP_KERNEL);
--	if (!devlink_rate)
+-	count = linecard->ops->types_count(linecard, linecard->priv);
+-	linecard->types = kmalloc_array(count, sizeof(*linecard_type),
+-					GFP_KERNEL);
+-	if (!linecard->types)
 -		return -ENOMEM;
+-	linecard->types_count = count;
 -
--	if (parent) {
--		devlink_rate->parent = parent;
--		refcount_inc(&devlink_rate->parent->refcnt);
+-	for (i = 0; i < count; i++) {
+-		linecard_type = &linecard->types[i];
+-		linecard->ops->types_get(linecard, linecard->priv, i,
+-					 &linecard_type->type,
+-					 &linecard_type->priv);
 -	}
--
--	devlink_rate->type = DEVLINK_RATE_TYPE_LEAF;
--	devlink_rate->devlink = devlink;
--	devlink_rate->devlink_port = devlink_port;
--	devlink_rate->priv = priv;
--	list_add_tail(&devlink_rate->list, &devlink->rate_list);
--	devlink_port->devlink_rate = devlink_rate;
--	devlink_rate_notify(devlink_rate, DEVLINK_CMD_RATE_NEW);
--
 -	return 0;
 -}
--EXPORT_SYMBOL_GPL(devl_rate_leaf_create);
+-
+-static void devlink_linecard_types_fini(struct devlink_linecard *linecard)
+-{
+-	kfree(linecard->types);
+-}
 -
 -/**
-- * devl_rate_leaf_destroy - destroy devlink rate leaf
+- *	devl_linecard_create - Create devlink linecard
 - *
-- * @devlink_port: devlink port linked to the rate object
+- *	@devlink: devlink
+- *	@linecard_index: driver-specific numerical identifier of the linecard
+- *	@ops: linecards ops
+- *	@priv: user priv pointer
 - *
-- * Destroy the devlink rate object of type leaf on provided @devlink_port.
+- *	Create devlink linecard instance with provided linecard index.
+- *	Caller can use any indexing, even hw-related one.
+- *
+- *	Return: Line card structure or an ERR_PTR() encoded error code.
 - */
--void devl_rate_leaf_destroy(struct devlink_port *devlink_port)
+-struct devlink_linecard *
+-devl_linecard_create(struct devlink *devlink, unsigned int linecard_index,
+-		     const struct devlink_linecard_ops *ops, void *priv)
 -{
--	struct devlink_rate *devlink_rate = devlink_port->devlink_rate;
+-	struct devlink_linecard *linecard;
+-	int err;
 -
--	devl_assert_locked(devlink_port->devlink);
--	if (!devlink_rate)
--		return;
+-	if (WARN_ON(!ops || !ops->provision || !ops->unprovision ||
+-		    !ops->types_count || !ops->types_get))
+-		return ERR_PTR(-EINVAL);
 -
--	devlink_rate_notify(devlink_rate, DEVLINK_CMD_RATE_DEL);
--	if (devlink_rate->parent)
--		refcount_dec(&devlink_rate->parent->refcnt);
--	list_del(&devlink_rate->list);
--	devlink_port->devlink_rate = NULL;
--	kfree(devlink_rate);
+-	if (devlink_linecard_index_exists(devlink, linecard_index))
+-		return ERR_PTR(-EEXIST);
+-
+-	linecard = kzalloc(sizeof(*linecard), GFP_KERNEL);
+-	if (!linecard)
+-		return ERR_PTR(-ENOMEM);
+-
+-	linecard->devlink = devlink;
+-	linecard->index = linecard_index;
+-	linecard->ops = ops;
+-	linecard->priv = priv;
+-	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-	mutex_init(&linecard->state_lock);
+-
+-	err = devlink_linecard_types_init(linecard);
+-	if (err) {
+-		mutex_destroy(&linecard->state_lock);
+-		kfree(linecard);
+-		return ERR_PTR(err);
+-	}
+-
+-	list_add_tail(&linecard->list, &devlink->linecard_list);
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	return linecard;
 -}
--EXPORT_SYMBOL_GPL(devl_rate_leaf_destroy);
+-EXPORT_SYMBOL_GPL(devl_linecard_create);
 -
 -/**
-- * devl_rate_nodes_destroy - destroy all devlink rate nodes on device
-- * @devlink: devlink instance
+- *	devl_linecard_destroy - Destroy devlink linecard
 - *
-- * Unset parent for all rate objects and destroy all rate nodes
-- * on specified device.
+- *	@linecard: devlink linecard
 - */
--void devl_rate_nodes_destroy(struct devlink *devlink)
+-void devl_linecard_destroy(struct devlink_linecard *linecard)
 -{
--	static struct devlink_rate *devlink_rate, *tmp;
--	const struct devlink_ops *ops = devlink->ops;
--
--	devl_assert_locked(devlink);
--
--	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
--		if (!devlink_rate->parent)
--			continue;
--
--		refcount_dec(&devlink_rate->parent->refcnt);
--		if (devlink_rate_is_leaf(devlink_rate))
--			ops->rate_leaf_parent_set(devlink_rate, NULL, devlink_rate->priv,
--						  NULL, NULL);
--		else if (devlink_rate_is_node(devlink_rate))
--			ops->rate_node_parent_set(devlink_rate, NULL, devlink_rate->priv,
--						  NULL, NULL);
--	}
--	list_for_each_entry_safe(devlink_rate, tmp, &devlink->rate_list, list) {
--		if (devlink_rate_is_node(devlink_rate)) {
--			ops->rate_node_del(devlink_rate, devlink_rate->priv, NULL);
--			list_del(&devlink_rate->list);
--			kfree(devlink_rate->name);
--			kfree(devlink_rate);
--		}
--	}
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
+-	list_del(&linecard->list);
+-	devlink_linecard_types_fini(linecard);
+-	mutex_destroy(&linecard->state_lock);
+-	kfree(linecard);
 -}
--EXPORT_SYMBOL_GPL(devl_rate_nodes_destroy);
+-EXPORT_SYMBOL_GPL(devl_linecard_destroy);
 -
- static int devlink_linecard_types_init(struct devlink_linecard *linecard)
- {
- 	struct devlink_linecard_type *linecard_type;
-diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+-/**
+- *	devlink_linecard_provision_set - Set provisioning on linecard
+- *
+- *	@linecard: devlink linecard
+- *	@type: linecard type
+- *
+- *	This is either called directly from the provision() op call or
+- *	as a result of the provision() op call asynchronously.
+- */
+-void devlink_linecard_provision_set(struct devlink_linecard *linecard,
+-				    const char *type)
+-{
+-	mutex_lock(&linecard->state_lock);
+-	WARN_ON(linecard->type && strcmp(linecard->type, type));
+-	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONED;
+-	linecard->type = type;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-}
+-EXPORT_SYMBOL_GPL(devlink_linecard_provision_set);
+-
+-/**
+- *	devlink_linecard_provision_clear - Clear provisioning on linecard
+- *
+- *	@linecard: devlink linecard
+- *
+- *	This is either called directly from the unprovision() op call or
+- *	as a result of the unprovision() op call asynchronously.
+- */
+-void devlink_linecard_provision_clear(struct devlink_linecard *linecard)
+-{
+-	mutex_lock(&linecard->state_lock);
+-	WARN_ON(linecard->nested_devlink);
+-	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
+-	linecard->type = NULL;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-}
+-EXPORT_SYMBOL_GPL(devlink_linecard_provision_clear);
+-
+-/**
+- *	devlink_linecard_provision_fail - Fail provisioning on linecard
+- *
+- *	@linecard: devlink linecard
+- *
+- *	This is either called directly from the provision() op call or
+- *	as a result of the provision() op call asynchronously.
+- */
+-void devlink_linecard_provision_fail(struct devlink_linecard *linecard)
+-{
+-	mutex_lock(&linecard->state_lock);
+-	WARN_ON(linecard->nested_devlink);
+-	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONING_FAILED;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-}
+-EXPORT_SYMBOL_GPL(devlink_linecard_provision_fail);
+-
+-/**
+- *	devlink_linecard_activate - Set linecard active
+- *
+- *	@linecard: devlink linecard
+- */
+-void devlink_linecard_activate(struct devlink_linecard *linecard)
+-{
+-	mutex_lock(&linecard->state_lock);
+-	WARN_ON(linecard->state != DEVLINK_LINECARD_STATE_PROVISIONED);
+-	linecard->state = DEVLINK_LINECARD_STATE_ACTIVE;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-}
+-EXPORT_SYMBOL_GPL(devlink_linecard_activate);
+-
+-/**
+- *	devlink_linecard_deactivate - Set linecard inactive
+- *
+- *	@linecard: devlink linecard
+- */
+-void devlink_linecard_deactivate(struct devlink_linecard *linecard)
+-{
+-	mutex_lock(&linecard->state_lock);
+-	switch (linecard->state) {
+-	case DEVLINK_LINECARD_STATE_ACTIVE:
+-		linecard->state = DEVLINK_LINECARD_STATE_PROVISIONED;
+-		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-		break;
+-	case DEVLINK_LINECARD_STATE_UNPROVISIONING:
+-		/* Line card is being deactivated as part
+-		 * of unprovisioning flow.
+-		 */
+-		break;
+-	default:
+-		WARN_ON(1);
+-		break;
+-	}
+-	mutex_unlock(&linecard->state_lock);
+-}
+-EXPORT_SYMBOL_GPL(devlink_linecard_deactivate);
+-
+-/**
+- *	devlink_linecard_nested_dl_set - Attach/detach nested devlink
+- *					 instance to linecard.
+- *
+- *	@linecard: devlink linecard
+- *	@nested_devlink: devlink instance to attach or NULL to detach
+- */
+-void devlink_linecard_nested_dl_set(struct devlink_linecard *linecard,
+-				    struct devlink *nested_devlink)
+-{
+-	mutex_lock(&linecard->state_lock);
+-	linecard->nested_devlink = nested_devlink;
+-	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
+-	mutex_unlock(&linecard->state_lock);
+-}
+-EXPORT_SYMBOL_GPL(devlink_linecard_nested_dl_set);
+diff --git a/net/devlink/linecard.c b/net/devlink/linecard.c
 new file mode 100644
-index 000000000000..dff1593b8406
+index 000000000000..85c32c314b0f
 --- /dev/null
-+++ b/net/devlink/rate.c
-@@ -0,0 +1,722 @@
++++ b/net/devlink/linecard.c
+@@ -0,0 +1,606 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (c) 2016 Mellanox Technologies. All rights reserved.
@@ -890,87 +797,80 @@ index 000000000000..dff1593b8406
 +
 +#include "devl_internal.h"
 +
-+static inline bool
-+devlink_rate_is_leaf(struct devlink_rate *devlink_rate)
++static struct devlink_linecard *
++devlink_linecard_get_by_index(struct devlink *devlink,
++			      unsigned int linecard_index)
 +{
-+	return devlink_rate->type == DEVLINK_RATE_TYPE_LEAF;
-+}
++	struct devlink_linecard *devlink_linecard;
 +
-+static inline bool
-+devlink_rate_is_node(struct devlink_rate *devlink_rate)
-+{
-+	return devlink_rate->type == DEVLINK_RATE_TYPE_NODE;
-+}
-+
-+static struct devlink_rate *
-+devlink_rate_leaf_get_from_info(struct devlink *devlink, struct genl_info *info)
-+{
-+	struct devlink_rate *devlink_rate;
-+	struct devlink_port *devlink_port;
-+
-+	devlink_port = devlink_port_get_from_attrs(devlink, info->attrs);
-+	if (IS_ERR(devlink_port))
-+		return ERR_CAST(devlink_port);
-+	devlink_rate = devlink_port->devlink_rate;
-+	return devlink_rate ?: ERR_PTR(-ENODEV);
-+}
-+
-+static struct devlink_rate *
-+devlink_rate_node_get_by_name(struct devlink *devlink, const char *node_name)
-+{
-+	static struct devlink_rate *devlink_rate;
-+
-+	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
-+		if (devlink_rate_is_node(devlink_rate) &&
-+		    !strcmp(node_name, devlink_rate->name))
-+			return devlink_rate;
++	list_for_each_entry(devlink_linecard, &devlink->linecard_list, list) {
++		if (devlink_linecard->index == linecard_index)
++			return devlink_linecard;
 +	}
-+	return ERR_PTR(-ENODEV);
++	return NULL;
 +}
 +
-+static struct devlink_rate *
-+devlink_rate_node_get_from_attrs(struct devlink *devlink, struct nlattr **attrs)
++static bool devlink_linecard_index_exists(struct devlink *devlink,
++					  unsigned int linecard_index)
 +{
-+	const char *rate_node_name;
-+	size_t len;
-+
-+	if (!attrs[DEVLINK_ATTR_RATE_NODE_NAME])
-+		return ERR_PTR(-EINVAL);
-+	rate_node_name = nla_data(attrs[DEVLINK_ATTR_RATE_NODE_NAME]);
-+	len = strlen(rate_node_name);
-+	/* Name cannot be empty or decimal number */
-+	if (!len || strspn(rate_node_name, "0123456789") == len)
-+		return ERR_PTR(-EINVAL);
-+
-+	return devlink_rate_node_get_by_name(devlink, rate_node_name);
++	return devlink_linecard_get_by_index(devlink, linecard_index);
 +}
 +
-+static struct devlink_rate *
-+devlink_rate_node_get_from_info(struct devlink *devlink, struct genl_info *info)
++static struct devlink_linecard *
++devlink_linecard_get_from_attrs(struct devlink *devlink, struct nlattr **attrs)
 +{
-+	return devlink_rate_node_get_from_attrs(devlink, info->attrs);
++	if (attrs[DEVLINK_ATTR_LINECARD_INDEX]) {
++		u32 linecard_index = nla_get_u32(attrs[DEVLINK_ATTR_LINECARD_INDEX]);
++		struct devlink_linecard *linecard;
++
++		linecard = devlink_linecard_get_by_index(devlink, linecard_index);
++		if (!linecard)
++			return ERR_PTR(-ENODEV);
++		return linecard;
++	}
++	return ERR_PTR(-EINVAL);
 +}
 +
-+static struct devlink_rate *
-+devlink_rate_get_from_info(struct devlink *devlink, struct genl_info *info)
++static struct devlink_linecard *
++devlink_linecard_get_from_info(struct devlink *devlink, struct genl_info *info)
 +{
-+	struct nlattr **attrs = info->attrs;
-+
-+	if (attrs[DEVLINK_ATTR_PORT_INDEX])
-+		return devlink_rate_leaf_get_from_info(devlink, info);
-+	else if (attrs[DEVLINK_ATTR_RATE_NODE_NAME])
-+		return devlink_rate_node_get_from_info(devlink, info);
-+	else
-+		return ERR_PTR(-EINVAL);
++	return devlink_linecard_get_from_attrs(devlink, info->attrs);
 +}
 +
-+static int devlink_nl_rate_fill(struct sk_buff *msg,
-+				struct devlink_rate *devlink_rate,
-+				enum devlink_command cmd, u32 portid, u32 seq,
-+				int flags, struct netlink_ext_ack *extack)
++static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct devlink *devlink)
 +{
-+	struct devlink *devlink = devlink_rate->devlink;
++	struct nlattr *nested_attr;
++
++	nested_attr = nla_nest_start(msg, DEVLINK_ATTR_NESTED_DEVLINK);
++	if (!nested_attr)
++		return -EMSGSIZE;
++	if (devlink_nl_put_handle(msg, devlink))
++		goto nla_put_failure;
++
++	nla_nest_end(msg, nested_attr);
++	return 0;
++
++nla_put_failure:
++	nla_nest_cancel(msg, nested_attr);
++	return -EMSGSIZE;
++}
++
++struct devlink_linecard_type {
++	const char *type;
++	const void *priv;
++};
++
++static int devlink_nl_linecard_fill(struct sk_buff *msg,
++				    struct devlink *devlink,
++				    struct devlink_linecard *linecard,
++				    enum devlink_command cmd, u32 portid,
++				    u32 seq, int flags,
++				    struct netlink_ext_ack *extack)
++{
++	struct devlink_linecard_type *linecard_type;
++	struct nlattr *attr;
 +	void *hdr;
++	int i;
 +
 +	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
 +	if (!hdr)
@@ -978,40 +878,33 @@ index 000000000000..dff1593b8406
 +
 +	if (devlink_nl_put_handle(msg, devlink))
 +		goto nla_put_failure;
-+
-+	if (nla_put_u16(msg, DEVLINK_ATTR_RATE_TYPE, devlink_rate->type))
++	if (nla_put_u32(msg, DEVLINK_ATTR_LINECARD_INDEX, linecard->index))
++		goto nla_put_failure;
++	if (nla_put_u8(msg, DEVLINK_ATTR_LINECARD_STATE, linecard->state))
++		goto nla_put_failure;
++	if (linecard->type &&
++	    nla_put_string(msg, DEVLINK_ATTR_LINECARD_TYPE, linecard->type))
 +		goto nla_put_failure;
 +
-+	if (devlink_rate_is_leaf(devlink_rate)) {
-+		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX,
-+				devlink_rate->devlink_port->index))
++	if (linecard->types_count) {
++		attr = nla_nest_start(msg,
++				      DEVLINK_ATTR_LINECARD_SUPPORTED_TYPES);
++		if (!attr)
 +			goto nla_put_failure;
-+	} else if (devlink_rate_is_node(devlink_rate)) {
-+		if (nla_put_string(msg, DEVLINK_ATTR_RATE_NODE_NAME,
-+				   devlink_rate->name))
-+			goto nla_put_failure;
++		for (i = 0; i < linecard->types_count; i++) {
++			linecard_type = &linecard->types[i];
++			if (nla_put_string(msg, DEVLINK_ATTR_LINECARD_TYPE,
++					   linecard_type->type)) {
++				nla_nest_cancel(msg, attr);
++				goto nla_put_failure;
++			}
++		}
++		nla_nest_end(msg, attr);
 +	}
 +
-+	if (nla_put_u64_64bit(msg, DEVLINK_ATTR_RATE_TX_SHARE,
-+			      devlink_rate->tx_share, DEVLINK_ATTR_PAD))
++	if (linecard->nested_devlink &&
++	    devlink_nl_put_nested_handle(msg, linecard->nested_devlink))
 +		goto nla_put_failure;
-+
-+	if (nla_put_u64_64bit(msg, DEVLINK_ATTR_RATE_TX_MAX,
-+			      devlink_rate->tx_max, DEVLINK_ATTR_PAD))
-+		goto nla_put_failure;
-+
-+	if (nla_put_u32(msg, DEVLINK_ATTR_RATE_TX_PRIORITY,
-+			devlink_rate->tx_priority))
-+		goto nla_put_failure;
-+
-+	if (nla_put_u32(msg, DEVLINK_ATTR_RATE_TX_WEIGHT,
-+			devlink_rate->tx_weight))
-+		goto nla_put_failure;
-+
-+	if (devlink_rate->parent)
-+		if (nla_put_string(msg, DEVLINK_ATTR_RATE_PARENT_NODE_NAME,
-+				   devlink_rate->parent->name))
-+			goto nla_put_failure;
 +
 +	genlmsg_end(msg, hdr);
 +	return 0;
@@ -1021,14 +914,15 @@ index 000000000000..dff1593b8406
 +	return -EMSGSIZE;
 +}
 +
-+static void devlink_rate_notify(struct devlink_rate *devlink_rate,
-+				enum devlink_command cmd)
++static void devlink_linecard_notify(struct devlink_linecard *linecard,
++				    enum devlink_command cmd)
 +{
-+	struct devlink *devlink = devlink_rate->devlink;
++	struct devlink *devlink = linecard->devlink;
 +	struct sk_buff *msg;
 +	int err;
 +
-+	WARN_ON(cmd != DEVLINK_CMD_RATE_NEW && cmd != DEVLINK_CMD_RATE_DEL);
++	WARN_ON(cmd != DEVLINK_CMD_LINECARD_NEW &&
++		cmd != DEVLINK_CMD_LINECARD_DEL);
 +
 +	if (!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED))
 +		return;
@@ -1037,51 +931,84 @@ index 000000000000..dff1593b8406
 +	if (!msg)
 +		return;
 +
-+	err = devlink_nl_rate_fill(msg, devlink_rate, cmd, 0, 0, 0, NULL);
++	err = devlink_nl_linecard_fill(msg, devlink, linecard, cmd, 0, 0, 0,
++				       NULL);
 +	if (err) {
 +		nlmsg_free(msg);
 +		return;
 +	}
 +
-+	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
-+				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
++	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
++				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
 +}
 +
-+void devlink_rates_notify_register(struct devlink *devlink)
++void devlink_linecards_notify_register(struct devlink *devlink)
 +{
-+	struct devlink_rate *rate_node;
++	struct devlink_linecard *linecard;
 +
-+	list_for_each_entry(rate_node, &devlink->rate_list, list)
-+		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
++	list_for_each_entry(linecard, &devlink->linecard_list, list)
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
 +}
 +
-+void devlink_rates_notify_unregister(struct devlink *devlink)
++void devlink_linecards_notify_unregister(struct devlink *devlink)
 +{
-+	struct devlink_rate *rate_node;
++	struct devlink_linecard *linecard;
 +
-+	list_for_each_entry_reverse(rate_node, &devlink->rate_list, list)
-+		devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_DEL);
++	list_for_each_entry_reverse(linecard, &devlink->linecard_list, list)
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
 +}
 +
-+static int
-+devlink_nl_rate_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
-+			     struct netlink_callback *cb, int flags)
++int devlink_nl_linecard_get_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_linecard *linecard;
++	struct sk_buff *msg;
++	int err;
++
++	linecard = devlink_linecard_get_from_info(devlink, info);
++	if (IS_ERR(linecard))
++		return PTR_ERR(linecard);
++
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!msg)
++		return -ENOMEM;
++
++	mutex_lock(&linecard->state_lock);
++	err = devlink_nl_linecard_fill(msg, devlink, linecard,
++				       DEVLINK_CMD_LINECARD_NEW,
++				       info->snd_portid, info->snd_seq, 0,
++				       info->extack);
++	mutex_unlock(&linecard->state_lock);
++	if (err) {
++		nlmsg_free(msg);
++		return err;
++	}
++
++	return genlmsg_reply(msg, info);
++}
++
++static int devlink_nl_linecard_get_dump_one(struct sk_buff *msg,
++					    struct devlink *devlink,
++					    struct netlink_callback *cb,
++					    int flags)
 +{
 +	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
-+	struct devlink_rate *devlink_rate;
++	struct devlink_linecard *linecard;
 +	int idx = 0;
 +	int err = 0;
 +
-+	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
-+		enum devlink_command cmd = DEVLINK_CMD_RATE_NEW;
-+		u32 id = NETLINK_CB(cb->skb).portid;
-+
++	list_for_each_entry(linecard, &devlink->linecard_list, list) {
 +		if (idx < state->idx) {
 +			idx++;
 +			continue;
 +		}
-+		err = devlink_nl_rate_fill(msg, devlink_rate, cmd, id,
-+					   cb->nlh->nlmsg_seq, flags, NULL);
++		mutex_lock(&linecard->state_lock);
++		err = devlink_nl_linecard_fill(msg, devlink, linecard,
++					       DEVLINK_CMD_LINECARD_NEW,
++					       NETLINK_CB(cb->skb).portid,
++					       cb->nlh->nlmsg_seq, flags,
++					       cb->extack);
++		mutex_unlock(&linecard->state_lock);
 +		if (err) {
 +			state->idx = idx;
 +			break;
@@ -1092,518 +1019,382 @@ index 000000000000..dff1593b8406
 +	return err;
 +}
 +
-+int devlink_nl_rate_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
++int devlink_nl_linecard_get_dumpit(struct sk_buff *skb,
++				   struct netlink_callback *cb)
 +{
-+	return devlink_nl_dumpit(skb, cb, devlink_nl_rate_get_dump_one);
++	return devlink_nl_dumpit(skb, cb, devlink_nl_linecard_get_dump_one);
 +}
 +
-+int devlink_nl_rate_get_doit(struct sk_buff *skb, struct genl_info *info)
++static struct devlink_linecard_type *
++devlink_linecard_type_lookup(struct devlink_linecard *linecard,
++			     const char *type)
 +{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_rate *devlink_rate;
-+	struct sk_buff *msg;
++	struct devlink_linecard_type *linecard_type;
++	int i;
++
++	for (i = 0; i < linecard->types_count; i++) {
++		linecard_type = &linecard->types[i];
++		if (!strcmp(type, linecard_type->type))
++			return linecard_type;
++	}
++	return NULL;
++}
++
++static int devlink_linecard_type_set(struct devlink_linecard *linecard,
++				     const char *type,
++				     struct netlink_ext_ack *extack)
++{
++	const struct devlink_linecard_ops *ops = linecard->ops;
++	struct devlink_linecard_type *linecard_type;
 +	int err;
 +
-+	devlink_rate = devlink_rate_get_from_info(devlink, info);
-+	if (IS_ERR(devlink_rate))
-+		return PTR_ERR(devlink_rate);
++	mutex_lock(&linecard->state_lock);
++	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
++		err = -EBUSY;
++		goto out;
++	}
++	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
++		err = -EBUSY;
++		goto out;
++	}
 +
-+	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg)
-+		return -ENOMEM;
++	linecard_type = devlink_linecard_type_lookup(linecard, type);
++	if (!linecard_type) {
++		NL_SET_ERR_MSG(extack, "Unsupported line card type provided");
++		err = -EINVAL;
++		goto out;
++	}
 +
-+	err = devlink_nl_rate_fill(msg, devlink_rate, DEVLINK_CMD_RATE_NEW,
-+				   info->snd_portid, info->snd_seq, 0,
-+				   info->extack);
++	if (linecard->state != DEVLINK_LINECARD_STATE_UNPROVISIONED &&
++	    linecard->state != DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
++		NL_SET_ERR_MSG(extack, "Line card already provisioned");
++		err = -EBUSY;
++		/* Check if the line card is provisioned in the same
++		 * way the user asks. In case it is, make the operation
++		 * to return success.
++		 */
++		if (ops->same_provision &&
++		    ops->same_provision(linecard, linecard->priv,
++					linecard_type->type,
++					linecard_type->priv))
++			err = 0;
++		goto out;
++	}
++
++	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONING;
++	linecard->type = linecard_type->type;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++	err = ops->provision(linecard, linecard->priv, linecard_type->type,
++			     linecard_type->priv, extack);
 +	if (err) {
-+		nlmsg_free(msg);
-+		return err;
++		/* Provisioning failed. Assume the linecard is unprovisioned
++		 * for future operations.
++		 */
++		mutex_lock(&linecard->state_lock);
++		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++		linecard->type = NULL;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		mutex_unlock(&linecard->state_lock);
 +	}
++	return err;
 +
-+	return genlmsg_reply(msg, info);
-+}
-+
-+static bool
-+devlink_rate_is_parent_node(struct devlink_rate *devlink_rate,
-+			    struct devlink_rate *parent)
-+{
-+	while (parent) {
-+		if (parent == devlink_rate)
-+			return true;
-+		parent = parent->parent;
-+	}
-+	return false;
-+}
-+
-+static int
-+devlink_nl_rate_parent_node_set(struct devlink_rate *devlink_rate,
-+				struct genl_info *info,
-+				struct nlattr *nla_parent)
-+{
-+	struct devlink *devlink = devlink_rate->devlink;
-+	const char *parent_name = nla_data(nla_parent);
-+	const struct devlink_ops *ops = devlink->ops;
-+	size_t len = strlen(parent_name);
-+	struct devlink_rate *parent;
-+	int err = -EOPNOTSUPP;
-+
-+	parent = devlink_rate->parent;
-+
-+	if (parent && !len) {
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			err = ops->rate_leaf_parent_set(devlink_rate, NULL,
-+							devlink_rate->priv, NULL,
-+							info->extack);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			err = ops->rate_node_parent_set(devlink_rate, NULL,
-+							devlink_rate->priv, NULL,
-+							info->extack);
-+		if (err)
-+			return err;
-+
-+		refcount_dec(&parent->refcnt);
-+		devlink_rate->parent = NULL;
-+	} else if (len) {
-+		parent = devlink_rate_node_get_by_name(devlink, parent_name);
-+		if (IS_ERR(parent))
-+			return -ENODEV;
-+
-+		if (parent == devlink_rate) {
-+			NL_SET_ERR_MSG(info->extack, "Parent to self is not allowed");
-+			return -EINVAL;
-+		}
-+
-+		if (devlink_rate_is_node(devlink_rate) &&
-+		    devlink_rate_is_parent_node(devlink_rate, parent->parent)) {
-+			NL_SET_ERR_MSG(info->extack, "Node is already a parent of parent node.");
-+			return -EEXIST;
-+		}
-+
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			err = ops->rate_leaf_parent_set(devlink_rate, parent,
-+							devlink_rate->priv, parent->priv,
-+							info->extack);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			err = ops->rate_node_parent_set(devlink_rate, parent,
-+							devlink_rate->priv, parent->priv,
-+							info->extack);
-+		if (err)
-+			return err;
-+
-+		if (devlink_rate->parent)
-+			/* we're reassigning to other parent in this case */
-+			refcount_dec(&devlink_rate->parent->refcnt);
-+
-+		refcount_inc(&parent->refcnt);
-+		devlink_rate->parent = parent;
-+	}
-+
-+	return 0;
-+}
-+
-+static int devlink_nl_rate_set(struct devlink_rate *devlink_rate,
-+			       const struct devlink_ops *ops,
-+			       struct genl_info *info)
-+{
-+	struct nlattr *nla_parent, **attrs = info->attrs;
-+	int err = -EOPNOTSUPP;
-+	u32 priority;
-+	u32 weight;
-+	u64 rate;
-+
-+	if (attrs[DEVLINK_ATTR_RATE_TX_SHARE]) {
-+		rate = nla_get_u64(attrs[DEVLINK_ATTR_RATE_TX_SHARE]);
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			err = ops->rate_leaf_tx_share_set(devlink_rate, devlink_rate->priv,
-+							  rate, info->extack);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			err = ops->rate_node_tx_share_set(devlink_rate, devlink_rate->priv,
-+							  rate, info->extack);
-+		if (err)
-+			return err;
-+		devlink_rate->tx_share = rate;
-+	}
-+
-+	if (attrs[DEVLINK_ATTR_RATE_TX_MAX]) {
-+		rate = nla_get_u64(attrs[DEVLINK_ATTR_RATE_TX_MAX]);
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			err = ops->rate_leaf_tx_max_set(devlink_rate, devlink_rate->priv,
-+							rate, info->extack);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			err = ops->rate_node_tx_max_set(devlink_rate, devlink_rate->priv,
-+							rate, info->extack);
-+		if (err)
-+			return err;
-+		devlink_rate->tx_max = rate;
-+	}
-+
-+	if (attrs[DEVLINK_ATTR_RATE_TX_PRIORITY]) {
-+		priority = nla_get_u32(attrs[DEVLINK_ATTR_RATE_TX_PRIORITY]);
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			err = ops->rate_leaf_tx_priority_set(devlink_rate, devlink_rate->priv,
-+							     priority, info->extack);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			err = ops->rate_node_tx_priority_set(devlink_rate, devlink_rate->priv,
-+							     priority, info->extack);
-+
-+		if (err)
-+			return err;
-+		devlink_rate->tx_priority = priority;
-+	}
-+
-+	if (attrs[DEVLINK_ATTR_RATE_TX_WEIGHT]) {
-+		weight = nla_get_u32(attrs[DEVLINK_ATTR_RATE_TX_WEIGHT]);
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			err = ops->rate_leaf_tx_weight_set(devlink_rate, devlink_rate->priv,
-+							   weight, info->extack);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			err = ops->rate_node_tx_weight_set(devlink_rate, devlink_rate->priv,
-+							   weight, info->extack);
-+
-+		if (err)
-+			return err;
-+		devlink_rate->tx_weight = weight;
-+	}
-+
-+	nla_parent = attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME];
-+	if (nla_parent) {
-+		err = devlink_nl_rate_parent_node_set(devlink_rate, info,
-+						      nla_parent);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static bool devlink_rate_set_ops_supported(const struct devlink_ops *ops,
-+					   struct genl_info *info,
-+					   enum devlink_rate_type type)
-+{
-+	struct nlattr **attrs = info->attrs;
-+
-+	if (type == DEVLINK_RATE_TYPE_LEAF) {
-+		if (attrs[DEVLINK_ATTR_RATE_TX_SHARE] && !ops->rate_leaf_tx_share_set) {
-+			NL_SET_ERR_MSG(info->extack, "TX share set isn't supported for the leafs");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_TX_MAX] && !ops->rate_leaf_tx_max_set) {
-+			NL_SET_ERR_MSG(info->extack, "TX max set isn't supported for the leafs");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] &&
-+		    !ops->rate_leaf_parent_set) {
-+			NL_SET_ERR_MSG(info->extack, "Parent set isn't supported for the leafs");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_TX_PRIORITY] && !ops->rate_leaf_tx_priority_set) {
-+			NL_SET_ERR_MSG_ATTR(info->extack,
-+					    attrs[DEVLINK_ATTR_RATE_TX_PRIORITY],
-+					    "TX priority set isn't supported for the leafs");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_TX_WEIGHT] && !ops->rate_leaf_tx_weight_set) {
-+			NL_SET_ERR_MSG_ATTR(info->extack,
-+					    attrs[DEVLINK_ATTR_RATE_TX_WEIGHT],
-+					    "TX weight set isn't supported for the leafs");
-+			return false;
-+		}
-+	} else if (type == DEVLINK_RATE_TYPE_NODE) {
-+		if (attrs[DEVLINK_ATTR_RATE_TX_SHARE] && !ops->rate_node_tx_share_set) {
-+			NL_SET_ERR_MSG(info->extack, "TX share set isn't supported for the nodes");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_TX_MAX] && !ops->rate_node_tx_max_set) {
-+			NL_SET_ERR_MSG(info->extack, "TX max set isn't supported for the nodes");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] &&
-+		    !ops->rate_node_parent_set) {
-+			NL_SET_ERR_MSG(info->extack, "Parent set isn't supported for the nodes");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_TX_PRIORITY] && !ops->rate_node_tx_priority_set) {
-+			NL_SET_ERR_MSG_ATTR(info->extack,
-+					    attrs[DEVLINK_ATTR_RATE_TX_PRIORITY],
-+					    "TX priority set isn't supported for the nodes");
-+			return false;
-+		}
-+		if (attrs[DEVLINK_ATTR_RATE_TX_WEIGHT] && !ops->rate_node_tx_weight_set) {
-+			NL_SET_ERR_MSG_ATTR(info->extack,
-+					    attrs[DEVLINK_ATTR_RATE_TX_WEIGHT],
-+					    "TX weight set isn't supported for the nodes");
-+			return false;
-+		}
-+	} else {
-+		WARN(1, "Unknown type of rate object");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+int devlink_nl_cmd_rate_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_rate *devlink_rate;
-+	const struct devlink_ops *ops;
-+	int err;
-+
-+	devlink_rate = devlink_rate_get_from_info(devlink, info);
-+	if (IS_ERR(devlink_rate))
-+		return PTR_ERR(devlink_rate);
-+
-+	ops = devlink->ops;
-+	if (!ops || !devlink_rate_set_ops_supported(ops, info, devlink_rate->type))
-+		return -EOPNOTSUPP;
-+
-+	err = devlink_nl_rate_set(devlink_rate, ops, info);
-+
-+	if (!err)
-+		devlink_rate_notify(devlink_rate, DEVLINK_CMD_RATE_NEW);
++out:
++	mutex_unlock(&linecard->state_lock);
 +	return err;
 +}
 +
-+int devlink_nl_cmd_rate_new_doit(struct sk_buff *skb, struct genl_info *info)
++static int devlink_linecard_type_unset(struct devlink_linecard *linecard,
++				       struct netlink_ext_ack *extack)
 +{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_rate *rate_node;
-+	const struct devlink_ops *ops;
 +	int err;
 +
-+	ops = devlink->ops;
-+	if (!ops || !ops->rate_node_new || !ops->rate_node_del) {
-+		NL_SET_ERR_MSG(info->extack, "Rate nodes aren't supported");
-+		return -EOPNOTSUPP;
++	mutex_lock(&linecard->state_lock);
++	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being provisioned");
++		err = -EBUSY;
++		goto out;
++	}
++	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONING) {
++		NL_SET_ERR_MSG(extack, "Line card is currently being unprovisioned");
++		err = -EBUSY;
++		goto out;
++	}
++	if (linecard->state == DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
++		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++		linecard->type = NULL;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		err = 0;
++		goto out;
 +	}
 +
-+	if (!devlink_rate_set_ops_supported(ops, info, DEVLINK_RATE_TYPE_NODE))
-+		return -EOPNOTSUPP;
++	if (linecard->state == DEVLINK_LINECARD_STATE_UNPROVISIONED) {
++		NL_SET_ERR_MSG(extack, "Line card is not provisioned");
++		err = 0;
++		goto out;
++	}
++	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONING;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++	err = linecard->ops->unprovision(linecard, linecard->priv,
++					 extack);
++	if (err) {
++		/* Unprovisioning failed. Assume the linecard is unprovisioned
++		 * for future operations.
++		 */
++		mutex_lock(&linecard->state_lock);
++		linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++		linecard->type = NULL;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		mutex_unlock(&linecard->state_lock);
++	}
++	return err;
 +
-+	rate_node = devlink_rate_node_get_from_attrs(devlink, info->attrs);
-+	if (!IS_ERR(rate_node))
-+		return -EEXIST;
-+	else if (rate_node == ERR_PTR(-EINVAL))
-+		return -EINVAL;
++out:
++	mutex_unlock(&linecard->state_lock);
++	return err;
++}
 +
-+	rate_node = kzalloc(sizeof(*rate_node), GFP_KERNEL);
-+	if (!rate_node)
++int devlink_nl_cmd_linecard_set_doit(struct sk_buff *skb,
++				     struct genl_info *info)
++{
++	struct netlink_ext_ack *extack = info->extack;
++	struct devlink *devlink = info->user_ptr[0];
++	struct devlink_linecard *linecard;
++	int err;
++
++	linecard = devlink_linecard_get_from_info(devlink, info);
++	if (IS_ERR(linecard))
++		return PTR_ERR(linecard);
++
++	if (info->attrs[DEVLINK_ATTR_LINECARD_TYPE]) {
++		const char *type;
++
++		type = nla_data(info->attrs[DEVLINK_ATTR_LINECARD_TYPE]);
++		if (strcmp(type, "")) {
++			err = devlink_linecard_type_set(linecard, type, extack);
++			if (err)
++				return err;
++		} else {
++			err = devlink_linecard_type_unset(linecard, extack);
++			if (err)
++				return err;
++		}
++	}
++
++	return 0;
++}
++
++static int devlink_linecard_types_init(struct devlink_linecard *linecard)
++{
++	struct devlink_linecard_type *linecard_type;
++	unsigned int count;
++	int i;
++
++	count = linecard->ops->types_count(linecard, linecard->priv);
++	linecard->types = kmalloc_array(count, sizeof(*linecard_type),
++					GFP_KERNEL);
++	if (!linecard->types)
 +		return -ENOMEM;
++	linecard->types_count = count;
 +
-+	rate_node->devlink = devlink;
-+	rate_node->type = DEVLINK_RATE_TYPE_NODE;
-+	rate_node->name = nla_strdup(info->attrs[DEVLINK_ATTR_RATE_NODE_NAME], GFP_KERNEL);
-+	if (!rate_node->name) {
-+		err = -ENOMEM;
-+		goto err_strdup;
++	for (i = 0; i < count; i++) {
++		linecard_type = &linecard->types[i];
++		linecard->ops->types_get(linecard, linecard->priv, i,
++					 &linecard_type->type,
++					 &linecard_type->priv);
 +	}
-+
-+	err = ops->rate_node_new(rate_node, &rate_node->priv, info->extack);
-+	if (err)
-+		goto err_node_new;
-+
-+	err = devlink_nl_rate_set(rate_node, ops, info);
-+	if (err)
-+		goto err_rate_set;
-+
-+	refcount_set(&rate_node->refcnt, 1);
-+	list_add(&rate_node->list, &devlink->rate_list);
-+	devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
 +	return 0;
-+
-+err_rate_set:
-+	ops->rate_node_del(rate_node, rate_node->priv, info->extack);
-+err_node_new:
-+	kfree(rate_node->name);
-+err_strdup:
-+	kfree(rate_node);
-+	return err;
 +}
 +
-+int devlink_nl_cmd_rate_del_doit(struct sk_buff *skb, struct genl_info *info)
++static void devlink_linecard_types_fini(struct devlink_linecard *linecard)
 +{
-+	struct devlink *devlink = info->user_ptr[0];
-+	struct devlink_rate *rate_node;
-+	int err;
-+
-+	rate_node = devlink_rate_node_get_from_info(devlink, info);
-+	if (IS_ERR(rate_node))
-+		return PTR_ERR(rate_node);
-+
-+	if (refcount_read(&rate_node->refcnt) > 1) {
-+		NL_SET_ERR_MSG(info->extack, "Node has children. Cannot delete node.");
-+		return -EBUSY;
-+	}
-+
-+	devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_DEL);
-+	err = devlink->ops->rate_node_del(rate_node, rate_node->priv,
-+					  info->extack);
-+	if (rate_node->parent)
-+		refcount_dec(&rate_node->parent->refcnt);
-+	list_del(&rate_node->list);
-+	kfree(rate_node->name);
-+	kfree(rate_node);
-+	return err;
-+}
-+
-+int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
-+			     struct netlink_ext_ack *extack)
-+{
-+	struct devlink_rate *devlink_rate;
-+
-+	list_for_each_entry(devlink_rate, &devlink->rate_list, list)
-+		if (devlink_rate_is_node(devlink_rate)) {
-+			NL_SET_ERR_MSG(extack, "Rate node(s) exists.");
-+			return -EBUSY;
-+		}
-+	return 0;
++	kfree(linecard->types);
 +}
 +
 +/**
-+ * devl_rate_node_create - create devlink rate node
-+ * @devlink: devlink instance
-+ * @priv: driver private data
-+ * @node_name: name of the resulting node
-+ * @parent: parent devlink_rate struct
++ *	devl_linecard_create - Create devlink linecard
 + *
-+ * Create devlink rate object of type node
++ *	@devlink: devlink
++ *	@linecard_index: driver-specific numerical identifier of the linecard
++ *	@ops: linecards ops
++ *	@priv: user priv pointer
++ *
++ *	Create devlink linecard instance with provided linecard index.
++ *	Caller can use any indexing, even hw-related one.
++ *
++ *	Return: Line card structure or an ERR_PTR() encoded error code.
 + */
-+struct devlink_rate *
-+devl_rate_node_create(struct devlink *devlink, void *priv, char *node_name,
-+		      struct devlink_rate *parent)
++struct devlink_linecard *
++devl_linecard_create(struct devlink *devlink, unsigned int linecard_index,
++		     const struct devlink_linecard_ops *ops, void *priv)
 +{
-+	struct devlink_rate *rate_node;
++	struct devlink_linecard *linecard;
++	int err;
 +
-+	rate_node = devlink_rate_node_get_by_name(devlink, node_name);
-+	if (!IS_ERR(rate_node))
++	if (WARN_ON(!ops || !ops->provision || !ops->unprovision ||
++		    !ops->types_count || !ops->types_get))
++		return ERR_PTR(-EINVAL);
++
++	if (devlink_linecard_index_exists(devlink, linecard_index))
 +		return ERR_PTR(-EEXIST);
 +
-+	rate_node = kzalloc(sizeof(*rate_node), GFP_KERNEL);
-+	if (!rate_node)
++	linecard = kzalloc(sizeof(*linecard), GFP_KERNEL);
++	if (!linecard)
 +		return ERR_PTR(-ENOMEM);
 +
-+	if (parent) {
-+		rate_node->parent = parent;
-+		refcount_inc(&rate_node->parent->refcnt);
++	linecard->devlink = devlink;
++	linecard->index = linecard_index;
++	linecard->ops = ops;
++	linecard->priv = priv;
++	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++	mutex_init(&linecard->state_lock);
++
++	err = devlink_linecard_types_init(linecard);
++	if (err) {
++		mutex_destroy(&linecard->state_lock);
++		kfree(linecard);
++		return ERR_PTR(err);
 +	}
 +
-+	rate_node->type = DEVLINK_RATE_TYPE_NODE;
-+	rate_node->devlink = devlink;
-+	rate_node->priv = priv;
-+
-+	rate_node->name = kstrdup(node_name, GFP_KERNEL);
-+	if (!rate_node->name) {
-+		kfree(rate_node);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	refcount_set(&rate_node->refcnt, 1);
-+	list_add(&rate_node->list, &devlink->rate_list);
-+	devlink_rate_notify(rate_node, DEVLINK_CMD_RATE_NEW);
-+	return rate_node;
++	list_add_tail(&linecard->list, &devlink->linecard_list);
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	return linecard;
 +}
-+EXPORT_SYMBOL_GPL(devl_rate_node_create);
++EXPORT_SYMBOL_GPL(devl_linecard_create);
 +
 +/**
-+ * devl_rate_leaf_create - create devlink rate leaf
-+ * @devlink_port: devlink port object to create rate object on
-+ * @priv: driver private data
-+ * @parent: parent devlink_rate struct
++ *	devl_linecard_destroy - Destroy devlink linecard
 + *
-+ * Create devlink rate object of type leaf on provided @devlink_port.
++ *	@linecard: devlink linecard
 + */
-+int devl_rate_leaf_create(struct devlink_port *devlink_port, void *priv,
-+			  struct devlink_rate *parent)
++void devl_linecard_destroy(struct devlink_linecard *linecard)
 +{
-+	struct devlink *devlink = devlink_port->devlink;
-+	struct devlink_rate *devlink_rate;
-+
-+	devl_assert_locked(devlink_port->devlink);
-+
-+	if (WARN_ON(devlink_port->devlink_rate))
-+		return -EBUSY;
-+
-+	devlink_rate = kzalloc(sizeof(*devlink_rate), GFP_KERNEL);
-+	if (!devlink_rate)
-+		return -ENOMEM;
-+
-+	if (parent) {
-+		devlink_rate->parent = parent;
-+		refcount_inc(&devlink_rate->parent->refcnt);
-+	}
-+
-+	devlink_rate->type = DEVLINK_RATE_TYPE_LEAF;
-+	devlink_rate->devlink = devlink;
-+	devlink_rate->devlink_port = devlink_port;
-+	devlink_rate->priv = priv;
-+	list_add_tail(&devlink_rate->list, &devlink->rate_list);
-+	devlink_port->devlink_rate = devlink_rate;
-+	devlink_rate_notify(devlink_rate, DEVLINK_CMD_RATE_NEW);
-+
-+	return 0;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_DEL);
++	list_del(&linecard->list);
++	devlink_linecard_types_fini(linecard);
++	mutex_destroy(&linecard->state_lock);
++	kfree(linecard);
 +}
-+EXPORT_SYMBOL_GPL(devl_rate_leaf_create);
++EXPORT_SYMBOL_GPL(devl_linecard_destroy);
 +
 +/**
-+ * devl_rate_leaf_destroy - destroy devlink rate leaf
++ *	devlink_linecard_provision_set - Set provisioning on linecard
 + *
-+ * @devlink_port: devlink port linked to the rate object
++ *	@linecard: devlink linecard
++ *	@type: linecard type
 + *
-+ * Destroy the devlink rate object of type leaf on provided @devlink_port.
++ *	This is either called directly from the provision() op call or
++ *	as a result of the provision() op call asynchronously.
 + */
-+void devl_rate_leaf_destroy(struct devlink_port *devlink_port)
++void devlink_linecard_provision_set(struct devlink_linecard *linecard,
++				    const char *type)
 +{
-+	struct devlink_rate *devlink_rate = devlink_port->devlink_rate;
-+
-+	devl_assert_locked(devlink_port->devlink);
-+	if (!devlink_rate)
-+		return;
-+
-+	devlink_rate_notify(devlink_rate, DEVLINK_CMD_RATE_DEL);
-+	if (devlink_rate->parent)
-+		refcount_dec(&devlink_rate->parent->refcnt);
-+	list_del(&devlink_rate->list);
-+	devlink_port->devlink_rate = NULL;
-+	kfree(devlink_rate);
++	mutex_lock(&linecard->state_lock);
++	WARN_ON(linecard->type && strcmp(linecard->type, type));
++	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONED;
++	linecard->type = type;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
 +}
-+EXPORT_SYMBOL_GPL(devl_rate_leaf_destroy);
++EXPORT_SYMBOL_GPL(devlink_linecard_provision_set);
 +
 +/**
-+ * devl_rate_nodes_destroy - destroy all devlink rate nodes on device
-+ * @devlink: devlink instance
++ *	devlink_linecard_provision_clear - Clear provisioning on linecard
 + *
-+ * Unset parent for all rate objects and destroy all rate nodes
-+ * on specified device.
++ *	@linecard: devlink linecard
++ *
++ *	This is either called directly from the unprovision() op call or
++ *	as a result of the unprovision() op call asynchronously.
 + */
-+void devl_rate_nodes_destroy(struct devlink *devlink)
++void devlink_linecard_provision_clear(struct devlink_linecard *linecard)
 +{
-+	static struct devlink_rate *devlink_rate, *tmp;
-+	const struct devlink_ops *ops = devlink->ops;
-+
-+	devl_assert_locked(devlink);
-+
-+	list_for_each_entry(devlink_rate, &devlink->rate_list, list) {
-+		if (!devlink_rate->parent)
-+			continue;
-+
-+		refcount_dec(&devlink_rate->parent->refcnt);
-+		if (devlink_rate_is_leaf(devlink_rate))
-+			ops->rate_leaf_parent_set(devlink_rate, NULL, devlink_rate->priv,
-+						  NULL, NULL);
-+		else if (devlink_rate_is_node(devlink_rate))
-+			ops->rate_node_parent_set(devlink_rate, NULL, devlink_rate->priv,
-+						  NULL, NULL);
-+	}
-+	list_for_each_entry_safe(devlink_rate, tmp, &devlink->rate_list, list) {
-+		if (devlink_rate_is_node(devlink_rate)) {
-+			ops->rate_node_del(devlink_rate, devlink_rate->priv, NULL);
-+			list_del(&devlink_rate->list);
-+			kfree(devlink_rate->name);
-+			kfree(devlink_rate);
-+		}
-+	}
++	mutex_lock(&linecard->state_lock);
++	WARN_ON(linecard->nested_devlink);
++	linecard->state = DEVLINK_LINECARD_STATE_UNPROVISIONED;
++	linecard->type = NULL;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
 +}
-+EXPORT_SYMBOL_GPL(devl_rate_nodes_destroy);
++EXPORT_SYMBOL_GPL(devlink_linecard_provision_clear);
++
++/**
++ *	devlink_linecard_provision_fail - Fail provisioning on linecard
++ *
++ *	@linecard: devlink linecard
++ *
++ *	This is either called directly from the provision() op call or
++ *	as a result of the provision() op call asynchronously.
++ */
++void devlink_linecard_provision_fail(struct devlink_linecard *linecard)
++{
++	mutex_lock(&linecard->state_lock);
++	WARN_ON(linecard->nested_devlink);
++	linecard->state = DEVLINK_LINECARD_STATE_PROVISIONING_FAILED;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++}
++EXPORT_SYMBOL_GPL(devlink_linecard_provision_fail);
++
++/**
++ *	devlink_linecard_activate - Set linecard active
++ *
++ *	@linecard: devlink linecard
++ */
++void devlink_linecard_activate(struct devlink_linecard *linecard)
++{
++	mutex_lock(&linecard->state_lock);
++	WARN_ON(linecard->state != DEVLINK_LINECARD_STATE_PROVISIONED);
++	linecard->state = DEVLINK_LINECARD_STATE_ACTIVE;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++}
++EXPORT_SYMBOL_GPL(devlink_linecard_activate);
++
++/**
++ *	devlink_linecard_deactivate - Set linecard inactive
++ *
++ *	@linecard: devlink linecard
++ */
++void devlink_linecard_deactivate(struct devlink_linecard *linecard)
++{
++	mutex_lock(&linecard->state_lock);
++	switch (linecard->state) {
++	case DEVLINK_LINECARD_STATE_ACTIVE:
++		linecard->state = DEVLINK_LINECARD_STATE_PROVISIONED;
++		devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++		break;
++	case DEVLINK_LINECARD_STATE_UNPROVISIONING:
++		/* Line card is being deactivated as part
++		 * of unprovisioning flow.
++		 */
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++	mutex_unlock(&linecard->state_lock);
++}
++EXPORT_SYMBOL_GPL(devlink_linecard_deactivate);
++
++/**
++ *	devlink_linecard_nested_dl_set - Attach/detach nested devlink
++ *					 instance to linecard.
++ *
++ *	@linecard: devlink linecard
++ *	@nested_devlink: devlink instance to attach or NULL to detach
++ */
++void devlink_linecard_nested_dl_set(struct devlink_linecard *linecard,
++				    struct devlink *nested_devlink)
++{
++	mutex_lock(&linecard->state_lock);
++	linecard->nested_devlink = nested_devlink;
++	devlink_linecard_notify(linecard, DEVLINK_CMD_LINECARD_NEW);
++	mutex_unlock(&linecard->state_lock);
++}
++EXPORT_SYMBOL_GPL(devlink_linecard_nested_dl_set);
 -- 
 2.41.0
 
