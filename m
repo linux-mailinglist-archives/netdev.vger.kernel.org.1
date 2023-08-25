@@ -1,208 +1,418 @@
-Return-Path: <netdev+bounces-30762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F26788F2C
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 21:07:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F058B788F4B
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 21:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 313B51C20E26
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 19:07:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 562A62817D5
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 19:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A08318B16;
-	Fri, 25 Aug 2023 19:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DDD18C05;
+	Fri, 25 Aug 2023 19:43:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823E82915
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 19:07:05 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BD9272B;
-	Fri, 25 Aug 2023 12:07:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692990420; x=1724526420;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=6UUfSj/UJmCbC5zGcO3AKCRignGGEY+ieIG/q9Qe/Fo=;
-  b=aqbBDd7pvrEh7TPjxK/hLNEOjEHHWGs6Nd9/FBaJbYAxwPiASUwZuDKX
-   VB8Q84VfMjxjOLgh1/oNQmxr8dEyP1muNMHGavENUhwrRARzbezJkeFXJ
-   rLWJFXHvbAfVUWUClmQ9K2VccWsmjkDEMDjhAD2zznHWNBnOHRLyhMbY5
-   LJOWafE1X6LewJ/VkhDqYROwwTwv0climdTqwtTlypLbM8UPRBjqnxXFt
-   rWkc13JHqR1mwr8zI8zgJWO0BHcp97xQnA9AP3hsA3ujm4Ojt9GMG0BRt
-   MIrQUkvF3+Ga29G1n757J21UWXxnU6xq55ExiI+ohLlCZsk6AiIKxSICY
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="359779847"
-X-IronPort-AV: E=Sophos;i="6.02,201,1688454000"; 
-   d="scan'208";a="359779847"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 12:07:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="881242147"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Aug 2023 12:07:04 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 25 Aug 2023 12:06:58 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 25 Aug 2023 12:06:58 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.109)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 25 Aug 2023 12:06:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UjhgGEV/uCY1tICfgv1uSUHlzr2L+CHYwgJYDryeS3i9UNjHb9zd53zbRypKUgYP1eaG9As3t0uf2RtBKkbKmsmwXBND/0zZ8NuvGsTRz742TKDO2jlPcsqdvX0ma0vY4WtdtxdY885XuPCfnUHipemuDwiKIXB1SplfWQomB4QdqXkFT9+PFLjAy2Dn9Umnp17g0pEJacCmTKe+NK/B7Mbu69Nw/JzE1evEXDYmMcN7z6SqH4GKamjoiI1wJWNqhSYX1UQq53CJS2CO4OayAB0BypweXoI6Pd8UhXzszjOJ9anMCz7K5TGpCQv8rUc0/kj5S/NyAmnIqeFw6ejedA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2wSZen0Tih98xDY5GlLblBiqDbeF8C4XBTM1Psystjk=;
- b=VhgRCjP4MsX/guSHsfYSqlTUcuDyxUIY5q32P75HlmxFPIhDEdayEjDVV0oMONK0hjZ6yiss+A40PfWU62JKTLb2WNIfExskHdMYDJCexSqr/X2X/KQc7w/E+DGB+fmIpg/8CjFzulbwYzFPgs7wYbk6bJnzLrJ9tz0Byqc6v5Ckly1E2/qTfeJwDJdjRowVIA9oOVP12azbB5oriKqrpUsjOISNfv+gmFEEnWElFW+GrzWqKfelQbtNePGc5UHnipGpHN8pOjVavIdNPq81w/K1lY8D89ykITGbneBP7WLC2jF8eY8775RyLWRvkAcDjX/1FEFVpk3kpbHmItr8YA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8414.namprd11.prod.outlook.com (2603:10b6:610:17e::19)
- by SJ0PR11MB4864.namprd11.prod.outlook.com (2603:10b6:a03:2d4::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Fri, 25 Aug
- 2023 19:06:55 +0000
-Received: from CH3PR11MB8414.namprd11.prod.outlook.com
- ([fe80::ed67:3510:8326:d4d5]) by CH3PR11MB8414.namprd11.prod.outlook.com
- ([fe80::ed67:3510:8326:d4d5%2]) with mapi id 15.20.6699.028; Fri, 25 Aug 2023
- 19:06:55 +0000
-From: "Michalik, Michal" <michal.michalik@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, poros <poros@redhat.com>, "Olech, Milena"
-	<milena.olech@intel.com>, mschmidt <mschmidt@redhat.com>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>, "bvanassche@acm.org"
-	<bvanassche@acm.org>
-Subject: RE: [PATCH RFC net-next v1 2/2] selftests/dpll: add DPLL system
- integration selftests
-Thread-Topic: [PATCH RFC net-next v1 2/2] selftests/dpll: add DPLL system
- integration selftests
-Thread-Index: AQHZ0R7y+sClUTv/akmAx/gH3L3jSa/wjecAgAP0HyCAAMRjgIAD48hAgAB4uQCAAchgAA==
-Date: Fri, 25 Aug 2023 19:06:55 +0000
-Message-ID: <CH3PR11MB8414200922FA16348A4F36C9E3E3A@CH3PR11MB8414.namprd11.prod.outlook.com>
-References: <20230817152209.23868-1-michal.michalik@intel.com>
-	<20230817152209.23868-3-michal.michalik@intel.com>
-	<20230818140802.063aae1f@kernel.org>
-	<CH3PR11MB84141E0EDA588B84F7E10F71E31EA@CH3PR11MB8414.namprd11.prod.outlook.com>
-	<20230821141327.1ae35b2e@kernel.org>
-	<CH3PR11MB84149ADA77B4A6FBD4F0C230E31DA@CH3PR11MB8414.namprd11.prod.outlook.com>
- <20230824084934.3b9b96ee@kernel.org>
-In-Reply-To: <20230824084934.3b9b96ee@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR11MB8414:EE_|SJ0PR11MB4864:EE_
-x-ms-office365-filtering-correlation-id: 74132cf8-b020-4a18-1965-08dba59e72c6
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UJcBf0/tF2cYqNG3jZRNteC+6KO7m4bQTNhLtF9MxddyEEiMdnxtDWAE2xtkKDu77KXedFzABhpA4tb/J2WATD6UWNTr4/H7JCic3O5R/XmD83827Z8o+7Y9q3JuGPCU1rNU7/DdQYFngQZBmPRgGM/PIzi7NuNUXPc31Ks3V1XnVg0KO7CgvedtskEwUiy86XY1oiJcUjXVAOmzFC0UNWaJ6AHpjY0W79Wf/6ISlYtvHNwI1b9SJp0Jwrn45vMB2+STRVB2JoiSfPgD799OOQFDEQ6Q9vhylLxPGKD+880gWtNH8BGFiRMPd1eQJd7cdJtgYi9KikUHa0Cw9ZG+YCrCLM3HJgAiUrgrB/TQH9sNSQN4qtUdy9r0/TsU8tvEnAnutSDIbG5BNkpXlBgSvfHsjhcWfMezb2MkRdWbk769STFd6EwRUatkwZaYq7gT5P3W9Cfxydf3t1U4pORthabkKRQQI0Kw9LnJodTI5zi4TGG7Ioo0STICckuMBB3Wrfp2Rw4MoLwdFJ8hQqyJH1vecxm8z/4yf5W04DK9WO/8MP5H2jW595I6BH9v9YPTSTWejKJFwV5NbjMDGhGX4Z/tG30vKuA5GYvf9IHHJBPkFAWtQQurWRnFCjxg11Id
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8414.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(396003)(366004)(346002)(451199024)(1800799009)(186009)(82960400001)(38100700002)(38070700005)(122000001)(8676002)(4326008)(8936002)(6506007)(64756008)(54906003)(41300700001)(66476007)(33656002)(53546011)(316002)(66446008)(66946007)(76116006)(6916009)(7696005)(86362001)(66556008)(71200400001)(9686003)(478600001)(26005)(55016003)(83380400001)(7416002)(2906002)(52536014)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2gqin3VwZkfvgs2hLQDFQlMMF4Y8mGbLYSzT6kORI42wzCMw6WHI2fyAQgx/?=
- =?us-ascii?Q?K0tfUi9CTXjWJK3OUOtzoJfd/qt/8RVYDXbuvqlFSLqod+2OeLw9iugZ2wr1?=
- =?us-ascii?Q?0h2nH+Eo21NFYfkJHpRiiCSxYYmWA9v3sWiATWBD8mqenYiRIvGM6Ox+C+9z?=
- =?us-ascii?Q?CLq+AEnjo3QdcOmolIieu8TZMlfmRfRJ3LTe208SmEsCQ9Oh3nvBdlMBV3/r?=
- =?us-ascii?Q?MixmzUv54wD2wWm2Htvjw2V+vRQk8IUxJ72qOt3HbinRLBdLbWYlkuUYCVvm?=
- =?us-ascii?Q?Dl3rRyx4olzx8JXqJzQR9lEEJhVqSUDUr3hcIjBoGQd7vSW4HEtZ4rK3Byrv?=
- =?us-ascii?Q?woCI8yluBBpratMcuSb3Io+r8WqWlvktn7+0XEJWMMahQHRjm3MMnKpYVN3y?=
- =?us-ascii?Q?iY1w1N7Yeytsn8kuEnEwDqWEm4hZp8U0bmgQMr2r14WL+uIUsBtEV5zA0bfU?=
- =?us-ascii?Q?vjuC7X4wcFD7VDBzkkzq1FTsdeOkA7lTQtGwy2fxNpModyCJF1+xKCchi9Kv?=
- =?us-ascii?Q?I9roZ2nYBxq1uZSxwYCe4+WrXAlB8FrrDZESHrYuQj2QKHSdNOmatWkKT/xU?=
- =?us-ascii?Q?76vWy4DCvImk01+ff5X40J7s4yNfvUriF94U2ZPUVEdd2aQRxyTDMqccekty?=
- =?us-ascii?Q?puSXZWpHrWcWogAsPHoq0+pDFW5A4fRmJl5+VHgTxAii1u1jhkXlNlZnyeXt?=
- =?us-ascii?Q?Zf2bnasf1mOcNtmMfQwQIB9IB2aiTov5wpPLK2fhBOmctb2eZ0ko58wUViDH?=
- =?us-ascii?Q?6ku/+e7bIc/PPMRbJ8G3bcTJuDDuEuj5QdgXI3J8/rE1Yyc+9dPXfOmA01l7?=
- =?us-ascii?Q?cl9iRQMi8IKBle+tJFzhO+VPLB/NCE35RX8xavfMujdt3C9C8LsSbvQlt8dF?=
- =?us-ascii?Q?je2PkszQsbYYrjGBiv37kiuCrf6d14kgqYKT+9gbXM9ZoLwvxk8uVn43ZT8U?=
- =?us-ascii?Q?AK67WlGBxJtl6Ce7cBetW5jFMVFQRu0b3iCaZfKDBvsEmSq8MUv7jQLTPBxS?=
- =?us-ascii?Q?uYTGcB+ucweifM4GVWki/z+9T66r17U4MymfdFuvuvhkITBa8yKS0e/D19u2?=
- =?us-ascii?Q?HSrs0TvbsoVYB9Y6z5EF1el4N5EhIj3gYRrbEGn0jnza+ya6fzyARNp/5eB4?=
- =?us-ascii?Q?xjFPcb51llULA6l7EQZhaEuEcv3Y/0Rf6tdafND2oFmA1w+rVjUWslz3hEMQ?=
- =?us-ascii?Q?J+V6vL1NDCzKVMgec2ywbKfD+zDClBPaLKzLLjbszdJPffPIoCpN3QxlpP10?=
- =?us-ascii?Q?mnHGIrvCtfVFWBQZSYtACNNwAEOxLq3a67W/S9PDFYHW92gAn7JFaucrh0wI?=
- =?us-ascii?Q?SUnda0u3fPB2t7YRdE4ncfE0rD3uD7343xlkvzIfsIL/i7nmcEDr+XPV2Vm7?=
- =?us-ascii?Q?dnGR2JIGinpQnflvdjrGgWmB+A6f5gYlh/TzMD2eva96tCpr6RSRhFp8Q44O?=
- =?us-ascii?Q?H0HAd4XjeeNpfe9d4yGs/dM9ZlGBwQ2Uf/h020+fHW3VouxzS0r0/04pFNFb?=
- =?us-ascii?Q?gceah6iJd6ngjV+N6eQVVCp+yYbb4MgBeekABEZQEmzV45wJViS+EzEJxx4Z?=
- =?us-ascii?Q?7WSFwvRejHeze3fagqQlUTaHY31tagSy5X78Ri3E?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3D8322B;
+	Fri, 25 Aug 2023 19:43:26 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3152684;
+	Fri, 25 Aug 2023 12:43:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=2yeZvWrPXuOx5+odzuqcbm1Y9YI1/4FQbjAdVVSMiSc=; b=fSV56oqvZO9N/8mE1AoLGUUJyZ
+	ZBjnYwX5g8fpaVpYlx11/6f3ybGtXzQp87jsUjzaNY4GNr8YtBORv+Tp6L3uAEgrOrx4X8URyHMCN
+	afk52YCZneVDVBpA0intMs4m9JiekaiA8ItpFKiIQAMw6eESqlVQ4b6dUlXJNHimJyNp+dtMYOl7v
+	2ubMPteTRgzI18P/8ZimmaOiQ22WJt46zG6DDysM6PBz6J0+mV5ayoM3bOQfsqvSbI/s1Zmhs8P/O
+	hX2VvPN/S7wOH4FpYlO9AkZVj9yDEKycHHEvrjkDd/zr4aICZZ+Li52H+Y9rondJrNlMKffR6JcBT
+	iWEcW82w==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qZciF-00034P-Ia; Fri, 25 Aug 2023 21:43:19 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2023-08-25
+Date: Fri, 25 Aug 2023 21:43:19 +0200
+Message-Id: <20230825194319.12727-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8414.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74132cf8-b020-4a18-1965-08dba59e72c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2023 19:06:55.1659
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4Ob/JTScGkCmi12Z2KZs+skxxTsRgeQrotKAgIJ8DcTKdBCmRJr9s9qUvt9ZJIyAPKTp8Ooo5BEH2P34XzsWKVBnSY0hYiu3f0Hkf8Euqys=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4864
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/27011/Fri Aug 25 09:40:47 2023)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 24 August 2023 5:50 PM CEST, Jakub Kicinski wrote:
->=20
-> On Thu, 24 Aug 2023 08:59:53 +0000 Michalik, Michal wrote:
->> >> The biggest concern for me is the requirement of selftests[2]:
->> >>   "Don't take too long;"
->> >> This approach is reloading the modules few times to check few scenari=
-os.
->> >> Also, the DPLL subsystem is being tested against multiple requests - =
-so
->> >> it takes some time to finish (not too long but is definitely not inst=
-ant). =20
->> >=20
->> > I think the time constraints are more of a question of practicality.
->> > A developer should be able to run the tests as part of their workflow.
->>=20
->> That makes sense - agree. So Jakub, if I understand correctly we have a =
-few
->> different problems to solve here:
->> 1) how to deploy the module:
->>  - now it's separated, we should consider e.g. netdevsim
->> 2) if we should have those tests a part of selftests
->>  - I would remove it from selftests and move it to ./tools/testing
->> 3) if we should use Python at all:
->>  - fast to develop and easy to maintain
->>  - might be problematic to deploy (no Python, VMs, embedded, no network =
-etc.)
->> =20
->> Do I understand our current outcome of the discussion correctly?
->=20
-> Yes, and on (3) unless someone objects let's stick to Python.
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Please be kindly informed that I just start my 2 week vacations returning o=
-n 11th Sep.
-Excuse me for the upcoming delay in preparing the v2 of the RFC.
+The following pull-request contains BPF updates for your *net-next* tree.
 
-All the best,
-M^2
+We've added 87 non-merge commits during the last 8 day(s) which contain
+a total of 104 files changed, 3719 insertions(+), 4212 deletions(-).
+
+The main changes are:
+
+1) Add multi uprobe BPF links for attaching multiple uprobes and usdt probes,
+   which is significantly faster and saves extra fds, from Jiri Olsa.
+
+2) Add support BPF cpu v4 instructions for arm64 JIT compiler, from Xu Kuohai.
+
+3) Add support BPF cpu v4 instructions for riscv64 JIT compiler, from Pu Lehui.
+
+4) Fix LWT BPF xmit hooks wrt their return values where propagating the result
+   from skb_do_redirect() would trigger a use-after-free, from Yan Zhai.
+
+5) Fix a BPF verifier issue related to bpf_kptr_xchg() with local kptr where the
+   map's value kptr type and locally allocated obj type mismatch, from Yonghong Song.
+
+6) Fix BPF verifier's check_func_arg_reg_off() function wrt graph root/node
+   which bypassed reg->off == 0 enforcement, from Kumar Kartikeya Dwivedi.
+
+7) Lift BPF verifier restriction in networking BPF programs to treat comparison
+   of packet pointers not as a pointer leak, from Yafang Shao.
+
+8) Remove unmaintained XDP BPF samples as they are maintained in xdp-tools
+   repository out of tree, from Toke Høiland-Jørgensen.
+
+9) Batch of fixes for the tracing programs from BPF samples in order to make
+   them more libbpf-aware, from Daniel T. Lee.
+
+10) Fix a libbpf signedness determination bug in the CO-RE relocation handling
+    logic, from Andrii Nakryiko.
+
+11) Extend libbpf to support CO-RE kfunc relocations. Also follow-up fixes
+    for bpf_refcount shared ownership implementation, both from Dave Marchevsky.
+
+12) Add a new bpf_object__unpin() API function to libbpf, from Daniel Xu.
+
+13) Fix a memory leak in libbpf to also free btf_vmlinux when the bpf_object
+    gets closed, from Hao Luo.
+
+14) Small error output improvements to test_bpf module, from Helge Deller.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Alexei Starovoitov, Andrii Nakryiko, Björn Töpel, Dave Marchevsky, David 
+Vernet, Eduard Zingerman, Florent Revest, Jiri Olsa, Jordan Griege, 
+Kumar Kartikeya Dwivedi, Lorenz Bauer, Oleg Nesterov, Song Liu, Toke 
+Høiland-Jørgensen, Yafang Shao, Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit c2e5f4fd1148727801a63d938cec210f16b48864:
+
+  Merge branch 'netconsole-enable-compile-time-configuration' (2023-08-17 19:25:44 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to ec0ded2e02822ee6a7acb655d186af91854112cb:
+
+  Merge branch 'bpf-refcount-followups-3-bpf_mem_free_rcu-refcounted-nodes' (2023-08-25 09:23:23 -0700)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (8):
+      Merge branch 'remove-unnecessary-synchronizations-in-cpumap'
+      Merge branch 'samples-bpf-make-bpf-programs-more-libbpf-aware'
+      Merge branch 'bpf-add-multi-uprobe-link'
+      Merge branch 'fix-for-check_func_arg_reg_off'
+      Merge branch 'bpf-fix-an-issue-in-verifing-allow_ptr_leaks'
+      Merge branch 'samples-bpf-remove-unmaintained-xdp-sample-utilities'
+      Merge branch 'add-support-cpu-v4-insns-for-rv64'
+      Merge branch 'bpf-refcount-followups-3-bpf_mem_free_rcu-refcounted-nodes'
+
+Andrii Nakryiko (2):
+      selftests/bpf: add uprobe_multi test binary to .gitignore
+      libbpf: fix signedness determination in CO-RE relo handling logic
+
+Daniel T. Lee (9):
+      samples/bpf: fix warning with ignored-attributes
+      samples/bpf: convert to vmlinux.h with tracing programs
+      samples/bpf: unify bpf program suffix to .bpf with tracing programs
+      samples/bpf: fix symbol mismatch by compiler optimization
+      samples/bpf: make tracing programs to be more CO-RE centric
+      samples/bpf: fix bio latency check with tracepoint
+      samples/bpf: fix broken map lookup probe
+      samples/bpf: refactor syscall tracing programs using BPF_KSYSCALL macro
+      samples/bpf: simplify spintest with kprobe.multi
+
+Daniel Xu (1):
+      libbpf: Add bpf_object__unpin()
+
+Dave Marchevsky (9):
+      libbpf: Support triple-underscore flavors for kfunc relocation
+      selftests/bpf: Add CO-RE relocs kfunc flavors tests
+      bpf: Ensure kptr_struct_meta is non-NULL for collection insert and refcount_acquire
+      bpf: Consider non-owning refs trusted
+      bpf: Use bpf_mem_free_rcu when bpf_obj_dropping refcounted nodes
+      bpf: Reenable bpf_refcount_acquire
+      bpf: Consider non-owning refs to refcounted nodes RCU protected
+      bpf: Allow bpf_spin_{lock,unlock} in sleepable progs
+      selftests/bpf: Add tests for rbtree API interaction in sleepable progs
+
+Hao Luo (1):
+      libbpf: Free btf_vmlinux when closing bpf_object
+
+Helge Deller (1):
+      bpf/tests: Enhance output on error and fix typos
+
+Hou Tao (2):
+      bpf, cpumap: Use queue_rcu_work() to remove unnecessary rcu_barrier()
+      bpf, cpumask: Clean up bpf_cpu_map_entry directly in cpu_map_free
+
+Jiri Olsa (28):
+      bpf: Switch BPF_F_KPROBE_MULTI_RETURN macro to enum
+      bpf: Add attach_type checks under bpf_prog_attach_check_attach_type
+      bpf: Add multi uprobe link
+      bpf: Add cookies support for uprobe_multi link
+      bpf: Add pid filter support for uprobe_multi link
+      bpf: Add bpf_get_func_ip helper support for uprobe link
+      libbpf: Add uprobe_multi attach type and link names
+      libbpf: Move elf_find_func_offset* functions to elf object
+      libbpf: Add elf_open/elf_close functions
+      libbpf: Add elf symbol iterator
+      libbpf: Add elf_resolve_syms_offsets function
+      libbpf: Add elf_resolve_pattern_offsets function
+      libbpf: Add bpf_link_create support for multi uprobes
+      libbpf: Add bpf_program__attach_uprobe_multi function
+      libbpf: Add support for u[ret]probe.multi[.s] program sections
+      libbpf: Add uprobe multi link detection
+      libbpf: Add uprobe multi link support to bpf_program__attach_usdt
+      selftests/bpf: Move get_time_ns to testing_helpers.h
+      selftests/bpf: Add uprobe_multi skel test
+      selftests/bpf: Add uprobe_multi api test
+      selftests/bpf: Add uprobe_multi link test
+      selftests/bpf: Add uprobe_multi test program
+      selftests/bpf: Add uprobe_multi bench test
+      selftests/bpf: Add uprobe_multi usdt test code
+      selftests/bpf: Add uprobe_multi usdt bench test
+      selftests/bpf: Add uprobe_multi cookie test
+      selftests/bpf: Add uprobe_multi pid filter tests
+      selftests/bpf: Add extra link to uprobe_multi tests
+
+Kumar Kartikeya Dwivedi (2):
+      bpf: Fix check_func_arg_reg_off bug for graph root/node
+      selftests/bpf: Add test for bpf_obj_drop with bad reg->off
+
+Pu Lehui (7):
+      riscv, bpf: Fix missing exception handling and redundant zext for LDX_B/H/W
+      riscv, bpf: Support sign-extension load insns
+      riscv, bpf: Support sign-extension mov insns
+      riscv, bpf: Support 32-bit offset jmp insn
+      riscv, bpf: Support signed div/mod insns
+      riscv, bpf: Support unconditional bswap insn
+      selftests/bpf: Enable cpu v4 tests for RV64
+
+Toke Høiland-Jørgensen (7):
+      samples/bpf: Remove the xdp_monitor utility
+      samples/bpf: Remove the xdp_redirect* utilities
+      samples/bpf: Remove the xdp_rxq_info utility
+      samples/bpf: Remove the xdp1 and xdp2 utilities
+      samples/bpf: Remove the xdp_sample_pkts utility
+      samples/bpf: Cleanup .gitignore
+      samples/bpf: Add note to README about the XDP utilities moved to xdp-tools
+
+Xu Kuohai (7):
+      arm64: insn: Add encoders for LDRSB/LDRSH/LDRSW
+      bpf, arm64: Support sign-extension load instructions
+      bpf, arm64: Support sign-extension mov instructions
+      bpf, arm64: Support unconditional bswap
+      bpf, arm64: Support 32-bit offset jmp instruction
+      bpf, arm64: Support signed div/mod instructions
+      selftests/bpf: Enable cpu v4 tests for arm64
+
+Yafang Shao (2):
+      bpf: Fix issue in verifying allow_ptr_leaks
+      selftests/bpf: Add selftest for allow_ptr_leaks
+
+Yan Zhai (4):
+      lwt: Fix return values of BPF xmit ops
+      lwt: Check LWTUNNEL_XMIT_CONTINUE strictly
+      selftests/bpf: Add lwt_xmit tests for BPF_REDIRECT
+      selftests/bpf: Add lwt_xmit tests for BPF_REROUTE
+
+Yonghong Song (5):
+      selftests/bpf: Fix a selftest compilation error
+      bpf: Fix a bpf_kptr_xchg() issue with local kptr
+      selftests/bpf: Add a failure test for bpf_kptr_xchg() with local kptr
+      bpf: Remove a WARN_ON_ONCE warning related to local kptr
+      selftests/bpf: Add a local kptr test with no special fields
+
+ arch/arm64/include/asm/insn.h                      |   4 +
+ arch/arm64/lib/insn.c                              |   6 +
+ arch/arm64/net/bpf_jit.h                           |  12 +
+ arch/arm64/net/bpf_jit_comp.c                      |  91 ++-
+ arch/riscv/net/bpf_jit.h                           |  30 +
+ arch/riscv/net/bpf_jit_comp64.c                    | 102 +++-
+ include/linux/bpf.h                                |   3 +-
+ include/linux/bpf_verifier.h                       |   2 +-
+ include/linux/trace_events.h                       |   6 +
+ include/net/lwtunnel.h                             |   5 +-
+ include/uapi/linux/bpf.h                           |  22 +-
+ kernel/bpf/cpumap.c                                | 113 ++--
+ kernel/bpf/helpers.c                               |   8 +-
+ kernel/bpf/syscall.c                               | 135 +++--
+ kernel/bpf/verifier.c                              |  94 ++--
+ kernel/trace/bpf_trace.c                           | 342 +++++++++++-
+ lib/test_bpf.c                                     |  12 +-
+ net/core/lwt_bpf.c                                 |   7 +-
+ net/ipv4/ip_output.c                               |   2 +-
+ net/ipv6/ip6_output.c                              |   2 +-
+ samples/bpf/.gitignore                             |  12 -
+ samples/bpf/Makefile                               |  68 +--
+ samples/bpf/README.rst                             |   6 +
+ samples/bpf/net_shared.h                           |   2 +
+ .../bpf/{offwaketime_kern.c => offwaketime.bpf.c}  |  39 +-
+ samples/bpf/offwaketime_user.c                     |   2 +-
+ samples/bpf/{spintest_kern.c => spintest.bpf.c}    |  27 +-
+ samples/bpf/spintest_user.c                        |  24 +-
+ samples/bpf/test_map_in_map.bpf.c                  |  10 +-
+ samples/bpf/test_overhead_kprobe.bpf.c             |  20 +-
+ samples/bpf/test_overhead_tp.bpf.c                 |  29 +-
+ samples/bpf/{tracex1_kern.c => tracex1.bpf.c}      |  25 +-
+ samples/bpf/tracex1_user.c                         |   2 +-
+ samples/bpf/{tracex3_kern.c => tracex3.bpf.c}      |  40 +-
+ samples/bpf/tracex3_user.c                         |   2 +-
+ samples/bpf/{tracex4_kern.c => tracex4.bpf.c}      |   3 +-
+ samples/bpf/tracex4_user.c                         |   2 +-
+ samples/bpf/{tracex5_kern.c => tracex5.bpf.c}      |  12 +-
+ samples/bpf/tracex5_user.c                         |   2 +-
+ samples/bpf/{tracex6_kern.c => tracex6.bpf.c}      |  20 +-
+ samples/bpf/tracex6_user.c                         |   2 +-
+ samples/bpf/{tracex7_kern.c => tracex7.bpf.c}      |   3 +-
+ samples/bpf/tracex7_user.c                         |   2 +-
+ samples/bpf/xdp1_kern.c                            | 100 ----
+ samples/bpf/xdp1_user.c                            | 166 ------
+ samples/bpf/xdp2_kern.c                            | 125 -----
+ samples/bpf/xdp_monitor.bpf.c                      |   8 -
+ samples/bpf/xdp_monitor_user.c                     | 118 ----
+ samples/bpf/xdp_redirect.bpf.c                     |  49 --
+ samples/bpf/xdp_redirect_cpu.bpf.c                 | 539 ------------------
+ samples/bpf/xdp_redirect_cpu_user.c                | 559 -------------------
+ samples/bpf/xdp_redirect_map.bpf.c                 |  97 ----
+ samples/bpf/xdp_redirect_map_multi.bpf.c           |  77 ---
+ samples/bpf/xdp_redirect_map_multi_user.c          | 232 --------
+ samples/bpf/xdp_redirect_map_user.c                | 228 --------
+ samples/bpf/xdp_redirect_user.c                    | 172 ------
+ samples/bpf/xdp_rxq_info_kern.c                    | 140 -----
+ samples/bpf/xdp_rxq_info_user.c                    | 614 ---------------------
+ samples/bpf/xdp_sample_pkts_kern.c                 |  57 --
+ samples/bpf/xdp_sample_pkts_user.c                 | 196 -------
+ tools/include/uapi/linux/bpf.h                     |  22 +-
+ tools/lib/bpf/Build                                |   2 +-
+ tools/lib/bpf/bpf.c                                |  11 +
+ tools/lib/bpf/bpf.h                                |  11 +-
+ tools/lib/bpf/elf.c                                | 440 +++++++++++++++
+ tools/lib/bpf/libbpf.c                             | 424 +++++++-------
+ tools/lib/bpf/libbpf.h                             |  52 ++
+ tools/lib/bpf/libbpf.map                           |   2 +
+ tools/lib/bpf/libbpf_internal.h                    |  21 +
+ tools/lib/bpf/relo_core.c                          |   2 +-
+ tools/lib/bpf/usdt.c                               | 116 ++--
+ tools/testing/selftests/bpf/.gitignore             |   1 +
+ tools/testing/selftests/bpf/Makefile               |   5 +
+ tools/testing/selftests/bpf/bench.h                |   9 -
+ tools/testing/selftests/bpf/config                 |   2 +
+ .../testing/selftests/bpf/prog_tests/bpf_cookie.c  |  78 +++
+ .../selftests/bpf/prog_tests/kprobe_multi_test.c   |   8 -
+ .../selftests/bpf/prog_tests/local_kptr_stash.c    |  33 +-
+ .../testing/selftests/bpf/prog_tests/lwt_helpers.h | 139 +++++
+ .../selftests/bpf/prog_tests/lwt_redirect.c        | 330 +++++++++++
+ .../testing/selftests/bpf/prog_tests/lwt_reroute.c | 262 +++++++++
+ .../selftests/bpf/prog_tests/refcounted_kptr.c     |  26 +
+ .../testing/selftests/bpf/prog_tests/task_kfunc.c  |   2 +
+ tools/testing/selftests/bpf/prog_tests/tc_bpf.c    |  36 +-
+ .../selftests/bpf/prog_tests/uprobe_multi_test.c   | 415 ++++++++++++++
+ .../testing/selftests/bpf/progs/local_kptr_stash.c |  28 +
+ .../selftests/bpf/progs/local_kptr_stash_fail.c    |  85 +++
+ .../testing/selftests/bpf/progs/refcounted_kptr.c  |  71 +++
+ .../selftests/bpf/progs/refcounted_kptr_fail.c     |  28 +
+ .../selftests/bpf/progs/task_kfunc_success.c       |  51 ++
+ tools/testing/selftests/bpf/progs/test_ldsx_insn.c |   3 +-
+ .../selftests/bpf/progs/test_lwt_redirect.c        |  90 +++
+ .../testing/selftests/bpf/progs/test_lwt_reroute.c |  36 ++
+ tools/testing/selftests/bpf/progs/test_tc_bpf.c    |  13 +
+ tools/testing/selftests/bpf/progs/uprobe_multi.c   | 101 ++++
+ .../selftests/bpf/progs/uprobe_multi_bench.c       |  15 +
+ .../selftests/bpf/progs/uprobe_multi_usdt.c        |  16 +
+ tools/testing/selftests/bpf/progs/verifier_bswap.c |   3 +-
+ tools/testing/selftests/bpf/progs/verifier_gotol.c |   3 +-
+ tools/testing/selftests/bpf/progs/verifier_ldsx.c  |   3 +-
+ tools/testing/selftests/bpf/progs/verifier_movsx.c |   3 +-
+ tools/testing/selftests/bpf/progs/verifier_sdiv.c  |   3 +-
+ tools/testing/selftests/bpf/testing_helpers.h      |  10 +
+ tools/testing/selftests/bpf/uprobe_multi.c         |  91 +++
+ 104 files changed, 3719 insertions(+), 4212 deletions(-)
+ rename samples/bpf/{offwaketime_kern.c => offwaketime.bpf.c} (76%)
+ rename samples/bpf/{spintest_kern.c => spintest.bpf.c} (67%)
+ rename samples/bpf/{tracex1_kern.c => tracex1.bpf.c} (60%)
+ rename samples/bpf/{tracex3_kern.c => tracex3.bpf.c} (70%)
+ rename samples/bpf/{tracex4_kern.c => tracex4.bpf.c} (95%)
+ rename samples/bpf/{tracex5_kern.c => tracex5.bpf.c} (90%)
+ rename samples/bpf/{tracex6_kern.c => tracex6.bpf.c} (71%)
+ rename samples/bpf/{tracex7_kern.c => tracex7.bpf.c} (82%)
+ delete mode 100644 samples/bpf/xdp1_kern.c
+ delete mode 100644 samples/bpf/xdp1_user.c
+ delete mode 100644 samples/bpf/xdp2_kern.c
+ delete mode 100644 samples/bpf/xdp_monitor.bpf.c
+ delete mode 100644 samples/bpf/xdp_monitor_user.c
+ delete mode 100644 samples/bpf/xdp_redirect.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_cpu.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_cpu_user.c
+ delete mode 100644 samples/bpf/xdp_redirect_map.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_map_multi.bpf.c
+ delete mode 100644 samples/bpf/xdp_redirect_map_multi_user.c
+ delete mode 100644 samples/bpf/xdp_redirect_map_user.c
+ delete mode 100644 samples/bpf/xdp_redirect_user.c
+ delete mode 100644 samples/bpf/xdp_rxq_info_kern.c
+ delete mode 100644 samples/bpf/xdp_rxq_info_user.c
+ delete mode 100644 samples/bpf/xdp_sample_pkts_kern.c
+ delete mode 100644 samples/bpf/xdp_sample_pkts_user.c
+ create mode 100644 tools/lib/bpf/elf.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_redirect.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/lwt_reroute.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/uprobe_multi_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/local_kptr_stash_fail.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_lwt_redirect.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_lwt_reroute.c
+ create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi.c
+ create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_bench.c
+ create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_usdt.c
+ create mode 100644 tools/testing/selftests/bpf/uprobe_multi.c
 
