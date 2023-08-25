@@ -1,104 +1,131 @@
-Return-Path: <netdev+bounces-30622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA3578838D
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:32:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5387883F4
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 11:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F15281706
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:32:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C11F1C20F8F
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45EAC8CB;
-	Fri, 25 Aug 2023 09:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854D8C8DF;
+	Fri, 25 Aug 2023 09:40:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5327C2D6
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:32:09 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228241FD4
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 02:32:06 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mtapsc-2-CWXtiu9VOBa0HfxzC4PXkQ-1; Fri, 25 Aug 2023 10:32:04 +0100
-X-MC-Unique: CWXtiu9VOBa0HfxzC4PXkQ-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 25 Aug
- 2023 10:32:02 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 25 Aug 2023 10:32:02 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Mahmoud Maatuq' <mahmoudmatook.mm@gmail.com>, "keescook@chromium.org"
-	<keescook@chromium.org>, "edumazet@google.com" <edumazet@google.com>,
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
-	"wad@chromium.org" <wad@chromium.org>, "luto@amacapital.net"
-	<luto@amacapital.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "shuah@kernel.org" <shuah@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>
-CC: "linux-kernel-mentees@lists.linuxfoundation.org"
-	<linux-kernel-mentees@lists.linuxfoundation.org>
-Subject: RE: [PATCH v2 2/2] selftests/net: replace ternary operator with
- min()/max()
-Thread-Topic: [PATCH v2 2/2] selftests/net: replace ternary operator with
- min()/max()
-Thread-Index: AQHZ1slDuEzSfgmyIkyLho9d3Y2q6K/6vr1A
-Date: Fri, 25 Aug 2023 09:32:02 +0000
-Message-ID: <dd7b956916e044b181e7ccd1823f14ec@AcuMS.aculab.com>
-References: <20230824202415.131824-1-mahmoudmatook.mm@gmail.com>
- <20230824202415.131824-2-mahmoudmatook.mm@gmail.com>
-In-Reply-To: <20230824202415.131824-2-mahmoudmatook.mm@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E024C8D1
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 09:40:48 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A515F1FD5;
+	Fri, 25 Aug 2023 02:40:46 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RXFJ117srzVkb3;
+	Fri, 25 Aug 2023 17:38:25 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 25 Aug
+ 2023 17:40:43 +0800
+Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Alexander Duyck <alexander.duyck@gmail.com>, Jakub Kicinski
+	<kuba@kernel.org>
+CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Mina Almasry
+	<almasrymina@google.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>
+References: <20230816100113.41034-1-linyunsheng@huawei.com>
+ <20230816100113.41034-2-linyunsheng@huawei.com>
+ <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
+ <20230817091554.31bb3600@kernel.org>
+ <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
+ <20230817165744.73d61fb6@kernel.org>
+ <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
+ <20230818145145.4b357c89@kernel.org>
+ <1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
+ <20230821113543.536b7375@kernel.org>
+ <5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
+ <20230822083821.58d5d26c@kernel.org>
+ <79a49ccd-b0c0-0b99-4b4d-c4a416d7e327@huawei.com>
+ <20230823072552.044d13b3@kernel.org>
+ <CAKgT0UeSOBbXohq1rZ3YsB4abB_-5ktkLtYbDKTah8dvaojruA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <5aae00a4-42c0-df8b-30cb-d47c91cf1095@huawei.com>
+Date: Fri, 25 Aug 2023 17:40:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+In-Reply-To: <CAKgT0UeSOBbXohq1rZ3YsB4abB_-5ktkLtYbDKTah8dvaojruA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,PDS_BAD_THREAD_QP_64,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Mahmoud Maatuq
-> Sent: 24 August 2023 21:24
-....
->  =09=09tdeliver =3D glob_tstart + ts->delay_us * 1000;
-> -=09=09tdeliver_max =3D tdeliver_max > tdeliver ?
-> -=09=09=09       tdeliver_max : tdeliver;
-> +=09=09tdeliver_max =3D max(tdeliver_max, tdeliver);
+On 2023/8/24 2:00, Alexander Duyck wrote:
+> On Wed, Aug 23, 2023 at 7:25 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Wed, 23 Aug 2023 11:03:31 +0800 Yunsheng Lin wrote:
+>>> On 2023/8/22 23:38, Jakub Kicinski wrote:
+>>>> On Tue, 22 Aug 2023 17:21:35 +0800 Yunsheng Lin wrote:
+>>>>> As the CONFIG_PHYS_ADDR_T_64BIT seems to used widely in x86/arm/mips/powerpc,
+>>>>> I am not sure if we can really make the above assumption.
+>>>>>
+>>>>> https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT
+>>>>
+>>>> Huh, it's actually used a lot less than I anticipated!
+>>>>
+>>>> None of the x86/arm/mips/powerpc systems matter IMHO - the only _real_
+>>>
+>>> Is there any particular reason that you think that the above systems does
+>>> not really matter?
+>>
+>> Not the systems themselves but the combination of a 32b arch with
+>> an address space >16TB. All those arches have 64b equivalent, seems
+>> logical to use the 64b version for a system with a large address space.
+>> If we're talking about a system which ends up running Linux.
+>>
+>>> As we have made a similar wrong assumption about those arches before, I am
+>>> really trying to be more cautious about it.
+>>>
+>>> I searched through the web, some seems to be claiming that "32-bits is DEAD",
+>>> I am not sure if there is some common agreement among the kernel community,
+>>> is there any previous discussion about that?
+>>
+>> My suspicion/claim is that 32 + PAGE_SHIFT should be enough bits for
+>> any 32b platform.
+> 
+> One additional thing we could consider would be to simply look at
+> having page_pool enforce a DMA mask for the device to address any
+> cases where we might not be able to fit the address. Then in the
+> unlikely event that somebody is running a 32b system with over 16
+> terabytes of RAM. With that the DMA subsystem would handle it for us
+> and we wouldn't have to worry so much about it.
 
-That was spectacularly horrid...
-What is wrong with using:
-=09if (tdeliver > tdeliver_max)
-=09=09tdeliver_max =3D tdeliver;
-That is pretty obviously calculating the upper bound.
-Even the version with max() needs extra parsing by the human reader.
+It seems there is a API to acquire the DMA mask used by the device:
+https://elixir.free-electrons.com/linux/v6.4-rc6/source/include/linux/dma-mapping.h#L434
 
-(The only issue is whether it reads better with the if condition
-reversed.)
+Is it possible to use that to check if DMA mask used by the device is
+within 32 + PAGE_SHIFT limit, if yes, we use jakub's proposal to reduce
+reduce the dma address bit, if no, we fail the page_pool creation?
 
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+> .
+> 
 
