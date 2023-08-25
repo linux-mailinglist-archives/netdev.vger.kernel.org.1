@@ -1,112 +1,164 @@
-Return-Path: <netdev+bounces-30683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB95788895
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:29:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268C67888A1
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:32:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2465281698
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 13:29:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 774EF2817E2
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 13:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0C2D53F;
-	Fri, 25 Aug 2023 13:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69007DDAA;
+	Fri, 25 Aug 2023 13:32:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC4CCA79
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 13:29:41 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC221FDF;
-	Fri, 25 Aug 2023 06:29:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kby7pl3idO/bMWkcA00Dzg9yYh2+GlYM7ZuG4/jazKQ=; b=hgYdt44QpM0bWTPJZ+RS3zhlQC
-	Pjl5YKidc/tsjgkF0lLKfl45YFwmHZVA0WXIIJijXQOEUbentcnVeBl7eNHfCluVmnAGMyMLwpw6U
-	b/G6JCczb+7qaiOrv/w9hCad/Co/qISuxx6AYGNfS0AZVQ+hsHHbhgkc+DVqxbuQdFcA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qZWsU-0055pj-6Z; Fri, 25 Aug 2023 15:29:30 +0200
-Date: Fri, 25 Aug 2023 15:29:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, sebastian.tobuschat@nxp.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v2 3/5] net: phy: nxp-c45-tja11xx add MACsec
- support
-Message-ID: <95f66997-c6dd-4bbc-b1ef-dad1e7ed533e@lunn.ch>
-References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
- <20230824091615.191379-4-radu-nicolae.pirea@oss.nxp.com>
- <ZOikKUjRvces_vVj@hog>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534BBD523
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 13:32:54 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8AB1FDE
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 06:32:52 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-4009fdc224dso72415e9.1
+        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 06:32:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692970371; x=1693575171; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jMgENuQTUm9al0raOuSkoRbcV4eFm8ZoAXmdkzqummM=;
+        b=mpjB2aMPstSr/9aUA9o4x2Q11ub8LlCgy8zS1XNlGcK9SUh3DsEKTFcEPCgK64EY0X
+         OBNin9gTZwYkXCaLXnIxotZA8cHQnrXdOmMvrAfyrnSIb0b33P/lGDqmUNpoF9RMmCuk
+         7JeQKve7zD/wLjSCJp71ByJez1n/u5f/lv1qaw0CU3WP/gOdtRKr0sq8SiIQhyYhKs4o
+         d6SNUcmNYdCJKsQT9Hl55dzWQNvGuBNArguyjGicN+bK7UOaSNghM3VOnTWyyks+XfIS
+         NLYK4sA+5ClwwrHvzjKaUMMgYsJCc8y/U4AQh/ioIdJmK/fZ1/FOixaYmcjhlzniidvw
+         TN1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692970371; x=1693575171;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jMgENuQTUm9al0raOuSkoRbcV4eFm8ZoAXmdkzqummM=;
+        b=dTSJBFE6/0MyxTt9mS4y1SALs/6YWR9SQWNuo+9rvRUYTuO6UOxmVjMaVaD4VQrnCG
+         alPbT/G267drWZ4c+Om3kfbu7NmNdAIT0K3VLV8v8Qvnr+5rCH2fEh63Im4B/ER8RQ9d
+         sjXcFjN2sUud5oyYe9HGfrrDHK4wstn8HNgoer0DzkdA6moMpwvJMhojIG2TwlyimmXu
+         xwIqtiviKw7/UXWIEU/ZkPArRSse4hrbI24JJAoyOlZx4j2rC/wmgYH1WHzVAZIOodG9
+         wL5A9f/lBUdT6rfV1NEaFfcm3pAB2yaTOhHBZbQAU8fDYcGhwOllMnEdhDLq5R5q/KWQ
+         shkQ==
+X-Gm-Message-State: AOJu0YzCQLtpPorUi59JCcHqeRrJ+48nJt8vMKXkEi2OAPHK6RPy3Cc0
+	aIXKQ53tokPZF4fzaKS5mLw//g==
+X-Google-Smtp-Source: AGHT+IGJR6VlnUlpJi5XWv4o1WdYQ0zmm0E6porJBW6byN68WqZpCJrXbmhmp5hwFVUsPoFo4L5SMQ==
+X-Received: by 2002:a05:600c:1d98:b0:401:a494:2bbb with SMTP id p24-20020a05600c1d9800b00401a4942bbbmr161556wms.5.1692970371097;
+        Fri, 25 Aug 2023 06:32:51 -0700 (PDT)
+Received: from localhost ([2a00:79e0:9d:4:d136:2a30:906a:7af7])
+        by smtp.gmail.com with ESMTPSA id y6-20020adfd086000000b003179b3fd837sm2264180wrh.33.2023.08.25.06.32.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Aug 2023 06:32:49 -0700 (PDT)
+From: Jann Horn <jannh@google.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	dccp@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net] dccp: Fix out of bounds access in DCCP error handler
+Date: Fri, 25 Aug 2023 15:32:41 +0200
+Message-ID: <20230825133241.3635236-1-jannh@google.com>
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZOikKUjRvces_vVj@hog>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 02:52:57PM +0200, Sabrina Dubroca wrote:
-> [Some of the questions I'm asking are probably dumb since I don't know
-> anything about phy drivers. Sorry if that's the case.]
-> 
-> General code organization nit: I think it would be easier to review
-> the code if helpers functions were grouped by the type of object they
-> work on. All the RXSA-related functions together, all the TXSA
-> functions together, same for RXSC and then TXSC/SecY. Right now I see
-> some RXSA functions in a group of TXSA functions, another in the
-> middle of a group of RXSC functions. It makes navigating through the
-> code a bit less convenient.
+There was a previous attempt to fix an out-of-bounds access in the DCCP
+error handlers, but that fix assumed that the error handlers only want
+to access the first 8 bytes of the DCCP header. Actually, they also look
+at the DCCP sequence number, which is stored beyond 8 bytes, so an
+explicit pskb_may_pull() is required.
 
-For networking, and Linux in general, forward declarations are not
-liked. Functions should appear before they are used. That places a bit
-of restrictions on ordering, but in general you can still group code
-in meaningful ways.
+Fixes: 6706a97fec96 ("dccp: fix out of bound access in dccp_v4_err()")
+Fixes: 1aa9d1a0e7ee ("ipv6: dccp: fix out of bound access in dccp_v6_err()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jann Horn <jannh@google.com>
+---
+ net/dccp/ipv4.c | 13 +++++++++----
+ net/dccp/ipv6.c | 15 ++++++++++-----
+ 2 files changed, 19 insertions(+), 9 deletions(-)
 
-> 2023-08-24, 12:16:13 +0300, Radu Pirea (NXP OSS) wrote:
-> > +static int nxp_c45_macsec_write(struct phy_device *phydev, u16 reg, u32 val)
-> > +{
-> > +	WARN_ON_ONCE(reg % 4);
-> > +
-> > +	reg = reg / 2;
-> > +	phy_write_mmd(phydev, MDIO_MMD_VEND2,
-> > +		      VEND1_MACSEC_BASE + reg, val);
-> > +	phy_write_mmd(phydev, MDIO_MMD_VEND2,
-> > +		      VEND1_MACSEC_BASE + reg + 1, val >> 16);
-> 
-> Can these calls fail? ie, do you need to handle errors like in
-> nxp_c45_macsec_read (and then in callers of nxp_c45_macsec_write)?
+diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+index fa8079303cb0..dcd2fb774d82 100644
+--- a/net/dccp/ipv4.c
++++ b/net/dccp/ipv4.c
+@@ -255,12 +255,17 @@ static int dccp_v4_err(struct sk_buff *skb, u32 info)
+ 	int err;
+ 	struct net *net = dev_net(skb->dev);
+ 
+-	/* Only need dccph_dport & dccph_sport which are the first
+-	 * 4 bytes in dccp header.
++	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
++	 * which is in byte 7 of the dccp header.
+ 	 * Our caller (icmp_socket_deliver()) already pulled 8 bytes for us.
++	 *
++	 * Later on, we want to access the sequence number fields, which are
++	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
+ 	 */
+-	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
+-	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
++	dh = (struct dccp_hdr *)(skb->data + offset);
++	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
++		return -EINVAL;
++	iph = (struct iphdr *)skb->data;
+ 	dh = (struct dccp_hdr *)(skb->data + offset);
+ 
+ 	sk = __inet_lookup_established(net, &dccp_hashinfo,
+diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+index d29d1163203d..25816e790527 100644
+--- a/net/dccp/ipv6.c
++++ b/net/dccp/ipv6.c
+@@ -74,7 +74,7 @@ static inline __u64 dccp_v6_init_sequence(struct sk_buff *skb)
+ static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 			u8 type, u8 code, int offset, __be32 info)
+ {
+-	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
++	const struct ipv6hdr *hdr;
+ 	const struct dccp_hdr *dh;
+ 	struct dccp_sock *dp;
+ 	struct ipv6_pinfo *np;
+@@ -83,12 +83,17 @@ static int dccp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 	__u64 seq;
+ 	struct net *net = dev_net(skb->dev);
+ 
+-	/* Only need dccph_dport & dccph_sport which are the first
+-	 * 4 bytes in dccp header.
++	/* For the first __dccp_basic_hdr_len() check, we only need dh->dccph_x,
++	 * which is in byte 7 of the dccp header.
+ 	 * Our caller (icmpv6_notify()) already pulled 8 bytes for us.
++	 *
++	 * Later on, we want to access the sequence number fields, which are
++	 * beyond 8 bytes, so we have to pskb_may_pull() ourselves.
+ 	 */
+-	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_sport) > 8);
+-	BUILD_BUG_ON(offsetofend(struct dccp_hdr, dccph_dport) > 8);
++	dh = (struct dccp_hdr *)(skb->data + offset);
++	if (!pskb_may_pull(skb, offset + __dccp_basic_hdr_len(dh)))
++		return -EINVAL;
++	hdr = (const struct ipv6hdr *)skb->data;
+ 	dh = (struct dccp_hdr *)(skb->data + offset);
+ 
+ 	sk = __inet6_lookup_established(net, &dccp_hashinfo,
 
-Access to PHY devices can fail, but if it does, such failures are
-generally fatal and there is no real recovery, also the next read/
-write is also likely to fail. So we do recommend checking return codes
-and just return the error up the stack. That failure might get trapped
-up the stack, and turned into a phy_error() call which will disable
-the PHY.
+base-commit: 93f5de5f648d2b1ce3540a4ac71756d4a852dc23
+-- 
+2.42.0.rc1.204.g551eb34607-goog
 
-> > +static bool nxp_c45_rx_sc_valid(struct nxp_c45_secy *phy_secy,
-> > +				struct macsec_rx_sc *rx_sc)
-> > +{
-> > +	u16 port =  (__force u64)rx_sc->sci >> (ETH_ALEN * 8);
-> 
-> u64 sci = be64_to_cpu((__force __be64)rx_sc->sci);
-
-why is the __force needed? What happens with a normal cast?
-
-    Andrew
 
