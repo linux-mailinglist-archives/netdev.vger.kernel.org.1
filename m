@@ -1,170 +1,230 @@
-Return-Path: <netdev+bounces-30746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC62788CD6
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 17:53:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27203788D76
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 18:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9E042816B6
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:53:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574C21C20F83
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 16:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BE71774B;
-	Fri, 25 Aug 2023 15:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD4D17FE5;
+	Fri, 25 Aug 2023 16:54:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37113174F3
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 15:52:27 +0000 (UTC)
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA3810D
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:52:26 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3a76d882052so781650b6e.0
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 08:52:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1692978745; x=1693583545;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WLmjnO5KUtCrD/gaeJk57IaZoZ7aWFu8I5CCnY6/uVk=;
-        b=R6cvZAQMIck6RPUCmyl9Zw+odkD7vlJth0JnJ1cOdiwb8BFhbEHzjPD6qy4ITETTf+
-         nIad62R8lauuKF51+G6yCPAGLE9vb0b1f7zNvyKAj8JHXEzAp8RWuAXjzAZDe2AVPv+n
-         oIkG7hAnu/yBTmD2xYq0FyN3a4974S+vTdLD0PnXVQVpf5T/t1JoswJjFZKS+Z5Rr5hT
-         EoM7h1DT//tsELC+xM+aBoDAx8+e0D64rFaHhLCIY/AyH6nnC7Wf4LzAAUavWefmas+o
-         nHWvQonzHt+SzmKOQfuI1iUI7exTbWG+A2VfsXVuzIQcp7sZOHiRisHIRsogTPfv7hv/
-         3MXQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D2417AD5;
+	Fri, 25 Aug 2023 16:54:04 +0000 (UTC)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47539E77;
+	Fri, 25 Aug 2023 09:54:02 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-9a1de3417acso461118866b.0;
+        Fri, 25 Aug 2023 09:54:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692978745; x=1693583545;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WLmjnO5KUtCrD/gaeJk57IaZoZ7aWFu8I5CCnY6/uVk=;
-        b=IsrayjCiykOltPNIuRvGyG3JfEhJ7iQ53FV3XXP4VKAdeMLu8g0MO2sYKvhDiYu/H2
-         45eLHfCkQ99IgJvzeX+IkbzDaSTBbBaFbIWigF8FzplRW9HHiE/rNOs4toZgcjtFKCkb
-         1ugsFFufupe/zZw5QlpMzX5NSXEZ0iFw9V5ufpPr8jnxyvFB06ksW73xksxAyPf4zKYJ
-         WFQBUfJz3c7ohBaAkE1PcsF8njQe22q/SbUuiglpyiaoB6wOkZeeoHORnyFdbeUP+hUL
-         YE2Dhzo2LcbaPGRBLJfvzhke766APHbv+cf1dHiuN73+sY8yxQDi+OPLnUaemMBgnIX1
-         N5zA==
-X-Gm-Message-State: AOJu0YwzcRI1oLggeS5OFjmrFL2dzBliCRPmD+Ze0wfdo7eWU2eFUI/5
-	TXU6AWe8troCKlWL+vuYejiZhARcbbOZiS2R8Fc=
-X-Google-Smtp-Source: AGHT+IFIKnrhO+/mOSKmEIGfhd8Cqmd61ZlIHGvyPtauitYOPh4tLbB07yfw14cg8AV7q0QhM40huQ==
-X-Received: by 2002:aca:231a:0:b0:3a8:84a9:242c with SMTP id e26-20020aca231a000000b003a884a9242cmr3029811oie.42.1692978745437;
-        Fri, 25 Aug 2023 08:52:25 -0700 (PDT)
-Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:6001:c5a2:ad40:e52a])
-        by smtp.gmail.com with ESMTPSA id bk28-20020a0568081a1c00b003a88a9af01esm856678oib.49.2023.08.25.08.52.22
+        d=1e100.net; s=20221208; t=1692982441; x=1693587241;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lP7cZ2Rz5OnDrr8sQ04GNTnuORrvKWdUu3qvHzVHGws=;
+        b=R0nO/pLGP33FZhAWAdCUIb34pLwFWWMW3oo6kXRJF4ReZR+PjGbVOB5HFnkgKfJvF9
+         BYujvycMpO4bsshZTyK9FQ97fvgBrOYCVj/gRRE3mICWHBbLGcHS97Gl9Bit6ut1kveq
+         loOmJDL4Pnupla08sfGLtgUhwHKjpOXgBG9krfmLxPKVgnloiC75X0Fb5g7etfEdQu8Y
+         wQEAsWmNVjGldghsx7TTeMQItASa/9/g6shC1YitQpsi8+gnZrZ6jk+XQwCbRolVlJdB
+         SIBni7v+vA5aD69OR+sQG2uFNe1xaBZ4NqraIv4UWQCe1qc5iacphXnYWmT2FiGeAdQx
+         H1Ew==
+X-Gm-Message-State: AOJu0YwahpJJ/hqcor9XV2MVR33B33Fy1VN23e0C3mJDZ5tqxaDIHM0S
+	gM9jDww9MhCWvVBpYAU8FhI=
+X-Google-Smtp-Source: AGHT+IEuGVqHOFGyJFWQzjtY1yWk9pBKq0Vq4sKCayTDkfjAubGXdPAXCAi5P0CQCpGGZ9/kzOdKYw==
+X-Received: by 2002:a17:906:c116:b0:993:f664:ce25 with SMTP id do22-20020a170906c11600b00993f664ce25mr19345106ejc.19.1692982440507;
+        Fri, 25 Aug 2023 09:54:00 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-003.fbsv.net. [2a03:2880:31ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id dk24-20020a170906f0d800b0099ddc81903asm1125265ejb.221.2023.08.25.09.53.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 08:52:25 -0700 (PDT)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	victor@mojatatu.com,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v2 4/4] net/sched: cls_route: make netlink errors meaningful
-Date: Fri, 25 Aug 2023 12:51:48 -0300
-Message-Id: <20230825155148.659895-5-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230825155148.659895-1-pctammela@mojatatu.com>
-References: <20230825155148.659895-1-pctammela@mojatatu.com>
+        Fri, 25 Aug 2023 09:53:59 -0700 (PDT)
+Date: Fri, 25 Aug 2023 09:53:58 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Gabriel Krisman Bertazi <krisman@suse.de>, sdf@google.com,
+	axboe@kernel.dk, asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v3 8/9] io_uring/cmd: BPF hook for getsockopt cmd
+Message-ID: <ZOjcpmlukOuEmuZ9@gmail.com>
+References: <20230817145554.892543-1-leitao@debian.org>
+ <20230817145554.892543-9-leitao@debian.org>
+ <87pm3l32rk.fsf@suse.de>
+ <6ae89b3a-b53d-dd2c-ecc6-1094f9b95586@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ae89b3a-b53d-dd2c-ecc6-1094f9b95586@linux.dev>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use netlink extended ack and parsing policies to return more meaningful
-errors instead of the relying solely on errnos.
+On Mon, Aug 21, 2023 at 01:25:25PM -0700, Martin KaFai Lau wrote:
+> On 8/17/23 12:08 PM, Gabriel Krisman Bertazi wrote:
+> > Shouldn't you call sock->ops->getsockopt for level!=SOL_SOCKET prior to
+> > running the hook?  Before this patch, it would bail out with EOPNOTSUPP,
+> > but now the bpf hook gets called even for level!=SOL_SOCKET, which
+> > doesn't fit __sys_getsockopt. Am I misreading the code?
+> I agree it should not call into bpf if the io_uring cannot support non
+> SOL_SOCKET optnames. Otherwise, the bpf prog will get different optval and
+> optlen when running in _sys_getsockopt vs io_uring getsockopt (e.g. in
+> regular _sys_getsockopt(SOL_TCP), bpf expects the optval returned from
+> tcp_getsockopt).
+> 
+> I think __sys_getsockopt can also be refactored similar to __sys_setsockopt
+> in patch 3. Yes, for non SOL_SOCKET it only supports __user *optval and
+> __user *optlen but may be a WARN_ON_ONCE/BUG_ON(sockpt_is_kernel(optval))
+> can be added before calling ops->getsockopt()? Then this details can be
+> hidden away from the io_uring.
 
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- net/sched/cls_route.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
-index 1e20bbd687f1..b34cf02c6c51 100644
---- a/net/sched/cls_route.c
-+++ b/net/sched/cls_route.c
-@@ -400,30 +400,32 @@ static int route4_set_parms(struct net *net, struct tcf_proto *tp,
- 		if (new && handle & 0x8000)
- 			return -EINVAL;
- 		to = nla_get_u32(tb[TCA_ROUTE4_TO]);
--		if (to > 0xFF)
--			return -EINVAL;
- 		nhandle = to;
- 	}
+Right, I've spent some time thinking about it, and this could be done.
+This is a draft I have. Is it what you had in mind?
+
+--
+
+diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
+index 5e3419eb267a..e39743f4ce5e 100644
+--- a/include/linux/bpf-cgroup.h
++++ b/include/linux/bpf-cgroup.h
+@@ -378,7 +378,7 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
+ ({									       \
+ 	int __ret = 0;							       \
+ 	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))			       \
+-		get_user(__ret, optlen);				       \
++		copy_from_sockptr(&__ret, optlen, sizeof(int));		       \
+ 	__ret;								       \
+ })
  
-+	if (tb[TCA_ROUTE4_FROM] && tb[TCA_ROUTE4_IIF]) {
-+		NL_SET_ERR_MSG(extack,
-+			       "'from' and 'fromif' are mutually exclusive");
-+		return -EINVAL;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 2a0324275347..24ea1719fd02 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1855,6 +1855,8 @@ int sock_setsockopt(struct socket *sock, int level, int op,
+ 		    sockptr_t optval, unsigned int optlen);
+ int do_sock_setsockopt(struct socket *sock, bool compat, int level,
+ 		       int optname, sockptr_t optval, int optlen);
++int do_sock_getsockopt(struct socket *sock, bool compat, int level,
++		       int optname, sockptr_t optval, sockptr_t optlen);
+ 
+ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		  sockptr_t optval, sockptr_t optlen);
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9370fd50aa2c..2a5f30f14f5c 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1997,14 +1997,6 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 	return 0;
+ }
+ 
+-int sock_getsockopt(struct socket *sock, int level, int optname,
+-		    char __user *optval, int __user *optlen)
+-{
+-	return sk_getsockopt(sock->sk, level, optname,
+-			     USER_SOCKPTR(optval),
+-			     USER_SOCKPTR(optlen));
+-}
+-
+ /*
+  * Initialize an sk_lock.
+  *
+diff --git a/net/socket.c b/net/socket.c
+index b5e4398a6b4d..f0d6b6b1f75e 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2290,6 +2290,40 @@ SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
+ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+ 							 int optname));
+ 
++int do_sock_getsockopt(struct socket *sock, bool compat, int level,
++		       int optname, sockptr_t optval, sockptr_t optlen)
++{
++	int max_optlen __maybe_unused;
++	int err;
++
++	err = security_socket_getsockopt(sock, level, optname);
++	if (err)
++		return err;
++
++	if (level == SOL_SOCKET) {
++		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
++	} else if (unlikely(!sock->ops->getsockopt)) {
++		err = -EOPNOTSUPP;
++	} else {
++		if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
++			      "Invalid argument type"))
++			return -EOPNOTSUPP;
++
++		err = sock->ops->getsockopt(sock, level, optname, optval.user,
++					    optlen.user);
 +	}
 +
- 	if (tb[TCA_ROUTE4_FROM]) {
--		if (tb[TCA_ROUTE4_IIF])
--			return -EINVAL;
- 		id = nla_get_u32(tb[TCA_ROUTE4_FROM]);
--		if (id > 0xFF)
--			return -EINVAL;
- 		nhandle |= id << 16;
- 	} else if (tb[TCA_ROUTE4_IIF]) {
- 		id = nla_get_u32(tb[TCA_ROUTE4_IIF]);
--		if (id > 0x7FFF)
--			return -EINVAL;
- 		nhandle |= (id | 0x8000) << 16;
- 	} else
- 		nhandle |= 0xFFFF << 16;
- 
- 	if (handle && new) {
- 		nhandle |= handle & 0x7F00;
--		if (nhandle != handle)
-+		if (nhandle != handle) {
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "Unexpected handle %x (expected %x)",
-+					   handle, nhandle);
- 			return -EINVAL;
-+		}
- 	}
- 
- 	if (!nhandle) {
-@@ -478,7 +480,6 @@ static int route4_change(struct net *net, struct sk_buff *in_skb,
- 	struct route4_filter __rcu **fp;
- 	struct route4_filter *fold, *f1, *pfp, *f = NULL;
- 	struct route4_bucket *b;
--	struct nlattr *opt = tca[TCA_OPTIONS];
- 	struct nlattr *tb[TCA_ROUTE4_MAX + 1];
- 	unsigned int h, th;
- 	int err;
-@@ -489,10 +490,12 @@ static int route4_change(struct net *net, struct sk_buff *in_skb,
- 		return -EINVAL;
- 	}
- 
--	if (opt == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tca, TCA_OPTIONS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "missing options");
- 		return -EINVAL;
++	if (!compat) {
++		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
++						     optval, optlen, max_optlen,
++						     err);
 +	}
++
++	return err;
++}
++EXPORT_SYMBOL(do_sock_getsockopt);
++
+ /*
+  *	Get a socket option. Because we don't know the option lengths we have
+  *	to pass a user mode parameter for the protocols to sort out.
+@@ -2297,35 +2331,17 @@ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+ int __sys_getsockopt(int fd, int level, int optname, char __user *optval,
+ 		int __user *optlen)
+ {
+-	int max_optlen __maybe_unused;
+ 	int err, fput_needed;
++	bool compat = in_compat_syscall();
+ 	struct socket *sock;
  
--	err = nla_parse_nested_deprecated(tb, TCA_ROUTE4_MAX, opt,
-+	err = nla_parse_nested_deprecated(tb, TCA_ROUTE4_MAX, tca[TCA_OPTIONS],
- 					  route4_policy, NULL);
- 	if (err < 0)
+ 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
+ 	if (!sock)
  		return err;
--- 
-2.39.2
-
+ 
+-	err = security_socket_getsockopt(sock, level, optname);
+-	if (err)
+-		goto out_put;
+-
+-	if (!in_compat_syscall())
+-		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
+-
+-	if (level == SOL_SOCKET)
+-		err = sock_getsockopt(sock, level, optname, optval, optlen);
+-	else if (unlikely(!sock->ops->getsockopt))
+-		err = -EOPNOTSUPP;
+-	else
+-		err = sock->ops->getsockopt(sock, level, optname, optval,
+-					    optlen);
++	err = do_sock_getsockopt(sock, compat, level, optname,
++				 USER_SOCKPTR(optval), USER_SOCKPTR(optlen));
+ 
+-	if (!in_compat_syscall())
+-		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+-						     USER_SOCKPTR(optval),
+-						     USER_SOCKPTR(optlen),
+-						     max_optlen, err);
+-out_put:
+ 	fput_light(sock->file, fput_needed);
+ 	return err;
+ }
 
