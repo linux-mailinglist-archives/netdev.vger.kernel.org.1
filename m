@@ -1,114 +1,262 @@
-Return-Path: <netdev+bounces-30665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E899788785
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 14:34:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1DA678878B
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 14:34:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D046F1C20FF7
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 12:34:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961A22817A0
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 12:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248D0CA79;
-	Fri, 25 Aug 2023 12:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F20229CC;
+	Fri, 25 Aug 2023 12:31:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181FC2772E
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 12:31:17 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B873E6B
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 05:30:49 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-52683b68c2fso1337083a12.0
-        for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 05:30:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B4C229C6;
+	Fri, 25 Aug 2023 12:31:33 +0000 (UTC)
+Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8949A199E;
+	Fri, 25 Aug 2023 05:31:07 -0700 (PDT)
+Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-5733d11894dso122677eaf.0;
+        Fri, 25 Aug 2023 05:31:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692966635; x=1693571435;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RGJySe5oV5RvT65+50/oiO7t28jIHypCcuPr0UQ4mVk=;
-        b=k/Z9BLU7irljc9SAQdIelUeKfRH/uOdl8aETiOxsEWAbA5T24oJU07WmsnVswDTL7z
-         nList5SAGKekwMimaimJ0ME1YjWpYagnwtqfzzqpRSYRph6Rh9GXSpjpnZ9NHDf8+xBK
-         UkZc0BZU+1cMPWBJXbHQ3TYVcYKYmGkCdvs/1rmUSOknGl0XZ9Oh9fpXLAZDa/AJo9Uz
-         n2wyiH3fEuepD1UmsBREDkRfLO1p87PLi3gJUPIsGvTfYnYu8wuc5i8mwmlb3ePkHtvB
-         4pRAX8UvcqipeEtzsOTPKqhQSlE5RBpJuRN9OQz+EekNqhZR/oTU50WbyIjMrtih/9jC
-         atBw==
+        d=gmail.com; s=20221208; t=1692966665; x=1693571465;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YRKIbe9km6CeNUkJxYwc6+rnZeYcY9trxyLwF4yKyMs=;
+        b=cNf6HggT6H5bB1KJUjN1N/RPS0cln1ZWWk+GyjOtOhL8NlUBcjGIZSDGUJfWvXXvmp
+         iFgtJp8lhNIIeIvHd0vBnXytgCb8/crtqQhmZPE5+Blxwq674S560hLPuxyC9XV5wYvE
+         qORTfYN93VcQbLm5rSYI9ScPRoXQSt24KSDnl+JMRuJTN7fbfNgWag6UijaCrfsIfyTp
+         UfzxYSQOR+kkc9XdND96tMNgscUp6wZaZzz9WVEu6EXCeihXIYbkT1WE9qt5daQgNiJM
+         I8fqcaNDcyGq/XyxtYiUVM63Y5dfzGmCmbHBDszn1ktkkS5DT9NJHcK1R/9R9/T+ZvPb
+         W6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692966635; x=1693571435;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGJySe5oV5RvT65+50/oiO7t28jIHypCcuPr0UQ4mVk=;
-        b=W/278nXMf20IPzobDThKFI/xEke+TsURCXRIYb7Agc6bAFAkyof/NlHTHk+XYdyTHz
-         3tusTN82N05iQax6ZOs62Xlufe6aSVs0Z4En5s4L+785PPQBCQbYcLTVTMFHdxqpNDQO
-         Fwvx81O5PD3M+5+ZDYLhi8BVrakbS9CZjXo202fELRjdCUUTWmjxZzgVbyttIeO40mHv
-         sEffCLvDxI34seyGXOQ7QxFSEFnbyZlY41PSId+BGlBe7bvl/P4QKgZPEeaICjFUhVOJ
-         0+JmMOJ1vMG1YnUiPj1JW9+lGA4KNYRvhA8z+ZSmzaHd/tk/XRZXQssnAWHMJ69Nh5Vq
-         0uiw==
-X-Gm-Message-State: AOJu0YyHLeIJTCUpIVd8fK4RC0x8gR6jetubL1MootwQ2mceJFNqcUdo
-	bsMEq4qhUeitKsje6beyDwKDVQ==
-X-Google-Smtp-Source: AGHT+IFV8ktlaz42ycnW/eurNZSB0myL1XwQezOptOEffZJu52cScVPqfwDGT9wSU8UMOUd/x9czUA==
-X-Received: by 2002:aa7:c2cd:0:b0:526:9626:e37d with SMTP id m13-20020aa7c2cd000000b005269626e37dmr13254744edp.37.1692966635044;
-        Fri, 25 Aug 2023 05:30:35 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id p8-20020aa7d308000000b005288f0e547esm967693edq.55.2023.08.25.05.30.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Aug 2023 05:30:34 -0700 (PDT)
-Message-ID: <29a968e9-9c6f-034d-35fe-71c42b5d7cbb@linaro.org>
-Date: Fri, 25 Aug 2023 14:30:32 +0200
+        d=1e100.net; s=20221208; t=1692966665; x=1693571465;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YRKIbe9km6CeNUkJxYwc6+rnZeYcY9trxyLwF4yKyMs=;
+        b=RkD3PhRtIa7CL/F8s0oORRclYpavYGVaJU+fzE4sHSgij40FC9COvGllG3xHQfx2he
+         l4Zb86KR6L3WvmSV3hIqQrf+zy7ax2ZnENDNsiwMVGAWYJsyvBfP6R54Hilo+II31Wgc
+         nj2dmEVu7A+FVXxEKyxCiT5oe5O1kmDGwdaEsw9EktUQP2wVqjiMB+h//waAM6Pqe7Ai
+         FtQC03V/gS+JDZ6cnTmOq0XIHtNfJ1gdU86Cu+swfkIEuLJDwNJDqnEy0Hl5CIi8PaRE
+         7YLKU8DvqjhYc2jhi4rYzozS2k6gTXaWaJkbu80Azuyw1sQrlrgX3DU71uWfwdzMpOCN
+         2qsg==
+X-Gm-Message-State: AOJu0YzDscsilO2qmFZkKYhhj153HQIL2aB6FdAkcD4FU4DkW7C5pKMg
+	jCRDlCB0HZy4UobPztYIno6/89bQjDJ3zTXnSKHI5rN0K6Fpyw==
+X-Google-Smtp-Source: AGHT+IH8KeaZ4JVhL35+Edw7ObMw0tKMmTAtQ95xGkfNLVLhv9B12YWfbptMfkykRKSlOllYC6ZC1UroRldmZbwhSys=
+X-Received: by 2002:a4a:bc82:0:b0:569:a08a:d9c5 with SMTP id
+ m2-20020a4abc82000000b00569a08ad9c5mr17077662oop.0.1692966665381; Fri, 25 Aug
+ 2023 05:31:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH V2 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
- reset definitions
-Content-Language: en-US
-To: Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org,
- agross@kernel.org, konrad.dybcio@linaro.org, mturquette@baylibre.com,
- sboyd@kernel.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- p.zabel@pengutronix.de, richardcochran@gmail.com, arnd@arndb.de,
- geert+renesas@glider.be, nfraprado@collabora.com, rafal@milecki.pl,
- peng.fan@nxp.com, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-Cc: quic_saahtoma@quicinc.com
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-5-quic_devipriy@quicinc.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230825091234.32713-5-quic_devipriy@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <20230824122853.3494-1-magnus.karlsson@gmail.com>
+ <20230824122853.3494-4-magnus.karlsson@gmail.com> <ZOiYOw0eSsU6dfRX@boxer>
+In-Reply-To: <ZOiYOw0eSsU6dfRX@boxer>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Fri, 25 Aug 2023 14:30:54 +0200
+Message-ID: <CAJ8uoz3LTC6XQ6SiS6KpY=bhVHgphU8_F29MzFdEvbKZKt7wtA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 03/11] selftests/xsk: add option to only run
+ tests in a single mode
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, netdev@vger.kernel.org, bpf@vger.kernel.org, yhs@fb.com, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com, 
+	haoluo@google.com, jolsa@kernel.org, przemyslaw.kitszel@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 25/08/2023 11:12, Devi Priya wrote:
-> Add NSSCC clock and reset definitions for ipq9574.
-> 
-> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> ---
->  Changes in V2:
-> 	- Referenced gcc.yaml and dropped the duplicate properties from
-> 	  the binding
-> 	- Updated Uniphy clock names
-> 	- Added nssnoc clocks and clock-names
+On Fri, 25 Aug 2023 at 14:02, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Thu, Aug 24, 2023 at 02:28:45PM +0200, Magnus Karlsson wrote:
+> > From: Magnus Karlsson <magnus.karlsson@intel.com>
+> >
+> > Add an option -m on the command line that allows the user to run the
+> > tests in a single mode instead of all of them. Valid modes are skb,
+> > drv, and zc (zero-copy). An example:
+> >
+> > To run test suite in drv mode only:
+> >
+> > ./test_xsk.sh -m drv
+> >
+> > Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> > ---
+> >  tools/testing/selftests/bpf/test_xsk.sh  | 10 ++++++-
+> >  tools/testing/selftests/bpf/xskxceiver.c | 34 +++++++++++++++++++++---
+> >  tools/testing/selftests/bpf/xskxceiver.h |  4 +--
+> >  3 files changed, 40 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
+> > index 2aa5a3445056..5ae2b3c27e21 100755
+> > --- a/tools/testing/selftests/bpf/test_xsk.sh
+> > +++ b/tools/testing/selftests/bpf/test_xsk.sh
+> > @@ -73,17 +73,21 @@
+> >  #
+> >  # Run test suite for physical device in loopback mode
+> >  #   sudo ./test_xsk.sh -i IFACE
+> > +#
+> > +# Run test suite in a specific mode only [skb,drv,zc]
+> > +#   sudo ./test_xsk.sh -m MODE
+> >
+> >  . xsk_prereqs.sh
+> >
+> >  ETH=""
+> >
+> > -while getopts "vi:d" flag
+> > +while getopts "vi:dm:" flag
+> >  do
+> >       case "${flag}" in
+> >               v) verbose=1;;
+> >               d) debug=1;;
+> >               i) ETH=${OPTARG};;
+> > +             m) XSKTEST_MODE=${OPTARG};;
+> >       esac
+> >  done
+> >
+> > @@ -153,6 +157,10 @@ if [[ $verbose -eq 1 ]]; then
+> >       ARGS+="-v "
+> >  fi
+> >
+> > +if [ -n "$XSKTEST_MODE" ]; then
+> > +     ARGS+="-m ${XSKTEST_MODE} "
+> > +fi
+> > +
+> >  retval=$?
+> >  test_status $retval "${TEST_NAME}"
+> >
+> > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+> > index 514fe994e02b..9f79c2b6aa97 100644
+> > --- a/tools/testing/selftests/bpf/xskxceiver.c
+> > +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> > @@ -107,6 +107,9 @@
+> >  static const char *MAC1 = "\x00\x0A\x56\x9E\xEE\x62";
+> >  static const char *MAC2 = "\x00\x0A\x56\x9E\xEE\x61";
+> >
+> > +static bool opt_verbose;
+> > +static enum test_mode opt_mode = TEST_MODE_ALL;
+> > +
+> >  static void __exit_with_error(int error, const char *file, const char *func, int line)
+> >  {
+> >       ksft_test_result_fail("[%s:%s:%i]: ERROR: %d/\"%s\"\n", file, func, line, error,
+> > @@ -310,17 +313,19 @@ static struct option long_options[] = {
+> >       {"interface", required_argument, 0, 'i'},
+> >       {"busy-poll", no_argument, 0, 'b'},
+> >       {"verbose", no_argument, 0, 'v'},
+> > +     {"mode", required_argument, 0, 'm'},
+> >       {0, 0, 0, 0}
+> >  };
+> >
+> >  static void usage(const char *prog)
+> >  {
+> >       const char *str =
+> > -             "  Usage: %s [OPTIONS]\n"
+> > +             "  Usage: xskxceiver [OPTIONS]\n"
+> >               "  Options:\n"
+> >               "  -i, --interface      Use interface\n"
+> >               "  -v, --verbose        Verbose output\n"
+> > -             "  -b, --busy-poll      Enable busy poll\n";
+> > +             "  -b, --busy-poll      Enable busy poll\n"
+> > +             "  -m, --mode           Run only mode skb, drv, or zc\n";
+> >
+> >       ksft_print_msg(str, prog);
+> >  }
+> > @@ -342,7 +347,7 @@ static void parse_command_line(struct ifobject *ifobj_tx, struct ifobject *ifobj
+> >       opterr = 0;
+> >
+> >       for (;;) {
+> > -             c = getopt_long(argc, argv, "i:vb", long_options, &option_index);
+> > +             c = getopt_long(argc, argv, "i:vbm:", long_options, &option_index);
+> >               if (c == -1)
+> >                       break;
+> >
+> > @@ -371,6 +376,21 @@ static void parse_command_line(struct ifobject *ifobj_tx, struct ifobject *ifobj
+> >                       ifobj_tx->busy_poll = true;
+> >                       ifobj_rx->busy_poll = true;
+> >                       break;
+> > +             case 'm':
+> > +                     if (!strncmp("skb", optarg, min_t(size_t, strlen(optarg),
+> > +                                                       strlen("skb")))) {
+> > +                             opt_mode = TEST_MODE_SKB;
+> > +                     } else if (!strncmp("drv", optarg, min_t(size_t, strlen(optarg),
+> > +                                                              strlen("drv")))) {
+> > +                             opt_mode = TEST_MODE_DRV;
+> > +                     } else if (!strncmp("zc", optarg, min_t(size_t, strlen(optarg),
+> > +                                                             strlen("zc")))) {
+> > +                             opt_mode = TEST_MODE_ZC;
+> > +                     } else {
+> > +                             usage(basename(argv[0]));
+> > +                             ksft_exit_xfail();
+> > +                     }
+> > +                     break;
+> >               default:
+> >                       usage(basename(argv[0]));
+> >                       ksft_exit_xfail();
+> > @@ -2365,9 +2385,15 @@ int main(int argc, char **argv)
+> >       test.tx_pkt_stream_default = tx_pkt_stream_default;
+> >       test.rx_pkt_stream_default = rx_pkt_stream_default;
+> >
+> > -     ksft_set_plan(modes * TEST_TYPE_MAX);
+> > +     if (opt_mode == TEST_MODE_ALL)
+> > +             ksft_set_plan(modes * TEST_TYPE_MAX);
+> > +     else
+> > +             ksft_set_plan(TEST_TYPE_MAX);
+>
+> what will happen if i run zc mode for a device that does not support it?
+> what will happen if i run xdp mode for a device that does not support it?
+>
+> I know we will do nothing and exit gracefully, but i am wondering if
+> xskxceiver should catch it.
 
+Hmm, yes it would be nicer just to get a message that zc or drv is not
+supported than that it does nothing. I can add two if statements for
+this if you like? We do have the information already at this point.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Rob's bot report is a result of patch #2 failing to apply.
-
-Best regards,
-Krzysztof
-
+> >
+> >       for (i = 0; i < modes; i++) {
+> > +             if (opt_mode != TEST_MODE_ALL && i != opt_mode)
+> > +                     continue;
+> > +
+> >               for (j = 0; j < TEST_TYPE_MAX; j++) {
+> >                       test_spec_init(&test, ifobj_tx, ifobj_rx, i);
+> >                       run_pkt_test(&test, i, j);
+> > diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
+> > index 233b66cef64a..1412492e9618 100644
+> > --- a/tools/testing/selftests/bpf/xskxceiver.h
+> > +++ b/tools/testing/selftests/bpf/xskxceiver.h
+> > @@ -63,7 +63,7 @@ enum test_mode {
+> >       TEST_MODE_SKB,
+> >       TEST_MODE_DRV,
+> >       TEST_MODE_ZC,
+> > -     TEST_MODE_MAX
+> > +     TEST_MODE_ALL
+> >  };
+> >
+> >  enum test_type {
+> > @@ -98,8 +98,6 @@ enum test_type {
+> >       TEST_TYPE_MAX
+> >  };
+> >
+> > -static bool opt_verbose;
+> > -
+> >  struct xsk_umem_info {
+> >       struct xsk_ring_prod fq;
+> >       struct xsk_ring_cons cq;
+> > --
+> > 2.34.1
+> >
 
