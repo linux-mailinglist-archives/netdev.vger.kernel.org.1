@@ -1,185 +1,88 @@
-Return-Path: <netdev+bounces-30568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0B45788121
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:43:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F53078813C
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 09:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F7EC28173E
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 07:42:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8055B281715
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 07:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA401FA8;
-	Fri, 25 Aug 2023 07:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386D81FD3;
+	Fri, 25 Aug 2023 07:49:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAB217FC
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 07:42:57 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D140E6A;
-	Fri, 25 Aug 2023 00:42:55 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id A82D086824;
-	Fri, 25 Aug 2023 09:42:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1692949373;
-	bh=GIqC9Xv384AEKjzYxVeUMeLxfZbuNJ6onBjh++8s48U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k5dCYTGsrkBunazjaC+Ml4N/V7NfK1RQX2Egrqq0Kr8wMSFStnYN2+krulSLH/6p3
-	 cfw0fyyifAIjjw0u9KeFw1cNHSA/QkGNu/qvBinMRKVEqkIpWX6cFrcB/E4IQNYtXk
-	 1JUsOzw8ykjB9mLE36NC+9sor3uK+ut6GWtMx3taEscB/1MTm0ENB7Q8qUzIf8yvjs
-	 UrzYABsfOD27gYwLKCWOkQfsF30XR3KfdZw0WiPE0F2uoTxQJZEdTj65T64xrNOJ7C
-	 il3Nhj9KyRzBIsDWpoAgIBBkhr0pU6glI4dZLuJeeWMRtEnM0VIJOUeF/9c7LXsj/K
-	 U7X5IRwa4jWBg==
-Date: Fri, 25 Aug 2023 09:42:46 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477
- errata (DS80000754C)
-Message-ID: <20230825094246.211a4898@wsk>
-In-Reply-To: <9504d420-c137-2fde-312d-2c8e6f84ddd1@gmail.com>
-References: <20230824154827.166274-1-lukma@denx.de>
-	<20230824154827.166274-2-lukma@denx.de>
-	<9504d420-c137-2fde-312d-2c8e6f84ddd1@gmail.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298F21FC9
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 07:49:26 +0000 (UTC)
+Received: from smtpbg153.qq.com (smtpbg153.qq.com [13.245.218.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67BF12109
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 00:49:13 -0700 (PDT)
+X-QQ-mid:Yeas48t1692949617t909t24556
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [60.177.96.73])
+X-QQ-SSF:00400000000000F0FRF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 16920672897235981624
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <netdev@vger.kernel.org>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<Jose.Abreu@synopsys.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<mengyuanlou@net-swift.com>
+References: <20230823061935.415804-1-jiawenwu@trustnetic.com> <20230823061935.415804-8-jiawenwu@trustnetic.com> <7d999689-cea9-4e66-8807-a04eb9ad4cb5@lunn.ch> <039101d9d62e$c97b21f0$5c7165d0$@trustnetic.com> <8b142b43-65fa-465b-aa41-bd2200e71c63@lunn.ch>
+In-Reply-To: <8b142b43-65fa-465b-aa41-bd2200e71c63@lunn.ch>
+Subject: RE: [PATCH net-next v3 7/8] net: txgbe: support copper NIC with external PHY
+Date: Fri, 25 Aug 2023 15:46:56 +0800
+Message-ID: <042201d9d728$52af63b0$f80e2b10$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/X5uYKu_bpYe++gKJ4hIqhg7";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQLjS4V8x90Nevlz1qgYPpmCd0AswgJrx3vJAVCl4+cBaEK6jQGoDBvmrbE1ErA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/X5uYKu_bpYe++gKJ4hIqhg7
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thursday, August 24, 2023 9:02 PM, Andrew Lunn wrote:
+> On Thu, Aug 24, 2023 at 10:00:41AM +0800, Jiawen Wu wrote:
+> > On Wednesday, August 23, 2023 11:36 PM, Andrew Lunn wrote:
+> > > > +static int txgbe_phy_read(struct mii_bus *bus, int phy_addr,
+> > > > +			  int devnum, int regnum)
+> > >
+> > > There is a general pattern to use the postfix _c45 for the method that
+> > > implements C45 access. Not a must, just a nice to have.
+> > >
+> > > Does this bus master not support C22 at all?
+> >
+> > It supports C22.
+> 
+> I was looking at how the two MDIO bus master implementations
+> differ. Once difference is a register write to set C22/C45, which this
+> code does not have. The second change appears to be a clock setting.
+> 
+> If you added C22, do the two become more similar? Should this actually
+> be one implementation in the library?
 
-On Thu, 24 Aug 2023 08:54:37 -0700
-Florian Fainelli <f.fainelli@gmail.com> wrote:
+Yes, it could be moved to libwx for txgbe/ngbe. I will send a patch later to implement it.
 
-> On 8/24/2023 8:48 AM, Lukasz Majewski wrote:
-> > The KSZ9477 errata points out the link up/down problem when EEE is
-> > enabled in the device to which the KSZ9477 tries to auto negotiate.
-> >=20
-> > The suggested workaround is to clear advertisement EEE registers
-> > (accessed as per port MMD one).
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> >   drivers/net/dsa/microchip/ksz9477.c | 40
-> > ++++++++++++++++++++++++++++- 1 file changed, 39 insertions(+), 1
-> > deletion(-)
-> >=20
-> > diff --git a/drivers/net/dsa/microchip/ksz9477.c
-> > b/drivers/net/dsa/microchip/ksz9477.c index
-> > cb6aa7c668a8..563f497ba656 100644 ---
-> > a/drivers/net/dsa/microchip/ksz9477.c +++
-> > b/drivers/net/dsa/microchip/ksz9477.c @@ -1128,6 +1128,44 @@ int
-> > ksz9477_enable_stp_addr(struct ksz_device *dev) return 0;
-> >   }
-> >  =20
-> > +static int ksz9477_errata(struct dsa_switch *ds)
-> > +{
-> > +	struct ksz_device *dev =3D ds->priv;
-> > +	u16 val;
-> > +	int p;
-> > +
-> > +	/* KSZ9477 Errata DS80000754C
-> > +	 *
-> > +	 * Module 4: Energy Efficient Ethernet (EEE) feature
-> > select must be
-> > +	 * manually disabled
-> > +	 *   The EEE feature is enabled by default, but it is not
-> > fully
-> > +	 *   operational. It must be manually disabled through
-> > register
-> > +	 *   controls. If not disabled, the PHY ports can
-> > auto-negotiate
-> > +	 *   to enable EEE, and this feature can cause link drops
-> > when linked
-> > +	 *   to another device supporting EEE.
-> > +	 *
-> > +	 *   Only PHY ports (dsa user) [0-4] need to have the EEE
-> > advertisement
-> > +	 *   bits cleared.
-> > +	 */
-> > +
-> > +	for (p =3D 0; p < ds->num_ports; p++) {
-> > +		if (!dsa_is_user_port(ds, p))
-> > +			continue;
-> > +
-> > +		ksz9477_port_mmd_read(dev, p,
-> > MMD_DEVICE_ID_EEE_ADV,
-> > +				      MMD_EEE_ADV, &val, 1);
-> > +
-> > +		pr_err("%s: PORT: %d val: 0x%x pc: %d\n",
-> > __func__, p, val,
-> > +		       ds->num_ports); =20
->=20
-> Left over debugging?
->=20
-
-Yes, correct - I will fix it.
-
-> > +
-> > +		val &=3D ~(EEE_ADV_100MBIT | EEE_ADV_1GBIT);
-> > +		ksz9477_port_mmd_write(dev, p,
-> > MMD_DEVICE_ID_EEE_ADV,
-> > +				       MMD_EEE_ADV, &val, 1);
-> > +	}
-> > +
-> > +	return 0; =20
->=20
-> You don't propagate any error, so make this return void?
-
-I will fix this too.
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/X5uYKu_bpYe++gKJ4hIqhg7
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmToW3YACgkQAR8vZIA0
-zr13rQgAodpJW/I8pztGdsV0lEkJ0kEYvyxD3TJoLaVUfK7kDwsenxyKcV6ggeCE
-katdjiNpQvjPMQR2MC1Dkz1wAGSVD+b6vqykHygF6IKPd5oS5lesVV+emAo0qbXV
-gXKEwMsLQ2nbjrp6z/ZikvSFvtZujny0ez4PLXnijf0tOfHEixiVGd23e15UvN8B
-i3fmq3zOXa5tq0i4J2/J94ll8h3iHsGreYIzWr9aXpdlxzQvgM629FPa3KmchXbk
-HVbV7SIeG8qbNwHdkft4FszAui/mLCqb6Aia4bO619+1N3yZhLzbpdTLPZIMZSi8
-B9mpiPFnLSu9YPIJMSwbPYnt4C+skQ==
-=RxGt
------END PGP SIGNATURE-----
-
---Sig_/X5uYKu_bpYe++gKJ4hIqhg7--
 
