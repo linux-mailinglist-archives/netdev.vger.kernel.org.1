@@ -1,81 +1,105 @@
-Return-Path: <netdev+bounces-30677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80CB078882F
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:14:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE76C788837
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 15:16:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B068A1C20F3D
-	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 13:14:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7FC6281809
+	for <lists+netdev@lfdr.de>; Fri, 25 Aug 2023 13:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C06D523;
-	Fri, 25 Aug 2023 13:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90133D529;
+	Fri, 25 Aug 2023 13:16:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2797DCA79
-	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 13:14:28 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 683AD1FD3;
-	Fri, 25 Aug 2023 06:14:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=WcztSKj5cpoHARaecgwtq07bIuRdK/t/+wgohiVvEWU=; b=Aw
-	6BcijSAGACN5JRCAIn4fHKk7BGfUG1q8Fnh6pgmgpQEhmOoEhI6lmHbsuJ6mniOKKWwhfpJhHG/vE
-	8Zv3o7RvhrvaJnVdmPaRRgf0qBi7Vcwp3RnfuiUg8Xbl1wuqt0dLkE67TfGMMdS+Tpdg+1KlB9BzN
-	aBuZtFplTKNbSuw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qZWdg-0055lW-Rs; Fri, 25 Aug 2023 15:14:12 +0200
-Date: Fri, 25 Aug 2023 15:14:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, airat.gl@gmail.com
-Subject: Re: [PATCH net] dt-bindings: net: dsa: marvell: fix wrong model in
- compatibility list
-Message-ID: <f9889926-a20a-4002-9e8b-2735a24f9c51@lunn.ch>
-References: <20230825082027.18773-1-alexis.lothore@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44361AD5C
+	for <netdev@vger.kernel.org>; Fri, 25 Aug 2023 13:16:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE85C433C7;
+	Fri, 25 Aug 2023 13:16:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1692969373;
+	bh=rc6EOAIAqN+MG5yLa2BM8K075X9y9wYSgScNSMQ//Rs=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=SwIoIzKn8+DIepzA0Y6ZfEuhkKbHxLFPztwBiBVNnrQ1VQ/IP+pi9GrT+7BrUwRtY
+	 2rQkV86WSH3Dy1n4j4Cc9B8UJzAm0tqeeLL6lcyu2H4/SZh1yv0V/BNazmDoUOhV96
+	 L3/8ZDxvxSBigyNkYxyZpQWAIReVOtxdK2rmNFnuQn5rOdiw7vZbpGn9gmjILY4Wfx
+	 pJLwfQ12QOlXZzQF5TzhI3XCueD98kpvWBTPgpY5xo+dmUTHvBWQiKpv7kng8p3XNA
+	 x0FXLrQz4M4m12ZLZpadQMiKndgkPvs7xyX2xBgsfYcvhmgu/F1HgOL5DJxCB7Pgb7
+	 nSR3YZej8ZJkg==
+Message-ID: <55079677-9139-2f68-fe4c-053020b6f33f@kernel.org>
+Date: Fri, 25 Aug 2023 15:16:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: hawk@kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Geetha sowjanya <gakula@marvell.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ hariprasad <hkelam@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Qingfang DENG <qingfang.deng@siflower.com.cn>
+Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
+Content-Language: en-US
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ netdev@vger.kernel.org, Ratheesh Kannoth <rkannoth@marvell.com>
+References: <20230823094757.gxvCEOBi@linutronix.de>
+ <d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230825082027.18773-1-alexis.lothore@bootlin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 10:20:27AM +0200, Alexis Lothor� wrote:
-> From: Alexis Lothor� <alexis.lothore@bootlin.com>
+
+
+On 23/08/2023 21.45, Jesper Dangaard Brouer wrote:
+> On 23/08/2023 11.47, Sebastian Andrzej Siewior wrote:
+[...]
+>>
+>> This breaks in octeontx2 where a worker is used to fill the buffer:
+>>    otx2_pool_refill_task() -> otx2_alloc_rbuf() -> __otx2_alloc_rbuf() ->
+>>    otx2_alloc_pool_buf() -> page_pool_alloc_frag().
+>>
 > 
-> Fix wrong switch name in compatibility list. 88E6163 switch does not exist
-> and is in fact 88E6361
+> This seems problematic! - this is NOT allowed.
 > 
-> Fixes: 9229a9483d80 ("dt-bindings: net: dsa: marvell: add MV88E6361 switch to compatibility list")
-> Signed-off-by: Alexis Lothor� <alexis.lothore@bootlin.com>
+> But otx2_pool_refill_task() is a work-queue, and I though it runs in
+> process-context.  This WQ process is not allowed to use the lockless PP
+> cache.  This seems to be a bug!
+> 
+> The problematic part is otx2_alloc_rbuf() that disables BH:
+> 
+>   int otx2_alloc_rbuf(struct otx2_nic *pfvf, struct otx2_pool *pool,
+>              dma_addr_t *dma)
+>   {
+>      int ret;
+> 
+>      local_bh_disable();
+>      ret = __otx2_alloc_rbuf(pfvf, pool, dma);
+>      local_bh_enable();
+>      return ret;
+>   }
+> 
+> The fix, can be to not do this local_bh_disable() in this driver?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Correcting myself. It is not a fix to remove this local_bh_disable().
+(which is obvious now I read the code again).
 
-    Andrew
+This WQ process is not allowed to use the page_pool_alloc() API this way
+(from a work-queue).  The PP alloc-side API must only be used under NAPI
+protection.  Thanks for spotting this Sebastian!
+
+Will/can any of the Cc'ed Marvell people work on a fix?
+
+--Jesper
 
