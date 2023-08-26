@@ -1,184 +1,170 @@
-Return-Path: <netdev+bounces-30870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3575978965A
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 13:54:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9760D7896E9
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 15:32:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62C691C21064
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 11:54:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48D86281883
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 13:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4331ED52D;
-	Sat, 26 Aug 2023 11:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFE3DDC1;
+	Sat, 26 Aug 2023 13:32:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D2A2F30;
-	Sat, 26 Aug 2023 11:54:08 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F03C2123;
-	Sat, 26 Aug 2023 04:54:06 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RXw9h2q8zztRqF;
-	Sat, 26 Aug 2023 19:50:16 +0800 (CST)
-Received: from [10.174.176.93] (10.174.176.93) by
- canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Sat, 26 Aug 2023 19:54:03 +0800
-Message-ID: <389e52fe-13e9-4ded-bfb0-fcffea9b1cbf@huawei.com>
-Date: Sat, 26 Aug 2023 19:54:02 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8EFCA58
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 13:32:21 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9554D2114
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:32:20 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-500b3f7f336so196720e87.1
+        for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:32:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693056739; x=1693661539;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IkJ7s8OrsLy9BfgJwAFkbNy+c764NK4QgxuZUl0LtFo=;
+        b=bUcLauVa3UalyuzHJnik09YWrDw/DeI+/Ao3YFhMPPx9zWGHjn71E0vHNj2inQe6WO
+         r26MvoC7HE+ISnOssAMaHidPPi0j8ZsPrAAoB39t0tjH4jGZ4qngR0p/QMqosPvwID3t
+         +Z+bb1rHxw6RByu6rw2yCKU6hF5Wo+KZuO6+3D2Gteo7zLjCIwDdYsuALuSKU+oGDd3y
+         RssbsMa1FYxf7oq2/S7afqVVWhWgE0KuMhE3rHf/U5xnjZvLI3gqp7cu0gEaPiu5TJhl
+         2O7rav7xd339Vd2pGMA2xga+2HkTuPucLKF24jjjVxzQnBxeSfbcytPHsQG7F87Ddq9C
+         n4JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693056739; x=1693661539;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IkJ7s8OrsLy9BfgJwAFkbNy+c764NK4QgxuZUl0LtFo=;
+        b=aWG81rJGaB+K8pIkUUUZ5674x742S74ZuvU9xz3pg1/rb24Fp40lqIF5snbMTVqb8j
+         F7AD2mJbTjzYOJmpefqXPD5il6b6GyWyz9VqlI47B0tnbLEpmA0l+txgmCl8jQ1GsSUJ
+         MweNt6sODCFRzDJuXN19u9/xQnfyZEGYfBXXcU08IrAfyeLGzE3tM+nWG5GxPNwBW46O
+         6pcxNl5NLZHJatM7u2gLNqP+4UZFPxxvjUT8ghedpTU+V5U/AJ4m2emqVMU7GJMUUk1b
+         IfNU6OeRzQhNHzagqzvrz91yQKi6VR+JsPwv/eP9EpetWPO72cSHpa5uladfdxzLySoS
+         pAVg==
+X-Gm-Message-State: AOJu0Yw7z0woxvj/N8sVR5DrM7q5XxQbW81BvqXZsol4D5ThawmqjvuF
+	CLxPb91sX2KG0GlYEgq+gP4=
+X-Google-Smtp-Source: AGHT+IER9+Ix/5U4zo/mvxWZ8NAT0EXTNAoaCbHNthqYpZAi1xLAQEQ/2uTxn94TPquRaZnTHv7tdA==
+X-Received: by 2002:a05:6512:1042:b0:4fe:d0f:1f1e with SMTP id c2-20020a056512104200b004fe0d0f1f1emr18744343lfb.25.1693056738553;
+        Sat, 26 Aug 2023 06:32:18 -0700 (PDT)
+Received: from mobilestation ([95.79.200.178])
+        by smtp.gmail.com with ESMTPSA id x2-20020ac25dc2000000b004fe39f31dc7sm715616lfq.294.2023.08.26.06.32.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Aug 2023 06:32:17 -0700 (PDT)
+Date: Sat, 26 Aug 2023 16:32:15 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Feiyang Chen <chenfeiyang@loongson.cn>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 08/10] net: stmmac: move xgmac specific phylink
+ caps to dwxgmac2 core
+Message-ID: <rpwsyyjdzeixx3f7o3pxeslyff7yc3fuutm436ygjggoyiwjcb@7s3skg627mid>
+References: <ZOddFH22PWmOmbT5@shell.armlinux.org.uk>
+ <E1qZAXd-005pUP-JL@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH bpf-next v3 1/7] bpf, sockmap: add BPF_F_PERMANENT flag
- for skmsg redirect
-To: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki
-	<jakub@cloudflare.com>
-CC: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
-	<martin.lau@linux.dev>, <song@kernel.org>, <yonghong.song@linux.dev>,
-	<kpsingh@kernel.org>, <sdf@google.com>, <haoluo@google.com>,
-	<jolsa@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20230824143959.1134019-1-liujian56@huawei.com>
- <20230824143959.1134019-2-liujian56@huawei.com>
- <87r0nr5j0a.fsf@cloudflare.com> <64e95611f1b33_1d0032088c@john.notmuch>
-From: "liujian (CE)" <liujian56@huawei.com>
-In-Reply-To: <64e95611f1b33_1d0032088c@john.notmuch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.176.93]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1qZAXd-005pUP-JL@rmk-PC.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Aug 24, 2023 at 02:38:29PM +0100, Russell King (Oracle) wrote:
+> Move the xgmac specific phylink capabilities to the dwxgmac2 support
+> core.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 10 ++++++++++
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 10 ----------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> index 34e1b0c3f346..f352be269deb 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> @@ -47,6 +47,14 @@ static void dwxgmac2_core_init(struct mac_device_info *hw,
+>  	writel(XGMAC_INT_DEFAULT_EN, ioaddr + XGMAC_INT_EN);
+>  }
+>  
+> +static void xgmac_phylink_get_caps(struct stmmac_priv *priv)
+> +{
+> +	priv->phylink_config.mac_capabilities |= MAC_2500FD | MAC_5000FD |
+> +						 MAC_10000FD | MAC_25000FD |
+> +						 MAC_40000FD | MAC_50000FD |
+> +						 MAC_100000FD;
+> +}
+> +
+>  static void dwxgmac2_set_mac(void __iomem *ioaddr, bool enable)
+>  {
+>  	u32 tx = readl(ioaddr + XGMAC_TX_CONFIG);
+> @@ -1490,6 +1498,7 @@ static void dwxgmac3_fpe_configure(void __iomem *ioaddr, u32 num_txq,
+>  
+>  const struct stmmac_ops dwxgmac210_ops = {
+>  	.core_init = dwxgmac2_core_init,
 
+> +	.phylink_get_caps = xgmac_phylink_get_caps,
 
-On 2023/8/26 9:32, John Fastabend wrote:
-> Jakub Sitnicki wrote:
->> On Thu, Aug 24, 2023 at 10:39 PM +08, Liu Jian wrote:
->>> If the sockmap msg redirection function is used only to forward packets
->>> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
->>> program is the same each time. In this case, the BPF program only needs to
->>> be run once. Add BPF_F_PERMANENT flag to bpf_msg_redirect_map() and
->>> bpf_msg_redirect_hash() to implement this ability.
->>>
->>> Then we can enable this function in the bpf program as follows:
->>> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENT);
->>>
->>> Test results using netperf  TCP_STREAM mode:
->>> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
->>> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
->>> done
->>>
->>> before:
->>> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
->>> after:
->>> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
->>>
->>> Signed-off-by: Liu Jian <liujian56@huawei.com>
-> 
-> [...]
-> 
->>>   /* BPF_FUNC_skb_set_tunnel_key and BPF_FUNC_skb_get_tunnel_key flags. */
->>> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
->>> index a29508e1ff35..df1443cf5fbd 100644
->>> --- a/net/core/skmsg.c
->>> +++ b/net/core/skmsg.c
->>> @@ -885,6 +885,11 @@ int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
->>>   			goto out;
->>>   		}
->>>   		psock->redir_ingress = sk_msg_to_ingress(msg);
->>> +		if (!msg->apply_bytes && !msg->cork_bytes)
->>> +			psock->redir_permanent =
->>> +				msg->flags & BPF_F_PERMANENT;
->>> +		else
->>> +			psock->redir_permanent = false;
->>
->> Above can be rewritten as:
->>
->> 		psock->redir_permanent = !msg->apply_bytes &&
->> 					 !msg->cork_bytes &&
->> 					 (msg->flags & BPF_F_PERMANENT);
->>
->> But as I wrote earlier, I don't think it's a good idea to ignore the
->> flag. We can detect this conflict at the time the bpf_msg_sk_redirect_*
->> helper is called and return an error.
->>
->> Naturally that means that that bpf_msg_{cork,apply}_bytes helpers need
->> to be adjusted to return an error if BPF_F_PERMANENT has been set.
-> 
-> So far we've not really done much to protect a user from doing
-> rather silly things. The following will all do something without
-> errors,
-> 
->    bpf_msg_apply_bytes()
->    bpf_msg_apply_bytes() <- reset apply bytes
-> 
->    bpf_msg_cork_bytes()
->    bpf_msg_cork_bytes() <- resets cork byte
-> 
-> also,
-> 
->    bpf_msg_redirect(..., BPF_F_INGRESS);
->    bpf_msg_redirect(..., 0); <- resets sk_redir and flags
-> 
-> maybe there is some valid reason to even do above if further parsing
-> identifies some reason to redirect to a alert socket or something.
-> 
-> My original thinking was in the interest of not having a bunch of
-> extra checks for performance reasons we shouldn't add guard rails
-> unless something really unexpected might happen like a kernel
-> panic or what not.
-> 
-> This does feel a bit different though because before we
-> didn't have calls that could impact other calls. My best idea
-> is to just create a precedence and follow it. I would propose,
-> 
-> 'If BPF_F_PERMANENT is set apply_bytes and cork_bytes are
->   ignored.'
-> 
-I think it's better.
-Both low-priority or high-priority are ok for me. But I think it's 
-better that BPF_F_PERMANENT has a low priority. Because BPF_F_PERMANEN 
-is only for performance, and apply_bytes or cork_bytes may be used to a 
-user logic function.
+This doesn't look correct. DW XGMAC doesn't support 25/40/50/100Gbps
+speeds.
 
-> The other direction (what is above?) has a bit of an inconsistency
-> where these two flows are different?
+>  	.set_mac = dwxgmac2_set_mac,
+>  	.rx_ipc = dwxgmac2_rx_ipc,
+>  	.rx_queue_enable = dwxgmac2_rx_queue_enable,
+> @@ -1551,6 +1560,7 @@ static void dwxlgmac2_rx_queue_enable(struct mac_device_info *hw, u8 mode,
+>  
+>  const struct stmmac_ops dwxlgmac2_ops = {
+>  	.core_init = dwxgmac2_core_init,
+
+> +	.phylink_get_caps = xgmac_phylink_get_caps,
+
+This is ok.
+
+-Serge(y)
+
+>  	.set_mac = dwxgmac2_set_mac,
+>  	.rx_ipc = dwxgmac2_rx_ipc,
+>  	.rx_queue_enable = dwxlgmac2_rx_queue_enable,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 0b02845e7e9d..5cf8304564c6 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -1227,16 +1227,6 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+>  	/* Get the MAC specific capabilities */
+>  	stmmac_mac_phylink_get_caps(priv);
+>  
+> -	if (priv->plat->has_xgmac) {
+> -		priv->phylink_config.mac_capabilities |= MAC_2500FD;
+> -		priv->phylink_config.mac_capabilities |= MAC_5000FD;
+> -		priv->phylink_config.mac_capabilities |= MAC_10000FD;
+> -		priv->phylink_config.mac_capabilities |= MAC_25000FD;
+> -		priv->phylink_config.mac_capabilities |= MAC_40000FD;
+> -		priv->phylink_config.mac_capabilities |= MAC_50000FD;
+> -		priv->phylink_config.mac_capabilities |= MAC_100000FD;
+> -	}
+> -
+>  	/* Half-Duplex can only work with single queue */
+>  	if (priv->plat->tx_queues_to_use > 1)
+>  		priv->phylink_config.mac_capabilities &=
+> -- 
+> 2.30.2
 > 
->    bpf_apply_bytes()
->    bpf_msg_redirect(..., BPF_F_PERMANENT)
 > 
-> and
-> 
->    bpf_msg_redirect(..., BPF_F_PERMANENT)
->    bpf_apply_bytes()
-> 
-> It would be best if order of operations doesn't change the
-> outcome because that starts to get really hard to reason about.
-> 
-> This avoids having to add checks all over the place and then
-> if users want we could give some mechanisms to read apply
-> and cork bytes so people could write macros over those if
-> they really want the hard error.
-> 
-> WDYT?
-> 
-> [...]
-> 
-> Thanks!
 
