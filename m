@@ -1,51 +1,47 @@
-Return-Path: <netdev+bounces-30823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069A87892C8
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 02:49:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BCBE7892CE
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 02:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B0351C210AC
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:49:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163B128196A
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2666818D;
-	Sat, 26 Aug 2023 00:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63FD381;
+	Sat, 26 Aug 2023 00:54:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55AF37F
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 00:49:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09DF6C433C8;
-	Sat, 26 Aug 2023 00:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A802637F
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 00:54:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC56C433C8;
+	Sat, 26 Aug 2023 00:54:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693010966;
-	bh=uyTnossv5zy8IIZE2b01UOp7U3twIuBpWTgg0kk/pu0=;
+	s=k20201202; t=1693011298;
+	bh=/yywbGq6ACHFhnVK1HEPC1x6NEHvjwMXNT4AE6QpBpc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jVlvc2bgSKSzABlWdyrHFV2Z2DkrR+oNjcFKNtLU7iZZBNz81TnVvLb8aJ2yDiOV9
-	 WqPB8CmKX9xafbX+vl86HFR4+65VDAqnLyHw/HwA420MyX3WuKh8Fn31+2QiL9Akxn
-	 Stzq/ziOYK5PEvuaZV9LHWjqagYHq9tsJ1WeDA+Qaf11K9z8f/TCtCmE1H+UYWzCmX
-	 qp8IgI+DiR5B5br4iA+c4Ud+qlhUAUOF5i4HhKAys/8m6XTxiKMacEdwnDx2AvPXjJ
-	 9dBzLvrW2FKh4UbVW6fxsuOwh8isqs9mtVMeeHcoao4WZoEvSSSkEJYcGJC9pVGhzJ
-	 2Op5NwJsU2xLw==
-Date: Fri, 25 Aug 2023 17:49:25 -0700
+	b=TeWq8O4es9uTN7wHQKmtKLZwe41v4hN/Yrigp2WZf+YdtRtAkvpx+lCIkdJ6DWI4w
+	 4SoI9qSjI0htVCG97rEOx2Q9EDFJGrVIgAtJ55IA+v2TQIKIS87jMQGfe56DAQ/ZBS
+	 TKKIfmiDlD2ca3U65flk4CUWZmzx6s2ya6dfGt18eKdHpG4NNFA0lzlwXlEiHi8/aK
+	 ALCxB4Ot3xFqCu5zaK60qeIygX4zimv17ukrTDXw87qPUXdJ5ssl1dtzXHojB2xQuD
+	 U2x7nyJk3PlMEEepqJeGXjFghAbpd6JierHd1P9vgQc6JUi4mTzh3HxiPoWtw10dwL
+	 lC3qhVSTYfuNw==
+Date: Fri, 25 Aug 2023 17:54:56 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: <netdev@vger.kernel.org>, <jesse.brandeburg@intel.com>,
- <anthony.l.nguyen@intel.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>
-Subject: Re: [RFC PATCH net-next 1/3] net: ethtool: add symmetric Toeplitz
- RSS hash function
-Message-ID: <20230825174925.45ea6ee5@kernel.org>
-In-Reply-To: <eed1f254-3ba1-6157-fe51-f9d230a770a9@intel.com>
-References: <20230823164831.3284341-1-ahmed.zaki@intel.com>
-	<20230823164831.3284341-2-ahmed.zaki@intel.com>
-	<20230824111455.686e98b4@kernel.org>
-	<849341ef-b0f4-d93f-1420-19c75ebf82b2@intel.com>
-	<20230824174336.6fb801d5@kernel.org>
-	<eed1f254-3ba1-6157-fe51-f9d230a770a9@intel.com>
+To: "Drewek, Wojciech" <wojciech.drewek@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+ <przemyslaw.kitszel@intel.com>, "idosch@nvidia.com" <idosch@nvidia.com>
+Subject: Re: [PATCH iwl-next v2] ice: Disable Cage Max Power override
+Message-ID: <20230825175456.44051773@kernel.org>
+In-Reply-To: <MW4PR11MB57768054635E8DEF841BB2A9FDE3A@MW4PR11MB5776.namprd11.prod.outlook.com>
+References: <20230824085459.35998-1-wojciech.drewek@intel.com>
+	<20230824083201.79f79513@kernel.org>
+	<MW4PR11MB57768054635E8DEF841BB2A9FDE3A@MW4PR11MB5776.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,44 +51,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 25 Aug 2023 14:46:42 -0600 Ahmed Zaki wrote:
-> > I'm just trying to help, if you want a single knob you'd need to add
-> > new fields to the API and the RXFH API is not netlink-ified.
-> >
-> > Using hashing algo for configuring fields feels like a dirty hack.  
+On Fri, 25 Aug 2023 11:01:07 +0000 Drewek, Wojciech wrote:
+> > Can you say more? We have ETHTOOL_MSG_MODULE_GET / SET, sounds like
+> > something we could quite easily get ethtool to support?  
 > 
-> Ok. Another way to add a single knob is to a flag in "struct 
-> ethtool_rxfh" (there are still some reserved bytes) and then:
+> So you're suggesting that ethtool could support setting the maximum power in the cage? 
+> Something like:
+>  - new "--set-module" parameter called "power-max"
+>  - new "--get-module" parameters: "power-max-allowed",
+>   "power-min-allowed" indicating limitations reported by the HW.
 
-Sorry we do have ETHTOOL_MSG_RSS_GET. It just doesn't cover the flow
-config now. But you can add the new field there without a problem.
+Yup. Oh, nice you even CCed Ido already :)
 
-> ethtool -X eth0 --symmetric hfunc toeplitz
-> 
-> This will also allow drivers/NICs to implement this as they wish (XOR, 
-> sorted, ..etc). Better ?
+> About the patch itself, it's only about restoration of the default
+> settings upon port split. Those might be overwritten by Intel's
+> external tools.
 
-We should specify the fields, I reckon, something like:
-
-ethtool -X eth0 --symmetric sdfn hfunc toeplitz
-
-So that the driver can make sure the user expects symmetry on fields
-the device supports.
-
-> >> I agree that we will need to take care of some cases like if the user
-> >> removes only "source IP" or "destination port" from the hash fields,
-> >> without that field's counterpart (we can prevent this, or show a
-> >> warning, ..etc). I was planning to address that in a follow-up
-> >> series; ie. handling the "ethtool -U rx-flow-hash". Do you want that
-> >> to be included in the same series as well?  
-> > Yes, the validation needs to be part of the same series. But the
-> > semantics of selecting only src or dst need to be established, too.
-> > You said you feed dst ^ src into the hashing twice - why?  
-> 
-> To maintain the same input length (same as the regular Toeplitz input) 
-> to the hash H/W block
-
-But that's a choice, right? We're configuring the input we could as
-well choose to make it shorter? v4 and v6 use the same key with
-different input lengths, right?
+I guess, the thing that sent me down the path of putting the control
+in hands of the user more directly was the question of "why do we need
+to reset on port split"? Why is that a policy the driver is supposed
+to follow?
 
