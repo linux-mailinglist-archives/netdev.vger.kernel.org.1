@@ -1,283 +1,82 @@
-Return-Path: <netdev+bounces-30820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8BC7892BC
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 02:39:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B67257892BD
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 02:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9A081C21022
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:39:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D2BF281763
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1F537F;
-	Sat, 26 Aug 2023 00:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A3237E;
+	Sat, 26 Aug 2023 00:43:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEB437E
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 00:39:46 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6221F26B2;
-	Fri, 25 Aug 2023 17:39:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693010385; x=1724546385;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zBEsPpbqpz0jgz/L1/kzw9Bxwx0vlfNsgqHrm4AXy+Y=;
-  b=ahloIwhntAo04CGxyx3jF94Joy5KKMcQo8eMkMHhrY/sTsDB4l68YG6Z
-   eGBM7o09GUmZDXmRN6vqMB2IbfJ9fxLtiPLSPhDPZilkp037qHDDLohtx
-   l2sJUtpiLe+Ia5b7HVtV0znv542r5TpW+iKclk4PEDmdke4DbFBzP7izX
-   7t7hC3lnaAdxIieVJOIg9HM8FAz1tT9HvY1uqWMjscDefiuBtDf0AkNZE
-   M7FFPGwJ4a5lQO3AXaTx1RhbDAQOBT71+n2+VzHaAJLKx1cgDtwKZi6Sr
-   2BHzxLmNRT+uYDaB+FKcBTFwcTPIvTIMWly6UmlVukPtoFXK44vt3R+Iu
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="373704369"
-X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
-   d="scan'208";a="373704369"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 17:39:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="772670959"
-X-IronPort-AV: E=Sophos;i="6.02,202,1688454000"; 
-   d="scan'208";a="772670959"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 25 Aug 2023 17:39:40 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qZhL1-0004At-1O;
-	Sat, 26 Aug 2023 00:39:39 +0000
-Date: Sat, 26 Aug 2023 08:38:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lukasz Majewski <lukma@denx.de>, Tristram.Ha@microchip.com,
-	Eric Dumazet <edumazet@google.com>, davem@davemloft.net
-Cc: oe-kbuild-all@lists.linux.dev, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kristian Overskeid <koverskeid@gmail.com>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
- decoding
-Message-ID: <202308260833.erhVKBnc-lkp@intel.com>
-References: <20230825153111.228768-1-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB6A18D
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 00:43:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB64C433C8;
+	Sat, 26 Aug 2023 00:42:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693010580;
+	bh=OHi//unu0dgaZORSb3vTVvuJD2QQpLeafSDZ4MXXcDU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=shNXxyEvMBGBrO1md8O2nMpKMwt+RfNHadEdbAVsaANladXMJokyRO8MJv1N3qxJS
+	 WPRBXUUCKWQRLPG2eJesmYcl0C4WcUyscx2xh/S5AQ+sXcYOORpF1B0AthATdcnLKh
+	 vri0GMIrop6tA0dAiO4SbgiCHRWOHH4zWbyT3OafTFlZbgj0VqjZawF0XaxGTv4L+7
+	 a7klv22wGEqQmJ9J8bXLgGzMEawqfB1S+MT7G0buRDP911i2zx3cO0xQKvSZzs0bou
+	 UjJyo9sp20F6q1/b6fb83UBxUgMi5fLArTqFT5SCUH6Oz0hYxctyobViCCfd8C0llb
+	 H4FwNSDQRChUQ==
+Date: Fri, 25 Aug 2023 17:42:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, netdev@vger.kernel.org, Ratheesh Kannoth
+ <rkannoth@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Geetha sowjanya <gakula@marvell.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Paolo Abeni <pabeni@redhat.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>, hariprasad
+ <hkelam@marvell.com>, Qingfang DENG <qingfang.deng@siflower.com.cn>
+Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
+Message-ID: <20230825174258.3db24492@kernel.org>
+In-Reply-To: <2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
+References: <20230823094757.gxvCEOBi@linutronix.de>
+	<d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
+	<923d74d4-3d43-8cac-9732-c55103f6dafb@intel.com>
+	<044c90b6-4e38-9ae9-a462-def21649183d@kernel.org>
+	<ce5627eb-5cae-7b9a-fed3-dc1ee725464a@intel.com>
+	<2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825153111.228768-1-lukma@denx.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Lukasz,
+On Fri, 25 Aug 2023 19:25:42 +0200 Jesper Dangaard Brouer wrote:
+> >> This WQ process is not allowed to use the page_pool_alloc() API this
+> >> way (from a work-queue).  The PP alloc-side API must only be used
+> >> under NAPI protection.  
+> > 
+> > Who did say that? If I don't set p.napi, how is Page Pool then tied to NAPI?  
+> 
+> *I* say that (as the PP inventor) as that was the design and intent,
+> that this is tied to a NAPI instance and rely on the NAPI protection to
+> make it safe to do lockless access to this cache array.
 
-kernel test robot noticed the following build errors:
+Absolutely no objection to us making the NAPI / bh context a requirement
+past the startup stage, but just to be sure I understand the code -
+technically if the driver never recycles direct, does not set the NAPI,
+does not use xdp_return_frame_rx_napi etc. - the cache is always empty
+so we good?
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.5-rc7 next-20230825]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Lukasz-Majewski/net-hsr-Provide-fix-for-HSRv1-supervisor-frames-decoding/20230825-233423
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230825153111.228768-1-lukma%40denx.de
-patch subject: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames decoding
-config: riscv-randconfig-001-20230826 (https://download.01.org/0day-ci/archive/20230826/202308260833.erhVKBnc-lkp@intel.com/config)
-compiler: riscv64-linux-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230826/202308260833.erhVKBnc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308260833.erhVKBnc-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/hsr/hsr_framereg.c: In function 'hsr_handle_sup_frame':
->> net/hsr/hsr_framereg.c:289:12: error: 'And' undeclared (first use in this function)
-     289 |          * And leave the HSR tag.
-         |            ^~~
-   net/hsr/hsr_framereg.c:289:12: note: each undeclared identifier is reported only once for each function it appears in
->> net/hsr/hsr_framereg.c:289:15: error: expected ';' before 'leave'
-     289 |          * And leave the HSR tag.
-         |               ^~~~~~
-         |               ;
-
-
-vim +/And +289 net/hsr/hsr_framereg.c
-
-   249	
-   250	/* Use the Supervision frame's info about an eventual macaddress_B for merging
-   251	 * nodes that has previously had their macaddress_B registered as a separate
-   252	 * node.
-   253	 */
-   254	void hsr_handle_sup_frame(struct hsr_frame_info *frame)
-   255	{
-   256		struct hsr_node *node_curr = frame->node_src;
-   257		struct hsr_port *port_rcv = frame->port_rcv;
-   258		struct hsr_priv *hsr = port_rcv->hsr;
-   259		struct hsr_sup_payload *hsr_sp;
-   260		struct hsr_sup_tlv *hsr_sup_tlv;
-   261		struct hsr_node *node_real;
-   262		struct sk_buff *skb = NULL;
-   263		struct list_head *node_db;
-   264		struct ethhdr *ethhdr;
-   265		int i;
-   266		unsigned int pull_size = 0;
-   267		unsigned int total_pull_size = 0;
-   268	
-   269		/* Here either frame->skb_hsr or frame->skb_prp should be
-   270		 * valid as supervision frame always will have protocol
-   271		 * header info.
-   272		 */
-   273		if (frame->skb_hsr)
-   274			skb = frame->skb_hsr;
-   275		else if (frame->skb_prp)
-   276			skb = frame->skb_prp;
-   277		else if (frame->skb_std)
-   278			skb = frame->skb_std;
-   279		if (!skb)
-   280			return;
-   281	
-   282		/* Leave the ethernet header. */
-   283		pull_size = sizeof(struct ethhdr);
-   284		skb_pull(skb, pull_size);
-   285		total_pull_size += pull_size;
-   286	
-   287		ethhdr = (struct ethhdr *)skb_mac_header(skb);
-   288	
- > 289		 * And leave the HSR tag.
-   290		 *
-   291		 * The HSRv1 supervisory frame encapsulates the v0 frame
-   292		 * with EtherType of 0x88FB
-   293		 */
-   294		if (ethhdr->h_proto == htons(ETH_P_HSR)) {
-   295			if (hsr->prot_version == HSR_V1)
-   296				/* In the above step the DA, SA and EtherType
-   297				 * (0x892F - HSRv1) bytes has been removed.
-   298				 *
-   299				 * As the HSRv1 has the HSR header added, one need
-   300				 * to remove path_and_LSDU_size and sequence_nr fields.
-   301				 *
-   302				 */
-   303				pull_size = 4;
-   304			else
-   305				pull_size = sizeof(struct hsr_tag);
-   306	
-   307			skb_pull(skb, pull_size);
-   308			total_pull_size += pull_size;
-   309		}
-   310	
-   311		/* And leave the HSR sup tag. */
-   312		pull_size = sizeof(struct hsr_tag);
-   313		skb_pull(skb, pull_size);
-   314		total_pull_size += pull_size;
-   315	
-   316		/* get HSR sup payload */
-   317		if (hsr->prot_version == HSR_V1) {
-   318			/* In the HSRv1 supervisor frame, when
-   319			 * one with EtherType = 0x88FB is extracted, the Node A
-   320			 * MAC address is preceded with type and length elements of TLV
-   321			 * data field.
-   322			 *
-   323			 * It needs to be removed to get the remote peer MAC address.
-   324			 */
-   325			pull_size = sizeof(struct hsr_sup_tlv);
-   326			skb_pull(skb, pull_size);
-   327			total_pull_size += pull_size;
-   328		}
-   329	
-   330		hsr_sp = (struct hsr_sup_payload *)skb->data;
-   331	
-   332		/* Merge node_curr (registered on macaddress_B) into node_real */
-   333		node_db = &port_rcv->hsr->node_db;
-   334		node_real = find_node_by_addr_A(node_db, hsr_sp->macaddress_A);
-   335		if (!node_real)
-   336			/* No frame received from AddrA of this node yet */
-   337			node_real = hsr_add_node(hsr, node_db, hsr_sp->macaddress_A,
-   338						 HSR_SEQNR_START - 1, true,
-   339						 port_rcv->type);
-   340		if (!node_real)
-   341			goto done; /* No mem */
-   342		if (node_real == node_curr)
-   343			/* Node has already been merged */
-   344			goto done;
-   345	
-   346		/* Leave the first HSR sup payload. */
-   347		pull_size = sizeof(struct hsr_sup_payload);
-   348		skb_pull(skb, pull_size);
-   349		total_pull_size += pull_size;
-   350	
-   351		/* Get second supervision tlv */
-   352		hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
-   353		/* And check if it is a redbox mac TLV */
-   354		if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
-   355			/* We could stop here after pushing hsr_sup_payload,
-   356			 * or proceed and allow macaddress_B and for redboxes.
-   357			 */
-   358			/* Sanity check length */
-   359			if (hsr_sup_tlv->HSR_TLV_length != 6)
-   360				goto done;
-   361	
-   362			/* Leave the second HSR sup tlv. */
-   363			pull_size = sizeof(struct hsr_sup_tlv);
-   364			skb_pull(skb, pull_size);
-   365			total_pull_size += pull_size;
-   366	
-   367			/* Get redbox mac address. */
-   368			hsr_sp = (struct hsr_sup_payload *)skb->data;
-   369	
-   370			/* Check if redbox mac and node mac are equal. */
-   371			if (!ether_addr_equal(node_real->macaddress_A, hsr_sp->macaddress_A)) {
-   372				/* This is a redbox supervision frame for a VDAN! */
-   373				goto done;
-   374			}
-   375		}
-   376	
-   377		ether_addr_copy(node_real->macaddress_B, ethhdr->h_source);
-   378		spin_lock_bh(&node_real->seq_out_lock);
-   379		for (i = 0; i < HSR_PT_PORTS; i++) {
-   380			if (!node_curr->time_in_stale[i] &&
-   381			    time_after(node_curr->time_in[i], node_real->time_in[i])) {
-   382				node_real->time_in[i] = node_curr->time_in[i];
-   383				node_real->time_in_stale[i] =
-   384							node_curr->time_in_stale[i];
-   385			}
-   386			if (seq_nr_after(node_curr->seq_out[i], node_real->seq_out[i]))
-   387				node_real->seq_out[i] = node_curr->seq_out[i];
-   388		}
-   389		spin_unlock_bh(&node_real->seq_out_lock);
-   390		node_real->addr_B_port = port_rcv->type;
-   391	
-   392		spin_lock_bh(&hsr->list_lock);
-   393		if (!node_curr->removed) {
-   394			list_del_rcu(&node_curr->mac_list);
-   395			node_curr->removed = true;
-   396			kfree_rcu(node_curr, rcu_head);
-   397		}
-   398		spin_unlock_bh(&hsr->list_lock);
-   399	
-   400	done:
-   401		/* Push back here */
-   402		skb_push(skb, total_pull_size);
-   403	}
-   404	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I wonder if we can add a check like "mark the pool as BH-only on first
+BH use, and WARN() on process use afterwards". But I'm not sure what
+CONFIG you'd accept that being under ;)
 
