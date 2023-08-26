@@ -1,84 +1,44 @@
-Return-Path: <netdev+bounces-30859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D9D478941D
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 08:59:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BBD789492
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 09:57:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AB691C20F25
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 06:59:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D95C28197F
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 07:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CE7ECA;
-	Sat, 26 Aug 2023 06:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AB91371;
+	Sat, 26 Aug 2023 07:57:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB7DEB8
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:59:34 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA2E19AC;
-	Fri, 25 Aug 2023 23:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693033171; x=1724569171;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8m7G2/O7JyDUFzbF1iO3H8x210d51lOyDfQC7OxdN/g=;
-  b=WI6zb700mXULo4R/eC5ZEw4PHz5KSEUKt2l8YgmArviU9ZpoBGlI8QYS
-   1tJ4DQpH4JtLsqrikPswBBjUDlH1f1g5lsjzcOorNhOYQqYJ44jqi4g4G
-   YPzQtzpXh0K7tnlkkoS7GuTdWdHoZ1LUumMftOdsqYEMXTV3V0mYL8Mpw
-   8X4UFosKMbj3SDIZf2pKHGFA9sb9dvbgeaz/SESoUT2VHGXhD1LFmNSiV
-   eAxnTvJSCdT8iLyNvrgXcENxdDwMo5x9nScWaPAtcimz/7PtzBl7e+rND
-   8krlor0mZmOhcV0Q3fJEMT4BVZuvbZz+5YHAltKcsOaOT1SNpDcblMXDH
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="373728847"
-X-IronPort-AV: E=Sophos;i="6.02,203,1688454000"; 
-   d="scan'208";a="373728847"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 23:59:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="861291303"
-X-IronPort-AV: E=Sophos;i="6.02,203,1688454000"; 
-   d="scan'208";a="861291303"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 25 Aug 2023 23:59:23 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qZnGU-0004RR-1I;
-	Sat, 26 Aug 2023 06:59:22 +0000
-Date: Sat, 26 Aug 2023 14:58:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y.Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-	linux-mtd@lists.infradead.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-	Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-	ceph-devel@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
-	linux-nfs@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-	linux-inte@web.codeaurora.org, grity@vger.kernel.org,
-	"Jason A.Donenfeld" <Jason@zx2c4.com>,
-	Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/12] ubifs: Do not include crypto/algapi.h
-Message-ID: <202308261414.HKw1Mrip-lkp@intel.com>
-References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5D210F5
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 07:57:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D2DC433C7;
+	Sat, 26 Aug 2023 07:57:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693036666;
+	bh=s5UFF6YdVTUzLTpts9iidYKRQGA4rnxTrUx4AVS1eNo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=czasA/TWa0axRcpv4fCRzdo2mSn9QVvP7C1EJhqCpP/TTbxruqgfuBzc2HV462x1Y
+	 qdENlbLRGTY87aws09om8gEg/0lD4h86NNckAYWhT91zHlM0yAur8vn9edb0shiHtM
+	 O/dBWrVZU4fSq3rWEGLuy9l7za8QxXTLnxjRroAvaigdrBZnYO39k72Dg7sqqb0+eT
+	 etdNdtt0cfE8AjuQ33UoTn7ckc2r99RMUTPrUbG6bVeo9K3tQX4nLlJJYfpcCvsdcd
+	 q78qzlIhlYTCxv1BF0bwepoAJBcQ8seGkxGzQ/6Tje6AOHnoDbSdmD/H4axA4ZBjv1
+	 JmjHhnOFICf5A==
+Date: Sat, 26 Aug 2023 09:57:40 +0200
+From: Simon Horman <horms@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	kuba@kernel.org, gal@nvidia.com, martin.lau@linux.dev
+Subject: Re: [PATCH net-next 1/2] net: Fix skb consume leak in
+ sch_handle_egress
+Message-ID: <20230826075740.GO3523530@kernel.org>
+References: <20230825134946.31083-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,156 +47,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230825134946.31083-1-daniel@iogearbox.net>
 
-Hi Herbert,
+On Fri, Aug 25, 2023 at 03:49:45PM +0200, Daniel Borkmann wrote:
+> Fix a memory leak for the tc egress path with TC_ACT_{STOLEN,QUEUED,TRAP}:
+> 
+>   [...]
+>   unreferenced object 0xffff88818bcb4f00 (size 232):
+>   comm "softirq", pid 0, jiffies 4299085078 (age 134.028s)
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 80 70 61 81 88 ff ff 00 41 31 14 81 88 ff ff  ..pa.....A1.....
+>   backtrace:
+>     [<ffffffff9991b938>] kmem_cache_alloc_node+0x268/0x400
+>     [<ffffffff9b3d9231>] __alloc_skb+0x211/0x2c0
+>     [<ffffffff9b3f0c7e>] alloc_skb_with_frags+0xbe/0x6b0
+>     [<ffffffff9b3bf9a9>] sock_alloc_send_pskb+0x6a9/0x870
+>     [<ffffffff9b6b3f00>] __ip_append_data+0x14d0/0x3bf0
+>     [<ffffffff9b6ba24e>] ip_append_data+0xee/0x190
+>     [<ffffffff9b7e1496>] icmp_push_reply+0xa6/0x470
+>     [<ffffffff9b7e4030>] icmp_reply+0x900/0xa00
+>     [<ffffffff9b7e42e3>] icmp_echo.part.0+0x1a3/0x230
+>     [<ffffffff9b7e444d>] icmp_echo+0xcd/0x190
+>     [<ffffffff9b7e9566>] icmp_rcv+0x806/0xe10
+>     [<ffffffff9b699bd1>] ip_protocol_deliver_rcu+0x351/0x3d0
+>     [<ffffffff9b699f14>] ip_local_deliver_finish+0x2b4/0x450
+>     [<ffffffff9b69a234>] ip_local_deliver+0x174/0x1f0
+>     [<ffffffff9b69a4b2>] ip_sublist_rcv_finish+0x1f2/0x420
+>     [<ffffffff9b69ab56>] ip_sublist_rcv+0x466/0x920
+>   [...]
+> 
+> I was able to reproduce this via:
+> 
+>   ip link add dev dummy0 type dummy
+>   ip link set dev dummy0 up
+>   tc qdisc add dev eth0 clsact
+>   tc filter add dev eth0 egress protocol ip prio 1 u32 match ip protocol 1 0xff action mirred egress redirect dev dummy0
+>   ping 1.1.1.1
+>   <stolen>
+> 
+> After the fix, there are no kmemleak reports with the reproducer. This is
+> in line with what is also done on the ingress side, and from debugging the
+> skb_unref(skb) on dummy xmit and sch_handle_egress() side, it is visible
+> that these are two different skbs with both skb_unref(skb) as true. The two
+> seen skbs are due to mirred doing a skb_clone() internally as use_reinsert
+> is false in tcf_mirred_act() for egress. This was initially reported by Gal.
+> 
+> Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
+> Reported-by: Gal Pressman <gal@nvidia.com>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Link: https://lore.kernel.org/bpf/bdfc2640-8f65-5b56-4472-db8e2b161aab@nvidia.com
 
-kernel test robot noticed the following build errors:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-[auto build test ERROR on wireless-next/main]
-[also build test ERROR on wireless/main linus/master rw-ubifs/next rw-ubifs/fixes v6.5-rc7 next-20230825]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/fscrypt-Do-not-include-crypto-algapi-h/20230823-183716
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
-patch link:    https://lore.kernel.org/r/E1qYl9s-006vDm-IW%40formenos.hmeau.com
-patch subject: [PATCH 2/12] ubifs: Do not include crypto/algapi.h
-config: x86_64-randconfig-075-20230823 (https://download.01.org/0day-ci/archive/20230826/202308261414.HKw1Mrip-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20230826/202308261414.HKw1Mrip-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308261414.HKw1Mrip-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from fs/ubifs/auth.c:12:
->> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'
-                   return -EINVAL;
-                           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:97:11: warning: array index 3 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-                   return (set->sig[3] | set->sig[2] |
-                           ^        ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:97:25: warning: array index 2 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-                   return (set->sig[3] | set->sig[2] |
-                                         ^        ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:98:4: warning: array index 1 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-                           set->sig[1] | set->sig[0]) == 0;
-                           ^        ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:100:11: warning: array index 1 is past the end of the array (that has type 'unsigned long[1]') [-Warray-bounds]
-                   return (set->sig[1] | set->sig[0]) == 0;
-                           ^        ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:113:11: warning: array index 3 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
-                   return  (set1->sig[3] == set2->sig[3]) &&
-                            ^         ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:113:27: warning: array index 3 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
-                   return  (set1->sig[3] == set2->sig[3]) &&
-                                            ^         ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:114:5: warning: array index 2 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
-                           (set1->sig[2] == set2->sig[2]) &&
-                            ^         ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-   In file included from include/linux/fs.h:33:
-   In file included from include/linux/percpu-rwsem.h:7:
-   In file included from include/linux/rcuwait.h:6:
-   In file included from include/linux/sched/signal.h:6:
-   include/linux/signal.h:114:21: warning: array index 2 is past the end of the array (that has type 'const unsigned long[1]') [-Warray-bounds]
-                           (set1->sig[2] == set2->sig[2]) &&
-                                            ^         ~
-   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
-           unsigned long sig[_NSIG_WORDS];
-           ^
-   In file included from fs/ubifs/auth.c:18:
-   In file included from fs/ubifs/ubifs.h:16:
-
-
-vim +/EINVAL +23 include/linux/verification.h
-
-817aef260037f3 Yannik Sembritzki 2018-08-16  19  
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  20  static inline int system_keyring_id_check(u64 id)
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  21  {
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  22  	if (id > (unsigned long)VERIFY_USE_PLATFORM_KEYRING)
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20 @23  		return -EINVAL;
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  24  
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  25  	return 0;
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  26  }
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  27  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
