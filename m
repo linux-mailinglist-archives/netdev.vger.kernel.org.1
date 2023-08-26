@@ -1,61 +1,83 @@
-Return-Path: <netdev+bounces-30862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 820837894D5
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 10:38:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 940B0789560
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 11:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FF152819D5
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 08:38:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 725611C2096E
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 09:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1D5186E;
-	Sat, 26 Aug 2023 08:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45C82119;
+	Sat, 26 Aug 2023 09:45:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804E71C29
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 08:38:01 +0000 (UTC)
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C53A4213A;
-	Sat, 26 Aug 2023 01:37:56 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qZomd-007ymm-Rh; Sat, 26 Aug 2023 16:36:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Aug 2023 16:36:41 +0800
-Date: Sat, 26 Aug 2023 16:36:41 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: kernel test robot <lkp@intel.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y.Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-	linux-mtd@lists.infradead.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-	Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-	ceph-devel@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
-	linux-nfs@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-	linux-inte@web.codeaurora.org, grity@vger.kernel.org,
-	"Jason A.Donenfeld" <Jason@zx2c4.com>,
-	Ayush Sawal <ayush.sawal@chelsio.com>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-Subject: [PATCH] KEYS: Include linux/errno.h in linux/verification.h
-Message-ID: <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
-References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
- <202308261414.HKw1Mrip-lkp@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75B82102
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 09:45:34 +0000 (UTC)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A841B5;
+	Sat, 26 Aug 2023 02:45:33 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-31c6cd238e0so1737255f8f.0;
+        Sat, 26 Aug 2023 02:45:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693043131; x=1693647931;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EcmeCq/32Wiyi3Ru6rZay2ig3zBVjavNEyIttUA3Hls=;
+        b=chwHg8mGkspRC0bpi1AOT4+Xo82JletVcBQUGMJu1iMGLwh8xJs3KfV5mAM9xGQqXz
+         daVXupwyuiVECSDFN/43DgShfgF6bPzGUEaLfuqgPKVYhq5pfzBTJaGG0ebhZFa5C1qD
+         iGNBNjwA20ReXbAhzUmZk1NKbxIhuLyVQUKAbVuHO+hhFFzFz7sUYKJeIrCmb6nffMeJ
+         dKTcLDSau51/EX3YkDm0NDttOOi9N5PBg4WQ4ITUf7codCnlTlMDEqyQzsCJEWyO/eqr
+         pTNNxeLoebEsFHftK+CvX4mCidW5CIVegIKzGaDQ25ojJmQg70ipnBxiLZIJqc67/f2K
+         yLMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693043131; x=1693647931;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EcmeCq/32Wiyi3Ru6rZay2ig3zBVjavNEyIttUA3Hls=;
+        b=CPg1Qh/5Is/m8ys++ONJc8Pu1Jr2aJBoqJ4JsnCoIv3vrnNmR79Pzgu2imfFqxjIh5
+         Iu9DnGugmuJ84+2dd2xI6HhNXjdchp14/pVRBVw9+kjFveGVl0uln22p//HBNa22Ud73
+         HXEk+7GhtAYnYZkO02MA7sexf0wUKqIVSnCpfXnkDG01Yl/p9sS9APiufb2ry095H9tl
+         y3lZaaA9r37AhN6P3qR5+ppw48rRGwVuT8BbzPvCiSQBv8ONGAaWFGhIfYFV0TAtCQrF
+         sj5PpYI3C+9xxD2ixB/whO3Ynn+UoQcVI4uhVqNNUaLKi2yDuCRF0RvI23+QO/Y7MBli
+         wfDw==
+X-Gm-Message-State: AOJu0Yyqn4xScNTxJfErYcAB4W+N+jxNMNKTD1ze7vFGp8weCNiq/E2A
+	Ct1vlgyT4hGueR4JAfn1oKo=
+X-Google-Smtp-Source: AGHT+IGugDagkjN8l4cZ2iCV4RjulgnZxvwY3RYAOx3N3ArjiJDFmUO3gLNIyGsmg0LAwwuVbUP2CQ==
+X-Received: by 2002:adf:ec8a:0:b0:317:de66:259b with SMTP id z10-20020adfec8a000000b00317de66259bmr16715345wrn.15.1693043131326;
+        Sat, 26 Aug 2023 02:45:31 -0700 (PDT)
+Received: from mmaatuq-HP-Laptop-15-dy2xxx ([2001:8f8:1163:6db:5fbb:8783:6dd3:4939])
+        by smtp.gmail.com with ESMTPSA id x3-20020a05600c2a4300b003fe601a7d46sm7646174wme.45.2023.08.26.02.45.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Aug 2023 02:45:30 -0700 (PDT)
+Date: Sat, 26 Aug 2023 13:45:23 +0400
+From: Mahmoud Matook <mahmoudmatook.mm@gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: keescook@chromium.org, edumazet@google.com,
+	willemdebruijn.kernel@gmail.com, wad@chromium.org,
+	luto@amacapital.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kuba@kernel.org, shuah@kernel.org,
+	pabeni@redhat.com, linux-kselftest@vger.kernel.org,
+	davem@davemloft.net, linux-kernel-mentees@lists.linuxfoundation.org,
+	David Laight <David.Laight@aculab.com>
+Subject: Re: [PATCH v2 1/2] selftests: Provide local define of min() and max()
+Message-ID: <20230826094523.bl6kbcwelj23cydu@mmaatuq-HP-Laptop-15-dy2xxx>
+Mail-Followup-To: Sean Christopherson <seanjc@google.com>,
+	keescook@chromium.org, edumazet@google.com,
+	willemdebruijn.kernel@gmail.com, wad@chromium.org,
+	luto@amacapital.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kuba@kernel.org, shuah@kernel.org,
+	pabeni@redhat.com, linux-kselftest@vger.kernel.org,
+	davem@davemloft.net, linux-kernel-mentees@lists.linuxfoundation.org,
+	David Laight <David.Laight@aculab.com>
+References: <20230824202415.131824-1-mahmoudmatook.mm@gmail.com>
+ <ZOjIHo2A6HZ8K4Qp@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,44 +86,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202308261414.HKw1Mrip-lkp@intel.com>
-X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
-	PDS_RDNS_DYNAMIC_FP,RCVD_IN_DNSWL_BLOCKED,RDNS_DYNAMIC,SPF_HELO_NONE,
-	SPF_PASS,TVD_RCVD_IP autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: **
+In-Reply-To: <ZOjIHo2A6HZ8K4Qp@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 26, 2023 at 02:58:48PM +0800, kernel test robot wrote:
->
-> All errors (new ones prefixed by >>):
+On 08/25, Sean Christopherson wrote:
+
+> On Fri, Aug 25, 2023, Mahmoud Maatuq wrote:
+> > to avoid manual calculation of min and max values
+> > and fix coccinelle warnings such WARNING opportunity for min()/max()
+> > adding one common definition that could be used in multiple files
+> > under selftests.
+> > there are also some defines for min/max scattered locally inside sources
+> > under selftests.
+> > this also prepares for cleaning up those redundant defines and include
+> > kselftest.h instead.
+> > 
+> > Signed-off-by: Mahmoud Maatuq <mahmoudmatook.mm@gmail.com>
+> > Suggested-by: David Laight <David.Laight@aculab.com>
+> > ---
+> > changes in v2:
+> > redefine min/max in a more strict way to avoid 
+> > signedness mismatch and multiple evaluation.
+> > is_signed_type() moved from selftests/kselftest_harness.h 
+> > to selftests/kselftest.h.
+> > ---
+> >  tools/testing/selftests/kselftest.h         | 24 +++++++++++++++++++++
 > 
->    In file included from fs/ubifs/auth.c:12:
-> >> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'
+> Heh, reminds me of https://xkcd.com/927.
+> 
+> All of these #defines are available in tools/include/linux/kernel.h, and it's
+> trivially easy for selftests to add all of tools/include to their include path.
+> I don't see any reason for the selftests framework to define yet another version,
+> just fix the individual tests.
 
----8<---
-Add inclusion of linux/errno.h as otherwise the reference to EINVAL
-may be invalid.
-
-Fixes: f3cf4134c5c6 ("bpf: Add bpf_lookup_*_key() and bpf_key_put() kfuncs")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202308261414.HKw1Mrip-lkp@intel.com/
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/linux/verification.h b/include/linux/verification.h
-index f34e50ebcf60..cb2d47f28091 100644
---- a/include/linux/verification.h
-+++ b/include/linux/verification.h
-@@ -8,6 +8,7 @@
- #ifndef _LINUX_VERIFICATION_H
- #define _LINUX_VERIFICATION_H
- 
-+#include <linux/errno.h>
- #include <linux/types.h>
- 
- /*
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+giving the reviews seems that patchset is useless.
+still a confusing point for me; after adding tools/include to the
+include path of selftes how we can differentaite between  #include
+<linux/kernel.h> that under tools/include and one under usr/include.
 
