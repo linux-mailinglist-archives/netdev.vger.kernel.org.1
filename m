@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-30871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9760D7896E9
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 15:32:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BBE7896EC
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 15:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48D86281883
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 13:32:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210211C209A8
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 13:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFE3DDC1;
-	Sat, 26 Aug 2023 13:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BCEDDC5;
+	Sat, 26 Aug 2023 13:36:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8EFCA58
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 13:32:21 +0000 (UTC)
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9554D2114
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:32:20 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-500b3f7f336so196720e87.1
-        for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:32:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7940CD314
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 13:36:53 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C6B92110
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:36:51 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4fe21e7f3d1so2817703e87.3
+        for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 06:36:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693056739; x=1693661539;
+        d=gmail.com; s=20221208; t=1693057009; x=1693661809;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IkJ7s8OrsLy9BfgJwAFkbNy+c764NK4QgxuZUl0LtFo=;
-        b=bUcLauVa3UalyuzHJnik09YWrDw/DeI+/Ao3YFhMPPx9zWGHjn71E0vHNj2inQe6WO
-         r26MvoC7HE+ISnOssAMaHidPPi0j8ZsPrAAoB39t0tjH4jGZ4qngR0p/QMqosPvwID3t
-         +Z+bb1rHxw6RByu6rw2yCKU6hF5Wo+KZuO6+3D2Gteo7zLjCIwDdYsuALuSKU+oGDd3y
-         RssbsMa1FYxf7oq2/S7afqVVWhWgE0KuMhE3rHf/U5xnjZvLI3gqp7cu0gEaPiu5TJhl
-         2O7rav7xd339Vd2pGMA2xga+2HkTuPucLKF24jjjVxzQnBxeSfbcytPHsQG7F87Ddq9C
-         n4JQ==
+        bh=6VkMa5W6uY3fSZYkhCX3GMktDqjJzGb0eTy0nnjALzA=;
+        b=VUfosENc6y/n5gCCAAAV0zZo9DYMBol7CZSu70vmZ8hUuszuGjKhgjIZCU3gtz1iTv
+         FkO531+MIkQf60yH9909064vmM6yWSrvW3nCxwbiGGViKxnwg3fiIU0oQq/t6wHEVS/K
+         5sS0xpIrNmYc1DGhp9K4Iq6EqLKKwwJEFIWno6iZv9/iOqfZZJZCw3Tv5T9R7l9EReWD
+         E5K5mlAS7ZNVpWRcyqxl094bjusJa6PeYZH8WN+DveFayodNCFeUW3kWAZXMII9HMY9o
+         Aa1i/Ki6lxWyGRg6AI98e16s7EJa1lvek+iSRGz/wfElDGOAKazfFOh1HSDuJbz9r3s4
+         uNrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693056739; x=1693661539;
+        d=1e100.net; s=20221208; t=1693057009; x=1693661809;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IkJ7s8OrsLy9BfgJwAFkbNy+c764NK4QgxuZUl0LtFo=;
-        b=aWG81rJGaB+K8pIkUUUZ5674x742S74ZuvU9xz3pg1/rb24Fp40lqIF5snbMTVqb8j
-         F7AD2mJbTjzYOJmpefqXPD5il6b6GyWyz9VqlI47B0tnbLEpmA0l+txgmCl8jQ1GsSUJ
-         MweNt6sODCFRzDJuXN19u9/xQnfyZEGYfBXXcU08IrAfyeLGzE3tM+nWG5GxPNwBW46O
-         6pcxNl5NLZHJatM7u2gLNqP+4UZFPxxvjUT8ghedpTU+V5U/AJ4m2emqVMU7GJMUUk1b
-         IfNU6OeRzQhNHzagqzvrz91yQKi6VR+JsPwv/eP9EpetWPO72cSHpa5uladfdxzLySoS
-         pAVg==
-X-Gm-Message-State: AOJu0Yw7z0woxvj/N8sVR5DrM7q5XxQbW81BvqXZsol4D5ThawmqjvuF
-	CLxPb91sX2KG0GlYEgq+gP4=
-X-Google-Smtp-Source: AGHT+IER9+Ix/5U4zo/mvxWZ8NAT0EXTNAoaCbHNthqYpZAi1xLAQEQ/2uTxn94TPquRaZnTHv7tdA==
-X-Received: by 2002:a05:6512:1042:b0:4fe:d0f:1f1e with SMTP id c2-20020a056512104200b004fe0d0f1f1emr18744343lfb.25.1693056738553;
-        Sat, 26 Aug 2023 06:32:18 -0700 (PDT)
+        bh=6VkMa5W6uY3fSZYkhCX3GMktDqjJzGb0eTy0nnjALzA=;
+        b=K9JnakJRQUucEYuYoACzOdfEc4th/MZhTVlC+AtctP0HDRGwJ0xy0ONgnd1mma/qKj
+         bYQtgGARQZo737QK5gQd46hT0Lb/MOekhI65xDkEpHvuzS4nf8s/3Z/cXl4xEOK6pxeH
+         XQwsNKctlFGmDijUZWZ8hUFrvSouERjqmWuME8LiblgQVx75vQ2IeayjX7mjtUn8tx3u
+         2gY5evQy3JZgKXbQKJyntB2AlMbPnru70e9KwppUrQWI71IsS7iaS2kWtBvU41olH0aN
+         alV5e11+O2DSWTSDSqjSVjdYw+C6Td4CLZpHf/OqdoNmasw10dZs4+3u+NZszeSWKpM9
+         1exg==
+X-Gm-Message-State: AOJu0Yw2u1us8MJC3QhLM6eV2U7/K58OpH4SYvye1Fj168R3i9XA/nz8
+	Wo518gjIocYgQYCGxMr63rI=
+X-Google-Smtp-Source: AGHT+IECrT/f4YU7eGYMT2JKLqncJPJWUk/GN3HdGnXoaiZGZEg51ifpGDI4TjkBwNtKbaT99ZyWtw==
+X-Received: by 2002:a05:6512:b22:b0:4fe:df2:b82d with SMTP id w34-20020a0565120b2200b004fe0df2b82dmr15910554lfu.37.1693057009281;
+        Sat, 26 Aug 2023 06:36:49 -0700 (PDT)
 Received: from mobilestation ([95.79.200.178])
-        by smtp.gmail.com with ESMTPSA id x2-20020ac25dc2000000b004fe39f31dc7sm715616lfq.294.2023.08.26.06.32.17
+        by smtp.gmail.com with ESMTPSA id c3-20020ac24143000000b004ff8631d6c0sm709430lfi.278.2023.08.26.06.36.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Aug 2023 06:32:17 -0700 (PDT)
-Date: Sat, 26 Aug 2023 16:32:15 +0300
+        Sat, 26 Aug 2023 06:36:48 -0700 (PDT)
+Date: Sat, 26 Aug 2023 16:36:46 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
@@ -67,7 +67,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
 Subject: Re: [PATCH net-next 08/10] net: stmmac: move xgmac specific phylink
  caps to dwxgmac2 core
-Message-ID: <rpwsyyjdzeixx3f7o3pxeslyff7yc3fuutm436ygjggoyiwjcb@7s3skg627mid>
+Message-ID: <m6wo7hsk2wy2sgwjxlj37u5zg3iba7ecgjrvmhvkw7kdm7o6j7@ggcag6ziyk4c>
 References: <ZOddFH22PWmOmbT5@shell.armlinux.org.uk>
  <E1qZAXd-005pUP-JL@rmk-PC.armlinux.org.uk>
 Precedence: bulk
@@ -104,7 +104,15 @@ On Thu, Aug 24, 2023 at 02:38:29PM +0100, Russell King (Oracle) wrote:
 >  	writel(XGMAC_INT_DEFAULT_EN, ioaddr + XGMAC_INT_EN);
 >  }
 >  
+
 > +static void xgmac_phylink_get_caps(struct stmmac_priv *priv)
+
+Also after splitting this method up into DW XGMAC v2.x and DW XLGMAC
+v2.x specific functions please preserve the local naming convention:
+use dwxgmac2_ and dwxlgmac2_ prefixes.
+
+-Serge(y)
+
 > +{
 > +	priv->phylink_config.mac_capabilities |= MAC_2500FD | MAC_5000FD |
 > +						 MAC_10000FD | MAC_25000FD |
@@ -119,12 +127,7 @@ On Thu, Aug 24, 2023 at 02:38:29PM +0100, Russell King (Oracle) wrote:
 >  
 >  const struct stmmac_ops dwxgmac210_ops = {
 >  	.core_init = dwxgmac2_core_init,
-
 > +	.phylink_get_caps = xgmac_phylink_get_caps,
-
-This doesn't look correct. DW XGMAC doesn't support 25/40/50/100Gbps
-speeds.
-
 >  	.set_mac = dwxgmac2_set_mac,
 >  	.rx_ipc = dwxgmac2_rx_ipc,
 >  	.rx_queue_enable = dwxgmac2_rx_queue_enable,
@@ -132,13 +135,7 @@ speeds.
 >  
 >  const struct stmmac_ops dwxlgmac2_ops = {
 >  	.core_init = dwxgmac2_core_init,
-
 > +	.phylink_get_caps = xgmac_phylink_get_caps,
-
-This is ok.
-
--Serge(y)
-
 >  	.set_mac = dwxgmac2_set_mac,
 >  	.rx_ipc = dwxgmac2_rx_ipc,
 >  	.rx_queue_enable = dwxlgmac2_rx_queue_enable,
