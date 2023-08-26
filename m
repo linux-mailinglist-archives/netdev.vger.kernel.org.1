@@ -1,82 +1,89 @@
-Return-Path: <netdev+bounces-30821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67257892BD
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 02:43:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBD07892BF
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 02:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D2BF281763
-	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6992E28194B
+	for <lists+netdev@lfdr.de>; Sat, 26 Aug 2023 00:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A3237E;
-	Sat, 26 Aug 2023 00:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7ED382;
+	Sat, 26 Aug 2023 00:46:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB6A18D
-	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 00:43:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB64C433C8;
-	Sat, 26 Aug 2023 00:42:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693010580;
-	bh=OHi//unu0dgaZORSb3vTVvuJD2QQpLeafSDZ4MXXcDU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=shNXxyEvMBGBrO1md8O2nMpKMwt+RfNHadEdbAVsaANladXMJokyRO8MJv1N3qxJS
-	 WPRBXUUCKWQRLPG2eJesmYcl0C4WcUyscx2xh/S5AQ+sXcYOORpF1B0AthATdcnLKh
-	 vri0GMIrop6tA0dAiO4SbgiCHRWOHH4zWbyT3OafTFlZbgj0VqjZawF0XaxGTv4L+7
-	 a7klv22wGEqQmJ9J8bXLgGzMEawqfB1S+MT7G0buRDP911i2zx3cO0xQKvSZzs0bou
-	 UjJyo9sp20F6q1/b6fb83UBxUgMi5fLArTqFT5SCUH6Oz0hYxctyobViCCfd8C0llb
-	 H4FwNSDQRChUQ==
-Date: Fri, 25 Aug 2023 17:42:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, netdev@vger.kernel.org, Ratheesh Kannoth
- <rkannoth@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Geetha sowjanya <gakula@marvell.com>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Paolo Abeni <pabeni@redhat.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham
- <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>, hariprasad
- <hkelam@marvell.com>, Qingfang DENG <qingfang.deng@siflower.com.cn>
-Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
-Message-ID: <20230825174258.3db24492@kernel.org>
-In-Reply-To: <2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
-References: <20230823094757.gxvCEOBi@linutronix.de>
-	<d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
-	<923d74d4-3d43-8cac-9732-c55103f6dafb@intel.com>
-	<044c90b6-4e38-9ae9-a462-def21649183d@kernel.org>
-	<ce5627eb-5cae-7b9a-fed3-dc1ee725464a@intel.com>
-	<2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7F637F
+	for <netdev@vger.kernel.org>; Sat, 26 Aug 2023 00:46:05 +0000 (UTC)
+Received: from out-251.mta1.migadu.com (out-251.mta1.migadu.com [IPv6:2001:41d0:203:375::fb])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1762119;
+	Fri, 25 Aug 2023 17:46:02 -0700 (PDT)
+Message-ID: <65665aaa-f3c1-123a-c61d-7b128835a1c5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1693010760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nuWctfqYYotL0SbuEIUtNLS1sxkPyQ7nPENsxxNa6iI=;
+	b=PmQF2XqfZruoMX7oq1wyyhx2LeS29heyMgGH53kPSk8p8BtMwRy9CSeAd6bLuh4F2h6TAR
+	WGe6x7/BXHs/VkqEmkfxNNvHX8zt+CTgme75rsFXFERUBCPRqNvfdH7b7cJtmZvQm8eiKM
+	8Q5c6Rkeef4UOT2XsFxG9bxZd89qK3E=
+Date: Fri, 25 Aug 2023 17:45:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH v3 8/9] io_uring/cmd: BPF hook for getsockopt cmd
+Content-Language: en-US
+To: Breno Leitao <leitao@debian.org>
+Cc: Gabriel Krisman Bertazi <krisman@suse.de>, sdf@google.com,
+ axboe@kernel.dk, asml.silence@gmail.com, willemdebruijn.kernel@gmail.com,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ io-uring@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+References: <20230817145554.892543-1-leitao@debian.org>
+ <20230817145554.892543-9-leitao@debian.org> <87pm3l32rk.fsf@suse.de>
+ <6ae89b3a-b53d-dd2c-ecc6-1094f9b95586@linux.dev> <ZOjcpmlukOuEmuZ9@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <ZOjcpmlukOuEmuZ9@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 25 Aug 2023 19:25:42 +0200 Jesper Dangaard Brouer wrote:
-> >> This WQ process is not allowed to use the page_pool_alloc() API this
-> >> way (from a work-queue).  The PP alloc-side API must only be used
-> >> under NAPI protection.  
-> > 
-> > Who did say that? If I don't set p.napi, how is Page Pool then tied to NAPI?  
+On 8/25/23 9:53 AM, Breno Leitao wrote:
+> On Mon, Aug 21, 2023 at 01:25:25PM -0700, Martin KaFai Lau wrote:
+>> On 8/17/23 12:08 PM, Gabriel Krisman Bertazi wrote:
+>>> Shouldn't you call sock->ops->getsockopt for level!=SOL_SOCKET prior to
+>>> running the hook?  Before this patch, it would bail out with EOPNOTSUPP,
+>>> but now the bpf hook gets called even for level!=SOL_SOCKET, which
+>>> doesn't fit __sys_getsockopt. Am I misreading the code?
+>> I agree it should not call into bpf if the io_uring cannot support non
+>> SOL_SOCKET optnames. Otherwise, the bpf prog will get different optval and
+>> optlen when running in _sys_getsockopt vs io_uring getsockopt (e.g. in
+>> regular _sys_getsockopt(SOL_TCP), bpf expects the optval returned from
+>> tcp_getsockopt).
+>>
+>> I think __sys_getsockopt can also be refactored similar to __sys_setsockopt
+>> in patch 3. Yes, for non SOL_SOCKET it only supports __user *optval and
+>> __user *optlen but may be a WARN_ON_ONCE/BUG_ON(sockpt_is_kernel(optval))
+>> can be added before calling ops->getsockopt()? Then this details can be
+>> hidden away from the io_uring.
 > 
-> *I* say that (as the PP inventor) as that was the design and intent,
-> that this is tied to a NAPI instance and rely on the NAPI protection to
-> make it safe to do lockless access to this cache array.
+> 
+> Right, I've spent some time thinking about it, and this could be done.
+> This is a draft I have. Is it what you had in mind?
 
-Absolutely no objection to us making the NAPI / bh context a requirement
-past the startup stage, but just to be sure I understand the code -
-technically if the driver never recycles direct, does not set the NAPI,
-does not use xdp_return_frame_rx_napi etc. - the cache is always empty
-so we good?
+Yes. lgtm. Thanks.
 
-I wonder if we can add a check like "mark the pool as BH-only on first
-BH use, and WARN() on process use afterwards". But I'm not sure what
-CONFIG you'd accept that being under ;)
 
