@@ -1,84 +1,92 @@
-Return-Path: <netdev+bounces-30885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5D237899E9
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 02:18:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6AD7899F6
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 02:56:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86FF41C208B5
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 00:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EACFB1C20899
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 00:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B14C363;
-	Sun, 27 Aug 2023 00:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC98388;
+	Sun, 27 Aug 2023 00:56:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA31182
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 00:18:09 +0000 (UTC)
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423F01BE;
-	Sat, 26 Aug 2023 17:18:08 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2bcbfb3705dso31704451fa.1;
-        Sat, 26 Aug 2023 17:18:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7A036A
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 00:56:21 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AE0C19A;
+	Sat, 26 Aug 2023 17:56:20 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1bf3a2f44ffso16788165ad.1;
+        Sat, 26 Aug 2023 17:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693095486; x=1693700286;
+        d=gmail.com; s=20221208; t=1693097780; x=1693702580;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R0O9+Nd81lV61HUqL9J8WFR0wEb+50cA6S0W+jgCLe8=;
-        b=c/affskxQbENShZrDrcXcKAkTEXbHsnQQKmV0Pou8bPhhXgqTFq+jOGmmDB/J9k+Z3
-         Lwj8SoVltyelWC4dq4f05GgIu1Vl3mAC1moPIvkwCjrkQda++FmI0T73NwWdda9WZ4tl
-         ZPUL61i4oIuWMvnAWboCGhLHW5Yiz4OTRdctRiGAv3YePFte8v7Eb0sfg1dqQeEuzE6p
-         GI41iMMFHl97rHL/QlgVJZnR2W2SO8laQCgdHK0nAUme/x6tOqEILrLVU82JZDGO5H0c
-         NVJNCC7/BocOfV9X13sU7FSmqaC1KEGSjvkPH9+ez455BpePqhA8J5kTYASrGoC8D72D
-         8fLQ==
+        bh=+ePHcufuMq3pmxeqUOnA6gD856Da2hnjiacEbgQNiyc=;
+        b=Qg0w2uKEwnnq0bqmn3hKAmMtE5qhqY89qkRHTyzd8mb8cxpOveDG44s6c6vmM+tabc
+         klOope0puKZ3o8Y4j4zsSkE3sGXVGmA3YfKHJznMJtUp1GK87hvLIC6I+8qjN6PBjkmf
+         NGaq9nLN5gOWyWi5c2OBiQLXkTF1g17xhjeaQP4vGzNI54Fvu01bDAlYT8gCrlP8TzDu
+         J2tsFJIRWSmaWfhLWNYkQKf1SxxNRkeUXjY8YQElgNultmi9i39q63Nk5BzTngyHUF5a
+         qPxbApNKVYm6fjkrQuhBWg9vVU/Cw0swY0b32lHVj92sEneXw/WuzW11ywJ/oFQN5WiH
+         XSKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693095486; x=1693700286;
+        d=1e100.net; s=20221208; t=1693097780; x=1693702580;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R0O9+Nd81lV61HUqL9J8WFR0wEb+50cA6S0W+jgCLe8=;
-        b=Q3AYhm4zZscO12pAJVRhSPBUI7l0GxSsBWQSfJVy2iNG7MLXS4vB5k6i1nMW0nHl3k
-         T+uR/DOCzlG2Wdt9y+DyzTX4X8Gjv9QcD1cCjK5FaDUnfw6Pc6iODecqMCK3glPu17W9
-         H0NgrYBwHPRiS75UGmV7eTy8UOCHUGlI0PK00uUj7EKhkt5MJgo+JqLOVu6jtVdK5ZpS
-         qppoYOC3B3G/NGSWUoHLy4qX9bUOYZkhU+NmlhBItQ/BK1ZVnxOyn2kE5iaf7mrKxCOX
-         S1uTy78cWNGcnxG9t/wMsr39AjtkI7faqgo62oMAlM+NWI+O5zn+dtZNNS4C2S8sErzp
-         mfOw==
-X-Gm-Message-State: AOJu0YzvD6HKCWvxd7uHdoRTbl9i1RLUMxzpnzr2IFZv7pfT3lhSOw/Q
-	oHjTXiYlcLJggj6Wp2PEs2DzbcToP0nFCw==
-X-Google-Smtp-Source: AGHT+IETf2PT2oT9j6J9nHb3QF2V2wh+kc6yhG5eIffZAbTs9nY9WVTgxgZMkeph09QnN5G5PyYhHw==
-X-Received: by 2002:a2e:3c0e:0:b0:2b6:3651:f12f with SMTP id j14-20020a2e3c0e000000b002b63651f12fmr17021462lja.3.1693095486177;
-        Sat, 26 Aug 2023 17:18:06 -0700 (PDT)
-Received: from mobilestation ([95.79.200.178])
-        by smtp.gmail.com with ESMTPSA id x1-20020a05651c104100b002bcd2653872sm1015042ljm.30.2023.08.26.17.18.04
+        bh=+ePHcufuMq3pmxeqUOnA6gD856Da2hnjiacEbgQNiyc=;
+        b=IGP1YlSmf2EOgqAlzJusRp6GDylG8d19s+isvzNUgY2TrIzyR6aucuIm8NWZVMK6H8
+         8fcVCdHwWn7Ra8isU48Bv7SxwM4DSfSzr7SWr8ibZhjR7f8u0Vy4nmzUnneRHDL8k4t+
+         8rxMDaSXoJtzbxDf8OkfwM9baMCoa9Xq9jTYxCbxYPtZxBmICHGkhSwVVXNHQpGyaHqf
+         2FXvrCn3e0R2jqAlPKvQCMQOv8dv2IfqIaSQc1mb8DEdITqbZTX54Xf4ZBLMK8oT9HqK
+         DlQaH4aRFOKEVnM6fMz3BkbE9htgGIaptAMMbCnU+71UpCYQc+UbA2MlB3lXSEWuJQ6x
+         WQhQ==
+X-Gm-Message-State: AOJu0Yz8r+K7xi3MF40rBm8qV4Fp9tATMC8Uoj8uWFhxarxl7Sz4yFEZ
+	Hcbn2zUKr01Mr1cjGGnvrZk=
+X-Google-Smtp-Source: AGHT+IGsVSfybNw1HZ46sl7MDJywNFAJTvz4szI5nRtjxvKaS7S9I8OcoK5k/yTSe0vWLdwkhxWndA==
+X-Received: by 2002:a17:903:11c8:b0:1b8:90bd:d157 with SMTP id q8-20020a17090311c800b001b890bdd157mr25752357plh.26.1693097779637;
+        Sat, 26 Aug 2023 17:56:19 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id o15-20020a170902d4cf00b001b9f7bc3e77sm4306436plg.189.2023.08.26.17.56.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Aug 2023 17:18:05 -0700 (PDT)
-Date: Sun, 27 Aug 2023 03:18:03 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Rohan G Thomas <rohan.g.thomas@intel.com>
-Cc: alexandre.torgue@foss.st.com, conor+dt@kernel.org, 
-	conor.dooley@microchip.com, davem@davemloft.net, devicetree@vger.kernel.org, 
-	edumazet@google.com, joabreu@synopsys.com, krzysztof.kozlowski+dt@linaro.org, 
-	kuba@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	peppe.cavallaro@st.com, robh+dt@kernel.org
-Subject: Re: [PATCH net-next v5 1/2] dt-bindings: net: snps,dwmac: Tx queues
- with coe
-Message-ID: <stdtvjzyaudpnxoj4pxdqw4okrmq2bkmbefvyapbs2racx4dhv@of5t463f4nm5>
-References: <l7yajzhpuotn62pjkxk43qtcn3u4zltpyqcvo224737bjg3eab@bzu6pirxbvh2>
- <20230823171004.6825-1-rohan.g.thomas@intel.com>
+        Sat, 26 Aug 2023 17:56:19 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 1F9C681656C0; Sun, 27 Aug 2023 07:56:15 +0700 (WIB)
+Date: Sun, 27 Aug 2023 07:56:15 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: mengkanglai <mengkanglai2@huawei.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Noah Goldstein <goldstein.w.n@gmail.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "Fengtao (fengtao, Euler)" <fengtao40@huawei.com>,
+	"Yanan (Euler)" <yanan@huawei.com>
+Subject: Re: =?utf-8?B?562U5aSN?= =?utf-8?Q?=3A?= [BUGREPORT]
+ slab-out-of-bounds in do_csum
+Message-ID: <ZOqfL52gs81HzdcM@debian.me>
+References: <bfb7e812fb9043e78e88bbe65334b9ef@huawei.com>
+ <ZOR13ezPVcuVHh_H@debian.me>
+ <c82e104ceb6344a38dd1b0514379ae88@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="s9oSqcPKScbLWA+u"
 Content-Disposition: inline
-In-Reply-To: <20230823171004.6825-1-rohan.g.thomas@intel.com>
+In-Reply-To: <c82e104ceb6344a38dd1b0514379ae88@huawei.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -86,79 +94,35 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 24, 2023 at 01:10:04AM +0800, Rohan G Thomas wrote:
-> >On Tue, Aug 22, 2023 at 05:15:25PM -0700, Jakub Kicinski wrote:
-> >> On Sat, 19 Aug 2023 10:31:31 +0800 Rohan G Thomas wrote:
-> >> > +      snps,tx-queues-with-coe:
-> >> > +        $ref: /schemas/types.yaml#/definitions/uint32
-> >> > +        description: number of TX queues that support TX checksum offloading
-> >> 
-> >
-> >> Is it going to be obvious that if not present all queues support
-> >> checksum offload? I think we should document the default.
-> >
-> >This question is debatable:
-> >1. By default the DW xGMAC and DW QoS Eth IP-cores are
-> >synthesized with only the very first Tx queue having Tx COE enabled.
-> >2. If TSO is disabled then the Tx COE can be individually enabled
-> >for each queue available on DW QoS Eth controller and for the very
-> >first N queues on DW xGMAC controller.
-> >3. If TSO is enabled then the Tx COE will be automatically and always
-> >enabled for as many first queues as there are TSO-capable
-> >DMA-channels.
-> >4. At the current state the STMMAC driver assumes that all Tx Queues
-> >support Tx COE.
-> >
-> >The entry 4 can't be changed since we'll risk to catch regressions on
-> >the platforms with no property specified. On the other hand it partly
-> >contradicts to the rest of the entries. I don't know what would be a
-> >correct way to specify the default value in this case. Most likely
-> >just keep the entry 4 and be done with it.
-> >
-> >BTW I just noticed that but the suggested "snps,tx-queues-with-coe"
-> >property semantic will only cover a DW XGMAC-part of the case 2. DW
-> >QoS Eth can be synthesized with Tx COE individually enabled for a
-> >particular queue if TSO is unavailable.
-> 
-> Hi Serge,
-> 
-> Didn't know about a different IP configuration supported by DW QoS Eth IP. If
-> this is the case, I think we can have a flag 'coe-unsupported' for any TX
-> queue subnode as below.
-> 
-> +          snps,coe-unsupported:
 
-> +            $ref: /schemas/types.yaml#/definitions/flag
+--s9oSqcPKScbLWA+u
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-AFAIR tKrzysztof preferred to use type: boolean for the flags.
+On Sat, Aug 26, 2023 at 10:05:27AM +0000, mengkanglai wrote:
+> The attachment is the fuzz reproduction program.
+> Have you encountered similar problems?
+>=20
 
-> +            description:
-> +              TX checksum offload is unsupported by the TX queue. 
+Please don't top-post; reply inline with appropriate context instead.
 
-> +              If TX checksum
-> +              offload is requested for a packet to be transmitted through this
-> +              TX queue then have a software fallback in the driver for checksum
-> +              calculation.
+Anyway, your reply doesn't answer my previous question: Do you
+have this issue on mainline?
 
-This is redundant in the HW description.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-> 
+--s9oSqcPKScbLWA+u
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> If this is okay, I can rework the patch based on this. Covers both DW QoS Eth IP
-> and DW XGMAC IP cases.
+-----BEGIN PGP SIGNATURE-----
 
-I guess that's the only choice we have seeing the driver already
-expects all the Tx queues having the COE supported.
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZOqfLwAKCRD2uYlJVVFO
+o5RyAQCOgJBsHUjj8vq7ws1jvA6MpJclQYujSZODQg/IpQSvvgEA8y9h6hgkTzmI
+XQeEpmtycVfxre/ll8ZRuykDE/jlqQY=
+=o3uf
+-----END PGP SIGNATURE-----
 
--Serge(y)
-
-> 
-> >
-> >-Serge(y)
-> >
-> >> -- 
-> >> pw-bot: cr
-> 
-> BR,
-> Rohan
+--s9oSqcPKScbLWA+u--
 
