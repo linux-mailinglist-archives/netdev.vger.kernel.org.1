@@ -1,89 +1,104 @@
-Return-Path: <netdev+bounces-30947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1736178A083
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 19:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A7E178A0BB
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 19:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3921280F73
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:35:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB2A6280F37
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EE013FFD;
-	Sun, 27 Aug 2023 17:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A80413FFA;
+	Sun, 27 Aug 2023 17:58:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E877923DB
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 17:35:54 +0000 (UTC)
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C618CF4;
-	Sun, 27 Aug 2023 10:35:53 -0700 (PDT)
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-d7481bc4d6fso2510000276.2;
-        Sun, 27 Aug 2023 10:35:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693157753; x=1693762553;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yHRJyx7j7BhNrqT0LEFiRvYT/7EP1f7+a5goYW9ZPlQ=;
-        b=RqXchjQi9yl1fewbsZSVO18bmqNCA8yVXVt4+XX7Z7LK4mwNSbgU9jEFwTzV+2ycSA
-         OrN824x7+fFyG4kiIqpTEDvbC524lW4SJUDzKxEWpD1La5ylozDQbtHbmtHo3OwtQYlf
-         mxAMsCVxKlxWDGuahz8+ONEFPFYUqFreSKPC5opYU4Eeu76suhcp+TGyggfsALyWZRUz
-         DlBEG+dZQF5kM6oqHFXSmge2JFMaj6V3IyiwWPF/UPZgoGwktqqZX5IcDj/3KGRMF62E
-         fytoly1D6G8fSXc+3Z5nXfNcfBRIHqQ3aRSgnwS9cdy/sVsFrZoQMSXQe4CjLUrCnfel
-         AR9g==
-X-Gm-Message-State: AOJu0Yw12RMLKVKkunwEDRlv5fsV4e/Pl+uwD5LM0ICM8FR73ks0cYLn
-	oyp3CVDDNja5EZcJ7zHEdV/bn8D0fhdptJC6Qtk=
-X-Google-Smtp-Source: AGHT+IFJ1JezbeXTpjjF0OoeKFxHC2a61ED9VzkqbhoT8LTwdtSmsZCpkyXrM/VyazMaxfjC0Yfep1dd4tZSMKxYXzE=
-X-Received: by 2002:a25:830d:0:b0:d78:69ad:cffa with SMTP id
- s13-20020a25830d000000b00d7869adcffamr6115368ybk.42.1693157752891; Sun, 27
- Aug 2023 10:35:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8917EE
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 17:58:15 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B8ECC4;
+	Sun, 27 Aug 2023 10:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3bcqGb8c9MJdTQ6tWNLuuoF9D7rQzI8cfAXINlj2RDI=; b=XXdQMLUmFZOx4/OSGyjOKjkXQO
+	6NMQdjFHsIPxoVX1hyRgrdHuXR63gKElQ/cNdJIl2uZ3gy5+NGINuxF7oWPDqxBA9ThHOW+f3osK7
+	p+fDlQ90EEK5mC2Z0A9LTYzcEvDFtEWGrAEELsbthQkpWFt5pbHF6I79rRBECnHF5zE6WfQFZxTxe
+	SNGGsfVnpxQ8IzqYH+8qz4BvRZq4a1jv/K2SiW2oxuazQccAMje6MBWTRnsnR2pwmUP9y5sj1s0qT
+	eUwkURqWTczX0h8KVf+nROL0UQy/zYNAMEcVjXJOPYf2Q07tNq47i/ekqDZG8/uE+Ci8IsnFrinC1
+	vlLHV+KQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51984)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qaK0f-00076U-35;
+	Sun, 27 Aug 2023 18:57:14 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qaK0c-0002it-AX; Sun, 27 Aug 2023 18:57:10 +0100
+Date: Sun, 27 Aug 2023 18:57:10 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Emil Renner Berthing <kernel@esmil.dk>
+Cc: Jisheng Zhang <jszhang@kernel.org>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: stmmac: dwmac-starfive: remove
+ unnecessary clk_get_rate()
+Message-ID: <ZOuOdt2/y5mKuuv0@shell.armlinux.org.uk>
+References: <20230827134150.2918-1-jszhang@kernel.org>
+ <20230827134150.2918-3-jszhang@kernel.org>
+ <CANBLGcwFW_Y4PC1hxJ7OQN-h025e5wwoCNwnk8OXh3ALFQPcXg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230827134150.2918-1-jszhang@kernel.org> <20230827134150.2918-2-jszhang@kernel.org>
- <ZOtWmedBsa6wQQ6+@shell.armlinux.org.uk>
-In-Reply-To: <ZOtWmedBsa6wQQ6+@shell.armlinux.org.uk>
-From: Emil Renner Berthing <kernel@esmil.dk>
-Date: Sun, 27 Aug 2023 19:35:41 +0200
-Message-ID: <CANBLGcyfxNSgNjNvU1_N2ZC5q1YjqDjS69E7grbfCYM7bmm=-g@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: stmmac: dwmac-starfive: improve error
- handling during probe
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jisheng Zhang <jszhang@kernel.org>, Samin Guo <samin.guo@starfivetech.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANBLGcwFW_Y4PC1hxJ7OQN-h025e5wwoCNwnk8OXh3ALFQPcXg@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, 27 Aug 2023 at 15:59, Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
-> On Sun, Aug 27, 2023 at 09:41:49PM +0800, Jisheng Zhang wrote:
-> > After stmmac_probe_config_dt() succeeds, when error happens later,
-> > stmmac_remove_config_dt() needs to be called for proper error handling.
->
-> Have you thought about converting to use devm_stmmac_probe_config_dt()
-> which will call stmmac_remove_config_dt() if the probe fails or when
-> the device is unbound?
+On Sun, Aug 27, 2023 at 07:33:10PM +0200, Emil Renner Berthing wrote:
+> On Sun, 27 Aug 2023 at 15:53, Jisheng Zhang <jszhang@kernel.org> wrote:
+> >
+> > In starfive_dwmac_fix_mac_speed(), the rate gotten by clk_get_rate()
+> > is not necessary, remove the clk_get_rate() calling.
+> 
+> Thanks. I suggested this change during the initial review, but someone
+> wanted the code as it is. I must admit I don't understand why, so
+> Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
 
-+1. Using devm_stmmac_probe_config_dt() seems like a better solution.
+The code in starfive_dwmac_fix_mac_speed() is a repeated pattern amongst
+many drivers, and having each platform driver re-implement this is not
+sane. Those who know me will know that I have a patch that cleans this
+all up - moving basically the guts of this to a library function which
+platform drivers can make use of.
 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+It's not like the clock rates are somehow special - they're standard for
+10M/100M/1G speeds on a GMII-family interface, and the 10M/100M also
+share the clock rates with MII.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
