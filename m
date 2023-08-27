@@ -1,65 +1,79 @@
-Return-Path: <netdev+bounces-30953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E4578A1A0
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 22:52:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C524578A1B3
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 23:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D8D1C20755
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 20:52:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFB82280E79
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 21:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB01614286;
-	Sun, 27 Aug 2023 20:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7512914287;
+	Sun, 27 Aug 2023 21:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B7D14000;
-	Sun, 27 Aug 2023 20:52:12 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B715123;
-	Sun, 27 Aug 2023 13:52:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=64WGA8VV9Ar6eu59jwKakipB5IQeiUdKnhF4bZRyjJg=; b=f4Amt/s2VPJBfpbA4kwhdXTdVg
-	/pn5N3WZwWFuLeNUpjeDraYY4nQbaO2UYvFIaQahuWJpv6yWj9SJhm3438dxwJSqQjroyoc9F0SYv
-	XAWPI0/B2+Jwn7WLlLOC7qTdz3pp+yI4mEjVaLz0qln0W2Hlp6Bqseo3n3BK6S7q8PWF2QR7jDDR5
-	5QOB+otXNut9VVTlFGgE9OB8fNY4Zqee0Fvn6lAYSC0XLvrtBqaDQzjA8XPvUV/U40DN9P1BUUcT+
-	KJAEsVOCJlXQA4wp82KhD9XmJfIxAUdOp4MXoPkTY5GoW5ML77D0bFxP371EeaBKUbiVosNZkp33g
-	ozZ78lYw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qaMjj-00DkxQ-7a; Sun, 27 Aug 2023 20:51:55 +0000
-Date: Sun, 27 Aug 2023 21:51:55 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Hao Xu <hao.xu@linux.dev>
-Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-	Dave Chinner <david@fromorbit.com>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 09/11] vfs: error out -EAGAIN if atime needs to be updated
-Message-ID: <ZOu3a/24YJrtpIy1@casper.infradead.org>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-10-hao.xu@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F1113FF1
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 21:01:57 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BE74B5;
+	Sun, 27 Aug 2023 14:01:52 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50078eba7afso4059410e87.0;
+        Sun, 27 Aug 2023 14:01:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693170110; x=1693774910;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ulpChpcoy8VlUT/kLKfOHdPOjX+o2BAu8P/16CYMK0s=;
+        b=RkZzDQPfUqj6F5fdvcMHzxoVR00+KYXLWxAOsSYAZNYJZ4ljhNN9I+wqLOGyDHiMnY
+         CQphZse3aOylU/9IZPZ1aaFu4w1cdLx4xqh4wqfdONz9AYHykj2B3c992BX3DpNwD86i
+         1xsabOhbm5HyLgNnv8N5fPdpUU31Bvxg4BXHP0pyfwkSx5akZzC5wn5gftVCN5gG74T3
+         8TerNlPig64gtArmqucYjto90irA4FA6NpQGxYKoc5L6DCtQs0z8Qef1JAsaEW/+AvPM
+         UjVu9IKuCoV64voI1Z6xIcfg3Ku2/KRbvx/VgSugSl15sUkV4G14Wd2itJzplGjsbeID
+         +RPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693170110; x=1693774910;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ulpChpcoy8VlUT/kLKfOHdPOjX+o2BAu8P/16CYMK0s=;
+        b=XnssbF+OvYbAW5vIrTPsMfkx0C3Q3tPsaUjKfDOYIXqcibaIRUvUSQsWOk5o421HaP
+         c1sF3fWdUIe8ULB88DbzJBaTrzDezEaPK9pkBJOYnSTqA7rVVEEtiD9ELSF+DLcTI8cW
+         DqUWFF2bj7Oe14+jHo3Q4tJzyevhTZNhIEnUagUm8G4ngSmNk5ttLag1k3xUOBrCKk8U
+         SVexIXM48UghKb6rJedPBBcJz2Kxs/FUzitmGBrvPFe4VvS3bNZF9a6BMREZbzgCvzG8
+         BPutYiLmVWlB2SAYWrJSBTRdr+i7Z/mt0mwFDA7LG1PhXYaj9M2MTlRRq4l+khBGoEOV
+         al5A==
+X-Gm-Message-State: AOJu0YwaHDRrVEtP3GhGU+WH6IUybyPEL82jkxG6V2700QjAivcmtbiB
+	MP8N08Z/2RgJ7A1P06zlSZY=
+X-Google-Smtp-Source: AGHT+IH7O3PchMh/vNAPMm9q+TNABaGxipRSESTad+5nesBzrvn2XS6gxhHJZi8/rdjfw4c+YKBc3Q==
+X-Received: by 2002:a05:6512:4012:b0:4fe:8ba9:4c4 with SMTP id br18-20020a056512401200b004fe8ba904c4mr21079937lfb.59.1693170109841;
+        Sun, 27 Aug 2023 14:01:49 -0700 (PDT)
+Received: from mobilestation ([95.79.200.178])
+        by smtp.gmail.com with ESMTPSA id c23-20020a197617000000b004ff748f6f1fsm1280986lff.69.2023.08.27.14.01.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Aug 2023 14:01:49 -0700 (PDT)
+Date: Mon, 28 Aug 2023 00:01:47 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet
+ Controller
+Message-ID: <q7o7wqodz5epyjdj7vlryaseugr2fjhef2cgsh65trw3r2jorm@5z5a5tyuyq4d>
+References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
+ <20230824125012.1040288-3-keguang.zhang@gmail.com>
+ <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
+ <c32130ab-27dc-e991-10fd-db0fba25cc97@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,18 +82,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230827132835.1373581-10-hao.xu@linux.dev>
+In-Reply-To: <c32130ab-27dc-e991-10fd-db0fba25cc97@linaro.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 27, 2023 at 09:28:33PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> To enforce nowait semantics, error out -EAGAIN if atime needs to be
-> updated.
+Hi Krzysztof
 
-Squash this into patch 6.  Otherwise patch 6 makes no sense.
+On Sun, Aug 27, 2023 at 09:56:06AM +0200, Krzysztof Kozlowski wrote:
+> On 26/08/2023 23:04, Serge Semin wrote:
+> >> +  clock-names:
+> >> +    items:
+> >> +      - const: stmmaceth
+> > 
+> >   clock-names:
+> >     const: stmmaceth
+> > ?
+> 
+
+> The existing syntax is correct. This is a string array.
+
+Could you please clarify whether it's a requirement (always specify
+items: property for an array) or just an acceptable option (another
+one is suggested in my comment)? I am asking because:
+1. In this case the "clock-names" array is supposed to have only one
+item. Directly setting "const: stmmaceth" with no items: property
+shall simplify it.
+2. There are single-entry "clock-names" property in the DT-bindings
+defined as I suggested.
+3. There is a "compatible" property which is also a string array but
+it can be defined as I suggested (omitting the items property).
+
+so based on all of that using the "items:"-based constraint here seems
+redundant. Am I wrong to think like that? If so in what aspect?
+
+-Serge(y)
+
+> 
+> > 
+> >> +
+> >> +  interrupts:
+> >> +    maxItems: 1
+> >> +
+> > 
+> >> +  interrupt-names:
+> >> +    items:
+> >> +      - const: macirq
+> > 
+> >   interrupt-names:
+> >     const: macirq
+> > ?
+> 
+> As well.
+> 
+> > 
+> >> +
+> >> +  loongson,ls1-syscon:
+> >> +    $ref: /schemas/types.yaml#/definitions/phandle
+> >> +    description:
+> >> +      Phandle to the syscon containing some extra configurations
+> >> +      including PHY interface mode.
+> >> +
+> > 
+> >> +  phy-mode:
+> >> +    items:
+> >> +      - enum:
+> >> +          - mii
+> >> +          - rmii
+> > 
+> >   phy-mode:
+> >     enum: ...
+> > ?
+> 
+> Here indeed, this is a string, not a list, so items are wrong.
+> 
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
