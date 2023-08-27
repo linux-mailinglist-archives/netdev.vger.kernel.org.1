@@ -1,307 +1,191 @@
-Return-Path: <netdev+bounces-30942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B4178A077
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 19:18:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C6378A07B
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 19:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B111C1C2091C
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:18:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D51C280F1F
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B3F111AA;
-	Sun, 27 Aug 2023 17:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF8C111B7;
+	Sun, 27 Aug 2023 17:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E2411184
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 17:18:13 +0000 (UTC)
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D50B4;
-	Sun, 27 Aug 2023 10:18:10 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.west.internal (Postfix) with ESMTP id 81889320076F;
-	Sun, 27 Aug 2023 13:18:06 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Sun, 27 Aug 2023 13:18:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1693156686; x=1693243086; bh=tJv/AQ1qUk8XI
-	cGYa2IeHHGFgUMAkpcwasA2plQ3J6o=; b=ddPDOv+oiW0tbtzXYD1iulTZwLfSI
-	1x6IRY1hGy768h3Fo28AI8OsC9ALnMnI6qNKlC0nsVwoeZQTTopLOJdlSHFaA2Vg
-	Kh72elHfPhpY9J6ZnOmA1lYyi7rou7HEMMohZmOMM/RTWSkllF98oRe567au12b1
-	woZUg/WqIy9GVmveDAB9mBNFpeDkULd3vSs9K3PRTA1S7+viI413gOVl/MBVqhIJ
-	+q9ILxRupGQaKTl29cM7JRH7UjtkFVdO+bcwUoNUHyxy7ix2PWDi0Yp5UdKeLMZK
-	WqoGIOsOcOWAooTQJyt2RkfyhDXVs+hzt2AIfxck9CBcsJg/Yk+Ujk2sg==
-X-ME-Sender: <xms:TYXrZG5X03-Hd8fSZg17WdqMaeAdA4YwAbkUxVaOg2mGJX-lyKGebA>
-    <xme:TYXrZP4p55J4Vxu6ccfzGNzDKT3UP6vhRfmKs1az_l839mBOLY0cakS3s70PY4PpC
-    cKhZnxkKpD4PEY>
-X-ME-Received: <xmr:TYXrZFdtry21eUJzXoUUXGLfwgMU-OGD0qRKU_UWecr3pcGgPN4p43hMV3S3>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudefvddgudduvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedtffelvddvudelieeutddvlefhteejieeivdefhffhudejgedvgfdtueeg
-    vedtkeenucffohhmrghinheprhhouhhtvghrmhhulhhtihhprghthhhvihhprdhshhenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgt
-    hhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:TYXrZDIkBZNfe1Og02xD1IXmOS9t6HV4Xj16ETSl-uBrAaPhMqKY8w>
-    <xmx:TYXrZKIZES5qW0zYLJbLuh5l9e71QyjspfKLkQLqESBx4IQkego1-w>
-    <xmx:TYXrZEwSjpgBYXWeE1v8gBohuCQl0AZMChQYvWcpLc1kZCQd-alJ1A>
-    <xmx:ToXrZJ9ZgFuKINHtq0cMneIZIxeNRo4mg0XqTVla15ETe3oWeenqpg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 27 Aug 2023 13:18:05 -0400 (EDT)
-Date: Sun, 27 Aug 2023 20:18:01 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net v2 3/3] selftests: forwarding: Add test for
- load-balancing between multiple servers
-Message-ID: <ZOuFSbnxgaST4qKD@shredder>
-References: <20230825090830.18635-1-sriram.yagnaraman@est.tech>
- <20230825090830.18635-4-sriram.yagnaraman@est.tech>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD7E11189
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 17:29:51 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DE5F4
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 10:29:50 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52a3ff5f0abso3392146a12.1
+        for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 10:29:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1693157389; x=1693762189;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=LPmDki2jpYmN+rUL74lZb77KopA7ykC3IrhyHOaP5Sc=;
+        b=aY2L7YUJ+cvTkhJhR0XlDrjjsH05kx1CpDr8mBLFube6RPAWBdmvRRThgiK/Sj5qlZ
+         Vq0LApnSBSKPbuuv8ioMrHiK9JbYuegDGxWDLEAu33ZYMNZ39HZ9Nfk6RXygv+mcrcVs
+         7mSNUkeDnBKNivOGehw7v9N1FjdAsZTTSzOSw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693157389; x=1693762189;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LPmDki2jpYmN+rUL74lZb77KopA7ykC3IrhyHOaP5Sc=;
+        b=hOxeIQTA9Q4mFJTUUxMBXcZjyKKN4RHl2GGMAhxIIe3sAurZaBECN4fKxucsTG3Yg9
+         uHnOZJgMFI0inH+xO/Lg3ykqNPGHqdr2OgkpSW8514kLBcP9Lb3ch9xVI66Tu3TllgIC
+         avpYAr6rwL/o4xVKFBy8dTSygYPvpmGumcdlkNXqnl2Vr9qGKYsiwk5COnoJM12kjAnO
+         iWx82B2UMxFttchlg7P7P/t7yPxvK+7e7e8dlw2lW9lJb1Ewryy9D1GHMkopRhl0934K
+         xUg+WIIz+AxTHLSloghGBJ3pe8q5tW/kYSGXzF2PuzJlWhR9oyOAJ/WhBlY99PTQWk2e
+         uFfA==
+X-Gm-Message-State: AOJu0YxKtbnZ70JV5E6Y5Yorcta19CkhJN+m9CBgKXxIGKFsf2EKJ77P
+	QxGIEx/kcIGEleh6W71CP6s4gRri8lxUwhSPgkDgpQ==
+X-Google-Smtp-Source: AGHT+IGtdrxzbvikfnbQXn8MYrbeBQt54+vNvJ+mFKVCT2YWOyXHUwOoUkByO30gPKwJFiEf9zd9SjN9493qMZTmELs=
+X-Received: by 2002:aa7:d651:0:b0:525:570c:566b with SMTP id
+ v17-20020aa7d651000000b00525570c566bmr18942506edr.22.1693157388599; Sun, 27
+ Aug 2023 10:29:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825090830.18635-4-sriram.yagnaraman@est.tech>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_NONE autolearn=ham
+References: <20230825190443.48375-1-m.kobuk@ispras.ru> <20230827165130.GV3523530@kernel.org>
+In-Reply-To: <20230827165130.GV3523530@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Sun, 27 Aug 2023 10:29:37 -0700
+Message-ID: <CACKFLi=+BL3xZGhEV3_J0pcEu9Xm8QkE6hE0g4RHd9xZqzjD_Q@mail.gmail.com>
+Subject: Re: [PATCH] ethernet: tg3: remove unreachable code
+To: Simon Horman <horms@kernel.org>
+Cc: Mikhail Kobuk <m.kobuk@ispras.ru>, Siva Reddy Kallam <siva.kallam@broadcom.com>, 
+	Prashant Sreedharan <prashant@broadcom.com>, Michael Chan <mchan@broadcom.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Jean Delvare <jdelvare@suse.com>, 
+	Guenter Roeck <linux@roeck-us.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hwmon@vger.kernel.org, lvc-project@linuxtesting.org, 
+	Alexey Khoroshilov <khoroshilov@ispras.ru>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000b9ff670603eaecf2"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 11:08:30AM +0200, Sriram Yagnaraman wrote:
-> Create a topology with a host, and a router. The host (veth0) is in the
-> default namespace, and a network namespace is created for the router,
-> the peer veth1 is moved to the router netns. A dummy interface is added
-> inside the router netns, to simulate a network that has two neighbors.
-> An ECMP route to a virtual IP (vip) with the two neighbors as the next
-> hop is added.
-> 
-> The test uses perf stat to count the number of fib:fib_table_lookup
-> tracepoint hits for IPv4 and the number of fib6:fib6_table_lookup for
-> IPv6. The measured count is checked to be within 15% for the number of
-> packets received on veth1 in the router.
-> 
-> See diagram in the test for more information.
-> 
-> Suggested-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-> ---
->  .../testing/selftests/net/forwarding/Makefile |   1 +
->  tools/testing/selftests/net/forwarding/lib.sh |   5 +
->  .../net/forwarding/router_multipath_vip.sh    | 255 ++++++++++++++++++
+--000000000000b9ff670603eaecf2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I believe this test better fits in fib_tests.sh. Here's a diff that uses
-the previously mentioned method [1]. I verified that it fails without
-the fixes and passes with them:
+On Sun, Aug 27, 2023 at 9:51=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Fri, Aug 25, 2023 at 10:04:41PM +0300, Mikhail Kobuk wrote:
+>
+> + Matt Carlson <mcarlson@broadcom.com>
 
-Before:
+Matt Carlson is no longer working for Broadcom.
 
-IPv4 multipath list receive tests
-    TEST: Multipath route hit ratio (.15)                               [FAIL]
-    TEST: Single path route hit ratio (.15)                             [ OK ]
+>
+> > 'tp->irq_max' value is either 1 [L16336] or 5 [L16354], as indicated in
+> > tg3_get_invariants(). Therefore, 'i' can't exceed 4 in tg3_init_one()
+> > that makes (i <=3D 4) always true. Moreover, 'intmbx' value set at the
+> > last iteration is not used later in it's scope.
+> >
+> > Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> >
+> > Fixes: 78f90dcf184b ("tg3: Move napi_add calls below tg3_get_invariants=
+")
+> > Signed-off-by: Mikhail Kobuk <m.kobuk@ispras.ru>
+> > Reviewed-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
 
-IPv6 multipath list receive tests
-    TEST: Multipath route hit ratio (.15)                               [FAIL]
-    TEST: Single path route hit ratio (.14)                             [ OK ]
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-After:
+--000000000000b9ff670603eaecf2
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-IPv4 multipath list receive tests
-    TEST: Multipath route hit ratio (.99)                               [ OK ]
-    TEST: Single path route hit ratio (.15)                             [ OK ]
-
-IPv6 multipath list receive tests
-    TEST: Multipath route hit ratio (.99)                               [ OK ]
-    TEST: Single path route hit ratio (.14)                             [ OK ]
-
-[1]
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 35d89dfa6f11..5ffbfdad943c 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -9,7 +9,7 @@ ret=0
- ksft_skip=4
- 
- # all tests in this script. Can be overridden with -t option
--TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh"
-+TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify ipv6_rt ipv4_rt ipv6_addr_metric ipv4_addr_metric ipv6_route_metrics ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh ipv4_mpath_list ipv6_mpath_list"
- 
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -2138,6 +2138,143 @@ ipv4_bcast_neigh_test()
- 	cleanup
- }
- 
-+mpath_dep_check()
-+{
-+	if [ ! -x "$(command -v mausezahn)" ]; then
-+		echo "mausezahn command not found. Skipping test"
-+		return 1
-+	fi
-+
-+	if [ ! -x "$(command -v jq)" ]; then
-+		echo "jq command not found. Skipping test"
-+		return 1
-+	fi
-+
-+	if [ ! -x "$(command -v bc)" ]; then
-+		echo "bc command not found. Skipping test"
-+		return 1
-+	fi
-+
-+	if [ ! -x "$(command -v perf)" ]; then
-+		echo "perf command not found. Skipping test"
-+		return 1
-+	fi
-+
-+	perf list fib:* | grep -q fib_table_lookup
-+	if [ $? -ne 0 ]; then
-+		echo "IPv4 FIB tracepoint not found. Skipping test"
-+		return 1
-+	fi
-+
-+	perf list fib6:* | grep -q fib6_table_lookup
-+	if [ $? -ne 0 ]; then
-+		echo "IPv6 FIB tracepoint not found. Skipping test"
-+		return 1
-+	fi
-+
-+	return 0
-+}
-+
-+list_rcv_eval()
-+{
-+	local name=$1; shift
-+	local file=$1; shift
-+	local exp=$1; shift
-+
-+
-+	local count=$(tail -n 1 $file | jq '.["counter-value"] | tonumber | floor')
-+	local ratio=$(echo "scale=2; $count / 65536" | bc -l)
-+	local res=$(echo "$ratio $exp" | bc)
-+	[[ $res -eq 1 ]]
-+	log_test $? 0 "$name route hit ratio ($ratio)"
-+}
-+
-+ipv4_mpath_list_test()
-+{
-+	echo
-+	echo "IPv4 multipath list receive tests"
-+
-+	mpath_dep_check || return 1
-+
-+	route_setup
-+
-+	set -e
-+	run_cmd "ip netns exec ns1 ethtool -K veth1 tcp-segmentation-offload off"
-+
-+	run_cmd "ip netns exec ns2 bash -c \"echo 20000 > /sys/class/net/veth2/gro_flush_timeout\""
-+	run_cmd "ip netns exec ns2 bash -c \"echo 1 > /sys/class/net/veth2/napi_defer_hard_irqs\""
-+	run_cmd "ip netns exec ns2 ethtool -K veth2 generic-receive-offload on"
-+	run_cmd "ip -n ns2 link add name nh1 up type dummy"
-+	run_cmd "ip -n ns2 link add name nh2 up type dummy"
-+	run_cmd "ip -n ns2 address add 172.16.201.1/24 dev nh1"
-+	run_cmd "ip -n ns2 address add 172.16.202.1/24 dev nh2"
-+	run_cmd "ip -n ns2 neigh add 172.16.201.2 lladdr 00:11:22:33:44:55 nud perm dev nh1"
-+	run_cmd "ip -n ns2 neigh add 172.16.202.2 lladdr 00:aa:bb:cc:dd:ee nud perm dev nh2"
-+	run_cmd "ip -n ns2 route add 203.0.113.0/24 nexthop via 172.16.201.2 nexthop via 172.16.202.2"
-+	run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.fib_multipath_hash_policy=1"
-+	set +e
-+
-+	local dmac=$(ip -n ns2 -j link show dev veth2 | jq -r '.[]["address"]')
-+	local tmp_file=$(mktemp)
-+
-+	# Packets forwarded in a list using a multipath route must not reuse a
-+	# cached result so that a flow always hits the same nexthop. In other
-+	# words, the FIB lookup tracepoint needs to be triggered for every
-+	# packet.
-+	run_cmd "perf stat -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- ip netns exec ns1 mausezahn veth1 -a own -b $dmac -A 172.16.101.1 -B 203.0.113.1 -t udp 'sp=12345,dp=0-65535' -q"
-+	list_rcv_eval "Multipath" $tmp_file ">= 0.95"
-+
-+	# The same is not true for a single path route.
-+	run_cmd "ip -n ns2 route replace 203.0.113.0/24 nexthop via 172.16.201.2"
-+	run_cmd "perf stat -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- ip netns exec ns1 mausezahn veth1 -a own -b $dmac -A 172.16.101.1 -B 203.0.113.1 -t udp 'sp=12345,dp=0-65535' -q"
-+	list_rcv_eval "Single path" $tmp_file "< 0.95"
-+
-+	rm $tmp_file
-+	route_cleanup
-+}
-+
-+ipv6_mpath_list_test()
-+{
-+	echo
-+	echo "IPv6 multipath list receive tests"
-+
-+	mpath_dep_check || return 1
-+
-+	route_setup
-+
-+	set -e
-+	run_cmd "ip netns exec ns1 ethtool -K veth1 tcp-segmentation-offload off"
-+
-+	run_cmd "ip netns exec ns2 bash -c \"echo 20000 > /sys/class/net/veth2/gro_flush_timeout\""
-+	run_cmd "ip netns exec ns2 bash -c \"echo 1 > /sys/class/net/veth2/napi_defer_hard_irqs\""
-+	run_cmd "ip netns exec ns2 ethtool -K veth2 generic-receive-offload on"
-+	run_cmd "ip -n ns2 link add name nh1 up type dummy"
-+	run_cmd "ip -n ns2 link add name nh2 up type dummy"
-+	run_cmd "ip -n ns2 -6 address add 2001:db8:201::1/64 dev nh1"
-+	run_cmd "ip -n ns2 -6 address add 2001:db8:202::1/64 dev nh2"
-+	run_cmd "ip -n ns2 -6 neigh add 2001:db8:201::2 lladdr 00:11:22:33:44:55 nud perm dev nh1"
-+	run_cmd "ip -n ns2 -6 neigh add 2001:db8:202::2 lladdr 00:aa:bb:cc:dd:ee nud perm dev nh2"
-+	run_cmd "ip -n ns2 -6 route add 2001:db8:301::/64 nexthop via 2001:db8:201::2 nexthop via 2001:db8:202::2"
-+	run_cmd "ip netns exec ns2 sysctl -qw net.ipv6.fib_multipath_hash_policy=1"
-+	set +e
-+
-+	local dmac=$(ip -n ns2 -j link show dev veth2 | jq -r '.[]["address"]')
-+	local tmp_file=$(mktemp)
-+
-+	# Packets forwarded in a list using a multipath route must not reuse a
-+	# cached result so that a flow always hits the same nexthop. In other
-+	# words, the FIB lookup tracepoint needs to be triggered for every
-+	# packet.
-+	run_cmd "perf stat -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- ip netns exec ns1 mausezahn -6 veth1 -a own -b $dmac -A 2001:db8:101::1 -B 2001:db8:301::1 -t udp 'sp=12345,dp=0-65535' -q"
-+	list_rcv_eval "Multipath" $tmp_file ">= 0.95"
-+
-+	# The same is not true for a single path route.
-+	run_cmd "ip -n ns2 route replace 2001:db8:301::/64 nexthop via 2001:db8:201::2"
-+	run_cmd "perf stat -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- ip netns exec ns1 mausezahn -6 veth1 -a own -b $dmac -A 2001:db8:101::1 -B 2001:db8:301::1 -t udp 'sp=12345,dp=0-65535' -q"
-+	list_rcv_eval "Single path" $tmp_file "< 0.95"
-+
-+	rm $tmp_file
-+	route_cleanup
-+}
-+
- ################################################################################
- # usage
- 
-@@ -2217,6 +2354,8 @@ do
- 	ipv4_mangle)			ipv4_mangle_test;;
- 	ipv6_mangle)			ipv6_mangle_test;;
- 	ipv4_bcast_neigh)		ipv4_bcast_neigh_test;;
-+	ipv4_mpath_list)		ipv4_mpath_list_test;;
-+	ipv6_mpath_list)		ipv6_mpath_list_test;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
- 	esac
--- 
-2.40.1
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFwfujSFAPfd9SzXpLFyRD1fWCc8T64w
+V48knDg22/6OMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDgy
+NzE3Mjk0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAHarlYBRvaeOIv5ZZhBXxSg2KjNC2qAzx3ZDGA6dArbxmvpYls
+q4e4y/NuAenYbvg+QwOi9Fens5LbfKKx5t0VLQ/kTLEztocCrUMWmssblCkAZqPZlCh+KSroFQIj
+GN1C9jp4Fg3nvQdrNOfXng+XTeTuHZHpfvHqAdPwlatIrdqXcXjiEoePs9+9ccqJ5NTmo4FPvn43
+taTo3IydC5rvB15/QUZ+Ql8OnQdwQ9qzrtLkZKkRupcJs+SpZMfIZDn2v7T+aKps7Qu8+yY/q020
+BmKZ6Cxf7GiK5ous4HiXbvdoTeTOwMN8BeZzWEyh+tUYq0RW5nPhZYtLUHiz4XTT
+--000000000000b9ff670603eaecf2--
 
