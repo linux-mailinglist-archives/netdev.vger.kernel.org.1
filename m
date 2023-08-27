@@ -1,231 +1,131 @@
-Return-Path: <netdev+bounces-30926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86D41789F65
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 15:36:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A30AC789F81
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 15:37:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F805280FE0
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 13:36:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C3A9280FCB
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 13:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B278C14;
-	Sun, 27 Aug 2023 13:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3387ECA58;
+	Sun, 27 Aug 2023 13:37:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A1D883C
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 13:36:35 +0000 (UTC)
-Received: from out-244.mta1.migadu.com (out-244.mta1.migadu.com [IPv6:2001:41d0:203:375::f4])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7387C1B1
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 06:36:28 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1693143386;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NAMtHKwgj081g8lIPVs72MliioxtTYHj7D9CTN85ELE=;
-	b=u7n0PP5Y7t8pZAzx+5IbBJkZfY9azRKTfFVD9LVMOb4Thl+C2D6j0w7wWcMlmzcA25L4C8
-	zEudurGp2ODbmGylA6BsBPQ9105gr52QFoDr/T1ABSTboWT6yVGzUbuarS4ljsFfYjiAKI
-	tkX7K8GiO8NfI2EeGspOsslEfgzb2IA=
-From: Hao Xu <hao.xu@linux.dev>
-To: io-uring@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Dominique Martinet <asmadeus@codewreck.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Stefan Roesch <shr@fb.com>,
-	Clay Harris <bugs@claycon.org>,
-	Dave Chinner <david@fromorbit.com>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-cachefs@redhat.com,
-	ecryptfs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org,
-	bpf@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291EC8BF0
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 13:37:40 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EFF418D;
+	Sun, 27 Aug 2023 06:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693143458; x=1724679458;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=RKVN1bWO+6tJ6WlmxsOXbk1vq7oGMYXcJ+RHQjqKcpI=;
+  b=M1j/VzE2owymIttDRH7CpB18nft2F8ryiP2IJkji3PYzExMRcjAvTxmU
+   dQW8Kndd32OrQ5FOc9dmb8bkE11X1Ma48TOREPh0v28/QEC3B/319yS3C
+   ZagnVz7I/qRhOOC0hLGwXR3CuFFZA32iBRQ1CAqKh3pzk41LV1yyT9hIu
+   yi2IBpHjY1jGQN2ca/QzlaZ38CnYARDRCTemws8nSIks6S2q46T4nTMTn
+   M4tRu8FcYmgFyuCVam0+TLloG323ghzpUscNn8iSceE9j5xTYtgDTfca7
+   08+D+3zJlqzoCr+ow7b+9UKhF/VIY0u5U6fDh4lRhufZQTyiMrlcb1YB+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10815"; a="354471018"
+X-IronPort-AV: E=Sophos;i="6.02,205,1688454000"; 
+   d="scan'208";a="354471018"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2023 06:37:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10815"; a="1068752164"
+X-IronPort-AV: E=Sophos;i="6.02,205,1688454000"; 
+   d="scan'208";a="1068752164"
+Received: from dplotkin-mobl.ger.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.249.41.231])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2023 06:37:34 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: linux-pci@vger.kernel.org,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Chas Williams <3chas3@gmail.com>,
+	linux-atm-general@lists.sourceforge.net,
 	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	codalist@coda.cs.cmu.edu,
-	linux-f2fs-devel@lists.sourceforge.net,
-	cluster-devel@redhat.com,
-	linux-mm@kvack.org,
-	linux-nilfs@vger.kernel.org,
-	devel@lists.orangefs.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-mtd@lists.infradead.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 11/11] io_uring: add support for getdents
-Date: Sun, 27 Aug 2023 21:28:35 +0800
-Message-Id: <20230827132835.1373581-12-hao.xu@linux.dev>
-In-Reply-To: <20230827132835.1373581-1-hao.xu@linux.dev>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH v2 4/8] atm: iphase: Do PCI error checks on own line
+Date: Sun, 27 Aug 2023 16:37:01 +0300
+Message-Id: <20230827133705.12991-5-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230827133705.12991-1-ilpo.jarvinen@linux.intel.com>
+References: <20230827133705.12991-1-ilpo.jarvinen@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Hao Xu <howeyxu@tencent.com>
+In get_esi() PCI errors are checked inside line-split if conditions (in
+addition to the file not following the coding style). To make the code
+in get_esi() more readable, fix the coding style and use the usual
+error handling pattern with a separate variable.
 
-This add support for getdents64 to io_uring, acting exactly like the
-syscall: the directory is iterated from it's current's position as
-stored in the file struct, and the file's position is updated exactly as
-if getdents64 had been called.
+In addition, initialization of 'error' variable at declaration is not
+needed.
 
-For filesystems that support NOWAIT in iterate_shared(), try to use it
-first; if a user already knows the filesystem they use do not support
-nowait they can force async through IOSQE_ASYNC in the sqe flags,
-avoiding the need to bounce back through a useless EAGAIN return.
+No function changes intended.
 
-Co-developed-by: Dominique Martinet <asmadeus@codewreck.org>
-Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
-Signed-off-by: Hao Xu <howeyxu@tencent.com>
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
- include/uapi/linux/io_uring.h |  1 +
- io_uring/fs.c                 | 53 +++++++++++++++++++++++++++++++++++
- io_uring/fs.h                 |  3 ++
- io_uring/opdef.c              |  8 ++++++
- 4 files changed, 65 insertions(+)
+ drivers/atm/iphase.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 8e61f8b7c2ce..3896397a1998 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -240,6 +240,7 @@ enum io_uring_op {
- 	IORING_OP_URING_CMD,
- 	IORING_OP_SEND_ZC,
- 	IORING_OP_SENDMSG_ZC,
-+	IORING_OP_GETDENTS,
- 
- 	/* this goes last, obviously */
- 	IORING_OP_LAST,
-diff --git a/io_uring/fs.c b/io_uring/fs.c
-index f6a69a549fd4..04711feac4e6 100644
---- a/io_uring/fs.c
-+++ b/io_uring/fs.c
-@@ -47,6 +47,12 @@ struct io_link {
- 	int				flags;
- };
- 
-+struct io_getdents {
-+	struct file			*file;
-+	struct linux_dirent64 __user	*dirent;
-+	unsigned int			count;
-+};
-+
- int io_renameat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- {
- 	struct io_rename *ren = io_kiocb_to_cmd(req, struct io_rename);
-@@ -291,3 +297,50 @@ void io_link_cleanup(struct io_kiocb *req)
- 	putname(sl->oldpath);
- 	putname(sl->newpath);
- }
-+
-+int io_getdents_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-+{
-+	struct io_getdents *gd = io_kiocb_to_cmd(req, struct io_getdents);
-+
-+	if (READ_ONCE(sqe->off))
-+		return -EINVAL;
-+
-+	gd->dirent = u64_to_user_ptr(READ_ONCE(sqe->addr));
-+	gd->count = READ_ONCE(sqe->len);
-+
-+	return 0;
-+}
-+
-+int io_getdents(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	struct io_getdents *gd = io_kiocb_to_cmd(req, struct io_getdents);
-+	struct file *file = req->file;
-+	unsigned long getdents_flags = 0;
-+	bool force_nonblock = issue_flags & IO_URING_F_NONBLOCK;
-+	bool locked;
-+	int ret;
-+
-+	if (force_nonblock) {
-+		if (!(file->f_flags & O_NONBLOCK) &&
-+		    !(file->f_mode & FMODE_NOWAIT))
-+			return -EAGAIN;
-+
-+		getdents_flags = DIR_CONTEXT_F_NOWAIT;
+diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
+index 324148686953..9bba8f280a4d 100644
+--- a/drivers/atm/iphase.c
++++ b/drivers/atm/iphase.c
+@@ -2291,19 +2291,21 @@ static int get_esi(struct atm_dev *dev)
+ static int reset_sar(struct atm_dev *dev)  
+ {  
+ 	IADEV *iadev;  
+-	int i, error = 1;  
++	int i, error;
+ 	unsigned int pci[64];  
+ 	  
+ 	iadev = INPH_IA_DEV(dev);  
+-	for(i=0; i<64; i++)  
+-	  if ((error = pci_read_config_dword(iadev->pci,  
+-				i*4, &pci[i])) != PCIBIOS_SUCCESSFUL)  
+-  	      return error;  
++	for (i = 0; i < 64; i++) {
++		error = pci_read_config_dword(iadev->pci, i * 4, &pci[i]);
++		if (error != PCIBIOS_SUCCESSFUL)
++			return error;
 +	}
-+
-+	ret = file_pos_lock_nowait(file, force_nonblock);
-+	if (ret == -EAGAIN)
-+		return ret;
-+	locked = ret;
-+
-+	ret = vfs_getdents(file, gd->dirent, gd->count, getdents_flags);
-+	if (locked)
-+		file_pos_unlock(file);
-+
-+	if (ret == -EAGAIN && force_nonblock)
-+		return -EAGAIN;
-+
-+	io_req_set_res(req, ret, 0);
-+	return 0;
-+}
-+
-diff --git a/io_uring/fs.h b/io_uring/fs.h
-index 0bb5efe3d6bb..f83a6f3a678d 100644
---- a/io_uring/fs.h
-+++ b/io_uring/fs.h
-@@ -18,3 +18,6 @@ int io_symlinkat(struct io_kiocb *req, unsigned int issue_flags);
- int io_linkat_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
- int io_linkat(struct io_kiocb *req, unsigned int issue_flags);
- void io_link_cleanup(struct io_kiocb *req);
-+
-+int io_getdents_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
-+int io_getdents(struct io_kiocb *req, unsigned int issue_flags);
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index 3b9c6489b8b6..1bae6b2a8d0b 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -428,6 +428,11 @@ const struct io_issue_def io_issue_defs[] = {
- 		.prep			= io_eopnotsupp_prep,
- #endif
- 	},
-+	[IORING_OP_GETDENTS] = {
-+		.needs_file		= 1,
-+		.prep			= io_getdents_prep,
-+		.issue			= io_getdents,
-+	},
- };
- 
- 
-@@ -648,6 +653,9 @@ const struct io_cold_def io_cold_defs[] = {
- 		.fail			= io_sendrecv_fail,
- #endif
- 	},
-+	[IORING_OP_GETDENTS] = {
-+		.name			= "GETDENTS",
-+	},
- };
- 
- const char *io_uring_get_opcode(u8 opcode)
+ 	writel(0, iadev->reg+IPHASE5575_EXT_RESET);  
+-	for(i=0; i<64; i++)  
+-	  if ((error = pci_write_config_dword(iadev->pci,  
+-					i*4, pci[i])) != PCIBIOS_SUCCESSFUL)  
+-	    return error;  
++	for (i = 0; i < 64; i++) {
++		error = pci_write_config_dword(iadev->pci, i * 4, pci[i]);
++		if (error != PCIBIOS_SUCCESSFUL)
++			return error;
++	}
+ 	udelay(5);  
+ 	return 0;  
+ }  
 -- 
-2.25.1
+2.30.2
 
 
