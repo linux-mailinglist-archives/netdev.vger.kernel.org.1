@@ -1,75 +1,52 @@
-Return-Path: <netdev+bounces-30936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C7378A00E
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:45:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8860178A01E
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 18:09:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1581C280F67
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 15:45:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA4AE280F48
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 16:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84CB1097A;
-	Sun, 27 Aug 2023 15:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957BF1118A;
+	Sun, 27 Aug 2023 16:09:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB81D10965
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 15:45:48 +0000 (UTC)
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BC2ED;
-	Sun, 27 Aug 2023 08:45:47 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id BB3AB3200413;
-	Sun, 27 Aug 2023 11:45:43 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Sun, 27 Aug 2023 11:45:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1693151143; x=1693237543; bh=JprlLIqEJWaRb
-	bi++2K0fgr0aIwsjL2WLjUkdt7UMVY=; b=fF+ce6qLQEP5ohnZiY6XGK71zIuDd
-	fx9JGhEUu+xcUSTxBHMsuaEMOu5AXbHZqVzXnOtB6x4GOtZdIsTI7cu9JtmeMeCx
-	tNIeXWBnIyCWrtC3xwh+u0S+htKjMYzEI8VyeloymvnUTueW1wnSNdfHBm/8rhH+
-	qGFlFVZarg1+hbgB8jvkijrOtWkNAQ18MGa/ML1HZCEAXSB3/iel4PBAYISAWqgm
-	NFRNfNaMHyYyi1C374ez3clGgb/YL2mwD3izrzmRaIrFl/JqRIIaDsh658RwALfD
-	KcM6y6zWlc1lQx3ulyYAa5maaCCZpwvfbEnAky1iTaX2n2Ku0KZLbyRYA==
-X-ME-Sender: <xms:p2_rZF1d32fJ6vaYYzALtRLxHJrkx2jWY39SmPUbFyUJI02-ggZN5Q>
-    <xme:p2_rZMFqrudxZ3Bx7Bss9pvWgfh6DVPj1yjs6-EODPID2igsiYLE_w5OAmRGKPr3W
-    LcD44XTbxm6eYs>
-X-ME-Received: <xmr:p2_rZF4yeRg21SfoZ9yYGzkk5DxJx_Cf95jRpgsCA_2w0jTHytxQQFH_TWrz>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudefvddgleegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
-    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
-    guohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:p2_rZC1SZoZW0QNJtBELsik3okBXbJCHDIooSI5RSSJBQlsGxlxS6A>
-    <xmx:p2_rZIEvJStKXevZ-avEbwrDSadS_9a3FfFuVKZkkZqWvKO2t2tW-w>
-    <xmx:p2_rZD-8VfH1yACZgAGpSeGNM33ojktmxenLzzVRPy_Yf9cw3OK0oQ>
-    <xmx:p2_rZGZucXPs_Oj3ClrrYeseb53giYE_eKvIkQPxPK0_bPfU_eqTTg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 27 Aug 2023 11:45:42 -0400 (EDT)
-Date: Sun, 27 Aug 2023 18:45:38 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BFA63A5
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 16:09:32 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4193B2;
+	Sun, 27 Aug 2023 09:09:29 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qaIK7-0006yH-1d;
+	Sun, 27 Aug 2023 16:09:11 +0000
+Date: Sun, 27 Aug 2023 17:09:02 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net v2 2/3] ipv6: ignore dst hint for multipath routes
-Message-ID: <ZOtvor13INKwpwbc@shredder>
-References: <20230825090830.18635-1-sriram.yagnaraman@est.tech>
- <20230825090830.18635-3-sriram.yagnaraman@est.tech>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next v2] net: ethernet: mtk_eth_soc: add paths
+ and SerDes modes for MT7988
+Message-ID: <ZOt1Hp7v1tKRNGgX@makrotopia.org>
+References: <8b05b606aa37cd30445b8a6d73caef1b0d0cfbfa.1692908556.git.daniel@makrotopia.org>
+ <20230827153523.GS3523530@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,39 +55,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230825090830.18635-3-sriram.yagnaraman@est.tech>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=ham
+In-Reply-To: <20230827153523.GS3523530@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 11:08:29AM +0200, Sriram Yagnaraman wrote:
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 56a55585eb79..4631e03c84b4 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -424,6 +424,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
->  	if (match->nh && have_oif_match && res->nh)
->  		return;
->  
-> +	IP6CB(skb)->flags |= IP6SKB_MULTIPATH;
+Hi Simon,
 
-skb can be NULL here in case this is called as part of route query from
-user space, so we need:
+thank you for reviewing!
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 4631e03c84b4..a02328c93a53 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -424,7 +424,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
-        if (match->nh && have_oif_match && res->nh)
-                return;
- 
--       IP6CB(skb)->flags |= IP6SKB_MULTIPATH;
-+       if (skb)
-+               IP6CB(skb)->flags |= IP6SKB_MULTIPATH;
- 
-        /* We might have already computed the hash for ICMPv6 errors. In such
-         * case it will always be non-zero. Otherwise now is the time to do it.
+On Sun, Aug 27, 2023 at 05:35:23PM +0200, Simon Horman wrote:
+> On Thu, Aug 24, 2023 at 09:24:48PM +0100, Daniel Golle wrote:
+> > MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
+> > connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-R,
+> > 2500Base-X, 1000Base-X and Cisco SGMII interface modes.
+> > 
+> > Implement support for configuring for the new paths to SerDes interfaces
+> > and the internal 2.5G PHY.
+> > 
+> > Add USXGMII PCS driver for 10GBase-R, 5GBase-R and USXGMII mode, and
+> > setup the new PHYA on MT7988 to access the also still existing old
+> > LynxI PCS for 1000Base-X, 2500Base-X and Cisco SGMII PCS interface
+> > modes.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> Hi Daniel,
+> 
+> some minor feedback from my side.
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/mediatek/mtk_usxgmii.c b/drivers/net/ethernet/mediatek/mtk_usxgmii.c
+> 
+> ...
+> 
+> > +static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> > +				  phy_interface_t interface,
+> > +				  const unsigned long *advertising,
+> > +				  bool permit_pause_to_mac)
+> > +{
+> > +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
+> > +	struct mtk_eth *eth = mpcs->eth;
+> > +	struct regmap *pextp = eth->regmap_pextp[mpcs->id];
+> > +	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
+> > +	bool mode_changed = false;
+> > +
+> > +	if (!pextp)
+> > +		return -ENODEV;
+> > +
+> > +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
+> > +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) |
+> > +			  (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
+> > +			  USXGMII_AN_ENABLE : 0;
+> 
+> clang-16 W=1 suggests using parentheses here:
+> 
+>  drivers/net/ethernet/mediatek/mtk_usxgmii.c:468:51: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
+>                            (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
+>                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+>  drivers/net/ethernet/mediatek/mtk_usxgmii.c:468:51: note: place parentheses around the '|' expression to silence this warning
+>                            (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
+>                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+>  drivers/net/ethernet/mediatek/mtk_usxgmii.c:468:51: note: place parentheses around the '?:' expression to evaluate it first
+>                            (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
+>                                                                         ^
+>                            (
+
+Yeah, I've seen that one coming up on patchwork as well, fixed it already in my
+local tree.
+
+> 
+> > +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
+> > +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
+> > +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
+> > +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_RX_MODE_10G) |
+> > +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_TX_MODE_10G);
+> 
+> ...
+> 
+> > +int mtk_usxgmii_init(struct mtk_eth *eth)
+> > +{
+> > +	struct device_node *r = eth->dev->of_node;
+> > +	struct device *dev = eth->dev;
+> > +	struct device_node *np;
+> > +	int i, ret;
+> > +
+> > +	for (i = 0; i < MTK_MAX_DEVS; i++) {
+> > +		np = of_parse_phandle(r, "mediatek,usxgmiisys", i);
+> > +		if (!np)
+> > +			break;
+> > +
+> > +		eth->usxgmii_pcs[i] = devm_kzalloc(dev, sizeof(*eth->usxgmii_pcs), GFP_KERNEL);
+> 
+> Smatch warns that only 8 bytes are allocated, whereas 64 are needed.
+> I think one more defference of the parameter to sizeof().
+> 
+> e.g.:
+> 
+> 		eth->usxgmii_pcs[i] = devm_kzalloc(dev,
+> 						   sizeof(*eth->usxgmii_pcs[i]),
+> 						   GFP_KERNEL);
+
+Good catch, thank you! I will fix it.
+
+
+> 
+> > +		if (!eth->usxgmii_pcs[i])
+> > +			return -ENOMEM;
+> > +
+> > +		eth->usxgmii_pcs[i]->id = i;
+> > +		eth->usxgmii_pcs[i]->eth = eth;
+> > +		eth->usxgmii_pcs[i]->regmap = syscon_node_to_regmap(np);
+> > +		if (IS_ERR(eth->usxgmii_pcs[i]->regmap))
+> > +			return PTR_ERR(eth->usxgmii_pcs[i]->regmap);
+> > +
+> > +		eth->usxgmii_pcs[i]->pcs.ops = &mtk_usxgmii_pcs_ops;
+> > +		eth->usxgmii_pcs[i]->pcs.poll = true;
+> > +		eth->usxgmii_pcs[i]->pcs.neg_mode = true;
+> > +		eth->usxgmii_pcs[i]->interface = PHY_INTERFACE_MODE_NA;
+> > +		eth->usxgmii_pcs[i]->neg_mode = -1;
+> > +
+> > +		of_node_put(np);
+> > +	}
+> 
+> ...
+> 
 
