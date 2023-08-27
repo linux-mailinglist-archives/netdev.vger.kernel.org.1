@@ -1,75 +1,83 @@
-Return-Path: <netdev+bounces-30887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62FCA789ABE
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 03:05:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2723B789AD6
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 03:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC30A281095
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 01:05:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B31F1C20899
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 01:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CBE38B;
-	Sun, 27 Aug 2023 01:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E92A39E;
+	Sun, 27 Aug 2023 01:41:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B97E36A
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 01:05:32 +0000 (UTC)
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCEE619A;
-	Sat, 26 Aug 2023 18:05:30 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2bcc187e0b5so31909871fa.1;
-        Sat, 26 Aug 2023 18:05:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693098329; x=1693703129;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wh08RvjtMadNV8YyJ9pJe6FtKaLPWrZmhvyrDo+tDiY=;
-        b=frkaAwktoorcXwQ2lF0D4PouETVI7MnarulLVDj54omSxdzlMT/d5DfMOCYYM3uVbD
-         KdI9s+TvWDyPw7dIGBxQjkHq8amEsK5D6wcd/fWDXsrukkSjeBQrNyOm2VTp9T0VSwJ+
-         Nt0x7ePCJhUssJBuO3t4sl1dh4pVkW6zMfTsnSs0HQbx6b3GaHoM7g2bniZScSiy4tI0
-         K6p8XVOknpAoUjjK0k9KlX0q+qwr0+74SJGoHmwm91DoZW6HcbMUFEYldPGWXUgwRQRa
-         E1MuX5EziEJ+DoI79D+uLfeneuyCPvneGiyQZ+U7ZJF7t4HKF+KvRtFkpzn4m9FPVAC2
-         eC4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693098329; x=1693703129;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wh08RvjtMadNV8YyJ9pJe6FtKaLPWrZmhvyrDo+tDiY=;
-        b=i79SJi1ZdRFkIughkMULsZe679ofMwJccA/XtbF7/TqbssEnwE4O53D1gsnJF5fZs8
-         UTBMS0d15j/GKmx18rTlTVsqhOo6sQJku1Mqs2tu04xkCImX6uWF/mvHZ2SE5dqPYXao
-         8sJ4jSW852Lm8sp1DJcydQkDMwmWv05kKMHhXisJidPYdLDgjE54dKPliSz4SoJxW/eN
-         7gY8meDDSxU9tGF6WWrhAF9Zr2GEx38R04hUfNrv9oKfr30D0zbTNSKk3Z0vw6c7j5Dd
-         5ZY8z7KzjAhcLdjCDiSTVcQzxAovKS09izA6F4hQAnBIjoS1vWaL/pJH1Iq8caplPwOw
-         QnuQ==
-X-Gm-Message-State: AOJu0YxUgco347Ow2gdHTc7t0UDomZBjjSwawvGuxi7VOaGlGFjK+rsB
-	3/+TXKQ/7IWM9WoGpWk/kko=
-X-Google-Smtp-Source: AGHT+IH0UZuuaxknJzE6dFxZoiFGxR4nMxrJELQhqMeeO4NGfTXq2f+Ep7uv2zM0/BtVTCJzV2giSg==
-X-Received: by 2002:a2e:9699:0:b0:2bc:d6d8:fd35 with SMTP id q25-20020a2e9699000000b002bcd6d8fd35mr10569761lji.47.1693098328914;
-        Sat, 26 Aug 2023 18:05:28 -0700 (PDT)
-Received: from mobilestation ([95.79.200.178])
-        by smtp.gmail.com with ESMTPSA id e25-20020a2e8199000000b002b702dfb510sm1000375ljg.39.2023.08.26.18.05.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Aug 2023 18:05:28 -0700 (PDT)
-Date: Sun, 27 Aug 2023 04:05:26 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Rohan G Thomas <rohan.g.thomas@intel.com>, "David S . Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Conor Dooley <conor.dooley@microchip.com>
-Subject: Re: Synopsys XGMII MAC and USXGMII interfaces
-Message-ID: <q325fnweuebsmjrsfi3xfnttetgjmjsssvlscgq6lftg6acjsh@zkku2kmtpbmk>
-References: <ZOXmWLB4TKGKvkiE@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9101339C
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 01:41:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420171BB;
+	Sat, 26 Aug 2023 18:41:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693100503; x=1724636503;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SwkzD2XXqz25xBQj7+Qw+0ndFDroxkcAVZksTk/82zE=;
+  b=dC08DkCT5x6B4IiQYJ7xM+AD2ZEvTUFtJH9zUGz/RqG1IKhp+75SSKOY
+   Am/WMICCgWn2lnJ6DGSaTSF5LlcBmI/l5DhOgcAVYmhcwbKrPWm9fzqST
+   Izl00RydOTdX8y6bIzPcxJ9HELeJDiBKqjbP8Q75oZ86ok8oiKTvdB0wQ
+   oUwoxkX6lET291AIK+s0dC7yXXK45/1t76fGwbgddUbeUpOVin6h4PVeJ
+   EEOLC58is3gpdwBaq8h9pkgMAF7Z6e5j7l8R9uHat7VPlJUMdM5F6QI99
+   1BYEmEn3dpAl9WFs2L76QZmGD/b6fwruJ5dTWZR22GyZrZVSlXWH9u4Pa
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10814"; a="373790138"
+X-IronPort-AV: E=Sophos;i="6.02,204,1688454000"; 
+   d="scan'208";a="373790138"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2023 18:41:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10814"; a="687707446"
+X-IronPort-AV: E=Sophos;i="6.02,204,1688454000"; 
+   d="scan'208";a="687707446"
+Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 26 Aug 2023 18:41:34 -0700
+Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qa4mT-0005GT-2s;
+	Sun, 27 Aug 2023 01:41:33 +0000
+Date: Sun, 27 Aug 2023 09:40:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y.Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+	linux-mtd@lists.infradead.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+	Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+	ceph-devel@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wireless@vger.kernel.org,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	Mat Martineau <martineau@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
+	linux-nfs@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
+	linux-inte@web.codeaurora.org, grity@vger.kernel.org,
+	"Jason A.Donenfeld" <Jason@zx2c4.com>,
+	Ayush Sawal <ayush.sawal@chelsio.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/12] ubifs: Do not include crypto/algapi.h
+Message-ID: <202308270908.Go1QPOZ7-lkp@intel.com>
+References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,76 +86,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZOXmWLB4TKGKvkiE@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 23, 2023 at 11:58:32AM +0100, Russell King (Oracle) wrote:
-> Part 2 of the discussion...
-> 
-> A similar issue applies to PHY_INTERFACE_MODE_USXGMII, but is reversed.
-> USXGMII supports 10M, 100M, 1G, 2.5G, 5G and 10G. Phylink allows all of
-> these because that's what the appropriate standard says. dwxgmac2
-> initialises config register settings for speeds from 10M up to 10G.
-> However, the PHY_INTERFACE_MODE_USXGMII switch() block in
-> stmmac_mac_link_up() only handles 2.5G, 5G and 10G. Shouldn't it handle
-> the other speed cases - it looks like the MAC does support them.
+Hi Herbert,
 
-AFAICS yes, it should.
+kernel test robot noticed the following build errors:
 
-> 
-> The initialisation done by dwxgmac2_setup() does setup control register
-> masks for everything from 10M to 10G, so on the face of it, it looks
-> like a mistake in stmmac_mac_link_up().
+[auto build test ERROR on wireless-next/main]
+[also build test ERROR on wireless/main linus/master rw-ubifs/next rw-ubifs/fixes v6.5-rc7 next-20230825]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Right.
+url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/fscrypt-Do-not-include-crypto-algapi-h/20230823-183716
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
+patch link:    https://lore.kernel.org/r/E1qYl9s-006vDm-IW%40formenos.hmeau.com
+patch subject: [PATCH 2/12] ubifs: Do not include crypto/algapi.h
+config: x86_64-randconfig-r016-20230823 (https://download.01.org/0day-ci/archive/20230827/202308270908.Go1QPOZ7-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce: (https://download.01.org/0day-ci/archive/20230827/202308270908.Go1QPOZ7-lkp@intel.com/reproduce)
 
-> 
-> If it's something outside of the MAC that doesn't support these speeds
-> when operating as USXGMII, then that needs to be handled.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308270908.Go1QPOZ7-lkp@intel.com/
 
-Based on what USXGMII is mentioned on just a single Synopsys PCS/PHY
-page on the Synopsys site I guess that DW XGMAC doesn't know anything
-about the USXGMII interface. As I explained in my comment to part 1 it
-just exposes a multi-protocol port(s) capable of working as XGMII,
-GMII or MII. Then XPCS consumes/supplies the data from/to the
-activated interface and performs a respective data encoding/decoding.
-On the lowest level DW PMA/PHY does the serdes-ing. See the brief
-description on the Synopsys 10G PHY page (on the "Downloads and
-Documentation" menu):
-https://www.synopsys.com/dw/ipdir.php?ds=dwc_multi_protocol_10g_phy
-it has two layers:
-- Multi-protocol PCS
-- Multi-protocol PHY
-both are designed to provide USXGMII and SGMII interfaces. 
+All errors (new ones prefixed by >>):
 
-> 
-> The other weird thing is that when using PHY_INTERFACE_MODE_USXGMII
-> with XPCS, XPCS supports 1G, 2.5G and 10G ethtool link modes, but not
-> 5G. So combining the implementation in stmmac_mac_link_up(), that
-> means only 2.5G and 10G can actually be functional. Is that a fair
-> assessment of the USXGMII situation with stmmac?
+   In file included from fs/ubifs/auth.c:12:0:
+   include/linux/verification.h: In function 'system_keyring_id_check':
+>> include/linux/verification.h:23:11: error: 'EINVAL' undeclared (first use in this function)
+      return -EINVAL;
+              ^~~~~~
+   include/linux/verification.h:23:11: note: each undeclared identifier is reported only once for each function it appears in
 
-AFAICS assessment seems quite fair. If USXGMII is an external
-interface then these ethtool link modes are just irrelevant. Despite
-of the XLGMII case I don't just see of how USXGMII mode could be used
-as an internal MAC-PCS. Since it's an external interface then the
-actual link modes are supposed to be retrieved from an external PHY.
-Seeing STMMAC driver doesn't support an external PHY attached if XPCS
-performs C73 auto-negotiation, then the xpcs_usxgmii_features array
-should have been filled with all the USXGMII-speed-compatible link
-modes.
 
--Serge(y)
+vim +/EINVAL +23 include/linux/verification.h
 
-> 
-> Thanks.
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+817aef260037f3 Yannik Sembritzki 2018-08-16  19  
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  20  static inline int system_keyring_id_check(u64 id)
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  21  {
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  22  	if (id > (unsigned long)VERIFY_USE_PLATFORM_KEYRING)
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20 @23  		return -EINVAL;
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  24  
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  25  	return 0;
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  26  }
+f3cf4134c5c6c4 Roberto Sassu     2022-09-20  27  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
