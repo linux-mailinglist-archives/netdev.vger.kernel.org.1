@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-30890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49737789B86
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 08:02:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00C84789B88
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 08:21:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EDF61C20860
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 06:02:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B9EC280FCB
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 06:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28D9801;
-	Sun, 27 Aug 2023 06:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2989480A;
+	Sun, 27 Aug 2023 06:21:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5CC7EE
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 06:02:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13DA9C433C9;
-	Sun, 27 Aug 2023 06:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CD27EE
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 06:21:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 27B7AC433C9;
+	Sun, 27 Aug 2023 06:21:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693116147;
-	bh=/AXE11cfMUOPxJ8229ag5JhTUk5MA8EkCaal0JODIF0=;
+	s=k20201202; t=1693117307;
+	bh=6UUXpO9T2ZjC/jSRr1ot3zZfncDhgWdLHcdF5xDh8zk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kznXOKm7+LvxQVtzHrRFpJshTCp2HhyzzeJTw6/B6TuXAeybPid3fAXgst1UUNp7Y
-	 og3kH8GKswtKjChn548kQUrP7X8PKtUClwlQjO1A+0KHXVlcnkaT76himsSuZ+77+3
-	 H1jTFeqNYe6nKip3rPnvc7qKREXNMzeOpNgqyRI8LrN4y6FgtQKOM5Ns4ukVXmGuZ0
-	 y6JPY2R978P7kra59hfnc3tnoYnrxfqQ8Q8jgQfOmcGXVgdq2n+D7+SUAe0T7Kz/SS
-	 3L1IysONxAM3TFz8msupSRVn1nv9LFVZi7au5JkzKzXsPuuHR9DuaVqpLq2iG9s7NN
-	 jTD904sVhpUQw==
+	b=FO5tXPdOEjpQmNZOqrRATWIad10KITbXuBLgewxwStt1JiDPZCd0dhDxMzc66WPxV
+	 yiklSu54L3pE4rHSiCdpcfV0+j1ZdKGc6DLDVpr0FPps2G4R+RUu7wilxXlyWJpize
+	 6kEmJAnGOliHg5rcHU5vvhJxB5HepbCR8ScvCGR65WXFUOm8U/HY+MiKAo62TeqBIX
+	 pnAQN+sGNzxJv1ditKAvOpny/ODkllPi176IecAYDCYjtCh9Q/mfeChQ7OUq01MWUS
+	 TSDLBXdBLWvMq8HE2opTzevd9JQTE8lYywNRcwawF+DM7rVkaV240dX/whs59B1E9q
+	 0RP6Zh6oKuV+A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB5CFC595D7;
-	Sun, 27 Aug 2023 06:02:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0BB27E33083;
+	Sun, 27 Aug 2023 06:21:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,50 +41,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] sfc: introduce eth,
- ipv4 and ipv6 pedit offloads
+Subject: Re: [PATCH v7 0/5] Introduce IEP driver and packet timestamping support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169311614695.23659.11317146439281618197.git-patchwork-notify@kernel.org>
-Date: Sun, 27 Aug 2023 06:02:26 +0000
-References: <20230824112842.47883-1-pieter.jansen-van-vuuren@amd.com>
-In-Reply-To: <20230824112842.47883-1-pieter.jansen-van-vuuren@amd.com>
-To: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com
+ <169311730704.334.2679024548095794148.git-patchwork-notify@kernel.org>
+Date: Sun, 27 Aug 2023 06:21:47 +0000
+References: <20230824114618.877730-1-danishanwar@ti.com>
+In-Reply-To: <20230824114618.877730-1-danishanwar@ti.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: rdunlap@infradead.org, rogerq@kernel.org, simon.horman@corigine.com,
+ vigneshr@ti.com, andrew@lunn.ch, richardcochran@gmail.com,
+ conor+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ nm@ti.com, srk@ti.com, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 24 Aug 2023 12:28:36 +0100 you wrote:
-> This set introduces mac source and destination pedit set action offloads.
-> It also adds offload for ipv4 ttl and ipv6 hop limit pedit set action as
-> well pedit add actions that would result in the same semantics as
-> decrementing the ttl and hop limit.
+On Thu, 24 Aug 2023 17:16:13 +0530 you wrote:
+> This series introduces Industrial Ethernet Peripheral (IEP) driver to
+> support timestamping of ethernet packets and thus support PTP and PPS
+> for PRU ICSSG ethernet ports.
 > 
-> v2:
-> - fix 'efx_tc_mangle' kdoc which was orphaned when adding 'efx_tc_pedit_add'.
-> - add description of 'match' in 'efx_tc_mangle' kdoc.
-> - correct some inconsistent kdoc indentation.
+> This series also adds 10M full duplex support for ICSSG ethernet driver.
+> 
+> There are two IEP instances. IEP0 is used for packet timestamping while IEP1
+> is used for 10M full duplex support.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/6] sfc: introduce ethernet pedit set action infrastructure
-    https://git.kernel.org/netdev/net-next/c/439c4be98318
-  - [net-next,v2,2/6] sfc: add mac source and destination pedit action offload
-    https://git.kernel.org/netdev/net-next/c/0c676503bd4f
-  - [net-next,v2,3/6] sfc: add decrement ttl by offloading set ipv4 ttl actions
-    https://git.kernel.org/netdev/net-next/c/66f728872636
-  - [net-next,v2,4/6] sfc: add decrement ipv6 hop limit by offloading set hop limit actions
-    https://git.kernel.org/netdev/net-next/c/9dbc8d2b9a02
-  - [net-next,v2,5/6] sfc: introduce pedit add actions on the ipv4 ttl field
-    https://git.kernel.org/netdev/net-next/c/64848f062e33
-  - [net-next,v2,6/6] sfc: extend pedit add action to handle decrement ipv6 hop limit
-    https://git.kernel.org/netdev/net-next/c/e8e0bd60e483
+  - [v7,1/5] dt-bindings: net: Add ICSS IEP
+    https://git.kernel.org/netdev/net-next/c/f0035689c036
+  - [v7,2/5] dt-bindings: net: Add IEP property in ICSSG
+    https://git.kernel.org/netdev/net-next/c/b12056278378
+  - [v7,3/5] net: ti: icss-iep: Add IEP driver
+    https://git.kernel.org/netdev/net-next/c/c1e0230eeaab
+  - [v7,4/5] net: ti: icssg-prueth: add packet timestamping and ptp support
+    https://git.kernel.org/netdev/net-next/c/186734c15886
+  - [v7,5/5] net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support
+    https://git.kernel.org/netdev/net-next/c/443a2367ba3c
 
 You are awesome, thank you!
 -- 
