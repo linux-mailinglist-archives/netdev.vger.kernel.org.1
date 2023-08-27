@@ -1,144 +1,225 @@
-Return-Path: <netdev+bounces-30888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2723B789AD6
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 03:41:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2DB789AE9
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 04:08:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B31F1C20899
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 01:41:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE33E1C208D8
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 02:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E92A39E;
-	Sun, 27 Aug 2023 01:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A60626;
+	Sun, 27 Aug 2023 02:08:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9101339C
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 01:41:44 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420171BB;
-	Sat, 26 Aug 2023 18:41:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693100503; x=1724636503;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SwkzD2XXqz25xBQj7+Qw+0ndFDroxkcAVZksTk/82zE=;
-  b=dC08DkCT5x6B4IiQYJ7xM+AD2ZEvTUFtJH9zUGz/RqG1IKhp+75SSKOY
-   Am/WMICCgWn2lnJ6DGSaTSF5LlcBmI/l5DhOgcAVYmhcwbKrPWm9fzqST
-   Izl00RydOTdX8y6bIzPcxJ9HELeJDiBKqjbP8Q75oZ86ok8oiKTvdB0wQ
-   oUwoxkX6lET291AIK+s0dC7yXXK45/1t76fGwbgddUbeUpOVin6h4PVeJ
-   EEOLC58is3gpdwBaq8h9pkgMAF7Z6e5j7l8R9uHat7VPlJUMdM5F6QI99
-   1BYEmEn3dpAl9WFs2L76QZmGD/b6fwruJ5dTWZR22GyZrZVSlXWH9u4Pa
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10814"; a="373790138"
-X-IronPort-AV: E=Sophos;i="6.02,204,1688454000"; 
-   d="scan'208";a="373790138"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2023 18:41:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10814"; a="687707446"
-X-IronPort-AV: E=Sophos;i="6.02,204,1688454000"; 
-   d="scan'208";a="687707446"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 26 Aug 2023 18:41:34 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qa4mT-0005GT-2s;
-	Sun, 27 Aug 2023 01:41:33 +0000
-Date: Sun, 27 Aug 2023 09:40:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y.Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-	linux-mtd@lists.infradead.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-	Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-	ceph-devel@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
-	linux-nfs@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-	linux-inte@web.codeaurora.org, grity@vger.kernel.org,
-	"Jason A.Donenfeld" <Jason@zx2c4.com>,
-	Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/12] ubifs: Do not include crypto/algapi.h
-Message-ID: <202308270908.Go1QPOZ7-lkp@intel.com>
-References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5978936A
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 02:08:39 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36DAB5;
+	Sat, 26 Aug 2023 19:08:37 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68bee12e842so1462855b3a.3;
+        Sat, 26 Aug 2023 19:08:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693102117; x=1693706917;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Unbp2ZpICOQWNOmfXdVYXDQBbfyTCMGLqrJomuDfh5E=;
+        b=gN/B2xI4/WC5EUpt5UlHyrA197k+K2qhXo6r4Apf9ki3seJnESPEF4OA9hf5EiqpUL
+         FYY99GPQYFhGhgrBWOt5UfD6fsZTcNHeGnWaebJgCm3mQvj/6iRjC2YOwIqETCI/BZG3
+         4NBJIK5/ngfy5rXOnamC4q7uqO/GMckMweWdfc3t0CMutNX0260OyFM/TwRkrXLt3lp7
+         R9PrN9YTKfdiWxNLwfBe3AklhkvPHQayQP0Gsq1AWQYWS3dBeYkh07UHzhuE7yR/jLMc
+         TQx+WjqgTRU7LF4R4hg012vpUiSq7BwKXOvTbWVMzh4p9hHX+FEH4mzHVDtq3VqveavU
+         GRIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693102117; x=1693706917;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Unbp2ZpICOQWNOmfXdVYXDQBbfyTCMGLqrJomuDfh5E=;
+        b=LvfSCuxc+BI1bSJZKwYoUYHHZxYEv/sHDlEgO258p4b+tfZFRvt38EtzqgKBBY6jZz
+         HhmLKdeA3OhVLQ1mDU0gwQh5pGafkVFFBn/ovu4njGt3KVxZ8ekVX908JnmPCIq3RrOc
+         9V0tndBWCnUi2dCdN2p8Qfhyusah2DoLgclwFNhXjGev0ILmwOGDjQBI29K9jdzUiiOg
+         NpSC3A1ftqucmJsQ/mf2FhURGvRKtgxH/T7CiRezffPmh8VHyCsOMOxa/nuOROyeTOrA
+         DowECwHOcllOGi20wCA3g7nnZFykcV59i15pVJbVIbpMsHryyCuOf2zCEbNCPepRKt/P
+         L3Og==
+X-Gm-Message-State: AOJu0YwnzGKaNWxtWRUx9kzwWSQfIpuGhWBSlY9aMTu2Cr2eNEWQA96J
+	LHZha1a8kwHGUV1AtszAojY=
+X-Google-Smtp-Source: AGHT+IHGwfm+OQdiQjXg1Ze6oIspHb+/+uoN5f9AxRbgbtzV4zhDbC4Zk03ykux422uqNCmPlu2OxA==
+X-Received: by 2002:a17:902:e842:b0:1b8:63c6:84ab with SMTP id t2-20020a170902e84200b001b863c684abmr19703767plg.61.1693102116945;
+        Sat, 26 Aug 2023 19:08:36 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id y4-20020a170902ed4400b001b8943b37a5sm4395320plb.24.2023.08.26.19.08.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Aug 2023 19:08:36 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 860808A73D6D; Sun, 27 Aug 2023 09:07:58 +0700 (WIB)
+Date: Sun, 27 Aug 2023 09:07:40 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Volodymyr Litovka <doka@funlab.cc>, linux-kernel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Netfilter <netfilter-devel@vger.kernel.org>
+Subject: Re: [Networking] ERSPAN decapsulation drops DHCP unicast packets
+Message-ID: <ZOqv7E9/Qn2T1GwD@debian.me>
+References: <eaf3d0d8-fca2-029e-9c57-ddae31f17726@funlab.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="aNOZKJJDPt95AMQg"
 Content-Disposition: inline
-In-Reply-To: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <eaf3d0d8-fca2-029e-9c57-ddae31f17726@funlab.cc>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Herbert,
 
-kernel test robot noticed the following build errors:
+--aNOZKJJDPt95AMQg
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[auto build test ERROR on wireless-next/main]
-[also build test ERROR on wireless/main linus/master rw-ubifs/next rw-ubifs/fixes v6.5-rc7 next-20230825]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Sat, Aug 26, 2023 at 09:55:30PM +0200, Volodymyr Litovka wrote:
+> Hi colleagues,
+>=20
+> I'm trying to catch and process (in 3rd party analytics app) DHCP packets
+> from ERSPAN session, but cannot do this due to absence of DHCP unicast
+> packets after decapsulation.
+>=20
+> The model is pretty simple: there is PHY interface (enp2s0) which receive
+> ERSPAN traffic and erspan-type interface to get decapsulated packets
+> (inspan, created using command "ip link add inspan type erspan seq key 10
+> local 10.171.165.65 erspan_ver 1", where 10.171.165.65 is ERSPAN target).
+> Then I'm going to rewrite headers in the proper ways (nftable's netdev
+> family) and forward packets to the pool of workers.
+>=20
+> Having this, I'm expecting everything, which is encapsulated inside ERSPA=
+N,
+> on 'inspan' interface. And there is _almost_ everything except DHCP unica=
+st
+> packets - tcpdump shows about 1kps on this interface of decapsulated
+> packets, but no DHCP unicast (see below traces).
+>=20
+> To avoid any interactions, I removed and disabled everything that can cat=
+ch
+> DHCP in userspace - systemd-networkd, netplan, dhcp-client. There is no D=
+HCP
+> server and ifupdown - for test purposes, I'm bringing networking manually.
+> Apparmor disabled as well. Kernel (Linux 5.19.0-42-generic
+> #43~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC) compiled without CONFIG_IP_PNP
+> (according to /boot/config-5.19.0-42-generic). Nothing in userspace liste=
+ns
+> on UDP/68 and UDP/67:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/fscrypt-Do-not-include-crypto-algapi-h/20230823-183716
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
-patch link:    https://lore.kernel.org/r/E1qYl9s-006vDm-IW%40formenos.hmeau.com
-patch subject: [PATCH 2/12] ubifs: Do not include crypto/algapi.h
-config: x86_64-randconfig-r016-20230823 (https://download.01.org/0day-ci/archive/20230827/202308270908.Go1QPOZ7-lkp@intel.com/config)
-compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
-reproduce: (https://download.01.org/0day-ci/archive/20230827/202308270908.Go1QPOZ7-lkp@intel.com/reproduce)
+Can you reproduce this on latest mainline?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308270908.Go1QPOZ7-lkp@intel.com/
+>=20
+> # netstat -tunlpa
+> Active Internet connections (servers and established)
+> Proto Recv-Q Send-Q Local Address=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Foreign Address=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0
+> State=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PID/Program name
+> tcp=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 0 0.0.0.0:22 0.0.0.0:*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LISTEN=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 544/sshd:
+> /usr/sbin
+> tcp6=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+0 :::22 :::*=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LISTEN=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 544/sshd:
+> /usr/sbin
+>=20
+> I have no ideas, why this is happening. Decapsulation itself works, but
+> particular kind of packets get lost.
+>=20
+> I will appreciate if anyone can help me understand where is the bug - in =
+my
+> configuration or somewhere inside the kernel?
+>=20
+> Evidence of traffic presence/absence is below.
+>=20
+> Thank you.
+>=20
+> Encapsulated ERSPAN session (udp and port 67/68) contains lot of different
+> kinds of DHCP packets:
+>=20
+> # tcpdump -s0 -w- -i enp2s0 'proto gre and ether[73:1]=3D17 and
+> (ether[84:2]=3D67 or ether[84:2]=3D68)' | tshark -r- -l
+> =C2=A0[ ... ]
+> =C2=A0=C2=A0=C2=A0 7=C2=A0=C2=A0 0.001942=C2=A0 0.0.0.0 =E2=86=92 255.255=
+=2E255.255 DHCP 392 DHCP Discover -
+> Transaction ID 0x25c096fc
+> =C2=A0=C2=A0=C2=A0 8=C2=A0=C2=A0 0.003432=C2=A0 z.z.z.z =E2=86=92 a.a.a.a=
+ =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DHCP 418 DHCP ACK=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 -
+> Transaction ID 0x5515126a
+> =C2=A0=C2=A0=C2=A0 9=C2=A0=C2=A0 0.005170=C2=A0 m.m.m.m =E2=86=92 z.z.z.z=
+ =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DHCP 435 DHCP Discover -
+> Transaction ID 0xa7b7
+> =C2=A0=C2=A0 10=C2=A0=C2=A0 0.005171=C2=A0 m.m.m.m =E2=86=92 z.z.z.z=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DHCP 435 DHCP Discover -
+> Transaction ID 0xa7b7
+> =C2=A0=C2=A0 11=C2=A0=C2=A0 0.015399=C2=A0 n.n.n.n =E2=86=92 z.z.z.z=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DHCP 690 DHCP Request=C2=A0 -
+> Transaction ID 0x54955233
+> =C2=A0=C2=A0 12=C2=A0=C2=A0 0.025537=C2=A0 z.z.z.z =E2=86=92 n.n.n.n=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DHCP 420 DHCP ACK=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 -
+> Transaction ID 0x54955233
+> =C2=A0=C2=A0 13=C2=A0=C2=A0 0.030313=C2=A0 z.z.z.z =E2=86=92 m.m.m.m =C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DHCP 413 DHCP Offer=C2=A0=C2=A0=C2=
+=A0 -
+> Transaction ID 0xa7b7
+>=20
+> but decapsulated traffic (which I'm seeing on inspan interface) contains
+> just the following:
+>=20
+> # tcpdump -i inspan 'port 67 or port 68'
+> listening on inspan, link-type EN10MB (Ethernet), snapshot length 262144
+> bytes
+> 17:23:36.540721 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+> 17:23:39.760036 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+> 17:23:44.135711 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+> 17:23:52.008504 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+>=20
 
-All errors (new ones prefixed by >>):
+What hardware?
 
-   In file included from fs/ubifs/auth.c:12:0:
-   include/linux/verification.h: In function 'system_keyring_id_check':
->> include/linux/verification.h:23:11: error: 'EINVAL' undeclared (first use in this function)
-      return -EINVAL;
-              ^~~~~~
-   include/linux/verification.h:23:11: note: each undeclared identifier is reported only once for each function it appears in
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--aNOZKJJDPt95AMQg
+Content-Type: application/pgp-signature; name="signature.asc"
 
-vim +/EINVAL +23 include/linux/verification.h
+-----BEGIN PGP SIGNATURE-----
 
-817aef260037f3 Yannik Sembritzki 2018-08-16  19  
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  20  static inline int system_keyring_id_check(u64 id)
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  21  {
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  22  	if (id > (unsigned long)VERIFY_USE_PLATFORM_KEYRING)
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20 @23  		return -EINVAL;
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  24  
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  25  	return 0;
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  26  }
-f3cf4134c5c6c4 Roberto Sassu     2022-09-20  27  
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZOqvxQAKCRD2uYlJVVFO
+o4J2AQCm9hvlqgudCT9i+WZ01S3ukWoQ0YIHzd117pIJDwJ4EgD7BKcyeDH4f2Q3
+9Pw7aOq5rF+GtOTZk1yHl6hb5dM7kQA=
+=+iUI
+-----END PGP SIGNATURE-----
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--aNOZKJJDPt95AMQg--
 
