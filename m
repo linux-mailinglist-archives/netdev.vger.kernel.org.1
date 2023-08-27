@@ -1,54 +1,50 @@
-Return-Path: <netdev+bounces-30934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFA1C789FFD
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:35:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C3778A005
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 17:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A6D1C2074B
-	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 15:35:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8E11C20752
+	for <lists+netdev@lfdr.de>; Sun, 27 Aug 2023 15:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5F610975;
-	Sun, 27 Aug 2023 15:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294A610976;
+	Sun, 27 Aug 2023 15:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAA17EE
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 15:35:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 909A2C433C8;
-	Sun, 27 Aug 2023 15:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DC163A7
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 15:43:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CD65C433C8;
+	Sun, 27 Aug 2023 15:43:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693150544;
-	bh=+gBmB6phxBG675V7B23im2AszsyUQIMzN/S49Yo0jrY=;
+	s=k20201202; t=1693151007;
+	bh=bPb4p4j0igZCsViibtVoyOO+JM0u5QNB2s0HIgV+F8I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V0UoKEhQBamo3y3A5oUc/n0nYmvTreWpxPw0AmZRpTL4wHLeIIqyl24MrDdyxGf7V
-	 5aFZlZw/FseGIwt5FhSTK2eA9H/jmaLCiXSxq33sxo5L20EJmEX3qReKH2f/Rq8+Os
-	 W6YqJ6Z2nG0I+iqG2prZ6MQaDAO122bbx+q8myfdRCpzlwLwtGFa450Aa+9BBpBq1L
-	 BSscGrQghzLsvdUgYiD8zGoUKQG1Ijwf6y5KDDYsngCJ1DZdY2XFhV10YxM49djoci
-	 L8wHtHqqhjG2LWkHziM3JK8L3TfzYaPhoHORQyRuyUR9rzpOhx7/gAI96OW+3nO5FR
-	 O83YgQtzWWlhA==
-Date: Sun, 27 Aug 2023 17:35:23 +0200
+	b=lC44SRzrz4+W1/99hfg3uctoMoGo8F8b9BvJLyDlihyuz3NJ3XpESzTeDCSAw5uBR
+	 p0dwoGWIBkEt5/2tCuIHNUtllS+hiJjoQ1zpyofy47tXbEMI2VPMhm1q4R1kSluSNx
+	 2MxxGeDs6JiyybQdvmUEp7BpegjQ2oXA2oKROvhDj/3y7ZGUTqO8kB5vLUEVGJrUls
+	 J7omuqoSq0psI8MzX+L6V8SzHkTb0dXSWNnYafi+TeW/pW8Ig8R1WhPWgiZNTKsIIn
+	 iTowfQ5UTG1oH/WXP9oeYXumpG6f2BFAbv50c4NxjItLE5vPDNNiFYdCdZe6XwZ9lr
+	 LFWxOpV/Fz3Yw==
+Date: Sun, 27 Aug 2023 17:43:12 +0200
 From: Simon Horman <horms@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next v2] net: ethernet: mtk_eth_soc: add paths
- and SerDes modes for MT7988
-Message-ID: <20230827153523.GS3523530@kernel.org>
-References: <8b05b606aa37cd30445b8a6d73caef1b0d0cfbfa.1692908556.git.daniel@makrotopia.org>
+To: Evan Quan <evan.quan@amd.com>
+Cc: lenb@kernel.org, johannes@sipsolutions.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alexander.deucher@amd.com, rafael@kernel.org, Lijo.Lazar@amd.com,
+	mario.limonciello@amd.com, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [V10 1/8] ACPI: Add support for AMD ACPI based Wifi band RFI
+ mitigation feature
+Message-ID: <20230827154312.GT3523530@kernel.org>
+References: <20230825083846.4001973-1-evan.quan@amd.com>
+ <20230825083846.4001973-2-evan.quan@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,113 +53,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8b05b606aa37cd30445b8a6d73caef1b0d0cfbfa.1692908556.git.daniel@makrotopia.org>
+In-Reply-To: <20230825083846.4001973-2-evan.quan@amd.com>
 
-On Thu, Aug 24, 2023 at 09:24:48PM +0100, Daniel Golle wrote:
-> MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
-> connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-R,
-> 2500Base-X, 1000Base-X and Cisco SGMII interface modes.
+On Fri, Aug 25, 2023 at 04:38:39PM +0800, Evan Quan wrote:
+> Due to electrical and mechanical constraints in certain platform designs
+> there may be likely interference of relatively high-powered harmonics of
+> the (G-)DDR memory clocks with local radio module frequency bands used
+> by Wifi 6/6e/7.
 > 
-> Implement support for configuring for the new paths to SerDes interfaces
-> and the internal 2.5G PHY.
+> To mitigate this, AMD has introduced a mechanism that devices can use to
+> notify active use of particular frequencies so that other devices can make
+> relative internal adjustments as necessary to avoid this resonance.
 > 
-> Add USXGMII PCS driver for 10GBase-R, 5GBase-R and USXGMII mode, and
-> setup the new PHYA on MT7988 to access the also still existing old
-> LynxI PCS for 1000Base-X, 2500Base-X and Cisco SGMII PCS interface
-> modes.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-
-Hi Daniel,
-
-some minor feedback from my side.
+> Signed-off-by: Evan Quan <evan.quan@amd.com>
 
 ...
 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_usxgmii.c b/drivers/net/ethernet/mediatek/mtk_usxgmii.c
+> diff --git a/drivers/acpi/amd_wbrf.c b/drivers/acpi/amd_wbrf.c
 
 ...
 
-> +static int mtk_usxgmii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-> +				  phy_interface_t interface,
-> +				  const unsigned long *advertising,
-> +				  bool permit_pause_to_mac)
+> +/**
+> + * acpi_amd_wbrf_add_exclusion - broadcast the frequency band the device
+> + *                               is using
+> + *
+> + * @dev: device pointer
+> + * @in: input structure containing the frequency band the device is using
+> + *
+> + * Broadcast to other consumers the frequency band the device starts
+> + * to use. Underneath the surface the information is cached into an
+> + * internal buffer first. Then a notification is sent to all those
+> + * registered consumers. So then they can retrieve that buffer to
+> + * know the latest active frequency bands. The benifit with such design
+
+nit: ./checkpatch.pl --codespell suggests benifit -> benefit.
+
+> + * is for those consumers which have not been registered yet, they can
+> + * still have a chance to retrieve such information later.
+> + */
+> +int acpi_amd_wbrf_add_exclusion(struct device *dev,
+> +				struct wbrf_ranges_in_out *in)
 > +{
-> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-> +	struct mtk_eth *eth = mpcs->eth;
-> +	struct regmap *pextp = eth->regmap_pextp[mpcs->id];
-> +	unsigned int an_ctrl = 0, link_timer = 0, xfi_mode = 0, adapt_mode = 0;
-> +	bool mode_changed = false;
+> +	struct acpi_device *adev = ACPI_COMPANION(dev);
+> +	int ret;
 > +
-> +	if (!pextp)
+> +	if (!adev)
 > +		return -ENODEV;
 > +
-> +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
-> +		an_ctrl = FIELD_PREP(USXGMII_AN_SYNC_CNT, 0x1FF) |
-> +			  (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
-> +			  USXGMII_AN_ENABLE : 0;
-
-clang-16 W=1 suggests using parentheses here:
-
- drivers/net/ethernet/mediatek/mtk_usxgmii.c:468:51: warning: operator '?:' has lower precedence than '|'; '|' will be evaluated first [-Wbitwise-conditional-parentheses]
-                           (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
-                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
- drivers/net/ethernet/mediatek/mtk_usxgmii.c:468:51: note: place parentheses around the '|' expression to silence this warning
-                           (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
-                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
- drivers/net/ethernet/mediatek/mtk_usxgmii.c:468:51: note: place parentheses around the '?:' expression to evaluate it first
-                           (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) ?
-                                                                        ^
-                           (
-
-> +		link_timer = FIELD_PREP(USXGMII_LINK_TIMER_IDLE_DETECT, 0x7B) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_COMP_ACK_DETECT, 0x7B) |
-> +			     FIELD_PREP(USXGMII_LINK_TIMER_AN_RESTART, 0x7B);
-> +		xfi_mode = FIELD_PREP(USXGMII_XFI_RX_MODE, USXGMII_XFI_RX_MODE_10G) |
-> +			   FIELD_PREP(USXGMII_XFI_TX_MODE, USXGMII_XFI_TX_MODE_10G);
-
-...
-
-> +int mtk_usxgmii_init(struct mtk_eth *eth)
-> +{
-> +	struct device_node *r = eth->dev->of_node;
-> +	struct device *dev = eth->dev;
-> +	struct device_node *np;
-> +	int i, ret;
+> +	ret = wbrf_record(adev, WBRF_RECORD_ADD, in);
+> +	if (ret)
+> +		return ret;
 > +
-> +	for (i = 0; i < MTK_MAX_DEVS; i++) {
-> +		np = of_parse_phandle(r, "mediatek,usxgmiisys", i);
-> +		if (!np)
-> +			break;
+> +	blocking_notifier_call_chain(&wbrf_chain_head,
+> +				     WBRF_CHANGED,
+> +				     NULL);
 > +
-> +		eth->usxgmii_pcs[i] = devm_kzalloc(dev, sizeof(*eth->usxgmii_pcs), GFP_KERNEL);
-
-Smatch warns that only 8 bytes are allocated, whereas 64 are needed.
-I think one more defference of the parameter to sizeof().
-
-e.g.:
-
-		eth->usxgmii_pcs[i] = devm_kzalloc(dev,
-						   sizeof(*eth->usxgmii_pcs[i]),
-						   GFP_KERNEL);
-
-> +		if (!eth->usxgmii_pcs[i])
-> +			return -ENOMEM;
-> +
-> +		eth->usxgmii_pcs[i]->id = i;
-> +		eth->usxgmii_pcs[i]->eth = eth;
-> +		eth->usxgmii_pcs[i]->regmap = syscon_node_to_regmap(np);
-> +		if (IS_ERR(eth->usxgmii_pcs[i]->regmap))
-> +			return PTR_ERR(eth->usxgmii_pcs[i]->regmap);
-> +
-> +		eth->usxgmii_pcs[i]->pcs.ops = &mtk_usxgmii_pcs_ops;
-> +		eth->usxgmii_pcs[i]->pcs.poll = true;
-> +		eth->usxgmii_pcs[i]->pcs.neg_mode = true;
-> +		eth->usxgmii_pcs[i]->interface = PHY_INTERFACE_MODE_NA;
-> +		eth->usxgmii_pcs[i]->neg_mode = -1;
-> +
-> +		of_node_put(np);
-> +	}
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(acpi_amd_wbrf_add_exclusion);
 
 ...
 
