@@ -1,158 +1,162 @@
-Return-Path: <netdev+bounces-31041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C5278B075
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:34:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B911D78B081
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C51E4280E29
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:34:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC4371C208CB
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E968911CB4;
-	Mon, 28 Aug 2023 12:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F77A11CB5;
+	Mon, 28 Aug 2023 12:35:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F7C613F
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:34:18 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548B7A8
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:34:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693226056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IeX3XhG+CN71DFNoHnKntS+TBHF+GD6RwGz31duwrG4=;
-	b=R3I+H18UIi/sUcFlY03mjB8uj6Q2a1QiDDsgNfTdO/S5sSpYZsgBNcMasE9/tFRkeHksVQ
-	JJD9N3LTg3Yj54ewuadvTU7uartO9QTrNjEmtUJvN3n6++tAOH21HKUagzxZGd/zLpCkjT
-	dVbbVedcIojO//y/J++QoBRiM0d5Ksg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-357-sMqdEYlGMOCQzqt736z3Gw-1; Mon, 28 Aug 2023 08:34:15 -0400
-X-MC-Unique: sMqdEYlGMOCQzqt736z3Gw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9a57d664076so417945266b.1
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:34:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413856117
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:35:56 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5079126
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:35:53 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b974031aeaso48125981fa.0
+        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693226152; x=1693830952;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U8FHoF0EEmuxAOTXhuGWB0DeQBV57gCB/+pF5x9rYb8=;
+        b=gRDXI736iuTJFUUiRF4E62C+qEsccSMJ1SkQ9nG0QQNdFSO+Kt6BbzdhAUnFTjziGI
+         EeuMZa+UaUDJ+o07JNOtP1S1idXGzCuOzbgyMwziHzkdBfnn7y1EhhTxDUeQxXrsWjbk
+         jQhawFqvcQsACxULxRSjo6oi8DkDNA2MxjEem5JKXrUu3ff/C12sMtdMGIq8cH+oCmX1
+         +FnzUvPvXz7nQYTgWc22cfIF0/73cGcyIOVGJF8nplrtVTn9hFwO4SHZjnSu2flTBWP9
+         dk9B91+11lPK/whCssNn+wc2IYAhvRTCw8Q8NAKTUv/xVQTD7Q9hVym0NbiKxROuv2GC
+         WgiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693226054; x=1693830854;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IeX3XhG+CN71DFNoHnKntS+TBHF+GD6RwGz31duwrG4=;
-        b=CD1V984AjvS3Ta5OFCRtYnSxt71DFbn3zPgHWsR7VPvBYBXDLk9A60oH/fU239KFrH
-         C8dbHx4UUnuOu4AKuMMlAg4fNXl7u/Y/D2reZ6yZm6AJKCdNiGCzTwWPRlrybmmNwKI3
-         6jdnkSiJEMJwymzkb5qg41h7l8C4FPTQlV3Ehv+ZTT97oB27sLJZnsF3qGHGHXTPYsmk
-         2EXC49oIcqsehD5dWXRDmFCdMH9ZBsoZgw6SIKqMuHnae0c+Acyv+TADiGkt7fPqFBhx
-         WZT/Kr7m/8i90355yw34PU9sosddnRznMVAadGD35lOY8GAcVkel1ExKbwQSZikNuogn
-         S43g==
-X-Gm-Message-State: AOJu0YzKqItt++Nr2n1A7N6rXfPQvXE5k7+a8//WxPh/MeRhEm36N8Ne
-	sifjFSmAqmcZ/zQDhTWLoK4mAhGldqM/bQ9UaN3SEXNWoAqd+yCe6x8tTsJ/6FqrPcNbC4eC26u
-	kqGjlWpUv0FVnNOXd
-X-Received: by 2002:a17:907:2c43:b0:9a5:ae8a:6e0b with SMTP id hf3-20020a1709072c4300b009a5ae8a6e0bmr3152412ejc.24.1693226054076;
-        Mon, 28 Aug 2023 05:34:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFvIYvE40qF94wju/vrECQS+a8jGSOWgEJ/XOnb9M9nBvCyed4CkVVv3ij0FcWley91Ct77oQ==
-X-Received: by 2002:a17:907:2c43:b0:9a5:ae8a:6e0b with SMTP id hf3-20020a1709072c4300b009a5ae8a6e0bmr3152394ejc.24.1693226053833;
-        Mon, 28 Aug 2023 05:34:13 -0700 (PDT)
-Received: from [192.168.41.200] (83-90-141-187-cable.dk.customer.tdc.net. [83.90.141.187])
-        by smtp.gmail.com with ESMTPSA id a5-20020a17090682c500b0098f33157e7dsm4550663ejy.82.2023.08.28.05.34.12
+        d=1e100.net; s=20221208; t=1693226152; x=1693830952;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U8FHoF0EEmuxAOTXhuGWB0DeQBV57gCB/+pF5x9rYb8=;
+        b=DmTisRfd8fCwwm7faYcm6owmIW3g87QlCPTZ5FmaOTmsQxD/lw+MVyUoMMBFCcL3on
+         9wgnHVtBHZ+SKlf4CxQMlwp8rN4t2yLOU3BJOiAS3uYGlPxSipbYRZc0xNyl0YgodMZv
+         RqQ3JVHOSjwhiAqYujTotZwmDUGL8nni7136zbrJD1FyNYvMYQFIw/q/kS0ZNAvw3PWC
+         Z/2jFVmqARAbXf7sEIBUaTNyvd9UKbdmQs9NmYFd31QJ2qk+cT2fnJl1WOPnaFx++fnD
+         TxHPswesXTBn/aZA6p7AvgnG/EhKP7YswR0xU3hmjSKTlx4ExpIlrxeLvIrirbhFy/hV
+         TlJQ==
+X-Gm-Message-State: AOJu0YxKjVmZojGgdxgNBphfLjcSnfcx5+eH7SH5HKfNcSPMYIenRfLV
+	2fADB7uYOf8mhhm9j6AWZRTmxA==
+X-Google-Smtp-Source: AGHT+IHaVAV7m/SxxXQTce6SzKSz9Jg84rLyUgxT39ppgMlbeCRLlAK4JgHzs+HlNgnDqopNISb+nA==
+X-Received: by 2002:a2e:8918:0:b0:2bc:eaec:e23f with SMTP id d24-20020a2e8918000000b002bceaece23fmr9199572lji.43.1693226151808;
+        Mon, 28 Aug 2023 05:35:51 -0700 (PDT)
+Received: from [192.168.1.101] (abyl195.neoplus.adsl.tpnet.pl. [83.9.31.195])
+        by smtp.gmail.com with ESMTPSA id l26-20020a2e99da000000b002bcb239a7efsm1742551ljj.56.2023.08.28.05.35.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Aug 2023 05:34:13 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <d2c2d69e-7aad-0176-828b-dca051961e7b@redhat.com>
-Date: Mon, 28 Aug 2023 14:34:11 +0200
+        Mon, 28 Aug 2023 05:35:51 -0700 (PDT)
+Message-ID: <790ead1e-7b15-4f88-bdf9-738b24531ef0@linaro.org>
+Date: Mon, 28 Aug 2023 14:35:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: brouer@redhat.com, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, Ratheesh Kannoth <rkannoth@marvell.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Geetha sowjanya <gakula@marvell.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham
- <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
- hariprasad <hkelam@marvell.com>,
- Qingfang DENG <qingfang.deng@siflower.com.cn>
-Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 5/7] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
 Content-Language: en-US
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>
-References: <20230823094757.gxvCEOBi@linutronix.de>
- <d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
- <923d74d4-3d43-8cac-9732-c55103f6dafb@intel.com>
- <044c90b6-4e38-9ae9-a462-def21649183d@kernel.org>
- <ce5627eb-5cae-7b9a-fed3-dc1ee725464a@intel.com>
- <2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
- <d1f43386-b337-db94-7d9d-d078cd20c927@intel.com>
-In-Reply-To: <d1f43386-b337-db94-7d9d-d078cd20c927@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+To: Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org,
+ agross@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
+ richardcochran@gmail.com, arnd@arndb.de, geert+renesas@glider.be,
+ nfraprado@collabora.com, rafal@milecki.pl, peng.fan@nxp.com,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Cc: quic_saahtoma@quicinc.com
+References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
+ <20230825091234.32713-6-quic_devipriy@quicinc.com>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <20230825091234.32713-6-quic_devipriy@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 28/08/2023 13.07, Alexander Lobakin wrote:
->> This can be a workaround fix:
->>
->> $ git diff
->> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
->> b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
->> index dce3cea00032..ab7ca146fddf 100644
->> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
->> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
->> @@ -578,6 +578,10 @@ int otx2_alloc_buffer(struct otx2_nic *pfvf, struct
->> otx2_cq_queue *cq,
->>                  struct refill_work *work;
->>                  struct delayed_work *dwork;
->>
->> +               /* page_pool alloc API cannot be used from WQ */
->> +               if (cq->rbpool->page_pool)
->> +                       return -ENOMEM;
-> I believe that breaks the driver?
+On 25.08.2023 11:12, Devi Priya wrote:
+> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+> devices.
 > 
+> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> ---
+[...]
 
-Why would that break the driver?
+> +	[UBI3_CLKRST_CLAMP_ENABLE] = { 0x28A04, 9 },
+Please make all hex lowercase.
 
-AFAIK returning 0 here will break the driver.
-We need to return something non-zero, see otx2_refill_pool_ptrs() 
-copy-pasted below signature.
+[...]
 
+> +	[PPE_FULL_RESET] = { 0x28A08, 0, 1, 0x1E0000 },
+{ .reg = 0x28a08, .bitmask = GENMASK(foo,bar) },
 
->> +
->>                  work = &pfvf->refill_wrk[cq->cq_idx];
->>                  dwork = &work->pool_refill_work;
->>                  /* Schedule a task if no other task is running */
+[...]
 
+> +	ret = devm_pm_runtime_enable(&pdev->dev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = devm_pm_clk_create(&pdev->dev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = of_pm_clk_add_clk(&pdev->dev, "nssnoc_nsscc");
+> +	if (ret < 0) {
+> +		dev_err(&pdev->dev, "Failed to acquire nssnoc_nsscc clock\n");
+> +		return ret;
+dev_err_probe, everywhere?
 
---Jesper
-
-  void otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
-  {
-	struct otx2_nic *pfvf = dev;
-	dma_addr_t bufptr;
-
-	while (cq->pool_ptrs) {
-		if (otx2_alloc_buffer(pfvf, cq, &bufptr))
-			break;
-		otx2_aura_freeptr(pfvf, cq->cq_idx, bufptr + OTX2_HEAD_ROOM);
-		cq->pool_ptrs--;
-	}
-  }
-
+Konrad
 
