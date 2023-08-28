@@ -1,102 +1,201 @@
-Return-Path: <netdev+bounces-31033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1D678AFC2
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:13:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7147078AFCF
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B85D280DB9
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B6EA280DEF
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29A511CA1;
-	Mon, 28 Aug 2023 12:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FAE11CA5;
+	Mon, 28 Aug 2023 12:15:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E402A6AB3
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:13:27 +0000 (UTC)
-Received: from mail.astralinux.ru (mail.astralinux.ru [217.74.38.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4964AD8;
-	Mon, 28 Aug 2023 05:13:26 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.astralinux.ru (Postfix) with ESMTP id EF67318679C9;
-	Mon, 28 Aug 2023 15:13:22 +0300 (MSK)
-Received: from mail.astralinux.ru ([127.0.0.1])
-	by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id G81cKs3rJnHP; Mon, 28 Aug 2023 15:13:22 +0300 (MSK)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.astralinux.ru (Postfix) with ESMTP id 7AD351867508;
-	Mon, 28 Aug 2023 15:13:22 +0300 (MSK)
-X-Virus-Scanned: amavisd-new at astralinux.ru
-Received: from mail.astralinux.ru ([127.0.0.1])
-	by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id EARIoZ7lm7Kq; Mon, 28 Aug 2023 15:13:22 +0300 (MSK)
-Received: from rbta-msk-lt-302690.astralinux.ru (unknown [10.177.233.169])
-	by mail.astralinux.ru (Postfix) with ESMTPSA id BE91818634AE;
-	Mon, 28 Aug 2023 15:13:20 +0300 (MSK)
-From: Alexandra Diupina <adiupina@astralinux.ru>
-To: Zhao Qiang <qiang.zhao@nxp.com>
-Cc: Alexandra Diupina <adiupina@astralinux.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH v3] fsl_ucc_hdlc: process the result of hold_open()
-Date: Mon, 28 Aug 2023 15:12:35 +0300
-Message-Id: <20230828121235.13953-1-adiupina@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <896acfac-fadb-016b-20ff-a06e18edb4d9@csgroup.eu>
-References: 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3035C11C97
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:15:18 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6029EA
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:15:17 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-594e1154756so32035607b3.2
+        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:15:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693224917; x=1693829717;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sUjNYQByD3mykD1XcEhHPqjOsVz74RxaCLnMVp3MCFA=;
+        b=EHJB+jdXSiD6I5W9BfyaVljpXQIVJy1BxeMdE3yE4lHte/r704tfevUguB2akzMWM9
+         w0bpOWIRlXe6KJOYrUsIW6reSQkq7TI0ZTsqzotmK1avY+YUD7gInISsCJaYaedmwCd2
+         VhP81by7+MKiHqknDrdsvhoF3qhzljdBpbWsrSwAfz/Geltps93/MZpxP54Wdy0F+NkV
+         B4RNhRhVyctQG3revs15vsFYZLrSG1oMPouboxvKF9GpKvknQk0wnzKY0TJ4hm1A9VAZ
+         vzTHLChvmvCf9K8kMZqYBU101mA7Vvkphxnpp+4Jj5TmYtJS2jPt6lh3m4GZCbjy2ueE
+         fzfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693224917; x=1693829717;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sUjNYQByD3mykD1XcEhHPqjOsVz74RxaCLnMVp3MCFA=;
+        b=FG3CBHMKqjmohz7hbf1DX1CsHHhRinUAt2yYc/I5eifNM3Wkj9stS6+cc6nraemxfi
+         3Y4WjjHRpsHrn/n/Er4Pq54JKzk+pK/zVTee2/lKcHrgzZgS0B+NAivuXVm6HkecdLhS
+         4YfyvEAzqhXpU6FvQ8nOlv5wLB8y/mn6b1wmCjnZDE5hHaTsbEgH51QrZJ0jbe+f7SG6
+         svqxWvT4tIFVkUckBHwSnp6zrjPi69t3+9sjFJGT6VEhukbLtidpvq6O20jTGJXbh7vy
+         Xez6L0YW+jia6S22L3sklzoDWo3tvWM8Y1WZFhaMGzO8qQds6KZAB8osHEr1E3AKs0iZ
+         d87w==
+X-Gm-Message-State: AOJu0YwSrS+dgwj4YgbbT8j1bkyy1iaQnXmt1mhWqRfLUiN9ABUIQyxT
+	q/SQTtRzZoANXQSlo9pce6u6gZcA7/WEYA==
+X-Google-Smtp-Source: AGHT+IEV149mscChtJeMPOTaYrIpFZcYD6pFW92g1jmTe8rX1rD+zOeFUDiO4GOfRArG9lOc3kIqq4DruTz0rg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:108f:b0:d7a:bf7d:bc0f with SMTP
+ id v15-20020a056902108f00b00d7abf7dbc0fmr405331ybu.3.1693224917091; Mon, 28
+ Aug 2023 05:15:17 -0700 (PDT)
+Date: Mon, 28 Aug 2023 12:15:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230828121515.2848684-1-edumazet@google.com>
+Subject: [PATCH net] ipv4: annotate data-races around fi->fib_dead
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Process the result of hold_open() and return it from
-uhdlc_open() in case of an error
-It is necessary to pass the error code up the control flow,
-similar to a possible error in request_irq()
+syzbot complained about a data-race in fib_table_lookup() [1]
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Add appropriate annotations to document it.
 
-Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
-Signed-off-by: Alexandra Diupina <adiupina@astralinux.ru>
+[1]
+BUG: KCSAN: data-race in fib_release_info / fib_table_lookup
+
+write to 0xffff888150f31744 of 1 bytes by task 1189 on cpu 0:
+fib_release_info+0x3a0/0x460 net/ipv4/fib_semantics.c:281
+fib_table_delete+0x8d2/0x900 net/ipv4/fib_trie.c:1777
+fib_magic+0x1c1/0x1f0 net/ipv4/fib_frontend.c:1106
+fib_del_ifaddr+0x8cf/0xa60 net/ipv4/fib_frontend.c:1317
+fib_inetaddr_event+0x77/0x200 net/ipv4/fib_frontend.c:1448
+notifier_call_chain kernel/notifier.c:93 [inline]
+blocking_notifier_call_chain+0x90/0x200 kernel/notifier.c:388
+__inet_del_ifa+0x4df/0x800 net/ipv4/devinet.c:432
+inet_del_ifa net/ipv4/devinet.c:469 [inline]
+inetdev_destroy net/ipv4/devinet.c:322 [inline]
+inetdev_event+0x553/0xaf0 net/ipv4/devinet.c:1606
+notifier_call_chain kernel/notifier.c:93 [inline]
+raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
+call_netdevice_notifiers_info net/core/dev.c:1962 [inline]
+call_netdevice_notifiers_mtu+0xd2/0x130 net/core/dev.c:2037
+dev_set_mtu_ext+0x30b/0x3e0 net/core/dev.c:8673
+do_setlink+0x5be/0x2430 net/core/rtnetlink.c:2837
+rtnl_setlink+0x255/0x300 net/core/rtnetlink.c:3177
+rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6445
+netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2549
+rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6463
+netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+netlink_unicast+0x56f/0x640 net/netlink/af_netlink.c:1365
+netlink_sendmsg+0x665/0x770 net/netlink/af_netlink.c:1914
+sock_sendmsg_nosec net/socket.c:725 [inline]
+sock_sendmsg net/socket.c:748 [inline]
+sock_write_iter+0x1aa/0x230 net/socket.c:1129
+do_iter_write+0x4b4/0x7b0 fs/read_write.c:860
+vfs_writev+0x1a8/0x320 fs/read_write.c:933
+do_writev+0xf8/0x220 fs/read_write.c:976
+__do_sys_writev fs/read_write.c:1049 [inline]
+__se_sys_writev fs/read_write.c:1046 [inline]
+__x64_sys_writev+0x45/0x50 fs/read_write.c:1046
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+read to 0xffff888150f31744 of 1 bytes by task 21839 on cpu 1:
+fib_table_lookup+0x2bf/0xd50 net/ipv4/fib_trie.c:1585
+fib_lookup include/net/ip_fib.h:383 [inline]
+ip_route_output_key_hash_rcu+0x38c/0x12c0 net/ipv4/route.c:2751
+ip_route_output_key_hash net/ipv4/route.c:2641 [inline]
+__ip_route_output_key include/net/route.h:134 [inline]
+ip_route_output_flow+0xa6/0x150 net/ipv4/route.c:2869
+send4+0x1e7/0x500 drivers/net/wireguard/socket.c:61
+wg_socket_send_skb_to_peer+0x94/0x130 drivers/net/wireguard/socket.c:175
+wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
+wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
+wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
+process_one_work+0x434/0x860 kernel/workqueue.c:2600
+worker_thread+0x5f2/0xa10 kernel/workqueue.c:2751
+kthread+0x1d7/0x210 kernel/kthread.c:389
+ret_from_fork+0x2e/0x40 arch/x86/kernel/process.c:145
+ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+
+value changed: 0x00 -> 0x01
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 21839 Comm: kworker/u4:18 Tainted: G W 6.5.0-syzkaller #0
+
+Fixes: dccd9ecc3744 ("ipv4: Do not use dead fib_info entries.")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-v3: Fix the commits tree
-v2: Remove the 'rc' variable (stores the return value of the=20
-hdlc_open()) as Christophe Leroy <christophe.leroy@csgroup.eu> suggested
- drivers/net/wan/fsl_ucc_hdlc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/fib_semantics.c | 5 ++++-
+ net/ipv4/fib_trie.c      | 3 ++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdl=
-c.c
-index 47c2ad7a3e42..4164abea7725 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -731,7 +731,7 @@ static int uhdlc_open(struct net_device *dev)
- 		napi_enable(&priv->napi);
- 		netdev_reset_queue(dev);
- 		netif_start_queue(dev);
--		hdlc_open(dev);
-+		return hdlc_open(dev);
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 65ba18a91865ae9a9bd850052811509b8fb3a79b..eafa4a033515782b4ade9a81ec12cb22f5e51e35 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -278,7 +278,8 @@ void fib_release_info(struct fib_info *fi)
+ 				hlist_del(&nexthop_nh->nh_hash);
+ 			} endfor_nexthops(fi)
+ 		}
+-		fi->fib_dead = 1;
++		/* Paired with READ_ONCE() from fib_table_lookup() */
++		WRITE_ONCE(fi->fib_dead, 1);
+ 		fib_info_put(fi);
  	}
-=20
- 	return 0;
---=20
-2.30.2
+ 	spin_unlock_bh(&fib_info_lock);
+@@ -1581,6 +1582,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
+ link_it:
+ 	ofi = fib_find_info(fi);
+ 	if (ofi) {
++		/* fib_table_lookup() should not see @fi yet. */
+ 		fi->fib_dead = 1;
+ 		free_fib_info(fi);
+ 		refcount_inc(&ofi->fib_treeref);
+@@ -1619,6 +1621,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
+ 
+ failure:
+ 	if (fi) {
++		/* fib_table_lookup() should not see @fi yet. */
+ 		fi->fib_dead = 1;
+ 		free_fib_info(fi);
+ 	}
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 74d403dbd2b4e6128dacd1bfc3579a1fc3d635aa..d13fb9e76b9718c674b82ea9069f98fb29f06425 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -1582,7 +1582,8 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
+ 		if (fa->fa_dscp &&
+ 		    inet_dscp_to_dsfield(fa->fa_dscp) != flp->flowi4_tos)
+ 			continue;
+-		if (fi->fib_dead)
++		/* Paired with WRITE_ONCE() in fib_release_info() */
++		if (READ_ONCE(fi->fib_dead))
+ 			continue;
+ 		if (fa->fa_info->fib_scope < flp->flowi4_scope)
+ 			continue;
+-- 
+2.42.0.rc1.204.g551eb34607-goog
 
 
