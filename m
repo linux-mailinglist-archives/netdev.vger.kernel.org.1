@@ -1,201 +1,107 @@
-Return-Path: <netdev+bounces-31034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7147078AFCF
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:15:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C748678B008
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B6EA280DEF
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:15:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64A20280DB0
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FAE11CA5;
-	Mon, 28 Aug 2023 12:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3817311CB0;
+	Mon, 28 Aug 2023 12:25:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3035C11C97
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:15:18 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6029EA
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:15:17 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-594e1154756so32035607b3.2
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:15:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693224917; x=1693829717;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sUjNYQByD3mykD1XcEhHPqjOsVz74RxaCLnMVp3MCFA=;
-        b=EHJB+jdXSiD6I5W9BfyaVljpXQIVJy1BxeMdE3yE4lHte/r704tfevUguB2akzMWM9
-         w0bpOWIRlXe6KJOYrUsIW6reSQkq7TI0ZTsqzotmK1avY+YUD7gInISsCJaYaedmwCd2
-         VhP81by7+MKiHqknDrdsvhoF3qhzljdBpbWsrSwAfz/Geltps93/MZpxP54Wdy0F+NkV
-         B4RNhRhVyctQG3revs15vsFYZLrSG1oMPouboxvKF9GpKvknQk0wnzKY0TJ4hm1A9VAZ
-         vzTHLChvmvCf9K8kMZqYBU101mA7Vvkphxnpp+4Jj5TmYtJS2jPt6lh3m4GZCbjy2ueE
-         fzfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693224917; x=1693829717;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sUjNYQByD3mykD1XcEhHPqjOsVz74RxaCLnMVp3MCFA=;
-        b=FG3CBHMKqjmohz7hbf1DX1CsHHhRinUAt2yYc/I5eifNM3Wkj9stS6+cc6nraemxfi
-         3Y4WjjHRpsHrn/n/Er4Pq54JKzk+pK/zVTee2/lKcHrgzZgS0B+NAivuXVm6HkecdLhS
-         4YfyvEAzqhXpU6FvQ8nOlv5wLB8y/mn6b1wmCjnZDE5hHaTsbEgH51QrZJ0jbe+f7SG6
-         svqxWvT4tIFVkUckBHwSnp6zrjPi69t3+9sjFJGT6VEhukbLtidpvq6O20jTGJXbh7vy
-         Xez6L0YW+jia6S22L3sklzoDWo3tvWM8Y1WZFhaMGzO8qQds6KZAB8osHEr1E3AKs0iZ
-         d87w==
-X-Gm-Message-State: AOJu0YwSrS+dgwj4YgbbT8j1bkyy1iaQnXmt1mhWqRfLUiN9ABUIQyxT
-	q/SQTtRzZoANXQSlo9pce6u6gZcA7/WEYA==
-X-Google-Smtp-Source: AGHT+IEV149mscChtJeMPOTaYrIpFZcYD6pFW92g1jmTe8rX1rD+zOeFUDiO4GOfRArG9lOc3kIqq4DruTz0rg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:108f:b0:d7a:bf7d:bc0f with SMTP
- id v15-20020a056902108f00b00d7abf7dbc0fmr405331ybu.3.1693224917091; Mon, 28
- Aug 2023 05:15:17 -0700 (PDT)
-Date: Mon, 28 Aug 2023 12:15:15 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D62511C9F
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:25:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3A74C433C8;
+	Mon, 28 Aug 2023 12:25:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693225549;
+	bh=1jc7+zlzQOne7RnC8B6F4JM0ri3eqrDyd9zLA8CrD8Q=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=JsUydquVOR7ca9/xs7YifFQBBFStyboihWcpOVd7/RpRKepfzaoX9R8m0afrYV4nM
+	 vbDpobCmRJ/Yri9GImCo62qsc+JcuEbubnLdkpvvik00z6iu9LU/2bXL2YPqOhdfPW
+	 tTL+Mc+tz7guQzwg5/HvABIQCmkrcBLDlCsE6dxsvjBq6Tma+1FPORxUUDDChk4OH/
+	 XLOV1hbEIZXfMTyxU2PGtpkeKDNP12s4jJqF1LBUrHDmG0vUH/h6t0/K1PBkC4ZERB
+	 ZIajzpZ7KquqglrchRC7MwCg87ZOV20ziiJvUdV3iwFU/oluRrjJhEZjiF5FkZ/bJY
+	 /2GpA7XVRHVhA==
+Message-ID: <ec6f9b3a-39ec-404c-7876-4c581aa8ced2@kernel.org>
+Date: Mon, 28 Aug 2023 14:25:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230828121515.2848684-1-edumazet@google.com>
-Subject: [PATCH net] ipv4: annotate data-races around fi->fib_dead
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, netdev@vger.kernel.org,
+ Ratheesh Kannoth <rkannoth@marvell.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Geetha sowjanya <gakula@marvell.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Paolo Abeni <pabeni@redhat.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ hariprasad <hkelam@marvell.com>,
+ Qingfang DENG <qingfang.deng@siflower.com.cn>
+Subject: Re: [BUG] Possible unsafe page_pool usage in octeontx2
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+References: <20230823094757.gxvCEOBi@linutronix.de>
+ <d34d4c1c-2436-3d4c-268c-b971c9cc473f@kernel.org>
+ <923d74d4-3d43-8cac-9732-c55103f6dafb@intel.com>
+ <044c90b6-4e38-9ae9-a462-def21649183d@kernel.org>
+ <ce5627eb-5cae-7b9a-fed3-dc1ee725464a@intel.com>
+ <2a31b2b2-cef7-f511-de2a-83ce88927033@kernel.org>
+ <20230825174258.3db24492@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20230825174258.3db24492@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot complained about a data-race in fib_table_lookup() [1]
 
-Add appropriate annotations to document it.
 
-[1]
-BUG: KCSAN: data-race in fib_release_info / fib_table_lookup
+On 26/08/2023 02.42, Jakub Kicinski wrote:
+> On Fri, 25 Aug 2023 19:25:42 +0200 Jesper Dangaard Brouer wrote:
+>>>> This WQ process is not allowed to use the page_pool_alloc() API this
+>>>> way (from a work-queue).  The PP alloc-side API must only be used
+>>>> under NAPI protection.
+>>>
+>>> Who did say that? If I don't set p.napi, how is Page Pool then tied to NAPI?
+>>
+>> *I* say that (as the PP inventor) as that was the design and intent,
+>> that this is tied to a NAPI instance and rely on the NAPI protection to
+>> make it safe to do lockless access to this cache array.
+> 
+> Absolutely no objection to us making the NAPI / bh context a requirement
+> past the startup stage, but just to be sure I understand the code -
+> technically if the driver never recycles direct, does not set the NAPI,
+> does not use xdp_return_frame_rx_napi etc. - the cache is always empty
+> so we good?
+> 
 
-write to 0xffff888150f31744 of 1 bytes by task 1189 on cpu 0:
-fib_release_info+0x3a0/0x460 net/ipv4/fib_semantics.c:281
-fib_table_delete+0x8d2/0x900 net/ipv4/fib_trie.c:1777
-fib_magic+0x1c1/0x1f0 net/ipv4/fib_frontend.c:1106
-fib_del_ifaddr+0x8cf/0xa60 net/ipv4/fib_frontend.c:1317
-fib_inetaddr_event+0x77/0x200 net/ipv4/fib_frontend.c:1448
-notifier_call_chain kernel/notifier.c:93 [inline]
-blocking_notifier_call_chain+0x90/0x200 kernel/notifier.c:388
-__inet_del_ifa+0x4df/0x800 net/ipv4/devinet.c:432
-inet_del_ifa net/ipv4/devinet.c:469 [inline]
-inetdev_destroy net/ipv4/devinet.c:322 [inline]
-inetdev_event+0x553/0xaf0 net/ipv4/devinet.c:1606
-notifier_call_chain kernel/notifier.c:93 [inline]
-raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
-call_netdevice_notifiers_info net/core/dev.c:1962 [inline]
-call_netdevice_notifiers_mtu+0xd2/0x130 net/core/dev.c:2037
-dev_set_mtu_ext+0x30b/0x3e0 net/core/dev.c:8673
-do_setlink+0x5be/0x2430 net/core/rtnetlink.c:2837
-rtnl_setlink+0x255/0x300 net/core/rtnetlink.c:3177
-rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6445
-netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2549
-rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6463
-netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
-netlink_unicast+0x56f/0x640 net/netlink/af_netlink.c:1365
-netlink_sendmsg+0x665/0x770 net/netlink/af_netlink.c:1914
-sock_sendmsg_nosec net/socket.c:725 [inline]
-sock_sendmsg net/socket.c:748 [inline]
-sock_write_iter+0x1aa/0x230 net/socket.c:1129
-do_iter_write+0x4b4/0x7b0 fs/read_write.c:860
-vfs_writev+0x1a8/0x320 fs/read_write.c:933
-do_writev+0xf8/0x220 fs/read_write.c:976
-__do_sys_writev fs/read_write.c:1049 [inline]
-__se_sys_writev fs/read_write.c:1046 [inline]
-__x64_sys_writev+0x45/0x50 fs/read_write.c:1046
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Nope cache is NOT always empty, the PP cache will be refilled if empty.
+Thus, PP alloc side code will touch/use pool->alloc.cache[].  See two
+places in code with comment: /* Return last page */.
 
-read to 0xffff888150f31744 of 1 bytes by task 21839 on cpu 1:
-fib_table_lookup+0x2bf/0xd50 net/ipv4/fib_trie.c:1585
-fib_lookup include/net/ip_fib.h:383 [inline]
-ip_route_output_key_hash_rcu+0x38c/0x12c0 net/ipv4/route.c:2751
-ip_route_output_key_hash net/ipv4/route.c:2641 [inline]
-__ip_route_output_key include/net/route.h:134 [inline]
-ip_route_output_flow+0xa6/0x150 net/ipv4/route.c:2869
-send4+0x1e7/0x500 drivers/net/wireguard/socket.c:61
-wg_socket_send_skb_to_peer+0x94/0x130 drivers/net/wireguard/socket.c:175
-wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
-wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
-wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
-process_one_work+0x434/0x860 kernel/workqueue.c:2600
-worker_thread+0x5f2/0xa10 kernel/workqueue.c:2751
-kthread+0x1d7/0x210 kernel/kthread.c:389
-ret_from_fork+0x2e/0x40 arch/x86/kernel/process.c:145
-ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+The PP cache is always refilled; Either from ptr_ring or via
+page-allocators bulking APIs.
 
-value changed: 0x00 -> 0x01
+> I wonder if we can add a check like "mark the pool as BH-only on first
+> BH use, and WARN() on process use afterwards". But I'm not sure what
+> CONFIG you'd accept that being under ;)
+> 
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 21839 Comm: kworker/u4:18 Tainted: G W 6.5.0-syzkaller #0
+The PP alloc side is designed as a Single Consumer data-structure/model
+on alloc side, (via a lockless cache/array).  That on empty cache
+fallback to bulk from a Multi Consumer data-structure/model to amortize
+that cost.  This is where the PP speedup comes from.
 
-Fixes: dccd9ecc3744 ("ipv4: Do not use dead fib_info entries.")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/fib_semantics.c | 5 ++++-
- net/ipv4/fib_trie.c      | 3 ++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index 65ba18a91865ae9a9bd850052811509b8fb3a79b..eafa4a033515782b4ade9a81ec12cb22f5e51e35 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -278,7 +278,8 @@ void fib_release_info(struct fib_info *fi)
- 				hlist_del(&nexthop_nh->nh_hash);
- 			} endfor_nexthops(fi)
- 		}
--		fi->fib_dead = 1;
-+		/* Paired with READ_ONCE() from fib_table_lookup() */
-+		WRITE_ONCE(fi->fib_dead, 1);
- 		fib_info_put(fi);
- 	}
- 	spin_unlock_bh(&fib_info_lock);
-@@ -1581,6 +1582,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
- link_it:
- 	ofi = fib_find_info(fi);
- 	if (ofi) {
-+		/* fib_table_lookup() should not see @fi yet. */
- 		fi->fib_dead = 1;
- 		free_fib_info(fi);
- 		refcount_inc(&ofi->fib_treeref);
-@@ -1619,6 +1621,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
- 
- failure:
- 	if (fi) {
-+		/* fib_table_lookup() should not see @fi yet. */
- 		fi->fib_dead = 1;
- 		free_fib_info(fi);
- 	}
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 74d403dbd2b4e6128dacd1bfc3579a1fc3d635aa..d13fb9e76b9718c674b82ea9069f98fb29f06425 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1582,7 +1582,8 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
- 		if (fa->fa_dscp &&
- 		    inet_dscp_to_dsfield(fa->fa_dscp) != flp->flowi4_tos)
- 			continue;
--		if (fi->fib_dead)
-+		/* Paired with WRITE_ONCE() in fib_release_info() */
-+		if (READ_ONCE(fi->fib_dead))
- 			continue;
- 		if (fa->fa_info->fib_scope < flp->flowi4_scope)
- 			continue;
--- 
-2.42.0.rc1.204.g551eb34607-goog
-
+--Jesper
 
