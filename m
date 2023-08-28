@@ -1,46 +1,49 @@
-Return-Path: <netdev+bounces-31113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F91F78B88D
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 21:40:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A462A78B88F
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 21:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5527280EEE
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 19:40:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58879280ED7
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 19:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5D114012;
-	Mon, 28 Aug 2023 19:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E83214015;
+	Mon, 28 Aug 2023 19:41:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669AA29AB
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 19:40:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94338C433C7;
-	Mon, 28 Aug 2023 19:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7647D13AF8
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 19:41:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97074C433C7;
+	Mon, 28 Aug 2023 19:41:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693251650;
-	bh=yS/x4S3B0SAE5WxEAeTZKQjfCSYVYBosMEntmMa+VI8=;
+	s=k20201202; t=1693251713;
+	bh=FRkyoN28bA0TvlJ3RY9iFOdJIYYMOxmsjaIcU+xn6HA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jImMnye5gpm7ZO4ZaxCapaI/8gtOFPHtHJ3agla8hS7pT1PVMw3pEn0/vy1SRG/5Y
-	 YWk9xZM0L3EITRbgp2k6ISva7Gik/vxeXKkuxkZcePBR3C2iKv7i0KtQehtFdIdrNp
-	 NAGEnplyMNQ0PxGrYHFdKYv97Uk56mdYcYtHHqXW3IQ4EYo3kYQWoFHD/edHAx7vJK
-	 xgfISi9apw9LQ/z+m8Hi55WPSDfQYkHFp4UHhlN4ORu4PStJ7TvmsuvuYZQTgWN+QE
-	 6Wm0U/Yp0zScf2bIFldUuUDoMbXXaBsqt/sd269PcZey2emu4D75OJZScKAqBJFljY
-	 Ghxp56ko0c/7Q==
-Date: Mon, 28 Aug 2023 12:40:49 -0700
+	b=Z6ykNQHj5v1smymmy8iT87a87m3qn0RUsD5d6MSzm0nvQocIRjlQjx5T/gkjcCnq4
+	 ebQrqlBLCwhtPUeyi835/CATC7qcAPDZJV4CIeVAQoP6bA8aG23275zbf0c4qB4/kg
+	 GFm01kwEWoZRq7iP+n1THZK/kDlw1PmVogBxepsSxKtSpio50As0QTGelcex8AbnaA
+	 /xjeHsLgLk0thp8nOVnIAlZ6sWfORKVj57Bofp7+D45XiRPWzUcNHoLddqgfbOIoMQ
+	 uB/TO/FSzvVh+FgYSOGioLZjOsc3BfqALSUxdLcUR9leFRBHsB+ejUFC6go3IDgHCU
+	 mkrkQsKrHXWPg==
+Date: Mon, 28 Aug 2023 12:41:51 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexandra Diupina <adiupina@astralinux.ru>
-Cc: Chas Williams <3chas3@gmail.com>,
- linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH] idt77252: remove check of idt77252_init_ubr() return
- value
-Message-ID: <20230828124049.6bec893f@kernel.org>
-In-Reply-To: <20230828143646.8835-1-adiupina@astralinux.ru>
-References: <20230828143646.8835-1-adiupina@astralinux.ru>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jiri Pirko <jiri@resnulli.us>, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Milena Olech
+ <milena.olech@intel.com>, Michal Michalik <michal.michalik@intel.com>,
+ linux-arm-kernel@lists.infradead.org, poros@redhat.com,
+ mschmidt@redhat.com, netdev@vger.kernel.org, linux-clk@vger.kernel.org,
+ Bart Van Assche <bvanassche@acm.org>, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next v7 0/9] Create common DPLL configuration API
+Message-ID: <20230828124151.37130b34@kernel.org>
+In-Reply-To: <20230824213132.827338-1-vadim.fedorenko@linux.dev>
+References: <20230824213132.827338-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,19 +53,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Aug 2023 17:36:46 +0300 Alexandra Diupina wrote:
-> idt77252_init_ubr() always returns 0, so it is possible
-> to remove check of its return value
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Fixes: 2dde18cd1d8f ("Linux 6.5")
+On Thu, 24 Aug 2023 22:31:23 +0100 Vadim Fedorenko wrote:
+>  41 files changed, 8050 insertions(+), 96 deletions(-)
 
-How is this a fix and if it was how could the release tag possibly have
-caused the issue?
-
-I think this is pointless churn, unless the error handling is buggy
-in itself you should leave this code be.
+After some deliberation we decided to play it safe and defer 
+DPLL to v6.7, sorry.
 -- 
-pw-bot: reject
+pw-bot: defer
 
