@@ -1,440 +1,189 @@
-Return-Path: <netdev+bounces-30975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B712378A4F6
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 06:39:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D9D578A514
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 07:06:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DFBF1C208E3
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 04:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D8B7280DE4
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 05:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DA865B;
-	Mon, 28 Aug 2023 04:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68087809;
+	Mon, 28 Aug 2023 05:06:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FB3634
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 04:39:18 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABC80124;
-	Sun, 27 Aug 2023 21:39:15 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-52a3ff5f0abso3731875a12.1;
-        Sun, 27 Aug 2023 21:39:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D6E7ED
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:06:31 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EBB8126
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 22:06:28 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99bf3f59905so347983166b.3
+        for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 22:06:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693197554; x=1693802354;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1693199187; x=1693803987;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wE6m2GXwFFPq4NJBQ0sRXfE2Cg2dR5BXR+AZ5aIwj60=;
-        b=ivdDT9fJBsNV1HczxghuQp2MnsA5ghjkHEXqdwZeO8s4hyZ6he51QHNTZ4jqzm5GXi
-         W0ymhp0caMHShka9rf+WgflQDShDHwbo9R96Be68Gb7rjehpqepaA9GekOEN5+gMSjsL
-         YpbRu3co6nUGGiYcZDFZNCtbUrXtyigf6JzeRboQR7LTtZhoekWLVK8e+gvWJcGsqjpv
-         OAbCBelLDR+y73DheOdV1iU5d1Db1eotWDFpKfIpd/oxiL3kmke5w8pc1qRkuumiPJUF
-         x/+Kau8wPROTHPuc6jvwURj5UpRwr4m/Udjtl4fHvkQ983unzol13wlfpkJTAdtjdHKf
-         UOyg==
+        bh=K6D6JAZ/JA00j7W09g1xJqIX9kfKMl1/EjqDZT54j3Q=;
+        b=AdPAMvQbn4cqqWcstkH5PcLwkelrNWzOYbnxvBRX0W8rvLskaaIdHtlwrEXYxXJ6ob
+         zKBr2mwkuLKbnA552OaSxka2w9U5KVE37DFGuGP0cFof5d3g9YNC4cpFzRIZMZjIyozR
+         QRJckZ6loK4wq2t8bdgQA+IBsLhV2DaHDsB8M8AOtcdCU3AWI9eb8M7qCul1wwV9ovT6
+         bQd85cuO0Punu2emfwRtqCwJCIO2iXHN6IatQ26+EHXSxPZzY2mbmI/deF43XhWQOfvM
+         XqmwECyVfPygkYu9PsX5LG5jklIJOYypkBE3YWt1xRVRHl5PqhqTgdF4gg86lkHhXR21
+         KSeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693197554; x=1693802354;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1693199187; x=1693803987;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wE6m2GXwFFPq4NJBQ0sRXfE2Cg2dR5BXR+AZ5aIwj60=;
-        b=Kj+2QGzr3hpl5o79cj2kJVRixHc5kIYWH8OijlVOiXZpSfZfMxpRDjEO75sDlg/5vb
-         tf1BEIVKdhKBznl0ZfutAs7L1BvIAkIbtpn/7rSDstaQ4jvGqsBNOqOUsve1qm+4YR5q
-         +dg3vTIBiE9Izu2L88zAwPM/dIn+FNO1qUszzCeM+HwhF3ZdyY9iL3oB7qGp2DKX3jNT
-         IEAEmdV/0QSvJHK/0yxw+LNc9t/pEdpM4Tza93/NgRrP/nfM2J2pv5BaqFuAqe+j4Z8W
-         3xbRCzn6dSIKej/s5H4l23HkHyWeOvv1FJPkbnGDhVQ+z5PKjgEjIFwcsF9aZkNM5zrt
-         s/xQ==
-X-Gm-Message-State: AOJu0YyKb9+PfnsiG94GByYDXPiFf17DiTuB0fUumvYb/OEUYAdzOb9C
-	ytDmr5zuWwqlXW985BwhxCk80oZEh2uSndgxkWg=
-X-Google-Smtp-Source: AGHT+IH/joOSu2b6OBOw236aHBSrAmkDgpyHagqggNExbdBZSoySDRp9Ig9Qq6ElZUFHQbWAhhDC6mXkyTflxXfoOiQ=
-X-Received: by 2002:a05:6402:74f:b0:514:9ab4:3524 with SMTP id
- p15-20020a056402074f00b005149ab43524mr18419532edy.7.1693197553857; Sun, 27
- Aug 2023 21:39:13 -0700 (PDT)
+        bh=K6D6JAZ/JA00j7W09g1xJqIX9kfKMl1/EjqDZT54j3Q=;
+        b=PFb6Tr4VDpRDnnzY0Bh14a9tXsuWOl6SG+4XXtGB0MYeF9Mv/e5jbtqbOkmmIwep4N
+         HRruj3lUW+ky4hP4if7N+qfAEJKdxrA3Q+it50NiqW+jVw65BtwwrRfaxnvZNz6w3cx7
+         I9zdPlf2aLP8xAssmkUdw6TbNYmcIC8EQkd2LrN+1rIjTV+FQ+WRqt4a5Nd7noJjYd4v
+         54fMKfeuSxpkqLPSTR4r06HpiTA+Kq35TMwonW9gIv4ilvj8mpR575uvoW2RTPwmBnZt
+         oc/0ptzZ4xDyfJXvneaTDesIG/sBWheWvCdbBWGLrTYvAbYtWSxelUHwdxD/ftzAz7E2
+         xlNA==
+X-Gm-Message-State: AOJu0YzRdwFLxrciK+W2WNzyH0LkWVWG5lCSC94jGqWWUG9vKSIqfCGr
+	HahpksSoCcqClWrOYBfS9mU=
+X-Google-Smtp-Source: AGHT+IHwy4Y7vi6jCqMBmvc5RaHd7JqzP62BHzMz8GMdoH/y2F4XoENJC93vR18Qj54HpVMvpPMnnQ==
+X-Received: by 2002:a17:906:3199:b0:9a2:276d:d83c with SMTP id 25-20020a170906319900b009a2276dd83cmr7098062ejy.18.1693199186623;
+        Sun, 27 Aug 2023 22:06:26 -0700 (PDT)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id u4-20020a170906108400b0099d798a6bb5sm4183012eju.67.2023.08.27.22.06.25
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 27 Aug 2023 22:06:26 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
- <20230824125012.1040288-3-keguang.zhang@gmail.com> <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
-In-Reply-To: <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
-From: Keguang Zhang <keguang.zhang@gmail.com>
-Date: Mon, 28 Aug 2023 12:38:37 +0800
-Message-ID: <CAJhJPsWOOiPnkr-Mk0BXOgCBSMyFx+x7STbO910cxc1RoC8_dw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet Controller
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Serge Semin <Sergey.Semin@baikalelectronics.ru>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: Re: High Cpu load when run smartdns : __ipv6_dev_get_saddr
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <a576811a-91ca-9153-afd8-c9738d6eb92b@kernel.org>
+Date: Mon, 28 Aug 2023 08:06:15 +0300
+Cc: netdev <netdev@vger.kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ pymumu@gmail.com
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Message-Id: <5BE82D57-6948-448D-ABA4-64AF2849944B@gmail.com>
+References: <164ECEA1-0779-4EB8-8B2B-387F7CEC7A89@gmail.com>
+ <b82afbaf-c548-5b7e-8853-12c3e6a8f757@kernel.org>
+ <4898B1F7-2EB5-4182-9D8D-FC8FC780E9B7@gmail.com>
+ <a576811a-91ca-9153-afd8-c9738d6eb92b@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+X-Mailer: Apple Mail (2.3731.700.6)
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 27, 2023 at 5:04=E2=80=AFAM Serge Semin <fancer.lancer@gmail.co=
-m> wrote:
->
-> On Thu, Aug 24, 2023 at 08:50:10PM +0800, Keguang Zhang wrote:
-> > Add devicetree binding document for Loongson-1 Ethernet controller.
-> >
-> > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
-> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > ---
-> > V2 -> V3: Split the DT-schema file into loongson,ls1b-gmac.yaml
-> >           and loongson,ls1c-emac.yaml (suggested by Serge Semin)
-> >           Change the compatibles to loongson,ls1b-gmac and loongson,ls1=
-c-emac
-> >           Rename loongson,dwmac-syscon to loongson,ls1-syscon
-> >           Amend the title
-> >           Add description
-> >           Add Reviewed-by tag from Krzysztof Kozlowski(Sorry! I'm not s=
-ure)
-> > V1 -> V2: Fix "clock-names" and "interrupt-names" property
-> >           Rename the syscon property to "loongson,dwmac-syscon"
-> >           Drop "phy-handle" and "phy-mode" requirement
-> >           Revert adding loongson,ls1b-dwmac/loongson,ls1c-dwmac
-> >           to snps,dwmac.yaml
-> >
-> >  .../bindings/net/loongson,ls1b-gmac.yaml      | 115 ++++++++++++++++++
-> >  .../bindings/net/loongson,ls1c-emac.yaml      | 114 +++++++++++++++++
-> >  2 files changed, 229 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1b=
--gmac.yaml
-> >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1c=
--emac.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.y=
-aml b/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
-> > new file mode 100644
-> > index 000000000000..f661d5b86649
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
-> > @@ -0,0 +1,115 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/loongson,ls1b-gmac.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Loongson-1B Gigabit Ethernet MAC Controller
-> > +
-> > +maintainers:
-> > +  - Keguang Zhang <keguang.zhang@gmail.com>
-> > +
->
-> > +description:
->
-> Use "|" to keep the text formatting.
->   description: |
->
-> > +  Loongson-1B Gigabit Ethernet MAC Controller is based on
-> > +  Synopsys DesignWare MAC (version 3.50a).
-> > +
->
-> > +  Main features
-> > +  - Dual 10/100/1000Mbps GMAC controllers
-> > +  - Full-duplex operation (IEEE 802.3x flow control automatic transmis=
-sion)
-> > +  - Half-duplex operation (CSMA/CD Protocol and back-pressure support)
-> > +  - RX Checksum Offload
-> > +  - TX Checksum insertion
-> > +  - MII interface
-> > +  - RGMII interface
->
-> If only all the DW *MAC-based devices have such info in the
-> bindings the life would have been much easier...
->
-> > +
-> > +select:
-> > +  properties:
-> > +    compatible:
-> > +      contains:
-> > +        enum:
-> > +          - loongson,ls1b-gmac
-> > +  required:
-> > +    - compatible
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - loongson,ls1b-gmac
-> > +      - const: snps,dwmac-3.50a
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
->
-> > +  clock-names:
-> > +    items:
-> > +      - const: stmmaceth
->
-> since there is a single clock then just:
->   clock-names:
->     const: stmmaceth
->
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
->
-> > +  interrupt-names:
-> > +    items:
-> > +      - const: macirq
->
-> ditto. just
->   interrupt-names:
->     const: macirq
->
-> > +
-> > +  loongson,ls1-syscon:
-> > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > +    description:
-> > +      Phandle to the syscon containing some extra configurations
-> > +      including PHY interface mode.
-> > +
->
-> > +  phy-mode:
-> > +    items:
-> > +      - enum:
-> > +          - mii
-> > +          - rgmii-id
->
-> it's a single string then just:
->   phy-mode:
->     enum: ...
->
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - clock-names
-> > +  - interrupts
-> > +  - interrupt-names
-> > +  - loongson,ls1-syscon
-> > +
-> > +allOf:
-> > +  - $ref: snps,dwmac.yaml#
-> > +
-> > +unevaluatedProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
-> > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > +
-> > +    gmac0: ethernet@1fe10000 {
-> > +        compatible =3D "loongson,ls1b-gmac", "snps,dwmac-3.50a";
-> > +        reg =3D <0x1fe10000 0x10000>;
-> > +
-> > +        clocks =3D <&clkc LS1X_CLKID_AHB>;
-> > +        clock-names =3D "stmmaceth";
-> > +
-> > +        interrupt-parent =3D <&intc1>;
-> > +        interrupts =3D <2 IRQ_TYPE_LEVEL_HIGH>;
-> > +        interrupt-names =3D "macirq";
-> > +
-> > +        loongson,ls1-syscon =3D <&syscon>;
-> > +
-> > +        phy-handle =3D <&phy0>;
-> > +        phy-mode =3D "mii";
-> > +        snps,pbl =3D <1>;
-> > +
-> > +        mdio {
-> > +            #address-cells =3D <1>;
-> > +            #size-cells =3D <0>;
-> > +            compatible =3D "snps,dwmac-mdio";
-> > +
-> > +            phy0: ethernet-phy@0 {
-> > +                reg =3D <0x0>;
-> > +            };
-> > +        };
-> > +    };
-> > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1c-emac.y=
-aml b/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
-> > new file mode 100644
-> > index 000000000000..1ffad41941bf
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
-> > @@ -0,0 +1,114 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/loongson,ls1c-emac.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Loongson-1C Ethernet MAC Controller
-> > +
-> > +maintainers:
-> > +  - Keguang Zhang <keguang.zhang@gmail.com>
-> > +
->
-> > +description:
->
-> the same comment about the "|" modifier.
->
-> > +  Loongson-1C Ethernet MAC Controller is based on
-> > +  Synopsys DesignWare MAC (version 3.50a).
-> > +
->
-> > +  Main features
-> > +  - 10/100Mbps
-> > +  - Full-duplex operation (IEEE 802.3x flow control automatic transmis=
-sion)
-> > +  - Half-duplex operation (CSMA/CD Protocol and back-pressure support)
-> > +  - IEEE 802.1Q VLAN tag detection for reception frames
-> > +  - MII interface
-> > +  - RMII interface
->
-> Based on the plat_stmmacenet_data data defined for the LS1C MAC it
-> also support support Tx COE. Isn't it? What about Rx COE?
->
-According to the value read from HW Feature Register(offset 0x1058),
-both TXCOESEL an
-RXTYP1COE/RXTYP2COE are zero.
-Therefore, neither TX COE nor RX COE is supported by LS1C MAC.
-Current plat_stmmacenet_data is Inaccurate.
+Hi David
 
-> > +
-> > +select:
-> > +  properties:
-> > +    compatible:
-> > +      contains:
-> > +        enum:
-> > +          - loongson,ls1c-emac
-> > +  required:
-> > +    - compatible
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - loongson,ls1c-emac
-> > +      - const: snps,dwmac-3.50a
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
->
-> > +  clock-names:
-> > +    items:
-> > +      - const: stmmaceth
->
->   clock-names:
->     const: stmmaceth
-> ?
->
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
->
-> > +  interrupt-names:
-> > +    items:
-> > +      - const: macirq
->
->   interrupt-names:
->     const: macirq
-> ?
->
-> > +
-> > +  loongson,ls1-syscon:
-> > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > +    description:
-> > +      Phandle to the syscon containing some extra configurations
-> > +      including PHY interface mode.
-> > +
->
-> > +  phy-mode:
-> > +    items:
-> > +      - enum:
-> > +          - mii
-> > +          - rmii
->
->   phy-mode:
->     enum: ...
-> ?
->
-> -Serge(y)
->
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - clock-names
-> > +  - interrupts
-> > +  - interrupt-names
-> > +  - loongson,ls1-syscon
-> > +
-> > +allOf:
-> > +  - $ref: snps,dwmac.yaml#
-> > +
-> > +unevaluatedProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
-> > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > +
-> > +    emac: ethernet@1fe10000 {
-> > +        compatible =3D "loongson,ls1c-emac", "snps,dwmac-3.50a";
-> > +        reg =3D <0x1fe10000 0x10000>;
-> > +
-> > +        clocks =3D <&clkc LS1X_CLKID_AHB>;
-> > +        clock-names =3D "stmmaceth";
-> > +
-> > +        interrupt-parent =3D <&intc1>;
-> > +        interrupts =3D <2 IRQ_TYPE_LEVEL_HIGH>;
-> > +        interrupt-names =3D "macirq";
-> > +
-> > +        loongson,ls1-syscon =3D <&syscon>;
-> > +
-> > +        phy-handle =3D <&phy0>;
-> > +        phy-mode =3D "mii";
-> > +        snps,pbl =3D <1>;
-> > +
-> > +        mdio {
-> > +            #address-cells =3D <1>;
-> > +            #size-cells =3D <0>;
-> > +            compatible =3D "snps,dwmac-mdio";
-> > +
-> > +            phy0: ethernet-phy@13 {
-> > +                reg =3D <0x13>;
-> > +            };
-> > +        };
-> > +    };
-> > --
-> > 2.39.2
-> >
-> >
+
+> On 28 Aug 2023, at 5:42, David Ahern <dsahern@kernel.org> wrote:
+>=20
+> On 8/27/23 1:17 PM, Martin Zaharinov wrote:
+>> Hi David,
+>>=20
+>>=20
+>>=20
+>>> On 27 Aug 2023, at 19:51, David Ahern <dsahern@kernel.org> wrote:
+>>>=20
+>>> On 8/27/23 7:20 AM, Martin Zaharinov wrote:
+>>>> Hi Eric=20
+>>>>=20
+>>>>=20
+>>>> i need you help to find is this bug or no.
+>>>>=20
+>>>> I talk with smartdns team and try to research in his code but for =
+the moment not found ..
+>>>>=20
+>>>> test system have 5k ppp users on pppoe device
+>>>>=20
+>>>> after run smartdns =20
+>>>>=20
+>>>> service got to 100% load=20
+>>>>=20
+>>>> in normal case when run other 2 type of dns server (isc bind or =
+knot ) all is fine .
+>>>>=20
+>>>> but when run smartdns  see perf :=20
+>>>>=20
+>>>>=20
+>>>> PerfTop:    4223 irqs/sec  kernel:96.9%  exact: 100.0% lost: 0/0 =
+drop: 0/0 [4000Hz cycles],  (target_pid: 1208268)
+>>>> =
+--------------------------------------------------------------------------=
+--------------------------------------------------------------------------=
+-----------------------------------------------------------
+>>>>=20
+>>>>   28.48%  [kernel]        [k] __ipv6_dev_get_saddr
+>>>>   12.31%  [kernel]        [k] l3mdev_master_ifindex_rcu
+>>>>    6.63%  [pppoe]         [k] pppoe_rcv
+>>>>    3.82%  [kernel]        [k] ipv6_dev_get_saddr
+>>>>    2.07%  [kernel]        [k] __dev_queue_xmit
+>>>=20
+>>> Can you post stack traces for the top 5 symbols?
+>>=20
+>> If write how i will get.
+>=20
+> While running traffic load:
+>    perf record -a -g -- sleep 5
+>    perf report --stdio
+>=20
+
+
+Here is perf.data file : https://easyupload.io/k3ep8l
 
 
 
---
-Best regards,
+>>=20
+>>>=20
+>>> What is the packet rate when the above is taken?
+>>=20
+>> its normal rate of dns query=E2=80=A6 with both other dns server all =
+is fine=20
+>=20
+> That means nothing to me. You will need to post packet rates.
 
-Keguang Zhang
+I honestly don't know how to measure it, but I don't think they are more =
+than 10k QPS - in system have 5-5.5k users=20
+
+>=20
+>>=20
+>>>=20
+>>> 4,223 irqs/sec is not much of a load; can you add some details on =
+the
+>>> hardware and networking setup (e.g., l3mdev reference suggests you =
+are
+>>> using VRF)?
+>> No system is very simple:
+>>=20
+>> eth0 (Internet) Router (smartDNS + pppoe server ) - eth1 ( User side =
+with pppoe server ) here have 5000 ppp interface .
+>>=20
+>> with both other service i dont see all work fine.
+>=20
+> ip link sh type vrf
+> --> that does not show any devices? It should because the majority of
+> work done in l3mdev_master_ifindex_rcu is for vrf port devices. ie., =
+it
+> should not appear in the perf-top data you posted unless vrf devices =
+are
+> in play.
+
+VRF is disable in kernel config .
+
+
+
+
 
