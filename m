@@ -1,48 +1,46 @@
-Return-Path: <netdev+bounces-31116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B418E78B89F
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 21:45:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 697FE78B8A3
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 21:46:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0A781C20994
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 19:45:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B431C209A3
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 19:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7481401A;
-	Mon, 28 Aug 2023 19:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B5814266;
+	Mon, 28 Aug 2023 19:46:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B65B13AF8
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 19:45:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5FFC433C7;
-	Mon, 28 Aug 2023 19:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA0A29AB;
+	Mon, 28 Aug 2023 19:45:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C5BC433C8;
+	Mon, 28 Aug 2023 19:45:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693251926;
-	bh=/TFoJ9iNTO+oLdrfv9gPgJ9S3rhJOk+mYgfZoPHhSFw=;
+	s=k20201202; t=1693251959;
+	bh=yhDfpHHMTwoKf6lQHxj/LI3JfvoIJGkL3VYzwzQSSPo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K5gd5DdoeibNNQzbxTcvO9+A4y1uf74jS8uQBsk7DmwzdJtbGND1qDi1u+7Ik/T0c
-	 Mjf4sFq1IxGg8wGWa8x45ubR3NzRwfb8VPVYj4eqkfmUi56rAwITPDUPDXdRZTBhoE
-	 vyEIEbhEm0i0GAd6IzvQkpgAivpv0ULzpPsT7ziW4zAQRo4e1CkGRjdB9L+Igvs4S5
-	 nkJt5IW1Vb5HJf0qHL8l9teQlseQWJlPpiCHP+Y+KUiWWSkVnlqzu8MbZm+FKua/mn
-	 tOs+4hVh8BytH2BnJSCK0wfcYZz6aasBvsXCSGgtq1YIIX8cISDLheIjqFv172PUKc
-	 MLoJNXMf1ULZg==
-Date: Mon, 28 Aug 2023 12:45:24 -0700
+	b=ntOoDqAO4HSTdUm/9O+IxWZMHgoAovKePv+l/8lN/W/C43VzX+fklx87Jnc/Ky7/f
+	 eVMNzplEf+Lo2ztDOvYdjJPp/pmyrbENd81do8XnQ6WK6VOPexIDW95Tccb317hl8q
+	 LGzwXdISp5hQIIg0+LEqFW44L9eOunA5oYo4Gq80VlpMHzHlDNME/HiVZbrAxgLMz9
+	 xsRgwJ9gmqq5Dfh+nvpCcYH0wbWl3L3py4QKE1o3c5TayOGg9s7B6MxTaSWFz5a0g/
+	 WcciuDb3toaDbjKQQfEtSWrv6E9/MCUgmnMn25Yao6O4AW87OdWTAmDNxdD9g9QNNC
+	 RxZUL8ri1U5vw==
+Date: Mon, 28 Aug 2023 12:45:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: haozhe chang <haozhe.chang@mediatek.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Loic Poulain <loic.poulain@linaro.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg
- <johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] wwan: core: Use the bitmap API to
- allocate bitmaps
-Message-ID: <20230828124524.5ca4da50@kernel.org>
-In-Reply-To: <20230828131953.3721392-1-andriy.shevchenko@linux.intel.com>
-References: <20230828131953.3721392-1-andriy.shevchenko@linux.intel.com>
+To: Zheao Li <me@manjusaka.me>
+Cc: edumazet@google.com, mhiramat@kernel.org, rostedt@goodmis.org,
+ davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v4] tracepoint: add new `tcp:tcp_ca_event` trace event
+Message-ID: <20230828124557.0cc70e58@kernel.org>
+In-Reply-To: <20230825133246.344364-1-me@manjusaka.me>
+References: <20230825133246.344364-1-me@manjusaka.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,12 +50,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Aug 2023 16:19:53 +0300 Andy Shevchenko wrote:
-> Use bitmap_zalloc() and bitmap_free() instead of hand-writing them.
-> It is less verbose and it improves the type checking and semantic.
+On Fri, 25 Aug 2023 13:32:47 +0000 Zheao Li wrote:
+> This the 4th version of the patch, the previous discusstion is here
 > 
-> While at it, add missing header inclusion (should be bitops.h,
-> but with the above change it becomes bitmap.h).
+> https://lore.kernel.org/linux-trace-kernel/20230807183308.9015-1-me@manjusaka.me/
+> 
+> In this version of the code, here's some different:
+> 
+> 1. The event name has been changed from `tcp_ca_event_set` to
+> `tcp_ca_event`
+> 
+> 2. Output the current protocol family in TP_printk
+> 
+> 3. Show the ca_event symbol instead of the original number
+> 
+> But the `./scripts/checkpatch.pl` has been failed to check this patch,
+> because we sill have some code error in ./scripts/checkpatch.pl(in
+> another world, the test would be failed when we use the 
+> scripts/checkpatch.pl to check the events/tcp.h
+> 
+> Feel free to ask me if you have have any issues and ideas.
 
 ## Form letter - net-next-closed
 
