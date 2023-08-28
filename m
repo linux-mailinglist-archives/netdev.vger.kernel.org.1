@@ -1,117 +1,85 @@
-Return-Path: <netdev+bounces-31024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BC878A9E3
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:17:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F68278A9EA
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:17:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E33161C208BC
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 10:17:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 881C01C203D8
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 10:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B963F6AD7;
-	Mon, 28 Aug 2023 10:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F056FAF;
+	Mon, 28 Aug 2023 10:17:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5A911C8D
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 10:17:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304B4132
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 03:17:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693217831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KcjP4KV6fMpkBHQo9eR0heg/yFLgiC7gAFcEQzg242c=;
-	b=a4OUtWsO9ILdG/8/p2AAbGB7JwSj4d0XldBRmXkCrtEt6gy0oFsBRsDsyn0wnCV1d2VtPC
-	iMO88KZpu6AGxZ7+PjAtlE0eNee/rNa13disfatnRJPSnvk4k8B9n5tITDCKDR/Pph9Kzc
-	654364z0kHw9llIRqQjFEDEVLyYZjvc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-quEglgcLOeW7HKHMrA6n0A-1; Mon, 28 Aug 2023 06:17:10 -0400
-X-MC-Unique: quEglgcLOeW7HKHMrA6n0A-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9a5b578b1c1so14062266b.1
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 03:17:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693217829; x=1693822629;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KcjP4KV6fMpkBHQo9eR0heg/yFLgiC7gAFcEQzg242c=;
-        b=HrehRioZXVWe8+0wT1/56dxYEoWh0OEHLR5+xNOFb9pKeVpYbvEYH+YyFpQ8XnmRAA
-         adMGVRMyKu5thcJl3c/yifG4eRW4o+36N9zDUOH4kwbphJNoVxG4sDNIthZYVXZbXWNT
-         skP4EbjEJia4/uhSNN1kjQlZYubO2PwGi1iU1OxLkPdQVuCTkC2kI592xP/1K+dW3pD3
-         XHEF/9vpyWB+eR4wX0ZOxiOv7vxQr6aIiRLC9sfqwNPF4uxcc8nNXaPykuvqC3Dtwx52
-         K1LJVc5jbJ46mEu5oTLErrnFmS6/G1NxsCZdE5ebW/H9IyKQzAu3wA8MiTe3uNaAreC/
-         OPRw==
-X-Gm-Message-State: AOJu0YzH7u6Su5fbE99lPoSP0MPATK74DEK2DYT5cMkR0RBklHnoWUNy
-	s9VB7vlQtGDuQP+eYa05WdGUVeJL7I/lqvAUd3ySjFKjCZXb5DL6bKrnFa5vd6EMZmRUWJ3aPIb
-	fF3gs0L9PWoEeVmGbfsq0r9p/
-X-Received: by 2002:a17:906:1dd:b0:99d:ecb4:12fd with SMTP id 29-20020a17090601dd00b0099decb412fdmr18555067ejj.6.1693217828934;
-        Mon, 28 Aug 2023 03:17:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGuQ1ivUZh5ReTyVNwe4awvJYCZF8Yho2LZZ5LhVYNoBqqt4S+expYzsQCNwkei3qEY6F+NLQ==
-X-Received: by 2002:a17:906:1dd:b0:99d:ecb4:12fd with SMTP id 29-20020a17090601dd00b0099decb412fdmr18555055ejj.6.1693217828662;
-        Mon, 28 Aug 2023 03:17:08 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-242-28.dyn.eolo.it. [146.241.242.28])
-        by smtp.gmail.com with ESMTPSA id y16-20020a1709064b1000b009a1dbf55665sm4449915eju.161.2023.08.28.03.17.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 03:17:08 -0700 (PDT)
-Message-ID: <bdf7db1a44ab0ee46fc621329ef9bc61734a723a.camel@redhat.com>
-Subject: Re: [PATCH net-next] net: annotate data-races around sock->ops
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, syzbot
-	 <syzkaller@googlegroups.com>
-Date: Mon, 28 Aug 2023 12:17:06 +0200
-In-Reply-To: <20230808135809.2300241-1-edumazet@google.com>
-References: <20230808135809.2300241-1-edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E0C11C8D
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 10:17:52 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE797198
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 03:17:42 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-75-lK0TCRb5PQ2j4Fl9s7mA7Q-1; Mon, 28 Aug 2023 06:17:23 -0400
+X-MC-Unique: lK0TCRb5PQ2j4Fl9s7mA7Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1FBF3C11C60;
+	Mon, 28 Aug 2023 10:17:22 +0000 (UTC)
+Received: from hog (unknown [10.45.224.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B7324C1602B;
+	Mon, 28 Aug 2023 10:17:20 +0000 (UTC)
+Date: Mon, 28 Aug 2023 12:17:19 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
+ mdo_insert_tx_tag
+Message-ID: <ZOx0L722xg5-J_he@hog>
+References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+2023-08-24, 12:16:15 +0300, Radu Pirea (NXP OSS) wrote:
+> Implement mdo_insert_tx_tag to insert the TLV header in the ethernet
+> frame.
+> 
+> If extscs parameter is set to 1, then the TLV header will contain the
+> TX SC that will be used to encrypt the frame, otherwise the TX SC will
+> be selected using the MAC source address.
 
-On Tue, 2023-08-08 at 13:58 +0000, Eric Dumazet wrote:
-> IPV6_ADDRFORM socket option is evil, because it can change sock->ops
-> while other threads might read it. Same issue for sk->sk_family
-> being set to AF_INET.
->=20
-> Adding READ_ONCE() over sock->ops reads is needed for sockets
-> that might be impacted by IPV6_ADDRFORM.
->=20
-> Note that mptcp_is_tcpsk() can also overwrite sock->ops.
->
-> Adding annotations for all sk->sk_family reads will require
-> more patches :/
+In which case would a user choose not to use the SCI? Using the MAC
+address is probably fine in basic setups, but having to fiddle with a
+module parameter (so unloading and reloading the module, which means
+losing network connectivity) to make things work when the setup
+evolves is really not convenient.
 
-I was unable to give the above a proper look before due to OoO on my
-side.
+Is there a drawback to always using the SCI?
 
-The mptcp code calls mptcp_is_tcpsk() only before the fd for the newly
-accepted socket is installed, so we should not have concurrent racing
-access to sock->ops?!? Do you have any related splat handy?
-
-Thanks,
-
-Paolo
+-- 
+Sabrina
 
 
