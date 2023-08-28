@@ -1,46 +1,53 @@
-Return-Path: <netdev+bounces-31117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 697FE78B8A3
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 21:46:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C759C78B8AC
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 21:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B431C209A3
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 19:46:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 896C1280EEB
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 19:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B5814266;
-	Mon, 28 Aug 2023 19:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E48A14267;
+	Mon, 28 Aug 2023 19:47:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA0A29AB;
-	Mon, 28 Aug 2023 19:45:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C5BC433C8;
-	Mon, 28 Aug 2023 19:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F401401A
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 19:47:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66336C433C7;
+	Mon, 28 Aug 2023 19:47:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693251959;
-	bh=yhDfpHHMTwoKf6lQHxj/LI3JfvoIJGkL3VYzwzQSSPo=;
+	s=k20201202; t=1693252065;
+	bh=C4Ir9bNWumGZzSRtNes2Jz5ys6JqBziIumxbHwsTdO4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ntOoDqAO4HSTdUm/9O+IxWZMHgoAovKePv+l/8lN/W/C43VzX+fklx87Jnc/Ky7/f
-	 eVMNzplEf+Lo2ztDOvYdjJPp/pmyrbENd81do8XnQ6WK6VOPexIDW95Tccb317hl8q
-	 LGzwXdISp5hQIIg0+LEqFW44L9eOunA5oYo4Gq80VlpMHzHlDNME/HiVZbrAxgLMz9
-	 xsRgwJ9gmqq5Dfh+nvpCcYH0wbWl3L3py4QKE1o3c5TayOGg9s7B6MxTaSWFz5a0g/
-	 WcciuDb3toaDbjKQQfEtSWrv6E9/MCUgmnMn25Yao6O4AW87OdWTAmDNxdD9g9QNNC
-	 RxZUL8ri1U5vw==
-Date: Mon, 28 Aug 2023 12:45:57 -0700
+	b=pt2TiriD50KKRwOmmP5NpsaQE/9Yosb+AWCBsHFkuvx1YnDtVcr5cC1cMTTps4Ug2
+	 sxYBUqkIdoEo3hg9uQnrdU3hoDPs9s6hRQsaXt8wIa2SWNyIYhXFz6TWN9rx+zFqwe
+	 rDOgPOSjJDW3u+aLPC30xtSXRzOa09okhBs/XxYAre2ExymejyBtKIiHl1lwst4jcJ
+	 vfKYGIOf6HwZ4G0d0AyMkJI+vkqQwMkRFqmeBzUGBiLihfMoL/fLKlK7Wn7myHZKRZ
+	 hno996IvnfHCxH8vK2twXukWv8fKEiA4R5PU29wnMwWM3/ZOPOU2hKk1uahpHBTfdV
+	 w40ubq/+KxytQ==
+Date: Mon, 28 Aug 2023 12:47:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Zheao Li <me@manjusaka.me>
-Cc: edumazet@google.com, mhiramat@kernel.org, rostedt@goodmis.org,
- davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v4] tracepoint: add new `tcp:tcp_ca_event` trace event
-Message-ID: <20230828124557.0cc70e58@kernel.org>
-In-Reply-To: <20230825133246.344364-1-me@manjusaka.me>
-References: <20230825133246.344364-1-me@manjusaka.me>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
+ <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Russell King
+ <linux@armlinux.org.uk>, Frank Wunderlich <frank-w@public-files.de>,
+ =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: add paths and
+ SerDes modes for MT7988
+Message-ID: <20230828124743.4882a1a2@kernel.org>
+In-Reply-To: <e6bb7c95c93e7ae91de998d2fd32580db2ce05c3.1693183332.git.daniel@makrotopia.org>
+References: <e6bb7c95c93e7ae91de998d2fd32580db2ce05c3.1693183332.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,26 +57,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 25 Aug 2023 13:32:47 +0000 Zheao Li wrote:
-> This the 4th version of the patch, the previous discusstion is here
-> 
-> https://lore.kernel.org/linux-trace-kernel/20230807183308.9015-1-me@manjusaka.me/
-> 
-> In this version of the code, here's some different:
-> 
-> 1. The event name has been changed from `tcp_ca_event_set` to
-> `tcp_ca_event`
-> 
-> 2. Output the current protocol family in TP_printk
-> 
-> 3. Show the ca_event symbol instead of the original number
-> 
-> But the `./scripts/checkpatch.pl` has been failed to check this patch,
-> because we sill have some code error in ./scripts/checkpatch.pl(in
-> another world, the test would be failed when we use the 
-> scripts/checkpatch.pl to check the events/tcp.h
-> 
-> Feel free to ask me if you have have any issues and ideas.
+On Mon, 28 Aug 2023 01:56:19 +0100 Daniel Golle wrote:
+> MT7988 comes with a built-in 2.5G TP PHY as well as SerDes lanes to
+> connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-R,
+> 2500Base-X, 1000Base-X and Cisco SGMII interface modes.
 
 ## Form letter - net-next-closed
 
