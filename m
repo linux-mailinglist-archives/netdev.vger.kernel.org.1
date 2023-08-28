@@ -1,199 +1,154 @@
-Return-Path: <netdev+bounces-31001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D64AD78A6F7
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 10:01:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC36478A7BD
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 10:33:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 131C31C20831
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:01:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFF501C208BA
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879823D71;
-	Mon, 28 Aug 2023 08:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC82440C;
+	Mon, 28 Aug 2023 08:33:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776C310FE
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 08:01:56 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2132.outbound.protection.outlook.com [40.107.22.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEACA115;
-	Mon, 28 Aug 2023 01:01:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IdC/DR8t6ZnX19qB7XNSZKsnQaNYiZDAKLjtD7Sew6Nvwh3oj1Fn4Xwvz8HdEwhUru7yC1jVP4tNjbX2qSUEJOpzhuyeaacvl5A8DpqD1ww7AmYGpeqV85JxKyTMdTUNth57Iy9arC8s/XjNw+g7SatyLbb4DmrbV0yVkta8pGsbBA+JrgOD21MW4kQ6ob4TaEj/dABMyaqEkCrZFR8wh3yylvCMPRVylhUjJUXLfplaAcgzEP4U88Knq317gkuospRLGUr7oCcmQw7HWTY4PeaOg8S5jqmfMeMatd5fw88rientPbccs2NDGkv2S2oFlUM7V3ibyh7Y9i2pJOCUyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KTFhZI39gLAa1T8EkEQeOyVgbe5rK+eY+7WtbmJZe8E=;
- b=hwDDxi+WGneOi8BNWif8b8tKrcyRxUkN4+Nn8xZbgdaUZ5z1hDXZ/TXGH+Kq3C9rkJYJ2REPINO9BuuntTRBlBQAZF5kfqxNvhXtYg2aSbWPV6KO4QemSXAIhbY++sDT7fRxf4vnzoAG/CQU3dvvSi/OOdep6QEr8kgSuhwxo3GKkyHHZhqBw0maAdHJKRNAAC4vUtYQFKuSRZhifY4aOToXsjW7bVSijlk8AsG1sX23BkR6Qcs6OReCnzjb/gAB0SJrs8M6HFYoBYypo5iOVvuHcSE1yfV6k3i7cWRmYUFE4B5+tUd+eVD/qg1OTTmRcKQgNWQ+fWWPjE8MVB6z6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=estab.onmicrosoft.com;
- s=selector2-estab-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KTFhZI39gLAa1T8EkEQeOyVgbe5rK+eY+7WtbmJZe8E=;
- b=Ngf8JFRKrlRN/hBHXguG+G1Mgj6QNXlQpF3RukuwfZcgTe8Sa3g8Dexv3NFGg3aPmqXuRJqT1slWUVJ2dOVOrDn2RS7e20EoDmOjdJlEO06kRp2qCHSaOndr8UlCmS1nSE/XWapTqSxu2wbvrMFuyQtjVJcSZn5pNDtcNoqJwrg=
-Received: from DBBP189MB1433.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:1e7::15)
- by DU0P189MB1889.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:349::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Mon, 28 Aug
- 2023 08:01:48 +0000
-Received: from DBBP189MB1433.EURP189.PROD.OUTLOOK.COM
- ([fe80::759b:94eb:c2e8:c670]) by DBBP189MB1433.EURP189.PROD.OUTLOOK.COM
- ([fe80::759b:94eb:c2e8:c670%6]) with mapi id 15.20.6699.034; Mon, 28 Aug 2023
- 08:01:48 +0000
-From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-To: Ido Schimmel <idosch@idosch.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern
-	<dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Shuah Khan
-	<shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
-Subject: RE: [PATCH net v2 3/3] selftests: forwarding: Add test for
- load-balancing between multiple servers
-Thread-Topic: [PATCH net v2 3/3] selftests: forwarding: Add test for
- load-balancing between multiple servers
-Thread-Index: AQHZ1zO828Em232gHEyoHRZchodYqa/+ZnWAgAD2CEA=
-Date: Mon, 28 Aug 2023 08:01:47 +0000
-Message-ID:
- <DBBP189MB1433550DB3ED13B3B712E11E95E0A@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
-References: <20230825090830.18635-1-sriram.yagnaraman@est.tech>
- <20230825090830.18635-4-sriram.yagnaraman@est.tech>
- <ZOuFSbnxgaST4qKD@shredder>
-In-Reply-To: <ZOuFSbnxgaST4qKD@shredder>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DBBP189MB1433:EE_|DU0P189MB1889:EE_
-x-ms-office365-filtering-correlation-id: da41b99d-19d8-4803-2b7b-08dba79d0772
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- IY1thia1RSzjQCYQNOtQoM7PTu0wwfNcrz9kgzAcMaPmvbv5BiTL12bq2ayJoJh/8OtoRmk01MWltWmmU/n6Vp4Dv4vv3oWVnXVbS6oNKDsZI+hHiePyyzQHX2gnO6noEZv2/PjV6iCykYXrtJSrBCj55pYN9mus8FXq2N988RvlC9yLS6OiZmOgrokZ85GGVCmXEUPVz7Jj7U+fXA2mEtm+vv8z47dLU/JJhjPTGKv30fT6ONwZD8dQu2u6kWu53pPYt2lS78YqtpPpvigGTH/n7okluwlzGGc/FFpkTXoJf75sCyKQB+iNMbA01hQN22709DO3ZTPHgbAFFUoqkCAvzRfLDx54qYldQhlU86wTTHo2gIJJgFBLIpwRzy975Tmxl3dQPXOGdDjpC72ya9Qz3r/+YZCZJ6/D5H43Zu45Y5tKpKiGs/ufAPcDfiM0kU5LZDUKNaudgVnuNG3bsX10I6JduThlPR4cqsXV8xSe31A3P8/+pleY0eIJn3M9uJFqN+8LYuEZ46F7jyTUJ87sTj1fTV3s5v9Z8WXMuCB80p8Y8H3MJUVEfGHPK8qGV5eykXoTC4+cNChyGWviacVKOmRjwQd+dDzKbVvgjRI6tTTssviY7GRYbP8QNaKt
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBP189MB1433.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(376002)(39830400003)(366004)(451199024)(1800799009)(186009)(83380400001)(478600001)(122000001)(26005)(66574015)(7696005)(53546011)(6506007)(71200400001)(55016003)(9686003)(5660300002)(86362001)(2906002)(33656002)(44832011)(52536014)(7416002)(316002)(38100700002)(4326008)(38070700005)(6916009)(66446008)(64756008)(76116006)(41300700001)(66476007)(8936002)(8676002)(66556008)(66946007)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?R0ZCVFpQYWowaFdBR3dPaVZiZHJQNXVFb05SUUY3WkN0VUNEajBrVUR5Z1BU?=
- =?utf-8?B?SlZHVlROaHZrZ0dCQnV2ZVJhWTBsOFpLV3pYT0lObzhOMHFKbUg4NnZGby9w?=
- =?utf-8?B?K3Jsa1dMbmswa0lVRjFkNDI1OVMvdXU5WEVTdGRnQ0g0VnY0a2dVaFhrTjhP?=
- =?utf-8?B?cUJocWViWXJxaGI4Nng1eWQ0ZGJUT2w3WW0raCtaaG1nNUdYekVFTG5aMURW?=
- =?utf-8?B?ZkZKUnZ2UUQ3L0RKUlMvWUl4aWcvTk51ckFoWWFQTWk3VUhRR0laVlRYUjNz?=
- =?utf-8?B?Y3k2ejMweXZwWGpET1NoQ2wzWmoydytHK3kyajV1UDhPVi85Rzc5OFlIVHJu?=
- =?utf-8?B?aTlDY0I4M082SUovbGZTWEdUUzVFM215U2l6YXpFK0RNZ3N1aUFjazc1YlE5?=
- =?utf-8?B?ajVFaG5nQXFzRUU1NVRlN25PYkNhYlJhS0lIbmVMdXo3MDFDUEEwMHkxMklp?=
- =?utf-8?B?NnJWeldvajBqTWwzbmhrbmEvck9wZ0dYUUxvZmZJdUlHSFlrbWhyQWVtT3R0?=
- =?utf-8?B?TXF6NzJHTlpGcFAwTUJ0bC9TUHN0MmdvRDVMeUtaK0c2WUo2NHRRSFl1a2VF?=
- =?utf-8?B?WTRqYVBEN0lSejZmUTBPYUZ1YUVRYmFqMERFZVhHdzlKclAwWTd4T0RFa3NE?=
- =?utf-8?B?VXl0TkNSMzE5ZG1pTmM3ditnQUE5NGJIQ3ZQNVhBT1FaYVUySHlQYUlvSUds?=
- =?utf-8?B?Y2ZFSTNQNk9xdjBEZ0dDSGNpNmJsQm91RWRJN3V2NW1lVmJnZkV3VERDMEhm?=
- =?utf-8?B?RDBsR242Q3BVaU9LbFlxMFVwWEVHWDJ6TFZ6Skw0a1JQNUtCemdIWHo3NTla?=
- =?utf-8?B?cC9jRHVpeTlncmlpVkp6RndRTmNlUXZLODFmYXN0aFlDQXNsem1JRzNjU29t?=
- =?utf-8?B?S1ZzenQxd2t6UXBxakNxWFhPZWlsSlNkTU1BU0RTaXA2UjFOeDVVUlRHMW9T?=
- =?utf-8?B?WHM4NjNVLzVQMFZKYllTLzRpSnMwMkZWRzBYK29aZlJsWHVBdDVjVE5lL2pV?=
- =?utf-8?B?T2FBSkZPazVLU1QxVDFGTjBkVTFwWWVQZ1lyMGE2L25qbFk5VlVtLzNGMUx4?=
- =?utf-8?B?QUJpSzFHWlViL01HMzdRYnQ1OTJXUjljaDV3c203ODZielJDa2FyanhoUXpI?=
- =?utf-8?B?TWxGSTFLWTBqUG9zOU9Tc0tKd0s5aSt4ZjU5U2lld2pRazBnT1RGT0dUWnRp?=
- =?utf-8?B?TDFNUzdOQWtFMUtEcFV4U1ZhOENpa3dnc0FWdHdKVG1RakhIU0l2cXNrN2tP?=
- =?utf-8?B?NjBaUk1HaHlCcWlOaXRtV2NtNUVkNmlNYWN4M1VjK1VmNE0yTmhJNFM1UzBk?=
- =?utf-8?B?VmgxZ2s0K2ljWXFDTDV2aUNqSGpnUjR2VkRxR0xSektZRkd5eFJhcUFFblJi?=
- =?utf-8?B?dEcra2JJRDh2MGU2eHFOQTZKdENPd25ONENib0VyeHlZZ2c1ZFZBQXhGK1A0?=
- =?utf-8?B?REpsT1RGTU1IRWxRSW0yWEIzZUc5YUdZTTJ1KzN6aDZxUmU3RXJveTFkM2Y5?=
- =?utf-8?B?VjJBdy8xVHYwRW04b1dWUUNaUWMzRUQ3a0gvcGdBcjFHSjhMQ0ZuS3FKOGQ5?=
- =?utf-8?B?WXBGdjBPQ0JtNWNHWHFYR3N1L3k2OWFRU0lhdGlGRXhjUzd3TUVsdnkzQXlN?=
- =?utf-8?B?aDFxMTZ4VUtVWDREbUMzcjJtRU8yNkRiUUxiNjQ2V1JFMjBZYXFQaEtuYlRL?=
- =?utf-8?B?NTNYVkNYbDhxUHQ1ZVJNMlhiRlk3T1pKR0hkcEFsdlpsQmFPdnhWNFFEMytl?=
- =?utf-8?B?bUZ4RVp3SVVhb2NEVmh3cU96NEs1QkZFU3lZcE5CNVlCRnI2Y1ZoUnVOb0pO?=
- =?utf-8?B?aEdVUStzckhTQzZWL1MzN29vQzRiVjNYNzZQZU5oMGhhY0J4VFh1L0ZsdzV1?=
- =?utf-8?B?c1ZkcGUzdy9rZUhYRUNiV2NhRkdTdzhKOGk0ZmMyYjJtdG1aZWpTUzJreDRn?=
- =?utf-8?B?TmdtNVB3VFdDNzZTbGJFMEVYTkpTZGhIWksvNDRqWWJGdS9DNU5LUS9rMld4?=
- =?utf-8?B?VjMrNHlsZmEzZncyd3FkREFqVXlBMDBsMG9LWDNSSENqdFkrVkVxc082M1dB?=
- =?utf-8?B?OG5XMG1TaFFzTG5Sdmhka2cxU0VuTkZSMXlJeWUyWUdhYk1UV0ZNbFQ0dUJE?=
- =?utf-8?Q?r2RGLX5IRlu2nak5PZOmRWBgR?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBAB632
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 08:33:24 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB52E0
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 01:33:23 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-523100882f2so3862234a12.2
+        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 01:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1693211601; x=1693816401;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=KlU7prAFO78u6FO2NXinFlb1Ej3G0cvXArnnUWfJS1E=;
+        b=OK+QfG5ztCrkWKZ2ZJut74sBKaxxBpKaTtp4698eRAv7/z/ZnPaOphiRZOD6lvxw3K
+         ltSedaGtCqpu5GBCp0oPoLa8ZiwCyB8zrUiv/O/FqRGQFtLzQ4XLpyzBSaWB000Sc29d
+         ETB+OT4we0h6TGYZJR+Wr37R3F080iqUtqgJY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693211601; x=1693816401;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KlU7prAFO78u6FO2NXinFlb1Ej3G0cvXArnnUWfJS1E=;
+        b=Fdopi+n0O/GpmEAePGJjb8psT5/cf++zZdt9p/8rw78+izKt7udTrX/RSvlYlvu5gz
+         C2LB76gZ5vdpMoV/Wcs4KeCFJxKKU8D1srceprNQiq7kaS2gy1Bdktb5V153NGm54Nux
+         REW4WGKYZ7a0mt1yBoePAdHXpYWTa8ZhYYLMmwJA+oKM+1UbQY4Qn/aA62nD0C7n7p35
+         6jwankRLDKprnteGCo2UqE2GEWF+5ODMutChhoToCriLv+/iO/iZmgGgYeNLn4Zriz68
+         gi5UGsvlBnyCs9+qrLuc1f0zLB7JD7g3bCiu3l4QBizRgzm4jneD1JawgE8BgGuga5o/
+         u/4Q==
+X-Gm-Message-State: AOJu0Yxbf7wRmyD8zmIs0rGNCDQtBa3XM6/vZ9ya+LN0nZkiBuiDUg7s
+	TEpB5jdo0wqqbTDxlGis0p874A==
+X-Google-Smtp-Source: AGHT+IH/Pzn+oZ9rkbvwB6EgbaZHwI3oR3oayPWryQaegSwpBzxqD24I4U2U0WI2wP6mB9GBIeT2Lg==
+X-Received: by 2002:aa7:c04c:0:b0:522:3a89:a79d with SMTP id k12-20020aa7c04c000000b005223a89a79dmr17861471edo.2.1693211601437;
+        Mon, 28 Aug 2023 01:33:21 -0700 (PDT)
+Received: from cloudflare.com (79.184.208.4.ipv4.supernova.orange.pl. [79.184.208.4])
+        by smtp.gmail.com with ESMTPSA id v21-20020a056402185500b00528dc95ad4bsm4229378edy.95.2023.08.28.01.33.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Aug 2023 01:33:20 -0700 (PDT)
+References: <20230824143959.1134019-1-liujian56@huawei.com>
+ <20230824143959.1134019-2-liujian56@huawei.com>
+ <87r0nr5j0a.fsf@cloudflare.com> <64e95611f1b33_1d0032088c@john.notmuch>
+User-agent: mu4e 1.6.10; emacs 28.2
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Liu Jian <liujian56@huawei.com>, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/7] bpf, sockmap: add BPF_F_PERMANENT flag
+ for skmsg redirect
+Date: Mon, 28 Aug 2023 10:13:29 +0200
+In-reply-to: <64e95611f1b33_1d0032088c@john.notmuch>
+Message-ID: <87a5uba7n4.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DBBP189MB1433.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: da41b99d-19d8-4803-2b7b-08dba79d0772
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2023 08:01:47.9208
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RcoceYSqtwLz5nnezdlMCIlJU7cFST3MSlaHHBkqPxjxpgZkE4qC5yQCo6oFtquf/GCRqkIWC3+a/v2x+qCR1DKqd6XrDhMXhTl9/J0F+90=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0P189MB1889
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGkgSWRvLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IElkbyBTY2hp
-bW1lbCA8aWRvc2NoQGlkb3NjaC5vcmc+DQo+IFNlbnQ6IFN1bmRheSwgMjcgQXVndXN0IDIwMjMg
-MTk6MTgNCj4gVG86IFNyaXJhbSBZYWduYXJhbWFuIDxzcmlyYW0ueWFnbmFyYW1hbkBlc3QudGVj
-aD4NCj4gQ2M6IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtzZWxmdGVzdEB2Z2VyLmtl
-cm5lbC5vcmc7IERhdmlkIFMgLiBNaWxsZXINCj4gPGRhdmVtQGRhdmVtbG9mdC5uZXQ+OyBFcmlj
-IER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+OyBKYWt1Yg0KPiBLaWNpbnNraSA8a3ViYUBr
-ZXJuZWwub3JnPjsgUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPjsgRGF2aWQgQWhlcm4N
-Cj4gPGRzYWhlcm5Aa2VybmVsLm9yZz47IElkbyBTY2hpbW1lbCA8aWRvc2NoQG52aWRpYS5jb20+
-OyBTaHVhaCBLaGFuDQo+IDxzaHVhaEBrZXJuZWwub3JnPjsgUGV0ciBNYWNoYXRhIDxwZXRybUBu
-dmlkaWEuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldCB2MiAzLzNdIHNlbGZ0ZXN0czog
-Zm9yd2FyZGluZzogQWRkIHRlc3QgZm9yIGxvYWQtDQo+IGJhbGFuY2luZyBiZXR3ZWVuIG11bHRp
-cGxlIHNlcnZlcnMNCj4gDQo+IE9uIEZyaSwgQXVnIDI1LCAyMDIzIGF0IDExOjA4OjMwQU0gKzAy
-MDAsIFNyaXJhbSBZYWduYXJhbWFuIHdyb3RlOg0KPiA+IENyZWF0ZSBhIHRvcG9sb2d5IHdpdGgg
-YSBob3N0LCBhbmQgYSByb3V0ZXIuIFRoZSBob3N0ICh2ZXRoMCkgaXMgaW4NCj4gPiB0aGUgZGVm
-YXVsdCBuYW1lc3BhY2UsIGFuZCBhIG5ldHdvcmsgbmFtZXNwYWNlIGlzIGNyZWF0ZWQgZm9yIHRo
-ZQ0KPiA+IHJvdXRlciwgdGhlIHBlZXIgdmV0aDEgaXMgbW92ZWQgdG8gdGhlIHJvdXRlciBuZXRu
-cy4gQSBkdW1teSBpbnRlcmZhY2UNCj4gPiBpcyBhZGRlZCBpbnNpZGUgdGhlIHJvdXRlciBuZXRu
-cywgdG8gc2ltdWxhdGUgYSBuZXR3b3JrIHRoYXQgaGFzIHR3bw0KPiBuZWlnaGJvcnMuDQo+ID4g
-QW4gRUNNUCByb3V0ZSB0byBhIHZpcnR1YWwgSVAgKHZpcCkgd2l0aCB0aGUgdHdvIG5laWdoYm9y
-cyBhcyB0aGUgbmV4dA0KPiA+IGhvcCBpcyBhZGRlZC4NCj4gPg0KPiA+IFRoZSB0ZXN0IHVzZXMg
-cGVyZiBzdGF0IHRvIGNvdW50IHRoZSBudW1iZXIgb2YgZmliOmZpYl90YWJsZV9sb29rdXANCj4g
-PiB0cmFjZXBvaW50IGhpdHMgZm9yIElQdjQgYW5kIHRoZSBudW1iZXIgb2YgZmliNjpmaWI2X3Rh
-YmxlX2xvb2t1cCBmb3INCj4gPiBJUHY2LiBUaGUgbWVhc3VyZWQgY291bnQgaXMgY2hlY2tlZCB0
-byBiZSB3aXRoaW4gMTUlIGZvciB0aGUgbnVtYmVyIG9mDQo+ID4gcGFja2V0cyByZWNlaXZlZCBv
-biB2ZXRoMSBpbiB0aGUgcm91dGVyLg0KPiA+DQo+ID4gU2VlIGRpYWdyYW0gaW4gdGhlIHRlc3Qg
-Zm9yIG1vcmUgaW5mb3JtYXRpb24uDQo+ID4NCj4gPiBTdWdnZXN0ZWQtYnk6IElkbyBTY2hpbW1l
-bCA8aWRvc2NoQG52aWRpYS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogU3JpcmFtIFlhZ25hcmFt
-YW4gPHNyaXJhbS55YWduYXJhbWFuQGVzdC50ZWNoPg0KPiA+IC0tLQ0KPiA+ICAuLi4vdGVzdGlu
-Zy9zZWxmdGVzdHMvbmV0L2ZvcndhcmRpbmcvTWFrZWZpbGUgfCAgIDEgKw0KPiA+ICB0b29scy90
-ZXN0aW5nL3NlbGZ0ZXN0cy9uZXQvZm9yd2FyZGluZy9saWIuc2ggfCAgIDUgKw0KPiA+ICAuLi4v
-bmV0L2ZvcndhcmRpbmcvcm91dGVyX211bHRpcGF0aF92aXAuc2ggICAgfCAyNTUgKysrKysrKysr
-KysrKysrKysrDQo+IA0KPiBJIGJlbGlldmUgdGhpcyB0ZXN0IGJldHRlciBmaXRzIGluIGZpYl90
-ZXN0cy5zaC4gSGVyZSdzIGEgZGlmZiB0aGF0IHVzZXMgdGhlIHByZXZpb3VzbHkNCj4gbWVudGlv
-bmVkIG1ldGhvZCBbMV0uIEkgdmVyaWZpZWQgdGhhdCBpdCBmYWlscyB3aXRob3V0IHRoZSBmaXhl
-cyBhbmQgcGFzc2VzIHdpdGgNCj4gdGhlbToNCj4gDQo+IEJlZm9yZToNCj4gDQo+IElQdjQgbXVs
-dGlwYXRoIGxpc3QgcmVjZWl2ZSB0ZXN0cw0KPiAgICAgVEVTVDogTXVsdGlwYXRoIHJvdXRlIGhp
-dCByYXRpbyAoLjE1KSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBbRkFJTF0NCj4gICAg
-IFRFU1Q6IFNpbmdsZSBwYXRoIHJvdXRlIGhpdCByYXRpbyAoLjE1KSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgWyBPSyBdDQo+IA0KPiBJUHY2IG11bHRpcGF0aCBsaXN0IHJlY2VpdmUgdGVz
-dHMNCj4gICAgIFRFU1Q6IE11bHRpcGF0aCByb3V0ZSBoaXQgcmF0aW8gKC4xNSkgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgW0ZBSUxdDQo+ICAgICBURVNUOiBTaW5nbGUgcGF0aCByb3V0
-ZSBoaXQgcmF0aW8gKC4xNCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsgT0sgXQ0KPiAN
-Cj4gQWZ0ZXI6DQo+IA0KPiBJUHY0IG11bHRpcGF0aCBsaXN0IHJlY2VpdmUgdGVzdHMNCj4gICAg
-IFRFU1Q6IE11bHRpcGF0aCByb3V0ZSBoaXQgcmF0aW8gKC45OSkgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgWyBPSyBdDQo+ICAgICBURVNUOiBTaW5nbGUgcGF0aCByb3V0ZSBoaXQgcmF0
-aW8gKC4xNSkgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsgT0sgXQ0KPiANCj4gSVB2NiBt
-dWx0aXBhdGggbGlzdCByZWNlaXZlIHRlc3RzDQo+ICAgICBURVNUOiBNdWx0aXBhdGggcm91dGUg
-aGl0IHJhdGlvICguOTkpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFsgT0sgXQ0KPiAg
-ICAgVEVTVDogU2luZ2xlIHBhdGggcm91dGUgaGl0IHJhdGlvICguMTQpICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBbIE9LIF0NCj4gDQoNClRoYW5rcyBhIGxvdCwgaXQgd29ya3MgZm9yIG1l
-IGFzIHdlbGwuIA0KSSB3aWxsIHBvc3QgdjMgd2l0aCB0aGlzIHZlcnNpb24gb2YgdGhlIHRlc3Qg
-dGhlbi4gDQo=
+On Fri, Aug 25, 2023 at 06:32 PM -07, John Fastabend wrote:
+> Jakub Sitnicki wrote:
+
+[...]
+
+>> But as I wrote earlier, I don't think it's a good idea to ignore the
+>> flag. We can detect this conflict at the time the bpf_msg_sk_redirect_*
+>> helper is called and return an error.
+>> 
+>> Naturally that means that that bpf_msg_{cork,apply}_bytes helpers need
+>> to be adjusted to return an error if BPF_F_PERMANENT has been set.
+>
+> So far we've not really done much to protect a user from doing
+> rather silly things. The following will all do something without
+> errors,
+>
+>   bpf_msg_apply_bytes()
+>   bpf_msg_apply_bytes() <- reset apply bytes
+>
+>   bpf_msg_cork_bytes()
+>   bpf_msg_cork_bytes() <- resets cork byte
+>
+> also,
+>
+>   bpf_msg_redirect(..., BPF_F_INGRESS);
+>   bpf_msg_redirect(..., 0); <- resets sk_redir and flags
+>
+> maybe there is some valid reason to even do above if further parsing
+> identifies some reason to redirect to a alert socket or something.
+>
+> My original thinking was in the interest of not having a bunch of
+> extra checks for performance reasons we shouldn't add guard rails
+> unless something really unexpected might happen like a kernel
+> panic or what not.
+>
+> This does feel a bit different though because before we
+> didn't have calls that could impact other calls. My best idea
+> is to just create a precedence and follow it. I would propose,
+>
+> 'If BPF_F_PERMANENT is set apply_bytes and cork_bytes are
+>  ignored.'
+>
+> The other direction (what is above?) has a bit of an inconsistency
+> where these two flows are different?
+>
+>   bpf_apply_bytes()
+>   bpf_msg_redirect(..., BPF_F_PERMANENT)
+>
+> and
+>
+>   bpf_msg_redirect(..., BPF_F_PERMANENT)
+>   bpf_apply_bytes()
+>
+> It would be best if order of operations doesn't change the
+> outcome because that starts to get really hard to reason about.
+>
+> This avoids having to add checks all over the place and then
+> if users want we could give some mechanisms to read apply
+> and cork bytes so people could write macros over those if
+> they really want the hard error.
+>
+> WDYT?
+
+These semantics sound sane to me. Easy to explain:
+
+BPF_F_PERMANENT takes precedence over apply/cork_bytes.
+
+Good point about order of operations.
 
