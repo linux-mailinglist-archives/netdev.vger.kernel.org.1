@@ -1,131 +1,101 @@
-Return-Path: <netdev+bounces-31019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F9078A8FB
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 11:33:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8DA78A911
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 11:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F33B280DDE
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:33:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CFFF1C2082F
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DCE6131;
-	Mon, 28 Aug 2023 09:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1206AA6;
+	Mon, 28 Aug 2023 09:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927144C91
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 09:33:23 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10078FF;
-	Mon, 28 Aug 2023 02:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=uHxuq2I8/ZyhsPIJmnm5XYbNAhRPkS8ziwT5zTbeJps=; b=lO8mubL68pHZiPHcvvPCwSD50I
-	uex7iY0O9aXpWaBriDkeZBCETSv7sEcsAyNKdE/OHPrADmuQHX02Ze/3A6Mi8r92DsYCorXkBAH9C
-	PRVkyOCr/jR1d6nYpa3K3KVQGEPKyQI0Maa0WkE2MFYz/sjPUt35p8d6QCX6WaK/cJjK8p9U+j/a5
-	BiFLoXm+c4QvzqDbv2mYgaUyr4chWFHNNOfHfjJ5rFyllD3wZT0q+2HozNJw/+UGJ8S0qOZNV30GO
-	j5pw+8Hn6XbiAqG6geKRCBIfWB5toKYt68QhCVW085lRCPhWiewmJvE9UsI9zBCw8GPBY6UgTvpAL
-	6/puGIWw==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qaYcN-0007aY-A4; Mon, 28 Aug 2023 11:33:07 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qaYcM-0000ba-24; Mon, 28 Aug 2023 11:33:06 +0200
-Subject: Re: [PATCH] KEYS: Include linux/errno.h in linux/verification.h
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- kernel test robot <lkp@intel.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Eric Biggers <ebiggers@kernel.org>, "Theodore Y.Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org,
- Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
- Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
- ceph-devel@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
- "David S. Miller" <davem@davemloft.net>,
- Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org,
- Matthieu Baerts <matthieu.baerts@tessares.net>,
- Mat Martineau <martineau@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
- Mimi Zohar <zohar@linux.ibm.com>, linux-inte@web.codeaurora.org,
- grity@vger.kernel.org, "Jason A.Donenfeld" <Jason@zx2c4.com>,
- Ayush Sawal <ayush.sawal@chelsio.com>, llvm@lists.linux.dev,
- oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
- David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
- <202308261414.HKw1Mrip-lkp@intel.com> <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <8481f02f-7dad-0459-bd2e-536ff8ab6896@iogearbox.net>
-Date: Mon, 28 Aug 2023 11:33:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D042F38
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 09:42:33 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D95FFF
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 02:42:32 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-272-roygIhXMM0-hLGSViJHjJA-1; Mon, 28 Aug 2023 05:42:28 -0400
+X-MC-Unique: roygIhXMM0-hLGSViJHjJA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED3218564F0;
+	Mon, 28 Aug 2023 09:42:27 +0000 (UTC)
+Received: from hog (unknown [10.45.224.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 199BD492C13;
+	Mon, 28 Aug 2023 09:42:26 +0000 (UTC)
+Date: Mon, 28 Aug 2023 11:42:25 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Scott Dial <scott@scottdial.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] macsec: introduce default_async_crypto sysctl
+Message-ID: <ZOxsAR42r8t3z0Dq@hog>
+References: <9328d206c5d9f9239cae27e62e74de40b258471d.1692279161.git.sd@queasysnail.net>
+ <20230818184648.127b2ccf@kernel.org>
+ <ZOTWzJ4aEa5geNva@hog>
+ <a9af0c0a-ec7c-fa01-05ac-147fccb94fbf@scottdial.com>
+ <ZOdUw66jbDWE8blF@hog>
+ <76e055e9-5b2b-75b9-b545-cbdbc6ad2112@scottdial.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27014/Mon Aug 28 09:38:26 2023)
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <76e055e9-5b2b-75b9-b545-cbdbc6ad2112@scottdial.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Herbert,
+2023-08-24, 13:08:41 -0400, Scott Dial wrote:
+> On 8/24/2023 9:01 AM, Sabrina Dubroca wrote:
+> > 2023-08-23, 16:22:31 -0400, Scott Dial wrote:
+> > > AES-NI's implementation of gcm(aes) requires the FPU, so if it's busy=
+ the
+> > > decrypt gets stuck on the cryptd queue, but that queue is not
+> > > order-preserving.
+> >=20
+> > It should be (per CPU [*]). The queue itself is a linked list, and if w=
+e
+> > have requests on the queue we don't let new requests skip the queue.
+>=20
+> My apologies, I'll be the first to admit that I have not tracked all of t=
+he
+> code changes to either the macsec driver or linux-crypto since I first ma=
+de
+> the commit. This comment that requests are queued forced me to review the
+> code again and it appears that the queueing issue was resolved in v5.2-rc=
+1
+> with commit 1661131a0479, so I no longer believe we need the
+> CRYPTO_ALG_ASYNC since v5.2 and going forward.
 
-On 8/26/23 10:36 AM, Herbert Xu wrote:
-> On Sat, Aug 26, 2023 at 02:58:48PM +0800, kernel test robot wrote:
->>
->> All errors (new ones prefixed by >>):
->>
->>     In file included from fs/ubifs/auth.c:12:
->>>> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'
-> 
-> ---8<---
-> Add inclusion of linux/errno.h as otherwise the reference to EINVAL
-> may be invalid.
-> 
-> Fixes: f3cf4134c5c6 ("bpf: Add bpf_lookup_*_key() and bpf_key_put() kfuncs")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202308261414.HKw1Mrip-lkp@intel.com/
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/include/linux/verification.h b/include/linux/verification.h
-> index f34e50ebcf60..cb2d47f28091 100644
-> --- a/include/linux/verification.h
-> +++ b/include/linux/verification.h
-> @@ -8,6 +8,7 @@
->   #ifndef _LINUX_VERIFICATION_H
->   #define _LINUX_VERIFICATION_H
->   
-> +#include <linux/errno.h>
->   #include <linux/types.h>
->   
->   /*
-> 
+Are you sure about this? 1661131a0479 pre-dates your patch by over a
+year.
 
-Looks good, do you plan to route this fix to Linus?
+And AFAICT, that series only moved the existing FPU usable +
+cryptd_aead_queued tests from AESNI's implementation of gcm(aes) to
+common SIMD helpers.
 
-Thanks,
-Daniel
+--=20
+Sabrina
+
 
