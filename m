@@ -1,115 +1,131 @@
-Return-Path: <netdev+bounces-31018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D4B78A8FA
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 11:31:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F9078A8FB
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 11:33:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8DE91C208EE
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:31:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F33B280DDE
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1791A6120;
-	Mon, 28 Aug 2023 09:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DCE6131;
+	Mon, 28 Aug 2023 09:33:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C566611E
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 09:31:44 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB52C2
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 02:31:43 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-4036bd4fff1so333151cf.0
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 02:31:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693215103; x=1693819903; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7aImaCUpd15w6Z50jIH/8b5YX0+tQXUFAi5vOGxQzEg=;
-        b=P6Fds/oeSwtSz5nk3ZDfBS/l2/gMH8hHwirTqw9pxlyS7CEAl/VNvYUYrfqDerOFj7
-         fDXapXhXCkvq8QyJ61KGuix8kV7pb43dJix8p4DZCgzBb4+kAPAUpG4GfoVm8bWoHPN8
-         mikXQHaKGDyI6MF6suOEFTZzgdP3utqVpYfPL2eerpFi91jSpLSu3BpyHDoj5vIH4I/g
-         CXse9oxSTAfUjkKdYa1sagIDs/L218CN8+WRNLmslQTVXGyL666el6+B26TkQ/AidiQP
-         MH/R75jFD+0aqvhNZ7ltX2mSnf6Ul1y0ezWjUhWKyMeTMXQj4ERhfNX7dHs4Fm4pZRvs
-         uKZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693215103; x=1693819903;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7aImaCUpd15w6Z50jIH/8b5YX0+tQXUFAi5vOGxQzEg=;
-        b=Is5K4wV2K49duZM1tgAUfEj3tPbVYsd81swXHyTlF8xaulhouNZYXCdPIU/EQbyErJ
-         8+nGZt3XHAYfBwG7zDno82HBlJvCEiCArfafka+2iw+kkJ5NnBVAjGwWw4e71YJjkJXM
-         aj/TMdfQgAhf0qeuTSWZ5tGuKpaH/scAKIcJg2ZULNruodBSFHTavyPZ2tfQp0GcuJEf
-         KVbq1r0bdpu5+20Xf/USMrUvHfdXiKvPdVroPYZuE/QIGccgDEX/lVxTxWcwINHl0g9e
-         FwihcsAQVvS1/X62FwB6RsnwLKXHys0SuJULxF2e2PxCIlao9WDajE2CuLjHhY2t3NNX
-         PZ8w==
-X-Gm-Message-State: AOJu0YwMCXmTA2YDNHdF1ANcMI6g4n1wEFNEMV+ZZo8cB4g8lt2ymdbu
-	e+vuQRxIg9vpYDekZI8mv9jay3RRtj3q3Mwim/Ch+Z1tp4PEYHyMB+M=
-X-Google-Smtp-Source: AGHT+IGiXI80Ug9N5nOC64BTv95E0lqUHlK8/xym8ZmIhF2oPHQtZpmruRtUBsLLcvBvr4IAotf6xaWCVlYnvenqsBg=
-X-Received: by 2002:a05:622a:1910:b0:412:16f:c44f with SMTP id
- w16-20020a05622a191000b00412016fc44fmr331181qtc.6.1693215102925; Mon, 28 Aug
- 2023 02:31:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927144C91
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 09:33:23 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10078FF;
+	Mon, 28 Aug 2023 02:33:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=uHxuq2I8/ZyhsPIJmnm5XYbNAhRPkS8ziwT5zTbeJps=; b=lO8mubL68pHZiPHcvvPCwSD50I
+	uex7iY0O9aXpWaBriDkeZBCETSv7sEcsAyNKdE/OHPrADmuQHX02Ze/3A6Mi8r92DsYCorXkBAH9C
+	PRVkyOCr/jR1d6nYpa3K3KVQGEPKyQI0Maa0WkE2MFYz/sjPUt35p8d6QCX6WaK/cJjK8p9U+j/a5
+	BiFLoXm+c4QvzqDbv2mYgaUyr4chWFHNNOfHfjJ5rFyllD3wZT0q+2HozNJw/+UGJ8S0qOZNV30GO
+	j5pw+8Hn6XbiAqG6geKRCBIfWB5toKYt68QhCVW085lRCPhWiewmJvE9UsI9zBCw8GPBY6UgTvpAL
+	6/puGIWw==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qaYcN-0007aY-A4; Mon, 28 Aug 2023 11:33:07 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qaYcM-0000ba-24; Mon, 28 Aug 2023 11:33:06 +0200
+Subject: Re: [PATCH] KEYS: Include linux/errno.h in linux/verification.h
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ kernel test robot <lkp@intel.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Eric Biggers <ebiggers@kernel.org>, "Theodore Y.Ts'o" <tytso@mit.edu>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, linux-fscrypt@vger.kernel.org,
+ Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+ Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+ ceph-devel@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org,
+ Matthieu Baerts <matthieu.baerts@tessares.net>,
+ Mat Martineau <martineau@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
+ Mimi Zohar <zohar@linux.ibm.com>, linux-inte@web.codeaurora.org,
+ grity@vger.kernel.org, "Jason A.Donenfeld" <Jason@zx2c4.com>,
+ Ayush Sawal <ayush.sawal@chelsio.com>, llvm@lists.linux.dev,
+ oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+ David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
+References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
+ <202308261414.HKw1Mrip-lkp@intel.com> <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <8481f02f-7dad-0459-bd2e-536ff8ab6896@iogearbox.net>
+Date: Mon, 28 Aug 2023 11:33:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230819044059.833749-1-edumazet@google.com> <20230819044059.833749-4-edumazet@google.com>
- <ZOEOS5Qf4o2xw1Gj@vergenet.net>
-In-Reply-To: <ZOEOS5Qf4o2xw1Gj@vergenet.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 28 Aug 2023 11:31:31 +0200
-Message-ID: <CANn89iKXGXPQZj2nm8ZRdXJsp8A32MSp9BTxhYu7WVns2eAknA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: l2tp_eth: use generic dev->stats fields
-To: Simon Horman <horms@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+In-Reply-To: <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/27014/Mon Aug 28 09:38:26 2023)
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 19, 2023 at 8:47=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Sat, Aug 19, 2023 at 04:40:59AM +0000, Eric Dumazet wrote:
-> > Core networking has opt-in atomic variant of dev->stats,
-> > simply use DEV_STATS_INC(), DEV_STATS_ADD() and DEV_STATS_READ().
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
-> >  net/l2tp/l2tp_eth.c | 32 ++++++++++++--------------------
-> >  1 file changed, 12 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
->
-> ...
->
-> > @@ -146,10 +138,10 @@ static void l2tp_eth_dev_recv(struct l2tp_session=
- *session, struct sk_buff *skb,
-> >
-> >       priv =3D netdev_priv(dev);
-> >       if (dev_forward_skb(dev, skb) =3D=3D NET_RX_SUCCESS) {
-> > -             atomic_long_inc(&priv->rx_packets);
-> > -             atomic_long_add(data_len, &priv->rx_bytes);
-> > +             DEV_STATS_INC(dev, rx_packets);
-> > +             DEV_STATS_ADD(dev, rx_bytes, data_len);
->
-> Hi Eric,
->
-> W=3D1 builds with clang-16 and gcc-13 tell me that priv
-> is set but unused if this branch is taken.
+Hi Herbert,
 
-Oops, thanks, will fix in V2.
+On 8/26/23 10:36 AM, Herbert Xu wrote:
+> On Sat, Aug 26, 2023 at 02:58:48PM +0800, kernel test robot wrote:
+>>
+>> All errors (new ones prefixed by >>):
+>>
+>>     In file included from fs/ubifs/auth.c:12:
+>>>> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'
+> 
+> ---8<---
+> Add inclusion of linux/errno.h as otherwise the reference to EINVAL
+> may be invalid.
+> 
+> Fixes: f3cf4134c5c6 ("bpf: Add bpf_lookup_*_key() and bpf_key_put() kfuncs")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202308261414.HKw1Mrip-lkp@intel.com/
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/include/linux/verification.h b/include/linux/verification.h
+> index f34e50ebcf60..cb2d47f28091 100644
+> --- a/include/linux/verification.h
+> +++ b/include/linux/verification.h
+> @@ -8,6 +8,7 @@
+>   #ifndef _LINUX_VERIFICATION_H
+>   #define _LINUX_VERIFICATION_H
+>   
+> +#include <linux/errno.h>
+>   #include <linux/types.h>
+>   
+>   /*
+> 
+
+Looks good, do you plan to route this fix to Linus?
+
+Thanks,
+Daniel
 
