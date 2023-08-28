@@ -1,246 +1,141 @@
-Return-Path: <netdev+bounces-30997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB55F78A5B4
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:22:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC68378A652
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:15:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3BB1C20431
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 06:22:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39588280D99
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 07:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4D56AD9;
-	Mon, 28 Aug 2023 06:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15596ED6;
+	Mon, 28 Aug 2023 07:15:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC8C6AD7
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:17:49 +0000 (UTC)
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99062136
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 23:17:27 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-31ad779e6b3so2308042f8f.2
-        for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 23:17:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07276EC2
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 07:15:24 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFA1116
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 00:15:21 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99bcfe28909so357837766b.3
+        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 00:15:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1693203446; x=1693808246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x77Qg/BjgNoz0Q/ag/jLI620TxfLaHya5Tlt9sTjz+0=;
-        b=ytssBqXy/dr9kNg4u1jUc5zLMKG8i2MGg5VLdyrsQNPm/D/nOi0Bk7qswUWqvwf8r9
-         nDMWKgz6k40dX6doxflhEM38TOtbBsoEfsWgawtghFKnKTCx4FzhlCvRCQIU697sEwGA
-         ponKlqSa+be9OGaGwjV7UdBtW6LSa1YSEsHN9a7MOaEN5SFluK0eQftX27iMGNn6V3ui
-         aR5oi8yjMynm2+bS1pugYFVqUAUN7bgMcZ0+LWCCZ2p71BUDIAkCBWjvwdeOG6uGL3ix
-         YGBdsbr1H3g5HgP7iTReI+mjERaZP/tH0/hGq1nNzRxXozpStynA8h4L0W/Nmsx8OS2o
-         hjRQ==
+        d=linaro.org; s=google; t=1693206919; x=1693811719;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HJAzGXxVLZwUhvU/AbwqXIQG//zHq0gh5RxbohWoMzQ=;
+        b=IAPS6RTDr+Uuos2iktTsV6YF4O0gf9AMecbKe0U1yvoJY+4RpFvnUKOeILUOzN9fZd
+         bJwoaK97ve5ZzSZVaBaosV3ZEswi2I9AVBNzAdGbc3p4cMqN2ZhK6MRvgNcLVtJ+hSzD
+         gE0vT4GkyZ/7FB6ZcoO8vnoE476dx1WQdvTuJHZ+Anz57RiGI1lPkcd0FSNGH2Hg5Qd+
+         FQhS/I9Oww6456S5v4C1Kme9W3UZOusUXKv2KHtboGIp0y9t7w5lysWwhnIvnopFWWds
+         WztDvXU+2dsWMOyjMom12SUquq71oEeatqwgRfmeOGtqnf1uUnIBdsrONQY58Aq5bDsb
+         VRDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693203446; x=1693808246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x77Qg/BjgNoz0Q/ag/jLI620TxfLaHya5Tlt9sTjz+0=;
-        b=IEOJwNN1N8/YjMYZaePjQ3Opoetruro1ZqNavjFBLP3+RBBMbyWJbvrL0O8r+mEzEJ
-         0BrBFWhoyYfgX4cqg53uw8d9V6CrKVrJUWTWsrOMI7g1LnZrDUZD/9tFCRuWuYWu0KfZ
-         9rvxlqkHG61IvfR/ACzxL08TWX+gX4syk6DuexXWk9KGrfCdIHislTc8ZHp4SGQ++5jV
-         EHQIv5phsvjnSHJ+DmjWyHdqy2VgvsgrHbSo14hqL1vc4lbtwEMyzvQ0bN+YIlk/MHog
-         5ZfEqkeJ7VBvO+kzHw8eqFIf1fnrhpAFaDSox5JlPKvQ9ptTdJEs3Vwl4IS8OhvIuuEK
-         vUgg==
-X-Gm-Message-State: AOJu0Ywhn/DQ8OS0hsVa11NZ6Y2DiWTpfrLRK0eqNpm+cw8P6Cgir+bw
-	5AyZu1pnKxdWEwqWFVrnzwb3kgVmPvTox/Mgz74+sg==
-X-Google-Smtp-Source: AGHT+IFAczWSy5kXtanZc1sjr+qW+EjsLQloQpqoE2C+St4DgwXRiU2AXnmHlhsxED6sLIBnVfTczw==
-X-Received: by 2002:a05:6000:234:b0:317:6623:e33f with SMTP id l20-20020a056000023400b003176623e33fmr20743059wrz.14.1693203446131;
-        Sun, 27 Aug 2023 23:17:26 -0700 (PDT)
-Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id z12-20020adff1cc000000b00317f29ad113sm9506931wro.32.2023.08.27.23.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Aug 2023 23:17:25 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	moshe@nvidia.com
-Subject: [patch net-next v2 15/15] devlink: move devlink_notify_register/unregister() to dev.c
-Date: Mon, 28 Aug 2023 08:16:57 +0200
-Message-ID: <20230828061657.300667-16-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230828061657.300667-1-jiri@resnulli.us>
-References: <20230828061657.300667-1-jiri@resnulli.us>
+        d=1e100.net; s=20221208; t=1693206919; x=1693811719;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HJAzGXxVLZwUhvU/AbwqXIQG//zHq0gh5RxbohWoMzQ=;
+        b=DRvZq0k2o2vuTlE+Q1xkHxfoMpHmo+7HJouP8CsIFzqvlkwgDRqcJosl5dLZNmSwNZ
+         cDcSICEvyHeUXkyaz6aF1rSM0FXZ9aZpit00cNAy92/esGOvfULC+3zH2RmwlVlSEyEb
+         Vrks6CW2RENnW2RATP2RCViVQJLYcoAL1GJGr8+k3EVMU3pDhink0LaGvQWMGKiLjZfX
+         3lOj8aY8sexap14asYyRptBQV7cK0ANBL6k2dH+z/hgZCZ9fxXXONnanVbd/hAMIpkfJ
+         fbrH64rIdE64k2za6zlGgXpvZxeofHGeRWZkdaGRBQwuDKtQ2EomRUyEpk8WJwMfmuos
+         sQBw==
+X-Gm-Message-State: AOJu0Yx9PtrjA7ccWMDtzNtKkTuevzny2Nii2RUDNrl5q79kOPNP/3DB
+	MqY53vv/ruU7zOe6kwhlG0CRMA==
+X-Google-Smtp-Source: AGHT+IGKvH+GBgAKQHWDhZZV09OE+zv1MgYwJxJsoDg2/XCIHmz1dXnuC31AHBwhEWMoUKUR5gkSfQ==
+X-Received: by 2002:a17:906:5d:b0:9a5:846d:d823 with SMTP id 29-20020a170906005d00b009a5846dd823mr6109942ejg.45.1693206919659;
+        Mon, 28 Aug 2023 00:15:19 -0700 (PDT)
+Received: from [192.168.0.22] ([77.252.47.225])
+        by smtp.gmail.com with ESMTPSA id fx13-20020a170906b74d00b00982be08a9besm4376385ejb.172.2023.08.28.00.15.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Aug 2023 00:15:19 -0700 (PDT)
+Message-ID: <d6f796aa-c468-037c-3f53-d0c4306c8890@linaro.org>
+Date: Mon, 28 Aug 2023 09:15:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet
+ Controller
+Content-Language: en-US
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Serge Semin <Sergey.Semin@baikalelectronics.ru>
+References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
+ <20230824125012.1040288-3-keguang.zhang@gmail.com>
+ <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
+ <c32130ab-27dc-e991-10fd-db0fba25cc97@linaro.org>
+ <q7o7wqodz5epyjdj7vlryaseugr2fjhef2cgsh65trw3r2jorm@5z5a5tyuyq4d>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <q7o7wqodz5epyjdj7vlryaseugr2fjhef2cgsh65trw3r2jorm@5z5a5tyuyq4d>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+On 27/08/2023 23:01, Serge Semin wrote:
+> Hi Krzysztof
+> 
+> On Sun, Aug 27, 2023 at 09:56:06AM +0200, Krzysztof Kozlowski wrote:
+>> On 26/08/2023 23:04, Serge Semin wrote:
+>>>> +  clock-names:
+>>>> +    items:
+>>>> +      - const: stmmaceth
+>>>
+>>>   clock-names:
+>>>     const: stmmaceth
+>>> ?
+>>
+> 
+>> The existing syntax is correct. This is a string array.
+> 
+> Could you please clarify whether it's a requirement (always specify
+> items: property for an array) or just an acceptable option (another
+> one is suggested in my comment)? I am asking because:
+> 1. In this case the "clock-names" array is supposed to have only one
+> item. Directly setting "const: stmmaceth" with no items: property
+> shall simplify it.
+> 2. There are single-entry "clock-names" property in the DT-bindings
+> defined as I suggested.
+> 3. There is a "compatible" property which is also a string array but
+> it can be defined as I suggested (omitting the items property).
+> 
+> so based on all of that using the "items:"-based constraint here seems
+> redundant. Am I wrong to think like that? If so in what aspect?
 
-At last, move the last bits out of leftover.c,
-the devlink_notify_register/unregister() functions to dev.c
+Syntax is correct in both cases. However the single list compatible
+*cannot grow*, while single list clock might, when developer notices
+that the binding was incomplete. People add binding matching drivers,
+not the hardware, thus having incomplete list of clocks is happening all
+the time.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- net/devlink/Makefile        |  2 +-
- net/devlink/dev.c           | 28 +++++++++++++++++-
- net/devlink/devl_internal.h |  6 ++--
- net/devlink/leftover.c      | 58 -------------------------------------
- 4 files changed, 30 insertions(+), 64 deletions(-)
- delete mode 100644 net/devlink/leftover.c
-
-diff --git a/net/devlink/Makefile b/net/devlink/Makefile
-index 71f490d301d7..000da622116a 100644
---- a/net/devlink/Makefile
-+++ b/net/devlink/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
-+obj-y := core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
- 	 resource.o param.o region.o health.o trap.o rate.o linecard.o
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index abf3393a7a17..bba4ace7d22b 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -174,7 +174,7 @@ static int devlink_nl_fill(struct sk_buff *msg, struct devlink *devlink,
- 	return -EMSGSIZE;
- }
- 
--void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
-+static void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
- {
- 	struct sk_buff *msg;
- 	int err;
-@@ -230,6 +230,32 @@ int devlink_nl_get_dumpit(struct sk_buff *msg, struct netlink_callback *cb)
- 	return devlink_nl_dumpit(msg, cb, devlink_nl_get_dump_one);
- }
- 
-+void devlink_notify_register(struct devlink *devlink)
-+{
-+	devlink_notify(devlink, DEVLINK_CMD_NEW);
-+	devlink_linecards_notify_register(devlink);
-+	devlink_ports_notify_register(devlink);
-+	devlink_trap_policers_notify_register(devlink);
-+	devlink_trap_groups_notify_register(devlink);
-+	devlink_traps_notify_register(devlink);
-+	devlink_rates_notify_register(devlink);
-+	devlink_regions_notify_register(devlink);
-+	devlink_params_notify_register(devlink);
-+}
-+
-+void devlink_notify_unregister(struct devlink *devlink)
-+{
-+	devlink_params_notify_unregister(devlink);
-+	devlink_regions_notify_unregister(devlink);
-+	devlink_rates_notify_unregister(devlink);
-+	devlink_traps_notify_unregister(devlink);
-+	devlink_trap_groups_notify_unregister(devlink);
-+	devlink_trap_policers_notify_unregister(devlink);
-+	devlink_ports_notify_unregister(devlink);
-+	devlink_linecards_notify_unregister(devlink);
-+	devlink_notify(devlink, DEVLINK_CMD_DEL);
-+}
-+
- static void devlink_reload_failed_set(struct devlink *devlink,
- 				      bool reload_failed)
- {
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index efca6abf7af7..f6b5fea2e13c 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -124,9 +124,6 @@ typedef int devlink_nl_dump_one_func_t(struct sk_buff *msg,
- struct devlink *
- devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs);
- 
--void devlink_notify_unregister(struct devlink *devlink);
--void devlink_notify_register(struct devlink *devlink);
--
- int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
- 		      devlink_nl_dump_one_func_t *dump_one);
- 
-@@ -151,7 +148,8 @@ devlink_nl_put_handle(struct sk_buff *msg, struct devlink *devlink)
- int devlink_nl_msg_reply_and_new(struct sk_buff **msg, struct genl_info *info);
- 
- /* Notify */
--void devlink_notify(struct devlink *devlink, enum devlink_command cmd);
-+void devlink_notify_register(struct devlink *devlink);
-+void devlink_notify_unregister(struct devlink *devlink);
- void devlink_ports_notify_register(struct devlink *devlink);
- void devlink_ports_notify_unregister(struct devlink *devlink);
- void devlink_params_notify_register(struct devlink *devlink);
-diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-deleted file mode 100644
-index 05e056d6d5ea..000000000000
---- a/net/devlink/leftover.c
-+++ /dev/null
-@@ -1,58 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- * net/core/devlink.c - Network physical/parent device Netlink interface
-- *
-- * Heavily inspired by net/wireless/
-- * Copyright (c) 2016 Mellanox Technologies. All rights reserved.
-- * Copyright (c) 2016 Jiri Pirko <jiri@mellanox.com>
-- */
--
--#include <linux/etherdevice.h>
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/types.h>
--#include <linux/slab.h>
--#include <linux/gfp.h>
--#include <linux/device.h>
--#include <linux/list.h>
--#include <linux/netdevice.h>
--#include <linux/spinlock.h>
--#include <linux/refcount.h>
--#include <linux/workqueue.h>
--#include <linux/u64_stats_sync.h>
--#include <linux/timekeeping.h>
--#include <rdma/ib_verbs.h>
--#include <net/netlink.h>
--#include <net/genetlink.h>
--#include <net/rtnetlink.h>
--#include <net/net_namespace.h>
--#include <net/sock.h>
--#include <net/devlink.h>
--
--#include "devl_internal.h"
--
--void devlink_notify_register(struct devlink *devlink)
--{
--	devlink_notify(devlink, DEVLINK_CMD_NEW);
--	devlink_linecards_notify_register(devlink);
--	devlink_ports_notify_register(devlink);
--	devlink_trap_policers_notify_register(devlink);
--	devlink_trap_groups_notify_register(devlink);
--	devlink_traps_notify_register(devlink);
--	devlink_rates_notify_register(devlink);
--	devlink_regions_notify_register(devlink);
--	devlink_params_notify_register(devlink);
--}
--
--void devlink_notify_unregister(struct devlink *devlink)
--{
--	devlink_params_notify_unregister(devlink);
--	devlink_regions_notify_unregister(devlink);
--	devlink_rates_notify_unregister(devlink);
--	devlink_traps_notify_unregister(devlink);
--	devlink_trap_groups_notify_unregister(devlink);
--	devlink_trap_policers_notify_unregister(devlink);
--	devlink_ports_notify_unregister(devlink);
--	devlink_linecards_notify_unregister(devlink);
--	devlink_notify(devlink, DEVLINK_CMD_DEL);
--}
--- 
-2.41.0
+Best regards,
+Krzysztof
 
 
