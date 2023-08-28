@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-30962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45E2378A3CF
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 03:10:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD7378A3D1
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 03:11:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E54ED280DC1
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 01:10:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 725CF1C204AB
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 01:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC97063F;
-	Mon, 28 Aug 2023 01:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DAF36D;
+	Mon, 28 Aug 2023 01:10:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C4F36D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02AF63D
 	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 01:10:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D8DDDC433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E8301C433CB;
 	Mon, 28 Aug 2023 01:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693185031;
-	bh=yKKE7NcvkrG2KAPbm552N47r7GnLB6Dc8UDhGM7ph9g=;
+	s=k20201202; t=1693185032;
+	bh=cfZiD3y3ugpsmjINH8YbPrPJZ/R9Oz49mvJK+G06CNI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LI1vGpnGO8aNGk1C0wtB5o1mKBnRnklSRJ/01EFWGENqrup04HqhYhSWy5uZsuKZV
-	 Q5GusEWm3tqjITW66muNmf+PCj0TGICqSkmFxVF97Be4jORUzPntdRe0wOia9XCXg3
-	 IoIHrmn1IFhwJA9CVOB41J1Yl0V3PSB0SCaTxc7YiJZVMR1IiewhERq9HrSxihrVis
-	 WkRC5d/gM+JdNmTLsuan4k4IMPrLzxWdJFcRRT2ex7ydCc/Dao8lVMHHK3xZ4y1vAX
-	 HKJ/Y7YPeUMDf3zhvtIGK/qedeUeSRCmCHsJvXSu4WCKes19zr1JuY6DAJNLmYj96l
-	 QRED6LlaQondQ==
+	b=oKmDPZ32ZTkxIV2AOR28nVjWwteY6vPGuJiRKLVq6OPdLiRq5bNtapaIc2apZcYpF
+	 3w5URoizOMLULYib7XktNf0p4AsnJ3kyLqTeZ582dW5dDyntl9sGMlaHAKaCMOlBVh
+	 DN2Wp0XuOKc+aPGlfQRYby4feLu3KHyiWbjNSvngC8wnBUbE8apdOe93UL2+yKnJpv
+	 5SO23MXuWMLD8A3SazsqgdrAyDKxZ5NA9U5nLhsMfkyfry6uVyTQxrvRACnywmle0l
+	 Vk4iWJeSakEiC1z8amJHi6YeB4+dBgAP95Qr4c6LpWNXatvg2tKAWPWSrSQ9eeabCL
+	 aPcJvsB+cAWRw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B4C3FE21EDF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CAF0FE44466;
 	Mon, 28 Aug 2023 01:10:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,68 +41,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/17] tls: expand tls_cipher_size_desc to simplify
- getsockopt/setsockopt
+Subject: Re: [PATCH net-next v6 00/12] tools/net/ynl: Add support for netlink-raw
+ families
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169318503173.15537.3848147900342525852.git-patchwork-notify@kernel.org>
+ <169318503182.15537.7692763414392804985.git-patchwork-notify@kernel.org>
 Date: Mon, 28 Aug 2023 01:10:31 +0000
-References: <cover.1692977948.git.sd@queasysnail.net>
-In-Reply-To: <cover.1692977948.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
- kuba@kernel.org
+References: <20230825122756.7603-1-donald.hunter@gmail.com>
+In-Reply-To: <20230825122756.7603-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, corbet@lwn.net,
+ linux-doc@vger.kernel.org, sdf@google.com, arkadiusz.kubalewski@intel.com,
+ donald.hunter@redhat.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 25 Aug 2023 23:35:05 +0200 you wrote:
-> Commit 2d2c5ea24243 ("net/tls: Describe ciphers sizes by const
-> structs") introduced tls_cipher_size_desc to describe the size of the
-> fields of the per-cipher crypto_info structs, and commit ea7a9d88ba21
-> ("net/tls: Use cipher sizes structs") used it, but only in
-> tls_device.c and tls_device_fallback.c, and skipped converting similar
-> code in tls_main.c and tls_sw.c.
+On Fri, 25 Aug 2023 13:27:43 +0100 you wrote:
+> This patchset adds support for netlink-raw families such as rtnetlink.
+> 
+> Patch 1 fixes a typo in existing schemas
+> Patch 2 contains the schema definition
+> Patches 3 & 4 update the schema documentation
+> Patches 5 - 9 extends ynl
+> Patches 10 - 12 add several netlink-raw specs
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,01/17] selftests: tls: add test variants for aria-gcm
-    https://git.kernel.org/netdev/net-next/c/84e306b08340
-  - [net-next,02/17] selftests: tls: add getsockopt test
-    https://git.kernel.org/netdev/net-next/c/f27ad62fe38c
-  - [net-next,03/17] selftests: tls: test some invalid inputs for setsockopt
-    https://git.kernel.org/netdev/net-next/c/4bfb6224ed80
-  - [net-next,04/17] tls: move tls_cipher_size_desc to net/tls/tls.h
-    https://git.kernel.org/netdev/net-next/c/fd0fc6fdd889
-  - [net-next,05/17] tls: add TLS_CIPHER_ARIA_GCM_* to tls_cipher_size_desc
-    https://git.kernel.org/netdev/net-next/c/200e23165109
-  - [net-next,06/17] tls: reduce size of tls_cipher_size_desc
-    https://git.kernel.org/netdev/net-next/c/037303d67607
-  - [net-next,07/17] tls: rename tls_cipher_size_desc to tls_cipher_desc
-    https://git.kernel.org/netdev/net-next/c/8db44ab26beb
-  - [net-next,08/17] tls: extend tls_cipher_desc to fully describe the ciphers
-    https://git.kernel.org/netdev/net-next/c/176a3f50bc6a
-  - [net-next,09/17] tls: validate cipher descriptions at compile time
-    https://git.kernel.org/netdev/net-next/c/0d98cc02022d
-  - [net-next,10/17] tls: expand use of tls_cipher_desc in tls_set_device_offload
-    https://git.kernel.org/netdev/net-next/c/3524dd4d5f1f
-  - [net-next,11/17] tls: allocate the fallback aead after checking that the cipher is valid
-    https://git.kernel.org/netdev/net-next/c/d2322cf5ed59
-  - [net-next,12/17] tls: expand use of tls_cipher_desc in tls_sw_fallback_init
-    https://git.kernel.org/netdev/net-next/c/e907277aeb6c
-  - [net-next,13/17] tls: get crypto_info size from tls_cipher_desc in do_tls_setsockopt_conf
-    https://git.kernel.org/netdev/net-next/c/5f309ade49c7
-  - [net-next,14/17] tls: use tls_cipher_desc to simplify do_tls_getsockopt_conf
-    https://git.kernel.org/netdev/net-next/c/077e05d13548
-  - [net-next,15/17] tls: use tls_cipher_desc to get per-cipher sizes in tls_set_sw_offload
-    https://git.kernel.org/netdev/net-next/c/d9a6ca1a9758
-  - [net-next,16/17] tls: use tls_cipher_desc to access per-cipher crypto_info in tls_set_sw_offload
-    https://git.kernel.org/netdev/net-next/c/48dfad27fd40
-  - [net-next,17/17] tls: get cipher_name from cipher_desc in tls_set_sw_offload
-    https://git.kernel.org/netdev/net-next/c/f3e444e31f9f
+  - [net-next,v6,01/12] doc/netlink: Fix typo in genetlink-* schemas
+    https://git.kernel.org/netdev/net-next/c/c4e1ab07b557
+  - [net-next,v6,02/12] doc/netlink: Add a schema for netlink-raw families
+    https://git.kernel.org/netdev/net-next/c/ed68c58c0eb4
+  - [net-next,v6,03/12] doc/netlink: Update genetlink-legacy documentation
+    https://git.kernel.org/netdev/net-next/c/294f37fc8772
+  - [net-next,v6,04/12] doc/netlink: Document the netlink-raw schema extensions
+    https://git.kernel.org/netdev/net-next/c/2db8abf0b455
+  - [net-next,v6,05/12] tools/ynl: Add mcast-group schema parsing to ynl
+    https://git.kernel.org/netdev/net-next/c/88901b967958
+  - [net-next,v6,06/12] tools/net/ynl: Fix extack parsing with fixed header genlmsg
+    https://git.kernel.org/netdev/net-next/c/fb0a06d455d6
+  - [net-next,v6,07/12] tools/net/ynl: Add support for netlink-raw families
+    https://git.kernel.org/netdev/net-next/c/e46dd903efe3
+  - [net-next,v6,08/12] tools/net/ynl: Implement nlattr array-nest decoding in ynl
+    https://git.kernel.org/netdev/net-next/c/0493e56d021d
+  - [net-next,v6,09/12] tools/net/ynl: Add support for create flags
+    https://git.kernel.org/netdev/net-next/c/1768d8a767f8
+  - [net-next,v6,10/12] doc/netlink: Add spec for rt addr messages
+    https://git.kernel.org/netdev/net-next/c/dfb0f7d9d979
+  - [net-next,v6,11/12] doc/netlink: Add spec for rt link messages
+    https://git.kernel.org/netdev/net-next/c/b2f63d904e72
+  - [net-next,v6,12/12] doc/netlink: Add spec for rt route messages
+    https://git.kernel.org/netdev/net-next/c/023289b4f582
 
 You are awesome, thank you!
 -- 
