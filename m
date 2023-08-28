@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-30998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C2C78A5B5
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:23:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB55F78A5B4
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:22:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AED23280DAF
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 06:22:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3BB1C20431
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 06:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110376AD7;
-	Mon, 28 Aug 2023 06:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4D56AD9;
+	Mon, 28 Aug 2023 06:17:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F341BEEDF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC8C6AD7
 	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:17:49 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D93F3131
-	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 23:17:25 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-313e742a787so1713923f8f.1
-        for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 23:17:25 -0700 (PDT)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99062136
+	for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 23:17:27 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-31ad779e6b3so2308042f8f.2
+        for <netdev@vger.kernel.org>; Sun, 27 Aug 2023 23:17:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1693203444; x=1693808244;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1693203446; x=1693808246;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KqNWuxo68jYgBpf79Bc3c/Gn8vBAj1yPz9W5PW5VsHg=;
-        b=PV/YaMI06ikdtigmruHBRIIIKZCWxHgv6XQ5tWVJtKLHrwyjFjnhRes6ARZALKWE6x
-         ZQy0+9Z9DCBEqfGvta5/iFcpahpG+lOCpq7sYmVNS5jUpPZK7R12nRvx1MdPI7IFt2Op
-         wk2lQtDHKl6A26fApWx/VjRUa2k24ZlO4ZYHy8X5uyII35XESkLMhc+U8FED8f4tM2gZ
-         rpsqtD6ETiypB72zAqXhBJ1xD8ZoChxzuG8dp4dwwr8ED1N71btijJkBwXF9UXfXiJfj
-         iK0kVmjr5MOKqU0OmU5f7mPCcHpzPXsGwrzS2th1vCyEJhi9Co11bpW50rj3pxCniK2e
-         Vngw==
+        bh=x77Qg/BjgNoz0Q/ag/jLI620TxfLaHya5Tlt9sTjz+0=;
+        b=ytssBqXy/dr9kNg4u1jUc5zLMKG8i2MGg5VLdyrsQNPm/D/nOi0Bk7qswUWqvwf8r9
+         nDMWKgz6k40dX6doxflhEM38TOtbBsoEfsWgawtghFKnKTCx4FzhlCvRCQIU697sEwGA
+         ponKlqSa+be9OGaGwjV7UdBtW6LSa1YSEsHN9a7MOaEN5SFluK0eQftX27iMGNn6V3ui
+         aR5oi8yjMynm2+bS1pugYFVqUAUN7bgMcZ0+LWCCZ2p71BUDIAkCBWjvwdeOG6uGL3ix
+         YGBdsbr1H3g5HgP7iTReI+mjERaZP/tH0/hGq1nNzRxXozpStynA8h4L0W/Nmsx8OS2o
+         hjRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693203444; x=1693808244;
+        d=1e100.net; s=20221208; t=1693203446; x=1693808246;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KqNWuxo68jYgBpf79Bc3c/Gn8vBAj1yPz9W5PW5VsHg=;
-        b=dxvab4XzQaBccxbHBbgElvBJdiUvPXKg6dFPx/a/gOUXuSQm1LFLQxOE9aq8kbALZb
-         koInNlpSIavn4/B5er4fkqfFJdEmrlk50cCfbGRFhTiuI+Rk1SxvZ6vOdJfkLtMtsYLC
-         5N3gNSLNX7dmbENXmcHV7UTYEZkp4k/Vuzdt2U1YzuRnc2pWzuzfvtdDQ9Ut7i2ce1LQ
-         Eumi/KqmXm2qFNIO7ggKOsimtr/JL9xEEb1nxRfDTQhg3Fo8/nUW0yvznZFUi7xmjulu
-         BOq5T0HlHtqiS6h5JF4WC0TmXNXnDmVnPIW0m/NljQZFD/iI41Aq7DaERNKvIrd7xwcT
-         GcrA==
-X-Gm-Message-State: AOJu0Yxb8WVGHCRX/tj4HO6nB5nsUzFI3QtLn4IAxrydENV42zT9u0js
-	kV/eVE/B0zLIhKyS3kgdtlepEeynV7gMIXVPIS1DrQ==
-X-Google-Smtp-Source: AGHT+IGkMP/m0EWso+4lfaCgTcJ8oJJ0O/ycliogwNV3kLGDgaeKNxVuC+ufPQEM/x6hqPaDSzvfTg==
-X-Received: by 2002:a5d:63c2:0:b0:314:3369:df57 with SMTP id c2-20020a5d63c2000000b003143369df57mr19413535wrw.5.1693203444452;
-        Sun, 27 Aug 2023 23:17:24 -0700 (PDT)
+        bh=x77Qg/BjgNoz0Q/ag/jLI620TxfLaHya5Tlt9sTjz+0=;
+        b=IEOJwNN1N8/YjMYZaePjQ3Opoetruro1ZqNavjFBLP3+RBBMbyWJbvrL0O8r+mEzEJ
+         0BrBFWhoyYfgX4cqg53uw8d9V6CrKVrJUWTWsrOMI7g1LnZrDUZD/9tFCRuWuYWu0KfZ
+         9rvxlqkHG61IvfR/ACzxL08TWX+gX4syk6DuexXWk9KGrfCdIHislTc8ZHp4SGQ++5jV
+         EHQIv5phsvjnSHJ+DmjWyHdqy2VgvsgrHbSo14hqL1vc4lbtwEMyzvQ0bN+YIlk/MHog
+         5ZfEqkeJ7VBvO+kzHw8eqFIf1fnrhpAFaDSox5JlPKvQ9ptTdJEs3Vwl4IS8OhvIuuEK
+         vUgg==
+X-Gm-Message-State: AOJu0Ywhn/DQ8OS0hsVa11NZ6Y2DiWTpfrLRK0eqNpm+cw8P6Cgir+bw
+	5AyZu1pnKxdWEwqWFVrnzwb3kgVmPvTox/Mgz74+sg==
+X-Google-Smtp-Source: AGHT+IFAczWSy5kXtanZc1sjr+qW+EjsLQloQpqoE2C+St4DgwXRiU2AXnmHlhsxED6sLIBnVfTczw==
+X-Received: by 2002:a05:6000:234:b0:317:6623:e33f with SMTP id l20-20020a056000023400b003176623e33fmr20743059wrz.14.1693203446131;
+        Sun, 27 Aug 2023 23:17:26 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id l12-20020a7bc44c000000b003fbc0a49b57sm9700275wmi.6.2023.08.27.23.17.23
+        by smtp.gmail.com with ESMTPSA id z12-20020adff1cc000000b00317f29ad113sm9506931wro.32.2023.08.27.23.17.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Aug 2023 23:17:23 -0700 (PDT)
+        Sun, 27 Aug 2023 23:17:25 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -63,9 +63,9 @@ Cc: kuba@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	moshe@nvidia.com
-Subject: [patch net-next v2 14/15] devlink: move small_ops definition into netlink.c
-Date: Mon, 28 Aug 2023 08:16:56 +0200
-Message-ID: <20230828061657.300667-15-jiri@resnulli.us>
+Subject: [patch net-next v2 15/15] devlink: move devlink_notify_register/unregister() to dev.c
+Date: Mon, 28 Aug 2023 08:16:57 +0200
+Message-ID: <20230828061657.300667-16-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230828061657.300667-1-jiri@resnulli.us>
 References: <20230828061657.300667-1-jiri@resnulli.us>
@@ -77,560 +77,169 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	UPPERCASE_50_75 autolearn=no autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Move the generic netlink small_ops definition where they are consumed,
-into netlink.c
+At last, move the last bits out of leftover.c,
+the devlink_notify_register/unregister() functions to dev.c
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- net/devlink/devl_internal.h |   2 -
- net/devlink/leftover.c      | 251 ------------------------------------
- net/devlink/netlink.c       | 251 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 251 insertions(+), 253 deletions(-)
+ net/devlink/Makefile        |  2 +-
+ net/devlink/dev.c           | 28 +++++++++++++++++-
+ net/devlink/devl_internal.h |  6 ++--
+ net/devlink/leftover.c      | 58 -------------------------------------
+ 4 files changed, 30 insertions(+), 64 deletions(-)
+ delete mode 100644 net/devlink/leftover.c
 
+diff --git a/net/devlink/Makefile b/net/devlink/Makefile
+index 71f490d301d7..000da622116a 100644
+--- a/net/devlink/Makefile
++++ b/net/devlink/Makefile
+@@ -1,4 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-obj-y := leftover.o core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
++obj-y := core.o netlink.o netlink_gen.o dev.o port.o sb.o dpipe.o \
+ 	 resource.o param.o region.o health.o trap.o rate.o linecard.o
+diff --git a/net/devlink/dev.c b/net/devlink/dev.c
+index abf3393a7a17..bba4ace7d22b 100644
+--- a/net/devlink/dev.c
++++ b/net/devlink/dev.c
+@@ -174,7 +174,7 @@ static int devlink_nl_fill(struct sk_buff *msg, struct devlink *devlink,
+ 	return -EMSGSIZE;
+ }
+ 
+-void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
++static void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
+ {
+ 	struct sk_buff *msg;
+ 	int err;
+@@ -230,6 +230,32 @@ int devlink_nl_get_dumpit(struct sk_buff *msg, struct netlink_callback *cb)
+ 	return devlink_nl_dumpit(msg, cb, devlink_nl_get_dump_one);
+ }
+ 
++void devlink_notify_register(struct devlink *devlink)
++{
++	devlink_notify(devlink, DEVLINK_CMD_NEW);
++	devlink_linecards_notify_register(devlink);
++	devlink_ports_notify_register(devlink);
++	devlink_trap_policers_notify_register(devlink);
++	devlink_trap_groups_notify_register(devlink);
++	devlink_traps_notify_register(devlink);
++	devlink_rates_notify_register(devlink);
++	devlink_regions_notify_register(devlink);
++	devlink_params_notify_register(devlink);
++}
++
++void devlink_notify_unregister(struct devlink *devlink)
++{
++	devlink_params_notify_unregister(devlink);
++	devlink_regions_notify_unregister(devlink);
++	devlink_rates_notify_unregister(devlink);
++	devlink_traps_notify_unregister(devlink);
++	devlink_trap_groups_notify_unregister(devlink);
++	devlink_trap_policers_notify_unregister(devlink);
++	devlink_ports_notify_unregister(devlink);
++	devlink_linecards_notify_unregister(devlink);
++	devlink_notify(devlink, DEVLINK_CMD_DEL);
++}
++
+ static void devlink_reload_failed_set(struct devlink *devlink,
+ 				      bool reload_failed)
+ {
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 8c81f731a4c7..efca6abf7af7 100644
+index efca6abf7af7..f6b5fea2e13c 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -121,8 +121,6 @@ typedef int devlink_nl_dump_one_func_t(struct sk_buff *msg,
- 				       struct netlink_callback *cb,
- 				       int flags);
- 
--extern const struct genl_small_ops devlink_nl_small_ops[40];
--
+@@ -124,9 +124,6 @@ typedef int devlink_nl_dump_one_func_t(struct sk_buff *msg,
  struct devlink *
  devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs);
  
+-void devlink_notify_unregister(struct devlink *devlink);
+-void devlink_notify_register(struct devlink *devlink);
+-
+ int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
+ 		      devlink_nl_dump_one_func_t *dump_one);
+ 
+@@ -151,7 +148,8 @@ devlink_nl_put_handle(struct sk_buff *msg, struct devlink *devlink)
+ int devlink_nl_msg_reply_and_new(struct sk_buff **msg, struct genl_info *info);
+ 
+ /* Notify */
+-void devlink_notify(struct devlink *devlink, enum devlink_command cmd);
++void devlink_notify_register(struct devlink *devlink);
++void devlink_notify_unregister(struct devlink *devlink);
+ void devlink_ports_notify_register(struct devlink *devlink);
+ void devlink_ports_notify_unregister(struct devlink *devlink);
+ void devlink_params_notify_register(struct devlink *devlink);
 diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index a477cdbab940..05e056d6d5ea 100644
+deleted file mode 100644
+index 05e056d6d5ea..000000000000
 --- a/net/devlink/leftover.c
-+++ b/net/devlink/leftover.c
-@@ -31,257 +31,6 @@
- 
- #include "devl_internal.h"
- 
--const struct genl_small_ops devlink_nl_small_ops[40] = {
--	{
--		.cmd = DEVLINK_CMD_PORT_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_port_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_SET,
--		.doit = devlink_nl_cmd_rate_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_NEW,
--		.doit = devlink_nl_cmd_rate_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_DEL,
--		.doit = devlink_nl_cmd_rate_del_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_SPLIT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_port_split_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_UNSPLIT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_port_unsplit_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_NEW,
--		.doit = devlink_nl_cmd_port_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_DEL,
--		.doit = devlink_nl_cmd_port_del_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
++++ /dev/null
+@@ -1,58 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- * net/core/devlink.c - Network physical/parent device Netlink interface
+- *
+- * Heavily inspired by net/wireless/
+- * Copyright (c) 2016 Mellanox Technologies. All rights reserved.
+- * Copyright (c) 2016 Jiri Pirko <jiri@mellanox.com>
+- */
 -
--	{
--		.cmd = DEVLINK_CMD_LINECARD_SET,
--		.doit = devlink_nl_cmd_linecard_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_POOL_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_sb_pool_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_PORT_POOL_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_sb_port_pool_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_TC_POOL_BIND_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_sb_tc_pool_bind_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_OCC_SNAPSHOT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_sb_occ_snapshot_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_OCC_MAX_CLEAR,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_sb_occ_max_clear_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_ESWITCH_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_eswitch_get_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_ESWITCH_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_eswitch_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_TABLE_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_dpipe_table_get,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_ENTRIES_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_dpipe_entries_get,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_HEADERS_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_dpipe_headers_get,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_TABLE_COUNTERS_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_dpipe_table_counters_set,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RESOURCE_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_resource_set,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RESOURCE_DUMP,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_resource_dump,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_RELOAD,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_reload,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PARAM_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_param_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_PARAM_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_port_param_get_doit,
--		.dumpit = devlink_nl_cmd_port_param_get_dumpit,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_PARAM_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_port_param_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_NEW,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_region_new,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_DEL,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_region_del,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_READ,
--		.validate = GENL_DONT_VALIDATE_STRICT |
--			    GENL_DONT_VALIDATE_DUMP_STRICT,
--		.dumpit = devlink_nl_cmd_region_read_dumpit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_health_reporter_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_RECOVER,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_health_reporter_recover_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DIAGNOSE,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_health_reporter_diagnose_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT |
--			    GENL_DONT_VALIDATE_DUMP_STRICT,
--		.dumpit = devlink_nl_cmd_health_reporter_dump_get_dumpit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_health_reporter_dump_clear_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_TEST,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_health_reporter_test_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_FLASH_UPDATE,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_cmd_flash_update,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_SET,
--		.doit = devlink_nl_cmd_trap_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_GROUP_SET,
--		.doit = devlink_nl_cmd_trap_group_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_POLICER_SET,
--		.doit = devlink_nl_cmd_trap_policer_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SELFTESTS_RUN,
--		.doit = devlink_nl_cmd_selftests_run,
--		.flags = GENL_ADMIN_PERM,
--	},
--	/* -- No new ops here! Use split ops going forward! -- */
--};
+-#include <linux/etherdevice.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/types.h>
+-#include <linux/slab.h>
+-#include <linux/gfp.h>
+-#include <linux/device.h>
+-#include <linux/list.h>
+-#include <linux/netdevice.h>
+-#include <linux/spinlock.h>
+-#include <linux/refcount.h>
+-#include <linux/workqueue.h>
+-#include <linux/u64_stats_sync.h>
+-#include <linux/timekeeping.h>
+-#include <rdma/ib_verbs.h>
+-#include <net/netlink.h>
+-#include <net/genetlink.h>
+-#include <net/rtnetlink.h>
+-#include <net/net_namespace.h>
+-#include <net/sock.h>
+-#include <net/devlink.h>
 -
- void devlink_notify_register(struct devlink *devlink)
- {
- 	devlink_notify(devlink, DEVLINK_CMD_NEW);
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 5f57afd31dea..fc3e7c029a3b 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -255,6 +255,257 @@ int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
- 		return devlink_nl_inst_iter_dumpit(msg, cb, flags, dump_one);
- }
- 
-+static const struct genl_small_ops devlink_nl_small_ops[40] = {
-+	{
-+		.cmd = DEVLINK_CMD_PORT_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_port_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_RATE_SET,
-+		.doit = devlink_nl_cmd_rate_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_RATE_NEW,
-+		.doit = devlink_nl_cmd_rate_new_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_RATE_DEL,
-+		.doit = devlink_nl_cmd_rate_del_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PORT_SPLIT,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_port_split_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PORT_UNSPLIT,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_port_unsplit_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PORT_NEW,
-+		.doit = devlink_nl_cmd_port_new_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PORT_DEL,
-+		.doit = devlink_nl_cmd_port_del_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+
-+	{
-+		.cmd = DEVLINK_CMD_LINECARD_SET,
-+		.doit = devlink_nl_cmd_linecard_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_SB_POOL_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_sb_pool_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_SB_PORT_POOL_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_sb_port_pool_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_SB_TC_POOL_BIND_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_sb_tc_pool_bind_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_SB_OCC_SNAPSHOT,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_sb_occ_snapshot_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_SB_OCC_MAX_CLEAR,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_sb_occ_max_clear_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_ESWITCH_GET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_eswitch_get_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_ESWITCH_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_eswitch_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_DPIPE_TABLE_GET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_dpipe_table_get,
-+		/* can be retrieved by unprivileged users */
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_DPIPE_ENTRIES_GET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_dpipe_entries_get,
-+		/* can be retrieved by unprivileged users */
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_DPIPE_HEADERS_GET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_dpipe_headers_get,
-+		/* can be retrieved by unprivileged users */
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_DPIPE_TABLE_COUNTERS_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_dpipe_table_counters_set,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_RESOURCE_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_resource_set,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_RESOURCE_DUMP,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_resource_dump,
-+		/* can be retrieved by unprivileged users */
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_RELOAD,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_reload,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PARAM_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_param_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PORT_PARAM_GET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_port_param_get_doit,
-+		.dumpit = devlink_nl_cmd_port_param_get_dumpit,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+		/* can be retrieved by unprivileged users */
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_PORT_PARAM_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_port_param_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_REGION_NEW,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_region_new,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_REGION_DEL,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_region_del,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_REGION_READ,
-+		.validate = GENL_DONT_VALIDATE_STRICT |
-+			    GENL_DONT_VALIDATE_DUMP_STRICT,
-+		.dumpit = devlink_nl_cmd_region_read_dumpit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_HEALTH_REPORTER_SET,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_health_reporter_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_HEALTH_REPORTER_RECOVER,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_health_reporter_recover_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DIAGNOSE,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_health_reporter_diagnose_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_GET,
-+		.validate = GENL_DONT_VALIDATE_STRICT |
-+			    GENL_DONT_VALIDATE_DUMP_STRICT,
-+		.dumpit = devlink_nl_cmd_health_reporter_dump_get_dumpit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_health_reporter_dump_clear_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_HEALTH_REPORTER_TEST,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_health_reporter_test_doit,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_FLASH_UPDATE,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = devlink_nl_cmd_flash_update,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_TRAP_SET,
-+		.doit = devlink_nl_cmd_trap_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_TRAP_GROUP_SET,
-+		.doit = devlink_nl_cmd_trap_group_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_TRAP_POLICER_SET,
-+		.doit = devlink_nl_cmd_trap_policer_set_doit,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd = DEVLINK_CMD_SELFTESTS_RUN,
-+		.doit = devlink_nl_cmd_selftests_run,
-+		.flags = GENL_ADMIN_PERM,
-+	},
-+	/* -- No new ops here! Use split ops going forward! -- */
-+};
-+
- struct genl_family devlink_nl_family __ro_after_init = {
- 	.name		= DEVLINK_GENL_NAME,
- 	.version	= DEVLINK_GENL_VERSION,
+-#include "devl_internal.h"
+-
+-void devlink_notify_register(struct devlink *devlink)
+-{
+-	devlink_notify(devlink, DEVLINK_CMD_NEW);
+-	devlink_linecards_notify_register(devlink);
+-	devlink_ports_notify_register(devlink);
+-	devlink_trap_policers_notify_register(devlink);
+-	devlink_trap_groups_notify_register(devlink);
+-	devlink_traps_notify_register(devlink);
+-	devlink_rates_notify_register(devlink);
+-	devlink_regions_notify_register(devlink);
+-	devlink_params_notify_register(devlink);
+-}
+-
+-void devlink_notify_unregister(struct devlink *devlink)
+-{
+-	devlink_params_notify_unregister(devlink);
+-	devlink_regions_notify_unregister(devlink);
+-	devlink_rates_notify_unregister(devlink);
+-	devlink_traps_notify_unregister(devlink);
+-	devlink_trap_groups_notify_unregister(devlink);
+-	devlink_trap_policers_notify_unregister(devlink);
+-	devlink_ports_notify_unregister(devlink);
+-	devlink_linecards_notify_unregister(devlink);
+-	devlink_notify(devlink, DEVLINK_CMD_DEL);
+-}
 -- 
 2.41.0
 
