@@ -1,127 +1,89 @@
-Return-Path: <netdev+bounces-30980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-30981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3350478A57C
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:04:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126AA78A580
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 08:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4BA5280DA9
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 06:04:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E7061C20442
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 06:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA98A3F;
-	Mon, 28 Aug 2023 06:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DAB5A4D;
+	Mon, 28 Aug 2023 06:10:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9214C7ED
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:04:23 +0000 (UTC)
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AE9EC;
-	Sun, 27 Aug 2023 23:04:22 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1c06f6f98c0so21997275ad.3;
-        Sun, 27 Aug 2023 23:04:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693202662; x=1693807462;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3w60luS48j6vUYZqPx587vsJwRkad+xFDz6Iuy07TfY=;
-        b=kQml0mzl+6L4UF8cHDKVVCmFq4e5tayCw1DlF2QQvBw8fOOuBOeNGZ2c0Z2MqGDf3Z
-         sX/fJ2RezR87FM8ZXTuf3IgJ7zY+nfPLeU9eVJ1E4SmT+SAcpRC1+AZ29T4T941TVmHB
-         CavKMhjwlYhE0B1LpXI9nAljVdUIIPDYXyeCeSxMwwgLrSI8AIpd0Cc1Y3BhFS2opVSr
-         QeZHw4sd3XXHvGxTohPfKQPplaPZCz4I2lBldmZsut2xn3caRgfc0W7s0hwBNxwuYEEP
-         MpzKAXiOw/F+VqmfrsFHbwB/LGXiotbuRu/K+htuZmagLXnEOMRepD0wJrnjRNw8YKiV
-         nRvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693202662; x=1693807462;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3w60luS48j6vUYZqPx587vsJwRkad+xFDz6Iuy07TfY=;
-        b=gVlfYkkM5R86wh+4onwLzwscsx48EQoCyTtolE3kQa27mrkr3e4xjmYG9VcobTQoID
-         jgx1VFopj8aIUaCCvLr91Pew+cIFqdL5yODCH1unPkSBJDLhKOUudJRW6zY6FazNgHCx
-         j4d/Ux/xKqDul4lbEi7cE0lRH71GcpKVhCr5irQpKlE3IRTS4Q0u+PYPrE8eZU/a6oRe
-         xz6t6pZAolZwgCicLA9R45r6oH6IkCsqpcdEXPEIhyIBU3kwrhzvaYWo4ZdEIr8cuuX/
-         pHkZDzvblr4uaFqCxgGvWhCEZOjrqvB2m4yg0Efcsq/ahacgk74y12g5iXDxioLRNxUw
-         JFfQ==
-X-Gm-Message-State: AOJu0YxgiGcQDyraMWSGfgVJkg/6u5Awgy7P0bP5c7hoO/iUPbPn1jHo
-	oMxzHlUVf2qq8NuLIylaEMo=
-X-Google-Smtp-Source: AGHT+IELM9yP+4vP6DACSH+Fv9Hniiv/KteTD8sX/BfTxlIped+YCry8g1m/KSQIazlINwfa5tHodw==
-X-Received: by 2002:a17:902:c3c3:b0:1b8:6cae:3570 with SMTP id j3-20020a170902c3c300b001b86cae3570mr25192497plj.11.1693202661704;
-        Sun, 27 Aug 2023 23:04:21 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id k1-20020a170902c40100b001bde877a7casm6280498plk.264.2023.08.27.23.04.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Aug 2023 23:04:20 -0700 (PDT)
-Date: Mon, 28 Aug 2023 14:04:16 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	shuah@kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net-next,v3] selftests: bonding: create directly devices
- in the target namespaces
-Message-ID: <ZOw44Bvbr4qRhz8x@Laptop-X1>
-References: <20230826022330.3474899-1-shaozhengchao@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE46A2C
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 044BEC433C8;
+	Mon, 28 Aug 2023 06:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693203022;
+	bh=YSD34U9HLx/wXNqtoDrWKl9l+3hnZR/njNrMuHDK4Rg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NQ0zuRmsuCh58l10aVKcXUf/DfSCCZ2FBphkCS0+oEpX0LkehiP8Z8/O43vCjgo5P
+	 njbN1SteUI1PMQGLjlM73Ktx18oiR5o/GeY/yi3xen2WdVLUtbr2Wbsop1KeGc58tv
+	 KsxJK6tfCSrDtkgFXiHNXM4TA18NFbRbsqaXzItC8k+cPzUEkawTzUbEsgvQBKhlGc
+	 FLN51p5oMQPRzuJBWd1/AWDO2DIML+wBPy+WsqOKI4VMNzFZ7vgN4LU0GARy1KaBWy
+	 /e8S1JKuJ1KV+wpF/7vGIzP7U/7RsO845anOJdV3LDPAuUra3TRBUFkVbQDQfaSFmQ
+	 A9AXRhgaCGg2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E1431E33081;
+	Mon, 28 Aug 2023 06:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230826022330.3474899-1-shaozhengchao@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] igb: set max size RX buffer when store bad packet is
+ enabled
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169320302191.19170.10006129327745919806.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Aug 2023 06:10:21 +0000
+References: <20230824204619.1551135-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20230824204619.1551135-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, radoslawx.tyl@intel.com,
+ greearb@candelatech.com, jesse.brandeburg@intel.com, stable@vger.kernel.org,
+ manfred.rudigier@omicronenergy.com, arpanax.arland@intel.com
 
-On Sat, Aug 26, 2023 at 10:23:30AM +0800, Zhengchao Shao wrote:
-> If failed to set link1_1 to netns client, we should delete link1_1 in the
-> cleanup path. But if set link1_1 to netns client successfully, delete
-> link1_1 will report warning. So it will be safer creating directly the
-> devices in the target namespaces.
-> 
-> Reported-by: Hangbin Liu <liuhangbin@gmail.com>
-> Closes: https://lore.kernel.org/all/ZNyJx1HtXaUzOkNA@Laptop-X1/
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
-> v3: create the eth0 in the namespace
-> v2: create directly devices in the target namespaces
-> ---
->  .../drivers/net/bonding/bond-arp-interval-causes-panic.sh | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-> index 7b2d421f09cf..4917dbb35a44 100755
-> --- a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-> +++ b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-> @@ -22,14 +22,12 @@ server_ip4=192.168.1.254
->  echo 180 >/proc/sys/kernel/panic
->  
->  # build namespaces
-> -ip link add dev link1_1 type veth peer name link1_2
-> -
->  ip netns add "server"
-> -ip link set dev link1_2 netns server up name eth0
-> +ip netns add "client"
-> +ip -n client link add eth0 type veth peer name eth0 netns server
-> +ip netns exec server ip link set dev eth0 up
->  ip netns exec server ip addr add ${server_ip4}/24 dev eth0
->  
-> -ip netns add "client"
-> -ip link set dev link1_1 netns client down name eth0
->  ip netns exec client ip link add dev bond0 down type bond mode 1 \
->  	miimon 100 all_slaves_active 1
->  ip netns exec client ip link set dev eth0 down master bond0
-> -- 
-> 2.34.1
-> 
+Hello:
 
-Acked-by: Hangbin Liu <liuhangbin@gmail.com>
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 24 Aug 2023 13:46:19 -0700 you wrote:
+> From: Radoslaw Tyl <radoslawx.tyl@intel.com>
+> 
+> Increase the RX buffer size to 3K when the SBP bit is on. The size of
+> the RX buffer determines the number of pages allocated which may not
+> be sufficient for receive frames larger than the set MTU size.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 89eaefb61dc9 ("igb: Support RX-ALL feature flag.")
+> Reported-by: Manfred Rudigier <manfred.rudigier@omicronenergy.com>
+> Signed-off-by: Radoslaw Tyl <radoslawx.tyl@intel.com>
+> Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] igb: set max size RX buffer when store bad packet is enabled
+    https://git.kernel.org/netdev/net/c/bb5ed01cd242
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
