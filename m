@@ -1,141 +1,219 @@
-Return-Path: <netdev+bounces-31043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E871278B0BF
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:41:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A218778B0D0
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 454BA280E03
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:41:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 744E41C20410
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4BC125A6;
-	Mon, 28 Aug 2023 12:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF693125AD;
+	Mon, 28 Aug 2023 12:44:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDCA125A0
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:41:41 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38C3E5;
-	Mon, 28 Aug 2023 05:41:39 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50098cc8967so5021419e87.1;
-        Mon, 28 Aug 2023 05:41:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12DE46BA
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:44:22 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090FE100
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:44:21 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d74a0f88457so3820535276.2
+        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:44:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693226498; x=1693831298;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=35Zvmo59YN6o3oPAuxnrM8DnmGEhpgbLp58kB3g9lGU=;
-        b=KSxh1ke+AfqK9ORplGlqm3Eit0KfK+YhWYLVMtxDY4buQMStb0+QJsms3Ku6pCvCbC
-         GLw0DNyl5PcYzZzILkUqyYmoblod2u44FftEatXPsjyxp0rKRN3KJN3cvmQSMslbQoSl
-         xJUNbaidTzygQRF1ChfqgNP/kPG/TQ8O8sPo7rU38PTY3JQLH8+DCsAjl+x1p871cbZm
-         feRtMbwgiApiSCfvZ3axD0O4iG4b1vAfy6vSB83CuXdDp9121EI+OoTFcYDHyiQNgM83
-         qBom01b8lnIiexli8boD9pmqBjvpE/XFzvJx/gomDD0p/BKeIvJ9DxzdmBpR1jxbUK47
-         VS9w==
+        d=google.com; s=20221208; t=1693226660; x=1693831460;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0gNdXyvwmU1BEiu+u2AzAKQjUDXvrwMvpJWRLzG/nnY=;
+        b=HOugWpQn85RdVyMglokCPKtiMJ5i5N4YtiIjHM1P6/fLpUub4QRXkCoZyxIO6/2XBY
+         P/TNUUfROai9lO15B52dblJm6jLGM3UhzanpD1S1mXlbcgDqv4+fD1qelh5zzQ06kYKj
+         6loOcyNJxLRqaq1Ufir4WsEYCDgaEr/xq1Po905T5fyuJLJeWQjTYofDWCGoVvgAtd0A
+         nN0nexVDHw4S1exQF8Kaq0qdUfAN0b5BPRO62qnC21knoORBQIkzDIwESoXng7L1oDbe
+         sZ1kJWlRNLdtQQd0toYzO36TkfmJFjB10uFvRQSoiv7ptX8GLCrSaLpyS0mrYGbZoT/t
+         Bneg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693226498; x=1693831298;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=35Zvmo59YN6o3oPAuxnrM8DnmGEhpgbLp58kB3g9lGU=;
-        b=TNNpZnsj8iz5DKcYa7h8ZTdPeSe7N9/1356QnljzEzmfqU4lMmkRZ4eMAkeWzpKBOZ
-         49QkV0woy17bkmzEV8J7dmmRdxIFxxEzzBfroyJ3G/6OjUHy4vyWnpXInrWxPT1b3OZp
-         n+aQI5wMJPMNGG6Pxu2GNiQlTPEAiPiyUizhWzupAVOzzQraoM/DLsZi1k2X6WADQx3p
-         h4TYn5g8IzJ0xrxbn/WNFy6tL22scMNgEchtQziwk6EfSfZF6htnNzl0WshzbLsAs8XQ
-         lIVhiVtkDjjh1gtMaDub9TZMMkaEERVmQkNj6wwKptkWnLJkxxZB5DdBAxnPJ2TxoDXZ
-         6+rw==
-X-Gm-Message-State: AOJu0YwxCOqr/iyRYHjEOpab62CUcSkKi+SSDdGbx0XVFNtvP5nKHVbD
-	1uJGuhVPfdUXNEoOxSZzQeQ=
-X-Google-Smtp-Source: AGHT+IFRlAtGX0zI23L+HPcaLdtS//sAFD2U7kQ3HH8Hea5Ggh0g2kh1a/yBtz8lEpewXjLli0HgGg==
-X-Received: by 2002:a05:6512:2203:b0:4fe:2d93:2b50 with SMTP id h3-20020a056512220300b004fe2d932b50mr22395653lfu.31.1693226497635;
-        Mon, 28 Aug 2023 05:41:37 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id i22-20020ac25236000000b004ff981955cesm1568114lfl.228.2023.08.28.05.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 05:41:37 -0700 (PDT)
-Date: Mon, 28 Aug 2023 15:41:35 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet
- Controller
-Message-ID: <mqea2nlysz4x3ff7xhg3fypgiyvrpqz6pwje4kavxoigrdlbtr@k6jw7jqsbkxr>
-References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
- <20230824125012.1040288-3-keguang.zhang@gmail.com>
- <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
- <c32130ab-27dc-e991-10fd-db0fba25cc97@linaro.org>
- <q7o7wqodz5epyjdj7vlryaseugr2fjhef2cgsh65trw3r2jorm@5z5a5tyuyq4d>
- <d6f796aa-c468-037c-3f53-d0c4306c8890@linaro.org>
+        d=1e100.net; s=20221208; t=1693226660; x=1693831460;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0gNdXyvwmU1BEiu+u2AzAKQjUDXvrwMvpJWRLzG/nnY=;
+        b=GmmxXNimFbmyJSIhkrBgQzXCQh0jsKRKiSJ3duNieN2qETiM0GVqCIKzXts4alPsJ6
+         +RIheMMqvvDrdQfUpQ03B9YOSeB2AoOhH3U8T4zs5nB5V5j6fFi+6W31/cq7KOp1p2PV
+         fJ32nYkfDPfy9WYbvIevt7LVxHLOVwRrtcWSDte9yLU0OzgG/hFnx47nPQzYBJ89x/Y+
+         2xwl62Ccv4AMzhgZSbnGSMY8W7M0d2VkuAv5BieLRQTI+W7uL6PyCN9aC8j2vHHqoZ6c
+         yXPI2XvcqfGS2WMqL1tHxaxMhrDj5Go+UJumOPzHHeEFYmk9p++flqNti6RgJe3RFmG+
+         TQNw==
+X-Gm-Message-State: AOJu0Yx6JYHoUgm9j8Xym7RvigLUxFnub5sjoy5anWa0O2Pit5iohDK5
+	yrcC9DtQ5PdFeWBgupiSHjRtkrGLj9VVHg==
+X-Google-Smtp-Source: AGHT+IFj5k99EE4+ZqNexUKNrndfDrzb/Ae7j0PZUd0gdkkMCrUc/rIGCIXX00fbSIMjL/tnJteHDYLc0MfpBw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:41c1:0:b0:d45:daf4:1fc5 with SMTP id
+ o184-20020a2541c1000000b00d45daf41fc5mr778736yba.3.1693226660326; Mon, 28 Aug
+ 2023 05:44:20 -0700 (PDT)
+Date: Mon, 28 Aug 2023 12:44:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d6f796aa-c468-037c-3f53-d0c4306c8890@linaro.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230828124419.2915961-1-edumazet@google.com>
+Subject: [PATCH net] sctp: annotate data-races around sk->sk_wmem_queued
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 28, 2023 at 09:15:17AM +0200, Krzysztof Kozlowski wrote:
-> On 27/08/2023 23:01, Serge Semin wrote:
-> > Hi Krzysztof
-> > 
-> > On Sun, Aug 27, 2023 at 09:56:06AM +0200, Krzysztof Kozlowski wrote:
-> >> On 26/08/2023 23:04, Serge Semin wrote:
-> >>>> +  clock-names:
-> >>>> +    items:
-> >>>> +      - const: stmmaceth
-> >>>
-> >>>   clock-names:
-> >>>     const: stmmaceth
-> >>> ?
-> >>
-> > 
-> >> The existing syntax is correct. This is a string array.
-> > 
-> > Could you please clarify whether it's a requirement (always specify
-> > items: property for an array) or just an acceptable option (another
-> > one is suggested in my comment)? I am asking because:
-> > 1. In this case the "clock-names" array is supposed to have only one
-> > item. Directly setting "const: stmmaceth" with no items: property
-> > shall simplify it.
-> > 2. There are single-entry "clock-names" property in the DT-bindings
-> > defined as I suggested.
-> > 3. There is a "compatible" property which is also a string array but
-> > it can be defined as I suggested (omitting the items property).
-> > 
-> > so based on all of that using the "items:"-based constraint here seems
-> > redundant. Am I wrong to think like that? If so in what aspect?
-> 
+sk->sk_wmem_queued can be read locklessly from sctp_poll()
 
-> Syntax is correct in both cases. However the single list compatible
-> *cannot grow*, while single list clock might, when developer notices
-> that the binding was incomplete. People add binding matching drivers,
-> not the hardware, thus having incomplete list of clocks is happening all
-> the time.
+Use sk_wmem_queued_add() when the field is changed,
+and add READ_ONCE() annotations in sctp_writeable()
+and sctp_assocs_seq_show()
 
-So it's just a matter of maintainability. Got it. Thanks.
+syzbot reported:
 
--Serge(y)
+BUG: KCSAN: data-race in sctp_poll / sctp_wfree
 
-> 
-> Best regards,
-> Krzysztof
-> 
+read-write to 0xffff888149d77810 of 4 bytes by interrupt on cpu 0:
+sctp_wfree+0x170/0x4a0 net/sctp/socket.c:9147
+skb_release_head_state+0xb7/0x1a0 net/core/skbuff.c:988
+skb_release_all net/core/skbuff.c:1000 [inline]
+__kfree_skb+0x16/0x140 net/core/skbuff.c:1016
+consume_skb+0x57/0x180 net/core/skbuff.c:1232
+sctp_chunk_destroy net/sctp/sm_make_chunk.c:1503 [inline]
+sctp_chunk_put+0xcd/0x130 net/sctp/sm_make_chunk.c:1530
+sctp_datamsg_put+0x29a/0x300 net/sctp/chunk.c:128
+sctp_chunk_free+0x34/0x50 net/sctp/sm_make_chunk.c:1515
+sctp_outq_sack+0xafa/0xd70 net/sctp/outqueue.c:1381
+sctp_cmd_process_sack net/sctp/sm_sideeffect.c:834 [inline]
+sctp_cmd_interpreter net/sctp/sm_sideeffect.c:1366 [inline]
+sctp_side_effects net/sctp/sm_sideeffect.c:1198 [inline]
+sctp_do_sm+0x12c7/0x31b0 net/sctp/sm_sideeffect.c:1169
+sctp_assoc_bh_rcv+0x2b2/0x430 net/sctp/associola.c:1051
+sctp_inq_push+0x108/0x120 net/sctp/inqueue.c:80
+sctp_rcv+0x116e/0x1340 net/sctp/input.c:243
+sctp6_rcv+0x25/0x40 net/sctp/ipv6.c:1120
+ip6_protocol_deliver_rcu+0x92f/0xf30 net/ipv6/ip6_input.c:437
+ip6_input_finish net/ipv6/ip6_input.c:482 [inline]
+NF_HOOK include/linux/netfilter.h:303 [inline]
+ip6_input+0xbd/0x1b0 net/ipv6/ip6_input.c:491
+dst_input include/net/dst.h:468 [inline]
+ip6_rcv_finish+0x1e2/0x2e0 net/ipv6/ip6_input.c:79
+NF_HOOK include/linux/netfilter.h:303 [inline]
+ipv6_rcv+0x74/0x150 net/ipv6/ip6_input.c:309
+__netif_receive_skb_one_core net/core/dev.c:5452 [inline]
+__netif_receive_skb+0x90/0x1b0 net/core/dev.c:5566
+process_backlog+0x21f/0x380 net/core/dev.c:5894
+__napi_poll+0x60/0x3b0 net/core/dev.c:6460
+napi_poll net/core/dev.c:6527 [inline]
+net_rx_action+0x32b/0x750 net/core/dev.c:6660
+__do_softirq+0xc1/0x265 kernel/softirq.c:553
+run_ksoftirqd+0x17/0x20 kernel/softirq.c:921
+smpboot_thread_fn+0x30a/0x4a0 kernel/smpboot.c:164
+kthread+0x1d7/0x210 kernel/kthread.c:389
+ret_from_fork+0x2e/0x40 arch/x86/kernel/process.c:145
+ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+
+read to 0xffff888149d77810 of 4 bytes by task 17828 on cpu 1:
+sctp_writeable net/sctp/socket.c:9304 [inline]
+sctp_poll+0x265/0x410 net/sctp/socket.c:8671
+sock_poll+0x253/0x270 net/socket.c:1374
+vfs_poll include/linux/poll.h:88 [inline]
+do_pollfd fs/select.c:873 [inline]
+do_poll fs/select.c:921 [inline]
+do_sys_poll+0x636/0xc00 fs/select.c:1015
+__do_sys_ppoll fs/select.c:1121 [inline]
+__se_sys_ppoll+0x1af/0x1f0 fs/select.c:1101
+__x64_sys_ppoll+0x67/0x80 fs/select.c:1101
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+value changed: 0x00019e80 -> 0x0000cc80
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 17828 Comm: syz-executor.1 Not tainted 6.5.0-rc7-syzkaller-00185-g28f20a19294d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+
+Fixes: 1da177e4c3f ("Linux-2.6.12-rc2")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: Xin Long <lucien.xin@gmail.com>
+---
+ net/sctp/proc.c   |  2 +-
+ net/sctp/socket.c | 10 +++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/net/sctp/proc.c b/net/sctp/proc.c
+index f13d6a34f32f2f733df83ac82766466234cda42f..ec00ee75d59a658b7ad0086314f7e82a49ffc876 100644
+--- a/net/sctp/proc.c
++++ b/net/sctp/proc.c
+@@ -282,7 +282,7 @@ static int sctp_assocs_seq_show(struct seq_file *seq, void *v)
+ 		assoc->init_retries, assoc->shutdown_retries,
+ 		assoc->rtx_data_chunks,
+ 		refcount_read(&sk->sk_wmem_alloc),
+-		sk->sk_wmem_queued,
++		READ_ONCE(sk->sk_wmem_queued),
+ 		sk->sk_sndbuf,
+ 		sk->sk_rcvbuf);
+ 	seq_printf(seq, "\n");
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 76f1bce49a8e7b3eabfc53c66eaf6f68d41cfb77..d5f19850f9a0efb8afd444b0da7452e78e912df8 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -69,7 +69,7 @@
+ #include <net/sctp/stream_sched.h>
+ 
+ /* Forward declarations for internal helper functions. */
+-static bool sctp_writeable(struct sock *sk);
++static bool sctp_writeable(const struct sock *sk);
+ static void sctp_wfree(struct sk_buff *skb);
+ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+ 				size_t msg_len);
+@@ -140,7 +140,7 @@ static inline void sctp_set_owner_w(struct sctp_chunk *chunk)
+ 
+ 	refcount_add(sizeof(struct sctp_chunk), &sk->sk_wmem_alloc);
+ 	asoc->sndbuf_used += chunk->skb->truesize + sizeof(struct sctp_chunk);
+-	sk->sk_wmem_queued += chunk->skb->truesize + sizeof(struct sctp_chunk);
++	sk_wmem_queued_add(sk, chunk->skb->truesize + sizeof(struct sctp_chunk));
+ 	sk_mem_charge(sk, chunk->skb->truesize);
+ }
+ 
+@@ -9144,7 +9144,7 @@ static void sctp_wfree(struct sk_buff *skb)
+ 	struct sock *sk = asoc->base.sk;
+ 
+ 	sk_mem_uncharge(sk, skb->truesize);
+-	sk->sk_wmem_queued -= skb->truesize + sizeof(struct sctp_chunk);
++	sk_wmem_queued_add(sk, -(skb->truesize + sizeof(struct sctp_chunk)));
+ 	asoc->sndbuf_used -= skb->truesize + sizeof(struct sctp_chunk);
+ 	WARN_ON(refcount_sub_and_test(sizeof(struct sctp_chunk),
+ 				      &sk->sk_wmem_alloc));
+@@ -9299,9 +9299,9 @@ void sctp_write_space(struct sock *sk)
+  * UDP-style sockets or TCP-style sockets, this code should work.
+  *  - Daisy
+  */
+-static bool sctp_writeable(struct sock *sk)
++static bool sctp_writeable(const struct sock *sk)
+ {
+-	return sk->sk_sndbuf > sk->sk_wmem_queued;
++	return READ_ONCE(sk->sk_sndbuf) > READ_ONCE(sk->sk_wmem_queued);
+ }
+ 
+ /* Wait for an association to go into ESTABLISHED state. If timeout is 0,
+-- 
+2.42.0.rc1.204.g551eb34607-goog
+
 
