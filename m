@@ -1,173 +1,208 @@
-Return-Path: <netdev+bounces-31052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 132D278B168
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 15:13:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F98878B172
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 15:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C047A280E21
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 13:13:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECF69280E22
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 13:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D773712B63;
-	Mon, 28 Aug 2023 13:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122FE125D8;
+	Mon, 28 Aug 2023 13:16:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBCC12B62
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 13:13:18 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEF69D
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693228396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S523gr4MdHiwr4uyw9+ZPJkjHmfhDiqToxLKBqfpIWk=;
-	b=Se1n5cgFKj3jutW5hJhBiutc1lHZ6C7iTdGxweLERKvqeOtS3MDLTE+XpGvdsQHMfIWZ5i
-	+7Dvj9L7r4XvlwUGjbqqaxub1DrlZlnCDNKDDt21Z2thHj+R3FzCoK1trZhWjJfJ5P6tJs
-	QTxfRMoeebqPu2/or4pDlfNDEecZ9Ik=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-SldDJtdHOE-oVwsXkazkIw-1; Mon, 28 Aug 2023 09:13:15 -0400
-X-MC-Unique: SldDJtdHOE-oVwsXkazkIw-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b9d5bc6161so7756061fa.0
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:13:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B04125AD
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 13:16:40 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C81E11C;
+	Mon, 28 Aug 2023 06:16:39 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b9f0b7af65so47264261fa.1;
+        Mon, 28 Aug 2023 06:16:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693228597; x=1693833397;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XFmS+lobOszZw6W/QjUfDnJ5/Wvc31my2B1+5jBa7/A=;
+        b=OQDAjV8mL2PUcye54nJcr6yKcKc1uYXBEejW9G0o+zfSHAPiUae7LS2RRT+CdJav1d
+         j8gXyy7HXBObI85M8fhu1vAyA086jT9dhzVbit+NxLf4dCvQXPbW+Wl8qFRUt13Iquka
+         GLvsON1Oc3cdnxwHgpbYt0cweaWvqknrNFy/CQnp5RcalL0G+xeUzARgt5H4pWJ0sBfF
+         8vpzXWXvpAkLSgOx28M2huZunrNYiRx+mnxzxEyaJbVdlP+aUscSjhVGZfs9lmwFl0B8
+         0+NjXU5YXcuaIrUgPD4s+YKG060zx1NOgmPkMxO8C+oSag77EIejkjB5KsHjdQzw0+Pe
+         46Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693228394; x=1693833194;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S523gr4MdHiwr4uyw9+ZPJkjHmfhDiqToxLKBqfpIWk=;
-        b=MqGA44a12+ACGVfyDyGxrUYVZboSAO2aRD58w2biQQir2zg2xKR1f6C86wRt7Vip4E
-         7Z6yaByEiVdN85oxBn5Vwtms3rfM33bbSVSG9/+lJQX04NWynMWebv85FUvDD8FceCWQ
-         LyPQV4ECftD6MLCzH3uw9TNl+FhM37B20kzR6K2OGnqh/oeoc6WshOWPfIViknYzNKgb
-         DcgRqotkrMRN8Ze0THONgeRf/zy6mDjWfKqL5HMtok1TUyHN3DpoqHIKDvHhxx+u0gEt
-         BgnrmR37CqJVyj6k14QCVCxvDQBlAX+/NXmFJHdC87T6SO/JNrQVm3Qnm6dBifzikyVG
-         ZuQw==
-X-Gm-Message-State: AOJu0YyKbG3Vo2PFfnt6R7sDtkur2ssIhE4IXwcF1EfNwExefxoTGA6A
-	TBrSijsdjCBdKc4kH9b8u23lzQjkZeCCspR/Y/z0bBCG4UlDO0xiklc2LRgtAu2H8WA2SQ0qlPm
-	2Gre1zno4boe64r2P
-X-Received: by 2002:a2e:be1b:0:b0:2bd:cfe:66aa with SMTP id z27-20020a2ebe1b000000b002bd0cfe66aamr2266339ljq.4.1693228393810;
-        Mon, 28 Aug 2023 06:13:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMiLcOBmHyiB5YG9tc8EsJz5Vuc94K9oaVLolgoleqTsFOZRfRRve1eqwbodgUcXSF8AmiAw==
-X-Received: by 2002:a2e:be1b:0:b0:2bd:cfe:66aa with SMTP id z27-20020a2ebe1b000000b002bd0cfe66aamr2266328ljq.4.1693228393379;
-        Mon, 28 Aug 2023 06:13:13 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-245-240.dyn.eolo.it. [146.241.245.240])
-        by smtp.gmail.com with ESMTPSA id q4-20020a170906144400b00992f81122e1sm4624407ejc.21.2023.08.28.06.13.12
+        d=1e100.net; s=20221208; t=1693228597; x=1693833397;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XFmS+lobOszZw6W/QjUfDnJ5/Wvc31my2B1+5jBa7/A=;
+        b=Z3C6TShQfif/BxccEqyr7zskmuApr8VgIXQXxq+HNs8b4WQwHZHsBwfiDvF7wox9r+
+         0ndgpHOctFzjv024C1QBbJzE8Q2SYteVG7ginnATG7JPMs+HXlMFbgw7TCjWFPf304D2
+         nXaWO1UjDWdf4AfBBNd7naMfAjesHUFklG7bDtE7Y+U6G8GiQ6ouDZzKigWohets8eG4
+         05SSwwSFqZCg+gjoTGW2ZF5CZel/m+zUnR0vMZ4KN7scfTFN/ugjEZFTVgGve38Xj9qQ
+         vU9dyV7sXrChtYs6W2UH4CIPFZLiddbCqneBQPGxOcf7C8Hg8KQcJakUxjW1Z30YOHjQ
+         aAjQ==
+X-Gm-Message-State: AOJu0YybkRVNsuusFFPE+Zje1GQCcoIxUaLu/lJahEi3c/R/+oxLMyLi
+	ka6Bho+MIjH8TO4RzXHVuKw=
+X-Google-Smtp-Source: AGHT+IGSl1gon6Mw15MQYmfOY6/9wlPue4ynOnk1kyxKFHnkqnQl6GNsj4QdZfkhjBmEOXhmF7zt6A==
+X-Received: by 2002:a2e:a201:0:b0:2b5:9d78:213e with SMTP id h1-20020a2ea201000000b002b59d78213emr18323279ljm.22.1693228597433;
+        Mon, 28 Aug 2023 06:16:37 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id l17-20020a2e7011000000b002b9f1214394sm1754206ljc.13.2023.08.28.06.16.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 06:13:13 -0700 (PDT)
-Message-ID: <dd0c339f4ee4f58a7439589ce6e7766d7ce844ae.camel@redhat.com>
-Subject: Re: [PATCH net-next] net: annotate data-races around sock->ops
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>,  netdev@vger.kernel.org, eric.dumazet@gmail.com, syzbot
- <syzkaller@googlegroups.com>
-Date: Mon, 28 Aug 2023 15:13:11 +0200
-In-Reply-To: <CANn89iJSjug5+UaLMQ0QLa49nFRnO6a_x7pCJUQggnmfezj62g@mail.gmail.com>
-References: <20230808135809.2300241-1-edumazet@google.com>
-	 <bdf7db1a44ab0ee46fc621329ef9bc61734a723a.camel@redhat.com>
-	 <CANn89iJSjug5+UaLMQ0QLa49nFRnO6a_x7pCJUQggnmfezj62g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Mon, 28 Aug 2023 06:16:36 -0700 (PDT)
+Date: Mon, 28 Aug 2023 16:16:34 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime@web.codeaurora.org, Coquelin@web.codeaurora.org, 
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH net-next v2 2/3] dt-bindings: net: add T-HEAD dwmac
+ support
+Message-ID: <koiz2vlo3juah7kgvefjiyvxkh7k6tu3an3v7uewpmtdurkico@sazvvhpwvzg6>
+References: <20230827091710.1483-1-jszhang@kernel.org>
+ <20230827091710.1483-3-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230827091710.1483-3-jszhang@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-08-28 at 13:20 +0200, Eric Dumazet wrote:
-> On Mon, Aug 28, 2023 at 12:17=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> > On Tue, 2023-08-08 at 13:58 +0000, Eric Dumazet wrote:
-> > > IPV6_ADDRFORM socket option is evil, because it can change sock->ops
-> > > while other threads might read it. Same issue for sk->sk_family
-> > > being set to AF_INET.
-> > >=20
-> > > Adding READ_ONCE() over sock->ops reads is needed for sockets
-> > > that might be impacted by IPV6_ADDRFORM.
-> > >=20
-> > > Note that mptcp_is_tcpsk() can also overwrite sock->ops.
-> > >=20
-> > > Adding annotations for all sk->sk_family reads will require
-> > > more patches :/
-> >=20
-> > I was unable to give the above a proper look before due to OoO on my
-> > side.
-> >=20
-> > The mptcp code calls mptcp_is_tcpsk() only before the fd for the newly
-> > accepted socket is installed, so we should not have concurrent racing
-> > access to sock->ops?!? Do you have any related splat handy?
-> >=20
->=20
-> syzbot splat was on another layer. I tried to fix all sites that could
-> trigger a similar issue.
->=20
-> BUG: KCSAN: data-race in ____sys_sendmsg / do_ipv6_setsockopt
->=20
-> write to 0xffff888109f24ca0 of 8 bytes by task 4470 on cpu 0:
-> do_ipv6_setsockopt+0x2c5e/0x2ce0 net/ipv6/ipv6_sockglue.c:491
-> ipv6_setsockopt+0x57/0x130 net/ipv6/ipv6_sockglue.c:1012
-> udpv6_setsockopt+0x95/0xa0 net/ipv6/udp.c:1690
-> sock_common_setsockopt+0x61/0x70 net/core/sock.c:3663
-> __sys_setsockopt+0x1c3/0x230 net/socket.c:2273
-> __do_sys_setsockopt net/socket.c:2284 [inline]
-> __se_sys_setsockopt net/socket.c:2281 [inline]
-> __x64_sys_setsockopt+0x66/0x80 net/socket.c:2281
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
->=20
-> read to 0xffff888109f24ca0 of 8 bytes by task 4469 on cpu 1:
-> sock_sendmsg_nosec net/socket.c:724 [inline]
-> sock_sendmsg net/socket.c:747 [inline]
-> ____sys_sendmsg+0x349/0x4c0 net/socket.c:2503
-> ___sys_sendmsg net/socket.c:2557 [inline]
-> __sys_sendmmsg+0x263/0x500 net/socket.c:2643
-> __do_sys_sendmmsg net/socket.c:2672 [inline]
-> __se_sys_sendmmsg net/socket.c:2669 [inline]
-> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2669
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
->=20
-> value changed: 0xffffffff850e32b8 -> 0xffffffff850da890
->=20
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 4469 Comm: syz-executor.1 Not tainted
-> 6.4.0-rc5-syzkaller-00313-g4c605260bc60 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine,
-> BIOS Google 05/25/2023
->=20
-> Maybe MPTCP side (mptcp_is_tcpsk()) was ok,
-> but  the fact that mptcp_is_tcpsk() was able to write over sock->ops
-> was a bit strange to me.
->=20
-> mptcp_is_tcpsk() should answer a question, with a read-only argument.
->=20
-> I suggest changing the name of the helper to better reflect what it is do=
-ing.
+On Sun, Aug 27, 2023 at 05:17:09PM +0800, Jisheng Zhang wrote:
+> Add documentation to describe T-HEAD dwmac.
+> 
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
+>  .../devicetree/bindings/net/thead,dwmac.yaml  | 77 +++++++++++++++++++
+>  2 files changed, 78 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/thead,dwmac.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index b196c5de2061..73821f86a609 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -96,6 +96,7 @@ properties:
+>          - snps,dwxgmac
+>          - snps,dwxgmac-2.10
+>          - starfive,jh7110-dwmac
+> +        - thead,th1520-dwmac
+>  
+>    reg:
+>      minItems: 1
+> diff --git a/Documentation/devicetree/bindings/net/thead,dwmac.yaml b/Documentation/devicetree/bindings/net/thead,dwmac.yaml
+> new file mode 100644
+> index 000000000000..bf8ec8ca2753
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/thead,dwmac.yaml
+> @@ -0,0 +1,77 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/thead,dwmac.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: T-HEAD DWMAC Ethernet controller
+> +
+> +maintainers:
+> +  - Jisheng Zhang <jszhang@kernel.org>
+> +
+> +select:
+> +  properties:
+> +    compatible:
+> +      contains:
+> +        enum:
+> +          - thead,th1520-dwmac
+> +  required:
+> +    - compatible
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - enum:
+> +          - thead,th1520-dwmac
+> +      - const: snps,dwmac-3.70a
+> +
+> +  reg:
+> +    maxItems: 1
+> +
 
-Thanks for double checking. Indeed such helper name is confusing, and
-should be renamed; I'll try to take care of it after the merge window.
+> +  thead,gmacapb:
 
-Cheers,
+BTW what is a point in having the "apb" prefix in the name?
+The property name like "thead,gmac-syscon" looks much more suitable
+since it refers to the actual property content.
 
-Paolo
+-Serge(y)
 
-
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      The phandle to the syscon node that control ethernet
+> +      interface and timing delay.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - clock-names
+> +  - interrupts
+> +  - interrupt-names
+> +  - phy-mode
+> +  - thead,gmacapb
+> +
+> +allOf:
+> +  - $ref: snps,dwmac.yaml#
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    gmac0: ethernet@e7070000 {
+> +        compatible = "thead,th1520-dwmac", "snps,dwmac-3.70a";
+> +        reg = <0xe7070000 0x2000>;
+> +        clocks = <&clk 1>, <&clk 2>;
+> +        clock-names = "stmmaceth", "pclk";
+> +        interrupts = <66>;
+> +        interrupt-names = "macirq";
+> +        phy-mode = "rgmii-id";
+> +        snps,fixed-burst;
+> +        snps,axi-config = <&stmmac_axi_setup>;
+> +        snps,pbl = <32>;
+> +        thead,gmacapb = <&gmacapb_syscon>;
+> +        phy-handle = <&phy0>;
+> +
+> +        mdio {
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +            compatible = "snps,dwmac-mdio";
+> +
+> +            phy0: ethernet-phy@0 {
+> +                reg = <0>;
+> +            };
+> +        };
+> +    };
+> -- 
+> 2.40.1
+> 
+> 
 
