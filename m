@@ -1,111 +1,102 @@
-Return-Path: <netdev+bounces-31077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE5978B413
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 17:10:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE5B78B42C
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 17:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEF031C20942
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 15:10:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50A72280E69
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 15:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFE112B9B;
-	Mon, 28 Aug 2023 15:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33039134A9;
+	Mon, 28 Aug 2023 15:15:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8CF46AB
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 15:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 87D7BC433C9;
-	Mon, 28 Aug 2023 15:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693235426;
-	bh=1huhoU3egi185unJwEIKOx+anulzH0a80bAypmmlKqA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mUnVEMioRK1IcYFsOAYy2Ig28q8VEgdfIY3zKPnTA3+L7C583EwAQLXLPAYohE/e0
-	 lJ6BCTzT5dumvZK0C/zqrx+c5es104paR/ODVzWUw+TTvkY6aN4Vw3yYSUvN+dlK0p
-	 yLcGZCOMB8NPveHQdGvSKDLNKMOvdqzBAI6Bo2jnTvyYakTWJW+XXM+sX1w1hq+qOc
-	 DvSE7tPsYHOIxxkRmN8zI2LlR7sZ/vGE+YBQV63Z69wcJVVbNw05yzjxC+IO3ktczF
-	 uTdITP0eCGuwTdRsnYdoXGsKfhQ6Dj90VCTUGRhpbxrSULzcDPe11dnbQn4rTQNCNx
-	 aXMdiOKzKAwLw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6BA8FC3274C;
-	Mon, 28 Aug 2023 15:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273E846AB
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 15:15:50 +0000 (UTC)
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 893CAE0;
+	Mon, 28 Aug 2023 08:15:43 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 016295C02DB;
+	Mon, 28 Aug 2023 11:15:41 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Mon, 28 Aug 2023 11:15:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1693235740; x=1693322140; bh=dk0sUeihoiRFU
+	0WpuwREI6ssYjEijVUMy2C2p5Lb4Wk=; b=ibTG1vNDSBFy09zlazkJK1NQIaGNr
+	G5HNYsFH7PDapOxXT4Uf1OXmQ5+uqKfC9MQXVfTOluX7avtt/KiM7vQIdP7XR1Zu
+	S9AdNMWJAMmbHqb73M/9VgjnRWetp/pa6YIlv9ApaaFZQp1kgIWpLZ8BNgslPI+Z
+	vymdd6GZSc5jsaVdpQY5nXfTIalT3eWho7xmoYizxiEDcj8d3+YSlE2WaL9a4ePX
+	8u6FF4MllTjMtqOrQsde17AAawHiLg6BY7ymtclRpwhjqS6UcUrpPH4QC9WCIak+
+	Tqbcgm2v+WPf66hFQnPZCVfGfVB+gGMzm17ecn9teecX9Imzzcup+TQhw==
+X-ME-Sender: <xms:HLrsZNkfore9e5bJLf7KI1Y0Wv_ykZvhYlCg6pc1_0iF72zp6sx_YQ>
+    <xme:HLrsZI2hpqqIHPj1Nef_bNCRJs0b9ohCKNeu6YOTH8iBfplZc1uC8F3iCxFFvRsbf
+    DWvZ9ZOESHNhPA>
+X-ME-Received: <xmr:HLrsZDrPc4lHqQAT3q1Oij06ALYYQX26nKOcG8nDX9i9U-M1JomctoJStdtu>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudefgedgkeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
+    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
+    guohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:HLrsZNnD2CzvWPPxfkwYXiM4mnbRHCT4v8SmpmqE3wxUBifwZykmNw>
+    <xmx:HLrsZL0dkM5LNq3VLIrum_z-Cpyr6HoOMTFDQQAoi2TqQ-5XnmrKkg>
+    <xmx:HLrsZMsTNz8HcuZv1A2TM8leyZLxt9196QD_ojq0k26CRyk6HAnWrA>
+    <xmx:HLrsZEL6_KtN7Nh1uBhn_m_AMBK2rIu40DCBFk5vXt_QJ2ecR_UoyA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 28 Aug 2023 11:15:39 -0400 (EDT)
+Date: Mon, 28 Aug 2023 18:15:37 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net v3 1/3] ipv4: ignore dst hint for multipath routes
+Message-ID: <ZOy6GQh2JbwZ8ycI@shredder>
+References: <20230828113221.20123-1-sriram.yagnaraman@est.tech>
+ <20230828113221.20123-2-sriram.yagnaraman@est.tech>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [patch net-next v2 00/15] devlink: finish file split and get retire
- leftover.c
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169323542643.23917.7003415325979671600.git-patchwork-notify@kernel.org>
-Date: Mon, 28 Aug 2023 15:10:26 +0000
-References: <20230828061657.300667-1-jiri@resnulli.us>
-In-Reply-To: <20230828061657.300667-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, moshe@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230828113221.20123-2-sriram.yagnaraman@est.tech>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 28 Aug 2023 08:16:42 +0200 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On Mon, Aug 28, 2023 at 01:32:19PM +0200, Sriram Yagnaraman wrote:
+> Route hints when the nexthop is part of a multipath group causes packets
+> in the same receive batch to be sent to the same nexthop irrespective of
+> the multipath hash of the packet. So, do not extract route hint for
+> packets whose destination is part of a multipath group.
 > 
-> This patchset finishes a move Jakub started and Moshe continued in the
-> past. I was planning to do this for a long time, so here it is, finally.
+> A new SKB flag IPSKB_MULTIPATH is introduced for this purpose, set the
+> flag when route is looked up in ip_mkroute_input() and use it in
+> ip_extract_route_hint() to check for the existence of the flag.
 > 
-> This patchset does not change any behaviour. It just splits leftover.c
-> into per-object files and do necessary changes, like declaring functions
-> used from other code, on the way.
-> 
-> [...]
+> Fixes: 02b24941619f ("ipv4: use dst hint for ipv4 list receive")
+> Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
 
-Here is the summary with links:
-  - [net-next,v2,01/15] devlink: push object register/unregister notifications into separate helpers
-    https://git.kernel.org/netdev/net-next/c/56e65312830e
-  - [net-next,v2,02/15] devlink: push port related code into separate file
-    https://git.kernel.org/netdev/net-next/c/eec1e5ea1d71
-  - [net-next,v2,03/15] devlink: push shared buffer related code into separate file
-    https://git.kernel.org/netdev/net-next/c/2b4d8bb08889
-  - [net-next,v2,04/15] devlink: move and rename devlink_dpipe_send_and_alloc_skb() helper
-    https://git.kernel.org/netdev/net-next/c/2475ed158c47
-  - [net-next,v2,05/15] devlink: push dpipe related code into separate file
-    https://git.kernel.org/netdev/net-next/c/a9fd44b15fc5
-  - [net-next,v2,06/15] devlink: push resource related code into separate file
-    https://git.kernel.org/netdev/net-next/c/a9f960074ecd
-  - [net-next,v2,07/15] devlink: push param related code into separate file
-    https://git.kernel.org/netdev/net-next/c/830c41e1e987
-  - [net-next,v2,08/15] devlink: push region related code into separate file
-    https://git.kernel.org/netdev/net-next/c/1aa47ca1f52e
-  - [net-next,v2,09/15] devlink: use tracepoint_enabled() helper
-    https://git.kernel.org/netdev/net-next/c/85facf94fd80
-  - [net-next,v2,10/15] devlink: push trap related code into separate file
-    https://git.kernel.org/netdev/net-next/c/4bbdec80ff27
-  - [net-next,v2,11/15] devlink: push rate related code into separate file
-    https://git.kernel.org/netdev/net-next/c/7cc7194e85ca
-  - [net-next,v2,12/15] devlink: push linecard related code into separate file
-    https://git.kernel.org/netdev/net-next/c/9edbe6f36c5f
-  - [net-next,v2,13/15] devlink: move tracepoint definitions into core.c
-    https://git.kernel.org/netdev/net-next/c/890c55667437
-  - [net-next,v2,14/15] devlink: move small_ops definition into netlink.c
-    https://git.kernel.org/netdev/net-next/c/29a390d17748
-  - [net-next,v2,15/15] devlink: move devlink_notify_register/unregister() to dev.c
-    https://git.kernel.org/netdev/net-next/c/71179ac5c211
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
