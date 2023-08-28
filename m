@@ -1,101 +1,441 @@
-Return-Path: <netdev+bounces-31048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517F578B14E
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 15:06:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF0A78B15D
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 15:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13901280DBD
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 13:06:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0231C208A3
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 13:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E894A125C8;
-	Mon, 28 Aug 2023 13:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03606125CD;
+	Mon, 28 Aug 2023 13:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8D546BA
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 13:06:07 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE2FC9
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 06:06:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=xU3UrktoxuPlKfn1FWUirA0UpmqxYaLwMPWmeTz084k=; b=EMi3agsj8gb7g9MYQww5Ql2a6b
-	BNaiRCn5BC0S0OYAgSy/B1A+dFdRxoPLzyAvuOOQkZhlB7VjOeMr0xZzXx6/lPgY3+8n7BxRTSA++
-	H4IaCZAlKXD5DbGwzuZDcfS8mS8RGBBBk31tKxQzS4KvsJ4mfB5lTHllBptJaQS6AIh9xYoCJSjRt
-	JZ/GA/PKM7+dIKqf49xM76jwcwHLcb5XaU1p0/SR8wTQawZIAmXO8Illr4zUrpvb8XOFmS6pcXP+m
-	8m7c+m0nL0QihDoC7Au+DLAE6YeBQPbczOQc8SOQ03HkxziRBza/1EKxfRA65wN7BXKyW8ngl4aQY
-	x40/HqVg==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qabwM-0004Ir-W4; Mon, 28 Aug 2023 15:05:59 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qabwN-000Fe1-0z; Mon, 28 Aug 2023 15:05:59 +0200
-Subject: Re: [PATCH net-next 1/2] net: Fix skb consume leak in
- sch_handle_egress
-To: Gal Pressman <gal@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, pabeni@redhat.com, kuba@kernel.org,
- martin.lau@linux.dev
-References: <20230825134946.31083-1-daniel@iogearbox.net>
- <14c3f6ad-b264-b6f8-19a0-5bc8ad83f13f@nvidia.com>
- <6b6a21e4-8ade-9da3-2219-1ca2faa24b51@nvidia.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <b16d0899-d812-6a51-047a-b5eee7badb0d@iogearbox.net>
-Date: Mon, 28 Aug 2023 15:05:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F70125BB
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 13:10:27 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 209EDCC;
+	Mon, 28 Aug 2023 06:10:25 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50091b91a83so4832530e87.3;
+        Mon, 28 Aug 2023 06:10:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693228223; x=1693833023;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wpqvqS+fYSjFHYGuyg+gEAZd0FugNzJBjVPZjXEWq4E=;
+        b=r7UAA6kgupMZUSPR5e5uaaI8wzVG6TpQLS+7eu5AxXVYQgI5bAzu8g6QqWP3sUTZUj
+         U0OorX63BEt+ozzEBLLJT71oaTVNEz8/ilQYad9qdpkXBVkX2guhiTITN/7roFDYrO1X
+         58bF5x5oVfO0Y4FkCWxqwd2g8H95U59VeGmUYbWgN0cCzGori1haVrITTlL+uX8hGNKr
+         ZuLb77b/0cSSniyn8nvl0fl93qFB3dirrBcuQBoK5zoOVeSjY1aU+vz4uYdDQA62fE/g
+         96ks6ZMUADQq66oXGLXd98lvGL3hO03cjBBkQENaBh/ebF/jW46Xt/hkkGQfMOIYDXMX
+         gigA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693228223; x=1693833023;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wpqvqS+fYSjFHYGuyg+gEAZd0FugNzJBjVPZjXEWq4E=;
+        b=duQXnRyqLYXTF3ZyhlJoIU7uesM8xJY2HTPoGR1kRF5UM7/4BDH6shJmE/mc0rac/I
+         WSn9Gpl0HtnzJFUMkVJjOfPDFPZPxeSfczjNruUMMPTUyo6sPhA4l2U38a0qs5I3P+B8
+         5hBErL3KmhNBwtA7P9oK51SDwGn9SyA8OwQWiKlZK4nuhu2MohvXvN/kP8gsKOltW1ws
+         wVV7Qo/lMSmW6gQbNE4YfP5F863Ab5rveYBGl/eB+hgg28VkGBTGwRoT6MZ7yAVkbd3j
+         29G7n30dqH3A52ZCQKFX36degW7oy7yjSaFXUE41ZneO2y5vWgEAUz1MlGnE769YAAI7
+         CNtw==
+X-Gm-Message-State: AOJu0YyAWrw0+XXy9OPPTEUW+7AA9IaMpSPsLDu9KyM7RBmqZrTZuYN6
+	5AwfmF8ha5ZkfOT6lxbx3YTfof6IYUvwXiUlSs8=
+X-Google-Smtp-Source: AGHT+IGTdT+RlfQq1iFceMWgVEykC3GfUKhMxWYC8+y/6ChxgTlYLs9wDHB7KESy6dP8u5oxa14gzSK/dSOOww78HWA=
+X-Received: by 2002:a05:6512:1cd:b0:4ff:af45:1ef7 with SMTP id
+ f13-20020a05651201cd00b004ffaf451ef7mr15536129lfp.6.1693228222939; Mon, 28
+ Aug 2023 06:10:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6b6a21e4-8ade-9da3-2219-1ca2faa24b51@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27014/Mon Aug 28 09:38:26 2023)
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
+ <20230824125012.1040288-3-keguang.zhang@gmail.com> <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
+In-Reply-To: <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
+From: Keguang Zhang <keguang.zhang@gmail.com>
+Date: Mon, 28 Aug 2023 21:09:46 +0800
+Message-ID: <CAJhJPsXEzqbwxBzwHqSG2_PxWPONofNycdTADZ3j=86J5CnMfQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet Controller
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/28/23 2:55 PM, Gal Pressman wrote:
-> On 27/08/2023 16:55, Gal Pressman wrote:
->> On 25/08/2023 16:49, Daniel Borkmann wrote:
-[...]
->>> After the fix, there are no kmemleak reports with the reproducer. This is
->>> in line with what is also done on the ingress side, and from debugging the
->>> skb_unref(skb) on dummy xmit and sch_handle_egress() side, it is visible
->>> that these are two different skbs with both skb_unref(skb) as true. The two
->>> seen skbs are due to mirred doing a skb_clone() internally as use_reinsert
->>> is false in tcf_mirred_act() for egress. This was initially reported by Gal.
->>>
->>> Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
->>> Reported-by: Gal Pressman <gal@nvidia.com>
->>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->>> Link: https://lore.kernel.org/bpf/bdfc2640-8f65-5b56-4472-db8e2b161aab@nvidia.com
->>
->> I suspect that this series causes our regression to timeout due to some
->> stuck tests :\.
->> I'm not 100% sure yet though, verifying..
-> 
-> Seems like everything is passing now, hope it was a false alarm, will
-> report back if anything breaks.
+On Sun, Aug 27, 2023 at 5:04=E2=80=AFAM Serge Semin <fancer.lancer@gmail.co=
+m> wrote:
+>
+> On Thu, Aug 24, 2023 at 08:50:10PM +0800, Keguang Zhang wrote:
+> > Add devicetree binding document for Loongson-1 Ethernet controller.
+> >
+> > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> > ---
+> > V2 -> V3: Split the DT-schema file into loongson,ls1b-gmac.yaml
+> >           and loongson,ls1c-emac.yaml (suggested by Serge Semin)
+> >           Change the compatibles to loongson,ls1b-gmac and loongson,ls1=
+c-emac
+> >           Rename loongson,dwmac-syscon to loongson,ls1-syscon
+> >           Amend the title
+> >           Add description
+> >           Add Reviewed-by tag from Krzysztof Kozlowski(Sorry! I'm not s=
+ure)
+> > V1 -> V2: Fix "clock-names" and "interrupt-names" property
+> >           Rename the syscon property to "loongson,dwmac-syscon"
+> >           Drop "phy-handle" and "phy-mode" requirement
+> >           Revert adding loongson,ls1b-dwmac/loongson,ls1c-dwmac
+> >           to snps,dwmac.yaml
+> >
+> >  .../bindings/net/loongson,ls1b-gmac.yaml      | 115 ++++++++++++++++++
+> >  .../bindings/net/loongson,ls1c-emac.yaml      | 114 +++++++++++++++++
+> >  2 files changed, 229 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1b=
+-gmac.yaml
+> >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1c=
+-emac.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.y=
+aml b/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
+> > new file mode 100644
+> > index 000000000000..f661d5b86649
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
+> > @@ -0,0 +1,115 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/loongson,ls1b-gmac.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Loongson-1B Gigabit Ethernet MAC Controller
+> > +
+> > +maintainers:
+> > +  - Keguang Zhang <keguang.zhang@gmail.com>
+> > +
+>
+> > +description:
+>
+> Use "|" to keep the text formatting.
+>   description: |
+>
+Will do.
 
-Sounds good, thanks for your help Gal!
+> > +  Loongson-1B Gigabit Ethernet MAC Controller is based on
+> > +  Synopsys DesignWare MAC (version 3.50a).
+> > +
+>
+> > +  Main features
+> > +  - Dual 10/100/1000Mbps GMAC controllers
+> > +  - Full-duplex operation (IEEE 802.3x flow control automatic transmis=
+sion)
+> > +  - Half-duplex operation (CSMA/CD Protocol and back-pressure support)
+> > +  - RX Checksum Offload
+> > +  - TX Checksum insertion
+> > +  - MII interface
+> > +  - RGMII interface
+>
+> If only all the DW *MAC-based devices have such info in the
+> bindings the life would have been much easier...
+>
+> > +
+> > +select:
+> > +  properties:
+> > +    compatible:
+> > +      contains:
+> > +        enum:
+> > +          - loongson,ls1b-gmac
+> > +  required:
+> > +    - compatible
+> > +
+> > +properties:
+> > +  compatible:
+> > +    items:
+> > +      - enum:
+> > +          - loongson,ls1b-gmac
+> > +      - const: snps,dwmac-3.50a
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    maxItems: 1
+> > +
+>
+> > +  clock-names:
+> > +    items:
+> > +      - const: stmmaceth
+>
+> since there is a single clock then just:
+>   clock-names:
+>     const: stmmaceth
+>
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+>
+> > +  interrupt-names:
+> > +    items:
+> > +      - const: macirq
+>
+> ditto. just
+>   interrupt-names:
+>     const: macirq
+>
+> > +
+> > +  loongson,ls1-syscon:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > +    description:
+> > +      Phandle to the syscon containing some extra configurations
+> > +      including PHY interface mode.
+> > +
+>
+> > +  phy-mode:
+> > +    items:
+> > +      - enum:
+> > +          - mii
+> > +          - rgmii-id
+>
+> it's a single string then just:
+>   phy-mode:
+>     enum: ...
+>
+Will do.
+
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - clocks
+> > +  - clock-names
+> > +  - interrupts
+> > +  - interrupt-names
+> > +  - loongson,ls1-syscon
+> > +
+> > +allOf:
+> > +  - $ref: snps,dwmac.yaml#
+> > +
+> > +unevaluatedProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
+> > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > +
+> > +    gmac0: ethernet@1fe10000 {
+> > +        compatible =3D "loongson,ls1b-gmac", "snps,dwmac-3.50a";
+> > +        reg =3D <0x1fe10000 0x10000>;
+> > +
+> > +        clocks =3D <&clkc LS1X_CLKID_AHB>;
+> > +        clock-names =3D "stmmaceth";
+> > +
+> > +        interrupt-parent =3D <&intc1>;
+> > +        interrupts =3D <2 IRQ_TYPE_LEVEL_HIGH>;
+> > +        interrupt-names =3D "macirq";
+> > +
+> > +        loongson,ls1-syscon =3D <&syscon>;
+> > +
+> > +        phy-handle =3D <&phy0>;
+> > +        phy-mode =3D "mii";
+> > +        snps,pbl =3D <1>;
+> > +
+> > +        mdio {
+> > +            #address-cells =3D <1>;
+> > +            #size-cells =3D <0>;
+> > +            compatible =3D "snps,dwmac-mdio";
+> > +
+> > +            phy0: ethernet-phy@0 {
+> > +                reg =3D <0x0>;
+> > +            };
+> > +        };
+> > +    };
+> > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1c-emac.y=
+aml b/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
+> > new file mode 100644
+> > index 000000000000..1ffad41941bf
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
+> > @@ -0,0 +1,114 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/loongson,ls1c-emac.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Loongson-1C Ethernet MAC Controller
+> > +
+> > +maintainers:
+> > +  - Keguang Zhang <keguang.zhang@gmail.com>
+> > +
+>
+> > +description:
+>
+> the same comment about the "|" modifier.
+>
+Will do.
+
+> > +  Loongson-1C Ethernet MAC Controller is based on
+> > +  Synopsys DesignWare MAC (version 3.50a).
+> > +
+>
+> > +  Main features
+> > +  - 10/100Mbps
+> > +  - Full-duplex operation (IEEE 802.3x flow control automatic transmis=
+sion)
+> > +  - Half-duplex operation (CSMA/CD Protocol and back-pressure support)
+> > +  - IEEE 802.1Q VLAN tag detection for reception frames
+> > +  - MII interface
+> > +  - RMII interface
+>
+> Based on the plat_stmmacenet_data data defined for the LS1C MAC it
+> also support support Tx COE. Isn't it? What about Rx COE?
+>
+> > +
+> > +select:
+> > +  properties:
+> > +    compatible:
+> > +      contains:
+> > +        enum:
+> > +          - loongson,ls1c-emac
+> > +  required:
+> > +    - compatible
+> > +
+> > +properties:
+> > +  compatible:
+> > +    items:
+> > +      - enum:
+> > +          - loongson,ls1c-emac
+> > +      - const: snps,dwmac-3.50a
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    maxItems: 1
+> > +
+>
+> > +  clock-names:
+> > +    items:
+> > +      - const: stmmaceth
+>
+>   clock-names:
+>     const: stmmaceth
+> ?
+>
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+>
+> > +  interrupt-names:
+> > +    items:
+> > +      - const: macirq
+>
+>   interrupt-names:
+>     const: macirq
+> ?
+>
+> > +
+> > +  loongson,ls1-syscon:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > +    description:
+> > +      Phandle to the syscon containing some extra configurations
+> > +      including PHY interface mode.
+> > +
+>
+> > +  phy-mode:
+> > +    items:
+> > +      - enum:
+> > +          - mii
+> > +          - rmii
+>
+>   phy-mode:
+>     enum: ...
+> ?
+Will do.
+>
+> -Serge(y)
+>
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - clocks
+> > +  - clock-names
+> > +  - interrupts
+> > +  - interrupt-names
+> > +  - loongson,ls1-syscon
+> > +
+> > +allOf:
+> > +  - $ref: snps,dwmac.yaml#
+> > +
+> > +unevaluatedProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
+> > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > +
+> > +    emac: ethernet@1fe10000 {
+> > +        compatible =3D "loongson,ls1c-emac", "snps,dwmac-3.50a";
+> > +        reg =3D <0x1fe10000 0x10000>;
+> > +
+> > +        clocks =3D <&clkc LS1X_CLKID_AHB>;
+> > +        clock-names =3D "stmmaceth";
+> > +
+> > +        interrupt-parent =3D <&intc1>;
+> > +        interrupts =3D <2 IRQ_TYPE_LEVEL_HIGH>;
+> > +        interrupt-names =3D "macirq";
+> > +
+> > +        loongson,ls1-syscon =3D <&syscon>;
+> > +
+> > +        phy-handle =3D <&phy0>;
+> > +        phy-mode =3D "mii";
+> > +        snps,pbl =3D <1>;
+> > +
+> > +        mdio {
+> > +            #address-cells =3D <1>;
+> > +            #size-cells =3D <0>;
+> > +            compatible =3D "snps,dwmac-mdio";
+> > +
+> > +            phy0: ethernet-phy@13 {
+> > +                reg =3D <0x13>;
+> > +            };
+> > +        };
+> > +    };
+> > --
+> > 2.39.2
+> >
+> >
+
+
+
+--=20
+Best regards,
+
+Keguang Zhang
 
