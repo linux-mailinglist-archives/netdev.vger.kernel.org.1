@@ -1,162 +1,141 @@
-Return-Path: <netdev+bounces-31042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B911D78B081
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:35:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E871278B0BF
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC4371C208CB
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:35:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 454BA280E03
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F77A11CB5;
-	Mon, 28 Aug 2023 12:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4BC125A6;
+	Mon, 28 Aug 2023 12:41:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413856117
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:35:56 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5079126
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:35:53 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b974031aeaso48125981fa.0
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:35:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDCA125A0
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:41:41 +0000 (UTC)
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38C3E5;
+	Mon, 28 Aug 2023 05:41:39 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50098cc8967so5021419e87.1;
+        Mon, 28 Aug 2023 05:41:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693226152; x=1693830952;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U8FHoF0EEmuxAOTXhuGWB0DeQBV57gCB/+pF5x9rYb8=;
-        b=gRDXI736iuTJFUUiRF4E62C+qEsccSMJ1SkQ9nG0QQNdFSO+Kt6BbzdhAUnFTjziGI
-         EeuMZa+UaUDJ+o07JNOtP1S1idXGzCuOzbgyMwziHzkdBfnn7y1EhhTxDUeQxXrsWjbk
-         jQhawFqvcQsACxULxRSjo6oi8DkDNA2MxjEem5JKXrUu3ff/C12sMtdMGIq8cH+oCmX1
-         +FnzUvPvXz7nQYTgWc22cfIF0/73cGcyIOVGJF8nplrtVTn9hFwO4SHZjnSu2flTBWP9
-         dk9B91+11lPK/whCssNn+wc2IYAhvRTCw8Q8NAKTUv/xVQTD7Q9hVym0NbiKxROuv2GC
-         WgiQ==
+        d=gmail.com; s=20221208; t=1693226498; x=1693831298;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=35Zvmo59YN6o3oPAuxnrM8DnmGEhpgbLp58kB3g9lGU=;
+        b=KSxh1ke+AfqK9ORplGlqm3Eit0KfK+YhWYLVMtxDY4buQMStb0+QJsms3Ku6pCvCbC
+         GLw0DNyl5PcYzZzILkUqyYmoblod2u44FftEatXPsjyxp0rKRN3KJN3cvmQSMslbQoSl
+         xJUNbaidTzygQRF1ChfqgNP/kPG/TQ8O8sPo7rU38PTY3JQLH8+DCsAjl+x1p871cbZm
+         feRtMbwgiApiSCfvZ3axD0O4iG4b1vAfy6vSB83CuXdDp9121EI+OoTFcYDHyiQNgM83
+         qBom01b8lnIiexli8boD9pmqBjvpE/XFzvJx/gomDD0p/BKeIvJ9DxzdmBpR1jxbUK47
+         VS9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693226152; x=1693830952;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U8FHoF0EEmuxAOTXhuGWB0DeQBV57gCB/+pF5x9rYb8=;
-        b=DmTisRfd8fCwwm7faYcm6owmIW3g87QlCPTZ5FmaOTmsQxD/lw+MVyUoMMBFCcL3on
-         9wgnHVtBHZ+SKlf4CxQMlwp8rN4t2yLOU3BJOiAS3uYGlPxSipbYRZc0xNyl0YgodMZv
-         RqQ3JVHOSjwhiAqYujTotZwmDUGL8nni7136zbrJD1FyNYvMYQFIw/q/kS0ZNAvw3PWC
-         Z/2jFVmqARAbXf7sEIBUaTNyvd9UKbdmQs9NmYFd31QJ2qk+cT2fnJl1WOPnaFx++fnD
-         TxHPswesXTBn/aZA6p7AvgnG/EhKP7YswR0xU3hmjSKTlx4ExpIlrxeLvIrirbhFy/hV
-         TlJQ==
-X-Gm-Message-State: AOJu0YxKjVmZojGgdxgNBphfLjcSnfcx5+eH7SH5HKfNcSPMYIenRfLV
-	2fADB7uYOf8mhhm9j6AWZRTmxA==
-X-Google-Smtp-Source: AGHT+IHaVAV7m/SxxXQTce6SzKSz9Jg84rLyUgxT39ppgMlbeCRLlAK4JgHzs+HlNgnDqopNISb+nA==
-X-Received: by 2002:a2e:8918:0:b0:2bc:eaec:e23f with SMTP id d24-20020a2e8918000000b002bceaece23fmr9199572lji.43.1693226151808;
-        Mon, 28 Aug 2023 05:35:51 -0700 (PDT)
-Received: from [192.168.1.101] (abyl195.neoplus.adsl.tpnet.pl. [83.9.31.195])
-        by smtp.gmail.com with ESMTPSA id l26-20020a2e99da000000b002bcb239a7efsm1742551ljj.56.2023.08.28.05.35.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Aug 2023 05:35:51 -0700 (PDT)
-Message-ID: <790ead1e-7b15-4f88-bdf9-738b24531ef0@linaro.org>
-Date: Mon, 28 Aug 2023 14:35:49 +0200
+        d=1e100.net; s=20221208; t=1693226498; x=1693831298;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=35Zvmo59YN6o3oPAuxnrM8DnmGEhpgbLp58kB3g9lGU=;
+        b=TNNpZnsj8iz5DKcYa7h8ZTdPeSe7N9/1356QnljzEzmfqU4lMmkRZ4eMAkeWzpKBOZ
+         49QkV0woy17bkmzEV8J7dmmRdxIFxxEzzBfroyJ3G/6OjUHy4vyWnpXInrWxPT1b3OZp
+         n+aQI5wMJPMNGG6Pxu2GNiQlTPEAiPiyUizhWzupAVOzzQraoM/DLsZi1k2X6WADQx3p
+         h4TYn5g8IzJ0xrxbn/WNFy6tL22scMNgEchtQziwk6EfSfZF6htnNzl0WshzbLsAs8XQ
+         lIVhiVtkDjjh1gtMaDub9TZMMkaEERVmQkNj6wwKptkWnLJkxxZB5DdBAxnPJ2TxoDXZ
+         6+rw==
+X-Gm-Message-State: AOJu0YwxCOqr/iyRYHjEOpab62CUcSkKi+SSDdGbx0XVFNtvP5nKHVbD
+	1uJGuhVPfdUXNEoOxSZzQeQ=
+X-Google-Smtp-Source: AGHT+IFRlAtGX0zI23L+HPcaLdtS//sAFD2U7kQ3HH8Hea5Ggh0g2kh1a/yBtz8lEpewXjLli0HgGg==
+X-Received: by 2002:a05:6512:2203:b0:4fe:2d93:2b50 with SMTP id h3-20020a056512220300b004fe2d932b50mr22395653lfu.31.1693226497635;
+        Mon, 28 Aug 2023 05:41:37 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id i22-20020ac25236000000b004ff981955cesm1568114lfl.228.2023.08.28.05.41.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Aug 2023 05:41:37 -0700 (PDT)
+Date: Mon, 28 Aug 2023 15:41:35 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet
+ Controller
+Message-ID: <mqea2nlysz4x3ff7xhg3fypgiyvrpqz6pwje4kavxoigrdlbtr@k6jw7jqsbkxr>
+References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
+ <20230824125012.1040288-3-keguang.zhang@gmail.com>
+ <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
+ <c32130ab-27dc-e991-10fd-db0fba25cc97@linaro.org>
+ <q7o7wqodz5epyjdj7vlryaseugr2fjhef2cgsh65trw3r2jorm@5z5a5tyuyq4d>
+ <d6f796aa-c468-037c-3f53-d0c4306c8890@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 5/7] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-Content-Language: en-US
-To: Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org,
- agross@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
- richardcochran@gmail.com, arnd@arndb.de, geert+renesas@glider.be,
- nfraprado@collabora.com, rafal@milecki.pl, peng.fan@nxp.com,
- linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-Cc: quic_saahtoma@quicinc.com
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-6-quic_devipriy@quicinc.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20230825091234.32713-6-quic_devipriy@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6f796aa-c468-037c-3f53-d0c4306c8890@linaro.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 25.08.2023 11:12, Devi Priya wrote:
-> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
-> devices.
+On Mon, Aug 28, 2023 at 09:15:17AM +0200, Krzysztof Kozlowski wrote:
+> On 27/08/2023 23:01, Serge Semin wrote:
+> > Hi Krzysztof
+> > 
+> > On Sun, Aug 27, 2023 at 09:56:06AM +0200, Krzysztof Kozlowski wrote:
+> >> On 26/08/2023 23:04, Serge Semin wrote:
+> >>>> +  clock-names:
+> >>>> +    items:
+> >>>> +      - const: stmmaceth
+> >>>
+> >>>   clock-names:
+> >>>     const: stmmaceth
+> >>> ?
+> >>
+> > 
+> >> The existing syntax is correct. This is a string array.
+> > 
+> > Could you please clarify whether it's a requirement (always specify
+> > items: property for an array) or just an acceptable option (another
+> > one is suggested in my comment)? I am asking because:
+> > 1. In this case the "clock-names" array is supposed to have only one
+> > item. Directly setting "const: stmmaceth" with no items: property
+> > shall simplify it.
+> > 2. There are single-entry "clock-names" property in the DT-bindings
+> > defined as I suggested.
+> > 3. There is a "compatible" property which is also a string array but
+> > it can be defined as I suggested (omitting the items property).
+> > 
+> > so based on all of that using the "items:"-based constraint here seems
+> > redundant. Am I wrong to think like that? If so in what aspect?
 > 
-> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> ---
-[...]
 
-> +	[UBI3_CLKRST_CLAMP_ENABLE] = { 0x28A04, 9 },
-Please make all hex lowercase.
+> Syntax is correct in both cases. However the single list compatible
+> *cannot grow*, while single list clock might, when developer notices
+> that the binding was incomplete. People add binding matching drivers,
+> not the hardware, thus having incomplete list of clocks is happening all
+> the time.
 
-[...]
+So it's just a matter of maintainability. Got it. Thanks.
 
-> +	[PPE_FULL_RESET] = { 0x28A08, 0, 1, 0x1E0000 },
-{ .reg = 0x28a08, .bitmask = GENMASK(foo,bar) },
+-Serge(y)
 
-[...]
-
-> +	ret = devm_pm_runtime_enable(&pdev->dev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = devm_pm_clk_create(&pdev->dev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = of_pm_clk_add_clk(&pdev->dev, "nssnoc_nsscc");
-> +	if (ret < 0) {
-> +		dev_err(&pdev->dev, "Failed to acquire nssnoc_nsscc clock\n");
-> +		return ret;
-dev_err_probe, everywhere?
-
-Konrad
+> 
+> Best regards,
+> Krzysztof
+> 
 
