@@ -1,464 +1,284 @@
-Return-Path: <netdev+bounces-31045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB6678B0E3
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:47:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F2F78B10F
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 14:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 710F71C20429
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:47:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0A461C208D9
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 12:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C201F125B3;
-	Mon, 28 Aug 2023 12:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3D7125BB;
+	Mon, 28 Aug 2023 12:52:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE85A48
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:47:01 +0000 (UTC)
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC80B11A;
-	Mon, 28 Aug 2023 05:46:59 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5007c8308c3so4966388e87.0;
-        Mon, 28 Aug 2023 05:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693226818; x=1693831618;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RKbygzd8nBa97vp+FOLUHU4VMJn4AUJJs7Ji4/H8MIo=;
-        b=j9Fcv7/ATbvge3u73//9A7bUOFLTUCpq+Mo8mv2pVE746flc37hDqa00q+AwZnsLQf
-         WjVIigWKc2rTGUCFof4NWky/tTpH8kCfajMCaAkcN0HEfUwxSHwgvWLl+IjgUu2RQEqp
-         DiNeNB7iVyDpX4nmbPHE/ZLfW/Dp5KMrILSx2aBk/g8mIy9x5fTe5iXPp3ujxBR/pkiB
-         R67M3sNNzqnX53GGye18q75YstmT4DHGL8ERe5PTqh0iirZ3hM+VWaow3SjJrC3a/+9R
-         86hsRkHK2EK4c2ybQkys+wqYJFiaKrWLOOn8n3aCWYmCm5uquCsXORdFuoCs8HMsR/lr
-         Jy+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693226818; x=1693831618;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RKbygzd8nBa97vp+FOLUHU4VMJn4AUJJs7Ji4/H8MIo=;
-        b=YI6atPzPBqz9+GTf3J4OiUnDSiCBmhdYRccSNDQc0/kER5reY8ErUEYtTORgFs9QBB
-         I7a9oVBFgFbN4YCE71PP3kj0enqino07k30cBH5E+7u6HvD1VtWa8c3/rJgNvZ3MThLs
-         b/VD2vbIbdCO/N9zqIqRbmO2NGdryhtBuHZ5274fJ9sfepSrOU6Asc9sv6NRhVZvH0Ih
-         fge+B8OnLsBVc5pcwP3b3RF1/BeBSWefF5MP8ifc1icr4XjJ+uSjSyrz7FZs72pjjGHv
-         VxJ/ZmsJKY0BSN5Sqd1N3Te6GS/vFCSlCjfkidBYRWqUtKDHuYX36n1/5hLaRuHE/FSJ
-         quew==
-X-Gm-Message-State: AOJu0YwjnzrYfLrxRAcgtDVCmQKPCMT/P/p68oskP0QdlSxpfhrmIRw+
-	BpVWLW+63FLK5O2ka/u0aA8=
-X-Google-Smtp-Source: AGHT+IH8FOgmgz8Tec69XkCKDfGkNM/vLrWCchFCekesBi1O3Vzp9vTnsFX8SVlxBZvpGQjH6ojkXA==
-X-Received: by 2002:a05:6512:12cb:b0:500:8443:744a with SMTP id p11-20020a05651212cb00b005008443744amr19189182lfg.7.1693226817678;
-        Mon, 28 Aug 2023 05:46:57 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id v13-20020ac2592d000000b005009cbbdff7sm1570479lfi.11.2023.08.28.05.46.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 05:46:56 -0700 (PDT)
-Date: Mon, 28 Aug 2023 15:46:54 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Keguang Zhang <keguang.zhang@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Serge Semin <Sergey.Semin@baikalelectronics.ru>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v3 2/4] dt-bindings: net: Add Loongson-1 Ethernet
- Controller
-Message-ID: <vlbb25vj4qcbxpijvdiypnebbw7m2cuoepxr6sn74kgjhg4f3h@3z2x3l2kolxx>
-References: <20230824125012.1040288-1-keguang.zhang@gmail.com>
- <20230824125012.1040288-3-keguang.zhang@gmail.com>
- <dwe4oyunc2uitullflhryg7kmgeklj5wlx6ztrg5hahl64tkuz@koe4tijgj3bp>
- <CAJhJPsWOOiPnkr-Mk0BXOgCBSMyFx+x7STbO910cxc1RoC8_dw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498AE125B9
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 12:52:37 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51FE2107
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 05:52:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693227155; x=1724763155;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=0tLU3Y09BQUkxu4IV89orRIQpc+aKxw3Ks/9MpQmPaU=;
+  b=ep/FHOHi9+rHnhEaPvN/fNv8szlozo3YdQFT2IwUcmYIQOTN2z6UUBvX
+   1mQhnj/kmeHDSQSPWnZ7lPduCTG6UwGsnCibySOgFzgyRf5isr8plpOR7
+   /P4NyN8ROVO7+9Izq2A5IerbG9C/45f9obQfx/29N0VZOlilllHIFBFOQ
+   TYt14MWkjDsFunn3hhzTe0OEA0RYHM1xPGMqs+OD7+msUaxub+I2mhJrM
+   zqqvc/zf7lTQOaSasvr4dcu5HT/pItm6Rampal7bltSMRA8RXN9zidtlk
+   sAbnXh+NYcb36MTdud5ANSTY50HN+YKNlb2i+83sgVGKwUo0cqgEHnJwg
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="441438595"
+X-IronPort-AV: E=Sophos;i="6.02,207,1688454000"; 
+   d="scan'208";a="441438595"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2023 05:52:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="688092568"
+X-IronPort-AV: E=Sophos;i="6.02,207,1688454000"; 
+   d="scan'208";a="688092568"
+Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 28 Aug 2023 05:52:27 -0700
+Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qabjB-0007sr-1r;
+	Mon, 28 Aug 2023 12:52:23 +0000
+Date: Mon, 28 Aug 2023 20:51:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	netdev@vger.kernel.org
+Subject: [linux-next:master 13014/13109] include/linux/netlink.h:116:13:
+ warning: 'sfc: Unsupported: only suppo...' directive output truncated
+ writing 104 bytes into a region of size 80
+Message-ID: <202308282000.2XNh0K6D-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJhJPsWOOiPnkr-Mk0BXOgCBSMyFx+x7STbO910cxc1RoC8_dw@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 28, 2023 at 12:38:37PM +0800, Keguang Zhang wrote:
-> On Sun, Aug 27, 2023 at 5:04 AM Serge Semin <fancer.lancer@gmail.com> wrote:
-> >
-> > On Thu, Aug 24, 2023 at 08:50:10PM +0800, Keguang Zhang wrote:
-> > > Add devicetree binding document for Loongson-1 Ethernet controller.
-> > >
-> > > Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
-> > > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > > ---
-> > > V2 -> V3: Split the DT-schema file into loongson,ls1b-gmac.yaml
-> > >           and loongson,ls1c-emac.yaml (suggested by Serge Semin)
-> > >           Change the compatibles to loongson,ls1b-gmac and loongson,ls1c-emac
-> > >           Rename loongson,dwmac-syscon to loongson,ls1-syscon
-> > >           Amend the title
-> > >           Add description
-> > >           Add Reviewed-by tag from Krzysztof Kozlowski(Sorry! I'm not sure)
-> > > V1 -> V2: Fix "clock-names" and "interrupt-names" property
-> > >           Rename the syscon property to "loongson,dwmac-syscon"
-> > >           Drop "phy-handle" and "phy-mode" requirement
-> > >           Revert adding loongson,ls1b-dwmac/loongson,ls1c-dwmac
-> > >           to snps,dwmac.yaml
-> > >
-> > >  .../bindings/net/loongson,ls1b-gmac.yaml      | 115 ++++++++++++++++++
-> > >  .../bindings/net/loongson,ls1c-emac.yaml      | 114 +++++++++++++++++
-> > >  2 files changed, 229 insertions(+)
-> > >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
-> > >  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml b/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
-> > > new file mode 100644
-> > > index 000000000000..f661d5b86649
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
-> > > @@ -0,0 +1,115 @@
-> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > > +%YAML 1.2
-> > > +---
-> > > +$id: http://devicetree.org/schemas/net/loongson,ls1b-gmac.yaml#
-> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > +
-> > > +title: Loongson-1B Gigabit Ethernet MAC Controller
-> > > +
-> > > +maintainers:
-> > > +  - Keguang Zhang <keguang.zhang@gmail.com>
-> > > +
-> >
-> > > +description:
-> >
-> > Use "|" to keep the text formatting.
-> >   description: |
-> >
-> > > +  Loongson-1B Gigabit Ethernet MAC Controller is based on
-> > > +  Synopsys DesignWare MAC (version 3.50a).
-> > > +
-> >
-> > > +  Main features
-> > > +  - Dual 10/100/1000Mbps GMAC controllers
-> > > +  - Full-duplex operation (IEEE 802.3x flow control automatic transmission)
-> > > +  - Half-duplex operation (CSMA/CD Protocol and back-pressure support)
-> > > +  - RX Checksum Offload
-> > > +  - TX Checksum insertion
-> > > +  - MII interface
-> > > +  - RGMII interface
-> >
-> > If only all the DW *MAC-based devices have such info in the
-> > bindings the life would have been much easier...
-> >
-> > > +
-> > > +select:
-> > > +  properties:
-> > > +    compatible:
-> > > +      contains:
-> > > +        enum:
-> > > +          - loongson,ls1b-gmac
-> > > +  required:
-> > > +    - compatible
-> > > +
-> > > +properties:
-> > > +  compatible:
-> > > +    items:
-> > > +      - enum:
-> > > +          - loongson,ls1b-gmac
-> > > +      - const: snps,dwmac-3.50a
-> > > +
-> > > +  reg:
-> > > +    maxItems: 1
-> > > +
-> > > +  clocks:
-> > > +    maxItems: 1
-> > > +
-> >
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+head:   2ee82481c392eec06a7ef28df61b7f0d8e45be2e
+commit: 01183204bc24d9612add84a809377cb10737e77f [13014/13109] Merge branch 'main' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230828/202308282000.2XNh0K6D-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230828/202308282000.2XNh0K6D-lkp@intel.com/reproduce)
 
-> > > +  clock-names:
-> > > +    items:
-> > > +      - const: stmmaceth
-> >
-> > since there is a single clock then just:
-> >   clock-names:
-> >     const: stmmaceth
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308282000.2XNh0K6D-lkp@intel.com/
 
-As Krzysztof noted please ignore this comment.
+All warnings (new ones prefixed by >>):
 
-> >
-> > > +
-> > > +  interrupts:
-> > > +    maxItems: 1
-> > > +
-> >
-> > > +  interrupt-names:
-> > > +    items:
-> > > +      - const: macirq
-> >
+   In file included from include/uapi/linux/neighbour.h:6,
+                    from include/linux/netdevice.h:45,
+                    from include/net/sch_generic.h:5,
+                    from include/net/pkt_cls.h:7,
+                    from drivers/net/ethernet/sfc/tc.c:12:
+   drivers/net/ethernet/sfc/tc.c: In function 'efx_tc_mangle':
+>> include/linux/netlink.h:116:13: warning: 'sfc: Unsupported: only suppo...' directive output truncated writing 104 bytes into a region of size 80 [-Wformat-truncation=]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1223:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1223 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: directive argument in the range [0, 254]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1223:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1223 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: 'snprintf' output between 107 and 110 bytes into a destination of size 80
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1223:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1223 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: warning: 'sfc: Unsupported: only suppo...' directive output truncated writing 110 bytes into a region of size 80 [-Wformat-truncation=]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1282:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1282 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: directive argument in the range [0, 254]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1282:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1282 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: 'snprintf' output between 113 and 116 bytes into a destination of size 80
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1282:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1282 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+>> include/linux/netlink.h:116:13: warning: ') out of range, only support...' directive output truncated writing 60 bytes into a region of size between 46 and 55 [-Wformat-truncation=]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1271:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1271 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: 'snprintf' output between 86 and 95 bytes into a destination of size 80
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:1271:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+    1271 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c: In function 'efx_tc_flower_record_encap_match':
+   include/linux/netlink.h:116:13: warning: ' conflicts with existing pse...' directive output truncated writing 53 bytes into a region of size between 28 and 33 [-Wformat-truncation=]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:634:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+     634 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: directive argument in the range [0, 65535]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:634:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+     634 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: 'snprintf' output between 102 and 112 bytes into a destination of size 80
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:634:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+     634 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: warning: ' conflicts with existing pse...' directive output truncated writing 57 bytes into a region of size 39 [-Wformat-truncation=]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:627:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+     627 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: directive argument in the range [0, 255]
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:627:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+     627 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:116:13: note: 'snprintf' output 103 bytes into a destination of size 80
+     116 |         if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,               \
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     117 |                      "%s" fmt "%s", "", ##args, "") >=                         \
+         |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/netlink.h:131:9: note: in expansion of macro 'NL_SET_ERR_MSG_FMT'
+     131 |         NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
+         |         ^~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/sfc/tc.c:627:33: note: in expansion of macro 'NL_SET_ERR_MSG_FMT_MOD'
+     627 |                                 NL_SET_ERR_MSG_FMT_MOD(extack,
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
 
-> > ditto. just
-> >   interrupt-names:
-> >     const: macirq
 
-ditto.
+vim +116 include/linux/netlink.h
 
-> >
-> > > +
-> > > +  loongson,ls1-syscon:
-> > > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > > +    description:
-> > > +      Phandle to the syscon containing some extra configurations
-> > > +      including PHY interface mode.
-> > > +
-> >
-> > > +  phy-mode:
-> > > +    items:
-> > > +      - enum:
-> > > +          - mii
-> > > +          - rgmii-id
-> >
-> > it's a single string then just:
-> >   phy-mode:
-> >     enum: ...
-> >
-> > > +
-> > > +required:
-> > > +  - compatible
-> > > +  - reg
-> > > +  - clocks
-> > > +  - clock-names
-> > > +  - interrupts
-> > > +  - interrupt-names
-> > > +  - loongson,ls1-syscon
-> > > +
-> > > +allOf:
-> > > +  - $ref: snps,dwmac.yaml#
-> > > +
-> > > +unevaluatedProperties: false
-> > > +
-> > > +examples:
-> > > +  - |
-> > > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
-> > > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > > +
-> > > +    gmac0: ethernet@1fe10000 {
-> > > +        compatible = "loongson,ls1b-gmac", "snps,dwmac-3.50a";
-> > > +        reg = <0x1fe10000 0x10000>;
-> > > +
-> > > +        clocks = <&clkc LS1X_CLKID_AHB>;
-> > > +        clock-names = "stmmaceth";
-> > > +
-> > > +        interrupt-parent = <&intc1>;
-> > > +        interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
-> > > +        interrupt-names = "macirq";
-> > > +
-> > > +        loongson,ls1-syscon = <&syscon>;
-> > > +
-> > > +        phy-handle = <&phy0>;
-> > > +        phy-mode = "mii";
-> > > +        snps,pbl = <1>;
-> > > +
-> > > +        mdio {
-> > > +            #address-cells = <1>;
-> > > +            #size-cells = <0>;
-> > > +            compatible = "snps,dwmac-mdio";
-> > > +
-> > > +            phy0: ethernet-phy@0 {
-> > > +                reg = <0x0>;
-> > > +            };
-> > > +        };
-> > > +    };
-> > > diff --git a/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml b/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
-> > > new file mode 100644
-> > > index 000000000000..1ffad41941bf
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
-> > > @@ -0,0 +1,114 @@
-> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > > +%YAML 1.2
-> > > +---
-> > > +$id: http://devicetree.org/schemas/net/loongson,ls1c-emac.yaml#
-> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > +
-> > > +title: Loongson-1C Ethernet MAC Controller
-> > > +
-> > > +maintainers:
-> > > +  - Keguang Zhang <keguang.zhang@gmail.com>
-> > > +
-> >
-> > > +description:
-> >
-> > the same comment about the "|" modifier.
-> >
-> > > +  Loongson-1C Ethernet MAC Controller is based on
-> > > +  Synopsys DesignWare MAC (version 3.50a).
-> > > +
-> >
-> > > +  Main features
-> > > +  - 10/100Mbps
-> > > +  - Full-duplex operation (IEEE 802.3x flow control automatic transmission)
-> > > +  - Half-duplex operation (CSMA/CD Protocol and back-pressure support)
-> > > +  - IEEE 802.1Q VLAN tag detection for reception frames
-> > > +  - MII interface
-> > > +  - RMII interface
-> >
-> > Based on the plat_stmmacenet_data data defined for the LS1C MAC it
-> > also support support Tx COE. Isn't it? What about Rx COE?
-> >
+2d4bc93368f5a0d Johannes Berg 2017-04-12  107  
+51c352bdbcd23d7 Edward Cree   2022-10-18  108  /* We splice fmt with %s at each end even in the snprintf so that both calls
+51c352bdbcd23d7 Edward Cree   2022-10-18  109   * can use the same string constant, avoiding its duplication in .ro
+51c352bdbcd23d7 Edward Cree   2022-10-18  110   */
+51c352bdbcd23d7 Edward Cree   2022-10-18  111  #define NL_SET_ERR_MSG_FMT(extack, fmt, args...) do {			       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  112  	struct netlink_ext_ack *__extack = (extack);			       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  113  									       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  114  	if (!__extack)							       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  115  		break;							       \
+51c352bdbcd23d7 Edward Cree   2022-10-18 @116  	if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,	       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  117  		     "%s" fmt "%s", "", ##args, "") >=			       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  118  	    NETLINK_MAX_FMTMSG_LEN)					       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  119  		net_warn_ratelimited("%s" fmt "%s", "truncated extack: ",      \
+51c352bdbcd23d7 Edward Cree   2022-10-18  120  				     ##args, "\n");			       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  121  									       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  122  	do_trace_netlink_extack(__extack->_msg_buf);			       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  123  									       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  124  	__extack->_msg = __extack->_msg_buf;				       \
+51c352bdbcd23d7 Edward Cree   2022-10-18  125  } while (0)
+51c352bdbcd23d7 Edward Cree   2022-10-18  126  
 
-> According to the value read from HW Feature Register(offset 0x1058),
-> both TXCOESEL an
-> RXTYP1COE/RXTYP2COE are zero.
-> Therefore, neither TX COE nor RX COE is supported by LS1C MAC.
-> Current plat_stmmacenet_data is Inaccurate.
+:::::: The code at line 116 was first introduced by commit
+:::::: 51c352bdbcd23d7ce46b06c1e64c82754dc44044 netlink: add support for formatted extack messages
 
-And since STMMAC probe() procedure overrides the
-plat_stmmacenet_data.tx_coe field then no problems the mistaken value
-caused. I see. Thanks for clarification.
+:::::: TO: Edward Cree <ecree.xilinx@gmail.com>
+:::::: CC: Jakub Kicinski <kuba@kernel.org>
 
--Serge(y)
-
-> 
-> > > +
-> > > +select:
-> > > +  properties:
-> > > +    compatible:
-> > > +      contains:
-> > > +        enum:
-> > > +          - loongson,ls1c-emac
-> > > +  required:
-> > > +    - compatible
-> > > +
-> > > +properties:
-> > > +  compatible:
-> > > +    items:
-> > > +      - enum:
-> > > +          - loongson,ls1c-emac
-> > > +      - const: snps,dwmac-3.50a
-> > > +
-> > > +  reg:
-> > > +    maxItems: 1
-> > > +
-> > > +  clocks:
-> > > +    maxItems: 1
-> > > +
-> >
-> > > +  clock-names:
-> > > +    items:
-> > > +      - const: stmmaceth
-> >
-
-> >   clock-names:
-> >     const: stmmaceth
-> > ?
-
-Please ignore this comment.
-
-> >
-> > > +
-> > > +  interrupts:
-> > > +    maxItems: 1
-> > > +
-> >
-> > > +  interrupt-names:
-> > > +    items:
-> > > +      - const: macirq
-> >
-
-> >   interrupt-names:
-> >     const: macirq
-> > ?
-
-ditto.
-
--Serge(y)
-
-> >
-> > > +
-> > > +  loongson,ls1-syscon:
-> > > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > > +    description:
-> > > +      Phandle to the syscon containing some extra configurations
-> > > +      including PHY interface mode.
-> > > +
-> >
-> > > +  phy-mode:
-> > > +    items:
-> > > +      - enum:
-> > > +          - mii
-> > > +          - rmii
-> >
-> >   phy-mode:
-> >     enum: ...
-> > ?
-> >
-> > -Serge(y)
-> >
-> > > +
-> > > +required:
-> > > +  - compatible
-> > > +  - reg
-> > > +  - clocks
-> > > +  - clock-names
-> > > +  - interrupts
-> > > +  - interrupt-names
-> > > +  - loongson,ls1-syscon
-> > > +
-> > > +allOf:
-> > > +  - $ref: snps,dwmac.yaml#
-> > > +
-> > > +unevaluatedProperties: false
-> > > +
-> > > +examples:
-> > > +  - |
-> > > +    #include <dt-bindings/clock/loongson,ls1x-clk.h>
-> > > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > > +
-> > > +    emac: ethernet@1fe10000 {
-> > > +        compatible = "loongson,ls1c-emac", "snps,dwmac-3.50a";
-> > > +        reg = <0x1fe10000 0x10000>;
-> > > +
-> > > +        clocks = <&clkc LS1X_CLKID_AHB>;
-> > > +        clock-names = "stmmaceth";
-> > > +
-> > > +        interrupt-parent = <&intc1>;
-> > > +        interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
-> > > +        interrupt-names = "macirq";
-> > > +
-> > > +        loongson,ls1-syscon = <&syscon>;
-> > > +
-> > > +        phy-handle = <&phy0>;
-> > > +        phy-mode = "mii";
-> > > +        snps,pbl = <1>;
-> > > +
-> > > +        mdio {
-> > > +            #address-cells = <1>;
-> > > +            #size-cells = <0>;
-> > > +            compatible = "snps,dwmac-mdio";
-> > > +
-> > > +            phy0: ethernet-phy@13 {
-> > > +                reg = <0x13>;
-> > > +            };
-> > > +        };
-> > > +    };
-> > > --
-> > > 2.39.2
-> > >
-> > >
-> 
-> 
-> 
-> --
-> Best regards,
-> 
-> Keguang Zhang
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
