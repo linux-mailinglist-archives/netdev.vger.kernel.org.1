@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-31014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B04D78A8F1
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 11:30:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE84578A8F5
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 11:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C0AE1C208BE
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:30:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97E90280DDE
+	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 09:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FB86125;
-	Mon, 28 Aug 2023 09:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5576AB8;
+	Mon, 28 Aug 2023 09:30:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1354C8C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D13A6122
 	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 09:30:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 37BA8C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C6703C43395;
 	Mon, 28 Aug 2023 09:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1693215029;
-	bh=v1gr32bBIJ5C07MAKcoxSB43dH+IPc84xwYX/CT2vpc=;
+	bh=DyjistNpfQlse3jCh5g2R74pkQlmRRv890yjBn+4RIE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rY9zwwlQG8dskwtdxiP/WbPrE9aGL4/klhTu6h732vOvouE1FzRdfNcipE/uIVXbR
-	 pkiuGtw1NMhcW0/vEJ5Dlvu0tQTh1vTL3STMmVsQDMyZKmx/tHnIsAq4/Ui9x8W1Hv
-	 KaAxVhExkVsHnsJ760c20dgqTBhMAUnWNlInnYvYCNXUA/NwTmDXQJxWFUpyOsKnlO
-	 mH6z7WTbHC17X8COQBIqKuVo767h9+shQJUQrsmbMYhGPw643ll2E73BmIwMDCJbMC
-	 XesBxylQVitKx+MaBHpQ/bsZU1UuvVLN2xJjJlTcIGRhPVCScIP3cNJc44e73NM8tY
-	 krCktm5LAWyOA==
+	b=gWHjivKdsW5ws9PyRgXnlHtcMIsheDzQAhTtcSTAafbMgHSTD54+Mg0g1vyOrJYEs
+	 OWjjBogoUPEhaMyJzJ9rr1w8rqlQZQlMMTKDbk7/fX+CHaqgXj5y1myozhXmufWa6R
+	 IhBg/n2+uSB69ne5N6hmSYiktRibPO9VF1s5l0nS5Yhf0NErsCxuhApLL2XHLWRVWr
+	 ezuB8d93yvMpyGZBifKsENBTxVxIc+96sNrO9kzUbTZF5rpI8lSIJ0Sh78BI2+EV44
+	 X01QKzjet8Guxme/Jf7a/h5LAC1wj8Az3z2o+q2LgqHZ72NyZNd/ajHUm8oyIE6/w2
+	 UaySH4g5OB9Ig==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12787E21EDF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B329EC3274C;
 	Mon, 28 Aug 2023 09:30:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,40 +41,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] inet: fix IP_TRANSPARENT error handling
+Subject: Re: [PATCH] ethernet: tg3: remove unreachable code
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169321502907.13199.7646505785035523534.git-patchwork-notify@kernel.org>
+ <169321502973.13199.8379981419921280271.git-patchwork-notify@kernel.org>
 Date: Mon, 28 Aug 2023 09:30:29 +0000
-References: <20230828084732.2366402-1-edumazet@google.com>
-In-Reply-To: <20230828084732.2366402-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, syzkaller@googlegroups.com, soheil@google.com,
- horms@kernel.org, matthieu.baerts@tessares.net
+References: <20230825190443.48375-1-m.kobuk@ispras.ru>
+In-Reply-To: <20230825190443.48375-1-m.kobuk@ispras.ru>
+To: Mikhail Kobuk <m.kobuk@ispras.ru>
+Cc: siva.kallam@broadcom.com, prashant@broadcom.com, mchan@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, jdelvare@suse.com, linux@roeck-us.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, lvc-project@linuxtesting.org,
+ khoroshilov@ispras.ru
 
 Hello:
 
-This patch was applied to bpf/bpf-next.git (master)
+This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 28 Aug 2023 08:47:32 +0000 you wrote:
-> My recent patch forgot to change error handling for IP_TRANSPARENT
-> socket option.
+On Fri, 25 Aug 2023 22:04:41 +0300 you wrote:
+> 'tp->irq_max' value is either 1 [L16336] or 5 [L16354], as indicated in
+> tg3_get_invariants(). Therefore, 'i' can't exceed 4 in tg3_init_one()
+> that makes (i <= 4) always true. Moreover, 'intmbx' value set at the
+> last iteration is not used later in it's scope.
 > 
-> WARNING: bad unlock balance detected!
-> 6.5.0-rc7-syzkaller-01717-g59da9885767a #0 Not tainted
-> -------------------------------------
-> syz-executor151/5028 is trying to release lock (sk_lock-AF_INET) at:
-> [<ffffffff88213983>] sockopt_release_sock+0x53/0x70 net/core/sock.c:1073
-> but there are no more locks to release!
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] inet: fix IP_TRANSPARENT error handling
-    https://git.kernel.org/bpf/bpf-next/c/8be6f88b9d3f
+  - ethernet: tg3: remove unreachable code
+    https://git.kernel.org/netdev/net/c/ec1b90886f3c
 
 You are awesome, thank you!
 -- 
