@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-31208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5012C78C2CB
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:57:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEB478C2CC
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:58:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ACAF281111
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:57:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 077661C20A32
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BD515490;
-	Tue, 29 Aug 2023 10:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5C4154B8;
+	Tue, 29 Aug 2023 10:54:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E6215AE0
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:54:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 465DFC433C8;
-	Tue, 29 Aug 2023 10:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14E915AE0
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:54:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 060FAC433C7;
+	Tue, 29 Aug 2023 10:54:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693306456;
-	bh=pwxVh7O0mYqw2Ljn4tWnXFw2NWOIpp5wpRx6GKnF3MQ=;
+	s=k20201202; t=1693306463;
+	bh=6nCILmacmIccYtgXTE19gVmX2P5pq+VSU/q00ww6xVQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TlKbQjvVK9K4YSKtdymvF/Ur44cypX+U/4zLiElbDFRpRu05lbRZdQkf9hbUN9Us2
-	 m0zFUy/2rxA7JjWHaRt9dO0nQtqgQLhxcz/v3OBG1YuFbKNsaPCzG1hiSokn7hZYjQ
-	 1hj04nbSHJOHKWzZN0/f6gUehOAvk+VR36BiPaSdHUpJTl3WT9u0B/GgPeLOQlkO27
-	 u2tI8RrRRDVKg13ezQU3tJVgzvi2MlqooNH/OCA/0Q/do0Xn2mMNES8SnAa74Rq2na
-	 g0bq9Eg+kZvANWD1hn0SvCzWXrxqLaEIUExjRs+j49vZEekSGH9MlANBHsx9t9Yj5H
-	 lJvFWybYA14Lw==
+	b=NKMvejOVQzNvMY2e93hkV80IHU1WHDa9CV+dqb5VnfbKNuUKrEMzLB4uOGB2SQzpC
+	 85qAeuQSqF8U6R3+lmXoTByAQESpJon8YswKLOAvII8sNMqg+layFi5ztj+B/YNQoa
+	 MhIg59lBdg9wD1R5yNjNz8N3FVV1oZ9DFe95NUOvXHBA5jXwI+x5onYzwYbiU9LWFW
+	 yBWGOHUcjBG8ufUrJSp1/Qwi9A/xSOMsu4wjpRNha/N0TOsEeJOXKtW/SsJCjbT/fl
+	 TT7tEAHwo3avaY3ofdt54GTsSEHHCQ6S58yO+tZplSA+BTZX3vUJlK3TBIsIE2q7Ey
+	 JCHZrXJjyn0wA==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -64,9 +64,9 @@ To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 16/22] net: stmmac: dwmac-sti: use devm_stmmac_probe_config_dt()
-Date: Tue, 29 Aug 2023 18:40:27 +0800
-Message-Id: <20230829104033.955-17-jszhang@kernel.org>
+Subject: [PATCH net-next 17/22] net: stmmac: dwmac-stm32: use devm_stmmac_probe_config_dt()
+Date: Tue, 29 Aug 2023 18:40:28 +0800
+Message-Id: <20230829104033.955-18-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230829104033.955-1-jszhang@kernel.org>
 References: <20230829104033.955-1-jszhang@kernel.org>
@@ -83,14 +83,14 @@ variant of stmmac_probe_config_dt().
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-stm32.c   | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
-index 0d653bbb931b..4445cddc4cbe 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c
-@@ -273,20 +273,18 @@ static int sti_dwmac_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+index 3a09085819dc..7214a1b11b34 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+@@ -370,21 +370,18 @@ static int stm32_dwmac_probe(struct platform_device *pdev)
  	if (ret)
  		return ret;
  
@@ -107,27 +107,36 @@ index 0d653bbb931b..4445cddc4cbe 100644
 +	if (!dwmac)
 +		return -ENOMEM;
  
- 	ret = sti_dwmac_parse_data(dwmac, pdev);
+ 	data = of_device_get_match_data(&pdev->dev);
+ 	if (!data) {
+ 		dev_err(&pdev->dev, "no of match data provided\n");
+-		ret = -EINVAL;
+-		goto err_remove_config_dt;
++		return -EINVAL;
+ 	}
+ 
+ 	dwmac->ops = data;
+@@ -393,14 +390,14 @@ static int stm32_dwmac_probe(struct platform_device *pdev)
+ 	ret = stm32_dwmac_parse_data(dwmac, &pdev->dev);
  	if (ret) {
  		dev_err(&pdev->dev, "Unable to parse OF data\n");
 -		goto err_remove_config_dt;
 +		return ret;
  	}
  
- 	dwmac->fix_retime_src = data->fix_retime_src;
-@@ -296,7 +294,7 @@ static int sti_dwmac_probe(struct platform_device *pdev)
+ 	plat_dat->bsp_priv = dwmac;
  
- 	ret = clk_prepare_enable(dwmac->clk);
+ 	ret = stm32_dwmac_init(plat_dat);
  	if (ret)
 -		goto err_remove_config_dt;
 +		return ret;
  
- 	ret = sti_dwmac_set_mode(dwmac);
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
  	if (ret)
-@@ -310,8 +308,6 @@ static int sti_dwmac_probe(struct platform_device *pdev)
+@@ -410,8 +407,6 @@ static int stm32_dwmac_probe(struct platform_device *pdev)
  
- disable_clk:
- 	clk_disable_unprepare(dwmac->clk);
+ err_clk_disable:
+ 	stm32_dwmac_clk_disable(dwmac);
 -err_remove_config_dt:
 -	stmmac_remove_config_dt(pdev, plat_dat);
  
