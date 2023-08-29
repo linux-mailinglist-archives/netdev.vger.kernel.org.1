@@ -1,96 +1,183 @@
-Return-Path: <netdev+bounces-31155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBA478BEFC
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 09:13:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA1078BF58
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 09:42:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40E4D280F8E
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 07:13:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A26EE280BF5
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 07:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D061117;
-	Tue, 29 Aug 2023 07:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8708763A3;
+	Tue, 29 Aug 2023 07:42:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF77139A
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:13:52 +0000 (UTC)
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D8D1A2
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 00:13:48 -0700 (PDT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1bb29dc715bso46116875ad.1
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 00:13:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693293228; x=1693898028;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r90dxKRrAxSdcMhUbemphmlT2U8eOTFjROIuf6rT5x4=;
-        b=OmDrAan5um8rbQG4Rugh1IKq8KHhSZRBjWm0PO4Rv5KvDesPpqsIQghlh0g9UzWoDr
-         yNyJBBp/IThuumHIwebk3WxAiTCsiO+cAYlhwAYx4PrNIWzFCmd/huz3T/SGtSsoH9n8
-         2HuKKpwdxppU4rTICV88dD3K23jn8Q3ZybO9bAFayk2PWufbiwg65JlAIQXQdOJNJ8I6
-         jEwbbu5u4TQDNlfbyCaIAzOid8uYHmrzu4vTIFUGtOYb9NngajEpqzOgkRKM6CcccF7w
-         HH/p5t5UtxEYYdm1jiylrhkVJ0ozjrbWnp9dDlBButfyXA08MvfcdxQVnlncClcfiY07
-         1yXA==
-X-Gm-Message-State: AOJu0YwN0fLXdjCrJ3Doxk9QjsPVQjV0+vK9OWHEzajcdDiLX0opnvBv
-	F5JnkbFRlCD6RTaxedR3fgDFjOL+XovJKi4meYHoXcHLCyPG
-X-Google-Smtp-Source: AGHT+IErkkDOVDGY+PuYZzei0K8WpzuukspOAHFs8WRVugxDVl1JUe41zpPhjBD/UlW1LWjodN3QvT4eAMg13XvKNMjkk03i/Bbd
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CDCEC6
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:42:08 +0000 (UTC)
+Received: from out-248.mta1.migadu.com (out-248.mta1.migadu.com [IPv6:2001:41d0:203:375::f8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2280139;
+	Tue, 29 Aug 2023 00:42:04 -0700 (PDT)
+Message-ID: <ca10040f-b7fa-7c43-1c89-6706d13b2747@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1693294923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kzCYK+m1dXoYq1GdX9wRq/xLcjMjzBwHZbogX1zaiXI=;
+	b=wx9qXfUOb6FlguPiqwy6R82+yQxWta9+fR66YAQ2/1ZdnqJnQPp1kHU4jR8nRlngim3iOe
+	HThmnzNEUSaEuQwHiVi+WxF88JyUG2K+H0WcvTm70cW04LSIUXyP6AZ74VPb7aBxP9rojs
+	L1LrBvpa76A1LVLwfY5LHU6MjnCVZUs=
+Date: Tue, 29 Aug 2023 15:41:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:903:41d2:b0:1c0:bf60:ba51 with SMTP id
- u18-20020a17090341d200b001c0bf60ba51mr635680ple.3.1693293228282; Tue, 29 Aug
- 2023 00:13:48 -0700 (PDT)
-Date: Tue, 29 Aug 2023 00:13:48 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005f5c1306040a8d02@google.com>
-Subject: [syzbot] Monthly dccp report (Aug 2023)
-From: syzbot <syzbot+list9a743d22b2ab0cf14540@syzkaller.appspotmail.com>
-To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
+Content-Language: en-US
+To: Matthew Wilcox <willy@infradead.org>
+Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Pavel Begunkov <asml.silence@gmail.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Stefan Roesch <shr@fb.com>,
+ Clay Harris <bugs@claycon.org>, Dave Chinner <david@fromorbit.com>,
+ "Darrick J . Wong" <djwong@kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-cachefs@redhat.com, ecryptfs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+ linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+ linux-mm@kvack.org, linux-nilfs@vger.kernel.org, devel@lists.orangefs.org,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-mtd@lists.infradead.org, Wanpeng Li <wanpengli@tencent.com>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-3-hao.xu@linux.dev>
+ <ZOu1xYS6LRmPgEiV@casper.infradead.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Hao Xu <hao.xu@linux.dev>
+In-Reply-To: <ZOu1xYS6LRmPgEiV@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello dccp maintainers/developers,
+On 8/28/23 04:44, Matthew Wilcox wrote:
+> On Sun, Aug 27, 2023 at 09:28:26PM +0800, Hao Xu wrote:
+>> +++ b/fs/xfs/libxfs/xfs_da_btree.c
+>> @@ -2643,16 +2643,32 @@ xfs_da_read_buf(
+>>   	struct xfs_buf_map	map, *mapp = &map;
+>>   	int			nmap = 1;
+>>   	int			error;
+>> +	int			buf_flags = 0;
+>>   
+>>   	*bpp = NULL;
+>>   	error = xfs_dabuf_map(dp, bno, flags, whichfork, &mapp, &nmap);
+>>   	if (error || !nmap)
+>>   		goto out_free;
+>>   
+>> +	/*
+>> +	 * NOWAIT semantics mean we don't wait on the buffer lock nor do we
+>> +	 * issue IO for this buffer if it is not already in memory. Caller will
+>> +	 * retry. This will return -EAGAIN if the buffer is in memory and cannot
+>> +	 * be locked, and no buffer and no error if it isn't in memory.  We
+>> +	 * translate both of those into a return state of -EAGAIN and *bpp =
+>> +	 * NULL.
+>> +	 */
+> 
+> I would not include this comment.
 
-This is a 31-day syzbot report for the dccp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/dccp
+No strong comment here, since this patch is mostly from Dave, it's
+better if Dave can ack this.
 
-During the period, 0 new issues were detected and 1 were fixed.
-In total, 4 issues are still open and 5 have been fixed so far.
+> 
+>> +	if (flags & XFS_DABUF_NOWAIT)
+>> +		buf_flags |= XBF_TRYLOCK | XBF_INCORE;
+>>   	error = xfs_trans_read_buf_map(mp, tp, mp->m_ddev_targp, mapp, nmap, 0,
+>>   			&bp, ops);
+> 
+> what tsting did you do with this?  Because you don't actually _use_
+> buf_flags anywhere in this patch (presumably they should be the
+> sixth argument to xfs_trans_read_buf_map() instead of 0).  So I can only
+> conclude that either you didn't test, or your testing was inadequate.
+> 
 
-Some of the still happening issues:
 
-Ref Crashes Repro Title
-<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
-                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
-<2> 48      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
-                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
-<3> 12      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
-                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
+The tests I've done are listed in the cover-letter, this one is missed, 
+the tricky place is it's hard to get this kind of mistake since it runs
+well without nowait logic...I'll fix it in next version.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>>   	if (error)
+>>   		goto out_free;
+>> +	if (!bp) {
+>> +		ASSERT(flags & XFS_DABUF_NOWAIT);
+> 
+> I don't think this ASSERT is appropriate.
+> 
+>> @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
+>>   				bp = NULL;
+>>   			}
+>>   
+>> -			if (*lock_mode == 0)
+>> -				*lock_mode = xfs_ilock_data_map_shared(dp);
+>> +			if (*lock_mode == 0) {
+>> +				*lock_mode =
+>> +					xfs_ilock_data_map_shared_generic(dp,
+>> +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
+>> +				if (!*lock_mode) {
+>> +					error = -EAGAIN;
+>> +					break;
+>> +				}
+>> +			}
+> 
+> 'generic' doesn't seem like a great suffix to mean 'takes nowait flag'.
+> And this is far too far indented.
+> 
+> 			xfs_dir2_lock(dp, ctx, lock_mode);
+> 
+> with:
+> 
+> STATIC void xfs_dir2_lock(struct xfs_inode *dp, struct dir_context *ctx,
+> 		unsigned int lock_mode)
+> {
+> 	if (*lock_mode)
+> 		return;
+> 	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
+> 		return xfs_ilock_data_map_shared_nowait(dp);
+> 	return xfs_ilock_data_map_shared(dp);
+> }
+> 
+> ... which I think you can use elsewhere in this patch (reformat it to
+> XFS coding style, of course).  And then you don't need
+> xfs_ilock_data_map_shared_generic().
+> 
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+How about rename xfs_ilock_data_map_shared() to 
+xfs_ilock_data_map_block() and rename 
+xfs_ilock_data_map_shared_generic() to xfs_ilock_data_map_shared()?
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+STATIC void xfs_ilock_data_map_shared(struct xfs_inode *dp, struct 
+dir_context *ctx, unsigned int lock_mode)
+{
+  	if (*lock_mode)
+  		return;
+  	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
+  		return xfs_ilock_data_map_shared_nowait(dp);
+  	return xfs_ilock_data_map_shared_block(dp);
+}
 
-You may send multiple commands in a single email message.
+
 
