@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-31270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9561D78C630
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:37:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 085A578C631
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:37:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C60471C20A60
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:36:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8432281255
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4F51800A;
-	Tue, 29 Aug 2023 13:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A8218017;
+	Tue, 29 Aug 2023 13:34:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E059117FF9
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:33:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D38CC433C7;
-	Tue, 29 Aug 2023 13:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3DC18013
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:33:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9995C43391;
+	Tue, 29 Aug 2023 13:33:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693316037;
-	bh=yRyRN37PTHMzVlb8n1Eahwe2ZeMZDpDdESAEjlEta90=;
+	s=k20201202; t=1693316039;
+	bh=phlraBDcLpGYR0u6On3c6JH2VMHDE1fmHi6oj5Wf0p0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=omhRlHN5qQYgztZ7rPtM1bmOp3ShtSyE5UPC0t1yq5xYpWBXpDSfAcIu2Z+SUoHvt
-	 FZaHV0nkCKNfuUWpnO+O2w4GhpMBEuflI6K0w81eMqSAn3XCaC3s74XJ/bLtcnmPAz
-	 Sydg+M5PyF9vXi74wEpVl+a128bf4aH4k/oPOqL78FZnpMCn/07KWxnm4XVJaGz4EO
-	 /axRcxS6WerdMrnGE2qRLvzBC9Kd9VRkCNUPiCmt+6T401MaKDy/dOuta1Zwq3IUpx
-	 MGqf6dS7CsloAnS6USPbSML3tlZbikpX0qMcjPcjKUeJlrrfObSAWfQreQNvgle+uW
-	 3XT6zPzgyt3+A==
+	b=ayfS5D4cJzqE3CMHyqK78ftvGj0OvgMnd9CCtaSbxhJGqvZO3X7N72WqIuIPJa1Ph
+	 Fgrhr1tdKeW+7zgM0X0Z1uF5saWnr2PR0S564LzfCsXt5m8/NBVnB/lwcQCoUoNRpJ
+	 7Q5YL6PpCJuy1cTc1pVQzL9PkluHrLAJU3K9SGVAKYkmcVZGjuTxII48nEufrTTwKV
+	 kUsdUrvPsWb+hrQaqrlQdi/Km2g2X1jS1sc9FnpDG5CerR2j2rL0vwYHjFT0TcAMgo
+	 d/dAPF+zmi7pZ5fBAfOKqxrZnab2V9+7XK7TO0n9gaZBKX2eqZMDR2Bm/Br1jaM8/z
+	 71ETo/uxByg3w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: David Christensen <drc@linux.vnet.ibm.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	aelior@marvell.com,
-	skalluru@marvell.com,
-	manishc@marvell.com,
+	vyasevich@gmail.com,
+	nhorman@tuxdriver.com,
+	marcelo.leitner@gmail.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-sctp@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 2/6] bnx2x: fix page fault following EEH recovery
-Date: Tue, 29 Aug 2023 09:33:48 -0400
-Message-Id: <20230829133352.520671-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 3/6] sctp: handle invalid error codes without calling BUG()
+Date: Tue, 29 Aug 2023 09:33:49 -0400
+Message-Id: <20230829133352.520671-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230829133352.520671-1-sashal@kernel.org>
 References: <20230829133352.520671-1-sashal@kernel.org>
@@ -61,52 +61,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.254
 Content-Transfer-Encoding: 8bit
 
-From: David Christensen <drc@linux.vnet.ibm.com>
+From: Dan Carpenter <dan.carpenter@linaro.org>
 
-[ Upstream commit 7ebe4eda4265642859507d1b3ca330d8c196cfe5 ]
+[ Upstream commit a0067dfcd9418fd3b0632bc59210d120d038a9c6 ]
 
-In the last step of the EEH recovery process, the EEH driver calls into
-bnx2x_io_resume() to re-initialize the NIC hardware via the function
-bnx2x_nic_load().  If an error occurs during bnx2x_nic_load(), OS and
-hardware resources are released and an error code is returned to the
-caller.  When called from bnx2x_io_resume(), the return code is ignored
-and the network interface is brought up unconditionally.  Later attempts
-to send a packet via this interface result in a page fault due to a null
-pointer reference.
+The sctp_sf_eat_auth() function is supposed to return enum sctp_disposition
+values but if the call to sctp_ulpevent_make_authkey() fails, it returns
+-ENOMEM.
 
-This patch checks the return code of bnx2x_nic_load(), prints an error
-message if necessary, and does not enable the interface.
+This results in calling BUG() inside the sctp_side_effects() function.
+Calling BUG() is an over reaction and not helpful.  Call WARN_ON_ONCE()
+instead.
 
-Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+This code predates git.
+
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ net/sctp/sm_sideeffect.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index b5f58c62e7d20..211fbc8f75712 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -14426,11 +14426,16 @@ static void bnx2x_io_resume(struct pci_dev *pdev)
- 	bp->fw_seq = SHMEM_RD(bp, func_mb[BP_FW_MB_IDX(bp)].drv_mb_header) &
- 							DRV_MSG_SEQ_NUMBER_MASK;
- 
--	if (netif_running(dev))
--		bnx2x_nic_load(bp, LOAD_NORMAL);
-+	if (netif_running(dev)) {
-+		if (bnx2x_nic_load(bp, LOAD_NORMAL)) {
-+			netdev_err(bp->dev, "Error during driver initialization, try unloading/reloading the driver\n");
-+			goto done;
-+		}
-+	}
- 
- 	netif_device_attach(dev);
- 
-+done:
- 	rtnl_unlock();
- }
+diff --git a/net/sctp/sm_sideeffect.c b/net/sctp/sm_sideeffect.c
+index 8d32229199b96..c964e7ca6f7e5 100644
+--- a/net/sctp/sm_sideeffect.c
++++ b/net/sctp/sm_sideeffect.c
+@@ -1240,7 +1240,10 @@ static int sctp_side_effects(enum sctp_event_type event_type,
+ 	default:
+ 		pr_err("impossible disposition %d in state %d, event_type %d, event_id %d\n",
+ 		       status, state, event_type, subtype.chunk);
+-		BUG();
++		error = status;
++		if (error >= 0)
++			error = -EINVAL;
++		WARN_ON_ONCE(1);
+ 		break;
+ 	}
  
 -- 
 2.40.1
