@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-31193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04AC878C297
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:52:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21FC78C298
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:53:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3633E1C209DA
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:52:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F2BD1C20A00
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E980914F98;
-	Tue, 29 Aug 2023 10:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2631014F9C;
+	Tue, 29 Aug 2023 10:52:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F9F1548A
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:52:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94D1CC433CB;
-	Tue, 29 Aug 2023 10:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B251548A
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:52:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F020DC433C7;
+	Tue, 29 Aug 2023 10:52:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693306355;
-	bh=OTXCsvCc3TTe8yvZj3iGweMMXsRHTGyqZXpD3RGqgpM=;
+	s=k20201202; t=1693306362;
+	bh=YlrN4bDSNF+KqWi7kN9bxa/oeNXOFAT09nZc/x9+vhk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NkzhTqN98TTwRlZCKO/14ohdzWUG5Bkr8JjeEbgWi77hFCnKnOR0S3Dst3xxKuYR7
-	 RSx8RBGo/jUzFzjMzYz10vSmA2vtzgE1V6HJ55acD+ACrWB1rYXt/ObTd1b2YDS5gh
-	 NUl3sMVvPXXuMWTmOPIb3SF12GIUAMjD2kjYJ0sMc988YzZ2pG5VX7t1DGISy16zg9
-	 tCxfOfCxPWrSw+jZzlszGFkLwo8TXNCpgkyVbfRK+oQ7izHZvhzURnO8o4wlX5Ardn
-	 /0nWw46etXTSPR0EYllLXuB5xAs3vSO7ujslVWArhxj4atdu4b05aaMjKOL2vVHNaI
-	 BkI/CxjPoaDBg==
+	b=MT7nQTlUYtZiYAgGtLh+udooCtUNmM5y7PhDkmFnTeeNwPirp2P35OpOTsHzsUoV2
+	 26aWoycgV/rvHl5bdRSndWyDksEsg0ZhUkQWFnEn5/EulaFgg2XMSRVVABk//MciFJ
+	 a+iGLwUF82z4m4SWtOAecwkNA2ROwzKZlk8a5cfbATRbmTN5HfdN6vMQmO8h4bO4YY
+	 EPS86bXYZfu5dUSRmoVV41IkGhWyd9Vz6MvYjeBOvKs0AcsUrh9OMWFdcyO0k9EXEm
+	 YAj01P2eZZ/cZm+IfeFXD8BbwIGqt74GOO9rFA2fzcyCZOJY8vIdQBhAz8wxkUcVUf
+	 ptPXdHcjefFVQ==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -64,9 +64,9 @@ To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 01/22] net: stmmac: dwmac-anarion: use devm_stmmac_probe_config_dt()
-Date: Tue, 29 Aug 2023 18:40:12 +0800
-Message-Id: <20230829104033.955-2-jszhang@kernel.org>
+Subject: [PATCH net-next 02/22] net: stmmac: dwmac-dwc-qos-eth: use devm_stmmac_probe_config_dt()
+Date: Tue, 29 Aug 2023 18:40:13 +0800
+Message-Id: <20230829104033.955-3-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230829104033.955-1-jszhang@kernel.org>
 References: <20230829104033.955-1-jszhang@kernel.org>
@@ -81,51 +81,60 @@ Content-Transfer-Encoding: 8bit
 Simplify the driver's probe() function by using the devres
 variant of stmmac_probe_config_dt().
 
-The remove_new() callback now needs to be switched to
-stmmac_pltfr_remove_no_dt().
-
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c   | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-index 58a7f08e8d78..0df3a2ad0986 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-@@ -115,7 +115,7 @@ static int anarion_dwmac_probe(struct platform_device *pdev)
- 	if (IS_ERR(gmac))
- 		return PTR_ERR(gmac);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+index 61ebf36da13d..ec924c6c76c6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+@@ -435,15 +435,14 @@ static int dwc_eth_dwmac_probe(struct platform_device *pdev)
+ 	if (IS_ERR(stmmac_res.addr))
+ 		return PTR_ERR(stmmac_res.addr);
  
 -	plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
 +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
  	if (IS_ERR(plat_dat))
  		return PTR_ERR(plat_dat);
  
-@@ -124,13 +124,7 @@ static int anarion_dwmac_probe(struct platform_device *pdev)
- 	anarion_gmac_init(pdev, gmac);
- 	plat_dat->bsp_priv = gmac;
- 
--	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
--	if (ret) {
--		stmmac_remove_config_dt(pdev, plat_dat);
--		return ret;
--	}
+ 	ret = data->probe(pdev, plat_dat, &stmmac_res);
+ 	if (ret < 0) {
+ 		dev_err_probe(&pdev->dev, ret, "failed to probe subdriver\n");
 -
--	return 0;
-+	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+-		goto remove_config;
++		return ret;
+ 	}
+ 
+ 	ret = dwc_eth_dwmac_config_dt(pdev, plat_dat);
+@@ -458,25 +457,17 @@ static int dwc_eth_dwmac_probe(struct platform_device *pdev)
+ 
+ remove:
+ 	data->remove(pdev);
+-remove_config:
+-	stmmac_remove_config_dt(pdev, plat_dat);
+ 
+ 	return ret;
  }
  
- static const struct of_device_id anarion_dwmac_match[] = {
-@@ -141,7 +135,7 @@ MODULE_DEVICE_TABLE(of, anarion_dwmac_match);
+ static void dwc_eth_dwmac_remove(struct platform_device *pdev)
+ {
+-	struct net_device *ndev = platform_get_drvdata(pdev);
+-	struct stmmac_priv *priv = netdev_priv(ndev);
+-	const struct dwc_eth_dwmac_data *data;
+-
+-	data = device_get_match_data(&pdev->dev);
++	const struct dwc_eth_dwmac_data *data = device_get_match_data(&pdev->dev);
  
- static struct platform_driver anarion_dwmac_driver = {
- 	.probe  = anarion_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove,
-+	.remove_new = stmmac_pltfr_remove_no_dt,
- 	.driver = {
- 		.name           = "anarion-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
+ 	stmmac_dvr_remove(&pdev->dev);
+ 
+ 	data->remove(pdev);
+-
+-	stmmac_remove_config_dt(pdev, priv->plat);
+ }
+ 
+ static const struct of_device_id dwc_eth_dwmac_match[] = {
 -- 
 2.40.1
 
