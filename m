@@ -1,192 +1,213 @@
-Return-Path: <netdev+bounces-31289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0A678C873
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 17:19:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C037D78C897
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 17:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1909D281208
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:19:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AFA028123E
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C83D17ACC;
-	Tue, 29 Aug 2023 15:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EEA17ACF;
+	Tue, 29 Aug 2023 15:29:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7091F17AB8
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:19:27 +0000 (UTC)
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16DAD1B3
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 08:19:25 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-40c72caec5cso340461cf.0
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 08:19:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693322364; x=1693927164; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yok9zOHaaso3upHdgoBzUMlvLWZAGMbiAVLczgzy+QQ=;
-        b=QbFAVpCsAsu+MxbLJWtN17rZOZufL/GRppX+k4sM4z4csUoUzbFh+yfL1aIouUvn2N
-         hhNqNS4aWzVg8gvPAsKyLKnKccpKWgN5UDPh+F7QgZUMIFOhD4qq+GnLRFqyYUPkTLlL
-         5JMDn1Je0/50QOOYSZ2W2r7iW4K8K6BtEB47NqoFKGiiFuhtcuE6o6oI+f/XyqK8ozuU
-         /4cWFWMni0jGONDDy8L1Ztg7igGBJjlDCkr8fAVwNUuaXzQcRJSp3d1B/C09XO7oMX4i
-         eEwXq+o5oTuKVzTFHGfP+YUkOATaSrK6QQjmmG6KVqUPqcpe1h4PR0KI5ny2jIw2OI43
-         CW/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693322364; x=1693927164;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yok9zOHaaso3upHdgoBzUMlvLWZAGMbiAVLczgzy+QQ=;
-        b=blqoin/g/Qb4K0KX3X8i6g6IgtyRGBu/42Am7QAK5gPPHH0MKRKuBPnsqZLZ6o+cRN
-         YJNxY4TKl+xha/C2u3Y2cEEOWL/UUAsC7h2x1oPrxKaz7h4z6Uj97OwxDw6cnDieHuVt
-         iJZHZSyHZZLxHnUQ8p/Hkmyx/HZ0R+6T1VycLYg47+3kUADqLjGCCdeHyn6Vh5XmwIyi
-         FYL6U1znsU/6LeQIndWhhx9+XSFXwvjrS4unnNWQCWLzDMAJ6+OpT0HHnLQO5KpHX8Wn
-         Ed9g78sIpZqyj4a/2LLBTGI5fe1/KBfD4CIPCfv0opAdyex1Zv32aq8BOhLyz9GtSLoO
-         Qf+w==
-X-Gm-Message-State: AOJu0YzASjjwq0PH24GEfmJIJ/vAM/QbHSp1Z878qPNS3vStVzYIXCQk
-	U158OZd2tyajOYNJDVxg4xmdOSBcYvspAvxYN8qnDg==
-X-Google-Smtp-Source: AGHT+IFf0VG5PTlQt+GAvPdfLw2R2NzuOjnqKj3f9VsvfQrxRoWYJrhpfTzuDfd9gXFAUymhyFN3untbNOoz6X5VAKI=
-X-Received: by 2002:ac8:5b0f:0:b0:410:4845:8d37 with SMTP id
- m15-20020ac85b0f000000b0041048458d37mr161045qtw.29.1693322363932; Tue, 29 Aug
- 2023 08:19:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574A814F6B
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:29:25 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D55132;
+	Tue, 29 Aug 2023 08:29:22 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 31DCA80702;
+	Tue, 29 Aug 2023 17:29:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693322961;
+	bh=GXRLNBa2w1Prm2RkQtWFwcIN9kBBUv94ZVlih8cyj54=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oK5fLib1FGuYUOCooikMUvyGA7BNtcSGvVmHLRl2cMKvEINL/C6ZYCgE6IjVBYbD+
+	 BQTlZPmuaX/K3wW0YTksg/+d+sy5OrLDfVWgEUWrHW8tb70peHU2Lsvn8zTWsES12I
+	 XFPP78mxNNuaHPm3k2DFlAJGkcn8XTg9USza97HO0EiOuO8RqaY3dkPDcPdZShiuVO
+	 1j8ubzS2ZHO1o5WR3DzOtQwxTWGui6KMQDd0tb0GLT5QvYFNbxC0DY3pjviw+LK7WE
+	 8dAjndFtzlc/cERHItK3dJiI0IcrFFbdvBno22qngcKsqiRXAya7sCKpu9a2zrolyd
+	 zZOC/M8U7/MUA==
+Date: Tue, 29 Aug 2023 17:29:13 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com, Oleksij
+ Rempel <linux@rempel-privat.de>, Arun Ramadoss
+ <arun.ramadoss@microchip.com>, f.fainelli@gmail.com, andrew@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ Woojung.Huh@microchip.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477
+ errata (DS80000754C)
+Message-ID: <20230829172913.518210b0@wsk>
+In-Reply-To: <20230829144209.GD31399@pengutronix.de>
+References: <BYAPR11MB35583A648E4E44944A0172A0ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+	<20230825103911.682b3d70@wsk>
+	<862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
+	<BYAPR11MB3558A24A05D30BA93408851EECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+	<20230826104910.voaw3ndvs52yoy2v@skbuf>
+	<20230829103533.7966f332@wsk>
+	<20230829101851.435pxwwse2mo5fwi@skbuf>
+	<20230829132429.529283be@wsk>
+	<20230829114739.GC31399@pengutronix.de>
+	<20230829143829.68410966@wsk>
+	<20230829144209.GD31399@pengutronix.de>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <00000000000010353a05fecceea0@google.com> <6144228a-799f-4de3-8483-b7add903df0c@collabora.com>
-In-Reply-To: <6144228a-799f-4de3-8483-b7add903df0c@collabora.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 29 Aug 2023 17:19:13 +0200
-Message-ID: <CANn89iJiBp9t69Y3htwGGb=pTWhjFQPxKPD1E6uSFks5NrgctA@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING in inet_sock_destruct (4)
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: syzbot <syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com>, 
-	bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	jacob.e.keller@intel.com, jiri@nvidia.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, fishgylk@gmail.com, bagasdotme@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/m3=fATDj/Tb/P3I_F3IAylm";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 29, 2023 at 2:44=E2=80=AFPM Muhammad Usama Anjum
-<usama.anjum@collabora.com> wrote:
->
-> On 6/23/23 7:36 PM, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit: 45a3e24f65e9 Linux 6.4-rc7
-> > git tree: upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D160cc82f280=
-000
-> > kernel config: https://syzkaller.appspot.com/x/.config?x=3D2cbd298d0aff=
-1140
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3Dde6565462ab54=
-0f50e47
-> > compiler: gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils f=
-or Debian) 2.35.2
-> > syz repro: https://syzkaller.appspot.com/x/repro.syz?x=3D160aacb7280000
-> > C reproducer: https://syzkaller.appspot.com/x/repro.c?x=3D17c115d328000=
-0
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/c09bcd4ec365/d=
-isk-45a3e24f.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/03549b639718/vmli=
-nux-45a3e24f.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/91f203e5f63e=
-/bzImage-45a3e24f.xz
-> >
-> > The issue was bisected to:
-> >
-> > commit 565b4824c39fa335cba2028a09d7beb7112f3c9a
-> > Author: Jiri Pirko <jiri@nvidia.com>
-> > Date: Mon Feb 6 09:41:51 2023 +0000
-> >
-> > devlink: change port event netdev notifier from per-net to global
-> >
-> > bisection log: https://syzkaller.appspot.com/x/bisect.txt?x=3D110a1a5b2=
-80000
-> > final oops: https://syzkaller.appspot.com/x/report.txt?x=3D130a1a5b2800=
-00
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D150a1a5b280=
-000
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the co=
-mmit:
-> > Reported-by: syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com
-> > Fixes: 565b4824c39f ("devlink: change port event netdev notifier from p=
-er-net to global")
-> >
-> > ------------[ cut here ]------------
-> > WARNING: CPU: 0 PID: 5025 at net/ipv4/af_inet.c:154 inet_sock_destruct+=
-0x6df/0x8a0 net/ipv4/af_inet.c:154
-> This same warning has been spotted and reported:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D217555
->
-> Syzbot has found the same warning on 4.14, 5.15, 6.1, 6.5-rc and latest
-> mainline (1c59d383390f9) kernels. The provided reproducers (such as
-> https://syzkaller.appspot.com/text?tag=3DReproC&x=3D15a10e8aa80000) are
-> reproducing the same warnings on multicore (at least 2 CPUs) qemu instanc=
-e.
+--Sig_/m3=fATDj/Tb/P3I_F3IAylm
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Can you test the following fix ?
-Thanks.
+Hi Oleksij,
 
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index 25816e790527dbd6ff55ffb94762b5974e8144aa..1085357b30c9a0d4bf7a578cebf=
-3eeddec953632
-100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -377,8 +377,13 @@ static int dccp_v6_conn_request(struct sock *sk,
-struct sk_buff *skb)
-        if (ipv6_opt_accepted(sk, skb, IP6CB(skb)) ||
-            np->rxopt.bits.rxinfo || np->rxopt.bits.rxoinfo ||
-            np->rxopt.bits.rxhlim || np->rxopt.bits.rxohlim) {
-+               /* Only initialize ireq->pktops once.
-+                * We must take a refcount on skb because ireq->pktops
-+                * could be consumed immediately.
-+                */
-                refcount_inc(&skb->users);
--               ireq->pktopts =3D skb;
-+               if (cmpxchg(&ireq->pktopts, NULL, skb))
-+                       refcount_dec(&skb->users);
-        }
-        ireq->ir_iif =3D READ_ONCE(sk->sk_bound_dev_if);
+> On Tue, Aug 29, 2023 at 02:38:29PM +0200, Lukasz Majewski wrote:
+> > Hi Oleksij, =20
+>=20
+> ...
+>=20
+> > Hence, I would prefer to apply the Errata and then somebody, who
+> > would like to enable EEE can try if it works for him. =20
+>=20
+> ok.
+>=20
+> > IMHO, code to fix erratas shall be added unconditionally, without
+> > any "freedom of choic =20
+>=20
+> This claim is not consistent with the patch. To make it without
+> ability to enable EEE, you will need to clear all eee_supported bits.
+> If this HW is really so broken, then it is the we how it should be
+> fixed.
+>=20
+> > > Beside, are you able to reproduce this issue? =20
+> >=20
+> > Yes, I can reproduce the issue. I do use two Microchip's development
+> > boards (KSZ9477-EVB [1]) connected together to test HSR as well as
+> > communication with HOST PC. =20
+>=20
+> I use KSZ9477-EVB as well.
+>=20
+> > The network on this board without this patch is not usable
+> > (continually I do encounter link up/downs). =20
+>=20
+> My test setup runs currently about two hours. It had 4 link drops on
+> LAN3 and none on other ports. Swapping cables connected to LAN2 and
+> LAN3 still let the LAN3 sometimes drop the connection. So far, for
+> example LAN2 works stable and this is probably the reason why I have
+> not seen this issue before. After disabling EEE on LAN3 I start
+> getting drops on LAN2.
+>=20
 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 6e86721e1cdbb8d47b754a2675f6ab1643c7342c..d45aa267473c4ab817cfda06966=
-a536718b50a53
-100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -798,8 +798,13 @@ static void tcp_v6_init_req(struct request_sock *req,
-             np->rxopt.bits.rxinfo ||
-             np->rxopt.bits.rxoinfo || np->rxopt.bits.rxhlim ||
-             np->rxopt.bits.rxohlim || np->repflow)) {
-+               /* Only initialize ireq->pktops once.
-+                * We must take a refcount on skb because ireq->pktops
-+                * could be consumed immediately.
-+                */
-                refcount_inc(&skb->users);
--               ireq->pktopts =3D skb;
-+               if (cmpxchg(&ireq->pktopts, NULL, skb))
-+                       refcount_dec(&skb->users);
-        }
- }
+Ok.
+
+> > Please be also aware, that this errata fix is (implicitly I think)
+> > already present in the kernel:
+> > https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/micrel.c=
+#L1804
+> >=20
+> > However, the execution order of PHY/DSA functions with newest
+> > mainline makes it not working any more (I've described it in
+> > details in the earlier mail to Vladimir). =20
+>=20
+> Ok, since it was already not advertised by default, I have nothing
+> against having default policy to not advertise EEE for this switch.
+>=20
+
+Ok.
+
+> On other hand, since this functionality is not listed as supported by
+> the KSZ9477 datasheet (No word about IEEE 802.3az Energy Efficient
+> Ethernet (EEE)) compared to KSZ8565R datasheet (where EEE support is
+> listed) and it is confirmed to work not stable enough, then it should
+> be disabled properly.
+
+I've described this problem in more details here:
+https://lore.kernel.org/lkml/20230829132429.529283be@wsk/
+
+-------->8---------
+The issue is that ksz9477_config_init() (drivers/net/phy/micrel.c) is
+executed AFTER generic phy_probe():
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/phy_device.c=
+#L3256
+in which the EEE advertisement registers are read.
+
+Hence, those registers needs to be cleared earlier - as I do in
+ksz9477_setup() in drivers/net/dsa/microchip/ksz9477.
+
+Here the precedence matters ...
+----------8<-------------
+
+> The phydev->supported_eee should be cleared.
+> See ksz9477_get_features().
+>=20
+
+Removing the linkmod_and() from ksz9477_get_features():
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/micrel.c#L14=
+08
+
+doesn't help.
+
+It looks like it is done too late (please read the above e-mail). We
+would need to disable the eee support at all for this switch IC or
+apply the original version of this patch (I mean clear in-KSZ9477 EEE
+advertisement register early).
+
+>=20
+> Regards,
+> Oleksij
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/m3=fATDj/Tb/P3I_F3IAylm
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTuDskACgkQAR8vZIA0
+zr0SzAf8CF4+HvTpzAC4rMQhvCWNO2d9+Ik3lbPeKjmb8NTc271HPNi/9rVI7feR
+7H3KIOKiRHeLwcfYUMhZ2/YFa3Cz4M2V0PRn2e3M7bd0/8d4qy05mbwpM7vs8plb
+1QMbHrtqWaK9hN+mErgbV1y+nqCZIf/zJluQp4GAwLKknedR7/5PSHJ6SU04lQLy
+J/y+fgrxB7N0muLoOLfPT9TuEEZ1DnzBQawk951kfjOsaxIGuweOmAsjTNavWlf3
+FI4d0RTCsupVrov+JIsWJtaHnMYSSYS44dBgnxAFkgdx8bMoMbSA1oRxwIj+9tYP
+zcfQr9+gkIQNcRziQ+ZpP1uvLWyBDw==
+=5Cw7
+-----END PGP SIGNATURE-----
+
+--Sig_/m3=fATDj/Tb/P3I_F3IAylm--
 
