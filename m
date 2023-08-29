@@ -1,157 +1,138 @@
-Return-Path: <netdev+bounces-31172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877E078C19F
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 11:39:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 100A278C261
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 867A51C209C8
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 09:39:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3D89280FF2
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438D814F78;
-	Tue, 29 Aug 2023 09:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61CC14F73;
+	Tue, 29 Aug 2023 10:40:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D3214F69
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 09:39:55 +0000 (UTC)
-Received: from mail-pf1-f208.google.com (mail-pf1-f208.google.com [209.85.210.208])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED97C9E
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 02:39:53 -0700 (PDT)
-Received: by mail-pf1-f208.google.com with SMTP id d2e1a72fcca58-68a3ba17c7bso4445364b3a.2
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 02:39:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693301993; x=1693906793;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hkrIRuB/KPiotjwKowWNb1HI/98DR9xAPXUPa4EZXHE=;
-        b=O9KJma7npK9//V2Oz1Hx3J0XAAcOjUUdq7IdMvEVP4gfCl9Kzc9M/+BOcmu3jWoeU4
-         A65n1V4GMXmIBHS3fDdVjBpgz9AazvuR/POHJSRv+o+BA4HwLKrucFQ/c3db8Nm/Pxvm
-         YCVqr6ahU81Muq87RUFMgwmjwL5Vcr8ui1FLF3W0GGUmFFHNnDG4bJGDVaFU1/abGMVX
-         q2FOUh/3mPsP7kTOE8YS0SxHM7sMDmKUKo/K+H97W/XODQPw7iLjvtDHTTN/V7S2Acs5
-         31EE0hWTGySmaReHRoSMBRqo1EAZlZupcCfNFimbrbsTG+3cGbQ6n8cyQvHPjHR7Q4vi
-         50wg==
-X-Gm-Message-State: AOJu0YwZj/VByE2e3jPA57kZ6keIv6NIMH0GvUzZQf9df2xB9w2AdPsK
-	JTNgc+bOytXzWfb4DCMiJOgPw+Nvfd+0OTTjOIqUDdKNkDbp
-X-Google-Smtp-Source: AGHT+IEdy+SdGk+xeL79w68etB+bpMNJdFi/Zg+lDXeT5igRdxr5vPtbLZDZoPGe/9Fh97TleRSOarPSGNJSggDQ6tT9LAX0TQa0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FBF14F6E
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:40:10 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2072.outbound.protection.outlook.com [40.107.92.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B905219A
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 03:40:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dWlpBzGgaDoD3U0jH93pNek1RwjasyPkwlYQHCpGB4FXowgnThpmlvouUs2yp/03yvb4nHiEST43+hxlyk4i9FlDhcY1xqCH72UQ18YXog7TGRkOW/p1oIfAjM8oA12uXolOhMmDjdx7OuZQq6oke5njpnRPUuzjR/rkBeuR1UfBXO7DEdJ4GBifM5NGBmt+ouuQRwJyb4n9x+x0NhSD8SVwvew+xf0jXswQ0WJVMrwngnbzx1nN3c/5PnpAnxfkOWq++XHXi1Hij9yBax685EeJbnc/j4C62zXvwMiP97aQUpXyPMAmGZGeCsUzUgWDSTLTsQL7DsDh2wZwNXpgyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zyN9N5JJSVfgbHGWT0dFofVIUrSHJlesDAms79y4R/U=;
+ b=jvGkGpJ85f4DA9w8fR660s3Fm6JR4YkMMA4caTnvGgV1YgEuN73mWrWOma/l87szfLPYqf2OwArEIecGv6EqpY2XsmHkU84Juvh4dm3rlY9c+ka1Rf6MfDzw7IGEBxrxbsndp96alQ+0N5ZZbXMrtZ9GEabXsktNbBwgJdhh34/aZg1FcMgndi2KHEnmmGo2+wwC2qV2uCnIZ3OOk6ySn5dFW5O0/ke6rBAo+2UXznoX/LjUYhkcqOBymK77YB422hwF5FyuxO3czHsHtLX78r5ZyfjLkc4Y/MYBwbhsksE9XvYHPl6DuyR6oNORCp+ylWlvHziZOyodHvylgKsQ2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=networkplumber.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zyN9N5JJSVfgbHGWT0dFofVIUrSHJlesDAms79y4R/U=;
+ b=T+0F95G7esd9iJBfZVfWKNgSLjfMSdDsVbK94gzbwknhPrXe58znxRDPRLVAjXxtLUbOgsvqRzN8ZQ+vxFEoFThWhMwJVrRSP+niCV4w22/PjN5B9TdUIpzOv/DmWr5gpUo4nTL68B+XVL8TYFx3cqDsfjeNNpUGLgrtyLivFkjrks4Dm/XuokN2RpgAzRhjtX3N/UeszoUKJ0qHi7/8KCe/CvA/4ogQLGcwIqGKdRC+l7eh0g+POJnMNYBhOOtBt2poNzQHO2mNaQaMZLC+bvydZo5Q98GvNaGUebRAx3B0uDa6+bk5qvarFQw/UYxDCHv0sL/rDyBPnsNR6XbK2w==
+Received: from BY5PR04CA0020.namprd04.prod.outlook.com (2603:10b6:a03:1d0::30)
+ by SJ1PR12MB6217.namprd12.prod.outlook.com (2603:10b6:a03:458::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Tue, 29 Aug
+ 2023 10:40:07 +0000
+Received: from CO1PEPF000044EF.namprd05.prod.outlook.com
+ (2603:10b6:a03:1d0:cafe::2a) by BY5PR04CA0020.outlook.office365.com
+ (2603:10b6:a03:1d0::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35 via Frontend
+ Transport; Tue, 29 Aug 2023 10:40:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000044EF.mail.protection.outlook.com (10.167.241.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.17 via Frontend Transport; Tue, 29 Aug 2023 10:40:06 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 29 Aug 2023
+ 03:39:56 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 29 Aug
+ 2023 03:39:54 -0700
+References: <20230823100128.54451-1-francois.michel@uclouvain.be>
+ <20230823100128.54451-2-francois.michel@uclouvain.be>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: <francois.michel@uclouvain.be>
+CC: <netdev@vger.kernel.org>, <stephen@networkplumber.org>
+Subject: Re: [PATCH v2 iproute2-next 1/2] tc: support the netem seed
+ parameter for loss and corruption events
+Date: Tue, 29 Aug 2023 12:07:25 +0200
+In-Reply-To: <20230823100128.54451-2-francois.michel@uclouvain.be>
+Message-ID: <87y1hurv2f.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:1491:b0:68b:dfef:de87 with SMTP id
- v17-20020a056a00149100b0068bdfefde87mr5135810pfu.4.1693301993531; Tue, 29 Aug
- 2023 02:39:53 -0700 (PDT)
-Date: Tue, 29 Aug 2023 02:39:53 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d26ff606040c9719@google.com>
-Subject: [syzbot] [net?] [v9fs?] KCSAN: data-race in p9_fd_create /
- p9_fd_create (2)
-From: syzbot <syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com>
-To: asmadeus@codewreck.org, davem@davemloft.net, edumazet@google.com, 
-	ericvh@kernel.org, kuba@kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux_oss@crudebyte.com, lucho@ionkov.net, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	v9fs@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044EF:EE_|SJ1PR12MB6217:EE_
+X-MS-Office365-Filtering-Correlation-Id: db2ff018-586e-4320-0ae1-08dba87c4fb5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	eAuRWK7N9fKnMLV4Kv/5qhMqVLlofnxtUiobyaXQp+HM5+5yAsjSsNNfQYB5PEXS35o4idStvcxfiu2/WsP0Hc2/wFeunpUioVQaJcLPOAck4KhXxGxu/xO6fKlsXanzCGAvizV3DctPuhIC8gQuwO1cdDwAoeQ6gKWW+JEvnaidaLNk1uuk3s4ejiigEp8NDQObK+zNUs/9LSQnie7WGSSYDNPPROxdpD1BbiRA0z8lTtcSfFeK+J1ZcMRlEVKjHqqc3wUd/MgLjaPo0SecGuOrDGxiX28t/MvtFcsl/FrLExV2bUWn+jovrKPq8d1E6m2gJzlb0UVG1mJyknnr/qEdySL/XJhKYrOvanRfjkLp3AgzGJnxuPzpS9hn3NeGyT4FUwoVQcn3kvQ7P8kScANZZQEycHVfQRAolxaCqC71sMo33o+6xTcyo6eRIXEU1ACAnO4PiwP0s8Lj0yrhMSt5q1bwJBEmB3/M012/ebNMtXfpkyToO8wfZGWWR+LtrAfEIQ3tu6Hinh6ft5Y28B54zWrgRIVPD23UQFJNsAUIfXKAIKaoumpHOjz7nW6VMyQZb2vil76IFkmUaQewgVaEPFBkKEQ3Pw87w+rAzcJ4Rbpdt5ZdIPibq7CoRtnye3YLzxQ+hRYOJcs/8EGa+bFhWwTEbiH0JuTWYevV0Lcy3qKa++gXWsK+VHEL7gIcdA+LIqMBYwhM5opXuw9XPArg9f0yC7xseBI2pTyjhFcIdSuEF0WQ4nWjZf/bxapP
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(136003)(376002)(39860400002)(186009)(451199024)(1800799009)(82310400011)(46966006)(36840700001)(40470700004)(6666004)(2616005)(86362001)(40480700001)(36756003)(82740400003)(40460700003)(7636003)(47076005)(356005)(36860700001)(70206006)(83380400001)(4744005)(426003)(16526019)(26005)(2906002)(478600001)(70586007)(8936002)(8676002)(4326008)(316002)(5660300002)(6916009)(336012)(54906003)(41300700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2023 10:40:06.8795
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: db2ff018-586e-4320-0ae1-08dba87c4fb5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044EF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6217
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Took me a while to fight my way through all the unreads to this, and
+it's already merged, but...
 
-syzbot found the following issue on:
+francois.michel@uclouvain.be writes:
 
-HEAD commit:    53663f4103ff Merge tag 'nfs-for-6.5-2' of git://git.linux-..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=103fc55fa80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f12c32a009b80107
-dashboard link: https://syzkaller.appspot.com/bug?extid=e441aeeb422763cc5511
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> diff --git a/tc/q_netem.c b/tc/q_netem.c
+> index 8ace2b61..febddd49 100644
+> --- a/tc/q_netem.c
+> +++ b/tc/q_netem.c
+> @@ -31,6 +31,7 @@ static void explain(void)
+>  		"                 [ loss random PERCENT [CORRELATION]]\n"
+>  		"                 [ loss state P13 [P31 [P32 [P23 P14]]]\n"
+>  		"                 [ loss gemodel PERCENT [R [1-H [1-K]]]\n"
+> +		"                 [ seed SEED \n]"
 
-Unfortunately, I don't have any reproducer for this issue yet.
+The newline seems misplaced.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f32101f0e8a2/disk-53663f41.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2e577e9d7daf/vmlinux-53663f41.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/af8ae7d4d06e/bzImage-53663f41.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in p9_fd_create / p9_fd_create
-
-read-write to 0xffff888130fb3d48 of 4 bytes by task 15599 on cpu 0:
- p9_fd_open net/9p/trans_fd.c:842 [inline]
- p9_fd_create+0x210/0x250 net/9p/trans_fd.c:1092
- p9_client_create+0x595/0xa70 net/9p/client.c:1010
- v9fs_session_init+0xf9/0xd90 fs/9p/v9fs.c:410
- v9fs_mount+0x69/0x630 fs/9p/vfs_super.c:123
- legacy_get_tree+0x74/0xd0 fs/fs_context.c:611
- vfs_get_tree+0x51/0x190 fs/super.c:1519
- do_new_mount+0x203/0x660 fs/namespace.c:3335
- path_mount+0x496/0xb30 fs/namespace.c:3662
- do_mount fs/namespace.c:3675 [inline]
- __do_sys_mount fs/namespace.c:3884 [inline]
- __se_sys_mount+0x27f/0x2d0 fs/namespace.c:3861
- __x64_sys_mount+0x67/0x80 fs/namespace.c:3861
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-read-write to 0xffff888130fb3d48 of 4 bytes by task 15563 on cpu 1:
- p9_fd_open net/9p/trans_fd.c:842 [inline]
- p9_fd_create+0x210/0x250 net/9p/trans_fd.c:1092
- p9_client_create+0x595/0xa70 net/9p/client.c:1010
- v9fs_session_init+0xf9/0xd90 fs/9p/v9fs.c:410
- v9fs_mount+0x69/0x630 fs/9p/vfs_super.c:123
- legacy_get_tree+0x74/0xd0 fs/fs_context.c:611
- vfs_get_tree+0x51/0x190 fs/super.c:1519
- do_new_mount+0x203/0x660 fs/namespace.c:3335
- path_mount+0x496/0xb30 fs/namespace.c:3662
- do_mount fs/namespace.c:3675 [inline]
- __do_sys_mount fs/namespace.c:3884 [inline]
- __se_sys_mount+0x27f/0x2d0 fs/namespace.c:3861
- __x64_sys_mount+0x67/0x80 fs/namespace.c:3861
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-value changed: 0x00008002 -> 0x00008802
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 15563 Comm: syz-executor.3 Not tainted 6.5.0-rc7-syzkaller-00013-g53663f4103ff #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>  		"                 [ ecn ]\n"
+>  		"                 [ reorder PERCENT [CORRELATION] [ gap DISTANCE ]]\n"
+>  		"                 [ rate RATE [PACKETOVERHEAD] [CELLSIZE] [CELLOVERHEAD]]\n"
 
