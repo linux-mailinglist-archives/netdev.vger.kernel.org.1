@@ -1,112 +1,120 @@
-Return-Path: <netdev+bounces-31250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6449478C543
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:28:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A99C78C53F
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:28:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95F611C20A32
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:28:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3FC52811BE
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CBD3174FB;
-	Tue, 29 Aug 2023 13:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3097174E2;
+	Tue, 29 Aug 2023 13:27:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91861174FA
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:27:58 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1CD1BF;
-	Tue, 29 Aug 2023 06:27:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693315676; x=1724851676;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=laQRomop/n4nHuaCgZ5NZ9HZ/MzLLf0xrWo3cv6IzIE=;
-  b=WMOBye1KLzqHUs2GNLhtirkKGpD/DyAdrLyHh5+cZ/v2lXtdKYMT3eeU
-   FkS+MWv7BbXaStdrwTWL4IfY0ojTCxHl2QUBDeIf7eN6aPKSIxL8MHNnz
-   epB7N7kB4VNpyBYGQCCAXZHkqTGg/1baTzPQM3Ld1omw8XxXhHvreczjD
-   Mz8m/Bh/yCGJSbxQyRg0GJRIvOi0i4BRDzLWtGeFkeIqEjxd60J09XvAC
-   a4iA90Kq6YldIWwqmW0+jShXwNruY4+BvRRQLvs+qsFNEd5JdB7Pg3+Qn
-   itrbUvxKd8JUmeSMvRFH/9yvBXAhDPj2+m3/1cemZAkmN1Vt+kDQ4snnR
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="354879049"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="354879049"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 06:27:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="768074772"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="768074772"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga008.jf.intel.com with ESMTP; 29 Aug 2023 06:27:01 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qaykF-004tC2-0a;
-	Tue, 29 Aug 2023 16:26:59 +0300
-Date: Tue, 29 Aug 2023 16:26:58 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: haozhe chang <haozhe.chang@mediatek.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] wwan: core: Use the bitmap API to
- allocate bitmaps
-Message-ID: <ZO3yIo3tGb8NRiy6@smile.fi.intel.com>
-References: <20230828131953.3721392-1-andriy.shevchenko@linux.intel.com>
- <20230828124524.5ca4da50@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F9115499
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:27:56 +0000 (UTC)
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAE91A2;
+	Tue, 29 Aug 2023 06:27:55 -0700 (PDT)
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-d795e9a0816so3501297276.3;
+        Tue, 29 Aug 2023 06:27:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693315674; x=1693920474;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MQtjCSCni+7C5O5VnAvqJgCasBYKOxd9nBefXlVFPAk=;
+        b=Tbm6NIxcLzZTGt+aGT1NaTBlEjPZvPtO5KJT7+WMH2+alap8EEzN4LaImnxNrY20zX
+         +LRe6B7ojRguyFU3u+pNXr8DFnx/mzgjvZ9Nw8Zopb0uSE94NuID8yGjL5ZcL8rYspSa
+         Vhy8Z7M1pTBhgXDVaUn7jiWYCC5A+96mf8g9EyHmixlkbu9B5wGLruBwdHFcp+jOIwMZ
+         XB34gB8ChJGJpplFdHjARYoDcIiuPyjDEjSshcrGS9/nM9/NkstQbW7hIpXq4EOxyj5o
+         cLQKl/k4dRC708DvNCpIih/dYPv2tzLl4EPXKwack+1YtDFgecPjZpH+OfbUjXx9YEJQ
+         7T/A==
+X-Gm-Message-State: AOJu0Yy792KLbajH/yoegM3eJONRCh2nuwLvOgHqAvL/ErY7okr8tKZw
+	7O1Q7gpzHTjQUU5IdG7dArhdNpt61qZnMh5+q8o=
+X-Google-Smtp-Source: AGHT+IHtBH2bbRJiuiyR80YOw62jWW/Dlp1289hLPTjmSziAPSX4+jmdDFPRYyz+gz6lzvR9uEv6P3zIylolpBEMKJA=
+X-Received: by 2002:a25:4157:0:b0:d78:1311:aa1b with SMTP id
+ o84-20020a254157000000b00d781311aa1bmr11731206yba.48.1693315674549; Tue, 29
+ Aug 2023 06:27:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230828124524.5ca4da50@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230829104033.955-1-jszhang@kernel.org> <ZO3UuY9jKz8VenGA@shell.armlinux.org.uk>
+ <ZO3WsHH1GDWdcLAU@xhacker> <CANBLGcwoiiA=ZOVenMZXM4pHSYn0dyGpzjm76i1Fin+8+NiqLA@mail.gmail.com>
+In-Reply-To: <CANBLGcwoiiA=ZOVenMZXM4pHSYn0dyGpzjm76i1Fin+8+NiqLA@mail.gmail.com>
+From: Emil Renner Berthing <kernel@esmil.dk>
+Date: Tue, 29 Aug 2023 15:27:43 +0200
+Message-ID: <CANBLGcwz8GeK_9DNC_UDq9YbpxRVYFKd59LEVeJOTeGU9wdXEQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/22] convert to devm_stmmac_probe_config_dt
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	Vladimir Zapolskiy <vz@mleia.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Samin Guo <samin.guo@starfivetech.com>, 
+	Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Samuel Holland <samuel@sholland.org>, Thierry Reding <thierry.reding@gmail.com>, 
+	Jonathan Hunter <jonathanh@nvidia.com>, Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Aug 28, 2023 at 12:45:24PM -0700, Jakub Kicinski wrote:
-> On Mon, 28 Aug 2023 16:19:53 +0300 Andy Shevchenko wrote:
-> > Use bitmap_zalloc() and bitmap_free() instead of hand-writing them.
-> > It is less verbose and it improves the type checking and semantic.
-> > 
-> > While at it, add missing header inclusion (should be bitops.h,
-> > but with the above change it becomes bitmap.h).
-> 
-> ## Form letter - net-next-closed
-> 
-> The merge window for v6.6 has begun and therefore net-next is closed
-> for new drivers, features, code refactoring and optimizations.
-> We are currently accepting bug fixes only.
+On Tue, 29 Aug 2023 at 15:22, Emil Renner Berthing <kernel@esmil.dk> wrote:
+>
+> On Tue, 29 Aug 2023 at 13:41, Jisheng Zhang <jszhang@kernel.org> wrote:
+> >
+> > On Tue, Aug 29, 2023 at 12:21:29PM +0100, Russell King (Oracle) wrote:
+> > > On Tue, Aug 29, 2023 at 06:40:11PM +0800, Jisheng Zhang wrote:
+> > > > Russell pointed out there's a new devm_stmmac_probe_config_dt()
+> > > > helper now when reviewing my starfive gmac error handling patch[1].
+> > > > After greping the code, this nice helper was introduced by Bartosz in
+> > > > [2], I think it's time to convert all dwmac users to this helper and
+> > > > finally complete the TODO in [2] "but once all users of the old
+> > > > stmmac_pltfr_remove() are converted to the devres helper, it will be
+> > > > renamed back to stmmac_pltfr_remove() and the no_dt function removed."
+> > >
+> > > I think a useful final patch may be to make stmmac_probe_config_dt()
+> > > static so there aren't any new uses of stmmac_probe_config_dt().
+> >
+> > Good idea!
+>
+> Once this is done are there any users of stmmac_pltfr_remove() left?
+> If not it would be great to remove that too and maybe even remove the
+> _no_dt from stmmac_pltfr_remove_no_dt().
 
-Sure.
+Sorry about the noise. I should learn to read the full series before replying.
 
-> Please repost when net-next reopens after Sept 11th.
-
-I'm wondering since we have established lore archive along with `b4` or any
-analogous tool (since there is an API) why I need to repost. It increases
-the SNR in the mailing lists, consumes more resources —> adds into global
-climate change.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+> > >
+> > > Also note that net-next is now closed, so please wait until after -rc1
+> > > for net-next to re-open, or post as RFC. Thanks.
+> >
+> > oops, I didn't notice this cycle of window is closed, I will wait for next
+> > development window.
+> >
+> > Thank you
+> > >
+> > > --
+> > > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> > > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
