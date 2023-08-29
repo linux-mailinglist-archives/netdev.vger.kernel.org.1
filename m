@@ -1,374 +1,132 @@
-Return-Path: <netdev+bounces-31139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A1678BD3E
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 05:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02B0F78BD3D
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 05:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F087280054
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 03:29:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7847280ED0
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 03:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4C7EA6;
-	Tue, 29 Aug 2023 03:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C95EA9;
+	Tue, 29 Aug 2023 03:29:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B8FA47
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 03:29:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47BF4C433C8;
-	Tue, 29 Aug 2023 03:29:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693279776;
-	bh=pkLE9UcEziJW1NdrYNC30jdjpO3GI5kYG+hces0qcNc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pg05PWKDkQU1rzdHaeMgkutxYZF3R8rwD8yZdKRaoP0Obvz01ojB6mi0zXiTq4lgA
-	 q/aBVHF3vRhKJ/GFPuvKEUCrmTgrncXnOJ8xstjPtPjCsvYlf/NWUgeO6NE7wl1qIo
-	 r9XKY/VqZ6qb/2tOtNWR0sbRzxJLlnO3WIvA0dw10nDz7TCkw4km5HqDwQQSvs1yq8
-	 p8SUM+/BkfBOkLQ/ZhEmOLWswylB/tBqet/fk5QPw24zaVA4Mr9p4HueiG7mAw9uBw
-	 NaHroWJyfQtG77dt9qOdNUpKb3caZus6okrPx3WVC/f131Jbnk1oHO3rm/1zTnEHwQ
-	 J07qy5sK/PZew==
-Date: Tue, 29 Aug 2023 11:17:45 +0800
-From: Jisheng Zhang <jszhang@kernel.org>
-To: Serge Semin <fancer.lancer@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>, Maxime@web.codeaurora.org,
-	Coquelin@web.codeaurora.org,
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: add glue layer for T-HEAD
- TH1520 SoC
-Message-ID: <ZO1jWUa7xgZuHdRH@xhacker>
-References: <20230827091710.1483-1-jszhang@kernel.org>
- <20230827091710.1483-4-jszhang@kernel.org>
- <maj7mkdtkhp3z7xzcwvopnup3lhm5h5wyxz3j2ljryjbwpwilx@xdizgwctqukn>
- <ZOzAO5xhWdGcBXD1@xhacker>
- <logkjnuiq2jgrphv4y7bqy523zsj6pskafwzpfdg6grvk5m7jk@hgucfu4e6azo>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFA1EA6
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 03:29:37 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BFCF110;
+	Mon, 28 Aug 2023 20:29:37 -0700 (PDT)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37T2VbxH031740;
+	Tue, 29 Aug 2023 03:28:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=EhZf3ayO/wDgQ6rYztFJO+yN7mD/q2RQlkhBvaG9Ui0=;
+ b=ouLV7d8WwDMdkAzdgRpJEIK3wTlBNoK43jpEpbAYIC7dlHCUEM3U05Ed7KcHk5KUOtZg
+ +27dPSAbTnOxFw+m1EJtu9BDVthfesqW5PAWopD8keUVCQ4btSaFZoWiDdq6CT2pPZCp
+ vp7i+Gvix/gHgzkIkR2rev9n804KBXAw1Vkd60EdsaQ9llUVBu1BK6aQM92KnSiBuVgD
+ zFIR9OxG+4/85FyuVxN+I3+i667jrcC3Le6K6SNu6xLIBFNmyoyWterK4NeX/Q7xmdd4
+ 0Qe/GItjjCmtrokuCcfZ5WDvPTfSX10dbsK/CTt32rwp2zJPPDLB5NYLuAeKuD3xstE4 fw== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3srvr81ghx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Aug 2023 03:28:54 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37T3SrGw001787
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Aug 2023 03:28:53 GMT
+Received: from [10.216.21.12] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 28 Aug
+ 2023 20:28:45 -0700
+Message-ID: <63826bbc-7193-f6fd-358d-87ad6b3ae5b1@quicinc.com>
+Date: Tue, 29 Aug 2023 08:58:37 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <logkjnuiq2jgrphv4y7bqy523zsj6pskafwzpfdg6grvk5m7jk@hgucfu4e6azo>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH V2 1/7] clk: qcom: clk-alpha-pll: Add NSS HUAYRA ALPHA PLL
+ support for ipq9574
+To: Stephen Boyd <sboyd@kernel.org>, <agross@kernel.org>,
+        <andersson@kernel.org>, <arnd@arndb.de>, <catalin.marinas@arm.com>,
+        <conor+dt@kernel.org>, <devicetree@vger.kernel.org>,
+        <geert+renesas@glider.be>, <konrad.dybcio@linaro.org>,
+        <krzysztof.kozlowski+dt@linaro.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <mturquette@baylibre.com>,
+        <netdev@vger.kernel.org>, <nfraprado@collabora.com>,
+        <p.zabel@pengutronix.de>, <peng.fan@nxp.com>, <rafal@milecki.pl>,
+        <richardcochran@gmail.com>, <robh+dt@kernel.org>, <will@kernel.org>
+CC: <quic_saahtoma@quicinc.com>
+References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
+ <20230825091234.32713-2-quic_devipriy@quicinc.com>
+ <4a00db79414dbc47a2b7792d849f7056.sboyd@kernel.org>
+Content-Language: en-US
+From: Devi Priya <quic_devipriy@quicinc.com>
+In-Reply-To: <4a00db79414dbc47a2b7792d849f7056.sboyd@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Q7kegw_-tSm7uznGqCAL3sL8_6h0oaLb
+X-Proofpoint-ORIG-GUID: Q7kegw_-tSm7uznGqCAL3sL8_6h0oaLb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-28_20,2023-08-28_04,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
+ mlxscore=0 phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2308100000 definitions=main-2308290030
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Aug 28, 2023 at 08:30:50PM +0300, Serge Semin wrote:
-> On Mon, Aug 28, 2023 at 11:41:47PM +0800, Jisheng Zhang wrote:
-> > On Mon, Aug 28, 2023 at 04:40:19PM +0300, Serge Semin wrote:
-> > > On Sun, Aug 27, 2023 at 05:17:10PM +0800, Jisheng Zhang wrote:
-> > > > Add dwmac glue driver to support the dwmac on the T-HEAD TH1520 SoC.
-> > > > 
-> > > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > > > ---
-> > > >  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
-> > > >  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
-> > > >  .../net/ethernet/stmicro/stmmac/dwmac-thead.c | 302 ++++++++++++++++++
-> > > >  3 files changed, 314 insertions(+)
-> > > >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-> > > > 
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> > > > index 06c6871f8788..1bf71804c270 100644
-> > > > --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> > > > @@ -216,6 +216,17 @@ config DWMAC_SUN8I
-> > > >  	  stmmac device driver. This driver is used for H3/A83T/A64
-> > > >  	  EMAC ethernet controller.
-> > > >  
-> > > > +config DWMAC_THEAD
-> > > > +	tristate "T-HEAD dwmac support"
-> > > > +	depends on OF && (ARCH_THEAD || COMPILE_TEST)
-> > > > +	select MFD_SYSCON
-> > > > +	help
-> > > > +	  Support for ethernet controllers on T-HEAD RISC-V SoCs
-> > > > +
-> > > > +	  This selects the T-HEAD platform specific glue layer support for
-> > > > +	  the stmmac device driver. This driver is used for T-HEAD TH1520
-> > > > +	  ethernet controller.
-> > > > +
-> > > >  config DWMAC_IMX8
-> > > >  	tristate "NXP IMX8 DWMAC support"
-> > > >  	default ARCH_MXC
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> > > > index 5b57aee19267..d73171ed6ad7 100644
-> > > > --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> > > > @@ -27,6 +27,7 @@ obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
-> > > >  obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
-> > > >  obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
-> > > >  obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
-> > > > +obj-$(CONFIG_DWMAC_THEAD)	+= dwmac-thead.o
-> > > >  obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
-> > > >  obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
-> > > >  obj-$(CONFIG_DWMAC_GENERIC)	+= dwmac-generic.o
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-> > > > new file mode 100644
-> > > > index 000000000000..85135ef05906
-> > > > --- /dev/null
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-> > > > @@ -0,0 +1,302 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > +/*
-> > > > + * T-HEAD DWMAC platform driver
-> > > > + *
-> > > > + * Copyright (C) 2021 Alibaba Group Holding Limited.
-> > > > + * Copyright (C) 2023 Jisheng Zhang <jszhang@kernel.org>
-> > > > + *
-> > > > + */
-> > > > +
-> > > > +#include <linux/bitfield.h>
-> > > > +#include <linux/mfd/syscon.h>
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/of.h>
-> > > > +#include <linux/of_device.h>
-> > > > +#include <linux/of_net.h>
-> > > > +#include <linux/platform_device.h>
-> > > > +#include <linux/regmap.h>
-> > > > +
-> > > > +#include "stmmac_platform.h"
-> > > > +
-> > > > +#define GMAC_CLK_EN			0x00
-> > > > +#define  GMAC_TX_CLK_EN			BIT(1)
-> > > > +#define  GMAC_TX_CLK_N_EN		BIT(2)
-> > > > +#define  GMAC_TX_CLK_OUT_EN		BIT(3)
-> > > > +#define  GMAC_RX_CLK_EN			BIT(4)
-> > > > +#define  GMAC_RX_CLK_N_EN		BIT(5)
-> > > > +#define  GMAC_EPHY_REF_CLK_EN		BIT(6)
-> > > > +#define GMAC_RXCLK_DELAY_CTRL		0x04
-> > > > +#define  GMAC_RXCLK_BYPASS		BIT(15)
-> > > > +#define  GMAC_RXCLK_INVERT		BIT(14)
-> > > > +#define  GMAC_RXCLK_DELAY_MASK		GENMASK(4, 0)
-> > > > +#define  GMAC_RXCLK_DELAY_VAL(x)	FIELD_PREP(GMAC_RXCLK_DELAY_MASK, (x))
-> > > > +#define GMAC_TXCLK_DELAY_CTRL		0x08
-> > > > +#define  GMAC_TXCLK_BYPASS		BIT(15)
-> > > > +#define  GMAC_TXCLK_INVERT		BIT(14)
-> > > > +#define  GMAC_TXCLK_DELAY_MASK		GENMASK(4, 0)
-> > > > +#define  GMAC_TXCLK_DELAY_VAL(x)	FIELD_PREP(GMAC_RXCLK_DELAY_MASK, (x))
-> > > > +#define GMAC_PLLCLK_DIV			0x0c
-> > > > +#define  GMAC_PLLCLK_DIV_EN		BIT(31)
-> > > > +#define  GMAC_PLLCLK_DIV_MASK		GENMASK(7, 0)
-> > > > +#define  GMAC_PLLCLK_DIV_NUM(x)		FIELD_PREP(GMAC_PLLCLK_DIV_MASK, (x))
-> > > > +#define GMAC_GTXCLK_SEL			0x18
-> > > > +#define  GMAC_GTXCLK_SEL_PLL		BIT(0)
-> > > > +#define GMAC_INTF_CTRL			0x1c
-> > > > +#define  PHY_INTF_MASK			BIT(0)
-> > > > +#define  PHY_INTF_RGMII			FIELD_PREP(PHY_INTF_MASK, 1)
-> > > > +#define  PHY_INTF_MII_GMII		FIELD_PREP(PHY_INTF_MASK, 0)
-> > > > +#define GMAC_TXCLK_OEN			0x20
-> > > > +#define  TXCLK_DIR_MASK			BIT(0)
-> > > > +#define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
-> > > > +#define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
-> > > > +
-> > > > +#define GMAC_GMII_RGMII_RATE	125000000
-> > > > +#define GMAC_MII_RATE		25000000
-> > > > +
-> > > > +struct thead_dwmac {
-> > > > +	struct plat_stmmacenet_data *plat;
-> > > > +	struct regmap *apb_regmap;
-> > > > +	struct device *dev;
-> > > > +	u32 rx_delay;
-> > > > +	u32 tx_delay;
-> > > > +};
-> > > > +
-> > > > +static int thead_dwmac_set_phy_if(struct plat_stmmacenet_data *plat)
-> > > > +{
-> > > > +	struct thead_dwmac *dwmac = plat->bsp_priv;
-> > > > +	u32 phyif;
-> > > > +
-> > > > +	switch (plat->interface) {
-> > > > +	case PHY_INTERFACE_MODE_MII:
-> > > > +		phyif = PHY_INTF_MII_GMII;
-> > > > +		break;
-> > > > +	case PHY_INTERFACE_MODE_RGMII:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_ID:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> > > > +		phyif = PHY_INTF_RGMII;
-> > > > +		break;
-> > > > +	default:
-> > > > +		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-> > > > +			plat->interface);
-> > > > +		return -EINVAL;
-> > > > +	};
-> > > > +
-> > > > +	regmap_write(dwmac->apb_regmap, GMAC_INTF_CTRL, phyif);
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > > +static int thead_dwmac_set_txclk_dir(struct plat_stmmacenet_data *plat)
-> > > > +{
-> > > > +	struct thead_dwmac *dwmac = plat->bsp_priv;
-> > > > +	u32 txclk_dir;
-> > > > +
-> > > > +	switch (plat->interface) {
-> > > > +	case PHY_INTERFACE_MODE_MII:
-> > > > +		txclk_dir = TXCLK_DIR_INPUT;
-> > > > +		break;
-> > > > +	case PHY_INTERFACE_MODE_RGMII:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_ID:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> > > > +		txclk_dir = TXCLK_DIR_OUTPUT;
-> > > > +		break;
-> > > > +	default:
-> > > > +		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-> > > > +			plat->interface);
-> > > > +		return -EINVAL;
-> > > > +	};
-> > > > +
-> > > > +	regmap_write(dwmac->apb_regmap, GMAC_TXCLK_OEN, txclk_dir);
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > > +static void thead_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mode)
-> > > > +{
-> > > > +	struct thead_dwmac *dwmac = priv;
-> > > > +	struct plat_stmmacenet_data *plat = dwmac->plat;
-> > > > +	unsigned long rate;
-> > > > +	u32 div;
-> > > > +
-> > > > +	switch (plat->interface) {
-> > > > +	/* For MII, rxc/txc is provided by phy */
-> > > > +	case PHY_INTERFACE_MODE_MII:
-> > > > +		return;
-> > > > +
-> > > > +	case PHY_INTERFACE_MODE_RGMII:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_ID:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> > > > +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> > > 
-> > > > +		rate = clk_get_rate(plat->stmmac_clk);
-> > > > +		if (!rate || rate % GMAC_GMII_RGMII_RATE != 0 ||
-> > > > +		    rate % GMAC_MII_RATE != 0) {
-> > > > +			dev_err(dwmac->dev, "invalid gmac rate %ld\n", rate);
-> > > > +			return;
-> > > > +		}
-> > > > +
-> > > > +		regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV, GMAC_PLLCLK_DIV_EN, 0);
-> > > > +
-> > > > +		switch (speed) {
-> > > > +		case SPEED_1000:
-> > > > +			div = rate / GMAC_GMII_RGMII_RATE;
-> > > > +			break;
-> > > > +		case SPEED_100:
-> > > > +			div = rate / GMAC_MII_RATE;
-> > > > +			break;
-> > > > +		case SPEED_10:
-> > > > +			div = rate * 10 / GMAC_MII_RATE;
-> > > > +			break;
-> > > > +		default:
-> > > > +			dev_err(dwmac->dev, "invalid speed %u\n", speed);
-> > > > +			return;
-> > > > +		}
-> > > > +		regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV,
-> > > > +				   GMAC_PLLCLK_DIV_MASK, GMAC_PLLCLK_DIV_NUM(div));
-> > > > +
-> > > > +		regmap_update_bits(dwmac->apb_regmap, GMAC_PLLCLK_DIV,
-> > > > +				   GMAC_PLLCLK_DIV_EN, GMAC_PLLCLK_DIV_EN);
-> > > 
-> > > This chunk looks like a hard-coded implementation of the
-> > > CLK_SET_RATE_GATE Tx-clocks rate setup which parental clock is the
-> > > "stmmaceth" clock. I suggest to move it to the respective driver, add
-> > > a "tx" clock to the bindings and use the common clock kernel API
-> > > methods here only.
-> > 
-> > I did consider your solution before writing the code, here are the
-> > reasons why I dropped it:
-> > 
-> 
-> > There's no any clk IP here, the HW just puts several
-> > gmac related control bits here, such as rx/tx delay, bypass, invert
-> > interface choice, clk direction. 
-> 
-> You omitted the essential part of your code which I pointed out.
-> 
-> > From this point of view, it looks more
-> > like a syscon rather than clk.
-> 
-> Toggling control bits is surely the syscon work. But gating a parental
-> clock, settings up the parental clock _divider_ and ungating the clock
-> back is the clock controller function. So it means your syscon is just
-> a normal multi-function device, which one of the function is the clock
-> controller.
-> 
-> It's not like your situation is unique. For instance in case of a SoC
-> I was working with recently Clock Control Unit (CCU) was actually a
-> multi-function device which had:
-> 1. PLLs and Dividers supplying the clocks to the SoC components.
 
-Hi Serge,
 
-This is the big difference between your case and TH1520 gmac.
-(PS: @Emil, I read your comments in another reply. IIUC, jh7110 puts a
-real clk IP for gmac tx clock purpose)
-
-However, There's no real clk IP in the TH1520 gmac related syscon, yep, div
-and enable are some what clock related bits, but that's all, no more, no less.
-So even in this case, another abstraction layer via. clk subsystem is still
-preferred? IOW, a seperate clk driver for the gmac?
-
-Thanks
+On 8/26/2023 2:28 AM, Stephen Boyd wrote:
+> Quoting Devi Priya (2023-08-25 02:12:28)
+>> diff --git a/drivers/clk/qcom/clk-alpha-pll.c b/drivers/clk/qcom/clk-alpha-pll.c
+>> index e4ef645f65d1..1c2a72840cd2 100644
+>> --- a/drivers/clk/qcom/clk-alpha-pll.c
+>> +++ b/drivers/clk/qcom/clk-alpha-pll.c
+>> @@ -228,6 +228,18 @@ const u8 clk_alpha_pll_regs[][PLL_OFF_MAX_REGS] = {
+>>                  [PLL_OFF_ALPHA_VAL] = 0x24,
+>>                  [PLL_OFF_ALPHA_VAL_U] = 0x28,
+>>          },
+>> +
 > 
-> 2. SoC components reset controller.
-> 3. I2C-interface controller.
-> 4. AXI-bus errors report registers.
-> 5. PCIe-controller tunings (LTSSM, link up/down, etc)
-> 6. SATA-controller tunings.
-> 7. Full SoC reset controller (syscon reboot),
-> 8. L2-cache tunings controller.
-> with the sub-functions CSRs joint in a single space. In that case the
-> PCIe-controller tunings and a lot of its reference clocks settings
-> were intermixed in a single chunk of the registers. So I had to create
-> a driver for the clocks anyway including all the PCIe reference
-> clock and refer to the syscon in the PCIe-controller device node for
-> the respective PCIe platform-specific tunings.
-> 
-> > 
-> > Secondly, I see other SoCs did similar for this case, such as
-> > dwmac-visconti, dwmac-meson8b, dwmac-ipq806x, dwmac-socfpga and so on.
-> > They met similar issue as the above.
-> 
-> First I failed to find any clock-related things in the dwmac-socfpga
+> Why the extra newline? All other types aren't this way.
+Sure, will drop it in V3
 
-I believe the ptp ref clk related is just to enable the clk by toggling
-corresponding bit. Anyway that's not important part here.
-
-> driver looking in anyway as yours. Second the dwmac-meson8b driver
-> creates a generic clock handler right in the driver. I don't think
-> it's a great solution but at the very least it registers the clock
-> handler in the kernel. But seeing the PROG_ETHERNET CSR is of 8 bytes
-> long there (0xc8834540 0x8) and defined at looking random base address
-> it's definitely a part of a Meson system controller which just
-> directly passed to the device driver. It's not correct. That part
-> should have been at least specified as a syscon too. Third the
-> dwmac-visconti driver is not a good example seeing it defines some
-> specific registers way away from the NIC CSR space. It's most likely a
-> separate device like syscon. Fourth dwmac-ipq806x driver
-> implementation looks indeed like yours.
-
-> In anyway I don't say your solution is fully wrong. At the very least
-> you have a syscon node defined. But it just makes you adding
-> incomplete device/platform bindings. Your network device do have the
-> Tx reference clock as a part of the separate system controller, but
-> you have to omit it because of the syscon property. You do have a
-> syscon node, but don't have its clock function exported. So AFAICS in
-> your case things can be implemented in a more canonical way than they
-> are now.
+Thanks,
+Devi Priya
 > 
+>> +       [CLK_ALPHA_PLL_TYPE_NSS_HUAYRA] =  {
+>> +               [PLL_OFF_L_VAL] = 0x04,
+>> +               [PLL_OFF_ALPHA_VAL] = 0x08,
+>> +               [PLL_OFF_TEST_CTL] = 0x0c,
+>> +               [PLL_OFF_TEST_CTL_U] = 0x10,
+>> +               [PLL_OFF_USER_CTL] = 0x14,
+>> +               [PLL_OFF_CONFIG_CTL] = 0x18,
+>> +               [PLL_OFF_CONFIG_CTL_U] = 0x1c,
+>> +               [PLL_OFF_STATUS] = 0x20,
+>> +       },
+>> +
 
