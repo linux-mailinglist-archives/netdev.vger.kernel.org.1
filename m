@@ -1,368 +1,196 @@
-Return-Path: <netdev+bounces-31214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 270AF78C2D5
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:59:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D528F78C279
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:42:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498341C209E7
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C11328105F
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B9615495;
-	Tue, 29 Aug 2023 10:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF3D15495;
+	Tue, 29 Aug 2023 10:41:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A360216403
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:55:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA40C433CD;
-	Tue, 29 Aug 2023 10:54:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693306500;
-	bh=A+5nG12JdLHOmwCPVbQZNkwbQxDQAPFkHb/v3gCs8sA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W2ahLA50bma1QLPHaodGNXXSV9T3Q9UY5bvsW9kd9ssS5ERdVxc5LKzU9OKNxHUPk
-	 xkBMSxO3OdAotiptLyxdrh/+f44tlMwQnAhWHgkHSEyhGkizAm02Xb3yNGMbUVveNG
-	 xNI2tCNpU9yWqR0Fzdj6SgQ5KvdNhG4EKB9Dt03v4BayQtWFmRRwsrTrHRxl7JNISE
-	 PBYYlL79dMb4yLFQzIS2pXQlfH8POXzBtDMKyD2h6Q0oorALpq/c2XzMnsId0aarMx
-	 4f+Qzr1MLHLvhZ9egLBqNchukFGBT2VvGKJ9sov1lstK6/L9m/L8TIwq4iIDHPsfKN
-	 y7DWptTT7d9PA==
-From: Jisheng Zhang <jszhang@kernel.org>
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Vladimir Zapolskiy <vz@mleia.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Samin Guo <samin.guo@starfivetech.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF861548A
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:41:03 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51D21B3
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 03:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693305661; x=1724841661;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BdBH2lJUjIkGzweI6LRi0ejXpdeaGgcJfZ+XQnnKpXI=;
+  b=cRULa+mRYZlr+UXDBKd+/iWWuez+GzkQebv7twfVkXut/oaoAY2WhUsX
+   EDWLhoM8xsud0mtojZlZ2E+oOJNjRGo5DsPQGNq5obUBM3ZpjqrpBgsuD
+   WMpX33Q98tqy0XlFt9lsA3f/oLDBKDr/JrH3XSi6tDFug2SMW9QqAq2xY
+   1L2o8CtBnYwgzYZhXH7b1Rqzl/wefBWylnyj2ZRoIdreBjlsfcAoQwlzq
+   bbonjEsRiOCBBaRHYFj6FXq9PJxDczyPVUY4r/0EYGT+F+k77WqnUHWGi
+   156N8p8iWoUImH+FqcWRGr1rYJ4TEo7Q91kWnFeRa5j8b6pkftC2gPUiz
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="461696882"
+X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
+   d="scan'208";a="461696882"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 03:41:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="853229781"
+X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
+   d="scan'208";a="853229781"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by fmsmga002.fm.intel.com with ESMTP; 29 Aug 2023 03:40:59 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 22/22] net: stmmac: rename stmmac_pltfr_remove_no_dt to stmmac_pltfr_remove
-Date: Tue, 29 Aug 2023 18:40:33 +0800
-Message-Id: <20230829104033.955-23-jszhang@kernel.org>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230829104033.955-1-jszhang@kernel.org>
-References: <20230829104033.955-1-jszhang@kernel.org>
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v4 iwl-next 04/11] ice: rename verify_cached to has_ready_bitmap
+Date: Tue, 29 Aug 2023 12:40:34 +0200
+Message-Id: <20230829104041.64131-5-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230829104041.64131-1-karol.kolacinski@intel.com>
+References: <20230829104041.64131-1-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Now, all users of the old stmmac_pltfr_remove() are converted to the
-devres helper, it's time to rename stmmac_pltfr_remove_no_dt() back to
-stmmac_pltfr_remove() and remove the old stmmac_pltfr_remove().
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+The tx->verify_cached flag is used to inform the Tx timestamp tracking
+code whether it needs to verify the cached Tx timestamp value against
+a previous captured value. This is necessary on E810 hardware which does
+not have a Tx timestamp ready bitmap.
+
+In addition, we currently rely on the fact that the
+ice_get_phy_tx_tstamp_ready() function returns all 1s for E810 hardware.
+Instead of introducing a brand new flag, rename and verify_cached to
+has_ready_bitmap, inverting the relevant checks.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- .../ethernet/stmicro/stmmac/dwmac-anarion.c   |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-imx.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-ingenic.c   |  2 +-
- .../stmicro/stmmac/dwmac-intel-plat.c         |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-meson.c |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-meson8b.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-starfive.c  |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-tegra.c |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-visconti.c  |  2 +-
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++----------------
- .../ethernet/stmicro/stmmac/stmmac_platform.h |  1 -
- 17 files changed, 18 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 19 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h |  8 +++++---
+ 2 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-index 0df3a2ad0986..643ee6d8d4dd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-@@ -135,7 +135,7 @@ MODULE_DEVICE_TABLE(of, anarion_dwmac_match);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index a9c5552dd0d3..f513bbbba9f8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -591,9 +591,11 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 	hw = &pf->hw;
  
- static struct platform_driver anarion_dwmac_driver = {
- 	.probe  = anarion_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "anarion-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-index f4c817e9fc13..abf8cdb3c625 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-@@ -418,7 +418,7 @@ MODULE_DEVICE_TABLE(of, imx_dwmac_match);
+ 	/* Read the Tx ready status first */
+-	err = ice_get_phy_tx_tstamp_ready(hw, tx->block, &tstamp_ready);
+-	if (err)
+-		return;
++	if (tx->has_ready_bitmap) {
++		err = ice_get_phy_tx_tstamp_ready(hw, tx->block, &tstamp_ready);
++		if (err)
++			return;
++	}
  
- static struct platform_driver imx_dwmac_driver = {
- 	.probe  = imx_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "imx-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-index ddfd7af63492..21dfd9bd40ad 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-@@ -370,7 +370,7 @@ MODULE_DEVICE_TABLE(of, ingenic_mac_of_matches);
+ 	/* Drop packets if the link went down */
+ 	link_up = ptp_port->link_up;
+@@ -621,7 +623,8 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 		 * If we do not, the hardware logic for generating a new
+ 		 * interrupt can get stuck on some devices.
+ 		 */
+-		if (!(tstamp_ready & BIT_ULL(phy_idx))) {
++		if (tx->has_ready_bitmap &&
++		    !(tstamp_ready & BIT_ULL(phy_idx))) {
+ 			if (drop_ts)
+ 				goto skip_ts_read;
  
- static struct platform_driver ingenic_mac_driver = {
- 	.probe		= ingenic_mac_probe,
--	.remove_new	= stmmac_pltfr_remove_no_dt,
-+	.remove_new	= stmmac_pltfr_remove,
- 	.driver		= {
- 		.name	= "ingenic-mac",
- 		.pm		= pm_ptr(&ingenic_mac_pm_ops),
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-index d1aec2ca2b42..70edc5232379 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-@@ -164,7 +164,7 @@ static void intel_eth_plat_remove(struct platform_device *pdev)
- {
- 	struct intel_dwmac *dwmac = get_stmmac_bsp_priv(&pdev->dev);
+@@ -641,7 +644,7 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 		 * from the last cached timestamp. If it is not, skip this for
+ 		 * now assuming it hasn't yet been captured by hardware.
+ 		 */
+-		if (!drop_ts && tx->verify_cached &&
++		if (!drop_ts && !tx->has_ready_bitmap &&
+ 		    raw_tstamp == tx->tstamps[idx].cached_tstamp)
+ 			continue;
  
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 	clk_disable_unprepare(dwmac->tx_clk);
+@@ -651,7 +654,7 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 
+ skip_ts_read:
+ 		spin_lock(&tx->lock);
+-		if (tx->verify_cached && raw_tstamp)
++		if (!tx->has_ready_bitmap && raw_tstamp)
+ 			tx->tstamps[idx].cached_tstamp = raw_tstamp;
+ 		clear_bit(idx, tx->in_use);
+ 		skb = tx->tstamps[idx].skb;
+@@ -895,7 +898,7 @@ ice_ptp_init_tx_e822(struct ice_pf *pf, struct ice_ptp_tx *tx, u8 port)
+ 	tx->block = port / ICE_PORTS_PER_QUAD;
+ 	tx->offset = (port % ICE_PORTS_PER_QUAD) * INDEX_PER_PORT_E822;
+ 	tx->len = INDEX_PER_PORT_E822;
+-	tx->verify_cached = 0;
++	tx->has_ready_bitmap = 1;
+ 
+ 	return ice_ptp_alloc_tx_tracker(tx);
  }
+@@ -918,7 +921,7 @@ ice_ptp_init_tx_e810(struct ice_pf *pf, struct ice_ptp_tx *tx)
+ 	 * verify new timestamps against cached copy of the last read
+ 	 * timestamp.
+ 	 */
+-	tx->verify_cached = 1;
++	tx->has_ready_bitmap = 0;
  
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-index a9916fd07616..281687d7083b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-@@ -487,7 +487,7 @@ MODULE_DEVICE_TABLE(of, ipq806x_gmac_dwmac_match);
- 
- static struct platform_driver ipq806x_gmac_dwmac_driver = {
- 	.probe = ipq806x_gmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name		= "ipq806x-gmac-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-index 5d4936642de5..802024583d50 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-@@ -72,7 +72,7 @@ MODULE_DEVICE_TABLE(of, lpc18xx_dwmac_match);
- 
- static struct platform_driver lpc18xx_dwmac_driver = {
- 	.probe  = lpc18xx_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "lpc18xx-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-index 1c37df6d22b3..6d6f08a6a4c7 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-@@ -683,7 +683,7 @@ static void mediatek_dwmac_remove(struct platform_device *pdev)
- {
- 	struct mediatek_dwmac_plat_data *priv_plat = get_stmmac_bsp_priv(&pdev->dev);
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 	mediatek_dwmac_clks_config(priv_plat, false);
+ 	return ice_ptp_alloc_tx_tracker(tx);
  }
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-index 3373d3ec2368..a16bfa9089ea 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-@@ -78,7 +78,7 @@ MODULE_DEVICE_TABLE(of, meson6_dwmac_match);
- 
- static struct platform_driver meson6_dwmac_driver = {
- 	.probe  = meson6_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "meson6-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-index 37f249980929..b23944aa344e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-@@ -520,7 +520,7 @@ MODULE_DEVICE_TABLE(of, meson8b_dwmac_match);
- 
- static struct platform_driver meson8b_dwmac_driver = {
- 	.probe  = meson8b_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "meson8b-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 6d5e45fb54c9..aac69e2766ba 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -500,7 +500,7 @@ static void socfpga_dwmac_remove(struct platform_device *pdev)
- 	struct stmmac_priv *priv = netdev_priv(ndev);
- 	struct phylink_pcs *pcs = priv->hw->lynx_pcs;
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 
- 	lynx_pcs_destroy(pcs);
- }
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-index 76f3a36f32c7..6096e515f877 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-@@ -152,7 +152,7 @@ MODULE_DEVICE_TABLE(of, starfive_dwmac_match);
- 
- static struct platform_driver starfive_dwmac_driver = {
- 	.probe  = starfive_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name = "starfive-dwmac",
- 		.pm = &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index bfe49b5a9929..d9f241b5c38c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -1312,7 +1312,7 @@ static void sun8i_dwmac_remove(struct platform_device *pdev)
- 		clk_put(gmac->ephy_clk);
- 	}
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 	sun8i_dwmac_unset_syscon(gmac);
- }
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-index b857235f5b1f..2653a9f0958c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-@@ -172,7 +172,7 @@ MODULE_DEVICE_TABLE(of, sun7i_dwmac_match);
- 
- static struct platform_driver sun7i_dwmac_driver = {
- 	.probe  = sun7i_gmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "sun7i-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-index 7e512c0762ea..362f85136c3e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-@@ -358,7 +358,7 @@ static void tegra_mgbe_remove(struct platform_device *pdev)
- 
- 	clk_bulk_disable_unprepare(ARRAY_SIZE(mgbe_clks), mgbe->clks);
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- }
- 
- static const struct of_device_id tegra_mgbe_match[] = {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-index 75fafd23385a..b2942fc76445 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-@@ -259,7 +259,7 @@ static void visconti_eth_dwmac_remove(struct platform_device *pdev)
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 
- 	visconti_eth_clock_remove(pdev);
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index ff330423ee66..4950ec2c69ce 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -808,7 +808,7 @@ static void devm_stmmac_pltfr_remove(void *data)
- {
- 	struct platform_device *pdev = data;
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- }
- 
- /**
-@@ -835,12 +835,12 @@ int devm_stmmac_pltfr_probe(struct platform_device *pdev,
- EXPORT_SYMBOL_GPL(devm_stmmac_pltfr_probe);
- 
- /**
-- * stmmac_pltfr_remove_no_dt
-+ * stmmac_pltfr_remove
-  * @pdev: pointer to the platform device
-  * Description: This undoes the effects of stmmac_pltfr_probe() by removing the
-  * driver and calling the platform's exit() callback.
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 48c0d56c0568..f8fd8e00bbc8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -100,7 +100,7 @@ struct ice_perout_channel {
+  * the last timestamp we read for a given index. If the current timestamp
+  * value is the same as the cached value, we assume a new timestamp hasn't
+  * been captured. This avoids reporting stale timestamps to the stack. This is
+- * only done if the verify_cached flag is set in ice_ptp_tx structure.
++ * only done if the has_ready_bitmap flag is not set in ice_ptp_tx structure.
   */
--void stmmac_pltfr_remove_no_dt(struct platform_device *pdev)
-+void stmmac_pltfr_remove(struct platform_device *pdev)
- {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-@@ -849,23 +849,6 @@ void stmmac_pltfr_remove_no_dt(struct platform_device *pdev)
- 	stmmac_dvr_remove(&pdev->dev);
- 	stmmac_pltfr_exit(pdev, plat);
- }
--EXPORT_SYMBOL_GPL(stmmac_pltfr_remove_no_dt);
--
--/**
-- * stmmac_pltfr_remove
-- * @pdev: platform device pointer
-- * Description: this function calls the main to free the net resources
-- * and calls the platforms hook and release the resources (e.g. mem).
-- */
--void stmmac_pltfr_remove(struct platform_device *pdev)
--{
--	struct net_device *ndev = platform_get_drvdata(pdev);
--	struct stmmac_priv *priv = netdev_priv(ndev);
--	struct plat_stmmacenet_data *plat = priv->plat;
--
--	stmmac_pltfr_remove_no_dt(pdev);
--	stmmac_remove_config_dt(pdev, plat);
--}
- EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
+ struct ice_tx_tstamp {
+ 	struct sk_buff *skb;
+@@ -130,7 +130,9 @@ enum ice_tx_tstamp_work {
+  * @init: if true, the tracker is initialized;
+  * @calibrating: if true, the PHY is calibrating the Tx offset. During this
+  *               window, timestamps are temporarily disabled.
+- * @verify_cached: if true, verify new timestamp differs from last read value
++ * @has_ready_bitmap: if true, the hardware has a valid Tx timestamp ready
++ *                    bitmap register. If false, fall back to verifying new
++ *                    timestamp values against previously cached copy.
+  */
+ struct ice_ptp_tx {
+ 	spinlock_t lock; /* lock protecting in_use bitmap */
+@@ -142,7 +144,7 @@ struct ice_ptp_tx {
+ 	u8 len;
+ 	u8 init : 1;
+ 	u8 calibrating : 1;
+-	u8 verify_cached : 1;
++	u8 has_ready_bitmap : 1;
+ };
  
- /**
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
-index c5565b2a70ac..bb07a99e1248 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
-@@ -32,7 +32,6 @@ int stmmac_pltfr_probe(struct platform_device *pdev,
- int devm_stmmac_pltfr_probe(struct platform_device *pdev,
- 			    struct plat_stmmacenet_data *plat,
- 			    struct stmmac_resources *res);
--void stmmac_pltfr_remove_no_dt(struct platform_device *pdev);
- void stmmac_pltfr_remove(struct platform_device *pdev);
- extern const struct dev_pm_ops stmmac_pltfr_pm_ops;
- 
+ /* Quad and port information for initializing timestamp blocks */
 -- 
-2.40.1
+2.39.2
 
 
