@@ -1,169 +1,141 @@
-Return-Path: <netdev+bounces-31317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 202BB78CFDB
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 01:06:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264A178D093
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 01:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 500591C209E0
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 23:06:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6928281214
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 23:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1756FCD;
-	Tue, 29 Aug 2023 23:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EF36FDC;
+	Tue, 29 Aug 2023 23:28:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6E66FAB
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:06:07 +0000 (UTC)
-Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CC41BF;
-	Tue, 29 Aug 2023 16:05:37 -0700 (PDT)
-Received: by nautica.notk.org (Postfix, from userid 108)
-	id EFDE8C023; Wed, 30 Aug 2023 01:05:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1693350335; bh=dQHdkT5Gp4NzAC/U19NudWM0qbVpz/0YzX6DXUrgrU8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XS4D5XU0wXBqa5VoXoKJqu7ZT3qrIwS0cTp+M8Bstdu1h55bk9CxOITynDdloV3Dm
-	 UeVlL6si6gTbL//h1GUju0n9dZgGjCYtHunz+ZwhFhmzSi7nSnEm+/qJOIvTkJ1pxl
-	 wwu96KMlOjdg1Xuj1DU05QK8B4JIvitma8cQ6A2N0xjq/B5wtb94QxBDvg4Mg/HemL
-	 vLIkmL+aGpcFPnJ4QOp8GonouZ9SqcAbjmg+jXHiEJ/j5rP28+lLElfYSGo1RF4B/q
-	 fR2+drhPF5vk6ddhOHttRrdNFhNdN4jwAFRn7QmHHXvFOc579eHAidqgZd13OdlAiq
-	 Gq9qMztLDxY0Q==
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-Received: from gaia (localhost [127.0.0.1])
-	by nautica.notk.org (Postfix) with ESMTPS id CB810C009;
-	Wed, 30 Aug 2023 01:05:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1693350334; bh=dQHdkT5Gp4NzAC/U19NudWM0qbVpz/0YzX6DXUrgrU8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z8K02d90bU3sYHjw49onFq3FMgLLGv0QmiMPW43N2x2S26ncmvtmX+HBX9c+0MaSl
-	 mtxekmDUFFLy26mN0DlHj1Urq0sKG7N93V2upft+EXuNvPHANDBu3DtLXQ+VB2ZRfC
-	 eK2uy7RW6btEIkbjz9BU11u+/SWghJTAfMzl07fqhR+AmeBLITI2iJIfvJG7UO0nsr
-	 +VTurKbqWkEvFLkDiuE7+oi1dDM0dMcJHAez3S6WBTvN61fNNd+IzNHtsAxDaMgP3n
-	 E1/xa7VpfJJ/GQcSMBW2nTXXyGHZEEDVd+SFJD4b784h9WMQOjHcWl8cMyAmoOMYbV
-	 mZnJ7AqkLmyFw==
-Received: from localhost (gaia [local])
-	by gaia (OpenSMTPD) with ESMTPA id 3031a51d;
-	Tue, 29 Aug 2023 23:05:22 +0000 (UTC)
-Date: Wed, 30 Aug 2023 08:05:07 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Marco Elver <elver@google.com>
-Cc: syzbot <syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, ericvh@kernel.org,
-	kuba@kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux_oss@crudebyte.com,
-	lucho@ionkov.net, netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com, v9fs@lists.linux.dev
-Subject: Re: [syzbot] [net?] [v9fs?] KCSAN: data-race in p9_fd_create /
- p9_fd_create (2)
-Message-ID: <ZO55o4lE2rKO5AlI@codewreck.org>
-References: <000000000000d26ff606040c9719@google.com>
- <ZO3PFO_OpNfBW7bd@codewreck.org>
- <ZO38mqkS0TYUlpFp@elver.google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC896AAC
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:28:32 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAEEA11B;
+	Tue, 29 Aug 2023 16:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1693351706;
+	bh=MxfD5rB/5DGRsx1UFZiv+c2vCsiVC6XlMi4cYQc+DJY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BaCv5kNx3dK43bYNeOzj6Uef42zVtb1lJodrEvVcs0sGdKSGUpXPrh+PLu94Mzea8
+	 b1ak4Xru3g3jS2nCZm/lm3bCBj4KDwX8iiySRUVsnbULEtDuXtjqHumUiuF7X3j+tU
+	 b39oAdffrJ9AlEA95TTw0C/Kt+6C9P246jdhqC5jPgwvZHNxfvTUnDUjrhfIUcfXkn
+	 EitkyhpU3LkeMQOWrI7BfmpnEHxbWWrRSLXH9HlC8VIid0w2N8DjzX1I1p/lhTuUcq
+	 IhKWsY/FIgLyt45/n5zyKn3fOd1GsEKQW94QR05zb6sHagxVKb8ratyQnCeYQvTR1f
+	 7nbRrey4/yfDQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Rb3Ws3NT9z4wd0;
+	Wed, 30 Aug 2023 09:28:25 +1000 (AEST)
+Date: Wed, 30 Aug 2023 09:28:14 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>,
+ PowerPC <linuxppc-dev@lists.ozlabs.org>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the net-next tree with the powerpc
+ tree
+Message-ID: <20230830092814.71cb6911@canb.auug.org.au>
+In-Reply-To: <20230818111707.2714e8cb@canb.auug.org.au>
+References: <20230818111707.2714e8cb@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZO38mqkS0TYUlpFp@elver.google.com>
+Content-Type: multipart/signed; boundary="Sig_/kzYIKj8Isww0Z0lB3pjBXEU";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Marco Elver wrote on Tue, Aug 29, 2023 at 04:11:38PM +0200:
-> On Tue, Aug 29, 2023 at 07:57PM +0900, Dominique Martinet wrote:
-> [...]
-> > Yes well that doesn't seem too hard to hit, both threads are just
-> > setting O_NONBLOCK to the same fd in parallel (0x800 is 04000,
-> > O_NONBLOCK)
-> > 
-> > I'm not quite sure why that'd be a problem; and I'm also pretty sure
-> > that wouldn't work anyway (9p has no muxing or anything that'd allow
-> > sharing the same fd between multiple mounts)
-> > 
-> > Can this be flagged "don't care" ?
-> 
-> If it's an intentional data race, it could be marked data_race() [1].
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
+--Sig_/kzYIKj8Isww0Z0lB3pjBXEU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks!
+Hi all,
 
-> However, staring at this code for a bit, I wonder why the f_flags are
-> set on open, and not on initialization somewhere...
+On Fri, 18 Aug 2023 11:17:07 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> Today's linux-next merge of the net-next tree got a conflict in:
+>=20
+>   drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+>=20
+> between commit:
+>=20
+>   60bc069c433f ("powerpc/include: Remove unneeded #include <asm/fs_pd.h>")
+>=20
+> from the powerpc tree and commit:
+>=20
+>   7a76918371fe ("net: fs_enet: Move struct fs_platform_info into fs_enet.=
+h")
+>=20
+> from the net-next tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> --=20
+> Cheers,
+> Stephen Rothwell
+>=20
+> diff --cc drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+> index aad96cb2ab4e,d371072fff60..000000000000
+> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+> @@@ -9,8 -10,8 +10,6 @@@
+>   #include <linux/phy.h>
+>   #include <linux/dma-mapping.h>
+>  =20
+> - #include <linux/fs_enet_pd.h>
+>  -#include <asm/fs_pd.h>
+> --
+>   #ifdef CONFIG_CPM1
+>   #include <asm/cpm1.h>
+>   #endif
 
-This open is during the mount initialization (mount/p9_client_create,
-full path in the stack); there's no more initialization-ish code we
-have.
-The problem here is that we allow to pass any old arbitrary fd, so the
-user can open their fd how they want and abuse mount to use it on
-multiple mounts, even if that has no way of working (as I mentionned,
-there's no control flow at all -- you'll create two completely separate
-client state machines that'll both try to read and/or write (separate
-fds) on the same fd, and it'll all get jumbled up.
-> 
-> Anyway, a patch like the below would document that the data race is
-> intended and we assume that there is no way (famous last words) the
-> compiler or the CPU can mess it up (and KCSAN won't report it again).
+This is now a conflict between the powerpc tree and Linus' tree.
 
-That's good enough for me as my position really is just "don't do
-that"... Would that also protect from syzcaller sending the fd to mount
-on one side, and calling fcntl(F_SETFL) on the side?
-At this rate we might as well just take the file's f_lock as setfl does,
-but perhaps there's a way to steal the fd from userspace somehow?
+--=20
+Cheers,
+Stephen Rothwell
 
-It's not just "don't use this fd for another mount", it really is "don't
-use this fd anymore while it is used by a mount".
+--Sig_/kzYIKj8Isww0Z0lB3pjBXEU
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-This is made complicated that we only want to steal half of the fd, you
-could imagine a weird setup like this:
+-----BEGIN PGP SIGNATURE-----
 
- ┌────────────────────────────────────┐         ┌─────────────────┐
- │                                    │         │                 │
- │                                    │         │  kernel client  │
- │   fd3 tcp to server                │         │                 │
- │       write end  ◄─────────────────┼─────────┤                 │
- │                                    │         │                 │
- │       read end   ──┐               │         │                 │
- │                    │               │         │                 │
- │   fd4 pipeA        │ MITMing...    │         │                 │
- │                    │               │         │                 │
- │       write end  ◄─┘               │         │                 │
- │                                    │         │                 │
- │   fd5 pipeB                        │         │                 │
- │                                    │         │                 │
- │       read end  ───────────────────┼────────►│                 │
- │                                    │         │                 │
- │                                    │         │                 │
- └────────────────────────────────────┘         └─────────────────┘
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmTufw8ACgkQAVBC80lX
+0GwGLgf/YrbEQb46AZGblOXOfqDRqvOClfY16YPJ421dwyYDswib581afeFKKuT4
+vTnIg78VaetO8fLJXBP1E9mzu9LRPLmxMfYwDrlK5fk6IHP9X5euTN8VenbZsmYi
+giGEaVKOd23q/CfZ0NRi+JhWRffPezZabAIYmo23UKw+QNaKMCsdziARRKmvT8DN
+jkqfvR8GQz7nMJjzhMZj24xiTWs478zGRhOTXUXMWxDdcNKdbg4GzZlcD8ikV8az
+GAU59J9HXcHeGPYpW4zLS2TWEFw1xF7xphIRlYJd63qRKQeiI4zyHQn+5V2wfgLm
+OptDIA4IDHhVixYrjyCleSXLrlm8UQ==
+=LI+k
+-----END PGP SIGNATURE-----
 
-I'm not sure we actually want to support something like that, but it's
-currently possible and making mount act like close() on the fd would
-break this... :|
-
-So, yeah, well; this is one of these "please don't do this" that
-syzcaller has no way of knowing about; it's good to test (please don't
-do this has no security guarantee so the kernel shouldn't blow up!),
-but if the only fallout is breakage then yeah data_race() is fine.
-
-Compilers and/or CPU might be able to blow this out of proportion, but
-hopefully they won't go around modifying another unrelated value in
-memory somewhere, and we do fdget so it shouldn't turn into a UAF, so I
-guess it's fine?... Just taking f_lock here won't solve anything and
-might give the impression we support concurrent uses.
-
-
-Sorry for rambling, and thanks for the patch; I'm not sure if Eric has
-anything planned for next cycle but either of us can take it and call it
-a day.
--- 
-Dominique Martinet | Asmadeus
+--Sig_/kzYIKj8Isww0Z0lB3pjBXEU--
 
