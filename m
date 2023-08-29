@@ -1,213 +1,180 @@
-Return-Path: <netdev+bounces-31127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A0778BB7F
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 01:32:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB10678BC57
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 03:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37C951C20976
-	for <lists+netdev@lfdr.de>; Mon, 28 Aug 2023 23:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C136280F19
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 01:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65067111BB;
-	Mon, 28 Aug 2023 23:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229F77FF;
+	Tue, 29 Aug 2023 01:07:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C051FA3
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 23:32:45 +0000 (UTC)
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B938C2
-	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 16:32:42 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-77a62a84855so135606939f.1
-        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 16:32:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B6B7FA
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 01:07:55 +0000 (UTC)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6295812D
+	for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 18:07:54 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bdbf10333bso30160285ad.1
+        for <netdev@vger.kernel.org>; Mon, 28 Aug 2023 18:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1693265562; x=1693870362;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T93MIF/NuiHl+rjyOE4h3UC1+9GMIxS+wvWeV030tBM=;
-        b=Pvd7uGRQglDNm6gqw3gu/GzG9JGn4owIHTL4flQs5e+UnGIvi7b2D0R1ykjzx5eKXM
-         flu6JXn8EKugGswme7qGZ/D07rILkohZptmeX15zT/8McGt9QKXDzqObCk7ortfBUd3l
-         oq2cAHygRsuem/EtqUwEvJs0UeKCY0eqAUDZR8wl3H6oBMbQHhEdmFBURWyJTzHr96fL
-         48hk38lyZ5FLJBUWKXWiaoTvPi8hVLh+BzYw05I2hmi92zwXn5JGmRLLfPU5/MeBtLaC
-         cL1WPf8H4eHJfLqj92wQW+f/w9u8WCpRCLWDf/PUYDFtWxtwG6lLaOulCp4pjsBDhPOE
-         FSTg==
+        d=gmail.com; s=20221208; t=1693271274; x=1693876074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QPbW47pZT+pAVeMclK+lu3UmNpzz/SgVXYHgP23l6o0=;
+        b=d9vq4ZZEJsCadXYoUzjlWIk+HWho6QzeJy9gB0bVV44HKqOpc/f5piFDoRIViI/0/f
+         doh0AzOHWR+pXBn0vNMHjh/Vx99rsN7W06pvSht6BAY5tqPY6yfGAu9cCxcEhoC69a2h
+         wDXhgdYrU4lAySm/Ky0k3qItUYutQLYCBfQN5h5hJLifKv0TXXE5MM6dA1GlCDpH+yjI
+         nzNH+mUTdd9URfl7brB3ZMdx29IQ4OtsLz3UFcK6kHEJt5sYk7tmaOBJS2hnApvVFUb+
+         vW5dwGtvl7gvHOdwee49EgvRe8UNV7kfjKx0cV3IlLGxZz9Wix3pygc9t79LO5LG2P3r
+         D7GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693265562; x=1693870362;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T93MIF/NuiHl+rjyOE4h3UC1+9GMIxS+wvWeV030tBM=;
-        b=L2JjlYAJF0BQpFoZxMSRQyj3ha/S66ysLkdk2rFKHXZTke9uxdFI7CHapcr01RO02G
-         m4wSkZdni+9TVdpGQAsTtKPZLNPMQ05rzr2KBPXTOLAQJUnUVODMCqYceKQPRZEYpMsu
-         HOW1FQ3xe6J/aLvNHX362XHCRFkMrS8VtKuIJdtonR1EOVTfLGnX7oh4QG175vZch9oO
-         G77I4h9O23Y1DYxfEF/e9NJqeKhqCaCAK+P7rLNTkkq49TB4R4wpCPa+cuWMX+gZNPFf
-         Zks542aY9XEXx+q04XMhSZ/tT0sU0fvsRPTXQYkSC9yQeDTzLxtIWfgCBOIq0/CAz3cA
-         1fbg==
-X-Gm-Message-State: AOJu0YwpY8raPyQPr9Hk9xg6AFT48JOIlUNpUK59bS+OO7lquTrxsSR1
-	MavltNAjGuttM1kwFi/3RpyqMQ==
-X-Google-Smtp-Source: AGHT+IGULA6p/QOjVd5QXqxdF6Nc9Ib7BFCila5yxZl8IDZ8ArnZaHF8MqlgbFLLC0bPpuOoXOWHAQ==
-X-Received: by 2002:a5d:971a:0:b0:783:47cd:27b5 with SMTP id h26-20020a5d971a000000b0078347cd27b5mr17689459iol.3.1693265561847;
-        Mon, 28 Aug 2023 16:32:41 -0700 (PDT)
-Received: from dev-mkhalfella2.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id cw18-20020a05663849d200b0042b149aeccdsm2786197jab.104.2023.08.28.16.32.40
+        d=1e100.net; s=20221208; t=1693271274; x=1693876074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QPbW47pZT+pAVeMclK+lu3UmNpzz/SgVXYHgP23l6o0=;
+        b=jaq1WzC6i5XG8AEp5v/PVU9O1h5PEOm5GpZa5Q4cEXI1v7LWcJLheFeZumkzsLVgx+
+         APZCcGu3vYq0U/Y4oYJMo7ItQkVYd7l27GOfb8HAUs2JRmu1VhkSTXlb0axQR1A8Jszq
+         rqPgqsye1Czy5cZTqQioUpJRAUy7I+1FPvma19DcsdnDxerBJJZAcCmy01wwo7fQ9ryr
+         oWDku8ulQehOYLtmqEQH4AJH/91mm4KlLcvZGlbZkEXwcr+vyPrTksl+bYNJDMnGh0k/
+         48V88JDrlRSv5LHgiFHpglzJEZHIoEe0x5vqDEB1A6XyGqVsk4VoEreeUQrqkir1Q5Rw
+         xo/Q==
+X-Gm-Message-State: AOJu0YyVvxOfljP1+vtufzRbbwOYdHsq6p+wFxiQixS7WqjStcHNx/WG
+	/QNb5fi3arct86LKNr/SgP8=
+X-Google-Smtp-Source: AGHT+IFPiy+QJXhLH+MvjpJrnkv5Jpw4ZDXQ0mgQOT7gKwNCvQNG47JzInEUeMJa0gMJ6M71G4ngYA==
+X-Received: by 2002:a17:903:2291:b0:1bc:6c8:cde3 with SMTP id b17-20020a170903229100b001bc06c8cde3mr32684048plh.57.1693271273772;
+        Mon, 28 Aug 2023 18:07:53 -0700 (PDT)
+Received: from Laptop-X1 ([2409:8a02:7820:a6d0:fe00:94b0:34da:834c])
+        by smtp.gmail.com with ESMTPSA id c15-20020a170902d48f00b001bdc8a5e96csm8048315plg.169.2023.08.28.18.07.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 16:32:41 -0700 (PDT)
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: "David S. Miller" <davem@davemloft.net>,
+        Mon, 28 Aug 2023 18:07:52 -0700 (PDT)
+Date: Tue, 29 Aug 2023 09:07:46 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: David Ahern <dsahern@kernel.org>
+Cc: Ido Schimmel <idosch@idosch.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>
-Cc: Mohamed Khalfella <mkhalfella@purestorage.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	David Howells <dhowells@redhat.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	Kees Cook <keescook@chromium.org>,
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-	linux-kernel@vger.kernel.org (open list),
-	bpf@vger.kernel.org (open list:BPF [MISC])
-Subject: [PATCH] skbuff: skb_segment, Update nfrags after calling zero copy functions
-Date: Mon, 28 Aug 2023 17:32:07 -0600
-Message-Id: <20230828233210.36532-1-mkhalfella@purestorage.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [Questions] Some issues about IPv4/IPv6 nexthop route
+Message-ID: <ZO1E4iy5hmd4kpHl@Laptop-X1>
+References: <ZLngmOaz24y5yLz8@Laptop-X1>
+ <d6a204b1-e606-f6ad-660a-28cc5469be2e@kernel.org>
+ <ZLobpQ7jELvCeuoD@Laptop-X1>
+ <ZLzY42I/GjWCJ5Do@shredder>
+ <ZL48xbowL8QQRr9s@Laptop-X1>
+ <20230724084820.4aa133cc@hermes.local>
+ <ZMDyoRzngXVESEd1@Laptop-X1>
+ <ZMKC7jTVF38JAeNb@shredder>
+ <ZOxSYqrgndbdL4/M@Laptop-X1>
+ <078061ce-1411-d150-893a-d0a950c8866f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <078061ce-1411-d150-893a-d0a950c8866f@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-We have seen kernel panic with stacktrace below. This is 5.15.123
-LTS kernel running a qemu VM with virtio network interface and
-vhost=on. When enabling packet corruption, with command below, we see
-the kernel panic.
+On Mon, Aug 28, 2023 at 09:06:25AM -0600, David Ahern wrote:
+> >>> But there are 2 issues here:
+> >>> 1. the *type* and *protocol* field are actally ignored
+> >>> 2. when do `ip monitor route`, the info dumpped in fib6_add_rt2node()
+> >>>    use the config info from user space. When means `ip monitor` show the
+> >>>    incorrect type and protocol
+> >>>
+> >>> So my questions are, should we show weight/scope for IPv4?
+> > 
+> > Here is the first one. As the weight/scope are not shown, the two separate
+> > routes would looks exactly the same for end user, which makes user confused.
+> 
+> Asked and answered many times above: Weight has no meaning on single
+> path routes; it is not even tracked if I recall correctly.
 
-tc qdisc add dev eth2 root netem corrupt 0.7065335155074846%
+Yes, I'm sorry that I asked this question over and over again. Because I
+always got the answer that these are two different routes and weight are
+meaningless for none-multipath route. But IIRC, I never got a straight answer
+of what we should deal with this problem.
+> 
+> > So why not just show the weight/scope, or forbid user to add a non-multipath
+> > route with weight/scope?
+> 
+> That is a change to a uAPI we can not do at this point.
 
-[  193.894380] BUG: kernel NULL pointer dereference, address: 00000000000000bc
-[  193.894635] #PF: supervisor read access in kernel mode
-[  193.894828] #PF: error_code(0x0000) - not-present page
-[  193.895027] PGD 0 P4D 0
-[  193.895140] Oops: 0000 [#1] SMP
-[  193.895273] CPU: 13 PID: 18164 Comm: vh-net-17428 Kdump: loaded Tainted: G           O      5.15.123+ #26
-[  193.895602] Hardware name:
-[  193.903919] RIP: 0010:skb_segment+0xb0e/0x12f0
-[  193.908176] Code: 45 a8 50 e8 54 46 be ff 44 8b 5d 80 41 01 c7 48 83 c4 18 44 89 7d b4 44 3b 5d b0 0f 8c f0 00 00 00 4d 85 e4 0f 84 65 07 00 00 <45> 8b b4 24 bc 00 00 00 48 8b b5 70 ff ff ff 4d 03 b4 24 c0 00 00
-[  193.921099] RSP: 0018:ffffc9002bf2f770 EFLAGS: 00010282
-[  193.925552] RAX: 00000000000000ee RBX: ffff88baab5092c8 RCX: 0000000000000003
-[  193.934308] RDX: 0000000000000000 RSI: 00000000fff7ffff RDI: 0000000000000001
-[  193.943281] RBP: ffffc9002bf2f850 R08: 0000000000000000 R09: c0000000fff7ffff
-[  193.952658] R10: 0000000000000029 R11: ffffc9002bf2f310 R12: 0000000000000000
-[  193.962423] R13: ffff88abc2291e00 R14: ffff88abc2291d00 R15: ffff88abc2290600
-[  193.972593] FS:  0000000000000000(0000) GS:ffff88c07f840000(0000) knlGS:0000000000000000
-[  193.983302] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  193.988891] CR2: 00000000000000bc CR3: 0000001dccb4b006 CR4: 00000000001726e0
-[  193.999925] MSR 198h IA32 perf status 0x00001ba000001a00
-[  194.005488] MSR 19Ch IA32 thermal status 0x0000000088370000
-[  194.010983] MSR 1B1h IA32 package thermal status 0x0000000088330000
-[  194.021892] Call Trace:
-[  194.027422]  <TASK>
-[  194.032838]  ? __die_body+0x1a/0x60
-[  194.038172]  ? page_fault_oops+0x12d/0x4d0
-[  194.043395]  ? skb_segment+0xb0e/0x12f0
-[  194.048501]  ? search_bpf_extables+0x59/0x60
-[  194.053547]  ? fixup_exception+0x1d/0x250
-[  194.058537]  ? exc_page_fault+0x67/0x140
-[  194.063382]  ? asm_exc_page_fault+0x1f/0x30
-[  194.068171]  ? skb_segment+0xb0e/0x12f0
-[  194.072861]  tcp_gso_segment+0x107/0x540
-[  194.077507]  ? sk_common_release+0xe0/0xe0
-[  194.082031]  inet_gso_segment+0x15c/0x3d0
-[  194.086441]  ? __skb_get_hash_symmetric+0x190/0x190
-[  194.090783]  skb_mac_gso_segment+0x9f/0x110
-[  194.095016]  __skb_gso_segment+0xc1/0x190
-[  194.099124]  ? netif_skb_features+0xb5/0x280
-[  194.103131]  netem_enqueue+0x290/0xb10 [sch_netem]
-[  194.107071]  dev_qdisc_enqueue+0x16/0x70
-[  194.110884]  __dev_queue_xmit+0x63b/0xb30
-[  194.114569]  ? inet_gso_segment+0x15c/0x3d0
-[  194.118160]  ? bond_start_xmit+0x159/0x380 [bonding]
-[  194.121670]  bond_start_xmit+0x159/0x380 [bonding]
-[  194.125101]  ? skb_mac_gso_segment+0xa7/0x110
-[  194.128506]  dev_hard_start_xmit+0xc3/0x1e0
-[  194.131787]  __dev_queue_xmit+0x8a0/0xb30
-[  194.134977]  ? macvlan_start_xmit+0x4f/0x100 [macvlan]
-[  194.138225]  macvlan_start_xmit+0x4f/0x100 [macvlan]
-[  194.141477]  dev_hard_start_xmit+0xc3/0x1e0
-[  194.144622]  sch_direct_xmit+0xe3/0x280
-[  194.147748]  __dev_queue_xmit+0x54a/0xb30
-[  194.150924]  ? tap_get_user+0x2a8/0x9c0 [tap]
-[  194.154131]  tap_get_user+0x2a8/0x9c0 [tap]
-[  194.157358]  tap_sendmsg+0x52/0x8e0 [tap]
-[  194.160565]  ? get_tx_bufs+0x42/0x1d0 [vhost_net]
-[  194.163815]  ? get_tx_bufs+0x16a/0x1d0 [vhost_net]
-[  194.167049]  handle_tx_zerocopy+0x14e/0x4c0 [vhost_net]
-[  194.170351]  ? add_range+0x11/0x30
-[  194.173631]  handle_tx+0xcd/0xe0 [vhost_net]
-[  194.176959]  vhost_worker+0x76/0xb0 [vhost]
-[  194.180299]  ? vhost_flush_work+0x10/0x10 [vhost]
-[  194.183667]  kthread+0x118/0x140
-[  194.187007]  ? set_kthread_struct+0x40/0x40
-[  194.190358]  ret_from_fork+0x1f/0x30
-[  194.193670]  </TASK>
+Yes, that's the answers I want to receive. Either show it, forbid it, or
+not change it as it would change uAPI.
 
-I have narrowed the issue down to these lines in skb_segment()
+> 
+> > 
+> >>> How to deal the type/proto info missing for IPv6?
+> > 
+> > What we should do for this bug? The type/proto info are ignored when
+> > merge the IPv6 nexthop entries.
+> 
+> I need more information; this thread has gone on for a long time now.
 
-4247                 if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
-4248                     skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
-4249                         goto err;
+Sure, here is the reproducer:
 
-It is possible for skb_orphan_frags() or skb_zerocopy_clone() to update
-`nr_frags` as both functions may call skb_copy_ubufs(). If `nr_frags`
-gets updated, the local copy in `nfrags` might end up stale and cause
-this panic. In particular it is possible the while loop below hits
-`i >= nrfrags` prematurely and tries to move to next `frag_skb` by using
-`list_skb`. If `list_skb` is NULL then we hit the panic above.
++ ip link add dummy1 up type dummy
++ ip link add dummy2 up type dummy
++ ip addr add 2001:db8:101::1/64 dev dummy1
++ ip addr add 2001:db8:101::2/64 dev dummy2
++ ip monitor route
++ sleep 1
++ ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
+local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100 metric 1024 pref medium
++ ip route prepend unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
+2001:db8:103::/64 table 100 metric 1024 pref medium
+        nexthop via 2001:db8:101::10 dev dummy2 weight 1
+        nexthop via 2001:db8:101::10 dev dummy1 weight 1
 
-The naive way to fix this is to update `nfrags` as shown in this patch.
-This way we get the correct number of fragments and while loop can
-find all fragments without needing to move to next skbuff.
+   ^^ Here you can see the ip monitor print the route with unicast, even the
+      "dev dummy1" route should be local
 
-I wanted to share this with the list and see what people think before
-submitting a patch. Specially that I have not tested this on master
-branch.
++ ip -6 route show table 100
+local 2001:db8:103::/64 metric 1024 pref medium
+        nexthop via 2001:db8:101::10 dev dummy1 weight 1
+        nexthop via 2001:db8:101::10 dev dummy2 weight 1
 
-Fixes: bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions once per nskb")
-Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
----
- net/core/skbuff.c | 4 ++++
- 1 file changed, 4 insertions(+)
+    ^^ But the final route still keep using local. Which is different with
+       what `ip monitor` print
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a298992060e6..864cc8ad1969 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4567,6 +4567,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 		if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
- 		    skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
- 			goto err;
-+		/* Update nfrags in case skb_copy_ubufs() updates nr_frags */
-+		nfrags = skb_shinfo(frag_skb)->nr_frags;
- 
- 		while (pos < offset + len) {
- 			if (i >= nfrags) {
-@@ -4587,6 +4589,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 				    skb_zerocopy_clone(nskb, frag_skb,
- 						       GFP_ATOMIC))
- 					goto err;
-+				/* Update nfrags in case skb_copy_ubufs() updates nr_frags */
-+				nfrags = skb_shinfo(frag_skb)->nr_frags;
- 
- 				list_skb = list_skb->next;
- 			}
--- 
-2.17.1
++ ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
+2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 table 200 proto kernel metric 1024 pref medium
++ ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
+2001:db8:104::/64 table 200 proto bgp metric 1024 pref medium
+        nexthop via 2001:db8:101::10 dev dummy2 weight 1
+        nexthop via 2001:db8:101::10 dev dummy1 weight 1
++ ip -6 route show table 200
+2001:db8:104::/64 proto kernel metric 1024 pref medium
+        nexthop via 2001:db8:101::10 dev dummy1 weight 1
+        nexthop via 2001:db8:101::10 dev dummy2 weight 1
 
+        ^^ Same here, ip monitor print protocol bgp, but the actual protocol
+           is still kernel. We just merged them together and ignored the
+           protocol field.
+
++ kill $!
+
+As I asked, The type/proto info are ignored and dropped when merge the IPv6
+nexthop entries. How should we deal with this bug? Fix it or ignore it?
+
+Thanks
+Hangbin
 
