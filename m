@@ -1,97 +1,120 @@
-Return-Path: <netdev+bounces-31279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8320F78C666
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:46:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D712078C6CE
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 16:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0E9281240
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:46:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA9E2811F8
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5877117741;
-	Tue, 29 Aug 2023 13:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A1117753;
+	Tue, 29 Aug 2023 14:05:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE92B14F6C
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:46:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69BDCC433C7;
-	Tue, 29 Aug 2023 13:46:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693316783;
-	bh=mxUSGoaiwDu9p3NHVkQW2/eRUPS+fI4b+7+yluZCnZU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MTBNFf91Si/pjCRqCKIwNMeD7UY8htfyBKc+B+DV45VggRervqbx3MDnbkEcjeYyb
-	 XLX4R2uvdznzl3fy/E4L/E+Xn/FDbd3I4bwAVVi6PKKdXij5MECU4Aa8SbCI9cqzi1
-	 M+8vQ+pOR1M2W98JCUamxm28VRWo3iP6iWDWbrCu2nO/lE0Qxl8Ij1nr0b05TyozXf
-	 gOZZfT07ge+JLQ0hYzUXtS9JQu1JTo/Y+2QrEtO0xSeloR8S8XpIFWhKahMEpqNQaQ
-	 YK2KMYjsZC2/9sk34g6EEC3KIAVg2A3vg3XWD3IDS6GThkag+C+G1Hzy0395IKxN28
-	 cve3TJVy1b0aA==
-Date: Tue, 29 Aug 2023 14:46:16 +0100
-From: Lee Jones <lee@kernel.org>
-To: Zheng Wang <zyytlz.wz@163.com>
-Cc: s.shtylyov@omp.ru, linyunsheng@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, p.zabel@pengutronix.de,
-	geert+renesas@glider.be, magnus.damm@gmail.com,
-	yoshihiro.shimoda.uh@renesas.com, biju.das.jz@bp.renesas.com,
-	wsa+renesas@sang-engineering.com, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	hackerzheng666@gmail.com, 1395428693sheep@gmail.com,
-	alex000young@gmail.com
-Subject: Re: [PATCH v4] net: ravb: Fix possible UAF bug in ravb_remove
-Message-ID: <20230829134616.GA215597@google.com>
-References: <20230725030026.1664873-1-zyytlz.wz@163.com>
- <20230815100844.GA495519@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A5C14AA7
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 14:05:12 +0000 (UTC)
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CED2CD1
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:05:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1693317906; x=1724853906;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HIjB6DSGcDiXSyJUkfXprhzVVBjmfilf4Wii2YLRbOw=;
+  b=oiQKfJANMP30n/nTDZpQs3IrnBL0+RhY4JVpdxNDsqJ8IsHffP+5mzFn
+   aIBmlyFtDStHBJoSbsovTf173nbjYJc/JlVWpCqYOLeDNHK1fcJRMzAkt
+   3yZjNpAFxupk1xuDkSJnUQejsDW5xBFGpZ2HkzJqHDdTPxoEsJVEDaFtN
+   lH9czGadEzZOvqRmJ/FJT3Otmjuq3m0A6eIvyj6LCXM8ChTBgaZLPdZKK
+   Vsz8GLdb8JtaCWqVRr1gOfwJhdMt+6nAI1YNnvT09ydPQMLkKjMT+v6eh
+   CUIQnCJze3A2g7bXNPocLZpfybvGdUdzZelYunLa8EMq9dhagGFNZsPk0
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.02,210,1688421600"; 
+   d="scan'208";a="32680003"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 29 Aug 2023 16:05:04 +0200
+Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 0271E280045;
+	Tue, 29 Aug 2023 16:05:03 +0200 (CEST)
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next] net: stmmac: failure to probe without MAC interface specified
+Date: Tue, 29 Aug 2023 16:05:03 +0200
+Message-ID: <4507976.LvFx2qVVIh@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <E1qayn0-006Q8J-GE@rmk-PC.armlinux.org.uk>
+References: <E1qayn0-006Q8J-GE@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230815100844.GA495519@google.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 15 Aug 2023, Lee Jones wrote:
+Am Dienstag, 29. August 2023, 15:29:50 CEST schrieb Russell King (Oracle):
+> Alexander Stein reports that commit a014c35556b9 ("net: stmmac: clarify
+> difference between "interface" and "phy_interface"") caused breakage,
+> because plat->mac_interface will never be negative. Fix this by using
+> the "rc" temporary variable in stmmac_probe_config_dt().
+>=20
+> Reported-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> I don't think the net tree is up to date with the net-next, so this
+> patch needs applying to net-next preferably before the pull request
+> to fix a regression.
 
-> On Tue, 25 Jul 2023, Zheng Wang wrote:
-> 
-> > In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
-> > If timeout occurs, it will start the work. And if we call
-> > ravb_remove without finishing the work, there may be a
-> > use-after-free bug on ndev.
-> > 
-> > Fix it by finishing the job before cleanup in ravb_remove.
-> > 
-> > Note that this bug is found by static analysis, it might be
-> > false positive.
-> > 
-> > Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> > Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
-> > Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> > ---
-> > v4:
-> > - add information about the bug was found suggested by Yunsheng Lin
-> > v3:
-> > - fix typo in commit message
-> > v2:
-> > - stop dev_watchdog so that handle no more timeout work suggested by Yunsheng Lin,
-> > add an empty line to make code clear suggested by Sergey Shtylyov
-> > ---
-> >  drivers/net/ethernet/renesas/ravb_main.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> 
-> Trying my best not to sound like a broken record, but ...
-> 
-> What's the latest with this fix?  Is a v5 en route?
+On top of next-20230829:
+Tested-by: Alexander Stein <alexander.stein@ew.tq-group.com>
 
-Any update please Zheng Wang?
+Thanks
 
--- 
-Lee Jones [李琼斯]
+> Thanks.
+>=20
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c index
+> 35f4b1484029..0f28795e581c 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -419,9 +419,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, =
+u8
+> *mac) return ERR_PTR(phy_mode);
+>=20
+>  	plat->phy_interface =3D phy_mode;
+> -	plat->mac_interface =3D stmmac_of_get_mac_mode(np);
+> -	if (plat->mac_interface < 0)
+> -		plat->mac_interface =3D plat->phy_interface;
+> +	rc =3D stmmac_of_get_mac_mode(np);
+> +	plat->mac_interface =3D rc < 0 ? plat->phy_interface : rc;
+>=20
+>  	/* Some wrapper drivers still rely on phy_node. Let's save it while
+>  	 * they are not converted to phylink. */
+
+
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
+
 
