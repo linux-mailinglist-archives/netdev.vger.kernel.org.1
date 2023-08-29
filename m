@@ -1,121 +1,93 @@
-Return-Path: <netdev+bounces-31315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E77B78CF7F
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 00:24:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1687878CFB4
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 00:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D42D28128A
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:24:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DC951C20A6A
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B1F18AE6;
-	Tue, 29 Aug 2023 22:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82DE6FBA;
+	Tue, 29 Aug 2023 22:57:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C68182D4
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 22:24:23 +0000 (UTC)
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2F01A6
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:24:21 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-68bed286169so4229826b3a.1
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:24:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1693347860; x=1693952660; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+YYrVRvFGP8cHlPGoJT9wVJUhY8GN/rwR0tzqEGpip4=;
-        b=HGN6wzE0Z+22ftS0x+nuWnCprmDpb/v0SZ86HyOgWputm+heKUXR2mnqzErStq72tE
-         c4zpJAZLjtl3kqpneEua/+I1WrnSnldvcrdEQdT7A5hy/DT7Q29PJg5ZsJoNRAT7q9t5
-         0pNXHfsoylRRBs84O2jg2jQ44b0YU6QiALeVPzBfC77m+1icx0TiWZM2135zoO1fYz30
-         Gm9oV5xtAaqTC6GGk81p9SW1a+4NDotdsld40wB+14KpNtaDa2zplFhdZqkhACTXNKdX
-         846zMFSDYPBeCRHYzXhz0Q3MFtvLKbd7Qz/i6wN3kFU3FU+6W9fVtld63qMKc3qTQ68j
-         7KuA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4976AAC
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 22:57:27 +0000 (UTC)
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BDF1BE
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:57:26 -0700 (PDT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2717f4ba116so4032402a91.0
+        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:57:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693347860; x=1693952660;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+YYrVRvFGP8cHlPGoJT9wVJUhY8GN/rwR0tzqEGpip4=;
-        b=MCbtbhOi+229F4EuGms6UFGdhYq9rORuIsLSrwJwQoLKsOdqK9LWbmoXWNQZUMs1I7
-         jYCXdxYob+3tuYtgQuVmk+rx7o3oSmB2v/9qob5k9Xnjjkx5NHXlY3+V+UZRbF+1WEWC
-         xAPO6j7K7iNf5yuXW3EvIWz5YgbQcxF8H9220A8XeNyuEWD3ebzBShSFLMoTN8fGL9D3
-         fyfHWmY157hpIBMW0fjXudi5rCAQb/OkqUqT+4ormpuzUc1C4/j+5na1WmzI0ZYA3wn+
-         1TmUoiEmxhO2jS1c4c6hg9/ndW9ytYKLFNW3RiOA/rQSIKnELmbVZ8tMDks8OdALTjMt
-         SyUw==
-X-Gm-Message-State: AOJu0Yz2+rG0fryI+b3QEFxcLDFcUieveg/u1DO+jIJ2t9JS0t53pk5g
-	tlp9w6q4FE44Y4qXvsU7MyI/Yg==
-X-Google-Smtp-Source: AGHT+IFPNsEXPkaJPGMeeiEFHipjnGseCng4DOTgYsmDDTAwZXJBdp93d1gYNXCJe3ucMHjD39GcnA==
-X-Received: by 2002:a05:6a20:9746:b0:148:656b:9a1f with SMTP id hs6-20020a056a20974600b00148656b9a1fmr654936pzc.20.1693347860454;
-        Tue, 29 Aug 2023 15:24:20 -0700 (PDT)
-Received: from medusa.lab.kspace.sh (c-98-207-191-243.hsd1.ca.comcast.net. [98.207.191.243])
-        by smtp.googlemail.com with ESMTPSA id v12-20020a170902b7cc00b001993a1fce7bsm9798784plz.196.2023.08.29.15.24.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 15:24:20 -0700 (PDT)
-Date: Tue, 29 Aug 2023 15:24:18 -0700
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: willemjdebruijn <willemdebruijn.kernel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	David Howells <dhowells@redhat.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	Kees Cook <keescook@chromium.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:BPF [MISC]" <bpf@vger.kernel.org>
-Subject: Re: [PATCH] skbuff: skb_segment, Update nfrags after calling zero
- copy functions
-Message-ID: <20230829222418.GB1473980@medusa>
-References: <20230828233210.36532-1-mkhalfella@purestorage.com>
- <64ed7188a2745_9cf208e1@penguin.notmuch>
- <20230829065010.GO4091703@medusa>
- <CANn89iLbNF_kGG9S3R9Y8gpoEM71Wesoi1mTA3-at4Furc+0Fg@mail.gmail.com>
- <20230829093105.GA611013@medusa>
- <CANn89iLzOFikw2A8HJJ0zvg1Znw+EnOH2Tm2ghrURkE7NXvQSg@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1693349846; x=1693954646;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cAx6PSOlRe1SoOmdVLTfSTqRq8XYYm/GJtA05ydLXZQ=;
+        b=F0p/cBFPoS8suy81xIc/A/C3BemzjfwUwB3TbrSo1jBGHQgFb8cBNVjliU2gyChd1g
+         EJr2O94GuuMDKn6EAoPRu5zSsp6U9oWYwvMGGBKX53DnhUAuZn5S0OWh8XPAVEXH3wM0
+         nt9M2Ll2KDGVEYIM/nPGu5gA0yPGyehetasSSQi0FJAjYjQuG55JTNVp+758iSotFi6A
+         63OAZ48geaEtci7YBXJxU0chUdyGMHRLYzM2JOsY5xbq1RqB7nzgvXcOdvuBrKnKjmv9
+         KTBxWpUU2AGuu9/2BF5wsqj7IpG0nPAhIY13df6VgM6PW/AZ+/iYX72VTFpF4/1jKi14
+         cMpg==
+X-Gm-Message-State: AOJu0YwM+ot6ClZ3b0FhLOywScjnWli6z8RpAhmKPQlaQ2WhMGaEJD71
+	Oy73eXAkaDpFAT9Yep9gqkyu/odn1+YQrUBuHEjcMiA/Nbe6
+X-Google-Smtp-Source: AGHT+IEzdCowiZmXUDDhkbYINfZE/r+09JEfRrBJG3TV1PZiXW7dTgVeIl0Jj6WsJu8Hs/EFNhtwmwBtC0shQ2WpNjmc8DS1vxGs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANn89iLzOFikw2A8HJJ0zvg1Znw+EnOH2Tm2ghrURkE7NXvQSg@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:a17:90a:c908:b0:268:5c5d:25cf with SMTP id
+ v8-20020a17090ac90800b002685c5d25cfmr153388pjt.4.1693349845961; Tue, 29 Aug
+ 2023 15:57:25 -0700 (PDT)
+Date: Tue, 29 Aug 2023 15:57:25 -0700
+In-Reply-To: <00000000000017ad3f06040bf394@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000c97a4060417bcaf@google.com>
+Subject: Re: [syzbot] [net] INFO: rcu detected stall in sys_close (5)
+From: syzbot <syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com>
+To: brauner@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	eric.dumazet@gmail.com, gautamramk@gmail.com, hdanton@sina.com, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, lesliemonis@gmail.com, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mohitbhasi1998@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sdp.sachin@gmail.com, syzkaller-bugs@googlegroups.com, tahiliani@nitk.edu.in, 
+	viro@zeniv.linux.org.uk, vsaicharan1998@gmail.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-29 12:09:15 +0200, Eric Dumazet wrote:
-> Another way to test this path for certain (without tcpdump having to race)
-> is to add a temporary/debug patch like this one:
-> 
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index a298992060e6efdecb87c7ffc8290eafe330583f..20cc42be5e81cdca567515f2a886af4ada0fbe0a
-> 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1749,7 +1749,8 @@ int skb_copy_ubufs(struct sk_buff *skb, gfp_t gfp_mask)
->         int i, order, psize, new_frags;
->         u32 d_off;
-> 
-> -       if (skb_shared(skb) || skb_unclone(skb, gfp_mask))
-> +       if (skb_shared(skb) ||
-> +           pskb_expand_head(skb, 0, 0, gfp_mask))
->                 return -EINVAL;
-> 
->         if (!num_frags)
-> 
-> Note that this might catch other bugs :/
+syzbot has bisected this issue to:
 
-I was not able to make it allocate a new frags by running tcpdump while
-reproing the problem. However, I was able to do it with your patch.
+commit ec97ecf1ebe485a17cd8395a5f35e6b80b57665a
+Author: Mohit P. Tahiliani <tahiliani@nitk.edu.in>
+Date:   Wed Jan 22 18:22:33 2020 +0000
+
+    net: sched: add Flow Queue PIE packet scheduler
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=101bb718680000
+start commit:   727dbda16b83 Merge tag 'hardening-v6.6-rc1' of git://git.k..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=121bb718680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=141bb718680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=45047a5b8c295201
+dashboard link: https://syzkaller.appspot.com/bug?extid=e46fbd5289363464bc13
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14780797a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c1fc9fa80000
+
+Reported-by: syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
+Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
