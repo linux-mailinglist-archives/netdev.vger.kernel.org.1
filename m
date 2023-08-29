@@ -1,210 +1,198 @@
-Return-Path: <netdev+bounces-31309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3B478CDBC
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:45:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B1F078CF02
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 23:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB41F1C20A65
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 20:45:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EEB21C20997
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 21:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54945182A3;
-	Tue, 29 Aug 2023 20:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F02A182CB;
+	Tue, 29 Aug 2023 21:57:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4824414AAF
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 20:45:11 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5FD21BB;
-	Tue, 29 Aug 2023 13:45:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=qqpCUFR3P/c8X+gNxuXmGaV/FqFgRToVQytMVMpzzZU=; b=Dve5+6o8hMnkJ5nWqXTD/1k5Ig
-	c+eL+0Tiv6N9rCEFJgeCjKJ4omPyPHn9fnqB3Jf8MqMaOyZqL+1UBHqlsS5YXH7+VQoXGOrthij6U
-	wXE8kb0bhwdeKsa8zyMuKPbVXAZmTXwfMMt3f1XiBd7bIzJsMtP+il1X36DMva9FrwpSsxX2Bbm+7
-	EuvcibeFMzWbVd3TNrqT4ZRzkQJ0Q9NQiatktpBmVWsXjDxGZFkVQEKbevr1IsN647m6SvvMo+viz
-	Yvy04a63uv+YPdHNtPwsUdAKlVbW2MWxd4cief6pa6kf+sxylyo5091Al/BfKdZkegt5uFBdYqewR
-	nJDOB6Og==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qb5a3-00CF5F-1u;
-	Tue, 29 Aug 2023 20:44:55 +0000
-Date: Tue, 29 Aug 2023 13:44:55 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Joel Granados <joel.granados@gmail.com>, linux-fsdevel@vger.kernel.org,
-	rds-devel@oss.oracle.com, "David S. Miller" <davem@davemloft.net>,
-	Florian Westphal <fw@strlen.de>, willy@infradead.org,
-	Jan Karcher <jaka@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	Simon Horman <horms@verge.net.au>,
-	Tony Lu <tonylu@linux.alibaba.com>, linux-wpan@vger.kernel.org,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	mptcp@lists.linux.dev, Heiko Carstens <hca@linux.ibm.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Will Deacon <will@kernel.org>, Julian Anastasov <ja@ssi.bg>,
-	netfilter-devel@vger.kernel.org, Joerg Reuter <jreuter@yaina.de>,
-	linux-kernel@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	linux-sctp@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-hams@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-	coreteam@netfilter.org, Ralf Baechle <ralf@linux-mips.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>, keescook@chromium.org,
-	Roopa Prabhu <roopa@nvidia.com>, David Ahern <dsahern@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Wenjia Zhang <wenjia@linux.ibm.com>, josh@joshtriplett.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-	linux-s390@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>, lvs-devel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Iurii Zaikin <yzaikin@google.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	bridge@lists.linux-foundation.org,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Mat Martineau <martineau@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Joel Granados <j.granados@samsung.com>, mcgrof@kernel.org
-Subject: [GIT PULL] sysctl changes for v6.6-rc1
-Message-ID: <ZO5Yx5JFogGi/cBo@bombadil.infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F9714AAF
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 21:57:58 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E3BFD;
+	Tue, 29 Aug 2023 14:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1693346276; x=1724882276;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UDLuiDS9MveSpZkSMoJ+lQBt3LONLtYyAY0wCeaSfxI=;
+  b=G4dcceXacljblUXneB8nUJFPUPuRvpMifTa+gVPAtWXPsQbenBQFMT4z
+   rl6DNvRNSJrkFGCJuMfZj8vLktp++eTxZsMrPdTRC+82ncL3rmD+Ix6yv
+   kodYT1PVpjnyYQ15SiAcLtmXCkaOc4bUrzxg6XkcvyVJtQc4xPWtKF7in
+   r8r1VZbXTvayE9wi47U0s8zuNXQ/RUz4zdlHC7iX3ZuWCZx4ogVExfyiS
+   P/c/OAar6f5LUQDPDlPubFRqNBKuzSR5K3QqOhmzS9VsLZRcl53y//Xr0
+   5FxId7MDWiMdO+/4BZlmRhdVEcCbASwKAoDgkX9IYI6W07GiX0mtvjLU6
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.02,211,1688454000"; 
+   d="scan'208";a="2002465"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 29 Aug 2023 14:57:55 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Tue, 29 Aug 2023 14:57:55 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Tue, 29 Aug 2023 14:57:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LfindMz7QaWdajQnccq/4XQE8RE7emRGB0MqmBmm5J0jfW2P0fc7ZMjU6RrTdyNTg0dK5NxaWuPLKyX/c4JPJJ6gNp8uqr5JMKd1UgNVMhTKlEaBb9uUjVXDmfZcEkmpz1QeXR0dRg4quTndBWLvvZMfXAgxkF6D77JLJM++hnJcDkVnmVXNZDwTiTQ92lH5dUytVdhdKl8f0cXWZN6Cj3CeH/bfLWBmZjmwHB/qH5D2CyRK6fu5B6jYyhc9cc58AIgXic0oYAHqb0vynxwisYXJU/qQ/EhS8FwSO9+2e+MNDi0ap9bLKJHSK7BW4Km6eQB4sxGJvk3oXjnurbsIIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EKkD6yTKZCa8FDT49yfTaGI71emPPJTOVbdLJGKkDqc=;
+ b=Vcx5RhfA/UDQpj28xQ7dyG2bOv6BpqjtmKBEbTV/Ovl2FxMJs0J19wiSjNT8o/p8XJXZhX3InHP3qtBFbN2bdlG/I6l2gjnPgwwPhM63X8wwniMgyYWBbJlCNeSFnSQMesNJWYd9p01LWGpFxejbjUlYFPjApKLEuKcXXWCxOe5xdg4i7RMhwOMnUjx+gYfT05+ANIZljZb+Zna6n6VjYn0u/Tzsdg4E4Yd7ZqaLjr1AehoVF29Hvx8UcaAx6Q+FHEvPGZpYWBJIJeaG79EmGjhrukzppPCwXyRrSwSvDd4Q11Tz2ceK8tn6HA5haVjEE1vlIqIv7smIvD+Uvmn3+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EKkD6yTKZCa8FDT49yfTaGI71emPPJTOVbdLJGKkDqc=;
+ b=ca+hsYTHTUE3YeQiAypTke/ey3cCvtQVK49cNwXvnFUCkdonU27uuyl9x+1kXW0Gi1w2ayK5hdnhjTqXyT4+BUcFDS7R0aGoqe/g2s4FEL/SJCGB30P/gu/H4FvHpEFKfw807VgqKMT4a4OQZ4CpPVou4JPDq0LDWR1CBg2eSAU=
+Received: from BYAPR11MB3558.namprd11.prod.outlook.com (2603:10b6:a03:b3::11)
+ by PH7PR11MB7098.namprd11.prod.outlook.com (2603:10b6:510:20d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Tue, 29 Aug
+ 2023 21:57:51 +0000
+Received: from BYAPR11MB3558.namprd11.prod.outlook.com
+ ([fe80::ceda:7787:e08b:7a19]) by BYAPR11MB3558.namprd11.prod.outlook.com
+ ([fe80::ceda:7787:e08b:7a19%7]) with mapi id 15.20.6699.034; Tue, 29 Aug 2023
+ 21:57:50 +0000
+From: <Tristram.Ha@microchip.com>
+To: <olteanv@gmail.com>
+CC: <f.fainelli@gmail.com>, <andrew@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <Woojung.Huh@microchip.com>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
+	<lukma@denx.de>
+Subject: RE: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Thread-Topic: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Thread-Index: AQHZ1qKWLyunbFo9dUGlg3dtAL+k26/6NENwgAB9tYCAAHHrgIAANckAgAEO8gCABXFuAA==
+Date: Tue, 29 Aug 2023 21:57:50 +0000
+Message-ID: <BYAPR11MB3558EFBB4DBC86AC3C338747ECE7A@BYAPR11MB3558.namprd11.prod.outlook.com>
+References: <20230824154827.166274-1-lukma@denx.de>
+ <20230824154827.166274-2-lukma@denx.de>
+ <BYAPR11MB35583A648E4E44944A0172A0ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <20230825103911.682b3d70@wsk>
+ <862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
+ <BYAPR11MB3558A24A05D30BA93408851EECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <20230826104910.voaw3ndvs52yoy2v@skbuf>
+In-Reply-To: <20230826104910.voaw3ndvs52yoy2v@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BYAPR11MB3558:EE_|PH7PR11MB7098:EE_
+x-ms-office365-filtering-correlation-id: 9f28cfed-090c-4830-ebb3-08dba8dafcee
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: se/7kAFlfgdXN8ogM8esNZT9pQjGRd72j9ky/FE309OdmqKqDN8yX3hlJi66dYV5//xXAr9vjXvGoY1VUuUOYMSY7oem7B2gscq1thbxOnb/OJ+IBwQDlVYkAcG+51RrFC5ZDDJ3w6Hz4/ySlXYJj8pRMEeik2UNRrtpJLeFNvw+eLlv13cbwu5oLnSnlW3PuLrI7QZjktwdxEzABfh824Je8w0Mtuv2mS+d0L53nOkQ5DMn8XerVnaMvoq+O2dQzcpVf5wy+rmupQG2Vz0nQ8t9getNOdB4OTHHjO7WIk0AxduWeQ+L1ncOIJSv9XnJqxzu1gsE1TXc5g1jTmPMf6FAEcmfVWS30TG/psxmpgK7w/O0uNOixhe7k6/PJa0uCCrKXMjwYrJjGOT+OLwM8+NJM7sHS0Uk1dDtiYffBrVZIQ+NwFEQ+g750/yYMBBwc3iwOV9qSYwApRQM68fZVHlqWVeKFVVvX8+GL38IjTuFkb+FtsRPubzzCmeplhFbkZPdNVZc9Io8VFBh3k3syNVt6ekuH8ZOQpzC+fnExdB3NEd5ka6MBx8go8SDjYqegC4e26TZCaekagB03bYbIdCL9m/GGEF+/ll2b/BsyN06NZWIe5XBYTGlqpM+DkLj
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3558.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(376002)(396003)(366004)(39860400002)(1800799009)(186009)(451199024)(8936002)(122000001)(66946007)(478600001)(76116006)(6506007)(64756008)(7696005)(71200400001)(66446008)(54906003)(66556008)(66476007)(6916009)(38070700005)(38100700002)(316002)(66899024)(41300700001)(9686003)(26005)(8676002)(5660300002)(52536014)(55016003)(2906002)(86362001)(83380400001)(7416002)(33656002)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6TqU2wmCpynnomuCLEl0eg2AXf4T6BMCTV8yBDH1oJ8o9Q+4IImyPvt1V4NO?=
+ =?us-ascii?Q?8C2tL+56V9D229uecIvNlpj3Mqj9+JxzoneGuCZyx+cshMwPlwiQniNpmIHJ?=
+ =?us-ascii?Q?VsxVF/vF4tohShd0brFBAC60KYrmE8lsQo5+wgcbIvae34DaZjjB3F2XYIfQ?=
+ =?us-ascii?Q?Sm+8A5GEBpbzJLpf6yZZzu3CbCP3/1/GKJCKQ9bFn3X+C4Zvgh9TkjyzBSYp?=
+ =?us-ascii?Q?Yu0qhL1XNm6pl/t7OsXgOKJnc+/UsoOqb398NcJyV2R6KXe7yx6te9hQkGxf?=
+ =?us-ascii?Q?MtZTyhA78pK3aLEUL5eLRB0Zbh6SgMasM9SGq/aGzNdPLuEunHQwNNa4vN4w?=
+ =?us-ascii?Q?1qDfRwQ66qevSVUojVIyMXOGs0Zetu0XlIXyt+FZPO2FUR8SYB1Uyet3/dme?=
+ =?us-ascii?Q?Yl85JPphvaayeUgxCt/ic28FtIKbFJEW6MFKNdybqlUmNN7igd1C9r2PyTtx?=
+ =?us-ascii?Q?Bx930JVUKgk3K87RQKm2Qz/UZe5I6LEznqqBLpo0knFPDcfnCMX1bfENVsHH?=
+ =?us-ascii?Q?XOcx6r/ArttSub61pTh1RFx7W8KQeW67/V1WCdrqZi4amTz+XLGZUit9rTGr?=
+ =?us-ascii?Q?QGuA/jvDGQYd8HbrGTVoeYrsv56a6TCNGl28VHUvr0od8QQgLc1Xn1+Nc182?=
+ =?us-ascii?Q?B/K1IN4lJcsPvvwriONIyiqajz6JLPmmZ+N2jr3kRo8ldbbFDPzfQrNDC45Q?=
+ =?us-ascii?Q?2cxyeTZLIzEry7bYd3jdtqCdiybBo+JRxCVJ1HipBz66HldoMKeSwN2QNy8l?=
+ =?us-ascii?Q?mz4wNwCY9HP6idvI+if6zEjXjRWtjGNZ2n/YXcE7/PHmXZynRsOqznCp8Gme?=
+ =?us-ascii?Q?gBZI3E0t9t0zHH/fgWYjXtO0JCmIO0X6eMZlSG1z1aysw3Sw7OXPn8r3jizv?=
+ =?us-ascii?Q?Ti13+Q6c8aQK3aKUZCpNM6+Mm4Wr9QbtkSHkKyQYtBksRvW11rKoIJO8t2GM?=
+ =?us-ascii?Q?Gyx1FyF13APmLah90DYTZb6i+YiiLQqFxPHGbjmatfowK+n1ajqJp3iS2fMk?=
+ =?us-ascii?Q?JkN7eZk6se5j9KF3wtWXClBqkw9/MySThl4pur2jeKfBn3uStFo4gZrUPS8f?=
+ =?us-ascii?Q?xjVUBpjqkePNKy2/tzrdplwpUGhpQAJkCgRag0wDmTy7ZpP/28+2H5dK/pYD?=
+ =?us-ascii?Q?BjZlL6I2C5wimQnWrXjmTO0gHfUThXRbso4w9KKLCgkT6i5FoapnGxG8k2qI?=
+ =?us-ascii?Q?w06GP9VnENFnAWIphdjGs/IzAxKiyCANHFhgPHCSj1d44N/jDSvo5uTXK80w?=
+ =?us-ascii?Q?wjD331+lByh76ZGcteIv0khCHkdMWYURWa6LxmjxA6x6ZkdIgSFXMT2RW6a5?=
+ =?us-ascii?Q?/976qNgAhzGcHlpbrFiEcjAwVGv1AU4AZmP4BmD+GQgEhXrGZjDCsYwaynoQ?=
+ =?us-ascii?Q?1NeZq4r48+/iBrcy+DnSSK8Ff0rpaSwJYkv5ClALVLhHvPKxa2nhaP0msDF+?=
+ =?us-ascii?Q?Z+9N6s3CBZY5u234akU7gfIZ5AL8JAo7CUxXnuvK495dySBtjOQJRMQ/xzpx?=
+ =?us-ascii?Q?Ahc0ejqCzTvu7+CkTw4Z/ajVvmg2jUW1uLlW6KIYOBRbiOOoMAg6LGxTxnEH?=
+ =?us-ascii?Q?+naJtURnxugAq8/krPRxvOBRjLwbDcAdfXzVdW8A?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3558.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f28cfed-090c-4830-ebb3-08dba8dafcee
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2023 21:57:50.2706
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EVPESPGByfnlD7DrEzHH9d36dllfVc1sZNRdcVk05CMpJBnJ3jtgN2it3/gDvM3zMZdd0uVGE1rwwdiK85F9t2/UCfvGOk2DETWniMO6BaE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7098
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
+> On Fri, Aug 25, 2023 at 06:48:41PM +0000, Tristram.Ha@microchip.com wrote=
+:
+> > > > IMHO adding functions to MMD modification would facilitate further
+> > > > development (for example LED setup).
+> > >
+> > > We already have some KSZ9477 specific initialization done in the Micr=
+el
+> > > PHY driver under drivers/net/phy/micrel.c, can we converge on the PHY
+> > > driver which has a reasonable amount of infrastructure for dealing wi=
+th
+> > > workarounds, indirect or direct MMD accesses etc.?
+> >
+> > Actually the internal PHY used in the KSZ9897/KSZ9477/KSZ9893 switches
+> > are special and only used inside those switches.  Putting all the switc=
+h
+> > related code in Micrel PHY driver does not really help.  When the switc=
+h
+> > is reset all those PHY registers need to be set again, but the PHY driv=
+er
+> > only executes those code during PHY initialization.  I do not know if
+> > there is a good way to tell the PHY to re-initialize again.
+>=20
+> Suppose there was a method to tell the PHY driver to re-initialize itself=
+.
+> What would be the key points in which the DSA switch driver would need
+> to trigger that method? Where is the switch reset at runtime?
 
-  Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
+Currently the DSA switch driver loads independently and is then
+controlled by the main DSA driver.  The switch is reset during
+initialization, and later the PHYs are initialized.  I was talking
+hypothetically that the switch may need to be reset to correct some
+hardware problems, but then there may be no good way to tell the PHYs to
+re-initialize.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/ tags/sysctl-6.6-rc1
-
-for you to fetch changes up to 53f3811dfd5e39507ee3aaea1be09aabce8f9c98:
-
-  sysctl: Use ctl_table_size as stopping criteria for list macro (2023-08-15 15:26:18 -0700)
-
-----------------------------------------------------------------
-sysctl-6.6-rc1
-
-Long ago we set out to remove the kitchen sink on kernel/sysctl.c arrays and
-placings sysctls to their own sybsystem or file to help avoid merge conflicts.
-Matthew Wilcox pointed out though that if we're going to do that we might as
-well also *save* space while at it and try to remove the extra last sysctl
-entry added at the end of each array, a sentintel, instead of bloating the
-kernel by adding a new sentinel with each array moved.
-
-Doing that was not so trivial, and has required slowing down the moves of
-kernel/sysctl.c arrays and measuring the impact on size by each new move.
-
-The complex part of the effort to help reduce the size of each sysctl is being
-done by the patient work of el señor Don Joel Granados. A lot of this is truly
-painful code refactoring and testing and then trying to measure the savings of
-each move and removing the sentinels. Although Joel already has code which does
-most of this work, experience with sysctl moves in the past shows is we need to
-be careful due to the slew of odd build failures that are possible due to the
-amount of random Kconfig options sysctls use.
-
-To that end Joel's work is split by first addressing the major housekeeping
-needed to remove the sentinels, which is part of this merge request. The rest
-of the work to actually remove the sentinels will be done later in future
-kernel releases.
-
-At first I was only going to send his first 7 patches of his patch series,
-posted 1 month ago, but in retrospect due to the testing the changes have
-received in linux-next and the minor changes they make this goes with the
-entire set of patches Joel had planned: just sysctl house keeping. There are
-networking changes but these are part of the house keeping too.
-
-The preliminary math is showing this will all help reduce the overall build
-time size of the kernel and run time memory consumed by the kernel by about
-~64 bytes per array where we are able to remove each sentinel in the future.
-That also means there is no more bloating the kernel with the extra ~64 bytes
-per array moved as no new sentinels are created.
-
-Most of this has been in linux-next for about a month, the last 7 patches took
-a minor refresh 2 week ago based on feedback.
-
-----------------------------------------------------------------
-Joel Granados (14):
-      sysctl: Prefer ctl_table_header in proc_sysctl
-      sysctl: Use ctl_table_header in list_for_each_table_entry
-      sysctl: Add ctl_table_size to ctl_table_header
-      sysctl: Add size argument to init_header
-      sysctl: Add a size arg to __register_sysctl_table
-      sysctl: Add size to register_sysctl
-      sysctl: Add size arg to __register_sysctl_init
-      sysctl: Add size to register_net_sysctl function
-      ax.25: Update to register_net_sysctl_sz
-      netfilter: Update to register_net_sysctl_sz
-      networking: Update to register_net_sysctl_sz
-      vrf: Update to register_net_sysctl_sz
-      sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
-      sysctl: Use ctl_table_size as stopping criteria for list macro
-
- arch/arm64/kernel/armv8_deprecated.c    |  2 +-
- arch/s390/appldata/appldata_base.c      |  2 +-
- drivers/net/vrf.c                       |  3 +-
- fs/proc/proc_sysctl.c                   | 90 +++++++++++++++++----------------
- include/linux/sysctl.h                  | 31 +++++++++---
- include/net/ipv6.h                      |  2 +
- include/net/net_namespace.h             | 10 ++--
- ipc/ipc_sysctl.c                        |  4 +-
- ipc/mq_sysctl.c                         |  4 +-
- kernel/ucount.c                         |  5 +-
- net/ax25/sysctl_net_ax25.c              |  3 +-
- net/bridge/br_netfilter_hooks.c         |  3 +-
- net/core/neighbour.c                    |  8 ++-
- net/core/sysctl_net_core.c              |  3 +-
- net/ieee802154/6lowpan/reassembly.c     |  8 ++-
- net/ipv4/devinet.c                      |  3 +-
- net/ipv4/ip_fragment.c                  |  3 +-
- net/ipv4/route.c                        |  8 ++-
- net/ipv4/sysctl_net_ipv4.c              |  3 +-
- net/ipv4/xfrm4_policy.c                 |  3 +-
- net/ipv6/addrconf.c                     |  3 +-
- net/ipv6/icmp.c                         |  5 ++
- net/ipv6/netfilter/nf_conntrack_reasm.c |  3 +-
- net/ipv6/reassembly.c                   |  3 +-
- net/ipv6/route.c                        |  9 ++++
- net/ipv6/sysctl_net_ipv6.c              | 16 ++++--
- net/ipv6/xfrm6_policy.c                 |  3 +-
- net/mpls/af_mpls.c                      |  6 ++-
- net/mptcp/ctrl.c                        |  3 +-
- net/netfilter/ipvs/ip_vs_ctl.c          |  8 ++-
- net/netfilter/ipvs/ip_vs_lblc.c         | 10 ++--
- net/netfilter/ipvs/ip_vs_lblcr.c        | 10 ++--
- net/netfilter/nf_conntrack_standalone.c |  4 +-
- net/netfilter/nf_log.c                  |  7 +--
- net/rds/tcp.c                           |  3 +-
- net/sctp/sysctl.c                       |  4 +-
- net/smc/smc_sysctl.c                    |  3 +-
- net/sysctl_net.c                        | 26 +++++++---
- net/unix/sysctl_net_unix.c              |  3 +-
- net/xfrm/xfrm_sysctl.c                  |  8 ++-
- 40 files changed, 222 insertions(+), 113 deletions(-)
 
