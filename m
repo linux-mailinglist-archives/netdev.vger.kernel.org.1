@@ -1,228 +1,368 @@
-Return-Path: <netdev+bounces-31182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4837778C278
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:42:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 270AF78C2D5
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1E0728100C
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:41:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498341C209E7
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2DC15496;
-	Tue, 29 Aug 2023 10:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B9615495;
+	Tue, 29 Aug 2023 10:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D36E1548A
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:41:01 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 003F71A3
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 03:40:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693305659; x=1724841659;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lNEo+vH44CIJL7CnGfkHcb621MNdtgwunz1RpSYwxVM=;
-  b=VIvf0OrOjF3CHYBEDVrNW9jlzCf41CUuivTkRoZbZF6dAjmsZ4Wsxlb6
-   +fHhikampcl3LyRDmrAz1dy8poK/AMeGDYQvYnLTmT0CXSoK+3VWfYNSD
-   O/yTuMuBOYyg7bK/yOLiEuO2tXI09mUe5bzDEE2XbEHCZ4Uo+xeFzLOrg
-   VEZH08mMfHiH7f44MVHHpfVPBNmiwWyeJr0UoGVY8VfhYTkdyuLDLfIXM
-   oRNWlE4RVdslqdV61t70EMrRF/ksnB4N+ixLj8Or4OOhR+lrx3av9n3Xn
-   Gna1pZCpTZi4KS5j/73p1+Xcx0VAj9cNinQj3PNvWqZ+GRGbb1J3ywyz/
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="461696879"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="461696879"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 03:40:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="853229774"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="853229774"
-Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by fmsmga002.fm.intel.com with ESMTP; 29 Aug 2023 03:40:58 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A360216403
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:55:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA40C433CD;
+	Tue, 29 Aug 2023 10:54:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693306500;
+	bh=A+5nG12JdLHOmwCPVbQZNkwbQxDQAPFkHb/v3gCs8sA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=W2ahLA50bma1QLPHaodGNXXSV9T3Q9UY5bvsW9kd9ssS5ERdVxc5LKzU9OKNxHUPk
+	 xkBMSxO3OdAotiptLyxdrh/+f44tlMwQnAhWHgkHSEyhGkizAm02Xb3yNGMbUVveNG
+	 xNI2tCNpU9yWqR0Fzdj6SgQ5KvdNhG4EKB9Dt03v4BayQtWFmRRwsrTrHRxl7JNISE
+	 PBYYlL79dMb4yLFQzIS2pXQlfH8POXzBtDMKyD2h6Q0oorALpq/c2XzMnsId0aarMx
+	 4f+Qzr1MLHLvhZ9egLBqNchukFGBT2VvGKJ9sov1lstK6/L9m/L8TIwq4iIDHPsfKN
+	 y7DWptTT7d9PA==
+From: Jisheng Zhang <jszhang@kernel.org>
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Vladimir Zapolskiy <vz@mleia.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	jesse.brandeburg@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v4 iwl-next 03/11] ice: pass reset type to PTP reset functions
-Date: Tue, 29 Aug 2023 12:40:33 +0200
-Message-Id: <20230829104041.64131-4-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230829104041.64131-1-karol.kolacinski@intel.com>
-References: <20230829104041.64131-1-karol.kolacinski@intel.com>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 22/22] net: stmmac: rename stmmac_pltfr_remove_no_dt to stmmac_pltfr_remove
+Date: Tue, 29 Aug 2023 18:40:33 +0800
+Message-Id: <20230829104033.955-23-jszhang@kernel.org>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230829104033.955-1-jszhang@kernel.org>
+References: <20230829104033.955-1-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+Now, all users of the old stmmac_pltfr_remove() are converted to the
+devres helper, it's time to rename stmmac_pltfr_remove_no_dt() back to
+stmmac_pltfr_remove() and remove the old stmmac_pltfr_remove().
 
-The ice_ptp_prepare_for_reset() and ice_ptp_reset() functions currently
-check the pf->flags ICE_FLAG_PFR_REQ bit to determine if the current
-reset is a PF reset or not.
-
-This is problematic, because it is possible that a PF reset and a higher
-level reset (CORE reset, GLOBAL reset, EMP reset) are requested
-simultaneously. In that case, the driver performs the highest level
-reset requested. However, the ICE_FLAG_PFR_REQ flag will still be set.
-
-The main driver reset functions take an enum ice_reset_req indicating
-which reset is actually being performed. Pass this data into the PTP
-functions and rely on this instead of relying on the driver flags.
-
-This ensures that the PTP code performs the proper level of reset that
-the driver is actually undergoing.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c |  4 ++--
- drivers/net/ethernet/intel/ice/ice_ptp.c  | 17 ++++++++---------
- drivers/net/ethernet/intel/ice/ice_ptp.h  | 16 ++++++++++++----
- 3 files changed, 22 insertions(+), 15 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-anarion.c   |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-imx.c   |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-ingenic.c   |  2 +-
+ .../stmicro/stmmac/dwmac-intel-plat.c         |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-meson.c |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-meson8b.c   |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-tegra.c |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-visconti.c  |  2 +-
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++----------------
+ .../ethernet/stmicro/stmmac/stmmac_platform.h |  1 -
+ 17 files changed, 18 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 8f327ad5b569..0ef765db008b 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -611,7 +611,7 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	ice_pf_dis_all_vsi(pf, false);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
+index 0df3a2ad0986..643ee6d8d4dd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
+@@ -135,7 +135,7 @@ MODULE_DEVICE_TABLE(of, anarion_dwmac_match);
  
- 	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
--		ice_ptp_prepare_for_reset(pf);
-+		ice_ptp_prepare_for_reset(pf, reset_type);
+ static struct platform_driver anarion_dwmac_driver = {
+ 	.probe  = anarion_dwmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name           = "anarion-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+index f4c817e9fc13..abf8cdb3c625 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+@@ -418,7 +418,7 @@ MODULE_DEVICE_TABLE(of, imx_dwmac_match);
  
- 	if (ice_is_feature_supported(pf, ICE_F_GNSS))
- 		ice_gnss_exit(pf);
-@@ -7403,7 +7403,7 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	 * fail.
- 	 */
- 	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
--		ice_ptp_reset(pf);
-+		ice_ptp_reset(pf, reset_type);
+ static struct platform_driver imx_dwmac_driver = {
+ 	.probe  = imx_dwmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name           = "imx-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+index ddfd7af63492..21dfd9bd40ad 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+@@ -370,7 +370,7 @@ MODULE_DEVICE_TABLE(of, ingenic_mac_of_matches);
  
- 	if (ice_is_feature_supported(pf, ICE_F_GNSS))
- 		ice_gnss_init(pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 159885d48411..a9c5552dd0d3 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2462,8 +2462,10 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- /**
-  * ice_ptp_prepare_for_reset - Prepare PTP for reset
-  * @pf: Board private structure
-+ * @reset_type: the reset type being performed
-  */
--void ice_ptp_prepare_for_reset(struct ice_pf *pf)
-+void
-+ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ static struct platform_driver ingenic_mac_driver = {
+ 	.probe		= ingenic_mac_probe,
+-	.remove_new	= stmmac_pltfr_remove_no_dt,
++	.remove_new	= stmmac_pltfr_remove,
+ 	.driver		= {
+ 		.name	= "ingenic-mac",
+ 		.pm		= pm_ptr(&ingenic_mac_pm_ops),
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
+index d1aec2ca2b42..70edc5232379 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
+@@ -164,7 +164,7 @@ static void intel_eth_plat_remove(struct platform_device *pdev)
  {
- 	struct ice_ptp *ptp = &pf->ptp;
- 	u8 src_tmr;
-@@ -2478,7 +2480,7 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf)
+ 	struct intel_dwmac *dwmac = get_stmmac_bsp_priv(&pdev->dev);
  
- 	kthread_cancel_delayed_work_sync(&ptp->work);
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ 	clk_disable_unprepare(dwmac->tx_clk);
+ }
  
--	if (test_bit(ICE_PFR_REQ, pf->state))
-+	if (reset_type == ICE_RESET_PFR)
- 		return;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
+index a9916fd07616..281687d7083b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
+@@ -487,7 +487,7 @@ MODULE_DEVICE_TABLE(of, ipq806x_gmac_dwmac_match);
  
- 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
-@@ -2498,8 +2500,9 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf)
- /**
-  * ice_ptp_reset - Initialize PTP hardware clock support after reset
-  * @pf: Board private structure
-+ * @reset_type: the reset type being performed
-  */
--void ice_ptp_reset(struct ice_pf *pf)
-+void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ static struct platform_driver ipq806x_gmac_dwmac_driver = {
+ 	.probe = ipq806x_gmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name		= "ipq806x-gmac-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
+index 5d4936642de5..802024583d50 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
+@@ -72,7 +72,7 @@ MODULE_DEVICE_TABLE(of, lpc18xx_dwmac_match);
+ 
+ static struct platform_driver lpc18xx_dwmac_driver = {
+ 	.probe  = lpc18xx_dwmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name           = "lpc18xx-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
+index 1c37df6d22b3..6d6f08a6a4c7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
+@@ -683,7 +683,7 @@ static void mediatek_dwmac_remove(struct platform_device *pdev)
  {
- 	struct ice_ptp *ptp = &pf->ptp;
- 	struct ice_hw *hw = &pf->hw;
-@@ -2509,7 +2512,7 @@ void ice_ptp_reset(struct ice_pf *pf)
+ 	struct mediatek_dwmac_plat_data *priv_plat = get_stmmac_bsp_priv(&pdev->dev);
  
- 	if (ptp->state != ICE_PTP_RESETTING) {
- 		if (ptp->state == ICE_PTP_READY) {
--			ice_ptp_prepare_for_reset(pf);
-+			ice_ptp_prepare_for_reset(pf, reset_type);
- 		} else {
- 			err = -EINVAL;
- 			dev_err(ice_pf_to_dev(pf), "PTP was not initialized\n");
-@@ -2517,12 +2520,9 @@ void ice_ptp_reset(struct ice_pf *pf)
- 		}
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ 	mediatek_dwmac_clks_config(priv_plat, false);
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
+index 3373d3ec2368..a16bfa9089ea 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
+@@ -78,7 +78,7 @@ MODULE_DEVICE_TABLE(of, meson6_dwmac_match);
+ 
+ static struct platform_driver meson6_dwmac_driver = {
+ 	.probe  = meson6_dwmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name           = "meson6-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
+index 37f249980929..b23944aa344e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
+@@ -520,7 +520,7 @@ MODULE_DEVICE_TABLE(of, meson8b_dwmac_match);
+ 
+ static struct platform_driver meson8b_dwmac_driver = {
+ 	.probe  = meson8b_dwmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name           = "meson8b-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 6d5e45fb54c9..aac69e2766ba 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -500,7 +500,7 @@ static void socfpga_dwmac_remove(struct platform_device *pdev)
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
+ 	struct phylink_pcs *pcs = priv->hw->lynx_pcs;
+ 
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ 
+ 	lynx_pcs_destroy(pcs);
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+index 76f3a36f32c7..6096e515f877 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+@@ -152,7 +152,7 @@ MODULE_DEVICE_TABLE(of, starfive_dwmac_match);
+ 
+ static struct platform_driver starfive_dwmac_driver = {
+ 	.probe  = starfive_dwmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name = "starfive-dwmac",
+ 		.pm = &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index bfe49b5a9929..d9f241b5c38c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -1312,7 +1312,7 @@ static void sun8i_dwmac_remove(struct platform_device *pdev)
+ 		clk_put(gmac->ephy_clk);
  	}
  
--	if (test_bit(ICE_PFR_REQ, pf->state))
-+	if (reset_type == ICE_RESET_PFR || !ice_pf_src_tmr_owned(pf))
- 		goto pfr;
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ 	sun8i_dwmac_unset_syscon(gmac);
+ }
  
--	if (!ice_pf_src_tmr_owned(pf))
--		goto reset_ts;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
+index b857235f5b1f..2653a9f0958c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
+@@ -172,7 +172,7 @@ MODULE_DEVICE_TABLE(of, sun7i_dwmac_match);
+ 
+ static struct platform_driver sun7i_dwmac_driver = {
+ 	.probe  = sun7i_gmac_probe,
+-	.remove_new = stmmac_pltfr_remove_no_dt,
++	.remove_new = stmmac_pltfr_remove,
+ 	.driver = {
+ 		.name           = "sun7i-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+index 7e512c0762ea..362f85136c3e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+@@ -358,7 +358,7 @@ static void tegra_mgbe_remove(struct platform_device *pdev)
+ 
+ 	clk_bulk_disable_unprepare(ARRAY_SIZE(mgbe_clks), mgbe->clks);
+ 
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ }
+ 
+ static const struct of_device_id tegra_mgbe_match[] = {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
+index 75fafd23385a..b2942fc76445 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
+@@ -259,7 +259,7 @@ static void visconti_eth_dwmac_remove(struct platform_device *pdev)
+ 	struct net_device *ndev = platform_get_drvdata(pdev);
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
+ 
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ 
+ 	visconti_eth_clock_remove(pdev);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index ff330423ee66..4950ec2c69ce 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -808,7 +808,7 @@ static void devm_stmmac_pltfr_remove(void *data)
+ {
+ 	struct platform_device *pdev = data;
+ 
+-	stmmac_pltfr_remove_no_dt(pdev);
++	stmmac_pltfr_remove(pdev);
+ }
+ 
+ /**
+@@ -835,12 +835,12 @@ int devm_stmmac_pltfr_probe(struct platform_device *pdev,
+ EXPORT_SYMBOL_GPL(devm_stmmac_pltfr_probe);
+ 
+ /**
+- * stmmac_pltfr_remove_no_dt
++ * stmmac_pltfr_remove
+  * @pdev: pointer to the platform device
+  * Description: This undoes the effects of stmmac_pltfr_probe() by removing the
+  * driver and calling the platform's exit() callback.
+  */
+-void stmmac_pltfr_remove_no_dt(struct platform_device *pdev)
++void stmmac_pltfr_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *ndev = platform_get_drvdata(pdev);
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
+@@ -849,23 +849,6 @@ void stmmac_pltfr_remove_no_dt(struct platform_device *pdev)
+ 	stmmac_dvr_remove(&pdev->dev);
+ 	stmmac_pltfr_exit(pdev, plat);
+ }
+-EXPORT_SYMBOL_GPL(stmmac_pltfr_remove_no_dt);
 -
- 	err = ice_ptp_init_phc(hw);
- 	if (err)
- 		goto err;
-@@ -2566,7 +2566,6 @@ void ice_ptp_reset(struct ice_pf *pf)
- 			goto err;
- 	}
+-/**
+- * stmmac_pltfr_remove
+- * @pdev: platform device pointer
+- * Description: this function calls the main to free the net resources
+- * and calls the platforms hook and release the resources (e.g. mem).
+- */
+-void stmmac_pltfr_remove(struct platform_device *pdev)
+-{
+-	struct net_device *ndev = platform_get_drvdata(pdev);
+-	struct stmmac_priv *priv = netdev_priv(ndev);
+-	struct plat_stmmacenet_data *plat = priv->plat;
+-
+-	stmmac_pltfr_remove_no_dt(pdev);
+-	stmmac_remove_config_dt(pdev, plat);
+-}
+ EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
  
--reset_ts:
- 	/* Restart the PHY timestamping block */
- 	ice_ptp_reset_phy_timestamping(pf);
+ /**
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
+index c5565b2a70ac..bb07a99e1248 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
+@@ -32,7 +32,6 @@ int stmmac_pltfr_probe(struct platform_device *pdev,
+ int devm_stmmac_pltfr_probe(struct platform_device *pdev,
+ 			    struct plat_stmmacenet_data *plat,
+ 			    struct stmmac_resources *res);
+-void stmmac_pltfr_remove_no_dt(struct platform_device *pdev);
+ void stmmac_pltfr_remove(struct platform_device *pdev);
+ extern const struct dev_pm_ops stmmac_pltfr_pm_ops;
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 674a0abe3cdd..48c0d56c0568 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -311,8 +311,9 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
- void
- ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
- 		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb);
--void ice_ptp_reset(struct ice_pf *pf);
--void ice_ptp_prepare_for_reset(struct ice_pf *pf);
-+void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type);
-+void ice_ptp_prepare_for_reset(struct ice_pf *pf,
-+			       enum ice_reset_req reset_type);
- void ice_ptp_init(struct ice_pf *pf);
- void ice_ptp_release(struct ice_pf *pf);
- void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup);
-@@ -343,8 +344,15 @@ static inline bool ice_ptp_process_ts(struct ice_pf *pf)
- static inline void
- ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
- 		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb) { }
--static inline void ice_ptp_reset(struct ice_pf *pf) { }
--static inline void ice_ptp_prepare_for_reset(struct ice_pf *pf) { }
-+static inline void ice_ptp_reset(struct ice_pf *pf,
-+				 enum ice_reset_req reset_type)
-+{
-+}
-+
-+static inline void ice_ptp_prepare_for_reset(struct ice_pf *pf,
-+					     enum ice_reset_req reset_type)
-+{
-+}
- static inline void ice_ptp_init(struct ice_pf *pf) { }
- static inline void ice_ptp_release(struct ice_pf *pf) { }
- static inline void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
 -- 
-2.39.2
+2.40.1
 
 
